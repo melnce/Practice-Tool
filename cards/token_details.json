@@ -30,7 +30,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90004110-silent-rider",
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "name": "Servant of Cocytus",
@@ -62,8 +64,19 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90004130-demon-of-purgatory",
-    "fanfare": [{"op": "damage", "target": "enemy:follower", "amount": 6, "select": 2}, 
-                {"op": "damage", "target": "enemy:leader", "amount": 6}],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6,
+        "select": 2
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 6
+      }
+    ],
     "keywords": []
   },
   {
@@ -81,13 +94,13 @@
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90004310-astaroths-reckoning",
     "keywords": [],
-     "spell": [
-    {
-      "op": "set_max_hp",
-      "player": "opponent",
-      "amount": 1
-    }
-  ]
+    "spell": [
+      {
+        "op": "set_max_hp",
+        "player": "opponent",
+        "amount": 1
+      }
+    ]
   },
   {
     "name": "Fairy",
@@ -105,7 +118,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90011110-fairy",
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "name": "Deepwood Bounty",
@@ -122,7 +137,11 @@
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90011310-deepwood-bounty",
     "spell": [
-      { "op": "heal_leader", "player": "self", "amount": 1 }
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 1
+      }
     ]
   },
   {
@@ -140,13 +159,13 @@
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90014310-bramble-burst",
     "spell": [
-        {
-            "op": "damage_follower_or_leader",
-            "target": "enemy:follower",
-            "amount": 3,
-            "select": 1,
-            "can_target_leader": true
-        }
+      {
+        "op": "damage_follower_or_leader",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1,
+        "can_target_leader": true
+      }
     ]
   },
   {
@@ -206,12 +225,21 @@
         "op": "board_name_gate",
         "name": "Prim, Princess's Picnic",
         "effects": [
-          { "op": "buff_self", "attack": 1, "defense": 1 },
-          { "op": "keyword_self", "keyword": "Bane" }
+          {
+            "op": "buff_self",
+            "attack": 1,
+            "defense": 1
+          },
+          {
+            "op": "keyword_self",
+            "keyword": "Bane"
+          }
         ]
       }
-  ],
-    "keywords": ["Ward"]
+    ],
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "name": "Clay Golem",
@@ -247,7 +275,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90031120-guardian-golem",
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "name": "Paper Shikigami",
@@ -265,9 +295,18 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90031130-paper-shikigami",
-    "keywords": ["Rush", { "name": "LastWords", "effects": [
-        { "op": "spellboost_hand", "times": 1 }
-      ]}]
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "spellboost_hand",
+            "times": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Demonic Shikigami",
@@ -285,12 +324,19 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031140_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90031140-demonic-shikigami",
-    "keywords": ["Rush", { "name": "LastWords", "effects": [
-        { "op": "spellboost_hand", "times": 1 }
-      ]}]
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "spellboost_hand",
+            "times": 1
+          }
+        ]
+      }
+    ]
   },
-
-
   {
     "name": "Magic Sediment",
     "cost": "1",
@@ -309,9 +355,24 @@
     "url": "https://shadowverse.gg/cards/90031210-magic-sediment",
     "engageSacrifice": false,
     "keywords": [
-      { "name": "Counter", "key": "earth", "count": 1, "destroyOnEmpty": true },
-      { "name": "Engage", "cost": 1, "effects": [ { "op": "add_counter", "key": "earth", "amount": 1 } ] }
-      ]
+      {
+        "name": "Counter",
+        "key": "earth",
+        "count": 1,
+        "destroyOnEmpty": true
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "add_counter",
+            "key": "earth",
+            "amount": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Onion Patch",
@@ -327,14 +388,21 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90032110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90032110-onion-patch",
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "strike",
         "source": "board",
         "effects": [
-          { "op": "spellboost_hand", "times": 1 }] }
-                 ]    
+          {
+            "op": "spellboost_hand",
+            "times": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Looking Smart!",
@@ -352,7 +420,17 @@
     "evo_image": "",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90033310-looking-smart",
-    "spell": [{ "op": "draw", "count": 2 }, { "op": "damage_random", "target": "enemy:follower", "amount": 2 }]
+    "spell": [
+      {
+        "op": "draw",
+        "count": 2
+      },
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 2
+      }
+    ]
   },
   {
     "name": "Celestial Shikigami",
@@ -370,9 +448,18 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90034110-celestial-shikigami",
-    "keywords": ["Ward", { "name": "LastWords", "effects": [
-        { "op": "spellboost_hand", "times": 3 }
-      ]}]
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "spellboost_hand",
+            "times": 3
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Noble Shikigami",
@@ -390,7 +477,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90034120-noble-shikigami",
-    "keywords": ["Ward", "Aura"]
+    "keywords": [
+      "Ward",
+      "Aura"
+    ]
   },
   {
     "name": "Anne's Summoning",
@@ -408,19 +498,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90034130-annes-summoning",
-    "keywords": ["Rush", "Ward"],
+    "keywords": [
+      "Rush",
+      "Ward"
+    ],
     "triggers": [
-                {
-                  "event": "end_of_turn",
-                  "source": "board",
-                  "condition": { "whose_turn": "opponent" },
-                  "effects": [
-                    {
-                      "op": "destroy_self"
-                    }
-                  ]
-                }
-              ]
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "opponent"
+        },
+        "effects": [
+          {
+            "op": "destroy_self"
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Fire Drake Whelp",
@@ -436,7 +531,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90041110-fire-drake-whelp",
-    "keywords": ["Intimidate"]
+    "keywords": [
+      "Intimidate"
+    ]
   },
   {
     "name": "Vastwing Dragon",
@@ -452,7 +549,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90041120-vastwing-dragon",
-    "keywords": ["Intimidate"]
+    "keywords": [
+      "Intimidate"
+    ]
   },
   {
     "name": "Majestic Megalorca",
@@ -470,7 +569,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90041130-majestic-megalorca",
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "name": "Otohime's Bodyguard",
@@ -488,7 +589,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90043110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90043110-otohimes-bodyguard",
-    "keywords": ["Storm", "Ward"]
+    "keywords": [
+      "Storm",
+      "Ward"
+    ]
   },
   {
     "name": "Supreme Golden Dragon",
@@ -504,7 +608,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90044110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90044110-supreme-golden-dragon",
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "name": "Supreme Silver Dragon",
@@ -520,7 +626,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90044120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90044120-supreme-silver-dragon",
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "name": "Whitefrost Whisper",
@@ -538,31 +646,33 @@
     "url": "https://shadowverse.gg/cards/90044310-whitefrost-whisper",
     "keywords": [],
     "spell": [
-            {
-              "op": "choose",
-              "options": [
-                {
-                  "label": "Destroy all damaged enemy followers",
-                  "effects": [
-                    {
-                      "op": "destroy_all",
-                      "target": "enemy:follower",
-                      "condition": { "damaged": true }
-                    }
-                  ]
-                },
-                {
-                  "label": "Increase the cost of all cards in your opponent's hand by 1 until the end of their turn",
-                  "effects": [
-                    {
-                      "op": "increase_opponent_hand_cost_eot",
-                      "amount": 1
-                    }
-                  ]
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Destroy all damaged enemy followers",
+            "effects": [
+              {
+                "op": "destroy_all",
+                "target": "enemy:follower",
+                "condition": {
+                  "damaged": true
                 }
-              ]
-            }
-          ]
+              }
+            ]
+          },
+          {
+            "label": "Increase the cost of all cards in your opponent's hand by 1 until the end of their turn",
+            "effects": [
+              {
+                "op": "increase_opponent_hand_cost_eot",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Skeleton",
@@ -596,7 +706,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90051120-bat",
-    "keywords": ["Drain"]
+    "keywords": [
+      "Drain"
+    ]
   },
   {
     "name": "Ghost",
@@ -614,19 +726,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90051130-ghost",
-    "keywords": ["Storm", "BanishOnDeath"],
+    "keywords": [
+      "Storm",
+      "BanishOnDeath"
+    ],
     "triggers": [
-        {
-          "event": "end_of_turn",
-          "source": "board",
-          "condition": { "whose_turn": "owner" },
-          "effects": [
-            {
-              "op": "banish_self"
-            }
-          ]
-        }
-      ]
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "banish_self"
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Rotting Zombie",
@@ -644,13 +761,23 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051140_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90051140-rotting-zombie",
-    "keywords": [{
-                  "name": "LastWords",
-                  "effects": [
-                    { "op": "summon_named", "name": "Rotting Zombie", "count": 1 },
-                    { "op": "remove_keyword", "target": "ally:last_summoned", "keyword": "LastWords" }
-                  ]
-                }]
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Rotting Zombie",
+            "count": 1
+          },
+          {
+            "op": "remove_keyword",
+            "target": "ally:last_summoned",
+            "keyword": "LastWords"
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Mimi, Right Paw Hellhound",
@@ -666,8 +793,19 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90054110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90054110-mimi-right-paw-hellhound",
-    "keywords": ["Rush", {"name": "LastWords", "effects": [
-            { "op": "damage", "target": "enemy:leader", "amount": 2 }]}]
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Coco, Left Paw Hellhound",
@@ -683,8 +821,19 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90054120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90054120-coco-left-paw-hellhound",
-    "keywords": ["Rush", {"name": "LastWords", "effects": [
-            { "op": "heal_leader", "player": "self", "amount": 2 }]}]
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "One-Tailed Fox",
@@ -700,20 +849,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90054130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90054130-one-tailed-fox",
-    "keywords": ["Rush", "Ward",  {
-      "name": "LastWords",
-      "effects": [
-        {
-          "op": "buff",
-          "target": "ally:follower",
-          "random": true,
-          "count": 1,
-          "attack": 1,
-          "defense": 0,
-          "name_filter": "Ginsetsu & Yuzuki, Twin Calamities"
-        }
-      ]
-    }]
+    "keywords": [
+      "Rush",
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "buff",
+            "target": "ally:follower",
+            "random": true,
+            "count": 1,
+            "attack": 1,
+            "defense": 0,
+            "name_filter": "Ginsetsu & Yuzuki, Twin Calamities"
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Holy Falcon",
@@ -729,7 +882,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90061110-holy-falcon",
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "name": "Holyflame Tiger",
@@ -745,7 +900,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90061120-holyflame-tiger",
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "name": "Regal Falcon",
@@ -761,7 +918,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90061130-regal-falcon",
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "name": "Holy Cavalier",
@@ -777,7 +936,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90064110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90064110-holy-cavalier",
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "name": "Puppet",
@@ -795,21 +956,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90071110-puppet",
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
-                {
-                  "event": "end_of_turn",
-                  "source": "board",
-                  "condition": { "whose_turn": "opponent" },
-                  "effects": [
-                    {
-                      "op": "destroy_self"
-                    }
-                  ]
-                }
-              ]
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "opponent"
+        },
+        "effects": [
+          {
+            "op": "destroy_self"
+          }
+        ]
+      }
+    ]
   },
-  
   {
     "name": "Enhanced Puppet",
     "cost": "1",
@@ -826,19 +990,23 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90071120-enhanced-puppet",
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
-                {
-                  "event": "end_of_turn",
-                  "source": "board",
-                  "condition": { "whose_turn": "opponent" },
-                  "effects": [
-                    {
-                      "op": "destroy_self"
-                    }
-                  ]
-                }
-              ]
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "opponent"
+        },
+        "effects": [
+          {
+            "op": "destroy_self"
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Gear of Ambition",
@@ -848,7 +1016,9 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": ["Artifact"],
+    "tribes": [
+      "Artifact"
+    ],
     "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Striker Artifact.\nCan't be played.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90071210.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
@@ -857,18 +1027,24 @@
     "keywords": [],
     "cant_play": true,
     "fuse_recipes": [
-                    {
-                      "id": "gear→striker",
-                      "partner_filters": [
-                        { "zone": "hand", "name_in": ["Gear of Ambition","Gear of Remembrance"] }
-                      ],
-                      "result": {
-                        "type": "transform",
-                        "result_card_name": "Striker Artifact",
-                        "targets": "merge"
-                      }
-                    }
-                  ]
+      {
+        "id": "gear→striker",
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "name_in": [
+              "Gear of Ambition",
+              "Gear of Remembrance"
+            ]
+          }
+        ],
+        "result": {
+          "type": "transform",
+          "result_card_name": "Striker Artifact",
+          "targets": "merge"
+        }
+      }
+    ]
   },
   {
     "name": "Gear of Remembrance",
@@ -878,7 +1054,9 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": ["Artifact"],
+    "tribes": [
+      "Artifact"
+    ],
     "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Fortifier Artifact.\nCan't be played.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90071220.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072120_evo.webp",
@@ -887,20 +1065,25 @@
     "keywords": [],
     "cant_play": true,
     "fuse_recipes": [
-                    {
-                      "id": "gear→striker",
-                      "partner_filters": [
-                        { "zone": "hand", "name_in": ["Gear of Ambition","Gear of Remembrance"] }
-                      ],
-                      "result": {
-                        "type": "transform",
-                        "result_card_name": "Striker Artifact",
-                        "targets": "merge"
-                      }
-                    }
-                  ]
+      {
+        "id": "gear→striker",
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "name_in": [
+              "Gear of Ambition",
+              "Gear of Remembrance"
+            ]
+          }
+        ],
+        "result": {
+          "type": "transform",
+          "result_card_name": "Striker Artifact",
+          "targets": "merge"
+        }
+      }
+    ]
   },
-
   {
     "name": "Striker Artifact",
     "cost": "3",
@@ -917,11 +1100,15 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90072110-striker-artifact",
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fuse": [
-            { "op": "start_fortifier_fuse" }
-          ]    
+      {
+        "op": "start_fortifier_fuse"
+      }
+    ]
   },
   {
     "name": "Fortifier Artifact",
@@ -939,11 +1126,15 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90072120-fortifier-artifact",
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fuse": [
-            { "op": "start_fortifier_fuse" }
-          ]
+      {
+        "op": "start_fortifier_fuse"
+      }
+    ]
   },
   {
     "name": "Doll Slayer",
@@ -961,12 +1152,18 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90072130-doll-slayer",
-    "keywords": ["Ambush", {
-                  "name": "LastWords", 
-                  "effects":
-                  [
-                    {
-                      "op": "summon_named", "name": "Vier, Heart Slayer"}]}]
+    "keywords": [
+      "Ambush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Vier, Heart Slayer"
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Ominous Artifact α",
@@ -986,51 +1183,70 @@
     "url": "https://shadowverse.gg/cards/90073110-ominous-artifact-a",
     "keywords": [],
     "triggers": [
-        {
-          "event": "end_of_turn",
-          "source": "board",
-          "condition": { "whose_turn": "owner" },
-          "effects": [
-            {
-              "op": "heal_leader", "player": "self", "amount": 3
-            }
-          ]
-        }
-      ],
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 3
+          }
+        ]
+      }
+    ],
     "fuse_recipes": [
-        {
-          "id": "alpha→omega",
-          "partner_filters": [
-            { "zone": "hand", "name_in": ["Ominous Artifact β", "Ominous Artifact γ"] }
-          ],
-          "result": {
-            "type": "transform",
-            "result_card_name": "Masterwork Artifact Ω",
-            "targets": "merge"
+      {
+        "id": "alpha→omega",
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "name_in": [
+              "Ominous Artifact β",
+              "Ominous Artifact γ"
+            ]
           }
-        },
-        {
-          "id": "alpha→waste_beta",
-          "partner_filters": [
-            { "zone": "hand", "name_in": ["Ominous Artifact β"] }
-          ],
-          "result": {
-            "type": "waste",
-            "consume": "partner"
-          }
-        },
-        {
-          "id": "alpha→waste_gamma",
-          "partner_filters": [
-            { "zone": "hand", "name_in": ["Ominous Artifact γ"] }
-          ],
-          "result": {
-            "type": "waste",
-            "consume": "partner"
-          }
+        ],
+        "result": {
+          "type": "transform",
+          "result_card_name": "Masterwork Artifact Ω",
+          "targets": "merge"
         }
-      ]
-
+      },
+      {
+        "id": "alpha→waste_beta",
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "name_in": [
+              "Ominous Artifact β"
+            ]
+          }
+        ],
+        "result": {
+          "type": "waste",
+          "consume": "partner"
+        }
+      },
+      {
+        "id": "alpha→waste_gamma",
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "name_in": [
+              "Ominous Artifact γ"
+            ]
+          }
+        ],
+        "result": {
+          "type": "waste",
+          "consume": "partner"
+        }
+      }
+    ]
   },
   {
     "name": "Ominous Artifact β",
@@ -1050,17 +1266,21 @@
     "url": "https://shadowverse.gg/cards/90073120-ominous-artifact-b",
     "keywords": [],
     "triggers": [
-        {
-          "event": "end_of_turn",
-          "source": "board",
-          "condition": { "whose_turn": "owner" },
-          "effects": [
-            {
-              "op": "damage", "target": "enemy:leader", "amount": 3
-            }
-          ]
-        }
-      ]
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 3
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Ominous Artifact γ",
@@ -1080,17 +1300,21 @@
     "url": "https://shadowverse.gg/cards/90073130-ominous-artifact-g",
     "keywords": [],
     "triggers": [
-        {
-          "event": "end_of_turn",
-          "source": "board",
-          "condition": { "whose_turn": "owner" },
-          "effects": [
-            {
-              "op": "damage_all", "target": "enemy:follower", "amount": 3
-            }
-          ]
-        }
-      ]
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "damage_all",
+            "target": "enemy:follower",
+            "amount": 3
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Masterwork Artifact Ω",
@@ -1108,12 +1332,23 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90074110-masterwork-artifact-w",
-    "fanfare":[{
-              "op": "damage_all", "target": "enemy:follower", "amount": 5
-              }, {
-              "op": "heal_leader", "player": "self", "amount": 5
-              }],
-    "keywords": ["Storm", "Ward", "Aura"],
+    "fanfare": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 5
+      },
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 5
+      }
+    ],
+    "keywords": [
+      "Storm",
+      "Ward",
+      "Aura"
+    ],
     "triggers": []
   },
   {
@@ -1132,8 +1367,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90074120-lloyd",
-    "keywords": ["Ward"],
-    "triggers":[]
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": []
   },
   {
     "name": "Victoria",
@@ -1151,7 +1388,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90074130-victoria",
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "follower_strike",
@@ -1182,11 +1421,13 @@
     "url": "https://shadowverse.gg/cards/90004320-great-testimony",
     "evolve": [],
     "superevolve": [],
-    "spell": [{
-            "op": "destroy",
-            "target": "enemy:follower",
-            "select": 1
-        }],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1206,7 +1447,18 @@
     "url": "https://shadowverse.gg/cards/90004330-sweetness-of-voracity",
     "evolve": [],
     "superevolve": [],
-    "spell": [{ "op": "damage_random", "target": "enemy:follower", "amount": 5 }, { "op": "damage", "target": "enemy:leader", "amount": 5 }],
+    "spell": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 5
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 5
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1226,30 +1478,42 @@
     "url": "https://shadowverse.gg/cards/90014320-annihilating-onslaught",
     "evolve": [],
     "superevolve": [],
-    "spell": [{
-              "op": "board_name_gate",
-              "name": "Izudia, Annihilation Manifest",
-              "effects": [
-                { "op": "damage", "target": "enemy:leader", "amount": 20 }
-                
-              ],
-              "else_effects": [
-                {
-                  "op": "damage",
-                  "target": "enemy:leader",
-                  "amount": 6
-                }
-              ]
-            }],
+    "spell": [
+      {
+        "op": "board_name_gate",
+        "name": "Izudia, Annihilation Manifest",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 20
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 6
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [
-                {
-                  "event": "end_of_turn",
-                  "source": "hand",
-                  "condition": { "whose_turn": "owner" },
-                  "effects": [{ "op": "reduce_cost_self", "amount": 1 }]
-                }
-              ]
+      {
+        "event": "end_of_turn",
+        "source": "hand",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "reduce_cost_self",
+            "amount": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "Gilded Blade",
@@ -1269,13 +1533,15 @@
     "url": "https://shadowverse.gg/cards/90021310-gilded-blade",
     "evolve": [],
     "superevolve": [],
-    "spell": [ {
-            "op": "damage_follower_or_leader",
-            "target": "enemy:follower",
-            "amount": 1,
-            "select": 1,
-            "can_target_leader": true
-        }],
+    "spell": [
+      {
+        "op": "damage_follower_or_leader",
+        "target": "enemy:follower",
+        "amount": 1,
+        "select": 1,
+        "can_target_leader": true
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1297,7 +1563,13 @@
     "url": "https://shadowverse.gg/cards/90021320-gilded-goblet",
     "evolve": [],
     "superevolve": [],
-    "spell": [ { "op": "heal_leader", "player": "self", "amount": 2 }],
+    "spell": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 2
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1319,26 +1591,29 @@
     "url": "https://shadowverse.gg/cards/90021330-gilded-boots",
     "evolve": [],
     "superevolve": [],
-    "spell": [  {
-              "op": "select",
-              "target": "ally:follower",
-              "select": true,
-              "select_count": 1,
-              "effects": [
-                {
-                  "op": "buff",
-                  "target": "selected",
-                  "attack": 1,
-                  "defense": 0                  
-                }, 
-                {
-                    "op": "keyword",
-                    "target": "selected",
-                    "keywords": ["Rush"]
-                }
-              ]
-            }
-          ],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "buff",
+            "target": "selected",
+            "attack": 1,
+            "defense": 0
+          },
+          {
+            "op": "keyword",
+            "target": "selected",
+            "keywords": [
+              "Rush"
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1360,25 +1635,29 @@
     "url": "https://shadowverse.gg/cards/90021340-gilded-necklace",
     "evolve": [],
     "superevolve": [],
-    "spell": [ {
-              "op": "select",
-              "target": "ally:follower",
-              "select": true,
-              "select_count": 1,
-              "effects": [
-                {
-                  "op": "buff",
-                  "target": "selected",
-                  "attack": 0,
-                  "defense": 1                  
-                }, 
-                {
-                    "op": "keyword",
-                    "target": "selected",
-                    "keywords": ["Ward"]
-                }
-              ]
-            }],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "buff",
+            "target": "selected",
+            "attack": 0,
+            "defense": 1
+          },
+          {
+            "op": "keyword",
+            "target": "selected",
+            "keywords": [
+              "Ward"
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1398,7 +1677,12 @@
     "url": "https://shadowverse.gg/cards/90024310-remnant-of-hollowness",
     "evolve": [],
     "superevolve": [],
-    "spell": [ { "op": "damage_split_all_enemies", "amount": 4 }],
+    "spell": [
+      {
+        "op": "damage_split_all_enemies",
+        "amount": 4
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1423,7 +1707,9 @@
         "op": "modify_cost_pool",
         "target": "ally:hand",
         "amount": 1,
-        "condition": { "card_type": "Follower" }
+        "condition": {
+          "card_type": "Follower"
+        }
       },
       {
         "op": "destroy_all",
@@ -1449,7 +1735,13 @@
     "url": "https://shadowverse.gg/cards/90044320-fangs-of-ardent-destruction",
     "evolve": [],
     "superevolve": [],
-    "spell": [{"op":"damage_all", "target": "all:follower", "amount": 1 }],
+    "spell": [
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "amount": 1
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1469,7 +1761,14 @@
     "url": "https://shadowverse.gg/cards/90054310-scream-diffusion",
     "evolve": [],
     "superevolve": [],
-    "spell": [{"op": "summon_named", "name": "Rulenye & Valnareik", "count": 2, "keyword": "Rush"}],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Rulenye & Valnareik",
+        "count": 2,
+        "keyword": "Rush"
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1490,16 +1789,18 @@
     "evolve": [],
     "superevolve": [],
     "spell": [
-        {
-          "op": "keyword",
-          "target": "ally:follower",
-          "condition": {
-            "name": "Rulenye & Valnareik"
-          },
-          "keywords": ["storm"],
-          "select": 1
-        }
-      ],
+      {
+        "op": "keyword",
+        "target": "ally:follower",
+        "condition": {
+          "name": "Rulenye & Valnareik"
+        },
+        "keywords": [
+          "storm"
+        ],
+        "select": 1
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1520,9 +1821,16 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [
-                  { "op": "banish_random", "target": "enemy:follower", "count": 1 },
-                  { "op": "increase_countdown", "amount": 1 }
-                ],
+      {
+        "op": "banish_random",
+        "target": "enemy:follower",
+        "count": 1
+      },
+      {
+        "op": "increase_countdown",
+        "amount": 1
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -1543,18 +1851,25 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [{
-            "name": "Countdown", 
-            "turns": 1
-        },
-        {
-            "name": "LastWords", 
-            "effects": [
-                {"op": "heal_leader", "amount": 1},
-                {"op": "summon_named", "name": "Black Psalm, New Revelation"}
-            ]
-        }
-      ],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 1
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "heal_leader",
+            "amount": 1
+          },
+          {
+            "op": "summon_named",
+            "name": "Black Psalm, New Revelation"
+          }
+        ]
+      }
+    ],
     "triggers": []
   },
   {
@@ -1574,18 +1889,26 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [{
-            "name": "Countdown", 
-            "turns": 1
-        },
-        {
-            "name": "LastWords", 
-            "effects": [
-                {"op": "damage", "target": "enemy:leader","amount": 1},
-                {"op": "summon_named", "name": "White Psalm, New Revelation"}
-            ]
-        } 
-        ],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 1
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          },
+          {
+            "op": "summon_named",
+            "name": "White Psalm, New Revelation"
+          }
+        ]
+      }
+    ],
     "triggers": []
   },
   {
@@ -1604,11 +1927,18 @@
     "url": "https://shadowverse.gg/cards/90074310-melodious-monody",
     "evolve": [],
     "superevolve": [],
-    "spell": [{
+    "spell": [
+      {
         "op": "destroy",
         "target": "ally:any",
         "select": true
-      }, { "op": "damage_random", "target": "enemy:follower", "amount":4 }],
+      },
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 4
+      }
+    ],
     "keywords": [],
     "triggers": []
   }

@@ -40,6 +40,7 @@ export async function startGame() {
   state.blueAnyAllyAttackedThisTurn = false;
   state.redAnyAllyAttackedThisTurn = false;
   await loadCardDatabase();
+  await import("@core/card_validation.js").then(({ validateCardDatabase }) => validateCardDatabase());
   await Promise.all([loadBlueDeck(blueChoice), loadRedDeck(redChoice)]);
 
   // === Faith crest bootstrap: if Sham-Nacha is in a deck, that player starts with Faith ===

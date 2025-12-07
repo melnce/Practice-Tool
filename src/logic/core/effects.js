@@ -321,7 +321,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
       case "reduce_cost_self": handleReduceCostSelf(sourceCard, eff); break;
       case "reduce_countdown": handleReduceCountdown(sourceCard, eff); break;
       case "reduce_deck_followers_cost": { const amt = parseInt(eff.amount ?? 1) || 1; reduceDeckFollowersCost(owner, amt); break; }
-      case "remove_keyword": handleRemoveKeyword(eff, owner); break;
+      case "remove_keyword": if (handleRemoveKeyword(eff, owner) === "pending") return; break;
       case "replace_deck": handleReplaceDeck(owner, eff); break;
       case "replace_deck_with_set_minus": { import("@logic/effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => render()); }); break; }
       case "restore_full_defense_self": {

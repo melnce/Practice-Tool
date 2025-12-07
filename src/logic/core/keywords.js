@@ -8,17 +8,17 @@ let __initializingKeywords = false;
 
 const KEYWORD_MAP = {
   rush: (c) => {
-  c.hasRush = true;
+    c.hasRush = true;
 
-  // Make sure it can actually attack right now
-  if (c.attacks_left == null) {
-    const per = Number.isFinite(c.attacks_per_turn) ? c.attacks_per_turn : 1;
-    c.attacks_left = per;
-  }
-  c.can_attack = true;             // <-- allow attacking this turn
-  c.can_attack_followers = true;   // follower-only on play turn is respected by combat
-  c.isRush = !c.hasStorm && !!c.justPlayed;
-},
+    // Make sure it can actually attack right now
+    if (c.attacks_left == null) {
+      const per = Number.isFinite(c.attacks_per_turn) ? c.attacks_per_turn : 1;
+      c.attacks_left = per;
+    }
+    c.can_attack = true;             // <-- allow attacking this turn
+    c.can_attack_followers = true;   // follower-only on play turn is respected by combat
+    c.isRush = !c.hasStorm && !!c.justPlayed;
+  },
   storm: (c) => {
     c.hasStorm = true;
     c.can_attack = true;  // Storm can attack anything
@@ -47,8 +47,8 @@ const KEYWORD_MAP = {
     c.hasAura = true;
   },
   lastwords: (c, opts) => {
-  c.hasLastWords = true;
-    
+    c.hasLastWords = true;
+
     // THIS IS THE FIX:
     // It only assigns the effects if the incoming 'opts' object
     // actually contains a valid 'effects' array.
@@ -123,7 +123,7 @@ const KEYWORD_MAP = {
   bleed: (c, opts) => {
     // opts: { to_leader?: number, to_self?: number }
     const toLeader = Number(opts?.to_leader ?? 1);
-    const toSelf   = Number(opts?.to_self   ?? 2);
+    const toSelf = Number(opts?.to_self ?? 2);
 
     c.hasBleed = true;
     // Keep one slot; last application overwrites numbers (intentional).
@@ -150,7 +150,7 @@ const KEYWORD_MAP = {
       c.cantAttackIsTemporary = true;
       // Track owner for end-of-turn cleanup
       const isBlue = state.blueBoard.includes(c);
-      const isRed  = state.redBoard.includes(c);
+      const isRed = state.redBoard.includes(c);
       c.cantAttackOwner = isBlue ? "blue" : (isRed ? "red" : c.cantAttackOwner || null);
     }
   },
@@ -223,7 +223,7 @@ export function handleKeyword(eff, owner, effectsQueue, context = {}) {
   const __selRaw = (eff.select ?? eff.select_count);
   if (__selRaw) {
     const requested = parseInt((eff.select ?? eff.select_count ?? 1));
-    const clamped   = Math.max(1, Math.min(requested, targets.length));
+    const clamped = Math.max(1, Math.min(requested, targets.length));
 
     if (targets.length === 0) return "no-valid-targets";
 
@@ -258,7 +258,7 @@ export function handleRemoveKeyword(eff, owner, explicitTargets) {
   if (eff.select && !explicitTargets) {
     state.pendingTargetEffect = { eff, owner, sourceCard: null, pool: targets, targets: [], selectCount: 1 };
     highlightSelectable(targets);
-    return;
+    return "pending";
   }
 
   const keywordToRemove = String(eff.keyword || "").toLowerCase();
