@@ -1,0 +1,364 @@
+#controlPanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+#deckSelection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+#turnControls {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+}
+
+
+
+#turnControls button {
+  background-color: white;
+  color: black;
+  border: 1px solid #333;
+  padding: 4px 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#turnControls button:hover {
+  background-color: #ddd;
+}
+
+.zone {
+  margin: 5px auto;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0;
+  max-width: 100%;
+}
+
+.hand-zone {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 16px;
+}
+
+#redHand {
+  justify-content: flex-start;
+}
+
+#blueHand {
+  justify-content: flex-end;
+}
+
+.leader-zone {
+  margin: 6px 0;
+}
+
+.leader {
+  border: 2px solid #888;
+  padding: 8px;
+  border-radius: 8px;
+  display: inline-block;
+  min-width: 160px;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+#redLeader .leader {
+  border-color: red;
+}
+
+#blueLeader .leader {
+  border-color: blue;
+}
+
+.stats-bar {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 4px;
+}
+
+.pp-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pp {
+  font-size: 1.4rem;
+  font-weight: bold;
+  background-color: #222;
+  border: 2px solid #888;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: white;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+
+
+.board-zone {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+  min-height: 160px;
+  min-width: 575px; /*perfect width */
+  padding: 8px;
+  border: 2px dashed rgba(255, 255, 255, 0.2); /* optional visual aid */
+}
+
+
+
+.board-zone.drag-over {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+#redBoard {
+  flex-direction: row-reverse;
+}
+
+#blueBoard {
+  flex-direction: row;
+}
+
+#turnControls {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center; /* ✅ fixes centering */
+  z-index: 100;
+}
+
+.pp-floating {
+  font-size: 1.4rem;
+  font-weight: bold;
+  background-color: #222;
+  border: 2px solid #888;
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: white;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+  text-align: center;
+}
+
+.floating-stats {
+  position: absolute;
+  left: 20px;
+  background-color: #111;
+  padding: 8px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  gap: 16px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  z-index: 50;
+}
+
+#redStatsContainer {
+  top: 120px; /* adjust as needed */
+  
+}
+
+#blueStatsContainer {
+  bottom: 120px; /* adjust as needed */
+  
+}
+
+#turnControls #redBoost {
+  background-color: orange;
+  color: black;
+  font-weight: bold;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#turnControls #redBoost.used {
+  background-color: #555 !important; /* force override orange */
+  color: #aaa !important;
+  cursor: default;
+}
+
+
+.leader {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  margin: auto;
+  margin-bottom: 10px;
+}
+
+.red-leader {
+  background-color: #800000;
+  border: 4px solid red;
+}
+
+.blue-leader {
+  background-color: #000066;
+  border: 4px solid blue;
+}
+
+.hp-value {
+  font-size: 2.2rem;
+}
+
+.leader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* center all 3 elements together */
+  gap: 8px; /* spacing between evo, leader, super evo */
+  margin: auto; /* keeps it centered in the layout */
+  width: fit-content; /* shrink to the buttons + leader size */
+}
+
+/* In your CSS file */
+.floating-stats span {
+    margin-right: 8px;
+    font-size: 0.9rem;
+}
+
+.floating-stats span:last-child {
+    margin-right: 0;
+}
+
+#redStats, #blueStats {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: white;
+    display: flex;
+    gap: 8px;
+}
+
+/* --- Crest UI Styles --- */
+
+/* Modify the main floating stats container to be a flex column */
+.floating-stats {
+  position: absolute;
+  left: 20px;
+  background-color: transparent; /* Remove background from parent */
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column; /* Stack stats and crests vertically */
+  gap: 6px; /* Space between stats bar and crests */
+  font-size: 1.1rem;
+  font-weight: bold;
+  z-index: 50;
+}
+
+/* Re-apply styling to the inner stats bar */
+#redStats, #blueStats {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: white;
+    display: flex;
+    gap: 8px;
+}
+
+/* The main container now stacks the rows vertically and centers them */
+.crest-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the rows horizontally */
+  gap: 2px; /* Small gap between the two rows */
+}
+
+/* New style for each row of crests */
+.crest-row {
+  display: flex;
+  justify-content: center; /* Center the slots within the row */
+  gap: 4px; /* Gap between individual crest slots */
+}
+
+/* Individual Crest Slot (now bigger) */
+.crest-slot {
+  width: 32px;  /* Increased from 24px */
+  height: 32px; /* Increased from 24px */
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 2px solid #555;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+}
+
+/* Style for an ACTIVE crest */
+.crest-slot.active {
+  background-color: #00ff99;
+  border-color: #99ffee;
+  box-shadow: 0 0 10px #00ff99, inset 0 0 5px rgba(255,255,255,0.5);
+}
+
+/* Add this to layout.css */
+
+.crest-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%; /* Make the image circular */
+  object-fit: cover; /* Ensure the image fills the space nicely */
+}
+
+/* allow absolute-positioned children like the badge */
+.crest-slot {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 2px solid #555;
+  border-radius: 50%;
+  transition: all 0.2s ease-in-out;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+}
+
+/* small circular badge in bottom-right */
+.crest-countdown {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: #222;
+  border: 1px solid #aaa;
+  color: #fff;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 0 6px rgba(0,0,0,0.6);
+  pointer-events: none; /* don’t block hover tooltip */
+}
+
+/* optional: pop a little when it changes (you can toggle this class in logic if you want) */
+.crest-countdown.pop {
+  transform: scale(1.1);
+}

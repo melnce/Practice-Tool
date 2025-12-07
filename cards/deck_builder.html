@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deck Builder — Prototype</title>
+  <style>
+    :root {
+      --bg:#0b0e12; --panel:#11151b; --muted:#98a2b3; --text:#e5e7eb; --accent:#6ee7ff; --accent2:#a78bfa;
+      --good:#22c55e; --warn:#f97316; --bad:#ef4444; --card:#1a202c;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--text); font:14px/1.4 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+    header{display:flex; gap:12px; align-items:center; padding:12px 16px; background:linear-gradient(90deg,#0b1220,#121826)}
+    header h1{font-size:16px; margin:0; font-weight:700; letter-spacing:.2px}
+    header .sub{color:var(--muted); font-weight:500}
+
+    .controls{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-left:auto}
+    select,input,button{background:#0e1320; color:var(--text); border:1px solid #1f2a44; border-radius:10px; padding:8px 10px}
+    button{cursor:pointer}
+    button.primary{border-color:#274766; background:#0d2538}
+    button:disabled{opacity:.6; cursor:not-allowed}
+
+    .wrap{display:grid; grid-template-columns: 360px 1fr 380px; gap:12px; padding:12px}
+    .panel{background:var(--panel); border:1px solid #1f2a44; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; min-height:0}
+    .panel h2{font-size:13px; letter-spacing:.1px; font-weight:700; margin:0; padding:10px 12px; border-bottom:1px solid #1f2a44; color:#cbd5e1}
+
+    /* Gallery */
+    .tools{display:flex; gap:8px; padding:10px; border-bottom:1px solid #1f2a44}
+    .tools input{flex:1}
+
+    .gallery{padding:10px; display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; overflow:auto}
+    .card{position:relative; background:#0c111a; border:1px solid #202a3d; border-radius:12px; overflow:hidden; display:flex; flex-direction:column}
+    .card img{width:100%; height:auto; object-fit:contain; background:#0f1624}
+    .card .meta{padding:8px 9px}
+    .card .name{font-weight:700; font-size:12px}
+    .card .cost{font-size:11px; color:var(--muted)}
+    .card.draggable{cursor:grab}
+    .addBtn{position:absolute; right:8px; top:8px; border-radius:9px; font-size:11px; padding:4px 7px}
+
+    /* Deck */
+    .deckTop{display:flex; align-items:center; gap:10px; padding:10px; border-bottom:1px solid #1f2a44}
+    .deckTop .stat{font-size:12px; color:var(--muted)}
+     .deck{
+      padding:10px;
+      display:grid;
+      grid-template-columns:repeat(5, 1fr);
+      gap:10px;
+      overflow:auto;
+      min-height:280px;
+      height:100%;          /* fill panel vertically */
+      align-content:start;  /* grid rows stay compact at top */
+    }
+    .slot{position:relative; background:#0c111a; border:1px dashed #2a3550; border-radius:12px; aspect-ratio: 3 / 4; display:flex; align-items:center; justify-content:center; color:#415277}
+    .slot.filled{border-style:solid; border-color:#334262}
+    .slot img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; border-radius:12px}
+    .slot .count{position:absolute; top:6px; left:6px; font-weight:800; background:#0b1220cc; border:1px solid #27314c; padding:2px 6px; border-radius:999px}
+    .slot .remove{position:absolute; bottom:6px; right:6px; border-radius:9px; font-size:11px; padding:4px 7px}
+
+    /* Sidebar */
+    .side{padding:10px; display:flex; flex-direction:column; gap:10px}
+    .kv{display:flex; align-items:center; justify-content:space-between; background:#0c111a; border:1px solid #202a3d; border-radius:12px; padding:10px}
+    .kv label{font-size:12px; color:var(--muted)}
+    .list{background:#0c111a; border:1px solid #202a3d; border-radius:12px; overflow:hidden}
+    .list table{width:100%; border-collapse:collapse}
+    .list th,.list td{padding:8px 10px; border-bottom:1px solid #182033; font-size:12px}
+    .list th{color:#94a3b8; text-align:left; background:#0b1220}
+    .list tfoot td{font-weight:800}
+
+    .pill{padding:2px 8px; border:1px solid #28405a; border-radius:999px; font-size:11px; color:#cbd5e1}
+    .ok{color:var(--good)}
+    .warn{color:var(--warn)}
+
+    .drop-hint{font-size:12px; color:#6980a6}
+
+    @media (max-width: 1200px){
+      .wrap{grid-template-columns:1fr}
+      .gallery{grid-template-columns:repeat(3, 1fr)}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Deck Builder <span class="sub">— minimal prototype</span></h1>
+    <div class="controls">
+      <label>
+        <span class="sub" style="display:block;font-size:11px">Class</span>
+        <select id="classSelect">
+          <option value="Abysscraft">Abysscraft</option>
+          <option value="Portalcraft">Portalcraft</option>
+          <option value="Swordcraft">Swordcraft</option>
+          <option value="Dragoncraft">Dragoncraft</option>
+          <option value="Havencraft">Havencraft</option>
+          <option value="Runecraft">Runecraft</option>
+          <option value="Forestcraft">Forestcraft</option>
+          <option value="Neutral">Neutral-only</option>
+        </select>
+      </label>
+      <label>
+        <span class="sub" style="display:block;font-size:11px">Deck name</span>
+        <input id="deckName" placeholder="e.g., Abyss Bats" />
+      </label>
+      <button id="saveBtn" class="primary">Export JSON</button>
+      <button id="setFolderBtn">Set export folder</button>
+      <button id="clearBtn">Clear</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Left: Card Gallery -->
+    <section class="panel">
+      <h2>Cards (class + Neutral)</h2>
+      <div class="tools">
+        <input id="search" placeholder="Search name, type..." />
+        <select id="costFilter">
+          <option value="">Cost: any</option>
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value=">=8">8+</option>
+        </select>
+      </div>
+      <div id="gallery" class="gallery" aria-label="Card gallery"></div>
+    </section>
+
+    <!-- Middle: Deck Grid -->
+    <section class="panel">
+      <h2>Deck (drag cards here)</h2>
+      <div class="deckTop">
+        <div class="stat">Max copies/card: <span class="pill">3</span></div>
+        <div class="stat">Deck size: <span id="deckCount" class="pill">0</span> / <span id="deckSize" class="pill">40</span></div>
+        <div class="stat">Class: <span id="classBadge" class="pill">Abysscraft</span></div>
+      </div>
+      <div id="deck" class="deck" aria-label="Deck slots"></div>
+    </section>
+
+    <!-- Right: List / Autosave info -->
+    <aside class="panel">
+      <h2>List & Autosave</h2>
+      <div class="side">
+        <div class="kv"><label>Autosave</label><div id="autosaveState" class="ok">ON (localStorage)</div></div>
+        <div class="kv"><label>Storage key</label><div id="storageKey" class="pill"></div></div>
+        <div class="list">
+          <table>
+            <thead>
+              <tr><th style="width:44px">#</th><th>Name</th><th style="width:46px">Cost</th><th style="width:60px">Count</th></tr>
+            </thead>
+            <tbody id="listBody"></tbody>
+            <tfoot>
+              <tr><td colspan="3">Total</td><td id="listTotal">0</td></tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="drop-hint">Tip: drag to deck; click “+” to add; click ✕ on a slot to remove; drag between slots to reorder.</div>
+      </div>
+    </aside>
+  </div>
+
+<script>
+// --- Config ---
+const DECK_SIZE = 40;
+const MAX_COPIES = 3;
+const BASE_PATH = 'classes/'; // this HTML lives in /cards/, JSON lives in /cards/classes/
+// Build file path like /cards/classes/<classname>_card_details.json
+function classFilePath(cls){
+  return `${BASE_PATH}${cls.toLowerCase()}_card_details.json`;
+}
+async function safeFetchJSON(path){
+  try{ const r = await fetch(path); if(!r.ok) return []; return await r.json(); }catch(e){ return []; }
+}
+
+// --- State ---
+let allCards = [];           // currently loaded (class + Neutral)
+let cardMap = new Map();     // name -> card object
+let deck = [];               // array of names (length <= DECK_SIZE), allows duplicates
+let className = 'Abysscraft';
+
+// --- DOM ---
+const els = {
+  classSelect: document.getElementById('classSelect'),
+  deck: document.getElementById('deck'),
+  deckCount: document.getElementById('deckCount'),
+  deckSize: document.getElementById('deckSize'),
+  classBadge: document.getElementById('classBadge'),
+  gallery: document.getElementById('gallery'),
+  search: document.getElementById('search'),
+  costFilter: document.getElementById('costFilter'),
+  listBody: document.getElementById('listBody'),
+  listTotal: document.getElementById('listTotal'),
+  saveBtn: document.getElementById('saveBtn'),
+  clearBtn: document.getElementById('clearBtn'),
+  deckName: document.getElementById('deckName'),
+  storageKey: document.getElementById('storageKey'),
+  setFolderBtn: document.getElementById('setFolderBtn'),
+};
+
+els.deckSize.textContent = DECK_SIZE;
+
+// --- Utilities ---
+function storageKey(){
+  const name = (els.deckName.value || className).trim();
+  return `deckbuilder:${className}:${name}`;
+}
+function save(){
+  const counts = deck.reduce((m,n)=> (m[n]=(m[n]||0)+1, m), {});
+  const payload = { class: className, cards: counts, size: deck.length, updated: Date.now() };
+  localStorage.setItem(storageKey(), JSON.stringify(payload));
+  els.storageKey.textContent = storageKey();
+}
+function loadIfAny(){
+  const key = storageKey();
+  const raw = localStorage.getItem(key);
+  if(!raw) return false;
+  try{
+    const obj = JSON.parse(raw);
+    if(obj && obj.cards){
+      deck = [];
+      Object.entries(obj.cards).forEach(([name,c])=>{ for(let i=0;i<c;i++) deck.push(name) });
+      renderDeck();
+      renderList();
+      return true;
+    }
+  }catch(e){ console.warn('Failed to parse saved deck', e) }
+  return false;
+}
+function countInDeck(name){ return deck.filter(n=>n===name).length }
+
+// --- Data loading ---
+async function loadCardsForClass(cls){
+  className = cls;
+  els.classBadge.textContent = cls;
+  // Neutral is always included
+  const neutralPath = classFilePath('Neutral');
+  const wantNeutral = await safeFetchJSON(neutralPath);
+  const wantClass = cls==='Neutral' ? [] : await safeFetchJSON(classFilePath(cls));
+  allCards = [...wantClass, ...wantNeutral].filter(c => c && c.name && (c.class===cls || c.class==='Neutral'));
+  cardMap = new Map(allCards.map(c=>[c.name, c]));
+  renderGallery();
+  if(!loadIfAny()){
+    deck = [];
+    renderDeck();
+    renderList();
+    save();
+  }
+}
+
+// --- Render: Gallery ---
+function renderGallery(){
+  const q = els.search.value.trim().toLowerCase();
+  const cf = els.costFilter.value;
+  let items = allCards;
+  if(q){ items = items.filter(c=> (c.name||'').toLowerCase().includes(q) || (c.type||'').toLowerCase().includes(q)); }
+  if(cf){
+    if(cf.startsWith('>=')) items = items.filter(c=> Number(c.cost)>=8);
+    else items = items.filter(c=> String(c.cost)===cf);
+  }
+  els.gallery.innerHTML = '';
+  items.sort((a,b)=> (a.cost-b.cost) || a.name.localeCompare(b.name));
+  items.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'card draggable';
+    card.draggable = true;
+    card.addEventListener('dragstart', (e)=>{
+      e.dataTransfer.setData('text/card', c.name);
+    });
+
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.alt = c.name;
+    img.src = c.base_image || '';
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.innerHTML = `<div class="name">${c.name}</div><div class="cost">${c.type || 'Card'} • Cost ${c.cost}</div>`;
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'addBtn';
+    addBtn.textContent = '+';
+    addBtn.title = 'Add to deck';
+    addBtn.addEventListener('click', ()=> addCard(c.name));
+
+    card.appendChild(img); card.appendChild(meta); card.appendChild(addBtn);
+    els.gallery.appendChild(card);
+  });
+}
+
+// --- Render: Deck grid ---
+function renderDeck(){
+  els.deck.innerHTML = '';
+  els.deckCount.textContent = deck.length;
+  const slots = Math.max(DECK_SIZE, deck.length);
+  for(let i=0;i<slots;i++){
+    const name = deck[i];
+    const slot = document.createElement('div');
+    slot.className = 'slot' + (name ? ' filled' : '');
+    slot.dataset.index = i;
+
+    // drag-over target
+    slot.addEventListener('dragover',(e)=>{e.preventDefault()});
+    slot.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      const fromIdx = e.dataTransfer.getData('text/slot');
+      const fromCard = e.dataTransfer.getData('text/card');
+      if(fromIdx){
+        // move
+        const fi = Number(fromIdx);
+        const [moved] = deck.splice(fi,1);
+        deck.splice(i,0,moved);
+        renderDeck(); renderList(); save();
+      }else if(fromCard){
+        addCard(fromCard, i);
+      }
+      e.stopPropagation(); // prevent bubbling to deck container
+    });
+
+    // allow reordering by dragging existing slots
+    slot.draggable = !!name;
+    slot.addEventListener('dragstart',(e)=>{
+      if(!name) return e.preventDefault();
+      e.dataTransfer.setData('text/slot', String(i));
+    });
+
+    // visuals
+    if(name){
+      const c = cardMap.get(name);
+      const img = document.createElement('img');
+      img.src = (c && c.base_image) || '';
+      img.alt = name;
+      slot.appendChild(img);
+
+      const cnt = countInDeck(name);
+      const badge = document.createElement('div');
+      badge.className = 'count';
+      badge.textContent = `×${cnt}`;
+      slot.appendChild(badge);
+
+      const rm = document.createElement('button');
+      rm.className = 'remove'; rm.textContent = '✕';
+      rm.addEventListener('click', ()=> removeAt(i));
+      slot.appendChild(rm);
+    } else {
+      slot.textContent = 'Drop card';
+    }
+
+    els.deck.appendChild(slot);
+  }
+}
+
+// --- Render: List ---
+function renderList(){
+  const counts = deck.reduce((m,n)=> (m[n]=(m[n]||0)+1,m),{});
+  const rows = Object.entries(counts).sort((a,b)=>{
+    const ca = cardMap.get(a[0]);
+    const cb = cardMap.get(b[0]);
+    return (Number(ca?.cost||0) - Number(cb?.cost||0)) || a[0].localeCompare(b[0]);
+  });
+  els.listBody.innerHTML = '';
+  let total = 0;
+  rows.forEach(([name,cnt])=>{
+    total += cnt;
+    const c = cardMap.get(name) || {};
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${cnt}</td><td>${name}</td><td>${c.cost ?? ''}</td><td>${cnt}</td>`;
+    els.listBody.appendChild(tr);
+  });
+  els.listTotal.textContent = String(total);
+}
+
+// --- Deck ops ---
+function addCard(name, toIndex=null){
+  // enforce class + Neutral only (paranoia)
+  const c = cardMap.get(name);
+  if(!c) return;
+  if(!(c.class===className || c.class==='Neutral')) return;
+  if(deck.length >= DECK_SIZE) return alert('Deck is full');
+  if(countInDeck(name) >= MAX_COPIES) return; // hard cap 3
+  if(toIndex==null || toIndex>deck.length) deck.push(name); else deck.splice(toIndex,0,name);
+  renderDeck(); renderList(); save();
+}
+function removeAt(index){
+  deck.splice(index,1);
+  renderDeck(); renderList(); save();
+}
+function clearDeck(){
+  if(!confirm('Clear current deck?')) return;
+  deck = []; renderDeck(); renderList(); save();
+}
+
+// --- Export (File System Access API with fallback) ---
+// Tiny IndexedDB store for persisting the chosen export directory handle.
+const DB_NAME = 'deckbuilder-db', STORE = 'handles', KEY = 'exportDir';
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    const r = indexedDB.open(DB_NAME,1);
+    r.onupgradeneeded = ()=> r.result.createObjectStore(STORE);
+    r.onerror = ()=> rej(r.error);
+    r.onsuccess = ()=> res(r.result);
+  });
+}
+async function saveDirHandle(handle){
+  const db = await idbOpen();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).put(handle, KEY);
+    tx.oncomplete = ()=> res();
+    tx.onerror = ()=> rej(tx.error);
+  });
+}
+async function loadDirHandle(){
+  const db = await idbOpen();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readonly');
+    const req = tx.objectStore(STORE).get(KEY);
+    req.onsuccess = ()=> res(req.result || null);
+    req.onerror = ()=> rej(req.error);
+  });
+}
+async function ensurePermission(handle){
+  if (!handle) return false;
+  const q = await handle.queryPermission({mode:'readwrite'});
+  if (q === 'granted') return true;
+  const r = await handle.requestPermission({mode:'readwrite'});
+  return r === 'granted';
+}
+async function pickExportFolder(){
+  if (!isSecureContext || !('showDirectoryPicker' in window)) {
+    alert('Choosing a folder needs a secure context.\nRun via http://localhost or https:// (e.g., VS Code Live Server).');
+    return null;
+  }
+  try{
+    const dir = await showDirectoryPicker({id:'deckbuilder-decks'});
+    if (await ensurePermission(dir)){
+      await saveDirHandle(dir);
+      return dir;
+    }
+  }catch{e}
+    console.warn('Folder selection cancelled/failed:', e);
+  return null;
+}
+async function exportJSON(){
+  const counts = deck.reduce((m,n)=> (m[n]=(m[n]||0)+1,m),{});
+  const list = Object.entries(counts).map(([name,count])=>({name, count}));
+  const payload = { class: className, deckName: (els.deckName.value||className), size: deck.length, cards: list };
+  const filename = `${(els.deckName.value||className).replace(/\s+/g,'_').toLowerCase()}_deck.json`;
+
+  // Save deck as before
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  // ALSO update index (for practice tool)
+  try {
+    let existing = [];
+    try {
+      const res = await fetch('decks/decks_index.json');
+      if (res.ok) existing = await res.json();
+    } catch {}
+    if (!existing.includes(filename)) existing.push(filename);
+
+    const idxBlob = new Blob([JSON.stringify(existing,null,2)], {type:'application/json'});
+    const a2 = document.createElement('a');
+    a2.href = URL.createObjectURL(idxBlob);
+    a2.download = 'decks_index.json';
+    a2.click();
+    URL.revokeObjectURL(a2.href);
+  } catch(e){ console.warn("Could not update decks_index", e); }
+}
+
+
+// --- Events ---
+els.classSelect.addEventListener('change', async (e)=>{
+  className = e.target.value;
+  els.classBadge.textContent = className;
+  // reset deck name placeholder to class
+  if(!els.deckName.value) els.deckName.placeholder = `${className} deck`;
+  await loadCardsForClass(className);
+});
+['input','keyup'].forEach(evt=> els.search.addEventListener(evt, renderGallery));
+els.costFilter.addEventListener('change', renderGallery);
+els.saveBtn.addEventListener('click', exportJSON);
+if (els.setFolderBtn) {
+  els.setFolderBtn.addEventListener('click', async ()=>{
+    const dir = await pickExportFolder();
+    if (dir) alert(`Export folder set to: ${dir.name}\nNext exports will save there automatically.`);
+  });
+}
+els.clearBtn.addEventListener('click', clearDeck);
+els.deckName.addEventListener('input', ()=>{ save(); });
+
+// --- Init ---
+(async function init(){
+  els.deckName.placeholder = `${className} deck`;
+  await loadCardsForClass(className);
+  // deck area as global drop target (accept drops on empty background)
+    els.deck.addEventListener('dragover', (e)=> e.preventDefault());
+    els.deck.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      // if a slot handled a reorder, ignore
+      if (e.dataTransfer.getData('text/slot')) return;
+      const fromCard = e.dataTransfer.getData('text/card');
+      if (fromCard) addCard(fromCard); // append to next empty slot
+    });
+  
+})();
+</script>
+</body>
+</html>

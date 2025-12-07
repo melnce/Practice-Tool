@@ -1,0 +1,1615 @@
+[
+  {
+    "name": "Goblin",
+    "cost": "1",
+    "attack": "1",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": null,
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90001110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90001110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90001110-goblin",
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Silent Rider",
+    "cost": "6",
+    "attack": "10",
+    "defense": "10",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Storm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004110-silent-rider",
+    "keywords": ["Storm"]
+  },
+  {
+    "name": "Servant of Cocytus",
+    "cost": "1",
+    "attack": "13",
+    "defense": "13",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": null,
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004120-servant-of-cocytus",
+    "keywords": []
+  },
+  {
+    "name": "Demon of Purgatory",
+    "cost": "5",
+    "attack": "9",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select 2 enemy followers on the field and deal 6 damage to them and the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004130-demon-of-purgatory",
+    "fanfare": [{"op": "damage", "target": "enemy:follower", "amount": 6, "select": 2}, 
+                {"op": "damage", "target": "enemy:leader", "amount": 6}],
+    "keywords": []
+  },
+  {
+    "name": "Astaroth's Reckoning",
+    "cost": "10",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Set the enemy leader's max defense to 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004310-astaroths-reckoning",
+    "keywords": [],
+     "spell": [
+    {
+      "op": "set_max_hp",
+      "player": "opponent",
+      "amount": 1
+    }
+  ]
+  },
+  {
+    "name": "Fairy",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Pixie"
+    ],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90011110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90011110-fairy",
+    "keywords": ["Rush"]
+  },
+  {
+    "name": "Deepwood Bounty",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90011310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90011310-deepwood-bounty",
+    "spell": [
+      { "op": "heal_leader", "player": "self", "amount": 1 }
+    ]
+  },
+  {
+    "name": "Bramble Burst",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an enemy follower on the field or the enemy leader and deal it 3 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90014310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90014310-bramble-burst",
+    "spell": [
+        {
+            "op": "damage_follower_or_leader",
+            "target": "enemy:follower",
+            "amount": 3,
+            "select": 1,
+            "can_target_leader": true
+        }
+    ]
+  },
+  {
+    "name": "Knight",
+    "cost": "0",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Officer"
+    ],
+    "description": null,
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021110-knight",
+    "keywords": []
+  },
+  {
+    "name": "Steelclad Knight",
+    "cost": "1",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Officer"
+    ],
+    "description": null,
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021120-steelclad-knight",
+    "keywords": []
+  },
+  {
+    "name": "Nonja, Silent Maid",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Gold",
+    "tribes": [
+      "Officer"
+    ],
+    "description": "Fanfare: If there's an allied Prim, Princess's Picnic on the field, give this follower +1/+1 and Bane.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90023110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90023110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90023110-nonja-silent-maid",
+    "fanfare": [
+      {
+        "op": "board_name_gate",
+        "name": "Prim, Princess's Picnic",
+        "effects": [
+          { "op": "buff_self", "attack": 1, "defense": 1 },
+          { "op": "keyword_self", "keyword": "Bane" }
+        ]
+      }
+  ],
+    "keywords": ["Ward"]
+  },
+  {
+    "name": "Clay Golem",
+    "cost": "1",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Golem"
+    ],
+    "description": null,
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90031110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90031110-clay-golem",
+    "keywords": []
+  },
+  {
+    "name": "Guardian Golem",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Golem"
+    ],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90031120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90031120-guardian-golem",
+    "keywords": ["Ward"]
+  },
+  {
+    "name": "Paper Shikigami",
+    "cost": "2",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Shikigami"
+    ],
+    "description": "Rush\nLast Words: Spellboost your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90031130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90031130-paper-shikigami",
+    "keywords": ["Rush", { "name": "LastWords", "effects": [
+        { "op": "spellboost_hand", "times": 1 }
+      ]}]
+  },
+  {
+    "name": "Demonic Shikigami",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Shikigami"
+    ],
+    "description": "Rush\nLast Words: Spellboost your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90031140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031140_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90031140-demonic-shikigami",
+    "keywords": ["Rush", { "name": "LastWords", "effects": [
+        { "op": "spellboost_hand", "times": 1 }
+      ]}]
+  },
+
+
+  {
+    "name": "Magic Sediment",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Earth Sigil"
+    ],
+    "description": "Earth Sigil\nEngage (1): Gain an earth sigil.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90031210.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90031210-magic-sediment",
+    "engageSacrifice": false,
+    "keywords": [
+      { "name": "Counter", "key": "earth", "count": 1, "destroyOnEmpty": true },
+      { "name": "Engage", "cost": 1, "effects": [ { "op": "add_counter", "key": "earth", "amount": 1 } ] }
+      ]
+  },
+  {
+    "name": "Onion Patch",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Rush\nStrike: Spellboost your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90032110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90032110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90032110-onion-patch",
+    "keywords": ["Rush"],
+    "triggers": [
+      {
+        "event": "strike",
+        "source": "board",
+        "effects": [
+          { "op": "spellboost_hand", "times": 1 }] }
+                 ]    
+  },
+  {
+    "name": "Looking Smart!",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Gold",
+    "tribes": [
+      "Mysteria"
+    ],
+    "description": "Draw 2 cards. Deal 2 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90033310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90033310-looking-smart",
+    "spell": [{ "op": "draw", "count": 2 }, { "op": "damage_random", "target": "enemy:follower", "amount": 2 }]
+  },
+  {
+    "name": "Celestial Shikigami",
+    "cost": "4",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Shikigami"
+    ],
+    "description": "Ward\nLast Words: Spellboost your hand 3 times.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034110-celestial-shikigami",
+    "keywords": ["Ward", { "name": "LastWords", "effects": [
+        { "op": "spellboost_hand", "times": 3 }
+      ]}]
+  },
+  {
+    "name": "Noble Shikigami",
+    "cost": "10",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Shikigami"
+    ],
+    "description": "When this follower enters the field, give it +X/+Y. X/Y is the total base attack/defense of allied Shikigami followers destroyed this turn.\nWard\nAura",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034120-noble-shikigami",
+    "keywords": ["Ward", "Aura"]
+  },
+  {
+    "name": "Anne's Summoning",
+    "cost": "3",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Mysteria"
+    ],
+    "description": "Rush\nWard\nAt the end of your opponent's turn, destroy this card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034130-annes-summoning",
+    "keywords": ["Rush", "Ward"],
+    "triggers": [
+                {
+                  "event": "end_of_turn",
+                  "source": "board",
+                  "condition": { "whose_turn": "opponent" },
+                  "effects": [
+                    {
+                      "op": "destroy_self"
+                    }
+                  ]
+                }
+              ]
+  },
+  {
+    "name": "Fire Drake Whelp",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Intimidate",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90041110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90041110-fire-drake-whelp",
+    "keywords": ["Intimidate"]
+  },
+  {
+    "name": "Vastwing Dragon",
+    "cost": "5",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Intimidate",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90041120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90041120-vastwing-dragon",
+    "keywords": ["Intimidate"]
+  },
+  {
+    "name": "Majestic Megalorca",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Marine"
+    ],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90041130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90041130-majestic-megalorca",
+    "keywords": ["Rush"]
+  },
+  {
+    "name": "Otohime's Bodyguard",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Gold",
+    "tribes": [
+      "Marine"
+    ],
+    "description": "Storm\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90043110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90043110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90043110-otohimes-bodyguard",
+    "keywords": ["Storm", "Ward"]
+  },
+  {
+    "name": "Supreme Golden Dragon",
+    "cost": "4",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90044110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90044110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90044110-supreme-golden-dragon",
+    "keywords": ["Ward"]
+  },
+  {
+    "name": "Supreme Silver Dragon",
+    "cost": "4",
+    "attack": "5",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90044120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90044120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90044120-supreme-silver-dragon",
+    "keywords": ["Rush"]
+  },
+  {
+    "name": "Whitefrost Whisper",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select a Mode to activate.\n1. Destroy all damaged enemy followers.\n2. Increase the cost of all cards in your opponent's hand by 1 until the end of their turn.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90044310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90044310-whitefrost-whisper",
+    "keywords": [],
+    "spell": [
+            {
+              "op": "choose",
+              "options": [
+                {
+                  "label": "Destroy all damaged enemy followers",
+                  "effects": [
+                    {
+                      "op": "destroy_all",
+                      "target": "enemy:follower",
+                      "condition": { "damaged": true }
+                    }
+                  ]
+                },
+                {
+                  "label": "Increase the cost of all cards in your opponent's hand by 1 until the end of their turn",
+                  "effects": [
+                    {
+                      "op": "increase_opponent_hand_cost_eot",
+                      "amount": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+  },
+  {
+    "name": "Skeleton",
+    "cost": "0",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Departed"
+    ],
+    "description": null,
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90051110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90051110-skeleton",
+    "keywords": []
+  },
+  {
+    "name": "Bat",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Drain",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90051120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90051120-bat",
+    "keywords": ["Drain"]
+  },
+  {
+    "name": "Ghost",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Departed"
+    ],
+    "description": "Storm\nWhen this card leaves the field, banish it.\nAt the end of your turn, banish this card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90051130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90051130-ghost",
+    "keywords": ["Storm", "BanishOnDeath"],
+    "triggers": [
+        {
+          "event": "end_of_turn",
+          "source": "board",
+          "condition": { "whose_turn": "owner" },
+          "effects": [
+            {
+              "op": "banish_self"
+            }
+          ]
+        }
+      ]
+  },
+  {
+    "name": "Rotting Zombie",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Departed"
+    ],
+    "description": "Last Words: Summon a Rotting Zombie and remove Last Words from it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90051140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051140_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90051140-rotting-zombie",
+    "keywords": [{
+                  "name": "LastWords",
+                  "effects": [
+                    { "op": "summon_named", "name": "Rotting Zombie", "count": 1 },
+                    { "op": "remove_keyword", "target": "ally:last_summoned", "keyword": "LastWords" }
+                  ]
+                }]
+  },
+  {
+    "name": "Mimi, Right Paw Hellhound",
+    "cost": "1",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Rush\nLast Words: Deal 2 damage to the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90054110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054110-mimi-right-paw-hellhound",
+    "keywords": ["Rush", {"name": "LastWords", "effects": [
+            { "op": "damage", "target": "enemy:leader", "amount": 2 }]}]
+  },
+  {
+    "name": "Coco, Left Paw Hellhound",
+    "cost": "1",
+    "attack": "1",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Rush\nLast Words: Restore 2 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90054120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054120-coco-left-paw-hellhound",
+    "keywords": ["Rush", {"name": "LastWords", "effects": [
+            { "op": "heal_leader", "player": "self", "amount": 2 }]}]
+  },
+  {
+    "name": "One-Tailed Fox",
+    "cost": "2",
+    "attack": "2",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Rush\nWard\nLast Words: Give a random allied Ginsetsu & Yuzuki, Twin Calamities on the field +1/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90054130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054130-one-tailed-fox",
+    "keywords": ["Rush", "Ward",  {
+      "name": "LastWords",
+      "effects": [
+        {
+          "op": "buff",
+          "target": "ally:follower",
+          "random": true,
+          "count": 1,
+          "attack": 1,
+          "defense": 0,
+          "name_filter": "Ginsetsu & Yuzuki, Twin Calamities"
+        }
+      ]
+    }]
+  },
+  {
+    "name": "Holy Falcon",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Storm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90061110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90061110-holy-falcon",
+    "keywords": ["Storm"]
+  },
+  {
+    "name": "Holyflame Tiger",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90061120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90061120-holyflame-tiger",
+    "keywords": ["Rush"]
+  },
+  {
+    "name": "Regal Falcon",
+    "cost": "6",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Storm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90061130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90061130-regal-falcon",
+    "keywords": ["Storm"]
+  },
+  {
+    "name": "Holy Cavalier",
+    "cost": "1",
+    "attack": "1",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90064110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90064110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90064110-holy-cavalier",
+    "keywords": ["Ward"]
+  },
+  {
+    "name": "Puppet",
+    "cost": "0",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Puppetry"
+    ],
+    "description": "Rush\nAt the end of your opponent's turn, destroy this card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071110-puppet",
+    "keywords": ["Rush"],
+    "triggers": [
+                {
+                  "event": "end_of_turn",
+                  "source": "board",
+                  "condition": { "whose_turn": "opponent" },
+                  "effects": [
+                    {
+                      "op": "destroy_self"
+                    }
+                  ]
+                }
+              ]
+  },
+  
+  {
+    "name": "Enhanced Puppet",
+    "cost": "1",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Puppetry"
+    ],
+    "description": "Rush\nAt the end of your opponent's turn, destroy this card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071120-enhanced-puppet",
+    "keywords": ["Rush"],
+    "triggers": [
+                {
+                  "event": "end_of_turn",
+                  "source": "board",
+                  "condition": { "whose_turn": "opponent" },
+                  "effects": [
+                    {
+                      "op": "destroy_self"
+                    }
+                  ]
+                }
+              ]
+  },
+  {
+    "name": "Gear of Ambition",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": ["Artifact"],
+    "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Striker Artifact.\nCan't be played.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071210-gear-of-ambition",
+    "keywords": [],
+    "cant_play": true,
+    "fuse_recipes": [
+                    {
+                      "id": "gear→striker",
+                      "partner_filters": [
+                        { "zone": "hand", "name_in": ["Gear of Ambition","Gear of Remembrance"] }
+                      ],
+                      "result": {
+                        "type": "transform",
+                        "result_card_name": "Striker Artifact",
+                        "targets": "merge"
+                      }
+                    }
+                  ]
+  },
+  {
+    "name": "Gear of Remembrance",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": ["Artifact"],
+    "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Fortifier Artifact.\nCan't be played.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071220.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071220-gear-of-remembrance",
+    "keywords": [],
+    "cant_play": true,
+    "fuse_recipes": [
+                    {
+                      "id": "gear→striker",
+                      "partner_filters": [
+                        { "zone": "hand", "name_in": ["Gear of Ambition","Gear of Remembrance"] }
+                      ],
+                      "result": {
+                        "type": "transform",
+                        "result_card_name": "Striker Artifact",
+                        "targets": "merge"
+                      }
+                    }
+                  ]
+  },
+
+  {
+    "name": "Striker Artifact",
+    "cost": "3",
+    "attack": "5",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [
+      "Artifact"
+    ],
+    "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nRush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90072110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90072110-striker-artifact",
+    "keywords": ["Rush"],
+    "triggers": [],
+    "fuse": [
+            { "op": "start_fortifier_fuse" }
+          ]    
+  },
+  {
+    "name": "Fortifier Artifact",
+    "cost": "3",
+    "attack": "1",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [
+      "Artifact"
+    ],
+    "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90072120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90072120-fortifier-artifact",
+    "keywords": ["Ward"],
+    "triggers": [],
+    "fuse": [
+            { "op": "start_fortifier_fuse" }
+          ]
+  },
+  {
+    "name": "Doll Slayer",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [
+      "Puppetry"
+    ],
+    "description": "Ambush\nLast Words: Summon a Vier, Heart Slayer.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90072130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90072130-doll-slayer",
+    "keywords": ["Ambush", {
+                  "name": "LastWords", 
+                  "effects":
+                  [
+                    {
+                      "op": "summon_named", "name": "Vier, Heart Slayer"}]}]
+  },
+  {
+    "name": "Ominous Artifact α",
+    "cost": "5",
+    "attack": "3",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [
+      "Artifact"
+    ],
+    "description": "Fuse: Ominous Artifact β and Ominous Artifact γ\nWhen you've Fused both to this card, transform it into a Masterwork Artifact Ω.\nAt the end of your turn, restore 3 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90073110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90073110-ominous-artifact-a",
+    "keywords": [],
+    "triggers": [
+        {
+          "event": "end_of_turn",
+          "source": "board",
+          "condition": { "whose_turn": "owner" },
+          "effects": [
+            {
+              "op": "heal_leader", "player": "self", "amount": 3
+            }
+          ]
+        }
+      ],
+    "fuse_recipes": [
+        {
+          "id": "alpha→omega",
+          "partner_filters": [
+            { "zone": "hand", "name_in": ["Ominous Artifact β", "Ominous Artifact γ"] }
+          ],
+          "result": {
+            "type": "transform",
+            "result_card_name": "Masterwork Artifact Ω",
+            "targets": "merge"
+          }
+        },
+        {
+          "id": "alpha→waste_beta",
+          "partner_filters": [
+            { "zone": "hand", "name_in": ["Ominous Artifact β"] }
+          ],
+          "result": {
+            "type": "waste",
+            "consume": "partner"
+          }
+        },
+        {
+          "id": "alpha→waste_gamma",
+          "partner_filters": [
+            { "zone": "hand", "name_in": ["Ominous Artifact γ"] }
+          ],
+          "result": {
+            "type": "waste",
+            "consume": "partner"
+          }
+        }
+      ]
+
+  },
+  {
+    "name": "Ominous Artifact β",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [
+      "Artifact"
+    ],
+    "description": "At the end of your turn, deal 3 damage to the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90073120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90073120-ominous-artifact-b",
+    "keywords": [],
+    "triggers": [
+        {
+          "event": "end_of_turn",
+          "source": "board",
+          "condition": { "whose_turn": "owner" },
+          "effects": [
+            {
+              "op": "damage", "target": "enemy:leader", "amount": 3
+            }
+          ]
+        }
+      ]
+  },
+  {
+    "name": "Ominous Artifact γ",
+    "cost": "5",
+    "attack": "5",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [
+      "Artifact"
+    ],
+    "description": "At the end of your turn, deal 3 damage to all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90073130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90073130-ominous-artifact-g",
+    "keywords": [],
+    "triggers": [
+        {
+          "event": "end_of_turn",
+          "source": "board",
+          "condition": { "whose_turn": "owner" },
+          "effects": [
+            {
+              "op": "damage_all", "target": "enemy:follower", "amount": 3
+            }
+          ]
+        }
+      ]
+  },
+  {
+    "name": "Masterwork Artifact Ω",
+    "cost": "10",
+    "attack": "10",
+    "defense": "10",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Artifact"
+    ],
+    "description": "Fanfare: Deal 5 damage to all enemy followers. Restore 5 defense to your leader.\nStorm\nWard\nAura",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074110-masterwork-artifact-w",
+    "fanfare":[{
+              "op": "damage_all", "target": "enemy:follower", "amount": 5
+              }, {
+              "op": "heal_leader", "player": "self", "amount": 5
+              }],
+    "keywords": ["Storm", "Ward", "Aura"],
+    "triggers": []
+  },
+  {
+    "name": "Lloyd",
+    "cost": "3",
+    "attack": "1",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Puppetry"
+    ],
+    "description": "Ward\nYour opponent can't select any cards other than this one for abilities.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074120-lloyd",
+    "keywords": ["Ward"],
+    "triggers":[]
+  },
+  {
+    "name": "Victoria",
+    "cost": "3",
+    "attack": "6",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Puppetry"
+    ],
+    "description": "Rush\nFollower Strike: Deal X damage to the opposing follower. X is this follower's attack.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074130-victoria",
+    "keywords": ["Rush"],
+    "triggers": [
+      {
+        "event": "follower_strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "defender",
+            "amount": "{self.attack}"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Great Testimony",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and destroy it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004320-great-testimony",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [{
+            "op": "destroy",
+            "target": "enemy:follower",
+            "select": 1
+        }],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Sweetness of Voracity",
+    "cost": "5",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Deal 5 damage to a random enemy follower and the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004330-sweetness-of-voracity",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [{ "op": "damage_random", "target": "enemy:follower", "amount": 5 }, { "op": "damage", "target": "enemy:leader", "amount": 5 }],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Annihilating Onslaught",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Activates in hand. At the end of your turn, reduce the cost of this card by 1.\nDeal 6 damage to the enemy leader. If there's an allied Izudia, Annihilation Manifest on the field, deal 20 damage instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90014320.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10314120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90014320-annihilating-onslaught",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [{
+              "op": "board_name_gate",
+              "name": "Izudia, Annihilation Manifest",
+              "effects": [
+                { "op": "damage", "target": "enemy:leader", "amount": 20 }
+                
+              ],
+              "else_effects": [
+                {
+                  "op": "damage",
+                  "target": "enemy:leader",
+                  "amount": 6
+                }
+              ]
+            }],
+    "keywords": [],
+    "triggers": [
+                {
+                  "event": "end_of_turn",
+                  "source": "hand",
+                  "condition": { "whose_turn": "owner" },
+                  "effects": [{ "op": "reduce_cost_self", "amount": 1 }]
+                }
+              ]
+  },
+  {
+    "name": "Gilded Blade",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Loot"
+    ],
+    "description": "Select an enemy follower on the field or the enemy leader and deal it 1 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021310-gilded-blade",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [ {
+            "op": "damage_follower_or_leader",
+            "target": "enemy:follower",
+            "amount": 1,
+            "select": 1,
+            "can_target_leader": true
+        }],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Gilded Goblet",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Loot"
+    ],
+    "description": "Restore 2 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021320-gilded-goblet",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [ { "op": "heal_leader", "player": "self", "amount": 2 }],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Gilded Boots",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Loot"
+    ],
+    "description": "Select an allied follower on the field and give it +1/+0 and Rush.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021330-gilded-boots",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [  {
+              "op": "select",
+              "target": "ally:follower",
+              "select": true,
+              "select_count": 1,
+              "effects": [
+                {
+                  "op": "buff",
+                  "target": "selected",
+                  "attack": 1,
+                  "defense": 0                  
+                }, 
+                {
+                    "op": "keyword",
+                    "target": "selected",
+                    "keywords": ["Rush"]
+                }
+              ]
+            }
+          ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Gilded Necklace",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Loot"
+    ],
+    "description": "Select an allied follower on the field and give it +0/+1 and Ward.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021340.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021340-gilded-necklace",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [ {
+              "op": "select",
+              "target": "ally:follower",
+              "select": true,
+              "select_count": 1,
+              "effects": [
+                {
+                  "op": "buff",
+                  "target": "selected",
+                  "attack": 0,
+                  "defense": 1                  
+                }, 
+                {
+                    "op": "keyword",
+                    "target": "selected",
+                    "keywords": ["Ward"]
+                }
+              ]
+            }],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Remnant of Hollowness",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Deal 4 damage split between all enemies.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90024310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90024310-remnant-of-hollowness",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [ { "op": "damage_split_all_enemies", "amount": 4 }],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Ersatz Elimination",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Increase the cost of all followers in your hand by 1. Destroy all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034310-ersatz-elimination",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "modify_cost_pool",
+        "target": "ally:hand",
+        "amount": 1,
+        "condition": { "card_type": "Follower" }
+      },
+      {
+        "op": "destroy_all",
+        "target": "enemy:follower"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Fangs of Ardent Destruction",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Deal 1 damage to all followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90044320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90044320-fangs-of-ardent-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [{"op":"damage_all", "target": "all:follower", "amount": 1 }],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Scream Diffusion",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Summon 2 copies of Rulenye & Valnareik and give them Rush.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054310-scream-diffusion",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [{"op": "summon_named", "name": "Rulenye & Valnareik", "count": 2, "keyword": "Rush"}],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Wings of Desire",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an allied Rulenye & Valnareik on the field and give it Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054320.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054320-wings-of-desire",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+        {
+          "op": "keyword",
+          "target": "ally:follower",
+          "condition": {
+            "name": "Rulenye & Valnareik"
+          },
+          "keywords": ["storm"],
+          "select": 1
+        }
+      ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Torrent of Despair",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Banish a random enemy follower from the field. Delay the counts of all your crests by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90064310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90064310-torrent-of-despair",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+                  { "op": "banish_random", "target": "enemy:follower", "count": 1 },
+                  { "op": "increase_countdown", "amount": 1 }
+                ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "White Psalm, New Revelation",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Countdown (1)\nLast Words: Restore 1 defense to your leader. Summon a Black Psalm, New Revelation.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074210.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074210-white-psalm-new-revelation",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [{
+            "name": "Countdown", 
+            "turns": 1
+        },
+        {
+            "name": "LastWords", 
+            "effects": [
+                {"op": "heal_leader", "amount": 1},
+                {"op": "summon_named", "name": "Black Psalm, New Revelation"}
+            ]
+        }
+      ],
+    "triggers": []
+  },
+  {
+    "name": "Black Psalm, New Revelation",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Countdown (1)\nLast Words: Deal 1 damage to the enemy leader. Summon a White Psalm, New Revelation.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074220.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074220-black-psalm-new-revelation",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [{
+            "name": "Countdown", 
+            "turns": 1
+        },
+        {
+            "name": "LastWords", 
+            "effects": [
+                {"op": "damage", "target": "enemy:leader","amount": 1},
+                {"op": "summon_named", "name": "White Psalm, New Revelation"}
+            ]
+        } 
+        ],
+    "triggers": []
+  },
+  {
+    "name": "Melodious Monody",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an allied card on the field and destroy it. Deal 4 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074310-melodious-monody",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [{
+        "op": "destroy",
+        "target": "ally:any",
+        "select": true
+      }, { "op": "damage_random", "target": "enemy:follower", "amount":4 }],
+    "keywords": [],
+    "triggers": []
+  }
+]

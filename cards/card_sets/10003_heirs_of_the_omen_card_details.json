@@ -1,0 +1,3710 @@
+[
+  {
+    "name": "Apostle of Voracity",
+    "cost": "4",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select another follower on the field and give it +4/-4.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10301110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10301110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10301110-apostle-of-voracity",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "buff",
+        "target": "all:follower",
+        "select": 1,
+        "attack": 4,
+        "defense": -4
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Greatness Ascended",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Draw 3 cards. If there are no duplicates in your deck, recover 3 play points.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10301310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10301310-greatness-ascended",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "draw",
+        "count": 3
+      },
+      {
+        "op": "no_duplicates_in_deck_gate",
+        "effects": [
+          {
+            "op": "recover_pp",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Inspirational One",
+    "cost": "2",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Activates in hand. When an enemy follower super-evolves, give this follower Bane.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10302110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10302110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10302110-inspirational-one",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "enemy_super_evolve",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Bane"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Dogged One",
+    "cost": "3",
+    "attack": "3",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Activates in hand. When an enemy follower super-evolves, give this follower Storm.\nRush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10303110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10303110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10303110-dogged-one",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush"
+    ],
+    "triggers": [
+      {
+        "event": "enemy_super_evolve",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Storm"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Tablet of Tribulations",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Neutral",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Banish all duplicates from your deck.\nEngage: Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10303210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10303210-tablet-of-tribulations",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "banish_duplicates_from_deck"
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Mjerrabaine, Great Manifest",
+    "cost": "4",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Add a Great Testimony to your hand.\nEvolve: Gain Crest: Mjerrabaine, Great Manifest.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10304110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10304110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10304110-mjerrabaine-great-manifest",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Mjerrabaine, Great Manifest",
+        "image": "images/crests/mjerrabaine_great_manifest.png",
+        "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            },
+            "effects": [
+              {
+                "op": "discard_all_except_named",
+                "names": [
+                  "Great Testimony"
+                ]
+              },
+              {
+                "op": "draw",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "replace_deck_with_set_minus",
+        "set_file": "/cards/card_sets/10003_heirs_of_the_omen_card_details.json",
+        "exclude": [
+          "Mjerrabaine, Great Manifest"
+        ]
+      },
+      {
+        "op": "set_deckout_victory",
+        "enabled": true
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Mjerrabaine, Great Manifest",
+        "image": "images/crests/mjerrabaine_great_manifest.png",
+        "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            },
+            "effects": [
+              {
+                "op": "discard_all_except_named",
+                "names": [
+                  "Great Testimony"
+                ]
+              },
+              {
+                "op": "draw",
+                "count": 6
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "replace_deck_with_set_minus",
+        "set_file": "/cards/card_sets/10003_heirs_of_the_omen_card_details.json",
+        "exclude": [
+          "Mjerrabaine, Great Manifest"
+        ]
+      },
+      {
+        "op": "set_deckout_victory",
+        "enabled": true
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Great Testimony",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Gilnelise, Voracity Manifest",
+    "cost": "3",
+    "attack": "0",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select another follower on the field and give it +2/-2. If both players have 10 max play points, add a Sweetness of Voracity to your hand.\nDrain\nEvolve: Select a follower on the field and give it +2/-2.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10304120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10304120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10304120-gilnelise-voracity-manifest",
+    "evolve": [
+      {
+        "op": "buff",
+        "target": "all:follower",
+        "select": 1,
+        "include_self": true,
+        "attack": 2,
+        "defense": -2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "all:follower",
+        "select": 1,
+        "include_self": true,
+        "attack": 2,
+        "defense": -2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "both_max_pp_gate",
+        "at_least": 10,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Sweetness of Voracity",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "op": "buff",
+        "target": "all:follower",
+        "select": 1,
+        "attack": 2,
+        "defense": -2
+      }
+    ],
+    "keywords": [
+      "Drain"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Devotee of Unkilling",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and give it -0/-1.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10311110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10311110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10311110-devotee-of-unkilling",
+    "evolve": [
+      {
+        "op": "buff",
+        "target": "enemy:follower",
+        "select": 1,
+        "attack": 0,
+        "defense": -1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "enemy:follower",
+        "select": 1,
+        "attack": 0,
+        "defense": -1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "buff",
+        "target": "enemy:follower",
+        "select": 1,
+        "attack": 0,
+        "defense": -1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Bearer of the Fairy Blade",
+    "cost": "2",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Whenever an allied Pixie follower enters the field, give this follower +1/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10311120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10311120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10311120-bearer-of-the-fairy-blade",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Pixie"
+        },
+        "effects": [
+          {
+            "op": "buff_self",
+            "attack": 1,
+            "defense": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Bestial Swipe",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and deal it 4 damage. Combo (3) - Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10311310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10311310-bestial-swipe",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 4,
+        "select": 1
+      },
+      {
+        "op": "combo_gate",
+        "count": 3,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Unkilling",
+    "cost": "6",
+    "attack": "5",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Give all enemy followers on the field -0/-3.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10312110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10312110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10312110-supplicant-of-unkilling",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "enemy:follower",
+        "attack": 0,
+        "defense": -3
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "buff",
+        "target": "enemy:follower",
+        "attack": 0,
+        "defense": -3
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Greatwood Warrior",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Last Words: Add a Deepwood Bounty and Fairy to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10312120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10312120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10312120-greatwood-warrior",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Deepwood Bounty",
+            "count": 1
+          },
+          {
+            "op": "add_to_hand",
+            "name": "Fairy",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Hamlet of Unkilling",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a card in your hand and discard it. Draw 2 cards.\nEngage: Destroy this card. Select an enemy follower on the field and give it -0/-2.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10312210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10312210-hamlet-of-unkilling",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "discard_select_hand",
+        "count": 1
+      },
+      {
+        "op": "draw",
+        "count": 2
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "buff",
+            "target": "enemy:follower",
+            "attack": 0,
+            "defense": -2,
+            "select": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Unkilling",
+    "cost": "9",
+    "attack": "4",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "When this card enters the field, summon an exact copy of it and give the exact copy -0/-1.\nRush\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10313110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10313110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10313110-congregant-of-unkilling",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush",
+      "Ward"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Eradicating Arrow",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Do this X times: \"Give a random enemy follower on the field -0/-1.\" X is your Combo.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10313310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10313310-eradicating-arrow",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "combo_repeat_buff",
+        "target": "enemy:follower",
+        "random": true,
+        "count": 1,
+        "attack": 0,
+        "defense": -1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Krulle, Heir to Unkilling",
+    "cost": "4",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Give all enemy followers on the field -0/-2.\nAmbush\nOnce on each of your turns, when an enemy follower is given - defense on the field, restore 1 defense to your leader.\nSuper-Evolve: Give your opponent Crest: Krulle, Heir to Unkilling.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10314110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10314110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10314110-krulle-heir-to-unkilling",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "player": "opponent",
+        "name": "Krulle, Heir to Unkilling",
+        "image": "images/crests/krulle_heir_to_unkilling.png",
+        "description": "Countdown (2) Whenever an allied follower enters the field, give it -1/-1",
+        "countdown": 2,
+        "trigger": {
+          "event": "ally_follower_enter",
+          "source": "board",
+          "effects": [
+            {
+              "op": "buff",
+              "target": "entering_follower",
+              "attack": -1,
+              "defense": -1
+            }
+          ]
+        }
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "buff",
+        "target": "enemy:follower",
+        "attack": 0,
+        "defense": -2
+      }
+    ],
+    "keywords": [
+      "Ambush"
+    ],
+    "triggers": [
+      {
+        "event": "enemy_follower_defense_down",
+        "source": "board",
+        "once_per_turn": true,
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "heal_leader",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Izudia, Annihilation Manifest",
+    "cost": "8",
+    "attack": "6",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and give it -0/-6.\nEvolve: Add an Annihilating Onslaught to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10314120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10314120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10314120-izudia-annihilation-manifest",
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Annihilating Onslaught",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Annihilating Onslaught",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "buff",
+        "target": "enemy:follower",
+        "attack": 0,
+        "defense": -6,
+        "select": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Devotee of Usurpation",
+    "cost": "2",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Gilded Boots to your hand.\nLast Words: Add a Gilded Goblet to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10321110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10321110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10321110-devotee-of-usurpation",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Boots",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Gilded Goblet",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Comrade of the Swordmaster",
+    "cost": "6",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Last Words: Summon a Comrade of the Swordmaster and remove Last Words from it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10321120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10321120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10321120-comrade-of-the-swordmaster",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Comrade of the Swordmaster",
+            "count": 1
+          },
+          {
+            "op": "remove_keyword",
+            "target": "ally:last_summoned",
+            "keyword": "LastWords"
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Shield Bash",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an allied follower on the field and give it Ward. Deal 4 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10321310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10321310-shield-bash",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "selected",
+            "keywords": [
+              "Ward"
+            ]
+          }
+        ]
+      },
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 4
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Usurpation",
+    "cost": "2",
+    "attack": "1",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add a Gilded Necklace to your hand.\nLast Words: Add a Gilded Blade to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10322110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10322110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10322110-supplicant-of-usurpation",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Necklace",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Gilded Blade",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Peppy Scout",
+    "cost": "5",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Summon a random Swordcraft follower that costs 3 or less from your deck.\nEvolve: Select another allied follower on the field and give it +2/+2.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10322120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10322120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10322120-peppy-scout",
+    "evolve": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "buff",
+            "target": "selected",
+            "attack": 2,
+            "defense": 2
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "buff",
+            "target": "selected",
+            "attack": 2,
+            "defense": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_random_from_deck",
+        "count": 1,
+        "filters": {
+          "type": "Follower",
+          "class": "Swordcraft",
+          "cost_lte": 3
+        }
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Lair of Usurpation",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Engage: Destroy this card. Select a Mode to activate.\n1. Add a Gilded Blade and Gilded Necklace to your hand.\n2. Add a Gilded Goblet and Gilded Boots to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10322210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10322210-lair-of-usurpation",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "choose",
+            "options": [
+              {
+                "label": "Add a Gilded Blade and Gilded Necklace to your hand",
+                "effects": [
+                  {
+                    "op": "add_to_hand",
+                    "name": "Gilded Blade",
+                    "count": 1
+                  },
+                  {
+                    "op": "add_to_hand",
+                    "name": "Gilded Necklace",
+                    "count": 1
+                  }
+                ]
+              },
+              {
+                "label": "Add a Gilded Goblet and Gilded Boots to your hand",
+                "effects": [
+                  {
+                    "op": "add_to_hand",
+                    "name": "Gilded Goblet",
+                    "count": 1
+                  },
+                  {
+                    "op": "add_to_hand",
+                    "name": "Gilded Boots",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Usurpation",
+    "cost": "4",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add a Gilded Goblet and Gilded Boots to your hand.\nWhenever you play or Fuse a Loot card, deal 3 damage to a random enemy follower.\nEvolve: Recover 1 play point.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10323110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10323110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10323110-congregant-of-usurpation",
+    "hasOngoing": true,
+    "evolve": [
+      {
+        "op": "recover_pp",
+        "player": "self",
+        "amount": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "recover_pp",
+        "player": "self",
+        "amount": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Goblet",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Boots",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "loot_fused",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 3
+          }
+        ]
+      },
+      {
+        "event": "loot_played",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Returning Slash",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fuse: Loot cards\nDeal 2 damage to a random enemy follower. Add a Gilded Blade to your hand. If you've Fused to this card, draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10323310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10323310-returning-slash",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 2
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Blade",
+        "count": 1
+      }
+    ],
+    "fuse_recipes": [
+      {
+        "id": "returning_slash_loot",
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "type": "Spell",
+            "tribe": "Loot"
+          }
+        ],
+        "finalize_op": "fuse_finalize_loot"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Sinciro, Heir to Usurpation",
+    "cost": "6",
+    "attack": "5",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fuse: Loot cards\nFanfare: Deal X damage to all enemies. X is the number of differently named cards Fused to this card.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10324110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10324110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10324110-sinciro-heir-to-usurpation",
+    "fuse_recipes": [
+      {
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "type": "Spell",
+            "tribe": "Loot"
+          }
+        ],
+        "multi": true,
+        "requires_confirmation": true,
+        "finalize_op": "fuse_finalize_loot"
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": "{self.fused_loot_unique}"
+      },
+      {
+        "op": "damage_all",
+        "target": "enemy:leader",
+        "amount": "{self.fused_loot_unique}"
+      }
+    ],
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": "{self.fused_loot_unique}"
+      },
+      {
+        "op": "damage_all",
+        "target": "enemy:leader",
+        "amount": "{self.fused_loot_unique}"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Octrice, Hollowness Manifest",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Octrice, Hollowness Manifest.\nEvolve: Add a Gilded Blade and Gilded Necklace to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10324120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10324120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10324120-octrice-hollowness-manifest",
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Blade",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Necklace",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Blade",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Necklace",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Octrice, Hollowness Manifest",
+        "image": "images/crests/octrice_hollowness_manifest.png",
+        "description": "Countdown (8). Whenever you play or Fuse a Loot card, advance this crest's count by 1.\nLast Words: Add a Remnant of Hollowness to your hand.",
+        "countdown": 8,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Remnant of Hollowness"
+          }
+        ],
+        "trigger": [
+          {
+            "event": "loot_fused",
+            "source": "board",
+            "effects": [
+              {
+                "op": "reduce_countdown",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "event": "loot_played",
+            "source": "board",
+            "effects": [
+              {
+                "op": "reduce_countdown",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Devotee of Truth",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: If this card's cost isn't 2, restore 3 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10331110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10331110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10331110-devotee-of-truth",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "self_cost_gate",
+        "cost": 2,
+        "else_effects": [
+          {
+            "op": "heal_leader",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Ascetic of Wuxing",
+    "cost": "4",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Summon a Paper Shikigami.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10331120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10331120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10331120-ascetic-of-wuxing",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Paper Shikigami",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Paper Shikigami",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Paper Shikigami",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Crystal Gazing",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Gain Crest: Crystal Gazing.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10331310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10331310-crystal-gazing",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "gain_crest",
+        "name": "Crystal Gazing",
+        "image": "images/crests/crystal_gazing.png",
+        "description": "Countdown (2) Last Words: Draw 2 cards. Deal 4 damage to all enemy followers.",
+        "countdown": 2,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 2
+          },
+          {
+            "op": "damage_all",
+            "target": "enemy:follower",
+            "amount": 4
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Truth",
+    "cost": "5",
+    "attack": "3",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Deal 3 damage to all other followers. If this card's cost isn't 5, draw 2 cards.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10332110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10332110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10332110-supplicant-of-truth",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": true
+        },
+        "amount": 3
+      },
+      {
+        "op": "self_cost_gate",
+        "cost": 5,
+        "else_effects": [
+          {
+            "op": "draw",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Institute of Truth",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (5)\nWhenever you play a follower whose cost has been changed, draw a card and advance this amulet's count by 1.\nEngage: Select a follower in your hand, increase its cost by 1, and give it +1/+1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10332210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10332210-institute-of-truth",
+    "hasOngoing": true,
+    "engageSacrifice": false,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "triggers": [
+      {
+        "event": "ally_follower_played",
+        "source": "board",
+        "condition": {
+          "cost_changed": true
+        },
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          },
+          {
+            "op": "reduce_countdown",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "countdown",
+        "count": 5
+      },
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "select",
+            "target": "ally:hand",
+            "select": 1,
+            "condition": {
+              "card_type": "Follower"
+            },
+            "effects": [
+              {
+                "op": "modify_cost",
+                "amount": 1,
+                "target": "selected"
+              },
+              {
+                "op": "buff",
+                "attack": 1,
+                "defense": 1,
+                "target": "selected"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Risky Amalgamation",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Summon a Guardian Golem and Clay Golem.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10332310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10332310-risky-amalgamation",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Guardian Golem",
+        "count": 1
+      },
+      {
+        "op": "summon_named",
+        "name": "Clay Golem",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Truth",
+    "cost": "3",
+    "attack": "3",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: If this card's cost isn't 3, summon 2 exact copies of it.\nRush\nSuper-Evolve: Summon an exact copy of this card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10333110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10333110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10333110-congregant-of-truth",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "summon_exact_copy",
+        "target": "self"
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "self_cost_gate",
+        "cost": 3,
+        "else_effects": [
+          {
+            "op": "summon_exact_copy",
+            "target": "ally:last_summoned",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      "Rush"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Illusory Conjuration",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select a follower in your hand and increase its cost by 1. Destroy a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10333310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10333310-illusory-conjuration",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "select": 1,
+        "condition": {
+          "card_type": "Follower"
+        },
+        "effects": [
+          {
+            "op": "modify_cost",
+            "amount": 1,
+            "target": "selected"
+          },
+          {
+            "op": "destroy_random",
+            "target": "enemy:follower"
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Velharia, Heir to Truth",
+    "cost": "2",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Draw a card.\nEvolve: Select an enemy follower on the field and banish it.\nSuper-Evolve: Banish all enemy copies of it from the field.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10334110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10334110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10334110-velharia-heir-to-truth",
+    "evolve": [
+      {
+        "op": "banish",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "banish_all_enemy_copies"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Raio, Elimination Manifest",
+    "cost": "9",
+    "attack": "9",
+    "defense": "9",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Reduce the cost of all followers in your deck by 3. Transform a random spell in your hand into an Ersatz Elimination. It costs 0 until the end of the turn.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10334120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10334120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10334120-raio-elimination-manifest",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "reduce_deck_followers_cost",
+        "amount": 3
+      },
+      {
+        "op": "transform_random_spell_in_hand",
+        "into": "Ersatz Elimination"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Devotee of Disdain",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "During your turn, whenever this follower takes damage but isn't destroyed, draw a Dragoncraft follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10341110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10341110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10341110-devotee-of-disdain",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "self_damaged",
+        "condition": {
+          "still_alive": true
+        },
+        "effects": [
+          {
+            "op": "draw_filtered",
+            "count": 1,
+            "filters": {
+              "type": "follower",
+              "class": "dragoncraft"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Snowstorm Dragonewt",
+    "cost": "6",
+    "attack": "6",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Destroy all damaged enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10341120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10341120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10341120-snowstorm-dragonewt",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy_all",
+        "target": "enemy:follower",
+        "condition": {
+          "damaged": true
+        }
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Raging Lightning",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Deal 5 damage to all followers with the highest defense. If you're in Overflow, deal 3 damage to all leaders with the highest defense.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10341310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10341310-raging-lightning",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_highest_defense",
+        "target": "follower",
+        "amount": 5
+      },
+      {
+        "op": "overflow_gate",
+        "effects": [
+          {
+            "op": "damage_highest_defense",
+            "target": "leader",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Disdain",
+    "cost": "5",
+    "attack": "3",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Rush\nWard\nAt the end of your turn, fully restore the defense of this follower and restore the same amount to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10342110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10342110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10342110-supplicant-of-disdain",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush",
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "restore_self_and_heal_leader"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ocean Rider",
+    "cost": "3",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Summon a Majestic Megalorca. If you're in Overflow, summon 2 instead.\nWhenever an allied Marine follower enters the field, give it Ward.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10342120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10342120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10342120-ocean-rider",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Majestic Megalorca"
+      },
+      {
+        "op": "overflow_gate",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Majestic Megalorca"
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Marine",
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "keywords": [
+              "Ward"
+            ],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Nation of Disdain",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (4)\nEngage (1): Deal 1 damage to all followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10342210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10342210-nation-of-disdain",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "countdown",
+        "turns": 4
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "damage_all",
+            "target": "all:follower",
+            "condition": {
+              "not_self": true
+            },
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Disdain",
+    "cost": "6",
+    "attack": "5",
+    "defense": "7",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Deal 3 damage to all followers.\nAt the end of your turn, if this follower's defense is 3 or less, give all Dragoncraft followers in your hand +1/+1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10343110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10343110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10343110-congregant-of-disdain",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": false
+        },
+        "amount": 3
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner",
+          "defense_lte": 3
+        },
+        "effects": [
+          {
+            "op": "buff_hand_class",
+            "class": "Dragoncraft",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ferocious Flame",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select an allied follower on the field and deal it 1 damage. Deal 3 damage to a random enemy follower. If you're in Overflow, draw a Dragoncraft follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10343310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10343310-ferocious-flame",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "ally:follower",
+        "select": 1,
+        "amount": 1
+      },
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 3
+      },
+      {
+        "op": "overflow_gate",
+        "effects": [
+          {
+            "op": "draw_filtered",
+            "count": 1,
+            "filters": {
+              "type": "follower",
+              "class": "dragoncraft"
+            }
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Azurifrit, Heir to Disdain",
+    "cost": "9",
+    "attack": "5",
+    "defense": "7",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Do this 3 times: \"Deal 2 damage to all followers.\"\nWard\nDuring your turn, whenever this follower takes damage but isn't destroyed, deal 1 damage to the enemy leader.\nSuper-Evolve: Fully restore the defense of this follower. Do this 3 times: \"Deal 2 damage to all followers.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10344110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10344110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10344110-azurifrit-heir-to-disdain",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "restore_full_defense_self"
+      },
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": false
+        },
+        "amount": 2
+      },
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": false
+        },
+        "amount": 2
+      },
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": false
+        },
+        "amount": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": false
+        },
+        "amount": 2
+      },
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": false
+        },
+        "amount": 2
+      },
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "condition": {
+          "not_self": false
+        },
+        "amount": 2
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "self_damaged",
+        "condition": {
+          "still_alive": true
+        },
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Galmieux, Ardor Manifest",
+    "cost": "5",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Galmieux, Ardor Manifest.\nEnhance (7): Give this follower Storm.\nOnce on each of your turns, when this follower takes damage but isn't destroyed, deal 3 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10344120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10344120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10344120-galmieux-ardor-manifest",
+    "hasOngoing": true,
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Galmieux, Ardor Manifest",
+        "image": "images/crests/galmieux_ardor_manifest.png",
+        "description": "Once each of your turns: when an allied follower takes damage but isn't destroyed, add a Fangs of Ardent Destruction to your hand.",
+        "trigger": {
+          "event": "self_damaged",
+          "once_per_turn": true,
+          "effects": [
+            {
+              "op": "add_to_hand",
+              "name": "Fangs of Ardent Destruction"
+            }
+          ],
+          "condition": {
+            "still_alive": true
+          }
+        }
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Storm"
+            ]
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "self_damaged",
+        "once_per_turn": true,
+        "condition": {
+          "still_alive": true,
+          "own_turn": true
+        },
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Devotee of Entwining",
+    "cost": "3",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Deal 1 damage to all enemy followers.\n2. Give this follower +2/+2.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10351110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10351110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10351110-devotee-of-entwining",
+    "evolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 1 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +2/+2",
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 1 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +2/+2",
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 1 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +2/+2",
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Ephemeral Demon Princess",
+    "cost": "8",
+    "attack": "4",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select 2 enemy followers on the field and destroy them. Deal 4 damage to your leader.\nStorm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10351120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10351120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10351120-ephemeral-demon-princess",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 4
+      }
+    ],
+    "keywords": [
+      "Storm"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "March of the Brutes",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Deal 2 damage to 2 random enemy followers and the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10351310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10351310-march-of-the-brutes",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 2,
+        "count": 2
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 2
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Entwining",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Deal 3 damage to a random enemy follower.\n2. Restore 2 defense to your leader.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10352110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10352110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10352110-supplicant-of-entwining",
+    "evolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Spirited Gravekeeper",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Enhance (7): Reanimate (5) and Reanimate (3).",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10352120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10352120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10352120-spirited-gravekeeper",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "reanimate",
+            "max_cost": 5
+          },
+          {
+            "op": "reanimate",
+            "max_cost": 3
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Castle of Entwining",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Draw a card.\n2. Give a random allied follower on the field +1/+1.\nEngage (1): Destroy this card. Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10352210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10352210-castle-of-entwining",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Draw a card",
+            "effects": [
+              {
+                "op": "draw",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Give a random allied follower on the field +1/+1",
+            "effects": [
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "attack": 1,
+                "defense": 1,
+                "random": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "choose",
+            "options": [
+              {
+                "label": "Draw a card",
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 1
+                  }
+                ]
+              },
+              {
+                "label": "Give a random allied follower on the field +1/+1",
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "ally:follower",
+                    "attack": 1,
+                    "defense": 1,
+                    "random": true,
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Entwining",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Summon a Congregant of Entwining and give it and this follower Rush.\n2. Summon a Congregant of Entwining and give it and this follower Ward.\n3. Give all allied copies of Congregant of Entwining on the field +2/+2.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10353110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10353110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10353110-congregant-of-entwining",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Rush",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Rush"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Rush"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Ward",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Ward"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Ward"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Give all allied copies of Congregant of Entwining on the field +2/+2",
+            "effects": [
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "name_filter": "Congregant of Entwining",
+                "attack": 2,
+                "defense": 2
+              },
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Rush",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Rush"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Rush"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Ward",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Ward"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Ward"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Give all allied copies of Congregant of Entwining on the field +2/+2",
+            "effects": [
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "name_filter": "Congregant of Entwining",
+                "attack": 2,
+                "defense": 2
+              },
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Screaming and Loathing",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select 2 Modes to activate.\n1. Recover 1 play point.\n2. Draw a follower.\n3. Draw a 3-cost spell.\n4. Deal 4 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10353310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10353310-screaming-and-loathing",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "choose",
+        "select_count": 2,
+        "unique": true,
+        "options": [
+          {
+            "label": "Recover 1 play point",
+            "effects": [
+              {
+                "op": "recover_pp",
+                "player": "self",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Draw a follower",
+            "effects": [
+              {
+                "op": "draw_filtered",
+                "count": 1,
+                "filters": {
+                  "type": "Follower"
+                }
+              }
+            ]
+          },
+          {
+            "label": "Draw a 3-cost spell",
+            "effects": [
+              {
+                "op": "draw_filtered",
+                "count": 1,
+                "filters": {
+                  "type": "Spell",
+                  "cost_eq": 3
+                }
+              }
+            ]
+          },
+          {
+            "label": "Deal 4 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 4,
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Sham-Nacha, Heir to Entwining",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Encroacher"
+    ],
+    "description": "Fanfare: Reduce the faith of Faith: Sham-Nacha, Heir to Entwining by 10 to give it \"Increase the number of Modes you can select by 1.\"\nSuper-Evolve: Select an enemy follower on the field, destroy it, and add a copy of it to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10354110.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10354110-sham-nacha-heir-to-entwining",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected:follower"
+          },
+          {
+            "op": "add_selected_copy_to_hand",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "crest_pay_counter",
+        "crest": "Faith",
+        "counter": "faith",
+        "amount": 10,
+        "on_success_effects": [
+          {
+            "op": "choose_bonus_add",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Rulenye & Valnareik",
+    "cost": "7",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Add a Scream Diffusion to your hand.\n2. Add a Wings of Desire to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10354120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10354120-rulenye-valnareik",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Add a Scream Diffusion to your hand",
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Scream Diffusion"
+              }
+            ]
+          },
+          {
+            "label": "Add a Wings of Desire to your hand",
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Wings of Desire"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Devotee of Repose",
+    "cost": "2",
+    "attack": "0",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Devotee of Repose.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10361110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10361110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10361110-devotee-of-repose",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Devotee of Repose",
+        "image": "images/crests/devotee_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, give a random allied follower -2/-0 and Ward.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "ally:follower",
+                    "random": true,
+                    "count": 1,
+                    "attack": -2,
+                    "defense": 0,
+                    "keyword": "Ward"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Knight of the Holy Order",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward\nWhenever this follower is given + attack or defense on the field, restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10361120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10361120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10361120-knight-of-the-holy-order",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "self_buffed_up",
+        "source": "board",
+        "effects": [
+          {
+            "op": "heal_leader",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Blinding Faith",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Deal 3 damage to all enemy followers.\nEnhance (8): Draw 3 cards. Restore 3 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10361310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10361310-blinding-faith",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 3
+      }
+    ],
+    "keywords": [
+      {
+        "name": "enhance",
+        "cost": 8,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 3
+          },
+          {
+            "op": "heal_leader",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Repose",
+    "cost": "3",
+    "attack": "1",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Supplicant of Repose.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10362110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10362110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10362110-supplicant-of-repose",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Supplicant of Repose",
+        "image": "images/crests/supplicant_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, restore 1 defense to your leader.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "heal_leader",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Temple of Repose",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (4)\nLast Words: Restore 2 defense to your leader. Give your leader Barrier.\nEngage: Advance this amulet's count by X. X is the number of crests you have.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10362210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10362210-temple-of-repose",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "heal_leader",
+            "amount": 2
+          },
+          {
+            "op": "leader_barrier",
+            "charges": 1
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "repeat_effect",
+            "count_source": "crest_count",
+            "effect": {
+              "op": "reduce_countdown",
+              "amount": 1
+            }
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Winged Lion Statue",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (3)\nLast Words: Summon a Holy Falcon and Holyflame Tiger.\nEngage (1): Advance this amulet's count by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10362220.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10362220-winged-lion-statue",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 3
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Holy Falcon"
+          },
+          {
+            "op": "summon_named",
+            "name": "Holyflame Tiger"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Repose",
+    "cost": "5",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and destroy it.\nEvolve: Gain Crest: Congregant of Repose.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10363110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10363110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10363110-congregant-of-repose",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Congregant of Repose",
+        "image": "images/crests/congregant_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "draw_filtered",
+                    "count": 1,
+                    "filters": {
+                      "type": "follower",
+                      "defense_eq": 4
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Congregant of Repose",
+        "image": "images/crests/congregant_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "draw_filtered",
+                    "count": 1,
+                    "filters": {
+                      "type": "follower",
+                      "defense_eq": 4
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Shining Disenchantment",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Countdown (4)\nLast Words: Deal 4 damage split between all enemies. Restore 4 defense to your leader.\nEngage: Advance this amulet's count by X. X is the number of crests you have.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10363210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10363210-shining-disenchantment",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "damage_split_all_enemies",
+            "amount": 4
+          },
+          {
+            "op": "heal_leader",
+            "amount": 4
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "repeat_effect",
+            "count_source": "crest_count",
+            "effect": {
+              "op": "reduce_countdown",
+              "amount": 1
+            }
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Himeka, Heir to Repose",
+    "cost": "6",
+    "attack": "0",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Himeka, Heir to Repose.\nSuper-Evolve: Set the attack of all enemy followers on the field to 4.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10364110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10364110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10364110-himeka-heir-to-repose",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "set_attack_to",
+        "target": "enemy:follower",
+        "value": 4
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Himeka, Heir to Repose",
+        "image": "images/crests/himeka_heir_to_repose.png",
+        "description": "Countdown (4). At the end of your turn, if there's an allied Himeka, Heir to Repose on the field, give X random enemy followers with 4 attack or less \"Can't attack followers or leaders\" until opponent's end of turn, then banish them. X is the number of crests you have.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "board_name_gate",
+                "name": "Himeka, Heir to Repose",
+                "effects": [
+                  {
+                    "op": "repeat_effect",
+                    "count_source": "crest_count",
+                    "effect": {
+                      "op": "himeka_crest_effect"
+                    }
+                  }
+                ],
+                "else_effects": []
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Marwynn, Despair Manifest",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Add a Torrent of Despair to your hand.\nEvolve: Gain Crest: Marwynn, Despair Manifest.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10364120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10364120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10364120-marwynn-despair-manifest",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Marwynn, Despair Manifest",
+        "image": "images/crests/marwynn_despair_manifest.png",
+        "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "damage_split_all_enemies",
+                    "count_source": "crest_count"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Marwynn, Despair Manifest",
+        "image": "images/crests/marwynn_despair_manifest.png",
+        "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "damage_split_all_enemies",
+                    "count_source": "crest_count"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Torrent of Despair"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Devotee of Destruction",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Give this follower +X/+X. X is the number of other allied cards on the field. Destroy all other allied cards on the field.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10371110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10371110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10371110-devotee-of-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "dynamic_buff_self",
+        "attack_source": "count_allies",
+        "defense_source": "count_allies",
+        "exclude_self": true
+      },
+      {
+        "op": "destroy_all",
+        "target": "ally:any",
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Supersonic Fighter",
+    "cost": "7",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Summon an Ominous Artifact \u03b3.\nEvolve: Select an allied Artifact follower on the field and give it +3/+3.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10371120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10371120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10371120-supersonic-fighter",
+    "evolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "tribe": "Artifact",
+        "attack": 3,
+        "defense": 3
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "tribe": "Artifact",
+        "attack": 3,
+        "defense": 3
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Ominous Artifact \u03b3"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Wired Assault",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and destroy it. Add 2 copies of Puppet to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10371310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10371310-wired-assault",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 2
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Destruction",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select another allied card on the field. If you selected one, destroy it and deal 2 damage to a random enemy follower.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10372110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10372110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10372110-supplicant-of-destruction",
+    "evolve": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Field Scientist",
+    "cost": "5",
+    "attack": "3",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a card in your hand and discard it. Draw 3 cards.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10372120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10372120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10372120-field-scientist",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "return_hand_to_deck",
+        "select": 1,
+        "target": "ally:hand",
+        "optional": true
+      },
+      {
+        "op": "draw",
+        "count": 3
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Wasteland of Destruction",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select another allied card on the field. If you selected one, destroy it and draw 2 cards.\nLast Words: Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10372210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10372210-wasteland-of-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw"
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Destruction",
+    "cost": "6",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Destroy X random enemy followers. X is the number of other allied cards on the field. Destroy all other allied cards on the field.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10373110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10373110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10373110-congregant-of-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy_random_other_allies"
+      },
+      {
+        "op": "destroy_all",
+        "target": "ally:any",
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Devastating Soprano",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select an allied card on the field and destroy it. Summon a White Psalm, New Revelation.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10373310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10373310-devastating-soprano",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "ally:any",
+        "select": true
+      },
+      {
+        "op": "summon_named",
+        "name": "White Psalm, New Revelation"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Axia, Heir to Destruction",
+    "cost": "3",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Ward\nCan't be destroyed by abilities.\nSuper-Evolve: Deal X damage to the enemy leader. X is the number of other allied cards on the field. Destroy all other allied cards on the field.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10374110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10374110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10374110-axia-heir-to-destruction",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "damage_enemy_leader_by_other_allies"
+      },
+      {
+        "op": "destroy_all",
+        "target": "ally:any",
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      "cant_be_destroyed"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Lishenna, Melody Manifest",
+    "cost": "4",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Add a Melodious Monody to your hand.\nCan't be destroyed by abilities.\nEvolve: Summon a White Psalm, New Revelation.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10374120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10374120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10374120-lishenna-melody-manifest",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "White Psalm, New Revelation"
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "White Psalm, New Revelation"
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Melodious Monody"
+      }
+    ],
+    "keywords": [
+      "cant_be_destroyed"
+    ],
+    "triggers": []
+  }
+]

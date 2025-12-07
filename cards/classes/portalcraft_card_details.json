@@ -1,0 +1,1782 @@
+[
+  {
+    "name": "Kitty Cannoneer",
+    "cost": "3",
+    "attack": "3",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition to your hand.\nRush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10071110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071110-kitty-cannoneer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      "Rush"
+    ]
+  },
+  {
+    "name": "Puppet Lancer",
+    "cost": "2",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add an Enhanced Puppet to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10071120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071120-puppet-lancer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Enhanced Puppet",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Mechanized Beast",
+    "cost": "6",
+    "attack": "4",
+    "defense": "9",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Bane\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10071130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071130-mechanized-beast",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Bane",
+      "Ward"
+    ]
+  },
+  {
+    "name": "Bullet from Beyond",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and destroy it. Add a Gear of Ambition and Gear of Remembrance to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071310-bullet-from-beyond",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Electric Whip Lass",
+    "cost": "2",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Remembrance to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10072110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10072110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10072110-electric-whip-lass",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Mecha Cavalier",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Ward\nEvolve: Summon a Mecha Cavalier.\nSuper-Evolve: Summon 2 instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10072120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10072120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10072120-mecha-cavalier",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Mecha Cavalier",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Mecha Cavalier",
+        "count": 2
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Puppet Theater",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add a Puppet to your hand.\nCountdown (2)\nAt the end of your turn, add a Puppet to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10072210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10072210-puppet-theater",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 1
+      }
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Puppet",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      }
+    ]
+  },
+  {
+    "name": "Elise, Electrifying Inventor",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Last Words: Add a Gear of Remembrance to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10171110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10171110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10171110-elise-electrifying-inventor",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Gear of Remembrance",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Dirk, Metal Mercenary",
+    "cost": "5",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Summon a Fortifier Artifact.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10171120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10171120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10171120-dirk-metal-mercenary",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Fortifier Artifact",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Ironheart Hunter",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition to your hand.\nEvolve: Select an enemy follower on the field and deal it 3 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10171130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10171130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10171130-ironheart-hunter",
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Medical-Grade Assassin",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add an Enhanced Puppet to your hand.\nOnce on each of your turns, when an allied Puppetry follower enters the field, give it Bane.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10171140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10171140_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10171140-medical-grade-assassin",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Enhanced Puppet",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Puppet Shield",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Summon 2 copies of Enhanced Puppet.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10171310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10171310-puppet-shield",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Enhanced Puppet",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Artifact Recharge",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Add a Gear of Ambition and Gear of Remembrance to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10171320.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10171320-artifact-recharge",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Rukina, Resistance Leader",
+    "cost": "4",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.\nEvolve: Summon a Striker Artifact.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10172110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10172110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10172110-rukina-resistance-leader",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Lovestruck Puppeteer",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add a Puppet to your hand.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10172120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10172120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10172120-lovestruck-puppeteer",
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Noah, Thread of Death",
+    "cost": "6",
+    "attack": "5",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add 3 copies of Puppet to your hand. Give all Puppetry followers in your hand +1/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10172130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10172130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10172130-noah-thread-of-death",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 3
+      },
+      {
+        "op": "buff_hand_tribe",
+        "tribe": "Puppetry",
+        "attack": 1,
+        "defense": 0
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Stream of Life",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and deal it 3 damage. Add a Gear of Remembrance to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10172310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10172310-stream-of-life",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Doomwright Resurgence",
+    "cost": "5",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select 2 Artifact followers in your hand that cost 5 or less, summon an exact copy of each, and give the exact copies \"At the end of your opponent's turn, destroy this card.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10172320.webp",
+    "evo_image": "",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10172320-doomwright-resurgence",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select_hand_summon_artifact_copies_eot_destroy",
+        "select": 2,
+        "max_cost": 5
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Miriam, the Resolute",
+    "cost": "3",
+    "attack": "2",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10173110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10173110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10173110-miriam-the-resolute",
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Sylvia, Garden Executioner",
+    "cost": "6",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Draw 2 cards.\n2. Restore 4 defense to your leader.\nEvolve: Select an enemy follower on the field and destroy it.\nSuper-Evolve: Select 2 instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10173120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10173120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10173120-sylvia-garden-executioner",
+    "evolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Draw 2 cards",
+            "effects": [
+              {
+                "op": "draw",
+                "count": 2
+              }
+            ]
+          },
+          {
+            "label": "Restore 4 defense to your leader",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 4
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Liam, Crazed Creator",
+    "cost": "10",
+    "attack": "8",
+    "defense": "8",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Summon 3 copies of Enhanced Puppet.\nEvolve: Give all allied Puppetry followers on the field Ward and \"Last Words: Deal 2 damage to the enemy leader.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10173130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10173130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10173130-liam-crazed-creator",
+    "evolve": [
+      {
+        "op": "keyword",
+        "target": "ally:follower",
+        "condition": {
+          "tribe": "Puppetry"
+        },
+        "keywords": [
+          {
+            "name": "Ward"
+          },
+          {
+            "name": "LastWords",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "keyword",
+        "target": "ally:follower",
+        "condition": {
+          "tribe": "Puppetry"
+        },
+        "keywords": [
+          {
+            "name": "Ward"
+          },
+          {
+            "name": "LastWords",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Enhanced Puppet",
+        "count": 3
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Alouette, Doomwright Ward",
+    "cost": "5",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.\nEvolve: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10173140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10173140_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10173140-alouette-doomwright-ward",
+    "evolve": [
+      {
+        "op": "select_hand_summon_artifact_copy",
+        "max_cost": 5
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select_hand_summon_artifact_copy",
+        "max_cost": 5
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Ancient Cannon",
+    "cost": "5",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition to your hand.\nWhenever you Fuse, deal 2 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10173210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10173210-ancient-cannon",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "on_fuse",
+        "source": "board",
+        "whose_turn": "owner",
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Eudie, Maiden Reborn",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Draw a card.\nEvolve: Gain Crest: Eudie, Maiden Reborn.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10174110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10174110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10174110-eudie-maiden-reborn",
+    "fanfare": [
+      {
+        "op": "draw",
+        "count": 1
+      }
+    ],
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Eudie, Maiden Reborn",
+        "image": "images/crests/eudie_maiden_reborn.png",
+        "description": "Countdown (3) At the end of your turn, if you have 5 cards or less in your hand, draw a card. If you have at least 6, restore 1 defense to your leader.",
+        "countdown": 3,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            },
+            "effects": [
+              {
+                "op": "hand_count_gate",
+                "condition": {
+                  "op": "<=",
+                  "value": 5,
+                  "owner": "self"
+                },
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 1
+                  }
+                ],
+                "else_effects": [
+                  {
+                    "op": "heal_leader",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Eudie, Maiden Reborn",
+        "image": "images/crests/eudie_maiden_reborn.png",
+        "description": "Countdown (3) At the end of your turn, if you have 5 cards or less in your hand, draw a card. If you have at least 6, restore 1 defense to your leader.",
+        "countdown": 3,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            },
+            "effects": [
+              {
+                "op": "hand_count_gate",
+                "condition": {
+                  "op": "<=",
+                  "value": 5,
+                  "owner": "self"
+                },
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 1
+                  }
+                ],
+                "else_effects": [
+                  {
+                    "op": "heal_leader",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Orchis, Newfound Heart",
+    "cost": "8",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Summon a Lloyd.\nWhenever an allied Puppetry follower enters the field, give it Storm and Bane.\nSuper-Evolve: Summon 2 copies of Enhanced Puppet.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10174120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10174120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10174120-orchis-newfound-heart",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Enhanced Puppet",
+        "count": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Lloyd"
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Puppetry",
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "keywords": [
+              "Storm",
+              "Bane"
+            ],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ralmia, Sonic Boom",
+    "cost": "8",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select 3 Artifact followers in your hand that cost 5 or less and summon an exact copy of each.\nSuper-Evolve: Give all allied Artifact followers +1/+1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10174130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10174130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10174130-ralmia-sonic-boom",
+    "keywords": [],
+    "fanfare": [
+      {
+        "op": "select_hand_summon_artifact_copy",
+        "max_cost": 5,
+        "select": 3
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "condition": {
+          "tribe": "Artifact"
+        },
+        "attack": 1,
+        "defense": 1
+      }
+    ]
+  },
+  {
+    "name": "Engineblade Maven",
+    "cost": "6",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Summon a Striker Artifact. Add a Gear of Remembrance to your hand.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10271110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10271110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10271110-engineblade-maven",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Puppet Cat",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: If there's a super-evolved allied follower on the field, add a Puppet to your hand and give it +3/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10271120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10271120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10271120-puppet-cat",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "super_evolved_allied_gate",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Puppet",
+            "count": 1
+          },
+          {
+            "op": "buff_last_added_to_hand",
+            "attack": 3,
+            "defense": 0
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Artifact Catapult",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition to your hand.\nEngage (3): Destroy this card. Select an Artifact follower in your hand that costs 5 or less, summon an exact copy of it, and give the exact copy \"At the end of your opponent's turn, destroy this card.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10271210.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10271210-artifact-catapult",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "select_hand_summon_artifact_copies_eot_destroy",
+            "select": 1,
+            "max_cost": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Vier, Heart Slayer",
+    "cost": "2",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a Puppetry follower in your hand and transform it into a Doll Slayer.\nBane",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10272110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10272110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10272110-vier-heart-slayer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "condition": {
+          "tribe": "Puppetry"
+        },
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "transform",
+            "into": "Doll Slayer"
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      "Bane"
+    ]
+  },
+  {
+    "name": "Achim, Lord of Despair",
+    "cost": "5",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Select an enemy follower on the field with 4 attack or less, banish it, and summon an exact copy of it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10272120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10272120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10272120-achim-lord-of-despair",
+    "evolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "attack_lte": 4
+        },
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "banish",
+            "target": "selected"
+          },
+          {
+            "op": "summon_exact_copy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "attack_lte": 4
+        },
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "banish",
+            "target": "selected"
+          },
+          {
+            "op": "summon_exact_copy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Flight of Icarus",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an Artifact follower in your hand and give it Rush and \"Last Words: Draw a card.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10272310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10272310-flight-of-icarus",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "keyword",
+        "target": "ally:hand",
+        "condition": {
+          "type_eq": "Follower",
+          "tribe": "Artifact"
+        },
+        "select": 1,
+        "keywords": [
+          "rush",
+          {
+            "name": "lastwords",
+            "effects": [
+              {
+                "op": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Carnelia, Ember of Darkness",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Remembrance to your hand.\nEvolve: Select an Artifact follower in your hand and give it Ward and \"Can't be destroyed by abilities.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10273110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10273110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10273110-carnelia-ember-of-darkness",
+    "evolve": [
+      {
+        "op": "keyword",
+        "target": "ally:hand",
+        "condition": {
+          "type_eq": "Follower",
+          "tribe": "Artifact"
+        },
+        "select": 1,
+        "keywords": [
+          "Ward",
+          "cant_be_destroyed"
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "keyword",
+        "target": "ally:hand",
+        "condition": {
+          "type_eq": "Follower",
+          "tribe": "Artifact"
+        },
+        "select": 1,
+        "keywords": [
+          "Ward",
+          "cant_be_destroyed"
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Synchronous Hearts",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Summon a Lloyd and Victoria.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10273310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10273310-synchronous-hearts",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Lloyd",
+        "count": 1
+      },
+      {
+        "op": "summon_named",
+        "name": "Victoria",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Zwei, Symphonic Heart",
+    "cost": "5",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Summon a Victoria.\nWhenever an allied Puppetry follower enters the field, give it Ward.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10274110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10274110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10274110-zwei-symphonic-heart",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Victoria",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Puppetry",
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "keywords": [
+              "Ward"
+            ],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Karula, Eternal Arts",
+    "cost": "6",
+    "attack": "5",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.\nSuper-Evolve: Give this follower \"Can attack 2 times per turn.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10274120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10274120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10274120-karula-eternal-arts",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "attacks_per_turn",
+        "value": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "select_hand_summon_artifact_copy",
+        "max_cost": 5
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Devotee of Destruction",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Give this follower +X/+X. X is the number of other allied cards on the field. Destroy all other allied cards on the field.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10371110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10371110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10371110-devotee-of-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "dynamic_buff_self",
+        "attack_source": "count_allies",
+        "defense_source": "count_allies",
+        "exclude_self": true
+      },
+      {
+        "op": "destroy_all",
+        "target": "ally:any",
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Supersonic Fighter",
+    "cost": "7",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Summon an Ominous Artifact γ.\nEvolve: Select an allied Artifact follower on the field and give it +3/+3.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10371120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10371120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10371120-supersonic-fighter",
+    "evolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "tribe": "Artifact",
+        "attack": 3,
+        "defense": 3
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "select_count": 1,
+        "tribe": "Artifact",
+        "attack": 3,
+        "defense": 3
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Ominous Artifact γ"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Wired Assault",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and destroy it. Add 2 copies of Puppet to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10371310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10371310-wired-assault",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 2
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Destruction",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select another allied card on the field. If you selected one, destroy it and deal 2 damage to a random enemy follower.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10372110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10372110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10372110-supplicant-of-destruction",
+    "evolve": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Field Scientist",
+    "cost": "5",
+    "attack": "3",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a card in your hand and discard it. Draw 3 cards.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10372120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10372120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10372120-field-scientist",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "return_hand_to_deck",
+        "select": 1,
+        "target": "ally:hand",
+        "optional": true
+      },
+      {
+        "op": "draw",
+        "count": 3
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Wasteland of Destruction",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select another allied card on the field. If you selected one, destroy it and draw 2 cards.\nLast Words: Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10372210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10372210-wasteland-of-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy_then",
+        "target": "ally:card",
+        "not_self": true,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw"
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Destruction",
+    "cost": "6",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Destroy X random enemy followers. X is the number of other allied cards on the field. Destroy all other allied cards on the field.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10373110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10373110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10373110-congregant-of-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy_random_other_allies"
+      },
+      {
+        "op": "destroy_all",
+        "target": "ally:any",
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Devastating Soprano",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select an allied card on the field and destroy it. Summon a White Psalm, New Revelation.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10373310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10373310-devastating-soprano",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "ally:any",
+        "select": true
+      },
+      {
+        "op": "summon_named",
+        "name": "White Psalm, New Revelation"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Axia, Heir to Destruction",
+    "cost": "3",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Ward\nCan't be destroyed by abilities.\nSuper-Evolve: Deal X damage to the enemy leader. X is the number of other allied cards on the field. Destroy all other allied cards on the field.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10374110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10374110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10374110-axia-heir-to-destruction",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "damage_enemy_leader_by_other_allies"
+      },
+      {
+        "op": "destroy_all",
+        "target": "ally:any",
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      "cant_be_destroyed"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Lishenna, Melody Manifest",
+    "cost": "4",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Add a Melodious Monody to your hand.\nCan't be destroyed by abilities.\nEvolve: Summon a White Psalm, New Revelation.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10374120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10374120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10374120-lishenna-melody-manifest",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "White Psalm, New Revelation"
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "White Psalm, New Revelation"
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Melodious Monody"
+      }
+    ],
+    "keywords": [
+      "cant_be_destroyed"
+    ],
+    "triggers": []
+  }
+]

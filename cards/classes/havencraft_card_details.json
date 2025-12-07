@@ -1,0 +1,1928 @@
+[
+  {
+    "name": "Soulcure Sister",
+    "cost": "6",
+    "attack": "3",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Restore 5 defense to your leader.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10061110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061110-soulcure-sister",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 5
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Fox of Purity",
+    "cost": "2",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10061120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061120-fox-of-purity",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Winged Warrior",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select another allied follower on the field and give it +1/+1.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10061130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061130-winged-warrior",
+    "evolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Avian Statue",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Countdown (2)\nLast Words: Summon a Regal Falcon.\nEngage (2): Advance this amulet's count by 2.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061210-avian-statue",
+    "engageSacrifice": false,
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Regal Falcon"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ironfist Priest",
+    "cost": "4",
+    "attack": "5",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Select an enemy follower on the field with 3 defense or less and banish it.\nSuper-Evolve: Banish all enemy followers with 3 defense or less instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10062110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10062110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10062110-ironfist-priest",
+    "evolve": [
+      {
+        "op": "banish",
+        "select": true,
+        "target": "enemy:follower",
+        "filters": {
+          "defense_lte": 3
+        }
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "banish",
+        "select": false,
+        "target": "enemy:follower",
+        "filters": {
+          "defense_lte": 3
+        }
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Sacred Griffon",
+    "cost": "8",
+    "attack": "6",
+    "defense": "8",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Ward\nWhenever you Engage an amulet, give this follower Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10062120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10062120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10062120-sacred-griffon",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "engage",
+        "source": "board",
+        "condition": {
+          "is_ally": true
+        },
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Storm"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Winged Statue",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (4)\nLast Words: Summon a Holy Falcon.\nEngage (1): Advance this amulet's count by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10062210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10062210-winged-statue",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "engageSacrifice": false,
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Holy Falcon"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Angelic Prism Priestess",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Draw an amulet.\nEvolve: Select an amulet in your hand and reduce its cost by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10161110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10161110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10161110-angelic-prism-priestess",
+    "fanfare": [
+      {
+        "op": "draw_filtered",
+        "count": 1,
+        "filters": {
+          "type": "Amulet"
+        }
+      }
+    ],
+    "evolve": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "select_count": 1,
+        "condition": {
+          "card_type": "Amulet"
+        },
+        "effects": [
+          {
+            "op": "reduce_cost",
+            "amount": 1,
+            "minCost": 0
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "select_count": 1,
+        "condition": {
+          "card_type": "Amulet"
+        },
+        "effects": [
+          {
+            "op": "reduce_cost",
+            "amount": 1,
+            "minCost": 0
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Holy Shieldmaiden",
+    "cost": "3",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward\nBarrier",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10161120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10161120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10161120-holy-shieldmaiden",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      "Barrier"
+    ]
+  },
+  {
+    "name": "Radiant Guiding Angel",
+    "cost": "5",
+    "attack": "2",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Draw 2 cards. Restore 2 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10161130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10161130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10161130-radiant-guiding-angel",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "draw",
+        "count": 2
+      },
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Mainyu, Darkdweller",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Aura\nWhenever you Engage an amulet, give this follower +1/+0 until the end of the turn.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10161140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10161140_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10161140-mainyu-darkdweller",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Aura"
+    ],
+    "triggers": [
+      {
+        "event": "engage",
+        "source": "board",
+        "condition": {
+          "is_ally": true
+        },
+        "effects": [
+          {
+            "op": "buff_self",
+            "attack": 1,
+            "defense": 0,
+            "until_end_of_turn": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Serene Sanctuary",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Countdown (3)\nLast Words: Draw 2 cards.\nEngage (1): Advance this amulet's count by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10161210.webp",
+    "evo_image": "",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10161210-serene-sanctuary",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "engageSacrifice": false,
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 3
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Featherfall",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Deal 3 damage to all enemy followers. Summon a Holy Falcon.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10161310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10161310-featherfall",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 3
+      },
+      {
+        "op": "summon_named",
+        "name": "Holy Falcon"
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Sarissa, Luxspear Al-mi'raj",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Whenever an allied follower with Ward is destroyed, give this follower +1/+1.\nEvolve: Give this follower Barrier.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10162110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10162110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10162110-sarissa-luxspear-al-miraj",
+    "hasOngoing": true,
+    "evolve": [
+      {
+        "op": "keyword_self",
+        "keyword": "Barrier"
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "keyword_self",
+        "keyword": "Barrier"
+      }
+    ],
+    "fanfare": [],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_ward_destroyed",
+        "source": "board",
+        "condition": {
+          "is_ally": true
+        },
+        "effects": [
+          {
+            "op": "buff_self",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Reno, Luxwing Featherfolk",
+    "cost": "4",
+    "attack": "3",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Clash: Deal 1 damage to the enemy leader.\nSuper-Evolve: Give this follower \"Can attack 2 times per turn.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10162120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10162120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10162120-reno-luxwing-featherfolk",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "attacks_per_turn",
+        "value": 2
+      }
+    ],
+    "fanfare": [],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "clash",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Maeve, Guardian of Earth",
+    "cost": "7",
+    "attack": "5",
+    "defense": "7",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Ward\nLast Words: Summon a copy of a random allied amulet destroyed this match with the highest base cost.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10162130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10162130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10162130-maeve-guardian-of-earth",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_destroyed_amulet_highest_base_cost"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Darkhaven Grace",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Engage (1): Select an allied follower on the field and give it +1/+1. Restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10162210.webp",
+    "evo_image": "",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10162210-darkhaven-grace",
+    "engageSacrifice": false,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "buff",
+            "target": "ally:follower",
+            "select": true,
+            "amount": 1,
+            "attack": 1,
+            "defense": 1
+          },
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Dose of Holiness",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Engage: Destroy this card. Select an enemy follower on the field and deal it 4 damage. Restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10162220.webp",
+    "evo_image": "",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10162220-dose-of-holiness",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "select": 1
+          },
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Skullfane of Demise",
+    "cost": "6",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Destroy all allied amulets. Deal X damage to all enemies. X is the number of amulets destroyed by this ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10163110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10163110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10163110-skullfane-of-demise",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy_allied_amulets_then_damage"
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Ronavero, Darkhaven Ward",
+    "cost": "4",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Ambush\nEvolve: Select an enemy follower on the field and destroy it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10163120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10163120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10163120-ronavero-darkhaven-ward",
+    "evolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ambush"
+    ]
+  },
+  {
+    "name": "Lapis, Shining Seraph",
+    "cost": "8",
+    "attack": "7",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Last Words: Gain Crest: Lapis, Shining Seraph.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10163130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10163130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10163130-lapis-shining-seraph",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "lastwords",
+        "effects": [
+          {
+            "op": "gain_crest",
+            "name": "Lapis, Shining Seraph",
+            "image": "images/crests/lapis_shining_seraph.png",
+            "description": "Countdown (2) Last Words: Summon a Lapis, Shining Seraph and give it Storm",
+            "countdown": 2,
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Lapis, Shining Seraph"
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Storm"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Pact of the Beast Princess",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Countdown (2)\nLast Words: Summon a Holyflame Tiger.\nEngage (1): Advance this amulet's count by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10163210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10163210-pact-of-the-beast-princess",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "engageSacrifice": false,
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Holyflame Tiger"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Unholy Vessel",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Engage: Destroy this card and all followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10163220.webp",
+    "evo_image": "",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10163220-unholy-vessel",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "engageSacrifice": true,
+    "keywords": [
+      {
+        "name": "Engage",
+        "effects": [
+          {
+            "op": "destroy_all",
+            "target": "all:follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Rodeo, Anathema of Judgment",
+    "cost": "7",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Anathema"
+    ],
+    "description": "Fanfare: Select a card in your hand and discard it. Summon 3 random differently named amulets from your deck that cost 3 or less.\nSuper-Evolve: Destroy a random enemy follower with the highest attack. Deal 1 damage to all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10164110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10164110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10164110-rodeo-anathema-of-judgment",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "destroy_highest",
+        "target": "enemy:follower",
+        "count": 1
+      },
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "discard_select_hand",
+        "count": 1
+      },
+      {
+        "op": "summon_random_from_deck",
+        "count": 3,
+        "distinct_by": "name",
+        "filters": {
+          "type": "Amulet",
+          "cost_lte": 3
+        }
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Jeanne, Saintly Knight",
+    "cost": "8",
+    "attack": "6",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Deal 6 damage to all enemy followers. Give all other allied followers on the field +2/+4.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10164120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10164120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10164120-jeanne-saintly-knight",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 6
+      },
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "attack": 2,
+        "defense": 4
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Salefa, Guardian of Water",
+    "cost": "5",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Restore 3 defense to your leader.\nWard\nEvolve: Deal 3 damage to all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10164130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10164130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10164130-salefa-guardian-of-water",
+    "evolve": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 3
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 3
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 3
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Cleric of Crushing",
+    "cost": "3",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward\nEvolve: Select a super-evolved enemy follower on the field and destroy it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10261110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10261110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10261110-cleric-of-crushing",
+    "evolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "is_super_evolved": true
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "is_super_evolved": true
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Damus, Oracle of Malice",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and give it \"At the end of your turn, destroy this card.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10261120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10261120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10261120-damus-oracle-of-malice",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "selected",
+            "keywords": [
+              {
+                "name": "trigger",
+                "trigger": {
+                  "event": "end_of_turn",
+                  "source": "board",
+                  "condition": {
+                    "whose_turn": "owner"
+                  },
+                  "effects": [
+                    {
+                      "op": "destroy_self"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Luminous Censer",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Engage (1): Destroy this card. Restore 4 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10261210.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10261210-luminous-censer",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Colette, Barrage Exorcist",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Do this 1 time: \"Deal 2 damage to a random enemy follower.\" If there are at least 2 allied amulets on the field, do it 2 times instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10262110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10262110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10262110-colette-barrage-exorcist",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "amulet_count_gate",
+        "count": 2,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 2
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Immaculate Adjudicator",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and banish it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10262120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10262120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10262120-immaculate-adjudicator",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "banish",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Divine Guard",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an allied follower on the field with Ward and give it +0/+1. Deal X damage to a random enemy follower. X is the selected follower's defense.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10262310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10262310-divine-guard",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": true,
+        "condition": {
+          "has_keyword": "ward"
+        },
+        "effects": [
+          {
+            "op": "buff",
+            "target": "selected:follower",
+            "attack": 0,
+            "defense": 1
+          },
+          {
+            "op": "damage_random_selected_defense"
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Agnes, the Swiftblade",
+    "cost": "5",
+    "attack": "3",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Storm\nStrike: If there are at least 2 allied amulets on the field, destroy a random enemy follower other than the opposing one.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10263110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10263110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10263110-agnes-the-swiftblade",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Storm"
+    ],
+    "triggers": [
+      {
+        "event": "strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "amulet_count_gate",
+            "count": 2,
+            "effects": [
+              {
+                "op": "destroy_random",
+                "target": "enemy:follower",
+                "exclude": [
+                  "context.defender"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Maddening Benison",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Restore 10 defense to your leader. Gain Crest: Maddening Benison.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10263310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10263310-maddening-benison",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 10
+      },
+      {
+        "op": "gain_crest",
+        "name": "Maddening Benison",
+        "image": "images/crests/maddening_benison.png",
+        "description": "Countdown (2). Last Words: Deal 10 damage to your leader",
+        "countdown": 2,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "ally:leader",
+            "amount": 10
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Aether, Empyrean Guardian",
+    "cost": "7",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Summon 3 random differently named followers that cost 3 or less from your deck.\nWard\nSuper-Evolve: Give all other allied followers on the field +0/+2 and Aura.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10264110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10264110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10264110-aether-empyrean-guardian",
+    "evolve": [],
+    "keywords": [
+      "Ward"
+    ],
+    "fanfare": [
+      {
+        "op": "summon_random_from_deck",
+        "count": 3,
+        "filters": {
+          "type": "follower",
+          "cost_lte": 3
+        },
+        "unique_names": true
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "attack": 0,
+        "defense": 2
+      },
+      {
+        "op": "keyword",
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "keywords": [
+          "Aura"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Wilbert, Desolate Paladin",
+    "cost": "6",
+    "attack": "4",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Ward\nLast Words: Summon 2 copies of Holy Cavalier.\nEvolve: Gain Crest: Wilbert, Desolate Paladin.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10264120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10264120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10264120-wilbert-desolate-paladin",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Wilbert, Desolate Paladin",
+        "image": "images/crests/wilbert_desolate_paladin.png",
+        "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
+        "trigger": {
+          "event": "ally_follower_enter",
+          "source": "board",
+          "condition": {
+            "has_keyword": "Ward",
+            "not_self": true
+          },
+          "effects": [
+            {
+              "op": "buff",
+              "target": "entering_follower",
+              "attack": 1,
+              "defense": 2,
+              "has_keyword": "Ward"
+            }
+          ]
+        }
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Wilbert, Desolate Paladin",
+        "image": "images/crests/wilbert_desolate_paladin.png",
+        "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
+        "trigger": {
+          "event": "ally_follower_enter",
+          "source": "board",
+          "condition": {
+            "has_keyword": "Ward",
+            "not_self": true
+          },
+          "effects": [
+            {
+              "op": "buff",
+              "target": "entering_follower",
+              "attack": 1,
+              "defense": 2,
+              "has_keyword": "Ward"
+            }
+          ]
+        }
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Holy Cavalier",
+            "count": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Devotee of Repose",
+    "cost": "2",
+    "attack": "0",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Devotee of Repose.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10361110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10361110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10361110-devotee-of-repose",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Devotee of Repose",
+        "image": "images/crests/devotee_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, give a random allied follower -2/-0 and Ward.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "ally:follower",
+                    "random": true,
+                    "count": 1,
+                    "attack": -2,
+                    "defense": 0,
+                    "keyword": "Ward"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Knight of the Holy Order",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward\nWhenever this follower is given + attack or defense on the field, restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10361120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10361120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10361120-knight-of-the-holy-order",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "self_buffed_up",
+        "source": "board",
+        "effects": [
+          {
+            "op": "heal_leader",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Blinding Faith",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Deal 3 damage to all enemy followers.\nEnhance (8): Draw 3 cards. Restore 3 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10361310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10361310-blinding-faith",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 3
+      }
+    ],
+    "keywords": [
+      {
+        "name": "enhance",
+        "cost": 8,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 3
+          },
+          {
+            "op": "heal_leader",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Repose",
+    "cost": "3",
+    "attack": "1",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Supplicant of Repose.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10362110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10362110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10362110-supplicant-of-repose",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Supplicant of Repose",
+        "image": "images/crests/supplicant_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, restore 1 defense to your leader.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "heal_leader",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Temple of Repose",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (4)\nLast Words: Restore 2 defense to your leader. Give your leader Barrier.\nEngage: Advance this amulet's count by X. X is the number of crests you have.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10362210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10362210-temple-of-repose",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "heal_leader",
+            "amount": 2
+          },
+          {
+            "op": "leader_barrier",
+            "charges": 1
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "repeat_effect",
+            "count_source": "crest_count",
+            "effect": {
+              "op": "reduce_countdown",
+              "amount": 1
+            }
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Winged Lion Statue",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (3)\nLast Words: Summon a Holy Falcon and Holyflame Tiger.\nEngage (1): Advance this amulet's count by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10362220.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10362220-winged-lion-statue",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 3
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Holy Falcon"
+          },
+          {
+            "op": "summon_named",
+            "name": "Holyflame Tiger"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Repose",
+    "cost": "5",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and destroy it.\nEvolve: Gain Crest: Congregant of Repose.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10363110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10363110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10363110-congregant-of-repose",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Congregant of Repose",
+        "image": "images/crests/congregant_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "draw_filtered",
+                    "count": 1,
+                    "filters": {
+                      "type": "follower",
+                      "defense_eq": 4
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Congregant of Repose",
+        "image": "images/crests/congregant_of_repose.png",
+        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "draw_filtered",
+                    "count": 1,
+                    "filters": {
+                      "type": "follower",
+                      "defense_eq": 4
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Shining Disenchantment",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Countdown (4)\nLast Words: Deal 4 damage split between all enemies. Restore 4 defense to your leader.\nEngage: Advance this amulet's count by X. X is the number of crests you have.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10363210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10363210-shining-disenchantment",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "damage_split_all_enemies",
+            "amount": 4
+          },
+          {
+            "op": "heal_leader",
+            "amount": 4
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "repeat_effect",
+            "count_source": "crest_count",
+            "effect": {
+              "op": "reduce_countdown",
+              "amount": 1
+            }
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Himeka, Heir to Repose",
+    "cost": "6",
+    "attack": "0",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Himeka, Heir to Repose.\nSuper-Evolve: Set the attack of all enemy followers on the field to 4.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10364110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10364110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10364110-himeka-heir-to-repose",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "set_attack_to",
+        "target": "enemy:follower",
+        "value": 4
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Himeka, Heir to Repose",
+        "image": "images/crests/himeka_heir_to_repose.png",
+        "description": "Countdown (4). At the end of your turn, if there's an allied Himeka, Heir to Repose on the field, give X random enemy followers with 4 attack or less \"Can't attack followers or leaders\" until opponent's end of turn, then banish them. X is the number of crests you have.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "board_name_gate",
+                "name": "Himeka, Heir to Repose",
+                "effects": [
+                  {
+                    "op": "repeat_effect",
+                    "count_source": "crest_count",
+                    "effect": {
+                      "op": "himeka_crest_effect"
+                    }
+                  }
+                ],
+                "else_effects": []
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Marwynn, Despair Manifest",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Add a Torrent of Despair to your hand.\nEvolve: Gain Crest: Marwynn, Despair Manifest.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10364120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10364120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10364120-marwynn-despair-manifest",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Marwynn, Despair Manifest",
+        "image": "images/crests/marwynn_despair_manifest.png",
+        "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "damage_split_all_enemies",
+                    "count_source": "crest_count"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Marwynn, Despair Manifest",
+        "image": "images/crests/marwynn_despair_manifest.png",
+        "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "no_ally_attacked_this_turn_gate",
+                "effects": [
+                  {
+                    "op": "damage_split_all_enemies",
+                    "count_source": "crest_count"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Torrent of Despair"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  }
+]

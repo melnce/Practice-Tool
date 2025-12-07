@@ -1,0 +1,3235 @@
+[
+  {
+    "name": "Twinblade Goblin",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: If there's a super-evolved allied follower on the field, select an enemy follower on the field and deal it 4 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10201110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10201110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10201110-twinblade-goblin",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "super_evolved_allied_gate",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "select": 1
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Dark Side",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select a follower on the field and give it +2/-2.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10201310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10201310-dark-side",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "buff",
+        "target": "all:follower",
+        "select": 1,
+        "attack": 2,
+        "defense": -2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Cheretta, Angelic Maid",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: If you've unlocked super-evolution, give this follower +0/+3.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10202110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10202110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10202110-cheretta-angelic-maid",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "super_evo_gate",
+        "effects": [
+          {
+            "op": "buff_self",
+            "attack": 0,
+            "defense": 3
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Reina, Angelic Partner",
+    "cost": "7",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Evolve: Evolve all unevolved allied followers on the field.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10203110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10203110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10203110-reina-angelic-partner",
+    "evolve": [
+      {
+        "op": "evolve_all_unevolved_allies"
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "evolve_all_unevolved_allies"
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Hnikar & Jafnhar, Firestorm Duo",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Enhance (5): Evolve this follower.\nLast Words: If this follower is evolved, deal 4 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10203120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10203120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10203120-hnikar-jafnhar-firestorm-duo",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "evolve_self"
+          }
+        ]
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "evolved_self_gate",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 4,
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Odin, Twilit Fate",
+    "cost": "7",
+    "attack": "4",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy card on the field and banish it.\nStorm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10204110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10204110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10204110-odin-twilit-fate",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "banish",
+        "target": "enemy:card",
+        "select": 1
+      }
+    ],
+    "keywords": [
+      "Storm"
+    ]
+  },
+  {
+    "name": "Grimnir, Heavenly Gale",
+    "cost": "3",
+    "attack": "2",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Grimnir, Heavenly Gale.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10204120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10204120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10204120-grimnir-heavenly-gale",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Grimnir, Heavenly Gale",
+        "image": "images/crests/grimnir_heavenly_gale.png",
+        "text": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
+        "trigger": {
+          "event": "end_of_turn",
+          "condition": {
+            "whose_turn": "owner"
+          },
+          "effects": [
+            {
+              "op": "super_evolved_allied_gate",
+              "effects": [
+                {
+                  "op": "damage_all",
+                  "target": "enemy:follower",
+                  "amount": 2
+                }
+              ],
+              "else_effects": []
+            }
+          ]
+        }
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Wildheart",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10211110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10211110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10211110-wildheart",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush"
+    ]
+  },
+  {
+    "name": "Dwarven Malletman",
+    "cost": "5",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and deal it 4 damage. Combo (3) - Deal damage to all enemy followers instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10211120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10211120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10211120-dwarven-malletman",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "combo_gate",
+        "count": 3,
+        "effects": [
+          {
+            "op": "damage_all",
+            "target": "enemy:follower",
+            "amount": 4
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "select": 1
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Woodwalkers",
+    "cost": "7",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Summon 3 copies of Gentle Treant.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10211310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10011130_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10211310-woodwalkers",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Gentle Treant",
+        "count": 3
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Lionel, Ardent Elf",
+    "cost": "6",
+    "attack": "6",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Summon 2 copies of Baby Carbuncle.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10212110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10212110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10212110-lionel-ardent-elf",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Baby Carbuncle",
+        "count": 2
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Fairy Fencer",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Activates in hand. Whenever an allied follower super-evolves, set the cost of this card to 1.\nFanfare: Add a Fairy to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10212120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10212120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10212120-fairy-fencer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Fairy",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_super_evolve",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "set_cost_self",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ambush from Above",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Do this 1 time: \"Deal 2 damage to a random enemy follower.\" Combo (3) - Do it 2 times instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10212310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10212310-ambush-from-above",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 2
+      },
+      {
+        "op": "combo_gate",
+        "count": 3,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Cynthia, Chivalrous Elf",
+    "cost": "4",
+    "attack": "4",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Summon 2 copies of Fairy.\nEvolve: Give all allied Pixie followers on the field +1/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10213110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10213110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10213110-cynthia-chivalrous-elf",
+    "evolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "tribes": "Pixie",
+        "attack": 1,
+        "defense": 0
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "tribes": "Pixie",
+        "attack": 1,
+        "defense": 0
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Fairy",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Garden's Allure",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fuse: Forestcraft cards\nDraw a card. If you've Fused to this card, draw 2 instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10213310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10213310-gardens-allure",
+    "evolve": [],
+    "superevolve": [],
+    "fuse_recipes": [
+      {
+        "id": "gardens_allure\u2192empowered",
+        "partner_filters": [
+          {
+            "zone": "hand",
+            "class_eq": "forestcraft"
+          }
+        ],
+        "finalize_op": "fuse_finalize_gardens_allure"
+      }
+    ],
+    "spell": [
+      {
+        "op": "draw",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Titania, Queen of Fairies",
+    "cost": "4",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Summon a Fairy. Gain Crest: Titania, Queen of Fairies.\nEvolve: Select an enemy follower on the field and transform it into a Fairy.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10214110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10214110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10214110-titania-queen-of-fairies",
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Fairy",
+        "count": 1
+      },
+      {
+        "op": "gain_crest",
+        "name": "Titania, Queen of Fairies",
+        "image": "images/crests/titania_queen_of_fairies.png",
+        "description": "At the start of your turn, add a Fairy to your hand",
+        "trigger": {
+          "event": "start_of_turn",
+          "effects": [
+            {
+              "op": "add_to_hand",
+              "name": "Fairy",
+              "count": 1
+            }
+          ]
+        }
+      }
+    ],
+    "evolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "transform",
+            "into": "Fairy"
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "transform",
+            "into": "Fairy"
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Lymaga, Untamed Wild",
+    "cost": "7",
+    "attack": "7",
+    "defense": "7",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select 2 enemy followers on the field and give them \"Can't attack followers or leaders\" until the end of your opponent's turn.\nSuper-Evolve: Select 2 enemy followers on the field and give them \"At the end of each turn, deal 1 damage to your leader and 2 damage to this follower.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10214120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10214120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10214120-lymaga-untamed-wild",
+    "evolve": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 2,
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "selected",
+            "keywords": [
+              {
+                "name": "cant_attack",
+                "until_opponent_eot": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 2,
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "selected",
+            "keywords": [
+              {
+                "name": "bleed",
+                "to_leader": 1,
+                "to_self": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Seria, Gunslinger Maid",
+    "cost": "2",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Deal 1 damage to 2 random enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10221110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10221110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10221110-seria-gunslinger-maid",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 1
+      },
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Nightshadow Ninja Master",
+    "cost": "5",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ambush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10221120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10221120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10221120-nightshadow-ninja-master",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ambush"
+    ]
+  },
+  {
+    "name": "Lucrative Deal",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Draw 2 cards. Your opponent draws a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10221310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10221310-lucrative-deal",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "draw",
+        "count": 2
+      },
+      {
+        "op": "draw_opponent",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Gelt, Intrepid Vice-Captain",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Ward\nAt the end of your turn, if there's a super-evolved allied follower on the field, give all allied followers on the field +1/+1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10222110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10222110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10222110-gelt-intrepid-vice-captain",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "super_evolved_allied_gate",
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 1,
+                "defense": 1
+              },
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "attack": 1,
+                "defense": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Rackhir, Ordinary Knight",
+    "cost": "4",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Draw a spell.\nEvolve: Recover 2 play points.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10222120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10222120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10222120-rackhir-ordinary-knight",
+    "evolve": [
+      {
+        "op": "recover_pp",
+        "player": "self",
+        "amount": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "recover_pp",
+        "player": "self",
+        "amount": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw_filtered",
+        "count": 1,
+        "filters": {
+          "type": "Spell"
+        }
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Band of Battle Princesses",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Deal 4 damage to a random enemy follower.\nEnhance (4): Deal damage to 3 random enemy followers instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10222310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10222310-band-of-battle-princesses",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 4,
+        "count": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 4,
+            "count": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ros\u00e9, Princess Knight",
+    "cost": "3",
+    "attack": "3",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Enhance (5): Draw a Swordcraft follower that costs 2 or less and set its cost to 0.\nRush\nFollower Strike: If the opposing follower is damaged, destroy it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10223110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10223110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10223110-rose-princess-knight",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush",
+      {
+        "name": "enhance",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "draw_filtered",
+            "count": 1,
+            "filters": {
+              "type": "follower",
+              "class": "Swordcraft",
+              "cost_lte": 2
+            }
+          },
+          {
+            "op": "set_cost_last_drawn",
+            "amount": 0
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "follower_strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "destroy_defender_if_damaged"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Prim, Princess's Picnic",
+    "cost": "2",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add a Nonja, Silent Maid to your hand.\nAmbush\nSuper-Evolve: Give all other allied followers on the field +1/+1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10223120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10223120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10223120-prim-princesss-picnic",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Nonja, Silent Maid",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      "Ambush"
+    ]
+  },
+  {
+    "name": "Gildaria, Anathema of Peace",
+    "cost": "6",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Anathema"
+    ],
+    "description": "Fanfare: Rally (20) - Super-evolve this follower.\nWhenever another allied follower enters the field, deal 1 damage to all enemy followers.\nWhen this follower evolves, summon 2 copies of Steelclad Knight and give them Rush.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10224110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10224110-gildaria-anathema-of-peace",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Steelclad Knight",
+        "keyword": "Rush",
+        "count": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Steelclad Knight",
+        "keyword": "Rush",
+        "count": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "rally_gate",
+        "count": 20,
+        "effects": [
+          {
+            "op": "super_evolve_self"
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "damage_all",
+            "target": "enemy:follower",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Yurius, Levin Authority",
+    "cost": "8",
+    "attack": "5",
+    "defense": "7",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Levin"
+    ],
+    "description": "Fanfare: Summon 2 enemy copies of Knight.\nWhenever an enemy follower enters the field, give it \"Can't attack followers or leaders\" until the end of your opponent's turn, deal 1 damage to the enemy leader, and restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10224120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10224120-yurius-levin-authority",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named_enemy",
+        "name": "Knight",
+        "count": 2
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "enemy_follower_enter",
+        "source": "board",
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "entering_follower",
+            "keywords": [
+              {
+                "name": "cant_attack",
+                "until_opponent_eot": true
+              }
+            ]
+          },
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          },
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Melvie, Adoring Witch",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Witch's New Brew to your hand. If there's a super-evolved allied follower on the field, gain 2 earth sigils.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10231110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10231110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10231110-melvie-adoring-witch",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Witch's New Brew",
+        "count": 1
+      },
+      {
+        "op": "super_evolved_allied_gate",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Magic Sediment",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Arcane Archivist",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select a card in your hand and return it to deck. Draw a spell.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10231120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10231120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10231120-arcane-archivist",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "return_hand_to_deck",
+        "select": 1,
+        "target": "ally:hand",
+        "optional": true
+      },
+      {
+        "op": "draw_filtered",
+        "count": 1,
+        "filters": {
+          "type": "Spell"
+        }
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Glacial Crash",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and destroy it. Earth Rite (1) - Deal 2 damage to the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10231310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10231310-glacial-crash",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "earth_rite",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Bergent, Rejected Artes",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Summon 2 copies of Onion Patch.\nEvolve: Gain Crest: Bergent, Rejected Artes.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10232110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10232110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10232110-bergent-rejected-artes",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Bergent, Rejected Artes",
+        "image": "images/crests/bergent_rejected_artes.png",
+        "description": "At the start of your turn, summon an Onion Patch",
+        "trigger": {
+          "event": "start_of_turn",
+          "effects": [
+            {
+              "op": "summon_named",
+              "name": "Onion Patch",
+              "count": 1
+            }
+          ]
+        }
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Bergent, Rejected Artes",
+        "image": "images/crests/bergent_rejected_artes.png",
+        "description": "At the start of your turn, summon an Onion Patch",
+        "trigger": {
+          "event": "start_of_turn",
+          "effects": [
+            {
+              "op": "summon_named",
+              "name": "Onion Patch",
+              "count": 1
+            }
+          ]
+        }
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Onion Patch",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Enchanting Perfumer",
+    "cost": "4",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and deal it 3 damage. Gain an earth sigil.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10232120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10232120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10232120-enchanting-perfumer",
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1
+      },
+      {
+        "op": "summon_named",
+        "name": "Magic Sediment",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1
+      },
+      {
+        "op": "summon_named",
+        "name": "Magic Sediment",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1
+      },
+      {
+        "op": "summon_named",
+        "name": "Magic Sediment",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Flames of Chaos",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "X starts at 0.\nOn Spellboost: Increase X by 1.\nDeal X damage split between all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10232310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10232310-flames-of-chaos",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "effects": [
+          {
+            "op": "chaos_counter"
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "chaos_split_damage",
+        "target": "enemy:follower"
+      }
+    ]
+  },
+  {
+    "name": "Owen, Mysterian Swordsman",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Gold",
+    "tribes": [
+      "Mysteria"
+    ],
+    "description": "Ward\nClash: Spellboost your hand.\nEvolve: Draw 2 followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10233110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10233110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10233110-owen-mysterian-swordsman",
+    "evolve": [
+      {
+        "op": "draw_filtered",
+        "count": 2,
+        "filters": {
+          "type": "Follower"
+        }
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "draw_filtered",
+        "count": 2,
+        "filters": {
+          "type": "Follower"
+        }
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "clash",
+        "source": "board",
+        "effects": [
+          {
+            "op": "spellboost_hand",
+            "times": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Pascale's Dance",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Gain an earth sigil. Gain Crest: Pascale's Dance.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10233310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10233310-pascales-dance",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Magic Sediment",
+        "count": 1
+      },
+      {
+        "op": "gain_crest",
+        "name": "Pascale's Dance",
+        "image": "images/crests/pascales_dance.png",
+        "description": "Countdown (1). End of your turn: Draw a card. Earth Rite (10): Double the attack and defense of all allied followers.",
+        "countdown": 1,
+        "trigger": {
+          "event": "end_of_turn",
+          "condition": {
+            "whose_turn": "owner"
+          },
+          "effects": [
+            {
+              "op": "draw",
+              "count": 1
+            },
+            {
+              "op": "earth_rite",
+              "cost": 10,
+              "effects": [
+                {
+                  "op": "double_stats_allies"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Lilanthim, Anathema of Edacity",
+    "cost": "8",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Anathema"
+    ],
+    "description": "Aura\nLast Words: Earth Rite (2) - Summon a Lilanthim, Anathema of Edacity.\nSuper-Evolve: Select 2 enemy followers on the field and destroy them.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10234110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10234110-lilanthim-anathema-of-edacity",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Aura",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "earth_rite",
+            "cost": 2,
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Lilanthim, Anathema of Edacity",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Norman, Adamant Alchemist",
+    "cost": "6",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Mysteria"
+    ],
+    "description": "Fanfare: Earth Rite (1) - Select a Mode to activate.\n1. Summon a Guardian Golem and give it Barrier.\n2. Draw 3 cards.\n3. Restore 4 defense to your leader.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10234120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10234120-norman-adamant-alchemist",
+    "evolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon a Guardian Golem and give it Barrier",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "summon_named",
+                    "name": "Guardian Golem",
+                    "keyword": "Barrier",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Draw 3 cards",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 3
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Restore 4 defense to your leader",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "heal_leader",
+                    "player": "self",
+                    "amount": 4
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon a Guardian Golem and give it Barrier",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "summon_named",
+                    "name": "Guardian Golem",
+                    "keyword": "Barrier",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Draw 3 cards",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 3
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Restore 4 defense to your leader",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "heal_leader",
+                    "player": "self",
+                    "amount": 4
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon a Guardian Golem and give it Barrier",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "summon_named",
+                    "name": "Guardian Golem",
+                    "keyword": "Barrier",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Draw 3 cards",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 3
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Restore 4 defense to your leader",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "heal_leader",
+                    "player": "self",
+                    "amount": 4
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Wise Guardian Dragon",
+    "cost": "10",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Activates in hand. Whenever an allied follower super-evolves, reduce the cost of this card by 3.\nFanfare: Summon a Vastwing Dragon.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10241110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10241110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10241110-wise-guardian-dragon",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Vastwing Dragon",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_super_evolve",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "reduce_cost_self",
+            "amount": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Soaring Ivory Dragon",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: If you're in Overflow, draw a card.\nRush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10241120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10241120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10241120-soaring-ivory-dragon",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "overflow_gate",
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      "Rush"
+    ]
+  },
+  {
+    "name": "Call of the Megalorca",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Summon a Majestic Megalorca. If you're in Overflow, draw a Call of the Megalorca.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10241310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041130_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10241310-call-of-the-megalorca",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Majestic Megalorca",
+        "count": 1
+      },
+      {
+        "op": "overflow_gate",
+        "effects": [
+          {
+            "op": "draw_named",
+            "name": "Call of the Megalorca"
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Intent Dragonewt Princess",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: If there's a super-evolved allied follower on the field, draw 2 cards.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10242110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10242110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10242110-intent-dragonewt-princess",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "super_evolved_allied_gate",
+        "effects": [
+          {
+            "op": "draw",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Seasoned Merman",
+    "cost": "5",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Summon 2 copies of Majestic Megalorca.\nEvolve: Summon a Majestic Megalorca.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10242120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10242120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10242120-seasoned-merman",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Majestic Megalorca",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Majestic Megalorca",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Majestic Megalorca",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Pyrewyrm Blade",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Engage (1): Destroy this card. Select an allied follower on the field and give it +1/+1 and \"Last Words: Summon a Pyrewyrm Blade.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10242210.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10242210-pyrewyrm-blade",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "select",
+            "target": "ally:follower",
+            "select_count": 1,
+            "effects": [
+              {
+                "op": "buff",
+                "target": "selected",
+                "attack": 1,
+                "defense": 1
+              },
+              {
+                "op": "keyword",
+                "target": "selected",
+                "keywords": [
+                  {
+                    "name": "LastWords",
+                    "effects": [
+                      {
+                        "op": "summon_named",
+                        "name": "Pyrewyrm Blade",
+                        "count": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Neptune, Arbiter of Tides",
+    "cost": "7",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Neptune, Arbiter of Tides. Summon 2 copies of Majestic Megalorca.\nWard\nSuper-Evolve: Summon 2 copies of Majestic Megalorca.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10243110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10243110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10243110-neptune-arbiter-of-tides",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Majestic Megalorca",
+        "count": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Bergent, Rejected Artes",
+        "image": "images/crests/neptune_arbiter_of_tides.png",
+        "description": "Whenever an allied Marine follower enters the field, restore 1 defense to your leader",
+        "trigger": {
+          "event": "ally_follower_enter",
+          "source": "board",
+          "condition": {
+            "tribe": "Marine",
+            "not_self": true
+          },
+          "effects": [
+            {
+              "op": "heal_leader",
+              "player": "self",
+              "amount": 1
+            }
+          ]
+        }
+      },
+      {
+        "op": "summon_named",
+        "name": "Majestic Megalorca",
+        "count": 2
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Draconic Strike",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select a card in your hand and reduce its cost by 2. Deal 3 damage to all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10243310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10243310-draconic-strike",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "reduce_cost",
+            "amount": 2,
+            "minCost": 0
+          }
+        ]
+      },
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 3
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Filene, Whitefrost Bloom",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: If you're in Overflow, add a Whitefrost Whisper to your hand.\nBane\nEvolve: Deal 1 damage to all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10244110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10244110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10244110-filene-whitefrost-bloom",
+    "evolve": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "overflow_gate",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Whitefrost Whisper",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      "Bane"
+    ]
+  },
+  {
+    "name": "Fennie, Prismatic Phoenix",
+    "cost": "8",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Halve the cost of all cards in your deck.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10244120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10244120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10244120-fennie-prismatic-phoenix",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "halve_deck_cost"
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Rayvn, the Silver Bullet",
+    "cost": "5",
+    "attack": "3",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Bane\nEvolve: Select 2 enemy followers on the field and destroy them. Deal 2 damage to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10251110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10251110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10251110-rayvn-the-silver-bullet",
+    "evolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Bane"
+    ]
+  },
+  {
+    "name": "Cultivator of Malice",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Last Words: Add a Ghost to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10251120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10251120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10251120-cultivator-of-malice",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Ghost",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ghastly Soiree",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Add a Ghost, Skeleton, and Rotting Zombie to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10251310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051130_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10251310-ghastly-soiree",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "add_to_hand",
+        "name": "Ghost",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Skeleton",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Rotting Zombie",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Vuella, the Blastwing",
+    "cost": "3",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Rush\nWhenever another allied follower super-evolves, give it and this follower +2/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10252110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10252110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10252110-vuella-the-blastwing",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush"
+    ],
+    "triggers": [
+      {
+        "event": "ally_super_evolve",
+        "source": "board",
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "buff",
+            "target": "entering_follower",
+            "attack": 2,
+            "defense": 0
+          },
+          {
+            "op": "buff_self",
+            "attack": 2,
+            "defense": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Undead Soldier",
+    "cost": "6",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Summon 2 copies of Rotting Zombie.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10252120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10252120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10252120-undead-soldier",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Rotting Zombie",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Winged Servants",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Summon 2 copies of Bat.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10252310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10252310-winged-servants",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Bat",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Laura, Cruel Commander",
+    "cost": "3",
+    "attack": "3",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Select another allied follower on the field and give it Bane.\nSuper-Evolve: Select another allied follower on the field and give it Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10253110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10253110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10253110-laura-cruel-commander",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "keyword",
+        "select": true,
+        "select_count": 1,
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "keywords": [
+          {
+            "name": "Storm"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "keyword",
+        "select": true,
+        "select_count": 1,
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "keywords": [
+          {
+            "name": "Bane"
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Exella, Nocturnal General",
+    "cost": "4",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Give this follower +X/+0. X is the number of other allied followers on the field. Deal 2 damage to your leader.\nStorm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10253120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10253120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10253120-exella-nocturnal-general",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "dynamic_buff_self",
+        "attack_source": "count_allies",
+        "exclude_self": true
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "keywords": [
+      "Storm"
+    ]
+  },
+  {
+    "name": "Ginsetsu & Yuzuki, Twin Calamities",
+    "cost": "9",
+    "attack": "5",
+    "defense": "9",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Summon 4 copies of One-Tailed Fox.\n2. Destroy 4 random enemy followers. Restore 4 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10254110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10254110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10254110-ginsetsu-yuzuki-twin-calamities",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon 4 copies of One-Tailed Fox",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "One-Tailed Fox",
+                "count": 4
+              }
+            ]
+          },
+          {
+            "label": "Destroy 4 random enemy followers. Restore 4 defense to your leader",
+            "effects": [
+              {
+                "op": "destroy_random",
+                "target": "enemy:follower",
+                "count": 4
+              },
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 4
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Charon, Stygian Oarswoman",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Reanimate (2) and Reanimate (1).\nWhenever an allied Departed follower enters the field, give it Ward.\nSuper-Evolve: Gain Crest: Charon, Stygian Oarswoman.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10254120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10254120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10254120-charon-stygian-oarswoman",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Charon, Stygian Oarswoman",
+        "image": "images/crests/charon_stygian_oarswoman.png",
+        "description": "Countdown (2) At the start of your turn, Reanimate (3)",
+        "countdown": 2,
+        "trigger": {
+          "event": "start_of_turn",
+          "effects": [
+            {
+              "op": "reanimate",
+              "max_cost": 3
+            }
+          ]
+        }
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "reanimate",
+        "max_cost": 2
+      },
+      {
+        "op": "reanimate",
+        "max_cost": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Departed"
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "keywords": [
+              "Ward"
+            ],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Cleric of Crushing",
+    "cost": "3",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward\nEvolve: Select a super-evolved enemy follower on the field and destroy it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10261110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10261110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10261110-cleric-of-crushing",
+    "evolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "is_super_evolved": true
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "is_super_evolved": true
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Damus, Oracle of Malice",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and give it \"At the end of your turn, destroy this card.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10261120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10261120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10261120-damus-oracle-of-malice",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "selected",
+            "keywords": [
+              {
+                "name": "trigger",
+                "trigger": {
+                  "event": "end_of_turn",
+                  "source": "board",
+                  "condition": {
+                    "whose_turn": "owner"
+                  },
+                  "effects": [
+                    {
+                      "op": "destroy_self"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Luminous Censer",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Engage (1): Destroy this card. Restore 4 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10261210.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10261210-luminous-censer",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 4
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Colette, Barrage Exorcist",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Do this 1 time: \"Deal 2 damage to a random enemy follower.\" If there are at least 2 allied amulets on the field, do it 2 times instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10262110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10262110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10262110-colette-barrage-exorcist",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "amulet_count_gate",
+        "count": 2,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 2
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Immaculate Adjudicator",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and banish it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10262120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10262120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10262120-immaculate-adjudicator",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "banish",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Divine Guard",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an allied follower on the field with Ward and give it +0/+1. Deal X damage to a random enemy follower. X is the selected follower's defense.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10262310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10262310-divine-guard",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": true,
+        "condition": {
+          "has_keyword": "ward"
+        },
+        "effects": [
+          {
+            "op": "buff",
+            "target": "selected:follower",
+            "attack": 0,
+            "defense": 1
+          },
+          {
+            "op": "damage_random_selected_defense"
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Agnes, the Swiftblade",
+    "cost": "5",
+    "attack": "3",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Storm\nStrike: If there are at least 2 allied amulets on the field, destroy a random enemy follower other than the opposing one.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10263110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10263110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10263110-agnes-the-swiftblade",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Storm"
+    ],
+    "triggers": [
+      {
+        "event": "strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "amulet_count_gate",
+            "count": 2,
+            "effects": [
+              {
+                "op": "destroy_random",
+                "target": "enemy:follower",
+                "exclude": [
+                  "context.defender"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Maddening Benison",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Restore 10 defense to your leader. Gain Crest: Maddening Benison.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10263310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10263310-maddening-benison",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 10
+      },
+      {
+        "op": "gain_crest",
+        "name": "Maddening Benison",
+        "image": "images/crests/maddening_benison.png",
+        "description": "Countdown (2). Last Words: Deal 10 damage to your leader",
+        "countdown": 2,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "ally:leader",
+            "amount": 10
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Aether, Empyrean Guardian",
+    "cost": "7",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Summon 3 random differently named followers that cost 3 or less from your deck.\nWard\nSuper-Evolve: Give all other allied followers on the field +0/+2 and Aura.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10264110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10264110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10264110-aether-empyrean-guardian",
+    "evolve": [],
+    "keywords": [
+      "Ward"
+    ],
+    "fanfare": [
+      {
+        "op": "summon_random_from_deck",
+        "count": 3,
+        "filters": {
+          "type": "follower",
+          "cost_lte": 3
+        },
+        "unique_names": true
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "attack": 0,
+        "defense": 2
+      },
+      {
+        "op": "keyword",
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "keywords": [
+          "Aura"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Wilbert, Desolate Paladin",
+    "cost": "6",
+    "attack": "4",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Ward\nLast Words: Summon 2 copies of Holy Cavalier.\nEvolve: Gain Crest: Wilbert, Desolate Paladin.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10264120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10264120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10264120-wilbert-desolate-paladin",
+    "evolve": [
+      {
+        "op": "gain_crest",
+        "name": "Wilbert, Desolate Paladin",
+        "image": "images/crests/wilbert_desolate_paladin.png",
+        "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
+        "trigger": {
+          "event": "ally_follower_enter",
+          "source": "board",
+          "condition": {
+            "has_keyword": "Ward",
+            "not_self": true
+          },
+          "effects": [
+            {
+              "op": "buff",
+              "target": "entering_follower",
+              "attack": 1,
+              "defense": 2,
+              "has_keyword": "Ward"
+            }
+          ]
+        }
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Wilbert, Desolate Paladin",
+        "image": "images/crests/wilbert_desolate_paladin.png",
+        "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
+        "trigger": {
+          "event": "ally_follower_enter",
+          "source": "board",
+          "condition": {
+            "has_keyword": "Ward",
+            "not_self": true
+          },
+          "effects": [
+            {
+              "op": "buff",
+              "target": "entering_follower",
+              "attack": 1,
+              "defense": 2,
+              "has_keyword": "Ward"
+            }
+          ]
+        }
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Holy Cavalier",
+            "count": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Engineblade Maven",
+    "cost": "6",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Summon a Striker Artifact. Add a Gear of Remembrance to your hand.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10271110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10271110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10271110-engineblade-maven",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Striker Artifact"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Puppet Cat",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: If there's a super-evolved allied follower on the field, add a Puppet to your hand and give it +3/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10271120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10271120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10271120-puppet-cat",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "super_evolved_allied_gate",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Puppet",
+            "count": 1
+          },
+          {
+            "op": "buff_last_added_to_hand",
+            "attack": 3,
+            "defense": 0
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Artifact Catapult",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition to your hand.\nEngage (3): Destroy this card. Select an Artifact follower in your hand that costs 5 or less, summon an exact copy of it, and give the exact copy \"At the end of your opponent's turn, destroy this card.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10271210.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10271210-artifact-catapult",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "select_hand_summon_artifact_copies_eot_destroy",
+            "select": 1,
+            "max_cost": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Vier, Heart Slayer",
+    "cost": "2",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a Puppetry follower in your hand and transform it into a Doll Slayer.\nBane",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10272110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10272110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10272110-vier-heart-slayer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "condition": {
+          "tribe": "Puppetry"
+        },
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "transform",
+            "into": "Doll Slayer"
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      "Bane"
+    ]
+  },
+  {
+    "name": "Achim, Lord of Despair",
+    "cost": "5",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Select an enemy follower on the field with 4 attack or less, banish it, and summon an exact copy of it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10272120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10272120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10272120-achim-lord-of-despair",
+    "evolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "attack_lte": 4
+        },
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "banish",
+            "target": "selected"
+          },
+          {
+            "op": "summon_exact_copy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "attack_lte": 4
+        },
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "banish",
+            "target": "selected"
+          },
+          {
+            "op": "summon_exact_copy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Flight of Icarus",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an Artifact follower in your hand and give it Rush and \"Last Words: Draw a card.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10272310.webp",
+    "evo_image": "",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10272310-flight-of-icarus",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "keyword",
+        "target": "ally:hand",
+        "condition": {
+          "type_eq": "Follower",
+          "tribe": "Artifact"
+        },
+        "select": 1,
+        "keywords": [
+          "rush",
+          {
+            "name": "lastwords",
+            "effects": [
+              {
+                "op": "draw",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Carnelia, Ember of Darkness",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Remembrance to your hand.\nEvolve: Select an Artifact follower in your hand and give it Ward and \"Can't be destroyed by abilities.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10273110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10273110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10273110-carnelia-ember-of-darkness",
+    "evolve": [
+      {
+        "op": "keyword",
+        "target": "ally:hand",
+        "condition": {
+          "type_eq": "Follower",
+          "tribe": "Artifact"
+        },
+        "select": 1,
+        "keywords": [
+          "Ward",
+          "cant_be_destroyed"
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "keyword",
+        "target": "ally:hand",
+        "condition": {
+          "type_eq": "Follower",
+          "tribe": "Artifact"
+        },
+        "select": 1,
+        "keywords": [
+          "Ward",
+          "cant_be_destroyed"
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Synchronous Hearts",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Summon a Lloyd and Victoria.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10273310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10273310-synchronous-hearts",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Lloyd",
+        "count": 1
+      },
+      {
+        "op": "summon_named",
+        "name": "Victoria",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Zwei, Symphonic Heart",
+    "cost": "5",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Summon a Victoria.\nWhenever an allied Puppetry follower enters the field, give it Ward.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10274110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10274110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10274110-zwei-symphonic-heart",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Victoria",
+        "count": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Puppetry",
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "keywords": [
+              "Ward"
+            ],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Karula, Eternal Arts",
+    "cost": "6",
+    "attack": "5",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.\nSuper-Evolve: Give this follower \"Can attack 2 times per turn.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10274120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10274120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10274120-karula-eternal-arts",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "attacks_per_turn",
+        "value": 2
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "select_hand_summon_artifact_copy",
+        "max_cost": 5
+      }
+    ],
+    "keywords": []
+  }
+]

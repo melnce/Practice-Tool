@@ -1,0 +1,40 @@
+
+
+export function getEnhanceTiers(card) {
+  if (Array.isArray(card?.enhanceTiers) && card.enhanceTiers.length) return [...card.enhanceTiers].sort((a,b)=>b.cost-a.cost);
+
+  const list = Array.isArray(card?.keywords) ? card.keywords : [];
+  const tiers = [];
+
+  for (const k of list) {
+    const name = (typeof k === "string" ? k : k?.name) || "";
+    if (name.toLowerCase() === "enhance") {
+      const cost = Number(typeof k === "object" ? k.cost : 0);
+      const effects = (typeof k === "object" && Array.isArray(k.effects)) ? k.effects : [];
+      if (cost > 0) tiers.push({ cost, effects });
+    }
+  }
+  tiers.sort((a, b) => b.cost - a.cost);
+  return tiers;
+}
+
+export function previewHandStats(card, availablePP) {
+  const isFollower = card.type === "Follower";
+  const baseCost = Number(card.cost) || 0;
+  let shownCost = baseCost;
+  let atkDisp = isFollower ? (Number(card.attack) || 0) : 0;
+  let defDisp = isFollower ? (Number(card.defense) || 0) : 0;
+
+  const tiers = getEnhanceTiers(card);
+  const tier = tiers.find(t => availablePP >= t.cost) || null;
+  if (tier) {
+    shownCost = tier.cost;
+    for (const eff of (tier.effects || [])) {
+      if (eff.op === "buff_self") {
+        atkDisp += Number(eff.attack) || 0;
+        defDisp += Number(eff.defense) || 0;
+      }
+    }
+  }
+  return { shownCost, atkDisp, defDisp, tier };
+}

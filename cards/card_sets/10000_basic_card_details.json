@@ -1,0 +1,1737 @@
+[
+  {
+    "name": "Indomitable Fighter",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Enhance (4): Give this follower +3/+3.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10001110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10001110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10001110-indomitable-fighter",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "buff_self",
+            "attack": 3,
+            "defense": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Leah, Bellringer Angel",
+    "cost": "2",
+    "attack": "0",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward\nLast Words: Draw a card.\nEvolve: Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10001120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10001120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10001120-leah-bellringer-angel",
+    "evolve": [
+      {
+        "op": "draw",
+        "player": "self",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "draw",
+        "player": "self",
+        "count": 1
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "player": "self",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Quake Goliath",
+    "cost": "4",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10001130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10001130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10001130-quake-goliath",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Detective's Lens",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Neutral",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Engage: Destroy this card. Select an enemy follower on the field and remove Ward from it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10001210.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10001210-detectives-lens",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "effects": [
+          {
+            "op": "remove_keyword",
+            "target": "enemy:follower",
+            "keyword": "Ward",
+            "select": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Arriet, Luxminstrel",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Restore 2 defense to your leader.\nSuper-Evolve: Restore 4 defense instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10002110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10002110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10002110-arriet-luxminstrel",
+    "evolve": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 4
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Caravan Mammoth",
+    "cost": "7",
+    "attack": "10",
+    "defense": "10",
+    "type": "Follower",
+    "class": "Neutral",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": null,
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10002120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10002120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10002120-caravan-mammoth",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Adventurers' Guild",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Neutral",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Draw a follower.\nEngage: Destroy this card. Select an allied follower on the field and give it Rush.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10002210.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10002210-adventurers-guild",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "draw_filtered",
+        "count": 1,
+        "filters": {
+          "type": "Follower"
+        }
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Engage",
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "ally:follower",
+            "select": true,
+            "keywords": [
+              "Rush"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Fairy Tamer",
+    "cost": "2",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add 2 copies of Fairy to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10011110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10011110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10011110-fairy-tamer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Fairy",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Stray Beastman",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Increase your Combo by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10011120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10011120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10011120-stray-beastman",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "combo_add",
+        "amount": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Gentle Treant",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "hasOngoing": true,
+    "description": "Fanfare: Combo (3) - Evolve this follower.\nStrike: Restore 2 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10011130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10011130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10011130-gentle-treant",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "combo_gate",
+        "count": 3,
+        "effects": [
+          {
+            "op": "evolve_self"
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Wild Profusion",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Fairy to your hand.\nCountdown (2)\nWhenever an allied Pixie follower enters the field, deal 1 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10011210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10011210-wild-profusion",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Fairy",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      },
+      {
+        "name": "PixieEnter",
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "May, Journey Elf",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Combo (3) - Select an enemy follower on the field and deal it 3 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10012110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10012110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10012110-may-journey-elf",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "combo_gate",
+        "count": 3,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3,
+            "select": 1
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Selwyn, Sonic Archer",
+    "cost": "7",
+    "attack": "4",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Storm\nSuper-Evolve: Select an enemy follower on the field and return it to hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10012120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10012120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10012120-selwyn-sonic-archer",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "return_to_hand",
+        "target": "enemy:follower",
+        "select": true
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Storm"
+    ]
+  },
+  {
+    "name": "Bug Alert",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an allied card on the field and return it to hand. Deal 2 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10012310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10012310-bug-alert",
+    "spell": [
+      {
+        "op": "return_to_hand",
+        "target": "ally",
+        "select": 1
+      },
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 2,
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Flashstep Quickblader",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Storm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10021110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10021110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10021110-flashstep-quickblader",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Storm"
+    ]
+  },
+  {
+    "name": "Arms Peddler",
+    "cost": "4",
+    "attack": "3",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Rush\nLast Words: Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10021120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10021120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10021120-arms-peddler",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Centaur Centurion",
+    "cost": "8",
+    "attack": "7",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Storm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10021130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10021130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10021130-centaur-centurion",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Storm"
+    ]
+  },
+  {
+    "name": "Way of the Maid",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select a card in your hand and return it to deck. Draw 2 Swordcraft followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10021310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10021310-way-of-the-maid",
+    "spell": [
+      {
+        "op": "return_hand_to_deck",
+        "select": 1,
+        "target": "ally:hand"
+      },
+      {
+        "op": "draw_filtered",
+        "count": 2,
+        "filters": {
+          "type": "follower",
+          "class": "Swordcraft"
+        }
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Royal Coachwoman",
+    "cost": "2",
+    "attack": "1",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Last Words: Summon a Knight.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10022110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10022110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10022110-royal-coachwoman",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Knight",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Rusty, Luxcard Trickster",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Super-Evolve: Draw all copies of Rusty, Luxcard Trickster and give them Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10022120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10022120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10022120-rusty-luxcard-trickster",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "draw_all_named_with_keyword",
+        "name": "Rusty, Luxcard Trickster",
+        "keyword": "storm"
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Ancestral Crown",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (4)\nWhenever an allied follower enters the field, give it +1/+1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10022210.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10022210-ancestral-crown",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "AllyEnter",
+        "effects": [
+          {
+            "op": "buff",
+            "target": "trigger",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Dazzling Runeknight",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Spellboost your hand 2 times.\n2. Earth Rite (1) - Give this follower +2/+2 and Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10031110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10031110_evo.webp",
+    "set": "[10000] Basic",
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Spellboost your hand 2 times",
+            "effects": [
+              {
+                "op": "spellboost_hand",
+                "times": 2
+              }
+            ]
+          },
+          {
+            "label": "Earth Rite (1): +2/+2 and Ward",
+            "requires": {
+              "earth_rite": 1
+            },
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Ward"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Witch's New Brew",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [
+      "Earth Sigil"
+    ],
+    "description": "Fanfare: Draw a card.\nEarth Sigil\nEngage (1): Gain an earth sigil.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10031210.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10031210-witchs-new-brew",
+    "engageSacrifice": false,
+    "fanfare": [
+      {
+        "op": "draw",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Counter",
+        "key": "earth",
+        "count": 1,
+        "destroyOnEmpty": true
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "add_counter",
+            "key": "earth",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Foresight",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10031310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10031310-foresight",
+    "spell": [
+      {
+        "op": "draw",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Truth Summons",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Summon a Clay Golem.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10031320.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10031320-truth-summons",
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Clay Golem"
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Remi & Rami, Two-Faced Witch",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Earth Rite (1) - Summon a Guardian Golem.\nSuper-Evolve: Select an allied Golem follower on the field, evolve it, and give it +3/+3.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10032110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10032110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10032110-remi-rami-two-faced-witch",
+    "evolve": [],
+    "fanfare": [
+      {
+        "op": "earth_rite",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Guardian Golem",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "select_evolve_golem",
+        "attack": 3,
+        "defense": 3
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Blaze Destroyer",
+    "cost": "10",
+    "attack": "8",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "On Spellboost: Reduce the cost of this card by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10032120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10032120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10032120-blaze-destroyer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "reduceCostBy": 1,
+        "minCost": 0
+      }
+    ]
+  },
+  {
+    "name": "Arcane Eruption",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Deal 2 damage to all followers. Earth Rite (1) - Draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10032310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10032310-arcane-eruption",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "spell": [
+      {
+        "op": "damage_all",
+        "target": "all:follower",
+        "amount": 2
+      },
+      {
+        "op": "earth_rite",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Searing Firenewt",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and deal it 1 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10041110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10041110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10041110-searing-firenewt",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 1,
+        "select": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Axe-Wielding Dragonslayer",
+    "cost": "6",
+    "attack": "5",
+    "defense": "10",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10041120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10041120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10041120-axe-wielding-dragonslayer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Warrior of the Deep",
+    "cost": "8",
+    "attack": "6",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Deal 6 damage to the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10041130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10041130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10041130-warrior-of-the-deep",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 6
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Strike of the Dragonewt",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and deal it 2 damage. If you're in Overflow, deal 4 damage instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10041310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10041310-strike-of-the-dragonewt",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": true,
+        "amount": 2,
+        "amount_overflow": 4
+      }
+    ]
+  },
+  {
+    "name": "Draconic Berserker",
+    "cost": "4",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Select an enemy follower on the field and deal it 4 damage.\nSuper-Evolve: Deal damage to all enemy followers instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10042110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10042110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10042110-draconic-berserker",
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 4,
+        "select": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 4
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Battleforged Dragon Keeper",
+    "cost": "5",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Enhance (7): Summon a Vastwing Dragon.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10042120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10042120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10042120-battleforged-dragon-keeper",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Vastwing Dragon",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Dragonsign",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Gain 1 max play point. Then, if you have 10 max play points, draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10042310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10042310-dragonsign",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "spell": [
+      {
+        "op": "dragonsign"
+      }
+    ]
+  },
+  {
+    "name": "Mistress of the Fanged",
+    "cost": "6",
+    "attack": "3",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Storm\nBane",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10051110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051110-mistress-of-the-fanged",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Storm",
+      "Bane"
+    ]
+  },
+  {
+    "name": "Night Fiend",
+    "cost": "3",
+    "attack": "4",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Deal 1 damage to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10051120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051120-night-fiend",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Devious Lesser Mummy",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Necromancy (4) - Give this follower Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10051130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051130-devious-lesser-mummy",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "necromancy_gate",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Storm"
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Chaos Cyclone",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select a Mode to activate.\n1. Draw a follower.\n2. Reanimate (2).",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051310-chaos-cyclone",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Draw a follower",
+            "effects": [
+              {
+                "op": "draw_filtered",
+                "count": 1,
+                "filters": {
+                  "type": "follower"
+                }
+              }
+            ]
+          },
+          {
+            "label": "Reanimate (2)",
+            "effects": [
+              {
+                "op": "reanimate",
+                "max_cost": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Lilith, Enchanting Succubus",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Last Words: Add a Bat to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10052110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10052110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10052110-lilith-enchanting-succubus",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Bat",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Amorous Necromancer",
+    "cost": "4",
+    "attack": "5",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Summon 2 copies of Ghost.\nSuper-Evolve: Give them Drain.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10052120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10052120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10052120-amorous-necromancer",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Ghost",
+        "count": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Ghost",
+        "count": 2
+      },
+      {
+        "op": "keyword",
+        "target": "ally:last_summoned",
+        "keywords": [
+          "drain"
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Soul Predation",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an allied follower on the field and destroy it. Draw 2 cards.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10052310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10052310-soul-predation",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "ally:follower",
+        "select": true
+      },
+      {
+        "op": "draw",
+        "count": 2
+      }
+    ]
+  },
+  {
+    "name": "Soulcure Sister",
+    "cost": "6",
+    "attack": "3",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Restore 5 defense to your leader.\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10061110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061110-soulcure-sister",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 5
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Fox of Purity",
+    "cost": "2",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10061120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061120-fox-of-purity",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Winged Warrior",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select another allied follower on the field and give it +1/+1.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10061130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061130-winged-warrior",
+    "evolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "select": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Avian Statue",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Countdown (2)\nLast Words: Summon a Regal Falcon.\nEngage (2): Advance this amulet's count by 2.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10061210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10061210-avian-statue",
+    "engageSacrifice": false,
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Regal Falcon"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ironfist Priest",
+    "cost": "4",
+    "attack": "5",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Select an enemy follower on the field with 3 defense or less and banish it.\nSuper-Evolve: Banish all enemy followers with 3 defense or less instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10062110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10062110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10062110-ironfist-priest",
+    "evolve": [
+      {
+        "op": "banish",
+        "select": true,
+        "target": "enemy:follower",
+        "filters": {
+          "defense_lte": 3
+        }
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "banish",
+        "select": false,
+        "target": "enemy:follower",
+        "filters": {
+          "defense_lte": 3
+        }
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Sacred Griffon",
+    "cost": "8",
+    "attack": "6",
+    "defense": "8",
+    "type": "Follower",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Ward\nWhenever you Engage an amulet, give this follower Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10062120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10062120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10062120-sacred-griffon",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
+      {
+        "event": "engage",
+        "source": "board",
+        "condition": {
+          "is_ally": true
+        },
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Storm"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Winged Statue",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Countdown (4)\nLast Words: Summon a Holy Falcon.\nEngage (1): Advance this amulet's count by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10062210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10062210-winged-statue",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "engageSacrifice": false,
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Holy Falcon"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "reduce_countdown",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Kitty Cannoneer",
+    "cost": "3",
+    "attack": "3",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Ambition to your hand.\nRush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10071110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071110-kitty-cannoneer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      "Rush"
+    ]
+  },
+  {
+    "name": "Puppet Lancer",
+    "cost": "2",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Add an Enhanced Puppet to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10071120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071120-puppet-lancer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Enhanced Puppet",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Mechanized Beast",
+    "cost": "6",
+    "attack": "4",
+    "defense": "9",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Bane\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10071130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071130-mechanized-beast",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Bane",
+      "Ward"
+    ]
+  },
+  {
+    "name": "Bullet from Beyond",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and destroy it. Add a Gear of Ambition and Gear of Remembrance to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10071310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10071310-bullet-from-beyond",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Electric Whip Lass",
+    "cost": "2",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add a Gear of Remembrance to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10072110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10072110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10072110-electric-whip-lass",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Mecha Cavalier",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Ward\nEvolve: Summon a Mecha Cavalier.\nSuper-Evolve: Summon 2 instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10072120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10072120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10072120-mecha-cavalier",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Mecha Cavalier",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Mecha Cavalier",
+        "count": 2
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Puppet Theater",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Portalcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add a Puppet to your hand.\nCountdown (2)\nAt the end of your turn, add a Puppet to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10072210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10072210-puppet-theater",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Puppet",
+        "count": 1
+      }
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Puppet",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      }
+    ]
+  }
+]

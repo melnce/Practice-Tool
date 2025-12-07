@@ -1,0 +1,2089 @@
+[
+  {
+    "name": "Mistress of the Fanged",
+    "cost": "6",
+    "attack": "3",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Storm\nBane",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10051110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051110-mistress-of-the-fanged",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Storm",
+      "Bane"
+    ]
+  },
+  {
+    "name": "Night Fiend",
+    "cost": "3",
+    "attack": "4",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Deal 1 damage to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10051120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051120-night-fiend",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Devious Lesser Mummy",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Necromancy (4) - Give this follower Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10051130_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051130-devious-lesser-mummy",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "necromancy_gate",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Storm"
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Chaos Cyclone",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select a Mode to activate.\n1. Draw a follower.\n2. Reanimate (2).",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10051310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10051310-chaos-cyclone",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Draw a follower",
+            "effects": [
+              {
+                "op": "draw_filtered",
+                "count": 1,
+                "filters": {
+                  "type": "follower"
+                }
+              }
+            ]
+          },
+          {
+            "label": "Reanimate (2)",
+            "effects": [
+              {
+                "op": "reanimate",
+                "max_cost": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Lilith, Enchanting Succubus",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Last Words: Add a Bat to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10052110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10052110_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10052110-lilith-enchanting-succubus",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Bat",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Amorous Necromancer",
+    "cost": "4",
+    "attack": "5",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Evolve: Summon 2 copies of Ghost.\nSuper-Evolve: Give them Drain.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10052120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10052120_evo.webp",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10052120-amorous-necromancer",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Ghost",
+        "count": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Ghost",
+        "count": 2
+      },
+      {
+        "op": "keyword",
+        "target": "ally:last_summoned",
+        "keywords": [
+          "drain"
+        ]
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Soul Predation",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Select an allied follower on the field and destroy it. Draw 2 cards.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10052310.webp",
+    "evo_image": "",
+    "set": "[10000] Basic",
+    "url": "https://shadowverse.gg/cards/10052310-soul-predation",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "ally:follower",
+        "select": true
+      },
+      {
+        "op": "draw",
+        "count": 2
+      }
+    ]
+  },
+  {
+    "name": "Aryll, Moonstruck Vampire",
+    "cost": "3",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Summon a Bat.\nWhenever an allied Bat enters the field, give it Storm and deal 1 damage to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10151110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10151110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10151110-aryll-moonstruck-vampire",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Bat"
+      }
+    ],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "name": "Bat",
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "target": "entering_follower",
+            "keywords": [
+              {
+                "name": "Storm"
+              }
+            ]
+          },
+          {
+            "op": "damage",
+            "target": "ally:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Nameless Demon",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Evolve: Summon 2 copies of Bat.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10151120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10151120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10151120-nameless-demon",
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Bat",
+        "count": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Bat",
+        "count": 2
+      }
+    ],
+    "fanfare": [],
+    "keywords": []
+  },
+  {
+    "name": "Little Miss Bonemancer",
+    "cost": "3",
+    "attack": "1",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Last Words: Summon 2 copies of Skeleton.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10151130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10151130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10151130-little-miss-bonemancer",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Skeleton",
+            "count": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ghost Juggler",
+    "cost": "6",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Reanimate (4).",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10151140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10151140_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10151140-ghost-juggler",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "reanimate",
+        "max_cost": 4
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Darkseal Demon",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Draw 2 cards. Deal 2 damage to your leader.\nEvolve: Select an enemy follower on the field and deal it 6 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10151150.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10151150_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10151150-darkseal-demon",
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6,
+        "select": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6,
+        "select": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw",
+        "count": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Reaper's Deathslash",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select an allied and enemy follower on the field and destroy them.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10151310.webp",
+    "evo_image": "",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10151310-reapers-deathslash",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "ally:follower",
+        "select": true
+      },
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": true
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Mino, Shrewd Reaper",
+    "cost": "2",
+    "attack": "2",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Enhance (4): Give this follower Rush and Bane.\nLast Words: Add a Skeleton to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10152110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10152110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10152110-mino-shrewd-reaper",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Skeleton",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Rush"
+            ]
+          },
+          {
+            "op": "keyword_self",
+            "keywords": [
+              "Bane"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Beryl, Nightmare Incarnate",
+    "cost": "2",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Deal 3 damage to your leader.\nEvolve: Restore 5 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10152120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10152120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10152120-beryl-nightmare-incarnate",
+    "evolve": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 5
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 5
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 3
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Yuna, Occult Hunter",
+    "cost": "4",
+    "attack": "3",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Ward\nLast Words: Add a Ghost and Bat to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10152130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10152130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10152130-yuna-occult-hunter",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Ghost",
+            "count": 1
+          },
+          {
+            "op": "add_to_hand",
+            "name": "Bat",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Vlad, Impaler",
+    "cost": "8",
+    "attack": "5",
+    "defense": "8",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select an enemy follower on the field and deal it 5 damage. Restore 5 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10152140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10152140_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10152140-vlad-impaler",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 5,
+        "select": 1
+      },
+      {
+        "op": "heal_leader",
+        "player": "self",
+        "amount": 5
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Shadowcrypt Memorial",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Add 2 shadows to your cemetery.\nEngage: Destroy this card. Summon 2 copies of Ghost.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10152210.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10152210-shadowcrypt-memorial",
+    "evolve": [],
+    "superevolve": [],
+    "engageSacrifice": true,
+    "keywords": [
+      {
+        "name": "Engage",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Ghost",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_shadows",
+        "amount": 2
+      }
+    ]
+  },
+  {
+    "name": "Ceres, Blue Rose Maiden",
+    "cost": "4",
+    "attack": "1",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Bane\nAt the end of your turn, restore 2 defense to your leader. If this follower is super-evolved, restore 4 instead and give this follower Barrier.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10153110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10153110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10153110-ceres-blue-rose-maiden",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "heal_leader",
+            "player": "self",
+            "amount": 2
+          },
+          {
+            "op": "super_evolved_self_gate",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 2
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  {
+                    "name": "Barrier",
+                    "charges": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      "Bane"
+    ]
+  },
+  {
+    "name": "Orthrus, Hellhound Blader",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Add 2 shadows to your cemetery.\nWard\nEvolve: Necromancy (4) - Do this 2 times: \"Deal 2 damage to a random enemy follower.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10153120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10153120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10153120-orthrus-hellhound-blader",
+    "evolve": [
+      {
+        "op": "necromancy_gate",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 1
+          },
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "necromancy_gate",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_shadows",
+        "amount": 2
+      }
+    ],
+    "keywords": [
+      "Ward"
+    ]
+  },
+  {
+    "name": "Mukan, Shadowcrypt Ward",
+    "cost": "4",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Necromancy (8) - Evolve this follower.\nWhenever an allied Departed follower enters the field, give it Bane.\nWhen this follower evolves, summon a Ghost.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10153130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10153130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10153130-mukan-shadowcrypt-ward",
+    "hasOngoing": true,
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Ghost",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Ghost",
+        "count": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "necromancy_gate",
+        "cost": 8,
+        "effects": [
+          {
+            "op": "evolve_self"
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Departed"
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "keywords": [
+              "Bane"
+            ],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Balto, Dusk Bounty Hunter",
+    "cost": "3",
+    "attack": "3",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Gain Crest: Balto, Dusk Bounty Hunter.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10153140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10153140_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10153140-balto-dusk-bounty-hunter",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Balto, Dusk Bounty Hunter",
+        "image": "images/crests/balto_dusk_bounty_hunter.png",
+        "description": "Countdown (4). At the end of your turn, deal 1 damage to both leaders.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            },
+            "effects": [
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 1
+              },
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Rage of Serpents",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select an enemy follower on the field or the enemy leader and deal it 3 damage. Deal 2 damage to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10153310.webp",
+    "evo_image": "",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10153310-rage-of-serpents",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_follower_or_leader",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1,
+        "can_target_leader": true
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Cerberus, Hellfire Unleashed",
+    "cost": "8",
+    "attack": "6",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Summon a Mimi, Right Paw Hellhound and Coco, Left Paw Hellhound. Necromancy (6) - Give all other allied followers on the field +2/+0.\nSuper-Evolve: Do this 2 times: \"Reanimate (1).\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10154110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10154110_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10154110-cerberus-hellfire-unleashed",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "reanimate",
+        "max_cost": 1
+      },
+      {
+        "op": "reanimate",
+        "max_cost": 1
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Mimi, Right Paw Hellhound",
+        "count": 1
+      },
+      {
+        "op": "summon_named",
+        "name": "Coco, Left Paw Hellhound",
+        "count": 1
+      },
+      {
+        "op": "necromancy_gate",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "buff",
+            "target": "ally:follower",
+            "attack": 2,
+            "defense": 0
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Medusa, Venomfang Royalty",
+    "cost": "7",
+    "attack": "3",
+    "defense": "7",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Rush\nCan attack 3 times per turn.\nFollower Strike: Destroy the opposing follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10154120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10154120_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10154120-medusa-venomfang-royalty",
+    "hasOngoing": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "attacks_per_turn": 3,
+    "keywords": [
+      "Rush"
+    ],
+    "triggers": [
+      {
+        "event": "follower_strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "follower_strike_destroy"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Aragavy, Eternal Hunter",
+    "cost": "5",
+    "attack": "4",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Deal 7 damage split between all enemy followers.\nEvolve: Deal 3 damage to both leaders.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10154130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10154130_evo.webp",
+    "set": "[10001] Legends Rise",
+    "url": "https://shadowverse.gg/cards/10154130-aragavy-eternal-hunter",
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 3
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 3
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 3
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 3
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "damage_split_fixed",
+        "target": "enemy_followers",
+        "amount": 7
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Rayvn, the Silver Bullet",
+    "cost": "5",
+    "attack": "3",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Bane\nEvolve: Select 2 enemy followers on the field and destroy them. Deal 2 damage to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10251110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10251110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10251110-rayvn-the-silver-bullet",
+    "evolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "fanfare": [],
+    "keywords": [
+      "Bane"
+    ]
+  },
+  {
+    "name": "Cultivator of Malice",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Last Words: Add a Ghost to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10251120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10251120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10251120-cultivator-of-malice",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Ghost",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Ghastly Soiree",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Add a Ghost, Skeleton, and Rotting Zombie to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10251310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051130_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10251310-ghastly-soiree",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "add_to_hand",
+        "name": "Ghost",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Skeleton",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Rotting Zombie",
+        "count": 1
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Vuella, the Blastwing",
+    "cost": "3",
+    "attack": "2",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Rush\nWhenever another allied follower super-evolves, give it and this follower +2/+0.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10252110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10252110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10252110-vuella-the-blastwing",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      "Rush"
+    ],
+    "triggers": [
+      {
+        "event": "ally_super_evolve",
+        "source": "board",
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "buff",
+            "target": "entering_follower",
+            "attack": 2,
+            "defense": 0
+          },
+          {
+            "op": "buff_self",
+            "attack": 2,
+            "defense": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Undead Soldier",
+    "cost": "6",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Summon 2 copies of Rotting Zombie.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10252120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10252120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10252120-undead-soldier",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Rotting Zombie",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Winged Servants",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Summon 2 copies of Bat.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10252310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10252310-winged-servants",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon_named",
+        "name": "Bat",
+        "count": 2
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Laura, Cruel Commander",
+    "cost": "3",
+    "attack": "3",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Select another allied follower on the field and give it Bane.\nSuper-Evolve: Select another allied follower on the field and give it Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10253110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10253110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10253110-laura-cruel-commander",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "keyword",
+        "select": true,
+        "select_count": 1,
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "keywords": [
+          {
+            "name": "Storm"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "keyword",
+        "select": true,
+        "select_count": 1,
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "keywords": [
+          {
+            "name": "Bane"
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Exella, Nocturnal General",
+    "cost": "4",
+    "attack": "1",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Give this follower +X/+0. X is the number of other allied followers on the field. Deal 2 damage to your leader.\nStorm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10253120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10253120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10253120-exella-nocturnal-general",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "dynamic_buff_self",
+        "attack_source": "count_allies",
+        "exclude_self": true
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      }
+    ],
+    "keywords": [
+      "Storm"
+    ]
+  },
+  {
+    "name": "Ginsetsu & Yuzuki, Twin Calamities",
+    "cost": "9",
+    "attack": "5",
+    "defense": "9",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Summon 4 copies of One-Tailed Fox.\n2. Destroy 4 random enemy followers. Restore 4 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10254110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10254110_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10254110-ginsetsu-yuzuki-twin-calamities",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon 4 copies of One-Tailed Fox",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "One-Tailed Fox",
+                "count": 4
+              }
+            ]
+          },
+          {
+            "label": "Destroy 4 random enemy followers. Restore 4 defense to your leader",
+            "effects": [
+              {
+                "op": "destroy_random",
+                "target": "enemy:follower",
+                "count": 4
+              },
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 4
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": []
+  },
+  {
+    "name": "Charon, Stygian Oarswoman",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Reanimate (2) and Reanimate (1).\nWhenever an allied Departed follower enters the field, give it Ward.\nSuper-Evolve: Gain Crest: Charon, Stygian Oarswoman.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10254120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10254120_evo.webp",
+    "set": "[10002] Infinity Evolved",
+    "url": "https://shadowverse.gg/cards/10254120-charon-stygian-oarswoman",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Charon, Stygian Oarswoman",
+        "image": "images/crests/charon_stygian_oarswoman.png",
+        "description": "Countdown (2) At the start of your turn, Reanimate (3)",
+        "countdown": 2,
+        "trigger": {
+          "event": "start_of_turn",
+          "effects": [
+            {
+              "op": "reanimate",
+              "max_cost": 3
+            }
+          ]
+        }
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "reanimate",
+        "max_cost": 2
+      },
+      {
+        "op": "reanimate",
+        "max_cost": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Departed"
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "keywords": [
+              "Ward"
+            ],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Devotee of Entwining",
+    "cost": "3",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Deal 1 damage to all enemy followers.\n2. Give this follower +2/+2.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10351110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10351110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10351110-devotee-of-entwining",
+    "evolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 1 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +2/+2",
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 1 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +2/+2",
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 1 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +2/+2",
+            "effects": [
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Ephemeral Demon Princess",
+    "cost": "8",
+    "attack": "4",
+    "defense": "6",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Fanfare: Select 2 enemy followers on the field and destroy them. Deal 4 damage to your leader.\nStorm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10351120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10351120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10351120-ephemeral-demon-princess",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 4
+      }
+    ],
+    "keywords": [
+      "Storm"
+    ],
+    "triggers": []
+  },
+  {
+    "name": "March of the Brutes",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Deal 2 damage to 2 random enemy followers and the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10351310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10351310-march-of-the-brutes",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 2,
+        "count": 2
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 2
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Supplicant of Entwining",
+    "cost": "4",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Deal 3 damage to a random enemy follower.\n2. Restore 2 defense to your leader.\nEvolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10352110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10352110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10352110-supplicant-of-entwining",
+    "evolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "heal_leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Spirited Gravekeeper",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Enhance (7): Reanimate (5) and Reanimate (3).",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10352120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10352120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10352120-spirited-gravekeeper",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "reanimate",
+            "max_cost": 5
+          },
+          {
+            "op": "reanimate",
+            "max_cost": 3
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Castle of Entwining",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Abysscraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Draw a card.\n2. Give a random allied follower on the field +1/+1.\nEngage (1): Destroy this card. Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10352210.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10352210-castle-of-entwining",
+    "engageSacrifice": true,
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Draw a card",
+            "effects": [
+              {
+                "op": "draw",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Give a random allied follower on the field +1/+1",
+            "effects": [
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "attack": 1,
+                "defense": 1,
+                "random": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "choose",
+            "options": [
+              {
+                "label": "Draw a card",
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 1
+                  }
+                ]
+              },
+              {
+                "label": "Give a random allied follower on the field +1/+1",
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "ally:follower",
+                    "attack": 1,
+                    "defense": 1,
+                    "random": true,
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "triggers": []
+  },
+  {
+    "name": "Congregant of Entwining",
+    "cost": "5",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Summon a Congregant of Entwining and give it and this follower Rush.\n2. Summon a Congregant of Entwining and give it and this follower Ward.\n3. Give all allied copies of Congregant of Entwining on the field +2/+2.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10353110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10353110_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10353110-congregant-of-entwining",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Rush",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Rush"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Rush"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Ward",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Ward"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Ward"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Give all allied copies of Congregant of Entwining on the field +2/+2",
+            "effects": [
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "name_filter": "Congregant of Entwining",
+                "attack": 2,
+                "defense": 2
+              },
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Rush",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Rush"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Rush"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Summon a Congregant of Entwining and give it and this follower Ward",
+            "effects": [
+              {
+                "op": "summon_named",
+                "name": "Congregant of Entwining",
+                "keywords": [
+                  "Ward"
+                ]
+              },
+              {
+                "op": "keyword_self",
+                "keywords": [
+                  "Ward"
+                ]
+              }
+            ]
+          },
+          {
+            "label": "Give all allied copies of Congregant of Entwining on the field +2/+2",
+            "effects": [
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "name_filter": "Congregant of Entwining",
+                "attack": 2,
+                "defense": 2
+              },
+              {
+                "op": "buff_self",
+                "attack": 2,
+                "defense": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Screaming and Loathing",
+    "cost": "3",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Gold",
+    "tribes": [],
+    "description": "Select 2 Modes to activate.\n1. Recover 1 play point.\n2. Draw a follower.\n3. Draw a 3-cost spell.\n4. Deal 4 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10353310.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10353310-screaming-and-loathing",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "choose",
+        "select_count": 2,
+        "unique": true,
+        "options": [
+          {
+            "label": "Recover 1 play point",
+            "effects": [
+              {
+                "op": "recover_pp",
+                "player": "self",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Draw a follower",
+            "effects": [
+              {
+                "op": "draw_filtered",
+                "count": 1,
+                "filters": {
+                  "type": "Follower"
+                }
+              }
+            ]
+          },
+          {
+            "label": "Draw a 3-cost spell",
+            "effects": [
+              {
+                "op": "draw_filtered",
+                "count": 1,
+                "filters": {
+                  "type": "Spell",
+                  "cost_eq": 3
+                }
+              }
+            ]
+          },
+          {
+            "label": "Deal 4 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 4,
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Sham-Nacha, Heir to Entwining",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [
+      "Encroacher"
+    ],
+    "description": "Fanfare: Reduce the faith of Faith: Sham-Nacha, Heir to Entwining by 10 to give it \"Increase the number of Modes you can select by 1.\"\nSuper-Evolve: Select an enemy follower on the field, destroy it, and add a copy of it to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10354110.webp",
+    "evo_image": "",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10354110-sham-nacha-heir-to-entwining",
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected:follower"
+          },
+          {
+            "op": "add_selected_copy_to_hand",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "crest_pay_counter",
+        "crest": "Faith",
+        "counter": "faith",
+        "amount": 10,
+        "on_success_effects": [
+          {
+            "op": "choose_bonus_add",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "name": "Rulenye & Valnareik",
+    "cost": "7",
+    "attack": "5",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Fanfare: Select a Mode to activate.\n1. Add a Scream Diffusion to your hand.\n2. Add a Wings of Desire to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/10354120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
+    "set": "[10003] Heirs of the Omen",
+    "url": "https://shadowverse.gg/cards/10354120-rulenye-valnareik",
+    "evolve": [],
+    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Add a Scream Diffusion to your hand",
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Scream Diffusion"
+              }
+            ]
+          },
+          {
+            "label": "Add a Wings of Desire to your hand",
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Wings of Desire"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  }
+]

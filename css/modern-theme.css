@@ -1,0 +1,219 @@
+/* ===== Modern, non-breaking overrides ===== */
+
+/* Palette + defaults */
+:root{
+  --bg-1:#0e0f12; --panel:rgba(24,26,32,.72); --stroke:rgba(255,255,255,.08);
+  --ink:#e9edf1; --muted:#9aa3ad; --accent:#61dafb; --good:#39d98a; --warn:#ffd400; --danger:#ff5c5c;
+}
+html,body{
+  background: radial-gradient(1200px 600px at 50% -10%, #1a1e26 0%, var(--bg-1) 45%, #0b0c0f 100%);
+  color:var(--ink);
+  font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+/* Layout wrappers (new, but harmless) */
+#appRoot{max-width:1200px;margin:0 auto;padding:8px 16px;}
+.side{display:flex;flex-direction:column;gap:10px}
+
+/* Control panel */
+#controlPanel{
+  position:sticky;top:0;z-index:200;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:10px 16px !important;
+  background:linear-gradient(180deg, rgba(30,32,38,.75), rgba(30,32,38,.55));
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--stroke);
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+#deckSelection{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+#deckSelection select,#controlPanel select,#controlPanel button,#seedInput{
+  background:#1f232a;color:var(--ink);border:1px solid var(--stroke);border-radius:8px;padding:6px 10px
+}
+#seedInput{width:160px}
+
+/* Turn controls — vertically centered on the viewport */
+#turnControls{
+  position: fixed;
+  right: 18px;
+  top: 50% !important;              /* was 140px */
+  transform: translateY(-50%);      /* center vertically */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.35);
+  z-index: 300;
+}
+
+/* Keep hover scales from shifting layout */
+#endTurnBlue:hover, #endTurnRed:hover { transform: scale(1.03); transform-origin: center; }
+
+/* Small screens/short windows: pin a bit lower to avoid header overlap */
+@media (max-height: 700px) {
+  #turnControls {
+    top: 60% !important;
+  }
+}
+#turnControls .pp-floating,#turnControls .pp{
+  background:#141821 !important;border:1px solid var(--stroke) !important;border-radius:10px;padding:8px 10px
+}
+#endTurnBlue,#endTurnRed{
+  width:200px !important; padding:12px 16px !important; border-radius:12px !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.35); font-weight:700
+}
+#endTurnBlue{background:linear-gradient(180deg,#246bff,#0040ff); color:white}
+#endTurnRed{background:linear-gradient(180deg,#ff4a4a,#b30000); color:white}
+#endTurnBlue:hover,#endTurnRed:hover{transform:scale(1.03)}
+#redBoost{border-radius:10px;padding:8px 10px;background:linear-gradient(180deg,#ffb703,#fb5607);color:#111}
+
+/* Zones/boards */
+.zone{display:flex;flex-wrap:wrap;gap:10px}
+.board-zone{
+  min-height:170px;padding:10px 12px;border:2px dashed rgba(255,255,255,.12) !important;border-radius:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)
+}
+.hand-zone{gap:10px;padding:10px 18px}
+
+/* Leaders */
+.leader-container{display:flex;align-items:center;gap:10px;justify-content:center}
+.leader{
+  width:84px !important;height:84px !important;display:grid;place-items:center;
+  font-size:1.9rem !important;font-weight:900;background: radial-gradient(80% 80% at 50% 20%, rgba(255,255,255,.12), rgba(0,0,0,.35));
+  border:3px solid rgba(255,255,255,.12) !important; border-radius:999px;
+  box-shadow:0 6px 16px rgba(0,0,0,.35), 0 0 0 4px rgba(0,0,0,.25) inset;
+}
+.red-leader{outline:3px solid rgba(255, 80, 80, .35)}
+.blue-leader{outline:3px solid rgba(80, 140, 255, .35)}
+.hp-value{letter-spacing:.5px}
+
+/* Crests */
+.crest-container{display:flex;gap:10px;align-items:center}
+.crest-row{display:flex;gap:6px}
+.crest-slot{
+  width:34px;height:34px;border-radius:8px;background:#11161d;border:1px solid rgba(255,255,255,.1);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.03)
+}
+.crest-slot.active{
+  background: radial-gradient(50% 50% at 50% 40%, rgba(0,255,170,.5), rgba(0,120,90,.35)) !important;
+  border-color: rgba(160,255,230,.6) !important;
+}
+
+/* Cards (no size change; just polish & crispness) */
+.card{
+  border:1px solid rgba(255,255,255,.08) !important;border-radius:10px !important;background:#1a1d23 !important;
+  box-shadow:0 10px 16px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
+  transition:transform .08s ease, box-shadow .12s ease, filter .12s ease; transform:translateZ(0)
+}
+.card:hover{transform:translateY(-2px)}
+.card img{image-rendering:auto !important; transform:translateZ(0); will-change:transform}
+.card.hidpi img{image-rendering:auto !important; filter:contrast(1.02) saturate(1.02)}
+.card-stats{width:26px !important;height:28px !important;border-radius:6px !important;box-shadow:0 1px 0 rgba(0,0,0,.35) inset}
+
+/* Tooltip */
+#cardTooltip{
+  background: rgba(18, 21, 27, 0.92) !important;border:1px solid var(--stroke);
+  box-shadow:0 12px 30px rgba(0,0,0,.45);border-radius:10px !important;max-width:360px !important;line-height:1.3
+}
+
+/* Select mode */
+.select-mode .card{filter:grayscale(.5) brightness(.85)}
+.select-mode .card.selectable{outline:3px solid var(--warn); box-shadow:0 0 12px var(--warn), 0 0 24px rgba(255,212,0,.3)}
+
+/* Turn controls stack spacing */
+#turnControls > * { margin: 6px 0; }
+#redBoost { margin-top: 2px; margin-bottom: 6px; }
+
+/* PP boxes: consistent, even look */
+.pp-floating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 120px;            /* fixed width so both are equal */
+  height: 44px;            /* fixed height */
+  margin: 4px auto;        /* center in column stack */
+
+  font-weight: 800;
+  font-size: 1.25rem;      /* bigger, matches button weight */
+  line-height: 1.3;
+  letter-spacing: 0.3px;
+  color: #fff;
+
+  background: linear-gradient(180deg, #1a2029, #12161d);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  text-align: center;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.03),
+    0 8px 14px rgba(0,0,0,.35);
+  transition: background .15s ease, color .15s ease;
+}
+
+/* Glow */
+.pp-floating::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 14px;
+  box-shadow: 0 0 12px rgba(97,218,251,0.3);
+  pointer-events: none;
+}
+
+
+/* ensure End Turn button doesn’t visually collide */
+#endTurnBlue, #endTurnRed { margin: 4px 0; }
+
+/* PP Boost states (unchanged logic, just polish) */
+#redBoost {
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 800;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: linear-gradient(180deg, #ffb703, #fb5607);
+  color: #111;
+  transition: transform .12s ease, filter .12s ease, background .12s ease, color .12s ease;
+}
+#redBoost:hover:not(.used){ filter: brightness(1.08); }
+#redBoost.used{
+  background: linear-gradient(180deg, #3a3f4a, #2a2d34) !important;
+  color: #9aa3ad !important;
+  border-color: rgba(255,255,255,0.08) !important;
+  cursor: not-allowed;
+  box-shadow: none !important;
+}
+
+/* Ensure visual space between "PP:" and the numbers */
+.pp-floating > span {
+  margin-left: 6px;     /* primary fix */
+}
+
+/* Fallback: if margin is overridden or the layout changes, inject a space */
+#redPP::before,
+#bluePP::before {
+  content: " ";
+}
+
+/* (optional) lock even sizing if you haven't already */
+.pp-floating {
+  width: 120px;
+  height: 44px;
+}
+
+/* --- Header should NOT stick while scrolling --- */
+#controlPanel{
+  position: static !important;   /* was sticky */
+  top: auto !important;
+  z-index: 1 !important;
+  box-shadow: none;              /* optional: remove drop shadow */
+  backdrop-filter: none;         /* optional: lighter on GPU */
+  -webkit-backdrop-filter: none; /* optional */
+}
+
+/* remove any extra top spacing from earlier themes */
+body { padding-top: 0 !important; }
+
