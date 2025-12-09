@@ -4,6 +4,27 @@ import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 import { grantBarrier } from "@logic/core/barrier.js";
 
 
+
+// Helper to manage selection flow
+function resolveSelectionQuery(eff, owner, targets, sourceCard, effectsQueue) {
+  const requested = parseInt((eff.select ?? eff.select_count ?? 1));
+  const clamped = Math.max(1, Math.min(requested, targets.length));
+
+  if (targets.length === 0) return "no-valid-targets";
+
+  state.pendingTargetEffect = {
+    eff,
+    owner,
+    sourceCard: sourceCard || null,
+    resumeEffects: effectsQueue,
+    pool: targets,
+    targets: [],
+    selectCount: clamped,
+  };
+  highlightSelectable(targets);
+  return "pending";
+}
+
 let __initializingKeywords = false;
 
 const KEYWORD_MAP = {
@@ -222,22 +243,7 @@ export function handleKeyword(eff, owner, effectsQueue, context = {}) {
 
   const __selRaw = (eff.select ?? eff.select_count);
   if (__selRaw) {
-    const requested = parseInt((eff.select ?? eff.select_count ?? 1));
-    const clamped = Math.max(1, Math.min(requested, targets.length));
-
-    if (targets.length === 0) return "no-valid-targets";
-
-    state.pendingTargetEffect = {
-      eff,
-      owner,
-      sourceCard: context.sourceCard || null,
-      resumeEffects: effectsQueue,
-      pool: targets,
-      targets: [],
-      selectCount: clamped,
-    };
-    highlightSelectable(targets);
-    return "pending";
+    return resolveSelectionQuery(eff, owner, targets, context.sourceCard, effectsQueue);
   }
 
   for (const target of targets) {
@@ -256,9 +262,12 @@ export function handleRemoveKeyword(eff, owner, explicitTargets) {
   if (!targets.length) return;
 
   if (eff.select && !explicitTargets) {
-    state.pendingTargetEffect = { eff, owner, sourceCard: null, pool: targets, targets: [], selectCount: 1 };
-    highlightSelectable(targets);
-    return "pending";
+    // For remove_keyword, we don't have effectsQueue usually? 
+    // handleRemoveKeyword(eff, owner, explicitTargets) doesn't take effectsQueue param?
+    // Wait, effects.js calls it as: handleRemoveKeyword(eff, owner).
+    // So effectsQueue is undefined. We might need to handle that in the helper.
+    // The helper stores it in pendingTargetEffect.resumeEffects.
+    return resolveSelectionQuery(eff, owner, targets, null, undefined);
   }
 
   const keywordToRemove = String(eff.keyword || "").toLowerCase();

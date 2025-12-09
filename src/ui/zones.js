@@ -1,4 +1,5 @@
 import { byId, clear } from "@ui/dom.js";
+import { isOwnBoard, isBoardZone } from "@helpers/board.js";
 import { previewHandStats } from "@helpers/enhance.js";
 import { computeHandGlow } from "@ui/helpers/glow.js";
 import { attachTooltip } from "@ui/tooltips.js";
@@ -90,8 +91,8 @@ export function renderZone(containerId, cards, state, rerender, clickable = fals
   const owner = isBlueHand ? "blue" : "red";
   const isBlueBoard = containerId === "blueBoard";
   const isRedBoard = containerId === "redBoard";
-  const isBoard = isBlueBoard || isRedBoard;
-  const isMyBoard = (isBlueBoard && state.isBlueTurn) || (isRedBoard && !state.isBlueTurn);
+  const isBoard = isBoardZone(containerId);
+  const isMyBoard = isOwnBoard(containerId, state);
 
   // allow dropping from own hand to own board
   if (isBoard && isMyBoard && !isMulligan) {
@@ -283,8 +284,7 @@ export function renderZone(containerId, cards, state, rerender, clickable = fals
     if (isBoard) applyBarrierOverlay(div, card);
 
     // === attack highlight (own board)
-    const isOwnBoard = (isBlueBoard && state.isBlueTurn) || (!state.isBlueTurn && isRedBoard);
-    if (isBoard && isFollower && card.can_attack && !card.hasAttacked && isOwnBoard) {
+    if (isBoard && isFollower && card.can_attack && !card.hasAttacked && isMyBoard) {
       if (!card.cantAttack && !card.cantAttackFollowers && !card.cantAttackLeaders && !card.hasCantAttack) {
         if (card.isRush && card.justPlayed) div.classList.add("rush-glow");
         else div.classList.add("can-attack");

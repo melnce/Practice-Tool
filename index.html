@@ -25,6 +25,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" />
   <title>Shadowverse Practice Tool</title>
+  <script>
+    window.APP_ROOT = '/';
+  </script>
 
   <!-- existing styles (unchanged order) -->
   <link rel="stylesheet" href="./css/base.css" />
@@ -375,11 +378,6 @@
       console.log(`Resolving ${path} from ${base}`);
       return new URL(path, base + '/').href;
     };
-  </script>
-  <script>
-    window.APP_ROOT = window.location.href.includes('localhost')
-      ? 'http://127.0.0.1:5500/'
-      : '/';
   </script>
 
 

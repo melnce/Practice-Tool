@@ -15,9 +15,9 @@ export function handleHealLeader(owner, eff) {
 
   // Apply healing, respecting the new dynamic max HP
   if (targetPlayerIsBlue) {
-    state.blueHP = Math.max(0, Math.min(state.blueMaxHP, state.blueHP + amt)); // <-- MODIFIED
+    state.blueHP = Math.max(0, Math.min(state.blueMaxHP, state.blueHP + amt));
   } else {
-    state.redHP = Math.max(0, Math.min(state.redMaxHP, state.redHP + amt)); // <-- MODIFIED
+    state.redHP = Math.max(0, Math.min(state.redMaxHP, state.redHP + amt));
   }
 }
 
@@ -82,24 +82,25 @@ export function handleDynamicHealLeader(owner, eff) {
 }
 
 /* ---------- NEW: leader barrier state ops ---------- */
-export function grantLeaderBarrier(owner, charges = 1) {
-  logEvent("leaderBarrierGrant", { owner, charges });
-  const keyC = owner === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier";
-  state[keyC] = Math.max(0, (state[keyC] | 0) + (charges | 0));
+export function grantLeaderBarrier(owner, _charges = 1) {
+  // Ignore extra charges: once the leader has Barrier, do nothing.
+  const key = owner === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier";
+  if (state[key]) return; // already has Barrier
+
+  state[key] = 1;
+  logEvent("leaderBarrierGrant", { owner });
 }
 
 export function popLeaderBarrier(owner, reason = "damage_prevent") {
-  const keyC = owner === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier";
-  if ((state[keyC] | 0) > 0) {
-    logEvent("leaderBarrierPop", { owner, reason });
-    state[keyC] = (state[keyC] | 0) - 1;
-    // optional UI flags:
-    const keyFx =
-      owner === "blue" ? "blueLeaderBarrierPopped" : "redLeaderBarrierPopped";
-    state[keyFx] = reason;
-    return true;
-  }
-  return false;
+  const key = owner === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier";
+  if (!state[key]) return false;
+
+  logEvent("leaderBarrierPop", { owner, reason });
+  state[key] = 0;
+  const fxKey =
+    owner === "blue" ? "blueLeaderBarrierPopped" : "redLeaderBarrierPopped";
+  state[fxKey] = reason;
+  return true;
 }
 
 /** Centralized leader damage that respects barrier and max HP */
@@ -127,8 +128,8 @@ export function handleLeaderBarrierOp(owner, eff) {
     (eff.player || "self") === "self"
       ? owner
       : owner === "blue"
-      ? "red"
-      : "blue";
-  const charges = parseInt(eff.charges ?? eff.amount ?? 1) || 1;
-  grantLeaderBarrier(target, charges);
+        ? "red"
+        : "blue";
+  // Ignore eff.charges / eff.amount > 1
+  grantLeaderBarrier(target, 1);
 }

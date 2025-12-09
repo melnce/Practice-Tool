@@ -338,31 +338,15 @@ function updateCrestsUI(playerPrefix, state) {
 function renderLeaderBarrierBadge(side) {
   const host = byId(side === "blue" ? "blueLeader" : "redLeader");
   if (!host) return;
-  // remove old badge
+
+  // Cleanup old badges just in case
   host.querySelectorAll(".leader-barrier-badge").forEach(n => n.remove());
-  const charges = (state[side === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier"] | 0);
-  if (charges <= 0) return;
-  const badge = document.createElement("div");
-  badge.className = "leader-barrier-badge";
-  badge.textContent = String(charges);
-  Object.assign(badge.style, {
-    position: "absolute",
-    right: "6px",
-    top: "6px",
-    minWidth: "18px",
-    height: "18px",
-    padding: "0 4px",
-    borderRadius: "9px",
-    background: "rgba(135,206,250,0.95)",
-    color: "#000",
-    fontWeight: "900",
-    fontSize: "12px",
-    lineHeight: "18px",
-    textAlign: "center",
-    boxShadow: "0 0 4px rgba(0,0,0,0.6)",
-    pointerEvents: "none",
-    zIndex: "5"
-  });
-  host.style.position = "relative"; // ensure positioning context
-  host.appendChild(badge);
+
+  const hasBarrier = (state[side === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier"] | 0) > 0;
+
+  if (hasBarrier) {
+    host.classList.add("has-leader-barrier");
+  } else {
+    host.classList.remove("has-leader-barrier");
+  }
 }

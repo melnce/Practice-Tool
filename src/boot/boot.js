@@ -3,12 +3,12 @@ import "@logic/index.js";
 
 // Entry points
 import { render } from "@ui/render.js";
+import { wireClick } from "@ui/dom.js";
 import { startGame } from "@logic/startGame.js";
 import { initHistoryHotkeys, onHistoryChange, resetHistory } from "@core/history.js";
 
 window.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("startGameBtn");
-  if (btn) btn.addEventListener("click", async () => {
+  wireClick("startGameBtn", async () => {
     await startGame();
     resetHistory(); // new game = new undo stack
   });

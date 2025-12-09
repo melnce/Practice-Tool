@@ -20,18 +20,24 @@ export async function loadCardDatabase() {
   fullCardData = {};
   tokenCardData = {};
 
-  const fullRes = await fetch(`${window.APP_ROOT}cards/card_details.json`);
+  let root = window.APP_ROOT || '/';
+  if (root.includes(':5500') && !window.location.href.includes(':5500')) {
+    console.warn("Detected invalid APP_ROOT (5500). Fallback to /");
+    root = '/';
+  }
+
+  const fullRes = await fetch(`${root}cards/card_details.json`);
   if (!fullRes.ok) throw new Error(`Main cards failed: ${fullRes.status}`);
   const fullJson = await fullRes.json();
 
-  const tokenRes = await fetch(`${window.APP_ROOT}cards/token_details.json`);
+  const tokenRes = await fetch(`${root}cards/token_details.json`);
   if (!tokenRes.ok) throw new Error(`Tokens failed: ${tokenRes.status}`);
   const tokenJson = await tokenRes.json();
 
   // Load lab vanilla set
   let vanillaJson = [];
   try {
-    const vanillaRes = await fetch(`${window.APP_ROOT}cards/vanilla_lab_set.json`);
+    const vanillaRes = await fetch(`${root}cards/vanilla_lab_set.json`);
     if (vanillaRes.ok) {
       vanillaJson = await vanillaRes.json();
     }

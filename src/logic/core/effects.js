@@ -53,6 +53,13 @@ import { opStartFuseFromCard, startFortifierFuse } from "@logic/effects/ops/fuse
 import { handCountGate } from "@logic/effects/gates/handCountGate.js";
 import { transformTarget, transformRandomSpellInHand } from "@logic/effects/ops/transform.js";
 import { handleComboRepeatBuff } from "@logic/effects/ops/buff.js";
+import {
+  handleDestroyAlliedAmuletsThenDamage,
+  handleDamageEnemyLeaderByOtherAllies,
+  handleDestroyRandomOtherAllies,
+  handleRestoreFullDefenseSelf,
+  handleRestoreSelfAndHealLeader
+} from "@logic/effects/ops/misc.js";
 
 
 
@@ -63,6 +70,11 @@ import { logEvent } from "@core/logger.js";
 
 
 // --- Core Wrappers (Unchanged) ---
+/**
+ * Triggers fanfare effects for a card.
+ * @param {object} card - The card with potential fanfare effects.
+ * @param {string} owner - "blue" or "red".
+ */
 export function onFanfare(card, owner) {
   const list = card.fanfare || [];
   if (Array.isArray(list) && list.length) runEffects([...list], owner, card);
@@ -95,6 +107,13 @@ function notifyLootPlayed(owner, sourceCard) {
 
 
 // --- The Master Effect Runner ---
+/**
+ * Main effect dispatcher. Processes a queue of effects sequentially.
+ * @param {Array<object>} effects - Array of effect objects to process.
+ * @param {string} owner - "blue" or "red".
+ * @param {object|null} sourceCard - The card initiating the effects.
+ * @param {object} [context={}] - Shared context for targeting and chaining.
+ */
 export function runEffects(effects, owner, sourceCard, context = {}) {
   while (effects.length) {
     const eff = effects.shift();
@@ -156,14 +175,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
       case "damage": if (handleDamage(eff, owner, sourceCard, effects, context) === "pending") return; break;
       case "damage_all": handleDamageAll(eff, owner, sourceCard); break;
       case "damage_all_by_allied_golems": handleDamageAllByAlliedGolems(eff, owner); break;
-      case "damage_enemy_leader_by_other_allies": {
-        // Compute X = number of OTHER allied cards on field
-        const myBoard = owner === "blue" ? state.blueBoard : state.redBoard;
-        const x = (myBoard || []).filter(c => c && (!sourceCard || c.uid !== sourceCard.uid)).length | 0;
-        const enemy = owner === "blue" ? "red" : "blue";
-        if (x > 0) applyLeaderDamage(enemy, x);
-        break;
-      }
+      case "damage_enemy_leader_by_other_allies": handleDamageEnemyLeaderByOtherAllies(owner, sourceCard); break;
       case "damage_follower_or_leader": if (handleDamageFollowerOrLeader(eff, owner, sourceCard, effects) === "pending") return; break;
       case "damage_highest_defense": handleDamageHighestDefense(eff, owner, sourceCard); break;
       case "damage_random": handleDamageRandom(eff, owner); break;
@@ -182,17 +194,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
       case "damage_split_sequential": handleDamageSplitSequential(eff, owner); break;
       case "destroy": if (handleDestroy(eff, owner, effects, context, sourceCard) === "pending") return; break;
       case "destroy_all": handleDestroyAll(eff, owner, sourceCard, context); break;
-      case "destroy_allied_amulets_then_damage": {
-        // 1) Destroy own amulets and get count X
-        const x = destroyAlliedAmulets(owner) | 0;
-
-        // 2) Deal X to all enemy followers and enemy leader
-        if (x > 0) {
-          handleDamageAll({ op: "damage_all", target: "enemy:follower", amount: x }, owner);
-          handleDamageAll({ op: "damage_all", target: "enemy:leader", amount: x }, owner);
-        }
-        break;
-      }
+      case "destroy_allied_amulets_then_damage": handleDestroyAlliedAmuletsThenDamage(owner); break;
       case "destroy_defender_if_damaged": {
         const t = context?.defender;
         if (!t) break;
@@ -220,22 +222,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
       }
       case "destroy_highest": handleDestroyHighest(eff, owner); break;
       case "destroy_random": handleDestroyRandom(eff, owner, context); break;
-      case "destroy_random_other_allies": {
-        // X = number of other allied cards on the field (followers + amulets),
-        // then destroy X random enemy followers (one by one).
-        const board = owner === "blue" ? state.blueBoard : state.redBoard;
-        // Count OTHER allied cards: everything on your board except the source
-        const x = (board || []).filter(c => c && (!sourceCard || c.uid !== sourceCard.uid)).length | 0;
-
-        for (let i = 0; i < x; i++) {
-          handleDestroyRandom(
-            { op: "destroy_random", target: "enemy:follower", count: 1 },
-            owner,
-            context
-          );
-        }
-        break;
-      }
+      case "destroy_random_other_allies": handleDestroyRandomOtherAllies(owner, sourceCard, context); break;
       case "destroy_self": handleDestroySelf(sourceCard); cleanupDead(); break;
       case "destroy_then": {
         const destroyed = handleDestroy(eff, owner, [], context, sourceCard);
@@ -324,45 +311,8 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
       case "remove_keyword": if (handleRemoveKeyword(eff, owner) === "pending") return; break;
       case "replace_deck": handleReplaceDeck(owner, eff); break;
       case "replace_deck_with_set_minus": { import("@logic/effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => render()); }); break; }
-      case "restore_full_defense_self": {
-        // Fully heal THIS follower's defense and remember the restored amount.
-        if (sourceCard && sourceCard.type === "Follower") {
-          const curr = parseInt(sourceCard.defense, 10) || 0;
-          const full =
-            Number.isFinite(sourceCard.potential_defense) ? sourceCard.potential_defense :
-              Number.isFinite(sourceCard.peak_defense) ? sourceCard.peak_defense :
-                Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense :
-                  curr;
-
-          const restored = Math.max(0, full - curr);
-          sourceCard.defense = full;
-
-          // make available to chained effects in this sequence
-          sourceCard.__lastRestored = restored;
-          context.__restored_amount = restored;
-        }
-        break;
-      }
-      case "restore_self_and_heal_leader": {
-        if (sourceCard?.type !== "Follower") break;
-
-        // compute full defense
-        const curr = parseInt(sourceCard.defense, 10) || 0;
-        const full =
-          Number.isFinite(sourceCard.potential_defense) ? sourceCard.potential_defense :
-            Number.isFinite(sourceCard.peak_defense) ? sourceCard.peak_defense :
-              Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense :
-                curr;
-
-        const restored = Math.max(0, full - curr);
-        if (restored > 0) {
-          sourceCard.defense = full;
-          // heal same amount
-          handleHealLeader(owner, { amount: restored });
-        }
-        render(); // force repaint now (even if restored = 0 it's harmless)
-        break;
-      }
+      case "restore_full_defense_self": handleRestoreFullDefenseSelf(sourceCard, context); break;
+      case "restore_self_and_heal_leader": handleRestoreSelfAndHealLeader(owner, sourceCard); break;
       case "return_hand_to_deck": if (handleReturnHandToDeck(eff, owner, effects) === "pending") return; break;
       case "return_to_hand": if (handleReturnToHand(eff, owner, sourceCard, effects) === "pending") return; break;
       case "select": { const res = handleSelect(eff, owner, sourceCard, effects); if (res === "pending") return res; break; }

@@ -20,6 +20,14 @@ function _isCardDamaged(c) {
   return curr < full;
 }
 
+function getCardSide(c) {
+  if (state.blueBoard?.includes(c)) return "blue";
+  if (state.redBoard?.includes(c)) return "red";
+  if (state.blueHand?.includes(c)) return "blue"; // also check hands for completeness
+  if (state.redHand?.includes(c)) return "red";
+  return c?.owner ?? null;
+}
+
 export function getPool(targetSpec, owner, sourceCard, condition = {}, context = {}) {
   const spec = String(targetSpec || "").trim().toLowerCase();
 
@@ -155,10 +163,7 @@ export function getPool(targetSpec, owner, sourceCard, condition = {}, context =
   // Determine owner by which board the card is on (cards often have no .owner)
   if (context.isTargetedEffect) {
     pool = pool.filter(c => {
-      const cardSide =
-        (state.blueBoard?.includes(c) ? "blue" :
-          state.redBoard?.includes(c) ? "red" :
-            (c?.owner ?? null)); // fallback only if explicitly set
+      const cardSide = getCardSide(c);
 
       const isEnemy = cardSide && cardSide !== owner;
       if (isEnemy && (c?.hasAmbush || c?.hasAura)) return false; // block enemy stealth
@@ -209,10 +214,7 @@ export function handleSelect(eff, owner, sourceCard, effectsQueue, context = {})
       const lloyds = (oppBoard || []).filter(c => c?.name === "Lloyd");
       if (!lloyds.length) return;
 
-      const poolHasOpponent = (pool || []).some(c =>
-        (state.blueBoard?.includes(c) ? "blue" :
-          state.redBoard?.includes(c) ? "red" : null) === opp
-      );
+      const poolHasOpponent = (pool || []).some(c => getCardSide(c) === opp);
       if (!poolHasOpponent) return;
 
       if (requestedCount <= 1) {

@@ -116,9 +116,11 @@
   flex-wrap: nowrap;
   gap: 6px;
   min-height: 160px;
-  min-width: 575px; /*perfect width */
+  min-width: 575px;
+  /*perfect width */
   padding: 8px;
-  border: 2px dashed rgba(255, 255, 255, 0.2); /* optional visual aid */
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  /* optional visual aid */
 }
 
 
@@ -143,7 +145,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  align-items: center; /* ✅ fixes centering */
+  align-items: center;
+  /* ✅ fixes centering */
   z-index: 100;
 }
 
@@ -174,13 +177,15 @@
 }
 
 #redStatsContainer {
-  top: 120px; /* adjust as needed */
-  
+  top: 120px;
+  /* adjust as needed */
+
 }
 
 #blueStatsContainer {
-  bottom: 120px; /* adjust as needed */
-  
+  bottom: 120px;
+  /* adjust as needed */
+
 }
 
 #turnControls #redBoost {
@@ -195,7 +200,8 @@
 }
 
 #turnControls #redBoost.used {
-  background-color: #555 !important; /* force override orange */
+  background-color: #555 !important;
+  /* force override orange */
   color: #aaa !important;
   cursor: default;
 }
@@ -211,7 +217,7 @@
   font-size: 2rem;
   font-weight: bold;
   color: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   margin: auto;
   margin-bottom: 10px;
 }
@@ -233,29 +239,34 @@
 .leader-container {
   display: flex;
   align-items: center;
-  justify-content: center; /* center all 3 elements together */
-  gap: 8px; /* spacing between evo, leader, super evo */
-  margin: auto; /* keeps it centered in the layout */
-  width: fit-content; /* shrink to the buttons + leader size */
+  justify-content: center;
+  /* center all 3 elements together */
+  gap: 8px;
+  /* spacing between evo, leader, super evo */
+  margin: auto;
+  /* keeps it centered in the layout */
+  width: fit-content;
+  /* shrink to the buttons + leader size */
 }
 
 /* In your CSS file */
 .floating-stats span {
-    margin-right: 8px;
-    font-size: 0.9rem;
+  margin-right: 8px;
+  font-size: 0.9rem;
 }
 
 .floating-stats span:last-child {
-    margin-right: 0;
+  margin-right: 0;
 }
 
-#redStats, #blueStats {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 4px 8px;
-    border-radius: 12px;
-    color: white;
-    display: flex;
-    gap: 8px;
+#redStats,
+#blueStats {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  gap: 8px;
 }
 
 /* --- Crest UI Styles --- */
@@ -264,58 +275,68 @@
 .floating-stats {
   position: absolute;
   left: 20px;
-  background-color: transparent; /* Remove background from parent */
+  background-color: transparent;
+  /* Remove background from parent */
   border: none;
   border-radius: 8px;
   display: flex;
-  flex-direction: column; /* Stack stats and crests vertically */
-  gap: 6px; /* Space between stats bar and crests */
+  flex-direction: column;
+  /* Stack stats and crests vertically */
+  gap: 6px;
+  /* Space between stats bar and crests */
   font-size: 1.1rem;
   font-weight: bold;
   z-index: 50;
 }
 
 /* Re-apply styling to the inner stats bar */
-#redStats, #blueStats {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 4px 8px;
-    border-radius: 12px;
-    color: white;
-    display: flex;
-    gap: 8px;
+#redStats,
+#blueStats {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  gap: 8px;
 }
 
 /* The main container now stacks the rows vertically and centers them */
 .crest-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center the rows horizontally */
-  gap: 2px; /* Small gap between the two rows */
+  align-items: center;
+  /* Center the rows horizontally */
+  gap: 2px;
+  /* Small gap between the two rows */
 }
 
 /* New style for each row of crests */
 .crest-row {
   display: flex;
-  justify-content: center; /* Center the slots within the row */
-  gap: 4px; /* Gap between individual crest slots */
+  justify-content: center;
+  /* Center the slots within the row */
+  gap: 4px;
+  /* Gap between individual crest slots */
 }
 
 /* Individual Crest Slot (now bigger) */
 .crest-slot {
-  width: 32px;  /* Increased from 24px */
-  height: 32px; /* Increased from 24px */
+  width: 32px;
+  /* Increased from 24px */
+  height: 32px;
+  /* Increased from 24px */
   background-color: rgba(0, 0, 0, 0.5);
   border: 2px solid #555;
   border-radius: 50%;
   transition: all 0.2s ease-in-out;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
 }
 
 /* Style for an ACTIVE crest */
 .crest-slot.active {
   background-color: #00ff99;
   border-color: #99ffee;
-  box-shadow: 0 0 10px #00ff99, inset 0 0 5px rgba(255,255,255,0.5);
+  box-shadow: 0 0 10px #00ff99, inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 /* Add this to layout.css */
@@ -323,8 +344,10 @@
 .crest-image {
   width: 100%;
   height: 100%;
-  border-radius: 50%; /* Make the image circular */
-  object-fit: cover; /* Ensure the image fills the space nicely */
+  border-radius: 50%;
+  /* Make the image circular */
+  object-fit: cover;
+  /* Ensure the image fills the space nicely */
 }
 
 /* allow absolute-positioned children like the badge */
@@ -336,7 +359,7 @@
   border: 2px solid #555;
   border-radius: 50%;
   transition: all 0.2s ease-in-out;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
 }
 
 /* small circular badge in bottom-right */
@@ -354,8 +377,9 @@
   font-size: 10px;
   line-height: 16px;
   text-align: center;
-  box-shadow: 0 0 6px rgba(0,0,0,0.6);
-  pointer-events: none; /* don’t block hover tooltip */
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  /* don’t block hover tooltip */
 }
 
 /* optional: pop a little when it changes (you can toggle this class in logic if you want) */

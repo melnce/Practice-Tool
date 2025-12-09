@@ -29,3 +29,12 @@ export function setDragData(e, payload) {
 export function getDragData(e) {
   return e.dataTransfer?.getData("text/plain") ?? "";
 }
+
+export function wireClick(id, handler) {
+  const el = document.getElementById(id);
+  if (!el) {
+    console.warn(`Missing element #${id}`);
+    return;
+  }
+  el.addEventListener("click", handler);
+}
