@@ -1,0 +1,496 @@
+// /gamelogic/playCard.js
+import { state } from "@core/gameState.js";
+import { render } from "@ui/render.js";
+import { applyKeywordsFromList } from "@logic/core/keywords.js";
+import { runEffects } from "@logic/core/effects.js";
+import { spellboostHand } from "@logic/effects/ops/spellboost.js";
+import { getPool } from "@logic/core/targeting.js";
+import { isOverflow } from "@helpers/overflow.js";
+import { fireTrigger } from "@logic/core/triggers.js";
+import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
+import { handleCongregantOnEnter } from "@logic/effects/cards/forestcraft/congregant.js";
+import { logEvent } from "@core/logger.js";
+import { doAction } from "@core/history.js";
+function _pushPlayedHistory(owner, card) {
+    const entry = {
+        uid: card?.uid,
+        name: card?.name,
+        type: card?.type,
+        cost: Number(card?.cost) || 0,
+        base_image: card?.base_image || null,
+        ts: Date.now()
+    };
+    if (owner === "blue")
+        state.bluePlayedHistory.push(entry);
+    else
+        state.redPlayedHistory.push(entry);
+}
+function getEffectiveCost(card) {
+    if (typeof card.effectiveCost === "number")
+        return card.effectiveCost;
+    if (card.cost_mod != null)
+        return (parseInt(card.cost, 10) || 0) + (parseInt(card.cost_mod, 10) || 0);
+    if (card.costModified != null)
+        return parseInt(card.costModified, 10) || 0;
+    return parseInt(card.cost, 10) || 0;
+}
+function countArtifactsInHand(owner, maxCost = 5) {
+    const hand = owner === "blue" ? state.blueHand : state.redHand;
+    if (!Array.isArray(hand))
+        return 0;
+    let n = 0;
+    for (const c of hand) {
+        if (!c || c.type !== "Follower")
+            continue;
+        const tribes = Array.isArray(c.tribes) ? c.tribes.map(t => String(t).toLowerCase()) : [];
+        if (!tribes.includes("artifact"))
+            continue;
+        if (getEffectiveCost(c) <= maxCost)
+            n++;
+    }
+    return n;
+}
+// Add this check function near your other spell validation functions
+function spellNeedsArtifactPair(card, player) {
+    // Check if this spell uses the artifact copy operation
+    const usesArtifactCopyOp = Array.isArray(card.spell) &&
+        card.spell.some(e => e && e.op === "select_hand_summon_artifact_copies_eot_destroy");
+    if (usesArtifactCopyOp) {
+        return countArtifactsInHand(player, 5) < 2;
+    }
+    return false;
+}
+// keep your existing helper
+function pickEnhanceTier(card, availablePP) {
+    const tiers = Array.isArray(card?.enhanceTiers) ? card.enhanceTiers : [];
+    if (!tiers.length && Array.isArray(card?.keywords)) {
+        const tmp = [];
+        for (const k of card.keywords) {
+            const name = (typeof k === "string" ? k : k?.name) || "";
+            if (name.toLowerCase() === "enhance") {
+                const cost = Number(typeof k === "object" ? k.cost : 0);
+                const effects = (typeof k === "object" && Array.isArray(k.effects)) ? k.effects : [];
+                if (cost > 0)
+                    tmp.push({ cost, effects });
+            }
+        }
+        tmp.sort((a, b) => b.cost - a.cost);
+        card.enhanceTiers = tmp;
+    }
+    for (const t of (card.enhanceTiers || [])) {
+        if (availablePP >= t.cost)
+            return t; // highest affordable                           
+    }
+    return null;
+}
+// Put near top or bottom of file
+// /gamelogic/playCard.js
+function mergeWitchsNewBrewOnPlay(newCard, owner) {
+    // only for the Brew amulet
+    if ((newCard?.type !== "Amulet") || (String(newCard.name).toLowerCase() !== "witch's new brew"))
+        return;
+    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+    // index of the just-played copy (it was just pushed to board)
+    const newIndex = board.lastIndexOf(newCard);
+    if (newIndex < 0)
+        return;
+    // collect counters from any previous Brew(s) AND Magic Sediments
+    const sum = {};
+    const toRemove = [];
+    for (let i = 0; i < board.length; i++) {
+        if (i === newIndex)
+            continue;
+        const c = board[i];
+        if (c && c.type === "Amulet") {
+            const cardName = String(c.name).toLowerCase();
+            // Check for both Witch's New Brew AND Magic Sediment
+            if (cardName === "witch's new brew" || cardName === "magic sediment") {
+                // merge all named counters (do NOT merge countdown etc.)
+                if (c.counters && typeof c.counters === "object") {
+                    for (const [k, v] of Object.entries(c.counters)) {
+                        sum[k] = (sum[k] || 0) + (Number(v) || 0);
+                    }
+                }
+                toRemove.push(i);
+            }
+        }
+    }
+    // nothing to merge
+    if (!toRemove.length)
+        return;
+    // apply merged counters to the new card
+    newCard.counters = newCard.counters || {};
+    for (const [k, v] of Object.entries(sum)) {
+        newCard.counters[k] = (newCard.counters[k] || 0) + v;
+    }
+    // remove old copies → grave (destroy them)
+    // remove from highest index down so indices stay valid
+    toRemove.sort((a, b) => b - a);
+    for (const idx of toRemove) {
+        grave.push(board.splice(idx, 1)[0]);
+        // Increment shadows for the owner
+        if (owner === "blue")
+            state.blueShadows++;
+        else
+            state.redShadows++;
+    }
+}
+function spellNeedsAllyOnBoard(card, player) {
+    // Determine which effect list will actually run (consider Enhance)
+    const availablePP = player === "blue" ? state.bluePP : state.redPP;
+    const tier = pickEnhanceTier(card, availablePP);
+    const baseList = (Array.isArray(card.spell) && card.spell.length ? card.spell : [])
+        .concat(Array.isArray(card.fanfare) ? card.fanfare : []);
+    const list = (tier && Array.isArray(tier.effects) && tier.effects.length)
+        ? tier.effects
+        : baseList;
+    // Way of the Maid-style requirement: needs to return an ally from board
+    return list.some(eff => eff &&
+        eff.select &&
+        String(eff.op).toLowerCase() === "return_to_hand" &&
+        String(eff.target || "").toLowerCase().startsWith("ally"));
+}
+function canCastSpell(card, player) {
+    const effects = Array.isArray(card.spell) && card.spell.length
+        ? card.spell
+        : (Array.isArray(card.fanfare) ? card.fanfare : []);
+    // Way of the Maid pattern: needs to return another hand card
+    const needsHandReturn = effects.some(e => String(e.op).toLowerCase() === "return_hand_to_deck" && e.select);
+    if (needsHandReturn) {
+        const hand = player === "blue" ? state.blueHand : state.redHand;
+        // spell itself is still in hand here, so we need at least 2 cards
+        if (hand.length <= 1)
+            return false;
+    }
+    return true;
+}
+function spellNeedsTarget(card, player) {
+    const availablePP = player === "blue" ? state.bluePP : state.redPP;
+    const tier = pickEnhanceTier(card, availablePP);
+    const baseList = (Array.isArray(card.spell) && card.spell.length ? card.spell : [])
+        .concat(Array.isArray(card.fanfare) ? card.fanfare : []);
+    const list = (tier && Array.isArray(tier.effects) && tier.effects.length)
+        ? tier.effects
+        : baseList;
+    // Allow follower-or-leader effects to be cast without a pre target.
+    const hasFollowerOrLeaderEffect = list.some(eff => eff?.op === "damage_follower_or_leader" && eff?.can_target_leader);
+    if (hasFollowerOrLeaderEffect)
+        return false;
+    const checkArr = (arr) => {
+        for (const eff of arr || []) {
+            if (eff?.op === "overflow_gate") {
+                if (isOverflow(player) && checkArr(eff.effects))
+                    return true;
+                continue;
+            }
+            // Skip custom ops that handle their own UI
+            if (eff?.op === "select_hand_summon_artifact_copies_eot_destroy")
+                continue;
+            if (eff?.select) {
+                // ✅ Pass the condition + targeted context so Ward filtering applies
+                const pool = getPool(eff.target, player, 
+                /* sourceCard */ null, 
+                /* condition  */ eff.condition, 
+                /* context    */ { isTargetedEffect: true });
+                if (!pool || pool.length === 0)
+                    return true; // needs target but none available
+            }
+            // Recurse nested effects if present
+            if (Array.isArray(eff?.effects) && eff.effects.length) {
+                if (checkArr(eff.effects))
+                    return true;
+            }
+        }
+        return false;
+    };
+    return checkArr(list);
+}
+function spellNeedsSpellboostTarget(card, player) {
+    // Only apply to Radiant Rainbow (or similar effects)
+    if (card.name.toLowerCase() !== "radiant rainbow")
+        return false;
+    const hand = player === "blue" ? state.blueHand : state.redHand;
+    return !hand.some(c => Array.isArray(c.keywords) && c.keywords.some(k => {
+        const kwName = typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
+        return kwName === "spellboost";
+    }));
+}
+function spellNeedsEnemyFollower(card, player) {
+    const enemyBoard = player === "blue" ? state.redBoard : state.blueBoard;
+    const needsEnemy = (card.name.toLowerCase() === "stormy blast" || card.name.toLowerCase() === "snowman army");
+    if (!needsEnemy)
+        return false;
+    // Return true if there are NO enemy followers
+    return !enemyBoard.some(c => c.type === "Follower");
+}
+// Internal core so we can wrap with history.doAction
+function _playCardCore(fromHand, player, index) {
+    // 1) Turn guard
+    if ((player === "blue" && !state.isBlueTurn) || (player === "red" && state.isBlueTurn))
+        return;
+    const card = fromHand[index];
+    if (!card)
+        return;
+    // 0) Can't-play guard
+    if (card.cant_play) {
+        if (!globalThis.HEADLESS) {
+            console.warn(`[cast blocked] ${card.name} cannot be played.`);
+        }
+        return;
+    }
+    // ⛔ spell pre-checks BEFORE paying/removing from hand
+    if (card.type === "Spell" && !canCastSpell(card, player)) {
+        if (!globalThis.HEADLESS) {
+            console.warn("[cast blocked] Spell needs a different hand card to return.");
+        }
+        return;
+    }
+    // --- NEW: Artifact pair requirement check ---
+    if (card.type === "Spell" && spellNeedsArtifactPair(card, player)) {
+        if (!globalThis.HEADLESS) {
+            console.warn("[cast blocked] Spell requires at least 2 Artifact followers (cost ≤ 5) in hand.");
+        }
+        return;
+    }
+    const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
+    const toGrave = player === "blue" ? state.blueGraveyard : state.redGraveyard;
+    const isFollower = card.type === "Follower";
+    const isAmulet = card.type === "Amulet";
+    const isSpell = card.type === "Spell";
+    const isPermanent = isFollower || isAmulet;
+    // New check for spells that require a target.
+    if (isSpell && spellNeedsTarget(card, player)) {
+        if (!globalThis.HEADLESS) {
+            console.warn("Spell requires a target but none are available. Cannot cast.");
+        }
+        return;
+    }
+    // --- NEW: Radiant Rainbow check ---
+    if (isSpell && spellNeedsSpellboostTarget(card, player)) {
+        if (!globalThis.HEADLESS) {
+            console.warn("Radiant Rainbow requires a card in hand with Spellboost.");
+        }
+        return;
+    }
+    // --- NEW: Stormy Blast check ---
+    if (isSpell && spellNeedsEnemyFollower(card, player)) {
+        if (!globalThis.HEADLESS) {
+            console.warn("Stormy Blast requires an enemy follower on the field.");
+        }
+        return;
+    }
+    // 2) Board space check for permanents only
+    if (isPermanent && toBoard.length >= 5)
+        return;
+    // --- NEW: Spell precondition (Bug Alert style) ---
+    if (isSpell && spellNeedsAllyOnBoard(card)) {
+        const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
+        if (myBoard.length === 0)
+            return; // not castable → do nothing, don't pay
+    }
+    // 3) Cost / Enhance (hand mod affects BASE only; ENHANCE ignores it)
+    const currentPP = player === "blue" ? state.bluePP : state.redPP;
+    const handMod = parseInt(card.cost_mod) || 0;
+    const baseCost = parseInt(card.cost) || 0;
+    // Pick highest affordable tier by *printed* tier cost (no hand mod)
+    const chosenTier = pickEnhanceTier(card, currentPP); // uses t.cost <= PP
+    // Final effective cost:
+    // - Enhanced: pay the tier's printed cost (ignore handMod)
+    // - Base: pay (base + handMod)
+    const effectiveCost = chosenTier ? chosenTier.cost : (baseCost + handMod);
+    if (!globalThis.HEADLESS) {
+        logEvent("enhanceDecision", {
+            player,
+            card: card.name,
+            uid: card.uid,
+            chosenTierCost: chosenTier ? chosenTier.cost : null,
+            effectiveCost
+        });
+    }
+    if (effectiveCost > currentPP)
+        return; // not affordable
+    // 4) Pay PP exactly once
+    if (player === "blue")
+        state.bluePP -= effectiveCost;
+    else
+        state.redPP -= effectiveCost;
+    // 5) Remove from hand and count play (matters for Combo glow/effects)
+    fromHand.splice(index, 1);
+    if (!globalThis.HEADLESS) {
+        logEvent("playCard", { player, card: card.name, uid: card.uid });
+    }
+    if (player === "blue")
+        state.bluePlaysThisTurn = (state.bluePlaysThisTurn || 0) + 1;
+    else
+        state.redPlaysThisTurn = (state.redPlaysThisTurn || 0) + 1;
+    // 6) Type-specific handling
+    if (isSpell) {
+        if (!globalThis.HEADLESS) {
+            logEvent("spellCast", { player, card: card.name, uid: card.uid, cost: effectiveCost });
+        }
+        const owner = state.isBlueTurn ? "blue" : "red";
+        spellboostHand(owner, 1);
+        // Record played history for spells
+        _pushPlayedHistory(player, card);
+        // Store the card reference BEFORE moving it to grave
+        const spellCard = card;
+        // Spells never enter board — go straight to grave and resolve once
+        toGrave.push(card);
+        // Increment shadows for the owner
+        if (owner === "blue")
+            state.blueShadows++;
+        else
+            state.redShadows++;
+        // AUTO-EVENT: any Loot spell played → fire 'loot_played'
+        const isLootSpell = Array.isArray(spellCard.tribes) &&
+            spellCard.tribes.some(t => String(t).toLowerCase() === "loot");
+        if (isLootSpell) {
+            // Guard: if JSON still has a notifier, don't double-emit
+            const jsonAlreadyNotifies = Array.isArray(spellCard.spell) &&
+                spellCard.spell.some(e => e && e.op === "notify_loot_played");
+            if (!jsonAlreadyNotifies) {
+                // Log auto "loot" notification (if any)
+                if (!globalThis.HEADLESS) {
+                    logEvent("lootPlayed", { player, card: spellCard.name, uid: spellCard.uid });
+                }
+                fireTrigger("loot_played", owner, {
+                    source: "play",
+                    kind: "loot",
+                    playedCard: spellCard
+                });
+            }
+        }
+        // FIX: Use enhanced effects if available, otherwise use base spell effects
+        let list = [];
+        if (chosenTier && Array.isArray(chosenTier.effects) && chosenTier.effects.length) {
+            list = [...chosenTier.effects];
+        }
+        else {
+            list = Array.isArray(card.spell) && card.spell.length
+                ? [...card.spell]
+                : (Array.isArray(card.fanfare) ? [...card.fanfare] : []);
+        }
+        // Pass the spellCard reference instead of null
+        if (list.length)
+            runEffects([...list], player, spellCard, []);
+        return render();
+    }
+    // Followers
+    if (isFollower) {
+        if (!globalThis.HEADLESS) {
+            logEvent("followerEnter", { player, card: card.name, uid: card.uid });
+        }
+        // Record played history for followers
+        _pushPlayedHistory(player, card);
+        // Snapshot whether the hand cost was modified (for "played" triggers only)
+        const printed = Number.isFinite(card.base_cost)
+            ? Number(card.base_cost)
+            : (parseInt(card.cost, 10) || 0);
+        const current = parseInt(card.cost, 10) || 0;
+        const handMod = parseInt(card.cost_mod, 10) || 0;
+        const costChangedOnPlay = (handMod !== 0) || (Number.isFinite(card.base_cost) && current !== printed);
+        // normalize numbers before any math
+        card.attack = parseInt(card.attack, 10) || 0;
+        card.defense = parseInt(card.defense, 10) || 0;
+        // Do NOT count the card itself if its own fanfare has Rally
+        const hasRallyFanfare = Array.isArray(card.fanfare) &&
+            card.fanfare.some(e => String(e.op).toLowerCase() === "rally_gate");
+        if (!hasRallyFanfare) {
+            if (player === "blue")
+                state.blueRally++;
+            else
+                state.redRally++;
+        }
+        if (card.base_attack === undefined)
+            card.base_attack = card.attack;
+        if (card.base_defense === undefined)
+            card.base_defense = card.defense;
+        if (card.peak_defense === undefined)
+            card.peak_defense = card.defense;
+        applyKeywordsFromList(card); // This sets hasRush/hasStorm
+        if (!globalThis.HEADLESS) {
+            console.log(`%c[PlayCard] ${card.name} keywords:`, 'color: blue', {
+                hasRush: card.hasRush,
+                hasStorm: card.hasStorm,
+                can_attack: card.can_attack,
+                keywords: card.keywords
+            });
+        }
+        card.can_attack = !!card.hasStorm || !!card.hasRush;
+        card.isRush = !!card.hasRush && !card.hasStorm;
+        card.justPlayed = true;
+        card.hasAttacked = false;
+        toBoard.push(card);
+        // Fire PLAYED-FROM-HAND (not summons) event
+        fireTrigger('ally_follower_played', player, { playedCard: card, costChanged: costChangedOnPlay });
+        medicalAssassinOnFollowerEnter(player, card); // Add this line
+        fireTrigger('ally_follower_enter', player, { enteringCard: card });
+        fireTrigger('enemy_follower_enter', player, { enteringCard: card });
+        // >>> Congregant chain (special case)
+        handleCongregantOnEnter(player, card);
+        if (chosenTier && Array.isArray(chosenTier.effects) && chosenTier.effects.length) {
+            runEffects([...chosenTier.effects], player, card);
+        }
+        // Re-apply keyword flags now that effects may have added some
+        applyKeywordsFromList(card);
+        // Update combat flags using the *new* keywords
+        card.can_attack = !!card.hasStorm || !!card.hasRush;
+        card.isRush = !!card.hasRush && !card.hasStorm;
+        // ⭐ Ally-enter amulets (e.g., Ancestral Crown)
+        {
+            const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
+            for (const perm of myBoard) {
+                if (perm !== card && perm.type === "Amulet" && perm.hasAllyEnter && Array.isArray(perm.allyEnterEffects)) {
+                    perm.allyEnterEffects.forEach(eff => {
+                        if (eff.op === "buff" && eff.target === "trigger") {
+                            card.attack = (parseInt(card.attack) || 0) + (parseInt(eff.attack) || 0);
+                            card.defense = (parseInt(card.defense) || 0) + (parseInt(eff.defense) || 0);
+                        }
+                    });
+                }
+            }
+        }
+        // Pixie-enter (your existing special case)
+        if (Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
+            const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
+            for (const perm of myBoard) {
+                if (perm.type === "Amulet" && perm.hasPixieEnter && Array.isArray(perm.pixieEnterEffects)) {
+                    runEffects([...perm.pixieEnterEffects], player, perm);
+                }
+            }
+        }
+        // Fanfare (after ally-enter)
+        if (Array.isArray(card.fanfare) && card.fanfare.length) {
+            state.lastSummoned = [card];
+            runEffects([...card.fanfare], player, card, { enteringCard: card });
+        }
+        return render();
+    }
+    // Amulets
+    if (isAmulet) {
+        if (!globalThis.HEADLESS) {
+            logEvent("amuletEnter", { player, card: card.name, uid: card.uid });
+        }
+        // Record played history for amulets
+        _pushPlayedHistory(player, card);
+        applyKeywordsFromList(card); // gives it counters/engage/etc.
+        toBoard.push(card);
+        // merge older Brew(s) into the new one, then remove the old copies
+        mergeWitchsNewBrewOnPlay(card, player);
+        if (chosenTier && Array.isArray(chosenTier.effects) && chosenTier.effects.length) {
+            runEffects([...chosenTier.effects], player, card);
+        }
+        if (Array.isArray(card.fanfare) && card.fanfare.length) {
+            state.lastSummoned = [card];
+            runEffects([...card.fanfare], player, card, { enteringCard: card });
+        }
+        return render();
+    }
+}
+// Public API: one undo step per "Play Card"
+export function playCard(fromHand, player, index) {
+    const card = fromHand?.[index];
+    const meta = { player, index, name: card?.name, uid: card?.uid };
+    return doAction("Play Card", () => _playCardCore(fromHand, player, index), meta, { autoRender: false });
+}

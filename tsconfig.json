@@ -1,0 +1,55 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "allowJs": true,
+        "checkJs": false,
+        "strict": false,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": [
+            "DOM",
+            "ES2020"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "main": [
+                "src/boot/boot.js"
+            ],
+            "gameLogic": [
+                "src/logic/index.js"
+            ],
+            "@core/*": [
+                "src/core/*"
+            ],
+            "@data/*": [
+                "src/data/*"
+            ],
+            "@logic/*": [
+                "src/helpers/*",
+                "src/logic/*"
+            ],
+            "@ui/*": [
+                "src/ui/*"
+            ],
+            "@helpers/*": [
+                "src/helpers/*"
+            ],
+            "@ops/*": [
+                "src/logic/effects/ops/*"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
