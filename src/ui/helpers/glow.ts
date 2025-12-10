@@ -1,4 +1,5 @@
 // src/ui/helpers/glow.ts
+import { state } from "@core/gameState.js";
 import { isOverflow } from "@helpers/overflow.js";
 import { comboReadyInHand } from "@helpers/combo.js";
 import { hasNecromancy } from "@helpers/necromancy.js";

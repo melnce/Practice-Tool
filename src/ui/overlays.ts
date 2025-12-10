@@ -50,7 +50,7 @@ export function applyKeywordOverlays(div: HTMLElement, card: CardInstance) {
     if (card.hasBane) {
         addIcon("images/icon_bane.png", "bane-icon");
     }
-    if (card.hasLastWords || (Array.isArray(card.keywords) && card.keywords.some(k => (k?.name || "").toLowerCase() === "lastwords"))) {
+    if (card.hasLastWords || (Array.isArray(card.keywords) && card.keywords.some(k => (typeof k === "string" ? k : k?.name || "").toLowerCase() === "lastwords"))) {
         addIcon("images/icon_last-words.png", "lastwords-icon");
     }
     if (card.hasDrain) {

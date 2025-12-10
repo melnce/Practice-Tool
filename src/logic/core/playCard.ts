@@ -27,15 +27,15 @@ function _pushPlayedHistory(owner: Player, card: CardInstance) {
         base_image: card?.base_image || null,
         ts: Date.now()
     };
-    if (owner === "blue") state.bluePlayedHistory.push(entry as any);
-    else state.redPlayedHistory.push(entry as any);
+    if (owner === "blue") state.bluePlayedHistory.push(entry as CardInstance);
+    else state.redPlayedHistory.push(entry as CardInstance);
 }
 
 function getEffectiveCost(card: CardInstance) {
-    if (typeof (card as any).effectiveCost === "number") return (card as any).effectiveCost;
-    if ((card as any).cost_mod != null) return (parseInt(card.cost as any, 10) || 0) + (parseInt((card as any).cost_mod, 10) || 0);
+    if (typeof card.effectiveCost === "number") return card.effectiveCost;
+    if (card.cost_mod != null) return (parseInt(String(card.cost), 10) || 0) + (parseInt(String(card.cost_mod), 10) || 0);
     if ((card as any).costModified != null) return parseInt((card as any).costModified, 10) || 0;
-    return parseInt(card.cost as any, 10) || 0;
+    return parseInt(String(card.cost), 10) || 0;
 }
 
 function countArtifactsInHand(owner: Player, maxCost = 5) {
@@ -166,9 +166,9 @@ function spellNeedsAllyOnBoard(card: CardInstance, player: Player) { // Player p
 
 
 function canCastSpell(card: CardInstance, player: Player) {
-    const effects = Array.isArray((card as any).spell) && (card as any).spell.length
-        ? (card as any).spell
-        : (Array.isArray((card as any).fanfare) ? (card as any).fanfare : []);
+    const effects = Array.isArray(card.spell) && card.spell.length
+        ? card.spell
+        : (Array.isArray(card.fanfare) ? card.fanfare : []);
 
     // Way of the Maid pattern: needs to return another hand card
     const needsHandReturn =
@@ -266,7 +266,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
     if (!card) return;
 
     // 0) Can't-play guard
-    if ((card as any).cant_play) {
+    if (card.cant_play) {
         if (!(globalThis as any).HEADLESS) {
             console.warn(`[cast blocked] ${card.name} cannot be played.`);
         }
@@ -332,8 +332,8 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
 
     // 3) Cost / Enhance (hand mod affects BASE only; ENHANCE ignores it)
     const currentPP = player === "blue" ? state.bluePP : state.redPP;
-    const handMod = parseInt((card as any).cost_mod) || 0;
-    const baseCost = parseInt(card.cost as any) || 0;
+    const handMod = parseInt(String(card.cost_mod)) || 0;
+    const baseCost = parseInt(String(card.cost)) || 0;
 
     // Pick highest affordable tier by *printed* tier cost (no hand mod)
     const chosenTier = pickEnhanceTier(card, currentPP); // uses t.cost <= PP
@@ -434,17 +434,15 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
         _pushPlayedHistory(player, card);
 
         // Snapshot whether the hand cost was modified (for "played" triggers only)
-        const printed = Number.isFinite((card as any).base_cost)
-            ? Number((card as any).base_cost)
-            : (parseInt(card.cost as any, 10) || 0);
-        const current = parseInt(card.cost as any, 10) || 0;
-        const handMod = parseInt((card as any).cost_mod, 10) || 0;
-        const costChangedOnPlay = (handMod !== 0) || (Number.isFinite((card as any).base_cost) && current !== printed);
+        const printed = Number.isFinite(card.base_cost)
+            ? Number(card.base_cost)
+            : (parseInt(String(card.cost), 10) || 0);
+        const current = parseInt(String(card.cost), 10) || 0;
+        const handMod = parseInt(String(card.cost_mod), 10) || 0;
+        const costChangedOnPlay = (handMod !== 0) || (Number.isFinite(card.base_cost) && current !== printed);
         // normalize numbers before any math
-        // @ts-ignore
-        card.attack = parseInt(card.attack as any, 10) || 0;
-        // @ts-ignore
-        card.defense = parseInt(card.defense as any, 10) || 0;
+        card.attack = parseInt(String(card.attack), 10) || 0;
+        card.defense = parseInt(String(card.defense), 10) || 0;
 
         // Do NOT count the card itself if its own fanfare has Rally
         const hasRallyFanfare =
@@ -471,7 +469,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
             });
         }
 
-        (card as any).can_attack = !!card.hasStorm || !!card.hasRush;
+        card.can_attack = !!card.hasStorm || !!card.hasRush;
         card.isRush = !!card.hasRush && !card.hasStorm;
         card.justPlayed = true;
         card.hasAttacked = false;
@@ -496,7 +494,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
         applyKeywordsFromList(card);
 
         // Update combat flags using the *new* keywords
-        (card as any).can_attack = !!card.hasStorm || !!card.hasRush;
+        card.can_attack = !!card.hasStorm || !!card.hasRush;
         card.isRush = !!card.hasRush && !card.hasStorm;
 
 

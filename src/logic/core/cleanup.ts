@@ -35,8 +35,8 @@ export function cleanupDead() {
 
             const isFollower = c.type === "Follower";
             const isAmulet = c.type === "Amulet";
-            const defLE0 = isFollower && ((parseInt((c.defense as any)) || 0) <= 0);
-            const countdown0 = isAmulet && c.hasCountdown && ((parseInt((c.countdown as any)) || 0) <= 0);
+            const defLE0 = isFollower && ((parseInt(String(c.defense))) || 0) <= 0;
+            const countdown0 = isAmulet && c.hasCountdown && ((parseInt(String(c.countdown))) || 0) <= 0;
             const shouldDestroy = defLE0 || countdown0;
 
             if (!shouldDestroy) continue;
@@ -51,8 +51,8 @@ export function cleanupDead() {
 
                 // Shikigami bookkeeping (unchanged)
                 if (Array.isArray(c.tribes) && c.tribes.includes("Shikigami")) {
-                    const aBase = parseInt((c.base_attack ?? c.attack) as any) || 0;
-                    const dBase = parseInt((c.base_defense ?? c.defense) as any) || 0;
+                    const aBase = parseInt(String(c.base_attack ?? c.attack)) || 0;
+                    const dBase = parseInt(String(c.base_defense ?? c.defense)) || 0;
                     if (owner === "blue") {
                         if (!state.shikigamiDeathsThisTurnBlue) state.shikigamiDeathsThisTurnBlue = [];
                         state.shikigamiDeathsThisTurnBlue.push({ attack: aBase, defense: dBase });
@@ -79,7 +79,7 @@ export function cleanupDead() {
                 // handleBanish will remove the card from the correct board.
                 // Only splice here if, for some reason, it didn't.
                 const before = board[i];
-                handleBanish(c, owner); // Assumes handleBanish signature
+                handleBanish(c); // Assumes handleBanish signature
                 // Prevent double-splice: only remove if the same object still sits at i.
                 if (board[i] === before) board.splice(i, 1);
             } else {

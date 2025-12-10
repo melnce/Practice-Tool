@@ -29,6 +29,12 @@ export interface KeywordEntry {
     name: string;
     cost?: number;
     effects?: Effect[];
+    key?: string;
+    count?: number;
+    reduceCostBy?: number;
+    minCost?: number;
+    destroyOnEmpty?: boolean;
+    [key: string]: any; // Allow loose typing for now
 }
 
 export interface CardTemplate {
@@ -60,6 +66,19 @@ export interface CardTemplate {
     hasEvolved?: boolean;
     hasCountdown?: boolean;
     hasEngage?: boolean;
+    hasStorm?: boolean;
+    cant_play?: boolean;
+
+    // Spell/Amulet specific
+    spell?: Effect[];
+    fuse?: any[];
+    fuse_recipes?: any[];
+
+    // Cost modifiers
+    cost_mod?: number;
+    base_cost?: number | string;
+    effectiveCost?: number;
+    potential_defense?: number;
 
     // Numeric stats
     countdown?: number | string;
@@ -146,6 +165,25 @@ export interface GameState {
     redBoostUsedEarly: boolean;
     redBoostUsedLate: boolean;
     redBoostPending: boolean;
+
+    pendingTargetEffect?: {
+        eff: Effect;
+        owner: Player;
+        sourceCard: CardInstance | null;
+        resumeEffects: Effect[];
+        pool: CardInstance[];
+        targets: CardInstance[];
+        selectCount: number;
+        canTargetLeader?: boolean;
+        requiresConfirmation?: boolean;
+        confirmationText?: string;
+    };
+
+    // Runtime tracking (not persisted in saves usually, but needed for effects)
+    lastSummoned?: CardInstance[];
+    lastDrawnCards?: CardInstance[];
+    deckoutWinsBlue?: boolean;
+    deckoutWinsRed?: boolean;
 
     [key: string]: any;
 }

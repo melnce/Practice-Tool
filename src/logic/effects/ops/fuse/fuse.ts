@@ -184,7 +184,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
 }
 
 // -------------------- generic finalize (unchanged behavior) --------------------
-export function fuse_finalize_generic(owner: Player, initiatorUid: number, partnerCard: CardInstance, resultSpec: any) {
+export function fuse_finalize_generic(owner: Player, initiatorUid: string, partnerCard: CardInstance, resultSpec: any) {
     const hand = handOf(owner);
 
     const iIdx = hand.findIndex(c => c?.uid === initiatorUid);

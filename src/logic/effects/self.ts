@@ -209,6 +209,6 @@ export function handleDestroySelf(sourceCard: CardInstance) {
 export function handleBanishSelf(sourceCard: CardInstance, owner: Player) {
     if (sourceCard) {
         logEvent("banishSelf", { card: sourceCard?.name, uid: sourceCard?.uid });
-        handleBanish(sourceCard, owner);
+        handleBanish(sourceCard);
     }
 }

@@ -1,2 +1,4 @@
 /decks
 /game_rules
+node_modules/
+dist/

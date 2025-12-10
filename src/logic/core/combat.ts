@@ -190,7 +190,7 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
 
     // Drain (leaders heal based on actual damage dealt)
     if (attackerHasDrain && dealtToDef > 0) {
-        handleHealLeader(attackerPlayer, { amount: dealtToDef });
+        handleHealLeader(attackerPlayer, { op: "heal", amount: dealtToDef } as any);
         logEvent("drainHeal", { player: attackerPlayer, amount: dealtToDef, source: attacker.name });
     }
 
@@ -259,7 +259,7 @@ function _attackLeaderCore(attackerIdx: number, attackerPlayer: Player, defender
     applyLeaderDamage(defenderPlayer, damage);
 
     if ((attacker as any).hasDrain && damage > 0) {
-        handleHealLeader(attackerPlayer, { amount: damage });
+        handleHealLeader(attackerPlayer, { op: "heal", amount: damage } as any);
         logEvent("drainHeal", { player: attackerPlayer, amount: damage, source: attacker.name });
     }
 

@@ -2,16 +2,27 @@
   "name": "practice-tool",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
+  "imports": {
+    "#core/*": "./dist/core/*.js",
+    "#logic/*": "./dist/logic/*.js",
+    "#ui/*": "./dist/ui/*.js",
+    "#helpers/*": "./dist/helpers/*.js",
+    "#data/*": "./dist/data/*.js"
+  },
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "smoke": "npx tsx -r tsconfig-paths/register src/dev/smokeTests.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

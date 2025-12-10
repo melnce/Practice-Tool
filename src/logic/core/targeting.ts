@@ -44,7 +44,7 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     if (spec === "selected" || spec.startsWith("selected:")) {
         // Prefer the context passed by resolveTarget() when you confirmed the selection
         let chosen = Array.isArray(context?.targets) ? context.targets
-            : Array.isArray((state as any).pendingTargetEffect?.targets) ? (state as any).pendingTargetEffect.targets
+            : Array.isArray(state.pendingTargetEffect?.targets) ? state.pendingTargetEffect!.targets
                 : [];
 
         chosen = (chosen || []).filter(Boolean);
@@ -82,8 +82,8 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     if (side === "selected") {
         const chosen = Array.isArray(context?.targets)
             ? context.targets
-            : (Array.isArray((state as any).pendingTargetEffect?.targets)
-                ? (state as any).pendingTargetEffect.targets
+            : (Array.isArray(state.pendingTargetEffect?.targets)
+                ? state.pendingTargetEffect!.targets
                 : []);
         pool = (chosen || []).filter(Boolean);
     }
@@ -202,7 +202,7 @@ export function clearSelectableFlags() {
     });
 }
 
-export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: TargetContext = {}) {
+export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: Effect[], context: TargetContext = {}) {
     // requested number of picks from JSON
     const requestedCount = parseInt((eff.select ?? eff.select_count ?? 1));
 
@@ -278,7 +278,7 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
 
     // Special case for super evolve
     if (eff.effects && (eff.effects as Effect[]).some((e: Effect) => e.op === "super_evolve")) {
-        (state as any).pendingTargetEffect = {
+        state.pendingTargetEffect = {
             eff: (eff.effects as Effect[]).find((e: Effect) => e.op === "super_evolve"),
             owner,
             sourceCard,
@@ -288,7 +288,7 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
             selectCount: effectiveCount,
         };
     } else {
-        (state as any).pendingTargetEffect = {
+        state.pendingTargetEffect = {
             eff: { op: 'nested_effects', effects: eff.effects },
             owner,
             sourceCard,

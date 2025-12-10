@@ -29,7 +29,7 @@ import { getCardDetails as _getCardDetails } from "@data/cardDatabase.js";
 import { state } from "@core/gameState.js";
 import { Player } from "@core/types.js";
 
-export function startFuseFromHand(owner: Player, initiatorUid: number) {
+export function startFuseFromHand(owner: Player, initiatorUid: string) {
     runEffects([{
         op: "start_fuse_from_card",
         initiator_uid: initiatorUid

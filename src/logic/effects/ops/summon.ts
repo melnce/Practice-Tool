@@ -77,7 +77,8 @@ function seedCountersFromKeywords(card: CardInstance) {
     card.counters = card.counters || {};
     const kws = Array.isArray(card.keywords) ? card.keywords : [];
     for (const k of kws) {
-        if (k?.name === "Counter") {
+        // @ts-ignore
+        if (typeof k !== "string" && k?.name === "Counter") {
             const key = String(k.key);
             const count = Number(k.count || 0);
             if (key) {
@@ -115,7 +116,8 @@ function startingEarthFromKeywords(cardData: CardTemplate) {
     let n = 0;
     const kws = Array.isArray(cardData?.keywords) ? cardData.keywords : [];
     for (const k of kws) {
-        if (k?.name === "Counter" && String(k.key) === "earth") {
+        // @ts-ignore
+        if (typeof k !== "string" && k?.name === "Counter" && String(k.key) === "earth") {
             n += Number(k.count || 0);
         }
     }

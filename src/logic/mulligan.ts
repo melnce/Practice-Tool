@@ -68,7 +68,7 @@ function chooseMulliganUids(owner: Player) {
     // - Blue (going first): replace cost > 2
     // - Red  (going second): replace cost > 3
     const cutoff = (owner === "blue") ? 2 : 3;
-    const picks: number[] = [];
+    const picks: string[] = [];
     for (const c of hand) {
         const cost = Number((c as any)?.cost) || 0;
         if (cost > cutoff) picks.push(c.uid);
@@ -101,7 +101,7 @@ function queueAutoMulligan(owner: Player) {
     }, 100);
 }
 
-export function toggleMulliganPick(owner: Player, uid: number) {
+export function toggleMulliganPick(owner: Player, uid: string) {
     if (state.phase !== "mulligan") return;
     if (state.mulliganStage !== owner) return;
 

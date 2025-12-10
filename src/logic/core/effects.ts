@@ -278,7 +278,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "increase_opponent_hand_cost_eot": { const amt = parseInt(eff.amount ?? 1) || 1; applyTempOpponentHandCostMod(owner, amt); break; }
             case "juno_damage": if (handleJunoDamage(eff, owner, sourceCard, effects) === "pending") return; break;
             case "keyword": { const merged = { ...(context || {}), sourceCard }; if (handleKeyword(eff, owner, effects, merged) === "pending") return; break; }
-            case "keyword_self": { const target = sourceCard || (Array.isArray((state as any).lastSummoned) ? (state as any).lastSummoned[0] : null); handleKeywordSelf(target, eff); break; }
+            case "keyword_self": { const target = sourceCard || (Array.isArray(state.lastSummoned) ? state.lastSummoned[0] : null); handleKeywordSelf(target, eff); break; }
             case "kuon_enhance": import('../effects/cards/runecraft/kuon.js').then(({ handleKuonEnhance }) => { handleKuonEnhance(owner); }); break;
             case "leader_barrier": { handleLeaderBarrierOp(owner, eff); break; }
             case "modify_cost": handleModifyCost(eff, owner, sourceCard, context); break;
@@ -321,7 +321,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "select_hand_summon_artifact_copy": logEvent("summon", { owner, op: eff.op, status: "pending_selection" }); if (handleSelectHandSummonArtifactCopy(eff, owner, effects) === "pending") return; break;
             case "select_hand_summon_artifact_copies_eot_destroy": logEvent("summon", { owner, op: eff.op, status: "pending_selection" }); if (handleSelectHandSummonArtifactCopiesEOT(eff, owner, effects) === "pending") return; break;
             case "set_attack_to": { const res = handleSetAttackTo(eff, owner, sourceCard, effects, context); if (res === "pending") return res; break; }
-            case "set_deckout_victory": { const enable = eff.enabled !== false; if (owner === "blue") (state as any).deckoutWinsBlue = enable; else (state as any).deckoutWinsRed = enable; break; }
+            case "set_deckout_victory": { const enable = eff.enabled !== false; if (owner === "blue") state.deckoutWinsBlue = enable; else state.deckoutWinsRed = enable; break; }
             case "set_max_hp": handleSetMaxHP(eff, owner); break;
             case "spellboost_hand": spellboostHand(owner, eff as any); break;
             case "spellboost_target": if (sourceCard) { spellboostHand(owner, 1, sourceCard); } break;
@@ -338,11 +338,11 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "set_cost_last_drawn": {
                 const v = parseInt(eff.amount);
                 if (!Number.isFinite(v)) break;
-                const arr = (state as any).lastDrawnCards || [];
+                const arr = state.lastDrawnCards || [];
                 const target = arr[0]; // most recently drawn
                 if (target) {
                     if (target.base_cost === undefined) {
-                        target.base_cost = parseInt(target.cost) || 0;
+                        target.base_cost = parseInt(String(target.cost)) || 0;
                     }
                     target.cost = Math.max(0, v);
                 }
