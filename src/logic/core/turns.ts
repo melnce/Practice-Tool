@@ -1,4 +1,4 @@
-// src/logic/core/turns.ts
+﻿// src/logic/core/turns.ts
 import { state } from "@core/gameState.js";
 import { drawCard } from "@core/utils.js";
 // @ts-ignore
@@ -114,7 +114,7 @@ export function endTurnBlue() {
         const fx = processCrestEvent("blue", "end_of_turn");
         if (fx.length) {
             state.suppressCleanup = true;            // <— start atomic crest phase
-            for (const eff of fx) runEffects([eff], "blue");
+            for (const eff of fx) runEffects([eff], "blue", null);
             state.suppressCleanup = false;           // <— end atomic crest phase
         }
         cleanupDead();                             // resolve deaths + Last Words once
@@ -135,12 +135,12 @@ export function endTurnBlue() {
     resetEngageFlagsAtTurnStart("red");
     {
         const redStartFx = processCrestEvent("red", "start_of_turn");
-        if (redStartFx.length) runEffects([...redStartFx], "red");
+        if (redStartFx.length) runEffects([...redStartFx], "red", null);
     }
 
     {
         const redCrestFx = tickCrests("red");
-        if (redCrestFx.length) runEffects([...redCrestFx], "red");
+        if (redCrestFx.length) runEffects([...redCrestFx], "red", null);
     }
     cleanupDead();
 
@@ -180,7 +180,7 @@ export function endTurnRed() {
         const fx = processCrestEvent("red", "end_of_turn");
         if (fx.length) {
             state.suppressCleanup = true;
-            for (const eff of fx) runEffects([eff], "red");
+            for (const eff of fx) runEffects([eff], "red", null);
             state.suppressCleanup = false;
         }
         cleanupDead();
@@ -208,12 +208,12 @@ export function endTurnRed() {
     resetEngageFlagsAtTurnStart("blue");
     {
         const blueStartFx = processCrestEvent("blue", "start_of_turn");
-        if (blueStartFx.length) runEffects([...blueStartFx], "blue");
+        if (blueStartFx.length) runEffects([...blueStartFx], "blue", null);
     }
 
     {
         const blueCrestFx = tickCrests("blue");
-        if (blueCrestFx.length) runEffects([...blueCrestFx], "blue");
+        if (blueCrestFx.length) runEffects([...blueCrestFx], "blue", null);
     }
     cleanupDead();
 
@@ -281,3 +281,4 @@ function resetShikigamiDeathLogs() {
     state.shikigamiDeathsThisTurnBlue = [];
     state.shikigamiDeathsThisTurnRed = [];
 }
+

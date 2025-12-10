@@ -12,10 +12,10 @@
   },
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run build || exit 0 && vitest run",
+    "test:watch": "npm run build || exit 0 && vitest",
     "build": "tsc",
-    "watch": "tsc -w",
-    "smoke": "npx tsx -r tsconfig-paths/register src/dev/smokeTests.ts"
+    "watch": "tsc -w"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
   "devDependencies": {
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
   }
 }

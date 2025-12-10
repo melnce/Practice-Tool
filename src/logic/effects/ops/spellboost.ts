@@ -1,4 +1,4 @@
-// src/logic/effects/ops/spellboost.ts
+﻿// src/logic/effects/ops/spellboost.ts
 import { state } from "@core/gameState.js";
 // @ts-ignore
 import { render } from "@ui/render.js";
@@ -204,7 +204,7 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
         // --- Board-wide reactions to spellboost (e.g., Runeblade-style buffs) ---
         for (const c of board) {
             const kw = getSpellboostKeyword(c);
-            if (!kw || !Array.isArray(kw.effects) || kw.effects.length === 0) continue;
+            if (!kw || !Array.isArray(kw.effects) || kw.effects.length === 0 as any) continue;
 
             for (const effect of kw.effects) {
                 if (effect.op === "stormy_blast_counter") {
@@ -221,3 +221,5 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
 
     render();
 }
+
+

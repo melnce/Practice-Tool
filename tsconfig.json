@@ -9,6 +9,7 @@
         "allowJs": false,
         "checkJs": false,
         "strict": false,
+        "noImplicitAny": false,
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "skipLibCheck": true,
@@ -26,21 +27,40 @@
             "gameLogic": [
                 "src/logic/index.ts"
             ],
+            "@core/*.js": [
+                "src/core/*.ts"
+            ],
             "@core/*": [
                 "src/core/*"
             ],
+            "@data/*.js": [
+                "src/data/*.ts"
+            ],
             "@data/*": [
                 "src/data/*"
+            ],
+            "@logic/*.js": [
+                "src/helpers/*.ts",
+                "src/logic/*.ts"
             ],
             "@logic/*": [
                 "src/helpers/*",
                 "src/logic/*"
             ],
+            "@ui/*.js": [
+                "src/ui/*.ts"
+            ],
             "@ui/*": [
                 "src/ui/*"
             ],
+            "@helpers/*.js": [
+                "src/helpers/*.ts"
+            ],
             "@helpers/*": [
                 "src/helpers/*"
+            ],
+            "@ops/*.js": [
+                "src/logic/effects/ops/*.ts"
             ],
             "@ops/*": [
                 "src/logic/effects/ops/*"
@@ -48,7 +68,7 @@
         }
     },
     "include": [
-        "src/**/*"
+        "src/**/*.ts"
     ],
     "exclude": [
         "node_modules",

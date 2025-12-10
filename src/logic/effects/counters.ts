@@ -1,4 +1,4 @@
-// src/logic/effects/counters.ts
+﻿// src/logic/effects/counters.ts
 import { state } from "@core/gameState.js";
 // @ts-ignore
 import { render } from "@ui/render.js";
@@ -21,7 +21,7 @@ function removeFromBoard(card: CardInstance) {
 function getCounterConfig(card: CardInstance, key: string) {
     if (!Array.isArray(card.keywords)) return null;
     return card.keywords.find(
-        (k) => k && k.name === "Counter" && String(k.key) === String(key)
+        (k) => k && (k as any).name === "Counter" && String((k as any).key) === String(key)
     );
 }
 
@@ -166,3 +166,5 @@ export function handleIncreaseCountdown(owner: Player, amount = 1) {
     }
     render();
 }
+
+

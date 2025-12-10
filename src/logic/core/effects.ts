@@ -121,7 +121,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
 
         switch (eff.op) {
             case "add_counter": handleAddCounter(eff, owner, sourceCard); break;
-            case "add_selected_copy_to_hand": { const t = context?.selectedCard || (context?.targets?.[0] || null); if (!t || !t.name) break; handleAddToHand({ count: eff.count ?? 1, name: t.name }, owner); break; }
+            case "add_selected_copy_to_hand": { const t = context?.selectedCard || (context?.targets?.[0] || null); if (!t || !t.name) break; handleAddToHand({ count: eff.count ?? 1, name: t.name } as any, owner); break; }
             case "add_shadows": handleAddShadows(eff, owner); break;
             case "add_to_hand": handleAddToHand(eff, owner); break;
             case "amulet_count_gate": { const next = amuletCountGate(owner, eff) ? (eff.effects || []) : (eff.else_effects || []); if (next.length) effects.unshift(...next); break; }
@@ -130,7 +130,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "banish_all_enemy_copies": { const target = context?.selectedCard || (context?.targets?.[0] || null); if (target) { handleBanishAllEnemyCopies(owner, target); } break; }
             case "banish_duplicates_from_deck": handleBanishDuplicatesFromDeck(owner); return "done";
             case "banish_random": handleBanishRandom(eff, owner); break;
-            case "banish_self": handleBanishSelf(sourceCard); break;
+            case "banish_self": handleBanishSelf(sourceCard as any, owner); break;
             case "board_name_gate": {
                 const want = String(eff.name || eff.card_name || "").trim();
                 if (!want) break;
@@ -162,8 +162,8 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
                 else state.redChooseBonus = (state.redChooseBonus || 0) + (parseInt(eff.amount ?? 1, 10) || 0);
                 break;
             }
-            case "combo_add": handleComboAdd(owner, eff); break;
-            case "combo_gate": if (handleComboGate(owner, eff)) { effects.unshift(...(eff.effects || [])); } else { effects.unshift(...(eff.else_effects || [])); } break;
+            case "combo_add": handleComboAdd(owner, eff as any); break;
+            case "combo_gate": if (handleComboGate(owner, eff as any)) { effects.unshift(...(eff.effects || [])); } else { effects.unshift(...(eff.else_effects || [])); } break;
             case "combo_repeat_buff": { const res = handleComboRepeatBuff(eff, owner, sourceCard, effects, context); if (res === "pending") return res; break; }
             case "congregant_fill_board": handleFillCongregantCopies(owner, sourceCard); break;
             case "crest_add_counter": { const ok = crestAddCounter(owner, eff.crest || eff.name, eff.counter || "faith", eff.amount ?? 1); break; }

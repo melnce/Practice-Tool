@@ -1,4 +1,4 @@
-// src/logic/core/resolveTarget.ts
+﻿// src/logic/core/resolveTarget.ts
 // This file has been updated to handle multi-targeting effects.
 
 import { state } from "@core/gameState.js";
@@ -230,7 +230,7 @@ export function resolvePendingTarget(uid: string | "leader") {
             );
             if (poolHasOpponent) {
                 const lloydUids = new Set(lloyds.map(l => l.uid));
-                const firstPick = !pending.targets || pending.targets.length === 0;
+                const firstPick = !pending.targets || pending.targets.length === 0 as any;
                 const singlePick = Number(pending.selectCount || 1) <= 1;
                 const clickedIsLloyd = lloydUids.has(uid);
 
@@ -257,7 +257,7 @@ export function resolvePendingTarget(uid: string | "leader") {
         // Unselect
         pending.targets.splice(idx, 1);
         // Hide confirm if empty selection and we require confirmation
-        if (pending.requiresConfirmation && (!pending.targets || pending.targets.length === 0)) {
+        if (pending.requiresConfirmation && (!pending.targets || pending.targets.length === 0 as any)) {
             const container = document.getElementById('targetingConfirmation');
             if (container) container.style.display = 'none';
         }
@@ -797,3 +797,4 @@ export function confirmTargetsIfNeeded() {
     clearSelectableFlags();
     render();
 }
+

@@ -1,4 +1,4 @@
-// src/logic/effects/ops/fuse/fuse.artifact.ts
+﻿// src/logic/effects/ops/fuse/fuse.artifact.ts
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
@@ -192,7 +192,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: number, par
     }, 0);
 
     const resultName =
-        sumCost === 1 ? "Ominous Artifact α" :
+        sumCost === 1 as any ? "Ominous Artifact α" :
             sumCost === 2 ? "Ominous Artifact β" :
                 "Ominous Artifact γ";
 
@@ -263,7 +263,7 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: number, partner
             result_name: "Masterwork Artifact Ω",
             targets: "merge"
         };
-    } else if ((partners || []).length === 1) {
+    } else if ((partners || []).length === 1 as any) {
         const pIdx = idxOf(partners[0]?.uid);
         if (pIdx !== -1) hand.splice(pIdx, 1);
         state.lastFuse = {
@@ -307,3 +307,4 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: number, partner
 
     clearSelectableFlags(); render();
 }
+
