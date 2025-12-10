@@ -1,4 +1,4 @@
-// @ops/fuse.js
+// src/logic/effects/ops/fuse/fuse.ts
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
@@ -7,8 +7,11 @@ import { getCardDetails } from "@data/cardDatabase.js";
 import { makeUid } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 // Class-specific modules
+// @ts-ignore
 import { startGearMultiSelect, startAlphaSelect, startFortifierFuse, fuse_finalize_alpha, fuse_finalize_gear_multi, fuse_finalize_fortifier, } from "@logic/effects/ops/fuse/fuse.artifact.js";
+// @ts-ignore
 import { fuse_finalize_gardens_allure, } from "@logic/effects/ops/fuse/fuse.forest.js";
+// @ts-ignore
 import { fuse_finalize_loot, } from "@logic/effects/ops/fuse/fuse.loot.js";
 // Re-export finalize handlers so runEffects can find them by op string
 export { fuse_finalize_alpha, fuse_finalize_gear_multi, fuse_finalize_fortifier, fuse_finalize_gardens_allure, fuse_finalize_loot, startFortifierFuse, };
@@ -25,7 +28,9 @@ function filterByPartnerFilters(candidates, filters = []) {
     const pass = (card, f) => {
         if (f.zone && f.zone !== "hand")
             return false;
+        // @ts-ignore
         const cType = String(card?.type || "").toLowerCase();
+        // @ts-ignore
         const cClass = String(card?.class || "").toLowerCase();
         const wantType = String(f.type ?? f.type_eq ?? "").toLowerCase();
         const wantClass = String(f.class ?? f.class_eq ?? "").toLowerCase();
@@ -35,6 +40,7 @@ function filterByPartnerFilters(candidates, filters = []) {
             return false;
         if (Array.isArray(f.name_in) && !f.name_in.includes(card.name))
             return false;
+        // @ts-ignore
         if (f.tribe && !(Array.isArray(card.tribes) && card.tribes.includes(f.tribe)))
             return false;
         if (Number.isFinite(f.cost_max)) {
@@ -42,6 +48,7 @@ function filterByPartnerFilters(candidates, filters = []) {
             if (effCost > f.cost_max)
                 return false;
         }
+        // @ts-ignore
         if (f.keyword && !Array.isArray(card?.keywords)?.some(k => (k?.name || k) === f.keyword))
             return false;
         return true;
@@ -118,8 +125,10 @@ export function opStartFuseFromCard(eff, owner) {
         eff: {
             op: "fuse_finalize_generic",
             initiator_uid: initiator.uid,
+            // @ts-ignore
             recipe_id: info.recipe?.id || null,
             recipe_index: info.recipeIndex,
+            // @ts-ignore
             result: info.recipe?.result || null
         },
         owner,

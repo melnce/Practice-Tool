@@ -1,8 +1,8 @@
+// src/logic/effects/ops/destroy.ts
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 import { state } from "@core/gameState.js";
 import { runEffects } from "@logic/core/effects.js";
-import { render } from "@ui/render.js";
 import { randInt } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 // --- helpers --------------------------------------------------------------
@@ -98,7 +98,7 @@ export function handleDestroy(eff, owner, effectsQueue, context = {}, sourceCard
     }
     const pool = getPool(eff.target, owner, sourceCard, eff.condition, { isTargetedEffect: true }).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
     if (pool.length) {
-        logEvent("destroy_select", { owner, pool: pool.length, select: parseInt(eff.select ?? eff.select_count ?? 1, 10) });
+        logEvent("destroy_select", { owner, pool: pool.length, select: parseInt((eff.select ?? eff.select_count ?? 1), 10) });
         state.pendingTargetEffect = {
             eff,
             owner,
@@ -106,7 +106,7 @@ export function handleDestroy(eff, owner, effectsQueue, context = {}, sourceCard
             resumeEffects: effectsQueue,
             pool,
             targets: [],
-            selectCount: parseInt(eff.select ?? eff.select_count ?? 1, 10),
+            selectCount: parseInt((eff.select ?? eff.select_count ?? 1), 10),
         };
         highlightSelectable(pool);
         return "pending";

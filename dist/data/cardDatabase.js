@@ -1,6 +1,4 @@
-// =============================
-// cardDatabase.js
-// =============================
+// src/data/cardDatabase.ts
 import { hasInherentStorm, hasInherentRush, hasInherentWard, hasInherentIntimidate, hasInherentBarrier, hasInherentBane, hasInherentBanishOnDeath, hasInherentLastWords, hasInherentCountdown } from "./keywords.js";
 let fullCardData = {};
 let tokenCardData = {};
@@ -46,11 +44,11 @@ export async function loadCardDatabase() {
             card.hasLastWords = hasInherentLastWords(card.keywords);
             card.hasCountdown = hasInherentCountdown(card.keywords);
             if (card.hasLastWords) {
-                const lastWordsKeyword = card.keywords.find(k => typeof k === 'object' && k.name === "LastWords");
+                const lastWordsKeyword = Array.isArray(card.keywords) ? card.keywords.find((k) => typeof k === 'object' && k.name === "LastWords") : null;
                 card.lastWordsEffects = lastWordsKeyword?.effects || [];
             }
             if (card.hasCountdown) {
-                const countdownKeyword = card.keywords.find(k => typeof k === 'object' && k.name === "Countdown");
+                const countdownKeyword = Array.isArray(card.keywords) ? card.keywords.find((k) => typeof k === 'object' && k.name === "Countdown") : null;
                 if (countdownKeyword) {
                     card.countdown = parseInt(countdownKeyword.turns) || 0;
                 }
@@ -73,7 +71,7 @@ export async function loadCardDatabase() {
             token.hasLastWords = hasInherentLastWords(token.keywords);
             token.hasCountdown = hasInherentCountdown(token.keywords);
             if (token.hasCountdown) {
-                const countdownKeyword = token.keywords.find(k => typeof k === 'object' && k.name === "Countdown");
+                const countdownKeyword = Array.isArray(token.keywords) ? token.keywords.find((k) => typeof k === 'object' && k.name === "Countdown") : null;
                 if (countdownKeyword) {
                     token.countdown = parseInt(countdownKeyword.turns) || 0;
                 }

@@ -1,3 +1,4 @@
+// src/logic/effects/ops/transform.ts
 import { state } from "@core/gameState.js";
 import { getCardDetails } from "@data/cardDatabase.js";
 import { applyKeywordsFromList } from "@logic/core/keywords.js";
@@ -54,7 +55,9 @@ export function transformTarget(target, intoName) {
     c.owner = owner;
     // Initialize basics depending on type
     if (c.type === "Follower") {
+        // @ts-ignore
         c.attack = parseInt(c.attack) || 0;
+        // @ts-ignore
         c.defense = parseInt(c.defense) || 0;
         if (c.base_attack == null)
             c.base_attack = c.attack;
@@ -70,8 +73,9 @@ export function transformTarget(target, intoName) {
         c.justPlayed = target.justPlayed === true;
         c.hasAttacked = target.hasAttacked === true;
         c.attacks_per_turn = perTurnNew;
+        // @ts-ignore
         c.attacks_left = Math.max(0, Math.min(perTurnNew, leftOld));
-        c.can_attack = target.can_attack && (c.hasStorm || c.hasRush || !target.justPlayed);
+        c.can_attack = !!(target.can_attack && (c.hasStorm || c.hasRush || !target.justPlayed));
     }
     else if (c.type === "Amulet") {
         applyKeywordsFromList(c);
@@ -119,7 +123,9 @@ export function transformHandTarget(target, intoName) {
     if (target.spellboostCount !== undefined)
         c.spellboostCount = target.spellboostCount;
     // Minimal numeric init (hand preview may rely on these)
+    // @ts-ignore
     c.attack = parseInt(c.attack) || 0;
+    // @ts-ignore
     c.defense = parseInt(c.defense) || 0;
     hand.splice(idx, 1, c);
     logEvent("transformHandTarget", { owner, from: target.name, to: intoName, uid: target.uid });
@@ -150,13 +156,18 @@ export function transformRandomSpellInHand(owner, intoName = "Ersatz Elimination
     const updated = (owner === "blue" ? state.blueHand : state.redHand).find(c => c && c.uid === uid);
     if (!updated)
         return;
+    // @ts-ignore
     const printed = parseInt(updated.cost, 10) || 0;
+    // @ts-ignore
     const existingM = parseInt(updated.cost_mod || 0, 10) || 0;
     const current = printed + existingM;
     const delta = 0 - current; // bring to zero
+    // @ts-ignore
     if (updated.base_cost === undefined)
         updated.base_cost = printed;
+    // @ts-ignore
     updated.cost_mod = existingM + delta;
+    // @ts-ignore
     updated.temp_cost_mod_until_eot = (parseInt(updated.temp_cost_mod_until_eot, 10) || 0) + delta;
     logEvent("transformRandomSpell", { owner, to: intoName });
 }

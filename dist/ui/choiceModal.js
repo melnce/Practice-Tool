@@ -1,4 +1,4 @@
-// ui/choiceModal.js
+// src/ui/choiceModal.ts
 export function showChoiceModal(options, callback) {
     const modal = document.createElement('div');
     modal.className = 'choice-modal';
@@ -19,6 +19,7 @@ export function showChoiceModal(options, callback) {
     modal.querySelectorAll('.choice-option').forEach(btn => {
         btn.addEventListener('click', () => {
             btn.classList.add('processing');
+            // @ts-ignore
             const index = parseInt(btn.dataset.index);
             document.body.removeChild(modal);
             callback(index);

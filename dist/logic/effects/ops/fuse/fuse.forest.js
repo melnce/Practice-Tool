@@ -1,4 +1,4 @@
-// @effects/fuse.forest.js
+// src/logic/effects/ops/fuse/fuse.forest.ts
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { clearSelectableFlags } from "@logic/core/targeting.js";
@@ -43,6 +43,7 @@ export function fuse_finalize_gardens_allure(owner, initiator_uid, partners) {
         used: (partners || []).map(x => x.name),
     });
     initiator.isFused = true;
+    // @ts-ignore
     initiator.spell = [{ op: "draw", count: 2 }];
     initiator.lastFuseRound = state.roundCount;
     logEvent("fuseFinalize", {

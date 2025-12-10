@@ -1,10 +1,14 @@
+// src/logic/effects/ops/spellboost.ts
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { runEffects } from "@logic/core/effects.js";
 import { getCardDetails } from "@data/cardDatabase.js";
-import { rand, randInt, makeUid } from "@core/rng.js";
+import { makeUid } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
+// @ts-ignore
 import { handleStormyBlastCounter } from "@logic/effects/cards/runecraft/stormyBlast.js";
+// @ts-ignore
 import { handleWilliamCounter } from "@logic/effects/cards/runecraft/william.js";
 /* ------------------------ helpers ------------------------ */
 function incSB(card) {
@@ -69,12 +73,13 @@ function handleSpellboostKeywordEffects(owner, c) {
             }
             // --- Custom: Stormy Blast counter / UI update ---
             if (effect.op === "stormy_blast_counter") {
-                import("../cards/runecraft/stormyBlast.js").then(module => {
+                import("@logic/effects/cards/runecraft/stormyBlast.js").then(module => {
                     module.handleStormyBlastCounter(c);
                     // Keep spell's damage in sync for UI if present
                     if (c.spell && Array.isArray(c.spell)) {
                         for (const se of c.spell) {
                             if (se.op === "stormy_blast_damage") {
+                                // @ts-ignore
                                 se.stormyBlastDamage = c.currentStormyBlastDamage ?? 2;
                             }
                         }
@@ -84,13 +89,14 @@ function handleSpellboostKeywordEffects(owner, c) {
             }
             // --- Custom: William counter ---
             if (effect.op === "william_counter") {
-                import("../cards/runecraft/william.js").then(module => {
+                import("@logic/effects/cards/runecraft/william.js").then(module => {
                     module.handleWilliamCounter(c);
                 });
                 continue;
             }
             if (effect.op === "chaos_counter") {
-                import("../cards/runecraft/chaos.js").then(module => {
+                import("@logic/effects/cards/runecraft/chaos.js").then(module => {
+                    // @ts-ignore
                     module.handleChaosCounter(c);
                 });
                 continue;
@@ -135,11 +141,13 @@ export function spellboostHand(owner, times = 1, targetCard = null) {
                 if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
                     const reduceBy = Number.isFinite(kw.reduceCostBy) ? kw.reduceCostBy : 0;
                     const minCost = Number.isFinite(kw.minCost) ? kw.minCost : 0;
+                    // @ts-ignore
                     targetCard.base_cost = targetCard.base_cost ?? (parseInt(targetCard.cost, 10) || 0);
                     const prev = targetCard.spellboostCostCount || 0;
                     const next = prev + reduceBy;
                     targetCard.spellboostCostCount = next;
                     const newCost = Math.max(minCost, targetCard.base_cost - next);
+                    // @ts-ignore
                     if (Number.isFinite(newCost))
                         targetCard.cost = newCost;
                 }
@@ -160,11 +168,13 @@ export function spellboostHand(owner, times = 1, targetCard = null) {
                 if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
                     const reduceBy = Number.isFinite(kw.reduceCostBy) ? kw.reduceCostBy : 0;
                     const minCost = Number.isFinite(kw.minCost) ? kw.minCost : 0;
+                    // @ts-ignore
                     c.base_cost = c.base_cost ?? (parseInt(c.cost, 10) || 0);
                     const prev = c.spellboostCostCount || 0;
                     const next = prev + reduceBy;
                     c.spellboostCostCount = next;
                     const newCost = Math.max(minCost, c.base_cost - next);
+                    // @ts-ignore
                     if (Number.isFinite(newCost))
                         c.cost = newCost;
                 }

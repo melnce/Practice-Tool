@@ -1,3 +1,4 @@
+// src/logic/effects/ops/bounce.ts
 import { state } from "@core/gameState.js";
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 import { pushToHand } from "@core/utils.js";
@@ -47,7 +48,7 @@ export function bounceToHand(card) {
     logEvent("bounceToHand", { from: owner, name: removed.name, oldUid: removed.uid, newUid: fresh.uid });
 }
 // Handle "return_to_hand" effect
-export function handleReturnToHand(eff, owner, sourceCard = null, effectsQueue) {
+export function handleReturnToHand(eff, owner, sourceCard, effectsQueue) {
     // allow followers + amulets by default; narrow if filters.type is given
     let pool = getPool(eff.target, owner).filter(c => c.type === "Follower" || c.type === "Amulet");
     if (eff.filters?.type) {

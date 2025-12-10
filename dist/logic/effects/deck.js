@@ -1,3 +1,4 @@
+// src/logic/effects/deck.ts
 import { state } from "@core/gameState.js";
 import { getCardDetails } from "@data/cardDatabase.js";
 import { shuffleInPlace } from "@core/utils.js";
@@ -39,6 +40,7 @@ export async function replaceDeckWithSetMinus(owner, eff) {
             continue;
         if (exclude.has(String(base.name)))
             continue;
+        // @ts-ignore
         const copy = JSON.parse(JSON.stringify(base));
         copy.uid = makeUid();
         deck.push(copy);

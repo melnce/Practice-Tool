@@ -3,9 +3,10 @@
         "target": "ES2020",
         "module": "ESNext",
         "moduleResolution": "bundler",
-        "outDir": "./dist",
+        "noEmitOnError": false,
         "rootDir": "./src",
-        "allowJs": true,
+        "outDir": "./dist",
+        "allowJs": false,
         "checkJs": false,
         "strict": false,
         "esModuleInterop": true,
@@ -19,10 +20,10 @@
         "baseUrl": ".",
         "paths": {
             "main": [
-                "src/boot/boot.js"
+                "src/boot/boot.ts"
             ],
             "gameLogic": [
-                "src/logic/index.js"
+                "src/logic/index.ts"
             ],
             "@core/*": [
                 "src/core/*"

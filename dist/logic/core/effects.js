@@ -1,8 +1,8 @@
-// gamelogic/effects.js
+// gamelogic/effects.ts
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { fireTrigger } from "@logic/core/triggers.js";
-import { handleBanish, handleBanishTargeted, handleBanishDuplicatesFromDeck, handleBanishAllEnemyCopies, handleBanishRandom } from "@logic/effects/ops/banish.js";
+import { handleBanishTargeted, handleBanishDuplicatesFromDeck, handleBanishAllEnemyCopies, handleBanishRandom } from "@logic/effects/ops/banish.js";
 import { handleHimekaCrestEffect } from "@logic/effects/cards/havencraft/himeka.js";
 import { addMaxPP } from "@logic/pp.js";
 import { handleReturnToHand } from "@logic/effects/ops/bounce.js";
@@ -13,34 +13,34 @@ import { handleChoose } from "@logic/effects/ops/choose.js";
 import { handleAddCounter, handleReduceCountdown, handleIncreaseCountdown } from "@logic/effects/counters.js";
 import { handleDamage, handleDamageAll, handleDamageRandom, handleDamageSplitSequential, handleDamageFollowerOrLeader, handleDamageAllByAlliedGolems, handleDamageSplitFixed, handleDamageRandomSelectedDefense, handleDamageSplitAllEnemies, handleDamageHighestDefense } from "@logic/effects/ops/damage.js";
 import { handleReplaceDeck } from "@logic/effects/deck.js";
-import { handleDestroy, handleDestroyHighest, destroyAlliedAmulets, handleDestroyAll, handleDestroyRandom, resolveDestroy } from "@logic/effects/ops/destroy.js";
+import { handleDestroy, handleDestroyHighest, handleDestroyAll, handleDestroyRandom, resolveDestroy } from "@logic/effects/ops/destroy.js";
 import { handleDragonsign as handleDragonSign } from "@logic/effects/cards/dragoncraft/dragonsign.js";
 import { handleDraw, handleDrawAllNamedWithKeyword, handleDrawFiltered, handleAddToHand, handleDrawComboFollower, handleDrawOpponent, handleDrawNamed } from "@logic/effects/ops/draw.js";
 import { consumeEarthSigils } from "@logic/effects/cards/runecraft/earth.js";
 import { handleSelectEvolveGolem } from "@logic/effects/cards/runecraft/golem.js";
 import { handleDiscardSelectHand, handleTransformInHand, handleDiscardAllExceptNamed } from "@logic/effects/hand.js";
-import { handleKeyword, handleRemoveKeyword, handleKeywordSelf, handleConditionalKeyword } from "@logic/core/keywords.js";
-import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp, applyLeaderDamage } from "@logic/effects/leader.js";
+import { handleKeyword, handleRemoveKeyword, handleKeywordSelf } from "@logic/core/keywords.js";
+import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp } from "@logic/effects/leader.js";
 import { handleReanimate } from "@logic/effects/ops/reanimate.js";
 import { handleReturnHandToDeck } from "@logic/effects/ops/returnHandToDeck.js";
 import { handleRepeatEffect } from "@logic/effects/repeat.js";
 import { handleEvolveSelf } from "@logic/effects/ops/evolve.js";
 import { handleBuffSelf, handleDestroySelf, handleBanishSelf, handleDynamicBuffSelf } from "@logic/effects/self.js";
 import { spellboostHand } from "@logic/effects/ops/spellboost.js";
-import { summonNamed, summonRandomFromDeck, handleSelectHandSummonArtifactCopiesEOT, summonExactCopyFromHand, handleSelectHandSummonArtifactCopy, summonExactCopy } from "@logic/effects/ops/summon.js";
-import { handleSuperEvoGate, handleEvolvedSelfGate, amuletCountGate, hasNoDuplicatesInDeck, noAllyAttackedThisTurn } from "@logic/effects/gates/gates.js";
-import { handleSelect, getPool, highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
+import { summonNamed, summonRandomFromDeck, handleSelectHandSummonArtifactCopiesEOT, handleSelectHandSummonArtifactCopy, summonExactCopy, handleSummonDestroyedAmuletHighestBaseCost } from "@logic/effects/ops/summon.js";
+import { handleSuperEvoGate, amuletCountGate, hasNoDuplicatesInDeck, noAllyAttackedThisTurn } from "@logic/effects/gates/gates.js";
+import { handleSelect, getPool } from "@logic/core/targeting.js";
 import { handleComboAdd, handleComboGate } from "@logic/effects/gates/combo.js";
 import { handleReduceCostSelf, handleReduceCost, handleSetCostSelf, applyTempOpponentHandCostMod, handleHalveDeckCost, handleModifyCost, handleModifyCostPool, reduceDeckFollowersCost } from "@logic/effects/cost.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 import { isOverflow } from "@helpers/overflow.js";
 import { hasNecromancy, spendShadows } from "@helpers/necromancy.js";
-import { onEvolve } from "@logic/evolveUtils.js";
 import { applyAttacksPerTurn } from "@logic/effects/attacks.js";
 import { opStartFuseFromCard, startFortifierFuse } from "@logic/effects/ops/fuse/fuse.js";
 import { handCountGate } from "@logic/effects/gates/handCountGate.js";
 import { transformTarget, transformRandomSpellInHand } from "@logic/effects/ops/transform.js";
 import { handleComboRepeatBuff } from "@logic/effects/ops/buff.js";
+import { handleCongregantOnEnter as handleFillCongregantCopies } from "@logic/effects/cards/forestcraft/congregant.js";
 import { handleDestroyAlliedAmuletsThenDamage, handleDamageEnemyLeaderByOtherAllies, handleDestroyRandomOtherAllies, handleRestoreFullDefenseSelf, handleRestoreSelfAndHealLeader } from "@logic/effects/ops/misc.js";
 import { logEvent } from "@core/logger.js";
 // --- Core Wrappers (Unchanged) ---
@@ -57,12 +57,12 @@ export function onFanfare(card, owner) {
 function handleAddShadows(eff, owner) {
     const amt = parseInt(eff?.amount ?? 1) || 1;
     if (owner === "blue")
-        state.blueShadows += amt;
+        state.blueShadows = (state.blueShadows || 0) + amt;
     else
-        state.redShadows += amt;
+        state.redShadows = (state.redShadows || 0) + amt;
 }
 function getEffectiveCost(card) {
-    if (Number.isFinite(card?.effectiveCost))
+    if (Number.isFinite(card.effectiveCost))
         return card.effectiveCost;
     const base = parseInt(card?.cost, 10) || 0;
     const mod = parseInt(card?.cost_mod, 10) || 0;
@@ -90,6 +90,8 @@ function notifyLootPlayed(owner, sourceCard) {
 export function runEffects(effects, owner, sourceCard, context = {}) {
     while (effects.length) {
         const eff = effects.shift();
+        if (!eff)
+            continue;
         switch (eff.op) {
             case "add_counter":
                 handleAddCounter(eff, owner, sourceCard);
@@ -209,7 +211,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
                 break;
             }
             case "congregant_fill_board":
-                congregantFillBoard(owner, sourceCard);
+                handleFillCongregantCopies(owner, sourceCard);
                 break;
             case "crest_add_counter": {
                 const ok = crestAddCounter(owner, eff.crest || eff.name, eff.counter || "faith", eff.amount ?? 1);
@@ -316,7 +318,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
                 const destroyed = handleDestroy(eff, owner, [], context, sourceCard);
                 if (destroyed === "pending")
                     return destroyed;
-                if (destroyed && destroyed > 0) {
+                if (typeof destroyed === "number" && destroyed > 0) {
                     if (Array.isArray(eff.effects))
                         effects.unshift(...eff.effects);
                 }
@@ -399,7 +401,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
                 logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name });
                 break;
             case "fuse_start":
-                if (handleStartFuse(eff, owner, sourceCard, effects) === "pending")
+                if (opStartFuseFromCard(eff, owner) === "pending")
                     return;
                 break;
             case "gain_crest":
@@ -559,7 +561,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
                     return;
                 break;
             case "select": {
-                const res = handleSelect(eff, owner, sourceCard, effects);
+                const res = handleSelect(eff, owner, sourceCard, effects, context);
                 if (res === "pending")
                     return res;
                 break;
@@ -570,7 +572,7 @@ export function runEffects(effects, owner, sourceCard, context = {}) {
                 break;
             case "select_hand_summon_artifact_copy":
                 logEvent("summon", { owner, op: eff.op, status: "pending_selection" });
-                if (handleSelectHandSummonArtifactCopy(eff, owner, effects, sourceCard) === "pending")
+                if (handleSelectHandSummonArtifactCopy(eff, owner, effects) === "pending")
                     return;
                 break;
             case "select_hand_summon_artifact_copies_eot_destroy":

@@ -1,16 +1,15 @@
+// src/logic/core/cleanup.ts
 import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { dealDamage, popBarrier } from "@logic/core/barrier.js";
-import { fireTrigger } from "@logic/core/triggers.js";
 import { handleBanish } from "@logic/effects/ops/banish.js";
 import { runEffects } from "@logic/core/effects.js";
 import { logEvent } from "@core/logger.js";
+import { fireTrigger } from "@logic/core/triggers.js";
 export function cleanupDead() {
     // Skip cleanup while a “batch” (like crest EOT) is running.
     if (state.suppressCleanup)
         return;
     const triggerLastWords = (card, owner) => {
-        if (card?._lwFired)
+        if (card._lwFired)
             return; // guard against re-entry
         if (!card?.hasLastWords)
             return;
@@ -43,8 +42,8 @@ export function cleanupDead() {
                 fireTrigger("follower_leaves_field", owner);
                 // Shikigami bookkeeping (unchanged)
                 if (Array.isArray(c.tribes) && c.tribes.includes("Shikigami")) {
-                    const aBase = parseInt(c.base_attack ?? c.attack) || 0;
-                    const dBase = parseInt(c.base_defense ?? c.defense) || 0;
+                    const aBase = parseInt((c.base_attack ?? c.attack)) || 0;
+                    const dBase = parseInt((c.base_defense ?? c.defense)) || 0;
                     if (owner === "blue") {
                         if (!state.shikigamiDeathsThisTurnBlue)
                             state.shikigamiDeathsThisTurnBlue = [];
@@ -71,7 +70,7 @@ export function cleanupDead() {
                 // handleBanish will remove the card from the correct board.
                 // Only splice here if, for some reason, it didn't.
                 const before = board[i];
-                handleBanish(c);
+                handleBanish(c, owner); // Assumes handleBanish signature
                 // Prevent double-splice: only remove if the same object still sits at i.
                 if (board[i] === before)
                     board.splice(i, 1);
@@ -84,6 +83,7 @@ export function cleanupDead() {
                     name: c.name,
                     type: c.type,
                     cost: Number(c?.cost) || 0,
+                    // @ts-ignore
                     base_image: c?.base_image || null,
                     ts: Date.now()
                 };

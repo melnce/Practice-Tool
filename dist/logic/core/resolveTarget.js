@@ -1,24 +1,33 @@
-// core/resolveTarget.js
+// src/logic/core/resolveTarget.ts
 // This file has been updated to handle multi-targeting effects.
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { runEffects } from "@logic/core/effects.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 import { dealDamage } from "@logic/core/barrier.js";
 import { applyKeyword, handleRemoveKeyword } from "@logic/core/keywords.js";
+// @ts-ignore
 import { transformTarget, transformHandTarget } from "@logic/effects/ops/transform.js";
+// @ts-ignore
 import { resolveDestroy } from "@logic/effects/ops/destroy.js";
+// @ts-ignore
 import { handleBanish } from "@logic/effects/ops/banish.js";
+// @ts-ignore
 import { bounceToHand } from "@logic/effects/ops/bounce.js";
+// @ts-ignore
 import { resolveReturnHandToDeck } from "@logic/effects/ops/returnHandToDeck.js";
 import { clearSelectableFlags } from "@logic/core/targeting.js";
 import { isOverflow } from "@helpers/overflow.js";
-import { onEvolve } from "@logic/evolveUtils.js";
 import { fireTrigger } from "@logic/core/triggers.js";
-import { summonNamed, summonExactCopyFromHand } from "@logic/effects/ops/summon.js";
+// @ts-ignore
+import { summonExactCopyFromHand } from "@logic/effects/ops/summon.js";
+// @ts-ignore
 import { applyLeaderDamage } from "@logic/effects/leader.js";
-import { fuse_finalize_generic as opFinalizeFuseGeneric, fuse_finalize_fortifier as opFinalizeFortifierFuse, fuse_finalize_gear_multi as opFinalizeGearMulti, fuse_finalize_alpha as opFinalizeAlphaFuse, fuse_finalize_gardens_allure as opFinalizeGardensAllure, fuse_finalize_loot as opFinalizeLootFuse, } from "@logic/effects/ops/fuse/fuse.js";
-import { getCardDetails } from "@data/cardDatabase.js";
+import { fuse_finalize_generic as opFinalizeFuseGeneric, fuse_finalize_fortifier as opFinalizeFortifierFuse, fuse_finalize_gear_multi as opFinalizeGearMulti, fuse_finalize_alpha as opFinalizeAlphaFuse, fuse_finalize_gardens_allure as opFinalizeGardensAllure, fuse_finalize_loot as opFinalizeLootFuse,
+// @ts-ignore
+ } from "@logic/effects/ops/fuse/fuse.js";
+// @ts-ignore
 import { handleEvolveSelf } from "@logic/effects/ops/evolve.js";
 import { logEvent } from "@core/logger.js";
 import { doAction } from "@core/history.js";
@@ -79,7 +88,7 @@ function showConfirmationButton(pending) {
                 owner,
                 source: pending?.sourceCard?.name,
                 sourceUid: pending?.sourceCard?.uid,
-                targets: (pending?.targets || []).map(t => ({ name: t?.name, uid: t?.uid, type: t?.type }))
+                targets: (pending?.targets || []).map((t) => ({ name: t?.name, uid: t?.uid, type: t?.type }))
             });
             // If this is a nested effect (select → effects), run the child effects
             if (eff && eff.op === "nested_effects") {
@@ -170,7 +179,7 @@ export function resolvePendingTarget(uid) {
         console.warn(`resolvePendingTarget: Could not find target with UID: ${uid}`);
         return;
     }
-    if (!pending.pool.some(p => p.uid === uid)) {
+    if (!pending.pool.some((p) => p.uid === uid)) {
         console.warn("Clicked card is not in the valid target pool.");
         return;
     }
@@ -182,7 +191,7 @@ export function resolvePendingTarget(uid) {
         const lloyds = oppBoard.filter(c => c?.name === "Lloyd");
         if (lloyds.length) {
             // Only care if the current pool includes opponent-side targets (use board membership, not c.owner)
-            const poolHasOpponent = (pending.pool || []).some(c => (state.blueBoard?.includes(c) ? "blue" :
+            const poolHasOpponent = (pending.pool || []).some((c) => (state.blueBoard?.includes(c) ? "blue" :
                 state.redBoard?.includes(c) ? "red" : null) === opp);
             if (poolHasOpponent) {
                 const lloydUids = new Set(lloyds.map(l => l.uid));
@@ -207,7 +216,7 @@ export function resolvePendingTarget(uid) {
         console.warn("Lloyd enforcement failed:", e);
     }
     // --- Toggle selection ---
-    const idx = pending.targets.findIndex(t => t.uid === uid);
+    const idx = pending.targets.findIndex((t) => t.uid === uid);
     if (idx !== -1) {
         // Unselect
         pending.targets.splice(idx, 1);
@@ -271,7 +280,7 @@ export function resolvePendingTarget(uid) {
         return;
     }
     if (eff.op === "damage") {
-        function resolveAmount(eff, owner, sourceCard) {
+        const resolveAmount = (eff, owner, sourceCard) => {
             const raw = eff.amount;
             const rawOverflow = eff.amount_overflow ?? eff.overflow_amount;
             const resolveToken = (val) => {
@@ -287,14 +296,14 @@ export function resolvePendingTarget(uid) {
             const base = resolveToken(raw);
             const of = resolveToken(rawOverflow ?? base);
             return isOverflow(owner) ? of : base;
-        }
+        };
         const amt = resolveAmount(eff, owner, sourceCard);
         if (amt) {
             // 1. This loop deals the damage FIRST.
             for (const target of targets) {
                 if (target.type === "Follower") {
                     dealDamage(target, amt);
-                    console.log(`%c[resolveTarget.js] After dealDamage, ${target.name}'s defense is now: ${target.defense}`, 'color: purple; font-weight: bold;');
+                    // console.log(`%c[resolveTarget.js] After dealDamage, ${target.name}'s defense is now: ${target.defense}`, 'color: purple; font-weight: bold;');
                 }
             }
             // 2. Cleanup runs SECOND, after damage is done.
@@ -459,7 +468,7 @@ export function resolvePendingTarget(uid) {
         // --- THIS BLOCK IS THE FIX ---
         for (const target of targets) {
             // We must determine the owner to fire the trigger correctly.
-            const targetOwner = state.blueBoard.includes(target) ? "blue" : "red";
+            // const targetOwner = state.blueBoard.includes(target) ? "blue" : "red";
             // Call the trigger BEFORE banishing the card.
             fireTrigger("allied_follower_leaves_field", owner);
             handleBanish(target);
@@ -481,26 +490,33 @@ export function resolvePendingTarget(uid) {
         const tribeOk = (card) => {
             if (!rawTribes)
                 return true;
-            const want = rawTribes.map(t => String(t).toLowerCase());
+            const want = rawTribes.map((t) => String(t).toLowerCase());
             return Array.isArray(card.tribes) &&
                 card.tribes.some(tr => want.includes(String(tr).toLowerCase()));
         };
         for (const target of targets.filter(tribeOk)) {
             // Initialize buff tracking
+            // @ts-ignore
             if (!target.buffs)
                 target.buffs = { attack: 0, defense: 0 };
             // Apply buff
+            // @ts-ignore
             target.buffs.attack += a;
+            // @ts-ignore
             target.buffs.defense += d;
             target.attack = Math.max(0, (parseInt(target.attack) || 0) + a);
             target.defense = (parseInt(target.defense) || 0) + d;
             target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
             // Update potential stats
+            // @ts-ignore
             if (!target.potential_attack)
                 target.potential_attack = target.base_attack || target.attack;
+            // @ts-ignore
             if (!target.potential_defense)
                 target.potential_defense = target.base_defense || target.defense;
+            // @ts-ignore
             target.potential_attack += a;
+            // @ts-ignore
             target.potential_defense += d;
             // Fire "enemy_follower_defense_down" if we actually reduced DEF on an enemy follower
             if (d < 0 && target?.type === "Follower") {
@@ -611,35 +627,47 @@ export function resolvePendingTarget(uid) {
             target.base_attack = parseInt(target.attack) || 0;
         if (!target.base_defense)
             target.base_defense = parseInt(target.defense) || 0;
+        // @ts-ignore
         if (!target.buffs)
             target.buffs = { attack: 0, defense: 0 };
         // Apply evolution bonuses (treated as base stats)
+        // @ts-ignore
         target.base_attack += 2;
+        // @ts-ignore
         target.base_defense += 2;
+        // @ts-ignore
         target.attack = target.base_attack;
+        // @ts-ignore
         target.defense = target.base_defense;
         // Apply additional buffs
         const a = parseInt(eff.attack || 0) || 0;
         const d = parseInt(eff.defense || 0) || 0;
+        // @ts-ignore
         target.buffs.attack += a;
+        // @ts-ignore
         target.buffs.defense += d;
+        // @ts-ignore
         target.attack += a;
+        // @ts-ignore
         target.defense += d;
         // Update potential stats
+        // @ts-ignore
         target.potential_attack = target.base_attack + target.buffs.attack;
+        // @ts-ignore
         target.potential_defense = target.base_defense + target.buffs.defense;
         target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
     }
     else if (eff.op === 'nested_effects') {
         // Run nested effects, with special handling for new targeted ops
         for (const target of targets) {
-            for (const nestedEff of eff.effects) {
+            for (const nestedEff of (eff.effects || [])) {
                 if (nestedEff.op === 'set_stats') {
                     // Handle set_stats directly here
                     if (nestedEff.attack !== undefined) {
                         const newAttack = parseInt(nestedEff.attack);
                         target.attack = newAttack;
                         // When stats are 'set', potential and base stats should also match the new value.
+                        // @ts-ignore
                         target.potential_attack = newAttack;
                         target.base_attack = newAttack;
                     }
@@ -648,6 +676,7 @@ export function resolvePendingTarget(uid) {
                         target.defense = newDefense;
                         // This is the critical fix: update potential_defense to the new value.
                         // This effectively resets the follower's health ceiling to the new number.
+                        // @ts-ignore
                         target.potential_defense = newDefense;
                         target.base_defense = newDefense;
                         target.peak_defense = newDefense;

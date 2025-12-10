@@ -1,3 +1,4 @@
+// src/ui/dom.ts
 // Small DOM helpers to keep UI files clean
 export const $ = (id) => {
     const el = document.getElementById(id);
@@ -6,7 +7,6 @@ export const $ = (id) => {
     }
     return el;
 };
-// dom.js
 export function byId(id) {
     const el = document.getElementById(id);
     if (!el) {

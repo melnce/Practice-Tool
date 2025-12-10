@@ -1,8 +1,9 @@
+// src/logic/effects/ops/buff.ts
 import { state } from "@core/gameState.js";
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 import { applyKeyword } from "@logic/core/keywords.js";
-import { rand, randInt } from "@core/rng.js";
+import { randInt } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 export function handleBuff(eff, owner, sourceCard, effectsQueue, context = {}) {
     // pass context so targets like "entering_follower" work
@@ -15,7 +16,7 @@ export function handleBuff(eff, owner, sourceCard, effectsQueue, context = {}) {
     const rawTribes = eff.tribes ? (Array.isArray(eff.tribes) ? eff.tribes : [eff.tribes]) :
         eff.tribe ? [eff.tribe] : null;
     if (rawTribes) {
-        const want = rawTribes.map(t => String(t).toLowerCase());
+        const want = rawTribes.map((t) => String(t).toLowerCase());
         pool = pool.filter(c => Array.isArray(c.tribes) &&
             c.tribes.some(tr => want.includes(String(tr).toLowerCase())));
     }
@@ -26,14 +27,14 @@ export function handleBuff(eff, owner, sourceCard, effectsQueue, context = {}) {
     }
     // (optional) support a list of names
     if (Array.isArray(eff.name_in) && eff.name_in.length) {
-        const wants = new Set(eff.name_in.map(n => String(n).toLowerCase()));
+        const wants = new Set(eff.name_in.map((n) => String(n).toLowerCase()));
         pool = pool.filter(c => wants.has(String(c.name || "").toLowerCase()));
     }
     // NEW: optional keyword filtering (e.g., "Ward")
     const rawKW = eff.has_keyword ?? eff.keywords;
     if (rawKW) {
         const wants = Array.isArray(rawKW) ? rawKW : [rawKW];
-        pool = pool.filter(c => wants.every(w => hasKeyword(c, w)));
+        pool = pool.filter(c => wants.every((w) => hasKeyword(c, w)));
     }
     if (!pool.length)
         return "done";
@@ -70,11 +71,16 @@ export function handleBuff(eff, owner, sourceCard, effectsQueue, context = {}) {
                 target.buffs = { attack: 0, defense: 0 };
             target.buffs.attack += a;
             target.buffs.defense += d;
+            // @ts-ignore
             target.attack = (parseInt(target.attack) || 0) + a;
+            // @ts-ignore
             target.defense = (parseInt(target.defense) || 0) + d;
+            // @ts-ignore
             target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
+            // @ts-ignore
             if (!target.potential_attack)
                 target.potential_attack = target.base_attack || target.attack;
+            // @ts-ignore
             if (!target.potential_defense)
                 target.potential_defense = target.base_defense || target.defense;
             target.potential_attack += a;
@@ -120,11 +126,16 @@ export function handleBuff(eff, owner, sourceCard, effectsQueue, context = {}) {
             target.buffs = { attack: 0, defense: 0 };
         target.buffs.attack += a;
         target.buffs.defense += d;
+        // @ts-ignore
         target.attack = (parseInt(target.attack) || 0) + a;
+        // @ts-ignore
         target.defense = (parseInt(target.defense) || 0) + d;
+        // @ts-ignore
         target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
+        // @ts-ignore
         if (!target.potential_attack)
             target.potential_attack = target.base_attack || target.attack;
+        // @ts-ignore
         if (!target.potential_defense)
             target.potential_defense = target.base_defense || target.defense;
         target.potential_attack += a;
@@ -173,10 +184,14 @@ export function handleBuffHandTribe(eff, owner) {
                 card.buffs = { attack: 0, defense: 0 };
             card.buffs.attack += a;
             card.buffs.defense += d;
+            // @ts-ignore
             card.attack = (parseInt(card.attack) || 0) + a;
+            // @ts-ignore
             card.defense = (parseInt(card.defense) || 0) + d;
             // keep previews coherent
+            // @ts-ignore
             card.potential_attack = (card.potential_attack ?? card.base_attack ?? card.attack) + a;
+            // @ts-ignore
             card.potential_defense = (card.potential_defense ?? card.base_defense ?? card.defense) + d;
             logEvent("buffHand", { owner, target: card.name, uid: card.uid, a: a, d: d, filter: eff.tribe });
         }
@@ -195,10 +210,14 @@ export function handleBuffHandClass(eff, owner) {
                 card.buffs = { attack: 0, defense: 0 };
             card.buffs.attack += a;
             card.buffs.defense += d;
+            // @ts-ignore
             card.attack = (parseInt(card.attack) || 0) + a;
+            // @ts-ignore
             card.defense = (parseInt(card.defense) || 0) + d;
             // keep previews coherent
+            // @ts-ignore
             card.potential_attack = (card.potential_attack ?? card.base_attack ?? card.attack) + a;
+            // @ts-ignore
             card.potential_defense = (card.potential_defense ?? card.base_defense ?? card.defense) + d;
             logEvent("buffHand", { owner, target: card.name, uid: card.uid, a: a, d: d, filter: wantClass });
         }
@@ -237,15 +256,19 @@ export function handleBuffLastAddedToHand(eff, owner) {
     const a = parseInt(eff.attack ?? 0) || 0;
     const d = parseInt(eff.defense ?? 0) || 0;
     // Ensure base stats stay as the printed values
+    // @ts-ignore
     if (card.base_attack == null)
         card.base_attack = parseInt(card.attack) || 0;
+    // @ts-ignore
     if (card.base_defense == null)
         card.base_defense = parseInt(card.defense) || 0;
     if (!card.buffs)
         card.buffs = { attack: 0, defense: 0 };
     card.buffs.attack += a;
     card.buffs.defense += d;
+    // @ts-ignore
     card.attack = (parseInt(card.attack) || 0) + a;
+    // @ts-ignore
     card.defense = (parseInt(card.defense) || 0) + d;
     card.potential_attack = card.base_attack + card.buffs.attack;
     card.potential_defense = card.base_defense + card.buffs.defense;
@@ -285,8 +308,9 @@ export function handleSetAttackTo(eff, owner, sourceCard, effectsQueue, context 
         .filter(c => c.type === "Follower");
     if (!pool.length)
         return "done";
-    const to = parseInt(eff.value ?? eff.set_to ?? eff.attack_to ?? 0) || 0;
+    const to = parseInt((eff.value ?? eff.set_to ?? eff.attack_to ?? 0)) || 0;
     for (const target of pool) {
+        // @ts-ignore
         const current = parseInt(target.attack) || 0;
         const delta = to - current;
         // ensure buffs container
@@ -294,8 +318,10 @@ export function handleSetAttackTo(eff, owner, sourceCard, effectsQueue, context 
             target.buffs = { attack: 0, defense: 0 };
         // Apply as a buff delta so future math stacks correctly with other effects
         target.buffs.attack += delta;
+        // @ts-ignore
         target.attack = current + delta;
         // keep previews coherent
+        // @ts-ignore
         if (!target.potential_attack)
             target.potential_attack = target.base_attack || target.attack;
         target.potential_attack += delta;

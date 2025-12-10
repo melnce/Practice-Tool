@@ -1,9 +1,11 @@
+// src/data/deckLoader.ts
 import { state } from "@core/gameState.js";
 import { drawCard, shuffleInPlace } from "@core/utils.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { getCardDetails } from "@data/cardDatabase.js";
 import { makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js"; // Add import
+import { logEvent } from "@core/logger.js";
 function normalizeDeck(raw) {
     // Accept:
     // 1) [ {name, count?}, ... ]

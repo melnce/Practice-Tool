@@ -1,4 +1,4 @@
-// repeat.js
+// src/logic/effects/repeat.ts
 import { state } from "@core/gameState.js";
 import { logEvent } from "@core/logger.js";
 export function handleRepeatEffect(eff, owner, sourceCard, effectsQueue) {

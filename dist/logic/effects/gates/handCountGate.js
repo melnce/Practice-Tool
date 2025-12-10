@@ -1,3 +1,4 @@
+// src/logic/effects/gates/handCountGate.ts
 import { state } from "@core/gameState.js";
 /**
  * Simple hand-size gate (NOT combo).

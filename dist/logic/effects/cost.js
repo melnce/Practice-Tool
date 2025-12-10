@@ -1,3 +1,4 @@
+// src/logic/effects/cost.ts
 import { state } from "@core/gameState.js";
 import { getPool } from "@logic/core/targeting.js";
 import { logEvent } from "@core/logger.js";

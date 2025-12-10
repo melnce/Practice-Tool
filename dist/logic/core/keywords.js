@@ -1,4 +1,4 @@
-// /gamelogic/keywords.js - Complete version with all original functions and keywords
+// /gamelogic/keywords.ts - Complete version with all original functions and keywords
 import { state } from "@core/gameState.js";
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 import { grantBarrier } from "@logic/core/barrier.js";
@@ -97,7 +97,7 @@ const KEYWORD_MAP = {
     },
     fanfare: (c, opts) => {
         c.hasFanfare = true;
-        c.fanfareEffects = Array.isArray(opts?.effects) ? opts.effects : [];
+        c.fanfare = Array.isArray(opts?.effects) ? opts.effects : [];
     },
     strike: (c, opts) => {
         c.hasStrike = true;
@@ -227,10 +227,10 @@ export function handleKeyword(eff, owner, effectsQueue, context = {}) {
     // NEW: name_filter support
     if (eff.name_filter) {
         const filterStr = String(eff.name_filter).toLowerCase();
-        targets = targets.filter(t => String(t.name || "").toLowerCase() === filterStr);
+        targets = targets.filter((t) => String(t.name || "").toLowerCase() === filterStr);
     }
     if (eff.exclude_self && context.sourceCard) {
-        targets = targets.filter(t => t.uid !== context.sourceCard.uid);
+        targets = targets.filter((t) => t.uid !== context.sourceCard.uid);
     }
     if (!targets.length)
         return "done";
@@ -328,14 +328,15 @@ export function handleConditionalKeyword(eff, owner) {
 export function clearCantAttack(card) {
     if (!card)
         return;
-    delete card.hasCantAttack;
-    delete card.cantAttack;
-    delete card.cantAttackFollowers;
-    delete card.cantAttackLeaders;
-    delete card.cantAttackUntilOpponentEOT;
-    delete card.cantAttackExpiresOnTurn;
-    delete card.cantAttackIsTemporary;
-    delete card.cantAttackOwner;
+    const c = card;
+    delete c.hasCantAttack;
+    delete c.cantAttack;
+    delete c.cantAttackFollowers;
+    delete c.cantAttackLeaders;
+    delete c.cantAttackUntilOpponentEOT;
+    delete c.cantAttackExpiresOnTurn;
+    delete c.cantAttackIsTemporary;
+    delete c.cantAttackOwner;
 }
 // Called at end-of-turn: if the *owner* of a locked card just ended their turn,
 // the “until opponent EOT” lock has served its purpose → clear it.
@@ -350,7 +351,7 @@ export function clearExpiredCantAttackAtEOT(endedPlayer) {
                 clearCantAttack(c);
             }
             // Optional absolute turn counter expiry
-            if (typeof c.cantAttackExpiresOnTurn === "number" && state.turnNumber >= c.cantAttackExpiresOnTurn) {
+            if (typeof c.cantAttackExpiresOnTurn === "number" && (state.roundCount ?? 0) >= c.cantAttackExpiresOnTurn) {
                 clearCantAttack(c);
             }
         }

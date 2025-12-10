@@ -1,3 +1,4 @@
+// src/ui/counts.ts
 import { byId } from "@ui/dom.js";
 export function updateCounts(state) {
     const updateIfExists = (id, value) => {
@@ -25,6 +26,8 @@ export function updateCounts(state) {
     updateIfExists("redShadows", state.redShadows); // Note capital 'S'
     const endBlue = byId("endTurnBlue");
     const endRed = byId("endTurnRed");
+    if (!endBlue || !endRed)
+        return;
     if (!state.gameStarted) {
         endBlue.style.display = "none";
         endRed.style.display = "none";

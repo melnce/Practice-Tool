@@ -1,4 +1,4 @@
-// @effects/fuse.artifact.js
+// src/logic/effects/ops/fuse/fuse.artifact.ts
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
@@ -49,7 +49,9 @@ export function startFortifierFuse(owner, initiator) {
     const hand = handOf(owner);
     // pool = all *other* Artifact cards in hand
     const pool = hand.filter(c => c?.uid !== initiator?.uid &&
+        // @ts-ignore
         Array.isArray(c?.tribes) &&
+        // @ts-ignore
         c.tribes.some(t => String(t).toLowerCase() === "artifact"));
     if (!pool.length) {
         clearSelectableFlags();
@@ -143,6 +145,7 @@ export function fuse_finalize_gear_multi(owner, initiatorUid, partners, resultNa
         result_name: resultName,
         targets: "merge"
     };
+    // @ts-ignore
     try {
         fireTrigger?.("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } });
     }
@@ -195,6 +198,7 @@ export function fuse_finalize_fortifier(owner, initiatorUid, partners) {
             hand.splice(idx, 1);
     }
     state.lastFuse = { owner, initiator_name: initiator.name, totalCost: sumCost, result_name: resultName };
+    // @ts-ignore
     try {
         fireTrigger?.("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } });
     }
@@ -271,6 +275,7 @@ export function fuse_finalize_alpha(owner, initiatorUid, partners) {
         });
     }
     try {
+        // @ts-ignore
         fireTrigger?.("on_fuse", owner, {
             initiator,
             partners,

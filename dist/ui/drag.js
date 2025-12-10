@@ -1,7 +1,8 @@
+// src/ui/drag.ts
 import { getDragData, setDragData } from "@ui/dom.js";
 import { doAction } from "@core/history.js";
 // External game logic hooks (keep same import paths as your project)
-const logic = () => import("@logic/index.js");
+const logic = () => import(/* webpackIgnore: true */ "@logic/index.js");
 export function makeLeaderDroppable(leaderEl, targetPlayer, state) {
     leaderEl.ondragover = (e) => e.preventDefault();
     leaderEl.ondrop = (e) => {
@@ -89,8 +90,11 @@ export function enableCardEvoDrop(div, containerId, card, state, rerender) {
                 card.buffs = { attack: 0, defense: 0 };
             card.buffs.attack += boost;
             card.buffs.defense += boost;
+            // @ts-ignore
             card.attack = (Number(card.attack) || 0) + boost;
+            // @ts-ignore
             card.defense = (Number(card.defense) || 0) + boost;
+            // @ts-ignore
             card.peak_defense = Math.max(card.peak_defense ?? Number(card.defense), Number(card.defense));
             if (card.evo_image)
                 card.base_image = card.evo_image;
@@ -128,14 +132,17 @@ export function enableEnemyFollowerDrop(div, attackerData, defenderIndex, state,
         const data = getDragData(e);
         const [attackerPlayer, attackerIndex] = data.split(",");
         const defenderPlayer = isRedBoard ? "red" : "blue";
-        const defenders = (state)[`${defenderPlayer}Board`];
+        // @ts-ignore  (state keys)
+        const defenders = state[`${defenderPlayer}Board`];
         const defender = defenders[defenderIndex];
+        // @ts-ignore
         const hasWard = defenders.some(c => c.hasWard && Number(c.defense) > 0);
         if (hasWard && !defender.hasWard)
             return;
         if (defender.hasIntimidate && !defender.hasWard)
             return;
         logic().then(({ attackFollower }) => {
+            // @ts-ignore
             attackFollower(parseInt(attackerIndex), defenderIndex, attackerPlayer, defenderPlayer);
         });
     };

@@ -1,4 +1,3 @@
-// No types import in JS
 export function applyKeywordOverlays(div, card) {
     const wrapper = div.querySelector(".card-image-wrapper") ?? div;
     // Create (or reuse) a bottom-center icon stack

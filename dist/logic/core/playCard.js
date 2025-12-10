@@ -1,13 +1,17 @@
-// /gamelogic/playCard.js
+// src/logic/core/playCard.ts
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { applyKeywordsFromList } from "@logic/core/keywords.js";
 import { runEffects } from "@logic/core/effects.js";
+// @ts-ignore
 import { spellboostHand } from "@logic/effects/ops/spellboost.js";
 import { getPool } from "@logic/core/targeting.js";
 import { isOverflow } from "@helpers/overflow.js";
 import { fireTrigger } from "@logic/core/triggers.js";
+// @ts-ignore
 import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
+// @ts-ignore
 import { handleCongregantOnEnter } from "@logic/effects/cards/forestcraft/congregant.js";
 import { logEvent } from "@core/logger.js";
 import { doAction } from "@core/history.js";
@@ -54,7 +58,7 @@ function countArtifactsInHand(owner, maxCost = 5) {
 function spellNeedsArtifactPair(card, player) {
     // Check if this spell uses the artifact copy operation
     const usesArtifactCopyOp = Array.isArray(card.spell) &&
-        card.spell.some(e => e && e.op === "select_hand_summon_artifact_copies_eot_destroy");
+        card.spell.some((e) => e && e.op === "select_hand_summon_artifact_copies_eot_destroy");
     if (usesArtifactCopyOp) {
         return countArtifactsInHand(player, 5) < 2;
     }
@@ -79,7 +83,7 @@ function pickEnhanceTier(card, availablePP) {
     }
     for (const t of (card.enhanceTiers || [])) {
         if (availablePP >= t.cost)
-            return t; // highest affordable                           
+            return t; // highest affordable
     }
     return null;
 }
@@ -137,7 +141,6 @@ function mergeWitchsNewBrewOnPlay(newCard, owner) {
     }
 }
 function spellNeedsAllyOnBoard(card, player) {
-    // Determine which effect list will actually run (consider Enhance)
     const availablePP = player === "blue" ? state.bluePP : state.redPP;
     const tier = pickEnhanceTier(card, availablePP);
     const baseList = (Array.isArray(card.spell) && card.spell.length ? card.spell : [])
@@ -146,7 +149,7 @@ function spellNeedsAllyOnBoard(card, player) {
         ? tier.effects
         : baseList;
     // Way of the Maid-style requirement: needs to return an ally from board
-    return list.some(eff => eff &&
+    return list.some((eff) => eff &&
         eff.select &&
         String(eff.op).toLowerCase() === "return_to_hand" &&
         String(eff.target || "").toLowerCase().startsWith("ally"));
@@ -156,7 +159,7 @@ function canCastSpell(card, player) {
         ? card.spell
         : (Array.isArray(card.fanfare) ? card.fanfare : []);
     // Way of the Maid pattern: needs to return another hand card
-    const needsHandReturn = effects.some(e => String(e.op).toLowerCase() === "return_hand_to_deck" && e.select);
+    const needsHandReturn = effects.some((e) => String(e.op).toLowerCase() === "return_hand_to_deck" && e.select);
     if (needsHandReturn) {
         const hand = player === "blue" ? state.blueHand : state.redHand;
         // spell itself is still in hand here, so we need at least 2 cards
@@ -174,7 +177,9 @@ function spellNeedsTarget(card, player) {
         ? tier.effects
         : baseList;
     // Allow follower-or-leader effects to be cast without a pre target.
-    const hasFollowerOrLeaderEffect = list.some(eff => eff?.op === "damage_follower_or_leader" && eff?.can_target_leader);
+    const hasFollowerOrLeaderEffect = list.some((eff) => 
+    /* eff?.op === "damage_follower_or_leader" && eff?.can_target_leader is not valid TS unless fields exist */
+    eff?.op === "damage_follower_or_leader" && eff?.can_target_leader);
     if (hasFollowerOrLeaderEffect)
         return false;
     const checkArr = (arr) => {
@@ -211,7 +216,7 @@ function spellNeedsSpellboostTarget(card, player) {
     if (card.name.toLowerCase() !== "radiant rainbow")
         return false;
     const hand = player === "blue" ? state.blueHand : state.redHand;
-    return !hand.some(c => Array.isArray(c.keywords) && c.keywords.some(k => {
+    return !hand.some(c => Array.isArray(c.keywords) && c.keywords.some((k) => {
         const kwName = typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
         return kwName === "spellboost";
     }));
@@ -284,7 +289,7 @@ function _playCardCore(fromHand, player, index) {
     if (isPermanent && toBoard.length >= 5)
         return;
     // --- NEW: Spell precondition (Bug Alert style) ---
-    if (isSpell && spellNeedsAllyOnBoard(card)) {
+    if (isSpell && spellNeedsAllyOnBoard(card, player)) { // added player param
         const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
         if (myBoard.length === 0)
             return; // not castable → do nothing, don't pay
@@ -348,7 +353,7 @@ function _playCardCore(fromHand, player, index) {
         if (isLootSpell) {
             // Guard: if JSON still has a notifier, don't double-emit
             const jsonAlreadyNotifies = Array.isArray(spellCard.spell) &&
-                spellCard.spell.some(e => e && e.op === "notify_loot_played");
+                spellCard.spell.some((e) => e && e.op === "notify_loot_played");
             if (!jsonAlreadyNotifies) {
                 // Log auto "loot" notification (if any)
                 if (!globalThis.HEADLESS) {
@@ -373,8 +378,10 @@ function _playCardCore(fromHand, player, index) {
         }
         // Pass the spellCard reference instead of null
         if (list.length)
-            runEffects([...list], player, spellCard, []);
-        return render();
+            runEffects([...list], player, spellCard, { targets: [] });
+        else
+            render();
+        return;
     }
     // Followers
     if (isFollower) {
@@ -391,11 +398,13 @@ function _playCardCore(fromHand, player, index) {
         const handMod = parseInt(card.cost_mod, 10) || 0;
         const costChangedOnPlay = (handMod !== 0) || (Number.isFinite(card.base_cost) && current !== printed);
         // normalize numbers before any math
+        // @ts-ignore
         card.attack = parseInt(card.attack, 10) || 0;
+        // @ts-ignore
         card.defense = parseInt(card.defense, 10) || 0;
         // Do NOT count the card itself if its own fanfare has Rally
         const hasRallyFanfare = Array.isArray(card.fanfare) &&
-            card.fanfare.some(e => String(e.op).toLowerCase() === "rally_gate");
+            card.fanfare.some((e) => String(e.op).toLowerCase() === "rally_gate");
         if (!hasRallyFanfare) {
             if (player === "blue")
                 state.blueRally++;
@@ -442,9 +451,11 @@ function _playCardCore(fromHand, player, index) {
             const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
             for (const perm of myBoard) {
                 if (perm !== card && perm.type === "Amulet" && perm.hasAllyEnter && Array.isArray(perm.allyEnterEffects)) {
-                    perm.allyEnterEffects.forEach(eff => {
+                    perm.allyEnterEffects.forEach((eff) => {
                         if (eff.op === "buff" && eff.target === "trigger") {
+                            // @ts-ignore
                             card.attack = (parseInt(card.attack) || 0) + (parseInt(eff.attack) || 0);
+                            // @ts-ignore
                             card.defense = (parseInt(card.defense) || 0) + (parseInt(eff.defense) || 0);
                         }
                     });

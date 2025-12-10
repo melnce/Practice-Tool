@@ -1,4 +1,4 @@
-// tooltips.js
+// src/ui/tooltips.ts
 import { state } from "@core/gameState.js";
 // NEW: show +A/+D based only on buffs/debuffs (not damage)
 function formatBuffDelta(card) {
@@ -79,7 +79,9 @@ export function attachTooltip(div, tooltipEl, card, isBlueSide) {
                 if (!div.isConnected || !tooltipEl.isConnected ||
                     document.hidden || !div.matches(':hover') ||
                     Date.now() > stopAt) {
+                    // @ts-ignore
                     cancelAnimationFrame(div.__ttRaf || 0);
+                    // @ts-ignore
                     div.__ttRaf = null;
                     return;
                 }
@@ -89,13 +91,18 @@ export function attachTooltip(div, tooltipEl, card, isBlueSide) {
                     rallyValue.textContent = need != null ? `${curr} / ${need}` : `${curr}`;
                     last = curr;
                 }
+                // @ts-ignore
                 div.__ttRaf = requestAnimationFrame(tick);
             }
+            // @ts-ignore
             cancelAnimationFrame(div.__ttRaf || 0);
+            // @ts-ignore
             div.__ttRaf = requestAnimationFrame(tick);
         }
         else {
+            // @ts-ignore
             cancelAnimationFrame(div.__ttRaf || 0);
+            // @ts-ignore
             div.__ttRaf = null;
         }
     };
@@ -106,7 +113,9 @@ export function attachTooltip(div, tooltipEl, card, isBlueSide) {
     };
     div.onmouseleave = () => {
         tooltipEl.style.display = "none";
+        // @ts-ignore
         cancelAnimationFrame(div.__ttRaf || 0);
+        // @ts-ignore
         div.__ttRaf = null;
     };
 }
@@ -115,7 +124,9 @@ window.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         // cancel any stray RAF stored on hovered elements
         document.querySelectorAll('[data-has-tooltip="1"]').forEach(el => {
+            // @ts-ignore
             cancelAnimationFrame(el.__ttRaf || 0);
+            // @ts-ignore
             el.__ttRaf = null;
         });
     }

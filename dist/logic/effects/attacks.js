@@ -1,9 +1,9 @@
-// gamelogic/effects/attacks.js
+// src/logic/effects/attacks.ts
 import { logEvent } from "@core/logger.js";
 export function applyAttacksPerTurn(eff, sourceCard) {
     if (!sourceCard)
         return;
-    const n = parseInt(eff.value ?? eff.count ?? eff.amount ?? eff.n ?? eff[0] ?? eff) ||
+    const n = parseInt((eff.value ?? eff.count ?? eff.amount ?? eff.n ?? eff[0] ?? eff)) ||
         1;
     logEvent("attacksPerTurn", {
         card: sourceCard.name,

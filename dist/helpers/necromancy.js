@@ -1,4 +1,4 @@
-// src/helpers/necromancy.js
+// src/helpers/necromancy.ts
 import { state } from "@core/gameState.js";
 export function hasNecromancy(owner, cost = 1) {
     const shadows = owner === "blue" ? state.blueShadows : state.redShadows;

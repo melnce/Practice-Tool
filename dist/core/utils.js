@@ -1,9 +1,9 @@
-// utils.js - Combined utility functions
-import { state } from "@core/gameState.js"; // NEW
-import { render } from "@ui/render.js"; // NEW
-import { logEvent } from "@core/logger.js"; // Add import
+// utils.ts - Combined utility functions
+import { state } from "@core/gameState.js";
+import { render } from "@ui/render.js";
+import { logEvent } from "@core/logger.js";
 // Pull *once* from rng and re-export locally-used helpers
-import { rand, randInt, choice as rngChoice, shuffleInPlace as rngShuffle, } from "@core/rng.js";
+import { randInt, choice as rngChoice, shuffleInPlace as rngShuffle, } from "@core/rng.js";
 // Constants
 export const MAX_HAND = 9;
 const REAPER_URLS = [
@@ -110,6 +110,7 @@ export function drawCard(hand, deck, owner = null) {
                     state.redHP = 0;
             }
             // Log the deckout event
+            // @ts-ignore
             logEvent("deckout", { loser: owner, winner: opp });
             render();
             return false;
@@ -117,7 +118,9 @@ export function drawCard(hand, deck, owner = null) {
     }
     // draw from the END of the array (top of deck)
     const top = deck.pop();
-    // Log the normal draw
-    logEvent("draw", { owner, card: top.name, uid: top.uid });
+    if (top) {
+        // Log the normal draw
+        logEvent("draw", { owner, card: top.name, uid: top.uid });
+    }
     return pushToHand(hand, top);
 }

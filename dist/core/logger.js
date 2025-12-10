@@ -1,4 +1,4 @@
-// /logger.js
+// src/core/logger.ts
 import { state } from "@core/gameState.js";
 /* =========================
    Stable stringify + hash
@@ -91,7 +91,7 @@ function fnv1a64Hex(str) {
         h1 = low;
         h2 = high;
     }
-    const toHex = n => n.toString(16).padStart(8, "0");
+    const toHex = (n) => n.toString(16).padStart(8, "0");
     return toHex(h2) + toHex(h1);
 }
 async function sha256Hex(str) {
@@ -181,6 +181,8 @@ export function setMaxLogEntries(n) {
 }
 /** Download logs as JSON (for repro / bug reports). */
 export function downloadLogs(filename = "game_log.json") {
+    if (typeof document === "undefined")
+        return;
     const blob = new Blob([JSON.stringify({ session: _sessionTag, log: _log }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

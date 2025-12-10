@@ -2,7 +2,6 @@ import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { runEffects } from "@logic/core/effects.js";
 import { randInt } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
 // helper (near top of file or inside getPool)
 function _isCardDamaged(c) {
     const curr = parseInt(c?.defense, 10) || 0;
@@ -25,24 +24,24 @@ function getCardSide(c) {
         return "red";
     return c?.owner ?? null;
 }
-export function getPool(targetSpec, owner, sourceCard, condition = {}, context = {}) {
+export function getPool(targetSpec, owner, sourceCard = null, condition = {}, context = {}) {
     const spec = String(targetSpec || "").trim().toLowerCase();
     // --- selected: use the already-chosen targets from a parent select() ---
     if (spec === "selected" || spec.startsWith("selected:")) {
         // Prefer the context passed by resolveTarget() when you confirmed the selection
         let chosen = Array.isArray(context?.targets) ? context.targets
-            : Array.isArray(state?.pendingTargetEffect?.targets) ? state.pendingTargetEffect.targets
+            : Array.isArray(state.pendingTargetEffect?.targets) ? state.pendingTargetEffect.targets
                 : [];
         chosen = (chosen || []).filter(Boolean);
         // Optional subtype filter: "selected:follower" / "selected:amulet"
         const parts = spec.split(":");
         if (parts[1] === "follower")
-            chosen = chosen.filter(c => c?.type === "Follower");
+            chosen = chosen.filter((c) => c?.type === "Follower");
         if (parts[1] === "amulet")
-            chosen = chosen.filter(c => c?.type === "Amulet");
+            chosen = chosen.filter((c) => c?.type === "Amulet");
         return chosen;
     }
-    let pool;
+    let pool = [];
     if (spec === "ally:last_summoned") {
         // Always return an array
         const ls = state.lastSummoned;
@@ -113,7 +112,7 @@ export function getPool(targetSpec, owner, sourceCard, condition = {}, context =
         pool = pool.filter(c => {
             if (!Array.isArray(c?.keywords))
                 return false;
-            return c.keywords.some(k => {
+            return c.keywords.some((k) => {
                 const kwName = typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
                 return kwName === keywordName;
             });
@@ -160,7 +159,7 @@ export function getPool(targetSpec, owner, sourceCard, condition = {}, context =
         pool = pool.filter(c => {
             const cardSide = getCardSide(c);
             const isEnemy = cardSide && cardSide !== owner;
-            if (isEnemy && (c?.hasAmbush || c?.hasAura))
+            if (isEnemy && (c?.hasAmbush || c.hasAura))
                 return false; // block enemy stealth
             return true; // allies always targetable
         });
@@ -255,9 +254,9 @@ export function handleSelect(eff, owner, sourceCard, effectsQueue, context = {})
         return "done";
     }
     // Special case for super evolve
-    if (eff.effects && eff.effects.some(e => e.op === "super_evolve")) {
+    if (eff.effects && eff.effects.some((e) => e.op === "super_evolve")) {
         state.pendingTargetEffect = {
-            eff: eff.effects.find(e => e.op === "super_evolve"),
+            eff: eff.effects.find((e) => e.op === "super_evolve"),
             owner,
             sourceCard,
             resumeEffects: effectsQueue,
@@ -279,8 +278,5 @@ export function handleSelect(eff, owner, sourceCard, effectsQueue, context = {})
     }
     highlightSelectable(pool);
     return "pending";
-    try {
-        logEvent("targetPrompt", { owner, op: (eff && eff.op) || "nested_effects", selectCount: effectiveCount, pool: (pool || []).map(t => ({ name: t?.name, uid: t?.uid, type: t?.type })) });
-    }
-    catch { }
+    // try { logEvent("targetPrompt", { owner, op: (eff && eff.op) || "nested_effects", selectCount: effectiveCount, pool: (pool || []).map(t => ({ name: t?.name, uid: t?.uid, type: t?.type })) }); } catch { }
 }

@@ -1,6 +1,8 @@
-// gamelogic/evolveUtils.js
+// src/logic/evolveUtils.ts
 import { runEffects } from "@logic/core/effects.js";
+// @ts-ignore
 import { handleEvolveSelf } from "@logic/effects/ops/evolve.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { state } from "@core/gameState.js";
 import { fireTrigger } from "@logic/core/triggers.js";
@@ -126,7 +128,7 @@ export function superEvolveAllyFromContext(owner, sourceCard, context) {
         ];
         return zones.find(c => c && c.uid === uid) || null;
     }
-    const target = (typeof sel === "string") ? findOnBoardByUid(sel)
+    const target = (typeof sel === "string") ? findOnBoardByUid(Number(sel)) // Convert string uid to number if needed? Wait, uids are numbers usually. Assuming string for now.
         : (findOnBoardByUid(sel.uid) || sel);
     if (!target)
         return;

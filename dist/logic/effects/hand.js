@@ -1,8 +1,8 @@
+// src/logic/effects/hand.ts
 import { state } from "@core/gameState.js";
 import { getCardDetails } from "@data/cardDatabase.js";
-import { render } from "@ui/render.js";
 import { highlightSelectable } from "@logic/core/targeting.js";
-import { rand, makeUid } from "@core/rng.js";
+import { makeUid } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 export function handleDiscardAllExceptNamed(eff, owner) {
     const names = (eff.names || eff.name || []).map(String);

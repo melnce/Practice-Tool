@@ -1,3 +1,4 @@
+// src/data/keywords.ts
 export function hasInherentStorm(description, keywords) {
     // ONLY check the keywords array - don't scan descriptions!
     return Array.isArray(keywords) && keywords.some(k => typeof k === 'string' && k.toLowerCase() === "storm");

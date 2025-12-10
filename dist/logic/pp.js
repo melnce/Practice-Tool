@@ -1,4 +1,4 @@
-// gamelogic/pp.js
+// src/logic/pp.ts
 import { state } from "@core/gameState.js";
 import { logEvent } from "@core/logger.js";
 export function increaseMaxPP(owner, amount = 1, { cap = 10, recalcNow = true } = {}) {

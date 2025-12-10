@@ -21,6 +21,7 @@ export type EffectOp =
 
 export interface Effect {
     op: EffectOp;
+    effects?: Effect[];
     [key: string]: any;
 }
 

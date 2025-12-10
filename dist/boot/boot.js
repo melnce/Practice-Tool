@@ -1,3 +1,4 @@
+// src/boot/boot.ts
 // Ensure global handlers (useRedBoost, endTurnBlue/Red) are registered
 import "@logic/index.js";
 // Entry points
@@ -6,6 +7,7 @@ import { wireClick } from "@ui/dom.js";
 import { startGame } from "@logic/startGame.js";
 import { initHistoryHotkeys, onHistoryChange, resetHistory } from "@core/history.js";
 window.addEventListener("DOMContentLoaded", () => {
+    // @ts-ignore
     wireClick("startGameBtn", async () => {
         await startGame();
         resetHistory(); // new game = new undo stack
@@ -36,31 +38,6 @@ document.addEventListener('contextmenu', (e) => {
         e.preventDefault();
     }
 }, { capture: true });
-function pretty(label) {
-    return label
-        .replace(/\.json$/i, '')
-        .replace(/_deck$/i, '')
-        .replace(/_/g, ' ');
-}
-function valueFromEntry(entry) {
-    // Accept "name", "file", or raw string
-    if (typeof entry === 'string')
-        return entry.replace(/^decks\//, '').replace(/\.json$/i, '');
-    if (entry && typeof entry === 'object') {
-        if (entry.file)
-            return entry.file.replace(/^decks\//, '').replace(/\.json$/i, '');
-        if (entry.name)
-            return entry.name.replace(/^decks\//, '').replace(/\.json$/i, '');
-    }
-    return 'example_deck';
-}
-function labelFromEntry(entry) {
-    if (typeof entry === 'string')
-        return pretty(entry);
-    if (entry && typeof entry === 'object')
-        return pretty(entry.label || entry.name || entry.file || '');
-    return 'example_deck';
-}
 function toLabel(file) {
     return file
         .replace(/^.*\//, '')
@@ -77,7 +54,8 @@ async function listDeckFiles() {
             const files = [...html.matchAll(/href="([^"]+\.json)"/gi)]
                 .map(m => decodeURIComponent(m[1]))
                 .map(name => name.split('/').pop()) // keep only filename
-                .filter(name => !/manifest\.json$/i.test(name) && !/decks_index\.json$/i.test(name));
+                .filter(name => name && !/manifest\.json$/i.test(name) && !/decks_index\.json$/i.test(name));
+            // @ts-ignore
             if (files.length)
                 return [...new Set(files)];
         }
@@ -101,9 +79,13 @@ async function populateDeckSelects() {
     const files = await listDeckFiles(); // array of filenames like "Sword_Midrange_deck.json"
     const blue = document.getElementById('blueDeckSelect');
     const red = document.getElementById('redDeckSelect');
+    if (!blue || !red)
+        return;
     for (const el of [blue, red]) {
         el.innerHTML = '';
         for (const f of files) {
+            if (!f)
+                continue;
             const opt = document.createElement('option');
             opt.value = f.replace(/\.json$/i, ''); // loader tolerates base or full
             opt.textContent = toLabel(f);

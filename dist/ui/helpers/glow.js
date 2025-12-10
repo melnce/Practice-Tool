@@ -1,7 +1,9 @@
+// src/ui/helpers/glow.ts
 import { isOverflow } from "@helpers/overflow.js";
 import { comboReadyInHand } from "@helpers/combo.js";
 import { hasNecromancy } from "@helpers/necromancy.js";
 import { getPool } from "@logic/core/targeting.js";
+// @ts-ignore
 import { handleSuperEvoGate } from "@logic/effects/gates/gates.js";
 // ---- local helpers ported from zones.js ----
 function getSpellboostCount(card) {
@@ -12,6 +14,7 @@ function getSpellboostCount(card) {
     if (!hasSpellboost)
         return null;
     for (const k of ["spellboostCount", "spellBoostCount", "spellboosts", "spell_boosts", "spellboost_counter"]) {
+        // @ts-ignore
         const v = card[k];
         if (Number.isFinite(Number(v)))
             return Number(v);
@@ -63,7 +66,7 @@ function hasOverflowInTree(effs) {
         if (Array.isArray(e.effects) && hasOverflowInTree(e.effects))
             return true;
         if (e.op === "choose" && Array.isArray(e.options)) {
-            if (e.options.some(opt => hasOverflowInTree(opt.effects || [])))
+            if (e.options.some((opt) => hasOverflowInTree(opt.effects || [])))
                 return true;
         }
     }
@@ -95,15 +98,16 @@ function needsUnmetTarget(list, owner, card) {
         if (eff.op === "stormy_blast_damage" || (card?.name && card.name.toLowerCase() === "snowman army")) {
             // needs enemy follower
             // owner here is "blue"/"red"
-            const enemyBoard = owner === "blue" ? card?.__state?.redBoard : card?.__state?.blueBoard;
-            const hasEnemyFollower = Array.isArray(enemyBoard) && enemyBoard.some(c => c.type === "Follower");
+            const stateAny = state; // Need access to opponent board from state if card.__state missing
+            const enemyBoard = owner === "blue" ? stateAny.redBoard : stateAny.blueBoard;
+            const hasEnemyFollower = Array.isArray(enemyBoard) && enemyBoard.some((c) => c.type === "Follower");
             if (!hasEnemyFollower)
                 return true;
         }
         if (Array.isArray(eff.effects) && needsUnmetTarget(eff.effects, owner, card))
             return true;
         if (eff.op === "choose" && Array.isArray(eff.options)) {
-            const allBlocked = eff.options.every(opt => needsUnmetTarget(opt.effects || [], owner, card));
+            const allBlocked = eff.options.every((opt) => needsUnmetTarget(opt.effects || [], owner, card));
             if (allBlocked)
                 return true;
         }
@@ -119,6 +123,7 @@ export function computeHandGlow(card, ctx) {
     // ctx: { state, owner, isPlayersTurn, availablePP, isSpell }
     const { state, owner, isPlayersTurn, availablePP, isSpell } = ctx;
     // attach state for some nested checks that need access (snowman army)
+    // @ts-ignore
     card.__state = state;
     // cost preview already computed by caller; use card.shownCost if present, else raw cost
     const shownCost = Number(card.shownCost ?? card.cost ?? 0);
@@ -145,7 +150,7 @@ export function computeHandGlow(card, ctx) {
                 canAfford = false;
         }
         // Needs ally on board if it returns ally to hand
-        const needsAlly = list.some(eff => eff && eff.select && String(eff.op).toLowerCase() === "return_to_hand" &&
+        const needsAlly = list.some((eff) => eff && eff.select && String(eff.op).toLowerCase() === "return_to_hand" &&
             String(eff.target || "").toLowerCase().startsWith("ally"));
         if (needsAlly) {
             const ownerBoard = owner === "blue" ? state.blueBoard : state.redBoard;
@@ -153,14 +158,14 @@ export function computeHandGlow(card, ctx) {
                 canAfford = false;
         }
         // Needs another hand pick (return_hand_to_deck with select)
-        const needsHandPick = list.some(e => String(e.op).toLowerCase() === "return_hand_to_deck" && e.select);
+        const needsHandPick = list.some((e) => String(e.op).toLowerCase() === "return_hand_to_deck" && e.select);
         if (needsHandPick) {
             const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
             if (ownerHand.length <= 1)
                 canAfford = false;
         }
         // If all select-targets have no valid pool, block (except when leader is explicitly targetable)
-        const canTargetLeader = list.some(eff => eff?.op === "damage_follower_or_leader" && eff?.can_target_leader);
+        const canTargetLeader = list.some((eff) => eff?.op === "damage_follower_or_leader" && eff?.can_target_leader);
         if (needsUnmetTarget(list, owner, card) && !canTargetLeader)
             canAfford = false;
         // Radiant Rainbow: require a Spellboost card in hand
@@ -210,6 +215,7 @@ export function computeHandGlow(card, ctx) {
     const crests = owner === "blue" ? (state.blueCrests || []) : (state.redCrests || []);
     const faith = (() => {
         const c = crests.find(x => String(x?.name).toLowerCase() === "faith");
+        // @ts-ignore
         return Number(c?.counters?.faith ?? 0);
     })();
     const isShamNacha = String(card?.name || "").toLowerCase() === "sham-nacha, heir to entwining";

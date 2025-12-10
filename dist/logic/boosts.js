@@ -1,5 +1,6 @@
-// /gamelogic/boosts.js
+// src/logic/boosts.ts
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { logEvent } from "@core/logger.js";
 import { doAction } from "@core/history.js";

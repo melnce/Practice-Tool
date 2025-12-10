@@ -1,4 +1,6 @@
+// src/logic/effects/ops/returnHandToDeck.ts
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { shuffleInPlace } from "@core/utils.js";
 import { logEvent } from "@core/logger.js";
@@ -17,7 +19,7 @@ function putBack(card, owner) {
  * status: "blocked" | "pending" | "done"
  * effectsQueue is optional; when present we stash & clear it while waiting.
  */
-export function handleReturnHandToDeck(eff, owner, effectsQueue = null) {
+export function handleReturnHandToDeck(eff, owner, effectsQueue = []) {
     const hand = owner === "blue" ? state.blueHand : state.redHand;
     // Support returning the entire hand (e.g., Dimension Climb)
     const wantAll = (typeof eff.select === "string" && eff.select.toLowerCase() === "all") ||

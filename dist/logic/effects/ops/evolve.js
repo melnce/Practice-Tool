@@ -1,3 +1,4 @@
+// src/logic/effects/ops/evolve.ts
 import { onEvolve } from "@logic/evolveUtils.js";
 import { logEvent } from "@core/logger.js";
 import { state } from "@core/gameState.js";
@@ -29,8 +30,11 @@ export function handleEvolveSelf(sourceCard, owner, opts = {}) {
         sourceCard.buffs = { attack: 0, defense: 0 };
     sourceCard.buffs.attack += attackBonus;
     sourceCard.buffs.defense += defenseBonus;
+    // @ts-ignore
     sourceCard.attack = (parseInt(sourceCard.attack) || 0) + attackBonus;
+    // @ts-ignore
     sourceCard.defense = (parseInt(sourceCard.defense) || 0) + defenseBonus;
+    // @ts-ignore
     sourceCard.peak_defense = Math.max(sourceCard.peak_defense ?? sourceCard.defense, sourceCard.defense);
     logEvent("evolve", { owner, name: sourceCard.name, uid: sourceCard.uid, mode, atk: +attackBonus, def: +defenseBonus });
     if (sourceCard.evo_image)

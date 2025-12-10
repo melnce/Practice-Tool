@@ -1,7 +1,7 @@
+// src/logic/effects/ops/reanimate.ts
 import { state } from "@core/gameState.js";
-import { getCardDetails } from "@data/cardDatabase.js";
 import { reanimateSummon } from "@logic/effects/ops/summon.js";
-import { rand, randInt } from "@core/rng.js";
+import { randInt } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 export function handleReanimate(eff, owner) {
     const maxCost = parseInt(eff.max_cost) || 0;

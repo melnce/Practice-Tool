@@ -1,4 +1,3 @@
-// gamelogic/triggers.js
 import { state } from "@core/gameState.js";
 import { runEffects } from "@logic/core/effects.js";
 import { logEvent } from "@core/logger.js";
@@ -78,7 +77,7 @@ export function fireTrigger(eventName, activePlayer, context = {}) {
                         if (cond.has_keyword || cond.keywords) {
                             const wantRaw = cond.has_keyword ?? cond.keywords;
                             const wants = Array.isArray(wantRaw) ? wantRaw : [wantRaw];
-                            const toKey = s => String(s || "").toLowerCase();
+                            const toKey = (s) => String(s || "").toLowerCase();
                             const hasKW = (card, kw) => {
                                 const k = toKey(kw);
                                 if (k === "ward" && card.hasWard)
@@ -100,12 +99,12 @@ export function fireTrigger(eventName, activePlayer, context = {}) {
                                 if (k === "lastwords" && card.hasLastWords)
                                     return true;
                                 if (Array.isArray(card.keywords)) {
-                                    return card.keywords.some(w => (typeof w === "string" && toKey(w) === k) ||
+                                    return card.keywords.some((w) => (typeof w === "string" && toKey(w) === k) ||
                                         (w && typeof w === "object" && toKey(w.name) === k));
                                 }
                                 return false;
                             };
-                            const ok = wants.every(w => hasKW(entered, w));
+                            const ok = wants.every((w) => hasKW(entered, w));
                             if (!ok)
                                 continue;
                         }
@@ -154,10 +153,10 @@ export function fireTrigger(eventName, activePlayer, context = {}) {
     }
     // --- Build a snapshot of zones (board first to avoid hand noise) ---
     const zones = [
-        ...state.blueBoard.map(card => ({ card, owner: 'blue', source: 'board' })),
-        ...state.redBoard.map(card => ({ card, owner: 'red', source: 'board' })),
-        ...state.blueHand.map(card => ({ card, owner: 'blue', source: 'hand' })),
-        ...state.redHand.map(card => ({ card, owner: 'red', source: 'hand' })),
+        ...state.blueBoard.map((card) => ({ card, owner: 'blue', source: 'board' })),
+        ...state.redBoard.map((card) => ({ card, owner: 'red', source: 'board' })),
+        ...state.blueHand.map((card) => ({ card, owner: 'blue', source: 'hand' })),
+        ...state.redHand.map((card) => ({ card, owner: 'red', source: 'hand' })),
     ];
     for (const { card, owner, source } of zones) {
         if (!Array.isArray(card?.triggers) || !card.triggers.length)
@@ -402,5 +401,5 @@ export function fireTrigger(eventName, activePlayer, context = {}) {
 }
 function hasCrest(player, crestName) {
     const crests = player === 'blue' ? state.blueCrests : state.redCrests;
-    return crests.some(c => c.name === crestName);
+    return crests.some((c) => c.name === crestName);
 }

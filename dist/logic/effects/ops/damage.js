@@ -1,3 +1,4 @@
+// src/logic/effects/ops/damage.ts
 import { dealDamage } from "@logic/core/barrier.js";
 import { state } from "@core/gameState.js";
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
@@ -157,7 +158,7 @@ function resolveAmountWithOverflow(eff, owner, context = {}) {
             return new Set(arr.map(String)).size | 0;
         }
         if (s === "{last_discarded_cost}") {
-            return parseInt(state.lastDiscardedCost || 0, 10) || 0;
+            return parseInt(state.lastDiscardedCost, 10) || 0;
         }
         if (s === "{hand_size}") {
             const hand = owner === "blue" ? state.blueHand : state.redHand;

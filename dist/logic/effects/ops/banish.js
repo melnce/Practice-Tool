@@ -1,4 +1,4 @@
-// effects/banish.js
+// effects/ops/banish.ts
 import { state } from "@core/gameState.js";
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 import { fireTrigger } from "@logic/core/triggers.js";
@@ -31,6 +31,7 @@ export function handleBanishTargeted(eff, owner, effectsQueue) {
     // Optional filters
     if (eff.filters?.defense_lte) {
         const cap = parseInt(eff.filters.defense_lte);
+        // @ts-ignore
         pool = pool.filter(c => (parseInt(c.defense) || 0) <= cap);
     }
     if (!pool.length)
@@ -137,7 +138,7 @@ export function handleBanishRandom(eff, owner) {
     let pool = getPool(eff.target || "enemy:follower", owner, null, eff.condition, { isTargetedEffect: true });
     if (!Array.isArray(pool) || pool.length === 0)
         return;
-    const n = Math.max(1, parseInt(eff.count ?? eff.amount ?? 1, 10) || 1);
+    const n = Math.max(1, parseInt((eff.count ?? eff.amount ?? 1), 10) || 1);
     const take = Math.min(n, pool.length);
     for (let i = 0; i < take; i++) {
         const idx = randInt(pool.length); // uses your seeded RNG

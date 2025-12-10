@@ -1,10 +1,11 @@
+// src/logic/effects/ops/choose.ts
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
+// @ts-ignore
 import { showChoiceModal } from "@ui/choiceModal.js";
+// @ts-ignore
 import { hasEarthSigils, consumeEarthSigils } from "@logic/effects/cards/runecraft/earth.js";
-import { spellboostHand } from "@logic/effects/ops/spellboost.js";
-import { handleDrawFiltered } from "@logic/effects/ops/draw.js";
-import { handleReanimate } from "@logic/effects/ops/reanimate.js";
 import { runEffects } from "@logic/core/effects.js";
 import { fireTrigger } from "@logic/core/triggers.js";
 import { logEvent } from "@core/logger.js";
@@ -37,6 +38,7 @@ export function handleChoose(eff, owner, sourceCard, effectsQueue) {
     const isAIMode = () => {
         // Your spectator sets these during AI searches/turns (see AlphaVanillaSpectator) :contentReference[oaicite:3]{index=3}
         // If you later run bots without the spectator, you can flip HEADLESS yourself before resolving effects.
+        // @ts-ignore
         return !!(globalThis && (globalThis.HEADLESS || globalThis.AI_SUPPRESS_RENDER));
     };
     // Tiny heuristic: favor immediate board impact & resources; slight penalty if ER cost can’t be paid.
@@ -79,7 +81,7 @@ export function handleChoose(eff, owner, sourceCard, effectsQueue) {
         const pool = available.slice();
         while (picked.length < selectCount && pool.length) {
             // Enforce uniqueness if requested
-            const candidates = unique ? pool.filter(o => !picked.includes(o)) : pool;
+            const candidates = unique ? pool.filter((o) => !picked.includes(o)) : pool;
             if (!candidates.length)
                 break;
             // Choose highest scoring remaining option
@@ -126,6 +128,7 @@ export function handleChoose(eff, owner, sourceCard, effectsQueue) {
             runEffects(effectsQueue, owner, sourceCard);
         }
         else {
+            // @ts-ignore
             if (!globalThis.AI_SUPPRESS_RENDER)
                 render();
         }

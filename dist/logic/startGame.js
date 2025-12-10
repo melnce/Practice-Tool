@@ -1,8 +1,9 @@
+// src/logic/startGame.ts
 import { state, resetGameState } from "@core/gameState.js";
 import { loadBlueDeck, loadRedDeck } from "@data/deckLoader.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { loadCardDatabase } from "@data/cardDatabase.js";
-import { drawCard } from "@core/utils.js";
 import { beginMulligan } from "@logic/mulligan.js";
 import { runEffects } from "@logic/core/effects.js";
 import { setSeed, getSeed } from "@core/rng.js";
@@ -12,7 +13,7 @@ function resetEvoButtons() {
         const el = document.getElementById(id);
         if (!el)
             return;
-        el.disabled = false; // re-enable
+        el.removeAttribute("disabled"); // re-enable
         el.classList.remove("used", "spent", "disabled"); // clean any flags you added
         el.draggable = true; // keep drag active
     });
@@ -36,6 +37,7 @@ export async function startGame() {
     state.blueAnyAllyAttackedThisTurn = false;
     state.redAnyAllyAttackedThisTurn = false;
     await loadCardDatabase();
+    // @ts-ignore
     await import("@core/card_validation.js").then(({ validateCardDatabase }) => validateCardDatabase());
     await Promise.all([loadBlueDeck(blueChoice), loadRedDeck(redChoice)]);
     // === Faith crest bootstrap: if Sham-Nacha is in a deck, that player starts with Faith ===
@@ -53,7 +55,7 @@ export async function startGame() {
                         event: "select_mode",
                         effects: [{ op: "crest_add_counter", crest: "Faith", counter: "faith", amount: 1 }]
                     }]
-            }], "blue", null);
+            }], "blue", null, { targets: [] });
     }
     if (hasSham(state.redDeck, state.redHand)) {
         runEffects([{
@@ -65,12 +67,12 @@ export async function startGame() {
                         event: "select_mode",
                         effects: [{ op: "crest_add_counter", crest: "Faith", counter: "faith", amount: 1 }]
                     }]
-            }], "red", null);
+            }], "red", null, { targets: [] });
     }
     const redBoost = document.getElementById("redBoost");
     redBoost?.classList.remove("used");
     if (redBoost) {
-        redBoost.disabled = false;
+        redBoost.removeAttribute("disabled");
         redBoost.style.backgroundColor = "orange";
     }
     // ✅ evolve charges & turn locks

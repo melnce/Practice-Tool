@@ -1,3 +1,4 @@
+// src/logic/effects/cards/runecraft/golem.ts
 import { state } from "@core/gameState.js";
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 export function handleSelectEvolveGolem(eff, owner, sourceCard, effectsQueue) {
@@ -7,6 +8,7 @@ export function handleSelectEvolveGolem(eff, owner, sourceCard, effectsQueue) {
         return "done";
     highlightSelectable(pool);
     state.pendingTargetEffect = {
+        // @ts-ignore
         eff: { op: "evolve_and_buff", attack: eff.attack ?? 3, defense: eff.defense ?? 3 },
         owner,
         sourceCard,

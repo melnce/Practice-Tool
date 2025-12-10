@@ -1,13 +1,18 @@
+// src/helpers/enhance.ts
 export function getEnhanceTiers(card) {
-    if (Array.isArray(card?.enhanceTiers) && card.enhanceTiers.length)
+    if (Array.isArray(card?.enhanceTiers) && card.enhanceTiers.length) {
         return [...card.enhanceTiers].sort((a, b) => b.cost - a.cost);
+    }
     const list = Array.isArray(card?.keywords) ? card.keywords : [];
     const tiers = [];
     for (const k of list) {
         const name = (typeof k === "string" ? k : k?.name) || "";
         if (name.toLowerCase() === "enhance") {
-            const cost = Number(typeof k === "object" ? k.cost : 0);
-            const effects = (typeof k === "object" && Array.isArray(k.effects)) ? k.effects : [];
+            // k is a KeywordEntry object here if not string, but TS doesn't know for sure
+            // Safely cast or check
+            const entry = k;
+            const cost = Number(typeof k === "object" ? entry.cost : 0);
+            const effects = (typeof k === "object" && Array.isArray(entry.effects)) ? entry.effects : [];
             if (cost > 0)
                 tiers.push({ cost, effects });
         }

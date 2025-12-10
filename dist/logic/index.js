@@ -1,22 +1,28 @@
-// gameLogic.js (barrel + window bindings)
+// src/logic/index.ts
 export { playCard } from "@logic/core/playCard.js";
 export { useRedBoost } from "@logic/boosts.js";
 export { endTurnBlue, endTurnRed } from "@logic/core/turns.js";
 export { attackFollower, attackLeader, handleDropOnLeader } from "@logic/core/combat.js";
+// @ts-ignore
 export { grantBarrier, dealDamage } from "@logic/core/barrier.js";
+// @ts-ignore
 export { startGame } from "@logic/startGame.js";
 export { onEvolve } from "@logic/evolveUtils.js";
 export { onFanfare, runEffects } from "@logic/core/effects.js";
+// @ts-ignore
 export { engageAmulet } from "@logic/effects/ops/engage.js";
 export { resolvePendingTarget } from "@logic/core/resolveTarget.js";
+// @ts-ignore
 export { summonNamed } from "@logic/effects/ops/summon.js";
 export { getCardDetails } from "@data/cardDatabase.js";
 // Expose to window
 import { runEffects } from "@logic/core/effects.js";
+// @ts-ignore
 import { startGame as _startGame } from "@logic/startGame.js";
 import { endTurnBlue as _endTurnBlue, endTurnRed as _endTurnRed } from "@logic/core/turns.js";
 import { useRedBoost as _useRedBoost } from "@logic/boosts.js";
 import "@data/cardDatabase.js";
+// @ts-ignore
 import { summonNamed as _summonNamed } from "@logic/effects/ops/summon.js";
 import { getCardDetails as _getCardDetails } from "@data/cardDatabase.js";
 import { state } from "@core/gameState.js";
@@ -24,7 +30,7 @@ export function startFuseFromHand(owner, initiatorUid) {
     runEffects([{
             op: "start_fuse_from_card",
             initiator_uid: initiatorUid
-        }], owner, null);
+        }], owner, null); // sourceCard null?
 }
 window.startGame = _startGame;
 window.endTurnBlue = _endTurnBlue;

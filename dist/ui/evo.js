@@ -1,3 +1,4 @@
+// src/ui/evo.ts
 import { byId } from "@ui/dom.js";
 export function updateEvoButtonsUI(state) {
     /** @type {HTMLButtonElement} */
@@ -25,7 +26,7 @@ export function updateEvoButtonsUI(state) {
     [bNE, bSE, rNE, rSE].forEach(btn => {
         btn.draggable = !btn.disabled;
         btn.ondragstart = (e) => {
-            const btnElem = /** @type {HTMLButtonElement} */ (e.currentTarget);
+            const btnElem = e.currentTarget;
             if (btnElem.disabled) {
                 e.preventDefault();
                 return;

@@ -1,5 +1,6 @@
-// gamelogic/mulligan.js
+// src/logic/mulligan.ts
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { drawCard, shuffleInPlace } from "@core/utils.js";
 import { logEvent } from "@core/logger.js";

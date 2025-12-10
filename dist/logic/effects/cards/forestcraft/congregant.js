@@ -1,8 +1,9 @@
-// gamelogic/effects/cards/forestcraft/congregant.js
+// src/logic/effects/cards/forestcraft/congregant.ts
 import { state } from "@core/gameState.js";
 import { fireTrigger } from "@logic/core/triggers.js";
+// @ts-ignore
 import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
-import { rand, randInt, makeUid } from "@core/rng.js";
+import { makeUid } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 function boardOf(owner) {
     return owner === "blue" ? state.blueBoard : state.redBoard;
@@ -12,9 +13,7 @@ function boardOf(owner) {
  * mark it as chain-spawned to suppress re-entry cascade.
  */
 function makeChainClone(prev, owner) {
-    const clone = (typeof structuredClone === "function")
-        ? structuredClone(prev)
-        : JSON.parse(JSON.stringify(prev));
+    const clone = JSON.parse(JSON.stringify(prev));
     // Identity/placement
     clone.uid = makeUid();
     clone.owner = owner;
@@ -27,12 +26,14 @@ function makeChainClone(prev, owner) {
     clone.keywords = Array.isArray(clone.keywords) ? clone.keywords : [];
     clone.buffs = clone.buffs || { attack: 0, defense: 0 };
     // Normalize numbers from prev
-    const prevAtk = parseInt(prev.attack) || 0;
-    const prevDef = parseInt(prev.defense) || 0;
+    const prevAtk = parseInt(String(prev.attack)) || 0;
+    const prevDef = parseInt(String(prev.defense)) || 0;
+    // @ts-ignore
     const prevBaseA = Number.isFinite(prev.base_attack) ? prev.base_attack : prevAtk - (parseInt(prev.buffs?.attack) || 0);
+    // @ts-ignore
     const prevBaseD = Number.isFinite(prev.base_defense) ? prev.base_defense : prevDef - (parseInt(prev.buffs?.defense) || 0);
-    const buffA = parseInt(prev.buffs?.attack) || 0;
-    const buffD = parseInt(prev.buffs?.defense) || 0;
+    const buffA = parseInt(String(prev.buffs?.attack)) || 0;
+    const buffD = parseInt(String(prev.buffs?.defense)) || 0;
     // EXACT copy but with -1 to the MAX HP (base_defense)
     const newBaseD = Math.max(0, prevBaseD - 1);
     // Attack copies exactly (base + buffs)
@@ -42,7 +43,9 @@ function makeChainClone(prev, owner) {
     clone.base_defense = newBaseD;
     clone.defense = newBaseD + buffD;
     // Keep potentials aligned so DEF is white (not damaged)
+    // @ts-ignore
     clone.potential_attack = clone.base_attack + buffA;
+    // @ts-ignore
     clone.potential_defense = clone.base_defense + buffD;
     // Peak is this instance's full current DEF
     clone.peak_defense = clone.defense;
@@ -50,7 +53,9 @@ function makeChainClone(prev, owner) {
     // Turn/attack flags
     clone.justPlayed = true;
     clone.hasAttacked = false;
+    // @ts-ignore
     clone.attacks_per_turn = Number.isFinite(clone.attacks_per_turn) ? clone.attacks_per_turn : 1;
+    // @ts-ignore
     clone.attacks_left = clone.attacks_per_turn;
     // Rush/Storm handling
     if (clone.hasStorm) {
@@ -69,8 +74,10 @@ function makeChainClone(prev, owner) {
         clone.isRush = false;
     }
     // Prevent re-entrant cascade from chain-spawned copies
+    // @ts-ignore
     clone._spawnedByCongregant = true;
     // Ensure UI "damaged" flag is false (white DEF)
+    // @ts-ignore
     clone.isDamaged = false;
     return clone;
 }
@@ -85,13 +92,14 @@ export function handleCongregantOnEnter(owner, enteringCard) {
     if (String(enteringCard.name) !== "Congregant of Unkilling")
         return;
     // Don’t start a new cascade from chain-spawned copies
+    // @ts-ignore
     if (enteringCard._spawnedByCongregant)
         return;
     const board = boardOf(owner);
     // Chain from the *latest* instance; stop if DEF would drop to 0 or board is full.
     let prev = enteringCard;
     while (board.length < 5) {
-        const nextDef = (parseInt(prev.defense, 10) || 0) - 1;
+        const nextDef = (parseInt(String(prev.defense), 10) || 0) - 1;
         if (nextDef <= 0)
             break;
         const clone = makeChainClone(prev, owner);
@@ -99,6 +107,7 @@ export function handleCongregantOnEnter(owner, enteringCard) {
         if (board.length >= 5)
             break;
         board.push(clone);
+        // @ts-ignore
         logEvent("congregantSpawn", { owner, name: clone.name, uid: clone.uid, base_defense: clone.base_defense });
         // Rally for followers
         if (owner === "blue")

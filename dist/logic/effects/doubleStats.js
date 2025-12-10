@@ -1,4 +1,6 @@
+// src/logic/effects/doubleStats.ts
 import { state } from "@core/gameState.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 import { logEvent } from "@core/logger.js";
@@ -11,7 +13,9 @@ export function doubleStatsAllies(owner) {
         const a = parseInt(c.attack) || 0;
         const d = parseInt(c.defense) || 0;
         // +current attack/defense == doubling
+        // @ts-ignore
         c.attack = a + a;
+        // @ts-ignore
         c.defense = d + d;
         // peak tracking like in buff.js
         c.peak_defense = Math.max(c.peak_defense ?? c.defense, c.defense);

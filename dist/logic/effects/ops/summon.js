@@ -1,20 +1,14 @@
-// summon.js
-//
-// Goals:
-// - Correctly initialize Followers and Amulets created by effects
-// - Special handling for Magic Sediment (merge into existing Brew/Sediment)
-// - Hard de-duplication for Earth Sigils (Brew/Sediment) to prevent "double Sediment"
-// - Keep existing public API (summonNamed, summonRandomFromDeck, reanimateSummon)
-// - Avoid side effects outside this file
+// src/logic/effects/ops/summon.ts
 import { state } from "@core/gameState.js";
 import { getCardDetails } from "@data/cardDatabase.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { fireTrigger } from "@logic/core/triggers.js";
 import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
-import { getPool, highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
+import { highlightSelectable } from "@logic/core/targeting.js";
 import { applyKeywordsFromList, applyKeyword } from "@logic/core/keywords.js";
 import { handleCongregantOnEnter } from "@logic/effects/cards/forestcraft/congregant.js";
-import { rand, randInt, makeUid } from "@core/rng.js";
+import { randInt, makeUid } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 // =============== Utilities ===============
 function boardOf(owner) {
@@ -45,6 +39,7 @@ function isEarthSigil(card) {
 }
 // Add in summon.js (Utilities section)
 function getEffectiveCost(card) {
+    // @ts-ignore
     if (card && typeof card.effectiveCost === "number")
         return card.effectiveCost;
     const base = parseInt(card?.cost, 10) || 0;
@@ -116,7 +111,9 @@ function startingEarthFromKeywords(cardData) {
 // =============== Initialization ===============
 function initFollower(card) {
     // normalize numbers
+    // @ts-ignore
     card.attack = parseInt(card.attack) || 0;
+    // @ts-ignore
     card.defense = parseInt(card.defense) || 0;
     // remember raw stats
     if (card.base_attack == null)
@@ -235,12 +232,14 @@ function pushToBoard(board, owner, card) {
             state.redRally++;
     }
     // MEDICAL ASSASSIN TRIGGER - ADD THIS LINE
+    // @ts-ignore
     medicalAssassinOnFollowerEnter(owner, card);
     // follower enter triggers
     if (isFollower(card)) {
         fireTrigger("ally_follower_enter", owner, { enteringCard: card });
         fireTrigger("enemy_follower_enter", owner, { enteringCard: card });
         // >>> Congregant chain (runs once when the first instance enters)
+        // @ts-ignore
         handleCongregantOnEnter(owner, card);
     }
     return true;
@@ -423,6 +422,7 @@ export function handleSummonDestroyedAmuletHighestBaseCost(owner) {
     // Random one among the highest base cost
     const pick = candidates[randInt(candidates.length)].g;
     // Re-create a fresh copy from DB and put it on board using existing API
+    // @ts-ignore
     summonNamed({ op: "summon_named", name: pick.name, count: 1 }, owner);
 }
 export function handleSelectHandSummonArtifactCopiesEOT(eff, owner, effectsQueue) {
@@ -445,7 +445,7 @@ export function handleSelectHandSummonArtifactCopiesEOT(eff, owner, effectsQueue
         resumeEffects: effectsQueue,
         pool,
         targets: [],
-        selectCount: Math.max(1, parseInt(eff.select ?? eff.select_count ?? 2, 10)),
+        selectCount: Math.max(1, parseInt((eff.select ?? eff.select_count ?? 2), 10)),
     };
     highlightSelectable(pool);
     return "pending";
@@ -474,7 +474,9 @@ export function summonExactCopyFromHand(srcCard, owner, position = "right") {
     // --- Follower init (this is what was missing) ---
     if (clone.type === "Follower") {
         // Numbers
+        // @ts-ignore
         clone.attack = parseInt(clone.attack) || 0;
+        // @ts-ignore
         clone.defense = parseInt(clone.defense) || 0;
         // Base/peak
         if (clone.base_attack == null)
@@ -520,10 +522,12 @@ export function summonExactCopyFromHand(srcCard, owner, position = "right") {
     state.lastSummoned = [clone];
     // Fire follower-enter hooks exactly like other summon paths
     if (clone.type === "Follower") {
+        // @ts-ignore
         medicalAssassinOnFollowerEnter(owner, clone); // consistency with pushToBoard
         fireTrigger("ally_follower_enter", owner, { enteringCard: clone });
         fireTrigger("enemy_follower_enter", owner, { enteringCard: clone });
         // Ensure effect-based summons also trigger the Congregrant chain
+        // @ts-ignore
         handleCongregantOnEnter(owner, clone);
     }
     return clone;
@@ -539,6 +543,7 @@ export function handleSelectHandSummonArtifactCopy(eff, owner, effectsQueue) {
             return false;
         const base = parseInt(c?.cost, 10) || 0;
         const mod = parseInt(c?.cost_mod, 10) || 0;
+        // @ts-ignore
         const effCost = Number.isFinite(c?.effectiveCost) ? c.effectiveCost : base + mod;
         return effCost <= maxCost;
     });
@@ -552,9 +557,9 @@ export function handleSelectHandSummonArtifactCopy(eff, owner, effectsQueue) {
         pool,
         targets: [],
         // ← respect JSON-specified select count
-        selectCount: Math.max(1, parseInt(eff.select ?? eff.select_count ?? 1, 10)),
+        selectCount: Math.max(1, parseInt((eff.select ?? eff.select_count ?? 1), 10)),
         // optional: let user confirm multi-selects (shows the confirm button)
-        requiresConfirmation: (parseInt(eff.select ?? 1, 10) > 1)
+        requiresConfirmation: (parseInt((eff.select ?? 1), 10) > 1)
     };
     highlightSelectable(pool);
     return "pending";
@@ -581,7 +586,9 @@ export function summonExactCopy(sourceCard, owner) {
     clone.keywords = Array.isArray(clone.keywords) ? clone.keywords : [];
     clone.buffs = clone.buffs || {};
     // Follower init similar to summonExactCopyFromHand
+    // @ts-ignore
     clone.attack = parseInt(clone.attack) || 0;
+    // @ts-ignore
     clone.defense = parseInt(clone.defense) || 0;
     if (clone.base_attack == null)
         clone.base_attack = clone.attack;
@@ -618,6 +625,7 @@ export function summonExactCopy(sourceCard, owner) {
     // >>> Congregant chain (special case)
     // This will fill remaining slots with -1 DEF copies and mark them
     // so they don’t cascade again.
+    // @ts-ignore
     handleCongregantOnEnter(owner, clone);
     state.lastSummoned = [clone];
     render();

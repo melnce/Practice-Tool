@@ -1,4 +1,4 @@
-// src/helpers/board.js
+// src/helpers/board.ts
 /**
  * Checks if the given zone ID represents the board of the current turn's player.
  * @param {string} zoneId - e.g. "blueBoard", "redBoard"

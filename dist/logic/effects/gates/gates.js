@@ -1,3 +1,4 @@
+// src/logic/effects/gates/gates.ts
 import { state } from "@core/gameState.js";
 import { hasNecromancy, spendShadows } from "@helpers/necromancy.js";
 import { isOverflow } from "@helpers/overflow.js";
@@ -6,13 +7,13 @@ export function handleOverflowGate(owner) {
     return isOverflow(owner);
 }
 export function handleNecromancyGate(owner, eff) {
-    const need = Math.max(1, parseInt(eff.cost ?? 1) || 1);
+    const need = Math.max(1, parseInt(String(eff.cost ?? 1)) || 1);
     if (hasNecromancy(owner, need)) {
         spendShadows(owner, need);
-        logEvent("necromancySpend", { owner, cost: need }); // ← add
+        logEvent("necromancySpend", { owner, cost: need });
         return true;
     }
-    logEvent("necromancyBlocked", { owner, need }); // ← optional
+    logEvent("necromancyBlocked", { owner, need });
     return false;
 }
 export function handleSuperEvoGate(owner) {
@@ -24,9 +25,9 @@ export function handleSuperEvoGate(owner) {
         return state.roundCount >= 6; // Red super evolve unlocks at round 6
     }
 }
-// effects/gates.js
 export function handleEvolvedSelfGate(eff, owner, sourceCard, effectsQueue) {
     const isEvolved = !!(sourceCard && sourceCard.hasEvolved);
+    // @ts-ignore
     const next = (isEvolved ? eff.effects : eff.else_effects) || [];
     if (next.length && Array.isArray(effectsQueue)) {
         effectsQueue.unshift(...next);
@@ -37,14 +38,13 @@ export function handleEvolvedSelfGate(eff, owner, sourceCard, effectsQueue) {
 export function amuletCountGate(owner, eff) {
     const need = parseInt(eff.count ?? 0);
     const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    // @ts-ignore
     const amuletCount = (board || []).filter(c => c.type === "Amulet").length;
     return amuletCount >= need;
 }
 /**
  * Checks if the owner's deck has no duplicate cards by name.
  * This is often called a "Highlander" condition.
- * @param {string} owner - "blue" or "red"
- * @returns {boolean} - True if no duplicates are found, otherwise false.
  */
 export function hasNoDuplicatesInDeck(owner) {
     const deck = owner === "blue" ? state.blueDeck : state.redDeck;
@@ -76,9 +76,13 @@ export function noAllyAttackedThisTurn(owner) {
     return !(board || []).some(c => {
         if (!c || c.type !== "Follower")
             return false;
+        // @ts-ignore
         const used = (c.attacks_used_this_turn ?? 0) > 0;
+        // @ts-ignore
         const legacy = !!c.hasAttacked;
+        // @ts-ignore
         const perTurn = Number.isFinite(c.attacks_per_turn) ? c.attacks_per_turn : 1;
+        // @ts-ignore
         const left = Number.isFinite(c.attacks_left) ? c.attacks_left : perTurn;
         const spent = left < perTurn;
         return used || legacy || spent;

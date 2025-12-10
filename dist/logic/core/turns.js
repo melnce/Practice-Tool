@@ -1,15 +1,20 @@
-// /gamelogic/turns.js
+// src/logic/core/turns.ts
 import { state } from "@core/gameState.js";
 import { drawCard } from "@core/utils.js";
+// @ts-ignore
 import { render } from "@ui/render.js";
 import { fireTrigger } from "@logic/core/triggers.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
+// @ts-ignore
 import { clearTemporaryBuffs } from "@logic/effects/self.js";
 import { runEffects } from "@logic/core/effects.js";
+// @ts-ignore
 import { tickCrests, processCrestEvent, resetCrestOncePerTurn } from "@logic/effects/crest.js";
-import { clearExpiredCantAttackAtEOT } from "@logic/core/keywords.js";
+// @ts-ignore
 import { resetEngageFlagsAtTurnStart } from "@logic/effects/ops/engage.js";
+// @ts-ignore
 import { resetMedicalAssassinGate } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
+// @ts-ignore
 import { processHimekaDelayedBanish } from "@logic/effects/cards/havencraft/himeka.js";
 import { dealDamage } from "@logic/core/barrier.js";
 import { logEvent } from "@core/logger.js";
@@ -72,7 +77,7 @@ function applyBleedAllBoardsAtEndOfTurn() {
         }
     }
 }
-function tickAmuletCountdowns(owner /* "blue" | "red" */) {
+function tickAmuletCountdowns(owner) {
     const board = owner === "blue" ? state.blueBoard : state.redBoard;
     for (const card of board) {
         if (card?.type === "Amulet" && card.hasCountdown && typeof card.countdown === "number" && card.countdown > 0) {

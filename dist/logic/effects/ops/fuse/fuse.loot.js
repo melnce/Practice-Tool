@@ -1,4 +1,4 @@
-// @effects/fuse.loot.js
+// src/logic/effects/ops/fuse/fuse.loot.ts
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { clearSelectableFlags } from "@logic/core/targeting.js";
@@ -12,15 +12,6 @@ function graveOf(owner) {
 }
 function alreadyFusedThisTurn(card) {
     return !!card && card.lastFuseRound === state.roundCount;
-}
-// Notify 'loot_fused' exactly ONCE per fuse finalize; include initiator for dedupe
-function notifyLootFused(owner, initiator, count) {
-    if (!count)
-        return;
-    try {
-        fireTrigger?.("loot_fused", owner, { source: "fuse", kind: "loot", initiator, count });
-    }
-    catch { }
 }
 // Returning Slash, etc.
 export function fuse_finalize_loot(owner, initiator_uid, partners) {
@@ -42,13 +33,16 @@ export function fuse_finalize_loot(owner, initiator_uid, partners) {
     // Only allow actual Loot spells (keep your stricter set if desired)
     const ALLOWED = new Set(["Gilded Blade", "Gilded Goblet", "Gilded Boots", "Gilded Necklace"]);
     const used = (partners || []).filter(p => p?.type === "Spell" &&
+        // @ts-ignore
         Array.isArray(p?.tribes) && p.tribes.includes("Loot") &&
         ALLOWED.has(p?.name));
     // Track unique fused names on this specific copy (for X = different names use-cases)
+    // @ts-ignore
     const prev = Array.isArray(initiator._fusedLootNames) ? initiator._fusedLootNames : [];
     const next = new Set(prev.map(String));
     for (const p of used)
         next.add(String(p.name || ""));
+    // @ts-ignore
     initiator._fusedLootNames = Array.from(next);
     // Consume selected Loot cards
     for (const p of used) {
@@ -66,10 +60,13 @@ export function fuse_finalize_loot(owner, initiator_uid, partners) {
     });
     // Fire exactly ONCE per fuse action on this initiator this TURN.
     // A card can only "fuse" once per turn by rule; treat multi-select as a single fuse.
+    // @ts-ignore
     if (initiator.__lootFuseTurn !== state.roundCount) {
+        // @ts-ignore
         initiator.__lootFuseTurn = state.roundCount;
         try {
             // Single ping; include count only as metadata (listeners should NOT loop).
+            // @ts-ignore
             fireTrigger?.("loot_fused", owner, { initiator, kind: "loot", count: used.length });
         }
         catch { }
@@ -81,8 +78,10 @@ export function fuse_finalize_loot(owner, initiator_uid, partners) {
     ];
     if (used.length >= 1)
         baseSpell.push({ op: "draw", count: 1 });
+    // @ts-ignore
     initiator.spell = baseSpell;
     initiator.isFused = used.length >= 1;
+    // @ts-ignore
     initiator.__lootFuseCount = used.length;
     initiator.lastFuseRound = state.roundCount;
     logEvent("fuseFinalize", {

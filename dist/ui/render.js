@@ -1,10 +1,11 @@
+// src/ui/render.ts
 import { renderZone } from "@ui/zones.js";
 import { updateCounts } from "@ui/counts.js";
 import { updateEvoButtonsUI } from "@ui/evo.js";
 import { makeLeaderDroppable } from "@ui/drag.js";
 import { byId } from "@ui/dom.js";
 import { state } from "@core/gameState.js";
-const logic = () => import("@logic/index.js");
+const logic = () => import(/* webpackIgnore: true */ "@logic/index.js");
 export function render() {
     // headers
     const setText = (id, text) => { const el = byId(id); if (el)
@@ -23,6 +24,8 @@ export function render() {
     updateCounts(state);
     const blueLeader = byId("blueLeader");
     const redLeader = byId("redLeader");
+    if (!blueLeader || !redLeader)
+        return;
     if (state.phase !== "mulligan" && state.pendingTargetEffect?.canTargetLeader) {
         // Show enemy leader as targetable
         const enemyLeader = state.isBlueTurn ? redLeader : blueLeader;
@@ -210,7 +213,7 @@ function wireHistoryImagePreview(scopeEl) {
     });
 }
 // render.js — add this helper above updateCrestsUI
-function orderedCrestSlots(container, side /* 'blue' | 'red' */) {
+function orderedCrestSlots(container, side) {
     const slots = Array.from(container.querySelectorAll('.crest-slot'));
     if (!slots.length)
         return [];
@@ -322,7 +325,7 @@ function renderLeaderBarrierBadge(side) {
         return;
     // Cleanup old badges just in case
     host.querySelectorAll(".leader-barrier-badge").forEach(n => n.remove());
-    const hasBarrier = (state[side === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier"] | 0) > 0;
+    const hasBarrier = state[side === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier"] > 0;
     if (hasBarrier) {
         host.classList.add("has-leader-barrier");
     }

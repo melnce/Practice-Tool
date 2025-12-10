@@ -1,6 +1,7 @@
+// src/logic/effects/cards/runecraft/earth.ts
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
-import { logEvent } from "@core/logger.js"; // Add import
+import { logEvent } from "@core/logger.js";
 function board(owner) { return owner === "blue" ? state.blueBoard : state.redBoard; }
 function isWitchsNewBrew(card) {
     const n = String(card?.name || "").toLowerCase();
