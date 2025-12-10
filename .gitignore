@@ -1,4 +1,26 @@
-/decks
-/game_rules
+# Personal data / notes (do not track)
+decks/
+game_rules/
+
+# Node dependencies
 node_modules/
+
+# Build output (generated JS)
 dist/
+
+# Logs and temp files
+*.log
+*_log*.txt
+_js_files.txt
+_ts_files.txt
+build_log*.txt
+*.tmp
+
+# OS / Editor clutter
+.DS_Store
+Thumbs.db
+
+# VS Code workspace files (optional)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
