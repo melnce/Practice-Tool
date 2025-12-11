@@ -3,6 +3,7 @@ import { state } from "@core/gameState.js";
 import { drawCard } from "@core/utils.js";
 // @ts-ignore
 import { render } from "@ui/render.js";
+import { recordEvent } from "@core/debugTimeline.js";
 import { fireTrigger } from "@logic/core/triggers.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 // @ts-ignore
@@ -16,7 +17,7 @@ import { resetEngageFlagsAtTurnStart } from "@logic/effects/ops/engage.js";
 // @ts-ignore
 import { resetMedicalAssassinGate } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
 // @ts-ignore
-import { processHimekaDelayedBanish } from "@logic/effects/cards/havencraft/himeka.js";
+// import { processHimekaDelayedBanish } from "@logic/effects/cards/havencraft/himeka.js";
 import { dealDamage } from "@logic/core/barrier.js";
 import { logEvent } from "@core/logger.js";
 import { beginAction, commitAction } from "@core/history.js";
@@ -101,12 +102,13 @@ function tickAmuletCountdowns(owner: Player) {
  */
 export function endTurnBlue() {
     if (!state.isBlueTurn) return;
+    recordEvent({ type: "end_turn", payload: { player: "blue" } });
     beginAction("End Turn (Blue)");
 
     clearTempHandCostMods("blue");
     state.blueBoard.forEach(card => clearTemporaryBuffs(card));
     fireTrigger("end_of_turn", "blue");
-    processHimekaDelayedBanish("blue");
+    // processHimekaDelayedBanish("blue");
     render();
 
     // ✅ Blue: run crest effects one by one, then cleanup once
@@ -114,7 +116,10 @@ export function endTurnBlue() {
         const fx = processCrestEvent("blue", "end_of_turn");
         if (fx.length) {
             state.suppressCleanup = true;            // <— start atomic crest phase
-            for (const eff of fx) runEffects([eff], "blue", null);
+            for (const eff of fx) {
+                console.log("[Turns] Running crest effect op:", eff.op);
+                runEffects([eff], "blue", null);
+            }
             state.suppressCleanup = false;           // <— end atomic crest phase
         }
         cleanupDead();                             // resolve deaths + Last Words once
@@ -172,7 +177,7 @@ export function endTurnRed() {
     clearTempHandCostMods("red");
     state.redBoard.forEach(card => clearTemporaryBuffs(card));
     fireTrigger("end_of_turn", "red");
-    processHimekaDelayedBanish("red");
+    // processHimekaDelayedBanish("red");
     render();
 
     // ✅ Red: run crest effects one by one, then cleanup once
