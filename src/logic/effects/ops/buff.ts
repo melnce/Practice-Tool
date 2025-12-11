@@ -63,7 +63,7 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
             targets: [],
             selectCount: parseInt((eff as any).select_count ?? 1),
             context
-        };
+        } as any;
         highlightSelectable(pool);
         return "pending";
     }

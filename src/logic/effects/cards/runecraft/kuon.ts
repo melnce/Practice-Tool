@@ -34,8 +34,8 @@ export function handleKuonEnhance(owner: Player) {
         ? (state.shikigamiDeathsThisTurnBlue || [])
         // @ts-ignore
         : (state.shikigamiDeathsThisTurnRed || []);
-    const sumA = pool.reduce((acc: number, x: CardInstance) => acc + (x.attack || 0), 0);
-    const sumD = pool.reduce((acc: number, x: CardInstance) => acc + (x.defense || 0), 0);
+    const sumA = pool.reduce((acc: number, x: CardInstance) => acc + (Number(x.attack) || 0), 0);
+    const sumD = pool.reduce((acc: number, x: CardInstance) => acc + (Number(x.defense) || 0), 0);
 
     // 3) Summon Noble Shikigami
     // @ts-ignore

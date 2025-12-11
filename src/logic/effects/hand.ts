@@ -51,7 +51,7 @@ export function handleDiscardSelectHand(eff: Effect, owner: Player, resumeEffect
         selectCount,
         targets: [],
         resumeEffects,
-    };
+    } as any;
 
     // mark with the correct flag and render
     highlightSelectable(pool); // sets __uiSelectable + render()

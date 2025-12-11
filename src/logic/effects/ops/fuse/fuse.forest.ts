@@ -18,7 +18,7 @@ function alreadyFusedThisTurn(card: CardInstance) {
 }
 
 // Finalize for Garden's Allure
-export function fuse_finalize_gardens_allure(owner: Player, initiator_uid: number, partners: CardInstance[]) {
+export function fuse_finalize_gardens_allure(owner: Player, initiator_uid: string, partners: CardInstance[]) {
     const hand = handOf(owner);
     const grave = graveOf(owner);
 

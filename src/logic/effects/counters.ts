@@ -30,7 +30,7 @@ function ensureDestroyOnZero(card: CardInstance, key: string) {
     const conf = getCounterConfig(card, key);
     const val = card.counters?.[key] ?? 0;
 
-    if (conf?.destroyOnEmpty && val <= 0) {
+    if ((conf as any)?.destroyOnEmpty && val <= 0) {
         // normalize to 0
         if (!card.counters) card.counters = {};
         card.counters[key] = 0;

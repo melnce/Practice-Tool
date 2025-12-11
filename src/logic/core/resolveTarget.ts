@@ -180,7 +180,7 @@ export function resolvePendingTarget(uid: string | "leader") {
 
     // Handle leader click
     if (uid === "leader" && pending.canTargetLeader) {
-        pending.targets.push({ type: "Leader" }); // Special leader target marker
+        pending.targets.push({ type: "Leader" } as any); // Special leader target marker
         // Continue with normal resolution
         const { eff, owner, resumeEffects } = pending;
 
@@ -194,7 +194,7 @@ export function resolvePendingTarget(uid: string | "leader") {
         clearSelectableFlags();
 
         if (resumeEffects?.length) {
-            runEffects(resumeEffects, owner);
+            runEffects(resumeEffects, owner, pending.sourceCard);
         } else {
             render();
         }
@@ -652,7 +652,7 @@ export function resolvePendingTarget(uid: string | "leader") {
 
         const target =
             !sel ? null :
-                (sel.uid ? sel : findByUid(sel, owner)); // supports either object or uid
+                (sel.uid ? sel : findByUid(sel as any, owner)); // supports either object or uid
 
         if (!target) return;                       // nothing selected
         if (sourceCard && target.uid === sourceCard.uid) return; // "not_self" safety

@@ -180,7 +180,7 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
 
     const finalize = () => {
         // One undo step for the whole choice confirmation
-        doAction(
+        (doAction as any)(
             "Confirm Choice",
             () => {
                 logEvent("chooseFinalize", { owner, picked: picked.length });

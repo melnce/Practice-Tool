@@ -53,7 +53,7 @@ export function handleRestoreFullDefenseSelf(sourceCard: CardInstance, context: 
                     Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense :
                         curr;
 
-        const restored = Math.max(0, full - curr);
+        const restored = Math.max(0, (full as number) - curr);
         // @ts-ignore
         sourceCard.defense = full;
 
@@ -79,7 +79,7 @@ export function handleRestoreSelfAndHealLeader(owner: Player, sourceCard: CardIn
                 Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense :
                     curr;
 
-    const restored = Math.max(0, full - curr);
+    const restored = Math.max(0, (full as number) - curr);
     if (restored > 0) {
         // @ts-ignore
         sourceCard.defense = full;

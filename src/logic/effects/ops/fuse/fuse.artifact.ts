@@ -126,7 +126,7 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
 }
 
 // ---------- finalizers (export with op-string names) ----------
-export function fuse_finalize_gear_multi(owner: Player, initiatorUid: number, partners: CardInstance[], resultName: string) {
+export function fuse_finalize_gear_multi(owner: Player, initiatorUid: string, partners: CardInstance[], resultName: string) {
     const hand = handOf(owner);
     const iIdx = hand.findIndex(c => c?.uid === initiatorUid);
     if (iIdx === -1) { clearSelectableFlags(); render(); return; }
@@ -173,7 +173,7 @@ export function fuse_finalize_gear_multi(owner: Player, initiatorUid: number, pa
     clearSelectableFlags(); render();
 }
 
-export function fuse_finalize_fortifier(owner: Player, initiatorUid: number, partners: CardInstance[]) {
+export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, partners: CardInstance[]) {
     const hand = handOf(owner);
     const iIdx = hand.findIndex(c => c?.uid === initiatorUid);
     if (iIdx === -1) { clearSelectableFlags(); render(); return; }
@@ -223,7 +223,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: number, par
     clearSelectableFlags(); render();
 }
 
-export function fuse_finalize_alpha(owner: Player, initiatorUid: number, partners: CardInstance[]) {
+export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partners: CardInstance[]) {
     const hand = handOf(owner);
     let iIdx = hand.findIndex(c => c?.uid === initiatorUid);
     if (iIdx === -1) { clearSelectableFlags(); render(); return; }
@@ -239,7 +239,7 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: number, partner
     const hasBeta = names.includes("Ominous Artifact β");
     const hasGamma = names.includes("Ominous Artifact γ");
 
-    const idxOf = (uid: number) => hand.findIndex(c => c?.uid === uid);
+    const idxOf = (uid: string) => hand.findIndex(c => c?.uid === uid);
 
     if (hasBeta && hasGamma) {
         const tmpl = getCardDetails("Masterwork Artifact Ω");

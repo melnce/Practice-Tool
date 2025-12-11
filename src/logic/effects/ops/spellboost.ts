@@ -61,9 +61,9 @@ function transformSelfInHand(owner: Player, c: CardInstance, targetName: string)
 function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
     const kws = Array.isArray(c.keywords) ? c.keywords : [];
     for (const kw of kws) {
-        if (kw?.name !== "Spellboost" || !Array.isArray(kw.effects)) continue;
+        if ((kw as any)?.name !== "Spellboost" || !Array.isArray((kw as any).effects)) continue;
 
-        for (const effect of kw.effects) {
+        for (const effect of (kw as any).effects) {
             // --- Custom: Homework Time! -> transform into Looking Smart! at threshold ---
             if (effect.op === "transform_self_if_spellboost_at_least") {
                 const need = Number(effect.threshold ?? 0);
@@ -190,7 +190,7 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
                     const next = prev + reduceBy;
                     c.spellboostCostCount = next;
 
-                    const newCost = Math.max(minCost, c.base_cost - next);
+                    const newCost = Math.max(minCost, (c.base_cost as number) - next);
                     // @ts-ignore
                     if (Number.isFinite(newCost)) c.cost = newCost;
                 }

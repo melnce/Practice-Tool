@@ -42,11 +42,11 @@ function makeChainClone(prev: CardInstance, owner: Player): CardInstance {
     const buffD = parseInt(String(prev.buffs?.defense)) || 0;
 
     // EXACT copy but with -1 to the MAX HP (base_defense)
-    const newBaseD = Math.max(0, prevBaseD - 1);
+    const newBaseD = Math.max(0, (prevBaseD as number) - 1);
 
     // Attack copies exactly (base + buffs)
-    clone.base_attack = prevBaseA;
-    clone.attack = prevBaseA + buffA;
+    clone.base_attack = (prevBaseA as number);
+    clone.attack = (prevBaseA as number) + buffA;
 
     // Defense copies with reduced MAX: base_defense -1, keep buffs
     clone.base_defense = newBaseD;
@@ -54,9 +54,9 @@ function makeChainClone(prev: CardInstance, owner: Player): CardInstance {
 
     // Keep potentials aligned so DEF is white (not damaged)
     // @ts-ignore
-    clone.potential_attack = clone.base_attack + buffA;
+    clone.potential_attack = (clone.base_attack as number) + buffA;
     // @ts-ignore
-    clone.potential_defense = clone.base_defense + buffD;
+    clone.potential_defense = (clone.base_defense as number) + buffD;
 
     // Peak is this instance's full current DEF
     clone.peak_defense = clone.defense;

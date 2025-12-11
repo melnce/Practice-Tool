@@ -17,7 +17,7 @@ function alreadyFusedThisTurn(card: CardInstance) {
 }
 
 // Returning Slash, etc.
-export function fuse_finalize_loot(owner: Player, initiator_uid: number, partners: CardInstance[]) {
+export function fuse_finalize_loot(owner: Player, initiator_uid: string, partners: CardInstance[]) {
     const hand = handOf(owner);
     const grave = graveOf(owner);
 
