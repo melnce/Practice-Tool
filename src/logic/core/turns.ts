@@ -39,8 +39,10 @@ function refreshBoardForNewTurn(board: CardInstance[]) {
         (card as any).attacks_per_turn = perTurn;
         (card as any).attacks_left = perTurn;
 
-        // Respect summoning sickness unless Rush/Storm
-        (card as any).can_attack = (!card.justPlayed) || card.hasRush || card.hasStorm;
+        // Respect summoning sickness unless Rush/Storm, but never allow attacking while locked
+        const isLocked = (card as any).cantAttack || (card as any).cantAttackFollowers || (card as any).cantAttackLeaders;
+        const canSwing = (!card.justPlayed) || card.hasRush || card.hasStorm;
+        (card as any).can_attack = canSwing && !isLocked;
 
         // Legacy/UI flag
         card.hasAttacked = false;
