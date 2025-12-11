@@ -2,7 +2,7 @@
 import { getPool, highlightSelectable } from "@logic/core/targeting.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 import { state } from "@core/gameState.js";
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 // @ts-ignore
 import { render } from "@ui/render.js";
 import { randInt } from "@core/rng.js";

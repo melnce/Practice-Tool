@@ -1,5 +1,5 @@
 // src/logic/evolveUtils.ts
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 // @ts-ignore
 import { handleEvolveSelf } from "@logic/effects/ops/evolve.js";
 // @ts-ignore

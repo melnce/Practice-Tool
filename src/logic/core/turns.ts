@@ -7,7 +7,7 @@ import { fireTrigger } from "@logic/core/triggers.js";
 import { cleanupDead } from "@logic/core/cleanup.js";
 // @ts-ignore
 import { clearTemporaryBuffs } from "@logic/effects/self.js";
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 // @ts-ignore
 import { tickCrests, processCrestEvent, resetCrestOncePerTurn } from "@logic/effects/crest.js";
 import { clearExpiredCantAttackAtEOT } from "@logic/core/keywords.js";

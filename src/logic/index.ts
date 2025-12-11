@@ -8,7 +8,8 @@ export { grantBarrier, dealDamage } from "@logic/core/barrier.js";
 // @ts-ignore
 export { startGame } from "@logic/startGame.js";
 export { onEvolve } from "@logic/evolveUtils.js";
-export { onFanfare, runEffects } from "@logic/core/effects.js";
+import { onFanfare, runEffects } from "@logic/core/effects/index.js";
+export { onFanfare, runEffects };
 // @ts-ignore
 export { engageAmulet } from "@logic/effects/ops/engage.js";
 export { resolvePendingTarget } from "@logic/core/resolveTarget.js";
@@ -17,7 +18,7 @@ export { summonNamed } from "@logic/effects/ops/summon.js";
 export { getCardDetails } from "@data/cardDatabase.js";
 
 // Expose to window
-import { runEffects } from "@logic/core/effects.js";
+
 // @ts-ignore
 import { startGame as _startGame } from "@logic/startGame.js";
 import { endTurnBlue as _endTurnBlue, endTurnRed as _endTurnRed } from "@logic/core/turns.js";

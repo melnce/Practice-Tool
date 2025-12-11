@@ -6,7 +6,7 @@ import { render } from "@ui/render.js";
 import { loadCardDatabase } from "@data/cardDatabase.js";
 import { drawCard } from "@core/utils.js";
 import { beginMulligan } from "@logic/mulligan.js";
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 import { setSeed, getSeed } from "@core/rng.js";
 import { logEvent } from "@core/logger.js";
 import { CardInstance, Player } from "@core/types.js";

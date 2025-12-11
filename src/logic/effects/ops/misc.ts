@@ -7,6 +7,7 @@ import { handleDamageAll, handleDamageRandom } from "@logic/effects/ops/damage.j
 import { destroyAlliedAmulets } from "@logic/effects/ops/destroy.js";
 import { applyLeaderDamage, handleHealLeader } from "@logic/effects/leader.js";
 import { Player, CardInstance, Effect } from "@core/types.js";
+import { addMaxPP } from "@logic/pp.js";
 
 // destroy_allied_amulets_then_damage
 export function handleDestroyAlliedAmuletsThenDamage(owner: Player) {
@@ -34,7 +35,6 @@ export function handleDestroyRandomOtherAllies(owner: Player, sourceCard: CardIn
             { op: "destroy_random", target: "enemy:follower", count: 1 } as any,
             owner
             // Note: original code called handleDestroyRandom but op was "destroy_random".
-            // effects.js line 231 passed { op: "destroy_random" ... } as eff.
         );
     }
 }
@@ -86,4 +86,32 @@ export function handleRestoreSelfAndHealLeader(owner: Player, sourceCard: CardIn
         handleHealLeader(owner, { amount: restored } as any);
     }
     render();
+}
+
+// --- Logic Moved from effects.ts ---
+
+export function handleChooseBonusAdd(owner: Player, eff: Effect) {
+    const amt = (eff.amount || 1) as number;
+    if (owner === "blue") state.blueChooseBonus = (state.blueChooseBonus || 0) + amt;
+    else state.redChooseBonus = (state.redChooseBonus || 0) + amt;
+}
+
+export function handleGainMaxPP(owner: Player, eff: Effect) {
+    const amt = (eff.amount || 1) as number;
+    addMaxPP(owner, amt, { cap: 10, recalcNow: true });
+}
+
+export function handleSetCostLastDrawn(eff: Effect) {
+    // @ts-ignore
+    const v = parseInt(eff.amount);
+    if (!Number.isFinite(v)) return;
+    const arr = state.lastDrawnCards || [];
+    const target = arr[0]; // most recently drawn
+    if (target) {
+        if (target.base_cost === undefined) {
+            // @ts-ignore
+            target.base_cost = parseInt(String(target.cost)) || 0;
+        }
+        target.cost = Math.max(0, v);
+    }
 }

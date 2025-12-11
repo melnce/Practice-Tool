@@ -102,3 +102,60 @@ export function noAllyAttackedThisTurn(owner: Player) {
         return used || legacy || spent;
     });
 }
+
+// --- Logic Moved from effects.ts ---
+
+export function handleBoardNameGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {
+    const want = String(eff.name || (eff as any).card_name || "").trim();
+    if (!want) return;
+    const myBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+    const found = (myBoard || []).some(c => String(c?.name) === want);
+    if (found) {
+        if (Array.isArray(eff.effects)) effectsQueue.unshift(...eff.effects!);
+    } else if (Array.isArray(eff.else_effects)) {
+        effectsQueue.unshift(...eff.else_effects);
+    }
+}
+
+export function handleBothMaxPPGate(eff: Effect, effectsQueue: Effect[]) {
+    // @ts-ignore
+    const need = Number.isFinite(eff.at_least) ? eff.at_least : 10;
+    const ok = (state.blueMaxPP >= need) && (state.redMaxPP >= need);
+    const next = ok ? (eff.effects || []) : (eff.else_effects || []);
+    if (next.length) effectsQueue.unshift(...next);
+}
+
+export function handleRallyGate(owner: Player, eff: any, effectsQueue: Effect[]) {
+    const need = parseInt(eff.count ?? 0);
+    const ownerRally = owner === "blue" ? state.blueRally : state.redRally;
+    if (ownerRally >= need) {
+        effectsQueue.unshift(...(eff.effects || []));
+    } else if (eff.else_effects) {
+        effectsQueue.unshift(...eff.else_effects);
+    }
+}
+
+function getEffectiveCost(card: CardInstance) {
+    // @ts-ignore
+    if (Number.isFinite(card.effectiveCost)) return card.effectiveCost;
+    const base = parseInt(card?.cost as string, 10) || 0;
+    const mod = parseInt((card as any)?.cost_mod, 10) || 0;
+    return base + mod;
+}
+
+export function handleSelfCostGate(sourceCard: CardInstance, eff: any, effectsQueue: Effect[]) {
+    if (!sourceCard) return;
+    const effCost = getEffectiveCost(sourceCard);
+    const targetCost = parseInt(eff.cost);
+    const pass = effCost === targetCost;
+    const next = pass ? (eff.effects || []) : (eff.else_effects || []);
+    if (next.length) effectsQueue.unshift(...next);
+}
+
+export function handleSuperEvolvedAlliedGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {
+    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    // @ts-ignore
+    const hasSuper = board.some(c => c.type === "Follower" && c.evoType === "super");
+    const next = (hasSuper ? eff.effects : eff.else_effects) || [];
+    if (next.length) effectsQueue.unshift(...next);
+}

@@ -3,7 +3,7 @@ import { state } from "@core/gameState.js";
 // @ts-ignore
 import { render } from "@ui/render.js";
 import { applyKeywordsFromList } from "@logic/core/keywords.js";
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 // @ts-ignore
 import { spellboostHand } from "@logic/effects/ops/spellboost.js";
 import { getPool } from "@logic/core/targeting.js";

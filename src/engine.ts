@@ -17,7 +17,7 @@ export { endTurnBlue, endTurnRed } from "./logic/core/turns.js";
 export { playCard } from "./logic/core/playCard.js";
 
 // Effects System
-export { runEffects } from "./logic/core/effects.js";
+export { runEffects } from "./logic/core/effects/index.js";
 
 // Types
 export * from "./core/types.js";

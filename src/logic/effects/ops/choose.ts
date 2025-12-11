@@ -10,7 +10,7 @@ import { hasEarthSigils, consumeEarthSigils } from "@logic/effects/cards/runecra
 import { spellboostHand } from "@logic/effects/ops/spellboost.js";
 import { handleDrawFiltered } from "@logic/effects/ops/draw.js";
 import { handleReanimate } from "@logic/effects/ops/reanimate.js";
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 import { fireTrigger } from "@logic/core/triggers.js";
 import { logEvent } from "@core/logger.js";
 import { doAction, appendStep } from "@core/history.js";

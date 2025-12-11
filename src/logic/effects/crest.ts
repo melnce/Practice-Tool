@@ -2,7 +2,7 @@
 import { state } from "@core/gameState.js";
 // @ts-ignore
 import { render } from "@ui/render.js";
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 import { logEvent } from "@core/logger.js";
 import { Effect, Player } from "@core/types.js";
 

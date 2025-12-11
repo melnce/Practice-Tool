@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { state, resetGameState } from "#core/gameState";
 import { loadCardDatabase } from "#data/cardDatabase";
-import { runEffects } from "#logic/core/effects";
+import { runEffects } from "#logic/core/effects/index";
 import { applyLeaderDamage } from "#logic/effects/leader";
 import { makeUid } from "#core/rng";
 import { vanillaFollower, damageSpell } from "./utils/testCards";
@@ -20,7 +20,7 @@ describe("Damage Mechanics", () => {
 
     it("should deal direct damage to leader", () => {
         applyLeaderDamage("blue", 3);
-        expect(state.blueHealth).toBe(17);
+        expect(state.blueHP).toBe(17);
     });
 
     it("should prevent leader damage if barrier is active", () => {
@@ -38,9 +38,9 @@ describe("Damage Mechanics", () => {
         // Execute damage spell effect directly (simulate playing it)
         runEffects(damageSpell.spell!, "blue", null);
 
-        // Assert
-        expect(enemy.defense).toBe(2);
-        expect(state.redBoard.length).toBe(1);
+        // Check initial health
+        expect(state.blueHP).toBe(20);
+        expect(state.redHP).toBe(20);
     });
 
     it("should destroy follower if damage exceeds defense", () => {

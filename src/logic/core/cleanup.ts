@@ -2,7 +2,7 @@
 import { state } from "@core/gameState.js";
 import { render } from "@ui/render.js";
 import { handleBanish } from "@logic/effects/ops/banish.js";
-import { runEffects } from "@logic/core/effects.js";
+import { runEffects } from "@logic/core/effects/index.js";
 import { logEvent } from "@core/logger.js";
 import { fireTrigger } from "@logic/core/triggers.js";
 import { CardInstance, Player } from "@core/types.js";

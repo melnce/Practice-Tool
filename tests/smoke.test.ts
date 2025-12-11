@@ -5,7 +5,7 @@ import { state, resetGameState } from "#core/gameState";
 import { startGame } from "#logic/startGame";
 import { playCard } from "#logic/core/playCard";
 import { endTurnBlue, endTurnRed } from "#logic/core/turns";
-import { runEffects } from "#logic/core/effects";
+import { runEffects } from "#logic/core/effects/index";
 // Type-only import
 import type { CardInstance } from "#core/types";
 

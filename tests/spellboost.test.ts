@@ -1,7 +1,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { state, resetGameState } from "#core/gameState";
-import { runEffects } from "#logic/core/effects";
+import { runEffects } from "#logic/core/effects/index";
 import { makeUid } from "#core/rng";
 import { spellboostCard } from "./utils/testCards";
 
