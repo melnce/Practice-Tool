@@ -14,10 +14,12 @@ import { CardTemplate } from "@core/types.js";
 
 let fullCardData: Record<string, CardTemplate> = {};
 let tokenCardData: Record<string, CardTemplate> = {};
+let cardIdMap: Record<string, CardTemplate> = {};
 
 export async function loadCardDatabase() {
     fullCardData = {};
     tokenCardData = {};
+    cardIdMap = {};
 
     let root = (window as any).APP_ROOT || '/';
     if (root.includes(':5500') && !window.location.href.includes(':5500')) {
@@ -44,8 +46,8 @@ export async function loadCardDatabase() {
         console.warn("Vanilla lab set not found or failed to load", e);
     }
 
-    for (const card of [...fullJson, ...vanillaJson]) {
-        if (!card.name) continue;
+    const processCard = (card: any, targetMap: Record<string, CardTemplate>) => {
+        if (!card.name) return;
         if (card.type === "Follower" || card.type === "Amulet") {
             card.hasStorm = hasInherentStorm(card.description, card.keywords);
             card.hasRush = hasInherentRush(card.description, card.keywords);
@@ -70,41 +72,46 @@ export async function loadCardDatabase() {
                 }
             }
         }
-        fullCardData[card.name] = card;
+        targetMap[card.name] = card;
+
+        // Index by ID if present
+        if (card.id) {
+            cardIdMap[String(card.id)] = card;
+        }
+    };
+
+    for (const card of [...fullJson, ...vanillaJson]) {
+        processCard(card, fullCardData);
     }
 
     for (const token of tokenJson) {
-        if (!token.name) continue;
-        if (token.type === "Follower" || token.type === "Amulet") {
-            token.hasStorm = hasInherentStorm(token.description, token.keywords);
-            token.hasRush = hasInherentRush(token.description, token.keywords);
-            token.hasWard = hasInherentWard(token.description, token.keywords);
-            token.hasIntimidate = hasInherentIntimidate(token.description, token.keywords);
-            token.hasBarrier = hasInherentBarrier(token.description, token.keywords);
-            token.barrierCharges = token.hasBarrier ? 1 : 0;
-            token.hasBane = hasInherentBane(token.description, token.keywords);
-            token.hasBanishOnDeath = hasInherentBanishOnDeath(token.keywords);
-            token.hasLastWords = hasInherentLastWords(token.keywords);
-            token.hasCountdown = hasInherentCountdown(token.keywords);
-
-            if (token.hasCountdown) {
-                const countdownKeyword = Array.isArray(token.keywords) ? token.keywords.find((k: any) => typeof k === 'object' && k.name === "Countdown") : null;
-                if (countdownKeyword) {
-                    token.countdown = parseInt(countdownKeyword.turns) || 0;
-                }
-            }
-        }
-        tokenCardData[token.name] = token;
+        processCard(token, tokenCardData);
     }
 }
 
-export function getCardDetails(name: string): CardTemplate | null {
-    return fullCardData[name] || tokenCardData[name] || null;
+// Now supports lookup by Name OR ID
+export function getCardDetails(nameOrId: string): CardTemplate | null {
+    if (!nameOrId) return null;
+
+    // 1. Exact ID match (8+ digits)
+    if (/^\d{8,}$/.test(nameOrId)) {
+        const byId = cardIdMap[nameOrId];
+        if (byId) return byId;
+    }
+
+    // 2. Name match
+    return fullCardData[nameOrId] || tokenCardData[nameOrId] || null;
+}
+
+export function getCardById(id: string): CardTemplate | null {
+    return cardIdMap[String(id)] || null;
 }
 
 (window as any).cardDatabase = {
     getCardDetails,
+    getCardById,
     fullData: fullCardData,
     tokenData: tokenCardData,
+    idMap: cardIdMap,
     reload: loadCardDatabase
 };

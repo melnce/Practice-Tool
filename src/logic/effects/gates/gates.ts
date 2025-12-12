@@ -125,6 +125,15 @@ export function handleBothMaxPPGate(eff: Effect, effectsQueue: Effect[]) {
     if (next.length) effectsQueue.unshift(...next);
 }
 
+export function handleMaxPPGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {
+    // @ts-ignore
+    const need = Number.isFinite(eff.at_least) ? eff.at_least : 10;
+    const currentMax = owner === "blue" ? state.blueMaxPP : state.redMaxPP;
+    const ok = currentMax >= need;
+    const next = ok ? (eff.effects || []) : (eff.else_effects || []);
+    if (next.length) effectsQueue.unshift(...next);
+}
+
 export function handleRallyGate(owner: Player, eff: any, effectsQueue: Effect[]) {
     const need = parseInt(eff.count ?? 0);
     const ownerRally = owner === "blue" ? state.blueRally : state.redRally;

@@ -1,5 +1,6 @@
 [
   {
+    "id": "90001110",
     "name": "Goblin",
     "cost": "1",
     "attack": "1",
@@ -17,6 +18,7 @@
     "triggers": []
   },
   {
+    "id": "90004110",
     "name": "Silent Rider",
     "cost": "6",
     "attack": "10",
@@ -35,6 +37,7 @@
     ]
   },
   {
+    "id": "90004120",
     "name": "Servant of Cocytus",
     "cost": "1",
     "attack": "13",
@@ -51,6 +54,7 @@
     "keywords": []
   },
   {
+    "id": "90004130",
     "name": "Demon of Purgatory",
     "cost": "5",
     "attack": "9",
@@ -80,6 +84,7 @@
     "keywords": []
   },
   {
+    "id": "90004310",
     "name": "Astaroth's Reckoning",
     "cost": "10",
     "attack": "0",
@@ -103,6 +108,7 @@
     ]
   },
   {
+    "id": "90011110",
     "name": "Fairy",
     "cost": "1",
     "attack": "1",
@@ -123,6 +129,7 @@
     ]
   },
   {
+    "id": "90011310",
     "name": "Deepwood Bounty",
     "cost": "0",
     "attack": "0",
@@ -145,6 +152,7 @@
     ]
   },
   {
+    "id": "90014310",
     "name": "Bramble Burst",
     "cost": "1",
     "attack": "0",
@@ -169,6 +177,7 @@
     ]
   },
   {
+    "id": "90021110",
     "name": "Knight",
     "cost": "0",
     "attack": "1",
@@ -187,6 +196,7 @@
     "keywords": []
   },
   {
+    "id": "90021120",
     "name": "Steelclad Knight",
     "cost": "1",
     "attack": "2",
@@ -205,6 +215,7 @@
     "keywords": []
   },
   {
+    "id": "90023110",
     "name": "Nonja, Silent Maid",
     "cost": "2",
     "attack": "2",
@@ -242,6 +253,7 @@
     ]
   },
   {
+    "id": "90031110",
     "name": "Clay Golem",
     "cost": "1",
     "attack": "2",
@@ -260,6 +272,7 @@
     "keywords": []
   },
   {
+    "id": "90031120",
     "name": "Guardian Golem",
     "cost": "3",
     "attack": "3",
@@ -280,6 +293,7 @@
     ]
   },
   {
+    "id": "90031130",
     "name": "Paper Shikigami",
     "cost": "2",
     "attack": "2",
@@ -309,6 +323,7 @@
     ]
   },
   {
+    "id": "90031140",
     "name": "Demonic Shikigami",
     "cost": "3",
     "attack": "3",
@@ -338,6 +353,7 @@
     ]
   },
   {
+    "id": "90031210",
     "name": "Magic Sediment",
     "cost": "1",
     "attack": "0",
@@ -375,6 +391,7 @@
     ]
   },
   {
+    "id": "90032110",
     "name": "Onion Patch",
     "cost": "1",
     "attack": "1",
@@ -405,6 +422,7 @@
     ]
   },
   {
+    "id": "90033310",
     "name": "Looking Smart!",
     "cost": "1",
     "attack": "0",
@@ -433,6 +451,7 @@
     ]
   },
   {
+    "id": "90034110",
     "name": "Celestial Shikigami",
     "cost": "4",
     "attack": "4",
@@ -462,6 +481,7 @@
     ]
   },
   {
+    "id": "90034120",
     "name": "Noble Shikigami",
     "cost": "10",
     "attack": "1",
@@ -483,6 +503,7 @@
     ]
   },
   {
+    "id": "90034130",
     "name": "Anne's Summoning",
     "cost": "3",
     "attack": "5",
@@ -518,6 +539,7 @@
     ]
   },
   {
+    "id": "90041110",
     "name": "Fire Drake Whelp",
     "cost": "1",
     "attack": "1",
@@ -536,6 +558,7 @@
     ]
   },
   {
+    "id": "90041120",
     "name": "Vastwing Dragon",
     "cost": "5",
     "attack": "5",
@@ -554,6 +577,7 @@
     ]
   },
   {
+    "id": "90041130",
     "name": "Majestic Megalorca",
     "cost": "2",
     "attack": "2",
@@ -574,6 +598,7 @@
     ]
   },
   {
+    "id": "90043110",
     "name": "Otohime's Bodyguard",
     "cost": "3",
     "attack": "2",
@@ -595,6 +620,7 @@
     ]
   },
   {
+    "id": "90044110",
     "name": "Supreme Golden Dragon",
     "cost": "4",
     "attack": "4",
@@ -613,6 +639,7 @@
     ]
   },
   {
+    "id": "90044120",
     "name": "Supreme Silver Dragon",
     "cost": "4",
     "attack": "5",
@@ -631,6 +658,7 @@
     ]
   },
   {
+    "id": "90044310",
     "name": "Whitefrost Whisper",
     "cost": "3",
     "attack": "0",
@@ -675,6 +703,7 @@
     ]
   },
   {
+    "id": "90051110",
     "name": "Skeleton",
     "cost": "0",
     "attack": "1",
@@ -693,6 +722,7 @@
     "keywords": []
   },
   {
+    "id": "90051120",
     "name": "Bat",
     "cost": "1",
     "attack": "1",
@@ -711,6 +741,7 @@
     ]
   },
   {
+    "id": "90051130",
     "name": "Ghost",
     "cost": "1",
     "attack": "1",
@@ -746,6 +777,7 @@
     ]
   },
   {
+    "id": "90051140",
     "name": "Rotting Zombie",
     "cost": "3",
     "attack": "2",
@@ -780,6 +812,7 @@
     ]
   },
   {
+    "id": "90054110",
     "name": "Mimi, Right Paw Hellhound",
     "cost": "1",
     "attack": "2",
@@ -808,6 +841,7 @@
     ]
   },
   {
+    "id": "90054120",
     "name": "Coco, Left Paw Hellhound",
     "cost": "1",
     "attack": "1",
@@ -836,6 +870,7 @@
     ]
   },
   {
+    "id": "90054130",
     "name": "One-Tailed Fox",
     "cost": "2",
     "attack": "2",
@@ -869,6 +904,7 @@
     ]
   },
   {
+    "id": "90061110",
     "name": "Holy Falcon",
     "cost": "3",
     "attack": "2",
@@ -887,6 +923,7 @@
     ]
   },
   {
+    "id": "90061120",
     "name": "Holyflame Tiger",
     "cost": "4",
     "attack": "4",
@@ -905,6 +942,7 @@
     ]
   },
   {
+    "id": "90061130",
     "name": "Regal Falcon",
     "cost": "6",
     "attack": "4",
@@ -923,6 +961,7 @@
     ]
   },
   {
+    "id": "90064110",
     "name": "Holy Cavalier",
     "cost": "1",
     "attack": "1",
@@ -941,6 +980,7 @@
     ]
   },
   {
+    "id": "90071110",
     "name": "Puppet",
     "cost": "0",
     "attack": "1",
@@ -975,6 +1015,7 @@
     ]
   },
   {
+    "id": "90071120",
     "name": "Enhanced Puppet",
     "cost": "1",
     "attack": "3",
@@ -1009,6 +1050,7 @@
     ]
   },
   {
+    "id": "90071210",
     "name": "Gear of Ambition",
     "cost": "1",
     "attack": "0",
@@ -1047,6 +1089,7 @@
     ]
   },
   {
+    "id": "90071220",
     "name": "Gear of Remembrance",
     "cost": "1",
     "attack": "0",
@@ -1085,6 +1128,7 @@
     ]
   },
   {
+    "id": "90072110",
     "name": "Striker Artifact",
     "cost": "3",
     "attack": "5",
@@ -1111,6 +1155,7 @@
     ]
   },
   {
+    "id": "90072120",
     "name": "Fortifier Artifact",
     "cost": "3",
     "attack": "1",
@@ -1137,6 +1182,7 @@
     ]
   },
   {
+    "id": "90072130",
     "name": "Doll Slayer",
     "cost": "1",
     "attack": "1",
@@ -1166,6 +1212,7 @@
     ]
   },
   {
+    "id": "90073110",
     "name": "Ominous Artifact α",
     "cost": "5",
     "attack": "3",
@@ -1249,6 +1296,7 @@
     ]
   },
   {
+    "id": "90073120",
     "name": "Ominous Artifact β",
     "cost": "5",
     "attack": "4",
@@ -1283,6 +1331,7 @@
     ]
   },
   {
+    "id": "90073130",
     "name": "Ominous Artifact γ",
     "cost": "5",
     "attack": "5",
@@ -1317,6 +1366,7 @@
     ]
   },
   {
+    "id": "90074110",
     "name": "Masterwork Artifact Ω",
     "cost": "10",
     "attack": "10",
@@ -1352,6 +1402,7 @@
     "triggers": []
   },
   {
+    "id": "90074120",
     "name": "Lloyd",
     "cost": "3",
     "attack": "1",
@@ -1373,6 +1424,7 @@
     "triggers": []
   },
   {
+    "id": "90074130",
     "name": "Victoria",
     "cost": "3",
     "attack": "6",
@@ -1406,6 +1458,7 @@
     ]
   },
   {
+    "id": "90004320",
     "name": "Great Testimony",
     "cost": "1",
     "attack": "0",
@@ -1432,6 +1485,7 @@
     "triggers": []
   },
   {
+    "id": "90004330",
     "name": "Sweetness of Voracity",
     "cost": "5",
     "attack": "0",
@@ -1463,6 +1517,7 @@
     "triggers": []
   },
   {
+    "id": "90014320",
     "name": "Annihilating Onslaught",
     "cost": "6",
     "attack": "0",
@@ -1516,6 +1571,7 @@
     ]
   },
   {
+    "id": "90021310",
     "name": "Gilded Blade",
     "cost": "1",
     "attack": "0",
@@ -1546,6 +1602,7 @@
     "triggers": []
   },
   {
+    "id": "90021320",
     "name": "Gilded Goblet",
     "cost": "1",
     "attack": "0",
@@ -1574,6 +1631,7 @@
     "triggers": []
   },
   {
+    "id": "90021330",
     "name": "Gilded Boots",
     "cost": "1",
     "attack": "0",
@@ -1618,6 +1676,7 @@
     "triggers": []
   },
   {
+    "id": "90021340",
     "name": "Gilded Necklace",
     "cost": "1",
     "attack": "0",
@@ -1662,6 +1721,7 @@
     "triggers": []
   },
   {
+    "id": "90024310",
     "name": "Remnant of Hollowness",
     "cost": "1",
     "attack": "0",
@@ -1687,6 +1747,7 @@
     "triggers": []
   },
   {
+    "id": "90034310",
     "name": "Ersatz Elimination",
     "cost": "4",
     "attack": "0",
@@ -1720,6 +1781,7 @@
     "triggers": []
   },
   {
+    "id": "90044320",
     "name": "Fangs of Ardent Destruction",
     "cost": "0",
     "attack": "0",
@@ -1746,6 +1808,7 @@
     "triggers": []
   },
   {
+    "id": "90054310",
     "name": "Scream Diffusion",
     "cost": "0",
     "attack": "0",
@@ -1773,6 +1836,7 @@
     "triggers": []
   },
   {
+    "id": "90054320",
     "name": "Wings of Desire",
     "cost": "0",
     "attack": "0",
@@ -1805,6 +1869,7 @@
     "triggers": []
   },
   {
+    "id": "90064310",
     "name": "Torrent of Despair",
     "cost": "2",
     "attack": "0",
@@ -1835,6 +1900,7 @@
     "triggers": []
   },
   {
+    "id": "90074210",
     "name": "White Psalm, New Revelation",
     "cost": "3",
     "attack": "0",
@@ -1873,6 +1939,7 @@
     "triggers": []
   },
   {
+    "id": "90074220",
     "name": "Black Psalm, New Revelation",
     "cost": "3",
     "attack": "0",
@@ -1912,6 +1979,7 @@
     "triggers": []
   },
   {
+    "id": "90074310",
     "name": "Melodious Monody",
     "cost": "1",
     "attack": "0",

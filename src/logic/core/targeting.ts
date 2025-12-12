@@ -136,6 +136,18 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
         });
     }
 
+    // Exclude keyword filter
+    if (condition.exclude_keyword) {
+        const keywordName = String(condition.exclude_keyword).toLowerCase();
+        pool = pool.filter(c => {
+            if (!Array.isArray(c?.keywords)) return true; // Keep if no keywords
+            return !c.keywords!.some((k: any) => {
+                const kwName = typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
+                return kwName === keywordName;
+            });
+        });
+    }
+
     if (condition.is_super_evolved) {
         pool = pool.filter(c => c && c.type === "Follower" && c.evoType === "super");
     }
@@ -204,7 +216,9 @@ export function clearSelectableFlags() {
 
 export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: Effect[], context: TargetContext = {}) {
     // requested number of picks from JSON
-    const requestedCount = parseInt((eff.select ?? eff.select_count ?? 1));
+    const raw = eff.select ?? eff.select_count ?? 1;
+    let requestedCount = parseInt(String(raw), 10);
+    if (!Number.isFinite(requestedCount) || requestedCount < 1) requestedCount = 1;
 
     // mark this as a targeted effect for Ambush/Aura filtering
     const targetedCtx = { ...context, isTargetedEffect: true, selectCount: requestedCount };
@@ -240,10 +254,15 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
     // after all filters, cap the select count to available targets
     const effectiveCount = Math.max(1, Math.min(requestedCount, pool.length));
 
-    // === BOT AUTO-TARGETING ===
-    // If SpectatorBot is active, pick targets at random and immediately resolve
-    // instead of opening the UI/pending state.
-    if (typeof window !== "undefined" && (window as any).__BOT_AUTO_TARGETING__ === true) {
+    // === AUTOMATIC SELECTION (Bot OR Mode=Random) ===
+    // If SpectatorBot is active OR the effect explicitly requests 'random' mode,
+    // pick targets at random and immediately resolve.
+    const isRandomMode = eff.mode === "random";
+    const isBot = (typeof window !== "undefined" && (window as any).__BOT_AUTO_TARGETING__ === true);
+
+    if (isBot || isRandomMode) {
+        console.log(`[Targeting] Auto-Select (Bot=${isBot}, RandomMode=${isRandomMode}) Pool Size: ${pool.length}`);
+
         // Honor any “must include these first” constraint from the Lloyd gate
         const picks: CardInstance[] = [];
         const mustFirst = targetedCtx.__lloydRequiredFirstUids || [];
@@ -269,10 +288,31 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
         if (Array.isArray(eff.effects) && eff.effects!.length) {
             runEffects([...eff.effects!], owner, sourceCard, selectedCtx);
         }
-        // Then continue with the rest of the queued effects (if any)
-        if (Array.isArray(effectsQueue) && effectsQueue.length) {
-            runEffects([...effectsQueue], owner, sourceCard, selectedCtx);
-        }
+        // Only trigger 'done' if we fully handled it (which we did).
+        // Does 'select' usually consume queue? No, queue is passed in context or separate.
+        // runEffects call handles nested. The queue passed to handleSelect is usually main queue.
+        // We do NOT process the main queue here recursively unless necessary.
+        // Standard handleSelect returns 'done' or 'pending'.
+        // If 'done', the caller (runEffects loop) continues nicely.
+        // BUT wait: standard handleSelect logic runs 'resumeEffects' (the rest of the queue) inside itself when UI interaction happens.
+        // If we return 'done', the loop in runEffects continues to the next item?
+        // YES.
+        // But what about using the selected targets for subsequent effects in the SAME queue via context?
+        // The user might use "selected" as target in next op.
+        // So we must update the context passed to runEffects *caller*?
+        // runEffects context is local to the function call.
+        // We cannot easily update the caller's context variable.
+        // However, usually 'select' is used with 'nested_effects' structure (eff.effects).
+        // If subsequent effects in the MAIN queue depend on this selection, they need context.
+        // Solution: We updated `selectedCtx`.
+        // If the main queue processing continues, it uses the OLD context.
+        // This suggests `handleSelect` should probably execute the rest of the queue itself if it modifies context?
+        // Or we rely on `state.__lastSelected` or similar global?
+        // `resolveTarget.ts` sets `state.__lastSelected`.
+        // Let's set it here too for parity.
+        state.__lastSelected = picks[0] || null;
+
+        // If 'select' is just a wrapper for nested effects, returning 'done' is fine.
         return "done";
     }
 

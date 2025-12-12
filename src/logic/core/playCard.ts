@@ -1,5 +1,6 @@
 // src/logic/core/playCard.ts
 import { state } from "@core/gameState.js";
+import { recordEvent } from "@core/debugTimeline.js";
 // @ts-ignore
 import { render } from "@ui/render.js";
 import { applyKeywordsFromList } from "@logic/core/keywords.js";
@@ -12,7 +13,7 @@ import { fireTrigger } from "@logic/core/triggers.js";
 // @ts-ignore
 import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
 // @ts-ignore
-import { handleCongregantOnEnter } from "@logic/effects/cards/forestcraft/congregant.js";
+// import { handleCongregantOnEnter } from "@logic/effects/cards/forestcraft/congregant.js";
 import { logEvent } from "@core/logger.js";
 import { doAction } from "@core/history.js";
 import { CardInstance, Player, Effect } from "@core/types.js";
@@ -20,6 +21,7 @@ import { CardInstance, Player, Effect } from "@core/types.js";
 
 function _pushPlayedHistory(owner: Player, card: CardInstance) {
     const entry = {
+        id: card?.id,
         uid: card?.uid,
         name: card?.name,
         type: card?.type,
@@ -383,8 +385,10 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
         // Spells never enter board — go straight to grave and resolve once
         toGrave.push(card);
         // Increment shadows for the owner
-        if (owner === "blue") state.blueShadows++;
-        else state.redShadows++;
+        if (owner === "blue") state.bluePlaysThisTurn++;
+        else state.redPlaysThisTurn++;
+
+        recordEvent({ type: "play_card", payload: { owner, card: card.name, uid: card.uid } });
 
         // AUTO-EVENT: any Loot spell played → fire 'loot_played'
         const isLootSpell =
@@ -461,7 +465,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
 
         applyKeywordsFromList(card); // This sets hasRush/hasStorm
         if (!(globalThis as any).HEADLESS) {
-            console.log(`%c[PlayCard] ${card.name} keywords:`, 'color: blue', {
+            console.log(`% c[PlayCard] ${card.name} keywords: `, 'color: blue', {
                 hasRush: card.hasRush,
                 hasStorm: card.hasStorm,
                 can_attack: (card as any).can_attack,
@@ -483,8 +487,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
         fireTrigger('ally_follower_enter', player as any, { enteringCard: card });
         fireTrigger('enemy_follower_enter', player as any, { enteringCard: card });
 
-        // >>> Congregant chain (special case)
-        handleCongregantOnEnter(player, card);
+
 
         if (chosenTier && Array.isArray(chosenTier.effects) && chosenTier.effects.length) {
             runEffects([...chosenTier.effects], player, card);

@@ -238,7 +238,11 @@ export function applyKeywordsFromList(card: CardInstance) {
 
 export function handleKeyword(eff: Effect, owner: Player, effectsQueue: any, context: any = {}) {
     const ctx = { ...context, isTargetedEffect: !!eff.select };
-    let targets = getPool(eff.target, owner, context.sourceCard, eff.condition, ctx);
+
+    // Support nested selection contexts (like Himeka)
+    let targets = (context.targets && context.targets.length > 0 && !eff.target)
+        ? context.targets
+        : getPool(eff.target, owner, context.sourceCard, eff.condition, ctx);
 
     // NEW: name_filter support
     if (eff.name_filter) {

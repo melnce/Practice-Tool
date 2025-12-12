@@ -360,3 +360,56 @@ export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardIn
     // No deaths to clean here (ATK only), but keep symmetry with other handlers
     return "done";
 }
+// NEW: set all matched targets' stats to fixed values
+export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any, context: any = {}) {
+    // Prefer explicitly passed selected targets (e.g. from select()) if this is a nested effect
+    let pool = (context?.targets && context.targets.length)
+        ? context.targets
+        : getPool(eff.target as any, owner, null, eff.condition, context)
+            .filter(c => c.type === "Follower");
+
+    // Re-filter just in case pool contained non-followers or mix
+    pool = pool.filter(c => c.type === "Follower");
+
+    if (!pool.length) return "done";
+
+    const setA = (eff.attack !== undefined) ? (parseInt(eff.attack as any) || 0) : null;
+    const setD = (eff.defense !== undefined) ? (parseInt(eff.defense as any) || 0) : null;
+
+    for (const target of pool) {
+        if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
+
+        if (setA !== null) {
+            // @ts-ignore
+            const currentA = parseInt(target.attack) || 0;
+            const deltaA = setA - currentA;
+            target.buffs.attack += deltaA;
+            // @ts-ignore
+            target.attack = setA;
+            // @ts-ignore
+            if (!target.potential_attack) target.potential_attack = target.base_attack || currentA;
+            target.potential_attack! += deltaA;
+        }
+
+        if (setD !== null) {
+            // @ts-ignore
+            const currentD = parseInt(target.defense) || 0;
+            const deltaD = setD - currentD;
+            target.buffs.defense += deltaD;
+            // @ts-ignore
+            target.defense = setD;
+            // @ts-ignore
+            if (!target.potential_defense) target.potential_defense = target.base_defense || currentD;
+            target.potential_defense! += deltaD;
+
+            // @ts-ignore
+            target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
+        }
+
+        logEvent("setStats", { owner, target: target.name, uid: target.uid, a: setA, d: setD });
+    }
+
+    // Cleanup dead if stats were set to 0 or less
+    cleanupDead();
+    return "done";
+}

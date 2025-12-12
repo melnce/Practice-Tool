@@ -26,7 +26,12 @@ function normalizeDeck(raw: any) {
     const expanded = [];
     for (const c of list) {
         const copies = Math.max(1, Number(c.count) || 1);
-        for (let i = 0; i < copies; i++) expanded.push({ name: c.name });
+        for (let i = 0; i < copies; i++) {
+            // Preserve Name AND ID
+            const entry: any = { name: c.name };
+            if (c.id) entry.id = c.id;
+            expanded.push(entry);
+        }
     }
 
     // Determine if this deck should be loaded in listed order (no shuffle)
@@ -51,7 +56,10 @@ function normalizeDeck(raw: any) {
 function enrichDeck(rawDeck: any) {
     const deck = normalizeDeck(rawDeck);
     return deck.map(card => {
-        const fullData = getCardDetails(card.name);
+        // Prefer ID lookup if available, otherwise name
+        const fullData = (card.id && getCardDetails(String(card.id)))
+            || getCardDetails(card.name);
+
         const enriched = fullData ? { ...fullData, ...card } : { ...card };
         enriched.uid = makeUid();
         return enriched;

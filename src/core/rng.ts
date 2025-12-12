@@ -25,16 +25,28 @@ function toSeed(v: number | string | bigint): number {
     return h >>> 0;
 }
 
+let _rng: () => number = () => Math.random(); // Default to Math.random
 let _seed: number | null = null;
-let _rng = mulberry32(Date.now() >>> 0); // default auto-seed
-let _cursor = 0; // how many rand() calls since last seed
+let _cursor = 0;
 
-/** Set the seed (number | string | bigint) */
+/** Set the seed to enable deterministic mode, or null to revert to Math.random() */
+export function setRNGSeed(seedLike: number | string | bigint | null | undefined): void {
+    if (seedLike === null || seedLike === undefined) {
+        _seed = null;
+        _rng = () => Math.random();
+        _cursor = 0;
+        logEvent("rng", { op: "seed", seed: "auto" });
+    } else {
+        _seed = toSeed(seedLike);
+        _rng = mulberry32(_seed);
+        _cursor = 0;
+        logEvent("rng", { op: "seed", seed: _seed });
+    }
+}
+
+/** Legacy alias for setRNGSeed (backwards compatibility) */
 export function setSeed(seedLike: number | string | bigint): void {
-    _seed = toSeed(seedLike);
-    _rng = mulberry32(_seed);
-    _cursor = 0;
-    logEvent("rng", { op: "seed", seed: _seed });
+    setRNGSeed(seedLike);
 }
 
 /** Get the current numeric seed (or null if auto) */

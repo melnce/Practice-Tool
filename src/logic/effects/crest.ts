@@ -149,6 +149,7 @@ export function processCrestEvent(owner: Player, event: string) {
             if (t.once_per_turn) t.usedThisTurn = true;
         }
     }
+    if (out.length) console.log(`[Crest] processCrestEvent("${event}") found ${out.length} effects.`);
     return out;
 }
 

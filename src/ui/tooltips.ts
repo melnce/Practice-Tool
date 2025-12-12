@@ -126,9 +126,23 @@ export function attachTooltip(div: HTMLElement, tooltipEl: HTMLElement, card: Ca
         }
     };
     div.onmousemove = (e: MouseEvent) => {
-        const offsetY = isBlueSide ? -tooltipEl.offsetHeight - 12 : 12;
-        tooltipEl.style.left = Math.min(e.pageX + 12, window.innerWidth - tooltipEl.offsetWidth - 12) + "px";
-        tooltipEl.style.top = Math.max(e.pageY + offsetY, 12) + "px";
+        const isBottomHalf = e.clientY > window.innerHeight / 2;
+        const left = Math.min(e.clientX + 12, window.innerWidth - tooltipEl.offsetWidth - 12);
+
+        // Smart Anchoring:
+        // If in bottom half, anchor to BOTTOM (grow upwards).
+        // If in top half, anchor to TOP (grow downwards).
+        // This removes offsetHeight dependency and guarantees "stick to edge" behavior.
+        if (isBottomHalf) {
+            const distanceFromBottom = window.innerHeight - e.clientY + 12;
+            tooltipEl.style.bottom = distanceFromBottom + "px";
+            tooltipEl.style.top = "auto";
+        } else {
+            const distanceFromTop = e.clientY + 12;
+            tooltipEl.style.top = distanceFromTop + "px";
+            tooltipEl.style.bottom = "auto";
+        }
+        tooltipEl.style.left = Math.max(0, left) + "px";
     };
     div.onmouseleave = () => {
         tooltipEl.style.display = "none";

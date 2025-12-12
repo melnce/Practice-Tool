@@ -99,6 +99,7 @@ export interface KeywordEntry {
 }
 
 export interface CardTemplate {
+    id: string; // Unique Identifier (e.g. "10001110")
     uid: string;
     name: string;
     type: "Follower" | "Amulet" | "Spell" | string;

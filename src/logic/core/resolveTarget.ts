@@ -231,7 +231,8 @@ export function resolvePendingTarget(uid: string | "leader") {
             if (poolHasOpponent) {
                 const lloydUids = new Set(lloyds.map(l => l.uid));
                 const firstPick = !pending.targets || pending.targets.length === 0 as any;
-                const singlePick = Number(pending.selectCount || 1) <= 1;
+                const safeCount = Number.isFinite(pending.selectCount) && pending.selectCount > 0 ? pending.selectCount : 1;
+                const singlePick = safeCount <= 1;
                 const clickedIsLloyd = lloydUids.has(uid);
 
                 // Rule:
@@ -292,7 +293,16 @@ export function resolvePendingTarget(uid: string | "leader") {
     }
 
     // --- Wait for More Targets if Needed OR if we require manual confirmation ---
-    if (pending.targets.length < pending.selectCount && !pending.requiresConfirmation) {
+    const requiredCount = (typeof pending.selectCount === "number" && Number.isFinite(pending.selectCount) && pending.selectCount > 0)
+        ? pending.selectCount
+        : 1;
+
+    // Debug log to trace the bug
+    if (!(globalThis as any).HEADLESS) {
+        console.log(`[Targeting] Selected: ${pending.targets.length}/${requiredCount} (raw: ${pending.selectCount})`);
+    }
+
+    if (pending.targets.length < requiredCount && !pending.requiresConfirmation) {
         render(); // Re-render to show selection and wait for the next click.
         return;
     }
