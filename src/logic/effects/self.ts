@@ -136,6 +136,14 @@ export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, own
         a += count;
     }
 
+    if (eff.attack_source === "shikigami_deaths") {
+        const pool = owner === "blue"
+            ? (state.shikigamiDeathsThisTurnBlue || [])
+            : (state.shikigamiDeathsThisTurnRed || []);
+        const sum = pool.reduce((acc: number, x: any) => acc + (Number(x.attack) || 0), 0);
+        a += sum;
+    }
+
     // Check for dynamic defense source - ADD THIS SECTION
     if (eff.defense_source === "combo") {
         const combo =
@@ -158,6 +166,14 @@ export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, own
             (c) => c.type === "Follower" && (!eff.exclude_self || c.uid !== sourceCard.uid)
         ).length;
         d += count;
+    }
+
+    if (eff.defense_source === "shikigami_deaths") {
+        const pool = owner === "blue"
+            ? (state.shikigamiDeathsThisTurnBlue || [])
+            : (state.shikigamiDeathsThisTurnRed || []);
+        const sum = pool.reduce((acc: number, x: any) => acc + (Number(x.defense) || 0), 0);
+        d += sum;
     }
 
     if (a === 0 && d === 0) return; // No buff to apply

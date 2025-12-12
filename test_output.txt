@@ -1,0 +1,145 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+[90mstderr[2m | tests/kuonEnhance.test.ts
+[22m[39mCannot set navigator
+
+[90mstdout[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould have Shikigami tokens in database
+[22m[39mCelestial tribes: [ [32m'Shikigami'[39m ]
+Demonic tribes: [ [32m'Shikigami'[39m ]
+Paper tribes: [ [32m'Shikigami'[39m ]
+
+[90mstdout[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould summon Shikigami via fanfare effect
+[22m[39mBoard after fanfare: [
+  { name: [32m'Celestial Shikigami'[39m, tribes: [ [32m'Shikigami'[39m ] },
+  { name: [32m'Demonic Shikigami'[39m, tribes: [ [32m'Shikigami'[39m ] },
+  { name: [32m'Paper Shikigami'[39m, tribes: [ [32m'Shikigami'[39m ] }
+]
+Celestial Shikigami tribes: [ [32m'Shikigami'[39m ]
+Demonic Shikigami tribes: [ [32m'Shikigami'[39m ]
+Paper Shikigami tribes: [ [32m'Shikigami'[39m ]
+
+[90mstderr[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould summon Shikigami via fanfare effect
+[22m[39mRender called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+
+[90mstdout[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould destroy Shikigami via destroy_all with tribe condition
+[22m[39mBoard before destroy: [ [32m'Celestial Shikigami'[39m, [32m'Demonic Shikigami'[39m, [32m'Paper Shikigami'[39m ]
+Board after destroy_all: []
+Shikigami deaths blue: [
+  { attack: [33m2[39m, defense: [33m1[39m },
+  { attack: [33m3[39m, defense: [33m3[39m },
+  { attack: [33m4[39m, defense: [33m5[39m }
+]
+
+[90mstderr[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould destroy Shikigami via destroy_all with tribe condition
+[22m[39mRender called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+
+[90mstdout[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould run full enhance sequence: fanfare then destroy then summon Noble
+[22m[39mAfter fanfare - board: [ [32m'Celestial Shikigami'[39m, [32m'Demonic Shikigami'[39m, [32m'Paper Shikigami'[39m ]
+After enhance - board: [ { name: [32m'Noble Shikigami'[39m, attack: [33m10[39m, defense: [33m10[39m } ]
+Shikigami deaths: [
+  { attack: [33m2[39m, defense: [33m1[39m },
+  { attack: [33m3[39m, defense: [33m3[39m },
+  { attack: [33m4[39m, defense: [33m5[39m }
+]
+Noble stats: { attack: [33m10[39m, defense: [33m10[39m }
+
+[90mstderr[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould run full enhance sequence: fanfare then destroy then summon Noble
+[22m[39mRender called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+
+[90mstdout[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould work when played via playCard (verifying execution order)
+[22m[39mPlaying Kuon with 10 PP...
+After playCard - board: [
+  {
+    name: [32m'Kuon, Fivefold Master'[39m,
+    attack: [33m3[39m,
+    defense: [33m3[39m,
+    buffs: [90mundefined[39m
+  },
+  {
+    name: [32m'Noble Shikigami'[39m,
+    attack: [33m10[39m,
+    defense: [33m10[39m,
+    buffs: { attack: [33m9[39m, defense: [33m9[39m }
+  }
+]
+Shikigami deaths: [
+  { attack: [33m2[39m, defense: [33m1[39m },
+  { attack: [33m3[39m, defense: [33m3[39m },
+  { attack: [33m4[39m, defense: [33m5[39m }
+]
+
+[90mstderr[2m | tests/kuonEnhance.test.ts[2m > [22m[2mKuon Enhance Effect[2m > [22m[2mshould work when played via playCard (verifying execution order)
+[22m[39mRender called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+Render called but not injected
+
+ [31m❯[39m tests/kuonEnhance.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 19[2mms[22m[39m
+     [32m✓[39m should have Shikigami tokens in database[32m 1[2mms[22m[39m
+     [32m✓[39m should summon Shikigami via fanfare effect[32m 4[2mms[22m[39m
+     [32m✓[39m should destroy Shikigami via destroy_all with tribe condition[32m 2[2mms[22m[39m
+     [32m✓[39m should run full enhance sequence: fanfare then destroy then summon Noble[32m 1[2mms[22m[39m
+[31m     [31m×[31m should work when played via playCard (verifying execution order)[39m[32m 5[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/kuonEnhance.test.ts[2m > [22mKuon Enhance Effect[2m > [22mshould work when played via playCard (verifying execution order)
+[31m[1mAssertionError[22m: expected 2 to be 1 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 2[39m
+
+[36m [2m❯[22m tests/kuonEnhance.test.ts:[2m165:40[22m[39m
+    [90m163| [39m
+    [90m164| [39m        [90m// Should have 1 Noble Shikigami[39m
+    [90m165| [39m        [34mexpect[39m(state[33m.[39mblueBoard[33m.[39mlength)[33m.[39m[34mtoBe[39m([34m1[39m)[33m;[39m
+    [90m   | [39m                                       [31m^[39m
+    [90m166| [39m        [34mexpect[39m(state[33m.[39mblueBoard[[34m0[39m][33m.[39mname)[33m.[39m[34mtoBe[39m([32m"Noble Shikigami"[39m)[33m;[39m
+    [90m167| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 23:14:34
+[2m   Duration [22m 452ms[2m (transform 268ms, setup 25ms, import 301ms, tests 19ms, environment 0ms)[22m
+

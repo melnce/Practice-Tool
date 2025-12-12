@@ -494,7 +494,19 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
 
 
 
+        // Fanfare FIRST (before enhance for followers, so enhance can modify what fanfare creates)
+        console.log(`%c[playCard] Check Fanfare for ${card.name}`, 'color: magenta');
+        if (Array.isArray((card as any).fanfare) && (card as any).fanfare.length) {
+            console.log(`%c[playCard] Executing Fanfare for ${card.name}`, 'color: magenta; font-weight: bold');
+            state.lastSummoned = [card];
+            runEffects([...(card as any).fanfare], player, card, { enteringCard: card });
+
+        }
+
+        // Enhance effects run AFTER fanfare (so they can modify fanfare results e.g. Kuon destroying summoned Shikigami)
+        console.log(`%c[playCard] Check Enhance for ${card.name}`, 'color: magenta');
         if (chosenTier && Array.isArray(chosenTier.effects) && chosenTier.effects.length) {
+            console.log(`%c[playCard] Executing Enhance for ${card.name}`, 'color: magenta; font-weight: bold');
             runEffects([...chosenTier.effects], player, card);
         }
 
@@ -531,14 +543,6 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
                     runEffects([...(perm as any).pixieEnterEffects], player, perm);
                 }
             }
-        }
-
-        // Fanfare (after ally-enter)
-        if (Array.isArray((card as any).fanfare) && (card as any).fanfare.length) {
-
-            state.lastSummoned = [card];
-            runEffects([...(card as any).fanfare], player, card, { enteringCard: card });
-
         }
 
         return safeRender();

@@ -300,7 +300,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
 
             case "keyword": { const merged = { ...(context || {}), sourceCard }; if (handleKeyword(eff as any, owner, queue, merged) === "pending") return; break; }
             case "keyword_self": { const target = sourceCard || (Array.isArray(state.lastSummoned) ? state.lastSummoned[0] : null); handleKeywordSelf(target!, eff); break; }
-            case "kuon_enhance": import('../../effects/cards/runecraft/kuon.js').then(({ handleKuonEnhance }) => { handleKuonEnhance(owner); }); break;
+
             case "leader_barrier": { handleLeaderBarrierOp(owner, eff); break; }
             case "modify_cost": handleModifyCost(eff, owner, sourceCard, context); break;
             case "modify_cost_pool": handleModifyCostPool(eff, owner, sourceCard); break;

@@ -4413,7 +4413,16 @@
         "cost": 10,
         "effects": [
           {
-            "op": "kuon_enhance"
+            "op": "destroy_all",
+            "target": "ally:follower",
+            "condition": {
+              "tribe": "Shikigami"
+            }
+          },
+          {
+            "op": "summon_named",
+            "name": "Noble Shikigami",
+            "count": 1
           }
         ]
       }

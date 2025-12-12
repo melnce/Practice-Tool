@@ -315,6 +315,21 @@
     <button id="endTurnRed" onclick="endTurnRed()" style="display: none;">End Turn (Red)</button>
     <button id="endTurnBlue" onclick="endTurnBlue()" style="display: none;">End Turn (Blue)</button>
     <div class="pp-floating" id="bluePPBox">PP: <span id="bluePP">1</span></div>
+
+    <!-- God Mode Controls (Hidden by default) -->
+    <div id="blueGodMode"
+      style="display: none; margin-top: 10px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 6px; border: 1px solid rgba(136, 68, 68, 0.4);">
+      <div style="font-size: 0.8rem; font-weight: bold; color: #aaa; margin-bottom: 6px; text-align: center;">GOD MODE
+      </div>
+      <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;">
+        <button id="godMinus" class="mini-btn" style="width: 30px;">-</button>
+        <button id="godPlus" class="mini-btn" style="width: 30px;">+</button>
+        <button id="godRefill" class="mini-btn" style="flex: 1;">Refill</button>
+      </div>
+      <div style="margin-top: 6px; display: flex; gap: 4px;">
+        <button id="godSetMax" class="mini-btn" style="flex: 1;">Set Max</button>
+      </div>
+    </div>
   </aside>
 
   <!-- burn preview -->

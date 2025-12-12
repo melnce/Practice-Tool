@@ -10,6 +10,7 @@ import { injectAdapter } from "../core/adapter.js";
 import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
 // @ts-ignore
 import { useRedBoost } from "../logic/boosts.js";
+import { state } from "../core/gameState.js";
 
 // Expose globals for UI onclick handlers
 (window as any).endTurnBlue = endTurnBlue;
@@ -37,6 +38,37 @@ window.addEventListener("DOMContentLoaded", () => {
         if (u) u.disabled = !canUndo;
         if (r) r.disabled = !canRedo;
     });
+
+    // God Mode Handlers
+    wireClick("godPlus", () => {
+        // @ts-ignore
+        state.bluePP = Math.min(state.blueMaxPP, state.bluePP + 1);
+        render();
+    });
+    wireClick("godMinus", () => {
+        // @ts-ignore
+        state.bluePP = Math.max(0, state.bluePP - 1);
+        render();
+    });
+    wireClick("godRefill", () => {
+        // @ts-ignore
+        state.bluePP = state.blueMaxPP;
+        render();
+    });
+    wireClick("godSetMax", () => {
+        const val = prompt("Set Max PP (and fill):", "10");
+        if (val) {
+            const n = parseInt(val, 10);
+            if (Number.isFinite(n) && n >= 0) {
+                // @ts-ignore
+                state.blueMaxPP = n;
+                // @ts-ignore
+                state.bluePP = n;
+                render();
+            }
+        }
+    });
+
 });
 
 

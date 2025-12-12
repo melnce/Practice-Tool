@@ -77,13 +77,7 @@ function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
 
 
 
-            // --- Custom: William counter ---
-            if (effect.op === "william_counter") {
-                import("../cards/runecraft/william.js").then(module => {
-                    module.handleWilliamCounter(c);
-                });
-                continue;
-            }
+
 
 
 

@@ -92,6 +92,14 @@ export function render() {
     renderListIfPresent("redPlayedList", state.redPlayedHistory);
     renderListIfPresent("blueDestroyedList", state.blueDestroyedHistory);
     renderListIfPresent("redDestroyedList", state.redDestroyedHistory);
+
+    // God Mode Visibility
+    const godPanel = byId("blueGodMode");
+    if (godPanel) {
+        const file = String(state.blueDeckFile || '');
+        const isTesting = /^0_.*\.json$/i.test(file) || /testing/i.test(file);
+        godPanel.style.display = isTesting ? "block" : "none";
+    }
 }
 
 // Helper: toggle End Turn buttons

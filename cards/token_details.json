@@ -500,6 +500,22 @@
     "keywords": [
       "Ward",
       "Aura"
+    ],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "self_only": true
+        },
+        "effects": [
+          {
+            "op": "dynamic_buff_self",
+            "attack_source": "shikigami_deaths",
+            "defense_source": "shikigami_deaths"
+          }
+        ]
+      }
     ]
   },
   {
