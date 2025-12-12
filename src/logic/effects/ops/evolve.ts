@@ -52,3 +52,15 @@ export function handleEvolveSelf(sourceCard: CardInstance, owner: Player, opts: 
     // Spend counters, set evo flags, and (optionally) run the card’s evolve/superevolve script.
     onEvolve(sourceCard, owner, mode, { spendPoint, skipEffects: !runEvoEffects });
 }
+
+export function handleEvolveTarget(eff: any, owner: Player, context: any = {}) {
+    const target = (context && (context.targetCard || context.selectedCard || (context.targets && context.targets[0]))) || null;
+    if (!target) {
+        console.warn("handleEvolveTarget: No target found in context.");
+        return;
+    }
+    const mode = eff.mode || "normal";
+    const spendPoint = eff.spendPoint === true;
+
+    handleEvolveSelf(target, owner, { mode, spendPoint, runEvoEffects: true });
+}

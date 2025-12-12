@@ -27,8 +27,7 @@ import { handleReplaceDeck } from "../../effects/deck.js";
 import { handleDestroy, handleDestroyHighest, destroyAlliedAmulets, handleDestroyAll, handleDestroyRandom, resolveDestroy } from "../../effects/ops/destroy.js";
 // import { handleDragonsign as handleDragonSign } from "@logic/effects/cards/dragoncraft/dragonsign.js";
 import { handleDraw, handleDrawAllNamedWithKeyword, handleDrawFiltered, handleAddToHand, handleDrawComboFollower, handleDrawOpponent, handleDrawNamed } from "../../effects/ops/draw.js";
-import { consumeEarthSigils } from "../../effects/cards/runecraft/earth.js";
-import { handleSelectEvolveGolem } from "../../effects/cards/runecraft/golem.js";
+import { consumeEarthSigils } from "../../effects/ops/earth.js";
 import { handleDiscardSelectHand, handleTransformInHand, handleDiscardAllExceptNamed } from "../../effects/hand.js";
 import { handleKeyword, handleRemoveKeyword, handleKeywordSelf, handleConditionalKeyword } from "../keywords.js";
 import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp, applyLeaderDamage } from "../../effects/leader.js";
@@ -330,7 +329,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "return_hand_to_deck": if (handleReturnHandToDeck(eff, owner, queue) === "pending") return; break;
             case "return_to_hand": if (handleReturnToHand(eff, owner, sourceCard, queue) === "pending") return; break;
             case "select": { const res = handleSelect(eff, owner, sourceCard, queue, context); if (res === "pending") return res; break; }
-            case "select_evolve_golem": if (handleSelectEvolveGolem(eff, owner, sourceCard, queue) === "pending") return; break;
+            case "evolve": { import("../../effects/ops/evolve.js").then(({ handleEvolveTarget }) => handleEvolveTarget(eff, owner, context)); break; }
             case "select_hand_summon_artifact_copy": logEvent("summon", { owner, op: eff.op, status: "pending_selection" }); if (handleSelectHandSummonArtifactCopy(eff, owner, queue) === "pending") return; break;
             case "select_hand_summon_artifact_copies_eot_destroy": logEvent("summon", { owner, op: eff.op, status: "pending_selection" }); if (handleSelectHandSummonArtifactCopiesEOT(eff, owner, queue) === "pending") return; break;
             case "set_attack_to": { const res = handleSetAttackTo(eff, owner, sourceCard, queue, context); if (res === "pending") return res; break; }

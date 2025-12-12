@@ -823,9 +823,22 @@
     ],
     "superevolve": [
       {
-        "op": "select_evolve_golem",
-        "attack": 3,
-        "defense": 3
+        "op": "select",
+        "target": "ally:follower",
+        "condition": {
+          "tribe": "Golem"
+        },
+        "effects": [
+          {
+            "op": "evolve"
+          },
+          {
+            "op": "buff",
+            "target": "selected",
+            "attack": 3,
+            "defense": 3
+          }
+        ]
       }
     ],
     "keywords": []
