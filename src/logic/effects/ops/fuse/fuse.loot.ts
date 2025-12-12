@@ -1,6 +1,6 @@
 // src/logic/effects/ops/fuse/fuse.loot.ts
 import { state } from "../../../../core/gameState.js";
-import { render } from "../../../../ui/render.js";
+import { adapter } from "../../../../core/adapter.js";
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
@@ -22,12 +22,12 @@ export function fuse_finalize_loot(owner: Player, initiator_uid: string, partner
     const grave = graveOf(owner);
 
     const initiator = hand.find(c => c?.uid === initiator_uid);
-    if (!initiator) { clearSelectableFlags(); render(); return; }
+    if (!initiator) { clearSelectableFlags(); adapter.render(); return; }
 
     if (alreadyFusedThisTurn(initiator)) {
         console.warn("[Fuse] This copy already fused this turn.");
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
-        clearSelectableFlags(); render(); return "done";
+        clearSelectableFlags(); adapter.render(); return "done";
     }
 
     // Only allow actual Loot spells (keep your stricter set if desired)
@@ -108,5 +108,5 @@ export function fuse_finalize_loot(owner: Player, initiator_uid: string, partner
     };
     try { fireTrigger?.("on_fuse", owner, { initiator, partners: used, result: { result_card_name: "fused_loot" } }); } catch { }
 
-    clearSelectableFlags(); render();
+    clearSelectableFlags(); adapter.render();
 }

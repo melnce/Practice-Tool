@@ -16,7 +16,7 @@ import { applyLeaderDamage, handleHealLeader } from "../effects/leader.js";
 import { resolveDestroy } from "../effects/ops/destroy.js";
 import { cleanupDead } from "./cleanup.js";
 // @ts-ignore
-import { render } from "../../ui/render.js";
+import { adapter } from "../../core/adapter.js";
 // @ts-ignore
 import { dealDamage, popBarrier } from "./barrier.js";
 import { doAction } from "../../core/history.js";
@@ -148,7 +148,7 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
 
         // IMMEDIATE CLEANUP so 0-DEF units vanish before damage exchange
         cleanupDead();
-        render();
+        adapter.render();
 
         // If the defender was removed or died due to follower_strike, award piercing now.
         const stillThere = defenderBoard[defenderIdx];
@@ -159,7 +159,7 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
             }
             spendAttack(attacker);
             recomputeAttackFlags(attacker);
-            render();
+            adapter.render();
             return;
         }
 
@@ -217,7 +217,7 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
     spendAttack(attacker);
     recomputeAttackFlags(attacker);
     cleanupDead();
-    render();
+    adapter.render();
 }
 
 export function attackFollower(attackerIdx: number, defenderIdx: number, attackerPlayer: Player, defenderPlayer: Player) {
@@ -276,7 +276,7 @@ function _attackLeaderCore(attackerIdx: number, attackerPlayer: Player, defender
 
     spendAttack(attacker);
     recomputeAttackFlags(attacker);
-    render();
+    adapter.render();
 }
 
 export function attackLeader(attackerIdx: number, attackerPlayer: Player, defenderPlayer: Player) {

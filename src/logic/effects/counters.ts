@@ -1,7 +1,8 @@
 ﻿// src/logic/effects/counters.ts
 import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../core/adapter.js";
 import { fireTrigger } from "../core/triggers.js";
 import { completeCrest } from "./crest.js";
 import { logEvent } from "../../core/logger.js";
@@ -40,7 +41,7 @@ function ensureDestroyOnZero(card: CardInstance, key: string) {
 
         // remove from board + re-render
         removeFromBoard(card);
-        render();
+        adapter.render();
         return true;
     }
     return false;
@@ -58,7 +59,7 @@ export function addCounter(card: CardInstance, key: string, amount = 1) {
     });
     // If someone adds a negative amount, still enforce destroy
     ensureDestroyOnZero(card, key);
-    render();
+    adapter.render();
 }
 
 export function setCounter(card: CardInstance, key: string, value: number) {
@@ -71,7 +72,7 @@ export function setCounter(card: CardInstance, key: string, value: number) {
         value: card.counters[key],
     });
     ensureDestroyOnZero(card, key);
-    render();
+    adapter.render();
 }
 
 export function spendCounter(card: CardInstance, key: string, amount = 1) {
@@ -84,7 +85,7 @@ export function spendCounter(card: CardInstance, key: string, amount = 1) {
         value: card.counters[key],
     });
     ensureDestroyOnZero(card, key);
-    render();
+    adapter.render();
 }
 
 // compatibility wrapper for effects.js
@@ -112,7 +113,7 @@ export function handleReduceCountdown(sourceCard: CardInstance, eff: Effect = {}
             owner: sourceCard.owner,
             value: sourceCard.countdown,
         });
-        render();
+        adapter.render();
         return;
     }
 
@@ -142,7 +143,7 @@ export function handleReduceCountdown(sourceCard: CardInstance, eff: Effect = {}
             return; // already removed + paid out
         }
 
-        render();
+        adapter.render();
         return;
     }
 
@@ -164,7 +165,7 @@ export function handleIncreaseCountdown(owner: Player, amount = 1) {
             });
         }
     }
-    render();
+    adapter.render();
 }
 
 

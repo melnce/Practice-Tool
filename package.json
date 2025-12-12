@@ -6,8 +6,9 @@
   "imports": {},
   "main": "main.js",
   "scripts": {
-    "test": "npm run build || exit 0 && vitest run",
+    "test": "npm run check:boundaries && npm run build || exit 0 && vitest run",
     "test:watch": "npm run build || exit 0 && vitest",
+    "check:boundaries": "node tools/check-boundaries.mjs",
     "build": "tsc",
     "watch": "tsc -w"
   },

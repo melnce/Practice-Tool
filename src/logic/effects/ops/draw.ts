@@ -126,6 +126,7 @@ export function handleAddToHand(eff: Effect, owner: Player) {
         if (hand.length >= MAX_HAND) break;
         const copy = JSON.parse(JSON.stringify(base));
         copy.uid = makeUid();
+
         if (pushToHand(hand, copy)) {
             state.lastAddedToHand = copy;
             logEvent("addToHand", { owner, name, uid: copy.uid });

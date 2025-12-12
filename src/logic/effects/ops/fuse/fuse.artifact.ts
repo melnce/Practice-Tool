@@ -1,6 +1,6 @@
 ﻿// src/logic/effects/ops/fuse/fuse.artifact.ts
 import { state } from "../../../../core/gameState.js";
-import { render } from "../../../../ui/render.js";
+import { adapter } from "../../../../core/adapter.js";
 import { highlightSelectable, clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
@@ -50,7 +50,7 @@ export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
     };
 
     highlightSelectable(pool);
-    render();
+    adapter.render();
     return "pending";
 }
 
@@ -65,7 +65,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
         // @ts-ignore
         c.tribes.some(t => String(t).toLowerCase() === "artifact")
     );
-    if (!pool.length) { clearSelectableFlags(); render(); return; }
+    if (!pool.length) { clearSelectableFlags(); adapter.render(); return; }
 
     logEvent("fuseOpen", {
         owner,
@@ -88,7 +88,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
     };
 
     highlightSelectable(pool);
-    render();
+    adapter.render();
     return "pending";
 }
 
@@ -121,7 +121,7 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
     };
 
     highlightSelectable(pool);
-    render();
+    adapter.render();
     return "pending";
 }
 
@@ -129,17 +129,17 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
 export function fuse_finalize_gear_multi(owner: Player, initiatorUid: string, partners: CardInstance[], resultName: string) {
     const hand = handOf(owner);
     const iIdx = hand.findIndex(c => c?.uid === initiatorUid);
-    if (iIdx === -1) { clearSelectableFlags(); render(); return; }
+    if (iIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const initiator = hand[iIdx];
 
     if (alreadyFusedThisTurn(initiator)) {
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
-        clearSelectableFlags(); render(); return;
+        clearSelectableFlags(); adapter.render(); return;
     }
 
     const tmpl = getCardDetails(resultName);
-    if (!tmpl) { clearSelectableFlags(); render(); return; }
+    if (!tmpl) { clearSelectableFlags(); adapter.render(); return; }
 
     const result = JSON.parse(JSON.stringify(tmpl));
     result.uid = makeUid();
@@ -170,19 +170,19 @@ export function fuse_finalize_gear_multi(owner: Player, initiatorUid: string, pa
         result: resultName,
     });
 
-    clearSelectableFlags(); render();
+    clearSelectableFlags(); adapter.render();
 }
 
 export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, partners: CardInstance[]) {
     const hand = handOf(owner);
     const iIdx = hand.findIndex(c => c?.uid === initiatorUid);
-    if (iIdx === -1) { clearSelectableFlags(); render(); return; }
+    if (iIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const initiator = hand[iIdx];
 
     if (alreadyFusedThisTurn(initiator)) {
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
-        clearSelectableFlags(); render(); return;
+        clearSelectableFlags(); adapter.render(); return;
     }
 
     const sumCost = (partners || []).reduce((acc: number, p: CardInstance) => {
@@ -197,7 +197,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, par
                 "Ominous Artifact γ";
 
     const tmpl = getCardDetails(resultName);
-    if (!tmpl) { clearSelectableFlags(); render(); return; }
+    if (!tmpl) { clearSelectableFlags(); adapter.render(); return; }
 
     const newCard = JSON.parse(JSON.stringify(tmpl));
     newCard.uid = makeUid();
@@ -220,19 +220,19 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, par
         result: resultName,
     });
 
-    clearSelectableFlags(); render();
+    clearSelectableFlags(); adapter.render();
 }
 
 export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partners: CardInstance[]) {
     const hand = handOf(owner);
     let iIdx = hand.findIndex(c => c?.uid === initiatorUid);
-    if (iIdx === -1) { clearSelectableFlags(); render(); return; }
+    if (iIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const initiator = hand[iIdx];
 
     if (alreadyFusedThisTurn(initiator)) {
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
-        clearSelectableFlags(); render(); return;
+        clearSelectableFlags(); adapter.render(); return;
     }
 
     const names = (partners || []).map(p => p?.name);
@@ -243,7 +243,7 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partner
 
     if (hasBeta && hasGamma) {
         const tmpl = getCardDetails("Masterwork Artifact Ω");
-        if (!tmpl) { clearSelectableFlags(); render(); return; }
+        if (!tmpl) { clearSelectableFlags(); adapter.render(); return; }
         const omega = JSON.parse(JSON.stringify(tmpl));
         omega.uid = makeUid();
 
@@ -305,6 +305,6 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partner
         });
     }
 
-    clearSelectableFlags(); render();
+    clearSelectableFlags(); adapter.render();
 }
 

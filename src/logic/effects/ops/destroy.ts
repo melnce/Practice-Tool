@@ -4,7 +4,8 @@ import { cleanupDead } from "../../core/cleanup.js";
 import { state } from "../../../core/gameState.js";
 import { runEffects } from "../../core/effects/index.js";
 // @ts-ignore
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+// import { render } from "../../../ui/render.js";
 import { randInt } from "../../../core/rng.js";
 import { logEvent } from "../../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../../core/types.js";

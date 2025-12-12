@@ -1,6 +1,6 @@
 // src/logic/effects/ops/fuse/fuse.ts
 import { state } from "../../../../core/gameState.js";
-import { render } from "../../../../ui/render.js";
+import { adapter } from "../../../../core/adapter.js";
 import { highlightSelectable, clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
@@ -109,7 +109,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
         console.warn("[Fuse] This copy already fused this turn.");
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
         clearSelectableFlags();
-        render();
+        adapter.render();
         return "done";
     }
 
@@ -147,7 +147,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
             finalize: info?.recipe?.finalize_op || "fuse_finalize_generic"
         });
         highlightSelectable(info.pool);
-        render();
+        adapter.render();
         return "pending";
     }
 
@@ -179,7 +179,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
         finalize: info?.recipe?.finalize_op || "fuse_finalize_generic"
     });
     highlightSelectable(info.pool);
-    render();
+    adapter.render();
     return "pending";
 }
 
@@ -189,7 +189,7 @@ export function fuse_finalize_generic(owner: Player, initiatorUid: string, partn
 
     const iIdx = hand.findIndex(c => c?.uid === initiatorUid);
     const pIdx = hand.findIndex(c => c?.uid === partnerCard?.uid);
-    if (iIdx === -1 || pIdx === -1) { clearSelectableFlags(); render(); return; }
+    if (iIdx === -1 || pIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const iCard = hand[iIdx];
     const pCard = hand[pIdx];
@@ -207,15 +207,15 @@ export function fuse_finalize_generic(owner: Player, initiatorUid: string, partn
             partner_name: pCard?.name,
             result_name: "wasted"
         };
-        clearSelectableFlags(); render(); return;
+        clearSelectableFlags(); adapter.render(); return;
     }
 
     if (!resultSpec || resultSpec.type !== "transform") {
-        clearSelectableFlags(); render(); return;
+        clearSelectableFlags(); adapter.render(); return;
     }
 
     const tmpl = getCardDetails(resultSpec.result_card_name);
-    if (!tmpl) { clearSelectableFlags(); render(); return; }
+    if (!tmpl) { clearSelectableFlags(); adapter.render(); return; }
 
     const mk = () => {
         const c = JSON.parse(JSON.stringify(tmpl));
@@ -269,5 +269,5 @@ export function fuse_finalize_generic(owner: Player, initiatorUid: string, partn
         result: resultSpec?.result_card_name || state?.lastFuse?.result_name || "wasted",
         targets
     });
-    clearSelectableFlags(); render();
+    clearSelectableFlags(); adapter.render();
 }

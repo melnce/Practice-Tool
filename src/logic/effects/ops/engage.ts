@@ -1,7 +1,8 @@
 // src/logic/effects/ops/engage.ts
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../../core/adapter.js";
 import { runEffects } from "../../core/effects/index.js";
 import { cleanupDead } from "../../core/cleanup.js";
 import { fireTrigger } from "../../core/triggers.js";
@@ -98,14 +99,14 @@ export function engageAmulet(owner: Player, index: number) {
                 if (sacrifice) {
                     logEvent("sacrifice", { owner, name: card.name, uid: card.uid, context: "engage" });
                     removeWithLastWords(card, owner);
-                    render();
+                    adapter.render();
                     cleanupDead();
                 }
 
                 // Run the full queue so handlers can attach resumeEffects properly
                 runEffects([...effects], owner, card);
                 card.engagedThisTurn = true;
-                render();
+                adapter.render();
                 return;
             }
 
@@ -115,12 +116,12 @@ export function engageAmulet(owner: Player, index: number) {
                 // Remove first, then perform engage effects with space available
                 logEvent("sacrifice", { owner, name: card.name, uid: card.uid, context: "engage" });
                 removeWithLastWords(card, owner);
-                render();
+                adapter.render();
                 cleanupDead();
 
                 runEffects([...effects], owner, card);
                 card.engagedThisTurn = true;
-                render();
+                adapter.render();
                 return;
             }
 
@@ -133,13 +134,13 @@ export function engageAmulet(owner: Player, index: number) {
                 logEvent("countdownZero", { owner, name: card.name, uid: card.uid, context: "engage" });
                 console.log(`[Engage] Countdown reached 0 for ${card.name} (${owner}) - UID: ${card.uid}`);
                 removeWithLastWords(card, owner);
-                render();
+                adapter.render();
                 cleanupDead();
                 return;
             }
 
             cleanupDead();
-            render();
+            adapter.render();
         },
         { owner, index },
         { autoRender: false }

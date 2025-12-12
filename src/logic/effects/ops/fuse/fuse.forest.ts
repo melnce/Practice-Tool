@@ -1,6 +1,6 @@
 // src/logic/effects/ops/fuse/fuse.forest.ts
 import { state } from "../../../../core/gameState.js";
-import { render } from "../../../../ui/render.js";
+import { adapter } from "../../../../core/adapter.js";
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
@@ -23,12 +23,12 @@ export function fuse_finalize_gardens_allure(owner: Player, initiator_uid: strin
     const grave = graveOf(owner);
 
     const initiator = hand.find(c => c?.uid === initiator_uid);
-    if (!initiator) { clearSelectableFlags(); render(); return; }
+    if (!initiator) { clearSelectableFlags(); adapter.render(); return; }
 
     if (alreadyFusedThisTurn(initiator)) {
         console.warn("[Fuse] This copy already fused this turn.");
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
-        clearSelectableFlags(); render(); return "done";
+        clearSelectableFlags(); adapter.render(); return "done";
     }
 
     for (const p of partners || []) {
@@ -58,5 +58,5 @@ export function fuse_finalize_gardens_allure(owner: Player, initiator_uid: strin
         result: "gardens_allure_mutate",
     });
 
-    clearSelectableFlags(); render();
+    clearSelectableFlags(); adapter.render();
 }

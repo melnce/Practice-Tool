@@ -260,8 +260,9 @@ export function handleKeyword(eff: Effect, owner: Player, effectsQueue: any, con
         return resolveSelectionQuery(eff, owner, targets, context.sourceCard, effectsQueue);
     }
 
+    const keywordList = Array.isArray(eff.keywords) ? eff.keywords : [eff.keyword].filter(Boolean);
     for (const target of targets) {
-        for (const k of (eff.keywords || [])) {
+        for (const k of keywordList) {
             const name = (typeof k === "string" ? k : k?.name) || "";
             const options = (typeof k === "object" ? k : undefined);
             applyKeyword(target, name, options);

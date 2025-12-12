@@ -1,7 +1,8 @@
 // utils.ts - Combined utility functions
 
 import { state } from "./gameState.js";
-import { render } from "../ui/render.js";
+// @ts-ignore
+import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 // Pull *once* from rng and re-export locally-used helpers
 import {
@@ -116,7 +117,7 @@ export function drawCard(hand: CardInstance[], deck: CardInstance[], owner: "blu
             // @ts-ignore
             logEvent("deckout", { loser: owner, winner: opp });
 
-            render();
+            adapter.render();
             return false;
         }
     }

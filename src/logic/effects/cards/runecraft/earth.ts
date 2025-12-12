@@ -1,6 +1,6 @@
 // src/logic/effects/cards/runecraft/earth.ts
 import { state } from "../../../../core/gameState.js";
-import { render } from "../../../../ui/render.js";
+import { adapter } from "../../../../core/adapter.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
 
@@ -37,7 +37,7 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
                 // Increment shadows for the owner
                 if (owner === "blue") state.blueShadows++;
                 else state.redShadows++;
-                render();
+                adapter.render();
             }
             return true;
         }

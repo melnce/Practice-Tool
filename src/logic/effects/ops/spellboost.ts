@@ -1,7 +1,8 @@
 ﻿// src/logic/effects/ops/spellboost.ts
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../../core/adapter.js";
 import { runEffects } from "../../core/effects/index.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { rand, randInt, makeUid } from "../../../core/rng.js";
@@ -219,7 +220,7 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
         }
     }
 
-    render();
+    adapter.render();
 }
 
 

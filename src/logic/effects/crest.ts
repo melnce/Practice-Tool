@@ -1,7 +1,8 @@
 // src/logic/effects/crest.ts
 import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../core/adapter.js";
 import { runEffects } from "../core/effects/index.js";
 import { logEvent } from "../../core/logger.js";
 import { Effect, Player } from "../../core/types.js";
@@ -169,6 +170,5 @@ export function completeCrest(crest: Crest, owner: Player, context: any = {}) {
     // Remove the crest so start-of-turn doesn’t fire it again
     const idx = list.indexOf(crest);
     if (idx !== -1) list.splice(idx, 1);
-
-    render();
+    adapter.render();
 }

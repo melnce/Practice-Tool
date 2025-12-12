@@ -1,27 +1,37 @@
 // src/boot/boot.ts
 // Ensure global handlers (useRedBoost, endTurnBlue/Red) are registered
-import "../logic/index.js";
+import * as engine from "../engine.js";
 
 // Entry points
 import { render } from "../ui/render.js";
 import { wireClick } from "../ui/dom.js";
-import { startGame } from "../logic/startGame.js";
-import { initHistoryHotkeys, onHistoryChange, resetHistory } from "../core/history.js";
+import { showChoiceModal } from "../ui/choiceModal.js";
+import { injectAdapter } from "../core/adapter.js";
+import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
+// @ts-ignore
+import { useRedBoost } from "../logic/boosts.js";
+
+// Expose globals for UI onclick handlers
+(window as any).endTurnBlue = endTurnBlue;
+(window as any).endTurnRed = endTurnRed;
+(window as any).useRedBoost = useRedBoost;
+
+// Initialize Logic -> UI Adapter
+injectAdapter({ render, showChoiceModal });
 
 window.addEventListener("DOMContentLoaded", () => {
     // @ts-ignore
     wireClick("startGameBtn", async () => {
-        await startGame();
-        resetHistory(); // new game = new undo stack
+        await engine.startNewGame();
     });
 
     try { render(); } catch (_) { }
 
     // Ctrl/Cmd+Z (undo), Ctrl+Y or Cmd+Shift+Z (redo)
-    initHistoryHotkeys();
+    engine.initHotkeys();
 
     // If you later add buttons with IDs 'undoBtn'/'redoBtn', this will enable/disable them
-    onHistoryChange(({ canUndo, canRedo }) => {
+    engine.onHistoryUpdate(({ canUndo, canRedo }) => {
         const u = document.getElementById("undoBtn") as HTMLButtonElement | null;
         const r = document.getElementById("redoBtn") as HTMLButtonElement | null;
         if (u) u.disabled = !canUndo;

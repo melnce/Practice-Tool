@@ -3,7 +3,7 @@
 
 import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../ui/render.js";
+import { adapter } from "../../core/adapter.js";
 import { runEffects } from "./effects/index.js";
 import { cleanupDead } from "./cleanup.js";
 import { dealDamage } from "./barrier.js";
@@ -156,7 +156,7 @@ function showConfirmationButton(pending: any) {
             container.style.display = 'none';
 
             if (resumeEffects?.length) runEffects(resumeEffects, owner, sourceCard);
-            else render();
+            else adapter.render();
         }, { op: pending?.eff?.op, owner: pending?.owner, source: pending?.sourceCard?.name }, { autoRender: false });
     });
 
@@ -196,7 +196,7 @@ export function resolvePendingTarget(uid: string | "leader") {
         if (resumeEffects?.length) {
             runEffects(resumeEffects, owner, pending.sourceCard);
         } else {
-            render();
+            adapter.render();
         }
         return;
     }
@@ -262,7 +262,7 @@ export function resolvePendingTarget(uid: string | "leader") {
             const container = document.getElementById('targetingConfirmation');
             if (container) container.style.display = 'none';
         }
-        render();
+        adapter.render();
         return;
     }
 
@@ -303,13 +303,13 @@ export function resolvePendingTarget(uid: string | "leader") {
     }
 
     if (pending.targets.length < requiredCount && !pending.requiresConfirmation) {
-        render(); // Re-render to show selection and wait for the next click.
+        adapter.render(); // Re-render to show selection and wait for the next click.
         return;
     }
 
     // If we require confirmation, we stop here and wait for the button click
     if (pending.requiresConfirmation) {
-        render(); // Update UI to show selected state
+        adapter.render(); // Update UI to show selected state
         return;
     }
 
@@ -326,7 +326,7 @@ export function resolvePendingTarget(uid: string | "leader") {
             delete state.pendingTargetEffect;
             clearSelectableFlags();
             if (resumeEffects?.length) runEffects(resumeEffects, owner, sourceCard);
-            else render();
+            else adapter.render();
         }, { op: eff?.op, owner, source: sourceCard?.name }, { autoRender: false });
         return;
     }
@@ -521,7 +521,7 @@ export function resolvePendingTarget(uid: string | "leader") {
         delete state.pendingTargetEffect;
         clearSelectableFlags();
         if (resumeEffects?.length) runEffects(resumeEffects, owner, sourceCard);
-        else render();
+        else adapter.render();
         return;
 
     } else if (eff.op === "banish") {
@@ -674,7 +674,7 @@ export function resolvePendingTarget(uid: string | "leader") {
         logEvent("evolve", { owner, target: target.name, mode: "super" });
 
         // Re-render so the evo art/stats show immediately
-        render();
+        adapter.render();
 
 
 
@@ -782,7 +782,7 @@ export function resolvePendingTarget(uid: string | "leader") {
             targets
         });
     } else {
-        render();
+        adapter.render();
     }
 }
 
@@ -805,6 +805,6 @@ export function confirmTargetsIfNeeded() {
     // If no confirmation is needed, just cleanup immediately
     delete state.pendingTargetEffect;
     clearSelectableFlags();
-    render();
+    adapter.render();
 }
 

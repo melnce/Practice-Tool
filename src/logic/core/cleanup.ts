@@ -1,6 +1,6 @@
 // src/logic/core/cleanup.ts
 import { state } from "../../core/gameState.js";
-import { render } from "../../ui/render.js";
+// import { render } from "../../ui/render.js";
 import { handleBanish } from "../effects/ops/banish.js";
 import { runEffects } from "./effects/index.js";
 import { logEvent } from "../../core/logger.js";

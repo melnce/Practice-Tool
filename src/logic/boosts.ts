@@ -1,7 +1,7 @@
 // src/logic/boosts.ts
 import { state } from "../core/gameState.js";
 // @ts-ignore
-import { render } from "../ui/render.js";
+import { adapter } from "../core/adapter.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
 
@@ -28,7 +28,7 @@ export function useRedBoost() {
                 boostBtn?.classList.remove("used");
                 logEvent("boost", { owner: "red", action: "cancel" });
             }
-            render();
+            adapter.render();
         },
         { owner: "red" },
         { autoRender: false }

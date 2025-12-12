@@ -1,7 +1,7 @@
 // src/logic/mulligan.ts
 import { state } from "../core/gameState.js";
 // @ts-ignore
-import { render } from "../ui/render.js";
+import { adapter } from "../core/adapter.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
@@ -40,7 +40,7 @@ export function beginMulligan() {
     });
 
     markSelectable("blue");
-    render();
+    adapter.render();
     showMulliganUI();
 }
 
@@ -95,7 +95,7 @@ function queueAutoMulligan(owner: Player) {
             if ((c as any).__mulliganSelected) bag.add(c.uid);
             else bag.delete(c.uid);
         });
-        render();
+        adapter.render();
         // Confirm immediately
         try { confirmMulligan(owner); } catch { }
     }, 100);
@@ -120,7 +120,7 @@ export function toggleMulliganPick(owner: Player, uid: string) {
         (card as any).__mulliganSelected = true;
         bag.add(uid);
     }
-    render();
+    adapter.render();
 }
 
 export function confirmMulligan(owner: Player) {
@@ -162,7 +162,7 @@ export function confirmMulligan(owner: Player) {
             if (owner === "blue") {
                 state.mulliganStage = "red";
                 markSelectable("red");
-                render();
+                adapter.render();
                 showMulliganUI();
 
             } else {
@@ -190,7 +190,7 @@ function startFirstTurn() {
     // Cleanup UI
     hideMulliganUI();
 
-    render();
+    adapter.render();
 }
 
 // ---- Simple UI helpers (two confirm buttons you can place in your HTML) ----

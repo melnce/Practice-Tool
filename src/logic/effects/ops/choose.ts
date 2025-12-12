@@ -1,9 +1,8 @@
 // src/logic/effects/ops/choose.ts
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../../ui/render.js";
 // @ts-ignore
-import { showChoiceModal } from "../../../ui/choiceModal.js";
+import { adapter } from "../../../core/adapter.js";
 
 // @ts-ignore
 import { hasEarthSigils, consumeEarthSigils } from "../cards/runecraft/earth.js";
@@ -130,7 +129,7 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
             runEffects(effectsQueue, owner, sourceCard);
         } else {
             // @ts-ignore
-            if (!globalThis.AI_SUPPRESS_RENDER) render();
+            if (!globalThis.AI_SUPPRESS_RENDER) adapter.render();
         }
         console.groupEnd();
         return "done";
@@ -154,7 +153,7 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
             return;
         }
 
-        showChoiceModal(roundPool, (selectedIndex: number) => {
+        adapter.showChoiceModal(roundPool, (selectedIndex: number) => {
             const selected = roundPool[selectedIndex];
             logEvent("choosePick", { owner, index: selectedIndex, requiresER: !!selected?.requires?.earth_rite });
             if (!selected) { finalize(); return; }
@@ -205,7 +204,7 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
                 if (effectsQueue && effectsQueue.length) {
                     runEffects([...effectsQueue], owner, sourceCard);
                 } else {
-                    render();
+                    adapter.render();
                 }
                 console.groupEnd();
             },

@@ -1,5 +1,6 @@
 import { state } from "../../core/gameState.js";
-import { render } from "../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../core/adapter.js";
 import { runEffects } from "./effects/index.js";
 import { randInt } from "../../core/rng.js";
 import { logEvent } from "../../core/logger.js";
@@ -205,7 +206,7 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
 
 export function highlightSelectable(cards: CardInstance[]) {
     cards.forEach(c => (c as any).__uiSelectable = true);
-    render();
+    adapter.render();
 }
 
 export function clearSelectableFlags() {

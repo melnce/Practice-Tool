@@ -3,7 +3,7 @@ import { state } from "../../core/gameState.js";
 import { drawCard } from "../../core/utils.js";
 // @ts-ignore
 // @ts-ignore
-import { render } from "../../ui/render.js";
+import { adapter } from "../../core/adapter.js";
 import { recordEvent } from "../../core/debugTimeline.js";
 import { fireTrigger } from "./triggers.js";
 import { cleanupDead } from "./cleanup.js";
@@ -16,7 +16,7 @@ import { clearExpiredCantAttackAtEOT } from "./keywords.js";
 // @ts-ignore
 import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 // @ts-ignore
-import { resetMedicalAssassinGate } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
+
 // @ts-ignore
 // import { processHimekaDelayedBanish } from "@logic/effects/cards/havencraft/himeka.js";
 import { dealDamage } from "./barrier.js";
@@ -27,7 +27,7 @@ import { CardInstance, Player } from "../../core/types.js";
 const isHeadless = () => (typeof globalThis !== "undefined" && (globalThis as any).HEADLESS);
 const safeRender = () => {
     // console.log("turns.ts: HEADLESS check =", isHeadless());
-    if (!isHeadless()) render();
+    if (!isHeadless()) adapter.render();
 };
 
 
@@ -166,7 +166,7 @@ export function endTurnBlue() {
     refreshBoardForNewTurn(state.redBoard);
 
     state.isBlueTurn = false;
-    resetMedicalAssassinGate("red");
+
     tickAmuletCountdowns("red");
     cleanupDead();
     state.activePlayer = "red";
@@ -240,7 +240,7 @@ export function endTurnRed() {
 
     state.isBlueTurn = true;
     tickAmuletCountdowns("blue");
-    resetMedicalAssassinGate("blue");
+
     cleanupDead();
     state.activePlayer = "blue";
     logEvent("startTurn", { player: state.activePlayer, round: state.roundCount });

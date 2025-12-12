@@ -8,7 +8,8 @@ import { randInt } from "../../../core/rng.js";
 import { logEvent } from "../../../core/logger.js";
 import { applyLeaderDamage } from "../leader.js";
 import { Effect, CardInstance, Player } from "../../../core/types.js";
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../../core/adapter.js";
 
 
 function isAlly(card: CardInstance, owner: Player) {
@@ -227,7 +228,7 @@ export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceC
     if (pool.length) {
         highlightSelectable(pool);
     } else {
-        render(); // Update UI to enable Leader selection even if no valid followers
+        adapter.render(); // Update UI to enable Leader selection even if no valid followers
     }
 
     return "pending";

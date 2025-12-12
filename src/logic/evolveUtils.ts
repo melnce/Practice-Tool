@@ -3,7 +3,7 @@ import { runEffects } from "./core/effects/index.js";
 // @ts-ignore
 import { handleEvolveSelf } from "./effects/ops/evolve.js";
 // @ts-ignore
-import { render } from "../ui/render.js";
+import { adapter } from "../core/adapter.js";
 import { state } from "../core/gameState.js";
 import { fireTrigger } from "./core/triggers.js";
 import { logEvent } from "../core/logger.js";
@@ -14,7 +14,7 @@ let __raf: number | null = null;
 function queueRender() {
     if (typeof window === "undefined") return; // headless sim
     if (__raf) cancelAnimationFrame(__raf);
-    __raf = requestAnimationFrame(() => { __raf = null; try { render(); } catch { } });
+    __raf = requestAnimationFrame(() => { __raf = null; try { adapter.render(); } catch { } });
 }
 
 export function canEvolve(owner: Player, card: CardInstance, mode: "normal" | "super" = "normal") {
@@ -145,5 +145,5 @@ export function superEvolveAllyFromContext(owner: Player, sourceCard: CardInstan
 
     logEvent("superEvolve", { owner, card: target.name, uid: target.uid });
 
-    render();
+    adapter.render();
 }

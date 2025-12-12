@@ -1,7 +1,8 @@
 // src/logic/core/effects/index.ts
 
 import { state } from "../../../core/gameState.js";
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../../core/adapter.js";
 import { fireTrigger } from "../triggers.js";
 import { CardInstance, Effect, Player, GameState } from "../../../core/types.js";
 
@@ -324,7 +325,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "reduce_deck_followers_cost": { const amt = parseInt(String(eff.amount ?? 1)) || 1; reduceDeckFollowersCost(owner, amt); break; }
             case "remove_keyword": if (handleRemoveKeyword(eff as any, owner) === "pending") return; break;
             case "replace_deck": handleReplaceDeck(owner, eff); break;
-            case "replace_deck_with_set_minus": { import("../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => render()); }); break; }
+            case "replace_deck_with_set_minus": { import("../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => adapter.render()); }); break; }
             case "restore_full_defense_self": handleRestoreFullDefenseSelf(sourceCard!, context); break;
             case "restore_self_and_heal_leader": handleRestoreSelfAndHealLeader(owner, sourceCard!); break;
             case "return_hand_to_deck": if (handleReturnHandToDeck(eff, owner, queue) === "pending") return; break;
@@ -407,5 +408,5 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
     }
 
     // A single, reliable render call after all synchronous effects are done.
-    render();
+    adapter.render();
 }

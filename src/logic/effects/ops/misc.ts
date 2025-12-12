@@ -2,7 +2,8 @@
 
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../../core/adapter.js";
 import { handleDamageAll, handleDamageRandom } from "./damage.js";
 import { destroyAlliedAmulets } from "./destroy.js";
 import { applyLeaderDamage, handleHealLeader } from "../leader.js";
@@ -85,7 +86,7 @@ export function handleRestoreSelfAndHealLeader(owner: Player, sourceCard: CardIn
         sourceCard.defense = full;
         handleHealLeader(owner, { amount: restored } as any);
     }
-    render();
+    adapter.render();
 }
 
 // --- Logic Moved from effects.ts ---

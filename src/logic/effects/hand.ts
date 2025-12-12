@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { getCardDetails } from "../../data/cardDatabase.js";
 // @ts-ignore
-import { render } from "../../ui/render.js";
+// import { render } from "../../ui/render.js";
 import { highlightSelectable } from "../core/targeting.js";
 import { rand, makeUid } from "../../core/rng.js";
 import { logEvent } from "../../core/logger.js";

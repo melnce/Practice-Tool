@@ -253,3 +253,11 @@ export interface GameState {
 
     [key: string]: any;
 }
+
+export interface StartGameOptions {
+    // Current implementation reads from DOM, no programmatic options supported yet.
+}
+
+export type HistoryAction = { type: "UNDO" } | { type: "REDO" } | { type: "RESET_HISTORY" };
+export type GameAction = { type: "END_TURN" };
+export type PlayerAction = HistoryAction | GameAction;

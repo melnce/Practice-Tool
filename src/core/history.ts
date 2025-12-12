@@ -1,6 +1,8 @@
+
 // /gamelogic/history.ts
 import { state } from "./gameState.js";
-import { render } from "../ui/render.js";
+// @ts-ignore
+import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 import { getRngSnapshot, setRngSnapshot } from "./rng.js";
 import { GameState } from "./types.js";
@@ -80,7 +82,7 @@ export function commitAction({ autoRender = true } = {}) {
   });
 
   const suppress = ((globalThis as any).HEADLESS === true) || ((globalThis as any).AI_SUPPRESS_RENDER === true);
-  if (autoRender && !suppress) render();
+  if (autoRender && !suppress) adapter.render();
   notify();
 }
 
@@ -89,7 +91,7 @@ export function abortAction() {
   if (!inAction) return;
   replaceState(inAction.before);
   inAction = null;
-  render();
+  adapter.render();
   notify();
 }
 
@@ -133,7 +135,7 @@ export function undo({ autoRender = true } = {}) {
     future.push(entry);
     replaceState(entry.before);
     logEvent("history_undo", { name: entry.name, meta: entry.meta || {} });
-    if (autoRender) render();
+    if (autoRender) adapter.render();
     notify();
     return true;
   }
@@ -148,7 +150,7 @@ export function redo({ autoRender = true } = {}) {
     past.push(entry);
     if (entry.after) replaceState(entry.after);
     logEvent("history_redo", { name: entry.name, meta: entry.meta || {} });
-    if (autoRender) render();
+    if (autoRender) adapter.render();
     notify();
     return true;
   }

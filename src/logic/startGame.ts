@@ -2,7 +2,8 @@
 import { state, resetGameState } from "../core/gameState.js";
 import { loadBlueDeck, loadRedDeck } from "../data/deckLoader.js";
 // @ts-ignore
-import { render } from "../ui/render.js";
+// @ts-ignore
+import { adapter } from "../core/adapter.js";
 import { loadCardDatabase } from "../data/cardDatabase.js";
 import { drawCard } from "../core/utils.js";
 import { beginMulligan } from "./mulligan.js";
@@ -93,7 +94,7 @@ export async function startGame() {
 
 
     state.gameStarted = true;
-    render();          // show opening hands
+    adapter.render();          // show opening hands
 
     resetEvoButtons();                  // ✅ reset evo UI
 

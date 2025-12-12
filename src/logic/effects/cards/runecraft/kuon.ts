@@ -2,7 +2,7 @@
 import { state } from "../../../../core/gameState.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { summonNamed } from "../../ops/summon.js";
-import { render } from "../../../../ui/render.js";
+import { adapter } from "../../../../core/adapter.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
 
@@ -58,5 +58,5 @@ export function handleKuonEnhance(owner: Player) {
         logEvent("kuonEnhance", { owner, sumA, sumD, nobleUid: noble.uid });
     }
 
-    render();
+    adapter.render();
 }

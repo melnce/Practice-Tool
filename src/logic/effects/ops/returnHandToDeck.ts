@@ -1,7 +1,8 @@
 // src/logic/effects/ops/returnHandToDeck.ts
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../../core/adapter.js";
 import { shuffleInPlace } from "../../../core/utils.js";
 import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
@@ -40,7 +41,7 @@ export function handleReturnHandToDeck(eff: Effect, owner: Player, effectsQueue:
             putBack(hand[0], owner);
         }
         logEvent("returnHandToDeckAll", { owner, count: returnedCount });
-        render();
+        adapter.render();
         return "done";
     }
 
@@ -68,13 +69,13 @@ export function handleReturnHandToDeck(eff: Effect, owner: Player, effectsQueue:
             selectCount: parseInt((eff as any).select_count || 1), // <-- Add this
         };
         hand.forEach(c => ((c as any).__uiSelectable = true)); // This is effectively highlightSelectable(pool)
-        render();
+        adapter.render();
         return "pending";
     }
 
     // no-select fallback
     putBack(hand[0], owner);
-    render();
+    adapter.render();
     return "done";
 }
 

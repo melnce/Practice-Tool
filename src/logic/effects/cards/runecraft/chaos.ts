@@ -1,7 +1,7 @@
 // src/logic/effects/cards/runecraft/chaos.ts
 import { state } from "../../../../core/gameState.js";
 import { handleDamageSplitFixed } from "../../ops/damage.js";
-import { render } from "../../../../ui/render.js";
+import { adapter } from "../../../../core/adapter.js";
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player } from "../../../../core/types.js";
 
@@ -46,5 +46,5 @@ export function handleChaosSplitDamage(owner: Player, sourceCard: CardInstance) 
     sourceCard.currentChaosDamage = 0;
 
     // ensure UI updates immediately
-    render();
+    adapter.render();
 }

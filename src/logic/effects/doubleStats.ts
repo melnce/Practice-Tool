@@ -1,7 +1,8 @@
 // src/logic/effects/doubleStats.ts
 import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../core/adapter.js";
 import { cleanupDead } from "../core/cleanup.js";
 import { logEvent } from "../../core/logger.js";
 import { Player } from "../../core/types.js";
@@ -29,5 +30,5 @@ export function doubleStatsAllies(owner: Player) {
         c.potential_defense = c.defense as any;
     }
     cleanupDead();
-    render();
+    adapter.render();
 }

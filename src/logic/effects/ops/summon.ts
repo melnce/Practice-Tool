@@ -2,7 +2,8 @@
 import { state } from "../../../core/gameState.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 // @ts-ignore
-import { render } from "../../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../../core/adapter.js";
 import { fireTrigger } from "../../core/triggers.js";
 // import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
 import { getPool, highlightSelectable, clearSelectableFlags } from "../../core/targeting.js";
@@ -243,6 +244,7 @@ function makeCardFromDB(cardData: CardTemplate, owner: Player): CardInstance {
     const card: CardInstance = JSON.parse(JSON.stringify(cardData));
     card.uid = makeUid();
     card.owner = owner;
+
     if (isFollower(card)) initFollower(card);
     else if (isAmulet(card)) initAmulet(card);
     return card;
@@ -327,7 +329,7 @@ export function summonNamed(eff: Effect, owner: Player) {
         }
     }
 
-    render();
+    adapter.render();
 }
 
 export function reanimateSummon(c: CardInstance, owner: Player) {
@@ -367,7 +369,7 @@ export function reanimateSummon(c: CardInstance, owner: Player) {
         logEvent("reanimateSummon", { owner, card: copy.name, uid: copy.uid });
         state.lastSummoned = [copy];
     }
-    render();
+    adapter.render();
 }
 
 
@@ -446,7 +448,7 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
     }
 
     logEvent("summonRandom", { owner, picks: state.lastSummoned.map(c => c.name) });
-    render();
+    adapter.render();
 }
 
 
@@ -691,7 +693,7 @@ export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
     // >>> Congregant chain managed by JSON triggers now
 
     state.lastSummoned = [clone];
-    render();
+    adapter.render();
     return clone;
 }
 

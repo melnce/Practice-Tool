@@ -3,11 +3,12 @@ import { state } from "../../core/gameState.js";
 import { recordEvent } from "../../core/debugTimeline.js";
 // @ts-ignore
 // @ts-ignore
-import { render } from "../../ui/render.js";
+// @ts-ignore
+import { adapter } from "../../core/adapter.js";
 import { applyKeywordsFromList } from "./keywords.js";
 
 const isHeadless = () => (typeof globalThis !== "undefined" && (globalThis as any).HEADLESS);
-const safeRender = () => { if (!isHeadless()) render(); };
+const safeRender = () => { if (!isHeadless()) adapter.render(); };
 import { runEffects } from "./effects/index.js";
 // @ts-ignore
 import { spellboostHand } from "../effects/ops/spellboost.js";
