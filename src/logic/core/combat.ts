@@ -1,18 +1,25 @@
 // src/logic/core/combat.ts
+import { GameState, CardInstance, Player } from "@core/types.js";
 import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { dealDamage, popBarrier } from "@logic/core/barrier.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { doAction } from "@core/history.js";
 import { logEvent } from "@core/logger.js";
-import { CardInstance, Player } from "@core/types.js";
+import { runEffects } from "@logic/core/effects/index.js";
+import { fireTrigger } from "@logic/core/triggers.js";
+import { recordEvent } from "@core/debugTimeline.js";
+
+// Helper: Resolve combat damage between two followers
+function resolveCombat(attacker: CardInstance, defender: CardInstance, owner: Player) { }
 
 // Imported from JS still
 // @ts-ignore
 import { applyLeaderDamage, handleHealLeader } from "@logic/effects/leader.js";
 // @ts-ignore
 import { resolveDestroy } from "@logic/effects/ops/destroy.js";
+import { cleanupDead } from "@logic/core/cleanup.js";
+// @ts-ignore
+import { render } from "@ui/render.js";
+// @ts-ignore
+import { dealDamage, popBarrier } from "@logic/core/barrier.js";
+import { doAction } from "@core/history.js";
 
 
 /* ------------------------------- helpers ------------------------------- */
@@ -55,19 +62,8 @@ function spendAttack(attacker: CardInstance) {
 
 function isAttackForbidden(card: CardInstance) {
     if (!card) return false;
-    if ((card as any).cantAttackIsTemporary && (card as any).cantAttackUntilOpponentEOT) {
-        const ownerIsBlue = (state.blueBoard || []).includes(card);
-        const owner = ownerIsBlue ? "blue" : "red";
-        // @ts-ignore
-        if (state.activePlayer === owner) clearCantAttack(card); // Function missing from context? Assuming global or imported? 
-        // Wait, clearCantAttack is not imported. It might be in 'misc.js' or util?
-        // Checking compat: original JS text said `clearCantAttack(card)`. 
-        // It is referenced but not imported in original JS provided? 
-        // Ah, if the original file didn't import it, it was relying on global or it was a bug in original code.
-        // I will comment it out or leave as is but usage might fail if not defined.
-        // I'll assume it's valid JS behavior (maybe auto-imported in bundle?) or bug.
-        // I'll suppress TS error.
-    }
+    // Logic removed: premature clearing of cantAttack.
+    // Cleanup is handled by clearExpiredCantAttackAtEOT in turn end phase.
     return !!((card as any).cantAttack || (card as any).cantAttackFollowers || (card as any).cantAttackLeaders);
 }
 function recomputeAttackFlags(card: CardInstance) {
@@ -162,7 +158,11 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
         defender.attack = parseInt(defender.attack as any) || 0;
         defender.defense = parseInt(defender.defense as any) || 0;
     }
+    // For now, assuming UI filtered it.
 
+    recordEvent({ type: "attack", payload: { attacker: attacker.name, defender: defender.name } });
+
+    attacker.hasAttacked = true;
     logEvent("attack", { attacker: attacker.name, defender: defender?.name, atkDmg, defDmg });
 
     // --- Simultaneous damage exchange ---
