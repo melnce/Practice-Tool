@@ -1,13 +1,13 @@
 
 import { describe, it, expect, beforeEach, beforeAll, vi } from "vitest";
-import { state, resetGameState } from "#core/gameState";
-import { loadCardDatabase } from "#data/cardDatabase";
-import { grantLeaderBarrier, applyLeaderDamage, handleLeaderBarrierOp } from "#logic/effects/leader";
-import { evolveFollower } from "#logic/effects/ops/evolve";
-import { summonNamed } from "#logic/effects/ops/summon";
-import { destroyCard } from "#logic/effects/ops/destroy";
-import { startGearMultiSelect, fuse_finalize_gear_multi } from "#logic/effects/ops/fuse/fuse.artifact";
-import { makeUid } from "#core/rng";
+import { state, resetGameState } from "../src/core/gameState";
+import { loadCardDatabase } from "../src/data/cardDatabase";
+import { grantLeaderBarrier, applyLeaderDamage, handleLeaderBarrierOp } from "../src/logic/effects/leader";
+import { evolveFollower } from "../src/logic/effects/ops/evolve";
+import { summonNamed } from "../src/logic/effects/ops/summon";
+import { destroyCard } from "../src/logic/effects/ops/destroy";
+import { startGearMultiSelect, fuse_finalize_gear_multi } from "../src/logic/effects/ops/fuse/fuse.artifact";
+import { makeUid } from "../src/core/rng";
 
 // Mocks
 // Ensure global mocks are present via setup.ts, but we might need specific ones here

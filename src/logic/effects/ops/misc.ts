@@ -1,13 +1,13 @@
 // src/logic/effects/ops/misc.ts
 
-import { state } from "@core/gameState.js";
+import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { handleDamageAll, handleDamageRandom } from "@logic/effects/ops/damage.js";
-import { destroyAlliedAmulets } from "@logic/effects/ops/destroy.js";
-import { applyLeaderDamage, handleHealLeader } from "@logic/effects/leader.js";
-import { Player, CardInstance, Effect } from "@core/types.js";
-import { addMaxPP } from "@logic/pp.js";
+import { render } from "../../../ui/render.js";
+import { handleDamageAll, handleDamageRandom } from "./damage.js";
+import { destroyAlliedAmulets } from "./destroy.js";
+import { applyLeaderDamage, handleHealLeader } from "../leader.js";
+import { Player, CardInstance, Effect } from "../../../core/types.js";
+import { addMaxPP } from "../../pp.js";
 
 // destroy_allied_amulets_then_damage
 export function handleDestroyAlliedAmuletsThenDamage(owner: Player) {

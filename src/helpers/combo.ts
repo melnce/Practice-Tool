@@ -1,5 +1,5 @@
 // src/helpers/combo.ts
-import { CardInstance, GameState } from "@core/types.js";
+import { CardInstance, GameState } from "../core/types.js";
 
 export function comboReadyInHand(card: CardInstance, owner: "blue" | "red", state: GameState): boolean {
     // Look for combo gates in both fanfare and spell blocks

@@ -1,10 +1,10 @@
 // src/logic/effects/doubleStats.ts
-import { state } from "@core/gameState.js";
+import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { logEvent } from "@core/logger.js";
-import { Player } from "@core/types.js";
+import { render } from "../../ui/render.js";
+import { cleanupDead } from "../core/cleanup.js";
+import { logEvent } from "../../core/logger.js";
+import { Player } from "../../core/types.js";
 
 export function doubleStatsAllies(owner: Player) {
     const board = owner === "blue" ? state.blueBoard : state.redBoard;

@@ -1,8 +1,8 @@
 // src/logic/effects/ops/evolve.ts
-import { onEvolve } from "@logic/evolveUtils.js";
-import { logEvent } from "@core/logger.js";
-import { state } from "@core/gameState.js";
-import { CardInstance, Player } from "@core/types.js";
+import { onEvolve } from "../../evolveUtils.js";
+import { logEvent } from "../../../core/logger.js";
+import { state } from "../../../core/gameState.js";
+import { CardInstance, Player } from "../../../core/types.js";
 
 function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
     if (!card || card.type !== "Follower" || card.hasEvolved) return false;

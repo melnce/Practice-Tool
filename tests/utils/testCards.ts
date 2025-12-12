@@ -1,5 +1,5 @@
 
-import { CardInstance } from "#core/types";
+import { CardInstance } from "../../src/core/types";
 
 /**
  * A minimal vanilla follower: 1/1, 1 PP.

@@ -1,11 +1,11 @@
 // src/ui/drag.ts
-import { getDragData, setDragData } from "@ui/dom.js";
-import { doAction } from "@core/history.js";
-import { CardInstance, GameState, Player } from "@core/types.js";
+import { getDragData, setDragData } from "./dom.js";
+import { doAction } from "../core/history.js";
+import { CardInstance, GameState, Player } from "../core/types.js";
 
 
 // External game logic hooks (keep same import paths as your project)
-const logic = () => import(/* webpackIgnore: true */ "@logic/index.js");
+const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
 
 export function makeLeaderDroppable(leaderEl: HTMLElement, targetPlayer: Player, state: GameState) {
     leaderEl.ondragover = (e) => e.preventDefault();

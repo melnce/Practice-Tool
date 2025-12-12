@@ -1,8 +1,8 @@
 // /gamelogic/barrier.ts
-import { state } from "@core/gameState.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Player } from "@core/types.js";
+import { state } from "../../core/gameState.js";
+import { fireTrigger } from "./triggers.js";
+import { logEvent } from "../../core/logger.js";
+import { CardInstance, Player } from "../../core/types.js";
 
 // Helper interface for card with barrier properties
 interface BarrierCard extends CardInstance {

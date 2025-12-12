@@ -1,10 +1,10 @@
 // src/logic/effects/ops/transform.ts
-import { state } from "@core/gameState.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { applyKeywordsFromList } from "@logic/core/keywords.js";
-import { randInt, makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { Player, CardInstance } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { getCardDetails } from "../../../data/cardDatabase.js";
+import { applyKeywordsFromList } from "../../core/keywords.js";
+import { randInt, makeUid } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { Player, CardInstance } from "../../../core/types.js";
 
 
 

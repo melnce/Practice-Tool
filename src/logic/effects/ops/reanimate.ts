@@ -1,10 +1,10 @@
 // src/logic/effects/ops/reanimate.ts
-import { state } from "@core/gameState.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { reanimateSummon } from "@logic/effects/ops/summon.js";
-import { rand, randInt } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, Player, CardInstance } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { getCardDetails } from "../../../data/cardDatabase.js";
+import { reanimateSummon } from "./summon.js";
+import { rand, randInt } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
 

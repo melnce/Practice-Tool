@@ -10,7 +10,7 @@ import {
     hasInherentLastWords,
     hasInherentCountdown
 } from "./keywords.js";
-import { CardTemplate } from "@core/types.js";
+import { CardTemplate } from "../core/types.js";
 
 let fullCardData: Record<string, CardTemplate> = {};
 let tokenCardData: Record<string, CardTemplate> = {};
@@ -27,11 +27,12 @@ export async function loadCardDatabase() {
         root = '/';
     }
 
-    const fullRes = await fetch(`${root}cards/card_details.json`);
+    const ts = Date.now();
+    const fullRes = await fetch(`${root}cards/card_details.json?v=${ts}`);
     if (!fullRes.ok) throw new Error(`Main cards failed: ${fullRes.status}`);
     const fullJson: any[] = await fullRes.json();
 
-    const tokenRes = await fetch(`${root}cards/token_details.json`);
+    const tokenRes = await fetch(`${root}cards/token_details.json?v=${ts}`);
     if (!tokenRes.ok) throw new Error(`Tokens failed: ${tokenRes.status}`);
     const tokenJson: any[] = await tokenRes.json();
 

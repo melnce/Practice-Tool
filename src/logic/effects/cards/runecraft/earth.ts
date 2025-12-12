@@ -1,8 +1,8 @@
 // src/logic/effects/cards/runecraft/earth.ts
-import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { logEvent } from "@core/logger.js";
-import { Player, CardInstance } from "@core/types.js";
+import { state } from "../../../../core/gameState.js";
+import { render } from "../../../../ui/render.js";
+import { logEvent } from "../../../../core/logger.js";
+import { Player, CardInstance } from "../../../../core/types.js";
 
 
 function board(owner: Player) { return owner === "blue" ? state.blueBoard : state.redBoard; }

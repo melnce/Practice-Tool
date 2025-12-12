@@ -1,5 +1,5 @@
 // src/helpers/overflow.ts
-import { state } from "@core/gameState.js";
+import { state } from "../core/gameState.js";
 
 // Overflow is ON when your *max* PP is at least 7 (temp +1 for red does NOT count)
 export function isOverflow(owner: "blue" | "red"): boolean {

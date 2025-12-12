@@ -1,11 +1,11 @@
 // src/logic/mulligan.ts
-import { state } from "@core/gameState.js";
+import { state } from "../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { drawCard, shuffleInPlace } from "@core/utils.js";
-import { logEvent } from "@core/logger.js";
-import { doAction } from "@core/history.js";
-import { Player, CardInstance } from "@core/types.js";
+import { render } from "../ui/render.js";
+import { drawCard, shuffleInPlace } from "../core/utils.js";
+import { logEvent } from "../core/logger.js";
+import { doAction } from "../core/history.js";
+import { Player, CardInstance } from "../core/types.js";
 
 
 function ownerZones(owner: Player) {

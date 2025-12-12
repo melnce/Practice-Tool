@@ -1,9 +1,9 @@
 // src/logic/effects/cards/runecraft/william.ts
-import { state } from "@core/gameState.js";
-import { dealDamage } from "@logic/core/barrier.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { logEvent } from "@core/logger.js";
-import { Player, CardInstance } from "@core/types.js";
+import { state } from "../../../../core/gameState.js";
+import { dealDamage } from "../../../core/barrier.js";
+import { cleanupDead } from "../../../core/cleanup.js";
+import { logEvent } from "../../../../core/logger.js";
+import { Player, CardInstance } from "../../../../core/types.js";
 
 
 const williamCounters: Record<number, number> = {}; // per-card X while in hand/board

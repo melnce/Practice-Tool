@@ -1,6 +1,6 @@
 
 import { describe, it, expect } from "vitest";
-import { rand, randInt, choice, setRNGSeed, getRngSnapshot, setRngSnapshot } from "#core/rng";
+import { rand, randInt, choice, setRNGSeed, getRngSnapshot, setRngSnapshot } from "../src/core/rng";
 
 describe("RNG Module", () => {
 

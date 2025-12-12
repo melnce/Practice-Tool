@@ -1,27 +1,35 @@
 ﻿// src/logic/core/turns.ts
-import { state } from "@core/gameState.js";
-import { drawCard } from "@core/utils.js";
+import { state } from "../../core/gameState.js";
+import { drawCard } from "../../core/utils.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { recordEvent } from "@core/debugTimeline.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
 // @ts-ignore
-import { clearTemporaryBuffs } from "@logic/effects/self.js";
-import { runEffects } from "@logic/core/effects/index.js";
+import { render } from "../../ui/render.js";
+import { recordEvent } from "../../core/debugTimeline.js";
+import { fireTrigger } from "./triggers.js";
+import { cleanupDead } from "./cleanup.js";
 // @ts-ignore
-import { tickCrests, processCrestEvent, resetCrestOncePerTurn } from "@logic/effects/crest.js";
-import { clearExpiredCantAttackAtEOT } from "@logic/core/keywords.js";
+import { clearTemporaryBuffs } from "../effects/self.js";
+import { runEffects } from "./effects/index.js";
 // @ts-ignore
-import { resetEngageFlagsAtTurnStart } from "@logic/effects/ops/engage.js";
+import { tickCrests, processCrestEvent, resetCrestOncePerTurn } from "../effects/crest.js";
+import { clearExpiredCantAttackAtEOT } from "./keywords.js";
+// @ts-ignore
+import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 // @ts-ignore
 import { resetMedicalAssassinGate } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
 // @ts-ignore
 // import { processHimekaDelayedBanish } from "@logic/effects/cards/havencraft/himeka.js";
-import { dealDamage } from "@logic/core/barrier.js";
-import { logEvent } from "@core/logger.js";
-import { beginAction, commitAction } from "@core/history.js";
-import { CardInstance, Player } from "@core/types.js";
+import { dealDamage } from "./barrier.js";
+import { logEvent } from "../../core/logger.js";
+import { beginAction, commitAction } from "../../core/history.js";
+import { CardInstance, Player } from "../../core/types.js";
+
+const isHeadless = () => (typeof globalThis !== "undefined" && (globalThis as any).HEADLESS);
+const safeRender = () => {
+    // console.log("turns.ts: HEADLESS check =", isHeadless());
+    if (!isHeadless()) render();
+};
+
 
 
 /**
@@ -111,7 +119,7 @@ export function endTurnBlue() {
     state.blueBoard.forEach(card => clearTemporaryBuffs(card));
     fireTrigger("end_of_turn", "blue");
     // processHimekaDelayedBanish("blue");
-    render();
+    safeRender();
 
     // ✅ Blue: run crest effects one by one, then cleanup once
     {
@@ -167,7 +175,7 @@ export function endTurnBlue() {
     state.redEvoUsedThisTurn = false;
     resetShikigamiDeathLogs();
 
-    render();
+    safeRender();
     logEvent("endTurn", { from: "blue" });
     commitAction({ autoRender: false });
 }
@@ -180,7 +188,7 @@ export function endTurnRed() {
     state.redBoard.forEach(card => clearTemporaryBuffs(card));
     fireTrigger("end_of_turn", "red");
     // processHimekaDelayedBanish("red");
-    render();
+    safeRender();
 
     // ✅ Red: run crest effects one by one, then cleanup once
     {
@@ -240,7 +248,7 @@ export function endTurnRed() {
     state.blueEvoUsedThisTurn = false;
     resetShikigamiDeathLogs();
 
-    render();
+    safeRender();
     logEvent("endTurn", { from: "red" });
     commitAction({ autoRender: false });
 }

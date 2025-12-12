@@ -1,6 +1,6 @@
 // src/ui/tooltips.ts
-import { state } from "@core/gameState.js";
-import { CardInstance, Player } from "@core/types.js";
+import { state } from "../core/gameState.js";
+import { CardInstance, Player } from "../core/types.js";
 
 // NEW: show +A/+D based only on buffs/debuffs (not damage)
 function formatBuffDelta(card: CardInstance) {

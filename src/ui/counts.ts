@@ -1,6 +1,6 @@
 // src/ui/counts.ts
-import { byId, $ } from "@ui/dom.js";
-import { GameState } from "@core/types.js";
+import { byId, $ } from "./dom.js";
+import { GameState } from "../core/types.js";
 
 
 export function updateCounts(state: GameState) {

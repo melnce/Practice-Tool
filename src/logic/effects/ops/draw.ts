@@ -1,12 +1,12 @@
 // src/logic/effects/ops/draw.ts — standardized draw handling
 
-import { state } from "@core/gameState.js";
-import { drawCard, pushToHand, MAX_HAND } from "@core/utils.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { applyKeyword } from "@logic/core/keywords.js";
-import { rand, randInt, makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, Player, CardInstance } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { drawCard, pushToHand, MAX_HAND } from "../../../core/utils.js";
+import { getCardDetails } from "../../../data/cardDatabase.js";
+import { applyKeyword } from "../../core/keywords.js";
+import { rand, randInt, makeUid } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
 /** -----------------------------

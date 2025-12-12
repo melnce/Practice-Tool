@@ -1,18 +1,18 @@
 // utils.ts - Combined utility functions
 
-import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { logEvent } from "@core/logger.js";
+import { state } from "./gameState.js";
+import { render } from "../ui/render.js";
+import { logEvent } from "./logger.js";
 // Pull *once* from rng and re-export locally-used helpers
 import {
     rand,
     randInt,
     choice as rngChoice,
     shuffleInPlace as rngShuffle,
-} from "@core/rng.js";
+} from "./rng.js";
 
 // Import types
-import { CardInstance } from "@core/types.js";
+import { CardInstance } from "./types.js";
 
 // Constants
 export const MAX_HAND = 9;

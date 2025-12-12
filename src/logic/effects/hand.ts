@@ -1,12 +1,12 @@
 // src/logic/effects/hand.ts
-import { state } from "@core/gameState.js";
-import { getCardDetails } from "@data/cardDatabase.js";
+import { state } from "../../core/gameState.js";
+import { getCardDetails } from "../../data/cardDatabase.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { highlightSelectable } from "@logic/core/targeting.js";
-import { rand, makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Player, Effect } from "@core/types.js";
+import { render } from "../../ui/render.js";
+import { highlightSelectable } from "../core/targeting.js";
+import { rand, makeUid } from "../../core/rng.js";
+import { logEvent } from "../../core/logger.js";
+import { CardInstance, Player, Effect } from "../../core/types.js";
 
 export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
     const names = (eff.names || eff.name || []).map(String);

@@ -1,7 +1,7 @@
 // src/logic/effects/cards/runecraft/stormyBlast.ts
-import { state } from "@core/gameState.js";
-import { getPool, highlightSelectable } from "@logic/core/targeting.js";
-import { Player, CardInstance, Effect } from "@core/types.js";
+import { state } from "../../../../core/gameState.js";
+import { getPool, highlightSelectable } from "../../../core/targeting.js";
+import { Player, CardInstance, Effect } from "../../../../core/types.js";
 
 // move into state instead of a module global
 function ensureCounterState() {

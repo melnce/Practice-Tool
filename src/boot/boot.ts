@@ -1,12 +1,12 @@
 // src/boot/boot.ts
 // Ensure global handlers (useRedBoost, endTurnBlue/Red) are registered
-import "@logic/index.js";
+import "../logic/index.js";
 
 // Entry points
-import { render } from "@ui/render.js";
-import { wireClick } from "@ui/dom.js";
-import { startGame } from "@logic/startGame.js";
-import { initHistoryHotkeys, onHistoryChange, resetHistory } from "@core/history.js";
+import { render } from "../ui/render.js";
+import { wireClick } from "../ui/dom.js";
+import { startGame } from "../logic/startGame.js";
+import { initHistoryHotkeys, onHistoryChange, resetHistory } from "../core/history.js";
 
 window.addEventListener("DOMContentLoaded", () => {
     // @ts-ignore

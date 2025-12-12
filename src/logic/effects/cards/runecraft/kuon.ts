@@ -1,10 +1,10 @@
 // src/logic/effects/cards/runecraft/kuon.ts
-import { state } from "@core/gameState.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { summonNamed } from "@logic/effects/ops/summon.js";
-import { render } from "@ui/render.js";
-import { logEvent } from "@core/logger.js";
-import { Player, CardInstance } from "@core/types.js";
+import { state } from "../../../../core/gameState.js";
+import { cleanupDead } from "../../../core/cleanup.js";
+import { summonNamed } from "../../ops/summon.js";
+import { render } from "../../../../ui/render.js";
+import { logEvent } from "../../../../core/logger.js";
+import { Player, CardInstance } from "../../../../core/types.js";
 
 
 function boardOf(owner: Player) {

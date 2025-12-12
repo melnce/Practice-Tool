@@ -1,14 +1,14 @@
 // src/logic/effects/ops/damage.ts
-import { dealDamage } from "@logic/core/barrier.js";
-import { state } from "@core/gameState.js";
-import { getPool, highlightSelectable } from "@logic/core/targeting.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { isOverflow } from "@helpers/overflow.js";
-import { randInt } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { applyLeaderDamage } from "@logic/effects/leader.js";
-import { Effect, CardInstance, Player } from "@core/types.js";
-import { render } from "@ui/render.js";
+import { dealDamage } from "../../core/barrier.js";
+import { state } from "../../../core/gameState.js";
+import { getPool, highlightSelectable } from "../../core/targeting.js";
+import { cleanupDead } from "../../core/cleanup.js";
+import { isOverflow } from "../../../helpers/overflow.js";
+import { randInt } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { applyLeaderDamage } from "../leader.js";
+import { Effect, CardInstance, Player } from "../../../core/types.js";
+import { render } from "../../../ui/render.js";
 
 
 function isAlly(card: CardInstance, owner: Player) {

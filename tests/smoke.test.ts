@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 
 // Import from compiled dist via #imports mapped in package.json
-import { state, resetGameState } from "#core/gameState";
-import { startGame } from "#logic/startGame";
-import { playCard } from "#logic/core/playCard";
-import { endTurnBlue, endTurnRed } from "#logic/core/turns";
-import { runEffects } from "#logic/core/effects/index";
+import { state, resetGameState } from "../src/core/gameState";
+import { startGame } from "../src/logic/startGame";
+import { playCard } from "../src/logic/core/playCard";
+import { endTurnBlue, endTurnRed } from "../src/logic/core/turns";
+import { runEffects } from "../src/logic/core/effects";
 // Type-only import
-import type { CardInstance } from "#core/types";
+import type { CardInstance } from "../src/core/types";
 
 declare const process: any;
 

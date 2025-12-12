@@ -1,13 +1,13 @@
 // src/logic/evolveUtils.ts
-import { runEffects } from "@logic/core/effects/index.js";
+import { runEffects } from "./core/effects/index.js";
 // @ts-ignore
-import { handleEvolveSelf } from "@logic/effects/ops/evolve.js";
+import { handleEvolveSelf } from "./effects/ops/evolve.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { state } from "@core/gameState.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Player, Effect } from "@core/types.js";
+import { render } from "../ui/render.js";
+import { state } from "../core/gameState.js";
+import { fireTrigger } from "./core/triggers.js";
+import { logEvent } from "../core/logger.js";
+import { CardInstance, Player, Effect } from "../core/types.js";
 
 // debounce UI updates so we don't spam render during chained effects
 let __raf: number | null = null;

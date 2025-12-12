@@ -1,10 +1,10 @@
 // src/logic/effects/crest.ts
-import { state } from "@core/gameState.js";
+import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, Player } from "@core/types.js";
+import { render } from "../../ui/render.js";
+import { runEffects } from "../core/effects/index.js";
+import { logEvent } from "../../core/logger.js";
+import { Effect, Player } from "../../core/types.js";
 
 // TODO: Define Crest type properly or reuse CardInstance with custom fields?
 // For now, using any to unblock migration.

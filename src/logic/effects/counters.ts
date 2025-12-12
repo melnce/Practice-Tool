@@ -1,11 +1,11 @@
 ﻿// src/logic/effects/counters.ts
-import { state } from "@core/gameState.js";
+import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { completeCrest } from "@logic/effects/crest.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { render } from "../../ui/render.js";
+import { fireTrigger } from "../core/triggers.js";
+import { completeCrest } from "./crest.js";
+import { logEvent } from "../../core/logger.js";
+import { CardInstance, Effect, Player } from "../../core/types.js";
 
 // --- helpers
 function boardOf(owner: Player) {

@@ -5,21 +5,41 @@ if (typeof window === "undefined") {
         addEventListener: noop,
         removeEventListener: noop,
         location: { search: "" },
-        requestAnimationFrame: (cb: any) => setTimeout(cb, 16),
-        cancelAnimationFrame: noop,
         cardDatabase: {}, // used by cardDatabase.js
         APP_ROOT: "/",
     };
-    (global as any).window = win;
-    (global as any).document = {
-        addEventListener: noop,
-        removeEventListener: noop,
-        getElementById: () => null,
-        querySelector: () => null,
-        createElement: () => ({ style: {}, classList: { add: noop, remove: noop } }),
-        body: { appendChild: noop },
-    };
-    (global as any).HEADLESS = true;
+    try { (globalThis as any).window = win; } catch (e) { console.warn("Cannot set global.window"); }
+    try {
+        (globalThis as any).document = {
+            addEventListener: noop,
+            removeEventListener: noop,
+            getElementById: () => null,
+            querySelector: () => null,
+            querySelectorAll: () => [],
+            createElement: () => ({
+                style: {},
+                classList: { add: noop, remove: noop, toggle: noop },
+                appendChild: noop,
+                append: noop,
+                innerHTML: "",
+                setAttribute: noop,
+                getAttribute: () => null,
+                textContent: "",
+                dataset: {},
+            }),
+            body: { appendChild: noop },
+        };
+    } catch (e) { console.warn("Cannot set global.document"); }
+
+    try { (globalThis as any).HEADLESS = true; } catch (e) { console.warn("Cannot set HEADLESS"); }
+    // The instruction seems to have a typo here.
+    // If the intent was to assign window to document, it would overwrite the mock document.
+    // Assuming the "from filesystem" was a misplaced comment for the next block.
+    // If the intent was to add a new line, it should be syntactically correct.
+    // Given the context, I will only apply the change to HEADLESS and keep the structure.
+    // If `(globalThis as any).document = (globalThis as any).window;` was intended,
+    // it would likely be a replacement for the mock document object, not an addition.
+    try { (globalThis as any).navigator = { userAgent: "node" }; } catch (e) { console.warn("Cannot set navigator"); }
 
     // Mock fetch to read from filesystem
     const fs = await import("fs");
@@ -32,7 +52,7 @@ if (typeof window === "undefined") {
         let valid = false;
         let filePath = "";
 
-        const cleanUrl = url.replace(/^[./]+/, "").replace(/^\//, "");
+        const cleanUrl = url.split("?")[0].replace(/^[./]+/, "").replace(/^\//, "");
 
         // Try resolving relative to CWD (Project Root)
         const potentialPath = path.resolve(process.cwd(), cleanUrl);

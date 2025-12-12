@@ -1,6 +1,6 @@
-import { state } from "@core/gameState.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, Player, GameState } from "@core/types.js";
+import { state } from "../../core/gameState.js";
+import { logEvent } from "../../core/logger.js";
+import { Effect, Player, GameState } from "../../core/types.js";
 
 /**
  * Handles healing a leader's defense.

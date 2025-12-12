@@ -1,8 +1,8 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { state, resetGameState } from "#core/gameState";
-import { resolveTarget } from "#logic/core/resolveTarget";
-import { makeUid } from "#core/rng";
+import { state, resetGameState } from "../src/core/gameState";
+import { resolveTarget } from "../src/logic/core/resolveTarget";
+import { makeUid } from "../src/core/rng";
 import { vanillaFollower } from "./utils/testCards";
 
 describe("Targeting Resolution", () => {

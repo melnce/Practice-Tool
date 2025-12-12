@@ -1,22 +1,26 @@
 // src/logic/core/playCard.ts
-import { state } from "@core/gameState.js";
-import { recordEvent } from "@core/debugTimeline.js";
+import { state } from "../../core/gameState.js";
+import { recordEvent } from "../../core/debugTimeline.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { applyKeywordsFromList } from "@logic/core/keywords.js";
-import { runEffects } from "@logic/core/effects/index.js";
 // @ts-ignore
-import { spellboostHand } from "@logic/effects/ops/spellboost.js";
-import { getPool } from "@logic/core/targeting.js";
-import { isOverflow } from "@helpers/overflow.js";
-import { fireTrigger } from "@logic/core/triggers.js";
+import { render } from "../../ui/render.js";
+import { applyKeywordsFromList } from "./keywords.js";
+
+const isHeadless = () => (typeof globalThis !== "undefined" && (globalThis as any).HEADLESS);
+const safeRender = () => { if (!isHeadless()) render(); };
+import { runEffects } from "./effects/index.js";
 // @ts-ignore
-import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
+import { spellboostHand } from "../effects/ops/spellboost.js";
+import { getPool } from "./targeting.js";
+import { isOverflow } from "../../helpers/overflow.js";
+import { fireTrigger } from "./triggers.js";
+// @ts-ignore
+// import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
 // @ts-ignore
 // import { handleCongregantOnEnter } from "@logic/effects/cards/forestcraft/congregant.js";
-import { logEvent } from "@core/logger.js";
-import { doAction } from "@core/history.js";
-import { CardInstance, Player, Effect } from "@core/types.js";
+import { logEvent } from "../../core/logger.js";
+import { doAction } from "../../core/history.js";
+import { CardInstance, Player, Effect } from "../../core/types.js";
 
 
 function _pushPlayedHistory(owner: Player, card: CardInstance) {
@@ -424,7 +428,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
 
         // Pass the spellCard reference instead of null
         if (list.length) runEffects([...list], player, spellCard, { targets: [] });
-        else render();
+        else safeRender();
         return;
     }
 
@@ -483,7 +487,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
         // Fire PLAYED-FROM-HAND (not summons) event
         fireTrigger('ally_follower_played', player as any, { playedCard: card, costChanged: costChangedOnPlay });
 
-        medicalAssassinOnFollowerEnter(player, card); // Add this line
+        // medicalAssassinOnFollowerEnter(player, card); // Hook removed - logic moved to JSON triggers
         fireTrigger('ally_follower_enter', player as any, { enteringCard: card });
         fireTrigger('enemy_follower_enter', player as any, { enteringCard: card });
 
@@ -536,7 +540,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
 
         }
 
-        return render();
+        return safeRender();
     }
 
 
@@ -562,7 +566,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
             state.lastSummoned = [card];
             runEffects([...(card as any).fanfare], player, card, { enteringCard: card });
         }
-        return render();
+        return safeRender();
     }
 }
 

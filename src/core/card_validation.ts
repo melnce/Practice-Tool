@@ -1,7 +1,7 @@
 // src/core/card_validation.ts
 
 // Since we cannot easily import getCardDetails (circular or strict), we rely on window.cardDatabase validation logic which is standalone.
-import { Effect } from "@core/types.js";
+import { Effect } from "./types.js";
 
 const SAFE_SINGLE_OPS = new Set([
     "damage", "buff", "banish", "keyword", "heal_leader", "draw", "recover_pp",

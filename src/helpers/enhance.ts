@@ -1,6 +1,6 @@
 // src/helpers/enhance.ts
 
-import { CardInstance, Effect, KeywordEntry } from "@core/types.js";
+import { CardInstance, Effect, KeywordEntry } from "../core/types.js";
 
 // Helper type for enhance tier
 interface EnhanceTier {

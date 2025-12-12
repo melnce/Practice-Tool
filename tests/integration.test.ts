@@ -1,11 +1,11 @@
 
 import { describe, it, expect, beforeEach, beforeAll, vi } from "vitest";
-import { state, resetGameState } from "#core/gameState";
-import { startGame } from "#logic/startGame";
-import { playCard } from "#logic/core/playCard";
-import { endTurnBlue, endTurnRed } from "#logic/core/turns";
-import { makeUid } from "#core/rng";
-import { loadCardDatabase } from "#data/cardDatabase";
+import { state, resetGameState } from "../src/core/gameState";
+import { startGame } from "../src/logic/startGame";
+import { playCard } from "../src/logic/core/playCard";
+import { endTurnBlue, endTurnRed } from "../src/logic/core/turns";
+import { makeUid } from "../src/core/rng";
+import { loadCardDatabase } from "../src/data/cardDatabase";
 import { vanillaFollower, damageSpell, evolveFollower as evoCardFixture } from "./utils/testCards";
 
 describe("Integration Simulation", () => {

@@ -1,7 +1,7 @@
 // src/logic/effects/gates/combo.ts
-import { state } from "@core/gameState.js";
-import { logEvent } from "@core/logger.js";
-import { Player } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { logEvent } from "../../../core/logger.js";
+import { Player } from "../../../core/types.js";
 
 interface ComboEffect {
     amount?: number;

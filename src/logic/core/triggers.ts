@@ -1,7 +1,7 @@
-import { state } from "@core/gameState.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { state } from "../../core/gameState.js";
+import { runEffects } from "./effects/index.js";
+import { logEvent } from "../../core/logger.js";
+import { CardInstance, Effect, Player } from "../../core/types.js";
 
 interface TriggerContext {
     initiator?: CardInstance;

@@ -1,12 +1,12 @@
 // src/data/deckLoader.ts
-import { state } from "@core/gameState.js";
-import { drawCard, shuffleInPlace } from "@core/utils.js";
+import { state } from "../core/gameState.js";
+import { drawCard, shuffleInPlace } from "../core/utils.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { Player } from "@core/types.js";
+import { render } from "../ui/render.js";
+import { getCardDetails } from "./cardDatabase.js";
+import { makeUid } from "../core/rng.js";
+import { logEvent } from "../core/logger.js";
+import { Player } from "../core/types.js";
 
 function normalizeDeck(raw: any) {
     // Accept:

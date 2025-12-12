@@ -1,8 +1,8 @@
 // src/logic/effects/cost.ts
-import { state } from "@core/gameState.js";
-import { getPool } from "@logic/core/targeting.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { state } from "../../core/gameState.js";
+import { getPool } from "../core/targeting.js";
+import { logEvent } from "../../core/logger.js";
+import { CardInstance, Effect, Player } from "../../core/types.js";
 
 /**
  * Reduces the cost of the card that owns the effect.

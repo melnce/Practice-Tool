@@ -1,5 +1,5 @@
 // src/ui/overlays.ts
-import { CardInstance } from "@core/types.js";
+import { CardInstance } from "../core/types.js";
 
 export function applyKeywordOverlays(div: HTMLElement, card: CardInstance) {
     const wrapper = div.querySelector(".card-image-wrapper") ?? div;

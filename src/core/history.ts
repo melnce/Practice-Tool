@@ -1,8 +1,8 @@
 // /gamelogic/history.ts
-import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { logEvent } from "@core/logger.js";
-import { getRngSnapshot, setRngSnapshot } from "@core/rng.js";
+import { state } from "./gameState.js";
+import { render } from "../ui/render.js";
+import { logEvent } from "./logger.js";
+import { getRngSnapshot, setRngSnapshot } from "./rng.js";
 import { GameState } from "./types.js";
 
 // --- Config ---

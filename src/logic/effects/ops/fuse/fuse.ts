@@ -1,12 +1,12 @@
 // src/logic/effects/ops/fuse/fuse.ts
-import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, GameState, Player } from "@core/types.js";
+import { state } from "../../../../core/gameState.js";
+import { render } from "../../../../ui/render.js";
+import { highlightSelectable, clearSelectableFlags } from "../../../core/targeting.js";
+import { fireTrigger } from "../../../core/triggers.js";
+import { getCardDetails } from "../../../../data/cardDatabase.js";
+import { makeUid } from "../../../../core/rng.js";
+import { logEvent } from "../../../../core/logger.js";
+import { CardInstance, GameState, Player } from "../../../../core/types.js";
 
 // Class-specific modules
 // @ts-ignore
@@ -17,17 +17,17 @@ import {
     fuse_finalize_alpha,
     fuse_finalize_gear_multi,
     fuse_finalize_fortifier,
-} from "@logic/effects/ops/fuse/fuse.artifact.js";
+} from "./fuse.artifact.js";
 
 // @ts-ignore
 import {
     fuse_finalize_gardens_allure,
-} from "@logic/effects/ops/fuse/fuse.forest.js";
+} from "./fuse.forest.js";
 
 // @ts-ignore
 import {
     fuse_finalize_loot,
-} from "@logic/effects/ops/fuse/fuse.loot.js";
+} from "./fuse.loot.js";
 
 // Re-export finalize handlers so runEffects can find them by op string
 export {

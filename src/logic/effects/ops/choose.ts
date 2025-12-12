@@ -1,20 +1,20 @@
 // src/logic/effects/ops/choose.ts
-import { state } from "@core/gameState.js";
+import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
+import { render } from "../../../ui/render.js";
 // @ts-ignore
-import { showChoiceModal } from "@ui/choiceModal.js";
+import { showChoiceModal } from "../../../ui/choiceModal.js";
 
 // @ts-ignore
-import { hasEarthSigils, consumeEarthSigils } from "@logic/effects/cards/runecraft/earth.js";
-import { spellboostHand } from "@logic/effects/ops/spellboost.js";
-import { handleDrawFiltered } from "@logic/effects/ops/draw.js";
-import { handleReanimate } from "@logic/effects/ops/reanimate.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { logEvent } from "@core/logger.js";
-import { doAction, appendStep } from "@core/history.js";
-import { Effect, Player, CardInstance } from "@core/types.js";
+import { hasEarthSigils, consumeEarthSigils } from "../cards/runecraft/earth.js";
+import { spellboostHand } from "./spellboost.js";
+import { handleDrawFiltered } from "./draw.js";
+import { handleReanimate } from "./reanimate.js";
+import { runEffects } from "../../core/effects/index.js";
+import { fireTrigger } from "../../core/triggers.js";
+import { logEvent } from "../../../core/logger.js";
+import { doAction, appendStep } from "../../../core/history.js";
+import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
 

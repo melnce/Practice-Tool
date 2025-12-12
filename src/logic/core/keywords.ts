@@ -1,8 +1,8 @@
 // /gamelogic/keywords.ts - Complete version with all original functions and keywords
-import { state } from "@core/gameState.js";
-import { getPool, highlightSelectable } from "@logic/core/targeting.js";
-import { grantBarrier } from "@logic/core/barrier.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { state } from "../../core/gameState.js";
+import { getPool, highlightSelectable } from "./targeting.js";
+import { grantBarrier } from "./barrier.js";
+import { CardInstance, Effect, Player } from "../../core/types.js";
 
 interface KeywordOptions {
     [key: string]: any;

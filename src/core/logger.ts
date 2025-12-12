@@ -1,6 +1,6 @@
 // src/core/logger.ts
-import { state } from "@core/gameState.js";
-import { GameState } from "@core/types.js";
+import { state } from "./gameState.js";
+import { GameState } from "./types.js";
 
 /* =========================
    Stable stringify + hash

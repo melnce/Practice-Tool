@@ -1,8 +1,8 @@
 
 import { describe, it, expect } from "vitest";
-import { validateGameState, assertValidGameState } from "#core/stateValidation";
-import { state, resetGameState } from "#core/gameState";
-import { GameState } from "#core/types";
+import { validateGameState, assertValidGameState } from "../src/core/stateValidation";
+import { state, resetGameState } from "../src/core/gameState";
+import { GameState } from "../src/core/types";
 
 describe("GameState Validation", () => {
 

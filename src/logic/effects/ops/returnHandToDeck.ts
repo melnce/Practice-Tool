@@ -1,10 +1,10 @@
 // src/logic/effects/ops/returnHandToDeck.ts
-import { state } from "@core/gameState.js";
+import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { shuffleInPlace } from "@core/utils.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, Player, CardInstance } from "@core/types.js";
+import { render } from "../../../ui/render.js";
+import { shuffleInPlace } from "../../../core/utils.js";
+import { logEvent } from "../../../core/logger.js";
+import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
 

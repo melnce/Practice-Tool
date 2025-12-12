@@ -1,5 +1,5 @@
 // src/core/rng.ts
-import { logEvent } from "@core/logger.js";
+import { logEvent } from "./logger.js";
 
 
 // --- PRNG core: mulberry32 ---------------------------------------------------

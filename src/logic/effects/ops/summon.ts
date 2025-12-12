@@ -1,16 +1,16 @@
 // src/logic/effects/ops/summon.ts
-import { state } from "@core/gameState.js";
-import { getCardDetails } from "@data/cardDatabase.js";
+import { state } from "../../../core/gameState.js";
+import { getCardDetails } from "../../../data/cardDatabase.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
-import { getPool, highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
-import { applyKeywordsFromList, applyKeyword } from "@logic/core/keywords.js";
+import { render } from "../../../ui/render.js";
+import { fireTrigger } from "../../core/triggers.js";
+// import { medicalAssassinOnFollowerEnter } from "@logic/effects/cards/portalcraft/medicalAssassin.js";
+import { getPool, highlightSelectable, clearSelectableFlags } from "../../core/targeting.js";
+import { applyKeywordsFromList, applyKeyword } from "../../core/keywords.js";
 // import { handleCongregantOnEnter } from "@logic/effects/cards/forestcraft/congregant.js";
-import { rand, randInt, makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, CardInstance, CardTemplate, Player } from "@core/types.js";
+import { rand, randInt, makeUid } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { Effect, CardInstance, CardTemplate, Player } from "../../../core/types.js";
 
 // =============== Utilities ===============
 
@@ -260,8 +260,8 @@ function pushToBoard(board: CardInstance[], owner: Player, card: CardInstance) {
     }
 
     // MEDICAL ASSASSIN TRIGGER - ADD THIS LINE
-    // @ts-ignore
-    medicalAssassinOnFollowerEnter(owner, card);
+    // Hook removed - replaced by JSON trigger
+    // medicalAssassinOnFollowerEnter(owner, card);
 
     // follower enter triggers
     if (isFollower(card)) {

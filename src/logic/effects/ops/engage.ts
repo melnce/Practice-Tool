@@ -1,13 +1,13 @@
 // src/logic/effects/ops/engage.ts
-import { state } from "@core/gameState.js";
+import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { logEvent } from "@core/logger.js";
-import { doAction } from "@core/history.js";
-import { Player, CardInstance, Effect } from "@core/types.js";
+import { render } from "../../../ui/render.js";
+import { runEffects } from "../../core/effects/index.js";
+import { cleanupDead } from "../../core/cleanup.js";
+import { fireTrigger } from "../../core/triggers.js";
+import { logEvent } from "../../../core/logger.js";
+import { doAction } from "../../../core/history.js";
+import { Player, CardInstance, Effect } from "../../../core/types.js";
 
 
 // --- Helpers ---

@@ -1,9 +1,9 @@
 // src/logic/effects/ops/fuse/fuse.forest.ts
-import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { clearSelectableFlags } from "@logic/core/targeting.js";
-import { logEvent } from "@core/logger.js";
-import { Player, CardInstance } from "@core/types.js";
+import { state } from "../../../../core/gameState.js";
+import { render } from "../../../../ui/render.js";
+import { clearSelectableFlags } from "../../../core/targeting.js";
+import { logEvent } from "../../../../core/logger.js";
+import { Player, CardInstance } from "../../../../core/types.js";
 
 function handOf(owner: Player) {
     return owner === "blue" ? state.blueHand : state.redHand;

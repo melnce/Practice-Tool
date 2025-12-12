@@ -6796,6 +6796,22 @@
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10171140-medical-grade-assassin",
     "hasOngoing": true,
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "condition": {
+          "tribe": "Puppetry"
+        },
+        "once_per_turn": true,
+        "effects": [
+          {
+            "op": "keyword",
+            "keyword": "Bane",
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "fanfare": [

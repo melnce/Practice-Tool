@@ -1,12 +1,12 @@
 // src/logic/effects/ops/bounce.ts
-import { state } from "@core/gameState.js";
-import { getPool, highlightSelectable } from "@logic/core/targeting.js";
-import { pushToHand } from "@core/utils.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { getPool, highlightSelectable } from "../../core/targeting.js";
+import { pushToHand } from "../../../core/utils.js";
+import { getCardDetails } from "../../../data/cardDatabase.js";
+import { fireTrigger } from "../../core/triggers.js";
+import { makeUid } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { CardInstance, Effect, Player } from "../../../core/types.js";
 
 
 // Create a fresh base copy (new uid)

@@ -1,8 +1,8 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { state, resetGameState } from "#core/gameState";
-import { endTurnBlue, endTurnRed, startTurnBlue, startTurnRed } from "#logic/core/turns";
-import { makeUid } from "#core/rng";
+import { state, resetGameState } from "../src/core/gameState";
+import { endTurnBlue, endTurnRed, startTurnBlue, startTurnRed } from "../src/logic/core/turns";
+import { makeUid } from "../src/core/rng";
 import { vanillaFollower } from "./utils/testCards";
 
 describe("Turn System", () => {

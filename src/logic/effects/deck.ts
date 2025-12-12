@@ -1,10 +1,10 @@
 // src/logic/effects/deck.ts
-import { state } from "@core/gameState.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { shuffleInPlace } from "@core/utils.js";
-import { makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, Player } from "@core/types.js";
+import { state } from "../../core/gameState.js";
+import { getCardDetails } from "../../data/cardDatabase.js";
+import { shuffleInPlace } from "../../core/utils.js";
+import { makeUid } from "../../core/rng.js";
+import { logEvent } from "../../core/logger.js";
+import { Effect, Player } from "../../core/types.js";
 
 export function handleReplaceDeck(owner: Player, eff: Effect & { cards?: { name: string, count?: number }[] }) {
     const deck = owner === "blue" ? state.blueDeck : state.redDeck;

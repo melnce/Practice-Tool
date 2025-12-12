@@ -1,9 +1,9 @@
 // src/logic/effects/cards/runecraft/chaos.ts
-import { state } from "@core/gameState.js";
-import { handleDamageSplitFixed } from "@logic/effects/ops/damage.js";
-import { render } from "@ui/render.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Player } from "@core/types.js";
+import { state } from "../../../../core/gameState.js";
+import { handleDamageSplitFixed } from "../../ops/damage.js";
+import { render } from "../../../../ui/render.js";
+import { logEvent } from "../../../../core/logger.js";
+import { CardInstance, Player } from "../../../../core/types.js";
 
 // Persist counters in state so undo/redo keeps them
 function ensureChaosState() {

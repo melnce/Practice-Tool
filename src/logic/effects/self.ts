@@ -1,13 +1,13 @@
 // src/logic/effects/self.ts
-import { state } from "@core/gameState.js";
-import { applyKeyword } from "@logic/core/keywords.js";
+import { state } from "../../core/gameState.js";
+import { applyKeyword } from "../core/keywords.js";
 // @ts-ignore
-import { handleBanish } from "@logic/effects/ops/banish.js";
+import { handleBanish } from "./ops/banish.js";
 // @ts-ignore
-import { resolveDestroy } from "@logic/effects/ops/destroy.js";
-import { rand, makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { resolveDestroy } from "./ops/destroy.js";
+import { rand, makeUid } from "../../core/rng.js";
+import { logEvent } from "../../core/logger.js";
+import { CardInstance, Effect, Player } from "../../core/types.js";
 
 export function handleBuffSelf(sourceCard: CardInstance, eff: Effect) {
     if (!sourceCard) return;

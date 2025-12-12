@@ -1,22 +1,22 @@
 // src/ui/zones.ts
-import { byId, clear } from "@ui/dom.js";
-import { isOwnBoard, isBoardZone } from "@helpers/board.js";
-import { previewHandStats } from "@helpers/enhance.js";
-import { computeHandGlow } from "@ui/helpers/glow.js";
-import { attachTooltip } from "@ui/tooltips.js";
-import { applyKeywordOverlays, applyBarrierOverlay } from "@ui/overlays.js";
+import { byId, clear } from "./dom.js";
+import { isOwnBoard, isBoardZone } from "../helpers/board.js";
+import { previewHandStats } from "../helpers/enhance.js";
+import { computeHandGlow } from "./helpers/glow.js";
+import { attachTooltip } from "./tooltips.js";
+import { applyKeywordOverlays, applyBarrierOverlay } from "./overlays.js";
 import {
     enableCardDragFromHand,
     enableBoardDropForOwnSide,
     enableCardEvoDrop,
     enableAttackerDrag,
     enableEnemyFollowerDrop
-} from "@ui/drag.js";
-import { GameState, CardInstance, Player } from "@core/types.js";
+} from "./drag.js";
+import { GameState, CardInstance, Player } from "../core/types.js";
 
 
-const logic = () => import(/* webpackIgnore: true */ "@logic/index.js");
-const engageLogic = () => import(/* webpackIgnore: true */ "@logic/effects/ops/engage.js");
+const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
+const engageLogic = () => import(/* webpackIgnore: true */ "../logic/effects/ops/engage.js");
 
 
 
@@ -336,7 +336,7 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
                 // Toggle click handler
                 div.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    import("@logic/mulligan.js").then(({ toggleMulliganPick }) => {
+                    import("../logic/mulligan.js").then(({ toggleMulliganPick }) => {
                         toggleMulliganPick(isBlueHand ? "blue" : "red", card.uid);
                     });
                 });

@@ -1,16 +1,16 @@
 ﻿// src/logic/effects/ops/spellboost.ts
-import { state } from "@core/gameState.js";
+import { state } from "../../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { getCardDetails } from "@data/cardDatabase.js";
-import { rand, randInt, makeUid } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
+import { render } from "../../../ui/render.js";
+import { runEffects } from "../../core/effects/index.js";
+import { getCardDetails } from "../../../data/cardDatabase.js";
+import { rand, randInt, makeUid } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
 // @ts-ignore
-import { handleStormyBlastCounter } from "@logic/effects/cards/runecraft/stormyBlast.js";
+import { handleStormyBlastCounter } from "../cards/runecraft/stormyBlast.js";
 // @ts-ignore
-import { handleWilliamCounter } from "@logic/effects/cards/runecraft/william.js";
-import { Player, CardInstance } from "@core/types.js";
+import { handleWilliamCounter } from "../cards/runecraft/william.js";
+import { Player, CardInstance } from "../../../core/types.js";
 
 
 /* ------------------------ helpers ------------------------ */
@@ -77,7 +77,7 @@ function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
 
             // --- Custom: Stormy Blast counter / UI update ---
             if (effect.op === "stormy_blast_counter") {
-                import("@logic/effects/cards/runecraft/stormyBlast.js").then(module => {
+                import("../cards/runecraft/stormyBlast.js").then(module => {
                     module.handleStormyBlastCounter(c);
 
                     // Keep spell's damage in sync for UI if present
@@ -95,13 +95,13 @@ function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
 
             // --- Custom: William counter ---
             if (effect.op === "william_counter") {
-                import("@logic/effects/cards/runecraft/william.js").then(module => {
+                import("../cards/runecraft/william.js").then(module => {
                     module.handleWilliamCounter(c);
                 });
                 continue;
             }
             if (effect.op === "chaos_counter") {
-                import("@logic/effects/cards/runecraft/chaos.js").then(module => {
+                import("../cards/runecraft/chaos.js").then(module => {
                     // @ts-ignore
                     module.handleChaosCounter(c);
                 });

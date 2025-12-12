@@ -1,10 +1,10 @@
 
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
-import { state, resetGameState } from "#core/gameState";
-import { loadCardDatabase } from "#data/cardDatabase";
-import { runEffects } from "#logic/core/effects/index";
-import { applyLeaderDamage } from "#logic/effects/leader";
-import { makeUid } from "#core/rng";
+import { state, resetGameState } from "../src/core/gameState";
+import { loadCardDatabase } from "../src/data/cardDatabase";
+import { runEffects } from "../src/logic/core/effects";
+import { applyLeaderDamage } from "../src/logic/effects/leader";
+import { makeUid } from "../src/core/rng";
 import { vanillaFollower, damageSpell } from "./utils/testCards";
 
 describe("Damage Mechanics", () => {

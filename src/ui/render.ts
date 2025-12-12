@@ -1,14 +1,14 @@
 // src/ui/render.ts
-import { renderZone } from "@ui/zones.js";
-import { updateCounts } from "@ui/counts.js";
-import { updateEvoButtonsUI } from "@ui/evo.js";
-import { makeLeaderDroppable } from "@ui/drag.js";
-import { byId } from "@ui/dom.js";
+import { renderZone } from "./zones.js";
+import { updateCounts } from "./counts.js";
+import { updateEvoButtonsUI } from "./evo.js";
+import { makeLeaderDroppable } from "./drag.js";
+import { byId } from "./dom.js";
 
-import { state } from "@core/gameState.js";
-import { GameState, Player, CardInstance } from "@core/types.js";
+import { state } from "../core/gameState.js";
+import { GameState, Player, CardInstance } from "../core/types.js";
 
-const logic = () => import(/* webpackIgnore: true */ "@logic/index.js");
+const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
 
 
 export function render() {

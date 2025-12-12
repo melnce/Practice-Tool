@@ -1,9 +1,9 @@
 // src/logic/effects/gates/gates.ts
-import { state } from "@core/gameState.js";
-import { hasNecromancy, spendShadows } from "@helpers/necromancy.js";
-import { isOverflow } from "@helpers/overflow.js";
-import { logEvent } from "@core/logger.js";
-import { Player, CardInstance, Effect } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { hasNecromancy, spendShadows } from "../../../helpers/necromancy.js";
+import { isOverflow } from "../../../helpers/overflow.js";
+import { logEvent } from "../../../core/logger.js";
+import { Player, CardInstance, Effect } from "../../../core/types.js";
 
 
 export function handleOverflowGate(owner: Player) {

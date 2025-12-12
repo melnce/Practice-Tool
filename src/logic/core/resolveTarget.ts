@@ -1,32 +1,32 @@
 ﻿// src/logic/core/resolveTarget.ts
 // This file has been updated to handle multi-targeting effects.
 
-import { state } from "@core/gameState.js";
+import { state } from "../../core/gameState.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { dealDamage } from "@logic/core/barrier.js";
-import { applyKeyword, handleRemoveKeyword } from "@logic/core/keywords.js";
+import { render } from "../../ui/render.js";
+import { runEffects } from "./effects/index.js";
+import { cleanupDead } from "./cleanup.js";
+import { dealDamage } from "./barrier.js";
+import { applyKeyword, handleRemoveKeyword } from "./keywords.js";
 // @ts-ignore
-import { transformTarget, transformHandTarget } from "@logic/effects/ops/transform.js";
+import { transformTarget, transformHandTarget } from "../effects/ops/transform.js";
 // @ts-ignore
-import { resolveDestroy } from "@logic/effects/ops/destroy.js";
+import { resolveDestroy } from "../effects/ops/destroy.js";
 // @ts-ignore
-import { handleBanish } from "@logic/effects/ops/banish.js";
+import { handleBanish } from "../effects/ops/banish.js";
 // @ts-ignore
-import { bounceToHand } from "@logic/effects/ops/bounce.js";
+import { bounceToHand } from "../effects/ops/bounce.js";
 // @ts-ignore
-import { resolveReturnHandToDeck } from "@logic/effects/ops/returnHandToDeck.js";
-import { clearSelectableFlags } from "@logic/core/targeting.js";
-import { isOverflow } from "@helpers/overflow.js";
+import { resolveReturnHandToDeck } from "../effects/ops/returnHandToDeck.js";
+import { clearSelectableFlags } from "./targeting.js";
+import { isOverflow } from "../../helpers/overflow.js";
 // @ts-ignore
-import { onEvolve } from "@logic/evolveUtils.js";
-import { fireTrigger } from "@logic/core/triggers.js";
+import { onEvolve } from "../evolveUtils.js";
+import { fireTrigger } from "./triggers.js";
 // @ts-ignore
-import { summonNamed, summonExactCopyFromHand } from "@logic/effects/ops/summon.js";
+import { summonNamed, summonExactCopyFromHand } from "../effects/ops/summon.js";
 // @ts-ignore
-import { applyLeaderDamage } from "@logic/effects/leader.js";
+import { applyLeaderDamage } from "../effects/leader.js";
 import {
     fuse_finalize_generic as opFinalizeFuseGeneric,
     fuse_finalize_fortifier as opFinalizeFortifierFuse,
@@ -35,15 +35,15 @@ import {
     fuse_finalize_gardens_allure as opFinalizeGardensAllure,
     fuse_finalize_loot as opFinalizeLootFuse,
     // @ts-ignore
-} from "@logic/effects/ops/fuse/fuse.js";
+} from "../effects/ops/fuse/fuse.js";
 
 // @ts-ignore
-import { getCardDetails } from "@data/cardDatabase.js";
+import { getCardDetails } from "../../data/cardDatabase.js";
 // @ts-ignore
-import { handleEvolveSelf } from "@logic/effects/ops/evolve.js";
-import { logEvent } from "@core/logger.js";
-import { doAction } from "@core/history.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { handleEvolveSelf } from "../effects/ops/evolve.js";
+import { logEvent } from "../../core/logger.js";
+import { doAction } from "../../core/history.js";
+import { CardInstance, Effect, Player } from "../../core/types.js";
 
 
 // --- BEGIN shared injection helpers ---

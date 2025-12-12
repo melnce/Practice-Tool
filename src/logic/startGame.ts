@@ -1,15 +1,15 @@
 // src/logic/startGame.ts
-import { state, resetGameState } from "@core/gameState.js";
-import { loadBlueDeck, loadRedDeck } from "@data/deckLoader.js";
+import { state, resetGameState } from "../core/gameState.js";
+import { loadBlueDeck, loadRedDeck } from "../data/deckLoader.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { loadCardDatabase } from "@data/cardDatabase.js";
-import { drawCard } from "@core/utils.js";
-import { beginMulligan } from "@logic/mulligan.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { setSeed, getSeed } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Player } from "@core/types.js";
+import { render } from "../ui/render.js";
+import { loadCardDatabase } from "../data/cardDatabase.js";
+import { drawCard } from "../core/utils.js";
+import { beginMulligan } from "./mulligan.js";
+import { runEffects } from "./core/effects/index.js";
+import { setSeed, getSeed } from "../core/rng.js";
+import { logEvent } from "../core/logger.js";
+import { CardInstance, Player } from "../core/types.js";
 
 
 function resetEvoButtons() {
@@ -43,7 +43,7 @@ export async function startGame() {
     state.redAnyAllyAttackedThisTurn = false;
     await loadCardDatabase();
     // @ts-ignore
-    await import("@core/card_validation.js").then(({ validateCardDatabase }) => validateCardDatabase());
+    await import("../core/card_validation.js").then(({ validateCardDatabase }) => validateCardDatabase());
     await Promise.all([loadBlueDeck(blueChoice), loadRedDeck(redChoice)]);
 
     // === Faith crest bootstrap: if Sham-Nacha is in a deck, that player starts with Faith ===

@@ -1,5 +1,5 @@
 // gameState.ts
-import { logEvent } from "@core/logger.js";
+import { logEvent } from "./logger.js";
 import { GameState } from "./types.js";
 
 // We cast the initial state to GameState.
@@ -108,5 +108,5 @@ export function resetGameState(): void {
 
 if (typeof window !== "undefined") {
   (window as any).gameState = state;
-  (window as any).debugSummon = () => import('@logic/effects/ops/summon.js');
+  (window as any).debugSummon = () => import('../logic/effects/ops/summon.js');
 }

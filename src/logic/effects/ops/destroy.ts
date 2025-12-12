@@ -1,13 +1,13 @@
 // src/logic/effects/ops/destroy.ts
-import { getPool, highlightSelectable } from "@logic/core/targeting.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { state } from "@core/gameState.js";
-import { runEffects } from "@logic/core/effects/index.js";
+import { getPool, highlightSelectable } from "../../core/targeting.js";
+import { cleanupDead } from "../../core/cleanup.js";
+import { state } from "../../../core/gameState.js";
+import { runEffects } from "../../core/effects/index.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
-import { randInt } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { CardInstance, Effect, Player } from "@core/types.js";
+import { render } from "../../../ui/render.js";
+import { randInt } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { CardInstance, Effect, Player } from "../../../core/types.js";
 
 // --- helpers --------------------------------------------------------------
 function isAlly(card: CardInstance, owner: Player) {

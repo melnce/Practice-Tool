@@ -1,6 +1,6 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { startRecordingTimeline, stopRecordingTimeline, clearTimeline, recordEvent, getTimeline } from "#core/debugTimeline";
+import { startRecordingTimeline, stopRecordingTimeline, clearTimeline, recordEvent, getTimeline } from "../src/core/debugTimeline";
 
 describe("Debug Timeline", () => {
     beforeEach(() => {

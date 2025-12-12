@@ -1,12 +1,12 @@
 // src/ui/helpers/glow.ts
-import { state } from "@core/gameState.js";
-import { isOverflow } from "@helpers/overflow.js";
-import { comboReadyInHand } from "@helpers/combo.js";
-import { hasNecromancy } from "@helpers/necromancy.js";
-import { getPool } from "@logic/core/targeting.js";
+import { state } from "../../core/gameState.js";
+import { isOverflow } from "../../helpers/overflow.js";
+import { comboReadyInHand } from "../../helpers/combo.js";
+import { hasNecromancy } from "../../helpers/necromancy.js";
+import { getPool } from "../../logic/core/targeting.js";
 // @ts-ignore
-import { handleSuperEvoGate } from "@logic/effects/gates/gates.js";
-import { CardInstance, GameState, Player, Effect } from "@core/types.js";
+import { handleSuperEvoGate } from "../../logic/effects/gates/gates.js";
+import { CardInstance, GameState, Player, Effect } from "../../core/types.js";
 
 
 // ---- local helpers ported from zones.js ----

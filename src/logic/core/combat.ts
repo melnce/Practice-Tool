@@ -1,25 +1,25 @@
 // src/logic/core/combat.ts
-import { GameState, CardInstance, Player } from "@core/types.js";
-import { state } from "@core/gameState.js";
-import { logEvent } from "@core/logger.js";
-import { runEffects } from "@logic/core/effects/index.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { recordEvent } from "@core/debugTimeline.js";
+import { GameState, CardInstance, Player } from "../../core/types.js";
+import { state } from "../../core/gameState.js";
+import { logEvent } from "../../core/logger.js";
+import { runEffects } from "./effects/index.js";
+import { fireTrigger } from "./triggers.js";
+import { recordEvent } from "../../core/debugTimeline.js";
 
 // Helper: Resolve combat damage between two followers
 function resolveCombat(attacker: CardInstance, defender: CardInstance, owner: Player) { }
 
 // Imported from JS still
 // @ts-ignore
-import { applyLeaderDamage, handleHealLeader } from "@logic/effects/leader.js";
+import { applyLeaderDamage, handleHealLeader } from "../effects/leader.js";
 // @ts-ignore
-import { resolveDestroy } from "@logic/effects/ops/destroy.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
+import { resolveDestroy } from "../effects/ops/destroy.js";
+import { cleanupDead } from "./cleanup.js";
 // @ts-ignore
-import { render } from "@ui/render.js";
+import { render } from "../../ui/render.js";
 // @ts-ignore
-import { dealDamage, popBarrier } from "@logic/core/barrier.js";
-import { doAction } from "@core/history.js";
+import { dealDamage, popBarrier } from "./barrier.js";
+import { doAction } from "../../core/history.js";
 
 
 /* ------------------------------- helpers ------------------------------- */

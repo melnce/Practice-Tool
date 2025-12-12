@@ -1,64 +1,64 @@
 // src/logic/core/effects/index.ts
 
-import { state } from "@core/gameState.js";
-import { render } from "@ui/render.js";
-import { fireTrigger } from "@logic/core/triggers.js";
-import { CardInstance, Effect, Player, GameState } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { render } from "../../../ui/render.js";
+import { fireTrigger } from "../triggers.js";
+import { CardInstance, Effect, Player, GameState } from "../../../core/types.js";
 
 
-import { handleBanish, handleBanishTargeted, handleBanishDuplicatesFromDeck, handleBanishAllEnemyCopies, handleBanishRandom } from "@logic/effects/ops/banish.js";
+import { handleBanish, handleBanishTargeted, handleBanishDuplicatesFromDeck, handleBanishAllEnemyCopies, handleBanishRandom } from "../../effects/ops/banish.js";
 // import { handleHimekaCrestEffect } from "@logic/effects/cards/havencraft/himeka.js"
-import { addMaxPP } from "@logic/pp.js";
-import { handleReturnToHand } from "@logic/effects/ops/bounce.js";
-import { handleBuff, handleBuffHandTribe, handleBuffLastAddedToHand, handleBuffHandClass, handleSetAttackTo, handleComboRepeatBuff, handleSetStats } from "@logic/effects/ops/buff.js";
-import { handleJunoDamage } from "@logic/effects/cards/runecraft/juno.js";
-import { processCrestEvent, handleGainCrest, crestAddCounter, crestSpendCounter } from "@logic/effects/crest.js";
-import { handleChoose } from "@logic/effects/ops/choose.js";
-import { handleAddCounter, handleReduceCountdown, handleIncreaseCountdown } from "@logic/effects/counters.js";
+import { addMaxPP } from "../../pp.js";
+import { handleReturnToHand } from "../../effects/ops/bounce.js";
+import { handleBuff, handleBuffHandTribe, handleBuffLastAddedToHand, handleBuffHandClass, handleSetAttackTo, handleComboRepeatBuff, handleSetStats } from "../../effects/ops/buff.js";
+import { handleJunoDamage } from "../../effects/cards/runecraft/juno.js";
+import { processCrestEvent, handleGainCrest, crestAddCounter, crestSpendCounter } from "../../effects/crest.js";
+import { handleChoose } from "../../effects/ops/choose.js";
+import { handleAddCounter, handleReduceCountdown, handleIncreaseCountdown } from "../../effects/counters.js";
 import {
     handleDamage, handleDamageAll, handleDamageRandom,
     handleDamageSplitSequential, handleDamageFollowerOrLeader,
     handleDamageAllByAlliedGolems, handleDamageSplitFixed,
     handleDamageRandomSelectedDefense,
     handleDamageSplitAllEnemies, handleDamageHighestDefense
-} from "@logic/effects/ops/damage.js";
-import { handleReplaceDeck } from "@logic/effects/deck.js";
-import { handleDestroy, handleDestroyHighest, destroyAlliedAmulets, handleDestroyAll, handleDestroyRandom, resolveDestroy } from "@logic/effects/ops/destroy.js";
+} from "../../effects/ops/damage.js";
+import { handleReplaceDeck } from "../../effects/deck.js";
+import { handleDestroy, handleDestroyHighest, destroyAlliedAmulets, handleDestroyAll, handleDestroyRandom, resolveDestroy } from "../../effects/ops/destroy.js";
 // import { handleDragonsign as handleDragonSign } from "@logic/effects/cards/dragoncraft/dragonsign.js";
-import { handleDraw, handleDrawAllNamedWithKeyword, handleDrawFiltered, handleAddToHand, handleDrawComboFollower, handleDrawOpponent, handleDrawNamed } from "@logic/effects/ops/draw.js";
-import { consumeEarthSigils } from "@logic/effects/cards/runecraft/earth.js";
-import { handleSelectEvolveGolem } from "@logic/effects/cards/runecraft/golem.js";
-import { handleDiscardSelectHand, handleTransformInHand, handleDiscardAllExceptNamed } from "@logic/effects/hand.js";
-import { handleKeyword, handleRemoveKeyword, handleKeywordSelf, handleConditionalKeyword } from "@logic/core/keywords.js";
-import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp, applyLeaderDamage } from "@logic/effects/leader.js";
-import { handleReanimate } from "@logic/effects/ops/reanimate.js";
-import { handleReturnHandToDeck } from "@logic/effects/ops/returnHandToDeck.js";
-import { handleRepeatEffect } from "@logic/effects/repeat.js";
-import { handleEvolveSelf } from "@logic/effects/ops/evolve.js";
-import { handleBuffSelf, handleDestroySelf, handleBanishSelf, handleDynamicBuffSelf } from "@logic/effects/self.js";
-import { spellboostHand } from "@logic/effects/ops/spellboost.js";
+import { handleDraw, handleDrawAllNamedWithKeyword, handleDrawFiltered, handleAddToHand, handleDrawComboFollower, handleDrawOpponent, handleDrawNamed } from "../../effects/ops/draw.js";
+import { consumeEarthSigils } from "../../effects/cards/runecraft/earth.js";
+import { handleSelectEvolveGolem } from "../../effects/cards/runecraft/golem.js";
+import { handleDiscardSelectHand, handleTransformInHand, handleDiscardAllExceptNamed } from "../../effects/hand.js";
+import { handleKeyword, handleRemoveKeyword, handleKeywordSelf, handleConditionalKeyword } from "../keywords.js";
+import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp, applyLeaderDamage } from "../../effects/leader.js";
+import { handleReanimate } from "../../effects/ops/reanimate.js";
+import { handleReturnHandToDeck } from "../../effects/ops/returnHandToDeck.js";
+import { handleRepeatEffect } from "../../effects/repeat.js";
+import { handleEvolveSelf } from "../../effects/ops/evolve.js";
+import { handleBuffSelf, handleDestroySelf, handleBanishSelf, handleDynamicBuffSelf } from "../../effects/self.js";
+import { spellboostHand } from "../../effects/ops/spellboost.js";
 import {
     summonNamed, summonRandomFromDeck, handleSelectHandSummonArtifactCopiesEOT, summonExactCopyFromHand, handleSelectHandSummonArtifactCopy,
     summonExactCopy, handleSummonDestroyedAmuletHighestBaseCost
-} from "@logic/effects/ops/summon.js";
+} from "../../effects/ops/summon.js";
 import {
     handleSuperEvoGate, handleEvolvedSelfGate, amuletCountGate, hasNoDuplicatesInDeck, noAllyAttackedThisTurn,
     handleBoardNameGate, handleBothMaxPPGate, handleRallyGate, handleSelfCostGate, handleSuperEvolvedAlliedGate,
     handleMaxPPGate
-} from "@logic/effects/gates/gates.js";
-import { handleSelect, getPool, highlightSelectable, clearSelectableFlags } from "@logic/core/targeting.js";
-import { handleComboAdd, handleComboGate } from "@logic/effects/gates/combo.js";
-import { handleReduceCostSelf, handleReduceCost, handleSetCostSelf, applyTempOpponentHandCostMod, handleHalveDeckCost, handleModifyCost, handleModifyCostPool, reduceDeckFollowersCost } from "@logic/effects/cost.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { isOverflow } from "@helpers/overflow.js";
-import { hasNecromancy, spendShadows } from "@helpers/necromancy.js";
-import { onEvolve } from "@logic/evolveUtils.js";
-import { recordEvent } from "@core/debugTimeline.js";
-import { applyAttacksPerTurn } from "@logic/effects/attacks.js";
-import { opStartFuseFromCard, startFortifierFuse } from "@logic/effects/ops/fuse/fuse.js";
-import { handCountGate } from "@logic/effects/gates/handCountGate.js";
-import { transformTarget, transformRandomSpellInHand } from "@logic/effects/ops/transform.js";
-import { handleFillBoardChainDecay as handleFillCongregantCopies } from "@logic/effects/ops/summon.js";
+} from "../../effects/gates/gates.js";
+import { handleSelect, getPool, highlightSelectable, clearSelectableFlags } from "../targeting.js";
+import { handleComboAdd, handleComboGate } from "../../effects/gates/combo.js";
+import { handleReduceCostSelf, handleReduceCost, handleSetCostSelf, applyTempOpponentHandCostMod, handleHalveDeckCost, handleModifyCost, handleModifyCostPool, reduceDeckFollowersCost } from "../../effects/cost.js";
+import { cleanupDead } from "../cleanup.js";
+import { isOverflow } from "../../../helpers/overflow.js";
+import { hasNecromancy, spendShadows } from "../../../helpers/necromancy.js";
+import { onEvolve } from "../../evolveUtils.js";
+import { recordEvent } from "../../../core/debugTimeline.js";
+import { applyAttacksPerTurn } from "../../effects/attacks.js";
+import { opStartFuseFromCard, startFortifierFuse } from "../../effects/ops/fuse/fuse.js";
+import { handCountGate } from "../../effects/gates/handCountGate.js";
+import { transformTarget, transformRandomSpellInHand } from "../../effects/ops/transform.js";
+import { handleFillBoardChainDecay as handleFillCongregantCopies } from "../../effects/ops/summon.js";
 import {
     handleDestroyAlliedAmuletsThenDamage,
     handleDamageEnemyLeaderByOtherAllies,
@@ -68,10 +68,10 @@ import {
     handleChooseBonusAdd,
     handleGainMaxPP,
     handleSetCostLastDrawn
-} from "@logic/effects/ops/misc.js";
+} from "../../effects/ops/misc.js";
 
 
-import { logEvent } from "@core/logger.js";
+import { logEvent } from "../../../core/logger.js";
 
 
 
@@ -324,7 +324,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "reduce_deck_followers_cost": { const amt = parseInt(String(eff.amount ?? 1)) || 1; reduceDeckFollowersCost(owner, amt); break; }
             case "remove_keyword": if (handleRemoveKeyword(eff as any, owner) === "pending") return; break;
             case "replace_deck": handleReplaceDeck(owner, eff); break;
-            case "replace_deck_with_set_minus": { import("@logic/effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => render()); }); break; }
+            case "replace_deck_with_set_minus": { import("../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => render()); }); break; }
             case "restore_full_defense_self": handleRestoreFullDefenseSelf(sourceCard!, context); break;
             case "restore_self_and_heal_leader": handleRestoreSelfAndHealLeader(owner, sourceCard!); break;
             case "return_hand_to_deck": if (handleReturnHandToDeck(eff, owner, queue) === "pending") return; break;
@@ -348,7 +348,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "stormy_blast_counter": import('../../effects/cards/runecraft/stormyBlast.js').then(({ handleStormyBlastCounter }) => { handleStormyBlastCounter(sourceCard!); }); break;
             case "stormy_blast_damage": import('../../effects/cards/runecraft/stormyBlast.js').then(({ handleStormyBlastDamage }) => { return handleStormyBlastDamage(eff, owner, sourceCard, queue); }); return;
             case "super_evo_gate": if (handleSuperEvoGate(owner)) { effects.unshift(...(eff.effects || [])); } break;
-            case "super_evolve_ally": { import("@logic/evolveUtils.js").then(({ superEvolveAllyFromContext }) => { superEvolveAllyFromContext(owner, sourceCard, context); }); break; }
+            case "super_evolve_ally": { import("../../evolveUtils.js").then(({ superEvolveAllyFromContext }) => { superEvolveAllyFromContext(owner, sourceCard, context); }); break; }
             case "super_evolved_allied_gate": handleSuperEvolvedAlliedGate(owner, eff, queue); break;
             case "super_evolve_self": handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false }); break;
             case "super_evolved_self_gate": { const isSuper = sourceCard && sourceCard.evoType === "super"; const next = (isSuper ? eff.effects : eff.else_effects) || []; if (next.length) { effects.unshift(...next); } break; }

@@ -1,7 +1,7 @@
 // src/logic/pp.ts
-import { state } from "@core/gameState.js";
-import { logEvent } from "@core/logger.js";
-import { Player } from "@core/types.js";
+import { state } from "../core/gameState.js";
+import { logEvent } from "../core/logger.js";
+import { Player } from "../core/types.js";
 
 
 export function increaseMaxPP(owner: Player, amount = 1, { cap = 10, recalcNow = true } = {}) {

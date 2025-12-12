@@ -1,11 +1,11 @@
 // src/logic/effects/ops/buff.ts
-import { state } from "@core/gameState.js";
-import { getPool, highlightSelectable } from "@logic/core/targeting.js";
-import { cleanupDead } from "@logic/core/cleanup.js";
-import { applyKeyword } from "@logic/core/keywords.js";
-import { rand, randInt } from "@core/rng.js";
-import { logEvent } from "@core/logger.js";
-import { Effect, Player, CardInstance } from "@core/types.js";
+import { state } from "../../../core/gameState.js";
+import { getPool, highlightSelectable } from "../../core/targeting.js";
+import { cleanupDead } from "../../core/cleanup.js";
+import { applyKeyword } from "../../core/keywords.js";
+import { rand, randInt } from "../../../core/rng.js";
+import { logEvent } from "../../../core/logger.js";
+import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
 export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any, context: any = {}) {
@@ -113,7 +113,7 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
 
             // NEW: notify when a positive buff is applied to a follower on the field
             if ((a > 0 || d > 0) && (state.blueBoard.includes(target) || state.redBoard.includes(target))) {
-                import("@logic/core/triggers.js").then(({ fireTrigger }) => {
+                import("../../core/triggers.js").then(({ fireTrigger }) => {
                     fireTrigger("self_buffed_up", owner, { target });
                 });
             }
@@ -124,7 +124,7 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
                     state.redBoard.includes(target) ? "red" : null;
                 const debufferOwner = owner; // the player executing this buff/debuff op
                 if (targetOwner && debufferOwner) {
-                    import("@logic/core/triggers.js").then(({ fireTrigger }) => {
+                    import("../../core/triggers.js").then(({ fireTrigger }) => {
                         fireTrigger("enemy_follower_defense_down", debufferOwner, { target });
                     });
                 }
@@ -173,7 +173,7 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
 
         // NEW: notify when a positive buff is applied to a follower on the field
         if ((a > 0 || d > 0) && (state.blueBoard.includes(target) || state.redBoard.includes(target))) {
-            import("@logic/core/triggers.js").then(({ fireTrigger }) => {
+            import("../../core/triggers.js").then(({ fireTrigger }) => {
                 fireTrigger("self_buffed_up", owner, { target });
             });
         }
@@ -184,7 +184,7 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
                 state.redBoard.includes(target) ? "red" : null;
             const debufferOwner = owner; // the player executing this buff/debuff op
             if (targetOwner && debufferOwner) {
-                import("@logic/core/triggers.js").then(({ fireTrigger }) => {
+                import("../../core/triggers.js").then(({ fireTrigger }) => {
                     fireTrigger("enemy_follower_defense_down", debufferOwner, { target });
                 });
             }
