@@ -8,9 +8,8 @@ import { getCardDetails } from "../../../data/cardDatabase.js";
 import { rand, randInt, makeUid } from "../../../core/rng.js";
 import { logEvent } from "../../../core/logger.js";
 // @ts-ignore
-import { handleStormyBlastCounter } from "../cards/runecraft/stormyBlast.js";
+
 // @ts-ignore
-import { handleWilliamCounter } from "../cards/runecraft/william.js";
 import { Player, CardInstance } from "../../../core/types.js";
 
 
@@ -76,23 +75,7 @@ function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
                 continue; // DO NOT pass this op to runEffects
             }
 
-            // --- Custom: Stormy Blast counter / UI update ---
-            if (effect.op === "stormy_blast_counter") {
-                import("../cards/runecraft/stormyBlast.js").then(module => {
-                    module.handleStormyBlastCounter(c);
 
-                    // Keep spell's damage in sync for UI if present
-                    if (c.spell && Array.isArray(c.spell)) {
-                        for (const se of c.spell) {
-                            if (se.op === "stormy_blast_damage") {
-                                // @ts-ignore
-                                se.stormyBlastDamage = c.currentStormyBlastDamage ?? 2;
-                            }
-                        }
-                    }
-                });
-                continue;
-            }
 
             // --- Custom: William counter ---
             if (effect.op === "william_counter") {
@@ -101,19 +84,22 @@ function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
                 });
                 continue;
             }
-            if (effect.op === "chaos_counter") {
-                import("../cards/runecraft/chaos.js").then(module => {
-                    // @ts-ignore
-                    module.handleChaosCounter(c);
-                });
-                continue;
-            }
+
 
 
             // Everything else: generic path
             runEffects([effect], owner, c);
         }
     }
+}
+
+export function handleSetSpellboostCount(eff: any, sourceCard: CardInstance) {
+    if (!sourceCard) return;
+    const val = parseInt(eff.amount ?? 0, 10) || 0;
+    sourceCard.spellboostCount = val;
+
+    // If setting to 0, visually clear it (UI might check for >0 or existing property)
+    // Re-rendering happens periodically
 }
 
 /* ------------------------ main ------------------------ */
@@ -208,14 +194,8 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
             if (!kw || !Array.isArray(kw.effects) || kw.effects.length === 0 as any) continue;
 
             for (const effect of kw.effects) {
-                if (effect.op === "stormy_blast_counter") {
-                    handleStormyBlastCounter(c);
-                } else if (effect.op === "william_counter") {
-                    handleWilliamCounter(c);
-                } else {
-                    // pass the board card as source so buff_self hits itself
-                    runEffects([effect], owner, c);
-                }
+                // pass the board card as source so buff_self hits itself
+                runEffects([effect], owner, c);
             }
         }
     }

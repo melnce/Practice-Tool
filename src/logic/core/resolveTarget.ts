@@ -27,6 +27,7 @@ import { fireTrigger } from "./triggers.js";
 import { summonNamed, summonExactCopyFromHand } from "../effects/ops/summon.js";
 // @ts-ignore
 import { applyLeaderDamage } from "../effects/leader.js";
+import { resolveAmountWithOverflow } from "../effects/ops/damage.js";
 import {
     fuse_finalize_generic as opFinalizeFuseGeneric,
     fuse_finalize_fortifier as opFinalizeFortifierFuse,
@@ -332,24 +333,8 @@ export function resolvePendingTarget(uid: string | "leader") {
     }
 
     if (eff.op === "damage") {
-        const resolveAmount = (eff: Effect, owner: Player, sourceCard: CardInstance) => {
-            const raw = eff.amount;
-            const rawOverflow = eff.amount_overflow ?? eff.overflow_amount;
-            const resolveToken = (val: any) => {
-                if (typeof val === "string") {
-                    if (val.trim().toLowerCase() === "{self.attack}") {
-                        return parseInt(sourceCard?.attack as any || 0) || 0;
-                    }
-                    const n = parseInt(val);
-                    return Number.isFinite(n) ? n : 0;
-                }
-                return parseInt(val) || 0;
-            };
-            const base = resolveToken(raw);
-            const of = resolveToken(rawOverflow ?? base);
-            return isOverflow(owner) ? of : base;
-        }
-        const amt = resolveAmount(eff, owner, sourceCard);
+        const amt = resolveAmountWithOverflow(eff, owner, { sourceCard });
+
         if (amt) {
             // 1. This loop deals the damage FIRST.
             for (const target of targets) {
@@ -361,14 +346,6 @@ export function resolvePendingTarget(uid: string | "leader") {
             // 2. Cleanup runs SECOND, after damage is done.
             cleanupDead();
         }
-    } else if (eff.op === "juno_damage") {
-        const earthCount = eff.amount || 0;
-        for (const target of targets) {
-            if (target.type === "Follower") {
-                dealDamage(target, earthCount);
-            }
-        }
-        cleanupDead();
     } else if (eff.op === "transform") {
         const intoName = String(eff.into || eff.name || "").trim();
         const target = (targets && targets[0]) || null;

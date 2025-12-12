@@ -24,7 +24,6 @@ export type EffectOp =
     | "gain_crest" | "gain_max_pp"
     | "halve_deck_cost" | "hand_count_gate" | "heal_leader" | "himeka_crest_effect"
     | "increase_countdown" | "increase_opponent_hand_cost_eot"
-    | "juno_damage"
     | "keyword" | "keyword_self" | "kuon_enhance"
     | "leader_barrier"
     | "modify_cost" | "modify_cost_pool"
@@ -39,11 +38,11 @@ export type EffectOp =
     | "set_attack_to" | "set_deckout_victory" | "set_max_hp"
     | "spellboost" | "spellboost_hand" | "spellboost_target"
     | "start_fortifier_fuse" | "start_fuse_from_card" | "self_cost_gate" | "set_cost_last_drawn" | "set_cost_self"
-    | "stormy_blast_counter" | "stormy_blast_damage" | "summon"
+    | "summon"
     | "super_evo_gate" | "super_evolve_ally" | "super_evolved_allied_gate" | "super_evolve_self" | "super_evolved_self_gate"
     | "summon_destroyed_amulet_highest_base_cost" | "summon_exact_copy" | "summon_named" | "summon_named_enemy" | "summon_random_from_deck"
     | "transform" | "transform_in_hand" | "transform_random_spell_in_hand" | "transform_self_if_spellboost_at_least"
-    | "william_counter" | "william_damage_all"
+    | "set_spellboost_count"
     | "notify_loot_played" | "rally" | "notify_burial" // passive ops
     | string;
 
@@ -57,6 +56,7 @@ export interface BaseEffect {
 export interface DamageEffect extends BaseEffect {
     op: "damage" | "damage_all" | "damage_random" | "damage_self" | "damage_follower_or_leader";
     amount?: number | string;
+    add_amount?: number | string;
     target?: string;
 }
 

@@ -12,7 +12,7 @@ import { handleBanish, handleBanishTargeted, handleBanishDuplicatesFromDeck, han
 import { addMaxPP } from "../../pp.js";
 import { handleReturnToHand } from "../../effects/ops/bounce.js";
 import { handleBuff, handleBuffHandTribe, handleBuffLastAddedToHand, handleBuffHandClass, handleSetAttackTo, handleComboRepeatBuff, handleSetStats } from "../../effects/ops/buff.js";
-import { handleJunoDamage } from "../../effects/cards/runecraft/juno.js";
+
 import { processCrestEvent, handleGainCrest, crestAddCounter, crestSpendCounter } from "../../effects/crest.js";
 import { handleChoose } from "../../effects/ops/choose.js";
 import { handleAddCounter, handleReduceCountdown, handleIncreaseCountdown } from "../../effects/counters.js";
@@ -37,7 +37,7 @@ import { handleReturnHandToDeck } from "../../effects/ops/returnHandToDeck.js";
 import { handleRepeatEffect } from "../../effects/repeat.js";
 import { handleEvolveSelf } from "../../effects/ops/evolve.js";
 import { handleBuffSelf, handleDestroySelf, handleBanishSelf, handleDynamicBuffSelf } from "../../effects/self.js";
-import { spellboostHand } from "../../effects/ops/spellboost.js";
+import { spellboostHand, handleSetSpellboostCount } from "../../effects/ops/spellboost.js";
 import {
     summonNamed, summonRandomFromDeck, handleSelectHandSummonArtifactCopiesEOT, summonExactCopyFromHand, handleSelectHandSummonArtifactCopy,
     summonExactCopy, handleSummonDestroyedAmuletHighestBaseCost
@@ -176,8 +176,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "buff_last_added_to_hand": handleBuffLastAddedToHand(eff, owner); break;
             case "buff_self": handleBuffSelf(sourceCard, eff); break;
             case "buff_hand_tribe": handleBuffHandTribe(eff, owner); break;
-            case "chaos_counter": import('../../effects/cards/runecraft/chaos.js').then(({ handleChaosCounter }) => { handleChaosCounter(sourceCard!); }); break;
-            case "chaos_split_damage": import('../../effects/cards/runecraft/chaos.js').then(({ handleChaosSplitDamage }) => { handleChaosSplitDamage(owner, sourceCard); }); break;
+
             case "choose": if (handleChoose(eff, owner, sourceCard, queue) === "pending") return; break;
             case "choose_bonus_add": handleChooseBonusAdd(owner, eff); break;
             case "combo_add": handleComboAdd(owner, eff as any); break;
@@ -214,7 +213,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
                 break;
             }
             case "damage_split_all_enemies": handleDamageSplitAllEnemies(eff, owner, sourceCard); break;
-            case "damage_split_fixed": handleDamageSplitFixed(eff, owner); break;
+            case "damage_split_fixed": handleDamageSplitFixed(eff, owner, sourceCard); break;
             case "damage_split_sequential": handleDamageSplitSequential(eff, owner); break;
             case "destroy": if (handleDestroy(eff, owner, queue, context, sourceCard) === "pending") return; break;
             case "destroy_all": handleDestroyAll(eff, owner, sourceCard, context); break;
@@ -262,7 +261,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "draw_opponent": handleDrawOpponent(eff, owner); break;
             case "dynamic_buff_self": handleDynamicBuffSelf(sourceCard, eff as any, owner); break;
             case "dynamic_heal_leader": handleDynamicHealLeader(owner, eff); logEvent("healLeader", { owner, amount: eff.amount }); break;
-            case "earth_rite": if (consumeEarthSigils(owner, (eff as any).cost || 1)) effects.unshift(...(eff.effects || [])); break;
+            case "earth_rite": if (consumeEarthSigils(owner, (eff as any).cost || 1)) queue.unshift(...(eff.effects || [])); break;
             case "evolved_self_gate": handleEvolvedSelfGate(eff, owner, sourceCard!, queue); break;
             case "evolve_all_unevolved_allies": {
                 const board = owner === "blue" ? state.blueBoard : state.redBoard;
@@ -298,7 +297,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "himeka_crest_effect": console.warn("Legacy himeka op used"); break;
             case "increase_countdown": { const amt = Number(eff.amount ?? 1); handleIncreaseCountdown(owner, amt); break; }
             case "increase_opponent_hand_cost_eot": { const amt = parseInt(String(eff.amount ?? 1)) || 1; applyTempOpponentHandCostMod(owner, amt); break; }
-            case "juno_damage": if (handleJunoDamage(eff, owner, sourceCard, queue) === "pending") return; break;
+
             case "keyword": { const merged = { ...(context || {}), sourceCard }; if (handleKeyword(eff as any, owner, queue, merged) === "pending") return; break; }
             case "keyword_self": { const target = sourceCard || (Array.isArray(state.lastSummoned) ? state.lastSummoned[0] : null); handleKeywordSelf(target!, eff); break; }
             case "kuon_enhance": import('../../effects/cards/runecraft/kuon.js').then(({ handleKuonEnhance }) => { handleKuonEnhance(owner); }); break;
@@ -346,8 +345,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "set_stats": { const res = handleSetStats(eff, owner, sourceCard, effects, context); if (res === "pending") return res; break; }
             case "set_cost_last_drawn": handleSetCostLastDrawn(eff); break;
             case "set_cost_self": handleSetCostSelf(sourceCard, eff); break;
-            case "stormy_blast_counter": import('../../effects/cards/runecraft/stormyBlast.js').then(({ handleStormyBlastCounter }) => { handleStormyBlastCounter(sourceCard!); }); break;
-            case "stormy_blast_damage": import('../../effects/cards/runecraft/stormyBlast.js').then(({ handleStormyBlastDamage }) => { return handleStormyBlastDamage(eff, owner, sourceCard, queue); }); return;
+            case "set_cost_self": handleSetCostSelf(sourceCard, eff); break;
             case "super_evo_gate": if (handleSuperEvoGate(owner)) { effects.unshift(...(eff.effects || [])); } break;
             case "super_evolve_ally": { import("../../evolveUtils.js").then(({ superEvolveAllyFromContext }) => { superEvolveAllyFromContext(owner, sourceCard, context); }); break; }
             case "super_evolved_allied_gate": handleSuperEvolvedAlliedGate(owner, eff, queue); break;
@@ -397,8 +395,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "transform_in_hand": handleTransformInHand(eff, owner); break;
             case "transform_random_spell_in_hand": { transformRandomSpellInHand(owner, (eff as any).into || "Ersatz Elimination"); break; }
             case "transform_self_if_spellboost_at_least": return;
-            case "william_counter": import('../../effects/cards/runecraft/william.js').then(({ handleWilliamCounter }) => { handleWilliamCounter(sourceCard!); }); break;
-            case "william_damage_all": { const x = ((sourceCard as any)?.currentWilliamDamage ?? (sourceCard as any)?.spellboostCount ?? 0) | 0; handleDamageAll({ op: "damage_all", target: "enemy:follower", amount: x } as any, owner); break; }
+            case "set_spellboost_count": handleSetSpellboostCount(eff, sourceCard!); break;
 
 
             default:

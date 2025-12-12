@@ -149,7 +149,7 @@ export function handleDamageSplitSequential(eff: Effect, owner: Player) {
 }
 
 
-function resolveAmountWithOverflow(eff: Effect, owner: Player, context: any = {}) {
+export function resolveAmountWithOverflow(eff: Effect, owner: Player, context: any = {}) {
     const resolveToken = (val: any) => {
         if (val == null) return 0;
         if (typeof val === "number") return val | 0;
@@ -188,18 +188,40 @@ function resolveAmountWithOverflow(eff: Effect, owner: Player, context: any = {}
             const hand = owner === "blue" ? state.blueHand : state.redHand;
             return hand.length | 0;
         }
+        if (s === "{earth_counter_sum}") {
+            const board = owner === "blue" ? state.blueBoard : state.redBoard;
+            return board
+                .filter(c => c?.type === "Amulet" && (c.counters?.earth || 0) > 0)
+                .reduce((sum, c) => sum + (c.counters?.earth || 0), 0);
+        }
+        if (s === "{self.spellboostcount}") {
+            const src = context.sourceCard || context.attacker || null;
+            return parseInt((src as any)?.spellboostCount || 0, 10) || 0;
+        }
 
         const n = parseInt(val, 10);
         return Number.isFinite(n) ? n : 0;
     };
 
     const baseRaw = eff.amount;
+    const addRaw = (eff as any).add_amount;
     const ofRaw = (eff as any).amount_overflow ?? (eff as any).overflow_amount ?? baseRaw;
 
     const baseAmt = resolveToken(baseRaw);
+    const addAmt = resolveToken(addRaw);
     const ofAmt = resolveToken(ofRaw);
 
-    return isOverflow(owner) ? ofAmt : baseAmt;
+    if (eff.add_amount) {
+        console.log(`[DamageDebug] Resolving add_amount: "${eff.add_amount}" -> ${addAmt}`);
+        console.log(`[DamageDebug] Context Source:`, context.sourceCard ? `${context.sourceCard.name} (SB: ${context.sourceCard.spellboostCount})` : "None");
+    }
+
+    const checkOverflow = isOverflow(owner);
+    // If overflowing, use override amount if present; otherwise use base. Always add add_amount.
+    // If ofRaw is defined, it OVERRIDES baseRaw.
+    const primary = (checkOverflow && ofRaw != null) ? ofAmt : baseAmt;
+
+    return primary + addAmt;
 }
 
 
@@ -257,9 +279,9 @@ export function handleDamageAllByAlliedGolems(eff: Effect, owner: Player) {
 
     cleanupDead();
 }
-export function handleDamageSplitFixed(eff: Effect, owner: Player) {
+export function handleDamageSplitFixed(eff: Effect, owner: Player, sourceCard: CardInstance = null as any) {
     // Use the configured amount (supports tokens/overflow)
-    let damageToDeal = resolveAmountWithOverflow(eff, owner);
+    let damageToDeal = resolveAmountWithOverflow(eff, owner, { sourceCard });
 
     if (damageToDeal <= 0) return;
 

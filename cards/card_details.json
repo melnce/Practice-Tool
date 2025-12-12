@@ -3858,16 +3858,16 @@
     "keywords": [
       {
         "name": "Spellboost",
-        "effects": [
-          {
-            "op": "stormy_blast_counter"
-          }
-        ]
+        "effects": []
       }
     ],
     "spell": [
       {
-        "op": "stormy_blast_damage"
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 2,
+        "add_amount": "{self.spellboostCount}"
       }
     ]
   },
@@ -3984,16 +3984,18 @@
     "keywords": [
       {
         "name": "Spellboost",
-        "effects": [
-          {
-            "op": "william_counter"
-          }
-        ]
+        "effects": []
       }
     ],
     "fanfare": [
       {
-        "op": "william_damage_all"
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": "{self.spellboostCount}"
+      },
+      {
+        "op": "set_spellboost_count",
+        "amount": 0
       }
     ],
     "evolve": [
@@ -4132,7 +4134,10 @@
     "url": "https://shadowverse.gg/cards/10133110-juno-visionary-alchemist",
     "fanfare": [
       {
-        "op": "juno_damage"
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": "{earth_counter_sum}"
       }
     ],
     "evolve": [
@@ -8785,17 +8790,14 @@
     "keywords": [
       {
         "name": "Spellboost",
-        "effects": [
-          {
-            "op": "chaos_counter"
-          }
-        ]
+        "effects": []
       }
     ],
     "spell": [
       {
-        "op": "chaos_split_damage",
-        "target": "enemy:follower"
+        "op": "damage_split_fixed",
+        "target": "enemy:follower",
+        "amount": "{self.spellboostCount}"
       }
     ]
   },

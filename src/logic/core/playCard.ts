@@ -390,8 +390,8 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
         // Spells never enter board — go straight to grave and resolve once
         toGrave.push(card);
         // Increment shadows for the owner
-        if (owner === "blue") state.bluePlaysThisTurn++;
-        else state.redPlaysThisTurn++;
+        if (owner === "blue") state.blueShadows++;
+        else state.redShadows++;
 
         recordEvent({ type: "play_card", payload: { owner, card: card.name, uid: card.uid } });
 
