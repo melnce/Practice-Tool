@@ -1,0 +1,49 @@
+[
+  {
+    "id": "sample_001",
+    "name": "Standard Bearer",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "cost": 2,
+    "stats": {
+      "attack": 2,
+      "defense": 2
+    },
+    "keywords": [],
+    "fanfare": [
+      {
+        "op": "draw",
+        "count": 1
+      }
+    ],
+    "lastWordsEffects": [
+      {
+        "op": "damage_follower_or_leader",
+        "amount": 1,
+        "target": "enemy_leader"
+      }
+    ],
+    "spell": [],
+    "unresolved": [],
+    "sourceText": "Fanfare: Draw a card.\nLast Words: Deal 1 damage to the enemy leader."
+  },
+  {
+    "id": "sample_002",
+    "name": "Quick Blader",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "cost": 1,
+    "stats": {
+      "attack": 1,
+      "defense": 1
+    },
+    "keywords": [
+      "Storm"
+    ],
+    "fanfare": [],
+    "lastWordsEffects": [],
+    "spell": [],
+    "unresolved": [],
+    "sourceText": "Storm."
+  }
+]

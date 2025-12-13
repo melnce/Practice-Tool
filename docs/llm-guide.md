@@ -1,7 +1,7 @@
 # LLM Contributor Guide
 
 ## Where to start
--   **New Card**: Add entry to `cards/card_details.json`. If generic effects (Deal Damage, Buff) are sufficient, you are done.
+-   **New Card**: Add entry to `cards/all.json` (or specific set file in `cards/sets/`).
 -   **New Effect**: Check `src/logic/effects/ops/`. If operation (e.g., `banish`) exists, reuse it. If not, add new `.ts` file in `ops/`.
 -   **Rule Change**: Modify `src/logic/core/turns.ts` or `src/logic/index.ts`.
 -   **UI Bug**: Check `src/ui/render.ts` or `src/ui/zones.ts`.
@@ -55,3 +55,16 @@
 -   **Build**: `npm run build` (runs `tsc`).
 -   **Test**: `npm test` (runs `vitest`).
 -   **Serve**: Use a static server (e.g., Live Server) on the root directory. Open `http://localhost:5500/dist/`.
+
+### Card Import Pipeline
+A deterministic pipeline exists to convert raw card descriptions into compiled JSON.
+- **Raw**: `cards/raw/*.json` (Input)
+- **Compiled**: `cards/compiled/*.json` (Output)
+- **Compiler logic**: `src/data/textCompiler/compiler.ts`
+- **Commands**:
+    - `npm run import:cards`: Compiles raw -> compiled.
+    - `npm run validate:cards`: Checks compiled output for unresolved text.
+    - `npm run cards:all`: Runs both.
+
+> [!NOTE]
+> Do NOT hand-edit files in `cards/compiled/`. Fix the compiler patterns in `src/data/textCompiler/compiler.ts` or the raw input in `cards/raw/` instead.

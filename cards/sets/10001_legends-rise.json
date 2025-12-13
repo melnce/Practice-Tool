@@ -1,5 +1,6 @@
 [
   {
+    "id": "10101110",
     "name": "Ruby, Greedy Cherub",
     "cost": "2",
     "attack": "2",
@@ -30,6 +31,7 @@
     "keywords": []
   },
   {
+    "id": "10101120",
     "name": "Vigilant Detective",
     "cost": "3",
     "attack": "3",
@@ -60,6 +62,7 @@
     ]
   },
   {
+    "id": "10101310",
     "name": "Goblin Foray",
     "cost": "5",
     "attack": "0",
@@ -85,6 +88,7 @@
     "keywords": []
   },
   {
+    "id": "10102110",
     "name": "Apollo, Heaven's Envoy",
     "cost": "3",
     "attack": "1",
@@ -122,6 +126,7 @@
     "keywords": []
   },
   {
+    "id": "10102310",
     "name": "Seraphic Tidings",
     "cost": "3",
     "attack": "0",
@@ -146,6 +151,7 @@
     "keywords": []
   },
   {
+    "id": "10103110",
     "name": "Phildau, Lionheart Ward",
     "cost": "2",
     "attack": "2",
@@ -177,6 +183,7 @@
     "keywords": []
   },
   {
+    "id": "10103310",
     "name": "Divine Thunder",
     "cost": "4",
     "attack": "0",
@@ -207,6 +214,7 @@
     "keywords": []
   },
   {
+    "id": "10104110",
     "name": "Olivia, Heroic Dark Angel",
     "cost": "7",
     "attack": "4",
@@ -255,6 +263,7 @@
     "keywords": []
   },
   {
+    "id": "10104120",
     "name": "Ruler of Cocytus",
     "cost": "10",
     "attack": "10",
@@ -296,6 +305,7 @@
     "keywords": []
   },
   {
+    "id": "10111110",
     "name": "Fay Twinkletoes",
     "cost": "2",
     "attack": "2",
@@ -328,6 +338,7 @@
     "keywords": []
   },
   {
+    "id": "10111120",
     "name": "Capricious Sprite",
     "cost": "3",
     "attack": "1",
@@ -374,6 +385,7 @@
     "keywords": []
   },
   {
+    "id": "10111130",
     "name": "Deepwood Fairy Beast",
     "cost": "8",
     "attack": "4",
@@ -400,6 +412,7 @@
     "keywords": []
   },
   {
+    "id": "10111140",
     "name": "Workin' Grasshopper",
     "cost": "3",
     "attack": "2",
@@ -424,6 +437,7 @@
     "keywords": []
   },
   {
+    "id": "10111150",
     "name": "Elder Sagebrush",
     "cost": "4",
     "attack": "3",
@@ -464,6 +478,7 @@
     "keywords": []
   },
   {
+    "id": "10111310",
     "name": "Fairy Convocation",
     "cost": "1",
     "attack": "0",
@@ -489,6 +504,7 @@
     "keywords": []
   },
   {
+    "id": "10112110",
     "name": "Aerin, Crystalian Frostward",
     "cost": "7",
     "attack": "6",
@@ -521,6 +537,7 @@
     ]
   },
   {
+    "id": "10112120",
     "name": "Good Fairy of the Pond",
     "cost": "1",
     "attack": "1",
@@ -551,6 +568,7 @@
     ]
   },
   {
+    "id": "10112130",
     "name": "Baby Carbuncle",
     "cost": "2",
     "attack": "2",
@@ -582,6 +600,7 @@
     "keywords": []
   },
   {
+    "id": "10112210",
     "name": "Lambent Cairn",
     "cost": "2",
     "attack": "0",
@@ -640,6 +659,7 @@
     ]
   },
   {
+    "id": "10112310",
     "name": "Fragrantwood Whispers",
     "cost": "3",
     "attack": "0",
@@ -668,6 +688,7 @@
     "keywords": []
   },
   {
+    "id": "10113110",
     "name": "Lily, Crystalian Innocence",
     "cost": "2",
     "attack": "1",
@@ -727,6 +748,7 @@
     "keywords": []
   },
   {
+    "id": "10113120",
     "name": "Glade, Fragrantwood Ward",
     "cost": "5",
     "attack": "3",
@@ -763,6 +785,7 @@
     "keywords": []
   },
   {
+    "id": "10113130",
     "name": "Bayle, Luxglaive Warrior",
     "cost": "8",
     "attack": "4",
@@ -804,6 +827,7 @@
     ]
   },
   {
+    "id": "10113140",
     "name": "Killer Rhinoceroach",
     "cost": "3",
     "attack": "0",
@@ -831,6 +855,7 @@
     ]
   },
   {
+    "id": "10113210",
     "name": "Godwood Staff",
     "cost": "3",
     "attack": "0",
@@ -882,6 +907,7 @@
     ]
   },
   {
+    "id": "10114110",
     "name": "Aria, Lady of the Woods",
     "cost": "6",
     "attack": "4",
@@ -929,6 +955,7 @@
     "keywords": []
   },
   {
+    "id": "10114120",
     "name": "Opulent Rose Queen",
     "cost": "9",
     "attack": "6",
@@ -962,6 +989,7 @@
     ]
   },
   {
+    "id": "10114130",
     "name": "Amataz, Origin Blader",
     "cost": "3",
     "attack": "2",
@@ -1022,6 +1050,7 @@
     ]
   },
   {
+    "id": "10121110",
     "name": "Ian, Lovebound Knight",
     "cost": "3",
     "attack": "2",
@@ -1052,6 +1081,7 @@
     ]
   },
   {
+    "id": "10121120",
     "name": "Ernesta, Peace Hawker",
     "cost": "6",
     "attack": "4",
@@ -1092,6 +1122,7 @@
     "keywords": []
   },
   {
+    "id": "10121130",
     "name": "Lyrala, Luminous Potionwright",
     "cost": "3",
     "attack": "1",
@@ -1135,6 +1166,7 @@
     ]
   },
   {
+    "id": "10121140",
     "name": "Hound of War",
     "cost": "3",
     "attack": "4",
@@ -1167,6 +1199,7 @@
     ]
   },
   {
+    "id": "10121150",
     "name": "Ignominious Samurai",
     "cost": "2",
     "attack": "2",
@@ -1198,6 +1231,7 @@
     ]
   },
   {
+    "id": "10121310",
     "name": "Knightly Rending",
     "cost": "4",
     "attack": "0",
@@ -1228,6 +1262,7 @@
     "keywords": []
   },
   {
+    "id": "10122110",
     "name": "Luminous Commander",
     "cost": "1",
     "attack": "1",
@@ -1279,6 +1314,7 @@
     ]
   },
   {
+    "id": "10122120",
     "name": "Luminous Magus",
     "cost": "5",
     "attack": "1",
@@ -1326,6 +1362,7 @@
     ]
   },
   {
+    "id": "10122130",
     "name": "Luminous Lancetrooper",
     "cost": "2",
     "attack": "1",
@@ -1373,6 +1410,7 @@
     ]
   },
   {
+    "id": "10122140",
     "name": "Shinobi Squirrel",
     "cost": "2",
     "attack": "2",
@@ -1406,6 +1444,7 @@
     ]
   },
   {
+    "id": "10122310",
     "name": "Ironcrown Majesty",
     "cost": "3",
     "attack": "0",
@@ -1455,6 +1494,7 @@
     "keywords": []
   },
   {
+    "id": "10123110",
     "name": "Jeno, Levin Axeraider",
     "cost": "7",
     "attack": "7",
@@ -1503,6 +1543,7 @@
     ]
   },
   {
+    "id": "10123120",
     "name": "Valse, Silent Sniper",
     "cost": "3",
     "attack": "2",
@@ -1545,6 +1586,7 @@
     ]
   },
   {
+    "id": "10123130",
     "name": "Zirconia, Ironcrown Ward",
     "cost": "4",
     "attack": "4",
@@ -1588,6 +1630,7 @@
     "keywords": []
   },
   {
+    "id": "10123140",
     "name": "Amalia, Luxsteel Paladin",
     "cost": "8",
     "attack": "6",
@@ -1639,6 +1682,7 @@
     ]
   },
   {
+    "id": "10123310",
     "name": "Ravening Tentacles",
     "cost": "7",
     "attack": "0",
@@ -1673,6 +1717,7 @@
     "keywords": []
   },
   {
+    "id": "10124110",
     "name": "Albert, Levin Stormsaber",
     "cost": "5",
     "attack": "3",
@@ -1711,6 +1756,7 @@
     ]
   },
   {
+    "id": "10124120",
     "name": "Amelia, Silver Captain",
     "cost": "6",
     "attack": "4",
@@ -1756,6 +1802,7 @@
     "keywords": []
   },
   {
+    "id": "10124130",
     "name": "Kagemitsu, Enduring Warrior",
     "cost": "3",
     "attack": "2",
@@ -1801,6 +1848,7 @@
     ]
   },
   {
+    "id": "10131110",
     "name": "Runeblade Conductor",
     "cost": "5",
     "attack": "1",
@@ -1841,6 +1889,7 @@
     ]
   },
   {
+    "id": "10131120",
     "name": "Apprentice Astrologer",
     "cost": "2",
     "attack": "2",
@@ -1875,6 +1924,7 @@
     "keywords": []
   },
   {
+    "id": "10131130",
     "name": "Owl Summoner",
     "cost": "3",
     "attack": "3",
@@ -1913,6 +1963,7 @@
     "keywords": []
   },
   {
+    "id": "10131140",
     "name": "Starry-Eyed Penguin Wizard",
     "cost": "4",
     "attack": "2",
@@ -1947,6 +1998,7 @@
     "keywords": []
   },
   {
+    "id": "10131310",
     "name": "Radiant Rainbow",
     "cost": "2",
     "attack": "0",
@@ -1985,6 +2037,7 @@
     "keywords": []
   },
   {
+    "id": "10131320",
     "name": "Stormy Blast",
     "cost": "1",
     "attack": "0",
@@ -2003,20 +2056,21 @@
     "keywords": [
       {
         "name": "Spellboost",
-        "effects": [
-          {
-            "op": "stormy_blast_counter"
-          }
-        ]
+        "effects": []
       }
     ],
     "spell": [
       {
-        "op": "stormy_blast_damage"
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 2,
+        "add_amount": "{self.spellboostCount}"
       }
     ]
   },
   {
+    "id": "10132110",
     "name": "Ms. Miranda, Adored Academic",
     "cost": "2",
     "attack": "2",
@@ -2065,6 +2119,7 @@
     "keywords": []
   },
   {
+    "id": "10132120",
     "name": "Emmylou, Witch of Wonder",
     "cost": "5",
     "attack": "2",
@@ -2108,6 +2163,7 @@
     ]
   },
   {
+    "id": "10132130",
     "name": "William, Mysterian Student",
     "cost": "6",
     "attack": "5",
@@ -2126,16 +2182,18 @@
     "keywords": [
       {
         "name": "Spellboost",
-        "effects": [
-          {
-            "op": "william_counter"
-          }
-        ]
+        "effects": []
       }
     ],
     "fanfare": [
       {
-        "op": "william_damage_all"
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": "{self.spellboostCount}"
+      },
+      {
+        "op": "set_spellboost_count",
+        "amount": 0
       }
     ],
     "evolve": [
@@ -2152,6 +2210,7 @@
     ]
   },
   {
+    "id": "10132310",
     "name": "Sagelight Teachings",
     "cost": "3",
     "attack": "0",
@@ -2193,17 +2252,14 @@
           },
           {
             "label": "Earth Rite (3) - Deal 4 damage to all enemy followers",
+            "requires": {
+              "earth_rite": 3
+            },
             "effects": [
               {
-                "op": "earth_rite",
-                "cost": 3,
-                "effects": [
-                  {
-                    "op": "damage_all",
-                    "target": "enemy:follower",
-                    "amount": 4
-                  }
-                ]
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 4
               }
             ]
           }
@@ -2213,6 +2269,7 @@
     "keywords": []
   },
   {
+    "id": "10132320",
     "name": "Snowman Army",
     "cost": "8",
     "attack": "0",
@@ -2239,7 +2296,7 @@
             "defense": 1
           },
           {
-            "op": "keyword_self",
+            "op": "keyword",
             "keywords": [
               {
                 "name": "cant_attack",
@@ -2259,6 +2316,7 @@
     ]
   },
   {
+    "id": "10133110",
     "name": "Juno, Visionary Alchemist",
     "cost": "5",
     "attack": "3",
@@ -2274,7 +2332,10 @@
     "url": "https://shadowverse.gg/cards/10133110-juno-visionary-alchemist",
     "fanfare": [
       {
-        "op": "juno_damage"
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": "{earth_counter_sum}"
       }
     ],
     "evolve": [
@@ -2282,7 +2343,7 @@
         "op": "gain_crest",
         "name": "Juno, Visionary Alchemist",
         "image": "images/crests/juno_visionary_alchemist.png",
-        "description": "Countdown (3). At the end of your turn: Earth Rite (1) \u2013 Summon a Guardian Golem.",
+        "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
         "trigger": {
           "event": "end_of_turn",
@@ -2309,7 +2370,7 @@
         "op": "gain_crest",
         "name": "Juno, Visionary Alchemist",
         "image": "images/crests/juno_visionary_alchemist.png",
-        "description": "Countdown (3). At the end of your turn: Earth Rite (1) \u2013 Summon a Guardian Golem.",
+        "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
         "trigger": {
           "event": "end_of_turn",
@@ -2334,6 +2395,7 @@
     "keywords": []
   },
   {
+    "id": "10133120",
     "name": "Penelope, Potions Prodigy",
     "cost": "2",
     "attack": "2",
@@ -2374,6 +2436,7 @@
     "keywords": []
   },
   {
+    "id": "10133130",
     "name": "Edelweiss, Sagelight Ward",
     "cost": "4",
     "attack": "2",
@@ -2425,6 +2488,7 @@
     "keywords": []
   },
   {
+    "id": "10133310",
     "name": "Homework Time!",
     "cost": "3",
     "attack": "0",
@@ -2462,6 +2526,7 @@
     ]
   },
   {
+    "id": "10133320",
     "name": "Demonic Call",
     "cost": "7",
     "attack": "0",
@@ -2492,6 +2557,7 @@
     ]
   },
   {
+    "id": "10134110",
     "name": "Kuon, Fivefold Master",
     "cost": "7",
     "attack": "3",
@@ -2545,13 +2611,23 @@
         "cost": 10,
         "effects": [
           {
-            "op": "kuon_enhance"
+            "op": "destroy_all",
+            "target": "ally:follower",
+            "condition": {
+              "tribe": "Shikigami"
+            }
+          },
+          {
+            "op": "summon_named",
+            "name": "Noble Shikigami",
+            "count": 1
           }
         ]
       }
     ]
   },
   {
+    "id": "10134120",
     "name": "Anne & Grea, Mysterian Duo",
     "cost": "5",
     "attack": "4",
@@ -2597,6 +2673,7 @@
     "keywords": []
   },
   {
+    "id": "10134310",
     "name": "Dimension Climb",
     "cost": "18",
     "attack": "0",
@@ -2641,6 +2718,7 @@
     ]
   },
   {
+    "id": "10141110",
     "name": "Silvercloud Dragonrider",
     "cost": "8",
     "attack": "6",
@@ -2672,6 +2750,7 @@
     ]
   },
   {
+    "id": "10141120",
     "name": "Swordsnout Trencher",
     "cost": "5",
     "attack": "4",
@@ -2703,6 +2782,7 @@
     "keywords": []
   },
   {
+    "id": "10141130",
     "name": "Fledgling Dragonslayer",
     "cost": "4",
     "attack": "2",
@@ -2728,6 +2808,7 @@
     "keywords": []
   },
   {
+    "id": "10141140",
     "name": "Little Dragon Nanny",
     "cost": "2",
     "attack": "1",
@@ -2765,6 +2846,7 @@
     "keywords": []
   },
   {
+    "id": "10141150",
     "name": "Whitescale Herald",
     "cost": "4",
     "attack": "4",
@@ -2795,6 +2877,7 @@
     "keywords": []
   },
   {
+    "id": "10141310",
     "name": "Calamity Breath",
     "cost": "6",
     "attack": "0",
@@ -2820,6 +2903,7 @@
     "keywords": []
   },
   {
+    "id": "10143210",
     "name": "Fan of Otohime",
     "cost": "1",
     "attack": "0",
@@ -2855,6 +2939,7 @@
     ]
   },
   {
+    "id": "10142110",
     "name": "Kit, Luxfang Champion",
     "cost": "6",
     "attack": "8",
@@ -2886,6 +2971,7 @@
     ]
   },
   {
+    "id": "10142120",
     "name": "Eyfa, Windrider",
     "cost": "3",
     "attack": "2",
@@ -2919,6 +3005,7 @@
     ]
   },
   {
+    "id": "10142130",
     "name": "Zell, Windreader",
     "cost": "3",
     "attack": "3",
@@ -2953,6 +3040,7 @@
     "keywords": []
   },
   {
+    "id": "10142140",
     "name": "Marion, Ravishing Dragonewt",
     "cost": "4",
     "attack": "3",
@@ -2997,6 +3085,7 @@
     "keywords": []
   },
   {
+    "id": "10142310",
     "name": "Goldennote Melody",
     "cost": "3",
     "attack": "0",
@@ -3031,6 +3120,7 @@
     "keywords": []
   },
   {
+    "id": "10143110",
     "name": "Genesis Dragon Reborn",
     "cost": "10",
     "attack": "9",
@@ -3052,6 +3142,7 @@
     ]
   },
   {
+    "id": "10143120",
     "name": "Liu Feng, Goldennote Ward",
     "cost": "4",
     "attack": "3",
@@ -3090,6 +3181,7 @@
     "keywords": []
   },
   {
+    "id": "10143130",
     "name": "Zahar, Stormwave Dragoon",
     "cost": "6",
     "attack": "3",
@@ -3117,6 +3209,7 @@
     ]
   },
   {
+    "id": "10143140",
     "name": "Twilight Dragon",
     "cost": "9",
     "attack": "9",
@@ -3148,6 +3241,7 @@
     "keywords": []
   },
   {
+    "id": "10144110",
     "name": "Burnite, Anathema of Flame",
     "cost": "7",
     "attack": "7",
@@ -3210,6 +3304,7 @@
     "keywords": []
   },
   {
+    "id": "10144120",
     "name": "Forte, Blackwing Dragoon",
     "cost": "6",
     "attack": "5",
@@ -3232,6 +3327,7 @@
     ]
   },
   {
+    "id": "10144130",
     "name": "Garyu, Fabled Dragonkin",
     "cost": "8",
     "attack": "5",
@@ -3277,6 +3373,7 @@
     "keywords": []
   },
   {
+    "id": "10151110",
     "name": "Aryll, Moonstruck Vampire",
     "cost": "3",
     "attack": "1",
@@ -3327,6 +3424,7 @@
     "keywords": []
   },
   {
+    "id": "10151120",
     "name": "Nameless Demon",
     "cost": "2",
     "attack": "2",
@@ -3358,6 +3456,7 @@
     "keywords": []
   },
   {
+    "id": "10151130",
     "name": "Little Miss Bonemancer",
     "cost": "3",
     "attack": "1",
@@ -3388,6 +3487,7 @@
     ]
   },
   {
+    "id": "10151140",
     "name": "Ghost Juggler",
     "cost": "6",
     "attack": "5",
@@ -3412,6 +3512,7 @@
     "keywords": []
   },
   {
+    "id": "10151150",
     "name": "Darkseal Demon",
     "cost": "5",
     "attack": "4",
@@ -3455,6 +3556,7 @@
     "keywords": []
   },
   {
+    "id": "10151310",
     "name": "Reaper's Deathslash",
     "cost": "1",
     "attack": "0",
@@ -3485,6 +3587,7 @@
     "keywords": []
   },
   {
+    "id": "10152110",
     "name": "Mino, Shrewd Reaper",
     "cost": "2",
     "attack": "2",
@@ -3533,6 +3636,7 @@
     ]
   },
   {
+    "id": "10152120",
     "name": "Beryl, Nightmare Incarnate",
     "cost": "2",
     "attack": "3",
@@ -3570,6 +3674,7 @@
     "keywords": []
   },
   {
+    "id": "10152130",
     "name": "Yuna, Occult Hunter",
     "cost": "4",
     "attack": "3",
@@ -3606,6 +3711,7 @@
     ]
   },
   {
+    "id": "10152140",
     "name": "Vlad, Impaler",
     "cost": "8",
     "attack": "5",
@@ -3637,6 +3743,7 @@
     "keywords": []
   },
   {
+    "id": "10152210",
     "name": "Shadowcrypt Memorial",
     "cost": "3",
     "attack": "0",
@@ -3673,6 +3780,7 @@
     ]
   },
   {
+    "id": "10153110",
     "name": "Ceres, Blue Rose Maiden",
     "cost": "4",
     "attack": "1",
@@ -3730,6 +3838,7 @@
     ]
   },
   {
+    "id": "10153120",
     "name": "Orthrus, Hellhound Blader",
     "cost": "2",
     "attack": "2",
@@ -3788,6 +3897,7 @@
     ]
   },
   {
+    "id": "10153130",
     "name": "Mukan, Shadowcrypt Ward",
     "cost": "4",
     "attack": "3",
@@ -3848,6 +3958,7 @@
     "keywords": []
   },
   {
+    "id": "10153140",
     "name": "Balto, Dusk Bounty Hunter",
     "cost": "3",
     "attack": "3",
@@ -3895,6 +4006,7 @@
     "keywords": []
   },
   {
+    "id": "10153310",
     "name": "Rage of Serpents",
     "cost": "2",
     "attack": "0",
@@ -3927,6 +4039,7 @@
     "keywords": []
   },
   {
+    "id": "10154110",
     "name": "Cerberus, Hellfire Unleashed",
     "cost": "8",
     "attack": "6",
@@ -3978,6 +4091,7 @@
     "keywords": []
   },
   {
+    "id": "10154120",
     "name": "Medusa, Venomfang Royalty",
     "cost": "7",
     "attack": "3",
@@ -4012,6 +4126,7 @@
     ]
   },
   {
+    "id": "10154130",
     "name": "Aragavy, Eternal Hunter",
     "cost": "5",
     "attack": "4",
@@ -4059,6 +4174,7 @@
     "keywords": []
   },
   {
+    "id": "10161110",
     "name": "Angelic Prism Priestess",
     "cost": "3",
     "attack": "2",
@@ -4118,6 +4234,7 @@
     "keywords": []
   },
   {
+    "id": "10161120",
     "name": "Holy Shieldmaiden",
     "cost": "3",
     "attack": "2",
@@ -4140,6 +4257,7 @@
     ]
   },
   {
+    "id": "10161130",
     "name": "Radiant Guiding Angel",
     "cost": "5",
     "attack": "2",
@@ -4169,6 +4287,7 @@
     "keywords": []
   },
   {
+    "id": "10161140",
     "name": "Mainyu, Darkdweller",
     "cost": "2",
     "attack": "2",
@@ -4207,6 +4326,7 @@
     ]
   },
   {
+    "id": "10161210",
     "name": "Serene Sanctuary",
     "cost": "1",
     "attack": "0",
@@ -4251,6 +4371,7 @@
     ]
   },
   {
+    "id": "10161310",
     "name": "Featherfall",
     "cost": "6",
     "attack": "0",
@@ -4280,6 +4401,7 @@
     "keywords": []
   },
   {
+    "id": "10162110",
     "name": "Sarissa, Luxspear Al-mi'raj",
     "cost": "2",
     "attack": "2",
@@ -4326,6 +4448,7 @@
     ]
   },
   {
+    "id": "10162120",
     "name": "Reno, Luxwing Featherfolk",
     "cost": "4",
     "attack": "3",
@@ -4364,6 +4487,7 @@
     ]
   },
   {
+    "id": "10162130",
     "name": "Maeve, Guardian of Earth",
     "cost": "7",
     "attack": "5",
@@ -4393,6 +4517,7 @@
     ]
   },
   {
+    "id": "10162210",
     "name": "Darkhaven Grace",
     "cost": "2",
     "attack": "0",
@@ -4433,6 +4558,7 @@
     ]
   },
   {
+    "id": "10162220",
     "name": "Dose of Holiness",
     "cost": "3",
     "attack": "0",
@@ -4470,6 +4596,7 @@
     ]
   },
   {
+    "id": "10163110",
     "name": "Skullfane of Demise",
     "cost": "6",
     "attack": "4",
@@ -4493,6 +4620,7 @@
     "keywords": []
   },
   {
+    "id": "10163120",
     "name": "Ronavero, Darkhaven Ward",
     "cost": "4",
     "attack": "1",
@@ -4526,6 +4654,7 @@
     ]
   },
   {
+    "id": "10163130",
     "name": "Lapis, Shining Seraph",
     "cost": "8",
     "attack": "7",
@@ -4570,6 +4699,7 @@
     ]
   },
   {
+    "id": "10163210",
     "name": "Pact of the Beast Princess",
     "cost": "2",
     "attack": "0",
@@ -4614,6 +4744,7 @@
     ]
   },
   {
+    "id": "10163220",
     "name": "Unholy Vessel",
     "cost": "6",
     "attack": "0",
@@ -4644,6 +4775,7 @@
     ]
   },
   {
+    "id": "10164110",
     "name": "Rodeo, Anathema of Judgment",
     "cost": "7",
     "attack": "5",
@@ -4690,6 +4822,7 @@
     "keywords": []
   },
   {
+    "id": "10164120",
     "name": "Jeanne, Saintly Knight",
     "cost": "8",
     "attack": "6",
@@ -4723,6 +4856,7 @@
     ]
   },
   {
+    "id": "10164130",
     "name": "Salefa, Guardian of Water",
     "cost": "5",
     "attack": "3",
@@ -4762,6 +4896,7 @@
     ]
   },
   {
+    "id": "10171110",
     "name": "Elise, Electrifying Inventor",
     "cost": "1",
     "attack": "1",
@@ -4792,6 +4927,7 @@
     ]
   },
   {
+    "id": "10171120",
     "name": "Dirk, Metal Mercenary",
     "cost": "5",
     "attack": "5",
@@ -4817,6 +4953,7 @@
     "keywords": []
   },
   {
+    "id": "10171130",
     "name": "Ironheart Hunter",
     "cost": "2",
     "attack": "2",
@@ -4856,6 +4993,7 @@
     "keywords": []
   },
   {
+    "id": "10171140",
     "name": "Medical-Grade Assassin",
     "cost": "3",
     "attack": "2",
@@ -4870,6 +5008,22 @@
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10171140-medical-grade-assassin",
     "hasOngoing": true,
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "condition": {
+          "tribe": "Puppetry"
+        },
+        "once_per_turn": true,
+        "effects": [
+          {
+            "op": "keyword",
+            "keyword": "Bane",
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -4882,6 +5036,7 @@
     "keywords": []
   },
   {
+    "id": "10171310",
     "name": "Puppet Shield",
     "cost": "3",
     "attack": "0",
@@ -4907,6 +5062,7 @@
     "keywords": []
   },
   {
+    "id": "10171320",
     "name": "Artifact Recharge",
     "cost": "1",
     "attack": "0",
@@ -4937,6 +5093,7 @@
     "keywords": []
   },
   {
+    "id": "10172110",
     "name": "Rukina, Resistance Leader",
     "cost": "4",
     "attack": "3",
@@ -4979,6 +5136,7 @@
     "keywords": []
   },
   {
+    "id": "10172120",
     "name": "Lovestruck Puppeteer",
     "cost": "2",
     "attack": "2",
@@ -5016,6 +5174,7 @@
     "keywords": []
   },
   {
+    "id": "10172130",
     "name": "Noah, Thread of Death",
     "cost": "6",
     "attack": "5",
@@ -5047,6 +5206,7 @@
     "keywords": []
   },
   {
+    "id": "10172310",
     "name": "Stream of Life",
     "cost": "2",
     "attack": "0",
@@ -5078,6 +5238,7 @@
     "keywords": []
   },
   {
+    "id": "10172320",
     "name": "Doomwright Resurgence",
     "cost": "5",
     "attack": "0",
@@ -5103,6 +5264,7 @@
     "keywords": []
   },
   {
+    "id": "10173110",
     "name": "Miriam, the Resolute",
     "cost": "3",
     "attack": "2",
@@ -5155,6 +5317,7 @@
     "keywords": []
   },
   {
+    "id": "10173120",
     "name": "Sylvia, Garden Executioner",
     "cost": "6",
     "attack": "5",
@@ -5211,6 +5374,7 @@
     "keywords": []
   },
   {
+    "id": "10173130",
     "name": "Liam, Crazed Creator",
     "cost": "10",
     "attack": "8",
@@ -5282,6 +5446,7 @@
     "keywords": []
   },
   {
+    "id": "10173140",
     "name": "Alouette, Doomwright Ward",
     "cost": "5",
     "attack": "2",
@@ -5322,6 +5487,7 @@
     "keywords": []
   },
   {
+    "id": "10173210",
     "name": "Ancient Cannon",
     "cost": "5",
     "attack": "0",
@@ -5362,6 +5528,7 @@
     ]
   },
   {
+    "id": "10174110",
     "name": "Eudie, Maiden Reborn",
     "cost": "3",
     "attack": "3",
@@ -5463,6 +5630,7 @@
     "triggers": []
   },
   {
+    "id": "10174120",
     "name": "Orchis, Newfound Heart",
     "cost": "8",
     "attack": "5",
@@ -5514,6 +5682,7 @@
     ]
   },
   {
+    "id": "10174130",
     "name": "Ralmia, Sonic Boom",
     "cost": "8",
     "attack": "2",

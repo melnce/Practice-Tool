@@ -28,7 +28,7 @@ export async function loadCardDatabase() {
     }
 
     const ts = Date.now();
-    const fullRes = await fetch(`${root}cards/card_details.json?v=${ts}`);
+    const fullRes = await fetch(`${root}cards/all.json?v=${ts}`);
     if (!fullRes.ok) throw new Error(`Main cards failed: ${fullRes.status}`);
     const fullJson: any[] = await fullRes.json();
 

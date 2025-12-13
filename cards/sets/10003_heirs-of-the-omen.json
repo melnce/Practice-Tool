@@ -1,5 +1,6 @@
 [
   {
+    "id": "10301110",
     "name": "Apostle of Voracity",
     "cost": "4",
     "attack": "2",
@@ -28,6 +29,7 @@
     "triggers": []
   },
   {
+    "id": "10301310",
     "name": "Greatness Ascended",
     "cost": "4",
     "attack": "0",
@@ -62,6 +64,7 @@
     "triggers": []
   },
   {
+    "id": "10302110",
     "name": "Inspirational One",
     "cost": "2",
     "attack": "1",
@@ -97,6 +100,7 @@
     ]
   },
   {
+    "id": "10303110",
     "name": "Dogged One",
     "cost": "3",
     "attack": "3",
@@ -132,6 +136,7 @@
     ]
   },
   {
+    "id": "10303210",
     "name": "Tablet of Tribulations",
     "cost": "3",
     "attack": "0",
@@ -167,6 +172,7 @@
     "triggers": []
   },
   {
+    "id": "10304110",
     "name": "Mjerrabaine, Great Manifest",
     "cost": "4",
     "attack": "3",
@@ -269,6 +275,7 @@
     "triggers": []
   },
   {
+    "id": "10304120",
     "name": "Gilnelise, Voracity Manifest",
     "cost": "3",
     "attack": "0",
@@ -328,6 +335,7 @@
     "triggers": []
   },
   {
+    "id": "10311110",
     "name": "Devotee of Unkilling",
     "cost": "2",
     "attack": "2",
@@ -372,6 +380,7 @@
     "triggers": []
   },
   {
+    "id": "10311120",
     "name": "Bearer of the Fairy Blade",
     "cost": "2",
     "attack": "1",
@@ -408,6 +417,7 @@
     ]
   },
   {
+    "id": "10311310",
     "name": "Bestial Swipe",
     "cost": "2",
     "attack": "0",
@@ -445,6 +455,7 @@
     "triggers": []
   },
   {
+    "id": "10312110",
     "name": "Supplicant of Unkilling",
     "cost": "6",
     "attack": "5",
@@ -479,6 +490,7 @@
     "triggers": []
   },
   {
+    "id": "10312120",
     "name": "Greatwood Warrior",
     "cost": "4",
     "attack": "4",
@@ -515,6 +527,7 @@
     "triggers": []
   },
   {
+    "id": "10312210",
     "name": "Hamlet of Unkilling",
     "cost": "3",
     "attack": "0",
@@ -559,6 +572,7 @@
     "triggers": []
   },
   {
+    "id": "10313110",
     "name": "Congregant of Unkilling",
     "cost": "9",
     "attack": "4",
@@ -579,9 +593,22 @@
       "Rush",
       "Ward"
     ],
-    "triggers": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "condition": {
+          "is_self": true
+        },
+        "effects": [
+          {
+            "op": "fill_board_chain_decay"
+          }
+        ]
+      }
+    ]
   },
   {
+    "id": "10313310",
     "name": "Eradicating Arrow",
     "cost": "1",
     "attack": "0",
@@ -611,6 +638,7 @@
     "triggers": []
   },
   {
+    "id": "10314110",
     "name": "Krulle, Heir to Unkilling",
     "cost": "4",
     "attack": "1",
@@ -677,6 +705,7 @@
     ]
   },
   {
+    "id": "10314120",
     "name": "Izudia, Annihilation Manifest",
     "cost": "8",
     "attack": "6",
@@ -717,6 +746,7 @@
     "triggers": []
   },
   {
+    "id": "10321110",
     "name": "Devotee of Usurpation",
     "cost": "2",
     "attack": "2",
@@ -754,6 +784,7 @@
     "triggers": []
   },
   {
+    "id": "10321120",
     "name": "Comrade of the Swordmaster",
     "cost": "6",
     "attack": "5",
@@ -790,6 +821,7 @@
     "triggers": []
   },
   {
+    "id": "10321310",
     "name": "Shield Bash",
     "cost": "2",
     "attack": "0",
@@ -807,19 +839,12 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "select",
+        "op": "keyword",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "keyword",
-            "target": "selected",
-            "keywords": [
-              "Ward"
-            ]
-          }
-        ]
+        "keywords": [
+          "Ward"
+        ],
+        "select": 1
       },
       {
         "op": "damage_random",
@@ -831,6 +856,7 @@
     "triggers": []
   },
   {
+    "id": "10322110",
     "name": "Supplicant of Usurpation",
     "cost": "2",
     "attack": "1",
@@ -868,6 +894,7 @@
     "triggers": []
   },
   {
+    "id": "10322120",
     "name": "Peppy Scout",
     "cost": "5",
     "attack": "3",
@@ -883,34 +910,20 @@
     "url": "https://shadowverse.gg/cards/10322120-peppy-scout",
     "evolve": [
       {
-        "op": "select",
+        "op": "buff",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "buff",
-            "target": "selected",
-            "attack": 2,
-            "defense": 2
-          }
-        ]
+        "attack": 2,
+        "defense": 2,
+        "select": 1
       }
     ],
     "superevolve": [
       {
-        "op": "select",
+        "op": "buff",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "buff",
-            "target": "selected",
-            "attack": 2,
-            "defense": 2
-          }
-        ]
+        "attack": 2,
+        "defense": 2,
+        "select": 1
       }
     ],
     "fanfare": [
@@ -928,6 +941,7 @@
     "triggers": []
   },
   {
+    "id": "10322210",
     "name": "Lair of Usurpation",
     "cost": "1",
     "attack": "0",
@@ -991,6 +1005,7 @@
     "triggers": []
   },
   {
+    "id": "10323110",
     "name": "Congregant of Usurpation",
     "cost": "4",
     "attack": "3",
@@ -1058,6 +1073,7 @@
     ]
   },
   {
+    "id": "10323310",
     "name": "Returning Slash",
     "cost": "1",
     "attack": "0",
@@ -1102,6 +1118,7 @@
     "triggers": []
   },
   {
+    "id": "10324110",
     "name": "Sinciro, Heir to Usurpation",
     "cost": "6",
     "attack": "5",
@@ -1158,6 +1175,7 @@
     "triggers": []
   },
   {
+    "id": "10324120",
     "name": "Octrice, Hollowness Manifest",
     "cost": "3",
     "attack": "3",
@@ -1236,6 +1254,7 @@
     "triggers": []
   },
   {
+    "id": "10331110",
     "name": "Devotee of Truth",
     "cost": "2",
     "attack": "2",
@@ -1267,6 +1286,7 @@
     "triggers": []
   },
   {
+    "id": "10331120",
     "name": "Ascetic of Wuxing",
     "cost": "4",
     "attack": "3",
@@ -1305,6 +1325,7 @@
     "triggers": []
   },
   {
+    "id": "10331310",
     "name": "Crystal Gazing",
     "cost": "4",
     "attack": "0",
@@ -1344,6 +1365,7 @@
     "triggers": []
   },
   {
+    "id": "10332110",
     "name": "Supplicant of Truth",
     "cost": "5",
     "attack": "3",
@@ -1383,6 +1405,7 @@
     "triggers": []
   },
   {
+    "id": "10332210",
     "name": "Institute of Truth",
     "cost": "3",
     "attack": "0",
@@ -1455,6 +1478,7 @@
     ]
   },
   {
+    "id": "10332310",
     "name": "Risky Amalgamation",
     "cost": "4",
     "attack": "0",
@@ -1486,6 +1510,7 @@
     "triggers": []
   },
   {
+    "id": "10333110",
     "name": "Congregant of Truth",
     "cost": "3",
     "attack": "3",
@@ -1525,6 +1550,7 @@
     "triggers": []
   },
   {
+    "id": "10333310",
     "name": "Illusory Conjuration",
     "cost": "2",
     "attack": "0",
@@ -1565,6 +1591,7 @@
     "triggers": []
   },
   {
+    "id": "10334110",
     "name": "Velharia, Heir to Truth",
     "cost": "2",
     "attack": "1",
@@ -1607,6 +1634,7 @@
     "triggers": []
   },
   {
+    "id": "10334120",
     "name": "Raio, Elimination Manifest",
     "cost": "9",
     "attack": "9",
@@ -1636,6 +1664,7 @@
     "triggers": []
   },
   {
+    "id": "10341110",
     "name": "Devotee of Disdain",
     "cost": "2",
     "attack": "2",
@@ -1674,6 +1703,7 @@
     ]
   },
   {
+    "id": "10341120",
     "name": "Snowstorm Dragonewt",
     "cost": "6",
     "attack": "6",
@@ -1702,6 +1732,7 @@
     "triggers": []
   },
   {
+    "id": "10341310",
     "name": "Raging Lightning",
     "cost": "3",
     "attack": "0",
@@ -1738,6 +1769,7 @@
     "triggers": []
   },
   {
+    "id": "10342110",
     "name": "Supplicant of Disdain",
     "cost": "5",
     "attack": "3",
@@ -1774,6 +1806,7 @@
     ]
   },
   {
+    "id": "10342120",
     "name": "Ocean Rider",
     "cost": "3",
     "attack": "1",
@@ -1827,6 +1860,7 @@
     ]
   },
   {
+    "id": "10342210",
     "name": "Nation of Disdain",
     "cost": "2",
     "attack": "0",
@@ -1866,6 +1900,7 @@
     "triggers": []
   },
   {
+    "id": "10343110",
     "name": "Congregant of Disdain",
     "cost": "6",
     "attack": "5",
@@ -1913,6 +1948,7 @@
     ]
   },
   {
+    "id": "10343310",
     "name": "Ferocious Flame",
     "cost": "1",
     "attack": "0",
@@ -1958,6 +1994,7 @@
     "triggers": []
   },
   {
+    "id": "10344110",
     "name": "Azurifrit, Heir to Disdain",
     "cost": "9",
     "attack": "5",
@@ -2048,6 +2085,7 @@
     ]
   },
   {
+    "id": "10344120",
     "name": "Galmieux, Ardor Manifest",
     "cost": "5",
     "attack": "5",
@@ -2117,6 +2155,7 @@
     ]
   },
   {
+    "id": "10351110",
     "name": "Devotee of Entwining",
     "cost": "3",
     "attack": "1",
@@ -2215,6 +2254,7 @@
     "triggers": []
   },
   {
+    "id": "10351120",
     "name": "Ephemeral Demon Princess",
     "cost": "8",
     "attack": "4",
@@ -2248,6 +2288,7 @@
     "triggers": []
   },
   {
+    "id": "10351310",
     "name": "March of the Brutes",
     "cost": "4",
     "attack": "0",
@@ -2280,6 +2321,7 @@
     "triggers": []
   },
   {
+    "id": "10352110",
     "name": "Supplicant of Entwining",
     "cost": "4",
     "attack": "4",
@@ -2381,6 +2423,7 @@
     "triggers": []
   },
   {
+    "id": "10352120",
     "name": "Spirited Gravekeeper",
     "cost": "2",
     "attack": "2",
@@ -2416,6 +2459,7 @@
     "triggers": []
   },
   {
+    "id": "10352210",
     "name": "Castle of Entwining",
     "cost": "2",
     "attack": "0",
@@ -2498,6 +2542,7 @@
     "triggers": []
   },
   {
+    "id": "10353110",
     "name": "Congregant of Entwining",
     "cost": "5",
     "attack": "4",
@@ -2636,6 +2681,7 @@
     "triggers": []
   },
   {
+    "id": "10353310",
     "name": "Screaming and Loathing",
     "cost": "3",
     "attack": "0",
@@ -2710,6 +2756,7 @@
     "triggers": []
   },
   {
+    "id": "10354110",
     "name": "Sham-Nacha, Heir to Entwining",
     "cost": "2",
     "attack": "2",
@@ -2761,6 +2808,7 @@
     "triggers": []
   },
   {
+    "id": "10354120",
     "name": "Rulenye & Valnareik",
     "cost": "7",
     "attack": "5",
@@ -2805,6 +2853,7 @@
     "triggers": []
   },
   {
+    "id": "10361110",
     "name": "Devotee of Repose",
     "cost": "2",
     "attack": "0",
@@ -2854,6 +2903,7 @@
     "triggers": []
   },
   {
+    "id": "10361120",
     "name": "Knight of the Holy Order",
     "cost": "2",
     "attack": "2",
@@ -2888,6 +2938,7 @@
     ]
   },
   {
+    "id": "10361310",
     "name": "Blinding Faith",
     "cost": "4",
     "attack": "0",
@@ -2922,6 +2973,11 @@
           {
             "op": "heal_leader",
             "amount": 3
+          },
+          {
+            "op": "damage_all",
+            "target": "enemy:follower",
+            "amount": 3
           }
         ]
       }
@@ -2929,6 +2985,7 @@
     "triggers": []
   },
   {
+    "id": "10362110",
     "name": "Supplicant of Repose",
     "cost": "3",
     "attack": "1",
@@ -2973,6 +3030,7 @@
     "triggers": []
   },
   {
+    "id": "10362210",
     "name": "Temple of Repose",
     "cost": "3",
     "attack": "0",
@@ -3025,6 +3083,7 @@
     "triggers": []
   },
   {
+    "id": "10362220",
     "name": "Winged Lion Statue",
     "cost": "3",
     "attack": "0",
@@ -3073,6 +3132,7 @@
     "triggers": []
   },
   {
+    "id": "10363110",
     "name": "Congregant of Repose",
     "cost": "5",
     "attack": "2",
@@ -3155,6 +3215,7 @@
     "triggers": []
   },
   {
+    "id": "10363210",
     "name": "Shining Disenchantment",
     "cost": "4",
     "attack": "0",
@@ -3207,6 +3268,7 @@
     "triggers": []
   },
   {
+    "id": "10364110",
     "name": "Himeka, Heir to Repose",
     "cost": "6",
     "attack": "0",
@@ -3244,11 +3306,41 @@
                 "name": "Himeka, Heir to Repose",
                 "effects": [
                   {
-                    "op": "repeat_effect",
-                    "count_source": "crest_count",
-                    "effect": {
-                      "op": "himeka_crest_effect"
-                    }
+                    "op": "nested_effects",
+                    "effects": [
+                      {
+                        "op": "select",
+                        "mode": "random",
+                        "qty": 1,
+                        "target": "enemy:follower",
+                        "condition": {
+                          "attack_lte": 4,
+                          "exclude_keyword": "cant_attack"
+                        },
+                        "effects": [
+                          {
+                            "op": "keyword",
+                            "keywords": [
+                              {
+                                "name": "cant_attack",
+                                "until_opponent_eot": true
+                              }
+                            ]
+                          },
+                          {
+                            "op": "grant_trigger",
+                            "trigger": {
+                              "event": "end_of_turn",
+                              "effects": [
+                                {
+                                  "op": "banish_self"
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ],
                 "else_effects": []
@@ -3262,6 +3354,7 @@
     "triggers": []
   },
   {
+    "id": "10364120",
     "name": "Marwynn, Despair Manifest",
     "cost": "4",
     "attack": "4",
@@ -3333,6 +3426,7 @@
     "triggers": []
   },
   {
+    "id": "10371110",
     "name": "Devotee of Destruction",
     "cost": "4",
     "attack": "4",
@@ -3369,6 +3463,7 @@
     "triggers": []
   },
   {
+    "id": "10371120",
     "name": "Supersonic Fighter",
     "cost": "7",
     "attack": "3",
@@ -3377,7 +3472,7 @@
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Summon an Ominous Artifact \u03b3.\nEvolve: Select an allied Artifact follower on the field and give it +3/+3.",
+    "description": "Fanfare: Summon an Ominous Artifact γ.\nEvolve: Select an allied Artifact follower on the field and give it +3/+3.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10371120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10371120_evo.webp",
     "set": "[10003] Heirs of the Omen",
@@ -3407,13 +3502,14 @@
     "fanfare": [
       {
         "op": "summon_named",
-        "name": "Ominous Artifact \u03b3"
+        "name": "Ominous Artifact γ"
       }
     ],
     "keywords": [],
     "triggers": []
   },
   {
+    "id": "10371310",
     "name": "Wired Assault",
     "cost": "4",
     "attack": "0",
@@ -3445,6 +3541,7 @@
     "triggers": []
   },
   {
+    "id": "10372110",
     "name": "Supplicant of Destruction",
     "cost": "2",
     "attack": "2",
@@ -3504,6 +3601,7 @@
     "triggers": []
   },
   {
+    "id": "10372120",
     "name": "Field Scientist",
     "cost": "5",
     "attack": "3",
@@ -3535,6 +3633,7 @@
     "triggers": []
   },
   {
+    "id": "10372210",
     "name": "Wasteland of Destruction",
     "cost": "2",
     "attack": "0",
@@ -3576,6 +3675,7 @@
     "triggers": []
   },
   {
+    "id": "10373110",
     "name": "Congregant of Destruction",
     "cost": "6",
     "attack": "3",
@@ -3607,6 +3707,7 @@
     "triggers": []
   },
   {
+    "id": "10373310",
     "name": "Devastating Soprano",
     "cost": "2",
     "attack": "0",
@@ -3637,6 +3738,7 @@
     "triggers": []
   },
   {
+    "id": "10374110",
     "name": "Axia, Heir to Destruction",
     "cost": "3",
     "attack": "2",
@@ -3671,6 +3773,7 @@
     "triggers": []
   },
   {
+    "id": "10374120",
     "name": "Lishenna, Melody Manifest",
     "cost": "4",
     "attack": "2",

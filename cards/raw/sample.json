@@ -1,0 +1,26 @@
+[
+    {
+        "id": "sample_001",
+        "name": "Standard Bearer",
+        "craft": "Swordcraft",
+        "type": "Follower",
+        "cost": 2,
+        "stats": {
+            "attack": 2,
+            "defense": 2
+        },
+        "text": "Fanfare: Draw a card.\nLast Words: Deal 1 damage to the enemy leader."
+    },
+    {
+        "id": "sample_002",
+        "name": "Quick Blader",
+        "craft": "Swordcraft",
+        "type": "Follower",
+        "cost": 1,
+        "stats": {
+            "attack": 1,
+            "defense": 1
+        },
+        "text": "Storm."
+    }
+]

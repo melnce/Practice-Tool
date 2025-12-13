@@ -10,7 +10,11 @@
     "test:watch": "npm run build || exit 0 && vitest",
     "check:boundaries": "node tools/check-boundaries.mjs",
     "build": "tsc",
-    "watch": "tsc -w"
+    "watch": "tsc -w",
+    "import:cards": "npx tsx tools/import_raw_cards.ts",
+    "validate:cards": "npx tsx tools/validate_compiled_cards.ts",
+    "report:unresolved": "npx tsx tools/report_unresolved_cards.ts",
+    "cards:all": "npm run import:cards && npm run validate:cards"
   },
   "keywords": [],
   "author": "",

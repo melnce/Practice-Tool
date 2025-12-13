@@ -2025,5 +2025,37 @@
     ],
     "keywords": [],
     "triggers": []
+  },
+  {
+    "id": "90034320",
+    "name": "Ars Magna",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an enemy and deal it 2 damage. Restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034320-ars-magna",
+    "spell": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 2
+          },
+          {
+            "op": "heal_leader",
+            "amount": 1
+          }
+        ]
+      }
+    ]
   }
 ]

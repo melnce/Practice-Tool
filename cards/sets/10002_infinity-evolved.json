@@ -1,5 +1,6 @@
 [
   {
+    "id": "10201110",
     "name": "Twinblade Goblin",
     "cost": "1",
     "attack": "1",
@@ -31,6 +32,7 @@
     "keywords": []
   },
   {
+    "id": "10201310",
     "name": "Dark Side",
     "cost": "2",
     "attack": "0",
@@ -58,6 +60,7 @@
     "keywords": []
   },
   {
+    "id": "10202110",
     "name": "Cheretta, Angelic Maid",
     "cost": "2",
     "attack": "2",
@@ -88,6 +91,7 @@
     "keywords": []
   },
   {
+    "id": "10203110",
     "name": "Reina, Angelic Partner",
     "cost": "7",
     "attack": "5",
@@ -115,6 +119,7 @@
     "keywords": []
   },
   {
+    "id": "10203120",
     "name": "Hnikar & Jafnhar, Firestorm Duo",
     "cost": "2",
     "attack": "2",
@@ -160,6 +165,7 @@
     ]
   },
   {
+    "id": "10204110",
     "name": "Odin, Twilit Fate",
     "cost": "7",
     "attack": "4",
@@ -187,6 +193,7 @@
     ]
   },
   {
+    "id": "10204120",
     "name": "Grimnir, Heavenly Gale",
     "cost": "3",
     "attack": "2",
@@ -207,7 +214,7 @@
         "op": "gain_crest",
         "name": "Grimnir, Heavenly Gale",
         "image": "images/crests/grimnir_heavenly_gale.png",
-        "text": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
+        "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
         "trigger": {
           "event": "end_of_turn",
           "condition": {
@@ -234,6 +241,7 @@
     ]
   },
   {
+    "id": "10211110",
     "name": "Wildheart",
     "cost": "3",
     "attack": "3",
@@ -255,6 +263,7 @@
     ]
   },
   {
+    "id": "10211120",
     "name": "Dwarven Malletman",
     "cost": "5",
     "attack": "5",
@@ -294,6 +303,7 @@
     "keywords": []
   },
   {
+    "id": "10211310",
     "name": "Woodwalkers",
     "cost": "7",
     "attack": "0",
@@ -319,6 +329,7 @@
     "keywords": []
   },
   {
+    "id": "10212110",
     "name": "Lionel, Ardent Elf",
     "cost": "6",
     "attack": "6",
@@ -346,6 +357,7 @@
     ]
   },
   {
+    "id": "10212120",
     "name": "Fairy Fencer",
     "cost": "2",
     "attack": "2",
@@ -383,6 +395,7 @@
     ]
   },
   {
+    "id": "10212310",
     "name": "Ambush from Above",
     "cost": "1",
     "attack": "0",
@@ -419,6 +432,7 @@
     "keywords": []
   },
   {
+    "id": "10213110",
     "name": "Cynthia, Chivalrous Elf",
     "cost": "4",
     "attack": "4",
@@ -460,6 +474,7 @@
     "keywords": []
   },
   {
+    "id": "10213310",
     "name": "Garden's Allure",
     "cost": "2",
     "attack": "0",
@@ -477,7 +492,7 @@
     "superevolve": [],
     "fuse_recipes": [
       {
-        "id": "gardens_allure\u2192empowered",
+        "id": "gardens_allure→empowered",
         "partner_filters": [
           {
             "zone": "hand",
@@ -496,6 +511,7 @@
     "keywords": []
   },
   {
+    "id": "10214110",
     "name": "Titania, Queen of Fairies",
     "cost": "4",
     "attack": "2",
@@ -561,6 +577,7 @@
     "keywords": []
   },
   {
+    "id": "10214120",
     "name": "Lymaga, Untamed Wild",
     "cost": "7",
     "attack": "7",
@@ -577,46 +594,35 @@
     "evolve": [],
     "fanfare": [
       {
-        "op": "select",
+        "op": "keyword",
         "target": "enemy:follower",
-        "select_count": 2,
-        "effects": [
+        "keywords": [
           {
-            "op": "keyword",
-            "target": "selected",
-            "keywords": [
-              {
-                "name": "cant_attack",
-                "until_opponent_eot": true
-              }
-            ]
+            "name": "cant_attack",
+            "until_opponent_eot": true
           }
-        ]
+        ],
+        "select": 2
       }
     ],
     "superevolve": [
       {
-        "op": "select",
+        "op": "keyword",
         "target": "enemy:follower",
-        "select_count": 2,
-        "effects": [
+        "keywords": [
           {
-            "op": "keyword",
-            "target": "selected",
-            "keywords": [
-              {
-                "name": "bleed",
-                "to_leader": 1,
-                "to_self": 2
-              }
-            ]
+            "name": "bleed",
+            "to_leader": 1,
+            "to_self": 2
           }
-        ]
+        ],
+        "select": 2
       }
     ],
     "keywords": []
   },
   {
+    "id": "10221110",
     "name": "Seria, Gunslinger Maid",
     "cost": "2",
     "attack": "2",
@@ -647,6 +653,7 @@
     "keywords": []
   },
   {
+    "id": "10221120",
     "name": "Nightshadow Ninja Master",
     "cost": "5",
     "attack": "4",
@@ -668,6 +675,7 @@
     ]
   },
   {
+    "id": "10221310",
     "name": "Lucrative Deal",
     "cost": "2",
     "attack": "0",
@@ -696,6 +704,7 @@
     "keywords": []
   },
   {
+    "id": "10222110",
     "name": "Gelt, Intrepid Vice-Captain",
     "cost": "3",
     "attack": "3",
@@ -744,6 +753,7 @@
     ]
   },
   {
+    "id": "10222120",
     "name": "Rackhir, Ordinary Knight",
     "cost": "4",
     "attack": "3",
@@ -783,6 +793,7 @@
     "keywords": []
   },
   {
+    "id": "10222310",
     "name": "Band of Battle Princesses",
     "cost": "2",
     "attack": "0",
@@ -822,7 +833,8 @@
     ]
   },
   {
-    "name": "Ros\u00e9, Princess Knight",
+    "id": "10223110",
+    "name": "Rosé, Princess Knight",
     "cost": "3",
     "attack": "3",
     "defense": "2",
@@ -873,6 +885,7 @@
     ]
   },
   {
+    "id": "10223120",
     "name": "Prim, Princess's Picnic",
     "cost": "2",
     "attack": "1",
@@ -907,6 +920,7 @@
     ]
   },
   {
+    "id": "10224110",
     "name": "Gildaria, Anathema of Peace",
     "cost": "6",
     "attack": "4",
@@ -968,6 +982,7 @@
     ]
   },
   {
+    "id": "10224120",
     "name": "Yurius, Levin Authority",
     "cost": "8",
     "attack": "5",
@@ -1023,6 +1038,7 @@
     ]
   },
   {
+    "id": "10231110",
     "name": "Melvie, Adoring Witch",
     "cost": "2",
     "attack": "2",
@@ -1058,6 +1074,7 @@
     "keywords": []
   },
   {
+    "id": "10231120",
     "name": "Arcane Archivist",
     "cost": "2",
     "attack": "2",
@@ -1091,6 +1108,7 @@
     "keywords": []
   },
   {
+    "id": "10231310",
     "name": "Glacial Crash",
     "cost": "4",
     "attack": "0",
@@ -1127,6 +1145,7 @@
     "keywords": []
   },
   {
+    "id": "10232110",
     "name": "Bergent, Rejected Artes",
     "cost": "5",
     "attack": "4",
@@ -1186,6 +1205,7 @@
     "keywords": []
   },
   {
+    "id": "10232120",
     "name": "Enchanting Perfumer",
     "cost": "4",
     "attack": "3",
@@ -1241,6 +1261,7 @@
     "keywords": []
   },
   {
+    "id": "10232310",
     "name": "Flames of Chaos",
     "cost": "3",
     "attack": "0",
@@ -1259,21 +1280,19 @@
     "keywords": [
       {
         "name": "Spellboost",
-        "effects": [
-          {
-            "op": "chaos_counter"
-          }
-        ]
+        "effects": []
       }
     ],
     "spell": [
       {
-        "op": "chaos_split_damage",
-        "target": "enemy:follower"
+        "op": "damage_split_fixed",
+        "target": "enemy:follower",
+        "amount": "{self.spellboostCount}"
       }
     ]
   },
   {
+    "id": "10233110",
     "name": "Owen, Mysterian Swordsman",
     "cost": "3",
     "attack": "3",
@@ -1325,6 +1344,7 @@
     ]
   },
   {
+    "id": "10233310",
     "name": "Pascale's Dance",
     "cost": "2",
     "attack": "0",
@@ -1378,6 +1398,7 @@
     "keywords": []
   },
   {
+    "id": "10234110",
     "name": "Lilanthim, Anathema of Edacity",
     "cost": "8",
     "attack": "5",
@@ -1423,6 +1444,7 @@
     ]
   },
   {
+    "id": "10234120",
     "name": "Norman, Adamant Alchemist",
     "cost": "6",
     "attack": "5",
@@ -1606,6 +1628,7 @@
     "keywords": []
   },
   {
+    "id": "10241110",
     "name": "Wise Guardian Dragon",
     "cost": "10",
     "attack": "4",
@@ -1643,6 +1666,7 @@
     ]
   },
   {
+    "id": "10241120",
     "name": "Soaring Ivory Dragon",
     "cost": "1",
     "attack": "1",
@@ -1674,6 +1698,7 @@
     ]
   },
   {
+    "id": "10241310",
     "name": "Call of the Megalorca",
     "cost": "2",
     "attack": "0",
@@ -1708,6 +1733,7 @@
     "keywords": []
   },
   {
+    "id": "10242110",
     "name": "Intent Dragonewt Princess",
     "cost": "2",
     "attack": "2",
@@ -1737,6 +1763,7 @@
     "keywords": []
   },
   {
+    "id": "10242120",
     "name": "Seasoned Merman",
     "cost": "5",
     "attack": "3",
@@ -1774,6 +1801,7 @@
     "keywords": []
   },
   {
+    "id": "10242210",
     "name": "Pyrewyrm Blade",
     "cost": "1",
     "attack": "0",
@@ -1830,6 +1858,7 @@
     ]
   },
   {
+    "id": "10243110",
     "name": "Neptune, Arbiter of Tides",
     "cost": "7",
     "attack": "5",
@@ -1884,6 +1913,7 @@
     ]
   },
   {
+    "id": "10243310",
     "name": "Draconic Strike",
     "cost": "6",
     "attack": "0",
@@ -1921,6 +1951,7 @@
     "keywords": []
   },
   {
+    "id": "10244110",
     "name": "Filene, Whitefrost Bloom",
     "cost": "2",
     "attack": "2",
@@ -1965,6 +1996,7 @@
     ]
   },
   {
+    "id": "10244120",
     "name": "Fennie, Prismatic Phoenix",
     "cost": "8",
     "attack": "4",
@@ -1988,6 +2020,7 @@
     "keywords": []
   },
   {
+    "id": "10251110",
     "name": "Rayvn, the Silver Bullet",
     "cost": "5",
     "attack": "3",
@@ -2031,6 +2064,7 @@
     ]
   },
   {
+    "id": "10251120",
     "name": "Cultivator of Malice",
     "cost": "1",
     "attack": "1",
@@ -2061,6 +2095,7 @@
     ]
   },
   {
+    "id": "10251310",
     "name": "Ghastly Soiree",
     "cost": "2",
     "attack": "0",
@@ -2096,6 +2131,7 @@
     "keywords": []
   },
   {
+    "id": "10252110",
     "name": "Vuella, the Blastwing",
     "cost": "3",
     "attack": "2",
@@ -2139,6 +2175,7 @@
     ]
   },
   {
+    "id": "10252120",
     "name": "Undead Soldier",
     "cost": "6",
     "attack": "3",
@@ -2164,6 +2201,7 @@
     "keywords": []
   },
   {
+    "id": "10252310",
     "name": "Winged Servants",
     "cost": "2",
     "attack": "0",
@@ -2189,6 +2227,7 @@
     "keywords": []
   },
   {
+    "id": "10253110",
     "name": "Laura, Cruel Commander",
     "cost": "3",
     "attack": "3",
@@ -2238,6 +2277,7 @@
     "keywords": []
   },
   {
+    "id": "10253120",
     "name": "Exella, Nocturnal General",
     "cost": "4",
     "attack": "1",
@@ -2270,6 +2310,7 @@
     ]
   },
   {
+    "id": "10254110",
     "name": "Ginsetsu & Yuzuki, Twin Calamities",
     "cost": "9",
     "attack": "5",
@@ -2320,6 +2361,7 @@
     "keywords": []
   },
   {
+    "id": "10254120",
     "name": "Charon, Stygian Oarswoman",
     "cost": "5",
     "attack": "4",
@@ -2383,6 +2425,7 @@
     ]
   },
   {
+    "id": "10261110",
     "name": "Cleric of Crushing",
     "cost": "3",
     "attack": "2",
@@ -2398,32 +2441,22 @@
     "url": "https://shadowverse.gg/cards/10261110-cleric-of-crushing",
     "evolve": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "enemy:follower",
+        "select": 1,
         "condition": {
           "is_super_evolved": true
-        },
-        "effects": [
-          {
-            "op": "destroy",
-            "target": "selected"
-          }
-        ]
+        }
       }
     ],
     "superevolve": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "enemy:follower",
+        "select": 1,
         "condition": {
           "is_super_evolved": true
-        },
-        "effects": [
-          {
-            "op": "destroy",
-            "target": "selected"
-          }
-        ]
+        }
       }
     ],
     "fanfare": [],
@@ -2432,6 +2465,7 @@
     ]
   },
   {
+    "id": "10261120",
     "name": "Damus, Oracle of Malice",
     "cost": "2",
     "attack": "2",
@@ -2449,37 +2483,32 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "select",
+        "op": "keyword",
         "target": "enemy:follower",
-        "select_count": 1,
-        "effects": [
+        "keywords": [
           {
-            "op": "keyword",
-            "target": "selected",
-            "keywords": [
-              {
-                "name": "trigger",
-                "trigger": {
-                  "event": "end_of_turn",
-                  "source": "board",
-                  "condition": {
-                    "whose_turn": "owner"
-                  },
-                  "effects": [
-                    {
-                      "op": "destroy_self"
-                    }
-                  ]
+            "name": "trigger",
+            "trigger": {
+              "event": "end_of_turn",
+              "source": "board",
+              "condition": {
+                "whose_turn": "owner"
+              },
+              "effects": [
+                {
+                  "op": "destroy_self"
                 }
-              }
-            ]
+              ]
+            }
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "keywords": []
   },
   {
+    "id": "10261210",
     "name": "Luminous Censer",
     "cost": "2",
     "attack": "0",
@@ -2512,6 +2541,7 @@
     ]
   },
   {
+    "id": "10262110",
     "name": "Colette, Barrage Exorcist",
     "cost": "3",
     "attack": "2",
@@ -2552,6 +2582,7 @@
     "keywords": []
   },
   {
+    "id": "10262120",
     "name": "Immaculate Adjudicator",
     "cost": "5",
     "attack": "4",
@@ -2577,6 +2608,7 @@
     "keywords": []
   },
   {
+    "id": "10262310",
     "name": "Divine Guard",
     "cost": "1",
     "attack": "0",
@@ -2616,6 +2648,7 @@
     "keywords": []
   },
   {
+    "id": "10263110",
     "name": "Agnes, the Swiftblade",
     "cost": "5",
     "attack": "3",
@@ -2658,6 +2691,7 @@
     ]
   },
   {
+    "id": "10263310",
     "name": "Maddening Benison",
     "cost": "2",
     "attack": "0",
@@ -2697,6 +2731,7 @@
     "keywords": []
   },
   {
+    "id": "10264110",
     "name": "Aether, Empyrean Guardian",
     "cost": "7",
     "attack": "2",
@@ -2748,6 +2783,7 @@
     ]
   },
   {
+    "id": "10264120",
     "name": "Wilbert, Desolate Paladin",
     "cost": "6",
     "attack": "4",
@@ -2827,6 +2863,7 @@
     ]
   },
   {
+    "id": "10271110",
     "name": "Engineblade Maven",
     "cost": "6",
     "attack": "4",
@@ -2876,6 +2913,7 @@
     "keywords": []
   },
   {
+    "id": "10271120",
     "name": "Puppet Cat",
     "cost": "2",
     "attack": "2",
@@ -2911,6 +2949,7 @@
     "keywords": []
   },
   {
+    "id": "10271210",
     "name": "Artifact Catapult",
     "cost": "2",
     "attack": "0",
@@ -2949,6 +2988,7 @@
     ]
   },
   {
+    "id": "10272110",
     "name": "Vier, Heart Slayer",
     "cost": "2",
     "attack": "1",
@@ -2985,6 +3025,7 @@
     ]
   },
   {
+    "id": "10272120",
     "name": "Achim, Lord of Despair",
     "cost": "5",
     "attack": "3",
@@ -3042,6 +3083,7 @@
     "keywords": []
   },
   {
+    "id": "10272310",
     "name": "Flight of Icarus",
     "cost": "1",
     "attack": "0",
@@ -3083,6 +3125,7 @@
     "keywords": []
   },
   {
+    "id": "10273110",
     "name": "Carnelia, Ember of Darkness",
     "cost": "2",
     "attack": "2",
@@ -3130,6 +3173,7 @@
     "keywords": []
   },
   {
+    "id": "10273310",
     "name": "Synchronous Hearts",
     "cost": "6",
     "attack": "0",
@@ -3160,6 +3204,7 @@
     "keywords": []
   },
   {
+    "id": "10274110",
     "name": "Zwei, Symphonic Heart",
     "cost": "5",
     "attack": "3",
@@ -3204,6 +3249,7 @@
     ]
   },
   {
+    "id": "10274120",
     "name": "Karula, Eternal Arts",
     "cost": "6",
     "attack": "5",

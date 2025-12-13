@@ -1,5 +1,6 @@
 [
   {
+    "id": "10001110",
     "name": "Indomitable Fighter",
     "cost": "2",
     "attack": "2",
@@ -31,6 +32,7 @@
     ]
   },
   {
+    "id": "10001120",
     "name": "Leah, Bellringer Angel",
     "cost": "2",
     "attack": "0",
@@ -74,6 +76,7 @@
     ]
   },
   {
+    "id": "10001130",
     "name": "Quake Goliath",
     "cost": "4",
     "attack": "4",
@@ -95,6 +98,7 @@
     ]
   },
   {
+    "id": "10001210",
     "name": "Detective's Lens",
     "cost": "2",
     "attack": "0",
@@ -127,6 +131,7 @@
     ]
   },
   {
+    "id": "10002110",
     "name": "Arriet, Luxminstrel",
     "cost": "3",
     "attack": "3",
@@ -158,6 +163,7 @@
     "keywords": []
   },
   {
+    "id": "10002120",
     "name": "Caravan Mammoth",
     "cost": "7",
     "attack": "10",
@@ -177,6 +183,7 @@
     "keywords": []
   },
   {
+    "id": "10002210",
     "name": "Adventurers' Guild",
     "cost": "3",
     "attack": "0",
@@ -219,6 +226,7 @@
     ]
   },
   {
+    "id": "10011110",
     "name": "Fairy Tamer",
     "cost": "2",
     "attack": "1",
@@ -244,6 +252,7 @@
     "keywords": []
   },
   {
+    "id": "10011120",
     "name": "Stray Beastman",
     "cost": "2",
     "attack": "2",
@@ -268,6 +277,7 @@
     "keywords": []
   },
   {
+    "id": "10011130",
     "name": "Gentle Treant",
     "cost": "4",
     "attack": "4",
@@ -311,6 +321,7 @@
     ]
   },
   {
+    "id": "10011210",
     "name": "Wild Profusion",
     "cost": "2",
     "attack": "0",
@@ -351,6 +362,7 @@
     ]
   },
   {
+    "id": "10012110",
     "name": "May, Journey Elf",
     "cost": "1",
     "attack": "1",
@@ -383,6 +395,7 @@
     "keywords": []
   },
   {
+    "id": "10012120",
     "name": "Selwyn, Sonic Archer",
     "cost": "7",
     "attack": "4",
@@ -410,6 +423,7 @@
     ]
   },
   {
+    "id": "10012310",
     "name": "Bug Alert",
     "cost": "1",
     "attack": "0",
@@ -439,6 +453,7 @@
     "keywords": []
   },
   {
+    "id": "10021110",
     "name": "Flashstep Quickblader",
     "cost": "1",
     "attack": "1",
@@ -460,6 +475,7 @@
     ]
   },
   {
+    "id": "10021120",
     "name": "Arms Peddler",
     "cost": "4",
     "attack": "3",
@@ -490,6 +506,7 @@
     ]
   },
   {
+    "id": "10021130",
     "name": "Centaur Centurion",
     "cost": "8",
     "attack": "7",
@@ -511,6 +528,7 @@
     ]
   },
   {
+    "id": "10021310",
     "name": "Way of the Maid",
     "cost": "2",
     "attack": "0",
@@ -542,6 +560,7 @@
     "keywords": []
   },
   {
+    "id": "10022110",
     "name": "Royal Coachwoman",
     "cost": "2",
     "attack": "1",
@@ -572,6 +591,7 @@
     ]
   },
   {
+    "id": "10022120",
     "name": "Rusty, Luxcard Trickster",
     "cost": "3",
     "attack": "3",
@@ -597,6 +617,7 @@
     "keywords": []
   },
   {
+    "id": "10022210",
     "name": "Ancestral Crown",
     "cost": "4",
     "attack": "0",
@@ -632,6 +653,7 @@
     ]
   },
   {
+    "id": "10031110",
     "name": "Dazzling Runeknight",
     "cost": "2",
     "attack": "2",
@@ -681,6 +703,7 @@
     ]
   },
   {
+    "id": "10031210",
     "name": "Witch's New Brew",
     "cost": "1",
     "attack": "0",
@@ -724,6 +747,7 @@
     ]
   },
   {
+    "id": "10031310",
     "name": "Foresight",
     "cost": "1",
     "attack": "0",
@@ -746,6 +770,7 @@
     "keywords": []
   },
   {
+    "id": "10031320",
     "name": "Truth Summons",
     "cost": "2",
     "attack": "0",
@@ -768,6 +793,7 @@
     "keywords": []
   },
   {
+    "id": "10032110",
     "name": "Remi & Rami, Two-Faced Witch",
     "cost": "4",
     "attack": "4",
@@ -797,14 +823,28 @@
     ],
     "superevolve": [
       {
-        "op": "select_evolve_golem",
-        "attack": 3,
-        "defense": 3
+        "op": "select",
+        "target": "ally:follower",
+        "condition": {
+          "tribe": "Golem"
+        },
+        "effects": [
+          {
+            "op": "evolve"
+          },
+          {
+            "op": "buff",
+            "target": "selected",
+            "attack": 3,
+            "defense": 3
+          }
+        ]
       }
     ],
     "keywords": []
   },
   {
+    "id": "10032120",
     "name": "Blaze Destroyer",
     "cost": "10",
     "attack": "8",
@@ -830,6 +870,7 @@
     ]
   },
   {
+    "id": "10032310",
     "name": "Arcane Eruption",
     "cost": "4",
     "attack": "0",
@@ -865,6 +906,7 @@
     ]
   },
   {
+    "id": "10041110",
     "name": "Searing Firenewt",
     "cost": "2",
     "attack": "2",
@@ -891,6 +933,7 @@
     "keywords": []
   },
   {
+    "id": "10041120",
     "name": "Axe-Wielding Dragonslayer",
     "cost": "6",
     "attack": "5",
@@ -912,6 +955,7 @@
     ]
   },
   {
+    "id": "10041130",
     "name": "Warrior of the Deep",
     "cost": "8",
     "attack": "6",
@@ -937,6 +981,7 @@
     "keywords": []
   },
   {
+    "id": "10041310",
     "name": "Strike of the Dragonewt",
     "cost": "1",
     "attack": "0",
@@ -963,6 +1008,7 @@
     ]
   },
   {
+    "id": "10042110",
     "name": "Draconic Berserker",
     "cost": "4",
     "attack": "4",
@@ -995,6 +1041,7 @@
     "keywords": []
   },
   {
+    "id": "10042120",
     "name": "Battleforged Dragon Keeper",
     "cost": "5",
     "attack": "5",
@@ -1026,6 +1073,7 @@
     ]
   },
   {
+    "id": "10042310",
     "name": "Dragonsign",
     "cost": "3",
     "attack": "0",
@@ -1044,11 +1092,23 @@
     "fanfare": [],
     "spell": [
       {
-        "op": "dragonsign"
+        "op": "add_max_pp",
+        "amount": 1
+      },
+      {
+        "op": "max_pp_gate",
+        "at_least": 10,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          }
+        ]
       }
     ]
   },
   {
+    "id": "10051110",
     "name": "Mistress of the Fanged",
     "cost": "6",
     "attack": "3",
@@ -1071,6 +1131,7 @@
     ]
   },
   {
+    "id": "10051120",
     "name": "Night Fiend",
     "cost": "3",
     "attack": "4",
@@ -1096,6 +1157,7 @@
     "keywords": []
   },
   {
+    "id": "10051130",
     "name": "Devious Lesser Mummy",
     "cost": "2",
     "attack": "2",
@@ -1128,6 +1190,7 @@
     "keywords": []
   },
   {
+    "id": "10051310",
     "name": "Chaos Cyclone",
     "cost": "2",
     "attack": "0",
@@ -1174,6 +1237,7 @@
     "keywords": []
   },
   {
+    "id": "10052110",
     "name": "Lilith, Enchanting Succubus",
     "cost": "1",
     "attack": "1",
@@ -1204,6 +1268,7 @@
     ]
   },
   {
+    "id": "10052120",
     "name": "Amorous Necromancer",
     "cost": "4",
     "attack": "5",
@@ -1242,6 +1307,7 @@
     "keywords": []
   },
   {
+    "id": "10052310",
     "name": "Soul Predation",
     "cost": "2",
     "attack": "0",
@@ -1271,6 +1337,7 @@
     ]
   },
   {
+    "id": "10061110",
     "name": "Soulcure Sister",
     "cost": "6",
     "attack": "3",
@@ -1298,6 +1365,7 @@
     ]
   },
   {
+    "id": "10061120",
     "name": "Fox of Purity",
     "cost": "2",
     "attack": "1",
@@ -1319,6 +1387,7 @@
     ]
   },
   {
+    "id": "10061130",
     "name": "Winged Warrior",
     "cost": "4",
     "attack": "4",
@@ -1362,6 +1431,7 @@
     "keywords": []
   },
   {
+    "id": "10061210",
     "name": "Avian Statue",
     "cost": "4",
     "attack": "0",
@@ -1403,6 +1473,7 @@
     ]
   },
   {
+    "id": "10062110",
     "name": "Ironfist Priest",
     "cost": "4",
     "attack": "5",
@@ -1440,6 +1511,7 @@
     "keywords": []
   },
   {
+    "id": "10062120",
     "name": "Sacred Griffon",
     "cost": "8",
     "attack": "6",
@@ -1478,6 +1550,7 @@
     ]
   },
   {
+    "id": "10062210",
     "name": "Winged Statue",
     "cost": "1",
     "attack": "0",
@@ -1522,6 +1595,7 @@
     ]
   },
   {
+    "id": "10071110",
     "name": "Kitty Cannoneer",
     "cost": "3",
     "attack": "3",
@@ -1549,6 +1623,7 @@
     ]
   },
   {
+    "id": "10071120",
     "name": "Puppet Lancer",
     "cost": "2",
     "attack": "2",
@@ -1574,6 +1649,7 @@
     "keywords": []
   },
   {
+    "id": "10071130",
     "name": "Mechanized Beast",
     "cost": "6",
     "attack": "4",
@@ -1596,6 +1672,7 @@
     ]
   },
   {
+    "id": "10071310",
     "name": "Bullet from Beyond",
     "cost": "4",
     "attack": "0",
@@ -1631,6 +1708,7 @@
     "keywords": []
   },
   {
+    "id": "10072110",
     "name": "Electric Whip Lass",
     "cost": "2",
     "attack": "1",
@@ -1656,6 +1734,7 @@
     "keywords": []
   },
   {
+    "id": "10072120",
     "name": "Mecha Cavalier",
     "cost": "5",
     "attack": "4",
@@ -1689,6 +1768,7 @@
     ]
   },
   {
+    "id": "10072210",
     "name": "Puppet Theater",
     "cost": "2",
     "attack": "0",
