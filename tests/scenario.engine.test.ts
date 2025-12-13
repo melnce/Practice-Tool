@@ -41,7 +41,8 @@ describe("Engine Golden Path", () => {
 
     it("should drive game state via dispatch", async () => {
         // 1. Start Game
-        const stateStart = await startNewGame();
+        // 1. Start Game
+        const stateStart = await startNewGame({ deckAId: "sample_blue", deckBId: "sample_red", seed: 12345 });
         expect(stateStart).toBeDefined();
         expect(stateStart.isBlueTurn).toBe(true);
         expect(stateStart.roundCount).toBe(1);

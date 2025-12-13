@@ -255,9 +255,43 @@ export interface GameState {
 }
 
 export interface StartGameOptions {
-    // Current implementation reads from DOM, no programmatic options supported yet.
+    deckAId: string;
+    deckBId: string;
+    seed?: number;
 }
+
+// Action Payloads
+export type TargetSpec =
+    | { type: "card"; uid: string }
+    | { type: "leader"; player: Player };
+
+export type PlayCardAction = {
+    type: "PLAY_CARD";
+    player: Player;
+    cardUid: string;
+    // Optional targeting for the card being played (if it requires a target immediately, though usually handled by UI/ResolveTarget)
+    // For now, minimal.
+};
+
+export type AttackAction = {
+    type: "ATTACK";
+    player: Player;
+    attackerUid: string;
+    defender: TargetSpec;
+};
+
+export type ChooseTargetAction = {
+    type: "CHOOSE_TARGET";
+    player: Player;
+    target: TargetSpec;
+};
 
 export type HistoryAction = { type: "UNDO" } | { type: "REDO" } | { type: "RESET_HISTORY" };
 export type GameAction = { type: "END_TURN" };
-export type PlayerAction = HistoryAction | GameAction;
+
+export type PlayerAction =
+    | HistoryAction
+    | GameAction
+    | PlayCardAction
+    | AttackAction
+    | ChooseTargetAction;

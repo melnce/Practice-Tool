@@ -13,6 +13,8 @@ import { logEvent } from "../core/logger.js";
 import { CardInstance, Player } from "../core/types.js";
 
 
+import { StartGameOptions } from "../core/types.js";
+
 function resetEvoButtons() {
     ["blueNormalEvo", "blueSuperEvo", "redNormalEvo", "redSuperEvo"].forEach(id => {
         const el = document.getElementById(id);
@@ -23,15 +25,13 @@ function resetEvoButtons() {
     });
 }
 
-export async function startGame() {
-    const blueChoice = (document.getElementById("blueDeckSelect") as HTMLSelectElement)?.value || "sample_blue";
-    const redChoice = (document.getElementById("redDeckSelect") as HTMLSelectElement)?.value || "sample_red";
+export async function startGame(options: StartGameOptions) {
+    const blueChoice = options.deckAId;
+    const redChoice = options.deckBId;
 
-    // ↓↓↓ INSERTED: seed RNG before any shuffles/draws happen
-    const seedValue = (document.getElementById("seedInput") as HTMLInputElement)?.value;
-    if (seedValue !== undefined && seedValue !== null && String(seedValue).trim() !== "" && !Number.isNaN(Number(seedValue))) {
-        setSeed(Number(seedValue));
-        console.log(`[RNG] Using provided seed: ${seedValue}`);
+    if (options.seed !== undefined && options.seed !== null) {
+        setSeed(options.seed);
+        console.log(`[RNG] Using provided seed: ${options.seed}`);
     } else {
         const autoSeed = Date.now() >>> 0;
         setSeed(autoSeed);

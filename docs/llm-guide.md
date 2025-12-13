@@ -14,10 +14,21 @@
 -   **Use `.js` extensions** for all relative imports in `src/`.
 
 ### Engine API
--   `startNewGame(options?: StartGameOptions)`: Resets game.
+### Engine API
+-   `startNewGame(options: StartGameOptions)`: Resets game. Options:
+    -   `deckAId` (string): Filename for Blue deck (e.g. "sample_blue").
+    -   `deckBId` (string): Filename for Red deck.
+    -   `seed?` (number): Optional generic seed for RNG determinism.
+    ```typescript
+    await startNewGame({ deckAId: "sample_blue", deckBId: "sample_red", seed: 12345 });
+    ```
 -   `dispatch(state, action)`: Mutates state. Use `PlayerAction` types.
+    - `PLAY_CARD`: Play a card from hand. `{ type: "PLAY_CARD", player: "blue", cardUid: "..." }`
+    - `ATTACK`: Attack a target. `{ type: "ATTACK", player: "blue", attackerUid: "...", defender: { type: "card", uid: "..." } }`
+    - `CHOOSE_TARGET`: Select a target for pending effect. `{ type: "CHOOSE_TARGET", player: "blue", target: { type: "card", uid: "..." } }`
 -   `getState()`: Returns current state (Read-Only).
 -   **Do not mutate state directly** in UI or Boot.
+-   **Invariants**: `dispatch` enforces GameState validity in dev/test (throws errors if state is corrupted).
 
 ### Architecture Guardrails
 -   **Core/Logic must NOT import UI**.

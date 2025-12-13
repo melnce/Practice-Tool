@@ -23,7 +23,21 @@ injectAdapter({ render, showChoiceModal });
 window.addEventListener("DOMContentLoaded", () => {
     // @ts-ignore
     wireClick("startGameBtn", async () => {
-        await engine.startNewGame();
+        const blueSelect = document.getElementById("blueDeckSelect") as HTMLSelectElement;
+        const redSelect = document.getElementById("redDeckSelect") as HTMLSelectElement;
+        const seedInput = document.getElementById("seedInput") as HTMLInputElement;
+
+        // Default or read value
+        const deckAId = blueSelect?.value || "sample_blue";
+        const deckBId = redSelect?.value || "sample_red";
+
+        // Parse seed
+        let seed: number | undefined;
+        if (seedInput && seedInput.value.trim() !== "" && !Number.isNaN(Number(seedInput.value))) {
+            seed = Number(seedInput.value);
+        }
+
+        await engine.startNewGame({ deckAId, deckBId, seed });
     });
 
     try { render(); } catch (_) { }
