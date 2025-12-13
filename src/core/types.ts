@@ -144,7 +144,7 @@ export interface CardTemplate {
     effectiveCost?: number;
     potential_defense?: number;
     countdown?: number | string;
-    barrierCharges?: number;
+    // barrierCharges?: number; // Removed
     peak_defense?: number;
     keywords?: (string | KeywordEntry)[];
     fanfare?: Effect[];
@@ -216,9 +216,12 @@ export interface GameState {
     blueEvoCharges: number;
     redEvoCharges: number;
     blueSuperEvoCharges: number;
-    redSuperEvoCharges: number;
     blueEvoUsedThisTurn: boolean;
     redEvoUsedThisTurn: boolean;
+
+    // Total total successful evolves per match (for counting, e.g. Odin/Grimnir/Sandalphon gates)
+    blueEvoCount: number;
+    redEvoCount: number;
 
     bluePlaysThisTurn: number;
     redPlaysThisTurn: number;

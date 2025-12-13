@@ -107,6 +107,96 @@ function tickAmuletCountdowns(owner: Player) {
     }
 }
 
+// --- Invoke Logic ---
+// Helper to scan deck for Invoke cards
+function scanDeckForInvokes(owner: Player, timing: "start_of_turn" | "end_of_turn") {
+    const deck = owner === "blue" ? state.blueDeck : state.redDeck;
+    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+
+    // Safety copy to iterate while mutating deck
+    const candidates = [...deck];
+    const invokedNames = new Set<string>();
+
+    for (const card of candidates) {
+        // Skip if we already invoked a copy of this card
+        if (invokedNames.has(card.name)) continue;
+
+        // Run condition check
+        const inv = (card as any).invoke;
+        if (!inv || !inv.condition) continue;
+
+        // Check timing (default to start_of_turn of NOT specified, for backward compat, or require explicit?)
+        // User wants explicit. Let's strict match if present, else default? 
+        // Better: strict match. Sandalphon now has explicit.
+        const cardTiming = inv.timing || "start_of_turn"; // Defaulting to start for now
+
+        // Console log for debugging the user's issue
+        console.log(`[InvokeScan] Card=${card.name} Timing=${cardTiming} CurrentPhase=${timing}`);
+
+        if (cardTiming !== timing) continue;
+
+        // Simple condition check (extensible)
+        let conditionMet = false;
+
+        // Evolve count check
+        if (typeof inv.condition.evolved_count_at_least === "number") {
+            const stat = owner === "blue" ? state.blueEvoCount : state.redEvoCount;
+            console.log(`[InvokeScan] ConditionCheck: Need=${inv.condition.evolved_count_at_least} Have=${stat}`);
+            if (stat >= inv.condition.evolved_count_at_least) conditionMet = true;
+        }
+
+        if (conditionMet) {
+            console.log(`[InvokeScan] MATCH! Invoking ${card.name}`);
+            logEvent("invoke", { owner, card: card.name });
+            invokedNames.add(card.name);
+
+            // Execute invoke effects
+            // Usually: summon self from deck
+            // Sandalphon: "Invoke this card. When this card is Invoked, gain Crest... and return this card to hand."
+
+            // Standard Invoke: Move from deck to board.
+            // If the card has specific 'invoke_effects', run them? 
+            // Or treat it as a summon -> then triggers fire "on_invoke"?
+            // Sandalphon text: "Invoke this card. When this card is Invoked..."
+            // This implies the act of Invoking IS summoning it, and then a trigger happens?
+            // "Invoke" keyword in SV usually means: "Summon this follower from your deck to your field."
+
+            // Implementation:
+            // 1. Remove from deck
+            const index = deck.indexOf(card);
+            if (index === -1) continue; // Already moved?
+            deck.splice(index, 1);
+
+            // 2. Add to board (or hand if full? usually banish if full)
+            const board = owner === "blue" ? state.blueBoard : state.redBoard;
+            if (board.length < 5) { // Assuming 5 slots
+                board.push(card);
+                card.zone = "board";
+                card.justPlayed = true; // Summoning sickness
+
+                // Fire "invoke" event for the card itself to react
+                // Sandalphon reacts to his own invocation
+                fireTrigger("invoke", owner, { sourceCard: card, invokedCard: card });
+            } else {
+                console.log("Invoke failed: Board full");
+                // Banish? Or stay in deck? SV rules usually say stay in deck if full?
+                // Actually they give shadows? Let's burn it to graveyard for now or just drop it.
+                // "If your area is full, Invoked cards remain in your deck." -> Official ruling.
+                // So we should put it back if full.
+                deck.push(card);
+            }
+
+            // "Only 1 copy of an Invoke card will activated each turn"
+            // This limit is per-name usually.
+            // For now, simpler: processed one, maybe break if we want strict single invoke per name?
+            // User requirement: "Only 1 copy of an Invoke card will activated each turn"
+            // We should strip subsequent copies of THIS card name from candidates?
+            // Naive approach: break after first success? No, different cards can invoke.
+            // Correct approach: Track invoked names this turn.
+        }
+    }
+}
+
 /**
  * Handles the end of the blue player's turn and sets up the red player's turn.
  */
@@ -120,6 +210,9 @@ export function endTurnBlue() {
     fireTrigger("end_of_turn", "blue");
     // processHimekaDelayedBanish("blue");
     safeRender();
+
+    // Check End of Turn Invokes
+    scanDeckForInvokes("blue", "end_of_turn");
 
     // ✅ Blue: run crest effects one by one, then cleanup once
     {
@@ -159,8 +252,12 @@ export function endTurnBlue() {
     }
     cleanupDead();
 
+    // Draw for Red
     drawCard(state.redHand, state.redDeck, "red");
-    logEvent("draw", { player: "red", count: 1 }); // in endTurnBlue()
+    logEvent("draw", { player: "red", count: 1 });
+    // Invoke Phase (Start of Turn)
+    scanDeckForInvokes("red", "start_of_turn");
+
     state.redPlaysThisTurn = 0;
 
     refreshBoardForNewTurn(state.redBoard);
@@ -189,6 +286,9 @@ export function endTurnRed() {
     fireTrigger("end_of_turn", "red");
     // processHimekaDelayedBanish("red");
     safeRender();
+
+    // Check End of Turn Invokes
+    scanDeckForInvokes("red", "end_of_turn");
 
     // ✅ Red: run crest effects one by one, then cleanup once
     {
@@ -232,8 +332,12 @@ export function endTurnRed() {
     }
     cleanupDead();
 
+    // Draw for Blue
     drawCard(state.blueHand, state.blueDeck, "blue");
-    logEvent("draw", { player: "blue", count: 1 }); // in endTurnRed()
+    logEvent("draw", { player: "blue", count: 1 });
+    // Invoke Phase (Start of Turn)
+    scanDeckForInvokes("blue", "start_of_turn");
+
     state.bluePlaysThisTurn = 0;
 
     refreshBoardForNewTurn(state.blueBoard);

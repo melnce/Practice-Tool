@@ -176,6 +176,12 @@ export function fireTrigger(eventName: string, activePlayer: Player, context: Tr
         for (const trigger of (card as any).triggers) {
             if (trigger.event !== eventName) continue;
 
+            // FIX: Default source for followers/amulets is board-only unless specified
+            const defaultSource = (card.type === "Follower" || card.type === "Amulet") ? "board" : null;
+            const requiredSource = trigger.source || defaultSource;
+
+            if (requiredSource && requiredSource !== source) continue;
+
             // --- Self-damaged: only fire on the damaged follower itself ---
             if (eventName === "self_damaged") {
                 const damaged = context?.damagedCard;

@@ -37,6 +37,7 @@ export function bounceToHand(card: CardInstance) {
         toHand = state.redHand;
         owner = "red";
     } else {
+        console.warn(`[BounceToHand] Card ${card.name}#${card.uid} not found on any board! bi=${bi} ri=${ri}`);
         return; // Card not on a board; ignore.
     }
 
@@ -56,14 +57,19 @@ export function bounceToHand(card: CardInstance) {
 // Handle "return_to_hand" effect
 export function handleReturnToHand(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any) {
     // allow followers + amulets by default; narrow if filters.type is given
-    let pool = getPool(eff.target as any, owner).filter(c => c.type === "Follower" || c.type === "Amulet");
+    console.log(`[BounceOp] HandleReturnToHand Target=${eff.target} Owner=${owner} Source=${sourceCard?.name}#${sourceCard?.uid}`);
+
+    let pool = getPool(eff.target as any, owner, sourceCard).filter(c => c.type === "Follower" || c.type === "Amulet");
+    console.log(`[BounceOp] Pool size after init: ${pool.length}`);
+
     if ((eff as any).filters?.type) {
         const want = String((eff as any).filters.type).toLowerCase();
         pool = pool.filter(c => (c.type || "").toLowerCase() === want);
     }
 
-    // If there's a source card, filter it out of the pool so it can't target itself.
-    if (sourceCard) {
+    // If there's a source card, filter it out of the pool so it can't target itself,
+    // UNLESS current op target is explicitly "self".
+    if (sourceCard && eff.target !== "self") {
         pool = pool.filter(c => c.uid !== sourceCard.uid);
     }
 

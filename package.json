@@ -11,15 +11,13 @@
     "check:boundaries": "node tools/check-boundaries.mjs",
     "build": "tsc",
     "watch": "tsc -w",
-    "import:cards": "npx tsx tools/import_raw_cards.ts",
-    "validate:cards": "npx tsx tools/validate_compiled_cards.ts",
-    "report:unresolved": "npx tsx tools/report_unresolved_cards.ts",
-    "cards:all": "npm run import:cards && npm run validate:cards"
+    "watch:cards": "npx tsx scripts/watch_cards.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^25.0.1",
     "ts-morph": "^27.0.2",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",

@@ -83,6 +83,36 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // God Mode: EP
+    wireClick("godEPPlus", () => {
+        // @ts-ignore
+        state.blueEvoCharges = (state.blueEvoCharges || 0) + 1;
+        render();
+    });
+    wireClick("godEPMinus", () => {
+        // @ts-ignore
+        state.blueEvoCharges = Math.max(0, (state.blueEvoCharges || 0) - 1);
+        render();
+    });
+    wireClick("godEPRefill", () => {
+        // @ts-ignore
+        state.blueEvoCharges = 3; // Max EP for P2 is 3, usually enough.
+        render();
+    });
+
+    wireClick("godSetEvoCount", () => {
+        const inp = document.getElementById("godEvoCountVal") as HTMLInputElement;
+        if (inp) {
+            const val = parseInt(inp.value, 10);
+            if (Number.isFinite(val)) {
+                // @ts-ignore
+                state.blueEvoCount = val;
+                // Also sync red for convenience? No, separate controls preferred but user asked for "i can evolve"
+                render();
+            }
+        }
+    });
+
 });
 
 

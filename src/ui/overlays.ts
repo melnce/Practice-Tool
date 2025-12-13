@@ -86,7 +86,7 @@ export function applyKeywordOverlays(div: HTMLElement, card: CardInstance) {
 }
 
 export function applyBarrierOverlay(div: HTMLElement, card: CardInstance) {
-    if ((card.barrierCharges || 0) <= 0) return;
+    if (!card.hasBarrier) return;
     const wrap = div.querySelector(".card-image-wrapper") ?? div;
     let ov = wrap.querySelector(".barrier-overlay");
     if (!ov) {
@@ -94,7 +94,7 @@ export function applyBarrierOverlay(div: HTMLElement, card: CardInstance) {
         ov.className = "barrier-overlay";
         wrap.appendChild(ov);
     }
-    ov.setAttribute("data-charges", card.barrierCharges! > 1 ? String(card.barrierCharges) : "");
+    ov.setAttribute("data-charges", "");
 
     if (card.__uiFlashBarrier) {
         wrap.classList.add("barrier-flash");

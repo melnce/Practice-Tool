@@ -116,3 +116,37 @@ export function handleSetCostLastDrawn(eff: Effect) {
         target.cost = Math.max(0, v);
     }
 }
+
+export function handleRestoreAllies(owner: Player, eff: Effect) {
+    console.log(`[Op] Restore Allies for ${owner}`);
+    const amount = (eff.amount || 1) as number;
+
+    // 1. Heal Leader
+    handleHealLeader(owner, { amount } as any);
+
+    // 2. Heal Followers
+    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    for (const c of board) {
+        if (!c || c.type !== "Follower") continue;
+        // @ts-ignore
+        const curr = parseInt(c.defense, 10) || 0;
+        const full =
+            // @ts-ignore
+            Number.isFinite(c.potential_defense) ? c.potential_defense :
+                // @ts-ignore
+                Number.isFinite(c.peak_defense) ? c.peak_defense :
+                    // @ts-ignore
+                    Number.isFinite(c.base_defense) ? c.base_defense :
+                        curr;
+
+        // Can only restore up to the difference
+        const canRestore = (full as number) - curr;
+        if (canRestore > 0) {
+            const actual = Math.min(amount, canRestore);
+            // @ts-ignore
+            c.defense = curr + actual;
+            // No specific trigger fired per follower here for simplicity, 
+            // but in a full engine we'd fire 'on_heal' per unit.
+        }
+    }
+}

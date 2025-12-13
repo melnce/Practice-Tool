@@ -217,7 +217,7 @@ function spellNeedsTarget(card: CardInstance, player: Player) {
             // Skip custom ops that handle their own UI
             if (eff?.op === "select_hand_summon_artifact_copies_eot_destroy") continue;
 
-            if (eff?.select) {
+            if (eff?.select || eff?.op === "select") {
                 // ✅ Pass the condition + targeted context so Ward filtering applies
                 const pool = getPool(
                     eff.target,

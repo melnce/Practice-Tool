@@ -10,6 +10,21 @@ export function handleOverflowGate(owner: Player) {
     return isOverflow(owner);
 }
 
+export function handleSkyboundArtGate(owner: string, eff: any, sourceCard: any) {
+    // Gauge = Current Turn (roundCount) + Evolves Witnessed
+    const witnesses = (sourceCard?.skyboundArtEvolvesWitnessed || 0);
+    const gauge = (state.roundCount || 1) + witnesses;
+    const req = parseInt(eff.requirement || eff.count || 10, 10);
+
+    console.log(`[SkyboundGap] Gate Check: Turn=${state.roundCount} Witnessed=${witnesses} Gauge=${gauge} Req=${req} Card=${sourceCard?.name}`);
+
+    // If gauge met -> return true (gate passes)
+    if (gauge >= req) {
+        return true;
+    }
+    return false;
+}
+
 export function handleNecromancyGate(owner: Player, eff: any) {
     const need = Math.max(1, parseInt(String(eff.cost ?? 1)) || 1);
     if (hasNecromancy(owner, need)) {
@@ -168,3 +183,13 @@ export function handleSuperEvolvedAlliedGate(owner: Player, eff: Effect, effects
     const next = (hasSuper ? eff.effects : eff.else_effects) || [];
     if (next.length) effectsQueue.unshift(...next);
 }
+
+export function handleEvolvedAlliedGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {
+    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    // @ts-ignore
+    const hasEvolved = board.some(c => c.type === "Follower" && (c.hasEvolved || c.evoType === "super"));
+    const next = (hasEvolved ? eff.effects : eff.else_effects) || [];
+    if (next.length) effectsQueue.unshift(...next);
+}
+
+

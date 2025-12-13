@@ -137,3 +137,14 @@ export function handleLeaderBarrierOp(owner: Player, eff: Effect) {
     // Ignore eff.charges / eff.amount > 1
     grantLeaderBarrier(target, 1);
 }
+// NEW: Recover Evolution Points
+export function handleRecoverEP(owner: Player, eff: Effect) {
+    const amt = parseInt(eff.amount) || 0;
+    const isBlue = (eff.player || "self") === "self" ? owner === "blue" : owner !== "blue";
+    if (isBlue) {
+        state.blueEvoCharges = (state.blueEvoCharges || 0) + amt;
+    } else {
+        state.redEvoCharges = (state.redEvoCharges || 0) + amt;
+    }
+    logEvent("recoverEP", { owner: isBlue ? "blue" : "red", amount: amt });
+}

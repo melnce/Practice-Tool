@@ -37,6 +37,12 @@ function resolveSelectionQuery(
 let __initializingKeywords = false;
 
 const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptions) => void } = {
+    maxdamagecap: (c, opts) => {
+        console.log(`[Keyword] Applying MaxDamageCap to ${c.name} with amount ${opts?.amount}`);
+        if (opts && typeof opts.amount === 'number') {
+            (c as any).maxDamageCap = opts.amount;
+        }
+    },
     rush: (c) => {
         c.hasRush = true;
 
@@ -146,6 +152,7 @@ const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptions) => 
         const add = Number(opts.count ?? 0);
         (c as any).counters[key] = ((c as any).counters[key] || 0) + add;
     },
+    "skybound art": (c) => { /* no-op logic, just allow tag */ },
     pixieenter: (c, opts) => {
         (c as any).hasPixieEnter = true;
         (c as any).pixieEnterEffects = Array.isArray(opts?.effects) ? opts.effects : [];

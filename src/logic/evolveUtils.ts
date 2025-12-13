@@ -112,6 +112,16 @@ export function onEvolve(card: CardInstance, owner: Player, mode: "normal" | "su
         runEffects(effectsToRun, owner, card);
     }
 
+    // NEW: Notify Skybound Art cards in hand
+    import("./effects/skybound.js").then(({ incrementSkyboundArt }) => {
+        incrementSkyboundArt(owner);
+    });
+
+    // Track total evolves (Moved from effects/ops/evolve.ts)
+    if (owner === "blue") state.blueEvoCount = (state.blueEvoCount || 0) + 1;
+    else state.redEvoCount = (state.redEvoCount || 0) + 1;
+    logEvent("evolveCount", { owner, count: owner === "blue" ? state.blueEvoCount : state.redEvoCount });
+
     spendCounters();
     fireEvoTriggers();
     logEvent("evolve", { owner, card: card.name, uid: card.uid, mode, via: "withEffects" });

@@ -6,7 +6,7 @@ import { CardInstance, Player } from "../../core/types.js";
 
 // Helper interface for card with barrier properties
 interface BarrierCard extends CardInstance {
-    barrierCharges?: number;
+    // barrierCharges?: number; // Removed
     hasBarrier?: boolean;
     __uiPopBarrier?: boolean;
     __uiFlashBarrier?: boolean;
@@ -20,14 +20,12 @@ interface BarrierCard extends CardInstance {
 }
 
 export function grantBarrier(card: BarrierCard, charges = 1) {
-    card.barrierCharges = (card.barrierCharges || 0) + charges;
-    card.hasBarrier = card.barrierCharges > 0;
+    card.hasBarrier = true;
 }
 
 function consumeBarrier(card: BarrierCard) {
-    if ((card.barrierCharges || 0) > 0) {
-        if (card.barrierCharges) card.barrierCharges--;
-        if ((card.barrierCharges || 0) <= 0) card.hasBarrier = false;
+    if (card.hasBarrier) {
+        card.hasBarrier = false;
         card.__uiPopBarrier = true; // optional UI flag
         return true;
     }
@@ -59,6 +57,12 @@ export function dealDamage(target: BarrierCard, amount: number, source: CardInst
     // Super-evolve: on its owner's turn, damage is reduced to 0,
     // but it STILL counts as an attempted hit (for triggers, barrier, bane rules, etc.).
     try {
+        // --- Max Damage Cap Check ---
+        if ((target as any).maxDamageCap > 0 && damageDealt > (target as any).maxDamageCap) {
+            console.log(`[Damage] Capped damage on ${target.name} from ${damageDealt} to ${(target as any).maxDamageCap}`);
+            damageDealt = (target as any).maxDamageCap;
+        }
+
         const isBlue = (state.blueBoard || []).includes(target);
         const owner: Player | null = isBlue ? "blue" : ((state.redBoard || []).includes(target) ? "red" : null);
 

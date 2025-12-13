@@ -55,7 +55,7 @@ export async function loadCardDatabase() {
             card.hasWard = hasInherentWard(card.description, card.keywords);
             card.hasIntimidate = hasInherentIntimidate(card.description, card.keywords);
             card.hasBarrier = hasInherentBarrier(card.description, card.keywords);
-            card.barrierCharges = card.hasBarrier ? 1 : 0;
+            // card.barrierCharges = card.hasBarrier ? 1 : 0; // Removed
             card.hasBane = hasInherentBane(card.description, card.keywords);
             card.hasBanishOnDeath = hasInherentBanishOnDeath(card.keywords);
             card.hasLastWords = hasInherentLastWords(card.keywords);

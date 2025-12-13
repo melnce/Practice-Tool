@@ -15,7 +15,9 @@
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90001110-goblin",
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90004110",
@@ -34,7 +36,10 @@
     "url": "https://shadowverse.gg/cards/90004110-silent-rider",
     "keywords": [
       "Storm"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90004120",
@@ -51,7 +56,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90004120-servant-of-cocytus",
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90004130",
@@ -81,7 +89,10 @@
         "amount": 6
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90004310",
@@ -105,7 +116,10 @@
         "player": "opponent",
         "amount": 1
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90011110",
@@ -126,7 +140,10 @@
     "url": "https://shadowverse.gg/cards/90011110-fairy",
     "keywords": [
       "Rush"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90011310",
@@ -149,7 +166,11 @@
         "player": "self",
         "amount": 1
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "90014310",
@@ -174,7 +195,11 @@
         "select": 1,
         "can_target_leader": true
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "90021110",
@@ -193,7 +218,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90021110-knight",
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90021120",
@@ -212,7 +240,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90021120-steelclad-knight",
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90023110",
@@ -250,7 +281,10 @@
     ],
     "keywords": [
       "Ward"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90031110",
@@ -269,7 +303,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90031110-clay-golem",
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90031120",
@@ -290,7 +327,10 @@
     "url": "https://shadowverse.gg/cards/90031120-guardian-golem",
     "keywords": [
       "Ward"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90031130",
@@ -320,7 +360,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90031140",
@@ -350,7 +393,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90031210",
@@ -388,7 +434,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90032110",
@@ -419,7 +468,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90033310",
@@ -448,7 +499,11 @@
         "target": "enemy:follower",
         "amount": 2
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "90034110",
@@ -478,7 +533,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90034120",
@@ -516,7 +574,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90034130",
@@ -552,7 +612,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90041110",
@@ -571,7 +633,10 @@
     "url": "https://shadowverse.gg/cards/90041110-fire-drake-whelp",
     "keywords": [
       "Intimidate"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90041120",
@@ -590,7 +655,10 @@
     "url": "https://shadowverse.gg/cards/90041120-vastwing-dragon",
     "keywords": [
       "Intimidate"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90041130",
@@ -611,7 +679,10 @@
     "url": "https://shadowverse.gg/cards/90041130-majestic-megalorca",
     "keywords": [
       "Rush"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90043110",
@@ -633,7 +704,10 @@
     "keywords": [
       "Storm",
       "Ward"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90044110",
@@ -652,7 +726,10 @@
     "url": "https://shadowverse.gg/cards/90044110-supreme-golden-dragon",
     "keywords": [
       "Ward"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90044120",
@@ -671,7 +748,10 @@
     "url": "https://shadowverse.gg/cards/90044120-supreme-silver-dragon",
     "keywords": [
       "Rush"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90044310",
@@ -716,7 +796,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90051110",
@@ -735,7 +818,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90051110-skeleton",
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90051120",
@@ -754,7 +840,10 @@
     "url": "https://shadowverse.gg/cards/90051120-bat",
     "keywords": [
       "Drain"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90051130",
@@ -790,7 +879,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90051140",
@@ -825,7 +916,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90054110",
@@ -854,7 +948,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90054120",
@@ -883,7 +980,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90054130",
@@ -917,7 +1017,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90061110",
@@ -936,7 +1039,10 @@
     "url": "https://shadowverse.gg/cards/90061110-holy-falcon",
     "keywords": [
       "Storm"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90061120",
@@ -955,7 +1061,10 @@
     "url": "https://shadowverse.gg/cards/90061120-holyflame-tiger",
     "keywords": [
       "Rush"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90061130",
@@ -974,7 +1083,10 @@
     "url": "https://shadowverse.gg/cards/90061130-regal-falcon",
     "keywords": [
       "Storm"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90064110",
@@ -993,7 +1105,10 @@
     "url": "https://shadowverse.gg/cards/90064110-holy-cavalier",
     "keywords": [
       "Ward"
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90071110",
@@ -1028,7 +1143,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90071120",
@@ -1063,7 +1180,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90071210",
@@ -1102,7 +1221,10 @@
           "targets": "merge"
         }
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90071220",
@@ -1141,7 +1263,10 @@
           "targets": "merge"
         }
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90072110",
@@ -1168,7 +1293,9 @@
       {
         "op": "start_fortifier_fuse"
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90072120",
@@ -1195,7 +1322,9 @@
       {
         "op": "start_fortifier_fuse"
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90072130",
@@ -1225,7 +1354,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "90073110",
@@ -1309,7 +1441,9 @@
           "consume": "partner"
         }
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90073120",
@@ -1344,7 +1478,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90073130",
@@ -1379,7 +1515,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90074110",
@@ -1415,7 +1553,9 @@
       "Ward",
       "Aura"
     ],
-    "triggers": []
+    "triggers": [],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90074120",
@@ -1437,7 +1577,9 @@
     "keywords": [
       "Ward"
     ],
-    "triggers": []
+    "triggers": [],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90074130",
@@ -1471,7 +1613,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "90004320",
@@ -2056,6 +2200,10 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": []
   }
 ]

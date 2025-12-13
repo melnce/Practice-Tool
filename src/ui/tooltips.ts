@@ -18,6 +18,18 @@ function formatBuffDelta(card: CardInstance) {
     return `<br><br><span class="buff-delta" style="color:${color};font-weight:700;">${sa}/${sd}</span>`;
 }
 
+// Helper to check for the keyword OR the gate op
+function hasSkyboundArt(card: any): boolean {
+    if (!card) return false;
+    // Check explicit keyword
+    if (card.keywords?.some((k: any) => (typeof k === "string" ? k : k?.name)?.toLowerCase() === "skybound art")) return true;
+    // Check gate in fanfare
+    if (card.fanfare?.some((f: any) => f.op === "skybound_art_gate")) return true;
+    // Check gate in triggers
+    if (card.triggers?.some((t: any) => t.effects?.some((e: any) => e.op === "skybound_art_gate"))) return true;
+    return false;
+}
+
 export function formatCardTooltip(card: CardInstance, owner: Player | null = null) {
     const name = String(card?.name ?? "");
     const clazz = String(card?.class ?? "Neutral");
@@ -27,51 +39,49 @@ export function formatCardTooltip(card: CardInstance, owner: Player | null = nul
 
     const classLine = hasTribes ? `${clazz}/${tribes}` : clazz;
 
-    // === Fused Loot (unique) section for cards like Sinciro ===
-    let fusedSection = "";
+    // === Fused Loot (unique) section ===
+    let extraText = "";
     if (Array.isArray(card?._fusedLootNames) && card._fusedLootNames.length > 0) {
-        const uniq = Array.from(
-            new Set(
-                card._fusedLootNames
-                    .map(n => String(n || "").trim())
-                    .filter(Boolean)
-            )
-        );
-        const count = uniq.length;
-        const names = uniq.join(", ");
-        fusedSection =
-            `<br><br><span style="color: orange;">Fused Loot (unique): ${count}<br>${names}</span>`;
+        const uniq = Array.from(new Set(card._fusedLootNames.map(n => String(n || "").trim()).filter(Boolean)));
+        extraText += `<br><br><span style="color: orange;">Fused Loot (unique): ${uniq.length}<br>${uniq.join(", ")}</span>`;
+    } else if ((card as any)._fusedCards && (card as any)._fusedCards.length > 0) {
+        extraText += `<br><span style="color: #aaa; font-size: 0.8em;">Fused: ${(card as any)._fusedCards.length} cards</span>`;
     }
 
-    // === Rally tracker (live) for Gildaria or any Rally card ===
-    let rallySection = "";
-    const wantsRally =
-        String(card?.name).toLowerCase() === "gildaria, anathema of peace" ||
-        /\brally\b/i.test(desc);
-    if (wantsRally) {
-        const side = owner ?? null;
-        const m = desc.match(/Rally\s*\((\d+)\)/i);
-        const need = m ? parseInt(m[1], 10) : null;
-        const initial =
-            side === "blue" ? (state.blueRally | 0) :
-                side === "red" ? (state.redRally | 0) : 0;
-        const initialText = need != null ? `${initial} / ${need}` : `${initial}`;
-        rallySection =
-            `<br><br><span class="rally-line" data-side="${side ?? ""}" data-need="${need ?? ""}" style="color: orange;">` +
-            `Rally: <span class="rally-value">${initialText}</span>` +
+    // === Rally tracker ===
+    // Priority: Keyword Object -> Gate Op -> Keyword String (legacy/fallback)
+    const rallyKw = card.keywords?.find((k: any) => (typeof k === "object" && k.name === "Rally"));
+    const rallyReq = rallyKw ? (rallyKw as any).count : null;
+    const rallyGate = !rallyReq && card.fanfare?.find((f: any) => f.op === "rally_gate");
+    const finalRallyReq = rallyReq || (rallyGate ? rallyGate.count : null);
+
+    if (finalRallyReq) {
+        const side = owner ?? state.activePlayer ?? "blue";
+        extraText += `<br><br><div class="tooltip-counter" data-type="rally" data-need="${finalRallyReq}" data-side="${side}">Refining...</div>`;
+    }
+
+    // === Skybound Art tracker ===
+    if (hasSkyboundArt(card)) {
+        const gate = card.fanfare?.find((f: any) => f.op === "skybound_art_gate");
+        const req = gate ? (gate.requirement || 10) : 10;
+        const current = ((card as any).skyboundArtEvolvesWitnessed || 0) + (state.roundCount || 1);
+
+        // Use structure compatible with attachTooltip's live updater
+        extraText +=
+            `<br><br><span class="skybound-line" data-req="${req}" style="color: #ebd04f;">` +
+            `Skybound Art: <span class="skybound-value">${current} / ${req}</span>` +
             `</span>`;
     }
 
-    // NEW: +A/+D line from buffs only
+    // === Buff Delta ===
     const buffDelta = formatBuffDelta(card);
 
     return `${name}
   
 ${classLine}
 
-${desc}${fusedSection}${rallySection}${buffDelta}`;
+${desc}${extraText}${buffDelta}`;
 }
-
 
 
 export function attachTooltip(div: HTMLElement, tooltipEl: HTMLElement, card: CardInstance, isBlueSide: boolean) {
@@ -82,15 +92,26 @@ export function attachTooltip(div: HTMLElement, tooltipEl: HTMLElement, card: Ca
         tooltipEl.innerHTML = formatCardTooltip(card, owner);
         tooltipEl.style.whiteSpace = "pre-line";
         tooltipEl.style.display = "block";
-        // Live refresh: only mutate the rally number when it actually changes
+
+        // Live refresh elements
         const rallyLine = tooltipEl.querySelector(".rally-line");
         const rallyValue = tooltipEl.querySelector(".rally-value");
+        const skyboundLine = tooltipEl.querySelector(".skybound-line");
+        const skyboundValue = tooltipEl.querySelector(".skybound-value");
+
         // === Safe live update (auto-stop) ===
-        if (rallyLine && rallyValue) {
-            const side = rallyLine.getAttribute("data-side");
-            const needAttr = rallyLine.getAttribute("data-need");
-            const need = needAttr ? parseInt(needAttr, 10) : null;
-            let last = NaN;
+        if ((rallyLine && rallyValue) || (skyboundLine && skyboundValue)) {
+            // Rally Data
+            const rSide = rallyLine?.getAttribute("data-side");
+            const rNeedAttr = rallyLine?.getAttribute("data-need");
+            const rNeed = rNeedAttr ? parseInt(rNeedAttr, 10) : null;
+
+            // Skybound Data
+            const sReqAttr = skyboundLine?.getAttribute("data-req");
+            const sReq = sReqAttr ? parseInt(sReqAttr, 10) : 10;
+
+            let lastRally = NaN;
+            let lastSkybound = NaN;
             let stopAt = Date.now() + 120000; // hard cap: 2 min
 
             function tick() {
@@ -104,13 +125,28 @@ export function attachTooltip(div: HTMLElement, tooltipEl: HTMLElement, card: Ca
                     div.__ttRaf = null;
                     return;
                 }
-                const curr =
-                    side === "blue" ? (state.blueRally | 0) :
-                        side === "red" ? (state.redRally | 0) : 0;
-                if (curr !== last) {
-                    rallyValue!.textContent = need != null ? `${curr} / ${need}` : `${curr}`;
-                    last = curr;
+
+                // Update Rally
+                if (rallyLine && rallyValue) {
+                    const curr =
+                        rSide === "blue" ? (state.blueRally | 0) :
+                            rSide === "red" ? (state.redRally | 0) : 0;
+                    if (curr !== lastRally) {
+                        rallyValue!.textContent = rNeed != null ? `${curr} / ${rNeed}` : `${curr}`;
+                        lastRally = curr;
+                    }
                 }
+
+                // Update Skybound
+                if (skyboundLine && skyboundValue) {
+                    const witnesses = (card.skyboundArtEvolvesWitnessed || 0);
+                    const curr = (state.roundCount || 1) + witnesses;
+                    if (curr !== lastSkybound) {
+                        skyboundValue!.textContent = `${curr} / ${sReq}`;
+                        lastSkybound = curr;
+                    }
+                }
+
                 // @ts-ignore
                 div.__ttRaf = requestAnimationFrame(tick);
             }

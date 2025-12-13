@@ -30,7 +30,7 @@ import { handleDraw, handleDrawAllNamedWithKeyword, handleDrawFiltered, handleAd
 import { consumeEarthSigils } from "../../effects/ops/earth.js";
 import { handleDiscardSelectHand, handleTransformInHand, handleDiscardAllExceptNamed } from "../../effects/hand.js";
 import { handleKeyword, handleRemoveKeyword, handleKeywordSelf, handleConditionalKeyword } from "../keywords.js";
-import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp, applyLeaderDamage } from "../../effects/leader.js";
+import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp, applyLeaderDamage, handleRecoverEP } from "../../effects/leader.js";
 import { handleReanimate } from "../../effects/ops/reanimate.js";
 import { handleReturnHandToDeck } from "../../effects/ops/returnHandToDeck.js";
 import { handleRepeatEffect } from "../../effects/repeat.js";
@@ -44,7 +44,7 @@ import {
 import {
     handleSuperEvoGate, handleEvolvedSelfGate, amuletCountGate, hasNoDuplicatesInDeck, noAllyAttackedThisTurn,
     handleBoardNameGate, handleBothMaxPPGate, handleRallyGate, handleSelfCostGate, handleSuperEvolvedAlliedGate,
-    handleMaxPPGate
+    handleMaxPPGate, handleSkyboundArtGate, handleEvolvedAlliedGate
 } from "../../effects/gates/gates.js";
 import { handleSelect, getPool, highlightSelectable, clearSelectableFlags } from "../targeting.js";
 import { handleComboAdd, handleComboGate } from "../../effects/gates/combo.js";
@@ -67,12 +67,12 @@ import {
     handleRestoreSelfAndHealLeader,
     handleChooseBonusAdd,
     handleGainMaxPP,
-    handleSetCostLastDrawn
+    handleSetCostLastDrawn,
+    handleRestoreAllies
 } from "../../effects/ops/misc.js";
 
 
 import { logEvent } from "../../../core/logger.js";
-
 
 
 
@@ -271,9 +271,21 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
                     }
                 }
                 logEvent("evolve", { owner, card: "(multi)" });
+                logEvent("evolve", { owner, card: "(multi)" });
                 break;
             }
-            case "evolve_self": handleEvolveSelf(sourceCard, owner); logEvent("evolve", { owner, card: sourceCard?.name }); break;
+            case "evolve_all_allies_named": {
+                const board = owner === "blue" ? state.blueBoard : state.redBoard;
+                const name = eff.name;
+                for (const c of board) {
+                    if ((c.name === name || c.base_name === name) && c.type === "Follower" && !c.hasEvolved) {
+                        handleEvolveSelf(c, owner, { spendPoint: false });
+                    }
+                }
+                logEvent("evolve", { owner, card: `(named ${name})` });
+                break;
+            }
+            case "evolve_self": handleEvolveSelf(sourceCard, owner, { spendPoint: false }); logEvent("evolve", { owner, card: sourceCard?.name }); break;
             case "fill_congregant_copies": handleFillCongregantCopies(owner, sourceCard); break;
             case "follower_strike_destroy": if (sourceCard && context?.defender) { resolveDestroy(context.defender, owner); cleanupDead(); } break;
             case "fuse_finalize_fortifier": logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break;
@@ -316,6 +328,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "reanimate": handleReanimate(eff, owner); break;
             case "rally_gate": handleRallyGate(owner, eff, queue); break;
             case "recover_pp": handleRecoverPP(owner, eff); break;
+            case "recover_ep": handleRecoverEP(owner, eff); break;
             case "repeat_effect": handleRepeatEffect(eff, owner, sourceCard, queue); break;
             case "reduce_cost": { const target = (context && (context.targetCard || context.selectedCard)) || sourceCard; handleReduceCost(target!, eff); break; }
             case "reduce_cost_self": handleReduceCostSelf(sourceCard, eff); break;
@@ -326,6 +339,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "replace_deck_with_set_minus": { import("../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => adapter.render()); }); break; }
             case "restore_full_defense_self": handleRestoreFullDefenseSelf(sourceCard!, context); break;
             case "restore_self_and_heal_leader": handleRestoreSelfAndHealLeader(owner, sourceCard!); break;
+            case "restore_allies": handleRestoreAllies(owner, eff); break;
             case "return_hand_to_deck": if (handleReturnHandToDeck(eff, owner, queue) === "pending") return; break;
             case "return_to_hand": if (handleReturnToHand(eff, owner, sourceCard, queue) === "pending") return; break;
             case "select": { const res = handleSelect(eff, owner, sourceCard, queue, context); if (res === "pending") return res; break; }
@@ -339,15 +353,16 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "spellboost_target": if (sourceCard) { spellboostHand(owner, 1, sourceCard); } break;
             case "start_fortifier_fuse": { const res = sourceCard ? startFortifierFuse(owner, sourceCard) : null; if (res === "pending") return res; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
             case "start_fuse_from_card": { if (opStartFuseFromCard(eff, owner) === "pending") return; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
+            case "skybound_art_gate": if (handleSkyboundArtGate(owner, eff, sourceCard)) { queue.unshift(...(eff.effects || [])); } break;
             case "self_cost_gate": handleSelfCostGate(sourceCard!, eff, effects); break;
-            case "set_attack_to": { const res = handleSetAttackTo(eff, owner, sourceCard, effects, context); if (res === "pending") return res; break; }
+
             case "set_stats": { const res = handleSetStats(eff, owner, sourceCard, effects, context); if (res === "pending") return res; break; }
             case "set_cost_last_drawn": handleSetCostLastDrawn(eff); break;
             case "set_cost_self": handleSetCostSelf(sourceCard, eff); break;
-            case "set_cost_self": handleSetCostSelf(sourceCard, eff); break;
-            case "super_evo_gate": if (handleSuperEvoGate(owner)) { effects.unshift(...(eff.effects || [])); } break;
+            case "super_evo_gate": if (handleSuperEvoGate(owner)) { queue.unshift(...(eff.effects || [])); } break;
             case "super_evolve_ally": { import("../../evolveUtils.js").then(({ superEvolveAllyFromContext }) => { superEvolveAllyFromContext(owner, sourceCard, context); }); break; }
             case "super_evolved_allied_gate": handleSuperEvolvedAlliedGate(owner, eff, queue); break;
+            case "evolved_allied_gate": handleEvolvedAlliedGate(owner, eff, queue); break;
             case "super_evolve_self": handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false }); break;
             case "super_evolved_self_gate": { const isSuper = sourceCard && sourceCard.evoType === "super"; const next = (isSuper ? eff.effects : eff.else_effects) || []; if (next.length) { effects.unshift(...next); } break; }
             case "summon_destroyed_amulet_highest_base_cost": handleSummonDestroyedAmuletHighestBaseCost(owner); logEvent("summon", { owner, name: "(highest cost destroyed amulet)" }); break;

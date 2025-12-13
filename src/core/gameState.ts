@@ -41,6 +41,8 @@ export const state: GameState = {
   // Track evolution usage per turn
   blueEvoUsedThisTurn: false,
   redEvoUsedThisTurn: false,
+  blueEvoCount: 0,
+  redEvoCount: 0,
 
   redBoostUsedEarly: false,
   redBoostUsedLate: false,
@@ -78,6 +80,8 @@ export function resetGameState(): void {
   state.redSuperEvoCharges = 2;
   state.blueEvoUsedThisTurn = false;
   state.redEvoUsedThisTurn = false;
+  state.blueEvoCount = 0;
+  state.redEvoCount = 0;
 
   state.blueHP = 20;
   state.redHP = 20;

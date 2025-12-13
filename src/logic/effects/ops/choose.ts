@@ -5,7 +5,7 @@ import { state } from "../../../core/gameState.js";
 import { adapter } from "../../../core/adapter.js";
 
 // @ts-ignore
-import { hasEarthSigils, consumeEarthSigils } from "../cards/runecraft/earth.js";
+import { hasEarthSigils, consumeEarthSigils } from "./earth.js";
 import { spellboostHand } from "./spellboost.js";
 import { handleDrawFiltered } from "./draw.js";
 import { handleReanimate } from "./reanimate.js";

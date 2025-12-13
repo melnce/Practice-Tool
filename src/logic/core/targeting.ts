@@ -102,7 +102,8 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
             pool = pool.filter(c => String(c?.type || "").toLowerCase() === handType);
         }
     } else {
-        if (side === "ally" || side === "self") pool = myBoard || [];
+        if (side === "self") pool = sourceCard ? [sourceCard] : [];
+        else if (side === "ally") pool = myBoard || [];
         else if (side.startsWith("enemy") || side === "opp" || side === "opponent") pool = oppBoard || [];
         else if (side === "any" || side === "both" || side === "all") pool = [...(myBoard || []), ...(oppBoard || [])];
         else pool = myBoard || [];
@@ -115,6 +116,7 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     // Condition filters
     // Default: exclude self, unless explicitly allowed
     const allowSelf =
+        (side === "self") ||
         (condition && (condition.not_self === false || condition.include_self === true));
 
     if (!allowSelf && sourceCard) {
@@ -226,6 +228,17 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
 
     // build the initial pool
     let pool = getPool(eff.target, owner, sourceCard, eff.condition, targetedCtx);
+
+    // Apply extra filters if specified in 'op: select' itself (e.g. "leftmost")
+    if (eff.filter === "leftmost") {
+        if (pool.length > 0) {
+            pool = [pool[0]]; // Assuming pool order matches board order (getPool usually returns board order)
+        }
+    } else if (eff.filter === "rightmost") {
+        if (pool.length > 0) {
+            pool = [pool[pool.length - 1]];
+        }
+    }
 
     // no valid targets at all → nothing to do
     if (!pool.length) return "done";
