@@ -6,8 +6,10 @@
   "imports": {},
   "main": "main.js",
   "scripts": {
-    "test": "npm run check:boundaries && npm run build || exit 0 && vitest run",
-    "test:watch": "npm run build || exit 0 && vitest",
+    "test": "npm run check:boundaries && npm run build || exit 0 && vitest run -c vitest.config.ts",
+    "test:watch": "npm run build || exit 0 && vitest -c vitest.config.ts",
+    "test:all": "vitest run -c vitest.all.config.ts",
+    "test:dev": "vitest run -c vitest.dev.config.ts --passWithNoTests",
     "check:boundaries": "node tools/check-boundaries.mjs",
     "build": "tsc",
     "watch": "tsc -w",

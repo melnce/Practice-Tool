@@ -1,5 +1,0 @@
-
-> practice-tool@1.0.0 build
-> tsc
-
-src/logic/effects/ops/spellboost.ts(82,24): error TS2307: Cannot find module '../cards/runecraft/william.js' or its corresponding type declarations.

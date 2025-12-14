@@ -8,8 +8,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
     test: {
         environment: "node",
-        include: ["tests/unit/**/*.test.ts", "tests/integration/**/*.test.ts"],
-        exclude: ["tests/_dev/**", "tests/regression/**"],
+        include: ["tests/_dev/**/*.ts", "tests/_dev/**/*.test.ts"],
         setupFiles: ["./tests/fixtures/setup.ts"],
     },
     resolve: {

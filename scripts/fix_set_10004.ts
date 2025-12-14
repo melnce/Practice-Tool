@@ -28,3 +28,4 @@ const updated = cards.map((c: any) => {
 
 fs.writeFileSync(FILE, JSON.stringify(updated, null, 2));
 console.log("IDs injected.");
+

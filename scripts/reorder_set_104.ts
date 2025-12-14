@@ -18,3 +18,4 @@ const reordered = cards.map((c: any) => {
 
 fs.writeFileSync(FILE, JSON.stringify(reordered, null, 2));
 console.log("IDs moved to top.");
+

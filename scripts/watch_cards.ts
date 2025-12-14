@@ -46,3 +46,4 @@ try {
 } catch (e) {
     console.error("Failed to start watcher:", e);
 }
+
