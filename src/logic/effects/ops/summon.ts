@@ -16,3 +16,4 @@ export * from "./summon_ops/chain.js";
 // (Functions like handleFillBoardChainDecay were alias-imported in other files)
 import { handleFillBoardChainDecay } from "./summon_ops/chain.js";
 export { handleFillBoardChainDecay as handleFillCongregantCopies };
+export * from "./summon_ops/invoke.js";

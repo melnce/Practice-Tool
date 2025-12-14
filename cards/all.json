@@ -15208,7 +15208,20 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10421110-randall-feet-fighter",
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "buff_self",
+            "keywords": [
+              "Storm"
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": [],
     "evolve": [],
     "superevolve": [],

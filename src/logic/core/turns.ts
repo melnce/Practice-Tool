@@ -15,6 +15,7 @@ import { tickCrests, processCrestEvent, resetCrestOncePerTurn } from "../effects
 import { clearExpiredCantAttackAtEOT } from "./keywords.js";
 // @ts-ignore
 import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
+import { handleInvoke } from "../effects/ops/summon.js";
 // @ts-ignore
 
 // @ts-ignore
@@ -150,41 +151,11 @@ function scanDeckForInvokes(owner: Player, timing: "start_of_turn" | "end_of_tur
             logEvent("invoke", { owner, card: card.name });
             invokedNames.add(card.name);
 
-            // Execute invoke effects
-            // Usually: summon self from deck
-            // Sandalphon: "Invoke this card. When this card is Invoked, gain Crest... and return this card to hand."
+            // Execute invoke logic via centralized handler
+            // This ensures stats are initialized, triggers fire, and Rally increments.
+            handleInvoke(owner, card);
 
-            // Standard Invoke: Move from deck to board.
-            // If the card has specific 'invoke_effects', run them? 
-            // Or treat it as a summon -> then triggers fire "on_invoke"?
-            // Sandalphon text: "Invoke this card. When this card is Invoked..."
-            // This implies the act of Invoking IS summoning it, and then a trigger happens?
-            // "Invoke" keyword in SV usually means: "Summon this follower from your deck to your field."
-
-            // Implementation:
-            // 1. Remove from deck
-            const index = deck.indexOf(card);
-            if (index === -1) continue; // Already moved?
-            deck.splice(index, 1);
-
-            // 2. Add to board (or hand if full? usually banish if full)
-            const board = owner === "blue" ? state.blueBoard : state.redBoard;
-            if (board.length < 5) { // Assuming 5 slots
-                board.push(card);
-                card.zone = "board";
-                card.justPlayed = true; // Summoning sickness
-
-                // Fire "invoke" event for the card itself to react
-                // Sandalphon reacts to his own invocation
-                fireTrigger("invoke", owner, { sourceCard: card, invokedCard: card });
-            } else {
-                console.log("Invoke failed: Board full");
-                // Banish? Or stay in deck? SV rules usually say stay in deck if full?
-                // Actually they give shadows? Let's burn it to graveyard for now or just drop it.
-                // "If your area is full, Invoked cards remain in your deck." -> Official ruling.
-                // So we should put it back if full.
-                deck.push(card);
-            }
+            // "Only 1 copy of an Invoke card will activated each turn"
 
             // "Only 1 copy of an Invoke card will activated each turn"
             // This limit is per-name usually.
