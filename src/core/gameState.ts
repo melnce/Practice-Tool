@@ -50,7 +50,8 @@ export const state: GameState = {
   bluePlaysThisTurn: 0,
   redPlaysThisTurn: 0,
 
-  gameStarted: false
+  gameStarted: false,
+  __debugId: Math.random()
 };
 
 export function resetGameState(): void {

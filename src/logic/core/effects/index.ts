@@ -3,7 +3,7 @@
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
 import { adapter } from "../../../core/adapter.js";
-import { fireTrigger } from "../triggers.js";
+import { fireTrigger, registerRunEffects } from "../triggers.js";
 import { CardInstance, Effect, Player, GameState } from "../../../core/types.js";
 
 
@@ -39,7 +39,7 @@ import { handleBuffSelf, handleDestroySelf, handleBanishSelf, handleDynamicBuffS
 import { spellboostHand, handleSetSpellboostCount } from "../../effects/ops/spellboost.js";
 import {
     summonNamed, summonRandomFromDeck, handleSelectHandSummonArtifactCopiesEOT, summonExactCopyFromHand, handleSelectHandSummonArtifactCopy,
-    summonExactCopy, handleSummonDestroyedAmuletHighestBaseCost
+    summonExactCopy, handleSummonDestroyedAmuletHighestBaseCost, summonFromHand
 } from "../../effects/ops/summon.js";
 import {
     handleSuperEvoGate, handleEvolvedSelfGate, amuletCountGate, hasNoDuplicatesInDeck, noAllyAttackedThisTurn,
@@ -139,6 +139,8 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
     // For now, simple iteration.
 
     const queue = [...effects]; // Shallow copy to process
+    console.log(`[runEffects] PROCESSING QUEUE: ${queue.length} items. Ops: ${queue.map(e => e.op).join(", ")}`);
+    console.log(`[runEffects] Queue dump:`, JSON.stringify(queue));
 
     while (queue.length > 0) {
         const eff = queue.shift()!;
@@ -342,7 +344,24 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "restore_allies": handleRestoreAllies(owner, eff); break;
             case "return_hand_to_deck": if (handleReturnHandToDeck(eff, owner, queue) === "pending") return; break;
             case "return_to_hand": if (handleReturnToHand(eff, owner, sourceCard, queue) === "pending") return; break;
-            case "select": { const res = handleSelect(eff, owner, sourceCard, queue, context); if (res === "pending") return res; break; }
+            case "select": {
+                if (eff.target.startsWith("hand:")) {
+                    const h = owner === "blue" ? state.blueHand : state.redHand;
+                    console.warn(`[index.ts select] StateID: ${(state as any).__debugId} HandSize: ${h.length} HandUIDs: ${h.map(c => c.uid)}`);
+                }
+                // Pass runner: runEffects in context.
+                if (eff.op === "select" || eff.op === "target") {
+                    const ctx = { ...context, runner: runEffects };
+                    const status = handleSelect(eff, owner, sourceCard, queue, ctx);
+                    if (status === "pending") {
+                        // If pending, we stop processing this queue (it will be resumed later)
+                        // BUT we do NOT clear the queue variable here, the function just returns.
+                        // The state.pendingTargetEffect holds the rest of the queue in 'resumeEffects'.
+                        return;
+                    }
+                }
+                break;
+            }
             case "evolve": { import("../../effects/ops/evolve.js").then(({ handleEvolveTarget }) => handleEvolveTarget(eff, owner, context)); break; }
             case "select_hand_summon_artifact_copy": logEvent("summon", { owner, op: eff.op, status: "pending_selection" }); if (handleSelectHandSummonArtifactCopy(eff, owner, queue) === "pending") return; break;
             case "select_hand_summon_artifact_copies_eot_destroy": logEvent("summon", { owner, op: eff.op, status: "pending_selection" }); if (handleSelectHandSummonArtifactCopiesEOT(eff, owner, queue) === "pending") return; break;
@@ -366,6 +385,18 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "super_evolve_self": handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false }); break;
             case "super_evolved_self_gate": { const isSuper = sourceCard && sourceCard.evoType === "super"; const next = (isSuper ? eff.effects : eff.else_effects) || []; if (next.length) { effects.unshift(...next); } break; }
             case "summon_destroyed_amulet_highest_base_cost": handleSummonDestroyedAmuletHighestBaseCost(owner); logEvent("summon", { owner, name: "(highest cost destroyed amulet)" }); break;
+            case "summon": {
+                // If we selected a card from hand previously (e.g. via Enhance > select > summon), use summonFromHand.
+                const target = context?.selectedCard || (context?.targets && context.targets[0]);
+                const hand = owner === "blue" ? state.blueHand : state.redHand;
+                if (target && hand.includes(target)) {
+                    summonFromHand(target, owner);
+                    break;
+                }
+                // Fallback or other summon logic could go here if needed.
+                console.warn("op: summon called but no valid hand target found in context.");
+                break;
+            }
             case "summon_exact_copy": {
                 // NEW: support "self" directly
                 if (eff.target === "self" && sourceCard && sourceCard.type === "Follower") {
@@ -421,3 +452,6 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
     // A single, reliable render call after all synchronous effects are done.
     adapter.render();
 }
+
+// Register with triggers module to cycle break
+registerRunEffects(runEffects);

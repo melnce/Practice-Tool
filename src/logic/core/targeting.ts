@@ -1,7 +1,8 @@
 import { state } from "../../core/gameState.js";
+console.log("Targeting Module State ID:", (state as any).__debugId);
 // @ts-ignore
 import { adapter } from "../../core/adapter.js";
-import { runEffects } from "./effects/index.js";
+// import { runEffects } from "./effects/index.js"; // Dependency injection via context.runner
 import { randInt } from "../../core/rng.js";
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
@@ -12,6 +13,7 @@ interface TargetContext {
     isTargetedEffect?: boolean;
     selectCount?: number;
     __lloydRequiredFirstUids?: string[];
+    runner?: Function; // Injected runEffects to break circular dependency
     [key: string]: any;
 }
 
@@ -94,8 +96,10 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     const oppBoard = owner === "blue" ? state.redBoard : state.blueBoard;
 
     // Base pool
-    if (type === "hand") {
+    if (side === "hand" || spec.startsWith("hand:")) {
         pool = myHand || [];
+        if (!(globalThis as any).HEADLESS) console.warn(`[getPool] Targeting Hand. Pool Size: ${pool.length}`);
+
         // Optional hand-type filter: condition.card_type = "Follower" | "Spell" | "Amulet"
         const handType = String(condition?.card_type || condition?.type_eq || "").toLowerCase();
         if (handType) {
@@ -112,6 +116,10 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     // Type filter
     if (type === "follower") pool = pool.filter(c => c?.type === "Follower");
     else if (type === "amulet") pool = pool.filter(c => c?.type === "Amulet");
+    else if (type === "spell") pool = pool.filter(c => c?.type === "Spell");
+
+    if (!(globalThis as any).HEADLESS && spec.startsWith("hand:")) console.warn(`[getPool] After Type Filter (${type}): ${pool.length}`);
+
 
     // Condition filters
     // Default: exclude self, unless explicitly allowed
@@ -229,6 +237,16 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
     // build the initial pool
     let pool = getPool(eff.target, owner, sourceCard, eff.condition, targetedCtx);
 
+    // Always log for debugging this issue
+    if (eff.target.startsWith("hand:")) console.log(`[handleSelect Debug] Target: ${eff.target}, Pool Size: ${pool.length}`);
+
+    if (!(globalThis as any).HEADLESS && eff.target.startsWith("hand:")) {
+        const myHand = owner === "blue" ? state.blueHand : state.redHand;
+        console.log("[handleSelect Debug] Hand valid?", myHand.length, "Hand UIDs:", myHand.map(c => c.uid));
+        console.log("[handleSelect Debug] Hand names:", myHand.map(c => c.name));
+        console.log("[handleSelect Debug] Source:", sourceCard?.name, sourceCard?.uid);
+    }
+
     // Apply extra filters if specified in 'op: select' itself (e.g. "leftmost")
     if (eff.filter === "leftmost") {
         if (pool.length > 0) {
@@ -300,30 +318,12 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
 
         // If this select wraps nested effects (usual case), resolve them now.
         if (Array.isArray(eff.effects) && eff.effects!.length) {
-            runEffects([...eff.effects!], owner, sourceCard, selectedCtx);
+            // runEffects([...eff.effects!], owner, sourceCard, selectedCtx);
+            const runner = context.runner || ((...args: any[]) => console.warn("Missing runner for handleSelect auto"));
+            runner([...eff.effects!], owner, sourceCard, selectedCtx);
         }
         // Only trigger 'done' if we fully handled it (which we did).
-        // Does 'select' usually consume queue? No, queue is passed in context or separate.
-        // runEffects call handles nested. The queue passed to handleSelect is usually main queue.
-        // We do NOT process the main queue here recursively unless necessary.
-        // Standard handleSelect returns 'done' or 'pending'.
-        // If 'done', the caller (runEffects loop) continues nicely.
-        // BUT wait: standard handleSelect logic runs 'resumeEffects' (the rest of the queue) inside itself when UI interaction happens.
-        // If we return 'done', the loop in runEffects continues to the next item?
-        // YES.
-        // But what about using the selected targets for subsequent effects in the SAME queue via context?
-        // The user might use "selected" as target in next op.
-        // So we must update the context passed to runEffects *caller*?
-        // runEffects context is local to the function call.
-        // We cannot easily update the caller's context variable.
-        // However, usually 'select' is used with 'nested_effects' structure (eff.effects).
-        // If subsequent effects in the MAIN queue depend on this selection, they need context.
-        // Solution: We updated `selectedCtx`.
-        // If the main queue processing continues, it uses the OLD context.
-        // This suggests `handleSelect` should probably execute the rest of the queue itself if it modifies context?
-        // Or we rely on `state.__lastSelected` or similar global?
-        // `resolveTarget.ts` sets `state.__lastSelected`.
-        // Let's set it here too for parity.
+
         state.__lastSelected = picks[0] || null;
 
         // If 'select' is just a wrapper for nested effects, returning 'done' is fine.

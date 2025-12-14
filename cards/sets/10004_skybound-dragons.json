@@ -281,7 +281,7 @@
     "class": "Forestcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Can attack 2 times per turn. Strike: Restore 3 defense to all allies.",
+    "description": "Can attack 2 times per turn.\nStrike: Restore 3 defense to all allies.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10411110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10411110_evo.webp",
     "set": "[10004] Skybound Dragons",

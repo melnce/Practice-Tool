@@ -1,7 +1,16 @@
 import { state } from "../../core/gameState.js";
-import { runEffects } from "./effects/index.js";
+// import { runEffects } from "./effects/index.js"; // Cycle breaker
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
+
+// Delayed binding for runEffects to avoid circular dependency
+let runEffects: any = (effects: Effect[], owner: Player, source: any, context?: any) => {
+    console.warn("runEffects called before registration in triggers.ts");
+};
+
+export function registerRunEffects(fn: any) {
+    runEffects = fn;
+}
 
 interface TriggerContext {
     initiator?: CardInstance;

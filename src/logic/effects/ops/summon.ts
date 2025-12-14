@@ -505,6 +505,84 @@ export function handleSelectHandSummonArtifactCopiesEOT(eff: Effect, owner: Play
     return "pending";
 }
 
+
+export function summonFromHand(card: CardInstance, owner: Player): boolean {
+    if (!card) return false;
+
+    const hand = owner === "blue" ? state.blueHand : state.redHand;
+    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+
+    // Must be in hand to be summoned from hand
+    const idx = hand.indexOf(card);
+    if (idx === -1) {
+        console.warn("summonFromHand: Card not found in owner's hand", card.name);
+        return false;
+    }
+
+    // Verify board space
+    if (board.length >= 5) {
+        console.warn("summonFromHand: Board is full");
+        return false;
+    }
+
+    // Remove from hand
+    hand.splice(idx, 1);
+
+    // Update state to be 'board'
+    card.zone = "board";
+    card.selected = false;
+    card.selectable = false;
+    card.glow = false;
+
+    // Initialize as if played/summoned
+    if (card.type === "Follower") {
+        // Ensure stats are numbers
+        // @ts-ignore
+        card.attack = parseInt(card.attack as any) || 0;
+        // @ts-ignore
+        card.defense = parseInt(card.defense as any) || 0;
+
+        if (card.base_attack == null) card.base_attack = card.attack;
+        if (card.base_defense == null) card.base_defense = card.defense;
+        if (card.peak_defense == null) card.peak_defense = card.defense;
+
+        // Apply keywords
+        applyKeywordsFromList(card);
+
+        // Turn state
+        card.justPlayed = true;
+        card.hasAttacked = false;
+        card.attacks_per_turn = Number.isFinite(card.attacks_per_turn) ? card.attacks_per_turn! : 1;
+        card.attacks_left = card.attacks_per_turn;
+
+        // Combat flags
+        if (card.hasStorm) {
+            card.can_attack = true;
+            card.can_attack_followers = true;
+            card.isRush = false;
+        } else if (card.hasRush) {
+            card.can_attack = true;
+            card.can_attack_followers = true;
+            card.isRush = true;
+        } else {
+            card.can_attack = false;
+            card.isRush = false;
+            card.can_attack_followers = false;
+        }
+    } else if (card.type === "Amulet") {
+        initAmulet(card);
+    }
+
+    if (pushToBoard(board, owner, card)) {
+        logEvent("summonFromHand", { owner, card: card.name, uid: card.uid });
+        state.lastSummoned = [card];
+        adapter.render();
+        return true;
+    }
+
+    return false;
+}
+
 // --- NEW: summonExactCopyFromHand ---
 // Summons an *exact* clone of a hand card (keeping buffs/keywords/current stats/cost mods/etc.).
 // It does NOT remove the original from hand (we copy, not move).
