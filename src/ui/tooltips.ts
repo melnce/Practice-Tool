@@ -59,7 +59,9 @@ export function formatCardTooltip(card: CardInstance, owner: Player | null = nul
 
     if (finalRallyReq) {
         const side = owner ?? state.activePlayer ?? "blue";
-        extraText += `<br><br><div class="tooltip-counter" data-type="rally" data-need="${finalRallyReq}" data-side="${side}">Refining...</div>`;
+        extraText += `<br><br><span class="rally-line" data-need="${finalRallyReq}" data-side="${side}" style="color: #7af;">` +
+            `Rally: <span class="rally-value">0 / ${finalRallyReq}</span>` +
+            `</span>`;
     }
 
     // === Skybound Art tracker ===

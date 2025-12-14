@@ -691,7 +691,7 @@
                 "defense": 2
               },
               {
-                "op": "keyword_self",
+                "op": "buff_self",
                 "keywords": [
                   "Ward"
                 ]
@@ -1179,7 +1179,7 @@
         "cost": 4,
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Storm"
             ]
@@ -1540,7 +1540,7 @@
         },
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Storm"
             ]

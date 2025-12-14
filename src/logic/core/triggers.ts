@@ -349,7 +349,7 @@ export function fireTrigger(eventName: string, activePlayer: Player, context: Tr
                 if (!cond.is_ally && owner === enteringOwner) continue;
             }
 
-            // is_self (Strictly ONLY the card itself entering, e.g. Congregant)
+            // is_self (Strictly ONLY the card itself entering, e.g. Congregant, Noble Shikigami)
             if (cond.is_self && enteringCard) {
                 if (enteringCard.uid !== card.uid) continue;
             }

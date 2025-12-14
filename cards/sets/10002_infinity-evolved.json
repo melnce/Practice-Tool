@@ -936,6 +936,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10224110-gildaria-anathema-of-peace",
+    "evolve_trigger_always": true,
     "evolve": [
       {
         "op": "summon_named",

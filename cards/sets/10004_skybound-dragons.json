@@ -321,6 +321,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10411120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10411120-manamel-super-cutest",
+    "evolve_trigger_always": true,
     "triggers": [
       {
         "event": "end_of_turn",
@@ -524,6 +525,7 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10413110-cupitan-iridescent-archer",
+    "evolve_trigger_always": true,
     "fanfare": [
       {
         "op": "skybound_art_gate",
@@ -782,7 +784,7 @@
     "class": "Swordcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Ward. Evolve: Summon a Mordred, Illusory Lion.",
+    "description": "Ward\nEvolve: Summon a Mordred, Illusory Lion.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10421120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421120_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -796,7 +798,12 @@
         "name": "Mordred, Illusory Lion"
       }
     ],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Mordred, Illusory Lion"
+      }
+    ],
     "triggers": []
   },
   {
@@ -809,7 +816,7 @@
     "class": "Swordcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Storm. Evolve: Summon an Arthur, Staunch Dragon.",
+    "description": "Storm\nEvolve: Summon an Arthur, Staunch Dragon.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10421130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421130_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -823,7 +830,12 @@
         "name": "Arthur, Staunch Dragon"
       }
     ],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Arthur, Staunch Dragon"
+      }
+    ],
     "triggers": []
   },
   {
@@ -836,7 +848,7 @@
     "class": "Swordcraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Deal 3 damage to all enemy followers. Intimidate",
+    "description": "Fanfare: Deal 3 damage to all enemy followers\nIntimidate",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10422110.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
@@ -885,7 +897,7 @@
     "class": "Swordcraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Ambush. Bane",
+    "description": "Ambush\nBane",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10422130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10422130_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -908,11 +920,12 @@
     "class": "Swordcraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Select aModeto activate.\n1. Super-evolve this follower.\n2. Deal 4 damage to all enemy followers.\n3. Restore 4 defense to your leader.\nEnhance(9): Activate all of them instead.",
+    "description": "Fanfare: Select a Mode to activate.\n1. Super-evolve this follower.\n2. Deal 4 damage to all enemy followers.\n3. Restore 4 defense to your leader.\nEnhance(9): Activate all of them instead.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10423110.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10423110-golden-knight-true-kings-blade",
+    "enhance_replaces_fanfare": true,
     "keywords": [
       {
         "name": "Enhance",
@@ -935,40 +948,33 @@
     ],
     "fanfare": [
       {
-        "op": "enhance_gate",
-        "pp_cost": 9,
-        "invert": true,
-        "effects": [
+        "op": "choose",
+        "select_count": 1,
+        "options": [
           {
-            "op": "choose",
-            "select_count": 1,
-            "options": [
+            "name": "Super-Evolve",
+            "effects": [
               {
-                "name": "Super-Evolve",
-                "effects": [
-                  {
-                    "op": "super_evolve_self"
-                  }
-                ]
-              },
+                "op": "super_evolve_self"
+              }
+            ]
+          },
+          {
+            "name": "Deal 4 to all enemy followers",
+            "effects": [
               {
-                "name": "Deal 4 to all enemies",
-                "effects": [
-                  {
-                    "op": "damage_all",
-                    "target": "enemy:follower",
-                    "amount": 4
-                  }
-                ]
-              },
+                "op": "damage_all",
+                "target": "enemy:follower",
+                "amount": 4
+              }
+            ]
+          },
+          {
+            "name": "Restore 4 to leader",
+            "effects": [
               {
-                "name": "Restore 4 to leader",
-                "effects": [
-                  {
-                    "op": "heal_leader",
-                    "amount": 4
-                  }
-                ]
+                "op": "heal_leader",
+                "amount": 4
               }
             ]
           }
@@ -989,7 +995,7 @@
     "class": "Swordcraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Select aModeto activate.\n1. Give the leftmost allied Swordcraft follower on the field \"Can attack 2 times per turn.\"\n2. Give all allied Swordcraft followers on the field +1/+1 andBarrier.\n3. Recover 2 play points and 1 evolution point.\n4. Restore 6 defense to your leader.",
+    "description": "Select a Mode to activate.\n1. Give the leftmost allied Swordcraft follower on the field \"Can attack 2 times per turn\".\n2. Give all allied Swordcraft followers on the field +1/+1 and Barrier.\n3. Recover 2 play points and 1 evolution point.\n4. Restore 6 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10423310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
@@ -1000,29 +1006,28 @@
         "select_count": 1,
         "options": [
           {
-            "name": "Leftmost can attack 2 times",
-            "effects": [
-              {
-                "op": "select",
-                "target": "ally:follower",
-                "count": 1,
-                "location": "board",
-                "filter": "leftmost",
-                "effects": [
-                  {
-                    "op": "buff",
-                    "attack_times": 2
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "name": "Buff all +1/+1 and Barrier",
+            "name": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\"",
             "effects": [
               {
                 "op": "buff",
                 "target": "ally:follower",
+                "filter": "leftmost",
+                "condition": {
+                  "class": "Swordcraft"
+                },
+                "attacks_per_turn": 2
+              }
+            ]
+          },
+          {
+            "name": "Give all allied Swordcraft followers +1/+1 and Barrier",
+            "effects": [
+              {
+                "op": "buff",
+                "target": "ally:follower",
+                "condition": {
+                  "class": "Swordcraft"
+                },
                 "attack": 1,
                 "defense": 1,
                 "keywords": [
@@ -1032,7 +1037,7 @@
             ]
           },
           {
-            "name": "Recover 2 PP and 1 EP",
+            "name": "Recover 2 play points and 1 evolution point",
             "effects": [
               {
                 "op": "recover_pp",
@@ -1045,7 +1050,7 @@
             ]
           },
           {
-            "name": "Restore 6 to leader",
+            "name": "Restore 6 defense to your leader",
             "effects": [
               {
                 "op": "heal_leader",
@@ -1568,6 +1573,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10442110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10442110-izmir-frigid-fate",
+    "evolve_trigger_always": true,
     "fanfare": [
       {
         "op": "max_pp_gate",

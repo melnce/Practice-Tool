@@ -107,8 +107,15 @@ export function onEvolve(card: CardInstance, owner: Player, mode: "normal" | "su
         effectsToRun = [...evolveObj.effects];
     }
 
-    // Run effects (card state is already updated)
-    if (effectsToRun.length > 0) {
+    // Determine if evolve effects should run:
+    // - Player-initiated evolves (spendPoint=true) always run effects ("Evolve:" cards)
+    // - Effect-initiated evolves only run if card has evolve_trigger_always flag ("When this evolves" cards)
+    const fromPlayer = spendPoint;
+    const alwaysTrigger = (card as any).evolve_trigger_always === true;
+    const shouldRunScript = fromPlayer || alwaysTrigger;
+
+    // Run effects only if conditions are met
+    if (effectsToRun.length > 0 && shouldRunScript) {
         runEffects(effectsToRun, owner, card);
     }
 

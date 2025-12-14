@@ -495,8 +495,10 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
 
 
         // Fanfare FIRST (before enhance for followers, so enhance can modify what fanfare creates)
+        // UNLESS card has enhance_replaces_fanfare flag AND enhance is active
+        const skipFanfareForEnhance = chosenTier && (card as any).enhance_replaces_fanfare;
         console.log(`%c[playCard] Check Fanfare for ${card.name}`, 'color: magenta');
-        if (Array.isArray((card as any).fanfare) && (card as any).fanfare.length) {
+        if (!skipFanfareForEnhance && Array.isArray((card as any).fanfare) && (card as any).fanfare.length) {
             console.log(`%c[playCard] Executing Fanfare for ${card.name}`, 'color: magenta; font-weight: bold');
             state.lastSummoned = [card];
             runEffects([...(card as any).fanfare], player, card, { enteringCard: card });

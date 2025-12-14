@@ -50,6 +50,17 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
         pool = pool.filter(c => wants.every((w: any) => hasKeyword(c, w)));
     }
 
+    // NEW: optional class filtering (e.g., "Swordcraft")
+    if (eff.condition && (eff.condition as any).class) {
+        const wantClass = String((eff.condition as any).class).toLowerCase();
+        pool = pool.filter(c => String(c.class || "").toLowerCase() === wantClass);
+    }
+
+    // NEW: optional filter (e.g., "leftmost")
+    if ((eff as any).filter === "leftmost" && pool.length > 0) {
+        pool = [pool[0]];
+    }
+
 
     if (!pool.length) return "done";
 
@@ -169,6 +180,18 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
                 const options = (typeof kw === "object" ? kw : undefined);
                 if (name) applyKeyword(target, name, options);
             }
+        }
+
+        // + Optional: set attacks_per_turn (e.g., "Can attack 2 times per turn")
+        if ((eff as any).attacks_per_turn !== undefined) {
+            const n = parseInt((eff as any).attacks_per_turn) || 1;
+            target.attacks_per_turn = n;
+            // Give them the attacks immediately if they can attack
+            if (target.hasStorm || target.hasRush || !target.justPlayed) {
+                target.attacks_left = n;
+                target.can_attack = true;
+            }
+            logEvent("attacksPerTurn", { owner, target: target.name, uid: target.uid, value: n });
         }
 
         // NEW: notify when a positive buff is applied to a follower on the field

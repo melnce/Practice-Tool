@@ -90,7 +90,7 @@
         "source": "hand",
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Bane"
             ]
@@ -126,7 +126,7 @@
         "source": "hand",
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Storm"
             ]
@@ -2128,7 +2128,7 @@
         "cost": 7,
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Storm"
             ]
@@ -2572,7 +2572,7 @@
                 ]
               },
               {
-                "op": "keyword_self",
+                "op": "buff_self",
                 "keywords": [
                   "Rush"
                 ]
@@ -2590,7 +2590,7 @@
                 ]
               },
               {
-                "op": "keyword_self",
+                "op": "buff_self",
                 "keywords": [
                   "Ward"
                 ]
@@ -2632,7 +2632,7 @@
                 ]
               },
               {
-                "op": "keyword_self",
+                "op": "buff_self",
                 "keywords": [
                   "Rush"
                 ]
@@ -2650,7 +2650,7 @@
                 ]
               },
               {
-                "op": "keyword_self",
+                "op": "buff_self",
                 "keywords": [
                   "Ward"
                 ]

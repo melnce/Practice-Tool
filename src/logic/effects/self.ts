@@ -51,6 +51,17 @@ export function handleBuffSelf(sourceCard: CardInstance, eff: Effect) {
         });
     }
 
+    // Apply keywords if specified
+    if (Array.isArray(eff.keywords)) {
+        for (const kw of eff.keywords) {
+            const name = (typeof kw === "string" ? kw : (kw as any)?.name) || "";
+            const options = (typeof kw === "object" ? kw : undefined);
+            if (name) {
+                applyKeyword(sourceCard, name, options);
+            }
+        }
+    }
+
     console.log(
         `%cAFTER BUFF SELF on ${sourceCard.name}:`,
         "color: cyan",

@@ -1220,7 +1220,7 @@
         "op": "super_evo_gate",
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keyword": "Bane"
           }
         ]
@@ -1525,7 +1525,7 @@
         "source": "board",
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               {
                 "name": "Barrier",
@@ -1573,7 +1573,7 @@
         "cost": 6,
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keyword": "Ambush"
           },
           {
@@ -1819,7 +1819,7 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "keyword_self",
+        "op": "buff_self",
         "keywords": [
           "Storm"
         ]
@@ -2450,6 +2450,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10133130_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10133130-edelweiss-sagelight-ward",
+    "evolve_trigger_always": true,
     "evolve": [
       {
         "op": "damage_random",
@@ -2771,7 +2772,7 @@
         "op": "overflow_gate",
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "storm"
             ]
@@ -2992,7 +2993,7 @@
         "op": "overflow_gate",
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Intimidate"
             ]
@@ -3156,6 +3157,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10143120_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10143120-liu-feng-goldennote-ward",
+    "evolve_trigger_always": true,
     "evolve": [
       {
         "op": "gain_max_pp",
@@ -3620,13 +3622,13 @@
         "cost": 4,
         "effects": [
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Rush"
             ]
           },
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keywords": [
               "Bane"
             ]
@@ -3820,7 +3822,7 @@
                 "amount": 2
               },
               {
-                "op": "keyword_self",
+                "op": "buff_self",
                 "keywords": [
                   {
                     "name": "Barrier",
@@ -3912,6 +3914,7 @@
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10153130-mukan-shadowcrypt-ward",
     "hasOngoing": true,
+    "evolve_trigger_always": true,
     "evolve": [
       {
         "op": "summon_named",
@@ -4418,13 +4421,13 @@
     "hasOngoing": true,
     "evolve": [
       {
-        "op": "keyword_self",
+        "op": "buff_self",
         "keyword": "Barrier"
       }
     ],
     "superevolve": [
       {
-        "op": "keyword_self",
+        "op": "buff_self",
         "keyword": "Barrier"
       }
     ],
@@ -4687,7 +4690,7 @@
                 "name": "Lapis, Shining Seraph"
               },
               {
-                "op": "keyword_self",
+                "op": "buff_self",
                 "keywords": [
                   "Storm"
                 ]

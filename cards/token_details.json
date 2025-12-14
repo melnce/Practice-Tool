@@ -273,7 +273,7 @@
             "defense": 1
           },
           {
-            "op": "keyword_self",
+            "op": "buff_self",
             "keyword": "Bane"
           }
         ]
@@ -564,7 +564,7 @@
         "event": "ally_follower_enter",
         "source": "board",
         "condition": {
-          "self_only": true
+          "is_self": true
         },
         "effects": [
           {

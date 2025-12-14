@@ -313,7 +313,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "increase_opponent_hand_cost_eot": { const amt = parseInt(String(eff.amount ?? 1)) || 1; applyTempOpponentHandCostMod(owner, amt); break; }
 
             case "keyword": { const merged = { ...(context || {}), sourceCard }; if (handleKeyword(eff as any, owner, queue, merged) === "pending") return; break; }
-            case "keyword_self": { const target = sourceCard || (Array.isArray(state.lastSummoned) ? state.lastSummoned[0] : null); handleKeywordSelf(target!, eff); break; }
+            // NOTE: keyword_self has been deprecated - use buff_self with keywords instead
 
             case "leader_barrier": { handleLeaderBarrierOp(owner, eff); break; }
             case "modify_cost": handleModifyCost(eff, owner, sourceCard, context); break;
