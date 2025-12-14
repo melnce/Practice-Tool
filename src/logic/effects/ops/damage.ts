@@ -108,14 +108,31 @@ export function handleDamageRandom(eff: Effect, owner: Player) {
     const amt = resolveAmountWithOverflow(eff, owner, {});
     let hits = Math.max(1, parseInt((eff.count as any) || 1));
 
+    const targetSpec = (eff.target as string || "").toLowerCase();
+
     while (hits-- > 0) {
         // Rebuild pool each hit (accounts for deaths mid-sequence)
-        const pool = getPool(eff.target as any, owner).filter(c => c && c.type === "Follower");
-        if (!pool.length) break;
+        const pool = [...getPool(eff.target as any, owner)];
 
-        const pick = pool[randInt(pool.length)];
+        // Include enemy leader if target is generic "enemy" or "all"
+        if (targetSpec === "enemy" || targetSpec === "enemy:all" || targetSpec === "all") {
+            const targetOwner = owner === "blue" ? "red" : "blue";
+            // @ts-ignore
+            pool.push({ type: "Leader", owner: targetOwner, name: "Enemy Leader" });
+        }
+
+        const valid = pool.filter(c => c && (c.type === "Follower" || c.type === "Leader"));
+        if (!valid.length) break;
+
+        const pick = valid[randInt(valid.length)];
         logEvent("damageRandom", { target: pick.name, uid: pick.uid, amount: amt });
-        dealDamage(pick, amt);      // super-protection will zero it out internally if applicable
+
+        if (pick.type === "Leader") {
+            // @ts-ignore
+            applyLeaderDamage(pick.owner, amt);
+        } else {
+            dealDamage(pick, amt);      // super-protection will zero it out internally if applicable
+        }
         cleanupDead();
     }
 }

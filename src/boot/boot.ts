@@ -105,9 +105,36 @@ window.addEventListener("DOMContentLoaded", () => {
         if (inp) {
             const val = parseInt(inp.value, 10);
             if (Number.isFinite(val)) {
+                // Determine delta to update Skybound Art (SBA)
+                // @ts-ignore
+                const oldVal = state.blueEvoCount || 0;
                 // @ts-ignore
                 state.blueEvoCount = val;
-                // Also sync red for convenience? No, separate controls preferred but user asked for "i can evolve"
+
+                // If we increased evolutions, manually trigger SBA increments
+                // so cards in hand "witness" these god-mode evolutions.
+                const delta = val - oldVal;
+                if (delta > 0) {
+                    import("../logic/effects/skybound.js").then(({ incrementSkyboundArt }) => {
+                        for (let i = 0; i < delta; i++) {
+                            incrementSkyboundArt("blue");
+                        }
+                        render();
+                    });
+                } else {
+                    render();
+                }
+            }
+        }
+    });
+
+    wireClick("godSetComboCount", () => {
+        const inp = document.getElementById("godComboCountVal") as HTMLInputElement;
+        if (inp) {
+            const val = parseInt(inp.value, 10);
+            if (Number.isFinite(val)) {
+                // @ts-ignore
+                state.bluePlaysThisTurn = val;
                 render();
             }
         }

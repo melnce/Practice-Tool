@@ -30,6 +30,11 @@ export function hasSkyboundArt(card: any): boolean {
         }
     }
 
+    // Check Spell effects for gate (for Spells like Alfheimr)
+    if (Array.isArray(card.spell) && card.spell.some((s: any) => s.op === "skybound_art_gate")) {
+        return true;
+    }
+
     return false;
 }
 

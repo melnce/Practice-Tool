@@ -58,7 +58,7 @@ export function fireTrigger(eventName: string, activePlayer: Player, context: Tr
         _seenLootFuseThisTurn.set(context.initiator, _turnToken as number);
     }
 
-    const enteringCard = context?.enteringCard ?? null;
+    const enteringCard = context?.enteringCard ?? context?.invokedCard ?? null;
     const enteringOwner: Player | null = enteringCard
         ? (state.blueBoard.includes(enteringCard) ? 'blue'
             : state.redBoard.includes(enteringCard) ? 'red'

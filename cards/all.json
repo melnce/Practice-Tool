@@ -14852,6 +14852,9 @@
     "triggers": [
       {
         "event": "invoke",
+        "condition": {
+          "is_self": true
+        },
         "effects": [
           {
             "op": "gain_crest",
@@ -14885,7 +14888,7 @@
         "effects": [
           {
             "op": "damage_random",
-            "target": "enemy:follower",
+            "target": "enemy",
             "amount": 2,
             "count": 5
           }
@@ -15068,7 +15071,8 @@
         "target": "ally:follower",
         "keywords": [
           "Barrier"
-        ]
+        ],
+        "include_self": true
       }
     ],
     "evolve": [],
@@ -15103,7 +15107,21 @@
         "effects": [
           {
             "op": "gain_crest",
-            "crest": "Starry Sky"
+            "name": "Starry Sky",
+            "image": "images/crests/starry_sky.png",
+            "description": "Countdown (1). Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.",
+            "countdown": 1,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 1
+              },
+              {
+                "op": "add_card_to_hand",
+                "name": "Starry Sky"
+              }
+            ]
           }
         ]
       }
@@ -15128,10 +15146,40 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10413110-cupitan-iridescent-archer",
-    "evolve": [],
-    "superevolve": [],
-    "keywords": [],
-    "triggers": []
+    "fanfare": [
+      {
+        "op": "skybound_art_gate",
+        "requirement": 15,
+        "effects": [
+          {
+            "op": "evolve_self"
+          },
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "triggers": [],
+    "evolve": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 1,
+        "count": 7
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 1,
+        "count": 7
+      }
+    ],
+    "keywords": []
   },
   {
     "id": "10413310",
@@ -15143,7 +15191,7 @@
     "class": "Forestcraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Select aModeto activate.Super Skybound Art- Activate all of them instead.\n1. Draw a card. Restore 1 defense to your leader.\n2. Give all allied followers on the field +1/+0 andRush.\n3. Give all allied followers on the field +0/+1 andWard.",
+    "description": "Select a Mode to activate. Super Skybound Art- Activate all of them instead.\n1. Draw a card. Restore 1 defense to your leader.\n2. Give all allied followers on the field +1/+0 and Rush.\n3. Give all allied followers on the field +0/+1 and Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10413310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
@@ -15151,7 +15199,86 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "spell": [
+      {
+        "op": "skybound_art_gate",
+        "requirement": 15,
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1
+          },
+          {
+            "op": "heal_leader",
+            "amount": 1
+          },
+          {
+            "op": "buff",
+            "target": "ally:follower",
+            "attack": 1,
+            "keywords": [
+              "Rush"
+            ]
+          },
+          {
+            "op": "buff",
+            "target": "ally:follower",
+            "defense": 1,
+            "keywords": [
+              "Ward"
+            ]
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "choose",
+            "select_count": 1,
+            "options": [
+              {
+                "name": "Draw a card. Restore 1 defense to your leader.",
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 1
+                  },
+                  {
+                    "op": "heal_leader",
+                    "amount": 1
+                  }
+                ]
+              },
+              {
+                "name": "Give all allied followers +1/+0 and Rush.",
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "ally:follower",
+                    "attack": 1,
+                    "keywords": [
+                      "Rush"
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "Give all allied followers +0/+1 and Ward.",
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "ally:follower",
+                    "defense": 1,
+                    "keywords": [
+                      "Ward"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10414110",

@@ -27,6 +27,8 @@ function hasSkyboundArt(card: any): boolean {
     if (card.fanfare?.some((f: any) => f.op === "skybound_art_gate")) return true;
     // Check gate in triggers
     if (card.triggers?.some((t: any) => t.effects?.some((e: any) => e.op === "skybound_art_gate"))) return true;
+    // Check gate in spell effects (for spells like Alfheimr)
+    if (card.spell?.some((s: any) => s.op === "skybound_art_gate")) return true;
     return false;
 }
 
@@ -62,7 +64,8 @@ export function formatCardTooltip(card: CardInstance, owner: Player | null = nul
 
     // === Skybound Art tracker ===
     if (hasSkyboundArt(card)) {
-        const gate = card.fanfare?.find((f: any) => f.op === "skybound_art_gate");
+        const gate = card.fanfare?.find((f: any) => f.op === "skybound_art_gate")
+            || card.spell?.find((s: any) => s.op === "skybound_art_gate");
         const req = gate ? (gate.requirement || 10) : 10;
         const current = ((card as any).skyboundArtEvolvesWitnessed || 0) + (state.roundCount || 1);
 

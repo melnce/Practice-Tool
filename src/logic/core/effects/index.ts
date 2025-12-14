@@ -181,7 +181,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "choose": if (handleChoose(eff, owner, sourceCard, queue) === "pending") return; break;
             case "choose_bonus_add": handleChooseBonusAdd(owner, eff); break;
             case "combo_add": handleComboAdd(owner, eff as any); break;
-            case "combo_gate": if (handleComboGate(owner, eff as any)) { effects.unshift(...(eff.effects || [])); } else { effects.unshift(...(eff.else_effects || [])); } break;
+            case "combo_gate": if (handleComboGate(owner, eff as any)) { queue.unshift(...(eff.effects || [])); } else { queue.unshift(...(eff.else_effects || [])); } break;
             case "combo_repeat_buff": { const res = handleComboRepeatBuff(eff, owner, sourceCard, queue, context); if (res === "pending") return res; break; }
             // Congregant / Generic Chain
             case "congregant_fill_board":
@@ -297,6 +297,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "halve_deck_cost": handleHalveDeckCost(owner); break;
             case "hand_count_gate": { const pass = handCountGate(owner, eff); const next = pass ? (eff.effects || []) : (eff.else_effects || []); if (next.length) effects.unshift(...next); break; }
             case "heal_leader": { handleHealLeader(owner, eff); logEvent("healLeader", { owner, amount: eff.amount }); const targetOwner = (eff.player || "self") === "self" ? owner : (owner === "blue" ? "red" : "blue"); const fx = processCrestEvent(targetOwner, "heal_leader"); if (fx.length) { effects.unshift(...fx); } break; }
+            case "gain_crest": handleGainCrest(eff as any, owner); break;
             case "grant_trigger": {
                 const targets = (context?.targets && context.targets.length) ? context.targets : (sourceCard ? [sourceCard] : []);
                 for (const t of targets) {
@@ -372,7 +373,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "spellboost_target": if (sourceCard) { spellboostHand(owner, 1, sourceCard); } break;
             case "start_fortifier_fuse": { const res = sourceCard ? startFortifierFuse(owner, sourceCard) : null; if (res === "pending") return res; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
             case "start_fuse_from_card": { if (opStartFuseFromCard(eff, owner) === "pending") return; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
-            case "skybound_art_gate": if (handleSkyboundArtGate(owner, eff, sourceCard)) { queue.unshift(...(eff.effects || [])); } break;
+            case "skybound_art_gate": if (handleSkyboundArtGate(owner, eff, sourceCard)) { queue.unshift(...(eff.effects || [])); } else { queue.unshift(...(eff.else_effects || [])); } break;
             case "self_cost_gate": handleSelfCostGate(sourceCard!, eff, effects); break;
 
             case "set_stats": { const res = handleSetStats(eff, owner, sourceCard, effects, context); if (res === "pending") return res; break; }

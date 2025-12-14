@@ -44,7 +44,7 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
     }
 
     // NEW: optional keyword filtering (e.g., "Ward")
-    const rawKW = (eff as any).has_keyword ?? eff.keywords;
+    const rawKW = (eff as any).has_keyword;
     if (rawKW) {
         const wants = Array.isArray(rawKW) ? rawKW : [rawKW];
         pool = pool.filter(c => wants.every((w: any) => hasKeyword(c, w)));

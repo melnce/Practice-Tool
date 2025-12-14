@@ -218,11 +218,13 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
         hasNecromancy(owner, card.fanfare.find(eff => eff.op === "necromancy_gate")?.cost || 0);
 
     // Skybound Art (Yellow Glow)
-    const hasSkybound = Array.isArray(card.fanfare) && card.fanfare.some(eff => eff.op === "skybound_art_gate");
+    const hasSkybound = (Array.isArray(card.fanfare) && card.fanfare.some(eff => eff.op === "skybound_art_gate"))
+        || (Array.isArray((card as any).spell) && (card as any).spell.some((eff: any) => eff.op === "skybound_art_gate"));
     let skyboundReady = false;
     if (isPlayersTurn && hasSkybound) {
         // inline logic for speed, matching gates.ts
-        const gateEff = card.fanfare.find(eff => eff.op === "skybound_art_gate");
+        const gateEff = (card.fanfare?.find(eff => eff.op === "skybound_art_gate"))
+            || ((card as any).spell?.find((eff: any) => eff.op === "skybound_art_gate"));
         const req = parseInt(gateEff?.requirement || gateEff?.count || 10, 10);
         const gauge = (state.roundCount || 1) + (card.skyboundArtEvolvesWitnessed || 0);
         skyboundReady = gauge >= req;
