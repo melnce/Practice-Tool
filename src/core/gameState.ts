@@ -1,23 +1,10 @@
-// gameState.ts
 import { logEvent } from "./logger.js";
 import { GameState } from "./types.js";
 
-// We cast the initial state to GameState.
-// Note: We initialize with some defaults that match the type.
-export const state: GameState = {
-  blueDeck: [], redDeck: [],
-  blueHand: [], redHand: [],
-  blueBoard: [], redBoard: [],
-  blueGraveyard: [], redGraveyard: [],
-  bluePlayedHistory: [], redPlayedHistory: [],
-  blueDestroyedHistory: [], redDestroyedHistory: [],
-  blueCrests: [],
-  redCrests: [],
-  blueChooseBonus: 0,
-  redChooseBonus: 0,
-  shikigamiDeathsThisTurnBlue: [],
-  shikigamiDeathsThisTurnRed: [],
-
+// -- 1. Canonical Defaults (Single Source of Truth) --
+// We strictly define all scalar defaults here. This object is spread
+// into the initial state and used to reset scalars.
+const DEFAULTS = {
   blueHP: 20, redHP: 20,
   blueMaxHP: 20, redMaxHP: 20,
   bluePP: 1, redPP: 1,
@@ -26,91 +13,123 @@ export const state: GameState = {
   blueShadows: 0,
   redShadows: 0,
 
-  isBlueTurn: true,
-  roundCount: 1,
-
   blueRally: 0,
   redRally: 0,
 
-  // Evolution charges (2 normal, 2 super)
+  isBlueTurn: true,
+  roundCount: 1,
+
+  // Evolution
   blueEvoCharges: 2,
   redEvoCharges: 2,
   blueSuperEvoCharges: 2,
   redSuperEvoCharges: 2,
 
-  // Track evolution usage per turn
   blueEvoUsedThisTurn: false,
   redEvoUsedThisTurn: false,
   blueEvoCount: 0,
   redEvoCount: 0,
 
+  // Dragoncraft specific
   redBoostUsedEarly: false,
   redBoostUsedLate: false,
   redBoostPending: false,
+
   bluePlaysThisTurn: 0,
   redPlaysThisTurn: 0,
+  blueChooseBonus: 0,
+  redChooseBonus: 0,
 
   gameStarted: false,
-  __debugId: Math.random()
-};
 
+  blueAnyAllyAttackedThisTurn: false,
+  redAnyAllyAttackedThisTurn: false,
+
+  // Dynamic / Optional fields (Explicitly reset to undefined/null)
+  lastFuse: undefined,
+  pendingTargetEffect: undefined,
+
+  deckoutWinsBlue: undefined,
+  deckoutWinsRed: undefined,
+  blueLeaderBarrier: undefined,
+  redLeaderBarrier: undefined,
+} as const;
+
+// -- 2. Array Keys (Identity Preservation) --
+// We list all array keys here. createInitialState allocates them once.
+// resetGameState clears them in-place (length = 0) effectively preserving identity.
+// Type enforced to be keys of GameState.
+// Type enforced to be keys of GameState where the value extends any[].
+type ArrayKey = {
+  [K in keyof GameState]-?: GameState[K] extends any[] ? K : never
+}[keyof GameState];
+
+const ARRAY_KEYS: readonly ArrayKey[] = [
+  "blueDeck", "redDeck",
+  "blueHand", "redHand",
+  "blueBoard", "redBoard",
+  "blueGraveyard", "redGraveyard",
+  "bluePlayedHistory", "redPlayedHistory",
+  "blueDestroyedHistory", "redDestroyedHistory",
+  "blueCrests", "redCrests",
+  "shikigamiDeathsThisTurnBlue", "shikigamiDeathsThisTurnRed",
+  "lastSummoned",
+  "lastDrawnCards"
+];
+
+// -- 3. Factory --
+export function createInitialState(): GameState {
+  // Explicit object literal assignment to ensure Type Safety without 'as any'
+  return {
+    ...DEFAULTS,
+
+    // Arrays (allocated exactly once)
+    blueDeck: [],
+    redDeck: [],
+    blueHand: [],
+    redHand: [],
+    blueBoard: [],
+    redBoard: [],
+    blueGraveyard: [],
+    redGraveyard: [],
+    bluePlayedHistory: [],
+    redPlayedHistory: [],
+    blueDestroyedHistory: [],
+    redDestroyedHistory: [],
+    blueCrests: [],
+    redCrests: [],
+    shikigamiDeathsThisTurnBlue: [],
+    shikigamiDeathsThisTurnRed: [],
+    lastSummoned: [],
+    lastDrawnCards: [],
+
+    // Debug Identity
+    __debugId: Math.random()
+  };
+}
+
+// -- 4. Exported Singleton --
+export const state: GameState = createInitialState();
+
+// -- 5. Reset Logic --
 export function resetGameState(): void {
-  state.blueDeck.length = 0;
-  state.redDeck.length = 0;
-  state.blueHand.length = 0;
-  state.redHand.length = 0;
-  state.blueBoard.length = 0;
-  state.redBoard.length = 0;
-  state.blueGraveyard.length = 0;
-  state.redGraveyard.length = 0;
-  state.bluePlayedHistory.length = 0;
-  state.redPlayedHistory.length = 0;
-  state.blueDestroyedHistory.length = 0;
-  state.redDestroyedHistory.length = 0;
-  state.blueCrests.length = 0;
-  state.redCrests.length = 0;
-  state.blueChooseBonus = 0;
-  state.redChooseBonus = 0;
-  state.shikigamiDeathsThisTurnBlue = [];
-  state.shikigamiDeathsThisTurnRed = [];
+  // A) Clear arrays in-place
+  // We assume strict invariants: these keys MUST exist and MUST be arrays.
+  for (const key of ARRAY_KEYS) {
+    state[key].length = 0;
+  }
 
-  // Reset evolution charges
-  state.blueEvoCharges = 2;
-  state.redEvoCharges = 2;
-  state.blueSuperEvoCharges = 2;
-  state.redSuperEvoCharges = 2;
-  state.blueEvoUsedThisTurn = false;
-  state.redEvoUsedThisTurn = false;
-  state.blueEvoCount = 0;
-  state.redEvoCount = 0;
+  // B) Reset scalars
+  Object.assign(state, DEFAULTS);
 
-  state.blueHP = 20;
-  state.redHP = 20;
-  state.blueMaxHP = 20;
-  state.redMaxHP = 20;
-  state.bluePP = 1;
-  state.redPP = 1;
-  state.blueMaxPP = 1;
-  state.redMaxPP = 1;
-  state.bluePermPP = 0;
-  state.redPermPP = 0;
-  state.blueShadows = 0;
-  state.redShadows = 0;
-  state.blueRally = 0;
-  state.redRally = 0;
-  state.isBlueTurn = true;
-  state.roundCount = 1;
-  state.redBoostUsedEarly = false;
-  state.redBoostPending = false;
-  state.redBoostUsedLate = false;
-  state.bluePlaysThisTurn = 0;
-  state.redPlaysThisTurn = 0;
-  state.gameStarted = false;
+  // C) Debug Identity
+  state.__debugId = Math.random();
 
-  // Log the game state reset
+  // Log
   logEvent("resetGameState", {});
 }
 
+// Global debug exposure (matches original)
 if (typeof window !== "undefined") {
   (window as any).gameState = state;
   (window as any).debugSummon = () => import('../logic/effects/ops/summon.js');

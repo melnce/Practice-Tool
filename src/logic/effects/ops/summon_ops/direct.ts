@@ -12,7 +12,7 @@ import { findEarthSigilTarget } from "./earth.js";
 // =============== Public API ===============
 
 export function summonNamed(eff: Effect, owner: Player) {
-    state.lastSummoned = [];
+    if (state.lastSummoned) state.lastSummoned.length = 0;
 
     const name = String((eff as any)?.name || "").trim();
     let count = parseInt((eff as any)?.count);
@@ -127,7 +127,7 @@ export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
     logEvent("summonExactCopy", { owner, from: sourceCard.name, uid: clone.uid });
     // >>> Congregant chain managed by JSON triggers now
 
-    state.lastSummoned = [clone];
+    if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(clone); }
     adapter.render();
     return clone;
 }

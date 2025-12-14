@@ -30,9 +30,11 @@ function isFiniteNum(x: any) {
 
 /** Track last-drawn cards for UI/debug (most recent first) */
 function trackLastDrawn(card: CardInstance) {
-    state.lastDrawnCards = state.lastDrawnCards || [];
-    state.lastDrawnCards.unshift(card);
-    if (state.lastDrawnCards.length > 5) state.lastDrawnCards.length = 5;
+    // state.lastDrawnCards is guaranteed by ARRAY_KEYS
+    if (state.lastDrawnCards) {
+        state.lastDrawnCards.unshift(card);
+        if (state.lastDrawnCards.length > 5) state.lastDrawnCards.length = 5;
+    }
 }
 
 /** -----------------------------

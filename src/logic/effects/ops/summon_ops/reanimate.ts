@@ -41,7 +41,7 @@ export function reanimateSummon(c: any, owner: Player) {
 
     if (pushToBoard(board, owner, copy)) {
         logEvent("reanimateSummon", { owner, card: copy.name, uid: copy.uid });
-        state.lastSummoned = [copy];
+        if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(copy); }
     }
     adapter.render();
 }

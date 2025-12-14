@@ -64,7 +64,7 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
     const take = Math.min(want, space, candidates.length);
     const picks = candidates.slice(0, take);
 
-    state.lastSummoned = [];
+    if (state.lastSummoned) state.lastSummoned.length = 0;
 
     // Summon and remove from deck
     for (const deckEntry of picks) {

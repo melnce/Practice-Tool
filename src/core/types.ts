@@ -216,6 +216,7 @@ export interface GameState {
     blueEvoCharges: number;
     redEvoCharges: number;
     blueSuperEvoCharges: number;
+    redSuperEvoCharges: number;
     blueEvoUsedThisTurn: boolean;
     redEvoUsedThisTurn: boolean;
 
@@ -244,8 +245,8 @@ export interface GameState {
         confirmationText?: string;
     };
 
-    lastSummoned?: CardInstance[];
-    lastDrawnCards?: CardInstance[];
+    lastSummoned: CardInstance[];
+    lastDrawnCards: CardInstance[];
     lastFuse?: { result_name: string;[key: string]: any };
 
     deckoutWinsBlue?: boolean;

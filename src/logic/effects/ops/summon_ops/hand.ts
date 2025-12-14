@@ -90,7 +90,7 @@ export function summonFromHand(card: CardInstance, owner: Player): boolean {
 
     if (pushToBoard(board, owner, card)) {
         logEvent("summonFromHand", { owner, card: card.name, uid: card.uid });
-        state.lastSummoned = [card];
+        if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(card); }
         adapter.render();
         return true;
     }
@@ -167,7 +167,7 @@ export function summonExactCopyFromHand(srcCard: CardInstance, owner: Player, po
 
     logEvent("summonExactCopy", { owner, from: srcCard.name, uid: clone.uid });
     // Track last summoned
-    state.lastSummoned = [clone];
+    if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(clone); }
 
     // Fire follower-enter hooks exactly like other summon paths
     if (clone.type === "Follower") {

@@ -500,7 +500,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
         console.log(`%c[playCard] Check Fanfare for ${card.name}`, 'color: magenta');
         if (!skipFanfareForEnhance && Array.isArray((card as any).fanfare) && (card as any).fanfare.length) {
             console.log(`%c[playCard] Executing Fanfare for ${card.name}`, 'color: magenta; font-weight: bold');
-            state.lastSummoned = [card];
+            if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(card); }
             runEffects([...(card as any).fanfare], player, card, { enteringCard: card });
 
         }
@@ -570,7 +570,7 @@ function _playCardCore(fromHand: CardInstance[], player: Player, index: number) 
             runEffects([...chosenTier.effects], player, card);
         }
         if (Array.isArray((card as any).fanfare) && (card as any).fanfare.length) {
-            state.lastSummoned = [card];
+            if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(card); }
             runEffects([...(card as any).fanfare], player, card, { enteringCard: card });
         }
         return safeRender();

@@ -27,7 +27,10 @@ if (typeof window === "undefined") {
                 textContent: "",
                 dataset: {},
             }),
-            body: { appendChild: noop },
+            body: {
+                appendChild: noop,
+                classList: { add: noop, remove: noop, toggle: noop }
+            },
         };
     } catch (e) { console.warn("Cannot set global.document"); }
 

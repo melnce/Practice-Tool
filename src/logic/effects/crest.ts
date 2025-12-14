@@ -27,8 +27,7 @@ function toArray(x: any) {
 }
 
 export function handleGainCrest(eff: Effect, owner: Player) {
-    if (!state.blueCrests) state.blueCrests = [];
-    if (!state.redCrests) state.redCrests = [];
+
 
     // NEW: allow giving to opponent
     const targetOwner =

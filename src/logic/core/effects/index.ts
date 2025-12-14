@@ -193,7 +193,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
                 const ok = crestSpendCounter(owner, (eff as any).crest || eff.name, (eff as any).counter || "faith", (eff as any).amount ?? 1);
                 // @ts-ignore
                 const chain = ok ? (eff.on_success_effects || []) : (eff.on_fail_effects || []);
-                if (chain.length) effects.unshift(...chain);
+                if (chain.length) queue.unshift(...chain);
                 break;
             }
             case "damage": if (handleDamage(eff as any, owner, sourceCard, queue, context) === "pending") return; break;
@@ -247,7 +247,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
                 const destroyed = handleDestroy(eff, owner, [], context, sourceCard);
                 if (destroyed === "pending") return destroyed;
                 if (typeof destroyed === "number" && destroyed > 0) {
-                    if (Array.isArray(eff.effects)) effects.unshift(...eff.effects!);
+                    if (Array.isArray(eff.effects)) queue.unshift(...eff.effects!);
                 }
                 break;
             }
@@ -295,8 +295,8 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "gain_crest": handleGainCrest(eff, owner); logEvent("gainCrest", { owner, crest: eff.name }); break;
             case "gain_max_pp": handleGainMaxPP(owner, eff); break;
             case "halve_deck_cost": handleHalveDeckCost(owner); break;
-            case "hand_count_gate": { const pass = handCountGate(owner, eff); const next = pass ? (eff.effects || []) : (eff.else_effects || []); if (next.length) effects.unshift(...next); break; }
-            case "heal_leader": { handleHealLeader(owner, eff); logEvent("healLeader", { owner, amount: eff.amount }); const targetOwner = (eff.player || "self") === "self" ? owner : (owner === "blue" ? "red" : "blue"); const fx = processCrestEvent(targetOwner, "heal_leader"); if (fx.length) { effects.unshift(...fx); } break; }
+            case "hand_count_gate": { const pass = handCountGate(owner, eff); const next = pass ? (eff.effects || []) : (eff.else_effects || []); if (next.length) queue.unshift(...next); break; }
+            case "heal_leader": { handleHealLeader(owner, eff); logEvent("healLeader", { owner, amount: eff.amount }); const targetOwner = (eff.player || "self") === "self" ? owner : (owner === "blue" ? "red" : "blue"); const fx = processCrestEvent(targetOwner, "heal_leader"); if (fx.length) { queue.unshift(...fx); } break; }
             case "gain_crest": handleGainCrest(eff as any, owner); break;
             case "grant_trigger": {
                 const targets = (context?.targets && context.targets.length) ? context.targets : (sourceCard ? [sourceCard] : []);
@@ -318,16 +318,16 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "leader_barrier": { handleLeaderBarrierOp(owner, eff); break; }
             case "modify_cost": handleModifyCost(eff, owner, sourceCard, context); break;
             case "modify_cost_pool": handleModifyCostPool(eff, owner, sourceCard); break;
-            case "necromancy_gate": if (hasNecromancy(owner, (eff as any).cost || 1)) { const cost = (eff as any).cost || 1; spendShadows(owner, cost); logEvent("necromancySpend", { owner, cost }); effects.unshift(...(eff.effects || [])); } break;
+            case "necromancy_gate": if (hasNecromancy(owner, (eff as any).cost || 1)) { const cost = (eff as any).cost || 1; spendShadows(owner, cost); logEvent("necromancySpend", { owner, cost }); queue.unshift(...(eff.effects || [])); } break;
             case "nested_effects": if (eff.effects?.length) queue.unshift(...eff.effects); break;
             case "no_ally_attacked_this_turn_gate": {
                 const pass = noAllyAttackedThisTurn(owner);
                 const next = pass ? (eff.effects || []) : (eff.else_effects || []);
-                if (next.length) effects.unshift(...next);
+                if (next.length) queue.unshift(...next);
                 break;
             }
-            case "no_duplicates_in_deck_gate": { if (hasNoDuplicatesInDeck(owner)) { effects.unshift(...(eff.effects || [])); } break; }
-            case "overflow_gate": if (isOverflow(owner)) effects.unshift(...(eff.effects || [])); break;
+            case "no_duplicates_in_deck_gate": { if (hasNoDuplicatesInDeck(owner)) { queue.unshift(...(eff.effects || [])); } break; }
+            case "overflow_gate": if (isOverflow(owner)) queue.unshift(...(eff.effects || [])); break;
             case "reanimate": handleReanimate(eff, owner); break;
             case "rally_gate": handleRallyGate(owner, eff, queue); break;
             case "recover_pp": handleRecoverPP(owner, eff); break;
@@ -374,9 +374,9 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "start_fortifier_fuse": { const res = sourceCard ? startFortifierFuse(owner, sourceCard) : null; if (res === "pending") return res; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
             case "start_fuse_from_card": { if (opStartFuseFromCard(eff, owner) === "pending") return; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
             case "skybound_art_gate": if (handleSkyboundArtGate(owner, eff, sourceCard)) { queue.unshift(...(eff.effects || [])); } else { queue.unshift(...(eff.else_effects || [])); } break;
-            case "self_cost_gate": handleSelfCostGate(sourceCard!, eff, effects); break;
+            case "self_cost_gate": handleSelfCostGate(sourceCard!, eff, queue); break;
 
-            case "set_stats": { const res = handleSetStats(eff, owner, sourceCard, effects, context); if (res === "pending") return res; break; }
+            case "set_stats": { const res = handleSetStats(eff, owner, sourceCard, queue, context); if (res === "pending") return res; break; }
             case "set_cost_last_drawn": handleSetCostLastDrawn(eff); break;
             case "set_cost_self": handleSetCostSelf(sourceCard, eff); break;
             case "super_evo_gate": if (handleSuperEvoGate(owner)) { queue.unshift(...(eff.effects || [])); } break;
@@ -384,7 +384,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "super_evolved_allied_gate": handleSuperEvolvedAlliedGate(owner, eff, queue); break;
             case "evolved_allied_gate": handleEvolvedAlliedGate(owner, eff, queue); break;
             case "super_evolve_self": handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false }); break;
-            case "super_evolved_self_gate": { const isSuper = sourceCard && sourceCard.evoType === "super"; const next = (isSuper ? eff.effects : eff.else_effects) || []; if (next.length) { effects.unshift(...next); } break; }
+            case "super_evolved_self_gate": { const isSuper = sourceCard && sourceCard.evoType === "super"; const next = (isSuper ? eff.effects : eff.else_effects) || []; if (next.length) { queue.unshift(...next); } break; }
             case "summon_destroyed_amulet_highest_base_cost": handleSummonDestroyedAmuletHighestBaseCost(owner); logEvent("summon", { owner, name: "(highest cost destroyed amulet)" }); break;
             case "summon": {
                 // If we selected a card from hand previously (e.g. via Enhance > select > summon), use summonFromHand.

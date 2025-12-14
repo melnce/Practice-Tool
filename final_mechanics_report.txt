@@ -1,0 +1,204 @@
+﻿
+ RUN  v4.0.15 C:/Projects/Practice Tool
+
+stdout | tests/mechanics.test.ts
+Mock document created with body.classList
+
+node.exe : stderr | 
+tests/mechanics.test.ts
+Au caractère Ligne:1 : 
+1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (stderr | test   
+ s/mechanics.test.t    
+s:String) [], Remo    
+teException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+Cannot set navigator
+
+19:41:18 [vite] (ssr) 
+warning: This case 
+clause will never be 
+evaluated because it 
+duplicates an earlier 
+case clause
+311 |              
+case 
+"hand_count_gate": { 
+const pass = 
+handCountGate(owner, 
+eff); const next = 
+pass ? (eff.effects || 
+[])...
+312 |              
+case "heal_leader": { h
+andleHealLeader(owner, 
+eff); 
+logEvent("healLeader", 
+{ owner, amount: 
+eff.amount })...
+313 |              
+case "gain_crest": 
+handleGainCrest(eff as 
+any, owner); break;
+    |                  
+ ^
+314 |              
+case "grant_trigger": {
+315 |                  
+const targets = 
+(context?.targets && co
+ntext.targets.length) 
+? context.targets : 
+(sourceCard ? [sourc...
+
+  Plugin: vite:esbuild
+  File: 
+C:/Projects/Practice To
+ol/src/logic/core/effec
+ts/index.ts
+stdout | tests/mechanics.test.ts
+Targeting Module State ID: [33m0.7868233501937947[39m
+
+stdout | tests/mechanics.test.ts > Mechanics Tests > Barrier Mechanic > should grant barrier and block one instance of damage
+[leader.ts] applyLeaderDamage: blue barrier=1 amount=5
+[leader.ts] Barrier popped.
+[leader.ts] applyLeaderDamage: blue barrier=0 amount=5
+[leader.ts] HP update: 20 -> 15
+
+stderr | tests/mechanic
+s.test.ts > Mechanics 
+Tests > Summon & 
+Destroy Mechanic > 
+should summon a unit 
+and then destroy it
+Render called but not 
+injected
+
+stderr | tests/mechanic
+s.test.ts > Mechanics 
+Tests > Advanced 
+Mechanic: Fuse 
+(Artifacts) > should 
+fuse Gear of Ambition 
++ Gear of Remembrance 
+into Striker Artifact
+Render called but not 
+injected
+Render called but not 
+injected
+Render called but not 
+injected
+
+ ÔØ» tests/mechanics.test.ts (6 tests | 2 failed) 16ms
+       Ô£ô should grant barrier and block one instance of damage 1ms
+       Ô£ô should not stack barriers 0ms
+       Ô£ô handleLeaderBarrierOp should only grant 1 barrier 0ms
+       ├ù should evolve a follower, modifying stats and flags 3ms
+       ├ù should summon a unit and then destroy it 2ms
+       Ô£ô should fuse Gear of Ambition + Gear of Remembrance into Striker Artifact 1ms
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» 
+Failed Tests 2 
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  tests/mechanics.
+test.ts > Mechanics 
+Tests > Follower 
+Evolve Mechanic > 
+should evolve a 
+follower, modifying 
+stats and flags
+AssertionError: 
+expected undefined to 
+be true // Object.is 
+equality
+
+[32m- Expected:[39m 
+true
+
+[31m+ Received:[39m 
+undefined
+
+ ÔØ» tests/mechanics.te
+st.ts:83:38
+     81| 
+     82|             
+// Assertions
+     83|             ex
+pect(dummy.hasEvolved).
+toBe(true);
+       |               
+                       
+^
+     84|             ex
+pect(dummy.attack).toBe
+(4);
+     85|             ex
+pect(dummy.defense).toB
+e(4);
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[1/2]ÔÄ»
+
+ FAIL  tests/mechanics.
+test.ts > Mechanics 
+Tests > Summon & 
+Destroy Mechanic > 
+should summon a unit 
+and then destroy it
+AssertionError: 
+expected 1 to be +0 // 
+Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 0[39m
+[31m+ 1[39m
+
+ ÔØ» tests/mechanics.te
+st.ts:116:44
+    114| 
+    115|             
+// Assert
+    116|             ex
+pect(state.blueBoard.le
+ngth).toBe(0);
+       |               
+                       
+      ^
+    117|             ex
+pect(state.blueGraveyar
+d.length).toBe(1);
+    118|             ex
+pect(state.blueGraveyar
+d[0].uid).toBe(unit.uid
+);
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[2/2]ÔÄ»
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  19:41:17
+   Duration  489ms (transform 311ms, setup 24ms, import 351ms, tests 16ms, environment 0ms)
+

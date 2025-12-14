@@ -1,0 +1,236 @@
+﻿
+ RUN  v4.0.15 C:/Projects/Practice Tool
+
+node.exe : stderr | 
+tests/reanimate.test.ts
+Au caractère Ligne:1 : 
+1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (stderr | test   
+ s/reanimate.test.t    
+s:String) [], Remo    
+teException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+Cannot set navigator
+
+stderr | tests/stormyBl
+ast.test.ts
+Cannot set navigator
+
+stderr | 
+tests/juno.test.ts
+Cannot set navigator
+
+19:27:32 [vite] (ssr) 
+warning: This case 
+clause will never be 
+evaluated because it 
+duplicates an earlier 
+case clause
+298 |              
+case 
+"hand_count_gate": { 
+const pass = 
+handCountGate(owner, 
+eff); const next = 
+pass ? (eff.effects || 
+[])...
+299 |              
+case "heal_leader": { h
+andleHealLeader(owner, 
+eff); 
+logEvent("healLeader", 
+{ owner, amount: 
+eff.amount })...
+300 |              
+case "gain_crest": 
+handleGainCrest(eff as 
+any, owner); break;
+    |                  
+ ^
+301 |              
+case "grant_trigger": {
+302 |                  
+const targets = 
+(context?.targets && co
+ntext.targets.length) 
+? context.targets : 
+(sourceCard ? [sourc...
+
+  Plugin: vite:esbuild
+  File: 
+C:/Projects/Practice To
+ol/src/logic/core/effec
+ts/index.ts
+stdout | tests/reanimate.test.ts
+Targeting Module State ID: [33m0.20179870397348787[39m
+
+stdout | tests/stormyBlast.test.ts
+Targeting Module State ID: [33m0.31787137696456824[39m
+
+stdout | tests/juno.test.ts
+Targeting Module State ID: [33m0.18056948237035764[39m
+
+stdout | tests/stormyBlast.test.ts > Stormy Blast Damage Logic > should scale damage with spellboost count using add_amount
+[DamageDebug] Resolving add_amount: "{self.spellboostCount}" -> 3
+[DamageDebug] Context Source: Stormy Blast (SB: 3)
+
+stderr | tests/stormyBl
+ast.test.ts > Stormy 
+Blast Damage Logic > 
+should scale damage 
+with spellboost count 
+using add_amount
+Render called but not 
+injected
+
+stderr | 
+tests/juno.test.ts > 
+Juno Earth Counter 
+Damage Logic > should 
+calculate damage based 
+on earth counter sum
+Render called but not 
+injected
+
+ Ô£ô tests/stormyBlast.test.ts (1 test) 3ms
+stderr | 
+tests/juno.test.ts > 
+Juno Earth Counter 
+Damage Logic > should 
+return 0 if no earth 
+counters exist
+Render called but not 
+injected
+
+ ÔØ» tests/juno.test.ts (2 tests | 1 failed) 6ms
+     ├ù should calculate damage based on earth counter sum 5ms
+     Ô£ô should return 0 if no earth counters exist 0ms
+stdout | tests/reanimate.test.ts > Reanimate Mechanics > should reanimate a follower from the graveyard
+[runEffects] PROCESSING QUEUE: 1 items. Ops: reanimate
+[runEffects] Queue dump: [{"op":"reanimate","x":2}]
+No eligible followers to reanimate
+
+stderr | tests/reanimat
+e.test.ts > Reanimate 
+Mechanics > should 
+reanimate a follower 
+from the graveyard
+Render called but not 
+injected
+
+stdout | tests/reanimate.test.ts > Reanimate Mechanics > should fail to reanimate if cost exceeds X
+[runEffects] PROCESSING QUEUE: 1 items. Ops: reanimate
+[runEffects] Queue dump: [{"op":"reanimate","x":4}]
+No eligible followers to reanimate
+
+stderr | tests/reanimat
+e.test.ts > Reanimate 
+Mechanics > should 
+fail to reanimate if 
+cost exceeds X
+Render called but not 
+injected
+
+ ÔØ» tests/reanimate.test.ts (2 tests | 1 failed) 13ms
+     ├ù should reanimate a follower from the graveyard 5ms
+     Ô£ô should fail to reanimate if cost exceeds X 1ms
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» 
+Failed Tests 2 
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  
+tests/juno.test.ts > 
+Juno Earth Counter 
+Damage Logic > should 
+calculate damage based 
+on earth counter sum
+AssertionError: 
+expected 10 to be 5 // 
+Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 5[39m
+[31m+ 10[39m
+
+ ÔØ» tests/juno.test.ts
+:55:31
+     53|         // 
+Expected: 2 + 3 = 5 
+damage
+     54|         // 
+Remaining: 10 - 5 = 5
+     55|         expect
+(enemy.defense).toBe(5)
+;
+       |               
+                ^
+     56|     });
+     57| 
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[1/2]ÔÄ»
+
+ FAIL  tests/reanimate.
+test.ts > Reanimate 
+Mechanics > should 
+reanimate a follower 
+from the graveyard
+AssertionError: 
+expected +0 to be 1 // 
+Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 0[39m
+
+ ÔØ» tests/reanimate.te
+st.ts:33:40
+     31|         runEff
+ects([reanimateEff], 
+"blue", null);
+     32| 
+     33|         expect
+(state.blueBoard.length
+).toBe(1);
+       |               
+                       
+  ^
+     34|         expect
+(state.blueBoard[0].nam
+e).toBe("Fairy");
+     35|         // 
+Should create a COPY 
+(new UID)
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[2/2]ÔÄ»
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  2 failed | 3 passed (5)
+   Start at  19:27:32
+   Duration  441ms (transform 788ms, setup 66ms, import 918ms, tests 22ms, environment 0ms)
+
