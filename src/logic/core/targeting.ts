@@ -78,8 +78,13 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     }
 
     const [sideRaw = "ally", typeRaw = ""] = spec.split(":");
-    const side = sideRaw.trim();
+    let side = sideRaw.trim();
     const type = typeRaw.trim();
+
+    // standardise "ally:hand" -> "hand"
+    if (side === "ally" && type === "hand") {
+        side = "hand";
+    }
 
     // NEW: use already chosen targets from a parent select()
     if (side === "selected") {
@@ -99,12 +104,6 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     if (side === "hand" || spec.startsWith("hand:")) {
         pool = myHand || [];
         if (!(globalThis as any).HEADLESS) console.warn(`[getPool] Targeting Hand. Pool Size: ${pool.length}`);
-
-        // Optional hand-type filter: condition.card_type = "Follower" | "Spell" | "Amulet"
-        const handType = String(condition?.card_type || condition?.type_eq || "").toLowerCase();
-        if (handType) {
-            pool = pool.filter(c => String(c?.type || "").toLowerCase() === handType);
-        }
     } else {
         if (side === "self") pool = sourceCard ? [sourceCard] : [];
         else if (side === "ally") pool = myBoard || [];
@@ -122,7 +121,6 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
 
 
     // Condition filters
-    // Default: exclude self, unless explicitly allowed
     const allowSelf =
         (side === "self") ||
         (condition && (condition.not_self === false || condition.include_self === true));
@@ -130,6 +128,13 @@ export function getPool(targetSpec: string, owner: Player, sourceCard: CardInsta
     if (!allowSelf && sourceCard) {
         pool = pool.filter(c => c?.uid !== sourceCard.uid);
     }
+
+    // Unified Type Check (moved from hand-only block, no aliases/fallbacks)
+    if (condition.type) {
+        const typeFilter = String(condition.type).toLowerCase();
+        pool = pool.filter(c => String(c?.type || "").toLowerCase() === typeFilter);
+    }
+
     if (condition.unevolved) {
         pool = pool.filter(c => c && !c.hasEvolved);
     }

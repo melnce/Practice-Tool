@@ -1,7 +1,7 @@
 # LLM Contributor Guide
 
 ## Where to start
--   **New Card**: Add entry to `cards/all.json` (or specific set file in `cards/sets/`).
+-   **New Card**: Add entry to specific set file in `cards/sets/`.
 -   **New Effect**: Check `src/logic/effects/ops/`. If operation (e.g., `banish`) exists, reuse it. If not, add new `.ts` file in `ops/`.
 -   **Rule Change**: Modify `src/logic/core/turns.ts` or `src/logic/index.ts`.
 -   **UI Bug**: Check `src/ui/render.ts` or `src/ui/zones.ts`.

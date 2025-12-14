@@ -8,6 +8,7 @@ import { randInt } from "../../../core/rng.js";
 import { logEvent } from "../../../core/logger.js";
 import { applyLeaderDamage } from "../leader.js";
 import { Effect, CardInstance, Player } from "../../../core/types.js";
+import { resolveDynamicValue } from "../../core/values.js";
 // @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 
@@ -167,66 +168,15 @@ export function handleDamageSplitSequential(eff: Effect, owner: Player) {
 
 
 export function resolveAmountWithOverflow(eff: Effect, owner: Player, context: any = {}) {
-    const resolveToken = (val: any) => {
-        if (val == null) return 0;
-        if (typeof val === "number") return val | 0;
-
-        const s = String(val).trim().toLowerCase();
-
-        if (s === "{self.attack}") {
-            const src = context.sourceCard || context.attacker || null;
-            return parseInt(src?.attack || 0, 10) || 0;
-        }
-        if (s === "{self.defense}") {
-            const src = context.sourceCard || context.attacker || null;
-            return parseInt(src?.defense || 0, 10) || 0;
-        }
-        // Optional niceties if you ever use them:
-        if (s === "{attacker.attack}") return parseInt(context.attacker?.attack || 0, 10) || 0;
-        if (s === "{defender.defense}") return parseInt(context.defender?.defense || 0, 10) || 0;
-
-        if (s === "{selected.defense}") {
-            // Check multiple sources for the selected card
-            const sel = context.selectedCard || state.__lastSelected;
-            return parseInt(sel?.defense || 0, 10) || 0;
-        }
-
-        // NEW: number of differently named Loot cards fused to THIS card
-        if (s === "{self.fused_loot_unique}") {
-            const src = context.sourceCard || context.attacker || null;
-            const arr = Array.isArray(src?._fusedLootNames) ? src._fusedLootNames : [];
-            return new Set(arr.map(String)).size | 0;
-        }
-
-        if (s === "{last_discarded_cost}") {
-            return parseInt(state.lastDiscardedCost, 10) || 0;
-        }
-        if (s === "{hand_size}") {
-            const hand = owner === "blue" ? state.blueHand : state.redHand;
-            return hand.length | 0;
-        }
-        if (s === "{earth_counter_sum}") {
-            const board = owner === "blue" ? state.blueBoard : state.redBoard;
-            return board
-                .filter(c => c?.type === "Amulet" && (c.counters?.earth || 0) > 0)
-                .reduce((sum, c) => sum + (c.counters?.earth || 0), 0);
-        }
-        if (s === "{self.spellboostcount}") {
-            const src = context.sourceCard || context.attacker || null;
-            return parseInt((src as any)?.spellboostCount || 0, 10) || 0;
-        }
-
-        const n = parseInt(val, 10);
-        return Number.isFinite(n) ? n : 0;
-    };
+    const ctx = { ...context, owner };
 
     const baseRaw = eff.amount;
     const addRaw = (eff as any).add_amount;
     const ofRaw = (eff as any).amount_overflow ?? (eff as any).overflow_amount ?? baseRaw;
 
-    const baseAmt = resolveToken(baseRaw);
-    const addAmt = resolveToken(addRaw);
-    const ofAmt = resolveToken(ofRaw);
+    const baseAmt = resolveDynamicValue(baseRaw, ctx);
+    const addAmt = resolveDynamicValue(addRaw, ctx);
+    const ofAmt = resolveDynamicValue(ofRaw, ctx);
 
     if (eff.add_amount) {
         console.log(`[DamageDebug] Resolving add_amount: "${eff.add_amount}" -> ${addAmt}`);
@@ -244,7 +194,7 @@ export function resolveAmountWithOverflow(eff: Effect, owner: Player, context: a
 
 
 export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any) {
-    const amt = resolveAmountWithOverflow(eff, owner);
+    const amt = resolveAmountWithOverflow(eff, owner, { sourceCard });
 
     state.pendingTargetEffect = {
         eff: {

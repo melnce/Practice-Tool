@@ -4206,7 +4206,7 @@
         "target": "ally:hand",
         "select_count": 1,
         "condition": {
-          "card_type": "Amulet"
+          "type": "Amulet"
         },
         "effects": [
           {
@@ -4223,7 +4223,7 @@
         "target": "ally:hand",
         "select_count": 1,
         "condition": {
-          "card_type": "Amulet"
+          "type": "Amulet"
         },
         "effects": [
           {

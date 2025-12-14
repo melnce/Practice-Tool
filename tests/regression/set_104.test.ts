@@ -104,7 +104,7 @@ describe("Set 104: Skybound Dragons", () => {
 
         const philo = {
             uid: "hand_1", id: "10431110", name: "Philosophia", type: "Follower", cost: 3,
-            fanfare: [{ op: "draw_filtered", card_type: "Spell", count: 1 }]
+            fanfare: [{ op: "draw_filtered", filters: { type: "Spell" }, count: 1 }]
         } as any;
         state.blueHand = [philo];
         state.bluePP = 3;
@@ -270,7 +270,7 @@ describe("Set 104: Skybound Dragons", () => {
             keywords: [{
                 name: "Enhance", cost: 8,
                 effects: [
-                    { op: "draw_filtered", card_type: "Follower", min_cost: 7 },
+                    { op: "draw_filtered", filters: { type: "Follower", cost_gte: 7 }, count: 1 },
                     { op: "recover_pp", amount: 7 }
                 ]
             }]
@@ -375,7 +375,7 @@ describe("Set 104: Skybound Dragons", () => {
         expect(izmirOnBoard?.hasEvolved).toBe(true);
     });
     it("Vyrn should evolve if super evo is active", async () => {
-        state = await startNewGame();
+        state = await startNewGame({ deckAId: "sample_blue", deckBId: "sample_red" });
         // We assume mergeSets has run, so Vyrn is in the DB
         const vyrnData = getCardDetails("Vyrn, Li'l Red Dragon");
         if (!vyrnData) throw new Error("Vyrn not found in DB");
@@ -399,7 +399,7 @@ describe("Set 104: Skybound Dragons", () => {
     });
 
     it("Golden Knight Enhance(9) should trigger all effects", async () => {
-        state = await startNewGame();
+        state = await startNewGame({ deckAId: "sample_blue", deckBId: "sample_red" });
         const knightData = getCardDetails("Golden Knight, True King's Blade");
         if (!knightData) throw new Error("Golden Knight not found");
 

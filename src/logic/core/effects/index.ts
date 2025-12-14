@@ -1,8 +1,7 @@
-// src/logic/core/effects/index.ts
-
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
 import { adapter } from "../../../core/adapter.js";
+import { resolveDynamicValue } from "../values.js";
 import { fireTrigger, registerRunEffects } from "../triggers.js";
 import { CardInstance, Effect, Player, GameState } from "../../../core/types.js";
 
@@ -139,8 +138,6 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
     // For now, simple iteration.
 
     const queue = [...effects]; // Shallow copy to process
-    console.log(`[runEffects] PROCESSING QUEUE: ${queue.length} items. Ops: ${queue.map(e => e.op).join(", ")}`);
-    console.log(`[runEffects] Queue dump:`, JSON.stringify(queue));
 
     while (queue.length > 0) {
         const eff = queue.shift()!;
@@ -175,7 +172,13 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "buff": { const res = handleBuff(eff as any, owner, sourceCard, [], context); if (res === "pending") return res; break; }
             case "buff_hand_class": handleBuffHandClass(eff, owner); break;
             case "buff_last_added_to_hand": handleBuffLastAddedToHand(eff, owner); break;
-            case "buff_self": handleBuffSelf(sourceCard, eff); break;
+            case "buff_self":
+                try {
+                    handleBuffSelf(sourceCard, eff);
+                } catch (e) {
+                    console.log("[ERROR] buff_self failed:", e);
+                }
+                break;
             case "buff_hand_tribe": handleBuffHandTribe(eff, owner); break;
 
             case "choose": if (handleChoose(eff, owner, sourceCard, queue) === "pending") return; break;
@@ -287,6 +290,16 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
                 logEvent("evolve", { owner, card: `(named ${name})` });
                 break;
             }
+            case "super_evolve_all_unevolved_allies": {
+                const board = owner === "blue" ? state.blueBoard : state.redBoard;
+                for (const ally of board) {
+                    if (ally.type === "Follower" && !ally.hasEvolved) {
+                        handleEvolveSelf(ally, owner, { mode: "super", spendPoint: false });
+                    }
+                }
+                logEvent("evolve", { owner, card: "(multi-super)" });
+                break;
+            }
             case "evolve_self": handleEvolveSelf(sourceCard, owner, { spendPoint: false }); logEvent("evolve", { owner, card: sourceCard?.name }); break;
             case "fill_congregant_copies": handleFillCongregantCopies(owner, sourceCard); break;
             case "follower_strike_destroy": if (sourceCard && context?.defender) { resolveDestroy(context.defender, owner); cleanupDead(); } break;
@@ -369,7 +382,18 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "set_attack_to": { const res = handleSetAttackTo(eff, owner, sourceCard, queue, context); if (res === "pending") return res; break; }
             case "set_deckout_victory": { const enable = (eff as any).enabled !== false; if (owner === "blue") state.deckoutWinsBlue = enable; else state.deckoutWinsRed = enable; break; }
             case "set_max_hp": handleSetMaxHP(eff, owner); break;
-            case "spellboost_hand": spellboostHand(owner, eff as any); break;
+
+            case "spellboost_hand": {
+                // resolve count/times dynamically if provided
+                const countRaw = eff.count ?? eff.times ?? 1;
+                const n = resolveDynamicValue(countRaw, { owner, sourceCard });
+                // DEBUG: Log for Suframare diagnosis
+                if (typeof countRaw === "string" && countRaw.includes("{self.")) {
+                    console.log(`[Spellboost] Dynamic count="${countRaw}" resolved to ${n}. SourceCard: ${sourceCard?.name ?? "null"}, Attack: ${sourceCard?.attack ?? "N/A"}`);
+                }
+                spellboostHand(owner, n);
+                break;
+            }
             case "spellboost_target": if (sourceCard) { spellboostHand(owner, 1, sourceCard); } break;
             case "start_fortifier_fuse": { const res = sourceCard ? startFortifierFuse(owner, sourceCard) : null; if (res === "pending") return res; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
             case "start_fuse_from_card": { if (opStartFuseFromCard(eff, owner) === "pending") return; logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break; }
@@ -456,3 +480,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
 
 // Register with triggers module to cycle break
 registerRunEffects(runEffects);
+
+// NEW: break cycle with spellboost
+import { registerRunEffectsForSpellboost } from "../../effects/ops/spellboost.js";
+registerRunEffectsForSpellboost(runEffects);

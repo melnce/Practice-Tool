@@ -1929,7 +1929,7 @@
         "target": "ally:hand",
         "amount": 1,
         "condition": {
-          "card_type": "Follower"
+          "type": "Follower"
         }
       },
       {

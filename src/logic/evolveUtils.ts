@@ -122,7 +122,7 @@ export function onEvolve(card: CardInstance, owner: Player, mode: "normal" | "su
     // NEW: Notify Skybound Art cards in hand
     import("./effects/skybound.js").then(({ incrementSkyboundArt }) => {
         incrementSkyboundArt(owner);
-    });
+    }).catch(e => console.error("Failed to load skybound module:", e));
 
     // Track total evolves (Moved from effects/ops/evolve.ts)
     if (owner === "blue") state.blueEvoCount = (state.blueEvoCount || 0) + 1;

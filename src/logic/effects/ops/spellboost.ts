@@ -3,7 +3,6 @@ import { state } from "../../../core/gameState.js";
 // @ts-ignore
 // @ts-ignore
 import { adapter } from "../../../core/adapter.js";
-import { runEffects } from "../../core/effects/index.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { rand, randInt, makeUid } from "../../../core/rng.js";
 import { logEvent } from "../../../core/logger.js";
@@ -11,6 +10,12 @@ import { logEvent } from "../../../core/logger.js";
 
 // @ts-ignore
 import { Player, CardInstance } from "../../../core/types.js";
+
+// CIRCULAR DEPENDENCY FIX:
+let runEffects: any = null;
+export function registerRunEffectsForSpellboost(fn: any) {
+    runEffects = fn;
+}
 
 
 /* ------------------------ helpers ------------------------ */
@@ -122,6 +127,8 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
     const t = normTimes(times);
     const hand = owner === "blue" ? state.blueHand : state.redHand;
     const board = owner === "blue" ? state.blueBoard : state.redBoard;
+
+
 
     for (let i = 0; i < t; i++) {
         // --- Single-card spellboost path ---

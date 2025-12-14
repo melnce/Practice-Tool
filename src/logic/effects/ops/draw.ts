@@ -149,8 +149,8 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
 
     const f = (eff.filters as any) || {};
 
-    const type = toLowerSafe(f.type ?? f.type_eq);
-    const cls = toLowerSafe(f.class ?? f.class_eq);
+    const type = toLowerSafe(f.type);
+    const cls = toLowerSafe(f.class);
 
     const costLte = isFiniteNum(f.cost_lte) ? Number(f.cost_lte) : null;
     const costGte = isFiniteNum(f.cost_gte) ? Number(f.cost_gte) : null;
