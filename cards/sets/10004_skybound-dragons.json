@@ -673,6 +673,18 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10414110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10414110-ewiyar-wind-personified",
+    "fanfare": [
+      {
+        "op": "skybound_art_gate",
+        "requirement": 10,
+        "effects": [
+          {
+            "op": "recover_ep",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -688,13 +700,41 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Do this 2 times: \"Deal 4 damage to a random enemy follower.\"Super-Evolve: GainCrest: Yuel & Societte, Dancing Duo.",
+    "description": "Fanfare: Do this 2 times: Deal 4 damage to a random enemy follower.\nSuper-Evolve: Gain Crest: Yuel & Societte, Dancing Duo.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10414120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10414120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10414120-yuel-societte-dancing-duo",
+    "fanfare": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 4,
+        "count": 2
+      }
+    ],
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Yuel & Societte, Dancing Duo",
+        "image": "images/crests/yuel_societte_dancing_duo.png",
+        "description": "Countdown (4). Once on each of your turns, when you play a follower, evolve it.",
+        "countdown": 4,
+        "once_per_turn": true,
+        "triggers": [
+          {
+            "event": "ally_follower_played",
+            "once_per_turn": true,
+            "effects": [
+              {
+                "op": "evolve"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": []
   },

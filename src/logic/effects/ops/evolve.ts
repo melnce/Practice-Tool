@@ -54,7 +54,7 @@ export function handleEvolveSelf(sourceCard: CardInstance, owner: Player, opts: 
 }
 
 export function handleEvolveTarget(eff: any, owner: Player, context: any = {}) {
-    const target = (context && (context.targetCard || context.selectedCard || (context.targets && context.targets[0]))) || null;
+    const target = (context && (context.targetCard || context.selectedCard || context.playedCard || context.enteringCard || (context.targets && context.targets[0]))) || null;
     if (!target) {
         console.warn("handleEvolveTarget: No target found in context.");
         return;
