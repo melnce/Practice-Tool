@@ -68,13 +68,12 @@ export function engageAmulet(owner: Player, index: number) {
             const card = board[index];
             if (!card || card.type !== "Amulet" || !card.hasEngage) return;
 
-            // Guard: once-per-turn
-            if (card.engageOncePerTurn !== false && card.engagedThisTurn) {
+            if (card.keywordState?.engageOncePerTurn !== false && card.keywordState?.engagedThisTurn) {
                 console.warn(`[Engage] ${card.name} already engaged this turn`);
                 return;
             }
 
-            const cost = Number(card.engageCost ?? 0) || 0;
+            const cost = Number(card.keywordState?.engageCost ?? 0) || 0;
 
             // Affordability check (optional; keep if your UI doesn't pre-check)
             const pp = owner === "blue" ? state.bluePP : state.redPP;
@@ -89,9 +88,10 @@ export function engageAmulet(owner: Player, index: number) {
             // Provide minimal context for listeners if needed later.
             fireTrigger("engage", owner, { sourceCard: card });
 
-            const effects = Array.isArray(card.engageEffects) ? card.engageEffects.slice() : [];
+            const engageEffects = card.keywordState?.engageEffects;
+            const effects = Array.isArray(engageEffects) ? engageEffects.slice() : [];
             const needsSelection = effectsNeedSelection(effects);
-            const sacrifice = !!card.engageSacrifice;
+            const sacrifice = !!card.keywordState?.engageSacrifice;
 
             // If effects require selection
             if (needsSelection) {
@@ -105,7 +105,8 @@ export function engageAmulet(owner: Player, index: number) {
 
                 // Run the full queue so handlers can attach resumeEffects properly
                 runEffects([...effects], owner, card);
-                card.engagedThisTurn = true;
+                if (!card.keywordState) card.keywordState = {};
+                card.keywordState.engagedThisTurn = true;
                 adapter.render();
                 return;
             }
@@ -120,14 +121,16 @@ export function engageAmulet(owner: Player, index: number) {
                 cleanupDead();
 
                 runEffects([...effects], owner, card);
-                card.engagedThisTurn = true;
+                if (!card.keywordState) card.keywordState = {};
+                card.keywordState.engagedThisTurn = true;
                 adapter.render();
                 return;
             }
 
             // Normal (non-sacrifice) engage:
             runEffects([...effects], owner, card);
-            card.engagedThisTurn = true;
+            if (!card.keywordState) card.keywordState = {};
+            card.keywordState.engagedThisTurn = true;
 
             // Only Countdown amulets can die here
             if (card.hasCountdown && Number(card.countdown ?? 0) <= 0) {
@@ -151,6 +154,6 @@ export function engageAmulet(owner: Player, index: number) {
 export function resetEngageFlagsAtTurnStart(owner: Player) {
     const board = boardOf(owner);
     for (const c of board) {
-        if (c && c.type === "Amulet") c.engagedThisTurn = false;
+        if (c && c.type === "Amulet" && c.keywordState) c.keywordState.engagedThisTurn = false;
     }
 }

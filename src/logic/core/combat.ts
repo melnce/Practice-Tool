@@ -31,7 +31,7 @@ function hasWardOn(board: CardInstance[]) { return board.some(c => c && c.type =
 function canTargetFollower(defender: CardInstance, defenderBoard: CardInstance[]) {
     if (!defender || defender.type !== "Follower") return false;
     if (defender.hasAmbush) return false;
-    if (defender.hasIntimidate) return false; // NEW: Intimidate = cannot be attacked
+    if (defender.keywordState?.hasIntimidate || (defender as any).hasIntimidate) return false; // Check both for safety/migration
     if (hasWardOn(defenderBoard) && !defender.hasWard) return false;
     return true;
 }
@@ -62,20 +62,14 @@ function spendAttack(attacker: CardInstance) {
 
 function isAttackForbidden(card: CardInstance) {
     if (!card) return false;
-    if ((card as any).cantAttackIsTemporary && (card as any).cantAttackUntilOpponentEOT) {
+    const ks = card.keywordState;
+    if (ks?.cantAttackIsTemporary && ks?.cantAttackUntilOpponentEOT) {
         const ownerIsBlue = (state.blueBoard || []).includes(card);
         const owner = ownerIsBlue ? "blue" : "red";
         // @ts-ignore
-        if (state.activePlayer === owner) clearCantAttack(card); // Function missing from context? Assuming global or imported? 
-        // Wait, clearCantAttack is not imported. It might be in 'misc.js' or util?
-        // Checking compat: original JS text said `clearCantAttack(card)`. 
-        // It is referenced but not imported in original JS provided? 
-        // Ah, if the original file didn't import it, it was relying on global or it was a bug in original code.
-        // I will comment it out or leave as is but usage might fail if not defined.
-        // I'll assume it's valid JS behavior (maybe auto-imported in bundle?) or bug.
-        // I'll suppress TS error.
+        if (state.activePlayer === owner) clearCantAttack(card); // Function missing? Assuming defined elsewhere.
     }
-    return !!((card as any).cantAttack || (card as any).cantAttackFollowers || (card as any).cantAttackLeaders);
+    return !!(ks?.cantAttack || ks?.cantAttackFollowers || ks?.cantAttackLeaders);
 }
 function recomputeAttackFlags(card: CardInstance) {
     const eligible = !!(card.hasStorm || !card.justPlayed || card.hasRush);
@@ -92,8 +86,8 @@ function hasCardTrigger(card: CardInstance, eventName: string, source = "board")
 }
 
 /* ------------------------ superevolve convenience checks ------------------------ */
-function isInvincibleOnAttack(attacker: CardInstance) { return attacker?.evoType === "super" || !!(attacker as any)?.isInvincibleOnAttack; }
-function hasPiercingOne(attacker: CardInstance) { return attacker?.evoType === "super" || !!(attacker as any)?.hasPiercing; }
+function isInvincibleOnAttack(attacker: CardInstance) { return attacker?.evoType === "super" || !!attacker.keywordState?.isInvincibleOnAttack; }
+function hasPiercingOne(attacker: CardInstance) { return attacker?.evoType === "super" || !!attacker.keywordState?.hasPiercing; }
 
 /* --------------------------- follower vs follower --------------------------- */
 
@@ -108,7 +102,7 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
     if (!attacker || !defender) return;
     if (attacker.type !== "Follower" || defender.type !== "Follower") return;
     if (!(attacker as any).can_attack || ((attacker as any).attacks_left ?? 1) <= 0) return;
-    if (isAttackForbidden(attacker)) return;
+    if (isAttackForbidden(attacker)) return; // Checks keywordState inside
     if (!canTargetFollower(defender, defenderBoard)) return;
 
     // Ambush breaks on own attack
@@ -195,7 +189,7 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
             resolveDestroy(attacker, attackerPlayer);
             logEvent("baneDestroy", { killer: defender.name, victim: attacker.name });
         }
-    } else if ((attacker as any).hasBarrier) {
+    } else if (attacker.keywordState?.hasBarrier || (attacker as any).hasBarrier) {
         popBarrier(attacker, "invincible_simul_zero");
     }
 

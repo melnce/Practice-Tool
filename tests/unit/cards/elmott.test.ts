@@ -65,7 +65,7 @@ describe("Elmott Logic", () => {
         it("should have correct Fanfare and Super-Evo definitions", async () => {
             const fs = await import("fs");
             const path = await import("path");
-            const filePath = path.resolve(__dirname, "../../../../cards/sets/10004_skybound-dragons.json");
+            const filePath = path.resolve(__dirname, "../../../cards/sets/10004_skybound-dragons.json");
 
             if (!fs.existsSync(filePath)) throw new Error("JSON not found");
 
@@ -75,20 +75,29 @@ describe("Elmott Logic", () => {
 
             expect(elmott).toBeDefined();
 
-            console.log("Elmott loaded:", JSON.stringify(elmott.evolve?.[0], null, 2));
+            console.log("Elmott loaded:", JSON.stringify(elmott.superevolve?.[0], null, 2));
 
-            // Check Fanfare
-            expect(elmott.fanfare[0].op).toBe("select");
-            expect(elmott.fanfare[0].effects[0].op).toBe("remove_abilities");
-            expect(elmott.fanfare[0].effects[1].op).toBe("damage");
-            expect(elmott.fanfare[0].effects[1].amount).toBe(3);
+            try {
+                // Check Fanfare
+                expect(elmott.fanfare[0].op).toBe("select");
+                expect(elmott.fanfare[0].effects[0].op).toBe("remove_abilities");
+                // expect(elmott.fanfare[0].effects[0].target).toBe("selected"); // Optional check if I added it
+                expect(elmott.fanfare[0].effects[1].op).toBe("damage");
+                expect(elmott.fanfare[0].effects[1].amount).toBe(3);
 
-            // Check Evolve (Super-Evo Gate)
-            expect(elmott.evolve[0].op).toBe("super_evo_gate");
-            const crestOp = elmott.evolve[0].effects[0];
-            expect(crestOp.op).toBe("gain_crest");
-            expect(crestOp.name).toContain("Elmott");
-            expect(crestOp.triggers[0].event).toBe("start_of_turn");
+                // Check Evolve (Super-Evolve)
+                expect(elmott.evolve.length).toBe(0);
+                expect(elmott.superevolve.length).toBe(1);
+                const crestOp = elmott.superevolve[0];
+                expect(crestOp.op).toBe("gain_crest");
+                expect(crestOp.name).toContain("Elmott");
+                expect(crestOp.triggers[0].event).toBe("start_of_turn");
+            } catch (e) {
+                console.error("Elmott Test Assertion Failed:", e);
+                console.log("Fanfare Dump:", JSON.stringify(elmott.fanfare, null, 2));
+                console.log("SuperEvolve Dump:", JSON.stringify(elmott.superevolve, null, 2));
+                throw e;
+            }
         });
     });
 });

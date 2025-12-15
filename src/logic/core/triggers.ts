@@ -112,7 +112,7 @@ export function fireTrigger(eventName: string, activePlayer: Player, context: Tr
                                 if (k === "storm" && card.hasStorm) return true;
                                 if (k === "bane" && card.hasBane) return true;
                                 if (k === "ambush" && card.hasAmbush) return true;
-                                if (k === "aura" && (card as any).hasAura) return true;
+                                if (k === "aura" && card.hasAura) return true;
                                 if (k === "drain" && (card as any).hasDrain) return true;
                                 if (k === "intimidate" && (card as any).hasIntimidate) return true;
                                 if (k === "lastwords" && card.hasLastWords) return true;
@@ -180,9 +180,10 @@ export function fireTrigger(eventName: string, activePlayer: Player, context: Tr
     ];
 
     for (const { card, owner, source } of zones) {
-        if (!Array.isArray((card as any)?.triggers) || !(card as any).triggers.length) continue;
+        const triggers = card.keywordState?.triggers;
+        if (!Array.isArray(triggers) || !triggers.length) continue;
 
-        for (const trigger of (card as any).triggers) {
+        for (const trigger of triggers) {
             if (trigger.event !== eventName) continue;
 
             // FIX: Default source for followers/amulets is board-only unless specified

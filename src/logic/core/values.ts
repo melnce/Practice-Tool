@@ -25,7 +25,11 @@ export function resolveDynamicValue(val: string | number | undefined | null, con
         const src = context.sourceCard || context.attacker || null;
         if (s === "{self.attack}") return parseInt((src as any)?.attack || 0, 10) || 0;
         if (s === "{self.defense}") return parseInt((src as any)?.defense || 0, 10) || 0;
-        if (s === "{self.spellboostcount}") return parseInt((src as any)?.spellboostCount || 0, 10) || 0;
+        if (s === "{self.spellboostcount}") {
+            const ks = src?.keywordState?.spellboostCount;
+            if (typeof ks === "number") return ks;
+            return parseInt((src as any)?.spellboostCount || 0, 10) || 0;
+        }
         if (s === "{self.fused_loot_unique}") {
             const arr = Array.isArray((src as any)?._fusedLootNames) ? (src as any)._fusedLootNames : [];
             return new Set(arr.map(String)).size | 0;

@@ -1,0 +1,4 @@
+❌ [VIOLATION] src\logic\core\resolveTarget.ts:9
+   Imports UI layer: '../../ui/targeting.js' -> C:/Projects/Practice Tool/src/ui/targeting.ts
+❌ [VIOLATION] src\logic\effects\ops\targeted\index.ts:46
+   Imports UI layer: '../../../../ui/text.js' -> C:/Projects/Practice Tool/src/ui/text.ts

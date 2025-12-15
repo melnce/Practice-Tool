@@ -1,3 +1,9 @@
+/**
+ * GUARDRAIL: This file is a ROUTER/ORCHESTRATOR.
+ * It must remain a thin layer that delegates logic to specific modules.
+ * DO NOT add complex rules, targeting logic, or keyword implementations here.
+ * Import them from their respective cohesive modules.
+ */
 import { state } from "../../../core/gameState.js";
 // @ts-ignore
 import { adapter } from "../../../core/adapter.js";
@@ -328,7 +334,28 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "increase_countdown": { const amt = Number(eff.amount ?? 1); handleIncreaseCountdown(owner, amt); break; }
             case "increase_opponent_hand_cost_eot": { const amt = parseInt(String(eff.amount ?? 1)) || 1; applyTempOpponentHandCostMod(owner, amt); break; }
 
-            case "keyword": { const merged = { ...(context || {}), sourceCard }; if (handleKeyword(eff as any, owner, queue, merged) === "pending") return; break; }
+            case "keyword": {
+                const merged = { ...(context || {}), sourceCard };
+                const ctx = { ...merged, isTargetedEffect: !!(eff.select || eff.select_count) };
+
+                // Hoist getPool call so keywords module doesn't touch targeting logic
+                const targets = (merged.targets && merged.targets.length > 0 && !eff.target)
+                    ? merged.targets
+                    : getPool(eff.target, owner, sourceCard, eff.condition, ctx);
+
+                const res = handleKeyword(eff as any, owner, queue, targets, merged);
+
+                if (res.kind === "request_target") {
+                    // Translate request to actual state mutation
+                    state.pendingTargetEffect = {
+                        ...res.request,
+                        targets: [] // Initialize empty targets for selection
+                    };
+                    highlightSelectable(res.request.pool);
+                    return; // Pause execution
+                }
+                break;
+            }
             // NOTE: keyword_self has been deprecated - use buff_self with keywords instead
 
             case "leader_barrier": { handleLeaderBarrierOp(owner, eff); break; }
@@ -353,8 +380,30 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "reduce_cost_self": handleReduceCostSelf(sourceCard, eff); break;
             case "reduce_countdown": handleReduceCountdown(sourceCard, eff); break;
             case "reduce_deck_followers_cost": { const amt = parseInt(String(eff.amount ?? 1)) || 1; reduceDeckFollowersCost(owner, amt); break; }
-            case "remove_keyword": if (handleRemoveKeyword(eff as any, owner) === "pending") return; break;
-            case "remove_abilities": if (handleRemoveAbilities(eff as any, owner, queue, context) === "pending") return; break;
+            case "remove_keyword": {
+                const targets = context?.targets || getPool(eff.target, owner);
+                const res = handleRemoveKeyword(eff as any, owner, targets, queue);
+                if (res.kind === "request_target") {
+                    state.pendingTargetEffect = { ...res.request, targets: [] };
+                    highlightSelectable(res.request.pool);
+                    return;
+                }
+                break;
+            }
+            case "remove_abilities": {
+                const ctx = { ...context, isTargetedEffect: !!eff.select };
+                const targets = (context.targets && context.targets.length > 0 && !eff.target)
+                    ? context.targets
+                    : getPool(eff.target, owner, sourceCard, eff.condition, ctx);
+
+                const res = handleRemoveAbilities(eff as any, owner, queue, targets, ctx);
+                if (res.kind === "request_target") {
+                    state.pendingTargetEffect = { ...res.request, targets: [] };
+                    highlightSelectable(res.request.pool);
+                    return;
+                }
+                break;
+            }
             case "replace_deck": handleReplaceDeck(owner, eff); break;
             case "replace_deck_with_set_minus": { import("../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => adapter.render()); }); break; }
             case "restore_full_defense_self": handleRestoreFullDefenseSelf(sourceCard!, context); break;

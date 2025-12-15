@@ -42,7 +42,7 @@ export function handleDestroyHighest(eff: Effect, owner: Player) {
     while (n-- > 0 && top.length) {
         const i = randInt(top.length);
         const pick = top.splice(i, 1)[0];
-        if (pick && !pick.cannotBeDestroyed && !isSuperProtected(pick, owner)) {
+        if (pick && !pick.keywordState?.cannotBeDestroyed && !isSuperProtected(pick, owner)) {
             logEvent("destroy", { target: pick.name, uid: pick.uid, reason: "highest_attack" });
             pick.defense = 0;
         }
@@ -76,7 +76,7 @@ export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardIns
                 : null;
         if (!cardOwner) continue;
 
-        if (card.cannotBeDestroyed) continue;
+        if (card.keywordState?.cannotBeDestroyed) continue;
 
         if (card.type === "Follower") {
             if (isSuperProtected(card, cardOwner)) continue;
@@ -96,8 +96,9 @@ export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardIns
                 grave.push(removed);
                 if (cardOwner === "blue") state.blueShadows++;
                 else state.redShadows++;
-                if (removed.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
-                    runEffects([...removed.lastWordsEffects], cardOwner, removed);
+                const lw = removed.keywordState?.lastWordsEffects || (removed as any).lastWordsEffects;
+                if (removed.hasLastWords && Array.isArray(lw)) {
+                    runEffects([...lw], cardOwner, removed);
                 }
             }
         }
@@ -153,7 +154,7 @@ export function resolveDestroy(target: CardInstance, owner: Player) {
             ? "red"
             : owner;
 
-    if (target.cannotBeDestroyed) return;
+    if (target.keywordState?.cannotBeDestroyed) return;
     if (isSuperProtected(target, inferredOwner)) return;
 
     logEvent("destroy", { target: target.name, uid: target.uid, type: target.type, reason: "targeted" });
@@ -170,8 +171,9 @@ export function resolveDestroy(target: CardInstance, owner: Player) {
         if (idx !== -1) {
             const removed = board.splice(idx, 1)[0];
             grave.push(removed);
-            if (removed.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
-                runEffects([...removed.lastWordsEffects], inferredOwner, removed);
+            const lw = removed.keywordState?.lastWordsEffects || (removed as any).lastWordsEffects;
+            if (removed.hasLastWords && Array.isArray(lw)) {
+                runEffects([...lw], inferredOwner, removed);
             }
             return true;
         }
@@ -196,8 +198,9 @@ export function destroyAlliedAmulets(owner: Player) {
         else state.redShadows++;
         destroyed++;
 
-        if (removed.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
-            runEffects([...removed.lastWordsEffects], owner, removed);
+        const lw = removed.keywordState?.lastWordsEffects || (removed as any).lastWordsEffects;
+        if (removed.hasLastWords && Array.isArray(lw)) {
+            runEffects([...lw], owner, removed);
         }
     }
     return destroyed;
@@ -247,7 +250,7 @@ export function handleDestroyRandom(eff: Effect, owner: Player, context: any = {
         const pick = pool.splice(idx, 1)[0];
         if (!pick) continue;
 
-        if (pick.cannotBeDestroyed) continue;
+        if (pick.keywordState?.cannotBeDestroyed) continue;
 
         const cardOwner = state.blueBoard.includes(pick)
             ? "blue"

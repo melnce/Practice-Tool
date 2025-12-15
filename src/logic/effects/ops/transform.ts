@@ -132,7 +132,14 @@ export function transformHandTarget(target: CardInstance, intoName: string) {
     // Preserve hand modifiers that affect cost/behavior while in hand
     if (target.cost_mod !== undefined) c.cost_mod = target.cost_mod;
     if (target.effectiveCost !== undefined) c.effectiveCost = target.effectiveCost;
-    if (target.spellboostCount !== undefined) c.spellboostCount = target.spellboostCount;
+
+    // Copy KeywordState relevant fields (spellboost)
+    if (target.keywordState) {
+        if (!c.keywordState) c.keywordState = {};
+        if (target.keywordState.spellboostCount !== undefined) {
+            c.keywordState.spellboostCount = target.keywordState.spellboostCount;
+        }
+    }
 
     // Minimal numeric init (hand preview may rely on these)
     // @ts-ignore

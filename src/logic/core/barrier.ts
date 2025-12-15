@@ -58,9 +58,10 @@ export function dealDamage(target: BarrierCard, amount: number, source: CardInst
     // but it STILL counts as an attempted hit (for triggers, barrier, bane rules, etc.).
     try {
         // --- Max Damage Cap Check ---
-        if ((target as any).maxDamageCap > 0 && damageDealt > (target as any).maxDamageCap) {
-            console.log(`[Damage] Capped damage on ${target.name} from ${damageDealt} to ${(target as any).maxDamageCap}`);
-            damageDealt = (target as any).maxDamageCap;
+        const cap = target.keywordState?.maxDamageCap;
+        if (cap !== undefined && cap > 0 && damageDealt > cap) {
+            console.log(`[Damage] Capped damage on ${target.name} from ${damageDealt} to ${cap}`);
+            damageDealt = cap;
         }
 
         const isBlue = (state.blueBoard || []).includes(target);

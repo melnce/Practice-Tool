@@ -1472,7 +1472,7 @@
     "class": "Runecraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Select an enemy follower on the field and deal it 4 damage. Gain an earth sigil. Skybound Art- Deal 2 damage to the enemy leader.",
+    "description": "Select an enemy follower on the field and deal it 4 damage. Gain an earth sigil.\nSkybound Art- Deal 2 damage to the enemy leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10433310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
@@ -1481,15 +1481,30 @@
       {
         "op": "select",
         "target": "enemy:follower",
+        "count": 1,
         "effects": [
           {
             "op": "damage",
+            "target": "selected",
             "amount": 4
           }
         ]
       },
       {
-        "op": "gain_earth_sigil"
+        "op": "summon_named",
+        "name": "Magic Sediment",
+        "count": 1
+      },
+      {
+        "op": "skybound_art_gate",
+        "requirement": 10,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 2
+          }
+        ]
       }
     ],
     "evolve": [],
@@ -1507,65 +1522,60 @@
     "class": "Runecraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "On Spellboost: Give this follower +1/+1.Fanfare: Spellboost your hand.Super-Evolve: Select aModeto activate.\n1. Give all other allied followers on the fieldBarrier.\n2. Deal X damage split between all enemy followers. X is this follower's attack.",
+    "description": "On Spellboost: Give this follower +1/+1.\nFanfare: Spellboost your hand.\nSuper-Evolve: Select a Mode to activate.\n1. Give all other allied followers on the field Barrier.\n2. Deal X damage split between all enemy followers. X is this follower's attack.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10434110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10434110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10434110-wamdus-water-personified",
-    "triggers": [
-      {
-        "type": "spellboost",
-        "op": "buff_self",
-        "attack": 1,
-        "defense": 1
-      }
-    ],
+    "triggers": [],
     "fanfare": [
       {
         "op": "spellboost_hand",
         "count": 1
       }
     ],
-    "evolve": [
+    "evolve": [],
+    "superevolve": [
       {
-        "op": "super_evo_gate",
-        "effects": [
+        "op": "choose",
+        "options": [
           {
-            "op": "choose",
-            "select_count": 1,
-            "options": [
+            "name": "Give all other allied followers on the field Barrier.",
+            "effects": [
               {
-                "name": "Give Barrier to Allies",
-                "effects": [
-                  {
-                    "op": "buff",
-                    "target": "ally:follower",
-                    "not_self": true,
-                    "keywords": [
-                      "Barrier"
-                    ]
-                  }
+                "op": "buff",
+                "target": "ally:follower",
+                "not_self": true,
+                "keywords": [
+                  "Barrier"
                 ]
-              },
+              }
+            ]
+          },
+          {
+            "name": "Deal X damage split between all enemy followers. X is this follower's attack.",
+            "effects": [
               {
-                "name": "Deal X dmg split",
-                "effects": [
-                  {
-                    "op": "damage_random",
-                    "target": "enemy:follower",
-                    "amount": 1,
-                    "count": -1,
-                    "scale_count_by_attack": true
-                  }
-                ]
+                "op": "damage_split_all_enemies",
+                "amount": "{self.attack}"
               }
             ]
           }
         ]
       }
     ],
-    "superevolve": [],
-    "keywords": []
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "effects": [
+          {
+            "op": "buff_self",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10434120",
@@ -1577,9 +1587,9 @@
     "class": "Runecraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Gain 2 earth sigils. Add anArs Magnato your hand.Skybound Art- Evolve this follower.Super Skybound Art- GainCrest: Cagliostro, Genius Alchemist.",
+    "description": "Fanfare: Gain 2 earth sigils. Add an Ars Magnato your hand.\nSkybound Art- Evolve this follower.\nSuper Skybound Art- Gain Crest: Cagliostro, Genius Alchemist.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10434120.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10434120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10434120-cagliostro-genius-alchemist",
     "evolve": [],
@@ -1622,7 +1632,7 @@
     "tribes": [],
     "description": "Activates in hand. Whenever a 3-base-cost allied follower super-evolves, set the cost of this card to 0 until the end of the turn.\nAt the end of your turn, give a random super-evolved allied follower on the field +1/+1.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10441120.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10441120-mari-megs-bestie",
     "evolve": [],
@@ -1759,7 +1769,7 @@
     "tribes": [],
     "description": "Fanfare: Skybound Art- Super-evolve this follower.\nWhenever a 2-base-cost allied follower enters the field, give this followerWard.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10443110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10443110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10443110-meg-girl-next-door",
     "evolve": [],
@@ -1814,7 +1824,7 @@
     "tribes": [],
     "description": "Fanfare: Select an enemy follower on the field and deal it 8 damage.IntimidateEvolve: Replicate the effects of this card'sFanfareability.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10444110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10444110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10444110-wilnas-flame-personified",
     "evolve": [],
@@ -1834,7 +1844,7 @@
     "tribes": [],
     "description": "Fanfare: Gain 1 max play point.Enhance(10): Give this followerStorm. Set your leader's max defense to 1. Give your leader \"Can't take more than 0 damage at a time\" until the end of your opponent's turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10444120.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10444120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10444120-zooey-ally-of-the-world",
     "evolve": [],
@@ -2007,7 +2017,7 @@
     "tribes": [],
     "description": "Fanfare: Select aModeto activate.\n1. Give this follower and another random allied follower on the field +1/+1.\n2. Deal 3 damage to a random enemy follower.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10452130.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10452130-baal-elemental-resonance",
     "fanfare": [
@@ -2116,7 +2126,7 @@
     "tribes": [],
     "description": "Fanfare: Necromancy(6) -Reanimate(2),Reanimate(1), and evolve them.\nAt the end of your turn, give all enemy followers on the field -2/-2.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10454110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10454110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10454110-fediel-darkness-personified",
     "fanfare": [
@@ -2162,7 +2172,7 @@
     "tribes": [],
     "description": "Fanfare: Deal 10 damage to all other followers.Super Skybound Art- GainCrest: Belial, Archangel of Cunning.Super-Evolve: Advance the count of yourCrest: Belial, Archangel of Cunningby 1.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10454120.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10454120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10454120-belial-archangel-of-cunning",
     "fanfare": [
@@ -2234,7 +2244,7 @@
     "tribes": [],
     "description": "At the end of your turn, if this follower is evolved, deal 2 damage to all followers.Evolve: Give this follower \"Can't attack followers or leaders\" until the end of the turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10461120.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10461120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461120-lamretta-sisterly-shepherd",
     "triggers": [
@@ -2361,7 +2371,7 @@
     "tribes": [],
     "description": "Fanfare: Summon a random Havencraft follower that costs 2 or less from your deck.Super-Evolve: Give all other allied followers on the fieldBarrier.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10462120.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10462120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10462120-sophia-zeyen-priestess",
     "evolve": [],
@@ -2430,7 +2440,7 @@
     "tribes": [],
     "description": "Whenever youEngagean amulet, restore 1 defense to your leader.Evolve: Select an enemy follower on the field and deal it 3 damage.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10463110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10463110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10463110-tikoh-asclepian-surgeon",
     "evolve": [
@@ -2521,7 +2531,7 @@
     "tribes": [],
     "description": "WardCan't attack followers or leaders.\nAt the end of your turn, if you've unlocked super-evolution, evolve a random unevolved allied follower on the field that didn't attack this turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10464110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10464110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10464110-galleon-earth-personified",
     "evolve": [],
@@ -2643,7 +2653,7 @@
     "tribes": [],
     "description": "Fanfare: Skybound Art- Select another unevolved allied follower on the field and evolve it and this follower.Clash: Deal 3 damage to the opposing follower.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10472110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10472110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10472110-eustace-howl-of-thunder",
     "evolve": [],
@@ -2711,7 +2721,7 @@
     "tribes": [],
     "description": "Fanfare: Select an Artifact follower in your hand and deal X damage to all enemy followers. X is the selected follower's attack.Last Words: Add aFortifier Artifactto your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10473110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10473110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10473110-cassius-sky-yearning-arrival",
     "evolve": [],
@@ -2751,7 +2761,7 @@
     "tribes": [],
     "description": "Fanfare: Do this 6 times: \"Deal 1 damage to a random enemy follower.\" Give all followers in your opponent's hand +1/+0.Skybound Art- GainCrest: Lu Woh, Light Personified.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10474110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10474110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10474110-lu-woh-light-personified",
     "evolve": [],
@@ -2771,7 +2781,7 @@
     "tribes": [],
     "description": "Fanfare: Select 2 enemy followers on the field, remove all abilities from them, and deal them 9 damage. Give the enemy leader \"Takes 1 more damage.\"",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10474120.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10474120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10474120-beelzebub-supreme-king",
     "evolve": [],

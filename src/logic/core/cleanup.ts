@@ -17,9 +17,10 @@ export function cleanupDead() {
     const triggerLastWords = (card: CardInstance, owner: Player) => {
         if ((card as any)._lwFired) return;              // guard against re-entry
         if (!card?.hasLastWords) return;
-        if (!Array.isArray((card as any).lastWordsEffects)) return;
+        const lw = card.keywordState?.lastWordsEffects || card.lastWordsEffects;
+        if (!Array.isArray(lw)) return;
         (card as any)._lwFired = true;                    // mark fired
-        runEffects([...(card as any).lastWordsEffects], owner, card);
+        runEffects([...lw], owner, card);
     };
 
     const cleanSide = (board: CardInstance[], grave: CardInstance[], owner: Player) => {
@@ -63,7 +64,9 @@ export function cleanupDead() {
                 }
 
                 // Emit only for destroyed (not banish/bounce) Wards
-                if (defLE0 && c.hasWard && !(c as any).hasBanishOnDeath) {
+                // Use keywordState for banishOnDeath check
+                const isBanishedOnDeath = c.keywordState?.banishOnDeath || (c as any).banishOnDeath;
+                if (defLE0 && c.hasWard && !isBanishedOnDeath) {
                     fireTrigger("ally_ward_destroyed", owner as any, { destroyedCard: c });
                 }
             }
@@ -74,7 +77,8 @@ export function cleanupDead() {
             delete (c as any).potential_defense;
             delete (c as any)._death_snapshot;
 
-            if ((c as any).hasBanishOnDeath) {
+            const isBanishedOnDeath = c.keywordState?.banishOnDeath || (c as any).banishOnDeath;
+            if (isBanishedOnDeath) {
                 logEvent("banishOnDeath", { card: c.name, owner });
                 // handleBanish will remove the card from the correct board.
                 // Only splice here if, for some reason, it didn't.
@@ -99,7 +103,8 @@ export function cleanupDead() {
                 // Remove from board before LWs
                 board.splice(i, 1);
 
-                const lwCount = Array.isArray((c as any).lastWordsEffects) ? (c as any).lastWordsEffects.length : 0;
+                const lw = c.keywordState?.lastWordsEffects || c.lastWordsEffects;
+                const lwCount = Array.isArray(lw) ? lw.length : 0;
                 if (lwCount > 0) logEvent("lastWords", { card: c.name, owner, count: lwCount });
 
                 // Run LWs and then move to grave

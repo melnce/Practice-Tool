@@ -22,7 +22,12 @@ export function registerRunEffectsForSpellboost(fn: any) {
 
 function incSB(card: CardInstance) {
     if (!card) return;
-    card.spellboostCount = (card.spellboostCount ?? 0) + 1;
+    if (!card.keywordState) card.keywordState = {};
+    const hasKS = typeof card.keywordState.spellboostCount === "number";
+    const val = (hasKS ? card.keywordState.spellboostCount! : (card.spellboostCount || 0)) + 1;
+
+    card.keywordState.spellboostCount = val;
+    card.spellboostCount = val; // Legacy sync for UI/Values
 }
 
 function getSpellboostKeyword(card: CardInstance) {
@@ -72,19 +77,13 @@ function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
             // --- Custom: Homework Time! -> transform into Looking Smart! at threshold ---
             if (effect.op === "transform_self_if_spellboost_at_least") {
                 const need = Number(effect.threshold ?? 0);
-                const have = Number(c.spellboostCount ?? 0); // AFTER increment
+                const have = Number(c.keywordState?.spellboostCount ?? 0); // AFTER increment
                 if (have >= need && effect.target_card_name) {
                     logEvent("spellboostTransform", { owner, from: c.name, to: effect.target_card_name });
                     transformSelfInHand(owner, c, effect.target_card_name);
                 }
                 continue; // DO NOT pass this op to runEffects
             }
-
-
-
-
-
-
 
             // Everything else: generic path
             runEffects([effect], owner, c);
@@ -95,7 +94,9 @@ function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
 export function handleSetSpellboostCount(eff: any, sourceCard: CardInstance) {
     if (!sourceCard) return;
     const val = parseInt(eff.amount ?? 0, 10) || 0;
-    sourceCard.spellboostCount = val;
+    if (!sourceCard.keywordState) sourceCard.keywordState = {};
+    sourceCard.keywordState.spellboostCount = val;
+    sourceCard.spellboostCount = val; // Legacy sync
 
     // If setting to 0, visually clear it (UI might check for >0 or existing property)
     // Re-rendering happens periodically
@@ -153,7 +154,7 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
                     // @ts-ignore
                     if (Number.isFinite(newCost)) targetCard.cost = newCost;
                 }
-                logEvent("spellboost", { owner, card: targetCard.name, uid: targetCard.uid, count: targetCard.spellboostCount, newCost: targetCard.cost });
+                logEvent("spellboost", { owner, card: targetCard.name, uid: targetCard.uid, count: targetCard.keywordState?.spellboostCount, newCost: targetCard.cost });
 
                 // run in-hand effects for THIS card
                 handleSpellboostKeywordEffects(owner, targetCard);
@@ -182,26 +183,14 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
                     // @ts-ignore
                     if (Number.isFinite(newCost)) c.cost = newCost;
                 }
-                logEvent("spellboost", { owner, card: c.name, uid: c.uid, count: c.spellboostCount, newCost: c.cost });
+                logEvent("spellboost", { owner, card: c.name, uid: c.uid, count: c.keywordState?.spellboostCount, newCost: c.cost });
 
                 // run in-hand effects for this card
                 handleSpellboostKeywordEffects(owner, c);
-            }
-        }
-
-        // --- Board-wide reactions to spellboost (e.g., Runeblade-style buffs) ---
-        for (const c of board) {
-            const kw = getSpellboostKeyword(c);
-            if (!kw || !Array.isArray(kw.effects) || kw.effects.length === 0 as any) continue;
-
-            for (const effect of kw.effects) {
-                // pass the board card as source so buff_self hits itself
-                runEffects([effect], owner, c);
             }
         }
     }
 
     adapter.render();
 }
-
 

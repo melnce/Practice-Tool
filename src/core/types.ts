@@ -1,3 +1,5 @@
+import { KeywordState } from "../logic/core/keywords/types.js";
+
 export type Player = "blue" | "red";
 
 export type EffectOp =
@@ -170,6 +172,8 @@ export interface CardInstance extends CardTemplate {
 
     // Runtime counters
     spellboostCount?: number;
+    keywordState?: KeywordState;
+
 
     // UI
     __uiFlashBarrier?: boolean;
