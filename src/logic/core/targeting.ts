@@ -224,7 +224,10 @@ export function highlightSelectable(cards: CardInstance[]) {
     adapter.render();
 }
 
+import { guardLifecycle } from "./targeting/guards.js";
+
 export function clearSelectableFlags() {
+    guardLifecycle("clearSelectableFlags");
     [...state.blueBoard, ...state.redBoard, ...state.blueHand, ...state.redHand].forEach(c => {
         if (c) delete (c as any).__uiSelectable;
     });

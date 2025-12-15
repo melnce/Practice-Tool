@@ -64,3 +64,18 @@ export function handleEvolveTarget(eff: any, owner: Player, context: any = {}) {
 
     handleEvolveSelf(target, owner, { mode, spendPoint, runEvoEffects: true });
 }
+
+export function handleEvolveLastSummoned(owner: Player) {
+    console.log(`[evolve_last_summoned] LastSummoned length: ${state.lastSummoned?.length}`);
+    if (!state.lastSummoned || state.lastSummoned.length === 0) return;
+
+    // Create a copy to avoid mutation issues during iteration if evolve triggers further summons (unlikely but safe)
+    const targets = [...state.lastSummoned];
+
+    for (const card of targets) {
+        console.log(`[evolve_last_summoned] Checking card: ${card.name} (${card.uid}) Zone: ${card.zone} Type: ${card.type} Evolved: ${card.hasEvolved}`);
+        if (card.zone === "board" && card.type === "Follower" && !card.hasEvolved) {
+            handleEvolveSelf(card, owner, { spendPoint: false });
+        }
+    }
+}

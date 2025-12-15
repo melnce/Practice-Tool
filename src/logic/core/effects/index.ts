@@ -28,12 +28,12 @@ import { handleDestroy, handleDestroyHighest, destroyAlliedAmulets, handleDestro
 import { handleDraw, handleDrawAllNamedWithKeyword, handleDrawFiltered, handleAddToHand, handleDrawComboFollower, handleDrawOpponent, handleDrawNamed } from "../../effects/ops/draw.js";
 import { consumeEarthSigils } from "../../effects/ops/earth.js";
 import { handleDiscardSelectHand, handleTransformInHand, handleDiscardAllExceptNamed } from "../../effects/hand.js";
-import { handleKeyword, handleRemoveKeyword, handleKeywordSelf, handleConditionalKeyword } from "../keywords.js";
+import { handleKeyword, handleRemoveKeyword, handleKeywordSelf, handleConditionalKeyword, handleRemoveAbilities } from "../keywords.js";
 import { handleHealLeader, handleRecoverPP, handleSetMaxHP, handleDynamicHealLeader, handleLeaderBarrierOp, applyLeaderDamage, handleRecoverEP } from "../../effects/leader.js";
 import { handleReanimate } from "../../effects/ops/reanimate.js";
 import { handleReturnHandToDeck } from "../../effects/ops/returnHandToDeck.js";
 import { handleRepeatEffect } from "../../effects/repeat.js";
-import { handleEvolveSelf } from "../../effects/ops/evolve.js";
+import { handleEvolveSelf, handleEvolveLastSummoned } from "../../effects/ops/evolve.js";
 import { handleBuffSelf, handleDestroySelf, handleBanishSelf, handleDynamicBuffSelf } from "../../effects/self.js";
 import { spellboostHand, handleSetSpellboostCount } from "../../effects/ops/spellboost.js";
 import {
@@ -114,6 +114,8 @@ function notifyLootPlayed(owner: Player, sourceCard: CardInstance | null) {
 
 
 // --- The Master Effect Runner ---
+import { guardLifecycle } from "../targeting/guards.js";
+
 /**
  * Main effect dispatcher. Processes a queue of effects sequentially.
  * @param {Array<object>} effects - Array of effect objects to process.
@@ -122,6 +124,7 @@ function notifyLootPlayed(owner: Player, sourceCard: CardInstance | null) {
  * @param {object} [context={}] - Shared context for targeting and chaining.
  */
 export function runEffects(effects: Effect[], owner: Player, sourceCard: CardInstance | null, context?: any) {
+    guardLifecycle("runEffects");
     if (!effects || effects.length === 0) return;
 
     // We do NOT stop execution if one fails; we process queue.
@@ -310,7 +313,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "halve_deck_cost": handleHalveDeckCost(owner); break;
             case "hand_count_gate": { const pass = handCountGate(owner, eff); const next = pass ? (eff.effects || []) : (eff.else_effects || []); if (next.length) queue.unshift(...next); break; }
             case "heal_leader": { handleHealLeader(owner, eff); logEvent("healLeader", { owner, amount: eff.amount }); const targetOwner = (eff.player || "self") === "self" ? owner : (owner === "blue" ? "red" : "blue"); const fx = processCrestEvent(targetOwner, "heal_leader"); if (fx.length) { queue.unshift(...fx); } break; }
-            case "gain_crest": handleGainCrest(eff as any, owner); break;
+
             case "grant_trigger": {
                 const targets = (context?.targets && context.targets.length) ? context.targets : (sourceCard ? [sourceCard] : []);
                 for (const t of targets) {
@@ -351,6 +354,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "reduce_countdown": handleReduceCountdown(sourceCard, eff); break;
             case "reduce_deck_followers_cost": { const amt = parseInt(String(eff.amount ?? 1)) || 1; reduceDeckFollowersCost(owner, amt); break; }
             case "remove_keyword": if (handleRemoveKeyword(eff as any, owner) === "pending") return; break;
+            case "remove_abilities": if (handleRemoveAbilities(eff as any, owner, queue, context) === "pending") return; break;
             case "replace_deck": handleReplaceDeck(owner, eff); break;
             case "replace_deck_with_set_minus": { import("../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => { replaceDeckWithSetMinus(owner, eff).then(() => adapter.render()); }); break; }
             case "restore_full_defense_self": handleRestoreFullDefenseSelf(sourceCard!, context); break;
@@ -407,6 +411,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "super_evolve_ally": { import("../../evolveUtils.js").then(({ superEvolveAllyFromContext }) => { superEvolveAllyFromContext(owner, sourceCard, context); }); break; }
             case "super_evolved_allied_gate": handleSuperEvolvedAlliedGate(owner, eff, queue); break;
             case "evolved_allied_gate": handleEvolvedAlliedGate(owner, eff, queue); break;
+            case "evolve_last_summoned": handleEvolveLastSummoned(owner); logEvent("evolve", { owner, card: "(last summoned)" }); break;
             case "super_evolve_self": handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false }); break;
             case "super_evolved_self_gate": { const isSuper = sourceCard && sourceCard.evoType === "super"; const next = (isSuper ? eff.effects : eff.else_effects) || []; if (next.length) { queue.unshift(...next); } break; }
             case "summon_destroyed_amulet_highest_base_cost": handleSummonDestroyedAmuletHighestBaseCost(owner); logEvent("summon", { owner, name: "(highest cost destroyed amulet)" }); break;

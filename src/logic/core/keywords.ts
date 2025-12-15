@@ -368,6 +368,45 @@ export function clearCantAttack(card: CardInstance) {
     delete c.cantAttackOwner;
 }
 
+export function handleRemoveAbilities(eff: Effect, owner: Player, effectsQueue: any, context: any = {}) {
+    const targets = (context.targets && context.targets.length > 0 && !eff.target)
+        ? context.targets
+        : getPool(eff.target, owner, context.sourceCard, eff.condition, context);
+
+    if (eff.select && !context.targets) {
+        return resolveSelectionQuery(eff, owner, targets, context.sourceCard, effectsQueue);
+    }
+
+    if (!targets || targets.length === 0) return "done";
+
+    for (const card of targets) {
+        // Clear boolean flags
+        card.hasRush = false;
+        card.hasStorm = false;
+        card.hasWard = false;
+        card.hasBane = false;
+        card.hasDrain = false;
+        card.hasAmbush = false;
+        card.hasIntimidate = false;
+        card.hasLastWords = false;
+        (card as any).hasBarrier = false;
+        (card as any).hasAura = false;
+
+        // Clear complex properties
+        (card as any).triggers = [];
+        (card as any).keywords = [];
+        (card as any).fanfare = [];
+        (card as any).lastWordsEffects = [];
+        (card as any).strikeEffects = [];
+        (card as any).engageEffects = [];
+        (card as any).enhanceTiers = [];
+
+        // Clear Cant Attack
+        clearCantAttack(card);
+    }
+    return "done";
+}
+
 // Called at end-of-turn: if the *owner* of a locked card just ended their turn,
 // the “until opponent EOT” lock has served its purpose → clear it.
 export function clearExpiredCantAttackAtEOT(endedPlayer: Player) {

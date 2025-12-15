@@ -20,6 +20,7 @@ export function makeCardFromDB(cardData: CardTemplate, owner: Player): CardInsta
 export function pushToBoard(board: CardInstance[], owner: Player, card: CardInstance) {
     // Respect max board size 5
     if (board.length >= 5) return false;
+    card.zone = "board";
     board.push(card);
 
     // Increment Rally if follower

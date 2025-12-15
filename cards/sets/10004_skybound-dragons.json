@@ -1292,7 +1292,8 @@
         ]
       },
       {
-        "op": "gain_earth_sigil",
+        "op": "summon_named",
+        "name": "Magic Sediment",
         "count": 2
       }
     ],
@@ -1326,8 +1327,10 @@
         "cost": 2,
         "effects": [
           {
-            "op": "evolve_all_allies_named",
-            "name": "Mireille & Risette, Penitent Duo"
+            "op": "evolve_last_summoned"
+          },
+          {
+            "op": "evolve_self"
           }
         ]
       }
@@ -1347,11 +1350,53 @@
     "class": "Runecraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Select aModeto activate.\n1. Draw a card. Deal 4 damage to a random enemy follower.\n2. Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader.",
+    "description": "Select a Mode to activate.\n1. Draw a card. Deal 4 damage to a random enemy follower.\n2. Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10432310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10432310-unleashed",
+    "spell": [
+      {
+        "op": "choose",
+        "select_count": 1,
+        "options": [
+          {
+            "name": "Draw a card. Deal 4 damage to a random enemy follower.",
+            "effects": [
+              {
+                "op": "draw",
+                "count": 1
+              },
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 4
+              }
+            ]
+          },
+          {
+            "name": "Draw 2 cards. Deal 4 damage to 2 random enemy followers and 2 damage to your leader.",
+            "effects": [
+              {
+                "op": "draw",
+                "count": 2
+              },
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 4,
+                "count": 2
+              },
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -1359,7 +1404,7 @@
   },
   {
     "id": "10433110",
-    "name": "Elmott, Remembrance Aflame",
+    "name": "Elmott, Remembrance Alflame",
     "cost": "3",
     "attack": "2",
     "defense": "1",
@@ -1367,43 +1412,53 @@
     "class": "Runecraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.Super-Evolve: GainCrest: Elmott, Remembrance Aflame.",
+    "description": "Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.\nSuper-Evolve: Gain Crest: Elmott, Remembrance Alflame.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10433110.webp",
-    "evo_image": "",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10433110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10433110-elmott-remembrance-aflame",
-    "evolve": [],
-    "superevolve": [],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "10441210",
-    "name": "Vyrn, Li'l Red Dragon",
-    "cost": "2",
-    "attack": "2",
-    "defense": "2",
-    "type": "Follower",
-    "class": "Dragoncraft",
-    "rarity": "Bronze",
-    "tribes": [],
-    "description": "Fanfare: If super evolution is active, evolve this follower.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/10441210.webp",
-    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441210_evo.webp",
-    "set": "[10004] Skybound Dragons",
-    "url": "https://shadowverse.gg/cards/10441210-vyrn-lil-red-dragon",
     "fanfare": [
       {
-        "op": "super_evo_gate",
+        "op": "select",
+        "target": "enemy:follower",
+        "count": 1,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "remove_abilities",
+            "target": "selected"
+          },
+          {
+            "op": "damage",
+            "target": "selected",
+            "amount": 3
           }
         ]
       }
     ],
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "gain_crest",
+        "name": "Elmott, Remembrance Aflame",
+        "description": "At the start of your turn, deal 1 damage to the enemy leader.",
+        "image": "images/crests/elmott.png",
+        "triggers": [
+          {
+            "event": "start_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            },
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
