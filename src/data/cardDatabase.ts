@@ -21,8 +21,11 @@ export async function loadCardDatabase() {
     tokenCardData = {};
     cardIdMap = {};
 
-    let root = (window as any).APP_ROOT || '/';
-    if (root.includes(':5500') && !window.location.href.includes(':5500')) {
+    const win = (typeof window !== "undefined") ? (window as any) : {};
+    let root = win.APP_ROOT || '/';
+
+    // Guard against window.location access in Node environment
+    if (root.includes(':5500') && win.location && !win.location.href.includes(':5500')) {
         console.warn("Detected invalid APP_ROOT (5500). Fallback to /");
         root = '/';
     }
