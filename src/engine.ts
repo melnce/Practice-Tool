@@ -42,7 +42,7 @@ export function getState(): GameState {
  * Dispatch a centralized action to mutate state.
  * Currently wraps history commands.
  */
-import { playCard } from "./logic/core/playCard.js";
+import { playCard } from "./logic/core/playCard/index.js";
 import { attackFollower, attackLeader } from "./logic/core/combat.js";
 import { resolvePendingTarget } from "./logic/core/resolveTarget.js";
 

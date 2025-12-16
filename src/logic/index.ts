@@ -1,5 +1,5 @@
 // src/logic/index.ts
-export { playCard } from "./core/playCard.js";
+export { playCard } from "./core/playCard/index.js";
 export { useRedBoost } from "./boosts.js";
 export { endTurnBlue, endTurnRed } from "./core/turns.js";
 export { attackFollower, attackLeader, handleDropOnLeader } from "./core/combat.js";

@@ -1,4 +1,5 @@
 import { KeywordState } from "../logic/core/keywords/types.js";
+import { PlayedHistoryEntry } from "../logic/core/playCard/types.js";
 
 export type Player = "blue" | "red";
 
@@ -203,8 +204,8 @@ export interface GameState {
     blueGraveyard: CardInstance[];
     redGraveyard: CardInstance[];
 
-    bluePlayedHistory: CardInstance[];
-    redPlayedHistory: CardInstance[];
+    bluePlayedHistory: PlayedHistoryEntry[];
+    redPlayedHistory: PlayedHistoryEntry[];
     blueDestroyedHistory: CardInstance[];
     redDestroyedHistory: CardInstance[];
 

@@ -1,0 +1,38 @@
+// src/logic/core/playCard/amulet.ts
+// Amulet resolution logic. Pure logic, no rendering.
+
+import { state } from "../../../core/gameState.js";
+import { CardInstance, Player, Effect } from "../../../core/types.js";
+import { runEffects } from "../effects/index.js";
+import { pushPlayedHistory } from "./history.js";
+import { PlayOutcome } from "./types.js";
+import { applyKeywordsFromList } from "../keywords.js";
+import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
+
+/**
+ * Play an amulet card. Returns PlayOutcome without rendering.
+ */
+export function playAmulet(card: CardInstance, player: Player, chosenTier: { effects: Effect[] } | null): PlayOutcome {
+    pushPlayedHistory(player, card);
+    applyKeywordsFromList(card);
+
+    const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
+    toBoard.push(card);
+
+    mergeWitchsNewBrewOnPlay(card, player);
+
+    if (chosenTier && Array.isArray(chosenTier.effects) && chosenTier.effects.length) {
+        runEffects([...chosenTier.effects], player, card);
+    }
+
+    if (Array.isArray(card.fanfare) && card.fanfare.length) {
+        if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(card); }
+        runEffects([...card.fanfare], player, card, { enteringCard: card });
+    }
+
+    if (state.pendingTargetEffect) {
+        return { kind: "paused" };
+    }
+
+    return { kind: "done" };
+}
