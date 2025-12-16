@@ -9,8 +9,6 @@ import { injectCardForTest, resetCardDatabaseForTests } from "../../src/data/car
 describe("Bounce Mechanics", () => {
     beforeEach(() => {
         resetGameState();
-        // Reset DB to ensure isolation
-        resetCardDatabaseForTests();
         // Inject the test card into the DB so fetchBaseCopyByName works
         injectCardForTest(vanillaFollower);
     });

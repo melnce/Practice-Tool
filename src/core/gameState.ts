@@ -116,7 +116,12 @@ export function resetGameState(): void {
   // A) Clear arrays in-place
   // We assume strict invariants: these keys MUST exist and MUST be arrays.
   for (const key of ARRAY_KEYS) {
-    state[key].length = 0;
+    if (Array.isArray(state[key])) {
+      state[key].length = 0;
+    } else {
+      // Recovery from corruption (e.g. tests)
+      (state as any)[key] = [];
+    }
   }
 
   // B) Reset scalars

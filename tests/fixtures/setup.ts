@@ -87,5 +87,12 @@ if (typeof window === "undefined") {
     };
 }
 
+import { beforeEach } from "vitest";
+import { resetCardDatabaseForTests } from "../../src/data/cardDatabase.js";
+
+beforeEach(() => {
+    resetCardDatabaseForTests();
+});
+
 export { };
 

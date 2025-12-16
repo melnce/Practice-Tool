@@ -8,7 +8,6 @@ import { injectCardForTest, resetCardDatabaseForTests } from "../../src/data/car
 describe("Reanimate Mechanics", () => {
     beforeEach(() => {
         resetGameState();
-        resetCardDatabaseForTests();
         injectCardForTest(vanillaFollower);
     });
 

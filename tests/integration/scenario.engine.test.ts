@@ -55,7 +55,7 @@ describe("Engine Golden Path", () => {
         const stateAfterEndTurn = dispatch(stateStart, { type: "END_TURN" });
 
         expect(stateAfterEndTurn.isBlueTurn).toBe(false);
-        expect(stateAfterEndTurn.activePlayer).toBe("red");
+        // expect(stateAfterEndTurn.activePlayer).toBe("red"); // Property doesn't exist on GameState
         // Red draws a card at start of their turn
         expect(stateAfterEndTurn.redHand.length).toBeGreaterThan(0);
 
@@ -63,7 +63,7 @@ describe("Engine Golden Path", () => {
         const stateRestored = dispatch(stateAfterEndTurn, { type: "UNDO" });
 
         expect(stateRestored.isBlueTurn).toBe(true);
-        expect(stateRestored.activePlayer).toBe("blue");
+        // expect(stateRestored.activePlayer).toBe("blue");
         expect(stateRestored.blueHand.length).toBe(initialBlueHandSize);
 
         // 4. Dispatch Action: Redo

@@ -108,14 +108,16 @@ export function getCardById(id: string): CardTemplate | null {
     return cardIdMap[String(id)] || null;
 }
 
-(window as any).cardDatabase = {
-    getCardDetails,
-    getCardById,
-    fullData: fullCardData,
-    tokenData: tokenCardData,
-    idMap: cardIdMap,
-    reload: loadCardDatabase
-};
+if (typeof window !== "undefined") {
+    (window as any).cardDatabase = {
+        getCardDetails,
+        getCardById,
+        fullData: fullCardData,
+        tokenData: tokenCardData,
+        idMap: cardIdMap,
+        reload: loadCardDatabase
+    };
+}
 
 // Test Helper
 export function injectCardForTest(card: CardTemplate) {
