@@ -77,6 +77,7 @@ export function compileCardText(text: string, type: string): CompiledOutput {
 
         // Compile Effect
         const effect = parseEffect(chunk);
+        // console.log(`[Compiler] Parsing chunk: "${chunk}" ->`, effect);
 
         if (effect) {
             if (currentSection === "fanfare") output.fanfare.push(effect);
@@ -104,7 +105,7 @@ function parseEffect(clause: string): Effect | null {
     // 2. Deal Damage
     // "Deal X damage to an enemy follower."
     // "Deal X damage to the enemy leader."
-    const dmgMatch = clause.match(/^Deal (\d+) damage to (an enemy follower|the enemy leader)\.?$/i);
+    const dmgMatch = clause.match(/^Deal (\d+) damage(?: to (an enemy follower|the enemy leader))?\.?$/i);
     if (dmgMatch) {
         const amt = parseInt(dmgMatch[1] ?? "0");
         const targetStr = (dmgMatch[2] ?? "").toLowerCase();
@@ -125,7 +126,11 @@ function parseEffect(clause: string): Effect | null {
                 effects: [{ op: "damage", amount: amt }]
             };
         } else if (targetStr.includes("leader")) {
-            return { op: "damage_follower_or_leader", amount: amt, target: "enemy_leader" }; // Or generic damage with target
+            return { op: "damage_follower_or_leader", amount: amt, target: "enemy_leader" };
+        } else {
+            // Implicit / Generic
+            // "Deal X damage." -> Default to simple damage op?
+            return { op: "damage", amount: amt };
         }
     }
 

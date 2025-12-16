@@ -1,0 +1,242 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+node.exe : [90mstderr[2m 
+| tests/unit/cards/mireille.
+test.ts
+Au caractère Ligne:1 : 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo          
+    : NotSpecifi    ed: 
+([90mstderr[    
+2m...ireille.test.    
+ts:String) [], Rem    
+oteException
+    + FullyQualifiedEr    
+rorId : NativeComm    
+andError
+ 
+[22m[39mCannot set 
+navigator
+
+[90mstderr[2m | tests/unit
+/cards.importer.test.ts
+[22m[39mCannot set 
+navigator
+
+[90mstderr[2m | tests/unit
+/cards/unleashed.test.ts
+[22m[39mCannot set 
+navigator
+
+ [31mÔØ»[39m tests/unit/cards/unleashed.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m should have the correct spell effects[39m[32m 2[2mms[22m[39m
+ [31mÔØ»[39m tests/unit/cards.importer.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 8[2mms[22m[39m
+[31m     [31m├ù[31m should extract keywords[39m[32m 5[2mms[22m[39m
+     [32mÔ£ô[39m should parse 'Draw X cards'[32m 1[2mms[22m[39m
+     [32mÔ£ô[39m should parse 'Deale X damage to an enemy follower'[32m 1[2mms[22m[39m
+     [32mÔ£ô[39m should capture unresolved text[32m 0[2mms[22m[39m
+[90mstdout[2m | tests/unit/cards/mireille.test.ts
+[22m[39mTargeting Module State ID: [33m0.7139564658172635[39m
+
+[90mstdout[2m | tests/unit/cards/mireille.test.ts[2m > [22m[2mMireille & Risette Fix[2m > [22m[2mhandleEvolveLastSummoned should evolve only cards in state.lastSummoned
+[22m[39m[evolve_last_summoned] LastSummoned length: 1
+[evolve_last_summoned] Checking card: Mireille Token (token1) Zone: board Type: Follower Evolved: false
+
+ [31mÔØ»[39m tests/unit/cards/mireille.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 7[2mms[22m[39m
+[31m     [31m├ù[31m handleEvolveLastSummoned should evolve only cards in state.lastSummoned[39m[32m 4[2mms[22m[39m
+[31m     [31m├ù[31m JSON Data Verification: Mireille uses correct ops[39m[32m 2[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[
+39m[1m[41m Failed Tests 4 
+[49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m te
+sts/unit/cards.importer.test
+.ts[2m > [22mCard Text 
+Compiler[2m > [22mshould 
+extract keywords
+[31m[1mAssertionError[22m
+: expected [] to have a 
+length of 1 but got +0[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1[39m
+[31m+ 0[39m
+
+[36m [2mÔØ»[22m tests/uni
+t/cards.importer.test.ts:[2
+m9:32[22m[39m
+    [90m  7| [39m        
+const result = 
+compileCardText("Storm. 
+Fanfare: Deal 1 damage.ÔÇª
+    [90m  8| [39m        
+[34mexpect[39m(result[33m.
+[39mkeywords)[33m.[39m[3
+4mtoContain[39m([32m"Storm
+"[39m)[33m;[39m
+    [90m  9| [39m        
+[34mexpect[39m(result[33m.
+[39mfanfare)[33m.[39m[34
+mtoHaveLength[39m([34m1[3
+9m)[33m;[39m
+    [90m   | [39m         
+                      
+[31m^[39m
+    [90m 10| [39m    
+})[33m;[39m
+    [90m 11| [39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/
+4]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m te
+sts/unit/cards/mireille.test
+.ts[2m > [22mMireille & 
+Risette Fix[2m > [22mhandl
+eEvolveLastSummoned should 
+evolve only cards in 
+state.lastSummoned
+[31m[1mReferenceError[22m
+: requestAnimationFrame is 
+not defined[39m
+[36m [2mÔØ»[22m 
+queueRender src/logic/evolve
+Utils.ts:[2m17:5[22m[39m
+    [90m 15| [39m    
+[35mif[39m 
+([35mtypeof[39m window 
+[33m===[39m 
+[32m"undefined"[39m) 
+[35mreturn[39m[33m;[39m 
+[90m// headless sim[39m
+    [90m 16| [39m    
+[35mif[39m (__raf) [34mca
+ncelAnimationFrame[39m(__ra
+f)[33m;[39m
+    [90m 17| [39m    
+__raf = 
+requestAnimationFrame(() => 
+{ __raf = null; try { 
+adapter.ÔÇª
+    [90m   | [39m    
+[31m^[39m
+    [90m 18| [39m}
+    [90m 19| [39m
+[90m [2mÔØ»[22m onEvolve 
+src/logic/evolveUtils.ts:[2
+m97:9[22m[39m
+[90m [2mÔØ»[22m 
+handleEvolveSelf src/logic/e
+ffects/ops/evolve.ts:[2m52:
+5[22m[39m
+[90m [2mÔØ»[22m 
+handleEvolveLastSummoned src
+/logic/effects/ops/evolve.ts
+:[2m77:13[22m[39m
+[90m [2mÔØ»[22m tests/uni
+t/cards/mireille.test.ts:[2
+m49:9[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/
+4]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m te
+sts/unit/cards/mireille.test
+.ts[2m > [22mMireille & 
+Risette Fix[2m > [22mJSON 
+Data Verification: Mireille 
+uses correct ops
+[31m[1mError[22m: 
+ENOENT: no such file or 
+directory, open 'C:\Projects
+\cards\sets\10004_skybound-d
+ragons.json'[39m
+[36m [2mÔØ»[22m tests/uni
+t/cards/mireille.test.ts:[2
+m69:32[22m[39m
+    [90m 67| [39m        
+[35mconst[39m path 
+[33m=[39m [35mawait[39m 
+[35mimport[39m([32m"path"
+[39m)[33m;[39m
+    [90m 68| [39m        
+const filePath = 
+path.resolve(__dirname, 
+"../../../../cards/seÔÇª
+    [90m 69| [39m        
+[35mconst[39m fileContent 
+[33m=[39m fs[33m.[39m[3
+4mreadFileSync[39m(filePath
+[33m,[39m [32m"utf-8"[39
+m)[33m;[39m
+    [90m   | [39m         
+                      
+[31m^[39m
+    [90m 70| [39m        
+[35mconst[39m cards 
+[33m=[39m [33mJSON[39m[
+33m.[39m[34mparse[39m(fil
+eContent)[33m;[39m
+    [90m 71| [39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/
+4]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m te
+sts/unit/cards/unleashed.tes
+t.ts[2m > [22mUnleashed 
+Card Data[2m > [22mshould 
+have the correct spell 
+effects
+[31m[1mError[22m: File 
+not found at C:\Projects\car
+ds\sets\10004_skybound-drago
+ns.json[39m
+[36m [2mÔØ»[22m tests/uni
+t/cards/unleashed.test.ts:[
+2m23:19[22m[39m
+    [90m 21| [39m
+    [90m 22| [39m        
+[35mif[39m ([33m![39mfs
+[33m.[39m[34mexistsSync[3
+9m(filePath)) {
+    [90m 23| [39m         
+   [35mthrow[39m 
+[35mnew[39m 
+[33mError[39m([32m`File 
+not found at [39m[36m${[3
+9mfilePath[36m}[39m[32m`
+[39m)[33m;[39m
+    [90m   | [39m         
+         [31m^[39m
+    [90m 24| [39m        }
+    [90m 25| [39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[4/
+4]ÔÄ»[22m[39m
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m3 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 22:48:24
+[2m   Duration [22m 519ms[2m (transform 427ms, setup 127ms, import 402ms, tests 18ms, environment 0ms)[22m
+

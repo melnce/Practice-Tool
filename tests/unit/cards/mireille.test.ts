@@ -15,6 +15,8 @@ import { CardInstance } from "../../../src/core/types.js";
 
 describe("Mireille & Risette Fix", () => {
     beforeEach(() => {
+        (globalThis as any).requestAnimationFrame = (cb: any) => setTimeout(cb, 1);
+        (globalThis as any).cancelAnimationFrame = (id: any) => clearTimeout(id);
         state.lastSummoned = [];
         state.blueBoard = [];
     });
@@ -49,13 +51,7 @@ describe("Mireille & Risette Fix", () => {
         handleEvolveLastSummoned(owner);
 
         // Assert
-        expect(token.hasEvolved).toBe(undefined); // Wait, handleEvolveSelf doesn't set hasEvolved IF we don't mock it or use real one.
-        // We are using the REAL handleEvolveSelf from the module import in `evolve.ts`? 
-        // No, we imported `handleEvolveLastSummoned` which imports `handleEvolveSelf` from the SAME file.
-        // So it executes logic: buffs stats, logs event.
-
-        // Let's check if stats changed.
-        expect(token.buffs).toBeDefined();
+        expect(token.hasEvolved).toBe(true); // Evolved
         expect(token.buffs?.attack).toBe(2); // Normal evo
 
         // Ensure other unit untouched (it wasn't in lastSummoned)
@@ -65,7 +61,7 @@ describe("Mireille & Risette Fix", () => {
     it("JSON Data Verification: Mireille uses correct ops", async () => {
         const fs = await import("fs");
         const path = await import("path");
-        const filePath = path.resolve(__dirname, "../../../../cards/sets/10004_skybound-dragons.json");
+        const filePath = path.resolve(__dirname, "../../../cards/sets/10004_skybound-dragons.json");
         const fileContent = fs.readFileSync(filePath, "utf-8");
         const cards = JSON.parse(fileContent);
 

@@ -8,7 +8,6 @@ if (typeof window === "undefined") {
 }
 
 import { state } from "../../../src/core/gameState.js";
-import { setupGame } from "../../../src/core/loop.js";
 
 describe("Unleashed Card Data", () => {
     it("should have the correct spell effects", async () => {
@@ -16,7 +15,7 @@ describe("Unleashed Card Data", () => {
         const path = await import("path");
         // Try resolving 3 levels up first, falling back to 4 if needed or just logging
         // Actually trust the pattern that worked for Mireille, but log the path.
-        const filePath = path.resolve(__dirname, "../../../../cards/sets/10004_skybound-dragons.json");
+        const filePath = path.resolve(__dirname, "../../../cards/sets/10004_skybound-dragons.json");
         // console.log("Test looking for JSON at:", filePath);
 
         if (!fs.existsSync(filePath)) {
