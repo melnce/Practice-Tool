@@ -58,6 +58,16 @@ export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstanc
         return "done";
     }
 
+    // NEW: If targets are explicitly provided in context (e.g. from test or pre-selection), use them directly.
+    if (context && Array.isArray(context.targets) && context.targets.length > 0) {
+        for (const t of context.targets) {
+            logEvent("damage", { target: t.name, uid: t.uid, amount: amt });
+            dealDamage(t, amt);
+        }
+        cleanupDead();
+        return "done";
+    }
+
     if (target.includes("leader")) {
         const isEnemy = target.includes("enemy");
         const targetPlayer = isEnemy ? (owner === "blue" ? "red" : "blue") : owner;

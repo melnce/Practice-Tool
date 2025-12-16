@@ -1,0 +1,56 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+node.exe : 
+[90mstderr[2m | tests
+/integration/stormyBlas
+t.test.ts
+Au caractère Ligne:1 : 
+1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([90mstderr[   
+ 2m...myBlast.test.    
+ts:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[22m[39mCannot set 
+navigator
+
+[90mstdout[2m | tests/integration/stormyBlast.test.ts
+[22m[39mTargeting Module State ID: [33m0.2101586745169537[39m
+
+[90mstdout[2m | tests/integration/stormyBlast.test.ts[2m > [22m[2mStormy Blast Damage Logic[2m > [22m[2mshould scale damage with spellboost count using add_amount
+[22m[39m[DamageDebug] Resolving add_amount: "{self.spellboostCount}" -> 3
+[DamageDebug] Context Source: Stormy Blast (SB: 3)
+
+[90mstderr[2m | tests
+/integration/stormyBlas
+t.test.ts[2m > 
+[22m[2mStormy Blast 
+Damage Logic[2m > 
+[22m[2mshould scale 
+damage with spellboost 
+count using add_amount
+[22m[39mRender 
+called but not injected
+
+ [32mÔ£ô[39m tests/integration/stormyBlast.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m   Start at [22m 22:57:45
+[2m   Duration [22m 496ms[2m (transform 330ms, setup 42ms, import 358ms, tests 3ms, environment 0ms)[22m
+

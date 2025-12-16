@@ -1,0 +1,117 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+node.exe : 
+[90mstderr[2m | tests
+/integration/stormyBlas
+t.test.ts
+Au caractère Ligne:1 : 
+1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: ([90mstderr[   
+ 2m...myBlast.test.    
+ts:String) [], Rem    
+oteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+[22m[39mCannot set 
+navigator
+
+[90mstdout[2m | tests/integration/stormyBlast.test.ts
+[22m[39mTargeting Module State ID: [33m0.5274826873024994[39m
+
+[90mstdout[2m | tests/integration/stormyBlast.test.ts[2m > [22m[2mStormy Blast Damage Logic[2m > [22m[2mshould scale damage with spellboost count using add_amount
+[22m[39m[DamageDebug] Resolving add_amount: "{self.spellboostCount}" -> 3
+[DamageDebug] Context Source: Stormy Blast (SB: 3)
+
+[90mstderr[2m | tests
+/integration/stormyBlas
+t.test.ts[2m > 
+[22m[2mStormy Blast 
+Damage Logic[2m > 
+[22m[2mshould scale 
+damage with spellboost 
+count using add_amount
+[22m[39mRender 
+called but not injected
+Render called but not 
+injected
+
+ [31mÔØ»[39m tests/integration/stormyBlast.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 8[2mms[22m[39m
+[31m     [31m├ù[31m should scale damage with spellboost count using add_amount[39m[32m 7[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»[39m[1m[41m 
+Failed Tests 1 [49m[2
+2m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»[39m
+
+[41m[1m FAIL 
+[22m[49m tests/integr
+ation/stormyBlast.test.
+ts[2m > [22mStormy 
+Blast Damage Logic[2m 
+> [22mshould scale 
+damage with spellboost 
+count using add_amount
+[31m[1mAssertionError
+[22m: expected 10 to 
+be 5 // Object.is 
+equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 5[39m
+[31m+ 10[39m
+
+[36m [2mÔØ»[22m test
+s/integration/stormyBla
+st.test.ts:[2m69:31[2
+2m[39m
+    [90m 67| [39m    
+    [90m// Expected 
+Damage: Base 2 + 
+Spellboost 3 = 5[39m
+    [90m 68| [39m    
+    [90m// Remaining 
+Defense: 10 - 5 = 
+5[39m
+    [90m 69| [39m    
+    [34mexpect[39m(en
+emy[33m.[39mdefense)
+[33m.[39m[34mtoBe[39
+m([34m5[39m)[33m;[3
+9m
+    [90m   | [39m    
+                       
+   [31m^[39m
+    [90m 70| [39m    
+})[33m;[39m
+    [90m 71| 
+[39m})[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]ÔÄ»[2
+2m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m   Start at [22m 22:56:13
+[2m   Duration [22m 556ms[2m (transform 370ms, setup 44ms, import 403ms, tests 8ms, environment 0ms)[22m
+
