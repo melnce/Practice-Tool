@@ -19,12 +19,18 @@ describe("Engine Invariants", () => {
     it("should throw if state is invalid BEFORE dispatch", async () => {
         const state = await startNewGame({ deckAId: "sample_blue", deckBId: "sample_red", seed: 1 });
 
-        // Corrupt state
-        (state as any).blueHand = null; // Invalid!
+        // Helper to restore state
+        const originalBlueHand = (state as any).blueHand;
+        try {
+            // Corrupt state
+            (state as any).blueHand = null; // Invalid!
 
-        expect(() => {
-            dispatch(state, { type: "END_TURN" });
-        }).toThrow(/Invariant failed BEFORE END_TURN/);
+            expect(() => {
+                dispatch(state, { type: "END_TURN" });
+            }).toThrow(/Invariant failed BEFORE END_TURN/);
+        } finally {
+            (state as any).blueHand = originalBlueHand;
+        }
     });
 
     it("should throw if state is invalid AFTER dispatch", async () => {
