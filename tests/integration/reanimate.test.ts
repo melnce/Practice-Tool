@@ -3,11 +3,12 @@ import { state, resetGameState } from "../../src/core/gameState";
 import { runEffects } from "../../src/logic/core/effects";
 import { makeUid } from "../../src/core/rng";
 import { vanillaFollower } from "../fixtures/utils/testCards";
-import { injectCardForTest } from "../../src/data/cardDatabase";
+import { injectCardForTest, resetCardDatabaseForTests } from "../../src/data/cardDatabase";
 
 describe("Reanimate Mechanics", () => {
     beforeEach(() => {
         resetGameState();
+        resetCardDatabaseForTests();
         injectCardForTest(vanillaFollower);
     });
 

@@ -125,3 +125,9 @@ export function injectCardForTest(card: CardTemplate) {
         cardIdMap[String(card.id)] = card;
     }
 }
+
+export function resetCardDatabaseForTests() {
+    fullCardData = {};
+    tokenCardData = {};
+    cardIdMap = {};
+}

@@ -1,0 +1,22 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+node.exe : [90mstderr[2m | tests/unit/targeting.test.ts
+Au caractère Ligne:1 : 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo              : NotSpecifi    ed: ([90mstderr[    2m...rgeting.test.    ts:String) [], Rem    oteException
+    + FullyQualifiedEr    rorId : NativeComm    andError
+ 
+[22m[39mCannot set navigator
+
+[90mstdout[2m | tests/unit/targeting.test.ts
+[22m[39mTargeting Module State ID: [33m0.33021327364620534[39m
+
+ [32mÔ£ô[39m tests/unit/targeting.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m   Start at [22m 22:34:31
+[2m   Duration [22m 187ms[2m (transform 67ms, setup 24ms, import 62ms, tests 3ms, environment 0ms)[22m
+

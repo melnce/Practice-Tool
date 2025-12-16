@@ -4,11 +4,13 @@ import { state, resetGameState } from "../../src/core/gameState";
 import { runEffects } from "../../src/logic/core/effects";
 import { makeUid } from "../../src/core/rng";
 import { vanillaFollower } from "../fixtures/utils/testCards";
-import { injectCardForTest } from "../../src/data/cardDatabase";
+import { injectCardForTest, resetCardDatabaseForTests } from "../../src/data/cardDatabase";
 
 describe("Bounce Mechanics", () => {
     beforeEach(() => {
         resetGameState();
+        // Reset DB to ensure isolation
+        resetCardDatabaseForTests();
         // Inject the test card into the DB so fetchBaseCopyByName works
         injectCardForTest(vanillaFollower);
     });
@@ -41,7 +43,7 @@ describe("Bounce Mechanics", () => {
         expect(state.blueHand[0].uid).not.toBe(unit.uid);
     });
 
-    it("should fail to bounce if hand is full (9 cards)", () => {
+    it("should burn bounced follower to graveyard if hand is full (9 cards)", () => {
         const unit = { ...vanillaFollower, uid: makeUid(), owner: "blue" as const };
         state.blueBoard = [unit];
         state.blueHand = Array(9).fill({ ...vanillaFollower, uid: "filler", owner: "blue" as const });
