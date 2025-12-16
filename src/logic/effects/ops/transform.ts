@@ -169,7 +169,9 @@ export function transformRandomSpellInHand(owner: Player, intoName = "Ersatz Eli
     if (!spells.length) return;
 
     const pick = spells[randInt(spells.length)];
+    if (!pick) return;
     const uid = pick.uid;
+
 
     // transform in hand (preserves uid/cost_mod/etc.)
     transformHandTarget(pick, intoName);

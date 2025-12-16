@@ -91,8 +91,9 @@ export function canPlayCard(card: CardInstance, player: Player): PreflightResult
     }
 
     // 1) ID-based bespoke check (if exists)
-    if (card.id && CARD_PREFLIGHT[card.id]) {
-        const result = CARD_PREFLIGHT[card.id](ctx);
+    const preflight = card.id ? CARD_PREFLIGHT[card.id] : undefined;
+    if (preflight) {
+        const result = preflight(ctx);
         if (!result.ok) return result;
     }
 

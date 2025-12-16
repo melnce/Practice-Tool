@@ -107,7 +107,7 @@ export function makeChainDecayClone(prev: CardInstance, owner: Player): CardInst
  * 
  * Logic generalized from Congregant of Unkilling to work for any card.
  */
-export function handleFillBoardChainDecay(owner: Player, enteringCard: CardInstance) {
+export function handleFillBoardChainDecay(owner: Player, enteringCard: CardInstance | null) {
     if (!enteringCard || enteringCard.type !== "Follower") return;
 
     // Don’t start a new cascade from chain-spawned copies

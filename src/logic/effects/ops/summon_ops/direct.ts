@@ -73,7 +73,7 @@ export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
     // Deep clone current instance (no cycles)
     const clone = (typeof structuredClone === "function")
         ? structuredClone(sourceCard)
-        : safeClone(sourceCard);
+        : safeClone<CardInstance>(sourceCard);
 
     // Normalize instance identity/placement
     clone.uid = makeUid();
@@ -89,10 +89,8 @@ export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
     clone.buffs = clone.buffs || {};
 
     // Follower init similar to summonExactCopyFromHand
-    // @ts-ignore
-    clone.attack = parseInt(clone.attack as any) || 0;
-    // @ts-ignore
-    clone.defense = parseInt(clone.defense as any) || 0;
+    clone.attack = parseInt(String(clone.attack || 0), 10) || 0;
+    clone.defense = parseInt(String(clone.defense || 0), 10) || 0;
 
     if (clone.base_attack == null) clone.base_attack = clone.attack;
     if (clone.base_defense == null) clone.base_defense = clone.defense;

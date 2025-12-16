@@ -56,7 +56,9 @@ export function compileCardText(text: string, type: string): CompiledOutput {
     const chunks = text.split(/(?:\r?\n|(?<=\.)\s+)/).map(s => s.trim()).filter(Boolean);
 
     for (let i = 0; i < chunks.length; i++) {
-        let chunk = chunks[i];
+        const rawChunk = chunks[i];
+        if (rawChunk === undefined) continue;
+        let chunk: string = rawChunk;
 
         // Detect Section Headers
         if (/^Fanfare:?/i.test(chunk)) {
@@ -94,7 +96,8 @@ function parseEffect(clause: string): Effect | null {
     // "Draw a card." / "Draw 2 cards."
     const drawMatch = clause.match(/^Draw (\d+|a) cards?\.?$/i);
     if (drawMatch) {
-        const count = drawMatch[1].toLowerCase() === "a" ? 1 : parseInt(drawMatch[1]);
+        const matchVal = drawMatch[1];
+        const count = matchVal?.toLowerCase() === "a" ? 1 : parseInt(matchVal ?? "1");
         return { op: "draw", count };
     }
 
@@ -103,8 +106,8 @@ function parseEffect(clause: string): Effect | null {
     // "Deal X damage to the enemy leader."
     const dmgMatch = clause.match(/^Deal (\d+) damage to (an enemy follower|the enemy leader)\.?$/i);
     if (dmgMatch) {
-        const amt = parseInt(dmgMatch[1]);
-        const targetStr = dmgMatch[2].toLowerCase();
+        const amt = parseInt(dmgMatch[1] ?? "0");
+        const targetStr = (dmgMatch[2] ?? "").toLowerCase();
         // Map target string to conventions (if resolveTarget supports them)
         // Our engine usually requires explicit selection or random.
         // "Deal X to an enemy follower" usually implies target SELECTION if not "random".
@@ -130,8 +133,9 @@ function parseEffect(clause: string): Effect | null {
     // "Summon a <Name>." / "Summon 2 <Name>s."
     const summonMatch = clause.match(/^Summon (\d+|a|an) (.+?)(?:s)?\.?$/i);
     if (summonMatch) {
-        const count = (summonMatch[1].toLowerCase() === "a" || summonMatch[1].toLowerCase() === "an") ? 1 : parseInt(summonMatch[1]);
-        const name = summonMatch[2]; // Clean up plurals? "Knight" vs "Knights"
+        const countStr = (summonMatch[1] ?? "a").toLowerCase();
+        const count = (countStr === "a" || countStr === "an") ? 1 : parseInt(countStr);
+        const name = summonMatch[2] ?? "Unknown"; // Clean up plurals? "Knight" vs "Knights"
         // Heuristic: remove trailing 's' if not part of name? Name matching is hard.
         // Assuming user provides singular names or we fix later.
 

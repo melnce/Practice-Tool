@@ -168,7 +168,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "banish_all_enemy_copies": { const target = context?.selectedCard || (context?.targets?.[0] || null); if (target) { handleBanishAllEnemyCopies(owner, target); } break; }
             case "banish_duplicates_from_deck": handleBanishDuplicatesFromDeck(owner); return "done";
             case "banish_random": handleBanishRandom(eff, owner); break;
-            case "banish_self": handleBanishSelf(sourceCard as any, owner); break;
+            case "banish_self": if (sourceCard) handleBanishSelf(sourceCard, owner); break;
             case "both_max_pp_gate": handleBothMaxPPGate(eff, queue); break;
             case "max_pp_gate": handleMaxPPGate(owner, eff, queue); break;
             case "board_name_gate": {
@@ -182,12 +182,9 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "buff_hand_class": handleBuffHandClass(eff, owner); break;
             case "buff_last_added_to_hand": handleBuffLastAddedToHand(eff, owner); break;
             case "buff_self":
-                try {
-                    handleBuffSelf(sourceCard, eff);
-                } catch (e) {
-                    console.log("[ERROR] buff_self failed:", e);
-                }
+                if (sourceCard) handleBuffSelf(sourceCard, eff);
                 break;
+
             case "buff_hand_tribe": handleBuffHandTribe(eff, owner); break;
 
             case "choose": if (handleChoose(eff, owner, sourceCard, queue) === "pending") return; break;
@@ -211,7 +208,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "damage": if (handleDamage(eff as any, owner, sourceCard, queue, context) === "pending") return; break;
             case "damage_all": handleDamageAll(eff as any, owner, sourceCard); break;
             case "damage_all_by_allied_golems": handleDamageAllByAlliedGolems(eff, owner); break;
-            case "damage_enemy_leader_by_other_allies": handleDamageEnemyLeaderByOtherAllies(owner, sourceCard!); break;
+            case "damage_enemy_leader_by_other_allies": if (sourceCard) handleDamageEnemyLeaderByOtherAllies(owner, sourceCard); break;
             case "damage_follower_or_leader": if (handleDamageFollowerOrLeader(eff, owner, sourceCard, queue) === "pending") return; break;
             case "damage_highest_defense": handleDamageHighestDefense(eff, owner, sourceCard); break;
             case "damage_random": handleDamageRandom(eff as any, owner); break;
@@ -254,7 +251,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "destroy_highest": handleDestroyHighest(eff, owner); break;
             case "destroy_random": handleDestroyRandom(eff, owner, context); break;
             case "destroy_random_other_allies": handleDestroyRandomOtherAllies(owner, sourceCard!, context); break;
-            case "destroy_self": handleDestroySelf(sourceCard); cleanupDead(); break;
+            case "destroy_self": if (sourceCard) { handleDestroySelf(sourceCard); cleanupDead(); } break;
             case "destroy_then": {
                 const destroyed = handleDestroy(eff, owner, [], context, sourceCard);
                 if (destroyed === "pending") return destroyed;
@@ -272,7 +269,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "draw_filtered": handleDrawFiltered(eff, owner); break;
             case "draw_named": handleDrawNamed(eff, owner); break;
             case "draw_opponent": handleDrawOpponent(eff, owner); break;
-            case "dynamic_buff_self": handleDynamicBuffSelf(sourceCard, eff as any, owner); break;
+            case "dynamic_buff_self": if (sourceCard) handleDynamicBuffSelf(sourceCard, eff as any, owner); break;
             case "dynamic_heal_leader": handleDynamicHealLeader(owner, eff); logEvent("healLeader", { owner, amount: eff.amount }); break;
             case "earth_rite": if (consumeEarthSigils(owner, (eff as any).cost || 1)) queue.unshift(...(eff.effects || [])); break;
             case "evolved_self_gate": handleEvolvedSelfGate(eff, owner, sourceCard!, queue); break;
@@ -309,7 +306,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
                 logEvent("evolve", { owner, card: "(multi-super)" });
                 break;
             }
-            case "evolve_self": handleEvolveSelf(sourceCard, owner, { spendPoint: false }); logEvent("evolve", { owner, card: sourceCard?.name }); break;
+            case "evolve_self": if (sourceCard) { handleEvolveSelf(sourceCard, owner, { spendPoint: false }); logEvent("evolve", { owner, card: sourceCard.name }); } break;
             case "fill_congregant_copies": handleFillCongregantCopies(owner, sourceCard); break;
             case "follower_strike_destroy": if (sourceCard && context?.defender) { resolveDestroy(context.defender, owner); cleanupDead(); } break;
             case "fuse_finalize_fortifier": logEvent("fuse", { owner, op: eff.op, source: sourceCard?.name }); break;
@@ -461,7 +458,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "super_evolved_allied_gate": handleSuperEvolvedAlliedGate(owner, eff, queue); break;
             case "evolved_allied_gate": handleEvolvedAlliedGate(owner, eff, queue); break;
             case "evolve_last_summoned": handleEvolveLastSummoned(owner); logEvent("evolve", { owner, card: "(last summoned)" }); break;
-            case "super_evolve_self": handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false }); break;
+            case "super_evolve_self": if (sourceCard) handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false }); break;
             case "super_evolved_self_gate": { const isSuper = sourceCard && sourceCard.evoType === "super"; const next = (isSuper ? eff.effects : eff.else_effects) || []; if (next.length) { queue.unshift(...next); } break; }
             case "summon_destroyed_amulet_highest_base_cost": handleSummonDestroyedAmuletHighestBaseCost(owner); logEvent("summon", { owner, name: "(highest cost destroyed amulet)" }); break;
             case "summon": {
@@ -519,8 +516,11 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             case "transform_in_hand": handleTransformInHand(eff, owner); break;
             case "transform_random_spell_in_hand": { transformRandomSpellInHand(owner, (eff as any).into || "Ersatz Elimination"); break; }
             case "transform_self_if_spellboost_at_least": return;
-            case "set_spellboost_count": handleSetSpellboostCount(eff, sourceCard!); break;
+            case "set_spellboost_count": if (sourceCard) handleSetSpellboostCount(eff, sourceCard); break;
 
+
+            case "spellboost": spellboostHand(owner, (eff.count ?? eff.times ?? 1) as number); break;
+            case "bounce": if (handleReturnToHand(eff, owner, sourceCard, queue) === "pending") return; break;
 
             default:
                 console.warn(`UNKNOWN EFFECT OPERATION: ${eff.op}`);

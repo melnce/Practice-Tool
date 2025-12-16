@@ -194,7 +194,7 @@ export function handleSelectHandSummonArtifactCopy(eff: Effect, owner: Player, e
         const base = parseInt(c?.cost as any, 10) || 0;
         const mod = parseInt(c?.cost_mod as any, 10) || 0;
         // @ts-ignore
-        const effCost = Number.isFinite(c?.effectiveCost) ? c.effectiveCost : base + mod;
+        const effCost: number = Number.isFinite((c as any).effectiveCost) ? (c as any).effectiveCost : base + mod;
         return effCost <= maxCost;
     });
 

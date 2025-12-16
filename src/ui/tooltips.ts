@@ -36,7 +36,7 @@ export function formatCardTooltip(card: CardInstance, owner: Player | null = nul
     const name = String(card?.name ?? "");
     const clazz = String(card?.class ?? "Neutral");
     const hasTribes = Array.isArray(card?.tribes) && card.tribes.length > 0;
-    const tribes = hasTribes ? card.tribes.join(", ") : "";
+    const tribes = hasTribes ? (card.tribes ?? []).join(", ") : "";
     const desc = (card?.description ?? "").trim();
 
     const classLine = hasTribes ? `${clazz}/${tribes}` : clazz;

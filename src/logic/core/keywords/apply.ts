@@ -78,7 +78,7 @@ export const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptio
         ks.hasRally = true;
         const need = Number(opts?.count ?? 0);
 
-        if (need > 0 && Array.isArray(opts.effects)) {
+        if (need > 0 && opts && Array.isArray(opts.effects)) {
             ks.rallyRequirement = need;
             ks.rallyEffects = opts.effects;
         }

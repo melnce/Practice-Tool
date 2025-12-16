@@ -146,7 +146,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
                 Number.isFinite(c?.effectiveCost) ? c.effectiveCost :
                     (Number(c?.cost) || 0) + (Number(c?.cost_mod) || 0)
             );
-            const eligible = ownerHand.filter(c =>
+            const eligible = ownerHand.filter((c: CardInstance) =>
                 c?.type === "Follower" &&
                 Array.isArray(c?.tribes) && c.tribes.includes("Artifact") &&
                 getEffectiveCost(c) <= 5
@@ -178,8 +178,8 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
         // Radiant Rainbow: require a Spellboost card in hand
         if (card.name && card.name.toLowerCase() === "radiant rainbow") {
             const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
-            const hasSB = ownerHand.some(c =>
-                Array.isArray(c.keywords) && c.keywords.some(k => (typeof k === "string" ? k : k?.name)?.toLowerCase?.() === "spellboost")
+            const hasSB = ownerHand.some((c: CardInstance) =>
+                Array.isArray(c.keywords) && c.keywords.some((k: string | { name?: string }) => (typeof k === "string" ? k : k?.name)?.toLowerCase?.() === "spellboost")
             );
             if (!hasSB) canAfford = false;
         }
@@ -215,7 +215,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
     // Necromancy
     const hasNecroGate = Array.isArray(card.fanfare) && card.fanfare.some(eff => eff.op === "necromancy_gate");
     const necromancyReady = isPlayersTurn && hasNecroGate &&
-        hasNecromancy(owner, card.fanfare.find(eff => eff.op === "necromancy_gate")?.cost || 0);
+        hasNecromancy(owner, (card.fanfare?.find((eff: Effect) => eff.op === "necromancy_gate") as Effect & { cost?: number })?.cost || 0);
 
     // Skybound Art (Yellow Glow)
     const hasSkybound = (Array.isArray(card.fanfare) && card.fanfare.some(eff => eff.op === "skybound_art_gate"))
@@ -253,7 +253,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
     // --- Faith (crest) gate: Sham-Nacha glows when Faith >= 10 ---
     const crests = owner === "blue" ? (state.blueCrests || []) : (state.redCrests || []);
     const faith = (() => {
-        const c = crests.find(x => String(x?.name).toLowerCase() === "faith");
+        const c = crests.find((x: CardInstance) => String(x?.name).toLowerCase() === "faith");
         // @ts-ignore
         return Number(c?.counters?.faith ?? 0);
     })();

@@ -3,9 +3,7 @@ import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { cleanupDead } from "../../core/cleanup.js";
 import { state } from "../../../core/gameState.js";
 import { runEffects } from "../../core/effects/index.js";
-// @ts-ignore
-// @ts-ignore
-// import { render } from "../../../ui/render.js";
+
 import { randInt } from "../../../core/rng.js";
 import { logEvent } from "../../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../../core/types.js";
@@ -31,14 +29,14 @@ function isSuperProtected(card: CardInstance, owner: Player) {
 // Destroy the highest attack followers (break ties randomly)
 export function handleDestroyHighest(eff: Effect, owner: Player) {
     const pool = getPool(eff.target as any, owner).filter(
-        (c) => c.type === "Follower" && (parseInt(c.defense as any, 10) || 0) > 0
+        (c) => c.type === "Follower" && (parseInt(String(c.defense), 10) || 0) > 0
     );
     if (!pool.length) return;
 
-    const highest = Math.max(...pool.map((c) => parseInt(c.attack as any, 10) || 0));
-    const top = pool.filter((c) => (parseInt(c.attack as any, 10) || 0) === highest);
+    const highest = Math.max(...pool.map((c) => parseInt(String(c.attack), 10) || 0));
+    const top = pool.filter((c) => (parseInt(String(c.attack), 10) || 0) === highest);
 
-    let n = Math.max(1, parseInt((eff.count as any) || 1, 10));
+    let n = Math.max(1, parseInt(String(eff.count || 1), 10));
     while (n-- > 0 && top.length) {
         const i = randInt(top.length);
         const pick = top.splice(i, 1)[0];
@@ -51,7 +49,7 @@ export function handleDestroyHighest(eff: Effect, owner: Player) {
 }
 
 // Destroy all from target (followers die; amulets move to grave + LW)
-export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardInstance = null as any, context: any = {}) {
+export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardInstance | null = null, context: any = {}) {
     let pool = getPool(
         (eff.target as any) || "all:follower",
         owner,
@@ -63,7 +61,7 @@ export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardIns
     pool = pool.filter(
         (c) =>
             c &&
-            ((c.type === "Follower" && (parseInt(c.defense as any, 10) || 0) > 0) ||
+            ((c.type === "Follower" && (parseInt(String(c.defense), 10) || 0) > 0) ||
                 c.type === "Amulet")
     );
     if (!pool.length) return;
@@ -93,6 +91,7 @@ export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardIns
             if (idx !== -1) {
                 logEvent("destroy", { target: card.name, uid: card.uid, type: card.type, reason: "destroy_all" });
                 const removed = board.splice(idx, 1)[0];
+                if (!removed) continue;
                 grave.push(removed);
                 if (cardOwner === "blue") state.blueShadows++;
                 else state.redShadows++;
@@ -107,7 +106,7 @@ export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardIns
 }
 
 // Targeted destroy (with selection UI)
-export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, context: any = {}, sourceCard: CardInstance = null as any) {
+export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, context: any = {}, sourceCard: CardInstance | null = null) {
     if (String(eff.target).toLowerCase().startsWith("selected")) {
         const targets = getPool(eff.target as any, owner, null, eff.condition, context);
         let count = 0;
@@ -127,7 +126,7 @@ export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, con
     ).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
 
     if (pool.length) {
-        logEvent("destroy_select", { owner, pool: pool.length, select: parseInt((eff.select ?? (eff as any).select_count ?? 1) as any, 10) });
+        logEvent("destroy_select", { owner, pool: pool.length, select: parseInt(String(eff.select ?? (eff as any).select_count ?? 1), 10) });
         state.pendingTargetEffect = {
             eff,
             owner,
@@ -135,7 +134,7 @@ export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, con
             resumeEffects: effectsQueue,
             pool,
             targets: [],
-            selectCount: parseInt((eff.select ?? (eff as any).select_count ?? 1) as any, 10),
+            selectCount: parseInt(String(eff.select ?? (eff as any).select_count ?? 1), 10),
         };
         highlightSelectable(pool);
         return "pending";
@@ -170,6 +169,7 @@ export function resolveDestroy(target: CardInstance, owner: Player) {
         const idx = board.indexOf(target);
         if (idx !== -1) {
             const removed = board.splice(idx, 1)[0];
+            if (!removed) return false;
             grave.push(removed);
             const lw = removed.keywordState?.lastWordsEffects || (removed as any).lastWordsEffects;
             if (removed.hasLastWords && Array.isArray(lw)) {
@@ -192,6 +192,7 @@ export function destroyAlliedAmulets(owner: Player) {
         if (!c || c.type !== "Amulet") continue;
 
         const removed = board.splice(i, 1)[0];
+        if (!removed) continue;
         logEvent("destroy", { target: removed.name, uid: removed.uid, type: "Amulet", reason: "destroy_allied_amulets" });
         grave.push(removed);
         if (owner === "blue") state.blueShadows++;
@@ -216,7 +217,7 @@ export function handleDestroyRandom(eff: Effect, owner: Player, context: any = {
         null,
         eff.condition,
         context
-    ).filter((c) => c && c.type === "Follower" && (parseInt(c.defense as any, 10) || 0) > 0);
+    ).filter((c) => c && c.type === "Follower" && (parseInt(String(c.defense), 10) || 0) > 0);
 
     if (!pool.length) return;
 
@@ -244,7 +245,7 @@ export function handleDestroyRandom(eff: Effect, owner: Player, context: any = {
     }
 
     // 3) pick & destroy
-    let n = Math.max(1, parseInt((eff.count as any) ?? 1, 10));
+    let n = Math.max(1, parseInt(String(eff.count ?? 1), 10));
     while (n-- > 0 && pool.length) {
         const idx = randInt(pool.length);
         const pick = pool.splice(idx, 1)[0];

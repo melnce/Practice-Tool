@@ -171,9 +171,11 @@ async function listDeckFiles() {
         if (r.ok) {
             const html = await r.text();
             const files = [...html.matchAll(/href="([^"]+\.json)"/gi)]
-                .map(m => decodeURIComponent(m[1]))
+                .map(m => m[1])
+                .filter((name): name is string => name !== undefined)
+                .map(name => decodeURIComponent(name))
                 .map(name => name.split('/').pop())        // keep only filename
-                .filter(name => name && !/manifest\.json$/i.test(name) && !/decks_index\.json$/i.test(name));
+                .filter((name): name is string => !!name && !/manifest\.json$/i.test(name) && !/decks_index\.json$/i.test(name));
             // @ts-ignore
             if (files.length) return [...new Set(files)];
         }

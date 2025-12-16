@@ -51,8 +51,8 @@ export type EffectOp =
 
 export interface BaseEffect {
     op: EffectOp;
-    effects?: Effect[]; // nested (success)
-    else_effects?: Effect[]; // nested (failure)
+    effects?: Effect[] | undefined; // nested (success)
+    else_effects?: Effect[] | undefined; // nested (failure)
     [key: string]: any;
 }
 
@@ -157,10 +157,10 @@ export interface CardTemplate {
 
     // Buff tracking
     buffs?: {
-        attack?: number;
-        defense?: number;
+        attack?: number | undefined;
+        defense?: number | undefined;
         [key: string]: any;
-    };
+    } | undefined;
 
     [key: string]: any;
 }
@@ -245,20 +245,20 @@ export interface GameState {
         pool: CardInstance[];
         targets: CardInstance[];
         selectCount: number;
-        canTargetLeader?: boolean;
-        requiresConfirmation?: boolean;
-        confirmationText?: string;
-    };
+        canTargetLeader?: boolean | undefined;
+        requiresConfirmation?: boolean | undefined;
+        confirmationText?: string | undefined;
+    } | undefined;
 
     lastSummoned: CardInstance[];
     lastDrawnCards: CardInstance[];
-    lastFuse?: { result_name: string;[key: string]: any };
+    lastFuse?: { result_name: string;[key: string]: any } | undefined;
 
-    deckoutWinsBlue?: boolean;
-    deckoutWinsRed?: boolean;
+    deckoutWinsBlue?: boolean | undefined;
+    deckoutWinsRed?: boolean | undefined;
 
-    blueLeaderBarrier?: number;
-    redLeaderBarrier?: number;
+    blueLeaderBarrier?: number | undefined;
+    redLeaderBarrier?: number | undefined;
 
     [key: string]: any;
 }
@@ -266,7 +266,7 @@ export interface GameState {
 export interface StartGameOptions {
     deckAId: string;
     deckBId: string;
-    seed?: number;
+    seed?: number | undefined;
 }
 
 // Action Payloads

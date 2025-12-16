@@ -59,8 +59,11 @@ export function mergeWitchsNewBrewOnPlay(newCard: CardInstance, owner: Player) {
 
     toRemove.sort((a, b) => b - a);
     for (const idx of toRemove) {
-        grave.push(board.splice(idx, 1)[0]);
-        if (owner === "blue") state.blueShadows++;
-        else state.redShadows++;
+        const removed = board.splice(idx, 1)[0];
+        if (removed) {
+            grave.push(removed);
+            if (owner === "blue") state.blueShadows++;
+            else state.redShadows++;
+        }
     }
 }

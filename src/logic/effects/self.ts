@@ -10,7 +10,6 @@ import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
 
 export function handleBuffSelf(sourceCard: CardInstance, eff: Effect) {
-    if (!sourceCard) return;
     const a = parseInt(eff.attack as any || 0) || 0;
     const d = parseInt(eff.defense as any || 0) || 0;
 
@@ -28,8 +27,8 @@ export function handleBuffSelf(sourceCard: CardInstance, eff: Effect) {
         sourceCard.buffs = { attack: 0, defense: 0 };
     }
     // Correctly track the buff amount
-    sourceCard.buffs.attack += a;
-    sourceCard.buffs.defense += d;
+    sourceCard.buffs.attack = (sourceCard.buffs.attack ?? 0) + a;
+    sourceCard.buffs.defense = (sourceCard.buffs.defense ?? 0) + d;
 
     // Update the card's current stats
     // @ts-ignore
@@ -80,15 +79,15 @@ export function clearTemporaryBuffs(card: CardInstance) {
         let totalDefense = 0;
 
         // Calculate total temporary buffs
-        card.temporaryBuffs.forEach((buff) => {
+        card.temporaryBuffs.forEach((buff: { attack: number; defense: number }) => {
             totalAttack += buff.attack;
             totalDefense += buff.defense;
         });
 
         // Remove the temporary buffs from tracking
         if (card.buffs) {
-            card.buffs.attack = Math.max(0, card.buffs.attack - totalAttack);
-            card.buffs.defense = Math.max(0, card.buffs.defense - totalDefense);
+            card.buffs.attack = Math.max(0, (card.buffs.attack ?? 0) - totalAttack);
+            card.buffs.defense = Math.max(0, (card.buffs.defense ?? 0) - totalDefense);
         }
 
         // Update the card's stats
@@ -116,7 +115,7 @@ export function clearTemporaryBuffs(card: CardInstance) {
  * NEW: Applies a buff to the source card based on a dynamic game state value.
  */
 export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, owner: Player) {
-    if (!sourceCard || !owner) return;
+    if (!owner) return;
 
     let a = parseInt(eff.attack as any || 0) || 0;
     let d = parseInt(eff.defense as any || 0) || 0;
@@ -202,8 +201,8 @@ export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, own
     }
 
     // Track and apply the buff
-    sourceCard.buffs.attack += a;
-    sourceCard.buffs.defense += d;
+    sourceCard.buffs.attack = (sourceCard.buffs.attack ?? 0) + a;
+    sourceCard.buffs.defense = (sourceCard.buffs.defense ?? 0) + d;
     // @ts-ignore
     sourceCard.attack = (parseInt(sourceCard.attack) || 0) + a;
     // @ts-ignore
@@ -225,17 +224,13 @@ export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, own
 }
 
 export function handleDestroySelf(sourceCard: CardInstance) {
-    if (sourceCard) {
-        logEvent("destroySelf", { card: sourceCard?.name, uid: sourceCard?.uid });
-        // Setting defense to 0 marks it for cleanup
-        // @ts-ignore
-        sourceCard.defense = 0;
-    }
+    logEvent("destroySelf", { card: sourceCard.name, uid: sourceCard.uid });
+    // Setting defense to 0 marks it for cleanup
+    // @ts-ignore
+    sourceCard.defense = 0;
 }
 
 export function handleBanishSelf(sourceCard: CardInstance, owner: Player) {
-    if (sourceCard) {
-        logEvent("banishSelf", { card: sourceCard?.name, uid: sourceCard?.uid });
-        handleBanish(sourceCard);
-    }
+    logEvent("banishSelf", { card: sourceCard.name, uid: sourceCard.uid });
+    handleBanish(sourceCard);
 }

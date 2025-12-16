@@ -157,7 +157,7 @@ export function dispatch(currentState: GameState, action: PlayerAction): GameSta
  * Initialize global hotkeys (Undo/Redo).
  */
 export function initHotkeys(target?: Document | HTMLElement) {
-    initHistoryHotkeys({ target });
+    initHistoryHotkeys(target ? { target } : {});
 }
 
 /**

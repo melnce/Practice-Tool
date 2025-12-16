@@ -16,6 +16,7 @@ export function makeLeaderDroppable(leaderEl: HTMLElement, targetPlayer: Player,
 
         // Only allow dropping attacker onto the opposite leader on the correct turn
         if ((targetPlayer === "blue" && state.isBlueTurn) || (targetPlayer === "red" && !state.isBlueTurn)) return;
+        if (!attackerIndex) return;
 
         logic().then(({ attackLeader }) => {
             attackLeader(parseInt(attackerIndex), attackerPlayer as Player, targetPlayer);
@@ -83,8 +84,8 @@ export function enableCardEvoDrop(div: HTMLElement, containerId: string, card: C
 
             // ensure buff container, then apply evo stats
             if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-            card.buffs.attack += boost;
-            card.buffs.defense += boost;
+            card.buffs.attack = (card.buffs.attack ?? 0) + boost;
+            card.buffs.defense = (card.buffs.defense ?? 0) + boost;
 
             // @ts-ignore
             card.attack = (Number(card.attack) || 0) + boost;
@@ -131,9 +132,10 @@ export function enableEnemyFollowerDrop(div: HTMLElement, attackerData: any, def
         // @ts-ignore  (state keys)
         const defenders = state[`${defenderPlayer}Board`];
         const defender = defenders[defenderIndex];
+        if (!defender) return;
 
         // @ts-ignore
-        const hasWard = defenders.some(c => c.hasWard && Number(c.defense) > 0);
+        const hasWard = defenders.some((c: CardInstance) => c.hasWard && Number(c.defense) > 0);
         if (hasWard && !defender.hasWard) return;
         if (defender.hasIntimidate && !defender.hasWard) return;
 

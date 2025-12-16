@@ -66,11 +66,13 @@ export function mergeSigils(board: CardInstance[], sigilsToMerge: CardInstance[]
 
     // Choose the first one as survivor
     const survivor = sigilsToMerge[0];
+    if (!survivor) return;
 
     // Sum counters from the others
     let totalEarth = Number(survivor.counters?.earth || 0);
     for (let i = 1; i < sigilsToMerge.length; i++) {
         const s = sigilsToMerge[i];
+        if (!s) continue;
         totalEarth += Number(s.counters?.earth || 0);
 
         // Remove from board

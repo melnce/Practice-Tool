@@ -17,7 +17,7 @@ export interface TargetedOpContext {
  * Result of the targeting engine processing a click.
  */
 export type TargetingResult =
-    | { kind: "invalid"; reason?: string }
+    | { kind: "invalid"; reason?: string | undefined }
     | { kind: "continue" }              // Selection updated, but not finished
     | { kind: "confirm_needed" }        // Valid selection, waiting for UI confirmation
     | { kind: "execute"; opCtx: TargetedOpContext }; // Selection complete, ready to execute

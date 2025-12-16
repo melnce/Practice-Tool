@@ -169,7 +169,7 @@ describe("PlayCard Invariants", () => {
 
             expect(result.kind).toBe("done");
             expect(state.bluePlayedHistory.length).toBe(1);
-            expect(state.bluePlayedHistory[0].name).toBe("Test Follower");
+            expect(state.bluePlayedHistory[0]?.name).toBe("Test Follower");
         });
 
         it("Follower added to board exactly once", () => {

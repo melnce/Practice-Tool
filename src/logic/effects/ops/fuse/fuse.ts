@@ -193,6 +193,7 @@ export function fuse_finalize_generic(owner: Player, initiatorUid: string, partn
 
     const iCard = hand[iIdx];
     const pCard = hand[pIdx];
+    if (!iCard || !pCard) { clearSelectableFlags(); adapter.render(); return; }
 
     if (resultSpec?.type === "waste") {
         if (resultSpec.consume === "partner") {

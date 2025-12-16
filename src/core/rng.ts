@@ -76,7 +76,9 @@ export function choice<T>(arr: T[] | null | undefined): T | null {
     const poolSize = arr.length;
     const resultIdx = randInt(poolSize);
     logEvent("rng", { op: "pick", fn: "choice", from: poolSize, resultIdx });
-    return arr[resultIdx];
+    const result = arr[resultIdx];
+    // resultIdx is guaranteed to be in bounds by randInt(poolSize)
+    return result !== undefined ? result : null;
 }
 
 /** In-place Fisher–Yates shuffle using the current RNG (or a provided rand-like fn) */
@@ -86,7 +88,10 @@ export function shuffleInPlace<T>(arr: T[], rng: () => number = rand): T[] {
         const from = i + 1;
         const resultIdx = Math.floor(rng() * from);
         logEvent("rng", { op: "pick", fn: "shuffleInPlace_step", from, resultIdx });
-        [arr[i], arr[resultIdx]] = [arr[resultIdx], arr[i]];
+        // Bounds guaranteed: i < n and resultIdx < from <= i+1 <= n
+        const temp = arr[i]!;
+        arr[i] = arr[resultIdx]!;
+        arr[resultIdx] = temp;
     }
     return arr;
 }

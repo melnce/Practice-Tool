@@ -258,11 +258,13 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
     // Apply extra filters if specified in 'op: select' itself (e.g. "leftmost")
     if (eff.filter === "leftmost") {
         if (pool.length > 0) {
-            pool = [pool[0]]; // Assuming pool order matches board order (getPool usually returns board order)
+            const first = pool[0];
+            pool = first ? [first] : []; // Assuming pool order matches board order (getPool usually returns board order)
         }
     } else if (eff.filter === "rightmost") {
         if (pool.length > 0) {
-            pool = [pool[pool.length - 1]];
+            const last = pool[pool.length - 1];
+            pool = last ? [last] : [];
         }
     }
 
@@ -317,7 +319,8 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
         const remaining = pool.filter(c => !picks.includes(c));
         while (picks.length < effectiveCount && remaining.length) {
             const idx = randInt(remaining.length);
-            picks.push(remaining.splice(idx, 1)[0]);
+            const picked = remaining.splice(idx, 1)[0];
+            if (picked) picks.push(picked);
         }
 
         // Clear any UI highlights and immediately resolve the effect queue
@@ -340,18 +343,21 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
 
     // Special case for super evolve
     if (eff.effects && (eff.effects as Effect[]).some((e: Effect) => e.op === "super_evolve")) {
-        state.pendingTargetEffect = {
-            eff: (eff.effects as Effect[]).find((e: Effect) => e.op === "super_evolve"),
-            owner,
-            sourceCard,
-            resumeEffects: effectsQueue,
-            pool,
-            targets: [],
-            selectCount: effectiveCount,
-        };
+        const superEvoEff = (eff.effects as Effect[]).find((e: Effect) => e.op === "super_evolve");
+        if (superEvoEff) {
+            state.pendingTargetEffect = {
+                eff: superEvoEff,
+                owner,
+                sourceCard,
+                resumeEffects: effectsQueue,
+                pool,
+                targets: [],
+                selectCount: effectiveCount,
+            };
+        }
     } else {
         state.pendingTargetEffect = {
-            eff: { op: 'nested_effects', effects: eff.effects },
+            eff: { op: 'nested_effects', effects: eff.effects ?? [] },
             owner,
             sourceCard,
             resumeEffects: effectsQueue,

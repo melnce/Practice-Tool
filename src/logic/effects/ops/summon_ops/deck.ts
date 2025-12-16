@@ -57,7 +57,10 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
     // Shuffle (Fisher–Yates)
     for (let i = candidates.length - 1; i > 0; i--) {
         const j = randInt(i + 1);
-        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+        // Swap is bounds-safe: i and j are both in [0, candidates.length-1]
+        const temp = candidates[i]!;
+        candidates[i] = candidates[j]!;
+        candidates[j] = temp;
     }
 
     // Respect board space and requested count

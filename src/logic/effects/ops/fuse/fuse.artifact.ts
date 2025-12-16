@@ -132,6 +132,7 @@ export function fuse_finalize_gear_multi(owner: Player, initiatorUid: string, pa
     if (iIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const initiator = hand[iIdx];
+    if (!initiator) { clearSelectableFlags(); adapter.render(); return; }
 
     if (alreadyFusedThisTurn(initiator)) {
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
@@ -179,6 +180,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, par
     if (iIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const initiator = hand[iIdx];
+    if (!initiator) { clearSelectableFlags(); adapter.render(); return; }
 
     if (alreadyFusedThisTurn(initiator)) {
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
@@ -229,6 +231,7 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partner
     if (iIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const initiator = hand[iIdx];
+    if (!initiator) { clearSelectableFlags(); adapter.render(); return; }
 
     if (alreadyFusedThisTurn(initiator)) {
         logEvent("fuseBlocked", { owner, reason: "already_fused_this_turn", initiator: initiator?.name });
@@ -264,7 +267,9 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partner
             targets: "merge"
         };
     } else if ((partners || []).length === 1 as any) {
-        const pIdx = idxOf(partners[0]?.uid);
+        const partner0 = partners[0];
+        if (!partner0) { clearSelectableFlags(); adapter.render(); return; }
+        const pIdx = idxOf(partner0.uid);
         if (pIdx !== -1) hand.splice(pIdx, 1);
         state.lastFuse = {
             owner,

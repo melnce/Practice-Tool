@@ -79,8 +79,10 @@ export function handleDrawNamed(eff: Effect, owner: Player) {
 
     for (let i = deck.length - 1; i >= 0; i--) {
         const c = deck[i];
+        if (!c) continue;
         if (toLowerSafe(c.name) === name) {
             const picked = removeAt(deck, i);
+            if (!picked) break;
             trackLastDrawn(picked);
             pushToHand(hand, picked); // tutors bypass drawCard
             logEvent("tutorNamed", { owner, name: name });
@@ -101,8 +103,10 @@ export function handleDrawAllNamedWithKeyword(eff: Effect, owner: Player) {
     const picked: CardInstance[] = [];
     for (let i = deck.length - 1; i >= 0; i--) {
         const c = deck[i];
+        if (!c) continue;
         if (toLowerSafe(c.name) === name) {
-            picked.push(removeAt(deck, i));
+            const removed = removeAt(deck, i);
+            if (removed) picked.push(removed);
         }
     }
     if (!picked.length) return;
@@ -205,9 +209,10 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
         return true;
     };
 
-    const idxs = [];
+    const idxs: number[] = [];
     for (let i = 0; i < deck.length; i++) {
-        if (matches(deck[i])) idxs.push(i);
+        const card = deck[i];
+        if (card && matches(card)) idxs.push(i);
     }
     if (!idxs.length) return;
 
@@ -217,7 +222,10 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
     if (mode === "random") {
         for (let i = idxs.length - 1; i > 0; i--) {
             const j = randInt(i + 1);
-            [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+            // Both indices are in bounds since i < idxs.length and j <= i
+            const temp = idxs[i]!;
+            idxs[i] = idxs[j]!;
+            idxs[j] = temp;
         }
         chosenIdxs = idxs.slice(0, want).sort((a, b) => b - a);
     } else {
@@ -229,6 +237,7 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
     for (const ix of chosenIdxs) {
         if (hand.length >= MAX_HAND) break;
         const picked = removeAt(deck, ix);
+        if (!picked) continue;
         trackLastDrawn(picked);
         if (!pushToHand(hand, picked)) break;
     }

@@ -35,7 +35,7 @@ export function fuse_finalize_gardens_allure(owner: Player, initiator_uid: strin
         const idx = hand.findIndex(c => c.uid === p.uid);
         if (idx !== -1) {
             const [used] = hand.splice(idx, 1);
-            grave.push(used);
+            if (used) grave.push(used);
         }
     }
 

@@ -29,15 +29,18 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
             logEvent("earthConsume", { owner, amount, card: c.name, uid: c.uid });
 
             if (c.counters!.earth! <= 0 && (isWitchsNewBrew(c) || c.destroyOnEmpty)) {
-                grave.push(b.splice(i, 1)[0]);
+                const removed = b.splice(i, 1)[0];
+                if (removed) {
+                    grave.push(removed);
 
-                // Log the earth sigil destruction
-                logEvent("earthSigilDestroyed", { owner, card: c.name, uid: c.uid });
+                    // Log the earth sigil destruction
+                    logEvent("earthSigilDestroyed", { owner, card: c.name, uid: c.uid });
 
-                // Increment shadows for the owner
-                if (owner === "blue") state.blueShadows++;
-                else state.redShadows++;
-                adapter.render();
+                    // Increment shadows for the owner
+                    if (owner === "blue") state.blueShadows++;
+                    else state.redShadows++;
+                    adapter.render();
+                }
             }
             return true;
         }

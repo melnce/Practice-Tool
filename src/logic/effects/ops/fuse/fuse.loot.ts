@@ -52,7 +52,7 @@ export function fuse_finalize_loot(owner: Player, initiator_uid: string, partner
         const idx = hand.findIndex(c => c?.uid === p.uid);
         if (idx !== -1) {
             const [taken] = hand.splice(idx, 1);
-            grave.push(taken);
+            if (taken) grave.push(taken);
         }
     }
 

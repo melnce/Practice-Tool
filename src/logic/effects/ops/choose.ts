@@ -28,7 +28,7 @@ function isWitchsNewBrew(card: CardInstance) {
 
 
 
-export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any) {
+export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any) {
     console.group("[CHOICE DEBUG] Handling choose effect (multi-pick)");
     const options = Array.isArray((eff as any)?.options) ? (eff as any).options : [];
     const baseSelect = Math.max(1, parseInt((eff as any)?.select_count ?? 1));
@@ -215,4 +215,5 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
     };
     // Start first round
     pickOnce(available);
+    return "pending"; // Return pending to pause effect chain while modal is shown
 }

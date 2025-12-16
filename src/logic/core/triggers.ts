@@ -359,7 +359,7 @@ export function fireTrigger(eventName: string, activePlayer: Player, context: Tr
             if (cond.tribe && enteringCard) {
                 const want = String(cond.tribe).toLowerCase();
                 const tribes = Array.isArray(enteringCard.tribes)
-                    ? enteringCard.tribes!.map(t => String(t).toLowerCase())
+                    ? enteringCard.tribes!.map((t: string) => String(t).toLowerCase())
                     : [];
                 console.log(`🏷️ Tribe check: ${want} in`, tribes);
                 if (!tribes.includes(want)) continue;

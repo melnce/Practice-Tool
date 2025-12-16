@@ -142,6 +142,7 @@ export function handleBanishRandom(eff: Effect, owner: Player) {
     for (let i = 0; i < take; i++) {
         const idx = randInt(pool.length);      // uses your seeded RNG
         const target = pool.splice(idx, 1)[0]; // remove selected target from pool
+        if (!target) continue;
         const targetOwner = state.blueBoard.includes(target) ? "blue" : "red";
         fireTrigger("follower_leaves_field", targetOwner);
         logEvent("banish", { card: target.name, uid: target.uid, owner: targetOwner, mode: "random" });

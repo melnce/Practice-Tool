@@ -55,7 +55,7 @@ export function bounceToHand(card: CardInstance) {
 }
 
 // Handle "return_to_hand" effect
-export function handleReturnToHand(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any) {
+export function handleReturnToHand(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any) {
     // allow followers + amulets by default; narrow if filters.type is given
     console.log(`[BounceOp] HandleReturnToHand Target=${eff.target} Owner=${owner} Source=${sourceCard?.name}#${sourceCard?.uid}`);
 

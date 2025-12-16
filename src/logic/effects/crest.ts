@@ -113,7 +113,8 @@ export function tickCrests(owner: Player) {
     // 2) Remove expired crests without disturbing earlier indices
     if (expiredIdx.length) {
         for (let k = expiredIdx.length - 1; k >= 0; k--) {
-            crests.splice(expiredIdx[k], 1);
+            const idx = expiredIdx[k];
+            if (idx !== undefined) crests.splice(idx, 1);
         }
     }
 

@@ -47,8 +47,9 @@ function showImageOverlayWithFallback(urls: string[]) {
     };
     img.onerror = () => {
         i += 1;
-        if (i < urls.length) {
-            img.src = urls[i];
+        const nextUrl = urls[i];
+        if (nextUrl !== undefined) {
+            img.src = nextUrl;
         } else {
             // give up silently
             box.style.display = "none";
@@ -57,7 +58,10 @@ function showImageOverlayWithFallback(urls: string[]) {
         }
     };
 
-    img.src = urls[0];
+    const firstUrl = urls[0];
+    if (firstUrl !== undefined) {
+        img.src = firstUrl;
+    }
 }
 
 function burnPreview(card: CardInstance | any) {

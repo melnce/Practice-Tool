@@ -8,7 +8,7 @@ import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
-export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any, context: any = {}) {
+export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
     // pass context so targets like "entering_follower" work
     let pool = getPool(eff.target as any, owner, null, eff.condition, context)
         .filter(c =>
@@ -58,7 +58,8 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
 
     // NEW: optional filter (e.g., "leftmost")
     if ((eff as any).filter === "leftmost" && pool.length > 0) {
-        pool = [pool[0]];
+        const first = pool[0];
+        pool = first ? [first] : [];
     }
 
 
@@ -87,15 +88,16 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
         const bag = [...pool];
         for (let i = 0; i < k && bag.length; i++) {
             const idx = randInt(bag.length);
-            chosen.push(bag.splice(idx, 1)[0]);
+            const picked = bag.splice(idx, 1)[0];
+            if (picked) chosen.push(picked);
         }
         const a = parseInt(eff.attack as any ?? 0) || 0;
         const d = parseInt(eff.defense as any ?? 0) || 0;
         console.log("[Devotee EOT] applying to", chosen.map(c => c.uid));
         for (const target of chosen) {
             if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
-            target.buffs.attack += a;
-            target.buffs.defense += d;
+            target.buffs.attack = (target.buffs.attack ?? 0) + a;
+            target.buffs.defense = (target.buffs.defense ?? 0) + d;
             // @ts-ignore
             target.attack = (parseInt(target.attack) || 0) + a;
             // @ts-ignore
@@ -152,8 +154,8 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance,
 
     for (const target of pool) {
         if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
-        target.buffs.attack += a;
-        target.buffs.defense += d;
+        target.buffs.attack = (target.buffs.attack ?? 0) + a;
+        target.buffs.defense = (target.buffs.defense ?? 0) + d;
 
         // @ts-ignore
         target.attack = (parseInt(target.attack) || 0) + a;
@@ -226,8 +228,8 @@ export function handleBuffHandTribe(eff: Effect, owner: Player) {
     for (const card of hand) {
         if (card.type === "Follower" && Array.isArray(card.tribes) && card.tribes.includes(eff.tribe)) {
             if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-            card.buffs.attack += a;
-            card.buffs.defense += d;
+            card.buffs.attack = (card.buffs.attack ?? 0) + a;
+            card.buffs.defense = (card.buffs.defense ?? 0) + d;
 
             // @ts-ignore
             card.attack = (parseInt(card.attack) || 0) + a;
@@ -255,8 +257,8 @@ export function handleBuffHandClass(eff: Effect, owner: Player) {
     for (const card of hand) {
         if (card.type === "Follower" && card.class === wantClass) {
             if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-            card.buffs.attack += a;
-            card.buffs.defense += d;
+            card.buffs.attack = (card.buffs.attack ?? 0) + a;
+            card.buffs.defense = (card.buffs.defense ?? 0) + d;
 
             // @ts-ignore
             card.attack = (parseInt(card.attack) || 0) + a;
@@ -308,23 +310,23 @@ export function handleBuffLastAddedToHand(eff: Effect, owner: Player) {
     if (card.base_defense == null) card.base_defense = parseInt(card.defense) || 0;
 
     if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-    card.buffs.attack += a;
-    card.buffs.defense += d;
+    card.buffs.attack = (card.buffs.attack ?? 0) + a;
+    card.buffs.defense = (card.buffs.defense ?? 0) + d;
 
     // @ts-ignore
     card.attack = (parseInt(card.attack) || 0) + a;
     // @ts-ignore
     card.defense = (parseInt(card.defense) || 0) + d;
 
-    card.potential_attack = card.base_attack + card.buffs.attack;
-    card.potential_defense = card.base_defense + card.buffs.defense;
+    card.potential_attack = (card.base_attack ?? 0) + (card.buffs.attack ?? 0);
+    card.potential_defense = (card.base_defense ?? 0) + (card.buffs.defense ?? 0);
     logEvent("buffLastAddedToHand", { owner, name: card.name, uid: card.uid, a: a, d: d });
 }
 
 // Repeat a single buff once per current Combo (plays this turn).
 // With replacement: we call handleBuff separately each time, so the same
 // random target can be chosen again on later iterations.
-export function handleComboRepeatBuff(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any[] = [], context: any = {}) {
+export function handleComboRepeatBuff(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any[] = [], context: any = {}) {
     const plays =
         owner === "blue" ? (state.bluePlaysThisTurn || 0)
             : (state.redPlaysThisTurn || 0);
@@ -352,7 +354,7 @@ export function handleComboRepeatBuff(eff: Effect, owner: Player, sourceCard: Ca
 }
 
 // NEW: set all matched targets' attack to a fixed value
-export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any, context: any = {}) {
+export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
     const pool = getPool(eff.target as any, owner, null, eff.condition, context)
         .filter(c => c.type === "Follower");
 
@@ -369,7 +371,7 @@ export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardIn
         if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
 
         // Apply as a buff delta so future math stacks correctly with other effects
-        target.buffs.attack += delta;
+        target.buffs.attack = (target.buffs.attack ?? 0) + delta;
         // @ts-ignore
         target.attack = current + delta;
 
@@ -384,7 +386,7 @@ export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardIn
     return "done";
 }
 // NEW: set all matched targets' stats to fixed values
-export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any, context: any = {}) {
+export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
     // Prefer explicitly passed selected targets (e.g. from select()) if this is a nested effect
     let pool = (context?.targets && context.targets.length)
         ? context.targets
@@ -392,7 +394,7 @@ export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInsta
             .filter(c => c.type === "Follower");
 
     // Re-filter just in case pool contained non-followers or mix
-    pool = pool.filter(c => c.type === "Follower");
+    pool = pool.filter((c: CardInstance) => c.type === "Follower");
 
     if (!pool.length) return "done";
 
@@ -406,7 +408,7 @@ export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInsta
             // @ts-ignore
             const currentA = parseInt(target.attack) || 0;
             const deltaA = setA - currentA;
-            target.buffs.attack += deltaA;
+            target.buffs.attack = (target.buffs.attack ?? 0) + deltaA;
             // @ts-ignore
             target.attack = setA;
             // @ts-ignore
@@ -418,7 +420,7 @@ export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInsta
             // @ts-ignore
             const currentD = parseInt(target.defense) || 0;
             const deltaD = setD - currentD;
-            target.buffs.defense += deltaD;
+            target.buffs.defense = (target.buffs.defense ?? 0) + deltaD;
             // @ts-ignore
             target.defense = setD;
             // @ts-ignore

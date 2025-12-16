@@ -135,7 +135,7 @@ export function onEvolve(card: CardInstance, owner: Player, mode: "normal" | "su
     queueRender();
 }
 
-export function superEvolveAllyFromContext(owner: Player, sourceCard: CardInstance, context: any) {
+export function superEvolveAllyFromContext(owner: Player, sourceCard: CardInstance | null, context: any) {
     // Prefer selected target; allow bare uid or stale object
     const sel = (context && (context.selectedCard || (context.targets && context.targets[0]))) || null;
     if (!sel) return;

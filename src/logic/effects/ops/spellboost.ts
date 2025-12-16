@@ -150,7 +150,7 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
                     const next = prev + reduceBy;
                     targetCard.spellboostCostCount = next;
 
-                    const newCost = Math.max(minCost, targetCard.base_cost - next);
+                    const newCost = Math.max(minCost ?? 0, Number(targetCard.base_cost ?? 0) - next);
                     // @ts-ignore
                     if (Number.isFinite(newCost)) targetCard.cost = newCost;
                 }
@@ -179,7 +179,7 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
                     const next = prev + reduceBy;
                     c.spellboostCostCount = next;
 
-                    const newCost = Math.max(minCost, (c.base_cost as number) - next);
+                    const newCost = Math.max(minCost ?? 0, Number(c.base_cost ?? 0) - next);
                     // @ts-ignore
                     if (Number.isFinite(newCost)) c.cost = newCost;
                 }

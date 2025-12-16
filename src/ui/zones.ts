@@ -178,11 +178,14 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
                     const entries = Object.entries(card.counters)
                         .filter(([, v]) => Number.isFinite(Number(v)));
                     if (entries.length) {
-                        const [, val] = entries[0];  // show the first numeric counter
-                        bottomRight.style.display = "block";
-                        bottomRight.className = "card-stats bottom-right countdown-badge";
-                        bottomRight.textContent = String(Number(val));
-                        shown = true;
+                        const first = entries[0];
+                        if (first) {
+                            const [, val] = first;  // show the first numeric counter
+                            bottomRight.style.display = "block";
+                            bottomRight.className = "card-stats bottom-right countdown-badge";
+                            bottomRight.textContent = String(Number(val));
+                            shown = true;
+                        }
                     }
                 }
                 if (!shown) bottomRight.style.display = "none";

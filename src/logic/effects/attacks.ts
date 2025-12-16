@@ -2,7 +2,7 @@
 import { logEvent } from "../../core/logger.js";
 import { Effect, CardInstance } from "../../core/types.js";
 
-export function applyAttacksPerTurn(eff: Effect & { value?: number, amount?: number, n?: number, [key: number]: number }, sourceCard: CardInstance) {
+export function applyAttacksPerTurn(eff: Effect & { value?: number, amount?: number, n?: number, [key: number]: number }, sourceCard: CardInstance | null) {
     if (!sourceCard) return;
 
     const n =

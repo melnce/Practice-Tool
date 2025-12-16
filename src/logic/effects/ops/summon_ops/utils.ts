@@ -40,12 +40,18 @@ export function nextId() {
 // function filterArtifactFollowersHand removed - moved to hand.ts
 
 // Safe deep clone that ignores cycles and engine backrefs
-export function safeClone(value: any, seen = new WeakSet()) {
+// Safe deep clone that ignores cycles and engine backrefs
+export function safeClone<T>(value: T, seen = new WeakSet<object>()): T {
     if (value === null || typeof value !== "object") return value;
-    if (seen.has(value)) return undefined;
+    // @ts-ignore
+    if (seen.has(value)) return undefined as T;
+    // @ts-ignore
     seen.add(value);
 
-    if (Array.isArray(value)) return value.map(v => safeClone(v, seen));
+    if (Array.isArray(value)) {
+        // @ts-ignore
+        return value.map((v) => safeClone(v, seen));
+    }
 
     const out: any = {};
     for (const [k, v] of Object.entries(value)) {
@@ -54,5 +60,5 @@ export function safeClone(value: any, seen = new WeakSet()) {
         if (v === state) continue; // direct reference to global state
         out[k] = safeClone(v, seen);
     }
-    return out;
+    return out as T;
 }

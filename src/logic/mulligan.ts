@@ -77,7 +77,8 @@ function chooseMulliganUids(owner: Player) {
     // If nothing selected and hand is clunky (e.g., all 3s on blue), pick the highest cost one.
     if (picks.length === 0) {
         const sorted = [...hand].sort((a, b) => (Number((b as any).cost || 0) - Number((a as any).cost || 0)));
-        if (sorted.length) picks.push(sorted[0].uid);
+        const first = sorted[0];
+        if (first) picks.push(first.uid);
     }
     return picks;
 }
@@ -139,8 +140,8 @@ export function confirmMulligan(owner: Player) {
                 const toPutBack = [];
                 for (let i = hand.length - 1; i >= 0; i--) {
                     const c = hand[i];
-                    if (bag.has(c.uid)) {
-                        toPutBack.push(hand.splice(i, 1)[0]);
+                    if (c && bag.has(c.uid)) {
+                        toPutBack.push(hand.splice(i, 1)[0]!);
                     }
                 }
                 // Return & shuffle

@@ -136,8 +136,10 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
         const idx = hand.findIndex(c => c.uid === t.uid);
         if (idx !== -1) {
             const [d] = hand.splice(idx, 1);
-            grave.push(d);
-            discarded.push(d);
+            if (d) {
+                grave.push(d);
+                discarded.push(d);
+            }
         }
     }
     if (targets.length > 0) {
@@ -166,8 +168,8 @@ TARGETED_OP_HANDLERS.set("buff", (ctx) => {
     };
     for (const target of targets.filter(tribeOk)) {
         if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
-        target.buffs.attack += a;
-        target.buffs.defense += d;
+        target.buffs.attack = (target.buffs.attack ?? 0) + a;
+        target.buffs.defense = (target.buffs.defense ?? 0) + d;
         target.attack = Math.max(0, (parseInt(target.attack as any) || 0) + a);
         target.defense = (parseInt(target.defense as any) || 0) + d;
         target.peak_defense = Math.max(target.peak_defense ?? (target.defense as number), target.defense as number);
@@ -288,14 +290,16 @@ TARGETED_OP_HANDLERS.set("super_evolve_ally", (ctx) => {
 
 TARGETED_OP_HANDLERS.set("super_evolve_self", (ctx) => {
     const { owner, sourceCard } = ctx;
+    if (!sourceCard) return { kind: "handled" };
     handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false });
-    logEvent("evolve", { owner, target: sourceCard?.name, mode: "super" });
+    logEvent("evolve", { owner, target: sourceCard.name, mode: "super" });
     return { kind: "handled" };
 });
 
 TARGETED_OP_HANDLERS.set("evolve_and_buff", (ctx) => {
     const { eff, targets } = ctx;
     const target = targets[0];
+    if (!target) return { kind: "handled" };
     if (!target.base_attack) target.base_attack = parseInt(target.attack as any) || 0;
     if (!target.base_defense) target.base_defense = parseInt(target.defense as any) || 0;
     if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
@@ -305,12 +309,12 @@ TARGETED_OP_HANDLERS.set("evolve_and_buff", (ctx) => {
     target.defense = (target as any).base_defense;
     const a = parseInt((eff as any).attack || 0) || 0;
     const d = parseInt((eff as any).defense || 0) || 0;
-    target.buffs.attack += a;
-    target.buffs.defense += d;
+    target.buffs.attack = (target.buffs.attack ?? 0) + a;
+    target.buffs.defense = (target.buffs.defense ?? 0) + d;
     (target as any).attack += a;
     (target as any).defense += d;
-    target.potential_attack = (target as any).base_attack + target.buffs.attack;
-    target.potential_defense = (target as any).base_defense + target.buffs.defense;
+    target.potential_attack = (target as any).base_attack + (target.buffs.attack ?? 0);
+    target.potential_defense = (target as any).base_defense + (target.buffs.defense ?? 0);
     target.peak_defense = Math.max(target.peak_defense ?? (target.defense as number), target.defense as number);
     return { kind: "handled" };
 });

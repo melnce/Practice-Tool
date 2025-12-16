@@ -16,6 +16,7 @@ function putBack(card: CardInstance, owner: Player) {
     const idx = hand.indexOf(card);
     if (idx < 0) return false;
     const [removed] = hand.splice(idx, 1);
+    if (!removed) return false;
     deck.push(removed);
     shuffleInPlace(deck);
     return true;
@@ -38,7 +39,9 @@ export function handleReturnHandToDeck(eff: Effect, owner: Player, effectsQueue:
         // Return everything currently in hand
         while (hand.length) {
             // putBack shuffles each time; that's fine, or replace with a single shuffle if you prefer
-            putBack(hand[0], owner);
+            const first = hand[0];
+            if (!first) break;
+            putBack(first, owner);
         }
         logEvent("returnHandToDeckAll", { owner, count: returnedCount });
         adapter.render();
@@ -74,7 +77,8 @@ export function handleReturnHandToDeck(eff: Effect, owner: Player, effectsQueue:
     }
 
     // no-select fallback
-    putBack(hand[0], owner);
+    const first = hand[0];
+    if (first) putBack(first, owner);
     adapter.render();
     return "done";
 }

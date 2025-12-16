@@ -13,7 +13,9 @@ function boardOf(owner: Player) {
     return owner === "blue" ? state.blueBoard : state.redBoard;
 }
 function removeFromBoard(card: CardInstance) {
-    const board = boardOf(card.owner);
+    const owner = card.owner;
+    if (!owner) return;
+    const board = boardOf(owner);
     const i = board.findIndex((c) => c.uid === card.uid);
     if (i !== -1) board.splice(i, 1);
 }
@@ -36,8 +38,11 @@ function ensureDestroyOnZero(card: CardInstance, key: string) {
         if (!card.counters) card.counters = {};
         card.counters[key] = 0;
 
+        const owner = card.owner;
         // fire a generic death/destroy trigger if you use one
-        fireTrigger("destroyed", card.owner, { destroyed: card });
+        if (owner) {
+            fireTrigger("destroyed", owner, { destroyed: card });
+        }
 
         // remove from board + re-render
         removeFromBoard(card);
@@ -89,7 +94,7 @@ export function spendCounter(card: CardInstance, key: string, amount = 1) {
 }
 
 // compatibility wrapper for effects.js
-export function handleAddCounter(eff: Effect, owner: Player, sourceCard: CardInstance) {
+export function handleAddCounter(eff: Effect, owner: Player, sourceCard: CardInstance | null) {
     const { key, amount = 1 } = eff as any;
     if (!sourceCard) return;
     addCounter(sourceCard, key, amount);
@@ -99,7 +104,7 @@ export function handleAddCounter(eff: Effect, owner: Player, sourceCard: CardIns
  * Used by effect: { op: "reduce_countdown", amount: N }
  * Works for Amulets AND Crests.
  */
-export function handleReduceCountdown(sourceCard: CardInstance, eff: Effect = {} as any) {
+export function handleReduceCountdown(sourceCard: CardInstance | null, eff: Effect = {} as any) {
     const dec = Number((eff as any).amount ?? 1);
 
     // Amulet legacy path (unchanged)

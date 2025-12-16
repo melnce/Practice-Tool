@@ -24,7 +24,7 @@ function isSuperProtected(card: CardInstance, owner: Player) {
     return !!(card && card.type === "Follower" && card.evoType === "super" && isOwnTurn(owner) && isAlly(card, owner));
 }
 
-export function handleDamageAll(eff: Effect, owner: Player, sourceCard: CardInstance = null as any) {
+export function handleDamageAll(eff: Effect, owner: Player, sourceCard: CardInstance | null = null) {
     const pool = getPool(eff.target as any, owner, sourceCard, eff.condition);
     // Amount may depend on the acting card (e.g., Sinciro)
     const amt = resolveAmountWithOverflow(eff, owner, { sourceCard });
@@ -47,7 +47,7 @@ export function handleDamageAll(eff: Effect, owner: Player, sourceCard: CardInst
     cleanupDead();
 }
 
-export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any, context: any = {}) {
+export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
     const target = (eff.target as string) || "";
     const amt = resolveAmountWithOverflow(eff, owner, { ...context, sourceCard });
 
@@ -69,7 +69,7 @@ export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstanc
         .filter(c => c.type === "Follower");
 
 
-    const selectCount = parseInt(eff.select as any) || 0;
+    const selectCount = parseInt(String(eff.select || 0)) || 0;
     if (selectCount > 0) {
         // --- MODIFIED LOGIC ---
         // Determine the actual number of targets that can be selected.
@@ -107,7 +107,7 @@ export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstanc
 
 export function handleDamageRandom(eff: Effect, owner: Player) {
     const amt = resolveAmountWithOverflow(eff, owner, {});
-    let hits = Math.max(1, parseInt((eff.count as any) || 1));
+    let hits = Math.max(1, parseInt(String(eff.count || 1)));
 
     const targetSpec = (eff.target as string || "").toLowerCase();
 
@@ -126,13 +126,14 @@ export function handleDamageRandom(eff: Effect, owner: Player) {
         if (!valid.length) break;
 
         const pick = valid[randInt(valid.length)];
+        if (!pick) break;
         logEvent("damageRandom", { target: pick.name, uid: pick.uid, amount: amt });
 
         if (pick.type === "Leader") {
             // @ts-ignore
             applyLeaderDamage(pick.owner, amt);
         } else {
-            dealDamage(pick, amt);      // super-protection will zero it out internally if applicable
+            dealDamage(pick as CardInstance, amt);      // super-protection will zero it out internally if applicable
         }
         cleanupDead();
     }
@@ -193,7 +194,7 @@ export function resolveAmountWithOverflow(eff: Effect, owner: Player, context: a
 
 
 
-export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceCard: CardInstance, effectsQueue: any) {
+export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any) {
     const amt = resolveAmountWithOverflow(eff, owner, { sourceCard });
 
     state.pendingTargetEffect = {
@@ -246,7 +247,7 @@ export function handleDamageAllByAlliedGolems(eff: Effect, owner: Player) {
 
     cleanupDead();
 }
-export function handleDamageSplitFixed(eff: Effect, owner: Player, sourceCard: CardInstance = null as any) {
+export function handleDamageSplitFixed(eff: Effect, owner: Player, sourceCard: CardInstance | null = null) {
     // Use the configured amount (supports tokens/overflow)
     let damageToDeal = resolveAmountWithOverflow(eff, owner, { sourceCard });
 
@@ -268,16 +269,17 @@ export function handleDamageSplitFixed(eff: Effect, owner: Player, sourceCard: C
 }
 
 // --- NEW: damage a random enemy follower for the selected unit's current DEF ---
-export function handleDamageRandomSelectedDefense(eff: Effect, owner: Player, _sourceCard: CardInstance, _effectsQueue: any, context: any = {}) {
+export function handleDamageRandomSelectedDefense(eff: Effect, owner: Player, _sourceCard: CardInstance | null, _effectsQueue: any, context: any = {}) {
     // Prefer the selection context; fall back to the global pointer if present
     const sel = context.selectedCard || state.__lastSelected || null;
-    const dmg = parseInt(sel?.defense ?? 0, 10) || 0;
+    const dmg = parseInt(String(sel?.defense ?? 0), 10) || 0;
     if (dmg <= 0) return;
 
     const pool = getPool("enemy:follower", owner).filter(c => c && c.type === "Follower");
     if (!pool.length) return;
 
     const pick = pool[randInt(pool.length)];
+    if (!pick) return;
     dealDamage(pick, dmg);
     cleanupDead();
 }
@@ -287,7 +289,7 @@ export function handleDamageRandomSelectedDefense(eff: Effect, owner: Player, _s
 //   and any *newly-summoned* followers from Last Words are ignored.
 // - Any remaining damage after exhausting snapshot followers goes to the leader.
 // - X comes from (in order): eff.count_source === "crest_count", eff.amount, or 0.
-export function handleDamageSplitAllEnemies(eff: Effect, owner: Player, sourceCard: CardInstance = null as any) {
+export function handleDamageSplitAllEnemies(eff: Effect, owner: Player, sourceCard: CardInstance | null = null) {
     // 1) Determine total pings X
     const crestCount = (() => {
         const list = owner === "blue" ? state.blueCrests : state.redCrests;
@@ -314,7 +316,7 @@ export function handleDamageSplitAllEnemies(eff: Effect, owner: Player, sourceCa
         if (remaining <= 0) break;
 
         // Use *current* DEF to cap how many pings this follower can absorb
-        const curDef = parseInt(target.defense as any, 10) || 0;
+        const curDef = parseInt(String(target.defense), 10) || 0;
         if (curDef <= 0) continue;
 
         const dmg = Math.min(remaining, curDef);
@@ -335,8 +337,8 @@ export function handleDamageSplitAllEnemies(eff: Effect, owner: Player, sourceCa
 }
 
 
-export function handleDamageHighestDefense(eff: Effect, owner: Player, sourceCard: CardInstance = null as any) {
-    const amt = parseInt((eff.amount as any)) || 0;
+export function handleDamageHighestDefense(eff: Effect, owner: Player, sourceCard: CardInstance | null = null) {
+    const amt = parseInt(String(eff.amount), 10) || 0;
 
     // Followers first
     if ((eff.target as string) === "follower") {
@@ -345,8 +347,8 @@ export function handleDamageHighestDefense(eff: Effect, owner: Player, sourceCar
 
         if (!allFollowers.length) return;
 
-        const maxDef = Math.max(...allFollowers.map(c => parseInt(c.defense as any) || 0));
-        const targets = allFollowers.filter(c => (parseInt(c.defense as any) || 0) === maxDef);
+        const maxDef = Math.max(...allFollowers.map(c => parseInt(String(c.defense), 10) || 0));
+        const targets = allFollowers.filter(c => (parseInt(String(c.defense), 10) || 0) === maxDef);
 
         for (const t of targets) dealDamage(t, amt);
         cleanupDead();

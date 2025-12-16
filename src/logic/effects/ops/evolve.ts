@@ -21,15 +21,14 @@ function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
 
 export function handleEvolveSelf(sourceCard: CardInstance, owner: Player, opts: any = {}) {
     const { spendPoint = true, mode = "normal", runEvoEffects = true } = opts; // <-- allow mode
-    if (!sourceCard) return;
     if (spendPoint && !canEvolve(owner, sourceCard, mode)) return; // engine gate
 
     const attackBonus = (mode === "super") ? 3 : 2;
     const defenseBonus = (mode === "super") ? 3 : 2;
 
     if (!sourceCard.buffs) sourceCard.buffs = { attack: 0, defense: 0 };
-    sourceCard.buffs.attack += attackBonus;
-    sourceCard.buffs.defense += defenseBonus;
+    sourceCard.buffs.attack = (sourceCard.buffs.attack ?? 0) + attackBonus;
+    sourceCard.buffs.defense = (sourceCard.buffs.defense ?? 0) + defenseBonus;
 
     // @ts-ignore
     sourceCard.attack = (parseInt(sourceCard.attack) || 0) + attackBonus;

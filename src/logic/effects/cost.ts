@@ -9,7 +9,7 @@ import { CardInstance, Effect, Player } from "../../core/types.js";
  * @param {object} sourceCard The card to be affected.
  * @param {object} eff The effect object, containing an amount.
  */
-export function handleReduceCostSelf(sourceCard: CardInstance, eff: Effect) {
+export function handleReduceCostSelf(sourceCard: CardInstance | null, eff: Effect) {
     if (!sourceCard) return;
 
     const amount = parseInt(eff.amount as any ?? 1);
@@ -56,7 +56,7 @@ export function handleReduceCost(targetCard: CardInstance, eff: Effect) {
     }
 }
 
-export function handleSetCostSelf(sourceCard: CardInstance, eff: Effect) {
+export function handleSetCostSelf(sourceCard: CardInstance | null, eff: Effect) {
     if (!sourceCard) return;
     const newCost = parseInt(eff.amount as any);
     if (Number.isFinite(newCost)) {
@@ -131,7 +131,7 @@ export function handleHalveDeckCost(owner: Player) {
  * Expects the selected card(s) in context.targets / context.selectedCard.
  * Positive amount increases cost; negative decreases.
  */
-export function handleModifyCost(eff: Effect, owner: Player, sourceCard: CardInstance, context: any = {}) {
+export function handleModifyCost(eff: Effect, owner: Player, sourceCard: CardInstance | null, context: any = {}) {
     const amount = parseInt(eff?.amount as any ?? 0) || 0;
     if (!amount) return;
 
@@ -161,7 +161,7 @@ export function handleModifyCost(eff: Effect, owner: Player, sourceCard: CardIns
 }
 
 // NEW: pool-based cost modifier (no manual selection needed)
-export function handleModifyCostPool(eff: Effect, owner: Player, sourceCard: CardInstance) {
+export function handleModifyCostPool(eff: Effect, owner: Player, sourceCard: CardInstance | null) {
     const amount = parseInt(eff?.amount as any ?? 0) || 0;
     if (!amount) return;
     const targetSpec = String((eff as any).target || "").trim() || "ally:hand";

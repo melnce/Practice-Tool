@@ -19,8 +19,11 @@ export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
     for (let i = hand.length - 1; i >= 0; i--) {
         const c = hand[i];
         if (c && keepSet.has(String(c.name))) continue; // keep
-        grave.push(hand.splice(i, 1)[0]); // discard
-        discarded++;
+        const removed = hand.splice(i, 1)[0];
+        if (removed) {
+            grave.push(removed); // discard
+            discarded++;
+        }
     }
 
     if (discarded > 0) {
@@ -84,6 +87,7 @@ export function handleTransformInHand(eff: Effect, owner: Player) {
     // Iterate backwards through the hand to safely replace items
     for (let i = hand.length - 1; i >= 0; i--) {
         const card = hand[i];
+        if (!card) continue;
         let matches = true;
 
         // Check class filter
@@ -93,6 +97,8 @@ export function handleTransformInHand(eff: Effect, owner: Player) {
 
         // Check cost filter - now with proper operator handling
         if (filter.cost && matches) {
+            const card = hand[i];
+            if (!card) continue;
             const cardCost = parseInt(card.cost as any, 10) || 0;
             const filterValue = parseInt(filter.cost.value, 10) || 0;
 

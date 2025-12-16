@@ -34,8 +34,9 @@ export function handleReanimate(eff: Effect, owner: Player) {
     // Try to find highest cost available (up to maxCost)
     let candidates: CardInstance[] = [];
     for (let cost = maxCost; cost >= 0; cost--) {
-        if (byCost[cost]?.length > 0) {
-            candidates = byCost[cost];
+        const costCandidates = byCost[cost];
+        if (costCandidates && costCandidates.length > 0) {
+            candidates = costCandidates;
             break;
         }
     }
@@ -47,6 +48,7 @@ export function handleReanimate(eff: Effect, owner: Player) {
 
     // Randomly select one from the highest available cost group
     const selected = candidates[randInt(candidates.length)];
+    if (!selected) return;
     logEvent("reanimatePick", { owner, name: selected.name, cost: parseInt(selected.cost as any) || 0 });
 
     // The key changes are here:

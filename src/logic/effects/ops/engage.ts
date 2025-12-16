@@ -37,6 +37,7 @@ function removeWithLastWords(card: CardInstance, owner: Player) {
         return;
     }
     const removed = board.splice(idx, 1)[0];
+    if (!removed) return;
 
     if (removed?.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
         console.log(`[Engage] Running Last Words for ${removed.name}`);
