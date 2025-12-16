@@ -4,14 +4,17 @@ import { state, resetGameState } from "../../src/core/gameState";
 import { runEffects } from "../../src/logic/core/effects";
 import { makeUid } from "../../src/core/rng";
 import { vanillaFollower } from "../fixtures/utils/testCards";
+import { injectCardForTest } from "../../src/data/cardDatabase";
 
 describe("Bounce Mechanics", () => {
     beforeEach(() => {
         resetGameState();
+        // Inject the test card into the DB so fetchBaseCopyByName works
+        injectCardForTest(vanillaFollower);
     });
 
     it("should bounce follower from board to hand", () => {
-        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blue" };
+        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blue" as const };
         state.blueBoard = [unit];
         state.blueHand = [];
 
@@ -33,13 +36,15 @@ describe("Bounce Mechanics", () => {
 
         expect(state.blueBoard.length).toBe(0);
         expect(state.blueHand.length).toBe(1);
-        expect(state.blueHand[0].uid).toBe(unit.uid);
+        expect(state.blueHand[0].name).toBe("Vanilla Follower");
+        // UID changes on bounce (reset)
+        expect(state.blueHand[0].uid).not.toBe(unit.uid);
     });
 
     it("should fail to bounce if hand is full (9 cards)", () => {
-        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blue" };
+        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blue" as const };
         state.blueBoard = [unit];
-        state.blueHand = Array(9).fill({ ...vanillaFollower, uid: "filler" });
+        state.blueHand = Array(9).fill({ ...vanillaFollower, uid: "filler", owner: "blue" as const });
 
         runEffects([{ op: "bounce", target: "ally:follower" }], "blue", null);
 
@@ -48,7 +53,8 @@ describe("Bounce Mechanics", () => {
         expect(state.blueBoard.length).toBe(0);
         expect(state.blueHand.length).toBe(9);
         expect(state.blueGraveyard.length).toBe(1);
-        expect(state.blueGraveyard[0].uid).toBe(unit.uid);
+        expect(state.blueGraveyard[0].name).toBe("Vanilla Follower");
+        expect(state.blueGraveyard[0].uid).not.toBe(unit.uid);
     });
 });
 

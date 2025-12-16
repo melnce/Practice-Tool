@@ -9,7 +9,7 @@ import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
 export function handleReanimate(eff: Effect, owner: Player) {
-    const maxCost = parseInt((eff as any).max_cost) || 0;
+    const maxCost = parseInt(String((eff as any).max_cost ?? (eff as any).x ?? 0)) || 0;
     const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
 
     // Find all followers in graveyard with cost <= maxCost
@@ -19,7 +19,8 @@ export function handleReanimate(eff: Effect, owner: Player) {
     );
 
     if (eligible.length === 0) {
-        console.log("No eligible followers to reanimate");
+        console.log(`No eligible followers to reanimate (maxCost=${maxCost}). Grave size: ${grave.length}`);
+        // console.log("Grave dump:", grave.map(c => `${c.name} (${c.cost})`));
         return;
     }
 

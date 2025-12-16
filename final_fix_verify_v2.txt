@@ -1,0 +1,53 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+node.exe : [90mstderr[2m | tests/integration/bounce.test.ts
+Au caractère Ligne:1 : 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo              : NotSpecifi    ed: ([90mstderr[    2m.../bounce.test.    ts:String) [], Rem    oteException
+    + FullyQualifiedEr    rorId : NativeComm    andError
+ 
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/reanimate.test.ts
+[22m[39mCannot set navigator
+
+[90mstdout[2m | tests/integration/reanimate.test.ts
+[22m[39mTargeting Module State ID: [33m0.3731524807031492[39m
+
+[90mstdout[2m | tests/integration/bounce.test.ts
+[22m[39mTargeting Module State ID: [33m0.4106011687261344[39m
+
+[90mstderr[2m | tests/integration/reanimate.test.ts[2m > [22m[2mReanimate Mechanics[2m > [22m[2mshould reanimate a follower from the graveyard
+[22m[39mRender called but not injected
+Render called but not injected
+
+[90mstdout[2m | tests/integration/bounce.test.ts[2m > [22m[2mBounce Mechanics[2m > [22m[2mshould bounce follower from board to hand
+[22m[39m[BounceOp] HandleReturnToHand Target=ally:follower Owner=blue Source=undefined#undefined
+[BounceOp] Pool size after init: 1
+
+[90mstderr[2m | tests/integration/bounce.test.ts[2m > [22m[2mBounce Mechanics[2m > [22m[2mshould bounce follower from board to hand
+[22m[39mRender called but not injected
+
+[90mstdout[2m | tests/integration/reanimate.test.ts[2m > [22m[2mReanimate Mechanics[2m > [22m[2mshould fail to reanimate if cost exceeds X
+[22m[39mNo eligible followers to reanimate (maxCost=4). Grave size: 1
+
+[90mstderr[2m | tests/integration/reanimate.test.ts[2m > [22m[2mReanimate Mechanics[2m > [22m[2mshould fail to reanimate if cost exceeds X
+[22m[39mRender called but not injected
+
+[90mstdout[2m | tests/integration/bounce.test.ts[2m > [22m[2mBounce Mechanics[2m > [22m[2mshould fail to bounce if hand is full (9 cards)
+[22m[39m[BounceOp] HandleReturnToHand Target=ally:follower Owner=blue Source=undefined#undefined
+[BounceOp] Pool size after init: 1
+
+[90mstderr[2m | tests/integration/bounce.test.ts[2m > [22m[2mBounce Mechanics[2m > [22m[2mshould fail to bounce if hand is full (9 cards)
+[22m[39mRender called but not injected
+
+ [32mÔ£ô[39m tests/integration/reanimate.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/bounce.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+[2m   Start at [22m 22:27:13
+[2m   Duration [22m 562ms[2m (transform 736ms, setup 48ms, import 855ms, tests 10ms, environment 0ms)[22m
+

@@ -116,3 +116,12 @@ export function getCardById(id: string): CardTemplate | null {
     idMap: cardIdMap,
     reload: loadCardDatabase
 };
+
+// Test Helper
+export function injectCardForTest(card: CardTemplate) {
+    if (!card.name) return;
+    fullCardData[card.name] = card;
+    if (card.id) {
+        cardIdMap[String(card.id)] = card;
+    }
+}

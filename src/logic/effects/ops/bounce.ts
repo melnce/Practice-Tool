@@ -50,8 +50,23 @@ export function bounceToHand(card: CardInstance) {
     const fresh = freshBaseCopyByName(removed.name);
     if (!fresh) return; // no DB entry → nothing to add
 
-    pushToHand(toHand, fresh);
-    logEvent("bounceToHand", { from: owner, name: removed.name, oldUid: removed.uid, newUid: fresh.uid });
+    const pushed = pushToHand(toHand, fresh);
+    if (!pushed) {
+        // Hand full -> Burn to graveyard
+        // Shadowverse: Bounced cards that trigger burn go to graveyard (shadows +1)
+        // We push the 'fresh' copy or 'removed'? Rules say "discarded".
+        // Usually treated as "destroyed" from hand perspective, so 'fresh' is appropriate/safe.
+        let grave: CardInstance[] | null = null;
+        if (owner === "blue") grave = state.blueGraveyard;
+        else if (owner === "red") grave = state.redGraveyard;
+
+        if (grave) {
+            grave.push(fresh);
+            logEvent("burn_to_grave", { owner, card: fresh.name, uid: fresh.uid });
+        }
+    } else {
+        logEvent("bounceToHand", { from: owner, name: removed.name, oldUid: removed.uid, newUid: fresh.uid });
+    }
 }
 
 // Handle "return_to_hand" effect
