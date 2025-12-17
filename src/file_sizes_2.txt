@@ -1,0 +1,10 @@
+﻿35774 C:\Projects\Practice Tool\src\logic\core\effects\index.ts
+22287 C:\Projects\Practice Tool\src\logic\core\triggers.ts
+19578 C:\Projects\Practice Tool\src\logic\effects\ops\buff.ts
+19454 C:\Projects\Practice Tool\src\ui\zones.ts
+18008 C:\Projects\Practice Tool\src\logic\effects\ops\targeted\index.ts
+16076 C:\Projects\Practice Tool\src\logic\core\targeting.ts
+14738 C:\Projects\Practice Tool\src\logic\effects\ops\damage.ts
+14300 C:\Projects\Practice Tool\src\ui\render.ts
+13937 C:\Projects\Practice Tool\src\logic\core\turns.ts
+12899 C:\Projects\Practice Tool\src\logic\core\combat.ts

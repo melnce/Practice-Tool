@@ -7,7 +7,7 @@ import { randInt } from "../../core/rng.js";
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
 
-interface TargetContext {
+export interface TargetContext {
     targets?: CardInstance[];
     enteringCard?: CardInstance;
     isTargetedEffect?: boolean;

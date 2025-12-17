@@ -2,10 +2,16 @@
 import { state } from "../../core/gameState.js";
 // import { render } from "../../ui/render.js";
 import { handleBanish } from "../effects/ops/banish.js";
-import { runEffects } from "./effects/index.js";
+// import { runEffects } from "./effects/index.js"; // Breaking cycle
 import { logEvent } from "../../core/logger.js";
 import { fireTrigger } from "./triggers.js";
-import { CardInstance, Player } from "../../core/types.js";
+import { CardInstance, Player, Effect } from "../../core/types.js";
+
+// Dependency Injection for runEffects
+let runEffects: (effects: Effect[], owner: Player, source: any, context?: any) => void;
+export function registerRunEffectsInCleanup(fn: any) {
+    runEffects = fn;
+}
 
 // @ts-ignore
 import { hasBanishOnDeath } from "@logic/core/utils.js"; // If needed, or just guard properties
@@ -19,6 +25,10 @@ export function cleanupDead() {
         if (!card?.hasLastWords) return;
         const lw = card.keywordState?.lastWordsEffects || card.lastWordsEffects;
         if (!Array.isArray(lw)) return;
+        if (!runEffects) {
+            console.warn("cleanupDead: runEffects not registered!");
+            return;
+        }
         (card as any)._lwFired = true;                    // mark fired
         runEffects([...lw], owner, card);
     };
@@ -38,7 +48,9 @@ export function cleanupDead() {
             const isAmulet = c.type === "Amulet";
             const defLE0 = isFollower && ((parseInt(String(c.defense))) || 0) <= 0;
             const countdown0 = isAmulet && c.hasCountdown && ((parseInt(String(c.countdown))) || 0) <= 0;
-            const shouldDestroy = defLE0 || countdown0;
+            const markedForDeath = !!(c as any).pendingDestruction;
+            if (markedForDeath) console.log(`[cleanupDead] Found marked card: ${c.name} (${c.uid})`);
+            const shouldDestroy = defLE0 || countdown0 || markedForDeath;
 
             if (!shouldDestroy) continue;
 

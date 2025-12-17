@@ -1,92 +1,254 @@
 import { KeywordState } from "../logic/core/keywords/types.js";
 import { PlayedHistoryEntry } from "../logic/core/playCard/types.js";
+import { EffectOp } from "../logic/core/effects/opTypes.js";
 
 export type Player = "blue" | "red";
 
-export type EffectOp =
-    | "add_counter" | "add_selected_copy_to_hand" | "add_shadows" | "add_to_hand"
-    | "amulet_count_gate" | "attacks_per_turn"
-    | "banish" | "banish_all_enemy_copies" | "banish_duplicates_from_deck" | "banish_random" | "banish_self"
-    | "board_name_gate" | "both_max_pp_gate"
-    | "buff" | "buff_hand_class" | "buff_last_added_to_hand" | "buff_self" | "buff_hand_tribe"
-    | "chaos_split_damage" | "choose" | "choose_bonus_add"
-    | "combo_add" | "combo_gate" | "combo_repeat_buff" | "congregant_fill_board"
-    | "crest_add_counter" | "crest_pay_counter"
-    | "damage" | "damage_all" | "damage_all_by_allied_golems" | "damage_enemy_leader_by_other_allies"
-    | "damage_follower_or_leader" | "damage_highest_defense" | "damage_random" | "damage_random_selected_defense"
-    | "damage_self" | "damage_split_all_enemies" | "damage_split_fixed" | "damage_split_sequential"
-    | "destroy" | "destroy_all" | "destroy_allied_amulets_then_damage" | "destroy_defender_if_damaged"
-    | "destroy_highest" | "destroy_random" | "destroy_random_other_allies" | "destroy_self" | "destroy_then"
-    | "discard_all_except_named" | "discard_select_hand"
-    | "double_stats_allies" | "dragonsign"
-    | "draw" | "draw_all_named_with_keyword" | "draw_combo_follower" | "draw_filtered" | "draw_named" | "draw_opponent"
-    | "dynamic_buff_self" | "dynamic_heal_leader"
-    | "earth_rite" | "evolved_self_gate" | "evolve_all_unevolved_allies" | "evolve_self"
-    | "fill_congregant_copies" | "follower_strike_destroy"
-    | "fuse_finalize_fortifier" | "fuse_start" | "fuse"
-    | "gain_crest" | "gain_max_pp"
-    | "halve_deck_cost" | "hand_count_gate" | "heal_leader" | "himeka_crest_effect"
-    | "increase_countdown" | "increase_opponent_hand_cost_eot"
-    | "keyword" | "keyword_self" | "kuon_enhance"
-    | "leader_barrier"
-    | "modify_cost" | "modify_cost_pool"
-    | "necromancy_gate" | "no_ally_attacked_this_turn_gate" | "no_duplicates_in_deck_gate"
-    | "overflow_gate"
-    | "reanimate" | "rally_gate" | "recover_pp" | "repeat_effect" | "reduce_cost" | "reduce_cost_self"
-    | "reduce_countdown" | "reduce_deck_followers_cost" | "remove_keyword"
-    | "replace_deck" | "replace_deck_with_set_minus"
-    | "restore_full_defense_self" | "restore_self_and_heal_leader"
-    | "return_hand_to_deck" | "return_to_hand"
-    | "select" | "select_evolve_golem" | "select_hand_summon_artifact_copy" | "select_hand_summon_artifact_copies_eot_destroy"
-    | "set_attack_to" | "set_deckout_victory" | "set_max_hp"
-    | "spellboost" | "spellboost_hand" | "spellboost_target"
-    | "start_fortifier_fuse" | "start_fuse_from_card" | "self_cost_gate" | "set_cost_last_drawn" | "set_cost_self"
-    | "summon"
-    | "super_evo_gate" | "super_evolve_ally" | "super_evolved_allied_gate" | "super_evolve_self" | "super_evolved_self_gate"
-    | "summon_destroyed_amulet_highest_base_cost" | "summon_exact_copy" | "summon_named" | "summon_named_enemy" | "summon_random_from_deck"
-    | "transform" | "transform_in_hand" | "transform_random_spell_in_hand" | "transform_self_if_spellboost_at_least"
-    | "set_spellboost_count"
-    | "notify_loot_played" | "rally" | "notify_burial" // passive ops
-    | string;
+export { EffectOp };
 
+// Common fields for all effects
 export interface BaseEffect {
-    op: EffectOp;
     effects?: Effect[] | undefined; // nested (success)
     else_effects?: Effect[] | undefined; // nested (failure)
-    [key: string]: any;
+    [key: string]: any; // Allow other properties but op MUST be strict in specific interfaces
 }
 
+// --- Combat ---
+export type DamageOps = Extract<EffectOp, "damage" | "damage_all" | "damage_random" | "damage_split_sequential" | "damage_follower_or_leader" | "damage_all_by_allied_golems" | "damage_split_fixed" | "damage_random_selected_defense" | "damage_split_all_enemies" | "damage_highest_defense" | "damage_enemy_leader_by_other_allies" | "damage_self">;
 export interface DamageEffect extends BaseEffect {
-    op: "damage" | "damage_all" | "damage_random" | "damage_self" | "damage_follower_or_leader";
+    op: DamageOps;
     amount?: number | string;
     add_amount?: number | string;
     target?: string;
 }
 
-export interface BuffEffect extends BaseEffect {
-    op: "buff" | "buff_self";
-    attack?: number | string;
-    defense?: number | string;
+export type DestroyOps = Extract<EffectOp, "destroy" | "destroy_all" | "destroy_highest" | "destroy_random" | "destroy_random_other_allies" | "destroy_allied_amulets" | "destroy_allied_amulets_then_damage" | "destroy_self" | "destroy_then" | "destroy_defender_if_damaged" | "follower_strike_destroy">;
+export interface DestroyEffect extends BaseEffect {
+    op: DestroyOps;
+    target?: string;
 }
 
-export interface SummonEffect extends BaseEffect {
-    op: "summon" | "summon_named" | "summon_exact_copy";
+export type BanishOps = Extract<EffectOp, "banish" | "banish_all_enemy_copies" | "banish_duplicates_from_deck" | "banish_random" | "banish_self">;
+export interface BanishEffect extends BaseEffect {
+    op: BanishOps;
+    target?: string;
+}
+
+export type HealOps = Extract<EffectOp, "heal_leader" | "dynamic_heal_leader" | "set_max_hp" | "leader_barrier" | "restore_full_defense_self" | "restore_self_and_heal_leader" | "restore_allies">;
+export interface HealEffect extends BaseEffect {
+    op: HealOps;
+    amount?: number | string;
+}
+
+// --- Resources ---
+export type ResourceOps = Extract<EffectOp, "add_max_pp" | "gain_max_pp" | "recover_pp" | "recover_ep" | "add_shadows" | "earth_rite">;
+export interface ResourceEffect extends BaseEffect {
+    op: ResourceOps;
+    amount?: number | string;
+}
+
+export type GateOps = Extract<EffectOp, "necromancy_gate" | "overflow_gate" | "hand_count_gate" | "rally_gate" | "amulet_count_gate" | "board_name_gate" | "both_max_pp_gate" | "combo_gate" | "evolved_self_gate" | "super_evolve_gate" | "super_evolved_self_gate" | "evolved_allied_gate" | "super_evolved_allied_gate" | "max_pp_gate" | "no_ally_attacked_this_turn_gate" | "no_duplicates_in_deck_gate" | "skybound_art_gate" | "self_cost_gate">;
+export interface GateEffect extends BaseEffect {
+    op: GateOps;
+    cost?: number; // necromancy
+    count?: number; // rally/hand
+    name?: string; // board_name
+}
+
+export type DrawOps = Extract<EffectOp, "draw" | "draw_all_named_with_keyword" | "draw_combo_follower" | "draw_filtered" | "draw_named" | "draw_opponent">;
+export interface DrawEffect extends BaseEffect {
+    op: DrawOps;
+    count?: number;
+    name?: string;
+    keyword?: string;
+}
+
+export type HandOps = Extract<EffectOp, "add_to_hand" | "add_selected_copy_to_hand" | "discard_select_hand" | "discard_all_except_named" | "transform_in_hand" | "transform_random_spell_in_hand">;
+export interface HandEffect extends BaseEffect {
+    op: HandOps;
     name?: string;
     count?: number;
 }
 
-export interface GateEffect extends BaseEffect {
-    op: "necromancy_gate" | "overflow_gate" | "hand_count_gate" | "rally_gate";
-    cost?: number; // for necromancy
-    count?: number; // for rally/hand
+export type DeckOps = Extract<EffectOp, "replace_deck" | "replace_deck_with_set_minus" | "set_cost_last_drawn" | "halve_deck_cost" | "reduce_deck_followers_cost">;
+export interface DeckEffect extends BaseEffect {
+    op: DeckOps;
 }
 
-// Fallback for everything else
-export interface GenericEffect extends BaseEffect {
-    op: string;
+export type CrestOps = Extract<EffectOp, "gain_crest" | "crest_add_counter" | "crest_pay_counter" | "himeka_crest_effect">;
+export interface CrestEffect extends BaseEffect {
+    op: CrestOps;
+    name?: string;
+    crest?: string;
+    counter?: string;
+    amount?: number;
 }
 
-export type Effect = DamageEffect | BuffEffect | SummonEffect | GateEffect | GenericEffect;
+export type FuseOps = Extract<EffectOp, "fuse_start" | "start_fortifier_fuse" | "start_fuse_from_card" | "fuse_finalize_fortifier" | "fuse_finalize_generic" | "fuse_finalize_alpha" | "fuse_finalize_gear_multi" | "fuse_finalize_gardens_allure" | "fuse_finalize_loot">;
+export interface FuseEffect extends BaseEffect {
+    op: FuseOps;
+    initiator_uid?: string;
+    partner?: any;
+    result?: any;
+}
+
+// --- Board ---
+export type SummonOps = Extract<EffectOp, "summon" | "summon_named" | "summon_exact_copy" | "summon_named_enemy" | "summon_random_from_deck" | "summon_destroyed_amulet_highest_base_cost" | "select_hand_summon_artifact_copy" | "select_hand_summon_artifact_copies_eot_destroy">;
+export interface SummonEffect extends BaseEffect {
+    op: SummonOps;
+    name?: string;
+    count?: number;
+    target?: string;
+    condition?: any;
+}
+
+export type CongregantOps = Extract<EffectOp, "fill_congregant_copies" | "congregant_fill_board" | "fill_board_chain_decay">;
+export interface CongregantEffect extends BaseEffect {
+    op: CongregantOps;
+}
+
+export type ReanimateOps = Extract<EffectOp, "reanimate">;
+export interface ReanimateEffect extends BaseEffect {
+    op: ReanimateOps;
+    cost?: number;
+}
+
+export type ReturnOps = Extract<EffectOp, "return_to_hand" | "bounce" | "return_hand_to_deck">;
+export interface ReturnEffect extends BaseEffect {
+    op: ReturnOps;
+}
+
+export type TransformOps = Extract<EffectOp, "transform">;
+export interface TransformEffect extends BaseEffect {
+    op: TransformOps;
+    name?: string;
+}
+
+// --- Buffs ---
+export type BuffOps = Extract<EffectOp, "buff" | "buff_hand_class" | "buff_hand_tribe" | "buff_last_added_to_hand" | "buff_self" | "dynamic_buff_self" | "combo_repeat_buff" | "set_stats" | "set_attack_to">;
+export interface BuffEffect extends BaseEffect {
+    op: BuffOps;
+    attack?: number | string;
+    defense?: number | string;
+    target?: string;
+    condition?: any;
+}
+
+export type AttacksOps = Extract<EffectOp, "attacks_per_turn">;
+export interface AttacksEffect extends BaseEffect {
+    op: AttacksOps;
+    amount?: number;
+}
+
+export type KeywordOps = Extract<EffectOp, "keyword" | "remove_keyword" | "remove_abilities" | "grant_trigger">;
+export interface KeywordEffect extends BaseEffect {
+    op: KeywordOps;
+    keyword?: string;
+    target?: string;
+    condition?: any;
+    select?: any;
+    select_count?: number;
+}
+
+export type CostOps = Extract<EffectOp, "modify_cost" | "modify_cost_pool" | "reduce_cost" | "reduce_cost_self" | "set_cost_self" | "increase_opponent_hand_cost_eot">;
+export interface CostEffect extends BaseEffect {
+    op: CostOps;
+    amount?: number | string;
+}
+
+export type CounterOps = Extract<EffectOp, "add_counter" | "reduce_countdown" | "increase_countdown">;
+export interface CounterEffect extends BaseEffect {
+    op: CounterOps;
+    amount?: number;
+    name?: string; // e.g. "loot_counter"
+}
+
+export type SpellboostOps = Extract<EffectOp, "spellboost" | "spellboost_hand" | "spellboost_target" | "set_spellboost_count" | "transform_self_if_spellboost_at_least">;
+export interface SpellboostEffect extends BaseEffect {
+    op: SpellboostOps;
+    amount?: number;
+}
+
+// --- Misc ---
+export type MiscOps = Extract<EffectOp, "select" | "target" | "choose" | "choose_bonus_add" | "nested_effects" | "repeat_effect">;
+export interface MiscEffect extends BaseEffect {
+    op: MiscOps;
+    count?: number;
+    target?: string;
+    select?: any;
+}
+
+export type EvolveOps = Extract<EffectOp, "evolve" | "evolve_self" | "super_evolve_self" | "evolve_last_summoned" | "evolve_all_unevolved_allies" | "evolve_all_allies_named" | "super_evolve_all_unevolved_allies" | "super_evolve_ally" | "super_evolve">;
+export interface EvolveEffect extends BaseEffect {
+    op: EvolveOps;
+    name?: string;
+}
+
+export type SpecialOps = Extract<EffectOp, "set_deckout_victory" | "dragonsign" | "combo_add">;
+export interface SpecialEffect extends BaseEffect {
+    op: SpecialOps;
+}
+
+// Helper to enforce exact op matches in the mapped type
+type Exact<T, Op> = T extends { op: unknown } ? (T & { op: Op }) : never;
+
+// --- The Total Mapping ---
+// we map each Group of Ops to their interface, but narrowed to the specific Op
+type MappedOps =
+    & { [K in DamageOps]: Exact<DamageEffect, K> }
+    & { [K in DestroyOps]: Exact<DestroyEffect, K> }
+    & { [K in BanishOps]: Exact<BanishEffect, K> }
+    & { [K in HealOps]: Exact<HealEffect, K> }
+    & { [K in ResourceOps]: Exact<ResourceEffect, K> }
+    & { [K in GateOps]: Exact<GateEffect, K> }
+    & { [K in DrawOps]: Exact<DrawEffect, K> }
+    & { [K in HandOps]: Exact<HandEffect, K> }
+    & { [K in DeckOps]: Exact<DeckEffect, K> }
+    & { [K in CrestOps]: Exact<CrestEffect, K> }
+    & { [K in FuseOps]: Exact<FuseEffect, K> }
+    & { [K in SummonOps]: Exact<SummonEffect, K> }
+    & { [K in CongregantOps]: Exact<CongregantEffect, K> }
+    & { [K in ReanimateOps]: Exact<ReanimateEffect, K> }
+    & { [K in ReturnOps]: Exact<ReturnEffect, K> }
+    & { [K in TransformOps]: Exact<TransformEffect, K> }
+    & { [K in BuffOps]: Exact<BuffEffect, K> }
+    & { [K in AttacksOps]: Exact<AttacksEffect, K> }
+    & { [K in KeywordOps]: Exact<KeywordEffect, K> }
+    & { [K in CostOps]: Exact<CostEffect, K> }
+    & { [K in CounterOps]: Exact<CounterEffect, K> }
+    & { [K in SpellboostOps]: Exact<SpellboostEffect, K> }
+    & { [K in MiscOps]: Exact<MiscEffect, K> }
+    & { [K in EvolveOps]: Exact<EvolveEffect, K> }
+    & { [K in SpecialOps]: Exact<SpecialEffect, K> };
+
+export type EffectByOp = MappedOps;
+
+// Assertions
+// 1. Total: All EffectOp keys must be present in EffectByOp
+type _AssertTotal = EffectOp extends keyof EffectByOp ? true : never;
+
+// 2. Exact: EffectByOp[K].op must be exactly K (Bi-directional)
+type _AssertExact = {
+    [K in EffectOp]:
+    EffectByOp[K]["op"] extends K
+    ? (K extends EffectByOp[K]["op"] ? true : never)
+    : never;
+};
+// Collapse the mapped type — if any entry is `never`, this becomes `never`
+type _AssertExactAll = _AssertExact[EffectOp] extends true ? true : never;
+
+// 3. Reverse: EffectByOp keys must be exactly EffectOp
+type _AssertReverse = keyof EffectByOp extends EffectOp ? true : never;
+
+// Force evaluation
+const _checks: [_AssertTotal, _AssertReverse, _AssertExactAll] = [true, true, true];
+
+// The Union Type
+export type Effect = EffectByOp[keyof EffectByOp];
+
+export type EffectResult = "pending" | void;
+
+// --- Other Interfaces from original file ---
 
 export interface KeywordEntry {
     name: string;
@@ -114,13 +276,11 @@ export interface CardTemplate {
     evo_image?: string;
     cost: number | string;
     base_cost?: number | string;
-
     // Stats
     attack?: number | string;
     defense?: number | string;
     base_attack?: number | string;
     base_defense?: number | string;
-
     // Flags
     can_attack?: boolean;
     hasAttacked?: boolean;
@@ -136,32 +296,27 @@ export interface CardTemplate {
     hasEngage?: boolean;
     hasStorm?: boolean;
     cant_play?: boolean;
-
     // Spell/Amulet specific
     spell?: Effect[];
     fuse?: any[];
     fuse_recipes?: any[];
-
     // Runtime-like (template might not have them but they appear)
     cost_mod?: number;
     effectiveCost?: number;
     potential_defense?: number;
     countdown?: number | string;
-    // barrierCharges?: number; // Removed
     peak_defense?: number;
     keywords?: (string | KeywordEntry)[];
     fanfare?: Effect[];
     enhanceTiers?: { cost: number; effects?: Effect[] }[];
     evoType?: "normal" | "super";
     lastWordsEffects?: Effect[];
-
     // Buff tracking
     buffs?: {
         attack?: number | undefined;
         defense?: number | undefined;
         [key: string]: any;
     } | undefined;
-
     [key: string]: any;
 }
 
@@ -170,12 +325,9 @@ export interface CardInstance extends CardTemplate {
     zone?: "deck" | "hand" | "board" | "graveyard" | "banished";
     instanceId?: string | number;
     originalCost?: number;
-
     // Runtime counters
     spellboostCount?: number;
     keywordState?: KeywordState;
-
-
     // UI
     __uiFlashBarrier?: boolean;
     __uiPopBarrier?: boolean;
@@ -190,11 +342,9 @@ export interface GameState {
     redMaxPP: number;
     bluePermPP: number;
     redPermPP: number;
-
     roundCount: number;
     isBlueTurn: boolean;
     gameStarted: boolean;
-
     blueHand: CardInstance[];
     redHand: CardInstance[];
     blueBoard: CardInstance[];
@@ -203,40 +353,31 @@ export interface GameState {
     redDeck: CardInstance[];
     blueGraveyard: CardInstance[];
     redGraveyard: CardInstance[];
-
     bluePlayedHistory: PlayedHistoryEntry[];
     redPlayedHistory: PlayedHistoryEntry[];
     blueDestroyedHistory: CardInstance[];
     redDestroyedHistory: CardInstance[];
-
     blueCrests: any[];
     redCrests: any[];
-
     blueShadows: number;
     redShadows: number;
-
     blueRally: number;
     redRally: number;
-
     blueEvoCharges: number;
     redEvoCharges: number;
     blueSuperEvoCharges: number;
     redSuperEvoCharges: number;
     blueEvoUsedThisTurn: boolean;
     redEvoUsedThisTurn: boolean;
-
     // Total total successful evolves per match (for counting, e.g. Odin/Grimnir/Sandalphon gates)
     blueEvoCount: number;
     redEvoCount: number;
-
     bluePlaysThisTurn: number;
     redPlaysThisTurn: number;
     blueChooseBonus: number;
     redChooseBonus: number;
-
     blueAnyAllyAttackedThisTurn?: boolean;
     redAnyAllyAttackedThisTurn?: boolean;
-
     pendingTargetEffect?: {
         eff: Effect;
         owner: Player;
@@ -249,17 +390,13 @@ export interface GameState {
         requiresConfirmation?: boolean | undefined;
         confirmationText?: string | undefined;
     } | undefined;
-
     lastSummoned: CardInstance[];
     lastDrawnCards: CardInstance[];
     lastFuse?: { result_name: string;[key: string]: any } | undefined;
-
     deckoutWinsBlue?: boolean | undefined;
     deckoutWinsRed?: boolean | undefined;
-
     blueLeaderBarrier?: number | undefined;
     redLeaderBarrier?: number | undefined;
-
     [key: string]: any;
 }
 
@@ -278,8 +415,6 @@ export type PlayCardAction = {
     type: "PLAY_CARD";
     player: Player;
     cardUid: string;
-    // Optional targeting for the card being played (if it requires a target immediately, though usually handled by UI/ResolveTarget)
-    // For now, minimal.
 };
 
 export type AttackAction = {

@@ -228,6 +228,8 @@ export function handleDestroySelf(sourceCard: CardInstance) {
     // Setting defense to 0 marks it for cleanup
     // @ts-ignore
     sourceCard.defense = 0;
+    // Explicitly mark for cleanup (for amulets/spells that don't have defense)
+    (sourceCard as any).pendingDestruction = true;
 }
 
 export function handleBanishSelf(sourceCard: CardInstance, owner: Player) {

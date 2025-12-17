@@ -400,12 +400,12 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
         if (state.phase !== "mulligan" && isBoard && isAmulet && card.hasEngage) {
             const ownerSide = isBlueBoard ? "blue" : "red";
             const myTurnSide = (isBlueBoard && state.isBlueTurn) || (isRedBoard && !state.isBlueTurn);
-            const cost = Number(card.engageCost || 0);
+            const cost = Number(card.keywordState?.engageCost ?? card.engageCost ?? 0);
             const enoughPP = ownerSide === "blue" ? state.bluePP >= cost : state.redPP >= cost;
 
             // Default = once per turn unless explicitly disabled
             const oncePerTurn = card.engageOncePerTurn !== false;
-            const alreadyEngaged = !!card.engagedThisTurn;
+            const alreadyEngaged = !!card.keywordState?.engagedThisTurn;
             const readyThisTurn = oncePerTurn ? !alreadyEngaged : true;
 
             const canEngage = myTurnSide && enoughPP && readyThisTurn;

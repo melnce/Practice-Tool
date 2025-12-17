@@ -174,7 +174,7 @@ export function resetHistory() {
 /** Hotkeys: Ctrl/Cmd+Z (undo), Ctrl+Shift+Z or Ctrl+Y (redo) */
 export function initHistoryHotkeys({ target = document }: { target?: Document | HTMLElement } = {}) {
   target.addEventListener("keydown", (e: any) => {
-    const isMac = navigator.platform.toUpperCase().includes("MAC");
+    const isMac = typeof navigator !== "undefined" && navigator.platform && navigator.platform.toUpperCase().includes("MAC");
     const ctrl = isMac ? e.metaKey : e.ctrlKey;
 
     // Undo: Ctrl/Cmd+Z (without Shift)

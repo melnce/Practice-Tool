@@ -180,8 +180,11 @@ export function fireTrigger(eventName: string, activePlayer: Player, context: Tr
     ];
 
     for (const { card, owner, source } of zones) {
-        const triggers = card.keywordState?.triggers;
-        if (!Array.isArray(triggers) || !triggers.length) continue;
+        const triggers = [
+            ...(card.triggers || []),
+            ...(card.keywordState?.triggers || [])
+        ];
+        if (!triggers.length) continue;
 
         for (const trigger of triggers) {
             if (trigger.event !== eventName) continue;

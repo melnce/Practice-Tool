@@ -1,0 +1,15 @@
+﻿
+> practice-tool@1.0.0 build
+> tsc
+
+src/logic/core/effects/domains/buffs.ts(46,70): error TS2345: Argument of type 'Effect' is not assignable to parameter of type 'Effect & { [key: number]: number; value?: number; amount?: number; n?: number; }'.
+  Type 'DamageEffect' is not assignable to type 'Effect & { [key: number]: number; value?: number; amount?: number; n?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Type 'DamageEffect' is not assignable to type '(DamageEffect & { [key: number]: number; value?: number; amount?: number; n?: number; }) | (GenericEffect & { [key: number]: number; value?: number; amount?: number; n?: number; })' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Type 'DamageEffect' is not assignable to type 'GenericEffect & { [key: number]: number; value?: number; amount?: number; n?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+        Type 'DamageEffect' is not assignable to type '{ [key: number]: number; value?: number; amount?: number; n?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+          Types of property 'amount' are incompatible.
+            Type 'string | number' is not assignable to type 'number'.
+              Type 'string' is not assignable to type 'number'.
+src/logic/core/effects/domains/misc.ts(113,51): error TS2322: Type 'string' is not assignable to type 'EffectResult | Promise<EffectResult>'.
+src/logic/core/effects/domains/resources.ts(17,45): error TS2307: Cannot find module '../../../helpers/necromancy.js' or its corresponding type declarations.
+src/logic/core/effects/domains/resources.ts(18,28): error TS2307: Cannot find module '../../../helpers/overflow.js' or its corresponding type declarations.

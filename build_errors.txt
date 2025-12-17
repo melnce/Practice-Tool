@@ -1,0 +1,36 @@
+﻿
+> practice-tool@1.0.0 build
+> tsc
+
+src/logic/core/effects/domains/board.ts(3,23): error TS2307: Cannot find module '../../../core/gameState.js' or its corresponding type declarations.
+src/logic/core/effects/domains/board.ts(4,26): error TS2307: Cannot find module '../../../core/logger.js' or its corresponding type declarations.
+src/logic/core/effects/domains/buffs.ts(3,23): error TS2307: Cannot find module '../../../core/gameState.js' or its corresponding type declarations.
+src/logic/core/effects/domains/buffs.ts(14,8): error TS2307: Cannot find module '../keywords.js' or its corresponding type declarations.
+src/logic/core/effects/domains/buffs.ts(46,70): error TS2345: Argument of type 'Effect' is not assignable to parameter of type 'Effect & { [key: number]: number; value?: number; amount?: number; n?: number; }'.
+  Type 'DamageEffect' is not assignable to type 'Effect & { [key: number]: number; value?: number; amount?: number; n?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+    Type 'DamageEffect' is not assignable to type '(DamageEffect & { [key: number]: number; value?: number; amount?: number; n?: number; }) | (GenericEffect & { [key: number]: number; value?: number; amount?: number; n?: number; })' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Type 'DamageEffect' is not assignable to type 'GenericEffect & { [key: number]: number; value?: number; amount?: number; n?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+        Type 'DamageEffect' is not assignable to type '{ [key: number]: number; value?: number; amount?: number; n?: number; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+          Types of property 'amount' are incompatible.
+            Type 'string | number' is not assignable to type 'number'.
+              Type 'string' is not assignable to type 'number'.
+src/logic/core/effects/domains/combat.ts(13,5): error TS2305: Module '"../../../effects/ops/destroy.js"' has no exported member 'handleDestroyAlliedAmuletsThenDamage'.
+src/logic/core/effects/domains/combat.ts(13,43): error TS2305: Module '"../../../effects/ops/destroy.js"' has no exported member 'handleDestroyRandomOtherAllies'.
+src/logic/core/effects/domains/combat.ts(17,53): error TS2724: '"../../../effects/ops/banish.js"' has no exported member named 'handleBanishSelf'. Did you mean 'handleBanish'?
+src/logic/core/effects/domains/combat.ts(21,44): error TS2305: Module '"../../../effects/leader.js"' has no exported member 'handleRestoreFullDefenseSelf'.
+src/logic/core/effects/domains/combat.ts(22,5): error TS2305: Module '"../../../effects/leader.js"' has no exported member 'handleRestoreSelfAndHealLeader'.
+src/logic/core/effects/domains/combat.ts(22,37): error TS2305: Module '"../../../effects/leader.js"' has no exported member 'handleRestoreAllies'.
+src/logic/core/effects/domains/combat.ts(68,56): error TS2322: Type 'number' is not assignable to type 'EffectResult | Promise<EffectResult>'.
+src/logic/core/effects/domains/combat.ts(125,16): error TS2307: Cannot find module '../../../core/logger.js' or its corresponding type declarations.
+src/logic/core/effects/domains/combat.ts(139,16): error TS2307: Cannot find module '../../../core/logger.js' or its corresponding type declarations.
+src/logic/core/effects/domains/misc.ts(3,23): error TS2307: Cannot find module '../../../core/gameState.js' or its corresponding type declarations.
+src/logic/core/effects/domains/misc.ts(4,26): error TS2307: Cannot find module '../../../core/logger.js' or its corresponding type declarations.
+src/logic/core/effects/domains/misc.ts(90,16): error TS2307: Cannot find module '../../evolveUtils.js' or its corresponding type declarations.
+src/logic/core/effects/domains/misc.ts(102,36): error TS7006: Parameter 'c' implicitly has an 'any' type.
+src/logic/core/effects/domains/misc.ts(113,51): error TS2322: Type 'string' is not assignable to type 'EffectResult | Promise<EffectResult>'.
+src/logic/core/effects/domains/resources.ts(3,23): error TS2307: Cannot find module '../../../core/gameState.js' or its corresponding type declarations.
+src/logic/core/effects/domains/resources.ts(4,26): error TS2307: Cannot find module '../../../effects/pp.js' or its corresponding type declarations.
+src/logic/core/effects/domains/resources.ts(15,51): error TS2305: Module '"../../../effects/ops/misc.js"' has no exported member 'handleGainCrest'.
+src/logic/core/effects/domains/resources.ts(17,45): error TS2307: Cannot find module '../../../helpers/necromancy.js' or its corresponding type declarations.
+src/logic/core/effects/domains/resources.ts(18,28): error TS2307: Cannot find module '../../../helpers/overflow.js' or its corresponding type declarations.
+src/logic/core/effects/domains/resources.ts(21,26): error TS2307: Cannot find module '../../../core/logger.js' or its corresponding type declarations.

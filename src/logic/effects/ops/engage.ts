@@ -69,12 +69,14 @@ export function engageAmulet(owner: Player, index: number) {
             const card = board[index];
             if (!card || card.type !== "Amulet" || !card.hasEngage) return;
 
-            if (card.keywordState?.engageOncePerTurn !== false && card.keywordState?.engagedThisTurn) {
+            const s = card.keywordState;
+            const engageOncePerTurn = s?.engageOncePerTurn ?? card.engageOncePerTurn ?? true;
+            if (engageOncePerTurn !== false && s?.engagedThisTurn) {
                 console.warn(`[Engage] ${card.name} already engaged this turn`);
                 return;
             }
 
-            const cost = Number(card.keywordState?.engageCost ?? 0) || 0;
+            const cost = Number(s?.engageCost ?? card.engageCost ?? 0);
 
             // Affordability check (optional; keep if your UI doesn't pre-check)
             const pp = owner === "blue" ? state.bluePP : state.redPP;
@@ -89,10 +91,10 @@ export function engageAmulet(owner: Player, index: number) {
             // Provide minimal context for listeners if needed later.
             fireTrigger("engage", owner, { sourceCard: card });
 
-            const engageEffects = card.keywordState?.engageEffects;
+            const engageEffects = s?.engageEffects ?? card.engageEffects;
             const effects = Array.isArray(engageEffects) ? engageEffects.slice() : [];
             const needsSelection = effectsNeedSelection(effects);
-            const sacrifice = !!card.keywordState?.engageSacrifice;
+            const sacrifice = !!(s?.engageSacrifice ?? card.engageSacrifice);
 
             // If effects require selection
             if (needsSelection) {
@@ -108,7 +110,9 @@ export function engageAmulet(owner: Player, index: number) {
                 runEffects([...effects], owner, card);
                 if (!card.keywordState) card.keywordState = {};
                 card.keywordState.engagedThisTurn = true;
+
                 adapter.render();
+                cleanupDead();
                 return;
             }
 
