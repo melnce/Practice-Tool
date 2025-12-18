@@ -4,6 +4,7 @@ import { adapter } from "../../../../core/adapter.js";
 import { highlightSelectable, clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
+import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
@@ -37,7 +38,7 @@ export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
         finalize: "fuse_finalize_gear_multi"
     });
 
-    state.pendingTargetEffect = {
+    setPendingTarget({
         eff: { op: "fuse_finalize_gear_multi", initiator_uid: initiator.uid, result_name: resultName },
         owner,
         sourceCard: initiator,
@@ -47,7 +48,7 @@ export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
         resumeEffects: [],
         requiresConfirmation: true,
         confirmationText: "Fuse Selected Gears",
-    };
+    });
 
     highlightSelectable(pool);
     adapter.render();
@@ -75,7 +76,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
         finalize: "fuse_finalize_fortifier"
     });
 
-    state.pendingTargetEffect = {
+    setPendingTarget({
         eff: { op: "fuse_finalize_fortifier", initiator_uid: initiator.uid },
         owner,
         sourceCard: initiator,
@@ -85,7 +86,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
         resumeEffects: [],
         requiresConfirmation: true,
         confirmationText: "Fuse Selected Artifacts",
-    };
+    });
 
     highlightSelectable(pool);
     adapter.render();
@@ -108,7 +109,7 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
         finalize: "fuse_finalize_alpha"
     });
 
-    state.pendingTargetEffect = {
+    setPendingTarget({
         eff: { op: "fuse_finalize_alpha", initiator_uid: initiator.uid },
         owner,
         sourceCard: initiator,
@@ -118,7 +119,7 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
         resumeEffects: [],
         requiresConfirmation: true,
         confirmationText: "Fuse Selected (β + γ → Ω)",
-    };
+    });
 
     highlightSelectable(pool);
     adapter.render();

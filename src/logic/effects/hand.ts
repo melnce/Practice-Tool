@@ -4,6 +4,7 @@ import { getCardDetails } from "../../data/cardDatabase.js";
 // @ts-ignore
 // import { render } from "../../ui/render.js";
 import { highlightSelectable } from "../core/targeting.js";
+import { setPendingTarget } from "../core/pendingTarget/index.js";
 
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Player, Effect } from "../../core/types.js";
@@ -45,7 +46,7 @@ export function handleDiscardSelectHand(eff: Effect, owner: Player, resumeEffect
     const selectCount = Math.min(n, hand.length);
     const pool = [...hand];
 
-    state.pendingTargetEffect = {
+    setPendingTarget({
         op: "discard_select_hand",
         eff: { ...eff, select_count: selectCount },
         owner,
@@ -54,7 +55,7 @@ export function handleDiscardSelectHand(eff: Effect, owner: Player, resumeEffect
         selectCount,
         targets: [],
         resumeEffects,
-    } as any;
+    } as any);
 
     // mark with the correct flag and render
     highlightSelectable(pool); // sets __uiSelectable + render()

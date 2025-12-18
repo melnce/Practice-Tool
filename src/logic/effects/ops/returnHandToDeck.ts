@@ -6,6 +6,7 @@ import { adapter } from "../../../core/adapter.js";
 import { shuffleInPlace } from "../../../core/utils.js";
 import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
+import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 
 
@@ -62,7 +63,7 @@ export function handleReturnHandToDeck(eff: Effect, owner: Player, effectsQueue:
         logEvent("returnHandToDeck_select", { owner, pool: hand.length, select: parseInt((eff as any).select_count || 1) });
         const resume = effectsQueue ? Array.from(effectsQueue) : [];
         if (effectsQueue) effectsQueue.length = 0;
-        state.pendingTargetEffect = {
+        setPendingTarget({
             eff,
             owner,
             sourceCard: null,
@@ -70,7 +71,7 @@ export function handleReturnHandToDeck(eff: Effect, owner: Player, effectsQueue:
             pool: hand, // <-- Add this (the pool is the hand)
             targets: [], // <-- Add this
             selectCount: parseInt((eff as any).select_count || 1), // <-- Add this
-        };
+        });
         hand.forEach(c => ((c as any).__uiSelectable = true)); // This is effectively highlightSelectable(pool)
         adapter.render();
         return "pending";

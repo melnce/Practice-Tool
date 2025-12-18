@@ -2,6 +2,7 @@
 import { registerOp } from "../registry.js";
 import { state } from "../../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../targeting.js";
+import { setPendingTarget } from "../../pendingTarget/index.js";
 import {
     handleBuff, handleBuffHandTribe, handleBuffLastAddedToHand,
     handleBuffHandClass, handleSetAttackTo, handleComboRepeatBuff, handleSetStats
@@ -62,10 +63,10 @@ export function registerBuffEffects() {
         const res = handleKeyword(eff, ctx.owner, ctx.queue, targets, merged);
 
         if (res.kind === "request_target") {
-            state.pendingTargetEffect = {
+            setPendingTarget({
                 ...res.request,
                 targets: []
-            };
+            });
             highlightSelectable(res.request.pool);
             return "pending";
         }
@@ -75,7 +76,7 @@ export function registerBuffEffects() {
         const targets = (ctx.context as any)?.targets || getPool(eff.target || "", ctx.owner);
         const res = handleRemoveKeyword(eff as any, ctx.owner, targets, ctx.queue);
         if (res.kind === "request_target") {
-            state.pendingTargetEffect = { ...res.request, targets: [] };
+            setPendingTarget({ ...res.request, targets: [] });
             highlightSelectable(res.request.pool);
             return "pending";
         }
@@ -89,7 +90,7 @@ export function registerBuffEffects() {
 
         const res = handleRemoveAbilities(eff as any, ctx.owner, ctx.queue, targets, opCtx);
         if (res.kind === "request_target") {
-            state.pendingTargetEffect = { ...res.request, targets: [] };
+            setPendingTarget({ ...res.request, targets: [] });
             highlightSelectable(res.request.pool);
             return "pending";
         }

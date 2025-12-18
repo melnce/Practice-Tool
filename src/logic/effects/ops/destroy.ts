@@ -3,6 +3,7 @@ import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { cleanupDead } from "../../core/cleanup.js";
 import { state } from "../../../core/gameState.js";
 import { runEffects } from "../../core/effects/index.js";
+import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 
 import { logEvent } from "../../../core/logger.js";
@@ -127,7 +128,7 @@ export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, con
 
     if (pool.length) {
         logEvent("destroy_select", { owner, pool: pool.length, select: parseInt(String(eff.select ?? (eff as any).select_count ?? 1), 10) });
-        state.pendingTargetEffect = {
+        setPendingTarget({
             eff,
             owner,
             sourceCard,
@@ -135,7 +136,7 @@ export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, con
             pool,
             targets: [],
             selectCount: parseInt(String(eff.select ?? (eff as any).select_count ?? 1), 10),
-        };
+        });
         highlightSelectable(pool);
         return "pending";
     }

@@ -4,6 +4,7 @@ import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { pushToHand } from "../../../core/utils.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { fireTrigger } from "../../core/triggers.js";
+import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../../core/types.js";
@@ -91,7 +92,7 @@ export function handleReturnToHand(eff: Effect, owner: Player, sourceCard: CardI
     if (!pool.length) return;
 
     if ((eff as any).select) {
-        state.pendingTargetEffect = {
+        setPendingTarget({
             eff,
             owner,
             sourceCard,
@@ -99,7 +100,7 @@ export function handleReturnToHand(eff: Effect, owner: Player, sourceCard: CardI
             pool,
             targets: [],
             selectCount: parseInt((eff as any).select_count || 1),
-        };
+        });
         logEvent("returnToHand_select", { owner, pool: pool.length, select: parseInt((eff as any).select_count || 1) });
         highlightSelectable(pool);
         return "pending";

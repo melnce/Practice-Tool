@@ -1,0 +1,395 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+[90mstderr[2m | tests/integration/integration.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/kuonEnhance.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/keywords_targeting.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/invariants.dispatch.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/juno.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/reanimate.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/william.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/bounce.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/chaos.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/verify_skybound_load.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/mechanics.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/turns.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/knightly-ardor.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/stormyBlast.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/scenario.engine.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/engine.actions.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/triggers.behavior.test.ts
+[22m[39mCannot set navigator
+
+[90mstderr[2m | tests/integration/ewiyar.test.ts
+[22m[39mCannot set navigator
+
+ [32m✓[39m tests/integration/ewiyar.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m tests/integration/triggers.behavior.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstdout[2m | tests/integration/stormyBlast.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/chaos.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/juno.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/turns.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+ [31m❯[39m tests/integration/stormyBlast.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should scale damage with spellboost count using add_amount[39m[32m 3[2mms[22m[39m
+ [31m❯[39m tests/integration/juno.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should calculate damage based on earth counter sum[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should return 0 if no earth counters exist[39m[32m 1[2mms[22m[39m
+ [31m❯[39m tests/integration/chaos.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should split spellboost damage across enemies[39m[32m 3[2mms[22m[39m
+[90mstdout[2m | tests/integration/bounce.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/william.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/knightly-ardor.test.ts
+[22m[39mTargeting Module State ID: [33m0.4098187533672899[39m
+
+[90mstdout[2m | tests/integration/engine.actions.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/integration.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/scenario.engine.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/reanimate.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+[90mstdout[2m | tests/integration/invariants.dispatch.test.ts
+[22m[39mTargeting Module State ID: [33m0.44161543087102473[39m
+
+ [31m❯[39m tests/integration/william.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should charge spellboost and reset after fanfare[39m[32m 3[2mms[22m[39m
+ [31m❯[39m tests/integration/bounce.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should bounce follower from board to hand[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should burn bounced follower to graveyard if hand is full (9 cards)[39m[32m 1[2mms[22m[39m
+ [31m❯[39m tests/integration/reanimate.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 5[2mms[22m[39m
+[31m     [31m×[31m should reanimate a follower from the graveyard[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m should fail to reanimate if cost exceeds X[39m[32m 0[2mms[22m[39m
+ [31m❯[39m tests/integration/knightly-ardor.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 13[2mms[22m[39m
+[31m     [31m×[31m Mode 1: Give leftmost allied Swordcraft follower attacks_per_turn = 2[39m[32m 3[2mms[22m[39m
+[31m     [31m×[31m Mode 2: Give all allied Swordcraft followers +1/+1 and Barrier[39m[32m 1[2mms[22m[39m
+     [32m✓[39m Mode 3: Recover 2 PP and 1 EP[32m 1[2mms[22m[39m
+     [32m✓[39m Mode 4: Restore 6 defense to leader[32m 0[2mms[22m[39m
+ [31m❯[39m tests/integration/turns.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 7[2mms[22m[39m
+     [32m✓[39m should gain PP max and refill PP on turn start[32m 3[2mms[22m[39m
+[31m     [31m×[31m should reset temporary flags like 'can_attack' on turn start[39m[32m 2[2mms[22m[39m
+     [32m✓[39m should increment round count after full cycle[32m 1[2mms[22m[39m
+ [31m❯[39m tests/integration/integration.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 11[2mms[22m[39m
+[31m     [31m×[31m should simulate a mini game flow[39m[32m 3[2mms[22m[39m
+[90mstdout[2m | tests/integration/scenario.engine.test.ts[2m > [22m[2mEngine Golden Path[2m > [22m[2mshould drive game state via dispatch
+[22m[39m[RNG] Using provided seed: 12345
+
+[90mstdout[2m | tests/integration/engine.actions.test.ts[2m > [22m[2mEngine Actions[2m > [22m[2mshould play a card via PLAY_CARD action
+[22m[39m[RNG] Using provided seed: 999
+
+[90mstdout[2m | tests/integration/invariants.dispatch.test.ts[2m > [22m[2mEngine Invariants[2m > [22m[2mshould throw if state is invalid BEFORE dispatch
+[22m[39m[RNG] Using provided seed: 1
+
+[90mstderr[2m | tests/integration/invariants.dispatch.test.ts[2m > [22m[2mEngine Invariants[2m > [22m[2mshould throw if state is invalid BEFORE dispatch
+[22m[39m[Validation] Database appears empty.
+
+[90mstderr[2m | tests/integration/engine.actions.test.ts[2m > [22m[2mEngine Actions[2m > [22m[2mshould play a card via PLAY_CARD action
+[22m[39m[Validation] Database appears empty.
+
+[90mstderr[2m | tests/integration/scenario.engine.test.ts[2m > [22m[2mEngine Golden Path[2m > [22m[2mshould drive game state via dispatch
+[22m[39m[Validation] Database appears empty.
+
+[90mstdout[2m | tests/integration/invariants.dispatch.test.ts[2m > [22m[2mEngine Invariants[2m > [22m[2mshould throw if state is invalid BEFORE dispatch
+[22m[39mValidating Card Database...
+
+[90mstdout[2m | tests/integration/engine.actions.test.ts[2m > [22m[2mEngine Actions[2m > [22m[2mshould play a card via PLAY_CARD action
+[22m[39mValidating Card Database...
+
+[90mstdout[2m | tests/integration/scenario.engine.test.ts[2m > [22m[2mEngine Golden Path[2m > [22m[2mshould drive game state via dispatch
+[22m[39mValidating Card Database...
+
+[90mstdout[2m | tests/integration/invariants.dispatch.test.ts[2m > [22m[2mEngine Invariants[2m > [22m[2mshould throw if state is invalid AFTER dispatch
+[22m[39m[RNG] Using provided seed: 1
+
+ [32m✓[39m tests/integration/engine.actions.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m tests/integration/scenario.engine.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 17[2mms[22m[39m
+[90mstderr[2m | tests/integration/invariants.dispatch.test.ts[2m > [22m[2mEngine Invariants[2m > [22m[2mshould throw if state is invalid AFTER dispatch
+[22m[39m[Validation] Database appears empty.
+
+[90mstdout[2m | tests/integration/invariants.dispatch.test.ts[2m > [22m[2mEngine Invariants[2m > [22m[2mshould throw if state is invalid AFTER dispatch
+[22m[39mValidating Card Database...
+
+ [32m✓[39m tests/integration/invariants.dispatch.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 4 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/integration/keywords_targeting.test.ts[2m [ tests/integration/keywords_targeting.test.ts ][22m
+[31m[1mError[22m: Cannot find module '../../src/logic/core/gameState.js' imported from 'C:/Projects/Practice Tool/tests/integration/keywords_targeting.test.ts'[39m
+[36m [2m❯[22m tests/integration/keywords_targeting.test.ts:[2m3:1[22m[39m
+    [90m  1| [39m
+    [90m  2| [39m[35mimport[39m { describe[33m,[39m test[33m,[39m expect[33m,[39m beforeEach } [35mfrom[39m [32m"vitest"[39m[33m;[39m
+    [90m  3| [39m[35mimport[39m { state } [35mfrom[39m [32m"../../src/logic/core/gameState.js"[39m[33m;[39m
+    [90m   | [39m[31m^[39m
+    [90m  4| [39m[35mimport[39m { runEffects } [35mfrom[39m [32m"../../src/logic/core/effects/index.js"[39m[33m;[39m
+    [90m  5| [39m[35mimport[39m { [33mCardInstance[39m[33m,[39m [33mEffect[39m } [35mfrom[39m [32m"../../src/logic/core/types.js"[39m[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/kuonEnhance.test.ts[2m [ tests/integration/kuonEnhance.test.ts ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+C:/Projects/Practice Tool/tests/integration/kuonEnhance.test.ts:181:0: ERROR: Unexpected "}"[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36mC:/Projects/Practice Tool/tests/integration/kuonEnhance.test.ts[39m:181:0
+[33m  
+  [33mUnexpected "}"[33m
+  179 |  
+  180 |  
+  181 |  });
+      |  ^
+  182 |  
+  183 |  
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vite/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vite/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vite/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vite/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vite/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/mechanics.test.ts[2m [ tests/integration/mechanics.test.ts ][22m
+[31m[1mError[22m: Transform failed with 1 error:
+C:/Projects/Practice Tool/tests/integration/mechanics.test.ts:157:0: ERROR: Unterminated string literal[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36mC:/Projects/Practice Tool/tests/integration/mechanics.test.ts[39m:157:0
+[33m  
+  [33mUnterminated string literal[33m
+  155 |  
+  156 |  
+  157 |  
+      |  ^
+  [39m
+[90m [2m❯[22m failureErrorWithLog node_modules/vite/node_modules/esbuild/lib/main.js:[2m1467:15[22m[39m
+[90m [2m❯[22m node_modules/vite/node_modules/esbuild/lib/main.js:[2m736:50[22m[39m
+[90m [2m❯[22m responseCallbacks.<computed> node_modules/vite/node_modules/esbuild/lib/main.js:[2m603:9[22m[39m
+[90m [2m❯[22m handleIncomingPacket node_modules/vite/node_modules/esbuild/lib/main.js:[2m658:12[22m[39m
+[90m [2m❯[22m Socket.readFromStdout node_modules/vite/node_modules/esbuild/lib/main.js:[2m581:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/verify_skybound_load.test.ts[2m [ tests/integration/verify_skybound_load.test.ts ][22m
+[31m[1mReferenceError[22m: describe is not defined[39m
+[36m [2m❯[22m tests/integration/verify_skybound_load.test.ts:[2m12:1[22m[39m
+    [90m 10| [39mstate[33m.[39mredDeck [33m=[39m [][33m;[39m
+    [90m 11| [39m
+    [90m 12| [39m[34mdescribe[39m([32m'Skybound Dragons Set Integrity'[39m[33m,[39m () [33m=>[39m {
+    [90m   | [39m[31m^[39m
+    [90m 13| [39m    const setPath = path.resolve(__dirname, '../cards/sets/10004_skybo…
+    [90m 14| [39m    [35mlet[39m cardData[33m:[39m any[] [33m=[39m [][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 13 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/integration/bounce.test.ts[2m > [22mBounce Mechanics[2m > [22mshould bounce follower from board to hand
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_3__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/bounce.test.ts:[2m17:49[22m[39m
+    [90m 15| [39m
+    [90m 16| [39m    [34mit[39m([32m"should bounce follower from board to hand"[39m[33m,[39m () [33m=>[39m {
+    [90m 17| [39m        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blu…
+    [90m   | [39m                                                [31m^[39m
+    [90m 18| [39m        state[33m.[39mblueBoard [33m=[39m [unit][33m;[39m
+    [90m 19| [39m        state[33m.[39mblueHand [33m=[39m [][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/bounce.test.ts[2m > [22mBounce Mechanics[2m > [22mshould burn bounced follower to graveyard if hand is full (9 cards)
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_3__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/bounce.test.ts:[2m45:49[22m[39m
+    [90m 43| [39m
+    [90m 44| [39m    it("should burn bounced follower to graveyard if hand is full (9 c…
+    [90m 45| [39m        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blu…
+    [90m   | [39m                                                [31m^[39m
+    [90m 46| [39m        state[33m.[39mblueBoard [33m=[39m [unit][33m;[39m
+    [90m 47| [39m        state.blueHand = Array(9).fill({ ...vanillaFollower, uid: "fil…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/chaos.test.ts[2m > [22mFlames of Chaos Logic[2m > [22mshould split spellboost damage across enemies
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_4__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/chaos.test.ts:[2m19:18[22m[39m
+    [90m 17| [39m        [90m// Mock Flames of Chaos[39m
+    [90m 18| [39m        [35mconst[39m chaosCard [33m=[39m {
+    [90m 19| [39m            uid[33m:[39m [34mmakeUid[39m()[33m,[39m
+    [90m   | [39m                 [31m^[39m
+    [90m 20| [39m            name[33m:[39m [32m"Flames of Chaos"[39m[33m,[39m
+    [90m 21| [39m            type[33m:[39m [32m"Spell"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/integration.test.ts[2m > [22mIntegration Simulation[2m > [22mshould simulate a mini game flow
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'deckAId')[39m
+[36m [2m❯[22m startGame src/logic/startGame.ts:[2m28:32[22m[39m
+    [90m 26| [39m
+    [90m 27| [39m[35mexport[39m [35masync[39m [35mfunction[39m [34mstartGame[39m(options[33m:[39m [33mStartGameOptions[39m) {
+    [90m 28| [39m    [35mconst[39m blueChoice [33m=[39m options[33m.[39mdeckAId[33m;[39m
+    [90m   | [39m                               [31m^[39m
+    [90m 29| [39m    [35mconst[39m redChoice [33m=[39m options[33m.[39mdeckBId[33m;[39m
+    [90m 30| [39m
+[90m [2m❯[22m tests/integration/integration.test.ts:[2m25:15[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/juno.test.ts[2m > [22mJuno Earth Counter Damage Logic[2m > [22mshould calculate damage based on earth counter sum
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_3__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/juno.test.ts:[2m18:18[22m[39m
+    [90m 16| [39m        [90m// Setup: Create amulets with earth counters[39m
+    [90m 17| [39m        [35mconst[39m sigil1 [33m=[39m {
+    [90m 18| [39m            uid[33m:[39m [34mmakeUid[39m()[33m,[39m
+    [90m   | [39m                 [31m^[39m
+    [90m 19| [39m            name[33m:[39m [32m"Earth Sigil 1"[39m[33m,[39m
+    [90m 20| [39m            type[33m:[39m [32m"Amulet"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/juno.test.ts[2m > [22mJuno Earth Counter Damage Logic[2m > [22mshould return 0 if no earth counters exist
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_3__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/juno.test.ts:[2m63:18[22m[39m
+    [90m 61| [39m
+    [90m 62| [39m        [35mconst[39m enemy [33m=[39m {
+    [90m 63| [39m            uid[33m:[39m [34mmakeUid[39m()[33m,[39m
+    [90m   | [39m                 [31m^[39m
+    [90m 64| [39m            name[33m:[39m [32m"Target"[39m[33m,[39m
+    [90m 65| [39m            type[33m:[39m [32m"Follower"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/knightly-ardor.test.ts[2m > [22mKnightly Ardor[2m > [22mMode 1: Give leftmost allied Swordcraft follower attacks_per_turn = 2
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_4__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/knightly-ardor.test.ts:[2m24:18[22m[39m
+    [90m 22| [39m        // Setup: Put 3 followers on board - only middle one is Swordc…
+    [90m 23| [39m        [35mconst[39m forestFollower [33m=[39m {
+    [90m 24| [39m            uid[33m:[39m [34mmakeUid[39m([32m"card"[39m)[33m,[39m
+    [90m   | [39m                 [31m^[39m
+    [90m 25| [39m            name[33m:[39m [32m"Forest Elf"[39m[33m,[39m
+    [90m 26| [39m            type[33m:[39m [32m"Follower"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/knightly-ardor.test.ts[2m > [22mKnightly Ardor[2m > [22mMode 2: Give all allied Swordcraft followers +1/+1 and Barrier
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_4__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/knightly-ardor.test.ts:[2m79:18[22m[39m
+    [90m 77| [39m    it("Mode 2: Give all allied Swordcraft followers +1/+1 and Barrier…
+    [90m 78| [39m        [35mconst[39m swordFollower [33m=[39m {
+    [90m 79| [39m            uid[33m:[39m [34mmakeUid[39m([32m"card"[39m)[33m,[39m
+    [90m   | [39m                 [31m^[39m
+    [90m 80| [39m            name[33m:[39m [32m"Knight"[39m[33m,[39m
+    [90m 81| [39m            type[33m:[39m [32m"Follower"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/reanimate.test.ts[2m > [22mReanimate Mechanics[2m > [22mshould reanimate a follower from the graveyard
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_3__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/reanimate.test.ts:[2m16:49[22m[39m
+    [90m 14| [39m    [34mit[39m([32m"should reanimate a follower from the graveyard"[39m[33m,[39m () [33m=>[39m {
+    [90m 15| [39m        // Use Vanilla Follower but override cost in graveyard instanc…
+    [90m 16| [39m        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blu…
+    [90m   | [39m                                                [31m^[39m
+    [90m 17| [39m        [90m// Populate graveyard (simulate death)[39m
+    [90m 18| [39m        state[33m.[39mblueGraveyard [33m=[39m [unit][33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/reanimate.test.ts[2m > [22mReanimate Mechanics[2m > [22mshould fail to reanimate if cost exceeds X
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_3__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/reanimate.test.ts:[2m37:49[22m[39m
+    [90m 35| [39m
+    [90m 36| [39m    [34mit[39m([32m"should fail to reanimate if cost exceeds X"[39m[33m,[39m () [33m=>[39m {
+    [90m 37| [39m        const unit = { ...vanillaFollower, uid: makeUid(), owner: "blu…
+    [90m   | [39m                                                [31m^[39m
+    [90m 38| [39m        state[33m.[39mblueGraveyard [33m=[39m [unit][33m;[39m
+    [90m 39| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/stormyBlast.test.ts[2m > [22mStormy Blast Damage Logic[2m > [22mshould scale damage with spellboost count using add_amount
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_4__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/stormyBlast.test.ts:[2m20:18[22m[39m
+    [90m 18| [39m        [90m// Mock Stormy Blast card[39m
+    [90m 19| [39m        [35mconst[39m stormyBlast [33m=[39m {
+    [90m 20| [39m            uid[33m:[39m [34mmakeUid[39m()[33m,[39m
+    [90m   | [39m                 [31m^[39m
+    [90m 21| [39m            name[33m:[39m [32m"Stormy Blast"[39m[33m,[39m
+    [90m 22| [39m            type[33m:[39m [32m"Spell"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/turns.test.ts[2m > [22mTurn System[2m > [22mshould reset temporary flags like 'can_attack' on turn start
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_3__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/turns.test.ts:[2m38:49[22m[39m
+    [90m 36| [39m    it("should reset temporary flags like 'can_attack' on turn start",…
+    [90m 37| [39m        [90m// Setup a unit for Red that attacked last turn (simulated)[39m
+    [90m 38| [39m        const unit = { ...vanillaFollower, uid: makeUid(), owner: "red…
+    [90m   | [39m                                                [31m^[39m
+    [90m 39| [39m        state[33m.[39mredBoard [33m=[39m [unit][33m;[39m
+    [90m 40| [39m        state[33m.[39misBlueTurn [33m=[39m [35mtrue[39m[33m;[39m [90m// currently Blue turn[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/17]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m tests/integration/william.test.ts[2m > [22mWilliam Logic[2m > [22mshould charge spellboost and reset after fanfare
+[31m[1mTypeError[22m: (0 , __vite_ssr_import_4__.makeUid) is not a function[39m
+[36m [2m❯[22m tests/integration/william.test.ts:[2m21:18[22m[39m
+    [90m 19| [39m        [90m// Mock William[39m
+    [90m 20| [39m        [35mconst[39m william [33m=[39m {
+    [90m 21| [39m            uid[33m:[39m [34mmakeUid[39m()[33m,[39m
+    [90m   | [39m                 [31m^[39m
+    [90m 22| [39m            name[33m:[39m [32m"William"[39m[33m,[39m
+    [90m 23| [39m            type[33m:[39m [32m"Follower"[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/17]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m13 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (18)[39m
+[2m      Tests [22m [1m[31m13 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (30)[39m
+[2m   Start at [22m 12:37:40
+[2m   Duration [22m 965ms[2m (transform 5.46s, setup 871ms, import 6.63s, tests 127ms, environment 3ms)[22m
+

@@ -8,6 +8,8 @@ import { applyKeyword } from "../../core/keywords.js";
 import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
 
+// Refactored: Import CardFilter module
+import { normalizeCardFilter, buildCardPredicate } from "../../core/cardFilter/index.js";
 
 /** -----------------------------
  * Helpers
@@ -143,6 +145,11 @@ export function handleAddToHand(eff: Effect, owner: Player) {
 /** -----------------------------
  * 3) Filtered / Tutor Draws
  * -----------------------------
+ * CONTRACT:
+ * - Selection modes: "topmost" (default) or "random".
+ * - Deck iteration: index 0 = bottom, high index = top (draw from top).
+ * - Filtering: MUST use CardFilter module (normalizeCardFilter + buildCardPredicate).
+ * - DO NOT add bespoke query logic here; extend CardFilter instead.
  */
 export function handleDrawFiltered(eff: Effect, owner: Player) {
     const want = clampInt((eff.count as any), 1);
@@ -151,63 +158,10 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
     const deck = owner === "blue" ? state.blueDeck : state.redDeck;
     const hand = owner === "blue" ? state.blueHand : state.redHand;
 
-    const f = (eff.filters as any) || {};
-
-    const type = toLowerSafe(f.type);
-    const cls = toLowerSafe(f.class);
-
-    const costLte = isFiniteNum(f.cost_lte) ? Number(f.cost_lte) : null;
-    const costGte = isFiniteNum(f.cost_gte) ? Number(f.cost_gte) : null;
-    const costEq = isFiniteNum(f.cost_eq) ? Number(f.cost_eq) : null;
-
-    const atkLte = isFiniteNum(f.attack_lte) ? Number(f.attack_lte) : null;
-    const atkGte = isFiniteNum(f.attack_gte) ? Number(f.attack_gte) : null;
-    const atkEq = isFiniteNum(f.attack_eq) ? Number(f.attack_eq) : null;
-
-    const defLte = isFiniteNum(f.defense_lte) ? Number(f.defense_lte) : null;
-    const defGte = isFiniteNum(f.defense_gte) ? Number(f.defense_gte) : null;
-    const defEq = isFiniteNum(f.defense_eq) ? Number(f.defense_eq) : null;
-
-    const tribeRaw =
-        f.tribe_in ?? f.tribe ?? f.tribes ?? f.tribes_in ?? null;
-    const tribeList = Array.isArray(tribeRaw)
-        ? tribeRaw.map(toLowerSafe).filter(Boolean)
-        : tribeRaw
-            ? [toLowerSafe(tribeRaw)]
-            : [];
-
-    const matches = (c: CardInstance) => {
-        const cType = toLowerSafe(c.type);
-        const cClass = toLowerSafe(c.class);
-        const cCost = Number(c.cost);
-        const cAtk = Number(c.attack);
-        const cDef = Number(c.defense);
-
-        if (type && cType !== type) return false;
-        if (cls && cClass !== cls) return false;
-
-        if (costEq != null && cCost !== costEq) return false;
-        if (costLte != null && !(cCost <= costLte)) return false;
-        if (costGte != null && !(cCost >= costGte)) return false;
-
-        if (atkEq != null && cAtk !== atkEq) return false;
-        if (atkLte != null && !(cAtk <= atkLte)) return false;
-        if (atkGte != null && !(cAtk >= atkGte)) return false;
-
-        if (defEq != null && cDef !== defEq) return false;
-        if (defLte != null && !(cDef <= defLte)) return false;
-        if (defGte != null && !(cDef >= defGte)) return false;
-
-        if (tribeList.length) {
-            const cardTribes = Array.isArray(c.tribes)
-                ? c.tribes.map(toLowerSafe)
-                : [];
-            const hasOne = tribeList.some((t: string) => cardTribes.includes(t));
-            if (!hasOne) return false;
-        }
-
-        return true;
-    };
+    // Refactored: Use CardFilter module for filtering logic
+    const filterSpec = (eff.filters as any) || {};
+    const normalizedFilter = normalizeCardFilter(filterSpec);
+    const matches = buildCardPredicate(normalizedFilter);
 
     const idxs: number[] = [];
     for (let i = 0; i < deck.length; i++) {

@@ -25,7 +25,7 @@ import { fireTrigger } from "../../../core/triggers.js";
 import { summonNamed, summonExactCopyFromHand } from "../summon.js";
 // @ts-ignore
 import { applyLeaderDamage } from "../../leader.js";
-import { resolveAmountWithOverflow } from "../damage.js";
+import { resolveAmountWithOverflow } from "../damage/index.js";
 import {
     fuse_finalize_generic as opFinalizeFuseGeneric,
     fuse_finalize_fortifier as opFinalizeFortifierFuse,

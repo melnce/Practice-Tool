@@ -1,225 +1,23 @@
 // src/logic/effects/ops/buff.ts
-import { state } from "../../../core/gameState.js";
-import { getPool, highlightSelectable } from "../../core/targeting.js";
-import { cleanupDead } from "../../core/cleanup.js";
-import { applyKeyword } from "../../core/keywords.js";
-
-import { logEvent } from "../../../core/logger.js";
+import { handleBuffOrchestrator } from "./buff/orchestrator.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
+import { state } from "../../../core/gameState.js";
+import { logEvent } from "../../../core/logger.js";
+import { cleanupDead } from "../../core/cleanup.js";
+import { getPool } from "../../core/targeting.js"; // Needed for other handlers
 
-
+// -----------------------------------------------------------------------------
+// MAIN ENTRY POINT (Refactored)
+// -----------------------------------------------------------------------------
 export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
-    // pass context so targets like "entering_follower" work
-    let pool = getPool(eff.target as any, owner, null, eff.condition, context)
-        .filter(c =>
-            c.type === "Follower" &&
-            // allow self when explicitly requested
-            ((eff as any).include_self || c.uid !== sourceCard?.uid)
-        );
-    console.log('BUFF pool uids:', pool.map(c => c.uid), 'source:', sourceCard?.uid, 'include_self:', !!(eff as any).include_self);
-
-
-    // NEW: optional tribe filtering
-    const rawTribes =
-        (eff as any).tribes ? (Array.isArray((eff as any).tribes) ? (eff as any).tribes : [(eff as any).tribes]) :
-            (eff as any).tribe ? [(eff as any).tribe] : null;
-    if (rawTribes) {
-        const want = rawTribes.map((t: any) => String(t).toLowerCase());
-        pool = pool.filter(c =>
-            Array.isArray(c.tribes) &&
-            c.tribes.some(tr => want.includes(String(tr).toLowerCase()))
-        );
-    }
-
-    // NEW: optional exact name filtering
-    if ((eff as any).name_filter) {
-        const want = String((eff as any).name_filter).toLowerCase();
-        pool = pool.filter(c => String(c.name || "").toLowerCase() === want);
-    }
-
-    // (optional) support a list of names
-    if (Array.isArray((eff as any).name_in) && (eff as any).name_in.length) {
-        const wants = new Set((eff as any).name_in.map((n: any) => String(n).toLowerCase()));
-        pool = pool.filter(c => wants.has(String(c.name || "").toLowerCase()));
-    }
-
-    // NEW: optional keyword filtering (e.g., "Ward")
-    const rawKW = (eff as any).has_keyword;
-    if (rawKW) {
-        const wants = Array.isArray(rawKW) ? rawKW : [rawKW];
-        pool = pool.filter(c => wants.every((w: any) => hasKeyword(c, w)));
-    }
-
-    // NEW: optional class filtering (e.g., "Swordcraft")
-    if (eff.condition && (eff.condition as any).class) {
-        const wantClass = String((eff.condition as any).class).toLowerCase();
-        pool = pool.filter(c => String(c.class || "").toLowerCase() === wantClass);
-    }
-
-    // NEW: optional filter (e.g., "leftmost")
-    if ((eff as any).filter === "leftmost" && pool.length > 0) {
-        const first = pool[0];
-        pool = first ? [first] : [];
-    }
-
-
-    if (!pool.length) return "done";
-
-    if ((eff as any).select) {
-        state.pendingTargetEffect = {
-            eff,
-            owner,
-            sourceCard,
-            resumeEffects: effectsQueue,
-            pool,
-            targets: [],
-            selectCount: parseInt((eff as any).select_count ?? 1),
-            context
-        } as any;
-        highlightSelectable(pool);
-        return "pending";
-    }
-
-    // NEW: random targeting path
-    if ((eff as any).random) {
-        const k = Math.max(0, parseInt((eff.count as any) ?? 1, 10));
-        if (k <= 0 || !pool.length) return "done";
-        const chosen = [];
-        const bag = [...pool];
-        for (let i = 0; i < k && bag.length; i++) {
-            const idx = state.rng.nextInt(bag.length);
-            const picked = bag.splice(idx, 1)[0];
-            if (picked) chosen.push(picked);
-        }
-        const a = parseInt(eff.attack as any ?? 0) || 0;
-        const d = parseInt(eff.defense as any ?? 0) || 0;
-        console.log("[Devotee EOT] applying to", chosen.map(c => c.uid));
-        for (const target of chosen) {
-            if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
-            target.buffs.attack = (target.buffs.attack ?? 0) + a;
-            target.buffs.defense = (target.buffs.defense ?? 0) + d;
-            // @ts-ignore
-            target.attack = (parseInt(target.attack) || 0) + a;
-            // @ts-ignore
-            target.defense = (parseInt(target.defense) || 0) + d;
-            // @ts-ignore
-            target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
-            // @ts-ignore
-            if (!target.potential_attack) target.potential_attack = target.base_attack || target.attack;
-            // @ts-ignore
-            if (!target.potential_defense) target.potential_defense = target.base_defense || target.defense;
-            target.potential_attack! += a;
-            target.potential_defense! += d;
-            logEvent("buff", { owner, target: target.name, uid: target.uid, a: a, d: d, mode: "random" });
-
-
-            // + Optional: grant keywords to exactly these buffed targets
-            const grantListRaw = eff.keywords || (eff as any).keyword || null;
-            if (grantListRaw) {
-                const grantList = Array.isArray(grantListRaw) ? grantListRaw : [grantListRaw];
-                for (const kw of grantList) {
-                    const name = (typeof kw === "string" ? kw : kw?.name) || "";
-                    const options = (typeof kw === "object" ? kw : undefined);
-                    if (name) applyKeyword(target, name, options);
-                }
-            }
-
-            // NEW: notify when a positive buff is applied to a follower on the field
-            if ((a > 0 || d > 0) && (state.blueBoard.includes(target) || state.redBoard.includes(target))) {
-                import("../../core/triggers.js").then(({ fireTrigger }) => {
-                    fireTrigger("self_buffed_up", owner, { target });
-                });
-            }
-
-            // Fire "enemy_follower_defense_down" if we actually reduced DEF on an enemy follower
-            if (d < 0 && target?.type === "Follower") {
-                const targetOwner = state.blueBoard.includes(target) ? "blue" :
-                    state.redBoard.includes(target) ? "red" : null;
-                const debufferOwner = owner; // the player executing this buff/debuff op
-                if (targetOwner && debufferOwner) {
-                    import("../../core/triggers.js").then(({ fireTrigger }) => {
-                        fireTrigger("enemy_follower_defense_down", debufferOwner, { target });
-                    });
-                }
-            }
-
-        }
-        // Remove anything that dropped to 0 or less
-        cleanupDead();
-        return "done";
-    }
-
-    const a = parseInt(eff.attack as any ?? 0) || 0;
-    const d = parseInt(eff.defense as any ?? 0) || 0;
-
-    for (const target of pool) {
-        if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
-        target.buffs.attack = (target.buffs.attack ?? 0) + a;
-        target.buffs.defense = (target.buffs.defense ?? 0) + d;
-
-        // @ts-ignore
-        target.attack = (parseInt(target.attack) || 0) + a;
-        // @ts-ignore
-        target.defense = (parseInt(target.defense) || 0) + d;
-        // @ts-ignore
-        target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
-
-        // @ts-ignore
-        if (!target.potential_attack) target.potential_attack = target.base_attack || target.attack;
-        // @ts-ignore
-        if (!target.potential_defense) target.potential_defense = target.base_defense || target.defense;
-        target.potential_attack! += a;
-        target.potential_defense! += d;
-        logEvent("buff", { owner, target: target.name, uid: target.uid, a: a, d: d, mode: "all" });
-
-
-        // + Optional: grant keywords to exactly these buffed targets
-        const grantListRaw = eff.keywords || (eff as any).keyword || null;
-        if (grantListRaw) {
-            const grantList = Array.isArray(grantListRaw) ? grantListRaw : [grantListRaw];
-            for (const kw of grantList) {
-                const name = (typeof kw === "string" ? kw : kw?.name) || "";
-                const options = (typeof kw === "object" ? kw : undefined);
-                if (name) applyKeyword(target, name, options);
-            }
-        }
-
-        // + Optional: set attacks_per_turn (e.g., "Can attack 2 times per turn")
-        if ((eff as any).attacks_per_turn !== undefined) {
-            const n = parseInt((eff as any).attacks_per_turn) || 1;
-            target.attacks_per_turn = n;
-            // Give them the attacks immediately if they can attack
-            if (target.hasStorm || target.hasRush || !target.justPlayed) {
-                target.attacks_left = n;
-                target.can_attack = true;
-            }
-            logEvent("attacksPerTurn", { owner, target: target.name, uid: target.uid, value: n });
-        }
-
-        // NEW: notify when a positive buff is applied to a follower on the field
-        if ((a > 0 || d > 0) && (state.blueBoard.includes(target) || state.redBoard.includes(target))) {
-            import("../../core/triggers.js").then(({ fireTrigger }) => {
-                fireTrigger("self_buffed_up", owner, { target });
-            });
-        }
-
-        // Fire "enemy_follower_defense_down" if we actually reduced DEF on an enemy follower
-        if (d < 0 && target?.type === "Follower") {
-            const targetOwner = state.blueBoard.includes(target) ? "blue" :
-                state.redBoard.includes(target) ? "red" : null;
-            const debufferOwner = owner; // the player executing this buff/debuff op
-            if (targetOwner && debufferOwner) {
-                import("../../core/triggers.js").then(({ fireTrigger }) => {
-                    fireTrigger("enemy_follower_defense_down", debufferOwner, { target });
-                });
-            }
-        }
-
-    }
-    // Remove anything that dropped to 0 or less
-    cleanupDead();
-    return "done";
+    return handleBuffOrchestrator(eff as any, owner, sourceCard, effectsQueue, context);
 }
+
+// -----------------------------------------------------------------------------
+// LEGACY / SPECIALIZED HANDLERS (Preserved)
+// LEGACY: Preserved for determinism/replay compatibility — specialized handlers are intentionally separate.
+// -----------------------------------------------------------------------------
+
 export function handleBuffHandTribe(eff: Effect, owner: Player) {
     const hand = owner === "blue" ? state.blueHand : state.redHand;
     const a = parseInt(eff.attack as any ?? 0) || 0;
@@ -275,27 +73,6 @@ export function handleBuffHandClass(eff: Effect, owner: Player) {
     }
 }
 
-
-function hasKeyword(card: CardInstance, kw: any) {
-    const k = String(kw || "").toLowerCase();
-    if (k === "ward" && card.hasWard) return true;
-    if (k === "rush" && card.hasRush) return true;
-    if (k === "storm" && card.hasStorm) return true;
-    if (k === "bane" && card.hasBane) return true;
-    if (k === "ambush" && card.hasAmbush) return true;
-    if (k === "aura" && card.hasAura) return true;
-    if (k === "drain" && card.hasDrain) return true;
-    if (k === "intimidate" && card.hasIntimidate) return true;
-    if (k === "lastwords" && card.hasLastWords) return true;
-
-    if (Array.isArray(card.keywords)) {
-        return card.keywords.some(w =>
-            (typeof w === "string" && String(w).toLowerCase() === k) ||
-            (w && typeof w === "object" && String(w.name || "").toLowerCase() === k)
-        );
-    }
-    return false;
-}
 export function handleBuffLastAddedToHand(eff: Effect, owner: Player) {
     const card = state.lastAddedToHand;
     if (!card) return;
@@ -324,8 +101,6 @@ export function handleBuffLastAddedToHand(eff: Effect, owner: Player) {
 }
 
 // Repeat a single buff once per current Combo (plays this turn).
-// With replacement: we call handleBuff separately each time, so the same
-// random target can be chosen again on later iterations.
 export function handleComboRepeatBuff(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any[] = [], context: any = {}) {
     const plays =
         owner === "blue" ? (state.bluePlaysThisTurn || 0)
@@ -333,23 +108,20 @@ export function handleComboRepeatBuff(eff: Effect, owner: Player, sourceCard: Ca
     if (plays <= 0) return;
     logEvent("comboRepeatBuff", { owner, plays });
 
-    // Build the inner buff op from the wrapper fields
     const inner = {
         op: "buff",
-        target: eff.target,        // e.g. "enemy:follower"
-        random: (eff as any).random,        // true
-        count: (eff as any).count,         // 1
-        attack: eff.attack,        // 0
-        defense: eff.defense,       // -1
-        include_self: (eff as any).include_self,  // optional
-        condition: eff.condition      // optional
+        target: eff.target,
+        random: (eff as any).random,
+        count: (eff as any).count,
+        attack: eff.attack,
+        defense: eff.defense,
+        include_self: (eff as any).include_self,
+        condition: eff.condition
     };
 
     for (let i = 0; i < plays; i++) {
         const res = handleBuff(inner as any, owner, sourceCard, effectsQueue, context);
-        if (res === "pending") return res; // propagate UI selection if ever needed
-        // If your engine requires, you can proactively clean up between ticks.
-        // cleanupDead(); // (imported at top of buff.js already)
+        if (res === "pending") return res;
     }
 }
 
@@ -370,7 +142,7 @@ export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardIn
         // ensure buffs container
         if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
 
-        // Apply as a buff delta so future math stacks correctly with other effects
+        // Apply as a buff delta
         target.buffs.attack = (target.buffs.attack ?? 0) + delta;
         // @ts-ignore
         target.attack = current + delta;
@@ -381,19 +153,16 @@ export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardIn
         target.potential_attack! += delta;
         logEvent("setAttackTo", { owner, target: target.name, uid: target.uid, to });
     }
-
-    // No deaths to clean here (ATK only), but keep symmetry with other handlers
     return "done";
 }
+
 // NEW: set all matched targets' stats to fixed values
 export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
-    // Prefer explicitly passed selected targets (e.g. from select()) if this is a nested effect
     let pool = (context?.targets && context.targets.length)
         ? context.targets
         : getPool(eff.target as any, owner, null, eff.condition, context)
             .filter(c => c.type === "Follower");
 
-    // Re-filter just in case pool contained non-followers or mix
     pool = pool.filter((c: CardInstance) => c.type === "Follower");
 
     if (!pool.length) return "done";
@@ -434,7 +203,6 @@ export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInsta
         logEvent("setStats", { owner, target: target.name, uid: target.uid, a: setA, d: setD });
     }
 
-    // Cleanup dead if stats were set to 0 or less
     cleanupDead();
     return "done";
 }

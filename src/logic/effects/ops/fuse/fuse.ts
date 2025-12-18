@@ -4,6 +4,7 @@ import { adapter } from "../../../../core/adapter.js";
 import { highlightSelectable, clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
+import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, GameState, Player } from "../../../../core/types.js";
@@ -127,7 +128,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
 
     // If recipe provides a custom finalize op, use a confirmable multi-select
     if (info.recipe?.finalize_op) {
-        state.pendingTargetEffect = {
+        setPendingTarget({
             eff: { op: info.recipe.finalize_op, initiator_uid: initiator.uid },
             owner,
             sourceCard: initiator,
@@ -137,7 +138,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
             resumeEffects: [],
             requiresConfirmation: true,
             confirmationText: "Fuse Selected Cards",
-        };
+        });
         logEvent("fuseOpen", {
             owner,
             initiator: initiator.name,
@@ -152,7 +153,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
     }
 
     // Otherwise fall back to generic transform/waste (kept for backward compatibility)
-    state.pendingTargetEffect = {
+    setPendingTarget({
         eff: {
             op: "fuse_finalize_generic",
             initiator_uid: initiator.uid,
@@ -168,7 +169,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
         selectCount: 1,
         targets: [],
         resumeEffects: [],
-    };
+    });
 
     logEvent("fuseOpen", {
         owner,

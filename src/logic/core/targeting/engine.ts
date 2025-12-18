@@ -45,7 +45,7 @@ export function applyTargetClick(state: GameState, pending: any, uid: string | "
     // 3. Validation (Pool & Rules)
     const validation = validateTargetSelection(state, pending, uid);
     if (!validation.ok) {
-        return { kind: "invalid", reason: validation.reason };
+        return { kind: "invalid", reason: validation.reason || "Invalid target" };
     }
 
     // 4. Special Case: Fortifier Fuse Finalization

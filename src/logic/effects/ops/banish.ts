@@ -2,6 +2,7 @@
 import { state } from "../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { fireTrigger } from "../../core/triggers.js";
+import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../../core/types.js";
@@ -33,10 +34,10 @@ export function handleBanishTargeted(eff: Effect, owner: Player, effectsQueue: a
     if (!pool.length) return "done";
 
     if ((eff as any).select) {
-        state.pendingTargetEffect = {
+        setPendingTarget({
             eff, owner, sourceCard: null, resumeEffects: effectsQueue,
             pool, targets: [], selectCount: parseInt((eff as any).select_count || 1),
-        };
+        });
         logEvent("banishTargeted_select", { owner, pool: pool.length, select: parseInt((eff as any).select_count || 1) });
         highlightSelectable(pool);
         return "pending";

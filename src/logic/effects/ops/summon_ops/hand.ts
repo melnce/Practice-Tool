@@ -9,6 +9,7 @@ import { highlightSelectable } from "../../../core/targeting.js"; // Targeting i
 import { initAmulet } from "./init.js";
 import { pushToBoard } from "./core.js";
 import { getEffectiveCost, nextId } from "./utils.js";
+import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 // =============== Hand Operations ===============
 
@@ -200,7 +201,7 @@ export function handleSelectHandSummonArtifactCopy(eff: Effect, owner: Player, e
 
     if (!pool.length) return;
 
-    state.pendingTargetEffect = {
+    setPendingTarget({
         eff: { ...eff, op: "select_hand_summon_artifact_copy" } as any, // resolved in resolveTarget.js
         owner,
         sourceCard: null,
@@ -211,7 +212,7 @@ export function handleSelectHandSummonArtifactCopy(eff: Effect, owner: Player, e
         selectCount: Math.max(1, parseInt((eff.select ?? (eff as any).select_count ?? 1) as any, 10)),
         // optional: let user confirm multi-selects (shows the confirm button)
         requiresConfirmation: (parseInt((eff.select ?? 1) as any, 10) > 1)
-    };
+    });
 
     highlightSelectable(pool);
     return "pending";
@@ -230,7 +231,7 @@ export function handleSelectHandSummonArtifactCopiesEOT(eff: Effect, owner: Play
 
     if (!pool.length) return;
 
-    state.pendingTargetEffect = {
+    setPendingTarget({
         eff: { ...eff, op: "select_hand_summon_artifact_copies_eot_destroy" } as any,
         owner,
         sourceCard: null,
@@ -238,7 +239,7 @@ export function handleSelectHandSummonArtifactCopiesEOT(eff: Effect, owner: Play
         pool,
         targets: [],
         selectCount: Math.max(1, parseInt((eff.select ?? (eff as any).select_count ?? 2) as any, 10)),
-    };
+    });
     highlightSelectable(pool);
     return "pending";
 }

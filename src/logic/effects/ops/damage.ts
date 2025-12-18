@@ -3,14 +3,16 @@ import { dealDamage } from "../../core/barrier.js";
 import { state } from "../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { cleanupDead } from "../../core/cleanup.js";
-import { isOverflow } from "../../../helpers/overflow.js";
 
 import { logEvent } from "../../../core/logger.js";
 import { applyLeaderDamage } from "../leader.js";
 import { Effect, CardInstance, Player } from "../../../core/types.js";
-import { resolveDynamicValue } from "../../core/values.js";
 // @ts-ignore
 import { adapter } from "../../../core/adapter.js";
+
+// Refactored: Import calculator from damage module
+import { resolveAmountWithOverflow } from "./damage/index.js";
+import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 
 function isAlly(card: CardInstance, owner: Player) {
@@ -91,7 +93,7 @@ export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstanc
         }
 
         // Initiate a selection process for the correct number of targets.
-        state.pendingTargetEffect = {
+        setPendingTarget({
             eff,
             owner,
             sourceCard,
@@ -99,7 +101,7 @@ export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstanc
             selectCount: actualSelectCount, // Use the adjusted, possible count
             pool,
             resumeEffects: effectsQueue,
-        };
+        });
         // --- END MODIFIED LOGIC ---
         logEvent("damage_select", { owner, pool: pool.length, select: actualSelectCount, amount: amt });
         highlightSelectable(pool);
@@ -178,36 +180,16 @@ export function handleDamageSplitSequential(eff: Effect, owner: Player) {
 }
 
 
-export function resolveAmountWithOverflow(eff: Effect, owner: Player, context: any = {}) {
-    const ctx = { ...context, owner };
 
-    const baseRaw = eff.amount;
-    const addRaw = (eff as any).add_amount;
-    const ofRaw = (eff as any).amount_overflow ?? (eff as any).overflow_amount ?? baseRaw;
+// REFACTORED: resolveAmountWithOverflow moved to ./damage/calculator.ts
 
-    const baseAmt = resolveDynamicValue(baseRaw, ctx);
-    const addAmt = resolveDynamicValue(addRaw, ctx);
-    const ofAmt = resolveDynamicValue(ofRaw, ctx);
-
-    if (eff.add_amount) {
-        console.log(`[DamageDebug] Resolving add_amount: "${eff.add_amount}" -> ${addAmt}`);
-        console.log(`[DamageDebug] Context Source:`, context.sourceCard ? `${context.sourceCard.name} (SB: ${context.sourceCard.spellboostCount})` : "None");
-    }
-
-    const checkOverflow = isOverflow(owner);
-    // If overflowing, use override amount if present; otherwise use base. Always add add_amount.
-    // If ofRaw is defined, it OVERRIDES baseRaw.
-    const primary = (checkOverflow && ofRaw != null) ? ofAmt : baseAmt;
-
-    return primary + addAmt;
-}
 
 
 
 export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any) {
     const amt = resolveAmountWithOverflow(eff, owner, { sourceCard });
 
-    state.pendingTargetEffect = {
+    setPendingTarget({
         eff: {
             ...eff,
             op: "damage_follower_or_leader",
@@ -220,7 +202,7 @@ export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceC
         pool: getPool(eff.target as any, owner, sourceCard, eff.condition, { isTargetedEffect: true }),
         resumeEffects: effectsQueue,
         canTargetLeader: (eff as any).can_target_leader
-    };
+    });
 
     logEvent("damageFoL_select", { owner, canTargetLeader: !!(eff as any).can_target_leader });
 
