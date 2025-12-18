@@ -4,7 +4,7 @@ import { state } from "../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { cleanupDead } from "../../core/cleanup.js";
 import { isOverflow } from "../../../helpers/overflow.js";
-import { randInt } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { applyLeaderDamage } from "../leader.js";
 import { Effect, CardInstance, Player } from "../../../core/types.js";
@@ -135,7 +135,7 @@ export function handleDamageRandom(eff: Effect, owner: Player) {
         const valid = pool.filter(c => c && (c.type === "Follower" || c.type === "Leader"));
         if (!valid.length) break;
 
-        const pick = valid[randInt(valid.length)];
+        const pick = valid[state.rng.nextInt(valid.length)];
         if (!pick) break;
         logEvent("damageRandom", { target: pick.name, uid: pick.uid, amount: amt });
 
@@ -288,7 +288,7 @@ export function handleDamageRandomSelectedDefense(eff: Effect, owner: Player, _s
     const pool = getPool("enemy:follower", owner).filter(c => c && c.type === "Follower");
     if (!pool.length) return;
 
-    const pick = pool[randInt(pool.length)];
+    const pick = pool[state.rng.nextInt(pool.length)];
     if (!pick) return;
     dealDamage(pick, dmg);
     cleanupDead();

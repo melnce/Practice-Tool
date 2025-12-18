@@ -1,5 +1,5 @@
 import { state } from "../../../../core/gameState.js";
-import { makeUid } from "../../../../core/rng.js";
+
 import { CardInstance, Player } from "../../../../core/types.js";
 
 // =============== Utilities ===============
@@ -34,7 +34,7 @@ export function getEffectiveCost(card: CardInstance) {
 
 export function nextId() {
     // Use seeded UID for deterministic instance IDs
-    return makeUid("inst_");
+    return state.rng.makeUid("inst_");
 }
 
 // function filterArtifactFollowersHand removed - moved to hand.ts

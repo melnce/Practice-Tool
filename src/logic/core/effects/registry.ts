@@ -1,4 +1,5 @@
 import { CardInstance, Player, Effect, EffectOp, EffectByOp, EffectResult } from "../../../core/types.js";
+import { EffectTraceSink } from "./trace.js";
 export { EffectResult };
 
 // Context passed to every effect handler
@@ -10,6 +11,7 @@ export interface EffectCtx {
     queue: Effect[]; // The current execution queue
     context: unknown; // Shared targeting/chaining context
     adapter: unknown;
+    trace?: EffectTraceSink;
 }
 
 

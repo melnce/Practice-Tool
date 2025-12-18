@@ -37,6 +37,13 @@ export function registerMiscEffects() {
         }
     });
 
+    // target is an alias for select (same handler)
+    registerOp("target", (eff, ctx): EffectResult => {
+        const opCtx = { ...(ctx.context as any), runner: runEffects };
+        const status = handleSelect(eff, ctx.owner, ctx.sourceCard, ctx.queue, opCtx);
+        if (status === "pending") return "pending";
+    });
+
     registerOp("choose", (eff, ctx) => {
         if (handleChoose(eff, ctx.owner, ctx.sourceCard, ctx.queue) === "pending") return "pending";
     });
@@ -91,6 +98,19 @@ export function registerMiscEffects() {
         import("../../../evolveUtils.js").then(({ superEvolveAllyFromContext }) => {
             superEvolveAllyFromContext(ctx.owner, ctx.sourceCard, ctx.context);
         });
+    });
+
+    // super_evolve - evolves a target with super evolution
+    registerOp("super_evolve", (eff, ctx) => {
+        // If there's a selected target, super-evolve it; otherwise evolve source if "self"
+        const target = (ctx.context as any)?.selectedCard || (ctx.context as any)?.targetCard;
+        if (target && target.type === "Follower") {
+            handleEvolveSelf(target, ctx.owner, { mode: "super", spendPoint: false });
+            doLog("evolve", { owner: ctx.owner, card: target.name, mode: "super" });
+        } else if (eff.target === "self" && ctx.sourceCard) {
+            handleEvolveSelf(ctx.sourceCard, ctx.owner, { mode: "super", spendPoint: false });
+            doLog("evolve", { owner: ctx.owner, card: ctx.sourceCard.name, mode: "super" });
+        }
     });
 
     // Gates

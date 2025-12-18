@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { getCardDetails } from "../../data/cardDatabase.js";
 import { shuffleInPlace } from "../../core/utils.js";
-import { makeUid } from "../../core/rng.js";
+
 import { logEvent } from "../../core/logger.js";
 import { Effect, Player } from "../../core/types.js";
 
@@ -16,7 +16,7 @@ export function handleReplaceDeck(owner: Player, eff: Effect & { cards?: { name:
             if (cardData) {
                 for (let i = 0; i < (count || 1); i++) {
                     const copy = JSON.parse(JSON.stringify(cardData));
-                    copy.uid = makeUid();
+                    copy.uid = state.rng.makeUid();
                     deck.push(copy);
                 }
             }
@@ -47,7 +47,7 @@ export async function replaceDeckWithSetMinus(owner: Player, eff: Effect & { set
         if (exclude.has(String(base.name))) continue;
         // @ts-ignore
         const copy = JSON.parse(JSON.stringify(base));
-        copy.uid = makeUid();
+        copy.uid = state.rng.makeUid();
         deck.push(copy);
     }
     shuffleInPlace(deck);

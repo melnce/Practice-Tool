@@ -16,6 +16,7 @@ import { registerRunEffectsForSpellboost } from "../../effects/ops/spellboost.js
 
 // Registry
 import { getOp, EffectCtx, sealRegistry } from "./registry.js";
+import { getGlobalTrace } from "./trace.js";
 import { registerCombatEffects } from "./domains/combat.js";
 import { registerResourceEffects } from "./domains/resources.js";
 import { registerBoardEffects } from "./domains/board.js";
@@ -124,6 +125,13 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
 
     const queue = [...effects]; // Shallow copy to process
 
+    // Trace: dispatch_start
+    // Access trace from context if available, or fall back to global trace (for replay injection)
+    const trace = context?.trace ?? getGlobalTrace();
+    if (trace) trace.emit({ kind: "dispatch_start", queueSize: queue.length });
+
+    let processedCount = 0;
+
     while (queue.length > 0) {
         const eff = queue.shift()!;
 
@@ -134,6 +142,9 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
 
         recordEvent({ type: "run_effect", payload: { op: eff.op, owner, source: sourceCard?.name } });
 
+        // Trace: effect_start
+        if (trace) trace.emit({ kind: "effect_start", op: eff.op, depth: 0 }); // Depth not tracked yet
+
         // Build context for the handler
         const ctx: EffectCtx = {
             state,
@@ -141,7 +152,8 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             sourceCard,
             queue,
             context,
-            adapter
+            adapter,
+            trace // Pass it down
         };
 
         try {
@@ -151,11 +163,19 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             // We do not wait for Promises (fire-and-forget for animations/async side effects),
             // UNLESS the handler explicitly paused by returning "pending".
             if (result === "pending") {
+                // Trace: effect_pending
+                if (trace) trace.emit({ kind: "effect_pending", op: eff.op });
+
                 // Paused execution (e.g. targeting waiting for input)
                 // The queue state is preserved in the closure references if passed to targeting,
                 // otherwise it is lost here (which is correct for "pause").
                 return;
             }
+
+            // Trace: effect_end
+            if (trace) trace.emit({ kind: "effect_end", op: eff.op });
+            processedCount++;
+
         } catch (e) {
             // Contextualize error
             const err = e instanceof Error ? e : new Error(String(e));
@@ -163,4 +183,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             throw err;
         }
     }
+
+    // Trace: dispatch_end
+    if (trace) trace.emit({ kind: "dispatch_end", processed: processedCount, remaining: queue.length });
 }

@@ -4,7 +4,7 @@ import { state } from "../../../core/gameState.js";
 // @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
-import { rand, randInt, makeUid } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 // @ts-ignore
 
@@ -58,7 +58,7 @@ function transformSelfInHand(owner: Player, c: CardInstance, targetName: string)
 
     hand[idx] = {
         ...JSON.parse(JSON.stringify(tpl)),
-        uid: makeUid("card_"),
+        uid: state.rng.makeUid("card_"),
         owner,
     };
 }

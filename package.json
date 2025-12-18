@@ -10,10 +10,12 @@
     "test:watch": "npm run build || exit 0 && vitest -c vitest.config.ts",
     "test:all": "vitest run -c vitest.all.config.ts",
     "test:dev": "vitest run -c vitest.dev.config.ts --passWithNoTests",
-    "check:boundaries": "node tools/check-boundaries.mjs",
+    "check:boundaries": "npx tsx scripts/check-boundaries.ts",
     "build": "tsc",
     "watch": "tsc -w",
-    "watch:cards": "npx tsx scripts/watch_cards.ts"
+    "watch:cards": "npx tsx scripts/watch_cards.ts",
+    "replay:check": "npx tsx scripts/replay.ts",
+    "replay:update": "npx tsx scripts/replay.ts --update"
   },
   "keywords": [],
   "author": "",

@@ -4,7 +4,7 @@ import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { pushToHand } from "../../../core/utils.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { fireTrigger } from "../../core/triggers.js";
-import { makeUid } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../../core/types.js";
 
@@ -14,7 +14,7 @@ function freshBaseCopyByName(name: string) {
     const base = getCardDetails(name);
     if (!base) return null;
     const copy = JSON.parse(JSON.stringify(base));
-    copy.uid = makeUid();
+    copy.uid = state.rng.makeUid();
     return copy;
 }
 

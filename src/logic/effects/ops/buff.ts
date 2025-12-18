@@ -3,7 +3,7 @@ import { state } from "../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { cleanupDead } from "../../core/cleanup.js";
 import { applyKeyword } from "../../core/keywords.js";
-import { rand, randInt } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
 
@@ -87,7 +87,7 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance 
         const chosen = [];
         const bag = [...pool];
         for (let i = 0; i < k && bag.length; i++) {
-            const idx = randInt(bag.length);
+            const idx = state.rng.nextInt(bag.length);
             const picked = bag.splice(idx, 1)[0];
             if (picked) chosen.push(picked);
         }

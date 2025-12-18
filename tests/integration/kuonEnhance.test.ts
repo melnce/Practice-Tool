@@ -3,7 +3,7 @@ import { state, resetGameState } from "../../src/core/gameState";
 import { loadCardDatabase, getCardDetails } from "../../src/data/cardDatabase";
 import { runEffects } from "../../src/logic/core/effects";
 import { playCard } from "../../src/logic/core/playCard";
-import { makeUid } from "../../src/core/rng";
+
 
 describe("Kuon Enhance Effect", () => {
     beforeAll(async () => {
@@ -140,7 +140,7 @@ describe("Kuon Enhance Effect", () => {
         const kuon = getCardDetails("Kuon, Fivefold Master");
         if (!kuon) throw new Error("Kuon not found");
 
-        const kuonInstance = { ...kuon, uid: makeUid(), owner: "blue" as any };
+        const kuonInstance = { ...kuon, uid: state.rng.makeUid(), owner: "blue" as any };
         state.blueHand = [kuonInstance];
         state.bluePP = 10;
         state.blueMaxPP = 10;

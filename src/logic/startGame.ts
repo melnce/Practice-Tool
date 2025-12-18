@@ -1,27 +1,26 @@
 // src/logic/startGame.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// BROWSER-ONLY: This module is for browser game initialization with DOM access.
+// Core/replay code imports dispatch.ts, not this module.
+// ─────────────────────────────────────────────────────────────────────────────
 import { state, resetGameState } from "../core/gameState.js";
 import { loadBlueDeck, loadRedDeck } from "../data/deckLoader.js";
-// @ts-ignore
-// @ts-ignore
 import { adapter } from "../core/adapter.js";
 import { loadCardDatabase } from "../data/cardDatabase.js";
 import { drawCard } from "../core/utils.js";
 import { beginMulligan } from "./mulligan.js";
 import { runEffects } from "./core/effects/index.js";
-import { setSeed, getSeed } from "../core/rng.js";
 import { logEvent } from "../core/logger.js";
 import { CardInstance, Player } from "../core/types.js";
-
-
 import { StartGameOptions } from "../core/types.js";
 
 function resetEvoButtons() {
     ["blueNormalEvo", "blueSuperEvo", "redNormalEvo", "redSuperEvo"].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
-        el.removeAttribute("disabled");              // re-enable
-        el.classList.remove("used", "spent", "disabled"); // clean any flags you added
-        el.draggable = true;              // keep drag active
+        el.removeAttribute("disabled");
+        el.classList.remove("used", "spent", "disabled");
+        el.draggable = true;
     });
 }
 
@@ -29,17 +28,18 @@ export async function startGame(options: StartGameOptions) {
     const blueChoice = options.deckAId;
     const redChoice = options.deckBId;
 
+    let finalSeed: number | string;
     if (options.seed !== undefined && options.seed !== null) {
-        setSeed(options.seed);
+        finalSeed = options.seed;
         console.log(`[RNG] Using provided seed: ${options.seed}`);
     } else {
         const autoSeed = Date.now() >>> 0;
-        setSeed(autoSeed);
+        finalSeed = autoSeed;
         console.log(`[RNG] Using auto seed: ${autoSeed}`);
     }
 
-    logEvent("gameStart", { blueDeck: blueChoice, redDeck: redChoice, seed: getSeed() });
-    resetGameState();
+    logEvent("gameStart", { blueDeck: blueChoice, redDeck: redChoice, seed: finalSeed });
+    resetGameState(finalSeed);
     state.blueAnyAllyAttackedThisTurn = false;
     state.redAnyAllyAttackedThisTurn = false;
     await loadCardDatabase();
@@ -79,9 +79,10 @@ export async function startGame(options: StartGameOptions) {
         }], "red", null, { targets: [] });
     }
 
+    // Reset red boost button (DOM)
     const redBoost = document.getElementById("redBoost");
     redBoost?.classList.remove("used");
-    if (redBoost) { redBoost.removeAttribute("disabled"); redBoost.style.backgroundColor = "orange"; }
+    if (redBoost) { redBoost.removeAttribute("disabled"); (redBoost as HTMLElement).style.backgroundColor = "orange"; }
 
     // ✅ evolve charges & turn locks
     state.blueEvoCharges = 2;

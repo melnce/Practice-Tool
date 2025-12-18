@@ -1,12 +1,14 @@
 // src/logic/mulligan.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// BROWSER-ONLY: This module handles mulligan phase with DOM access.
+// Core/replay code never imports this module.
+// ─────────────────────────────────────────────────────────────────────────────
 import { state } from "../core/gameState.js";
-// @ts-ignore
 import { adapter } from "../core/adapter.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
 import { Player, CardInstance } from "../core/types.js";
-
 
 function ownerZones(owner: Player) {
     return {
@@ -44,10 +46,11 @@ export function beginMulligan() {
     showMulliganUI();
 }
 
-
-// Debug/global fallback so you can call from console if buttons don't fire:
-(window as any).confirmMulligan = confirmMulligan;
-(window as any).toggleMulliganPick = toggleMulliganPick;
+// Debug/global fallback (browser only)
+if (typeof window !== "undefined") {
+    (window as any).confirmMulligan = confirmMulligan;
+    (window as any).toggleMulliganPick = toggleMulliganPick;
+}
 
 function markSelectable(owner: Player) {
     const { hand } = ownerZones(owner);
@@ -194,7 +197,7 @@ function startFirstTurn() {
     adapter.render();
 }
 
-// ---- Simple UI helpers (two confirm buttons you can place in your HTML) ----
+// ---- Simple UI helpers (browser only) ----
 function showMulliganUI() {
     const blueBtn = document.getElementById("blueMulliganConfirm") as HTMLButtonElement | null;
     const redBtn = document.getElementById("redMulliganConfirm") as HTMLButtonElement | null;

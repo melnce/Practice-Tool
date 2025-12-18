@@ -58,12 +58,61 @@ export function registerBoardEffects() {
     });
     registerOp("summon_named_enemy", (eff, ctx) => {
         const foe = ctx.owner === "blue" ? "red" : "blue";
-        // op needs to be SummonOps "summon_named" strictly
         summonNamed({ op: "summon_named", name: eff.name, count: eff.count || 1 } as any, foe);
         doLog("summon", { owner: foe, name: eff.name });
     });
 
-    // ...
+    // Summon random from deck
+    registerOp("summon_random_from_deck", (eff, ctx) => {
+        summonRandomFromDeck(eff, ctx.owner);
+    });
+
+    registerOp("summon_destroyed_amulet_highest_base_cost", (eff, ctx) => {
+        handleSummonDestroyedAmuletHighestBaseCost(ctx.owner);
+    });
+
+    registerOp("fill_congregant_copies", (eff, ctx) => {
+        handleFillCongregantCopies(ctx.owner, ctx.sourceCard);
+    });
+
+    registerOp("congregant_fill_board", (eff, ctx) => {
+        handleFillCongregantCopies(ctx.owner, ctx.sourceCard);
+    });
+
+    registerOp("fill_board_chain_decay", (eff, ctx) => {
+        // Placeholder - uses summonNamed with decay pattern
+        const name = eff.name || "";
+        const count = eff.count || 1;
+        for (let i = 0; i < count; i++) {
+            summonNamed({ op: "summon_named", name, count: 1 } as any, ctx.owner);
+        }
+    });
+
+    registerOp("select_hand_summon_artifact_copy", (eff, ctx) => {
+        handleSelectHandSummonArtifactCopy(eff, ctx.owner, ctx.sourceCard);
+    });
+
+    registerOp("select_hand_summon_artifact_copies_eot_destroy", (eff, ctx) => {
+        handleSelectHandSummonArtifactCopiesEOT(eff, ctx.owner, ctx.sourceCard);
+    });
+
+    // Reanimate
+    registerOp("reanimate", (eff, ctx) => {
+        handleReanimate(eff, ctx.owner);
+    });
+
+    // Return to hand / bounce
+    registerOp("return_to_hand", (eff, ctx) => {
+        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue);
+    });
+
+    registerOp("bounce", (eff, ctx) => {
+        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue);
+    });
+
+    registerOp("return_hand_to_deck", (eff, ctx) => {
+        handleReturnHandToDeck(eff, ctx.owner, ctx.queue);
+    });
 
     // Transform
     registerOp("transform", (eff, ctx) => {

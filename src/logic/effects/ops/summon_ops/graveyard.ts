@@ -1,5 +1,5 @@
 import { state } from "../../../../core/gameState.js";
-import { randInt } from "../../../../core/rng.js";
+
 import { Player } from "../../../../core/types.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { summonNamed } from "./direct.js";
@@ -24,7 +24,7 @@ export function handleSummonDestroyedAmuletHighestBaseCost(owner: Player) {
     if (!candidates.length) return;
 
     // Random one among the highest base cost
-    const choice = candidates[randInt(candidates.length)];
+    const choice = candidates[state.rng.nextInt(candidates.length)];
     if (!choice) return;
     const pick = choice.g;
 

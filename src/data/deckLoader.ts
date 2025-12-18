@@ -1,48 +1,30 @@
 // src/data/deckLoader.ts
 import { state } from "../core/gameState.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
-// @ts-ignore
-import { render } from "../ui/render.js";
+import { adapter } from "../core/adapter.js";
 import { getCardDetails } from "./cardDatabase.js";
-import { makeUid } from "../core/rng.js";
 import { logEvent } from "../core/logger.js";
 import { Player } from "../core/types.js";
 
-function normalizeDeck(raw: any) {
-    // Accept:
-    // 1) [ {name, count?}, ... ]
-    // 2) { cards: [ {name, count}, ... ] }
-    // 3) { cards: { "Card A": 2, "Card B": 1, ... } }
-    let list = null;
-    if (Array.isArray(raw)) {
-        list = raw;
-    } else if (raw && Array.isArray(raw.cards)) {
-        list = raw.cards;
-    } else if (raw && raw.cards && typeof raw.cards === 'object') {
-        list = Object.entries(raw.cards).map(([name, count]) => ({ name, count }));
-    }
-    if (!list) throw new Error("Deck JSON must be an array or { cards: [...] }");
 
-    const expanded = [];
-    for (const c of list) {
-        const copies = Math.max(1, Number(c.count) || 1);
-        for (let i = 0; i < copies; i++) {
-            // Preserve Name AND ID
-            const entry: any = { name: c.name };
-            if (c.id) entry.id = c.id;
-            expanded.push(entry);
+function normalizeDeck(raw: any) {
+    const expanded: any[] = [];
+    const isOrdered = !!raw.ordered;
+
+    if (Array.isArray(raw)) {
+        // Simple array of card objects or names
+        for (const item of raw) {
+            expanded.push(typeof item === "string" ? { name: item } : item);
+        }
+    } else if (raw && Array.isArray(raw.cards)) {
+        // Object with { cards: [...], ordered: boolean }
+        for (const entry of raw.cards) {
+            const count = entry.count || 1;
+            for (let i = 0; i < count; i++) {
+                expanded.push({ ...entry, count: undefined }); // Remove count from individual instance
+            }
         }
     }
-
-    // Determine if this deck should be loaded in listed order (no shuffle)
-    const file = String(raw.__deckFile || '');
-    const isOrdered =
-        raw.ordered === true ||                  // optional flag in JSON
-        raw.shuffle === false ||                 // optional flag in JSON
-        /^0_.*\.json$/i.test(file) ||            // any deck starting with "0_"
-        /testing/i.test(file) ||                 // filenames containing "testing"
-        file === '0_testing_deck.json';          // your current test deck
-
     if (isOrdered) {
         // We draw with deck.pop(), so reverse to make JSON[0] the first drawn.
         return expanded.reverse();
@@ -61,7 +43,7 @@ function enrichDeck(rawDeck: any) {
             || getCardDetails(card.name);
 
         const enriched = fullData ? { ...fullData, ...card } : { ...card };
-        enriched.uid = makeUid();
+        enriched.uid = state.rng.makeUid();
         return enriched;
     });
 }
@@ -98,7 +80,7 @@ export async function loadBlueDeck(deckName: string) {
     // Log the blue deck load
     logEvent("deckLoad", { owner: "blue", file: state.blueDeckFile, count: state.blueDeck.length });
 
-    render();
+    adapter.render();
 }
 
 export async function loadRedDeck(deckName: string) {
@@ -118,5 +100,5 @@ export async function loadRedDeck(deckName: string) {
     // Log the red deck load
     logEvent("deckLoad", { owner: "red", file: state.redDeckFile, count: state.redDeck.length });
 
-    render();
+    adapter.render();
 }

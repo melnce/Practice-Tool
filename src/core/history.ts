@@ -4,7 +4,7 @@ import { state } from "./gameState.js";
 // @ts-ignore
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
-import { getRngSnapshot, setRngSnapshot } from "./rng.js";
+
 import { GameState } from "./types.js";
 
 // --- Config ---
@@ -33,21 +33,37 @@ let inAction: ActionContext | null = null; // { name, before, meta }
 let onChange: ((status: { canUndo: boolean, canRedo: boolean }) => void) | null = null; // optional listener
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
+// Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
 function snapshot(): GameState {
-  const snap = structuredClone(state) as GameState;
-  // persist RNG position alongside state
-  (snap as any).__rng = getRngSnapshot();
+  // Exclude RNG from structuredClone because it contains methods/closures
+  const { rng, ...rest } = state;
+  const snap = structuredClone(rest) as GameState;
+
+  // Persist RNG internal state
+  if (rng) {
+    (snap as any).__rng = rng.snapshot();
+  }
   return snap;
 }
 
 function replaceState(next: GameState) {
+  // Preserve the RNG instance
+  const rngInstance = state.rng;
+
   // Replace all top-level keys to keep references stable where possible
   // (prevents modules holding "state" reference from becoming stale).
   for (const k of Object.keys(state)) delete state[k];
-  for (const [k, v] of Object.entries(next)) state[k] = v;
+  for (const [k, v] of Object.entries(next)) {
+    if (k !== "rng") state[k] = v;
+  }
 
-  // restore RNG after state rehydrate
-  if (next && (next as any).__rng) setRngSnapshot((next as any).__rng);
+  // Re-attach RNG instance
+  state.rng = rngInstance;
+
+  // restore RNG state after state rehydrate
+  if (state.rng && (next as any).__rng) {
+    state.rng.restore((next as any).__rng);
+  }
 }
 
 function trimRing() {

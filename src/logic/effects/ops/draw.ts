@@ -4,7 +4,7 @@ import { state } from "../../../core/gameState.js";
 import { drawCard, pushToHand, MAX_HAND } from "../../../core/utils.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { applyKeyword } from "../../core/keywords.js";
-import { rand, randInt, makeUid } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
 
@@ -131,7 +131,7 @@ export function handleAddToHand(eff: Effect, owner: Player) {
     for (let i = 0; i < n; i++) {
         if (hand.length >= MAX_HAND) break;
         const copy = JSON.parse(JSON.stringify(base));
-        copy.uid = makeUid();
+        copy.uid = state.rng.makeUid();
 
         if (pushToHand(hand, copy)) {
             state.lastAddedToHand = copy;
@@ -221,7 +221,7 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
 
     if (mode === "random") {
         for (let i = idxs.length - 1; i > 0; i--) {
-            const j = randInt(i + 1);
+            const j = state.rng.nextInt(i + 1);
             // Both indices are in bounds since i < idxs.length and j <= i
             const temp = idxs[i]!;
             idxs[i] = idxs[j]!;

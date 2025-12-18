@@ -1,12 +1,10 @@
 ﻿// src/logic/core/resolveTarget.ts
 import { state } from "../../core/gameState.js";
-// @ts-ignore
 import { adapter } from "../../core/adapter.js";
 import { runEffects } from "./effects/index.js";
 import { clearSelectableFlags } from "./targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { doAction } from "../../core/history.js";
-import { showTargetConfirmationButton, hideTargetConfirmation, triggerConfirmButtonClick } from "../../ui/targeting.js";
 import { applyTargetClick, TargetedOpContext } from "./targeting/index.js";
 import { dispatchTargetedOp, __getRegisteredTargetedOps } from "../effects/ops/targeted/index.js";
 
@@ -65,7 +63,7 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
         // Standard cleanup for ALL handled ops (Contract Step 3)
         delete state.pendingTargetEffect;
         clearSelectableFlags();
-        hideTargetConfirmation();
+        adapter.hideTargetConfirmation();
 
         if (opCtx.resumeEffects?.length) runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
         else adapter.render();
@@ -75,7 +73,7 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
 
 // UI Bridge
 export function confirmTargetsIfNeeded() {
-    triggerConfirmButtonClick();
+    adapter.triggerConfirmButtonClick();
 }
 
 // Internal UI helper
@@ -109,5 +107,5 @@ function showConfirmationButton(pending: any) {
         text: pending.confirmationText || "Confirm Selection",
         count: Array.isArray(pending.targets) ? pending.targets.length : 0
     };
-    showTargetConfirmationButton(vm);
+    adapter.showTargetConfirmationButton(vm);
 }

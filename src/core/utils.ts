@@ -5,12 +5,7 @@ import { state } from "./gameState.js";
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 // Pull *once* from rng and re-export locally-used helpers
-import {
-    rand,
-    randInt,
-    choice as rngChoice,
-    shuffleInPlace as rngShuffle,
-} from "./rng.js";
+// (Refactored to use state.rng directly)
 
 // Import types
 import { CardInstance } from "./types.js";
@@ -25,10 +20,25 @@ const REAPER_URLS = [
 ];
 
 // ---- RNG helpers (aliases to avoid duplication) ------------------------------
-// Keep old API names if other files import from utils:
-export const randomChoice = rngChoice;       // was local, now alias
-export const randomInt = randInt;          // was local, now alias
-export const shuffleInPlace = rngShuffle;    // was local, now alias
+export function randomChoice<T>(arr: T[] | null | undefined): T | null {
+    if (!arr || arr.length === 0) return null;
+    return state.rng.pick(arr);
+}
+
+export function randomInt(max: number): number {
+    return state.rng.nextInt(max);
+}
+
+export function shuffleInPlace<T>(arr: T[]): T[] {
+    const n = arr.length;
+    for (let i = n - 1; i > 0; i--) {
+        const j = state.rng.nextInt(i + 1);
+        const temp = arr[i]!;
+        arr[i] = arr[j]!;
+        arr[j] = temp;
+    }
+    return arr;
+}
 
 // -------- Helpers --------
 function showImageOverlayWithFallback(urls: string[]) {

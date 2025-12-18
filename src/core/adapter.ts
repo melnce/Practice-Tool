@@ -1,12 +1,19 @@
-import { guardLifecycle } from "../logic/core/targeting/guards.js";
+// src/core/adapter.ts
+// ─────────────────────────────────────────────────────────────────────────────
+// ENVIRONMENT ADAPTER - Default implementations are silent no-ops.
+// Browser code injects real implementations via injectAdapter().
+// This enables core modules to call adapter functions without UI imports.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const adapter = {
-    render: () => {
-        guardLifecycle("adapter.render");
-        console.warn("Render called but not injected");
-    },
-    showChoiceModal: (options: any[], callback: (index: number) => void) => { console.warn("showChoiceModal called but not injected"); },
-    // Add other UI dependencies here if needed (e.g. sounds)
+    // Default: no-op. Browser boot injects real implementations.
+    render: () => { /* no-op by default */ },
+    showChoiceModal: (options: unknown[], callback: (index: number) => void) => { /* no-op */ },
+
+    // Targeting confirmation UI
+    showTargetConfirmationButton: (vm: unknown) => { /* no-op */ },
+    hideTargetConfirmation: () => { /* no-op */ },
+    triggerConfirmButtonClick: () => { /* no-op */ },
 };
 
 export function injectAdapter(impl: Partial<typeof adapter>) {

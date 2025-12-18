@@ -1,5 +1,5 @@
 import { state } from "../../../../core/gameState.js";
-import { makeUid } from "../../../../core/rng.js";
+
 import { fireTrigger } from "../../../core/triggers.js";
 import { CardInstance, CardTemplate, Player } from "../../../../core/types.js";
 import { initAmulet, initFollower } from "./init.js";
@@ -9,7 +9,7 @@ import { isAmulet, isFollower } from "./utils.js";
 
 export function makeCardFromDB(cardData: CardTemplate, owner: Player): CardInstance {
     const card: CardInstance = JSON.parse(JSON.stringify(cardData));
-    card.uid = makeUid();
+    card.uid = state.rng.makeUid();
     card.owner = owner;
 
     if (isFollower(card)) initFollower(card);

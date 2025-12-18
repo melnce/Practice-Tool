@@ -2,7 +2,7 @@
 import { state } from "../../../core/gameState.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { reanimateSummon } from "./summon.js";
-import { rand, randInt } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
 
@@ -48,7 +48,7 @@ export function handleReanimate(eff: Effect, owner: Player) {
     }
 
     // Randomly select one from the highest available cost group
-    const selected = candidates[randInt(candidates.length)];
+    const selected = candidates[state.rng.nextInt(candidates.length)];
     if (!selected) return;
     logEvent("reanimatePick", { owner, name: selected.name, cost: parseInt(selected.cost as any) || 0 });
 

@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { makeUid } from "../../../../core/rng.js";
+
 import { applyKeywordsFromList, applyKeyword } from "../../../core/keywords.js";
 import { CardInstance, Effect, Player } from "../../../../core/types.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
@@ -76,7 +76,7 @@ export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
         : safeClone<CardInstance>(sourceCard);
 
     // Normalize instance identity/placement
-    clone.uid = makeUid();
+    clone.uid = state.rng.makeUid();
     clone.owner = owner;
     clone.zone = "board";
     clone.selected = false;

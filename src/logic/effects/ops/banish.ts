@@ -2,7 +2,7 @@
 import { state } from "../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { fireTrigger } from "../../core/triggers.js";
-import { randInt } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../../core/types.js";
 
@@ -140,7 +140,7 @@ export function handleBanishRandom(eff: Effect, owner: Player) {
     const take = Math.min(n, pool.length);
 
     for (let i = 0; i < take; i++) {
-        const idx = randInt(pool.length);      // uses your seeded RNG
+        const idx = state.rng.nextInt(pool.length);      // uses your seeded RNG
         const target = pool.splice(idx, 1)[0]; // remove selected target from pool
         if (!target) continue;
         const targetOwner = state.blueBoard.includes(target) ? "blue" : "red";

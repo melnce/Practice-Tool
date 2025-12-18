@@ -5,7 +5,7 @@ import { applyKeyword } from "../core/keywords.js";
 import { handleBanish } from "./ops/banish.js";
 // @ts-ignore
 import { resolveDestroy } from "./ops/destroy.js";
-import { rand, makeUid } from "../../core/rng.js";
+
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
 
@@ -46,7 +46,7 @@ export function handleBuffSelf(sourceCard: CardInstance, eff: Effect) {
         sourceCard.temporaryBuffs.push({
             attack: a,
             defense: d,
-            id: makeUid("buff_"),
+            id: state.rng.makeUid("buff_"),
         });
     }
 
@@ -218,7 +218,7 @@ export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, own
         sourceCard.temporaryBuffs.push({
             attack: a,
             defense: d,
-            id: makeUid("buff_"),
+            id: state.rng.makeUid("buff_"),
         });
     }
 }

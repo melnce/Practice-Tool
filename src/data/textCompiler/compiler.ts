@@ -1,5 +1,6 @@
 
 import { Effect, EffectOp } from "../../core/types.js";
+import { makeEffect } from "../../logic/core/effects/build.js";
 
 interface CompiledOutput {
     keywords: string[];
@@ -99,7 +100,7 @@ function parseEffect(clause: string): Effect | null {
     if (drawMatch) {
         const matchVal = drawMatch[1];
         const count = matchVal?.toLowerCase() === "a" ? 1 : parseInt(matchVal ?? "1");
-        return { op: "draw", count };
+        return makeEffect("draw", { count });
     }
 
     // 2. Deal Damage
@@ -123,14 +124,14 @@ function parseEffect(clause: string): Effect | null {
             return {
                 op: "select",
                 target: "enemy_follower",
-                effects: [{ op: "damage", amount: amt }]
+                effects: [makeEffect("damage", { amount: amt })]
             };
         } else if (targetStr.includes("leader")) {
-            return { op: "damage_follower_or_leader", amount: amt, target: "enemy_leader" };
+            return makeEffect("damage_follower_or_leader", { amount: amt, target: "enemy_leader" });
         } else {
             // Implicit / Generic
             // "Deal X damage." -> Default to simple damage op?
-            return { op: "damage", amount: amt };
+            return makeEffect("damage", { amount: amt });
         }
     }
 
@@ -144,23 +145,23 @@ function parseEffect(clause: string): Effect | null {
         // Heuristic: remove trailing 's' if not part of name? Name matching is hard.
         // Assuming user provides singular names or we fix later.
 
-        return { op: "summon_named", name, count };
+        return makeEffect("summon_named", { name, count });
     }
 
     // 4. Spellboost
     // "Spellboost: Subtract 1 from the cost of this card."
     if (/^Spellboost: Subtract 1 from the cost of this card\.?$/i.test(clause)) {
-        return { op: "spellboost_hand" }; // technically this is the effect OF spellboost, usually "spellboost" op is triggers.
+        return makeEffect("spellboost_hand", {}); // technically this is the effect OF spellboost, usually "spellboost" op is triggers.
         // But standardized logic often just marks "Spellboost" keyword.
         // Prompt said: "Spellboost" mentions -> keyword + op mapping where applicable.
         // For cost reduction:
-        return { op: "reduce_cost_self", amount: 1, condition: "spellboost" };
+        return makeEffect("reduce_cost_self", { amount: 1 });
     }
 
     // "Spellboost: Deal 1 more damage."
     // This implies a variable damage op.
     if (/^Spellboost: Deal 1 more damage\.?$/i.test(clause)) {
-        return { op: "damage", amount: "spellboost" }; // Simplified representation
+        return makeEffect("damage", { amount: "spellboost" }); // Simplified representation
     }
 
     return null;

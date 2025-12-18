@@ -333,7 +333,10 @@ export interface CardInstance extends CardTemplate {
     __uiPopBarrier?: boolean;
 }
 
+import { RNG } from "./rng.js";
+
 export interface GameState {
+    rng: RNG;
     blueHP: number;
     redHP: number;
     bluePP: number;
@@ -424,18 +427,56 @@ export type AttackAction = {
     defender: TargetSpec;
 };
 
-export type ChooseTargetAction = {
+export interface ChooseTargetAction {
     type: "CHOOSE_TARGET";
     player: Player;
     target: TargetSpec;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACTION TYPE MAPPING - Closed-world union with type-level assertions
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Step 1: Define all action types as string literal union
+export type ActionType =
+    | "UNDO"
+    | "REDO"
+    | "RESET_HISTORY"
+    | "END_TURN"
+    | "PLAY_CARD"
+    | "ATTACK"
+    | "CHOOSE_TARGET";
+
+// Step 2: Define the canonical type mapping (ActionType -> Action interface)
+export interface ActionByType {
+    UNDO: { type: "UNDO" };
+    REDO: { type: "REDO" };
+    RESET_HISTORY: { type: "RESET_HISTORY" };
+    END_TURN: { type: "END_TURN" };
+    PLAY_CARD: PlayCardAction;
+    ATTACK: AttackAction;
+    CHOOSE_TARGET: ChooseTargetAction;
+}
+
+// Step 3: Type assertions to enforce totality and exactness
+// Total: All ActionType keys must be present in ActionByType
+type _AssertActionTotal = ActionType extends keyof ActionByType ? true : never;
+// Reverse: ActionByType keys must be exactly ActionType
+type _AssertActionReverse = keyof ActionByType extends ActionType ? true : never;
+// Exact: ActionByType[K].type must equal K for all K
+type _AssertActionExact = {
+    [K in ActionType]: ActionByType[K]["type"] extends K
+    ? (K extends ActionByType[K]["type"] ? true : never)
+    : never;
 };
+type _AssertActionExactAll = _AssertActionExact[ActionType] extends true ? true : never;
 
-export type HistoryAction = { type: "UNDO" } | { type: "REDO" } | { type: "RESET_HISTORY" };
-export type GameAction = { type: "END_TURN" };
+// Force evaluation
+const _actionChecks: [_AssertActionTotal, _AssertActionReverse, _AssertActionExactAll] = [true, true, true];
 
-export type PlayerAction =
-    | HistoryAction
-    | GameAction
-    | PlayCardAction
-    | AttackAction
-    | ChooseTargetAction;
+// Step 4: The Union Type (derived from mapping)
+export type PlayerAction = ActionByType[ActionType];
+
+// Legacy aliases for compatibility
+export type HistoryAction = ActionByType["UNDO"] | ActionByType["REDO"] | ActionByType["RESET_HISTORY"];
+export type GameAction = ActionByType["END_TURN"];

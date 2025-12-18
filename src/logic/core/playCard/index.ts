@@ -13,14 +13,6 @@ import { adapter } from "../../../core/adapter.js";
 import { logEvent } from "../../../core/logger.js";
 import { PlayOutcome } from "./types.js";
 
-const isHeadless = () => (typeof globalThis !== "undefined" && (globalThis as any).HEADLESS);
-
-function safeRender() {
-    if (!isHeadless()) {
-        adapter.render();
-    }
-}
-
 /**
  * Play a card from hand. This is the main entry point.
  * - Wraps core logic in beginAction/commitAction for history management.
@@ -34,31 +26,25 @@ export function playCard(fromHand: CardInstance[], player: Player, index: number
     beginAction("Play Card", meta);
 
     try {
-        // Log before core execution (if not headless)
-        if (!isHeadless() && card) {
+        // Log before core execution
+        if (card) {
             logEvent("playCard:start", { player, card: card.name, uid: card.uid });
         }
 
         const outcome = playCardCore(fromHand, player, index);
 
         // Post-execution logging
-        if (!isHeadless() && card) {
+        if (card) {
             logEvent("playCard:outcome", { player, card: card.name, uid: card.uid, kind: outcome.kind });
         }
 
         // Commit the action (without auto-render, we handle it ourselves)
         commitAction({ autoRender: false });
 
-        // Render based on outcome
-        if (outcome.kind === "done") {
-            safeRender();
-        } else if (outcome.kind === "paused") {
-            // Render to show selection UI
-            safeRender();
+        // Render based on outcome (adapter.render() is no-op if not injected)
+        if (outcome.kind === "done" || outcome.kind === "paused") {
+            adapter.render();
         }
-        // "blocked" - no meaningful state change, but we still committed the action
-        // (in case blocked cards logged something). If truly nothing changed,
-        // history will just have a no-op entry which is fine.
 
         return outcome;
     } catch (e) {

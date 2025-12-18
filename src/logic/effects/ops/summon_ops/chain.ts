@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { makeUid } from "../../../../core/rng.js";
+
 import { fireTrigger } from "../../../core/triggers.js";
 import { CardInstance, Player } from "../../../../core/types.js";
 import { boardOf } from "./utils.js";
@@ -28,7 +28,7 @@ export function makeChainDecayClone(prev: CardInstance, owner: Player): CardInst
     // END MANUAL CLONE
 
     // Identity/placement
-    clone.uid = makeUid();
+    clone.uid = state.rng.makeUid();
     clone.owner = owner;
     clone.zone = "board";
     clone.selected = false;

@@ -3,7 +3,7 @@ console.log("Targeting Module State ID:", (state as any).__debugId);
 // @ts-ignore
 import { adapter } from "../../core/adapter.js";
 // import { runEffects } from "./effects/index.js"; // Dependency injection via context.runner
-import { randInt } from "../../core/rng.js";
+
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
 
@@ -318,7 +318,7 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
         // Fill remaining picks randomly from the rest of the pool (no duplicates)
         const remaining = pool.filter(c => !picks.includes(c));
         while (picks.length < effectiveCount && remaining.length) {
-            const idx = randInt(remaining.length);
+            const idx = state.rng.nextInt(remaining.length);
             const picked = remaining.splice(idx, 1)[0];
             if (picked) picks.push(picked);
         }

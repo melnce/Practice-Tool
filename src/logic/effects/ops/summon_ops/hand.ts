@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { makeUid } from "../../../../core/rng.js";
+
 import { fireTrigger } from "../../../core/triggers.js";
 import { applyKeywordsFromList } from "../../../core/keywords.js";
 import { adapter } from "../../../../core/adapter.js";

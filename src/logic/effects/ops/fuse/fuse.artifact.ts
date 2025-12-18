@@ -4,7 +4,7 @@ import { adapter } from "../../../../core/adapter.js";
 import { highlightSelectable, clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
-import { makeUid } from "../../../../core/rng.js";
+
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
 
@@ -143,7 +143,7 @@ export function fuse_finalize_gear_multi(owner: Player, initiatorUid: string, pa
     if (!tmpl) { clearSelectableFlags(); adapter.render(); return; }
 
     const result = JSON.parse(JSON.stringify(tmpl));
-    result.uid = makeUid();
+    result.uid = state.rng.makeUid();
 
     hand[iIdx] = result;
 
@@ -202,7 +202,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, par
     if (!tmpl) { clearSelectableFlags(); adapter.render(); return; }
 
     const newCard = JSON.parse(JSON.stringify(tmpl));
-    newCard.uid = makeUid();
+    newCard.uid = state.rng.makeUid();
 
     hand[iIdx] = newCard;
     for (const p of partners || []) {
@@ -248,7 +248,7 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partner
         const tmpl = getCardDetails("Masterwork Artifact Ω");
         if (!tmpl) { clearSelectableFlags(); adapter.render(); return; }
         const omega = JSON.parse(JSON.stringify(tmpl));
-        omega.uid = makeUid();
+        omega.uid = state.rng.makeUid();
 
         hand[iIdx] = omega;
 

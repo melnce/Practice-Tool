@@ -4,7 +4,7 @@ import { adapter } from "../../../../core/adapter.js";
 import { highlightSelectable, clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
-import { makeUid } from "../../../../core/rng.js";
+
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, GameState, Player } from "../../../../core/types.js";
 
@@ -220,7 +220,7 @@ export function fuse_finalize_generic(owner: Player, initiatorUid: string, partn
 
     const mk = () => {
         const c = JSON.parse(JSON.stringify(tmpl));
-        c.uid = makeUid();
+        c.uid = state.rng.makeUid();
         return c;
     };
 

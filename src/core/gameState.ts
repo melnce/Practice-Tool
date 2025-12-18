@@ -77,10 +77,14 @@ const ARRAY_KEYS: readonly ArrayKey[] = [
   "lastDrawnCards"
 ];
 
+import { createRng } from "./rng.js";
+
 // -- 3. Factory --
-export function createInitialState(): GameState {
+export function createInitialState(seed?: number | string): GameState {
+  const finalSeed = seed ?? Date.now();
   // Explicit object literal assignment to ensure Type Safety without 'as any'
   return {
+    rng: createRng(finalSeed),
     ...DEFAULTS,
 
     // Arrays (allocated exactly once)
@@ -104,7 +108,7 @@ export function createInitialState(): GameState {
     lastDrawnCards: [],
 
     // Debug Identity
-    __debugId: Math.random()
+    __debugId: createRng(finalSeed).nextFloat()
   };
 }
 
@@ -112,24 +116,33 @@ export function createInitialState(): GameState {
 export const state: GameState = createInitialState();
 
 // -- 5. Reset Logic --
-export function resetGameState(): void {
+export function resetStateInstance(target: GameState, seed?: number | string): void {
+  const finalSeed = seed ?? Date.now();
+
   // A) Clear arrays in-place
   // We assume strict invariants: these keys MUST exist and MUST be arrays.
   for (const key of ARRAY_KEYS) {
-    if (!Array.isArray(state[key])) {
-      throw new Error(`resetGameState: Critical invariant failed. Key '${key}' is not an array.`);
+    if (!Array.isArray(target[key])) {
+      throw new Error(`resetStateInstance: Critical invariant failed. Key '${key}' is not an array.`);
     }
-    state[key].length = 0;
+    target[key].length = 0;
   }
 
   // B) Reset scalars
-  Object.assign(state, DEFAULTS);
+  Object.assign(target, DEFAULTS);
 
-  // C) Debug Identity
-  state.__debugId = Math.random();
+  // C) Reset RNG
+  target.rng = createRng(finalSeed);
+
+  // D) Debug Identity
+  target.__debugId = target.rng.nextFloat();
 
   // Log
-  logEvent("resetGameState", {});
+  logEvent("resetStateInstance", { seed: finalSeed, debugId: target.__debugId });
+}
+
+export function resetGameState(seed?: number | string): void {
+  resetStateInstance(state, seed);
 }
 
 // Global debug exposure (matches original)

@@ -4,7 +4,7 @@ import { getCardDetails } from "../../data/cardDatabase.js";
 // @ts-ignore
 // import { render } from "../../ui/render.js";
 import { highlightSelectable } from "../core/targeting.js";
-import { rand, makeUid } from "../../core/rng.js";
+
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Player, Effect } from "../../core/types.js";
 
@@ -129,7 +129,7 @@ export function handleTransformInHand(eff: Effect, owner: Player) {
             // Create a fresh copy of the card from the database template
             const newCard = {
                 ...JSON.parse(JSON.stringify(cardTemplate)), // Deep clone
-                uid: makeUid("card_"),
+                uid: state.rng.makeUid("card_"),
             };
             logEvent("transformInHand", { owner, from: card.name, to: newCard.name });
             // Replace the old card with the new one

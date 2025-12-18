@@ -1,26 +1,27 @@
 // src/data/cardDatabase.ts
-import {
-    hasInherentStorm,
-    hasInherentRush,
-    hasInherentWard,
-    hasInherentIntimidate,
-    hasInherentBarrier,
-    hasInherentBane,
-    hasInherentBanishOnDeath,
-    hasInherentLastWords,
-    hasInherentCountdown
-} from "./keywords.js";
 import { CardTemplate } from "../core/types.js";
+import {
+    initCardDatabase,
+    getCardDetails as getCardFromIndex,
+    getCardById as getCardByIdFromIndex,
+    injectCardForTest as injectForTest,
+    resetCardIndex,
+    BuildCardIndexInput,
+    RawCardData
+} from "./cardIndex.js";
 
-let fullCardData: Record<string, CardTemplate> = {};
-let tokenCardData: Record<string, CardTemplate> = {};
-let cardIdMap: Record<string, CardTemplate> = {};
+// Re-export types if needed
+export { getCardDetails, getCardById } from "./cardIndex.js";
 
-export async function loadCardDatabase() {
-    fullCardData = {};
-    tokenCardData = {};
-    cardIdMap = {};
+// ─────────────────────────────────────────────────────────────────────────────
+// Browser Card Loader
+// ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Load cards via fetch (Browser Only).
+ * Returns raw data suitable for initCardDatabase.
+ */
+export async function loadCardsBrowser(): Promise<BuildCardIndexInput> {
     const win = (typeof window !== "undefined") ? (window as any) : {};
     let root = win.APP_ROOT || '/';
 
@@ -31,108 +32,67 @@ export async function loadCardDatabase() {
     }
 
     const ts = Date.now();
-    const fullRes = await fetch(`${root}cards/all.json?v=${ts}`);
+
+    // Parallel fetch for main cards and tokens
+    const [fullRes, tokenRes, vanillaRes] = await Promise.all([
+        fetch(`${root}cards/all.json?v=${ts}`),
+        fetch(`${root}cards/token_details.json?v=${ts}`),
+        fetch(`${root}cards/vanilla_lab_set.json`).catch(() => null) // Optional
+    ]);
+
     if (!fullRes.ok) throw new Error(`Main cards failed: ${fullRes.status}`);
-    const fullJson: any[] = await fullRes.json();
+    const fullJson: RawCardData[] = await fullRes.json();
 
-    const tokenRes = await fetch(`${root}cards/token_details.json?v=${ts}`);
     if (!tokenRes.ok) throw new Error(`Tokens failed: ${tokenRes.status}`);
-    const tokenJson: any[] = await tokenRes.json();
+    const tokenJson: RawCardData[] = await tokenRes.json();
 
-    // Load lab vanilla set
-    let vanillaJson: any[] = [];
-    try {
-        const vanillaRes = await fetch(`${root}cards/vanilla_lab_set.json`);
-        if (vanillaRes.ok) {
+    let vanillaJson: RawCardData[] = [];
+    if (vanillaRes && vanillaRes.ok) {
+        try {
             vanillaJson = await vanillaRes.json();
+        } catch (e) {
+            console.warn("Vanilla lab set failed to parse", e);
         }
+    }
+
+    return {
+        mainCards: [...fullJson, ...vanillaJson],
+        tokenCards: tokenJson
+    };
+}
+
+/**
+ * Main entry point for browser app.
+ * Loads cards and initializes the global index.
+ */
+export async function loadCardDatabase() {
+    try {
+        const data = await loadCardsBrowser();
+        initCardDatabase(data);
     } catch (e) {
-        console.warn("Vanilla lab set not found or failed to load", e);
-    }
-
-    const processCard = (card: any, targetMap: Record<string, CardTemplate>) => {
-        if (!card.name) return;
-        if (card.type === "Follower" || card.type === "Amulet") {
-            card.hasStorm = hasInherentStorm(card.description, card.keywords);
-            card.hasRush = hasInherentRush(card.description, card.keywords);
-            card.hasWard = hasInherentWard(card.description, card.keywords);
-            card.hasIntimidate = hasInherentIntimidate(card.description, card.keywords);
-            card.hasBarrier = hasInherentBarrier(card.description, card.keywords);
-            // card.barrierCharges = card.hasBarrier ? 1 : 0; // Removed
-            card.hasBane = hasInherentBane(card.description, card.keywords);
-            card.hasBanishOnDeath = hasInherentBanishOnDeath(card.keywords);
-            card.hasLastWords = hasInherentLastWords(card.keywords);
-            card.hasCountdown = hasInherentCountdown(card.keywords);
-
-            if (card.hasLastWords) {
-                const lastWordsKeyword = Array.isArray(card.keywords) ? card.keywords.find((k: any) => typeof k === 'object' && k.name === "LastWords") : null;
-                card.lastWordsEffects = lastWordsKeyword?.effects || [];
-            }
-
-            if (card.hasCountdown) {
-                const countdownKeyword = Array.isArray(card.keywords) ? card.keywords.find((k: any) => typeof k === 'object' && k.name === "Countdown") : null;
-                if (countdownKeyword) {
-                    card.countdown = parseInt(countdownKeyword.turns) || 0;
-                }
-            }
-        }
-        targetMap[card.name] = card;
-
-        // Index by ID if present
-        if (card.id) {
-            cardIdMap[String(card.id)] = card;
-        }
-    };
-
-    for (const card of [...fullJson, ...vanillaJson]) {
-        processCard(card, fullCardData);
-    }
-
-    for (const token of tokenJson) {
-        processCard(token, tokenCardData);
+        console.error("Failed to load card database:", e);
+        throw e;
     }
 }
 
-// Now supports lookup by Name OR ID
-export function getCardDetails(nameOrId: string): CardTemplate | null {
-    if (!nameOrId) return null;
+// ─────────────────────────────────────────────────────────────────────────────
+// Legacy / Test Compatibility
+// ─────────────────────────────────────────────────────────────────────────────
 
-    // 1. Exact ID match (8+ digits)
-    if (/^\d{8,}$/.test(nameOrId)) {
-        const byId = cardIdMap[nameOrId];
-        if (byId) return byId;
-    }
-
-    // 2. Name match
-    return fullCardData[nameOrId] || tokenCardData[nameOrId] || null;
-}
-
-export function getCardById(id: string): CardTemplate | null {
-    return cardIdMap[String(id)] || null;
-}
-
-if (typeof window !== "undefined") {
-    (window as any).cardDatabase = {
-        getCardDetails,
-        getCardById,
-        fullData: fullCardData,
-        tokenData: tokenCardData,
-        idMap: cardIdMap,
-        reload: loadCardDatabase
-    };
-}
-
-// Test Helper
+// Expose these for tests that might mock them (though usage should be migrated)
 export function injectCardForTest(card: CardTemplate) {
-    if (!card.name) return;
-    fullCardData[card.name] = card;
-    if (card.id) {
-        cardIdMap[String(card.id)] = card;
-    }
+    injectForTest(card);
 }
 
 export function resetCardDatabaseForTests() {
-    fullCardData = {};
-    tokenCardData = {};
-    cardIdMap = {};
+    resetCardIndex();
+}
+
+// Expose globals for debugging/console access
+if (typeof window !== "undefined") {
+    (window as any).cardDatabase = {
+        getCardDetails: getCardFromIndex,
+        getCardById: getCardByIdFromIndex,
+        reload: loadCardDatabase
+    };
 }

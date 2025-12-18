@@ -2,7 +2,7 @@
 import { state } from "../../../core/gameState.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../core/keywords.js";
-import { randInt, makeUid } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance } from "../../../core/types.js";
 
@@ -168,7 +168,7 @@ export function transformRandomSpellInHand(owner: Player, intoName = "Ersatz Eli
     const spells = hand.filter(c => c && c.type === "Spell");
     if (!spells.length) return;
 
-    const pick = spells[randInt(spells.length)];
+    const pick = state.rng.pick(spells);
     if (!pick) return;
     const uid = pick.uid;
 

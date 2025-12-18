@@ -4,7 +4,7 @@ import { cleanupDead } from "../../core/cleanup.js";
 import { state } from "../../../core/gameState.js";
 import { runEffects } from "../../core/effects/index.js";
 
-import { randInt } from "../../../core/rng.js";
+
 import { logEvent } from "../../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../../core/types.js";
 
@@ -38,7 +38,7 @@ export function handleDestroyHighest(eff: Effect, owner: Player) {
 
     let n = Math.max(1, parseInt(String(eff.count || 1), 10));
     while (n-- > 0 && top.length) {
-        const i = randInt(top.length);
+        const i = state.rng.nextInt(top.length);
         const pick = top.splice(i, 1)[0];
         if (pick && !pick.keywordState?.cannotBeDestroyed && !isSuperProtected(pick, owner)) {
             logEvent("destroy", { target: pick.name, uid: pick.uid, reason: "highest_attack" });
@@ -247,7 +247,7 @@ export function handleDestroyRandom(eff: Effect, owner: Player, context: any = {
     // 3) pick & destroy
     let n = Math.max(1, parseInt(String(eff.count ?? 1), 10));
     while (n-- > 0 && pool.length) {
-        const idx = randInt(pool.length);
+        const idx = state.rng.nextInt(pool.length);
         const pick = pool.splice(idx, 1)[0];
         if (!pick) continue;
 
