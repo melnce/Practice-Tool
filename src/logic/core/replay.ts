@@ -1,6 +1,5 @@
 import { GameState, PlayerAction } from "../../core/types.js";
 import { EffectTraceEvent, createArrayTrace } from "./effects/trace.js";
-import { EffectCtx } from "./effects/registry.js";
 
 
 // We will use PlayerAction as the Action type

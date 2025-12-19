@@ -65,8 +65,10 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
         clearSelectableFlags();
         adapter.hideTargetConfirmation();
 
-        if (opCtx.resumeEffects?.length) runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
-        else adapter.render();
+        if (opCtx.resumeEffects?.length) {
+            runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
+        }
+        adapter.render();
     }
     // If paused, orchestrator relinquishes control (no cleanup).
 }

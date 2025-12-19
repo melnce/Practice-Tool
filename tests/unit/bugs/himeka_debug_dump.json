@@ -1,0 +1,78 @@
+{
+  "blueCrestsCount": 2,
+  "redBoardCount": 2,
+  "redBoard": [
+    {
+      "name": "Fairy",
+      "uid": "0.43909780332111326",
+      "ks": {
+        "cantAttack": true,
+        "cantAttackFollowers": true,
+        "cantAttackLeaders": true,
+        "cantAttackUntilOpponentEOT": true,
+        "cantAttackIsTemporary": true,
+        "cantAttackOwner": "blue"
+      },
+      "triggers": [
+        {
+          "event": "end_of_turn",
+          "condition": {
+            "own_turn": true
+          },
+          "effects": [
+            {
+              "op": "banish_self"
+            }
+          ]
+        },
+        {
+          "event": "end_of_turn",
+          "condition": {
+            "own_turn": true
+          },
+          "effects": [
+            {
+              "op": "banish_self"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fairy",
+      "uid": "0.592031419102139",
+      "ks": {
+        "cantAttack": true,
+        "cantAttackFollowers": true,
+        "cantAttackLeaders": true,
+        "cantAttackUntilOpponentEOT": true,
+        "cantAttackIsTemporary": true,
+        "cantAttackOwner": "blue"
+      },
+      "triggers": [
+        {
+          "event": "end_of_turn",
+          "condition": {
+            "own_turn": true
+          },
+          "effects": [
+            {
+              "op": "banish_self"
+            }
+          ]
+        },
+        {
+          "event": "end_of_turn",
+          "condition": {
+            "own_turn": true
+          },
+          "effects": [
+            {
+              "op": "banish_self"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

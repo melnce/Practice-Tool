@@ -1,6 +1,6 @@
 import { state } from "../../core/gameState.js";
 import { adapter } from "../../core/adapter.js";
-import { logEvent } from "../../core/logger.js";
+// import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
 import { guardLifecycle } from "./targeting/guards.js";
 
@@ -161,7 +161,7 @@ export function handleSelect(eff: Effect, owner: Player, sourceCard: CardInstanc
         // If this select wraps nested effects (usual case), resolve them now.
         if (Array.isArray(eff.effects) && eff.effects!.length) {
             // runEffects([...eff.effects!], owner, sourceCard, selectedCtx);
-            const runner = context.runner || ((...args: any[]) => console.warn("Missing runner for handleSelect auto"));
+            const runner = context.runner || ((..._args: any[]) => console.warn("Missing runner for handleSelect auto"));
             runner([...eff.effects!], owner, sourceCard, selectedCtx);
         }
         // Only trigger 'done' if we fully handled it (which we did).

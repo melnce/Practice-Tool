@@ -1,0 +1,34 @@
+[CrestPay] Start op: {"op":"crest_pay_counter","crest":"Faith: Sham-Nacha, Heir to Entwining","counter":"faith","amount":10,"on_success_effects":[{"op":"choose_bonus_add","amount":1}]}
+[CrestPay] Payment ok: true
+[CrestPay] Chain length: 1
+[CrestPay] Enqueued.
+[CrestPay] Start op: {"op":"crest_pay_counter","crest":"Faith: Sham-Nacha, Heir to Entwining","counter":"faith","amount":10,"on_success_effects":[{"op":"choose_bonus_add","amount":1}]}
+[CrestPay] Payment ok: true
+[CrestPay] Chain length: 1
+[CrestPay] Enqueued.
+[Dispatcher] Start processing: crest_pay_counter. Queue len: 0
+[CrestPay] Start op: {"op":"crest_pay_counter","crest":"Faith: Sham-Nacha, Heir to Entwining","counter":"faith","amount":10,"on_success_effects":[{"op":"choose_bonus_add","amount":1}]}
+[CrestPay] Payment ok: true
+[CrestPay] Chain length: 1
+[CrestPay] Enqueued.
+[Dispatcher] Start processing: choose_bonus_add. Queue len: 0
+[Dispatcher] Start processing: crest_pay_counter. Queue len: 0
+[CrestPay] Start op: {"op":"crest_pay_counter","crest":"Faith: Sham-Nacha, Heir to Entwining","counter":"faith","amount":10,"on_success_effects":[{"op":"choose_bonus_add","amount":1}]}
+[CrestPay] Payment ok: true
+[CrestPay] Chain length: 1
+[CrestPay] Enqueued.
+[Dispatcher] Start processing: choose_bonus_add. Queue len: 0
+[BonusHandler] Called for [object Object]
+[Dispatcher] Start processing: crest_pay_counter. Queue len: 0
+[CrestPay] Start op: {"op":"crest_pay_counter","crest":"Faith: Sham-Nacha, Heir to Entwining","counter":"faith","amount":10,"on_success_effects":[{"op":"choose_bonus_add","amount":1}]}
+[CrestPay] Payment ok: true
+[CrestPay] Chain length: 1
+[CrestPay] Enqueued.
+[Dispatcher] Start processing: choose_bonus_add. Queue len: 0
+[BonusHandler] Called for [object Object]
+[Dispatcher] Start processing: crest_pay_counter. Queue len: 0
+[CrestPay] Start op: {"op":"crest_pay_counter","crest":"Faith: Sham-Nacha, Heir to Entwining","counter":"faith","amount":10,"on_success_effects":[{"op":"choose_bonus_add","amount":1}]}
+[CrestPay] Payment ok: true
+[CrestPay] Chain length: 1
+[CrestPay] Enqueued.
+[Dispatcher] Start processing: choose_bonus_add. Queue len: 0

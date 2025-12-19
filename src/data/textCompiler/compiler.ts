@@ -1,5 +1,5 @@
 
-import { Effect, EffectOp } from "../../core/types.js";
+import { Effect } from "../../core/types.js";
 import { makeEffect } from "../../logic/core/effects/build.js";
 
 interface CompiledOutput {

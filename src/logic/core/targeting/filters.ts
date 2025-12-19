@@ -74,11 +74,12 @@ export function applyFilters(pool: CardInstance[], query: TargetQuery, env: Targ
     if (cond.has_keyword) {
         const keywordName = String(cond.has_keyword).toLowerCase();
         filtered = filtered.filter(c => {
-            if (!Array.isArray(c?.keywords)) return false;
-            return c.keywords!.some((k: any) => {
+            const hasInArray = Array.isArray(c?.keywords) && c.keywords!.some((k: any) => {
                 const kwName = typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
                 return kwName === keywordName;
             });
+            const hasInState = (keywordName === "cant_attack" && (c?.keywordState?.hasCantAttack || c?.keywordState?.cantAttack || c?.keywordState?.cantAttackUntilOpponentEOT));
+            return hasInArray || hasInState;
         });
     }
 
@@ -90,7 +91,7 @@ export function applyFilters(pool: CardInstance[], query: TargetQuery, env: Targ
                 const kwName = typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
                 return kwName === keywordName;
             });
-            const hasInState = (keywordName === "cant_attack" && (c?.keywordState?.hasCantAttack || c?.keywordState?.cantAttack));
+            const hasInState = (keywordName === "cant_attack" && (c?.keywordState?.hasCantAttack || c?.keywordState?.cantAttack || c?.keywordState?.cantAttackUntilOpponentEOT));
 
             return !(hasInArray || hasInState);
         });

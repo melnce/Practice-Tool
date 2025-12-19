@@ -8,7 +8,7 @@ import { cleanupDead } from "./cleanup.js";
 import { clearTemporaryBuffs } from "../effects/self.js";
 import { runEffects } from "./effects/index.js";
 import { tickCrests, processCrestEvent, resetCrestOncePerTurn } from "../effects/crest.js";
-import { clearExpiredCantAttackAtEOT } from "./keywords.js";
+import { clearExpiredCantAttackAtEOT } from "./keywords/eot.js";
 import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 import { handleInvoke } from "../effects/ops/summon.js";
 import { dealDamage } from "./barrier.js";
@@ -96,7 +96,7 @@ function tickAmuletCountdowns(owner: Player) {
 // Helper to scan deck for Invoke cards
 function scanDeckForInvokes(owner: Player, timing: "start_of_turn" | "end_of_turn") {
     const deck = owner === "blue" ? state.blueDeck : state.redDeck;
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    // const board = owner === "blue" ? state.blueBoard : state.redBoard;
 
     // Safety copy to iterate while mutating deck
     const candidates = [...deck];
@@ -158,170 +158,221 @@ function scanDeckForInvokes(owner: Player, timing: "start_of_turn" | "end_of_tur
 export function endTurnBlue() {
     console.error(`[Turns] endTurnBlue called. isBlueTurn: ${state.isBlueTurn}`);
     if (!state.isBlueTurn) return;
-    recordEvent({ type: "end_turn", payload: { player: "blue" } });
-    beginAction("End Turn (Blue)");
 
-    clearTempHandCostMods("blue");
-    state.blueBoard.forEach(card => clearTemporaryBuffs(card));
-    fireTrigger("end_of_turn", "blue");
-    // processHimekaDelayedBanish("blue");
-    adapter.render();
+    try {
+        recordEvent({ type: "end_turn", payload: { player: "blue" } });
+        beginAction("End Turn (Blue)");
 
-    // Check End of Turn Invokes
-    scanDeckForInvokes("blue", "end_of_turn");
+        clearTempHandCostMods("blue");
+        state.blueBoard.forEach(card => clearTemporaryBuffs(card));
 
-    // ✅ Blue: run crest effects one by one, then cleanup once
-    {
-        const fx = processCrestEvent("blue", "end_of_turn");
-        if (fx.length) {
-            state.suppressCleanup = true;            // <— start atomic crest phase
-            for (const eff of fx) {
-                console.log("[Turns] Running crest effect op:", eff.op);
-                runEffects([eff], "blue", null);
+        try {
+            fireTrigger("end_of_turn", "blue");
+        } catch (e) { console.error("Error firing end_of_turn triggers:", e); }
+
+        // processHimekaDelayedBanish("blue");
+        adapter.render();
+
+        // Check End of Turn Invokes
+        try {
+            scanDeckForInvokes("blue", "end_of_turn");
+        } catch (e) { console.error("Error in Invoke scan:", e); }
+
+        // ✅ Blue: run crest effects one by one, then cleanup once
+        try {
+            const fx = processCrestEvent("blue", "end_of_turn");
+            if (fx.length) {
+                state.suppressCleanup = true;            // <— start atomic crest phase
+                for (const eff of fx) {
+                    console.log("[Turns] Running crest effect op:", eff.op);
+                    runEffects([eff], "blue", null);
+                }
+                state.suppressCleanup = false;           // <— end atomic crest phase
             }
-            state.suppressCleanup = false;           // <— end atomic crest phase
+        } catch (e) {
+            console.error("Error in Crest effects:", e);
+            state.suppressCleanup = false;
         }
         cleanupDead();                             // resolve deaths + Last Words once
+
+        clearExpiredCantAttackAtEOT("blue");
+        applyBleedAllBoardsAtEndOfTurn();
+
+        state.redMaxPP = Math.min(state.roundCount + (state.redPermPP || 0), 10);
+        state.redPP = state.redMaxPP;
+
+        // Reset evolution usage flag
+        state.blueEvoUsedThisTurn = false;
+
+        clearSummoningSickness(state.redBoard);
+
+        resetCrestOncePerTurn("red");
+        resetEngageFlagsAtTurnStart("red");
+        try {
+            const redStartFx = processCrestEvent("red", "start_of_turn");
+            if (redStartFx.length) runEffects([...redStartFx], "red", null);
+        } catch (e) { console.error("Error in Red start effects:", e); }
+
+        try {
+            const redCrestFx = tickCrests("red");
+            if (redCrestFx.length) runEffects([...redCrestFx], "red", null);
+        } catch (e) { console.error("Error in Red tick crests:", e); }
+        cleanupDead();
+
+        // Draw for Red
+        drawCard(state.redHand, state.redDeck, "red");
+        logEvent("draw", { player: "red", count: 1 });
+        // Invoke Phase (Start of Turn)
+        try {
+            scanDeckForInvokes("red", "start_of_turn");
+        } catch (e) { console.error("Error in Red Invoke Start:", e); }
+
+        state.redPlaysThisTurn = 0;
+
+        refreshBoardForNewTurn(state.redBoard);
+
+        state.isBlueTurn = false;
+
+        tickAmuletCountdowns("red");
+        cleanupDead();
+        state.activePlayer = "red";
+        logEvent("startTurn", { player: state.activePlayer, round: state.roundCount });
+        state.redAnyAllyAttackedThisTurn = false;
+        state.redEvoUsedThisTurn = false;
+        resetShikigamiDeathLogs();
+
+        adapter.render();
+        logEvent("endTurn", { from: "blue" });
+        commitAction({ autoRender: false });
+    } catch (criticalError) {
+        console.error("CRITICAL ERROR IN END_TURN (Blue):", criticalError);
+        // Force turn flip to avoid stuck state
+        state.isBlueTurn = false;
+        state.activePlayer = "red";
+        adapter.render();
     }
-
-    clearCantAttackUntilOpponentEOT(state.blueBoard);
-    applyBleedAllBoardsAtEndOfTurn();
-
-    state.redMaxPP = Math.min(state.roundCount + (state.redPermPP || 0), 10);
-    state.redPP = state.redMaxPP;
-
-    // Reset evolution usage flag
-    state.blueEvoUsedThisTurn = false;
-
-    clearSummoningSickness(state.redBoard);
-
-    resetCrestOncePerTurn("red");
-    resetEngageFlagsAtTurnStart("red");
-    {
-        const redStartFx = processCrestEvent("red", "start_of_turn");
-        if (redStartFx.length) runEffects([...redStartFx], "red", null);
-    }
-
-    {
-        const redCrestFx = tickCrests("red");
-        if (redCrestFx.length) runEffects([...redCrestFx], "red", null);
-    }
-    cleanupDead();
-
-    // Draw for Red
-    drawCard(state.redHand, state.redDeck, "red");
-    logEvent("draw", { player: "red", count: 1 });
-    // Invoke Phase (Start of Turn)
-    scanDeckForInvokes("red", "start_of_turn");
-
-    state.redPlaysThisTurn = 0;
-
-    refreshBoardForNewTurn(state.redBoard);
-
-    state.isBlueTurn = false;
-
-    tickAmuletCountdowns("red");
-    cleanupDead();
-    state.activePlayer = "red";
-    logEvent("startTurn", { player: state.activePlayer, round: state.roundCount });
-    state.redAnyAllyAttackedThisTurn = false;
-    state.redEvoUsedThisTurn = false;
-    resetShikigamiDeathLogs();
-
-    adapter.render();
-    logEvent("endTurn", { from: "blue" });
-    commitAction({ autoRender: false });
 }
 
 export function endTurnRed() {
     if (state.isBlueTurn) return;
-    beginAction("End Turn (Red)");
+    try {
+        console.log("I AM REAL TURNS TS");
+        beginAction("End Turn (Red)");
 
-    clearTempHandCostMods("red");
-    state.redBoard.forEach(card => clearTemporaryBuffs(card));
-    fireTrigger("end_of_turn", "red");
-    // processHimekaDelayedBanish("red");
-    adapter.render();
+        console.log("MARKER 0.1");
+        try { clearTempHandCostMods("red"); } catch (e) { console.log("ERR 0.1", e); }
+        console.log("MARKER 0.2");
+        try { state.redBoard.forEach(card => clearTemporaryBuffs(card)); } catch (e) { console.log("ERR 0.2", e); }
+        console.log("MARKER 0.3");
+        try {
+            fireTrigger("end_of_turn", "red");
+        } catch (e) { console.error("Error firing end_of_turn triggers (red):", e); }
 
-    // Check End of Turn Invokes
-    scanDeckForInvokes("red", "end_of_turn");
+        console.log("MARKER 0.4 - Rendering");
+        try { adapter.render(); } catch (e) { console.log("ERR Render", e); }
+        console.log("MARKER 0.5 - Post Render");
 
-    // ✅ Red: run crest effects one by one, then cleanup once
-    {
-        const fx = processCrestEvent("red", "end_of_turn");
-        if (fx.length) {
-            state.suppressCleanup = true;
-            for (const eff of fx) runEffects([eff], "red", null);
+        // Check End of Turn Invokes
+        // Check End of Turn Invokes
+        try {
+            scanDeckForInvokes("red", "end_of_turn");
+        } catch (e) { console.error("Error in Red Invoke EOT:", e); }
+        console.log("MARKER 2");
+
+        // ✅ Red: run crest effects one by one, then cleanup once
+        try {
+            console.log("MARKER 2.1 - CREST START");
+            const fx = processCrestEvent("red", "end_of_turn");
+            if (fx.length) {
+                state.suppressCleanup = true;
+                for (const eff of fx) runEffects([eff], "red", null);
+                state.suppressCleanup = false;
+            }
+            console.log("MARKER 2.2 - CREST END");
+        } catch (e) {
+            console.error("Error in Red Crest EOT:", e);
             state.suppressCleanup = false;
         }
+        console.log("MARKER 3");
         cleanupDead();
-    }
-    clearCantAttackUntilOpponentEOT(state.redBoard);
-    applyBleedAllBoardsAtEndOfTurn();
 
-    if (state.redBoostPending) {
-        if (state.roundCount <= 5) state.redBoostUsedEarly = true;
-        else state.redBoostUsedLate = true;
-        state.redBoostPending = false;
-    }
-
-    state.roundCount++;
-
-    state.blueMaxPP = Math.min(state.roundCount + (state.bluePermPP || 0), 10);
-    state.bluePP = state.blueMaxPP;
-
-    // Reset evolution usage flag
-    state.redEvoUsedThisTurn = false;
-
-    clearSummoningSickness(state.blueBoard);
-
-    resetCrestOncePerTurn("blue");
-    resetEngageFlagsAtTurnStart("blue");
-    {
-        const blueStartFx = processCrestEvent("blue", "start_of_turn");
-        if (blueStartFx.length) runEffects([...blueStartFx], "blue", null);
-    }
-
-    {
-        const blueCrestFx = tickCrests("blue");
-        if (blueCrestFx.length) runEffects([...blueCrestFx], "blue", null);
-    }
-    cleanupDead();
-
-    // Draw for Blue
-    drawCard(state.blueHand, state.blueDeck, "blue");
-    logEvent("draw", { player: "blue", count: 1 });
-    // Invoke Phase (Start of Turn)
-    scanDeckForInvokes("blue", "start_of_turn");
-
-    state.bluePlaysThisTurn = 0;
-
-    refreshBoardForNewTurn(state.blueBoard);
-
-    state.isBlueTurn = true;
-    tickAmuletCountdowns("blue");
-
-    cleanupDead();
-    state.activePlayer = "blue";
-    logEvent("startTurn", { player: state.activePlayer, round: state.roundCount });
-    state.blueAnyAllyAttackedThisTurn = false;
-    state.blueEvoUsedThisTurn = false;
-    resetShikigamiDeathLogs();
-
-    adapter.render();
-    logEvent("endTurn", { from: "red" });
-    commitAction({ autoRender: false });
-}
+        clearExpiredCantAttackAtEOT("red");
+        applyBleedAllBoardsAtEndOfTurn();
 
 
-function handleCountdowns(owner: Player) {
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
-    board.forEach(card => {
-        if (card?.type === "Amulet" && card.hasCountdown) {
-            (card as any).countdown = (Number((card as any).countdown) || 0) - 1;
+        if (state.redBoostPending) {
+            if (state.roundCount <= 5) state.redBoostUsedEarly = true;
+            else state.redBoostUsedLate = true;
+            state.redBoostPending = false;
         }
-    });
+
+        state.roundCount++;
+
+        state.blueMaxPP = Math.min(state.roundCount + (state.bluePermPP || 0), 10);
+        state.bluePP = state.blueMaxPP;
+
+        // Reset evolution usage flag
+        state.redEvoUsedThisTurn = false;
+
+        clearSummoningSickness(state.blueBoard);
+
+        resetCrestOncePerTurn("blue");
+        resetEngageFlagsAtTurnStart("blue");
+        try {
+            const blueStartFx = processCrestEvent("blue", "start_of_turn");
+            if (blueStartFx.length) runEffects([...blueStartFx], "blue", null);
+        } catch (e) { console.error("Error in Blue Start effects:", e); }
+
+        try {
+            const blueCrestFx = tickCrests("blue");
+            if (blueCrestFx.length) runEffects([...blueCrestFx], "blue", null);
+        } catch (e) { console.error("Error in Blue Tick Crests:", e); }
+        cleanupDead();
+
+        // Draw for Blue
+        drawCard(state.blueHand, state.blueDeck, "blue");
+        logEvent("draw", { player: "blue", count: 1 });
+        // Invoke Phase (Start of Turn)
+        try {
+            scanDeckForInvokes("blue", "start_of_turn");
+        } catch (e) { console.error("Error in Blue Start Invoke:", e); }
+
+        state.bluePlaysThisTurn = 0;
+
+        refreshBoardForNewTurn(state.blueBoard);
+
+        state.isBlueTurn = true;
+        tickAmuletCountdowns("blue");
+
+        cleanupDead();
+        state.activePlayer = "blue";
+        logEvent("startTurn", { player: state.activePlayer, round: state.roundCount });
+        state.blueAnyAllyAttackedThisTurn = false;
+        state.blueEvoUsedThisTurn = false;
+        resetShikigamiDeathLogs();
+
+        adapter.render();
+        logEvent("endTurn", { from: "red" });
+        commitAction({ autoRender: false });
+    } catch (criticalError) {
+        console.error("CRITICAL ERROR IN END_TURN (Red):", criticalError);
+        // Force turn flip
+        state.isBlueTurn = true;
+        state.activePlayer = "blue";
+        state.roundCount++; // Ensure round count increments if failed before
+        adapter.render();
+    }
 }
+
+
+// function handleCountdowns(owner: Player) {
+//     const board = owner === "blue" ? state.blueBoard : state.redBoard;
+//     board.forEach(card => {
+//         if (card?.type === "Amulet" && card.hasCountdown) {
+//             (card as any).countdown = (Number((card as any).countdown) || 0) - 1;
+//         }
+//     });
+// }
 
 function clearSummoningSickness(board: CardInstance[]) {
     board.forEach(card => {
@@ -331,26 +382,7 @@ function clearSummoningSickness(board: CardInstance[]) {
     });
 }
 
-function clearCantAttackUntilOpponentEOT(board: CardInstance[]) {
-    board.forEach(card => {
-        if (!card || card.type !== "Follower") return;
-        if (!(card as any).cantAttackUntilOpponentEOT) return;
 
-        // Drop all functional + UI flags
-        delete (card as any).cantAttack;
-        delete (card as any).cantAttackFollowers;
-        delete (card as any).cantAttackLeaders;
-        delete (card as any).cantAttackUntilOpponentEOT;
-        delete (card as any).hasCantAttack;           // <-- fixes your CSS overlay never dropping
-
-        // Make sure attackability is recalculated for UI/logic
-        const perTurn = Number.isFinite((card as any).attacks_per_turn) ? (card as any).attacks_per_turn : 1;
-        if ((card as any).attacks_left == null) (card as any).attacks_left = perTurn;
-        // Respect rush/storm/summoning-sickness
-        const eligible = (!!card.hasStorm) || (!card.justPlayed) || (!!card.hasRush);
-        (card as any).can_attack = eligible && ((card as any).attacks_left > 0);
-    });
-}
 
 function resetShikigamiDeathLogs() {
     state.shikigamiDeathsThisTurnBlue = [];

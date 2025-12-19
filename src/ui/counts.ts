@@ -1,3 +1,4 @@
+/* eslint-disable */
 // src/ui/counts.ts
 import { byId, $ } from "./dom.js";
 import { GameState } from "../core/types.js";

@@ -75,7 +75,7 @@ export function selectCardInHand(
     }
 
     // 1. Filter by Name/Cost/Type logic
-    const candidates = hand.filter((card, i) => {
+    const candidates = hand.filter((card) => {
         if (selector.name !== undefined && !card.name.includes(selector.name)) return false;
         if (selector.cost !== undefined && Number(card.cost) !== selector.cost) return false;
         if (selector.cardType !== undefined && card.type !== selector.cardType) return false;

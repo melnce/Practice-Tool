@@ -35,6 +35,7 @@ function handleSuperEvolvedSelfGate(eff: Effect, owner: string, sourceCard: Card
 
 export function registerMiscEffects() {
     registerOp("choose", handleChoose as any);
+    console.log("[Registry] Registering choose_bonus_add. Handler:", handleChooseBonusAdd);
     registerOp("choose_bonus_add", handleChooseBonusAdd as any);
 
     // Generic Op: Nested Effects
@@ -72,26 +73,42 @@ export function registerMiscEffects() {
     registerOp("super_evolve", stub("super_evolve"));
 
     // Gates
-    registerOp("amulet_count_gate", amuletCountGate as any);
-    registerOp("board_name_gate", (handleBoardNameGate || stub("board_name_gate")) as any);
+    registerOp("amulet_count_gate", (eff, ctx) => {
+        const ok = amuletCountGate(ctx.owner, eff);
+        const next = ok ? (eff.effects || []) : (eff.else_effects || []);
+        if (next.length) ctx.queue.unshift(...next);
+    });
+
+
+    registerOp("board_name_gate", (eff, ctx) => {
+        if (handleBoardNameGate) {
+            return handleBoardNameGate(ctx.owner, eff, ctx.queue);
+        }
+    });
+
     registerOp("both_max_pp_gate", (handleBothMaxPPGate || stub("both_max_pp_gate")) as any);
     registerOp("combo_gate", handleComboGate as any);
     registerOp("combo_add", handleComboAdd as any);
-    registerOp("evolved_self_gate", (handleEvolvedSelfGate || stub("evolved_self_gate")) as any);
-    registerOp("super_evolve_gate", (handleSuperEvoGate || stub("super_evolve_gate")) as any);
-    registerOp("super_evolved_self_gate", (handleSuperEvolvedSelfGate as any));
-    registerOp("evolved_allied_gate", handleEvolvedAlliedGate as any);
-    registerOp("super_evolved_allied_gate", handleSuperEvolvedAlliedGate as any);
+    registerOp("evolved_self_gate", (eff, ctx) => { (handleEvolvedSelfGate || stub("evolved_self_gate"))(eff, ctx.owner, ctx.sourceCard!, ctx.queue); });
+    registerOp("super_evolve_gate", (eff, ctx) => {
+        const ok = (handleSuperEvoGate || stub("super_evolve_gate"))(ctx.owner);
+        // Wrapper for predicate-only gate
+        const next = ok ? (eff.effects || []) : (eff.else_effects || []);
+        if (next.length) ctx.queue.unshift(...next);
+    });
+    registerOp("super_evolved_self_gate", (eff, ctx) => { handleSuperEvolvedSelfGate(eff, ctx.owner, ctx.sourceCard!, ctx.queue); });
+    registerOp("evolved_allied_gate", (eff, ctx) => handleEvolvedAlliedGate(ctx.owner, eff, ctx.queue));
+    registerOp("super_evolved_allied_gate", (eff, ctx) => handleSuperEvolvedAlliedGate(ctx.owner, eff, ctx.queue));
     registerOp("hand_count_gate", handCountGate as any);
-    registerOp("max_pp_gate", handleMaxPPGate as any);
+    registerOp("max_pp_gate", (eff, ctx) => handleMaxPPGate(ctx.owner, eff, ctx.queue));
 
     registerOp("no_ally_attacked_this_turn_gate", (noAllyAttackedThisTurn || stub("no_ally_attacked_this_turn_gate")) as any);
     registerOp("no_duplicates_in_deck_gate", (hasNoDuplicatesInDeck || stub("no_duplicates_in_deck_gate")) as any);
-    registerOp("rally_gate", (handleRallyGate || stub("rally_gate")) as any);
+    registerOp("rally_gate", (eff, ctx) => { (handleRallyGate || stub("rally_gate"))(ctx.owner, eff, ctx.queue); });
 
-    registerOp("repeat_effect", handleRepeatEffect as any);
-    registerOp("skybound_art_gate", handleSkyboundArtGate as any);
-    registerOp("self_cost_gate", handleSelfCostGate as any);
+    registerOp("repeat_effect", (eff, ctx) => handleRepeatEffect(eff, ctx.owner, ctx.sourceCard, ctx.queue));
+    registerOp("skybound_art_gate", (eff, ctx) => { handleSkyboundArtGate(ctx.owner, eff, ctx.sourceCard); });
+    registerOp("self_cost_gate", (eff, ctx) => { handleSelfCostGate(ctx.sourceCard!, eff, ctx.queue); });
 
     registerOp("set_deckout_victory", stub("set_deckout_victory"));
     registerOp("dragonsign", stub("dragonsign"));

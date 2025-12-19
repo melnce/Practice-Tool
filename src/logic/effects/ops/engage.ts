@@ -13,16 +13,16 @@ import { Player, CardInstance, Effect } from "../../../core/types.js";
 function boardOf(owner: Player) {
     return owner === "blue" ? state.blueBoard : state.redBoard;
 }
-function graveOf(owner: Player) {
-    return owner === "blue" ? state.blueGraveyard : state.redGraveyard;
-}
+// function graveOf(owner: Player) {
+//     return owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+// }
 function payEngageCost(owner: Player, cost: number) {
     // Assume PP system; no-op if you already checked affordability elsewhere.
     const pool = owner === "blue" ? "bluePP" : "redPP";
     const cur = state[pool] | 0;
     state[pool] = Math.max(0, cur - (cost | 0));
 }
-function effectsNeedSelection(effects: any[] = []) {
+function effectsNeedSelection(effects: Effect[] = []) {
     return Array.isArray(effects) && effects.some(e => e && (e.select === true || e.op === "select"));
 }
 
@@ -31,17 +31,17 @@ function removeWithLastWords(card: CardInstance, owner: Player) {
     const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
     const idx = board.findIndex(c => c?.uid === card.uid);
     if (idx === -1) {
-        console.warn(`[Engage] Could not find amulet on board: ${card?.name} (${owner})`);
+        // console.warn(`[Engage] Could not find amulet on board: ${card?.name} (${owner})`);
         return;
     }
     const removed = board.splice(idx, 1)[0];
     if (!removed) return;
 
     if (removed?.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
-        console.log(`[Engage] Running Last Words for ${removed.name}`);
+        // console.log(`[Engage] Running Last Words for ${removed.name}`);
         runEffects([...removed.lastWordsEffects], owner, removed);
     } else {
-        console.log(`[Engage] No Last Words or invalid effects for ${removed?.name}`);
+        // console.log(`[Engage] No Last Words or invalid effects for ${removed?.name}`);
     }
 
     grave.push(removed);
@@ -70,7 +70,8 @@ export function engageAmulet(owner: Player, index: number) {
             const s = card.keywordState;
             const engageOncePerTurn = s?.engageOncePerTurn ?? card.engageOncePerTurn ?? true;
             if (engageOncePerTurn !== false && s?.engagedThisTurn) {
-                console.warn(`[Engage] ${card.name} already engaged this turn`);
+                // console.warn(`[Engage] ${card.name} already engaged this turn`);
+                logEvent("engageSkipped", { reason: "limit", name: card.name });
                 return;
             }
 
@@ -90,7 +91,7 @@ export function engageAmulet(owner: Player, index: number) {
             fireTrigger("engage", owner, { sourceCard: card });
 
             const engageEffects = s?.engageEffects ?? card.engageEffects;
-            const effects = Array.isArray(engageEffects) ? engageEffects.slice() : [];
+            const effects = (Array.isArray(engageEffects) ? engageEffects.slice() : []) as Effect[];
             const needsSelection = effectsNeedSelection(effects);
             const sacrifice = !!(s?.engageSacrifice ?? card.engageSacrifice);
 
@@ -138,7 +139,7 @@ export function engageAmulet(owner: Player, index: number) {
             // Only Countdown amulets can die here
             if (card.hasCountdown && Number(card.countdown ?? 0) <= 0) {
                 logEvent("countdownZero", { owner, name: card.name, uid: card.uid, context: "engage" });
-                console.log(`[Engage] Countdown reached 0 for ${card.name} (${owner}) - UID: ${card.uid}`);
+                // console.log(`[Engage] Countdown reached 0 for ${card.name} (${owner}) - UID: ${card.uid}`);
                 removeWithLastWords(card, owner);
                 adapter.render();
                 cleanupDead();

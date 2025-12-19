@@ -55,7 +55,7 @@ export function registerCombatEffects() {
 
     registerOp("damage_self", (eff, ctx) => {
         if (ctx.sourceCard && ctx.sourceCard.type === "Follower") {
-            import('../../barrier.js').then(({ dealDamage }) => {
+            void import('../../barrier.js').then(({ dealDamage }) => {
                 dealDamage(ctx.sourceCard!, (eff.amount || 0) as number);
                 cleanupDead();
             });
@@ -123,12 +123,12 @@ export function registerCombatEffects() {
     registerOp("heal_leader", (eff, ctx) => {
         handleHealLeader(ctx.owner, eff);
         // logs handled in implementation sometimes?
-        import("../../../../core/logger.js").then(({ logEvent }) => {
+        void import("../../../../core/logger.js").then(({ logEvent }) => {
             logEvent("healLeader", { owner: ctx.owner, amount: eff.amount });
         });
 
         // Crest processing
-        import("../../../effects/crest.js").then(({ processCrestEvent }) => {
+        void import("../../../effects/crest.js").then(({ processCrestEvent }) => {
             const targetOwner = (eff.player || "self") === "self" ? ctx.owner : (ctx.owner === "blue" ? "red" : "blue");
             const fx = processCrestEvent(targetOwner, "heal_leader");
             if (fx.length) enqueueManyFront(ctx, fx);
@@ -137,7 +137,7 @@ export function registerCombatEffects() {
 
     registerOp("dynamic_heal_leader", (eff, ctx) => {
         handleDynamicHealLeader(ctx.owner, eff);
-        import("../../../../core/logger.js").then(({ logEvent }) => logEvent("healLeader", { owner: ctx.owner, amount: eff.amount }));
+        void import("../../../../core/logger.js").then(({ logEvent }) => logEvent("healLeader", { owner: ctx.owner, amount: eff.amount }));
     });
 
     registerOp("set_max_hp", (eff, ctx) => handleSetMaxHP(eff, ctx.owner));

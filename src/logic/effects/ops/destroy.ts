@@ -7,7 +7,7 @@ import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 
 import { logEvent } from "../../../core/logger.js";
-import { CardInstance, Effect, Player } from "../../../core/types.js";
+import { CardInstance, Effect, Player, DestroyEffect } from "../../../core/types.js";
 
 // --- helpers --------------------------------------------------------------
 function isAlly(card: CardInstance, owner: Player) {
@@ -29,7 +29,8 @@ function isSuperProtected(card: CardInstance, owner: Player) {
 
 // Destroy the highest attack followers (break ties randomly)
 export function handleDestroyHighest(eff: Effect, owner: Player) {
-    const pool = getPool(eff.target as any, owner).filter(
+    const dEff = eff as DestroyEffect;
+    const pool = getPool(dEff.target || "", owner).filter(
         (c) => c.type === "Follower" && (parseInt(String(c.defense), 10) || 0) > 0
     );
     if (!pool.length) return;
@@ -37,7 +38,7 @@ export function handleDestroyHighest(eff: Effect, owner: Player) {
     const highest = Math.max(...pool.map((c) => parseInt(String(c.attack), 10) || 0));
     const top = pool.filter((c) => (parseInt(String(c.attack), 10) || 0) === highest);
 
-    let n = Math.max(1, parseInt(String(eff.count || 1), 10));
+    let n = Math.max(1, parseInt(String(dEff.count || dEff["count" as keyof DestroyEffect] || 1), 10)); // Handle missing count in type
     while (n-- > 0 && top.length) {
         const i = state.rng.nextInt(top.length);
         const pick = top.splice(i, 1)[0];
@@ -51,11 +52,12 @@ export function handleDestroyHighest(eff: Effect, owner: Player) {
 
 // Destroy all from target (followers die; amulets move to grave + LW)
 export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardInstance | null = null, context: any = {}) {
+    const dEff = eff as DestroyEffect;
     let pool = getPool(
-        (eff.target as any) || "all:follower",
+        dEff.target || "all:follower",
         owner,
         sourceCard,
-        eff.condition,
+        dEff.condition,
         context
     );
 
@@ -109,8 +111,9 @@ export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardIns
 
 // Targeted destroy (with selection UI)
 export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, context: any = {}, sourceCard: CardInstance | null = null) {
-    if (String(eff.target).toLowerCase().startsWith("selected")) {
-        const targets = getPool(eff.target as any, owner, null, eff.condition, context);
+    const dEff = eff as DestroyEffect;
+    if (String(dEff.target).toLowerCase().startsWith("selected")) {
+        const targets = getPool(dEff.target || "", owner, null, dEff.condition, context);
         let count = 0;
         for (const target of targets) {
             if (resolveDestroy(target, owner)) count++;
@@ -120,15 +123,17 @@ export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, con
     }
 
     const pool = getPool(
-        eff.target as any,
+        dEff.target || "",
         owner,
         sourceCard,
-        eff.condition,
+        dEff.condition,
         { isTargetedEffect: true }
     ).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
 
     if (pool.length) {
-        logEvent("destroy_select", { owner, pool: pool.length, select: parseInt(String(eff.select ?? (eff as any).select_count ?? 1), 10) });
+        // Safe access to select/select_count
+        const sel = dEff.select ?? dEff["select_count" as keyof DestroyEffect] ?? 1; // Fallback
+        logEvent("destroy_select", { owner, pool: pool.length, select: parseInt(String(sel), 10) });
         setPendingTarget({
             eff,
             owner,
@@ -136,7 +141,7 @@ export function handleDestroy(eff: Effect, owner: Player, effectsQueue: any, con
             resumeEffects: effectsQueue,
             pool,
             targets: [],
-            selectCount: parseInt(String(eff.select ?? (eff as any).select_count ?? 1), 10),
+            selectCount: parseInt(String(sel), 10),
         });
         highlightSelectable(pool);
         return "pending";
@@ -214,12 +219,13 @@ export function destroyAlliedAmulets(owner: Player) {
 // Destroy N random followers from the target pool
 // Respects eff.exclude: "context.defender", "context.attacker", "uid:<uid>"
 export function handleDestroyRandom(eff: Effect, owner: Player, context: any = {}) {
+    const dEff = eff as DestroyEffect;
     // 1) base pool
     let pool = getPool(
-        (eff.target as any) || "enemy:follower",
+        dEff.target || "enemy:follower",
         owner,
         null,
-        eff.condition,
+        dEff.condition,
         context
     ).filter((c) => c && c.type === "Follower" && (parseInt(String(c.defense), 10) || 0) > 0);
 
@@ -227,7 +233,7 @@ export function handleDestroyRandom(eff: Effect, owner: Player, context: any = {
 
     // 2) excludes
     const excludes = new Set();
-    const ex = (eff as any).exclude;
+    const ex = dEff["exclude" as keyof DestroyEffect]; // Missing in type
     const list = Array.isArray(ex) ? ex : ex ? [ex] : [];
 
     for (const token of list) {
@@ -249,7 +255,7 @@ export function handleDestroyRandom(eff: Effect, owner: Player, context: any = {
     }
 
     // 3) pick & destroy
-    let n = Math.max(1, parseInt(String(eff.count ?? 1), 10));
+    let n = Math.max(1, parseInt(String(dEff.count ?? dEff["count" as keyof DestroyEffect] ?? 1), 10)); // Handle missing count
     while (n-- > 0 && pool.length) {
         const idx = state.rng.nextInt(pool.length);
         const pick = pool.splice(idx, 1)[0];

@@ -9,21 +9,10 @@ import { CardInstance, GameState, Player, Effect } from "../../core/types.js";
 
 
 // ---- local helpers ported from zones.js ----
-function getSpellboostCount(card: CardInstance) {
-    if (!card || typeof card !== "object") return null;
-    const hasSpellboost = Array.isArray(card.keywords) &&
-        card.keywords.some(k => (typeof k === "string" ? k : k?.name)?.toLowerCase?.() === "spellboost");
-    if (!hasSpellboost) return null;
-    for (const k of ["spellboostCount", "spellBoostCount", "spellboosts", "spell_boosts", "spellboost_counter"]) {
-        const v = card[k];
-        if (Number.isFinite(Number(v))) return Number(v);
-    }
-    return 0;
-}
 
-function earthRiteCostInFanfare(effects: any) {
+function earthRiteCostInFanfare(effects: Effect[] | unknown): number {
     if (!Array.isArray(effects)) return 0;
-    const scan = (effs: any): number => {
+    const scan = (effs: any[]): number => {
         let best = Infinity;
         for (const e of effs) {
             if (!e || typeof e !== "object") continue;
@@ -43,7 +32,7 @@ function earthRiteCostInFanfare(effects: any) {
         }
         return best;
     };
-    const r = scan(effects);
+    const r = scan(effects as any[]);
     return Number.isFinite(r) ? r : 0;
 }
 
@@ -52,7 +41,7 @@ function hasEarthOnBoard(state: GameState, owner: Player, n = 1) {
     return board.some(c => c?.type === "Amulet" && Number(c?.counters?.earth) >= n);
 }
 
-function hasOverflowInTree(effs: any) {
+function hasOverflowInTree(effs: unknown): boolean {
     if (!Array.isArray(effs)) return false;
     for (const e of effs) {
         if (!e || typeof e !== "object") continue;
@@ -70,7 +59,7 @@ function hasSuperEvoAllyOnBoard(state: GameState, owner: Player) {
     return board.some(c => c?.type === "Follower" && c.hasEvolved && c.evoType === "super");
 }
 
-function needsUnmetTarget(list: any, owner: Player, card: CardInstance | null) {
+function needsUnmetTarget(list: unknown, owner: Player, card: CardInstance | null): boolean {
     if (!Array.isArray(list)) return false;
     for (const eff of list) {
         if (!eff || typeof eff !== "object") continue;
@@ -113,14 +102,14 @@ function needsUnmetTarget(list: any, owner: Player, card: CardInstance | null) {
  * Returns: { glowClass: "enhance-ready" | "playable-glow" | null }
  */
 export function computeHandGlow(card: CardInstance, ctx: any) {
-    // ctx: { state, owner, isPlayersTurn, availablePP, isSpell }
+    // ctx: { state, owner, isPlayersTurn, availablePP, isSpell, tier?, shownCost? }
     const { state, owner, isPlayersTurn, availablePP, isSpell } = ctx;
 
     // NOTE: Do NOT attach state to card (circular reference breaks cloning)
     // State is available via ctx parameter for all checks
 
-    // cost preview already computed by caller; use card.shownCost if present, else raw cost
-    const shownCost = Number(card.shownCost ?? (card as any).cost ?? 0);
+    // cost preview already computed by caller; use ctx.shownCost if present
+    const shownCost = Number(ctx.shownCost ?? (card as any).shownCost ?? (card as any).cost ?? 0);
 
     let canAfford = isPlayersTurn && availablePP >= shownCost;
 
@@ -250,7 +239,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
     // --- Faith (crest) gate: Sham-Nacha glows when Faith >= 10 ---
     const crests = owner === "blue" ? (state.blueCrests || []) : (state.redCrests || []);
     const faith = (() => {
-        const c = crests.find((x: CardInstance) => String(x?.name).toLowerCase() === "faith");
+        const c = crests.find((x: CardInstance) => String(x?.name).toLowerCase() === "faith: sham-nacha, heir to entwining");
         return Number(c?.counters?.faith ?? 0);
     })();
     const isShamNacha = String(card?.name || "").toLowerCase() === "sham-nacha, heir to entwining";
@@ -264,8 +253,6 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
         necromancyReady ||
         superEvoReady ||
         superUnlockReady ||
-        fusedAllureReady ||
-        fusedSlashReady ||
         fusedAllureReady ||
         fusedSlashReady ||
         faithReady ||

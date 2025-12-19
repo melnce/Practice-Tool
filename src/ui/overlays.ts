@@ -37,7 +37,7 @@ export function applyKeywordOverlays(div: HTMLElement, card: CardInstance) {
         overlay.classList.add("aura-overlay");
         wrapper.appendChild(overlay);
     }
-    if (card.hasCantAttack) {
+    if (card.hasCantAttack || card.keywordState?.cantAttack || card.keywordState?.cantAttackUntilOpponentEOT) {
         const overlay = document.createElement("div");
         overlay.classList.add("cant_attack-overlay");
         wrapper.appendChild(overlay);

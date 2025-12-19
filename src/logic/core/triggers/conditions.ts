@@ -1,4 +1,4 @@
-import { TriggerContext, TriggerSpec, TriggerEventName } from "./types.js";
+import { TriggerContext, TriggerSpec } from "./types.js";
 import { CardInstance, Player } from "../../../core/types.js";
 
 // Helper to normalize "subject" card (entering, played, etc.)
@@ -43,8 +43,7 @@ export function evalCommonConditions(
     hostCard: CardInstance,
     owner: Player,
     activePlayer: Player,
-    context: TriggerContext,
-    event: TriggerEventName
+    context: TriggerContext
 ): boolean {
     const cond = trigger.condition || {};
     const subjectCard = getSubjectCard(context);

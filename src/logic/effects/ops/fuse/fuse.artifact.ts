@@ -159,7 +159,7 @@ export function fuse_finalize_gear_multi(owner: Player, initiatorUid: string, pa
         targets: "merge"
     };
 
-    try { fireTrigger("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } }); } catch { }
+    fireTrigger("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } });
 
     logEvent("fuseFinalize", {
         owner,
@@ -209,7 +209,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, par
     }
 
     state.lastFuse = { owner, initiator_name: initiator.name, totalCost: sumCost, result_name: resultName };
-    try { fireTrigger("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } }); } catch { }
+    fireTrigger("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } });
 
     logEvent("fuseFinalize", {
         owner,
@@ -284,13 +284,11 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partner
         });
     }
 
-    try {
-        fireTrigger("on_fuse", owner, {
-            initiator,
-            partners,
-            result: { result_card_name: hasBeta && hasGamma ? "Masterwork Artifact Ω" : "wasted" }
-        });
-    } catch { /* no-op */ }
+    fireTrigger("on_fuse", owner, {
+        initiator,
+        partners,
+        result: { result_card_name: hasBeta && hasGamma ? "Masterwork Artifact Ω" : "wasted" }
+    });
 
     if (hand[iIdx]?.name === "Ominous Artifact α") {
         hand[iIdx].lastFuseRound = state.roundCount;

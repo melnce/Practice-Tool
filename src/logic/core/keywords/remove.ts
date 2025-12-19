@@ -1,7 +1,7 @@
-import { CardInstance, Effect, Player } from "../../../core/types.js";
-import { normalizeKeywordName, KeywordName } from "./registry.js";
-import { getKS } from "./internal.js";
-import { state } from "../../../core/gameState.js"; // Needed for resolving owner in temporary lock clearing (maybe extract context?)
+import { CardInstance } from "../../../core/types.js";
+import { normalizeKeywordName } from "./registry.js";
+// import { getKS } from "./internal.js";
+// import { state } from "../../../core/gameState.js";
 
 // Helper to clear the lock flags on a single card
 export function clearCantAttack(card: CardInstance) {
@@ -34,10 +34,9 @@ export function removeKeywordFromSingleCard(target: CardInstance, rawKeyword: st
     else if (keywordToRemove === "ambush") target.hasAmbush = false;
 
     // Step 2: Remove from KeywordState if applicable
+    // (Logic to clear specific keyword state bits could be expanded here)
     if (target.keywordState) {
-        const ks = target.keywordState;
-        // Logic to clear specific keyword state bits could be expanded here if needed
-        // Currently most KS properties are set/added but not explicitly cleared individually unless 'remove all' triggers
+        // const ks = target.keywordState; 
     }
 
     // Step 3: Remove the keyword from the card's data array to fix the UI

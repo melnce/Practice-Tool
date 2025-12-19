@@ -4,7 +4,7 @@ import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player } from "../../../../core/types.js";
-import { BuffOp, BuffContext } from "./types.js";
+import { BuffOp } from "./types.js";
 import { filterBuffCandidates } from "./utils.js";
 import { withBuffDuration } from "./duration.js";
 import { applyStatBuff, applyKeywordBuff, applyAttacksPerTurnBuff, checkPostBuffTriggers } from "./core.js";

@@ -35,7 +35,7 @@ export function shouldFire(
     hostCard: CardInstance,
     event: TriggerEventName,
     currentTurn: number,
-    context?: TriggerContext
+    _context?: TriggerContext
 ): boolean {
     // 1. Once Per Turn
     if (trigger.once_per_turn) {
@@ -59,7 +59,7 @@ export function markFired(
     hostCard: CardInstance,
     event: TriggerEventName,
     currentTurn: number,
-    context?: TriggerContext
+    _context?: TriggerContext
 ): void {
     // 1. Once Per Turn
     if (trigger.once_per_turn) {

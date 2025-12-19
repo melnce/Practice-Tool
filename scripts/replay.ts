@@ -1,13 +1,9 @@
-// scripts/replay.ts
-// Replay CLI - Pure Node.js execution
-// Imports only from core-safe modules (no UI, no DOM)
-
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
 // Set HEADLESS flag BEFORE any engine imports
-(globalThis as Record<string, unknown>).HEADLESS = true;
+(globalThis as any).HEADLESS = true;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +18,7 @@ if (fs.existsSync(logFile)) fs.unlinkSync(logFile);
 function appendLog(msg: string) {
     try {
         fs.appendFileSync(logFile, msg + "\n");
-    } catch { }
+    } catch { /* ignore */ }
 }
 
 console.log = (...args: unknown[]) => {
@@ -66,16 +62,16 @@ async function main() {
     console.log("Importing engine modules from core...");
 
     // Dynamic imports from compiled dist/ output
-    const { runWithReplay } = await import("../dist/logic/core/replay.js");
-    const { diffReplays, formatReplayDiff } = await import("../dist/logic/core/replayVerify.js");
-    const { REPLAY_SCENARIOS } = await import("../dist/logic/core/replayScenarios.js");
-    const { dispatchAction } = await import("../dist/logic/core/dispatch.js");
-    const { resetGameState, state, createInitialState, resetStateInstance } = await import("../dist/core/gameState.js");
-    const { setGlobalTrace, getGlobalTrace } = await import("../dist/logic/core/effects/trace.js");
-    const { initReplayState } = await import("../dist/logic/core/replayInit.js");
+    const { runWithReplay } = await import("../dist/logic/core/replay.js") as any;
+    const { diffReplays, formatReplayDiff } = await import("../dist/logic/core/replayVerify.js") as any;
+    const { REPLAY_SCENARIOS } = await import("../dist/logic/core/replayScenarios.js") as any;
+    const { dispatchAction } = await import("../dist/logic/core/dispatch.js") as any;
+    const { resetGameState, state, createInitialState, resetStateInstance } = await import("../dist/core/gameState.js") as any;
+    const { setGlobalTrace, getGlobalTrace } = await import("../dist/logic/core/effects/trace.js") as any;
+    const { initReplayState } = await import("../dist/logic/core/replayInit.js") as any;
 
-    const { initCardDatabaseNode } = await import("../dist/data/cardLoaderNode.js");
-    const { ReplayInvariantError } = await import("../dist/logic/core/replayInvariants.js");
+    const { initCardDatabaseNode } = await import("../dist/data/cardLoaderNode.js") as any;
+    const { ReplayInvariantError } = await import("../dist/logic/core/replayInvariants.js") as any;
 
     console.log("Engine modules loaded successfully.");
 
@@ -88,7 +84,7 @@ async function main() {
     const applyAction = (currentState: unknown, action: unknown, traceCtx?: { trace: unknown }) => {
         setGlobalTrace(traceCtx?.trace);
         try {
-            return dispatchAction(currentState as unknown, action as unknown);
+            return dispatchAction(currentState as unknown, action as unknown, null);
         } finally {
             setGlobalTrace(undefined);
         }
@@ -108,8 +104,8 @@ async function main() {
     initReplayState({ seed: 12345, initialDraw: 0, strict: !updateMode }, checkStateA);
     initReplayState({ seed: 67890, initialDraw: 0, strict: !updateMode }, checkStateB);
 
-    const actualA = checkStateA.blueDeck.slice(0, 5).map(c => c.name);
-    const actualB = checkStateB.blueDeck.slice(0, 5).map(c => c.name);
+    const actualA = checkStateA.blueDeck.slice(0, 5).map((c: any) => c.name);
+    const actualB = checkStateB.blueDeck.slice(0, 5).map((c: any) => c.name);
 
     // Expected values - populate these after first run triggers failure with actuals
     const goldenA: string[] = ["Goblin", "Centaur Centurion", "Goblin", "Goblin", "May, Journey Elf"];
@@ -120,8 +116,8 @@ async function main() {
 
     if (diffA || diffB) {
         console.error("[FAIL] Shuffle Determinism: Mismatch against golden expectation.");
-        if (diffA) console.error(`  Seed 12345 Expected: ${JSON.stringify(goldenA)}\n  Seed 12345 Actual:   ${JSON.stringify(actualA)}`);
-        if (diffB) console.error(`  Seed 67890 Expected: ${JSON.stringify(goldenB)}\n  Seed 67890 Actual:   ${JSON.stringify(actualB)}`);
+        if (diffA) console.error(`  Seed 12345 Expected: ${JSON.stringify(goldenA)} \n  Seed 12345 Actual:   ${JSON.stringify(actualA)} `);
+        if (diffB) console.error(`  Seed 67890 Expected: ${JSON.stringify(goldenB)} \n  Seed 67890 Actual:   ${JSON.stringify(actualB)} `);
         process.exit(1);
     } else {
         console.log("[PASS] Shuffle Determinism: Correct.");
@@ -158,11 +154,11 @@ async function main() {
         let meta: Record<string, any> = {};
 
         if (isDynamic) {
-            console.log(`[DEBUG] Scenario ${scenario.id} IS DYNAMIC. InitParams:`, initParams);
+            console.log(`[DEBUG] Scenario ${scenario.id} IS DYNAMIC.InitParams: `, initParams);
             const buildFn = (scenario as any).build;
             console.log(`[DEBUG] Calling build function...`);
             const result = buildFn(state);
-            console.log(`[DEBUG] Build returned:`, result ? (Array.isArray(result) ? "Array" : "Object") : "null");
+            console.log(`[DEBUG] Build returned: `, result ? (Array.isArray(result) ? "Array" : "Object") : "null");
 
             if (Array.isArray(result)) {
                 actions = result;
@@ -176,13 +172,13 @@ async function main() {
         }
 
         // Execute actions
-        fs.appendFileSync("crash.log", `\n[DEBUG] Scenario ${scenario.id} Actions: ${JSON.stringify(actions)}\n`);
+        fs.appendFileSync("crash.log", `\n[DEBUG] Scenario ${scenario.id} Actions: ${JSON.stringify(actions)} \n`);
 
-        console.log(`[DEBUG] Actions to dispatch:`, actions);
+        console.log(`[DEBUG] Actions to dispatch: `, actions);
         if (!actions) {
             console.error("[DEBUG FAIL] Actions array is null/undefined!");
         } else {
-            actions.forEach((a, i) => console.log(`[DEBUG] Action[${i}]:`, a));
+            actions.forEach((a, i) => console.log(`[DEBUG] Action[${i}]: `, a));
         }
 
         for (const action of actions) {
@@ -215,7 +211,7 @@ async function main() {
             } else {
                 const diff = diffReplays(capsule, goldenCapsule);
                 if (!diff.ok) {
-                    const msg = `  FAIL: Mismatch in ${scenario.id}\n${formatReplayDiff(diff)}`;
+                    const msg = `  FAIL: Mismatch in ${scenario.id} \n${formatReplayDiff(diff)} `;
                     console.error(msg);
                     fs.appendFileSync("crash.log", msg + "\n");
                     failureCount++;
@@ -263,14 +259,14 @@ async function main() {
                         meta // Pass metadata
                     });
                 }
-            } catch (e: unknown) {
+            } catch (e: any) {
                 if (e instanceof ReplayInvariantError) {
-                    const msg = `  FAIL: Invariant "${e.invariantId}" failed in ${scenario.id}\n    ${e.message}`;
+                    const msg = `  FAIL: Invariant "${e.invariantId}" failed in ${scenario.id} \n    ${e.message} `;
                     console.error(msg);
                     fs.appendFileSync("crash.log", msg + "\n");
                     failureCount++;
                 } else {
-                    fs.appendFileSync("crash.log", `UNHANDLED ERROR: ${e}\n`);
+                    fs.appendFileSync("crash.log", `UNHANDLED ERROR: ${e} \n`);
                     throw e;
                 }
             }
@@ -291,6 +287,6 @@ async function main() {
 
 main().catch(err => {
     console.error("Replay CLI error:", err);
-    fs.appendFileSync("crash.log", `Error: ${err.message}\nStack: ${err.stack}\n`);
+    fs.appendFileSync("crash.log", `Error: ${err.message} \nStack: ${err.stack} \n`);
     process.exit(1);
 });

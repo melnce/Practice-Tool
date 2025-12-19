@@ -6,12 +6,12 @@
  */
 import { state } from "../../../core/gameState.js";
 import { adapter } from "../../../core/adapter.js";
-import { fireTrigger, registerRunEffects } from "../triggers.js";
+import { registerRunEffects } from "../triggers.js";
 import { CardInstance, Effect, Player, EffectOp, EffectByOp, EffectResult } from "../../../core/types.js";
 import { guardLifecycle } from "../targeting/guards.js";
 import { registerRunEffectsInCleanup } from "../cleanup.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
-import { registerRunEffectsForSpellboost } from "../../effects/ops/spellboost.js";
+
 
 // Registry
 import { getOp, EffectCtx, sealRegistry } from "./registry.js";
@@ -73,17 +73,11 @@ export function getEffectiveCost(card: CardInstance) {
 
 // Notify (event-only) that a Loot spell was played.
 // Keeps evolveEffects generic; cards listen via triggers (event: "loot_played").
-function notifyLootPlayed(owner: Player, sourceCard: CardInstance | null) {
-    if (!sourceCard) return;
-    const isLoot =
-        Array.isArray(sourceCard.tribes) &&
-        sourceCard.tribes!.some(t => String(t).toLowerCase() === "loot");
-    if (!isLoot) return;
-    fireTrigger("loot_played", owner, { source: "play", kind: "loot", playedCard: sourceCard });
-}
+
 
 // Helper: Dispatch effect with strict types
 function dispatchEffect<K extends EffectOp>(op: K, eff: Effect, ctx: EffectCtx): EffectResult | void {
+    console.error("DEBUG_DISPATCH: dispatching", op);
     if (eff.op !== op) return; // Should not happen if confirmed 'eff.op'
     const handler = getOp(op);
     if (!handler) {
@@ -150,7 +144,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
             sourceCard,
             queue,
             context,
-            adapter,
+            adapter: { ...adapter, render: () => { } } as any, // Prevent render loops
             trace // Pass it down
         };
 

@@ -1,0 +1,9 @@
+
+C:\Projects\Practice Tool\src\logic\core\effects\index.ts
+  14:10  warning  'registerRunEffectsForSpellboost' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  76:10  warning  'notifyLootPlayed' is defined but never used. Allowed unused vars must match /^_/u                 @typescript-eslint/no-unused-vars
+
+✖ 2 problems (0 errors, 2 warnings)
+
+
+ESLint found too many warnings (maximum: 0).

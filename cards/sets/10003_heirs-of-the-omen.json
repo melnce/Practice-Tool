@@ -3306,41 +3306,43 @@
                 "name": "Himeka, Heir to Repose",
                 "effects": [
                   {
-                    "op": "nested_effects",
-                    "effects": [
-                      {
-                        "op": "select",
-                        "mode": "random",
-                        "qty": 1,
-                        "target": "enemy:follower",
-                        "condition": {
-                          "attack_lte": 4,
-                          "exclude_keyword": "cant_attack"
+                    "op": "repeat_effect",
+                    "count_source": "crest_count",
+                    "effect": {
+                      "op": "select",
+                      "mode": "random",
+                      "qty": 1,
+                      "target": "enemy:follower",
+                      "condition": {
+                        "attack_lte": 4,
+                        "exclude_keyword": "cant_attack"
+                      },
+                      "effects": [
+                        {
+                          "op": "keyword",
+                          "keywords": [
+                            {
+                              "name": "cant_attack",
+                              "until_opponent_eot": true
+                            }
+                          ]
                         },
-                        "effects": [
-                          {
-                            "op": "keyword",
-                            "keywords": [
+                        {
+                          "op": "grant_trigger",
+                          "trigger": {
+                            "event": "end_of_turn",
+                            "condition": {
+                              "own_turn": true
+                            },
+                            "effects": [
                               {
-                                "name": "cant_attack",
-                                "until_opponent_eot": true
+                                "op": "banish_self"
                               }
                             ]
-                          },
-                          {
-                            "op": "grant_trigger",
-                            "trigger": {
-                              "event": "end_of_turn",
-                              "effects": [
-                                {
-                                  "op": "banish_self"
-                                }
-                              ]
-                            }
                           }
-                        ]
-                      }
-                    ]
+                        }
+                      ]
+                    }
                   }
                 ],
                 "else_effects": []

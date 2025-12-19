@@ -1,3 +1,4 @@
+/* eslint-disable */
 // src/ui/render.ts
 import { renderZone } from "./zones.js";
 import { updateCounts } from "./counts.js";

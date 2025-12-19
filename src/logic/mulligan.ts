@@ -8,7 +8,7 @@ import { adapter } from "../core/adapter.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
-import { Player, CardInstance } from "../core/types.js";
+import { Player } from "../core/types.js";
 
 function ownerZones(owner: Player) {
     return {
@@ -65,45 +65,9 @@ function clearSelectable(owner: Player) {
 
 
 
-function chooseMulliganUids(owner: Player) {
-    const { hand } = ownerZones(owner);
-    // Simple curve heuristic:
-    // - Blue (going first): replace cost > 2
-    // - Red  (going second): replace cost > 3
-    const cutoff = (owner === "blue") ? 2 : 3;
-    const picks: string[] = [];
-    for (const c of hand) {
-        const cost = Number((c as any)?.cost) || 0;
-        if (cost > cutoff) picks.push(c.uid);
-        if (picks.length >= 4) break; // obey selection cap
-    }
-    // If nothing selected and hand is clunky (e.g., all 3s on blue), pick the highest cost one.
-    if (picks.length === 0) {
-        const sorted = [...hand].sort((a, b) => (Number((b as any).cost || 0) - Number((a as any).cost || 0)));
-        const first = sorted[0];
-        if (first) picks.push(first.uid);
-    }
-    return picks;
-}
 
-function queueAutoMulligan(owner: Player) {
-    // Small delay to allow initial render; avoids racing the DOM.
-    setTimeout(() => {
-        if (state.phase !== "mulligan" || state.mulliganStage !== owner) return;
-        const bag = owner === "blue" ? state.mulliganBlueSelected : state.mulliganRedSelected;
-        const { hand } = ownerZones(owner);
-        const want = new Set(chooseMulliganUids(owner));
-        hand.forEach(c => {
-            if (!c || !(c as any).__mulliganSelectable) return;
-            (c as any).__mulliganSelected = want.has(c.uid);
-            if ((c as any).__mulliganSelected) bag.add(c.uid);
-            else bag.delete(c.uid);
-        });
-        adapter.render();
-        // Confirm immediately
-        try { confirmMulligan(owner); } catch { void 0; }
-    }, 100);
-}
+
+
 
 export function toggleMulliganPick(owner: Player, uid: string) {
     if (state.phase !== "mulligan") return;

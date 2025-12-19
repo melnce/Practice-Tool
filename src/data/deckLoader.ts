@@ -4,7 +4,7 @@ import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { adapter } from "../core/adapter.js";
 import { getCardDetails } from "./cardDatabase.js";
 import { logEvent } from "../core/logger.js";
-import { Player } from "../core/types.js";
+
 
 
 function normalizeDeck(raw: any, deckFile?: string) {

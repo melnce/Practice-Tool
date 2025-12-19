@@ -1,5 +1,5 @@
 // src/logic/core/targeting/validation.ts
-import { GameState, Player, CardInstance } from "../../../core/types.js";
+import { GameState, Player } from "../../../core/types.js";
 
 /** Result of a validation check */
 export interface ValidationResult {
@@ -57,7 +57,7 @@ export function validateTargetSelection(state: GameState, pending: any, uid: str
                 }
             }
         }
-    } catch (e) {
+    } catch {
         // Fallback if state access fails, but don't block valid moves if logic errs
         // Return valid? Or fail safe? Original code warned and continued (implicit return undefined -> void -> ok?)
         // Original code logged warning and DID NOT return, so it allowed it implicitly.

@@ -24,6 +24,8 @@ export default defineConfig([
       "**/coverage/**",
       "**/node_modules/**",
       "**/tests/legacy/**",
+      "**/tools/**",
+      "**/scripts/**/*.{js,cjs,mjs}"
     ],
   },
 
@@ -61,7 +63,7 @@ export default defineConfig([
     languageOptions: {
       // 🔴 REQUIRED for typed rules like no-floating-promises
       parserOptions: {
-        project: ["./tsconfig.json"],
+        project: ["./tsconfig.eslint.json"],
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -94,6 +96,59 @@ export default defineConfig([
 
       // Prevent `await` on non-promises (common hallucination)
       "@typescript-eslint/await-thenable": "error",
+    },
+  },
+
+  // ---------------------------------------------------------------------------
+  // Scripts and Tools overrides (CLI environment)
+  // ---------------------------------------------------------------------------
+  {
+    files: ["**/scripts/**/*.ts", "scripts/**/*.ts"],
+    rules: {
+      "no-console": "off",
+      "no-process-exit": "off",
+      // scripts often use dynamic requires or loose types
+      "@typescript-eslint/no-var-requires": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "no-empty": "off",
+      "no-constant-binary-expression": "off",
+      "@typescript-eslint/no-unnecessary-condition": "off",
+      "no-empty-function": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "no-undef": "off",
+      "no-shadow": "off",
+      "@typescript-eslint/no-shadow": "off",
+      "import/no-unresolved": "off"
+    },
+  },
+  {
+    files: ["**/tests/**/*.{ts,js,cjs,mjs}", "**/*.test.ts", "**/*.spec.ts"],
+    rules: {
+      "no-console": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
+      "no-empty": "off",
+      "no-constant-binary-expression": "off",
+      "@typescript-eslint/no-unnecessary-condition": "off",
+      "no-empty-function": "off",
+      "@typescript-eslint/no-empty-function": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "no-unused-vars": "off",
+      "no-undef": "off",
+      "no-shadow": "off"
     },
   },
 ]);

@@ -60,12 +60,9 @@ function spendAttack(attacker: CardInstance) {
 function isAttackForbidden(card: CardInstance) {
     if (!card) return false;
     const ks = card.keywordState;
-    if (ks?.cantAttackIsTemporary && ks?.cantAttackUntilOpponentEOT) {
-        const ownerIsBlue = (state.blueBoard || []).includes(card);
-        const owner = ownerIsBlue ? "blue" : "red";
-        const activePlayer = state.isBlueTurn ? "blue" : "red";
-        if (activePlayer === owner) clearCantAttack(card);
-    }
+    // Fix: Do NOT clear it here. 
+    // Clearing happens in turns.ts at End of Turn. 
+    // Clearing here causes it to vanish the moment the owner tries to attack.
     return !!(ks?.cantAttack || ks?.cantAttackFollowers || ks?.cantAttackLeaders);
 }
 

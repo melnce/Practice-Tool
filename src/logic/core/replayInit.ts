@@ -4,7 +4,7 @@
 // This provides deterministic game state with real cards for replay scenarios.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { state, resetGameState, resetStateInstance } from "../../core/gameState.js";
+import { state, resetStateInstance } from "../../core/gameState.js";
 import { CardInstance, GameState, Player } from "../../core/types.js";
 import { drawCard } from "../../core/utils.js";
 import { getCardDetails, isCardDatabaseInitialized } from "../../data/cardIndex.js";
@@ -109,7 +109,7 @@ function buildDeckFromNames(cardNames: readonly string[], rng: any, strict: bool
 
     if (strict && missing.length > 0) {
         const uniqueMissing = [...new Set(missing)];
-        throw new Error(`[ReplayInit] Strict Mode Failure: The following cards were not found in the database: ${uniqueMissing.join(", ")}`);
+        throw new Error(`[ReplayInit] Strict Mode Failure: The following cards were not found in the database: ${uniqueMissing.join(", ")} `);
     }
 
     return deck;
@@ -182,7 +182,7 @@ export function initReplayState(options: ReplayInitOptions, targetState?: GameSt
     s.redDeck.push(...redShuffled);
 
     if (initialDraw > 0) {
-        // console.log(`[ReplayInit] BlueDeck Size: ${s.blueDeck.length}. Top 5: ${s.blueDeck.slice(0, 5).map(c => c.name).join(", ")}`);
+        // console.log(`[ReplayInit] BlueDeck Size: ${ s.blueDeck.length }. Top 5: ${ s.blueDeck.slice(0, 5).map(c => c.name).join(", ") } `);
     }
 
     // Draw initial hands

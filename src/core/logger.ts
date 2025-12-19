@@ -1,6 +1,6 @@
 // src/core/logger.ts
 import { state } from "./gameState.js";
-import { GameState } from "./types.js";
+
 
 /* =========================
    Stable stringify + hash
@@ -109,7 +109,7 @@ async function sha256Hex(str: string): Promise<string> {
             const buf = await crypto.subtle.digest("SHA-256", data);
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
         }
-    } catch (_) { /* fall through */ }
+    } catch { /* fall through */ }
     return fnv1a64Hex(str);
 }
 

@@ -8,7 +8,7 @@
 export const adapter = {
     // Default: no-op. Browser boot injects real implementations.
     render: () => { /* no-op by default */ },
-    showChoiceModal: (_options: unknown[], callback: (index: number) => void) => { /* no-op */ },
+    showChoiceModal: (_options: unknown[], _callback: (index: number) => void) => { /* no-op */ },
 
     // Targeting confirmation UI
     showTargetConfirmationButton: (_vm: unknown) => { /* no-op */ },

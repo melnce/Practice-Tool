@@ -45,7 +45,7 @@ export function processCandidateTriggers(
         for (const trigger of cand.triggers) {
             if (trigger.event !== event) continue;
 
-            const cond = trigger.condition || {};
+
 
             // 1. Source Check
             // Legacy: Default source for followers/amulets is board-only unless specified
@@ -63,7 +63,7 @@ export function processCandidateTriggers(
 
             // 3. Common Conditions
             if (!options.skipCommonConditions) {
-                if (!evalCommonConditions(trigger, card, owner, activePlayer, context, event)) {
+                if (!evalCommonConditions(trigger, card, owner, activePlayer, context)) {
                     DEBUG_TRIGGERS.log({ event, card: card.name, triggerId: trigger.event, result: 'skip_conditions' });
                     continue;
                 }

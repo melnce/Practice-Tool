@@ -1,0 +1,199 @@
+
+FILE: C:\Projects\Practice Tool\src\core\adapter.ts
+  [11:44] @typescript-eslint/no-unused-vars: 'callback' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\core\logger.ts
+  [3:10] @typescript-eslint/no-unused-vars: 'GameState' is defined but never used. Allowed unused vars must match /^_/u.
+  [112:14] @typescript-eslint/no-unused-vars: '_' is defined but never used.
+
+FILE: C:\Projects\Practice Tool\src\data\deckLoader.ts
+  [7:10] @typescript-eslint/no-unused-vars: 'Player' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\data\textCompiler\compiler.ts
+  [2:18] @typescript-eslint/no-unused-vars: 'EffectOp' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\barrier.ts
+  [22:49] @typescript-eslint/no-unused-vars: 'charges' is assigned a value but never used. Allowed unused args must match /^_/u.
+  [93:15] @typescript-eslint/no-unused-vars: 'activePlayer' is assigned a value but never used. Allowed unused vars must match /^_/u.
+  [109:14] @typescript-eslint/no-unused-vars: '_' is defined but never used.
+  [109:17] no-empty: Empty block statement.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\effects\build.ts
+  [20:23] @typescript-eslint/no-empty-object-type: The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\effects\domains\buffs.ts
+  [3:10] @typescript-eslint/no-unused-vars: 'state' is defined but never used. Allowed unused vars must match /^_/u.
+  [26:10] @typescript-eslint/no-unused-vars: 'BuffEffect' is defined but never used. Allowed unused vars must match /^_/u.
+  [148:58] @typescript-eslint/no-unused-vars: 'eff' is defined but never used. Allowed unused args must match /^_/u.
+  [148:63] @typescript-eslint/no-unused-vars: 'ctx' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\effects\domains\combat.ts
+  [58:13] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+  [126:9] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+  [131:9] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+  [140:9] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\effects\domains\resources.ts
+  [25:46] @typescript-eslint/no-unused-vars: 'processCrestEvent' is defined but never used. Allowed unused vars must match /^_/u.
+  [91:9] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+  [99:9] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+  [100:13] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+  [103:45] @typescript-eslint/no-unused-vars: 'ctx' is defined but never used. Allowed unused args must match /^_/u.
+  [105:9] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+  [108:9] @typescript-eslint/no-floating-promises: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\effects\index.ts
+  [14:10] @typescript-eslint/no-unused-vars: 'registerRunEffectsForSpellboost' is defined but never used. Allowed unused vars must match /^_/u.
+  [76:10] @typescript-eslint/no-unused-vars: 'notifyLootPlayed' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\keywords\apply.ts
+  [1:24] @typescript-eslint/no-unused-vars: 'Player' is defined but never used. Allowed unused vars must match /^_/u.
+  [2:32] @typescript-eslint/no-unused-vars: 'KeywordName' is defined but never used. Allowed unused vars must match /^_/u.
+  [128:20] @typescript-eslint/no-unused-vars: 'c' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\keywords\remove.ts
+  [1:24] @typescript-eslint/no-unused-vars: 'Effect' is defined but never used. Allowed unused vars must match /^_/u.
+  [1:32] @typescript-eslint/no-unused-vars: 'Player' is defined but never used. Allowed unused vars must match /^_/u.
+  [2:32] @typescript-eslint/no-unused-vars: 'KeywordName' is defined but never used. Allowed unused vars must match /^_/u.
+  [3:10] @typescript-eslint/no-unused-vars: 'getKS' is defined but never used. Allowed unused vars must match /^_/u.
+  [4:10] @typescript-eslint/no-unused-vars: 'state' is defined but never used. Allowed unused vars must match /^_/u.
+  [38:15] @typescript-eslint/no-unused-vars: 'ks' is assigned a value but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\playCard\amulet.ts
+  [9:10] @typescript-eslint/no-unused-vars: 'applyKeywordsFromList' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\playCard\invariants.test.ts
+  [7:28] @typescript-eslint/no-unused-vars: 'playCardCore' is defined but never used. Allowed unused vars must match /^_/u.
+  [8:10] @typescript-eslint/no-unused-vars: 'canPlayCard' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\playCard\preflight.test.ts
+  [224:42] @typescript-eslint/no-require-imports: A `require()` style import is forbidden.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\playCard\types.ts
+  [2:10] @typescript-eslint/no-unused-vars: 'CardInstance' is defined but never used. Allowed unused vars must match /^_/u.
+  [2:24] @typescript-eslint/no-unused-vars: 'Player' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\replay.ts
+  [3:10] @typescript-eslint/no-unused-vars: 'EffectCtx' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\replayInit.ts
+  [7:17] @typescript-eslint/no-unused-vars: 'resetGameState' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\replayScenarioDsl.ts
+  [78:43] @typescript-eslint/no-unused-vars: 'i' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\replayScenarios.ts
+  [3:27] @typescript-eslint/no-unused-vars: 'invCardCountInZone' is defined but never used. Allowed unused vars must match /^_/u.
+  [3:74] @typescript-eslint/no-unused-vars: 'invEffectCount' is defined but never used. Allowed unused vars must match /^_/u.
+  [3:90] @typescript-eslint/no-unused-vars: 'invLeaderHealth' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\targeting.ts
+  [3:10] @typescript-eslint/no-unused-vars: 'logEvent' is defined but never used. Allowed unused vars must match /^_/u.
+  [164:51] @typescript-eslint/no-unused-vars: 'args' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\targeting\engine.ts
+  [2:21] @typescript-eslint/no-unused-vars: 'CardInstance' is defined but never used. Allowed unused vars must match /^_/u.
+  [3:27] @typescript-eslint/no-unused-vars: 'TargetedOpContext' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\targeting\validation.ts
+  [2:29] @typescript-eslint/no-unused-vars: 'CardInstance' is defined but never used. Allowed unused vars must match /^_/u.
+  [60:14] @typescript-eslint/no-unused-vars: 'e' is defined but never used.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\triggers.ts
+  [2:10] @typescript-eslint/no-unused-vars: 'CardInstance' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\triggers\conditions.ts
+  [47:5] @typescript-eslint/no-unused-vars: 'event' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\triggers\keys.ts
+  [1:23] @typescript-eslint/no-unused-vars: 'TriggerContext' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\triggers\process.ts
+  [48:19] @typescript-eslint/no-unused-vars: 'cond' is assigned a value but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\triggers\tracking.ts
+  [38:5] @typescript-eslint/no-unused-vars: 'context' is defined but never used. Allowed unused args must match /^_/u.
+  [62:5] @typescript-eslint/no-unused-vars: 'context' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\triggers\types.ts
+  [1:32] @typescript-eslint/no-unused-vars: 'Player' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\core\turns.ts
+  [11:10] @typescript-eslint/no-unused-vars: 'clearExpiredCantAttackAtEOT' is defined but never used. Allowed unused vars must match /^_/u.
+  [99:11] @typescript-eslint/no-unused-vars: 'board' is assigned a value but never used. Allowed unused vars must match /^_/u.
+  [317:10] @typescript-eslint/no-unused-vars: 'handleCountdowns' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\leader.ts
+  [3:26] @typescript-eslint/no-unused-vars: 'GameState' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\buff\orchestrator.ts
+  [7:18] @typescript-eslint/no-unused-vars: 'BuffContext' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\choose.ts
+  [5:10] @typescript-eslint/no-unused-vars: 'spellboostHand' is defined but never used. Allowed unused vars must match /^_/u.
+  [6:10] @typescript-eslint/no-unused-vars: 'handleDrawFiltered' is defined but never used. Allowed unused vars must match /^_/u.
+  [7:10] @typescript-eslint/no-unused-vars: 'handleReanimate' is defined but never used. Allowed unused vars must match /^_/u.
+  [16:10] @typescript-eslint/no-unused-vars: 'board' is defined but never used. Allowed unused vars must match /^_/u.
+  [20:10] @typescript-eslint/no-unused-vars: 'isWitchsNewBrew' is defined but never used. Allowed unused vars must match /^_/u.
+  [112:94] no-empty: Empty block statement.
+  [183:102] no-empty: Empty block statement.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\damage.ts
+  [24:10] @typescript-eslint/no-unused-vars: 'isSuperProtected' is defined but never used. Allowed unused vars must match /^_/u.
+  [329:72] @typescript-eslint/no-unused-vars: 'sourceCard' is assigned a value but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\draw.ts
+  [28:10] @typescript-eslint/no-unused-vars: 'isFiniteNum' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\engage.ts
+  [9:32] @typescript-eslint/no-unused-vars: 'Effect' is defined but never used. Allowed unused vars must match /^_/u.
+  [16:10] @typescript-eslint/no-unused-vars: 'graveOf' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\fuse\fuse.artifact.ts
+  [162:117] no-empty: Empty block statement.
+  [212:117] no-empty: Empty block statement.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\fuse\fuse.ts
+  [10:24] @typescript-eslint/no-unused-vars: 'GameState' is defined but never used. Allowed unused vars must match /^_/u.
+  [67:30] no-constant-binary-expression: Unexpected constant nullishness on the left-hand side of a `??` expression.
+  [67:30] no-constant-binary-expression: Unexpected constant nullishness on the left-hand side of a `??` expression.
+  [259:110] no-empty: Empty block statement.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\misc.ts
+  [29:89] @typescript-eslint/no-unused-vars: 'context' is defined but never used. Allowed unused args must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\reanimate.ts
+  [3:10] @typescript-eslint/no-unused-vars: 'getCardDetails' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\summon_ops\invoke.ts
+  [1:10] @typescript-eslint/no-unused-vars: 'state' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\ops\targeted\index.ts
+  [26:24] @typescript-eslint/no-unused-vars: 'Effect' is defined but never used. Allowed unused vars must match /^_/u.
+  [26:32] @typescript-eslint/no-unused-vars: 'Player' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\effects\skybound.ts
+  [3:10] @typescript-eslint/no-unused-vars: 'logEvent' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\evolveUtils.ts
+  [15:89] no-empty: Empty block statement.
+
+FILE: C:\Projects\Practice Tool\src\logic\mulligan.ts
+  [11:18] @typescript-eslint/no-unused-vars: 'CardInstance' is defined but never used. Allowed unused vars must match /^_/u.
+  [89:10] @typescript-eslint/no-unused-vars: 'queueAutoMulligan' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\logic\startGame.ts
+  [10:10] @typescript-eslint/no-unused-vars: 'drawCard' is defined but never used. Allowed unused vars must match /^_/u.
+  [14:24] @typescript-eslint/no-unused-vars: 'Player' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\ui\counts.ts
+  [2:16] @typescript-eslint/no-unused-vars: '$' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\ui\helpers\glow.ts
+  [12:10] @typescript-eslint/no-unused-vars: 'getSpellboostCount' is defined but never used. Allowed unused vars must match /^_/u.
+
+FILE: C:\Projects\Practice Tool\src\ui\render.ts
+  [9:29] @typescript-eslint/no-unused-vars: 'CardInstance' is defined but never used. Allowed unused vars must match /^_/u.

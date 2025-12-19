@@ -12,7 +12,7 @@ let __raf: number | null = null;
 function queueRender() {
     if (typeof window === "undefined") return; // headless sim
     if (__raf) cancelAnimationFrame(__raf);
-    __raf = requestAnimationFrame(() => { __raf = null; try { adapter.render(); } catch { } });
+    __raf = requestAnimationFrame(() => { __raf = null; try { adapter.render(); } catch { /* ignore */ } });
 }
 
 export function canEvolve(owner: Player, card: CardInstance, mode: "normal" | "super" = "normal") {

@@ -1,6 +1,7 @@
 // src/logic/core/playCard/preflight.test.ts
 import { describe, it, expect, beforeEach } from "vitest";
 import { canPlayCard } from "./preflight.js";
+import { playCardNoRender } from "./index.js";
 import { state, resetGameState } from "../../../core/gameState.js";
 import { CardInstance } from "../../../core/types.js";
 
@@ -221,7 +222,6 @@ describe("Preflight System", () => {
 
         it("done outcome mutates state correctly", () => {
             // Import playCardNoRender for this test
-            const { playCardNoRender } = require("./index.js");
 
             // Setup: simple follower with no targeting
             const follower: CardInstance = {

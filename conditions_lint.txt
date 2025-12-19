@@ -1,0 +1,8 @@
+
+C:\Projects\Practice Tool\src\logic\core\triggers\conditions.ts
+  47:5  warning  'event' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+✖ 1 problem (0 errors, 1 warning)
+
+
+ESLint found too many warnings (maximum: 0).

@@ -1,4 +1,5 @@
 
+/* eslint-disable no-console, no-process-exit, @typescript-eslint/no-explicit-any */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

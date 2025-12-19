@@ -1,5 +1,5 @@
-import { CardInstance, Player } from "../../../core/types.js";
-import { normalizeKeywordName, KeywordName } from "./registry.js";
+import { CardInstance } from "../../../core/types.js";
+import { normalizeKeywordName } from "./registry.js";
 import { getKS } from "./internal.js";
 import { grantBarrier } from "../barrier.js";
 import { state } from "../../../core/gameState.js";
@@ -37,8 +37,8 @@ export const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptio
     drain: (c) => { c.hasDrain = true; },
     intimidate: (c) => { c.hasIntimidate = true; },
     ambush: (c) => { c.hasAmbush = true; },
-    barrier: (c, opts) => {
-        grantBarrier(c, opts?.charges ?? 1);
+    barrier: (c) => {
+        grantBarrier(c);
         getKS(c).hasBarrier = true;
     },
     banish_on_death: (c) => { getKS(c).banishOnDeath = true; },
@@ -125,7 +125,7 @@ export const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptio
         const add = Number(opts.count ?? 0);
         ks.counters[key] = (ks.counters[key] || 0) + add;
     },
-    skybound_art: (c) => { },
+    skybound_art: () => { },
     pixie_enter: (c, opts) => {
         const ks = getKS(c);
         ks.hasPixieEnter = true;
@@ -146,7 +146,6 @@ export const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptio
     },
     cant_attack: (c, opts) => {
         const ks = getKS(c);
-        ks.hasCantAttack = true;
         ks.cantAttack = true;
         ks.cantAttackFollowers = true;
         ks.cantAttackLeaders = true;
@@ -157,10 +156,10 @@ export const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptio
         }
         if (opts?.until_opponent_eot) {
             ks.cantAttackUntilOpponentEOT = true;
+            ks.cantAttackUntilOpponentEOT = true;
             ks.cantAttackIsTemporary = true;
-            const isBlue = state.blueBoard.includes(c);
-            const isRed = state.redBoard.includes(c);
-            ks.cantAttackOwner = isBlue ? "blue" : (isRed ? "red" : (c as any).cantAttackOwner || null);
+            // Use the caster if provided, otherwise fallback to card owner (for self-buffs)
+            ks.cantAttackOwner = opts.request_owner || c.owner || null;
         }
     },
 };

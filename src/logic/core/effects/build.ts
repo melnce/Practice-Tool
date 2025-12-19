@@ -17,6 +17,7 @@ type PayloadOf<K extends EffectOp> = Omit<EffectByOp[K], "op">;
  * Uses the trick: {} extends Pick<T, P> is true only if P is optional.
  */
 type RequiredKeys<T> = {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     [P in keyof T]-?: {} extends Pick<T, P> ? never : P
 }[keyof T];
 

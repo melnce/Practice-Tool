@@ -1,0 +1,60 @@
+{
+  "op": "gain_crest",
+  "name": "Himeka, Heir to Repose",
+  "image": "images/crests/himeka_heir_to_repose.png",
+  "description": "Countdown (4). At the end of your turn, if there's an allied Himeka, Heir to Repose on the field, give X random enemy followers with 4 attack or less \"Can't attack followers or leaders\" until opponent's end of turn, then banish them. X is the number of crests you have.",
+  "countdown": 4,
+  "triggers": [
+    {
+      "event": "end_of_turn",
+      "effects": [
+        {
+          "op": "board_name_gate",
+          "name": "Himeka, Heir to Repose",
+          "effects": [
+            {
+              "op": "repeat_effect",
+              "count_source": "crest_count",
+              "effect": {
+                "op": "select",
+                "mode": "random",
+                "qty": 1,
+                "target": "enemy:follower",
+                "condition": {
+                  "attack_lte": 4,
+                  "exclude_keyword": "cant_attack"
+                },
+                "effects": [
+                  {
+                    "op": "keyword",
+                    "keywords": [
+                      {
+                        "name": "cant_attack",
+                        "until_opponent_eot": true
+                      }
+                    ]
+                  },
+                  {
+                    "op": "grant_trigger",
+                    "trigger": {
+                      "event": "end_of_turn",
+                      "condition": {
+                        "own_turn": true
+                      },
+                      "effects": [
+                        {
+                          "op": "banish_self"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "else_effects": []
+        }
+      ]
+    }
+  ]
+}

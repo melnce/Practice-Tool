@@ -1,6 +1,6 @@
 
 import { registerOp } from "../registry.js";
-import { state } from "../../../../core/gameState.js";
+// import { state } from "../../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../targeting.js";
 import { setPendingTarget } from "../../pendingTarget/index.js";
 import {
@@ -23,7 +23,7 @@ import { resolveDynamicValue } from "../../values.js";
 import { spellboostHand, handleSetSpellboostCount } from "../../../effects/ops/spellboost.js";
 import { getTargetingContext } from "../context.js";
 
-import { BuffEffect } from "../../../../core/types.js";
+// import { BuffEffect } from "../../../../core/types.js";
 
 export function registerBuffEffects() {
 
@@ -51,6 +51,8 @@ export function registerBuffEffects() {
 
     // Keywords
     registerOp("keyword", (eff, ctx) => {
+
+        // console.error("DEBUG_BUFFS: keyword op dispatched!");
         const tCtx = getTargetingContext(ctx);
         const merged = { ...tCtx, sourceCard: ctx.sourceCard, targets: (ctx.context as any)?.targets };
         // isTargetedEffect check logic
@@ -145,7 +147,7 @@ export function registerBuffEffects() {
     registerOp("set_spellboost_count", (eff, ctx) => {
         if (ctx.sourceCard) handleSetSpellboostCount(eff, ctx.sourceCard);
     });
-    registerOp("transform_self_if_spellboost_at_least", (eff, ctx) => {
+    registerOp("transform_self_if_spellboost_at_least", () => {
         // legacy no-op
     });
 

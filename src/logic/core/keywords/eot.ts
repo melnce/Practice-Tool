@@ -11,7 +11,7 @@ export function clearExpiredCantAttackAtEOT(endedPlayer: Player) {
             if (!c || !c.keywordState) continue;
             const ks = c.keywordState;
             // EOT lock expires right after the owner's turn ends
-            if (ks.cantAttackUntilOpponentEOT && ks.cantAttackOwner === endedPlayer) {
+            if (ks.cantAttackUntilOpponentEOT && ks.cantAttackOwner !== endedPlayer) {
                 clearCantAttack(c);
             }
             // Optional absolute turn counter expiry

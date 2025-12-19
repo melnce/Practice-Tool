@@ -78,8 +78,10 @@ export function handleRestoreSelfAndHealLeader(owner: Player, sourceCard: CardIn
 
 // --- Logic Moved from effects.ts ---
 
-export function handleChooseBonusAdd(owner: Player, eff: Effect) {
+export function handleChooseBonusAdd(eff: Effect, ctx: any) {
+    const owner = ctx.owner;
     const amt = (eff.amount || 1) as number;
+    console.log(`[Bonus] Adding choose bonus ${amt} to ${owner}`);
     if (owner === "blue") state.blueChooseBonus = (state.blueChooseBonus || 0) + amt;
     else state.redChooseBonus = (state.redChooseBonus || 0) + amt;
 }

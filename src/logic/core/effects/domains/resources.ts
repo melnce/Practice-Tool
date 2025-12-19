@@ -22,7 +22,7 @@ import {
     fuse_finalize_gear_multi, fuse_finalize_fortifier,
     fuse_finalize_gardens_allure, fuse_finalize_loot
 } from "../../../effects/ops/fuse/fuse.js";
-import { crestAddCounter, crestSpendCounter, processCrestEvent, handleGainCrest } from "../../../effects/crest.js";
+import { crestAddCounter, crestSpendCounter, handleGainCrest } from "../../../effects/crest.js";
 import { logEvent } from "../../../../core/logger.js";
 import { getAdapter, getTargetingContext } from "../context.js";
 import { enqueueManyFront } from "../queue.js";
@@ -88,7 +88,7 @@ export function registerResourceEffects() {
 
     registerOp("transform_in_hand", (eff, ctx) => handleTransformInHand(eff, ctx.owner));
     registerOp("transform_random_spell_in_hand", (eff, ctx) => {
-        import("../../../effects/ops/transform.js").then(({ transformRandomSpellInHand }) => {
+        void import("../../../effects/ops/transform.js").then(({ transformRandomSpellInHand }) => {
             transformRandomSpellInHand(ctx.owner, (eff as any).into || "Ersatz Elimination");
         });
     });
@@ -96,18 +96,18 @@ export function registerResourceEffects() {
     // Gate / Deck
     registerOp("replace_deck", (eff, ctx) => handleReplaceDeck(ctx.owner, eff));
     registerOp("replace_deck_with_set_minus", (eff, ctx) => {
-        import("../../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => {
-            replaceDeckWithSetMinus(ctx.owner, eff).then(() => getAdapter(ctx).render());
+        void import("../../../effects/deck.js").then(({ replaceDeckWithSetMinus }) => {
+            void replaceDeckWithSetMinus(ctx.owner, eff).then(() => getAdapter(ctx).render());
         });
     });
-    registerOp("set_cost_last_drawn", (eff, ctx) => handleSetCostLastDrawn(eff));
+    registerOp("set_cost_last_drawn", (eff) => handleSetCostLastDrawn(eff));
     registerOp("halve_deck_cost", (eff, ctx) => {
-        import("../../../effects/cost.js").then(({ handleHalveDeckCost }) => handleHalveDeckCost(ctx.owner));
+        void import("../../../effects/cost.js").then(({ handleHalveDeckCost }) => handleHalveDeckCost(ctx.owner));
     });
     registerOp("reduce_deck_followers_cost", (eff, ctx) => {
-        import("../../../effects/cost.js").then(({ reduceDeckFollowersCost }) => {
+        void import("../../../effects/cost.js").then(({ reduceDeckFollowersCost }) => {
             const amt = parseInt(String(eff.amount ?? 1)) || 1;
-            reduceDeckFollowersCost(ctx.owner, amt);
+            void reduceDeckFollowersCost(ctx.owner, amt);
         });
     });
 
@@ -125,7 +125,7 @@ export function registerResourceEffects() {
     });
     registerOp("crest_pay_counter", (eff, ctx) => {
         const ok = crestSpendCounter(ctx.owner, eff.crest || eff.name || "Main", eff.counter || "faith", eff.amount ?? 1);
-        const chain = ok ? (eff.effects || []) : (eff.else_effects || []);
+        const chain = ok ? (eff.on_success_effects || eff.effects || []) : (eff.else_effects || []);
         if (chain.length) enqueueManyFront(ctx, chain);
     });
 

@@ -20,6 +20,10 @@ export interface DamageEffect extends BaseEffect {
     amount?: number | string;
     add_amount?: number | string;
     target?: string;
+    condition?: any;
+    select?: number | string;
+    can_target_leader?: boolean;
+    count_source?: string;
 }
 
 export type DestroyOps = Extract<EffectOp, "destroy" | "destroy_all" | "destroy_highest" | "destroy_random" | "destroy_random_other_allies" | "destroy_allied_amulets" | "destroy_allied_amulets_then_damage" | "destroy_self" | "destroy_then" | "destroy_defender_if_damaged" | "follower_strike_destroy">;

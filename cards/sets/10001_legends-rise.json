@@ -1574,7 +1574,9 @@
         "effects": [
           {
             "op": "buff_self",
-            "keyword": "Ambush"
+            "keywords": [
+              "Ambush"
+            ]
           },
           {
             "op": "buff_self",

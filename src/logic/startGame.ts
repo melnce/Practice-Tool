@@ -7,11 +7,11 @@ import { state, resetGameState } from "../core/gameState.js";
 import { loadBlueDeck, loadRedDeck } from "../data/deckLoader.js";
 import { adapter } from "../core/adapter.js";
 import { loadCardDatabase } from "../data/cardDatabase.js";
-import { drawCard } from "../core/utils.js";
+
 import { beginMulligan } from "./mulligan.js";
 import { runEffects } from "./core/effects/index.js";
 import { logEvent } from "../core/logger.js";
-import { CardInstance, Player } from "../core/types.js";
+import { CardInstance } from "../core/types.js";
 import { StartGameOptions } from "../core/types.js";
 
 function resetEvoButtons() {
@@ -55,12 +55,13 @@ export async function startGame(options: StartGameOptions) {
     if (hasSham(state.blueDeck, state.blueHand)) {
         runEffects([{
             op: "gain_crest",
-            name: "Faith",
+            name: "Faith: Sham-Nacha, Heir to Entwining",
             image: "images/crests/faith.png",
             description: "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
             triggers: [{
                 event: "select_mode",
-                effects: [{ op: "crest_add_counter", crest: "Faith", counter: "faith", amount: 1 }]
+                condition: { "own_turn": true },
+                effects: [{ op: "crest_add_counter", crest: "Faith: Sham-Nacha, Heir to Entwining", counter: "faith", amount: 1 }]
             }]
         }], "blue", null, { targets: [] });
     }
@@ -68,12 +69,13 @@ export async function startGame(options: StartGameOptions) {
     if (hasSham(state.redDeck, state.redHand)) {
         runEffects([{
             op: "gain_crest",
-            name: "Faith",
+            name: "Faith: Sham-Nacha, Heir to Entwining",
             image: "images/crests/faith.png",
             description: "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
             triggers: [{
                 event: "select_mode",
-                effects: [{ op: "crest_add_counter", crest: "Faith", counter: "faith", amount: 1 }]
+                condition: { "own_turn": true },
+                effects: [{ op: "crest_add_counter", crest: "Faith: Sham-Nacha, Heir to Entwining", counter: "faith", amount: 1 }]
             }]
         }], "red", null, { targets: [] });
     }

@@ -7,7 +7,7 @@ import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, GameState, Player } from "../../../../core/types.js";
+import { CardInstance, Player } from "../../../../core/types.js";
 
 // Class-specific modules
 import {
@@ -64,7 +64,7 @@ function filterByPartnerFilters(candidates: CardInstance[], filters: any[] = [])
         if (f.tribe && !(Array.isArray(card.tribes) && card.tribes.includes(f.tribe))) return false;
 
         if (Number.isFinite(f.cost_max)) {
-            const effCost = (Number(card?.effectiveCost) ?? Number(card?.cost) ?? 0) + (Number(card?.cost_mod) || 0);
+            const effCost = (Number(card?.effectiveCost) || Number(card?.cost) || 0) + (Number(card?.cost_mod) || 0);
             if (effCost > f.cost_max) return false;
         }
         if (f.keyword) {
@@ -256,7 +256,7 @@ export function fuse_finalize_generic(owner: Player, initiatorUid: string, partn
         targets: "merge"
     };
 
-    try { fireTrigger?.("on_fuse", owner, { initiator: iCard, partner: pCard, result: resultSpec }); } catch { }
+    fireTrigger("on_fuse", owner, { initiator: iCard, partner: pCard, result: resultSpec });
 
     logEvent("fuseFinalize", {
         owner,

@@ -1,6 +1,6 @@
 import { PlayerAction, GameState } from "../../core/types.js";
 import { playCard } from "./replayScenarioDsl.js";
-import { ReplayInvariant, invCardCountInZone, invHandSize, invBoardSize, invEffectCount, invLeaderHealth, invCardMoved, invCardMovedByUid } from "./replayInvariants.js";
+import { ReplayInvariant, invHandSize, invBoardSize, invCardMoved, invCardMovedByUid } from "./replayInvariants.js";
 
 /**
  * Static scenario with pre-defined actions.

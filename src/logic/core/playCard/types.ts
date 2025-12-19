@@ -1,6 +1,4 @@
 
-import { CardInstance, Player } from "../../../core/types.js";
-
 export type PlayOutcome =
     | { kind: "blocked"; reason?: string }
     | { kind: "paused" }          // selection/targeting requested by effects

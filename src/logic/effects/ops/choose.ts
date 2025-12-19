@@ -2,30 +2,27 @@
 import { state } from "../../../core/gameState.js";
 import { hasEarthSigils, consumeEarthSigils } from "./earth.js";
 import { adapter } from "../../../core/adapter.js";
-import { spellboostHand } from "./spellboost.js";
-import { handleDrawFiltered } from "./draw.js";
-import { handleReanimate } from "./reanimate.js";
+// import { spellboostHand } from "./spellboost.js"; // Unused
+// import { handleDrawFiltered } from "./draw.js"; // Unused
+// import { handleReanimate } from "./reanimate.js"; // Unused
 import { runEffects } from "../../core/effects/index.js";
 import { fireTrigger } from "../../core/triggers.js";
 import { logEvent } from "../../../core/logger.js";
 import { doAction, appendStep } from "../../../core/history.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
 
+// Import types if needed, or define locally if specific to choose
+// ChooseEffect? 
+// For now, I will typify 'eff' as any to avoid breaking, but better to use Effect and safe access.
+// Actually, I should use Effect & { options?: any[], select_count?: number, unique?: boolean }
+// But for now, safe property access is enough.
 
+import { EffectCtx } from "../../core/effects/registry.js";
 
-function board(owner: Player) {
-    return owner === "blue" ? state.blueBoard : state.redBoard;
-}
+export function handleChoose(eff: Effect, ctx: EffectCtx) {
+    const { owner, sourceCard, queue: effectsQueue } = ctx;
 
-function isWitchsNewBrew(card: CardInstance) {
-    return card?.name?.toLowerCase().includes("witch") &&
-        card?.name?.toLowerCase().includes("brew");
-}
-
-
-
-export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any) {
-    console.group("[CHOICE DEBUG] Handling choose effect (multi-pick)");
+    // console.group("[CHOICE DEBUG] Handling choose effect (multi-pick)");
     const options = Array.isArray((eff as any)?.options) ? (eff as any).options : [];
     const baseSelect = Math.max(1, parseInt((eff as any)?.select_count ?? 1));
     const bonus = owner === "blue" ? (state.blueChooseBonus || 0) : (state.redChooseBonus || 0);
@@ -38,8 +35,8 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
     // All options remain available; Earth Rite cost will be attempted on pick
     const available = options;
     if (available.length === 0) {
-        console.warn("No options configured");
-        console.groupEnd();
+        // console.warn("No options configured");
+        // console.groupEnd();
         return;
     }
 
@@ -61,8 +58,8 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
             if (op === "summon_named" || op === "reanimate") s += 5;
             if (op === "buff" || op === "buff_self") s += 3;
             if (op === "draw" || op === "draw_filtered" || op === "add_to_hand") s += 3;
-            if (op === "recover_pp") s += 2;
-            if (op === "leader_barrier") s += 2;
+            if (op === "recover_pp" || op === "gain_max_pp" || op === "restore_pp") s += 2;
+            if (op === "leader_barrier" || op === "restore_defense" || op === "heal") s += 2;
             // small bias for effects mentioning enemy in target
             if (typeof e?.target === "string" && /enemy/i.test(e.target)) s += 1;
         }
@@ -109,7 +106,8 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
         });
         logEvent("chooseFinalize", { owner, picked: picked.length, ai: true });
         for (let i = 0; i < picked.length; i++) {
-            try { fireTrigger("select_mode", owner, { source: sourceCard || null }); } catch { }
+            // Removed try/catch empty block. fireTrigger should range.
+            fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
         }
         const combined: Effect[] = [];
         for (const opt of picked) {
@@ -125,7 +123,7 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
         } else {
             if (!(globalThis as any).AI_SUPPRESS_RENDER) adapter.render();
         }
-        console.groupEnd();
+        // console.groupEnd();
         return "done";
     }
     // ==== /AI path ====
@@ -135,52 +133,16 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
     // Track resource-payment outcome per option (e.g., Earth Rite)
     const paidByOpt = new Map();
 
-    const pickOnce = (pool: any[]) => {
-        // Build the pool for this round (remove duplicates if unique)
-        const roundPool = unique
-            ? pool.filter(opt => !picked.includes(opt))
-            : pool.slice();
-
-        if (roundPool.length === 0) {
-            console.warn("No options left to pick.");
-            finalize();
-            return;
-        }
-
-        adapter.showChoiceModal(roundPool, (selectedIndex: number) => {
-            const selected = roundPool[selectedIndex];
-            logEvent("choosePick", { owner, index: selectedIndex, requiresER: !!selected?.requires?.earth_rite });
-            if (!selected) { finalize(); return; }
-
-            // Try to pay Earth Rite; if it fails, we still proceed and fizzle later.
-            let paid = true;
-            if (selected.requires?.earth_rite) {
-                paid = consumeEarthSigils(owner, selected.requires.earth_rite);
-                if (!paid) console.warn("Earth Rite cost not paid – effect fizzles");
-            }
-
-            // Record selection and payment result
-            picked.push(selected);
-            paidByOpt.set(selected, paid);
-
-            if (picked.length < selectCount) {
-                pickOnce(pool);
-            } else {
-                finalize();
-            }
-        });
-    };
-
     const finalize = () => {
         // One undo step for the whole choice confirmation
-        (doAction as any)(
+        doAction(
             "Confirm Choice",
             () => {
                 logEvent("chooseFinalize", { owner, picked: picked.length });
 
                 // Make Faith crest deterministic & undoable: increment once per mode actually chosen
                 for (let i = 0; i < picked.length; i++) {
-                    try { fireTrigger("select_mode", owner, { source: sourceCard || null }); } catch { }
+                    fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
                 }
 
                 // Flatten effects of all picked options in pick order
@@ -200,14 +162,54 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
                 } else {
                     adapter.render();
                 }
-                console.groupEnd();
+                // console.groupEnd();
             },
             { owner, picks: picked.map(p => p?.label || p?.name || "(opt)") },
-            { owner, picks: picked.map(opt => opt?.label || opt?.name || "(opt)") },
             { autoRender: false }
         );
     };
+
+    const pickOnce = (pool: any[]) => {
+        // Build the pool for this round (remove duplicates if unique)
+        const roundPool = unique
+            ? pool.filter(opt => !picked.includes(opt))
+            : pool.slice();
+
+        if (roundPool.length === 0) {
+            // console.warn("No options left to pick.");
+            finalize();
+            return;
+        }
+
+        adapter.showChoiceModal(roundPool, (selectedIndex: number) => {
+            const selected = roundPool[selectedIndex];
+            logEvent("choosePick", { owner, index: selectedIndex, requiresER: !!selected?.requires?.earth_rite });
+            if (!selected) { finalize(); return; }
+
+            // Try to pay Earth Rite; if it fails, we still proceed and fizzle later.
+            let paid = true;
+            if (selected.requires?.earth_rite) {
+                paid = consumeEarthSigils(owner, selected.requires.earth_rite);
+                if (!paid) {
+                    // console.warn("Earth Rite cost not paid – effect fizzles");
+                    logEvent("earthRiteFizzle", { owner, option: selected.label });
+                }
+            }
+
+            // Record selection and payment result
+            picked.push(selected);
+            paidByOpt.set(selected, paid);
+
+            if (picked.length < selectCount) {
+                pickOnce(pool);
+            } else {
+                finalize();
+            }
+        });
+    };
+
     // Start first round
     pickOnce(available);
     return "pending"; // Return pending to pause effect chain while modal is shown
 }
+

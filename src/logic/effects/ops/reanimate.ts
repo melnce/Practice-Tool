@@ -1,6 +1,5 @@
 // src/logic/effects/ops/reanimate.ts
 import { state } from "../../../core/gameState.js";
-import { getCardDetails } from "../../../data/cardDatabase.js";
 import { reanimateSummon } from "./summon.js";
 
 import { logEvent } from "../../../core/logger.js";
@@ -8,26 +7,41 @@ import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 
 
+
+// Local type to avoid 'any'
+type ReanimateEffect = Effect & {
+    max_cost?: number | string;
+    cost?: number | string;
+    x?: number | string;
+};
+
 export function handleReanimate(eff: Effect, owner: Player) {
-    const maxCost = parseInt(String((eff as any).max_cost ?? (eff as any).cost ?? (eff as any).x ?? 0)) || 0;
+    const rEff = eff as ReanimateEffect;
+    // Resolve prioritization: max_cost > cost > x > 0
+    const rawCost = rEff.max_cost ?? rEff.cost ?? rEff.x ?? 0;
+    const maxCost = parseInt(String(rawCost)) || 0;
+
+    // Determine graveyard
     const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
 
     // Find all followers in graveyard with cost <= maxCost
-    const eligible = grave.filter(card =>
-        card.type === "Follower" &&
-        (parseInt((card as any).cost) || 0) <= maxCost
-    );
+    const eligible = grave.filter(card => {
+        if (card.type !== "Follower") return false;
+        // cost on CardInstance might be number or string?
+        // Using explicit cast or check
+        const cCost = parseInt(String(card.cost ?? 0)) || 0;
+        return cCost <= maxCost;
+    });
 
     if (eligible.length === 0) {
-        console.log(`No eligible followers to reanimate (maxCost=${maxCost}). Grave size: ${grave.length}`);
-        // console.log("Grave dump:", grave.map(c => `${c.name} (${c.cost})`));
+        logEvent("reanimateNoTargets", { maxCost, graveSize: grave.length });
         return;
     }
 
     // Group by cost for prioritization
     const byCost: Record<number, CardInstance[]> = {};
     eligible.forEach(card => {
-        const cost = parseInt((card as any).cost) || 0;
+        const cost = parseInt(String(card.cost ?? 0)) || 0;
         byCost[cost] = byCost[cost] || [];
         byCost[cost].push(card);
     });
@@ -43,14 +57,14 @@ export function handleReanimate(eff: Effect, owner: Player) {
     }
 
     if (candidates.length === 0) {
-        console.log("No candidates found despite eligibility check");
+        logEvent("reanimateNoCandidates", { maxCost });
         return;
     }
 
     // Randomly select one from the highest available cost group
     const selected = candidates[state.rng.nextInt(candidates.length)];
     if (!selected) return;
-    logEvent("reanimatePick", { owner, name: selected.name, cost: parseInt(selected.cost as any) || 0 });
+    logEvent("reanimatePick", { owner, name: selected.name, cost: parseInt(String(selected.cost ?? 0)) || 0 });
 
     // The key changes are here:
     // 1. Do NOT remove the card from the graveyard.

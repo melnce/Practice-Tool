@@ -6,7 +6,7 @@ import { CardInstance, Player, Effect } from "../../../core/types.js";
 import { runEffects } from "../effects/index.js";
 import { pushPlayedHistory } from "./history.js";
 import { PlayOutcome } from "./types.js";
-import { applyKeywordsFromList } from "../keywords.js";
+
 import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
 
 import { initAmulet } from "../../effects/ops/summon_ops/init.js";

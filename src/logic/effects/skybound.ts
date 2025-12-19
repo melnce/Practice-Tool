@@ -1,6 +1,6 @@
 import { state } from "../../core/gameState.js";
 import { Player } from "../../core/types.js";
-import { logEvent } from "../../core/logger.js";
+
 import { adapter } from "../../core/adapter.js";
 
 // Helper to check for the keyword (case-insensitive)

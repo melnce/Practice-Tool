@@ -54,11 +54,36 @@ export function handleKeyword(
     }
 
     const keywordList = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [(eff as any).keyword].filter(Boolean);
+
+    // Fix: Basic "until_end_of_turn: true" on the generic effect should propagate to keywords that support it (like cant_attack)
+    const genericExpiryOpts = eff.until_end_of_turn ? {
+        expires_on_turn: (state.roundCount ?? 0)
+    } : undefined;
+
     for (const target of targets) {
         for (const k of keywordList) {
-            const name = (typeof k === "string" ? k : k?.name) || "";
-            const options = (typeof k === "object" ? k : undefined);
-            applyKeyword(target, name, options);
+            let name = "";
+            let options: any = genericExpiryOpts ? { ...genericExpiryOpts } : undefined;
+            // Inject the caster (owner) so apply.ts knows who applied it
+            if (!options) options = {};
+            options.request_owner = owner;
+
+            if (typeof k === "string") {
+                name = k;
+            } else {
+                name = k?.name || "";
+                // Merge specific options with generic expiry, specific takes precedence? 
+                // Usually generic EOT flag should override or coexist. 
+                // Let's merge: specific options > generic options
+                if (k) {
+                    options = { ...options, ...k };
+                    // If specific has expiration, it keeps it. If not, it gets generic.
+                }
+            }
+
+            if (name) {
+                applyKeyword(target, name, options);
+            }
         }
     }
     return { kind: "done" };

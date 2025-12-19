@@ -19,7 +19,7 @@ interface BarrierCard extends CardInstance {
     peak_defense?: number;
 }
 
-export function grantBarrier(card: BarrierCard, charges = 1) {
+export function grantBarrier(card: BarrierCard) {
     card.hasBarrier = true;
 }
 
@@ -90,12 +90,6 @@ export function dealDamage(target: BarrierCard, amount: number, source: CardInst
         // But logically, `state.activePlayer` might just be missing.
         // I'll check `state.activePlayer` usage.
 
-        const activePlayer = state.isBlueTurn ? "blue" : "red";
-        // I'll replace `state.activePlayer` with this derived value if I can confirm logic.
-        // But strictly, I should replicate JS. If JS accessed `state.activePlayer` and it was undefined, then `preventedBySuper` was never true (unless owner was null/undefined).
-        // If super-evolve behavior depends on it, I should fix it.
-        // I will use `(state as any).activePlayer` to be safe/compilable.
-
         const currentActive = (state as any).activePlayer || (state.isBlueTurn ? "blue" : "red");
 
         if (owner && currentActive === owner && target?.evoType === "super") {
@@ -106,7 +100,7 @@ export function dealDamage(target: BarrierCard, amount: number, source: CardInst
                 target.__uiSuperZero = true; // optional UI flag
             }
         }
-    } catch (_) { }
+    } catch { /* ignore */ }
 
     // Apply remaining damage
     const newDefense = Math.max(0, initialDefense - damageDealt);

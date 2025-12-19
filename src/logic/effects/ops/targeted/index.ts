@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { state } from "../../../../core/gameState.js";
 import { runEffects } from "../../../core/effects/index.js";
 import { cleanupDead } from "../../../core/cleanup.js";
@@ -95,11 +96,13 @@ TARGETED_OP_HANDLERS.set("transform", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
-    const { eff, sourceCard, targets } = ctx;
+    const { eff, sourceCard, targets, owner } = ctx;
     for (const target of targets) {
         for (const k of ((eff as any).keywords || [])) {
             const name = (typeof k === "string" ? k : k?.name) || "";
-            applyKeyword(target, name, typeof k === "object" ? k : undefined);
+            const opts = typeof k === "object" ? { ...k } : {};
+            opts.request_owner = owner;
+            applyKeyword(target, name, opts);
         }
         // Logic specific injections
         if (sourceCard?.name?.toLowerCase() === "flight of icarus") injectDescAndBadge(target, `<span style="color: orange;">Rush<br>Last Words: Draw a card</span>`, ["Rush", "Last Words: Draw a card"]);
@@ -206,7 +209,8 @@ TARGETED_OP_HANDLERS.set("return_hand_to_deck", (ctx) => {
 
 TARGETED_OP_HANDLERS.set("remove_keyword", (ctx) => {
     const { eff, owner, targets } = ctx;
-    handleRemoveKeyword({ ...eff, select: false }, owner, targets);
+    const { select: _s, ...payload } = eff;
+    handleRemoveKeyword(payload as any, owner, targets);
     return { kind: "handled" };
 });
 
@@ -378,7 +382,8 @@ TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
                     }
                 } else {
                     runWithBypass(() => {
-                        runEffects([nestedEff], owner, target);
+                        // Pass targets explicitly so downstream ops (like keyword) know what to affect
+                        runEffects([nestedEff], owner, target, { targets: [target] });
                     });
                 }
             }

@@ -68,8 +68,8 @@ export function crestAddCounter(owner: Player, crestName: string, counterName: s
     const crest = findCrest(owner, crestName);
     if (!crest) return false;
     crest.counters = crest.counters || {};
-    crest.counters[counterName] =
-        (crest.counters[counterName] || 0) + (parseInt(amount as any, 10) || 0);
+    const oldVal = crest.counters[counterName] || 0;
+    crest.counters[counterName] = oldVal + (parseInt(amount as any, 10) || 0);
     return true;
 }
 
