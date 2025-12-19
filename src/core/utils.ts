@@ -114,10 +114,13 @@ export function drawCard(hand: CardInstance[], deck: CardInstance[], owner: "blu
 
     if (!deck || deck.length === 0) {
         if (typeof document !== "undefined") {
-            showImageOverlayWithFallback(REAPER_URLS);
             const iHaveCrest = (owner === "blue"
                 ? (state.blueCrests || []).some(c => c.name === "Mjerrabaine, Great Manifest")
                 : (state.redCrests || []).some(c => c.name === "Mjerrabaine, Great Manifest"));
+
+            const overlayImages = iHaveCrest ? ["/images/victory_card.png"] : REAPER_URLS;
+            showImageOverlayWithFallback(overlayImages);
+
             const iWinOnDeckout = iHaveCrest || (owner === "blue" ? !!state.deckoutWinsBlue : !!state.deckoutWinsRed);
             const opp = (owner === "blue") ? "red" : "blue";
 
