@@ -5,6 +5,8 @@ import { logEvent } from "../../core/logger.js";
 import { runEffects } from "./effects/index.js";
 import { fireTrigger } from "./triggers.js";
 import { recordEvent } from "../../core/debugTimeline.js";
+import { clearCantAttack } from "./keywords/remove.js";
+
 
 // Helper: Resolve combat damage between two followers
 function resolveCombat(attacker: CardInstance, defender: CardInstance, owner: Player) { }
@@ -71,10 +73,13 @@ function isAttackForbidden(card: CardInstance) {
     }
     return !!(ks?.cantAttack || ks?.cantAttackFollowers || ks?.cantAttackLeaders);
 }
+
 function recomputeAttackFlags(card: CardInstance) {
     const eligible = !!(card.hasStorm || !card.justPlayed || card.hasRush);
     const swingsLeft = ((card as any).attacks_left ?? 0) > 0;
-    (card as any).can_attack = eligible && swingsLeft;
+    // Fix: Check isAttackForbidden
+    const forbidden = isAttackForbidden(card);
+    (card as any).can_attack = eligible && swingsLeft && !forbidden;
     card.isRush = !!(card.justPlayed && card.hasRush && !card.hasStorm);
 }
 function stripAmbushOnSelfAttack(attacker: CardInstance) { if (attacker.hasAmbush) attacker.hasAmbush = false; }
@@ -175,8 +180,11 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
     let dealtToAtk = 0;
 
     // Attacker deals damage to defender
-    dealtToDef = dealDamage(defender, atkDmg, attacker);
-    if (attackerHasBane && dealtToDef > 0) {
+    const dmgResultDef = dealDamage(defender, atkDmg, attacker);
+    dealtToDef = dmgResultDef.damage;
+
+    // Bane triggers if damage was dealt OR a barrier was popped (which means it "hit")
+    if (attackerHasBane && (dealtToDef > 0 || dmgResultDef.barrierPopped)) {
         // Route through centralized destroy (respects cannotBeDestroyed & super-protect)
         resolveDestroy(defender, defenderPlayer);
         logEvent("baneDestroy", { killer: attacker.name, victim: defender.name });
@@ -184,8 +192,10 @@ function _attackFollowerCore(attackerIdx: number, defenderIdx: number, attackerP
 
     // Defender deals back, unless attacker is invincible on attack this swing
     if (!isInvincibleOnAttack(attacker)) {
-        dealtToAtk = dealDamage(attacker, defDmg, defender);
-        if (defenderHasBane && dealtToAtk > 0) {
+        const dmgResultAtk = dealDamage(attacker, defDmg, defender);
+        dealtToAtk = dmgResultAtk.damage;
+
+        if (defenderHasBane && (dealtToAtk > 0 || dmgResultAtk.barrierPopped)) {
             resolveDestroy(attacker, attackerPlayer);
             logEvent("baneDestroy", { killer: defender.name, victim: attacker.name });
         }

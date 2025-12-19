@@ -12,10 +12,10 @@ export function reanimateSummon(c: any, owner: Player) {
     const board = boardOf(owner);
     if (board.length >= 5) return;
 
-    const base = getCardDetails(c.name);
+    const base = getCardDetails(c.id) || getCardDetails(c.name);
     if (!base) return;
-
     const copy = makeCardFromDB(base, owner);
+    pushToBoard(board, owner, copy);
 
     // Reanimates enter 'justPlayed', but Rush/Storm should still work this turn:
     // - Storm: can attack leaders & followers

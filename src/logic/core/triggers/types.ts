@@ -23,7 +23,8 @@ export type TriggerEventName =
     | "allied_follower_leaves_field"
     | "invoke"
     | "destroyed"
-    | "select_mode";
+    | "select_mode"
+    | "leader_damaged";
 
 export interface TriggerContext {
     initiator?: CardInstance;

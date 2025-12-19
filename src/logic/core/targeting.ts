@@ -56,7 +56,7 @@ export function highlightSelectable(cards: CardInstance[]) {
 
 export function clearSelectableFlags() {
     guardLifecycle("clearSelectableFlags");
-    [...state.blueBoard, ...state.redBoard, ...state.blueHand, ...state.redHand].forEach(c => {
+    [...state.blueBoard, ...state.redBoard, ...state.blueHand, ...state.redHand, ...state.blueGraveyard, ...state.redGraveyard].forEach(c => {
         if (c) delete (c as any).__uiSelectable;
     });
 }

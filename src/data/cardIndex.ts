@@ -137,7 +137,14 @@ export function buildCardIndex(input: BuildCardIndexInput): CardIndex {
 // Global Card Index (singleton for engine use)
 // ─────────────────────────────────────────────────────────────────────────────
 
-let globalCardIndex: CardIndex | null = null;
+
+// Use globalThis to bridge split-brain modules in test environment
+const GLOBAL_KEY = "__TEST_CARD_INDEX__";
+let globalCardIndex: CardIndex | null = (globalThis as any)[GLOBAL_KEY] || null;
+
+export function getGlobalCardIndex(): CardIndex | null {
+    return globalCardIndex;
+}
 
 /**
  * Initialize the global card index.
@@ -145,6 +152,8 @@ let globalCardIndex: CardIndex | null = null;
  */
 export function initCardDatabase(cards: BuildCardIndexInput): void {
     globalCardIndex = buildCardIndex(cards);
+    (globalThis as any)[GLOBAL_KEY] = globalCardIndex;
+    console.log(`DEBUG: cardIndex.ts - initCardDatabase called. globalCardIndex set. Global key '${GLOBAL_KEY}' set:`, !!(globalThis as any)[GLOBAL_KEY]);
 }
 
 /**
@@ -152,6 +161,15 @@ export function initCardDatabase(cards: BuildCardIndexInput): void {
  * Returns null if card not found or database not initialized.
  */
 export function getCardDetails(nameOrId: string): CardTemplate | null {
+    if (!globalCardIndex) {
+        console.log(`DEBUG: cardIndex.ts - globalCardIndex is null. Attempting recovery from global key '${GLOBAL_KEY}'...`);
+        globalCardIndex = (globalThis as any)[GLOBAL_KEY] || null;
+        console.log(`DEBUG: cardIndex.ts - Recovery result:`, !!globalCardIndex);
+    }
+    // Debug for specific key failure
+    if (nameOrId === "Goblin" && !globalCardIndex) {
+        console.log("DEBUG: cardIndex.ts - getCardDetails('Goblin') failed because globalCardIndex is still null.");
+    }
     if (!nameOrId || !globalCardIndex) return null;
 
     // 1. Exact ID match (8+ digits)

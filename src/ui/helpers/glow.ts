@@ -118,9 +118,8 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
     // ctx: { state, owner, isPlayersTurn, availablePP, isSpell }
     const { state, owner, isPlayersTurn, availablePP, isSpell } = ctx;
 
-    // attach state for some nested checks that need access (snowman army)
-    // @ts-ignore
-    card.__state = state;
+    // NOTE: Do NOT attach state to card (circular reference breaks cloning)
+    // State is available via ctx parameter for all checks
 
     // cost preview already computed by caller; use card.shownCost if present, else raw cost
     const shownCost = Number(card.shownCost ?? (card as any).cost ?? 0);

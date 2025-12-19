@@ -1,0 +1,293 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.0.15 [39m[90mC:/Projects/Practice Tool[39m
+
+node.exe : [90mstderr[2m | 
+tests/unit/op-signature-guard
+.test.ts
+Au caractère Ligne:1 : 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: ([90mst  
+  derr[2m...e-guard.test.   
+ ts:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+[22m[39mCannot set 
+navigator
+
+[90mstderr[2m | tests/unit/
+op-signature-guard.test.ts[2
+m > [22m[2mOp Signature 
+Guard[2m > [22m[2mshould 
+match the committed op 
+signature inventory
+[22m[39mOp Signature 
+Mismatch Detected!
+
+[NEW SIGNATURES] - These 
+appear in sets 0-3 but are 
+not in the inventory:
+  - select(has_condition,has_
+nested_effects,target:ally:fo
+llower) (e.g. Remi & Rami, 
+Two-Faced Witch)
+  - damage_follower_or_leader
+(amount:5,select:1,target:ene
+my:follower) (e.g. Ravening 
+Tentacles)
+  - gain_crest(has_nested_eff
+ects,name:Kagemitsu, 
+Enduring Warrior) (e.g. 
+Kagemitsu, Enduring Warrior)
+  - damage(amount:{self.attac
+k},has_condition,select:1,tar
+get:enemy:follower) (e.g. 
+Runeblade Conductor)
+  - damage_all(amount:{self.s
+pellboostCount},target:enemy:
+follower) (e.g. William, 
+Mysterian Student)
+  - damage(amount:{earth_coun
+ter_sum},select:1,target:enem
+y:follower) (e.g. Juno, 
+Visionary Alchemist)
+  - damage_all(amount:{last_d
+iscarded_cost},target:enemy:f
+ollower) (e.g. Burnite, 
+Anathema of Flame)
+  - damage_follower_or_leader
+(amount:3,select:1,target:ene
+my:follower) (e.g. Rage of 
+Serpents)
+  - damage_split_fixed(amount
+:{self.spellboostCount},targe
+t:enemy:follower) (e.g. 
+Flames of Chaos)
+  - select(has_condition,has_
+nested_effects,select:true,ta
+rget:ally:follower) (e.g. 
+Divine Guard)
+  - select(has_condition,has_
+nested_effects,target:enemy:f
+ollower) (e.g. Achim, Lord 
+of Despair)
+  - damage_all(amount:{self.f
+used_loot_unique},target:enem
+y:follower) (e.g. Sinciro, 
+Heir to Usurpation)
+  - damage_all(amount:{self.f
+used_loot_unique},target:enem
+y:leader) (e.g. Sinciro, 
+Heir to Usurpation)
+  - gain_crest(has_nested_eff
+ects,name:Octrice, 
+Hollowness Manifest) (e.g. 
+Octrice, Hollowness Manifest)
+  - select(has_condition,has_
+nested_effects,select:1,targe
+t:ally:hand) (e.g. Institute 
+of Truth)
+  - board_name_gate(has_neste
+d_effects,name:Prim, 
+Princess's Picnic) (e.g. 
+Nonja, Silent Maid)
+  - board_name_gate(has_neste
+d_effects,name:Izudia, 
+Annihilation Manifest) (e.g. 
+Annihilating Onslaught)
+  - damage_follower_or_leader
+(amount:1,select:1,target:ene
+my:follower) (e.g. Gilded 
+Blade)
+
+[MISSING SIGNATURES] - These 
+are in the inventory but no 
+longer in sets 0-3:
+  - board_name_gate(has_neste
+d_effects,name:Prim, 
+Princess's ...
+  - board_name_gate(has_neste
+d_effects,name:Izudia, 
+Annihilat...
+  - damage(amount:{self.attac
+k},has_condition,select:1,tar
+get...
+  - damage(amount:{earth_coun
+ter_sum},select:1,target:enem
+y:f...
+  - damage_all(amount:{self.s
+pellboostCount},target:enemy:
+fol...
+  - damage_all(amount:{last_d
+iscarded_cost},target:enemy:f
+oll...
+  - damage_all(amount:{self.f
+used_loot_unique},target:enem
+y:f...
+  - damage_all(amount:{self.f
+used_loot_unique},target:enem
+y:l...
+  - damage_follower_or_leader
+(amount:5,select:1,target:ene
+my:...
+  - damage_follower_or_leader
+(amount:3,select:1,target:ene
+my:...
+  - damage_follower_or_leader
+(amount:1,select:1,target:ene
+my:...
+  - damage_split_fixed(amount
+:{self.spellboostCount},targe
+t:e...
+  - gain_crest(has_nested_eff
+ects,name:Kagemitsu, 
+Enduring Wa...
+  - gain_crest(has_nested_eff
+ects,name:Octrice, 
+Hollowness Ma...
+  - select(has_condition,has_
+nested_effects,target:ally:fo
+llo...
+  - select(has_condition,has_
+nested_effects,select:true,ta
+rge...
+  - select(has_condition,has_
+nested_effects,target:enemy:f
+oll...
+  - select(has_condition,has_
+nested_effects,select:1,targe
+t:a...
+
+To fix this:
+1. Run 'npx tsx scripts/scan-
+op-signatures.ts' to update 
+the inventory.
+2. If you added a new 
+feature, ensure you have 
+added corresponding tests in 
+'tests/unit/ops-signatures.te
+st.ts'.
+3. Commit the updated 
+inventory file.
+
+ [31mÔØ»[39m tests/unit/op-signature-guard.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 14[2mms[22m[39m
+[31m     [31m├ù[31m should match the committed op signature inventory[39m[32m 14[2mms[22m[39m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3
+9m[1m[41m Failed Tests 1 [
+49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m tes
+ts/unit/op-signature-guard.te
+st.ts[2m > [22mOp 
+Signature Guard[2m > 
+[22mshould match the 
+committed op signature 
+inventory
+[31m[1mAssertionError[22m:
+ expected [ ÔÇª(18) ] to 
+deeply equal [][39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   "select(has_conditio
+n,has_nested_effects,target:a
+lly:follower)",[39m
+[31m+   "damage_follower_or_
+leader(amount:5,select:1,targ
+et:enemy:follower)",[39m
+[31m+   "gain_crest(has_nest
+ed_effects,name:Kagemitsu, 
+Enduring Warrior)",[39m
+[31m+   "damage(amount:{self
+.attack},has_condition,select
+:1,target:enemy:follower)",[
+39m
+[31m+   "damage_all(amount:{
+self.spellboostCount},target:
+enemy:follower)",[39m
+[31m+   "damage(amount:{eart
+h_counter_sum},select:1,targe
+t:enemy:follower)",[39m
+[31m+   "damage_all(amount:{
+last_discarded_cost},target:e
+nemy:follower)",[39m
+[31m+   "damage_follower_or_
+leader(amount:3,select:1,targ
+et:enemy:follower)",[39m
+[31m+   "damage_split_fixed(
+amount:{self.spellboostCount}
+,target:enemy:follower)",[39
+m
+[31m+   "select(has_conditio
+n,has_nested_effects,select:t
+rue,target:ally:follower)",[
+39m
+[31m+   "select(has_conditio
+n,has_nested_effects,target:e
+nemy:follower)",[39m
+[31m+   "damage_all(amount:{
+self.fused_loot_unique},targe
+t:enemy:follower)",[39m
+[31m+   "damage_all(amount:{
+self.fused_loot_unique},targe
+t:enemy:leader)",[39m
+[31m+   "gain_crest(has_nest
+ed_effects,name:Octrice, 
+Hollowness Manifest)",[39m
+[31m+   "select(has_conditio
+n,has_nested_effects,select:1
+,target:ally:hand)",[39m
+[31m+   "board_name_gate(has
+_nested_effects,name:Prim, 
+Princess's Picnic)",[39m
+[31m+   "board_name_gate(has
+_nested_effects,name:Izudia, 
+Annihilation Manifest)",[39m
+[31m+   "damage_follower_or_
+leader(amount:1,select:1,targ
+et:enemy:follower)",[39m
+[31m+ ][39m
+
+[36m [2mÔØ»[22m tests/unit
+/op-signature-guard.test.ts:
+[2m77:31[22m[39m
+    [90m 75| [39m        }
+    [90m 76| [39m
+    [90m 77| [39m        [
+34mexpect[39m(newSignatures)
+[33m.[39m[34mtoEqual[39m(
+[])[33m;[39m
+    [90m   | [39m          
+                    
+[31m^[39m
+    [90m 78| [39m        [
+34mexpect[39m(missingSignatu
+res)[33m.[39m[34mtoEqual[
+39m([])[33m;[39m
+    [90m 79| [39m    
+})[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m   Start at [22m 21:35:27
+[2m   Duration [22m 201ms[2m (transform 56ms, setup 60ms, import 15ms, tests 14ms, environment 0ms)[22m
+

@@ -187,3 +187,9 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
     // Trace: dispatch_end
     if (trace) trace.emit({ kind: "dispatch_end", processed: processedCount, remaining: queue.length });
 }
+
+// --- Dependency Injection Registration ---
+// Register runEffects with cleanup.ts so Last Words can trigger
+registerRunEffectsInCleanup(runEffects);
+// Register runEffects with triggers/process.ts so board/hand triggers can execute effects
+registerRunEffects(runEffects);

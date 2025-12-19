@@ -3,7 +3,7 @@ import { logEvent } from "../../../../core/logger.js";
 
 import { applyKeywordsFromList, applyKeyword } from "../../../core/keywords.js";
 import { CardInstance, Effect, Player } from "../../../../core/types.js";
-import { getCardDetails } from "../../../../data/cardDatabase.js";
+import { getCardDetails, isCardDatabaseInitialized } from "../../../../data/cardIndex.js";
 import { adapter } from "../../../../core/adapter.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
 import { boardOf, normalizeName, safeClone } from "./utils.js";
@@ -23,6 +23,7 @@ export function summonNamed(eff: Effect, owner: Player) {
     const data = getCardDetails(name);
     if (!data) {
         console.error(`summonNamed: Card "${name}" not found in DB`);
+        console.log(`DEBUG: direct.ts - isCardDatabaseInitialized: ${isCardDatabaseInitialized()}`);
         return;
     }
 

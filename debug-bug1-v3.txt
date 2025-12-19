@@ -1,0 +1,99 @@
+﻿
+ RUN  v4.0.15 C:/Projects/Practice Tool
+
+node.exe : stderr | tests/uni
+t/bugs/bug1_earth_sigil.test.
+ts
+Au caractère Ligne:1 : 1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (stderr   
+  | tests/...h_sigil.test.   
+ ts:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+Cannot set navigator
+
+stdout | tests/unit/bugs/bug1_earth_sigil.test.ts > Bug 1: Earth Sigil Counter Initialization > Witch's New Brew should start with 1 earth sigil count
+Instance: {
+  "id": "10031210",
+  "name": "Witch's New Brew",
+  "cost": "1",
+  "attack": "0",
+  "defense": "0",
+  "type": "Amulet",
+  "class": "Runecraft",
+  "rarity": "Bronze",
+  "tribes": [
+    "Earth Sigil"
+  ],
+  "description": "Fanfare: Draw a card.\nEarth Sigil\nEngage (1): Gain an earth sigil.",
+  "base_image": "https://static.dotgg.gg/shadowverse/cards/10031210.webp",
+  "evo_image": "",
+  "set": "[10000] Basic",
+  "url": "https://shadowverse.gg/cards/10031210-witchs-new-brew",
+  "engageSacrifice": false,
+  "fanfare": [
+    {
+      "op": "draw",
+      "count": 1
+    }
+  ],
+  "keywords": [
+    {
+      "name": "Counter",
+      "key": "earth",
+      "count": 1,
+      "destroyOnEmpty": true
+    },
+    {
+      "name": "Engage",
+      "cost": 1,
+      "effects": [
+        {
+          "op": "add_counter",
+          "key": "earth",
+          "amount": 1
+        }
+      ]
+    }
+  ],
+  "uid": "uid_bpexw0z1",
+  "owner": "blue",
+  "keywordState": {
+    "counters": {
+      "earth": 1
+    },
+    "engageEffects": [
+      {
+        "op": "add_counter",
+        "key": "earth",
+        "amount": 1
+      }
+    ],
+    "engageCost": 1,
+    "engageOncePerTurn": true
+  },
+  "hasEngage": true,
+  "counters": {
+    "earth": 1
+  },
+  "destroyOnEmpty": true,
+  "zone": "board"
+}
+
+ Ô£ô tests/unit/bugs/bug1_earth_sigil.test.ts (1 test) 3ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  22:48:29
+   Duration  325ms (transform 169ms, setup 51ms, import 163ms, tests 3ms, environment 0ms)
+

@@ -62,6 +62,7 @@ export function bounceToHand(card: CardInstance) {
         else if (owner === "red") grave = state.redGraveyard;
 
         if (grave) {
+            fresh.zone = "graveyard";
             grave.push(fresh);
             logEvent("burn_to_grave", { owner, card: fresh.name, uid: fresh.uid });
         }
@@ -71,11 +72,11 @@ export function bounceToHand(card: CardInstance) {
 }
 
 // Handle "return_to_hand" effect
-export function handleReturnToHand(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any) {
+export function handleReturnToHand(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
     // allow followers + amulets by default; narrow if filters.type is given
     console.log(`[BounceOp] HandleReturnToHand Target=${eff.target} Owner=${owner} Source=${sourceCard?.name}#${sourceCard?.uid}`);
 
-    let pool = getPool(eff.target as any, owner, sourceCard).filter(c => c.type === "Follower" || c.type === "Amulet");
+    let pool = getPool(eff.target as any, owner, sourceCard, eff.condition, context).filter(c => c.type === "Follower" || c.type === "Amulet");
     console.log(`[BounceOp] Pool size after init: ${pool.length}`);
 
     if ((eff as any).filters?.type) {

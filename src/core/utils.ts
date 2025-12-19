@@ -97,6 +97,7 @@ export function pushToHand(hand: CardInstance[], card: CardInstance | any): bool
         burnPreview(card);           // burn visual
         return false;                // goes to void
     }
+    card.zone = "hand";
     hand.push(card);
     return true;
 }

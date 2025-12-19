@@ -1,177 +1,100 @@
 
-import { registerOp, EffectResult } from "../registry.js";
-import { enqueueManyFront } from "../queue.js";
 import { state } from "../../../../core/gameState.js";
-import { logEvent } from "../../../../core/logger.js";
-import { handleSelect, getPool } from "../../targeting.js";
-import { runEffects } from "../index.js"; // Needed for select runner context
+import { registerOp, EffectCtx } from "../registry.js";
+import { getPool, handleSelect, TargetContext } from "../../targeting.js";
+import { runEffects } from "../index.js";
 import {
-    handleSuperEvoGate, handleEvolvedSelfGate, amuletCountGate, hasNoDuplicatesInDeck,
-    noAllyAttackedThisTurn, handleBoardNameGate, handleBothMaxPPGate, handleRallyGate,
     handleSelfCostGate, handleSuperEvolvedAlliedGate, handleMaxPPGate,
-    handleSkyboundArtGate, handleEvolvedAlliedGate
+    handleSkyboundArtGate, handleEvolvedAlliedGate,
+    handleBoardNameGate, handleBothMaxPPGate, handleEvolvedSelfGate,
+    handleSuperEvoGate, hasNoDuplicatesInDeck, noAllyAttackedThisTurn,
+    handleRallyGate, amuletCountGate
 } from "../../../effects/gates/gates.js";
 import { handleComboAdd, handleComboGate } from "../../../effects/gates/combo.js";
 import { handCountGate } from "../../../effects/gates/handCountGate.js";
 import { handleChoose } from "../../../effects/ops/choose.js";
 import { handleChooseBonusAdd } from "../../../effects/ops/misc.js";
 import { handleRepeatEffect } from "../../../effects/repeat.js";
-import { handleEvolveSelf, handleEvolveLastSummoned } from "../../../effects/ops/evolve.js";
+import { handleEvolveSelf, handleEvolveTarget, handleEvolveLastSummoned } from "../../../effects/ops/evolve.js";
+import { Effect, CardInstance } from "../../../../core/types.js";
+import { logEvent } from "../../../../core/logger.js";
 
-const doLog = (event: string, payload: any) => logEvent(event, payload);
+const stub = (op: string) => (eff: Effect, ctx: EffectCtx) => {
+    // console.warn(`[Stub] Op '${op}' called but not implemented.`);
+};
 
-export function registerMiscEffects() {
-
-    // Select / Choose
-    registerOp("select", (eff, ctx): EffectResult => {
-        if (eff.target && eff.target.startsWith("hand:")) {
-            const h = ctx.owner === "blue" ? state.blueHand : state.redHand;
-            console.warn(`[index.ts select] StateID: ${(state as any).__debugId} HandSize: ${h.length}`);
-        }
-
-        if (eff.op === "select" || eff.op === "target") {
-            // Pass runner: runEffects to context so handleSelect can re-enter
-            const opCtx = { ...(ctx.context as any), runner: runEffects };
-            const status = handleSelect(eff, ctx.owner, ctx.sourceCard, ctx.queue, opCtx);
-            if (status === "pending") return "pending";
-        }
-    });
-
-    // target is an alias for select (same handler)
-    registerOp("target", (eff, ctx): EffectResult => {
-        const opCtx = { ...(ctx.context as any), runner: runEffects };
-        const status = handleSelect(eff, ctx.owner, ctx.sourceCard, ctx.queue, opCtx);
-        if (status === "pending") return "pending";
-    });
-
-    registerOp("choose", (eff, ctx) => {
-        if (handleChoose(eff, ctx.owner, ctx.sourceCard, ctx.queue) === "pending") return "pending";
-    });
-    registerOp("choose_bonus_add", (eff, ctx) => handleChooseBonusAdd(ctx.owner, eff));
-
-    // Evolve
-    registerOp("evolve", (eff, ctx) => {
-        import("../../../effects/ops/evolve.js").then(({ handleEvolveTarget }) => handleEvolveTarget(eff, ctx.owner, ctx.context as any));
-    });
-    registerOp("evolve_self", (eff, ctx) => {
-        if (ctx.sourceCard) {
-            handleEvolveSelf(ctx.sourceCard, ctx.owner, { spendPoint: false });
-            doLog("evolve", { owner: ctx.owner, card: ctx.sourceCard.name });
-        }
-    });
-    registerOp("super_evolve_self", (eff, ctx) => {
-        if (ctx.sourceCard) handleEvolveSelf(ctx.sourceCard, ctx.owner, { mode: "super", spendPoint: false });
-    });
-    registerOp("evolve_last_summoned", (eff, ctx) => {
-        handleEvolveLastSummoned(ctx.owner);
-        doLog("evolve", { owner: ctx.owner, card: "(last summoned)" });
-    });
-    registerOp("evolve_all_unevolved_allies", (eff, ctx) => {
-        const board = ctx.owner === "blue" ? state.blueBoard : state.redBoard;
-        for (const ally of board) {
-            if (ally.type === "Follower" && !ally.hasEvolved) {
-                handleEvolveSelf(ally, ctx.owner, { spendPoint: false });
-            }
-        }
-        doLog("evolve", { owner: ctx.owner, card: "(multi)" });
-    });
-    registerOp("evolve_all_allies_named", (eff, ctx) => {
-        const board = ctx.owner === "blue" ? state.blueBoard : state.redBoard;
-        const name = eff.name;
-        for (const c of board) {
-            if ((c.name === name || c.base_name === name) && c.type === "Follower" && !c.hasEvolved) {
-                handleEvolveSelf(c, ctx.owner, { spendPoint: false });
-            }
-        }
-        doLog("evolve", { owner: ctx.owner, card: `(named ${name})` });
-    });
-    registerOp("super_evolve_all_unevolved_allies", (eff, ctx) => {
-        const board = ctx.owner === "blue" ? state.blueBoard : state.redBoard;
-        for (const ally of board) {
-            if (ally.type === "Follower" && !ally.hasEvolved) {
-                handleEvolveSelf(ally, ctx.owner, { mode: "super", spendPoint: false });
-            }
-        }
-        doLog("evolve", { owner: ctx.owner, card: "(multi-super)" });
-    });
-    registerOp("super_evolve_ally", (eff, ctx) => {
-        import("../../../evolveUtils.js").then(({ superEvolveAllyFromContext }) => {
-            superEvolveAllyFromContext(ctx.owner, ctx.sourceCard, ctx.context);
-        });
-    });
-
-    // super_evolve - evolves a target with super evolution
-    registerOp("super_evolve", (eff, ctx) => {
-        // If there's a selected target, super-evolve it; otherwise evolve source if "self"
-        const target = (ctx.context as any)?.selectedCard || (ctx.context as any)?.targetCard;
-        if (target && target.type === "Follower") {
-            handleEvolveSelf(target, ctx.owner, { mode: "super", spendPoint: false });
-            doLog("evolve", { owner: ctx.owner, card: target.name, mode: "super" });
-        } else if (eff.target === "self" && ctx.sourceCard) {
-            handleEvolveSelf(ctx.sourceCard, ctx.owner, { mode: "super", spendPoint: false });
-            doLog("evolve", { owner: ctx.owner, card: ctx.sourceCard.name, mode: "super" });
-        }
-    });
-
-    // Gates
-    registerOp("amulet_count_gate", (eff, ctx) => {
-        const next = amuletCountGate(ctx.owner, eff) ? (eff.effects || []) : (eff.else_effects || []);
-        if (next.length) enqueueManyFront(ctx, next);
-    });
-    registerOp("board_name_gate", (eff, ctx) => {
-        const board = ctx.owner === "blue" ? state.blueBoard : state.redBoard;
-        const hasCard = board.some(c => c?.name === eff.name);
-        const next = hasCard ? (eff.effects || []) : (eff.else_effects || []);
-        if (next.length) enqueueManyFront(ctx, next);
-    });
-    registerOp("both_max_pp_gate", (eff, ctx) => handleBothMaxPPGate(eff, ctx.queue));
-    registerOp("combo_gate", (eff, ctx) => {
-        if (handleComboGate(ctx.owner, eff as any)) { enqueueManyFront(ctx, eff.effects || []); }
-        else { enqueueManyFront(ctx, eff.else_effects || []); }
-    });
-    registerOp("combo_add", (eff, ctx) => handleComboAdd(ctx.owner, eff as any));
-
-    registerOp("evolved_self_gate", (eff, ctx) => { handleEvolvedSelfGate(eff, ctx.owner, ctx.sourceCard!, ctx.queue); });
-    registerOp("super_evolve_gate", (eff, ctx) => { if (handleSuperEvoGate(ctx.owner)) enqueueManyFront(ctx, eff.effects || []); });
-    registerOp("super_evolved_self_gate", (eff, ctx) => {
-        const isSuper = ctx.sourceCard && ctx.sourceCard.evoType === "super";
-        const next = (isSuper ? eff.effects : eff.else_effects) || [];
-        if (next.length) enqueueManyFront(ctx, next);
-    });
-    registerOp("evolved_allied_gate", (eff, ctx) => handleEvolvedAlliedGate(ctx.owner, eff, ctx.queue));
-    registerOp("super_evolved_allied_gate", (eff, ctx) => handleSuperEvolvedAlliedGate(ctx.owner, eff, ctx.queue));
-
-    registerOp("hand_count_gate", (eff, ctx) => {
-        const pass = handCountGate(ctx.owner, eff);
-        const next = pass ? (eff.effects || []) : (eff.else_effects || []);
-        if (next.length) enqueueManyFront(ctx, next);
-    });
-    registerOp("max_pp_gate", (eff, ctx) => handleMaxPPGate(ctx.owner, eff, ctx.queue));
-    registerOp("nested_effects", (eff, ctx) => { if (eff.effects?.length) enqueueManyFront(ctx, eff.effects); });
-    registerOp("no_ally_attacked_this_turn_gate", (eff, ctx) => {
-        const pass = noAllyAttackedThisTurn(ctx.owner);
-        const next = pass ? (eff.effects || []) : (eff.else_effects || []);
-        if (next.length) enqueueManyFront(ctx, next);
-    });
-    registerOp("no_duplicates_in_deck_gate", (eff, ctx) => {
-        if (hasNoDuplicatesInDeck(ctx.owner)) { enqueueManyFront(ctx, eff.effects || []); }
-    });
-    registerOp("rally_gate", (eff, ctx) => handleRallyGate(ctx.owner, eff, ctx.queue));
-    registerOp("repeat_effect", (eff, ctx) => handleRepeatEffect(eff, ctx.owner, ctx.sourceCard, ctx.queue));
-    registerOp("skybound_art_gate", (eff, ctx) => {
-        if (handleSkyboundArtGate(ctx.owner, eff, ctx.sourceCard)) { enqueueManyFront(ctx, eff.effects || []); }
-        else { enqueueManyFront(ctx, eff.else_effects || []); }
-    });
-    registerOp("self_cost_gate", (eff, ctx) => handleSelfCostGate(ctx.sourceCard!, eff, ctx.queue));
-
-    registerOp("set_deckout_victory", (eff, ctx) => {
-        const enable = (eff as any).enabled !== false;
-        if (ctx.owner === "blue") state.deckoutWinsBlue = enable; else state.deckoutWinsRed = enable;
-    });
-
-    registerOp("himeka_crest_effect", (eff, ctx) => console.warn("Legacy himeka op used"));
-    registerOp("dragonsign", (eff, ctx) => { /* no-op in switch currently, likely removed/stubbed */ });
+// Inline Helper for Super Evolved Self Gate (Missing in gates.js)
+function handleSuperEvolvedSelfGate(eff: Effect, owner: string, sourceCard: CardInstance, effectsQueue: Effect[]) {
+    const isSuper = !!(sourceCard && sourceCard.type === "Follower" && sourceCard.evoType === "super");
+    // @ts-ignore
+    const next = (isSuper ? eff.effects : eff.else_effects) || [];
+    if (next.length && Array.isArray(effectsQueue)) {
+        effectsQueue.unshift(...next);
+    }
+    logEvent("gateBranch", { gate: "super_evolved_self", branch: isSuper ? "effects" : "else_effects" });
+    return "done";
 }
 
-import { MISC_OPS } from "./miscOps.js";
-export const OPS = MISC_OPS;
+export function registerMiscEffects() {
+    registerOp("choose", handleChoose as any);
+    registerOp("choose_bonus_add", handleChooseBonusAdd as any);
+
+    // Generic Op: Nested Effects
+    registerOp("nested_effects", (eff, ctx) => {
+        const nested = (eff as any).effects;
+        if (Array.isArray(nested) && nested.length > 0) {
+            runEffects(nested, ctx.owner, ctx.sourceCard || null, ctx.context);
+        }
+    });
+
+    // Generic Op: Select (Delegates to targeting.ts implementation)
+    registerOp("select", (eff, ctx) => {
+        // Ensure ctx.context has a runner if missing (targeting expects one for auto-resolve)
+        const tCtx: TargetContext = ctx.context || {};
+        if (!tCtx.runner) {
+            tCtx.runner = runEffects;
+        }
+
+        const res = handleSelect(eff, ctx.owner, ctx.sourceCard, ctx.queue, tCtx);
+        if (res === "pending") return "pending";
+    });
+
+    // Stubs
+    registerOp("target", stub("target")); // 'target' usually usually triggers checkTargeting?
+
+    // Evolve Family
+    registerOp("evolve", handleEvolveTarget as any);
+    registerOp("evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner));
+    registerOp("super_evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner, { mode: "super" }));
+    registerOp("evolve_last_summoned", handleEvolveLastSummoned as any);
+    registerOp("evolve_all_unevolved_allies", stub("evolve_all_unevolved_allies"));
+    registerOp("evolve_all_allies_named", stub("evolve_all_allies_named"));
+    registerOp("super_evolve_all_unevolved_allies", stub("super_evolve_all_unevolved_allies"));
+    registerOp("super_evolve_ally", stub("super_evolve_ally"));
+    registerOp("super_evolve", stub("super_evolve"));
+
+    // Gates
+    registerOp("amulet_count_gate", amuletCountGate as any);
+    registerOp("board_name_gate", (handleBoardNameGate || stub("board_name_gate")) as any);
+    registerOp("both_max_pp_gate", (handleBothMaxPPGate || stub("both_max_pp_gate")) as any);
+    registerOp("combo_gate", handleComboGate as any);
+    registerOp("combo_add", handleComboAdd as any);
+    registerOp("evolved_self_gate", (handleEvolvedSelfGate || stub("evolved_self_gate")) as any);
+    registerOp("super_evolve_gate", (handleSuperEvoGate || stub("super_evolve_gate")) as any);
+    registerOp("super_evolved_self_gate", (handleSuperEvolvedSelfGate as any));
+    registerOp("evolved_allied_gate", handleEvolvedAlliedGate as any);
+    registerOp("super_evolved_allied_gate", handleSuperEvolvedAlliedGate as any);
+    registerOp("hand_count_gate", handCountGate as any);
+    registerOp("max_pp_gate", handleMaxPPGate as any);
+
+    registerOp("no_ally_attacked_this_turn_gate", (noAllyAttackedThisTurn || stub("no_ally_attacked_this_turn_gate")) as any);
+    registerOp("no_duplicates_in_deck_gate", (hasNoDuplicatesInDeck || stub("no_duplicates_in_deck_gate")) as any);
+    registerOp("rally_gate", (handleRallyGate || stub("rally_gate")) as any);
+
+    registerOp("repeat_effect", handleRepeatEffect as any);
+    registerOp("skybound_art_gate", handleSkyboundArtGate as any);
+    registerOp("self_cost_gate", handleSelfCostGate as any);
+
+    registerOp("set_deckout_victory", stub("set_deckout_victory"));
+    registerOp("dragonsign", stub("dragonsign"));
+}

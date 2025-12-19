@@ -141,10 +141,20 @@ export function processCrestEvent(owner: Player, event: string) {
     if (!crests) return [];
     const out: Effect[] = [];
 
+    (state as any).__DEBUG_CREST_LOOP_STARTED = true;
+    (state as any).__DEBUG_CREST_COUNT = crests.length;
+
     for (const crest of crests) {
-        if (!Array.isArray(crest.triggers)) continue;
+        if (!Array.isArray(crest.triggers)) {
+            (state as any).__DEBUG_CREST_SKIPPED = true;
+            console.log("[Crest] Skipping crest (no triggers):", crest.name);
+            continue;
+        }
         for (const t of crest.triggers) {
+            (state as any).__DEBUG_TRIGGER_CHECKED = true;
+            console.log("[Crest] Checking trigger:", t.event, "vs", event);
             if (t.event !== event) continue;
+            (state as any).__DEBUG_TRIGGER_MATCHED = true;
             if (t.once_per_turn && t.usedThisTurn) continue;
             if (t.effects?.length) out.push(...t.effects);
             if (t.once_per_turn) t.usedThisTurn = true;

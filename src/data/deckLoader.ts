@@ -7,9 +7,12 @@ import { logEvent } from "../core/logger.js";
 import { Player } from "../core/types.js";
 
 
-function normalizeDeck(raw: any) {
+function normalizeDeck(raw: any, deckFile?: string) {
     const expanded: any[] = [];
     const isOrdered = !!raw.ordered;
+
+    // Testing decks: skip shuffle to preserve deterministic order
+    const isTestDeck = deckFile?.toLowerCase().includes("0_testing");
 
     if (Array.isArray(raw)) {
         // Simple array of card objects or names
@@ -25,7 +28,7 @@ function normalizeDeck(raw: any) {
             }
         }
     }
-    if (isOrdered) {
+    if (isOrdered || isTestDeck) {
         // We draw with deck.pop(), so reverse to make JSON[0] the first drawn.
         return expanded.reverse();
     }
@@ -35,8 +38,8 @@ function normalizeDeck(raw: any) {
     return expanded;
 }
 
-function enrichDeck(rawDeck: any) {
-    const deck = normalizeDeck(rawDeck);
+function enrichDeck(rawDeck: any, deckFile?: string) {
+    const deck = normalizeDeck(rawDeck, deckFile);
     return deck.map(card => {
         // Prefer ID lookup if available, otherwise name
         const fullData = (card.id && getCardDetails(String(card.id)))
@@ -66,7 +69,7 @@ async function fetchDeck(deckId: string) {
 export async function loadBlueDeck(deckName: string) {
     const loaded = await fetchDeck(deckName);
     state.blueDeckFile = loaded.__deckFile;
-    const enriched = enrichDeck(loaded);
+    const enriched = enrichDeck(loaded, loaded.__deckFile);
 
     state.blueDeck.length = 0;
     state.blueDeck.push(...enriched);
@@ -86,7 +89,7 @@ export async function loadBlueDeck(deckName: string) {
 export async function loadRedDeck(deckName: string) {
     const loaded = await fetchDeck(deckName);
     state.redDeckFile = loaded.__deckFile;
-    const enriched = enrichDeck(loaded);
+    const enriched = enrichDeck(loaded, loaded.__deckFile);
 
     state.redDeck.length = 0;
     state.redDeck.push(...enriched);

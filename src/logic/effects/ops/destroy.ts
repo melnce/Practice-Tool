@@ -93,6 +93,7 @@ export function handleDestroyAll(eff: Effect, owner: Player, sourceCard: CardIns
                 logEvent("destroy", { target: card.name, uid: card.uid, type: card.type, reason: "destroy_all" });
                 const removed = board.splice(idx, 1)[0];
                 if (!removed) continue;
+                removed.zone = "graveyard";
                 grave.push(removed);
                 if (cardOwner === "blue") state.blueShadows++;
                 else state.redShadows++;
@@ -171,6 +172,7 @@ export function resolveDestroy(target: CardInstance, owner: Player) {
         if (idx !== -1) {
             const removed = board.splice(idx, 1)[0];
             if (!removed) return false;
+            removed.zone = "graveyard";
             grave.push(removed);
             const lw = removed.keywordState?.lastWordsEffects || (removed as any).lastWordsEffects;
             if (removed.hasLastWords && Array.isArray(lw)) {
@@ -195,6 +197,7 @@ export function destroyAlliedAmulets(owner: Player) {
         const removed = board.splice(i, 1)[0];
         if (!removed) continue;
         logEvent("destroy", { target: removed.name, uid: removed.uid, type: "Amulet", reason: "destroy_allied_amulets" });
+        removed.zone = "graveyard";
         grave.push(removed);
         if (owner === "blue") state.blueShadows++;
         else state.redShadows++;

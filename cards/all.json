@@ -13608,7 +13608,7 @@
     "fanfare": [
       {
         "op": "crest_pay_counter",
-        "crest": "Faith",
+        "crest": "Faith: Sham-Nacha, Heir to Entwining",
         "counter": "faith",
         "amount": 10,
         "on_success_effects": [
@@ -16218,6 +16218,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10434120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10434120-cagliostro-genius-alchemist",
+    "fanfare": [],
     "evolve": [],
     "superevolve": [],
     "keywords": [],

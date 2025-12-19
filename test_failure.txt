@@ -1,0 +1,5 @@
+Expected 1 hit, got 0. Triggers check: [{"event":"end_of_turn","effects":[{"op":"nested_effects","effects":[{"op":"select","mode":"random","qty":1,"target":"enemy:follower","condition":{"attack_lte":4,"exclude_keyword":"cant_attack"},"effects":[{"op":"keyword","keywords":[{"name":"cant_attack","until_opponent_eot":true}]},{"op":"grant_trigger","trigger":{"event":"end_of_turn","condition":{"whose_turn":"self"},"effects":[{"op":"banish_self"}]}}]}]}]}]
+Board State:
+Enemy One (2/2): [undefined]
+Enemy Two (4/4): [undefined]
+Enemy Three (5/5): [undefined]

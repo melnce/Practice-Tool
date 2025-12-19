@@ -307,11 +307,15 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
 
         // === attack highlight (own board)
         if (isBoard && isFollower && card.can_attack && !card.hasAttacked && isMyBoard) {
-            if (!card.cantAttack && !card.cantAttackFollowers && !card.cantAttackLeaders && !card.hasCantAttack) {
+            // Check keywordState for cant_attack restrictions
+            const ks = card.keywordState || {};
+            const hasCantAttack = ks.cantAttack || ks.cantAttackFollowers || ks.cantAttackLeaders || ks.hasCantAttack;
+            if (!hasCantAttack) {
                 if (card.isRush && card.justPlayed) div.classList.add("rush-glow");
                 else div.classList.add("can-attack");
             }
         }
+
 
 
 

@@ -86,11 +86,13 @@ export function applyFilters(pool: CardInstance[], query: TargetQuery, env: Targ
     if (cond.exclude_keyword) {
         const keywordName = String(cond.exclude_keyword).toLowerCase();
         filtered = filtered.filter(c => {
-            if (!Array.isArray(c?.keywords)) return true;
-            return !c.keywords!.some((k: any) => {
+            const hasInArray = Array.isArray(c?.keywords) && c.keywords!.some((k: any) => {
                 const kwName = typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
                 return kwName === keywordName;
             });
+            const hasInState = (keywordName === "cant_attack" && (c?.keywordState?.hasCantAttack || c?.keywordState?.cantAttack));
+
+            return !(hasInArray || hasInState);
         });
     }
 

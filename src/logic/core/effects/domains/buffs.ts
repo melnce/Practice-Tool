@@ -52,7 +52,7 @@ export function registerBuffEffects() {
     // Keywords
     registerOp("keyword", (eff, ctx) => {
         const tCtx = getTargetingContext(ctx);
-        const merged = { ...tCtx, sourceCard: ctx.sourceCard };
+        const merged = { ...tCtx, sourceCard: ctx.sourceCard, targets: (ctx.context as any)?.targets };
         // isTargetedEffect check logic
         const opCtx = { ...merged, isTargetedEffect: !!(eff.select || eff.select_count) };
 

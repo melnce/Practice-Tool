@@ -113,7 +113,9 @@ export function createInitialState(seed?: number | string): GameState {
 }
 
 // -- 4. Exported Singleton --
-export const state: GameState = createInitialState();
+const GLOBAL_KEY = "__GAME_STATE_SINGLETON__";
+export const state: GameState = (globalThis as any)[GLOBAL_KEY] || createInitialState();
+(globalThis as any)[GLOBAL_KEY] = state;
 
 // -- 5. Reset Logic --
 export function resetStateInstance(target: GameState, seed?: number | string): void {

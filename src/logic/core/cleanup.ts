@@ -121,6 +121,7 @@ export function cleanupDead() {
 
                 // Run LWs and then move to grave
                 triggerLastWords(c, owner);
+                c.zone = "graveyard";
                 grave.push(c);
 
                 // shadows

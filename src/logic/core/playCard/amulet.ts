@@ -9,12 +9,14 @@ import { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
 import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
 
+import { initAmulet } from "../../effects/ops/summon_ops/init.js";
+
 /**
  * Play an amulet card. Returns PlayOutcome without rendering.
  */
 export function playAmulet(card: CardInstance, player: Player, chosenTier: { effects: Effect[] } | null): PlayOutcome {
     pushPlayedHistory(player, card);
-    applyKeywordsFromList(card);
+    initAmulet(card);
 
     const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
     toBoard.push(card);

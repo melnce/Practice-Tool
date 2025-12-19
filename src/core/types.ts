@@ -75,7 +75,7 @@ export interface DeckEffect extends BaseEffect {
     op: DeckOps;
 }
 
-export type CrestOps = Extract<EffectOp, "gain_crest" | "crest_add_counter" | "crest_pay_counter" | "himeka_crest_effect">;
+export type CrestOps = Extract<EffectOp, "gain_crest" | "crest_add_counter" | "crest_pay_counter">;
 export interface CrestEffect extends BaseEffect {
     op: CrestOps;
     name?: string;

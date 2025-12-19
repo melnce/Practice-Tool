@@ -156,6 +156,7 @@ function scanDeckForInvokes(owner: Player, timing: "start_of_turn" | "end_of_tur
  * Handles the end of the blue player's turn and sets up the red player's turn.
  */
 export function endTurnBlue() {
+    console.error(`[Turns] endTurnBlue called. isBlueTurn: ${state.isBlueTurn}`);
     if (!state.isBlueTurn) return;
     recordEvent({ type: "end_turn", payload: { player: "blue" } });
     beginAction("End Turn (Blue)");

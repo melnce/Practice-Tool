@@ -41,7 +41,7 @@ export function popBarrier(card: BarrierCard, reason = "forced_pop") {
 }
 
 export function dealDamage(target: BarrierCard, amount: number, source: CardInstance | null = null) {
-    if (!target) return 0;
+    if (!target) return { damage: 0, barrierPopped: false, preventedBySuper: false };
 
     const initialDefense = parseInt(target.defense as string) || 0;
     let damageDealt = amount;
@@ -145,7 +145,11 @@ export function dealDamage(target: BarrierCard, amount: number, source: CardInst
             fireTrigger("self_damaged", owner, { damagedCard: target, sourceCard: source });
         }
     }
-    return Math.max(0, damageDealt | 0);
+    return {
+        damage: Math.max(0, damageDealt | 0),
+        barrierPopped: !!barrierConsumed,
+        preventedBySuper
+    };
 }
 
 

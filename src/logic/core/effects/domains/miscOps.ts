@@ -33,6 +33,5 @@ export const MISC_OPS = [
     "skybound_art_gate",
     "self_cost_gate",
     "set_deckout_victory",
-    "himeka_crest_effect",
     "dragonsign"
 ] as const;

@@ -18,8 +18,11 @@ export function makeCardFromDB(cardData: CardTemplate, owner: Player): CardInsta
 }
 
 export function pushToBoard(board: CardInstance[], owner: Player, card: CardInstance) {
-    // Respect max board size 5
+    // Respect max board size 5 (and prevent duplicates)
     if (board.length >= 5) return false;
+    // Prevention: If card is already on board (e.g. reanimate logic artifact where object is reused),
+    // we silently ignore the push to preserve idempotency and prevent duplicates.
+    if (board.includes(card)) return true;
     card.zone = "board";
     board.push(card);
 

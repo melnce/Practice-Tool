@@ -1,6 +1,7 @@
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 import { Effect, Player, GameState } from "../../core/types.js";
+import { fireTrigger } from "../core/triggers.js";
 
 /**
  * Handles healing a leader's defense.
@@ -122,8 +123,18 @@ export function applyLeaderDamage(owner: Player, amount: number) {
     const cur = s[hpKey] | 0;
     const next = Math.max(0, cur - (amount | 0));
     s[hpKey] = next;
-    // clamp not needed downward; max clamp occurs on heals
-    return cur - next;
+
+    const actualDamage = cur - next;
+
+    // Fire leader_damaged trigger AFTER damage is applied
+    if (actualDamage > 0) {
+        fireTrigger("leader_damaged", owner, {
+            damagedLeader: owner,
+            amount: actualDamage
+        });
+    }
+
+    return actualDamage;
 }
 
 /* ---------- NEW: effect op for cards ---------- */

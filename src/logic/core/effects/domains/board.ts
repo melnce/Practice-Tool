@@ -103,11 +103,11 @@ export function registerBoardEffects() {
 
     // Return to hand / bounce
     registerOp("return_to_hand", (eff, ctx) => {
-        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue);
+        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context);
     });
 
     registerOp("bounce", (eff, ctx) => {
-        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue);
+        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context);
     });
 
     registerOp("return_hand_to_deck", (eff, ctx) => {

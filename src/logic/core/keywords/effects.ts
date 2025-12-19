@@ -50,10 +50,10 @@ export function handleKeyword(
 
     const __selRaw = (eff.select ?? eff.select_count);
     if (__selRaw) {
-        return createSelectionRequest(eff, owner, targets, context.sourceCard, effectsQueue);
+        return createSelectionRequest(eff, context.owner, targets, context.sourceCard, context.effectsQueue);
     }
 
-    const keywordList = Array.isArray(eff.keywords) ? eff.keywords : [eff.keyword].filter(Boolean);
+    const keywordList = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [(eff as any).keyword].filter(Boolean);
     for (const target of targets) {
         for (const k of keywordList) {
             const name = (typeof k === "string" ? k : k?.name) || "";

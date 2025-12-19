@@ -37,14 +37,93 @@ let onChange: ((status: { canUndo: boolean, canRedo: boolean }) => void) | null 
 function snapshot(): GameState {
   // Exclude RNG from structuredClone because it contains methods/closures
   const { rng, ...rest } = state;
-  const snap = structuredClone(rest) as GameState;
+
+  // Try structuredClone first
+  try {
+    const snap = structuredClone(rest) as GameState;
+    // Persist RNG internal state
+    if (rng) {
+      (snap as any).__rng = rng.snapshot();
+    }
+    return snap;
+  } catch (e) {
+    // Fallback: manually clone, skipping non-cloneable properties
+    console.warn("[History] structuredClone failed, using fallback. Error:", e);
+    return manualSnapshot(rest, rng);
+  }
+}
+
+function manualSnapshot(rest: any, rng: any): GameState {
+  const snap: any = {};
+
+  for (const key of Object.keys(rest)) {
+    const val = rest[key];
+
+    // Skip functions
+    if (typeof val === "function") {
+      console.warn(`[History] Skipping non-cloneable function at key: ${key}`);
+      continue;
+    }
+
+    // Skip undefined
+    if (val === undefined) continue;
+
+    // For arrays, deep clone each element, skipping functions
+    if (Array.isArray(val)) {
+      snap[key] = val.map((item, idx) => cloneItem(item, `${key}[${idx}]`));
+    }
+    // For objects, try structured clone on each
+    else if (val !== null && typeof val === "object") {
+      try {
+        snap[key] = structuredClone(val);
+      } catch {
+        console.warn(`[History] Skipping non-cloneable object at key: ${key}`);
+        snap[key] = {}; // fallback to empty
+      }
+    }
+    // Primitives: copy directly
+    else {
+      snap[key] = val;
+    }
+  }
 
   // Persist RNG internal state
-  if (rng) {
-    (snap as any).__rng = rng.snapshot();
+  if (rng && typeof rng.snapshot === "function") {
+    snap.__rng = rng.snapshot();
   }
-  return snap;
+
+  return snap as GameState;
 }
+
+function cloneItem(item: any, path: string): any {
+  if (item === null || item === undefined) return item;
+  if (typeof item === "function") {
+    console.warn(`[History] Skipping function in array at: ${path}`);
+    return null;
+  }
+  if (typeof item !== "object") return item;
+
+  try {
+    return structuredClone(item);
+  } catch {
+    // Object has non-cloneable properties - clone manually
+    const clone: any = Array.isArray(item) ? [] : {};
+    for (const key of Object.keys(item)) {
+      const val = item[key];
+      if (typeof val === "function") {
+        console.warn(`[History] Skipping function at: ${path}.${key}`);
+        continue;
+      }
+      if (val === null || val === undefined || typeof val !== "object") {
+        clone[key] = val;
+      } else {
+        clone[key] = cloneItem(val, `${path}.${key}`);
+      }
+    }
+    return clone;
+  }
+}
+
 
 function replaceState(next: GameState) {
   // Preserve the RNG instance

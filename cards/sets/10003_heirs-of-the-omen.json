@@ -2793,7 +2793,7 @@
     "fanfare": [
       {
         "op": "crest_pay_counter",
-        "crest": "Faith",
+        "crest": "Faith: Sham-Nacha, Heir to Entwining",
         "counter": "faith",
         "amount": 10,
         "on_success_effects": [
