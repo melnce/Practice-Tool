@@ -9,5 +9,5 @@
 
 ## Quick Start
 - `npm install`
-- `npm run watch:cards`
+- `npm run cards:watch`
 - `npm start`
