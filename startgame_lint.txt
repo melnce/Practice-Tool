@@ -1,9 +1,0 @@
-
-C:\Projects\Practice Tool\src\logic\startGame.ts
-  10:10  warning  'drawCard' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
-  14:24  warning  'Player' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
-
-✖ 2 problems (0 errors, 2 warnings)
-
-
-ESLint found too many warnings (maximum: 0).

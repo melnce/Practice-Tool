@@ -1,7 +1,0 @@
-
-C:\Projects\Practice Tool\src\logic\evolveUtils.ts
-  15:89  error  Empty block statement  no-empty
-
-✖ 1 problem (1 error, 0 warnings)
-
-

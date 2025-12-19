@@ -11,7 +11,13 @@ const __dirname = path.dirname(__filename);
 // Redirect logs to crash.log for debugging
 const originalLog = console.log;
 const originalError = console.error;
-const logFile = "crash.log";
+
+const reportDir = "reports";
+if (!fs.existsSync(reportDir)) {
+    fs.mkdirSync(reportDir, { recursive: true });
+}
+const logFile = path.join(reportDir, "crash.log");
+
 // Clear log file
 if (fs.existsSync(logFile)) fs.unlinkSync(logFile);
 
@@ -172,7 +178,7 @@ async function main() {
         }
 
         // Execute actions
-        fs.appendFileSync("crash.log", `\n[DEBUG] Scenario ${scenario.id} Actions: ${JSON.stringify(actions)} \n`);
+        fs.appendFileSync(logFile, `\n[DEBUG] Scenario ${scenario.id} Actions: ${JSON.stringify(actions)} \n`);
 
         console.log(`[DEBUG] Actions to dispatch: `, actions);
         if (!actions) {
@@ -205,7 +211,7 @@ async function main() {
             if (!goldenCapsule) {
                 const msg = `  FAIL: Missing golden file for ${scenario.id}`;
                 console.error(msg);
-                fs.appendFileSync("crash.log", msg + "\n");
+                fs.appendFileSync(logFile, msg + "\n");
                 failureCount++;
                 // Continue to invariants? Might fail if we assume golden state
             } else {
@@ -213,7 +219,7 @@ async function main() {
                 if (!diff.ok) {
                     const msg = `  FAIL: Mismatch in ${scenario.id} \n${formatReplayDiff(diff)} `;
                     console.error(msg);
-                    fs.appendFileSync("crash.log", msg + "\n");
+                    fs.appendFileSync(logFile, msg + "\n");
                     failureCount++;
                 }
             }
@@ -223,7 +229,6 @@ async function main() {
             console.log(`  Updated golden file.`);
         }
 
-        // Check invariants (always run checks if invariant present)
         // Check invariants (always run checks if invariant present)
         if (scenario.invariants && scenario.invariants.length > 0) {
             try {
@@ -263,10 +268,10 @@ async function main() {
                 if (e instanceof ReplayInvariantError) {
                     const msg = `  FAIL: Invariant "${e.invariantId}" failed in ${scenario.id} \n    ${e.message} `;
                     console.error(msg);
-                    fs.appendFileSync("crash.log", msg + "\n");
+                    fs.appendFileSync(logFile, msg + "\n");
                     failureCount++;
                 } else {
-                    fs.appendFileSync("crash.log", `UNHANDLED ERROR: ${e} \n`);
+                    fs.appendFileSync(logFile, `UNHANDLED ERROR: ${e} \n`);
                     throw e;
                 }
             }
@@ -277,7 +282,7 @@ async function main() {
 
     if (failureCount > 0) {
         console.error(`\n${failureCount} failure(s).`);
-        fs.appendFileSync("crash.log", `\n${failureCount} failure(s) occurred.\n`);
+        fs.appendFileSync(logFile, `\n${failureCount} failure(s) occurred.\n`);
         process.exit(1);
     } else {
         console.log("\nSuccess.");
@@ -287,6 +292,6 @@ async function main() {
 
 main().catch(err => {
     console.error("Replay CLI error:", err);
-    fs.appendFileSync("crash.log", `Error: ${err.message} \nStack: ${err.stack} \n`);
+    fs.appendFileSync(logFile, `Error: ${err.message} \nStack: ${err.stack} \n`);
     process.exit(1);
 });

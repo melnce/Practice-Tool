@@ -12,5 +12,9 @@ report.forEach(file => {
     }
 });
 
-fs.writeFileSync('src_lint_errors.txt', output);
-console.log("Written to src_lint_errors.txt");
+const outputDir = 'reports';
+if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir);
+}
+fs.writeFileSync('reports/src_lint_errors.txt', output);
+console.log("Written to reports/src_lint_errors.txt");

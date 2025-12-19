@@ -1,9 +1,0 @@
-
-C:\Projects\Practice Tool\src\logic\core\targeting\engine.ts
-  2:21  warning  'CardInstance' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
-  3:27  warning  'TargetedOpContext' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
-
-✖ 2 problems (0 errors, 2 warnings)
-
-
-ESLint found too many warnings (maximum: 0).
