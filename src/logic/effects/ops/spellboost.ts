@@ -4,9 +4,6 @@ import { adapter } from "../../../core/adapter.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 
 import { logEvent } from "../../../core/logger.js";
-// @ts-ignore
-
-// @ts-ignore
 import { Player, CardInstance } from "../../../core/types.js";
 
 // CIRCULAR DEPENDENCY FIX:
@@ -125,7 +122,7 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
 
     const t = normTimes(times);
     const hand = owner === "blue" ? state.blueHand : state.redHand;
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+
 
 
 

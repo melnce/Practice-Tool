@@ -101,7 +101,7 @@ function queueAutoMulligan(owner: Player) {
         });
         adapter.render();
         // Confirm immediately
-        try { confirmMulligan(owner); } catch { }
+        try { confirmMulligan(owner); } catch { void 0; }
     }, 100);
 }
 

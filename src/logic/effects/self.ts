@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { applyKeyword } from "../core/keywords.js";
 import { handleBanish } from "./ops/banish.js";
-import { resolveDestroy } from "./ops/destroy.js";
+
 
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
@@ -197,10 +197,8 @@ export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, own
     // Track and apply the buff
     sourceCard.buffs.attack = (sourceCard.buffs.attack ?? 0) + a;
     sourceCard.buffs.defense = (sourceCard.buffs.defense ?? 0) + d;
-    // @ts-ignore
-    sourceCard.attack = (parseInt(sourceCard.attack) || 0) + a;
-    // @ts-ignore
-    sourceCard.defense = (parseInt(sourceCard.defense) || 0) + d;
+    sourceCard.attack = (parseInt(String(sourceCard.attack)) || 0) + a;
+    sourceCard.defense = (parseInt(String(sourceCard.defense)) || 0) + d;
     sourceCard.peak_defense = Math.max(
         sourceCard.peak_defense ?? (sourceCard.defense as number),
         sourceCard.defense as number
@@ -225,7 +223,7 @@ export function handleDestroySelf(sourceCard: CardInstance) {
     (sourceCard as any).pendingDestruction = true;
 }
 
-export function handleBanishSelf(sourceCard: CardInstance, owner: Player) {
+export function handleBanishSelf(sourceCard: CardInstance, _owner: Player) {
     logEvent("banishSelf", { card: sourceCard.name, uid: sourceCard.uid });
     handleBanish(sourceCard);
 }

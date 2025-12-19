@@ -1,6 +1,5 @@
 // src/logic/boosts.ts
 import { state } from "../core/gameState.js";
-// @ts-ignore
 import { adapter } from "../core/adapter.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";

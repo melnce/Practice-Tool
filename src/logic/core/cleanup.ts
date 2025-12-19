@@ -13,8 +13,7 @@ export function registerRunEffectsInCleanup(fn: any) {
     runEffects = fn;
 }
 
-// @ts-ignore
-import { hasBanishOnDeath } from "@logic/core/utils.js"; // If needed, or just guard properties
+
 
 export function cleanupDead() {
     // Skip cleanup while a “batch” (like crest EOT) is running.
@@ -106,7 +105,6 @@ export function cleanupDead() {
                     name: c.name,
                     type: c.type,
                     cost: Number(c?.cost) || 0,
-                    // @ts-ignore
                     base_image: c?.base_image || null,
                     ts: Date.now()
                 };

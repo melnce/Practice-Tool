@@ -8,7 +8,6 @@ import { wireClick } from "../ui/dom.js";
 import { showChoiceModal } from "../ui/choiceModal.js";
 import { injectAdapter } from "../core/adapter.js";
 import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
-// @ts-ignore
 import { useRedBoost } from "../logic/boosts.js";
 import { state } from "../core/gameState.js";
 
@@ -21,7 +20,6 @@ import { state } from "../core/gameState.js";
 injectAdapter({ render, showChoiceModal });
 
 window.addEventListener("DOMContentLoaded", () => {
-    // @ts-ignore
     wireClick("startGameBtn", async () => {
         const blueSelect = document.getElementById("blueDeckSelect") as HTMLSelectElement;
         const redSelect = document.getElementById("redDeckSelect") as HTMLSelectElement;
@@ -40,7 +38,7 @@ window.addEventListener("DOMContentLoaded", () => {
         await engine.startNewGame({ deckAId, deckBId, seed });
     });
 
-    try { render(); } catch (_) { }
+    try { render(); } catch { /* ignore */ }
 
     // Ctrl/Cmd+Z (undo), Ctrl+Y or Cmd+Shift+Z (redo)
     engine.initHotkeys();
@@ -55,17 +53,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // God Mode Handlers
     wireClick("godPlus", () => {
-        // @ts-ignore
         state.bluePP = Math.min(state.blueMaxPP, state.bluePP + 1);
         render();
     });
     wireClick("godMinus", () => {
-        // @ts-ignore
         state.bluePP = Math.max(0, state.bluePP - 1);
         render();
     });
     wireClick("godRefill", () => {
-        // @ts-ignore
         state.bluePP = state.blueMaxPP;
         render();
     });
@@ -74,9 +69,7 @@ window.addEventListener("DOMContentLoaded", () => {
         if (val) {
             const n = parseInt(val, 10);
             if (Number.isFinite(n) && n >= 0) {
-                // @ts-ignore
                 state.blueMaxPP = n;
-                // @ts-ignore
                 state.bluePP = n;
                 render();
             }
@@ -85,17 +78,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
     // God Mode: EP
     wireClick("godEPPlus", () => {
-        // @ts-ignore
         state.blueEvoCharges = (state.blueEvoCharges || 0) + 1;
         render();
     });
     wireClick("godEPMinus", () => {
-        // @ts-ignore
         state.blueEvoCharges = Math.max(0, (state.blueEvoCharges || 0) - 1);
         render();
     });
     wireClick("godEPRefill", () => {
-        // @ts-ignore
         state.blueEvoCharges = 3; // Max EP for P2 is 3, usually enough.
         render();
     });
@@ -106,16 +96,14 @@ window.addEventListener("DOMContentLoaded", () => {
             const val = parseInt(inp.value, 10);
             if (Number.isFinite(val)) {
                 // Determine delta to update Skybound Art (SBA)
-                // @ts-ignore
                 const oldVal = state.blueEvoCount || 0;
-                // @ts-ignore
                 state.blueEvoCount = val;
 
                 // If we increased evolutions, manually trigger SBA increments
                 // so cards in hand "witness" these god-mode evolutions.
                 const delta = val - oldVal;
                 if (delta > 0) {
-                    import("../logic/effects/skybound.js").then(({ incrementSkyboundArt }) => {
+                    void import("../logic/effects/skybound.js").then(({ incrementSkyboundArt }) => {
                         for (let i = 0; i < delta; i++) {
                             incrementSkyboundArt("blue");
                         }
@@ -133,7 +121,6 @@ window.addEventListener("DOMContentLoaded", () => {
         if (inp) {
             const val = parseInt(inp.value, 10);
             if (Number.isFinite(val)) {
-                // @ts-ignore
                 state.bluePlaysThisTurn = val;
                 render();
             }
@@ -176,10 +163,9 @@ async function listDeckFiles() {
                 .map(name => decodeURIComponent(name))
                 .map(name => name.split('/').pop())        // keep only filename
                 .filter((name): name is string => !!name && !/manifest\.json$/i.test(name) && !/decks_index\.json$/i.test(name));
-            // @ts-ignore
             if (files.length) return [...new Set(files)];
         }
-    } catch { }
+    } catch { /* ignore */ }
     // 2) Fallback: decks_index.json (if your deckbuilder created it)
     try {
         const r = await fetch('decks/decks_index.json', { cache: 'no-cache' });
@@ -189,7 +175,7 @@ async function listDeckFiles() {
                 return [...new Set(arr.map(x => String(x).replace(/^decks\//, '').split('/').pop()))];
             }
         }
-    } catch { }
+    } catch { /* ignore */ }
     // 3) Last resort: still show example so UI works
     return ['example_deck.json'];
 }

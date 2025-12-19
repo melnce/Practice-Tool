@@ -40,7 +40,7 @@ export function render() {
         enemyLeader.classList.add("selectable");
         enemyLeader.onclick = (e) => {
             e.stopPropagation();
-            logic().then(({ resolvePendingTarget }) => resolvePendingTarget("leader"));
+            void logic().then(({ resolvePendingTarget }) => resolvePendingTarget("leader"));
         };
     } else {
         blueLeader.classList.remove("selectable");

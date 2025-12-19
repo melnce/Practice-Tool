@@ -28,7 +28,6 @@ function validateEffects(effects: Effect[], contextString: string) {
 
         // Recurse
         if (eff.effects) validateEffects(eff.effects, `${contextString} > ${eff.op}`);
-        // @ts-ignore
         if (eff.else_effects) validateEffects(eff.else_effects, `${contextString} > ${eff.op}(else)`);
     }
 }

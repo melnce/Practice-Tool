@@ -50,7 +50,7 @@ function normalizeForStable(value: any, seen: WeakSet<object>): any {
     if (value instanceof Set) {
         // sets serialized in sorted order for determinism
         const arr = Array.from(value).map(v => normalizeForStable(v, seen));
-        try { arr.sort(); } catch { }
+        try { arr.sort(); } catch { void 0; }
         return { "~~set": arr };
     }
 
@@ -161,7 +161,7 @@ export function logEvent(type: string, details: any = {}): number | undefined {
     if (_log.length > _maxEntries) _log.splice(0, _log.length - _maxEntries);
 
     // Fill hash asynchronously and mirror to console when ready
-    computeStateHash().then(h => {
+    void computeStateHash().then(h => {
         entry.stateHash = h;
         if (_mirrorToConsole) {
             // Compact log line for readability; expand entry for full object

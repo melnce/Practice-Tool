@@ -14,7 +14,7 @@ export interface TargetContext {
     isTargetedEffect?: boolean;
     selectCount?: number;
     __lloydRequiredFirstUids?: string[];
-    runner?: Function; // Injected runEffects
+    runner?: (...args: any[]) => any; // Injected runEffects
     [key: string]: any;
 }
 

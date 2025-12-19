@@ -13,6 +13,15 @@ export function handleBuff(eff: Effect, owner: Player, sourceCard: CardInstance 
     return handleBuffOrchestrator(eff as any, owner, sourceCard, effectsQueue, context);
 }
 
+const toNum = (v: number | string | undefined | null): number => {
+    if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+    if (typeof v === "string") {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+    }
+    return 0;
+};
+
 // -----------------------------------------------------------------------------
 // LEGACY / SPECIALIZED HANDLERS (Preserved)
 // LEGACY: Preserved for determinism/replay compatibility — specialized handlers are intentionally separate.
@@ -33,10 +42,9 @@ export function handleBuffHandTribe(eff: Effect, owner: Player) {
             card.defense = (parseInt(String(card.defense)) || 0) + d;
 
             // keep previews coherent
-            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
-            card.potential_attack = (card.potential_attack ?? card.base_attack ?? Number(card.attack)) + a;
-            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
-            card.potential_defense = (card.potential_defense ?? card.base_defense ?? Number(card.defense)) + d;
+            // keep previews coherent
+            card.potential_attack = toNum(card.potential_attack ?? card.base_attack ?? card.attack) + a;
+            card.potential_defense = toNum(card.potential_defense ?? card.base_defense ?? card.defense) + d;
             logEvent("buffHand", { owner, target: card.name, uid: card.uid, a: a, d: d, filter: eff.tribe });
         }
     }
@@ -60,10 +68,9 @@ export function handleBuffHandClass(eff: Effect, owner: Player) {
             (card as any).defense = (parseInt(String(card.defense)) || 0) + d;
 
             // keep previews coherent
-            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
-            card.potential_attack = (card.potential_attack ?? card.base_attack ?? Number(card.attack)) + a;
-            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
-            card.potential_defense = (card.potential_defense ?? card.base_defense ?? Number(card.defense)) + d;
+            // keep previews coherent
+            card.potential_attack = toNum(card.potential_attack ?? card.base_attack ?? card.attack) + a;
+            card.potential_defense = toNum(card.potential_defense ?? card.base_defense ?? card.defense) + d;
             logEvent("buffHand", { owner, target: card.name, uid: card.uid, a: a, d: d, filter: wantClass });
         }
     }

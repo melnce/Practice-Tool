@@ -1,7 +1,6 @@
 // utils.ts - Combined utility functions
 
 import { state } from "./gameState.js";
-// @ts-ignore
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 // Pull *once* from rng and re-export locally-used helpers
@@ -129,7 +128,6 @@ export function drawCard(hand: CardInstance[], deck: CardInstance[], owner: "blu
             }
 
             // Log the deckout event
-            // @ts-ignore
             logEvent("deckout", { loser: owner, winner: opp });
 
             adapter.render();

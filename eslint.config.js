@@ -23,6 +23,7 @@ export default defineConfig([
       "**/build/**",
       "**/coverage/**",
       "**/node_modules/**",
+      "**/tests/legacy/**",
     ],
   },
 
@@ -57,6 +58,13 @@ export default defineConfig([
   // ---------------------------------------------------------------------------
   {
     files: ["**/*.{ts,mts,cts}"],
+    languageOptions: {
+      // 🔴 REQUIRED for typed rules like no-floating-promises
+      parserOptions: {
+        project: ["./tsconfig.json"],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       // Allow exploration while refactoring / prototyping
       "@typescript-eslint/no-explicit-any": "off",

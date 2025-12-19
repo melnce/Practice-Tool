@@ -63,8 +63,8 @@ export function transformTarget(target: CardInstance, intoName: string) {
 
     // Initialize basics depending on type
     if (c.type === "Follower") {
-        c.attack = parseInt(c.attack as any) || 0;
-        c.defense = parseInt(c.defense as any) || 0;
+        c.attack = parseInt(String(c.attack)) || 0;
+        c.defense = parseInt(String(c.defense)) || 0;
         if (c.base_attack == null) c.base_attack = c.attack;
         if (c.base_defense == null) c.base_defense = c.defense;
         if (c.peak_defense == null) c.peak_defense = c.defense;
@@ -139,8 +139,8 @@ export function transformHandTarget(target: CardInstance, intoName: string) {
     }
 
     // Minimal numeric init (hand preview may rely on these)
-    c.attack = parseInt(c.attack as any) || 0;
-    c.defense = parseInt(c.defense as any) || 0;
+    c.attack = parseInt(String(c.attack)) || 0;
+    c.defense = parseInt(String(c.defense)) || 0;
 
     hand.splice(idx, 1, c);
     logEvent("transformHandTarget", { owner, from: target.name, to: intoName, uid: target.uid });
@@ -176,12 +176,12 @@ export function transformRandomSpellInHand(owner: Player, intoName = "Ersatz Eli
     if (!updated) return;
 
     const printed = parseInt(updated.cost as string, 10) || 0;
-    const existingM = parseInt((updated.cost_mod || 0) as any, 10) || 0;
+    const existingM = parseInt(String(updated.cost_mod || 0), 10) || 0;
     const current = printed + existingM;
     const delta = 0 - current; // bring to zero
 
     if (updated.base_cost === undefined) updated.base_cost = printed;
     updated.cost_mod = existingM + delta;
-    (updated as any).temp_cost_mod_until_eot = (parseInt((updated as any).temp_cost_mod_until_eot, 10) || 0) + delta;
+    updated.temp_cost_mod_until_eot = (parseInt(String(updated.temp_cost_mod_until_eot ?? 0), 10) || 0) + delta;
     logEvent("transformRandomSpell", { owner, to: intoName });
 }

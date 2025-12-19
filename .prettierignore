@@ -1,0 +1,9 @@
+dist
+build
+coverage
+node_modules
+.cache
+
+tests/legacy
+tests/_dev
+

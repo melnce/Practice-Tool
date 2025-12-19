@@ -106,7 +106,7 @@ export function runEffects(effects: Effect[], owner: Player, sourceCard: CardIns
     guardLifecycle("runEffects");
 
     // Runtime Assertion: Registry must be sealed
-    import("./registry.js").then(({ isRegistrySealed }) => {
+    void import("./registry.js").then(({ isRegistrySealed }) => {
         if (!isRegistrySealed()) {
             throw new Error("[Dispatcher] CRITICAL: Attempted to run effects before registry was sealed.");
         }

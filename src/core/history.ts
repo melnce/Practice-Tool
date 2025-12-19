@@ -1,7 +1,6 @@
 
 // /gamelogic/history.ts
 import { state } from "./gameState.js";
-// @ts-ignore
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 

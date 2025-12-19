@@ -1,1 +1,0 @@
-Error: [Registry] Cannot register op 'choose': Registry is sealed.

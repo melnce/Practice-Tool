@@ -18,7 +18,7 @@ export function makeLeaderDroppable(leaderEl: HTMLElement, targetPlayer: Player,
         if ((targetPlayer === "blue" && state.isBlueTurn) || (targetPlayer === "red" && !state.isBlueTurn)) return;
         if (!attackerIndex) return;
 
-        logic().then(({ attackLeader }) => {
+        void logic().then(({ attackLeader }) => {
             attackLeader(parseInt(attackerIndex || "0"), attackerPlayer as Player, targetPlayer);
         });
     };
@@ -49,7 +49,7 @@ export function enableBoardDropForOwnSide(div: HTMLElement, containerId: string,
             const player = containerId === "blueBoard" ? "blue" : "red";
             const hand = state[`${player}Hand`];
             const index = hand.findIndex(c => c.uid === cardUid);
-            if (index !== -1) logic().then(({ playCard }) => playCard(hand, player, index));
+            if (index !== -1) void logic().then(({ playCard }) => playCard(hand, player, index));
         }
     };
 }
@@ -112,7 +112,7 @@ export function enableCardEvoDrop(div: HTMLElement, containerId: string, card: C
             }
 
             // fire evolve hooks (does its own logging AND charge spending)
-            logic().then(({ onEvolve }) => onEvolve(card, owner, mode));
+            void logic().then(({ onEvolve }) => onEvolve(card, owner, mode));
         }, {}, { autoRender: false });
         rerender();
     };
@@ -134,7 +134,7 @@ export function enableEnemyFollowerDrop(div: HTMLElement, attackerData: any, def
         if (hasWard && !defender.hasWard) return;
         if (defender.hasIntimidate && !defender.hasWard) return;
 
-        logic().then(({ attackFollower }) => {
+        void logic().then(({ attackFollower }) => {
             attackFollower(parseInt(attackerIndex || "0"), defenderIndex, attackerPlayer as Player, defenderPlayer);
         });
     };

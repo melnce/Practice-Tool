@@ -328,7 +328,7 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
                 // Toggle click handler
                 div.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    import("../logic/mulligan.js").then(({ toggleMulliganPick }) => {
+                    void import("../logic/mulligan.js").then(({ toggleMulliganPick }) => {
                         toggleMulliganPick(isBlueHand ? "blue" : "red", card.uid);
                     });
                 });
@@ -359,7 +359,7 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
 
                     if (hasFuseRecipes || hasFortifierFuse) {
                         const ownerSide = isBlueHand ? "blue" : "red";
-                        logic().then(({ startFuseFromHand, runEffects }) => {
+                        void logic().then(({ startFuseFromHand, runEffects }) => {
                             if (hasFuseRecipes) startFuseFromHand(ownerSide, card.uid);
                             else runEffects([{ op: "start_fortifier_fuse", initiator_uid: card.uid }], ownerSide, card);
                         });
@@ -410,7 +410,7 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
                 div.addEventListener("contextmenu", (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    engageLogic().then(({ engageAmulet }) => engageAmulet(ownerSide, i));
+                    void engageLogic().then(({ engageAmulet }) => engageAmulet(ownerSide, i));
                 }, { once: true });
             }
         }
@@ -446,7 +446,7 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
             // Allow repeated click to toggle selection
             div.addEventListener("click", (e) => {
                 e.stopPropagation();
-                logic().then(({ resolvePendingTarget }) => resolvePendingTarget(card.uid));
+                void logic().then(({ resolvePendingTarget }) => resolvePendingTarget(card.uid));
             });
         }
 
