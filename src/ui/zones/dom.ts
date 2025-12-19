@@ -10,7 +10,7 @@ function createElement(tag: string, className?: string, text?: string): HTMLElem
     return el;
 }
 
-export function renderCardDOM(vm: CardViewModel, elementId: string, tooltipContainer: HTMLElement | null): HTMLElement {
+export function renderCardDOM(vm: CardViewModel, elementId: string, tooltipContainer: HTMLElement | null, isBoard = false): HTMLElement {
     const { card } = vm;
 
     const div = createElement("div", "card");
@@ -139,7 +139,7 @@ export function renderCardDOM(vm: CardViewModel, elementId: string, tooltipConta
     div.appendChild(imageWrapper);
 
     // Overlays
-    applyKeywordOverlays(div, card);
+    applyKeywordOverlays(div, card, isBoard);
     applyBarrierOverlay(div, card);
 
     // Tooltip

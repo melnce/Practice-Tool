@@ -78,7 +78,7 @@ export function renderZone(
         // MISS or STALE: Render fresh
         // Note: We deliberately create new DOM if VM changes to ensure all attributes/classes update.
         // A "Super Top Tier" would diff attributes, but that's overkill for this scope.
-        const newEl = renderCardDOM(vm, `${containerId}-${i}`, tooltipEl) as ReconcilableElement;
+        const newEl = renderCardDOM(vm, `${containerId}-${i}`, tooltipEl, ctx.isBoard) as ReconcilableElement;
         newEl.__cachedVM = vm; // Tag it
 
         attachHandlers(newEl, vm, ctx, state, rerender, clickable ? onClick : undefined);

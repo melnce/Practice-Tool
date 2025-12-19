@@ -229,6 +229,10 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
     const superUnlockReady = isPlayersTurn && hasSuperUnlockGate && handleSuperEvoGate(owner);
 
+    // Both Max PP gate (Gilnelise)
+    const hasBothMaxPPGate = Array.isArray(card.fanfare) && card.fanfare.some(e => e.op === "both_max_pp_gate");
+    const bothMaxPPReady = isPlayersTurn && hasBothMaxPPGate && (state.blueMaxPP >= 10 && state.redMaxPP >= 10); // Default to 10 if not specified, but typically check op params if available. Here assuming Gilnelise standard 10.
+
     const superEvoReady = hasSuperEvoGate && hasSuperEvoAllyOnBoard(state, owner);
 
     // hard block
@@ -256,7 +260,8 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
         fusedAllureReady ||
         fusedSlashReady ||
         faithReady ||
-        skyboundReady
+        skyboundReady ||
+        bothMaxPPReady
     ) {
         return { glowClass: "enhance-ready" };
     }

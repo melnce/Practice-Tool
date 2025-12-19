@@ -130,7 +130,13 @@ export function handleBothMaxPPGate(eff: Effect, effectsQueue: Effect[]) {
     const need = Number.isFinite((eff as any).at_least) ? (eff as any).at_least : 10;
     const ok = (state.blueMaxPP >= need) && (state.redMaxPP >= need);
     const next = ok ? (eff.effects || []) : (eff.else_effects || []);
-    if (next.length) effectsQueue.unshift(...next);
+    if (next.length) {
+        if (Array.isArray(effectsQueue)) {
+            effectsQueue.unshift(...next);
+        } else {
+            console.error("[Dispatcher] Error in op 'both_max_pp_gate': effectsQueue is not an array", effectsQueue);
+        }
+    }
 }
 
 export function handleMaxPPGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {

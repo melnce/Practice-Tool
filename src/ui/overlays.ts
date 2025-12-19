@@ -1,7 +1,7 @@
 // src/ui/overlays.ts
 import { CardInstance } from "../core/types.js";
 
-export function applyKeywordOverlays(div: HTMLElement, card: CardInstance) {
+export function applyKeywordOverlays(div: HTMLElement, card: CardInstance, isBoard = false) {
     const wrapper = div.querySelector(".card-image-wrapper") ?? div;
 
     // Create (or reuse) a bottom-center icon stack
@@ -19,30 +19,30 @@ export function applyKeywordOverlays(div: HTMLElement, card: CardInstance) {
         stack!.appendChild(img);
     };
 
-    if (card.hasWard) {
+    if (isBoard && card.hasWard) {
         const overlay = document.createElement("div");
         overlay.classList.add("ward-overlay");
         wrapper.appendChild(overlay);
     }
-    if (card.hasAmbush) {
+    if (isBoard && card.hasAmbush) {
         const overlay = document.createElement("div");
         overlay.classList.add("ambush-overlay");
         wrapper.appendChild(overlay);
     }
-    if (card.hasAura || (
+    if (isBoard && (card.hasAura || (
         Array.isArray(card.keywords) &&
         card.keywords.some(k => (typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase()) === "aura")
-    )) {
+    ))) {
         const overlay = document.createElement("div");
         overlay.classList.add("aura-overlay");
         wrapper.appendChild(overlay);
     }
-    if (card.hasCantAttack || card.keywordState?.cantAttack || card.keywordState?.cantAttackUntilOpponentEOT) {
+    if (isBoard && (card.hasCantAttack || card.keywordState?.cantAttack || card.keywordState?.cantAttackUntilOpponentEOT)) {
         const overlay = document.createElement("div");
         overlay.classList.add("cant_attack-overlay");
         wrapper.appendChild(overlay);
     }
-    if (card.hasIntimidate) {
+    if (isBoard && card.hasIntimidate) {
         const overlay = document.createElement("div");
         overlay.classList.add("intimidate-overlay");
         wrapper.appendChild(overlay);
@@ -60,10 +60,10 @@ export function applyKeywordOverlays(div: HTMLElement, card: CardInstance) {
         addIcon("images/icon_ongoing.png", "ongoing-icon");
     }
 
-    if (card.cannotBeDestroyed || (
+    if (isBoard && (card.cannotBeDestroyed || (
         Array.isArray(card.keywords) &&
         card.keywords.some(k => (typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase()) === "cant_be_destroyed")
-    )) {
+    ))) {
         const overlay = document.createElement("div");
         overlay.classList.add("cant-be-destroyed-overlay");
         wrapper.appendChild(overlay);

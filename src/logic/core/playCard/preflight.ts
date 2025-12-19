@@ -97,8 +97,8 @@ export function canPlayCard(card: CardInstance, player: Player): PreflightResult
         if (!result.ok) return result;
     }
 
-    // 2) Generic effect-driven checks (for spells and cards with spell/fanfare)
-    if (card.type === "Spell" || effectList.length > 0) {
+    // 2) Generic effect-driven checks (for spells only - followers can play even if fanfare targets miss)
+    if (card.type === "Spell") {
         // Check if any effect requires a target that doesn't exist
         const targetCheck = checkEffectsHaveValidTargets(effectList, player, card);
         if (!targetCheck.ok) return targetCheck;

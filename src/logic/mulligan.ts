@@ -20,8 +20,8 @@ function ownerZones(owner: Player) {
 export function beginMulligan() {
     // Skip mulligan entirely if testing deck is used by either side
     const usingTestDeck =
-        state.blueDeckFile === "0_testing_deck.json" ||
-        state.redDeckFile === "0_testing_deck.json";
+        (state.blueDeckFile && state.blueDeckFile.toLowerCase().includes("0_testing_")) ||
+        (state.redDeckFile && state.redDeckFile.toLowerCase().includes("0_testing_"));
 
     if (usingTestDeck) {
         console.log("[MULLIGAN] Skipping mulligan for testing deck");

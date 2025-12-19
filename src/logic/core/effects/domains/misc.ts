@@ -86,7 +86,7 @@ export function registerMiscEffects() {
         }
     });
 
-    registerOp("both_max_pp_gate", (handleBothMaxPPGate || stub("both_max_pp_gate")) as any);
+    registerOp("both_max_pp_gate", (eff, ctx) => { (handleBothMaxPPGate || stub("both_max_pp_gate"))(eff, ctx.queue); });
     registerOp("combo_gate", handleComboGate as any);
     registerOp("combo_add", handleComboAdd as any);
     registerOp("evolved_self_gate", (eff, ctx) => { (handleEvolvedSelfGate || stub("evolved_self_gate"))(eff, ctx.owner, ctx.sourceCard!, ctx.queue); });

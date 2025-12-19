@@ -11032,7 +11032,7 @@
       },
       {
         "op": "replace_deck_with_set_minus",
-        "set_file": "/cards/card_sets/10003_heirs_of_the_omen_card_details.json",
+        "set_file": "/cards/sets/10003_heirs-of-the-omen.json",
         "exclude": [
           "Mjerrabaine, Great Manifest"
         ]
@@ -11071,7 +11071,7 @@
       },
       {
         "op": "replace_deck_with_set_minus",
-        "set_file": "/cards/card_sets/10003_heirs_of_the_omen_card_details.json",
+        "set_file": "/cards/sets/10003_heirs-of-the-omen.json",
         "exclude": [
           "Mjerrabaine, Great Manifest"
         ]
