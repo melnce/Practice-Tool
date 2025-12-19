@@ -52,8 +52,8 @@ export function formatCardTooltip(card: CardInstance, owner: Player | null = nul
 
     // === Rally tracker ===
     // Priority: Keyword Object -> Gate Op -> Keyword String (legacy/fallback)
-    const rallyKw = card.keywords?.find((k: any) => (typeof k === "object" && k.name === "Rally"));
-    const rallyReq = rallyKw ? (rallyKw as any).count : null;
+    const rallyKw = card.keywords?.find(k => typeof k === "object" && k.name === "Rally") as any;
+    const rallyReq = rallyKw ? rallyKw.count : null;
     const rallyGate = !rallyReq && card.fanfare?.find((f: any) => f.op === "rally_gate");
     const finalRallyReq = rallyReq || (rallyGate ? rallyGate.count : null);
 
@@ -117,17 +117,15 @@ export function attachTooltip(div: HTMLElement, tooltipEl: HTMLElement, card: Ca
 
             let lastRally = NaN;
             let lastSkybound = NaN;
-            let stopAt = Date.now() + 120000; // hard cap: 2 min
+            const stopAt = Date.now() + 120000; // hard cap: 2 min
 
             function tick() {
                 // stop reasons: not hovered, node gone, tab hidden, time cap
                 if (!div.isConnected || !tooltipEl.isConnected ||
                     document.hidden || !div.matches(':hover') ||
                     Date.now() > stopAt) {
-                    // @ts-ignore
-                    cancelAnimationFrame(div.__ttRaf || 0);
-                    // @ts-ignore
-                    div.__ttRaf = null;
+                    cancelAnimationFrame((div as any).__ttRaf || 0);
+                    (div as any).__ttRaf = null;
                     return;
                 }
 
@@ -152,18 +150,13 @@ export function attachTooltip(div: HTMLElement, tooltipEl: HTMLElement, card: Ca
                     }
                 }
 
-                // @ts-ignore
-                div.__ttRaf = requestAnimationFrame(tick);
+                (div as any).__ttRaf = requestAnimationFrame(tick);
             }
-            // @ts-ignore
-            cancelAnimationFrame(div.__ttRaf || 0);
-            // @ts-ignore
-            div.__ttRaf = requestAnimationFrame(tick);
+            cancelAnimationFrame((div as any).__ttRaf || 0);
+            (div as any).__ttRaf = requestAnimationFrame(tick);
         } else {
-            // @ts-ignore
-            cancelAnimationFrame(div.__ttRaf || 0);
-            // @ts-ignore
-            div.__ttRaf = null;
+            cancelAnimationFrame((div as any).__ttRaf || 0);
+            (div as any).__ttRaf = null;
         }
     };
     div.onmousemove = (e: MouseEvent) => {
@@ -187,10 +180,8 @@ export function attachTooltip(div: HTMLElement, tooltipEl: HTMLElement, card: Ca
     };
     div.onmouseleave = () => {
         tooltipEl.style.display = "none";
-        // @ts-ignore
-        cancelAnimationFrame(div.__ttRaf || 0);
-        // @ts-ignore
-        div.__ttRaf = null;
+        if ((div as any).__ttRaf) cancelAnimationFrame((div as any).__ttRaf);
+        (div as any).__ttRaf = null;
     };
 }
 
@@ -199,10 +190,9 @@ window.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         // cancel any stray RAF stored on hovered elements
         document.querySelectorAll('[data-has-tooltip="1"]').forEach(el => {
-            // @ts-ignore
-            cancelAnimationFrame(el.__ttRaf || 0);
-            // @ts-ignore
-            el.__ttRaf = null;
+            const anyEl = el as any;
+            cancelAnimationFrame(anyEl.__ttRaf || 0);
+            anyEl.__ttRaf = null;
         });
     }
 });

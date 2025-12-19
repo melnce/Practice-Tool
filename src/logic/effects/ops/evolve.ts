@@ -30,12 +30,9 @@ export function handleEvolveSelf(sourceCard: CardInstance, owner: Player, opts: 
     sourceCard.buffs.attack = (sourceCard.buffs.attack ?? 0) + attackBonus;
     sourceCard.buffs.defense = (sourceCard.buffs.defense ?? 0) + defenseBonus;
 
-    // @ts-ignore
-    sourceCard.attack = (parseInt(sourceCard.attack) || 0) + attackBonus;
-    // @ts-ignore
-    sourceCard.defense = (parseInt(sourceCard.defense) || 0) + defenseBonus;
-    // @ts-ignore
-    sourceCard.peak_defense = Math.max(sourceCard.peak_defense ?? sourceCard.defense, sourceCard.defense);
+    sourceCard.attack = (parseInt(String(sourceCard.attack)) || 0) + attackBonus;
+    sourceCard.defense = (parseInt(String(sourceCard.defense)) || 0) + defenseBonus;
+    sourceCard.peak_defense = Math.max(sourceCard.peak_defense ?? (sourceCard.defense as number), sourceCard.defense as number);
     logEvent("evolve", { owner, name: sourceCard.name, uid: sourceCard.uid, mode, atk: +attackBonus, def: +defenseBonus });
     if (sourceCard.evo_image) sourceCard.base_image = sourceCard.evo_image;
 

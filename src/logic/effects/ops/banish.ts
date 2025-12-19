@@ -28,8 +28,7 @@ export function handleBanishTargeted(eff: Effect, owner: Player, effectsQueue: a
     // Optional filters
     if ((eff as any).filters?.defense_lte) {
         const cap = parseInt((eff as any).filters.defense_lte);
-        // @ts-ignore
-        pool = pool.filter(c => (parseInt(c.defense) || 0) <= cap);
+        pool = pool.filter(c => (parseInt(String(c.defense)) || 0) <= cap);
     }
     if (!pool.length) return "done";
 
@@ -135,7 +134,7 @@ export function handleBanishAllEnemyCopies(owner: Player, selected: CardInstance
  * Example eff: { op:"banish_random", target:"enemy:follower", count:1 }
  */
 export function handleBanishRandom(eff: Effect, owner: Player) {
-    let pool = getPool((eff.target as any) || "enemy:follower", owner, null, eff.condition, { isTargetedEffect: true });
+    const pool = getPool((eff.target as any) || "enemy:follower", owner, null, eff.condition, { isTargetedEffect: true });
     if (!Array.isArray(pool) || pool.length === 0) return;
     const n = Math.max(1, parseInt((eff.count ?? (eff as any).amount ?? 1) as any, 10) || 1);
     const take = Math.min(n, pool.length);

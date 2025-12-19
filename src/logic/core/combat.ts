@@ -1,25 +1,20 @@
 // src/logic/core/combat.ts
-import { GameState, CardInstance, Player } from "../../core/types.js";
+import { CardInstance, Player } from "../../core/types.js";
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
-import { runEffects } from "./effects/index.js";
+
 import { fireTrigger } from "./triggers.js";
 import { recordEvent } from "../../core/debugTimeline.js";
 import { clearCantAttack } from "./keywords/remove.js";
 
 
-// Helper: Resolve combat damage between two followers
-function resolveCombat(attacker: CardInstance, defender: CardInstance, owner: Player) { }
+
 
 // Imported from JS still
-// @ts-ignore
 import { applyLeaderDamage, handleHealLeader } from "../effects/leader.js";
-// @ts-ignore
 import { resolveDestroy } from "../effects/ops/destroy.js";
 import { cleanupDead } from "./cleanup.js";
-// @ts-ignore
 import { adapter } from "../../core/adapter.js";
-// @ts-ignore
 import { dealDamage, popBarrier } from "./barrier.js";
 import { doAction } from "../../core/history.js";
 
@@ -44,9 +39,9 @@ function effectiveAtk(card: CardInstance) {
 /* attack counter + flags */
 
 function spendAttack(attacker: CardInstance) {
-    if ((attacker as any).attacks_left == null) {
-        const per = Number.isFinite((attacker as any).attacks_per_turn) ? (attacker as any).attacks_per_turn : 1;
-        (attacker as any).attacks_left = per;
+    if (attacker.attacks_left == null) {
+        const per = Number.isFinite(attacker.attacks_per_turn) ? (attacker.attacks_per_turn as number) : 1;
+        attacker.attacks_left = per;
     }
 
     // mark: someone attacked this turn (even if they die later)
@@ -55,10 +50,10 @@ function spendAttack(attacker: CardInstance) {
     if (owner === "blue") state.blueAnyAllyAttackedThisTurn = true;
     else state.redAnyAllyAttackedThisTurn = true;
 
-    (attacker as any).attacks_used_this_turn = ((attacker as any).attacks_used_this_turn ?? 0) + 1;
-    const left = ((attacker as any).attacks_left ?? 1) - 1;
-    (attacker as any).attacks_left = Math.max(0, left);
-    attacker.hasAttacked = (attacker as any).attacks_left <= 0;
+    attacker.attacks_used_this_turn = (attacker.attacks_used_this_turn ?? 0) + 1;
+    const left = (attacker.attacks_left ?? 1) - 1;
+    attacker.attacks_left = Math.max(0, left);
+    attacker.hasAttacked = attacker.attacks_left <= 0;
 }
 
 
@@ -68,8 +63,8 @@ function isAttackForbidden(card: CardInstance) {
     if (ks?.cantAttackIsTemporary && ks?.cantAttackUntilOpponentEOT) {
         const ownerIsBlue = (state.blueBoard || []).includes(card);
         const owner = ownerIsBlue ? "blue" : "red";
-        // @ts-ignore
-        if (state.activePlayer === owner) clearCantAttack(card); // Function missing? Assuming defined elsewhere.
+        const activePlayer = state.isBlueTurn ? "blue" : "red";
+        if (activePlayer === owner) clearCantAttack(card);
     }
     return !!(ks?.cantAttack || ks?.cantAttackFollowers || ks?.cantAttackLeaders);
 }

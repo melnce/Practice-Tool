@@ -1,33 +1,27 @@
 
 import { state } from "../../../../core/gameState.js";
-import { cleanupDead } from "../../../core/cleanup.js";
+
 import { applyKeyword } from "../../../core/keywords.js";
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player } from "../../../../core/types.js";
 import { BuffOp } from "./types.js";
-// @ts-ignore
 import { fireTrigger } from "../../../core/triggers.js";
 
 /**
  * Applies stat changes to a card.
  * Handles `buffs`, `attack`, `defense`, `peak_defense`, `potential_*`.
  */
-export function applyStatBuff(target: CardInstance, a: number, d: number, owner: Player) {
+export function applyStatBuff(target: CardInstance, a: number, d: number, _owner: Player) {
     if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
     target.buffs.attack = (target.buffs.attack ?? 0) + a;
     target.buffs.defense = (target.buffs.defense ?? 0) + d;
 
-    // @ts-ignore
-    target.attack = (parseInt(target.attack) || 0) + a;
-    // @ts-ignore
-    target.defense = (parseInt(target.defense) || 0) + d;
-    // @ts-ignore
-    target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
+    (target as any).attack = (parseInt(String(target.attack)) || 0) + a;
+    (target as any).defense = (parseInt(String(target.defense)) || 0) + d;
+    target.peak_defense = Math.max(target.peak_defense ?? Number(target.defense), Number(target.defense));
 
-    // @ts-ignore
-    if (!target.potential_attack) target.potential_attack = target.base_attack || target.attack;
-    // @ts-ignore
-    if (!target.potential_defense) target.potential_defense = target.base_defense || target.defense;
+    if (!target.potential_attack) target.potential_attack = (target.base_attack || Number(target.attack) || 0) as number;
+    if (!target.potential_defense) target.potential_defense = (target.base_defense || Number(target.defense) || 0) as number;
     target.potential_attack! += a;
     target.potential_defense! += d;
 }

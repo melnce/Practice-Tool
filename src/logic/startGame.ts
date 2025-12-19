@@ -43,7 +43,6 @@ export async function startGame(options: StartGameOptions) {
     state.blueAnyAllyAttackedThisTurn = false;
     state.redAnyAllyAttackedThisTurn = false;
     await loadCardDatabase();
-    // @ts-ignore
     await import("../core/card_validation.js").then(({ validateCardDatabase }) => validateCardDatabase());
     await Promise.all([loadBlueDeck(blueChoice), loadRedDeck(redChoice)]);
 

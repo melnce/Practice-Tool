@@ -1,30 +1,16 @@
-// src/logic/effects/ops/targeted/index.ts
 import { state } from "../../../../core/gameState.js";
-// @ts-ignore
-import { adapter } from "../../../../core/adapter.js";
 import { runEffects } from "../../../core/effects/index.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { dealDamage } from "../../../core/barrier.js";
 import { applyKeyword, handleRemoveKeyword } from "../../../core/keywords.js";
-// @ts-ignore
 import { transformTarget, transformHandTarget } from "../transform.js";
-// @ts-ignore
 import { resolveDestroy } from "../destroy.js";
-// @ts-ignore
 import { handleBanish } from "../banish.js";
-// @ts-ignore
 import { bounceToHand } from "../bounce.js";
-// @ts-ignore
 import { resolveReturnHandToDeck } from "../returnHandToDeck.js";
 // clearSelectableFlags is NOT imported because handlers must not use it.
-import { isOverflow } from "../../../../helpers/overflow.js";
-// @ts-ignore
-import { onEvolve } from "../../evolveUtils.js";
 import { fireTrigger } from "../../../core/triggers.js";
-// @ts-ignore
-import { summonNamed, summonExactCopyFromHand } from "../summon.js";
-// @ts-ignore
-import { applyLeaderDamage } from "../../leader.js";
+import { summonExactCopyFromHand } from "../summon.js";
 import { resolveAmountWithOverflow } from "../damage/index.js";
 import {
     fuse_finalize_generic as opFinalizeFuseGeneric,
@@ -33,12 +19,7 @@ import {
     fuse_finalize_alpha as opFinalizeAlphaFuse,
     fuse_finalize_gardens_allure as opFinalizeGardensAllure,
     fuse_finalize_loot as opFinalizeLootFuse,
-    // @ts-ignore
 } from "../fuse/fuse.js";
-
-// @ts-ignore
-import { getCardDetails } from "../../../../data/cardDatabase.js";
-// @ts-ignore
 import { handleEvolveSelf } from "../evolve.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
@@ -173,10 +154,10 @@ TARGETED_OP_HANDLERS.set("buff", (ctx) => {
         target.attack = Math.max(0, (parseInt(target.attack as any) || 0) + a);
         target.defense = (parseInt(target.defense as any) || 0) + d;
         target.peak_defense = Math.max(target.peak_defense ?? (target.defense as number), target.defense as number);
-        if (!target.potential_attack) target.potential_attack = target.base_attack || target.attack;
-        if (!target.potential_defense) target.potential_defense = (target.base_defense || target.defense) as number;
-        (target as any).potential_attack += a;
-        (target as any).potential_defense += d;
+        if (!target.potential_attack) target.potential_attack = Number(target.base_attack || target.attack);
+        if (!target.potential_defense) target.potential_defense = Number(target.base_defense || target.defense);
+        target.potential_attack += a;
+        target.potential_defense += d;
         if (d < 0 && target.type === "Follower") {
             const targetOwner = state.blueBoard.includes(target) ? "blue" : state.redBoard.includes(target) ? "red" : null;
             if (targetOwner) fireTrigger("enemy_follower_defense_down", owner as any, { target });
@@ -313,8 +294,8 @@ TARGETED_OP_HANDLERS.set("evolve_and_buff", (ctx) => {
     target.buffs.defense = (target.buffs.defense ?? 0) + d;
     (target as any).attack += a;
     (target as any).defense += d;
-    target.potential_attack = (target as any).base_attack + (target.buffs.attack ?? 0);
-    target.potential_defense = (target as any).base_defense + (target.buffs.defense ?? 0);
+    target.potential_attack = Number(target.attack);
+    target.potential_defense = Number(target.defense);
     target.peak_defense = Math.max(target.peak_defense ?? (target.defense as number), target.defense as number);
     return { kind: "handled" };
 });

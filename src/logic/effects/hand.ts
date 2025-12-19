@@ -1,7 +1,6 @@
 // src/logic/effects/hand.ts
 import { state } from "../../core/gameState.js";
 import { getCardDetails } from "../../data/cardDatabase.js";
-// @ts-ignore
 // import { render } from "../../ui/render.js";
 import { highlightSelectable } from "../core/targeting.js";
 import { setPendingTarget } from "../core/pendingTarget/index.js";

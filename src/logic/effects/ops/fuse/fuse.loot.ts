@@ -34,17 +34,14 @@ export function fuse_finalize_loot(owner: Player, initiator_uid: string, partner
     const ALLOWED = new Set(["Gilded Blade", "Gilded Goblet", "Gilded Boots", "Gilded Necklace"]);
     const used = (partners || []).filter(p =>
         p?.type === "Spell" &&
-        // @ts-ignore
         Array.isArray(p?.tribes) && p.tribes.includes("Loot") &&
         ALLOWED.has(p?.name)
     );
 
     // Track unique fused names on this specific copy (for X = different names use-cases)
-    // @ts-ignore
     const prev = Array.isArray(initiator._fusedLootNames) ? initiator._fusedLootNames : [];
     const next = new Set(prev.map(String));
     for (const p of used) next.add(String(p.name || ""));
-    // @ts-ignore
     initiator._fusedLootNames = Array.from(next);
 
     // Consume selected Loot cards
@@ -65,15 +62,12 @@ export function fuse_finalize_loot(owner: Player, initiator_uid: string, partner
 
     // Fire exactly ONCE per fuse action on this initiator this TURN.
     // A card can only "fuse" once per turn by rule; treat multi-select as a single fuse.
-    // @ts-ignore
     if (initiator.__lootFuseTurn !== state.roundCount) {
-        // @ts-ignore
         initiator.__lootFuseTurn = state.roundCount;
         try {
             // Single ping; include count only as metadata (listeners should NOT loop).
-            // @ts-ignore
-            fireTrigger?.("loot_fused", owner, { initiator, kind: "loot", count: used.length });
-        } catch { }
+            fireTrigger("loot_fused", owner, { initiator, kind: "loot", count: used.length });
+        } catch { /* no-op */ }
     }
 
     // Mutate spell text/effects on this copy
@@ -83,10 +77,8 @@ export function fuse_finalize_loot(owner: Player, initiator_uid: string, partner
     ];
     if (used.length >= 1) baseSpell.push({ op: "draw", count: 1 });
 
-    // @ts-ignore
     initiator.spell = baseSpell;
     initiator.isFused = used.length >= 1;
-    // @ts-ignore
     initiator.__lootFuseCount = used.length;
     initiator.lastFuseRound = state.roundCount;
 
@@ -106,7 +98,7 @@ export function fuse_finalize_loot(owner: Player, initiator_uid: string, partner
         result_name: "fused_loot",
         targets: "merge",
     };
-    try { fireTrigger?.("on_fuse", owner, { initiator, partners: used, result: { result_card_name: "fused_loot" } }); } catch { }
+    try { fireTrigger?.("on_fuse", owner, { initiator, partners: used, result: { result_card_name: "fused_loot" } }); } catch { /* no-op */ }
 
     clearSelectableFlags(); adapter.render();
 }

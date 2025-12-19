@@ -1,5 +1,4 @@
 import { state } from "../../core/gameState.js";
-// @ts-ignore
 import { adapter } from "../../core/adapter.js";
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
@@ -50,14 +49,14 @@ function getCardSide(c: CardInstance): Player | null {
 }
 
 export function highlightSelectable(cards: CardInstance[]) {
-    cards.forEach(c => (c as any).__uiSelectable = true);
+    cards.forEach(c => c.__uiSelectable = true);
     adapter.render();
 }
 
 export function clearSelectableFlags() {
     guardLifecycle("clearSelectableFlags");
     [...state.blueBoard, ...state.redBoard, ...state.blueHand, ...state.redHand, ...state.blueGraveyard, ...state.redGraveyard].forEach(c => {
-        if (c) delete (c as any).__uiSelectable;
+        if (c) delete c.__uiSelectable;
     });
 }
 

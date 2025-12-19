@@ -1,7 +1,5 @@
 ﻿// src/logic/effects/counters.ts
 import { state } from "../../core/gameState.js";
-// @ts-ignore
-// @ts-ignore
 import { adapter } from "../../core/adapter.js";
 import { fireTrigger } from "../core/triggers.js";
 import { completeCrest } from "./crest.js";

@@ -10,7 +10,6 @@ import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, GameState, Player } from "../../../../core/types.js";
 
 // Class-specific modules
-// @ts-ignore
 import {
     startGearMultiSelect,
     startAlphaSelect,
@@ -20,12 +19,10 @@ import {
     fuse_finalize_fortifier,
 } from "./fuse.artifact.js";
 
-// @ts-ignore
 import {
     fuse_finalize_gardens_allure,
 } from "./fuse.forest.js";
 
-// @ts-ignore
 import {
     fuse_finalize_loot,
 } from "./fuse.loot.js";
@@ -55,9 +52,7 @@ function filterByPartnerFilters(candidates: CardInstance[], filters: any[] = [])
     const pass = (card: CardInstance, f: any) => {
         if (f.zone && f.zone !== "hand") return false;
 
-        // @ts-ignore
         const cType = String(card?.type || "").toLowerCase();
-        // @ts-ignore
         const cClass = String(card?.class || "").toLowerCase();
         const wantType = String(f.type ?? f.type_eq ?? "").toLowerCase();
         const wantClass = String(f.class ?? f.class_eq ?? "").toLowerCase();
@@ -66,15 +61,17 @@ function filterByPartnerFilters(candidates: CardInstance[], filters: any[] = [])
         if (wantClass && cClass !== wantClass) return false;
 
         if (Array.isArray(f.name_in) && !f.name_in.includes(card.name)) return false;
-        // @ts-ignore
         if (f.tribe && !(Array.isArray(card.tribes) && card.tribes.includes(f.tribe))) return false;
 
         if (Number.isFinite(f.cost_max)) {
             const effCost = (Number(card?.effectiveCost) ?? Number(card?.cost) ?? 0) + (Number(card?.cost_mod) || 0);
             if (effCost > f.cost_max) return false;
         }
-        // @ts-ignore
-        if (f.keyword && !Array.isArray(card?.keywords)?.some(k => (k?.name || k) === f.keyword)) return false;
+        if (f.keyword) {
+            const kws = Array.isArray(card?.keywords) ? card.keywords : [];
+            const hasKw = kws.some(k => (typeof k === "string" ? k : k?.name) === f.keyword);
+            if (!hasKw) return false;
+        }
         return true;
     };
 
@@ -157,10 +154,8 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
         eff: {
             op: "fuse_finalize_generic",
             initiator_uid: initiator.uid,
-            // @ts-ignore
             recipe_id: info.recipe?.id || null,
             recipe_index: info.recipeIndex,
-            // @ts-ignore
             result: info.recipe?.result || null
         },
         owner,

@@ -61,9 +61,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
     // pool = all *other* Artifact cards in hand
     const pool = hand.filter(c =>
         c?.uid !== initiator?.uid &&
-        // @ts-ignore
         Array.isArray(c?.tribes) &&
-        // @ts-ignore
         c.tribes.some(t => String(t).toLowerCase() === "artifact")
     );
     if (!pool.length) { clearSelectableFlags(); adapter.render(); return; }
@@ -161,8 +159,7 @@ export function fuse_finalize_gear_multi(owner: Player, initiatorUid: string, pa
         targets: "merge"
     };
 
-    // @ts-ignore
-    try { fireTrigger?.("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } }); } catch { }
+    try { fireTrigger("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } }); } catch { }
 
     logEvent("fuseFinalize", {
         owner,
@@ -212,8 +209,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, par
     }
 
     state.lastFuse = { owner, initiator_name: initiator.name, totalCost: sumCost, result_name: resultName };
-    // @ts-ignore
-    try { fireTrigger?.("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } }); } catch { }
+    try { fireTrigger("on_fuse", owner, { initiator, partners, result: { result_card_name: resultName } }); } catch { }
 
     logEvent("fuseFinalize", {
         owner,
@@ -228,7 +224,7 @@ export function fuse_finalize_fortifier(owner: Player, initiatorUid: string, par
 
 export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partners: CardInstance[]) {
     const hand = handOf(owner);
-    let iIdx = hand.findIndex(c => c?.uid === initiatorUid);
+    const iIdx = hand.findIndex(c => c?.uid === initiatorUid);
     if (iIdx === -1) { clearSelectableFlags(); adapter.render(); return; }
 
     const initiator = hand[iIdx];
@@ -289,13 +285,12 @@ export function fuse_finalize_alpha(owner: Player, initiatorUid: string, partner
     }
 
     try {
-        // @ts-ignore
-        fireTrigger?.("on_fuse", owner, {
+        fireTrigger("on_fuse", owner, {
             initiator,
             partners,
             result: { result_card_name: hasBeta && hasGamma ? "Masterwork Artifact Ω" : "wasted" }
         });
-    } catch { }
+    } catch { /* no-op */ }
 
     if (hand[iIdx]?.name === "Ominous Artifact α") {
         hand[iIdx].lastFuseRound = state.roundCount;

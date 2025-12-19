@@ -25,7 +25,6 @@ export function isFollower(card: CardInstance) {
 }
 
 export function getEffectiveCost(card: CardInstance) {
-    // @ts-ignore
     if (card && typeof card.effectiveCost === "number") return card.effectiveCost;
     const base = parseInt(card?.cost as any, 10) || 0;
     const mod = parseInt(card?.cost_mod as any, 10) || 0;
@@ -43,14 +42,11 @@ export function nextId() {
 // Safe deep clone that ignores cycles and engine backrefs
 export function safeClone<T>(value: T, seen = new WeakSet<object>()): T {
     if (value === null || typeof value !== "object") return value;
-    // @ts-ignore
-    if (seen.has(value)) return undefined as T;
-    // @ts-ignore
-    seen.add(value);
+    if (seen.has(value as object)) return undefined as T;
+    seen.add(value as object);
 
     if (Array.isArray(value)) {
-        // @ts-ignore
-        return value.map((v) => safeClone(v, seen));
+        return value.map((v) => safeClone(v, seen)) as unknown as T;
     }
 
     const out: any = {};

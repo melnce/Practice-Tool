@@ -300,16 +300,26 @@ export interface CardTemplate {
     spell?: Effect[];
     fuse?: any[];
     fuse_recipes?: any[];
+    // Combat / Runtime
+    attacks_left?: number;
+    attacks_per_turn?: number;
+    attacks_used_this_turn?: number;
+    triggers?: any[];
     // Runtime-like (template might not have them but they appear)
     cost_mod?: number;
     effectiveCost?: number;
+    potential_attack?: number;
     potential_defense?: number;
     countdown?: number | string;
     peak_defense?: number;
+    counters?: Record<string, number>;
     keywords?: (string | KeywordEntry)[];
     fanfare?: Effect[];
     enhanceTiers?: { cost: number; effects?: Effect[] }[];
     evoType?: "normal" | "super";
+    evolve?: Effect[] | { effects: Effect[] };
+    superevolve?: Effect[] | { effects: Effect[] };
+    evolve_trigger_always?: boolean;
     lastWordsEffects?: Effect[];
     // Buff tracking
     buffs?: {
@@ -331,6 +341,24 @@ export interface CardInstance extends CardTemplate {
     // UI
     __uiFlashBarrier?: boolean;
     __uiPopBarrier?: boolean;
+    __uiSelectable?: boolean;
+    __mulliganSelectable?: boolean;
+    __mulliganSelected?: boolean;
+    __icarusBuff?: boolean;
+    _spawnedByChain?: boolean;
+    _spawnedByCongregant?: boolean;
+    isDamaged?: boolean;
+    shownCost?: number; // UI preview cost
+
+    // Fuse
+    _fusedLootNames?: string[];
+    __lootFuseTurn?: number;
+    __lootFuseCount?: number;
+    lastFuseRound?: number;
+    isFused?: boolean;
+
+    // Legacy / loose props (migrating slowly)
+    on_discard?: Effect[];
 }
 
 import { RNG } from "./rng.js";

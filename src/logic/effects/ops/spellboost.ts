@@ -1,7 +1,5 @@
 ﻿// src/logic/effects/ops/spellboost.ts
 import { state } from "../../../core/gameState.js";
-// @ts-ignore
-// @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 
@@ -144,14 +142,12 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
                     const reduceBy = Number.isFinite(kw.reduceCostBy) ? kw.reduceCostBy : 0;
                     const minCost = Number.isFinite(kw.minCost) ? kw.minCost : 0;
 
-                    // @ts-ignore
-                    targetCard.base_cost = targetCard.base_cost ?? (parseInt(targetCard.cost, 10) || 0);
+                    targetCard.base_cost = targetCard.base_cost ?? (parseInt(String(targetCard.cost), 10) || 0);
                     const prev = targetCard.spellboostCostCount || 0;
                     const next = prev + reduceBy;
                     targetCard.spellboostCostCount = next;
 
                     const newCost = Math.max(minCost ?? 0, Number(targetCard.base_cost ?? 0) - next);
-                    // @ts-ignore
                     if (Number.isFinite(newCost)) targetCard.cost = newCost;
                 }
                 logEvent("spellboost", { owner, card: targetCard.name, uid: targetCard.uid, count: targetCard.keywordState?.spellboostCount, newCost: targetCard.cost });
@@ -173,14 +169,12 @@ export function spellboostHand(owner: Player, times: any = 1, targetCard: any = 
                     const reduceBy = Number.isFinite(kw.reduceCostBy) ? kw.reduceCostBy : 0;
                     const minCost = Number.isFinite(kw.minCost) ? kw.minCost : 0;
 
-                    // @ts-ignore
-                    c.base_cost = c.base_cost ?? (parseInt(c.cost, 10) || 0);
+                    c.base_cost = c.base_cost ?? (parseInt(String(c.cost), 10) || 0);
                     const prev = c.spellboostCostCount || 0;
                     const next = prev + reduceBy;
                     c.spellboostCostCount = next;
 
                     const newCost = Math.max(minCost ?? 0, Number(c.base_cost ?? 0) - next);
-                    // @ts-ignore
                     if (Number.isFinite(newCost)) c.cost = newCost;
                 }
                 logEvent("spellboost", { owner, card: c.name, uid: c.uid, count: c.keywordState?.spellboostCount, newCost: c.cost });

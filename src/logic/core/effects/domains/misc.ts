@@ -1,7 +1,6 @@
 
-import { state } from "../../../../core/gameState.js";
 import { registerOp, EffectCtx } from "../registry.js";
-import { getPool, handleSelect, TargetContext } from "../../targeting.js";
+import { handleSelect, TargetContext } from "../../targeting.js";
 import { runEffects } from "../index.js";
 import {
     handleSelfCostGate, handleSuperEvolvedAlliedGate, handleMaxPPGate,
@@ -19,14 +18,13 @@ import { handleEvolveSelf, handleEvolveTarget, handleEvolveLastSummoned } from "
 import { Effect, CardInstance } from "../../../../core/types.js";
 import { logEvent } from "../../../../core/logger.js";
 
-const stub = (op: string) => (eff: Effect, ctx: EffectCtx) => {
+const stub = (_op: string) => (_eff: Effect, _ctx: EffectCtx) => {
     // console.warn(`[Stub] Op '${op}' called but not implemented.`);
 };
 
 // Inline Helper for Super Evolved Self Gate (Missing in gates.js)
 function handleSuperEvolvedSelfGate(eff: Effect, owner: string, sourceCard: CardInstance, effectsQueue: Effect[]) {
     const isSuper = !!(sourceCard && sourceCard.type === "Follower" && sourceCard.evoType === "super");
-    // @ts-ignore
     const next = (isSuper ? eff.effects : eff.else_effects) || [];
     if (next.length && Array.isArray(effectsQueue)) {
         effectsQueue.unshift(...next);

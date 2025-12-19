@@ -89,8 +89,7 @@ export function registerResourceEffects() {
     registerOp("transform_in_hand", (eff, ctx) => handleTransformInHand(eff, ctx.owner));
     registerOp("transform_random_spell_in_hand", (eff, ctx) => {
         import("../../../effects/ops/transform.js").then(({ transformRandomSpellInHand }) => {
-            // @ts-ignore
-            transformRandomSpellInHand(ctx.owner, eff.into || "Ersatz Elimination");
+            transformRandomSpellInHand(ctx.owner, (eff as any).into || "Ersatz Elimination");
         });
     });
 

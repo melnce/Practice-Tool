@@ -1,7 +1,5 @@
 // src/logic/effects/ops/returnHandToDeck.ts
 import { state } from "../../../core/gameState.js";
-// @ts-ignore
-// @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 import { shuffleInPlace } from "../../../core/utils.js";
 import { logEvent } from "../../../core/logger.js";

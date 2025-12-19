@@ -45,7 +45,6 @@ export async function replaceDeckWithSetMinus(owner: Player, eff: Effect & { set
     for (const base of Array.isArray(cards) ? cards : []) {
         if (!base?.name) continue;
         if (exclude.has(String(base.name))) continue;
-        // @ts-ignore
         const copy = JSON.parse(JSON.stringify(base));
         copy.uid = state.rng.makeUid();
         deck.push(copy);

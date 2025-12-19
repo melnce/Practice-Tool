@@ -48,7 +48,6 @@ export function handleSuperEvoGate(owner: Player) {
 
 export function handleEvolvedSelfGate(eff: Effect, owner: string, sourceCard: CardInstance, effectsQueue: Effect[]) {
     const isEvolved = !!(sourceCard && sourceCard.hasEvolved);
-    // @ts-ignore
     const next = (isEvolved ? eff.effects : eff.else_effects) || [];
     if (next.length && Array.isArray(effectsQueue)) {
         effectsQueue.unshift(...next);
@@ -60,7 +59,6 @@ export function handleEvolvedSelfGate(eff: Effect, owner: string, sourceCard: Ca
 export function amuletCountGate(owner: Player, eff: any) {
     const need = parseInt(eff.count ?? 0);
     const board = owner === "blue" ? state.blueBoard : state.redBoard;
-    // @ts-ignore
     const amuletCount = (board || []).filter(c => c.type === "Amulet").length;
     return amuletCount >= need;
 }
@@ -103,15 +101,11 @@ export function noAllyAttackedThisTurn(owner: Player) {
     return !(board || []).some(c => {
         if (!c || c.type !== "Follower") return false;
 
-        // @ts-ignore
         const used = (c.attacks_used_this_turn ?? 0) > 0;
-        // @ts-ignore
         const legacy = !!c.hasAttacked;
 
-        // @ts-ignore
-        const perTurn = Number.isFinite(c.attacks_per_turn) ? c.attacks_per_turn : 1;
-        // @ts-ignore
-        const left = Number.isFinite(c.attacks_left) ? c.attacks_left : perTurn;
+        const perTurn = Number.isFinite(c.attacks_per_turn) ? c.attacks_per_turn! : 1;
+        const left = Number.isFinite(c.attacks_left) ? c.attacks_left! : perTurn;
         const spent = left < perTurn;
 
         return used || legacy || spent;
@@ -133,16 +127,14 @@ export function handleBoardNameGate(owner: Player, eff: Effect, effectsQueue: Ef
 }
 
 export function handleBothMaxPPGate(eff: Effect, effectsQueue: Effect[]) {
-    // @ts-ignore
-    const need = Number.isFinite(eff.at_least) ? eff.at_least : 10;
+    const need = Number.isFinite((eff as any).at_least) ? (eff as any).at_least : 10;
     const ok = (state.blueMaxPP >= need) && (state.redMaxPP >= need);
     const next = ok ? (eff.effects || []) : (eff.else_effects || []);
     if (next.length) effectsQueue.unshift(...next);
 }
 
 export function handleMaxPPGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {
-    // @ts-ignore
-    const need = Number.isFinite(eff.at_least) ? eff.at_least : 10;
+    const need = Number.isFinite((eff as any).at_least) ? (eff as any).at_least : 10;
     const currentMax = owner === "blue" ? state.blueMaxPP : state.redMaxPP;
     const ok = currentMax >= need;
     const next = ok ? (eff.effects || []) : (eff.else_effects || []);
@@ -160,7 +152,6 @@ export function handleRallyGate(owner: Player, eff: any, effectsQueue: Effect[])
 }
 
 function getEffectiveCost(card: CardInstance) {
-    // @ts-ignore
     if (Number.isFinite(card.effectiveCost)) return card.effectiveCost;
     const base = parseInt(card?.cost as string, 10) || 0;
     const mod = parseInt((card as any)?.cost_mod, 10) || 0;
@@ -178,7 +169,6 @@ export function handleSelfCostGate(sourceCard: CardInstance, eff: any, effectsQu
 
 export function handleSuperEvolvedAlliedGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {
     const board = owner === "blue" ? state.blueBoard : state.redBoard;
-    // @ts-ignore
     const hasSuper = board.some(c => c.type === "Follower" && c.evoType === "super");
     const next = (hasSuper ? eff.effects : eff.else_effects) || [];
     if (next.length) effectsQueue.unshift(...next);
@@ -186,7 +176,6 @@ export function handleSuperEvolvedAlliedGate(owner: Player, eff: Effect, effects
 
 export function handleEvolvedAlliedGate(owner: Player, eff: Effect, effectsQueue: Effect[]) {
     const board = owner === "blue" ? state.blueBoard : state.redBoard;
-    // @ts-ignore
     const hasEvolved = board.some(c => c.type === "Follower" && (c.hasEvolved || c.evoType === "super"));
     const next = (hasEvolved ? eff.effects : eff.else_effects) || [];
     if (next.length) effectsQueue.unshift(...next);

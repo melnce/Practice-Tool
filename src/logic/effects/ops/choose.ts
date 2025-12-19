@@ -1,11 +1,7 @@
 // src/logic/effects/ops/choose.ts
 import { state } from "../../../core/gameState.js";
-// @ts-ignore
-// @ts-ignore
-import { adapter } from "../../../core/adapter.js";
-
-// @ts-ignore
 import { hasEarthSigils, consumeEarthSigils } from "./earth.js";
+import { adapter } from "../../../core/adapter.js";
 import { spellboostHand } from "./spellboost.js";
 import { handleDrawFiltered } from "./draw.js";
 import { handleReanimate } from "./reanimate.js";
@@ -51,8 +47,7 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
     const isAIMode = () => {
         // Your spectator sets these during AI searches/turns (see AlphaVanillaSpectator) :contentReference[oaicite:3]{index=3}
         // If you later run bots without the spectator, you can flip HEADLESS yourself before resolving effects.
-        // @ts-ignore
-        return !!(globalThis && (globalThis.HEADLESS || globalThis.AI_SUPPRESS_RENDER));
+        return !!(globalThis && ((globalThis as any).HEADLESS || (globalThis as any).AI_SUPPRESS_RENDER));
     };
 
     // Tiny heuristic: favor immediate board impact & resources; slight penalty if ER cost can’t be paid.
@@ -128,8 +123,7 @@ export function handleChoose(eff: Effect, owner: Player, sourceCard: CardInstanc
         if (effectsQueue && effectsQueue.length) {
             runEffects(effectsQueue, owner, sourceCard);
         } else {
-            // @ts-ignore
-            if (!globalThis.AI_SUPPRESS_RENDER) adapter.render();
+            if (!(globalThis as any).AI_SUPPRESS_RENDER) adapter.render();
         }
         console.groupEnd();
         return "done";

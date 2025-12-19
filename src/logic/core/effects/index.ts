@@ -5,7 +5,6 @@
  * Import them from their respective cohesive modules.
  */
 import { state } from "../../../core/gameState.js";
-// @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 import { fireTrigger, registerRunEffects } from "../triggers.js";
 import { CardInstance, Effect, Player, EffectOp, EffectByOp, EffectResult } from "../../../core/types.js";
@@ -66,8 +65,7 @@ export function onFanfare(card: CardInstance, owner: Player) {
 }
 
 export function getEffectiveCost(card: CardInstance) {
-    // @ts-ignore
-    if (Number.isFinite(card.effectiveCost)) return card.effectiveCost;
+    if (typeof card.effectiveCost === 'number' && Number.isFinite(card.effectiveCost)) return card.effectiveCost;
     const base = parseInt(card?.cost as string, 10) || 0;
     const mod = parseInt((card as any)?.cost_mod, 10) || 0;
     return base + mod;

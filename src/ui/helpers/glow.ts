@@ -4,7 +4,6 @@ import { isOverflow } from "../../helpers/overflow.js";
 import { comboReadyInHand } from "../../helpers/combo.js";
 import { hasNecromancy } from "../../helpers/necromancy.js";
 import { getPool } from "../../logic/core/targeting.js";
-// @ts-ignore
 import { handleSuperEvoGate } from "../../logic/effects/gates/gates.js";
 import { CardInstance, GameState, Player, Effect } from "../../core/types.js";
 
@@ -16,7 +15,6 @@ function getSpellboostCount(card: CardInstance) {
         card.keywords.some(k => (typeof k === "string" ? k : k?.name)?.toLowerCase?.() === "spellboost");
     if (!hasSpellboost) return null;
     for (const k of ["spellboostCount", "spellBoostCount", "spellboosts", "spell_boosts", "spellboost_counter"]) {
-        // @ts-ignore
         const v = card[k];
         if (Number.isFinite(Number(v))) return Number(v);
     }
@@ -253,7 +251,6 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
     const crests = owner === "blue" ? (state.blueCrests || []) : (state.redCrests || []);
     const faith = (() => {
         const c = crests.find((x: CardInstance) => String(x?.name).toLowerCase() === "faith");
-        // @ts-ignore
         return Number(c?.counters?.faith ?? 0);
     })();
     const isShamNacha = String(card?.name || "").toLowerCase() === "sham-nacha, heir to entwining";

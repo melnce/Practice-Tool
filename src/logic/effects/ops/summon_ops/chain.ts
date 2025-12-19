@@ -38,10 +38,8 @@ export function makeChainDecayClone(prev: CardInstance, owner: Player): CardInst
     // Normalize numbers from prev
     const prevAtk = parseInt(String(prev.attack)) || 0;
     const prevDef = parseInt(String(prev.defense)) || 0;
-    // @ts-ignore
-    const prevBaseA = Number.isFinite(prev.base_attack) ? prev.base_attack : prevAtk - (parseInt(prev.buffs?.attack) || 0);
-    // @ts-ignore
-    const prevBaseD = Number.isFinite(prev.base_defense) ? prev.base_defense : prevDef - (parseInt(prev.buffs?.defense) || 0);
+    const prevBaseA = Number.isFinite(prev.base_attack) ? prev.base_attack! : prevAtk - (parseInt(String(prev.buffs?.attack)) || 0);
+    const prevBaseD = Number.isFinite(prev.base_defense) ? prev.base_defense! : prevDef - (parseInt(String(prev.buffs?.defense)) || 0);
     const buffA = parseInt(String(prev.buffs?.attack)) || 0;
     const buffD = parseInt(String(prev.buffs?.defense)) || 0;
 
@@ -57,9 +55,7 @@ export function makeChainDecayClone(prev: CardInstance, owner: Player): CardInst
     clone.defense = newBaseD + buffD;
 
     // Keep potentials aligned so DEF is white (not damaged)
-    // @ts-ignore
     clone.potential_attack = (clone.base_attack as number) + buffA;
-    // @ts-ignore
     clone.potential_defense = (clone.base_defense as number) + buffD;
 
     // Peak is this instance's full current DEF
@@ -69,9 +65,7 @@ export function makeChainDecayClone(prev: CardInstance, owner: Player): CardInst
     // Turn/attack flags
     clone.justPlayed = true;
     clone.hasAttacked = false;
-    // @ts-ignore
-    clone.attacks_per_turn = Number.isFinite(clone.attacks_per_turn) ? clone.attacks_per_turn : 1;
-    // @ts-ignore
+    clone.attacks_per_turn = Number.isFinite(clone.attacks_per_turn) ? clone.attacks_per_turn! : 1;
     clone.attacks_left = clone.attacks_per_turn;
 
     // Rush/Storm handling
@@ -91,11 +85,9 @@ export function makeChainDecayClone(prev: CardInstance, owner: Player): CardInst
 
     // Prevent re-entrant cascade from chain-spawned copies
     // Renamed from _spawnedByCongregant to generic _spawnedByChain
-    // @ts-ignore
     clone._spawnedByChain = true;
 
     // Ensure UI "damaged" flag is false (white DEF)
-    // @ts-ignore
     clone.isDamaged = false;
 
     return clone;
@@ -111,7 +103,6 @@ export function handleFillBoardChainDecay(owner: Player, enteringCard: CardInsta
     if (!enteringCard || enteringCard.type !== "Follower") return;
 
     // Don’t start a new cascade from chain-spawned copies
-    // @ts-ignore
     if (enteringCard._spawnedByChain || enteringCard._spawnedByCongregant) return;
 
     const board = boardOf(owner);
@@ -127,15 +118,13 @@ export function handleFillBoardChainDecay(owner: Player, enteringCard: CardInsta
         // Respect max board size
         if (board.length >= 5) break;
         board.push(clone);
-        // @ts-ignore
-        logEvent("chainSpawn", { owner, name: clone.name, uid: clone.uid, base_defense: clone.base_defense });
+        logEvent("chainSpawn", { owner, name: clone.name, uid: clone.uid, base_defense: clone.base_defense } as any);
 
         // Rally for followers
         if (owner === "blue") state.blueRally++;
         else state.redRally++;
 
         // Per-enter hooks & triggers (keep parity with pushToBoard)
-        // @ts-ignore
         // medicalAssassinOnFollowerEnter(owner, clone);
         fireTrigger("ally_follower_enter", owner, { enteringCard: clone });
         fireTrigger("enemy_follower_enter", owner, { enteringCard: clone });

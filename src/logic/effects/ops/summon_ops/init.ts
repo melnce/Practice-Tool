@@ -7,7 +7,6 @@ export function seedCountersFromKeywords(card: CardInstance) {
     card.counters = card.counters || {};
     const kws = Array.isArray(card.keywords) ? card.keywords : [];
     for (const k of kws) {
-        // @ts-ignore
         if (typeof k !== "string" && k?.name === "Counter") {
             const key = String(k.key);
             const count = Number(k.count || 0);
@@ -27,9 +26,7 @@ export function seedCountersFromKeywords(card: CardInstance) {
 
 export function initFollower(card: CardInstance) {
     // normalize numbers
-    // @ts-ignore
     card.attack = parseInt(card.attack as any) || 0;
-    // @ts-ignore
     card.defense = parseInt(card.defense as any) || 0;
 
     // remember raw stats

@@ -47,8 +47,7 @@ export function fuse_finalize_gardens_allure(owner: Player, initiator_uid: strin
     });
 
     initiator.isFused = true;
-    // @ts-ignore
-    initiator.spell = [{ op: "draw", count: 2 }];
+    initiator.spell = [{ op: "draw", count: 2 } as any];
     initiator.lastFuseRound = state.roundCount;
 
     logEvent("fuseFinalize", {

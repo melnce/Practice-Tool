@@ -1,7 +1,5 @@
 // src/logic/effects/ops/engage.ts
 import { state } from "../../../core/gameState.js";
-// @ts-ignore
-// @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 import { runEffects } from "../../core/effects/index.js";
 import { cleanupDead } from "../../core/cleanup.js";

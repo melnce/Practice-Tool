@@ -29,6 +29,5 @@ export function handleSummonDestroyedAmuletHighestBaseCost(owner: Player) {
     const pick = choice.g;
 
     // Re-create a fresh copy from DB and put it on board using existing API
-    // @ts-ignore
     summonNamed({ op: "summon_named", name: pick.name, count: 1 }, owner);
 }

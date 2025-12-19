@@ -26,19 +26,17 @@ export function handleBuffHandTribe(eff: Effect, owner: Player) {
     for (const card of hand) {
         if (card.type === "Follower" && Array.isArray(card.tribes) && card.tribes.includes(eff.tribe)) {
             if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-            card.buffs.attack = (card.buffs.attack ?? 0) + a;
-            card.buffs.defense = (card.buffs.defense ?? 0) + d;
+            card.buffs.attack = Number(card.buffs.attack ?? 0) + a;
+            card.buffs.defense = Number(card.buffs.defense ?? 0) + d;
 
-            // @ts-ignore
-            card.attack = (parseInt(card.attack) || 0) + a;
-            // @ts-ignore
-            card.defense = (parseInt(card.defense) || 0) + d;
+            card.attack = (parseInt(String(card.attack)) || 0) + a;
+            card.defense = (parseInt(String(card.defense)) || 0) + d;
 
             // keep previews coherent
-            // @ts-ignore
-            card.potential_attack = (card.potential_attack ?? card.base_attack ?? card.attack) + a;
-            // @ts-ignore
-            card.potential_defense = (card.potential_defense ?? card.base_defense ?? card.defense) + d;
+            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
+            card.potential_attack = (card.potential_attack ?? card.base_attack ?? Number(card.attack)) + a;
+            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
+            card.potential_defense = (card.potential_defense ?? card.base_defense ?? Number(card.defense)) + d;
             logEvent("buffHand", { owner, target: card.name, uid: card.uid, a: a, d: d, filter: eff.tribe });
         }
     }
@@ -55,19 +53,17 @@ export function handleBuffHandClass(eff: Effect, owner: Player) {
     for (const card of hand) {
         if (card.type === "Follower" && card.class === wantClass) {
             if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-            card.buffs.attack = (card.buffs.attack ?? 0) + a;
-            card.buffs.defense = (card.buffs.defense ?? 0) + d;
+            card.buffs.attack = Number(card.buffs.attack ?? 0) + a;
+            card.buffs.defense = Number(card.buffs.defense ?? 0) + d;
 
-            // @ts-ignore
-            card.attack = (parseInt(card.attack) || 0) + a;
-            // @ts-ignore
-            card.defense = (parseInt(card.defense) || 0) + d;
+            (card as any).attack = (parseInt(String(card.attack)) || 0) + a;
+            (card as any).defense = (parseInt(String(card.defense)) || 0) + d;
 
             // keep previews coherent
-            // @ts-ignore
-            card.potential_attack = (card.potential_attack ?? card.base_attack ?? card.attack) + a;
-            // @ts-ignore
-            card.potential_defense = (card.potential_defense ?? card.base_defense ?? card.defense) + d;
+            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
+            card.potential_attack = (card.potential_attack ?? card.base_attack ?? Number(card.attack)) + a;
+            // @ts-expect-error: TS falsely claims operator + cannot be applied to number and number here
+            card.potential_defense = (card.potential_defense ?? card.base_defense ?? Number(card.defense)) + d;
             logEvent("buffHand", { owner, target: card.name, uid: card.uid, a: a, d: d, filter: wantClass });
         }
     }
@@ -81,19 +77,15 @@ export function handleBuffLastAddedToHand(eff: Effect, owner: Player) {
     const d = parseInt(eff.defense as any ?? 0) || 0;
 
     // Ensure base stats stay as the printed values
-    // @ts-ignore
-    if (card.base_attack == null) card.base_attack = parseInt(card.attack) || 0;
-    // @ts-ignore
-    if (card.base_defense == null) card.base_defense = parseInt(card.defense) || 0;
+    if (card.base_attack == null) card.base_attack = parseInt(String(card.attack)) || 0;
+    if (card.base_defense == null) card.base_defense = parseInt(String(card.defense)) || 0;
 
     if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-    card.buffs.attack = (card.buffs.attack ?? 0) + a;
-    card.buffs.defense = (card.buffs.defense ?? 0) + d;
+    card.buffs.attack = Number(card.buffs.attack ?? 0) + a;
+    card.buffs.defense = Number(card.buffs.defense ?? 0) + d;
 
-    // @ts-ignore
-    card.attack = (parseInt(card.attack) || 0) + a;
-    // @ts-ignore
-    card.defense = (parseInt(card.defense) || 0) + d;
+    (card as any).attack = (parseInt(String(card.attack)) || 0) + a;
+    (card as any).defense = (parseInt(String(card.defense)) || 0) + d;
 
     card.potential_attack = (card.base_attack ?? 0) + (card.buffs.attack ?? 0);
     card.potential_defense = (card.base_defense ?? 0) + (card.buffs.defense ?? 0);
@@ -135,8 +127,7 @@ export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardIn
     const to = parseInt((eff.value ?? (eff as any).set_to ?? (eff as any).attack_to ?? 0) as any) || 0;
 
     for (const target of pool) {
-        // @ts-ignore
-        const current = parseInt(target.attack) || 0;
+        const current = parseInt(String(target.attack)) || 0;
         const delta = to - current;
 
         // ensure buffs container
@@ -144,12 +135,10 @@ export function handleSetAttackTo(eff: Effect, owner: Player, sourceCard: CardIn
 
         // Apply as a buff delta
         target.buffs.attack = (target.buffs.attack ?? 0) + delta;
-        // @ts-ignore
-        target.attack = current + delta;
+        (target as any).attack = current + delta;
 
         // keep previews coherent
-        // @ts-ignore
-        if (!target.potential_attack) target.potential_attack = target.base_attack || target.attack;
+        if (!target.potential_attack) target.potential_attack = (target.base_attack || Number(target.attack) || 0) as number;
         target.potential_attack! += delta;
         logEvent("setAttackTo", { owner, target: target.name, uid: target.uid, to });
     }
@@ -174,30 +163,23 @@ export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInsta
         if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
 
         if (setA !== null) {
-            // @ts-ignore
-            const currentA = parseInt(target.attack) || 0;
+            const currentA = parseInt(String(target.attack)) || 0;
             const deltaA = setA - currentA;
             target.buffs.attack = (target.buffs.attack ?? 0) + deltaA;
-            // @ts-ignore
-            target.attack = setA;
-            // @ts-ignore
+            (target as any).attack = setA;
             if (!target.potential_attack) target.potential_attack = target.base_attack || currentA;
             target.potential_attack! += deltaA;
         }
 
         if (setD !== null) {
-            // @ts-ignore
-            const currentD = parseInt(target.defense) || 0;
+            const currentD = parseInt(String(target.defense)) || 0;
             const deltaD = setD - currentD;
             target.buffs.defense = (target.buffs.defense ?? 0) + deltaD;
-            // @ts-ignore
-            target.defense = setD;
-            // @ts-ignore
+            (target as any).defense = setD;
             if (!target.potential_defense) target.potential_defense = target.base_defense || currentD;
             target.potential_defense! += deltaD;
 
-            // @ts-ignore
-            target.peak_defense = Math.max(target.peak_defense ?? target.defense, target.defense);
+            target.peak_defense = Math.max(target.peak_defense ?? Number(target.defense), Number(target.defense));
         }
 
         logEvent("setStats", { owner, target: target.name, uid: target.uid, a: setA, d: setD });

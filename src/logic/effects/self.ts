@@ -1,9 +1,7 @@
 // src/logic/effects/self.ts
 import { state } from "../../core/gameState.js";
 import { applyKeyword } from "../core/keywords.js";
-// @ts-ignore
 import { handleBanish } from "./ops/banish.js";
-// @ts-ignore
 import { resolveDestroy } from "./ops/destroy.js";
 
 import { logEvent } from "../../core/logger.js";
@@ -31,10 +29,8 @@ export function handleBuffSelf(sourceCard: CardInstance, eff: Effect) {
     sourceCard.buffs.defense = (sourceCard.buffs.defense ?? 0) + d;
 
     // Update the card's current stats
-    // @ts-ignore
-    sourceCard.attack = (parseInt(sourceCard.attack) || 0) + a;
-    // @ts-ignore
-    sourceCard.defense = (parseInt(sourceCard.defense) || 0) + d;
+    sourceCard.attack = (parseInt(String(sourceCard.attack)) || 0) + a;
+    sourceCard.defense = (parseInt(String(sourceCard.defense)) || 0) + d;
     sourceCard.peak_defense = Math.max(
         sourceCard.peak_defense ?? (sourceCard.defense as number),
         sourceCard.defense as number
@@ -91,10 +87,8 @@ export function clearTemporaryBuffs(card: CardInstance) {
         }
 
         // Update the card's stats
-        // @ts-ignore
-        card.attack = (parseInt(card.attack) || 0) - totalAttack;
-        // @ts-ignore
-        card.defense = Math.max(0, (parseInt(card.defense) || 0) - totalDefense);
+        card.attack = (parseInt(String(card.attack)) || 0) - totalAttack;
+        card.defense = Math.max(0, (parseInt(String(card.defense)) || 0) - totalDefense);
 
         // Reset temporary buffs tracking
         card.temporaryBuffs = [];
@@ -226,7 +220,6 @@ export function handleDynamicBuffSelf(sourceCard: CardInstance, eff: Effect, own
 export function handleDestroySelf(sourceCard: CardInstance) {
     logEvent("destroySelf", { card: sourceCard.name, uid: sourceCard.uid });
     // Setting defense to 0 marks it for cleanup
-    // @ts-ignore
     sourceCard.defense = 0;
     // Explicitly mark for cleanup (for amulets/spells that don't have defense)
     (sourceCard as any).pendingDestruction = true;

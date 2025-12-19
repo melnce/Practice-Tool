@@ -1,8 +1,6 @@
 // src/logic/effects/ops/misc.ts
 
 import { state } from "../../../core/gameState.js";
-// @ts-ignore
-// @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 import { handleDamageAll, handleDamageRandom } from "./damage.js";
 import { destroyAlliedAmulets } from "./destroy.js";
@@ -43,23 +41,17 @@ export function handleDestroyRandomOtherAllies(owner: Player, sourceCard: CardIn
 // restore_full_defense_self
 export function handleRestoreFullDefenseSelf(sourceCard: CardInstance, context: any) {
     if (sourceCard && sourceCard.type === "Follower") {
-        // @ts-ignore
-        const curr = parseInt(sourceCard.defense, 10) || 0;
+        const curr = parseInt(String(sourceCard.defense), 10) || 0;
         const full =
-            // @ts-ignore
-            Number.isFinite(sourceCard.potential_defense) ? sourceCard.potential_defense :
-                // @ts-ignore
-                Number.isFinite(sourceCard.peak_defense) ? sourceCard.peak_defense :
-                    // @ts-ignore
-                    Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense :
+            Number.isFinite(sourceCard.potential_defense) ? sourceCard.potential_defense! :
+                Number.isFinite(sourceCard.peak_defense) ? sourceCard.peak_defense! :
+                    Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense! :
                         curr;
 
         const restored = Math.max(0, (full as number) - curr);
-        // @ts-ignore
         sourceCard.defense = full;
 
         // make available to chained effects in this sequence
-        // @ts-ignore
         sourceCard.__lastRestored = restored;
         if (context) context.__restored_amount = restored;
     }
@@ -69,20 +61,15 @@ export function handleRestoreFullDefenseSelf(sourceCard: CardInstance, context: 
 export function handleRestoreSelfAndHealLeader(owner: Player, sourceCard: CardInstance) {
     if (sourceCard?.type !== "Follower") return;
 
-    // @ts-ignore
-    const curr = parseInt(sourceCard.defense, 10) || 0;
+    const curr = parseInt(String(sourceCard.defense), 10) || 0;
     const full =
-        // @ts-ignore
-        Number.isFinite(sourceCard.potential_defense) ? sourceCard.potential_defense :
-            // @ts-ignore
-            Number.isFinite(sourceCard.peak_defense) ? sourceCard.peak_defense :
-                // @ts-ignore
-                Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense :
+        Number.isFinite(sourceCard.potential_defense) ? sourceCard.potential_defense! :
+            Number.isFinite(sourceCard.peak_defense) ? sourceCard.peak_defense! :
+                Number.isFinite(sourceCard.base_defense) ? sourceCard.base_defense! :
                     curr;
 
     const restored = Math.max(0, (full as number) - curr);
     if (restored > 0) {
-        // @ts-ignore
         sourceCard.defense = full;
         handleHealLeader(owner, { amount: restored } as any);
     }
@@ -103,14 +90,12 @@ export function handleGainMaxPP(owner: Player, eff: Effect) {
 }
 
 export function handleSetCostLastDrawn(eff: Effect) {
-    // @ts-ignore
-    const v = parseInt(eff.amount);
+    const v = parseInt((eff.amount as string) || "0");
     if (!Number.isFinite(v)) return;
     const arr = state.lastDrawnCards || [];
     const target = arr[0]; // most recently drawn
     if (target) {
         if (target.base_cost === undefined) {
-            // @ts-ignore
             target.base_cost = parseInt(String(target.cost)) || 0;
         }
         target.cost = Math.max(0, v);
@@ -128,22 +113,17 @@ export function handleRestoreAllies(owner: Player, eff: Effect) {
     const board = owner === "blue" ? state.blueBoard : state.redBoard;
     for (const c of board) {
         if (!c || c.type !== "Follower") continue;
-        // @ts-ignore
-        const curr = parseInt(c.defense, 10) || 0;
+        const curr = parseInt(String(c.defense), 10) || 0;
         const full =
-            // @ts-ignore
-            Number.isFinite(c.potential_defense) ? c.potential_defense :
-                // @ts-ignore
-                Number.isFinite(c.peak_defense) ? c.peak_defense :
-                    // @ts-ignore
-                    Number.isFinite(c.base_defense) ? c.base_defense :
+            Number.isFinite(c.potential_defense) ? c.potential_defense! :
+                Number.isFinite(c.peak_defense) ? c.peak_defense! :
+                    Number.isFinite(c.base_defense) ? c.base_defense! :
                         curr;
 
         // Can only restore up to the difference
         const canRestore = (full as number) - curr;
         if (canRestore > 0) {
             const actual = Math.min(amount, canRestore);
-            // @ts-ignore
             c.defense = curr + actual;
             // No specific trigger fired per follower here for simplicity, 
             // but in a full engine we'd fire 'on_heal' per unit.

@@ -34,7 +34,7 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
     selected: (q, env) => {
         // LEGACY: Nested selection hierarchy.
         // Prefer context.targets (pass-down) over state.pending (global).
-        let chosen = Array.isArray(env.context?.targets)
+        const chosen = Array.isArray(env.context?.targets)
             ? env.context.targets
             : Array.isArray(state.pendingTargetEffect?.targets)
                 ? state.pendingTargetEffect!.targets

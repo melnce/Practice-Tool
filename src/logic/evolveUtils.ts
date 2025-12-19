@@ -1,8 +1,6 @@
 // src/logic/evolveUtils.ts
 import { runEffects } from "./core/effects/index.js";
-// @ts-ignore
 import { handleEvolveSelf } from "./effects/ops/evolve.js";
-// @ts-ignore
 import { adapter } from "../core/adapter.js";
 import { state } from "../core/gameState.js";
 import { fireTrigger } from "./core/triggers.js";
@@ -47,7 +45,7 @@ export function onEvolve(card: CardInstance, owner: Player, mode: "normal" | "su
     card.evoType = (mode === "super") ? "super" : "normal";
 
     // Get the correct evolve object based on mode
-    const evolveObj = (mode === "super" ? (card as any).superevolve : (card as any).evolve);
+    const evolveObj = (mode === "super" ? card.superevolve : card.evolve);
     const isBlue = owner === "blue";
     const spendCounters = () => {
         if (!spendPoint) return;
@@ -111,7 +109,7 @@ export function onEvolve(card: CardInstance, owner: Player, mode: "normal" | "su
     // - Player-initiated evolves (spendPoint=true) always run effects ("Evolve:" cards)
     // - Effect-initiated evolves only run if card has evolve_trigger_always flag ("When this evolves" cards)
     const fromPlayer = spendPoint;
-    const alwaysTrigger = (card as any).evolve_trigger_always === true;
+    const alwaysTrigger = card.evolve_trigger_always === true;
     const shouldRunScript = fromPlayer || alwaysTrigger;
 
     // Run effects only if conditions are met

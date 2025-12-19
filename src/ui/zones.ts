@@ -76,7 +76,6 @@ function getSpellboostCount(card: CardInstance) {
     ];
 
     for (const k of keys) {
-        // @ts-ignore
         const v = card[k];
         if (Number.isFinite(Number(v))) return Number(v);
     }
@@ -128,15 +127,12 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
 
         // If an enhance tier is active, show its printed cost.
         // Otherwise, add the temporary hand modifier to base cost.
-        // @ts-ignore
         let shownCost = Number(preview.shownCost) || 0;
-        // @ts-ignore
-        if (!preview.tier) {
+        if (!(preview as any).tier) {
             shownCost = Math.max(0, shownCost + handMod);
         }
 
-        // @ts-ignore
-        const { atkDisp, defDisp, tier } = preview;
+        const { atkDisp, defDisp, tier } = preview as any;
 
         // expose shownCost so glow can use it
         card.shownCost = shownCost;
@@ -159,9 +155,7 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
 
         // follower / amulet / spell display
         if (isFollower) {
-            // @ts-ignore
             bottomLeft.textContent = String(Math.max(0, atkDisp));
-            // @ts-ignore
             bottomRight.textContent = String(defDisp);
         } else if (isAmulet) {
             bottomLeft.style.display = "none";
@@ -192,7 +186,6 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
             }
         }
         // === Flight of Icarus badge (hand or board)
-        // @ts-ignore
         if (card.__icarusBuff) {
             const badge = document.createElement("div");
             badge.className = "icarus-badge";
@@ -255,9 +248,7 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
 
             // --- STAT CALCULATION & CORRECTION ---
             // 1. Initialize base stats ONCE. This is the card's printed value and should not change.
-            // @ts-ignore
             if (card.base_attack === undefined) card.base_attack = Number(card.attack) || 0;
-            // @ts-ignore
             if (card.base_defense === undefined) card.base_defense = Number(card.defense) || 0;
 
             // 2. Ensure the buff tracking object exists.
@@ -265,20 +256,14 @@ export function renderZone(containerId: string, cards: CardInstance[], state: Ga
 
             // 3. ALWAYS recalculate potential stats from base and buffs during every render.
             // This corrects any state corruption from other game logic and becomes the single source of truth.
-            // @ts-ignore
-            card.potential_attack = card.base_attack + card.buffs.attack;
-            // @ts-ignore
-            card.potential_defense = card.base_defense + card.buffs.defense;
+            card.potential_attack = (card.base_attack as number) + (card.buffs?.attack ?? 0);
+            card.potential_defense = (card.base_defense as number) + (card.buffs?.defense ?? 0);
 
             // 4. Determine the card's visual state based on this corrected data.
-            // @ts-ignore
-            card.isDamaged = (Number(card.defense) || 0) < card.potential_defense;
-            // @ts-ignore
-            const isAttackBuffed = atkDisp > card.base_attack;
-            // @ts-ignore
-            const isAttackDebuffed = atkDisp < card.base_attack;
-            // @ts-ignore
-            const isDefenseBuffed = defDisp > card.base_defense;
+            card.isDamaged = (Number(card.defense) || 0) < (card.potential_defense as number);
+            const isAttackBuffed = atkDisp > (card.base_attack as number);
+            const isAttackDebuffed = atkDisp < (card.base_attack as number);
+            const isDefenseBuffed = defDisp > (card.base_defense as number);
 
             // --- APPLY CSS CLASSES ---
             bottomLeft.classList.remove("stat-buffed", "stat-damaged");

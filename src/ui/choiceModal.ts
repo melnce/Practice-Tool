@@ -17,11 +17,11 @@ export function showChoiceModal(options: any[], callback: (index: number) => voi
   `;
 
   // Add click handlers
-  modal.querySelectorAll('.choice-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-      btn.classList.add('processing');
-      // @ts-ignore
-      const index = parseInt(btn.dataset.index);
+  modal.querySelectorAll('.choice-option').forEach((btn: Element) => {
+    const el = btn as HTMLElement;
+    el.addEventListener('click', () => {
+      el.classList.add('processing');
+      const index = parseInt(el.dataset.index || "0");
       document.body.removeChild(modal);
       callback(index);
     });

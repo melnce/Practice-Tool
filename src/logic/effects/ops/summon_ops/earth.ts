@@ -23,7 +23,6 @@ export function startingEarthFromKeywords(cardData: CardTemplate) {
     let n = 0;
     const kws = Array.isArray(cardData?.keywords) ? cardData.keywords : [];
     for (const k of kws) {
-        // @ts-ignore
         if (typeof k !== "string" && k?.name === "Counter" && String(k.key) === "earth") {
             n += Number(k.count || 0);
         }

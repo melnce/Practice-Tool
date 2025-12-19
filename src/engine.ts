@@ -118,8 +118,7 @@ function _dispatchInternal(currentState: GameState, action: PlayerAction): GameS
         }
         default:
             // Comprehensive check for unknown actions (or union members not handled)
-            // @ts-ignore
-            console.warn("Unknown action dispatched:", action);
+            console.warn("Unknown action dispatched:", action as any);
     }
     return state;
 }

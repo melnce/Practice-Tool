@@ -19,7 +19,7 @@ export function makeLeaderDroppable(leaderEl: HTMLElement, targetPlayer: Player,
         if (!attackerIndex) return;
 
         logic().then(({ attackLeader }) => {
-            attackLeader(parseInt(attackerIndex), attackerPlayer as Player, targetPlayer);
+            attackLeader(parseInt(attackerIndex || "0"), attackerPlayer as Player, targetPlayer);
         });
     };
 }
@@ -87,12 +87,9 @@ export function enableCardEvoDrop(div: HTMLElement, containerId: string, card: C
             card.buffs.attack = (card.buffs.attack ?? 0) + boost;
             card.buffs.defense = (card.buffs.defense ?? 0) + boost;
 
-            // @ts-ignore
-            card.attack = (Number(card.attack) || 0) + boost;
-            // @ts-ignore
-            card.defense = (Number(card.defense) || 0) + boost;
-            // @ts-ignore
-            card.peak_defense = Math.max(card.peak_defense ?? Number(card.defense), Number(card.defense));
+            card.attack = (parseInt(String(card.attack)) || 0) + boost;
+            card.defense = (parseInt(String(card.defense)) || 0) + boost;
+            card.peak_defense = Math.max(card.peak_defense ?? parseInt(String(card.defense)), parseInt(String(card.defense)));
             if (card.evo_image) card.base_image = card.evo_image;
 
             if (card.hasStorm) {
@@ -129,19 +126,16 @@ export function enableEnemyFollowerDrop(div: HTMLElement, attackerData: any, def
         const [attackerPlayer, attackerIndex] = data.split(",");
 
         const defenderPlayer = isRedBoard ? "red" : "blue";
-        // @ts-ignore  (state keys)
-        const defenders = state[`${defenderPlayer}Board`];
+        const defenders = defenderPlayer === "blue" ? state.blueBoard : state.redBoard;
         const defender = defenders[defenderIndex];
         if (!defender) return;
 
-        // @ts-ignore
-        const hasWard = defenders.some((c: CardInstance) => c.hasWard && Number(c.defense) > 0);
+        const hasWard = defenders.some((c: CardInstance) => (c.hasWard ?? false) && Number(c.defense ?? 0) > 0);
         if (hasWard && !defender.hasWard) return;
         if (defender.hasIntimidate && !defender.hasWard) return;
 
         logic().then(({ attackFollower }) => {
-            // @ts-ignore
-            attackFollower(parseInt(attackerIndex), defenderIndex, attackerPlayer, defenderPlayer);
+            attackFollower(parseInt(attackerIndex || "0"), defenderIndex, attackerPlayer as Player, defenderPlayer);
         });
     };
 }

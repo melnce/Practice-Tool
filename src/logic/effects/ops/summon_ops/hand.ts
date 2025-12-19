@@ -53,9 +53,7 @@ export function summonFromHand(card: CardInstance, owner: Player): boolean {
     // Initialize as if played/summoned
     if (card.type === "Follower") {
         // Ensure stats are numbers
-        // @ts-ignore
         card.attack = parseInt(card.attack as any) || 0;
-        // @ts-ignore
         card.defense = parseInt(card.defense as any) || 0;
 
         if (card.base_attack == null) card.base_attack = card.attack;
@@ -124,9 +122,7 @@ export function summonExactCopyFromHand(srcCard: CardInstance, owner: Player, po
     if (clone.type === "Follower") {
 
         // Numbers
-        // @ts-ignore
         clone.attack = parseInt(clone.attack as any) || 0;
-        // @ts-ignore
         clone.defense = parseInt(clone.defense as any) || 0;
 
         // Base/peak
@@ -172,12 +168,10 @@ export function summonExactCopyFromHand(srcCard: CardInstance, owner: Player, po
 
     // Fire follower-enter hooks exactly like other summon paths
     if (clone.type === "Follower") {
-        // @ts-ignore
         // medicalAssassinOnFollowerEnter(owner, clone);      // consistency with pushToBoard
         fireTrigger("ally_follower_enter", owner, { enteringCard: clone });
         fireTrigger("enemy_follower_enter", owner, { enteringCard: clone });
         // Ensure effect-based summons also trigger the Congregrant chain
-        // @ts-ignore
         // handleCongregantOnEnter(owner, clone);
     }
 
@@ -194,7 +188,6 @@ export function handleSelectHandSummonArtifactCopy(eff: Effect, owner: Player, e
         if (!tribes.includes("artifact")) return false;
         const base = parseInt(c?.cost as any, 10) || 0;
         const mod = parseInt(c?.cost_mod as any, 10) || 0;
-        // @ts-ignore
         const effCost: number = Number.isFinite((c as any).effectiveCost) ? (c as any).effectiveCost : base + mod;
         return effCost <= maxCost;
     });

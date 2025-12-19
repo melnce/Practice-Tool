@@ -7,7 +7,6 @@ import { cleanupDead } from "../../core/cleanup.js";
 import { logEvent } from "../../../core/logger.js";
 import { applyLeaderDamage } from "../leader.js";
 import { Effect, CardInstance, Player } from "../../../core/types.js";
-// @ts-ignore
 import { adapter } from "../../../core/adapter.js";
 
 // Refactored: Import calculator from damage module
@@ -130,8 +129,7 @@ export function handleDamageRandom(eff: Effect, owner: Player) {
         // Include enemy leader if target is generic "enemy" or "all"
         if (targetSpec === "enemy" || targetSpec === "enemy:all" || targetSpec === "all") {
             const targetOwner = owner === "blue" ? "red" : "blue";
-            // @ts-ignore
-            pool.push({ type: "Leader", owner: targetOwner, name: "Enemy Leader" });
+            pool.push({ type: "Leader", owner: targetOwner, name: "Enemy Leader" } as any);
         }
 
         const valid = pool.filter(c => c && (c.type === "Follower" || c.type === "Leader"));
@@ -142,8 +140,7 @@ export function handleDamageRandom(eff: Effect, owner: Player) {
         logEvent("damageRandom", { target: pick.name, uid: pick.uid, amount: amt });
 
         if (pick.type === "Leader") {
-            // @ts-ignore
-            applyLeaderDamage(pick.owner, amt);
+            applyLeaderDamage((pick as any).owner, amt);
         } else {
             dealDamage(pick as CardInstance, amt);      // super-protection will zero it out internally if applicable
         }

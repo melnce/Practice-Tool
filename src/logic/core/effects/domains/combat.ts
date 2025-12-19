@@ -13,11 +13,11 @@ import {
     handleDestroyAll, handleDestroyRandom, resolveDestroy
 } from "../../../effects/ops/destroy.js";
 import {
-    handleBanish, handleBanishTargeted, handleBanishDuplicatesFromDeck,
+    handleBanishTargeted, handleBanishDuplicatesFromDeck,
     handleBanishAllEnemyCopies, handleBanishRandom
 } from "../../../effects/ops/banish.js";
 import {
-    handleHealLeader, handleDynamicHealLeader, applyLeaderDamage,
+    handleHealLeader, handleDynamicHealLeader,
     handleLeaderBarrierOp, handleSetMaxHP
 } from "../../../effects/leader.js";
 import { handleDestroySelf, handleBanishSelf } from "../../../effects/self.js";
@@ -31,7 +31,7 @@ import {
     handleRestoreAllies
 } from "../../../effects/ops/misc.js";
 
-import { DamageEffect } from "../../../../core/types.js";
+
 
 export function registerCombatEffects() {
     registerOp("damage", (eff, ctx) => {
@@ -88,7 +88,6 @@ export function registerCombatEffects() {
         const t = (ctx.context as any)?.defender;
         if (!t) return;
         const current = parseInt(t.defense) || 0;
-        // @ts-ignore
         const base = Number.isFinite(t.peak_defense) ? t.peak_defense : (Number.isFinite(t.base_defense) ? t.base_defense : current);
 
         if (current < base) {

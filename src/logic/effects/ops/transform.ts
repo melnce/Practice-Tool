@@ -63,9 +63,7 @@ export function transformTarget(target: CardInstance, intoName: string) {
 
     // Initialize basics depending on type
     if (c.type === "Follower") {
-        // @ts-ignore
         c.attack = parseInt(c.attack as any) || 0;
-        // @ts-ignore
         c.defense = parseInt(c.defense as any) || 0;
         if (c.base_attack == null) c.base_attack = c.attack;
         if (c.base_defense == null) c.base_defense = c.defense;
@@ -75,13 +73,12 @@ export function transformTarget(target: CardInstance, intoName: string) {
         applyKeywordsFromList(c);
 
         // Preserve turn/action state (no free swing refresh)
-        const perTurnNew = Number.isFinite(c.attacks_per_turn) ? c.attacks_per_turn : 1;
-        const leftOld = Number.isFinite(target.attacks_left) ? target.attacks_left : perTurnNew;
+        const perTurnNew = Number.isFinite(c.attacks_per_turn) ? c.attacks_per_turn! : 1;
+        const leftOld = Number.isFinite(target.attacks_left) ? target.attacks_left! : perTurnNew;
 
         c.justPlayed = target.justPlayed === true;
         c.hasAttacked = target.hasAttacked === true;
         c.attacks_per_turn = perTurnNew;
-        // @ts-ignore
         c.attacks_left = Math.max(0, Math.min(perTurnNew, leftOld));
         c.can_attack = !!(target.can_attack && (c.hasStorm || c.hasRush || !target.justPlayed));
     } else if (c.type === "Amulet") {
@@ -142,9 +139,7 @@ export function transformHandTarget(target: CardInstance, intoName: string) {
     }
 
     // Minimal numeric init (hand preview may rely on these)
-    // @ts-ignore
     c.attack = parseInt(c.attack as any) || 0;
-    // @ts-ignore
     c.defense = parseInt(c.defense as any) || 0;
 
     hand.splice(idx, 1, c);
@@ -180,18 +175,13 @@ export function transformRandomSpellInHand(owner: Player, intoName = "Ersatz Eli
     const updated = (owner === "blue" ? state.blueHand : state.redHand).find(c => c && c.uid === uid);
     if (!updated) return;
 
-    // @ts-ignore
-    const printed = parseInt(updated.cost, 10) || 0;
-    // @ts-ignore
-    const existingM = parseInt(updated.cost_mod || 0, 10) || 0;
+    const printed = parseInt(updated.cost as string, 10) || 0;
+    const existingM = parseInt((updated.cost_mod || 0) as any, 10) || 0;
     const current = printed + existingM;
     const delta = 0 - current; // bring to zero
 
-    // @ts-ignore
     if (updated.base_cost === undefined) updated.base_cost = printed;
-    // @ts-ignore
     updated.cost_mod = existingM + delta;
-    // @ts-ignore
-    updated.temp_cost_mod_until_eot = (parseInt(updated.temp_cost_mod_until_eot, 10) || 0) + delta;
+    (updated as any).temp_cost_mod_until_eot = (parseInt((updated as any).temp_cost_mod_until_eot, 10) || 0) + delta;
     logEvent("transformRandomSpell", { owner, to: intoName });
 }

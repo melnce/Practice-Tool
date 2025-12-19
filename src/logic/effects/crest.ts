@@ -1,7 +1,5 @@
 // src/logic/effects/crest.ts
 import { state } from "../../core/gameState.js";
-// @ts-ignore
-// @ts-ignore
 import { adapter } from "../../core/adapter.js";
 import { runEffects } from "../core/effects/index.js";
 import { logEvent } from "../../core/logger.js";

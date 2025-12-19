@@ -32,7 +32,7 @@ export function compileCardText(text: string, type: string): CompiledOutput {
     // We'll remove found keywords from text to avoid re-parsing them as unresolved clauses?
     // Actually, keywords usually appear independently or at start.
 
-    let remainingText = text;
+    const remainingText = text;
 
     for (const kw of KEYWORDS) {
         // Match whole word, case insensitive? distinct keyword usually capitalized.
