@@ -15,6 +15,7 @@ export const KEYWORD_ALIASES: Record<string, KeywordName> = {
     "allyenter": "ally_enter",
     "maxdamagecap": "max_damage_cap",
     "cantattack": "cant_attack",
+    "can't attack": "cant_attack",
     "cannotbedestroyed": "cant_be_destroyed",
 };
 

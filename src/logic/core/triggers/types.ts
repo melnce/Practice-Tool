@@ -42,6 +42,7 @@ export interface TriggerContext {
 
 export interface TriggerSpec {
     event: TriggerEventName;
+    type?: string; // Shorthand alias (e.g. "end_of_turn_own")
     condition?: {
         not_self?: boolean;
         tribe?: string;

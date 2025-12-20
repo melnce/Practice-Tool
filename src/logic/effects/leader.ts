@@ -120,6 +120,17 @@ export function applyLeaderDamage(owner: Player, amount: number) {
     if (popLeaderBarrier(owner, "leader_hit")) return 0;
 
     const s = state as any;
+
+    // NEW: Check Max Damage Cap (Zooey)
+    const capKey = owner === "blue" ? "blueLeaderMaxDamageCap" : "redLeaderMaxDamageCap";
+    const cap = s[capKey];
+    if (typeof cap === "number" && Number.isFinite(cap)) {
+        if (amount > cap) {
+            logEvent("leaderDamageCapped", { owner, original: amount, capped: cap });
+            amount = cap;
+        }
+    }
+
     const cur = s[hpKey] | 0;
     const next = Math.max(0, cur - (amount | 0));
     s[hpKey] = next;
@@ -159,5 +170,27 @@ export function handleRecoverEP(owner: Player, eff: Effect) {
         state.redEvoCharges = Math.min(MAX_EP, (state.redEvoCharges || 0) + amt);
     }
     logEvent("recoverEP", { owner: isBlue ? "blue" : "red", amount: amt });
+}
+
+export function handleSetLeaderMaxDamageCap(eff: Effect, owner: Player) {
+    const targetPlayerString = eff.player || "self";
+    const amount = parseInt(eff.amount as any) || 0;
+    const isOpponent = targetPlayerString === "opponent";
+    const targetOwner: Player = isOpponent ? (owner === "blue" ? "red" : "blue") : owner;
+
+    const key = targetOwner === "blue" ? "blueLeaderMaxDamageCap" : "redLeaderMaxDamageCap";
+    const expiryKey = targetOwner === "blue" ? "blueLeaderMaxDamageCapExpiry" : "redLeaderMaxDamageCapExpiry";
+
+    const s = state as any;
+    s[key] = amount;
+
+    // Handle duration (Zooey uses "opponent_turn_end")
+    if (eff.duration === "opponent_turn_end") {
+        s[expiryKey] = "opponent_turn_end";
+    } else {
+        delete s[expiryKey];
+    }
+
+    logEvent("setLeaderMaxDamageCap", { owner: targetOwner, cap: amount, duration: eff.duration });
 }
 

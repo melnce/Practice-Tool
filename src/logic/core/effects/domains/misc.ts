@@ -112,4 +112,13 @@ export function registerMiscEffects() {
 
     registerOp("set_deckout_victory", stub("set_deckout_victory"));
     registerOp("dragonsign", stub("dragonsign"));
+
+    // Skybound
+    registerOp("boost_skybound_art_hand", (eff, ctx) => {
+        const amt = Number(eff.amount ?? 1);
+        // Dynamic import to avoid cycles if any (though skybound.ts is leaf)
+        import("../../../effects/skybound.js").then(({ incrementSkyboundArt }) => {
+            incrementSkyboundArt(ctx.owner, amt);
+        }).catch(e => console.error("Failed to load skybound module:", e));
+    });
 }

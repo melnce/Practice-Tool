@@ -25,6 +25,7 @@ export function resolveDynamicValue(val: string | number | undefined | null, con
         const src = context.sourceCard || context.attacker || null;
         if (s === "{self.attack}") return parseInt((src as any)?.attack || 0, 10) || 0;
         if (s === "{self.defense}") return parseInt((src as any)?.defense || 0, 10) || 0;
+        if (s === "{self.cost}") return parseInt((src as any)?.cost || 0, 10) || 0;
         if (s === "{self.spellboostcount}") {
             const ks = src?.keywordState?.spellboostCount;
             if (typeof ks === "number") return ks;
@@ -44,6 +45,10 @@ export function resolveDynamicValue(val: string | number | undefined | null, con
     if (s === "{selected.defense}") {
         const sel = context.selectedCard || state.__lastSelected;
         return parseInt((sel as any)?.defense || 0, 10) || 0;
+    }
+    if (s === "{selected.attack}") {
+        const sel = context.selectedCard || state.__lastSelected;
+        return parseInt((sel as any)?.attack || 0, 10) || 0;
     }
 
     // 4. Game state / Globals

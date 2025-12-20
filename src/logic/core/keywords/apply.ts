@@ -2,7 +2,7 @@ import { CardInstance } from "../../../core/types.js";
 import { normalizeKeywordName } from "./registry.js";
 import { getKS } from "./internal.js";
 import { grantBarrier } from "../barrier.js";
-import { state } from "../../../core/gameState.js";
+
 
 interface KeywordOptions {
     [key: string]: any;
@@ -99,6 +99,7 @@ export const KEYWORD_MAP: { [key: string]: (c: CardInstance, opts?: KeywordOptio
         ks.engageEffects = Array.isArray(opts.effects) ? opts.effects : [];
         ks.engageCost = Number(opts.cost ?? 0);
         ks.engageOncePerTurn = opts.once_per_turn !== false;
+        ks.engageSacrifice = !!(opts.sacrifice || opts.engageSacrifice);
     },
     enhance: (c, opts) => {
         if (!opts?.cost) return;

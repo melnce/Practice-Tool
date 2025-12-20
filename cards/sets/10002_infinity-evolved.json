@@ -216,10 +216,7 @@
         "image": "images/crests/grimnir_heavenly_gale.png",
         "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "super_evolved_allied_gate",
@@ -594,14 +591,12 @@
     "evolve": [],
     "fanfare": [
       {
-        "op": "keyword",
+        "op": "buff",
         "target": "enemy:follower",
         "keywords": [
-          {
-            "name": "cant_attack",
-            "until_opponent_eot": true
-          }
+          "Can't Attack"
         ],
+        "duration": "opponent_turn_end",
         "select": 2
       }
     ],
@@ -726,11 +721,8 @@
     ],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "super_evolved_allied_gate",
@@ -1374,10 +1366,7 @@
         "description": "Countdown (1). End of your turn: Draw a card. Earth Rite (10): Double the attack and defense of all allied followers.",
         "countdown": 1,
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "draw",
@@ -1816,14 +1805,11 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10242210-pyrewyrm-blade",
-    "engageSacrifice": true,
-    "evolve": [],
-    "superevolve": [],
-    "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
         "cost": 1,
+        "sacrifice": true,
         "effects": [
           {
             "op": "select",
@@ -2490,11 +2476,8 @@
           {
             "name": "trigger",
             "trigger": {
-              "event": "end_of_turn",
+              "type": "end_of_turn_own",
               "source": "board",
-              "condition": {
-                "whose_turn": "owner"
-              },
               "effects": [
                 {
                   "op": "destroy_self"
@@ -2523,7 +2506,6 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10261210-luminous-censer",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -2531,6 +2513,7 @@
       {
         "name": "Engage",
         "cost": 1,
+        "sacrifice": true,
         "effects": [
           {
             "op": "heal_leader",
@@ -2964,7 +2947,6 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10271210-artifact-catapult",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2978,6 +2960,7 @@
       {
         "name": "Engage",
         "cost": 3,
+        "sacrifice": true,
         "effects": [
           {
             "op": "select_hand_summon_artifact_copies_eot_destroy",

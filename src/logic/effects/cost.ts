@@ -131,8 +131,19 @@ export function handleHalveDeckCost(owner: Player) {
  * Expects the selected card(s) in context.targets / context.selectedCard.
  * Positive amount increases cost; negative decreases.
  */
+import { resolveDynamicValue } from "../core/values.js";
+
+// ... (existing imports, but add resolveDynamicValue)
+
+/**
+ * Generic cost modifier for selected target(s).
+ * Uses cost_mod so "cost_changed" triggers fire on enter.
+ * Expects the selected card(s) in context.targets / context.selectedCard.
+ * Positive amount increases cost; negative decreases.
+ */
 export function handleModifyCost(eff: Effect, owner: Player, sourceCard: CardInstance | null, context: any = {}) {
-    const amount = parseInt(eff?.amount as any ?? 0) || 0;
+    // RESOLVE DYNAMIC AMOUNT
+    const amount = resolveDynamicValue(eff.amount, { owner, sourceCard, ...context });
     if (!amount) return;
 
     const targets =
@@ -157,12 +168,18 @@ export function handleModifyCost(eff: Effect, owner: Player, sourceCard: CardIns
             newCost: (parseInt(t.cost, 10) || 0) + t.cost_mod,
             type: "mod",
         });
+
+        // TEMP support
+        if (eff.until_eot) {
+            t.temp_cost_mod_until_eot = (parseInt(t.temp_cost_mod_until_eot, 10) || 0) + amount;
+        }
     }
 }
 
 // NEW: pool-based cost modifier (no manual selection needed)
 export function handleModifyCostPool(eff: Effect, owner: Player, sourceCard: CardInstance | null) {
-    const amount = parseInt(eff?.amount as any ?? 0) || 0;
+    // RESOLVE DYNAMIC AMOUNT
+    const amount = resolveDynamicValue(eff.amount, { owner, sourceCard });
     if (!amount) return;
     const targetSpec = String((eff as any).target || "").trim() || "ally:hand";
     const condition = eff.condition || {};
@@ -181,8 +198,11 @@ export function handleModifyCostPool(eff: Effect, owner: Player, sourceCard: Car
             newCost: (parseInt(t.cost as any, 10) || 0) + t.cost_mod!,
             type: "mod",
         });
-        // Optional TEMP support:
-        // if (eff.until_eot) t.temp_cost_mod_until_eot = (parseInt(t.temp_cost_mod_until_eot,10)||0)+amount;
+
+        // TEMP support
+        if (eff.until_eot) {
+            t.temp_cost_mod_until_eot = (parseInt(t.temp_cost_mod_until_eot, 10) || 0) + amount;
+        }
     }
 }
 

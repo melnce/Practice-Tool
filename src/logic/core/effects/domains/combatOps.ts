@@ -32,7 +32,9 @@ export const COMBAT_OPS = [
     "dynamic_heal_leader",
     "set_max_hp",
     "leader_barrier",
+    "set_leader_max_damage_cap",
     "restore_full_defense_self",
     "restore_self_and_heal_leader",
-    "restore_allies"
+    "restore_allies",
+    "clash_damage"
 ] as const;

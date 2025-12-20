@@ -180,3 +180,35 @@ export function completeCrest(crest: Crest, owner: Player, context: any = {}) {
     if (idx !== -1) list.splice(idx, 1);
     adapter.render();
 }
+
+/**
+ * Remove a specific crest by name from the owner.
+ */
+export function removeCrest(owner: Player, crestName: string) {
+    const list = owner === "blue" ? state.blueCrests : state.redCrests;
+    if (!Array.isArray(list)) return;
+
+    const idx = list.findIndex(c => c.name === crestName);
+    if (idx !== -1) {
+        list.splice(idx, 1);
+        console.log(`[Crest] Removed crest "${crestName}" from ${owner}`);
+        adapter.render();
+    }
+}
+
+/**
+ * Advance (reduce) the countdown of a specific crest.
+ */
+export function crestAdvanceCountdown(owner: Player, crestName: string, amount: number = 1) {
+    const crest = findCrest(owner, crestName);
+    if (!crest || !Number.isFinite(crest.countdown)) return;
+
+    crest.countdown -= amount;
+    console.log(`[Crest] Advanced countdown of "${crestName}" by ${amount}. New countdown: ${crest.countdown}`);
+
+    if (crest.countdown <= 0) {
+        completeCrest(crest, owner);
+    } else {
+        adapter.render();
+    }
+}

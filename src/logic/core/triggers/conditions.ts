@@ -1,4 +1,5 @@
 import { TriggerContext, TriggerSpec } from "./types.js";
+import { state } from "../../../core/gameState.js";
 import { CardInstance, Player } from "../../../core/types.js";
 
 // Helper to normalize "subject" card (entering, played, etc.)
@@ -103,6 +104,16 @@ export function evalCommonConditions(
     if (typeof cond.defense_gte === "number" && def < cond.defense_gte) return false;
     if (cond.still_alive === true && def <= 0) return false;
 
+    // 7b. Subject Card Base Cost
+    if (cond.base_cost_eq != null && subjectCard) {
+        const lim = parseInt(String(cond.base_cost_eq), 10);
+        const cost = subjectCard.base_cost !== undefined
+            ? subjectCard.base_cost
+            : (parseInt(subjectCard.cost as any) || 0);
+
+        if (cost !== lim) return false;
+    }
+
     // 8. not_self
     if (cond.not_self && subjectCard && subjectCard.uid === hostCard.uid) return false;
 
@@ -114,6 +125,14 @@ export function evalCommonConditions(
         const wantRaw = cond.has_keyword ?? cond.keywords;
         const wants = (Array.isArray(wantRaw) ? wantRaw : [wantRaw]).filter((s: any) => typeof s === 'string');
         if (!checkKeywords(subjectCard, wants as string[])) return false;
+    }
+
+    // 11. Super Evolution Unlocked (for triggers/gates)
+    if (cond.super_evolution_unlocked) {
+        // From evolveUtils: Blue >= 7, Red >= 6
+        const isBlue = owner === "blue";
+        const unlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
+        if (!unlocked) return false;
     }
 
     return true;

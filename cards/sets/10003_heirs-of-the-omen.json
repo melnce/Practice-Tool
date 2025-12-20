@@ -194,10 +194,7 @@
         "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "discard_all_except_named",
@@ -233,10 +230,7 @@
         "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "discard_all_except_named",
@@ -541,7 +535,6 @@
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10312210-hamlet-of-unkilling",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -558,6 +551,7 @@
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "buff",
@@ -955,14 +949,11 @@
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10322210-lair-of-usurpation",
-    "engageSacrifice": true,
-    "evolve": [],
-    "superevolve": [],
-    "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "choose",
@@ -1384,10 +1375,7 @@
     "fanfare": [
       {
         "op": "damage_all",
-        "target": "all:follower",
-        "condition": {
-          "not_self": true
-        },
+        "target": "other:follower",
         "amount": 3
       },
       {
@@ -1420,7 +1408,6 @@
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10332210-institute-of-truth",
     "hasOngoing": true,
-    "engageSacrifice": false,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -1793,10 +1780,7 @@
     ],
     "triggers": [
       {
-        "event": "end_of_turn",
-        "condition": {
-          "whose_turn": "owner"
-        },
+        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "restore_self_and_heal_leader"
@@ -1888,10 +1872,7 @@
         "effects": [
           {
             "op": "damage_all",
-            "target": "all:follower",
-            "condition": {
-              "not_self": true
-            },
+            "target": "other:follower",
             "amount": 1
           }
         ]
@@ -1930,10 +1911,9 @@
     "keywords": [],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
         "condition": {
-          "whose_turn": "owner",
           "defense_lte": 3
         },
         "effects": [
@@ -2473,7 +2453,6 @@
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10352210-castle-of-entwining",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2508,6 +2487,7 @@
       {
         "name": "engage",
         "cost": 1,
+        "sacrifice": true,
         "effects": [
           {
             "op": "choose",
@@ -2784,7 +2764,8 @@
             "target": "selected:follower"
           },
           {
-            "op": "add_selected_copy_to_hand",
+            "op": "add_to_hand",
+            "source": "selection",
             "count": 1
           }
         ]
@@ -2878,7 +2859,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -3010,7 +2991,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -3155,7 +3136,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -3184,7 +3165,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -3299,7 +3280,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "board_name_gate",
@@ -3319,21 +3300,16 @@
                       },
                       "effects": [
                         {
-                          "op": "keyword",
+                          "op": "buff",
                           "keywords": [
-                            {
-                              "name": "cant_attack",
-                              "until_opponent_eot": true
-                            }
-                          ]
+                            "Can't Attack"
+                          ],
+                          "duration": "opponent_turn_end"
                         },
                         {
                           "op": "grant_trigger",
                           "trigger": {
-                            "event": "end_of_turn",
-                            "condition": {
-                              "own_turn": true
-                            },
+                            "type": "end_of_turn_own",
                             "effects": [
                               {
                                 "op": "banish_self"
@@ -3378,7 +3354,7 @@
         "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -3402,7 +3378,7 @@
         "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",

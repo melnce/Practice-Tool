@@ -6,7 +6,7 @@
   "countdown": 4,
   "triggers": [
     {
-      "event": "end_of_turn",
+      "type": "end_of_turn_own",
       "effects": [
         {
           "op": "board_name_gate",
@@ -26,21 +26,16 @@
                 },
                 "effects": [
                   {
-                    "op": "keyword",
+                    "op": "buff",
                     "keywords": [
-                      {
-                        "name": "cant_attack",
-                        "until_opponent_eot": true
-                      }
-                    ]
+                      "Can't Attack"
+                    ],
+                    "duration": "opponent_turn_end"
                   },
                   {
                     "op": "grant_trigger",
                     "trigger": {
-                      "event": "end_of_turn",
-                      "condition": {
-                        "own_turn": true
-                      },
+                      "type": "end_of_turn_own",
                       "effects": [
                         {
                           "op": "banish_self"

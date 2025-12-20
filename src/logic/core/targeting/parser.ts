@@ -63,7 +63,7 @@ export function parseTargetQuery(targetSpec: string, condition: any): TargetQuer
         side = "self";
     } else if (sideRaw.startsWith("enemy") || sideRaw === "opp" || sideRaw === "opponent") {
         side = "enemy";
-    } else if (sideRaw === "any" || sideRaw === "both" || sideRaw === "all") {
+    } else if (sideRaw === "any" || sideRaw === "both" || sideRaw === "all" || sideRaw === "other") {
         side = "any";
     } else {
         side = "ally"; // default

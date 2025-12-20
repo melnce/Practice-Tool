@@ -112,13 +112,13 @@
     "evo_image": "",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10001210-detectives-lens",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "remove_keyword",
@@ -197,7 +197,6 @@
     "evo_image": "",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10002210-adventurers-guild",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -212,6 +211,7 @@
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "keyword",
@@ -718,8 +718,6 @@
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10031210.webp",
     "evo_image": "",
     "set": "[10000] Basic",
-    "url": "https://shadowverse.gg/cards/10031210-witchs-new-brew",
-    "engageSacrifice": false,
     "fanfare": [
       {
         "op": "draw",
@@ -1445,7 +1443,6 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061130_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10061210-avian-statue",
-    "engageSacrifice": false,
     "keywords": [
       {
         "name": "Countdown",
@@ -1567,7 +1564,6 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": false,
     "keywords": [
       {
         "name": "Countdown",
@@ -1793,11 +1789,8 @@
     ],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "add_to_hand",

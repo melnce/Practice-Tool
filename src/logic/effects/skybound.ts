@@ -42,14 +42,14 @@ export function hasSkyboundArt(card: any): boolean {
  * Called whenever an ally evolves.
  * Increments the 'evolves witnessed' counter on all "Skybound Art" cards in hand.
  */
-export function incrementSkyboundArt(owner: Player) {
+export function incrementSkyboundArt(owner: Player, amount: number = 1) {
     const hand = owner === "blue" ? state.blueHand : state.redHand;
     let updated = false;
 
     for (const card of hand) {
         if (hasSkyboundArt(card)) {
             // Initialize if missing
-            card.skyboundArtEvolvesWitnessed = (card.skyboundArtEvolvesWitnessed || 0) + 1;
+            card.skyboundArtEvolvesWitnessed = (card.skyboundArtEvolvesWitnessed || 0) + amount;
             updated = true;
             // logEvent("skyboundCharge", { owner, card: card.name, newCount: card.skyboundArtEvolvesWitnessed });
         }

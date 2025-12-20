@@ -117,7 +117,7 @@ export function registerBoardEffects() {
     // Transform
     registerOp("transform", (eff, ctx) => {
         const into = String(eff.into || eff.name || "").trim();
-        const t = (ctx.context && ((ctx.context as any).selectedCard || (ctx.context as any).targetCard)) || null;
+        const t = (ctx.context && ((ctx.context as any).selectedCard || (ctx.context as any).targetCard || (ctx.context as any).targets?.[0])) || null;
         if (!into) return;
         if (t) {
             transformTarget(t, into);

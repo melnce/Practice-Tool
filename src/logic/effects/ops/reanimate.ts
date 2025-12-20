@@ -13,6 +13,7 @@ type ReanimateEffect = Effect & {
     max_cost?: number | string;
     cost?: number | string;
     x?: number | string;
+    evolve_summons?: boolean;
 };
 
 export function handleReanimate(eff: Effect, owner: Player) {
@@ -73,4 +74,10 @@ export function handleReanimate(eff: Effect, owner: Player) {
     // Call the new helper function to summon a copy of the selected card
     reanimateSummon(selected, owner);
     logEvent("reanimateSummon", { owner, name: selected.name });
+
+    if (rEff.evolve_summons) {
+        void import("./evolve.js").then(({ handleEvolveLastSummoned }) => {
+            handleEvolveLastSummoned(owner);
+        });
+    }
 }

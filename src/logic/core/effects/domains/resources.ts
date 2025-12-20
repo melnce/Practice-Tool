@@ -22,7 +22,7 @@ import {
     fuse_finalize_gear_multi, fuse_finalize_fortifier,
     fuse_finalize_gardens_allure, fuse_finalize_loot
 } from "../../../effects/ops/fuse/fuse.js";
-import { crestAddCounter, crestSpendCounter, handleGainCrest } from "../../../effects/crest.js";
+import { crestAddCounter, crestSpendCounter, handleGainCrest, removeCrest, crestAdvanceCountdown } from "../../../effects/crest.js";
 import { logEvent } from "../../../../core/logger.js";
 import { getAdapter, getTargetingContext } from "../context.js";
 import { enqueueManyFront } from "../queue.js";
@@ -129,10 +129,24 @@ export function registerResourceEffects() {
         if (chain.length) enqueueManyFront(ctx, chain);
     });
 
+    registerOp("destroy_crest", (eff, ctx) => {
+        const anyEff = eff as any;
+        const targetOwner = (anyEff.player === "opponent" && ctx.owner) ? (ctx.owner === "blue" ? "red" : "blue") : ctx.owner;
+        const name = anyEff.name || anyEff.crest;
+        if (name) removeCrest(targetOwner, name);
+    });
+
+    registerOp("crest_advance_countdown", (eff, ctx) => {
+        const anyEff = eff as any;
+        const name = anyEff.name || anyEff.crest;
+        if (name) crestAdvanceCountdown(ctx.owner, name, (anyEff.amount as number) || 1);
+    });
+
     registerOp("fuse_start", (eff, ctx) => {
         if (opStartFuseFromCard(eff, ctx.owner) === "pending") return "pending";
         doLog("fuse", { owner: ctx.owner, op: eff.op, source: ctx.sourceCard?.name });
     });
+
     registerOp("start_fortifier_fuse", (eff, ctx) => {
         const res = ctx.sourceCard ? startFortifierFuse(ctx.owner, ctx.sourceCard) : null;
         if (res === "pending") return "pending";

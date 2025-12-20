@@ -26,7 +26,7 @@ export interface DamageEffect extends BaseEffect {
     count_source?: string;
 }
 
-export type DestroyOps = Extract<EffectOp, "destroy" | "destroy_all" | "destroy_highest" | "destroy_random" | "destroy_random_other_allies" | "destroy_allied_amulets" | "destroy_allied_amulets_then_damage" | "destroy_self" | "destroy_then" | "destroy_defender_if_damaged" | "follower_strike_destroy">;
+export type DestroyOps = Extract<EffectOp, "destroy" | "destroy_all" | "destroy_highest" | "destroy_random" | "destroy_random_other_allies" | "destroy_allied_amulets" | "destroy_allied_amulets_then_damage" | "destroy_self" | "destroy_then" | "destroy_defender_if_damaged" | "follower_strike_destroy" | "clash_damage">;
 export interface DestroyEffect extends BaseEffect {
     op: DestroyOps;
     target?: string;
@@ -174,7 +174,7 @@ export interface SpellboostEffect extends BaseEffect {
 }
 
 // --- Misc ---
-export type MiscOps = Extract<EffectOp, "select" | "target" | "choose" | "choose_bonus_add" | "nested_effects" | "repeat_effect">;
+export type MiscOps = Extract<EffectOp, "select" | "target" | "choose" | "choose_bonus_add" | "nested_effects" | "repeat_effect" | "boost_skybound_art_hand">;
 export interface MiscEffect extends BaseEffect {
     op: MiscOps;
     count?: number;

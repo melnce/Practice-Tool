@@ -614,7 +614,6 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10112210-lambent-cairn",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -646,6 +645,7 @@
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "buff",
@@ -869,15 +869,11 @@
     "evo_image": "",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10113210-godwood-staff",
-    "engageSacrifice": true,
     "hasOngoing": true,
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "combo_gate",
@@ -896,6 +892,7 @@
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "return_to_hand",
@@ -2298,13 +2295,11 @@
             "defense": 1
           },
           {
-            "op": "keyword",
+            "op": "buff",
             "keywords": [
-              {
-                "name": "cant_attack",
-                "until_opponent_eot": true
-              }
-            ]
+              "Can't Attack"
+            ],
+            "duration": "opponent_turn_end"
           }
         ]
       }
@@ -2348,10 +2343,7 @@
         "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "earth_rite",
@@ -2375,10 +2367,7 @@
         "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "earth_rite",
@@ -2920,7 +2909,6 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90043110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10143210-fan-of-otohime",
-    "engageSacrifice": false,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -3763,10 +3751,10 @@
     "url": "https://shadowverse.gg/cards/10152210-shadowcrypt-memorial",
     "evolve": [],
     "superevolve": [],
-    "engageSacrifice": true,
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "summon_named",
@@ -3804,11 +3792,8 @@
     "fanfare": [],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "heal_leader",
@@ -3988,10 +3973,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
@@ -4348,7 +4330,6 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": false,
     "keywords": [
       {
         "name": "Countdown",
@@ -4536,7 +4517,6 @@
     "evo_image": "",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10162210-darkhaven-grace",
-    "engageSacrifice": false,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -4577,13 +4557,10 @@
     "evo_image": "",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10162220-dose-of-holiness",
-    "engageSacrifice": true,
-    "evolve": [],
-    "superevolve": [],
-    "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "damage",
@@ -4721,7 +4698,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": false,
+    "fanfare": [],
     "keywords": [
       {
         "name": "Countdown",
@@ -4766,10 +4743,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": true,
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "destroy_all",
@@ -5520,7 +5497,6 @@
       {
         "event": "on_fuse",
         "source": "board",
-        "whose_turn": "owner",
         "effects": [
           {
             "op": "damage_random",
@@ -5562,10 +5538,7 @@
         "countdown": 3,
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "hand_count_gate",
@@ -5601,10 +5574,7 @@
         "countdown": 3,
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "hand_count_gate",

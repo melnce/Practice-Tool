@@ -128,6 +128,15 @@ export function applyFilters(pool: CardInstance[], query: TargetQuery, env: Targ
         if (lim != null) filtered = filtered.filter(c => c?.type === "Follower" && (Number(c.defense) || 0) === lim);
     }
 
+    // 9b. Base Cost Filter
+    if (cond.base_cost_eq != null) {
+        const lim = toNum(cond.base_cost_eq);
+        if (lim != null) filtered = filtered.filter(c => {
+            const cost = c.base_cost !== undefined ? c.base_cost : (parseInt(c.cost as any) || 0);
+            return cost === lim;
+        });
+    }
+
     // 10. Ambush / Aura (Enemy Logic)
     // LEGACY: Ambush only protects against ENEMY targeted effects.
     // Self-targeting (buffs) or random effects (AOE) bypass this check.
@@ -145,6 +154,11 @@ export function applyFilters(pool: CardInstance[], query: TargetQuery, env: Targ
         filtered = filtered.filter(c => c?.type === "Follower" && _isCardDamaged(c));
     } else if (cond.damaged === false) {
         filtered = filtered.filter(c => c?.type === "Follower" && !_isCardDamaged(c));
+    }
+
+    // 12. Did Not Attack This Turn
+    if (cond.did_not_attack_this_turn) {
+        filtered = filtered.filter(c => c?.type === "Follower" && !(c as any).attacks_used_this_turn && !c.hasAttacked);
     }
 
     return filtered;

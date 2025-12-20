@@ -42,7 +42,7 @@ if (typeof window === "undefined") {
     // Given the context, I will only apply the change to HEADLESS and keep the structure.
     // If `(globalThis as any).document = (globalThis as any).window;` was intended,
     // it would likely be a replacement for the mock document object, not an addition.
-    try { (globalThis as any).navigator = { userAgent: "node" }; } catch (e) { console.warn("Cannot set navigator"); }
+    // try { (globalThis as any).navigator = { userAgent: "node" }; } catch (e) { console.warn("Cannot set navigator"); }
 
     // Mock fetch to read from filesystem
     const fs = await import("fs");

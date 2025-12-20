@@ -121,23 +121,41 @@ export function handleDrawAllNamedWithKeyword(eff: Effect, owner: Player) {
 }
 
 /** Create token(s) directly into hand */
-export function handleAddToHand(eff: Effect, owner: Player) {
+export function handleAddToHand(eff: Effect, owner: Player, context: any = {}) {
+    // 1. Resolve source Card Details (either from name OR from selection context)
     const n = clampInt((eff.count as any), 1);
-    const name = ((eff.name as any) || "").trim();
-    if (!n || !name) return;
-
     const hand = owner === "blue" ? state.blueHand : state.redHand;
-    const base = getCardDetails(name);
+    let base: any = null;
+
+    if (eff.source === "selection") {
+        // Copy from generic selection context
+        const sourceCard = context.selectedCard || (Array.isArray(context.targets) ? context.targets[0] : null);
+        if (sourceCard) {
+            // We want a fresh copy of this card's DEFINITION (plus maybe stats?)
+            // Usually "add a copy" means base card details, but sometimes exact copy. 
+            // "Primal Beast Absorption" says "add a copy", usually implies base copy in SV unless "exact copy".
+            // Let's assume Base Copy for now.
+            base = getCardDetails(sourceCard.name);
+        }
+    } else {
+        const name = ((eff.name as any) || "").trim();
+        if (name) {
+            base = getCardDetails(name);
+        }
+    }
+
     if (!base) return;
 
     for (let i = 0; i < n; i++) {
         if (hand.length >= MAX_HAND) break;
+        // 2. Clone it
         const copy = JSON.parse(JSON.stringify(base));
         copy.uid = state.rng.makeUid();
 
+        // 3. Push
         if (pushToHand(hand, copy)) {
             state.lastAddedToHand = copy;
-            logEvent("addToHand", { owner, name, uid: copy.uid });
+            logEvent("addToHand", { owner, name: copy.name, uid: copy.uid });
         } else break;
     }
 }

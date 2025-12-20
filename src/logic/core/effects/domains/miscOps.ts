@@ -23,6 +23,8 @@ export const MISC_OPS = [
     "super_evolved_self_gate",
     "evolved_allied_gate",
     "super_evolved_allied_gate",
+    "destroy_crest",
+    "crest_advance_countdown",
     "hand_count_gate",
     "max_pp_gate",
     "nested_effects",
@@ -33,5 +35,6 @@ export const MISC_OPS = [
     "skybound_art_gate",
     "self_cost_gate",
     "set_deckout_victory",
-    "dragonsign"
+    "dragonsign",
+    "boost_skybound_art_hand"
 ] as const;

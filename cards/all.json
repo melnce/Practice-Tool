@@ -112,13 +112,13 @@
     "evo_image": "",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10001210-detectives-lens",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "remove_keyword",
@@ -197,7 +197,6 @@
     "evo_image": "",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10002210-adventurers-guild",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -212,6 +211,7 @@
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "keyword",
@@ -718,8 +718,6 @@
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10031210.webp",
     "evo_image": "",
     "set": "[10000] Basic",
-    "url": "https://shadowverse.gg/cards/10031210-witchs-new-brew",
-    "engageSacrifice": false,
     "fanfare": [
       {
         "op": "draw",
@@ -1445,7 +1443,6 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061130_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10061210-avian-statue",
-    "engageSacrifice": false,
     "keywords": [
       {
         "name": "Countdown",
@@ -1567,7 +1564,6 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": false,
     "keywords": [
       {
         "name": "Countdown",
@@ -1793,11 +1789,8 @@
     ],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "add_to_hand",
@@ -2429,7 +2422,6 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10112210-lambent-cairn",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2461,6 +2453,7 @@
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "buff",
@@ -2684,15 +2677,11 @@
     "evo_image": "",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10113210-godwood-staff",
-    "engageSacrifice": true,
     "hasOngoing": true,
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "combo_gate",
@@ -2711,6 +2700,7 @@
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "return_to_hand",
@@ -4113,13 +4103,11 @@
             "defense": 1
           },
           {
-            "op": "keyword",
+            "op": "buff",
             "keywords": [
-              {
-                "name": "cant_attack",
-                "until_opponent_eot": true
-              }
-            ]
+              "Can't Attack"
+            ],
+            "duration": "opponent_turn_end"
           }
         ]
       }
@@ -4163,10 +4151,7 @@
         "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "earth_rite",
@@ -4190,10 +4175,7 @@
         "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "earth_rite",
@@ -4735,7 +4717,6 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90043110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10143210-fan-of-otohime",
-    "engageSacrifice": false,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -5578,10 +5559,10 @@
     "url": "https://shadowverse.gg/cards/10152210-shadowcrypt-memorial",
     "evolve": [],
     "superevolve": [],
-    "engageSacrifice": true,
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "summon_named",
@@ -5619,11 +5600,8 @@
     "fanfare": [],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "heal_leader",
@@ -5803,10 +5781,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
@@ -6163,7 +6138,6 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": false,
     "keywords": [
       {
         "name": "Countdown",
@@ -6351,7 +6325,6 @@
     "evo_image": "",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10162210-darkhaven-grace",
-    "engageSacrifice": false,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -6392,13 +6365,10 @@
     "evo_image": "",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10162220-dose-of-holiness",
-    "engageSacrifice": true,
-    "evolve": [],
-    "superevolve": [],
-    "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "damage",
@@ -6536,7 +6506,6 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": false,
     "keywords": [
       {
         "name": "Countdown",
@@ -6581,10 +6550,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "engageSacrifice": true,
     "keywords": [
       {
         "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
             "op": "destroy_all",
@@ -7335,7 +7304,6 @@
       {
         "event": "on_fuse",
         "source": "board",
-        "whose_turn": "owner",
         "effects": [
           {
             "op": "damage_random",
@@ -7377,10 +7345,7 @@
         "countdown": 3,
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "hand_count_gate",
@@ -7416,10 +7381,7 @@
         "countdown": 3,
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "hand_count_gate",
@@ -7753,10 +7715,7 @@
         "image": "images/crests/grimnir_heavenly_gale.png",
         "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "super_evolved_allied_gate",
@@ -8131,14 +8090,12 @@
     "evolve": [],
     "fanfare": [
       {
-        "op": "keyword",
+        "op": "buff",
         "target": "enemy:follower",
         "keywords": [
-          {
-            "name": "cant_attack",
-            "until_opponent_eot": true
-          }
+          "Can't Attack"
         ],
+        "duration": "opponent_turn_end",
         "select": 2
       }
     ],
@@ -8263,11 +8220,8 @@
     ],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
-        "condition": {
-          "whose_turn": "owner"
-        },
         "effects": [
           {
             "op": "super_evolved_allied_gate",
@@ -8911,10 +8865,7 @@
         "description": "Countdown (1). End of your turn: Draw a card. Earth Rite (10): Double the attack and defense of all allied followers.",
         "countdown": 1,
         "trigger": {
-          "event": "end_of_turn",
-          "condition": {
-            "whose_turn": "owner"
-          },
+          "type": "end_of_turn_own",
           "effects": [
             {
               "op": "draw",
@@ -9353,14 +9304,11 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10242210-pyrewyrm-blade",
-    "engageSacrifice": true,
-    "evolve": [],
-    "superevolve": [],
-    "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
         "cost": 1,
+        "sacrifice": true,
         "effects": [
           {
             "op": "select",
@@ -10027,11 +9975,8 @@
           {
             "name": "trigger",
             "trigger": {
-              "event": "end_of_turn",
+              "type": "end_of_turn_own",
               "source": "board",
-              "condition": {
-                "whose_turn": "owner"
-              },
               "effects": [
                 {
                   "op": "destroy_self"
@@ -10060,7 +10005,6 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10261210-luminous-censer",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -10068,6 +10012,7 @@
       {
         "name": "Engage",
         "cost": 1,
+        "sacrifice": true,
         "effects": [
           {
             "op": "heal_leader",
@@ -10501,7 +10446,6 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10271210-artifact-catapult",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -10515,6 +10459,7 @@
       {
         "name": "Engage",
         "cost": 3,
+        "sacrifice": true,
         "effects": [
           {
             "op": "select_hand_summon_artifact_copies_eot_destroy",
@@ -11011,10 +10956,7 @@
         "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "discard_all_except_named",
@@ -11050,10 +10992,7 @@
         "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
         "triggers": [
           {
-            "event": "end_of_turn",
-            "condition": {
-              "whose_turn": "owner"
-            },
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "discard_all_except_named",
@@ -11358,7 +11297,6 @@
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10312210-hamlet-of-unkilling",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -11375,6 +11313,7 @@
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "buff",
@@ -11772,14 +11711,11 @@
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10322210-lair-of-usurpation",
-    "engageSacrifice": true,
-    "evolve": [],
-    "superevolve": [],
-    "fanfare": [],
     "keywords": [
       {
         "name": "Engage",
         "cost": 0,
+        "sacrifice": true,
         "effects": [
           {
             "op": "choose",
@@ -12201,10 +12137,7 @@
     "fanfare": [
       {
         "op": "damage_all",
-        "target": "all:follower",
-        "condition": {
-          "not_self": true
-        },
+        "target": "other:follower",
         "amount": 3
       },
       {
@@ -12237,7 +12170,6 @@
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10332210-institute-of-truth",
     "hasOngoing": true,
-    "engageSacrifice": false,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -12610,10 +12542,7 @@
     ],
     "triggers": [
       {
-        "event": "end_of_turn",
-        "condition": {
-          "whose_turn": "owner"
-        },
+        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "restore_self_and_heal_leader"
@@ -12705,10 +12634,7 @@
         "effects": [
           {
             "op": "damage_all",
-            "target": "all:follower",
-            "condition": {
-              "not_self": true
-            },
+            "target": "other:follower",
             "amount": 1
           }
         ]
@@ -12747,10 +12673,9 @@
     "keywords": [],
     "triggers": [
       {
-        "event": "end_of_turn",
+        "type": "end_of_turn_own",
         "source": "board",
         "condition": {
-          "whose_turn": "owner",
           "defense_lte": 3
         },
         "effects": [
@@ -13290,7 +13215,6 @@
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
     "url": "https://shadowverse.gg/cards/10352210-castle-of-entwining",
-    "engageSacrifice": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -13325,6 +13249,7 @@
       {
         "name": "engage",
         "cost": 1,
+        "sacrifice": true,
         "effects": [
           {
             "op": "choose",
@@ -13601,7 +13526,8 @@
             "target": "selected:follower"
           },
           {
-            "op": "add_selected_copy_to_hand",
+            "op": "add_to_hand",
+            "source": "selection",
             "count": 1
           }
         ]
@@ -13695,7 +13621,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -13827,7 +13753,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -13972,7 +13898,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -14001,7 +13927,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -14116,7 +14042,7 @@
         "countdown": 4,
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "board_name_gate",
@@ -14136,21 +14062,16 @@
                       },
                       "effects": [
                         {
-                          "op": "keyword",
+                          "op": "buff",
                           "keywords": [
-                            {
-                              "name": "cant_attack",
-                              "until_opponent_eot": true
-                            }
-                          ]
+                            "Can't Attack"
+                          ],
+                          "duration": "opponent_turn_end"
                         },
                         {
                           "op": "grant_trigger",
                           "trigger": {
-                            "event": "end_of_turn",
-                            "condition": {
-                              "own_turn": true
-                            },
+                            "type": "end_of_turn_own",
                             "effects": [
                               {
                                 "op": "banish_self"
@@ -14195,7 +14116,7 @@
         "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -14219,7 +14140,7 @@
         "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
         "triggers": [
           {
-            "event": "end_of_turn",
+            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "no_ally_attacked_this_turn_gate",
@@ -14714,12 +14635,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10402110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10402110-yuni-cosmic-legacy",
+    "has_ongoing": true,
     "triggers": [
       {
-        "event": "end_of_turn",
-        "condition": {
-          "whose_turn": "owner"
-        },
+        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "restore_allies",
@@ -14843,7 +14762,7 @@
     "class": "Neutral",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Activates in deck. At the start of your turn, if allied followers have evolved at least 6 times this match,Invokethis card.\nWhen this card isInvoked, gainCrest: Sandalphon, Primarch Successorand return this card to hand\nFanfare: Super Skybound Art- Do this 5 times: \"Deal 2 damage to a random enemy.\"",
+    "description": "Activates in deck. At the start of your turn, if allied followers have evolved at least 6 times this match, Invoke this card.\nWhen this card is Invoked, gain Crest: Sandalphon, Primarch Successor and return this card to hand\nFanfare: Super Skybound Art- Do this 5 times: \"Deal 2 damage to a random enemy.\"",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10404110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10404110_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -14954,10 +14873,7 @@
     "evolve_trigger_always": true,
     "triggers": [
       {
-        "event": "end_of_turn",
-        "condition": {
-          "whose_turn": "owner"
-        },
+        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "evolve_self"
@@ -15831,12 +15747,10 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10431120-suframare-wandering-tutor",
+    "has_ongoing": true,
     "triggers": [
       {
-        "event": "end_of_turn",
-        "condition": {
-          "whose_turn": "owner"
-        },
+        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "spellboost_hand",
@@ -16217,12 +16131,65 @@
     "class": "Runecraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Gain 2 earth sigils. Add an Ars Magnato your hand.\nSkybound Art- Evolve this follower.\nSuper Skybound Art- Gain Crest: Cagliostro, Genius Alchemist.",
+    "description": "Fanfare: Gain 2 earth sigils. Add an Ars Magna to your hand.\nSkybound Art- Evolve this follower.\nSuper Skybound Art- Gain Crest: Cagliostro, Genius Alchemist.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10434120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10434120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10434120-cagliostro-genius-alchemist",
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon_named",
+        "name": "Magic Sediment",
+        "count": 2
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Ars Magna",
+        "count": 1
+      },
+      {
+        "op": "skybound_art_gate",
+        "requirement": 10,
+        "effects": [
+          {
+            "op": "evolve_self"
+          }
+        ]
+      },
+      {
+        "op": "skybound_art_gate",
+        "requirement": 15,
+        "effects": [
+          {
+            "op": "gain_crest",
+            "name": "Cagliostro, Genius Alchemist",
+            "description": "At the start of your turn, Earth Rite (1) - Add an Ars Magna to your hand.",
+            "image": "images/crests/cagliostro.png",
+            "triggers": [
+              {
+                "event": "start_of_turn",
+                "condition": {
+                  "own_turn": true
+                },
+                "effects": [
+                  {
+                    "op": "earth_rite",
+                    "amount": 1,
+                    "effects": [
+                      {
+                        "op": "add_to_hand",
+                        "name": "Ars Magna",
+                        "count": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -16238,7 +16205,7 @@
     "class": "Dragoncraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Ward. Aura",
+    "description": "Ward.\nAura.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10441110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441110_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -16266,10 +16233,50 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10441120-mari-megs-bestie",
+    "has_ongoing": true,
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [
+      {
+        "event": "ally_super_evolve",
+        "condition": {
+          "base_cost_eq": 3
+        },
+        "effects": [
+          {
+            "op": "modify_cost_pool",
+            "target": "self",
+            "amount": "-{self.cost}",
+            "until_eot": true
+          }
+        ]
+      },
+      {
+        "event": "end_of_turn",
+        "condition": {
+          "own_turn": true
+        },
+        "effects": [
+          {
+            "op": "select",
+            "target": "ally:follower",
+            "condition": {
+              "is_super_evolved": true
+            },
+            "count": 1,
+            "mode": "random",
+            "effects": [
+              {
+                "op": "buff",
+                "attack": 1,
+                "defense": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10441310",
@@ -16281,11 +16288,43 @@
     "class": "Dragoncraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "GainCrest: Crescent Tube Ride.",
+    "description": "Gain Crest: Crescent Tube Ride (Countdown (4). At the end of your turn, give a random allied follower on the field +1/+1.)",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10441310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10441310-crescent-tube-ride",
+    "fanfare": [
+      {
+        "op": "gain_crest",
+        "name": "Crescent Tube Ride",
+        "description": "Countdown (4). At the end of your turn, give a random allied follower on the field +1/+1.",
+        "image": "images/crests/crescent_tube_ride.png",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "condition": {
+              "own_turn": true
+            },
+            "effects": [
+              {
+                "op": "select",
+                "target": "ally:follower",
+                "count": 1,
+                "mode": "random",
+                "effects": [
+                  {
+                    "op": "buff",
+                    "attack": 1,
+                    "defense": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -16325,7 +16364,13 @@
         "amount": 3
       }
     ],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "damage_all",
+        "target": "enemy:follower",
+        "amount": 3
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -16339,13 +16384,36 @@
     "class": "Dragoncraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Super Skybound Art- Give this followerStorm.Super-Evolve: Select 2 enemy followers on the field and destroy them.",
+    "description": "Fanfare: Super Skybound Art (15)- Give this follower Storm.\nSuper-Evolve: Select 2 enemy followers on the field and destroy them.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10442120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10442120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10442120-mugen-steel-bodied-honesty",
+    "fanfare": [
+      {
+        "op": "skybound_art_gate",
+        "requirement": 15,
+        "effects": [
+          {
+            "op": "keyword",
+            "keyword": "Storm"
+          }
+        ]
+      }
+    ],
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "count": 2,
+        "effects": [
+          {
+            "op": "destroy"
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -16398,15 +16466,43 @@
     "class": "Dragoncraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Skybound Art- Super-evolve this follower.\nWhenever a 2-base-cost allied follower enters the field, give this followerWard.",
+    "description": "Fanfare: Skybound Art- Super-evolve this follower.\nWhenever a 2-base-cost allied follower enters the field, give this follower Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10443110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10443110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10443110-meg-girl-next-door",
+    "has_ongoing": true,
     "evolve": [],
     "superevolve": [],
+    "fanfare": [
+      {
+        "op": "skybound_art_gate",
+        "requirement": 10,
+        "effects": [
+          {
+            "op": "super_evolve_self"
+          }
+        ]
+      }
+    ],
     "keywords": [],
-    "triggers": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "base_cost_eq": 2
+        },
+        "effects": [
+          {
+            "op": "buff_self",
+            "keywords": [
+              "Ward"
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10443310",
@@ -16432,15 +16528,44 @@
             "op": "banish"
           },
           {
-            "op": "create_card_in_hand",
-            "source": "selection"
+            "op": "add_to_hand",
+            "source": "selection",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gain_max_pp",
+        "amount": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 10,
+        "effects": [
+          {
+            "op": "buff_self",
+            "keywords": [
+              "Storm"
+            ]
+          },
+          {
+            "op": "set_max_hp",
+            "amount": 1
+          },
+          {
+            "op": "set_leader_max_damage_cap",
+            "amount": 0,
+            "duration": "opponent_turn_end"
           }
         ]
       }
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
     "triggers": []
   },
   {
@@ -16453,14 +16578,38 @@
     "class": "Dragoncraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Select an enemy follower on the field and deal it 8 damage.IntimidateEvolve: Replicate the effects of this card'sFanfareability.",
+    "description": "Fanfare: Select an enemy follower on the field and deal it 8 damage.\nIntimidate.\nEvolve: Replicate the effects of this card'sFanfare ability.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10444110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10444110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10444110-wilnas-flame-personified",
-    "evolve": [],
-    "superevolve": [],
-    "keywords": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 8,
+        "select": 1
+      }
+    ],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 8,
+        "select": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 8,
+        "select": 1
+      }
+    ],
+    "keywords": [
+      "Intimidate"
+    ],
     "triggers": []
   },
   {
@@ -16473,14 +16622,42 @@
     "class": "Dragoncraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Gain 1 max play point.Enhance(10): Give this followerStorm. Set your leader's max defense to 1. Give your leader \"Can't take more than 0 damage at a time\" until the end of your opponent's turn.",
+    "description": "Fanfare: Gain 1 max play point.\nEnhance(10): Give this follower Storm. Set your leader's max defense to 1. Give your leader \"Can't take more than 0 damage at a time\" until the end of your opponent's turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10444120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10444120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10444120-zooey-ally-of-the-world",
+    "fanfare": [
+      {
+        "op": "gain_max_pp",
+        "amount": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 10,
+        "effects": [
+          {
+            "op": "buff_self",
+            "keywords": [
+              "Storm"
+            ]
+          },
+          {
+            "op": "set_max_hp",
+            "amount": 1
+          },
+          {
+            "op": "set_leader_max_damage_cap",
+            "amount": 0,
+            "duration": "opponent_turn_end"
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
     "triggers": []
   },
   {
@@ -16493,12 +16670,13 @@
     "class": "Abysscraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Enhance(4): Evolve this follower and give it +1/+1. Rush",
+    "description": "Enhance(4): Evolve this follower and give it +1/+1.\nRush",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10451110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10451110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10451110-almeida-headstrong-miner",
     "keywords": [
+      "Rush",
       {
         "name": "Enhance",
         "cost": 4,
@@ -16512,8 +16690,7 @@
             "defense": 1
           }
         ]
-      },
-      "Rush"
+      }
     ],
     "evolve": [],
     "superevolve": [],
@@ -16535,16 +16712,20 @@
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10451120-vaseraga-unyielding-scythe",
     "keywords": [
-      "Intimidate"
-    ],
-    "last_words": [
+      "Intimidate",
       {
-        "op": "summon_named",
-        "name": "Vaseraga, Unyielding Scythe"
-      },
-      {
-        "op": "damage_leader",
-        "amount": 2
+        "name": "Last Words",
+        "effects": [
+          {
+            "op": "summon_named",
+            "name": "Vaseraga, Unyielding Scythe"
+          },
+          {
+            "op": "damage",
+            "target": "ally:leader",
+            "amount": 2
+          }
+        ]
       }
     ],
     "evolve": [],
@@ -16561,20 +16742,40 @@
     "class": "Abysscraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Deal 2 damage to your leader. GainCrest: Valiant Edge.",
+    "description": "Deal 2 damage to your leader. Gain Crest: Valiant Edge.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10451310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10451310-valiant-edge",
     "spell": [
       {
-        "op": "damage_leader",
-        "amount": 2,
-        "target": "self"
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
       },
       {
         "op": "gain_crest",
-        "crest": "Valiant Edge"
+        "name": "Valiant Edge",
+        "description": "Countdown (2). At the end of your turn, deal 2 damage to a random enemy follower and restore 1 defense to your leader.",
+        "image": "images/crests/valiant_edge.png",
+        "countdown": 2,
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "amount": 2
+              },
+              {
+                "op": "heal",
+                "target": "ally:leader",
+                "amount": 1
+              }
+            ]
+          }
+        ]
       }
     ],
     "evolve": [],
@@ -16592,15 +16793,34 @@
     "class": "Abysscraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "RushAt the end of your turn, deal 4 damage to a random enemy follower, then deal 2 damage to a random enemy follower.",
+    "description": "Rush.\nAt the end of your turn, deal 4 damage to a random enemy follower, then deal 2 damage to a random enemy follower.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10452110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10452110-nezha-soaring-war-god",
+    "has_ongoing": true,
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": []
+    "keywords": [
+      "Rush"
+    ],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "effects": [
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 4
+          },
+          {
+            "op": "damage_random",
+            "target": "enemy:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10452120",
@@ -16612,7 +16832,7 @@
     "class": "Abysscraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: If there's an evolved allied follower on the field, evolve this follower.Aura",
+    "description": "Fanfare: If there's an evolved allied follower on the field, evolve this follower.\nAura",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10452120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452120_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -16622,12 +16842,10 @@
     ],
     "fanfare": [
       {
-        "op": "check_condition",
-        "condition": "evolved_ally_exists",
+        "op": "evolved_allied_gate",
         "effects": [
           {
-            "op": "evolve_self",
-            "spendPoint": false
+            "op": "evolve_self"
           }
         ]
       }
@@ -16646,7 +16864,7 @@
     "class": "Abysscraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Select aModeto activate.\n1. Give this follower and another random allied follower on the field +1/+1.\n2. Deal 3 damage to a random enemy follower.",
+    "description": "Fanfare: Select a Mode to activate.\n1. Give this follower and another random allied follower on the field +1/+1.\n2. Deal 3 damage to a random enemy follower.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10452130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452130_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -16657,7 +16875,7 @@
         "select_count": 1,
         "options": [
           {
-            "name": "Buff Self and another Random Ally",
+            "name": "Give this follower and another random allied follower on the field +1/+1",
             "effects": [
               {
                 "op": "buff_self",
@@ -16665,18 +16883,25 @@
                 "defense": 1
               },
               {
-                "op": "buff",
+                "op": "select",
                 "target": "ally:follower",
-                "not_self": true,
-                "count": 1,
-                "method": "random",
-                "attack": 1,
-                "defense": 1
+                "select_count": 1,
+                "mode": "random",
+                "condition": {
+                  "not_self": true
+                },
+                "effects": [
+                  {
+                    "op": "buff",
+                    "attack": 1,
+                    "defense": 1
+                  }
+                ]
               }
             ]
           },
           {
-            "name": "Deal 3 to Random Enemy",
+            "name": "Deal 3 damage to a random enemy follower",
             "effects": [
               {
                 "op": "damage_random",
@@ -16703,7 +16928,7 @@
     "class": "Abysscraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Evolve all unevolved allied followers on the field. Deal 2 damage to your leader.Drain",
+    "description": "Fanfare: Evolve all unevolved allied followers on the field. Deal 2 damage to your leader.\nDrain",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10453110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10453110_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -16716,9 +16941,9 @@
         "op": "evolve_all_unevolved_allies"
       },
       {
-        "op": "damage_leader",
-        "amount": 2,
-        "target": "self"
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
       }
     ],
     "evolve": [],
@@ -16735,7 +16960,7 @@
     "class": "Abysscraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Give all followers on the field -2/-2. Give yourself and your opponentCrest: Corruption.Super Skybound Art- Destroy yourCrest: Corruption.",
+    "description": "Give all followers on the field -2/-2. Give yourself and your opponent Crest: Corruption.\nSuper Skybound Art- Destroy your Crest: Corruption.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10453310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
@@ -16743,7 +16968,63 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "spell": [
+      {
+        "op": "buff",
+        "target": "all:follower",
+        "attack": -2,
+        "defense": -2
+      },
+      {
+        "op": "gain_crest",
+        "name": "Crest: Corruption",
+        "image": "images/crests/corruption.png",
+        "description": "Countdown (4). At the end of your turn, deal 2 damage to your leader.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "gain_crest",
+        "name": "Crest: Corruption",
+        "player": "opponent",
+        "image": "images/crests/corruption.png",
+        "description": "Countdown (4). At the end of your turn, deal 2 damage to your leader.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "skybound_art_gate",
+        "requirement": 15,
+        "effects": [
+          {
+            "op": "destroy_crest",
+            "name": "Crest: Corruption"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10454110",
@@ -16755,11 +17036,12 @@
     "class": "Abysscraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Necromancy(6) -Reanimate(2),Reanimate(1), and evolve them.\nAt the end of your turn, give all enemy followers on the field -2/-2.",
+    "description": "Fanfare: Necromancy(6) -Reanimate(2), Reanimate(1), and evolve them.\nAt the end of your turn, give all enemy followers on the field -2/-2.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10454110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10454110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10454110-fediel-darkness-personified",
+    "has_ongoing": true,
     "fanfare": [
       {
         "op": "necromancy_gate",
@@ -16781,10 +17063,14 @@
     "triggers": [
       {
         "type": "end_of_turn_own",
-        "op": "buff",
-        "target": "enemy:follower",
-        "attack": -2,
-        "defense": -2
+        "effects": [
+          {
+            "op": "buff",
+            "target": "enemy:follower",
+            "attack": -2,
+            "defense": -2
+          }
+        ]
       }
     ],
     "evolve": [],
@@ -16801,7 +17087,7 @@
     "class": "Abysscraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Deal 10 damage to all other followers.Super Skybound Art- GainCrest: Belial, Archangel of Cunning.Super-Evolve: Advance the count of yourCrest: Belial, Archangel of Cunningby 1.",
+    "description": "Fanfare: Deal 10 damage to all other followers.\nSuper Skybound Art- Gain Crest: Belial, Archangel of Cunning.\nSuper-Evolve: Advance the count of your Crest: Belial, Archangel of Cunning by 1.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10454120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10454120_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -16811,21 +17097,36 @@
         "op": "damage_all",
         "target": "other:follower",
         "amount": 10
-      }
-    ],
-    "evolve": [
+      },
       {
-        "op": "super_evolved_self_gate",
+        "op": "skybound_art_gate",
+        "requirement": 15,
         "effects": [
           {
-            "op": "start_crest",
-            "name": "Belial, Archangel of Cunning",
-            "increment": 1
+            "op": "gain_crest",
+            "name": "Crest: Belial, Archangel of Cunning",
+            "image": "images/crests/belial.png",
+            "description": "Countdown (4). Last Words: Deal 20 damage to the enemy leader.",
+            "countdown": 4,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 20
+              }
+            ]
           }
         ]
       }
     ],
-    "superevolve": [],
+    "evolve": [],
+    "superevolve": [
+      {
+        "op": "crest_advance_countdown",
+        "name": "Crest: Belial, Archangel of Cunning",
+        "amount": 1
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -16839,17 +17140,19 @@
     "class": "Havencraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "StormWhenever youEngagean amulet, give this followerDrain.",
+    "description": "Storm.\nWhenever you Engage an amulet, give this follower Drain.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10461110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10461110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461110-troue-heroic-visionary",
+    "has_ongoing": true,
     "keywords": [
       "Storm"
     ],
     "triggers": [
       {
         "event": "engage",
+        "source": "board",
         "effects": [
           {
             "op": "buff_self",
@@ -16873,11 +17176,12 @@
     "class": "Havencraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "At the end of your turn, if this follower is evolved, deal 2 damage to all followers.Evolve: Give this follower \"Can't attack followers or leaders\" until the end of the turn.",
+    "description": "At the end of your turn, if this follower is evolved, deal 2 damage to all followers.\nEvolve: Give this follower \"Can't attack followers or leaders\" until the end of the turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10461120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10461120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461120-lamretta-sisterly-shepherd",
+    "has_ongoing": true,
     "triggers": [
       {
         "type": "end_of_turn_own",
@@ -16912,34 +17216,36 @@
     "class": "Havencraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Engage(2): Destroy this card. Select an allied follower on the field and transform it into anAwed and Inspired. Draw a card.",
+    "description": "Engage(2): Destroy this card. Select an allied follower on the field and transform it into an Awed and Inspired. Draw a card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10461210.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461210-awed-and-inspired",
     "evolve": [],
     "superevolve": [],
-    "engageCost": 2,
-    "engageEffects": [
+    "keywords": [
       {
-        "op": "destroy_self"
-      },
-      {
-        "op": "select",
-        "target": "ally:follower",
+        "name": "Engage",
+        "cost": 2,
+        "sacrifice": true,
         "effects": [
           {
-            "op": "transform",
-            "into": "Awed and Inspired"
+            "op": "select",
+            "target": "ally:follower",
+            "effects": [
+              {
+                "op": "transform",
+                "into": "Awed and Inspired"
+              }
+            ]
+          },
+          {
+            "op": "draw",
+            "count": 1
           }
         ]
-      },
-      {
-        "op": "draw",
-        "count": 1
       }
     ],
-    "keywords": [],
     "triggers": []
   },
   {
@@ -16952,22 +17258,20 @@
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Enhance(6): Give this follower +0/+10.WardEvolve: Select a damaged enemy follower on the field and destroy it.",
+    "description": "Enhance(6): Give this follower +0/+10.\nWard.\nEvolve: Select a damaged enemy follower on the field and destroy it.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10462110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10462110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10462110-sara-graphoss-chosen",
     "keywords": [
+      "Ward",
       {
         "name": "Enhance",
         "cost": 6,
         "effects": [
           {
             "op": "buff_self",
-            "defense": 10,
-            "keywords": [
-              "Ward"
-            ]
+            "defense": 10
           }
         ]
       }
@@ -16987,7 +17291,20 @@
         ]
       }
     ],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "condition": {
+          "damaged": true
+        },
+        "effects": [
+          {
+            "op": "destroy"
+          }
+        ]
+      }
+    ],
     "triggers": []
   },
   {
@@ -17000,13 +17317,31 @@
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Summon a random Havencraft follower that costs 2 or less from your deck.Super-Evolve: Give all other allied followers on the fieldBarrier.",
+    "description": "Fanfare: Summon a random Havencraft follower that costs 2 or less from your deck.\nSuper-Evolve: Give all other allied followers on the field Barrier.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10462120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10462120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10462120-sophia-zeyen-priestess",
+    "fanfare": [
+      {
+        "op": "summon_random_from_deck",
+        "filters": {
+          "type": "Follower",
+          "class": "Havencraft",
+          "cost_lte": 2
+        }
+      }
+    ],
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "buff",
+        "target": "ally:follower",
+        "keywords": [
+          "Barrier"
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": []
   },
@@ -17020,32 +17355,33 @@
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Activates in hand. Whenever youEngagean amulet, reduce the cost of this card by 1.Engage: Destroy this card. Select an unevolved allied follower on the field and evolve it.",
+    "description": "Activates in hand. Whenever you Engage an amulet, reduce the cost of this card by 1.\nEngage: Destroy this card. Select an unevolved allied follower on the field and evolve it.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10462210.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10462210-skyfaring-vessel",
     "evolve": [],
     "superevolve": [],
-    "engageCost": 0,
-    "engageEffects": [
+    "keywords": [
       {
-        "op": "destroy_self"
-      },
-      {
-        "op": "select",
-        "target": "ally:follower",
-        "condition": {
-          "evolved": false
-        },
+        "name": "Engage",
+        "sacrifice": true,
         "effects": [
           {
-            "op": "evolve"
+            "op": "select",
+            "target": "ally:follower",
+            "condition": {
+              "unevolved": true
+            },
+            "effects": [
+              {
+                "op": "evolve"
+              }
+            ]
           }
         ]
       }
     ],
-    "keywords": [],
     "triggers": [
       {
         "event": "engage",
@@ -17069,11 +17405,12 @@
     "class": "Havencraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Whenever youEngagean amulet, restore 1 defense to your leader.Evolve: Select an enemy follower on the field and deal it 3 damage.",
+    "description": "Whenever you Engage an amulet, restore 1 defense to your leader.\nEvolve: Select an enemy follower on the field and deal it 3 damage.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10463110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10463110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10463110-tikoh-asclepian-surgeon",
+    "has_ongoing": true,
     "evolve": [
       {
         "op": "select",
@@ -17086,7 +17423,18 @@
         ]
       }
     ],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "effects": [
+          {
+            "op": "damage",
+            "amount": 3
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [
       {
@@ -17110,44 +17458,44 @@
     "class": "Havencraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Engage: Destroy this card. Select aModeto activate.\n1. Destroy a random enemy follower.\n2. Draw 2 cards.",
+    "description": "Engage: Destroy this card. Select a Mode to activate.\n1. Destroy a random enemy follower.\n2. Draw 2 cards.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10463210.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10463210-de-la-filles-gleaming-gems",
     "evolve": [],
     "superevolve": [],
-    "engageCost": 0,
-    "engageEffects": [
+    "keywords": [
       {
-        "op": "destroy_self"
-      },
-      {
-        "op": "choose",
-        "select_count": 1,
-        "options": [
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
           {
-            "name": "Destroy Enemy",
-            "effects": [
+            "op": "choose",
+            "options": [
               {
-                "op": "destroy_random",
-                "target": "enemy:follower"
-              }
-            ]
-          },
-          {
-            "name": "Draw 2",
-            "effects": [
+                "label": "Destroy a random enemy follower",
+                "effects": [
+                  {
+                    "op": "destroy_random",
+                    "target": "enemy:follower"
+                  }
+                ]
+              },
               {
-                "op": "draw",
-                "count": 2
+                "label": "Draw 2 cards",
+                "effects": [
+                  {
+                    "op": "draw",
+                    "count": 2
+                  }
+                ]
               }
             ]
           }
         ]
       }
     ],
-    "keywords": [],
     "triggers": []
   },
   {
@@ -17160,15 +17508,45 @@
     "class": "Havencraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "WardCan't attack followers or leaders.\nAt the end of your turn, if you've unlocked super-evolution, evolve a random unevolved allied follower on the field that didn't attack this turn.",
+    "description": "Ward.\nCan't attack followers or leaders.\nAt the end of your turn, if you've unlocked super-evolution, evolve a random unevolved allied follower on the field that didn't attack this turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10464110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10464110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10464110-galleon-earth-personified",
+    "has_ongoing": true,
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": []
+    "keywords": [
+      "Ward",
+      {
+        "name": "cant_attack"
+      }
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "condition": {
+          "super_evolution_unlocked": true
+        },
+        "effects": [
+          {
+            "op": "select",
+            "target": "ally:follower",
+            "mode": "random",
+            "count": 1,
+            "condition": {
+              "unevolved": true,
+              "did_not_attack_this_turn": true
+            },
+            "effects": [
+              {
+                "op": "evolve"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10464120",
@@ -17180,14 +17558,41 @@
     "class": "Havencraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Select 2 enemy followers on the field and banish them.Super Skybound Art- Super-evolve this follower.WardCan't take more than 3 damage at a time.",
+    "description": "Fanfare: Select 2 enemy followers on the field and banish them.\nSuper Skybound Art- Super-evolve this follower.\nWard\nCan't take more than 3 damage at a time.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10464120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10464120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10464120-vira-luminous-primal-knight",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      "Ward",
+      {
+        "name": "max_damage_cap",
+        "amount": 3
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "count": 2,
+        "effects": [
+          {
+            "op": "banish"
+          }
+        ]
+      },
+      {
+        "op": "skybound_art_gate",
+        "count": 15,
+        "effects": [
+          {
+            "op": "super_evolve_self"
+          }
+        ]
+      }
+    ],
     "triggers": []
   },
   {
@@ -17200,7 +17605,7 @@
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: If you've unlocked super-evolution, give this followerBarrier.Storm",
+    "description": "Fanfare: If you've unlocked super-evolution, give this follower Barrier.\nStorm.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10471110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471110_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -17210,7 +17615,7 @@
     ],
     "fanfare": [
       {
-        "op": "super_evo_gate",
+        "op": "super_evolve_gate",
         "effects": [
           {
             "op": "buff_self",
@@ -17235,14 +17640,22 @@
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Increase the Skybound Art gauges of all cards in your hand by 1.Rush",
+    "description": "Fanfare: Increase the Skybound Art gauges of all cards in your hand by 1.\nRush",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10471120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471120-tsubasa-blazing-gearcyclist",
+    "keywords": [
+      "Rush"
+    ],
+    "fanfare": [
+      {
+        "op": "boost_skybound_art_hand",
+        "amount": 1
+      }
+    ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
     "triggers": []
   },
   {
@@ -17255,21 +17668,25 @@
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Last Words: Add aStriker Artifactto your hand.",
+    "description": "Last Words: Add a Striker Artifact to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10471130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471130-isaac-congenial-engineer",
-    "last_words": [
-      {
-        "op": "create_card_in_hand",
-        "card_name": "Striker Artifact",
-        "count": 1
-      }
-    ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "last_words",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Striker Artifact",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": []
   },
   {
@@ -17282,15 +17699,46 @@
     "class": "Portalcraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Skybound Art- Select another unevolved allied follower on the field and evolve it and this follower.Clash: Deal 3 damage to the opposing follower.",
+    "description": "Fanfare: Skybound Art- Select another unevolved allied follower on the field and evolve it and this follower.\nClash: Deal 3 damage to the opposing follower.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10472110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10472110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10472110-eustace-howl-of-thunder",
-    "evolve": [],
-    "superevolve": [],
+    "fanfare": [
+      {
+        "op": "skybound_art_gate",
+        "count": 10,
+        "effects": [
+          {
+            "op": "select",
+            "target": "ally:follower",
+            "condition": {
+              "unevolved": true
+            },
+            "effects": [
+              {
+                "op": "evolve"
+              }
+            ]
+          },
+          {
+            "op": "evolve_self"
+          }
+        ]
+      }
+    ],
     "keywords": [],
-    "triggers": []
+    "triggers": [
+      {
+        "event": "clash",
+        "effects": [
+          {
+            "op": "clash_damage",
+            "amount": 3
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10472120",
@@ -17302,11 +17750,39 @@
     "class": "Portalcraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Select aModeto activate.\n1. Do this 3 times: \"Deal 4 damage to a random enemy follower.\"\n2. Deal 4 damage to the enemy leader.",
+    "description": "Fanfare: Select a Mode to activate.\n1. Do this 3 times: \"Deal 4 damage to a random enemy follower.\"\n2. Deal 4 damage to the enemy leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10472120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10472120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10472120-ilsa-brutal-drill-sergeant",
+    "fanfare": [
+      {
+        "op": "choose",
+        "options": [
+          {
+            "label": "Do this 3 times: \"Deal 4 damage to a random enemy follower.\"",
+            "effects": [
+              {
+                "op": "damage_random",
+                "target": "enemy:follower",
+                "count": 3,
+                "amount": 4
+              }
+            ]
+          },
+          {
+            "label": "Deal 4 damage to the enemy leader",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 4
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -17350,15 +17826,41 @@
     "class": "Portalcraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Select an Artifact follower in your hand and deal X damage to all enemy followers. X is the selected follower's attack.Last Words: Add aFortifier Artifactto your hand.",
+    "description": "Fanfare: Select an Artifact follower in your hand and deal X damage to all enemy followers. X is the selected follower's attack.\nLast Words: Add a Fortifier Artifact to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10473110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10473110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10473110-cassius-sky-yearning-arrival",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": []
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "condition": {
+          "tribe": "Artifact",
+          "type": "Follower"
+        },
+        "effects": [
+          {
+            "op": "damage_all",
+            "target": "enemy:follower",
+            "amount": "{selected.attack}"
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      {
+        "name": "last_words",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "card_name": "Fortifier Artifact"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10473310",
@@ -17370,11 +17872,31 @@
     "class": "Portalcraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Deal 3 damage to all enemies.Super Skybound Art- Deal 6 damage instead.",
+    "description": "Deal 3 damage to all enemies.\nSuper Skybound Art- Deal 6 damage instead.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10473310.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10473310-chaos-legion",
+    "spell": [
+      {
+        "op": "skybound_art_gate",
+        "count": 15,
+        "effects": [
+          {
+            "op": "damage_all",
+            "target": "enemy:all",
+            "amount": 6
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage_all",
+            "target": "enemy:all",
+            "amount": 3
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -17390,7 +17912,7 @@
     "class": "Portalcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Do this 6 times: \"Deal 1 damage to a random enemy follower.\" Give all followers in your opponent's hand +1/+0.Skybound Art- GainCrest: Lu Woh, Light Personified.",
+    "description": "Fanfare: Do this 6 times: \"Deal 1 damage to a random enemy follower.\" Give all followers in your opponent's hand +1/+0.\nSkybound Art- GainCrest: Lu Woh, Light Personified.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10474110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10474110_evo.webp",
     "set": "[10004] Skybound Dragons",

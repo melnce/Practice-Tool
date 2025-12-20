@@ -1,6 +1,7 @@
 // src/logic/effects/self.ts
 import { state } from "../../core/gameState.js";
 import { applyKeyword } from "../core/keywords.js";
+import { normalizeKeywordName } from "../core/keywords/registry.js";
 import { handleBanish } from "./ops/banish.js";
 
 
@@ -50,7 +51,15 @@ export function handleBuffSelf(sourceCard: CardInstance, eff: Effect) {
     if (Array.isArray(eff.keywords)) {
         for (const kw of eff.keywords) {
             const name = (typeof kw === "string" ? kw : (kw as any)?.name) || "";
-            const options = (typeof kw === "object" ? kw : undefined);
+            let options = (typeof kw === "object" ? kw : undefined);
+
+            // PATCH: Support duration="turn_end" for cant_attack by injecting expires_on_turn
+            const normalized = normalizeKeywordName(name);
+
+            if (eff.duration === "turn_end" && normalized === "cant_attack") {
+                options = { ...options, expires_on_turn: state.roundCount };
+            }
+
             if (name) {
                 applyKeyword(sourceCard, name, options);
             }

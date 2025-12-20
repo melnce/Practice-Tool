@@ -40,9 +40,36 @@ function refreshBoardForNewTurn(board: CardInstance[]) {
         // Legacy/UI flag
         card.hasAttacked = false;
 
-        // NEW: reset per-turn usage counter so EOT checks are accurate
         (card as any).attacks_used_this_turn = 0;
     });
+}
+
+function clearExpiredLeaderEffects(endedPlayer: Player) {
+    // If endedPlayer just ended their turn, process expirations.
+    // "opponent_turn_end" means if I am the opponent of the effect holder, and I ended my turn, it expires.
+    // E.g. Blue has effect "until opponent turn end". Red ends turn. Red is opponent. So Blue's effect expires.
+
+    const opponent = endedPlayer === "blue" ? "red" : "blue";
+
+    // Check Blue's effects (if Red ended turn)
+    if (endedPlayer === "red") {
+        const s = state as any;
+        if (s.blueLeaderMaxDamageCapExpiry === "opponent_turn_end") {
+            delete s.blueLeaderMaxDamageCap;
+            delete s.blueLeaderMaxDamageCapExpiry;
+            logEvent("leaderEffectExpired", { owner: "blue", effect: "max_damage_cap" });
+        }
+    }
+
+    // Check Red's effects (if Blue ended turn)
+    if (endedPlayer === "blue") {
+        const s = state as any;
+        if (s.redLeaderMaxDamageCapExpiry === "opponent_turn_end") {
+            delete s.redLeaderMaxDamageCap;
+            delete s.redLeaderMaxDamageCapExpiry;
+            logEvent("leaderEffectExpired", { owner: "red", effect: "max_damage_cap" });
+        }
+    }
 }
 
 function clearTempHandCostMods(endedPlayer: Player) {
@@ -197,6 +224,7 @@ export function endTurnBlue() {
 
         clearExpiredCantAttackAtEOT("blue");
         applyBleedAllBoardsAtEndOfTurn();
+        clearExpiredLeaderEffects("blue");
 
         state.redMaxPP = Math.min(state.roundCount + (state.redPermPP || 0), 10);
         state.redPP = state.redMaxPP;
@@ -298,6 +326,7 @@ export function endTurnRed() {
 
         clearExpiredCantAttackAtEOT("red");
         applyBleedAllBoardsAtEndOfTurn();
+        clearExpiredLeaderEffects("red");
 
 
         if (state.redBoostPending) {

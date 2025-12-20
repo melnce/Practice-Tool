@@ -43,7 +43,19 @@ export function processCandidateTriggers(
         const { card, owner, source } = cand;
 
         for (const trigger of cand.triggers) {
-            if (trigger.event !== event) continue;
+            let checkEvent = trigger.event;
+
+            // Shorthand: end_of_turn_own
+            if (trigger.type === "end_of_turn_own") {
+                checkEvent = "end_of_turn";
+            }
+
+            if (checkEvent !== event) continue;
+
+            // Shorthand Logic: end_of_turn_own means must be owner's turn
+            if (trigger.type === "end_of_turn_own") {
+                if (activePlayer !== owner) continue;
+            }
 
 
 

@@ -18,7 +18,7 @@ import {
 } from "../../../effects/ops/banish.js";
 import {
     handleHealLeader, handleDynamicHealLeader,
-    handleLeaderBarrierOp, handleSetMaxHP
+    handleLeaderBarrierOp, handleSetMaxHP, handleSetLeaderMaxDamageCap
 } from "../../../effects/leader.js";
 import { handleDestroySelf, handleBanishSelf } from "../../../effects/self.js";
 import { cleanupDead } from "../../cleanup.js";
@@ -103,6 +103,20 @@ export function registerCombatEffects() {
         }
     });
 
+    registerOp("clash_damage", (eff, ctx) => {
+        const attacker = (ctx.context as any)?.attacker;
+        const defender = (ctx.context as any)?.defender;
+        if (!attacker || !defender || !ctx.sourceCard) return;
+
+        // Opponent is whoever is NOT the source card
+        const opponent = ctx.sourceCard.uid === attacker.uid ? defender : attacker;
+
+        void import('../../barrier.js').then(({ dealDamage }) => {
+            dealDamage(opponent, Number(eff.amount || 0));
+            cleanupDead();
+        });
+    });
+
     // Banish
     registerOp("banish", (eff, ctx) => {
         if (handleBanishTargeted(eff, ctx.owner, ctx.queue) === "pending") return "pending";
@@ -141,6 +155,7 @@ export function registerCombatEffects() {
     });
 
     registerOp("set_max_hp", (eff, ctx) => handleSetMaxHP(eff, ctx.owner));
+    registerOp("set_leader_max_damage_cap", (eff, ctx) => handleSetLeaderMaxDamageCap(eff, ctx.owner));
     registerOp("leader_barrier", (eff, ctx) => handleLeaderBarrierOp(ctx.owner, eff));
 
     registerOp("restore_full_defense_self", (eff, ctx) => handleRestoreFullDefenseSelf(ctx.sourceCard!, ctx.context as any));
