@@ -47,6 +47,10 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
     // Standard Zones
     // -------------------------------------------------------------------------
 
+    attacker: (q, env) => {
+        return env.context?.attacker ? [env.context.attacker] : [];
+    },
+
     hand: (q, env) => {
         const myHand = env.owner === "blue" ? state.blueHand : state.redHand;
         const pool = myHand || [];

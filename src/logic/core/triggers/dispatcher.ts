@@ -19,6 +19,7 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
     "clash": handleCombatEvent,
     "strike": handleCombatEvent,
     "follower_strike": handleCombatEvent,
+    "leader_attacked": handleCombatEvent,
 
     // Play
     "ally_follower_played": handlePlayEvent,

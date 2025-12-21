@@ -335,6 +335,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10011210-wild-profusion",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -631,6 +632,7 @@
     "evo_image": "",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10022210-ancestral-crown",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -1522,6 +1524,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10062120_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10062120-sacred-griffon",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -1778,6 +1781,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10072210-puppet-theater",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [

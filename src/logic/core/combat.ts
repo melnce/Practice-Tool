@@ -262,6 +262,10 @@ function _attackLeaderCore(attackerIdx: number, attackerPlayer: Player, defender
     attacker.attack = parseInt(attacker.attack as any) || 0;
     attacker.defense = parseInt(attacker.defense as any) || 0;
 
+    // Fire generic defender trigger (pre-damage)
+    // Synchronous execution ensures any debuffs (e.g. Lu Woh) apply before effectiveAtk()
+    fireTrigger("leader_attacked", defenderPlayer, { attacker });
+
     const damage = effectiveAtk(attacker);
     applyLeaderDamage(defenderPlayer, damage);
 

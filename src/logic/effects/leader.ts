@@ -124,6 +124,19 @@ export function applyLeaderDamage(owner: Player, amount: number) {
     // NEW: Check Max Damage Cap (Zooey)
     const capKey = owner === "blue" ? "blueLeaderMaxDamageCap" : "redLeaderMaxDamageCap";
     const cap = s[capKey];
+
+    // NEW: Leader damage modifier (Beelzebub)
+    const modKey = owner === "blue" ? "blueLeaderDamagePlus" : "redLeaderDamagePlus";
+    const mod = parseInt(s[modKey] || 0);
+
+    // Apply modifier BEFORE cap? 
+    // Usually modifiers apply to the incoming damage packet. 
+    // "Takes 1 more damage" -> incoming + 1.
+    if (mod > 0) {
+        amount += mod;
+        logEvent("leaderDamageResistMod", { owner, mod, newAmount: amount });
+    }
+
     if (typeof cap === "number" && Number.isFinite(cap)) {
         if (amount > cap) {
             logEvent("leaderDamageCapped", { owner, original: amount, capped: cap });
@@ -194,3 +207,19 @@ export function handleSetLeaderMaxDamageCap(eff: Effect, owner: Player) {
     logEvent("setLeaderMaxDamageCap", { owner: targetOwner, cap: amount, duration: eff.duration });
 }
 
+
+// NEW: Modify how much damage a leader takes (permanently or temporarily)
+export function handleModifyLeaderDamageReceived(eff: Effect, owner: Player) {
+    const targetPlayerString = eff.player || 'self';
+    const isOpponent = targetPlayerString === 'opponent';
+    const targetOwner: Player = isOpponent ? (owner === 'blue' ? 'red' : 'blue') : owner;
+
+    const amt = parseInt(eff.amount as any) || 0;
+    
+    const key = targetOwner === 'blue' ? 'blueLeaderDamagePlus' : 'redLeaderDamagePlus';
+    const s = state as any;
+    
+    s[key] = (s[key] || 0) + amt;
+    
+    logEvent('modifyLeaderDamageReceived', { owner: targetOwner, amount: amt, total: s[key] });
+}

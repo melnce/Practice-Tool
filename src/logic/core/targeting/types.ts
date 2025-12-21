@@ -26,14 +26,14 @@ export interface TargetingEnv {
 
 export interface TargetQuery {
     raw: string;
-    side: "ally" | "enemy" | "hand" | "any" | "self" | "selected" | "special";
+    side: "ally" | "enemy" | "hand" | "any" | "self" | "selected" | "special" | "attacker";
     specialContext?: "entering_follower" | "last_summoned" | undefined;
     typeFilter?: "follower" | "amulet" | "spell" | undefined;
     condition: any;
 }
 
 // Closed union for Context Resolvers
-export type TargetContextKey = "special" | "selected" | "hand" | "self" | "ally" | "enemy" | "any";
+export type TargetContextKey = "special" | "selected" | "hand" | "self" | "ally" | "enemy" | "any" | "attacker";
 
 // Closed union for Filter Keys (for documentation/consts if needed)
 export type TargetFilterKey = "follower" | "amulet" | "spell";

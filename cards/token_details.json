@@ -595,6 +595,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90034130-annes-summoning",
+    "hasOngoing": true,
     "keywords": [
       "Rush",
       "Ward"
@@ -862,6 +863,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90051130-ghost",
+    "hasOngoing": true,
     "keywords": [
       "Storm",
       "BanishOnDeath"
@@ -1127,6 +1129,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90071110-puppet",
+    "hasOngoing": true,
     "keywords": [
       "Rush"
     ],
@@ -1164,6 +1167,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90071120-enhanced-puppet",
+    "hasOngoing": true,
     "keywords": [
       "Rush"
     ],
@@ -1376,6 +1380,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90073110-ominous-artifact-a",
+    "hasOngoing": true,
     "keywords": [],
     "triggers": [
       {
@@ -1462,6 +1467,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90073120-ominous-artifact-b",
+    "hasOngoing": true,
     "keywords": [],
     "triggers": [
       {
@@ -1499,6 +1505,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90073130-ominous-artifact-g",
+    "hasOngoing": true,
     "keywords": [],
     "triggers": [
       {

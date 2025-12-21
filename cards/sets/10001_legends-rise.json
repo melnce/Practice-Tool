@@ -961,11 +961,12 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Transform all Forestcraft cards in your hand that cost 1 or less into copies of Bramble Burst.\nWard",
+    "description": "Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst.\nWard.\nCan attack 2 times per turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10114120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10114120_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10114120-opulent-rose-queen",
+    "attacks_per_turn": 2,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -975,7 +976,7 @@
           "class": "Forestcraft",
           "cost": {
             "op": "<=",
-            "value": 1
+            "value": 2
           }
         },
         "target_card_name": "Bramble Burst"
@@ -3135,7 +3136,7 @@
   {
     "id": "10143120",
     "name": "Liu Feng, Goldennote Ward",
-    "cost": "4",
+    "cost": "3",
     "attack": "3",
     "defense": "3",
     "type": "Follower",
@@ -3379,6 +3380,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10151110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10151110-aryll-moonstruck-vampire",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -4288,6 +4290,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10161140_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10161140-mainyu-darkdweller",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -4697,7 +4700,6 @@
     "url": "https://shadowverse.gg/cards/10163210-pact-of-the-beast-princess",
     "evolve": [],
     "superevolve": [],
-    "fanfare": [],
     "fanfare": [],
     "keywords": [
       {
@@ -5358,9 +5360,9 @@
   {
     "id": "10173130",
     "name": "Liam, Crazed Creator",
-    "cost": "10",
-    "attack": "8",
-    "defense": "8",
+    "cost": "9",
+    "attack": "7",
+    "defense": "7",
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Gold",
@@ -5483,6 +5485,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10173210-ancient-cannon",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [

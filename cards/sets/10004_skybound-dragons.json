@@ -515,7 +515,7 @@
     "class": "Forestcraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Super Skybound Art- Evolve this follower. Deal 3 damage to the enemy leader.\nWhen this follower evolves, do this 7 times: \"Deal 1 damage to a random enemy follower.\"",
+    "description": "Fanfare: [Skybound Art] Evolve this follower. [Super Skybound Art] Deal 3 damage to the enemy leader.\nWhen this follower evolves, do this 7 times: \"Deal 1 damage to a random enemy follower.\"",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10413110.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
@@ -524,11 +524,17 @@
     "fanfare": [
       {
         "op": "skybound_art_gate",
-        "requirement": 15,
+        "requirement": 10,
         "effects": [
           {
             "op": "evolve_self"
-          },
+          }
+        ]
+      },
+      {
+        "op": "skybound_art_gate",
+        "requirement": 15,
+        "effects": [
           {
             "op": "damage",
             "target": "enemy:leader",
@@ -665,7 +671,7 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Skybound Art- Recover 1 evolution point.",
+    "description": "Fanfare: Skybound Art- Recover 1 evolution point.\nRush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10414110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10414110_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -684,7 +690,9 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -3366,6 +3374,51 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10474110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10474110-lu-woh-light-personified",
+    "fanfare": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 1,
+        "count": 6
+      },
+      {
+        "op": "buff",
+        "target": "enemy:hand:follower",
+        "attack": 1,
+        "defense": 0
+      },
+      {
+        "op": "skybound_art_gate",
+        "count": 10,
+        "effects": [
+          {
+            "op": "gain_crest",
+            "name": "Lu Woh, Light Personified",
+            "description": "Countdown (2). Whenever an enemy follower with Storm attacks a leader, give it -3/-0 until the end of the turn.",
+            "countdown": 2,
+            "image": "https://static.dotgg.gg/shadowverse/cards/10474110_token.webp",
+            "triggers": [
+              {
+                "event": "leader_attacked",
+                "condition": {
+                  "is_ally": false,
+                  "has_keyword": "Storm"
+                },
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "attacker",
+                    "attack": -3,
+                    "defense": 0,
+                    "until_end_of_turn": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -3388,6 +3441,29 @@
     "url": "https://shadowverse.gg/cards/10474120-beelzebub-supreme-king",
     "evolve": [],
     "superevolve": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "count": 2,
+        "target": "enemy:follower",
+        "effects": [
+          {
+            "op": "remove_abilities",
+            "target": "selected"
+          },
+          {
+            "op": "damage",
+            "target": "selected",
+            "amount": 9
+          }
+        ]
+      },
+      {
+        "op": "add_leader_damage_taken_bonus",
+        "target": "enemy:leader",
+        "amount": 1
+      }
+    ],
     "keywords": [],
     "triggers": []
   }

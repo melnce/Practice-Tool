@@ -713,6 +713,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10222110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10222110-gelt-intrepid-vice-captain",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -928,6 +929,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10224110-gildaria-anathema-of-peace",
+    "hasOngoing": true,
     "evolve_trigger_always": true,
     "evolve": [
       {
@@ -991,6 +993,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224120_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10224120-yurius-levin-authority",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2132,6 +2135,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10252110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10252110-vuella-the-blastwing",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -2362,6 +2366,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10254120_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10254120-charon-stygian-oarswoman",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [
       {
@@ -2466,6 +2471,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10261120_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10261120-damus-oracle-of-malice",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2677,7 +2683,7 @@
   {
     "id": "10263310",
     "name": "Maddening Benison",
-    "cost": "2",
+    "cost": "4",
     "attack": "0",
     "defense": "0",
     "type": "Spell",
@@ -2899,9 +2905,9 @@
   {
     "id": "10271120",
     "name": "Puppet Cat",
-    "cost": "2",
-    "attack": "2",
-    "defense": "2",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Bronze",
@@ -2930,7 +2936,9 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "id": "10271210",
@@ -2947,6 +2955,7 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10271210-artifact-catapult",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -3197,13 +3206,26 @@
     "class": "Portalcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Summon a Victoria.\nWhenever an allied Puppetry follower enters the field, give it Ward.",
+    "description": "Fanfare: Summon a Victoria.\nWhenever an allied Puppetry follower enters the field, give it Ward.\nEvolve: Summon an Enhanced Puppet.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10274110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10274110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10274110-zwei-symphonic-heart",
-    "evolve": [],
-    "superevolve": [],
+    "hasOngoing": true,
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Enhanced Puppet",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Enhanced Puppet",
+        "count": 1
+      }
+    ],
     "fanfare": [
       {
         "op": "summon_named",

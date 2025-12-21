@@ -53,6 +53,9 @@ const DEFAULTS = {
   deckoutWinsRed: undefined,
   blueLeaderBarrier: undefined,
   redLeaderBarrier: undefined,
+
+  blueLeaderDamagePlus: 0,
+  redLeaderDamagePlus: 0,
 } as const;
 
 // -- 2. Array Keys (Identity Preservation) --

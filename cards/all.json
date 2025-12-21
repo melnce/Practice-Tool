@@ -335,6 +335,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10011210-wild-profusion",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -631,6 +632,7 @@
     "evo_image": "",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10022210-ancestral-crown",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -1522,6 +1524,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10062120_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10062120-sacred-griffon",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -1778,6 +1781,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
     "set": "[10000] Basic",
     "url": "https://shadowverse.gg/cards/10072210-puppet-theater",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2769,11 +2773,12 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Transform all Forestcraft cards in your hand that cost 1 or less into copies of Bramble Burst.\nWard",
+    "description": "Fanfare: Transform all Forestcraft cards in your hand that cost 2 or less into copies of Bramble Burst.\nWard.\nCan attack 2 times per turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10114120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10114120_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10114120-opulent-rose-queen",
+    "attacks_per_turn": 2,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2783,7 +2788,7 @@
           "class": "Forestcraft",
           "cost": {
             "op": "<=",
-            "value": 1
+            "value": 2
           }
         },
         "target_card_name": "Bramble Burst"
@@ -4943,7 +4948,7 @@
   {
     "id": "10143120",
     "name": "Liu Feng, Goldennote Ward",
-    "cost": "4",
+    "cost": "3",
     "attack": "3",
     "defense": "3",
     "type": "Follower",
@@ -5187,6 +5192,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10151110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10151110-aryll-moonstruck-vampire",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -6096,6 +6102,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10161140_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10161140-mainyu-darkdweller",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -7165,9 +7172,9 @@
   {
     "id": "10173130",
     "name": "Liam, Crazed Creator",
-    "cost": "10",
-    "attack": "8",
-    "defense": "8",
+    "cost": "9",
+    "attack": "7",
+    "defense": "7",
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Gold",
@@ -7290,6 +7297,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10173210-ancient-cannon",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -8212,6 +8220,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10222110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10222110-gelt-intrepid-vice-captain",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -8427,6 +8436,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10224110-gildaria-anathema-of-peace",
+    "hasOngoing": true,
     "evolve_trigger_always": true,
     "evolve": [
       {
@@ -8490,6 +8500,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224120_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10224120-yurius-levin-authority",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -9631,6 +9642,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10252110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10252110-vuella-the-blastwing",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
@@ -9861,6 +9873,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10254120_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10254120-charon-stygian-oarswoman",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [
       {
@@ -9965,6 +9978,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10261120_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10261120-damus-oracle-of-malice",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -10176,7 +10190,7 @@
   {
     "id": "10263310",
     "name": "Maddening Benison",
-    "cost": "2",
+    "cost": "4",
     "attack": "0",
     "defense": "0",
     "type": "Spell",
@@ -10398,9 +10412,9 @@
   {
     "id": "10271120",
     "name": "Puppet Cat",
-    "cost": "2",
-    "attack": "2",
-    "defense": "2",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Bronze",
@@ -10429,7 +10443,9 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "id": "10271210",
@@ -10446,6 +10462,7 @@
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10271210-artifact-catapult",
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -10696,13 +10713,26 @@
     "class": "Portalcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Summon a Victoria.\nWhenever an allied Puppetry follower enters the field, give it Ward.",
+    "description": "Fanfare: Summon a Victoria.\nWhenever an allied Puppetry follower enters the field, give it Ward.\nEvolve: Summon an Enhanced Puppet.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10274110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10274110_evo.webp",
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10274110-zwei-symphonic-heart",
-    "evolve": [],
-    "superevolve": [],
+    "hasOngoing": true,
+    "evolve": [
+      {
+        "op": "summon_named",
+        "name": "Enhanced Puppet",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "summon_named",
+        "name": "Enhanced Puppet",
+        "count": 1
+      }
+    ],
     "fanfare": [
       {
         "op": "summon_named",
@@ -15066,7 +15096,7 @@
     "class": "Forestcraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Super Skybound Art- Evolve this follower. Deal 3 damage to the enemy leader.\nWhen this follower evolves, do this 7 times: \"Deal 1 damage to a random enemy follower.\"",
+    "description": "Fanfare: [Skybound Art] Evolve this follower. [Super Skybound Art] Deal 3 damage to the enemy leader.\nWhen this follower evolves, do this 7 times: \"Deal 1 damage to a random enemy follower.\"",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10413110.webp",
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
@@ -15075,11 +15105,17 @@
     "fanfare": [
       {
         "op": "skybound_art_gate",
-        "requirement": 15,
+        "requirement": 10,
         "effects": [
           {
             "op": "evolve_self"
-          },
+          }
+        ]
+      },
+      {
+        "op": "skybound_art_gate",
+        "requirement": 15,
+        "effects": [
           {
             "op": "damage",
             "target": "enemy:leader",
@@ -15216,7 +15252,7 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Skybound Art- Recover 1 evolution point.",
+    "description": "Fanfare: Skybound Art- Recover 1 evolution point.\nRush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10414110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10414110_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -15235,7 +15271,9 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -17917,6 +17955,51 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10474110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10474110-lu-woh-light-personified",
+    "fanfare": [
+      {
+        "op": "damage_random",
+        "target": "enemy:follower",
+        "amount": 1,
+        "count": 6
+      },
+      {
+        "op": "buff",
+        "target": "enemy:hand:follower",
+        "attack": 1,
+        "defense": 0
+      },
+      {
+        "op": "skybound_art_gate",
+        "count": 10,
+        "effects": [
+          {
+            "op": "gain_crest",
+            "name": "Lu Woh, Light Personified",
+            "description": "Countdown (2). Whenever an enemy follower with Storm attacks a leader, give it -3/-0 until the end of the turn.",
+            "countdown": 2,
+            "image": "https://static.dotgg.gg/shadowverse/cards/10474110_token.webp",
+            "triggers": [
+              {
+                "event": "leader_attacked",
+                "condition": {
+                  "is_ally": false,
+                  "has_keyword": "Storm"
+                },
+                "effects": [
+                  {
+                    "op": "buff",
+                    "target": "attacker",
+                    "attack": -3,
+                    "defense": 0,
+                    "until_end_of_turn": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -17939,6 +18022,29 @@
     "url": "https://shadowverse.gg/cards/10474120-beelzebub-supreme-king",
     "evolve": [],
     "superevolve": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "count": 2,
+        "target": "enemy:follower",
+        "effects": [
+          {
+            "op": "remove_abilities",
+            "target": "selected"
+          },
+          {
+            "op": "damage",
+            "target": "selected",
+            "amount": 9
+          }
+        ]
+      },
+      {
+        "op": "add_leader_damage_taken_bonus",
+        "target": "enemy:leader",
+        "amount": 1
+      }
+    ],
     "keywords": [],
     "triggers": []
   }

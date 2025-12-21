@@ -38,7 +38,7 @@ export interface BanishEffect extends BaseEffect {
     target?: string;
 }
 
-export type HealOps = Extract<EffectOp, "heal_leader" | "dynamic_heal_leader" | "set_max_hp" | "leader_barrier" | "restore_full_defense_self" | "restore_self_and_heal_leader" | "restore_allies">;
+export type HealOps = Extract<EffectOp, "heal_leader" | "dynamic_heal_leader" | "set_max_hp" | "leader_barrier" | "restore_full_defense_self" | "restore_self_and_heal_leader" | "restore_allies" | "modify_leader_damage_received">;
 export interface HealEffect extends BaseEffect {
     op: HealOps;
     amount?: number | string;

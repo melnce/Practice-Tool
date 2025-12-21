@@ -18,7 +18,8 @@ import {
 } from "../../../effects/ops/banish.js";
 import {
     handleHealLeader, handleDynamicHealLeader,
-    handleLeaderBarrierOp, handleSetMaxHP, handleSetLeaderMaxDamageCap
+    handleLeaderBarrierOp, handleSetMaxHP, handleSetLeaderMaxDamageCap,
+    handleModifyLeaderDamageReceived
 } from "../../../effects/leader.js";
 import { handleDestroySelf, handleBanishSelf } from "../../../effects/self.js";
 import { cleanupDead } from "../../cleanup.js";
@@ -157,6 +158,8 @@ export function registerCombatEffects() {
     registerOp("set_max_hp", (eff, ctx) => handleSetMaxHP(eff, ctx.owner));
     registerOp("set_leader_max_damage_cap", (eff, ctx) => handleSetLeaderMaxDamageCap(eff, ctx.owner));
     registerOp("leader_barrier", (eff, ctx) => handleLeaderBarrierOp(ctx.owner, eff));
+    registerOp("modify_leader_damage_received", (eff, ctx) => handleModifyLeaderDamageReceived(eff, ctx.owner));
+    registerOp("add_leader_damage_taken_bonus", (eff, ctx) => handleModifyLeaderDamageReceived(eff, ctx.owner));
 
     registerOp("restore_full_defense_self", (eff, ctx) => handleRestoreFullDefenseSelf(ctx.sourceCard!, ctx.context as any));
     registerOp("restore_self_and_heal_leader", (eff, ctx) => handleRestoreSelfAndHealLeader(ctx.owner, ctx.sourceCard!));
