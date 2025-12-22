@@ -49,10 +49,12 @@ describe("Wamdus Logic", () => {
             expect(mode1.effects[0].op).toBe("buff");
             expect(mode1.effects[0].keywords).toContain("Barrier");
 
-            // Mode 2: Damage Split
+            // Mode 2: Damage Split (migrated to canonical "damage" op)
             const mode2 = se.options.find((o: any) => o.name.includes("Deal X"));
             expect(mode2).toBeDefined();
-            expect(mode2.effects[0].op).toBe("damage_split_all_enemies");
+            expect(mode2.effects[0].op).toBe("damage");
+            expect(mode2.effects[0].distribution).toBe("split_sequential");
+            expect(mode2.effects[0].spill_to_leader).toBe(true);
             expect(mode2.effects[0].amount).toBe("{self.attack}");
         });
     });

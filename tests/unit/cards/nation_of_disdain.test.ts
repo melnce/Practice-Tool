@@ -20,7 +20,7 @@ describe("Nation of Disdain (10342210) Structure", () => {
         expect(engage).toBeDefined();
 
         const effect = engage.effects[0];
-        expect(effect.op).toBe("damage_all");
+        expect(effect.op).toBe("damage"); // migrated from damage_all
 
         // Use the new shorthand
         expect(effect.target).toBe("other:follower");

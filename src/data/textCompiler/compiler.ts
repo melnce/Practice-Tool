@@ -127,7 +127,7 @@ function parseEffect(clause: string): Effect | null {
                 effects: [makeEffect("damage", { amount: amt })]
             };
         } else if (targetStr.includes("leader")) {
-            return makeEffect("damage_follower_or_leader", { amount: amt, target: "enemy_leader" });
+            return makeEffect("damage", { amount: amt, target: "enemy_leader", fallback_leader: true });
         } else {
             // Implicit / Generic
             // "Deal X damage." -> Default to simple damage op?

@@ -1,13 +1,7 @@
 
 import { registerOp } from "../registry.js";
 import { enqueueManyFront } from "../queue.js";
-import {
-    handleDamage, handleDamageAll, handleDamageRandom,
-    handleDamageSplitSequential, handleDamageFollowerOrLeader,
-    handleDamageAllByAlliedGolems, handleDamageSplitFixed,
-    handleDamageRandomSelectedDefense,
-    handleDamageSplitAllEnemies, handleDamageHighestDefense
-} from "../../../effects/ops/damage.js";
+import { handleUnifiedDamage } from "../../../effects/ops/damage/unified.js";
 import {
     handleDestroy, handleDestroyHighest, destroyAlliedAmulets,
     handleDestroyAll, handleDestroyRandom, resolveDestroy
@@ -24,7 +18,6 @@ import {
 import { handleDestroySelf, handleBanishSelf } from "../../../effects/self.js";
 import { cleanupDead } from "../../cleanup.js";
 import {
-    handleDamageEnemyLeaderByOtherAllies,
     handleDestroyAlliedAmuletsThenDamage,
     handleDestroyRandomOtherAllies,
     handleRestoreFullDefenseSelf,
@@ -35,32 +28,11 @@ import {
 
 
 export function registerCombatEffects() {
+    // Unified damage handler - the single canonical damage op
+    // All damage effects use "op": "damage" with distribution/amount_source fields
     registerOp("damage", (eff, ctx) => {
-        if (handleDamage(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context as any) === "pending") return "pending";
-    });
-    registerOp("damage_all", (eff, ctx) => handleDamageAll(eff, ctx.owner, ctx.sourceCard));
-    registerOp("damage_random", (eff, ctx) => handleDamageRandom(eff, ctx.owner));
-    registerOp("damage_split_sequential", (eff, ctx) => handleDamageSplitSequential(eff, ctx.owner));
-    registerOp("damage_follower_or_leader", (eff, ctx) => {
-        if (handleDamageFollowerOrLeader(eff, ctx.owner, ctx.sourceCard, ctx.queue) === "pending") return "pending";
-    });
-    registerOp("damage_all_by_allied_golems", (eff, ctx) => handleDamageAllByAlliedGolems(eff, ctx.owner));
-    registerOp("damage_split_fixed", (eff, ctx) => handleDamageSplitFixed(eff, ctx.owner, ctx.sourceCard));
-    registerOp("damage_random_selected_defense", (eff, ctx) => handleDamageRandomSelectedDefense(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context as any));
-    registerOp("damage_split_all_enemies", (eff, ctx) => handleDamageSplitAllEnemies(eff, ctx.owner, ctx.sourceCard));
-    registerOp("damage_highest_defense", (eff, ctx) => handleDamageHighestDefense(eff, ctx.owner, ctx.sourceCard));
-
-    registerOp("damage_enemy_leader_by_other_allies", (eff, ctx) => {
-        if (ctx.sourceCard) handleDamageEnemyLeaderByOtherAllies(ctx.owner, ctx.sourceCard);
-    });
-
-    registerOp("damage_self", (eff, ctx) => {
-        if (ctx.sourceCard && ctx.sourceCard.type === "Follower") {
-            void import('../../barrier.js').then(({ dealDamage }) => {
-                dealDamage(ctx.sourceCard!, (eff.amount || 0) as number);
-                cleanupDead();
-            });
-        }
+        const result = handleUnifiedDamage(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context as any);
+        if (result === "pending") return "pending";
     });
 
     // Destroy

@@ -841,9 +841,11 @@
         "select": 1
       },
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 4
+        "amount": 4,
+        "distribution": "random_hits",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -1044,9 +1046,11 @@
         "source": "board",
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 3
+            "amount": 3,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       },
@@ -1055,9 +1059,11 @@
         "source": "board",
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 3
+            "amount": 3,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -1082,9 +1088,11 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 2
+        "amount": 2,
+        "distribution": "random_hits",
+        "count": 1
       },
       {
         "op": "add_to_hand",
@@ -1139,12 +1147,12 @@
     ],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": "{self.fused_loot_unique}"
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:leader",
         "amount": "{self.fused_loot_unique}"
       }
@@ -1152,12 +1160,12 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": "{self.fused_loot_unique}"
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:leader",
         "amount": "{self.fused_loot_unique}"
       }
@@ -1345,7 +1353,7 @@
             "count": 2
           },
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 4
           }
@@ -1374,7 +1382,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "other:follower",
         "amount": 3
       },
@@ -1737,17 +1745,21 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_highest_defense",
+        "op": "damage",
         "target": "follower",
-        "amount": 5
+        "amount": 5,
+        "distribution": "by_stat",
+        "stat": "defense"
       },
       {
         "op": "overflow_gate",
         "effects": [
           {
-            "op": "damage_highest_defense",
+            "op": "damage",
             "target": "leader",
-            "amount": 3
+            "amount": 3,
+            "distribution": "by_stat",
+            "stat": "defense"
           }
         ]
       }
@@ -1871,7 +1883,7 @@
         "cost": 1,
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "other:follower",
             "amount": 1
           }
@@ -1900,7 +1912,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "condition": {
           "not_self": false
@@ -1952,9 +1964,11 @@
         "amount": 1
       },
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 3
+        "amount": 3,
+        "distribution": "random_hits",
+        "count": 1
       },
       {
         "op": "overflow_gate",
@@ -1995,7 +2009,7 @@
         "op": "restore_full_defense_self"
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "condition": {
           "not_self": false
@@ -2003,7 +2017,7 @@
         "amount": 2
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "condition": {
           "not_self": false
@@ -2011,7 +2025,7 @@
         "amount": 2
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "condition": {
           "not_self": false
@@ -2021,7 +2035,7 @@
     ],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "condition": {
           "not_self": false
@@ -2029,7 +2043,7 @@
         "amount": 2
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "condition": {
           "not_self": false
@@ -2037,7 +2051,7 @@
         "amount": 2
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "condition": {
           "not_self": false
@@ -2126,9 +2140,11 @@
         },
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 3
+            "amount": 3,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -2157,7 +2173,7 @@
             "label": "Deal 1 damage to all enemy followers",
             "effects": [
               {
-                "op": "damage_all",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 1
               }
@@ -2184,7 +2200,7 @@
             "label": "Deal 1 damage to all enemy followers",
             "effects": [
               {
-                "op": "damage_all",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 1
               }
@@ -2211,7 +2227,7 @@
             "label": "Deal 1 damage to all enemy followers",
             "effects": [
               {
-                "op": "damage_all",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 1
               }
@@ -2286,10 +2302,11 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 2,
-        "count": 2
+        "count": 2,
+        "distribution": "random_hits"
       },
       {
         "op": "damage",
@@ -2323,10 +2340,11 @@
             "label": "Deal 3 damage to a random enemy follower",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 3,
-                "count": 1
+                "count": 1,
+                "distribution": "random_hits"
               }
             ]
           },
@@ -2351,10 +2369,11 @@
             "label": "Deal 3 damage to a random enemy follower",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 3,
-                "count": 1
+                "count": 1,
+                "distribution": "random_hits"
               }
             ]
           },
@@ -2379,10 +2398,11 @@
             "label": "Deal 3 damage to a random enemy follower",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 3,
-                "count": 1
+                "count": 1,
+                "distribution": "random_hits"
               }
             ]
           },
@@ -2722,10 +2742,11 @@
             "label": "Deal 4 damage to a random enemy follower",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 4,
-                "count": 1
+                "count": 1,
+                "distribution": "random_hits"
               }
             ]
           }
@@ -2937,7 +2958,7 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       }
@@ -2956,7 +2977,7 @@
             "amount": 3
           },
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 3
           }
@@ -3222,8 +3243,10 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "damage_split_all_enemies",
-            "amount": 4
+            "op": "damage",
+            "amount": 4,
+            "distribution": "split_sequential",
+            "spill_to_leader": true
           },
           {
             "op": "heal_leader",
@@ -3360,8 +3383,10 @@
                 "op": "no_ally_attacked_this_turn_gate",
                 "effects": [
                   {
-                    "op": "damage_split_all_enemies",
-                    "count_source": "crest_count"
+                    "op": "damage",
+                    "distribution": "split_sequential",
+                    "spill_to_leader": true,
+                    "amount_source": "crest_count"
                   }
                 ]
               }
@@ -3384,8 +3409,10 @@
                 "op": "no_ally_attacked_this_turn_gate",
                 "effects": [
                   {
-                    "op": "damage_split_all_enemies",
-                    "count_source": "crest_count"
+                    "op": "damage",
+                    "distribution": "split_sequential",
+                    "spill_to_leader": true,
+                    "amount_source": "crest_count"
                   }
                 ]
               }
@@ -3538,9 +3565,11 @@
         "not_self": true,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 2
+            "amount": 2,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -3552,9 +3581,11 @@
         "not_self": true,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 2
+            "amount": 2,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -3566,9 +3597,11 @@
         "not_self": true,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 2
+            "amount": 2,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -3731,7 +3764,9 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "damage_enemy_leader_by_other_allies"
+        "op": "damage",
+        "amount_source": "other_allies",
+        "target": "enemy:leader"
       },
       {
         "op": "destroy_all",

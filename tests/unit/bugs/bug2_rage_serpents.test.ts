@@ -35,12 +35,11 @@ describe('Bug 2: Rage of Serpents Selection State', () => {
             class: "Abysscraft",
             spell: [
                 {
-                    op: "damage_follower_or_leader",
+                    op: "damage",
                     target: "enemy:follower",
                     amount: 3,
-                    select: 1, // select: 1 means boolean true or count 1? Usually boolean true or number.
-                    // In JSON it was "select": 1
-                    can_target_leader: true
+                    select: 1,
+                    fallback_leader: true
                 } as any,
                 {
                     op: "damage",
@@ -70,7 +69,7 @@ describe('Bug 2: Rage of Serpents Selection State', () => {
         expect(outcome.kind).toBe("paused");
         const pending = state.pendingTargetEffect;
         expect(pending).toBeDefined();
-        expect(pending?.eff.op).toBe("damage_follower_or_leader");
+        expect(pending?.eff.op).toBe("damage");
         expect(pending?.resumeEffects).toHaveLength(1); // The self-damage effect
 
         // 2. Resolve on Enemy Follower
@@ -102,11 +101,11 @@ describe('Bug 2: Rage of Serpents Selection State', () => {
             class: "Abysscraft",
             spell: [
                 {
-                    op: "damage_follower_or_leader",
+                    op: "damage",
                     target: "enemy:follower",
                     amount: 3,
                     select: 1,
-                    can_target_leader: true
+                    fallback_leader: true
                 } as any,
                 {
                     op: "damage",

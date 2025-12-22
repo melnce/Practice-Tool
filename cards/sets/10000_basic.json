@@ -354,9 +354,11 @@
         "name": "PixieEnter",
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 1
+            "amount": 1,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -445,10 +447,11 @@
         "select": 1
       },
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 2,
-        "count": 1
+        "count": 1,
+        "distribution": "random_hits"
       }
     ],
     "keywords": []
@@ -895,7 +898,7 @@
     "fanfare": [],
     "spell": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "amount": 2
       },
@@ -1038,7 +1041,7 @@
     ],
     "superevolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 4
       }

@@ -19,7 +19,7 @@ vi.mock("../../src/data/cardDatabase.js", async (importOriginal) => {
         },
         "Golden Knight, True King's Blade": {
             id: "10423110", name: "Golden Knight, True King's Blade", type: "Follower", cost: 2, attack: 2, defense: 2,
-            keywords: [{ name: "Enhance", cost: 9, effects: [{ op: "super_evolve_self" }, { op: "damage_all", target: "enemy:follower", amount: 4 }, { op: "heal_leader", amount: 4 }] }],
+            keywords: [{ name: "Enhance", cost: 9, effects: [{ op: "super_evolve_self" }, { op: "damage", target: "enemy:follower", amount: 4 }, { op: "heal_leader", amount: 4 }] }],
             fanfare: [{ op: "choose", select_count: 1, options: [{ name: "Super-Evolve" }, { name: "Deal 4" }] }]
         }
     };
@@ -128,7 +128,7 @@ describe("Set 104: Skybound Dragons", () => {
         const runePortal = {
             uid: "hand_1", id: "10431310", name: "Rune Portal", type: "Spell", cost: 7,
             spell: [
-                { op: "damage_all", amount: 6, target: "enemy:follower" },
+                { op: "damage", amount: 6, target: "enemy:follower" },
                 { op: "heal_leader", amount: 3 }
             ]
         } as any;
@@ -190,7 +190,7 @@ describe("Set 104: Skybound Dragons", () => {
 
         const aglovale = {
             uid: "hand_1", id: "10422110", name: "Aglovale", type: "Follower", cost: 6,
-            fanfare: [{ op: "damage_all", target: "enemy:follower", amount: 3 }]
+            fanfare: [{ op: "damage", target: "enemy:follower", amount: 3 }]
         } as any;
         state.blueHand = [aglovale];
         state.bluePP = 6;
@@ -297,8 +297,8 @@ describe("Set 104: Skybound Dragons", () => {
                 type: "end_of_turn_own",
                 op: "nested_effects",
                 effects: [
-                    { op: "damage_random", target: "enemy:follower", amount: 4 },
-                    { op: "damage_random", target: "enemy:follower", amount: 2 }
+                    { op: "damage", distribution: "random_hits", target: "enemy:follower", amount: 4 },
+                    { op: "damage", distribution: "random_hits", target: "enemy:follower", amount: 2 }
                 ]
             }]
         } as any;

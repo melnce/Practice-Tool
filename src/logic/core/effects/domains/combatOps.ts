@@ -1,17 +1,6 @@
 
 export const COMBAT_OPS = [
-    "damage",
-    "damage_all",
-    "damage_random",
-    "damage_split_sequential",
-    "damage_follower_or_leader",
-    "damage_all_by_allied_golems",
-    "damage_split_fixed",
-    "damage_random_selected_defense",
-    "damage_split_all_enemies",
-    "damage_highest_defense",
-    "damage_enemy_leader_by_other_allies",
-    "damage_self",
+    "damage", // Unified damage op - handles all damage variants via distribution/amount_source fields
     "destroy",
     "destroy_all",
     "destroy_highest",

@@ -33,9 +33,10 @@ describe("Baal, Elemental Resonance (10452130)", () => {
         expect(op1.effects[1].mode).toBe("random");
         expect(op1.effects[1].condition.not_self).toBe(true);
 
-        // Option 2: Damage Random Enemy
+        // Option 2: Damage Random Enemy (migrated to canonical damage)
         const op2 = chooseOp.options[1];
-        expect(op2.effects[0].op).toBe("damage_random");
+        expect(op2.effects[0].op).toBe("damage");
+        expect(op2.effects[0].distribution).toBe("random_hits");
         expect(op2.effects[0].amount).toBe(3);
     });
 });

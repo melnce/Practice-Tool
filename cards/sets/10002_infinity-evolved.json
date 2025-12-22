@@ -153,10 +153,11 @@
             "op": "evolved_self_gate",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 4,
-                "count": 1
+                "count": 1,
+                "distribution": "random_hits"
               }
             ]
           }
@@ -222,7 +223,7 @@
               "op": "super_evolved_allied_gate",
               "effects": [
                 {
-                  "op": "damage_all",
+                  "op": "damage",
                   "target": "enemy:follower",
                   "amount": 2
                 }
@@ -282,7 +283,7 @@
         "count": 3,
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 4
           }
@@ -410,18 +411,22 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 2
+        "amount": 2,
+        "distribution": "random_hits",
+        "count": 1
       },
       {
         "op": "combo_gate",
         "count": 3,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 2
+            "amount": 2,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -635,14 +640,18 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 1
+        "amount": 1,
+        "distribution": "random_hits",
+        "count": 1
       },
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 1
+        "amount": 1,
+        "distribution": "random_hits",
+        "count": 1
       }
     ],
     "keywords": []
@@ -805,10 +814,11 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 4,
-        "count": 1
+        "count": 1,
+        "distribution": "random_hits"
       }
     ],
     "keywords": [
@@ -817,10 +827,11 @@
         "cost": 4,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 4,
-            "count": 3
+            "count": 3,
+            "distribution": "random_hits"
           }
         ]
       }
@@ -969,7 +980,7 @@
         },
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 1
           }
@@ -1282,9 +1293,10 @@
     ],
     "spell": [
       {
-        "op": "damage_split_fixed",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": "{self.spellboostCount}"
+        "amount": "{self.spellboostCount}",
+        "distribution": "split_sequential"
       }
     ]
   },
@@ -1937,7 +1949,7 @@
         ]
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       }
@@ -1961,14 +1973,14 @@
     "url": "https://shadowverse.gg/cards/10244110-filene-whitefrost-bloom",
     "evolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
     ],
     "superevolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
@@ -2555,18 +2567,20 @@
         "count": 2,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "count": 2
+            "count": 2,
+            "distribution": "random_hits"
           }
         ],
         "else_effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "count": 1
+            "count": 1,
+            "distribution": "random_hits"
           }
         ]
       }
@@ -2632,7 +2646,11 @@
             "defense": 1
           },
           {
-            "op": "damage_random_selected_defense"
+            "op": "damage",
+            "distribution": "random_hits",
+            "count": 1,
+            "amount_source": "selected_defense",
+            "target": "enemy:follower"
           }
         ]
       }

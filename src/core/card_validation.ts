@@ -5,7 +5,7 @@ import { Effect } from "./types.js";
 
 const SAFE_SINGLE_OPS = new Set([
     "damage", "buff", "banish", "keyword", "heal_leader", "draw", "recover_pp",
-    "reduce_cost", "destroy", "return_to_hand", "remove_keyword", "damage_follower_or_leader"
+    "reduce_cost", "destroy", "return_to_hand", "remove_keyword"
 ]);
 
 function validateEffects(effects: Effect[], contextString: string) {

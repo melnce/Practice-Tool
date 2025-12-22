@@ -104,21 +104,21 @@
     "url": "https://shadowverse.gg/cards/10102110-apollo-heavens-envoy",
     "evolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
     ],
     "superevolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
     ],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
@@ -206,7 +206,7 @@
         "count": 1
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
@@ -430,8 +430,11 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw", "count": "combo", "filters": {"type": "Follower"},
-        "count": 1
+        "op": "draw",
+        "count": 1,
+        "filters": {
+          "type": "Follower"
+        }
       }
     ],
     "keywords": []
@@ -459,18 +462,20 @@
         "count": 3,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 3,
-            "count": 3
+            "count": 3,
+            "distribution": "random_hits"
           }
         ],
         "else_effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 3,
-            "count": 1
+            "count": 1,
+            "distribution": "random_hits"
           }
         ]
       }
@@ -764,16 +769,20 @@
     "url": "https://shadowverse.gg/cards/10113120-glade-fragrantwood-ward",
     "evolve": [
       {
-        "op": "damage_split_sequential",
+        "op": "damage",
         "target": "enemy_followers",
-        "amount_dynamic": "hand_size"
+        "amount_dynamic": "hand_size",
+        "distribution": "split_sequential",
+        "amount_source": "hand_size"
       }
     ],
     "superevolve": [
       {
-        "op": "damage_split_sequential",
+        "op": "damage",
         "target": "enemy_followers",
-        "amount_dynamic": "hand_size"
+        "amount_dynamic": "hand_size",
+        "distribution": "split_sequential",
+        "amount_source": "hand_size"
       }
     ],
     "fanfare": [
@@ -1010,9 +1019,11 @@
             "tribe": "Pixie"
           },
           "effect": {
-            "op": "damage_random",
+            "op": "damage",
             "amount": 1,
-            "target": "enemy_followers"
+            "target": "enemy_followers",
+            "distribution": "random_hits",
+            "count": 1
           }
         }
       ]
@@ -1026,9 +1037,11 @@
             "tribe": "Pixie"
           },
           "effect": {
-            "op": "damage_random",
+            "op": "damage",
             "amount": 1,
-            "target": "enemy_followers"
+            "target": "enemy_followers",
+            "distribution": "random_hits",
+            "count": 1
           }
         }
       ]
@@ -1702,11 +1715,12 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_follower_or_leader",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 5,
         "select": 1,
-        "can_target_leader": true
+        "can_target_leader": true,
+        "fallback_leader": true
       },
       {
         "op": "heal_leader",
@@ -1743,7 +1757,7 @@
         "cost": 9,
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 3
           },
@@ -2139,8 +2153,9 @@
         "name": "Clay Golem"
       },
       {
-        "op": "damage_all_by_allied_golems",
-        "target": "enemy_board"
+        "op": "damage",
+        "target": "enemy_board",
+        "amount_source": "golem_count"
       }
     ],
     "superevolve": [
@@ -2149,8 +2164,9 @@
         "name": "Clay Golem"
       },
       {
-        "op": "damage_all_by_allied_golems",
-        "target": "enemy_board"
+        "op": "damage",
+        "target": "enemy_board",
+        "amount_source": "golem_count"
       }
     ],
     "fanfare": [],
@@ -2187,7 +2203,7 @@
     ],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": "{self.spellboostCount}"
       },
@@ -2257,7 +2273,7 @@
             },
             "effects": [
               {
-                "op": "damage_all",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 4
               }
@@ -2445,9 +2461,11 @@
     "evolve_trigger_always": true,
     "evolve": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 4
+        "amount": 4,
+        "distribution": "random_hits",
+        "count": 1
       },
       {
         "op": "recover_pp",
@@ -2457,9 +2475,11 @@
     ],
     "superevolve": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 4
+        "amount": 4,
+        "distribution": "random_hits",
+        "count": 1
       },
       {
         "op": "recover_pp",
@@ -2887,7 +2907,7 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "amount": 5
       }
@@ -3287,7 +3307,7 @@
         "count": 1
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": "{last_discarded_cost}"
       }
@@ -3847,16 +3867,18 @@
         "cost": 4,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "count": 1
+            "count": 1,
+            "distribution": "random_hits"
           },
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "count": 1
+            "count": 1,
+            "distribution": "random_hits"
           }
         ]
       }
@@ -3867,10 +3889,11 @@
         "cost": 4,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "count": 2
+            "count": 2,
+            "distribution": "random_hits"
           }
         ]
       }
@@ -4011,11 +4034,12 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_follower_or_leader",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3,
         "select": 1,
-        "can_target_leader": true
+        "can_target_leader": true,
+        "fallback_leader": true
       },
       {
         "op": "damage",
@@ -4153,9 +4177,10 @@
     ],
     "fanfare": [
       {
-        "op": "damage_split_fixed",
+        "op": "damage",
         "target": "enemy_followers",
-        "amount": 7
+        "amount": 7,
+        "distribution": "split_sequential"
       }
     ],
     "keywords": []
@@ -4376,7 +4401,7 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       },
@@ -4781,7 +4806,7 @@
         "count": 1
       },
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
@@ -4822,7 +4847,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 6
       },
@@ -4854,14 +4879,14 @@
     "url": "https://shadowverse.gg/cards/10164130-salefa-guardian-of-water",
     "evolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       }
     ],
     "superevolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       }
@@ -5500,10 +5525,11 @@
         "source": "board",
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "count": 1
+            "count": 1,
+            "distribution": "random_hits"
           }
         ]
       }

@@ -189,11 +189,12 @@
     "url": "https://shadowverse.gg/cards/90014310-bramble-burst",
     "spell": [
       {
-        "op": "damage_follower_or_leader",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3,
         "select": 1,
-        "can_target_leader": true
+        "can_target_leader": true,
+        "fallback_leader": true
       }
     ],
     "evolve": [],
@@ -496,9 +497,11 @@
         "count": 2
       },
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 2
+        "amount": 2,
+        "distribution": "random_hits",
+        "count": 1
       }
     ],
     "evolve": [],
@@ -1517,7 +1520,7 @@
         },
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 3
           }
@@ -1546,7 +1549,7 @@
     "url": "https://shadowverse.gg/cards/90074110-masterwork-artifact-w",
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 5
       },
@@ -1671,9 +1674,11 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 5
+        "amount": 5,
+        "distribution": "random_hits",
+        "count": 1
       },
       {
         "op": "damage",
@@ -1759,11 +1764,12 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_follower_or_leader",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1,
         "select": 1,
-        "can_target_leader": true
+        "can_target_leader": true,
+        "fallback_leader": true
       }
     ],
     "keywords": [],
@@ -1905,8 +1911,10 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_split_all_enemies",
-        "amount": 4
+        "op": "damage",
+        "amount": 4,
+        "distribution": "split_sequential",
+        "spill_to_leader": true
       }
     ],
     "keywords": [],
@@ -1965,7 +1973,7 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "all:follower",
         "amount": 1
       }
@@ -2168,9 +2176,11 @@
         "select": 1
       },
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
-        "amount": 4
+        "amount": 4,
+        "distribution": "random_hits",
+        "count": 1
       }
     ],
     "keywords": [],

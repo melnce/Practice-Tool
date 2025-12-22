@@ -43,7 +43,8 @@ describe("Unleashed Card Data", () => {
         expect(mode1.effects.length).toBe(2);
         expect(mode1.effects[0].op).toBe("draw");
         expect(mode1.effects[0].count).toBe(1);
-        expect(mode1.effects[1].op).toBe("damage_random");
+        expect(mode1.effects[1].op).toBe("damage"); // migrated from damage_random
+        expect(mode1.effects[1].distribution).toBe("random_hits");
         expect(mode1.effects[1].amount).toBe(4);
 
         // Mode 2
@@ -51,7 +52,8 @@ describe("Unleashed Card Data", () => {
         expect(mode2.effects.length).toBe(3);
         expect(mode2.effects[0].op).toBe("draw");
         expect(mode2.effects[0].count).toBe(2);
-        expect(mode2.effects[1].op).toBe("damage_random");
+        expect(mode2.effects[1].op).toBe("damage"); // migrated from damage_random
+        expect(mode2.effects[1].distribution).toBe("random_hits");
         expect(mode2.effects[1].amount).toBe(4);
         expect(mode2.effects[1].count).toBe(2);
         expect(mode2.effects[2].op).toBe("damage");

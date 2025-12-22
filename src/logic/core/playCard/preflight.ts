@@ -142,9 +142,9 @@ function getEffectList(card: CardInstance, chosenTier: { effects: Effect[] } | n
  * Recursively check if any effect requires a target (select/choose) that has an empty pool.
  */
 function checkEffectsHaveValidTargets(effects: Effect[], player: Player, sourceCard: CardInstance | null): PreflightResult {
-    // Allow follower-or-leader effects (can always target leader)
+    // Allow damage effects with fallback_leader (can always target leader)
     const hasFollowerOrLeaderEffect = effects.some((eff: Effect) =>
-        eff?.op === "damage_follower_or_leader" && (eff as any)?.can_target_leader
+        eff?.op === "damage" && (eff as any)?.fallback_leader
     );
     if (hasFollowerOrLeaderEffect) return { ok: true };
 

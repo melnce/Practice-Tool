@@ -158,7 +158,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
         }
 
         // If all select-targets have no valid pool, block (except when leader is explicitly targetable)
-        const canTargetLeader = list.some((eff: any) => eff?.op === "damage_follower_or_leader" && eff?.can_target_leader);
+        const canTargetLeader = list.some((eff: any) => eff?.op === "damage" && eff?.fallback_leader);
         if (needsUnmetTarget(list, owner, card) && !canTargetLeader) canAfford = false;
 
         // Radiant Rainbow: require a Spellboost card in hand

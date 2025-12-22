@@ -10,7 +10,7 @@ import { Effect, CardInstance, Player, DamageEffect } from "../../../core/types.
 import { adapter } from "../../../core/adapter.js";
 
 // Refactored: Import calculator from damage module
-import { resolveAmountWithOverflow } from "./damage/index.js";
+import { resolveAmountWithOverflow, applySplitSpillover, resolveDamageAmountExtended, applyDirectDamage, applyRandomHits } from "./damage/index.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 // ... [Keep helpers isAlly, isOwnTurn, isSuperProtected implicitly if used, or remove if unused]
@@ -19,13 +19,16 @@ import { setPendingTarget } from "../../core/pendingTarget/index.js";
 // The snippet shows them at lines 17-26. They are unused in the functions shown.
 // I will keep handles.
 
+/**
+ * REFACTORED: Now uses applyDirectDamage primitive for follower damage.
+ * Leader damage path preserved separately (different semantics).
+ */
 export function handleDamageAll(eff: Effect, owner: Player, sourceCard: CardInstance | null = null) {
     const dEff = eff as DamageEffect;
     const pool = getPool(dEff.target || "", owner, sourceCard, dEff.condition);
-    // Amount may depend on the acting card (e.g., Sinciro)
     const amt = resolveAmountWithOverflow(dEff, owner, { sourceCard });
 
-    // Handle leader damage if specified
+    // Handle leader damage if specified (separate path, different semantics)
     if (String(dEff.target || "").includes("leader")) {
         const targetPlayer = String(dEff.target || "").includes("enemy")
             ? (owner === "blue" ? "red" : "blue")
@@ -34,13 +37,9 @@ export function handleDamageAll(eff: Effect, owner: Player, sourceCard: CardInst
         return;
     }
 
-    // Default follower damage
-    for (const t of pool) if (t.type === "Follower") {
-        logEvent("damageAll", { target: t.name, uid: t.uid, amount: amt });
-        dealDamage(t, amt);
-    }
-
-    cleanupDead();
+    // Use primitive for follower damage
+    const followers = pool.filter(c => c.type === "Follower");
+    applyDirectDamage(amt, followers, "damageAll");
 }
 
 export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstance | null, effectsQueue: any, context: any = {}) {
@@ -112,66 +111,36 @@ export function handleDamage(eff: Effect, owner: Player, sourceCard: CardInstanc
     return "done";
 }
 
+/**
+ * REFACTORED: Now uses applyRandomHits primitive.
+ * Semantics preserved: pool rebuilt each hit, leader included if target is "enemy"/"all".
+ */
 export function handleDamageRandom(eff: Effect, owner: Player) {
     const dEff = eff as DamageEffect;
     const amt = resolveAmountWithOverflow(dEff, owner, {});
-    let hits = Math.max(1, parseInt(String(dEff.count || dEff["count" as keyof DamageEffect] || 1))); // Fallback for 'count' on DamageEffect? Use index access or add to type
-
+    const hits = Math.max(1, parseInt(String(dEff.count || dEff["count" as keyof DamageEffect] || 1)));
     const targetSpec = (dEff.target || "").toLowerCase();
 
-    while (hits-- > 0) {
-        // Rebuild pool each hit (accounts for deaths mid-sequence)
-        const pool = [...getPool(dEff.target || "", owner)];
-
-        // Include enemy leader if target is generic "enemy" or "all"
-        if (targetSpec === "enemy" || targetSpec === "enemy:all" || targetSpec === "all") {
-            const targetOwner = owner === "blue" ? "red" : "blue";
-            pool.push({ type: "Leader", owner: targetOwner, name: "Enemy Leader" } as any);
-        }
-
-        const valid = pool.filter(c => c && (c.type === "Follower" || c.type === "Leader"));
-        if (!valid.length) break;
-
-        const pick = valid[state.rng.nextInt(valid.length)];
-        if (!pick) break;
-        logEvent("damageRandom", { target: pick.name, uid: pick.uid, amount: amt });
-
-        if (pick.type === "Leader") {
-            applyLeaderDamage((pick as any).owner, amt);
-        } else {
-            dealDamage(pick as CardInstance, amt);      // super-protection will zero it out internally if applicable
-        }
-        cleanupDead();
-    }
+    // Use primitive - it handles pool rebuild, leader inclusion, and cleanup
+    applyRandomHits(hits, amt, targetSpec, owner);
 }
 
 /**
  * NEW: Handles damage split sequentially across targets.
  * Damage is dealt to the first target until destroyed, then spills
  * to the next, and so on.
+ * REFACTORED: Now uses applySplitSpillover primitive.
  */
 export function handleDamageSplitSequential(eff: Effect, owner: Player) {
     const dEff = eff as DamageEffect;
-    // Determine total damage based on hand size
-    const hand = owner === "blue" ? state.blueHand : state.redHand;
-    let damageToDeal = hand.length;
+    // Amount based on hand size
+    const totalAmount = resolveDamageAmountExtended(eff, { owner, sourceCard: null }, "hand_size");
+    if (totalAmount <= 0) return;
 
-    if (damageToDeal <= 0) return;
-
-    // Get enemy followers in the order they were played
     const pool = getPool(dEff.target || "", owner).filter(c => c.type === "Follower");
     if (!pool.length) return;
 
-    // Apply damage sequentially
-    for (const target of pool) {
-        if (damageToDeal <= 0) break; // All damage has been dealt
-
-        const damageForThisTarget = Math.min(damageToDeal, target.defense as number);
-        dealDamage(target, damageForThisTarget);
-        damageToDeal -= damageForThisTarget;
-    }
-    logEvent("damageSplitDone", { mode: "sequential", leftover: damageToDeal });
-    cleanupDead(); // Remove any destroyed followers
+    applySplitSpillover(totalAmount, pool, owner, { spillToLeader: false });
 }
 
 
@@ -188,8 +157,9 @@ export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceC
     setPendingTarget({
         eff: {
             ...dEff,
-            op: "damage_follower_or_leader",
-            amount: amt
+            op: "damage", // Canonical op
+            amount: amt,
+            fallback_leader: (dEff as any).fallback_leader ?? true
         } as any,
         owner,
         sourceCard,
@@ -197,10 +167,10 @@ export function handleDamageFollowerOrLeader(eff: Effect, owner: Player, sourceC
         selectCount: 1,
         pool: getPool(dEff.target || "", owner, sourceCard, dEff.condition, { isTargetedEffect: true }),
         resumeEffects: effectsQueue,
-        canTargetLeader: dEff.can_target_leader ?? false
+        canTargetLeader: (dEff as any).fallback_leader ?? true
     });
 
-    logEvent("damageFoL_select", { owner, canTargetLeader: !!dEff.can_target_leader });
+    logEvent("damage_select", { owner, canTargetLeader: true });
 
     const pool = getPool(dEff.target || "", owner);
     if (pool.length) {
@@ -235,26 +205,18 @@ export function handleDamageAllByAlliedGolems(_eff: Effect, owner: Player) {
 
     cleanupDead();
 }
+/**
+ * REFACTORED: Now uses applySplitSpillover primitive.
+ */
 export function handleDamageSplitFixed(eff: Effect, owner: Player, sourceCard: CardInstance | null = null) {
     const dEff = eff as DamageEffect;
-    // Use the configured amount (supports tokens/overflow)
-    let damageToDeal = resolveAmountWithOverflow(dEff, owner, { sourceCard });
+    const totalAmount = resolveAmountWithOverflow(dEff, owner, { sourceCard });
+    if (totalAmount <= 0) return;
 
-    if (damageToDeal <= 0) return;
-
-    // Get enemy followers in the order they were played
     const pool = getPool(dEff.target || "", owner).filter(c => c.type === "Follower");
     if (!pool.length) return;
 
-    for (const target of pool) {
-        if (damageToDeal <= 0) break;
-
-        const damageForThisTarget = Math.min(damageToDeal, target.defense as number);
-        dealDamage(target, damageForThisTarget);
-        damageToDeal -= damageForThisTarget;
-    }
-    logEvent("damageSplitDone", { mode: "fixed", leftover: damageToDeal });
-    cleanupDead();
+    applySplitSpillover(totalAmount, pool, owner, { spillToLeader: false });
 }
 
 // --- NEW: damage a random enemy follower for the selected unit's current DEF ---
@@ -275,52 +237,31 @@ export function handleDamageRandomSelectedDefense(_eff: Effect, owner: Player, _
 
 // NEW: split X pings across enemies, snapshotting the board and cleaning up once.
 // ...
+/**
+ * REFACTORED: Now uses applySplitSpillover primitive with spillToLeader enabled.
+ */
 export function handleDamageSplitAllEnemies(eff: Effect, owner: Player, sourceCard: CardInstance | null = null) {
     const dEff = eff as DamageEffect;
-    // 1) Determine total pings X
-    const crestCount = (() => {
-        const list = owner === "blue" ? state.blueCrests : state.redCrests;
-        return Array.isArray(list) ? list.length : 0;
-    })();
 
-    let total = 0;
+    // Determine total amount - support crest_count source
+    let total: number;
     if (String(dEff.count_source || "").toLowerCase() === "crest_count") {
-        total = crestCount | 0;
+        total = resolveDamageAmountExtended(eff, { owner, sourceCard }, "crest_count");
     } else {
         total = resolveAmountWithOverflow(dEff, owner, { sourceCard }) | 0;
     }
     if (total <= 0) return;
 
-    // 2) Snapshot enemy followers (oldest → newest) at *start* of the effect
+    // Snapshot enemy followers
     const enemy = (owner === "blue") ? "red" : "blue";
     const enemyBoard = (enemy === "blue" ? state.blueBoard : state.redBoard) || [];
     const snapshotFollowers = enemyBoard.filter(c => c && c.type === "Follower");
 
-    // 3) Spill pings through snapshot followers, then the rest to leader
-    let remaining = total;
+    // Use primitive with spillToLeader enabled
+    applySplitSpillover(total, snapshotFollowers, owner, { spillToLeader: true });
 
-    for (const target of snapshotFollowers) {
-        if (remaining <= 0) break;
-
-        // Use *current* DEF to cap how many pings this follower can absorb
-        const curDef = parseInt(String(target.defense), 10) || 0;
-        if (curDef <= 0) continue;
-
-        const dmg = Math.min(remaining, curDef);
-        if (dmg > 0) {
-            dealDamage(target, dmg);
-            remaining -= dmg;
-        }
-    }
-
-    // Whatever remains goes to the leader (ignores any new spawns)
-    if (remaining > 0) {
-        applyLeaderDamage(enemy, remaining);
-    }
-
-    // 4) Single cleanup after the whole batch → Last Words resolve *after* all pings
-    logEvent("damageSplitDone", { mode: "allEnemies", leftover: remaining });
-    cleanupDead();
+    // Primitive handles logging and cleanup - done
+    logEvent("damageSplitDone_outer", { mode: "allEnemies", total });
 }
 
 

@@ -244,13 +244,17 @@ TARGETED_OP_HANDLERS.set("destroy_then", (ctx) => {
     return { kind: "handled" };
 });
 
-TARGETED_OP_HANDLERS.set("damage_follower_or_leader", (ctx) => {
+// Handler for damage effects with select (including fallback_leader)
+TARGETED_OP_HANDLERS.set("damage", (ctx) => {
     const { eff, owner, targets } = ctx;
     const target = targets[0];
     const amt = (eff as any).amount as number;
     if (!target) {
-        if (owner === "blue") state.redHP = Math.max(0, state.redHP - amt);
-        else state.blueHP = Math.max(0, state.blueHP - amt);
+        // No target selected - if fallback_leader is true, damage enemy leader
+        if ((eff as any).fallback_leader) {
+            if (owner === "blue") state.redHP = Math.max(0, state.redHP - amt);
+            else state.blueHP = Math.max(0, state.blueHP - amt);
+        }
     } else if (target.type === "Follower") {
         dealDamage(target, amt);
         cleanupDead();

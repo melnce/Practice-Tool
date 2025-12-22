@@ -28,13 +28,15 @@ describe("Nezha JSON Definition", () => {
         expect(eot.type).toBe("end_of_turn_own");
         expect(eot.effects).toHaveLength(2);
 
-        // Effect 1: Deal 4
-        expect(eot.effects[0].op).toBe("damage_random");
+        // Effect 1: Deal 4 (migrated to canonical damage with random_hits)
+        expect(eot.effects[0].op).toBe("damage");
+        expect(eot.effects[0].distribution).toBe("random_hits");
         expect(eot.effects[0].target).toBe("enemy:follower");
         expect(eot.effects[0].amount).toBe(4);
 
-        // Effect 2: Deal 2
-        expect(eot.effects[1].op).toBe("damage_random");
+        // Effect 2: Deal 2 (migrated to canonical damage with random_hits)
+        expect(eot.effects[1].op).toBe("damage");
+        expect(eot.effects[1].distribution).toBe("random_hits");
         expect(eot.effects[1].target).toBe("enemy:follower");
         expect(eot.effects[1].amount).toBe(2);
     });

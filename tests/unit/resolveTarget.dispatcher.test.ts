@@ -23,7 +23,6 @@ describe("resolveTarget.ts Dispatcher Registration", () => {
         "remove_keyword",
         "destroy",
         "destroy_then",
-        "damage_follower_or_leader",
         "super_evolve_ally",
         "super_evolve_self",
         "evolve_and_buff",
@@ -39,9 +38,9 @@ describe("resolveTarget.ts Dispatcher Registration", () => {
     ];
 
     describe("Handler Registration", () => {
-        it("should register all 25 expected targeted ops", () => {
+        it("should register all 24 expected targeted ops", () => {
             const registeredOps = __getRegisteredTargetedOps();
-            expect(registeredOps).toHaveLength(25);
+            expect(registeredOps).toHaveLength(24);
         });
 
         it("should register damage handler", () => {

@@ -30,10 +30,11 @@
         "requirement": 10,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 5,
-            "count": 2
+            "count": 2,
+            "distribution": "random_hits"
           }
         ]
       }
@@ -129,9 +130,11 @@
             "name": "Deal 5 damage to a random enemy follower",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
-                "amount": 5
+                "amount": 5,
+                "distribution": "random_hits",
+                "count": 1
               }
             ]
           },
@@ -263,10 +266,11 @@
         "requirement": 15,
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy",
             "amount": 2,
-            "count": 5
+            "count": 5,
+            "distribution": "random_hits"
           }
         ]
       }
@@ -332,14 +336,14 @@
     ],
     "evolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
     ],
     "superevolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1
       }
@@ -471,9 +475,11 @@
     "url": "https://shadowverse.gg/cards/10412310-starry-sky",
     "spell": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "amount": 2,
-        "target": "enemy:follower"
+        "target": "enemy:follower",
+        "distribution": "random_hits",
+        "count": 1
       },
       {
         "op": "combo_gate",
@@ -546,18 +552,20 @@
     "triggers": [],
     "evolve": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1,
-        "count": 7
+        "count": 7,
+        "distribution": "random_hits"
       }
     ],
     "superevolve": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1,
-        "count": 7
+        "count": 7,
+        "distribution": "random_hits"
       }
     ],
     "keywords": []
@@ -712,10 +720,11 @@
     "url": "https://shadowverse.gg/cards/10414120-yuel-societte-dancing-duo",
     "fanfare": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 4,
-        "count": 2
+        "count": 2,
+        "distribution": "random_hits"
       }
     ],
     "evolve": [],
@@ -861,7 +870,7 @@
     ],
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       }
@@ -938,7 +947,7 @@
             "op": "super_evolve_self"
           },
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": 4
           },
@@ -966,7 +975,7 @@
             "name": "Deal 4 to all enemy followers",
             "effects": [
               {
-                "op": "damage_all",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 4
               }
@@ -1251,7 +1260,7 @@
     "url": "https://shadowverse.gg/cards/10431310-rune-portal",
     "spell": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "amount": 6,
         "target": "enemy:follower"
       },
@@ -1369,9 +1378,11 @@
                 "count": 1
               },
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
-                "amount": 4
+                "amount": 4,
+                "distribution": "random_hits",
+                "count": 1
               }
             ]
           },
@@ -1383,10 +1394,11 @@
                 "count": 2
               },
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
                 "amount": 4,
-                "count": 2
+                "count": 2,
+                "distribution": "random_hits"
               },
               {
                 "op": "damage",
@@ -1557,8 +1569,10 @@
             "name": "Deal X damage split between all enemy followers. X is this follower's attack.",
             "effects": [
               {
-                "op": "damage_split_all_enemies",
-                "amount": "{self.attack}"
+                "op": "damage",
+                "amount": "{self.attack}",
+                "distribution": "split_sequential",
+                "spill_to_leader": true
               }
             ]
           }
@@ -1816,14 +1830,14 @@
     ],
     "evolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       }
     ],
     "superevolve": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 3
       }
@@ -2221,9 +2235,11 @@
             "type": "end_of_turn_own",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
-                "amount": 2
+                "amount": 2,
+                "distribution": "random_hits",
+                "count": 1
               },
               {
                 "op": "heal",
@@ -2266,14 +2282,18 @@
         "type": "end_of_turn_own",
         "effects": [
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 4
+            "amount": 4,
+            "distribution": "random_hits",
+            "count": 1
           },
           {
-            "op": "damage_random",
+            "op": "damage",
             "target": "enemy:follower",
-            "amount": 2
+            "amount": 2,
+            "distribution": "random_hits",
+            "count": 1
           }
         ]
       }
@@ -2361,9 +2381,11 @@
             "name": "Deal 3 damage to a random enemy follower",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
-                "amount": 3
+                "amount": 3,
+                "distribution": "random_hits",
+                "count": 1
               }
             ]
           }
@@ -2551,7 +2573,7 @@
     "url": "https://shadowverse.gg/cards/10454120-belial-archangel-of-cunning",
     "fanfare": [
       {
-        "op": "damage_all",
+        "op": "damage",
         "target": "other:follower",
         "amount": 10
       },
@@ -2645,7 +2667,7 @@
         "op": "evolved_self_gate",
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "amount": 2
           }
         ]
@@ -3220,10 +3242,11 @@
             "label": "Do this 3 times: \"Deal 4 damage to a random enemy follower.\"",
             "effects": [
               {
-                "op": "damage_random",
+                "op": "damage",
                 "target": "enemy:follower",
                 "count": 3,
-                "amount": 4
+                "amount": 4,
+                "distribution": "random_hits"
               }
             ]
           },
@@ -3262,10 +3285,11 @@
     "url": "https://shadowverse.gg/cards/10472310-stone-breaker",
     "spell": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1,
-        "count": 6
+        "count": 6,
+        "distribution": "random_hits"
       }
     ],
     "evolve": [],
@@ -3300,7 +3324,7 @@
         },
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:follower",
             "amount": "{selected.attack}"
           }
@@ -3340,14 +3364,14 @@
         "count": 15,
         "effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:all",
             "amount": 6
           }
         ],
         "else_effects": [
           {
-            "op": "damage_all",
+            "op": "damage",
             "target": "enemy:all",
             "amount": 3
           }
@@ -3376,10 +3400,11 @@
     "url": "https://shadowverse.gg/cards/10474110-lu-woh-light-personified",
     "fanfare": [
       {
-        "op": "damage_random",
+        "op": "damage",
         "target": "enemy:follower",
         "amount": 1,
-        "count": 6
+        "count": 6,
+        "distribution": "random_hits"
       },
       {
         "op": "buff",

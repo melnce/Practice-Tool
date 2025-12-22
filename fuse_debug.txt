@@ -26,12 +26,12 @@ Gear of Ambition: {
   ]
 }
 Hand before fuse: Gear of Ambition, Gear of Remembrance
-Gear1 UID: uid_rxkxxj8z
+Gear1 UID: uid_srxr9p1s
 Gear1 fuse_recipes: [{"id":"gear→striker","partner_filters":[{"zone":"hand","name_in":["Gear of Ambition","Gear of Remembrance"]}],"result":{"type":"transform","result_card_name":"Striker Artifact","targets":"merge"}}]
 pendingTargetEffect after startFuse: {
   "eff": {
     "op": "fuse_finalize_gear_multi",
-    "initiator_uid": "uid_rxkxxj8z",
+    "initiator_uid": "uid_srxr9p1s",
     "result_name": "Striker Artifact"
   },
   "owner": "blue",
@@ -76,7 +76,7 @@ pendingTargetEffect after startFuse: {
     "evolve": [],
     "superevolve": [],
     "triggers": [],
-    "uid": "uid_rxkxxj8z",
+    "uid": "uid_srxr9p1s",
     "owner": "blue",
     "buffs": {
       "attack": 0,
@@ -125,7 +125,7 @@ pendingTargetEffect after startFuse: {
       "evolve": [],
       "superevolve": [],
       "triggers": [],
-      "uid": "uid_q2916y56",
+      "uid": "uid_ngtcuaml",
       "owner": "blue",
       "buffs": {
         "attack": 0,
@@ -143,6 +143,6 @@ pendingTargetEffect after startFuse: {
 Cards __uiSelectable: Gear of Ambition: false, Gear of Remembrance: true
 Selectable cards: Gear of Remembrance
 Pool before select: ["Gear of Remembrance"]
-Targeting gear2 UID: uid_bmjtveq3
+Targeting gear2 UID: uid_cliz41l5
 Targets after select: ["Gear of Remembrance"]
 pendingTargetEffect exists: true

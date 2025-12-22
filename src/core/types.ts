@@ -14,16 +14,21 @@ export interface BaseEffect {
 }
 
 // --- Combat ---
-export type DamageOps = Extract<EffectOp, "damage" | "damage_all" | "damage_random" | "damage_split_sequential" | "damage_follower_or_leader" | "damage_all_by_allied_golems" | "damage_split_fixed" | "damage_random_selected_defense" | "damage_split_all_enemies" | "damage_highest_defense" | "damage_enemy_leader_by_other_allies" | "damage_self">;
+// Unified damage op - all variants use canonical fields: distribution, amount_source, etc.
+export type DamageOps = Extract<EffectOp, "damage">;
 export interface DamageEffect extends BaseEffect {
     op: DamageOps;
     amount?: number | string;
-    add_amount?: number | string;
     target?: string;
     condition?: any;
     select?: number | string;
-    can_target_leader?: boolean;
-    count_source?: string;
+    distribution?: "direct" | "random_hits" | "split_sequential" | "by_stat";
+    amount_source?: "fixed" | "hand_size" | "selected_defense" | "golem_count" | "crest_count" | "other_allies";
+    count?: number; // for random_hits
+    stat?: "defense" | "hp"; // for by_stat
+    spill_to_leader?: boolean; // for split_sequential
+    include_leader?: boolean; // random_hits can target leader
+    fallback_leader?: boolean; // if no followers, allow leader selection
 }
 
 export type DestroyOps = Extract<EffectOp, "destroy" | "destroy_all" | "destroy_highest" | "destroy_random" | "destroy_random_other_allies" | "destroy_allied_amulets" | "destroy_allied_amulets_then_damage" | "destroy_self" | "destroy_then" | "destroy_defender_if_damaged" | "follower_strike_destroy" | "clash_damage">;
