@@ -3459,8 +3459,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "tribe": "Artifact",
         "attack": 3,
         "defense": 3
@@ -3470,8 +3469,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "tribe": "Artifact",
         "attack": 3,
         "defense": 3
@@ -3705,7 +3703,7 @@
       {
         "op": "destroy",
         "target": "ally:any",
-        "select": true
+        "select": 1
       },
       {
         "op": "summon_named",

@@ -27,8 +27,8 @@ export function attachHandlers(
         return;
     }
 
-    // 2. Target Selection (Resolving pending target)
-    if (vm.isSelectable && !ctx.isMulligan) {
+    // 2. Target Selection (Resolving pending target) - includes toggle for already-selected
+    if ((vm.isSelectable || vm.isSelected) && !ctx.isMulligan) {
         div.addEventListener("click", (e) => {
             e.stopPropagation();
             actions.handleResolveTarget(card.uid);
@@ -49,7 +49,7 @@ export function attachHandlers(
 
         // Left-click for Fuse
         div.addEventListener("click", (e) => {
-            if (vm.isSelectable) return; // handled above
+            if (vm.isSelectable || vm.isSelected) return; // handled above
 
             // Check turn
             const isPlayersTurn = ctx.isMyHand; // calculated in selector

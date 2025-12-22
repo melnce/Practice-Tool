@@ -524,7 +524,7 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": true
+        "select": 1
       },
       {
         "op": "heal_leader",
@@ -652,7 +652,7 @@
             "target": "ally:follower",
             "attack": 1,
             "defense": 1,
-            "select": true
+            "select": 1
           }
         ]
       }
@@ -1068,7 +1068,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
+        "select": 1,
         "amount": 1,
         "attack": 1,
         "defense": 1
@@ -1249,7 +1249,7 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": true
+        "select": 1
       },
       {
         "op": "summon_named",
@@ -2568,8 +2568,7 @@
     "superevolve": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "tribe": "Shikigami"
@@ -3015,8 +3014,7 @@
     "superevolve": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "not_self": true
@@ -3570,12 +3568,12 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "select": true
+        "select": 1
       },
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": true
+        "select": 1
       }
     ],
     "keywords": []
@@ -4531,7 +4529,7 @@
           {
             "op": "buff",
             "target": "ally:follower",
-            "select": true,
+            "select": 1,
             "amount": 1,
             "attack": 1,
             "defense": 1

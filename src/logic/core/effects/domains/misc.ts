@@ -62,7 +62,7 @@ export function registerMiscEffects() {
     registerOp("target", stub("target")); // 'target' usually usually triggers checkTargeting?
 
     // Evolve Family
-    registerOp("evolve", handleEvolveTarget as any);
+    registerOp("evolve", (eff, ctx) => handleEvolveTarget(eff, ctx.owner, ctx.context));
     registerOp("evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner));
     registerOp("super_evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner, { mode: "super" }));
     registerOp("evolve_last_summoned", handleEvolveLastSummoned as any);

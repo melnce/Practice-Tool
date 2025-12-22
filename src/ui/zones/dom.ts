@@ -67,8 +67,10 @@ export function renderCardDOM(vm: CardViewModel, elementId: string, tooltipConta
         const check = createElement("div", "selected-check", "✓");
         Object.assign(check.style, {
             position: "absolute", top: "6px", right: "8px",
-            fontSize: "20px", fontWeight: "900", color: "#2ecc71",
-            textShadow: "0 0 2px rgba(0,0,0,0.6)"
+            fontSize: "24px", fontWeight: "900", color: "#2ecc71",
+            textShadow: "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(46,204,113,0.8)",
+            zIndex: "100",
+            pointerEvents: "none"
         });
         imageWrapper.appendChild(check);
     }

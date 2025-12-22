@@ -2236,8 +2236,7 @@
     "superevolve": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "not_self": true
@@ -2252,8 +2251,7 @@
     "fanfare": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "not_self": true
@@ -2618,7 +2616,7 @@
       {
         "op": "select",
         "target": "ally:follower",
-        "select": true,
+        "select": 1,
         "condition": {
           "has_keyword": "ward"
         },

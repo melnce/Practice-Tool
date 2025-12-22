@@ -24,10 +24,13 @@ function hasKeyword(card: CardInstance, kw: any) {
 }
 
 export function filterBuffCandidates(pool: CardInstance[], eff: BuffOp, sourceCard: CardInstance | null): CardInstance[] {
+    // When target is "selected", user explicitly chose this card - don't filter it out as "self"
+    const isSelectedTarget = eff.target === "selected";
+
     let candidates = pool.filter(c =>
         c.type === "Follower" &&
-        // allow self when explicitly requested
-        (eff.include_self || c.uid !== sourceCard?.uid)
+        // allow self when explicitly requested OR when target is "selected"
+        (eff.include_self || isSelectedTarget || c.uid !== sourceCard?.uid)
     );
 
     // Tribe filtering

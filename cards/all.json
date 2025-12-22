@@ -124,7 +124,7 @@
             "op": "remove_keyword",
             "target": "enemy:follower",
             "keyword": "Ward",
-            "select": true
+            "select": 1
           }
         ]
       }
@@ -216,7 +216,7 @@
           {
             "op": "keyword",
             "target": "ally:follower",
-            "select": true,
+            "select": 1,
             "keywords": [
               "Rush"
             ]
@@ -415,7 +415,7 @@
       {
         "op": "return_to_hand",
         "target": "enemy:follower",
-        "select": true
+        "select": 1
       }
     ],
     "fanfare": [],
@@ -727,6 +727,7 @@
       }
     ],
     "keywords": [
+      "Aura",
       {
         "name": "Counter",
         "key": "earth",
@@ -1001,7 +1002,7 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "select": true,
+        "select": 1,
         "amount": 2,
         "amount_overflow": 4
       }
@@ -1328,7 +1329,7 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "select": true
+        "select": 1
       },
       {
         "op": "draw",
@@ -1405,7 +1406,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
+        "select": 1,
         "attack": 1,
         "defense": 1
       }
@@ -1414,7 +1415,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
+        "select": 1,
         "attack": 1,
         "defense": 1
       }
@@ -1423,7 +1424,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
+        "select": 1,
         "attack": 1,
         "defense": 1
       }
@@ -1489,7 +1490,7 @@
     "evolve": [
       {
         "op": "banish",
-        "select": true,
+        "select": 1,
         "target": "enemy:follower",
         "filters": {
           "defense_lte": 3
@@ -2336,7 +2337,7 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": true
+        "select": 1
       },
       {
         "op": "heal_leader",
@@ -2464,7 +2465,7 @@
             "target": "ally:follower",
             "attack": 1,
             "defense": 1,
-            "select": true
+            "select": 1
           }
         ]
       }
@@ -2880,7 +2881,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
+        "select": 1,
         "amount": 1,
         "attack": 1,
         "defense": 1
@@ -3061,7 +3062,7 @@
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": true
+        "select": 1
       },
       {
         "op": "summon_named",
@@ -4380,8 +4381,7 @@
     "superevolve": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "tribe": "Shikigami"
@@ -4827,8 +4827,7 @@
     "superevolve": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "not_self": true
@@ -5382,12 +5381,12 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "select": true
+        "select": 1
       },
       {
         "op": "destroy",
         "target": "enemy:follower",
-        "select": true
+        "select": 1
       }
     ],
     "keywords": []
@@ -6343,7 +6342,7 @@
           {
             "op": "buff",
             "target": "ally:follower",
-            "select": true,
+            "select": 1,
             "amount": 1,
             "attack": 1,
             "defense": 1
@@ -9743,8 +9742,7 @@
     "superevolve": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "not_self": true
@@ -9759,8 +9757,7 @@
     "fanfare": [
       {
         "op": "keyword",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "target": "ally:follower",
         "condition": {
           "not_self": true
@@ -10125,7 +10122,7 @@
       {
         "op": "select",
         "target": "ally:follower",
-        "select": true,
+        "select": 1,
         "condition": {
           "has_keyword": "ward"
         },
@@ -14251,8 +14248,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "tribe": "Artifact",
         "attack": 3,
         "defense": 3
@@ -14262,8 +14258,7 @@
       {
         "op": "buff",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "tribe": "Artifact",
         "attack": 3,
         "defense": 3
@@ -14497,7 +14492,7 @@
       {
         "op": "destroy",
         "target": "ally:any",
-        "select": true
+        "select": 1
       },
       {
         "op": "summon_named",

@@ -73,8 +73,11 @@ export function applyTargetClick(state: GameState, pending: any, uid: string | "
     const outcome = toggleSelection(pending, clickedTarget);
 
     if (outcome === "removed") {
-        // If unselected, and this caused confirmation to be hidden?
-        // Engine just says "continue". Orchestrator handles UI updates.
+        // If requiresConfirmation, update the button with new count
+        if (pending.requiresConfirmation) {
+            return { kind: "confirm_needed" };
+        }
+        // Otherwise just continue selection
         return { kind: "continue" };
     }
 

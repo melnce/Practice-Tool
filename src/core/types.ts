@@ -38,7 +38,7 @@ export interface BanishEffect extends BaseEffect {
     target?: string;
 }
 
-export type HealOps = Extract<EffectOp, "heal_leader" | "dynamic_heal_leader" | "set_max_hp" | "leader_barrier" | "restore_full_defense_self" | "restore_self_and_heal_leader" | "restore_allies" | "modify_leader_damage_received">;
+export type HealOps = Extract<EffectOp, "heal_leader" | "dynamic_heal_leader" | "set_max_hp" | "leader_barrier" | "restore_full_defense_self" | "restore_self_and_heal_leader" | "restore_allies" | "modify_leader_damage_received" | "add_leader_damage_taken_bonus" | "set_leader_max_damage_cap">;
 export interface HealEffect extends BaseEffect {
     op: HealOps;
     amount?: number | string;
@@ -79,7 +79,7 @@ export interface DeckEffect extends BaseEffect {
     op: DeckOps;
 }
 
-export type CrestOps = Extract<EffectOp, "gain_crest" | "crest_add_counter" | "crest_pay_counter">;
+export type CrestOps = Extract<EffectOp, "gain_crest" | "crest_add_counter" | "crest_pay_counter" | "crest_advance_countdown" | "destroy_crest">;
 export interface CrestEffect extends BaseEffect {
     op: CrestOps;
     name?: string;

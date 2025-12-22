@@ -417,6 +417,7 @@
     "url": "https://shadowverse.gg/cards/90031210-magic-sediment",
     "engageSacrifice": false,
     "keywords": [
+      "Aura",
       {
         "name": "Counter",
         "key": "earth",
@@ -1820,8 +1821,7 @@
       {
         "op": "select",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "effects": [
           {
             "op": "buff",
@@ -1865,8 +1865,7 @@
       {
         "op": "select",
         "target": "ally:follower",
-        "select": true,
-        "select_count": 1,
+        "select": 1,
         "effects": [
           {
             "op": "buff",
@@ -2166,7 +2165,7 @@
       {
         "op": "destroy",
         "target": "ally:any",
-        "select": true
+        "select": 1
       },
       {
         "op": "damage_random",

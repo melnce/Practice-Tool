@@ -173,7 +173,8 @@ export function createCardViewModel(
     let isSelected = false;
     if (ctx.isMulligan && card.__mulliganSelected) {
         isSelected = true;
-    } else if (!ctx.isMulligan && card.__uiSelectable) {
+    } else if (!ctx.isMulligan) {
+        // Check if card is in pending targets (works even after __uiSelectable is cleared)
         const targets = state.pendingTargetEffect?.targets;
         if (Array.isArray(targets) && targets.some((t: { uid?: string }) => t?.uid === card.uid)) {
             isSelected = true;

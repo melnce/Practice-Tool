@@ -74,21 +74,26 @@ export function playFollower(card: CardInstance, player: Player, chosenTier: { e
     // Ally-enter amulets (e.g. Ancestral Crown)
     const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
     for (const perm of myBoard) {
-        if (perm !== card && perm.type === "Amulet" && (perm as any).hasAllyEnter && Array.isArray((perm as any).allyEnterEffects)) {
-            (perm as any).allyEnterEffects.forEach((eff: any) => {
+        if (perm === card || perm.type !== "Amulet") continue;
+
+        // Check keywordState (where applyKeywordsFromList stores ally_enter data)
+        const ks = perm.keywordState;
+        if (ks?.hasAllyEnter && Array.isArray(ks.allyEnterEffects)) {
+            for (const eff of ks.allyEnterEffects) {
                 if (eff.op === "buff" && eff.target === "trigger") {
                     card.attack = (Number(card.attack) || 0) + (Number(eff.attack) || 0);
                     card.defense = (Number(card.defense) || 0) + (Number(eff.defense) || 0);
                 }
-            });
+            }
         }
     }
 
     // Pixie-enter
     if (Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
         for (const perm of myBoard) {
-            if (perm.type === "Amulet" && (perm as any).hasPixieEnter && Array.isArray((perm as any).pixieEnterEffects)) {
-                runEffects([...(perm as any).pixieEnterEffects], player, perm);
+            const ks = perm.keywordState || {};
+            if (perm.type === "Amulet" && ks.hasPixieEnter && Array.isArray(ks.pixieEnterEffects)) {
+                runEffects([...ks.pixieEnterEffects], player, perm);
             }
         }
     }

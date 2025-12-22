@@ -8,6 +8,7 @@ import { pushPlayedHistory } from "./history.js";
 import { PlayOutcome } from "./types.js";
 
 import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
+import { applyKeywordsFromList } from "../keywords.js";
 
 import { initAmulet } from "../../effects/ops/summon_ops/init.js";
 
@@ -17,6 +18,7 @@ import { initAmulet } from "../../effects/ops/summon_ops/init.js";
 export function playAmulet(card: CardInstance, player: Player, chosenTier: { effects: Effect[] } | null): PlayOutcome {
     pushPlayedHistory(player, card);
     initAmulet(card);
+    applyKeywordsFromList(card);
 
     const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
     toBoard.push(card);

@@ -5,13 +5,19 @@
 // This enables core modules to call adapter functions without UI imports.
 // ─────────────────────────────────────────────────────────────────────────────
 
+interface ConfirmationVM {
+    text: string;
+    count: number;
+    onConfirm: () => void;
+}
+
 export const adapter = {
     // Default: no-op. Browser boot injects real implementations.
     render: () => { /* no-op by default */ },
     showChoiceModal: (_options: unknown[], _callback: (index: number) => void) => { /* no-op */ },
 
     // Targeting confirmation UI
-    showTargetConfirmationButton: (_vm: unknown) => { /* no-op */ },
+    showTargetConfirmationButton: (_vm: ConfirmationVM) => { /* no-op */ },
     hideTargetConfirmation: () => { /* no-op */ },
     triggerConfirmButtonClick: () => { /* no-op */ },
 };

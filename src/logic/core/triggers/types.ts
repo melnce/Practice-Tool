@@ -24,7 +24,8 @@ export type TriggerEventName =
     | "invoke"
     | "destroyed"
     | "select_mode"
-    | "leader_attacked";
+    | "leader_attacked"
+    | "leader_damaged";
 
 export interface TriggerContext {
     initiator?: CardInstance;

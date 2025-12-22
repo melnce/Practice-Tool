@@ -6,6 +6,11 @@ import * as engine from "../engine.js";
 import { render } from "../ui/render.js";
 import { wireClick } from "../ui/dom.js";
 import { showChoiceModal } from "../ui/choiceModal.js";
+import {
+    showTargetConfirmationButton,
+    hideTargetConfirmation,
+    triggerConfirmButtonClick
+} from "../ui/targeting.js";
 import { injectAdapter } from "../core/adapter.js";
 import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
 import { useRedBoost } from "../logic/boosts.js";
@@ -16,8 +21,14 @@ import { state } from "../core/gameState.js";
 (window as any).endTurnRed = endTurnRed;
 (window as any).useRedBoost = useRedBoost;
 
-// Initialize Logic -> UI Adapter
-injectAdapter({ render, showChoiceModal });
+// Initialize Logic -> UI Adapter (wire ALL targeting UI functions)
+injectAdapter({
+    render,
+    showChoiceModal,
+    showTargetConfirmationButton,
+    hideTargetConfirmation,
+    triggerConfirmButtonClick
+});
 
 window.addEventListener("DOMContentLoaded", () => {
     wireClick("startGameBtn", async () => {
