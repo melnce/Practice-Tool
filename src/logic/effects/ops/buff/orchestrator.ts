@@ -75,7 +75,7 @@ export function handleBuffOrchestrator(
         });
 
         // Apply keywords
-        applyKeywordBuff(target, eff);
+        applyKeywordBuff(target, eff, owner);
 
         // Apply attacks per turn
         applyAttacksPerTurnBuff(target, eff, owner);

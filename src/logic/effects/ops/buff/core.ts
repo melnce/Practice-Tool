@@ -29,14 +29,25 @@ export function applyStatBuff(target: CardInstance, a: number, d: number, _owner
 /**
  * Applies keywords from the effect.
  */
-export function applyKeywordBuff(target: CardInstance, eff: BuffOp) {
-    const grantListRaw = eff.keywords || (eff as any).keyword || null;
+export function applyKeywordBuff(target: CardInstance, eff: BuffOp, requestOwner?: Player) {
+    // STRICT: Only accept keywords array, not singular keyword
+    const grantListRaw = eff.keywords || null;
     if (grantListRaw) {
         const grantList = Array.isArray(grantListRaw) ? grantListRaw : [grantListRaw];
         for (const kw of grantList) {
             const name = (typeof kw === "string" ? kw : kw?.name) || "";
-            const options = (typeof kw === "object" ? kw : undefined);
-            if (name) applyKeyword(target, name, options);
+            const options: any = (typeof kw === "object" ? { ...kw } : {});
+
+            // Pass duration from effect to keyword options
+            if (eff.duration === "opponent_turn_end") {
+                options.until_opponent_eot = true;
+                options.request_owner = requestOwner; // Who cast the debuff
+            }
+            if (eff.duration === "turn_end" || (eff as any).until_end_of_turn) {
+                options.expires_on_turn = state.roundCount;
+            }
+
+            if (name) applyKeyword(target, name, Object.keys(options).length > 0 ? options : undefined);
         }
     }
 }

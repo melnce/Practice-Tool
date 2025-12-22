@@ -49,12 +49,13 @@ export function handleGainCrest(eff: Effect, owner: Player) {
         countdown: Number.isFinite(+(eff as any).countdown) ? +(eff as any).countdown : undefined,
         // countdown-based “expiry effects” (legacy path)
         effects: Array.isArray(eff.effects) ? eff.effects : [],
-        // NEW: multi-event triggers
+        // multi-event triggers
         triggers: (triggers || []).map((t: any) => ({
             event: t.event,
             effects: Array.isArray(t.effects) ? t.effects : [],
             once_per_turn: !!t.once_per_turn,
             usedThisTurn: false,
+            condition: t.condition || null, // Store condition for filtering
         })),
         owner: targetOwner,
     };

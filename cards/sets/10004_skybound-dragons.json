@@ -139,7 +139,7 @@
             "name": "Draw 2 followers",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "filters": {
                   "type": "Follower"
                 },
@@ -181,7 +181,7 @@
         "cost": 8,
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "filters": {
               "type": "Follower",
               "cost_gte": 7
@@ -1177,7 +1177,7 @@
     "url": "https://shadowverse.gg/cards/10431110-philosophia-cryptic-sophist",
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Spell"

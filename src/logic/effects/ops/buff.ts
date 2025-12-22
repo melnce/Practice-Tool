@@ -179,14 +179,30 @@ export function handleSetStats(eff: Effect, owner: Player, sourceCard: CardInsta
         }
 
         if (setD !== null) {
-            const currentD = parseInt(String(target.defense)) || 0;
-            const deltaD = setD - currentD;
-            target.buffs.defense = (target.buffs.defense ?? 0) + deltaD;
-            (target as any).defense = setD;
-            if (!target.potential_defense) target.potential_defense = target.base_defense || currentD;
-            target.potential_defense! += deltaD;
+            // DEBUG: Log before state
+            console.log(`[set_stats] BEFORE: ${target.name}`, {
+                defense: target.defense,
+                base_defense: target.base_defense,
+                buffs_defense: target.buffs?.defense,
+                peak_defense: target.peak_defense
+            });
 
-            target.peak_defense = Math.max(target.peak_defense ?? Number(target.defense), Number(target.defense));
+            // For set_stats, we're setting a new "base" defense level
+            // Update base_defense so UI shows this as the new max HP
+            target.base_defense = setD;
+            target.buffs.defense = 0; // Reset buff delta since we're setting a new base
+            (target as any).defense = setD;
+            target.potential_defense = setD;
+            // For set_stats, peak_defense should equal the new defense (unit is at "full" health at new stat line)
+            target.peak_defense = setD;
+
+            // DEBUG: Log after state
+            console.log(`[set_stats] AFTER: ${target.name}`, {
+                defense: target.defense,
+                base_defense: target.base_defense,
+                buffs_defense: target.buffs?.defense,
+                peak_defense: target.peak_defense
+            });
         }
 
         logEvent("setStats", { owner, target: target.name, uid: target.uid, a: setA, d: setD });

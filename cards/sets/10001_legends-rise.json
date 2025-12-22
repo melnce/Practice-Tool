@@ -430,7 +430,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw_combo_follower",
+        "op": "draw", "count": "combo", "filters": {"type": "Follower"},
         "count": 1
       }
     ],
@@ -1786,7 +1786,7 @@
     ],
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "follower",
@@ -4177,7 +4177,7 @@
     "url": "https://shadowverse.gg/cards/10161110-angelic-prism-priestess",
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Amulet"

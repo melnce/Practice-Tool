@@ -8,6 +8,7 @@ import { CardInstance } from "../../../core/types.js";
  * All fields are optional.
  */
 export interface CardFilterSpec {
+    name?: string;  // Filter by card name (exact match)
     type?: string;
     class?: string;
 
@@ -34,6 +35,7 @@ export interface CardFilterSpec {
  * Normalized filter with all aliases resolved.
  */
 export interface NormalizedCardFilter {
+    name: string | null;  // Exact name match (lowercase)
     type: string | null;
     class: string | null;
 

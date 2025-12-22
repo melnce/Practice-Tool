@@ -201,7 +201,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Follower"
@@ -550,7 +550,7 @@
         "target": "ally:hand"
       },
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "follower",
@@ -609,9 +609,14 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "draw_all_named_with_keyword",
-        "name": "Rusty, Luxcard Trickster",
-        "keyword": "storm"
+        "op": "draw",
+        "filters": {
+          "name": "Rusty, Luxcard Trickster"
+        },
+        "count": "all",
+        "keywords": [
+          "Storm"
+        ]
       }
     ],
     "fanfare": [],
@@ -1215,7 +1220,7 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "count": 1,
                 "filters": {
                   "type": "follower"

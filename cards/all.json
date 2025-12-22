@@ -201,7 +201,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Follower"
@@ -550,7 +550,7 @@
         "target": "ally:hand"
       },
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "follower",
@@ -609,9 +609,14 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "draw_all_named_with_keyword",
-        "name": "Rusty, Luxcard Trickster",
-        "keyword": "storm"
+        "op": "draw",
+        "filters": {
+          "name": "Rusty, Luxcard Trickster"
+        },
+        "count": "all",
+        "keywords": [
+          "Storm"
+        ]
       }
     ],
     "fanfare": [],
@@ -1215,7 +1220,7 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "count": 1,
                 "filters": {
                   "type": "follower"
@@ -2243,8 +2248,11 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw_combo_follower",
-        "count": 1
+        "op": "draw",
+        "count": 1,
+        "filters": {
+          "type": "Follower"
+        }
       }
     ],
     "keywords": []
@@ -3599,7 +3607,7 @@
     ],
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "follower",
@@ -5990,7 +5998,7 @@
     "url": "https://shadowverse.gg/cards/10161110-angelic-prism-priestess",
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Amulet"
@@ -8198,7 +8206,8 @@
         "count": 2
       },
       {
-        "op": "draw_opponent",
+        "op": "draw",
+        "player": "opponent",
         "count": 1
       }
     ],
@@ -8282,7 +8291,7 @@
     ],
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Spell"
@@ -8356,7 +8365,7 @@
         "cost": 5,
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "count": 1,
             "filters": {
               "type": "follower",
@@ -8600,7 +8609,7 @@
         "optional": true
       },
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Spell"
@@ -8812,7 +8821,7 @@
     "url": "https://shadowverse.gg/cards/10233110-owen-mysterian-swordsman",
     "evolve": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "Follower"
@@ -8821,7 +8830,7 @@
     ],
     "superevolve": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "Follower"
@@ -9223,8 +9232,11 @@
         "op": "overflow_gate",
         "effects": [
           {
-            "op": "draw_named",
-            "name": "Call of the Megalorca"
+            "op": "draw",
+            "filters": {
+              "name": "Call of the Megalorca"
+            },
+            "count": 1
           }
         ]
       }
@@ -12467,7 +12479,7 @@
         },
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "count": 1,
             "filters": {
               "type": "follower",
@@ -12749,7 +12761,7 @@
         "op": "overflow_gate",
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "count": 1,
             "filters": {
               "type": "follower",
@@ -13486,7 +13498,7 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "count": 1,
                 "filters": {
                   "type": "Follower"
@@ -13498,7 +13510,7 @@
             "label": "Draw a 3-cost spell",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "count": 1,
                 "filters": {
                   "type": "Spell",
@@ -13931,7 +13943,7 @@
                 "op": "no_ally_attacked_this_turn_gate",
                 "effects": [
                   {
-                    "op": "draw_filtered",
+                    "op": "draw",
                     "count": 1,
                     "filters": {
                       "type": "follower",
@@ -13960,7 +13972,7 @@
                 "op": "no_ally_attacked_this_turn_gate",
                 "effects": [
                   {
-                    "op": "draw_filtered",
+                    "op": "draw",
                     "count": 1,
                     "filters": {
                       "type": "follower",
@@ -14715,7 +14727,7 @@
             "name": "Draw 2 followers",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "filters": {
                   "type": "Follower"
                 },
@@ -14757,7 +14769,7 @@
         "cost": 8,
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "filters": {
               "type": "Follower",
               "cost_gte": 7
@@ -15753,7 +15765,7 @@
     "url": "https://shadowverse.gg/cards/10431110-philosophia-cryptic-sophist",
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Spell"

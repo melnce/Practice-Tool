@@ -17,11 +17,15 @@ function toLowerSafe(s: any): string {
  */
 export function buildCardPredicate(filter: NormalizedCardFilter): CardPredicate {
     return (c: CardInstance): boolean => {
+        const cName = toLowerSafe(c.name);
         const cType = toLowerSafe(c.type);
         const cClass = toLowerSafe(c.class);
         const cCost = Number(c.cost);
         const cAtk = Number(c.attack);
         const cDef = Number(c.defense);
+
+        // Name filter (exact match)
+        if (filter.name && cName !== filter.name) return false;
 
         // Type filter
         if (filter.type && cType !== filter.type) return false;

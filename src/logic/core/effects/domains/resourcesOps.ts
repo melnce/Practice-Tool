@@ -8,12 +8,7 @@ export const RESOURCE_OPS = [
     "necromancy_gate",
     "overflow_gate",
     "earth_rite",
-    "draw",
-    "draw_all_named_with_keyword",
-    "draw_combo_follower",
-    "draw_filtered",
-    "draw_named",
-    "draw_opponent",
+    "draw",  // Unified draw op - supports player, filters, count, mode, keywords
     "add_to_hand",
     "add_selected_copy_to_hand",
     "discard_select_hand",

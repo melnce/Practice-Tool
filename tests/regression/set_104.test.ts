@@ -104,7 +104,7 @@ describe("Set 104: Skybound Dragons", () => {
 
         const philo = {
             uid: "hand_1", id: "10431110", name: "Philosophia", type: "Follower", cost: 3,
-            fanfare: [{ op: "draw_filtered", filters: { type: "Spell" }, count: 1 }]
+            fanfare: [{ op: "draw", filters: { type: "Spell" }, count: 1 }]
         } as any;
         state.blueHand = [philo];
         state.bluePP = 3;
@@ -270,7 +270,7 @@ describe("Set 104: Skybound Dragons", () => {
             keywords: [{
                 name: "Enhance", cost: 8,
                 effects: [
-                    { op: "draw_filtered", filters: { type: "Follower", cost_gte: 7 }, count: 1 },
+                    { op: "draw", filters: { type: "Follower", cost_gte: 7 }, count: 1 },
                     { op: "recover_pp", amount: 7 }
                 ]
             }]

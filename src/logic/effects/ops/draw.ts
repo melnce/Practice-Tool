@@ -40,30 +40,112 @@ function trackLastDrawn(card: CardInstance) {
 }
 
 /** -----------------------------
- * 1) Basic Draws (always via drawCard)
+ * UNIFIED DRAW OPERATION
  * -----------------------------
+ * Single entry point for all draw operations.
+ * 
+ * Parameters:
+ * - player: "self" (default) | "opponent" - who draws the cards
+ * - count: number | "all" | "combo" - how many to draw (default 1)
+ * - filters: { name?, type?, class?, cost_eq?, ... } - optional filtering
+ * - mode: "topmost" (default) | "random" - selection order when filtering
+ * - keywords: string[] - keywords to apply to drawn cards
  */
 export function handleDraw(eff: Effect, owner: Player) {
-    const n = clampInt((eff.count as any), 1);
-    const hand = owner === "blue" ? state.blueHand : state.redHand;
-    const deck = owner === "blue" ? state.blueDeck : state.redDeck;
-    logEvent("draw", { owner, count: n });
+    // Determine who draws
+    const playerParam = toLowerSafe((eff as any).player);
+    const drawingPlayer: Player = playerParam === "opponent"
+        ? (owner === "blue" ? "red" : "blue")
+        : owner;
 
-    for (let i = 0; i < n; i++) {
-        drawCard(hand, deck, owner);
+    const deck = drawingPlayer === "blue" ? state.blueDeck : state.redDeck;
+    const hand = drawingPlayer === "blue" ? state.blueHand : state.redHand;
+
+    // Check if we have filters - if so, use filtered draw logic
+    const hasFilters = (eff as any).filters && Object.keys((eff as any).filters).length > 0;
+
+    if (hasFilters) {
+        // Filtered draw path
+        const filterSpec = (eff as any).filters || {};
+        const normalizedFilter = normalizeCardFilter(filterSpec);
+        const matches = buildCardPredicate(normalizedFilter);
+
+        const idxs: number[] = [];
+        for (let i = 0; i < deck.length; i++) {
+            const card = deck[i];
+            if (card && matches(card)) idxs.push(i);
+        }
+        if (!idxs.length) return;
+
+        // Resolve count
+        const countRaw = (eff.count as any);
+        let want: number;
+        if (countRaw === "all") {
+            want = idxs.length;
+        } else if (countRaw === "combo") {
+            const combo = drawingPlayer === "blue"
+                ? (state.bluePlaysThisTurn || 0)
+                : (state.redPlaysThisTurn || 0);
+            want = combo;
+        } else {
+            want = clampInt(countRaw, 1);
+        }
+        if (!want) return;
+
+        const mode = toLowerSafe((eff as any).mode) || "topmost";
+        let chosenIdxs: number[];
+
+        if (mode === "random") {
+            for (let i = idxs.length - 1; i > 0; i--) {
+                const j = state.rng.nextInt(i + 1);
+                const temp = idxs[i]!;
+                idxs[i] = idxs[j]!;
+                idxs[j] = temp;
+            }
+            chosenIdxs = idxs.slice(0, want).sort((a, b) => b - a);
+        } else {
+            chosenIdxs = idxs.sort((a, b) => b - a).slice(0, want);
+        }
+
+        // Keywords to apply
+        const keywordsToApply = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [];
+
+        for (const ix of chosenIdxs) {
+            if (hand.length >= MAX_HAND) break;
+            const picked = removeAt(deck, ix);
+            if (!picked) continue;
+
+            for (const kw of keywordsToApply) {
+                const kwName = (typeof kw === "string" ? kw : kw?.name) || "";
+                if (kwName) applyKeyword(picked, kwName);
+            }
+
+            trackLastDrawn(picked);
+            if (!pushToHand(hand, picked)) break;
+        }
+        logEvent("draw", { owner: drawingPlayer, mode, filtered: true, moved: chosenIdxs.length });
+    } else {
+        // Simple draw path (no filters)
+        const countRaw = (eff.count as any);
+        let n: number;
+        if (countRaw === "combo") {
+            n = drawingPlayer === "blue"
+                ? (state.bluePlaysThisTurn || 0)
+                : (state.redPlaysThisTurn || 0);
+        } else {
+            n = clampInt(countRaw, 1);
+        }
+
+        logEvent("draw", { owner: drawingPlayer, count: n });
+        for (let i = 0; i < n; i++) {
+            drawCard(hand, deck, drawingPlayer);
+        }
     }
 }
 
+// DEPRECATED: Use handleDraw with player: "opponent"
 export function handleDrawOpponent(eff: Effect, owner: Player) {
-    const opp = owner === "blue" ? "red" : "blue";
-    const n = clampInt((eff.count as any), 1);
-    const hand = opp === "blue" ? state.blueHand : state.redHand;
-    const deck = opp === "blue" ? state.blueDeck : state.redDeck;
-    logEvent("draw", { owner: opp, count: n });
-
-    for (let i = 0; i < n; i++) {
-        drawCard(hand, deck, opp);
-    }
+    handleDraw({ ...eff, player: "opponent" } as any, owner);
 }
 
 /** -----------------------------
@@ -93,10 +175,9 @@ export function handleDrawNamed(eff: Effect, owner: Player) {
     }
 }
 
-/** Pull *all copies* of a named card and apply keyword */
+/** Pull *all copies* of a named card and apply keywords */
 export function handleDrawAllNamedWithKeyword(eff: Effect, owner: Player) {
     const name = toLowerSafe((eff.name as any));
-    const kw = toLowerSafe((eff.keyword as any) || "storm");
     if (!name) return;
 
     const deck = owner === "blue" ? state.blueDeck : state.redDeck;
@@ -113,11 +194,16 @@ export function handleDrawAllNamedWithKeyword(eff: Effect, owner: Player) {
     }
     if (!picked.length) return;
 
+    // STRICT: Use keywords array for consistency
+    const keywordsToApply = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [];
     for (const p of picked) {
-        applyKeyword(p, kw);
+        for (const kw of keywordsToApply) {
+            const kwName = (typeof kw === "string" ? kw : kw?.name) || "";
+            if (kwName) applyKeyword(p, kwName);
+        }
         if (!pushToHand(hand, p)) break;
     }
-    logEvent("tutorAllWithKeyword", { owner, name, keyword: kw, count: picked.length });
+    logEvent("tutorAllWithKeyword", { owner, name, keywords: keywordsToApply, count: picked.length });
 }
 
 /** Create token(s) directly into hand */
@@ -168,11 +254,14 @@ export function handleAddToHand(eff: Effect, owner: Player, context: any = {}) {
  * - Deck iteration: index 0 = bottom, high index = top (draw from top).
  * - Filtering: MUST use CardFilter module (normalizeCardFilter + buildCardPredicate).
  * - DO NOT add bespoke query logic here; extend CardFilter instead.
+ * 
+ * UNIFIED DRAW: This op now supports:
+ * - count: number | "all" - how many to draw (default 1)
+ * - filters: { name?, type?, class?, cost_eq?, ... } - what to match
+ * - mode: "topmost" | "random" - selection order
+ * - keywords: string[] - keywords to apply to drawn cards
  */
 export function handleDrawFiltered(eff: Effect, owner: Player) {
-    const want = clampInt((eff.count as any), 1);
-    if (!want) return;
-
     const deck = owner === "blue" ? state.blueDeck : state.redDeck;
     const hand = owner === "blue" ? state.blueHand : state.redHand;
 
@@ -188,13 +277,17 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
     }
     if (!idxs.length) return;
 
+    // Support count: "all" to draw all matches
+    const countRaw = (eff.count as any);
+    const want = countRaw === "all" ? idxs.length : clampInt(countRaw, 1);
+    if (!want) return;
+
     const mode = toLowerSafe((eff.mode as any)) || "topmost";
     let chosenIdxs;
 
     if (mode === "random") {
         for (let i = idxs.length - 1; i > 0; i--) {
             const j = state.rng.nextInt(i + 1);
-            // Both indices are in bounds since i < idxs.length and j <= i
             const temp = idxs[i]!;
             idxs[i] = idxs[j]!;
             idxs[j] = temp;
@@ -206,14 +299,24 @@ export function handleDrawFiltered(eff: Effect, owner: Player) {
             .slice(0, want);
     }
 
+    // Keywords to apply to drawn cards
+    const keywordsToApply = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [];
+
     for (const ix of chosenIdxs) {
         if (hand.length >= MAX_HAND) break;
         const picked = removeAt(deck, ix);
         if (!picked) continue;
+
+        // Apply keywords if specified
+        for (const kw of keywordsToApply) {
+            const kwName = (typeof kw === "string" ? kw : kw?.name) || "";
+            if (kwName) applyKeyword(picked, kwName);
+        }
+
         trackLastDrawn(picked);
         if (!pushToHand(hand, picked)) break;
     }
-    logEvent("tutorFiltered", { owner, mode, moved: chosenIdxs.length });
+    logEvent("drawFiltered", { owner, mode, moved: chosenIdxs.length, keywords: keywordsToApply.length > 0 ? keywordsToApply : undefined });
 }
 
 /** Example: combo-based tutor */

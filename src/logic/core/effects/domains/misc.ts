@@ -61,15 +61,23 @@ export function registerMiscEffects() {
     // Stubs
     registerOp("target", stub("target")); // 'target' usually usually triggers checkTargeting?
 
-    // Evolve Family
+    // Evolve Family - Effect-based evolutions should NOT spend evolve points
     registerOp("evolve", (eff, ctx) => handleEvolveTarget(eff, ctx.owner, ctx.context));
-    registerOp("evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner));
-    registerOp("super_evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner, { mode: "super" }));
+    registerOp("evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner, { spendPoint: false }));
+    registerOp("super_evolve_self", (eff, ctx) => handleEvolveSelf(ctx.sourceCard!, ctx.owner, { mode: "super", spendPoint: false }));
     registerOp("evolve_last_summoned", handleEvolveLastSummoned as any);
     registerOp("evolve_all_unevolved_allies", stub("evolve_all_unevolved_allies"));
     registerOp("evolve_all_allies_named", stub("evolve_all_allies_named"));
     registerOp("super_evolve_all_unevolved_allies", stub("super_evolve_all_unevolved_allies"));
-    registerOp("super_evolve_ally", stub("super_evolve_ally"));
+    registerOp("super_evolve_ally", (eff, ctx) => {
+        // Get the selected target from context
+        const target = ctx.context && ((ctx.context as any).targetCard || (ctx.context as any).selectedCard || ((ctx.context as any).targets && (ctx.context as any).targets[0]));
+        if (!target) {
+            console.warn("super_evolve_ally: No target found in context.");
+            return;
+        }
+        handleEvolveSelf(target, ctx.owner, { mode: "super", spendPoint: false });
+    });
     registerOp("super_evolve", stub("super_evolve"));
 
     // Gates

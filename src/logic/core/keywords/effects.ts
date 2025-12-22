@@ -53,7 +53,8 @@ export function handleKeyword(
         return createSelectionRequest(eff, context.owner, targets, context.sourceCard, context.effectsQueue);
     }
 
-    const keywordList = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [(eff as any).keyword].filter(Boolean);
+    // STRICT: Only accept keywords array, not singular keyword
+    const keywordList = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [];
 
     // Fix: Basic "until_end_of_turn: true" on the generic effect should propagate to keywords that support it (like cant_attack)
     const genericExpiryOpts = eff.until_end_of_turn ? {
@@ -103,9 +104,13 @@ export function handleRemoveKeyword(
         return createSelectionRequest(eff, owner, targets, null, effectsQueue);
     }
 
-    const keywordToRemove = String(eff.keyword || "").toLowerCase();
+    // STRICT: Only accept keywords array for consistency
+    const keywordsToRemove = Array.isArray((eff as any).keywords) ? (eff as any).keywords : [];
     for (const target of targets) {
-        removeKeywordFromSingleCard(target, keywordToRemove);
+        for (const kw of keywordsToRemove) {
+            const name = (typeof kw === "string" ? kw : kw?.name) || "";
+            if (name) removeKeywordFromSingleCard(target, name.toLowerCase());
+        }
     }
     return { kind: "done" };
 }
@@ -138,7 +143,8 @@ export function handleKeywordSelf(sourceCard: CardInstance, eff: Effect): Keywor
         return { kind: "done" };
     }
 
-    const keywords = Array.isArray(eff.keywords) ? eff.keywords : [eff.keyword || eff.name];
+    // STRICT: Only accept keywords array, not singular keyword
+    const keywords = Array.isArray(eff.keywords) ? eff.keywords : [];
     for (const kw of keywords) {
         const name = (typeof kw === "string" ? kw : (kw as any)?.name) || "";
         const options = (typeof kw === "object" ? kw : undefined);

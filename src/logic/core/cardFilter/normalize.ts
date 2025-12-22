@@ -19,6 +19,9 @@ function toNumOrNull(x: any): number | null {
 export function normalizeCardFilter(spec: CardFilterSpec | any): NormalizedCardFilter {
     const f = spec || {};
 
+    // Name (exact match)
+    const name = toLowerSafe(f.name) || null;
+
     // Type and Class
     const type = toLowerSafe(f.type) || null;
     const cls = toLowerSafe(f.class) || null;
@@ -48,6 +51,7 @@ export function normalizeCardFilter(spec: CardFilterSpec | any): NormalizedCardF
             : [];
 
     return {
+        name,
         type,
         class: cls,
         costEq,

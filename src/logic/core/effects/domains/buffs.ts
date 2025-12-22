@@ -29,7 +29,7 @@ export function registerBuffEffects() {
 
     // Stats
     registerOp("buff", (eff, ctx) => {
-        if (handleBuff(eff, ctx.owner, ctx.sourceCard, [], ctx.context as any) === "pending") return "pending";
+        if (handleBuff(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context as any) === "pending") return "pending";
     });
     registerOp("buff_hand_class", (eff, ctx) => handleBuffHandClass(eff, ctx.owner));
     registerOp("buff_hand_tribe", (eff, ctx) => handleBuffHandTribe(eff, ctx.owner));
@@ -58,9 +58,25 @@ export function registerBuffEffects() {
         // isTargetedEffect check logic
         const opCtx = { ...merged, isTargetedEffect: !!(eff.select || eff.select_count) };
 
-        const targets = (merged.targets && merged.targets.length > 0 && !eff.target)
+        let targets = (merged.targets && merged.targets.length > 0 && !eff.target)
             ? merged.targets
             : getPool(eff.target || "", ctx.owner, ctx.sourceCard, eff.condition, opCtx);
+
+        // Apply filters if specified (e.g., filters: { class: "Swordcraft" })
+        if ((eff as any).filters) {
+            const filters = (eff as any).filters;
+            targets = targets.filter((c: any) => {
+                if (filters.class && c.class !== filters.class) return false;
+                if (filters.type && c.type?.toLowerCase() !== String(filters.type).toLowerCase()) return false;
+                if (filters.tribe && (!Array.isArray(c.tribes) || !c.tribes.includes(filters.tribe))) return false;
+                return true;
+            });
+        }
+
+        // Apply exclude_self if specified
+        if ((eff as any).exclude_self && ctx.sourceCard) {
+            targets = targets.filter((c: any) => c.uid !== ctx.sourceCard?.uid);
+        }
 
         const res = handleKeyword(eff, ctx.owner, ctx.queue, targets, merged);
 

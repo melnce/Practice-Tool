@@ -692,7 +692,8 @@
         "count": 2
       },
       {
-        "op": "draw_opponent",
+        "op": "draw",
+        "player": "opponent",
         "count": 1
       }
     ],
@@ -776,7 +777,7 @@
     ],
     "fanfare": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Spell"
@@ -850,7 +851,7 @@
         "cost": 5,
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "count": 1,
             "filters": {
               "type": "follower",
@@ -1094,7 +1095,7 @@
         "optional": true
       },
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 1,
         "filters": {
           "type": "Spell"
@@ -1306,7 +1307,7 @@
     "url": "https://shadowverse.gg/cards/10233110-owen-mysterian-swordsman",
     "evolve": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "Follower"
@@ -1315,7 +1316,7 @@
     ],
     "superevolve": [
       {
-        "op": "draw_filtered",
+        "op": "draw",
         "count": 2,
         "filters": {
           "type": "Follower"
@@ -1717,8 +1718,11 @@
         "op": "overflow_gate",
         "effects": [
           {
-            "op": "draw_named",
-            "name": "Call of the Megalorca"
+            "op": "draw",
+            "filters": {
+              "name": "Call of the Megalorca"
+            },
+            "count": 1
           }
         ]
       }

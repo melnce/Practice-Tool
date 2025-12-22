@@ -62,8 +62,8 @@ const KNOWN_OPS = new Set([
     // Resources
     "add_max_pp", "gain_max_pp", "recover_pp", "recover_ep",
     "add_shadows", "necromancy_gate", "overflow_gate", "earth_rite",
-    "draw", "draw_all_named_with_keyword", "draw_combo_follower",
-    "draw_filtered", "draw_named", "draw_opponent", "add_to_hand",
+    "draw", // Unified draw op - supports player, filters, count, mode, keywords
+    "add_to_hand",
     "add_selected_copy_to_hand", "discard_select_hand", "discard_all_except_named",
     "transform_in_hand", "transform_random_spell_in_hand",
     "replace_deck", "replace_deck_with_set_minus", "set_cost_last_drawn",

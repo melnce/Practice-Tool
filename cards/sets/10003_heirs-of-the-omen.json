@@ -1678,7 +1678,7 @@
         },
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "count": 1,
             "filters": {
               "type": "follower",
@@ -1960,7 +1960,7 @@
         "op": "overflow_gate",
         "effects": [
           {
-            "op": "draw_filtered",
+            "op": "draw",
             "count": 1,
             "filters": {
               "type": "follower",
@@ -2697,7 +2697,7 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "count": 1,
                 "filters": {
                   "type": "Follower"
@@ -2709,7 +2709,7 @@
             "label": "Draw a 3-cost spell",
             "effects": [
               {
-                "op": "draw_filtered",
+                "op": "draw",
                 "count": 1,
                 "filters": {
                   "type": "Spell",
@@ -3142,7 +3142,7 @@
                 "op": "no_ally_attacked_this_turn_gate",
                 "effects": [
                   {
-                    "op": "draw_filtered",
+                    "op": "draw",
                     "count": 1,
                     "filters": {
                       "type": "follower",
@@ -3171,7 +3171,7 @@
                 "op": "no_ally_attacked_this_turn_gate",
                 "effects": [
                   {
-                    "op": "draw_filtered",
+                    "op": "draw",
                     "count": 1,
                     "filters": {
                       "type": "follower",

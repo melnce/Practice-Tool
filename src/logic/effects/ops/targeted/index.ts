@@ -369,16 +369,21 @@ TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
         for (const target of targets) {
             for (const nestedEff of ((eff as any).effects || [])) {
                 if (nestedEff.op === "set_stats") {
+                    // Ensure buffs object exists
+                    if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
+
                     if (nestedEff.attack !== undefined) {
                         target.attack = parseInt(nestedEff.attack);
                         target.potential_attack = target.attack as number;
                         target.base_attack = target.attack as number;
+                        target.buffs.attack = 0; // Reset attack buff
                     }
                     if (nestedEff.defense !== undefined) {
                         target.defense = parseInt(nestedEff.defense);
                         target.potential_defense = target.defense as number;
                         target.base_defense = target.defense as number;
                         target.peak_defense = target.defense as number;
+                        target.buffs.defense = 0; // Reset defense buff - this fixes the damaged UI issue
                     }
                 } else {
                     runWithBypass(() => {

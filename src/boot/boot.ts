@@ -138,6 +138,17 @@ window.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    wireClick("godSetShadows", () => {
+        const inp = document.getElementById("godShadowsVal") as HTMLInputElement;
+        if (inp) {
+            const val = parseInt(inp.value, 10);
+            if (Number.isFinite(val) && val >= 0) {
+                state.blueShadows = val;
+                render();
+            }
+        }
+    });
+
 });
 
 

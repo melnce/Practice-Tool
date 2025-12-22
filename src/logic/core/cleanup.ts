@@ -58,8 +58,8 @@ export function cleanupDead() {
             logEvent("destroyQueued", { card: c.name, owner, type: c.type, cause });
 
             if (isFollower) {
-                // leave-field trigger
-                fireTrigger("follower_leaves_field", owner as any);
+                // leave-field trigger - pass leavingOwner for is_ally condition
+                fireTrigger("follower_leaves_field", owner as any, { leavingOwner: owner, leavingCard: c });
 
                 // Shikigami bookkeeping (unchanged)
                 if (Array.isArray(c.tribes) && c.tribes.includes("Shikigami")) {

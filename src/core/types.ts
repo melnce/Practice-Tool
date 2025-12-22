@@ -59,7 +59,7 @@ export interface GateEffect extends BaseEffect {
     name?: string; // board_name
 }
 
-export type DrawOps = Extract<EffectOp, "draw" | "draw_all_named_with_keyword" | "draw_combo_follower" | "draw_filtered" | "draw_named" | "draw_opponent">;
+export type DrawOps = Extract<EffectOp, "draw" | "draw_opponent">;
 export interface DrawEffect extends BaseEffect {
     op: DrawOps;
     count?: number;

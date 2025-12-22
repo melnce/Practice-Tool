@@ -3,9 +3,7 @@ import { registerOp } from "../registry.js";
 import { state } from "../../../../core/gameState.js";
 import { addMaxPP } from "../../../pp.js";
 import {
-    handleDraw, handleDrawAllNamedWithKeyword, handleDrawFiltered,
-    handleAddToHand, handleDrawComboFollower, handleDrawOpponent,
-    handleDrawNamed
+    handleDraw, handleAddToHand
 } from "../../../effects/ops/draw.js";
 import {
     handleDiscardSelectHand, handleTransformInHand, handleDiscardAllExceptNamed
@@ -64,13 +62,8 @@ export function registerResourceEffects() {
         }
     });
 
-    // Draw / Hand
+    // UNIFIED DRAW - single entry point for all draw operations
     registerOp("draw", (eff, ctx) => handleDraw(eff, ctx.owner));
-    registerOp("draw_all_named_with_keyword", (eff, ctx) => handleDrawAllNamedWithKeyword(eff, ctx.owner));
-    registerOp("draw_combo_follower", (eff, ctx) => handleDrawComboFollower(eff, ctx.owner));
-    registerOp("draw_filtered", (eff, ctx) => handleDrawFiltered(eff, ctx.owner));
-    registerOp("draw_named", (eff, ctx) => handleDrawNamed(eff, ctx.owner));
-    registerOp("draw_opponent", (eff, ctx) => handleDrawOpponent(eff, ctx.owner));
     registerOp("add_to_hand", (eff, ctx) => handleAddToHand(eff, ctx.owner));
 
     registerOp("add_selected_copy_to_hand", (eff, ctx) => {

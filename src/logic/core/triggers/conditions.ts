@@ -2,9 +2,9 @@ import { TriggerContext, TriggerSpec } from "./types.js";
 import { state } from "../../../core/gameState.js";
 import { CardInstance, Player } from "../../../core/types.js";
 
-// Helper to normalize "subject" card (entering, played, etc.)
+// Helper to normalize "subject" card (entering, played, leaving, etc.)
 export function getSubjectCard(context: TriggerContext): CardInstance | null {
-    return context.enteringCard ?? context.invokedCard ?? context.playedCard ?? null;
+    return context.enteringCard ?? context.leavingCard ?? context.invokedCard ?? context.playedCard ?? null;
 }
 
 function checkKeywords(card: CardInstance, wants: string[]): boolean {
@@ -54,11 +54,12 @@ export function evalCommonConditions(
     if (cond.whose_turn === 'opponent' && activePlayer === owner) return false;
     if (trigger.your_turn_only && owner !== activePlayer) return false;
 
-    // 2. is_ally
+    // 2. is_ally - check enteringOwner for enter events, leavingOwner for leave events
     if (typeof cond.is_ally === 'boolean' && subjectCard) {
-        if (context.enteringOwner) {
-            if (cond.is_ally && owner !== context.enteringOwner) return false;
-            if (!cond.is_ally && owner === context.enteringOwner) return false;
+        const subjectOwner = context.enteringOwner ?? context.leavingOwner;
+        if (subjectOwner) {
+            if (cond.is_ally && owner !== subjectOwner) return false;
+            if (!cond.is_ally && owner === subjectOwner) return false;
         }
     }
 

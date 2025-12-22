@@ -23,7 +23,7 @@ function payEngageCost(owner: Player, cost: number) {
     state[pool] = Math.max(0, cur - (cost | 0));
 }
 function effectsNeedSelection(effects: Effect[] = []) {
-    return Array.isArray(effects) && effects.some(e => e && (e.select === true || e.op === "select"));
+    return Array.isArray(effects) && effects.some(e => e && (e.select === true || (typeof e.select === 'number' && e.select > 0) || e.op === "select"));
 }
 
 function removeWithLastWords(card: CardInstance, owner: Player) {

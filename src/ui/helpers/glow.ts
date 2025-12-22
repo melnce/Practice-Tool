@@ -17,7 +17,7 @@ function earthRiteCostInFanfare(effects: Effect[] | unknown): number {
         for (const e of effs) {
             if (!e || typeof e !== "object") continue;
             if (e.op === "earth_rite") {
-                const c = Math.max(1, Number(e.cost ?? 1) || 1);
+                const c = Math.max(1, Number(e.amount ?? 1) || 1);
                 best = Math.min(best, c);
             }
             if (Array.isArray(e.effects)) best = Math.min(best, scan(e.effects));

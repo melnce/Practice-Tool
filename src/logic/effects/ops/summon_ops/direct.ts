@@ -44,10 +44,7 @@ export function summonNamed(eff: Effect, owner: Player) {
 
         const card = makeCardFromDB(data, owner);
 
-        // Support "keyword": "Rush" and/or "keywords": ["Rush","Ward", ...]
-        if ((eff as any)?.keyword) {
-            applyKeyword(card, (eff as any).keyword);
-        }
+        // STRICT: Only accept keywords array, not singular keyword
         if (Array.isArray(eff?.keywords)) {
             for (const kw of eff.keywords) {
                 if (typeof kw === "string") applyKeyword(card, kw);
