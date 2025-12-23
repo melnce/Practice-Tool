@@ -8,19 +8,19 @@ import { Effect, Player, CardInstance } from "../../../core/types.js";
  * This matches the existing pendingTargetEffect structure.
  */
 export interface PendingTargetRequest {
-    eff: Effect;
-    owner: Player;
-    sourceCard: CardInstance | null;
-    targets: CardInstance[];
-    selectCount: number;
-    pool: CardInstance[];
-    resumeEffects?: Effect[];
-    canTargetLeader?: boolean;
+  eff: Effect;
+  owner: Player;
+  sourceCard: CardInstance | null;
+  targets: CardInstance[];
+  selectCount: number;
+  pool: CardInstance[];
+  resumeEffects?: Effect[];
+  canTargetLeader?: boolean;
 
-    // Allow additional properties for specialized ops
-    [key: string]: any;
+  // Allow additional properties for specialized ops
+  [key: string]: any;
 }
 
 export type PendingTargetResult =
-    | { status: "pending" }
-    | { status: "resolved"; targets: CardInstance[] };
+  | { status: "pending" }
+  | { status: "resolved"; targets: CardInstance[] };

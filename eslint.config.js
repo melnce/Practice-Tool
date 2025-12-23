@@ -25,7 +25,8 @@ export default defineConfig([
       "**/node_modules/**",
       "**/tests/legacy/**",
       "**/tools/**",
-      "**/scripts/**/*.{js,cjs,mjs}"
+      "**/scripts/**",
+      "**/reproduction/**",
     ],
   },
 
@@ -126,7 +127,7 @@ export default defineConfig([
       "no-undef": "off",
       "no-shadow": "off",
       "@typescript-eslint/no-shadow": "off",
-      "import/no-unresolved": "off"
+      "import/no-unresolved": "off",
     },
   },
   {
@@ -148,7 +149,7 @@ export default defineConfig([
       "@typescript-eslint/no-unused-vars": "off",
       "no-unused-vars": "off",
       "no-undef": "off",
-      "no-shadow": "off"
+      "no-shadow": "off",
     },
   },
 ]);

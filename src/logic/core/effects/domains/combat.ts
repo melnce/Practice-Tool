@@ -1,142 +1,93 @@
-
 import { registerOp } from "../registry.js";
 import { enqueueManyFront } from "../queue.js";
-import { handleUnifiedDamage } from "../../../effects/ops/damage/unified.js";
-import {
-    handleDestroy, handleDestroyHighest, destroyAlliedAmulets,
-    handleDestroyAll, handleDestroyRandom, resolveDestroy
-} from "../../../effects/ops/destroy.js";
-import {
-    handleBanishTargeted, handleBanishDuplicatesFromDeck,
-    handleBanishAllEnemyCopies, handleBanishRandom
-} from "../../../effects/ops/banish.js";
-import {
-    handleHealLeader, handleDynamicHealLeader,
-    handleLeaderBarrierOp, handleSetMaxHP, handleSetLeaderMaxDamageCap,
-    handleModifyLeaderDamageReceived
-} from "../../../effects/leader.js";
-import { handleDestroySelf, handleBanishSelf } from "../../../effects/self.js";
+import { handleDamage } from "../../../effects/ops/damage/unified.js";
+import { handleDestroy } from "../../../effects/ops/destroy/index.js";
+import { handleBanish } from "../../../effects/ops/banish/index.js";
+import { handleRestore } from "../../../effects/ops/restore/index.js";
+// Leader ops (handleLeaderBarrierOp, handleSetMaxHP, etc.) are now handled by unified stat/keyword ops
 import { cleanupDead } from "../../cleanup.js";
-import {
-    handleDestroyAlliedAmuletsThenDamage,
-    handleDestroyRandomOtherAllies,
-    handleRestoreFullDefenseSelf,
-    handleRestoreSelfAndHealLeader,
-    handleRestoreAllies
-} from "../../../effects/ops/misc.js";
-
-
 
 export function registerCombatEffects() {
-    // Unified damage handler - the single canonical damage op
-    // All damage effects use "op": "damage" with distribution/amount_source fields
-    registerOp("damage", (eff, ctx) => {
-        const result = handleUnifiedDamage(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context as any);
-        if (result === "pending") return "pending";
+  // Unified damage handler - the single canonical damage op
+  // All damage effects use "op": "damage" with distribution/amount_source fields
+  registerOp("damage", (eff, ctx) => {
+    const result = handleDamage(
+      eff,
+      ctx.owner,
+      ctx.sourceCard,
+      ctx.queue,
+      ctx.context as any,
+    );
+    if (result === "pending") return "pending";
+  });
+
+  // Unified destroy handler - the single canonical destroy op
+  // All destroy effects use "op": "destroy" with distribution/scope fields
+  registerOp("destroy", (eff, ctx) => {
+    const destroyCtx = {
+      ...((ctx.context as object) || {}),
+      sourceCard: ctx.sourceCard,
+      owner: ctx.owner,
+    };
+    const result = handleDestroy(eff, ctx.owner, ctx.queue, destroyCtx);
+    if (result === "pending") return "pending";
+  });
+
+  // Unified banish handler - the single canonical banish op
+  // All banish effects use "op": "banish" with distribution/scope fields
+  registerOp("banish", (eff, ctx) => {
+    const banishCtx = {
+      ...((ctx.context as object) || {}),
+      sourceCard: ctx.sourceCard,
+      owner: ctx.owner,
+    };
+    const result = handleBanish(eff, ctx.owner, ctx.queue, banishCtx);
+    if (result === "pending") return "pending";
+  });
+
+  // Unified restore handler - the single canonical restore/heal op
+  // All restore effects use "op": "restore" with target/amount_source fields
+  registerOp("restore", (eff, ctx) => {
+    const restoreCtx = {
+      ...((ctx.context as object) || {}),
+      sourceCard: ctx.sourceCard,
+      owner: ctx.owner,
+    };
+    handleRestore(eff, ctx.owner, ctx.queue, restoreCtx);
+
+    // Crest processing for leader heal
+    if (eff.target === "leader" || eff.target === "allies" || !eff.target) {
+      void import("../../../effects/crest.js").then(({ processCrestEvent }) => {
+        const targetOwner =
+          (eff.player || "self") === "self"
+            ? ctx.owner
+            : ctx.owner === "blue"
+              ? "red"
+              : "blue";
+        const fx = processCrestEvent(targetOwner, "heal_leader");
+        if (fx.length) enqueueManyFront(ctx, fx);
+      });
+    }
+  });
+
+  registerOp("clash_damage", (eff, ctx) => {
+    const attacker = (ctx.context as any)?.attacker;
+    const defender = (ctx.context as any)?.defender;
+    if (!attacker || !defender || !ctx.sourceCard) return;
+
+    // Opponent is whoever is NOT the source card
+    const opponent = ctx.sourceCard.uid === attacker.uid ? defender : attacker;
+
+    void import("../../barrier.js").then(({ dealDamage }) => {
+      dealDamage(opponent, Number(eff.amount || 0));
+      cleanupDead();
     });
-
-    // Destroy
-    registerOp("destroy", (eff, ctx) => {
-        if (handleDestroy(eff, ctx.owner, ctx.queue, ctx.context as any, ctx.sourceCard) === "pending") return "pending";
-    });
-    registerOp("destroy_all", (eff, ctx) => handleDestroyAll(eff, ctx.owner, ctx.sourceCard, ctx.context as any));
-    registerOp("destroy_highest", (eff, ctx) => handleDestroyHighest(eff, ctx.owner));
-    registerOp("destroy_random", (eff, ctx) => handleDestroyRandom(eff, ctx.owner, ctx.context as any));
-    registerOp("destroy_random_other_allies", (eff, ctx) => handleDestroyRandomOtherAllies(ctx.owner, ctx.sourceCard!, ctx.context as any));
-    registerOp("destroy_allied_amulets", (eff, ctx) => { destroyAlliedAmulets(ctx.owner); });
-    registerOp("destroy_allied_amulets_then_damage", (eff, ctx) => handleDestroyAlliedAmuletsThenDamage(ctx.owner));
-    registerOp("destroy_self", (eff, ctx) => {
-        if (ctx.sourceCard) { handleDestroySelf(ctx.sourceCard); cleanupDead(); }
-    });
-
-    registerOp("destroy_then", (eff, ctx) => {
-        const destroyed = handleDestroy(eff, ctx.owner, [], ctx.context as any, ctx.sourceCard);
-        if (destroyed === "pending") return "pending";
-        if (typeof destroyed === "number" && destroyed > 0) {
-            if (Array.isArray(eff.effects)) enqueueManyFront(ctx, eff.effects!);
-        }
-    });
-
-    registerOp("destroy_defender_if_damaged", (eff, ctx) => {
-        const t = (ctx.context as any)?.defender;
-        if (!t) return;
-        const current = parseInt(t.defense) || 0;
-        const base = Number.isFinite(t.peak_defense) ? t.peak_defense : (Number.isFinite(t.base_defense) ? t.base_defense : current);
-
-        if (current < base) {
-            resolveDestroy(t, ctx.owner);
-            cleanupDead();
-        }
-    });
-
-    registerOp("follower_strike_destroy", (eff, ctx) => {
-        if (ctx.sourceCard && (ctx.context as any)?.defender) {
-            resolveDestroy((ctx.context as any).defender, ctx.owner);
-            cleanupDead();
-        }
-    });
-
-    registerOp("clash_damage", (eff, ctx) => {
-        const attacker = (ctx.context as any)?.attacker;
-        const defender = (ctx.context as any)?.defender;
-        if (!attacker || !defender || !ctx.sourceCard) return;
-
-        // Opponent is whoever is NOT the source card
-        const opponent = ctx.sourceCard.uid === attacker.uid ? defender : attacker;
-
-        void import('../../barrier.js').then(({ dealDamage }) => {
-            dealDamage(opponent, Number(eff.amount || 0));
-            cleanupDead();
-        });
-    });
-
-    // Banish
-    registerOp("banish", (eff, ctx) => {
-        if (handleBanishTargeted(eff, ctx.owner, ctx.queue) === "pending") return "pending";
-    });
-    registerOp("banish_all_enemy_copies", (eff, ctx) => {
-        const target = (ctx.context as any)?.selectedCard || ((ctx.context as any)?.targets?.[0] || null);
-        if (target) handleBanishAllEnemyCopies(ctx.owner, target);
-    });
-    registerOp("banish_duplicates_from_deck", (eff, ctx) => {
-        handleBanishDuplicatesFromDeck(ctx.owner);
-    });
-    registerOp("banish_random", (eff, ctx) => handleBanishRandom(eff, ctx.owner));
-    registerOp("banish_self", (eff, ctx) => {
-        if (ctx.sourceCard) handleBanishSelf(ctx.sourceCard, ctx.owner);
-    });
-
-    // Leaders / Heal
-    registerOp("heal_leader", (eff, ctx) => {
-        handleHealLeader(ctx.owner, eff);
-        // logs handled in implementation sometimes?
-        void import("../../../../core/logger.js").then(({ logEvent }) => {
-            logEvent("healLeader", { owner: ctx.owner, amount: eff.amount });
-        });
-
-        // Crest processing
-        void import("../../../effects/crest.js").then(({ processCrestEvent }) => {
-            const targetOwner = (eff.player || "self") === "self" ? ctx.owner : (ctx.owner === "blue" ? "red" : "blue");
-            const fx = processCrestEvent(targetOwner, "heal_leader");
-            if (fx.length) enqueueManyFront(ctx, fx);
-        });
-    });
-
-    registerOp("dynamic_heal_leader", (eff, ctx) => {
-        handleDynamicHealLeader(ctx.owner, eff);
-        void import("../../../../core/logger.js").then(({ logEvent }) => logEvent("healLeader", { owner: ctx.owner, amount: eff.amount }));
-    });
-
-    registerOp("set_max_hp", (eff, ctx) => handleSetMaxHP(eff, ctx.owner));
-    registerOp("set_leader_max_damage_cap", (eff, ctx) => handleSetLeaderMaxDamageCap(eff, ctx.owner));
-    registerOp("leader_barrier", (eff, ctx) => handleLeaderBarrierOp(ctx.owner, eff));
-    registerOp("modify_leader_damage_received", (eff, ctx) => handleModifyLeaderDamageReceived(eff, ctx.owner));
-    registerOp("add_leader_damage_taken_bonus", (eff, ctx) => handleModifyLeaderDamageReceived(eff, ctx.owner));
-
-    registerOp("restore_full_defense_self", (eff, ctx) => handleRestoreFullDefenseSelf(ctx.sourceCard!, ctx.context as any));
-    registerOp("restore_self_and_heal_leader", (eff, ctx) => handleRestoreSelfAndHealLeader(ctx.owner, ctx.sourceCard!));
-    registerOp("restore_allies", (eff, ctx) => handleRestoreAllies(ctx.owner, eff));
-
+  });
+  // ========================================================================
+  // LEADER STATE EFFECTS - Now handled by unified ops with target: ally:leader / enemy:leader
+  // - stat op: set defense (max HP)
+  // - keyword op: Barrier, MaxDamageCap, Vulnerable
+  // ========================================================================
 }
 
 import { COMBAT_OPS } from "./combatOps.js";

@@ -15,28 +15,39 @@ import { initAmulet } from "../../effects/ops/summon_ops/init.js";
 /**
  * Play an amulet card. Returns PlayOutcome without rendering.
  */
-export function playAmulet(card: CardInstance, player: Player, chosenTier: { effects: Effect[] } | null): PlayOutcome {
-    pushPlayedHistory(player, card);
-    initAmulet(card);
-    applyKeywordsFromList(card);
+export function playAmulet(
+  card: CardInstance,
+  player: Player,
+  chosenTier: { effects: Effect[] } | null,
+): PlayOutcome {
+  pushPlayedHistory(player, card);
+  initAmulet(card);
+  applyKeywordsFromList(card);
 
-    const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
-    toBoard.push(card);
+  const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
+  toBoard.push(card);
 
-    mergeWitchsNewBrewOnPlay(card, player);
+  mergeWitchsNewBrewOnPlay(card, player);
 
-    if (chosenTier && Array.isArray(chosenTier.effects) && chosenTier.effects.length) {
-        runEffects([...chosenTier.effects], player, card);
+  if (
+    chosenTier &&
+    Array.isArray(chosenTier.effects) &&
+    chosenTier.effects.length
+  ) {
+    runEffects([...chosenTier.effects], player, card);
+  }
+
+  if (Array.isArray(card.fanfare) && card.fanfare.length) {
+    if (state.lastSummoned) {
+      state.lastSummoned.length = 0;
+      state.lastSummoned.push(card);
     }
+    runEffects([...card.fanfare], player, card, { enteringCard: card });
+  }
 
-    if (Array.isArray(card.fanfare) && card.fanfare.length) {
-        if (state.lastSummoned) { state.lastSummoned.length = 0; state.lastSummoned.push(card); }
-        runEffects([...card.fanfare], player, card, { enteringCard: card });
-    }
+  if (state.pendingTargetEffect) {
+    return { kind: "paused" };
+  }
 
-    if (state.pendingTargetEffect) {
-        return { kind: "paused" };
-    }
-
-    return { kind: "done" };
+  return { kind: "done" };
 }

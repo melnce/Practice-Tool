@@ -1,133 +1,66 @@
-
 import { registerOp } from "../registry.js";
-import { state } from "../../../../core/gameState.js";
-import { logEvent } from "../../../../core/logger.js";
-import {
-    summonNamed, summonRandomFromDeck, handleSelectHandSummonArtifactCopiesEOT,
-    handleSelectHandSummonArtifactCopy, summonExactCopy,
-    handleSummonDestroyedAmuletHighestBaseCost, summonFromHand,
-    handleFillCongregantCopies
-} from "../../../effects/ops/summon.js";
-import { handleReturnToHand } from "../../../effects/ops/bounce.js";
-import { handleReturnHandToDeck } from "../../../effects/ops/returnHandToDeck.js";
-import { handleReanimate } from "../../../effects/ops/reanimate.js";
-import { transformTarget } from "../../../effects/ops/transform.js";
-import { getPool } from "../../targeting.js"; // Targeting in core
-import { getTargetingContext } from "../context.js";
-
-const doLog = (event: string, payload: any) => logEvent(event, payload);
+import { handleSummon } from "../../../effects/ops/summon/index.js";
+import { handleReturn } from "../../../effects/ops/return/unified.js";
+import { handleAmulet } from "../../../effects/ops/amulet/unified.js";
+import { handleTransform } from "../../../effects/ops/transform.js";
 
 export function registerBoardEffects() {
+  // ========================================================================
+  // UNIFIED SUMMON - single entry point for all summon variants
+  // ========================================================================
+  registerOp("summon", (eff, ctx) => {
+    const summonCtx = {
+      owner: ctx.owner,
+      sourceCard: ctx.sourceCard,
+      targets: (ctx.context as any)?.targets || [],
+      ...((ctx.context as object) || {}),
+    };
+    handleSummon(eff, ctx.owner, ctx.queue, summonCtx);
+  });
 
-    // Summon
-    registerOp("summon", (eff, ctx) => {
-        const tCtx = getTargetingContext(ctx);
-        const target = (tCtx as any).selectedCard || (tCtx.targets && tCtx.targets[0]);
-        const hand = ctx.owner === "blue" ? state.blueHand : state.redHand;
-        if (target && hand.includes(target)) {
-            summonFromHand(target, ctx.owner);
-        } else {
-            console.warn("op: summon called but no valid hand target found in context.");
-        }
+  // ========================================================================
+  // SPECIALIZED OPS - Now routed through unified summon handler
+  // Legacy ops (fill_board_chain_decay, select_hand_summon_artifact_copy,
+  // select_hand_summon_artifact_copies_eot_destroy, summon_destroyed_amulet_highest_base_cost)
+  // are now handled by unified summon with source/mode fields.
+  // ========================================================================
+
+  // ========================================================================
+  // RETURN / BOUNCE / TRANSFORM
+  // ========================================================================
+
+  // ==========================================================================
+  // UNIFIED RETURN - replaces return_to_hand, bounce, return_hand_to_deck
+  // ==========================================================================
+  registerOp("return", (eff, ctx) => {
+    const result = handleReturn(eff as any, {
+      owner: ctx.owner,
+      source: ctx.sourceCard,
+      queue: ctx.queue,
+      context: ctx.context,
     });
+    if (result === "pending") return "pending";
+  });
 
-    registerOp("summon_exact_copy", (eff, ctx) => {
-        if (eff.target === "self" && ctx.sourceCard && ctx.sourceCard.type === "Follower") {
-            summonExactCopy(ctx.sourceCard, ctx.owner);
-            doLog("summon", { owner: ctx.owner, name: ctx.sourceCard.name });
-            return;
-        }
-
-        const targets = ((ctx.context as any)?.targets && (ctx.context as any).targets.length)
-            ? (ctx.context as any).targets
-            : getPool(eff.target || "", ctx.owner, ctx.sourceCard, eff.condition, ctx.context as any);
-
-        const times = Math.max(1, eff.count || 1);
-        for (const t of targets) {
-            if (t?.type !== "Follower") continue;
-            for (let i = 0; i < times; i++) {
-                summonExactCopy(t, ctx.owner);
-                doLog("summon", { owner: ctx.owner, name: t.name });
-            }
-        }
+  // ==========================================================================
+  // UNIFIED TRANSFORM - replaces transform, transform_in_hand, transform_random_spell_in_hand, spellboost_transform
+  // zone: "board" (default) = transform selected/targeted card on board
+  // zone: "hand" = transform cards in hand (mode: filter | random_spell)
+  // zone: "self" = transform the source card itself
+  // ==========================================================================
+  registerOp("transform", (eff, ctx) => {
+    handleTransform(eff as any, ctx.owner, {
+      sourceCard: ctx.sourceCard,
+      context: ctx.context,
     });
+  });
 
-    registerOp("summon_named", (eff, ctx) => {
-        summonNamed(eff, ctx.owner);
-        doLog("summon", { owner: ctx.owner, name: eff.name });
-    });
-    registerOp("summon_named_enemy", (eff, ctx) => {
-        const foe = ctx.owner === "blue" ? "red" : "blue";
-        summonNamed({ op: "summon_named", name: eff.name, count: eff.count || 1 } as any, foe);
-        doLog("summon", { owner: foe, name: eff.name });
-    });
-
-    // Summon random from deck
-    registerOp("summon_random_from_deck", (eff, ctx) => {
-        summonRandomFromDeck(eff, ctx.owner);
-    });
-
-    registerOp("summon_destroyed_amulet_highest_base_cost", (eff, ctx) => {
-        handleSummonDestroyedAmuletHighestBaseCost(ctx.owner);
-    });
-
-    registerOp("fill_congregant_copies", (eff, ctx) => {
-        handleFillCongregantCopies(ctx.owner, ctx.sourceCard);
-    });
-
-    registerOp("congregant_fill_board", (eff, ctx) => {
-        handleFillCongregantCopies(ctx.owner, ctx.sourceCard);
-    });
-
-    registerOp("fill_board_chain_decay", (eff, ctx) => {
-        // Placeholder - uses summonNamed with decay pattern
-        const name = eff.name || "";
-        const count = eff.count || 1;
-        for (let i = 0; i < count; i++) {
-            summonNamed({ op: "summon_named", name, count: 1 } as any, ctx.owner);
-        }
-    });
-
-    registerOp("select_hand_summon_artifact_copy", (eff, ctx) => {
-        handleSelectHandSummonArtifactCopy(eff, ctx.owner, ctx.sourceCard);
-    });
-
-    registerOp("select_hand_summon_artifact_copies_eot_destroy", (eff, ctx) => {
-        handleSelectHandSummonArtifactCopiesEOT(eff, ctx.owner, ctx.sourceCard);
-    });
-
-    // Reanimate
-    registerOp("reanimate", (eff, ctx) => {
-        handleReanimate(eff, ctx.owner);
-    });
-
-    // Return to hand / bounce
-    registerOp("return_to_hand", (eff, ctx) => {
-        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context);
-    });
-
-    registerOp("bounce", (eff, ctx) => {
-        handleReturnToHand(eff, ctx.owner, ctx.sourceCard, ctx.queue, ctx.context);
-    });
-
-    registerOp("return_hand_to_deck", (eff, ctx) => {
-        handleReturnHandToDeck(eff, ctx.owner, ctx.queue);
-    });
-
-    // Transform
-    registerOp("transform", (eff, ctx) => {
-        const into = String(eff.into || eff.name || "").trim();
-        const t = (ctx.context && ((ctx.context as any).selectedCard || (ctx.context as any).targetCard || (ctx.context as any).targets?.[0])) || null;
-        if (!into) return;
-        if (t) {
-            transformTarget(t, into);
-        } else if (ctx.sourceCard && eff.target === "self") {
-            transformTarget(ctx.sourceCard, into);
-        } else {
-            console.warn("transform: no target in context; use via select{...}");
-        }
-    });
-
+  // ==========================================================================
+  // UNIFIED AMULET - handles amulet countdown (instance-based targeting)
+  // ==========================================================================
+  registerOp("amulet", (eff, ctx) => {
+    handleAmulet(eff as any, { owner: ctx.owner, source: ctx.sourceCard });
+  });
 }
 
 import { BOARD_OPS } from "./boardOps.js";

@@ -15,91 +15,143 @@ import { CardInstance } from "../core/types.js";
 import { StartGameOptions } from "../core/types.js";
 
 function resetEvoButtons() {
-    ["blueNormalEvo", "blueSuperEvo", "redNormalEvo", "redSuperEvo"].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.removeAttribute("disabled");
-        el.classList.remove("used", "spent", "disabled");
-        el.draggable = true;
-    });
+  ["blueNormalEvo", "blueSuperEvo", "redNormalEvo", "redSuperEvo"].forEach(
+    (id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.removeAttribute("disabled");
+      el.classList.remove("used", "spent", "disabled");
+      el.draggable = true;
+    },
+  );
 }
 
 export async function startGame(options: StartGameOptions) {
-    const blueChoice = options.deckAId;
-    const redChoice = options.deckBId;
+  const blueChoice = options.deckAId;
+  const redChoice = options.deckBId;
 
-    let finalSeed: number | string;
-    if (options.seed !== undefined && options.seed !== null) {
-        finalSeed = options.seed;
-        console.log(`[RNG] Using provided seed: ${options.seed}`);
-    } else {
-        const autoSeed = Date.now() >>> 0;
-        finalSeed = autoSeed;
-        console.log(`[RNG] Using auto seed: ${autoSeed}`);
-    }
+  let finalSeed: number | string;
+  if (options.seed !== undefined && options.seed !== null) {
+    finalSeed = options.seed;
+    console.log(`[RNG] Using provided seed: ${options.seed}`);
+  } else {
+    const autoSeed = Date.now() >>> 0;
+    finalSeed = autoSeed;
+    console.log(`[RNG] Using auto seed: ${autoSeed}`);
+  }
 
-    logEvent("gameStart", { blueDeck: blueChoice, redDeck: redChoice, seed: finalSeed });
-    resetGameState(finalSeed);
-    state.blueAnyAllyAttackedThisTurn = false;
-    state.redAnyAllyAttackedThisTurn = false;
-    await loadCardDatabase();
-    await import("../core/card_validation.js").then(({ validateCardDatabase }) => validateCardDatabase());
-    await Promise.all([loadBlueDeck(blueChoice), loadRedDeck(redChoice)]);
+  logEvent("gameStart", {
+    blueDeck: blueChoice,
+    redDeck: redChoice,
+    seed: finalSeed,
+  });
+  resetGameState(finalSeed);
+  state.blueAnyAllyAttackedThisTurn = false;
+  state.redAnyAllyAttackedThisTurn = false;
+  await loadCardDatabase();
+  await import("../core/card_validation.js").then(({ validateCardDatabase }) =>
+    validateCardDatabase(),
+  );
+  await Promise.all([loadBlueDeck(blueChoice), loadRedDeck(redChoice)]);
 
-    // === Faith crest bootstrap: if Sham-Nacha is in a deck, that player starts with Faith ===
-    const hasSham = (deck: CardInstance[], hand: CardInstance[]) => {
-        const check = (arr: CardInstance[]) => (arr || []).some(c => String(c?.name).toLowerCase() === "sham-nacha, heir to entwining");
-        return check(deck) || check(hand);
-    };
+  // === Faith crest bootstrap: if Sham-Nacha is in a deck, that player starts with Faith ===
+  const hasSham = (deck: CardInstance[], hand: CardInstance[]) => {
+    const check = (arr: CardInstance[]) =>
+      (arr || []).some(
+        (c) =>
+          String(c?.name).toLowerCase() === "sham-nacha, heir to entwining",
+      );
+    return check(deck) || check(hand);
+  };
 
-    if (hasSham(state.blueDeck, state.blueHand)) {
-        runEffects([{
-            op: "gain_crest",
-            name: "Faith: Sham-Nacha, Heir to Entwining",
-            image: "images/crests/faith.png",
-            description: "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
-            triggers: [{
-                event: "select_mode",
-                condition: { "own_turn": true },
-                effects: [{ op: "crest_add_counter", crest: "Faith: Sham-Nacha, Heir to Entwining", counter: "faith", amount: 1 }]
-            }]
-        }], "blue", null, { targets: [] });
-    }
+  if (hasSham(state.blueDeck, state.blueHand)) {
+    runEffects(
+      [
+        {
+          op: "crest",
+          action: "gain",
+          name: "Faith: Sham-Nacha, Heir to Entwining",
+          image: "images/crests/faith.png",
+          description:
+            "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
+          triggers: [
+            {
+              event: "select_mode",
+              condition: { own_turn: true },
+              effects: [
+                {
+                  op: "crest",
+                  action: "add_counter",
+                  crest: "Faith: Sham-Nacha, Heir to Entwining",
+                  counter: "faith",
+                  amount: 1,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "blue",
+      null,
+      { targets: [] },
+    );
+  }
 
-    if (hasSham(state.redDeck, state.redHand)) {
-        runEffects([{
-            op: "gain_crest",
-            name: "Faith: Sham-Nacha, Heir to Entwining",
-            image: "images/crests/faith.png",
-            description: "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
-            triggers: [{
-                event: "select_mode",
-                condition: { "own_turn": true },
-                effects: [{ op: "crest_add_counter", crest: "Faith: Sham-Nacha, Heir to Entwining", counter: "faith", amount: 1 }]
-            }]
-        }], "red", null, { targets: [] });
-    }
+  if (hasSham(state.redDeck, state.redHand)) {
+    runEffects(
+      [
+        {
+          op: "crest",
+          action: "gain",
+          name: "Faith: Sham-Nacha, Heir to Entwining",
+          image: "images/crests/faith.png",
+          description:
+            "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
+          triggers: [
+            {
+              event: "select_mode",
+              condition: { own_turn: true },
+              effects: [
+                {
+                  op: "crest",
+                  action: "add_counter",
+                  crest: "Faith: Sham-Nacha, Heir to Entwining",
+                  counter: "faith",
+                  amount: 1,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "red",
+      null,
+      { targets: [] },
+    );
+  }
 
-    // Reset red boost button (DOM)
-    const redBoost = document.getElementById("redBoost");
-    redBoost?.classList.remove("used");
-    if (redBoost) { redBoost.removeAttribute("disabled"); (redBoost as HTMLElement).style.backgroundColor = "orange"; }
+  // Reset red boost button (DOM)
+  const redBoost = document.getElementById("redBoost");
+  redBoost?.classList.remove("used");
+  if (redBoost) {
+    redBoost.removeAttribute("disabled");
+    (redBoost as HTMLElement).style.backgroundColor = "orange";
+  }
 
-    // ✅ evolve charges & turn locks
-    state.blueEvoCharges = 2;
-    state.blueSuperEvoCharges = 2;
-    state.redEvoCharges = 2;
-    state.redSuperEvoCharges = 2;
+  // ✅ evolve charges & turn locks
+  state.blueEvoCharges = 2;
+  state.blueSuperEvoCharges = 2;
+  state.redEvoCharges = 2;
+  state.redSuperEvoCharges = 2;
 
-    state.blueEvoUsedThisTurn = false;
-    state.redEvoUsedThisTurn = false;
+  state.blueEvoUsedThisTurn = false;
+  state.redEvoUsedThisTurn = false;
 
+  state.gameStarted = true;
+  adapter.render(); // show opening hands
 
-    state.gameStarted = true;
-    adapter.render();          // show opening hands
+  resetEvoButtons(); // ✅ reset evo UI
 
-    resetEvoButtons();                  // ✅ reset evo UI
-
-    // Enter mulligan phase (pauses before turn 1)
-    beginMulligan();
+  // Enter mulligan phase (pauses before turn 1)
+  beginMulligan();
 }

@@ -113,7 +113,7 @@ describe("Mechanics Tests", () => {
             // Since we use real DB via fetch mock, we should pick a real card name.
             // "Fairy" is safe.
 
-            summonNamed({ op: "summon_named", name: "Fairy", count: 1 } as any, owner);
+            summonNamed({ op: "summon", name: "Fairy", count: 1 } as any, owner);
             expect(state.blueBoard.length).toBe(1);
             const unit = state.blueBoard[0];
             expect(unit.name).toBe("Fairy");

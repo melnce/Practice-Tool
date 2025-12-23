@@ -2,7 +2,11 @@
 export { playCard } from "./core/playCard/index.js";
 export { useRedBoost } from "./boosts.js";
 export { endTurnBlue, endTurnRed } from "./core/turns.js";
-export { attackFollower, attackLeader, handleDropOnLeader } from "./core/combat.js";
+export {
+  attackFollower,
+  attackLeader,
+  handleDropOnLeader,
+} from "./core/combat.js";
 export { grantBarrier, dealDamage } from "./core/barrier.js";
 export { startGame } from "./startGame.js";
 export { onEvolve } from "./evolveUtils.js";
@@ -16,7 +20,10 @@ export { getCardDetails } from "../data/cardDatabase.js";
 // Expose to window
 
 import { startGame as _startGame } from "./startGame.js";
-import { endTurnBlue as _endTurnBlue, endTurnRed as _endTurnRed } from "./core/turns.js";
+import {
+  endTurnBlue as _endTurnBlue,
+  endTurnRed as _endTurnRed,
+} from "./core/turns.js";
 import { useRedBoost as _useRedBoost } from "./boosts.js";
 import "../data/cardDatabase.js";
 import { summonNamed as _summonNamed } from "./effects/ops/summon.js";
@@ -25,10 +32,17 @@ import { state } from "../core/gameState.js";
 import { Player } from "../core/types.js";
 
 export function startFuseFromHand(owner: Player, initiatorUid: string) {
-    runEffects([{
-        op: "start_fuse_from_card",
-        initiator_uid: initiatorUid
-    }], owner, null); // sourceCard null?
+  runEffects(
+    [
+      {
+        op: "fuse",
+        action: "start",
+        initiator_uid: initiatorUid,
+      } as any,
+    ],
+    owner,
+    null,
+  ); // sourceCard null?
 }
 
 (window as any).startGame = _startGame;

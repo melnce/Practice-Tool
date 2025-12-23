@@ -2,99 +2,117 @@
 import { CardViewModel, ZoneContext } from "./types.js";
 import { GameState } from "../../core/types.js";
 import * as actions from "./actions.js";
-import { enableCardDragFromHand, enableCardEvoDrop, enableAttackerDrag, enableEnemyFollowerDrop } from "../drag.js";
+import {
+  enableCardDragFromHand,
+  enableCardEvoDrop,
+  enableAttackerDrag,
+  enableEnemyFollowerDrop,
+} from "../drag.js";
 
 export function attachHandlers(
-    div: HTMLElement,
-    vm: CardViewModel,
-    ctx: ZoneContext,
-    state: GameState,
-    rerender: () => void,
-    onPlayClick?: (i: number) => void
+  div: HTMLElement,
+  vm: CardViewModel,
+  ctx: ZoneContext,
+  state: GameState,
+  rerender: () => void,
+  onPlayClick?: (i: number) => void,
 ): void {
-    const { card, idx } = vm;
+  const { card, idx } = vm;
 
-    // 1. Mulligan Interactions
-    if (ctx.isMulligan) {
-        if (vm.isSelectable) {
-            div.addEventListener("click", (e) => {
-                e.stopPropagation();
-                const owner = ctx.isBlueHand ? "blue" : "red";
-                actions.handleMulliganToggle(owner, card.uid);
-            });
-            div.oncontextmenu = (e) => e.preventDefault();
-        }
-        return;
+  // 1. Mulligan Interactions
+  if (ctx.isMulligan) {
+    if (vm.isSelectable) {
+      div.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const owner = ctx.isBlueHand ? "blue" : "red";
+        actions.handleMulliganToggle(owner, card.uid);
+      });
+      div.oncontextmenu = (e) => e.preventDefault();
+    }
+    return;
+  }
+
+  // 2. Target Selection (Resolving pending target) - includes toggle for already-selected
+  if ((vm.isSelectable || vm.isSelected) && !ctx.isMulligan) {
+    div.addEventListener("click", (e) => {
+      e.stopPropagation();
+      actions.handleResolveTarget(card.uid);
+    });
+    // Dont return, might need drag if implemented for selectable cards?
+    // usually selection locks other interactions but lets keep consistent with orig file
+  }
+
+  // 3. Hand Interactions (Play, Fuse)
+  if (ctx.isHand) {
+    // Right-click to play (via callback from renderZone)
+    if (onPlayClick) {
+      div.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        onPlayClick(idx);
+      });
     }
 
-    // 2. Target Selection (Resolving pending target) - includes toggle for already-selected
-    if ((vm.isSelectable || vm.isSelected) && !ctx.isMulligan) {
-        div.addEventListener("click", (e) => {
-            e.stopPropagation();
-            actions.handleResolveTarget(card.uid);
-        });
-        // Dont return, might need drag if implemented for selectable cards? 
-        // usually selection locks other interactions but lets keep consistent with orig file
+    // Left-click for Fuse
+    div.addEventListener("click", (e) => {
+      if (vm.isSelectable || vm.isSelected) return; // handled above
+
+      // Check turn
+      const isPlayersTurn = ctx.isMyHand; // calculated in selector
+      if (!isPlayersTurn) return;
+
+      const hasFuseRecipes =
+        Array.isArray(card.fuse_recipes) && card.fuse_recipes.length > 0;
+      const hasFortifierFuse =
+        Array.isArray(card.fuse) &&
+        card.fuse.some((op) => op?.op === "fuse" && op?.type === "fortifier");
+
+      if (hasFuseRecipes || hasFortifierFuse) {
+        e.stopPropagation();
+        actions.handleFuse(ctx.owner, card.uid, !!hasFuseRecipes, card);
+      }
+    });
+
+    // Drag
+    enableCardDragFromHand(div, card, ctx.containerId);
+  }
+
+  // 4. Board Interactions
+  if (ctx.isBoard) {
+    // Evo Drop
+    if (vm.card.type === "Follower") {
+      enableCardEvoDrop(div, ctx.containerId, card, state, rerender);
     }
 
-    // 3. Hand Interactions (Play, Fuse)
-    if (ctx.isHand) {
-        // Right-click to play (via callback from renderZone)
-        if (onPlayClick) {
-            div.addEventListener("contextmenu", (e) => {
-                e.preventDefault();
-                onPlayClick(idx);
-            });
-        }
-
-        // Left-click for Fuse
-        div.addEventListener("click", (e) => {
-            if (vm.isSelectable || vm.isSelected) return; // handled above
-
-            // Check turn
-            const isPlayersTurn = ctx.isMyHand; // calculated in selector
-            if (!isPlayersTurn) return;
-
-            const hasFuseRecipes = Array.isArray(card.fuse_recipes) && card.fuse_recipes.length > 0;
-            const hasFortifierFuse = Array.isArray(card.fuse) && card.fuse.some(op => op?.op === "start_fortifier_fuse");
-
-            if (hasFuseRecipes || hasFortifierFuse) {
-                e.stopPropagation();
-                actions.handleFuse(ctx.owner, card.uid, !!hasFuseRecipes, card);
-            }
-        });
-
-        // Drag
-        enableCardDragFromHand(div, card, ctx.containerId);
+    // Combat Drag / Drop
+    if (vm.card.type === "Follower") {
+      if (ctx.isMyBoard && vm.canAttack) {
+        // enableAttackerDrag expects 'blue'/'red' string
+        enableAttackerDrag(div, ctx.owner, idx);
+      }
+      if (!ctx.isMyBoard) {
+        // enemy drop target
+        // enableEnemyFollowerDrop expects isRedBoard boolean
+        enableEnemyFollowerDrop(
+          div,
+          null,
+          idx,
+          state,
+          ctx.containerId === "redBoard",
+        );
+      }
     }
 
-    // 4. Board Interactions
-    if (ctx.isBoard) {
-        // Evo Drop
-        if (vm.card.type === "Follower") {
-            enableCardEvoDrop(div, ctx.containerId, card, state, rerender);
-        }
-
-        // Combat Drag / Drop
-        if (vm.card.type === "Follower") {
-            if (ctx.isMyBoard && vm.canAttack) {
-                // enableAttackerDrag expects 'blue'/'red' string
-                enableAttackerDrag(div, ctx.owner, idx);
-            }
-            if (!ctx.isMyBoard) {
-                // enemy drop target
-                // enableEnemyFollowerDrop expects isRedBoard boolean
-                enableEnemyFollowerDrop(div, null, idx, state, ctx.containerId === "redBoard");
-            }
-        }
-
-        // Engage
-        if (vm.canEngage) {
-            div.addEventListener("contextmenu", (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                actions.handleEngage(ctx.owner, idx);
-            }, { once: true });
-        }
+    // Engage
+    if (vm.canEngage) {
+      div.addEventListener(
+        "contextmenu",
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          actions.handleEngage(ctx.owner, idx);
+        },
+        { once: true },
+      );
     }
+  }
 }

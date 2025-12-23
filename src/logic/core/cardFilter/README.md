@@ -7,22 +7,22 @@ Used by `draw.ts` (tutor effects) and potentially other search/filter effects.
 
 ## 1. Module Responsibilities
 
-| File | Type | Responsibility |
-|------|------|----------------|
-| `types.ts` | **Types** | `CardFilterSpec`, `NormalizedCardFilter`, `CardPredicate`. |
-| `normalize.ts` | **Normalizer** | Converts raw specs into normalized format. Handles aliases. Pure. |
-| `predicates.ts` | **Builder** | Builds a predicate function from normalized filter. Pure. |
-| `index.ts` | **Barrel** | Re-exports for external consumers. |
+| File            | Type           | Responsibility                                                    |
+| --------------- | -------------- | ----------------------------------------------------------------- |
+| `types.ts`      | **Types**      | `CardFilterSpec`, `NormalizedCardFilter`, `CardPredicate`.        |
+| `normalize.ts`  | **Normalizer** | Converts raw specs into normalized format. Handles aliases. Pure. |
+| `predicates.ts` | **Builder**    | Builds a predicate function from normalized filter. Pure.         |
+| `index.ts`      | **Barrel**     | Re-exports for external consumers.                                |
 
 ## 2. Supported Filter Keys
 
-| Key | Description |
-|-----|-------------|
-| `type` | Card type (e.g., `follower`, `spell`, `amulet`). |
-| `class` | Card class (e.g., `forestcraft`, `swordcraft`). |
-| `cost_eq`, `cost_lte`, `cost_gte` | Cost comparisons. |
-| `attack_eq`, `attack_lte`, `attack_gte` | Attack stat comparisons. |
-| `defense_eq`, `defense_lte`, `defense_gte` | Defense stat comparisons. |
+| Key                                           | Description                                            |
+| --------------------------------------------- | ------------------------------------------------------ |
+| `type`                                        | Card type (e.g., `follower`, `spell`, `amulet`).       |
+| `class`                                       | Card class (e.g., `forestcraft`, `swordcraft`).        |
+| `cost_eq`, `cost_lte`, `cost_gte`             | Cost comparisons.                                      |
+| `attack_eq`, `attack_lte`, `attack_gte`       | Attack stat comparisons.                               |
+| `defense_eq`, `defense_lte`, `defense_gte`    | Defense stat comparisons.                              |
 | `tribe` / `tribes` / `tribe_in` / `tribes_in` | Tribe membership (OR logic: matches ANY listed tribe). |
 
 ## 3. Semantics (MUST NOT CHANGE)
@@ -40,9 +40,9 @@ Used by `draw.ts` (tutor effects) and potentially other search/filter effects.
 
 ## 5. Extension Rules
 
-| Goal | Action |
-|------|--------|
-| **New filter key** | Update `types.ts` (add to spec), `normalize.ts` (parse it), `predicates.ts` (apply it). |
-| **New alias for existing key** | Update `normalize.ts` only. |
+| Goal                           | Action                                                                                  |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| **New filter key**             | Update `types.ts` (add to spec), `normalize.ts` (parse it), `predicates.ts` (apply it). |
+| **New alias for existing key** | Update `normalize.ts` only.                                                             |
 
 **DO NOT** add filtering logic into `draw.ts` or other ops.

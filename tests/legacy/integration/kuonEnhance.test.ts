@@ -47,9 +47,9 @@ describe("Kuon Enhance Effect", () => {
     it("should summon Shikigami via fanfare effect", () => {
         // Simulate running fanfare effects
         const fanfareEffects = [
-            { op: "summon_named", name: "Celestial Shikigami", count: 1 },
-            { op: "summon_named", name: "Demonic Shikigami", count: 1 },
-            { op: "summon_named", name: "Paper Shikigami", count: 1 }
+            { op: "summon", name: "Celestial Shikigami", count: 1 },
+            { op: "summon", name: "Demonic Shikigami", count: 1 },
+            { op: "summon", name: "Paper Shikigami", count: 1 }
         ];
 
         runEffects(fanfareEffects as any, "blue", null);
@@ -71,9 +71,9 @@ describe("Kuon Enhance Effect", () => {
     it("should destroy Shikigami via destroy_all with tribe condition", () => {
         // First summon the Shikigami
         const fanfareEffects = [
-            { op: "summon_named", name: "Celestial Shikigami", count: 1 },
-            { op: "summon_named", name: "Demonic Shikigami", count: 1 },
-            { op: "summon_named", name: "Paper Shikigami", count: 1 }
+            { op: "summon", name: "Celestial Shikigami", count: 1 },
+            { op: "summon", name: "Demonic Shikigami", count: 1 },
+            { op: "summon", name: "Paper Shikigami", count: 1 }
         ];
 
         runEffects(fanfareEffects as any, "blue", null);
@@ -102,9 +102,9 @@ describe("Kuon Enhance Effect", () => {
         // Simulate the full Kuon enhance(10) sequence manually to verify Ops
         // 1. Fanfare summons 3 Shikigami
         const fanfareEffects = [
-            { op: "summon_named", name: "Celestial Shikigami", count: 1 },
-            { op: "summon_named", name: "Demonic Shikigami", count: 1 },
-            { op: "summon_named", name: "Paper Shikigami", count: 1 }
+            { op: "summon", name: "Celestial Shikigami", count: 1 },
+            { op: "summon", name: "Demonic Shikigami", count: 1 },
+            { op: "summon", name: "Paper Shikigami", count: 1 }
         ];
         runEffects(fanfareEffects as any, "blue", null);
 
@@ -119,7 +119,7 @@ describe("Kuon Enhance Effect", () => {
                 condition: { tribe: "Shikigami" }
             },
             {
-                op: "summon_named",
+                op: "summon",
                 name: "Noble Shikigami",
                 count: 1
             }

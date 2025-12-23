@@ -22,7 +22,7 @@ describe("Corruption (10453310)", () => {
         expect(card.spell).toHaveLength(4);
 
         // 1. Debuff
-        expect(card.spell[0].op).toBe("buff");
+        expect(card.spell[0].op).toBe("stat");
         expect(card.spell[0].target).toBe("all:follower");
         expect(card.spell[0].attack).toBe(-2);
         expect(card.spell[0].defense).toBe(-2);
@@ -40,7 +40,7 @@ describe("Corruption (10453310)", () => {
 
         // 4. SSA Destroy Crest
         const ssa = card.spell[3];
-        expect(ssa.op).toBe("super_skybound_art_gate");
+        expect(ssa.op).toBe("gate");
         expect(ssa.requirement).toBe(10);
         expect(ssa.effects[0].op).toBe("destroy_crest");
         expect(ssa.effects[0].name).toBe("Crest: Corruption");

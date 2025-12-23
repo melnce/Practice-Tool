@@ -1,5 +1,5 @@
 import { state } from "../../core/gameState.js";
-import { CardInstance, Player } from "../../core/types.js";
+import { Player } from "../../core/types.js";
 import { TriggerContext, TriggerEventName } from "./triggers/types.js";
 import { dispatchEvent } from "./triggers/dispatcher.js";
 import { registerRunEffectsInProcess } from "./triggers/process.js";
@@ -29,46 +29,52 @@ export type { TriggerContext } from "./triggers/types.js";
 // --------------------------------
 
 export function registerRunEffects(fn: any) {
-    registerRunEffectsInProcess(fn);
+  registerRunEffectsInProcess(fn);
 }
 
 // --- Main Entry Point ---
 
-export function fireTrigger(eventName: TriggerEventName, activePlayer: Player, context: TriggerContext = {}) {
-    const _turnToken =
-        Number.isFinite(state.turnNumber) ? state.turnNumber
-            : ((state.roundCount || 0) * 2 + (state.isBlueTurn ? 0 : 1));
+export function fireTrigger(
+  eventName: TriggerEventName,
+  activePlayer: Player,
+  context: TriggerContext = {},
+) {
+  const _turnToken = Number.isFinite(state.turnNumber)
+    ? state.turnNumber
+    : (state.roundCount || 0) * 2 + (state.isBlueTurn ? 0 : 1);
 
-    // Enhance context with turn info for internal modules
-    // Using a non-enumerable or specific prop to pass this down
-    context._turnNumber = _turnToken;
+  // Enhance context with turn info for internal modules
+  // Using a non-enumerable or specific prop to pass this down
+  context._turnNumber = _turnToken;
 
-    // 1. Loot Fused Dedupe
-    if (eventName === "loot_fused" && context?.initiator) {
-        if (handleLootFusedDedupe(context.initiator, _turnToken)) {
-            return;
-        }
+  // 1. Loot Fused Dedupe
+  if (eventName === "loot_fused" && context?.initiator) {
+    if (handleLootFusedDedupe(context.initiator, _turnToken)) {
+      return;
     }
+  }
 
-    // 2. Entering Owner Calc
-    // Derived once here to save re-calculation deeply/repeatedly
-    if (context.enteringOwner === undefined) {
-        const enteringCard = context.enteringCard ?? context.invokedCard ?? null;
-        if (enteringCard) {
-            context.enteringOwner = state.blueBoard.includes(enteringCard) ? 'blue'
-                : state.redBoard.includes(enteringCard) ? 'red'
-                    : null;
-        } else {
-            context.enteringOwner = null;
-        }
+  // 2. Entering Owner Calc
+  // Derived once here to save re-calculation deeply/repeatedly
+  if (context.enteringOwner === undefined) {
+    const enteringCard = context.enteringCard ?? context.invokedCard ?? null;
+    if (enteringCard) {
+      context.enteringOwner = state.blueBoard.includes(enteringCard)
+        ? "blue"
+        : state.redBoard.includes(enteringCard)
+          ? "red"
+          : null;
+    } else {
+      context.enteringOwner = null;
     }
+  }
 
-    // 3. Dispatch
-    dispatchEvent(eventName, activePlayer, context);
+  // 3. Dispatch
+  dispatchEvent(eventName, activePlayer, context);
 }
 
 // Helper kept for compatibility/utility if used externally, though not used in refactor
 export function hasCrest(player: Player, crestName: string) {
-    const crests = player === 'blue' ? state.blueCrests : state.redCrests;
-    return crests.some((c: any) => c.name === crestName);
+  const crests = player === "blue" ? state.blueCrests : state.redCrests;
+  return crests.some((c: any) => c.name === crestName);
 }

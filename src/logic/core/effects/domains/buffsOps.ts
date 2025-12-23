@@ -1,31 +1,19 @@
-
 export const BUFF_OPS = [
-    "buff",
-    "buff_hand_class",
-    "buff_hand_tribe",
-    "buff_last_added_to_hand",
-    "buff_self",
-    "dynamic_buff_self",
-    "combo_repeat_buff",
-    "set_stats",
-    "set_attack_to",
-    "attacks_per_turn",
-    "keyword",
-    "remove_keyword",
-    "remove_abilities",
-    "grant_trigger",
-    "modify_cost",
-    "modify_cost_pool",
-    "reduce_cost",
-    "reduce_cost_self",
-    "set_cost_self",
-    "increase_opponent_hand_cost_eot",
-    "add_counter",
-    "reduce_countdown",
-    "increase_countdown",
-    "spellboost",
-    "spellboost_hand",
-    "spellboost_target",
-    "set_spellboost_count",
-    "transform_self_if_spellboost_at_least"
+  // Unified stat - covers give +X/+Y, set stats, buff_hand_*, combo_repeat (mode:combo_repeat), etc
+  "stat",
+  // combo_repeat_buff was removed - now handled by stat with mode: "combo_repeat"
+  "attacks_per_turn",
+
+  // Unified keyword - replaces keyword, remove_keyword, remove_abilities, grant_trigger
+  "keyword",
+
+  // Unified cost - replaces 6 legacy cost ops
+  "cost",
+
+  // Unified counter - replaces add_counter, reduce_countdown, increase_countdown
+  "counter",
+
+  // Unified spellboost - replaces 5 legacy spellboost ops
+  // spellboost_transform is now handled by unified transform op with zone: "hand"
+  "spellboost",
 ] as const;

@@ -5,11 +5,16 @@ import { GameState } from "./types.js";
 // We strictly define all scalar defaults here. This object is spread
 // into the initial state and used to reset scalars.
 const DEFAULTS = {
-  blueHP: 20, redHP: 20,
-  blueMaxHP: 20, redMaxHP: 20,
-  bluePP: 1, redPP: 1,
-  blueMaxPP: 1, redMaxPP: 1,
-  bluePermPP: 0, redPermPP: 0,
+  blueHP: 20,
+  redHP: 20,
+  blueMaxHP: 20,
+  redMaxHP: 20,
+  bluePP: 1,
+  redPP: 1,
+  blueMaxPP: 1,
+  redMaxPP: 1,
+  bluePermPP: 0,
+  redPermPP: 0,
   blueShadows: 0,
   redShadows: 0,
 
@@ -37,8 +42,8 @@ const DEFAULTS = {
 
   bluePlaysThisTurn: 0,
   redPlaysThisTurn: 0,
-  blueChooseBonus: 0,
-  redChooseBonus: 0,
+  blueModeBonus: 0,
+  redModeBonus: 0,
 
   gameStarted: false,
 
@@ -64,20 +69,28 @@ const DEFAULTS = {
 // Type enforced to be keys of GameState.
 // Type enforced to be keys of GameState where the value extends any[].
 type ArrayKey = {
-  [K in keyof GameState]-?: GameState[K] extends any[] ? K : never
+  [K in keyof GameState]-?: GameState[K] extends any[] ? K : never;
 }[keyof GameState];
 
 const ARRAY_KEYS: readonly ArrayKey[] = [
-  "blueDeck", "redDeck",
-  "blueHand", "redHand",
-  "blueBoard", "redBoard",
-  "blueGraveyard", "redGraveyard",
-  "bluePlayedHistory", "redPlayedHistory",
-  "blueDestroyedHistory", "redDestroyedHistory",
-  "blueCrests", "redCrests",
-  "shikigamiDeathsThisTurnBlue", "shikigamiDeathsThisTurnRed",
+  "blueDeck",
+  "redDeck",
+  "blueHand",
+  "redHand",
+  "blueBoard",
+  "redBoard",
+  "blueGraveyard",
+  "redGraveyard",
+  "bluePlayedHistory",
+  "redPlayedHistory",
+  "blueDestroyedHistory",
+  "redDestroyedHistory",
+  "blueCrests",
+  "redCrests",
+  "shikigamiDeathsThisTurnBlue",
+  "shikigamiDeathsThisTurnRed",
   "lastSummoned",
-  "lastDrawnCards"
+  "lastDrawnCards",
 ];
 
 import { createRng } from "./rng.js";
@@ -111,24 +124,30 @@ export function createInitialState(seed?: number | string): GameState {
     lastDrawnCards: [],
 
     // Debug Identity
-    __debugId: createRng(finalSeed).nextFloat()
+    __debugId: createRng(finalSeed).nextFloat(),
   };
 }
 
 // -- 4. Exported Singleton --
 const GLOBAL_KEY = "__GAME_STATE_SINGLETON__";
-export const state: GameState = (globalThis as any)[GLOBAL_KEY] || createInitialState();
+export const state: GameState =
+  (globalThis as any)[GLOBAL_KEY] || createInitialState();
 (globalThis as any)[GLOBAL_KEY] = state;
 
 // -- 5. Reset Logic --
-export function resetStateInstance(target: GameState, seed?: number | string): void {
+export function resetStateInstance(
+  target: GameState,
+  seed?: number | string,
+): void {
   const finalSeed = seed ?? Date.now();
 
   // A) Clear arrays in-place
   // We assume strict invariants: these keys MUST exist and MUST be arrays.
   for (const key of ARRAY_KEYS) {
     if (!Array.isArray(target[key])) {
-      throw new Error(`resetStateInstance: Critical invariant failed. Key '${key}' is not an array.`);
+      throw new Error(
+        `resetStateInstance: Critical invariant failed. Key '${key}' is not an array.`,
+      );
     }
     target[key].length = 0;
   }
@@ -143,7 +162,10 @@ export function resetStateInstance(target: GameState, seed?: number | string): v
   target.__debugId = target.rng.nextFloat();
 
   // Log
-  logEvent("resetStateInstance", { seed: finalSeed, debugId: target.__debugId });
+  logEvent("resetStateInstance", {
+    seed: finalSeed,
+    debugId: target.__debugId,
+  });
 }
 
 export function resetGameState(seed?: number | string): void {
@@ -153,5 +175,5 @@ export function resetGameState(seed?: number | string): void {
 // Global debug exposure (matches original)
 if (typeof window !== "undefined") {
   (window as any).gameState = state;
-  (window as any).debugSummon = () => import('../logic/effects/ops/summon.js');
+  (window as any).debugSummon = () => import("../logic/effects/ops/summon.js");
 }

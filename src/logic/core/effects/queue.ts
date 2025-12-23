@@ -1,17 +1,16 @@
-
 import { Effect } from "../../../core/types.js";
 import { EffectCtx } from "./registry.js";
 
 function validateOp(eff: Effect) {
-    if (!eff || typeof eff.op !== "string") {
-        throw new Error(`[Queue] Invalid effect op: ${JSON.stringify(eff)}`);
-    }
+  if (!eff || typeof eff.op !== "string") {
+    throw new Error(`[Queue] Invalid effect op: ${JSON.stringify(eff)}`);
+  }
 }
 
 function validateQueue(ctx: EffectCtx) {
-    if (!Array.isArray(ctx.queue)) {
-        throw new Error("[Queue] Context queue is missing or validation failed.");
-    }
+  if (!Array.isArray(ctx.queue)) {
+    throw new Error("[Queue] Context queue is missing or validation failed.");
+  }
 }
 
 /**
@@ -19,9 +18,9 @@ function validateQueue(ctx: EffectCtx) {
  * (Less common in depth-first resolution, but standard for 'next' triggers).
  */
 export function enqueue(ctx: EffectCtx, eff: Effect) {
-    validateQueue(ctx);
-    validateOp(eff);
-    ctx.queue.push(eff);
+  validateQueue(ctx);
+  validateOp(eff);
+  ctx.queue.push(eff);
 }
 
 /**
@@ -29,9 +28,9 @@ export function enqueue(ctx: EffectCtx, eff: Effect) {
  * (Standard for resolving nested / child effects immediately).
  */
 export function enqueueFront(ctx: EffectCtx, eff: Effect) {
-    validateQueue(ctx);
-    validateOp(eff);
-    ctx.queue.unshift(eff);
+  validateQueue(ctx);
+  validateOp(eff);
+  ctx.queue.unshift(eff);
 }
 
 /**
@@ -40,8 +39,8 @@ export function enqueueFront(ctx: EffectCtx, eff: Effect) {
  * i.e. unshift(...effects)
  */
 export function enqueueManyFront(ctx: EffectCtx, effects: Effect[]) {
-    validateQueue(ctx);
-    if (!effects || effects.length === 0) return;
-    effects.forEach(validateOp);
-    ctx.queue.unshift(...effects);
+  validateQueue(ctx);
+  if (!effects || effects.length === 0) return;
+  effects.forEach(validateOp);
+  ctx.queue.unshift(...effects);
 }

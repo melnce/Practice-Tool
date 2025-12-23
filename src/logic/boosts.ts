@@ -5,31 +5,32 @@ import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
 
 export function useRedBoost() {
-    return doAction(
-        "Red Boost",
-        () => {
-            if (state.isBlueTurn) return;
+  return doAction(
+    "Red Boost",
+    () => {
+      if (state.isBlueTurn) return;
 
-            const boostBtn = document.getElementById("redBoost");
+      const boostBtn = document.getElementById("redBoost");
 
-            const alreadyUsed = (state.roundCount <= 5 && state.redBoostUsedEarly) ||
-                (state.roundCount > 5 && state.redBoostUsedLate);
-            if (alreadyUsed) return;
+      const alreadyUsed =
+        (state.roundCount <= 5 && state.redBoostUsedEarly) ||
+        (state.roundCount > 5 && state.redBoostUsedLate);
+      if (alreadyUsed) return;
 
-            if (!state.redBoostPending) {
-                state.redPP++;
-                state.redBoostPending = true;
-                boostBtn?.classList.add("used");
-                logEvent("boost", { owner: "red", action: "activate" });
-            } else {
-                state.redPP--;
-                state.redBoostPending = false;
-                boostBtn?.classList.remove("used");
-                logEvent("boost", { owner: "red", action: "cancel" });
-            }
-            adapter.render();
-        },
-        { owner: "red" },
-        { autoRender: false }
-    );
+      if (!state.redBoostPending) {
+        state.redPP++;
+        state.redBoostPending = true;
+        boostBtn?.classList.add("used");
+        logEvent("boost", { owner: "red", action: "activate" });
+      } else {
+        state.redPP--;
+        state.redBoostPending = false;
+        boostBtn?.classList.remove("used");
+        logEvent("boost", { owner: "red", action: "cancel" });
+      }
+      adapter.render();
+    },
+    { owner: "red" },
+    { autoRender: false },
+  );
 }

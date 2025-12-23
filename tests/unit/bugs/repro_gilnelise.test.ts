@@ -5,96 +5,92 @@ import { computeHandGlow } from "../../../src/ui/helpers/glow";
 import { CardInstance } from "../../../src/core/types";
 
 describe("Gilnelise Logic", () => {
-    beforeEach(() => {
-        Object.assign(state, createInitialState());
+  beforeEach(() => {
+    Object.assign(state, createInitialState());
+  });
+
+  describe("handleBothMaxPPGate", () => {
+    it("should handle effectsQueue correctly when both players have max PP", () => {
+      state.blueMaxPP = 10;
+      state.redMaxPP = 10;
+
+      const eff = {
+        op: "gate",
+        effects: [{ op: "heal", amount: 5 }],
+      };
+      const queue: any[] = [];
+
+      // Should push effects to queue
+      handleBothMaxPPGate(eff as any, queue);
+      expect(queue.length).toBe(1);
+      expect(queue[0].op).toBe("heal");
     });
 
-    describe("handleBothMaxPPGate", () => {
-        it("should handle effectsQueue correctly when both players have max PP", () => {
-            state.blueMaxPP = 10;
-            state.redMaxPP = 10;
+    it("should safely handle non-array queue (prevent crash)", () => {
+      state.blueMaxPP = 10;
+      state.redMaxPP = 10;
 
-            const eff = {
-                op: "both_max_pp_gate",
-                effects: [{ op: "heal", amount: 5 }]
-            };
-            const queue: any[] = [];
+      const eff = {
+        op: "gate",
+        effects: [{ op: "heal", amount: 5 }],
+      };
 
-            // Should push effects to queue
-            handleBothMaxPPGate(eff as any, queue);
-            expect(queue.length).toBe(1);
-            expect(queue[0].op).toBe("heal");
-        });
+      // @ts-ignore - simulate runtime error condition
+      const result = handleBothMaxPPGate(eff as any, undefined);
+      // Should not throw
+      expect(true).toBe(true);
+    });
+  });
 
-        it("should safely handle non-array queue (prevent crash)", () => {
-            state.blueMaxPP = 10;
-            state.redMaxPP = 10;
+  describe("Glow Logic", () => {
+    it("should return enhance-ready glow when both max PP >= 10", () => {
+      state.blueMaxPP = 10;
+      state.redMaxPP = 10;
 
-            const eff = {
-                op: "both_max_pp_gate",
-                effects: [{ op: "heal", amount: 5 }]
-            };
+      const card: CardInstance = {
+        id: "123",
+        name: "Gilnelise, Voracity Manifest",
+        cost: 2,
+        type: "Follower",
+        fanfare: [{ op: "gate", condition: "both_max_pp", effects: [] }],
+        uid: "999",
+      };
 
-            // @ts-ignore - simulate runtime error condition
-            const result = handleBothMaxPPGate(eff as any, undefined);
-            // Should not throw
-            expect(true).toBe(true);
-        });
+      const ctx = {
+        state,
+        owner: "blue",
+        isPlayersTurn: true,
+        availablePP: 10,
+        isSpell: false,
+      };
+
+      const result = computeHandGlow(card, ctx);
+      expect(result.glowClass).toBe("enhance-ready");
     });
 
-    describe("Glow Logic", () => {
-        it("should return enhance-ready glow when both max PP >= 10", () => {
-            state.blueMaxPP = 10;
-            state.redMaxPP = 10;
+    it("should return playable-glow when condition not met", () => {
+      state.blueMaxPP = 5;
+      state.redMaxPP = 10;
 
-            const card: CardInstance = {
-                id: "123",
-                name: "Gilnelise, Voracity Manifest",
-                cost: 2,
-                type: "Follower",
-                fanfare: [
-                    { op: "both_max_pp_gate", effects: [] }
-                ],
-                uid: "999"
-            };
+      const card: CardInstance = {
+        id: "123",
+        name: "Gilnelise, Voracity Manifest",
+        cost: 2,
+        type: "Follower",
+        fanfare: [{ op: "gate", condition: "both_max_pp", effects: [] }],
+        uid: "999",
+      };
 
-            const ctx = {
-                state,
-                owner: "blue",
-                isPlayersTurn: true,
-                availablePP: 10,
-                isSpell: false
-            };
+      const ctx = {
+        state,
+        owner: "blue",
+        isPlayersTurn: true,
+        availablePP: 10,
+        isSpell: false,
+      };
 
-            const result = computeHandGlow(card, ctx);
-            expect(result.glowClass).toBe("enhance-ready");
-        });
-
-        it("should return playable-glow when condition not met", () => {
-            state.blueMaxPP = 5;
-            state.redMaxPP = 10;
-
-            const card: CardInstance = {
-                id: "123",
-                name: "Gilnelise, Voracity Manifest",
-                cost: 2,
-                type: "Follower",
-                fanfare: [
-                    { op: "both_max_pp_gate", effects: [] }
-                ],
-                uid: "999"
-            };
-
-            const ctx = {
-                state,
-                owner: "blue",
-                isPlayersTurn: true,
-                availablePP: 10,
-                isSpell: false
-            };
-
-            const result = computeHandGlow(card, ctx);
-            expect(result.glowClass).toBe("playable-glow");
-        });
+      const result = computeHandGlow(card, ctx);
+      expect(result.glowClass).toBe("playable-glow");
     });
+  });
 });

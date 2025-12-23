@@ -4,7 +4,7 @@
 }
 
 @keyframes spell-effect {
-  0% { 
+  0% {
     filter: brightness(1.5) drop-shadow(0 0 10px rgba(100, 200, 255, 0.8));
     transform: scale(1.1);
   }

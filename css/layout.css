@@ -23,8 +23,6 @@
   z-index: 100;
 }
 
-
-
 #turnControls button {
   background-color: white;
   color: black;
@@ -108,8 +106,6 @@
   box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
 }
 
-
-
 .board-zone {
   display: flex;
   justify-content: center;
@@ -122,8 +118,6 @@
   border: 2px dashed rgba(255, 255, 255, 0.2);
   /* optional visual aid */
 }
-
-
 
 .board-zone.drag-over {
   background-color: rgba(255, 255, 255, 0.05);
@@ -179,13 +173,11 @@
 #redStatsContainer {
   top: 120px;
   /* adjust as needed */
-
 }
 
 #blueStatsContainer {
   bottom: 120px;
   /* adjust as needed */
-
 }
 
 #turnControls #redBoost {
@@ -205,7 +197,6 @@
   color: #aaa !important;
   cursor: default;
 }
-
 
 .leader {
   width: 80px;
@@ -336,7 +327,9 @@
 .crest-slot.active {
   background-color: #00ff99;
   border-color: #99ffee;
-  box-shadow: 0 0 10px #00ff99, inset 0 0 5px rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 0 10px #00ff99,
+    inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 
 /* Add this to layout.css */

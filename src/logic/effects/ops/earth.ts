@@ -4,46 +4,49 @@ import { adapter } from "../../../core/adapter.js";
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance } from "../../../core/types.js";
 
-
-function board(owner: Player) { return owner === "blue" ? state.blueBoard : state.redBoard; }
+function board(owner: Player) {
+  return owner === "blue" ? state.blueBoard : state.redBoard;
+}
 function isWitchsNewBrew(card: CardInstance) {
-    const n = String(card?.name || "").toLowerCase();
-    return n.includes("witch") && n.includes("brew");
+  const n = String(card?.name || "").toLowerCase();
+  return n.includes("witch") && n.includes("brew");
 }
 
 export function hasEarthSigils(owner: Player, amount = 1) {
-    const b = board(owner);
-    return b.some(c => c?.type === "Amulet" && (c.counters?.earth || 0) >= amount);
+  const b = board(owner);
+  return b.some(
+    (c) => c?.type === "Amulet" && (c.counters?.earth || 0) >= amount,
+  );
 }
 
 export function consumeEarthSigils(owner: Player, amount = 1) {
-    const b = board(owner);
-    const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const b = board(owner);
+  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
 
-    for (let i = 0; i < b.length; i++) {
-        const c = b[i];
-        if (c?.type === "Amulet" && (c.counters?.earth || 0) >= amount) {
-            c.counters!.earth! -= amount;
+  for (let i = 0; i < b.length; i++) {
+    const c = b[i];
+    if (c?.type === "Amulet" && (c.counters?.earth || 0) >= amount) {
+      c.counters!.earth! -= amount;
 
-            // Log the earth sigil consumption
-            logEvent("earthConsume", { owner, amount, card: c.name, uid: c.uid });
+      // Log the earth sigil consumption
+      logEvent("earthConsume", { owner, amount, card: c.name, uid: c.uid });
 
-            if (c.counters!.earth! <= 0 && (isWitchsNewBrew(c) || c.destroyOnEmpty)) {
-                const removed = b.splice(i, 1)[0];
-                if (removed) {
-                    grave.push(removed);
+      if (c.counters!.earth! <= 0 && (isWitchsNewBrew(c) || c.destroyOnEmpty)) {
+        const removed = b.splice(i, 1)[0];
+        if (removed) {
+          grave.push(removed);
 
-                    // Log the earth sigil destruction
-                    logEvent("earthSigilDestroyed", { owner, card: c.name, uid: c.uid });
+          // Log the earth sigil destruction
+          logEvent("earthSigilDestroyed", { owner, card: c.name, uid: c.uid });
 
-                    // Increment shadows for the owner
-                    if (owner === "blue") state.blueShadows++;
-                    else state.redShadows++;
-                    adapter.render();
-                }
-            }
-            return true;
+          // Increment shadows for the owner
+          if (owner === "blue") state.blueShadows++;
+          else state.redShadows++;
+          adapter.render();
         }
+      }
+      return true;
     }
-    return false;
+  }
+  return false;
 }

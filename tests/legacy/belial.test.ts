@@ -26,7 +26,7 @@ describe("Belial, Archangel of Cunning (10454120)", () => {
         expect(dmg.amount).toBe(10);
 
         // Item 2: SSA Gain Crest
-        const ssa = card.fanfare.find((f: any) => f.op === "super_skybound_art_gate");
+        const ssa = card.fanfare.find((f: any) => f.op === "gate");
         expect(ssa).toBeDefined();
         expect(ssa.requirement).toBe(10);
         expect(ssa.effects[0].op).toBe("gain_crest");

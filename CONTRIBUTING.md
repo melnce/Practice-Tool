@@ -12,27 +12,33 @@ npm run build
 ## Running Checks
 
 ### Full Test Suite
+
 ```bash
 npm test
 ```
 
 ### Architecture Guardrails
+
 ```bash
 npm run check:arch
 ```
 
 ### Replay Determinism
+
 ```bash
 npm run replay:check
 ```
 
 ### Golden Invariant Tests (Fast)
+
 ```bash
 npm run test:golden
 ```
-*Invariant guards for refactoring—run these when modifying targeting, pendingTarget, damage, triggers, or cardFilter.*
+
+_Invariant guards for refactoring—run these when modifying targeting, pendingTarget, damage, triggers, or cardFilter._
 
 ### All Checks (CI Equivalent)
+
 ```bash
 npm run build && npm test && npm run replay:check && npm run check:arch
 ```
@@ -42,6 +48,7 @@ npm run build && npm test && npm run replay:check && npm run check:arch
 To catch issues before push, set up a pre-push hook:
 
 ### Using Husky (Recommended)
+
 ```bash
 npm install husky --save-dev
 npx husky init
@@ -49,11 +56,14 @@ echo "npm run check:arch" > .husky/pre-push
 ```
 
 ### Manual Git Hook
+
 Create `.git/hooks/pre-push`:
+
 ```bash
 #!/bin/sh
 npm run check:arch
 ```
+
 Make it executable: `chmod +x .git/hooks/pre-push`
 
 ## Architecture Rules
@@ -69,6 +79,7 @@ See the following READMEs for architecture contracts:
 ## CI Pipeline
 
 The CI pipeline (`.github/workflows/ci.yml`) runs:
+
 1. `npm ci` - Install dependencies
 2. `npm run build` - TypeScript compilation
 3. `npm test` - Unit tests + boundary checks

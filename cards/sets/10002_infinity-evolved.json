@@ -18,7 +18,8 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "super_evolved_allied_gate",
+        "op": "gate",
+        "condition": "super_evolved_allied",
         "effects": [
           {
             "op": "damage",
@@ -50,7 +51,8 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "all:follower",
         "select": 1,
         "attack": 2,
@@ -78,10 +80,13 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "super_evo_gate",
+        "op": "gate",
+        "condition": "super_evo_unlocked",
         "effects": [
           {
-            "op": "buff_self",
+            "op": "stat",
+            "action": "give",
+            "target": "self",
             "attack": 0,
             "defense": 3
           }
@@ -107,12 +112,14 @@
     "url": "https://shadowverse.gg/cards/10203110-reina-angelic-partner",
     "evolve": [
       {
-        "op": "evolve_all_unevolved_allies"
+        "op": "evolve",
+        "target": "all_allies"
       }
     ],
     "superevolve": [
       {
-        "op": "evolve_all_unevolved_allies"
+        "op": "evolve",
+        "target": "all_allies"
       }
     ],
     "fanfare": [],
@@ -142,7 +149,8 @@
         "cost": 5,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       },
@@ -150,7 +158,8 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "evolved_self_gate",
+            "op": "gate",
+            "condition": "evolved_self",
             "effects": [
               {
                 "op": "damage",
@@ -189,9 +198,7 @@
         "select": 1
       }
     ],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10204120",
@@ -212,7 +219,8 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Grimnir, Heavenly Gale",
         "image": "images/crests/grimnir_heavenly_gale.png",
         "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
@@ -220,7 +228,8 @@
           "type": "end_of_turn_own",
           "effects": [
             {
-              "op": "super_evolved_allied_gate",
+              "op": "gate",
+              "condition": "super_evolved_allied",
               "effects": [
                 {
                   "op": "damage",
@@ -234,9 +243,7 @@
         }
       }
     ],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10211110",
@@ -256,9 +263,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Rush"
-    ]
+    "keywords": ["Rush"]
   },
   {
     "id": "10211120",
@@ -279,7 +284,8 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "combo_gate",
+        "op": "gate",
+        "condition": "combo",
         "count": 3,
         "effects": [
           {
@@ -319,7 +325,8 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Gentle Treant",
         "count": 3
       }
@@ -345,14 +352,13 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Baby Carbuncle",
         "count": 2
       }
     ],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10212120",
@@ -373,7 +379,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Fairy",
         "count": 1
       }
@@ -385,7 +393,9 @@
         "source": "hand",
         "effects": [
           {
-            "op": "set_cost_self",
+            "op": "cost",
+            "target": "self",
+            "mode": "set",
             "amount": 1
           }
         ]
@@ -418,7 +428,8 @@
         "count": 1
       },
       {
-        "op": "combo_gate",
+        "op": "gate",
+        "condition": "combo",
         "count": 3,
         "effects": [
           {
@@ -450,7 +461,8 @@
     "url": "https://shadowverse.gg/cards/10213110-cynthia-chivalrous-elf",
     "evolve": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
         "tribes": "Pixie",
         "attack": 1,
@@ -459,7 +471,8 @@
     ],
     "superevolve": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
         "tribes": "Pixie",
         "attack": 1,
@@ -468,7 +481,8 @@
     ],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Fairy",
         "count": 2
       }
@@ -501,12 +515,14 @@
             "class_eq": "forestcraft"
           }
         ],
-        "finalize_op": "fuse_finalize_gardens_allure"
+        "finalize_op": "fuse",
+        "finalize_type": "gardens_allure"
       }
     ],
     "spell": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 1
       }
     ],
@@ -529,12 +545,14 @@
     "url": "https://shadowverse.gg/cards/10214110-titania-queen-of-fairies",
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Fairy",
         "count": 1
       },
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Titania, Queen of Fairies",
         "image": "images/crests/titania_queen_of_fairies.png",
         "description": "At the start of your turn, add a Fairy to your hand",
@@ -542,7 +560,9 @@
           "event": "start_of_turn",
           "effects": [
             {
-              "op": "add_to_hand",
+              "op": "draw",
+              "source": "deck",
+              "source": "named",
               "name": "Fairy",
               "count": 1
             }
@@ -558,6 +578,7 @@
         "effects": [
           {
             "op": "transform",
+            "zone": "board",
             "into": "Fairy"
           }
         ]
@@ -571,6 +592,7 @@
         "effects": [
           {
             "op": "transform",
+            "zone": "board",
             "into": "Fairy"
           }
         ]
@@ -596,11 +618,10 @@
     "evolve": [],
     "fanfare": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "enemy:follower",
-        "keywords": [
-          "Can't Attack"
-        ],
+        "keywords": ["Can't Attack"],
         "duration": "opponent_turn_end",
         "select": 2
       }
@@ -608,6 +629,7 @@
     "superevolve": [
       {
         "op": "keyword",
+        "action": "grant",
         "target": "enemy:follower",
         "keywords": [
           {
@@ -674,9 +696,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ambush"
-    ]
+    "keywords": ["Ambush"]
   },
   {
     "id": "10221310",
@@ -698,10 +718,12 @@
     "spell": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 2
       },
       {
         "op": "draw",
+        "source": "deck",
         "player": "opponent",
         "count": 1
       }
@@ -727,24 +749,26 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [
       {
         "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
-            "op": "super_evolved_allied_gate",
+            "op": "gate",
+            "condition": "super_evolved_allied",
             "effects": [
               {
-                "op": "buff_self",
+                "op": "stat",
+                "action": "give",
+                "target": "self",
                 "attack": 1,
                 "defense": 1
               },
               {
-                "op": "buff",
+                "op": "stat",
+                "action": "give",
                 "target": "ally:follower",
                 "attack": 1,
                 "defense": 1
@@ -772,14 +796,16 @@
     "url": "https://shadowverse.gg/cards/10222120-rackhir-ordinary-knight",
     "evolve": [
       {
-        "op": "recover_pp",
+        "op": "pp",
+        "action": "recover",
         "player": "self",
         "amount": 2
       }
     ],
     "superevolve": [
       {
-        "op": "recover_pp",
+        "op": "pp",
+        "action": "recover",
         "player": "self",
         "amount": 2
       }
@@ -787,6 +813,7 @@
     "fanfare": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 1,
         "filters": {
           "type": "Spell"
@@ -863,6 +890,7 @@
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 1,
             "filters": {
               "type": "follower",
@@ -871,7 +899,9 @@
             }
           },
           {
-            "op": "set_cost_last_drawn",
+            "op": "cost",
+            "target": "last_drawn",
+            "action": "set",
             "amount": 0
           }
         ]
@@ -883,7 +913,9 @@
         "source": "board",
         "effects": [
           {
-            "op": "destroy_defender_if_damaged"
+            "op": "destroy",
+            "scope": "defender",
+            "only_if_damaged": true
           }
         ]
       }
@@ -907,7 +939,8 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
         "attack": 1,
         "defense": 1
@@ -915,14 +948,14 @@
     ],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Nonja, Silent Maid",
         "count": 1
       }
     ],
-    "keywords": [
-      "Ambush"
-    ]
+    "keywords": ["Ambush"]
   },
   {
     "id": "10224110",
@@ -933,9 +966,7 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Anathema"
-    ],
+    "tribes": ["Anathema"],
     "description": "Fanfare: Rally (20) - Super-evolve this follower.\nWhenever another allied follower enters the field, deal 1 damage to all enemy followers.\nWhen this follower evolves, summon 2 copies of Steelclad Knight and give them Rush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10224110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224110_evo.webp",
@@ -945,27 +976,32 @@
     "evolve_trigger_always": true,
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Steelclad Knight",
-        "keyword": "Rush",
+        "keywords": ["Rush"],
         "count": 2
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Steelclad Knight",
-        "keyword": "Rush",
+        "keywords": ["Rush"],
         "count": 2
       }
     ],
     "fanfare": [
       {
-        "op": "rally_gate",
+        "op": "gate",
+        "condition": "rally",
         "count": 20,
         "effects": [
           {
-            "op": "super_evolve_self"
+            "op": "evolve",
+            "target": "self",
+            "mode": "super"
           }
         ]
       }
@@ -997,9 +1033,7 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Levin"
-    ],
+    "tribes": ["Levin"],
     "description": "Fanfare: Summon 2 enemy copies of Knight.\nWhenever an enemy follower enters the field, give it \"Can't attack followers or leaders\" until the end of your opponent's turn, deal 1 damage to the enemy leader, and restore 1 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10224120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224120_evo.webp",
@@ -1010,7 +1044,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "summon_named_enemy",
+        "op": "summon",
+        "source": "named",
+        "owner": "enemy",
         "name": "Knight",
         "count": 2
       }
@@ -1023,6 +1059,7 @@
         "effects": [
           {
             "op": "keyword",
+            "action": "grant",
             "target": "entering_follower",
             "keywords": [
               {
@@ -1037,7 +1074,8 @@
             "amount": 1
           },
           {
-            "op": "heal_leader",
+            "op": "restore",
+            "target": "leader",
             "player": "self",
             "amount": 1
           }
@@ -1064,15 +1102,19 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Witch's New Brew",
         "count": 1
       },
       {
-        "op": "super_evolved_allied_gate",
+        "op": "gate",
+        "condition": "super_evolved_allied",
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Magic Sediment",
             "count": 2
           }
@@ -1100,13 +1142,15 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "return_hand_to_deck",
+        "op": "return",
+        "destination": "deck",
         "select": 1,
         "target": "ally:hand",
         "optional": true
       },
       {
         "op": "draw",
+        "source": "deck",
         "count": 1,
         "filters": {
           "type": "Spell"
@@ -1169,7 +1213,8 @@
     "url": "https://shadowverse.gg/cards/10232110-bergent-rejected-artes",
     "evolve": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Bergent, Rejected Artes",
         "image": "images/crests/bergent_rejected_artes.png",
         "description": "At the start of your turn, summon an Onion Patch",
@@ -1177,7 +1222,8 @@
           "event": "start_of_turn",
           "effects": [
             {
-              "op": "summon_named",
+              "op": "summon",
+              "source": "named",
               "name": "Onion Patch",
               "count": 1
             }
@@ -1187,7 +1233,8 @@
     ],
     "superevolve": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Bergent, Rejected Artes",
         "image": "images/crests/bergent_rejected_artes.png",
         "description": "At the start of your turn, summon an Onion Patch",
@@ -1195,7 +1242,8 @@
           "event": "start_of_turn",
           "effects": [
             {
-              "op": "summon_named",
+              "op": "summon",
+              "source": "named",
               "name": "Onion Patch",
               "count": 1
             }
@@ -1205,7 +1253,8 @@
     ],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Onion Patch",
         "count": 2
       }
@@ -1235,7 +1284,8 @@
         "select": 1
       },
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Magic Sediment",
         "count": 1
       }
@@ -1248,7 +1298,8 @@
         "select": 1
       },
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Magic Sediment",
         "count": 1
       }
@@ -1261,7 +1312,8 @@
         "select": 1
       },
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Magic Sediment",
         "count": 1
       }
@@ -1309,9 +1361,7 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": [
-      "Mysteria"
-    ],
+    "tribes": ["Mysteria"],
     "description": "Ward\nClash: Spellboost your hand.\nEvolve: Draw 2 followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10233110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10233110_evo.webp",
@@ -1320,6 +1370,7 @@
     "evolve": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 2,
         "filters": {
           "type": "Follower"
@@ -1329,6 +1380,7 @@
     "superevolve": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 2,
         "filters": {
           "type": "Follower"
@@ -1336,16 +1388,15 @@
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [
       {
         "event": "clash",
         "source": "board",
         "effects": [
           {
-            "op": "spellboost_hand",
+            "op": "spellboost",
+            "target": "hand",
             "times": 1
           }
         ]
@@ -1371,12 +1422,14 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Magic Sediment",
         "count": 1
       },
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Pascale's Dance",
         "image": "images/crests/pascales_dance.png",
         "description": "Countdown (1). End of your turn: Draw a card. Earth Rite (10): Double the attack and defense of all allied followers.",
@@ -1386,6 +1439,7 @@
           "effects": [
             {
               "op": "draw",
+              "source": "deck",
               "count": 1
             },
             {
@@ -1393,7 +1447,9 @@
               "cost": 10,
               "effects": [
                 {
-                  "op": "double_stats_allies"
+                  "op": "stat",
+                  "mode": "double",
+                  "target": "ally:follower"
                 }
               ]
             }
@@ -1412,9 +1468,7 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Anathema"
-    ],
+    "tribes": ["Anathema"],
     "description": "Aura\nLast Words: Earth Rite (2) - Summon a Lilanthim, Anathema of Edacity.\nSuper-Evolve: Select 2 enemy followers on the field and destroy them.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10234110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234110_evo.webp",
@@ -1439,7 +1493,8 @@
             "cost": 2,
             "effects": [
               {
-                "op": "summon_named",
+                "op": "summon",
+                "source": "named",
                 "name": "Lilanthim, Anathema of Edacity",
                 "count": 1
               }
@@ -1458,9 +1513,7 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Mysteria"
-    ],
+    "tribes": ["Mysteria"],
     "description": "Fanfare: Earth Rite (1) - Select a Mode to activate.\n1. Summon a Guardian Golem and give it Barrier.\n2. Draw 3 cards.\n3. Restore 4 defense to your leader.\nEvolve: Replicate the effects of this card's Fanfare ability.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10234120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234120_evo.webp",
@@ -1468,7 +1521,7 @@
     "url": "https://shadowverse.gg/cards/10234120-norman-adamant-alchemist",
     "evolve": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "label": "Summon a Guardian Golem and give it Barrier",
@@ -1478,9 +1531,10 @@
                 "cost": 1,
                 "effects": [
                   {
-                    "op": "summon_named",
+                    "op": "summon",
+                    "source": "named",
                     "name": "Guardian Golem",
-                    "keyword": "Barrier",
+                    "keywords": ["Barrier"],
                     "count": 1
                   }
                 ]
@@ -1496,6 +1550,7 @@
                 "effects": [
                   {
                     "op": "draw",
+                    "source": "deck",
                     "count": 3
                   }
                 ]
@@ -1510,7 +1565,8 @@
                 "cost": 1,
                 "effects": [
                   {
-                    "op": "heal_leader",
+                    "op": "restore",
+                    "target": "leader",
                     "player": "self",
                     "amount": 4
                   }
@@ -1523,7 +1579,7 @@
     ],
     "superevolve": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "label": "Summon a Guardian Golem and give it Barrier",
@@ -1533,9 +1589,10 @@
                 "cost": 1,
                 "effects": [
                   {
-                    "op": "summon_named",
+                    "op": "summon",
+                    "source": "named",
                     "name": "Guardian Golem",
-                    "keyword": "Barrier",
+                    "keywords": ["Barrier"],
                     "count": 1
                   }
                 ]
@@ -1551,6 +1608,7 @@
                 "effects": [
                   {
                     "op": "draw",
+                    "source": "deck",
                     "count": 3
                   }
                 ]
@@ -1565,7 +1623,8 @@
                 "cost": 1,
                 "effects": [
                   {
-                    "op": "heal_leader",
+                    "op": "restore",
+                    "target": "leader",
                     "player": "self",
                     "amount": 4
                   }
@@ -1578,7 +1637,7 @@
     ],
     "fanfare": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "label": "Summon a Guardian Golem and give it Barrier",
@@ -1588,9 +1647,10 @@
                 "cost": 1,
                 "effects": [
                   {
-                    "op": "summon_named",
+                    "op": "summon",
+                    "source": "named",
                     "name": "Guardian Golem",
-                    "keyword": "Barrier",
+                    "keywords": ["Barrier"],
                     "count": 1
                   }
                 ]
@@ -1606,6 +1666,7 @@
                 "effects": [
                   {
                     "op": "draw",
+                    "source": "deck",
                     "count": 3
                   }
                 ]
@@ -1620,7 +1681,8 @@
                 "cost": 1,
                 "effects": [
                   {
-                    "op": "heal_leader",
+                    "op": "restore",
+                    "target": "leader",
                     "player": "self",
                     "amount": 4
                   }
@@ -1652,7 +1714,8 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Vastwing Dragon",
         "count": 1
       }
@@ -1664,7 +1727,9 @@
         "source": "hand",
         "effects": [
           {
-            "op": "reduce_cost_self",
+            "op": "cost",
+            "target": "self",
+            "mode": "reduce",
             "amount": 3
           }
         ]
@@ -1690,18 +1755,18 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "overflow_gate",
+        "op": "gate",
+        "condition": "overflow",
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 1
           }
         ]
       }
     ],
-    "keywords": [
-      "Rush"
-    ]
+    "keywords": ["Rush"]
   },
   {
     "id": "10241310",
@@ -1722,15 +1787,18 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Majestic Megalorca",
         "count": 1
       },
       {
-        "op": "overflow_gate",
+        "op": "gate",
+        "condition": "overflow",
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "filters": {
               "name": "Call of the Megalorca"
             },
@@ -1760,10 +1828,12 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "super_evolved_allied_gate",
+        "op": "gate",
+        "condition": "super_evolved_allied",
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 2
           }
         ]
@@ -1788,21 +1858,24 @@
     "url": "https://shadowverse.gg/cards/10242120-seasoned-merman",
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Majestic Megalorca",
         "count": 1
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Majestic Megalorca",
         "count": 1
       }
     ],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Majestic Megalorca",
         "count": 2
       }
@@ -1836,20 +1909,23 @@
             "select_count": 1,
             "effects": [
               {
-                "op": "buff",
+                "op": "stat",
+                "action": "give",
                 "target": "selected",
                 "attack": 1,
                 "defense": 1
               },
               {
                 "op": "keyword",
+                "action": "grant",
                 "target": "selected",
                 "keywords": [
                   {
                     "name": "LastWords",
                     "effects": [
                       {
-                        "op": "summon_named",
+                        "op": "summon",
+                        "source": "named",
                         "name": "Pyrewyrm Blade",
                         "count": 1
                       }
@@ -1881,14 +1957,16 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Majestic Megalorca",
         "count": 2
       }
     ],
     "fanfare": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Bergent, Rejected Artes",
         "image": "images/crests/neptune_arbiter_of_tides.png",
         "description": "Whenever an allied Marine follower enters the field, restore 1 defense to your leader",
@@ -1901,7 +1979,8 @@
           },
           "effects": [
             {
-              "op": "heal_leader",
+              "op": "restore",
+              "target": "leader",
               "player": "self",
               "amount": 1
             }
@@ -1909,14 +1988,13 @@
         }
       },
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Majestic Megalorca",
         "count": 2
       }
     ],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10243310",
@@ -1942,7 +2020,9 @@
         "select_count": 1,
         "effects": [
           {
-            "op": "reduce_cost",
+            "op": "cost",
+            "target": "selected",
+            "mode": "reduce",
             "amount": 2,
             "minCost": 0
           }
@@ -1987,19 +2067,20 @@
     ],
     "fanfare": [
       {
-        "op": "overflow_gate",
+        "op": "gate",
+        "condition": "overflow",
         "effects": [
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "name": "Whitefrost Whisper",
             "count": 1
           }
         ]
       }
     ],
-    "keywords": [
-      "Bane"
-    ]
+    "keywords": ["Bane"]
   },
   {
     "id": "10244120",
@@ -2020,7 +2101,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "halve_deck_cost"
+        "op": "deck",
+        "action": "cost",
+        "mode": "halve"
       }
     ],
     "keywords": []
@@ -2065,9 +2148,7 @@
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Bane"
-    ]
+    "keywords": ["Bane"]
   },
   {
     "id": "10251120",
@@ -2092,7 +2173,9 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "name": "Ghost",
             "count": 1
           }
@@ -2119,17 +2202,23 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Ghost",
         "count": 1
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Skeleton",
         "count": 1
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Rotting Zombie",
         "count": 1
       }
@@ -2155,9 +2244,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [
       {
         "event": "ally_super_evolve",
@@ -2167,13 +2254,16 @@
         },
         "effects": [
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "entering_follower",
             "attack": 2,
             "defense": 0
           },
           {
-            "op": "buff_self",
+            "op": "stat",
+            "action": "give",
+            "target": "self",
             "attack": 2,
             "defense": 0
           }
@@ -2200,7 +2290,8 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Rotting Zombie",
         "count": 2
       }
@@ -2226,7 +2317,8 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Bat",
         "count": 2
       }
@@ -2252,6 +2344,7 @@
     "superevolve": [
       {
         "op": "keyword",
+        "action": "grant",
         "select": 1,
         "target": "ally:follower",
         "condition": {
@@ -2267,6 +2360,7 @@
     "fanfare": [
       {
         "op": "keyword",
+        "action": "grant",
         "select": 1,
         "target": "ally:follower",
         "condition": {
@@ -2300,7 +2394,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "dynamic_buff_self",
+        "op": "stat",
+        "action": "give",
+        "target": "self",
         "attack_source": "count_allies",
         "exclude_self": true
       },
@@ -2310,9 +2406,7 @@
         "amount": 2
       }
     ],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10254110",
@@ -2333,13 +2427,14 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "label": "Summon 4 copies of One-Tailed Fox",
             "effects": [
               {
-                "op": "summon_named",
+                "op": "summon",
+                "source": "named",
                 "name": "One-Tailed Fox",
                 "count": 4
               }
@@ -2349,12 +2444,14 @@
             "label": "Destroy 4 random enemy followers. Restore 4 defense to your leader",
             "effects": [
               {
-                "op": "destroy_random",
+                "op": "destroy",
+                "distribution": "random",
                 "target": "enemy:follower",
                 "count": 4
               },
               {
-                "op": "heal_leader",
+                "op": "restore",
+                "target": "leader",
                 "player": "self",
                 "amount": 4
               }
@@ -2384,7 +2481,8 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Charon, Stygian Oarswoman",
         "image": "images/crests/charon_stygian_oarswoman.png",
         "description": "Countdown (2) At the start of your turn, Reanimate (3)",
@@ -2393,7 +2491,8 @@
           "event": "start_of_turn",
           "effects": [
             {
-              "op": "reanimate",
+              "op": "summon",
+              "source": "graveyard",
               "max_cost": 3
             }
           ]
@@ -2402,11 +2501,13 @@
     ],
     "fanfare": [
       {
-        "op": "reanimate",
+        "op": "summon",
+        "source": "graveyard",
         "max_cost": 2
       },
       {
-        "op": "reanimate",
+        "op": "summon",
+        "source": "graveyard",
         "max_cost": 1
       }
     ],
@@ -2421,9 +2522,8 @@
         "effects": [
           {
             "op": "keyword",
-            "keywords": [
-              "Ward"
-            ],
+            "action": "grant",
+            "keywords": ["Ward"],
             "target": "entering_follower"
           }
         ]
@@ -2466,9 +2566,7 @@
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10261120",
@@ -2491,6 +2589,7 @@
     "fanfare": [
       {
         "op": "keyword",
+        "action": "grant",
         "target": "enemy:follower",
         "keywords": [
           {
@@ -2500,7 +2599,8 @@
               "source": "board",
               "effects": [
                 {
-                  "op": "destroy_self"
+                  "op": "destroy",
+                  "scope": "self"
                 }
               ]
             }
@@ -2536,7 +2636,8 @@
         "sacrifice": true,
         "effects": [
           {
-            "op": "heal_leader",
+            "op": "restore",
+            "target": "leader",
             "player": "self",
             "amount": 4
           }
@@ -2563,7 +2664,8 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "amulet_count_gate",
+        "op": "gate",
+        "condition": "amulet_count",
         "count": 2,
         "effects": [
           {
@@ -2640,7 +2742,8 @@
         },
         "effects": [
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "selected:follower",
             "attack": 0,
             "defense": 1
@@ -2675,24 +2778,22 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "triggers": [
       {
         "event": "strike",
         "source": "board",
         "effects": [
           {
-            "op": "amulet_count_gate",
+            "op": "gate",
+            "condition": "amulet_count",
             "count": 2,
             "effects": [
               {
-                "op": "destroy_random",
+                "op": "destroy",
+                "distribution": "random",
                 "target": "enemy:follower",
-                "exclude": [
-                  "context.defender"
-                ]
+                "exclude": ["context.defender"]
               }
             ]
           }
@@ -2719,12 +2820,14 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "heal_leader",
+        "op": "restore",
+        "target": "leader",
         "player": "self",
         "amount": 10
       },
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Maddening Benison",
         "image": "images/crests/maddening_benison.png",
         "description": "Countdown (2). Last Words: Deal 10 damage to your leader",
@@ -2756,12 +2859,11 @@
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10264110-aether-empyrean-guardian",
     "evolve": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "fanfare": [
       {
-        "op": "summon_random_from_deck",
+        "op": "summon",
+        "source": "deck",
         "count": 3,
         "filters": {
           "type": "follower",
@@ -2772,7 +2874,8 @@
     ],
     "superevolve": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
         "condition": {
           "not_self": true
@@ -2782,13 +2885,12 @@
       },
       {
         "op": "keyword",
+        "action": "grant",
         "target": "ally:follower",
         "condition": {
           "not_self": true
         },
-        "keywords": [
-          "Aura"
-        ]
+        "keywords": ["Aura"]
       }
     ]
   },
@@ -2809,7 +2911,8 @@
     "url": "https://shadowverse.gg/cards/10264120-wilbert-desolate-paladin",
     "evolve": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Wilbert, Desolate Paladin",
         "image": "images/crests/wilbert_desolate_paladin.png",
         "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
@@ -2822,7 +2925,8 @@
           },
           "effects": [
             {
-              "op": "buff",
+              "op": "stat",
+              "action": "give",
               "target": "entering_follower",
               "attack": 1,
               "defense": 2,
@@ -2834,7 +2938,8 @@
     ],
     "superevolve": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Wilbert, Desolate Paladin",
         "image": "images/crests/wilbert_desolate_paladin.png",
         "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
@@ -2847,7 +2952,8 @@
           },
           "effects": [
             {
-              "op": "buff",
+              "op": "stat",
+              "action": "give",
               "target": "entering_follower",
               "attack": 1,
               "defense": 2,
@@ -2864,7 +2970,8 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Holy Cavalier",
             "count": 2
           }
@@ -2889,33 +2996,42 @@
     "url": "https://shadowverse.gg/cards/10271110-engineblade-maven",
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Striker Artifact"
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Striker Artifact"
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
       }
     ],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Striker Artifact"
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -2941,24 +3057,27 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "super_evolved_allied_gate",
+        "op": "gate",
+        "condition": "super_evolved_allied",
         "effects": [
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "name": "Puppet",
             "count": 1
           },
           {
-            "op": "buff_last_added_to_hand",
+            "op": "stat",
+            "action": "give",
+            "target": "last_added_to_hand",
             "attack": 3,
             "defense": 0
           }
         ]
       }
     ],
-    "keywords": [
-      "Rush"
-    ]
+    "keywords": ["Rush"]
   },
   {
     "id": "10271210",
@@ -2980,7 +3099,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       }
@@ -2992,7 +3113,14 @@
         "sacrifice": true,
         "effects": [
           {
-            "op": "select_hand_summon_artifact_copies_eot_destroy",
+            "op": "summon",
+            "source": "hand",
+            "mode": "copy",
+            "filter": {
+              "type": "Artifact"
+            },
+            "select": true,
+            "eot_destroy": true,
             "select": 1,
             "max_cost": 5
           }
@@ -3028,14 +3156,13 @@
         "effects": [
           {
             "op": "transform",
+            "zone": "board",
             "into": "Doll Slayer"
           }
         ]
       }
     ],
-    "keywords": [
-      "Bane"
-    ]
+    "keywords": ["Bane"]
   },
   {
     "id": "10272120",
@@ -3066,7 +3193,8 @@
             "target": "selected"
           },
           {
-            "op": "summon_exact_copy",
+            "op": "summon",
+            "source": "copy",
             "target": "selected"
           }
         ]
@@ -3086,7 +3214,8 @@
             "target": "selected"
           },
           {
-            "op": "summon_exact_copy",
+            "op": "summon",
+            "source": "copy",
             "target": "selected"
           }
         ]
@@ -3115,6 +3244,7 @@
     "fanfare": [
       {
         "op": "keyword",
+        "action": "grant",
         "target": "ally:hand",
         "condition": {
           "type_eq": "Follower",
@@ -3128,6 +3258,7 @@
             "effects": [
               {
                 "op": "draw",
+                "source": "deck",
                 "amount": 1
               }
             ]
@@ -3155,31 +3286,27 @@
     "evolve": [
       {
         "op": "keyword",
+        "action": "grant",
         "target": "ally:hand",
         "condition": {
           "type_eq": "Follower",
           "tribe": "Artifact"
         },
         "select": 1,
-        "keywords": [
-          "Ward",
-          "cant_be_destroyed"
-        ]
+        "keywords": ["Ward", "cant_be_destroyed"]
       }
     ],
     "superevolve": [
       {
         "op": "keyword",
+        "action": "grant",
         "target": "ally:hand",
         "condition": {
           "type_eq": "Follower",
           "tribe": "Artifact"
         },
         "select": 1,
-        "keywords": [
-          "Ward",
-          "cant_be_destroyed"
-        ]
+        "keywords": ["Ward", "cant_be_destroyed"]
       }
     ],
     "fanfare": [],
@@ -3204,12 +3331,14 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Lloyd",
         "count": 1
       },
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Victoria",
         "count": 1
       }
@@ -3234,21 +3363,24 @@
     "hasOngoing": true,
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Enhanced Puppet",
         "count": 1
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Enhanced Puppet",
         "count": 1
       }
     ],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Victoria",
         "count": 1
       }
@@ -3265,9 +3397,8 @@
         "effects": [
           {
             "op": "keyword",
-            "keywords": [
-              "Ward"
-            ],
+            "action": "grant",
+            "keywords": ["Ward"],
             "target": "entering_follower"
           }
         ]
@@ -3298,7 +3429,13 @@
     ],
     "fanfare": [
       {
-        "op": "select_hand_summon_artifact_copy",
+        "op": "summon",
+        "source": "hand",
+        "mode": "copy",
+        "filter": {
+          "type": "Artifact"
+        },
+        "select": true,
         "max_cost": 5
       }
     ],

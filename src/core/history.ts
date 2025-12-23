@@ -1,4 +1,3 @@
-
 // /gamelogic/history.ts
 import { state } from "./gameState.js";
 import { adapter } from "./adapter.js";
@@ -26,10 +25,12 @@ interface ActionContext {
 }
 
 // --- Internals ---
-let past: HistoryEntry[] = [];   // stack of { name, before, after, meta }
+let past: HistoryEntry[] = []; // stack of { name, before, after, meta }
 let future: HistoryEntry[] = []; // stack of same
 let inAction: ActionContext | null = null; // { name, before, meta }
-let onChange: ((status: { canUndo: boolean, canRedo: boolean }) => void) | null = null; // optional listener
+let onChange:
+  | ((status: { canUndo: boolean; canRedo: boolean }) => void)
+  | null = null; // optional listener
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
@@ -123,7 +124,6 @@ function cloneItem(item: any, path: string): any {
   }
 }
 
-
 function replaceState(next: GameState) {
   // Preserve the RNG instance
   const rngInstance = state.rng;
@@ -148,13 +148,17 @@ function trimRing() {
   if (past.length > MAX_HISTORY) past = past.slice(past.length - MAX_HISTORY);
 }
 
-function notify() { if (typeof onChange === "function") onChange({ canUndo: past.length > 0, canRedo: future.length > 0 }); }
+function notify() {
+  if (typeof onChange === "function")
+    onChange({ canUndo: past.length > 0, canRedo: future.length > 0 });
+}
 
 // --- Public API ---
 
 /** Begin an action. Wrap mutations between beginAction/commitAction OR use doAction(). */
 export function beginAction(name: string, meta: any = {}) {
-  if (inAction) throw new Error("history.beginAction called while another action is open");
+  if (inAction)
+    throw new Error("history.beginAction called while another action is open");
   inAction = { name, before: snapshot(), meta };
 }
 
@@ -172,10 +176,12 @@ export function commitAction({ autoRender = true } = {}) {
     name: entry.name,
     meta: entry.meta || {},
     before_hash: entry.before_hash, // optional if you store it
-    after_hash: entry.after_hash
+    after_hash: entry.after_hash,
   });
 
-  const suppress = ((globalThis as any).HEADLESS === true) || ((globalThis as any).AI_SUPPRESS_RENDER === true);
+  const suppress =
+    (globalThis as any).HEADLESS === true ||
+    (globalThis as any).AI_SUPPRESS_RENDER === true;
   if (autoRender && !suppress) adapter.render();
   notify();
 }
@@ -190,7 +196,12 @@ export function abortAction() {
 }
 
 /** One-shot helper: wraps a mutation function into a Command. */
-export function doAction(name: string, fn: () => void, meta: any = {}, { autoRender = true } = {}) {
+export function doAction(
+  name: string,
+  fn: () => void,
+  meta: any = {},
+  { autoRender = true } = {},
+) {
   beginAction(name, meta);
   try {
     fn(); // perform all state mutations here
@@ -202,7 +213,9 @@ export function doAction(name: string, fn: () => void, meta: any = {}, { autoRen
 }
 
 /** True if an action is currently open. */
-export function isInAction() { return !!inAction; }
+export function isInAction() {
+  return !!inAction;
+}
 
 /**
  * Append a non-snapshot "step" into the current open action.
@@ -211,7 +224,7 @@ export function isInAction() { return !!inAction; }
 export function appendStep(name: string, meta: any = {}) {
   if (!inAction) {
     // No action open → record a zero-mutation action so the step is still visible in history.
-    doAction(name, () => { }, { step: true, ...meta }, { autoRender: false });
+    doAction(name, () => {}, { step: true, ...meta }, { autoRender: false });
     return;
   }
   if (!inAction.meta) inAction.meta = {};
@@ -251,11 +264,20 @@ export function redo({ autoRender = true } = {}) {
   return false;
 }
 
-export function canUndo() { return past.length > 0; }
-export function canRedo() { return future.length > 0; }
+export function canUndo() {
+  return past.length > 0;
+}
+export function canRedo() {
+  return future.length > 0;
+}
 
 /** Optional: set a listener to enable/disable UI buttons. */
-export function onHistoryChange(cb: (status: { canUndo: boolean, canRedo: boolean }) => void) { onChange = cb; notify(); }
+export function onHistoryChange(
+  cb: (status: { canUndo: boolean; canRedo: boolean }) => void,
+) {
+  onChange = cb;
+  notify();
+}
 
 /** Optional: clear all history (e.g., on New Game). */
 export function resetHistory() {
@@ -266,9 +288,14 @@ export function resetHistory() {
 }
 
 /** Hotkeys: Ctrl/Cmd+Z (undo), Ctrl+Shift+Z or Ctrl+Y (redo) */
-export function initHistoryHotkeys({ target = document }: { target?: Document | HTMLElement } = {}) {
+export function initHistoryHotkeys({
+  target = document,
+}: { target?: Document | HTMLElement } = {}) {
   target.addEventListener("keydown", (e: any) => {
-    const isMac = typeof navigator !== "undefined" && navigator.platform && navigator.platform.toUpperCase().includes("MAC");
+    const isMac =
+      typeof navigator !== "undefined" &&
+      navigator.platform &&
+      navigator.platform.toUpperCase().includes("MAC");
     const ctrl = isMac ? e.metaKey : e.ctrlKey;
 
     // Undo: Ctrl/Cmd+Z (without Shift)
@@ -278,8 +305,10 @@ export function initHistoryHotkeys({ target = document }: { target?: Document | 
       return;
     }
     // Redo: Ctrl/Cmd+Shift+Z OR Ctrl+Y
-    if ((ctrl && e.shiftKey && (e.key === "z" || e.key === "Z")) ||
-      (e.ctrlKey && (e.key === "y" || e.key === "Y"))) {
+    if (
+      (ctrl && e.shiftKey && (e.key === "z" || e.key === "Z")) ||
+      (e.ctrlKey && (e.key === "y" || e.key === "Y"))
+    ) {
       e.preventDefault();
       redo();
     }

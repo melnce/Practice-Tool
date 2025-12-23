@@ -1,0 +1,14 @@
+﻿src/logic/core/effects/build.ts(13,43): error TS2536: Type 'K' cannot be used to index type 'MappedOps'.
+src/logic/core/effects/build.ts(45,73): error TS2536: Type 'K' cannot be used to index type 'MappedOps'.
+src/logic/core/effects/build.ts(46,34): error TS2536: Type 'K' cannot be used to index type 'MappedOps'.
+src/logic/core/effects/build.ts(71,4): error TS2536: Type 'K' cannot be used to index type 'MappedOps'.
+src/logic/core/effects/build.ts(81,68): error TS2339: Property 'deck' does not exist on type 'MappedOps'.
+src/logic/core/effects/build.ts(81,68): error TS2339: Property 'discard' does not exist on type 'MappedOps'.
+src/logic/core/effects/build.ts(81,68): error TS2339: Property 'ep' does not exist on type 'MappedOps'.
+src/logic/core/effects/build.ts(81,68): error TS2339: Property 'pp' does not exist on type 'MappedOps'.
+src/logic/core/effects/domains/resources.ts(133,27): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Effect & { mode?: DiscardMode; }'.
+src/logic/core/effects/index.ts(87,27): error TS2536: Type 'K' cannot be used to index type 'MappedOps'.
+src/logic/core/effects/registry.ts(21,28): error TS2536: Type 'K' cannot be used to index type 'MappedOps'.
+src/logic/effects/ops/cost/unified.ts(79,14): error TS2678: Type '"last_drawn"' is not comparable to type 'CostTarget'.
+src/logic/effects/ops/stat/orchestrator.ts(14,17): error TS7023: 'handleStatOrchestrator' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions.
+src/logic/effects/ops/stat/orchestrator.ts(35,19): error TS7022: 'res' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.

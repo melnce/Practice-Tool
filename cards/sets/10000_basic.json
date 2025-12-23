@@ -23,7 +23,9 @@
         "cost": 4,
         "effects": [
           {
-            "op": "buff_self",
+            "op": "stat",
+            "action": "give",
+            "target": "self",
             "attack": 3,
             "defense": 3
           }
@@ -49,6 +51,7 @@
     "evolve": [
       {
         "op": "draw",
+        "source": "deck",
         "player": "self",
         "count": 1
       }
@@ -56,6 +59,7 @@
     "superevolve": [
       {
         "op": "draw",
+        "source": "deck",
         "player": "self",
         "count": 1
       }
@@ -68,6 +72,7 @@
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "player": "self",
             "count": 1
           }
@@ -93,9 +98,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10001210",
@@ -121,9 +124,10 @@
         "sacrifice": true,
         "effects": [
           {
-            "op": "remove_keyword",
+            "op": "keyword",
+            "action": "remove",
             "target": "enemy:follower",
-            "keyword": "Ward",
+            "keywords": ["Ward"],
             "select": 1
           }
         ]
@@ -147,14 +151,16 @@
     "url": "https://shadowverse.gg/cards/10002110-arriet-luxminstrel",
     "evolve": [
       {
-        "op": "heal_leader",
+        "op": "restore",
+        "target": "leader",
         "player": "self",
         "amount": 2
       }
     ],
     "superevolve": [
       {
-        "op": "heal_leader",
+        "op": "restore",
+        "target": "leader",
         "player": "self",
         "amount": 4
       }
@@ -202,6 +208,7 @@
     "fanfare": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 1,
         "filters": {
           "type": "Follower"
@@ -215,11 +222,10 @@
         "effects": [
           {
             "op": "keyword",
+            "action": "grant",
             "target": "ally:follower",
             "select": 1,
-            "keywords": [
-              "Rush"
-            ]
+            "keywords": ["Rush"]
           }
         ]
       }
@@ -244,7 +250,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Fairy",
         "count": 2
       }
@@ -270,7 +278,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "combo_add",
+        "op": "counter",
+        "action": "add",
+        "key": "combo",
         "amount": 1
       }
     ],
@@ -296,11 +306,13 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "combo_gate",
+        "op": "gate",
+        "condition": "combo",
         "count": 3,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -312,7 +324,8 @@
         "source": "board",
         "effects": [
           {
-            "op": "heal_leader",
+            "op": "restore",
+            "target": "leader",
             "player": "self",
             "amount": 2
           }
@@ -340,7 +353,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Fairy",
         "count": 1
       }
@@ -383,7 +398,8 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "combo_gate",
+        "op": "gate",
+        "condition": "combo",
         "count": 3,
         "effects": [
           {
@@ -415,15 +431,14 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "return_to_hand",
+        "op": "return",
+        "destination": "hand",
         "target": "enemy:follower",
         "select": 1
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10012310",
@@ -442,7 +457,8 @@
     "url": "https://shadowverse.gg/cards/10012310-bug-alert",
     "spell": [
       {
-        "op": "return_to_hand",
+        "op": "return",
+        "destination": "hand",
         "target": "ally",
         "select": 1
       },
@@ -474,9 +490,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10021120",
@@ -503,6 +517,7 @@
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 1
           }
         ]
@@ -527,9 +542,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10021310",
@@ -548,12 +561,14 @@
     "url": "https://shadowverse.gg/cards/10021310-way-of-the-maid",
     "spell": [
       {
-        "op": "return_hand_to_deck",
+        "op": "return",
+        "destination": "deck",
         "select": 1,
         "target": "ally:hand"
       },
       {
         "op": "draw",
+        "source": "deck",
         "count": 2,
         "filters": {
           "type": "follower",
@@ -586,7 +601,8 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Knight",
             "count": 1
           }
@@ -613,13 +629,12 @@
     "superevolve": [
       {
         "op": "draw",
+        "source": "deck",
         "filters": {
           "name": "Rusty, Luxcard Trickster"
         },
         "count": "all",
-        "keywords": [
-          "Storm"
-        ]
+        "keywords": ["Storm"]
       }
     ],
     "fanfare": [],
@@ -653,7 +668,8 @@
         "name": "AllyEnter",
         "effects": [
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "trigger",
             "attack": 1,
             "defense": 1
@@ -678,13 +694,14 @@
     "set": "[10000] Basic",
     "fanfare": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "label": "Spellboost your hand 2 times",
             "effects": [
               {
-                "op": "spellboost_hand",
+                "op": "spellboost",
+                "target": "hand",
                 "times": 2
               }
             ]
@@ -696,15 +713,17 @@
             },
             "effects": [
               {
-                "op": "buff_self",
+                "op": "stat",
+                "action": "give",
+                "target": "self",
                 "attack": 2,
                 "defense": 2
               },
               {
-                "op": "buff_self",
-                "keywords": [
-                  "Ward"
-                ]
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "keywords": ["Ward"]
               }
             ]
           }
@@ -721,9 +740,7 @@
     "type": "Amulet",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Earth Sigil"
-    ],
+    "tribes": ["Earth Sigil"],
     "description": "Fanfare: Draw a card.\nEarth Sigil\nEngage (1): Gain an earth sigil.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10031210.webp",
     "evo_image": "",
@@ -731,6 +748,7 @@
     "fanfare": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 1
       }
     ],
@@ -747,7 +765,8 @@
         "cost": 1,
         "effects": [
           {
-            "op": "add_counter",
+            "op": "counter",
+            "action": "add",
             "key": "earth",
             "amount": 1
           }
@@ -773,6 +792,7 @@
     "spell": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 1
       }
     ],
@@ -795,7 +815,8 @@
     "url": "https://shadowverse.gg/cards/10031320-truth-summons",
     "spell": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Clay Golem"
       }
     ],
@@ -823,7 +844,8 @@
         "cost": 1,
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Guardian Golem",
             "count": 1
           }
@@ -842,7 +864,8 @@
             "op": "evolve"
           },
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "selected",
             "attack": 3,
             "defense": 3
@@ -908,6 +931,7 @@
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 1
           }
         ]
@@ -959,9 +983,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10041130",
@@ -1073,7 +1095,8 @@
         "cost": 7,
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Vastwing Dragon",
             "count": 1
           }
@@ -1101,15 +1124,18 @@
     "fanfare": [],
     "spell": [
       {
-        "op": "add_max_pp",
+        "op": "pp",
+        "action": "gain_max",
         "amount": 1
       },
       {
-        "op": "max_pp_gate",
+        "op": "gate",
+        "condition": "max_pp",
         "at_least": 10,
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 1
           }
         ]
@@ -1134,10 +1160,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Storm",
-      "Bane"
-    ]
+    "keywords": ["Storm", "Bane"]
   },
   {
     "id": "10051120",
@@ -1184,14 +1207,15 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "necromancy_gate",
+        "op": "gate",
+        "condition": "necromancy",
         "cost": 4,
         "effects": [
           {
-            "op": "buff_self",
-            "keywords": [
-              "Storm"
-            ]
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -1217,13 +1241,14 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "label": "Draw a follower",
             "effects": [
               {
                 "op": "draw",
+                "source": "deck",
                 "count": 1,
                 "filters": {
                   "type": "follower"
@@ -1235,7 +1260,8 @@
             "label": "Reanimate (2)",
             "effects": [
               {
-                "op": "reanimate",
+                "op": "summon",
+                "source": "graveyard",
                 "max_cost": 2
               }
             ]
@@ -1268,7 +1294,9 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "name": "Bat",
             "count": 1
           }
@@ -1293,23 +1321,24 @@
     "url": "https://shadowverse.gg/cards/10052120-amorous-necromancer",
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Ghost",
         "count": 2
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Ghost",
         "count": 2
       },
       {
         "op": "keyword",
+        "action": "grant",
         "target": "ally:last_summoned",
-        "keywords": [
-          "drain"
-        ]
+        "keywords": ["drain"]
       }
     ],
     "fanfare": [],
@@ -1341,6 +1370,7 @@
       },
       {
         "op": "draw",
+        "source": "deck",
         "count": 2
       }
     ]
@@ -1364,14 +1394,13 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "heal_leader",
+        "op": "restore",
+        "target": "leader",
         "player": "self",
         "amount": 5
       }
     ],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10061120",
@@ -1391,9 +1420,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10061130",
@@ -1412,7 +1439,8 @@
     "url": "https://shadowverse.gg/cards/10061130-winged-warrior",
     "evolve": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
         "select": 1,
         "attack": 1,
@@ -1421,7 +1449,8 @@
     ],
     "superevolve": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
         "select": 1,
         "attack": 1,
@@ -1430,7 +1459,8 @@
     ],
     "fanfare": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
         "select": 1,
         "attack": 1,
@@ -1463,7 +1493,8 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Regal Falcon"
           }
         ]
@@ -1473,7 +1504,8 @@
         "cost": 2,
         "effects": [
           {
-            "op": "reduce_countdown",
+            "op": "amulet",
+            "action": "reduce_countdown",
             "amount": 2
           }
         ]
@@ -1537,9 +1569,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [
       {
         "event": "engage",
@@ -1549,10 +1579,10 @@
         },
         "effects": [
           {
-            "op": "buff_self",
-            "keywords": [
-              "Storm"
-            ]
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -1585,7 +1615,8 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Holy Falcon"
           }
         ]
@@ -1595,7 +1626,8 @@
         "cost": 1,
         "effects": [
           {
-            "op": "reduce_countdown",
+            "op": "amulet",
+            "action": "reduce_countdown",
             "amount": 1
           }
         ]
@@ -1621,14 +1653,14 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       }
     ],
-    "keywords": [
-      "Rush"
-    ]
+    "keywords": ["Rush"]
   },
   {
     "id": "10071120",
@@ -1649,7 +1681,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Enhanced Puppet",
         "count": 1
       }
@@ -1674,10 +1708,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Bane",
-      "Ward"
-    ]
+    "keywords": ["Bane", "Ward"]
   },
   {
     "id": "10071310",
@@ -1703,12 +1734,16 @@
         "select": 1
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -1734,7 +1769,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -1758,22 +1795,22 @@
     "url": "https://shadowverse.gg/cards/10072120-mecha-cavalier",
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Mecha Cavalier",
         "count": 1
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Mecha Cavalier",
         "count": 2
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10072210",
@@ -1795,7 +1832,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Puppet",
         "count": 1
       }
@@ -1806,7 +1845,9 @@
         "source": "board",
         "effects": [
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "name": "Puppet",
             "count": 1
           }

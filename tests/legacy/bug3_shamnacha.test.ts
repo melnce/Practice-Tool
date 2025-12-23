@@ -1,9 +1,9 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { state, resetGameState } from '../../../src/core/gameState.js';
-import { handleChooseBonusAdd } from '../../../src/logic/effects/ops/misc.js';
+import { handleModeBonus } from '../../../src/logic/effects/ops/misc.js';
 import { crestSpendCounter } from '../../../src/logic/effects/crest.js';
-import { handleChoose } from '../../../src/logic/effects/ops/choose.js';
+import { handleMode } from '../../../src/logic/effects/ops/mode.js';
 
 describe('Bug 3: Sham-Nacha Faith Mode Selection', () => {
     beforeEach(() => {
@@ -33,18 +33,18 @@ describe('Bug 3: Sham-Nacha Faith Mode Selection', () => {
 
         // Verify bonus IS added
         if (success) {
-            handleChooseBonusAdd('blue', { amount: 1 } as any);
+            handleModeBonus({ amount: 1 } as any, { owner: 'blue' });
         }
-        expect(state.blueChooseBonus).toBe(1);
+        expect(state.blueModeBonus).toBe(1);
     });
 
     it('Should allow selecting 3 modes if bonus is correctly applied', () => {
         // This test simulates the FIXED behavior to verify logic chain
-        state.blueChooseBonus = 1;
+        state.blueModeBonus = 1;
 
         // Mock Choose effect with 2 base options
         const eff = {
-            op: "choose",
+            op: "mode",
             select_count: 2,
             options: [
                 { label: "A" }, { label: "B" }, { label: "C" }, { label: "D" } // 4 options available

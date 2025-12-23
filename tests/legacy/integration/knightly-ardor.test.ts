@@ -65,7 +65,7 @@ describe("Knightly Ardor", () => {
 
         // Run the buff effect targeting leftmost Swordcraft
         runEffects([{
-            op: "buff",
+            op: "stat",
             target: "ally:follower",
             filter: "leftmost",
             condition: { class: "Swordcraft" },
@@ -104,7 +104,7 @@ describe("Knightly Ardor", () => {
         state.blueBoard = [swordFollower, forestFollower] as any;
 
         runEffects([{
-            op: "buff",
+            op: "stat",
             target: "ally:follower",
             condition: { class: "Swordcraft" },
             attack: 1,

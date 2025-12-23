@@ -1,35 +1,34 @@
-
 export const RESOURCE_OPS = [
-    "add_max_pp",
-    "gain_max_pp",
-    "recover_pp",
-    "recover_ep",
-    "add_shadows",
-    "necromancy_gate",
-    "overflow_gate",
-    "earth_rite",
-    "draw",  // Unified draw op - supports player, filters, count, mode, keywords
-    "add_to_hand",
-    "add_selected_copy_to_hand",
-    "discard_select_hand",
-    "discard_all_except_named",
-    "transform_in_hand",
-    "transform_random_spell_in_hand",
-    "replace_deck",
-    "replace_deck_with_set_minus",
-    "set_cost_last_drawn",
-    "halve_deck_cost",
-    "reduce_deck_followers_cost",
-    "gain_crest",
-    "crest_add_counter",
-    "crest_pay_counter",
-    "fuse_start",
-    "start_fortifier_fuse",
-    "start_fuse_from_card",
-    "fuse_finalize_fortifier",
-    "fuse_finalize_generic",
-    "fuse_finalize_alpha",
-    "fuse_finalize_gear_multi",
-    "fuse_finalize_gardens_allure",
-    "fuse_finalize_loot"
+  // Unified PP - replaces gain_max_pp, recover_pp
+  // action: "gain_max" = increase max PP
+  // action: "recover" = restore current PP
+  "pp",
+
+  // Unified EP - replaces recover_ep
+  // action: "recover" = restore evolution points
+  "ep",
+
+  "add_shadows",
+  "earth_rite",
+
+  // Unified draw - supports source: deck, named, copy
+  // Replaces add_to_hand, add_selected_copy_to_hand
+  "draw",
+
+  // Unified discard - replaces discard_select_hand, discard_all_except_named
+  // mode: "select" = select cards to discard (default)
+  // mode: "except_named" = discard all except named cards
+  "discard",
+
+  // transform_in_hand and transform_random_spell_in_hand are now handled by
+  // unified transform op (board.ts) with zone: "hand"
+
+  // Unified deck - replaces replace_deck, replace_deck_with_set_minus, halve_deck_cost, reduce_deck_followers_cost
+  // set_cost_last_drawn is now handled by cost op with target: "last_drawn"
+  "deck",
+
+  // Unified crest - replaces gain_crest, crest_add_counter, crest_pay_counter
+  "crest",
+  // Unified fuse - replaces fuse_start, start_fuse_from_card, fuse_finalize_*, start_fortifier_fuse
+  "fuse",
 ] as const;

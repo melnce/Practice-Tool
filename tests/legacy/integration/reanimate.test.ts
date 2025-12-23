@@ -30,7 +30,7 @@ describe("Reanimate Mechanics", () => {
         // Reanimate usually looks for largest cost <= X.
 
         const reanimateEff = {
-            op: "reanimate",
+            op: "summon",
             x: 2
         };
 
@@ -47,7 +47,7 @@ describe("Reanimate Mechanics", () => {
         state.blueGraveyard = [unit];
 
         const reanimateEff = {
-            op: "reanimate",
+            op: "summon",
             x: 4
         };
 

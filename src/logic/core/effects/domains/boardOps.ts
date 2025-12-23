@@ -1,19 +1,14 @@
-
 export const BOARD_OPS = [
-    "summon",
-    "summon_exact_copy",
-    "summon_named",
-    "summon_named_enemy",
-    "summon_random_from_deck",
-    "summon_destroyed_amulet_highest_base_cost",
-    "fill_congregant_copies",
-    "congregant_fill_board",
-    "fill_board_chain_decay",
-    "select_hand_summon_artifact_copy",
-    "select_hand_summon_artifact_copies_eot_destroy",
-    "reanimate",
-    "return_to_hand",
-    "bounce",
-    "return_hand_to_deck",
-    "transform"
+  // Unified summon - covers all summon variants via source/mode fields
+  // Includes: named, copy, deck, hand (artifact), destroyed/graveyard (reanimate), chain_fill
+  "summon",
+
+  // Unified return - replaces return_to_hand, bounce, return_hand_to_deck
+  "return",
+
+  // Unified amulet - handles amulet countdown (instance-based)
+  "amulet",
+
+  // Transform
+  "transform",
 ] as const;

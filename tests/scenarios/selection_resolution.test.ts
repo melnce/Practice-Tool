@@ -6,80 +6,80 @@ import { CardInstance, Effect } from "../../src/core/types.js";
 
 // Helper to create a dummy card
 function createCard(id: string, name: string): CardInstance {
-    return {
-        uid: id,
-        name: name,
-        type: "Follower",
-        cost: 1,
-        base_cost: 1,
-        attack: 1,
-        defense: 1,
-        base_attack: 1,
-        base_defense: 1,
-        keywordState: {},
-        zone: "board"
-    } as any;
+  return {
+    uid: id,
+    name: name,
+    type: "Follower",
+    cost: 1,
+    base_cost: 1,
+    attack: 1,
+    defense: 1,
+    base_attack: 1,
+    base_defense: 1,
+    keywordState: {},
+    zone: "board",
+  } as any;
 }
 
 describe("Scenario: Selection Resolution", () => {
-    beforeEach(() => {
-        resetGameState();
-    });
+  beforeEach(() => {
+    resetGameState();
+  });
 
-    afterEach(() => {
-        checkStateIntegrity(state);
-    });
+  afterEach(() => {
+    checkStateIntegrity(state);
+  });
 
-    it("should clear pendingSelection after a valid selection is made", () => {
-        const ally = createCard("ally_1", "Ally");
-        const enemy = createCard("enemy_1", "Enemy");
-        state.blueBoard.push(ally);
-        state.redBoard.push(enemy);
+  it("should clear pendingSelection after a valid selection is made", () => {
+    const ally = createCard("ally_1", "Ally");
+    const enemy = createCard("enemy_1", "Enemy");
+    state.blueBoard.push(ally);
+    state.redBoard.push(enemy);
 
-        // 1. Trigger an effect that requires selection
-        const effect: Effect = {
-            op: "damage",
-            amount: 1,
-            target: "enemy:follower",
-            select: 1
-        };
+    // 1. Trigger an effect that requires selection
+    const effect: Effect = {
+      op: "damage",
+      amount: 1,
+      target: "enemy:follower",
+      select: 1,
+    };
 
-        // 2. Mock the selection context provided by the UI/AI
-        const context = {
-            targets: [enemy]
-        };
+    // 2. Mock the selection context provided by the UI/AI
+    const context = {
+      targets: [enemy],
+    };
 
-        // 3. Run the effect
-        // The engine's `handleSelect` logic typically consumes the context.targets immediately if present
-        const result = runEffects([effect], "blue", ally, context);
+    // 3. Run the effect
+    // The engine's `handleSelect` logic typically consumes the context.targets immediately if present
+    const result = runEffects([effect], "blue", ally, context);
 
-        // 4. Verification
-        // Ops result: "done" means it executed successfully
-        expect(result).toBe("done");
+    // 4. Verification
+    // Ops result: "done" means it executed successfully
+    expect(result).toBe("done");
 
-        // State verification
-        expect(enemy.defense).toBe(0); // Damage applied (1 - 1 = 0)
-        expect(state.pendingSelection).toBeNull(); // Pending state must be clear
-    });
+    // State verification
+    expect(enemy.defense).toBe(0); // Damage applied (1 - 1 = 0)
+    expect(state.pendingSelection).toBeNull(); // Pending state must be clear
+  });
 
-    it("should set pendingSelection if no targets provided for a select ops", () => {
-        const ally = createCard("ally_1", "Ally");
-        const enemy = createCard("enemy_1", "Enemy");
-        state.blueBoard.push(ally);
-        state.redBoard.push(enemy);
+  it("should set pendingSelection if no targets provided for a select ops", () => {
+    const ally = createCard("ally_1", "Ally");
+    const enemy = createCard("enemy_1", "Enemy");
+    state.blueBoard.push(ally);
+    state.redBoard.push(enemy);
 
-        const effect: Effect = {
-            op: "damage",
-            amount: 1,
-            target: "enemy:follower",
-            select: 1
-        };
+    const effect: Effect = {
+      op: "damage",
+      amount: 1,
+      target: "enemy:follower",
+      select: 1,
+    };
 
-        // No context provided (undefined targets)
-        const result = runEffects([effect], "blue", ally);
+    // No context provided (undefined targets)
+    const result = runEffects([effect], "blue", ally);
 
-        expect(result).toBe("pending");
-        expect(state.pendingSelection).not.toBeNull();
-        expect(state.pendingSelection?.op).toBe("damage");
-    });
+    expect(result).toBe("pending");
+    expect(state.pendingSelection).not.toBeNull();
+    expect(state.pendingSelection?.op).toBe("damage");
+  });
 });

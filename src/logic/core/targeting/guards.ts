@@ -9,23 +9,24 @@ let _currentOp: string | null = null;
 let _isTargetedOpDispatchActive = false;
 
 // Environment check helper
-const isDev = () => typeof process !== "undefined" && process?.env?.NODE_ENV !== "production";
+const isDev = () =>
+  typeof process !== "undefined" && process?.env?.NODE_ENV !== "production";
 
 /**
  * Marks the start of a targeted operation dispatch.
  * @param opName - The operation being dispatched.
  */
 export function startDispatch(opName: string) {
-    _isTargetedOpDispatchActive = true;
-    if (isDev()) _currentOp = opName;
+  _isTargetedOpDispatchActive = true;
+  if (isDev()) _currentOp = opName;
 }
 
 /**
  * Marks the end of a targeted operation dispatch.
  */
 export function endDispatch() {
-    _isTargetedOpDispatchActive = false;
-    if (isDev()) _currentOp = null;
+  _isTargetedOpDispatchActive = false;
+  if (isDev()) _currentOp = null;
 }
 
 /**
@@ -33,23 +34,25 @@ export function endDispatch() {
  * ENFORCEMENT: Only allowed for specific operations.
  */
 export function runWithBypass(callback: () => void) {
-    if (isDev()) {
-        if (!_currentOp || !ALLOWED_BYPASS_OPS.has(_currentOp)) {
-            throw new Error(`Illegal guard bypass attempt by op: "${_currentOp}". Bypass is restricted.`);
-        }
+  if (isDev()) {
+    if (!_currentOp || !ALLOWED_BYPASS_OPS.has(_currentOp)) {
+      throw new Error(
+        `Illegal guard bypass attempt by op: "${_currentOp}". Bypass is restricted.`,
+      );
     }
+  }
 
-    // We don't use try/finally here for _isTargetedOpDispatchActive restore
-    // because if callback throws, the dispatcher's main try/finally will call endDispatch().
-    // Actually, we SHOULD restore strictness if we catch, but rethrow?
-    // Standard try/finally to ensure guard is restored for subsequent usage in same stack?
-    const wasActive = _isTargetedOpDispatchActive;
-    _isTargetedOpDispatchActive = false;
-    try {
-        callback();
-    } finally {
-        _isTargetedOpDispatchActive = wasActive;
-    }
+  // We don't use try/finally here for _isTargetedOpDispatchActive restore
+  // because if callback throws, the dispatcher's main try/finally will call endDispatch().
+  // Actually, we SHOULD restore strictness if we catch, but rethrow?
+  // Standard try/finally to ensure guard is restored for subsequent usage in same stack?
+  const wasActive = _isTargetedOpDispatchActive;
+  _isTargetedOpDispatchActive = false;
+  try {
+    callback();
+  } finally {
+    _isTargetedOpDispatchActive = wasActive;
+  }
 }
 
 /**
@@ -57,8 +60,10 @@ export function runWithBypass(callback: () => void) {
  * Throws if active.
  */
 export function guardLifecycle(functionName: string) {
-    // Only check in Dev/Test environments to prevent production crashes
-    if (isDev() && _isTargetedOpDispatchActive) {
-        throw new Error(`Targeted op handler illegally invoked lifecycle function: ${functionName}`);
-    }
+  // Only check in Dev/Test environments to prevent production crashes
+  if (isDev() && _isTargetedOpDispatchActive) {
+    throw new Error(
+      `Targeted op handler illegally invoked lifecycle function: ${functionName}`,
+    );
+  }
 }

@@ -33,7 +33,6 @@
   transform: scale(1.05);
 }
 
-
 #redBoost {
   margin-top: 6px;
   background-color: red;
@@ -55,7 +54,6 @@
   gap: 8px;
 }
 
-
 .evo-btn {
   padding: 6px 10px;
   border: none;
@@ -63,7 +61,7 @@
   font-weight: bold;
   cursor: pointer;
   font-size: 0.85rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .normal-evo {
@@ -82,7 +80,10 @@
   cursor: default;
 }
 
-.evo-btn:disabled { opacity: .4; cursor: default; }
+.evo-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 
 /* Choice Modal Styles */
 .choice-modal {
@@ -160,14 +161,14 @@
 }
 
 @keyframes pulse-glow {
-  0% { 
-    box-shadow: 0 0 5px rgba(255, 100, 100, 0.5); 
+  0% {
+    box-shadow: 0 0 5px rgba(255, 100, 100, 0.5);
   }
-  50% { 
-    box-shadow: 0 0 20px rgba(255, 100, 100, 0.8); 
+  50% {
+    box-shadow: 0 0 20px rgba(255, 100, 100, 0.8);
   }
-  100% { 
-    box-shadow: 0 0 5px rgba(255, 100, 100, 0.5); 
+  100% {
+    box-shadow: 0 0 5px rgba(255, 100, 100, 0.5);
   }
 }
 
@@ -184,7 +185,7 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 .confirm-targets-btn {
-  background: linear-gradient(45deg, #4CAF50, #45a049);
+  background: linear-gradient(45deg, #4caf50, #45a049);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -192,14 +193,14 @@
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
 }
 
 .confirm-targets-btn:hover {
-  background: linear-gradient(45deg, #45a049, #4CAF50);
+  background: linear-gradient(45deg, #45a049, #4caf50);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
 .confirm-targets-btn:active {

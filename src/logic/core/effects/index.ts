@@ -7,11 +7,17 @@
 import { state } from "../../../core/gameState.js";
 import { adapter } from "../../../core/adapter.js";
 import { registerRunEffects } from "../triggers.js";
-import { CardInstance, Effect, Player, EffectOp, EffectByOp, EffectResult } from "../../../core/types.js";
+import {
+  CardInstance,
+  Effect,
+  Player,
+  EffectOp,
+  EffectByOp,
+  EffectResult,
+} from "../../../core/types.js";
 import { guardLifecycle } from "../targeting/guards.js";
 import { registerRunEffectsInCleanup } from "../cleanup.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
-
 
 // Registry
 import { getOp, EffectCtx, sealRegistry } from "./registry.js";
@@ -36,19 +42,19 @@ import { listOps } from "./registry.js";
 const registered = new Set(listOps());
 const expected = new Set(ALL_OPS);
 
-const missing = ALL_OPS.filter(op => !registered.has(op));
-const extra = listOps().filter(op => !expected.has(op));
+const missing = ALL_OPS.filter((op) => !registered.has(op));
+const extra = listOps().filter((op) => !expected.has(op));
 
 if (missing.length > 0 || extra.length > 0) {
-    const msg = [
-        `Effect op registration mismatch.`,
-        `Expected: ${expected.size}, Actual: ${registered.size}`,
-        `Missing (${missing.length}):`,
-        ...missing.map(op => `- ${op}`),
-        `Extra (${extra.length}):`,
-        ...extra.map(op => `- ${op}`)
-    ].join("\n");
-    throw new Error(msg);
+  const msg = [
+    `Effect op registration mismatch.`,
+    `Expected: ${expected.size}, Actual: ${registered.size}`,
+    `Missing (${missing.length}):`,
+    ...missing.map((op) => `- ${op}`),
+    `Extra (${extra.length}):`,
+    ...extra.map((op) => `- ${op}`),
+  ].join("\n");
+  throw new Error(msg);
 }
 
 sealRegistry();
@@ -60,31 +66,38 @@ sealRegistry();
  * @param {string} owner - "blue" or "red".
  */
 export function onFanfare(card: CardInstance, owner: Player) {
-    const list = card.fanfare || [];
-    if (Array.isArray(list) && list.length) runEffects([...list], owner, card);
+  const list = card.fanfare || [];
+  if (Array.isArray(list) && list.length) runEffects([...list], owner, card);
 }
 
 export function getEffectiveCost(card: CardInstance) {
-    if (typeof card.effectiveCost === 'number' && Number.isFinite(card.effectiveCost)) return card.effectiveCost;
-    const base = parseInt(card?.cost as string, 10) || 0;
-    const mod = parseInt((card as any)?.cost_mod, 10) || 0;
-    return base + mod;
+  if (
+    typeof card.effectiveCost === "number" &&
+    Number.isFinite(card.effectiveCost)
+  )
+    return card.effectiveCost;
+  const base = parseInt(card?.cost as string, 10) || 0;
+  const mod = parseInt((card as any)?.cost_mod, 10) || 0;
+  return base + mod;
 }
 
 // Notify (event-only) that a Loot spell was played.
 // Keeps evolveEffects generic; cards listen via triggers (event: "loot_played").
 
-
 // Helper: Dispatch effect with strict types
-function dispatchEffect<K extends EffectOp>(op: K, eff: Effect, ctx: EffectCtx): EffectResult | void {
-    console.error("DEBUG_DISPATCH: dispatching", op);
-    if (eff.op !== op) return; // Should not happen if confirmed 'eff.op'
-    const handler = getOp(op);
-    if (!handler) {
-        throw new Error(`UNKNOWN EFFECT OPERATION: ${op}`);
-    }
-    // We cast strictly to 'EffectByOp[K]' which is safe because we verified op === K
-    return handler(eff as EffectByOp[K], ctx);
+function dispatchEffect<K extends EffectOp>(
+  op: K,
+  eff: Effect,
+  ctx: EffectCtx,
+): EffectResult | void {
+  console.error("DEBUG_DISPATCH: dispatching", op);
+  if (eff.op !== op) return; // Should not happen if confirmed 'eff.op'
+  const handler = getOp(op);
+  if (!handler) {
+    throw new Error(`UNKNOWN EFFECT OPERATION: ${op}`);
+  }
+  // We cast strictly to 'EffectByOp[K]' which is safe because we verified op === K
+  return handler(eff as EffectByOp[K], ctx);
 }
 
 // --- The Master Effect Runner ---
@@ -96,88 +109,104 @@ function dispatchEffect<K extends EffectOp>(op: K, eff: Effect, ctx: EffectCtx):
  * @param {object|null} sourceCard - The card initiating the effects.
  * @param {object} [context={}] - Shared context for targeting and chaining.
  */
-export function runEffects(effects: Effect[], owner: Player, sourceCard: CardInstance | null, context?: any) {
-    guardLifecycle("runEffects");
+export function runEffects(
+  effects: Effect[],
+  owner: Player,
+  sourceCard: CardInstance | null,
+  context?: any,
+) {
+  guardLifecycle("runEffects");
 
-    // Runtime Assertion: Registry must be sealed
-    void import("./registry.js").then(({ isRegistrySealed }) => {
-        if (!isRegistrySealed()) {
-            throw new Error("[Dispatcher] CRITICAL: Attempted to run effects before registry was sealed.");
-        }
+  // Runtime Assertion: Registry must be sealed
+  void import("./registry.js").then(({ isRegistrySealed }) => {
+    if (!isRegistrySealed()) {
+      throw new Error(
+        "[Dispatcher] CRITICAL: Attempted to run effects before registry was sealed.",
+      );
+    }
+  });
+
+  if (!effects) return;
+
+  // Runtime Assertion: Queue must be an array
+  if (!Array.isArray(effects)) {
+    throw new Error("[Dispatcher] Invalid effects queue: expected array.");
+  }
+
+  if (effects.length === 0) return;
+
+  const queue = [...effects]; // Shallow copy to process
+
+  // Trace: dispatch_start
+  // Access trace from context if available, or fall back to global trace (for replay injection)
+  const trace = context?.trace ?? getGlobalTrace();
+  if (trace) trace.emit({ kind: "dispatch_start", queueSize: queue.length });
+
+  let processedCount = 0;
+
+  while (queue.length > 0) {
+    const eff = queue.shift()!;
+
+    // Runtime Assertion: Op must be valid string
+    if (!eff.op || typeof eff.op !== "string") {
+      throw new Error(
+        `[Dispatcher] Invalid operation: ${JSON.stringify(eff)} in card ${sourceCard?.name || "unknown"}`,
+      );
+    }
+
+    recordEvent({
+      type: "run_effect",
+      payload: { op: eff.op, owner, source: sourceCard?.name },
     });
 
-    if (!effects) return;
+    // Trace: effect_start
+    if (trace) trace.emit({ kind: "effect_start", op: eff.op, depth: 0 }); // Depth not tracked yet
 
-    // Runtime Assertion: Queue must be an array
-    if (!Array.isArray(effects)) {
-        throw new Error("[Dispatcher] Invalid effects queue: expected array.");
+    // Build context for the handler
+    const ctx: EffectCtx = {
+      state,
+      owner,
+      sourceCard,
+      queue,
+      context,
+      adapter: { ...adapter, render: () => {} } as any, // Prevent render loops
+      trace, // Pass it down
+    };
+
+    try {
+      const result = dispatchEffect(eff.op, eff, ctx);
+
+      // Protocol: "pending" stops the queue. Anything else continues.
+      // We do not wait for Promises (fire-and-forget for animations/async side effects),
+      // UNLESS the handler explicitly paused by returning "pending".
+      if (result === "pending") {
+        // Trace: effect_pending
+        if (trace) trace.emit({ kind: "effect_pending", op: eff.op });
+
+        // Paused execution (e.g. targeting waiting for input)
+        // The queue state is preserved in the closure references if passed to targeting,
+        // otherwise it is lost here (which is correct for "pause").
+        return;
+      }
+
+      // Trace: effect_end
+      if (trace) trace.emit({ kind: "effect_end", op: eff.op });
+      processedCount++;
+    } catch (e) {
+      // Contextualize error
+      const err = e instanceof Error ? e : new Error(String(e));
+      err.message = `[Dispatcher] Error in op '${eff.op}': ${err.message}`;
+      throw err;
     }
+  }
 
-    if (effects.length === 0) return;
-
-    const queue = [...effects]; // Shallow copy to process
-
-    // Trace: dispatch_start
-    // Access trace from context if available, or fall back to global trace (for replay injection)
-    const trace = context?.trace ?? getGlobalTrace();
-    if (trace) trace.emit({ kind: "dispatch_start", queueSize: queue.length });
-
-    let processedCount = 0;
-
-    while (queue.length > 0) {
-        const eff = queue.shift()!;
-
-        // Runtime Assertion: Op must be valid string
-        if (!eff.op || typeof eff.op !== "string") {
-            throw new Error(`[Dispatcher] Invalid operation: ${JSON.stringify(eff)} in card ${sourceCard?.name || "unknown"}`);
-        }
-
-        recordEvent({ type: "run_effect", payload: { op: eff.op, owner, source: sourceCard?.name } });
-
-        // Trace: effect_start
-        if (trace) trace.emit({ kind: "effect_start", op: eff.op, depth: 0 }); // Depth not tracked yet
-
-        // Build context for the handler
-        const ctx: EffectCtx = {
-            state,
-            owner,
-            sourceCard,
-            queue,
-            context,
-            adapter: { ...adapter, render: () => { } } as any, // Prevent render loops
-            trace // Pass it down
-        };
-
-        try {
-            const result = dispatchEffect(eff.op, eff, ctx);
-
-            // Protocol: "pending" stops the queue. Anything else continues.
-            // We do not wait for Promises (fire-and-forget for animations/async side effects),
-            // UNLESS the handler explicitly paused by returning "pending".
-            if (result === "pending") {
-                // Trace: effect_pending
-                if (trace) trace.emit({ kind: "effect_pending", op: eff.op });
-
-                // Paused execution (e.g. targeting waiting for input)
-                // The queue state is preserved in the closure references if passed to targeting,
-                // otherwise it is lost here (which is correct for "pause").
-                return;
-            }
-
-            // Trace: effect_end
-            if (trace) trace.emit({ kind: "effect_end", op: eff.op });
-            processedCount++;
-
-        } catch (e) {
-            // Contextualize error
-            const err = e instanceof Error ? e : new Error(String(e));
-            err.message = `[Dispatcher] Error in op '${eff.op}': ${err.message}`;
-            throw err;
-        }
-    }
-
-    // Trace: dispatch_end
-    if (trace) trace.emit({ kind: "dispatch_end", processed: processedCount, remaining: queue.length });
+  // Trace: dispatch_end
+  if (trace)
+    trace.emit({
+      kind: "dispatch_end",
+      processed: processedCount,
+      remaining: queue.length,
+    });
 }
 
 // --- Dependency Injection Registration ---

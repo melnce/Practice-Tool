@@ -212,7 +212,10 @@
     "evo_image": null,
     "set": "[VANILLA] Custom",
     "url": null,
-    "keywords": [{ "name": "rally", "count": 3, "effects": [] }, { "name": "strike", "effects": [] }],
+    "keywords": [
+      { "name": "rally", "count": 3, "effects": [] },
+      { "name": "strike", "effects": [] }
+    ],
     "triggers": []
   },
   {

@@ -7,12 +7,12 @@ It separates pure calculation from execution side-effects.
 
 ## 1. Module Responsibilities
 
-| File | Type | Responsibility |
-|------|------|----------------|
-| `calculator.ts` | **Pure** | Resolves damage amounts. Handles overflow detection. No state mutation. |
-| `types.ts` | **Types** | `DamageOp`, `DamageContext`, `ResolvedDamage`. |
-| `index.ts` | **Barrel** | Re-exports for external consumers. |
-| `../damage.ts` | **Orchestrator** | Execution logic: target resolution, apply damage, call cleanup. |
+| File            | Type             | Responsibility                                                          |
+| --------------- | ---------------- | ----------------------------------------------------------------------- |
+| `calculator.ts` | **Pure**         | Resolves damage amounts. Handles overflow detection. No state mutation. |
+| `types.ts`      | **Types**        | `DamageOp`, `DamageContext`, `ResolvedDamage`.                          |
+| `index.ts`      | **Barrel**       | Re-exports for external consumers.                                      |
+| `../damage.ts`  | **Orchestrator** | Execution logic: target resolution, apply damage, call cleanup.         |
 
 ## 2. Invariants (MUST NOT CHANGE)
 
@@ -42,16 +42,17 @@ It separates pure calculation from execution side-effects.
 - `calculator.ts` **MUST NOT** import from `src/logic/effects/` or any execution/UI modules.
 
 **Policy A (Calculator Import Policy):**
+
 - Only `damage.ts`, `damage/index.ts`, and `targeted/index.ts` may import from `damage/calculator` or `damage/index`.
 - Other ops must NOT directly import the calculator.
 - (Enforced by `scripts/check-damage.ts`)
 
 ## 5. Extension Rules
 
-| Goal | Action |
-|------|--------|
-| **New overflow/math rule** | `calculator.ts` only. Keep pure. |
-| **New damage branching** (e.g., immunity like Ward) | `damage.ts` only. |
-| **New damage type** (e.g., "poison") | If pure calc → `calculator.ts`. If execution → `damage.ts`. |
+| Goal                                                | Action                                                      |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| **New overflow/math rule**                          | `calculator.ts` only. Keep pure.                            |
+| **New damage branching** (e.g., immunity like Ward) | `damage.ts` only.                                           |
+| **New damage type** (e.g., "poison")                | If pure calc → `calculator.ts`. If execution → `damage.ts`. |
 
 **DO NOT** add state mutation to `calculator.ts`.

@@ -17,13 +17,13 @@ This module handles the removal of dead (0 or negative defense) followers and tr
 
 Call **ONCE** at the end of each discrete damage/destroy phase:
 
-| Phase | Example |
-|-------|---------|
-| After damage application | `dealDamage(...)` → `cleanupDead()` |
-| After destroy effect | `handleDestroy(...)` → `cleanupDead()` |
-| After combat resolution | Combat damage → `cleanupDead()` |
-| End of turn cleanup | `endTurn()` → `cleanupDead()` |
-| After multi-hit effects | Full sequence → `cleanupDead()` once |
+| Phase                    | Example                                |
+| ------------------------ | -------------------------------------- |
+| After damage application | `dealDamage(...)` → `cleanupDead()`    |
+| After destroy effect     | `handleDestroy(...)` → `cleanupDead()` |
+| After combat resolution  | Combat damage → `cleanupDead()`        |
+| End of turn cleanup      | `endTurn()` → `cleanupDead()`          |
+| After multi-hit effects  | Full sequence → `cleanupDead()` once   |
 
 ## 3. When NOT To Call
 
@@ -35,17 +35,17 @@ Call **ONCE** at the end of each discrete damage/destroy phase:
 
 Only these orchestrator modules may call `cleanupDead`:
 
-| File | Purpose |
-|------|---------|
-| `ops/damage.ts` | Damage ops |
-| `ops/destroy.ts` | Destroy effects |
-| `ops/engage.ts` | Amulet engagement |
-| `ops/targeted/index.ts` | Targeted op dispatch |
+| File                                      | Purpose                  |
+| ----------------------------------------- | ------------------------ |
+| `ops/damage.ts`                           | Damage ops               |
+| `ops/destroy.ts`                          | Destroy effects          |
+| `ops/engage.ts`                           | Amulet engagement        |
+| `ops/targeted/index.ts`                   | Targeted op dispatch     |
 | `ops/buff.ts`, `ops/buff/orchestrator.ts` | Stat buffs that may kill |
-| `effects/doubleStats.ts` | Stat doubling |
-| `core/turns.ts` | Turn phase orchestration |
-| `core/combat.ts` | Combat resolution |
-| `core/effects/domains/combat.ts` | Combat effect handlers |
+| `effects/doubleStats.ts`                  | Stat doubling            |
+| `core/turns.ts`                           | Turn phase orchestration |
+| `core/combat.ts`                          | Combat resolution        |
+| `core/effects/domains/combat.ts`          | Combat effect handlers   |
 
 Other modules must NOT import or call `cleanupDead` directly.
 

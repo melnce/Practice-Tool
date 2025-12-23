@@ -7,93 +7,122 @@ import { getPool } from "../../logic/core/targeting.js";
 import { handleSuperEvoGate } from "../../logic/effects/gates/gates.js";
 import { CardInstance, GameState, Player, Effect } from "../../core/types.js";
 
-
 // ---- local helpers ported from zones.js ----
 
 function earthRiteCostInFanfare(effects: Effect[] | unknown): number {
-    if (!Array.isArray(effects)) return 0;
-    const scan = (effs: any[]): number => {
-        let best = Infinity;
-        for (const e of effs) {
-            if (!e || typeof e !== "object") continue;
-            if (e.op === "earth_rite") {
-                const c = Math.max(1, Number(e.amount ?? 1) || 1);
-                best = Math.min(best, c);
-            }
-            if (Array.isArray(e.effects)) best = Math.min(best, scan(e.effects));
-            if (e.op === "choose" && Array.isArray(e.options)) {
-                for (const opt of e.options) {
-                    const req = opt?.requires || {};
-                    const c = Number(req.earth_rite ?? req.earth ?? 0);
-                    if (c > 0) best = Math.min(best, c);
-                    if (Array.isArray(opt.effects)) best = Math.min(best, scan(opt.effects));
-                }
-            }
+  if (!Array.isArray(effects)) return 0;
+  const scan = (effs: any[]): number => {
+    let best = Infinity;
+    for (const e of effs) {
+      if (!e || typeof e !== "object") continue;
+      if (e.op === "earth_rite") {
+        const c = Math.max(1, Number(e.amount ?? 1) || 1);
+        best = Math.min(best, c);
+      }
+      if (Array.isArray(e.effects)) best = Math.min(best, scan(e.effects));
+      if (e.op === "mode" && Array.isArray(e.options)) {
+        for (const opt of e.options) {
+          const req = opt?.requires || {};
+          const c = Number(req.earth_rite ?? req.earth ?? 0);
+          if (c > 0) best = Math.min(best, c);
+          if (Array.isArray(opt.effects))
+            best = Math.min(best, scan(opt.effects));
         }
-        return best;
-    };
-    const r = scan(effects as any[]);
-    return Number.isFinite(r) ? r : 0;
+      }
+    }
+    return best;
+  };
+  const r = scan(effects as any[]);
+  return Number.isFinite(r) ? r : 0;
 }
 
 function hasEarthOnBoard(state: GameState, owner: Player, n = 1) {
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
-    return board.some(c => c?.type === "Amulet" && Number(c?.counters?.earth) >= n);
+  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  return board.some(
+    (c) => c?.type === "Amulet" && Number(c?.counters?.earth) >= n,
+  );
 }
 
 function hasOverflowInTree(effs: unknown): boolean {
-    if (!Array.isArray(effs)) return false;
-    for (const e of effs) {
-        if (!e || typeof e !== "object") continue;
-        if (e.op === "overflow_gate" || e.amount_overflow !== undefined || e.overflow_amount !== undefined) return true;
-        if (Array.isArray(e.effects) && hasOverflowInTree(e.effects)) return true;
-        if (e.op === "choose" && Array.isArray(e.options)) {
-            if (e.options.some((opt: any) => hasOverflowInTree(opt.effects || []))) return true;
-        }
+  if (!Array.isArray(effs)) return false;
+  for (const e of effs) {
+    if (!e || typeof e !== "object") continue;
+    if (
+      (e.op === "gate" && (e as any).condition === "overflow") ||
+      e.amount_overflow !== undefined ||
+      e.overflow_amount !== undefined
+    )
+      return true;
+    if (Array.isArray(e.effects) && hasOverflowInTree(e.effects)) return true;
+    if (e.op === "mode" && Array.isArray(e.options)) {
+      if (e.options.some((opt: any) => hasOverflowInTree(opt.effects || [])))
+        return true;
     }
-    return false;
+  }
+  return false;
 }
 
 function hasSuperEvoAllyOnBoard(state: GameState, owner: Player) {
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
-    return board.some(c => c?.type === "Follower" && c.hasEvolved && c.evoType === "super");
+  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  return board.some(
+    (c) => c?.type === "Follower" && c.hasEvolved && c.evoType === "super",
+  );
 }
 
-function needsUnmetTarget(list: unknown, owner: Player, card: CardInstance | null): boolean {
-    if (!Array.isArray(list)) return false;
-    for (const eff of list) {
-        if (!eff || typeof eff !== "object") continue;
+function needsUnmetTarget(
+  list: unknown,
+  owner: Player,
+  card: CardInstance | null,
+): boolean {
+  if (!Array.isArray(list)) return false;
+  for (const eff of list) {
+    if (!eff || typeof eff !== "object") continue;
 
-        if (eff.op === "overflow_gate") {
-            if (isOverflow(owner) && needsUnmetTarget(eff.effects, owner, card)) return true;
-            continue;
-        }
-        if (eff.op === "select_hand_summon_artifact_copies_eot_destroy") {
-            continue; // custom op that selects from hand
-        }
-
-        if (eff.select || eff.op === "select") {
-            const pool = getPool(eff.target, owner, null, eff.condition || {}, { isTargetedEffect: true });
-            if (!pool || pool.length === 0) return true;
-        }
-
-        if (eff.op === "stormy_blast_damage" || (card?.name && card.name.toLowerCase() === "snowman army")) {
-            // needs enemy follower
-            // owner here is "blue"/"red"
-            const stateAny = state as any; // Need access to opponent board from state if card.__state missing
-            const enemyBoard = owner === "blue" ? stateAny.redBoard : stateAny.blueBoard;
-            const hasEnemyFollower = Array.isArray(enemyBoard) && enemyBoard.some((c: any) => c.type === "Follower");
-            if (!hasEnemyFollower) return true;
-        }
-
-        if (Array.isArray(eff.effects) && needsUnmetTarget(eff.effects, owner, card)) return true;
-
-        if (eff.op === "choose" && Array.isArray(eff.options)) {
-            const allBlocked = eff.options.every((opt: any) => needsUnmetTarget(opt.effects || [], owner, card));
-            if (allBlocked) return true;
-        }
+    if (eff.op === "gate" && (eff as any).condition === "overflow") {
+      if (isOverflow(owner) && needsUnmetTarget(eff.effects, owner, card))
+        return true;
+      continue;
     }
-    return false;
+    if (eff.op === "select_hand_summon_artifact_copies_eot_destroy") {
+      continue; // custom op that selects from hand
+    }
+
+    if (eff.select || eff.op === "select") {
+      const pool = getPool(eff.target, owner, null, eff.condition || {}, {
+        isTargetedEffect: true,
+      });
+      if (!pool || pool.length === 0) return true;
+    }
+
+    if (
+      eff.op === "stormy_blast_damage" ||
+      (card?.name && card.name.toLowerCase() === "snowman army")
+    ) {
+      // needs enemy follower
+      // owner here is "blue"/"red"
+      const stateAny = state as any; // Need access to opponent board from state if card.__state missing
+      const enemyBoard =
+        owner === "blue" ? stateAny.redBoard : stateAny.blueBoard;
+      const hasEnemyFollower =
+        Array.isArray(enemyBoard) &&
+        enemyBoard.some((c: any) => c.type === "Follower");
+      if (!hasEnemyFollower) return true;
+    }
+
+    if (
+      Array.isArray(eff.effects) &&
+      needsUnmetTarget(eff.effects, owner, card)
+    )
+      return true;
+
+    if (eff.op === "mode" && Array.isArray(eff.options)) {
+      const allBlocked = eff.options.every((opt: any) =>
+        needsUnmetTarget(opt.effects || [], owner, card),
+      );
+      if (allBlocked) return true;
+    }
+  }
+  return false;
 }
 
 // ---- main exported API ----
@@ -102,170 +131,250 @@ function needsUnmetTarget(list: unknown, owner: Player, card: CardInstance | nul
  * Returns: { glowClass: "enhance-ready" | "playable-glow" | null }
  */
 export function computeHandGlow(card: CardInstance, ctx: any) {
-    // ctx: { state, owner, isPlayersTurn, availablePP, isSpell, tier?, shownCost? }
-    const { state, owner, isPlayersTurn, availablePP, isSpell } = ctx;
+  // ctx: { state, owner, isPlayersTurn, availablePP, isSpell, tier?, shownCost? }
+  const { state, owner, isPlayersTurn, availablePP, isSpell } = ctx;
 
-    // NOTE: Do NOT attach state to card (circular reference breaks cloning)
-    // State is available via ctx parameter for all checks
+  // NOTE: Do NOT attach state to card (circular reference breaks cloning)
+  // State is available via ctx parameter for all checks
 
-    // cost preview already computed by caller; use ctx.shownCost if present
-    const shownCost = Number(ctx.shownCost ?? (card as any).shownCost ?? (card as any).cost ?? 0);
+  // cost preview already computed by caller; use ctx.shownCost if present
+  const shownCost = Number(
+    ctx.shownCost ?? (card as any).shownCost ?? (card as any).cost ?? 0,
+  );
 
-    let canAfford = isPlayersTurn && availablePP >= shownCost;
+  let canAfford = isPlayersTurn && availablePP >= shownCost;
 
-    // ---- board capacity hard block (max 5) ----
-    const ownerBoard = owner === "blue" ? state.blueBoard : state.redBoard;
-    const isBoardCard = !isSpell && (card?.type === "Follower" || card?.type === "Amulet");
-    if (isBoardCard && Array.isArray(ownerBoard) && ownerBoard.filter(Boolean).length >= 5) {
-        return { glowClass: null }; // no glow if board is full
+  // ---- board capacity hard block (max 5) ----
+  const ownerBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+  const isBoardCard =
+    !isSpell && (card?.type === "Follower" || card?.type === "Amulet");
+  if (
+    isBoardCard &&
+    Array.isArray(ownerBoard) &&
+    ownerBoard.filter(Boolean).length >= 5
+  ) {
+    return { glowClass: null }; // no glow if board is full
+  }
+
+  // Spell-specific preconditions
+  if (isSpell) {
+    const list =
+      Array.isArray((card as any).spell) && (card as any).spell.length
+        ? (card as any).spell
+        : Array.isArray(card.fanfare)
+          ? card.fanfare
+          : [];
+
+    // Doomwright Resurgence: need >=2 eligible artifacts in hand
+    if (card.name === "Doomwright Resurgence") {
+      const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
+      const getEffectiveCost = (c: any) =>
+        Number.isFinite(c?.effectiveCost)
+          ? c.effectiveCost
+          : (Number(c?.cost) || 0) + (Number(c?.cost_mod) || 0);
+      const eligible = ownerHand.filter(
+        (c: CardInstance) =>
+          c?.type === "Follower" &&
+          Array.isArray(c?.tribes) &&
+          c.tribes.includes("Artifact") &&
+          getEffectiveCost(c) <= 5,
+      ).length;
+      if (eligible < 2) canAfford = false;
     }
 
-    // Spell-specific preconditions
-    if (isSpell) {
-        const list = Array.isArray((card as any).spell) && (card as any).spell.length ? (card as any).spell :
-            (Array.isArray(card.fanfare) ? card.fanfare : []);
-
-        // Doomwright Resurgence: need >=2 eligible artifacts in hand
-        if (card.name === "Doomwright Resurgence") {
-            const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
-            const getEffectiveCost = (c: any) => (
-                Number.isFinite(c?.effectiveCost) ? c.effectiveCost :
-                    (Number(c?.cost) || 0) + (Number(c?.cost_mod) || 0)
-            );
-            const eligible = ownerHand.filter((c: CardInstance) =>
-                c?.type === "Follower" &&
-                Array.isArray(c?.tribes) && c.tribes.includes("Artifact") &&
-                getEffectiveCost(c) <= 5
-            ).length;
-            if (eligible < 2) canAfford = false;
-        }
-
-        // Needs ally on board if it returns ally to hand
-        const needsAlly = list.some((eff: any) =>
-            eff && eff.select && String(eff.op).toLowerCase() === "return_to_hand" &&
-            String(eff.target || "").toLowerCase().startsWith("ally")
-        );
-        if (needsAlly) {
-            const ownerBoard = owner === "blue" ? state.blueBoard : state.redBoard;
-            if (ownerBoard.length === 0) canAfford = false;
-        }
-
-        // Needs another hand pick (return_hand_to_deck with select)
-        const needsHandPick = list.some((e: any) => String(e.op).toLowerCase() === "return_hand_to_deck" && e.select);
-        if (needsHandPick) {
-            const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
-            if (ownerHand.length <= 1) canAfford = false;
-        }
-
-        // If all select-targets have no valid pool, block (except when leader is explicitly targetable)
-        const canTargetLeader = list.some((eff: any) => eff?.op === "damage" && eff?.fallback_leader);
-        if (needsUnmetTarget(list, owner, card) && !canTargetLeader) canAfford = false;
-
-        // Radiant Rainbow: require a Spellboost card in hand
-        if (card.name && card.name.toLowerCase() === "radiant rainbow") {
-            const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
-            const hasSB = ownerHand.some((c: CardInstance) =>
-                Array.isArray(c.keywords) && c.keywords.some((k: string | { name?: string }) => (typeof k === "string" ? k : k?.name)?.toLowerCase?.() === "spellboost")
-            );
-            if (!hasSB) canAfford = false;
-        }
-    }
-
-    // gates that upgrade to yellow glow
-    const comboReady = isPlayersTurn && comboReadyInHand(card, owner, state);
-    const tier = ctx.tier ?? null; // caller may pass
-    const enhanceReady = isPlayersTurn && !!tier;
-    const fusedAllureReady =
-        isPlayersTurn &&
-        card?.name === "Garden's Allure" &&
-        card?.isFused === true;
-
-    const fusedSlashReady =
-        isPlayersTurn &&
-        card?.name === "Returning Slash" &&
-        card?.isFused === true;
-
-    // Earth Rite
-    const erCost = earthRiteCostInFanfare(
-        Array.isArray(card.fanfare) && card.fanfare.length ? card.fanfare :
-            (Array.isArray((card as any).spell) ? (card as any).spell : [])
+    // Needs ally on board if it returns ally to hand
+    const needsAlly = list.some(
+      (eff: any) =>
+        eff &&
+        eff.select &&
+        String(eff.op).toLowerCase() === "return_to_hand" &&
+        String(eff.target || "")
+          .toLowerCase()
+          .startsWith("ally"),
     );
-    const earthReady = isPlayersTurn && erCost > 0 && hasEarthOnBoard(state, owner, erCost);
-
-    // Overflow
-    const hasOverflowEffects =
-        hasOverflowInTree(Array.isArray(card.fanfare) ? card.fanfare : []) ||
-        hasOverflowInTree(Array.isArray((card as any).spell) ? (card as any).spell : []);
-    const overflowReady = isPlayersTurn && hasOverflowEffects && isOverflow(owner);
-
-    // Necromancy
-    const hasNecroGate = Array.isArray(card.fanfare) && card.fanfare.some(eff => eff.op === "necromancy_gate");
-    const necromancyReady = isPlayersTurn && hasNecroGate &&
-        hasNecromancy(owner, (card.fanfare?.find((eff: Effect) => eff.op === "necromancy_gate") as Effect & { cost?: number })?.cost || 0);
-
-    // Skybound Art (Yellow Glow)
-    const hasSkybound = (Array.isArray(card.fanfare) && card.fanfare.some(eff => eff.op === "skybound_art_gate"))
-        || (Array.isArray((card as any).spell) && (card as any).spell.some((eff: any) => eff.op === "skybound_art_gate"));
-    let skyboundReady = false;
-    if (isPlayersTurn && hasSkybound) {
-        // inline logic for speed, matching gates.ts
-        const gateEff = (card.fanfare?.find(eff => eff.op === "skybound_art_gate"))
-            || ((card as any).spell?.find((eff: any) => eff.op === "skybound_art_gate"));
-        const req = parseInt(gateEff?.requirement || gateEff?.count || 10, 10);
-        const gauge = (state.roundCount || 1) + (card.skyboundArtEvolvesWitnessed || 0);
-        skyboundReady = gauge >= req;
+    if (needsAlly) {
+      const ownerBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+      if (ownerBoard.length === 0) canAfford = false;
     }
 
-    // Super-evolved ally gate (generic support)
-    const hasSuperEvoGate = (
-        (Array.isArray(card.fanfare) && card.fanfare.some(e => /super[_-]?evo(lved)?_ally(_on_board)?_gate/i.test(e?.op))) ||
-        /super[- ]?evolved allied follower/i.test(card?.description || "")
+    // Needs another hand pick (return_hand_to_deck with select)
+    const needsHandPick = list.some(
+      (e: any) =>
+        String(e.op).toLowerCase() === "return_hand_to_deck" && e.select,
+    );
+    if (needsHandPick) {
+      const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
+      if (ownerHand.length <= 1) canAfford = false;
+    }
+
+    // If all select-targets have no valid pool, block (except when leader is explicitly targetable)
+    const canTargetLeader = list.some(
+      (eff: any) => eff?.op === "damage" && eff?.fallback_leader,
+    );
+    if (needsUnmetTarget(list, owner, card) && !canTargetLeader)
+      canAfford = false;
+
+    // Radiant Rainbow: require a Spellboost card in hand
+    if (card.name && card.name.toLowerCase() === "radiant rainbow") {
+      const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
+      const hasSB = ownerHand.some(
+        (c: CardInstance) =>
+          Array.isArray(c.keywords) &&
+          c.keywords.some(
+            (k: string | { name?: string }) =>
+              (typeof k === "string" ? k : k?.name)?.toLowerCase?.() ===
+              "spellboost",
+          ),
+      );
+      if (!hasSB) canAfford = false;
+    }
+  }
+
+  // gates that upgrade to yellow glow
+  const comboReady = isPlayersTurn && comboReadyInHand(card, owner, state);
+  const tier = ctx.tier ?? null; // caller may pass
+  const enhanceReady = isPlayersTurn && !!tier;
+  const fusedAllureReady =
+    isPlayersTurn && card?.name === "Garden's Allure" && card?.isFused === true;
+
+  const fusedSlashReady =
+    isPlayersTurn && card?.name === "Returning Slash" && card?.isFused === true;
+
+  // Earth Rite
+  const erCost = earthRiteCostInFanfare(
+    Array.isArray(card.fanfare) && card.fanfare.length
+      ? card.fanfare
+      : Array.isArray((card as any).spell)
+        ? (card as any).spell
+        : [],
+  );
+  const earthReady =
+    isPlayersTurn && erCost > 0 && hasEarthOnBoard(state, owner, erCost);
+
+  // Overflow
+  const hasOverflowEffects =
+    hasOverflowInTree(Array.isArray(card.fanfare) ? card.fanfare : []) ||
+    hasOverflowInTree(
+      Array.isArray((card as any).spell) ? (card as any).spell : [],
+    );
+  const overflowReady =
+    isPlayersTurn && hasOverflowEffects && isOverflow(owner);
+
+  // Necromancy
+  const hasNecroGate =
+    Array.isArray(card.fanfare) &&
+    card.fanfare.some(
+      (eff) => eff.op === "gate" && (eff as any).condition === "necromancy",
+    );
+  const necromancyReady =
+    isPlayersTurn &&
+    hasNecroGate &&
+    hasNecromancy(
+      owner,
+      (
+        card.fanfare?.find(
+          (eff: Effect) =>
+            eff.op === "gate" && (eff as any).condition === "necromancy",
+        ) as any
+      )?.cost || 0,
     );
 
-    // NEW: super-evolution unlock gate (e.g., Cheretta fanfare)
-    const hasSuperUnlockGate =
-        Array.isArray(card.fanfare) &&
-        card.fanfare.some(e => String(e.op).toLowerCase() === "super_evo_gate");
+  // Skybound Art (Yellow Glow)
+  const hasSkybound =
+    (Array.isArray(card.fanfare) &&
+      card.fanfare.some(
+        (eff) => eff.op === "gate" && (eff as any).condition === "skybound_art",
+      )) ||
+    (Array.isArray((card as any).spell) &&
+      (card as any).spell.some(
+        (eff: any) => eff.op === "gate" && eff.condition === "skybound_art",
+      ));
+  let skyboundReady = false;
+  if (isPlayersTurn && hasSkybound) {
+    // inline logic for speed, matching gates.ts
+    const gateEff =
+      card.fanfare?.find(
+        (eff) => eff.op === "gate" && (eff as any).condition === "skybound_art",
+      ) ||
+      (card as any).spell?.find(
+        (eff: any) => eff.op === "gate" && eff.condition === "skybound_art",
+      );
+    const req = parseInt(gateEff?.requirement || gateEff?.count || 10, 10);
+    const gauge =
+      (state.roundCount || 1) + (card.skyboundArtEvolvesWitnessed || 0);
+    skyboundReady = gauge >= req;
+  }
 
-    const superUnlockReady = isPlayersTurn && hasSuperUnlockGate && handleSuperEvoGate(owner);
+  // Super-evolved ally gate (generic support)
+  const hasSuperEvoGate =
+    (Array.isArray(card.fanfare) &&
+      card.fanfare.some(
+        (e) =>
+          e.op === "gate" &&
+          /super[_-]?evolved?[_-]?alli/i.test((e as any).condition || ""),
+      )) ||
+    /super[- ]?evolved allied follower/i.test(card?.description || "");
 
-    // Both Max PP gate (Gilnelise)
-    const hasBothMaxPPGate = Array.isArray(card.fanfare) && card.fanfare.some(e => e.op === "both_max_pp_gate");
-    const bothMaxPPReady = isPlayersTurn && hasBothMaxPPGate && (state.blueMaxPP >= 10 && state.redMaxPP >= 10); // Default to 10 if not specified, but typically check op params if available. Here assuming Gilnelise standard 10.
+  // NEW: super-evolution unlock gate (e.g., Cheretta fanfare)
+  const hasSuperUnlockGate =
+    Array.isArray(card.fanfare) &&
+    card.fanfare.some(
+      (e) => e.op === "gate" && (e as any).condition === "super_evo_unlocked",
+    );
 
-    const superEvoReady = hasSuperEvoGate && hasSuperEvoAllyOnBoard(state, owner);
+  const superUnlockReady =
+    isPlayersTurn && hasSuperUnlockGate && handleSuperEvoGate(owner);
 
-    // hard block
-    if (card.cant_play) canAfford = false;
+  // Both Max PP gate (Gilnelise)
+  const hasBothMaxPPGate =
+    Array.isArray(card.fanfare) &&
+    card.fanfare.some(
+      (e) => e.op === "gate" && (e as any).condition === "both_max_pp",
+    );
+  const bothMaxPPReady =
+    isPlayersTurn &&
+    hasBothMaxPPGate &&
+    state.blueMaxPP >= 10 &&
+    state.redMaxPP >= 10; // Default to 10 if not specified, but typically check op params if available. Here assuming Gilnelise standard 10.
 
-    if (!canAfford) return { glowClass: null };
+  const superEvoReady = hasSuperEvoGate && hasSuperEvoAllyOnBoard(state, owner);
 
-    // --- Faith (crest) gate: Sham-Nacha glows when Faith >= 10 ---
-    const crests = owner === "blue" ? (state.blueCrests || []) : (state.redCrests || []);
-    const faith = (() => {
-        const c = crests.find((x: CardInstance) => String(x?.name).toLowerCase() === "faith: sham-nacha, heir to entwining");
-        return Number(c?.counters?.faith ?? 0);
-    })();
-    const isShamNacha = String(card?.name || "").toLowerCase() === "sham-nacha, heir to entwining";
-    const faithReady = isPlayersTurn && isShamNacha && faith >= 10;
+  // hard block
+  if (card.cant_play) canAfford = false;
 
-    if (
-        enhanceReady ||
-        comboReady ||
-        earthReady ||
-        overflowReady ||
-        necromancyReady ||
-        superEvoReady ||
-        superUnlockReady ||
-        fusedAllureReady ||
-        fusedSlashReady ||
-        faithReady ||
-        skyboundReady ||
-        bothMaxPPReady
-    ) {
-        return { glowClass: "enhance-ready" };
-    }
+  if (!canAfford) return { glowClass: null };
 
+  // --- Faith (crest) gate: Sham-Nacha glows when Faith >= 10 ---
+  const crests =
+    owner === "blue" ? state.blueCrests || [] : state.redCrests || [];
+  const faith = (() => {
+    const c = crests.find(
+      (x: CardInstance) =>
+        String(x?.name).toLowerCase() ===
+        "faith: sham-nacha, heir to entwining",
+    );
+    return Number(c?.counters?.faith ?? 0);
+  })();
+  const isShamNacha =
+    String(card?.name || "").toLowerCase() === "sham-nacha, heir to entwining";
+  const faithReady = isPlayersTurn && isShamNacha && faith >= 10;
 
-    return { glowClass: "playable-glow" };
+  if (
+    enhanceReady ||
+    comboReady ||
+    earthReady ||
+    overflowReady ||
+    necromancyReady ||
+    superEvoReady ||
+    superUnlockReady ||
+    fusedAllureReady ||
+    fusedSlashReady ||
+    faithReady ||
+    skyboundReady ||
+    bothMaxPPReady
+  ) {
+    return { glowClass: "enhance-ready" };
+  }
+
+  return { glowClass: "playable-glow" };
 }

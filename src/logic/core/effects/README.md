@@ -21,6 +21,7 @@ effects[] → queue (shallow copy) → while loop → dispatchEffect(op) → han
 ## 2. Registry Pattern
 
 ### Structure
+
 ```
 registry.ts         - registerOp, getOp, sealRegistry
 domains/
@@ -32,6 +33,7 @@ domains/
 ```
 
 ### Registration Flow
+
 1. Domain modules call `registerOp(opName, handler)` at import time.
 2. `index.ts` imports all domains (triggers registration).
 3. `sealRegistry()` locks the registry.
@@ -39,25 +41,26 @@ domains/
 
 ## 3. Extension Rules
 
-| To Add | Action |
-|--------|--------|
-| New op | Add to `opTypes.ts` + register in appropriate `domains/*.ts` |
+| To Add     | Action                                                                             |
+| ---------- | ---------------------------------------------------------------------------------- |
+| New op     | Add to `opTypes.ts` + register in appropriate `domains/*.ts`                       |
 | New domain | Create `domains/<name>.ts`, export `register<Name>Effects()`, call from `index.ts` |
 
 **Must NOT:**
+
 - Add execution logic directly in `runEffects` (keep it thin).
 - Register ops after seal (throws).
 - Register duplicate ops (throws).
 
 ## 4. Invariants
 
-| Invariant | Enforcement |
-|-----------|-------------|
-| Ops typed | `registerOp<K>` enforces handler signature |
-| No duplicates | Throws on duplicate registration |
+| Invariant         | Enforcement                                      |
+| ----------------- | ------------------------------------------------ |
+| Ops typed         | `registerOp<K>` enforces handler signature       |
+| No duplicates     | Throws on duplicate registration                 |
 | Complete coverage | Bootstrap check compares `ALL_OPS` vs registered |
-| Sealed before run | Runtime assertion in `runEffects` |
-| Queue order | FIFO (first-in-first-out via `shift()`) |
-| Determinism | Effects must not use non-seeded randomness |
+| Sealed before run | Runtime assertion in `runEffects`                |
+| Queue order       | FIFO (first-in-first-out via `shift()`)          |
+| Determinism       | Effects must not use non-seeded randomness       |
 
 (Enforced by `scripts/check-effects-registry.ts`)

@@ -26,7 +26,8 @@
     "triggers": [],
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 10,
         "effects": [
           {
@@ -57,10 +58,12 @@
     "url": "https://shadowverse.gg/cards/10401120-vyrn-bestest-pal",
     "fanfare": [
       {
-        "op": "super_evo_gate",
+        "op": "gate",
+        "condition": "super_evo_unlocked",
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -91,7 +94,8 @@
         "type": "end_of_turn_own",
         "effects": [
           {
-            "op": "restore_allies",
+            "op": "restore",
+            "target": "allies",
             "amount": 1
           }
         ]
@@ -99,9 +103,7 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [
-      "Aura"
-    ]
+    "keywords": ["Aura"]
   },
   {
     "id": "10403110",
@@ -123,7 +125,7 @@
     "keywords": [],
     "fanfare": [
       {
-        "op": "choose",
+        "op": "mode",
         "select_count": 1,
         "options": [
           {
@@ -143,6 +145,7 @@
             "effects": [
               {
                 "op": "draw",
+                "source": "deck",
                 "filters": {
                   "type": "Follower"
                 },
@@ -153,11 +156,13 @@
         ]
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 10,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -185,6 +190,7 @@
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "filters": {
               "type": "Follower",
               "cost_gte": 7
@@ -192,7 +198,8 @@
             "count": 1
           },
           {
-            "op": "recover_pp",
+            "op": "pp",
+            "action": "recover",
             "amount": 7
           }
         ]
@@ -236,7 +243,8 @@
         },
         "effects": [
           {
-            "op": "gain_crest",
+            "op": "crest",
+            "action": "gain",
             "name": "Sandalphon, Primarch Successor",
             "image": "images/crests/sandalphon_primarch_successor.png",
             "description": "Countdown (2). At the end of your turn, restore 1 defense to all allies.",
@@ -246,7 +254,8 @@
                 "event": "end_of_turn",
                 "effects": [
                   {
-                    "op": "restore_allies",
+                    "op": "restore",
+                    "target": "allies",
                     "amount": 1
                   }
                 ]
@@ -254,7 +263,8 @@
             ]
           },
           {
-            "op": "return_to_hand",
+            "op": "return",
+            "destination": "hand",
             "target": "self"
           }
         ]
@@ -262,7 +272,8 @@
     ],
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
@@ -298,7 +309,8 @@
         "source": "board",
         "effects": [
           {
-            "op": "restore_allies",
+            "op": "restore",
+            "target": "allies",
             "amount": 3
           }
         ]
@@ -329,7 +341,8 @@
         "type": "end_of_turn_own",
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -373,10 +386,12 @@
         "select": 1
       },
       {
-        "op": "evolved_allied_gate",
+        "op": "gate",
+        "condition": "evolved_allied",
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 1
           }
         ]
@@ -417,7 +432,8 @@
             ]
           },
           {
-            "op": "return_to_hand",
+            "op": "return",
+            "destination": "hand",
             "target": "self"
           }
         ]
@@ -445,11 +461,10 @@
     "url": "https://shadowverse.gg/cards/10412120-anthuria-toe-tapping-torch",
     "fanfare": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
-        "keywords": [
-          "Barrier"
-        ],
+        "keywords": ["Barrier"],
         "include_self": true
       }
     ],
@@ -482,11 +497,13 @@
         "count": 1
       },
       {
-        "op": "combo_gate",
+        "op": "gate",
+        "condition": "combo",
         "count": 5,
         "effects": [
           {
-            "op": "gain_crest",
+            "op": "crest",
+            "action": "gain",
             "name": "Starry Sky",
             "image": "images/crests/starry_sky.png",
             "description": "Countdown (1). Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.",
@@ -498,8 +515,10 @@
                 "amount": 1
               },
               {
-                "op": "add_card_to_hand",
-                "name": "Starry Sky"
+                "op": "draw",
+                "source": "named",
+                "name": "Starry Sky",
+                "count": 1
               }
             ]
           }
@@ -529,16 +548,19 @@
     "evolve_trigger_always": true,
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 10,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
@@ -591,37 +613,38 @@
     "triggers": [],
     "spell": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
             "op": "draw",
+            "source": "deck",
             "count": 1
           },
           {
-            "op": "heal_leader",
+            "op": "restore",
+            "target": "leader",
             "amount": 1
           },
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "ally:follower",
             "attack": 1,
-            "keywords": [
-              "Rush"
-            ]
+            "keywords": ["Rush"]
           },
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "ally:follower",
             "defense": 1,
-            "keywords": [
-              "Ward"
-            ]
+            "keywords": ["Ward"]
           }
         ],
         "else_effects": [
           {
-            "op": "choose",
+            "op": "mode",
             "select_count": 1,
             "options": [
               {
@@ -629,10 +652,12 @@
                 "effects": [
                   {
                     "op": "draw",
+                    "source": "deck",
                     "count": 1
                   },
                   {
-                    "op": "heal_leader",
+                    "op": "restore",
+                    "target": "leader",
                     "amount": 1
                   }
                 ]
@@ -641,12 +666,11 @@
                 "name": "Give all allied followers +1/+0 and Rush.",
                 "effects": [
                   {
-                    "op": "buff",
+                    "op": "stat",
+                    "action": "give",
                     "target": "ally:follower",
                     "attack": 1,
-                    "keywords": [
-                      "Rush"
-                    ]
+                    "keywords": ["Rush"]
                   }
                 ]
               },
@@ -654,12 +678,11 @@
                 "name": "Give all allied followers +0/+1 and Ward.",
                 "effects": [
                   {
-                    "op": "buff",
+                    "op": "stat",
+                    "action": "give",
                     "target": "ally:follower",
                     "defense": 1,
-                    "keywords": [
-                      "Ward"
-                    ]
+                    "keywords": ["Ward"]
                   }
                 ]
               }
@@ -686,11 +709,13 @@
     "url": "https://shadowverse.gg/cards/10414110-ewiyar-wind-personified",
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 10,
         "effects": [
           {
-            "op": "recover_ep",
+            "op": "ep",
+            "action": "recover",
             "amount": 1
           }
         ]
@@ -698,9 +723,7 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": []
   },
   {
@@ -730,7 +753,8 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Yuel & Societte, Dancing Duo",
         "image": "images/crests/yuel_societte_dancing_duo.png",
         "description": "Countdown (4). Once on each of your turns, when you play a follower, evolve it.",
@@ -773,10 +797,10 @@
         "cost": 5,
         "effects": [
           {
-            "op": "buff_self",
-            "keywords": [
-              "Storm"
-            ]
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -801,18 +825,18 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10421120-arthur-staunch-dragon",
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Mordred, Illusory Lion"
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Mordred, Illusory Lion"
       }
     ],
@@ -833,18 +857,18 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10421130-mordred-illusory-lion",
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "evolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Arthur, Staunch Dragon"
       }
     ],
     "superevolve": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Arthur, Staunch Dragon"
       }
     ],
@@ -865,9 +889,7 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10422110-aglovale-lord-of-frost",
-    "keywords": [
-      "Intimidate"
-    ],
+    "keywords": ["Intimidate"],
     "fanfare": [
       {
         "op": "damage",
@@ -914,10 +936,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10422130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10422130-fiorito-muscles-in-bloom",
-    "keywords": [
-      "Ambush",
-      "Bane"
-    ],
+    "keywords": ["Ambush", "Bane"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -944,7 +963,9 @@
         "cost": 9,
         "effects": [
           {
-            "op": "super_evolve_self"
+            "op": "evolve",
+            "target": "self",
+            "mode": "super"
           },
           {
             "op": "damage",
@@ -952,7 +973,8 @@
             "amount": 4
           },
           {
-            "op": "heal_leader",
+            "op": "restore",
+            "target": "leader",
             "amount": 4
           }
         ]
@@ -960,14 +982,16 @@
     ],
     "fanfare": [
       {
-        "op": "choose",
+        "op": "mode",
         "select_count": 1,
         "options": [
           {
             "name": "Super-Evolve",
             "effects": [
               {
-                "op": "super_evolve_self"
+                "op": "evolve",
+                "target": "self",
+                "mode": "super"
               }
             ]
           },
@@ -985,7 +1009,8 @@
             "name": "Restore 4 to leader",
             "effects": [
               {
-                "op": "heal_leader",
+                "op": "restore",
+                "target": "leader",
                 "amount": 4
               }
             ]
@@ -1014,14 +1039,15 @@
     "url": "https://shadowverse.gg/cards/10423310-knightly-ardor",
     "spell": [
       {
-        "op": "choose",
+        "op": "mode",
         "select_count": 1,
         "options": [
           {
             "name": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\"",
             "effects": [
               {
-                "op": "buff",
+                "op": "stat",
+                "action": "give",
                 "target": "ally:follower",
                 "filter": "leftmost",
                 "condition": {
@@ -1035,16 +1061,15 @@
             "name": "Give all allied Swordcraft followers +1/+1 and Barrier",
             "effects": [
               {
-                "op": "buff",
+                "op": "stat",
+                "action": "give",
                 "target": "ally:follower",
                 "condition": {
                   "class": "Swordcraft"
                 },
                 "attack": 1,
                 "defense": 1,
-                "keywords": [
-                  "Barrier"
-                ]
+                "keywords": ["Barrier"]
               }
             ]
           },
@@ -1052,11 +1077,13 @@
             "name": "Recover 2 play points and 1 evolution point",
             "effects": [
               {
-                "op": "recover_pp",
+                "op": "pp",
+                "action": "recover",
                 "amount": 2
               },
               {
-                "op": "recover_ep",
+                "op": "ep",
+                "action": "recover",
                 "amount": 1
               }
             ]
@@ -1065,7 +1092,8 @@
             "name": "Restore 6 defense to your leader",
             "effects": [
               {
-                "op": "heal_leader",
+                "op": "restore",
+                "target": "leader",
                 "amount": 6
               }
             ]
@@ -1099,19 +1127,18 @@
         "cost": 6,
         "effects": [
           {
-            "op": "buff_self",
-            "keywords": [
-              "Storm"
-            ]
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
           },
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "ally:follower",
             "name": "Zeta & Bea, Crimson and Blue",
             "not_self": true,
-            "keywords": [
-              "Bane"
-            ]
+            "keywords": ["Bane"]
           }
         ]
       },
@@ -1119,7 +1146,8 @@
     ],
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Zeta & Bea, Crimson and Blue"
       }
     ],
@@ -1144,20 +1172,25 @@
     "url": "https://shadowverse.gg/cards/10424120-seofon-leader-of-the-eternals",
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
-            "op": "super_evolve_all_unevolved_allies"
+            "op": "evolve",
+            "target": "all_allies",
+            "mode": "super"
           }
         ],
         "else_effects": [
           {
-            "op": "skybound_art_gate",
+            "op": "gate",
+            "condition": "skybound_art",
             "requirement": 10,
             "effects": [
               {
-                "op": "evolve_all_unevolved_allies"
+                "op": "evolve",
+                "target": "all_allies"
               }
             ]
           }
@@ -1187,6 +1220,7 @@
     "fanfare": [
       {
         "op": "draw",
+        "source": "deck",
         "count": 1,
         "filters": {
           "type": "Spell"
@@ -1219,7 +1253,8 @@
         "type": "end_of_turn_own",
         "effects": [
           {
-            "op": "spellboost_hand",
+            "op": "spellboost",
+            "target": "hand",
             "count": "{self.attack}"
           }
         ]
@@ -1227,18 +1262,18 @@
     ],
     "evolve": [
       {
-        "op": "buff_self",
-        "keywords": [
-          "cant_attack"
-        ]
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "keywords": ["cant_attack"]
       }
     ],
     "superevolve": [
       {
-        "op": "buff_self",
-        "keywords": [
-          "cant_attack"
-        ]
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "keywords": ["cant_attack"]
       }
     ],
     "keywords": []
@@ -1265,7 +1300,8 @@
         "target": "enemy:follower"
       },
       {
-        "op": "heal_leader",
+        "op": "restore",
+        "target": "leader",
         "amount": 3
       }
     ],
@@ -1302,7 +1338,8 @@
         ]
       },
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Magic Sediment",
         "count": 2
       }
@@ -1329,7 +1366,8 @@
     "url": "https://shadowverse.gg/cards/10432120-mireille-risette-penitent-duo",
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Mireille & Risette, Penitent Duo"
       },
       {
@@ -1337,10 +1375,12 @@
         "cost": 2,
         "effects": [
           {
-            "op": "evolve_last_summoned"
+            "op": "evolve",
+            "target": "last_summoned"
           },
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -1367,7 +1407,7 @@
     "url": "https://shadowverse.gg/cards/10432310-unleashed",
     "spell": [
       {
-        "op": "choose",
+        "op": "mode",
         "select_count": 1,
         "options": [
           {
@@ -1375,6 +1415,7 @@
             "effects": [
               {
                 "op": "draw",
+                "source": "deck",
                 "count": 1
               },
               {
@@ -1391,6 +1432,7 @@
             "effects": [
               {
                 "op": "draw",
+                "source": "deck",
                 "count": 2
               },
               {
@@ -1437,7 +1479,8 @@
         "count": 1,
         "effects": [
           {
-            "op": "remove_abilities",
+            "op": "keyword",
+            "action": "silence",
             "target": "selected"
           },
           {
@@ -1451,7 +1494,8 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Elmott, Remembrance Aflame",
         "description": "At the start of your turn, deal 1 damage to the enemy leader.",
         "image": "images/crests/elmott.png",
@@ -1504,12 +1548,14 @@
         ]
       },
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Magic Sediment",
         "count": 1
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 10,
         "effects": [
           {
@@ -1543,25 +1589,25 @@
     "triggers": [],
     "fanfare": [
       {
-        "op": "spellboost_hand",
+        "op": "spellboost",
+        "target": "hand",
         "count": 1
       }
     ],
     "evolve": [],
     "superevolve": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "name": "Give all other allied followers on the field Barrier.",
             "effects": [
               {
-                "op": "buff",
+                "op": "stat",
+                "action": "give",
                 "target": "ally:follower",
                 "not_self": true,
-                "keywords": [
-                  "Barrier"
-                ]
+                "keywords": ["Barrier"]
               }
             ]
           },
@@ -1584,7 +1630,9 @@
         "name": "Spellboost",
         "effects": [
           {
-            "op": "buff_self",
+            "op": "stat",
+            "action": "give",
+            "target": "self",
             "attack": 1,
             "defense": 1
           }
@@ -1609,30 +1657,37 @@
     "url": "https://shadowverse.gg/cards/10434120-cagliostro-genius-alchemist",
     "fanfare": [
       {
-        "op": "summon_named",
+        "op": "summon",
+        "source": "named",
         "name": "Magic Sediment",
         "count": 2
       },
       {
-        "op": "add_to_hand",
+        "op": "draw",
+        "source": "deck",
+        "source": "named",
         "name": "Ars Magna",
         "count": 1
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 10,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
-            "op": "gain_crest",
+            "op": "crest",
+            "action": "gain",
             "name": "Cagliostro, Genius Alchemist",
             "description": "At the start of your turn, Earth Rite (1) - Add an Ars Magna to your hand.",
             "image": "images/crests/cagliostro.png",
@@ -1648,7 +1703,9 @@
                     "amount": 1,
                     "effects": [
                       {
-                        "op": "add_to_hand",
+                        "op": "draw",
+                        "source": "deck",
+                        "source": "named",
                         "name": "Ars Magna",
                         "count": 1
                       }
@@ -1681,10 +1738,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10441110-joel-wave-chaser",
-    "keywords": [
-      "Ward",
-      "Aura"
-    ],
+    "keywords": ["Ward", "Aura"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -1716,7 +1770,8 @@
         },
         "effects": [
           {
-            "op": "modify_cost_pool",
+            "op": "cost",
+            "mode": "modify",
             "target": "self",
             "amount": "-{self.cost}",
             "until_eot": true
@@ -1739,7 +1794,8 @@
             "mode": "random",
             "effects": [
               {
-                "op": "buff",
+                "op": "stat",
+                "action": "give",
                 "attack": 1,
                 "defense": 1
               }
@@ -1766,7 +1822,8 @@
     "url": "https://shadowverse.gg/cards/10441310-crescent-tube-ride",
     "fanfare": [
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Crescent Tube Ride",
         "description": "Countdown (4). At the end of your turn, give a random allied follower on the field +1/+1.",
         "image": "images/crests/crescent_tube_ride.png",
@@ -1785,7 +1842,8 @@
                 "mode": "random",
                 "effects": [
                   {
-                    "op": "buff",
+                    "op": "stat",
+                    "action": "give",
                     "attack": 1,
                     "defense": 1
                   }
@@ -1819,11 +1877,13 @@
     "evolve_trigger_always": true,
     "fanfare": [
       {
-        "op": "max_pp_gate",
+        "op": "gate",
+        "condition": "max_pp",
         "at_least": 10,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -1862,12 +1922,14 @@
     "url": "https://shadowverse.gg/cards/10442120-mugen-steel-bodied-honesty",
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
             "op": "keyword",
-            "keyword": "Storm"
+            "action": "grant",
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -1913,10 +1975,9 @@
             "amount": 3
           },
           {
-            "op": "buff",
-            "keywords": [
-              "Can't Attack"
-            ],
+            "op": "stat",
+            "action": "give",
+            "keywords": ["Can't Attack"],
             "duration": "opponent_turn_end"
           }
         ]
@@ -1947,11 +2008,14 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 10,
         "effects": [
           {
-            "op": "super_evolve_self"
+            "op": "evolve",
+            "target": "self",
+            "mode": "super"
           }
         ]
       }
@@ -1966,10 +2030,10 @@
         },
         "effects": [
           {
-            "op": "buff_self",
-            "keywords": [
-              "Ward"
-            ]
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Ward"]
           }
         ]
       }
@@ -1999,38 +2063,11 @@
             "op": "banish"
           },
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "source": "selection",
             "count": 1
-          }
-        ]
-      }
-    ],
-    "fanfare": [
-      {
-        "op": "gain_max_pp",
-        "amount": 1
-      }
-    ],
-    "keywords": [
-      {
-        "name": "Enhance",
-        "cost": 10,
-        "effects": [
-          {
-            "op": "buff_self",
-            "keywords": [
-              "Storm"
-            ]
-          },
-          {
-            "op": "set_max_hp",
-            "amount": 1
-          },
-          {
-            "op": "set_leader_max_damage_cap",
-            "amount": 0,
-            "duration": "opponent_turn_end"
           }
         ]
       }
@@ -2078,9 +2115,7 @@
         "select": 1
       }
     ],
-    "keywords": [
-      "Intimidate"
-    ],
+    "keywords": ["Intimidate"],
     "triggers": []
   },
   {
@@ -2100,7 +2135,8 @@
     "url": "https://shadowverse.gg/cards/10444120-zooey-ally-of-the-world",
     "fanfare": [
       {
-        "op": "gain_max_pp",
+        "op": "pp",
+        "action": "gain_max",
         "amount": 1
       }
     ],
@@ -2110,19 +2146,27 @@
         "cost": 10,
         "effects": [
           {
-            "op": "buff_self",
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
+          },
+          {
+            "op": "stat",
+            "target": "ally:leader",
+            "action": "set",
+            "defense": 1
+          },
+          {
+            "op": "keyword",
+            "target": "ally:leader",
             "keywords": [
-              "Storm"
+              {
+                "name": "MaxDamageCap",
+                "value": 0,
+                "duration": "opponent_turn_end"
+              }
             ]
-          },
-          {
-            "op": "set_max_hp",
-            "amount": 1
-          },
-          {
-            "op": "set_leader_max_damage_cap",
-            "amount": 0,
-            "duration": "opponent_turn_end"
           }
         ]
       }
@@ -2153,10 +2197,13 @@
         "cost": 4,
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           },
           {
-            "op": "buff_self",
+            "op": "stat",
+            "action": "give",
+            "target": "self",
             "attack": 1,
             "defense": 1
           }
@@ -2188,7 +2235,8 @@
         "name": "Last Words",
         "effects": [
           {
-            "op": "summon_named",
+            "op": "summon",
+            "source": "named",
             "name": "Vaseraga, Unyielding Scythe"
           },
           {
@@ -2225,7 +2273,8 @@
         "amount": 2
       },
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Valiant Edge",
         "description": "Countdown (2). At the end of your turn, deal 2 damage to a random enemy follower and restore 1 defense to your leader.",
         "image": "images/crests/valiant_edge.png",
@@ -2242,7 +2291,8 @@
                 "count": 1
               },
               {
-                "op": "heal",
+                "op": "restore",
+                "target_type": "leader",
                 "target": "ally:leader",
                 "amount": 1
               }
@@ -2274,9 +2324,7 @@
     "has_ongoing": true,
     "evolve": [],
     "superevolve": [],
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [
       {
         "type": "end_of_turn_own",
@@ -2314,15 +2362,15 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10452120-satyr-open-hearted-rover",
-    "keywords": [
-      "Aura"
-    ],
+    "keywords": ["Aura"],
     "fanfare": [
       {
-        "op": "evolved_allied_gate",
+        "op": "gate",
+        "condition": "evolved_allied",
         "effects": [
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -2348,14 +2396,16 @@
     "url": "https://shadowverse.gg/cards/10452130-baal-elemental-resonance",
     "fanfare": [
       {
-        "op": "choose",
+        "op": "mode",
         "select_count": 1,
         "options": [
           {
             "name": "Give this follower and another random allied follower on the field +1/+1",
             "effects": [
               {
-                "op": "buff_self",
+                "op": "stat",
+                "action": "give",
+                "target": "self",
                 "attack": 1,
                 "defense": 1
               },
@@ -2369,7 +2419,8 @@
                 },
                 "effects": [
                   {
-                    "op": "buff",
+                    "op": "stat",
+                    "action": "give",
                     "attack": 1,
                     "defense": 1
                   }
@@ -2412,12 +2463,11 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10453110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10453110-nehan-dispenser-of-samsara",
-    "keywords": [
-      "Drain"
-    ],
+    "keywords": ["Drain"],
     "fanfare": [
       {
-        "op": "evolve_all_unevolved_allies"
+        "op": "evolve",
+        "target": "all_allies"
       },
       {
         "op": "damage",
@@ -2449,13 +2499,15 @@
     "keywords": [],
     "spell": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "all:follower",
         "attack": -2,
         "defense": -2
       },
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Crest: Corruption",
         "image": "images/crests/corruption.png",
         "description": "Countdown (4). At the end of your turn, deal 2 damage to your leader.",
@@ -2474,7 +2526,8 @@
         ]
       },
       {
-        "op": "gain_crest",
+        "op": "crest",
+        "action": "gain",
         "name": "Crest: Corruption",
         "player": "opponent",
         "image": "images/crests/corruption.png",
@@ -2494,11 +2547,13 @@
         ]
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
-            "op": "destroy_crest",
+            "op": "crest",
+            "action": "destroy",
             "name": "Crest: Corruption"
           }
         ]
@@ -2523,16 +2578,19 @@
     "has_ongoing": true,
     "fanfare": [
       {
-        "op": "necromancy_gate",
+        "op": "gate",
+        "condition": "necromancy",
         "cost": 6,
         "effects": [
           {
-            "op": "reanimate",
+            "op": "summon",
+            "source": "graveyard",
             "max_cost": 2,
             "evolve_summons": true
           },
           {
-            "op": "reanimate",
+            "op": "summon",
+            "source": "graveyard",
             "max_cost": 1,
             "evolve_summons": true
           }
@@ -2544,7 +2602,8 @@
         "type": "end_of_turn_own",
         "effects": [
           {
-            "op": "buff",
+            "op": "stat",
+            "action": "give",
             "target": "enemy:follower",
             "attack": -2,
             "defense": -2
@@ -2578,11 +2637,13 @@
         "amount": 10
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "requirement": 15,
         "effects": [
           {
-            "op": "gain_crest",
+            "op": "crest",
+            "action": "gain",
             "name": "Crest: Belial, Archangel of Cunning",
             "image": "images/crests/belial.png",
             "description": "Countdown (4). Last Words: Deal 20 damage to the enemy leader.",
@@ -2601,7 +2662,8 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "crest_advance_countdown",
+        "op": "crest",
+        "action": "advance_countdown",
         "name": "Crest: Belial, Archangel of Cunning",
         "amount": 1
       }
@@ -2625,19 +2687,17 @@
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461110-troue-heroic-visionary",
     "has_ongoing": true,
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "triggers": [
       {
         "event": "engage",
         "source": "board",
         "effects": [
           {
-            "op": "buff_self",
-            "keywords": [
-              "Drain"
-            ]
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Drain"]
           }
         ]
       }
@@ -2664,7 +2724,8 @@
     "triggers": [
       {
         "type": "end_of_turn_own",
-        "op": "evolved_self_gate",
+        "op": "gate",
+        "condition": "evolved_self",
         "effects": [
           {
             "op": "damage",
@@ -2675,10 +2736,10 @@
     ],
     "evolve": [
       {
-        "op": "buff_self",
-        "keywords": [
-          "Can't Attack"
-        ],
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "keywords": ["Can't Attack"],
         "duration": "turn_end"
       }
     ],
@@ -2714,12 +2775,14 @@
             "effects": [
               {
                 "op": "transform",
+                "zone": "board",
                 "into": "Awed and Inspired"
               }
             ]
           },
           {
             "op": "draw",
+            "source": "deck",
             "count": 1
           }
         ]
@@ -2749,7 +2812,9 @@
         "cost": 6,
         "effects": [
           {
-            "op": "buff_self",
+            "op": "stat",
+            "action": "give",
+            "target": "self",
             "defense": 10
           }
         ]
@@ -2803,7 +2868,8 @@
     "url": "https://shadowverse.gg/cards/10462120-sophia-zeyen-priestess",
     "fanfare": [
       {
-        "op": "summon_random_from_deck",
+        "op": "summon",
+        "source": "deck",
         "filters": {
           "type": "Follower",
           "class": "Havencraft",
@@ -2814,11 +2880,10 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "ally:follower",
-        "keywords": [
-          "Barrier"
-        ]
+        "keywords": ["Barrier"]
       }
     ],
     "keywords": [],
@@ -2867,7 +2932,9 @@
         "source": "hand",
         "effects": [
           {
-            "op": "reduce_cost_self",
+            "op": "cost",
+            "target": "self",
+            "mode": "reduce",
             "amount": 1
           }
         ]
@@ -2920,7 +2987,8 @@
         "event": "engage",
         "effects": [
           {
-            "op": "heal_leader",
+            "op": "restore",
+            "target": "leader",
             "amount": 1
           }
         ]
@@ -2950,13 +3018,14 @@
         "sacrifice": true,
         "effects": [
           {
-            "op": "choose",
+            "op": "mode",
             "options": [
               {
                 "label": "Destroy a random enemy follower",
                 "effects": [
                   {
-                    "op": "destroy_random",
+                    "op": "destroy",
+                    "distribution": "random",
                     "target": "enemy:follower"
                   }
                 ]
@@ -2966,6 +3035,7 @@
                 "effects": [
                   {
                     "op": "draw",
+                    "source": "deck",
                     "count": 2
                   }
                 ]
@@ -3063,11 +3133,14 @@
         ]
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "count": 15,
         "effects": [
           {
-            "op": "super_evolve_self"
+            "op": "evolve",
+            "target": "self",
+            "mode": "super"
           }
         ]
       }
@@ -3089,18 +3162,17 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471110-sho-reborn-night-king",
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "fanfare": [
       {
-        "op": "super_evolve_gate",
+        "op": "gate",
+        "condition": "super_evo_unlocked",
         "effects": [
           {
-            "op": "buff_self",
-            "keywords": [
-              "Barrier"
-            ]
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Barrier"]
           }
         ]
       }
@@ -3124,9 +3196,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471120-tsubasa-blazing-gearcyclist",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "fanfare": [
       {
         "op": "boost_skybound_art_hand",
@@ -3159,7 +3229,9 @@
         "name": "last_words",
         "effects": [
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "name": "Striker Artifact",
             "count": 1
           }
@@ -3185,7 +3257,8 @@
     "url": "https://shadowverse.gg/cards/10472110-eustace-howl-of-thunder",
     "fanfare": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "count": 10,
         "effects": [
           {
@@ -3201,7 +3274,8 @@
             ]
           },
           {
-            "op": "evolve_self"
+            "op": "evolve",
+            "target": "self"
           }
         ]
       }
@@ -3236,7 +3310,7 @@
     "url": "https://shadowverse.gg/cards/10472120-ilsa-brutal-drill-sergeant",
     "fanfare": [
       {
-        "op": "choose",
+        "op": "mode",
         "options": [
           {
             "label": "Do this 3 times: \"Deal 4 damage to a random enemy follower.\"",
@@ -3336,7 +3410,9 @@
         "name": "last_words",
         "effects": [
           {
-            "op": "add_to_hand",
+            "op": "draw",
+            "source": "deck",
+            "source": "named",
             "card_name": "Fortifier Artifact"
           }
         ]
@@ -3360,7 +3436,8 @@
     "url": "https://shadowverse.gg/cards/10473310-chaos-legion",
     "spell": [
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "count": 15,
         "effects": [
           {
@@ -3407,17 +3484,20 @@
         "distribution": "random_hits"
       },
       {
-        "op": "buff",
+        "op": "stat",
+        "action": "give",
         "target": "enemy:hand:follower",
         "attack": 1,
         "defense": 0
       },
       {
-        "op": "skybound_art_gate",
+        "op": "gate",
+        "condition": "skybound_art",
         "count": 10,
         "effects": [
           {
-            "op": "gain_crest",
+            "op": "crest",
+            "action": "gain",
             "name": "Lu Woh, Light Personified",
             "description": "Countdown (2). Whenever an enemy follower with Storm attacks a leader, give it -3/-0 until the end of the turn.",
             "countdown": 2,
@@ -3431,7 +3511,8 @@
                 },
                 "effects": [
                   {
-                    "op": "buff",
+                    "op": "stat",
+                    "action": "give",
                     "target": "attacker",
                     "attack": -3,
                     "defense": 0,
@@ -3473,7 +3554,8 @@
         "target": "enemy:follower",
         "effects": [
           {
-            "op": "remove_abilities",
+            "op": "keyword",
+            "action": "silence",
             "target": "selected"
           },
           {
@@ -3484,9 +3566,14 @@
         ]
       },
       {
-        "op": "add_leader_damage_taken_bonus",
+        "op": "keyword",
         "target": "enemy:leader",
-        "amount": 1
+        "keywords": [
+          {
+            "name": "Vulnerable",
+            "value": 1
+          }
+        ]
       }
     ],
     "keywords": [],

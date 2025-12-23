@@ -24,7 +24,7 @@ describe("Buff Mechanics", () => {
         state.blueBoard = [unit];
 
         const buffEff = {
-            op: "buff",
+            op: "stat",
             target: "ally:follower",
             attack: 2,
             defense: 2
@@ -43,7 +43,7 @@ describe("Buff Mechanics", () => {
         state.blueBoard = [unit];
 
         const debuff = {
-            op: "buff",
+            op: "stat",
             target: "ally:follower",
             attack: -1,
             defense: -1
@@ -67,7 +67,7 @@ describe("Buff Mechanics", () => {
         // Mock selection by setting state.pendingTarget... but runEffects usually handles auto if no select needed?
         // If we use 'random'
         const buffRandom = {
-            op: "buff",
+            op: "stat",
             target: "ally:follower",
             random: true,
             count: 1,

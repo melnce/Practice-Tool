@@ -9,11 +9,11 @@ import { GameState } from "../core/types.js";
  * @returns {boolean}
  */
 export function isOwnBoard(zoneId: string, state: GameState): boolean {
-    const isBlueBoard = zoneId === "blueBoard";
-    const isRedBoard = zoneId === "redBoard";
-    if (!isBlueBoard && !isRedBoard) return false;
+  const isBlueBoard = zoneId === "blueBoard";
+  const isRedBoard = zoneId === "redBoard";
+  if (!isBlueBoard && !isRedBoard) return false;
 
-    return (isBlueBoard && state.isBlueTurn) || (isRedBoard && !state.isBlueTurn);
+  return (isBlueBoard && state.isBlueTurn) || (isRedBoard && !state.isBlueTurn);
 }
 
 /**
@@ -22,7 +22,7 @@ export function isOwnBoard(zoneId: string, state: GameState): boolean {
  * @returns {boolean}
  */
 export function isBoardZone(zoneId: string): boolean {
-    return zoneId === "blueBoard" || zoneId === "redBoard";
+  return zoneId === "blueBoard" || zoneId === "redBoard";
 }
 
 /**
@@ -31,7 +31,7 @@ export function isBoardZone(zoneId: string): boolean {
  * @returns {boolean}
  */
 export function isHandZone(zoneId: string): boolean {
-    return zoneId === "blueHand" || zoneId === "redHand";
+  return zoneId === "blueHand" || zoneId === "redHand";
 }
 
 /**
@@ -40,7 +40,7 @@ export function isHandZone(zoneId: string): boolean {
  * @returns {string|null}
  */
 export function getZoneOwner(zoneId: string): "blue" | "red" | null {
-    if (zoneId.startsWith("blue")) return "blue";
-    if (zoneId.startsWith("red")) return "red";
-    return null;
+  if (zoneId.startsWith("blue")) return "blue";
+  if (zoneId.startsWith("red")) return "red";
+  return null;
 }

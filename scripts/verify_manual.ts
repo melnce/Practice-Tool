@@ -1,4 +1,3 @@
-
 import { handleDamageSplitFixed } from "../src/logic/effects/ops/damage.js";
 
 // Mock resolution of dependencies locally or simple runner
@@ -14,6 +13,6 @@ import { handleDamageSplitFixed } from "../src/logic/effects/ops/damage.js";
 console.log("Static analysis confirms fixes applied.");
 console.log("1. targeting.ts: robust tribe check added.");
 console.log("2. damage.ts: handleDamageSplitFixed accepts sourceCard.");
-console.log("3. index.ts: dispatcher passes sourceCard to handleDamageSplitFixed.");
-
-
+console.log(
+  "3. index.ts: dispatcher passes sourceCard to handleDamageSplitFixed.",
+);

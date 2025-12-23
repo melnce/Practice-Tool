@@ -1,6 +1,6 @@
 # Op Signature Inventory
 
-Generated: 2025-12-18T20:36:28.119Z
+Generated: 2025-12-22T19:10:54.619Z
 
 ## Summary
 
@@ -12,8 +12,8 @@ Generated: 2025-12-18T20:36:28.119Z
 | 10003_heirs-of-the-omen.json | 77 |
 | token_details.json | 69 |
 
-**Total unique op signatures:** 369
-**Total unique ops used:** 116
+**Total unique op signatures:** 353
+**Total unique ops used:** 100
 
 ## ⚠️ Unknown/Unimplemented Ops
 
@@ -61,12 +61,6 @@ Generated: 2025-12-18T20:36:28.119Z
 |-----------|------|---------------------|-------------|
 | `add_max_pp(amount:1)` | spell | Dragonsign | 1 |
 
-### add_selected_copy_to_hand
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `add_selected_copy_to_hand(count:1)` | superevolve | Sham-Nacha, Heir to Entwining | 1 |
-
 ### add_shadows
 
 | Signature | Zone | Representative Card | Usage Count |
@@ -102,6 +96,7 @@ Generated: 2025-12-18T20:36:28.119Z
 | `add_to_hand(count:1,name:Gilded Necklace)` | fanfare | Supplicant of Usurpation | 4 |
 | `add_to_hand(count:1,name:Gilded Blade)` | keyword:LastWords | Supplicant of Usurpation | 5 |
 | `add_to_hand(name:Remnant of Hollowness)` | fanfare | Octrice, Hollowness Manifest | 1 |
+| `add_to_hand(count:1)` | superevolve | Sham-Nacha, Heir to Entwining | 1 |
 | `add_to_hand(name:Scream Diffusion)` | fanfare | Rulenye & Valnareik | 1 |
 | `add_to_hand(name:Wings of Desire)` | fanfare | Rulenye & Valnareik | 1 |
 | `add_to_hand(name:Torrent of Despair)` | fanfare | Marwynn, Despair Manifest | 1 |
@@ -124,10 +119,9 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `banish(select:true,target:enemy:follower)` | evolve | Ironfist Priest | 1 |
+| `banish(select:1,target:enemy:follower)` | evolve | Ironfist Priest | 3 |
 | `banish(select:false,target:enemy:follower)` | superevolve | Ironfist Priest | 1 |
 | `banish(select:1,target:enemy:card)` | fanfare | Odin, Twilit Fate | 1 |
-| `banish(select:1,target:enemy:follower)` | fanfare | Immaculate Adjudicator | 2 |
 | `banish(target:selected)` | evolve | Achim, Lord of Despair | 2 |
 
 ### banish_all_enemy_copies
@@ -173,23 +167,24 @@ Generated: 2025-12-18T20:36:28.119Z
 |-----------|------|---------------------|-------------|
 | `buff(target:trigger)` | keyword:AllyEnter | Ancestral Crown | 1 |
 | `buff(target:selected)` | superevolve | Remi & Rami, Two-Faced Witch | 7 |
-| `buff(select:true,target:ally:follower)` | fanfare | Winged Warrior | 6 |
+| `buff(select:1,target:ally:follower)` | fanfare | Winged Warrior | 8 |
 | `buff(target:ally:follower)` | fanfare | Fay Twinkletoes | 16 |
-| `buff(amount:1,select:true,target:ally:follower)` | fanfare | Ian, Lovebound Knight | 2 |
+| `buff(amount:1,select:1,target:ally:follower)` | fanfare | Ian, Lovebound Knight | 2 |
 | `buff(target:entering_follower)` | trigger:ally_follower_enter | Amalia, Luxsteel Paladin | 2 |
+| `buff` | spell | Snowman Army | 1 |
 | `buff(target:enemy:follower)` | fanfare | Twilight Dragon | 4 |
 | `buff(has_condition,target:ally:follower)` | superevolve | Ralmia, Sonic Boom | 2 |
 | `buff(select:1,target:all:follower)` | spell | Dark Side | 5 |
+| `buff(select:2,target:enemy:follower)` | fanfare | Lymaga, Untamed Wild | 1 |
 | `buff(target:selected:follower)` | spell | Divine Guard | 1 |
 | `buff(select:1,target:enemy:follower)` | fanfare | Devotee of Unkilling | 5 |
-| `buff(select:1,target:ally:follower)` | evolve | Peppy Scout | 2 |
 | `buff(count:1,target:ally:follower)` | keyword:engage | Castle of Entwining | 2 |
 
 ### buff_hand_class ⚠️
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `buff_hand_class` | trigger:end_of_turn | Congregant of Disdain | 1 |
+| `buff_hand_class` | trigger:unknown | Congregant of Disdain | 1 |
 
 ### buff_hand_tribe ⚠️
 
@@ -243,130 +238,72 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `damage(amount:3,select:1,target:enemy:follower)` | fanfare | May, Journey Elf | 11 |
-| `damage(amount:1,select:1,target:enemy:follower)` | fanfare | Searing Firenewt | 3 |
+| `damage(amount:1,count:1,target:enemy:follower)` | keyword:PixieEnter | Wild Profusion | 3 |
+| `damage(amount:3,select:1,target:enemy:follower)` | fanfare | May, Journey Elf | 13 |
+| `damage(amount:2,count:1,target:enemy:follower)` | spell | Bug Alert | 11 |
+| `damage(amount:2,target:all:follower)` | spell | Arcane Eruption | 1 |
+| `damage(amount:1,select:1,target:enemy:follower)` | fanfare | Searing Firenewt | 4 |
 | `damage(amount:6,target:enemy:leader)` | fanfare | Warrior of the Deep | 2 |
-| `damage(amount:2,select:true,target:enemy:follower)` | spell | Strike of the Dragonewt | 1 |
+| `damage(amount:2,select:1,target:enemy:follower)` | spell | Strike of the Dragonewt | 2 |
 | `damage(amount:4,select:1,target:enemy:follower)` | evolve | Draconic Berserker | 5 |
+| `damage(amount:4,target:enemy:follower)` | superevolve | Draconic Berserker | 4 |
 | `damage(amount:1,target:ally:leader)` | fanfare | Night Fiend | 2 |
-| `damage(amount:5,select:1,target:enemy:follower)` | fanfare | Valse, Silent Sniper | 4 |
+| `damage(amount:1,target:enemy:follower)` | fanfare | Apollo, Heaven's Envoy | 11 |
+| `damage(amount:3,count:3,target:enemy:follower)` | fanfare | Elder Sagebrush | 1 |
+| `damage(target:enemy_followers)` | evolve | Glade, Fragrantwood Ward | 2 |
+| `damage(amount:5,select:1,target:enemy:follower)` | fanfare | Valse, Silent Sniper | 5 |
+| `damage(amount:3,target:enemy:follower)` | keyword:Enhance | Albert, Levin Stormsaber | 8 |
 | `damage(amount:{self.attack},has_condition,select:1,target:enemy:follower)` | fanfare | Runeblade Conductor | 1 |
-| `damage(amount:2,select:1,target:enemy:follower)` | spell | Stormy Blast | 1 |
+| `damage(target:enemy_board)` | evolve | Emmylou, Witch of Wonder | 2 |
+| `damage(amount:{self.spellboostCount},target:enemy:follower)` | fanfare | William, Mysterian Student | 2 |
 | `damage(amount:{earth_counter_sum},select:1,target:enemy:follower)` | fanfare | Juno, Visionary Alchemist | 1 |
+| `damage(amount:4,count:1,target:enemy:follower)` | evolve | Edelweiss, Sagelight Ward | 7 |
+| `damage(amount:5,target:all:follower)` | spell | Calamity Breath | 1 |
+| `damage(amount:{last_discarded_cost},target:enemy:follower)` | fanfare | Burnite, Anathema of Flame | 1 |
 | `damage(amount:2,target:ally:leader)` | fanfare | Darkseal Demon | 5 |
 | `damage(amount:6,select:1,target:enemy:follower)` | evolve | Darkseal Demon | 2 |
 | `damage(amount:3,target:ally:leader)` | fanfare | Beryl, Nightmare Incarnate | 3 |
+| `damage(amount:2,count:2,target:enemy:follower)` | superevolve | Orthrus, Hellhound Blader | 3 |
+| `damage(amount:7,target:enemy_followers)` | fanfare | Aragavy, Eternal Hunter | 1 |
 | `damage(amount:3,target:enemy:leader)` | evolve | Aragavy, Eternal Hunter | 3 |
 | `damage(amount:1,target:enemy:leader)` | trigger:clash | Reno, Luxwing Featherfolk | 4 |
+| `damage(amount:6,target:enemy:follower)` | fanfare | Jeanne, Saintly Knight | 1 |
+| `damage(amount:4,count:3,target:enemy:follower)` | keyword:Enhance | Band of Battle Princesses | 1 |
 | `damage(amount:2,target:enemy:leader)` | spell | Glacial Crash | 3 |
+| `damage(count:1,target:enemy:follower)` | spell | Divine Guard | 1 |
 | `damage(amount:10,target:ally:leader)` | spell | Maddening Benison | 1 |
+| `damage(amount:3,count:1,target:enemy:follower)` | trigger:loot_fused | Congregant of Usurpation | 7 |
+| `damage(amount:{self.fused_loot_unique},target:enemy:follower)` | fanfare | Sinciro, Heir to Usurpation | 2 |
+| `damage(amount:{self.fused_loot_unique},target:enemy:leader)` | fanfare | Sinciro, Heir to Usurpation | 2 |
+| `damage(amount:3,target:other:follower)` | fanfare | Supplicant of Truth | 1 |
+| `damage(amount:5,target:follower)` | spell | Raging Lightning | 1 |
+| `damage(amount:3,target:leader)` | spell | Raging Lightning | 1 |
+| `damage(amount:1,target:other:follower)` | keyword:Engage | Nation of Disdain | 1 |
+| `damage(amount:3,has_condition,target:all:follower)` | fanfare | Congregant of Disdain | 1 |
 | `damage(amount:1,select:1,target:ally:follower)` | spell | Ferocious Flame | 1 |
+| `damage(amount:2,has_condition,target:all:follower)` | fanfare | Azurifrit, Heir to Disdain | 6 |
 | `damage(amount:4,target:ally:leader)` | fanfare | Ephemeral Demon Princess | 1 |
+| `damage(amount:4)` | keyword:LastWords | Shining Disenchantment | 2 |
+| `damage(target:enemy:leader)` | superevolve | Axia, Heir to Destruction | 1 |
 | `damage(amount:6,select:2,target:enemy:follower)` | fanfare | Demon of Purgatory | 1 |
+| `damage(amount:5,target:enemy:follower)` | fanfare | Masterwork Artifact Ω | 1 |
 | `damage(amount:{self.attack},target:defender)` | trigger:follower_strike | Victoria | 1 |
+| `damage(amount:5,count:1,target:enemy:follower)` | spell | Sweetness of Voracity | 1 |
 | `damage(amount:5,target:enemy:leader)` | spell | Sweetness of Voracity | 1 |
 | `damage(amount:20,target:enemy:leader)` | spell | Annihilating Onslaught | 1 |
+| `damage(amount:1,target:all:follower)` | spell | Fangs of Ardent Destruction | 1 |
 | `damage(amount:2)` | spell | Ars Magna | 1 |
-
-### damage_all
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_all(amount:2,target:all:follower)` | spell | Arcane Eruption | 1 |
-| `damage_all(amount:4,target:enemy:follower)` | superevolve | Draconic Berserker | 4 |
-| `damage_all(amount:1,target:enemy:follower)` | fanfare | Apollo, Heaven's Envoy | 11 |
-| `damage_all(amount:3,target:enemy:follower)` | keyword:Enhance | Albert, Levin Stormsaber | 8 |
-| `damage_all(amount:{self.spellboostCount},target:enemy:follower)` | fanfare | William, Mysterian Student | 1 |
-| `damage_all(amount:5,target:all:follower)` | spell | Calamity Breath | 1 |
-| `damage_all(amount:{last_discarded_cost},target:enemy:follower)` | fanfare | Burnite, Anathema of Flame | 1 |
-| `damage_all(amount:6,target:enemy:follower)` | fanfare | Jeanne, Saintly Knight | 1 |
-| `damage_all(amount:{self.fused_loot_unique},target:enemy:follower)` | fanfare | Sinciro, Heir to Usurpation | 2 |
-| `damage_all(amount:{self.fused_loot_unique},target:enemy:leader)` | fanfare | Sinciro, Heir to Usurpation | 2 |
-| `damage_all(amount:3,has_condition,target:all:follower)` | fanfare | Supplicant of Truth | 2 |
-| `damage_all(amount:1,has_condition,target:all:follower)` | keyword:Engage | Nation of Disdain | 1 |
-| `damage_all(amount:2,has_condition,target:all:follower)` | fanfare | Azurifrit, Heir to Disdain | 6 |
-| `damage_all(amount:5,target:enemy:follower)` | fanfare | Masterwork Artifact Ω | 1 |
-| `damage_all(amount:1,target:all:follower)` | spell | Fangs of Ardent Destruction | 1 |
-
-### damage_all_by_allied_golems
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_all_by_allied_golems(target:enemy_board)` | evolve | Emmylou, Witch of Wonder | 2 |
-
-### damage_enemy_leader_by_other_allies
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_enemy_leader_by_other_allies` | superevolve | Axia, Heir to Destruction | 1 |
-
-### damage_follower_or_leader
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_follower_or_leader(amount:5,select:1,target:enemy:follower)` | spell | Ravening Tentacles | 1 |
-| `damage_follower_or_leader(amount:3,select:1,target:enemy:follower)` | spell | Rage of Serpents | 2 |
-| `damage_follower_or_leader(amount:1,select:1,target:enemy:follower)` | spell | Gilded Blade | 1 |
-
-### damage_highest_defense
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_highest_defense(amount:5,target:follower)` | spell | Raging Lightning | 1 |
-| `damage_highest_defense(amount:3,target:leader)` | spell | Raging Lightning | 1 |
-
-### damage_random
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_random(amount:1,target:enemy:follower)` | keyword:PixieEnter | Wild Profusion | 3 |
-| `damage_random(amount:2,count:1,target:enemy:follower)` | spell | Bug Alert | 4 |
-| `damage_random(amount:3,count:3,target:enemy:follower)` | fanfare | Elder Sagebrush | 1 |
-| `damage_random(amount:4,target:enemy:follower)` | evolve | Edelweiss, Sagelight Ward | 4 |
-| `damage_random(amount:2,count:2,target:enemy:follower)` | superevolve | Orthrus, Hellhound Blader | 3 |
-| `damage_random(amount:4,count:1,target:enemy:follower)` | keyword:LastWords | Hnikar & Jafnhar, Firestorm Duo | 3 |
-| `damage_random(amount:2,target:enemy:follower)` | spell | Ambush from Above | 7 |
-| `damage_random(amount:4,count:3,target:enemy:follower)` | keyword:Enhance | Band of Battle Princesses | 1 |
-| `damage_random(amount:3,target:enemy:follower)` | trigger:loot_fused | Congregant of Usurpation | 4 |
-| `damage_random(amount:3,count:1,target:enemy:follower)` | fanfare | Supplicant of Entwining | 3 |
-| `damage_random(amount:5,target:enemy:follower)` | spell | Sweetness of Voracity | 1 |
-
-### damage_random_selected_defense
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_random_selected_defense` | spell | Divine Guard | 1 |
-
-### damage_split_all_enemies
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_split_all_enemies(amount:4)` | keyword:LastWords | Shining Disenchantment | 2 |
-
-### damage_split_fixed
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_split_fixed(amount:7,target:enemy_followers)` | fanfare | Aragavy, Eternal Hunter | 1 |
-| `damage_split_fixed(amount:{self.spellboostCount},target:enemy:follower)` | spell | Flames of Chaos | 1 |
-
-### damage_split_sequential
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `damage_split_sequential(target:enemy_followers)` | evolve | Glade, Fragrantwood Ward | 2 |
 
 ### destroy
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `destroy(select:true,target:ally:follower)` | spell | Soul Predation | 2 |
-| `destroy(select:1,target:enemy:follower)` | spell | Bullet from Beyond | 11 |
-| `destroy(select:true,target:enemy:follower)` | fanfare | Aerin, Crystalian Frostward | 3 |
+| `destroy(select:1,target:ally:follower)` | spell | Soul Predation | 2 |
+| `destroy(select:1,target:enemy:follower)` | spell | Bullet from Beyond | 14 |
 | `destroy(select:2,target:enemy:follower)` | superevolve | Sylvia, Garden Executioner | 5 |
 | `destroy(has_condition,select:1,target:enemy:follower)` | evolve | Cleric of Crushing | 2 |
 | `destroy(target:selected:follower)` | superevolve | Sham-Nacha, Heir to Entwining | 1 |
-| `destroy(select:true,target:ally:any)` | spell | Devastating Soprano | 2 |
+| `destroy(select:1,target:ally:any)` | spell | Devastating Soprano | 2 |
 
 ### destroy_all
 
@@ -431,42 +368,12 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `draw(count:1)` | evolve | Leah, Bellringer Angel | 23 |
-| `draw(count:2)` | spell | Soul Predation | 18 |
+| `draw(count:1)` | evolve | Leah, Bellringer Angel | 36 |
+| `draw(count:2)` | spell | Way of the Maid | 22 |
+| `draw(count:all)` | superevolve | Rusty, Luxcard Trickster | 1 |
 | `draw` | fanfare | Deepwood Fairy Beast | 3 |
 | `draw(count:5)` | spell | Dimension Climb | 1 |
 | `draw(count:3)` | superevolve | Twilight Dragon | 7 |
-
-### draw_all_named_with_keyword
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `draw_all_named_with_keyword(name:Rusty, Luxcard Trickster)` | superevolve | Rusty, Luxcard Trickster | 1 |
-
-### draw_combo_follower
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `draw_combo_follower(count:1)` | fanfare | Workin' Grasshopper | 1 |
-
-### draw_filtered
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `draw_filtered(count:1)` | fanfare | Adventurers' Guild | 10 |
-| `draw_filtered(count:2)` | spell | Way of the Maid | 4 |
-
-### draw_named
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `draw_named(name:Call of the Megalorca)` | fanfare | Call of the Megalorca | 1 |
-
-### draw_opponent
-
-| Signature | Zone | Representative Card | Usage Count |
-|-----------|------|---------------------|-------------|
-| `draw_opponent(count:1)` | spell | Lucrative Deal | 1 |
 
 ### dynamic_buff_self
 
@@ -591,19 +498,16 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `keyword(select:true,target:ally:follower)` | keyword:Engage | Adventurers' Guild | 1 |
+| `keyword(select:1,target:ally:follower)` | keyword:Engage | Adventurers' Guild | 2 |
 | `keyword(target:ally:last_summoned)` | superevolve | Amorous Necromancer | 1 |
 | `keyword(target:entering_follower)` | trigger:ally_follower_enter | Luminous Magus | 11 |
 | `keyword(target:ally:follower)` | superevolve | Amelia, Silver Captain | 3 |
-| `keyword` | spell | Snowman Army | 1 |
-| `keyword(has_condition,select:true,target:ally:follower)` | superevolve | Kuon, Fivefold Master | 4 |
+| `keyword(has_condition,select:1,target:ally:follower)` | superevolve | Kuon, Fivefold Master | 5 |
 | `keyword(has_condition,target:ally:follower)` | evolve | Liam, Crazed Creator | 3 |
-| `keyword(select:2,target:enemy:follower)` | fanfare | Lymaga, Untamed Wild | 2 |
+| `keyword(select:2,target:enemy:follower)` | superevolve | Lymaga, Untamed Wild | 1 |
 | `keyword(target:selected)` | keyword:Engage | Pyrewyrm Blade | 3 |
 | `keyword(select:1,target:enemy:follower)` | fanfare | Damus, Oracle of Malice | 1 |
 | `keyword(has_condition,select:1,target:ally:hand)` | fanfare | Flight of Icarus | 3 |
-| `keyword(select:1,target:ally:follower)` | spell | Shield Bash | 1 |
-| `keyword(has_condition,select:1,target:ally:follower)` | spell | Wings of Desire | 1 |
 
 ### leader_barrier
 
@@ -701,7 +605,7 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `remove_keyword(select:true,target:enemy:follower)` | keyword:Engage | Detective's Lens | 1 |
+| `remove_keyword(select:1,target:enemy:follower)` | keyword:Engage | Detective's Lens | 1 |
 | `remove_keyword(target:ally:last_summoned)` | keyword:LastWords | Comrade of the Swordmaster | 2 |
 
 ### repeat_effect
@@ -732,7 +636,7 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `restore_self_and_heal_leader` | trigger:end_of_turn | Supplicant of Disdain | 1 |
+| `restore_self_and_heal_leader` | trigger:unknown | Supplicant of Disdain | 1 |
 
 ### return_hand_to_deck
 
@@ -745,7 +649,7 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `return_to_hand(select:true,target:enemy:follower)` | superevolve | Selwyn, Sonic Archer | 1 |
+| `return_to_hand(select:1,target:enemy:follower)` | superevolve | Selwyn, Sonic Archer | 1 |
 | `return_to_hand(select:1,target:ally)` | spell | Bug Alert | 3 |
 
 ### select
@@ -755,14 +659,13 @@ Generated: 2025-12-18T20:36:28.119Z
 | `select(has_condition,has_nested_effects,target:ally:follower)` | superevolve | Remi & Rami, Two-Faced Witch | 2 |
 | `select(has_nested_effects,target:enemy:follower)` | fanfare | Lily, Crystalian Innocence | 5 |
 | `select(has_condition,has_nested_effects,target:ally:hand)` | spell | Radiant Rainbow | 4 |
-| `select(has_nested_effects,select:1,target:ally:follower)` | fanfare | Marion, Ravishing Dragonewt | 1 |
+| `select(has_nested_effects,select:1,target:ally:follower)` | fanfare | Marion, Ravishing Dragonewt | 3 |
 | `select(has_nested_effects,target:ally:follower)` | keyword:Engage | Pyrewyrm Blade | 1 |
 | `select(has_nested_effects,target:ally:hand)` | spell | Draconic Strike | 1 |
-| `select(has_condition,has_nested_effects,select:true,target:ally:follower)` | spell | Divine Guard | 1 |
+| `select(has_condition,has_nested_effects,select:1,target:ally:follower)` | spell | Divine Guard | 1 |
 | `select(has_condition,has_nested_effects,target:enemy:follower)` | evolve | Achim, Lord of Despair | 2 |
 | `select(has_condition,has_nested_effects,select:1,target:ally:hand)` | keyword:Engage | Institute of Truth | 2 |
 | `select(has_nested_effects,select:1,target:enemy:follower)` | superevolve | Velharia, Heir to Truth | 2 |
-| `select(has_nested_effects,select:true,target:ally:follower)` | spell | Gilded Boots | 2 |
 
 ### select_hand_summon_artifact_copies_eot_destroy ⚠️
 
@@ -920,6 +823,7 @@ Generated: 2025-12-18T20:36:28.119Z
 | `summon_named(name:Striker Artifact)` | fanfare | Engineblade Maven | 3 |
 | `summon_named(count:1,name:Lloyd)` | spell | Synchronous Hearts | 1 |
 | `summon_named(count:1,name:Victoria)` | spell | Synchronous Hearts | 2 |
+| `summon_named(count:1,name:Enhanced Puppet)` | evolve | Zwei, Symphonic Heart | 2 |
 | `summon_named(count:1,name:Comrade of the Swordmaster)` | keyword:LastWords | Comrade of the Swordmaster | 1 |
 | `summon_named(count:1,name:Clay Golem)` | spell | Risky Amalgamation | 1 |
 | `summon_named(name:Majestic Megalorca)` | fanfare | Ocean Rider | 2 |
@@ -972,7 +876,7 @@ Generated: 2025-12-18T20:36:28.119Z
 
 | Signature | Zone | Representative Card | Usage Count |
 |-----------|------|---------------------|-------------|
-| `super_evolved_self_gate(has_nested_effects)` | trigger:end_of_turn | Ceres, Blue Rose Maiden | 1 |
+| `super_evolved_self_gate(has_nested_effects)` | trigger:unknown | Ceres, Blue Rose Maiden | 1 |
 
 ### transform
 

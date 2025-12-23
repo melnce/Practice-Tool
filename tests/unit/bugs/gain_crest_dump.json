@@ -9,7 +9,8 @@
       "type": "end_of_turn_own",
       "effects": [
         {
-          "op": "board_name_gate",
+          "op": "gate",
+          "condition": "board_name",
           "name": "Himeka, Heir to Repose",
           "effects": [
             {
@@ -27,9 +28,7 @@
                 "effects": [
                   {
                     "op": "buff",
-                    "keywords": [
-                      "Can't Attack"
-                    ],
+                    "keywords": ["Can't Attack"],
                     "duration": "opponent_turn_end"
                   },
                   {

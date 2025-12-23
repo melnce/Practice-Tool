@@ -8,11 +8,11 @@
 
 ## Entry Points
 
-| Function | Purpose | Renders | History |
-|----------|---------|---------|---------|
-| `playCard()` | Main API for UI/engine | ✓ | ✓ |
-| `playCardNoRender()` | Tests, headless mode | ✗ | ✗ |
-| `playCardCore()` | Raw logic (internal) | ✗ | ✗ |
+| Function             | Purpose                | Renders | History |
+| -------------------- | ---------------------- | ------- | ------- |
+| `playCard()`         | Main API for UI/engine | ✓       | ✓       |
+| `playCardNoRender()` | Tests, headless mode   | ✗       | ✗       |
+| `playCardCore()`     | Raw logic (internal)   | ✗       | ✗       |
 
 ---
 
@@ -26,16 +26,19 @@ type PlayOutcome =
 ```
 
 ### `blocked`
+
 - **Meaning**: Card cannot be played
 - **State**: No mutation (PP, hand, board, history unchanged)
 - **Causes**: Wrong turn, insufficient PP, no valid target, cant_play flag, board full
 
 ### `paused`
+
 - **Meaning**: Targeting/selection requested mid-play
 - **State**: Partial mutation occurred, `state.pendingTargetEffect` is set
 - **Next**: Caller must handle target selection, then resolution continues
 
 ### `done`
+
 - **Meaning**: Card fully resolved
 - **State**: PP paid, card removed from hand, effects executed, history entry added
 - **Next**: Caller should render

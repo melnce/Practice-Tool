@@ -19,13 +19,13 @@ This document provides a high-level overview of the game engine architecture and
 
 ### Key Paths
 
-| Flow | Entry | Key Files |
-|------|-------|-----------|
-| Play Card | `playCard/<type>.ts` | `follower.ts`, `spell.ts`, `amulet.ts` |
-| Effect Dispatch | `runEffects()` | `logic/core/effects/index.ts` |
-| Target Selection | `setPendingTarget()` | `logic/core/pendingTarget/` |
-| Death Cleanup | `cleanupDead()` | `logic/core/cleanup.ts` |
-| Trigger Events | `fireTrigger()` | `logic/core/triggers/` |
+| Flow             | Entry                | Key Files                              |
+| ---------------- | -------------------- | -------------------------------------- |
+| Play Card        | `playCard/<type>.ts` | `follower.ts`, `spell.ts`, `amulet.ts` |
+| Effect Dispatch  | `runEffects()`       | `logic/core/effects/index.ts`          |
+| Target Selection | `setPendingTarget()` | `logic/core/pendingTarget/`            |
+| Death Cleanup    | `cleanupDead()`      | `logic/core/cleanup.ts`                |
+| Trigger Events   | `fireTrigger()`      | `logic/core/triggers/`                 |
 
 ### Lifecycle Rules
 
@@ -38,17 +38,17 @@ This document provides a high-level overview of the game engine architecture and
 
 ## Key Subsystems
 
-| Module | Contract | Purpose |
-|--------|----------|---------|
-| Effects Registry | [README](src/logic/core/effects/README.md) | Op registration, dispatch, sealing |
-| Ops Standard | [README](src/logic/effects/ops/README.md) | Structure rules for ops modules |
-| Triggers | [README](src/logic/core/triggers/README.md) | Event system, listener patterns |
-| Targeting | [README](src/logic/core/targeting/README.md) | Pool building, selection UI |
-| PendingTarget | [README](src/logic/core/pendingTarget/README.md) | Target selection lifecycle |
-| Cleanup | [README](src/logic/core/cleanup/README.md) | Death processing policy |
-| CardFilter | [README](src/logic/core/cardFilter/README.md) | Draw/search filter predicates |
-| Buff | [README](src/logic/effects/ops/buff/README.md) | Buff application patterns |
-| Damage | [README](src/logic/effects/ops/damage/README.md) | Damage calculator policy |
+| Module           | Contract                                         | Purpose                            |
+| ---------------- | ------------------------------------------------ | ---------------------------------- |
+| Effects Registry | [README](src/logic/core/effects/README.md)       | Op registration, dispatch, sealing |
+| Ops Standard     | [README](src/logic/effects/ops/README.md)        | Structure rules for ops modules    |
+| Triggers         | [README](src/logic/core/triggers/README.md)      | Event system, listener patterns    |
+| Targeting        | [README](src/logic/core/targeting/README.md)     | Pool building, selection UI        |
+| PendingTarget    | [README](src/logic/core/pendingTarget/README.md) | Target selection lifecycle         |
+| Cleanup          | [README](src/logic/core/cleanup/README.md)       | Death processing policy            |
+| CardFilter       | [README](src/logic/core/cardFilter/README.md)    | Draw/search filter predicates      |
+| Buff             | [README](src/logic/effects/ops/buff/README.md)   | Buff application patterns          |
+| Damage           | [README](src/logic/effects/ops/damage/README.md) | Damage calculator policy           |
 
 ---
 
@@ -64,16 +64,16 @@ npm run replay:check    # Replay determinism
 
 ### Check Scripts (`scripts/`)
 
-| Script | Enforces |
-|--------|----------|
-| `check-buffs.ts` | Buff import restrictions |
-| `check-targeting.ts` | Targeting import policy |
-| `check-damage.ts` | Damage calculator access |
-| `check-cardfilter.ts` | CardFilter module usage |
-| `check-cleanupdead.ts` | cleanupDead call allowlist |
-| `check-pendingtarget.ts` | pendingTarget write policy |
-| `check-effects-registry.ts` | Registry integrity |
-| `check-architecture.ts` | Unified runner |
+| Script                      | Enforces                   |
+| --------------------------- | -------------------------- |
+| `check-buffs.ts`            | Buff import restrictions   |
+| `check-targeting.ts`        | Targeting import policy    |
+| `check-damage.ts`           | Damage calculator access   |
+| `check-cardfilter.ts`       | CardFilter module usage    |
+| `check-cleanupdead.ts`      | cleanupDead call allowlist |
+| `check-pendingtarget.ts`    | pendingTarget write policy |
+| `check-effects-registry.ts` | Registry integrity         |
+| `check-architecture.ts`     | Unified runner             |
 
 ### CI Enforcement
 

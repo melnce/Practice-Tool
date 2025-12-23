@@ -8,11 +8,11 @@ import { PendingTargetRequest } from "./types.js";
 /**
  * Sets the pending target selection state.
  * This is the ONLY approved way for ops to initiate target selection.
- * 
+ *
  * @param request - The selection request specification
  */
 export function setPendingTarget(request: PendingTargetRequest): void {
-    state.pendingTargetEffect = request as any;
+  state.pendingTargetEffect = request as any;
 }
 
 /**
@@ -20,7 +20,7 @@ export function setPendingTarget(request: PendingTargetRequest): void {
  * Called by resolveTarget after execution completes.
  */
 export function clearPendingTarget(): void {
-    delete state.pendingTargetEffect;
+  delete state.pendingTargetEffect;
 }
 
 /**
@@ -28,7 +28,7 @@ export function clearPendingTarget(): void {
  * Safe for UI/read-only access.
  */
 export function getPendingTarget(): PendingTargetRequest | null {
-    return (state.pendingTargetEffect as PendingTargetRequest) || null;
+  return (state.pendingTargetEffect as PendingTargetRequest) || null;
 }
 
 /**
@@ -36,5 +36,5 @@ export function getPendingTarget(): PendingTargetRequest | null {
  * Use for pause/resume checks in playCard/* modules.
  */
 export function isPendingTarget(): boolean {
-    return !!state.pendingTargetEffect;
+  return !!state.pendingTargetEffect;
 }

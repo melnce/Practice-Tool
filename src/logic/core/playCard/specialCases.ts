@@ -20,50 +20,50 @@ import { CardInstance, Player } from "../../../core/types.js";
 const BREW_NAMES = new Set(["witch's new brew", "magic sediment"]);
 
 export function mergeWitchsNewBrewOnPlay(newCard: CardInstance, owner: Player) {
-    // Only for Witch's New Brew amulet
-    if (newCard?.type !== "Amulet") return;
-    if (!BREW_NAMES.has(String(newCard.name).toLowerCase())) return;
-    if (String(newCard.name).toLowerCase() !== "witch's new brew") return;
+  // Only for Witch's New Brew amulet
+  if (newCard?.type !== "Amulet") return;
+  if (!BREW_NAMES.has(String(newCard.name).toLowerCase())) return;
+  if (String(newCard.name).toLowerCase() !== "witch's new brew") return;
 
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
-    const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
 
-    const newIndex = board.lastIndexOf(newCard);
-    if (newIndex < 0) return;
+  const newIndex = board.lastIndexOf(newCard);
+  if (newIndex < 0) return;
 
-    const sum: Record<string, number> = {};
-    const toRemove: number[] = [];
+  const sum: Record<string, number> = {};
+  const toRemove: number[] = [];
 
-    for (let i = 0; i < board.length; i++) {
-        if (i === newIndex) continue;
-        const c = board[i];
-        if (c && c.type === "Amulet") {
-            const cardName = String(c.name).toLowerCase();
-            if (BREW_NAMES.has(cardName)) {
-                if ((c as any).counters && typeof (c as any).counters === "object") {
-                    for (const [k, v] of Object.entries((c as any).counters)) {
-                        sum[k] = (sum[k] || 0) + (Number(v) || 0);
-                    }
-                }
-                toRemove.push(i);
-            }
+  for (let i = 0; i < board.length; i++) {
+    if (i === newIndex) continue;
+    const c = board[i];
+    if (c && c.type === "Amulet") {
+      const cardName = String(c.name).toLowerCase();
+      if (BREW_NAMES.has(cardName)) {
+        if ((c as any).counters && typeof (c as any).counters === "object") {
+          for (const [k, v] of Object.entries((c as any).counters)) {
+            sum[k] = (sum[k] || 0) + (Number(v) || 0);
+          }
         }
+        toRemove.push(i);
+      }
     }
+  }
 
-    if (!toRemove.length) return;
+  if (!toRemove.length) return;
 
-    (newCard as any).counters = (newCard as any).counters || {};
-    for (const [k, v] of Object.entries(sum)) {
-        (newCard as any).counters[k] = ((newCard as any).counters[k] || 0) + v;
+  (newCard as any).counters = (newCard as any).counters || {};
+  for (const [k, v] of Object.entries(sum)) {
+    (newCard as any).counters[k] = ((newCard as any).counters[k] || 0) + v;
+  }
+
+  toRemove.sort((a, b) => b - a);
+  for (const idx of toRemove) {
+    const removed = board.splice(idx, 1)[0];
+    if (removed) {
+      grave.push(removed);
+      if (owner === "blue") state.blueShadows++;
+      else state.redShadows++;
     }
-
-    toRemove.sort((a, b) => b - a);
-    for (const idx of toRemove) {
-        const removed = board.splice(idx, 1)[0];
-        if (removed) {
-            grave.push(removed);
-            if (owner === "blue") state.blueShadows++;
-            else state.redShadows++;
-        }
-    }
+  }
 }

@@ -330,7 +330,7 @@ describe("Op Signature Coverage", () => {
         it("necromancy_gate: spend shadows if available, run nested effects", () => {
             state.blueShadows = 10;
             const effect: Effect = {
-                op: "necromancy_gate",
+                op: "gate",
                 cost: 4,
                 effects: [{ op: "heal_leader", amount: 5 }]
             };
@@ -343,7 +343,7 @@ describe("Op Signature Coverage", () => {
         it("necromancy_gate: do not run if insufficient shadows", () => {
             state.blueShadows = 2;
             const effect: Effect = {
-                op: "necromancy_gate",
+                op: "gate",
                 cost: 4,
                 effects: [{ op: "heal_leader", amount: 5 }]
             };
@@ -360,14 +360,14 @@ describe("Op Signature Coverage", () => {
 
     describe("Board Ops", () => {
         it("summon_named: summon a Goblin token", () => {
-            const effect: Effect = { op: "summon_named", name: "Goblin", count: 1 };
+            const effect: Effect = { op: "summon", name: "Goblin", count: 1 };
             runEffects([effect], "blue", null);
             expect(state.blueBoard.length).toBe(1);
             expect(state.blueBoard[0].name).toBe("Goblin");
         });
 
         it("summon_named: summon multiple tokens", () => {
-            const effect: Effect = { op: "summon_named", name: "Goblin", count: 3 };
+            const effect: Effect = { op: "summon", name: "Goblin", count: 3 };
             runEffects([effect], "blue", null);
             expect(state.blueBoard.length).toBe(3);
         });
@@ -388,7 +388,7 @@ describe("Op Signature Coverage", () => {
             const deadFollower = createFollower({ ...getCardDetails("Goblin"), name: "Reanimated", uid: makeTestUid() });
             placeInGraveyard(deadFollower, "blue");
 
-            const effect: Effect = { op: "reanimate", max_cost: 5 };
+            const effect: Effect = { op: "summon", max_cost: 5 };
             runEffects([effect], "blue", null);
 
             expect(state.blueBoard.length).toBe(1);
@@ -426,7 +426,7 @@ describe("Op Signature Coverage", () => {
             placeOnBoard(ally, "blue");
 
             // Removed params wrapping to match op signature
-            const effect: Effect = { op: "buff", attack: 2, defense: 3, target: "selected:ally:follower" };
+            const effect: Effect = { op: "stat", attack: 2, defense: 3, target: "selected:ally:follower" };
             runEffects([effect], "blue", null, { targets: [ally] });
 
 
@@ -438,7 +438,7 @@ describe("Op Signature Coverage", () => {
             const source = createFollower({ attack: 1, defense: 1 });
             placeOnBoard(source, "blue");
 
-            const effect: Effect = { op: "buff_self", attack: 3, defense: 2 };
+            const effect: Effect = { op: "stat", attack: 3, defense: 2 };
             runEffects([effect], "blue", source);
 
             expect(source.attack).toBe(4);
@@ -451,7 +451,7 @@ describe("Op Signature Coverage", () => {
             placeOnBoard(a1, "blue");
             placeOnBoard(a2, "blue");
 
-            const effect: Effect = { op: "buff", target: "ally:follower", attack: 1, defense: 1 };
+            const effect: Effect = { op: "stat", target: "ally:follower", attack: 1, defense: 1 };
             runEffects([effect], "blue", null);
 
             expect(a1.attack).toBe(2);
@@ -497,7 +497,7 @@ describe("Op Signature Coverage", () => {
         it("overflow_gate: triggers when PP >= 7", () => {
             state.blueMaxPP = 8;
             const effect: Effect = {
-                op: "overflow_gate",
+                op: "gate",
                 effects: [{ op: "heal_leader", amount: 3 }]
             };
             state.blueHP = 17;
@@ -508,7 +508,7 @@ describe("Op Signature Coverage", () => {
         it("overflow_gate: does not trigger when PP < 7", () => {
             state.blueMaxPP = 5;
             const effect: Effect = {
-                op: "overflow_gate",
+                op: "gate",
                 effects: [{ op: "heal_leader", amount: 3 }]
             };
             state.blueHP = 17;
@@ -519,7 +519,7 @@ describe("Op Signature Coverage", () => {
         it("combo_gate: triggers at combo >= N", () => {
             state.bluePlaysThisTurn = 3;
             const effect: Effect = {
-                op: "combo_gate",
+                op: "gate",
                 count: 3,
                 effects: [{ op: "draw", count: 1 }]
             };
@@ -531,7 +531,7 @@ describe("Op Signature Coverage", () => {
         it("combo_gate: does not trigger when combo < N", () => {
             state.blueCombo = 2;
             const effect: Effect = {
-                op: "combo_gate",
+                op: "gate",
                 count: 3,
                 effects: [{ op: "draw", count: 1 }]
             };
@@ -566,7 +566,7 @@ describe("Op Signature Coverage", () => {
     // ─────────────────────────────────────────────────────────────────────────
 
     describe("Misc Ops", () => {
-        it("spellboost_hand: increase spellboost count on spells in hand", () => {
+        it("spellboost: increase spellboost count on spells in hand", () => {
             const spell = createFollower({
                 type: "Spell",
                 cost: 10,
@@ -576,7 +576,7 @@ describe("Op Signature Coverage", () => {
             });
             placeInHand(spell, "blue");
 
-            const effect: Effect = { op: "spellboost_hand" };
+            const effect: Effect = { op: "spellboost", target: "hand" };
             runEffects([effect], "blue", null);
 
             expect(spell.spellboostCount).toBe(1);
@@ -584,7 +584,7 @@ describe("Op Signature Coverage", () => {
 
         it("choose: mode selection sets pending state", () => {
             const effect: Effect = {
-                op: "choose",
+                op: "mode",
                 count: 1,
                 options: [
                     { label: "Mode A", effects: [{ op: "draw", count: 1 }] },
@@ -597,7 +597,7 @@ describe("Op Signature Coverage", () => {
             // If running headless with AI, it should pick one
         });
 
-        it("evolve_self: evolve source follower", () => {
+        it("evolve: evolve source follower", () => {
             const follower = createFollower({
                 attack: 2,
                 defense: 2,
@@ -610,7 +610,7 @@ describe("Op Signature Coverage", () => {
             state.roundCount = 10;
             state.blueEvoCharges = 1;
 
-            const effect: Effect = { op: "evolve_self" };
+            const effect: Effect = { op: "evolve", target: "self" };
             runEffects([effect], "blue", follower);
 
             expect(follower.attack).toBe(4);
