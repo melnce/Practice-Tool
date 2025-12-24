@@ -10,7 +10,8 @@ export function useSecondPlayerPPBoost() {
     () => {
       if (state.activePlayer === "first") return;
 
-      const boostBtn = document.getElementById("secondPlayerPPBoost");
+      // Button ID is "redBoost" in the HTML
+      const boostBtn = document.getElementById("redBoost");
 
       const alreadyUsed =
         (state.roundCount <= 5 && state.secondPlayerPPBoostUsedEarly) ||
@@ -31,7 +32,7 @@ export function useSecondPlayerPPBoost() {
       // Render removed - UI layer
     },
     { owner: "second" },
-    { autoRender: false },
+    { autoRender: true },
   );
 }
 

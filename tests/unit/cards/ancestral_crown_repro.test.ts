@@ -21,7 +21,8 @@ describe("Ancestral Crown", () => {
 
   it("should buff allied followers by +1/+1 when they enter", () => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     state.players.first.pp = 10;
 
     // Play Ancestral Crown (Amulet ID: 10022210)

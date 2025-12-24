@@ -10,7 +10,7 @@ import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
 describe("Special Cases", () => {
   beforeEach(() => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
   });

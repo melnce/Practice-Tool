@@ -16,7 +16,8 @@ describe("Bug 1: Earth Sigils Initialization", () => {
     resetGameState(1);
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
   });
 
   it("Witchs New Brew should start with 1 earth counter", () => {

@@ -73,7 +73,8 @@ function _dispatchInternal(
       resetHistory();
       break;
     case "END_TURN":
-      if (currentState.isFirstPlayerTurn) endTurnBlue();
+      // Use activePlayer as source of truth (not legacy isFirstPlayerTurn)
+      if (currentState.activePlayer === "first") endTurnBlue();
       else endTurnRed();
       break;
     case "PLAY_CARD": {

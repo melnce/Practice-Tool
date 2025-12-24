@@ -11,7 +11,8 @@ import allCards from "../../../cards/all.json";
 describe("Bug 2: cant_attack enforcement", () => {
   beforeEach(() => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
   });
 
   afterEach(() => {

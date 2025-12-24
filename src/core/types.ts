@@ -37,14 +37,6 @@ export const SLOT_TO_LEGACY: Record<PlayerSlot, LegacyPlayer> = {
     second: "red",
 };
 
-/**
- * @deprecated Use SLOT_TO_LEGACY instead. Will be removed.
- */
-export const LEGACY_TO_SLOT: Record<LegacyPlayer, PlayerSlot> = {
-    blue: "first",
-    red: "second",
-};
-
 // =============================================================================
 // PLAYER STATE (Normalized per-player data)
 // =============================================================================
@@ -713,9 +705,7 @@ export interface GameState {
 
     // === GLOBAL GAME STATE ===
     roundCount: number;
-    /** True if first player's turn */
-    isFirstPlayerTurn: boolean;
-    /** Active player slot */
+    /** Active player slot - sole source of truth for whose turn it is */
     activePlayer: PlayerSlot;
     gameStarted: boolean;
 

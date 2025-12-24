@@ -42,14 +42,16 @@ export function updateCounts(state: GameState) {
     endRed.style.display = "none";
     return;
   }
+  // Use activePlayer as source of truth for turn state
+  const isFirstActive = state.activePlayer === "first";
 
-  endBlue.style.display = state.isFirstPlayerTurn ? "inline-block" : "none";
-  endRed.style.display = !state.isFirstPlayerTurn ? "inline-block" : "none";
+  endBlue.style.display = isFirstActive ? "inline-block" : "none";
+  endRed.style.display = !isFirstActive ? "inline-block" : "none";
 
-  endBlue.style.backgroundColor = state.isFirstPlayerTurn ? "#00f" : "white";
-  endRed.style.backgroundColor = !state.isFirstPlayerTurn ? "#f00" : "white";
-  endBlue.style.color = state.isFirstPlayerTurn ? "white" : "black";
-  endRed.style.color = !state.isFirstPlayerTurn ? "white" : "black";
+  endBlue.style.backgroundColor = isFirstActive ? "#00f" : "white";
+  endRed.style.backgroundColor = !isFirstActive ? "#f00" : "white";
+  endBlue.style.color = isFirstActive ? "white" : "black";
+  endRed.style.color = !isFirstActive ? "white" : "black";
 }
 
 

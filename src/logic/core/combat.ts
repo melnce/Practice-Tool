@@ -8,28 +8,15 @@ import { recordEvent } from "../../core/debugTimeline.js";
 import { getBoard, opponentOf, setHP, getHP, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
 
 // Imported from JS still
-import { applyLeaderDamage, handleHealLeader } from "../effects/leader.js";
+import { applyLeaderDamage } from "../effects/leader.js";
 import { destroyTarget } from "../effects/ops/destroy/index.js";
 import { cleanupDead } from "./cleanup.js";
 import { dealDamage, popBarrier } from "./barrier.js";
 import { doAction } from "../../core/history.js";
+import { handleRestore } from "../effects/ops/restore/index.js";
 
 /* ------------------------------- helpers ------------------------------- */
 
-/**
- * Get the board for a player.
- * @deprecated Use getBoard from playerHelpers
- */
-function boardFor(player: Player): CardInstance[] {
-  return getBoard(state, player);
-}
-
-/**
- * @deprecated Use opponentOf from playerHelpers
- */
-function enemyOf(player: Player): Player {
-  return opponentOf(player);
-}
 function hasWardOn(board: CardInstance[]) {
   return board.some((c) => c && c.type === "Follower" && c.hasWard);
 }
@@ -114,7 +101,80 @@ function hasPiercingOne(attacker: CardInstance) {
   return attacker?.evoType === "super" || !!attacker.keywordState?.hasPiercing;
 }
 
-/* --------------------------- follower vs follower --------------------------- */
+// =============================================================================
+// COMBAT RESOLUTION SUB-FUNCTIONS
+// Extracted for maintainability. Each handles one keyword's combat effect.
+// =============================================================================
+
+/**
+ * Resolves Bane keyword effect: destroys target if damage was dealt or barrier popped.
+ */
+function resolveBane(
+  source: CardInstance,
+  target: CardInstance,
+  targetOwner: Player,
+  damageDealt: number,
+  barrierPopped: boolean,
+): void {
+  if (!source.hasBane) return;
+  if (damageDealt <= 0 && !barrierPopped) return;
+
+  // Route through centralized destroy (respects cannotBeDestroyed & super-protect)
+  destroyTarget(target, targetOwner, "bane");
+  logEvent("baneDestroy", { killer: source.name, victim: target.name });
+}
+
+/**
+ * Resolves Drain keyword effect: restores leader HP based on damage dealt.
+ * Routes through unified restore handler for consistency with JSON card effects.
+ */
+function resolveDrain(
+  source: CardInstance,
+  sourceOwner: Player,
+  damageDealt: number,
+): void {
+  if (!source.hasDrain) return;
+  if (damageDealt <= 0) return;
+
+  // Route through unified restore handler with proper spec format
+  // Same format as JSON: { op: "restore", target: "leader", player: "self", amount: X }
+  const restored = handleRestore(
+    { op: "restore", target: "leader", player: "self", amount: damageDealt },
+    sourceOwner,
+    [],
+    { owner: sourceOwner, sourceCard: source },
+  );
+
+  if (restored > 0) {
+    logEvent("drainRestore", {
+      player: sourceOwner,
+      amount: restored,
+      source: source.name,
+    });
+  }
+}
+
+/**
+ * Resolves Piercing keyword effect: pings enemy leader for 1 if target dies.
+ */
+function resolvePiercing(
+  attacker: CardInstance,
+  defender: CardInstance,
+  defenderOwner: Player,
+): void {
+  if (!hasPiercingOne(attacker)) return;
+
+  const defenderDef = parseInt(defender.defense as any) || 0;
+  if (defenderDef > 0) return; // Defender survived, no piercing
+
+  const currentHP = getHP(state, defenderOwner);
+  setHP(state, defenderOwner, Math.max(0, currentHP - 1));
+  logEvent("piercingPing", {
+    attacker: attacker.name,
+    targetLeader: defenderOwner,
+    amount: 1,
+  });
+}
 
 function _attackFollowerCore(
   attackerIdx: number,
@@ -122,8 +182,8 @@ function _attackFollowerCore(
   attackerPlayer: Player,
   defenderPlayer: Player,
 ) {
-  const attackerBoard = boardFor(attackerPlayer);
-  const defenderBoard = boardFor(defenderPlayer);
+  const attackerBoard = getBoard(state, attackerPlayer);
+  const defenderBoard = getBoard(state, defenderPlayer);
 
   const attacker = attackerBoard[attackerIdx];
   const defender = defenderBoard[defenderIdx];
@@ -174,11 +234,6 @@ function _attackFollowerCore(
 
   const atkDmg = effectiveAtk(attacker);
   const defDmg = effectiveAtk(defender);
-
-  const attackerHasBane = !!attacker.hasBane;
-  const defenderHasBane = !!defender.hasBane;
-  const attackerHasDrain = !!attacker.hasDrain;
-  /* const defenderHasDrain = !!defender.hasDrain; */ // unused variable
 
   // Follower Strike: Fires ONLY when attacking a follower (before damage)
   if (hasCardTrigger(attacker, "follower_strike", "board")) {
@@ -232,22 +287,16 @@ function _attackFollowerCore(
   const dmgResultDef = dealDamage(defender, atkDmg, attacker);
   dealtToDef = dmgResultDef.damage;
 
-  // Bane triggers if damage was dealt OR a barrier was popped (which means it "hit")
-  if (attackerHasBane && (dealtToDef > 0 || dmgResultDef.barrierPopped)) {
-    // Route through centralized destroy (respects cannotBeDestroyed & super-protect)
-    destroyTarget(defender, defenderPlayer, "bane");
-    logEvent("baneDestroy", { killer: attacker.name, victim: defender.name });
-  }
+  // Resolve Bane for attacker
+  resolveBane(attacker, defender, defenderPlayer, dealtToDef, dmgResultDef.barrierPopped);
 
   // Defender deals back, unless attacker is invincible on attack this swing
   if (!isInvincibleOnAttack(attacker)) {
     const dmgResultAtk = dealDamage(attacker, defDmg, defender);
     dealtToAtk = dmgResultAtk.damage;
 
-    if (defenderHasBane && (dealtToAtk > 0 || dmgResultAtk.barrierPopped)) {
-      destroyTarget(attacker, attackerPlayer, "bane");
-      logEvent("baneDestroy", { killer: defender.name, victim: attacker.name });
-    }
+    // Resolve Bane for defender
+    resolveBane(defender, attacker, attackerPlayer, dealtToAtk, dmgResultAtk.barrierPopped);
   } else if (
     attacker.keywordState?.hasBarrier ||
     (attacker as any).hasBarrier
@@ -255,29 +304,9 @@ function _attackFollowerCore(
     popBarrier(attacker, "invincible_simul_zero");
   }
 
-  // Drain (leaders heal based on actual damage dealt)
-  if (attackerHasDrain && dealtToDef > 0) {
-    handleHealLeader(attackerPlayer, { op: "heal", amount: dealtToDef } as any);
-    logEvent("drainHeal", {
-      player: attackerPlayer,
-      amount: dealtToDef,
-      source: attacker.name,
-    });
-  }
-
-  // --- Piercing: if defender will die from this exchange, ping enemy leader for 1 ---
-  if (
-    hasPiercingOne(attacker) &&
-    (parseInt(defender.defense as any) || 0) <= 0
-  ) {
-    const currentHP = getHP(state, defenderPlayer);
-    setHP(state, defenderPlayer, Math.max(0, currentHP - 1));
-    logEvent("piercingPing", {
-      attacker: attacker.name,
-      targetLeader: defenderPlayer,
-      amount: 1,
-    });
-  }
+  // Resolve Drain and Piercing
+  resolveDrain(attacker, attackerPlayer, dealtToDef);
+  resolvePiercing(attacker, defender, defenderPlayer);
 
   // Spend the swing, refresh flags, clean (render happens at UI layer)
   spendAttack(attacker);
@@ -302,7 +331,7 @@ export function attackFollower(
         defenderPlayer,
       ),
     meta,
-    { autoRender: false },
+    { autoRender: true },
   );
 }
 
@@ -314,8 +343,8 @@ function _attackLeaderCore(
   defenderPlayer: Player,
 ) {
   // define first, then log
-  const attackerBoard = boardFor(attackerPlayer);
-  const defenderBoard = boardFor(defenderPlayer); // used for ward check
+  const attackerBoard = getBoard(state, attackerPlayer);
+  const defenderBoard = getBoard(state, defenderPlayer); // used for ward check
   const attacker = attackerBoard[attackerIdx];
 
   logEvent("attackLeader", {
@@ -368,12 +397,20 @@ function _attackLeaderCore(
   applyLeaderDamage(defenderPlayer, damage);
 
   if ((attacker as any).hasDrain && damage > 0) {
-    handleHealLeader(attackerPlayer, { op: "heal", amount: damage } as any);
-    logEvent("drainHeal", {
-      player: attackerPlayer,
-      amount: damage,
-      source: attacker.name,
-    });
+    // Route through unified restore handler with proper spec format
+    const restored = handleRestore(
+      { op: "restore", target: "leader", player: "self", amount: damage },
+      attackerPlayer,
+      [],
+      { owner: attackerPlayer, sourceCard: attacker },
+    );
+    if (restored > 0) {
+      logEvent("drainRestore", {
+        player: attackerPlayer,
+        amount: restored,
+        source: attacker.name,
+      });
+    }
   }
 
   spendAttack(attacker);
@@ -391,7 +428,7 @@ export function attackLeader(
     "Attack Leader",
     () => _attackLeaderCore(attackerIdx, attackerPlayer, defenderPlayer),
     meta,
-    { autoRender: false },
+    { autoRender: true },
   );
 }
 
@@ -400,7 +437,7 @@ export function handleDropOnLeader(
   attackerIdx: number,
   attackerPlayer: Player,
 ) {
-  return attackLeader(attackerIdx, attackerPlayer, enemyOf(attackerPlayer));
+  return attackLeader(attackerIdx, attackerPlayer, opponentOf(attackerPlayer));
 }
 
 

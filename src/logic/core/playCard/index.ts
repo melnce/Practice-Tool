@@ -50,13 +50,10 @@ export function playCard(
       });
     }
 
-    // Commit the action (without auto-render, we handle it ourselves)
-    commitAction({ autoRender: false });
+    // Commit the action with autoRender to update UI
+    commitAction({ autoRender: true });
 
-    // Render based on outcome (adapter.render() is no-op if not injected)
-    if (outcome.kind === "done" || outcome.kind === "paused") {
-      // Render removed - UI layer
-    }
+    // Render is handled by autoRender in commitAction
 
     return outcome;
   } catch (e) {

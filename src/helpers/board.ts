@@ -13,7 +13,9 @@ export function isOwnBoard(zoneId: string, state: GameState): boolean {
   const isRedBoard = zoneId === "redBoard";
   if (!isBlueBoard && !isRedBoard) return false;
 
-  return (isBlueBoard && state.isFirstPlayerTurn) || (isRedBoard && !state.isFirstPlayerTurn);
+  // Use activePlayer as source of truth for turn state
+  const isFirstActive = state.activePlayer === "first";
+  return (isBlueBoard && isFirstActive) || (isRedBoard && !isFirstActive);
 }
 
 /**

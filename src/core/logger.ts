@@ -176,8 +176,7 @@ export function logEvent(type: string, details: any = {}): number | undefined {
     type,
     session: _sessionTag || null,
     turn: state.roundCount ?? 0,
-    isFirstPlayerTurn: !!state.isFirstPlayerTurn,
-    activePlayer: state.activePlayer || (state.isFirstPlayerTurn ? "first" : "second"),
+    activePlayer: state.activePlayer ?? "first",
   };
 
   // Create shell entry immediately

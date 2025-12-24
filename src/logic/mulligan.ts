@@ -9,6 +9,7 @@ import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
 import { Player } from "../core/types.js";
 import { getHand, getDeck, isFirstPlayer, getDeckFile } from "../core/playerHelpers.js";
+import { adapter } from "../core/adapter.js";
 
 function ownerZones(owner: Player) {
   return {
@@ -44,7 +45,8 @@ export function beginMulligan() {
   });
 
   markSelectable("first");
-  // Render removed - UI layer
+  // Render to show selectable cards in UI
+  adapter.render();
   showMulliganUI();
 }
 
@@ -93,7 +95,8 @@ export function toggleMulliganPick(owner: Player, uid: string) {
     (card as any).__mulliganSelected = true;
     bag.add(uid);
   }
-  // Render removed - UI layer
+  // Re-render to show selection state
+  adapter.render();
 }
 
 export function confirmMulligan(owner: Player) {
@@ -142,7 +145,8 @@ export function confirmMulligan(owner: Player) {
       if (isFirstPlayer(owner)) {
         state.mulliganStage = "second";
         markSelectable("second");
-        // Render removed - UI layer
+        // Render to show second player's selectable cards
+        adapter.render();
         showMulliganUI();
       } else {
         // Both done → start first turn
@@ -150,7 +154,7 @@ export function confirmMulligan(owner: Player) {
       }
     },
     { owner, stage: "mulligan" },
-    { autoRender: false },
+    { autoRender: true },
   );
 }
 
@@ -168,7 +172,8 @@ function startFirstTurn() {
   // Cleanup UI
   hideMulliganUI();
 
-  // Render removed - UI layer
+  // Render to show game state ready for play
+  adapter.render();
 }
 
 // ---- Simple UI helpers (browser only) ----

@@ -11,8 +11,8 @@ import { grantBarrier } from "../../src/logic/core/barrier.js";
 describe("Bane vs Barrier Interaction", () => {
   beforeEach(() => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
-    // mock active player getter if needed, but logic seems to use state.isFirstPlayerTurn
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
   });
 
   afterEach(() => {

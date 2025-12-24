@@ -6,8 +6,7 @@ import { createRng } from "./rng.js";
 // Global defaults that are not per-player
 const DEFAULTS = {
   roundCount: 1,
-  isFirstPlayerTurn: true,
-  activePlayer: "first" as PlayerSlot,
+  activePlayer: "first" as PlayerSlot, // Sole source of truth for player turn
   gameStarted: false,
 
   // Second player PP boost (going-second advantage)

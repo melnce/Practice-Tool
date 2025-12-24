@@ -392,7 +392,7 @@ TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
       // State cleanup moved to Orchestrator
     },
     { op: eff?.op, owner, source: sourceCard?.name },
-    { autoRender: false },
+    { autoRender: true },
   );
   return { kind: "handled" };
 });

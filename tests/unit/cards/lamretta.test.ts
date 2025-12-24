@@ -13,7 +13,8 @@ describe("Lamretta, Sisterly Shepherd (10461120)", () => {
     state.players.second.board = [];
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     state.roundCount = 5; // Simulate mid-game
     if (!state.rng)
       state.rng = {

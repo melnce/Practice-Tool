@@ -2,28 +2,13 @@ import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 import { Effect, Player } from "../../core/types.js";
 import { fireTrigger } from "../core/triggers.js";
-import { isFirstPlayer, getHP, setHP, getMaxHP, setMaxHP, getPP, setPP, getMaxPP, getHand, opponentOf, getEvoCharges, setEvoCharges } from "../../core/playerHelpers.js";
+import { isFirstPlayer, getHP, setHP, setMaxHP, getPP, setPP, getMaxPP, opponentOf, getEvoCharges, setEvoCharges } from "../../core/playerHelpers.js";
 
-/**
- * Handles healing a leader's defense.
- * Now respects the dynamic maximum HP for each player.
- */
-export function handleHealLeader(owner: Player, eff: Effect) {
-  const amt = parseInt(eff.amount) || 0;
-
-  const targetPlayer: Player =
-    (eff.player || "self") === "self" ? owner : opponentOf(owner);
-
-  logEvent("healLeader", {
-    target: targetPlayer,
-    amount: amt,
-  });
-
-  // Apply healing, respecting the new dynamic max HP
-  const currentHP = getHP(state, targetPlayer);
-  const maxHP = getMaxHP(state, targetPlayer);
-  setHP(state, targetPlayer, Math.max(0, Math.min(maxHP, currentHP + amt)));
-}
+// ============================================================================
+// NOTE: "heal" operations are DEPRECATED. Use "restore" instead.
+// All healing should go through: handleRestore({ op: "restore", target: "leader", player: "self", amount: X })
+// from src/logic/effects/ops/restore/index.ts
+// ============================================================================
 
 /**
  * NEW: Sets a leader's maximum HP to a specific value.
@@ -68,16 +53,6 @@ export function handleRecoverPP(owner: Player, eff: Effect) {
 
   const next = Math.min(max, cur + amt);
   setPP(state, targetPlayer, next);
-}
-
-/**
- * (This function is unchanged but will now work correctly
- * because it calls the updated handleHealLeader)
- */
-export function handleDynamicHealLeader(owner: Player, eff: Effect) {
-  const hand = getHand(state, owner);
-  const amt = hand.length; // X is number of cards in hand
-  handleHealLeader(owner, { ...eff, amount: amt });
 }
 
 /* ---------- NEW: leader barrier state ops ---------- */

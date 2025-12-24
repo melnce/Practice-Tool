@@ -23,7 +23,8 @@ describe("Awed and Inspired (10461210)", () => {
     state.players.second.board = [];
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     // Mock RNG
     if (!state.rng)
       state.rng = {

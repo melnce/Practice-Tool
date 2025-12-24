@@ -24,26 +24,29 @@ export function updateEvoButtonsUI(state: GameState) {
   const redSuperUnlocked = state.roundCount >= 6;
   const blueSuperUnlocked = state.roundCount >= 7;
 
+  // Use activePlayer as source of truth for turn state
+  const isFirstActive = state.activePlayer === "first";
+
   bNE.disabled = !(
-    state.isFirstPlayerTurn &&
+    isFirstActive &&
     blueNormalUnlocked &&
     !state.players.first.evoUsedThisTurn &&
     state.players.first.evoCharges > 0
   );
   bSE.disabled = !(
-    state.isFirstPlayerTurn &&
+    isFirstActive &&
     blueSuperUnlocked &&
     !state.players.first.evoUsedThisTurn &&
     state.players.first.superEvoCharges > 0
   );
   rNE.disabled = !(
-    !state.isFirstPlayerTurn &&
+    !isFirstActive &&
     redNormalUnlocked &&
     !state.players.second.evoUsedThisTurn &&
     state.players.second.evoCharges > 0
   );
   rSE.disabled = !(
-    !state.isFirstPlayerTurn &&
+    !isFirstActive &&
     redSuperUnlocked &&
     !state.players.second.evoUsedThisTurn &&
     state.players.second.superEvoCharges > 0

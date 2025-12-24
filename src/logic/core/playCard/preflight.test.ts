@@ -8,7 +8,7 @@ import { CardInstance } from "../../../core/types.js";
 describe("Preflight System", () => {
   beforeEach(() => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
   });
@@ -251,7 +251,7 @@ describe("Preflight System", () => {
       state.players.first.hand = [follower];
       state.players.first.pp = 5;
       state.players.first.board = [];
-      state.isFirstPlayerTurn = true;
+      state.activePlayer = "first";
 
       const ppBefore = state.players.first.pp;
       const handLengthBefore = state.players.first.hand.length;

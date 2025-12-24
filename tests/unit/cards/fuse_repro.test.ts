@@ -49,7 +49,8 @@ describe("Fuse Selection (Bug Repro)", () => {
 
   it("should set pendingTargetEffect when starting fuse", async () => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     state.players.first.pp = 10;
 
     // Add 2 Gears to hand
@@ -76,7 +77,8 @@ describe("Fuse Selection (Bug Repro)", () => {
 
   it("should mark pool cards as __uiSelectable", async () => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     state.players.first.pp = 10;
 
     const gear1 = createCard("Gear of Ambition", "first");
@@ -99,7 +101,8 @@ describe("Fuse Selection (Bug Repro)", () => {
 
   it("should allow target selection via resolvePendingTarget", async () => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     state.players.first.pp = 10;
 
     const gear1 = createCard("Gear of Ambition", "first");

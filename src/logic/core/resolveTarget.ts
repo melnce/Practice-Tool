@@ -114,7 +114,7 @@ function showConfirmationButton(pending: any) {
         owner: pending?.owner,
         source: pending?.sourceCard?.name,
       },
-      { autoRender: false },
+      { autoRender: true },
     );
   };
 

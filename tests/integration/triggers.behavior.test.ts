@@ -23,7 +23,8 @@ describe("Trigger Module Invariants", () => {
     state.players.first.crests = [];
     state.players.second.crests = [];
     (state as any).turnNumber = 1;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
 
     effectSpy = vi.fn();
     registerRunEffects(effectSpy);

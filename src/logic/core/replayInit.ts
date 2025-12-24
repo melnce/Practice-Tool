@@ -221,7 +221,7 @@ export function initReplayState(
   }
 
   s.gameStarted = true;
-  s.isFirstPlayerTurn = true;
+  s.activePlayer = "first";
 
   return s;
 }

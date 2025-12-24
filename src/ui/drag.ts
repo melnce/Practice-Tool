@@ -18,9 +18,11 @@ export function makeLeaderDroppable(
     const [attackerPlayer, attackerIndex] = data.split(",");
 
     // Only allow dropping attacker onto the opposite leader on the correct turn
+    // Use activePlayer as source of truth
+    const isFirstActive = state.activePlayer === "first";
     if (
-      (targetPlayer === "first" && state.isFirstPlayerTurn) ||
-      (targetPlayer === "second" && !state.isFirstPlayerTurn)
+      (targetPlayer === "first" && isFirstActive) ||
+      (targetPlayer === "second" && !isFirstActive)
     )
       return;
     if (!attackerIndex) return;
@@ -99,9 +101,10 @@ export function enableCardEvoDrop(
     const isNormal = data.includes("NormalEvo");
     const isSuper = data.includes("SuperEvo");
 
-    // Turn + charges + per-turn lock
+    // Turn + charges + per-turn lock - use activePlayer as source of truth
+    const isFirstPlayerActive = state.activePlayer === "first";
     if (isBlueSide) {
-      if (!state.isFirstPlayerTurn) return;
+      if (!isFirstPlayerActive) return;
       if (isNormal) {
         if (state.players.first.evoUsedThisTurn || !(state.players.first.evoCharges > 0)) return;
       } else {
@@ -109,7 +112,7 @@ export function enableCardEvoDrop(
           return;
       }
     } else {
-      if (state.isFirstPlayerTurn) return;
+      if (isFirstPlayerActive) return;
       if (isNormal) {
         if (state.players.second.evoUsedThisTurn || !(state.players.second.evoCharges > 0)) return;
       } else {

@@ -16,7 +16,8 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
     resetGameState(1);
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     // Ensure leaders have HP
     state.players.first.hp = 20;
     state.players.second.hp = 20;

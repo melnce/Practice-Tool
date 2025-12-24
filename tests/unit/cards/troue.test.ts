@@ -13,7 +13,8 @@ describe("Troue, Heroic Visionary (10461110)", () => {
     state.players.second.board = [];
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     if (!state.rng)
       state.rng = {
         makeUid: () => Math.random().toString(36).substr(2, 9),

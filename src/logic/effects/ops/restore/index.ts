@@ -10,12 +10,12 @@ export {
   normalizeToUnifiedSpec,
 } from "./types.js";
 
-// Unified handler
+// Unified handler (PRIMARY API - use this for all restore operations)
 export { handleRestore } from "./unified.js";
 
-// Primitives (for advanced use cases)
+// Primitives (for follower-specific restore use cases)
+// NOTE: restoreLeaderHP is intentionally NOT exported - use handleRestore instead
 export {
-  restoreLeaderHP,
   restoreFollowerToFull,
   restoreFollowerByAmount,
   getAlliedFollowers,

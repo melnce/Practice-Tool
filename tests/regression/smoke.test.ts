@@ -45,7 +45,8 @@ describe("Smoke tests", () => {
     };
     state.players.first.hand = [goblin];
     state.players.first.pp = 1;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
 
     // Play it
     playCard(state.players.first.hand, "first", 0);

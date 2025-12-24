@@ -63,7 +63,7 @@ sealRegistry();
 /**
  * Triggers fanfare effects for a card.
  * @param {object} card - The card with potential fanfare effects.
- * @param {string} owner - "blue" or "red".
+ * @param {string} owner - "first" or "second" (semantic player slot).
  */
 export function onFanfare(card: CardInstance, owner: Player) {
   const list = card.fanfare || [];
@@ -104,7 +104,7 @@ function dispatchEffect<K extends EffectOp>(
 /**
  * Main effect dispatcher. Processes a queue of effects sequentially.
  * @param {Array<object>} effects - Array of effect objects to process.
- * @param {string} owner - "blue" or "red".
+ * @param {string} owner - "first" or "second" (semantic player slot).
  * @param {object|null} sourceCard - The card initiating the effects.
  * @param {object} [context={}] - Shared context for targeting and chaining.
  */

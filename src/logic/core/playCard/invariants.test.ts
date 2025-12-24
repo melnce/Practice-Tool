@@ -10,7 +10,7 @@ import { canPlayCard } from "./preflight.js";
 describe("PlayCard Invariants", () => {
   beforeEach(() => {
     resetGameState(1);
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
   });
@@ -222,7 +222,7 @@ describe("PlayCard Invariants", () => {
         defense: 2,
       };
 
-      state.isFirstPlayerTurn = false; // Red's turn
+      state.activePlayer = "second"; // Red's turn
       state.players.first.hand = [follower];
       state.players.first.pp = 10;
       const ppBefore = state.players.first.pp;

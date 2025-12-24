@@ -43,8 +43,9 @@ function isStateSame(
 ): boolean {
   const isBlue = ctx.owner === "first";
   const pp = isBlue ? state.players.first.pp : state.players.second.pp;
-  const isMyTurn =
-    (isBlue && state.isFirstPlayerTurn) || (!isBlue && !state.isFirstPlayerTurn);
+  // Use activePlayer as source of truth
+  const isFirstActive = state.activePlayer === "first";
+  const isMyTurn = (isBlue && isFirstActive) || (!isBlue && !isFirstActive);
 
   if (prev.pp !== pp) return false;
   // We keep the old turn check but also enforce strict activePlayer check
@@ -121,7 +122,8 @@ export function getMemoizedViewModel(
     viewModel: vm,
     lastStateArgs: {
       pp: isBlue ? state.players.first.pp : state.players.second.pp,
-      turn: (isBlue && state.isFirstPlayerTurn) || (!isBlue && !state.isFirstPlayerTurn),
+      // Use activePlayer as source of truth
+      turn: (isBlue && state.activePlayer === "first") || (!isBlue && state.activePlayer === "second"),
       activePlayer: state.activePlayer, // <-- Track this
       rally: `${state.players.first.rally}|${state.players.second.rally}`,
       shadows: `${state.players.first.shadows}|${state.players.second.shadows}`,

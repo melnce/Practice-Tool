@@ -14,7 +14,8 @@ describe("Supplicant of Truth (10332110) Integration", () => {
     state.players.second.board = [];
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
+    state.activePlayer = "first"; // Source of truth for player turn
     // Ensure RNG exists (setup usually handles it, but just in case)
     if (!state.rng)
       state.rng = {

@@ -9,6 +9,11 @@ import { byId } from "./dom.js";
 import { state } from "../core/gameState.js";
 import { GameState, Player, CardInstance } from "../core/types.js";
 
+// Map player slot to visual DOM prefix (first -> blue, second -> red)
+function domPrefix(player: Player): "blue" | "red" {
+  return player === "first" ? "blue" : "red";
+}
+
 const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
 
 export function render() {
@@ -24,12 +29,13 @@ export function render() {
   setText("blueShadows", state.players.first.shadows);
   setText("redShadows", state.players.second.shadows);
 
-  // zones
-  renderZone("blueHand", state.players.first.hand, state, render, state.isFirstPlayerTurn, (i) =>
+  // zones - use activePlayer as source of truth for turn state
+  const isFirstActive = state.activePlayer === "first";
+  renderZone("blueHand", state.players.first.hand, state, render, isFirstActive, (i) =>
     logic().then(({ playCard }) => playCard(state.players.first.hand, "first", i)),
   );
   renderZone("blueBoard", state.players.first.board, state, render);
-  renderZone("redHand", state.players.second.hand, state, render, !state.isFirstPlayerTurn, (i) =>
+  renderZone("redHand", state.players.second.hand, state, render, !isFirstActive, (i) =>
     logic().then(({ playCard }) => playCard(state.players.second.hand, "second", i)),
   );
   renderZone("redBoard", state.players.second.board, state, render);
@@ -44,8 +50,8 @@ export function render() {
     state.phase !== "mulligan" &&
     state.pendingTargetEffect?.canTargetLeader
   ) {
-    // Show enemy leader as targetable
-    const enemyLeader = state.isFirstPlayerTurn ? redLeader : blueLeader;
+    // Show enemy leader as targetable - use activePlayer as source of truth
+    const enemyLeader = state.activePlayer === "first" ? redLeader : blueLeader;
     enemyLeader.classList.add("selectable");
     enemyLeader.onclick = (e) => {
       e.stopPropagation();
@@ -70,17 +76,31 @@ export function render() {
     makeLeaderDroppable(byId("redLeader")!, "second", state);
   }
 
-  const ppBoostBtn = byId("secondPlayerPPBoost") as HTMLButtonElement;
+  // PP Boost button for second player - ID is "redBoost" in HTML
+  const ppBoostBtn = byId("redBoost") as HTMLButtonElement;
   if (ppBoostBtn) {
-    if (!state.secondPlayerPPBoostUsedLate && state.roundCount > 5) {
-      ppBoostBtn.disabled = false;
-      ppBoostBtn.classList.toggle("used", !!state.secondPlayerPPBoostPending);
-    } else if (!state.secondPlayerPPBoostUsedEarly && state.roundCount <= 5) {
-      ppBoostBtn.disabled = false;
-      ppBoostBtn.classList.toggle("used", !!state.secondPlayerPPBoostPending);
-    } else {
+    // Determine if boost has been used for this round tier
+    const alreadyUsed =
+      (state.roundCount <= 5 && state.secondPlayerPPBoostUsedEarly) ||
+      (state.roundCount > 5 && state.secondPlayerPPBoostUsedLate);
+
+    // Only enable on second player's turn
+    const isSecondPlayerTurn = state.activePlayer === "second";
+
+    if (alreadyUsed) {
+      // Permanently greyed out after use
       ppBoostBtn.disabled = true;
-      ppBoostBtn.classList.add("used");
+      ppBoostBtn.classList.add("used", "disabled");
+    } else if (!isSecondPlayerTurn) {
+      // Greyed out during first player's turn
+      ppBoostBtn.disabled = true;
+      ppBoostBtn.classList.remove("used");
+      ppBoostBtn.classList.add("disabled");
+    } else {
+      // Available on second player's turn
+      ppBoostBtn.disabled = false;
+      ppBoostBtn.classList.remove("disabled");
+      ppBoostBtn.classList.toggle("used", !!state.secondPlayerPPBoostPending);
     }
   }
 
@@ -113,17 +133,36 @@ export function render() {
   }
 }
 
-// Helper: toggle End Turn buttons
+// Helper: toggle End Turn buttons visibility and disabled state
 function setEndTurnDisabled(disabled: boolean) {
-  const ids = ["endTurnBlue", "endTurnRed"]; // no generic "endTurn" button in DOM
-  ids.forEach((id) => {
-    const el = document.getElementById(id) as HTMLButtonElement;
-    if (!el) return;
-    el.disabled = disabled;
-    el.classList.toggle("disabled", disabled);
-    if (disabled) el.setAttribute("aria-disabled", "true");
-    else el.removeAttribute("aria-disabled");
-  });
+  const blueBtn = document.getElementById("endTurnBlue") as HTMLButtonElement;
+  const redBtn = document.getElementById("endTurnRed") as HTMLButtonElement;
+
+  // During mulligan, hide both buttons
+  if (disabled) {
+    if (blueBtn) {
+      blueBtn.style.display = "none";
+      blueBtn.disabled = true;
+    }
+    if (redBtn) {
+      redBtn.style.display = "none";
+      redBtn.disabled = true;
+    }
+  } else {
+    // Show the button for the active player, hide the other
+    // Use activePlayer as the source of truth (not isFirstPlayerTurn)
+    const isFirstActive = state.activePlayer === "first";
+    if (blueBtn) {
+      blueBtn.style.display = isFirstActive ? "inline-block" : "none";
+      blueBtn.disabled = false;
+    }
+    if (redBtn) {
+      redBtn.style.display = isFirstActive ? "none" : "inline-block";
+      redBtn.disabled = false;
+    }
+  }
+
+  // Also handle generic class-based buttons
   const classBtns = document.querySelectorAll(
     ".end-turn, [data-action='endTurn']",
   );
@@ -296,7 +335,8 @@ function orderedCrestSlots(container: HTMLElement, side: Player) {
 function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
   const crests =
     playerPrefix === "first" ? state.players.first.crests || [] : state.players.second.crests || [];
-  const container = byId(`${playerPrefix}Crests`);
+  // Use visual DOM prefix (blue/red) not semantic (first/second)
+  const container = byId(`${domPrefix(playerPrefix)}Crests`);
   const tooltipEl = byId("cardTooltip");
   if (!container || !tooltipEl) return;
 
@@ -379,16 +419,14 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
 }
 
 function renderLeaderBarrierBadge(side: Player) {
-  const host = byId(side === "first" ? "blueLeader" : "redLeader");
+  const host = byId(`${domPrefix(side)}Leader`);
   if (!host) return;
 
   // Cleanup old badges just in case
   host.querySelectorAll(".leader-barrier-badge").forEach((n) => n.remove());
 
-  const hasBarrier =
-    (state[side === "first" ? "blueLeaderBarrier" : "redLeaderBarrier"] as
-      | any
-      | 0) > 0;
+  // Use nested player state for barrier check
+  const hasBarrier = (state.players[side].leaderBarrier || 0) > 0;
 
   if (hasBarrier) {
     host.classList.add("has-leader-barrier");

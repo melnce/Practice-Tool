@@ -189,8 +189,9 @@ export function createCardViewModel(
       const oncePerTurn = card.engageOncePerTurn !== false;
       const alreadyEngaged = !!ks?.engagedThisTurn;
       const readyThisTurn = !oncePerTurn || !alreadyEngaged;
-      const isMyTurn =
-        (isBlue && state.isFirstPlayerTurn) || (!isBlue && !state.isFirstPlayerTurn);
+      // Use activePlayer as source of truth
+      const isFirstActive = state.activePlayer === "first";
+      const isMyTurn = (isBlue && isFirstActive) || (!isBlue && !isFirstActive);
 
       canEngage = isMyTurn && enoughPP && readyThisTurn;
     }

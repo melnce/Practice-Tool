@@ -21,7 +21,7 @@ async function runTest() {
     // Setup State
     createInitialState(1);
     state.activePlayer = "first";
-    state.isFirstPlayerTurn = true;
+    state.activePlayer = "first";
     state.turnNumber = 1;
 
     // Load Suframare data manually from disk

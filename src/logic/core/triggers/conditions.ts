@@ -1,6 +1,7 @@
 import { TriggerContext, TriggerSpec } from "./types.js";
 import { state } from "../../../core/gameState.js";
 import { CardInstance, Player } from "../../../core/types.js";
+import { evaluateCardCondition, CardCondition } from "../conditions/evaluator.js";
 
 // Helper to normalize "subject" card (entering, played, leaving, etc.)
 export function getSubjectCard(context: TriggerContext): CardInstance | null {
@@ -13,38 +14,6 @@ export function getSubjectCard(context: TriggerContext): CardInstance | null {
   );
 }
 
-function checkKeywords(card: CardInstance, wants: string[]): boolean {
-  const toKey = (s: any) => String(s || "").toLowerCase();
-
-  // Helper to check one keyword
-  const hasKW = (c: CardInstance, kw: string) => {
-    const k = toKey(kw);
-    // Explicit boolean flags
-    if (k === "ward" && c.hasWard) return true;
-    if (k === "rush" && c.hasRush) return true;
-    if (k === "storm" && c.hasStorm) return true;
-    if (k === "bane" && c.hasBane) return true;
-    if (k === "ambush" && c.hasAmbush) return true;
-    if (k === "aura" && c.hasAura) return true;
-    // Check dynamic props if necessary (legacy code did (card as any).hasDrain)
-    if (k === "drain" && (c as any).hasDrain) return true;
-    if (k === "intimidate" && (c as any).hasIntimidate) return true;
-    if (k === "lastwords" && c.hasLastWords) return true;
-
-    // Check keywords array
-    if (Array.isArray(c.keywords)) {
-      return c.keywords!.some(
-        (w: any) =>
-          (typeof w === "string" && toKey(w) === k) ||
-          (w && typeof w === "object" && toKey(w.name) === k),
-      );
-    }
-    return false;
-  };
-
-  return wants.every((w) => hasKW(card, w));
-}
-
 export function evalCommonConditions(
   trigger: TriggerSpec,
   hostCard: CardInstance,
@@ -54,6 +23,10 @@ export function evalCommonConditions(
 ): boolean {
   const cond = trigger.condition || {};
   const subjectCard = getSubjectCard(context);
+
+  // =========================================================================
+  // TRIGGER-SPECIFIC CONDITIONS (not shareable with targeting)
+  // =========================================================================
 
   // 1. whose_turn
   if (cond.whose_turn === "owner" && activePlayer !== owner) return false;
@@ -74,36 +47,24 @@ export function evalCommonConditions(
     if (subjectCard.uid !== hostCard.uid) return false;
   }
 
-  // 4. tribe
-  if (cond.tribe && subjectCard) {
-    const want = String(cond.tribe).toLowerCase();
-    const tribes = Array.isArray(subjectCard.tribes)
-      ? subjectCard.tribes!.map((t) => String(t).toLowerCase())
-      : [];
-    if (!tribes.includes(want)) return false;
+  // 4. not_self
+  if (cond.not_self && subjectCard && subjectCard.uid === hostCard.uid)
+    return false;
+
+  // 5. own_turn
+  if (cond.own_turn && owner !== activePlayer) return false;
+
+  // 6. Super Evolution Unlocked (for triggers/gates)
+  if (cond.super_evolution_unlocked) {
+    // From evolveUtils: Blue >= 7, Red >= 6
+    const isBlue = owner === "first";
+    const unlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
+    if (!unlocked) return false;
   }
 
-  // 5. cost_changed
-  if (cond.cost_changed && subjectCard) {
-    const printed = Number.isFinite((subjectCard as any).base_cost)
-      ? Number((subjectCard as any).base_cost)
-      : Number(subjectCard.cost) || 0;
-
-    const current = Number(subjectCard.cost) || 0;
-    const handMod = Number((subjectCard as any).cost_mod) || 0;
-    const changed =
-      handMod !== 0 ||
-      (Number.isFinite((subjectCard as any).base_cost) && current !== printed);
-
-    if (!changed) return false;
-  }
-
-  // 6. name
-  if (cond.name && subjectCard) {
-    if (String(subjectCard.name) !== String(cond.name)) return false;
-  }
-
-  // 7. Host card stat gates
+  // =========================================================================
+  // HOST CARD STAT GATES (evaluated on the trigger's host card, not subject)
+  // =========================================================================
   const atk = parseInt(hostCard.attack as string, 10) || 0;
   const def = parseInt(hostCard.defense as string, 10) || 0;
 
@@ -117,39 +78,24 @@ export function evalCommonConditions(
     return false;
   if (cond.still_alive === true && def <= 0) return false;
 
-  // 7b. Subject Card Base Cost
-  if (cond.base_cost_eq != null && subjectCard) {
-    const lim = parseInt(String(cond.base_cost_eq), 10);
-    const cost =
-      subjectCard.base_cost !== undefined
-        ? subjectCard.base_cost
-        : parseInt(subjectCard.cost as any) || 0;
+  // =========================================================================
+  // SUBJECT CARD CONDITIONS (delegate to unified evaluator)
+  // =========================================================================
+  if (subjectCard) {
+    const sharedCond: CardCondition = {};
 
-    if (cost !== lim) return false;
-  }
+    // Extract conditions that apply to the subject card
+    if (cond.tribe) sharedCond.tribe = cond.tribe;
+    if (cond.name) sharedCond.name = cond.name;
+    if (cond.has_keyword) sharedCond.has_keyword = cond.has_keyword;
+    if (cond.keywords) sharedCond.keywords = cond.keywords;
+    if (cond.base_cost_eq != null) sharedCond.base_cost_eq = cond.base_cost_eq;
+    if (cond.cost_changed) sharedCond.cost_changed = cond.cost_changed;
 
-  // 8. not_self
-  if (cond.not_self && subjectCard && subjectCard.uid === hostCard.uid)
-    return false;
-
-  // 9. own_turn
-  if (cond.own_turn && owner !== activePlayer) return false;
-
-  // 10. keywords (Crest compat)
-  if ((cond.has_keyword || cond.keywords) && subjectCard) {
-    const wantRaw = cond.has_keyword ?? cond.keywords;
-    const wants = (Array.isArray(wantRaw) ? wantRaw : [wantRaw]).filter(
-      (s: any) => typeof s === "string",
-    );
-    if (!checkKeywords(subjectCard, wants as string[])) return false;
-  }
-
-  // 11. Super Evolution Unlocked (for triggers/gates)
-  if (cond.super_evolution_unlocked) {
-    // From evolveUtils: Blue >= 7, Red >= 6
-    const isBlue = owner === "first";
-    const unlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
-    if (!unlocked) return false;
+    // Apply shared conditions via unified evaluator
+    if (Object.keys(sharedCond).length > 0) {
+      if (!evaluateCardCondition(subjectCard, sharedCond)) return false;
+    }
   }
 
   return true;

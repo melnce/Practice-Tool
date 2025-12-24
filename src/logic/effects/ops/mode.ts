@@ -185,7 +185,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
         // console.groupEnd();
       },
       { owner, picks: picked.map((p) => p?.label || p?.name || "(opt)") },
-      { autoRender: false },
+      { autoRender: true },
     );
   };
 

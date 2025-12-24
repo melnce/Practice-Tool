@@ -16,8 +16,10 @@ export function buildZoneContext(
   const isBoard = isBoardZone(containerId);
   const owner: Player = isBlueHand || isBlueBoard ? "first" : "second";
   const isMyBoard = isOwnBoard(containerId, state);
+  // Use activePlayer as source of truth for turn state
+  const isFirstActive = state.activePlayer === "first";
   const isMyHand =
-    (isBlueHand && state.isFirstPlayerTurn) || (isRedHand && !state.isFirstPlayerTurn);
+    (isBlueHand && isFirstActive) || (isRedHand && !isFirstActive);
 
   return {
     containerId,

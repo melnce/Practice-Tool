@@ -170,7 +170,7 @@ export function engageAmulet(owner: Player, index: number) {
       // Render removed - UI layer
     },
     { owner, index },
-    { autoRender: false },
+    { autoRender: true },
   );
 }
 
