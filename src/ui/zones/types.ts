@@ -60,3 +60,17 @@ export interface CardViewModel {
   isSelectable?: boolean | undefined;
   isMulliganSelected?: boolean | undefined;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

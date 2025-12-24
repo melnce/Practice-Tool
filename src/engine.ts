@@ -73,12 +73,12 @@ function _dispatchInternal(
       resetHistory();
       break;
     case "END_TURN":
-      if (currentState.isBlueTurn) endTurnBlue();
+      if (currentState.isFirstPlayerTurn) endTurnBlue();
       else endTurnRed();
       break;
     case "PLAY_CARD": {
       const hand =
-        action.player === "blue" ? currentState.blueHand : currentState.redHand;
+        action.player === "first" ? currentState.players.first.hand : currentState.players.second.hand;
       const index = hand.findIndex((c) => c.uid === action.cardUid);
       if (index !== -1) {
         playCard(hand, action.player, index);
@@ -91,9 +91,9 @@ function _dispatchInternal(
     }
     case "ATTACK": {
       const attackerBoard =
-        action.player === "blue"
-          ? currentState.blueBoard
-          : currentState.redBoard;
+        action.player === "first"
+          ? currentState.players.first.board
+          : currentState.players.second.board;
       const attackerIdx = attackerBoard.findIndex(
         (c) => c.uid === action.attackerUid,
       );
@@ -109,9 +109,9 @@ function _dispatchInternal(
       if (defender.type === "leader") {
         attackLeader(attackerIdx, action.player, defender.player);
       } else {
-        const defPlayer = action.player === "blue" ? "red" : "blue";
+        const defPlayer = action.player === "first" ? "second" : "first";
         const defBoard =
-          defPlayer === "blue" ? currentState.blueBoard : currentState.redBoard;
+          defPlayer === "first" ? currentState.players.first.board : currentState.players.second.board;
         const defIdx = defBoard.findIndex((c) => c.uid === defender.uid);
 
         if (defIdx !== -1) {
@@ -189,3 +189,17 @@ export function onHistoryUpdate(
 ) {
   onHistoryChange(cb);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

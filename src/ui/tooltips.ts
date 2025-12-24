@@ -95,7 +95,7 @@ export function formatCardTooltip(
   const finalRallyReq = rallyReq || (rallyGate ? rallyGate.count : null);
 
   if (finalRallyReq) {
-    const side = owner ?? state.activePlayer ?? "blue";
+    const side = owner ?? state.activePlayer ?? "first";
     extraText +=
       `<br><br><span class="rally-line" data-need="${finalRallyReq}" data-side="${side}" style="color: #7af;">` +
       `Rally: <span class="rally-value">0 / ${finalRallyReq}</span>` +
@@ -140,7 +140,7 @@ export function attachTooltip(
   isBlueSide: boolean,
 ) {
   div.dataset.hasTooltip = "1";
-  const owner: Player = isBlueSide ? "blue" : "red";
+  const owner: Player = isBlueSide ? "first" : "second";
   div.onmouseenter = () => {
     // Render once so layout is stable
     tooltipEl.innerHTML = formatCardTooltip(card, owner);
@@ -185,10 +185,10 @@ export function attachTooltip(
         // Update Rally
         if (rallyLine && rallyValue) {
           const curr =
-            rSide === "blue"
-              ? state.blueRally | 0
-              : rSide === "red"
-                ? state.redRally | 0
+            rSide === "first"
+              ? state.players.first.rally | 0
+              : rSide === "second"
+                ? state.players.second.rally | 0
                 : 0;
           if (curr !== lastRally) {
             rallyValue!.textContent =
@@ -256,3 +256,17 @@ window.addEventListener("visibilitychange", () => {
     });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+

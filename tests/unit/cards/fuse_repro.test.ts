@@ -8,7 +8,7 @@ function log(msg: string) {
   fs.appendFileSync("fuse_debug.txt", msg + "\n", "utf8");
 }
 
-function createCard(nameOrId: string, owner: "blue" | "red") {
+function createCard(nameOrId: string, owner: "first" | "second") {
   const details = getCardDetails(nameOrId);
   if (!details) throw new Error(`Card not found: ${nameOrId}`);
   const card: any = { ...details };
@@ -25,9 +25,9 @@ describe("Fuse Selection (Bug Repro)", () => {
   });
 
   it("Gear of Ambition should have fuse_recipes", () => {
-    resetGameState();
+    resetGameState(1);
 
-    const gear = createCard("Gear of Ambition", "blue");
+    const gear = createCard("Gear of Ambition", "first");
     log(
       `Gear of Ambition: ${JSON.stringify(
         {
@@ -48,22 +48,22 @@ describe("Fuse Selection (Bug Repro)", () => {
   });
 
   it("should set pendingTargetEffect when starting fuse", async () => {
-    resetGameState();
-    state.isBlueTurn = true;
-    state.bluePP = 10;
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
+    state.players.first.pp = 10;
 
     // Add 2 Gears to hand
-    const gear1 = createCard("Gear of Ambition", "blue");
-    const gear2 = createCard("Gear of Remembrance", "blue");
-    state.blueHand.push(gear1, gear2);
+    const gear1 = createCard("Gear of Ambition", "first");
+    const gear2 = createCard("Gear of Remembrance", "first");
+    state.players.first.hand.push(gear1, gear2);
 
-    log(`Hand before fuse: ${state.blueHand.map((c) => c.name).join(", ")}`);
+    log(`Hand before fuse: ${state.players.first.hand.map((c) => c.name).join(", ")}`);
     log(`Gear1 UID: ${gear1.uid}`);
     log(`Gear1 fuse_recipes: ${JSON.stringify(gear1.fuse_recipes)}`);
 
     // Start fuse process
     const { startFuseFromHand } = await import("../../../src/logic/index");
-    startFuseFromHand("blue", gear1.uid);
+    startFuseFromHand("first", gear1.uid);
 
     log(
       `pendingTargetEffect after startFuse: ${JSON.stringify(state.pendingTargetEffect, null, 2)}`,
@@ -75,40 +75,40 @@ describe("Fuse Selection (Bug Repro)", () => {
   });
 
   it("should mark pool cards as __uiSelectable", async () => {
-    resetGameState();
-    state.isBlueTurn = true;
-    state.bluePP = 10;
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
+    state.players.first.pp = 10;
 
-    const gear1 = createCard("Gear of Ambition", "blue");
-    const gear2 = createCard("Gear of Remembrance", "blue");
-    state.blueHand.push(gear1, gear2);
+    const gear1 = createCard("Gear of Ambition", "first");
+    const gear2 = createCard("Gear of Remembrance", "first");
+    state.players.first.hand.push(gear1, gear2);
 
     const { startFuseFromHand } = await import("../../../src/logic/index");
-    startFuseFromHand("blue", gear1.uid);
+    startFuseFromHand("first", gear1.uid);
 
     log(
-      `Cards __uiSelectable: ${state.blueHand.map((c) => `${c.name}: ${!!c.__uiSelectable}`).join(", ")}`,
+      `Cards __uiSelectable: ${state.players.first.hand.map((c) => `${c.name}: ${!!c.__uiSelectable}`).join(", ")}`,
     );
 
     // The partner card (gear2) should be selectable
-    const selectableCards = state.blueHand.filter((c) => c.__uiSelectable);
+    const selectableCards = state.players.first.hand.filter((c) => c.__uiSelectable);
     log(`Selectable cards: ${selectableCards.map((c) => c.name).join(", ")}`);
 
     expect(selectableCards.length).toBeGreaterThan(0);
   });
 
   it("should allow target selection via resolvePendingTarget", async () => {
-    resetGameState();
-    state.isBlueTurn = true;
-    state.bluePP = 10;
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
+    state.players.first.pp = 10;
 
-    const gear1 = createCard("Gear of Ambition", "blue");
-    const gear2 = createCard("Gear of Remembrance", "blue");
-    state.blueHand.push(gear1, gear2);
+    const gear1 = createCard("Gear of Ambition", "first");
+    const gear2 = createCard("Gear of Remembrance", "first");
+    state.players.first.hand.push(gear1, gear2);
 
     const { startFuseFromHand, resolvePendingTarget } =
       await import("../../../src/logic/index");
-    startFuseFromHand("blue", gear1.uid);
+    startFuseFromHand("first", gear1.uid);
 
     log(
       `Pool before select: ${JSON.stringify(state.pendingTargetEffect?.pool?.map((c: any) => c.name))}`,
@@ -135,3 +135,9 @@ describe("Fuse Selection (Bug Repro)", () => {
     }
   });
 });
+
+
+
+
+
+

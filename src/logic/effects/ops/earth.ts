@@ -1,11 +1,11 @@
 // src/logic/effects/ops/earth.ts
 import { state } from "../../../core/gameState.js";
-import { adapter } from "../../../core/adapter.js";
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance } from "../../../core/types.js";
+import { getBoard, getGraveyard, addShadows } from "../../../core/playerHelpers.js";
 
 function board(owner: Player) {
-  return owner === "blue" ? state.blueBoard : state.redBoard;
+  return getBoard(state, owner);
 }
 function isWitchsNewBrew(card: CardInstance) {
   const n = String(card?.name || "").toLowerCase();
@@ -21,7 +21,7 @@ export function hasEarthSigils(owner: Player, amount = 1) {
 
 export function consumeEarthSigils(owner: Player, amount = 1) {
   const b = board(owner);
-  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const grave = getGraveyard(state, owner);
 
   for (let i = 0; i < b.length; i++) {
     const c = b[i];
@@ -40,9 +40,8 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
           logEvent("earthSigilDestroyed", { owner, card: c.name, uid: c.uid });
 
           // Increment shadows for the owner
-          if (owner === "blue") state.blueShadows++;
-          else state.redShadows++;
-          adapter.render();
+          addShadows(state, owner, 1);
+          // Render removed - UI layer
         }
       }
       return true;
@@ -50,3 +49,18 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
   }
   return false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

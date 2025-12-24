@@ -10,6 +10,7 @@ import { playSpell } from "./spell.js";
 import { playFollower } from "./follower.js";
 import { playAmulet } from "./amulet.js";
 import { PlayOutcome } from "./types.js";
+import { getPP, setPP, getPlaysThisTurn, setPlaysThisTurn, isFirstPlayer } from "../../../core/playerHelpers.js";
 
 /**
  * Core play card logic. Returns a PlayOutcome without any rendering.
@@ -21,9 +22,10 @@ export function playCardCore(
   index: number,
 ): PlayOutcome {
   // 1) Turn guard
+  const first = isFirstPlayer(player);
   if (
-    (player === "blue" && !state.isBlueTurn) ||
-    (player === "red" && state.isBlueTurn)
+    (first && state.activePlayer !== "first") ||
+    (!first && state.activePlayer === "first")
   ) {
     return { kind: "blocked", reason: "Not your turn" };
   }
@@ -38,7 +40,7 @@ export function playCardCore(
   }
 
   // 3) Cost / Enhance
-  const currentPP = player === "blue" ? state.bluePP : state.redPP;
+  const currentPP = getPP(state, player);
   const handMod = parseInt(String(card.cost_mod)) || 0;
   const baseCost = parseInt(String(card.cost)) || 0;
 
@@ -53,14 +55,11 @@ export function playCardCore(
   }
 
   // 4) Pay PP exactly once
-  if (player === "blue") state.bluePP -= effectiveCost;
-  else state.redPP -= effectiveCost;
+  setPP(state, player, currentPP - effectiveCost);
 
   // 5) Remove from hand and count play
   fromHand.splice(index, 1);
-  if (player === "blue")
-    state.bluePlaysThisTurn = (state.bluePlaysThisTurn || 0) + 1;
-  else state.redPlaysThisTurn = (state.redPlaysThisTurn || 0) + 1;
+  setPlaysThisTurn(state, player, getPlaysThisTurn(state, player) + 1);
 
   // 6) Dispatch by type
   if (card.type === "Spell") {
@@ -73,3 +72,18 @@ export function playCardCore(
 
   return { kind: "done" };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,22 +17,22 @@ export function render() {
     const el = byId(id);
     if (el) el.textContent = String(text);
   };
-  setText("blueHP", state.blueHP);
-  setText("redHP", state.redHP);
-  setText("bluePP", `${state.bluePP}/${state.blueMaxPP}`);
-  setText("redPP", `${state.redPP}/${state.redMaxPP}`);
-  setText("blueShadows", state.blueShadows);
-  setText("redShadows", state.redShadows);
+  setText("blueHP", state.players.first.hp);
+  setText("redHP", state.players.second.hp);
+  setText("bluePP", `${state.players.first.pp}/${state.players.first.maxPP}`);
+  setText("redPP", `${state.players.second.pp}/${state.players.second.maxPP}`);
+  setText("blueShadows", state.players.first.shadows);
+  setText("redShadows", state.players.second.shadows);
 
   // zones
-  renderZone("blueHand", state.blueHand, state, render, state.isBlueTurn, (i) =>
-    logic().then(({ playCard }) => playCard(state.blueHand, "blue", i)),
+  renderZone("blueHand", state.players.first.hand, state, render, state.isFirstPlayerTurn, (i) =>
+    logic().then(({ playCard }) => playCard(state.players.first.hand, "first", i)),
   );
-  renderZone("blueBoard", state.blueBoard, state, render);
-  renderZone("redHand", state.redHand, state, render, !state.isBlueTurn, (i) =>
-    logic().then(({ playCard }) => playCard(state.redHand, "red", i)),
+  renderZone("blueBoard", state.players.first.board, state, render);
+  renderZone("redHand", state.players.second.hand, state, render, !state.isFirstPlayerTurn, (i) =>
+    logic().then(({ playCard }) => playCard(state.players.second.hand, "second", i)),
   );
-  renderZone("redBoard", state.redBoard, state, render);
+  renderZone("redBoard", state.players.second.board, state, render);
 
   updateCounts(state);
 
@@ -45,7 +45,7 @@ export function render() {
     state.pendingTargetEffect?.canTargetLeader
   ) {
     // Show enemy leader as targetable
-    const enemyLeader = state.isBlueTurn ? redLeader : blueLeader;
+    const enemyLeader = state.isFirstPlayerTurn ? redLeader : blueLeader;
     enemyLeader.classList.add("selectable");
     enemyLeader.onclick = (e) => {
       e.stopPropagation();
@@ -61,26 +61,26 @@ export function render() {
   }
 
   // Render barrier badges for both leaders
-  renderLeaderBarrierBadge("blue");
-  renderLeaderBarrierBadge("red");
+  renderLeaderBarrierBadge("first");
+  renderLeaderBarrierBadge("second");
 
   // Leader drag-drop setup (disabled during mulligan)
   if (state.phase !== "mulligan") {
-    makeLeaderDroppable(byId("blueLeader")!, "blue", state);
-    makeLeaderDroppable(byId("redLeader")!, "red", state);
+    makeLeaderDroppable(byId("blueLeader")!, "first", state);
+    makeLeaderDroppable(byId("redLeader")!, "second", state);
   }
 
-  const redBoost = byId("redBoost") as HTMLButtonElement;
-  if (redBoost) {
-    if (!state.redBoostUsedLate && state.roundCount > 5) {
-      redBoost.disabled = false;
-      redBoost.classList.toggle("used", !!state.redBoostPending);
-    } else if (!state.redBoostUsedEarly && state.roundCount <= 5) {
-      redBoost.disabled = false;
-      redBoost.classList.toggle("used", !!state.redBoostPending);
+  const ppBoostBtn = byId("secondPlayerPPBoost") as HTMLButtonElement;
+  if (ppBoostBtn) {
+    if (!state.secondPlayerPPBoostUsedLate && state.roundCount > 5) {
+      ppBoostBtn.disabled = false;
+      ppBoostBtn.classList.toggle("used", !!state.secondPlayerPPBoostPending);
+    } else if (!state.secondPlayerPPBoostUsedEarly && state.roundCount <= 5) {
+      ppBoostBtn.disabled = false;
+      ppBoostBtn.classList.toggle("used", !!state.secondPlayerPPBoostPending);
     } else {
-      redBoost.disabled = true;
-      redBoost.classList.add("used");
+      ppBoostBtn.disabled = true;
+      ppBoostBtn.classList.add("used");
     }
   }
 
@@ -92,22 +92,22 @@ export function render() {
   }
 
   updateEvoButtonsUI(state);
-  updateCrestsUI("blue", state);
-  updateCrestsUI("red", state);
+  updateCrestsUI("first", state);
+  updateCrestsUI("second", state);
 
   // Disable/enable End Turn controls based on phase
   setEndTurnDisabled(state.phase === "mulligan");
 
   //sidebars/lists
-  renderListIfPresent("bluePlayedList", state.bluePlayedHistory);
-  renderListIfPresent("redPlayedList", state.redPlayedHistory);
-  renderListIfPresent("blueDestroyedList", state.blueDestroyedHistory);
-  renderListIfPresent("redDestroyedList", state.redDestroyedHistory);
+  renderListIfPresent("bluePlayedList", state.players.first.playedHistory);
+  renderListIfPresent("redPlayedList", state.players.second.playedHistory);
+  renderListIfPresent("blueDestroyedList", state.players.first.destroyedHistory);
+  renderListIfPresent("redDestroyedList", state.players.second.destroyedHistory);
 
   // God Mode Visibility
   const godPanel = byId("blueGodMode");
   if (godPanel) {
-    const file = String(state.blueDeckFile || "");
+    const file = String(state.players.first.deckFile || "");
     const isTesting = /^0_.*\.json$/i.test(file) || /testing/i.test(file);
     godPanel.style.display = isTesting ? "block" : "none";
   }
@@ -278,7 +278,7 @@ function orderedCrestSlots(container: HTMLElement, side: Player) {
   // Sort rows by screen Y:
   //  - BLUE: lower row (bigger top) first (near the player), then upper row
   //  - RED:  upper row (smaller top) first, then lower row (mirror)
-  rows.sort((a, b) => (side === "blue" ? b.top - a.top : a.top - b.top));
+  rows.sort((a, b) => (side === "first" ? b.top - a.top : a.top - b.top));
 
   // In each row:
   //  - BLUE: left → right
@@ -286,16 +286,16 @@ function orderedCrestSlots(container: HTMLElement, side: Player) {
   const ordered: Element[] = [];
   for (const row of rows) {
     row.items.sort((a, b) => a.left - b.left);
-    if (side === "red") row.items.reverse();
+    if (side === "second") row.items.reverse();
     for (const it of row.items) ordered.push(it.el);
   }
   return ordered;
 }
 
 // render.js — REPLACE updateCrestsUI with this
-function updateCrestsUI(playerPrefix: "blue" | "red", state: GameState) {
+function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
   const crests =
-    playerPrefix === "blue" ? state.blueCrests || [] : state.redCrests || [];
+    playerPrefix === "first" ? state.players.first.crests || [] : state.players.second.crests || [];
   const container = byId(`${playerPrefix}Crests`);
   const tooltipEl = byId("cardTooltip");
   if (!container || !tooltipEl) return;
@@ -352,16 +352,16 @@ function updateCrestsUI(playerPrefix: "blue" | "red", state: GameState) {
       // tooltip
       if (crestData.description) {
         slot.onmouseenter = () => {
-          let text = crestData.description;
+          let text = crestData.description ?? "";
           if (String(crestData.name || "").toLowerCase() === "faith") {
             const fc = Number(crestData?.counters?.faith ?? 0);
-            text = `${crestData.name} — ${fc}\n${crestData.description}`;
+            text = `${crestData.name} — ${fc}\n${crestData.description ?? ""}`;
           }
           tooltipEl.textContent = text;
           tooltipEl.style.display = "block";
         };
         slot.onmousemove = (e) => {
-          const isBlueSide = playerPrefix === "blue";
+          const isBlueSide = playerPrefix === "first";
           const offsetY = isBlueSide ? -tooltipEl.offsetHeight - 12 : 12;
           tooltipEl.style.left =
             Math.min(
@@ -379,14 +379,14 @@ function updateCrestsUI(playerPrefix: "blue" | "red", state: GameState) {
 }
 
 function renderLeaderBarrierBadge(side: Player) {
-  const host = byId(side === "blue" ? "blueLeader" : "redLeader");
+  const host = byId(side === "first" ? "blueLeader" : "redLeader");
   if (!host) return;
 
   // Cleanup old badges just in case
   host.querySelectorAll(".leader-barrier-badge").forEach((n) => n.remove());
 
   const hasBarrier =
-    (state[side === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier"] as
+    (state[side === "first" ? "blueLeaderBarrier" : "redLeaderBarrier"] as
       | any
       | 0) > 0;
 
@@ -396,3 +396,17 @@ function renderLeaderBarrierBadge(side: Player) {
     host.classList.remove("has-leader-barrier");
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

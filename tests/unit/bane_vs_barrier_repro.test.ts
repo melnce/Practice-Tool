@@ -10,17 +10,17 @@ import { grantBarrier } from "../../src/logic/core/barrier.js";
 
 describe("Bane vs Barrier Interaction", () => {
   beforeEach(() => {
-    resetGameState();
-    state.isBlueTurn = true;
-    // mock active player getter if needed, but logic seems to use state.isBlueTurn
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
+    // mock active player getter if needed, but logic seems to use state.isFirstPlayerTurn
   });
 
   afterEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   const makeTestFollower = (
-    owner: "blue" | "red",
+    owner: "first" | "second",
     name: string,
     stats: { attack: number; defense: number },
     traits: Partial<CardInstance> = {},
@@ -40,7 +40,7 @@ describe("Bane vs Barrier Interaction", () => {
     };
     const f = makeCardFromDB(template, owner);
     Object.assign(f, traits);
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    const board = owner === "first" ? state.players.first.board : state.players.second.board;
     pushToBoard(board, owner, f);
     return f;
   };
@@ -48,7 +48,7 @@ describe("Bane vs Barrier Interaction", () => {
   it("Barrier should block damage but NOT prevent Bane destruction", () => {
     // 1. Create Attacker with Bane (1/1)
     const attacker = makeTestFollower(
-      "blue",
+      "first",
       "Bane Attacker",
       { attack: 1, defense: 1 },
       {
@@ -60,7 +60,7 @@ describe("Bane vs Barrier Interaction", () => {
     );
 
     // 2. Create Defender with Barrier (2/2)
-    const defender = makeTestFollower("red", "Barrier Defender", {
+    const defender = makeTestFollower("second", "Barrier Defender", {
       attack: 2,
       defense: 2,
     });
@@ -70,7 +70,7 @@ describe("Bane vs Barrier Interaction", () => {
 
     // 3. Attack
     // attackerIdx=0, defenderIdx=0
-    attackFollower(0, 0, "blue", "red");
+    attackFollower(0, 0, "first", "second");
 
     // 4. Assertions
     // Barrier should be popped
@@ -78,7 +78,13 @@ describe("Bane vs Barrier Interaction", () => {
 
     // Bane should destroy it.
     const defenderIsDead =
-      (defender.defense as number) <= 0 || !state.redBoard.includes(defender);
+      (defender.defense as number) <= 0 || !state.players.second.board.includes(defender);
     expect(defenderIsDead).toBe(true);
   });
 });
+
+
+
+
+
+

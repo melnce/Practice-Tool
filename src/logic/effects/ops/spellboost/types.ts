@@ -49,3 +49,18 @@ export function normalizeToSpellboostSpec(eff: Effect): UnifiedSpellboostSpec {
       return { op: "spellboost", target: "hand", mode: "boost", count };
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

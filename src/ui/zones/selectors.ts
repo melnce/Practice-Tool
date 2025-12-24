@@ -14,10 +14,10 @@ export function buildZoneContext(
   const isRedBoard = containerId === "redBoard";
   const isHand = isBlueHand || isRedHand;
   const isBoard = isBoardZone(containerId);
-  const owner: Player = isBlueHand || isBlueBoard ? "blue" : "red";
+  const owner: Player = isBlueHand || isBlueBoard ? "first" : "second";
   const isMyBoard = isOwnBoard(containerId, state);
   const isMyHand =
-    (isBlueHand && state.isBlueTurn) || (isRedHand && !state.isBlueTurn);
+    (isBlueHand && state.isFirstPlayerTurn) || (isRedHand && !state.isFirstPlayerTurn);
 
   return {
     containerId,
@@ -33,3 +33,17 @@ export function buildZoneContext(
     isMulligan,
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

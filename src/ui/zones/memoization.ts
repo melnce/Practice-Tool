@@ -41,24 +41,24 @@ function isStateSame(
   state: GameState,
   ctx: ZoneContext,
 ): boolean {
-  const isBlue = ctx.owner === "blue";
-  const pp = isBlue ? state.bluePP : state.redPP;
+  const isBlue = ctx.owner === "first";
+  const pp = isBlue ? state.players.first.pp : state.players.second.pp;
   const isMyTurn =
-    (isBlue && state.isBlueTurn) || (!isBlue && !state.isBlueTurn);
+    (isBlue && state.isFirstPlayerTurn) || (!isBlue && !state.isFirstPlayerTurn);
 
   if (prev.pp !== pp) return false;
   // We keep the old turn check but also enforce strict activePlayer check
   if (prev.turn !== isMyTurn) return false;
   if (prev.activePlayer !== state.activePlayer) return false;
 
-  if (prev.boardLens !== `${state.blueBoard.length}|${state.redBoard.length}`)
+  if (prev.boardLens !== `${state.players.first.board.length}|${state.players.second.board.length}`)
     return false;
 
   const targetOp = state.pendingTargetEffect?.eff?.op ?? "";
   if (prev.targetId !== targetOp) return false;
 
-  if (prev.rally !== `${state.blueRally}|${state.redRally}`) return false;
-  if (prev.shadows !== `${state.blueShadows}|${state.redShadows}`) return false;
+  if (prev.rally !== `${state.players.first.rally}|${state.players.second.rally}`) return false;
+  if (prev.shadows !== `${state.players.first.shadows}|${state.players.second.shadows}`) return false;
 
   return true;
 }
@@ -114,18 +114,18 @@ export function getMemoizedViewModel(
 
   const vm = createCardViewModel(card, idx, ctx, state);
 
-  const isBlue = ctx.owner === "blue";
+  const isBlue = ctx.owner === "first";
   const ks = card.keywordState || {};
 
   const newEntry: CacheEntry = {
     viewModel: vm,
     lastStateArgs: {
-      pp: isBlue ? state.bluePP : state.redPP,
-      turn: (isBlue && state.isBlueTurn) || (!isBlue && !state.isBlueTurn),
+      pp: isBlue ? state.players.first.pp : state.players.second.pp,
+      turn: (isBlue && state.isFirstPlayerTurn) || (!isBlue && !state.isFirstPlayerTurn),
       activePlayer: state.activePlayer, // <-- Track this
-      rally: `${state.blueRally}|${state.redRally}`,
-      shadows: `${state.blueShadows}|${state.redShadows}`,
-      boardLens: `${state.blueBoard.length}|${state.redBoard.length}`,
+      rally: `${state.players.first.rally}|${state.players.second.rally}`,
+      shadows: `${state.players.first.shadows}|${state.players.second.shadows}`,
+      boardLens: `${state.players.first.board.length}|${state.players.second.board.length}`,
       targetId: state.pendingTargetEffect?.eff?.op ?? "",
     },
     lastCardArgs: {
@@ -148,3 +148,17 @@ export function getMemoizedViewModel(
   vmCache.set(card, newEntry);
   return vm;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

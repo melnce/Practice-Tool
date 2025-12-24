@@ -22,16 +22,16 @@ function makeCard(id: string, name: string): CardInstance {
 
 describe("Golden: Targeting Pool Ordering", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   it("ally:follower returns board order (left to right)", () => {
     const c1 = makeCard("a", "First");
     const c2 = makeCard("b", "Second");
     const c3 = makeCard("c", "Third");
-    state.blueBoard = [c1, c2, c3];
+    state.players.first.board = [c1, c2, c3];
 
-    const pool = getPool("ally:follower", "blue");
+    const pool = getPool("ally:follower", "first");
 
     expect(pool.map((c) => c.uid)).toEqual(["a", "b", "c"]);
   });
@@ -39,9 +39,9 @@ describe("Golden: Targeting Pool Ordering", () => {
   it("enemy:follower returns opponent board order", () => {
     const c1 = makeCard("x", "EnemyFirst");
     const c2 = makeCard("y", "EnemySecond");
-    state.redBoard = [c1, c2];
+    state.players.second.board = [c1, c2];
 
-    const pool = getPool("enemy:follower", "blue");
+    const pool = getPool("enemy:follower", "first");
 
     expect(pool.map((c) => c.uid)).toEqual(["x", "y"]);
   });
@@ -50,9 +50,9 @@ describe("Golden: Targeting Pool Ordering", () => {
     const c1 = makeCard("s1", "Summoned1");
     const c2 = makeCard("s2", "Summoned2");
     state.lastSummoned = [c1, c2];
-    state.blueBoard = [c1, c2];
+    state.players.first.board = [c1, c2];
 
-    const pool = getPool("last_summoned", "blue");
+    const pool = getPool("last_summoned", "first");
 
     expect(pool.map((c) => c.uid)).toEqual(["s1", "s2"]);
   });
@@ -62,12 +62,18 @@ describe("Golden: Targeting Pool Ordering", () => {
     const b2 = makeCard("b2", "Blue2");
     const r1 = makeCard("r1", "Red1");
 
-    state.blueBoard = [b1, b2];
-    state.redBoard = [r1];
+    state.players.first.board = [b1, b2];
+    state.players.second.board = [r1];
 
-    const pool = getPool("all:follower", "blue");
+    const pool = getPool("all:follower", "first");
 
     // Blue board first, then red board
     expect(pool.map((c) => c.uid)).toEqual(["b1", "b2", "r1"]);
   });
 });
+
+
+
+
+
+

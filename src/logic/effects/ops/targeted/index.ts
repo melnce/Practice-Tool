@@ -18,7 +18,7 @@ import { handleEvolveSelf } from "../evolve.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
 import { CardInstance, Effect, Player } from "../../../../core/types.js";
-import { injectDescAndBadge } from "../../../../ui/text.js";
+import { isFirstPlayer, getHand, getGraveyard, getBoard, addShadows, getHP, setHP, opponentOf } from "../../../../core/playerHelpers.js";
 import {
   TargetedOpContext,
   DispatchResult,
@@ -95,7 +95,9 @@ TARGETED_OP_HANDLERS.set("transform", (ctx) => {
   const intoName = String(eff.into ?? (eff as any).name ?? "").trim();
   const target = targets?.[0];
   if (!target || !intoName) return { kind: "handled" }; // Failure to resolve is still "handled" (no-op)
-  if (state.blueHand.includes(target) || state.redHand.includes(target))
+  const firstHand = getHand(state, "first");
+  const secondHand = getHand(state, "second");
+  if (firstHand.includes(target) || secondHand.includes(target))
     transformHandTarget(target, intoName);
   else transformTarget(target, intoName);
   logEvent("transform", { owner, target: target.name, into: intoName });
@@ -103,7 +105,7 @@ TARGETED_OP_HANDLERS.set("transform", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
-  const { eff, sourceCard, targets, owner } = ctx;
+  const { eff, targets, owner } = ctx;
   for (const target of targets) {
     for (const k of (eff as any).keywords || []) {
       const name = (typeof k === "string" ? k : k?.name) || "";
@@ -111,27 +113,15 @@ TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
       opts.request_owner = owner;
       applyKeyword(target, name, opts);
     }
-    // Logic specific injections
-    if (sourceCard?.name?.toLowerCase() === "flight of icarus")
-      injectDescAndBadge(
-        target,
-        `<span style="color: orange;">Rush<br>Last Words: Draw a card</span>`,
-        ["Rush", "Last Words: Draw a card"],
-      );
-    if (sourceCard?.name?.toLowerCase() === "carnelia, ember of darkness")
-      injectDescAndBadge(
-        target,
-        `<span style="color: orange;">Ward<br>Can't be destroyed by abilities</span>`,
-        ["Ward", "Can't be destroyed by abilities"],
-      );
+    // Note: UI badge injection removed - handled by UI layer via keywordState inspection
   }
   return { kind: "handled" };
 });
 
 TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
   const { owner, targets } = ctx;
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
-  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const hand = getHand(state, owner);
+  const grave = getGraveyard(state, owner);
   const discarded: CardInstance[] = [];
   for (const t of targets) {
     const idx = hand.findIndex((c) => c.uid === t.uid);
@@ -144,8 +134,7 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
     }
   }
   if (targets.length > 0) {
-    if (owner === "blue") state.blueShadows += targets.length;
-    else state.redShadows += targets.length;
+    addShadows(state, owner, targets.length);
   }
   if (discarded.length) {
     state.lastDiscardedCosts = discarded.map(
@@ -196,10 +185,12 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
     target.potential_attack += a;
     target.potential_defense += d;
     if (d < 0 && target.type === "Follower") {
-      const targetOwner = state.blueBoard.includes(target)
-        ? "blue"
-        : state.redBoard.includes(target)
-          ? "red"
+      const firstBoard = getBoard(state, "first");
+      const secondBoard = getBoard(state, "second");
+      const targetOwner = firstBoard.includes(target)
+        ? "first"
+        : secondBoard.includes(target)
+          ? "second"
           : null;
       if (targetOwner)
         fireTrigger("enemy_follower_defense_down", owner as any, { target });
@@ -212,7 +203,7 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
 TARGETED_OP_HANDLERS.set("banish", (ctx) => {
   const { owner, targets } = ctx;
   for (const target of targets) {
-    fireTrigger("allied_follower_leaves_field", owner as any);
+    // Note: banishCard() in primitives.ts fires ally/enemy_follower_leaves_field
     banishCard(target);
     logEvent("banish", { owner, target: target.name });
   }
@@ -244,10 +235,12 @@ TARGETED_OP_HANDLERS.set("remove_keyword", (ctx) => {
 TARGETED_OP_HANDLERS.set("destroy", (ctx) => {
   const { owner, targets } = ctx;
   for (const target of targets) {
-    const targetOwner = state.blueBoard.includes(target)
-      ? "blue"
-      : state.redBoard.includes(target)
-        ? "red"
+    const firstBoard = getBoard(state, "first");
+    const secondBoard = getBoard(state, "second");
+    const targetOwner = firstBoard.includes(target)
+      ? "first"
+      : secondBoard.includes(target)
+        ? "second"
         : owner;
     if (destroyTarget(target, targetOwner, "targeted"))
       logEvent("destroy", { owner, target: target.name });
@@ -261,10 +254,12 @@ TARGETED_OP_HANDLERS.set("destroy_then", (ctx) => {
   const { eff, owner, sourceCard, targets } = ctx;
   let destroyedCount = 0;
   for (const target of targets) {
-    const targetOwner = state.blueBoard.includes(target)
-      ? "blue"
-      : state.redBoard.includes(target)
-        ? "red"
+    const firstBoard = getBoard(state, "first");
+    const secondBoard = getBoard(state, "second");
+    const targetOwner = firstBoard.includes(target)
+      ? "first"
+      : secondBoard.includes(target)
+        ? "second"
         : owner;
     if (destroyTarget(target, targetOwner, "destroy_then")) {
       destroyedCount++;
@@ -288,18 +283,17 @@ TARGETED_OP_HANDLERS.set("damage", (ctx) => {
   const { eff, owner, targets } = ctx;
   const target = targets[0];
   const amt = (eff as any).amount as number;
+  const oppOwner = opponentOf(owner);
   if (!target) {
     // No target selected - if fallback_leader is true, damage enemy leader
     if ((eff as any).fallback_leader) {
-      if (owner === "blue") state.redHP = Math.max(0, state.redHP - amt);
-      else state.blueHP = Math.max(0, state.blueHP - amt);
+      setHP(state, oppOwner, Math.max(0, getHP(state, oppOwner) - amt));
     }
   } else if (target.type === "Follower") {
     dealDamage(target, amt);
     cleanupDead();
   } else if (target.type === "Leader") {
-    if (owner === "blue") state.redHP = Math.max(0, state.redHP - amt);
-    else state.blueHP = Math.max(0, state.blueHP - amt);
+    setHP(state, oppOwner, Math.max(0, getHP(state, oppOwner) - amt));
   }
   return { kind: "handled" };
 });
@@ -402,3 +396,18 @@ TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
   );
   return { kind: "handled" };
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

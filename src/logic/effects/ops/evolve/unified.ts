@@ -5,6 +5,7 @@ import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player, Effect } from "../../../../core/types.js";
 import { UnifiedEvolveSpec, normalizeToEvolveSpec } from "./types.js";
 import { onEvolve } from "../../../evolveUtils.js";
+import { getBoard, isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../../core/playerHelpers.js";
 
 /**
  * Unified evolve handler - handles all evolve variants.
@@ -64,7 +65,7 @@ function resolveTargets(
       );
 
     case "all_allies": {
-      const board = owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, owner);
       let candidates = board.filter(
         (c) => c.type === "Follower" && !c.hasEvolved,
       );
@@ -82,7 +83,7 @@ function resolveTargets(
     default:
       // Custom target string - could be a named card
       if (typeof target === "string" && target.length > 0) {
-        const board = owner === "blue" ? state.blueBoard : state.redBoard;
+        const board = getBoard(state, owner);
         return board.filter(
           (c) =>
             c.type === "Follower" &&
@@ -157,20 +158,31 @@ function applyEvolution(
 function canEvolve(owner: Player, card: CardInstance, mode: string): boolean {
   if (!card || card.type !== "Follower" || card.hasEvolved) return false;
 
-  const isBlue = owner === "blue";
-  const usedThisTurn = isBlue
-    ? state.blueEvoUsedThisTurn
-    : state.redEvoUsedThisTurn;
-  const normalUnlocked = isBlue ? state.roundCount >= 5 : state.roundCount >= 4;
-  const superUnlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
+  const first = isFirstPlayer(owner);
+  const usedThisTurn = getEvoUsedThisTurn(state, owner);
+  const normalUnlocked = first ? state.roundCount >= 5 : state.roundCount >= 4;
+  const superUnlocked = first ? state.roundCount >= 7 : state.roundCount >= 6;
 
   if (mode === "super") {
-    const charges = isBlue
-      ? state.blueSuperEvoCharges | 0
-      : state.redSuperEvoCharges | 0;
+    const charges = getSuperEvoCharges(state, owner);
     return superUnlocked && !usedThisTurn && charges > 0;
   } else {
-    const charges = isBlue ? state.blueEvoCharges | 0 : state.redEvoCharges | 0;
+    const charges = getEvoCharges(state, owner);
     return normalUnlocked && !usedThisTurn && charges > 0;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

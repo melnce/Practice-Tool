@@ -2,7 +2,6 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player } from "../../../../core/types.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
-import { adapter } from "../../../../core/adapter.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
 import { boardOf } from "./utils.js";
 
@@ -46,5 +45,20 @@ export function reanimateSummon(c: any, owner: Player) {
       state.lastSummoned.push(copy);
     }
   }
-  adapter.render();
+  // Render removed - UI orchestrator handles rendering
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

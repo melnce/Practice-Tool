@@ -30,3 +30,9 @@ describe("Satyr, Open-Hearted Rover (10452120)", () => {
     expect(effect.effects[0].target).toBe("self");
   });
 });
+
+
+
+
+
+

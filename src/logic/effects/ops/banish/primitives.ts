@@ -5,6 +5,7 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { CardInstance, Player } from "../../../../core/types.js";
+import { getBoard as getPlayerBoard, getDeck, getBanish } from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // CORE PRIMITIVES
@@ -12,7 +13,7 @@ import { CardInstance, Player } from "../../../../core/types.js";
 
 /**
  * Banish a single card from its current zone.
- * Fires follower_leaves_field trigger if from board.
+ * Fires ally_follower_leaves_field and enemy_follower_leaves_field triggers.
  * @returns true if card was banished
  */
 export function banishCard(
@@ -21,33 +22,39 @@ export function banishCard(
 ): boolean {
   if (!card) return false;
 
-  // Try blue board
-  const bi = state.blueBoard.indexOf(card);
+  // Try first player's board
+  const firstBoard = getPlayerBoard(state, "first");
+  const bi = firstBoard.indexOf(card);
   if (bi !== -1) {
-    state.blueBoard.splice(bi, 1);
-    fireTrigger("follower_leaves_field", "blue");
+    firstBoard.splice(bi, 1);
+    // Fire ally trigger for first, enemy trigger for second
+    fireTrigger("ally_follower_leaves_field", "first");
+    fireTrigger("enemy_follower_leaves_field", "second");
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
-      owner: "blue",
+      owner: "first",
       reason,
     });
-    moveToBanishZone(card, "blue");
+    moveToBanishZone(card, "first");
     return true;
   }
 
-  // Try red board
-  const ri = state.redBoard.indexOf(card);
+  // Try second player's board
+  const secondBoard = getPlayerBoard(state, "second");
+  const ri = secondBoard.indexOf(card);
   if (ri !== -1) {
-    state.redBoard.splice(ri, 1);
-    fireTrigger("follower_leaves_field", "red");
+    secondBoard.splice(ri, 1);
+    // Fire ally trigger for second, enemy trigger for first
+    fireTrigger("ally_follower_leaves_field", "second");
+    fireTrigger("enemy_follower_leaves_field", "first");
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
-      owner: "red",
+      owner: "second",
       reason,
     });
-    moveToBanishZone(card, "red");
+    moveToBanishZone(card, "second");
     return true;
   }
 
@@ -66,7 +73,7 @@ export function banishSelf(sourceCard: CardInstance | null): boolean {
  * Move card to banish zone if it exists.
  */
 function moveToBanishZone(card: CardInstance, owner: Player): void {
-  const bzone = owner === "blue" ? state.blueBanish : state.redBanish;
+  const bzone = getBanish(state, owner);
   if (Array.isArray(bzone)) {
     bzone.push(card);
   }
@@ -82,8 +89,8 @@ function moveToBanishZone(card: CardInstance, owner: Player): void {
 function getDeckAndBanish(
   owner: Player,
 ): [CardInstance[], CardInstance[] | null] {
-  const deck = owner === "blue" ? state.blueDeck : state.redDeck;
-  const bzone = owner === "blue" ? state.blueBanish : state.redBanish;
+  const deck = getDeck(state, owner);
+  const bzone = getBanish(state, owner);
   return [Array.isArray(deck) ? deck : [], Array.isArray(bzone) ? bzone : null];
 }
 
@@ -137,7 +144,7 @@ export function banishAllEnemyCopies(
 ): number {
   if (!selected || !selected.name) return 0;
 
-  const oppBoard = owner === "blue" ? state.redBoard : state.blueBoard;
+  const oppBoard = getPlayerBoard(state, owner === "first" ? "second" : "first");
   const hits = oppBoard.filter((c) => c?.name === selected.name);
 
   let count = 0;
@@ -154,8 +161,8 @@ export function banishAllEnemyCopies(
  * Get owner of a board card.
  */
 export function getCardOwner(card: CardInstance): Player | null {
-  if (state.blueBoard.includes(card)) return "blue";
-  if (state.redBoard.includes(card)) return "red";
+  if (getPlayerBoard(state, "first").includes(card)) return "first";
+  if (getPlayerBoard(state, "second").includes(card)) return "second";
   return null;
 }
 
@@ -163,5 +170,20 @@ export function getCardOwner(card: CardInstance): Player | null {
  * Get board for owner.
  */
 export function getBoard(owner: Player): CardInstance[] {
-  return owner === "blue" ? state.blueBoard : state.redBoard;
+  return getPlayerBoard(state, owner);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

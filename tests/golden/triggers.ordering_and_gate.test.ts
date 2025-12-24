@@ -10,7 +10,7 @@ import { TriggerEventName } from "../../src/logic/core/triggers/types";
 
 describe("Golden: Trigger Keys and Ordering", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   describe("trigger event names", () => {
@@ -77,3 +77,9 @@ describe("Golden: Trigger Keys and Ordering", () => {
     });
   });
 });
+
+
+
+
+
+

@@ -51,12 +51,12 @@ export function createCardViewModel(
 ): CardViewModel {
   const isFollower = card.type === "Follower";
   const isSpell = card.type === "Spell";
-  const isBlue = ctx.owner === "blue";
+  const isBlue = ctx.owner === "first";
 
   const availablePP = ctx.isHand
     ? ctx.isBlueHand
-      ? state.bluePP
-      : state.redPP
+      ? state.players.first.pp
+      : state.players.second.pp
     : 0;
 
   let shownCost = Number(card.cost) || 0;
@@ -184,13 +184,13 @@ export function createCardViewModel(
     if (!ctx.isMulligan && ctx.isBoard && card.hasEngage) {
       const ks = card.keywordState;
       const enoughPP = isBlue
-        ? state.bluePP >= engageCost
-        : state.redPP >= engageCost;
+        ? state.players.first.pp >= engageCost
+        : state.players.second.pp >= engageCost;
       const oncePerTurn = card.engageOncePerTurn !== false;
       const alreadyEngaged = !!ks?.engagedThisTurn;
       const readyThisTurn = !oncePerTurn || !alreadyEngaged;
       const isMyTurn =
-        (isBlue && state.isBlueTurn) || (!isBlue && !state.isBlueTurn);
+        (isBlue && state.isFirstPlayerTurn) || (!isBlue && !state.isFirstPlayerTurn);
 
       canEngage = isMyTurn && enoughPP && readyThisTurn;
     }
@@ -246,3 +246,17 @@ export function createCardViewModel(
     isMulliganSelected: !!card.__mulliganSelected,
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

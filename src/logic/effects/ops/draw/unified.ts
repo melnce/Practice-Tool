@@ -42,7 +42,7 @@ export function handleDraw(
 
   // Determine who draws
   const drawingPlayer: Player =
-    spec.player === "opponent" ? (owner === "blue" ? "red" : "blue") : owner;
+    spec.player === "opponent" ? (owner === "first" ? "second" : "first") : owner;
 
   const hand = getHand(drawingPlayer);
 
@@ -115,7 +115,7 @@ function drawNamed(
   for (let i = 0; i < count; i++) {
     if (hand.length >= MAX_HAND) break;
 
-    const copy = JSON.parse(JSON.stringify(base));
+    const copy = structuredClone(base);
     copy.uid = state.rng.makeUid();
 
     // Apply keywords if specified
@@ -248,3 +248,18 @@ function shuffleAndTake(indices: number[], want: number): number[] {
 // ============================================================================
 
 export { normalizeToUnifiedSpec, UnifiedDrawSpec } from "./types.js";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

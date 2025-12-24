@@ -1,6 +1,7 @@
 import { CardInstance } from "../../../../core/types.js";
 import { applyKeywordsFromList } from "../../../core/keywords.js";
 import { isEarthSigil } from "./earth.js";
+import { normalizeCardStats } from "../../../../core/cardStats.js";
 
 // Pull starting counters/destroyOnEmpty from the JSON keywords
 export function seedCountersFromKeywords(card: CardInstance) {
@@ -25,14 +26,11 @@ export function seedCountersFromKeywords(card: CardInstance) {
 // =============== Initialization ===============
 
 export function initFollower(card: CardInstance) {
-  // normalize numbers
-  card.attack = parseInt(card.attack as any) || 0;
-  card.defense = parseInt(card.defense as any) || 0;
+  // Normalize stats to numbers at creation boundary
+  normalizeCardStats(card);
 
-  // remember raw stats
-  if (card.base_attack == null) card.base_attack = card.attack;
-  if (card.base_defense == null) card.base_defense = card.defense;
-  if (card.peak_defense == null) card.peak_defense = card.defense;
+  // remember peak defense for restore mechanics
+  if (card.peak_defense == null) card.peak_defense = card.defense as number;
 
   // apply keyword booleans/params
   applyKeywordsFromList(card);
@@ -69,3 +67,18 @@ export function initAmulet(card: CardInstance) {
     card.countdown = Number(card.countdown || 0);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -147,10 +147,25 @@ export function evalCommonConditions(
   // 11. Super Evolution Unlocked (for triggers/gates)
   if (cond.super_evolution_unlocked) {
     // From evolveUtils: Blue >= 7, Red >= 6
-    const isBlue = owner === "blue";
+    const isBlue = owner === "first";
     const unlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
     if (!unlocked) return false;
   }
 
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,15 +1,16 @@
 import { state } from "../../../../core/gameState.js";
 
 import { CardInstance, Player } from "../../../../core/types.js";
+import { getBoard, getDeck } from "../../../../core/playerHelpers.js";
 
 // =============== Utilities ===============
 
 export function boardOf(owner: Player) {
-  return owner === "blue" ? state.blueBoard : state.redBoard;
+  return getBoard(state, owner);
 }
 
 export function deckOf(owner: Player) {
-  return owner === "blue" ? state.blueDeck : state.redDeck;
+  return getDeck(state, owner);
 }
 
 export function normalizeName(s: string) {
@@ -60,3 +61,18 @@ export function safeClone<T>(value: T, seen = new WeakSet<object>()): T {
   }
   return out as T;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

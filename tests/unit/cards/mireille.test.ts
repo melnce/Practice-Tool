@@ -18,11 +18,11 @@ describe("Mireille & Risette Fix", () => {
     (globalThis as any).requestAnimationFrame = (cb: any) => setTimeout(cb, 1);
     (globalThis as any).cancelAnimationFrame = (id: any) => clearTimeout(id);
     state.lastSummoned = [];
-    state.blueBoard = [];
+    state.players.first.board = [];
   });
 
   it("handleEvolveLastSummoned should evolve only cards in state.lastSummoned", () => {
-    const owner = "blue";
+    const owner = "first";
 
     // Mock Cards
     const token = {
@@ -86,3 +86,9 @@ describe("Mireille & Risette Fix", () => {
     expect(subEffects[1].target).toBe("self");
   });
 });
+
+
+
+
+
+

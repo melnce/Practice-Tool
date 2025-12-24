@@ -7,13 +7,14 @@ import { fireTrigger } from "../../core/triggers.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../core/logger.js";
-import { CardInstance, Effect, Player } from "../../../core/types.js";
+import { CardInstance, Effect, Player, EffectContext } from "../../../core/types.js";
+import { getBoard, getHand, getGraveyard, opponentOf } from "../../../core/playerHelpers.js";
 
 // Create a fresh base copy (new uid)
 function freshBaseCopyByName(name: string) {
   const base = getCardDetails(name);
   if (!base) return null;
-  const copy = JSON.parse(JSON.stringify(base));
+  const copy = structuredClone(base);
   copy.uid = state.rng.makeUid();
   return copy;
 }
@@ -22,20 +23,22 @@ function freshBaseCopyByName(name: string) {
 export function bounceToHand(card: CardInstance) {
   let fromArr = null;
   let toHand = null;
-  let owner: Player | null = null; // FIX: Declare the 'owner' variable.
+  let owner: Player | null = null;
 
-  const bi = state.blueBoard.indexOf(card);
-  const ri = state.redBoard.indexOf(card);
+  const firstBoard = getBoard(state, "first");
+  const secondBoard = getBoard(state, "second");
+  const bi = firstBoard.indexOf(card);
+  const ri = secondBoard.indexOf(card);
 
-  // FIX: Determine the owner based on which board the card was on.
+  // Determine the owner based on which board the card was on.
   if (bi !== -1) {
-    fromArr = state.blueBoard;
-    toHand = state.blueHand;
-    owner = "blue";
+    fromArr = firstBoard;
+    toHand = getHand(state, "first");
+    owner = "first";
   } else if (ri !== -1) {
-    fromArr = state.redBoard;
-    toHand = state.redHand;
-    owner = "red";
+    fromArr = secondBoard;
+    toHand = getHand(state, "second");
+    owner = "second";
   } else {
     console.warn(
       `[BounceToHand] Card ${card.name}#${card.uid} not found on any board! bi=${bi} ri=${ri}`,
@@ -43,8 +46,10 @@ export function bounceToHand(card: CardInstance) {
     return; // Card not on a board; ignore.
   }
 
-  // FIX: Call the trigger now that 'owner' is correctly defined.
-  fireTrigger("follower_leaves_field", owner);
+  // Fire ally trigger for owner, enemy trigger for opponent
+  const opponent = opponentOf(owner);
+  fireTrigger("ally_follower_leaves_field", owner);
+  fireTrigger("enemy_follower_leaves_field", opponent);
 
   const [removed] = fromArr.splice(fromArr.indexOf(card), 1);
   if (!removed) return;
@@ -56,11 +61,7 @@ export function bounceToHand(card: CardInstance) {
   if (!pushed) {
     // Hand full -> Burn to graveyard
     // Shadowverse: Bounced cards that trigger burn go to graveyard (shadows +1)
-    // We push the 'fresh' copy or 'removed'? Rules say "discarded".
-    // Usually treated as "destroyed" from hand perspective, so 'fresh' is appropriate/safe.
-    let grave: CardInstance[] | null = null;
-    if (owner === "blue") grave = state.blueGraveyard;
-    else if (owner === "red") grave = state.redGraveyard;
+    const grave = owner ? getGraveyard(state, owner) : null;
 
     if (grave) {
       fresh.zone = "graveyard";
@@ -82,14 +83,9 @@ export function handleReturnToHand(
   eff: Effect,
   owner: Player,
   sourceCard: CardInstance | null,
-  effectsQueue: any,
-  context: any = {},
+  effectsQueue: Effect[],
+  context: EffectContext = {},
 ) {
-  // allow followers + amulets by default; narrow if filters.type is given
-  console.log(
-    `[BounceOp] HandleReturnToHand Target=${eff.target} Owner=${owner} Source=${sourceCard?.name}#${sourceCard?.uid}`,
-  );
-
   let pool = getPool(
     eff.target as any,
     owner,
@@ -97,7 +93,6 @@ export function handleReturnToHand(
     eff.condition,
     context,
   ).filter((c) => c.type === "Follower" || c.type === "Amulet");
-  console.log(`[BounceOp] Pool size after init: ${pool.length}`);
 
   if ((eff as any).filters?.type) {
     const want = String((eff as any).filters.type).toLowerCase();
@@ -134,3 +129,18 @@ export function handleReturnToHand(
   // non-select → bounce all matching
   for (const t of pool) bounceToHand(t);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

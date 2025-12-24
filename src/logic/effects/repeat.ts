@@ -2,6 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../core/types.js";
+import { getHand, getCrests } from "../../core/playerHelpers.js";
 
 export function handleRepeatEffect(
   eff: Effect,
@@ -15,7 +16,7 @@ export function handleRepeatEffect(
   switch (eff.count_source) {
     case "count_in_hand":
       if (eff.filter?.tribe) {
-        const hand = owner === "blue" ? state.blueHand : state.redHand;
+        const hand = getHand(state, owner);
         count = hand.filter(
           (c) =>
             Array.isArray(c.tribes) && c.tribes.includes(eff.filter!.tribe!),
@@ -25,9 +26,7 @@ export function handleRepeatEffect(
 
     // NEW: number of crests you have
     case "crest_count":
-      count =
-        ((owner === "blue" ? state.blueCrests : state.redCrests) || []).length |
-        0;
+      count = (getCrests(state, owner) || []).length | 0;
       break;
 
     default:
@@ -39,6 +38,21 @@ export function handleRepeatEffect(
   }
 
   for (let i = 0; i < count; i++) {
-    effectsQueue.push(JSON.parse(JSON.stringify(eff.effect)));
+    effectsQueue.push(structuredClone(eff.effect));
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

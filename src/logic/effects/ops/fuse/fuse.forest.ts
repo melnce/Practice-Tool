@@ -1,16 +1,16 @@
 // src/logic/effects/ops/fuse/fuse.forest.ts
 import { state } from "../../../../core/gameState.js";
-import { adapter } from "../../../../core/adapter.js";
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
+import { getHand, getGraveyard } from "../../../../core/playerHelpers.js";
 
 function handOf(owner: Player) {
-  return owner === "blue" ? state.blueHand : state.redHand;
+  return getHand(state, owner);
 }
 
 function graveOf(owner: Player) {
-  return owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  return getGraveyard(state, owner);
 }
 
 function alreadyFusedThisTurn(card: CardInstance) {
@@ -29,7 +29,7 @@ export function fuse_finalize_gardens_allure(
   const initiator = hand.find((c) => c?.uid === initiator_uid);
   if (!initiator) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -41,7 +41,7 @@ export function fuse_finalize_gardens_allure(
       initiator: initiator?.name,
     });
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return "done";
   }
 
@@ -72,5 +72,20 @@ export function fuse_finalize_gardens_allure(
   });
 
   clearSelectableFlags();
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

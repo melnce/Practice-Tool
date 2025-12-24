@@ -19,9 +19,9 @@ async function runTest() {
     const { onEvolve } = await import("../../src/logic/evolveUtils.js");
 
     // Setup State
-    createInitialState();
-    state.activePlayer = "blue";
-    state.isBlueTurn = true;
+    createInitialState(1);
+    state.activePlayer = "first";
+    state.isFirstPlayerTurn = true;
     state.turnNumber = 1;
 
     // Load Suframare data manually from disk
@@ -47,15 +47,15 @@ async function runTest() {
     if (!suframareBase) throw new Error("Card getCardDetails returned null after injection");
     // Cast to any to set uid
     (suframareBase as any).uid = "suframare_1";
-    (suframareBase as any).owner = "blue";
+    (suframareBase as any).owner = "first";
 
     // @ts-ignore
-    state.blueBoard = [suframareBase];
+    state.players.first.board = [suframareBase];
 
     // Add a spellboostable card to hand
-    const spell = { uid: "spell_1", name: "Insight", type: "Spell", cost: 1, properties: {}, keywords: ["Spellboost"], triggers: [], owner: "blue", zone: "hand", spellboostCount: 0 };
+    const spell = { uid: "spell_1", name: "Insight", type: "Spell", cost: 1, properties: {}, keywords: ["Spellboost"], triggers: [], owner: "first", zone: "hand", spellboostCount: 0 };
     // @ts-ignore
-    state.blueHand = [spell];
+    state.players.first.hand = [spell];
 
     console.log("--- TEST START ---");
     console.log("Initial Hand Spellboost:", spell.spellboostCount);
@@ -66,7 +66,7 @@ async function runTest() {
     console.log("Set Suframare ATK to 1.");
 
     console.log("Triggering EOT (Suframare ATK: 1)...");
-    fireTrigger("end_of_turn", "blue", {});
+    fireTrigger("end_of_turn", "first", {});
     console.log("Hand Spellboost (Expected 1):", spell.spellboostCount);
 
     // Buff Suframare
@@ -75,13 +75,13 @@ async function runTest() {
 
     // Trigger EOT again
     console.log("Triggering EOT (Suframare ATK: 5)...");
-    fireTrigger("end_of_turn", "blue", {});
+    fireTrigger("end_of_turn", "first", {});
     // Should be 1 (prev) + 5 = 6
     console.log("Hand Spellboost (Expected 6):", spell.spellboostCount);
 
     // Evolve Test
     console.log("Evolving Suframare...");
-    onEvolve(suframareBase as any, "blue", "normal");
+    onEvolve(suframareBase as any, "first", "normal");
 
     console.log("Keywords:", (suframareBase as any).keywords);
     const hasCantAttack = (suframareBase as any).keywords?.includes("cant_attack");
@@ -96,9 +96,15 @@ async function runTest() {
 
     console.log("Super-Evolving Suframare...");
     (suframareBase as any).evoType = "super";
-    onEvolve(suframareBase as any, "blue", "super", { spendPoint: false });
+    onEvolve(suframareBase as any, "first", "super", { spendPoint: false });
     const hasCantAttackSuper = (suframareBase as any).keywords?.includes("cant_attack");
     console.log("Has CantAttack keyword (Super):", hasCantAttackSuper);
 }
 
 runTest().then(() => console.log("TEST COMPLETED SUCCESSFULLY")).catch(e => { console.error(e); process.exit(1); });
+
+
+
+
+
+

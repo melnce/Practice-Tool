@@ -6,6 +6,7 @@ import { setPendingTarget } from "../core/pendingTarget/index.js";
 
 import { logEvent } from "../../core/logger.js";
 import { Player, Effect } from "../../core/types.js";
+import { getHand, getGraveyard, addShadows, isFirstPlayer } from "../../core/playerHelpers.js";
 
 // ========================================================================
 // UNIFIED DISCARD HANDLER - routes by mode field
@@ -38,8 +39,8 @@ export function handleDiscard(
 export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
   const names = ((eff as any).names || (eff as any).name || []).map(String);
   const keepSet = new Set(names);
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
-  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const hand = getHand(state, owner);
+  const grave = getGraveyard(state, owner);
 
   let discarded = 0;
 
@@ -55,8 +56,7 @@ export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
 
   if (discarded > 0) {
     logEvent("discard", { owner, count: discarded });
-    if (owner === "blue") state.blueShadows += discarded;
-    else state.redShadows += discarded;
+    addShadows(state, owner, discarded);
   }
 }
 
@@ -70,7 +70,7 @@ export function handleDiscardSelectHand(
   resumeEffects: Effect[] = [],
 ) {
   const n = Math.max(0, parseInt((eff.count as any) ?? 1, 10));
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   if (n <= 0 || hand.length === 0) return;
 
   const selectCount = Math.min(n, hand.length);
@@ -93,3 +93,18 @@ export function handleDiscardSelectHand(
 }
 
 // Legacy handleTransformInHand was removed - now handled by unified transform op with zone: "hand"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

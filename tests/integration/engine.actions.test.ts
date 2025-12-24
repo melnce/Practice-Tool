@@ -38,7 +38,7 @@ describe("Engine Actions", () => {
     document.body.innerHTML = slots
       .map((id) => {
         if (id.includes("Select"))
-          return `<select id="${id}"><option value="sample_${id.includes("blue") ? "blue" : "red"}">D</option></select>`;
+          return `<select id="${id}"><option value="sample_${id.includes("first") ? "first" : "second"}">D</option></select>`;
         if (id.includes("Input")) return `<input id="${id}" value="123" />`;
         return `<div id="${id}"></div>`;
       })
@@ -62,37 +62,43 @@ describe("Engine Actions", () => {
 
     // Find a playable card in Blue's hand (assuming generic low cost or cheat PP)
     // For test stability, let's give infinite PP
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
 
-    const cardToPlay = state.blueHand[0];
+    const cardToPlay = state.players.first.hand[0];
     expect(cardToPlay).toBeDefined();
-    const initialHandSize = state.blueHand.length;
+    const initialHandSize = state.players.first.hand.length;
 
     // 2. Dispatch PLAY_CARD
     dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: cardToPlay.uid,
     });
 
     // 3. Assert
     // Card should be gone from hand
-    expect(state.blueHand.length).toBe(initialHandSize - 1);
+    expect(state.players.first.hand.length).toBe(initialHandSize - 1);
     expect(
-      state.blueHand.find((c) => c.uid === cardToPlay.uid),
+      state.players.first.hand.find((c) => c.uid === cardToPlay.uid),
     ).toBeUndefined();
 
     // Card should be in board (if follower/amulet) or graveyard (if spell)
     // determining type...
     if (cardToPlay.type === "Spell") {
       expect(
-        state.blueGraveyard.find((c) => c.uid === cardToPlay.uid),
+        state.players.first.graveyard.find((c) => c.uid === cardToPlay.uid),
       ).toBeDefined();
     } else {
       expect(
-        state.blueBoard.find((c) => c.uid === cardToPlay.uid),
+        state.players.first.board.find((c) => c.uid === cardToPlay.uid),
       ).toBeDefined();
     }
   });
 });
+
+
+
+
+
+

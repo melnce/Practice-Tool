@@ -111,3 +111,18 @@ export function dedupeEarthSigils(board: CardInstance[]) {
     mergeSigils(board, sediments);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

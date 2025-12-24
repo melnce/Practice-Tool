@@ -8,6 +8,7 @@ import { fireTrigger } from "../triggers.js";
 import { pushPlayedHistory } from "./history.js";
 import { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
+import { incrementRally, getBoard, opponentOf } from "../../../core/playerHelpers.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -37,8 +38,7 @@ export function playFollower(
     card.fanfare.some((e: any) => String(e.op).toLowerCase() === "rally_gate");
 
   if (!hasRallyFanfare) {
-    if (player === "blue") state.blueRally++;
-    else state.redRally++;
+    incrementRally(state, player);
   }
 
   if ((card as any).base_attack === undefined)
@@ -54,15 +54,17 @@ export function playFollower(
   card.justPlayed = true;
   card.hasAttacked = false;
 
-  const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
+  const toBoard = getBoard(state, player);
   toBoard.push(card);
 
+  // Fire ally trigger for owner, enemy trigger for opponent
+  const opponent = opponentOf(player);
   fireTrigger("ally_follower_played", player as any, {
     playedCard: card,
     costChanged: costChangedOnPlay,
   });
   fireTrigger("ally_follower_enter", player as any, { enteringCard: card });
-  fireTrigger("enemy_follower_enter", player as any, { enteringCard: card });
+  fireTrigger("enemy_follower_enter", opponent as any, { enteringCard: card });
 
   // Fanfare
   const skipFanfareForEnhance =
@@ -94,7 +96,7 @@ export function playFollower(
   card.isRush = !!card.hasRush && !card.hasStorm;
 
   // Ally-enter amulets (e.g. Ancestral Crown)
-  const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
+  const myBoard = getBoard(state, player);
   for (const perm of myBoard) {
     if (perm === card || perm.type !== "Amulet") continue;
 
@@ -132,3 +134,18 @@ export function playFollower(
 
   return { kind: "done" };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

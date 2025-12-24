@@ -4,6 +4,7 @@ import { TriggerContext, TriggerEventName } from "./triggers/types.js";
 import { dispatchEvent } from "./triggers/dispatcher.js";
 import { registerRunEffectsInProcess } from "./triggers/process.js";
 import { handleLootFusedDedupe } from "./triggers/tracking.js";
+import { getBoard, getCrests } from "../../core/playerHelpers.js";
 
 // Re-export for external consumers if needed
 export type { TriggerContext } from "./triggers/types.js";
@@ -41,7 +42,7 @@ export function fireTrigger(
 ) {
   const _turnToken = Number.isFinite(state.turnNumber)
     ? state.turnNumber
-    : (state.roundCount || 0) * 2 + (state.isBlueTurn ? 0 : 1);
+    : (state.roundCount || 0) * 2 + (state.activePlayer === "first" ? 0 : 1);
 
   // Enhance context with turn info for internal modules
   // Using a non-enumerable or specific prop to pass this down
@@ -59,10 +60,10 @@ export function fireTrigger(
   if (context.enteringOwner === undefined) {
     const enteringCard = context.enteringCard ?? context.invokedCard ?? null;
     if (enteringCard) {
-      context.enteringOwner = state.blueBoard.includes(enteringCard)
-        ? "blue"
-        : state.redBoard.includes(enteringCard)
-          ? "red"
+      context.enteringOwner = getBoard(state, "first").includes(enteringCard)
+        ? "first"
+        : getBoard(state, "second").includes(enteringCard)
+          ? "second"
           : null;
     } else {
       context.enteringOwner = null;
@@ -75,6 +76,21 @@ export function fireTrigger(
 
 // Helper kept for compatibility/utility if used externally, though not used in refactor
 export function hasCrest(player: Player, crestName: string) {
-  const crests = player === "blue" ? state.blueCrests : state.redCrests;
+  const crests = getCrests(state, player);
   return crests.some((c: any) => c.name === crestName);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -45,7 +45,7 @@ export function handleSummon(
 
   // Resolve target owner
   const targetOwner: Player =
-    spec.owner === "enemy" ? (owner === "blue" ? "red" : "blue") : owner;
+    spec.owner === "enemy" ? (owner === "first" ? "second" : "first") : owner;
 
   // ========================================================================
   // MODE-BASED ROUTING (takes precedence)
@@ -176,3 +176,18 @@ function handleReanimateWrapper(
   // Default reanimate behavior
   handleReanimate(eff, owner);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

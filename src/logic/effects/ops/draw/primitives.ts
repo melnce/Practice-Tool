@@ -5,6 +5,7 @@ import { state } from "../../../../core/gameState.js";
 import { pushToHand, MAX_HAND } from "../../../../core/utils.js";
 import { applyKeyword } from "../../../core/keywords.js";
 import { Player, CardInstance } from "../../../../core/types.js";
+import { getDeck as getDeckHelper, getHand as getHandHelper, getPlaysThisTurn } from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // DECK OPERATIONS
@@ -24,14 +25,14 @@ export function removeFromDeck(
  * Get deck for player.
  */
 export function getDeck(player: Player): CardInstance[] {
-  return player === "blue" ? state.blueDeck : state.redDeck;
+  return getDeckHelper(state, player);
 }
 
 /**
  * Get hand for player.
  */
 export function getHand(player: Player): CardInstance[] {
-  return player === "blue" ? state.blueHand : state.redHand;
+  return getHandHelper(state, player);
 }
 
 // ============================================================================
@@ -85,7 +86,20 @@ export function trackLastDrawn(card: CardInstance): void {
  * Get current combo count for player.
  */
 export function getComboCount(player: Player): number {
-  return player === "blue"
-    ? state.bluePlaysThisTurn || 0
-    : state.redPlaysThisTurn || 0;
+  return getPlaysThisTurn(state, player);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

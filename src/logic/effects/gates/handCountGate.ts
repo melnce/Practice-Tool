@@ -1,6 +1,7 @@
 // src/logic/effects/gates/handCountGate.ts
 import { state } from "../../../core/gameState.js";
 import { Player } from "../../../core/types.js";
+import { getHand, opponentOf } from "../../../core/playerHelpers.js";
 
 /**
  * Simple hand-size gate (NOT combo).
@@ -14,9 +15,9 @@ import { Player } from "../../../core/types.js";
 export function handCountGate(owner: Player, eff: any) {
   const cond = eff?.condition || {};
   const side =
-    cond.owner === "opponent" ? (owner === "blue" ? "red" : "blue") : owner;
+    cond.owner === "opponent" ? opponentOf(owner) : owner;
 
-  const n = (side === "blue" ? state.blueHand : state.redHand)?.length || 0;
+  const n = getHand(state, side)?.length || 0;
 
   const v = Number(cond.value ?? 0);
   const op = String(cond.op || "").trim();
@@ -38,3 +39,18 @@ export function handCountGate(owner: Player, eff: any) {
       return false;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

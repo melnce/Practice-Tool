@@ -4,26 +4,26 @@
 // Core/replay code never imports this module.
 // ─────────────────────────────────────────────────────────────────────────────
 import { state } from "../core/gameState.js";
-import { adapter } from "../core/adapter.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
 import { Player } from "../core/types.js";
+import { getHand, getDeck, isFirstPlayer, getDeckFile } from "../core/playerHelpers.js";
 
 function ownerZones(owner: Player) {
   return {
-    hand: owner === "blue" ? state.blueHand : state.redHand,
-    deck: owner === "blue" ? state.blueDeck : state.redDeck,
+    hand: getHand(state, owner),
+    deck: getDeck(state, owner),
   };
 }
 
 export function beginMulligan() {
   // Skip mulligan entirely if testing deck is used by either side
+  const firstDeckFile = getDeckFile(state, "first");
+  const secondDeckFile = getDeckFile(state, "second");
   const usingTestDeck =
-    (state.blueDeckFile &&
-      state.blueDeckFile.toLowerCase().includes("0_testing_")) ||
-    (state.redDeckFile &&
-      state.redDeckFile.toLowerCase().includes("0_testing_"));
+    (firstDeckFile && firstDeckFile.toLowerCase().includes("0_testing_")) ||
+    (secondDeckFile && secondDeckFile.toLowerCase().includes("0_testing_"));
 
   if (usingTestDeck) {
     console.log("[MULLIGAN] Skipping mulligan for testing deck");
@@ -34,17 +34,17 @@ export function beginMulligan() {
   // Normal mulligan flow
   logEvent("mulliganStart", {});
   state.phase = "mulligan";
-  state.mulliganStage = "blue";
-  state.mulliganBlueSelected = new Set();
-  state.mulliganRedSelected = new Set();
+  state.mulliganStage = "first";
+  state.mulliganFirstSelected = new Set();
+  state.mulliganSecondSelected = new Set();
 
-  [...state.blueHand, ...state.redHand].forEach((c) => {
+  [...getHand(state, "first"), ...getHand(state, "second")].forEach((c) => {
     delete (c as any).__mulliganSelectable;
     delete (c as any).__mulliganSelected;
   });
 
-  markSelectable("blue");
-  adapter.render();
+  markSelectable("first");
+  // Render removed - UI layer
   showMulliganUI();
 }
 
@@ -72,14 +72,17 @@ function clearSelectable(owner: Player) {
 
 export function toggleMulliganPick(owner: Player, uid: string) {
   if (state.phase !== "mulligan") return;
+  // Stage must match the owner slot directly
   if (state.mulliganStage !== owner) return;
 
   const { hand } = ownerZones(owner);
   const card = hand.find((c) => c.uid === uid);
   if (!card || !(card as any).__mulliganSelectable) return;
 
-  const bag =
-    owner === "blue" ? state.mulliganBlueSelected : state.mulliganRedSelected;
+  const bag = isFirstPlayer(owner)
+    ? state.mulliganFirstSelected
+    : state.mulliganSecondSelected;
+  if (!bag) return;
 
   if ((card as any).__mulliganSelected) {
     (card as any).__mulliganSelected = false;
@@ -90,7 +93,7 @@ export function toggleMulliganPick(owner: Player, uid: string) {
     (card as any).__mulliganSelected = true;
     bag.add(uid);
   }
-  adapter.render();
+  // Render removed - UI layer
 }
 
 export function confirmMulligan(owner: Player) {
@@ -102,12 +105,13 @@ export function confirmMulligan(owner: Player) {
         stage: state.mulliganStage,
       });
       if (state.phase !== "mulligan") return;
+      // Stage must match the owner slot directly
       if (state.mulliganStage !== owner) return;
 
-      const bag =
-        owner === "blue"
-          ? state.mulliganBlueSelected
-          : state.mulliganRedSelected; // fix typo
+      const bag = isFirstPlayer(owner)
+        ? state.mulliganFirstSelected
+        : state.mulliganSecondSelected;
+      if (!bag) return;
       const { hand, deck } = ownerZones(owner);
 
       if (bag.size > 0) {
@@ -130,15 +134,15 @@ export function confirmMulligan(owner: Player) {
 
       logEvent("mulligan", { owner, kept: [...hand.map((c) => c.name)] });
 
-      // Clean flags on this owner’s hand
+      // Clean flags on this owner's hand
       clearSelectable(owner);
       bag.clear();
 
       // Next owner or start the game proper
-      if (owner === "blue") {
-        state.mulliganStage = "red";
-        markSelectable("red");
-        adapter.render();
+      if (isFirstPlayer(owner)) {
+        state.mulliganStage = "second";
+        markSelectable("second");
+        // Render removed - UI layer
         showMulliganUI();
       } else {
         // Both done → start first turn
@@ -151,50 +155,49 @@ export function confirmMulligan(owner: Player) {
 }
 
 function startFirstTurn() {
-  logEvent("startFirstTurn", { active: "blue" });
-  // Blue draws 1 as the first turn draw
-  const blueHand = state.blueHand;
-  const blueDeck = state.blueDeck;
-  drawCard(blueHand, blueDeck, "blue");
+  logEvent("startFirstTurn", { active: "first" });
+  // First player draws 1 as the first turn draw
+  const firstHand = getHand(state, "first");
+  const firstDeck = getDeck(state, "first");
+  drawCard(firstHand, firstDeck, "first");
 
   // Switch to main phase / normal turn rules
   state.phase = "main";
-  state.activePlayer = "blue";
-  state.isBlueTurn = true;
+  state.activePlayer = "first";
 
   // Cleanup UI
   hideMulliganUI();
 
-  adapter.render();
+  // Render removed - UI layer
 }
 
 // ---- Simple UI helpers (browser only) ----
 function showMulliganUI() {
-  const blueBtn = document.getElementById(
-    "blueMulliganConfirm",
+  const firstBtn = document.getElementById(
+    "blueMulliganConfirm",  // Keep DOM IDs for backward compatibility
   ) as HTMLButtonElement | null;
-  const redBtn = document.getElementById(
-    "redMulliganConfirm",
+  const secondBtn = document.getElementById(
+    "redMulliganConfirm",   // Keep DOM IDs for backward compatibility
   ) as HTMLButtonElement | null;
   document.body.classList.add("mulligan-active");
-  if (blueBtn) {
-    blueBtn.style.display =
-      state.mulliganStage === "blue" ? "inline-block" : "none";
-    blueBtn.disabled = false;
-    blueBtn.onclick = () => confirmMulligan("blue");
+  if (firstBtn) {
+    firstBtn.style.display =
+      state.mulliganStage === "first" ? "inline-block" : "none";
+    firstBtn.disabled = false;
+    firstBtn.onclick = () => confirmMulligan("first");
   }
-  if (redBtn) {
-    redBtn.style.display =
-      state.mulliganStage === "red" ? "inline-block" : "none";
-    redBtn.disabled = false;
-    redBtn.onclick = () => confirmMulligan("red");
+  if (secondBtn) {
+    secondBtn.style.display =
+      state.mulliganStage === "second" ? "inline-block" : "none";
+    secondBtn.disabled = false;
+    secondBtn.onclick = () => confirmMulligan("second");
   }
 }
 
 function hideMulliganUI() {
-  const blueBtn = document.getElementById("blueMulliganConfirm");
-  const redBtn = document.getElementById("redMulliganConfirm");
-  if (blueBtn) blueBtn.style.display = "none";
-  if (redBtn) redBtn.style.display = "none";
+  const firstBtn = document.getElementById("blueMulliganConfirm");
+  const secondBtn = document.getElementById("redMulliganConfirm");
+  if (firstBtn) firstBtn.style.display = "none";
+  if (secondBtn) secondBtn.style.display = "none";
   document.body.classList.remove("mulligan-active");
 }

@@ -3,7 +3,6 @@ import { logEvent } from "../../../../core/logger.js";
 
 import { CardInstance, Effect, Player } from "../../../../core/types.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
-import { adapter } from "../../../../core/adapter.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
 import { boardOf, deckOf } from "./utils.js";
 
@@ -95,5 +94,20 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
     owner,
     picks: state.lastSummoned.map((c) => c.name),
   });
-  adapter.render();
+  // Render removed - UI orchestrator handles rendering
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

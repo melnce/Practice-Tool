@@ -1,18 +1,19 @@
 // src/logic/effects/ops/counter/types.ts
 // Unified counter operation types
+// NOTE: Countdown operations (reduce_countdown, delay_countdown) are handled by countdown/unified.ts, NOT counter
 
-export type CounterAction = "add" | "reduce_countdown" | "increase_countdown";
+export type CounterAction = "add" | "spend" | "set";
 
 export interface UnifiedCounterSpec {
   op: "counter";
   action: CounterAction;
-  key?: string; // for "add" action - e.g. "earth"
+  key: string; // Counter key - e.g. "earth", "combo", "faith"
   amount?: number;
 }
 
 /**
  * Normalize legacy counter ops to unified format.
- * NOTE: This is for reference during migration - not runtime normalization.
+ * NOTE: Only handles counter ops. Countdown ops are in countdown/types.ts
  */
 export function normalizeToCounterSpec(eff: any): UnifiedCounterSpec {
   switch (eff.op) {
@@ -23,17 +24,19 @@ export function normalizeToCounterSpec(eff: any): UnifiedCounterSpec {
         key: eff.key,
         amount: eff.amount ?? 1,
       };
-    case "reduce_countdown":
+    case "spend_counter":
       return {
         op: "counter",
-        action: "reduce_countdown",
+        action: "spend",
+        key: eff.key,
         amount: eff.amount ?? 1,
       };
-    case "increase_countdown":
+    case "set_counter":
       return {
         op: "counter",
-        action: "increase_countdown",
-        amount: eff.amount ?? 1,
+        action: "set",
+        key: eff.key,
+        amount: eff.amount ?? 0,
       };
     case "counter":
       return eff as UnifiedCounterSpec;
@@ -41,3 +44,18 @@ export function normalizeToCounterSpec(eff: any): UnifiedCounterSpec {
       throw new Error(`Unknown counter op: ${eff.op}`);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,5 @@
 // src/logic/effects/ops/fuse/fuse.artifact.ts
 import { state } from "../../../../core/gameState.js";
-import { adapter } from "../../../../core/adapter.js";
 import {
   highlightSelectable,
   clearSelectableFlags,
@@ -11,9 +10,10 @@ import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
+import { getHand } from "../../../../core/playerHelpers.js";
 
 function handOf(owner: Player) {
-  return owner === "blue" ? state.blueHand : state.redHand;
+  return getHand(state, owner);
 }
 
 function alreadyFusedThisTurn(card: CardInstance) {
@@ -62,7 +62,7 @@ export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
   });
 
   highlightSelectable(pool);
-  adapter.render();
+  // Render removed - UI layer
   return "pending";
 }
 
@@ -78,7 +78,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
   );
   if (!pool.length) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -108,7 +108,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
   });
 
   highlightSelectable(pool);
-  adapter.render();
+  // Render removed - UI layer
   return "pending";
 }
 
@@ -147,7 +147,7 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
   });
 
   highlightSelectable(pool);
-  adapter.render();
+  // Render removed - UI layer
   return "pending";
 }
 
@@ -162,14 +162,14 @@ export function fuse_finalize_gear_multi(
   const iIdx = hand.findIndex((c) => c?.uid === initiatorUid);
   if (iIdx === -1) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   const initiator = hand[iIdx];
   if (!initiator) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -180,18 +180,18 @@ export function fuse_finalize_gear_multi(
       initiator: initiator?.name,
     });
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   const tmpl = getCardDetails(resultName);
   if (!tmpl) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
-  const result = JSON.parse(JSON.stringify(tmpl));
+  const result = structuredClone(tmpl);
   result.uid = state.rng.makeUid();
 
   hand[iIdx] = result;
@@ -224,7 +224,7 @@ export function fuse_finalize_gear_multi(
   });
 
   clearSelectableFlags();
-  adapter.render();
+  // Render removed - UI layer
 }
 
 export function fuse_finalize_fortifier(
@@ -236,14 +236,14 @@ export function fuse_finalize_fortifier(
   const iIdx = hand.findIndex((c) => c?.uid === initiatorUid);
   if (iIdx === -1) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   const initiator = hand[iIdx];
   if (!initiator) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -254,7 +254,7 @@ export function fuse_finalize_fortifier(
       initiator: initiator?.name,
     });
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -275,11 +275,11 @@ export function fuse_finalize_fortifier(
   const tmpl = getCardDetails(resultName);
   if (!tmpl) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
-  const newCard = JSON.parse(JSON.stringify(tmpl));
+  const newCard = structuredClone(tmpl);
   newCard.uid = state.rng.makeUid();
 
   hand[iIdx] = newCard;
@@ -309,7 +309,7 @@ export function fuse_finalize_fortifier(
   });
 
   clearSelectableFlags();
-  adapter.render();
+  // Render removed - UI layer
 }
 
 export function fuse_finalize_alpha(
@@ -321,14 +321,14 @@ export function fuse_finalize_alpha(
   const iIdx = hand.findIndex((c) => c?.uid === initiatorUid);
   if (iIdx === -1) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   const initiator = hand[iIdx];
   if (!initiator) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -339,7 +339,7 @@ export function fuse_finalize_alpha(
       initiator: initiator?.name,
     });
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -353,10 +353,10 @@ export function fuse_finalize_alpha(
     const tmpl = getCardDetails("Masterwork Artifact Ω");
     if (!tmpl) {
       clearSelectableFlags();
-      adapter.render();
+      // Render removed - UI layer
       return;
     }
-    const omega = JSON.parse(JSON.stringify(tmpl));
+    const omega = structuredClone(tmpl);
     omega.uid = state.rng.makeUid();
 
     hand[iIdx] = omega;
@@ -379,7 +379,7 @@ export function fuse_finalize_alpha(
     const partner0 = partners[0];
     if (!partner0) {
       clearSelectableFlags();
-      adapter.render();
+      // Render removed - UI layer
       return;
     }
     const pIdx = idxOf(partner0.uid);
@@ -424,5 +424,20 @@ export function fuse_finalize_alpha(
   }
 
   clearSelectableFlags();
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

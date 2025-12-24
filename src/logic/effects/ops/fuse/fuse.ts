@@ -1,6 +1,5 @@
 // src/logic/effects/ops/fuse/fuse.ts
 import { state } from "../../../../core/gameState.js";
-import { adapter } from "../../../../core/adapter.js";
 import {
   highlightSelectable,
   clearSelectableFlags,
@@ -11,6 +10,7 @@ import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player } from "../../../../core/types.js";
+import { getHand } from "../../../../core/playerHelpers.js";
 
 // Class-specific modules
 import {
@@ -38,7 +38,7 @@ export {
 
 // -------------------- shared helpers --------------------
 function handOf(owner: Player) {
-  return owner === "blue" ? state.blueHand : state.redHand;
+  return getHand(state, owner);
 }
 
 function alreadyFusedThisTurn(card: CardInstance | null) {
@@ -122,7 +122,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
       initiator: initiator?.name,
     });
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return "done";
   }
 
@@ -174,7 +174,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
       finalize: `fuse:${finalizeType}`,
     });
     highlightSelectable(info.pool);
-    adapter.render();
+    // Render removed - UI layer
     return "pending";
   }
 
@@ -206,7 +206,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
     finalize: info?.recipe?.finalize_op || "fuse_finalize_generic",
   });
   highlightSelectable(info.pool);
-  adapter.render();
+  // Render removed - UI layer
   return "pending";
 }
 
@@ -223,7 +223,7 @@ export function fuse_finalize_generic(
   const pIdx = hand.findIndex((c) => c?.uid === partnerCard?.uid);
   if (iIdx === -1 || pIdx === -1) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -231,7 +231,7 @@ export function fuse_finalize_generic(
   const pCard = hand[pIdx];
   if (!iCard || !pCard) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -249,25 +249,25 @@ export function fuse_finalize_generic(
       result_name: "wasted",
     };
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   if (!resultSpec || resultSpec.type !== "transform") {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   const tmpl = getCardDetails(resultSpec.result_card_name);
   if (!tmpl) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   const mk = () => {
-    const c = JSON.parse(JSON.stringify(tmpl));
+    const c = structuredClone(tmpl);
     c.uid = state.rng.makeUid();
     return c;
   };
@@ -324,5 +324,20 @@ export function fuse_finalize_generic(
     targets,
   });
   clearSelectableFlags();
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

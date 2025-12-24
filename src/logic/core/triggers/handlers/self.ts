@@ -27,7 +27,7 @@ export function handleDamageEvent(
       const cond = trigger.condition || {};
       if (
         cond.still_alive &&
-        (parseInt(cand.card.defense as string, 10) || 0) <= 0
+        (parseInt((cand.card as any).defense as string, 10) || 0) <= 0
       )
         return false;
       if (cond.own_turn && cand.owner !== activePlayer) return false;
@@ -62,3 +62,18 @@ export function handleBuffEvent(
     },
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

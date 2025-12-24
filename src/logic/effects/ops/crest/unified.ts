@@ -1,33 +1,32 @@
 // src/logic/effects/ops/crest/unified.ts
-// Unified crest handler - replaces gain_crest, crest_add_counter, crest_pay_counter, destroy_crest, crest_advance_countdown
+// Unified crest handler - handles crest operations
 
 import { Effect, Player } from "../../../../core/types.js";
-import { adapter } from "../../../../core/adapter.js";
-import { logEvent } from "../../../../core/logger.js";
 import {
   handleGainCrest,
   crestAddCounter,
   crestSpendCounter,
-  removeCrest,
-  crestAdvanceCountdown,
-  crestIncreaseCountdown,
+  destroyCrest,
   completeCrest,
+  Crest,
 } from "../../crest.js";
 import { runEffects } from "../../../core/effects/index.js";
+import { handleCountdown } from "../countdown/unified.js";
 
 export interface CrestHandlerContext {
   owner: Player;
-  source?: any; // Optional: the crest object when in a crest trigger context
+  source?: Crest | null; // Optional: the crest object when in a crest trigger context
 }
 
 /**
  * Unified crest handler.
  * Routes to appropriate crest primitive based on action field.
+ * 
+ * Countdown operations are delegated to the unified countdown handler.
  */
 export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
   const action = (eff as any).action;
   const name = (eff as any).name || (eff as any).crest || "Main";
-  const target = (eff as any).target;
 
   switch (action) {
     case "gain": {
@@ -49,28 +48,15 @@ export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
       }
       break;
     }
-    case "advance_countdown": {
-      const amount = (eff as any).amount ?? 1;
-      // Support target: "self" for crest triggers
-      if (
-        target === "self" &&
-        ctx.source &&
-        Number.isFinite(ctx.source.countdown)
-      ) {
-        advanceCrestSelf(ctx.source, ctx.owner, amount);
-      } else {
-        crestAdvanceCountdown(ctx.owner, name, amount);
-      }
-      break;
-    }
-    case "increase_countdown": {
-      // Player-global: increases countdown of ALL crests
-      const amount = (eff as any).amount ?? 1;
-      crestIncreaseCountdown(ctx.owner, amount);
+    case "advance_countdown":
+    case "delay_countdown": {
+      // Route to unified countdown handler
+      handleCountdown(eff, { owner: ctx.owner, source: ctx.source });
       break;
     }
     case "destroy": {
-      removeCrest(ctx.owner, name);
+      // Destroy crest - Last Words fires automatically if present
+      destroyCrest(ctx.owner, name);
       break;
     }
     default:
@@ -78,21 +64,17 @@ export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
   }
 }
 
-/**
- * Advance (reduce) countdown of the source crest itself.
- * Used when target: "self" in crest trigger context.
- */
-function advanceCrestSelf(crest: any, owner: Player, amount: number): void {
-  crest.countdown -= amount;
-  logEvent("countdownChange", {
-    card: crest.name,
-    owner,
-    value: crest.countdown,
-  });
 
-  if (crest.countdown <= 0) {
-    completeCrest(crest, owner);
-  } else {
-    adapter.render();
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+

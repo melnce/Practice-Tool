@@ -6,6 +6,7 @@ import { banishCard } from "../effects/ops/banish/index.js";
 import { logEvent } from "../../core/logger.js";
 import { fireTrigger } from "./triggers.js";
 import { CardInstance, Player, Effect } from "../../core/types.js";
+import { isFirstPlayer, opponentOf, getBoard, getGraveyard, addShadows, getDestroyedHistory } from "../../core/playerHelpers.js";
 
 // Dependency Injection for runEffects
 let runEffects: (
@@ -71,30 +72,27 @@ export function cleanupDead() {
       logEvent("destroyQueued", { card: c.name, owner, type: c.type, cause });
 
       if (isFollower) {
-        // leave-field trigger - pass leavingOwner for is_ally condition
-        fireTrigger("follower_leaves_field", owner as any, {
+        // Fire ally trigger for the owner, enemy trigger for the opponent
+        const opponent = opponentOf(owner);
+        fireTrigger("ally_follower_leaves_field", owner as any, {
+          leavingOwner: owner,
+          leavingCard: c,
+        });
+        fireTrigger("enemy_follower_leaves_field", opponent as any, {
           leavingOwner: owner,
           leavingCard: c,
         });
 
-        // Shikigami bookkeeping (unchanged)
+        // Shikigami bookkeeping (track full card for Kuon effect)
         if (Array.isArray(c.tribes) && c.tribes.includes("Shikigami")) {
-          const aBase = parseInt(String(c.base_attack ?? c.attack)) || 0;
-          const dBase = parseInt(String(c.base_defense ?? c.defense)) || 0;
-          if (owner === "blue") {
-            if (!state.shikigamiDeathsThisTurnBlue)
-              state.shikigamiDeathsThisTurnBlue = [];
-            state.shikigamiDeathsThisTurnBlue.push({
-              attack: aBase,
-              defense: dBase,
-            });
+          if (isFirstPlayer(owner)) {
+            if (!state.players.first.shikigamiDeathsThisTurn)
+              state.players.first.shikigamiDeathsThisTurn = [];
+            state.players.first.shikigamiDeathsThisTurn.push(c);
           } else {
-            if (!state.shikigamiDeathsThisTurnRed)
-              state.shikigamiDeathsThisTurnRed = [];
-            state.shikigamiDeathsThisTurnRed.push({
-              attack: aBase,
-              defense: dBase,
-            });
+            if (!state.players.second.shikigamiDeathsThisTurn)
+              state.players.second.shikigamiDeathsThisTurn = [];
+            state.players.second.shikigamiDeathsThisTurn.push(c);
           }
         }
 
@@ -135,9 +133,9 @@ export function cleanupDead() {
           cost: Number(c?.cost) || 0,
           base_image: c?.base_image || null,
           ts: Date.now(),
+          id: c.id, // Preserve card id for history
         };
-        if (owner === "blue") state.blueDestroyedHistory.push(histEntry as any);
-        else state.redDestroyedHistory.push(histEntry as any);
+        getDestroyedHistory(state, owner).push(histEntry as any);
         // Remove from board before LWs
         board.splice(i, 1);
 
@@ -152,12 +150,26 @@ export function cleanupDead() {
         grave.push(c);
 
         // shadows
-        if (owner === "blue") state.blueShadows++;
-        else state.redShadows++;
+        addShadows(state, owner, 1);
       }
     }
   };
 
-  cleanSide(state.blueBoard, state.blueGraveyard, "blue");
-  cleanSide(state.redBoard, state.redGraveyard, "red");
+  cleanSide(getBoard(state, "first"), getGraveyard(state, "first"), "first");
+  cleanSide(getBoard(state, "second"), getGraveyard(state, "second"), "second");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

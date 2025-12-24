@@ -21,7 +21,7 @@ function getCard(id: string): CardInstance {
 
 describe("Scenario: Zone Movement Integrity", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   afterEach(() => {
@@ -32,49 +32,55 @@ describe("Scenario: Zone Movement Integrity", () => {
     const card = getCard("card_1");
 
     // 1. Start in Hand
-    placeInHand(card, "blue");
+    placeInHand(card, "first");
 
     expect(card.zone).toBe("hand");
-    expect(state.blueHand).toContain(card);
-    expect(state.blueBoard).not.toContain(card);
-    expect(state.blueGraveyard).not.toContain(card);
+    expect(state.players.first.hand).toContain(card);
+    expect(state.players.first.board).not.toContain(card);
+    expect(state.players.first.graveyard).not.toContain(card);
 
     // 2. Play to Board
     // Using direct helper to simulate operation effect, verifying state updates
-    placeOnBoard(card, "blue");
+    placeOnBoard(card, "first");
 
     expect(card.zone).toBe("board");
-    expect(state.blueHand).not.toContain(card); // Must be removed from hand
-    expect(state.blueBoard).toContain(card);
-    expect(state.blueGraveyard).not.toContain(card);
+    expect(state.players.first.hand).not.toContain(card); // Must be removed from hand
+    expect(state.players.first.board).toContain(card);
+    expect(state.players.first.graveyard).not.toContain(card);
 
     // 3. Destroy to Graveyard
-    placeInGraveyard(card, "blue");
+    placeInGraveyard(card, "first");
 
     expect(card.zone).toBe("graveyard");
-    expect(state.blueHand).not.toContain(card);
-    expect(state.blueBoard).not.toContain(card); // Must be removed from board
-    expect(state.blueGraveyard).toContain(card);
+    expect(state.players.first.hand).not.toContain(card);
+    expect(state.players.first.board).not.toContain(card); // Must be removed from board
+    expect(state.players.first.graveyard).toContain(card);
   });
 
   it("should handle opponent zone moves correctly", () => {
     const card = getCard("enemy_1");
 
     // Appear on enemy board
-    placeOnBoard(card, "red");
+    placeOnBoard(card, "second");
 
     expect(card.zone).toBe("board"); // Zone enum is usually just 'board', context implies owner
-    expect(state.redBoard).toContain(card);
-    expect(state.blueBoard).not.toContain(card);
+    expect(state.players.second.board).toContain(card);
+    expect(state.players.first.board).not.toContain(card);
 
     // Banish (remove from board, do not add to grave)
     // (Simulating banish logic manually)
-    const idx = state.redBoard.indexOf(card);
-    state.redBoard.splice(idx, 1);
+    const idx = state.players.second.board.indexOf(card);
+    state.players.second.board.splice(idx, 1);
     card.zone = "void"; // Banish/Void
 
-    expect(state.redBoard).not.toContain(card);
-    expect(state.redGraveyard).not.toContain(card);
+    expect(state.players.second.board).not.toContain(card);
+    expect(state.players.second.graveyard).not.toContain(card);
     expect(card.zone).toBe("void");
   });
 });
+
+
+
+
+
+

@@ -11,6 +11,7 @@ import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
 import { applyKeywordsFromList } from "../keywords.js";
 
 import { initAmulet } from "../../effects/ops/summon_ops/init.js";
+import { getBoard } from "../../../core/playerHelpers.js";
 
 /**
  * Play an amulet card. Returns PlayOutcome without rendering.
@@ -24,7 +25,7 @@ export function playAmulet(
   initAmulet(card);
   applyKeywordsFromList(card);
 
-  const toBoard = player === "blue" ? state.blueBoard : state.redBoard;
+  const toBoard = getBoard(state, player);
   toBoard.push(card);
 
   mergeWitchsNewBrewOnPlay(card, player);
@@ -51,3 +52,18 @@ export function playAmulet(
 
   return { kind: "done" };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

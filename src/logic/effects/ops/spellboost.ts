@@ -1,10 +1,10 @@
 // src/logic/effects/ops/spellboost.ts
 import { state } from "../../../core/gameState.js";
-import { adapter } from "../../../core/adapter.js";
 // Legacy spellboost transform removed: getCardDetails import no longer needed
 
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance } from "../../../core/types.js";
+import { getHand } from "../../../core/playerHelpers.js";
 
 // CIRCULAR DEPENDENCY FIX:
 let runEffects: any = null;
@@ -94,7 +94,7 @@ export function spellboostHand(
   times: any = 1,
   targetCard: any = null,
 ) {
-  if (owner !== "blue" && owner !== "red") return;
+  if (owner !== "first" && owner !== "second") return;
 
   // Signature normalization
   // If the second argument looks like a card (has uid), treat it as targetCard
@@ -114,7 +114,7 @@ export function spellboostHand(
   }
 
   const t = normTimes(times);
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
 
   for (let i = 0; i < t; i++) {
     // --- Single-card spellboost path ---
@@ -196,5 +196,20 @@ export function spellboostHand(
     }
   }
 
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

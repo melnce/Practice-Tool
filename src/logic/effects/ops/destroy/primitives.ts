@@ -5,6 +5,7 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
 import { runEffects } from "../../../core/effects/index.js";
+import { getBoard as getBoardHelper, getGraveyard as getGraveyardHelper, addShadows } from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // PROTECTION CHECKS
@@ -14,7 +15,7 @@ import { runEffects } from "../../../core/effects/index.js";
  * Check if card is on owner's board.
  */
 export function isAlly(card: CardInstance, owner: Player): boolean {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoardHelper(state, owner);
   return board?.includes(card) ?? false;
 }
 
@@ -53,8 +54,8 @@ export function canBeDestroyed(card: CardInstance, owner: Player): boolean {
  * Infer owner from board position.
  */
 export function inferCardOwner(card: CardInstance): Player | null {
-  if (state.blueBoard.includes(card)) return "blue";
-  if (state.redBoard.includes(card)) return "red";
+  if (getBoardHelper(state, "first").includes(card)) return "first";
+  if (getBoardHelper(state, "second").includes(card)) return "second";
   return null;
 }
 
@@ -99,9 +100,8 @@ export function destroyTarget(
 
   // Amulet destroy - move to graveyard + Last Words
   if (target.type === "Amulet") {
-    const board = cardOwner === "blue" ? state.blueBoard : state.redBoard;
-    const grave =
-      cardOwner === "blue" ? state.blueGraveyard : state.redGraveyard;
+    const board = getBoardHelper(state, cardOwner);
+    const grave = getGraveyardHelper(state, cardOwner);
     const idx = board.indexOf(target);
 
     if (idx === -1) return false;
@@ -113,8 +113,7 @@ export function destroyTarget(
     grave.push(removed);
 
     // Add shadow
-    if (cardOwner === "blue") state.blueShadows++;
-    else state.redShadows++;
+    addShadows(state, cardOwner, 1);
 
     // Fire Last Words
     fireLastWords(removed, cardOwner);
@@ -140,9 +139,24 @@ export function fireLastWords(card: CardInstance, owner: Player): void {
 // ============================================================================
 
 export function getBoard(owner: Player): CardInstance[] {
-  return owner === "blue" ? state.blueBoard : state.redBoard;
+  return getBoardHelper(state, owner);
 }
 
 export function getGraveyard(owner: Player): CardInstance[] {
-  return owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  return getGraveyardHelper(state, owner);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

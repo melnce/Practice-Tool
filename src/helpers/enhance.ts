@@ -54,3 +54,17 @@ export function previewHandStats(card: CardInstance, availablePP: number) {
   }
   return { shownCost, atkDisp, defDisp, tier };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

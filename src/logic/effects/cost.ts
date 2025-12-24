@@ -3,6 +3,7 @@ import { state } from "../../core/gameState.js";
 import { getPool } from "../core/targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
+import { getHand, getDeck, opponentOf } from "../../core/playerHelpers.js";
 
 /**
  * Reduces the cost of the card that owns the effect.
@@ -82,8 +83,8 @@ export function handleSetCostSelf(
 }
 
 export function applyTempOpponentHandCostMod(owner: Player, amount: number) {
-  const opponent = owner === "blue" ? "red" : "blue";
-  const hand = opponent === "blue" ? state.blueHand : state.redHand;
+  const opponent = opponentOf(owner);
+  const hand = getHand(state, opponent);
 
   for (const card of hand) {
     // track base cost for safety
@@ -105,7 +106,7 @@ export function applyTempOpponentHandCostMod(owner: Player, amount: number) {
 }
 
 export function handleHalveDeckCost(owner: Player) {
-  const deck = owner === "blue" ? state.blueDeck : state.redDeck;
+  const deck = getDeck(state, owner);
   let changed = false;
 
   for (const card of deck) {
@@ -229,7 +230,7 @@ export function handleModifyCostPool(
 }
 
 export function reduceDeckFollowersCost(owner: Player, amount = 1) {
-  const deck = owner === "blue" ? state.blueDeck : state.redDeck;
+  const deck = getDeck(state, owner);
   let changed = false;
 
   for (const card of deck) {
@@ -250,3 +251,18 @@ export function reduceDeckFollowersCost(owner: Player, amount = 1) {
     logEvent("costChangeBulk", { owner, type: "reduceDeckFollowers", amount });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

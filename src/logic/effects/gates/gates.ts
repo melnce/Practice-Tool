@@ -4,6 +4,7 @@ import { hasNecromancy, spendShadows } from "../../../helpers/necromancy.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance, Effect } from "../../../core/types.js";
+import { isFirstPlayer, getBoard, getDeck, getRally, getMaxPP, getAnyAllyAttackedThisTurn } from "../../../core/playerHelpers.js";
 
 export function handleOverflowGate(owner: Player) {
   return isOverflow(owner);
@@ -14,20 +15,11 @@ export function handleSkyboundArtGate(
   eff: any,
   sourceCard: any,
 ) {
-  // Gauge = Current Turn (roundCount) + Evolves Witnessed
   const witnesses = sourceCard?.skyboundArtEvolvesWitnessed || 0;
   const gauge = (state.roundCount || 1) + witnesses;
   const req = parseInt(eff.requirement || eff.count || 10, 10);
 
-  console.log(
-    `[SkyboundGap] Gate Check: Turn=${state.roundCount} Witnessed=${witnesses} Gauge=${gauge} Req=${req} Card=${sourceCard?.name}`,
-  );
-
-  // If gauge met -> return true (gate passes)
-  if (gauge >= req) {
-    return true;
-  }
-  return false;
+  return gauge >= req;
 }
 
 export function handleNecromancyGate(owner: Player, eff: any) {
@@ -43,11 +35,8 @@ export function handleNecromancyGate(owner: Player, eff: any) {
 
 export function handleSuperEvoGate(owner: Player) {
   // Check if super evolution is unlocked for this player
-  if (owner === "blue") {
-    return state.roundCount >= 7; // Blue super evolve unlocks at round 7
-  } else {
-    return state.roundCount >= 6; // Red super evolve unlocks at round 6
-  }
+  // First player unlocks at round 7, second at round 6
+  return isFirstPlayer(owner) ? state.roundCount >= 7 : state.roundCount >= 6;
 }
 
 export function handleEvolvedSelfGate(
@@ -70,7 +59,7 @@ export function handleEvolvedSelfGate(
 
 export function amuletCountGate(owner: Player, eff: any) {
   const need = parseInt(eff.count ?? 0);
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   const amuletCount = (board || []).filter((c) => c.type === "Amulet").length;
   return amuletCount >= need;
 }
@@ -80,7 +69,7 @@ export function amuletCountGate(owner: Player, eff: any) {
  * This is often called a "Highlander" condition.
  */
 export function hasNoDuplicatesInDeck(owner: Player) {
-  const deck = owner === "blue" ? state.blueDeck : state.redDeck;
+  const deck = getDeck(state, owner);
   if (!deck || deck.length <= 1) {
     return true; // An empty or single-card deck has no duplicates.
   }
@@ -100,14 +89,10 @@ export function hasNoDuplicatesInDeck(owner: Player) {
 
 export function noAllyAttackedThisTurn(owner: Player) {
   // hard truth first: if anyone on this side attacked, block immediately
-  if (
-    owner === "blue"
-      ? !!state.blueAnyAllyAttackedThisTurn
-      : !!state.redAnyAllyAttackedThisTurn
-  ) {
+  if (getAnyAllyAttackedThisTurn(state, owner)) {
     return false;
   }
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
 
   // A follower is considered to have attacked this turn if ANY of these are true:
   // - attacks_used_this_turn > 0
@@ -138,7 +123,7 @@ export function handleBoardNameGate(
 ) {
   const want = String(eff.name || (eff as any).card_name || "").trim();
   if (!want) return;
-  const myBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+  const myBoard = getBoard(state, owner);
   const found = (myBoard || []).some((c) => String(c?.name) === want);
   if (found) {
     if (Array.isArray(eff.effects)) effectsQueue.unshift(...eff.effects!);
@@ -151,7 +136,7 @@ export function handleBothMaxPPGate(eff: Effect, effectsQueue: Effect[]) {
   const need = Number.isFinite((eff as any).at_least)
     ? (eff as any).at_least
     : 10;
-  const ok = state.blueMaxPP >= need && state.redMaxPP >= need;
+  const ok = getMaxPP(state, "first") >= need && getMaxPP(state, "second") >= need;
   const next = ok ? eff.effects || [] : eff.else_effects || [];
   if (next.length) {
     if (Array.isArray(effectsQueue)) {
@@ -173,7 +158,7 @@ export function handleMaxPPGate(
   const need = Number.isFinite((eff as any).at_least)
     ? (eff as any).at_least
     : 10;
-  const currentMax = owner === "blue" ? state.blueMaxPP : state.redMaxPP;
+  const currentMax = getMaxPP(state, owner);
   const ok = currentMax >= need;
   const next = ok ? eff.effects || [] : eff.else_effects || [];
   if (next.length) effectsQueue.unshift(...next);
@@ -185,7 +170,7 @@ export function handleRallyGate(
   effectsQueue: Effect[],
 ) {
   const need = parseInt(eff.count ?? 0);
-  const ownerRally = owner === "blue" ? state.blueRally : state.redRally;
+  const ownerRally = getRally(state, owner);
   if (ownerRally >= need) {
     effectsQueue.unshift(...(eff.effects || []));
   } else if (eff.else_effects) {
@@ -218,7 +203,7 @@ export function handleSuperEvolvedAlliedGate(
   eff: Effect,
   effectsQueue: Effect[],
 ) {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   const hasSuper = board.some(
     (c) => c.type === "Follower" && c.evoType === "super",
   );
@@ -231,10 +216,25 @@ export function handleEvolvedAlliedGate(
   eff: Effect,
   effectsQueue: Effect[],
 ) {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   const hasEvolved = board.some(
     (c) => c.type === "Follower" && (c.hasEvolved || c.evoType === "super"),
   );
   const next = (hasEvolved ? eff.effects : eff.else_effects) || [];
   if (next.length) effectsQueue.unshift(...next);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

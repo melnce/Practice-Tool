@@ -2,8 +2,9 @@
 import { state } from "./gameState.js";
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
-
 import { GameState } from "./types.js";
+import { validateGameState } from "./stateValidation.js";
+import { hashGameState, ReplayStep } from "./stateHash.js";
 
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
@@ -195,20 +196,64 @@ export function abortAction() {
   notify();
 }
 
+/** Options for doAction wrapper. */
+export interface DoActionOptions {
+  autoRender?: boolean;
+  /** If true, run invariant checks before/after action */
+  checkInvariants?: boolean;
+  /** If provided, push replay step with hashes */
+  replayLog?: ReplayStep[];
+}
+
 /** One-shot helper: wraps a mutation function into a Command. */
 export function doAction(
   name: string,
   fn: () => void,
   meta: any = {},
-  { autoRender = true } = {},
+  options: DoActionOptions = {},
 ) {
+  const { autoRender = true, checkInvariants, replayLog } = options;
+
+  // Determine if we should check invariants
+  const shouldCheck = checkInvariants ??
+    !!(globalThis as any).CHECK_INVARIANTS;
+
+  // Pre-action invariant check
+  if (shouldCheck) {
+    const result = validateGameState(state);
+    if (!result.valid) {
+      throw new Error(`Invariant BEFORE ${name}: ${result.issues.join(", ")}`);
+    }
+  }
+
+  // Hash before (for replay verification)
+  const hashBefore = replayLog ? hashGameState(state) : undefined;
+
   beginAction(name, meta);
   try {
     fn(); // perform all state mutations here
     commitAction({ autoRender });
+
+    // Hash after and log (for replay verification)
+    if (replayLog && hashBefore !== undefined) {
+      const hashAfter = hashGameState(state);
+      replayLog.push({
+        actionType: name,
+        stateHashBefore: hashBefore,
+        stateHashAfter: hashAfter,
+      });
+    }
   } catch (e) {
     abortAction();
     throw e;
+  }
+
+  // Post-action invariant check
+  if (shouldCheck) {
+    const result = validateGameState(state);
+    if (!result.valid) {
+      throw new Error(`Invariant AFTER ${name}: ${result.issues.join(", ")}`);
+    }
   }
 }
 
@@ -224,7 +269,7 @@ export function isInAction() {
 export function appendStep(name: string, meta: any = {}) {
   if (!inAction) {
     // No action open → record a zero-mutation action so the step is still visible in history.
-    doAction(name, () => {}, { step: true, ...meta }, { autoRender: false });
+    doAction(name, () => { }, { step: true, ...meta }, { autoRender: false });
     return;
   }
   if (!inAction.meta) inAction.meta = {};
@@ -314,3 +359,17 @@ export function initHistoryHotkeys({
     }
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

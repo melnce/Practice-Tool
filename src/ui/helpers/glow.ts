@@ -37,7 +37,7 @@ function earthRiteCostInFanfare(effects: Effect[] | unknown): number {
 }
 
 function hasEarthOnBoard(state: GameState, owner: Player, n = 1) {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = owner === "first" ? state.players.first.board : state.players.second.board;
   return board.some(
     (c) => c?.type === "Amulet" && Number(c?.counters?.earth) >= n,
   );
@@ -63,7 +63,7 @@ function hasOverflowInTree(effs: unknown): boolean {
 }
 
 function hasSuperEvoAllyOnBoard(state: GameState, owner: Player) {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = owner === "first" ? state.players.first.board : state.players.second.board;
   return board.some(
     (c) => c?.type === "Follower" && c.hasEvolved && c.evoType === "super",
   );
@@ -102,7 +102,7 @@ function needsUnmetTarget(
       // owner here is "blue"/"red"
       const stateAny = state as any; // Need access to opponent board from state if card.__state missing
       const enemyBoard =
-        owner === "blue" ? stateAny.redBoard : stateAny.blueBoard;
+        owner === "first" ? stateAny.redBoard : stateAny.blueBoard;
       const hasEnemyFollower =
         Array.isArray(enemyBoard) &&
         enemyBoard.some((c: any) => c.type === "Follower");
@@ -145,7 +145,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
   let canAfford = isPlayersTurn && availablePP >= shownCost;
 
   // ---- board capacity hard block (max 5) ----
-  const ownerBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+  const ownerBoard = owner === "first" ? state.players.first.board : state.players.second.board;
   const isBoardCard =
     !isSpell && (card?.type === "Follower" || card?.type === "Amulet");
   if (
@@ -167,7 +167,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
     // Doomwright Resurgence: need >=2 eligible artifacts in hand
     if (card.name === "Doomwright Resurgence") {
-      const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
+      const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
       const getEffectiveCost = (c: any) =>
         Number.isFinite(c?.effectiveCost)
           ? c.effectiveCost
@@ -193,7 +193,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
           .startsWith("ally"),
     );
     if (needsAlly) {
-      const ownerBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+      const ownerBoard = owner === "first" ? state.players.first.board : state.players.second.board;
       if (ownerBoard.length === 0) canAfford = false;
     }
 
@@ -203,7 +203,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
         String(e.op).toLowerCase() === "return_hand_to_deck" && e.select,
     );
     if (needsHandPick) {
-      const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
+      const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
       if (ownerHand.length <= 1) canAfford = false;
     }
 
@@ -216,7 +216,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
     // Radiant Rainbow: require a Spellboost card in hand
     if (card.name && card.name.toLowerCase() === "radiant rainbow") {
-      const ownerHand = owner === "blue" ? state.blueHand : state.redHand;
+      const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
       const hasSB = ownerHand.some(
         (c: CardInstance) =>
           Array.isArray(c.keywords) &&
@@ -334,8 +334,8 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
   const bothMaxPPReady =
     isPlayersTurn &&
     hasBothMaxPPGate &&
-    state.blueMaxPP >= 10 &&
-    state.redMaxPP >= 10; // Default to 10 if not specified, but typically check op params if available. Here assuming Gilnelise standard 10.
+    state.players.first.maxPP >= 10 &&
+    state.players.second.maxPP >= 10; // Default to 10 if not specified, but typically check op params if available. Here assuming Gilnelise standard 10.
 
   const superEvoReady = hasSuperEvoGate && hasSuperEvoAllyOnBoard(state, owner);
 
@@ -346,7 +346,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
   // --- Faith (crest) gate: Sham-Nacha glows when Faith >= 10 ---
   const crests =
-    owner === "blue" ? state.blueCrests || [] : state.redCrests || [];
+    owner === "first" ? state.players.first.crests || [] : state.players.second.crests || [];
   const faith = (() => {
     const c = crests.find(
       (x: CardInstance) =>
@@ -378,3 +378,17 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
   return { glowClass: "playable-glow" };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

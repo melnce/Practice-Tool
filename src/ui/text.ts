@@ -51,3 +51,17 @@ function _ensureInjectState(card: any) {
   card.__badgeLines = card.__badgeLines || [];
   card.__badgeSet = card.__badgeSet || new Set();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

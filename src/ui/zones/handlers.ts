@@ -24,7 +24,7 @@ export function attachHandlers(
     if (vm.isSelectable) {
       div.addEventListener("click", (e) => {
         e.stopPropagation();
-        const owner = ctx.isBlueHand ? "blue" : "red";
+        const owner = ctx.isBlueHand ? "first" : "second";
         actions.handleMulliganToggle(owner, card.uid);
       });
       div.oncontextmenu = (e) => e.preventDefault();
@@ -116,3 +116,17 @@ export function attachHandlers(
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

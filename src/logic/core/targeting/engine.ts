@@ -3,6 +3,7 @@ import { GameState } from "../../../core/types.js";
 import { TargetingResult } from "./types.js";
 import { validateTargetSelection } from "./validation.js";
 import { toggleSelection } from "./selection.js";
+import { getBoard, getHand } from "../../../core/playerHelpers.js";
 
 /**
  * Core Targeting Engine.
@@ -40,10 +41,10 @@ export function applyTargetClick(
   // 2. Resolve Card Entity
   // (We rely on state lookups here. Orchestrator passed us 'state'.)
   const all = [
-    ...state.blueBoard,
-    ...state.redBoard,
-    ...state.blueHand,
-    ...state.redHand,
+    ...getBoard(state, "first"),
+    ...getBoard(state, "second"),
+    ...getHand(state, "first"),
+    ...getHand(state, "second"),
   ];
   const clickedTarget = all.find((c) => c.uid === uid);
 
@@ -105,8 +106,8 @@ export function applyTargetClick(
 
   const requiredCount =
     typeof pending.selectCount === "number" &&
-    Number.isFinite(pending.selectCount) &&
-    pending.selectCount > 0
+      Number.isFinite(pending.selectCount) &&
+      pending.selectCount > 0
       ? pending.selectCount
       : 1;
 
@@ -126,3 +127,18 @@ export function applyTargetClick(
     },
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

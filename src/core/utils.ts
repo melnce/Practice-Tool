@@ -7,7 +7,7 @@ import { logEvent } from "./logger.js";
 // (Refactored to use state.rng directly)
 
 // Import types
-import { CardInstance } from "./types.js";
+import { CardInstance, Player } from "./types.js";
 
 // Constants
 export const MAX_HAND = 9;
@@ -89,6 +89,13 @@ function burnPreview(card: CardInstance | any) {
   setTimeout(() => (box.style.display = "none"), 900);
 }
 
+/**
+ * Helper to check if player is first player (accepts both legacy and new format).
+ */
+function isFirstPlayer(owner: Player | null): boolean {
+  return owner === "first";
+}
+
 export function pushToHand(
   hand: CardInstance[],
   card: CardInstance | any,
@@ -96,9 +103,9 @@ export function pushToHand(
   if (!card) return false;
   if (hand.length >= MAX_HAND) {
     // Log the burn effect
-    let owner: "blue" | "red" | null = null;
-    if (hand === state.blueHand) owner = "blue";
-    else if (hand === state.redHand) owner = "red";
+    let owner: Player | null = null;
+    if (hand === state.players.first.hand) owner = "first";
+    else if (hand === state.players.second.hand) owner = "second";
     logEvent("burn", { owner, card: card.name });
 
     burnPreview(card); // burn visual
@@ -113,27 +120,28 @@ export function pushToHand(
  * drawCard(hand, deck, owner?)
  * - If deck empty: instant loss for the drawer + flash Reaper image.
  * - Owner inference keeps old call sites working.
+ * @param owner - Player slot (accepts both legacy and new format)
  */
 export function drawCard(
   hand: CardInstance[],
   deck: CardInstance[],
-  owner: "blue" | "red" | null = null,
+  owner: Player | null = null,
 ): boolean {
   if (!owner) {
-    if (hand === state.blueHand) owner = "blue";
-    else if (hand === state.redHand) owner = "red";
+    if (hand === state.players.first.hand) owner = "first";
+    else if (hand === state.players.second.hand) owner = "second";
   }
 
   if (!deck || deck.length === 0) {
     if (typeof document !== "undefined") {
-      const iHaveCrest =
-        owner === "blue"
-          ? (state.blueCrests || []).some(
-              (c) => c.name === "Mjerrabaine, Great Manifest",
-            )
-          : (state.redCrests || []).some(
-              (c) => c.name === "Mjerrabaine, Great Manifest",
-            );
+      const isFirst = isFirstPlayer(owner);
+      const iHaveCrest = isFirst
+        ? (state.players.first.crests || []).some(
+          (c) => c.name === "Mjerrabaine, Great Manifest",
+        )
+        : (state.players.second.crests || []).some(
+          (c) => c.name === "Mjerrabaine, Great Manifest",
+        );
 
       const overlayImages = iHaveCrest
         ? ["/images/victory_card.png"]
@@ -142,18 +150,20 @@ export function drawCard(
 
       const iWinOnDeckout =
         iHaveCrest ||
-        (owner === "blue" ? !!state.deckoutWinsBlue : !!state.deckoutWinsRed);
-      const opp = owner === "blue" ? "red" : "blue";
+        (isFirst ? !!state.players.first.deckoutWins : !!state.players.second.deckoutWins);
 
       if (iWinOnDeckout) {
-        if (opp === "blue") state.blueHP = 0;
-        else state.redHP = 0;
+        // I win, opponent loses
+        if (isFirst) state.players.second.hp = 0;
+        else state.players.first.hp = 0;
       } else {
-        if (owner === "blue") state.blueHP = 0;
-        else state.redHP = 0;
+        // I lose
+        if (isFirst) state.players.first.hp = 0;
+        else state.players.second.hp = 0;
       }
 
       // Log the deckout event
+      const opp = isFirst ? "second" : "first";
       logEvent("deckout", { loser: owner, winner: opp });
 
       adapter.render();
@@ -170,3 +180,18 @@ export function drawCard(
 
   return pushToHand(hand, top);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

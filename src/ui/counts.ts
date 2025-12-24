@@ -9,7 +9,7 @@ export function updateCounts(state: GameState) {
     if (!el) {
       console.warn(`Element with id "${id}" not found - creating it`);
       // Create the element if it doesn't exist (fallback)
-      const statsDiv = id.includes("blue")
+      const statsDiv = id.includes("first")
         ? byId("blueStats")
         : byId("redStats");
       if (statsDiv) {
@@ -22,15 +22,15 @@ export function updateCounts(state: GameState) {
     el.textContent = String(value);
   };
 
-  updateIfExists("blueHandCount", state.blueHand.length);
-  updateIfExists("blueDeckCount", state.blueDeck.length);
-  updateIfExists("blueGraveCount", state.blueGraveyard.length);
-  updateIfExists("blueShadows", state.blueShadows); // Note capital 'S'
+  updateIfExists("blueHandCount", state.players.first.hand.length);
+  updateIfExists("blueDeckCount", state.players.first.deck.length);
+  updateIfExists("blueGraveCount", state.players.first.graveyard.length);
+  updateIfExists("blueShadows", state.players.first.shadows); // Note capital 'S'
 
-  updateIfExists("redHandCount", state.redHand.length);
-  updateIfExists("redDeckCount", state.redDeck.length);
-  updateIfExists("redGraveCount", state.redGraveyard.length);
-  updateIfExists("redShadows", state.redShadows); // Note capital 'S'
+  updateIfExists("redHandCount", state.players.second.hand.length);
+  updateIfExists("redDeckCount", state.players.second.deck.length);
+  updateIfExists("redGraveCount", state.players.second.graveyard.length);
+  updateIfExists("redShadows", state.players.second.shadows); // Note capital 'S'
 
   const endBlue = byId("endTurnBlue");
   const endRed = byId("endTurnRed");
@@ -43,11 +43,25 @@ export function updateCounts(state: GameState) {
     return;
   }
 
-  endBlue.style.display = state.isBlueTurn ? "inline-block" : "none";
-  endRed.style.display = !state.isBlueTurn ? "inline-block" : "none";
+  endBlue.style.display = state.isFirstPlayerTurn ? "inline-block" : "none";
+  endRed.style.display = !state.isFirstPlayerTurn ? "inline-block" : "none";
 
-  endBlue.style.backgroundColor = state.isBlueTurn ? "#00f" : "white";
-  endRed.style.backgroundColor = !state.isBlueTurn ? "#f00" : "white";
-  endBlue.style.color = state.isBlueTurn ? "white" : "black";
-  endRed.style.color = !state.isBlueTurn ? "white" : "black";
+  endBlue.style.backgroundColor = state.isFirstPlayerTurn ? "#00f" : "white";
+  endRed.style.backgroundColor = !state.isFirstPlayerTurn ? "#f00" : "white";
+  endBlue.style.color = state.isFirstPlayerTurn ? "white" : "black";
+  endRed.style.color = !state.isFirstPlayerTurn ? "white" : "black";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

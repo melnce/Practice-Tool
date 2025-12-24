@@ -5,7 +5,7 @@ import { CardInstance } from "../../../src/core/types";
 
 describe("Demon of Purgatory Playability", () => {
   beforeEach(() => {
-    Object.assign(state, createInitialState());
+    Object.assign(state, createInitialState(1));
   });
 
   it("should be playable even if no enemy followers are on board", () => {
@@ -33,12 +33,12 @@ describe("Demon of Purgatory Playability", () => {
     };
 
     // Ensure we have PP
-    state.bluePP = 5;
-    state.blueMaxPP = 5;
-    state.blueHand = [demon];
-    state.redBoard = []; // No enemies
+    state.players.first.pp = 5;
+    state.players.first.maxPP = 5;
+    state.players.first.hand = [demon];
+    state.players.second.board = []; // No enemies
 
-    const result = canPlayCard(demon, "blue");
+    const result = canPlayCard(demon, "first");
 
     // This should fail currently, but we want it to PASS
     if (!result.ok) {
@@ -52,3 +52,9 @@ describe("Demon of Purgatory Playability", () => {
     expect(result.ok).toBe(true);
   });
 });
+
+
+
+
+
+

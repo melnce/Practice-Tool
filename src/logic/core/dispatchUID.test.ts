@@ -5,12 +5,12 @@ import { GameState, PlayCardAction } from "../../core/types.js";
 
 describe("UID Dispatch Hardening", () => {
   it("throws specific error when UID is not found in hand", () => {
-    const state: GameState = createInitialState();
+    const state: GameState = createInitialState(1);
 
     // Construct a malicious/invalid action targeting a non-existent UID
     const invalidAction: PlayCardAction = {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "uid_NON_EXISTENT_99999",
     };
 
@@ -23,10 +23,10 @@ describe("UID Dispatch Hardening", () => {
   });
 
   it("throws when using wrong player's UID (wrong zone/owner)", () => {
-    const state: GameState = createInitialState();
+    const state: GameState = createInitialState(1);
 
     // Mock a card in RED hand
-    state.redHand = [
+    state.players.second.hand = [
       {
         name: "Test Goblin",
         cost: 1,
@@ -39,7 +39,7 @@ describe("UID Dispatch Hardening", () => {
     // Try to play it as BLUE player
     const invalidAction: PlayCardAction = {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "uid_RED_ONE",
     };
 
@@ -50,3 +50,18 @@ describe("UID Dispatch Hardening", () => {
     );
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

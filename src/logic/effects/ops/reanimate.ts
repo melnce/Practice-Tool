@@ -4,6 +4,7 @@ import { reanimateSummon } from "./summon.js";
 
 import { logEvent } from "../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../core/types.js";
+import { getGraveyard } from "../../../core/playerHelpers.js";
 
 // Local type to avoid 'any'
 type ReanimateEffect = Effect & {
@@ -20,7 +21,7 @@ export function handleReanimate(eff: Effect, owner: Player) {
   const maxCost = parseInt(String(rawCost)) || 0;
 
   // Determine graveyard
-  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const grave = getGraveyard(state, owner);
 
   // Find all followers in graveyard with cost <= maxCost
   const eligible = grave.filter((card) => {
@@ -82,3 +83,18 @@ export function handleReanimate(eff: Effect, owner: Player) {
     });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

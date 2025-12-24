@@ -198,7 +198,9 @@
         "select": 1
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "id": "10204120",
@@ -243,7 +245,9 @@
         }
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10211110",
@@ -263,7 +267,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "id": "10211120",
@@ -358,7 +364,9 @@
         "count": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10212120",
@@ -380,7 +388,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Fairy",
         "count": 1
@@ -561,7 +568,6 @@
           "effects": [
             {
               "op": "draw",
-              "source": "deck",
               "source": "named",
               "name": "Fairy",
               "count": 1
@@ -621,7 +627,9 @@
         "op": "stat",
         "action": "give",
         "target": "enemy:follower",
-        "keywords": ["Can't Attack"],
+        "keywords": [
+          "Can't Attack"
+        ],
         "duration": "opponent_turn_end",
         "select": 2
       }
@@ -696,7 +704,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ambush"]
+    "keywords": [
+      "Ambush"
+    ]
   },
   {
     "id": "10221310",
@@ -749,7 +759,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "type": "end_of_turn_own",
@@ -949,13 +961,14 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Nonja, Silent Maid",
         "count": 1
       }
     ],
-    "keywords": ["Ambush"]
+    "keywords": [
+      "Ambush"
+    ]
   },
   {
     "id": "10224110",
@@ -966,7 +979,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Rally (20) - Super-evolve this follower.\nWhenever another allied follower enters the field, deal 1 damage to all enemy followers.\nWhen this follower evolves, summon 2 copies of Steelclad Knight and give them Rush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10224110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224110_evo.webp",
@@ -979,7 +994,9 @@
         "op": "summon",
         "source": "named",
         "name": "Steelclad Knight",
-        "keywords": ["Rush"],
+        "keywords": [
+          "Rush"
+        ],
         "count": 2
       }
     ],
@@ -988,7 +1005,9 @@
         "op": "summon",
         "source": "named",
         "name": "Steelclad Knight",
-        "keywords": ["Rush"],
+        "keywords": [
+          "Rush"
+        ],
         "count": 2
       }
     ],
@@ -1033,7 +1052,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Fanfare: Summon 2 enemy copies of Knight.\nWhenever an enemy follower enters the field, give it \"Can't attack followers or leaders\" until the end of your opponent's turn, deal 1 damage to the enemy leader, and restore 1 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10224120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224120_evo.webp",
@@ -1103,7 +1124,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Witch's New Brew",
         "count": 1
@@ -1361,7 +1381,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Ward\nClash: Spellboost your hand.\nEvolve: Draw 2 followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10233110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10233110_evo.webp",
@@ -1388,7 +1410,9 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "clash",
@@ -1468,7 +1492,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Aura\nLast Words: Earth Rite (2) - Summon a Lilanthim, Anathema of Edacity.\nSuper-Evolve: Select 2 enemy followers on the field and destroy them.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10234110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234110_evo.webp",
@@ -1513,7 +1539,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Earth Rite (1) - Select a Mode to activate.\n1. Summon a Guardian Golem and give it Barrier.\n2. Draw 3 cards.\n3. Restore 4 defense to your leader.\nEvolve: Replicate the effects of this card's Fanfare ability.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10234120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234120_evo.webp",
@@ -1534,7 +1562,9 @@
                     "op": "summon",
                     "source": "named",
                     "name": "Guardian Golem",
-                    "keywords": ["Barrier"],
+                    "keywords": [
+                      "Barrier"
+                    ],
                     "count": 1
                   }
                 ]
@@ -1592,7 +1622,9 @@
                     "op": "summon",
                     "source": "named",
                     "name": "Guardian Golem",
-                    "keywords": ["Barrier"],
+                    "keywords": [
+                      "Barrier"
+                    ],
                     "count": 1
                   }
                 ]
@@ -1650,7 +1682,9 @@
                     "op": "summon",
                     "source": "named",
                     "name": "Guardian Golem",
-                    "keywords": ["Barrier"],
+                    "keywords": [
+                      "Barrier"
+                    ],
                     "count": 1
                   }
                 ]
@@ -1766,7 +1800,9 @@
         ]
       }
     ],
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "id": "10241310",
@@ -1994,7 +2030,9 @@
         "count": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10243310",
@@ -2072,7 +2110,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Whitefrost Whisper",
             "count": 1
@@ -2080,7 +2117,9 @@
         ]
       }
     ],
-    "keywords": ["Bane"]
+    "keywords": [
+      "Bane"
+    ]
   },
   {
     "id": "10244120",
@@ -2148,7 +2187,9 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Bane"]
+    "keywords": [
+      "Bane"
+    ]
   },
   {
     "id": "10251120",
@@ -2174,7 +2215,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Ghost",
             "count": 1
@@ -2203,21 +2243,18 @@
     "spell": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Ghost",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Skeleton",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Rotting Zombie",
         "count": 1
@@ -2244,7 +2281,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "ally_super_evolve",
@@ -2406,7 +2445,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "id": "10254110",
@@ -2523,7 +2564,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -2566,7 +2609,9 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10261120",
@@ -2778,7 +2823,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [
       {
         "event": "strike",
@@ -2793,7 +2840,9 @@
                 "op": "destroy",
                 "distribution": "random",
                 "target": "enemy:follower",
-                "exclude": ["context.defender"]
+                "exclude": [
+                  "context.defender"
+                ]
               }
             ]
           }
@@ -2832,6 +2881,9 @@
         "image": "images/crests/maddening_benison.png",
         "description": "Countdown (2). Last Words: Deal 10 damage to your leader",
         "countdown": 2,
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "damage",
@@ -2859,7 +2911,9 @@
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10264110-aether-empyrean-guardian",
     "evolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "fanfare": [
       {
         "op": "summon",
@@ -2890,7 +2944,9 @@
         "condition": {
           "not_self": true
         },
-        "keywords": ["Aura"]
+        "keywords": [
+          "Aura"
+        ]
       }
     ]
   },
@@ -3002,7 +3058,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -3016,7 +3071,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -3030,7 +3084,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -3062,7 +3115,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Puppet",
             "count": 1
@@ -3077,7 +3129,9 @@
         ]
       }
     ],
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "id": "10271210",
@@ -3100,7 +3154,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
@@ -3119,7 +3172,6 @@
             "filter": {
               "type": "Artifact"
             },
-            "select": true,
             "eot_destroy": true,
             "select": 1,
             "max_cost": 5
@@ -3162,7 +3214,9 @@
         ]
       }
     ],
-    "keywords": ["Bane"]
+    "keywords": [
+      "Bane"
+    ]
   },
   {
     "id": "10272120",
@@ -3293,7 +3347,10 @@
           "tribe": "Artifact"
         },
         "select": 1,
-        "keywords": ["Ward", "cant_be_destroyed"]
+        "keywords": [
+          "Ward",
+          "cant_be_destroyed"
+        ]
       }
     ],
     "superevolve": [
@@ -3306,7 +3363,10 @@
           "tribe": "Artifact"
         },
         "select": 1,
-        "keywords": ["Ward", "cant_be_destroyed"]
+        "keywords": [
+          "Ward",
+          "cant_be_destroyed"
+        ]
       }
     ],
     "fanfare": [],
@@ -3398,7 +3458,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "target": "entering_follower"
           }
         ]

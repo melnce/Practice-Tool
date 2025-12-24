@@ -199,42 +199,55 @@ export function initReplayState(
   const deckDef = REPLAY_DECKS[deckId] ?? REPLAY_DECK_STANDARD;
 
   // Build decks from card names
-  const blueDeck = buildDeckFromNames(deckDef.cards, s.rng, strict);
-  const redDeck = buildDeckFromNames(deckDef.cards, s.rng, strict);
+  const firstDeck = buildDeckFromNames(deckDef.cards, s.rng, strict);
+  const secondDeck = buildDeckFromNames(deckDef.cards, s.rng, strict);
 
   // Shuffle using seeded RNG - FIX: Shuffle returns a copy, we must use it!
-  const blueShuffled = s.rng.shuffle(blueDeck);
-  const redShuffled = s.rng.shuffle(redDeck);
+  const firstShuffled = s.rng.shuffle(firstDeck);
+  const secondShuffled = s.rng.shuffle(secondDeck);
 
-  // Load decks
-  s.blueDeck.push(...blueShuffled);
-  s.redDeck.push(...redShuffled);
+  // Load decks (use nested player state)
+  s.players.first.deck.push(...firstShuffled);
+  s.players.second.deck.push(...secondShuffled);
 
   if (initialDraw > 0) {
-    // console.log(`[ReplayInit] BlueDeck Size: ${ s.blueDeck.length }. Top 5: ${ s.blueDeck.slice(0, 5).map(c => c.name).join(", ") } `);
+    // console.log(`[ReplayInit] FirstDeck Size: ${s.players.first.deck.length}. Top 5: ${s.players.first.deck.slice(0, 5).map(c => c.name).join(", ")} `);
   }
 
-  // Draw initial hands
+  // Draw initial hands (use nested player state)
   for (let i = 0; i < initialDraw; i++) {
-    drawCard(s.blueHand, s.blueDeck, "blue");
-    drawCard(s.redHand, s.redDeck, "red");
+    drawCard(s.players.first.hand, s.players.first.deck, "first");
+    drawCard(s.players.second.hand, s.players.second.deck, "second");
   }
 
   s.gameStarted = true;
-  s.isBlueTurn = true;
+  s.isFirstPlayerTurn = true;
 
   return s;
 }
+
+// Import playerHelpers for PP operations
+import { setPP as setPPHelper, setMaxPP } from "../../core/playerHelpers.js";
 
 /**
  * Helper to set PP for testing specific PP levels
  */
 export function setPP(player: Player, current: number, max?: number): void {
-  if (player === "blue") {
-    state.bluePP = current;
-    state.blueMaxPP = max ?? current;
-  } else {
-    state.redPP = current;
-    state.redMaxPP = max ?? current;
-  }
+  setPPHelper(state, player, current);
+  setMaxPP(state, player, max ?? current);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

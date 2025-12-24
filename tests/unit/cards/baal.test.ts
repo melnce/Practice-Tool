@@ -42,3 +42,9 @@ describe("Baal, Elemental Resonance (10452130)", () => {
     expect(op2.effects[0].amount).toBe(3);
   });
 });
+
+
+
+
+
+

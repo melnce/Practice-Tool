@@ -34,3 +34,9 @@ describe("Ezecrain, Portent of Vengeance Data Verification", () => {
     expect(fanfare[1].count).toBe(2);
   });
 });
+
+
+
+
+
+

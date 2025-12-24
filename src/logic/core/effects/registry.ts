@@ -72,3 +72,18 @@ export function listOps(): EffectOp[] {
 export function hasOp(op: EffectOp): boolean {
   return registry.has(op);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

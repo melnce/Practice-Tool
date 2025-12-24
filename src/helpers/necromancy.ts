@@ -1,18 +1,40 @@
 // src/helpers/necromancy.ts
 import { state } from "../core/gameState.js";
+import { Player } from "../core/types.js";
 
-export function hasNecromancy(
-  owner: "blue" | "red",
-  cost: number = 1,
-): boolean {
-  const shadows = owner === "blue" ? state.blueShadows : state.redShadows;
+/**
+ * Check if player has enough shadows for necromancy cost.
+ * @param owner - Player slot (accepts both legacy and new format)
+ */
+export function hasNecromancy(owner: Player, cost: number = 1): boolean {
+  const isFirst = owner === "first";
+  const shadows = isFirst ? state.players.first.shadows : state.players.second.shadows;
   return shadows >= cost;
 }
 
-export function spendShadows(owner: "blue" | "red", cost: number = 1): void {
-  if (owner === "blue") {
-    state.blueShadows = Math.max(0, state.blueShadows - cost);
+/**
+ * Spend shadows for necromancy cost.
+ * @param owner - Player slot (accepts both legacy and new format)
+ */
+export function spendShadows(owner: Player, cost: number = 1): void {
+  const isFirst = owner === "first";
+  if (isFirst) {
+    state.players.first.shadows = Math.max(0, state.players.first.shadows - cost);
   } else {
-    state.redShadows = Math.max(0, state.redShadows - cost);
+    state.players.second.shadows = Math.max(0, state.players.second.shadows - cost);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

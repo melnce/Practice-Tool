@@ -13,7 +13,7 @@ declare const process: any;
 
 describe("Smoke tests", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   it("Scenario A: Start Game", async () => {
@@ -23,9 +23,9 @@ describe("Smoke tests", () => {
     await startGame();
 
     expect(state.gameStarted).toBe(true);
-    expect(state.blueHand.length).toBeGreaterThan(0);
-    expect(state.redHand.length).toBeGreaterThan(0);
-    expect(state.blueHP).toBe(20);
+    expect(state.players.first.hand.length).toBeGreaterThan(0);
+    expect(state.players.second.hand.length).toBeGreaterThan(0);
+    expect(state.players.first.hp).toBe(20);
     expect(state.turnCount >= 1 || state.roundCount >= 1).toBe(true);
   });
 
@@ -43,29 +43,35 @@ describe("Smoke tests", () => {
       defense: 2,
       can_attack: false,
     };
-    state.blueHand = [goblin];
-    state.bluePP = 1;
-    state.isBlueTurn = true;
+    state.players.first.hand = [goblin];
+    state.players.first.pp = 1;
+    state.isFirstPlayerTurn = true;
 
     // Play it
-    playCard(state.blueHand, "blue", 0);
+    playCard(state.players.first.hand, "first", 0);
 
-    expect(state.blueBoard.length).toBe(1);
-    expect(state.blueBoard[0].name).toBe("Goblin");
-    expect(state.bluePP).toBe(0);
+    expect(state.players.first.board.length).toBe(1);
+    expect(state.players.first.board[0].name).toBe("Goblin");
+    expect(state.players.first.pp).toBe(0);
   });
 
   it("Scenario C: Damage Leader", () => {
     console.log("--- Scenario C: Damage Leader ---");
-    state.redHP = 20;
+    state.players.second.hp = 20;
 
     // Run a direct damage effect
     runEffects(
       [{ op: "damage", amount: 3, target: "enemy:leader" }],
-      "blue",
+      "first",
       null,
     );
 
-    expect(state.redHP).toBe(17);
+    expect(state.players.second.hp).toBe(17);
   });
 });
+
+
+
+
+
+

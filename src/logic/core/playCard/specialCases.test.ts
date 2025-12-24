@@ -9,10 +9,10 @@ import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
 
 describe("Special Cases", () => {
   beforeEach(() => {
-    resetGameState();
-    state.isBlueTurn = true;
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
   });
 
   describe("Radiant Rainbow Preflight", () => {
@@ -39,9 +39,9 @@ describe("Special Cases", () => {
         ],
       };
 
-      state.blueHand = [radiantRainbow];
+      state.players.first.hand = [radiantRainbow];
 
-      const result = canPlayCard(radiantRainbow, "blue");
+      const result = canPlayCard(radiantRainbow, "first");
       expect(result.ok).toBe(false);
     });
 
@@ -74,9 +74,9 @@ describe("Special Cases", () => {
         keywords: [{ name: "Spellboost", effects: [] }],
       };
 
-      state.blueHand = [radiantRainbow, spellboostCard];
+      state.players.first.hand = [radiantRainbow, spellboostCard];
 
-      const result = canPlayCard(radiantRainbow, "blue");
+      const result = canPlayCard(radiantRainbow, "first");
       expect(result.ok).toBe(true);
     });
   });
@@ -100,25 +100,25 @@ describe("Special Cases", () => {
         cost: 1,
       };
 
-      state.blueBoard = [existingBrew, newBrew];
-      state.blueGraveyard = [];
-      state.blueShadows = 0;
+      state.players.first.board = [existingBrew, newBrew];
+      state.players.first.graveyard = [];
+      state.players.first.shadows = 0;
 
-      mergeWitchsNewBrewOnPlay(newBrew, "blue");
+      mergeWitchsNewBrewOnPlay(newBrew, "first");
 
       // Existing brew should be removed
-      expect(state.blueBoard.length).toBe(1);
-      expect(state.blueBoard[0]).toBe(newBrew);
+      expect(state.players.first.board.length).toBe(1);
+      expect(state.players.first.board[0]).toBe(newBrew);
 
       // Counters should be merged
       expect((newBrew as any).counters.earth).toBe(3);
 
       // Old brew should be in graveyard
-      expect(state.blueGraveyard.length).toBe(1);
-      expect(state.blueGraveyard[0]).toBe(existingBrew);
+      expect(state.players.first.graveyard.length).toBe(1);
+      expect(state.players.first.graveyard[0]).toBe(existingBrew);
 
       // Shadow should be incremented
-      expect(state.blueShadows).toBe(1);
+      expect(state.players.first.shadows).toBe(1);
     });
 
     it("merges counters from Magic Sediment", () => {
@@ -139,13 +139,13 @@ describe("Special Cases", () => {
         cost: 1,
       };
 
-      state.blueBoard = [sediment, newBrew];
-      state.blueGraveyard = [];
-      state.blueShadows = 0;
+      state.players.first.board = [sediment, newBrew];
+      state.players.first.graveyard = [];
+      state.players.first.shadows = 0;
 
-      mergeWitchsNewBrewOnPlay(newBrew, "blue");
+      mergeWitchsNewBrewOnPlay(newBrew, "first");
 
-      expect(state.blueBoard.length).toBe(1);
+      expect(state.players.first.board.length).toBe(1);
       expect((newBrew as any).counters.earth).toBe(1);
     });
 
@@ -166,13 +166,28 @@ describe("Special Cases", () => {
         cost: 1,
       };
 
-      state.blueBoard = [otherAmulet, newBrew];
-      state.blueGraveyard = [];
+      state.players.first.board = [otherAmulet, newBrew];
+      state.players.first.graveyard = [];
 
-      mergeWitchsNewBrewOnPlay(newBrew, "blue");
+      mergeWitchsNewBrewOnPlay(newBrew, "first");
 
-      expect(state.blueBoard.length).toBe(2);
-      expect(state.blueGraveyard.length).toBe(0);
+      expect(state.players.first.board.length).toBe(2);
+      expect(state.players.first.graveyard.length).toBe(0);
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

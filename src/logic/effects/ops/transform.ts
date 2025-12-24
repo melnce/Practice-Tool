@@ -5,6 +5,7 @@ import { applyKeywordsFromList } from "../../core/keywords.js";
 
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance, Effect } from "../../../core/types.js";
+import { getHand, getBoard } from "../../../core/playerHelpers.js";
 
 // ========================================================================
 // UNIFIED TRANSFORM HANDLER - routes by zone field
@@ -158,7 +159,7 @@ function matchesFilter(card: CardInstance, filter: TransformFilter): boolean {
  * mode: "all" (default)
  */
 function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   const filter = eff.filter || {};
   const targetCardName = eff.into || eff.target_card_name;
 
@@ -179,7 +180,7 @@ function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
 
     if (matchesFilter(card, filter)) {
       const newCard = {
-        ...JSON.parse(JSON.stringify(cardTemplate)),
+        ...structuredClone(cardTemplate),
         uid: state.rng.makeUid("card_"),
       };
       logEvent("transformInHand", { owner, from: card.name, to: newCard.name });
@@ -197,7 +198,7 @@ function transformRandomInHand(
   owner: Player,
   intoName: string,
 ) {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   if (!hand?.length) return;
 
   const filter = eff.filter || {};
@@ -216,7 +217,7 @@ function transformRandomInHand(
 
   // If the original transformRandomSpellInHand set cost to 0, replicate that behavior
   // (This is specific to the Raio card behavior)
-  const updated = (owner === "blue" ? state.blueHand : state.redHand).find(
+  const updated = getHand(state, owner).find(
     (c) => c && c.uid === uid,
   );
   if (!updated) return;
@@ -239,10 +240,14 @@ function transformRandomInHand(
 /** Locate which zone currently holds the card. */
 function locateZone(target: CardInstance) {
   if (!target) return null;
-  if (state.blueBoard?.includes(target)) return "blueBoard";
-  if (state.redBoard?.includes(target)) return "redBoard";
-  if (state.blueHand?.includes(target)) return "blueHand";
-  if (state.redHand?.includes(target)) return "redHand";
+  const firstBoard = getBoard(state, "first");
+  const secondBoard = getBoard(state, "second");
+  const firstHand = getHand(state, "first");
+  const secondHand = getHand(state, "second");
+  if (firstBoard?.includes(target)) return "firstBoard";
+  if (secondBoard?.includes(target)) return "secondBoard";
+  if (firstHand?.includes(target)) return "firstHand";
+  if (secondHand?.includes(target)) return "secondHand";
   return null;
 }
 
@@ -260,17 +265,17 @@ export function transformTarget(target: CardInstance, intoName: string) {
   const zone = locateZone(target);
 
   // If it's in hand, delegate to hand transformer and return.
-  if (zone === "blueHand" || zone === "redHand") {
+  if (zone === "firstHand" || zone === "secondHand") {
     return transformHandTarget(target, intoName);
   }
 
-  if (zone !== "blueBoard" && zone !== "redBoard") {
+  if (zone !== "firstBoard" && zone !== "secondBoard") {
     console.warn("transformTarget: target not found on any board");
     return;
   }
 
-  const board = zone === "blueBoard" ? state.blueBoard : state.redBoard;
-  const owner = zone === "blueBoard" ? "blue" : "red";
+  const board = getBoard(state, zone === "firstBoard" ? "first" : "second");
+  const owner = zone === "firstBoard" ? "first" : "second";
 
   const base = getCardDetails(intoName);
   if (!base) {
@@ -285,7 +290,7 @@ export function transformTarget(target: CardInstance, intoName: string) {
   }
 
   // Clone new template and preserve identity
-  const c: CardInstance = JSON.parse(JSON.stringify(base));
+  const c: CardInstance = structuredClone(base);
   c.uid = target.uid;
   c.owner = owner;
 
@@ -342,13 +347,13 @@ export function transformHandTarget(target: CardInstance, intoName: string) {
   }
 
   const zone = locateZone(target);
-  if (zone !== "blueHand" && zone !== "redHand") {
+  if (zone !== "firstHand" && zone !== "secondHand") {
     console.warn("transformHandTarget: target not found in any hand");
     return;
   }
 
-  const hand = zone === "blueHand" ? state.blueHand : state.redHand;
-  const owner = zone === "blueHand" ? "blue" : "red";
+  const hand = getHand(state, zone === "firstHand" ? "first" : "second");
+  const owner = zone === "firstHand" ? "first" : "second";
 
   const base = getCardDetails(intoName);
   if (!base) {
@@ -362,7 +367,7 @@ export function transformHandTarget(target: CardInstance, intoName: string) {
     return;
   }
 
-  const c: CardInstance = JSON.parse(JSON.stringify(base));
+  const c: CardInstance = structuredClone(base);
   c.uid = target.uid;
   c.owner = owner;
 
@@ -395,12 +400,27 @@ export function transformHandTarget(target: CardInstance, intoName: string) {
 /** Convenience entry point that works for either board or hand. */
 export function transformAnywhere(target: CardInstance, intoName: string) {
   const zone = locateZone(target);
-  if (zone === "blueBoard" || zone === "redBoard")
+  if (zone === "firstBoard" || zone === "secondBoard")
     return transformTarget(target, intoName);
-  if (zone === "blueHand" || zone === "redHand")
+  if (zone === "firstHand" || zone === "secondHand")
     return transformHandTarget(target, intoName);
   console.warn("transformAnywhere: target not found in board/hand");
 }
 
 // Legacy transformRandomSpellInHand was removed - now handled by:
 // { op: "transform", zone: "hand", mode: "random", filter: { type: "Spell" }, into: "..." }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

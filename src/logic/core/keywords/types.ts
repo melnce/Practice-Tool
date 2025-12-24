@@ -88,3 +88,18 @@ export interface KeywordState {
   // Barrier
   hasBarrier?: boolean;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

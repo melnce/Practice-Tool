@@ -6,6 +6,7 @@ import { isOverflow } from "../../../helpers/overflow.js";
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance, Effect } from "../../../core/types.js";
 import { UnifiedGateSpec, normalizeToGateSpec } from "./types.js";
+import { isFirstPlayer, getMaxPP, getPlaysThisTurn, getHand, getBoard, getDeck, getRally, getAnyAllyAttackedThisTurn } from "../../../core/playerHelpers.js";
 
 /**
  * Unified gate handler - evaluates any gate condition and queues effects.
@@ -66,13 +67,13 @@ function evaluateCondition(
     // =====================================================================
     case "max_pp": {
       const need = spec.at_least ?? 10;
-      const currentMax = owner === "blue" ? state.blueMaxPP : state.redMaxPP;
+      const currentMax = getMaxPP(state, owner);
       return currentMax >= need;
     }
 
     case "both_max_pp": {
       const need = spec.at_least ?? 10;
-      return state.blueMaxPP >= need && state.redMaxPP >= need;
+      return getMaxPP(state, "first") >= need && getMaxPP(state, "second") >= need;
     }
 
     // =====================================================================
@@ -80,28 +81,25 @@ function evaluateCondition(
     // =====================================================================
     case "combo": {
       const need = spec.count ?? 1;
-      const plays =
-        owner === "blue"
-          ? state.bluePlaysThisTurn || 0
-          : state.redPlaysThisTurn || 0;
+      const plays = getPlaysThisTurn(state, owner);
       return plays >= need;
     }
 
     case "rally": {
       const need = spec.count ?? 1;
-      const rally = owner === "blue" ? state.blueRally : state.redRally;
+      const rally = getRally(state, owner);
       return rally >= need;
     }
 
     case "hand_count": {
       const need = spec.count ?? 1;
-      const hand = owner === "blue" ? state.blueHand : state.redHand;
+      const hand = getHand(state, owner);
       return hand.length >= need;
     }
 
     case "amulet_count": {
       const need = spec.count ?? 1;
-      const board = owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, owner);
       const amuletCount = (board || []).filter(
         (c) => c.type === "Amulet",
       ).length;
@@ -133,20 +131,20 @@ function evaluateCondition(
       );
 
     case "evolved_allied": {
-      const board = owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, owner);
       return board.some(
         (c) => c.type === "Follower" && (c.hasEvolved || c.evoType === "super"),
       );
     }
 
     case "super_evolved_allied": {
-      const board = owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, owner);
       return board.some((c) => c.type === "Follower" && c.evoType === "super");
     }
 
     case "super_evo_unlocked":
-      // Blue unlocks at turn 7, red at turn 6
-      return owner === "blue" ? state.roundCount >= 7 : state.roundCount >= 6;
+      // First player unlocks at turn 7, second player at turn 6
+      return isFirstPlayer(owner) ? state.roundCount >= 7 : state.roundCount >= 6;
 
     // =====================================================================
     // BOARD/CARD GATES
@@ -154,7 +152,7 @@ function evaluateCondition(
     case "board_name": {
       const want = String(spec.name || "").trim();
       if (!want) return false;
-      const myBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+      const myBoard = getBoard(state, owner);
       return (myBoard || []).some((c) => String(c?.name) === want);
     }
 
@@ -172,22 +170,15 @@ function evaluateCondition(
       const witnesses = (sourceCard as any)?.skyboundArtEvolvesWitnessed || 0;
       const gauge = (state.roundCount || 1) + witnesses;
       const req = spec.requirement ?? 10;
-      console.log(
-        `[Gate] Skybound Art: Turn=${state.roundCount} Witnessed=${witnesses} Gauge=${gauge} Req=${req}`,
-      );
       return gauge >= req;
     }
 
     case "no_ally_attacked": {
       // Check global flag first
-      if (
-        owner === "blue"
-          ? !!state.blueAnyAllyAttackedThisTurn
-          : !!state.redAnyAllyAttackedThisTurn
-      ) {
+      if (getAnyAllyAttackedThisTurn(state, owner)) {
         return false;
       }
-      const board = owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, owner);
       return !(board || []).some((c) => {
         if (!c || c.type !== "Follower") return false;
         const used = (c.attacks_used_this_turn ?? 0) > 0;
@@ -204,7 +195,7 @@ function evaluateCondition(
     }
 
     case "highlander": {
-      const deck = owner === "blue" ? state.blueDeck : state.redDeck;
+      const deck = getDeck(state, owner);
       if (!deck || deck.length <= 1) return true;
       const seenNames = new Set<string>();
       for (const card of deck) {
@@ -234,3 +225,18 @@ function getEffectiveCost(card: CardInstance): number {
   const mod = parseInt((card as any)?.cost_mod, 10) || 0;
   return base + mod;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

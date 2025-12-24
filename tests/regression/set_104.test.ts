@@ -108,17 +108,17 @@ describe("Set 104: Skybound Dragons", () => {
       can_attack: true,
       evolve: [{ op: "summon", name: "Mordred, Illusory Lion" }],
     } as any;
-    state.blueHand = [arthur];
-    state.bluePP = 3;
-    state.blueMaxPP = 3;
+    state.players.first.hand = [arthur];
+    state.players.first.pp = 3;
+    state.players.first.maxPP = 3;
 
     // Play Arthur
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
-    expect(state.blueBoard[0].name).toBe("Arthur, Staunch Dragon");
+    expect(state.players.first.board[0].name).toBe("Arthur, Staunch Dragon");
 
     // Evolve Arthur
     // NOTE: We don't have a direct "EVOLVE" PlayerAction yet!
@@ -145,10 +145,10 @@ describe("Set 104: Skybound Dragons", () => {
 
     const spell = { uid: "deck_1", type: "Spell", name: "Target Spell" } as any;
     const follower = { uid: "deck_2", type: "Follower", name: "Noise" } as any;
-    state.blueDeck = [follower, spell]; // Top is 0? usually. draw pops from end? or shift?
+    state.players.first.deck = [follower, spell]; // Top is 0? usually. draw pops from end? or shift?
     // logic/core/draw.ts: return deck.pop().
     // So end of array = top.
-    state.blueDeck = [follower, spell, follower]; // spell in middle
+    state.players.first.deck = [follower, spell, follower]; // spell in middle
 
     const philo = {
       uid: "hand_1",
@@ -158,17 +158,17 @@ describe("Set 104: Skybound Dragons", () => {
       cost: 3,
       fanfare: [{ op: "draw", filters: { type: "Spell" }, count: 1 }],
     } as any;
-    state.blueHand = [philo];
-    state.bluePP = 3;
+    state.players.first.hand = [philo];
+    state.players.first.pp = 3;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
     // Should have drawn the spell
-    expect(state.blueHand.some((c) => c.name === "Target Spell")).toBe(true);
+    expect(state.players.first.hand.some((c) => c.name === "Target Spell")).toBe(true);
   });
 
   it("Rune Portal should damage all and heal leader", async () => {
@@ -178,11 +178,11 @@ describe("Set 104: Skybound Dragons", () => {
     });
 
     // Setup enemies
-    state.redBoard = [
+    state.players.second.board = [
       { uid: "e1", defense: 6, type: "Follower" },
       { uid: "e2", defense: 7, type: "Follower" },
     ] as any;
-    state.blueHP = 10;
+    state.players.first.hp = 10;
 
     const runePortal = {
       uid: "hand_1",
@@ -195,22 +195,22 @@ describe("Set 104: Skybound Dragons", () => {
         { op: "heal_leader", amount: 3 },
       ],
     } as any;
-    state.blueHand = [runePortal];
-    state.bluePP = 7;
-    state.blueMaxPP = 7;
+    state.players.first.hand = [runePortal];
+    state.players.first.pp = 7;
+    state.players.first.maxPP = 7;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
-    expect(state.redBoard.length).toBe(1); // e1 died (6-6=0), e2 left (7-6=1)
-    expect((state.redBoard[0] as any).defense).toBe(1); // Wait, damage persistence?
+    expect(state.players.second.board.length).toBe(1); // e1 died (6-6=0), e2 left (7-6=1)
+    expect((state.players.second.board[0] as any).defense).toBe(1); // Wait, damage persistence?
     // In logic/core/damage.ts, damage reduces defense? Or adds damage counter?
     // Usually reduces defense.
 
-    expect(state.blueHP).toBe(13);
+    expect(state.players.first.hp).toBe(13);
   });
   it("Randall should gain Storm on Enhance(5)", async () => {
     state = await startNewGame({
@@ -231,16 +231,16 @@ describe("Set 104: Skybound Dragons", () => {
         },
       ],
     } as any;
-    state.blueHand = [randall];
-    state.bluePP = 5; // Enough for Enhance
+    state.players.first.hand = [randall];
+    state.players.first.pp = 5; // Enough for Enhance
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
-    expect(state.blueBoard[0].keywords).toContain("Storm");
-    expect(state.bluePP).toBe(0); // 5 consumed
+    expect(state.players.first.board[0].keywords).toContain("Storm");
+    expect(state.players.first.pp).toBe(0); // 5 consumed
   });
 
   it("Anthuria should give Barrier to allies", async () => {
@@ -254,7 +254,7 @@ describe("Set 104: Skybound Dragons", () => {
       type: "Follower",
       keywords: [],
     } as any;
-    state.blueBoard = [ally];
+    state.players.first.board = [ally];
 
     const anthuria = {
       uid: "hand_1",
@@ -264,21 +264,21 @@ describe("Set 104: Skybound Dragons", () => {
       cost: 5,
       fanfare: [{ op: "stat", target: "ally:follower", keywords: ["Barrier"] }],
     } as any;
-    state.blueHand = [anthuria];
-    state.bluePP = 5;
+    state.players.first.hand = [anthuria];
+    state.players.first.pp = 5;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
     // Both Anthuria (self) and Ally should have Barrier?
     // JSON said: "ally:follower" -> usually includes self unless `not_self` is set.
     // Let's assume it buffs all.
-    expect(state.blueBoard.length).toBe(2);
-    expect(state.blueBoard[0].keywords).toContain("Barrier"); // ally
-    expect(state.blueBoard[1].keywords).toContain("Barrier"); // anthuria (if target includes self)
+    expect(state.players.first.board.length).toBe(2);
+    expect(state.players.first.board[0].keywords).toContain("Barrier"); // ally
+    expect(state.players.first.board[1].keywords).toContain("Barrier"); // anthuria (if target includes self)
   });
 
   it("Aglovale should damage all enemies", async () => {
@@ -286,7 +286,7 @@ describe("Set 104: Skybound Dragons", () => {
       deckAId: "sample_blue",
       deckBId: "sample_red",
     });
-    state.redBoard = [{ uid: "e1", defense: 3, type: "Follower" }] as any;
+    state.players.second.board = [{ uid: "e1", defense: 3, type: "Follower" }] as any;
 
     const aglovale = {
       uid: "hand_1",
@@ -296,16 +296,16 @@ describe("Set 104: Skybound Dragons", () => {
       cost: 6,
       fanfare: [{ op: "damage", target: "enemy:follower", amount: 3 }],
     } as any;
-    state.blueHand = [aglovale];
-    state.bluePP = 6;
+    state.players.first.hand = [aglovale];
+    state.players.first.pp = 6;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
-    expect(state.redBoard.length).toBe(0); // 3-3=0 -> Destroyed
+    expect(state.players.second.board.length).toBe(0); // 3-3=0 -> Destroyed
   });
 
   it("Ezecrain should damage 2 enemies and summon 2 Magic Sediments", async () => {
@@ -314,7 +314,7 @@ describe("Set 104: Skybound Dragons", () => {
       deckBId: "sample_red",
     });
     // Setup 2 enemies
-    state.redBoard = [
+    state.players.second.board = [
       { uid: "e1", defense: 5, type: "Follower" },
       { uid: "e2", defense: 5, type: "Follower" },
     ] as any;
@@ -335,13 +335,13 @@ describe("Set 104: Skybound Dragons", () => {
         { op: "summon", name: "Magic Sediment", count: 2 },
       ],
     } as any;
-    state.blueHand = [ezecrain];
-    state.bluePP = 6;
-    state.blueBoard = [];
+    state.players.first.hand = [ezecrain];
+    state.players.first.pp = 6;
+    state.players.first.board = [];
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
@@ -350,23 +350,23 @@ describe("Set 104: Skybound Dragons", () => {
     // Select e1
     state = dispatch(state, {
       type: "CHOOSE_TARGET",
-      player: "blue",
+      player: "first",
       target: { type: "card", uid: "e1" },
     });
     // Select e2
     state = dispatch(state, {
       type: "CHOOSE_TARGET",
-      player: "blue",
+      player: "first",
       target: { type: "card", uid: "e2" },
     });
 
     // Damage applied?
-    expect((state.redBoard[0] as any).defense).toBe(1); // 5-4
-    expect((state.redBoard[1] as any).defense).toBe(1);
+    expect((state.players.second.board[0] as any).defense).toBe(1); // 5-4
+    expect((state.players.second.board[1] as any).defense).toBe(1);
 
     // Sigils?
     expect(
-      state.blueBoard.filter((c) => c.name === "Magic Sediment").length,
+      state.players.first.board.filter((c) => c.name === "Magic Sediment").length,
     ).toBe(2);
   });
 
@@ -375,7 +375,7 @@ describe("Set 104: Skybound Dragons", () => {
       deckAId: "sample_blue",
       deckBId: "sample_red",
     });
-    state.redBoard = [{ uid: "e1", defense: 6, type: "Follower" }] as any;
+    state.players.second.board = [{ uid: "e1", defense: 6, type: "Follower" }] as any;
 
     const flare = {
       uid: "hand_1",
@@ -392,22 +392,22 @@ describe("Set 104: Skybound Dragons", () => {
         { op: "summon", name: "Magic Sediment" },
       ],
     } as any;
-    state.blueHand = [flare];
-    state.bluePP = 2;
+    state.players.first.hand = [flare];
+    state.players.first.pp = 2;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
     state = dispatch(state, {
       type: "CHOOSE_TARGET",
-      player: "blue",
+      player: "first",
       target: { type: "card", uid: "e1" },
     });
 
-    expect((state.redBoard[0] as any).defense).toBe(2); // 6-4
-    expect(state.blueBoard.some((c) => c.name === "Magic Sediment")).toBe(true);
+    expect((state.players.second.board[0] as any).defense).toBe(2); // 6-4
+    expect(state.players.first.board.some((c) => c.name === "Magic Sediment")).toBe(true);
   });
 
   it("Lyria should Enhance(8) to Draw and Recover PP", async () => {
@@ -421,7 +421,7 @@ describe("Set 104: Skybound Dragons", () => {
       cost: 9,
       name: "Big Guy",
     } as any;
-    state.blueDeck = [bigFollower];
+    state.players.first.deck = [bigFollower];
 
     const lyria = {
       uid: "hand_1",
@@ -444,20 +444,20 @@ describe("Set 104: Skybound Dragons", () => {
         },
       ],
     } as any;
-    state.blueHand = [lyria];
-    state.bluePP = 8;
-    state.blueMaxPP = 8;
+    state.players.first.hand = [lyria];
+    state.players.first.pp = 8;
+    state.players.first.maxPP = 8;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
     // Cost 8 paid -> 0 left. Recover 7 -> 7 left.
-    expect(state.bluePP).toBe(7);
+    expect(state.players.first.pp).toBe(7);
     // Drawn?
-    expect(state.blueHand.some((c) => c.name === "Big Guy")).toBe(true);
+    expect(state.players.first.hand.some((c) => c.name === "Big Guy")).toBe(true);
   });
 
   it("Nezha should deal EOT damage", async () => {
@@ -465,7 +465,7 @@ describe("Set 104: Skybound Dragons", () => {
       deckAId: "sample_blue",
       deckBId: "sample_red",
     });
-    state.redBoard = [{ uid: "e1", defense: 5, type: "Follower" }] as any;
+    state.players.second.board = [{ uid: "e1", defense: 5, type: "Follower" }] as any;
 
     const nezha = {
       uid: "b1",
@@ -493,17 +493,17 @@ describe("Set 104: Skybound Dragons", () => {
         },
       ],
     } as any;
-    state.blueBoard = [nezha];
+    state.players.first.board = [nezha];
 
     // End turn action? Dispatch END_TURN
-    state = dispatch(state, { type: "END_TURN", player: "blue" } as any);
+    state = dispatch(state, { type: "END_TURN", player: "first" } as any);
 
     // Damage applied? 5-4=1 or 5-2=3 or both (random).
     // Since only 1 enemy, both hit same logic?
     // damage_random selects valid target.
     // It hits e1 for 4. Defense 1.
     // Then hits e1 for 2. Defense -1. Destroyed.
-    expect(state.redBoard.length).toBe(0);
+    expect(state.players.second.board.length).toBe(0);
   });
 
   it("Unleashed should present Modes", async () => {
@@ -528,12 +528,12 @@ describe("Set 104: Skybound Dragons", () => {
         },
       ],
     } as any;
-    state.blueHand = [unleashed];
-    state.bluePP = 2;
+    state.players.first.hand = [unleashed];
+    state.players.first.pp = 2;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
     expect(true).toBe(true);
@@ -550,7 +550,7 @@ describe("Set 104: Skybound Dragons", () => {
       type: "Follower",
       hasEvolved: true,
     } as any;
-    state.blueBoard = [evolvedAlly];
+    state.players.first.board = [evolvedAlly];
 
     const satyr = {
       uid: "hand_1",
@@ -566,17 +566,17 @@ describe("Set 104: Skybound Dragons", () => {
         },
       ],
     } as any;
-    state.blueHand = [satyr];
-    state.bluePP = 3;
+    state.players.first.hand = [satyr];
+    state.players.first.pp = 3;
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
-    expect(state.blueBoard.length).toBe(2);
-    const satyrOnBoard = state.blueBoard.find((c) => c.name === "Satyr");
+    expect(state.players.first.board.length).toBe(2);
+    const satyrOnBoard = state.players.first.board.find((c) => c.name === "Satyr");
     expect(satyrOnBoard?.hasEvolved).toBe(true);
   });
 
@@ -585,8 +585,8 @@ describe("Set 104: Skybound Dragons", () => {
       deckAId: "sample_blue",
       deckBId: "sample_red",
     });
-    state.blueMaxPP = 10;
-    state.bluePP = 10;
+    state.players.first.maxPP = 10;
+    state.players.first.pp = 10;
 
     const izmir = {
       uid: "hand_1",
@@ -602,15 +602,15 @@ describe("Set 104: Skybound Dragons", () => {
         },
       ],
     } as any;
-    state.blueHand = [izmir];
+    state.players.first.hand = [izmir];
 
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_1",
     });
 
-    const izmirOnBoard = state.blueBoard.find((c) => c.name === "Izmir");
+    const izmirOnBoard = state.players.first.board.find((c) => c.name === "Izmir");
     expect(izmirOnBoard?.hasEvolved).toBe(true);
   });
   it("Vyrn should evolve if super evo is active", async () => {
@@ -626,19 +626,19 @@ describe("Set 104: Skybound Dragons", () => {
     // super_evo_gate checks round >= 7 for blue.
     state.roundCount = 8;
 
-    const card: any = { ...vyrnData, uid: "hand_vyrn", owner: "blue" };
-    state.blueHand = [card];
-    state.bluePP = 3;
-    state.blueMaxPP = 3;
+    const card: any = { ...vyrnData, uid: "hand_vyrn", owner: "first" };
+    state.players.first.hand = [card];
+    state.players.first.pp = 3;
+    state.players.first.maxPP = 3;
 
     // Play
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_vyrn",
     });
 
-    const vyrn = state.blueBoard[0];
+    const vyrn = state.players.first.board[0];
     expect(vyrn).toBeDefined();
     // Should have evolved
     expect(vyrn.hasEvolved).toBe(true);
@@ -653,36 +653,36 @@ describe("Set 104: Skybound Dragons", () => {
     if (!knightData) throw new Error("Golden Knight not found");
 
     // Enhance 9
-    state.blueMaxPP = 10;
-    state.bluePP = 10;
+    state.players.first.maxPP = 10;
+    state.players.first.pp = 10;
 
-    const card: any = { ...knightData, uid: "hand_knight", owner: "blue" };
-    state.blueHand = [card];
-    state.redBoard = [
+    const card: any = { ...knightData, uid: "hand_knight", owner: "first" };
+    state.players.first.hand = [card];
+    state.players.second.board = [
       { name: "Target", type: "Follower", defense: 4, uid: "t1" } as any,
     ];
 
     // Play
     state = dispatch(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: "hand_knight",
     });
 
-    const knight = state.blueBoard[0];
+    const knight = state.players.first.board[0];
     // 1. Should be super evolved? (Op: super_evolve_self)
     // super_evolve_self usually sets hasEvolved=true and evoType="super".
     expect(knight.hasEvolved).toBe(true);
     expect(knight.evoType).toBe("super");
 
     // 2. Damage all enemies 4
-    const target = state.redBoard[0]; // Assuming it survived or died?
+    const target = state.players.second.board[0]; // Assuming it survived or died?
     // 4 dmg to 4 def -> died
     // Wait, dispatch mechanics might differ.
     if (target) {
       // If it's still there, check damage. But likely died.
       // If died, redBoard empty.
-      expect(state.redBoard.length).toBe(0);
+      expect(state.players.second.board.length).toBe(0);
     }
 
     // 3. Heal leader 4
@@ -696,3 +696,9 @@ describe("Set 104: Skybound Dragons", () => {
     // We'll see. If it fails, we know we need to pass option index.
   });
 });
+
+
+
+
+
+

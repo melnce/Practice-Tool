@@ -1,7 +1,7 @@
 import { state } from "../../core/gameState.js";
 import { Player } from "../../core/types.js";
+import { getHand } from "../../core/playerHelpers.js";
 
-import { adapter } from "../../core/adapter.js";
 
 // Helper to check for the keyword OR the gate op (allows removing explicit keyword)
 export function hasSkyboundArt(card: any): boolean {
@@ -60,7 +60,7 @@ export function hasSkyboundArt(card: any): boolean {
  * Increments the 'evolves witnessed' counter on all "Skybound Art" cards in hand.
  */
 export function incrementSkyboundArt(owner: Player, amount: number = 1) {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   let updated = false;
 
   for (const card of hand) {
@@ -74,6 +74,21 @@ export function incrementSkyboundArt(owner: Player, amount: number = 1) {
   }
 
   if (updated) {
-    adapter.render();
+    // Render removed - UI layer
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

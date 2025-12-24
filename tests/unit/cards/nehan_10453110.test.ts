@@ -33,3 +33,9 @@ describe("Nehan, Dispenser of Samsara (10453110)", () => {
     expect(card.fanfare[1].amount).toBe(2);
   });
 });
+
+
+
+
+
+

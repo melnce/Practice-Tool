@@ -7,6 +7,7 @@ import {
   invCardMoved,
   invCardMovedByUid,
 } from "./replayInvariants.js";
+import { getHand, getPP } from "../../core/playerHelpers.js";
 
 /**
  * Static scenario with pre-defined actions.
@@ -201,7 +202,7 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
       "Plays the first available card from hand (preferring cheap/no-target)",
     initParams: { startingPP: 10, initialDraw: 12 }, // Ensure lots of PP and options
     build: (gameState) => {
-      const hand = gameState.blueHand;
+      const hand = getHand(gameState, "first");
 
       // Prefer cards that are usually safe to play (no mandatory targets)
       // Prefer cards that are usually safe to play (no mandatory targets)
@@ -224,14 +225,14 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
 
       // Ensure card is defined before accessing name
       if (!card) {
-        const debugMsg = `[SCENARIO FAIL] No cards in hand. PP: ${gameState.bluePP}`;
+        const debugMsg = `[SCENARIO FAIL] No cards in hand. PP: ${getPP(gameState, "first")}`;
         throw new Error(debugMsg);
       }
 
       const cardName = card.name;
 
       const actions: PlayerAction[] = [
-        playCard(gameState, "blue", { index: targetIndex }),
+        playCard(gameState, "first", { index: targetIndex }),
       ];
 
       return {
@@ -242,11 +243,11 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
     invariants: [
       invCardMoved("played_to_board", {
         metaKey: "playedCardName",
-        player: "blue",
+        player: "first",
         fromZone: "hand",
         toZone: "board",
       }),
-      invHandSize("blue_hand_dec", "blue", 8), // 9 - 1 = 8 (Assuming cap 9)
+      invHandSize("blue_hand_dec", "first", 8), // 9 - 1 = 8 (Assuming cap 9)
     ],
   },
 
@@ -261,7 +262,7 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
     initParams: { startingPP: 10, initialDraw: 12 },
     build: (gameState) => {
       const actions: PlayerAction[] = [];
-      const hand = gameState.blueHand;
+      const hand = getHand(gameState, "first");
 
       // Strict Mode: Require at least 2 distinct playable cards (Follower, Cost <= 3)
       // Filter hand to find valid card instances
@@ -287,8 +288,8 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
       }
 
       // Build actions using Strict UID Selector
-      actions.push(playCard(gameState, "blue", { uid: card1.uid }));
-      actions.push(playCard(gameState, "blue", { uid: card2.uid }));
+      actions.push(playCard(gameState, "first", { uid: card1.uid }));
+      actions.push(playCard(gameState, "first", { uid: card2.uid }));
 
       // Return actions + meta for invariants
       return {
@@ -300,16 +301,16 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
       };
     },
     invariants: [
-      invBoardSize("blue_board_size_2", "blue", 2),
+      invBoardSize("blue_board_size_2", "first", 2),
       invCardMovedByUid("first_play", {
         metaKey: "playedUid1",
-        player: "blue",
+        player: "first",
         fromZone: "hand",
         toZone: "board",
       }),
       invCardMovedByUid("second_play", {
         metaKey: "playedUid2",
-        player: "blue",
+        player: "first",
         fromZone: "hand",
         toZone: "board",
       }),
@@ -332,7 +333,7 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
         // Play index 0, assuming robust starting hand or fallback
         // Use Follower to ensure board size invariant passes
         actions.push(
-          playCard(gameState, "blue", { cardType: "Follower", index: 0 }),
+          playCard(gameState, "first", { cardType: "Follower", index: 0 }),
         );
       } catch {
         // No card available
@@ -343,7 +344,7 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
 
       return actions;
     },
-    invariants: [invBoardSize("blue_retains_board", "blue", 1)],
+    invariants: [invBoardSize("blue_retains_board", "first", 1)],
   },
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -360,7 +361,7 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
 
       // Blue plays first
       try {
-        actions.push(playCard(gameState, "blue", { index: 0 }));
+        actions.push(playCard(gameState, "first", { index: 0 }));
       } catch {
         /* skip */
       }
@@ -370,7 +371,7 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
 
       // Red plays
       try {
-        actions.push(playCard(gameState, "red", { index: 0 }));
+        actions.push(playCard(gameState, "second", { index: 0 }));
       } catch {
         /* skip */
       }
@@ -382,3 +383,18 @@ export const REPLAY_SCENARIOS: readonly ReplayScenario[] = [
     },
   },
 ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

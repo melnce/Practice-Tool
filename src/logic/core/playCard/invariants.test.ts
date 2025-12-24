@@ -9,10 +9,10 @@ import { canPlayCard } from "./preflight.js";
 
 describe("PlayCard Invariants", () => {
   beforeEach(() => {
-    resetGameState();
-    state.isBlueTurn = true;
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
   });
 
   describe("Blocked Invariants", () => {
@@ -28,15 +28,15 @@ describe("PlayCard Invariants", () => {
         ],
       };
 
-      state.blueHand = [spell];
-      state.bluePP = 5;
-      state.redBoard = []; // No targets
+      state.players.first.hand = [spell];
+      state.players.first.pp = 5;
+      state.players.second.board = []; // No targets
 
-      const ppBefore = state.bluePP;
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const ppBefore = state.players.first.pp;
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("blocked");
-      expect(state.bluePP).toBe(ppBefore);
+      expect(state.players.first.pp).toBe(ppBefore);
     });
 
     it("Hand unchanged when blocked", () => {
@@ -51,14 +51,14 @@ describe("PlayCard Invariants", () => {
         ],
       };
 
-      state.blueHand = [spell];
-      state.redBoard = [];
-      const handBefore = [...state.blueHand];
+      state.players.first.hand = [spell];
+      state.players.second.board = [];
+      const handBefore = [...state.players.first.hand];
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("blocked");
-      expect(state.blueHand).toEqual(handBefore);
+      expect(state.players.first.hand).toEqual(handBefore);
     });
 
     it("Board unchanged when blocked", () => {
@@ -73,7 +73,7 @@ describe("PlayCard Invariants", () => {
       };
 
       // Fill board to max
-      state.blueBoard = Array(5)
+      state.players.first.board = Array(5)
         .fill(null)
         .map((_, i) => ({
           id: `board-${i}`,
@@ -85,13 +85,13 @@ describe("PlayCard Invariants", () => {
           defense: 1,
         }));
 
-      state.blueHand = [follower];
-      const boardLengthBefore = state.blueBoard.length;
+      state.players.first.hand = [follower];
+      const boardLengthBefore = state.players.first.board.length;
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("blocked");
-      expect(state.blueBoard.length).toBe(boardLengthBefore);
+      expect(state.players.first.board.length).toBe(boardLengthBefore);
     });
 
     it("No played history entry when blocked", () => {
@@ -106,14 +106,14 @@ describe("PlayCard Invariants", () => {
         ],
       };
 
-      state.blueHand = [spell];
-      state.redBoard = [];
-      state.bluePlayedHistory = [];
+      state.players.first.hand = [spell];
+      state.players.second.board = [];
+      state.players.first.playedHistory = [];
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("blocked");
-      expect(state.bluePlayedHistory.length).toBe(0);
+      expect(state.players.first.playedHistory.length).toBe(0);
     });
   });
 
@@ -129,14 +129,14 @@ describe("PlayCard Invariants", () => {
         defense: 2,
       };
 
-      state.blueHand = [follower];
-      state.bluePP = 10;
-      const ppBefore = state.bluePP;
+      state.players.first.hand = [follower];
+      state.players.first.pp = 10;
+      const ppBefore = state.players.first.pp;
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("done");
-      expect(state.bluePP).toBe(ppBefore - 3); // Exactly one cost payment
+      expect(state.players.first.pp).toBe(ppBefore - 3); // Exactly one cost payment
     });
 
     it("Card removed from hand exactly once", () => {
@@ -150,13 +150,13 @@ describe("PlayCard Invariants", () => {
         defense: 2,
       };
 
-      state.blueHand = [follower];
-      const handLengthBefore = state.blueHand.length;
+      state.players.first.hand = [follower];
+      const handLengthBefore = state.players.first.hand.length;
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("done");
-      expect(state.blueHand.length).toBe(handLengthBefore - 1);
+      expect(state.players.first.hand.length).toBe(handLengthBefore - 1);
     });
 
     it("Played history entry added exactly once", () => {
@@ -170,14 +170,14 @@ describe("PlayCard Invariants", () => {
         defense: 2,
       };
 
-      state.blueHand = [follower];
-      state.bluePlayedHistory = [];
+      state.players.first.hand = [follower];
+      state.players.first.playedHistory = [];
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("done");
-      expect(state.bluePlayedHistory.length).toBe(1);
-      expect(state.bluePlayedHistory[0]?.name).toBe("Test Follower");
+      expect(state.players.first.playedHistory.length).toBe(1);
+      expect(state.players.first.playedHistory[0]?.name).toBe("Test Follower");
     });
 
     it("Follower added to board exactly once", () => {
@@ -191,13 +191,13 @@ describe("PlayCard Invariants", () => {
         defense: 2,
       };
 
-      state.blueHand = [follower];
-      state.blueBoard = [];
+      state.players.first.hand = [follower];
+      state.players.first.board = [];
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("done");
-      expect(state.blueBoard.length).toBe(1);
+      expect(state.players.first.board.length).toBe(1);
     });
   });
 
@@ -222,16 +222,16 @@ describe("PlayCard Invariants", () => {
         defense: 2,
       };
 
-      state.isBlueTurn = false; // Red's turn
-      state.blueHand = [follower];
-      state.bluePP = 10;
-      const ppBefore = state.bluePP;
+      state.isFirstPlayerTurn = false; // Red's turn
+      state.players.first.hand = [follower];
+      state.players.first.pp = 10;
+      const ppBefore = state.players.first.pp;
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("blocked");
       expect("reason" in result ? result.reason : "").toContain("turn");
-      expect(state.bluePP).toBe(ppBefore);
+      expect(state.players.first.pp).toBe(ppBefore);
     });
 
     it("Blocks play when not enough PP", () => {
@@ -245,13 +245,28 @@ describe("PlayCard Invariants", () => {
         defense: 2,
       };
 
-      state.blueHand = [follower];
-      state.bluePP = 3; // Not enough
+      state.players.first.hand = [follower];
+      state.players.first.pp = 3; // Not enough
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("blocked");
       expect("reason" in result ? result.reason : "").toContain("PP");
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

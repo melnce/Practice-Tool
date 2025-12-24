@@ -7,7 +7,6 @@ import {
   getCardDetails,
   isCardDatabaseInitialized,
 } from "../../../../data/cardIndex.js";
-import { adapter } from "../../../../core/adapter.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
 import { boardOf, normalizeName, safeClone } from "./utils.js";
 import { findEarthSigilTarget } from "./earth.js";
@@ -65,8 +64,7 @@ export function summonNamed(eff: Effect, owner: Player) {
       state.lastSummoned.push(card);
     }
   }
-
-  adapter.render();
+  // Render removed - UI orchestrator handles rendering
 }
 
 export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
@@ -137,6 +135,21 @@ export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
     state.lastSummoned.length = 0;
     state.lastSummoned.push(clone);
   }
-  adapter.render();
+  // Render removed - UI orchestrator handles rendering
   return clone;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

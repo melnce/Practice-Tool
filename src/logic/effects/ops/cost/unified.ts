@@ -6,6 +6,7 @@ import { CardInstance, Player, Effect } from "../../../../core/types.js";
 import { getPool } from "../../../core/targeting.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 import { UnifiedCostSpec, normalizeToCostSpec } from "./types.js";
+import { opponentOf, getHand } from "../../../../core/playerHelpers.js";
 
 /**
  * Unified cost handler - handles all cost modification variants.
@@ -78,8 +79,8 @@ function resolveTargets(
     }
 
     case "opponent_hand": {
-      const opponent = owner === "blue" ? "red" : "blue";
-      return opponent === "blue" ? state.blueHand : state.redHand;
+      const opponent = opponentOf(owner);
+      return getHand(state, opponent);
     }
 
     case "last_drawn": {
@@ -143,3 +144,18 @@ function applyCostChange(
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

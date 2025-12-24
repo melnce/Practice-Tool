@@ -13,7 +13,6 @@ import {
   abortAction,
 } from "../../../core/history.js";
 import { playCardCore } from "./core.js";
-import { adapter } from "../../../core/adapter.js";
 import { logEvent } from "../../../core/logger.js";
 import { PlayOutcome } from "./types.js";
 
@@ -56,7 +55,7 @@ export function playCard(
 
     // Render based on outcome (adapter.render() is no-op if not injected)
     if (outcome.kind === "done" || outcome.kind === "paused") {
-      adapter.render();
+      // Render removed - UI layer
     }
 
     return outcome;
@@ -81,3 +80,18 @@ export function playCardNoRender(
 // Re-export types for consumers
 export type { PlayOutcome } from "./types.js";
 export { playCardCore } from "./core.js";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

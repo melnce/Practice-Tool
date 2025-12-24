@@ -6,13 +6,13 @@ import { CardInstance } from "../../../src/core/types";
 
 describe("Gilnelise Logic", () => {
   beforeEach(() => {
-    Object.assign(state, createInitialState());
+    Object.assign(state, createInitialState(1));
   });
 
   describe("handleBothMaxPPGate", () => {
     it("should handle effectsQueue correctly when both players have max PP", () => {
-      state.blueMaxPP = 10;
-      state.redMaxPP = 10;
+      state.players.first.maxPP = 10;
+      state.players.second.maxPP = 10;
 
       const eff = {
         op: "gate",
@@ -27,8 +27,8 @@ describe("Gilnelise Logic", () => {
     });
 
     it("should safely handle non-array queue (prevent crash)", () => {
-      state.blueMaxPP = 10;
-      state.redMaxPP = 10;
+      state.players.first.maxPP = 10;
+      state.players.second.maxPP = 10;
 
       const eff = {
         op: "gate",
@@ -44,8 +44,8 @@ describe("Gilnelise Logic", () => {
 
   describe("Glow Logic", () => {
     it("should return enhance-ready glow when both max PP >= 10", () => {
-      state.blueMaxPP = 10;
-      state.redMaxPP = 10;
+      state.players.first.maxPP = 10;
+      state.players.second.maxPP = 10;
 
       const card: CardInstance = {
         id: "123",
@@ -58,7 +58,7 @@ describe("Gilnelise Logic", () => {
 
       const ctx = {
         state,
-        owner: "blue",
+        owner: "first",
         isPlayersTurn: true,
         availablePP: 10,
         isSpell: false,
@@ -69,8 +69,8 @@ describe("Gilnelise Logic", () => {
     });
 
     it("should return playable-glow when condition not met", () => {
-      state.blueMaxPP = 5;
-      state.redMaxPP = 10;
+      state.players.first.maxPP = 5;
+      state.players.second.maxPP = 10;
 
       const card: CardInstance = {
         id: "123",
@@ -83,7 +83,7 @@ describe("Gilnelise Logic", () => {
 
       const ctx = {
         state,
-        owner: "blue",
+        owner: "first",
         isPlayersTurn: true,
         availablePP: 10,
         isSpell: false,
@@ -94,3 +94,9 @@ describe("Gilnelise Logic", () => {
     });
   });
 });
+
+
+
+
+
+

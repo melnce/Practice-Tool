@@ -20,3 +20,18 @@ export function handleGenericEvent(
   const zones = getAllZoneCandidates();
   processCandidateTriggers(zones, { event, activePlayer, context });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

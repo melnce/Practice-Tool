@@ -1,6 +1,7 @@
 // src/logic/core/replayInvariants.ts
 import { GameState, Player, EffectOp } from "../../core/types.js";
 import { EffectTraceEvent } from "./effects/trace.js";
+import { getHand, getBoard, getDeck, getGraveyard, getHP } from "../../core/playerHelpers.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. Error Type
@@ -45,23 +46,13 @@ export interface ReplayInvariant {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getPlayerState(state: GameState, player: Player) {
-  if (player === "blue") {
-    return {
-      hand: state.blueHand,
-      board: state.blueBoard,
-      deck: state.blueDeck,
-      graveyard: state.blueGraveyard,
-      leaderHealth: state.blueLeaderHealth,
-    };
-  } else {
-    return {
-      hand: state.redHand,
-      board: state.redBoard,
-      deck: state.redDeck,
-      graveyard: state.redGraveyard,
-      leaderHealth: state.redLeaderHealth,
-    };
-  }
+  return {
+    hand: getHand(state, player),
+    board: getBoard(state, player),
+    deck: getDeck(state, player),
+    graveyard: getGraveyard(state, player),
+    leaderHealth: getHP(state, player),
+  };
 }
 
 type Zone = "hand" | "board" | "graveyard" | "deck";
@@ -231,10 +222,7 @@ export function invLeaderHealth(
     id: `leader_health_${player}_${idSuffix}`,
     description: `Assert ${player} leader health is ${expected}`,
     check({ scenarioId, finalState }) {
-      const actual =
-        player === "blue"
-          ? finalState.blueLeaderHealth
-          : finalState.redLeaderHealth;
+      const actual = getHP(finalState, player);
       if (actual !== expected) {
         throw new ReplayInvariantError(
           `leader_health_${player}_${idSuffix}`,
@@ -258,7 +246,7 @@ export function invHandSize(
     id: `hand_size_${player}_${idSuffix}`,
     description: `Assert ${player} hand size is ${expected}`,
     check({ scenarioId, finalState }) {
-      const hand = player === "blue" ? finalState.blueHand : finalState.redHand;
+      const hand = getHand(finalState, player);
       if (hand.length !== expected) {
         throw new ReplayInvariantError(
           `hand_size_${player}_${idSuffix}`,
@@ -282,8 +270,7 @@ export function invBoardSize(
     id: `board_size_${player}_${idSuffix}`,
     description: `Assert ${player} board size is ${expected}`,
     check({ scenarioId, finalState }) {
-      const board =
-        player === "blue" ? finalState.blueBoard : finalState.redBoard;
+      const board = getBoard(finalState, player);
       if (board.length !== expected) {
         throw new ReplayInvariantError(
           `board_size_${player}_${idSuffix}`,
@@ -361,3 +348,18 @@ export function invEffectCount(
     },
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,13 +1,34 @@
 // src/helpers/overflow.ts
 import { state } from "../core/gameState.js";
+import { Player } from "../core/types.js";
 
-// Overflow is ON when your *max* PP is at least 7 (temp +1 for red does NOT count)
-export function isOverflow(owner: "blue" | "red"): boolean {
-  // adapt to your state keys; prefer explicit max fields
-  const max =
-    owner === "blue"
-      ? (state.blueMaxPP ?? state.bluePPMax ?? 0)
-      : (state.redMaxPP ?? state.redPPMax ?? 0);
+/**
+ * Check if player has Overflow active.
+ * Overflow is ON when max PP is at least 7 (temp +1 for second player doesn't count).
+ * 
+ * @param owner - Player slot (accepts both legacy "blue"/"red" and new "first"/"second")
+ */
+export function isOverflow(owner: Player): boolean {
+  // Map to internal state keys
+  const isFirst = owner === "first";
+
+  const max = isFirst
+    ? state.players.first.maxPP
+    : state.players.second.maxPP;
 
   return Number(max) >= 7;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

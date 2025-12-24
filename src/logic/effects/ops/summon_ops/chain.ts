@@ -4,6 +4,7 @@ import { logEvent } from "../../../../core/logger.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { CardInstance, Player } from "../../../../core/types.js";
 import { boardOf } from "./utils.js";
+import { setRally, getRally, opponentOf } from "../../../../core/playerHelpers.js";
 
 // =============== Generic Board Fill Chain ===============
 
@@ -138,15 +139,30 @@ export function handleFillBoardChainDecay(
     } as any);
 
     // Rally for followers
-    if (owner === "blue") state.blueRally++;
-    else state.redRally++;
+    setRally(state, owner, getRally(state, owner) + 1);
 
     // Per-enter hooks & triggers (keep parity with pushToBoard)
-    // medicalAssassinOnFollowerEnter(owner, clone);
+    // Fire ally trigger for owner, enemy trigger for opponent
+    const opponent = opponentOf(owner);
     fireTrigger("ally_follower_enter", owner, { enteringCard: clone });
-    fireTrigger("enemy_follower_enter", owner, { enteringCard: clone });
+    fireTrigger("enemy_follower_enter", opponent, { enteringCard: clone });
 
     // Next link in the chain is the clone we just placed
     prev = clone;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

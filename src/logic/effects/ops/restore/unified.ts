@@ -37,7 +37,7 @@ export function handleRestore(
 
   // Resolve target player
   const targetPlayer: Player =
-    spec.player === "opponent" ? (owner === "blue" ? "red" : "blue") : owner;
+    spec.player === "opponent" ? (owner === "first" ? "second" : "first") : owner;
 
   // Resolve amount
   const amount = resolveAmount(spec, targetPlayer, context);
@@ -156,3 +156,18 @@ function storeInContext(
   context[variableName] = value;
   logEvent("restore_store_variable", { variable: variableName, value });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

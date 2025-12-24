@@ -56,7 +56,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Detective's Lens",
             "count": 1
@@ -375,7 +374,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Fairy"
       }
@@ -388,7 +386,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Fairy"
       }
@@ -401,7 +398,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Fairy"
       }
@@ -530,7 +526,6 @@
     "spell": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Fairy",
         "count": 2
@@ -568,7 +563,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10112120",
@@ -594,7 +591,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Fairy",
             "count": 1
@@ -662,14 +658,12 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Deepwood Bounty",
             "count": 1
           },
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Fairy",
             "count": 1
@@ -678,7 +672,6 @@
         "else_effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Fairy",
             "count": 1
@@ -724,7 +717,6 @@
     "spell": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Deepwood Bounty",
         "count": 1
@@ -869,11 +861,8 @@
     "keywords": [],
     "triggers": [
       {
-        "event": "follower_leaves_field",
+        "event": "ally_follower_leaves_field",
         "source": "hand",
-        "condition": {
-          "is_ally": true
-        },
         "effects": [
           {
             "op": "cost",
@@ -911,7 +900,9 @@
         "defense": 0
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "id": "10113210",
@@ -1005,7 +996,9 @@
             {
               "op": "keyword",
               "action": "grant",
-              "keywords": ["Storm"],
+              "keywords": [
+                "Storm"
+              ],
               "target": "entering_follower"
             }
           ]
@@ -1046,7 +1039,9 @@
         "target_card_name": "Bramble Burst"
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10114130",
@@ -1111,7 +1106,9 @@
         }
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10121110",
@@ -1141,7 +1138,9 @@
         "defense": 1
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10121120",
@@ -1196,7 +1195,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Fanfare: Summon a Steelclad Knight.\nWhenever an allied Officer follower enters the field, restore 1 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10121130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10121130_evo.webp",
@@ -1291,12 +1292,16 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
     ],
-    "keywords": ["Rush"]
+    "keywords": [
+      "Rush"
+    ]
   },
   {
     "id": "10121310",
@@ -1339,7 +1344,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Silver",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Whenever an allied Officer follower enters the field, give this follower +1/+0 until the end of the turn.\nEvolve: Summon a Knight.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10122110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10122110_evo.webp",
@@ -1393,7 +1400,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Silver",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Fanfare: Summon 3 copies of Steelclad Knight.\nWhenever an allied Officer follower enters the field, give it Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10122120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10122120_evo.webp",
@@ -1423,7 +1432,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -1439,7 +1450,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Silver",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Fanfare: Summon a Knight.\nWhenever an allied Officer follower enters the field, give it Rush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10122130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10122130_evo.webp",
@@ -1469,7 +1482,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Rush"],
+            "keywords": [
+              "Rush"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -1508,7 +1523,9 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Ambush"]
+    "keywords": [
+      "Ambush"
+    ]
   },
   {
     "id": "10122310",
@@ -1572,7 +1589,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Gold",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Rush\nCan attack 2 times per turn.\nStrike: Give this follower Barrier. Summon a Knight.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10123110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10123110_evo.webp",
@@ -1583,7 +1602,10 @@
     "superevolve": [],
     "fanfare": [],
     "attacks_per_turn": 2,
-    "keywords": ["Rush", "Strike"],
+    "keywords": [
+      "Rush",
+      "Strike"
+    ],
     "triggers": [
       {
         "event": "strike",
@@ -1644,7 +1666,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Ambush"]
+            "keywords": [
+              "Ambush"
+            ]
           },
           {
             "op": "stat",
@@ -1743,7 +1767,10 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Rush", "Ward"],
+            "keywords": [
+              "Rush",
+              "Ward"
+            ],
             "target": "entering_follower"
           },
           {
@@ -1766,7 +1793,9 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Gold",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Select an enemy follower on the field or the enemy leader and deal it 5 damage. Restore 5 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10123310.webp",
     "evo_image": "",
@@ -1801,7 +1830,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Enhance (9): Deal 3 damage to all enemy followers. Give this follower \"Can attack 2 times per turn.\"\nStorm",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10124110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10124110_evo.webp",
@@ -1854,7 +1885,9 @@
           "class": "Swordcraft"
         },
         "exclude_self": true,
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "fanfare": [
@@ -1897,13 +1930,15 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       }
     ],
     "fanfare": [],
     "keywords": [
       {
-        "name": "lastwords",
+        "name": "LastWords",
         "effects": [
           {
             "op": "crest",
@@ -1912,6 +1947,9 @@
             "image": "images/crests/kagemitsu_enduring_warrior.png",
             "description": "Countdown (2) Last Words: Summon a Kagemitsu, Enduring Warrior",
             "countdown": 2,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "summon",
@@ -2166,7 +2204,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Silver",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Spellboost your hand.\nEvolve: Select an enemy follower on the field and deal it 3 damage. Spellboost your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10132110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10132110_evo.webp",
@@ -2264,7 +2304,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Silver",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "X starts at 0.\nOn Spellboost: Increase X by 1.\nFanfare: Deal X damage to all enemy followers.\nEvolve: Spellboost your hand 2 times.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10132130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10132130_evo.webp",
@@ -2396,7 +2438,9 @@
           {
             "op": "stat",
             "action": "give",
-            "keywords": ["Can't Attack"],
+            "keywords": [
+              "Can't Attack"
+            ],
             "duration": "opponent_turn_end"
           }
         ]
@@ -2601,7 +2645,9 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "X starts at 0.\nOn Spellboost: Increase X by 1. Then, if X is at least 5, transform this card into a Looking Smart!\nDraw 2 cards.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10133310.webp",
     "evo_image": "",
@@ -2752,7 +2798,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Summon an Anne's Summoning. Spellboost your hand 3 times.\nEvolve: Select an enemy follower on the field and deal it 3 damage.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10134120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10134120_evo.webp",
@@ -2897,7 +2945,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["storm"]
+            "keywords": [
+              "storm"
+            ]
           }
         ]
       }
@@ -3085,7 +3135,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "on_discard": [
       {
         "op": "stat",
@@ -3124,12 +3176,16 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Intimidate"]
+            "keywords": [
+              "Intimidate"
+            ]
           }
         ]
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "id": "10142130",
@@ -3270,7 +3326,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"]
+    "keywords": [
+      "Storm"
+    ]
   },
   {
     "id": "10143120",
@@ -3341,7 +3399,9 @@
         "count": 1
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10143140",
@@ -3386,7 +3446,9 @@
     "type": "Follower",
     "class": "Dragoncraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Select a card in your hand and discard it. Deal X damage to all enemy followers. X is the cost of the selected card.\nSuper-Evolve: Give your opponent Crest: Burnite, Anathema of Flame.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10144110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10144110_evo.webp",
@@ -3413,7 +3475,7 @@
             ]
           },
           {
-            "event": "heal_leader",
+            "event": "leader_restored",
             "once_per_turn": true,
             "effects": [
               {
@@ -3458,7 +3520,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm", "Intimidate"]
+    "keywords": [
+      "Storm",
+      "Intimidate"
+    ]
   },
   {
     "id": "10144130",
@@ -3482,14 +3547,18 @@
         "action": "grant",
         "target": "ally:follower",
         "name_filter": "Supreme Golden Dragon",
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       },
       {
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
         "name_filter": "Supreme Silver Dragon",
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "fanfare": [
@@ -3752,7 +3821,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Skeleton",
             "count": 1
@@ -3767,13 +3835,17 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
@@ -3844,14 +3916,12 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Ghost",
             "count": 1
           },
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Bat",
             "count": 1
@@ -3987,7 +4057,9 @@
         ]
       }
     ],
-    "keywords": ["Bane"]
+    "keywords": [
+      "Bane"
+    ]
   },
   {
     "id": "10153120",
@@ -4049,7 +4121,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10153130",
@@ -4108,7 +4182,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Bane"],
+            "keywords": [
+              "Bane"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -4274,7 +4350,9 @@
     "superevolve": [],
     "fanfare": [],
     "attacks_per_turn": 3,
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "follower_strike",
@@ -4420,7 +4498,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward", "Barrier"]
+    "keywords": [
+      "Ward",
+      "Barrier"
+    ]
   },
   {
     "id": "10161130",
@@ -4473,7 +4554,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Aura"],
+    "keywords": [
+      "Aura"
+    ],
     "triggers": [
       {
         "event": "engage",
@@ -4592,7 +4675,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "superevolve": [
@@ -4600,7 +4685,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "fanfare": [],
@@ -4838,7 +4925,9 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Ambush"]
+    "keywords": [
+      "Ambush"
+    ]
   },
   {
     "id": "10163130",
@@ -4869,6 +4958,9 @@
             "image": "images/crests/lapis_shining_seraph.png",
             "description": "Countdown (2) Last Words: Summon a Lapis, Shining Seraph and give it Storm",
             "countdown": 2,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "summon",
@@ -4879,7 +4971,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Storm"]
+                "keywords": [
+                  "Storm"
+                ]
               }
             ]
           }
@@ -4974,7 +5068,9 @@
     "type": "Follower",
     "class": "Havencraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Select a card in your hand and discard it. Summon 3 random differently named amulets from your deck that cost 3 or less.\nSuper-Evolve: Destroy a random enemy follower with the highest attack. Deal 1 damage to all enemy followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10164110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10164110_evo.webp",
@@ -5044,7 +5140,9 @@
         "defense": 4
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10164130",
@@ -5083,7 +5181,9 @@
         "amount": 3
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": [
+      "Ward"
+    ]
   },
   {
     "id": "10171110",
@@ -5109,7 +5209,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Gear of Remembrance",
             "count": 1
@@ -5179,7 +5278,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
@@ -5214,7 +5312,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Bane"],
+            "keywords": [
+              "Bane"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -5225,7 +5325,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Enhanced Puppet",
         "count": 1
@@ -5280,14 +5379,12 @@
     "spell": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -5329,14 +5426,12 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -5362,7 +5457,6 @@
     "evolve": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Puppet",
         "count": 1
@@ -5371,7 +5465,6 @@
     "superevolve": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Puppet",
         "count": 1
@@ -5380,7 +5473,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Puppet",
         "count": 1
@@ -5408,7 +5500,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Puppet",
         "count": 3
@@ -5450,7 +5541,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -5483,7 +5573,6 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": true,
         "eot_destroy": true,
         "select": 2,
         "max_cost": 5
@@ -5509,14 +5598,12 @@
     "evolve": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -5525,14 +5612,12 @@
     "superevolve": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -5541,14 +5626,12 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -5732,14 +5815,12 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Remembrance",
         "count": 1
@@ -5768,7 +5849,6 @@
     "fanfare": [
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Gear of Ambition",
         "count": 1
@@ -5941,7 +6021,10 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Storm", "Bane"],
+            "keywords": [
+              "Storm",
+              "Bane"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -5972,7 +6055,6 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": true,
         "max_cost": 5,
         "select": 3
       }

@@ -2,6 +2,7 @@
 import { state } from "../../../core/gameState.js";
 import { logEvent } from "../../../core/logger.js";
 import { Player } from "../../../core/types.js";
+import { getPlaysThisTurn, setPlaysThisTurn } from "../../../core/playerHelpers.js";
 
 interface ComboEffect {
   amount?: number;
@@ -11,13 +12,9 @@ interface ComboEffect {
 
 export function handleComboAdd(owner: Player, eff: ComboEffect) {
   const add = parseInt(String(eff.amount ?? eff.count ?? 1)) || 0;
-  if (owner === "blue") {
-    state.bluePlaysThisTurn = (state.bluePlaysThisTurn || 0) + add;
-    logEvent("comboAdd", { owner, add, plays: state.bluePlaysThisTurn });
-  } else {
-    state.redPlaysThisTurn = (state.redPlaysThisTurn || 0) + add;
-    logEvent("comboAdd", { owner, add, plays: state.redPlaysThisTurn });
-  }
+  const newPlays = getPlaysThisTurn(state, owner) + add;
+  setPlaysThisTurn(state, owner, newPlays);
+  logEvent("comboAdd", { owner, add, plays: newPlays });
 }
 
 export function handleComboGate(
@@ -25,10 +22,7 @@ export function handleComboGate(
   ctx: any,
 ) {
   const need = Math.max(1, parseInt(String(eff.count || eff.min || 1)));
-  const plays =
-    ctx.owner === "blue"
-      ? state.bluePlaysThisTurn || 0
-      : state.redPlaysThisTurn || 0;
+  const plays = getPlaysThisTurn(state, ctx.owner);
 
   const conditionMet = plays >= need;
   const next = (conditionMet ? eff.effects : eff.else_effects) || [];
@@ -45,3 +39,18 @@ export function handleComboGate(
 
   return "done";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

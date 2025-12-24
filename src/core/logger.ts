@@ -176,8 +176,8 @@ export function logEvent(type: string, details: any = {}): number | undefined {
     type,
     session: _sessionTag || null,
     turn: state.roundCount ?? 0,
-    isBlueTurn: !!state.isBlueTurn,
-    activePlayer: state.activePlayer || (state.isBlueTurn ? "blue" : "red"),
+    isFirstPlayerTurn: !!state.isFirstPlayerTurn,
+    activePlayer: state.activePlayer || (state.isFirstPlayerTurn ? "first" : "second"),
   };
 
   // Create shell entry immediately
@@ -254,3 +254,17 @@ if (typeof window !== "undefined") {
   (window as any).computeStateHash = computeStateHash;
   (window as any).setGameLogSession = setSessionTag;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

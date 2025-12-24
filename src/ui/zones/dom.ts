@@ -178,15 +178,29 @@ export function renderCardDOM(
 
   // Tooltip
   if (tooltipContainer) {
-    // Original logic checks (containerId.includes("blue")) for `isAlly`.
+    // Original logic checks (containerId.includes("first")) for `isAlly`.
     // We need that context. `attachTooltip` uses it for "Can evolve" checks etc.
     // We'll pass it in or infer.
-    // `attachTooltip(div, tooltipEl, card, containerId.includes("blue"));`
+    // `attachTooltip(div, tooltipEl, card, containerId.includes("first"));`
     // We need `isBlue` passed to `renderCardDOM` or derive it.
     // Let's rely on `id` prefix or pass a boolean.
-    const isBlue = elementId.includes("blue");
+    const isBlue = elementId.includes("first");
     attachTooltip(div, tooltipContainer, card, isBlue);
   }
 
   return div;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

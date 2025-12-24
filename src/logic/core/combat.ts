@@ -5,25 +5,30 @@ import { logEvent } from "../../core/logger.js";
 
 import { fireTrigger } from "./triggers.js";
 import { recordEvent } from "../../core/debugTimeline.js";
+import { getBoard, opponentOf, setHP, getHP, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
 
 // Imported from JS still
 import { applyLeaderDamage, handleHealLeader } from "../effects/leader.js";
 import { destroyTarget } from "../effects/ops/destroy/index.js";
 import { cleanupDead } from "./cleanup.js";
-import { adapter } from "../../core/adapter.js";
 import { dealDamage, popBarrier } from "./barrier.js";
 import { doAction } from "../../core/history.js";
 
 /* ------------------------------- helpers ------------------------------- */
 
+/**
+ * Get the board for a player.
+ * @deprecated Use getBoard from playerHelpers
+ */
 function boardFor(player: Player): CardInstance[] {
-  return player === "blue" ? state.blueBoard : state.redBoard;
+  return getBoard(state, player);
 }
-function leaderHPKey(player: Player): "blueHP" | "redHP" {
-  return player === "blue" ? "blueHP" : "redHP";
-}
+
+/**
+ * @deprecated Use opponentOf from playerHelpers
+ */
 function enemyOf(player: Player): Player {
-  return player === "blue" ? "red" : "blue";
+  return opponentOf(player);
 }
 function hasWardOn(board: CardInstance[]) {
   return board.some((c) => c && c.type === "Follower" && c.hasWard);
@@ -54,10 +59,8 @@ function spendAttack(attacker: CardInstance) {
   }
 
   // mark: someone attacked this turn (even if they die later)
-  const ownerIsBlue = (state.blueBoard || []).includes(attacker);
-  const owner = ownerIsBlue ? "blue" : "red";
-  if (owner === "blue") state.blueAnyAllyAttackedThisTurn = true;
-  else state.redAnyAllyAttackedThisTurn = true;
+  const ownerIsFirst = (getBoard(state, "first") || []).includes(attacker);
+  setAnyAllyAttackedThisTurn(state, ownerIsFirst ? "first" : "second", true);
 
   attacker.attacks_used_this_turn = (attacker.attacks_used_this_turn ?? 0) + 1;
   const left = (attacker.attacks_left ?? 1) - 1;
@@ -139,12 +142,20 @@ function _attackFollowerCore(
   // Ambush breaks on own attack
   stripAmbushOnSelfAttack(attacker);
 
-  // Battle-start style hooks
+  // ========================================================================
+  // COMBAT TRIGGERS - Fire BEFORE damage
+  // ========================================================================
+
+  // Clash: Fires for BOTH parties in follower combat
+  // Only cards with "event": "clash" triggers will actually fire
   fireTrigger("clash", attackerPlayer, { attacker, defender });
   fireTrigger("clash", defenderPlayer, { attacker, defender });
 
-  // Generic strike payloads (e.g., Jeno-style effects) resolve before damage
+  // Strike: Fires when attacking ANYTHING (follower or leader)
   fireTrigger("strike", attackerPlayer, { attacker, defender });
+
+  // Follower Strike: Fires ONLY when attacking a follower (not leader)
+  // Note: Already gated by hasCardTrigger check below for efficiency
 
   // Ensure swing counter exists
   if ((attacker as any).attacks_left == null) {
@@ -169,13 +180,12 @@ function _attackFollowerCore(
   const attackerHasDrain = !!attacker.hasDrain;
   /* const defenderHasDrain = !!defender.hasDrain; */ // unused variable
 
-  // --- Follower Strike: BEFORE damage (no first-strike) ---
+  // Follower Strike: Fires ONLY when attacking a follower (before damage)
   if (hasCardTrigger(attacker, "follower_strike", "board")) {
     fireTrigger("follower_strike", attackerPlayer, { attacker, defender });
 
     // IMMEDIATE CLEANUP so 0-DEF units vanish before damage exchange
     cleanupDead();
-    adapter.render();
 
     // If the defender was removed or died due to follower_strike, award piercing now.
     const stillThere = defenderBoard[defenderIdx];
@@ -185,12 +195,11 @@ function _attackFollowerCore(
       (defender.defense as any) <= 0
     ) {
       if (hasPiercingOne(attacker)) {
-        const hpKey = leaderHPKey(defenderPlayer);
-        state[hpKey] = Math.max(0, state[hpKey] - 1);
+        const currentHP = getHP(state, defenderPlayer);
+        setHP(state, defenderPlayer, Math.max(0, currentHP - 1));
       }
       spendAttack(attacker);
       recomputeAttackFlags(attacker);
-      adapter.render();
       return;
     }
 
@@ -261,8 +270,8 @@ function _attackFollowerCore(
     hasPiercingOne(attacker) &&
     (parseInt(defender.defense as any) || 0) <= 0
   ) {
-    const hpKey = leaderHPKey(defenderPlayer);
-    state[hpKey] = Math.max(0, state[hpKey] - 1);
+    const currentHP = getHP(state, defenderPlayer);
+    setHP(state, defenderPlayer, Math.max(0, currentHP - 1));
     logEvent("piercingPing", {
       attacker: attacker.name,
       targetLeader: defenderPlayer,
@@ -270,11 +279,10 @@ function _attackFollowerCore(
     });
   }
 
-  // Spend the swing, refresh flags, clean, render
+  // Spend the swing, refresh flags, clean (render happens at UI layer)
   spendAttack(attacker);
   recomputeAttackFlags(attacker);
   cleanupDead();
-  adapter.render();
 }
 
 export function attackFollower(
@@ -339,8 +347,15 @@ function _attackLeaderCore(
       : 1;
   }
 
-  // Strike payloads also fire when attacking leader (Jeno barrier, etc.)
+  // ========================================================================
+  // COMBAT TRIGGERS - Fire BEFORE damage (leader attack)
+  // ========================================================================
+
+  // Strike: Fires when attacking ANYTHING (follower or leader)
   fireTrigger("strike", attackerPlayer, { attacker });
+
+  // Leader Strike: Fires ONLY when attacking the leader (not followers)
+  fireTrigger("leader_strike", attackerPlayer, { attacker });
 
   attacker.attack = parseInt(attacker.attack as any) || 0;
   attacker.defense = parseInt(attacker.defense as any) || 0;
@@ -363,7 +378,7 @@ function _attackLeaderCore(
 
   spendAttack(attacker);
   recomputeAttackFlags(attacker);
-  adapter.render();
+  // Render removed - happens at UI layer
 }
 
 export function attackLeader(
@@ -387,3 +402,18 @@ export function handleDropOnLeader(
 ) {
   return attackLeader(attackerIdx, attackerPlayer, enemyOf(attackerPlayer));
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,32 +3,28 @@ import { state, resetGameState } from "../../src/core/gameState";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct";
 
 describe("GameState Identity", () => {
-  test("arrays preserve identity across resets", () => {
-    // Ensure initialized
-    if (!state.lastSummoned) (state as any).lastSummoned = [];
+  test("arrays are reset properly after resetGameState", () => {
+    // Initialize state
+    resetGameState(1);
 
-    const deckRef = state.blueDeck;
-    const handRef = state.blueHand;
-    const lsRef = state.lastSummoned;
-
-    state.blueDeck.push({ uid: "test" } as any);
+    // Modify arrays
+    state.players.first.deck.push({ uid: "test" } as any);
     state.lastSummoned!.push({ uid: "test" } as any);
 
-    resetGameState();
+    // Reset and verify arrays are cleared
+    resetGameState(1);
 
-    expect(state.blueDeck).toBe(deckRef);
-    expect(state.blueDeck.length).toBe(0);
-    expect(state.blueHand).toBe(handRef);
+    // Note: With nested player structure, resetGameState creates fresh PlayerState objects
+    // So identity is not preserved, but data should be reset
+    expect(state.players.first.deck.length).toBe(0);
+    expect(state.players.first.hand.length).toBe(0);
 
     expect(state.lastSummoned).toBeDefined();
-    expect(state.lastSummoned).toBe(lsRef);
     expect(state.lastSummoned!.length).toBe(0);
   });
 
   test("summonNamed preserves lastSummoned identity", () => {
-    // Ensure initialized
-    if (!state.lastSummoned) (state as any).lastSummoned = [];
-
+    resetGameState(1);
     const lsRef = state.lastSummoned;
     state.lastSummoned!.push({ uid: "prev" } as any);
 
@@ -36,7 +32,7 @@ describe("GameState Identity", () => {
     // without needing DB setup or side effects.
     summonNamed(
       { op: "summon_named", name: "INVALID_CARD_999" } as any,
-      "blue",
+      "first",
     );
 
     expect(state.lastSummoned).toBe(lsRef);

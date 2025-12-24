@@ -13,16 +13,16 @@ import { Effect } from "../../src/core/types";
 
 describe("Golden: Damage Calculator Stability", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
     // Ensure no overflow state (maxPP < 7)
-    state.blueMaxPP = 3;
-    state.redMaxPP = 3;
+    state.players.first.maxPP = 3;
+    state.players.second.maxPP = 3;
   });
 
   describe("base amount resolution", () => {
     it("resolves numeric amount", () => {
       const eff: Effect = { op: "damage", amount: 5 };
-      const ctx: DamageAmountContext = { owner: "blue" };
+      const ctx: DamageAmountContext = { owner: "first" };
 
       const result = resolveDamageAmount(eff, ctx);
 
@@ -33,7 +33,7 @@ describe("Golden: Damage Calculator Stability", () => {
 
     it("handles zero damage", () => {
       const eff: Effect = { op: "damage", amount: 0 };
-      const ctx: DamageAmountContext = { owner: "blue" };
+      const ctx: DamageAmountContext = { owner: "first" };
 
       const result = resolveDamageAmount(eff, ctx);
 
@@ -44,7 +44,7 @@ describe("Golden: Damage Calculator Stability", () => {
   describe("add_amount stacking", () => {
     it("adds add_amount to base", () => {
       const eff: Effect = { op: "damage", amount: 3, add_amount: 2 };
-      const ctx: DamageAmountContext = { owner: "blue" };
+      const ctx: DamageAmountContext = { owner: "first" };
 
       const result = resolveDamageAmount(eff, ctx);
 
@@ -57,10 +57,10 @@ describe("Golden: Damage Calculator Stability", () => {
   describe("overflow mechanics", () => {
     it("uses overflow_amount when overflowing", () => {
       // Trigger overflow: maxPP >= 7
-      state.blueMaxPP = 7;
+      state.players.first.maxPP = 7;
 
       const eff: Effect = { op: "damage", amount: 2, amount_overflow: 5 };
-      const ctx: DamageAmountContext = { owner: "blue" };
+      const ctx: DamageAmountContext = { owner: "first" };
 
       const result = resolveDamageAmount(eff, ctx);
 
@@ -70,10 +70,10 @@ describe("Golden: Damage Calculator Stability", () => {
     });
 
     it("uses base amount when not overflowing", () => {
-      state.blueMaxPP = 6; // Not overflowing (< 7)
+      state.players.first.maxPP = 6; // Not overflowing (< 7)
 
       const eff: Effect = { op: "damage", amount: 2, amount_overflow: 5 };
-      const ctx: DamageAmountContext = { owner: "blue" };
+      const ctx: DamageAmountContext = { owner: "first" };
 
       const result = resolveDamageAmount(eff, ctx);
 
@@ -82,7 +82,7 @@ describe("Golden: Damage Calculator Stability", () => {
     });
 
     it("overflow + add_amount combines correctly", () => {
-      state.blueMaxPP = 7; // Overflowing
+      state.players.first.maxPP = 7; // Overflowing
 
       const eff: Effect = {
         op: "damage",
@@ -90,7 +90,7 @@ describe("Golden: Damage Calculator Stability", () => {
         amount_overflow: 4,
         add_amount: 1,
       };
-      const ctx: DamageAmountContext = { owner: "blue" };
+      const ctx: DamageAmountContext = { owner: "first" };
 
       const result = resolveDamageAmount(eff, ctx);
 
@@ -102,7 +102,7 @@ describe("Golden: Damage Calculator Stability", () => {
   describe("edge cases", () => {
     it("handles undefined add_amount gracefully", () => {
       const eff: Effect = { op: "damage", amount: 3 };
-      const ctx: DamageAmountContext = { owner: "blue" };
+      const ctx: DamageAmountContext = { owner: "first" };
 
       const result = resolveDamageAmount(eff, ctx);
 
@@ -111,3 +111,9 @@ describe("Golden: Damage Calculator Stability", () => {
     });
   });
 });
+
+
+
+
+
+

@@ -37,3 +37,17 @@ export function recordEvent(
 export function getTimeline(): DebugEvent[] {
   return [..._timeline];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

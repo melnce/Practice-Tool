@@ -1,6 +1,6 @@
 // src/helpers/board.ts
 
-import { GameState } from "../core/types.js";
+import { GameState, Player } from "../core/types.js";
 
 /**
  * Checks if the given zone ID represents the board of the current turn's player.
@@ -13,7 +13,7 @@ export function isOwnBoard(zoneId: string, state: GameState): boolean {
   const isRedBoard = zoneId === "redBoard";
   if (!isBlueBoard && !isRedBoard) return false;
 
-  return (isBlueBoard && state.isBlueTurn) || (isRedBoard && !state.isBlueTurn);
+  return (isBlueBoard && state.isFirstPlayerTurn) || (isRedBoard && !state.isFirstPlayerTurn);
 }
 
 /**
@@ -35,12 +35,20 @@ export function isHandZone(zoneId: string): boolean {
 }
 
 /**
- * Returns the owner string ("blue" or "red") for a given zone ID.
+ * Returns the owner PlayerSlot for a given zone ID.
  * @param {string} zoneId
- * @returns {string|null}
+ * @returns {Player|null}
  */
-export function getZoneOwner(zoneId: string): "blue" | "red" | null {
-  if (zoneId.startsWith("blue")) return "blue";
-  if (zoneId.startsWith("red")) return "red";
+export function getZoneOwner(zoneId: string): Player | null {
+  if (zoneId.startsWith("blue")) return "first";
+  if (zoneId.startsWith("red")) return "second";
   return null;
 }
+
+
+
+
+
+
+
+

@@ -8,8 +8,8 @@ export function increaseMaxPP(
   amount = 1,
   { cap = 10, recalcNow = true } = {},
 ) {
-  const permPPKey = owner === "blue" ? "bluePermPP" : "redPermPP";
-  const maxPPKey = owner === "blue" ? "blueMaxPP" : "redMaxPP";
+  const permPPKey = owner === "first" ? "bluePermPP" : "redPermPP";
+  const maxPPKey = owner === "first" ? "blueMaxPP" : "redMaxPP";
 
   state[permPPKey] = Math.min(cap, (state[permPPKey] || 0) + amount);
 
@@ -27,3 +27,18 @@ export function increaseMaxPP(
 export function addMaxPP(owner: Player, amount = 1, opts = {}) {
   return increaseMaxPP(owner, amount, opts);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

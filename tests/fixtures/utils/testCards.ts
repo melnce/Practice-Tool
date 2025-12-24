@@ -124,3 +124,9 @@ export const spellboostCard: CardInstance = {
     },
   ],
 };
+
+
+
+
+
+

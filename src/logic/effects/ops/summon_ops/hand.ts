@@ -3,18 +3,18 @@ import { logEvent } from "../../../../core/logger.js";
 
 import { fireTrigger } from "../../../core/triggers.js";
 import { applyKeywordsFromList } from "../../../core/keywords.js";
-import { adapter } from "../../../../core/adapter.js";
 import { CardInstance, Effect, Player } from "../../../../core/types.js";
 import { highlightSelectable } from "../../../core/targeting.js"; // Targeting is external
 import { initAmulet } from "./init.js";
 import { pushToBoard } from "./core.js";
 import { getEffectiveCost, nextId } from "./utils.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import { getHand, getBoard, opponentOf } from "../../../../core/playerHelpers.js";
 
 // =============== Hand Operations ===============
 
 export function filterArtifactFollowersHand(owner: Player, maxCost: number) {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   return hand.filter(
     (c) =>
       c?.type === "Follower" &&
@@ -27,8 +27,8 @@ export function filterArtifactFollowersHand(owner: Player, maxCost: number) {
 export function summonFromHand(card: CardInstance, owner: Player): boolean {
   if (!card) return false;
 
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const hand = getHand(state, owner);
+  const board = getBoard(state, owner);
 
   // Must be in hand to be summoned from hand
   const idx = hand.indexOf(card);
@@ -97,7 +97,7 @@ export function summonFromHand(card: CardInstance, owner: Player): boolean {
       state.lastSummoned.length = 0;
       state.lastSummoned.push(card);
     }
-    adapter.render();
+    // Render removed - UI orchestrator handles rendering
     return true;
   }
 
@@ -115,7 +115,7 @@ export function summonExactCopyFromHand(
   const clone: CardInstance =
     typeof structuredClone === "function"
       ? structuredClone(srcCard)
-      : JSON.parse(JSON.stringify(srcCard));
+      : structuredClone(srcCard);
 
   // Normalize instance/placement fields
   clone.id = nextId();
@@ -169,7 +169,7 @@ export function summonExactCopyFromHand(
   }
 
   // Place on board (respect space)
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   if (!Array.isArray(board) || board.length >= 5) return null;
 
   if (position === "left") board.unshift(clone);
@@ -184,9 +184,10 @@ export function summonExactCopyFromHand(
 
   // Fire follower-enter hooks exactly like other summon paths
   if (clone.type === "Follower") {
-    // medicalAssassinOnFollowerEnter(owner, clone);      // consistency with pushToBoard
+    // Fire ally trigger for owner, enemy trigger for opponent
+    const opponent = opponentOf(owner);
     fireTrigger("ally_follower_enter", owner, { enteringCard: clone });
-    fireTrigger("enemy_follower_enter", owner, { enteringCard: clone });
+    fireTrigger("enemy_follower_enter", opponent, { enteringCard: clone });
     // Ensure effect-based summons also trigger the Congregrant chain
     // handleCongregantOnEnter(owner, clone);
   }
@@ -200,7 +201,7 @@ export function handleSelectHandSummonArtifactCopy(
   effectsQueue: any,
 ) {
   const maxCost = Number((eff as any).max_cost ?? 5);
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
 
   const pool = (hand || []).filter((c) => {
     if (!c || c.type !== "Follower") return false;
@@ -244,7 +245,7 @@ export function handleSelectHandSummonArtifactCopiesEOT(
   effectsQueue: any,
 ) {
   const maxCost = Number((eff as any).max_cost ?? 5);
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
 
   const pool = (hand || []).filter((c) => {
     if (!c || c.type !== "Follower") return false;
@@ -275,3 +276,18 @@ export function handleSelectHandSummonArtifactCopiesEOT(
   highlightSelectable(pool);
   return "pending";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

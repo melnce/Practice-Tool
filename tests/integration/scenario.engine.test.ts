@@ -15,10 +15,10 @@ vi.mock("../../src/ui/render.js", () => ({
 // Mock sound/assets if needed
 vi.mock("../../src/ui/dom.js", () => ({
   byId: () => document.createElement("div"),
-  clear: () => {},
-  wireClick: () => {},
+  clear: () => { },
+  wireClick: () => { },
   getDragData: () => "",
-  setDragData: () => {},
+  setDragData: () => { },
 }));
 
 describe("Engine Golden Path", () => {
@@ -44,37 +44,34 @@ describe("Engine Golden Path", () => {
 
   it("should drive game state via dispatch", async () => {
     // 1. Start Game
-    // 1. Start Game
     const stateStart = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
       seed: 12345,
     });
     expect(stateStart).toBeDefined();
-    expect(stateStart.isBlueTurn).toBe(true);
+    expect(stateStart.activePlayer).toBe("first");
     expect(stateStart.roundCount).toBe(1);
 
-    // Store snapshot of initial state basics
-    const initialBlueHandSize = stateStart.blueHand.length;
+    // Store snapshot of initial state basics (now using nested player state)
+    const initialFirstHandSize = stateStart.players.first.hand.length;
 
-    // 2. Dispatch Action: End Turn (Blue -> Red)
+    // 2. Dispatch Action: End Turn (First -> Second)
     // We pass stateStart as "currentState" context, though currently engine uses singleton.
     const stateAfterEndTurn = dispatch(stateStart, { type: "END_TURN" });
 
-    expect(stateAfterEndTurn.isBlueTurn).toBe(false);
-    // expect(stateAfterEndTurn.activePlayer).toBe("red"); // Property doesn't exist on GameState
-    // Red draws a card at start of their turn
-    expect(stateAfterEndTurn.redHand.length).toBeGreaterThan(0);
+    expect(stateAfterEndTurn.activePlayer).toBe("second");
+    // Second player draws a card at start of their turn
+    expect(stateAfterEndTurn.players.second.hand.length).toBeGreaterThan(0);
 
     // 3. Dispatch Action: Undo
     const stateRestored = dispatch(stateAfterEndTurn, { type: "UNDO" });
 
-    expect(stateRestored.isBlueTurn).toBe(true);
-    // expect(stateRestored.activePlayer).toBe("blue");
-    expect(stateRestored.blueHand.length).toBe(initialBlueHandSize);
+    expect(stateRestored.activePlayer).toBe("first");
+    expect(stateRestored.players.first.hand.length).toBe(initialFirstHandSize);
 
     // 4. Dispatch Action: Redo
     const stateRedone = dispatch(stateRestored, { type: "REDO" });
-    expect(stateRedone.isBlueTurn).toBe(false);
+    expect(stateRedone.activePlayer).toBe("second");
   });
 });

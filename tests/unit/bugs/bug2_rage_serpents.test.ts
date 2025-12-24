@@ -13,13 +13,13 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
   });
 
   beforeEach(() => {
-    resetGameState();
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
-    state.isBlueTurn = true;
+    resetGameState(1);
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
+    state.isFirstPlayerTurn = true;
     // Ensure leaders have HP
-    state.blueHP = 20;
-    state.redHP = 20;
+    state.players.first.hp = 20;
+    state.players.second.hp = 20;
   });
 
   it("should deal damage to target follower AND self leader, then clear pending state", () => {
@@ -30,7 +30,7 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
       name: "Rage of Serpents",
       type: "Spell",
       cost: 2,
-      owner: "blue",
+      owner: "first",
       class: "Abysscraft",
       spell: [
         {
@@ -56,15 +56,15 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
       cost: 2,
       attack: 2,
       defense: 3, // Will die from 3 damage
-      owner: "red",
+      owner: "second",
       zone: "board",
     };
-    state.redBoard = [enemyFollower];
+    state.players.second.board = [enemyFollower];
 
-    state.blueHand = [rage];
+    state.players.first.hand = [rage];
 
     // 1. Play Card -> Should Pause
-    const outcome = playCard(state.blueHand, "blue", 0);
+    const outcome = playCard(state.players.first.hand, "first", 0);
     expect(outcome.kind).toBe("paused");
     const pending = state.pendingTargetEffect;
     expect(pending).toBeDefined();
@@ -76,10 +76,10 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
 
     // 3. Verify Damage & Death
     // Follower had 3 Def, took 3 Dmg -> Dead
-    expect(state.redGraveyard).toContain(enemyFollower);
+    expect(state.players.second.graveyard).toContain(enemyFollower);
 
     // 4. Verify Resume Effect (Self Damage)
-    expect(state.blueHP).toBe(18); // 20 - 2 = 18
+    expect(state.players.first.hp).toBe(18); // 20 - 2 = 18
 
     // 5. Verify State Pickup
     expect(state.pendingTargetEffect).toBeUndefined();
@@ -96,7 +96,7 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
       name: "Rage of Serpents",
       type: "Spell",
       cost: 2,
-      owner: "blue",
+      owner: "first",
       class: "Abysscraft",
       spell: [
         {
@@ -122,25 +122,25 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
       cost: 2,
       attack: 2,
       defense: 5,
-      owner: "red",
+      owner: "second",
       zone: "board",
     };
-    state.redBoard = [enemyFollower];
+    state.players.second.board = [enemyFollower];
 
-    state.blueHand = [rage];
+    state.players.first.hand = [rage];
 
     // 1. Play
-    playCard(state.blueHand, "blue", 0);
+    playCard(state.players.first.hand, "first", 0);
     expect(state.pendingTargetEffect).toBeDefined();
 
     // 2. Resolve on Leader
     resolvePendingTarget("leader"); // Target enemy leader
 
     // 3. Verify Enemy Leader Damage
-    expect(state.redHP).toBe(17); // 20 - 3 = 17
+    expect(state.players.second.hp).toBe(17); // 20 - 3 = 17
 
     // 4. Verify Self Damage
-    expect(state.blueHP).toBe(18); // 20 - 2 = 18
+    expect(state.players.first.hp).toBe(18); // 20 - 2 = 18
 
     expect(state.pendingTargetEffect).toBeUndefined();
 
@@ -148,3 +148,9 @@ describe("Bug 2: Rage of Serpents Selection State", () => {
     expect((enemyFollower as any).__uiSelectable).toBeUndefined();
   });
 });
+
+
+
+
+
+

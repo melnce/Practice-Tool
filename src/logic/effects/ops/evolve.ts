@@ -3,22 +3,19 @@ import { onEvolve } from "../../evolveUtils.js";
 import { logEvent } from "../../../core/logger.js";
 import { state } from "../../../core/gameState.js";
 import { CardInstance, Player } from "../../../core/types.js";
+import { isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../core/playerHelpers.js";
 
 function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
   if (!card || card.type !== "Follower" || card.hasEvolved) return false;
-  const isBlue = owner === "blue";
-  const usedThisTurn = isBlue
-    ? state.blueEvoUsedThisTurn
-    : state.redEvoUsedThisTurn;
-  const normalUnlocked = isBlue ? state.roundCount >= 5 : state.roundCount >= 4;
-  const superUnlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
+  const first = isFirstPlayer(owner);
+  const usedThisTurn = getEvoUsedThisTurn(state, owner);
+  const normalUnlocked = first ? state.roundCount >= 5 : state.roundCount >= 4;
+  const superUnlocked = first ? state.roundCount >= 7 : state.roundCount >= 6;
   if (mode === "super") {
-    const charges = isBlue
-      ? state.blueSuperEvoCharges | 0
-      : state.redSuperEvoCharges | 0;
+    const charges = getSuperEvoCharges(state, owner);
     return superUnlocked && !usedThisTurn && charges > 0;
   } else {
-    const charges = isBlue ? state.blueEvoCharges | 0 : state.redEvoCharges | 0;
+    const charges = getEvoCharges(state, owner);
     return normalUnlocked && !usedThisTurn && charges > 0;
   }
 }
@@ -108,3 +105,18 @@ export function handleEvolveLastSummoned(owner: Player) {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

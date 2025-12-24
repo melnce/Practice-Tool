@@ -6,6 +6,7 @@ import { state } from "../../../../core/gameState.js";
 import { CardInstance, Effect, Player } from "../../../../core/types.js";
 import { addCounter, spendCounter, setCounter } from "../../counters.js";
 import { logEvent } from "../../../../core/logger.js";
+import { getPlaysThisTurn, setPlaysThisTurn } from "../../../../core/playerHelpers.js";
 
 export interface CounterHandlerContext {
   owner: Player;
@@ -16,7 +17,7 @@ export interface CounterHandlerContext {
  * Unified counter handler.
  * Handles:
  * - Card-based counters: CardInstance.counters["key"]
- * - Game state counters: "combo" (state.bluePlaysThisTurn / state.redPlaysThisTurn)
+ * - Game state counters: "combo" (first/second player playsThisTurn)
  */
 export function handleCounter(eff: Effect, ctx: CounterHandlerContext): void {
   const action = (eff as any).action;
@@ -71,22 +72,29 @@ function handleComboCounter(
   amount: number,
 ): void {
   if (action === "add") {
-    if (owner === "blue") {
-      state.bluePlaysThisTurn = (state.bluePlaysThisTurn || 0) + amount;
-      logEvent("comboAdd", {
-        owner,
-        add: amount,
-        plays: state.bluePlaysThisTurn,
-      });
-    } else {
-      state.redPlaysThisTurn = (state.redPlaysThisTurn || 0) + amount;
-      logEvent("comboAdd", {
-        owner,
-        add: amount,
-        plays: state.redPlaysThisTurn,
-      });
-    }
+    const newPlays = getPlaysThisTurn(state, owner) + amount;
+    setPlaysThisTurn(state, owner, newPlays);
+    logEvent("comboAdd", {
+      owner,
+      add: amount,
+      plays: newPlays,
+    });
   } else {
     console.warn(`[counter] Unsupported action for combo: ${action}`);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

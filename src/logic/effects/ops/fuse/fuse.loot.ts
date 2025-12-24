@@ -1,16 +1,16 @@
 // src/logic/effects/ops/fuse/fuse.loot.ts
 import { state } from "../../../../core/gameState.js";
-import { adapter } from "../../../../core/adapter.js";
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types.js";
+import { getHand, getGraveyard } from "../../../../core/playerHelpers.js";
 
 function handOf(owner: Player) {
-  return owner === "blue" ? state.blueHand : state.redHand;
+  return getHand(state, owner);
 }
 function graveOf(owner: Player) {
-  return owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  return getGraveyard(state, owner);
 }
 function alreadyFusedThisTurn(card: CardInstance) {
   return !!card && card.lastFuseRound === state.roundCount;
@@ -28,7 +28,7 @@ export function fuse_finalize_loot(
   const initiator = hand.find((c) => c?.uid === initiator_uid);
   if (!initiator) {
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -40,7 +40,7 @@ export function fuse_finalize_loot(
       initiator: initiator?.name,
     });
     clearSelectableFlags();
-    adapter.render();
+    // Render removed - UI layer
     return "done";
   }
 
@@ -138,5 +138,20 @@ export function fuse_finalize_loot(
   }
 
   clearSelectableFlags();
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

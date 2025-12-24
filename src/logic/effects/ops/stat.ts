@@ -1,10 +1,11 @@
 // src/logic/effects/ops/stat.ts
 import { handleStatOrchestrator } from "./stat/orchestrator.js";
-import { Effect, Player, CardInstance } from "../../../core/types.js";
+import { Effect, Player, CardInstance, EffectContext } from "../../../core/types.js";
 import { state } from "../../../core/gameState.js";
 import { logEvent } from "../../../core/logger.js";
 import { cleanupDead } from "../../core/cleanup.js";
-import { getPool } from "../../core/targeting.js"; // Needed for other handlers
+import { getPool } from "../../core/targeting.js";
+import { getHand, getPlaysThisTurn } from "../../../core/playerHelpers.js";
 
 // -----------------------------------------------------------------------------
 // MAIN ENTRY POINT (Refactored)
@@ -13,8 +14,8 @@ export function handleStat(
   eff: Effect,
   owner: Player,
   sourceCard: CardInstance | null,
-  effectsQueue: any,
-  context: any = {},
+  effectsQueue: Effect[],
+  context: EffectContext = {},
 ) {
   return handleStatOrchestrator(
     eff as any,
@@ -40,7 +41,7 @@ const toNum = (v: number | string | undefined | null): number => {
 // -----------------------------------------------------------------------------
 
 export function handleBuffHandTribe(eff: Effect, owner: Player) {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   const a = parseInt((eff.attack as any) ?? 0) || 0;
   const d = parseInt((eff.defense as any) ?? 0) || 0;
 
@@ -76,7 +77,7 @@ export function handleBuffHandTribe(eff: Effect, owner: Player) {
 }
 
 export function handleBuffHandClass(eff: Effect, owner: Player) {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   const a = parseInt((eff.attack as any) ?? 0) || 0;
   const d = parseInt((eff.defense as any) ?? 0) || 0;
   const wantClass = String(eff.class || "").trim();
@@ -146,13 +147,10 @@ export function handleComboRepeatBuff(
   eff: Effect,
   owner: Player,
   sourceCard: CardInstance | null,
-  effectsQueue: any[] = [],
-  context: any = {},
+  effectsQueue: Effect[] = [],
+  context: EffectContext = {},
 ) {
-  const plays =
-    owner === "blue"
-      ? state.bluePlaysThisTurn || 0
-      : state.redPlaysThisTurn || 0;
+  const plays = getPlaysThisTurn(state, owner);
   if (plays <= 0) return;
   logEvent("comboRepeatBuff", { owner, plays });
 
@@ -184,8 +182,8 @@ export function handleSetAttackTo(
   eff: Effect,
   owner: Player,
   sourceCard: CardInstance | null,
-  effectsQueue: any,
-  context: any = {},
+  effectsQueue: Effect[],
+  context: EffectContext = {},
 ) {
   const pool = getPool(
     eff.target as any,
@@ -234,15 +232,15 @@ export function handleSetStats(
   eff: Effect,
   owner: Player,
   sourceCard: CardInstance | null,
-  effectsQueue: any,
-  context: any = {},
+  effectsQueue: Effect[],
+  context: EffectContext = {},
 ) {
   let pool =
     context?.targets && context.targets.length
       ? context.targets
       : getPool(eff.target as any, owner, null, eff.condition, context).filter(
-          (c) => c.type === "Follower",
-        );
+        (c) => c.type === "Follower",
+      );
 
   pool = pool.filter((c: CardInstance) => c.type === "Follower");
 
@@ -262,19 +260,11 @@ export function handleSetStats(
       target.buffs.attack = (target.buffs.attack ?? 0) + deltaA;
       (target as any).attack = setA;
       if (!target.potential_attack)
-        target.potential_attack = target.base_attack || currentA;
+        target.potential_attack = parseInt(String(target.base_attack)) || currentA;
       target.potential_attack! += deltaA;
     }
 
     if (setD !== null) {
-      // DEBUG: Log before state
-      console.log(`[set_stats] BEFORE: ${target.name}`, {
-        defense: target.defense,
-        base_defense: target.base_defense,
-        buffs_defense: target.buffs?.defense,
-        peak_defense: target.peak_defense,
-      });
-
       // For set_stats, we're setting a new "base" defense level
       // Update base_defense so UI shows this as the new max HP
       target.base_defense = setD;
@@ -283,14 +273,6 @@ export function handleSetStats(
       target.potential_defense = setD;
       // For set_stats, peak_defense should equal the new defense (unit is at "full" health at new stat line)
       target.peak_defense = setD;
-
-      // DEBUG: Log after state
-      console.log(`[set_stats] AFTER: ${target.name}`, {
-        defense: target.defense,
-        base_defense: target.base_defense,
-        buffs_defense: target.buffs?.defense,
-        peak_defense: target.peak_defense,
-      });
     }
 
     logEvent("setStats", {
@@ -305,3 +287,18 @@ export function handleSetStats(
   cleanupDead();
   return "done";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

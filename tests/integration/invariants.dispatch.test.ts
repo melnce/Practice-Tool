@@ -13,10 +13,10 @@ vi.mock("../../src/ui/render.js", () => ({
 }));
 vi.mock("../../src/ui/dom.js", () => ({
   byId: () => document.createElement("div"),
-  clear: () => {},
-  wireClick: () => {},
+  clear: () => { },
+  wireClick: () => { },
   getDragData: () => "",
-  setDragData: () => {},
+  setDragData: () => { },
 }));
 
 describe("Engine Invariants", () => {
@@ -52,17 +52,17 @@ describe("Engine Invariants", () => {
       seed: 1,
     });
 
-    // Helper to restore state
-    const originalBlueHand = (state as any).blueHand;
+    // Helper to restore state (now using nested player structure)
+    const originalFirstHand = state.players.first.hand;
     try {
-      // Corrupt state
-      (state as any).blueHand = null; // Invalid!
+      // Corrupt state (now targeting nested structure)
+      (state.players.first as any).hand = null; // Invalid!
 
       expect(() => {
         dispatch(state, { type: "END_TURN" });
       }).toThrow(/Invariant failed BEFORE END_TURN/);
     } finally {
-      (state as any).blueHand = originalBlueHand;
+      state.players.first.hand = originalFirstHand;
     }
   });
 

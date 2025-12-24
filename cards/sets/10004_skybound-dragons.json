@@ -103,7 +103,9 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Aura"]
+    "keywords": [
+      "Aura"
+    ]
   },
   {
     "id": "10403110",
@@ -464,7 +466,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"],
+        "keywords": [
+          "Barrier"
+        ],
         "include_self": true
       }
     ],
@@ -508,6 +512,9 @@
             "image": "images/crests/starry_sky.png",
             "description": "Countdown (1). Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.",
             "countdown": 1,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "damage",
@@ -632,14 +639,18 @@
             "action": "give",
             "target": "ally:follower",
             "attack": 1,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "stat",
             "action": "give",
             "target": "ally:follower",
             "defense": 1,
-            "keywords": ["Ward"]
+            "keywords": [
+              "Ward"
+            ]
           }
         ],
         "else_effects": [
@@ -670,7 +681,9 @@
                     "action": "give",
                     "target": "ally:follower",
                     "attack": 1,
-                    "keywords": ["Rush"]
+                    "keywords": [
+                      "Rush"
+                    ]
                   }
                 ]
               },
@@ -682,7 +695,9 @@
                     "action": "give",
                     "target": "ally:follower",
                     "defense": 1,
-                    "keywords": ["Ward"]
+                    "keywords": [
+                      "Ward"
+                    ]
                   }
                 ]
               }
@@ -723,7 +738,9 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -800,7 +817,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -825,7 +844,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10421120-arthur-staunch-dragon",
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "evolve": [
       {
         "op": "summon",
@@ -857,7 +878,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10421130-mordred-illusory-lion",
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "evolve": [
       {
         "op": "summon",
@@ -889,7 +912,9 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10422110-aglovale-lord-of-frost",
-    "keywords": ["Intimidate"],
+    "keywords": [
+      "Intimidate"
+    ],
     "fanfare": [
       {
         "op": "damage",
@@ -936,7 +961,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10422130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10422130-fiorito-muscles-in-bloom",
-    "keywords": ["Ambush", "Bane"],
+    "keywords": [
+      "Ambush",
+      "Bane"
+    ],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -1069,7 +1097,9 @@
                 },
                 "attack": 1,
                 "defense": 1,
-                "keywords": ["Barrier"]
+                "keywords": [
+                  "Barrier"
+                ]
               }
             ]
           },
@@ -1130,7 +1160,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           },
           {
             "op": "stat",
@@ -1138,7 +1170,9 @@
             "target": "ally:follower",
             "name": "Zeta & Bea, Crimson and Blue",
             "not_self": true,
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       },
@@ -1265,7 +1299,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["cant_attack"]
+        "keywords": [
+          "cant_attack"
+        ]
       }
     ],
     "superevolve": [
@@ -1273,7 +1309,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["cant_attack"]
+        "keywords": [
+          "cant_attack"
+        ]
       }
     ],
     "keywords": []
@@ -1607,7 +1645,9 @@
                 "action": "give",
                 "target": "ally:follower",
                 "not_self": true,
-                "keywords": ["Barrier"]
+                "keywords": [
+                  "Barrier"
+                ]
               }
             ]
           },
@@ -1664,7 +1704,6 @@
       },
       {
         "op": "draw",
-        "source": "deck",
         "source": "named",
         "name": "Ars Magna",
         "count": 1
@@ -1704,7 +1743,6 @@
                     "effects": [
                       {
                         "op": "draw",
-                        "source": "deck",
                         "source": "named",
                         "name": "Ars Magna",
                         "count": 1
@@ -1738,7 +1776,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10441110-joel-wave-chaser",
-    "keywords": ["Ward", "Aura"],
+    "keywords": [
+      "Ward",
+      "Aura"
+    ],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -1929,7 +1970,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -1977,7 +2020,9 @@
           {
             "op": "stat",
             "action": "give",
-            "keywords": ["Can't Attack"],
+            "keywords": [
+              "Can't Attack"
+            ],
             "duration": "opponent_turn_end"
           }
         ]
@@ -2033,7 +2078,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Ward"]
+            "keywords": [
+              "Ward"
+            ]
           }
         ]
       }
@@ -2064,8 +2111,6 @@
           },
           {
             "op": "draw",
-            "source": "deck",
-            "source": "named",
             "source": "selection",
             "count": 1
           }
@@ -2115,7 +2160,9 @@
         "select": 1
       }
     ],
-    "keywords": ["Intimidate"],
+    "keywords": [
+      "Intimidate"
+    ],
     "triggers": []
   },
   {
@@ -2149,7 +2196,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           },
           {
             "op": "stat",
@@ -2232,7 +2281,7 @@
     "keywords": [
       "Intimidate",
       {
-        "name": "Last Words",
+        "name": "LastWords",
         "effects": [
           {
             "op": "summon",
@@ -2324,7 +2373,9 @@
     "has_ongoing": true,
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "type": "end_of_turn_own",
@@ -2362,7 +2413,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10452120-satyr-open-hearted-rover",
-    "keywords": ["Aura"],
+    "keywords": [
+      "Aura"
+    ],
     "fanfare": [
       {
         "op": "gate",
@@ -2463,7 +2516,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10453110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10453110-nehan-dispenser-of-samsara",
-    "keywords": ["Drain"],
+    "keywords": [
+      "Drain"
+    ],
     "fanfare": [
       {
         "op": "evolve",
@@ -2648,6 +2703,9 @@
             "image": "images/crests/belial.png",
             "description": "Countdown (4). Last Words: Deal 20 damage to the enemy leader.",
             "countdown": 4,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "damage",
@@ -2687,7 +2745,9 @@
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461110-troue-heroic-visionary",
     "has_ongoing": true,
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [
       {
         "event": "engage",
@@ -2697,7 +2757,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Drain"]
+            "keywords": [
+              "Drain"
+            ]
           }
         ]
       }
@@ -2739,7 +2801,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Can't Attack"],
+        "keywords": [
+          "Can't Attack"
+        ],
         "duration": "turn_end"
       }
     ],
@@ -2883,7 +2947,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "keywords": [],
@@ -3162,7 +3228,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471110-sho-reborn-night-king",
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "fanfare": [
       {
         "op": "gate",
@@ -3172,7 +3240,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Barrier"]
+            "keywords": [
+              "Barrier"
+            ]
           }
         ]
       }
@@ -3196,7 +3266,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471120-tsubasa-blazing-gearcyclist",
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "fanfare": [
       {
         "op": "boost_skybound_art_hand",
@@ -3230,7 +3302,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "name": "Striker Artifact",
             "count": 1
@@ -3284,9 +3355,11 @@
     "triggers": [
       {
         "event": "clash",
+        "source": "board",
         "effects": [
           {
-            "op": "clash_damage",
+            "op": "damage",
+            "target": "clash_opponent",
             "amount": 3
           }
         ]
@@ -3411,7 +3484,6 @@
         "effects": [
           {
             "op": "draw",
-            "source": "deck",
             "source": "named",
             "card_name": "Fortifier Artifact"
           }

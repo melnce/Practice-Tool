@@ -6,6 +6,7 @@ import { banishCard } from "./ops/banish/index.js";
 
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
+import { getPlaysThisTurn, getHand, getBoard, isFirstPlayer } from "../../core/playerHelpers.js";
 
 export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {
   const a = parseInt((eff.attack as any) || 0) || 0;
@@ -64,11 +65,6 @@ export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {
       }
     }
   }
-
-  console.log(`%cAFTER BUFF SELF on ${sourceCard.name}:`, "color: cyan", {
-    defense: sourceCard.defense,
-    buffs: JSON.parse(JSON.stringify(sourceCard.buffs || null)),
-  });
 }
 
 // Add this new function to clear temporary buffs
@@ -102,16 +98,6 @@ export function clearTemporaryBuffs(card: CardInstance) {
 
     // Reset temporary buffs tracking
     card.temporaryBuffs = [];
-
-    console.log(
-      `%cCLEARED TEMPORARY BUFFS from ${card.name}:`,
-      "color: orange",
-      {
-        attack: card.attack,
-        defense: card.defense,
-        buffs: JSON.parse(JSON.stringify(card.buffs || null)),
-      },
-    );
   }
 }
 
@@ -130,15 +116,12 @@ export function handleDynamicStatSelf(
 
   // Check for dynamic attack source
   if (eff.attack_source === "combo") {
-    const combo =
-      owner === "blue"
-        ? state.bluePlaysThisTurn || 0
-        : state.redPlaysThisTurn || 0;
+    const combo = getPlaysThisTurn(state, owner);
     a += combo;
   }
 
   if (eff.attack_source === "count_in_hand" && eff.filter?.tribe) {
-    const hand = owner === "blue" ? state.blueHand : state.redHand;
+    const hand = getHand(state, owner);
     const count = hand.filter(
       (c) => Array.isArray(c.tribes) && c.tribes.includes(eff.filter!.tribe!),
     ).length;
@@ -146,7 +129,7 @@ export function handleDynamicStatSelf(
   }
 
   if (eff.attack_source === "count_allies") {
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    const board = getBoard(state, owner);
     // count followers excluding self if exclude_self is set
     const count = board.filter(
       (c) =>
@@ -157,10 +140,9 @@ export function handleDynamicStatSelf(
   }
 
   if (eff.attack_source === "shikigami_deaths") {
-    const pool =
-      owner === "blue"
-        ? state.shikigamiDeathsThisTurnBlue || []
-        : state.shikigamiDeathsThisTurnRed || [];
+    const pool = isFirstPlayer(owner)
+      ? state.players.first.shikigamiDeathsThisTurn || []
+      : state.players.second.shikigamiDeathsThisTurn || [];
     const sum = pool.reduce(
       (acc: number, x: any) => acc + (Number(x.attack) || 0),
       0,
@@ -170,22 +152,19 @@ export function handleDynamicStatSelf(
 
   // Check for dynamic defense source - ADD THIS SECTION
   if (eff.defense_source === "combo") {
-    const combo =
-      owner === "blue"
-        ? state.bluePlaysThisTurn || 0
-        : state.redPlaysThisTurn || 0;
+    const combo = getPlaysThisTurn(state, owner);
     d += combo;
   }
 
   if (eff.defense_source === "count_in_hand" && eff.filter?.tribe) {
-    const hand = owner === "blue" ? state.blueHand : state.redHand;
+    const hand = getHand(state, owner);
     const count = hand.filter(
       (c) => Array.isArray(c.tribes) && c.tribes.includes(eff.filter!.tribe!),
     ).length;
     d += count;
   }
   if (eff.defense_source === "count_allies") {
-    const board = owner === "blue" ? state.blueBoard : state.redBoard;
+    const board = getBoard(state, owner);
     const count = board.filter(
       (c) =>
         c.type === "Follower" &&
@@ -195,10 +174,9 @@ export function handleDynamicStatSelf(
   }
 
   if (eff.defense_source === "shikigami_deaths") {
-    const pool =
-      owner === "blue"
-        ? state.shikigamiDeathsThisTurnBlue || []
-        : state.shikigamiDeathsThisTurnRed || [];
+    const pool = isFirstPlayer(owner)
+      ? state.players.first.shikigamiDeathsThisTurn || []
+      : state.players.second.shikigamiDeathsThisTurn || [];
     const sum = pool.reduce(
       (acc: number, x: any) => acc + (Number(x.defense) || 0),
       0,
@@ -253,3 +231,18 @@ export function handleBanishSelf(sourceCard: CardInstance, _owner: Player) {
   logEvent("banishSelf", { card: sourceCard.name, uid: sourceCard.uid });
   banishCard(sourceCard);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

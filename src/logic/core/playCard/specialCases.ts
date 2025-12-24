@@ -5,6 +5,7 @@
 
 import { state } from "../../../core/gameState.js";
 import { CardInstance, Player } from "../../../core/types.js";
+import { getBoard, getGraveyard, addShadows } from "../../../core/playerHelpers.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Witch's New Brew Merge Logic
@@ -25,8 +26,8 @@ export function mergeWitchsNewBrewOnPlay(newCard: CardInstance, owner: Player) {
   if (!BREW_NAMES.has(String(newCard.name).toLowerCase())) return;
   if (String(newCard.name).toLowerCase() !== "witch's new brew") return;
 
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
-  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const board = getBoard(state, owner);
+  const grave = getGraveyard(state, owner);
 
   const newIndex = board.lastIndexOf(newCard);
   if (newIndex < 0) return;
@@ -62,8 +63,22 @@ export function mergeWitchsNewBrewOnPlay(newCard: CardInstance, owner: Player) {
     const removed = board.splice(idx, 1)[0];
     if (removed) {
       grave.push(removed);
-      if (owner === "blue") state.blueShadows++;
-      else state.redShadows++;
+      addShadows(state, owner, 1);
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

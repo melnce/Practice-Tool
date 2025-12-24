@@ -32,3 +32,18 @@ export const RESOURCE_OPS = [
   // Unified fuse - replaces fuse_start, start_fuse_from_card, fuse_finalize_*, start_fortifier_fuse
   "fuse",
 ] as const;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

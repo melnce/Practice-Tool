@@ -19,8 +19,8 @@ export function makeLeaderDroppable(
 
     // Only allow dropping attacker onto the opposite leader on the correct turn
     if (
-      (targetPlayer === "blue" && state.isBlueTurn) ||
-      (targetPlayer === "red" && !state.isBlueTurn)
+      (targetPlayer === "first" && state.isFirstPlayerTurn) ||
+      (targetPlayer === "second" && !state.isFirstPlayerTurn)
     )
       return;
     if (!attackerIndex) return;
@@ -72,9 +72,9 @@ export function enableBoardDropForOwnSide(
       sourceType === "hand" &&
       sourceId === containerId.replace("Board", "Hand")
     ) {
-      const player = containerId === "blueBoard" ? "blue" : "red";
-      const hand = state[`${player}Hand`];
-      const index = hand.findIndex((c) => c.uid === cardUid);
+      const player: Player = containerId === "blueBoard" ? "first" : "second";
+      const hand = player === "first" ? state.players.first.hand : state.players.second.hand;
+      const index = hand.findIndex((c: CardInstance) => c.uid === cardUid);
       if (index !== -1)
         void logic().then(({ playCard }) => playCard(hand, player, index));
     }
@@ -101,23 +101,23 @@ export function enableCardEvoDrop(
 
     // Turn + charges + per-turn lock
     if (isBlueSide) {
-      if (!state.isBlueTurn) return;
+      if (!state.isFirstPlayerTurn) return;
       if (isNormal) {
-        if (state.blueEvoUsedThisTurn || !(state.blueEvoCharges > 0)) return;
+        if (state.players.first.evoUsedThisTurn || !(state.players.first.evoCharges > 0)) return;
       } else {
-        if (state.blueEvoUsedThisTurn || !(state.blueSuperEvoCharges > 0))
+        if (state.players.first.evoUsedThisTurn || !(state.players.first.superEvoCharges > 0))
           return;
       }
     } else {
-      if (state.isBlueTurn) return;
+      if (state.isFirstPlayerTurn) return;
       if (isNormal) {
-        if (state.redEvoUsedThisTurn || !(state.redEvoCharges > 0)) return;
+        if (state.players.second.evoUsedThisTurn || !(state.players.second.evoCharges > 0)) return;
       } else {
-        if (state.redEvoUsedThisTurn || !(state.redSuperEvoCharges > 0)) return;
+        if (state.players.second.evoUsedThisTurn || !(state.players.second.superEvoCharges > 0)) return;
       }
     }
 
-    const owner: Player = isBlueSide ? "blue" : "red";
+    const owner: Player = isBlueSide ? "first" : "second";
     const mode = isNormal ? "normal" : "super";
     doAction(
       isSuper ? "Super Evolve" : "Evolve",
@@ -151,9 +151,9 @@ export function enableCardEvoDrop(
         // REMOVE THE MANUAL CHARGE DECREMENTING HERE
         // The onEvolve function will handle charge spending
         if (isBlueSide) {
-          state.blueEvoUsedThisTurn = true; // Just track turn usage
+          state.players.first.evoUsedThisTurn = true; // Just track turn usage
         } else {
-          state.redEvoUsedThisTurn = true; // Just track turn usage
+          state.players.second.evoUsedThisTurn = true; // Just track turn usage
         }
 
         // fire evolve hooks (does its own logging AND charge spending)
@@ -179,9 +179,9 @@ export function enableEnemyFollowerDrop(
     const data = getDragData(e);
     const [attackerPlayer, attackerIndex] = data.split(",");
 
-    const defenderPlayer = isRedBoard ? "red" : "blue";
+    const defenderPlayer = isRedBoard ? "second" : "first";
     const defenders =
-      defenderPlayer === "blue" ? state.blueBoard : state.redBoard;
+      defenderPlayer === "first" ? state.players.first.board : state.players.second.board;
     const defender = defenders[defenderIndex];
     if (!defender) return;
 
@@ -201,3 +201,17 @@ export function enableEnemyFollowerDrop(
     });
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

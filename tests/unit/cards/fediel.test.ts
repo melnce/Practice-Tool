@@ -53,3 +53,9 @@ describe("Fediel, Darkness Personified (10454110)", () => {
     expect(debuff.defense).toBe(-2);
   });
 });
+
+
+
+
+
+

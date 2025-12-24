@@ -1,174 +1,100 @@
 import { logEvent } from "./logger.js";
-import { GameState } from "./types.js";
-
-// -- 1. Canonical Defaults (Single Source of Truth) --
-// We strictly define all scalar defaults here. This object is spread
-// into the initial state and used to reset scalars.
-const DEFAULTS = {
-  blueHP: 20,
-  redHP: 20,
-  blueMaxHP: 20,
-  redMaxHP: 20,
-  bluePP: 1,
-  redPP: 1,
-  blueMaxPP: 1,
-  redMaxPP: 1,
-  bluePermPP: 0,
-  redPermPP: 0,
-  blueShadows: 0,
-  redShadows: 0,
-
-  blueRally: 0,
-  redRally: 0,
-
-  isBlueTurn: true,
-  roundCount: 1,
-
-  // Evolution
-  blueEvoCharges: 2,
-  redEvoCharges: 2,
-  blueSuperEvoCharges: 2,
-  redSuperEvoCharges: 2,
-
-  blueEvoUsedThisTurn: false,
-  redEvoUsedThisTurn: false,
-  blueEvoCount: 0,
-  redEvoCount: 0,
-
-  // Dragoncraft specific
-  redBoostUsedEarly: false,
-  redBoostUsedLate: false,
-  redBoostPending: false,
-
-  bluePlaysThisTurn: 0,
-  redPlaysThisTurn: 0,
-  blueModeBonus: 0,
-  redModeBonus: 0,
-
-  gameStarted: false,
-
-  blueAnyAllyAttackedThisTurn: false,
-  redAnyAllyAttackedThisTurn: false,
-
-  // Dynamic / Optional fields (Explicitly reset to undefined/null)
-  lastFuse: undefined,
-  pendingTargetEffect: undefined,
-
-  deckoutWinsBlue: undefined,
-  deckoutWinsRed: undefined,
-  blueLeaderBarrier: undefined,
-  redLeaderBarrier: undefined,
-
-  blueLeaderDamagePlus: 0,
-  redLeaderDamagePlus: 0,
-} as const;
-
-// -- 2. Array Keys (Identity Preservation) --
-// We list all array keys here. createInitialState allocates them once.
-// resetGameState clears them in-place (length = 0) effectively preserving identity.
-// Type enforced to be keys of GameState.
-// Type enforced to be keys of GameState where the value extends any[].
-type ArrayKey = {
-  [K in keyof GameState]-?: GameState[K] extends any[] ? K : never;
-}[keyof GameState];
-
-const ARRAY_KEYS: readonly ArrayKey[] = [
-  "blueDeck",
-  "redDeck",
-  "blueHand",
-  "redHand",
-  "blueBoard",
-  "redBoard",
-  "blueGraveyard",
-  "redGraveyard",
-  "bluePlayedHistory",
-  "redPlayedHistory",
-  "blueDestroyedHistory",
-  "redDestroyedHistory",
-  "blueCrests",
-  "redCrests",
-  "shikigamiDeathsThisTurnBlue",
-  "shikigamiDeathsThisTurnRed",
-  "lastSummoned",
-  "lastDrawnCards",
-];
-
+import { GameState, createPlayerState, PlayerSlot } from "./types.js";
 import { createRng } from "./rng.js";
 
-// -- 3. Factory --
-export function createInitialState(seed?: number | string): GameState {
-  const finalSeed = seed ?? Date.now();
-  // Explicit object literal assignment to ensure Type Safety without 'as any'
+// -- 1. Canonical Defaults (Single Source of Truth) --
+// Global defaults that are not per-player
+const DEFAULTS = {
+  roundCount: 1,
+  isFirstPlayerTurn: true,
+  activePlayer: "first" as PlayerSlot,
+  gameStarted: false,
+
+  // Second player PP boost (going-second advantage)
+  secondPlayerPPBoostUsedEarly: false,
+  secondPlayerPPBoostUsedLate: false,
+  secondPlayerPPBoostPending: false,
+
+  // Ephemeral
+  pendingTargetEffect: undefined,
+  lastFuse: undefined,
+} as const;
+
+// -- 2. Factory --
+// IMPORTANT: seed is REQUIRED for determinism. No Date.now() fallback.
+// For tests/dev, use a fixed seed. For production, caller must provide seed.
+export function createInitialState(seed: number | string): GameState {
+  if (seed === undefined || seed === null) {
+    throw new Error("createInitialState requires a seed for determinism");
+  }
+
+  const rng = createRng(seed);
+
   return {
-    rng: createRng(finalSeed),
+    rng,
     ...DEFAULTS,
 
-    // Arrays (allocated exactly once)
-    blueDeck: [],
-    redDeck: [],
-    blueHand: [],
-    redHand: [],
-    blueBoard: [],
-    redBoard: [],
-    blueGraveyard: [],
-    redGraveyard: [],
-    bluePlayedHistory: [],
-    redPlayedHistory: [],
-    blueDestroyedHistory: [],
-    redDestroyedHistory: [],
-    blueCrests: [],
-    redCrests: [],
-    shikigamiDeathsThisTurnBlue: [],
-    shikigamiDeathsThisTurnRed: [],
+    // Players (nested)
+    players: {
+      first: createPlayerState(false),
+      second: createPlayerState(true),
+    },
+
+    // Ephemeral arrays
     lastSummoned: [],
     lastDrawnCards: [],
 
     // Debug Identity
-    __debugId: createRng(finalSeed).nextFloat(),
+    __debugId: rng.nextFloat(),
   };
 }
 
-// -- 4. Exported Singleton --
+// -- 3. Exported Singleton --
+// Uses fixed seed 0 for singleton. Caller should use resetGameState(seed) before use.
 const GLOBAL_KEY = "__GAME_STATE_SINGLETON__";
 export const state: GameState =
-  (globalThis as any)[GLOBAL_KEY] || createInitialState();
+  (globalThis as any)[GLOBAL_KEY] || createInitialState(0);
 (globalThis as any)[GLOBAL_KEY] = state;
 
-// -- 5. Reset Logic --
+// -- 4. Reset Logic --
+// IMPORTANT: seed is REQUIRED for determinism. No Date.now() fallback.
 export function resetStateInstance(
   target: GameState,
-  seed?: number | string,
+  seed: number | string,
 ): void {
-  const finalSeed = seed ?? Date.now();
-
-  // A) Clear arrays in-place
-  // We assume strict invariants: these keys MUST exist and MUST be arrays.
-  for (const key of ARRAY_KEYS) {
-    if (!Array.isArray(target[key])) {
-      throw new Error(
-        `resetStateInstance: Critical invariant failed. Key '${key}' is not an array.`,
-      );
-    }
-    target[key].length = 0;
+  if (seed === undefined || seed === null) {
+    throw new Error("resetStateInstance requires a seed for determinism");
   }
 
-  // B) Reset scalars
+  // A) Reset players
+  target.players.first = createPlayerState(false);
+  target.players.second = createPlayerState(true);
+
+  // B) Reset global scalars
   Object.assign(target, DEFAULTS);
 
-  // C) Reset RNG
-  target.rng = createRng(finalSeed);
+  // C) Reset ephemeral arrays
+  target.lastSummoned = [];
+  target.lastDrawnCards = [];
 
-  // D) Debug Identity
+  // D) Reset RNG
+  target.rng = createRng(seed);
+
+  // E) Debug Identity
   target.__debugId = target.rng.nextFloat();
 
   // Log
   logEvent("resetStateInstance", {
-    seed: finalSeed,
+    seed: seed,
     debugId: target.__debugId,
   });
 }
 
-export function resetGameState(seed?: number | string): void {
+// IMPORTANT: seed is REQUIRED for determinism. No Date.now() fallback.
+export function resetGameState(seed: number | string): void {
+  if (seed === undefined || seed === null) {
+    throw new Error("resetGameState requires a seed for determinism");
+  }
   resetStateInstance(state, seed);
 }
 
@@ -177,3 +103,11 @@ if (typeof window !== "undefined") {
   (window as any).gameState = state;
   (window as any).debugSummon = () => import("../logic/effects/ops/summon.js");
 }
+
+
+
+
+
+
+
+

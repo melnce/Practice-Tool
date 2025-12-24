@@ -107,3 +107,17 @@ class MulberryRNG implements RNG {
 export function createRng(seedLike: number | string | bigint): RNG {
   return new MulberryRNG(seedLike);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

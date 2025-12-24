@@ -20,7 +20,9 @@ export function registerRunEffectsInProcess(fn: typeof runEffects) {
 }
 
 export interface ProcessingCandidate {
-  card: CardInstance;
+  // CardInstance for board/hand triggers, Crest for crest triggers
+  // Using any to avoid cascading type errors from polymorphic usage
+  card: any;
   owner: Player;
   source: string; // "board", "hand", "crest", etc.
   triggers: TriggerSpec[];
@@ -132,3 +134,18 @@ export function processCandidateTriggers(
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

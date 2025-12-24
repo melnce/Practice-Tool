@@ -66,3 +66,18 @@ export function buildCardPredicate(
     return true;
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

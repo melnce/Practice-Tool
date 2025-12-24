@@ -3,6 +3,7 @@ import { state } from "../../core/gameState.js";
 import { fireTrigger } from "./triggers.js";
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Player } from "../../core/types.js";
+import { getBoard, toSlot } from "../../core/playerHelpers.js";
 
 // Helper interface for card with barrier properties
 interface BarrierCard extends CardInstance {
@@ -74,40 +75,19 @@ export function dealDamage(
       damageDealt = cap;
     }
 
-    const isBlue = (state.blueBoard || []).includes(target);
-    const owner: Player | null = isBlue
-      ? "blue"
-      : (state.redBoard || []).includes(target)
-        ? "red"
+    const firstBoard = getBoard(state, "first");
+    const secondBoard = getBoard(state, "second");
+    const isFirst = (firstBoard || []).includes(target);
+    const owner: Player | null = isFirst
+      ? "first"
+      : (secondBoard || []).includes(target)
+        ? "second"
         : null;
 
-    // Check if activePlayer matches owner (activePlayer is not explicitly in GameState type yet but is in state object logic?
-    // Wait, gameState.ts has 'isBlueTurn'. I need to derive activePlayer or add it to GameState.
-    // 'state.activePlayer' logic might be missing in my GameState type or it's a getter?
-    // Looking at gameState.js, there is NO activePlayer field.
-    // dealDamage code in JS had: `state.activePlayer === owner`.
-    // Maybe `state.activePlayer` is set somewhere else or I missed it in gameState.js?
-    // Checking gameState.js content from Step 54: NO activePlayer.
-    // Checking gameState.ts content I wrote: NO activePlayer.
-    // But `src/logic/core/barrier.js` uses `state.activePlayer`.
-    // This implies `state.activePlayer` is injected or I missed it.
-    // Or maybe it's `state.isBlueTurn ? 'blue' : 'red'`.
-    // Wait, `dealDamage` in `barrier.js` line 49: `if (owner && state.activePlayer === owner ...)`
-    // If `state.activePlayer` doesn't exist on `state`, this code would fail in JS (undefined === owner -> false).
-    // Unless `state` is a Proxy or modified elsewhere.
-    // I will assume `state.activePlayer` is NOT reliable if not in `gameState.js`.
-    // However, I must not break behavior. If JS used it, maybe it worked?
-    // Or maybe `state` has it.
-    // I will use `(state.isBlueTurn ? 'blue' : 'red')` as a fallback or proxy for `activePlayer` if I can't find it.
-    // Actually, `activePlayer` is likely `state.isBlueTurn ? "blue" : "red"`.
-    // I'll add `activePlayer` to GameState type as optional or `[key: string]: any` covers it.
-    // But logically, `state.activePlayer` might just be missing.
-    // I'll check `state.activePlayer` usage.
+    // Use typed activePlayer from GameState
+    const currentActive = state.activePlayer;
 
-    const currentActive =
-      (state as any).activePlayer || (state.isBlueTurn ? "blue" : "red");
-
-    if (owner && currentActive === owner && target?.evoType === "super") {
+    if (owner && toSlot(currentActive) === toSlot(owner) && target?.evoType === "super") {
       // Only *reduce* the damage; don't undo a barrier pop that already happened.
       if (amount > 0) {
         damageDealt = 0;
@@ -115,8 +95,8 @@ export function dealDamage(
         target.__uiSuperZero = true; // optional UI flag
       }
     }
-  } catch {
-    /* ignore */
+  } catch (e) {
+    console.error("[dealDamage] Error in super-evolve protection check:", e);
   }
 
   // Apply remaining damage
@@ -155,18 +135,15 @@ export function dealDamage(
     target?.type === "Follower" &&
     (target.defense as number) > 0
   ) {
-    const owner = state.blueBoard.includes(target)
-      ? "blue"
-      : state.redBoard.includes(target)
-        ? "red"
+    const firstBoard = getBoard(state, "first");
+    const secondBoard = getBoard(state, "second");
+    const owner = firstBoard.includes(target)
+      ? "first"
+      : secondBoard.includes(target)
+        ? "second"
         : null;
 
-    // Re-calculating owner here?
-    if (
-      owner &&
-      ((state as any).activePlayer || (state.isBlueTurn ? "blue" : "red")) ===
-        owner
-    ) {
+    if (owner && toSlot(state.activePlayer) === toSlot(owner)) {
       fireTrigger("self_damaged", owner, {
         damagedCard: target,
         sourceCard: source,
@@ -239,3 +216,18 @@ export function setPotentialFromBasePlus(
   card.isDamaged =
     (parseInt(card.defense as string, 10) || 0) < card.potential_defense;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

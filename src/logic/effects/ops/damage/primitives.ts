@@ -16,6 +16,7 @@ import {
 } from "../../../../core/types.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
 import { DamageContext } from "./types.js";
+import { getHand, getBoard, getCrests, opponentOf } from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // TYPES (re-export for convenience, additional types only)
@@ -89,7 +90,7 @@ export function resolveDamageAmountExtended(
 
   switch (source) {
     case "hand_size": {
-      const hand = owner === "blue" ? state.blueHand : state.redHand;
+      const hand = getHand(state, owner);
       return hand.length;
     }
 
@@ -99,7 +100,7 @@ export function resolveDamageAmountExtended(
     }
 
     case "golem_count": {
-      const board = owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, owner);
       return board.filter(
         (c) =>
           c.type === "Follower" &&
@@ -109,7 +110,7 @@ export function resolveDamageAmountExtended(
     }
 
     case "other_allies": {
-      const board = owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, owner);
       // Exclude source card if present
       return board.filter(
         (c) =>
@@ -118,7 +119,7 @@ export function resolveDamageAmountExtended(
     }
 
     case "crest_count": {
-      const list = owner === "blue" ? state.blueCrests : state.redCrests;
+      const list = getCrests(state, owner);
       return Array.isArray(list) ? list.length : 0;
     }
 
@@ -180,7 +181,7 @@ export function applyRandomHits(
 
     // Optionally add leader
     if (includeLeader) {
-      const targetOwner = owner === "blue" ? "red" : "blue";
+      const targetOwner = opponentOf(owner);
       pool.push({
         type: "Leader",
         owner: targetOwner,
@@ -246,7 +247,7 @@ export function applySplitSpillover(
 
   // Spill to leader if enabled
   if (remaining > 0 && rules?.spillToLeader) {
-    const enemy = owner === "blue" ? "red" : "blue";
+    const enemy = opponentOf(owner);
     applyLeaderDamage(enemy, remaining);
   }
 
@@ -256,3 +257,18 @@ export function applySplitSpillover(
   });
   cleanupDead();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

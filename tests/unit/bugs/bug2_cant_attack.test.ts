@@ -10,12 +10,12 @@ import allCards from "../../../cards/all.json";
 
 describe("Bug 2: cant_attack enforcement", () => {
   beforeEach(() => {
-    resetGameState();
-    state.isBlueTurn = true;
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
   });
 
   afterEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   it("Should prevent attack when cant_attack is active", () => {
@@ -34,14 +34,14 @@ describe("Bug 2: cant_attack enforcement", () => {
       set: "Basic",
     } as any;
 
-    const attacker = makeCardFromDB(goblinData, "blue");
-    pushToBoard(state.blueBoard, "blue", attacker);
+    const attacker = makeCardFromDB(goblinData, "first");
+    pushToBoard(state.players.first.board, "first", attacker);
     attacker.can_attack = true;
     attacker.attacks_left = 1;
 
     // Setup defender
-    const defender = makeCardFromDB(goblinData, "red");
-    pushToBoard(state.redBoard, "red", defender);
+    const defender = makeCardFromDB(goblinData, "second");
+    pushToBoard(state.players.second.board, "second", defender);
 
     // Apply cant_attack keyword manually
     attacker.keywords = [{ name: "cant_attack" } as any];
@@ -52,7 +52,7 @@ describe("Bug 2: cant_attack enforcement", () => {
 
     const initialDefHealth = defender.defense;
 
-    attackFollower(0, 0, "blue", "red");
+    attackFollower(0, 0, "first", "second");
 
     // Assert: Attack SHOULD fail (defense unchanged)
     // With previous code, it would succeed (defense reduced by 1)
@@ -60,3 +60,9 @@ describe("Bug 2: cant_attack enforcement", () => {
     expect(defender.defense).toBe(initialDefHealth);
   });
 });
+
+
+
+
+
+

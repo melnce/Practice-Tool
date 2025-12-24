@@ -8,12 +8,12 @@ import { CardInstance } from "../../../src/core/types";
 
 describe("Lamretta, Sisterly Shepherd (10461120)", () => {
   beforeEach(() => {
-    state.blueHand = [];
-    state.blueBoard = [];
-    state.redBoard = [];
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
-    state.isBlueTurn = true;
+    state.players.first.hand = [];
+    state.players.first.board = [];
+    state.players.second.board = [];
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
+    state.isFirstPlayerTurn = true;
     state.roundCount = 5; // Simulate mid-game
     if (!state.rng)
       state.rng = {
@@ -26,7 +26,7 @@ describe("Lamretta, Sisterly Shepherd (10461120)", () => {
     const lamrettaDef: any = masterCardDefinitions.find(
       (c: any) => c.id === "10461120",
     );
-    const lamretta = makeCardFromDB(lamrettaDef, "blue");
+    const lamretta = makeCardFromDB(lamrettaDef, "first");
 
     // 2. Mock Evolve Effect call (since we just want to test the keyword logic patched in buff_self)
     // Usually Evolve ops are run by `src/logic/effects/ops/evolve.ts` which calls `evolve_self`.
@@ -59,3 +59,9 @@ describe("Lamretta, Sisterly Shepherd (10461120)", () => {
     expect(lamretta.keywordState?.cantAttackExpiresOnTurn).toBe(5); // Should match state.roundCount
   });
 });
+
+
+
+
+
+

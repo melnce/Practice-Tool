@@ -1,14 +1,13 @@
 // src/logic/effects/counters.ts
 import { state } from "../../core/gameState.js";
-import { adapter } from "../../core/adapter.js";
-import { fireTrigger } from "../core/triggers.js";
 import { completeCrest } from "./crest.js";
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
+import { getBoard, getCrests } from "../../core/playerHelpers.js";
 
 // --- helpers
 function boardOf(owner: Player) {
-  return owner === "blue" ? state.blueBoard : state.redBoard;
+  return getBoard(state, owner);
 }
 function removeFromBoard(card: CardInstance) {
   const owner = card.owner;
@@ -39,15 +38,9 @@ function ensureDestroyOnZero(card: CardInstance, key: string) {
     if (!card.counters) card.counters = {};
     card.counters[key] = 0;
 
-    const owner = card.owner;
-    // fire a generic death/destroy trigger if you use one
-    if (owner) {
-      fireTrigger("destroyed", owner, { destroyed: card });
-    }
-
     // remove from board + re-render
     removeFromBoard(card);
-    adapter.render();
+    // Render removed - UI layer
     return true;
   }
   return false;
@@ -65,7 +58,7 @@ export function addCounter(card: CardInstance, key: string, amount = 1) {
   });
   // If someone adds a negative amount, still enforce destroy
   ensureDestroyOnZero(card, key);
-  adapter.render();
+  // Render removed - UI layer
 }
 
 export function setCounter(card: CardInstance, key: string, value: number) {
@@ -78,7 +71,7 @@ export function setCounter(card: CardInstance, key: string, value: number) {
     value: card.counters[key],
   });
   ensureDestroyOnZero(card, key);
-  adapter.render();
+  // Render removed - UI layer
 }
 
 export function spendCounter(card: CardInstance, key: string, amount = 1) {
@@ -91,7 +84,7 @@ export function spendCounter(card: CardInstance, key: string, amount = 1) {
     value: card.counters[key],
   });
   ensureDestroyOnZero(card, key);
-  adapter.render();
+  // Render removed - UI layer
 }
 
 // compatibility wrapper for effects.js
@@ -126,17 +119,15 @@ export function handleReduceCountdown(
       owner: sourceCard.owner,
       value: sourceCard.countdown,
     });
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
   // Crest path
-  const inBlue =
-    Array.isArray(state.blueCrests) &&
-    state.blueCrests.includes(sourceCard as any);
-  const inRed =
-    Array.isArray(state.redCrests) &&
-    state.redCrests.includes(sourceCard as any);
+  const blueCrests = getCrests(state, "first");
+  const redCrests = getCrests(state, "second");
+  const inBlue = Array.isArray(blueCrests) && blueCrests.includes(sourceCard as any);
+  const inRed = Array.isArray(redCrests) && redCrests.includes(sourceCard as any);
   const isCrestObject =
     !!sourceCard && Number.isFinite(sourceCard.countdown) && (inBlue || inRed);
 
@@ -145,7 +136,7 @@ export function handleReduceCountdown(
       0,
       (Number(sourceCard.countdown) || 0) - dec,
     );
-    const owner = inBlue ? "blue" : "red";
+    const owner = inBlue ? "first" : "second";
     logEvent("countdownChange", {
       card: sourceCard?.name,
       owner,
@@ -158,7 +149,7 @@ export function handleReduceCountdown(
       return; // already removed + paid out
     }
 
-    adapter.render();
+    // Render removed - UI layer
     return;
   }
 
@@ -167,7 +158,7 @@ export function handleReduceCountdown(
 
 // Increase countdown instead of reducing it
 export function handleIncreaseCountdown(owner: Player, amount = 1) {
-  const crests = owner === "blue" ? state.blueCrests : state.redCrests;
+  const crests = getCrests(state, owner);
   if (!Array.isArray(crests)) return;
 
   for (const crest of crests) {
@@ -180,5 +171,20 @@ export function handleIncreaseCountdown(owner: Player, amount = 1) {
       });
     }
   }
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

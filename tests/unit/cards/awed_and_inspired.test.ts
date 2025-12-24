@@ -18,12 +18,12 @@ describe("Awed and Inspired (10461210)", () => {
       tokenCards: [],
     });
 
-    state.blueHand = [];
-    state.blueBoard = [];
-    state.redBoard = [];
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
-    state.isBlueTurn = true;
+    state.players.first.hand = [];
+    state.players.first.board = [];
+    state.players.second.board = [];
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
+    state.isFirstPlayerTurn = true;
     // Mock RNG
     if (!state.rng)
       state.rng = {
@@ -40,7 +40,7 @@ describe("Awed and Inspired (10461210)", () => {
     const amuletDef: any = masterCardDefinitions.find(
       (c: any) => c.id === "10461210",
     );
-    const amulet = makeCardFromDB(amuletDef, "blue");
+    const amulet = makeCardFromDB(amuletDef, "first");
 
     // 2. Setup Ally Follower (Target)
     const fairyDef: any = {
@@ -51,22 +51,22 @@ describe("Awed and Inspired (10461210)", () => {
       defense: 1,
       cost: 1,
     };
-    const fairy = makeCardFromDB(fairyDef, "blue");
+    const fairy = makeCardFromDB(fairyDef, "first");
 
     // 3. Place on board
-    state.blueBoard = [amulet, fairy];
+    state.players.first.board = [amulet, fairy];
     // Index 0: Amulet, Index 1: Fairy
 
     // 4. Setup Draw Deck
     const deckCardDef = { ...fairyDef, name: "Deck Fairy" };
-    const deckCard = makeCardFromDB(deckCardDef, "blue");
-    state.blueDeck = [deckCard];
+    const deckCard = makeCardFromDB(deckCardDef, "first");
+    state.players.first.deck = [deckCard];
 
-    const initialHandSize = state.blueHand.length;
+    const initialHandSize = state.players.first.hand.length;
 
     // 5. Engage Amulet (Index 0)
     // This stops at 'select' op
-    const actionResult = engageAmulet("blue", 0);
+    const actionResult = engageAmulet("first", 0);
 
     // 6. Verify Pending Target State
     console.log("Pending Target Eff:", state.pendingTargetEffect?.eff);
@@ -77,23 +77,29 @@ describe("Awed and Inspired (10461210)", () => {
     // 7. Resolve Selection (Select the Fairy at index 1 -> now index 0 because amulet destroyed?)
     // Wait, 'destroy_self' runs BEFORE 'select'.
     // So Amulet is gone. Fairy is now at index 0.
-    expect(state.blueBoard.length).toBe(1);
-    expect(state.blueBoard[0].uid).toBe(fairy.uid); // Fairy is the only one left
-    expect(state.blueGraveyard.length).toBe(1); // Amulet in grave
+    expect(state.players.first.board.length).toBe(1);
+    expect(state.players.first.board[0].uid).toBe(fairy.uid); // Fairy is the only one left
+    expect(state.players.first.graveyard.length).toBe(1); // Amulet in grave
 
-    const targetFairy = state.blueBoard[0];
+    const targetFairy = state.players.first.board[0];
 
     resolvePendingTarget(targetFairy.uid);
 
     // 8. Verify Transformation
     // Fairy should now be "Awed and Inspired"
-    const transformed = state.blueBoard[0];
+    const transformed = state.players.first.board[0];
     expect(transformed.name).toBe("Awed and Inspired");
     expect(transformed.type).toBe("Amulet"); // It transformed into an amulet
 
     // 9. Verify Draw
     // Draw op is AFTER select. Does it run?
-    expect(state.blueHand.length).toBe(initialHandSize + 1);
-    expect(state.blueHand[0].name).toBe("Deck Fairy");
+    expect(state.players.first.hand.length).toBe(initialHandSize + 1);
+    expect(state.players.first.hand[0].name).toBe("Deck Fairy");
   });
 });
+
+
+
+
+
+

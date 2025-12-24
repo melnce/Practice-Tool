@@ -90,7 +90,6 @@ function dispatchEffect<K extends EffectOp>(
   eff: Effect,
   ctx: EffectCtx,
 ): EffectResult | void {
-  console.error("DEBUG_DISPATCH: dispatching", op);
   if (eff.op !== op) return; // Should not happen if confirmed 'eff.op'
   const handler = getOp(op);
   if (!handler) {
@@ -169,7 +168,7 @@ export function runEffects(
       sourceCard,
       queue,
       context,
-      adapter: { ...adapter, render: () => {} } as any, // Prevent render loops
+      adapter: { ...adapter, render: () => { } } as any, // Prevent render loops
       trace, // Pass it down
     };
 
@@ -214,3 +213,18 @@ export function runEffects(
 registerRunEffectsInCleanup(runEffects);
 // Register runEffects with triggers/process.ts so board/hand triggers can execute effects
 registerRunEffects(runEffects);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

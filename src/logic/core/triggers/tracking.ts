@@ -71,3 +71,18 @@ export function markFired(
     trigger.usedThisTurn = true; // Legacy/Compat flag
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

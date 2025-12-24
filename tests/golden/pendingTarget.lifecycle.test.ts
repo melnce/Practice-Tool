@@ -27,7 +27,7 @@ function makeCard(id: string): CardInstance {
 
 describe("Golden: PendingTarget Lifecycle", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   it("initially no pending target", () => {
@@ -41,7 +41,7 @@ describe("Golden: PendingTarget Lifecycle", () => {
 
     setPendingTarget({
       eff,
-      owner: "blue",
+      owner: "first",
       sourceCard: null,
       pool,
       targets: [],
@@ -58,7 +58,7 @@ describe("Golden: PendingTarget Lifecycle", () => {
   it("clearPendingTarget removes pending state", () => {
     setPendingTarget({
       eff: { op: "stat" },
-      owner: "red",
+      owner: "second",
       sourceCard: null,
       pool: [makeCard("x")],
       targets: [],
@@ -79,7 +79,7 @@ describe("Golden: PendingTarget Lifecycle", () => {
 
     setPendingTarget({
       eff: { op: "destroy" },
-      owner: "blue",
+      owner: "first",
       sourceCard: null,
       pool: [t1, t2],
       targets: [],
@@ -94,3 +94,9 @@ describe("Golden: PendingTarget Lifecycle", () => {
     expect(pending?.targets.length).toBe(1);
   });
 });
+
+
+
+
+
+

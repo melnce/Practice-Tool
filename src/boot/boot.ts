@@ -76,15 +76,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // God Mode Handlers
   wireClick("godPlus", () => {
-    state.bluePP = Math.min(state.blueMaxPP, state.bluePP + 1);
+    state.players.first.pp = Math.min(state.players.first.maxPP, state.players.first.pp + 1);
     render();
   });
   wireClick("godMinus", () => {
-    state.bluePP = Math.max(0, state.bluePP - 1);
+    state.players.first.pp = Math.max(0, state.players.first.pp - 1);
     render();
   });
   wireClick("godRefill", () => {
-    state.bluePP = state.blueMaxPP;
+    state.players.first.pp = state.players.first.maxPP;
     render();
   });
   wireClick("godSetMax", () => {
@@ -92,8 +92,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (val) {
       const n = parseInt(val, 10);
       if (Number.isFinite(n) && n >= 0) {
-        state.blueMaxPP = n;
-        state.bluePP = n;
+        state.players.first.maxPP = n;
+        state.players.first.pp = n;
         render();
       }
     }
@@ -101,15 +101,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // God Mode: EP
   wireClick("godEPPlus", () => {
-    state.blueEvoCharges = (state.blueEvoCharges || 0) + 1;
+    state.players.first.evoCharges = (state.players.first.evoCharges || 0) + 1;
     render();
   });
   wireClick("godEPMinus", () => {
-    state.blueEvoCharges = Math.max(0, (state.blueEvoCharges || 0) - 1);
+    state.players.first.evoCharges = Math.max(0, (state.players.first.evoCharges || 0) - 1);
     render();
   });
   wireClick("godEPRefill", () => {
-    state.blueEvoCharges = 3; // Max EP for P2 is 3, usually enough.
+    state.players.first.evoCharges = 3; // Max EP for P2 is 3, usually enough.
     render();
   });
 
@@ -119,8 +119,8 @@ window.addEventListener("DOMContentLoaded", () => {
       const val = parseInt(inp.value, 10);
       if (Number.isFinite(val)) {
         // Determine delta to update Skybound Art (SBA)
-        const oldVal = state.blueEvoCount || 0;
-        state.blueEvoCount = val;
+        const oldVal = state.players.first.evoCount || 0;
+        state.players.first.evoCount = val;
 
         // If we increased evolutions, manually trigger SBA increments
         // so cards in hand "witness" these god-mode evolutions.
@@ -129,7 +129,7 @@ window.addEventListener("DOMContentLoaded", () => {
           void import("../logic/effects/skybound.js").then(
             ({ incrementSkyboundArt }) => {
               for (let i = 0; i < delta; i++) {
-                incrementSkyboundArt("blue");
+                incrementSkyboundArt("first");
               }
               render();
             },
@@ -146,7 +146,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (inp) {
       const val = parseInt(inp.value, 10);
       if (Number.isFinite(val)) {
-        state.bluePlaysThisTurn = val;
+        state.players.first.playsThisTurn = val;
         render();
       }
     }
@@ -157,7 +157,7 @@ window.addEventListener("DOMContentLoaded", () => {
     if (inp) {
       const val = parseInt(inp.value, 10);
       if (Number.isFinite(val) && val >= 0) {
-        state.blueShadows = val;
+        state.players.first.shadows = val;
         render();
       }
     }
@@ -255,3 +255,17 @@ async function populateDeckSelects() {
 }
 
 window.addEventListener("DOMContentLoaded", populateDeckSelects);
+
+
+
+
+
+
+
+
+
+
+
+
+
+

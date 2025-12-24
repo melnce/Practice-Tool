@@ -8,6 +8,7 @@ import { getPool } from "../targeting.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import { pickEnhanceTier } from "./cost.js";
 import { getEffectiveCost } from "./cost.js";
+import { getPP, getHand, getBoard, opponentOf } from "../../../core/playerHelpers.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -77,10 +78,10 @@ export function canPlayCard(
   player: Player,
 ): PreflightResult {
   // Build context
-  const availablePP = player === "blue" ? state.bluePP : state.redPP;
-  const hand = player === "blue" ? state.blueHand : state.redHand;
-  const myBoard = player === "blue" ? state.blueBoard : state.redBoard;
-  const enemyBoard = player === "red" ? state.blueBoard : state.redBoard;
+  const availablePP = getPP(state, player);
+  const hand = getHand(state, player);
+  const myBoard = getBoard(state, player);
+  const enemyBoard = getBoard(state, opponentOf(player));
 
   // Determine effect list (enhanced or base)
   const chosenTier = pickEnhanceTier(card, availablePP);
@@ -287,3 +288,18 @@ function checkArtifactPairRequirement(
 }
 
 // PreflightContext is already exported at definition
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

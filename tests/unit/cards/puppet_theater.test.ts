@@ -32,3 +32,9 @@ describe("Puppet Theater (10072210)", () => {
     expect(trigger.effects[0].name).toBe("Puppet");
   });
 });
+
+
+
+
+
+

@@ -3,18 +3,19 @@
 import { state } from "../../../core/gameState.js";
 import { applyLeaderDamage } from "../leader.js";
 import { Player, CardInstance, Effect } from "../../../core/types.js";
+import { getBoard, opponentOf, addModeBonus } from "../../../core/playerHelpers.js";
 
 // damage_enemy_leader_by_other_allies
 export function handleDamageEnemyLeaderByOtherAllies(
   owner: Player,
   sourceCard: CardInstance,
 ) {
-  const myBoard = owner === "blue" ? state.blueBoard : state.redBoard;
+  const myBoard = getBoard(state, owner);
   const x =
     (myBoard || []).filter(
       (c) => c && (!sourceCard || c.uid !== sourceCard.uid),
     ).length | 0;
-  const enemy = owner === "blue" ? "red" : "blue";
+  const enemy = opponentOf(owner);
   if (x > 0) applyLeaderDamage(enemy, x);
 }
 
@@ -24,8 +25,7 @@ export function handleModeBonus(eff: Effect, ctx: any) {
   const owner = ctx.owner;
   const amt = (eff.amount || 1) as number;
   console.log(`[ModeBonus] Adding mode bonus ${amt} to ${owner}`);
-  if (owner === "blue") state.blueModeBonus = (state.blueModeBonus || 0) + amt;
-  else state.redModeBonus = (state.redModeBonus || 0) + amt;
+  addModeBonus(state, owner, amt);
 }
 
 // Legacy handleGainMaxPP was removed - now handled by:
@@ -43,3 +43,17 @@ export function handleSetCostLastDrawn(eff: Effect) {
     target.cost = Math.max(0, v);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

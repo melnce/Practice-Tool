@@ -5,6 +5,7 @@ import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player } from "../../../../core/types.js";
 import { StatOp } from "./types.js";
 import { fireTrigger } from "../../../core/triggers.js";
+import { getBoard } from "../../../../core/playerHelpers.js";
 
 /**
  * Applies stat changes to a card (additive).
@@ -158,19 +159,21 @@ export function checkPostBuffTriggers(
 ) {
   // NEW: notify when a positive buff is applied to a follower on the field
   // LEGACY: explicit trigger firing preserved for determinism/replay compatibility — do not simplify to reactive system
+  const blueBoard = getBoard(state, "first");
+  const redBoard = getBoard(state, "second");
   if (
     (a > 0 || d > 0) &&
-    (state.blueBoard.includes(target) || state.redBoard.includes(target))
+    (blueBoard.includes(target) || redBoard.includes(target))
   ) {
     fireTrigger("self_buffed_up", owner, { target });
   }
 
   // Fire "enemy_follower_defense_down" if we actually reduced DEF on an enemy follower
   if (d < 0 && target?.type === "Follower") {
-    const targetOwner = state.blueBoard.includes(target)
-      ? "blue"
-      : state.redBoard.includes(target)
-        ? "red"
+    const targetOwner = blueBoard.includes(target)
+      ? "first"
+      : redBoard.includes(target)
+        ? "second"
         : null;
     const debufferOwner = owner; // the player executing this buff/debuff op
     if (targetOwner && debufferOwner) {
@@ -178,3 +181,18 @@ export function checkPostBuffTriggers(
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

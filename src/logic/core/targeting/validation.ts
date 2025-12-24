@@ -1,5 +1,6 @@
 // src/logic/core/targeting/validation.ts
 import { GameState, Player } from "../../../core/types.js";
+import { getBoard, opponentOf } from "../../../core/playerHelpers.js";
 
 /** Result of a validation check */
 export interface ValidationResult {
@@ -30,20 +31,17 @@ export function validateTargetSelection(
   // 2. Lloyd Enforcement (Global Taunt)
   try {
     const me = pending.owner as Player;
-    const opp: Player = me === "blue" ? "red" : "blue";
-    const oppBoard = (opp === "blue" ? state.blueBoard : state.redBoard) || [];
+    const opp = opponentOf(me);
+    const oppBoard = getBoard(state, opp) || [];
     const lloyds = oppBoard.filter((c) => c?.name === "Lloyd");
 
     if (lloyds.length > 0) {
       // Only care if the current pool includes opponent-side targets
       // We verify opponent-side status by board membership
+      const myBoard = getBoard(state, me) || [];
       const poolHasOpponent = (pending.pool || []).some(
         (c: any) =>
-          (state.blueBoard?.includes(c)
-            ? "blue"
-            : state.redBoard?.includes(c)
-              ? "red"
-              : null) === opp,
+          !myBoard.includes(c) && oppBoard.includes(c),
       );
 
       if (poolHasOpponent) {
@@ -52,8 +50,8 @@ export function validateTargetSelection(
 
         const safeCount =
           typeof pending.selectCount === "number" &&
-          Number.isFinite(pending.selectCount) &&
-          pending.selectCount > 0
+            Number.isFinite(pending.selectCount) &&
+            pending.selectCount > 0
             ? pending.selectCount
             : 1;
 
@@ -83,3 +81,18 @@ export function validateTargetSelection(
   // All checks passed
   return { ok: true };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

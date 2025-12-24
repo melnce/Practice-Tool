@@ -23,10 +23,10 @@ function createCard(id: string, name: string): CardInstance {
 
 describe("Scenario: End of Turn Delayed Triggers", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
     // Setup initial basic state
-    state.blueHP = 20;
-    state.redHP = 20;
+    state.players.first.hp = 20;
+    state.players.second.hp = 20;
   });
 
   afterEach(() => {
@@ -35,7 +35,7 @@ describe("Scenario: End of Turn Delayed Triggers", () => {
 
   it("should fire delayed effects at end of turn and clean up", () => {
     const ally = createCard("ally_trigger", "TriggerUnit");
-    state.blueBoard.push(ally);
+    state.players.first.board.push(ally);
 
     // 1. Manually register a delayed trigger
     // This simulates a card effect saying "At the end of your turn, deal 1 damage to enemy leader"
@@ -48,14 +48,14 @@ describe("Scenario: End of Turn Delayed Triggers", () => {
     registerTrigger(ally, triggerDef);
 
     // Verify initial state
-    expect(state.redHP).toBe(20);
+    expect(state.players.second.hp).toBe(20);
 
     // 2. End Turn (Blue)
     endTurnBlue();
 
     // 3. Assertions
     // Effect should have fired
-    expect(state.redHP).toBe(19);
+    expect(state.players.second.hp).toBe(19);
 
     // Trigger maintenance check?
     // Note: Permanent triggers (from card text) persist.
@@ -65,7 +65,7 @@ describe("Scenario: End of Turn Delayed Triggers", () => {
 
   it("should NOT fire opponents end of turn triggers", () => {
     const enemy = createCard("enemy_trigger", "EnemyUnit");
-    state.redBoard.push(enemy);
+    state.players.second.board.push(enemy);
 
     // Enemy has a trigger "At the end of YOUR (Red's) turn..."
     registerTrigger(enemy, {
@@ -77,6 +77,12 @@ describe("Scenario: End of Turn Delayed Triggers", () => {
     endTurnBlue();
 
     // Blue ended turn, so it's not Red's EOT. Red's trigger should not fire.
-    expect(state.blueHP).toBe(20);
+    expect(state.players.first.hp).toBe(20);
   });
 });
+
+
+
+
+
+

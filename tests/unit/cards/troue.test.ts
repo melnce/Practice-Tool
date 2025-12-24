@@ -8,12 +8,12 @@ import { CardInstance } from "../../../src/core/types";
 
 describe("Troue, Heroic Visionary (10461110)", () => {
   beforeEach(() => {
-    state.blueHand = [];
-    state.blueBoard = [];
-    state.redBoard = [];
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
-    state.isBlueTurn = true;
+    state.players.first.hand = [];
+    state.players.first.board = [];
+    state.players.second.board = [];
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
+    state.isFirstPlayerTurn = true;
     if (!state.rng)
       state.rng = {
         makeUid: () => Math.random().toString(36).substr(2, 9),
@@ -25,7 +25,7 @@ describe("Troue, Heroic Visionary (10461110)", () => {
     const troueDef: any = masterCardDefinitions.find(
       (c: any) => c.id === "10461110",
     );
-    const troue = makeCardFromDB(troueDef, "blue");
+    const troue = makeCardFromDB(troueDef, "first");
 
     // 2. Setup Dummy Engage Amulet
     const amuletDef: any = {
@@ -37,10 +37,10 @@ describe("Troue, Heroic Visionary (10461110)", () => {
       engageCost: 0,
       engageEffects: [{ op: "draw", source: "named", name: "Fairy", count: 0 }], // specific effect irrelevant, just need to run
     };
-    const amulet = makeCardFromDB(amuletDef, "blue");
+    const amulet = makeCardFromDB(amuletDef, "first");
 
     // 3. Place on board
-    state.blueBoard = [troue, amulet];
+    state.players.first.board = [troue, amulet];
     // Indices: Troue=0, Amulet=1
 
     // Verify pre-condition: Troue has no drain
@@ -49,7 +49,7 @@ describe("Troue, Heroic Visionary (10461110)", () => {
     ).toBeFalsy();
 
     // 4. Engage Amulet
-    engageAmulet("blue", 1);
+    engageAmulet("first", 1);
 
     // 5. Verify Post-condition: Troue has Drain
     // Drain is usually stored in keywordState.drain or keywords array depending on implementation of 'buff_self'
@@ -65,3 +65,9 @@ describe("Troue, Heroic Visionary (10461110)", () => {
     expect(hasDrainKeyword).toBe(true);
   });
 });
+
+
+
+
+
+

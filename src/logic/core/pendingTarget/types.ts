@@ -24,3 +24,18 @@ export interface PendingTargetRequest {
 export type PendingTargetResult =
   | { status: "pending" }
   | { status: "resolved"; targets: CardInstance[] };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

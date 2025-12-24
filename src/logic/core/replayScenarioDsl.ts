@@ -12,6 +12,7 @@ import {
   ChooseTargetAction,
   TargetSpec,
 } from "../../core/types.js";
+import { getHand, getBoard } from "../../core/playerHelpers.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Selector Options
@@ -61,7 +62,7 @@ export function selectCardInHand(
   owner: Player,
   selector: CardSelector,
 ): CardInstance {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
 
   // 0. UID Match (Fast path, exact)
   if (selector.uid) {
@@ -91,7 +92,7 @@ export function selectCardInHand(
       .join(", ");
     throw new Error(
       `selectCardInHand: No card found matching criteria ${JSON.stringify(selector)} for ${owner}.\n` +
-        `Available cards: ${available || "(empty hand)"}`,
+      `Available cards: ${available || "(empty hand)"}`,
     );
   }
 
@@ -100,7 +101,7 @@ export function selectCardInHand(
     if (selector.index < 0 || selector.index >= candidates.length) {
       throw new Error(
         `selectCardInHand: Index ${selector.index} out of bounds for matches of ${JSON.stringify(selector)}.\n` +
-          `Found ${candidates.length} matches.`,
+        `Found ${candidates.length} matches.`,
       );
     }
     return candidates[selector.index]!;
@@ -111,8 +112,8 @@ export function selectCardInHand(
     const matches = candidates.map((c) => `${c.name} (${c.uid})`).join(", ");
     throw new Error(
       `selectCardInHand: Multiple cards match ${JSON.stringify(selector)} for ${owner}.\n` +
-        `Matches: ${matches}\n` +
-        `Specify 'index' to disambiguate (e.g. index: 0 for the first one).`,
+      `Matches: ${matches}\n` +
+      `Specify 'index' to disambiguate (e.g. index: 0 for the first one).`,
     );
   }
 
@@ -129,7 +130,7 @@ export function selectFollowerOnBoard(
   state: GameState,
   selector: BoardSelector,
 ): CardInstance {
-  const board = selector.owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, selector.owner);
 
   const candidates = board.filter((card) => {
     if (selector.name !== undefined && !card.name.includes(selector.name))
@@ -147,7 +148,7 @@ export function selectFollowerOnBoard(
       .join(", ");
     throw new Error(
       `selectFollowerOnBoard: No card found matching ${JSON.stringify(selector)} for ${selector.owner}.\n` +
-        `Available on board: ${available || "(empty board)"}`,
+      `Available on board: ${available || "(empty board)"}`,
     );
   }
 
@@ -155,7 +156,7 @@ export function selectFollowerOnBoard(
     if (selector.index < 0 || selector.index >= candidates.length) {
       throw new Error(
         `selectFollowerOnBoard: Index ${selector.index} out of bounds for matches of ${JSON.stringify(selector)}.\n` +
-          `Found ${candidates.length} matches.`,
+        `Found ${candidates.length} matches.`,
       );
     }
     return candidates[selector.index]!;
@@ -165,8 +166,8 @@ export function selectFollowerOnBoard(
     const matches = candidates.map((c) => `${c.name} (${c.uid})`).join(", ");
     throw new Error(
       `selectFollowerOnBoard: Multiple cards match ${JSON.stringify(selector)} for ${selector.owner}.\n` +
-        `Matches: ${matches}\n` +
-        `Specify 'index' to disambiguate.`,
+      `Matches: ${matches}\n` +
+      `Specify 'index' to disambiguate.`,
     );
   }
 
@@ -182,12 +183,12 @@ export function selectTarget(
   selector: TargetSelector,
 ): TargetSpec {
   if (selector.zone === "leader") {
-    const player = selector.owner ?? "red"; // Default to enemy leader
+    const player = selector.owner ?? "second"; // Default to enemy leader
     return { type: "leader", player };
   }
 
   // Board target
-  const owner = selector.owner ?? "red";
+  const owner = selector.owner ?? "second";
   const boardSelector: BoardSelector = { owner };
   if (selector.index !== undefined) boardSelector.index = selector.index;
   if (selector.name !== undefined) boardSelector.name = selector.name;
@@ -260,7 +261,7 @@ export function chooseTarget(
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function describeHand(state: GameState, owner: Player): string {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   return hand
     .map(
       (c, i) => `[${i}] ${c.name} (${c.type}, cost ${c.cost}, uid: ${c.uid})`,
@@ -269,10 +270,25 @@ export function describeHand(state: GameState, owner: Player): string {
 }
 
 export function describeBoard(state: GameState, owner: Player): string {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   return board
     .map(
       (c, i) => `[${i}] ${c.name} (${c.type}, cost ${c.cost}, uid: ${c.uid})`,
     )
     .join("\n");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

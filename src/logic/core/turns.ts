@@ -1,7 +1,6 @@
 // src/logic/core/turns.ts
 import { state } from "../../core/gameState.js";
 import { drawCard } from "../../core/utils.js";
-import { adapter } from "../../core/adapter.js";
 import { recordEvent } from "../../core/debugTimeline.js";
 import { fireTrigger } from "./triggers.js";
 import { cleanupDead } from "./cleanup.js";
@@ -19,6 +18,7 @@ import { dealDamage } from "./barrier.js";
 import { logEvent } from "../../core/logger.js";
 import { beginAction, commitAction } from "../../core/history.js";
 import { CardInstance, Player } from "../../core/types.js";
+import { isFirstPlayer, getHand, getBoard, getDeck, setHP, getHP, getEvoCount, getPP, setPP, getMaxPP, setMaxPP, getPermPP, setPlaysThisTurn, setEvoUsedThisTurn, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
 
 /**
  * Helper: at the start of a player's turn, refresh their followers.
@@ -55,31 +55,28 @@ function refreshBoardForNewTurn(board: CardInstance[]) {
 function clearExpiredLeaderEffects(endedPlayer: Player) {
   // If endedPlayer just ended their turn, process expirations.
   // "opponent_turn_end" means if I am the opponent of the effect holder, and I ended my turn, it expires.
-  // E.g. Blue has effect "until opponent turn end". Red ends turn. Red is opponent. So Blue's effect expires.
+  const isFirst = isFirstPlayer(endedPlayer);
+  const s = state as any;
 
-  const opponent = endedPlayer === "blue" ? "red" : "blue";
-
-  // Check Blue's effects (if Red ended turn)
-  if (endedPlayer === "red") {
-    const s = state as any;
+  // Check first player's effects (if second player ended turn)
+  if (!isFirst) {
     if (s.blueLeaderMaxDamageCapExpiry === "opponent_turn_end") {
       delete s.blueLeaderMaxDamageCap;
       delete s.blueLeaderMaxDamageCapExpiry;
       logEvent("leaderEffectExpired", {
-        owner: "blue",
+        owner: "first",
         effect: "max_damage_cap",
       });
     }
   }
 
-  // Check Red's effects (if Blue ended turn)
-  if (endedPlayer === "blue") {
-    const s = state as any;
+  // Check second player's effects (if first player ended turn)
+  if (isFirst) {
     if (s.redLeaderMaxDamageCapExpiry === "opponent_turn_end") {
       delete s.redLeaderMaxDamageCap;
       delete s.redLeaderMaxDamageCapExpiry;
       logEvent("leaderEffectExpired", {
-        owner: "red",
+        owner: "second",
         effect: "max_damage_cap",
       });
     }
@@ -87,7 +84,7 @@ function clearExpiredLeaderEffects(endedPlayer: Player) {
 }
 
 function clearTempHandCostMods(endedPlayer: Player) {
-  const hand = endedPlayer === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, endedPlayer);
   for (const card of hand) {
     const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
     if (delta !== 0) {
@@ -98,9 +95,9 @@ function clearTempHandCostMods(endedPlayer: Player) {
 }
 
 function applyBleedAllBoardsAtEndOfTurn() {
-  const sides = [
-    { owner: "blue", board: state.blueBoard },
-    { owner: "red", board: state.redBoard },
+  const sides: { owner: Player; board: CardInstance[] }[] = [
+    { owner: "first", board: getBoard(state, "first") },
+    { owner: "second", board: getBoard(state, "second") },
   ];
 
   for (const { owner, board } of sides) {
@@ -112,11 +109,8 @@ function applyBleedAllBoardsAtEndOfTurn() {
       const toSelf = Number((card as any).bleed.toSelf || 0);
 
       if (toLeader > 0) {
-        if (owner === "blue") {
-          state.blueHP = Math.max(0, state.blueHP - toLeader);
-        } else {
-          state.redHP = Math.max(0, state.redHP - toLeader);
-        }
+        const currentHP = getHP(state, owner);
+        setHP(state, owner, Math.max(0, currentHP - toLeader));
       }
       if (toSelf > 0) dealDamage(card, toSelf); // the follower itself
     }
@@ -124,7 +118,7 @@ function applyBleedAllBoardsAtEndOfTurn() {
 }
 
 function tickAmuletCountdowns(owner: Player) {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   for (const card of board) {
     if (
       card?.type === "Amulet" &&
@@ -143,8 +137,7 @@ function scanDeckForInvokes(
   owner: Player,
   timing: "start_of_turn" | "end_of_turn",
 ) {
-  const deck = owner === "blue" ? state.blueDeck : state.redDeck;
-  // const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const deck = getDeck(state, owner);
 
   // Safety copy to iterate while mutating deck
   const candidates = [...deck];
@@ -161,12 +154,7 @@ function scanDeckForInvokes(
     // Check timing (default to start_of_turn of NOT specified, for backward compat, or require explicit?)
     // User wants explicit. Let's strict match if present, else default?
     // Better: strict match. Sandalphon now has explicit.
-    const cardTiming = inv.timing || "start_of_turn"; // Defaulting to start for now
-
-    // Console log for debugging the user's issue
-    console.log(
-      `[InvokeScan] Card=${card.name} Timing=${cardTiming} CurrentPhase=${timing}`,
-    );
+    const cardTiming = inv.timing || "start_of_turn";
 
     if (cardTiming !== timing) continue;
 
@@ -175,15 +163,11 @@ function scanDeckForInvokes(
 
     // Evolve count check
     if (typeof inv.condition.evolved_count_at_least === "number") {
-      const stat = owner === "blue" ? state.blueEvoCount : state.redEvoCount;
-      console.log(
-        `[InvokeScan] ConditionCheck: Need=${inv.condition.evolved_count_at_least} Have=${stat}`,
-      );
+      const stat = getEvoCount(state, owner);
       if (stat >= inv.condition.evolved_count_at_least) conditionMet = true;
     }
 
     if (conditionMet) {
-      console.log(`[InvokeScan] MATCH! Invoking ${card.name}`);
       logEvent("invoke", { owner, card: card.name });
       invokedNames.add(card.name);
 
@@ -208,40 +192,38 @@ function scanDeckForInvokes(
  * Handles the end of the blue player's turn and sets up the red player's turn.
  */
 export function endTurnBlue() {
-  console.error(`[Turns] endTurnBlue called. isBlueTurn: ${state.isBlueTurn}`);
-  if (!state.isBlueTurn) return;
+  if (state.activePlayer !== "first") return;
 
   try {
-    recordEvent({ type: "end_turn", payload: { player: "blue" } });
+    recordEvent({ type: "end_turn", payload: { player: "first" } });
     beginAction("End Turn (Blue)");
 
-    clearTempHandCostMods("blue");
-    state.blueBoard.forEach((card) => clearTemporaryBuffs(card));
+    clearTempHandCostMods("first");
+    getBoard(state, "first").forEach((card) => clearTemporaryBuffs(card));
 
     try {
-      fireTrigger("end_of_turn", "blue");
+      fireTrigger("end_of_turn", "first");
     } catch (e) {
       console.error("Error firing end_of_turn triggers:", e);
     }
 
-    // processHimekaDelayedBanish("blue");
-    adapter.render();
+    // processHimekaDelayedBanish("first");
+    // Render removed - UI orchestrator handles rendering
 
     // Check End of Turn Invokes
     try {
-      scanDeckForInvokes("blue", "end_of_turn");
+      scanDeckForInvokes("first", "end_of_turn");
     } catch (e) {
       console.error("Error in Invoke scan:", e);
     }
 
     // ? Blue: run crest effects one by one, then cleanup once
     try {
-      const fx = processCrestEvent("blue", "end_of_turn");
+      const fx = processCrestEvent("first", "end_of_turn");
       if (fx.length) {
         state.suppressCleanup = true; // <� start atomic crest phase
         for (const eff of fx) {
-          console.log("[Turns] Running crest effect op:", eff.op);
-          runEffects([eff], "blue", null);
+          runEffects([eff], "first", null);
         }
         state.suppressCleanup = false; // <� end atomic crest phase
       }
@@ -251,218 +233,197 @@ export function endTurnBlue() {
     }
     cleanupDead(); // resolve deaths + Last Words once
 
-    clearExpiredCantAttackAtEOT("blue");
+    clearExpiredCantAttackAtEOT("first");
     applyBleedAllBoardsAtEndOfTurn();
-    clearExpiredLeaderEffects("blue");
+    clearExpiredLeaderEffects("first");
 
-    state.redMaxPP = Math.min(state.roundCount + (state.redPermPP || 0), 10);
-    state.redPP = state.redMaxPP;
+    setMaxPP(state, "second", Math.min(state.roundCount + getPermPP(state, "second"), 10));
+    setPP(state, "second", getMaxPP(state, "second"));
 
     // Reset evolution usage flag
-    state.blueEvoUsedThisTurn = false;
+    setEvoUsedThisTurn(state, "first", false);
 
-    clearSummoningSickness(state.redBoard);
+    clearSummoningSickness(getBoard(state, "second"));
 
-    resetCrestOncePerTurn("red");
-    resetEngageFlagsAtTurnStart("red");
+    resetCrestOncePerTurn("second");
+    resetEngageFlagsAtTurnStart("second");
     try {
-      const redStartFx = processCrestEvent("red", "start_of_turn");
-      if (redStartFx.length) runEffects([...redStartFx], "red", null);
+      const redStartFx = processCrestEvent("second", "start_of_turn");
+      if (redStartFx.length) runEffects([...redStartFx], "second", null);
     } catch (e) {
       console.error("Error in Red start effects:", e);
     }
 
     try {
-      const redCrestFx = tickCrests("red");
-      if (redCrestFx.length) runEffects([...redCrestFx], "red", null);
+      const redCrestFx = tickCrests("second");
+      if (redCrestFx.length) runEffects([...redCrestFx], "second", null);
     } catch (e) {
       console.error("Error in Red tick crests:", e);
     }
     cleanupDead();
 
     // Draw for Red
-    drawCard(state.redHand, state.redDeck, "red");
-    logEvent("draw", { player: "red", count: 1 });
+    drawCard(getHand(state, "second"), getDeck(state, "second"), "second");
+    logEvent("draw", { player: "second", count: 1 });
     // Invoke Phase (Start of Turn)
     try {
-      scanDeckForInvokes("red", "start_of_turn");
+      scanDeckForInvokes("second", "start_of_turn");
     } catch (e) {
       console.error("Error in Red Invoke Start:", e);
     }
 
-    state.redPlaysThisTurn = 0;
+    setPlaysThisTurn(state, "second", 0);
 
-    refreshBoardForNewTurn(state.redBoard);
+    refreshBoardForNewTurn(getBoard(state, "second"));
 
-    state.isBlueTurn = false;
+    // isBlueTurn removed - activePlayer is source of truth
 
-    tickAmuletCountdowns("red");
+    tickAmuletCountdowns("second");
     cleanupDead();
-    state.activePlayer = "red";
+    state.activePlayer = "second";
     logEvent("startTurn", {
       player: state.activePlayer,
       round: state.roundCount,
     });
-    state.redAnyAllyAttackedThisTurn = false;
-    state.redEvoUsedThisTurn = false;
+    // Fire start_of_turn trigger for red's turn
+    try {
+      fireTrigger("start_of_turn", "second");
+    } catch (e) {
+      console.error("Error firing start_of_turn triggers (red):", e);
+    }
+    setAnyAllyAttackedThisTurn(state, "second", false);
+    setEvoUsedThisTurn(state, "second", false);
     resetShikigamiDeathLogs();
 
-    adapter.render();
+    // Render removed - UI orchestrator handles rendering
     logEvent("endTurn", { from: "blue" });
     commitAction({ autoRender: false });
   } catch (criticalError) {
     console.error("CRITICAL ERROR IN END_TURN (Blue):", criticalError);
     // Force turn flip to avoid stuck state
-    state.isBlueTurn = false;
-    state.activePlayer = "red";
-    adapter.render();
+    // isBlueTurn removed - activePlayer is source of truth
+    state.activePlayer = "second";
+    // Render removed - UI orchestrator handles rendering
   }
 }
 
 export function endTurnRed() {
-  if (state.isBlueTurn) return;
+  if (state.activePlayer === "first") return;
   try {
-    console.log("I AM REAL TURNS TS");
     beginAction("End Turn (Red)");
 
-    console.log("MARKER 0.1");
+    clearTempHandCostMods("second");
+    getBoard(state, "second").forEach((card) => clearTemporaryBuffs(card));
+
     try {
-      clearTempHandCostMods("red");
-    } catch (e) {
-      console.log("ERR 0.1", e);
-    }
-    console.log("MARKER 0.2");
-    try {
-      state.redBoard.forEach((card) => clearTemporaryBuffs(card));
-    } catch (e) {
-      console.log("ERR 0.2", e);
-    }
-    console.log("MARKER 0.3");
-    try {
-      fireTrigger("end_of_turn", "red");
+      fireTrigger("end_of_turn", "second");
     } catch (e) {
       console.error("Error firing end_of_turn triggers (red):", e);
     }
 
-    console.log("MARKER 0.4 - Rendering");
-    try {
-      adapter.render();
-    } catch (e) {
-      console.log("ERR Render", e);
-    }
-    console.log("MARKER 0.5 - Post Render");
+    // Render removed - UI orchestrator handles rendering
 
-    // Check End of Turn Invokes
-    // Check End of Turn Invokes
     try {
-      scanDeckForInvokes("red", "end_of_turn");
+      scanDeckForInvokes("second", "end_of_turn");
     } catch (e) {
       console.error("Error in Red Invoke EOT:", e);
     }
-    console.log("MARKER 2");
 
-    // ? Red: run crest effects one by one, then cleanup once
     try {
-      console.log("MARKER 2.1 - CREST START");
-      const fx = processCrestEvent("red", "end_of_turn");
+      const fx = processCrestEvent("second", "end_of_turn");
       if (fx.length) {
         state.suppressCleanup = true;
-        for (const eff of fx) runEffects([eff], "red", null);
+        for (const eff of fx) runEffects([eff], "second", null);
         state.suppressCleanup = false;
       }
-      console.log("MARKER 2.2 - CREST END");
     } catch (e) {
       console.error("Error in Red Crest EOT:", e);
       state.suppressCleanup = false;
     }
-    console.log("MARKER 3");
     cleanupDead();
 
-    clearExpiredCantAttackAtEOT("red");
+    clearExpiredCantAttackAtEOT("second");
     applyBleedAllBoardsAtEndOfTurn();
-    clearExpiredLeaderEffects("red");
+    clearExpiredLeaderEffects("second");
 
-    if (state.redBoostPending) {
-      if (state.roundCount <= 5) state.redBoostUsedEarly = true;
-      else state.redBoostUsedLate = true;
-      state.redBoostPending = false;
+    if (state.secondPlayerPPBoostPending) {
+      if (state.roundCount <= 5) state.secondPlayerPPBoostUsedEarly = true;
+      else state.secondPlayerPPBoostUsedLate = true;
+      state.secondPlayerPPBoostPending = false;
     }
 
     state.roundCount++;
 
-    state.blueMaxPP = Math.min(state.roundCount + (state.bluePermPP || 0), 10);
-    state.bluePP = state.blueMaxPP;
+    setMaxPP(state, "first", Math.min(state.roundCount + getPermPP(state, "first"), 10));
+    setPP(state, "first", getMaxPP(state, "first"));
 
     // Reset evolution usage flag
-    state.redEvoUsedThisTurn = false;
+    setEvoUsedThisTurn(state, "second", false);
 
-    clearSummoningSickness(state.blueBoard);
+    clearSummoningSickness(getBoard(state, "first"));
 
-    resetCrestOncePerTurn("blue");
-    resetEngageFlagsAtTurnStart("blue");
+    resetCrestOncePerTurn("first");
+    resetEngageFlagsAtTurnStart("first");
     try {
-      const blueStartFx = processCrestEvent("blue", "start_of_turn");
-      if (blueStartFx.length) runEffects([...blueStartFx], "blue", null);
+      const blueStartFx = processCrestEvent("first", "start_of_turn");
+      if (blueStartFx.length) runEffects([...blueStartFx], "first", null);
     } catch (e) {
       console.error("Error in Blue Start effects:", e);
     }
 
     try {
-      const blueCrestFx = tickCrests("blue");
-      if (blueCrestFx.length) runEffects([...blueCrestFx], "blue", null);
+      const blueCrestFx = tickCrests("first");
+      if (blueCrestFx.length) runEffects([...blueCrestFx], "first", null);
     } catch (e) {
       console.error("Error in Blue Tick Crests:", e);
     }
     cleanupDead();
 
     // Draw for Blue
-    drawCard(state.blueHand, state.blueDeck, "blue");
-    logEvent("draw", { player: "blue", count: 1 });
+    drawCard(getHand(state, "first"), getDeck(state, "first"), "first");
+    logEvent("draw", { player: "first", count: 1 });
     // Invoke Phase (Start of Turn)
     try {
-      scanDeckForInvokes("blue", "start_of_turn");
+      scanDeckForInvokes("first", "start_of_turn");
     } catch (e) {
       console.error("Error in Blue Start Invoke:", e);
     }
 
-    state.bluePlaysThisTurn = 0;
+    setPlaysThisTurn(state, "first", 0);
 
-    refreshBoardForNewTurn(state.blueBoard);
+    refreshBoardForNewTurn(getBoard(state, "first"));
 
-    state.isBlueTurn = true;
-    tickAmuletCountdowns("blue");
+    // isBlueTurn removed - activePlayer is source of truth
+    tickAmuletCountdowns("first");
 
     cleanupDead();
-    state.activePlayer = "blue";
+    state.activePlayer = "first";
     logEvent("startTurn", {
       player: state.activePlayer,
       round: state.roundCount,
     });
-    state.blueAnyAllyAttackedThisTurn = false;
-    state.blueEvoUsedThisTurn = false;
+    // Fire start_of_turn trigger for blue's turn
+    try {
+      fireTrigger("start_of_turn", "first");
+    } catch (e) {
+      console.error("Error firing start_of_turn triggers (blue):", e);
+    }
+    setAnyAllyAttackedThisTurn(state, "first", false);
+    setEvoUsedThisTurn(state, "first", false);
     resetShikigamiDeathLogs();
 
-    adapter.render();
-    logEvent("endTurn", { from: "red" });
+    // Render removed - UI orchestrator handles rendering
+    logEvent("endTurn", { from: "second" });
     commitAction({ autoRender: false });
   } catch (criticalError) {
     console.error("CRITICAL ERROR IN END_TURN (Red):", criticalError);
     // Force turn flip
-    state.isBlueTurn = true;
-    state.activePlayer = "blue";
+    // isBlueTurn removed - activePlayer is source of truth
+    state.activePlayer = "first";
     state.roundCount++; // Ensure round count increments if failed before
-    adapter.render();
+    // Render removed - UI orchestrator handles rendering
   }
 }
-
-// function handleCountdowns(owner: Player) {
-//     const board = owner === "blue" ? state.blueBoard : state.redBoard;
-//     board.forEach(card => {
-//         if (card?.type === "Amulet" && card.hasCountdown) {
-//             (card as any).countdown = (Number((card as any).countdown) || 0) - 1;
-//         }
-//     });
-// }
 
 function clearSummoningSickness(board: CardInstance[]) {
   board.forEach((card) => {
@@ -473,6 +434,21 @@ function clearSummoningSickness(board: CardInstance[]) {
 }
 
 function resetShikigamiDeathLogs() {
-  state.shikigamiDeathsThisTurnBlue = [];
-  state.shikigamiDeathsThisTurnRed = [];
+  state.players.first.shikigamiDeathsThisTurn = [];
+  state.players.second.shikigamiDeathsThisTurn = [];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

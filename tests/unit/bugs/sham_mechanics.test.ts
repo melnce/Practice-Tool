@@ -6,11 +6,10 @@ import {
   crestAddCounter,
 } from "../../../src/logic/effects/crest";
 import { runEffects } from "../../../src/logic/core/effects/index";
-// import { adapter } from '../../../src/core/adapter'; // not strictly needed for logic tests
 
 describe("Sham-Nacha Mechanics", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
     (globalThis as any).HEADLESS = true;
   });
 
@@ -18,7 +17,7 @@ describe("Sham-Nacha Mechanics", () => {
     // Setup Faith Crest
     handleGainCrest(
       { name: "Faith: Sham-Nacha, Heir to Entwining" } as any,
-      "blue",
+      "first",
     );
 
     const card = {
@@ -29,21 +28,21 @@ describe("Sham-Nacha Mechanics", () => {
     } as any;
     const ctx = {
       state,
-      owner: "blue",
+      owner: "first",
       isPlayersTurn: true,
       availablePP: 10,
       isSpell: false,
     };
 
     // Case 1: Faith < 10
-    crestAddCounter("blue", "Faith: Sham-Nacha, Heir to Entwining", "faith", 9);
+    crestAddCounter("first", "Faith: Sham-Nacha, Heir to Entwining", "faith", 9);
     let res = computeHandGlow(card, ctx);
     console.log("Faith 9 Glow:", res.glowClass);
     expect(res.glowClass).not.toBe("enhance-ready");
     expect(res.glowClass).toBe("playable-glow");
 
     // Case 2: Faith = 10
-    crestAddCounter("blue", "Faith: Sham-Nacha, Heir to Entwining", "faith", 1); // 9+1=10
+    crestAddCounter("first", "Faith: Sham-Nacha, Heir to Entwining", "faith", 1); // 9+1=10
     res = computeHandGlow(card, ctx);
     console.log("Faith 10 Glow:", res.glowClass);
     expect(res.glowClass).toBe("enhance-ready");
@@ -53,15 +52,15 @@ describe("Sham-Nacha Mechanics", () => {
     // Setup
     handleGainCrest(
       { name: "Faith: Sham-Nacha, Heir to Entwining" } as any,
-      "blue",
+      "first",
     );
     crestAddCounter(
-      "blue",
+      "first",
       "Faith: Sham-Nacha, Heir to Entwining",
       "faith",
       15,
     );
-    state.blueModeBonus = 0;
+    state.players.first.modeBonus = 0;
 
     // Simulate Sham-Nacha Fanfare Effect
     const fanfare = [
@@ -75,13 +74,13 @@ describe("Sham-Nacha Mechanics", () => {
       },
     ];
 
-    runEffects(fanfare as any, "blue", null);
+    runEffects(fanfare as any, "first", null);
 
-    // Verify Consumption
-    const crest = state.blueCrests.find((c) => c.name.includes("Sham-Nacha"));
-    expect(crest.counters.faith).toBe(5); // 15 - 10 = 5
+    // Verify Consumption (now using nested player state)
+    const crest = state.players.first.crests.find((c) => c.name.includes("Sham-Nacha"));
+    expect(crest!.counters!.faith).toBe(5); // 15 - 10 = 5
 
-    // Verify Bonus
-    expect(state.blueModeBonus).toBe(1);
+    // Verify Bonus (now using nested player state)
+    expect(state.players.first.modeBonus).toBe(1);
   });
 });

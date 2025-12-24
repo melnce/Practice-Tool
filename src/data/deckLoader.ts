@@ -66,25 +66,25 @@ async function fetchDeck(deckId: string) {
 
 export async function loadBlueDeck(deckName: string) {
   const loaded = await fetchDeck(deckName);
-  state.blueDeckFile = loaded.__deckFile;
+  state.players.first.deckFile = loaded.__deckFile;
   const enriched = enrichDeck(loaded, loaded.__deckFile);
 
-  state.blueDeck.length = 0;
-  state.blueDeck.push(...enriched);
-  state.blueHand.length = 0;
-  state.blueBoard.length = 0;
-  state.blueGraveyard.length = 0;
+  state.players.first.deck.length = 0;
+  state.players.first.deck.push(...enriched);
+  state.players.first.hand.length = 0;
+  state.players.first.board.length = 0;
+  state.players.first.graveyard.length = 0;
 
-  state.blueHP = 20;
-  state.bluePP = 1;
-  state.blueMaxPP = 1;
-  for (let i = 0; i < 4; i++) drawCard(state.blueHand, state.blueDeck);
+  state.players.first.hp = 20;
+  state.players.first.pp = 1;
+  state.players.first.maxPP = 1;
+  for (let i = 0; i < 4; i++) drawCard(state.players.first.hand, state.players.first.deck);
 
   // Log the blue deck load
   logEvent("deckLoad", {
-    owner: "blue",
-    file: state.blueDeckFile,
-    count: state.blueDeck.length,
+    owner: "first",
+    file: state.players.first.deckFile,
+    count: state.players.first.deck.length,
   });
 
   adapter.render();
@@ -92,26 +92,39 @@ export async function loadBlueDeck(deckName: string) {
 
 export async function loadRedDeck(deckName: string) {
   const loaded = await fetchDeck(deckName);
-  state.redDeckFile = loaded.__deckFile;
+  state.players.second.deckFile = loaded.__deckFile;
   const enriched = enrichDeck(loaded, loaded.__deckFile);
 
-  state.redDeck.length = 0;
-  state.redDeck.push(...enriched);
-  state.redHand.length = 0;
-  state.redBoard.length = 0;
-  state.redGraveyard.length = 0;
+  state.players.second.deck.length = 0;
+  state.players.second.deck.push(...enriched);
+  state.players.second.hand.length = 0;
+  state.players.second.board.length = 0;
+  state.players.second.graveyard.length = 0;
 
-  state.redHP = 20;
-  state.redPP = 1;
-  state.redMaxPP = 1;
-  for (let i = 0; i < 4; i++) drawCard(state.redHand, state.redDeck);
+  state.players.second.hp = 20;
+  state.players.second.pp = 1;
+  state.players.second.maxPP = 1;
+  for (let i = 0; i < 4; i++) drawCard(state.players.second.hand, state.players.second.deck);
 
   // Log the red deck load
   logEvent("deckLoad", {
-    owner: "red",
-    file: state.redDeckFile,
-    count: state.redDeck.length,
+    owner: "second",
+    file: state.players.second.deckFile,
+    count: state.players.second.deck.length,
   });
 
   adapter.render();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

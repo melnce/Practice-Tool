@@ -1,36 +1,53 @@
 // src/logic/boosts.ts
 import { state } from "../core/gameState.js";
-import { adapter } from "../core/adapter.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
+import { getPP, setPP } from "../core/playerHelpers.js";
 
-export function useRedBoost() {
+export function useSecondPlayerPPBoost() {
   return doAction(
-    "Red Boost",
+    "Second Player PP Boost",
     () => {
-      if (state.isBlueTurn) return;
+      if (state.activePlayer === "first") return;
 
-      const boostBtn = document.getElementById("redBoost");
+      const boostBtn = document.getElementById("secondPlayerPPBoost");
 
       const alreadyUsed =
-        (state.roundCount <= 5 && state.redBoostUsedEarly) ||
-        (state.roundCount > 5 && state.redBoostUsedLate);
+        (state.roundCount <= 5 && state.secondPlayerPPBoostUsedEarly) ||
+        (state.roundCount > 5 && state.secondPlayerPPBoostUsedLate);
       if (alreadyUsed) return;
 
-      if (!state.redBoostPending) {
-        state.redPP++;
-        state.redBoostPending = true;
+      if (!state.secondPlayerPPBoostPending) {
+        setPP(state, "second", getPP(state, "second") + 1);
+        state.secondPlayerPPBoostPending = true;
         boostBtn?.classList.add("used");
-        logEvent("boost", { owner: "red", action: "activate" });
+        logEvent("boost", { owner: "second", action: "activate" });
       } else {
-        state.redPP--;
-        state.redBoostPending = false;
+        setPP(state, "second", getPP(state, "second") - 1);
+        state.secondPlayerPPBoostPending = false;
         boostBtn?.classList.remove("used");
-        logEvent("boost", { owner: "red", action: "cancel" });
+        logEvent("boost", { owner: "second", action: "cancel" });
       }
-      adapter.render();
+      // Render removed - UI layer
     },
-    { owner: "red" },
+    { owner: "second" },
     { autoRender: false },
   );
 }
+
+// Legacy export for backwards compatibility during transition
+export const useRedBoost = useSecondPlayerPPBoost;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

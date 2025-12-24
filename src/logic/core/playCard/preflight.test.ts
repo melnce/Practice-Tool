@@ -7,10 +7,10 @@ import { CardInstance } from "../../../core/types.js";
 
 describe("Preflight System", () => {
   beforeEach(() => {
-    resetGameState();
-    state.isBlueTurn = true;
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
+    resetGameState(1);
+    state.isFirstPlayerTurn = true;
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
   });
 
   describe("Spell with required target", () => {
@@ -32,15 +32,15 @@ describe("Preflight System", () => {
         ],
       };
 
-      state.blueHand = [spell];
-      state.redBoard = []; // No enemy followers
+      state.players.first.hand = [spell];
+      state.players.second.board = []; // No enemy followers
 
-      const result = canPlayCard(spell, "blue");
+      const result = canPlayCard(spell, "first");
       expect(result.ok).toBe(false);
       expect("reason" in result ? result.reason : "").toContain("target");
 
       // Verify PP unchanged
-      expect(state.bluePP).toBe(10);
+      expect(state.players.first.pp).toBe(10);
     });
 
     it("allows when enemy follower exists", () => {
@@ -70,10 +70,10 @@ describe("Preflight System", () => {
         defense: 2,
       };
 
-      state.blueHand = [spell];
-      state.redBoard = [enemyFollower];
+      state.players.first.hand = [spell];
+      state.players.second.board = [enemyFollower];
 
-      const result = canPlayCard(spell, "blue");
+      const result = canPlayCard(spell, "first");
       expect(result.ok).toBe(true);
     });
   });
@@ -101,9 +101,9 @@ describe("Preflight System", () => {
       };
 
       // Only the spell itself in hand, no spellboost cards
-      state.blueHand = [radiantRainbow];
+      state.players.first.hand = [radiantRainbow];
 
-      const result = canPlayCard(radiantRainbow, "blue");
+      const result = canPlayCard(radiantRainbow, "first");
       expect(result.ok).toBe(false);
       expect("reason" in result ? result.reason : "").toContain("Spellboost");
     });
@@ -140,9 +140,9 @@ describe("Preflight System", () => {
         keywords: [{ name: "Spellboost", effects: [] }],
       };
 
-      state.blueHand = [radiantRainbow, spellboostCard];
+      state.players.first.hand = [radiantRainbow, spellboostCard];
 
-      const result = canPlayCard(radiantRainbow, "blue");
+      const result = canPlayCard(radiantRainbow, "first");
       expect(result.ok).toBe(true);
     });
   });
@@ -160,7 +160,7 @@ describe("Preflight System", () => {
       };
 
       // Fill board with 5 followers
-      state.blueBoard = Array(5)
+      state.players.first.board = Array(5)
         .fill(null)
         .map((_, i) => ({
           id: `board-${i}`,
@@ -172,9 +172,9 @@ describe("Preflight System", () => {
           defense: 1,
         }));
 
-      state.blueHand = [follower];
+      state.players.first.hand = [follower];
 
-      const result = canPlayCard(follower, "blue");
+      const result = canPlayCard(follower, "first");
       expect(result.ok).toBe(false);
       expect("reason" in result ? result.reason : "").toContain("full");
     });
@@ -191,9 +191,9 @@ describe("Preflight System", () => {
         cant_play: true,
       };
 
-      state.blueHand = [card];
+      state.players.first.hand = [card];
 
-      const result = canPlayCard(card, "blue");
+      const result = canPlayCard(card, "first");
       expect(result.ok).toBe(false);
       expect("reason" in result ? result.reason : "").toContain(
         "cannot be played",
@@ -220,18 +220,18 @@ describe("Preflight System", () => {
         ],
       };
 
-      state.blueHand = [spell];
-      state.bluePP = 5;
-      state.redBoard = []; // No targets
-      const handLengthBefore = state.blueHand.length;
-      const ppBefore = state.bluePP;
+      state.players.first.hand = [spell];
+      state.players.first.pp = 5;
+      state.players.second.board = []; // No targets
+      const handLengthBefore = state.players.first.hand.length;
+      const ppBefore = state.players.first.pp;
 
-      const result = canPlayCard(spell, "blue");
+      const result = canPlayCard(spell, "first");
 
       // Preflight should block, state unchanged
       expect(result.ok).toBe(false);
-      expect(state.blueHand.length).toBe(handLengthBefore);
-      expect(state.bluePP).toBe(ppBefore);
+      expect(state.players.first.hand.length).toBe(handLengthBefore);
+      expect(state.players.first.pp).toBe(ppBefore);
     });
 
     it("done outcome mutates state correctly", () => {
@@ -248,21 +248,36 @@ describe("Preflight System", () => {
         defense: 3,
       };
 
-      state.blueHand = [follower];
-      state.bluePP = 5;
-      state.blueBoard = [];
-      state.isBlueTurn = true;
+      state.players.first.hand = [follower];
+      state.players.first.pp = 5;
+      state.players.first.board = [];
+      state.isFirstPlayerTurn = true;
 
-      const ppBefore = state.bluePP;
-      const handLengthBefore = state.blueHand.length;
-      const boardLengthBefore = state.blueBoard.length;
+      const ppBefore = state.players.first.pp;
+      const handLengthBefore = state.players.first.hand.length;
+      const boardLengthBefore = state.players.first.board.length;
 
-      const result = playCardNoRender(state.blueHand, "blue", 0);
+      const result = playCardNoRender(state.players.first.hand, "first", 0);
 
       expect(result.kind).toBe("done");
-      expect(state.bluePP).toBe(ppBefore - 2); // Cost paid
-      expect(state.blueHand.length).toBe(handLengthBefore - 1); // Removed from hand
-      expect(state.blueBoard.length).toBe(boardLengthBefore + 1); // Added to board
+      expect(state.players.first.pp).toBe(ppBefore - 2); // Cost paid
+      expect(state.players.first.hand.length).toBe(handLengthBefore - 1); // Removed from hand
+      expect(state.players.first.board.length).toBe(boardLengthBefore + 1); // Added to board
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

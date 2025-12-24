@@ -7,7 +7,7 @@ import { runEffects } from "../../src/logic/core/effects/index.js";
 
 // Setup environment
 (globalThis as any).HEADLESS = true;
-resetGameState();
+resetGameState(1);
 
 console.log("=== START DEBUG ===");
 
@@ -15,11 +15,11 @@ try {
   // 1. Gain Crest
   handleGainCrest(
     { name: "Faith: Sham-Nacha, Heir to Entwining" } as any,
-    "blue",
+    "first",
   );
 
   // 2. Add Counters
-  crestAddCounter("blue", "Faith: Sham-Nacha, Heir to Entwining", "faith", 15);
+  crestAddCounter("first", "Faith: Sham-Nacha, Heir to Entwining", "faith", 15);
   console.log("Faith Count:", state.blueCrests[0].counters.faith);
 
   // 3. Run Effect
@@ -34,7 +34,7 @@ try {
   ];
 
   console.log("Running runEffects...");
-  runEffects(fanfare as any, "blue", null);
+  runEffects(fanfare as any, "first", null);
 
   console.log("=== DONE DEBUG ===");
   console.log("Final Faith:", state.blueCrests[0].counters.faith);
@@ -42,3 +42,9 @@ try {
 } catch (e) {
   console.error("CRASHED:", e);
 }
+
+
+
+
+
+

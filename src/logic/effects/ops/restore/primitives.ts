@@ -4,6 +4,8 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player } from "../../../../core/types.js";
+import { fireTrigger } from "../../../core/triggers.js";
+import { getHP, setHP, getMaxHP, getHand, getBoard } from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // LEADER RESTORE
@@ -11,34 +13,32 @@ import { CardInstance, Player } from "../../../../core/types.js";
 
 /**
  * Restore leader HP by fixed amount, respecting max HP.
+ * Fires `leader_restored` trigger if HP actually increases.
  * @returns actual amount healed
  */
 export function restoreLeaderHP(player: Player, amount: number): number {
   if (amount <= 0) return 0;
 
-  if (player === "blue") {
-    const before = state.blueHP;
-    state.blueHP = Math.max(
-      0,
-      Math.min(state.blueMaxHP, state.blueHP + amount),
-    );
-    const healed = state.blueHP - before;
+  const before = getHP(state, player);
+  const maxHP = getMaxHP(state, player);
+  const newHP = Math.max(0, Math.min(maxHP, before + amount));
+  setHP(state, player, newHP);
+  const healed = newHP - before;
+
+  if (healed > 0) {
     logEvent("restoreLeader", { player, amount: healed });
-    return healed;
-  } else {
-    const before = state.redHP;
-    state.redHP = Math.max(0, Math.min(state.redMaxHP, state.redHP + amount));
-    const healed = state.redHP - before;
-    logEvent("restoreLeader", { player, amount: healed });
-    return healed;
+    // Fire trigger so cards/crests can react to leader heal
+    fireTrigger("leader_restored", player, { amount: healed });
   }
+
+  return healed;
 }
 
 /**
  * Get hand size for a player.
  */
 export function getHandSize(player: Player): number {
-  const hand = player === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, player);
   return hand?.length || 0;
 }
 
@@ -114,6 +114,21 @@ export function restoreFollowerByAmount(
  * Get allied followers on board.
  */
 export function getAlliedFollowers(owner: Player): CardInstance[] {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   return board.filter((c) => c && c.type === "Follower");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

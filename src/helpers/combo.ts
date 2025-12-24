@@ -3,7 +3,7 @@ import { CardInstance, GameState } from "../core/types.js";
 
 export function comboReadyInHand(
   card: CardInstance,
-  owner: "blue" | "red",
+  owner: "first" | "second",
   state: GameState,
 ): boolean {
   // Look for combo gates in both fanfare and spell blocks
@@ -14,9 +14,9 @@ export function comboReadyInHand(
   if (!gates.length) return false;
 
   const plays =
-    owner === "blue"
-      ? state.bluePlaysThisTurn || 0
-      : state.redPlaysThisTurn || 0;
+    owner === "first"
+      ? state.players.first.playsThisTurn || 0
+      : state.players.second.playsThisTurn || 0;
   const futurePlays = plays + 1; // glow one play early (as intended)
 
   return gates.some(
@@ -27,3 +27,17 @@ export function comboReadyInHand(
       futurePlays >= (Number((e as any).count ?? 1) || 1),
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

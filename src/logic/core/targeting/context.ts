@@ -1,6 +1,7 @@
 import { state } from "../../../core/gameState.js";
 import { CardInstance } from "../../../core/types.js";
 import { TargetQuery, TargetingEnv, TargetContextKey } from "./types.js";
+import { getHand, getBoard, opponentOf } from "../../../core/playerHelpers.js";
 
 type ResolverFn = (query: TargetQuery, env: TargetingEnv) => CardInstance[];
 
@@ -16,14 +17,9 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
     }
     if (q.specialContext === "entering_follower") {
       if (env.context.enteringCard) {
-        // LEGACY: Log preserved from legacy engine behavior
-        console.log(
-          `%c[Targeting] Found entering_follower: ${env.context.enteringCard.name}`,
-          "color: green; font-weight: bold;",
-        );
         return [env.context.enteringCard];
       }
-      console.warn("entering_follower target used without context");
+      console.warn("[Targeting] entering_follower target used without context");
       return [];
     }
     return [];
@@ -53,15 +49,9 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
     return env.context?.attacker ? [env.context.attacker] : [];
   },
 
-  hand: (q, env) => {
-    const myHand = env.owner === "blue" ? state.blueHand : state.redHand;
-    const pool = myHand || [];
-
-    // Legacy logging
-    if (!(globalThis as any).HEADLESS) {
-      console.warn(`[getPool] Targeting Hand. Pool Size: ${pool.length}`);
-    }
-    return pool;
+  hand: (_q, env) => {
+    const myHand = getHand(state, env.owner);
+    return myHand || [];
   },
 
   self: (q, env) => {
@@ -69,18 +59,18 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
   },
 
   ally: (q, env) => {
-    const myBoard = env.owner === "blue" ? state.blueBoard : state.redBoard;
+    const myBoard = getBoard(state, env.owner);
     return myBoard || [];
   },
 
   enemy: (q, env) => {
-    const oppBoard = env.owner === "blue" ? state.redBoard : state.blueBoard;
+    const oppBoard = getBoard(state, opponentOf(env.owner));
     return oppBoard || [];
   },
 
   any: (q, env) => {
-    const myBoard = env.owner === "blue" ? state.blueBoard : state.redBoard;
-    const oppBoard = env.owner === "blue" ? state.redBoard : state.blueBoard;
+    const myBoard = getBoard(state, env.owner);
+    const oppBoard = getBoard(state, opponentOf(env.owner));
     return [...(myBoard || []), ...(oppBoard || [])];
   },
 };
@@ -96,3 +86,18 @@ export function resolveBasePool(
   // Fallback (legacy seemed to default to ally/board if unknown, but parser forces valid side)
   return [];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

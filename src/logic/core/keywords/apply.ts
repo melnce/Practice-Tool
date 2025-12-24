@@ -69,6 +69,9 @@ export const KEYWORD_MAP: {
   aura: (c) => {
     c.hasAura = true;
   },
+  taunt: (c) => {
+    c.hasTaunt = true;
+  },
   last_words: (c, opts) => {
     c.hasLastWords = true;
     const ks = getKS(c);
@@ -144,7 +147,7 @@ export const KEYWORD_MAP: {
     const add = Number(opts.count ?? 0);
     ks.counters[key] = (ks.counters[key] || 0) + add;
   },
-  skybound_art: () => {},
+  skybound_art: () => { },
   pixie_enter: (c, opts) => {
     const ks = getKS(c);
     ks.hasPixieEnter = true;
@@ -241,3 +244,18 @@ export function applyKeywordsFromList(card: CardInstance) {
   }
   __initializingKeywords = false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -14,10 +14,10 @@ export function updateEvoButtonsUI(state: GameState) {
 
   if (!bNE || !bSE || !rNE || !rSE) return;
 
-  bNE.textContent = `Evo (${state.blueEvoCharges ?? 0})`;
-  bSE.textContent = `Super (${state.blueSuperEvoCharges ?? 0})`;
-  rNE.textContent = `Evo (${state.redEvoCharges ?? 0})`;
-  rSE.textContent = `Super (${state.redSuperEvoCharges ?? 0})`;
+  bNE.textContent = `Evo (${state.players.first.evoCharges ?? 0})`;
+  bSE.textContent = `Super (${state.players.first.superEvoCharges ?? 0})`;
+  rNE.textContent = `Evo (${state.players.second.evoCharges ?? 0})`;
+  rSE.textContent = `Super (${state.players.second.superEvoCharges ?? 0})`;
 
   const redNormalUnlocked = state.roundCount >= 4;
   const blueNormalUnlocked = state.roundCount >= 5;
@@ -25,28 +25,28 @@ export function updateEvoButtonsUI(state: GameState) {
   const blueSuperUnlocked = state.roundCount >= 7;
 
   bNE.disabled = !(
-    state.isBlueTurn &&
+    state.isFirstPlayerTurn &&
     blueNormalUnlocked &&
-    !state.blueEvoUsedThisTurn &&
-    state.blueEvoCharges > 0
+    !state.players.first.evoUsedThisTurn &&
+    state.players.first.evoCharges > 0
   );
   bSE.disabled = !(
-    state.isBlueTurn &&
+    state.isFirstPlayerTurn &&
     blueSuperUnlocked &&
-    !state.blueEvoUsedThisTurn &&
-    state.blueSuperEvoCharges > 0
+    !state.players.first.evoUsedThisTurn &&
+    state.players.first.superEvoCharges > 0
   );
   rNE.disabled = !(
-    !state.isBlueTurn &&
+    !state.isFirstPlayerTurn &&
     redNormalUnlocked &&
-    !state.redEvoUsedThisTurn &&
-    state.redEvoCharges > 0
+    !state.players.second.evoUsedThisTurn &&
+    state.players.second.evoCharges > 0
   );
   rSE.disabled = !(
-    !state.isBlueTurn &&
+    !state.isFirstPlayerTurn &&
     redSuperUnlocked &&
-    !state.redEvoUsedThisTurn &&
-    state.redSuperEvoCharges > 0
+    !state.players.second.evoUsedThisTurn &&
+    state.players.second.superEvoCharges > 0
   );
 
   [bNE, bSE, rNE, rSE].forEach((btn) => {
@@ -61,3 +61,17 @@ export function updateEvoButtonsUI(state: GameState) {
     };
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

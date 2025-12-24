@@ -1,26 +1,13 @@
 // src/logic/evolveUtils.ts
 import { runEffects } from "./core/effects/index.js";
 import { handleEvolveSelf } from "./effects/ops/evolve.js";
-import { adapter } from "../core/adapter.js";
 import { state } from "../core/gameState.js";
 import { fireTrigger } from "./core/triggers.js";
 import { logEvent } from "../core/logger.js";
 import { CardInstance, Player, Effect } from "../core/types.js";
+import { isFirstPlayer, getEvoCharges, setEvoCharges, getSuperEvoCharges, setSuperEvoCharges, getEvoUsedThisTurn, setEvoUsedThisTurn, getEvoCount, incrementEvoCount, getBoard, getBackrow, opponentOf } from "../core/playerHelpers.js";
 
-// debounce UI updates so we don't spam render during chained effects
-let __raf: number | null = null;
-function queueRender() {
-  if (typeof window === "undefined") return; // headless sim
-  if (__raf) cancelAnimationFrame(__raf);
-  __raf = requestAnimationFrame(() => {
-    __raf = null;
-    try {
-      adapter.render();
-    } catch {
-      /* ignore */
-    }
-  });
-}
+// Note: Rendering removed from logic layer - UI orchestrator handles all rendering
 
 export function canEvolve(
   owner: Player,
@@ -30,24 +17,20 @@ export function canEvolve(
   if (!card || card.type !== "Follower") return false;
   if (card.hasEvolved) return false;
 
-  const isBlue = owner === "blue";
+  const first = isFirstPlayer(owner);
 
-  // Unlock rounds (red earlier than blue)
-  const normalUnlocked = isBlue ? state.roundCount >= 5 : state.roundCount >= 4;
-  const superUnlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
+  // Unlock rounds (second player earlier than first)
+  const normalUnlocked = first ? state.roundCount >= 5 : state.roundCount >= 4;
+  const superUnlocked = first ? state.roundCount >= 7 : state.roundCount >= 6;
 
   // Per-turn limit
-  const usedThisTurn = isBlue
-    ? state.blueEvoUsedThisTurn
-    : state.redEvoUsedThisTurn;
+  const usedThisTurn = getEvoUsedThisTurn(state, owner);
 
   if (mode === "super") {
-    const charges = isBlue
-      ? state.blueSuperEvoCharges
-      : state.redSuperEvoCharges;
+    const charges = getSuperEvoCharges(state, owner);
     return superUnlocked && !usedThisTurn && charges > 0;
   } else {
-    const charges = isBlue ? state.blueEvoCharges : state.redEvoCharges;
+    const charges = getEvoCharges(state, owner);
     return normalUnlocked && !usedThisTurn && charges > 0;
   }
 }
@@ -66,35 +49,25 @@ export function onEvolve(
 
   // Get the correct evolve object based on mode
   const evolveObj = mode === "super" ? card.superevolve : card.evolve;
-  const isBlue = owner === "blue";
   const spendCounters = () => {
     if (!spendPoint) return;
     if (mode === "super") {
       // Only decrement super evolution charges for super evolves
-      if (isBlue) {
-        state.blueSuperEvoCharges = Math.max(0, state.blueSuperEvoCharges - 1);
-        state.blueEvoUsedThisTurn = true;
-      } else {
-        state.redSuperEvoCharges = Math.max(0, state.redSuperEvoCharges - 1);
-        state.redEvoUsedThisTurn = true;
-      }
+      setSuperEvoCharges(state, owner, Math.max(0, getSuperEvoCharges(state, owner) - 1));
+      setEvoUsedThisTurn(state, owner, true);
     } else {
       // Only decrement normal evolution charges for normal evolves
-      if (isBlue) {
-        state.blueEvoCharges = Math.max(0, state.blueEvoCharges - 1);
-        state.blueEvoUsedThisTurn = true;
-      } else {
-        state.redEvoCharges = Math.max(0, state.redEvoCharges - 1);
-        state.redEvoUsedThisTurn = true;
-      }
+      setEvoCharges(state, owner, Math.max(0, getEvoCharges(state, owner) - 1));
+      setEvoUsedThisTurn(state, owner, true);
     }
   };
 
   const fireEvoTriggers = () => {
     if (mode === "super") {
-      // Two distinct hooks by design
+      // Fire ally trigger for owner, enemy trigger for opponent
+      const opponent = opponentOf(owner);
       fireTrigger("ally_super_evolve", owner, { enteringCard: card });
-      fireTrigger("enemy_super_evolve", owner, { enteringCard: card });
+      fireTrigger("enemy_super_evolve", opponent, { enteringCard: card });
     }
   };
 
@@ -109,7 +82,6 @@ export function onEvolve(
       mode,
       via: "skipEffects",
     });
-    queueRender();
     return;
   }
 
@@ -124,7 +96,6 @@ export function onEvolve(
       mode,
       via: "noEffects",
     });
-    queueRender();
     return;
   }
 
@@ -157,11 +128,10 @@ export function onEvolve(
     .catch((e) => console.error("Failed to load skybound module:", e));
 
   // Track total evolves (Moved from effects/ops/evolve.ts)
-  if (owner === "blue") state.blueEvoCount = (state.blueEvoCount || 0) + 1;
-  else state.redEvoCount = (state.redEvoCount || 0) + 1;
+  incrementEvoCount(state, owner);
   logEvent("evolveCount", {
     owner,
-    count: owner === "blue" ? state.blueEvoCount : state.redEvoCount,
+    count: getEvoCount(state, owner),
   });
 
   spendCounters();
@@ -173,7 +143,6 @@ export function onEvolve(
     mode,
     via: "withEffects",
   });
-  queueRender();
 }
 
 export function superEvolveAllyFromContext(
@@ -190,12 +159,12 @@ export function superEvolveAllyFromContext(
 
   function findOnBoardByUid(uid: number) {
     const zones = [
-      ...(state.blueBoard || []),
-      ...(state.redBoard || []),
-      ...(state.blueBackrow || []),
-      ...(state.redBackrow || []),
+      ...getBoard(state, "first"),
+      ...getBoard(state, "second"),
+      ...getBackrow(state, "first"),
+      ...getBackrow(state, "second"),
     ];
-    return zones.find((c) => c && c.uid === uid) || null;
+    return zones.find((c) => c && Number(c.uid) === uid) || null;
   }
 
   const target =
@@ -215,6 +184,19 @@ export function superEvolveAllyFromContext(
   });
 
   logEvent("superEvolve", { owner, card: target.name, uid: target.uid });
-
-  adapter.render();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,14 +17,17 @@ import { attackFollower, attackLeader } from "./combat.js";
 import { resolvePendingTarget } from "./resolveTarget.js";
 import { undo, redo, resetHistory } from "../../core/history.js";
 import { assertValidGameState } from "../../core/stateValidation.js";
+import { hashGameState, ReplayStep } from "../../core/stateHash.js";
+import { isFirstPlayer, getHand, getBoard, opponentOf } from "../../core/playerHelpers.js";
 
 /**
  * Dependencies that can be injected for testing/replay.
- * Currently minimal - expand as needed.
  */
 export interface DispatchDeps {
   /** If true, run state invariant checks before/after dispatch */
   checkInvariants?: boolean;
+  /** If provided, push replay steps with hashes for determinism verification */
+  replayLog?: ReplayStep[];
 }
 
 function shouldCheckInvariants(deps?: DispatchDeps): boolean {
@@ -51,12 +54,11 @@ function dispatchInternal(
       resetHistory();
       break;
     case "END_TURN":
-      if (currentState.isBlueTurn) endTurnBlue();
+      if (isFirstPlayer(currentState.activePlayer)) endTurnBlue();
       else endTurnRed();
       break;
     case "PLAY_CARD": {
-      const hand =
-        action.player === "blue" ? currentState.blueHand : currentState.redHand;
+      const hand = getHand(currentState, action.player);
       const index = hand.findIndex((c) => c.uid === action.cardUid);
 
       if (index !== -1) {
@@ -73,10 +75,7 @@ function dispatchInternal(
       break;
     }
     case "ATTACK": {
-      const attackerBoard =
-        action.player === "blue"
-          ? currentState.blueBoard
-          : currentState.redBoard;
+      const attackerBoard = getBoard(currentState, action.player);
       const attackerIdx = attackerBoard.findIndex(
         (c) => c.uid === action.attackerUid,
       );
@@ -86,9 +85,8 @@ function dispatchInternal(
       if (defender.type === "leader") {
         attackLeader(attackerIdx, action.player, defender.player);
       } else {
-        const defPlayer = action.player === "blue" ? "red" : "blue";
-        const defBoard =
-          defPlayer === "blue" ? currentState.blueBoard : currentState.redBoard;
+        const defPlayer = opponentOf(action.player);
+        const defBoard = getBoard(currentState, defPlayer);
         const defIdx = defBoard.findIndex((c) => c.uid === defender.uid);
 
         if (defIdx !== -1) {
@@ -138,8 +136,21 @@ export function dispatchAction<T extends ActionType>(
     }
   }
 
+  // Hash before (for replay verification)
+  const hashBefore = deps?.replayLog ? hashGameState(currentState) : undefined;
+
   // Execute action
   const nextState = dispatchInternal(currentState, action);
+
+  // Hash after and log (for replay verification)
+  if (deps?.replayLog && hashBefore !== undefined) {
+    const hashAfter = hashGameState(nextState);
+    deps.replayLog.push({
+      actionType: action.type,
+      stateHashBefore: hashBefore,
+      stateHashAfter: hashAfter,
+    });
+  }
 
   // Post-dispatch invariant check (optional)
   if (shouldCheckInvariants(deps)) {
@@ -154,3 +165,18 @@ export function dispatchAction<T extends ActionType>(
 
   return nextState;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

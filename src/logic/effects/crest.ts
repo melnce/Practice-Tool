@@ -1,16 +1,64 @@
 // src/logic/effects/crest.ts
 import { state } from "../../core/gameState.js";
-import { adapter } from "../../core/adapter.js";
 import { runEffects } from "../core/effects/index.js";
 import { logEvent } from "../../core/logger.js";
 import { Effect, Player } from "../../core/types.js";
+import { isFirstPlayer, opponentOf, getCrests as getCrestsHelper } from "../../core/playerHelpers.js";
 
-// TODO: Define Crest type properly or reuse CardInstance with custom fields?
-// For now, using any to unblock migration.
-type Crest = any;
+// =============================================================================
+// CREST TYPES
+// =============================================================================
+
+/**
+ * Event trigger attached to a crest (e.g., "end_of_turn_own")
+ */
+export interface CrestTrigger {
+  event?: string;
+  type?: string; // Alias for event in some triggers
+  effects?: Effect[];
+  once_per_turn?: boolean;
+  usedThisTurn?: boolean;
+  condition?: Record<string, unknown> | null;
+}
+
+/**
+ * Crest - represents an active effect/aura on a player.
+ * 
+ * Crests can have:
+ * - countdown: Decrements at start of turn, fires effects when reaching 0
+ * - triggers: Event-based effects (e.g., end_of_turn_own)
+ * - keywords: Including "Last Words" which fires effects on destroy
+ * - effects: The payload effects (fired on countdown=0 OR destroy if Last Words)
+ */
+export interface Crest {
+  name: string;
+  owner: Player;
+
+  // Visual/description
+  image?: string;
+  description?: string;
+
+  // Counters (e.g., "faith" counter for some crests)
+  counters?: Record<string, number>;
+
+  // Countdown (decrements at start of turn)
+  countdown?: number;
+
+  // Effects to run when countdown=0 OR when destroyed (if has Last Words keyword)
+  effects?: Effect[];
+
+  // Event triggers (e.g., end_of_turn_own)
+  triggers?: CrestTrigger[];
+
+  // Legacy: single trigger (backwards compatibility)
+  trigger?: CrestTrigger;
+
+  // Keywords (e.g., ["Last Words"])
+  keywords?: string[];
+}
 
 function getCrests(owner: Player) {
-  return owner === "blue" ? state.blueCrests : state.redCrests;
+  return getCrestsHelper(state, owner);
 }
 function findCrest(owner: Player, name: string) {
   const list = getCrests(owner) || [];
@@ -26,14 +74,9 @@ function toArray(x: any) {
 
 export function handleGainCrest(eff: Effect, owner: Player) {
   // NEW: allow giving to opponent
-  const targetOwner =
-    (eff as any).player === "opponent"
-      ? owner === "blue"
-        ? "red"
-        : "blue"
-      : owner;
+  const targetOwner = (eff as any).player === "opponent" ? opponentOf(owner) : owner;
 
-  const crests = targetOwner === "blue" ? state.blueCrests : state.redCrests;
+  const crests = getCrestsHelper(state, targetOwner);
   const crestName = (eff as any).name?.trim();
   if (!crestName || crests.some((c) => c.name === crestName)) {
     console.warn(`[Crest] Crest "${crestName}" already active or invalid.`);
@@ -45,7 +88,7 @@ export function handleGainCrest(eff: Effect, owner: Player) {
     ? (eff as any).triggers
     : toArray((eff as any).trigger);
 
-  const newCrest: Crest = {
+  const newCrest = {
     name: crestName,
     image: (eff as any).image,
     description: (eff as any).description,
@@ -56,19 +99,19 @@ export function handleGainCrest(eff: Effect, owner: Player) {
     // countdown-based “expiry effects” (legacy path)
     effects: Array.isArray(eff.effects) ? eff.effects : [],
     // multi-event triggers
-    triggers: (triggers || []).map((t: any) => ({
+    triggers: (triggers || []).map((t: any): CrestTrigger => ({
       event: t.event,
+      type: t.type, // Include type field (e.g., "end_of_turn_own")
       effects: Array.isArray(t.effects) ? t.effects : [],
       once_per_turn: !!t.once_per_turn,
       usedThisTurn: false,
-      condition: t.condition || null, // Store condition for filtering
+      condition: t.condition ?? null,
     })),
     owner: targetOwner,
-  };
+  } as Crest;
 
   crests.push(newCrest);
   logEvent("gainCrest", { owner: targetOwner, crest: crestName });
-  console.log(`[Crest] ${targetOwner} gained Crest: "${crestName}"`);
 }
 
 export function crestAddCounter(
@@ -94,15 +137,16 @@ export function crestSpendCounter(
   const crest = findCrest(owner, crestName);
   if (!crest) return false;
   const need = parseInt(amount as any, 10) || 0;
-  const cur = parseInt(crest.counters?.[counterName] || 0, 10);
+  const cur = parseInt(String(crest.counters?.[counterName] ?? 0), 10);
   if (cur < need) return false;
+  if (!crest.counters) crest.counters = {};
   crest.counters[counterName] = cur - need;
   return true;
 }
 
 /** Start-of-turn countdown tick (unchanged behavior) */
 export function tickCrests(owner: Player) {
-  const crests = owner === "blue" ? state.blueCrests : state.redCrests;
+  const crests = getCrests(owner);
   if (!Array.isArray(crests) || !crests.length) return [];
 
   // 1) Countdown left→right (visual order) and collect expirations
@@ -110,8 +154,8 @@ export function tickCrests(owner: Player) {
   const effectsToRun: Effect[] = [];
 
   for (let i = 0; i < crests.length; i++) {
-    const c = crests[i];
-    if (!Number.isFinite(c?.countdown)) continue;
+    const c: any = crests[i];
+    if (typeof c?.countdown !== "number" || !Number.isFinite(c.countdown)) continue;
 
     c.countdown -= 1;
 
@@ -138,7 +182,7 @@ export function tickCrests(owner: Player) {
 
 /** NEW: reset once-per-turn gates at owner’s turn start */
 export function resetCrestOncePerTurn(owner: Player) {
-  const crests = owner === "blue" ? state.blueCrests : state.redCrests;
+  const crests = getCrestsHelper(state, owner);
   if (!crests) return;
   for (const c of crests) {
     if (Array.isArray(c.triggers)) {
@@ -152,7 +196,7 @@ export function resetCrestOncePerTurn(owner: Player) {
  * Returns a flat list of effects to be executed by runEffects(owner).
  */
 export function processCrestEvent(owner: Player, event: string) {
-  const crests = owner === "blue" ? state.blueCrests : state.redCrests;
+  const crests = getCrests(owner);
   if (!crests) return [];
   const out: Effect[] = [];
 
@@ -160,60 +204,90 @@ export function processCrestEvent(owner: Player, event: string) {
   (state as any).__DEBUG_CREST_COUNT = crests.length;
 
   for (const crest of crests) {
-    if (!Array.isArray(crest.triggers)) {
-      (state as any).__DEBUG_CREST_SKIPPED = true;
-      console.log("[Crest] Skipping crest (no triggers):", crest.name);
-      continue;
-    }
+    if (!Array.isArray(crest.triggers)) continue;
     for (const t of crest.triggers) {
-      (state as any).__DEBUG_TRIGGER_CHECKED = true;
-      console.log("[Crest] Checking trigger:", t.event, "vs", event);
       if (t.event !== event) continue;
-      (state as any).__DEBUG_TRIGGER_MATCHED = true;
       if (t.once_per_turn && t.usedThisTurn) continue;
       if (t.effects?.length) out.push(...t.effects);
       if (t.once_per_turn) t.usedThisTurn = true;
     }
   }
-  if (out.length)
-    console.log(
-      `[Crest] processCrestEvent("${event}") found ${out.length} effects.`,
-    );
   return out;
 }
 
-// Call this when a crest reaches 0 to pay out immediately and remove it.
 export function completeCrest(crest: Crest, owner: Player, context: any = {}) {
   if (!crest) return;
-  const list = owner === "blue" ? state.blueCrests : state.redCrests;
+  const list = getCrests(owner);
   if (!Array.isArray(list) || !list.includes(crest)) return; // already gone
 
   logEvent("crestComplete", { owner, crest: crest.name });
 
   // Pay out the crest's reward/effects
   if (Array.isArray(crest.effects) && crest.effects.length) {
-    runEffects([...crest.effects], owner, crest, context);
+    runEffects([...crest.effects], owner, null, context);
   }
 
   // Remove the crest so start-of-turn doesn’t fire it again
   const idx = list.indexOf(crest);
   if (idx !== -1) list.splice(idx, 1);
-  adapter.render();
+  // Render removed - UI layer
 }
 
 /**
  * Remove a specific crest by name from the owner.
+ * NOTE: Does NOT trigger Last Words - use destroyCrestWithLastWord for that.
  */
 export function removeCrest(owner: Player, crestName: string) {
-  const list = owner === "blue" ? state.blueCrests : state.redCrests;
+  const list = getCrests(owner);
   if (!Array.isArray(list)) return;
 
   const idx = list.findIndex((c) => c.name === crestName);
   if (idx !== -1) {
     list.splice(idx, 1);
-    console.log(`[Crest] Removed crest "${crestName}" from ${owner}`);
-    adapter.render();
+    // Render removed - UI layer
   }
+}
+
+/**
+ * Destroy a crest, triggering its Last Words effects if present.
+ * 
+ * Like follower/amulet death: destroy → Last Words fire automatically if present.
+ * No separate "WithLastWord" variant needed.
+ * 
+ * Last Words trigger when:
+ * 1. Crest has "Last Words" in its keywords array, OR
+ * 2. Crest description contains "Last Words:"
+ */
+export function destroyCrest(owner: Player, crestName: string) {
+  const list = getCrests(owner);
+  if (!Array.isArray(list)) return;
+
+  const crest = findCrest(owner, crestName);
+  if (!crest) return;
+
+  logEvent("crestDestroy", { owner, crest: crestName });
+
+  // Check if crest has Last Words keyword (same pattern as followers/amulets)
+  // Accepts: string "LastWords"/"lastwords" OR object {name: "LastWords"}
+  const hasLastWords =
+    (Array.isArray(crest.keywords) &&
+      crest.keywords.some((k: any) =>
+        (typeof k === "string" && k.toLowerCase() === "lastwords") ||
+        (typeof k === "object" && k !== null && k.name === "LastWords")
+      )) ||
+    (crest.description &&
+      crest.description.toLowerCase().includes("last words"));
+
+  // Trigger Last Words effects
+  if (hasLastWords && Array.isArray(crest.effects) && crest.effects.length) {
+    logEvent("crestLastWords", { owner, crest: crestName, effectCount: crest.effects.length });
+    runEffects([...crest.effects], owner, null);
+  }
+
+  // Remove crest from list
+  const idx = list.indexOf(crest);
+  if (idx !== -1) list.splice(idx, 1);
+  // Render removed - UI layer
 }
 
 /**
@@ -227,15 +301,12 @@ export function crestAdvanceCountdown(
   const crest = findCrest(owner, crestName);
   if (!crest || !Number.isFinite(crest.countdown)) return;
 
-  crest.countdown -= amount;
-  console.log(
-    `[Crest] Advanced countdown of "${crestName}" by ${amount}. New countdown: ${crest.countdown}`,
-  );
+  (crest as any).countdown -= amount;
 
-  if (crest.countdown <= 0) {
+  if ((crest as any).countdown <= 0) {
     completeCrest(crest, owner);
   } else {
-    adapter.render();
+    // Render removed - UI layer
   }
 }
 
@@ -244,7 +315,7 @@ export function crestAdvanceCountdown(
  * Used by effects that delay crest completion.
  */
 export function crestIncreaseCountdown(owner: Player, amount: number = 1) {
-  const crests = owner === "blue" ? state.blueCrests : state.redCrests;
+  const crests = getCrests(owner);
   if (!Array.isArray(crests)) return;
 
   for (const crest of crests) {
@@ -257,5 +328,20 @@ export function crestIncreaseCountdown(owner: Player, amount: number = 1) {
       });
     }
   }
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

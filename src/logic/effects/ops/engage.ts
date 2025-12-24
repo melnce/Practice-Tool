@@ -1,25 +1,24 @@
 // src/logic/effects/ops/engage.ts
 import { state } from "../../../core/gameState.js";
-import { adapter } from "../../../core/adapter.js";
 import { runEffects } from "../../core/effects/index.js";
 import { cleanupDead } from "../../core/cleanup.js";
 import { fireTrigger } from "../../core/triggers.js";
 import { logEvent } from "../../../core/logger.js";
 import { doAction } from "../../../core/history.js";
 import { Player, CardInstance, Effect } from "../../../core/types.js";
+import { getBoard, getGraveyard, getPP, setPP, addShadows } from "../../../core/playerHelpers.js";
 
 // --- Helpers ---
 function boardOf(owner: Player) {
-  return owner === "blue" ? state.blueBoard : state.redBoard;
+  return getBoard(state, owner);
 }
 // function graveOf(owner: Player) {
-//     return owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+//     return getGraveyard(state, owner);
 // }
 function payEngageCost(owner: Player, cost: number) {
   // Assume PP system; no-op if you already checked affordability elsewhere.
-  const pool = owner === "blue" ? "bluePP" : "redPP";
-  const cur = state[pool] | 0;
-  state[pool] = Math.max(0, cur - (cost | 0));
+  const cur = getPP(state, owner);
+  setPP(state, owner, Math.max(0, cur - (cost | 0)));
 }
 function effectsNeedSelection(effects: Effect[] = []) {
   return (
@@ -35,26 +34,21 @@ function effectsNeedSelection(effects: Effect[] = []) {
 }
 
 function removeWithLastWords(card: CardInstance, owner: Player) {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
-  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const board = getBoard(state, owner);
+  const grave = getGraveyard(state, owner);
   const idx = board.findIndex((c) => c?.uid === card.uid);
   if (idx === -1) {
-    // console.warn(`[Engage] Could not find amulet on board: ${card?.name} (${owner})`);
     return;
   }
   const removed = board.splice(idx, 1)[0];
   if (!removed) return;
 
   if (removed?.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
-    // console.log(`[Engage] Running Last Words for ${removed.name}`);
     runEffects([...removed.lastWordsEffects], owner, removed);
-  } else {
-    // console.log(`[Engage] No Last Words or invalid effects for ${removed?.name}`);
   }
 
   grave.push(removed);
-  if (owner === "blue") state.blueShadows++;
-  else state.redShadows++;
+  addShadows(state, owner, 1);
 }
 
 // --- Main API ---
@@ -88,7 +82,7 @@ export function engageAmulet(owner: Player, index: number) {
       const cost = Number(s?.engageCost ?? card.engageCost ?? 0);
 
       // Affordability check (optional; keep if your UI doesn't pre-check)
-      const pp = owner === "blue" ? state.bluePP : state.redPP;
+      const pp = getPP(state, owner);
       if (pp < cost) return;
 
       logEvent("engageStart", { owner, name: card.name, uid: card.uid, cost });
@@ -118,7 +112,7 @@ export function engageAmulet(owner: Player, index: number) {
             context: "engage",
           });
           removeWithLastWords(card, owner);
-          adapter.render();
+          // Render removed - UI layer
           cleanupDead();
         }
 
@@ -127,7 +121,7 @@ export function engageAmulet(owner: Player, index: number) {
         if (!card.keywordState) card.keywordState = {};
         card.keywordState.engagedThisTurn = true;
 
-        adapter.render();
+        // Render removed - UI layer
         cleanupDead();
         return;
       }
@@ -142,13 +136,13 @@ export function engageAmulet(owner: Player, index: number) {
           context: "engage",
         });
         removeWithLastWords(card, owner);
-        adapter.render();
+        // Render removed - UI layer
         cleanupDead();
 
         runEffects([...effects], owner, card);
         if (!card.keywordState) card.keywordState = {};
         card.keywordState.engagedThisTurn = true;
-        adapter.render();
+        // Render removed - UI layer
         return;
       }
 
@@ -167,13 +161,13 @@ export function engageAmulet(owner: Player, index: number) {
         });
         // console.log(`[Engage] Countdown reached 0 for ${card.name} (${owner}) - UID: ${card.uid}`);
         removeWithLastWords(card, owner);
-        adapter.render();
+        // Render removed - UI layer
         cleanupDead();
         return;
       }
 
       cleanupDead();
-      adapter.render();
+      // Render removed - UI layer
     },
     { owner, index },
     { autoRender: false },
@@ -188,3 +182,18 @@ export function resetEngageFlagsAtTurnStart(owner: Player) {
       c.keywordState.engagedThisTurn = false;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

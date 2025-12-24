@@ -2755,11 +2755,8 @@
     "keywords": [],
     "triggers": [
       {
-        "event": "follower_leaves_field",
+        "event": "ally_follower_leaves_field",
         "source": "hand",
-        "condition": {
-          "is_ally": true
-        },
         "effects": [
           {
             "op": "cost",
@@ -3835,7 +3832,7 @@
     "fanfare": [],
     "keywords": [
       {
-        "name": "lastwords",
+        "name": "LastWords",
         "effects": [
           {
             "op": "crest",
@@ -3844,6 +3841,9 @@
             "image": "images/crests/kagemitsu_enduring_warrior.png",
             "description": "Countdown (2) Last Words: Summon a Kagemitsu, Enduring Warrior",
             "countdown": 2,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "summon",
@@ -5369,7 +5369,7 @@
             ]
           },
           {
-            "event": "heal_leader",
+            "event": "leader_restored",
             "once_per_turn": true,
             "effects": [
               {
@@ -6852,6 +6852,9 @@
             "image": "images/crests/lapis_shining_seraph.png",
             "description": "Countdown (2) Last Words: Summon a Lapis, Shining Seraph and give it Storm",
             "countdown": 2,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "summon",
@@ -7464,8 +7467,8 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": 2,
         "eot_destroy": true,
+        "select": 2,
         "max_cost": 5
       }
     ],
@@ -7944,8 +7947,8 @@
         "filter": {
           "type": "Artifact"
         },
-        "select": 3,
-        "max_cost": 5
+        "max_cost": 5,
+        "select": 3
       }
     ],
     "superevolve": [
@@ -10843,6 +10846,9 @@
         "image": "images/crests/maddening_benison.png",
         "description": "Countdown (2). Last Words: Deal 10 damage to your leader",
         "countdown": 2,
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "damage",
@@ -11131,8 +11137,8 @@
             "filter": {
               "type": "Artifact"
             },
-            "select": 1,
             "eot_destroy": true,
+            "select": 1,
             "max_cost": 5
           }
         ]
@@ -12757,6 +12763,9 @@
         "image": "images/crests/octrice_hollowness_manifest.png",
         "description": "Countdown (8). Whenever you play or Fuse a Loot card, advance this crest's count by 1.\nLast Words: Add a Remnant of Hollowness to your hand.",
         "countdown": 8,
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "draw",
@@ -12896,6 +12905,9 @@
         "image": "images/crests/crystal_gazing.png",
         "description": "Countdown (2) Last Words: Draw 2 cards. Deal 4 damage to all enemy followers.",
         "countdown": 2,
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "draw",
@@ -16031,6 +16043,9 @@
             "image": "images/crests/starry_sky.png",
             "description": "Countdown (1). Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.",
             "countdown": 1,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "damage",
@@ -17797,7 +17812,7 @@
     "keywords": [
       "Intimidate",
       {
-        "name": "Last Words",
+        "name": "LastWords",
         "effects": [
           {
             "op": "summon",
@@ -18219,6 +18234,9 @@
             "image": "images/crests/belial.png",
             "description": "Countdown (4). Last Words: Deal 20 damage to the enemy leader.",
             "countdown": 4,
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "damage",
@@ -18868,9 +18886,11 @@
     "triggers": [
       {
         "event": "clash",
+        "source": "board",
         "effects": [
           {
-            "op": "clash_damage",
+            "op": "damage",
+            "target": "clash_opponent",
             "amount": 3
           }
         ]

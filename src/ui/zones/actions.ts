@@ -57,3 +57,17 @@ export function handlePlayCard(
     .then(({ playCard }) => playCard(handArray, owner, index))
     .catch(reportError);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

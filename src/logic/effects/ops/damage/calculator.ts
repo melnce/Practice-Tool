@@ -41,19 +41,6 @@ export function resolveDamageAmount(
   const addAmt = resolveDynamicValue(addRaw, ctx);
   const ofAmt = resolveDynamicValue(ofRaw, ctx);
 
-  // LEGACY: Debug logging for add_amount resolution
-  if (eff.add_amount) {
-    console.log(
-      `[DamageDebug] Resolving add_amount: "${eff.add_amount}" -> ${addAmt}`,
-    );
-    console.log(
-      `[DamageDebug] Context Source:`,
-      ctx.sourceCard
-        ? `${ctx.sourceCard.name} (SB: ${ctx.sourceCard.spellboostCount})`
-        : "None",
-    );
-  }
-
   const checkOverflow = isOverflow(ctx.owner);
 
   // LEGACY: If overflowing, use override amount if present; otherwise use base.
@@ -80,3 +67,18 @@ export function resolveAmountWithOverflow(
   const ctx: DamageAmountContext = { ...context, owner };
   return resolveDamageAmount(eff, ctx).finalAmount;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,9 +1,9 @@
 import { state } from "../../../../core/gameState.js";
-
 import { fireTrigger } from "../../../core/triggers.js";
 import { CardInstance, CardTemplate, Player } from "../../../../core/types.js";
 import { initAmulet, initFollower } from "./init.js";
-import { isAmulet, isFollower } from "./utils.js";
+import { isFollower, isAmulet } from "./utils.js";
+import { opponentOf, setRally, getRally } from "../../../../core/playerHelpers.js";
 
 // =============== Core Summon Routines ===============
 
@@ -11,7 +11,7 @@ export function makeCardFromDB(
   cardData: CardTemplate,
   owner: Player,
 ): CardInstance {
-  const card: CardInstance = JSON.parse(JSON.stringify(cardData));
+  const card: CardInstance = structuredClone(cardData);
   card.uid = state.rng.makeUid();
   card.owner = owner;
 
@@ -35,8 +35,7 @@ export function pushToBoard(
 
   // Increment Rally if follower
   if (card.type === "Follower") {
-    if (owner === "blue") state.blueRally++;
-    else state.redRally++;
+    setRally(state, owner, getRally(state, owner) + 1);
   }
 
   // MEDICAL ASSASSIN TRIGGER - ADD THIS LINE
@@ -45,8 +44,10 @@ export function pushToBoard(
 
   // follower enter triggers
   if (isFollower(card)) {
+    // Fire ally trigger for owner, enemy trigger for opponent
+    const opponent = opponentOf(owner);
     fireTrigger("ally_follower_enter", owner, { enteringCard: card });
-    fireTrigger("enemy_follower_enter", owner, { enteringCard: card });
+    fireTrigger("enemy_follower_enter", opponent, { enteringCard: card });
 
     // >>> Congregant chain (runs once when the first instance enters)
     // Legacy Support REMOVED: Managed by JSON Trigger now
@@ -54,3 +55,18 @@ export function pushToBoard(
   }
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

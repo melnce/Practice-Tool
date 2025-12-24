@@ -9,7 +9,7 @@ import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
 import { Effect, CardInstance, Player } from "../../../../core/types.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
-import { adapter } from "../../../../core/adapter.js";
+import { getBoard, getHP, opponentOf } from "../../../../core/playerHelpers.js";
 
 import {
   UnifiedDamageSpec,
@@ -40,7 +40,7 @@ export function handleDamage(
   eff: Effect & Record<string, any>,
   owner: Player,
   sourceCard: CardInstance | null,
-  effectsQueue: any,
+  effectsQueue: Effect[],
   context: DamageContext = { owner, sourceCard },
 ): "pending" | "done" | void {
   // Normalize to canonical spec
@@ -67,6 +67,20 @@ export function handleDamage(
     return "done";
   }
 
+  // Special case: clash_opponent targeting (Clash triggers)
+  // Targets whoever is opposing the source card in combat
+  if (spec.target === "clash_opponent" && sourceCard) {
+    const opponent =
+      sourceCard.uid === ctx.attacker?.uid ? ctx.defender :
+        sourceCard.uid === ctx.defender?.uid ? ctx.attacker :
+          null;
+    if (opponent) {
+      dealDamage(opponent, amount);
+      cleanupDead();
+      return "done";
+    }
+  }
+
   // Special case: self targeting
   if (spec.target === "self" && sourceCard) {
     if (sourceCard.type === "Follower") {
@@ -85,7 +99,7 @@ export function handleDamage(
   // Leader targeting
   if (String(spec.target || "").includes("leader")) {
     const isEnemy = String(spec.target || "").includes("enemy");
-    const targetPlayer = isEnemy ? (owner === "blue" ? "red" : "blue") : owner;
+    const targetPlayer = isEnemy ? opponentOf(owner) : owner;
     applyLeaderDamage(targetPlayer, amount);
     return "done";
   }
@@ -184,7 +198,7 @@ function handleSelection(
   amount: number,
   owner: Player,
   sourceCard: CardInstance | null,
-  effectsQueue: any,
+  effectsQueue: Effect[],
 ): "pending" | "done" {
   const selectCount = Math.min(spec.select || 1, pool.length);
 
@@ -213,7 +227,7 @@ function handleSelection(
   if (pool.length) {
     highlightSelectable(pool);
   } else {
-    adapter.render();
+    // Render removed - UI layer
   }
 
   return "pending";
@@ -233,8 +247,8 @@ function handleByStatDamage(
     targetType === "all:follower"
   ) {
     const allFollowers = [
-      ...(state.blueBoard || []),
-      ...(state.redBoard || []),
+      ...getBoard(state, "first"),
+      ...getBoard(state, "second"),
     ].filter((c) => c && c.type === "Follower");
     if (!allFollowers.length) return;
 
@@ -251,9 +265,9 @@ function handleByStatDamage(
   }
 
   if (targetType === "leader") {
-    const blueHP = state.blueHP;
-    const redHP = state.redHP;
-    const enemy = blueHP >= redHP ? "blue" : "red";
+    const blueHP = getHP(state, "first");
+    const redHP = getHP(state, "second");
+    const enemy = blueHP >= redHP ? "first" : "second";
     applyLeaderDamage(enemy, amount);
   }
 }
@@ -263,3 +277,18 @@ function handleByStatDamage(
 // ============================================================================
 
 export { normalizeToUnifiedSpec, UnifiedDamageSpec } from "./types.js";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

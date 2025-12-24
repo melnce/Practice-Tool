@@ -19,11 +19,20 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   start_of_turn: handleTurnEvent,
   end_of_turn: handleTurnEvent,
 
-  // Combat
+  // Combat - Strike family (attacker only)
+  strike: handleCombatEvent,          // Any attack target
+  follower_strike: handleCombatEvent, // Attacking follower only
+  leader_strike: handleCombatEvent,   // Attacking leader only
+
+  // Combat - Clash (follower combat, both parties eligible)
   clash: handleCombatEvent,
-  strike: handleCombatEvent,
-  follower_strike: handleCombatEvent,
+
+  // Combat - Defense
   leader_attacked: handleCombatEvent,
+  leader_damaged: handleGenericEvent,
+
+  // Leader state changes
+  leader_restored: handleGenericEvent,
 
   // Play
   ally_follower_played: handlePlayEvent,
@@ -39,6 +48,16 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   engage: handleRestrictedZoneEvent,
   ally_follower_enter: handleRestrictedZoneEvent,
   enemy_follower_enter: handleRestrictedZoneEvent,
+
+  // Explicit generic handlers (no implicit fallback)
+  invoke: handleGenericEvent,
+  loot_fused: handleGenericEvent,
+  loot_played: handleGenericEvent,
+  ally_follower_leaves_field: handleGenericEvent,
+  enemy_follower_leaves_field: handleGenericEvent,
+  enemy_follower_defense_down: handleGenericEvent,
+  ally_ward_destroyed: handleGenericEvent,
+  select_mode: handleGenericEvent,  // Mode selection (used by Faith crest)
 };
 
 export function dispatchEvent(
@@ -49,3 +68,18 @@ export function dispatchEvent(
   const handler = EVENT_HANDLERS[event] || handleGenericEvent;
   handler(event, activePlayer, context);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

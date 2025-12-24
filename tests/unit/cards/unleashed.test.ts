@@ -66,3 +66,9 @@ describe("Unleashed Card Data", () => {
     expect(mode2.effects[2].amount).toBe(2);
   });
 });
+
+
+
+
+
+

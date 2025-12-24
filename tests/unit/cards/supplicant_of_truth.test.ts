@@ -9,12 +9,12 @@ import { CardInstance } from "../../../src/core/types";
 describe("Supplicant of Truth (10332110) Integration", () => {
   beforeEach(() => {
     // Minimal state reset
-    state.blueHand = [];
-    state.blueBoard = [];
-    state.redBoard = [];
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
-    state.isBlueTurn = true;
+    state.players.first.hand = [];
+    state.players.first.board = [];
+    state.players.second.board = [];
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
+    state.isFirstPlayerTurn = true;
     // Ensure RNG exists (setup usually handles it, but just in case)
     if (!state.rng)
       state.rng = {
@@ -36,24 +36,24 @@ describe("Supplicant of Truth (10332110) Integration", () => {
       defense: 5,
     };
 
-    const supplicant = makeCardFromDB(supplicantDef, "blue");
-    const ally = makeCardFromDB(dummyDef, "blue");
-    const enemy = makeCardFromDB(dummyDef, "red");
+    const supplicant = makeCardFromDB(supplicantDef, "first");
+    const ally = makeCardFromDB(dummyDef, "first");
+    const enemy = makeCardFromDB(dummyDef, "second");
 
     // Setup board
-    state.blueHand = [supplicant];
-    state.blueBoard = [ally];
-    state.redBoard = [enemy];
+    state.players.first.hand = [supplicant];
+    state.players.first.board = [ally];
+    state.players.second.board = [enemy];
 
     // Dispatch Play
     dispatchAction(state, {
       type: "PLAY_CARD",
-      player: "blue",
+      player: "first",
       cardUid: supplicant.uid,
     });
 
     // Verify Supplicant is on board
-    const playedSupplicant = state.blueBoard.find(
+    const playedSupplicant = state.players.first.board.find(
       (c) => c.uid === supplicant.uid,
     );
     expect(playedSupplicant).toBeDefined();
@@ -61,14 +61,20 @@ describe("Supplicant of Truth (10332110) Integration", () => {
     // Verify Damage
     // Ally 5 -> 2
     // Find by logic: it's the one that isn't supplicant
-    const boardAlly = state.blueBoard.find((c) => c.uid === ally.uid);
+    const boardAlly = state.players.first.board.find((c) => c.uid === ally.uid);
     expect(boardAlly!.defense).toBe(2);
 
     // Enemy 5 -> 2
-    const boardEnemy = state.redBoard.find((c) => c.uid === enemy.uid);
+    const boardEnemy = state.players.second.board.find((c) => c.uid === enemy.uid);
     expect(boardEnemy!.defense).toBe(2);
 
     // Supplicant should be undamaged (base defense 2)
     expect(playedSupplicant!.defense).toBe(2);
   });
 });
+
+
+
+
+
+

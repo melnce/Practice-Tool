@@ -245,3 +245,18 @@ export function validateUnifiedSpec(spec: UnifiedDrawSpec): string[] {
 
   return warnings;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

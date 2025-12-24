@@ -6,7 +6,7 @@ import { CardInstance } from "../../../core/types.js";
 describe("Played History", () => {
   it("pushes a lightweight entry, not full card", () => {
     // Setup
-    state.bluePlayedHistory = [];
+    state.players.first.playedHistory = [];
     const card: CardInstance = {
       id: "123",
       uid: "uid-123",
@@ -22,11 +22,11 @@ describe("Played History", () => {
     };
 
     // Execute
-    pushPlayedHistory("blue", card);
+    pushPlayedHistory("first", card);
 
     // Assert
-    expect(state.bluePlayedHistory).toHaveLength(1);
-    const entry = state.bluePlayedHistory[0];
+    expect(state.players.first.playedHistory).toHaveLength(1);
+    const entry = state.players.first.playedHistory[0];
 
     expect(entry).toEqual(
       expect.objectContaining({
@@ -45,3 +45,18 @@ describe("Played History", () => {
     expect((entry as any).zone).toBeUndefined();
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

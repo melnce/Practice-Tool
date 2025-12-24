@@ -1,8 +1,8 @@
 import { state } from "../../core/gameState.js";
-import { adapter } from "../../core/adapter.js";
 // import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
 import { guardLifecycle } from "./targeting/guards.js";
+import { getBoard, getHand, getGraveyard } from "../../core/playerHelpers.js";
 
 // Refactored Imports
 import {
@@ -42,33 +42,24 @@ export function getPool(
   return finalPool;
 }
 
-// -----------------------------------------------------------------------------
-// Legacy / UI Helpers (Preserved)
-// -----------------------------------------------------------------------------
-
-function getCardSide(c: CardInstance): Player | null {
-  if (state.blueBoard?.includes(c)) return "blue";
-  if (state.redBoard?.includes(c)) return "red";
-  if (state.blueHand?.includes(c)) return "blue";
-  if (state.redHand?.includes(c)) return "red";
-  return c?.owner ?? null;
-}
 
 export function highlightSelectable(cards: CardInstance[]) {
   cards.forEach((c) => (c.__uiSelectable = true));
-  adapter.render();
+  // Render removed - UI layer
 }
 
 export function clearSelectableFlags() {
   guardLifecycle("clearSelectableFlags");
-  [
-    ...state.blueBoard,
-    ...state.redBoard,
-    ...state.blueHand,
-    ...state.redHand,
-    ...state.blueGraveyard,
-    ...state.redGraveyard,
-  ].forEach((c) => {
+  // Use playerHelpers for player-agnostic zone access
+  const allCards = [
+    ...getBoard(state, "first"),
+    ...getBoard(state, "second"),
+    ...getHand(state, "first"),
+    ...getHand(state, "second"),
+    ...getGraveyard(state, "first"),
+    ...getGraveyard(state, "second"),
+  ];
+  allCards.forEach((c) => {
     if (c) delete c.__uiSelectable;
   });
 }
@@ -77,150 +68,72 @@ export function clearSelectableFlags() {
 // handleSelect (Orchestrator for Selection Effects)
 // -----------------------------------------------------------------------------
 
+import {
+  parseSelectConfig,
+  applyPositionFilter,
+  pickRandomTargets,
+  shouldAutoSelect,
+} from "./targeting/selectHelpers.js";
+
+/**
+ * Orchestrates target selection for effects.
+ *
+ * This is a thin orchestrator that delegates to focused helper functions:
+ * - parseSelectConfig: Extract count from effect
+ * - applyPositionFilter: Handle leftmost/rightmost
+ * - pickRandomTargets: Bot/random mode selection
+ *
+ * @returns "pending" if waiting for UI selection, void if resolved
+ */
 export function handleSelect(
   eff: Effect,
   owner: Player,
   sourceCard: CardInstance | null,
   effectsQueue: Effect[],
   context: TargetContext = {},
-) {
-  // requested number of picks from JSON
-  const raw = eff.select ?? eff.select_count ?? 1;
-  let requestedCount = parseInt(String(raw), 10);
-  if (!Number.isFinite(requestedCount) || requestedCount < 1)
-    requestedCount = 1;
+): "pending" | void {
+  // 1. Parse configuration
+  const { count: requestedCount } = parseSelectConfig(eff);
 
-  // mark this as a targeted effect for Ambush/Aura filtering
+  // 2. Build targeted context
   const targetedCtx = {
     ...context,
     isTargetedEffect: true,
     selectCount: requestedCount,
   };
 
-  // build the initial pool
+  // 3. Get and filter pool
   let pool = getPool(eff.target, owner, sourceCard, eff.condition, targetedCtx);
+  pool = applyPositionFilter(pool, eff.filter);
 
-  // Always log for debugging this issue
-  if (String(eff.target).startsWith("hand:"))
-    console.log(
-      `[handleSelect Debug] Target: ${eff.target}, Pool Size: ${pool.length}`,
-    );
+  // 4. Early exit if no valid targets
+  if (!pool.length) return;
 
-  if (!(globalThis as any).HEADLESS && String(eff.target).startsWith("hand:")) {
-    const myHand = owner === "blue" ? state.blueHand : state.redHand;
-    console.log(
-      "[handleSelect Debug] Hand valid?",
-      myHand.length,
-      "Hand UIDs:",
-      myHand.map((c) => c.uid),
-    );
-    console.log(
-      "[handleSelect Debug] Hand names:",
-      myHand.map((c) => c.name),
-    );
-    console.log(
-      "[handleSelect Debug] Source:",
-      sourceCard?.name,
-      sourceCard?.uid,
-    );
-  }
+  // 5. Cap count to available targets
+  const effectiveCount = Math.min(requestedCount, pool.length);
 
-  // Apply extra filters if specified in 'op: select' itself (e.g. "leftmost")
-  if (eff.filter === "leftmost") {
-    if (pool.length > 0) {
-      const first = pool[0];
-      pool = first ? [first] : []; // Assuming pool order matches board order (getPool usually returns board order)
-    }
-  } else if (eff.filter === "rightmost") {
-    if (pool.length > 0) {
-      const last = pool[pool.length - 1];
-      pool = last ? [last] : [];
-    }
-  }
+  // 6. Auto-selection path (bot or random mode)
+  if (shouldAutoSelect(eff.mode)) {
+    const picks = pickRandomTargets(pool, effectiveCount, state.rng);
 
-  // no valid targets at all → nothing to do
-  if (!pool.length) return "done";
-
-  // --- LLOYD GATING (may shrink the pool) ---
-  (function applyLloydGate() {
-    try {
-      const opp = owner === "blue" ? "red" : "blue";
-      const oppBoard = opp === "blue" ? state.blueBoard : state.redBoard;
-      const lloyds = (oppBoard || []).filter((c) => c?.name === "Lloyd");
-      if (!lloyds.length) return;
-
-      const poolHasOpponent = (pool || []).some((c) => getCardSide(c) === opp);
-      if (!poolHasOpponent) return;
-
-      if (requestedCount <= 1) {
-        const lloydUids = new Set(lloyds.map((l) => l.uid));
-        pool = pool.filter((c) => lloydUids.has(c?.uid));
-      } else {
-        targetedCtx.__lloydRequiredFirstUids = lloyds.map((l) => l.uid);
-      }
-    } catch (e) {
-      console.warn("Lloyd gate failed:", e);
-    }
-  })();
-
-  // after all filters, cap the select count to available targets
-  const effectiveCount = Math.max(1, Math.min(requestedCount, pool.length));
-
-  // === AUTOMATIC SELECTION (Bot OR Mode=Random) ===
-  // If SpectatorBot is active OR the effect explicitly requests 'random' mode,
-  // pick targets at random and immediately resolve.
-  const isRandomMode = eff.mode === "random";
-  const isBot =
-    typeof window !== "undefined" &&
-    (window as any).__BOT_AUTO_TARGETING__ === true;
-
-  if (isBot || isRandomMode) {
-    console.log(
-      `[Targeting] Auto-Select (Bot=${isBot}, RandomMode=${isRandomMode}) Pool Size: ${pool.length}`,
-    );
-
-    // Honor any “must include these first” constraint from the Lloyd gate
-    const picks: CardInstance[] = [];
-    const mustFirst = targetedCtx.__lloydRequiredFirstUids || [];
-    if (mustFirst.length) {
-      const set = new Set(mustFirst);
-      for (const c of pool) {
-        if (picks.length >= effectiveCount) break;
-        if (set.has(c?.uid)) picks.push(c);
-      }
-    }
-    // Fill remaining picks randomly from the rest of the pool (no duplicates)
-    const remaining = pool.filter((c) => !picks.includes(c));
-    while (picks.length < effectiveCount && remaining.length) {
-      const idx = state.rng.nextInt(remaining.length);
-      const picked = remaining.splice(idx, 1)[0];
-      if (picked) picks.push(picked);
-    }
-
-    // Clear any UI highlights and immediately resolve the effect queue
     clearSelectableFlags();
     const selectedCtx = { ...targetedCtx, targets: picks };
 
-    // If this select wraps nested effects (usual case), resolve them now.
-    if (Array.isArray(eff.effects) && eff.effects!.length) {
-      // runEffects([...eff.effects!], owner, sourceCard, selectedCtx);
+    // Execute nested effects with selected targets
+    if (Array.isArray(eff.effects) && eff.effects.length) {
       const runner =
         context.runner ||
-        ((..._args: any[]) =>
-          console.warn("Missing runner for handleSelect auto"));
-      runner([...eff.effects!], owner, sourceCard, selectedCtx);
+        ((..._args: any[]) => console.warn("Missing runner for handleSelect auto"));
+      runner([...eff.effects], owner, sourceCard, selectedCtx);
     }
-    // Only trigger 'done' if we fully handled it (which we did).
 
     state.__lastSelected = picks[0] || null;
-
-    // If 'select' is just a wrapper for nested effects, returning 'done' is fine.
-    return "done";
+    return;
   }
 
-  // Set pending target effect for UI selection
+  // 7. Manual selection: set up pending state for UI
   state.pendingTargetEffect = {
-    eff: { op: "nested_effects" as any, effects: eff.effects ?? [] }, // Internal marker for pending selection resolution
+    eff: { op: "nested_effects" as any, effects: eff.effects ?? [] },
     owner,
     sourceCard,
     resumeEffects: effectsQueue,
@@ -232,3 +145,19 @@ export function handleSelect(
   highlightSelectable(pool);
   return "pending";
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

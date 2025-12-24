@@ -94,3 +94,18 @@ export function isValidEffect(value: unknown): value is Effect {
   if (typeof (value as { op: unknown }).op !== "string") return false;
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

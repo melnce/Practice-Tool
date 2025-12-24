@@ -9,8 +9,8 @@ describe("processCandidateTriggers", () => {
     processModule.registerRunEffectsInProcess(runEffects);
 
     // Setup
-    const owner = "blue";
-    const opponent = "red";
+    const owner = "first";
+    const opponent = "second";
 
     // Mock card
     const card: any = { name: "TestCard", type: "Follower", uid: "1" };
@@ -52,3 +52,9 @@ describe("processCandidateTriggers", () => {
     expect(runEffects).not.toHaveBeenCalled();
   });
 });
+
+
+
+
+
+

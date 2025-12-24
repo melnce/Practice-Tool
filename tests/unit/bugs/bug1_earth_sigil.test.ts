@@ -13,10 +13,10 @@ describe("Bug 1: Earth Sigils Initialization", () => {
   });
 
   beforeEach(() => {
-    resetGameState();
-    state.bluePP = 10;
-    state.blueMaxPP = 10;
-    state.isBlueTurn = true;
+    resetGameState(1);
+    state.players.first.pp = 10;
+    state.players.first.maxPP = 10;
+    state.isFirstPlayerTurn = true;
   });
 
   it("Witchs New Brew should start with 1 earth counter", () => {
@@ -27,7 +27,7 @@ describe("Bug 1: Earth Sigils Initialization", () => {
       name: "Witch's New Brew",
       type: "Amulet",
       cost: 1,
-      owner: "blue",
+      owner: "first",
       keywords: [
         {
           name: "Counter",
@@ -38,12 +38,12 @@ describe("Bug 1: Earth Sigils Initialization", () => {
       ] as any,
     };
 
-    state.blueHand = [brew];
+    state.players.first.hand = [brew];
 
     // playCard(hand, player, index)
-    playCard(state.blueHand, "blue", 0);
+    playCard(state.players.first.hand, "first", 0);
 
-    const playedBrew = state.blueBoard[0];
+    const playedBrew = state.players.first.board[0];
     expect(playedBrew).toBeDefined();
     // The bug is that it starts at 0 or undefined despite keyword
     expect(playedBrew.counters?.earth).toBe(1);
@@ -57,16 +57,22 @@ describe("Bug 1: Earth Sigils Initialization", () => {
       name: "Magic Sediment",
       type: "Amulet",
       cost: 0,
-      owner: "blue",
+      owner: "first",
       keywords: [],
     };
 
-    state.blueHand = [sediment];
-    playCard(state.blueHand, "blue", 0);
+    state.players.first.hand = [sediment];
+    playCard(state.players.first.hand, "first", 0);
 
-    const played = state.blueBoard[0];
+    const played = state.players.first.board[0];
     expect(played).toBeDefined();
     expect(played.name).toBe("Magic Sediment");
     expect(played.counters?.earth).toBe(1);
   });
 });
+
+
+
+
+
+

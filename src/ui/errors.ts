@@ -5,3 +5,17 @@
 export function reportError(error: unknown): void {
   console.error("[UI Error]", error);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

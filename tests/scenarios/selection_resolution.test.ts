@@ -23,7 +23,7 @@ function createCard(id: string, name: string): CardInstance {
 
 describe("Scenario: Selection Resolution", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   afterEach(() => {
@@ -33,8 +33,8 @@ describe("Scenario: Selection Resolution", () => {
   it("should clear pendingSelection after a valid selection is made", () => {
     const ally = createCard("ally_1", "Ally");
     const enemy = createCard("enemy_1", "Enemy");
-    state.blueBoard.push(ally);
-    state.redBoard.push(enemy);
+    state.players.first.board.push(ally);
+    state.players.second.board.push(enemy);
 
     // 1. Trigger an effect that requires selection
     const effect: Effect = {
@@ -51,7 +51,7 @@ describe("Scenario: Selection Resolution", () => {
 
     // 3. Run the effect
     // The engine's `handleSelect` logic typically consumes the context.targets immediately if present
-    const result = runEffects([effect], "blue", ally, context);
+    const result = runEffects([effect], "first", ally, context);
 
     // 4. Verification
     // Ops result: "done" means it executed successfully
@@ -65,8 +65,8 @@ describe("Scenario: Selection Resolution", () => {
   it("should set pendingSelection if no targets provided for a select ops", () => {
     const ally = createCard("ally_1", "Ally");
     const enemy = createCard("enemy_1", "Enemy");
-    state.blueBoard.push(ally);
-    state.redBoard.push(enemy);
+    state.players.first.board.push(ally);
+    state.players.second.board.push(enemy);
 
     const effect: Effect = {
       op: "damage",
@@ -76,10 +76,16 @@ describe("Scenario: Selection Resolution", () => {
     };
 
     // No context provided (undefined targets)
-    const result = runEffects([effect], "blue", ally);
+    const result = runEffects([effect], "first", ally);
 
     expect(result).toBe("pending");
     expect(state.pendingSelection).not.toBeNull();
     expect(state.pendingSelection?.op).toBe("damage");
   });
 });
+
+
+
+
+
+

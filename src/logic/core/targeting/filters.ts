@@ -1,6 +1,7 @@
 import { state } from "../../../core/gameState.js";
 import { CardInstance, Player } from "../../../core/types.js";
 import { TargetQuery, TargetingEnv } from "./types.js";
+import { getBoard, getHand } from "../../../core/playerHelpers.js";
 
 // -----------------------------------------------------------------------------
 // Helpers
@@ -18,11 +19,11 @@ function _isCardDamaged(c: CardInstance) {
   return curr < full;
 }
 
-function getCardSide(c: CardInstance): Player | null {
-  if (state.blueBoard?.includes(c)) return "blue";
-  if (state.redBoard?.includes(c)) return "red";
-  if (state.blueHand?.includes(c)) return "blue";
-  if (state.redHand?.includes(c)) return "red";
+export function getCardSide(c: CardInstance): Player | null {
+  if (getBoard(state, "first")?.includes(c)) return "first";
+  if (getBoard(state, "second")?.includes(c)) return "second";
+  if (getHand(state, "first")?.includes(c)) return "first";
+  if (getHand(state, "second")?.includes(c)) return "second";
   return c?.owner ?? null;
 }
 
@@ -201,6 +202,25 @@ export function applyFilters(
     });
   }
 
+  // 11. Taunt Enforcement (opponents must target Taunt cards first)
+  // If targeting enemies and any have Taunt, ONLY Taunt cards are valid targets.
+  if (env.context.isTargetedEffect) {
+    const tauntCards = filtered.filter((c) => {
+      const cardSide = getCardSide(c);
+      const isEnemy = cardSide && cardSide !== env.owner;
+      return isEnemy && (c as any).hasTaunt;
+    });
+
+    if (tauntCards.length > 0) {
+      // Filter to only Taunt cards + any ally cards (Taunt only restricts enemy targeting)
+      filtered = filtered.filter((c) => {
+        const cardSide = getCardSide(c);
+        const isEnemy = cardSide && cardSide !== env.owner;
+        return !isEnemy || (c as any).hasTaunt;
+      });
+    }
+  }
+
   // 11. Damaged
   if (cond.damaged === true) {
     filtered = filtered.filter(
@@ -224,3 +244,18 @@ export function applyFilters(
 
   return filtered;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

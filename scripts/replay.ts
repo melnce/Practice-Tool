@@ -127,8 +127,8 @@ async function main() {
   // Shuffle Determinism Golden Check (Exact Assertions)
   // ─────────────────────────────────────────────────────────────────────────────
   console.log("Running Shuffle Determinism Check...");
-  const checkStateA = createInitialState();
-  const checkStateB = createInitialState();
+  const checkStateA = createInitialState(1);
+  const checkStateB = createInitialState(1);
 
   // Init with two different seeds
   initReplayState(
@@ -300,7 +300,7 @@ async function main() {
         // This satisfies "Independent Instances" requirement and avoids Deep Clone.
 
         // createInitialState creates a NEW object, independent of singleton `state`
-        const initialStateForInv = createInitialState();
+        const initialStateForInv = createInitialState(1);
 
         // Initialize it exactly as the singleton was initialized
         if (isDynamic) {

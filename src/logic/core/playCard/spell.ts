@@ -9,6 +9,7 @@ import { recordEvent } from "../../../core/debugTimeline.js";
 import { fireTrigger } from "../triggers.js";
 import { pushPlayedHistory } from "./history.js";
 import { PlayOutcome } from "./types.js";
+import { getGraveyard, addShadows, isFirstPlayer } from "../../../core/playerHelpers.js";
 
 /**
  * Play a spell card. Returns PlayOutcome without rendering.
@@ -19,7 +20,7 @@ export function playSpell(
   effectiveCost: number,
   chosenTier: { effects: Effect[] } | null,
 ): PlayOutcome {
-  const owner = state.isBlueTurn ? "blue" : "red";
+  const owner = isFirstPlayer(state.activePlayer) ? "first" : "second";
 
   // Spellboost hand
   spellboostHand(owner, 1);
@@ -30,12 +31,11 @@ export function playSpell(
   const spellCard = card;
 
   // To Graveyard
-  const toGrave = player === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const toGrave = getGraveyard(state, player);
   toGrave.push(card);
 
   // Shadows
-  if (owner === "blue") state.blueShadows++;
-  else state.redShadows++;
+  addShadows(state, player, 1);
 
   // Debug timeline (not UI rendering)
   recordEvent({
@@ -87,3 +87,18 @@ export function playSpell(
 
   return { kind: "done" };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

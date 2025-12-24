@@ -1,7 +1,7 @@
 import { GameState } from "../../../core/types.js";
-import { adapter } from "../../../core/adapter.js";
 import { EffectCtx } from "./registry.js";
 import { TargetContext } from "../targeting.js";
+import { adapter } from "../../../core/adapter.js";
 
 type Adapter = typeof adapter;
 
@@ -40,3 +40,18 @@ export function getTargetingContext(ctx: EffectCtx): TargetContext {
   }
   return {};
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

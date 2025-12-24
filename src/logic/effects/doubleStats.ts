@@ -1,12 +1,12 @@
 // src/logic/effects/doubleStats.ts
 import { state } from "../../core/gameState.js";
-import { adapter } from "../../core/adapter.js";
 import { cleanupDead } from "../core/cleanup.js";
 import { logEvent } from "../../core/logger.js";
 import { Player } from "../../core/types.js";
+import { getBoard } from "../../core/playerHelpers.js";
 
 export function doubleStatsAllies(owner: Player) {
-  const board = owner === "blue" ? state.blueBoard : state.redBoard;
+  const board = getBoard(state, owner);
   logEvent("doubleStatsAllies", { owner, count: board.length });
   for (const c of board) {
     if (!c || c.type !== "Follower") continue;
@@ -31,5 +31,20 @@ export function doubleStatsAllies(owner: Player) {
     c.potential_defense = c.defense as any;
   }
   cleanupDead();
-  adapter.render();
+  // Render removed - UI layer
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

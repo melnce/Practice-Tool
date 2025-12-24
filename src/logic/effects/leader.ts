@@ -2,6 +2,7 @@ import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 import { Effect, Player } from "../../core/types.js";
 import { fireTrigger } from "../core/triggers.js";
+import { isFirstPlayer, getHP, setHP, getMaxHP, setMaxHP, getPP, setPP, getMaxPP, getHand, opponentOf, getEvoCharges, setEvoCharges } from "../../core/playerHelpers.js";
 
 /**
  * Handles healing a leader's defense.
@@ -10,20 +11,18 @@ import { fireTrigger } from "../core/triggers.js";
 export function handleHealLeader(owner: Player, eff: Effect) {
   const amt = parseInt(eff.amount) || 0;
 
-  const targetPlayerIsBlue =
-    (eff.player || "self") === "self" ? owner === "blue" : owner !== "blue";
+  const targetPlayer: Player =
+    (eff.player || "self") === "self" ? owner : opponentOf(owner);
 
   logEvent("healLeader", {
-    target: targetPlayerIsBlue ? "blue" : "red",
+    target: targetPlayer,
     amount: amt,
   });
 
   // Apply healing, respecting the new dynamic max HP
-  if (targetPlayerIsBlue) {
-    state.blueHP = Math.max(0, Math.min(state.blueMaxHP, state.blueHP + amt));
-  } else {
-    state.redHP = Math.max(0, Math.min(state.redMaxHP, state.redHP + amt));
-  }
+  const currentHP = getHP(state, targetPlayer);
+  const maxHP = getMaxHP(state, targetPlayer);
+  setHP(state, targetPlayer, Math.max(0, Math.min(maxHP, currentHP + amt)));
 }
 
 /**
@@ -34,22 +33,14 @@ export function handleSetMaxHP(eff: Effect, owner: Player) {
   const amount = parseInt(eff.amount) || 20;
 
   const isOpponent = targetPlayerString === "opponent";
-  const targetOwner: Player = isOpponent
-    ? owner === "blue"
-      ? "red"
-      : "blue"
-    : owner;
+  const targetOwner: Player = isOpponent ? opponentOf(owner) : owner;
 
   logEvent("setLeaderMaxHP", { owner: targetOwner, maxHP: amount });
 
-  if (targetOwner === "blue") {
-    state.blueMaxHP = amount;
-    // Clamp current HP to the new max (no accidental +amt)
-    state.blueHP = Math.max(0, Math.min(state.blueMaxHP, state.blueHP));
-  } else {
-    state.redMaxHP = amount;
-    state.redHP = Math.max(0, Math.min(state.redMaxHP, state.redHP));
-  }
+  setMaxHP(state, targetOwner, amount);
+  // Clamp current HP to the new max (no accidental +amt)
+  const currentHP = getHP(state, targetOwner);
+  setHP(state, targetOwner, Math.max(0, Math.min(amount, currentHP)));
 }
 
 /**
@@ -58,11 +49,11 @@ export function handleSetMaxHP(eff: Effect, owner: Player) {
  */
 export function handleRecoverPP(owner: Player, eff: Effect) {
   // Determine target side
-  const targetIsBlue =
-    (eff.player || "self") === "self" ? owner === "blue" : owner !== "blue";
+  const targetPlayer: Player =
+    (eff.player || "self") === "self" ? owner : opponentOf(owner);
 
-  const cur = targetIsBlue ? state.bluePP : state.redPP;
-  const max = targetIsBlue ? state.blueMaxPP : state.redMaxPP;
+  const cur = getPP(state, targetPlayer);
+  const max = getMaxPP(state, targetPlayer);
 
   // Allow symbolic "full" refills (your card uses "currentMaxPP")
   let amt;
@@ -76,8 +67,7 @@ export function handleRecoverPP(owner: Player, eff: Effect) {
   }
 
   const next = Math.min(max, cur + amt);
-  if (targetIsBlue) state.bluePP = next;
-  else state.redPP = next;
+  setPP(state, targetPlayer, next);
 }
 
 /**
@@ -85,7 +75,7 @@ export function handleRecoverPP(owner: Player, eff: Effect) {
  * because it calls the updated handleHealLeader)
  */
 export function handleDynamicHealLeader(owner: Player, eff: Effect) {
-  const hand = owner === "blue" ? state.blueHand : state.redHand;
+  const hand = getHand(state, owner);
   const amt = hand.length; // X is number of cards in hand
   handleHealLeader(owner, { ...eff, amount: amt });
 }
@@ -93,32 +83,23 @@ export function handleDynamicHealLeader(owner: Player, eff: Effect) {
 /* ---------- NEW: leader barrier state ops ---------- */
 export function grantLeaderBarrier(owner: Player, _charges = 1) {
   // Ignore extra charges: once the leader has Barrier, do nothing.
-  const key = owner === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier";
-  if (state[key]) return; // already has Barrier
+  if (state.players[owner].leaderBarrier) return; // already has Barrier
 
-  const s = state as any; // Allow dynamic access for now or update GameState to have index signature
-  s[key] = 1;
+  state.players[owner].leaderBarrier = 1;
   logEvent("leaderBarrierGrant", { owner });
 }
 
 export function popLeaderBarrier(owner: Player, reason = "damage_prevent") {
-  const key = owner === "blue" ? "blueLeaderBarrier" : "redLeaderBarrier";
-  const s = state as any;
-  if (!s[key]) return false;
+  if (!state.players[owner].leaderBarrier) return false;
 
   logEvent("leaderBarrierPop", { owner, reason });
-  s[key] = 0;
-  const fxKey =
-    owner === "blue" ? "blueLeaderBarrierPopped" : "redLeaderBarrierPopped";
-  s[fxKey] = reason;
+  state.players[owner].leaderBarrier = 0;
+  // Note: leaderBarrierPopped reason is now just logged, not stored separately
   return true;
 }
 
 /** Centralized leader damage that respects barrier and max HP */
 export function applyLeaderDamage(owner: Player, amount: number) {
-  const hpKey = owner === "blue" ? "blueHP" : "redHP";
-  // const maxKey = owner === "blue" ? "blueMaxHP" : "redMaxHP"; // Unused
-
   if ((amount | 0) <= 0) return 0;
 
   logEvent("leaderDamage", { owner, amount });
@@ -126,21 +107,13 @@ export function applyLeaderDamage(owner: Player, amount: number) {
   // Barrier soaks the *whole packet* and consumes 1 charge
   if (popLeaderBarrier(owner, "leader_hit")) return 0;
 
-  const s = state as any;
+  // NEW: Check Max Damage Cap (Zooey) - now from nested state
+  const cap = state.players[owner].leaderMaxDamageCap;
 
-  // NEW: Check Max Damage Cap (Zooey)
-  const capKey =
-    owner === "blue" ? "blueLeaderMaxDamageCap" : "redLeaderMaxDamageCap";
-  const cap = s[capKey];
+  // NEW: Leader damage modifier (Beelzebub) - now from nested state
+  const mod = state.players[owner].leaderDamageTakenBonus || 0;
 
-  // NEW: Leader damage modifier (Beelzebub)
-  const modKey =
-    owner === "blue" ? "blueLeaderDamagePlus" : "redLeaderDamagePlus";
-  const mod = parseInt(s[modKey] || 0);
-
-  // Apply modifier BEFORE cap?
-  // Usually modifiers apply to the incoming damage packet.
-  // "Takes 1 more damage" -> incoming + 1.
+  // Apply modifier BEFORE cap
   if (mod > 0) {
     amount += mod;
     logEvent("leaderDamageResistMod", { owner, mod, newAmount: amount });
@@ -153,9 +126,9 @@ export function applyLeaderDamage(owner: Player, amount: number) {
     }
   }
 
-  const cur = s[hpKey] | 0;
+  const cur = getHP(state, owner);
   const next = Math.max(0, cur - (amount | 0));
-  s[hpKey] = next;
+  setHP(state, owner, next);
 
   const actualDamage = cur - next;
 
@@ -173,44 +146,31 @@ export function applyLeaderDamage(owner: Player, amount: number) {
 /* ---------- NEW: effect op for cards ---------- */
 export function handleLeaderBarrierOp(owner: Player, eff: Effect) {
   const target: Player =
-    (eff.player || "self") === "self"
-      ? owner
-      : owner === "blue"
-        ? "red"
-        : "blue";
+    (eff.player || "self") === "self" ? owner : opponentOf(owner);
   // Ignore eff.charges / eff.amount > 1
   grantLeaderBarrier(target, 1);
 }
 // NEW: Recover Evolution Points (capped at starting max)
 export function handleRecoverEP(owner: Player, eff: Effect) {
   const amt = parseInt(eff.amount) || 0;
-  const isBlue =
-    (eff.player || "self") === "self" ? owner === "blue" : owner !== "blue";
+  const targetPlayer: Player =
+    (eff.player || "self") === "self" ? owner : opponentOf(owner);
   const MAX_EP = 2; // Starting maximum for both players
-  if (isBlue) {
-    state.blueEvoCharges = Math.min(MAX_EP, (state.blueEvoCharges || 0) + amt);
-  } else {
-    state.redEvoCharges = Math.min(MAX_EP, (state.redEvoCharges || 0) + amt);
-  }
-  logEvent("recoverEP", { owner: isBlue ? "blue" : "red", amount: amt });
+  const currentEvo = getEvoCharges(state, targetPlayer);
+  setEvoCharges(state, targetPlayer, Math.min(MAX_EP, currentEvo + amt));
+  logEvent("recoverEP", { owner: targetPlayer, amount: amt });
 }
 
 export function handleSetLeaderMaxDamageCap(eff: Effect, owner: Player) {
   const targetPlayerString = eff.player || "self";
   const amount = parseInt(eff.amount as any) || 0;
   const isOpponent = targetPlayerString === "opponent";
-  const targetOwner: Player = isOpponent
-    ? owner === "blue"
-      ? "red"
-      : "blue"
-    : owner;
+  const targetOwner: Player = isOpponent ? opponentOf(owner) : owner;
 
-  const key =
-    targetOwner === "blue" ? "blueLeaderMaxDamageCap" : "redLeaderMaxDamageCap";
-  const expiryKey =
-    targetOwner === "blue"
-      ? "blueLeaderMaxDamageCapExpiry"
-      : "redLeaderMaxDamageCapExpiry";
+  const key = isFirstPlayer(targetOwner) ? "blueLeaderMaxDamageCap" : "redLeaderMaxDamageCap";
+  const expiryKey = isFirstPlayer(targetOwner)
+    ? "blueLeaderMaxDamageCapExpiry"
+    : "redLeaderMaxDamageCapExpiry";
 
   const s = state as any;
   s[key] = amount;
@@ -233,23 +193,31 @@ export function handleSetLeaderMaxDamageCap(eff: Effect, owner: Player) {
 export function handleModifyLeaderDamageReceived(eff: Effect, owner: Player) {
   const targetPlayerString = eff.player || "self";
   const isOpponent = targetPlayerString === "opponent";
-  const targetOwner: Player = isOpponent
-    ? owner === "blue"
-      ? "red"
-      : "blue"
-    : owner;
+  const targetOwner: Player = isOpponent ? opponentOf(owner) : owner;
 
   const amt = parseInt(eff.amount as any) || 0;
 
-  const key =
-    targetOwner === "blue" ? "blueLeaderDamagePlus" : "redLeaderDamagePlus";
-  const s = state as any;
-
-  s[key] = (s[key] || 0) + amt;
+  // Use nested player state
+  state.players[targetOwner].leaderDamageTakenBonus += amt;
 
   logEvent("modifyLeaderDamageReceived", {
     owner: targetOwner,
     amount: amt,
-    total: s[key],
+    total: state.players[targetOwner].leaderDamageTakenBonus,
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -28,7 +28,6 @@ function storeInContext(ctx: DestroyContext, key: string, value: number): void {
     ctx.variables = {};
   }
   ctx.variables[key] = value;
-  console.log(`[Context] Stored ${key} = ${value}`);
 }
 
 // ============================================================================
@@ -346,3 +345,18 @@ function runThenEffects(
 // ============================================================================
 
 export { normalizeToUnifiedSpec, UnifiedDestroySpec } from "./types.js";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

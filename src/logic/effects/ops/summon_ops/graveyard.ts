@@ -3,9 +3,10 @@ import { state } from "../../../../core/gameState.js";
 import { Player } from "../../../../core/types.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { summonNamed } from "./direct.js";
+import { getGraveyard } from "../../../../core/playerHelpers.js";
 
 export function handleSummonDestroyedAmuletHighestBaseCost(owner: Player) {
-  const grave = owner === "blue" ? state.blueGraveyard : state.redGraveyard;
+  const grave = getGraveyard(state, owner);
 
   // Only amulets that actually hit the graveyard (i.e., were destroyed, not banished/bounced)
   const destroyedAmulets = grave.filter((c) => c?.type === "Amulet");
@@ -34,3 +35,18 @@ export function handleSummonDestroyedAmuletHighestBaseCost(owner: Player) {
     owner,
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

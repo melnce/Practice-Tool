@@ -1,7 +1,7 @@
 // src/logic/effects/ops/mode.ts
 import { state } from "../../../core/gameState.js";
-import { hasEarthSigils, consumeEarthSigils } from "./earth.js";
 import { adapter } from "../../../core/adapter.js";
+import { hasEarthSigils, consumeEarthSigils } from "./earth.js";
 // import { spellboostHand } from "./spellboost.js"; // Unused
 // import { handleDrawFiltered } from "./draw.js"; // Unused
 // import { handleReanimate } from "./reanimate.js"; // Unused
@@ -10,6 +10,7 @@ import { fireTrigger } from "../../core/triggers.js";
 import { logEvent } from "../../../core/logger.js";
 import { doAction, appendStep } from "../../../core/history.js";
 import { Effect } from "../../../core/types.js";
+import { getModeBonus } from "../../../core/playerHelpers.js";
 
 // Import types if needed, or define locally if specific to mode
 // ChooseEffect?
@@ -27,8 +28,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
     ? (eff as any).options
     : [];
   const baseSelect = Math.max(1, parseInt((eff as any)?.select_count ?? 1));
-  const bonus =
-    owner === "blue" ? state.blueModeBonus || 0 : state.redModeBonus || 0;
+  const bonus = getModeBonus(state, owner);
   // Clamp to available options
   const selectCount = Math.min(options.length, baseSelect + bonus);
   logEvent("chooseOpen", { owner, options: options.length, selectCount });
@@ -123,8 +123,8 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       requiresER: picked.map((p) => !!p?.requires?.earth_rite),
     });
     logEvent("chooseFinalize", { owner, picked: picked.length, ai: true });
+    // Fire select_mode trigger for each mode chosen (used by Faith crest)
     for (let i = 0; i < picked.length; i++) {
-      // Removed try/catch empty block. fireTrigger should range.
       fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
     }
     const combined: Effect[] = [];
@@ -139,9 +139,8 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
     }
     if (effectsQueue && effectsQueue.length) {
       runEffects(effectsQueue, owner, sourceCard);
-    } else {
-      if (!(globalThis as any).AI_SUPPRESS_RENDER) adapter.render();
     }
+    // Render removed - UI layer handles rendering
     // console.groupEnd();
     return "done";
   }
@@ -159,7 +158,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       () => {
         logEvent("chooseFinalize", { owner, picked: picked.length });
 
-        // Make Faith crest deterministic & undoable: increment once per mode actually chosen
+        // Fire select_mode trigger for each mode chosen (used by Faith crest)
         for (let i = 0; i < picked.length; i++) {
           fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
         }
@@ -181,7 +180,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
         if (effectsQueue && effectsQueue.length) {
           runEffects([...effectsQueue], owner, sourceCard);
         } else {
-          adapter.render();
+          // Render removed - UI layer
         }
         // console.groupEnd();
       },
@@ -240,3 +239,18 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   pickOnce(available);
   return "pending"; // Return pending to pause effect chain while modal is shown
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -8,8 +8,8 @@ import { adapter } from "../../../src/core/adapter";
 
 describe("Bug: Faith Owner Isolation", () => {
   beforeEach(() => {
-    resetGameState();
-    adapter.render = () => {};
+    resetGameState(1);
+    adapter.render = () => { };
   });
 
   it("should only increment the active player crest when select_mode is fired", () => {
@@ -34,28 +34,28 @@ describe("Bug: Faith Owner Isolation", () => {
       ],
     };
 
-    handleGainCrest(crestDef as any, "blue");
-    handleGainCrest(crestDef as any, "red");
+    handleGainCrest(crestDef as any, "first");
+    handleGainCrest(crestDef as any, "second");
 
-    // Verify both exist
-    const blueCrest = state.blueCrests.find(
+    // Verify both exist (now using nested player state)
+    const firstCrest = state.players.first.crests.find(
       (c) => c.name === "Faith: Sham-Nacha, Heir to Entwining",
     );
-    const redCrest = state.redCrests.find(
+    const secondCrest = state.players.second.crests.find(
       (c) => c.name === "Faith: Sham-Nacha, Heir to Entwining",
     );
 
-    expect(blueCrest).toBeDefined();
-    expect(redCrest).toBeDefined();
-    expect(blueCrest!.owner).toBe("blue");
-    expect(redCrest!.owner).toBe("red");
+    expect(firstCrest).toBeDefined();
+    expect(secondCrest).toBeDefined();
+    expect(firstCrest!.owner).toBe("first");
+    expect(secondCrest!.owner).toBe("second");
 
-    // 2. Fire select_mode for BLUE
-    console.log(" firing select_mode for BLUE...");
-    fireTrigger("select_mode", "blue", { sourceCard: null });
+    // 2. Fire select_mode for first player
+    console.log(" firing select_mode for first player...");
+    fireTrigger("select_mode", "first", { sourceCard: null });
 
-    // 3. Verify ONLY Blue increased
-    expect(blueCrest!.counters?.faith || 0).toBe(1);
-    expect(redCrest!.counters?.faith || 0).toBe(0); // Should stay 0
+    // 3. Verify ONLY first player increased
+    expect(firstCrest!.counters?.faith || 0).toBe(1);
+    expect(secondCrest!.counters?.faith || 0).toBe(0); // Should stay 0
   });
 });

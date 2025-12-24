@@ -1,5 +1,6 @@
 import { state } from "../../core/gameState.js";
 import { CardInstance, Player } from "../../core/types.js";
+import { getHand, getBoard } from "../../core/playerHelpers.js";
 
 interface ResolveContext {
   sourceCard?: CardInstance | null;
@@ -68,13 +69,13 @@ export function resolveDynamicValue(
     // if owner provided, resolve for them. If not, default to 0 or derive from source?
     // Safer to require owner in context for non-dependent ops.
     if (context.owner) {
-      const hand = context.owner === "blue" ? state.blueHand : state.redHand;
+      const hand = getHand(state, context.owner);
       return hand.length | 0;
     }
   }
   if (s === "{earth_counter_sum}") {
     if (context.owner) {
-      const board = context.owner === "blue" ? state.blueBoard : state.redBoard;
+      const board = getBoard(state, context.owner);
       return board
         .filter((c) => c?.type === "Amulet" && (c.counters?.earth || 0) > 0)
         .reduce((sum, c) => sum + (c.counters?.earth || 0), 0);
@@ -85,3 +86,18 @@ export function resolveDynamicValue(
   const n = parseInt(s, 10);
   return Number.isFinite(n) ? n : 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

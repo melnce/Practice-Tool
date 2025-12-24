@@ -50,3 +50,17 @@ export function wireClick(id: string, handler: (e: MouseEvent) => void) {
   }
   el.addEventListener("click", handler);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

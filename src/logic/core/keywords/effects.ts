@@ -74,8 +74,8 @@ export function handleKeyword(
   // Fix: Basic "until_end_of_turn: true" on the generic effect should propagate to keywords that support it (like cant_attack)
   const genericExpiryOpts = eff.until_end_of_turn
     ? {
-        expires_on_turn: state.roundCount ?? 0,
-      }
+      expires_on_turn: state.roundCount ?? 0,
+    }
     : undefined;
 
   for (const target of targets) {
@@ -162,6 +162,7 @@ export function handleRemoveAbilities(
 }
 
 import { state } from "../../../core/gameState.js";
+import { getEvoCharges, getSuperEvoCharges } from "../../../core/playerHelpers.js";
 
 // ... (existing imports are fine, just fixing the functions at the end)
 
@@ -188,13 +189,11 @@ export function handleKeywordSelf(
 export function handleConditionalKeyword(eff: Effect, owner: Player) {
   switch (eff.condition) {
     case "super_evo_unlocked": {
-      const charges =
-        owner === "blue" ? state.blueSuperEvoCharges : state.redSuperEvoCharges;
+      const charges = getSuperEvoCharges(state, owner);
       return charges > 0;
     }
     case "evo_unlocked": {
-      const normalCharges =
-        owner === "blue" ? state.blueEvoCharges : state.redEvoCharges;
+      const normalCharges = getEvoCharges(state, owner);
       return normalCharges > 0;
     }
     default:
@@ -204,3 +203,18 @@ export function handleConditionalKeyword(eff: Effect, owner: Player) {
       return false;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

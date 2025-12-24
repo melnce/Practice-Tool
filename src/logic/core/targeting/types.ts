@@ -8,13 +8,27 @@ export { CardInstance, Player, Effect };
 // -----------------------------------------------------------------------------
 
 export interface TargetContext {
+  // Core targeting fields
   targets?: CardInstance[];
   enteringCard?: CardInstance;
   isTargetedEffect?: boolean;
   selectCount?: number;
-  __lloydRequiredFirstUids?: string[];
-  runner?: (...args: any[]) => any; // Injected runEffects
-  [key: string]: any;
+
+  // Combat context
+  attacker?: CardInstance;
+  defender?: CardInstance;
+
+  // Source card reference
+  sourceCard?: CardInstance | null;
+
+  // Cross-effect communication
+  variables?: Record<string, number | string>;
+
+  // Adapter for rendering
+  adapter?: { render: () => void };
+
+  // Injected runEffects function
+  runner?: (...args: any[]) => any;
 }
 
 export interface TargetingEnv {
@@ -26,14 +40,14 @@ export interface TargetingEnv {
 export interface TargetQuery {
   raw: string;
   side:
-    | "ally"
-    | "enemy"
-    | "hand"
-    | "any"
-    | "self"
-    | "selected"
-    | "special"
-    | "attacker";
+  | "ally"
+  | "enemy"
+  | "hand"
+  | "any"
+  | "self"
+  | "selected"
+  | "special"
+  | "attacker";
   specialContext?: "entering_follower" | "last_summoned" | undefined;
   typeFilter?: "follower" | "amulet" | "spell" | undefined;
   condition: any;
@@ -77,3 +91,18 @@ export type DispatchResult =
   | { kind: "handled" }
   | { kind: "paused" }
   | { kind: "error"; reason: string }; // Assuming error state exists or just omitted
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,47 +10,47 @@ import * as path from "path";
 
 describe("Card: Beelzebub, Supreme King", () => {
   beforeEach(() => {
-    resetGameState();
+    resetGameState(1);
   });
 
   describe("Core Logic: Leader Damage Bonus", () => {
     it("should correctly store the damage bonus in state", () => {
-      handleModifyLeaderDamageReceived({ amount: 1 } as any, "red");
-      expect(state.redLeaderDamagePlus).toBe(1);
-      expect(state.blueLeaderDamagePlus).toBe(0);
+      handleModifyLeaderDamageReceived({ amount: 1 } as any, "second");
+      expect(state.players.second.leaderDamageTakenBonus).toBe(1);
+      expect(state.players.first.leaderDamageTakenBonus).toBe(0);
 
-      handleModifyLeaderDamageReceived({ amount: 1 } as any, "red");
-      expect(state.redLeaderDamagePlus).toBe(2); // Stacking
+      handleModifyLeaderDamageReceived({ amount: 1 } as any, "second");
+      expect(state.players.second.leaderDamageTakenBonus).toBe(2); // Stacking
     });
 
     it("should apply the bonus when taking damage", () => {
-      state.redLeaderDamagePlus = 1;
-      state.redHP = 20;
+      state.players.second.leaderDamageTakenBonus = 1;
+      state.players.second.hp = 20;
 
       // Damage 2 + 1 = 3
-      applyLeaderDamage("red", 2);
-      expect(state.redHP).toBe(17);
+      applyLeaderDamage("second", 2);
+      expect(state.players.second.hp).toBe(17);
 
       // Peristent: Damage 1 + 1 = 2
-      applyLeaderDamage("red", 1);
-      expect(state.redHP).toBe(15);
+      applyLeaderDamage("second", 1);
+      expect(state.players.second.hp).toBe(15);
     });
 
     it("should NOT apply bonus for 0 damage or healing", () => {
-      state.redLeaderDamagePlus = 5;
-      state.redHP = 20;
+      state.players.second.leaderDamageTakenBonus = 5;
+      state.players.second.hp = 20;
 
-      applyLeaderDamage("red", 0);
-      expect(state.redHP).toBe(20);
+      applyLeaderDamage("second", 0);
+      expect(state.players.second.hp).toBe(20);
 
-      applyLeaderDamage("red", -5);
-      expect(state.redHP).toBe(20);
+      applyLeaderDamage("second", -5);
+      expect(state.players.second.hp).toBe(20);
     });
 
     it("should respect resetGameState", () => {
-      state.redLeaderDamagePlus = 5;
-      resetGameState();
-      expect(state.redLeaderDamagePlus).toBe(0);
+      state.players.second.leaderDamageTakenBonus = 5;
+      resetGameState(1);
+      expect(state.players.second.leaderDamageTakenBonus).toBe(0);
     });
   });
 

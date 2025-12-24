@@ -33,7 +33,7 @@ export function resolvePendingTarget(uid: string | "leader") {
   }
 
   // Always Render selection updates (engine mutates pending.targets)
-  adapter.render();
+  // Render removed - UI layer
 
   if (result.kind === "continue") {
     return;
@@ -71,7 +71,7 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
     if (opCtx.resumeEffects?.length) {
       runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
     }
-    adapter.render();
+    // Render removed - UI layer
   }
   // If paused, orchestrator relinquishes control (no cleanup).
 }
@@ -126,3 +126,18 @@ function showConfirmationButton(pending: any) {
   };
   adapter.showTargetConfirmationButton(vm);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

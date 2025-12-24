@@ -5,7 +5,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { state, resetGameState } from "../core/gameState.js";
 import { loadBlueDeck, loadRedDeck } from "../data/deckLoader.js";
-import { adapter } from "../core/adapter.js";
 import { loadCardDatabase } from "../data/cardDatabase.js";
 
 import { beginMulligan } from "./mulligan.js";
@@ -13,6 +12,7 @@ import { runEffects } from "./core/effects/index.js";
 import { logEvent } from "../core/logger.js";
 import { CardInstance } from "../core/types.js";
 import { StartGameOptions } from "../core/types.js";
+import { setAnyAllyAttackedThisTurn, setEvoCharges, setSuperEvoCharges, setEvoUsedThisTurn, getDeck, getHand } from "../core/playerHelpers.js";
 
 function resetEvoButtons() {
   ["blueNormalEvo", "blueSuperEvo", "redNormalEvo", "redSuperEvo"].forEach(
@@ -46,8 +46,8 @@ export async function startGame(options: StartGameOptions) {
     seed: finalSeed,
   });
   resetGameState(finalSeed);
-  state.blueAnyAllyAttackedThisTurn = false;
-  state.redAnyAllyAttackedThisTurn = false;
+  setAnyAllyAttackedThisTurn(state, "first", false);
+  setAnyAllyAttackedThisTurn(state, "second", false);
   await loadCardDatabase();
   await import("../core/card_validation.js").then(({ validateCardDatabase }) =>
     validateCardDatabase(),
@@ -64,7 +64,7 @@ export async function startGame(options: StartGameOptions) {
     return check(deck) || check(hand);
   };
 
-  if (hasSham(state.blueDeck, state.blueHand)) {
+  if (hasSham(getDeck(state, "first"), getHand(state, "first"))) {
     runEffects(
       [
         {
@@ -91,13 +91,13 @@ export async function startGame(options: StartGameOptions) {
           ],
         },
       ],
-      "blue",
+      "first",
       null,
       { targets: [] },
     );
   }
 
-  if (hasSham(state.redDeck, state.redHand)) {
+  if (hasSham(getDeck(state, "second"), getHand(state, "second"))) {
     runEffects(
       [
         {
@@ -124,34 +124,49 @@ export async function startGame(options: StartGameOptions) {
           ],
         },
       ],
-      "red",
+      "second",
       null,
       { targets: [] },
     );
   }
 
-  // Reset red boost button (DOM)
-  const redBoost = document.getElementById("redBoost");
-  redBoost?.classList.remove("used");
-  if (redBoost) {
-    redBoost.removeAttribute("disabled");
-    (redBoost as HTMLElement).style.backgroundColor = "orange";
+  // Reset second player PP boost button (DOM)
+  const ppBoostBtn = document.getElementById("secondPlayerPPBoost");
+  ppBoostBtn?.classList.remove("used");
+  if (ppBoostBtn) {
+    ppBoostBtn.removeAttribute("disabled");
+    (ppBoostBtn as HTMLElement).style.backgroundColor = "orange";
   }
 
   // ✅ evolve charges & turn locks
-  state.blueEvoCharges = 2;
-  state.blueSuperEvoCharges = 2;
-  state.redEvoCharges = 2;
-  state.redSuperEvoCharges = 2;
+  setEvoCharges(state, "first", 2);
+  setSuperEvoCharges(state, "first", 2);
+  setEvoCharges(state, "second", 2);
+  setSuperEvoCharges(state, "second", 2);
 
-  state.blueEvoUsedThisTurn = false;
-  state.redEvoUsedThisTurn = false;
+  setEvoUsedThisTurn(state, "first", false);
+  setEvoUsedThisTurn(state, "second", false);
 
   state.gameStarted = true;
-  adapter.render(); // show opening hands
+  // Render removed - UI layer // show opening hands
 
   resetEvoButtons(); // ✅ reset evo UI
 
   // Enter mulligan phase (pauses before turn 1)
   beginMulligan();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
