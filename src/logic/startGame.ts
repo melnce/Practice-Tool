@@ -93,7 +93,7 @@ export async function startGame(options: StartGameOptions) {
       ],
       "first",
       null,
-      { targets: [] },
+      { targets: [], targetUids: [] },
     );
   }
 
@@ -126,7 +126,7 @@ export async function startGame(options: StartGameOptions) {
       ],
       "second",
       null,
-      { targets: [] },
+      { targets: [], targetUids: [] },
     );
   }
 

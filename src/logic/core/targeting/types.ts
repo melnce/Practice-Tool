@@ -4,22 +4,33 @@ import { CardInstance, Player, Effect } from "../../../core/types.js";
 export { CardInstance, Player, Effect };
 
 // -----------------------------------------------------------------------------
-// New Refactor Types (Targeting Logic)
+// Modern Targeting Types (UID-Only)
 // -----------------------------------------------------------------------------
 
+/**
+ * Context passed through effect execution.
+ * 
+ * Uses UID-only targeting for determinism and serialization.
+ * Use resolveUid() to get CardInstance when needed.
+ */
 export interface TargetContext {
-  // Core targeting fields
-  targets?: CardInstance[];
-  enteringCard?: CardInstance;
+  // UID-based targeting (preferred - use when available)
+  targetUids?: string[];
+
+  // Source card (kept for convenience - frequently accessed)  
+  sourceCard?: CardInstance | null;
+  sourceCardUid?: string;
+
+  // Entering card context (for triggers)
+  enteringCardUid?: string;
+
+  // Targeting metadata
   isTargetedEffect?: boolean;
   selectCount?: number;
 
-  // Combat context
-  attacker?: CardInstance;
-  defender?: CardInstance;
-
-  // Source card reference
-  sourceCard?: CardInstance | null;
+  // Combat context (UIDs)
+  attackerUid?: string;
+  defenderUid?: string;
 
   // Cross-effect communication
   variables?: Record<string, number | string>;
@@ -29,6 +40,19 @@ export interface TargetContext {
 
   // Injected runEffects function
   runner?: (...args: any[]) => any;
+
+  // --------------------------------------------------------------------------
+  // DEPRECATED - Object refs for backward compatibility during migration
+  // Use UID-based fields above instead
+  // --------------------------------------------------------------------------
+  /** @deprecated Use targetUids */
+  targets?: CardInstance[];
+  /** @deprecated Use enteringCardUid */
+  enteringCard?: CardInstance;
+  /** @deprecated Use attackerUid */
+  attacker?: CardInstance;
+  /** @deprecated Use defenderUid */
+  defender?: CardInstance;
 }
 
 export interface TargetingEnv {
@@ -70,14 +94,18 @@ export type TargetFilterKey = "follower" | "amulet" | "spell";
 export type TargetSide = TargetContextKey; // Side maps 1:1 to context resolver keys
 
 // -----------------------------------------------------------------------------
-// Legacy / UI Engine Types (Restored)
+// Targeted Operation Context (UID-Only)
 // -----------------------------------------------------------------------------
 
+/**
+ * Context for targeted operation execution.
+ * Uses UID-only targeting for determinism.
+ */
 export interface TargetedOpContext {
   eff: Effect;
   owner: Player;
   sourceCard: CardInstance | null;
-  targets: CardInstance[];
+  targetUids: string[];
   resumeEffects?: Effect[];
 }
 
@@ -90,7 +118,7 @@ export type TargetingResult =
 export type DispatchResult =
   | { kind: "handled" }
   | { kind: "paused" }
-  | { kind: "error"; reason: string }; // Assuming error state exists or just omitted
+  | { kind: "error"; reason: string };
 
 
 

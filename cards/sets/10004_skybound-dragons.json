@@ -2721,7 +2721,7 @@
     "superevolve": [
       {
         "op": "crest",
-        "action": "advance_countdown",
+        "action": "advance",
         "name": "Crest: Belial, Archangel of Cunning",
         "amount": 1
       }

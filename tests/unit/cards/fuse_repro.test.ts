@@ -131,7 +131,8 @@ describe("Fuse Selection (Bug Repro)", () => {
     // We just want to verify the click was processed
     const pending = state.pendingTargetEffect;
     if (pending) {
-      expect(pending.targets?.length).toBeGreaterThan(0);
+      // Use targetUids (UID-only targeting)
+      expect(pending.targetUids?.length).toBeGreaterThan(0);
     } else {
       // Fuse completed immediately
       log("Fuse completed (no pending)");

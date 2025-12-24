@@ -174,11 +174,11 @@ export function initReplayState(
   // Reset to clean state
   resetStateInstance(s, seed);
 
-  // Set up PP
-  s.bluePP = startingPP;
-  s.blueMaxPP = startingPP;
-  s.redPP = startingPP;
-  s.redMaxPP = startingPP;
+  // Set up PP (using nested player state)
+  s.players.first.pp = startingPP;
+  s.players.first.maxPP = startingPP;
+  s.players.second.pp = startingPP;
+  s.players.second.maxPP = startingPP;
 
   if (deckId === "empty") {
     // Empty decks for minimal testing

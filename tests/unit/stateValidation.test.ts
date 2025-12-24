@@ -22,22 +22,23 @@ describe("GameState Validation", () => {
 
     const result = validateGameState(state);
     expect(result.valid).toBe(false);
-    expect(result.issues[0]).toContain("Null/undefined entry in players.first.hand");
+    expect(result.issues[0]).toContain("H3: Null entry in players.first.hand");
 
     expect(() => assertValidGameState(state)).toThrow("Invalid GameState");
   });
 
-  it("detects duplicate instanceIds in active zones", () => {
+  it("detects duplicate UIDs in zones (H1 invariant)", () => {
     resetGameState(1);
-    const card1 = { uid: "c1", name: "C1", instanceId: 100 } as any;
-    const card2 = { uid: "c2", name: "C2", instanceId: 100 } as any;
+    // Use the same UID for both cards - this should trigger H1 violation
+    const card1 = { uid: "duplicate-uid", name: "Card1", instanceId: 100 } as any;
+    const card2 = { uid: "duplicate-uid", name: "Card2", instanceId: 101 } as any;
 
     state.players.first.hand.push(card1);
     state.players.second.board.push(card2);
 
     const result = validateGameState(state);
     expect(result.valid).toBe(false);
-    expect(result.issues[0]).toContain("Duplicate instanceId 100");
+    expect(result.issues[0]).toContain("H1: Duplicate UID");
   });
 
   it("detects invalid numeric fields", () => {
@@ -66,6 +67,6 @@ describe("GameState Validation", () => {
 
     const result = validateGameState(brokenState);
     expect(result.valid).toBe(false);
-    expect(result.issues[0]).toContain("Missing or invalid array: players.first.deck");
+    expect(result.issues[0]).toContain("H3: Missing or invalid array: players.first.deck");
   });
 });

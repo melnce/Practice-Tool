@@ -6,6 +6,7 @@ import { applyKeywordsFromList } from "../../core/keywords.js";
 import { logEvent } from "../../../core/logger.js";
 import { Player, CardInstance, Effect } from "../../../core/types.js";
 import { getHand, getBoard } from "../../../core/playerHelpers.js";
+import { resolveUid } from "../../../core/uidResolver.js";
 
 // ========================================================================
 // UNIFIED TRANSFORM HANDLER - routes by zone field
@@ -87,11 +88,23 @@ export function handleTransform(
     case "board":
     default: {
       // Board transform - get target from context
-      const t =
-        ctx.context?.selectedCard ||
-        ctx.context?.targetCard ||
-        ctx.context?.targets?.[0] ||
-        null;
+      // Prefer UID-based targeting
+      let t: CardInstance | null = null;
+
+      if (ctx.context?.targetUids?.length) {
+        // UID-only path
+        t = resolveUid(ctx.context.targetUids[0]);
+      }
+
+      // Fallback to deprecated object refs
+      if (!t) {
+        t =
+          ctx.context?.selectedCard ||
+          ctx.context?.targetCard ||
+          ctx.context?.targets?.[0] ||
+          null;
+      }
+
       if (t) {
         transformTarget(t, into);
       } else if (ctx.sourceCard && eff.target === "self") {

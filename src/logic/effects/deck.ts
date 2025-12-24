@@ -7,8 +7,9 @@ import { state } from "../../core/gameState.js";
 import { getCardDetails } from "../../data/cardDatabase.js";
 import { shuffleInPlace } from "../../core/utils.js";
 import { logEvent } from "../../core/logger.js";
-import { Effect, Player } from "../../core/types.js";
+import { Effect as _Effect, Player } from "../../core/types.js";
 import { getDeck } from "../../core/playerHelpers.js";
+import { handleHalveDeckCost, reduceDeckFollowersCost } from "./cost.js";
 
 // ========================================================================
 // UNIFIED DECK HANDLER - routes by action field
@@ -35,16 +36,13 @@ export function handleDeck(
             break;
 
         case "cost":
-            void import("./cost.js").then(
-                ({ handleHalveDeckCost, reduceDeckFollowersCost }) => {
-                    if (eff.mode === "halve") {
-                        handleHalveDeckCost(owner);
-                    } else if (eff.filter === "follower") {
-                        const amt = parseInt(eff.amount ?? 1) || 1;
-                        reduceDeckFollowersCost(owner, amt);
-                    }
-                },
-            );
+            // NOTE: Synchronous import ensures deterministic effect execution order
+            if (eff.mode === "halve") {
+                handleHalveDeckCost(owner);
+            } else if (eff.filter === "follower") {
+                const amt = parseInt(eff.amount ?? 1) || 1;
+                reduceDeckFollowersCost(owner, amt);
+            }
             break;
 
         default:

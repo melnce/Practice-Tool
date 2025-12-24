@@ -87,8 +87,9 @@ describe("Bug Bounty: State Validation", () => {
 
         const result = validateGameState(state);
 
-        expect(result.valid).toBe(false);
-        expect(result.issues.some(i => i.includes("non-numeric defense"))).toBe(true);
+        // Non-numeric defense is now a WARNING (W3) not a hard fail
+        // Should be in warns, but still valid since it's a warning not error
+        expect(result.warns.some(i => i.includes("non-numeric defense"))).toBe(true);
     });
 });
 
@@ -117,7 +118,7 @@ describe("Bug Bounty: Board Invariants", () => {
         const result = validateGameState(state);
 
         expect(result.valid).toBe(false);
-        expect(result.issues.some(i => i.includes("overflow"))).toBe(true);
+        expect(result.issues.some(i => i.includes("H4:") && i.includes("exceeds"))).toBe(true);
     });
 });
 

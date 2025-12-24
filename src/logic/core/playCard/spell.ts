@@ -78,7 +78,7 @@ export function playSpell(
   }
 
   if (list.length) {
-    runEffects([...list], player, spellCard, { targets: [] });
+    runEffects([...list], player, spellCard, { targets: [], targetUids: [] });
   }
 
   if (state.pendingTargetEffect) {

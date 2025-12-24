@@ -2,6 +2,7 @@ import { state } from "../../../core/gameState.js";
 import { CardInstance } from "../../../core/types.js";
 import { TargetQuery, TargetingEnv, TargetContextKey } from "./types.js";
 import { getHand, getBoard, opponentOf } from "../../../core/playerHelpers.js";
+import { resolveUid, resolveUids } from "../../../core/uidResolver.js";
 
 type ResolverFn = (query: TargetQuery, env: TargetingEnv) => CardInstance[];
 
@@ -16,6 +17,11 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
       return Array.isArray(ls) ? ls : ls ? [ls] : [];
     }
     if (q.specialContext === "entering_follower") {
+      // Prefer UID resolution, fallback to deprecated object ref
+      if (env.context.enteringCardUid) {
+        const card = resolveUid(env.context.enteringCardUid);
+        return card ? [card] : [];
+      }
       if (env.context.enteringCard) {
         return [env.context.enteringCard];
       }
@@ -30,12 +36,15 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
   // -------------------------------------------------------------------------
 
   selected: (q, env) => {
-    // LEGACY: Nested selection hierarchy.
-    // Prefer context.targets (pass-down) over state.pending (global).
+    // Prefer UID-based selection
+    if (env.context?.targetUids?.length) {
+      return resolveUids(env.context.targetUids);
+    }
+    // Fallback to deprecated object refs
     const chosen = Array.isArray(env.context?.targets)
       ? env.context.targets
-      : Array.isArray(state.pendingTargetEffect?.targets)
-        ? state.pendingTargetEffect!.targets
+      : Array.isArray(state.pendingTargetEffect?.targetUids)
+        ? resolveUids(state.pendingTargetEffect!.targetUids)
         : [];
 
     return (chosen || []).filter(Boolean);
@@ -46,6 +55,11 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
   // -------------------------------------------------------------------------
 
   attacker: (q, env) => {
+    // Prefer UID resolution
+    if (env.context?.attackerUid) {
+      const card = resolveUid(env.context.attackerUid);
+      return card ? [card] : [];
+    }
     return env.context?.attacker ? [env.context.attacker] : [];
   },
 

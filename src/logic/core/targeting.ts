@@ -3,6 +3,7 @@ import { state } from "../../core/gameState.js";
 import { CardInstance, Effect, Player } from "../../core/types.js";
 import { guardLifecycle } from "./targeting/guards.js";
 import { getBoard, getHand, getGraveyard } from "../../core/playerHelpers.js";
+import { toUids, toUid } from "../../core/uidResolver.js";
 
 // Refactored Imports
 import {
@@ -117,7 +118,12 @@ export function handleSelect(
     const picks = pickRandomTargets(pool, effectiveCount, state.rng);
 
     clearSelectableFlags();
-    const selectedCtx = { ...targetedCtx, targets: picks };
+    // Populate both object refs (deprecated) and UIDs (preferred)
+    const selectedCtx = {
+      ...targetedCtx,
+      targets: picks,
+      targetUids: toUids(picks),
+    };
 
     // Execute nested effects with selected targets
     if (Array.isArray(eff.effects) && eff.effects.length) {
@@ -132,13 +138,17 @@ export function handleSelect(
   }
 
   // 7. Manual selection: set up pending state for UI
+  // Populate both object refs (deprecated) and UIDs (preferred)
   state.pendingTargetEffect = {
     eff: { op: "nested_effects" as any, effects: eff.effects ?? [] },
     owner,
     sourceCard,
+    sourceCardUid: toUid(sourceCard),
     resumeEffects: effectsQueue,
     pool,
+    poolUids: toUids(pool),
     targets: [],
+    targetUids: [],
     selectCount: effectiveCount,
   };
 

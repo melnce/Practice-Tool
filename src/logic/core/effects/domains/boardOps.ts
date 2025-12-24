@@ -6,9 +6,6 @@ export const BOARD_OPS = [
   // Unified return - replaces return_to_hand, bounce, return_hand_to_deck
   "return",
 
-  // Unified amulet - handles amulet countdown (instance-based)
-  "amulet",
-
   // Transform
   "transform",
 ] as const;

@@ -6,7 +6,8 @@ import { setPendingTarget } from "../core/pendingTarget/index.js";
 
 import { logEvent } from "../../core/logger.js";
 import { Player, Effect } from "../../core/types.js";
-import { getHand, getGraveyard, addShadows, isFirstPlayer } from "../../core/playerHelpers.js";
+import { getHand, getGraveyard, addShadows } from "../../core/playerHelpers.js";
+import { toUids } from "../../core/uidResolver.js";
 
 // ========================================================================
 // UNIFIED DISCARD HANDLER - routes by mode field
@@ -82,8 +83,10 @@ export function handleDiscardSelectHand(
     owner,
     sourceCard: null,
     pool,
+    poolUids: toUids(pool),
     selectCount,
     targets: [],
+    targetUids: [],
     resumeEffects,
   } as any);
 

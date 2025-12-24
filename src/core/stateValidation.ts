@@ -1,80 +1,112 @@
+// src/core/stateValidation.ts
+// Post-op invariant validator - implements H1-H8 hard fail invariants from OP audit
+
 import type { GameState, CardInstance } from "./types.js";
 
 export interface GameStateValidationResult {
   valid: boolean;
-  issues: string[];
+  fails: string[];  // HARD FAIL - game state is corrupt
+  warns: string[];  // WARNING - suspicious but recoverable
+  issues: string[]; // Legacy compatibility - combines fails + warns
 }
 
+// =============================================================================
+// MAIN VALIDATOR
+// =============================================================================
+
 export function validateGameState(state: GameState): GameStateValidationResult {
-  const issues: string[] = [];
+  const fails: string[] = [];
+  const warns: string[] = [];
 
   if (!state || typeof state !== "object") {
-    return { valid: false, issues: ["State is null or not an object"] };
+    return { valid: false, fails: ["State is null or not an object"], warns: [], issues: ["State is null or not an object"] };
   }
 
-  // 1. Check critical arrays exist in nested player structure
+  // Check players structure exists
   if (!state.players?.first || !state.players?.second) {
-    issues.push("Missing players.first or players.second");
-    return { valid: false, issues };
+    fails.push("H3: Missing players.first or players.second");
+    return { valid: false, fails, warns, issues: [...fails, ...warns] };
   }
 
-  const arrayFieldsFirst = ["hand", "board", "deck", "graveyard"] as const;
-  const arrayFieldsSecond = ["hand", "board", "deck", "graveyard"] as const;
+  // =========================================================================
+  // H1: UNIQUE UIDs - No duplicate uid across all zones
+  // =========================================================================
+  const allCards = collectAllCards(state);
+  const uidSet = new Set<string>();
+  for (const card of allCards) {
+    if (card.uid) {
+      if (uidSet.has(card.uid)) {
+        fails.push(`H1: Duplicate UID ${card.uid} (${card.name})`);
+      }
+      uidSet.add(card.uid);
+    }
+  }
 
-  for (const field of arrayFieldsFirst) {
-    if (!Array.isArray(state.players.first[field])) {
-      issues.push(`Missing or invalid array: players.first.${field}`);
-    } else {
-      // Check for nulls/undefined in arrays
-      const arr = state.players.first[field] as any[];
+  // =========================================================================
+  // H3: ZONE CONSISTENCY - Card in exactly one zone
+  // =========================================================================
+  for (const player of ["first", "second"] as const) {
+    const zones = ["hand", "board", "deck", "graveyard"] as const;
+    for (const zone of zones) {
+      const arr = state.players[player][zone] as CardInstance[];
+      if (!Array.isArray(arr)) {
+        fails.push(`H3: Missing or invalid array: players.${player}.${zone}`);
+        continue;
+      }
+      // Check for null entries
       for (let i = 0; i < arr.length; i++) {
         if (!arr[i]) {
-          issues.push(`Null/undefined entry in players.first.${field} at index ${i}`);
+          fails.push(`H3: Null entry in players.${player}.${zone}[${i}]`);
+        }
+      }
+      // Check owner matches zone location
+      for (const card of arr) {
+        if (card && card.owner && card.owner !== player) {
+          warns.push(`H3: Card ${card.name} (${card.uid}) in ${player}.${zone} has owner=${card.owner}`);
         }
       }
     }
   }
 
-  for (const field of arrayFieldsSecond) {
-    if (!Array.isArray(state.players.second[field])) {
-      issues.push(`Missing or invalid array: players.second.${field}`);
-    } else {
-      // Check for nulls/undefined in arrays
-      const arr = state.players.second[field] as any[];
-      for (let i = 0; i < arr.length; i++) {
-        if (!arr[i]) {
-          issues.push(`Null/undefined entry in players.second.${field} at index ${i}`);
-        }
-      }
+  // =========================================================================
+  // H4: BOARD CAP - board.length <= 5 per player
+  // =========================================================================
+  const BOARD_MAX = 5;
+  if (state.players.first.board.length > BOARD_MAX) {
+    fails.push(`H4: First board exceeds ${BOARD_MAX}: ${state.players.first.board.length}`);
+  }
+  if (state.players.second.board.length > BOARD_MAX) {
+    fails.push(`H4: Second board exceeds ${BOARD_MAX}: ${state.players.second.board.length}`);
+  }
+
+  // =========================================================================
+  // H5: SINGLE activePlayer - Must be "first" or "second"
+  // =========================================================================
+  if (state.activePlayer !== "first" && state.activePlayer !== "second") {
+    fails.push(`H5: Invalid activePlayer: ${state.activePlayer}`);
+  }
+
+  // =========================================================================
+  // H6: HP BOUNDS - 0 <= hp <= maxHP
+  // =========================================================================
+  for (const player of ["first", "second"] as const) {
+    const hp = state.players[player].hp;
+    const maxHP = state.players[player].maxHP ?? 20;
+
+    if (typeof hp !== "number" || !Number.isFinite(hp)) {
+      fails.push(`H6: ${player}.hp is not a finite number: ${hp}`);
+    } else if (hp > maxHP) {
+      warns.push(`H6: ${player}.hp (${hp}) exceeds maxHP (${maxHP})`);
+    }
+    // Note: hp can go below 0 (overkill damage) but warn if very negative
+    if (typeof hp === "number" && hp < -100) {
+      warns.push(`H6: ${player}.hp unusually negative: ${hp}`);
     }
   }
 
-  // 2. Check Instance ID uniqueness (only across active zones where collision matters most)
-  const activeZones = [
-    { player: "first" as const, fields: ["hand", "board"] as const },
-    { player: "second" as const, fields: ["hand", "board"] as const },
-  ];
-  const seenIds = new Set<string | number>();
-
-  for (const { player, fields } of activeZones) {
-    for (const field of fields) {
-      const arr = state.players[player][field] as CardInstance[];
-      if (Array.isArray(arr)) {
-        for (const c of arr) {
-          if (c && c.instanceId !== undefined) {
-            if (seenIds.has(c.instanceId)) {
-              issues.push(
-                `Duplicate instanceId ${c.instanceId} found in players.${player}.${field}`,
-              );
-            }
-            seenIds.add(c.instanceId);
-          }
-        }
-      }
-    }
-  }
-
-  // 3. Check numeric bounds (conservative) - using nested structure
+  // =========================================================================
+  // NUMERIC FIELD VALIDATION (negative checks)
+  // =========================================================================
   const numericChecks = [
     { val: state.players.first.pp, name: "first.pp" },
     { val: state.players.second.pp, name: "second.pp" },
@@ -88,55 +120,77 @@ export function validateGameState(state: GameState): GameStateValidationResult {
   ];
 
   for (const { val, name } of numericChecks) {
-    if (typeof val !== "number" || !Number.isFinite(val) || val < 0) {
-      issues.push(`Invalid numeric field ${name}: ${val}`);
+    if (typeof val !== "number" || !Number.isFinite(val)) {
+      fails.push(`Invalid numeric field ${name}: ${val}`);
+    } else if (val < 0) {
+      warns.push(`Negative value for ${name}: ${val}`);
     }
   }
 
-  // HP can be negative (death), but must be finite number
-  if (typeof state.players.first.hp !== "number" || !Number.isFinite(state.players.first.hp))
-    issues.push(`Invalid first.hp: ${state.players.first.hp}`);
-  if (typeof state.players.second.hp !== "number" || !Number.isFinite(state.players.second.hp))
-    issues.push(`Invalid second.hp: ${state.players.second.hp}`);
-
-  // 4. Board size invariant (max 5 followers)
-  const BOARD_MAX = 5;
-  if (Array.isArray(state.players.first.board) && state.players.first.board.length > BOARD_MAX) {
-    issues.push(`First player board overflow: ${state.players.first.board.length} > ${BOARD_MAX}`);
-  }
-  if (Array.isArray(state.players.second.board) && state.players.second.board.length > BOARD_MAX) {
-    issues.push(`Second player board overflow: ${state.players.second.board.length} > ${BOARD_MAX}`);
-  }
-
-  // 5. activePlayer validation (single source of truth)
-  if (state.activePlayer !== "first" && state.activePlayer !== "second") {
-    issues.push(`Invalid activePlayer: ${state.activePlayer}`);
+  // =========================================================================
+  // W1: COUNTDOWN NUMERIC - countdown >= 0 for amulets
+  // =========================================================================
+  for (const player of ["first", "second"] as const) {
+    for (const card of state.players[player].board) {
+      if (card?.type === "Amulet" && card.hasCountdown) {
+        const cd = Number(card.countdown);
+        if (!Number.isFinite(cd) || cd < 0) {
+          warns.push(`W1: Amulet ${card.name} has invalid countdown: ${card.countdown}`);
+        }
+      }
+    }
   }
 
-  // 6. Defense type validation (should be number, not string)
-  const boards = [
-    { name: "first.board", arr: state.players.first.board },
-    { name: "second.board", arr: state.players.second.board },
-  ];
-  for (const { name, arr } of boards) {
-    if (Array.isArray(arr)) {
-      for (const card of arr) {
-        if (card && card.type === "Follower") {
-          if (typeof card.defense !== "number") {
-            issues.push(
-              `${name}: card "${card.name}" has non-numeric defense: ${typeof card.defense}`
-            );
-          }
+  // =========================================================================
+  // W3: STATS NON-NEGATIVE - attack >= 0, defense >= 0 for followers
+  // =========================================================================
+  for (const player of ["first", "second"] as const) {
+    for (const card of state.players[player].board) {
+      if (card?.type === "Follower") {
+        const atk = Number(card.attack);
+        const def = Number(card.defense);
+        if (typeof card.defense !== "number") {
+          warns.push(`W3: ${player}.board: ${card.name} has non-numeric defense: ${typeof card.defense}`);
+        }
+        if (atk < 0) {
+          warns.push(`W3: ${card.name} has negative attack: ${atk}`);
+        }
+        if (def < 0) {
+          warns.push(`W3: ${card.name} has negative defense: ${def}`);
         }
       }
     }
   }
 
   return {
-    valid: issues.length === 0,
-    issues,
+    valid: fails.length === 0,
+    fails,
+    warns,
+    issues: [...fails, ...warns],
   };
 }
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+function collectAllCards(state: GameState): CardInstance[] {
+  const cards: CardInstance[] = [];
+  for (const player of ["first", "second"] as const) {
+    const zones = ["hand", "board", "deck", "graveyard"] as const;
+    for (const zone of zones) {
+      const arr = state.players[player][zone];
+      if (Array.isArray(arr)) {
+        cards.push(...arr.filter((c) => c != null));
+      }
+    }
+  }
+  return cards;
+}
+
+// =============================================================================
+// ASSERTION HELPER
+// =============================================================================
 
 export function assertValidGameState(
   state: GameState,
@@ -146,7 +200,21 @@ export function assertValidGameState(
   if (!result.valid) {
     const msg =
       `Invalid GameState${context ? ` (${context})` : ""}:\n` +
-      result.issues.map((i) => `- ${i}`).join("\n");
+      `HARD FAILS:\n` +
+      result.fails.map((i) => `  - ${i}`).join("\n") +
+      (result.warns.length > 0
+        ? `\nWARNINGS:\n` + result.warns.map((i) => `  - ${i}`).join("\n")
+        : "");
     throw new Error(msg);
   }
 }
+
+// Legacy compatibility - returns {valid, issues} format
+export function validateGameStateLegacy(state: GameState): { valid: boolean; issues: string[] } {
+  const result = validateGameState(state);
+  return {
+    valid: result.valid,
+    issues: [...result.fails, ...result.warns],
+  };
+}
+

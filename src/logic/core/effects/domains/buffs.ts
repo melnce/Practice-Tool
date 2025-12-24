@@ -7,6 +7,7 @@ import { handleKeyword } from "../../../effects/ops/keyword/unified.js";
 import { handleCost } from "../../../effects/ops/cost/unified.js";
 import { handleSpellboost } from "../../../effects/ops/spellboost/unified.js";
 import { handleCounter } from "../../../effects/ops/counter/unified.js";
+import { handleCountdown } from "../../../effects/ops/countdown/unified.js";
 import { applyAttacksPerTurn } from "../../../effects/attacks.js";
 import { getTargetingContext } from "../context.js";
 
@@ -42,6 +43,7 @@ export function registerBuffEffects() {
             ...tCtx,
             sourceCard: ctx.sourceCard,
             targets: (ctx.context as any)?.targets,
+            targetUids: (ctx.context as any)?.targetUids,
         };
         const opCtx = {
             ...merged,
@@ -95,6 +97,7 @@ export function registerBuffEffects() {
             setPendingTarget({
                 ...res.request,
                 targets: [],
+                targetUids: [],
             });
             highlightSelectable(res.request.pool);
             return "pending";
@@ -121,6 +124,14 @@ export function registerBuffEffects() {
     // ==========================================================================
     registerOp("spellboost", (eff, ctx) => {
         handleSpellboost(eff as any, ctx.owner, ctx.sourceCard, ctx.context);
+    });
+
+    // ==========================================================================
+    // UNIFIED COUNTDOWN - handles amulet and crest countdown timers
+    // Standalone op eliminating the amulet/crest redirect pattern
+    // ==========================================================================
+    registerOp("countdown", (eff, ctx) => {
+        handleCountdown(eff as any, { owner: ctx.owner, source: ctx.sourceCard });
     });
 }
 

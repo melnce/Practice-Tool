@@ -1311,7 +1311,7 @@
             "effects": [
               {
                 "op": "crest",
-                "action": "advance_countdown",
+                "action": "advance",
                 "name": "Octrice, Hollowness Manifest",
                 "amount": 1
               }
@@ -1323,7 +1323,7 @@
             "effects": [
               {
                 "op": "crest",
-                "action": "advance_countdown",
+                "action": "advance",
                 "name": "Octrice, Hollowness Manifest",
                 "amount": 1
               }
@@ -1528,8 +1528,8 @@
             "count": 1
           },
           {
-            "op": "amulet",
-            "action": "reduce_countdown",
+            "op": "countdown",
+            "action": "advance",
             "amount": 1
           }
         ]
@@ -3269,8 +3269,8 @@
             "op": "repeat_effect",
             "count_source": "crest_count",
             "effect": {
-              "op": "amulet",
-              "action": "reduce_countdown",
+              "op": "countdown",
+              "action": "advance",
               "amount": 1
             }
           }
@@ -3322,8 +3322,8 @@
         "cost": 1,
         "effects": [
           {
-            "op": "amulet",
-            "action": "reduce_countdown",
+            "op": "countdown",
+            "action": "advance",
             "amount": 1
           }
         ]
@@ -3467,8 +3467,8 @@
             "op": "repeat_effect",
             "count_source": "crest_count",
             "effect": {
-              "op": "amulet",
-              "action": "reduce_countdown",
+              "op": "countdown",
+              "action": "advance",
               "amount": 1
             }
           }

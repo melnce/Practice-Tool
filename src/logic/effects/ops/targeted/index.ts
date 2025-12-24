@@ -11,14 +11,14 @@ import { bounceToHand } from "../bounce.js";
 import { resolveReturnHandToDeck } from "../returnHandToDeck.js";
 // clearSelectableFlags is NOT imported because handlers must not use it.
 import { fireTrigger } from "../../../core/triggers.js";
-import { summonExactCopyFromHand } from "../summon.js";
 import { resolveAmountWithOverflow } from "../damage/index.js";
 import { handleFuse } from "../fuse/unified.js";
 import { handleEvolveSelf } from "../evolve.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
-import { CardInstance, Effect, Player } from "../../../../core/types.js";
-import { isFirstPlayer, getHand, getGraveyard, getBoard, addShadows, getHP, setHP, opponentOf } from "../../../../core/playerHelpers.js";
+import { CardInstance } from "../../../../core/types.js";
+import { getHand, getGraveyard, getBoard, addShadows, getHP, setHP, opponentOf } from "../../../../core/playerHelpers.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 import {
   TargetedOpContext,
   DispatchResult,
@@ -32,7 +32,6 @@ import {
 type TargetedOpHandler = (ctx: TargetedOpContext) => DispatchResult;
 const TARGETED_OP_HANDLERS: Map<string, TargetedOpHandler> = new Map();
 
-// Accessors for testing
 // Accessors for testing
 export function __getRegisteredTargetedOps(): string[] {
   return Array.from(TARGETED_OP_HANDLERS.keys());
@@ -54,15 +53,11 @@ export function __registerMockHandler(op: string, handler: TargetedOpHandler) {
 export function dispatchTargetedOp(opCtx: TargetedOpContext): DispatchResult {
   const handler = TARGETED_OP_HANDLERS.get(opCtx.eff.op);
   if (!handler) {
-    // Step 2: Actionable Error
-    const targetsSummary = opCtx.targets
-      .map((t) => `${t.name}(${t.uid})`)
-      .join(", ");
     const errorMsg = [
       `[dispatchTargetedOp] Unknown op: "${opCtx.eff.op}"`,
       `Source: ${opCtx.sourceCard?.name || "Unknown"} (${opCtx.sourceCard?.uid})`,
       `Owner: ${opCtx.owner}`,
-      `Targets (${opCtx.targets.length}): ${targetsSummary}`,
+      `TargetUids: ${opCtx.targetUids.join(", ")}`,
     ].join(" | ");
     throw new Error(errorMsg);
   }
@@ -75,11 +70,15 @@ export function dispatchTargetedOp(opCtx: TargetedOpContext): DispatchResult {
   }
 }
 
-// Handler Definitions
+// =============================================================================
+// Handler Definitions - UID-Only Targeting
 // Contract: Handlers mutate state only. No cleanup, no resumeEffects, no render.
+// All handlers use resolveUids() to get CardInstance[] from targetUids.
+// =============================================================================
 
 TARGETED_OP_HANDLERS.set("damage", (ctx) => {
-  const { eff, owner, sourceCard, targets } = ctx;
+  const { eff, owner, sourceCard, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   const amt = resolveAmountWithOverflow(eff, owner, { sourceCard });
   if (amt) {
     for (const target of targets) {
@@ -91,10 +90,11 @@ TARGETED_OP_HANDLERS.set("damage", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("transform", (ctx) => {
-  const { eff, owner, targets } = ctx;
+  const { eff, owner, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   const intoName = String(eff.into ?? (eff as any).name ?? "").trim();
   const target = targets?.[0];
-  if (!target || !intoName) return { kind: "handled" }; // Failure to resolve is still "handled" (no-op)
+  if (!target || !intoName) return { kind: "handled" };
   const firstHand = getHand(state, "first");
   const secondHand = getHand(state, "second");
   if (firstHand.includes(target) || secondHand.includes(target))
@@ -105,7 +105,8 @@ TARGETED_OP_HANDLERS.set("transform", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
-  const { eff, targets, owner } = ctx;
+  const { eff, targetUids, owner } = ctx;
+  const targets = resolveUids(targetUids);
   for (const target of targets) {
     for (const k of (eff as any).keywords || []) {
       const name = (typeof k === "string" ? k : k?.name) || "";
@@ -113,18 +114,18 @@ TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
       opts.request_owner = owner;
       applyKeyword(target, name, opts);
     }
-    // Note: UI badge injection removed - handled by UI layer via keywordState inspection
   }
   return { kind: "handled" };
 });
 
 TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
-  const { owner, targets } = ctx;
+  const { owner, targetUids } = ctx;
   const hand = getHand(state, owner);
   const grave = getGraveyard(state, owner);
   const discarded: CardInstance[] = [];
-  for (const t of targets) {
-    const idx = hand.findIndex((c) => c.uid === t.uid);
+
+  for (const uid of targetUids) {
+    const idx = hand.findIndex((c) => c.uid === uid);
     if (idx !== -1) {
       const [d] = hand.splice(idx, 1);
       if (d) {
@@ -133,8 +134,9 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
       }
     }
   }
-  if (targets.length > 0) {
-    addShadows(state, owner, targets.length);
+
+  if (targetUids.length > 0) {
+    addShadows(state, owner, targetUids.length);
   }
   if (discarded.length) {
     state.lastDiscardedCosts = discarded.map(
@@ -150,7 +152,8 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("stat", (ctx) => {
-  const { eff, owner, targets } = ctx;
+  const { eff, owner, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   const a = parseInt((eff as any).attack || 0) || 0;
   const d = parseInt((eff as any).defense || 0) || 0;
   const rawTribes = (eff as any).tribes
@@ -201,9 +204,9 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("banish", (ctx) => {
-  const { owner, targets } = ctx;
+  const { owner, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   for (const target of targets) {
-    // Note: banishCard() in primitives.ts fires ally/enemy_follower_leaves_field
     banishCard(target);
     logEvent("banish", { owner, target: target.name });
   }
@@ -211,7 +214,8 @@ TARGETED_OP_HANDLERS.set("banish", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("return", (ctx) => {
-  const { owner, targets, eff } = ctx;
+  const { owner, targetUids, eff } = ctx;
+  const targets = resolveUids(targetUids);
   const destination = (eff as any).destination ?? "hand";
   for (const target of targets) {
     if (destination === "hand") {
@@ -226,14 +230,16 @@ TARGETED_OP_HANDLERS.set("return", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("remove_keyword", (ctx) => {
-  const { eff, owner, targets } = ctx;
+  const { eff, owner, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   const { select: _s, ...payload } = eff;
   handleRemoveKeyword(payload as any, owner, targets);
   return { kind: "handled" };
 });
 
 TARGETED_OP_HANDLERS.set("destroy", (ctx) => {
-  const { owner, targets } = ctx;
+  const { owner, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   for (const target of targets) {
     const firstBoard = getBoard(state, "first");
     const secondBoard = getBoard(state, "second");
@@ -246,12 +252,12 @@ TARGETED_OP_HANDLERS.set("destroy", (ctx) => {
       logEvent("destroy", { owner, target: target.name });
   }
   cleanupDead();
-  // State cleanup moved to Orchestrator
   return { kind: "handled" };
 });
 
 TARGETED_OP_HANDLERS.set("destroy_then", (ctx) => {
-  const { eff, owner, sourceCard, targets } = ctx;
+  const { eff, owner, sourceCard, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   let destroyedCount = 0;
   for (const target of targets) {
     const firstBoard = getBoard(state, "first");
@@ -268,24 +274,21 @@ TARGETED_OP_HANDLERS.set("destroy_then", (ctx) => {
   }
   cleanupDead();
   if (destroyedCount > 0 && Array.isArray((eff as any).effects)) {
-    // Run nested effects (immediate mutation)
     runEffects([...(eff as any).effects], owner, sourceCard, {
-      selectedCard: targets?.[0] || null,
-      targets,
+      targetUids,
     });
   }
-  // State cleanup moved to Orchestrator
   return { kind: "handled" };
 });
 
-// Handler for damage effects with select (including fallback_leader)
+// Damage handler with fallback_leader support
 TARGETED_OP_HANDLERS.set("damage", (ctx) => {
-  const { eff, owner, targets } = ctx;
+  const { eff, owner, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   const target = targets[0];
   const amt = (eff as any).amount as number;
   const oppOwner = opponentOf(owner);
   if (!target) {
-    // No target selected - if fallback_leader is true, damage enemy leader
     if ((eff as any).fallback_leader) {
       setHP(state, oppOwner, Math.max(0, getHP(state, oppOwner) - amt));
     }
@@ -299,14 +302,14 @@ TARGETED_OP_HANDLERS.set("damage", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("super_evolve_ally", (ctx) => {
-  const { owner, sourceCard, targets } = ctx;
+  const { owner, sourceCard, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   const target = targets?.[0];
   if (!target) return { kind: "handled" };
   if (sourceCard && target.uid === sourceCard.uid) return { kind: "handled" };
   if (target.hasEvolved) return { kind: "handled" };
   handleEvolveSelf(target, owner, { mode: "super", spendPoint: false });
   logEvent("evolve", { owner, target: target.name, mode: "super" });
-  // adapter.render() moved to Orchestrator
   return { kind: "handled" };
 });
 
@@ -319,7 +322,8 @@ TARGETED_OP_HANDLERS.set("super_evolve_self", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("evolve_and_buff", (ctx) => {
-  const { eff, targets } = ctx;
+  const { eff, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   const target = targets[0];
   if (!target) return { kind: "handled" };
   if (!target.base_attack)
@@ -346,68 +350,47 @@ TARGETED_OP_HANDLERS.set("evolve_and_buff", (ctx) => {
   return { kind: "handled" };
 });
 
-// Unified fuse handler - replaces 6 legacy fuse_finalize_* handlers
 TARGETED_OP_HANDLERS.set("fuse", (ctx) => {
-  const { eff, owner, sourceCard, targets } = ctx;
-  handleFuse(eff as any, owner, sourceCard, [], { targets });
+  const { eff, owner, sourceCard, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
+  handleFuse(eff as any, owner, sourceCard, [], { targetUids });
   return { kind: "handled" };
 });
 
-// Legacy summon handlers (select_hand_summon_artifact_copy, select_hand_summon_artifact_copies_eot_destroy)
-// now routed through unified summon op with source: "hand"
-
 TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
-  const { eff, owner, sourceCard, targets } = ctx;
+  const { eff, owner, sourceCard, targetUids } = ctx;
+  const targets = resolveUids(targetUids);
   doAction(
     "Resolve Targets",
     () => {
       for (const target of targets) {
         for (const nestedEff of (eff as any).effects || []) {
           if (nestedEff.op === "set_stats") {
-            // Ensure buffs object exists
             if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
 
             if (nestedEff.attack !== undefined) {
               target.attack = parseInt(nestedEff.attack);
               target.potential_attack = target.attack as number;
               target.base_attack = target.attack as number;
-              target.buffs.attack = 0; // Reset attack buff
+              target.buffs.attack = 0;
             }
             if (nestedEff.defense !== undefined) {
               target.defense = parseInt(nestedEff.defense);
               target.potential_defense = target.defense as number;
               target.base_defense = target.defense as number;
               target.peak_defense = target.defense as number;
-              target.buffs.defense = 0; // Reset defense buff - this fixes the damaged UI issue
+              target.buffs.defense = 0;
             }
           } else {
             runWithBypass(() => {
-              // Pass targets explicitly so downstream ops (like keyword) know what to affect
-              runEffects([nestedEff], owner, target, { targets: [target] });
+              runEffects([nestedEff], owner, target, { targetUids: [target.uid] });
             });
           }
         }
       }
-
-      // State cleanup moved to Orchestrator
     },
     { op: eff?.op, owner, source: sourceCard?.name },
     { autoRender: true },
   );
   return { kind: "handled" };
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

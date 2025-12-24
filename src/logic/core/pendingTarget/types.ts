@@ -5,15 +5,21 @@ import { Effect, Player, CardInstance } from "../../../core/types.js";
 
 /**
  * Shape of a pending target selection request.
- * This matches the existing pendingTargetEffect structure.
+ * Uses UID-only targeting for determinism and serialization.
  */
 export interface PendingTargetRequest {
   eff: Effect;
   owner: Player;
+
+  // Source card (kept for convenience)
   sourceCard: CardInstance | null;
-  targets: CardInstance[];
+  sourceCardUid?: string;
+
+  // UID-based targeting (required)
+  targetUids: string[];
+  poolUids: string[];
+
   selectCount: number;
-  pool: CardInstance[];
   resumeEffects?: Effect[];
   canTargetLeader?: boolean;
 
@@ -23,7 +29,7 @@ export interface PendingTargetRequest {
 
 export type PendingTargetResult =
   | { status: "pending" }
-  | { status: "resolved"; targets: CardInstance[] };
+  | { status: "resolved"; targetUids: string[] };
 
 
 

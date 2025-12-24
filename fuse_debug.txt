@@ -140,11 +140,16 @@ pendingTargetEffect after startFuse: {
   "targets": [],
   "resumeEffects": [],
   "requiresConfirmation": true,
-  "confirmationText": "Fuse Selected Gears"
+  "confirmationText": "Fuse Selected Gears",
+  "targetUids": [],
+  "poolUids": [
+    "uid_izkkhjrd"
+  ],
+  "sourceCardUid": "uid_03jmyljh"
 }
 Cards __uiSelectable: Gear of Ambition: false, Gear of Remembrance: true
 Selectable cards: Gear of Remembrance
 Pool before select: ["Gear of Remembrance"]
 Targeting gear2 UID: uid_izkkhjrd
-Targets after select: ["Gear of Remembrance"]
+Targets after select: []
 pendingTargetEffect exists: true

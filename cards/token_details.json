@@ -2115,7 +2115,7 @@
       },
       {
         "op": "crest",
-        "action": "delay_countdown",
+        "action": "delay",
         "amount": 1
       }
     ],

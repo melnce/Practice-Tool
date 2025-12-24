@@ -9,6 +9,7 @@ import { consumeEarthSigils } from "../../../effects/ops/earth.js";
 import { handleFuse } from "../../../effects/ops/fuse/unified.js";
 // Legacy import removed: startFortifierFuse (now handled by fuse op with type: "fortifier")
 import { handleCrest } from "../../../effects/ops/crest/unified.js";
+import { handleDeck } from "../../../effects/deck.js";
 import { logEvent } from "../../../../core/logger.js";
 import { getAdapter } from "../context.js";
 import { enqueueManyFront } from "../queue.js";
@@ -146,11 +147,10 @@ export function registerResourceEffects() {
     // UNIFIED DECK - replaces replace_deck, replace_deck_with_set_minus,
     // halve_deck_cost, reduce_deck_followers_cost
     // set_cost_last_drawn is now handled by cost op with target: "last_drawn"
+    // NOTE: Synchronous import ensures deterministic effect execution order
     // ========================================================================
     registerOp("deck", (eff, ctx) => {
-        void import("../../../effects/deck.js").then(({ handleDeck }) => {
-            handleDeck(eff, ctx.owner, { adapter: getAdapter(ctx) });
-        });
+        handleDeck(eff, ctx.owner, { adapter: getAdapter(ctx) });
     });
 
     // ========================================================================

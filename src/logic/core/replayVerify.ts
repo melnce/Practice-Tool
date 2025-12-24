@@ -13,12 +13,12 @@ export interface ReplayDiff {
   finalStateHashMatch: boolean;
 
   firstTraceDiff?:
-    | {
-        index: number;
-        left: EffectTraceEvent | undefined;
-        right: EffectTraceEvent | undefined;
-      }
-    | undefined;
+  | {
+    index: number;
+    left: EffectTraceEvent | undefined;
+    right: EffectTraceEvent | undefined;
+  }
+  | undefined;
 
   summary: {
     leftEvents: number;
@@ -58,6 +58,10 @@ function traceEventEqual(
       if (b.kind !== "effect_pending") return false;
       return a.op === b.op;
 
+    case "effect_hash":
+      if (b.kind !== "effect_hash") return false;
+      return a.op === b.op && a.hash === b.hash;
+
     case "dispatch_end":
       if (b.kind !== "dispatch_end") return false;
       return a.processed === b.processed && a.remaining === b.remaining;
@@ -92,6 +96,7 @@ export function diffReplays(a: ReplayCapsule, b: ReplayCapsule): ReplayDiff {
     "effect_start",
     "effect_end",
     "effect_pending",
+    "effect_hash",
     "dispatch_end",
   ];
 
@@ -174,6 +179,8 @@ function formatTraceEvent(e: EffectTraceEvent | undefined): string {
       return `effect_end(op=${e.op})`;
     case "effect_pending":
       return `effect_pending(op=${e.op})`;
+    case "effect_hash":
+      return `effect_hash(op=${e.op}, hash=${e.hash})`;
     case "dispatch_end":
       return `dispatch_end(processed=${e.processed}, remaining=${e.remaining})`;
   }

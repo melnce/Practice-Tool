@@ -46,7 +46,7 @@ export function validateTargetSelection(
 
       if (poolHasOpponent) {
         const lloydUids = new Set(lloyds.map((l) => l.uid));
-        const firstPick = !pending.targets || pending.targets.length === 0;
+        const firstPick = !pending.targetUids || pending.targetUids.length === 0;
 
         const safeCount =
           typeof pending.selectCount === "number" &&

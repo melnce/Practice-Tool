@@ -1532,8 +1532,8 @@
         "cost": 2,
         "effects": [
           {
-            "op": "amulet",
-            "action": "reduce_countdown",
+            "op": "countdown",
+            "action": "advance",
             "amount": 2
           }
         ]
@@ -1658,8 +1658,8 @@
         "cost": 1,
         "effects": [
           {
-            "op": "amulet",
-            "action": "reduce_countdown",
+            "op": "countdown",
+            "action": "advance",
             "amount": 1
           }
         ]

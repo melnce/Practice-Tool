@@ -140,8 +140,8 @@ async function main() {
     checkStateB,
   );
 
-  const actualA = checkStateA.blueDeck.slice(0, 5).map((c: any) => c.name);
-  const actualB = checkStateB.blueDeck.slice(0, 5).map((c: any) => c.name);
+  const actualA = checkStateA.players.first.deck.slice(0, 5).map((c: any) => c.name);
+  const actualB = checkStateB.players.first.deck.slice(0, 5).map((c: any) => c.name);
 
   // Expected values - populate these after first run triggers failure with actuals
   const goldenA: string[] = [

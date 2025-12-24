@@ -11,8 +11,11 @@ export const BUFF_OPS = [
     "cost",
 
     // Unified counter - replaces add_counter (handles card counters like earth, faith)
-    // NOTE: Countdown ops (reduce_countdown, delay_countdown) are in countdown module, not here
     "counter",
+
+    // Unified countdown - handles amulet and crest countdown timers
+    // NOTE: This is now a standalone op, eliminating the amulet/crest redirect
+    "countdown",
 
     // Unified spellboost - replaces 5 legacy spellboost ops
     // spellboost_transform is now handled by unified transform op with zone: "hand"

@@ -6,6 +6,7 @@ import { clearSelectableFlags } from "./targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { doAction } from "../../core/history.js";
 import { applyTargetClick, TargetedOpContext } from "./targeting/index.js";
+import { resolveUids } from "../../core/uidResolver.js";
 import {
   dispatchTargetedOp,
   __getRegisteredTargetedOps,
@@ -13,7 +14,6 @@ import {
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
-// Legacy sentinels are removed as contract is now strict
 
 /**
  * Handles a click on a target (card or leader) when a targeting effect is pending.
@@ -31,9 +31,6 @@ export function resolvePendingTarget(uid: string | "leader") {
     if (result.reason) console.warn(result.reason);
     return;
   }
-
-  // Always Render selection updates (engine mutates pending.targets)
-  // Render removed - UI layer
 
   if (result.kind === "continue") {
     return;
@@ -71,7 +68,6 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
     if (opCtx.resumeEffects?.length) {
       runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
     }
-    // Render removed - UI layer
   }
   // If paused, orchestrator relinquishes control (no cleanup).
 }
@@ -87,20 +83,25 @@ function showConfirmationButton(pending: any) {
     doAction(
       "Confirm Targets",
       () => {
+        // Build UID-only opCtx
+        const targetUids = pending.targetUids || [];
         const opCtx: TargetedOpContext = {
           eff: pending.eff,
           owner: pending.owner,
           sourceCard: pending.sourceCard,
-          targets: pending.targets,
+          targetUids,
           resumeEffects: pending.resumeEffects,
         };
 
+        // Log with resolved targets for debugging
+        const resolvedTargets = resolveUids(targetUids);
         logEvent("targetsConfirmed", {
           op: opCtx.eff.op,
           owner: opCtx.owner,
           source: opCtx.sourceCard?.name,
           sourceUid: opCtx.sourceCard?.uid,
-          targets: (opCtx.targets || []).map((t: any) => ({
+          targetUids,
+          targets: resolvedTargets.map((t) => ({
             name: t?.name,
             uid: t?.uid,
             type: t?.type,
@@ -122,22 +123,7 @@ function showConfirmationButton(pending: any) {
     pending,
     onConfirm,
     text: pending.confirmationText || "Confirm Selection",
-    count: Array.isArray(pending.targets) ? pending.targets.length : 0,
+    count: Array.isArray(pending.targetUids) ? pending.targetUids.length : 0,
   };
   adapter.showTargetConfirmationButton(vm);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

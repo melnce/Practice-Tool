@@ -431,6 +431,16 @@ export interface SpellboostEffect extends BaseEffect {
     count?: number | string;
 }
 
+// Unified countdown op - handles amulet and crest countdown timers
+export type CountdownOps = Extract<EffectOp, "countdown">;
+export interface CountdownEffect extends BaseEffect {
+    op: CountdownOps;
+    action?: "advance" | "delay";
+    amount?: number;
+    target?: "self" | string;
+    name?: string; // crest name for name-based targeting
+}
+
 // --- Misc ---
 // Note: gate has GateOps, evolve has EvolveOps, combo_add/set_deckout_victory have SpecialOps
 export type MiscOps = Extract<
@@ -492,8 +502,9 @@ type MappedOps = { [K in DamageOps]: Exact<DamageEffect, K> } & {
 } & { [K in AttacksOps]: Exact<AttacksEffect, K> } & {
     [K in KeywordOps]: Exact<KeywordEffect, K>;
 } & { [K in CostOps]: Exact<CostEffect, K> } & {
-    [K in CounterOps]: Exact<CounterEffect, K>;
-} & { [K in SpellboostOps]: Exact<SpellboostEffect, K> } & {
+} & { [K in CounterOps]: Exact<CounterEffect, K> } & {
+    [K in SpellboostOps]: Exact<SpellboostEffect, K>;
+} & { [K in CountdownOps]: Exact<CountdownEffect, K> } & {
     [K in MiscOps]: Exact<MiscEffect, K>;
 } & { [K in EvolveOps]: Exact<EvolveEffect, K> } & {
     [K in SpecialOps]: Exact<SpecialEffect, K>;
@@ -550,20 +561,30 @@ export interface EffectCondition {
 /**
  * Context object passed through effect execution chain.
  * Replaces `context: any` throughout the codebase.
+ * 
+ * UID-based fields (targetUids, etc.) are preferred for determinism.
  */
 export interface EffectContext {
-    /** Selected targets from targeting system */
+    // UID-based targeting (preferred for determinism)
+    targetUids?: string[];
+    enteringCardUid?: string;
+    attackerUid?: string;
+    defenderUid?: string;
+
+    // Object refs (deprecated - use UIDs instead)
+    /** @deprecated Use targetUids */
     targets?: CardInstance[];
-    /** Card entering the field (for enter triggers) */
+    /** @deprecated Use enteringCardUid */
     enteringCard?: CardInstance;
+    /** @deprecated Use defenderUid */
+    defender?: CardInstance;
+    /** @deprecated Use attackerUid */
+    attacker?: CardInstance;
+
     /** Flag indicating this effect requires targeting */
     isTargetedEffect?: boolean;
     /** Number of targets to select */
     selectCount?: number;
-    /** Defender in combat context */
-    defender?: CardInstance;
-    /** Attacker in combat context */
-    attacker?: CardInstance;
     /** Cross-effect communication variables */
     variables?: Record<string, number | string>;
     /** Adapter reference for rendering */
@@ -733,6 +754,10 @@ export interface GameState {
         canTargetLeader?: boolean | undefined;
         requiresConfirmation?: boolean | undefined;
         confirmationText?: string | undefined;
+        // UID-based fields (preferred for serialization)
+        sourceCardUid?: string;
+        poolUids?: string[];
+        targetUids?: string[];
     }
     | undefined;
     lastSummoned: CardInstance[];

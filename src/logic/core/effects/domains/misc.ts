@@ -1,4 +1,4 @@
-import { registerOp, EffectCtx } from "../registry.js";
+import { registerOp, EffectCtx as _EffectCtx } from "../registry.js";
 import { handleSelect, TargetContext } from "../../targeting.js";
 import { runEffects } from "../index.js";
 import { handleMode } from "../../../effects/ops/mode.js";
@@ -6,11 +6,9 @@ import { handleModeBonus } from "../../../effects/ops/misc.js";
 import { handleRepeatEffect } from "../../../effects/repeat.js";
 import { handleEvolve } from "../../../effects/ops/evolve/unified.js";
 import { handleGate } from "../../../effects/gates/unified.js";
-import { Effect } from "../../../../core/types.js";
-
-const stub = (_op: string) => (_eff: Effect, _ctx: EffectCtx) => {
-  // console.warn(`[Stub] Op '${op}' called but not implemented.`);
-};
+import { incrementSkyboundArt } from "../../../effects/skybound.js";
+import { state } from "../../../../core/gameState.js";
+import { Effect as _Effect } from "../../../../core/types.js";
 
 export function registerMiscEffects() {
   registerOp("mode", handleMode as any);
@@ -48,17 +46,16 @@ export function registerMiscEffects() {
     handleRepeatEffect(eff, ctx.owner, ctx.sourceCard, ctx.queue),
   );
 
-  registerOp("set_deckout_victory", stub("set_deckout_victory"));
+  // set_deckout_victory - enables alternate win condition when opponent decks out
+  registerOp("set_deckout_victory", (_eff, ctx) => {
+    state.players[ctx.owner].deckoutWins = true;
+  });
 
   // Skybound
+  // NOTE: Synchronous import ensures deterministic effect execution order
   registerOp("boost_skybound_art_hand", (eff, ctx) => {
     const amt = Number(eff.amount ?? 1);
-    // Dynamic import to avoid cycles if any (though skybound.ts is leaf)
-    import("../../../effects/skybound.js")
-      .then(({ incrementSkyboundArt }) => {
-        incrementSkyboundArt(ctx.owner, amt);
-      })
-      .catch((e) => console.error("Failed to load skybound module:", e));
+    incrementSkyboundArt(ctx.owner, amt);
   });
 }
 

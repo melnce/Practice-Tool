@@ -1,7 +1,6 @@
 import { registerOp } from "../registry.js";
 import { handleSummon } from "../../../effects/ops/summon/index.js";
 import { handleReturn } from "../../../effects/ops/return/unified.js";
-import { handleAmulet } from "../../../effects/ops/amulet/unified.js";
 import { handleTransform } from "../../../effects/ops/transform.js";
 
 export function registerBoardEffects() {
@@ -13,6 +12,7 @@ export function registerBoardEffects() {
       owner: ctx.owner,
       sourceCard: ctx.sourceCard,
       targets: (ctx.context as any)?.targets || [],
+      targetUids: (ctx.context as any)?.targetUids || [],
       ...((ctx.context as object) || {}),
     };
     handleSummon(eff, ctx.owner, ctx.queue, summonCtx);
@@ -55,12 +55,7 @@ export function registerBoardEffects() {
     });
   });
 
-  // ==========================================================================
-  // UNIFIED AMULET - handles amulet countdown (instance-based targeting)
-  // ==========================================================================
-  registerOp("amulet", (eff, ctx) => {
-    handleAmulet(eff as any, { owner: ctx.owner, source: ctx.sourceCard });
-  });
+  // NOTE: "amulet" op removed - use "countdown" op instead
 }
 
 import { BOARD_OPS } from "./boardOps.js";

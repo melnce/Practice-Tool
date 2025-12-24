@@ -7,7 +7,7 @@ import { state } from "../../../../core/gameState.js";
 import { Crest, completeCrest } from "../../crest.js";
 import { getCrests } from "../../../../core/playerHelpers.js";
 
-export type CountdownAction = "advance" | "increase";
+export type CountdownAction = "advance" | "delay";
 
 export interface CountdownHandlerContext {
     owner: Player;
@@ -19,8 +19,8 @@ export interface CountdownHandlerContext {
  * Works for both amulets (CardInstance) and crests (Crest).
  * 
  * Actions:
- * - "advance" (or "advance_countdown"): Reduce countdown (move toward 0)
- * - "increase" (or "delay_countdown"): Increase countdown (delay expiry)
+ * - "advance": Reduce countdown (move toward 0)
+ * - "delay": Increase countdown (delay expiry)
  * 
  * Targeting:
  * - target: "self" → uses ctx.source (amulet or crest)
@@ -53,14 +53,14 @@ export function handleCountdown(eff: Effect, ctx: CountdownHandlerContext): void
 }
 
 /**
- * Normalize action string to canonical form
+ * Normalize action string to canonical form (advance or delay)
  */
 function normalizeAction(action: string): CountdownAction {
-    if (action === "advance" || action === "advance_countdown" || action === "reduce" || action === "reduce_countdown") {
+    if (action === "advance") {
         return "advance";
     }
-    if (action === "increase" || action === "delay_countdown") {
-        return "increase";
+    if (action === "delay") {
+        return "delay";
     }
     return "advance"; // default
 }
