@@ -12,6 +12,7 @@ export default defineConfig({
       "tests/unit/**/*.test.ts",
       "tests/integration/**/*.test.ts",
       "tests/golden/**/*.test.ts",
+      "tests/mechanics/**/*.test.ts",
     ],
     exclude: ["tests/_dev/**", "tests/regression/**"],
     setupFiles: ["./tests/fixtures/setup.ts"],

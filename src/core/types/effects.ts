@@ -117,6 +117,15 @@ export interface DrawEffect extends BaseEffect {
     keyword?: string;
 }
 
+/** Search op - filtered deck search with shuffle */
+export type SearchOps = Extract<EffectOp, "search">;
+export interface SearchEffect extends BaseEffect {
+    op: SearchOps;
+    count?: number;
+    filter?: Record<string, any>;
+    filters?: Record<string, any>;
+}
+
 /** Unified discard op - mode field handles select/except_named variants */
 export type HandOps = Extract<EffectOp, "discard">;
 export interface HandEffect extends BaseEffect {
@@ -339,19 +348,20 @@ type MappedOps = { [K in DamageOps]: Exact<DamageEffect, K> } & {
 { [K in ResourceOps]: Exact<ResourceEffect, K> } & {
     [K in GateOps]: Exact<GateEffect, K>;
 } & { [K in DrawOps]: Exact<DrawEffect, K> } & {
-    [K in HandOps]: Exact<HandEffect, K>;
+    [K in SearchOps]: Exact<SearchEffect, K>
+} & { [K in HandOps]: Exact<HandEffect, K>;
 } & { [K in DeckOps]: Exact<DeckEffect, K> } & {
-    [K in CrestOps]: Exact<CrestEffect, K>;
-} & { [K in FuseOps]: Exact<FuseEffect, K> } & {
-    [K in SummonOps]: Exact<SummonEffect, K>;
+    [K in CrestOps]: Exact<CrestEffect, K> } & {
+    [K in FuseOps]: Exact<FuseEffect, K> } & {
+    [K in SummonOps]: Exact<SummonEffect, K>
 } & { [K in ReturnOps]: Exact<ReturnEffect, K> } & {
-    [K in AmuletOps]: Exact<AmuletEffect, K>;
+    [K in AmuletOps]: Exact<AmuletEffect, K>
 } & { [K in TransformOps]: Exact<TransformEffect, K> } & {
     [K in BuffOps]: Exact<BuffEffect, K>;
-} & { [K in AttacksOps]: Exact<AttacksEffect, K> } & {
-    [K in KeywordOps]: Exact<KeywordEffect, K>;
-} & { [K in CostOps]: Exact<CostEffect, K> } & {
-    [K in CounterOps]: Exact<CounterEffect, K>;
+} & { [K in AttacksOps]: Exact<AttacksEffect, K>;
+} & { [K in KeywordOps]: Exact<KeywordEffect, K>;
+} & { [K in CostOps]: Exact<CostEffect, K>;
+} & { [K in CounterOps]: Exact<CounterEffect, K>;
 } & { [K in SpellboostOps]: Exact<SpellboostEffect, K> } & {
     [K in CountdownOps]: Exact<CountdownEffect, K>;
 } & { [K in MiscOps]: Exact<MiscEffect, K> } & {

@@ -211,10 +211,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Follower"
         }
       }
@@ -577,10 +576,9 @@
         "target": "ally:hand"
       },
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "follower",
           "class": "Swordcraft"
         }
@@ -638,15 +636,14 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "draw",
-        "source": "deck",
-        "filters": {
-          "name": "Rusty, Luxcard Trickster"
-        },
+        "op": "search",
         "count": "all",
         "keywords": [
           "Storm"
-        ]
+        ],
+        "filter": {
+          "name": "Rusty, Luxcard Trickster"
+        }
       }
     ],
     "fanfare": [],
@@ -1270,10 +1267,9 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw",
-                "source": "deck",
+                "op": "search",
                 "count": 1,
-                "filters": {
+                "filter": {
                   "type": "follower"
                 }
               }

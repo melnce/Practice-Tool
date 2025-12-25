@@ -1803,10 +1803,9 @@
         },
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
+            "op": "search",
             "count": 1,
-            "filters": {
+            "filter": {
               "type": "follower",
               "class": "dragoncraft"
             }
@@ -2109,10 +2108,9 @@
         "condition": "overflow",
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
+            "op": "search",
             "count": 1,
-            "filters": {
+            "filter": {
               "type": "follower",
               "class": "dragoncraft"
             }
@@ -2895,10 +2893,9 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw",
-                "source": "deck",
+                "op": "search",
                 "count": 1,
-                "filters": {
+                "filter": {
                   "type": "Follower"
                 }
               }
@@ -2908,10 +2905,9 @@
             "label": "Draw a 3-cost spell",
             "effects": [
               {
-                "op": "draw",
-                "source": "deck",
+                "op": "search",
                 "count": 1,
-                "filters": {
+                "filter": {
                   "type": "Spell",
                   "cost_eq": 3
                 }

@@ -5,17 +5,11 @@ import { state } from "../../../../core/gameState.js";
 import { drawCard } from "../../../../core/utils.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
-import {
-  normalizeCardFilter,
-  buildCardPredicate,
-} from "../../../core/cardFilter/index.js";
 
 import { UnifiedDrawSpec, normalizeToUnifiedSpec } from "./types.js";
 import {
   getDeck,
   getHand,
-  removeFromDeck,
-  moveToHand,
   applyKeywords,
   trackLastDrawn,
   getComboCount,
@@ -38,6 +32,19 @@ export function handleDraw(
   eff: Effect & Record<string, any>,
   owner: Player,
 ): void {
+  // ========================================================================
+  // MIGRATION GUARD: Draw no longer supports filters
+  // Use "search" op for filtered deck searches (shuffles after)
+  // ========================================================================
+  if (eff.filters || eff.filter) {
+    throw new Error(
+      `[draw] MIGRATION REQUIRED: "draw" op no longer supports "filters". ` +
+      `Use "search" op for filtered deck searches. ` +
+      `Change { "op": "draw", "source": "deck", "filters": {...} } to { "op": "search", "filter": {...} }. ` +
+      `Effect: ${JSON.stringify(eff)}`
+    );
+  }
+
   const spec = normalizeToUnifiedSpec(eff);
 
   // Determine who draws
@@ -61,11 +68,7 @@ export function handleDraw(
     case "deck":
     default: {
       const deck = getDeck(drawingPlayer);
-      if (spec.filters) {
-        drawFiltered(deck, hand, spec, count, drawingPlayer);
-      } else {
-        drawSimple(deck, hand, count, drawingPlayer);
-      }
+      drawSimple(deck, hand, count, drawingPlayer);
       break;
     }
   }
@@ -154,94 +157,7 @@ function drawSimple(
   }
 }
 
-// ============================================================================
-// INTERNAL: FILTERED DRAW (with filters)
-// ============================================================================
 
-/**
- * Filtered draw - search deck for matching cards.
- * Respects mode (topmost/random) and applies keywords.
- */
-function drawFiltered(
-  deck: CardInstance[],
-  hand: CardInstance[],
-  spec: UnifiedDrawSpec,
-  count: number,
-  player: Player,
-): void {
-  const normalizedFilter = normalizeCardFilter(spec.filters!);
-  const matches = buildCardPredicate(normalizedFilter);
-
-  // Find all matching indices (0 = bottom, high = top)
-  const matchingIndices: number[] = [];
-  for (let i = 0; i < deck.length; i++) {
-    const card = deck[i];
-    if (card && matches(card)) {
-      matchingIndices.push(i);
-    }
-  }
-
-  if (matchingIndices.length === 0) return;
-
-  // Determine how many to draw
-  const want =
-    spec.count === "all"
-      ? matchingIndices.length
-      : Math.min(count, matchingIndices.length);
-  if (want <= 0) return;
-
-  // Select indices based on mode
-  let selectedIndices: number[];
-  if (spec.mode === "random") {
-    selectedIndices = shuffleAndTake(matchingIndices, want);
-  } else {
-    // Topmost = highest indices first
-    selectedIndices = matchingIndices
-      .sort((a, b) => b - a) // Descending (top first)
-      .slice(0, want);
-  }
-
-  // Sort descending for removal (remove highest first to maintain indices)
-  selectedIndices.sort((a, b) => b - a);
-
-  // Draw selected cards
-  for (const idx of selectedIndices) {
-    if (hand.length >= 9) break; // MAX_HAND
-
-    const card = removeFromDeck(deck, idx);
-    if (!card) continue;
-
-    // Apply keywords if specified
-    if (spec.keywords.length > 0) {
-      applyKeywords(card, spec.keywords);
-    }
-
-    trackLastDrawn(card);
-    if (!moveToHand(hand, card)) break;
-  }
-
-  logEvent("draw", {
-    owner: player,
-    mode: spec.mode,
-    filtered: true,
-    moved: selectedIndices.length,
-    keywords: spec.keywords.length > 0 ? spec.keywords : undefined,
-  });
-}
-
-// ============================================================================
-// INTERNAL: SHUFFLE HELPER
-// ============================================================================
-
-function shuffleAndTake(indices: number[], want: number): number[] {
-  // Fisher-Yates shuffle
-  const arr = [...indices];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = state.rng.nextInt(i + 1);
-    [arr[i], arr[j]] = [arr[j]!, arr[i]!];
-  }
-  return arr.slice(0, want).sort((a, b) => b - a);
-}
 
 // ============================================================================
 // EXPORTS

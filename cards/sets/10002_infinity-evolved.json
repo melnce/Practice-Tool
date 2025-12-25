@@ -828,10 +828,9 @@
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Spell"
         }
       }
@@ -905,10 +904,9 @@
         "cost": 5,
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
+            "op": "search",
             "count": 1,
-            "filters": {
+            "filter": {
               "type": "follower",
               "class": "Swordcraft",
               "cost_lte": 2
@@ -1173,10 +1171,9 @@
         "optional": true
       },
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Spell"
         }
       }
@@ -1399,20 +1396,18 @@
     "url": "https://shadowverse.gg/cards/10233110-owen-mysterian-swordsman",
     "evolve": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "Follower"
         }
       }
     ],
     "superevolve": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "Follower"
         }
       }
@@ -1843,12 +1838,11 @@
         "condition": "overflow",
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
-            "filters": {
+            "op": "search",
+            "count": 1,
+            "filter": {
               "name": "Call of the Megalorca"
-            },
-            "count": 1
+            }
           }
         ]
       }

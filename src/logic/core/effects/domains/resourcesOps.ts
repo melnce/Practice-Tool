@@ -15,6 +15,10 @@ export const RESOURCE_OPS = [
   // Replaces add_to_hand, add_selected_copy_to_hand
   "draw",
 
+  // Search - filtered deck search with shuffle
+  // Distinct from draw for AI training (intentional vs random acquisition)
+  "search",
+
   // Unified discard - replaces discard_select_hand, discard_all_except_named
   // mode: "select" = select cards to discard (default)
   // mode: "except_named" = discard all except named cards

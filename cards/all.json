@@ -211,10 +211,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Follower"
         }
       }
@@ -577,10 +576,9 @@
         "target": "ally:hand"
       },
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "follower",
           "class": "Swordcraft"
         }
@@ -638,15 +636,14 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "draw",
-        "source": "deck",
-        "filters": {
-          "name": "Rusty, Luxcard Trickster"
-        },
+        "op": "search",
         "count": "all",
         "keywords": [
           "Storm"
-        ]
+        ],
+        "filter": {
+          "name": "Rusty, Luxcard Trickster"
+        }
       }
     ],
     "fanfare": [],
@@ -1270,10 +1267,9 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw",
-                "source": "deck",
+                "op": "search",
                 "count": 1,
-                "filters": {
+                "filter": {
                   "type": "follower"
                 }
               }
@@ -2346,10 +2342,9 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Follower"
         }
       }
@@ -3788,10 +3783,9 @@
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "follower",
           "class": "Swordcraft"
         }
@@ -6332,10 +6326,9 @@
     "url": "https://shadowverse.gg/cards/10161110-angelic-prism-priestess",
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Amulet"
         }
       }
@@ -8799,10 +8792,9 @@
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Spell"
         }
       }
@@ -8876,10 +8868,9 @@
         "cost": 5,
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
+            "op": "search",
             "count": 1,
-            "filters": {
+            "filter": {
               "type": "follower",
               "class": "Swordcraft",
               "cost_lte": 2
@@ -9144,10 +9135,9 @@
         "optional": true
       },
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Spell"
         }
       }
@@ -9370,20 +9360,18 @@
     "url": "https://shadowverse.gg/cards/10233110-owen-mysterian-swordsman",
     "evolve": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "Follower"
         }
       }
     ],
     "superevolve": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "Follower"
         }
       }
@@ -9814,12 +9802,11 @@
         "condition": "overflow",
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
-            "filters": {
+            "op": "search",
+            "count": 1,
+            "filter": {
               "name": "Call of the Megalorca"
-            },
-            "count": 1
+            }
           }
         ]
       }
@@ -13298,10 +13285,9 @@
         },
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
+            "op": "search",
             "count": 1,
-            "filters": {
+            "filter": {
               "type": "follower",
               "class": "dragoncraft"
             }
@@ -13604,10 +13590,9 @@
         "condition": "overflow",
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
+            "op": "search",
             "count": 1,
-            "filters": {
+            "filter": {
               "type": "follower",
               "class": "dragoncraft"
             }
@@ -14390,10 +14375,9 @@
             "label": "Draw a follower",
             "effects": [
               {
-                "op": "draw",
-                "source": "deck",
+                "op": "search",
                 "count": 1,
-                "filters": {
+                "filter": {
                   "type": "Follower"
                 }
               }
@@ -14403,10 +14387,9 @@
             "label": "Draw a 3-cost spell",
             "effects": [
               {
-                "op": "draw",
-                "source": "deck",
+                "op": "search",
                 "count": 1,
-                "filters": {
+                "filter": {
                   "type": "Spell",
                   "cost_eq": 3
                 }
@@ -15709,12 +15692,11 @@
             "name": "Draw 2 followers",
             "effects": [
               {
-                "op": "draw",
-                "source": "deck",
-                "filters": {
+                "op": "search",
+                "count": 2,
+                "filter": {
                   "type": "Follower"
-                },
-                "count": 2
+                }
               }
             ]
           }
@@ -15754,13 +15736,12 @@
         "cost": 8,
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
-            "filters": {
+            "op": "search",
+            "count": 1,
+            "filter": {
               "type": "Follower",
               "cost_gte": 7
-            },
-            "count": 1
+            }
           },
           {
             "op": "pp",
@@ -16816,10 +16797,9 @@
     "url": "https://shadowverse.gg/cards/10431110-philosophia-cryptic-sophist",
     "fanfare": [
       {
-        "op": "draw",
-        "source": "deck",
+        "op": "search",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Spell"
         }
       }

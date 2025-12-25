@@ -1,6 +1,7 @@
 import { registerOp } from "../registry.js";
 import { state } from "../../../../core/gameState.js";
 import { handleDraw } from "../../../effects/ops/draw/index.js";
+import { handleSearch } from "../../../effects/ops/search/index.js";
 import { handleDiscard } from "../../../effects/hand.js";
 // Legacy imports removed: handleReplaceDeck, handleSetCostLastDrawn (now in unified deck/cost ops)
 import { consumeEarthSigils } from "../../../effects/ops/earth.js";
@@ -129,6 +130,12 @@ export function registerResourceEffects() {
     // source: "named" = generate card by name (replaces add_to_hand)
     // source: "copy" = copy selected card (replaces add_selected_copy_to_hand)
     registerOp("draw", (eff, ctx) => handleDraw(eff, ctx.owner));
+
+    // ========================================================================
+    // SEARCH - distinct from draw for AI training semantics
+    // Searches deck for matching cards, adds to hand, shuffles deck
+    // ========================================================================
+    registerOp("search", (eff, ctx) => handleSearch(eff, ctx.owner));
 
     // ========================================================================
     // UNIFIED DISCARD - replaces discard_select_hand, discard_all_except_named
