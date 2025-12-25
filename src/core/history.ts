@@ -2,7 +2,7 @@
 import { state } from "./gameState.js";
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
-import { GameState } from "./types.js";
+import type { GameState } from "./types/index.js";
 import { validateGameState } from "./stateValidation.js";
 import { hashGameState, ReplayStep } from "./stateHash.js";
 

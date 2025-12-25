@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Player } from "../../../../core/types.js";
+import { Player } from "../../../../core/types/index.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
 import { boardOf } from "./utils.js";

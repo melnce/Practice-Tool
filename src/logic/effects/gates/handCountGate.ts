@@ -1,6 +1,6 @@
 // src/logic/effects/gates/handCountGate.ts
 import { state } from "../../../core/gameState.js";
-import { Player } from "../../../core/types.js";
+import { Player } from "../../../core/types/index.js";
 import { getHand, opponentOf } from "../../../core/playerHelpers.js";
 
 /**

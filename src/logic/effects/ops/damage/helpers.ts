@@ -7,7 +7,7 @@ import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
 import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
-import { Effect, CardInstance, Player } from "../../../../core/types.js";
+import { Effect, CardInstance, Player } from "../../../../core/types/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getBoard, getHP } from "../../../../core/playerHelpers.js";
 

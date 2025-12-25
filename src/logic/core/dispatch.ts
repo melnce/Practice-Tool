@@ -10,7 +10,7 @@ import {
   PlayerAction,
   ActionType,
   ActionByType,
-} from "../../core/types.js";
+} from "../../core/types/index.js";
 import { endTurnBlue, endTurnRed } from "./turns.js";
 import { playCardNoRender } from "./playCard/index.js";
 import { attackFollower, attackLeader } from "./combat.js";

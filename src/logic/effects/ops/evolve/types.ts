@@ -1,6 +1,6 @@
 // src/logic/effects/ops/evolve/types.ts
 
-import { Effect } from "../../../../core/types.js";
+import { Effect } from "../../../../core/types/index.js";
 
 /**
  * Target for an evolve operation.

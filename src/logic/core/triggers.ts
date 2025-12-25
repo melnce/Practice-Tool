@@ -1,5 +1,5 @@
 import { state } from "../../core/gameState.js";
-import { Player } from "../../core/types.js";
+import { Player } from "../../core/types/index.js";
 import { TriggerContext, TriggerEventName } from "./triggers/types.js";
 import { dispatchEvent } from "./triggers/dispatcher.js";
 import { registerRunEffectsInProcess } from "./triggers/process.js";

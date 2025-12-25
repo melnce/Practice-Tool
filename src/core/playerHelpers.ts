@@ -7,7 +7,7 @@
  * All logic uses PlayerSlot ("first" / "second").
  */
 
-import { GameState, Player, PlayerSlot, CardInstance, PlayerState } from "./types.js";
+import type { GameState, Player, PlayerSlot, CardInstance, PlayerState } from "./types/index.js";
 
 // ============================================================================
 // PLAYER SLOT HELPERS

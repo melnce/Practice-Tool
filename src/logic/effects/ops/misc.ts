@@ -2,7 +2,7 @@
 
 import { state } from "../../../core/gameState.js";
 import { applyLeaderDamage } from "../leader.js";
-import { Player, CardInstance, Effect } from "../../../core/types.js";
+import { Player, CardInstance, Effect } from "../../../core/types/index.js";
 import { getBoard, opponentOf, addModeBonus } from "../../../core/playerHelpers.js";
 
 // damage_enemy_leader_by_other_allies

@@ -1,6 +1,6 @@
 // src/logic/effects/ops/spellboost/types.ts
 
-import { Effect } from "../../../../core/types.js";
+import { Effect } from "../../../../core/types/index.js";
 
 export type SpellboostTarget = "hand" | "self";
 export type SpellboostMode = "boost" | "set";

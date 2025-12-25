@@ -1,6 +1,6 @@
 import { state } from "../src/logic/core/gameState.js";
 import { runEffects } from "../src/logic/core/effects/index.js";
-import { CardInstance } from "../src/logic/core/types.js";
+import { CardInstance } from "../src/logic/core/types/index.js";
 import { makeUid } from "../src/logic/core/rng.js";
 import { adapter } from "../src/logic/core/adapter.js";
 import { playCard } from "../src/logic/core/playCard.js";

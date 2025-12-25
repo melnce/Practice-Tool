@@ -1,5 +1,5 @@
 // src/ui/zones/actions.ts
-import { Player, CardInstance } from "../../core/types.js";
+import { Player, CardInstance } from "../../core/types/index.js";
 import { reportError } from "../errors.js";
 
 // Lazy imports for logic

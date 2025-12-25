@@ -1,7 +1,7 @@
 // src/logic/effects/ops/banish/types.ts
 // Unified banish types and normalization.
 
-import { Effect, Player, CardInstance } from "../../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 
 // ============================================================================
 // DISTRIBUTION & SCOPE TYPES

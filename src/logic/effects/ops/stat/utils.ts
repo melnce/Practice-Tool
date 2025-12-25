@@ -1,4 +1,4 @@
-import { CardInstance } from "../../../../core/types.js";
+import { CardInstance } from "../../../../core/types/index.js";
 import { StatOp } from "./types.js";
 
 function hasKeyword(card: CardInstance, kw: any) {

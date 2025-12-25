@@ -5,7 +5,7 @@ import {
   EffectOp,
   EffectByOp,
   EffectResult,
-} from "../../../core/types.js";
+} from "../../../core/types/index.js";
 import { EffectTraceSink } from "./trace.js";
 export { EffectResult };
 

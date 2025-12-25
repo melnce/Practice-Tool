@@ -1,5 +1,5 @@
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types.js";
+import { CardInstance, Player } from "../../../core/types/index.js";
 import { ProcessingCandidate } from "./process.js";
 import { TriggerSpec } from "./types.js";
 import { getBoard, getHand, getCrests } from "../../../core/playerHelpers.js";

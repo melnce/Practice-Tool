@@ -3,7 +3,7 @@
 // Phase 1 of UID-only targeting normalization
 
 import { state } from "./gameState.js";
-import { CardInstance, Player } from "./types.js";
+import type { CardInstance, Player } from "./types/index.js";
 import { getHand, getBoard, getDeck, getGraveyard } from "./playerHelpers.js";
 
 // =============================================================================

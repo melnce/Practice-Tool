@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 
-import { CardInstance, Player } from "../../../../core/types.js";
+import { CardInstance, Player } from "../../../../core/types/index.js";
 import { getBoard, getDeck } from "../../../../core/playerHelpers.js";
 
 // =============== Utilities ===============

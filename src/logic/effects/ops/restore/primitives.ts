@@ -3,7 +3,7 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player } from "../../../../core/types.js";
+import { CardInstance, Player } from "../../../../core/types/index.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getHP, setHP, getMaxHP, getHand, getBoard } from "../../../../core/playerHelpers.js";
 

@@ -1,7 +1,7 @@
 // src/logic/effects/ops/fuse/unified.ts
 // Unified fuse operation handler
 
-import { Player, CardInstance, Effect, EffectContext } from "../../../../core/types.js";
+import { Player, CardInstance, Effect, EffectContext } from "../../../../core/types/index.js";
 import { FuseOp } from "./types.js";
 
 // Import existing handlers

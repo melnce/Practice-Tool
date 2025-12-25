@@ -1,4 +1,4 @@
-import { PlayerAction, GameState } from "../../core/types.js";
+import { PlayerAction, GameState } from "../../core/types/index.js";
 import { playCard } from "./replayScenarioDsl.js";
 import {
   ReplayInvariant,

@@ -1,7 +1,7 @@
 // src/logic/effects/ops/summon/unified.ts
 // Unified summon handler - thin router delegating to specialized handlers
 
-import { Effect, Player } from "../../../../core/types.js";
+import { Effect, Player } from "../../../../core/types/index.js";
 import { logEvent } from "../../../../core/logger.js";
 
 import { SummonContext, normalizeToUnifiedSpec } from "./types.js";

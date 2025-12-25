@@ -11,7 +11,7 @@ import {
   AttackAction,
   ChooseTargetAction,
   TargetSpec,
-} from "../../core/types.js";
+} from "../../core/types/index.js";
 import { getHand, getBoard } from "../../core/playerHelpers.js";
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Public API for playCard. This is the ONLY layer that handles rendering.
 
-import { CardInstance, Player } from "../../../core/types.js";
+import { CardInstance, Player } from "../../../core/types/index.js";
 import {
   beginAction,
   commitAction,

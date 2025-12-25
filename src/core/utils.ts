@@ -7,7 +7,7 @@ import { logEvent } from "./logger.js";
 // (Refactored to use state.rng directly)
 
 // Import types
-import { CardInstance, Player } from "./types.js";
+import type { CardInstance, Player } from "./types/index.js";
 
 // Constants
 export const MAX_HAND = 9;

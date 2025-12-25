@@ -1,6 +1,6 @@
 // src/logic/effects/gates/types.ts
 
-import { Effect, Player, CardInstance } from "../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../core/types/index.js";
 
 /**
  * Gate condition types - unified from 17 legacy gate ops.

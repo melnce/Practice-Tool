@@ -1,4 +1,4 @@
-import { Effect } from "../../core/types.js";
+import { Effect } from "../../core/types/index.js";
 import { makeEffect } from "../../logic/core/effects/build.js";
 
 interface CompiledOutput {

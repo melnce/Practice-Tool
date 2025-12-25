@@ -7,7 +7,7 @@ import { state } from "../../core/gameState.js";
 import { getCardDetails } from "../../data/cardDatabase.js";
 import { shuffleInPlace } from "../../core/utils.js";
 import { logEvent } from "../../core/logger.js";
-import { Effect as _Effect, Player } from "../../core/types.js";
+import { Effect as _Effect, Player } from "../../core/types/index.js";
 import { getDeck } from "../../core/playerHelpers.js";
 import { handleHalveDeckCost, reduceDeckFollowersCost } from "./cost.js";
 

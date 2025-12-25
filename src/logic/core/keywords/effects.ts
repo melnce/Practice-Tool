@@ -1,4 +1,4 @@
-import { Effect, Player, CardInstance } from "../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../core/types/index.js";
 import {
   removeKeywordFromSingleCard,
   removeAllAbilitiesFromCard,

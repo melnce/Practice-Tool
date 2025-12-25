@@ -9,7 +9,7 @@ import { runEffects } from "../../core/effects/index.js";
 import { fireTrigger } from "../../core/triggers.js";
 import { logEvent } from "../../../core/logger.js";
 import { doAction, appendStep } from "../../../core/history.js";
-import { Effect } from "../../../core/types.js";
+import { Effect } from "../../../core/types/index.js";
 import { getModeBonus } from "../../../core/playerHelpers.js";
 
 // Import types if needed, or define locally if specific to mode

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { state, resetGameState } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { checkStateIntegrity } from "../../src/logic/debug/stateIntegrity.js";
-import { CardInstance, Effect } from "../../src/core/types.js";
+import { CardInstance, Effect } from "../../src/core/types/index.js";
 
 // Helper to create a dummy card
 function createCard(id: string, name: string): CardInstance {

@@ -4,7 +4,7 @@ import {
   registerRunEffects,
 } from "../../src/logic/core/triggers.js";
 import { state, resetGameState } from "../../src/core/gameState.js";
-import { CardInstance } from "../../src/core/types.js";
+import { CardInstance } from "../../src/core/types/index.js";
 
 // Mock minimal dependencies
 vi.mock("../../src/ui/render.js", () => ({ logEvent: vi.fn() }));

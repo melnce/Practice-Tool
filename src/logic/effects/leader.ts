@@ -1,6 +1,6 @@
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
-import { Effect, Player } from "../../core/types.js";
+import { Effect, Player } from "../../core/types/index.js";
 import { fireTrigger } from "../core/triggers.js";
 import { isFirstPlayer, getHP, setHP, setMaxHP, getPP, setPP, getMaxPP, opponentOf, getEvoCharges, setEvoCharges } from "../../core/playerHelpers.js";
 

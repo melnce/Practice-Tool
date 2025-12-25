@@ -1,4 +1,4 @@
-import { Effect, Player, CardInstance, EffectContext } from "../../../../core/types.js";
+import { Effect, Player, CardInstance, EffectContext } from "../../../../core/types/index.js";
 
 export interface StatContext {
   owner: Player;

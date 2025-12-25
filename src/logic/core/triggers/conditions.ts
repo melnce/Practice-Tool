@@ -1,6 +1,6 @@
 import { TriggerContext, TriggerSpec } from "./types.js";
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types.js";
+import { CardInstance, Player } from "../../../core/types/index.js";
 import { evaluateCardCondition, CardCondition } from "../conditions/evaluator.js";
 
 // Helper to normalize "subject" card (entering, played, leaving, etc.)

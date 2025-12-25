@@ -1,7 +1,7 @@
 // src/logic/core/cardFilter/predicates.ts
 // Builds card filter predicates from normalized filters.
 
-import { CardInstance } from "../../../core/types.js";
+import { CardInstance } from "../../../core/types/index.js";
 import { NormalizedCardFilter, CardPredicate } from "./types.js";
 
 function toLowerSafe(s: any): string {

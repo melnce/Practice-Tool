@@ -1,5 +1,5 @@
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types.js";
+import { CardInstance, Player } from "../../../core/types/index.js";
 import { TargetQuery, TargetingEnv } from "./types.js";
 import { getBoard, getHand } from "../../../core/playerHelpers.js";
 import { evaluateCardCondition, CardCondition } from "../conditions/evaluator.js";

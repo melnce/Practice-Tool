@@ -5,7 +5,7 @@
  * Same seed + same actions MUST produce identical hash.
  */
 
-import type { GameState, CardInstance } from "./types.js";
+import type { GameState, CardInstance } from "./types/index.js";
 
 // ============================================================================
 // CANONICAL STATE HASH

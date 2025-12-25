@@ -3,7 +3,7 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 

@@ -1,5 +1,5 @@
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types.js";
+import { CardInstance, Player } from "../../../core/types/index.js";
 import { PlayedHistoryEntry } from "./types.js";
 import { getPlayedHistory } from "../../../core/playerHelpers.js";
 

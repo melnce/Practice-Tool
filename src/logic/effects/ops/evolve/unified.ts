@@ -2,7 +2,7 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player, Effect } from "../../../../core/types.js";
+import { CardInstance, Player, Effect } from "../../../../core/types/index.js";
 import { UnifiedEvolveSpec, normalizeToEvolveSpec } from "./types.js";
 import { onEvolve } from "../../../evolveUtils.js";
 import { getBoard, isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../../core/playerHelpers.js";

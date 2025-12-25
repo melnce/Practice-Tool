@@ -9,7 +9,7 @@ import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player } from "../../../../core/types.js";
+import { CardInstance, Player } from "../../../../core/types/index.js";
 import { getHand } from "../../../../core/playerHelpers.js";
 
 // Class-specific modules

@@ -14,7 +14,7 @@ import {
   EffectOp,
   EffectByOp,
   EffectResult,
-} from "../../../core/types.js";
+} from "../../../core/types/index.js";
 import { guardLifecycle } from "../targeting/guards.js";
 import { registerRunEffectsInCleanup } from "../cleanup.js";
 import { recordEvent } from "../../../core/debugTimeline.js";

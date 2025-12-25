@@ -1,5 +1,5 @@
 // src/logic/core/targeting/validation.ts
-import { GameState, Player } from "../../../core/types.js";
+import { GameState, Player } from "../../../core/types/index.js";
 import { getBoard, opponentOf } from "../../../core/playerHelpers.js";
 
 /** Result of a validation check */

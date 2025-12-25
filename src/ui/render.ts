@@ -7,7 +7,7 @@ import { makeLeaderDroppable } from "./drag.js";
 import { byId } from "./dom.js";
 
 import { state } from "../core/gameState.js";
-import { GameState, Player, CardInstance } from "../core/types.js";
+import { GameState, Player, CardInstance } from "../core/types/index.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {

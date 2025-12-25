@@ -1,7 +1,7 @@
 // src/logic/effects/ops/keyword/unified.ts
 // Unified keyword handler - replaces keyword, remove_keyword, remove_abilities, grant_trigger
 
-import { CardInstance, Effect, Player } from "../../../../core/types.js";
+import { CardInstance, Effect, Player } from "../../../../core/types/index.js";
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { applyKeyword } from "../../../core/keywords/apply.js";

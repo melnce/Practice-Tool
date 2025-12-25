@@ -9,7 +9,7 @@
  * - Cast access ((card as any).hasIntimidate)
  */
 
-import { CardInstance } from "../../../core/types.js";
+import { CardInstance } from "../../../core/types/index.js";
 
 /**
  * Normalize keyword name for comparison.

@@ -1,6 +1,6 @@
 // src/logic/effects/ops/cost/types.ts
 
-import { Effect } from "../../../../core/types.js";
+import { Effect } from "../../../../core/types/index.js";
 
 export type CostTarget =
   | "self"

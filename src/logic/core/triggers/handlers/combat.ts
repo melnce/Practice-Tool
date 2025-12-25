@@ -1,4 +1,4 @@
-import { Player } from "../../../../core/types.js";
+import { Player } from "../../../../core/types/index.js";
 import { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
 import { getAllZoneCandidates, getCrestCandidates } from "../utils.js";
 import { processCandidateTriggers, ProcessingCandidate } from "../process.js";

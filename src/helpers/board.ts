@@ -1,6 +1,6 @@
 // src/helpers/board.ts
 
-import { GameState, Player } from "../core/types.js";
+import { GameState, Player } from "../core/types/index.js";
 
 /**
  * Checks if the given zone ID represents the board of the current turn's player.

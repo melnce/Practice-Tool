@@ -1,4 +1,4 @@
-import { CardInstance, Player, Effect } from "../../../core/types.js";
+import { CardInstance, Player, Effect } from "../../../core/types/index.js";
 
 // Re-export shared types
 export { CardInstance, Player, Effect };

@@ -1,6 +1,6 @@
 // src/logic/effects/attacks.ts
 import { logEvent } from "../../core/logger.js";
-import { Effect, CardInstance } from "../../core/types.js";
+import { Effect, CardInstance } from "../../core/types/index.js";
 
 export function applyAttacksPerTurn(
   eff: Effect & {

@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { runEffects } from "../core/effects/index.js";
 import { logEvent } from "../../core/logger.js";
-import { Effect, Player } from "../../core/types.js";
+import { Effect, Player } from "../../core/types/index.js";
 import { isFirstPlayer, opponentOf, getCrests as getCrestsHelper } from "../../core/playerHelpers.js";
 
 // =============================================================================

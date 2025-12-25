@@ -3,7 +3,7 @@
 // Contract: docs/playcard-contract.md
 
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types.js";
+import { CardInstance, Player } from "../../../core/types/index.js";
 import { canPlayCard } from "./preflight.js";
 import { pickEnhanceTier } from "./cost.js";
 import { playSpell } from "./spell.js";

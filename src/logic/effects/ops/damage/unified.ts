@@ -5,7 +5,7 @@ import { getPool } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
-import { Effect, CardInstance, Player } from "../../../../core/types.js";
+import { Effect, CardInstance, Player } from "../../../../core/types/index.js";
 import { opponentOf } from "../../../../core/playerHelpers.js";
 
 import {

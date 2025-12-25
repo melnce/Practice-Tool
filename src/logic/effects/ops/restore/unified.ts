@@ -1,7 +1,7 @@
 // src/logic/effects/ops/restore/unified.ts
 // Unified restore handler - single entry point for all restore/heal operations.
 
-import { Effect, Player, CardInstance } from "../../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { logEvent } from "../../../../core/logger.js";
 
 import {

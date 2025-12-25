@@ -14,7 +14,7 @@ import { logEvent } from "../../../../core/logger.js";
 import { getAdapter } from "../context.js";
 import { enqueueManyFront } from "../queue.js";
 import { addMaxPP } from "../../../pp.js";
-import { Effect, Player, EffectContext } from "../../../../core/types.js";
+import { Effect, Player, EffectContext } from "../../../../core/types/index.js";
 import { isFirstPlayer, getPP, setPP, getMaxPP, opponentOf, addShadows, getEvoCharges, setEvoCharges } from "../../../../core/playerHelpers.js";
 
 const doLog = (event: string, payload: any) => logEvent(event, payload);

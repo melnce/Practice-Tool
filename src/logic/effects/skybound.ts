@@ -1,5 +1,5 @@
 import { state } from "../../core/gameState.js";
-import { Player } from "../../core/types.js";
+import { Player } from "../../core/types/index.js";
 import { getHand } from "../../core/playerHelpers.js";
 
 

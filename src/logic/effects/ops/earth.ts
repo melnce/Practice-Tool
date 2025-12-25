@@ -1,7 +1,7 @@
 // src/logic/effects/ops/earth.ts
 import { state } from "../../../core/gameState.js";
 import { logEvent } from "../../../core/logger.js";
-import { Player, CardInstance } from "../../../core/types.js";
+import { Player, CardInstance } from "../../../core/types/index.js";
 import { getBoard, getGraveyard, addShadows } from "../../../core/playerHelpers.js";
 
 function board(owner: Player) {

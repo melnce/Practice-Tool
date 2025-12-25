@@ -5,7 +5,7 @@ import { normalizeKeywordName } from "../core/keywords/registry.js";
 import { banishCard } from "./ops/banish/index.js";
 
 import { logEvent } from "../../core/logger.js";
-import { CardInstance, Effect, Player } from "../../core/types.js";
+import { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { getPlaysThisTurn, getHand, getBoard, isFirstPlayer } from "../../core/playerHelpers.js";
 
 export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {

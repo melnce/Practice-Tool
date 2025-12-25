@@ -3,7 +3,7 @@ import { state, resetGameState } from "../../src/core/gameState.js";
 import { endTurnBlue, endTurnRed } from "../../src/logic/core/turns.js";
 import { registerTrigger } from "../../src/logic/core/triggers.js";
 import { checkStateIntegrity } from "../../src/logic/debug/stateIntegrity.js";
-import { CardInstance } from "../../src/core/types.js";
+import { CardInstance } from "../../src/core/types/index.js";
 
 function createCard(id: string, name: string): CardInstance {
   return {

@@ -2,7 +2,7 @@
 // Entry point for stat operation - delegates to orchestrator
 
 import { handleStatOrchestrator } from "./stat/orchestrator.js";
-import { Effect, Player, CardInstance, EffectContext } from "../../../core/types.js";
+import { Effect, Player, CardInstance, EffectContext } from "../../../core/types/index.js";
 
 /**
  * Unified stat handler.

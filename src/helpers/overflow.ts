@@ -1,6 +1,6 @@
 // src/helpers/overflow.ts
 import { state } from "../core/gameState.js";
-import { Player } from "../core/types.js";
+import { Player } from "../core/types/index.js";
 
 /**
  * Check if player has Overflow active.

@@ -1,4 +1,4 @@
-import { GameState, CardInstance } from "../../core/types.js";
+import { GameState, CardInstance } from "../../core/types/index.js";
 import { getHand, getBoard, getDeck, getGraveyard } from "../../core/playerHelpers.js";
 
 export function checkStateIntegrity(state: GameState) {

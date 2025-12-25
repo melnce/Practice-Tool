@@ -1,5 +1,5 @@
 // src/logic/core/replayInvariants.ts
-import { GameState, Player, EffectOp } from "../../core/types.js";
+import { GameState, Player, EffectOp } from "../../core/types/index.js";
 import { EffectTraceEvent } from "./effects/trace.js";
 import { getHand, getBoard, getDeck, getGraveyard, getHP } from "../../core/playerHelpers.js";
 

@@ -3,7 +3,7 @@
 // All "can I play this card?" logic is centralized here.
 
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player, Effect } from "../../../core/types.js";
+import { CardInstance, Player, Effect } from "../../../core/types/index.js";
 import { getPool } from "../targeting.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import { pickEnhanceTier } from "./cost.js";

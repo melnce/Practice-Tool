@@ -1,6 +1,6 @@
 // src/engine.ts
 import { state } from "./core/gameState.js";
-import { GameState, StartGameOptions, PlayerAction } from "./core/types.js";
+import type { GameState, StartGameOptions, PlayerAction } from "./core/types/index.js";
 import { startGame } from "./logic/startGame.js";
 import { endTurnBlue, endTurnRed } from "./logic/core/turns.js";
 import {
@@ -15,7 +15,7 @@ import {
 
 // Re-exports for consumers (UI/Tests)
 // Re-exports for consumers (UI/Tests)
-export type { GameState } from "./core/types.js";
+export type { GameState } from "./core/types/index.js";
 // Do not export mutable state directly. Use getState().
 
 // Action Definitions

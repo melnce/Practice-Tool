@@ -3,7 +3,7 @@
 // Also handles special game state counters like "combo"
 
 import { state } from "../../../../core/gameState.js";
-import { CardInstance, Effect, Player } from "../../../../core/types.js";
+import { CardInstance, Effect, Player } from "../../../../core/types/index.js";
 import { addCounter, spendCounter, setCounter } from "../../counters.js";
 import { logEvent } from "../../../../core/logger.js";
 import { getPlaysThisTurn, setPlaysThisTurn } from "../../../../core/playerHelpers.js";

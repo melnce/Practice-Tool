@@ -1,4 +1,4 @@
-import { CardInstance, Effect, Player } from "../../../core/types.js";
+import { CardInstance, Effect, Player } from "../../../core/types/index.js";
 import { logEvent } from "../../../core/logger.js";
 import { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";

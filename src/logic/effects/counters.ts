@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { completeCrest } from "./crest.js";
 import { logEvent } from "../../core/logger.js";
-import { CardInstance, Effect, Player } from "../../core/types.js";
+import { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { getBoard, getCrests } from "../../core/playerHelpers.js";
 
 // --- helpers

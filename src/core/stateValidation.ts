@@ -1,7 +1,7 @@
 // src/core/stateValidation.ts
 // Post-op invariant validator - implements H1-H8 hard fail invariants from OP audit
 
-import type { GameState, CardInstance } from "./types.js";
+import type { GameState, CardInstance } from "./types/index.js";
 
 export interface GameStateValidationResult {
   valid: boolean;

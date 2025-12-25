@@ -1,7 +1,7 @@
 // Imports from src
 import fs from "fs";
 import { initReplayState } from "../src/logic/core/replayInit.js";
-import { GameState } from "../src/core/types.js";
+import { GameState } from "../src/core/types/index.js";
 import { state } from "../src/core/gameState.js";
 import { initCardDatabaseNode } from "../src/data/cardLoaderNode.js";
 import { isCardDatabaseInitialized } from "../src/data/cardIndex.js";

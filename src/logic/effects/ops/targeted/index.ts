@@ -16,7 +16,7 @@ import { handleFuse } from "../fuse/unified.js";
 import { handleEvolveSelf } from "../evolve.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
-import { CardInstance } from "../../../../core/types.js";
+import { CardInstance } from "../../../../core/types/index.js";
 import { getHand, getGraveyard, getBoard, addShadows, getHP, setHP, opponentOf } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 import {

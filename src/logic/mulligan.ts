@@ -7,7 +7,7 @@ import { state } from "../core/gameState.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
-import { Player } from "../core/types.js";
+import { Player } from "../core/types/index.js";
 import { getHand, getDeck, isFirstPlayer, getDeckFile } from "../core/playerHelpers.js";
 import { adapter } from "../core/adapter.js";
 

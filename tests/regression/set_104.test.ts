@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { startNewGame, dispatch } from "../../src/engine.js";
 import { getCardDetails } from "../../src/data/cardDatabase.js";
-import { GameState } from "../../src/core/types.js";
+import { GameState } from "../../src/core/types/index.js";
 
 // Mocks
 // Mocks

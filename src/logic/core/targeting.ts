@@ -1,6 +1,6 @@
 import { state } from "../../core/gameState.js";
 // import { logEvent } from "../../core/logger.js";
-import { CardInstance, Effect, Player } from "../../core/types.js";
+import { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { guardLifecycle } from "./targeting/guards.js";
 import { getBoard, getHand, getGraveyard } from "../../core/playerHelpers.js";
 import { toUids, toUid } from "../../core/uidResolver.js";

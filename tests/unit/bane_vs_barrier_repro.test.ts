@@ -5,7 +5,7 @@ import {
   pushToBoard,
 } from "../../src/logic/effects/ops/summon_ops/core.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
-import { CardInstance, CardTemplate } from "../../src/core/types.js";
+import { CardInstance, CardTemplate } from "../../src/core/types/index.js";
 import { grantBarrier } from "../../src/logic/core/barrier.js";
 
 describe("Bane vs Barrier Interaction", () => {

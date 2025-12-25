@@ -1,4 +1,4 @@
-import { Player } from "../../../core/types.js";
+import { Player } from "../../../core/types/index.js";
 import { TriggerContext, TriggerEventName } from "./types.js";
 import { handleGenericEvent } from "./handlers/common.js";
 import { handleCombatEvent } from "./handlers/combat.js";

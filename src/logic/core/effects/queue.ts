@@ -1,4 +1,4 @@
-import { Effect } from "../../../core/types.js";
+import { Effect } from "../../../core/types/index.js";
 import { EffectCtx } from "./registry.js";
 
 function validateOp(eff: Effect) {

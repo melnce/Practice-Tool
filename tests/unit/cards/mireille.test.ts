@@ -8,7 +8,7 @@ if (typeof window === "undefined") {
 
 import { state } from "../../../src/core/gameState.js";
 import { handleEvolveLastSummoned } from "../../../src/logic/effects/ops/evolve.js";
-import { CardInstance } from "../../../src/core/types.js";
+import { CardInstance } from "../../../src/core/types/index.js";
 
 // We mock ONLY what we need.
 // We are testing: handleEvolveLastSummoned logic + JSON correctness (via separate check).

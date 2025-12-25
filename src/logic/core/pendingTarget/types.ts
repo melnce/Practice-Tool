@@ -1,7 +1,7 @@
 // src/logic/core/pendingTarget/types.ts
 // Types for pending target selection state
 
-import { Effect, Player, CardInstance } from "../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../core/types/index.js";
 
 /**
  * Shape of a pending target selection request.

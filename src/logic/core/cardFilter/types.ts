@@ -1,7 +1,7 @@
 // src/logic/core/cardFilter/types.ts
 // Shared types for card filtering logic.
 
-import { CardInstance } from "../../../core/types.js";
+import { CardInstance } from "../../../core/types/index.js";
 
 /**
  * Raw filter specification as used in effect definitions.

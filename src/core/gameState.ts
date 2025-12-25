@@ -1,5 +1,6 @@
 import { logEvent } from "./logger.js";
-import { GameState, createPlayerState, PlayerSlot } from "./types.js";
+import type { GameState, PlayerSlot } from "./types/index.js";
+import { createPlayerState } from "./playerState.js";
 import { createRng } from "./rng.js";
 
 // -- 1. Canonical Defaults (Single Source of Truth) --

@@ -1,5 +1,5 @@
 // src/ui/zones/selectors.ts
-import { GameState, Player } from "../../core/types.js";
+import { GameState, Player } from "../../core/types/index.js";
 import { isOwnBoard, isBoardZone } from "../../helpers/board.js";
 import { ZoneContext } from "./types.js";
 

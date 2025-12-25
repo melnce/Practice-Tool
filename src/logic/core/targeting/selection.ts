@@ -1,5 +1,5 @@
 // src/logic/core/targeting/selection.ts
-import { CardInstance } from "../../../core/types.js";
+import { CardInstance } from "../../../core/types/index.js";
 
 /**
  * Toggles a card's presence in the pending selection.

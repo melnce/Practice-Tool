@@ -4,7 +4,7 @@
 import { state } from "../../../../core/gameState.js";
 import { drawCard } from "../../../../core/utils.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import {
   normalizeCardFilter,
   buildCardPredicate,

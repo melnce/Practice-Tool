@@ -3,7 +3,7 @@ import { state } from "../../../../core/gameState.js";
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Player, CardInstance } from "../../../../core/types.js";
+import { Player, CardInstance } from "../../../../core/types/index.js";
 import { getHand, getGraveyard } from "../../../../core/playerHelpers.js";
 
 function handOf(owner: Player) {

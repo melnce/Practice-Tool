@@ -6,7 +6,7 @@
  * Use these utilities at card creation/parsing boundaries.
  */
 
-import { CardInstance } from "./types.js";
+import type { CardInstance } from "./types/index.js";
 
 // ============================================================================
 // TYPE COERCION - Use at parsing boundaries ONLY

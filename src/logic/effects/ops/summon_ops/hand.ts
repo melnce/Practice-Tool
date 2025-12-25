@@ -3,7 +3,7 @@ import { logEvent } from "../../../../core/logger.js";
 
 import { fireTrigger } from "../../../core/triggers.js";
 import { applyKeywordsFromList } from "../../../core/keywords.js";
-import { CardInstance, Effect, Player } from "../../../../core/types.js";
+import { CardInstance, Effect, Player } from "../../../../core/types/index.js";
 import { highlightSelectable } from "../../../core/targeting.js"; // Targeting is external
 import { initAmulet } from "./init.js";
 import { pushToBoard } from "./core.js";

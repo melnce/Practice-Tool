@@ -2,7 +2,7 @@
 import { onEvolve } from "../../evolveUtils.js";
 import { logEvent } from "../../../core/logger.js";
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types.js";
+import { CardInstance, Player } from "../../../core/types/index.js";
 import { isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../core/playerHelpers.js";
 
 function canEvolve(owner: Player, card: CardInstance, mode = "normal") {

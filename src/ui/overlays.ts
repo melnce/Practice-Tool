@@ -1,5 +1,5 @@
 // src/ui/overlays.ts
-import { CardInstance } from "../core/types.js";
+import { CardInstance } from "../core/types/index.js";
 
 export function applyKeywordOverlays(
   div: HTMLElement,

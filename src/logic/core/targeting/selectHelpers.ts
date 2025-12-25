@@ -2,7 +2,7 @@
  * Pure helper functions for target selection.
  * Extracted from handleSelect for single responsibility.
  */
-import { CardInstance, Effect } from "../../../core/types.js";
+import { CardInstance, Effect } from "../../../core/types/index.js";
 import { RNG } from "../../../core/rng.js";
 
 // -----------------------------------------------------------------------------

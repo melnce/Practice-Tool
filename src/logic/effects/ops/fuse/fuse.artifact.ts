@@ -9,7 +9,7 @@ import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
-import { Player, CardInstance } from "../../../../core/types.js";
+import { Player, CardInstance } from "../../../../core/types/index.js";
 import { getHand } from "../../../../core/playerHelpers.js";
 
 function handOf(owner: Player) {

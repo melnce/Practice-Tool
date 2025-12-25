@@ -2,7 +2,7 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player, Effect } from "../../../../core/types.js";
+import { CardInstance, Player, Effect } from "../../../../core/types/index.js";
 import { getPool } from "../../../core/targeting.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 import { UnifiedCostSpec, normalizeToCostSpec } from "./types.js";

@@ -17,7 +17,7 @@ import { handleInvoke } from "../effects/ops/summon.js";
 import { dealDamage } from "./barrier.js";
 import { logEvent } from "../../core/logger.js";
 import { beginAction, commitAction } from "../../core/history.js";
-import { CardInstance, Player } from "../../core/types.js";
+import { CardInstance, Player } from "../../core/types/index.js";
 import { isFirstPlayer, getHand, getBoard, getDeck, setHP, getHP, getEvoCount, getPP, setPP, getMaxPP, setMaxPP, getPermPP, setPlaysThisTurn, setEvoUsedThisTurn, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
 
 /**

@@ -13,7 +13,7 @@ import {
   CardInstance,
   Player,
   DamageEffect,
-} from "../../../../core/types.js";
+} from "../../../../core/types/index.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
 import { DamageContext } from "./types.js";
 import { getHand, getBoard, getCrests, opponentOf } from "../../../../core/playerHelpers.js";

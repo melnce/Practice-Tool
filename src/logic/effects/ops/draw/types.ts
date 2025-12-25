@@ -1,7 +1,7 @@
 // src/logic/effects/ops/draw/types.ts
 // Unified types for draw operations.
 
-import { Effect, Player, CardInstance } from "../../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { CardFilterSpec } from "../../../core/cardFilter/types.js";
 
 // ============================================================================

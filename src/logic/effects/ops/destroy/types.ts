@@ -1,7 +1,7 @@
 // src/logic/effects/ops/destroy/types.ts
 // Unified types for destroy operations.
 
-import { Effect, Player, CardInstance } from "../../../../core/types.js";
+import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 
 // ============================================================================
 // DISTRIBUTION MODES

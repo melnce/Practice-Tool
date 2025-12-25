@@ -6,7 +6,7 @@ import {
   placeInHand,
 } from "../../src/logic/utils/zoneHelpers.js";
 import { checkStateIntegrity } from "../../src/logic/debug/stateIntegrity.js";
-import { CardInstance } from "../../src/core/types.js";
+import { CardInstance } from "../../src/core/types/index.js";
 
 // Minimal helpers since we don't have global helpers exposed
 function getCard(id: string): CardInstance {

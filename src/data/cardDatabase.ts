@@ -1,5 +1,5 @@
 // src/data/cardDatabase.ts
-import { CardTemplate } from "../core/types.js";
+import { CardTemplate } from "../core/types/index.js";
 import {
   initCardDatabase,
   getCardDetails as getCardFromIndex,

@@ -1,7 +1,7 @@
 // src/logic/effects/ops/crest/unified.ts
 // Unified crest handler - handles crest operations
 
-import { Effect, Player } from "../../../../core/types.js";
+import { Effect, Player } from "../../../../core/types/index.js";
 import {
   handleGainCrest,
   crestAddCounter,

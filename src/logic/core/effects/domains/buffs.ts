@@ -11,7 +11,7 @@ import { handleCountdown } from "../../../effects/ops/countdown/unified.js";
 import { applyAttacksPerTurn } from "../../../effects/attacks.js";
 import { getTargetingContext } from "../context.js";
 
-// import { BuffEffect } from "../../../../core/types.js";
+// import { BuffEffect } from "../../../../core/types/index.js";
 
 export function registerBuffEffects() {
     // Stats - unified stat handler covers give +X/+Y, set stats, buff_hand_*, combo_repeat, etc

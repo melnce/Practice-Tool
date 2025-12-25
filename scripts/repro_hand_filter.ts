@@ -1,6 +1,6 @@
 import { getPool } from "../src/logic/core/targeting.js";
 import { state } from "../src/logic/core/gameState.js";
-import { CardInstance } from "../src/logic/core/types.js";
+import { CardInstance } from "../src/logic/core/types/index.js";
 import { makeUid } from "../src/logic/core/rng.js";
 
 // Mock globalThis.HEADLESS for logging check

@@ -2,7 +2,7 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { fireTrigger } from "../../../core/triggers.js";
-import { CardInstance, Player } from "../../../../core/types.js";
+import { CardInstance, Player } from "../../../../core/types/index.js";
 import { initAmulet, initFollower } from "./init.js";
 import { pushToBoard } from "./core.js";
 import { deckOf, boardOf } from "./utils.js";

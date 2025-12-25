@@ -1,4 +1,4 @@
-import { CardInstance } from "../../../core/types.js";
+import { CardInstance } from "../../../core/types/index.js";
 import { KeywordState } from "./types.js";
 
 // Helper to access or initialize keyword state

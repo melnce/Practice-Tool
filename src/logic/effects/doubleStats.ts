@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { cleanupDead } from "../core/cleanup.js";
 import { logEvent } from "../../core/logger.js";
-import { Player } from "../../core/types.js";
+import { Player } from "../../core/types/index.js";
 import { getBoard } from "../../core/playerHelpers.js";
 
 export function doubleStatsAllies(owner: Player) {

@@ -1,5 +1,5 @@
 // src/helpers/combo.ts
-import { CardInstance, GameState } from "../core/types.js";
+import { CardInstance, GameState } from "../core/types/index.js";
 
 export function comboReadyInHand(
   card: CardInstance,

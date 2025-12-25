@@ -4,7 +4,7 @@
 // This module builds card lookup indices from raw card data.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { CardTemplate } from "../core/types.js";
+import { CardTemplate } from "../core/types/index.js";
 import {
   hasInherentStorm,
   hasInherentRush,

@@ -8,7 +8,7 @@ import { handleEvolve } from "../../../effects/ops/evolve/unified.js";
 import { handleGate } from "../../../effects/gates/unified.js";
 import { incrementSkyboundArt } from "../../../effects/skybound.js";
 import { state } from "../../../../core/gameState.js";
-import { Effect as _Effect } from "../../../../core/types.js";
+import { Effect as _Effect } from "../../../../core/types/index.js";
 
 export function registerMiscEffects() {
   registerOp("mode", handleMode as any);

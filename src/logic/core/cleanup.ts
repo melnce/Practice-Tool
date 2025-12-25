@@ -5,7 +5,7 @@ import { banishCard } from "../effects/ops/banish/index.js";
 // import { runEffects } from "./effects/index.js"; // Breaking cycle
 import { logEvent } from "../../core/logger.js";
 import { fireTrigger } from "./triggers.js";
-import { CardInstance, Player, Effect } from "../../core/types.js";
+import { CardInstance, Player, Effect } from "../../core/types/index.js";
 import { isFirstPlayer, opponentOf, getBoard, getGraveyard, addShadows, getDestroyedHistory } from "../../core/playerHelpers.js";
 
 // Dependency Injection for runEffects

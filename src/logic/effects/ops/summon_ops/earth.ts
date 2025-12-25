@@ -1,4 +1,4 @@
-import { CardInstance, CardTemplate } from "../../../../core/types.js";
+import { CardInstance, CardTemplate } from "../../../../core/types/index.js";
 import { isAmulet, normalizeName } from "./utils.js";
 
 // =============== Utilities ===============

@@ -1,5 +1,5 @@
 // src/logic/core/combat.ts
-import { CardInstance, Player } from "../../core/types.js";
+import { CardInstance, Player } from "../../core/types/index.js";
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 

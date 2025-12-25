@@ -1,5 +1,5 @@
 import { state } from "../../../../core/gameState.js";
-import { CardInstance } from "../../../../core/types.js";
+import { CardInstance } from "../../../../core/types/index.js";
 import { StatOp } from "./types.js";
 
 /**

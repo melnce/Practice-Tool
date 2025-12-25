@@ -1,4 +1,4 @@
-import { CardInstance, Effect, Player } from "../../../core/types.js";
+import { CardInstance, Effect, Player } from "../../../core/types/index.js";
 
 export interface PendingTargetRequest {
   eff: Effect;

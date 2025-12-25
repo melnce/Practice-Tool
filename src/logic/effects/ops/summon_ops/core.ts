@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 import { fireTrigger } from "../../../core/triggers.js";
-import { CardInstance, CardTemplate, Player } from "../../../../core/types.js";
+import { CardInstance, CardTemplate, Player } from "../../../../core/types/index.js";
 import { initAmulet, initFollower } from "./init.js";
 import { isFollower, isAmulet } from "./utils.js";
 import { opponentOf, setRally, getRally } from "../../../../core/playerHelpers.js";

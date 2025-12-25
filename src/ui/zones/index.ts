@@ -1,6 +1,6 @@
 // src/ui/zones/index.ts
 import { byId } from "../dom.js";
-import { GameState, CardInstance } from "../../core/types.js";
+import { GameState, CardInstance } from "../../core/types/index.js";
 import { enableBoardDropForOwnSide } from "../drag.js";
 import { buildZoneContext } from "./selectors.js";
 import { getMemoizedViewModel } from "./memoization.js";

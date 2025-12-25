@@ -1,4 +1,4 @@
-import { CardInstance, GameState } from "../../core/types.js";
+import { CardInstance, GameState } from "../../core/types/index.js";
 import { ZoneContext, CardViewModel } from "./types.js";
 import { createCardViewModel } from "./viewModel.js";
 
