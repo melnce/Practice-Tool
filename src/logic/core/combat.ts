@@ -205,11 +205,22 @@ function _attackFollowerCore(
   // ========================================================================
   // COMBAT TRIGGERS - Fire BEFORE damage
   // ========================================================================
+  // Combat triggers fire in this sequence:
+  // 1. Clash (both parties, simultaneously - neither dies until both resolve)
+  // 2. Strike (attacker only)
+  // 3. Follower Strike (if applicable, attacker only)
+  // 4. Damage exchange
+  // ========================================================================
 
   // Clash: Fires for BOTH parties in follower combat
-  // Only cards with "event": "clash" triggers will actually fire
+  // SEMANTICS: Both Clash triggers fire "simultaneously" - if attacker's Clash
+  // would kill the defender, defender's Clash still fires before cleanup.
+  // This ensures fair resolution when both combatants have Clash.
+  state.suppressCleanup = true; // Defer deaths until both Clash triggers resolve
   fireTrigger("clash", attackerPlayer, { attacker, defender });
   fireTrigger("clash", defenderPlayer, { attacker, defender });
+  state.suppressCleanup = false;
+  cleanupDead(); // Now process any deaths from Clash effects
 
   // Strike: Fires when attacking ANYTHING (follower or leader)
   fireTrigger("strike", attackerPlayer, { attacker, defender });

@@ -10,7 +10,7 @@ import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player } from "../../../../core/types/index.js";
-import { getHand } from "../../../../core/playerHelpers.js";
+import { alreadyFusedThisTurn, handOf, FuseOp } from "./types.js";
 
 // Class-specific modules
 import {
@@ -37,13 +37,7 @@ export {
 };
 
 // -------------------- shared helpers --------------------
-function handOf(owner: Player) {
-  return getHand(state, owner);
-}
-
-function alreadyFusedThisTurn(card: CardInstance | null) {
-  return !!card && card.lastFuseRound === state.roundCount;
-}
+// NOTE: alreadyFusedThisTurn and handOf imported from types.ts
 
 function filterByPartnerFilters(
   candidates: CardInstance[],
@@ -155,7 +149,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
         action: "finalize",
         type: finalizeType,
         initiator_uid: initiator.uid,
-      } as any,
+      } as FuseOp,
       owner,
       sourceCard: initiator,
       pool: info.pool,
@@ -188,7 +182,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
       recipe_id: info.recipe?.id || null,
       recipe_index: info.recipeIndex,
       result: info.recipe?.result || null,
-    } as any,
+    } as FuseOp,
     owner,
     sourceCard: initiator,
     pool: info.pool,
@@ -243,7 +237,7 @@ export function fuse_finalize_generic(
     }
     state.lastFuse = {
       owner,
-      time: Date.now(),
+      time: state.gameTick,
       initiator_name: iCard?.name,
       partner_name: pCard?.name,
       result_name: "wasted",
@@ -301,7 +295,7 @@ export function fuse_finalize_generic(
 
   state.lastFuse = {
     owner,
-    time: Date.now(),
+    time: state.gameTick,
     initiator_name: iCard?.name,
     partner_name: pCard?.name,
     result_name: resultSpec.result_card_name,

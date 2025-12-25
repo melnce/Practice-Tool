@@ -35,9 +35,12 @@ export async function startGame(options: StartGameOptions) {
     finalSeed = options.seed;
     console.log(`[RNG] Using provided seed: ${options.seed}`);
   } else {
-    const autoSeed = Date.now() >>> 0;
-    finalSeed = autoSeed;
-    console.log(`[RNG] Using auto seed: ${autoSeed}`);
+    // P0-3 FIX: For AI training readiness, require explicit seed.
+    // Browser/dev can still pass Date.now() explicitly if desired.
+    throw new Error(
+      "[startGame] Seed is required for determinism. " +
+      "Pass { seed: Date.now() } for casual play or a fixed seed for reproducibility."
+    );
   }
 
   logEvent("gameStart", {

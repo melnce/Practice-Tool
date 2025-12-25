@@ -21,9 +21,18 @@ function mapToCandidate(
 }
 
 export function getAllZoneCandidates(): ProcessingCandidate[] {
+  // P1-3 FIX: Sort board candidates by insertionTs for deterministic ordering
+  // Hand candidates don't need sorting (array order is already deterministic)
+  const firstBoard = getBoard(state, "first")
+    .slice()
+    .sort((a, b) => ((a as any).insertionTs ?? 0) - ((b as any).insertionTs ?? 0));
+  const secondBoard = getBoard(state, "second")
+    .slice()
+    .sort((a, b) => ((a as any).insertionTs ?? 0) - ((b as any).insertionTs ?? 0));
+
   return [
-    ...getBoard(state, "first").map((c) => mapToCandidate(c, "first", "board")),
-    ...getBoard(state, "second").map((c) => mapToCandidate(c, "second", "board")),
+    ...firstBoard.map((c) => mapToCandidate(c, "first", "board")),
+    ...secondBoard.map((c) => mapToCandidate(c, "second", "board")),
     ...getHand(state, "first").map((c) => mapToCandidate(c, "first", "hand")),
     ...getHand(state, "second").map((c) => mapToCandidate(c, "second", "hand")),
   ];
@@ -36,14 +45,8 @@ export function getCrestCandidates(
   if (!Array.isArray(crests)) return [];
 
   return crests.map((crest) => {
-    // Crest structure in legacy:
-    // crest triggers can be in `crest.triggers` (array) or `crest.trigger` (single)
-    const rawTriggers =
-      Array.isArray(crest.triggers) && crest.triggers.length
-        ? crest.triggers
-        : crest.trigger
-          ? [crest.trigger]
-          : [];
+    // Phase 2: Only use triggers array (singular trigger field removed)
+    const rawTriggers = Array.isArray(crest.triggers) ? crest.triggers : [];
 
     return {
       card: crest,

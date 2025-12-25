@@ -10,15 +10,7 @@ import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types/index.js";
-import { getHand } from "../../../../core/playerHelpers.js";
-
-function handOf(owner: Player) {
-  return getHand(state, owner);
-}
-
-function alreadyFusedThisTurn(card: CardInstance) {
-  return !!card && card.lastFuseRound === state.roundCount;
-}
+import { alreadyFusedThisTurn, handOf, FuseOp } from "./types.js";
 
 // ---------- starters ----------
 export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
@@ -50,7 +42,7 @@ export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
       type: "gear_multi",
       initiator_uid: initiator.uid,
       result_name: resultName,
-    } as any,
+    } as FuseOp,
     owner,
     sourceCard: initiator,
     pool,
@@ -96,7 +88,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
       action: "finalize",
       type: "fortifier",
       initiator_uid: initiator.uid,
-    } as any,
+    } as FuseOp,
     owner,
     sourceCard: initiator,
     pool,
@@ -135,7 +127,7 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
       action: "finalize",
       type: "alpha",
       initiator_uid: initiator.uid,
-    } as any,
+    } as FuseOp,
     owner,
     sourceCard: initiator,
     pool,
@@ -266,7 +258,7 @@ export function fuse_finalize_fortifier(
   }, 0);
 
   const resultName =
-    sumCost === (1 as any)
+    sumCost === 1
       ? "Ominous Artifact α"
       : sumCost === 2
         ? "Ominous Artifact β"
@@ -375,7 +367,7 @@ export function fuse_finalize_alpha(
       result_name: "Masterwork Artifact Ω",
       targets: "merge",
     };
-  } else if ((partners || []).length === (1 as any)) {
+  } else if ((partners || []).length === 1) {
     const partner0 = partners[0];
     if (!partner0) {
       clearSelectableFlags();

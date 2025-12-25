@@ -51,6 +51,28 @@ export interface FuseContext {
   context: any;
 }
 
+// ============================================================================
+// SHARED FUSE HELPERS - Consolidated from duplicate implementations
+// ============================================================================
+
+import { state } from "../../../../core/gameState.js";
+import { getHand, getGraveyard } from "../../../../core/playerHelpers.js";
+
+/** Check if this card already fused this turn */
+export function alreadyFusedThisTurn(card: CardInstance | null): boolean {
+  return !!card && card.lastFuseRound === state.roundCount;
+}
+
+/** Get player's hand */
+export function handOf(owner: Player): CardInstance[] {
+  return getHand(state, owner);
+}
+
+/** Get player's graveyard */
+export function graveOf(owner: Player): CardInstance[] {
+  return getGraveyard(state, owner);
+}
+
 
 
 

@@ -19,10 +19,11 @@ export function registerRunEffectsInProcess(fn: typeof runEffects) {
   runEffects = fn;
 }
 
+// P2-2: Type safety note for ProcessingCandidate.card
+// Currently `any` due to polymorphic usage (CardInstance | Crest).
+// TODO: Define union type `TriggerableEntity = CardInstance | CrestInstance`
 export interface ProcessingCandidate {
-  // CardInstance for board/hand triggers, Crest for crest triggers
-  // Using any to avoid cascading type errors from polymorphic usage
-  card: any;
+  card: any; // P2-2: CardInstance for board/hand, Crest for crests
   owner: Player;
   source: string; // "board", "hand", "crest", etc.
   triggers: TriggerSpec[];
@@ -37,11 +38,26 @@ export interface ProcessOptions {
   skipTracking?: boolean;
 }
 
+// P0-4 FIX: Maximum trigger chain depth to prevent infinite loops
+const MAX_CHAIN_DEPTH = 100;
+
 export function processCandidateTriggers(
   candidates: ProcessingCandidate[],
   options: ProcessOptions,
 ) {
   const { event, activePlayer, context, predicate } = options;
+
+  // P0-4 FIX: Chain depth guard to prevent infinite trigger recursion
+  const currentDepth = ((context as any)._chainDepth ?? 0) as number;
+  if (currentDepth > MAX_CHAIN_DEPTH) {
+    console.error(
+      `[Triggers] Chain depth exceeded ${MAX_CHAIN_DEPTH} for event "${event}". ` +
+      `Possible infinite loop. Aborting trigger processing.`
+    );
+    return;
+  }
+  // Increment depth for nested trigger calls
+  (context as any)._chainDepth = currentDepth + 1;
 
   // We assume context has turnNumber info if needed, or we compute it.
   const currentTurn = context._turnNumber as number;
@@ -127,10 +143,8 @@ export function processCandidateTriggers(
       // 6. Mark Fired
       if (!options.skipTracking) {
         markFired(trigger, card, event, currentTurn, context);
-      } else {
-        // Compatibility for broken/legacy once_per_turn behavior in specific handlers
-        if (trigger.once_per_turn) trigger.usedThisTurn = true;
       }
+      // Phase 4: REMOVED legacy usedThisTurn fallback in skipTracking branch
     }
   }
 }

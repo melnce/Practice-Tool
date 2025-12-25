@@ -45,6 +45,21 @@ Certain events bypass standard condition checks for historical or specific gamep
 - **Clash**: Bypasses standard `evalCommonConditions` because Clash logic is evaluated differently (caller validation).
 - **Fusion**: Often skips generic tracking to handle its own specific "one ping" rules.
 
+### d. Owner Filtering Reference (P1-4)
+
+Some events fire for only one player, others for both. This determines which cards can respond.
+
+| Event | Fires For | Handler Notes |
+|-------|-----------|---------------|
+| `start_of_turn`, `end_of_turn` | Active player | Only current player's cards respond |
+| `ally_follower_enter` | Owner of entering card | Cards owned by entering card's owner |
+| `enemy_follower_enter` | Opponent of entering card | Cards owned by opponent of entering card |
+| `ally_follower_played` | Active player | Cards owned by player who played |
+| `clash` | BOTH players | One call per player (2 total) |
+| `strike`, `follower_strike`, `leader_strike` | Attacker only | Only attacker's cards respond |
+| `self_damaged`, `self_buffed_up` | Owner of affected card | Only the affected card itself |
+| `on_fuse` | Active player | Fusing player's cards only |
+
 ## 3. Extension Rules
 
 ### Adding a new Trigger Event
@@ -60,6 +75,23 @@ Certain events bypass standard condition checks for historical or specific gamep
 
 - Modify `tracking.ts` only.
 - Ensure state is stored on the card instance transiently.
+
+### Skip Flags Reference (P1-1)
+
+Handlers may bypass standard pipeline phases via `skipCommonConditions` and `skipTracking`. 
+**These bypasses are legitimate ONLY when the predicate fully replaces the skipped logic.**
+
+| Handler | Flags Used | Rationale |
+|---------|------------|-----------|
+| `combat.ts` | Both | Self-targeted (UID match), once-per-action implicit |
+| `play.ts` | Both | Custom `checkPlayConditions()`, once-per-play implicit |
+| `self.ts` | Both | Self-targeted (UID match), once-per-event implicit |
+| `fuse.ts` | Both | Owner-restricted predicate, once-per-fuse implicit |
+| `zones.ts` | None | Standard pipeline, no bypasses |
+| `turn.ts` | None | Standard pipeline, no bypasses |
+| `common.ts` | None | Generic fallback, no bypasses |
+
+**GUARDRAIL: New handlers should avoid skip flags unless the predicate fully covers the logic.**
 
 ## 4. Debugging
 

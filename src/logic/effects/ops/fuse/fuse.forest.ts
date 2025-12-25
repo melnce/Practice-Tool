@@ -1,21 +1,9 @@
 // src/logic/effects/ops/fuse/fuse.forest.ts
-import { state } from "../../../../core/gameState.js";
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Player, CardInstance } from "../../../../core/types/index.js";
-import { getHand, getGraveyard } from "../../../../core/playerHelpers.js";
-
-function handOf(owner: Player) {
-  return getHand(state, owner);
-}
-
-function graveOf(owner: Player) {
-  return getGraveyard(state, owner);
-}
-
-function alreadyFusedThisTurn(card: CardInstance) {
-  return !!card && card.lastFuseRound === state.roundCount;
-}
+import { Player, CardInstance, Effect } from "../../../../core/types/index.js";
+import { alreadyFusedThisTurn, handOf, graveOf } from "./types.js";
+import { state } from "../../../../core/gameState.js";
 
 // Finalize for Garden's Allure
 export function fuse_finalize_gardens_allure(
@@ -61,7 +49,7 @@ export function fuse_finalize_gardens_allure(
   });
 
   initiator.isFused = true;
-  initiator.spell = [{ op: "draw", count: 2 } as any];
+  initiator.spell = [{ op: "draw", count: 2 }] as Effect[];
   initiator.lastFuseRound = state.roundCount;
 
   logEvent("fuseFinalize", {

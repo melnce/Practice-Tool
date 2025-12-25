@@ -40,10 +40,16 @@ class MulberryRNG implements RNG {
   private _cursor: number;
   private _gen: () => number;
 
+  // P1-1 FIX: Checkpoint cache for O(1) restore during MCTS rollbacks
+  private static readonly CHECKPOINT_INTERVAL = 1000;
+  private _checkpoints: Map<number, number> = new Map(); // cursor -> internal state (seed offset)
+
   constructor(seedLike: number | string | bigint) {
     this._seed = toSeed(seedLike);
     this._cursor = 0;
     this._gen = mulberry32(this._seed);
+    // Store initial checkpoint
+    this._checkpoints.set(0, this._seed);
   }
 
   get seed() {
@@ -56,6 +62,14 @@ class MulberryRNG implements RNG {
   nextFloat(): number {
     const r = this._gen();
     this._cursor++;
+
+    // P1-1 FIX: Auto-checkpoint at intervals for fast restore
+    if (this._cursor % MulberryRNG.CHECKPOINT_INTERVAL === 0) {
+      // The internal state after N calls is seed + N * 0x6d2b79f5
+      // We can compute this directly rather than storing huge state
+      this._checkpoints.set(this._cursor, this._seed + this._cursor * 0x6d2b79f5);
+    }
+
     return r;
   }
 
@@ -94,13 +108,36 @@ class MulberryRNG implements RNG {
 
   restore(s: { seed: number; cursor: number }): void {
     this._seed = s.seed;
-    this._gen = mulberry32(this._seed);
-    this._cursor = 0;
-    // Fast-forward
-    for (let i = 0; i < s.cursor; i++) {
+
+    // P1-1 FIX: Use checkpoints for O(1) restore when possible
+    // Find the nearest checkpoint at or before the target cursor
+    let nearestCheckpoint = 0;
+    let nearestState = this._seed;
+
+    for (const [cursor, state] of this._checkpoints) {
+      if (cursor <= s.cursor && cursor > nearestCheckpoint) {
+        nearestCheckpoint = cursor;
+        nearestState = state;
+      }
+    }
+
+    // Restore from nearest checkpoint
+    this._gen = mulberry32(nearestState);
+    this._cursor = nearestCheckpoint;
+
+    // Fast-forward only from checkpoint (max CHECKPOINT_INTERVAL-1 iterations)
+    const remaining = s.cursor - nearestCheckpoint;
+    for (let i = 0; i < remaining; i++) {
       this._gen();
     }
     this._cursor = s.cursor;
+
+    // Clear checkpoints beyond target cursor (they're now invalid)
+    for (const cursor of this._checkpoints.keys()) {
+      if (cursor > s.cursor) {
+        this._checkpoints.delete(cursor);
+      }
+    }
   }
 }
 

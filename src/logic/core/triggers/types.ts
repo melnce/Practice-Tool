@@ -56,7 +56,17 @@ export type TriggerEventName =
   | "invoke"
   | "select_mode";  // Mode selection (used by Faith crest)
 
+// =============================================================================
+// TRIGGER CONTEXT
+// =============================================================================
+// P0-2 FIX: TriggerContext supports both object refs (legacy) and UIDs (preferred).
+// - Use *Uid fields for serialization/determinism
+// - Object refs are convenience aliases that may become stale
+// - Use resolveContextCard() helper to get live card state from UID
+// =============================================================================
+
 export interface TriggerContext {
+  // --- Object References (Legacy - may become stale) ---
   initiator?: CardInstance;
   enteringCard?: CardInstance;
   invokedCard?: CardInstance;
@@ -65,8 +75,30 @@ export interface TriggerContext {
   attacker?: CardInstance;
   defender?: CardInstance;
   playedCard?: CardInstance;
+  leavingCard?: CardInstance;
+  destroyedCard?: CardInstance;
+
+  // --- UID Fields (P0-2 FIX - Source of Truth) ---
+  initiatorUid?: string;
+  enteringCardUid?: string;
+  invokedCardUid?: string;
+  targetUid?: string;
+  damagedCardUid?: string;
+  attackerUid?: string;
+  defenderUid?: string;
+  playedCardUid?: string;
+  leavingCardUid?: string;
+  destroyedCardUid?: string;
+
+  // --- Derived/Computed ---
+  enteringOwner?: string | null;
+  leavingOwner?: string | null;
+
+  // --- State Flags ---
   costChanged?: boolean;
-  // Allow any other properties
+  _turnNumber?: number;
+
+  // Allow any other properties (flexible extension)
   [key: string]: any;
 }
 
@@ -96,7 +128,7 @@ export interface TriggerSpec {
   once_per_turn?: boolean;
   once_key?: string;
   your_turn_only?: boolean;
-  usedThisTurn?: boolean; // Runtime state
+  // Phase 4: REMOVED usedThisTurn - use __onceByTurn store on CardInstance
 }
 
 

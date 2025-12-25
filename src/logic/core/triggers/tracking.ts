@@ -4,14 +4,18 @@ import { TriggerSpec, TriggerEventName, TriggerContext } from "./types.js";
 import { logEvent } from "../../../core/logger.js";
 
 // --- Dedupe map for "one fuse → one ping" invariant ---
+// P2-4: WeakMap is acceptable here since:
+// 1. Cards stay alive during the turn they're fused
+// 2. If GC'd between fuses (rare), a new fusion is legitimate
+// 3. Cleared implicitly when cards are removed from game
 const _seenLootFuseThisTurn = new WeakMap<CardInstance, number>();
 
-// Helper to access the hidden __onceByTurn property
+// Phase 3: Helper to access the __onceByTurn store (now typed on CardInstance)
 function getOnceByTurnStore(hostCard: CardInstance): Record<string, number> {
-  if (!(hostCard as any).__onceByTurn) {
-    (hostCard as any).__onceByTurn = Object.create(null);
+  if (!hostCard.__onceByTurn) {
+    hostCard.__onceByTurn = Object.create(null);
   }
-  return (hostCard as any).__onceByTurn;
+  return hostCard.__onceByTurn!;
 }
 
 // LEGACY: Special global dedupe for Loot Fusion (one ping per turn rule)
@@ -68,7 +72,7 @@ export function markFired(
     const key = makeOncePerTurnKey(trigger, event);
     const store = getOnceByTurnStore(hostCard);
     store[key] = currentTurn;
-    trigger.usedThisTurn = true; // Legacy/Compat flag
+    // Phase 4: REMOVED trigger.usedThisTurn assignment
   }
 }
 

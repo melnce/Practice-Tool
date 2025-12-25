@@ -4,17 +4,7 @@ import { clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
 import { Player, CardInstance } from "../../../../core/types/index.js";
-import { getHand, getGraveyard } from "../../../../core/playerHelpers.js";
-
-function handOf(owner: Player) {
-  return getHand(state, owner);
-}
-function graveOf(owner: Player) {
-  return getGraveyard(state, owner);
-}
-function alreadyFusedThisTurn(card: CardInstance) {
-  return !!card && card.lastFuseRound === state.roundCount;
-}
+import { alreadyFusedThisTurn, handOf, graveOf } from "./types.js";
 
 // Returning Slash, etc.
 export function fuse_finalize_loot(

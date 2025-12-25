@@ -34,7 +34,14 @@ export function handleCombatEvent(
     event,
     activePlayer,
     context,
+    // P1-1 RATIONALE: Combat triggers (strike, clash) bypass common conditions because:
+    // 1. They are SELF-TARGETED: only the attacking/clashing card fires its own triggers
+    // 2. Predicates below fully handle eligibility via UID matching
+    // 3. Common conditions like whose_turn/is_ally are irrelevant for combat
     skipCommonConditions: true,
+    // P1-1 RATIONALE: Combat triggers bypass tracking because:
+    // 1. They fire at most once per combat exchange (implicit once-per-action)
+    // 2. The predicate ensures only the correct card fires
     skipTracking: true,
     predicate: (trigger: TriggerSpec, cand: ProcessingCandidate) => {
       if (cand.owner !== activePlayer) return false;

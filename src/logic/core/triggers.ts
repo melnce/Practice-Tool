@@ -4,10 +4,26 @@ import { TriggerContext, TriggerEventName } from "./triggers/types.js";
 import { dispatchEvent } from "./triggers/dispatcher.js";
 import { registerRunEffectsInProcess } from "./triggers/process.js";
 import { handleLootFusedDedupe } from "./triggers/tracking.js";
+import { enrichContextWithUids } from "./triggers/resolve.js";
 import { getBoard, getCrests } from "../../core/playerHelpers.js";
 
 // Re-export for external consumers if needed
 export type { TriggerContext } from "./triggers/types.js";
+
+// --- Chain Depth Protection ---
+// P0-1 FIX: Prevents infinite trigger loops by limiting chain depth.
+// A trigger chain is when a trigger fires an effect that causes another trigger.
+const MAX_TRIGGER_CHAIN_DEPTH = 100;
+let _triggerChainDepth = 0;
+
+// Exposed for testing/debugging
+export function getTriggerChainDepth(): number {
+  return _triggerChainDepth;
+}
+
+export function resetTriggerChainDepth(): void {
+  _triggerChainDepth = 0;
+}
 
 // --- RunEffects Registration ---
 // We keep the registration API on this module to maintain backward compatibility
@@ -27,6 +43,7 @@ export type { TriggerContext } from "./triggers/types.js";
 // 3. INVARIANTS:
 //    - Execution Order: Crests -> Board -> Hand (Hand is last).
 //    - Trace hooks are available via `DEBUG_TRIGGERS` (see `debug.ts`).
+//    - Chain depth is limited to MAX_TRIGGER_CHAIN_DEPTH (100).
 // --------------------------------
 
 export function registerRunEffects(fn: any) {
@@ -40,38 +57,56 @@ export function fireTrigger(
   activePlayer: Player,
   context: TriggerContext = {},
 ) {
-  const _turnToken = Number.isFinite(state.turnNumber)
-    ? state.turnNumber
-    : (state.roundCount || 0) * 2 + (state.activePlayer === "first" ? 0 : 1);
-
-  // Enhance context with turn info for internal modules
-  // Using a non-enumerable or specific prop to pass this down
-  context._turnNumber = _turnToken;
-
-  // 1. Loot Fused Dedupe
-  if (eventName === "loot_fused" && context?.initiator) {
-    if (handleLootFusedDedupe(context.initiator, _turnToken)) {
-      return;
-    }
+  // P0-1 FIX: Chain depth protection
+  if (_triggerChainDepth >= MAX_TRIGGER_CHAIN_DEPTH) {
+    const msg = `[Triggers] Chain depth exceeded ${MAX_TRIGGER_CHAIN_DEPTH}. ` +
+      `Event: ${eventName}, Player: ${activePlayer}. ` +
+      `This indicates an infinite loop in trigger effects.`;
+    console.error(msg);
+    throw new Error(msg);
   }
 
-  // 2. Entering Owner Calc
-  // Derived once here to save re-calculation deeply/repeatedly
-  if (context.enteringOwner === undefined) {
-    const enteringCard = context.enteringCard ?? context.invokedCard ?? null;
-    if (enteringCard) {
-      context.enteringOwner = getBoard(state, "first").includes(enteringCard)
-        ? "first"
-        : getBoard(state, "second").includes(enteringCard)
-          ? "second"
-          : null;
-    } else {
-      context.enteringOwner = null;
-    }
-  }
+  _triggerChainDepth++;
 
-  // 3. Dispatch
-  dispatchEvent(eventName, activePlayer, context);
+  try {
+    // P0-2 FIX: Enrich context with UIDs for deterministic serialization
+    enrichContextWithUids(context);
+
+    const _turnToken = Number.isFinite(state.turnNumber)
+      ? state.turnNumber
+      : (state.roundCount || 0) * 2 + (state.activePlayer === "first" ? 0 : 1);
+
+    // Enhance context with turn info for internal modules
+    // Using a non-enumerable or specific prop to pass this down
+    context._turnNumber = _turnToken;
+
+    // 1. Loot Fused Dedupe
+    if (eventName === "loot_fused" && context?.initiator) {
+      if (handleLootFusedDedupe(context.initiator, _turnToken)) {
+        return;
+      }
+    }
+
+    // 2. Entering Owner Calc
+    // Derived once here to save re-calculation deeply/repeatedly
+    if (context.enteringOwner === undefined) {
+      const enteringCard = context.enteringCard ?? context.invokedCard ?? null;
+      if (enteringCard) {
+        context.enteringOwner = getBoard(state, "first").includes(enteringCard)
+          ? "first"
+          : getBoard(state, "second").includes(enteringCard)
+            ? "second"
+            : null;
+      } else {
+        context.enteringOwner = null;
+      }
+    }
+
+    // 3. Dispatch
+    dispatchEvent(eventName, activePlayer, context);
+  } finally {
+    _triggerChainDepth--;
+  }
 }
 
 // Helper kept for compatibility/utility if used externally, though not used in refactor

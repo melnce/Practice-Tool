@@ -17,7 +17,7 @@ export interface CrestTrigger {
   type?: string; // Alias for event in some triggers
   effects?: Effect[];
   once_per_turn?: boolean;
-  usedThisTurn?: boolean;
+  // REMOVED: usedThisTurn - now uses __onceByTurn store pattern
   condition?: Record<string, unknown> | null;
 }
 
@@ -50,11 +50,13 @@ export interface Crest {
   // Event triggers (e.g., end_of_turn_own)
   triggers?: CrestTrigger[];
 
-  // Legacy: single trigger (backwards compatibility)
-  trigger?: CrestTrigger;
+  // REMOVED Phase 2: trigger? field - all cards migrated to triggers[]
 
   // Keywords (e.g., ["Last Words"])
   keywords?: string[];
+
+  // Phase 1: Unified tracking store (same pattern as CardInstance)
+  __onceByTurn?: Record<string, number>;
 }
 
 function getCrests(owner: Player) {
@@ -65,11 +67,6 @@ function findCrest(owner: Player, name: string) {
   return list.find(
     (c) => String(c.name).toLowerCase() === String(name).toLowerCase(),
   );
-}
-
-/** Normalize to array */
-function toArray(x: any) {
-  return Array.isArray(x) ? x : x ? [x] : [];
 }
 
 export function handleGainCrest(eff: Effect, owner: Player) {
@@ -83,10 +80,8 @@ export function handleGainCrest(eff: Effect, owner: Player) {
     return;
   }
 
-  // Support both legacy "trigger" (single) and new "triggers" (array)
-  const triggers = (eff as any).triggers?.length
-    ? (eff as any).triggers
-    : toArray((eff as any).trigger);
+  // Phase 2: Only use triggers array (singular trigger field removed)
+  const triggers = (eff as any).triggers ?? [];
 
   const newCrest = {
     name: crestName,
@@ -104,10 +99,11 @@ export function handleGainCrest(eff: Effect, owner: Player) {
       type: t.type, // Include type field (e.g., "end_of_turn_own")
       effects: Array.isArray(t.effects) ? t.effects : [],
       once_per_turn: !!t.once_per_turn,
-      usedThisTurn: false,
+      // REMOVED: usedThisTurn initialization - uses crest.__onceByTurn now
       condition: t.condition ?? null,
     })),
     owner: targetOwner,
+    __onceByTurn: {}, // Initialize tracking store
   } as Crest;
 
   crests.push(newCrest);
@@ -185,14 +181,13 @@ export function resetCrestOncePerTurn(owner: Player) {
   const crests = getCrestsHelper(state, owner);
   if (!crests) return;
   for (const c of crests) {
-    if (Array.isArray(c.triggers)) {
-      for (const t of c.triggers) t.usedThisTurn = false;
-    }
+    // Clear the __onceByTurn store (Phase 1 unified tracking)
+    (c as any).__onceByTurn = {};
   }
 }
 
 /**
- * NEW: collect effects for a crest event.
+ * Phase 1: collect effects for a crest event using __onceByTurn store.
  * Returns a flat list of effects to be executed by runEffects(owner).
  */
 export function processCrestEvent(owner: Player, event: string) {
@@ -200,17 +195,34 @@ export function processCrestEvent(owner: Player, event: string) {
   if (!crests) return [];
   const out: Effect[] = [];
 
+  // Get current turn for tracking
+  const currentTurn = (state as any).turnNumber ?? state.roundCount ?? 0;
+
   (state as any).__DEBUG_CREST_LOOP_STARTED = true;
   (state as any).__DEBUG_CREST_COUNT = crests.length;
 
   for (const crest of crests) {
     if (!Array.isArray(crest.triggers)) continue;
-    for (const t of crest.triggers) {
-      if (t.event !== event) continue;
-      if (t.once_per_turn && t.usedThisTurn) continue;
-      if (t.effects?.length) out.push(...t.effects);
-      if (t.once_per_turn) t.usedThisTurn = true;
+
+    // Ensure __onceByTurn store exists
+    if (!(crest as any).__onceByTurn) {
+      (crest as any).__onceByTurn = {};
     }
+    const store = (crest as any).__onceByTurn as Record<string, number>;
+    const triggers = crest.triggers;
+
+    triggers.forEach((t, i) => {
+      if (t.event !== event) return;
+
+      // Check once_per_turn using store
+      if (t.once_per_turn) {
+        const key = `${event}_${i}`; // Unique key per trigger
+        if (store[key] === currentTurn) return; // Already fired this turn
+        store[key] = currentTurn; // Mark as fired
+      }
+
+      if (t.effects?.length) out.push(...t.effects);
+    });
   }
   return out;
 }

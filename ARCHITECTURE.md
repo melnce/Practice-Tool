@@ -86,7 +86,7 @@ npm run replay:check    # Replay determinism
 ### Add a New Op
 
 1. Add op name to `src/logic/core/effects/opTypes.ts` (`ALL_OPS`).
-2. Add type to `src/core/types.ts` (`EffectOp` union).
+2. Add type to `src/core/types/effects.ts` (`EffectByOp` mapping).
 3. Register handler in appropriate `domains/*.ts`:
    ```ts
    registerOp("my_op", (eff, ctx) => { ... });

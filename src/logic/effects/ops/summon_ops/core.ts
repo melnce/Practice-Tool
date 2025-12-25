@@ -31,6 +31,9 @@ export function pushToBoard(
   // we silently ignore the push to preserve idempotency and prevent duplicates.
   if (board.includes(card)) return true;
   card.zone = "board";
+  // P1-3 FIX: Record insertion timestamp for deterministic ordering
+  // Uses gameTick for replay compatibility, falls back to array length for stability
+  (card as any).insertionTs = state.gameTick ?? board.length;
   board.push(card);
 
   // Increment Rally if follower

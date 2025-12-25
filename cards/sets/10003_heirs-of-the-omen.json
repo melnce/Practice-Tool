@@ -697,19 +697,21 @@
         "image": "images/crests/krulle_heir_to_unkilling.png",
         "description": "Countdown (2) Whenever an allied follower enters the field, give it -1/-1",
         "countdown": 2,
-        "trigger": {
-          "event": "ally_follower_enter",
-          "source": "board",
-          "effects": [
-            {
-              "op": "stat",
-              "action": "give",
-              "target": "entering_follower",
-              "attack": -1,
-              "defense": -1
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "source": "board",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "entering_follower",
+                "attack": -1,
+                "defense": -1
+              }
+            ]
+          }
+        ]
       }
     ],
     "fanfare": [
@@ -1304,7 +1306,7 @@
             "name": "Remnant of Hollowness"
           }
         ],
-        "trigger": [
+        "triggers": [
           {
             "event": "loot_fused",
             "source": "board",
@@ -2238,20 +2240,22 @@
         "name": "Galmieux, Ardor Manifest",
         "image": "images/crests/galmieux_ardor_manifest.png",
         "description": "Once each of your turns: when an allied follower takes damage but isn't destroyed, add a Fangs of Ardent Destruction to your hand.",
-        "trigger": {
-          "event": "self_damaged",
-          "once_per_turn": true,
-          "effects": [
-            {
-              "op": "draw",
-              "source": "named",
-              "name": "Fangs of Ardent Destruction"
+        "triggers": [
+          {
+            "event": "self_damaged",
+            "once_per_turn": true,
+            "effects": [
+              {
+                "op": "draw",
+                "source": "named",
+                "name": "Fangs of Ardent Destruction"
+              }
+            ],
+            "condition": {
+              "still_alive": true
             }
-          ],
-          "condition": {
-            "still_alive": true
           }
-        }
+        ]
       }
     ],
     "keywords": [
@@ -3542,15 +3546,17 @@
                         {
                           "op": "keyword",
                           "action": "grant_trigger",
-                          "trigger": {
-                            "type": "end_of_turn_own",
-                            "effects": [
-                              {
-                                "op": "banish",
-                                "scope": "self"
-                              }
-                            ]
-                          }
+                          "triggers": [
+                            {
+                              "type": "end_of_turn_own",
+                              "effects": [
+                                {
+                                  "op": "banish",
+                                  "scope": "self"
+                                }
+                              ]
+                            }
+                          ]
                         }
                       ]
                     }

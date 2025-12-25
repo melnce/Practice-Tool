@@ -226,23 +226,25 @@
         "name": "Grimnir, Heavenly Gale",
         "image": "images/crests/grimnir_heavenly_gale.png",
         "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
-        "trigger": {
-          "type": "end_of_turn_own",
-          "effects": [
-            {
-              "op": "gate",
-              "condition": "super_evolved_allied",
-              "effects": [
-                {
-                  "op": "damage",
-                  "target": "enemy:follower",
-                  "amount": 2
-                }
-              ],
-              "else_effects": []
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "gate",
+                "condition": "super_evolved_allied",
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:follower",
+                    "amount": 2
+                  }
+                ],
+                "else_effects": []
+              }
+            ]
+          }
+        ]
       }
     ],
     "keywords": [
@@ -563,17 +565,19 @@
         "name": "Titania, Queen of Fairies",
         "image": "images/crests/titania_queen_of_fairies.png",
         "description": "At the start of your turn, add a Fairy to your hand",
-        "trigger": {
-          "event": "start_of_turn",
-          "effects": [
-            {
-              "op": "draw",
-              "source": "named",
-              "name": "Fairy",
-              "count": 1
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "start_of_turn",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "named",
+                "name": "Fairy",
+                "count": 1
+              }
+            ]
+          }
+        ]
       }
     ],
     "evolve": [
@@ -1238,17 +1242,19 @@
         "name": "Bergent, Rejected Artes",
         "image": "images/crests/bergent_rejected_artes.png",
         "description": "At the start of your turn, summon an Onion Patch",
-        "trigger": {
-          "event": "start_of_turn",
-          "effects": [
-            {
-              "op": "summon",
-              "source": "named",
-              "name": "Onion Patch",
-              "count": 1
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "start_of_turn",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Onion Patch",
+                "count": 1
+              }
+            ]
+          }
+        ]
       }
     ],
     "superevolve": [
@@ -1258,17 +1264,19 @@
         "name": "Bergent, Rejected Artes",
         "image": "images/crests/bergent_rejected_artes.png",
         "description": "At the start of your turn, summon an Onion Patch",
-        "trigger": {
-          "event": "start_of_turn",
-          "effects": [
-            {
-              "op": "summon",
-              "source": "named",
-              "name": "Onion Patch",
-              "count": 1
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "start_of_turn",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Onion Patch",
+                "count": 1
+              }
+            ]
+          }
+        ]
       }
     ],
     "fanfare": [
@@ -1458,27 +1466,29 @@
         "image": "images/crests/pascales_dance.png",
         "description": "Countdown (1). End of your turn: Draw a card. Earth Rite (10): Double the attack and defense of all allied followers.",
         "countdown": 1,
-        "trigger": {
-          "type": "end_of_turn_own",
-          "effects": [
-            {
-              "op": "draw",
-              "source": "deck",
-              "count": 1
-            },
-            {
-              "op": "earth_rite",
-              "cost": 10,
-              "effects": [
-                {
-                  "op": "stat",
-                  "mode": "double",
-                  "target": "ally:follower"
-                }
-              ]
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 1
+              },
+              {
+                "op": "earth_rite",
+                "cost": 10,
+                "effects": [
+                  {
+                    "op": "stat",
+                    "mode": "double",
+                    "target": "ally:follower"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ],
     "keywords": []
@@ -2006,22 +2016,24 @@
         "name": "Bergent, Rejected Artes",
         "image": "images/crests/neptune_arbiter_of_tides.png",
         "description": "Whenever an allied Marine follower enters the field, restore 1 defense to your leader",
-        "trigger": {
-          "event": "ally_follower_enter",
-          "source": "board",
-          "condition": {
-            "tribe": "Marine",
-            "not_self": true
-          },
-          "effects": [
-            {
-              "op": "restore",
-              "target": "leader",
-              "player": "self",
-              "amount": 1
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "source": "board",
+            "condition": {
+              "tribe": "Marine",
+              "not_self": true
+            },
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 1
+              }
+            ]
+          }
+        ]
       },
       {
         "op": "summon",
@@ -2528,16 +2540,18 @@
         "image": "images/crests/charon_stygian_oarswoman.png",
         "description": "Countdown (2) At the start of your turn, Reanimate (3)",
         "countdown": 2,
-        "trigger": {
-          "event": "start_of_turn",
-          "effects": [
-            {
-              "op": "summon",
-              "source": "graveyard",
-              "max_cost": 3
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "start_of_turn",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "graveyard",
+                "max_cost": 3
+              }
+            ]
+          }
+        ]
       }
     ],
     "fanfare": [
@@ -2639,16 +2653,18 @@
         "keywords": [
           {
             "name": "trigger",
-            "trigger": {
-              "type": "end_of_turn_own",
-              "source": "board",
-              "effects": [
-                {
-                  "op": "destroy",
-                  "scope": "self"
-                }
-              ]
-            }
+            "triggers": [
+              {
+                "type": "end_of_turn_own",
+                "source": "board",
+                "effects": [
+                  {
+                    "op": "destroy",
+                    "scope": "self"
+                  }
+                ]
+              }
+            ]
           }
         ],
         "select": 1
@@ -2972,24 +2988,26 @@
         "name": "Wilbert, Desolate Paladin",
         "image": "images/crests/wilbert_desolate_paladin.png",
         "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
-        "trigger": {
-          "event": "ally_follower_enter",
-          "source": "board",
-          "condition": {
-            "has_keyword": "Ward",
-            "not_self": true
-          },
-          "effects": [
-            {
-              "op": "stat",
-              "action": "give",
-              "target": "entering_follower",
-              "attack": 1,
-              "defense": 2,
-              "has_keyword": "Ward"
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "source": "board",
+            "condition": {
+              "has_keyword": "Ward",
+              "not_self": true
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "entering_follower",
+                "attack": 1,
+                "defense": 2,
+                "has_keyword": "Ward"
+              }
+            ]
+          }
+        ]
       }
     ],
     "superevolve": [
@@ -2999,24 +3017,26 @@
         "name": "Wilbert, Desolate Paladin",
         "image": "images/crests/wilbert_desolate_paladin.png",
         "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
-        "trigger": {
-          "event": "ally_follower_enter",
-          "source": "board",
-          "condition": {
-            "has_keyword": "Ward",
-            "not_self": true
-          },
-          "effects": [
-            {
-              "op": "stat",
-              "action": "give",
-              "target": "entering_follower",
-              "attack": 1,
-              "defense": 2,
-              "has_keyword": "Ward"
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "source": "board",
+            "condition": {
+              "has_keyword": "Ward",
+              "not_self": true
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "entering_follower",
+                "attack": 1,
+                "defense": 2,
+                "has_keyword": "Ward"
+              }
+            ]
+          }
+        ]
       }
     ],
     "fanfare": [],

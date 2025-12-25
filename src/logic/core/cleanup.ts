@@ -126,13 +126,16 @@ export function cleanupDead() {
       } else {
         logEvent("death", { card: c.name, owner });
         // History: mark as destroyed (only true deaths, not banish/bounce)
+        // P2-3 FIX: Use deterministic game tick instead of Date.now() for replay
+        const gameTick = (state as any).gameTick ??
+          ((state.roundCount || 0) * 1000 + (state.activePlayer === "first" ? 0 : 500));
         const histEntry = {
           uid: c.uid,
           name: c.name,
           type: c.type,
           cost: Number(c?.cost) || 0,
           base_image: c?.base_image || null,
-          ts: Date.now(),
+          ts: gameTick,
           id: c.id, // Preserve card id for history
         };
         getDestroyedHistory(state, owner).push(histEntry as any);

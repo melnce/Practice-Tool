@@ -16,8 +16,13 @@ export function handleFuseEvent(
     event,
     activePlayer,
     context,
-    skipCommonConditions: true, // LEGACY: on_fuse relies on implicit logic
-    skipTracking: true, // LEGACY: on_fuse doesn't use standard tracking
+    // P1-1 RATIONALE: Fuse triggers bypass common conditions because:
+    // 1. They are hand-sourced and owner-restricted by predicate
+    // 2. Fuse is a unique mechanic not covered by standard conditions
+    skipCommonConditions: true,
+    // P1-1 RATIONALE: Fuse triggers bypass tracking because:
+    // 1. Each fuse action is distinct - implicit once-per-fuse semantics
+    skipTracking: true,
     predicate: (trigger, cand) => {
       // Legacy: source check implicit (Zones).
       // Logic: if (owner === activePlayer) run.

@@ -170,9 +170,11 @@ export function logEvent(type: string, details: any = {}): number | undefined {
   const id = ++_id;
 
   // Basic metadata snapshot (cheap)
+  // P0-1 FIX: Use state.gameTick for deterministic timestamps (was Date.now())
+  const gameTick = (state as any).gameTick ?? 0;
   const meta = {
     id,
-    ts: Date.now(),
+    ts: gameTick,
     type,
     session: _sessionTag || null,
     turn: state.roundCount ?? 0,

@@ -108,12 +108,18 @@ export interface CardInstance extends CardTemplate {
     isDamaged?: boolean;
     shownCost?: number; // UI preview cost
 
+    // P1-3 FIX: Insertion timestamp for deterministic trigger ordering
+    insertionTs?: number;
+
     // Fuse
     _fusedLootNames?: string[];
     __lootFuseTurn?: number;
     __lootFuseCount?: number;
     lastFuseRound?: number;
     isFused?: boolean;
+
+    // Phase 3: Unified once-per-turn tracking store
+    __onceByTurn?: Record<string, number>;
 
     // Legacy / loose props (migrating slowly)
     on_discard?: Effect[];

@@ -18,6 +18,16 @@ export interface GameState {
 
     // === GLOBAL GAME STATE ===
     roundCount: number;
+    /** 
+     * P0-3 FIX: Explicit turn number for tracking once-per-turn effects.
+     * Incremented atomically in turn transitions. Required for determinism.
+     */
+    turnNumber: number;
+    /**
+     * P2-3 FIX: Deterministic game tick counter for history timestamps.
+     * Incremented on each effect dispatch. Replaces Date.now().
+     */
+    gameTick: number;
     /** Active player slot - sole source of truth for whose turn it is */
     activePlayer: PlayerSlot;
     gameStarted: boolean;

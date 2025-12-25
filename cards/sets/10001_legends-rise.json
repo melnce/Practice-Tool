@@ -987,22 +987,24 @@
         "name": "Aria, Lady of the Woods",
         "image": "images/crests/aria_lady_of_the_woods.png",
         "description": "Whenever an allied Pixie follower enters the field, give it Storm.",
-        "trigger": {
-          "event": "ally_follower_enter",
-          "condition": {
-            "tribe": "Pixie"
-          },
-          "effects": [
-            {
-              "op": "keyword",
-              "action": "grant",
-              "keywords": [
-                "Storm"
-              ],
-              "target": "entering_follower"
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "condition": {
+              "tribe": "Pixie"
+            },
+            "effects": [
+              {
+                "op": "keyword",
+                "action": "grant",
+                "keywords": [
+                  "Storm"
+                ],
+                "target": "entering_follower"
+              }
+            ]
+          }
+        ]
       }
     ],
     "keywords": []
@@ -2485,22 +2487,24 @@
         "image": "images/crests/juno_visionary_alchemist.png",
         "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
-        "trigger": {
-          "type": "end_of_turn_own",
-          "effects": [
-            {
-              "op": "earth_rite",
-              "cost": 1,
-              "effects": [
-                {
-                  "op": "summon",
-                  "source": "named",
-                  "name": "Guardian Golem"
-                }
-              ]
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Guardian Golem"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ],
     "superevolve": [
@@ -2511,22 +2515,24 @@
         "image": "images/crests/juno_visionary_alchemist.png",
         "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
         "countdown": 3,
-        "trigger": {
-          "type": "end_of_turn_own",
-          "effects": [
-            {
-              "op": "earth_rite",
-              "cost": 1,
-              "effects": [
-                {
-                  "op": "summon",
-                  "source": "named",
-                  "name": "Guardian Golem"
-                }
-              ]
-            }
-          ]
-        }
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "earth_rite",
+                "cost": 1,
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Guardian Golem"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
     ],
     "keywords": []
@@ -5907,7 +5913,6 @@
             "effects": [
               {
                 "op": "gate",
-                "condition": "hand_count",
                 "condition": {
                   "op": "<=",
                   "value": 5,
@@ -5947,7 +5952,6 @@
             "effects": [
               {
                 "op": "gate",
-                "condition": "hand_count",
                 "condition": {
                   "op": "<=",
                   "value": 5,

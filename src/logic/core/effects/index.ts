@@ -146,6 +146,9 @@ export function runEffects(
   while (queue.length > 0) {
     const eff = queue.shift()!;
 
+    // P2-3 FIX: Increment game tick for deterministic ordering
+    state.gameTick = (state.gameTick || 0) + 1;;
+
     // Runtime Assertion: Op must be valid string
     if (!eff.op || typeof eff.op !== "string") {
       throw new Error(

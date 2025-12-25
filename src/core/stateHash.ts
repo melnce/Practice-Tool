@@ -53,10 +53,12 @@ function canonicalizeState(state: GameState): object {
         redHand: state.players.second.hand.map(canonicalizeCard),
         blueBoard: state.players.first.board.map(canonicalizeCard),
         redBoard: state.players.second.board.map(canonicalizeCard),
-        blueDeck: state.players.first.deck.length, // Just count for performance
-        redDeck: state.players.second.deck.length,
-        blueGraveyard: state.players.first.graveyard.map(c => c.id),
-        redGraveyard: state.players.second.graveyard.map(c => c.id),
+        // P0-2 FIX: Include deck card IDs for proper state fingerprinting (was length only)
+        blueDeck: state.players.first.deck.map(c => c.id),
+        redDeck: state.players.second.deck.map(c => c.id),
+        // P1-4: Use canonicalizeCard for graveyard (was ID only)
+        blueGraveyard: state.players.first.graveyard.map(canonicalizeCard),
+        redGraveyard: state.players.second.graveyard.map(canonicalizeCard),
     };
 }
 

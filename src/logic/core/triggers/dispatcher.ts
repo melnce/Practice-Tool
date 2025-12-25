@@ -65,8 +65,14 @@ export function dispatchEvent(
   activePlayer: Player, // legacy calls it activePlayer, but context.owner might differ
   context: TriggerContext,
 ) {
-  const handler = EVENT_HANDLERS[event] || handleGenericEvent;
-  handler(event, activePlayer, context);
+  const handler = EVENT_HANDLERS[event];
+
+  // P2-5: Dev-mode warning for events without explicit handler registration
+  if (!handler && typeof window !== "undefined" && (window as any).__DEV__) {
+    console.warn(`[Triggers] Event "${event}" has no explicit handler, using generic fallback.`);
+  }
+
+  (handler || handleGenericEvent)(event, activePlayer, context);
 }
 
 

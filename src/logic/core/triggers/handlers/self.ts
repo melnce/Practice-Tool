@@ -16,8 +16,14 @@ export function handleDamageEvent(
     event,
     activePlayer,
     context,
-    skipCommonConditions: true, // LEGACY: self_damaged has unique condition logic
-    skipTracking: true, // LEGACY: self_damaged relies on manual tracking/predicate
+    // P1-1 RATIONALE: Self-damaged triggers bypass common conditions because:
+    // 1. They are SELF-TARGETED: only the damaged card fires its own trigger
+    // 2. Predicate below handles identity check via UID
+    // 3. Custom conditions (still_alive, own_turn) handled in predicate
+    skipCommonConditions: true,
+    // P1-1 RATIONALE: Self-damaged triggers bypass tracking because:
+    // 1. Each damage event is distinct - implicit once-per-damage semantics
+    skipTracking: true,
     predicate: (trigger, cand) => {
       const damaged = context.damagedCard;
       if (!damaged) return false;
@@ -50,8 +56,13 @@ export function handleBuffEvent(
     event,
     activePlayer,
     context,
-    skipCommonConditions: true, // LEGACY: self_buffed_up is specialized
-    skipTracking: true, // LEGACY: standard tracking skipped
+    // P1-1 RATIONALE: Self-buffed triggers bypass common conditions because:
+    // 1. They are SELF-TARGETED: only the buffed card fires its own trigger
+    // 2. Predicate handles identity + board source check
+    skipCommonConditions: true,
+    // P1-1 RATIONALE: Self-buffed triggers bypass tracking because:
+    // 1. Each buff event is distinct - card can be buffed multiple times
+    skipTracking: true,
     predicate: (trigger, cand) => {
       const t = context.target;
       if (!t) return false;

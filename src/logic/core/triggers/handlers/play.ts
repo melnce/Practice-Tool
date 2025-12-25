@@ -60,7 +60,13 @@ export function handlePlayEvent(
     event,
     activePlayer,
     context,
+    // P1-1 RATIONALE: Play triggers bypass common conditions because:
+    // 1. They use custom checkPlayConditions() which handles tribe/cost/name checks
+    // 2. Already filters by owner + board source in predicate
     skipCommonConditions: true,
+    // P1-1 RATIONALE: Play triggers bypass tracking because:
+    // 1. Each play is a unique action - implicit once-per-play semantics
+    // 2. The same card playing twice = two distinct events
     skipTracking: true,
     predicate: (trigger: TriggerSpec, cand: ProcessingCandidate) => {
       if (cand.owner !== activePlayer) return false;

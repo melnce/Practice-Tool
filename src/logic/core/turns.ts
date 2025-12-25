@@ -200,6 +200,9 @@ function _endTurnCore(endingPlayer: Player) {
   beginAction(`End Turn (${endingLabel})`);
 
   // === PHASE 1: End-of-Turn Cleanup for Ending Player ===
+  // P1-3 FIX: Batch cleanup - suppress during phase, run once at end
+  state.suppressCleanup = true;
+
   clearTempHandCostMods(endingPlayer);
   getBoard(state, endingPlayer).forEach((card) => clearTemporaryBuffs(card));
 
@@ -219,14 +222,14 @@ function _endTurnCore(endingPlayer: Player) {
   try {
     const fx = processCrestEvent(endingPlayer, "end_of_turn");
     if (fx.length) {
-      state.suppressCleanup = true;
       for (const eff of fx) runEffects([eff], endingPlayer, null);
-      state.suppressCleanup = false;
     }
   } catch (e) {
     console.error(`Error in ${endingLabel} Crest EOT:`, e);
-    state.suppressCleanup = false;
   }
+
+  // P1-3 FIX: Single cleanup at end of Phase 1
+  state.suppressCleanup = false;
   cleanupDead();
 
   clearExpiredCantAttackAtEOT(endingPlayer);
@@ -244,6 +247,9 @@ function _endTurnCore(endingPlayer: Player) {
   }
 
   // === PHASE 3: Prepare Next Player's Turn ===
+  // P1-3 FIX: Batch cleanup during turn prep
+  state.suppressCleanup = true;
+
   setMaxPP(state, nextPlayer, Math.min(state.roundCount + getPermPP(state, nextPlayer), 10));
   setPP(state, nextPlayer, getMaxPP(state, nextPlayer));
 
@@ -268,7 +274,6 @@ function _endTurnCore(endingPlayer: Player) {
   } catch (e) {
     console.error(`Error in ${nextPlayer} tick crests:`, e);
   }
-  cleanupDead();
 
   // Draw for next player
   drawCard(getHand(state, nextPlayer), getDeck(state, nextPlayer), nextPlayer);
@@ -284,13 +289,19 @@ function _endTurnCore(endingPlayer: Player) {
   setPlaysThisTurn(state, nextPlayer, 0);
   refreshBoardForNewTurn(getBoard(state, nextPlayer));
   tickAmuletCountdowns(nextPlayer);
+
+  // P1-3 FIX: Single cleanup at end of Phase 3
+  state.suppressCleanup = false;
   cleanupDead();
 
   // === PHASE 4: Switch Active Player ===
   state.activePlayer = nextPlayer;
+  // P0-3 FIX: Increment turn number atomically for deterministic tracking
+  state.turnNumber = (state.turnNumber || 0) + 1;
   logEvent("startTurn", {
     player: state.activePlayer,
     round: state.roundCount,
+    turn: state.turnNumber,
   });
 
   try {
