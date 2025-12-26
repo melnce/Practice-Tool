@@ -54,8 +54,21 @@ export function bounceToHand(card: CardInstance) {
   const [removed] = fromArr.splice(fromArr.indexOf(card), 1);
   if (!removed) return;
 
-  const fresh = freshBaseCopyByName(removed.name);
-  if (!fresh) return; // no DB entry → nothing to add
+  // Try to get fresh base copy from database
+  let fresh = freshBaseCopyByName(removed.name);
+
+  // Fallback: For synthetic/test cards not in database, create a reset copy
+  // This enables AI training scenarios and testing with custom cards
+  if (!fresh) {
+    fresh = structuredClone(removed);
+    fresh.uid = state.rng.makeUid();
+    fresh.zone = "hand";
+    // Reset combat state
+    delete fresh.hasAttacked;
+    delete fresh.hasEvolved;
+    delete fresh.exhausted;
+    delete fresh.attacksThisTurn;
+  }
 
   const pushed = pushToHand(toHand, fresh);
   if (!pushed) {
@@ -107,6 +120,13 @@ export function handleReturnToHand(
 
   if (!pool.length) return;
 
+  // Handle select: "all" - bounce all matching cards immediately
+  if ((eff as any).select === "all") {
+    for (const t of pool) bounceToHand(t);
+    return;
+  }
+
+  // Numeric select - use pending target for UI selection
   if ((eff as any).select) {
     setPendingTarget({
       eff,

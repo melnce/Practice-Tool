@@ -28,6 +28,19 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
       console.warn("[Targeting] entering_follower target used without context");
       return [];
     }
+    if (q.specialContext === "played_card") {
+      // For ally_follower_played triggers
+      const ctx = env.context as any;
+      if (ctx.playedCardUid) {
+        const card = resolveUid(ctx.playedCardUid);
+        return card ? [card] : [];
+      }
+      if (ctx.playedCard) {
+        return [ctx.playedCard];
+      }
+      console.warn("[Targeting] played_card target used without context");
+      return [];
+    }
     return [];
   },
 

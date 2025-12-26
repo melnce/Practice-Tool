@@ -43,7 +43,7 @@ describe("Mechanic Contract: targeting", () => {
                 op: "damage" as const,
                 target: "enemy:follower",
                 amount: 2,
-                select: "all",
+                // No select field = targets all by default
             };
             whenRunEffects([effect], "first");
 
@@ -65,7 +65,7 @@ describe("Mechanic Contract: targeting", () => {
                 action: "give",
                 target: "ally:follower",
                 attack: 1,
-                select: "all",
+                // No select field = targets all by default
             };
             whenRunEffects([effect], "first");
 

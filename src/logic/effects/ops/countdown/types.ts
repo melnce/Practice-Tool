@@ -14,69 +14,41 @@ export interface CountdownSpec {
 }
 
 /**
- * Normalize legacy op names to unified countdown spec
+ * Normalize countdown spec.
+ * STRICT MODE - only accepts "countdown" op with required fields.
  */
-export function normalizeCountdownSpec(eff: Effect): CountdownSpec | null {
+export function normalizeCountdownSpec(eff: Effect): CountdownSpec {
     const op = (eff as any).op;
 
-    // Already unified
-    if (op === "countdown") {
-        return {
-            op: "countdown",
-            action: (eff as any).action === "increase" || (eff as any).action === "delay_countdown"
-                ? "increase"
-                : "advance",
-            amount: (eff as any).amount,
-            target: (eff as any).target,
-            name: (eff as any).name,
-        };
+    // ==========================================================================
+    // STRICT: Only accept "countdown" op
+    // ==========================================================================
+    if (op !== "countdown") {
+        throw new Error(
+            `[countdown] Invalid op: "${op}". Legacy ops are removed. ` +
+            `Use { "op": "countdown", "action": "advance"|"increase", ... }. ` +
+            `Effect: ${JSON.stringify(eff)}`
+        );
     }
 
-    // Legacy amulet ops
-    if (op === "amulet") {
-        const action = (eff as any).action;
-        if (action === "reduce_countdown" || action === "advance_countdown") {
-            return {
-                op: "countdown",
-                action: "advance",
-                amount: (eff as any).amount,
-                target: "self",
-            };
-        }
-        if (action === "delay_countdown") {
-            return {
-                op: "countdown",
-                action: "increase",
-                amount: (eff as any).amount,
-                target: "self",
-            };
-        }
+    // ==========================================================================
+    // REQUIRED: action
+    // ==========================================================================
+    const action = (eff as any).action;
+    if (!action || (action !== "advance" && action !== "increase")) {
+        throw new Error(
+            `[countdown] Missing or invalid field: "action". Must be "advance" or "increase". ` +
+            `Effect: ${JSON.stringify(eff)}`
+        );
     }
 
-    // Legacy crest countdown ops
-    if (op === "crest") {
-        const action = (eff as any).action;
-        if (action === "advance_countdown") {
-            return {
-                op: "countdown",
-                action: "advance",
-                amount: (eff as any).amount,
-                target: (eff as any).target,
-                name: (eff as any).name,
-            };
-        }
-        if (action === "delay_countdown") {
-            return {
-                op: "countdown",
-                action: "increase",
-                amount: (eff as any).amount,
-                target: (eff as any).target,
-                name: (eff as any).name,
-            };
-        }
-    }
-
-    return null;
+    return {
+        op: "countdown",
+        action: action as CountdownAction,
+        amount: (eff as any).amount,
+        target: (eff as any).target,
+        name: (eff as any).name,
+    };
 }
 
 

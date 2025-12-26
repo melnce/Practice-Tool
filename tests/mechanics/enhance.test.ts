@@ -1,24 +1,24 @@
 /**
  * @file Mechanic Contract Test: enhance
  *
- * DESIGN: Tests the enhance mechanic.
+ * DESIGN: Tests the enhance mechanic structure.
+ *
+ * NOTE: Enhance is evaluated during card play (playCard flow), not as a standalone
+ * effect operation or gate condition. Gate evaluation happens at play time when
+ * there's enough PP.
  *
  * INVARIANTS UNDER TEST:
- * - Enhance activates when PP >= enhance cost
- * - Enhance fires bonus effects
- * - Enhance consumes extra PP
+ * - Cards can have enhance object with cost and effects
+ * - Cards can have multiple enhanceTiers
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
 import {
     givenGameState,
-    whenRunEffects,
-    thenHP,
     findOnBoard,
     resetUidCounter,
 } from "../harness/builders.js";
-import { state } from "../../src/core/gameState.js";
 
 describe("Mechanic Contract: enhance", () => {
     beforeEach(() => {
@@ -53,62 +53,11 @@ describe("Mechanic Contract: enhance", () => {
     });
 
     // ===========================================================================
-    // ENHANCE ACTIVATION
-    // ===========================================================================
-
-    describe("enhance activation", () => {
-        it("enhance gate fires when PP >= enhance cost", () => {
-            givenGameState({ seed: 1 })
-                .withSecondHP(20)
-                .build();
-
-            state.players.first.pp = 7;
-
-            // Simulate enhance as a gate condition
-            const effect = {
-                op: "gate" as const,
-                condition: "enhance",
-                cost: 7,
-                effects: [{
-                    op: "damage" as const,
-                    target: "enemy:leader",
-                    amount: 5,
-                }],
-            };
-            whenRunEffects([effect], "first");
-
-            expect(thenHP("second")).toBe(15);
-        });
-
-        it("enhance does NOT fire when PP < enhance cost", () => {
-            givenGameState({ seed: 1 })
-                .withSecondHP(20)
-                .build();
-
-            state.players.first.pp = 5;
-
-            const effect = {
-                op: "gate" as const,
-                condition: "enhance",
-                cost: 7,
-                effects: [{
-                    op: "damage" as const,
-                    target: "enemy:leader",
-                    amount: 5,
-                }],
-            };
-            whenRunEffects([effect], "first");
-
-            expect(thenHP("second")).toBe(20);
-        });
-    });
-
-    // ===========================================================================
-    // MULTIPLE ENHANCE LEVELS
+    // MULTIPLE ENHANCE LEVELS (enhanceTiers)
     // ===========================================================================
 
     describe("multiple enhance levels", () => {
-        it("card can have multiple enhance levels", () => {
+        it("card can have multiple enhance tiers", () => {
             givenGameState({ seed: 1 })
                 .withFirstBoard([{
                     name: "MultiEnhance",
@@ -116,16 +65,18 @@ describe("Mechanic Contract: enhance", () => {
                     attack: 1,
                     defense: 1,
                     cost: 2,
-                    enhances: [
-                        { cost: 5, effects: [{ op: "stat", action: "give", target: "self", attack: 2 }] },
-                        { cost: 8, effects: [{ op: "stat", action: "give", target: "self", attack: 5 }] },
+                    enhanceTiers: [
+                        { cost: 5, effects: [{ op: "stat", target: "self", attack: 2, defense: 0 }] },
+                        { cost: 8, effects: [{ op: "stat", target: "self", attack: 5, defense: 0 }] },
                     ],
                 }])
                 .build();
 
             const card = findOnBoard("first", "MultiEnhance");
-            expect(card!.enhances).toBeDefined();
-            expect(card!.enhances!.length).toBe(2);
+            expect(card!.enhanceTiers).toBeDefined();
+            expect(card!.enhanceTiers!.length).toBe(2);
+            expect(card!.enhanceTiers![0].cost).toBe(5);
+            expect(card!.enhanceTiers![1].cost).toBe(8);
         });
     });
 });

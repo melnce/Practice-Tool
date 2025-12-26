@@ -9,62 +9,74 @@ import { getHand, getBoard } from "../../../core/playerHelpers.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 
 // ========================================================================
-// UNIFIED TRANSFORM HANDLER - routes by zone field
+// UNIFIED TRANSFORM HANDLER - target field REQUIRED
 // ========================================================================
 
 export type TransformZone = "board" | "hand" | "self";
-// mode: "random" = pick one random card from filtered set
-// mode: "all" = transform all cards matching filter (default for zone: hand)
-// Note: spellboost threshold transforms are now handled by gate(spellboost_count) + transform
 export type TransformMode = "all" | "random";
 
 export interface TransformFilter {
-  type?: string; // "Spell", "Follower", "Amulet"
-  class?: string; // "Runecraft", "Swordcraft", etc
+  type?: string;
+  class?: string;
   cost?: { op: string; value: number };
 }
 
 export interface TransformSpec {
-  zone?: TransformZone;
+  target: string;           // REQUIRED: unified target (e.g., "enemy:follower", "ally:hand")
   mode?: TransformMode;
-  into?: string;
+  into?: string;            // REQUIRED for board/self
   name?: string;
   filter?: TransformFilter;
-  target_card_name?: string;
+  select?: number;
 }
 
 /**
  * Unified transform handler.
  *
- * zone: "board" (default) - transform selected/targeted card on board
- * zone: "hand" - transform cards in hand
- * zone: "self" - transform the source card itself
+ * CANONICAL FORMAT (target field REQUIRED):
+ *   { "op": "transform", "target": "enemy:follower", "select": 1, "into": "Fairy" }
+ *   { "op": "transform", "target": "ally:hand", "filter": {...}, "into": "Token" }
  *
- * mode: "all" (default) - transform all cards matching filter
- * mode: "random" - pick one random card from filter and transform
- * mode: "threshold" - handled by spellboost.ts (transform at spellboost count)
- *
- * filter: { type: "Spell" | "Follower", class: "...", cost: {...} }
+ * Zone derivation from target:
+ *   - target contains ":hand" → zone = "hand"
+ *   - target === "self" → zone = "self"
+ *   - otherwise → zone = "board"
  */
 export function handleTransform(
   eff: Effect & TransformSpec,
   owner: Player,
   ctx: { sourceCard?: CardInstance | null; context?: any },
 ): void {
-  // Zone is MANDATORY - no default
-  if (!eff.zone) {
-    console.warn("transform: zone field is mandatory (board, hand, self)");
-    return;
+  // ========================================================================
+  // STRICT: target field is REQUIRED
+  // ========================================================================
+  if (!eff.target) {
+    throw new Error(
+      `[transform] Missing required field: "target". ` +
+      `Use "enemy:follower", "ally:hand", or "self". ` +
+      `Effect: ${JSON.stringify(eff)}`
+    );
   }
-  const zone = eff.zone as TransformZone;
+
+  const targetStr = String(eff.target).toLowerCase();
+  let zone: TransformZone;
+
+  if (targetStr.includes(":hand")) {
+    zone = "hand";
+  } else if (targetStr === "self") {
+    zone = "self";
+  } else {
+    zone = "board";
+  }
+
   const mode = (eff.mode || "all") as TransformMode;
-  const into = String(
-    eff.into || eff.name || eff.target_card_name || "",
-  ).trim();
+  const into = String(eff.into || eff.name || "").trim();
 
   if (!into && zone !== "hand") {
-    console.warn("transform: missing target card name (into)");
-    return;
+    throw new Error(
+      `[transform] Missing required field: "into". ` +
+      `Effect: ${JSON.stringify(eff)}`
+    );
   }
 
   switch (zone) {
@@ -87,12 +99,11 @@ export function handleTransform(
 
     case "board":
     default: {
-      // Board transform - get target from context
-      // Prefer UID-based targeting
+      // Board transform - get target from context or resolve via select
       let t: CardInstance | null = null;
 
+      // First check for UID-based targeting from context
       if (ctx.context?.targetUids?.length) {
-        // UID-only path
         t = resolveUid(ctx.context.targetUids[0]);
       }
 
@@ -107,10 +118,12 @@ export function handleTransform(
 
       if (t) {
         transformTarget(t, into);
-      } else if (ctx.sourceCard && eff.target === "self") {
+      } else if (ctx.sourceCard && (eff.target === "self" || targetStr === "self")) {
         transformTarget(ctx.sourceCard, into);
       } else {
-        console.warn("transform: no target in context; use via select{...}");
+        // No target in context - this means selection wasn't done
+        // Log for debugging but don't throw
+        console.warn("transform: no target in context. Ensure selection is performed before transform.");
       }
       return;
     }
@@ -170,6 +183,7 @@ function matchesFilter(card: CardInstance, filter: TransformFilter): boolean {
 /**
  * Transform all cards in hand matching the filter.
  * mode: "all" (default)
+ * Preserves UID, owner, and zone to maintain card identity.
  */
 function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
   const hand = getHand(state, owner);
@@ -192,9 +206,12 @@ function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
     if (!card) continue;
 
     if (matchesFilter(card, filter)) {
+      // PRESERVE UID, owner, zone - only replace card properties
       const newCard = {
         ...structuredClone(cardTemplate),
-        uid: state.rng.makeUid("card_"),
+        uid: card.uid,          // PRESERVE original UID
+        owner: card.owner,      // PRESERVE owner
+        zone: card.zone,        // PRESERVE zone
       };
       logEvent("transformInHand", { owner, from: card.name, to: newCard.name });
       hand[i] = newCard as CardInstance;

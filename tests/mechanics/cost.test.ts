@@ -2,6 +2,11 @@
  * @file Mechanic Contract Test: cost manipulation
  *
  * DESIGN: Tests cost modification operations.
+ * CANONICAL FORMAT:
+ *   - op: "cost"
+ *   - mode: "reduce" | "set" | "modify" | "increase"  (NOT "action")
+ *   - target: "self" | "selected" | "pool" | "opponent_hand" | "last_drawn"
+ *   - pool: "ally:hand" | "ally:board" etc. (required when target is "pool")
  *
  * INVARIANTS UNDER TEST:
  * - Cost reduction modifies card cost correctly
@@ -18,7 +23,6 @@ import {
     thenHand,
     resetUidCounter,
 } from "../harness/builders.js";
-import { state } from "../../src/core/gameState.js";
 
 describe("Mechanic Contract: cost", () => {
     beforeEach(() => {
@@ -37,8 +41,9 @@ describe("Mechanic Contract: cost", () => {
 
             const effect = {
                 op: "cost" as const,
-                action: "reduce",
-                target: "ally:hand",
+                mode: "reduce",
+                target: "pool",
+                pool: "ally:hand",
                 amount: 2,
             };
             whenRunEffects([effect], "first");
@@ -54,8 +59,9 @@ describe("Mechanic Contract: cost", () => {
 
             const effect = {
                 op: "cost" as const,
-                action: "reduce",
-                target: "ally:hand",
+                mode: "reduce",
+                target: "pool",
+                pool: "ally:hand",
                 amount: 5,
             };
             whenRunEffects([effect], "first");
@@ -75,8 +81,9 @@ describe("Mechanic Contract: cost", () => {
 
             const effect = {
                 op: "cost" as const,
-                action: "reduce",
-                target: "ally:hand",
+                mode: "reduce",
+                target: "pool",
+                pool: "ally:hand",
                 amount: 1,
             };
             whenRunEffects([effect], "first");
@@ -95,8 +102,9 @@ describe("Mechanic Contract: cost", () => {
 
             const effect = {
                 op: "cost" as const,
-                action: "reduce",
-                target: "ally:hand",
+                mode: "reduce",
+                target: "pool",
+                pool: "ally:hand",
                 amount: 2,
             };
             whenRunEffects([effect], "first");
@@ -118,8 +126,9 @@ describe("Mechanic Contract: cost", () => {
 
             const effect = {
                 op: "cost" as const,
-                action: "set",
-                target: "ally:hand",
+                mode: "set",
+                target: "pool",
+                pool: "ally:hand",
                 amount: 1,
             };
             whenRunEffects([effect], "first");
@@ -134,8 +143,9 @@ describe("Mechanic Contract: cost", () => {
 
             const effect = {
                 op: "cost" as const,
-                action: "set",
-                target: "ally:hand",
+                mode: "set",
+                target: "pool",
+                pool: "ally:hand",
                 amount: 0,
             };
             whenRunEffects([effect], "first");
@@ -145,7 +155,7 @@ describe("Mechanic Contract: cost", () => {
     });
 
     // ===========================================================================
-    // SPELLBOOST
+    // SPELLBOOST (canonical format: target: "ally:hand")
     // ===========================================================================
 
     describe("spellboost", () => {
@@ -155,7 +165,7 @@ describe("Mechanic Contract: cost", () => {
                     name: "SpellboostCard",
                     type: "Spell",
                     cost: 10,
-                    hasSpellboost: true,
+                    keywords: [{ name: "Spellboost" }],
                     spellboostCount: 0,
                 }])
                 .build();
@@ -163,7 +173,7 @@ describe("Mechanic Contract: cost", () => {
             const effect = {
                 op: "spellboost" as const,
                 target: "ally:hand",
-                amount: 1,
+                count: 1,
             };
             whenRunEffects([effect], "first");
 
@@ -177,9 +187,7 @@ describe("Mechanic Contract: cost", () => {
                     name: "SpellboostCard",
                     type: "Spell",
                     cost: 10,
-                    originalCost: 10,
-                    hasSpellboost: true,
-                    spellboostCostReduction: 1,
+                    keywords: [{ name: "Spellboost", reduceCostBy: 1, minCost: 0 }],
                     spellboostCount: 0,
                 }])
                 .build();
@@ -187,7 +195,7 @@ describe("Mechanic Contract: cost", () => {
             const effect = {
                 op: "spellboost" as const,
                 target: "ally:hand",
-                amount: 3,
+                count: 3,
             };
             whenRunEffects([effect], "first");
 

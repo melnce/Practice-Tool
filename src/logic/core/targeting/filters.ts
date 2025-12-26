@@ -37,10 +37,18 @@ export function applyFilters(
     filtered = filtered.filter((c) => c?.type === "Spell");
 
   // 2. Self Exclusion
+  // ally:X targets exclude self by default (standard Shadowverse behavior)
+  // Self is only included when:
+  //  - query.side is "self"
+  //  - cond.include_self is true
+  //  - cond.not_self is explicitly false
+  const forceExcludeSelf = query.excludeSelf === true;
   const allowSelf =
-    query.side === "self" ||
-    cond.not_self === false ||
-    cond.include_self === true;
+    !forceExcludeSelf && (
+      query.side === "self" ||
+      cond.not_self === false ||
+      cond.include_self === true
+    );
 
   if (!allowSelf && env.sourceCard) {
     filtered = filtered.filter((c) => c?.uid !== env.sourceCard!.uid);

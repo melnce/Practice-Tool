@@ -16,8 +16,29 @@ export interface SearchSpec {
 
 /**
  * Normalize a search effect to a unified spec.
+ * STRICT MODE - requires filter and count.
  */
 export function normalizeSearchSpec(eff: Effect & Record<string, any>): SearchSpec {
+    // ==========================================================================
+    // STRICT: op must be "search"
+    // ==========================================================================
+    if (eff.op !== "search") {
+        throw new Error(
+            `[search] Invalid op: "${eff.op}". Must be "search". ` +
+            `Effect: ${JSON.stringify(eff)}`
+        );
+    }
+
+    // ==========================================================================
+    // REQUIRED: count
+    // ==========================================================================
+    if (eff.count === undefined) {
+        throw new Error(
+            `[search] Missing required field: "count". ` +
+            `Effect: ${JSON.stringify(eff)}`
+        );
+    }
+
     return {
         filters: eff.filter || eff.filters || {},
         count: typeof eff.count === "number" ? eff.count : 1,

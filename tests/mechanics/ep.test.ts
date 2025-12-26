@@ -4,9 +4,8 @@
  * DESIGN: Tests evolution point operations.
  *
  * INVARIANTS UNDER TEST:
- * - Gain EP increases count
- * - Consume EP decreases count
- * - EP cannot go below 0
+ * - Recover EP increases count
+ * - EP caps at 2
  * - EP is per-player
  */
 
@@ -25,92 +24,53 @@ describe("Mechanic Contract: EP", () => {
     });
 
     // ===========================================================================
-    // GAIN EP
+    // RECOVER EP
+    // Canonical: { op: "ep", action: "recover", amount: N, player: "self"|"enemy" }
     // ===========================================================================
 
-    describe("gain EP", () => {
+    describe("ep action: recover", () => {
         it("increases evolution points", () => {
             givenGameState({ seed: 1 }).build();
-            state.players.first.evolutionPoints = 2;
+            state.players.first.evoCharges = 0;
 
             const effect = {
                 op: "ep" as const,
-                action: "gain",
+                action: "recover",
                 amount: 1,
             };
             whenRunEffects([effect], "first");
 
-            expect(state.players.first.evolutionPoints).toBe(3);
+            expect(state.players.first.evoCharges).toBe(1);
         });
 
         it("EP is per-player", () => {
             givenGameState({ seed: 1 }).build();
-            state.players.first.evolutionPoints = 2;
-            state.players.second.evolutionPoints = 1;
+            state.players.first.evoCharges = 0;
+            state.players.second.evoCharges = 1;
 
             const effect = {
                 op: "ep" as const,
-                action: "gain",
+                action: "recover",
                 amount: 1,
             };
             whenRunEffects([effect], "first");
 
-            expect(state.players.first.evolutionPoints).toBe(3);
-            expect(state.players.second.evolutionPoints).toBe(1);
+            expect(state.players.first.evoCharges).toBe(1);
+            expect(state.players.second.evoCharges).toBe(1);
         });
-    });
 
-    // ===========================================================================
-    // CONSUME EP
-    // ===========================================================================
-
-    describe("consume EP", () => {
-        it("decreases evolution points", () => {
+        it("EP caps at 2", () => {
             givenGameState({ seed: 1 }).build();
-            state.players.first.evolutionPoints = 3;
+            state.players.first.evoCharges = 1;
 
             const effect = {
                 op: "ep" as const,
-                action: "consume",
-                amount: 1,
+                action: "recover",
+                amount: 5, // Try to recover more than cap
             };
             whenRunEffects([effect], "first");
 
-            expect(state.players.first.evolutionPoints).toBe(2);
-        });
-
-        it("EP cannot go below 0", () => {
-            givenGameState({ seed: 1 }).build();
-            state.players.first.evolutionPoints = 1;
-
-            const effect = {
-                op: "ep" as const,
-                action: "consume",
-                amount: 5,
-            };
-            whenRunEffects([effect], "first");
-
-            expect(state.players.first.evolutionPoints).toBeGreaterThanOrEqual(0);
-        });
-    });
-
-    // ===========================================================================
-    // SET EP
-    // ===========================================================================
-
-    describe("set EP", () => {
-        it("sets EP to exact value", () => {
-            givenGameState({ seed: 1 }).build();
-            state.players.first.evolutionPoints = 5;
-
-            const effect = {
-                op: "ep" as const,
-                action: "set",
-                amount: 2,
-            };
-            whenRunEffects([effect], "first");
-
-            expect(state.players.first.evolutionPoints).toBe(2);
+            expect(state.players.first.evoCharges).toBeLessThanOrEqual(2);
         });
     });
 });

@@ -125,7 +125,7 @@ describe("Mechanic Contract: restore", () => {
                     type: "Follower",
                     attack: 3,
                     defense: 2,
-                    maxDefense: 5,
+                    peak_defense: 5,
                 }])
                 .build();
 
@@ -147,7 +147,7 @@ describe("Mechanic Contract: restore", () => {
                     type: "Follower",
                     attack: 3,
                     defense: 4,
-                    maxDefense: 5,
+                    peak_defense: 5,
                 }])
                 .build();
 

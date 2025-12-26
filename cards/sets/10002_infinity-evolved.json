@@ -389,8 +389,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Fairy",
         "count": 1
       }
@@ -430,17 +429,19 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 2,
-        "distribution": "random_hits",
-        "count": 1
-      },
-      {
         "op": "gate",
         "condition": "combo",
         "count": 3,
         "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 2,
+            "distribution": "random",
+            "count": 2
+          }
+        ],
+        "else_effects": [
           {
             "op": "damage",
             "target": "enemy:follower",
@@ -473,7 +474,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "tribes": "Pixie",
+        "condition": {
+          "tribe": "Pixie"
+        },
         "attack": 1,
         "defense": 0
       }
@@ -483,7 +486,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "tribes": "Pixie",
+        "condition": {
+          "tribe": "Pixie"
+        },
         "attack": 1,
         "defense": 0
       }
@@ -530,9 +535,22 @@
     ],
     "spell": [
       {
-        "op": "draw",
-        "source": "deck",
-        "count": 1
+        "op": "gate",
+        "condition": "has_fuse_materials",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          }
+        ]
       }
     ],
     "keywords": []
@@ -570,8 +588,7 @@
             "event": "start_of_turn",
             "effects": [
               {
-                "op": "draw",
-                "source": "named",
+                "op": "add_to_hand",
                 "name": "Fairy",
                 "count": 1
               }
@@ -582,30 +599,18 @@
     ],
     "evolve": [
       {
-        "op": "select",
+        "op": "transform",
         "target": "enemy:follower",
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "transform",
-            "zone": "board",
-            "into": "Fairy"
-          }
-        ]
+        "select": 1,
+        "into": "Fairy"
       }
     ],
     "superevolve": [
       {
-        "op": "select",
+        "op": "transform",
         "target": "enemy:follower",
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "transform",
-            "zone": "board",
-            "into": "Fairy"
-          }
-        ]
+        "select": 1,
+        "into": "Fairy"
       }
     ],
     "keywords": []
@@ -778,13 +783,6 @@
               {
                 "op": "stat",
                 "action": "give",
-                "target": "self",
-                "attack": 1,
-                "defense": 1
-              },
-              {
-                "op": "stat",
-                "action": "give",
                 "target": "ally:follower",
                 "attack": 1,
                 "defense": 1
@@ -860,7 +858,7 @@
         "target": "enemy:follower",
         "amount": 4,
         "count": 1,
-        "distribution": "random_hits"
+        "distribution": "random"
       }
     ],
     "keywords": [
@@ -873,7 +871,7 @@
             "target": "enemy:follower",
             "amount": 4,
             "count": 3,
-            "distribution": "random_hits"
+            "distribution": "random"
           }
         ]
       }
@@ -916,7 +914,8 @@
             "op": "cost",
             "target": "last_drawn",
             "action": "set",
-            "amount": 0
+            "amount": 0,
+            "mode": "set"
           }
         ]
       }
@@ -929,7 +928,8 @@
           {
             "op": "destroy",
             "scope": "defender",
-            "only_if_damaged": true
+            "only_if_damaged": true,
+            "target": "enemy:follower"
           }
         ]
       }
@@ -956,14 +956,16 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
         "attack": 1,
         "defense": 1
       }
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Nonja, Silent Maid",
         "count": 1
       }
@@ -1125,8 +1127,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Witch's New Brew",
         "count": 1
       },
@@ -1423,8 +1424,8 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "hand",
-            "times": 1
+            "target": "ally:hand",
+            "count": 1
           }
         ]
       }
@@ -1477,7 +1478,8 @@
                   {
                     "op": "stat",
                     "mode": "double",
-                    "target": "ally:follower"
+                    "target": "ally:follower",
+                    "action": "give"
                   }
                 ]
               }
@@ -1951,14 +1953,14 @@
               {
                 "op": "stat",
                 "action": "give",
-                "target": "selected",
+                "target": "selected:follower",
                 "attack": 1,
                 "defense": 1
               },
               {
                 "op": "keyword",
                 "action": "grant",
-                "target": "selected",
+                "target": "selected:follower",
                 "keywords": [
                   {
                     "name": "LastWords",
@@ -2007,7 +2009,7 @@
       {
         "op": "crest",
         "action": "gain",
-        "name": "Bergent, Rejected Artes",
+        "name": "Neptune, Arbiter of Tides",
         "image": "images/crests/neptune_arbiter_of_tides.png",
         "description": "Whenever an allied Marine follower enters the field, restore 1 defense to your leader",
         "triggers": [
@@ -2059,18 +2061,12 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "select",
+        "op": "cost",
         "target": "ally:hand",
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "cost",
-            "target": "selected",
-            "mode": "reduce",
-            "amount": 2,
-            "minCost": 0
-          }
-        ]
+        "select": 1,
+        "action": "reduce",
+        "amount": 2,
+        "minCost": 0
       },
       {
         "op": "damage",
@@ -2115,8 +2111,7 @@
         "condition": "overflow",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Whitefrost Whisper",
             "count": 1
           }
@@ -2220,8 +2215,7 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Ghost",
             "count": 1
           }
@@ -2248,20 +2242,17 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Ghost",
         "count": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Skeleton",
         "count": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Rotting Zombie",
         "count": 1
       }
@@ -2654,7 +2645,8 @@
                 "effects": [
                   {
                     "op": "destroy",
-                    "scope": "self"
+                    "scope": "self",
+                    "target": "enemy:follower"
                   }
                 ]
               }
@@ -2849,6 +2841,7 @@
               {
                 "op": "destroy",
                 "distribution": "random",
+                "count": 1,
                 "target": "enemy:follower",
                 "exclude": [
                   "context.defender"
@@ -3071,8 +3064,7 @@
         "name": "Striker Artifact"
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -3084,8 +3076,7 @@
         "name": "Striker Artifact"
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -3097,8 +3088,7 @@
         "name": "Striker Artifact"
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -3128,8 +3118,7 @@
         "condition": "super_evolved_allied",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Puppet",
             "count": 1
           },
@@ -3167,8 +3156,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Ambition",
         "count": 1
       }
@@ -3213,19 +3201,13 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "select",
+        "op": "transform",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "tribe": "Puppetry"
         },
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "transform",
-            "zone": "board",
-            "into": "Doll Slayer"
-          }
-        ]
+        "select": 1,
+        "into": "Doll Slayer"
       }
     ],
     "keywords": [
@@ -3258,12 +3240,12 @@
         "effects": [
           {
             "op": "banish",
-            "target": "selected"
+            "target": "selected:follower"
           },
           {
             "op": "summon",
             "source": "copy",
-            "target": "selected"
+            "target": "selected:follower"
           }
         ]
       }
@@ -3279,12 +3261,12 @@
         "effects": [
           {
             "op": "banish",
-            "target": "selected"
+            "target": "selected:follower"
           },
           {
             "op": "summon",
             "source": "copy",
-            "target": "selected"
+            "target": "selected:follower"
           }
         ]
       }
@@ -3327,7 +3309,7 @@
               {
                 "op": "draw",
                 "source": "deck",
-                "amount": 1
+                "count": 1
               }
             ]
           }
@@ -3383,7 +3365,13 @@
         ]
       }
     ],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
+        "count": 1
+      }
+    ],
     "keywords": []
   },
   {

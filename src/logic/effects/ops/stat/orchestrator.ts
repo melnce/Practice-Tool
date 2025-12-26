@@ -67,6 +67,14 @@ export function handleStatOrchestrator(
     const specialTarget = detectSpecialTarget(eff);
 
     if (specialTarget === "self" && sourceCard) {
+        // Handle action: "set" separately - it overrides stats rather than adding
+        if (eff.action === "set") {
+            const setA = eff.attack !== undefined ? parseInt(eff.attack as any) || 0 : null;
+            const setD = eff.defense !== undefined ? parseInt(eff.defense as any) || 0 : null;
+            setStatsBuff(sourceCard, setA, setD, owner);
+            return "done";
+        }
+        // Default: action: "give" adds stats
         if (eff.attack_source || eff.defense_source) {
             handleDynamicStatSelf(sourceCard, eff as Effect, owner);
         } else {
@@ -161,7 +169,8 @@ function handlePoolBasedBuff(
     context: EffectContext,
 ): "done" | "pending" {
     // 1. Get and filter pool
-    const rawPool = getPool(eff.target as any, owner, null, eff.condition, context);
+    // BUG FIX: Must pass sourceCard to getPool for correct ally:follower targeting
+    const rawPool = getPool(eff.target as any, owner, sourceCard, eff.condition, context);
     const pool = filterBuffCandidates(rawPool, eff, sourceCard);
 
     if (!pool.length) return "done";

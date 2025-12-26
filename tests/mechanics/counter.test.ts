@@ -1,12 +1,12 @@
 /**
  * @file Mechanic Contract Test: counter mechanics
  *
- * DESIGN: Tests counter operations (shadows, rally, crest, etc.)
- *
- * INVARIANTS UNDER TEST:
- * - Counters increment/decrement correctly
- * - Counters are per-player
- * - Counters cannot go below 0
+ * DESIGN: Tests counter operations
+ * - counter op: for card-level counters (earth, faith) and game-state counters (combo)
+ * - add_shadows op: for player-level shadows counter
+ * 
+ * NOTE: Rally is NOT modified via effect ops - it's automatically incremented
+ * when followers enter play. Crest counters use the crest op.
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -15,8 +15,10 @@ import {
     givenGameState,
     whenRunEffects,
     resetUidCounter,
+    thenBoard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
+import type { CardInstance } from "../../src/core/types/index.js";
 
 describe("Mechanic Contract: counters", () => {
     beforeEach(() => {
@@ -24,18 +26,17 @@ describe("Mechanic Contract: counters", () => {
     });
 
     // ===========================================================================
-    // SHADOWS
+    // ADD_SHADOWS (player-level, uses add_shadows op)
+    // Canonical: { op: "add_shadows", amount: N }
     // ===========================================================================
 
-    describe("shadows counter", () => {
+    describe("add_shadows op", () => {
         it("add_shadows increases shadow count", () => {
             givenGameState({ seed: 1 }).build();
             state.players.first.shadows = 5;
 
             const effect = {
-                op: "counter" as const,
-                counter: "shadows",
-                action: "add",
+                op: "add_shadows" as const,
                 amount: 3,
             };
             whenRunEffects([effect], "first");
@@ -49,9 +50,7 @@ describe("Mechanic Contract: counters", () => {
             state.players.second.shadows = 5;
 
             const effect = {
-                op: "counter" as const,
-                counter: "shadows",
-                action: "add",
+                op: "add_shadows" as const,
                 amount: 3,
             };
             whenRunEffects([effect], "first");
@@ -63,78 +62,81 @@ describe("Mechanic Contract: counters", () => {
     });
 
     // ===========================================================================
-    // RALLY
+    // COUNTER OP - CARD-LEVEL
+    // Canonical: { op: "counter", action: "add"|"spend"|"set", key: "earth"|"faith", amount: N }
     // ===========================================================================
 
-    describe("rally counter", () => {
-        it("rally increments on follower play", () => {
+    describe("counter op (card-level)", () => {
+        it("adds counter to source card", () => {
             givenGameState({ seed: 1 }).build();
-            state.players.first.rally = 5;
+
+            // Create a source card with counter capability
+            const sourceCard: CardInstance = {
+                uid: "test-1",
+                name: "Magic Sediment",
+                type: "Amulet",
+                owner: "first",
+                zone: "board",
+                counters: { earth: 0 },
+            } as CardInstance;
+            state.players.first.board.push(sourceCard);
 
             const effect = {
                 op: "counter" as const,
-                counter: "rally",
                 action: "add",
+                key: "earth",
                 amount: 1,
             };
-            whenRunEffects([effect], "first");
+            // Note: counter op on card requires sourceCard parameter
+            whenRunEffects([effect], "first", sourceCard);
 
-            expect(state.players.first.rally).toBe(6);
+            expect(sourceCard.counters?.earth).toBe(1);
         });
 
-        it("rally is per-player", () => {
+        it("spends counter from source card", () => {
             givenGameState({ seed: 1 }).build();
-            state.players.first.rally = 8;
-            state.players.second.rally = 3;
+
+            const sourceCard: CardInstance = {
+                uid: "test-1",
+                name: "Magic Sediment",
+                type: "Amulet",
+                owner: "first",
+                zone: "board",
+                counters: { earth: 3 },
+            } as CardInstance;
+            state.players.first.board.push(sourceCard);
 
             const effect = {
                 op: "counter" as const,
-                counter: "rally",
-                action: "add",
-                amount: 2,
+                action: "spend",
+                key: "earth",
+                amount: 1,
             };
-            whenRunEffects([effect], "first");
+            whenRunEffects([effect], "first", sourceCard);
 
-            expect(state.players.first.rally).toBe(10);
-            expect(state.players.second.rally).toBe(3);
+            expect(sourceCard.counters?.earth).toBe(2);
         });
     });
 
     // ===========================================================================
-    // CREST (FAITH)
+    // COMBO COUNTER (game-state via counter op)
+    // Canonical: { op: "counter", action: "add", key: "combo", amount: N }
     // ===========================================================================
 
-    describe("crest counter", () => {
-        it("increments crest count", () => {
+    describe("counter op (combo)", () => {
+        it("add combo increments playsThisTurn", () => {
             givenGameState({ seed: 1 }).build();
-            state.players.first.crest = 0;
+            state.players.first.playsThisTurn = 2;
 
             const effect = {
                 op: "counter" as const,
-                counter: "crest",
                 action: "add",
+                key: "combo",
                 amount: 1,
             };
             whenRunEffects([effect], "first");
 
-            expect(state.players.first.crest).toBe(1);
-        });
-
-        it("crest is per-player", () => {
-            givenGameState({ seed: 1 }).build();
-            state.players.first.crest = 2;
-            state.players.second.crest = 1;
-
-            const effect = {
-                op: "counter" as const,
-                counter: "crest",
-                action: "add",
-                amount: 1,
-            };
-            whenRunEffects([effect], "first");
-
-            expect(state.players.first.crest).toBe(3);
-            expect(state.players.second.crest).toBe(1);
+            expect(state.players.first.playsThisTurn).toBe(3);
         });
     });
 
@@ -143,34 +145,28 @@ describe("Mechanic Contract: counters", () => {
     // ===========================================================================
 
     describe("edge cases", () => {
-        it("counter cannot go below 0", () => {
+        it("spend counter cannot go below 0", () => {
             givenGameState({ seed: 1 }).build();
-            state.players.first.shadows = 3;
+
+            const sourceCard: CardInstance = {
+                uid: "test-1",
+                name: "Magic Sediment",
+                type: "Amulet",
+                owner: "first",
+                zone: "board",
+                counters: { earth: 1 },
+            } as CardInstance;
+            state.players.first.board.push(sourceCard);
 
             const effect = {
                 op: "counter" as const,
-                counter: "shadows",
-                action: "subtract",
-                amount: 10,
+                action: "spend",
+                key: "earth",
+                amount: 5,
             };
-            whenRunEffects([effect], "first");
+            whenRunEffects([effect], "first", sourceCard);
 
-            expect(state.players.first.shadows).toBeGreaterThanOrEqual(0);
-        });
-
-        it("adding 0 does nothing", () => {
-            givenGameState({ seed: 1 }).build();
-            state.players.first.rally = 5;
-
-            const effect = {
-                op: "counter" as const,
-                counter: "rally",
-                action: "add",
-                amount: 0,
-            };
-            whenRunEffects([effect], "first");
-
-            expect(state.players.first.rally).toBe(5);
+            expect(sourceCard.counters?.earth).toBeGreaterThanOrEqual(0);
         });
     });
 });

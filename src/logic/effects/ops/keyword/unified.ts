@@ -294,6 +294,7 @@ function handleSilence(
 
 /**
  * Grant a trigger to targets
+ * STRICT: Only accepts triggers (plural) array
  */
 function handleGrantTrigger(
     eff: Effect,
@@ -305,10 +306,19 @@ function handleGrantTrigger(
             ? [ctx.sourceCard]
             : [];
 
+    // STRICT: Only accept plural "triggers" array
+    const triggersToAdd = Array.isArray((eff as any).triggers)
+        ? (eff as any).triggers
+        : [];
+
+    if (triggersToAdd.length === 0) return { kind: "done" };
+
     for (const t of targets) {
-        if (!t || !(eff as any).trigger) continue;
+        if (!t) continue;
         if (!Array.isArray(t.triggers)) t.triggers = [];
-        t.triggers.push((eff as any).trigger);
+        for (const trig of triggersToAdd) {
+            t.triggers.push(trig);
+        }
     }
     return { kind: "done" };
 }

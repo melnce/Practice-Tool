@@ -255,8 +255,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Fairy",
         "count": 2
       }
@@ -357,8 +356,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Fairy",
         "count": 1
       }
@@ -710,8 +708,8 @@
             "effects": [
               {
                 "op": "spellboost",
-                "target": "hand",
-                "times": 2
+                "target": "ally:hand",
+                "count": 2
               }
             ]
           },
@@ -874,12 +872,13 @@
         },
         "effects": [
           {
-            "op": "evolve"
+            "op": "evolve",
+            "target": "selected:follower"
           },
           {
             "op": "stat",
             "action": "give",
-            "target": "selected",
+            "target": "selected:follower",
             "attack": 3,
             "defense": 3
           }
@@ -1045,11 +1044,24 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "damage",
-        "target": "enemy:follower",
-        "select": 1,
-        "amount": 2,
-        "amount_overflow": 4
+        "op": "gate",
+        "condition": "overflow",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "select": 1,
+            "amount": 4
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "select": 1,
+            "amount": 2
+          }
+        ]
       }
     ]
   },
@@ -1313,8 +1325,7 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Bat",
             "count": 1
           }
@@ -1601,7 +1612,8 @@
         "event": "engage",
         "source": "board",
         "condition": {
-          "is_ally": true
+          "is_ally": true,
+          "type": "Amulet"
         },
         "effects": [
           {
@@ -1681,8 +1693,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Ambition",
         "count": 1
       }
@@ -1710,8 +1721,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Enhanced Puppet",
         "count": 1
       }
@@ -1765,14 +1775,12 @@
         "select": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Ambition",
         "count": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -1798,8 +1806,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gear of Remembrance",
         "count": 1
       }
@@ -1862,8 +1869,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Puppet",
         "count": 1
       }
@@ -1874,8 +1880,7 @@
         "source": "board",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Puppet",
             "count": 1
           }

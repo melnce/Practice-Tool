@@ -28,17 +28,11 @@ function hasKeyword(card: CardInstance, kw: any) {
 export function filterBuffCandidates(
   pool: CardInstance[],
   eff: StatOp,
-  sourceCard: CardInstance | null,
+  _sourceCard: CardInstance | null,
 ): CardInstance[] {
-  // When target is "selected", user explicitly chose this card - don't filter it out as "self"
-  const isSelectedTarget = eff.target === "selected";
-
-  let candidates = pool.filter(
-    (c) =>
-      c.type === "Follower" &&
-      // allow self when explicitly requested OR when target is "selected"
-      (eff.include_self || isSelectedTarget || c.uid !== sourceCard?.uid),
-  );
+  // Self-exclusion is already handled by the targeting system (applyFilters)
+  // filterBuffCandidates only applies additional buff-specific filters
+  let candidates = pool.filter((c) => c.type === "Follower");
 
   // Tribe filtering
   const rawTribes = eff.tribes

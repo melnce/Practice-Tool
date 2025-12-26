@@ -82,11 +82,13 @@ export function processCandidateTriggers(
 
       // 1. Source Check
       // Legacy: Default source for followers/amulets is board-only unless specified
+      // Special case: "self" means self-triggered, not a zone
       if (cand.source !== "crest") {
         const defaultSource =
           card.type === "Follower" || card.type === "Amulet" ? "board" : null;
         const requiredSource = trigger.source || defaultSource;
-        if (requiredSource && requiredSource !== source) continue;
+        // "self" means the trigger is on the card itself - treat as always matching the card's zone
+        if (requiredSource && (requiredSource as string) !== "self" && requiredSource !== source) continue;
       }
 
       // 2. Custom Predicate (Event-specific logic)

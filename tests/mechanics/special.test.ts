@@ -33,8 +33,8 @@ describe("Mechanic Contract: special", () => {
                 .withFirstHand([{
                     name: "SkyboundCard",
                     type: "Follower",
-                    hasSkyboundArt: true,
-                    skyboundArtProgress: 0,
+                    keywords: ["Skybound Art"],
+                    skyboundArtEvolvesWitnessed: 0,
                 }])
                 .build();
 
@@ -44,8 +44,12 @@ describe("Mechanic Contract: special", () => {
             };
             whenRunEffects([effect], "first");
 
-            const card = thenHand("first").find(c => c.hasSkyboundArt);
-            expect(card!.skyboundArtProgress).toBe(5);
+            const card = thenHand("first").find(c =>
+                Array.isArray(c.keywords) && c.keywords.some((k: any) =>
+                    String(k?.name || k || "").toLowerCase() === "skybound art"
+                )
+            );
+            expect(card!.skyboundArtEvolvesWitnessed).toBe(5);
         });
 
         it("does not affect non-skybound cards", () => {
@@ -81,7 +85,7 @@ describe("Mechanic Contract: special", () => {
             whenRunEffects([effect], "first");
 
             // This should set a flag that decking out = victory
-            expect(state.players.first.deckoutVictory).toBe(true);
+            expect(state.players.first.deckoutWins).toBe(true);
         });
 
         it("is per-player", () => {
@@ -93,8 +97,8 @@ describe("Mechanic Contract: special", () => {
             };
             whenRunEffects([effect], "first");
 
-            expect(state.players.first.deckoutVictory).toBe(true);
-            expect(state.players.second.deckoutVictory).toBeFalsy();
+            expect(state.players.first.deckoutWins).toBe(true);
+            expect(state.players.second.deckoutWins).toBeFalsy();
         });
     });
 });

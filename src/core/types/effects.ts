@@ -126,6 +126,17 @@ export interface SearchEffect extends BaseEffect {
     filters?: Record<string, any>;
 }
 
+/** add_to_hand op - add card to hand (token generation or copy) */
+export type AddToHandOps = Extract<EffectOp, "add_to_hand">;
+export interface AddToHandEffect extends BaseEffect {
+    op: AddToHandOps;
+    source?: "named" | "copy";  // default: "named"
+    name?: string;              // required when source=named
+    target?: "selected" | "last_drawn" | "trigger" | "self";  // required when source=copy
+    count: number;
+    player?: "ally" | "enemy";
+}
+
 /** Unified discard op - mode field handles select/except_named variants */
 export type HandOps = Extract<EffectOp, "discard">;
 export interface HandEffect extends BaseEffect {
@@ -349,6 +360,7 @@ type MappedOps = { [K in DamageOps]: Exact<DamageEffect, K> } & {
     [K in GateOps]: Exact<GateEffect, K>;
 } & { [K in DrawOps]: Exact<DrawEffect, K> } & {
     [K in SearchOps]: Exact<SearchEffect, K>
+} & { [K in AddToHandOps]: Exact<AddToHandEffect, K>
 } & { [K in HandOps]: Exact<HandEffect, K>;
 } & { [K in DeckOps]: Exact<DeckEffect, K> } & {
     [K in CrestOps]: Exact<CrestEffect, K> } & {

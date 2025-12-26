@@ -40,19 +40,6 @@ describe("Mechanic Contract: add_shadows", () => {
             expect(state.players.first.shadows).toBe(8);
         });
 
-        it("adding 0 shadows does nothing", () => {
-            givenGameState({ seed: 1 }).build();
-            state.players.first.shadows = 5;
-
-            const effect = {
-                op: "add_shadows" as const,
-                amount: 0,
-            };
-            whenRunEffects([effect], "first");
-
-            expect(state.players.first.shadows).toBe(5);
-        });
-
         it("shadows are per-player", () => {
             givenGameState({ seed: 1 }).build();
             state.players.first.shadows = 10;

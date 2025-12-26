@@ -1,0 +1,102 @@
+[
+  {
+    "cardId": "10112210",
+    "cardName": "Lambent Cairn",
+    "description": "Fanfare: Add a Fairy to your hand. Combo (3) - Add a Deepwood Bounty to your hand.\nEngage: Destroy this card. Select an allied follower on the field and give it +1/+1.",
+    "verdict": "FAIL",
+    "reasoning": "Implementation adds an extra Fairy on Combo 3 not described; description only adds Deepwood Bounty on Combo 3, not an additional Fairy.",
+    "stateChanges": "Fanfare (base): Add 1x Fairy to hand\nFanfare IF Combo 3: Add 1x Deepwood Bounty to hand\nFanfare IF Combo 3: Add 1x Fairy to hand\nKeyword: Engage (sacrifice: true)\nEngage: give +1/+1 to allied follower",
+    "timestamp": "2025-12-26T13:27:15.703Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10221310",
+    "cardName": "Lucrative Deal",
+    "description": "Draw 2 cards. Your opponent draws a card.",
+    "verdict": "FAIL",
+    "reasoning": "Implementation draws 2 cards for the player but only draws 1 card without specifying opponent; opponent must draw 1 card as per description, which is missing.",
+    "stateChanges": "Spell: Draw 2 card(s)\nSpell: Draw 1 card(s)",
+    "timestamp": "2025-12-26T13:27:19.096Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10344120",
+    "cardName": "Galmieux, Ardor Manifest",
+    "description": "Fanfare: Gain Crest: Galmieux, Ardor Manifest.\nEnhance (7): Give this follower Storm.\nOnce on each of your turns, when this follower takes damage but isn't destroyed, deal 3 damage to a random enemy follower.",
+    "verdict": "FAIL",
+    "reasoning": "The description's fanfare grants a crest that triggers when THIS follower takes damage, dealing 3 damage to a random enemy follower; the implementation's crest triggers when ANY allied follower takes damage and adds a card to hand, which contradicts the description.",
+    "stateChanges": "Fanfare: Gain Crest: Galmieux, Ardor Manifest\n  └─ Definition: Once each of your turns: when an allied follower takes damage but isn't destroyed, add a Fangs of Ardent Destruction to your hand.\n--- Enhance (7) Path ---\nEnhance (7): give Storm to self\nOn self damaged (Once per turn) (IF still_alive=true, own_turn=true): Deal 3 damage to random enemy followers",
+    "timestamp": "2025-12-26T13:27:24.567Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10353110",
+    "cardName": "Congregant of Entwining",
+    "description": "Fanfare: Select a Mode to activate.\n1. Summon a Congregant of Entwining and give it and this follower Rush.\n2. Summon a Congregant of Entwining and give it and this follower Ward.\n3. Give all allied copies of Congregant of Entwining on the field +2/+2.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
+    "verdict": "FAIL",
+    "reasoning": "Option 3 in the implementation gives +2/+2 to all allied Congregant of Entwining AND to self, but the description only says +2/+2 to all allied copies (including self), so giving +2/+2 to self separately is redundant but acceptable; however, the description says 'give it and this follower Rush/Ward' for options 1 and 2, but the implementation gives Rush/Ward only to self and the summoned follower separately, which matches. The main issue is that the implementation's option 3 gives +2/+2 twice to self (once as part of all allied copies and once separately), which is not described. Therefore, the implementation adds an extra +2/+2 to self beyond the description, causing a mismatch.",
+    "stateChanges": "Fanfare: Choose a mode (3 options):\n  1. Option 1\n    └─ Effect: Summon 1x Congregant of Entwining with Rush\n    └─ Effect: give Rush to self\n  2. Option 2\n    └─ Effect: Summon 1x Congregant of Entwining with Ward\n    └─ Effect: give Ward to self\n  3. Option 3\n    └─ Effect: give +2/+2 to all allied followers named \"Congregant of Entwining\"\n    └─ Effect: give +2/+2 to self\nSuper-Evolve: Choose a mode (3 options):\n  1. Option 1\n    └─ Effect: Summon 1x Congregant of Entwining with Rush\n    └─ Effect: give Rush to self\n  2. Option 2\n    └─ Effect: Summon 1x Congregant of Entwining with Ward\n    └─ Effect: give Ward to self\n  3. Option 3\n    └─ Effect: give +2/+2 to all allied followers named \"Congregant of Entwining\"\n    └─ Effect: give +2/+2 to self",
+    "timestamp": "2025-12-26T13:27:25.932Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10443310",
+    "cardName": "Primal Beast Absorption",
+    "description": "Select an enemy card on the field, banish it, and add a copy of it to your hand.",
+    "verdict": "FAIL",
+    "reasoning": "The implementation only banishes enemy followers, but the description says 'enemy card' which includes all card types, not just followers.",
+    "stateChanges": "Spell: Select 1 enemy:any\n  └─ Selection Effect: Banish selected:follower\n  └─ Selection Effect: Add 1x [dynamic card] to hand",
+    "timestamp": "2025-12-26T13:27:28.691Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90051140",
+    "cardName": "Rotting Zombie",
+    "description": "Last Words: Summon a Rotting Zombie and remove Last Words from it.",
+    "verdict": "FAIL",
+    "reasoning": "The implementation removes 'unknown' from the last summoned ally instead of removing 'Last Words' from it as described.",
+    "stateChanges": "Last Words: Summon 1x Rotting Zombie\nLast Words: remove unknown to ally:last summoned",
+    "timestamp": "2025-12-26T13:27:30.777Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90071210",
+    "cardName": "Gear of Ambition",
+    "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Striker Artifact.\nCan't be played.",
+    "verdict": "FAIL",
+    "reasoning": "The card has no programmed effects, but the description requires Fuse and transformation effects, which are missing.",
+    "stateChanges": "No programmed effects found",
+    "timestamp": "2025-12-26T13:27:32.142Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90071220",
+    "cardName": "Gear of Remembrance",
+    "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Fortifier Artifact.\nCan't be played.",
+    "verdict": "FAIL",
+    "reasoning": "The card has no programmed effects, but the description requires a Fuse effect and transformation, which are missing.",
+    "stateChanges": "No programmed effects found",
+    "timestamp": "2025-12-26T13:27:31.916Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90072110",
+    "cardName": "Striker Artifact",
+    "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nRush",
+    "verdict": "FAIL",
+    "reasoning": "The implementation only includes Rush keyword but lacks the Fuse mechanic and transformation effects based on fused cards' total cost.",
+    "stateChanges": "Keyword: Rush",
+    "timestamp": "2025-12-26T13:27:33.543Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90074120",
+    "cardName": "Lloyd",
+    "description": "Ward\nYour opponent can't select any cards other than this one for abilities.",
+    "verdict": "FAIL",
+    "reasoning": "The description specifies 'Ward' and that opponent can't select any cards other than this one, but the implementation adds 'Taunt' which is not mentioned, indicating a mismatch.",
+    "stateChanges": "Keyword: Ward\nKeyword: Taunt",
+    "timestamp": "2025-12-26T13:27:33.447Z",
+    "retries": 0
+  }
+]

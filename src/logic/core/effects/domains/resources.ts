@@ -1,6 +1,7 @@
 import { registerOp } from "../registry.js";
 import { state } from "../../../../core/gameState.js";
 import { handleDraw } from "../../../effects/ops/draw/index.js";
+import { handleAddToHand } from "../../../effects/ops/add_to_hand/index.js";
 import { handleSearch } from "../../../effects/ops/search/index.js";
 import { handleDiscard } from "../../../effects/hand.js";
 // Legacy imports removed: handleReplaceDeck, handleSetCostLastDrawn (now in unified deck/cost ops)
@@ -125,11 +126,22 @@ export function registerResourceEffects() {
         }
     });
 
-    // UNIFIED DRAW - single entry point for all draw operations
-    // source: "deck" (default) = draw from deck
-    // source: "named" = generate card by name (replaces add_to_hand)
-    // source: "copy" = copy selected card (replaces add_selected_copy_to_hand)
+    // ========================================================================
+    // DRAW - deck only, thins deck (stochastic card acquisition)
+    // For token generation, use "add_to_hand" op
+    // For filtered deck search, use "search" op
+    // ========================================================================
     registerOp("draw", (eff, ctx) => handleDraw(eff, ctx.owner));
+
+    // ========================================================================
+    // ADD_TO_HAND - add card to hand (does NOT thin deck)
+    // source: "named" (default) = create token from database
+    // source: "copy" = duplicate existing card from target
+    // ========================================================================
+    registerOp("add_to_hand", (eff, ctx) => handleAddToHand(eff, ctx.owner, ctx.sourceCard, {
+        selected: (ctx.context as any)?.selected,
+        lastDrawn: (state as any).lastDrawnCard,
+    }));
 
     // ========================================================================
     // SEARCH - distinct from draw for AI training semantics

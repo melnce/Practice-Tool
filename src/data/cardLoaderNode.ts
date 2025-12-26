@@ -7,7 +7,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { RawCardData, BuildCardIndexInput } from "./cardIndex.js";
+import { RawCardData, BuildCardIndexInput, initCardDatabase } from "./cardIndex.js";
 
 // Get directory path for relative imports
 const __filename = fileURLToPath(import.meta.url);
@@ -49,9 +49,9 @@ export function loadCardsNode(): BuildCardIndexInput {
 /**
  * Initialize card database using Node loader.
  * Convenience function for scripts and tests.
+ * Uses static import to ensure single module instance.
  */
 export async function initCardDatabaseNode(): Promise<void> {
-  const { initCardDatabase } = await import("./cardIndex.js");
   const cards = loadCardsNode();
   initCardDatabase(cards);
 }

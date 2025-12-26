@@ -152,10 +152,10 @@ describe("Mechanic Contract: destroy", () => {
     });
 
     // ===========================================================================
-    // DESTROY_SELF
+    // DESTROY SELF
     // ===========================================================================
 
-    describe("destroy_self operation", () => {
+    describe("destroy with target: self", () => {
         it("destroys the source card", () => {
             givenGameState({ seed: 1 })
                 .withFirstBoard([{ name: "SelfDestruct", type: "Follower", attack: 1, defense: 1 }])
@@ -164,7 +164,8 @@ describe("Mechanic Contract: destroy", () => {
             const sourceCard = findOnBoard("first", "SelfDestruct");
 
             const effect = {
-                op: "destroy_self" as const,
+                op: "destroy" as const,
+                target: "self",
             };
             whenRunEffects([effect], "first", sourceCard);
 

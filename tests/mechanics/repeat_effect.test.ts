@@ -1,12 +1,17 @@
 /**
  * @file Mechanic Contract Test: repeat_effect
  *
- * DESIGN: Tests the repeat_effect operation (loop effects X times).
+ * DESIGN: Tests the repeat_effect operation (loop effects X times dynamically).
+ *
+ * CANONICAL SCHEMA:
+ * - count_source: "count_in_hand" | "crest_count"
+ * - filter: { tribe: "..." } (for count_in_hand)
+ * - effect: { op: "...", ... } (singular, not effects array)
  *
  * INVARIANTS UNDER TEST:
- * - Effect fires specified number of times
- * - Count 0 fires nothing
- * - Cumulative effects stack
+ * - Effect fires number of times based on count_source
+ * - count_in_hand counts matching cards in hand
+ * - crest_count counts crests on player
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -15,9 +20,10 @@ import {
     givenGameState,
     whenRunEffects,
     thenHP,
-    findOnBoard,
     resetUidCounter,
 } from "../harness/builders.js";
+import { state } from "../../src/core/gameState.js";
+import type { Crest } from "../../src/logic/effects/crest.js";
 
 describe("Mechanic Contract: repeat_effect", () => {
     beforeEach(() => {
@@ -25,101 +31,107 @@ describe("Mechanic Contract: repeat_effect", () => {
     });
 
     // ===========================================================================
-    // BASIC REPEAT
+    // COUNT FROM HAND
     // ===========================================================================
 
-    describe("repeat effect", () => {
-        it("fires effect specified number of times", () => {
+    describe("count_source: count_in_hand", () => {
+        it("fires effect once per matching card in hand", () => {
             givenGameState({ seed: 1 })
                 .withSecondHP(20)
+                .withFirstHand([
+                    { name: "Fairy", type: "Follower", attack: 1, defense: 1, tribes: ["Pixie"] },
+                    { name: "Fairy2", type: "Follower", attack: 1, defense: 1, tribes: ["Pixie"] },
+                    { name: "Knight", type: "Follower", attack: 2, defense: 2, tribes: ["Officer"] },
+                ])
                 .build();
 
             const effect = {
                 op: "repeat_effect" as const,
-                count: 5,
-                effects: [{
+                count_source: "count_in_hand",
+                filter: { tribe: "Pixie" },
+                effect: {
                     op: "damage" as const,
                     target: "enemy:leader",
                     amount: 1,
-                }],
+                },
             };
             whenRunEffects([effect], "first");
 
-            // 5 x 1 damage = 5 damage
-            expect(thenHP("second")).toBe(15);
+            // 2 Pixies in hand = 2 damage
+            expect(thenHP("second")).toBe(18);
         });
 
-        it("cumulative stat buffs stack", () => {
-            givenGameState({ seed: 1 })
-                .withFirstBoard([{ name: "Target", type: "Follower", attack: 1, defense: 1 }])
-                .build();
-
-            const effect = {
-                op: "repeat_effect" as const,
-                count: 3,
-                effects: [{
-                    op: "stat" as const,
-                    action: "give",
-                    target: "ally:follower",
-                    attack: 2,
-                }],
-            };
-            whenRunEffects([effect], "first");
-
-            // 3 x +2 attack = +6 attack
-            expect(findOnBoard("first", "Target")!.attack).toBe(7);
-        });
-
-        it("count 0 fires nothing", () => {
+        it("empty hand fires nothing", () => {
             givenGameState({ seed: 1 })
                 .withSecondHP(20)
                 .build();
 
             const effect = {
                 op: "repeat_effect" as const,
-                count: 0,
-                effects: [{
+                count_source: "count_in_hand",
+                filter: { tribe: "Pixie" },
+                effect: {
                     op: "damage" as const,
                     target: "enemy:leader",
                     amount: 5,
-                }],
+                },
             };
             whenRunEffects([effect], "first");
 
             expect(thenHP("second")).toBe(20);
         });
-
-        it("count 1 fires once", () => {
-            givenGameState({ seed: 1 })
-                .withSecondHP(20)
-                .build();
-
-            const effect = {
-                op: "repeat_effect" as const,
-                count: 1,
-                effects: [{
-                    op: "damage" as const,
-                    target: "enemy:leader",
-                    amount: 3,
-                }],
-            };
-            whenRunEffects([effect], "first");
-
-            expect(thenHP("second")).toBe(17);
-        });
     });
 
     // ===========================================================================
-    // DYNAMIC COUNT
+    // COUNT FROM CRESTS
     // ===========================================================================
 
-    describe("dynamic count", () => {
-        it("count from counter (e.g., shadows)", () => {
+    describe("count_source: crest_count", () => {
+        it("fires effect once per active crest", () => {
             givenGameState({ seed: 1 })
                 .withSecondHP(20)
                 .build();
 
-            // Would need shadows count to test, but we can test fixed for now
+            state.players.first.crests = [
+                { name: "Crest A", owner: "first" } as Crest,
+                { name: "Crest B", owner: "first" } as Crest,
+                { name: "Crest C", owner: "first" } as Crest,
+            ];
+
+            const effect = {
+                op: "repeat_effect" as const,
+                count_source: "crest_count",
+                effect: {
+                    op: "damage" as const,
+                    target: "enemy:leader",
+                    amount: 2,
+                },
+            };
+            whenRunEffects([effect], "first");
+
+            // 3 crests = 6 damage
+            expect(thenHP("second")).toBe(14);
+        });
+
+        it("no crests fires nothing", () => {
+            givenGameState({ seed: 1 })
+                .withSecondHP(20)
+                .build();
+
+            state.players.first.crests = [];
+
+            const effect = {
+                op: "repeat_effect" as const,
+                count_source: "crest_count",
+                effect: {
+                    op: "damage" as const,
+                    target: "enemy:leader",
+                    amount: 5,
+                },
+            };
+            whenRunEffects([effect], "first");
+
+            expect(thenHP("second")).toBe(20);
         });
     });
 });

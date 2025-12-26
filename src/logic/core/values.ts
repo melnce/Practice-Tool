@@ -1,6 +1,6 @@
 import { state } from "../../core/gameState.js";
 import { CardInstance, Player } from "../../core/types/index.js";
-import { getHand, getBoard } from "../../core/playerHelpers.js";
+import { getHand, getBoard, getPlaysThisTurn } from "../../core/playerHelpers.js";
 
 interface ResolveContext {
   sourceCard?: CardInstance | null;
@@ -79,6 +79,12 @@ export function resolveDynamicValue(
       return board
         .filter((c) => c?.type === "Amulet" && (c.counters?.earth || 0) > 0)
         .reduce((sum, c) => sum + (c.counters?.earth || 0), 0);
+    }
+  }
+
+  if (s === "{combo}") {
+    if (context.owner) {
+      return getPlaysThisTurn(state, context.owner);
     }
   }
 

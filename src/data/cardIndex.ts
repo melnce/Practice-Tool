@@ -141,15 +141,23 @@ export function buildCardIndex(input: BuildCardIndexInput): CardIndex {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Global Card Index (singleton for engine use)
-// ─────────────────────────────────────────────────────────────────────────────
 
 // Use globalThis to bridge split-brain modules in test environment
-const GLOBAL_KEY = "__TEST_CARD_INDEX__";
-let globalCardIndex: CardIndex | null = (globalThis as any)[GLOBAL_KEY] || null;
+// CRITICAL: Do NOT use a module-level variable - ESM split-brain creates
+// separate module instances, each with their own variable. Always read/write
+// directly to globalThis to ensure all instances share the same data.
+const GLOBAL_KEY = "__CARD_INDEX__";
+
+/**
+ * Get the shared card index from globalThis.
+ * Always reads from globalThis to handle ESM split-brain.
+ */
+function getIndex(): CardIndex | null {
+  return (globalThis as any)[GLOBAL_KEY] || null;
+}
 
 export function getGlobalCardIndex(): CardIndex | null {
-  return globalCardIndex;
+  return getIndex();
 }
 
 /**
@@ -157,10 +165,10 @@ export function getGlobalCardIndex(): CardIndex | null {
  * Call this once at startup with cards loaded via browser or Node loader.
  */
 export function initCardDatabase(cards: BuildCardIndexInput): void {
-  globalCardIndex = buildCardIndex(cards);
-  (globalThis as any)[GLOBAL_KEY] = globalCardIndex;
+  const index = buildCardIndex(cards);
+  (globalThis as any)[GLOBAL_KEY] = index;
   console.log(
-    `DEBUG: cardIndex.ts - initCardDatabase called. globalCardIndex set. Global key '${GLOBAL_KEY}' set:`,
+    `DEBUG: cardIndex.ts - initCardDatabase called. Global key '${GLOBAL_KEY}' set:`,
     !!(globalThis as any)[GLOBAL_KEY],
   );
 }
@@ -170,31 +178,19 @@ export function initCardDatabase(cards: BuildCardIndexInput): void {
  * Returns null if card not found or database not initialized.
  */
 export function getCardDetails(nameOrId: string): CardTemplate | null {
-  if (!globalCardIndex) {
-    console.log(
-      `DEBUG: cardIndex.ts - globalCardIndex is null. Attempting recovery from global key '${GLOBAL_KEY}'...`,
-    );
-    globalCardIndex = (globalThis as any)[GLOBAL_KEY] || null;
-    console.log(`DEBUG: cardIndex.ts - Recovery result:`, !!globalCardIndex);
-  }
-  // Debug for specific key failure
-  if (nameOrId === "Goblin" && !globalCardIndex) {
-    console.log(
-      "DEBUG: cardIndex.ts - getCardDetails('Goblin') failed because globalCardIndex is still null.",
-    );
-  }
-  if (!nameOrId || !globalCardIndex) return null;
+  const index = getIndex();
+  if (!nameOrId || !index) return null;
 
   // 1. Exact ID match (8+ digits)
   if (/^\d{8,}$/.test(nameOrId)) {
-    const byId = globalCardIndex.byId.get(nameOrId);
+    const byId = index.byId.get(nameOrId);
     if (byId) return byId;
   }
 
   // 2. Name match (main cards first, then tokens)
   return (
-    globalCardIndex.byName.get(nameOrId) ??
-    globalCardIndex.tokensByName.get(nameOrId) ??
+    index.byName.get(nameOrId) ??
+    index.tokensByName.get(nameOrId) ??
     null
   );
 }
@@ -203,22 +199,23 @@ export function getCardDetails(nameOrId: string): CardTemplate | null {
  * Get card by ID only.
  */
 export function getCardById(id: string): CardTemplate | null {
-  if (!globalCardIndex) return null;
-  return globalCardIndex.byId.get(String(id)) ?? null;
+  const index = getIndex();
+  if (!index) return null;
+  return index.byId.get(String(id)) ?? null;
 }
 
 /**
  * Check if card database is initialized.
  */
 export function isCardDatabaseInitialized(): boolean {
-  return globalCardIndex !== null;
+  return getIndex() !== null;
 }
 
 /**
  * Reset global index (for testing).
  */
 export function resetCardIndex(): void {
-  globalCardIndex = null;
+  (globalThis as any)[GLOBAL_KEY] = null;
 }
 
 /**
@@ -227,18 +224,20 @@ export function resetCardIndex(): void {
 export function injectCardForTest(card: CardTemplate): void {
   if (!card.name) return;
 
-  if (!globalCardIndex) {
-    globalCardIndex = {
+  let index = getIndex();
+  if (!index) {
+    index = {
       byName: new Map(),
       byId: new Map(),
       tokensByName: new Map(),
     };
+    (globalThis as any)[GLOBAL_KEY] = index;
   }
 
   // Cast to mutable for injection
-  (globalCardIndex.byName as Map<string, CardTemplate>).set(card.name, card);
+  (index.byName as Map<string, CardTemplate>).set(card.name, card);
   if (card.id) {
-    (globalCardIndex.byId as Map<string, CardTemplate>).set(
+    (index.byId as Map<string, CardTemplate>).set(
       String(card.id),
       card,
     );

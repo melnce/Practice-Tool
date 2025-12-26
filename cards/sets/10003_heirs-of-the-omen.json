@@ -21,6 +21,9 @@
         "op": "stat",
         "action": "give",
         "target": "all:follower",
+        "condition": {
+          "not_self": true
+        },
         "select": 1,
         "attack": 4,
         "defense": -4
@@ -163,7 +166,8 @@
     "fanfare": [
       {
         "op": "banish",
-        "scope": "deck_duplicates"
+        "scope": "deck_duplicates",
+        "target": "ally:deck"
       }
     ],
     "keywords": [
@@ -203,6 +207,20 @@
         "name": "Mjerrabaine, Great Manifest",
         "image": "images/crests/mjerrabaine_great_manifest.png",
         "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
+        "on_gain": [
+          {
+            "op": "deck",
+            "action": "replace",
+            "from_set": "10003_heirs-of-the-omen",
+            "exclude": [
+              "Mjerrabaine, Great Manifest"
+            ]
+          },
+          {
+            "op": "set_deckout_victory",
+            "enabled": true
+          }
+        ],
         "triggers": [
           {
             "type": "end_of_turn_own",
@@ -222,18 +240,6 @@
             ]
           }
         ]
-      },
-      {
-        "op": "deck",
-        "action": "replace",
-        "from_set": "10003_heirs-of-the-omen",
-        "exclude": [
-          "Mjerrabaine, Great Manifest"
-        ]
-      },
-      {
-        "op": "set_deckout_victory",
-        "enabled": true
       }
     ],
     "superevolve": [
@@ -243,6 +249,20 @@
         "name": "Mjerrabaine, Great Manifest",
         "image": "images/crests/mjerrabaine_great_manifest.png",
         "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
+        "on_gain": [
+          {
+            "op": "deck",
+            "action": "replace",
+            "from_set": "10003_heirs-of-the-omen",
+            "exclude": [
+              "Mjerrabaine, Great Manifest"
+            ]
+          },
+          {
+            "op": "set_deckout_victory",
+            "enabled": true
+          }
+        ],
         "triggers": [
           {
             "type": "end_of_turn_own",
@@ -262,24 +282,11 @@
             ]
           }
         ]
-      },
-      {
-        "op": "deck",
-        "action": "replace",
-        "from_set": "10003_heirs-of-the-omen",
-        "exclude": [
-          "Mjerrabaine, Great Manifest"
-        ]
-      },
-      {
-        "op": "set_deckout_victory",
-        "enabled": true
       }
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Great Testimony",
         "count": 1
       }
@@ -331,8 +338,7 @@
         "at_least": 10,
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Sweetness of Voracity",
             "count": 1
           }
@@ -539,14 +545,12 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Deepwood Bounty",
             "count": 1
           },
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Fairy",
             "count": 1
           }
@@ -634,7 +638,18 @@
         "effects": [
           {
             "op": "summon",
-            "mode": "chain_fill"
+            "source": "self",
+            "mode": "copy",
+            "count": 1,
+            "then": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "ally:last_summoned",
+                "attack": 0,
+                "defense": -1
+              }
+            ]
           }
         ]
       }
@@ -659,13 +674,19 @@
     "superevolve": [],
     "spell": [
       {
-        "op": "stat",
-        "mode": "combo_repeat",
-        "target": "enemy:follower",
-        "random": true,
-        "count": 1,
-        "attack": 0,
-        "defense": -1
+        "op": "repeat_effect",
+        "count_source": "combo",
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "enemy:follower",
+            "select": 1,
+            "distribution": "random",
+            "attack": 0,
+            "defense": -1
+          }
+        ]
       }
     ],
     "keywords": [],
@@ -761,16 +782,14 @@
     "url": "https://shadowverse.gg/cards/10314120-izudia-annihilation-manifest",
     "evolve": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Annihilating Onslaught",
         "count": 1
       }
     ],
     "superevolve": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Annihilating Onslaught",
         "count": 1
       }
@@ -807,8 +826,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Boots",
         "count": 1
       }
@@ -818,8 +836,7 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Gilded Goblet",
             "count": 1
           }
@@ -926,8 +943,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Necklace",
         "count": 1
       }
@@ -937,8 +953,7 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Gilded Blade",
             "count": 1
           }
@@ -1025,14 +1040,12 @@
                 "label": "Add a Gilded Blade and Gilded Necklace to your hand",
                 "effects": [
                   {
-                    "op": "draw",
-                    "source": "named",
+                    "op": "add_to_hand",
                     "name": "Gilded Blade",
                     "count": 1
                   },
                   {
-                    "op": "draw",
-                    "source": "named",
+                    "op": "add_to_hand",
                     "name": "Gilded Necklace",
                     "count": 1
                   }
@@ -1042,14 +1055,12 @@
                 "label": "Add a Gilded Goblet and Gilded Boots to your hand",
                 "effects": [
                   {
-                    "op": "draw",
-                    "source": "named",
+                    "op": "add_to_hand",
                     "name": "Gilded Goblet",
                     "count": 1
                   },
                   {
-                    "op": "draw",
-                    "source": "named",
+                    "op": "add_to_hand",
                     "name": "Gilded Boots",
                     "count": 1
                   }
@@ -1096,14 +1107,12 @@
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Goblet",
         "count": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Boots",
         "count": 1
       }
@@ -1164,10 +1173,20 @@
         "count": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Blade",
         "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "has_fuse_materials",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          }
+        ]
       }
     ],
     "fuse_recipes": [
@@ -1262,28 +1281,24 @@
     "url": "https://shadowverse.gg/cards/10324120-octrice-hollowness-manifest",
     "evolve": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Blade",
         "count": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Necklace",
         "count": 1
       }
     ],
     "superevolve": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Blade",
         "count": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Gilded Necklace",
         "count": 1
       }
@@ -1301,8 +1316,7 @@
         ],
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Remnant of Hollowness"
           }
         ],
@@ -1556,7 +1570,7 @@
             "effects": [
               {
                 "op": "cost",
-                "target": "selected",
+                "target": "selected:follower",
                 "mode": "modify",
                 "amount": 1
               },
@@ -1565,7 +1579,7 @@
                 "action": "give",
                 "attack": 1,
                 "defense": 1,
-                "target": "selected"
+                "target": "selected:follower"
               }
             ]
           }
@@ -1678,14 +1692,15 @@
         "effects": [
           {
             "op": "cost",
-            "mode": "modify",
+            "action": "increase",
             "amount": 1,
-            "target": "selected"
+            "target": "selected:follower"
           },
           {
             "op": "destroy",
             "distribution": "random",
-            "target": "enemy:follower"
+            "target": "enemy:follower",
+            "count": 1
           }
         ]
       }
@@ -1717,15 +1732,10 @@
     ],
     "superevolve": [
       {
-        "op": "select",
+        "op": "banish",
         "target": "enemy:follower",
         "select": 1,
-        "effects": [
-          {
-            "op": "banish",
-            "scope": "all_enemy_copies"
-          }
-        ]
+        "scope": "all_enemy_copies"
       }
     ],
     "fanfare": [
@@ -1757,14 +1767,17 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "deck",
-        "action": "cost",
-        "filter": "follower",
+        "op": "cost",
+        "action": "reduce",
+        "filter": {
+          "type": "Follower"
+        },
+        "target": "ally:deck",
         "amount": 3
       },
       {
         "op": "transform",
-        "zone": "hand",
+        "target": "ally:hand",
         "mode": "random",
         "filter": {
           "type": "Spell"
@@ -1864,7 +1877,7 @@
     "spell": [
       {
         "op": "damage",
-        "target": "follower",
+        "target": "all:follower",
         "amount": 5,
         "distribution": "by_stat",
         "stat": "defense"
@@ -1875,7 +1888,7 @@
         "effects": [
           {
             "op": "damage",
-            "target": "leader",
+            "target": "all:leader",
             "amount": 3,
             "distribution": "by_stat",
             "stat": "defense"
@@ -1948,18 +1961,22 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "summon",
-        "source": "named",
-        "name": "Majestic Megalorca"
-      },
-      {
         "op": "gate",
         "condition": "overflow",
         "effects": [
           {
             "op": "summon",
             "source": "named",
-            "name": "Majestic Megalorca"
+            "name": "Majestic Megalorca",
+            "count": 2
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Majestic Megalorca",
+            "count": 1
           }
         ]
       }
@@ -2015,7 +2032,7 @@
         "effects": [
           {
             "op": "damage",
-            "target": "other:follower",
+            "target": "all:follower",
             "amount": 1
           }
         ]
@@ -2063,7 +2080,7 @@
           {
             "op": "stat",
             "action": "give",
-            "target": "hand",
+            "target": "ally:hand",
             "class": "Dragoncraft",
             "attack": 1,
             "defense": 1
@@ -2244,8 +2261,7 @@
             "once_per_turn": true,
             "effects": [
               {
-                "op": "draw",
-                "source": "named",
+                "op": "add_to_hand",
                 "name": "Fangs of Ardent Destruction"
               }
             ],
@@ -2454,7 +2470,7 @@
         "target": "enemy:follower",
         "amount": 2,
         "count": 2,
-        "distribution": "random_hits"
+        "distribution": "random"
       },
       {
         "op": "damage",
@@ -2651,7 +2667,8 @@
                 "target": "ally:follower",
                 "attack": 1,
                 "defense": 1,
-                "random": true
+                "select": 1,
+                "distribution": "random"
               }
             ]
           }
@@ -2686,8 +2703,8 @@
                     "target": "ally:follower",
                     "attack": 1,
                     "defense": 1,
-                    "random": true,
-                    "count": 1
+                    "select": 1,
+                    "distribution": "random"
                   }
                 ]
               }
@@ -2875,7 +2892,7 @@
     "spell": [
       {
         "op": "mode",
-        "select_count": 2,
+        "select": 2,
         "unique": true,
         "options": [
           {
@@ -2961,8 +2978,9 @@
             "target": "selected:follower"
           },
           {
-            "op": "draw",
-            "source": "selection",
+            "op": "add_to_hand",
+            "source": "copy",
+            "target": "selected:follower",
             "count": 1
           }
         ]
@@ -3011,8 +3029,7 @@
             "label": "Add a Scream Diffusion to your hand",
             "effects": [
               {
-                "op": "draw",
-                "source": "named",
+                "op": "add_to_hand",
                 "name": "Scream Diffusion"
               }
             ]
@@ -3021,8 +3038,7 @@
             "label": "Add a Wings of Desire to your hand",
             "effects": [
               {
-                "op": "draw",
-                "source": "named",
+                "op": "add_to_hand",
                 "name": "Wings of Desire"
               }
             ]
@@ -3257,7 +3273,8 @@
             "target": "leader",
             "keywords": [
               "Barrier"
-            ]
+            ],
+            "action": "grant"
           }
         ]
       },
@@ -3266,13 +3283,9 @@
         "cost": 0,
         "effects": [
           {
-            "op": "repeat_effect",
-            "count_source": "crest_count",
-            "effect": {
-              "op": "countdown",
-              "action": "advance",
-              "amount": 1
-            }
+            "op": "countdown",
+            "action": "advance",
+            "amount_source": "crest_count"
           }
         ]
       }
@@ -3450,7 +3463,8 @@
             "op": "damage",
             "amount": 4,
             "distribution": "split_sequential",
-            "spill_to_leader": true
+            "spill_to_leader": true,
+            "target": "enemy:follower"
           },
           {
             "op": "restore",
@@ -3464,13 +3478,9 @@
         "cost": 0,
         "effects": [
           {
-            "op": "repeat_effect",
-            "count_source": "crest_count",
-            "effect": {
-              "op": "countdown",
-              "action": "advance",
-              "amount": 1
-            }
+            "op": "countdown",
+            "action": "advance",
+            "amount_source": "crest_count"
           }
         ]
       }
@@ -3498,7 +3508,7 @@
         "op": "stat",
         "action": "set",
         "target": "enemy:follower",
-        "value": 4
+        "attack": 4
       }
     ],
     "fanfare": [
@@ -3537,7 +3547,8 @@
                           "keywords": [
                             "Can't Attack"
                           ],
-                          "duration": "opponent_turn_end"
+                          "duration": "opponent_turn_end",
+                          "target": "selected:follower"
                         },
                         {
                           "op": "keyword",
@@ -3548,11 +3559,13 @@
                               "effects": [
                                 {
                                   "op": "banish",
-                                  "scope": "self"
+                                  "scope": "self",
+                                  "target": "selected:follower"
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          "target": "selected:follower"
                         }
                       ]
                     }
@@ -3602,7 +3615,8 @@
                     "op": "damage",
                     "distribution": "split_sequential",
                     "spill_to_leader": true,
-                    "amount_source": "crest_count"
+                    "amount_source": "crest_count",
+                    "target": "enemy:follower"
                   }
                 ]
               }
@@ -3630,7 +3644,8 @@
                     "op": "damage",
                     "distribution": "split_sequential",
                     "spill_to_leader": true,
-                    "amount_source": "crest_count"
+                    "amount_source": "crest_count",
+                    "target": "enemy:follower"
                   }
                 ]
               }
@@ -3641,8 +3656,7 @@
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Torrent of Despair"
       }
     ],
@@ -3710,7 +3724,9 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "tribe": "Artifact",
+        "condition": {
+          "tribe": "Artifact"
+        },
         "attack": 3,
         "defense": 3
       }
@@ -3721,7 +3737,9 @@
         "action": "give",
         "target": "ally:follower",
         "select": 1,
-        "tribe": "Artifact",
+        "condition": {
+          "tribe": "Artifact"
+        },
         "attack": 3,
         "defense": 3
       }
@@ -3760,8 +3778,7 @@
         "select": 1
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Puppet",
         "count": 2
       }
@@ -3857,8 +3874,7 @@
     "superevolve": [],
     "fanfare": [
       {
-        "op": "return",
-        "destination": "deck",
+        "op": "discard",
         "select": 1,
         "target": "ally:hand",
         "optional": true
@@ -3909,7 +3925,9 @@
         "name": "LastWords",
         "effects": [
           {
-            "op": "draw"
+            "op": "draw",
+            "source": "deck",
+            "count": 1
           }
         ]
       }
@@ -4053,8 +4071,7 @@
     ],
     "fanfare": [
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Melodious Monody"
       }
     ],

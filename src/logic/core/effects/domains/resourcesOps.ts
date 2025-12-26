@@ -11,9 +11,14 @@ export const RESOURCE_OPS = [
   "add_shadows",
   "earth_rite",
 
-  // Unified draw - supports source: deck, named, copy
-  // Replaces add_to_hand, add_selected_copy_to_hand
+  // Draw - deck only, thins deck (stochastic card acquisition)
   "draw",
+
+  // Add to hand - add card to hand
+  // source: "named" (default) = create token from database
+  // source: "copy" = duplicate existing card
+  // Does NOT thin deck
+  "add_to_hand",
 
   // Search - filtered deck search with shuffle
   // Distinct from draw for AI training (intentional vs random acquisition)
@@ -36,18 +41,3 @@ export const RESOURCE_OPS = [
   // Unified fuse - replaces fuse_start, start_fuse_from_card, fuse_finalize_*, start_fortifier_fuse
   "fuse",
 ] as const;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

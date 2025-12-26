@@ -108,6 +108,12 @@ export function handleGainCrest(eff: Effect, owner: Player) {
 
   crests.push(newCrest);
   logEvent("gainCrest", { owner: targetOwner, crest: crestName });
+
+  // Run on_gain effects AFTER crest is successfully added
+  const onGainEffects = Array.isArray((eff as any).on_gain) ? (eff as any).on_gain : [];
+  if (onGainEffects.length > 0) {
+    runEffects(onGainEffects, targetOwner, null, {});
+  }
 }
 
 export function crestAddCounter(
@@ -140,40 +146,33 @@ export function crestSpendCounter(
   return true;
 }
 
-/** Start-of-turn countdown tick (unchanged behavior) */
+/** 
+ * Start-of-turn countdown tick.
+ * When countdown reaches 0, the crest is DESTROYED (triggers Last Words if present).
+ * Effects do NOT fire just because countdown completed - only Last Words triggers on destruction.
+ */
 export function tickCrests(owner: Player) {
   const crests = getCrests(owner);
-  if (!Array.isArray(crests) || !crests.length) return [];
+  if (!Array.isArray(crests) || !crests.length) return;
 
-  // 1) Countdown left→right (visual order) and collect expirations
-  const expiredIdx: number[] = [];
-  const effectsToRun: Effect[] = [];
+  // Collect names of crests to destroy (can't modify array while iterating)
+  const toDestroy: string[] = [];
 
-  for (let i = 0; i < crests.length; i++) {
-    const c: any = crests[i];
+  for (const c of crests) {
     if (typeof c?.countdown !== "number" || !Number.isFinite(c.countdown)) continue;
 
     c.countdown -= 1;
 
     if (c.countdown <= 0) {
       logEvent("crestExpire", { owner, crest: c.name });
-      // preserve *forward* order of expiring crests
-      if (Array.isArray(c.effects) && c.effects.length) {
-        effectsToRun.push(...c.effects);
-      }
-      expiredIdx.push(i);
+      toDestroy.push(c.name);
     }
   }
 
-  // 2) Remove expired crests without disturbing earlier indices
-  if (expiredIdx.length) {
-    for (let k = expiredIdx.length - 1; k >= 0; k--) {
-      const idx = expiredIdx[k];
-      if (idx !== undefined) crests.splice(idx, 1);
-    }
+  // Destroy expired crests (this triggers Last Words if keyword present)
+  for (const name of toDestroy) {
+    destroyCrest(owner, name);
   }
-
-  return effectsToRun;
 }
 
 /** NEW: reset once-per-turn gates at owner’s turn start */

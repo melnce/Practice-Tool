@@ -1,0 +1,350 @@
+{
+  "totalCrests": 34,
+  "passed": 34,
+  "failed": 0,
+  "unclear": 0,
+  "errors": 0,
+  "results": [
+    {
+      "crestName": "Aria, Lady of the Woods",
+      "sourceCard": "Aria, Lady of the Woods (10114110)",
+      "description": "Whenever an allied Pixie follower enters the field, give it Storm.",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger matches the description by granting Storm to allied Pixie followers upon entering the field.",
+      "programmedBehavior": "Triggers:\n  On ally follower enter (IF tribe=Pixie): Grant Storm to entering_follower",
+      "timestamp": "2025-12-26T12:31:46.440Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Kagemitsu, Enduring Warrior",
+      "sourceCard": "Kagemitsu, Enduring Warrior (10124130)",
+      "description": "Countdown (2) Last Words: Summon a Kagemitsu, Enduring Warrior",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior matches the description exactly with a 2-turn countdown and Last Words effect summoning Kagemitsu, Enduring Warrior.",
+      "programmedBehavior": "Countdown: 2 turns\nKeywords: LastWords\nEffects (Last Words/Completion): Summon 1x Kagemitsu, Enduring Warrior",
+      "timestamp": "2025-12-26T12:31:46.458Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Juno, Visionary Alchemist",
+      "sourceCard": "Juno, Visionary Alchemist (10133110)",
+      "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
+      "verdict": "PASS",
+      "reasoning": "The programmed countdown and trigger with Earth Rite (1) summoning a Guardian Golem at end of own turn matches the description exactly.",
+      "programmedBehavior": "Countdown: 3 turns\nTriggers:\n  On end of turn own: Earth Rite (1) → Summon 1x Guardian Golem",
+      "timestamp": "2025-12-26T12:31:47.823Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Burnite, Anathema of Flame",
+      "sourceCard": "Burnite, Anathema of Flame (10144110)",
+      "description": "At the start of your turn, deal 1 damage to your leader. Once on each of your turns, when your leader's defense is restored, deal 1 damage to it.",
+      "verdict": "PASS",
+      "reasoning": "The programmed triggers and effects match the description exactly, including the once per turn condition on leader restoration damage.",
+      "programmedBehavior": "Triggers:\n  On start of turn: Deal 1 damage to ally:leader\n  On leader restored [Once per turn]: Deal 1 damage to ally:leader",
+      "timestamp": "2025-12-26T12:31:47.936Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Balto, Dusk Bounty Hunter",
+      "sourceCard": "Balto, Dusk Bounty Hunter (10153140)",
+      "description": "Countdown (4). At the end of your turn, deal 1 damage to both leaders.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 4-turn countdown and deals 1 damage to both leaders at the end of your turn, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn own: Deal 1 damage to ally:leader; Deal 1 damage to enemy:leader",
+      "timestamp": "2025-12-26T12:31:49.407Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Lapis, Shining Seraph",
+      "sourceCard": "Lapis, Shining Seraph (10163130)",
+      "description": "Countdown (2) Last Words: Summon a Lapis, Shining Seraph and give it Storm",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 2-turn countdown with Last Words that summon Lapis and grant it Storm, matching the description.",
+      "programmedBehavior": "Countdown: 2 turns\nKeywords: LastWords\nEffects (Last Words/Completion): Summon 1x Lapis, Shining Seraph; Give Storm to self",
+      "timestamp": "2025-12-26T12:31:49.384Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Eudie, Maiden Reborn",
+      "sourceCard": "Eudie, Maiden Reborn (10174110)",
+      "description": "Countdown (3) At the end of your turn, if you have 5 cards or less in your hand, draw a card. If you have at least 6, restore 1 defense to your leader.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 3-turn countdown and triggers at end of own turn, drawing a card if hand size is 5 or less, else restoring 1 defense to leader, matching the description.",
+      "programmedBehavior": "Countdown: 3 turns\nTriggers:\n  On end of turn own: IF [object Object]: Draw 1 card(s) ELSE: Restore 1 to leader",
+      "timestamp": "2025-12-26T12:31:51.148Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Grimnir, Heavenly Gale",
+      "sourceCard": "Grimnir, Heavenly Gale (10204120)",
+      "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger and effect match the description exactly: at end of own turn, if a super-evolved allied follower exists, deal 2 damage to all enemy followers.",
+      "programmedBehavior": "Triggers:\n  On end of turn own: IF super_evolved_allied: Deal 2 damage to enemy:follower",
+      "timestamp": "2025-12-26T12:31:51.398Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Titania, Queen of Fairies",
+      "sourceCard": "Titania, Queen of Fairies (10214110)",
+      "description": "At the start of your turn, add a Fairy to your hand",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger at the start of your turn adds a Fairy to hand, matching the description exactly.",
+      "programmedBehavior": "Triggers:\n  On start of turn: Add 1x Fairy to hand",
+      "timestamp": "2025-12-26T12:31:52.853Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Bergent, Rejected Artes",
+      "sourceCard": "Bergent, Rejected Artes (10232110)",
+      "description": "At the start of your turn, summon an Onion Patch",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger at the start of your turn to summon an Onion Patch matches the description exactly.",
+      "programmedBehavior": "Triggers:\n  On start of turn: Summon 1x Onion Patch",
+      "timestamp": "2025-12-26T12:31:52.565Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Pascale's Dance",
+      "sourceCard": "Pascale's Dance (10233310)",
+      "description": "Countdown (1). End of your turn: Draw a card. Earth Rite (10): Double the attack and defense of all allied followers.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements the countdown, end of turn card draw, and Earth Rite effect as described.",
+      "programmedBehavior": "Countdown: 1 turns\nTriggers:\n  On end of turn own: Draw 1 card(s); Earth Rite (10) → Double attack and defense of ally:follower",
+      "timestamp": "2025-12-26T12:31:54.240Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Neptune, Arbiter of Tides",
+      "sourceCard": "Neptune, Arbiter of Tides (10243110)",
+      "description": "Whenever an allied Marine follower enters the field, restore 1 defense to your leader",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger matches the description exactly, restoring 1 defense to the leader whenever an allied Marine follower enters.",
+      "programmedBehavior": "Triggers:\n  On ally follower enter (IF tribe=Marine, not_self=true): Restore 1 to leader",
+      "timestamp": "2025-12-26T12:31:54.144Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Charon, Stygian Oarswoman",
+      "sourceCard": "Charon, Stygian Oarswoman (10254120)",
+      "description": "Countdown (2) At the start of your turn, Reanimate (3)",
+      "verdict": "PASS",
+      "reasoning": "The implementation correctly sets a 2-turn countdown and triggers Reanimate (3) at the start of the player's turn as described.",
+      "programmedBehavior": "Countdown: 2 turns\nTriggers:\n  On start of turn: Reanimate (3)",
+      "timestamp": "2025-12-26T12:31:55.590Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Maddening Benison",
+      "sourceCard": "Maddening Benison (10263310)",
+      "description": "Countdown (2). Last Words: Deal 10 damage to your leader",
+      "verdict": "PASS",
+      "reasoning": "The implementation correctly includes a 2-turn countdown and a Last Words effect dealing 10 damage to the ally leader, matching the description.",
+      "programmedBehavior": "Countdown: 2 turns\nKeywords: LastWords\nEffects (Last Words/Completion): Deal 10 damage to ally:leader",
+      "timestamp": "2025-12-26T12:31:55.588Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Wilbert, Desolate Paladin",
+      "sourceCard": "Wilbert, Desolate Paladin (10264120)",
+      "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger matches the description by giving +1/+2 to allied followers with Ward upon entering the field.",
+      "programmedBehavior": "Triggers:\n  On ally follower enter (IF has_keyword=Ward, not_self=true): Give +1/+2 to entering_follower",
+      "timestamp": "2025-12-26T12:31:56.851Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Mjerrabaine, Great Manifest",
+      "sourceCard": "Mjerrabaine, Great Manifest (10304110)",
+      "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
+      "verdict": "PASS",
+      "reasoning": "The implementation includes the on gain deck replacement and deckout victory, and the end of turn discard and draw effects as described.",
+      "programmedBehavior": "On Gain: deck effect; set_deckout_victory effect\nTriggers:\n  On end of turn own: Discard all cards except named \"Great Testimony\"; Draw 6 card(s)",
+      "timestamp": "2025-12-26T12:31:57.022Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Krulle, Heir to Unkilling",
+      "sourceCard": "Krulle, Heir to Unkilling (10314110)",
+      "description": "Countdown (2) Whenever an allied follower enters the field, give it -1/-1",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 2-turn countdown and triggers -1/-1 on allied follower entry as described.",
+      "programmedBehavior": "Countdown: 2 turns\nTriggers:\n  On ally follower enter: Give -1/-1 to entering_follower",
+      "timestamp": "2025-12-26T12:31:58.897Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Octrice, Hollowness Manifest",
+      "sourceCard": "Octrice, Hollowness Manifest (10324120)",
+      "description": "Countdown (8). Whenever you play or Fuse a Loot card, advance this crest's count by 1.\nLast Words: Add a Remnant of Hollowness to your hand.",
+      "verdict": "PASS",
+      "reasoning": "The implementation correctly includes countdown 8, advances countdown on playing or fusing Loot cards, and adds Remnant of Hollowness to hand on Last Words.",
+      "programmedBehavior": "Countdown: 8 turns\nKeywords: LastWords\nTriggers:\n  On loot fused: Advance crest countdown by 1\n  On loot played: Advance crest countdown by 1\nEffects (Last Words/Completion): Add 1x Remnant of Hollowness to hand",
+      "timestamp": "2025-12-26T12:31:58.347Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Crystal Gazing",
+      "sourceCard": "Crystal Gazing (10331310)",
+      "description": "Countdown (2) Last Words: Draw 2 cards. Deal 4 damage to all enemy followers.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior matches the description exactly, including countdown, last words, and effects.",
+      "programmedBehavior": "Countdown: 2 turns\nKeywords: LastWords\nEffects (Last Words/Completion): Draw 2 card(s); Deal 4 damage to enemy:follower",
+      "timestamp": "2025-12-26T12:32:00.745Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Galmieux, Ardor Manifest",
+      "sourceCard": "Galmieux, Ardor Manifest (10344120)",
+      "description": "Once each of your turns: when an allied follower takes damage but isn't destroyed, add a Fangs of Ardent Destruction to your hand.",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger on allied follower damage (if still alive) once per turn matches the description of adding Fangs of Ardent Destruction when an allied follower takes damage but isn't destroyed, once each turn.",
+      "programmedBehavior": "Triggers:\n  On self damaged (IF still_alive=true) [Once per turn]: Add 1x Fangs of Ardent Destruction to hand",
+      "timestamp": "2025-12-26T12:32:00.473Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Devotee of Repose",
+      "sourceCard": "Devotee of Repose (10361110)",
+      "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, give a random allied follower -2/-0 and Ward.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 4-turn countdown and triggers at the end of the player's turn, applying -2/-0 and Ward to a random allied follower if no allied followers attacked, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn own: IF no_ally_attacked: Give -2/0 and Ward to ally:follower",
+      "timestamp": "2025-12-26T12:32:02.424Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Supplicant of Repose",
+      "sourceCard": "Supplicant of Repose (10362110)",
+      "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, restore 1 defense to your leader.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 4-turn countdown and restores 1 defense to the leader at the end of the turn if no allied followers attacked, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn own: IF no_ally_attacked: Restore 1 to leader",
+      "timestamp": "2025-12-26T12:32:02.182Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Congregant of Repose",
+      "sourceCard": "Congregant of Repose (10363110)",
+      "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior matches the description exactly, including countdown and conditional draw at end of own turn if no allied followers attacked.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn own: IF no_ally_attacked: Draw 1 card(s) (type=follower, defense=4)",
+      "timestamp": "2025-12-26T12:32:03.743Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Himeka, Heir to Repose",
+      "sourceCard": "Himeka, Heir to Repose (10364110)",
+      "description": "Countdown (4). At the end of your turn, if there's an allied Himeka, Heir to Repose on the field, give X random enemy followers with 4 attack or less \"Can't attack followers or leaders\" until opponent's end of turn, then banish them. X is the number of crests you have.",
+      "verdict": "PASS",
+      "reasoning": "The implementation correctly applies countdown 4, triggers at end of own turn if allied Himeka is present, gives 'Can't attack' to X random enemy followers with ≤4 attack, and banishes them at opponent's end of turn, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn own: IF board_name (name=\"Himeka, Heir to Repose\"): Repeat X (crest_count) times: Select 1 random from enemy:follower WHERE attack≤4, not cant_attack THEN: Give Can't Attack to selected:follower; Grant trigger to selected:follower → On end of turn own: Banish selected:follower",
+      "timestamp": "2025-12-26T12:32:04.071Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Marwynn, Despair Manifest",
+      "sourceCard": "Marwynn, Despair Manifest (10364120)",
+      "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior triggers at end of own turn, checks if no allied followers attacked, and deals damage equal to crest count split among enemies, matching the description.",
+      "programmedBehavior": "Triggers:\n  On end of turn own: IF no_ally_attacked: Deal crest_count damage to enemy:follower (split_sequential) (spills to leader)",
+      "timestamp": "2025-12-26T12:32:05.507Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Starry Sky",
+      "sourceCard": "Starry Sky (10412310)",
+      "description": "Countdown (1). Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements the countdown, Last Words damage, and adding a Starry Sky to hand as described.",
+      "programmedBehavior": "Countdown: 1 turns\nKeywords: LastWords\nEffects (Last Words/Completion): Deal 1 damage to enemy:leader; Add 1x Starry Sky to hand",
+      "timestamp": "2025-12-26T12:32:05.504Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Yuel & Societte, Dancing Duo",
+      "sourceCard": "Yuel & Societte, Dancing Duo (10414120)",
+      "description": "Countdown (4). Once on each of your turns, when you play a follower, evolve it.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 4-turn countdown and triggers once per turn on playing a follower to evolve it, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On ally follower played [Once per turn]: Evolve played_card",
+      "timestamp": "2025-12-26T12:32:06.826Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Elmott, Remembrance Aflame",
+      "sourceCard": "Elmott, Remembrance Alflame (10433110)",
+      "description": "At the start of your turn, deal 1 damage to the enemy leader.",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger 'start_of_turn_own' matches 'At the start of your turn' and deals 1 damage to the enemy leader as described.",
+      "programmedBehavior": "Triggers:\n  On start of turn (IF whose_turn=owner): Deal 1 damage to enemy:leader",
+      "timestamp": "2025-12-26T12:32:07.005Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Cagliostro, Genius Alchemist",
+      "sourceCard": "Cagliostro, Genius Alchemist (10434120)",
+      "description": "At the start of your turn, Earth Rite (1) - Add an Ars Magna to your hand.",
+      "verdict": "PASS",
+      "reasoning": "The programmed trigger at start of own turn with Earth Rite (1) adding Ars Magna matches the description exactly.",
+      "programmedBehavior": "Triggers:\n  On start of turn (IF own_turn=true): Earth Rite (1) → Add 1x Ars Magna to hand",
+      "timestamp": "2025-12-26T12:32:08.399Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Crescent Tube Ride",
+      "sourceCard": "Crescent Tube Ride (10441310)",
+      "description": "Countdown (4). At the end of your turn, give a random allied follower on the field +1/+1.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 4-turn countdown and triggers at the end of the player's turn to give a random allied follower +1/+1, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn (IF own_turn=true): Give +1/+1 to ally:follower",
+      "timestamp": "2025-12-26T12:32:09.122Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Valiant Edge",
+      "sourceCard": "Valiant Edge (10451310)",
+      "description": "Countdown (2). At the end of your turn, deal 2 damage to a random enemy follower and restore 1 defense to your leader.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior matches the description exactly, including countdown duration and triggered effects at end of own turn.",
+      "programmedBehavior": "Countdown: 2 turns\nTriggers:\n  On end of turn own: Deal 2 damage to enemy:follower (random_hits); Restore 1 to ally:leader",
+      "timestamp": "2025-12-26T12:32:10.811Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Crest: Corruption",
+      "sourceCard": "Corruption (10453310)",
+      "description": "Countdown (4). At the end of your turn, deal 2 damage to your leader.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 4-turn countdown and deals 2 damage to the player's leader at the end of their turn, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn own: Deal 2 damage to ally:leader",
+      "timestamp": "2025-12-26T12:32:10.516Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Crest: Belial, Archangel of Cunning",
+      "sourceCard": "Belial, Archangel of Cunning (10454120)",
+      "description": "Countdown (4). Last Words: Deal 20 damage to the enemy leader.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements a 4-turn countdown and a Last Words effect dealing 20 damage to the enemy leader, matching the description.",
+      "programmedBehavior": "Countdown: 4 turns\nKeywords: LastWords\nEffects (Last Words/Completion): Deal 20 damage to enemy:leader",
+      "timestamp": "2025-12-26T12:32:12.335Z",
+      "retries": 0
+    },
+    {
+      "crestName": "Lu Woh, Light Personified",
+      "sourceCard": "Lu Woh, Light Personified (10474110)",
+      "description": "Countdown (2). Whenever an enemy follower with Storm attacks a leader, give it -3/-0 until the end of the turn.",
+      "verdict": "PASS",
+      "reasoning": "The programmed behavior correctly implements the countdown and the trigger that gives -3/-0 to enemy Storm followers attacking a leader, matching the description.",
+      "programmedBehavior": "Countdown: 2 turns\nTriggers:\n  On leader attacked (IF is_ally=false, has_keyword=Storm): Give -3/0 to attacker",
+      "timestamp": "2025-12-26T12:32:12.252Z",
+      "retries": 0
+    }
+  ],
+  "generatedAt": "2025-12-26T12:32:12.335Z"
+}

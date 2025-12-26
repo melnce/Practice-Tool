@@ -35,12 +35,11 @@ export function handleSpellboost(
       break;
 
     case "boost":
-    default:
       // Apply spellboost to target(s)
       if (spec.target === "self" && sourceCard) {
         // Single card spellboost
         spellboostHand(owner, 1, sourceCard);
-      } else {
+      } else if (spec.target === "ally:hand") {
         // Whole hand spellboost
         spellboostHand(owner, count);
       }

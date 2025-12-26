@@ -269,8 +269,8 @@ function _endTurnCore(endingPlayer: Player) {
   }
 
   try {
-    const crestFx = tickCrests(nextPlayer);
-    if (crestFx.length) runEffects([...crestFx], nextPlayer, null);
+    // tickCrests now handles destruction internally (no effects returned)
+    tickCrests(nextPlayer);
   } catch (e) {
     console.error(`Error in ${nextPlayer} tick crests:`, e);
   }

@@ -218,6 +218,14 @@ registerCondition("highlander", (_spec, owner) => {
     return true;
 });
 
+registerCondition("fused_this_turn", (_spec, _owner, sourceCard) => {
+    if (!sourceCard) return false;
+    // Check if any cards have been fused to this card instance
+    // Logic differs by expansion but usually stored in _fusedLootNames or _fusedCards
+    const fused = (sourceCard as any)._fusedLootNames || (sourceCard as any)._fusedCards;
+    return Array.isArray(fused) && fused.length > 0;
+});
+
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================

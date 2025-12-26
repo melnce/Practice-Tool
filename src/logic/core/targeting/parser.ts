@@ -33,6 +33,16 @@ export function parseTargetQuery(
     };
   }
 
+  // Support "played_card" for ally_follower_played triggers
+  if (raw === "played_card") {
+    return {
+      raw,
+      side: "special",
+      specialContext: "played_card",
+      condition,
+    };
+  }
+
   // 2. Handle "selected" (with optional subtype)
   if (raw === "selected" || raw.startsWith("selected:")) {
     const parts = raw.split(":");
@@ -61,6 +71,8 @@ export function parseTargetQuery(
 
   // Map side to enum
   let side: TargetQuery["side"] = "ally";
+  let excludeSelf = false;
+
   if (sideRaw === "hand") {
     side = "hand";
   } else if (sideRaw === "self") {
@@ -73,13 +85,12 @@ export function parseTargetQuery(
     sideRaw === "opponent"
   ) {
     side = "enemy";
-  } else if (
-    sideRaw === "any" ||
-    sideRaw === "both" ||
-    sideRaw === "all" ||
-    sideRaw === "other"
-  ) {
+  } else if (sideRaw === "any" || sideRaw === "both" || sideRaw === "all") {
     side = "any";
+  } else if (sideRaw === "other") {
+    // "other" means ally followers excluding self
+    side = "ally";
+    excludeSelf = true;
   } else {
     side = "ally"; // default
   }
@@ -95,6 +106,7 @@ export function parseTargetQuery(
     side,
     typeFilter,
     condition,
+    excludeSelf,
   };
 }
 

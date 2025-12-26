@@ -57,6 +57,10 @@ export function handleRestore(
       restored = handleRestoreAllies(owner, amount);
       break;
 
+    case "followers":
+      restored = handleRestoreFollowers(targetPlayer, amount);
+      break;
+
     default:
       logEvent("restore_unknown_target", { target: spec.target });
       restored = 0;
@@ -103,6 +107,16 @@ function handleRestoreAllies(owner: Player, amount: number): number {
     totalRestored += restoreFollowerByAmount(follower, amount);
   }
 
+  return totalRestored;
+}
+
+function handleRestoreFollowers(owner: Player, amount: number): number {
+  // Heal all allied followers (NOT leader)
+  let totalRestored = 0;
+  const followers = getAlliedFollowers(owner);
+  for (const follower of followers) {
+    totalRestored += restoreFollowerByAmount(follower, amount);
+  }
   return totalRestored;
 }
 

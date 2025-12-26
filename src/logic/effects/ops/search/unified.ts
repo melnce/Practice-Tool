@@ -19,6 +19,7 @@ import {
 import { applyKeyword } from "../../../core/keywords.js";
 import { MAX_HAND, pushToHand } from "../../../../core/utils.js";
 import { getDeck, getHand, getGraveyard, opponentOf } from "../../../../core/playerHelpers.js";
+import { resolveDynamicValue } from "../../../core/values.js";
 
 import { SearchSpec, normalizeSearchSpec } from "./types.js";
 
@@ -52,8 +53,16 @@ export function handleSearch(
         return; // Search requires filters
     }
 
+
+
     // Build predicate from filters
-    const normalizedFilter = normalizeCardFilter(spec.filters);
+    const resolvedFilters = { ...spec.filters };
+    for (const key in resolvedFilters) {
+        if (typeof resolvedFilters[key] === "string" && (resolvedFilters[key] as string).startsWith("{")) {
+            resolvedFilters[key] = resolveDynamicValue(resolvedFilters[key], { owner: searchingPlayer });
+        }
+    }
+    const normalizedFilter = normalizeCardFilter(resolvedFilters);
     const matches = buildCardPredicate(normalizedFilter);
 
     // Find all matching cards

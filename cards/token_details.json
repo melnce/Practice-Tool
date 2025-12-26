@@ -78,10 +78,16 @@
     "url": "https://shadowverse.gg/cards/90004130-demon-of-purgatory",
     "fanfare": [
       {
-        "op": "damage",
+        "op": "select",
         "target": "enemy:follower",
-        "amount": 6,
-        "select": 2
+        "select": 2,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "selected:follower",
+            "amount": 6
+          }
+        ]
       },
       {
         "op": "damage",
@@ -366,8 +372,8 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "hand",
-            "times": 1
+            "target": "ally:hand",
+            "count": 1
           }
         ]
       }
@@ -400,8 +406,8 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "hand",
-            "times": 1
+            "target": "ally:hand",
+            "count": 1
           }
         ]
       }
@@ -478,8 +484,8 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "hand",
-            "times": 1
+            "target": "ally:hand",
+            "count": 1
           }
         ]
       }
@@ -547,8 +553,8 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "hand",
-            "times": 3
+            "target": "ally:hand",
+            "count": 3
           }
         ]
       }
@@ -1955,6 +1961,7 @@
     "spell": [
       {
         "op": "damage",
+        "target": "all:enemy",
         "amount": 4,
         "distribution": "split_sequential",
         "spill_to_leader": true
@@ -2049,7 +2056,9 @@
         "source": "named",
         "name": "Rulenye & Valnareik",
         "count": 2,
-        "keyword": "Rush"
+        "keywords": [
+          "Rush"
+        ]
       }
     ],
     "keywords": [],
@@ -2106,7 +2115,7 @@
     "url": "https://shadowverse.gg/cards/90064310-torrent-of-despair",
     "evolve": [],
     "superevolve": [],
-    "fanfare": [
+    "spell": [
       {
         "op": "banish",
         "distribution": "random",
@@ -2256,10 +2265,12 @@
     "spell": [
       {
         "op": "select",
-        "target": "enemy:follower",
+        "target": "enemy:any",
+        "count": 1,
         "effects": [
           {
             "op": "damage",
+            "target": "selected",
             "amount": 2
           },
           {

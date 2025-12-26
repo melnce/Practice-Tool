@@ -1,6 +1,6 @@
 // Mock global window object for browser-dependent code
 if (typeof window === "undefined") {
-  const noop = () => {};
+  const noop = () => { };
   const win: any = {
     addEventListener: noop,
     removeEventListener: noop,
@@ -100,14 +100,12 @@ if (typeof window === "undefined") {
   };
 }
 
-import { beforeEach } from "vitest";
-import { resetCardDatabaseForTests } from "../../src/data/cardDatabase.js";
+// NOTE: Do NOT reset card database in beforeEach here!
+// Mechanics tests use beforeAll to initialize the card DB, and beforeEach runs after beforeAll,
+// which would wipe the DB before each test runs. Individual test files should handle their own
+// reset if needed.
 
-beforeEach(() => {
-  resetCardDatabaseForTests();
-});
-
-export {};
+export { };
 
 
 

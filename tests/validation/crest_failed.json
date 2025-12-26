@@ -1,0 +1,12 @@
+[
+  {
+    "crestName": "Himeka, Heir to Repose",
+    "sourceCard": "Himeka, Heir to Repose (10364110)",
+    "description": "Countdown (4). At the end of your turn, if there's an allied Himeka, Heir to Repose on the field, give X random enemy followers with 4 attack or less \"Can't attack followers or leaders\" until opponent's end of turn, then banish them. X is the number of crests you have.",
+    "verdict": "FAIL",
+    "reasoning": "The implementation applies 'Can't Attack' but does not banish the selected enemy followers as required by the description.",
+    "programmedBehavior": "Countdown: 4 turns\nTriggers:\n  On end of turn own: IF board_name (name=\"Himeka, Heir to Repose\"): Repeat X (crest_count) times: Select 1 random from enemy:follower WHERE attack≤4, not cant_attack THEN: Give Can't Attack to selected:follower; Grant keyword to selected:follower",
+    "timestamp": "2025-12-26T12:28:02.097Z",
+    "retries": 0
+  }
+]

@@ -72,9 +72,10 @@ export interface TargetQuery {
   | "selected"
   | "special"
   | "attacker";
-  specialContext?: "entering_follower" | "last_summoned" | undefined;
+  specialContext?: "entering_follower" | "last_summoned" | "played_card" | undefined;
   typeFilter?: "follower" | "amulet" | "spell" | undefined;
   condition: any;
+  excludeSelf?: boolean;  // "other:X" targets exclude the source card
 }
 
 // Closed union for Context Resolvers

@@ -423,13 +423,10 @@
         "cost": 8,
         "effects": [
           {
-            "op": "select",
+            "op": "summon",
             "target": "hand:follower",
-            "effects": [
-              {
-                "op": "summon"
-              }
-            ]
+            "select": 1,
+            "source": "named"
           },
           {
             "op": "return",
@@ -520,8 +517,7 @@
                 "amount": 1
               },
               {
-                "op": "draw",
-                "source": "named",
+                "op": "add_to_hand",
                 "name": "Starry Sky",
                 "count": 1
               }
@@ -781,7 +777,8 @@
             "once_per_turn": true,
             "effects": [
               {
-                "op": "evolve"
+                "op": "evolve",
+                "target": "played_card"
               }
             ]
           }
@@ -1285,7 +1282,7 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "hand",
+            "target": "ally:hand",
             "count": "{self.attack}"
           }
         ]
@@ -1368,6 +1365,7 @@
         "effects": [
           {
             "op": "damage",
+            "target": "selected:follower",
             "amount": 4
           }
         ]
@@ -1516,11 +1514,11 @@
           {
             "op": "keyword",
             "action": "silence",
-            "target": "selected"
+            "target": "selected:follower"
           },
           {
             "op": "damage",
-            "target": "selected",
+            "target": "selected:follower",
             "amount": 3
           }
         ]
@@ -1571,16 +1569,10 @@
     "url": "https://shadowverse.gg/cards/10433310-alchemic-flare",
     "spell": [
       {
-        "op": "select",
-        "target": "enemy:follower",
-        "count": 1,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected",
-            "amount": 4
-          }
-        ]
+        "op": "damage",
+        "target": "selected:follower",
+        "select": 1,
+        "amount": 4
       },
       {
         "op": "summon",
@@ -1625,7 +1617,7 @@
     "fanfare": [
       {
         "op": "spellboost",
-        "target": "hand",
+        "target": "ally:hand",
         "count": 1
       }
     ],
@@ -1655,7 +1647,8 @@
                 "op": "damage",
                 "amount": "{self.attack}",
                 "distribution": "split_sequential",
-                "spill_to_leader": true
+                "spill_to_leader": true,
+                "target": "enemy:follower"
               }
             ]
           }
@@ -1700,8 +1693,7 @@
         "count": 2
       },
       {
-        "op": "draw",
-        "source": "named",
+        "op": "add_to_hand",
         "name": "Ars Magna",
         "count": 1
       },
@@ -1739,8 +1731,7 @@
                     "amount": 1,
                     "effects": [
                       {
-                        "op": "draw",
-                        "source": "named",
+                        "op": "add_to_hand",
                         "name": "Ars Magna",
                         "count": 1
                       }
@@ -1823,21 +1814,16 @@
         },
         "effects": [
           {
-            "op": "select",
+            "op": "stat",
             "target": "ally:follower",
-            "condition": {
+            "select": 1,
+            "action": "give",
+            "attack": 1,
+            "defense": 1,
+            "filter": {
               "is_super_evolved": true
             },
-            "count": 1,
-            "mode": "random",
-            "effects": [
-              {
-                "op": "stat",
-                "action": "give",
-                "attack": 1,
-                "defense": 1
-              }
-            ]
+            "select_mode": "random"
           }
         ]
       }
@@ -1874,18 +1860,13 @@
             },
             "effects": [
               {
-                "op": "select",
+                "op": "stat",
                 "target": "ally:follower",
-                "count": 1,
-                "mode": "random",
-                "effects": [
-                  {
-                    "op": "stat",
-                    "action": "give",
-                    "attack": 1,
-                    "defense": 1
-                  }
-                ]
+                "select": 1,
+                "action": "give",
+                "attack": 1,
+                "defense": 1,
+                "select_mode": "random"
               }
             ]
           }
@@ -1969,7 +1950,8 @@
             "action": "grant",
             "keywords": [
               "Storm"
-            ]
+            ],
+            "target": "self"
           }
         ]
       }
@@ -1977,14 +1959,9 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "enemy:follower",
-        "count": 2,
-        "effects": [
-          {
-            "op": "destroy"
-          }
-        ]
+        "select": 2
       }
     ],
     "keywords": [],
@@ -2012,7 +1989,8 @@
         "effects": [
           {
             "op": "damage",
-            "amount": 3
+            "amount": 3,
+            "target": "selected:follower"
           },
           {
             "op": "stat",
@@ -2020,7 +1998,8 @@
             "keywords": [
               "Can't Attack"
             ],
-            "duration": "opponent_turn_end"
+            "duration": "opponent_turn_end",
+            "target": "selected:follower"
           }
         ]
       }
@@ -2104,11 +2083,13 @@
         "target": "enemy:any",
         "effects": [
           {
-            "op": "banish"
+            "op": "banish",
+            "target": "selected:follower"
           },
           {
-            "op": "draw",
-            "source": "selection",
+            "op": "add_to_hand",
+            "source": "copy",
+            "target": "selection:any",
             "count": 1
           }
         ]
@@ -2212,7 +2193,8 @@
                 "value": 0,
                 "duration": "opponent_turn_end"
               }
-            ]
+            ],
+            "action": "grant"
           }
         ]
       }
@@ -2381,14 +2363,14 @@
             "op": "damage",
             "target": "enemy:follower",
             "amount": 4,
-            "distribution": "random_hits",
+            "distribution": "random",
             "count": 1
           },
           {
             "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "distribution": "random_hits",
+            "distribution": "random",
             "count": 1
           }
         ]
@@ -2460,21 +2442,16 @@
                 "defense": 1
               },
               {
-                "op": "select",
+                "op": "stat",
                 "target": "ally:follower",
-                "select_count": 1,
-                "mode": "random",
-                "condition": {
+                "select": 1,
+                "action": "give",
+                "attack": 1,
+                "defense": 1,
+                "filter": {
                   "not_self": true
                 },
-                "effects": [
-                  {
-                    "op": "stat",
-                    "action": "give",
-                    "attack": 1,
-                    "defense": 1
-                  }
-                ]
+                "select_mode": "random"
               }
             ]
           },
@@ -2788,7 +2765,8 @@
         "effects": [
           {
             "op": "damage",
-            "amount": 2
+            "amount": 2,
+            "target": "all:follower"
           }
         ]
       }
@@ -2831,15 +2809,10 @@
         "sacrifice": true,
         "effects": [
           {
-            "op": "select",
+            "op": "transform",
             "target": "ally:follower",
-            "effects": [
-              {
-                "op": "transform",
-                "zone": "board",
-                "into": "Awed and Inspired"
-              }
-            ]
+            "select": 1,
+            "into": "Awed and Inspired"
           },
           {
             "op": "draw",
@@ -2884,30 +2857,22 @@
     "fanfare": [],
     "evolve": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "enemy:follower",
-        "condition": {
+        "select": 1,
+        "filter": {
           "damaged": true
-        },
-        "effects": [
-          {
-            "op": "destroy"
-          }
-        ]
+        }
       }
     ],
     "superevolve": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "enemy:follower",
-        "condition": {
+        "select": 1,
+        "filter": {
           "damaged": true
-        },
-        "effects": [
-          {
-            "op": "destroy"
-          }
-        ]
+        }
       }
     ],
     "triggers": []
@@ -2946,7 +2911,10 @@
         "target": "ally:follower",
         "keywords": [
           "Barrier"
-        ]
+        ],
+        "filter": {
+          "not_self": true
+        }
       }
     ],
     "keywords": [],
@@ -2975,16 +2943,12 @@
         "sacrifice": true,
         "effects": [
           {
-            "op": "select",
+            "op": "evolve",
             "target": "ally:follower",
-            "condition": {
+            "select": 1,
+            "filter": {
               "unevolved": true
-            },
-            "effects": [
-              {
-                "op": "evolve"
-              }
-            ]
+            }
           }
         ]
       }
@@ -3022,26 +2986,18 @@
     "has_ongoing": true,
     "evolve": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
-        "effects": [
-          {
-            "op": "damage",
-            "amount": 3
-          }
-        ]
+        "select": 1,
+        "amount": 3
       }
     ],
     "superevolve": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
-        "effects": [
-          {
-            "op": "damage",
-            "amount": 3
-          }
-        ]
+        "select": 1,
+        "amount": 3
       }
     ],
     "keywords": [],
@@ -3089,7 +3045,8 @@
                   {
                     "op": "destroy",
                     "distribution": "random",
-                    "target": "enemy:follower"
+                    "target": "enemy:follower",
+                    "select": 1
                   }
                 ]
               },
@@ -3142,19 +3099,14 @@
         },
         "effects": [
           {
-            "op": "select",
+            "op": "evolve",
             "target": "ally:follower",
-            "mode": "random",
-            "count": 1,
-            "condition": {
+            "select": 1,
+            "filter": {
               "unevolved": true,
               "did_not_attack_this_turn": true
             },
-            "effects": [
-              {
-                "op": "evolve"
-              }
-            ]
+            "select_mode": "random"
           }
         ]
       }
@@ -3186,14 +3138,9 @@
     ],
     "fanfare": [
       {
-        "op": "select",
+        "op": "banish",
         "target": "enemy:follower",
-        "count": 2,
-        "effects": [
-          {
-            "op": "banish"
-          }
-        ]
+        "select": 2
       },
       {
         "op": "gate",
@@ -3298,8 +3245,7 @@
         "name": "last_words",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "name": "Striker Artifact",
             "count": 1
           }
@@ -3330,16 +3276,12 @@
         "count": 10,
         "effects": [
           {
-            "op": "select",
+            "op": "evolve",
             "target": "ally:follower",
-            "condition": {
+            "select": 1,
+            "filter": {
               "unevolved": true
-            },
-            "effects": [
-              {
-                "op": "evolve"
-              }
-            ]
+            }
           },
           {
             "op": "evolve",
@@ -3461,8 +3403,9 @@
     "fanfare": [
       {
         "op": "select",
-        "target": "ally:hand",
-        "condition": {
+        "target": "ally:hand_card",
+        "select": 1,
+        "filter": {
           "tribe": "Artifact",
           "type": "Follower"
         },
@@ -3480,8 +3423,7 @@
         "name": "last_words",
         "effects": [
           {
-            "op": "draw",
-            "source": "named",
+            "op": "add_to_hand",
             "card_name": "Fortifier Artifact"
           }
         ]
@@ -3625,11 +3567,11 @@
           {
             "op": "keyword",
             "action": "silence",
-            "target": "selected"
+            "target": "selected:follower"
           },
           {
             "op": "damage",
-            "target": "selected",
+            "target": "selected:follower",
             "amount": 9
           }
         ]
@@ -3642,7 +3584,8 @@
             "name": "Vulnerable",
             "value": 1
           }
-        ]
+        ],
+        "action": "grant"
       }
     ],
     "keywords": [],

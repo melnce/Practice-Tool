@@ -1,0 +1,270 @@
+{
+  "totalCards": 26,
+  "passed": 16,
+  "failed": 10,
+  "unclear": 0,
+  "errors": 0,
+  "results": [
+    {
+      "cardId": "10031210",
+      "cardName": "Witch's New Brew",
+      "description": "Fanfare: Draw a card.\nEarth Sigil\nEngage (1): Gain an earth sigil.",
+      "verdict": "PASS",
+      "reasoning": "All described effects are implemented: fanfare draws a card, the amulet provides an earth sigil, and Engage (1) adds an earth sigil without destroying the card.",
+      "stateChanges": "Fanfare: Draw 1 card(s)\nKeyword: Aura\nKeyword: Counter\nKeyword: Engage (sacrifice: false)\nEngage: add 1 to earth counter",
+      "timestamp": "2025-12-26T13:27:13.205Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10052120",
+      "cardName": "Amorous Necromancer",
+      "description": "Evolve: Summon 2 copies of Ghost.\nSuper-Evolve: Give them Drain.",
+      "verdict": "PASS",
+      "reasoning": "Super-Evolve grants Drain to the summoned Ghosts as described; summoning 2 Ghosts on Evolve and Super-Evolve matches the description.",
+      "stateChanges": "Evolve: Summon 2x Ghost\nSuper-Evolve: Summon 2x Ghost\nSuper-Evolve: grant drain to ally:last summoned_all",
+      "timestamp": "2025-12-26T13:27:13.082Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10061210",
+      "cardName": "Avian Statue",
+      "description": "Countdown (2)\nLast Words: Summon a Regal Falcon.\nEngage (2): Advance this amulet's count by 2.",
+      "verdict": "PASS",
+      "reasoning": "All described effects are implemented: Countdown (2), Last Words summoning Regal Falcon, and Engage (2) advancing countdown by 2 with no sacrifice.",
+      "stateChanges": "Keyword: Countdown\nLast Words: Summon 1x Regal Falcon\nKeyword: Engage (sacrifice: false)\nEngage: Countdown advance by 2",
+      "timestamp": "2025-12-26T13:27:14.381Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10062210",
+      "cardName": "Winged Statue",
+      "description": "Countdown (4)\nLast Words: Summon a Holy Falcon.\nEngage (1): Advance this amulet's count by 1.",
+      "verdict": "PASS",
+      "reasoning": "All described effects (Countdown 4, Last Words summon Holy Falcon, Engage (1) advances countdown without destruction) are correctly implemented.",
+      "stateChanges": "Keyword: Countdown\nLast Words: Summon 1x Holy Falcon\nKeyword: Engage (sacrifice: false)\nEngage: Countdown advance by 1",
+      "timestamp": "2025-12-26T13:27:14.382Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10111110",
+      "cardName": "Fay Twinkletoes",
+      "description": "Fanfare: Combo (3) - Give all other allied followers on the field +1/+1.",
+      "verdict": "PASS",
+      "reasoning": "The implementation correctly applies +1/+1 to all other allied followers when Combo 3 is achieved, matching the description.",
+      "stateChanges": "Fanfare IF Combo 3: give +1/+1 to all allied followers (excluding self)",
+      "timestamp": "2025-12-26T13:27:16.279Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10112210",
+      "cardName": "Lambent Cairn",
+      "description": "Fanfare: Add a Fairy to your hand. Combo (3) - Add a Deepwood Bounty to your hand.\nEngage: Destroy this card. Select an allied follower on the field and give it +1/+1.",
+      "verdict": "FAIL",
+      "reasoning": "Implementation adds an extra Fairy on Combo 3 not described; description only adds Deepwood Bounty on Combo 3, not an additional Fairy.",
+      "stateChanges": "Fanfare (base): Add 1x Fairy to hand\nFanfare IF Combo 3: Add 1x Deepwood Bounty to hand\nFanfare IF Combo 3: Add 1x Fairy to hand\nKeyword: Engage (sacrifice: true)\nEngage: give +1/+1 to allied follower",
+      "timestamp": "2025-12-26T13:27:15.703Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10143210",
+      "cardName": "Fan of Otohime",
+      "description": "Engage (3): Summon an Otohime's Bodyguard. Select a card in your hand and discard it.",
+      "verdict": "PASS",
+      "reasoning": "Engage (3) with sacrifice: false matches paying 3 PP without destroying the card; summoning Otohime's Bodyguard and discarding a card are both implemented as described.",
+      "stateChanges": "Keyword: Engage (sacrifice: false)\nEngage: Summon 1x Otohime's Bodyguard\nEngage: discard effect",
+      "timestamp": "2025-12-26T13:27:17.717Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10162210",
+      "cardName": "Darkhaven Grace",
+      "description": "Engage (1): Select an allied follower on the field and give it +1/+1. Restore 1 defense to your leader.",
+      "verdict": "PASS",
+      "reasoning": "Implementation matches description: Engage costs 1 PP (sacrifice false), buffs allied follower +1/+1, and restores 1 defense to leader.",
+      "stateChanges": "Keyword: Engage (sacrifice: false)\nEngage: give +1/+1 to allied follower\nEngage: Restore 1 to leader",
+      "timestamp": "2025-12-26T13:27:17.583Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10163210",
+      "cardName": "Pact of the Beast Princess",
+      "description": "Countdown (2)\nLast Words: Summon a Holyflame Tiger.\nEngage (1): Advance this amulet's count by 1.",
+      "verdict": "PASS",
+      "reasoning": "All described effects (Countdown 2, Last Words summon Holyflame Tiger, Engage (1) advances countdown) are implemented correctly with proper sacrifice flag.",
+      "stateChanges": "Keyword: Countdown\nLast Words: Summon 1x Holyflame Tiger\nKeyword: Engage (sacrifice: false)\nEngage: Countdown advance by 1",
+      "timestamp": "2025-12-26T13:27:19.704Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10221310",
+      "cardName": "Lucrative Deal",
+      "description": "Draw 2 cards. Your opponent draws a card.",
+      "verdict": "FAIL",
+      "reasoning": "Implementation draws 2 cards for the player but only draws 1 card without specifying opponent; opponent must draw 1 card as per description, which is missing.",
+      "stateChanges": "Spell: Draw 2 card(s)\nSpell: Draw 1 card(s)",
+      "timestamp": "2025-12-26T13:27:19.096Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10263110",
+      "cardName": "Agnes, the Swiftblade",
+      "description": "Storm\nStrike: If there are at least 2 allied amulets on the field, destroy a random enemy follower other than the opposing one.",
+      "verdict": "PASS",
+      "reasoning": "The implementation includes Storm and the conditional strike effect that destroys a random enemy follower if there are at least 2 allied amulets, matching the description exactly.",
+      "stateChanges": "Keyword: Storm\nOn strike: Conditional (amulet_count 2)\n  └─ If met: Destroy random enemy follower (excluding defender)",
+      "timestamp": "2025-12-26T13:27:21.065Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10303210",
+      "cardName": "Tablet of Tribulations",
+      "description": "Fanfare: Banish all duplicates from your deck.\nEngage: Draw a card.",
+      "verdict": "PASS",
+      "reasoning": "Fanfare banishes duplicates from deck and Engage draws a card without sacrifice, matching the description.",
+      "stateChanges": "Fanfare: Banish deck_duplicates\nKeyword: Engage (sacrifice: false)\nEngage: Draw 1 card(s)",
+      "timestamp": "2025-12-26T13:27:20.865Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10332210",
+      "cardName": "Institute of Truth",
+      "description": "Countdown (5)\nWhenever you play a follower whose cost has been changed, draw a card and advance this amulet's count by 1.\nEngage: Select a follower in your hand, increase its cost by 1, and give it +1/+1.",
+      "verdict": "PASS",
+      "reasoning": "All described effects are implemented: countdown with 5, drawing and advancing countdown when playing a follower with changed cost, and Engage increasing cost by 1 and giving +1/+1 to a follower in hand without destroying the amulet.",
+      "stateChanges": "Keyword: countdown\nKeyword: Engage (sacrifice: false)\nEngage: Select 1 ally:hand\n  └─ Condition: type=Follower\n  └─ Selection Effect: Cost: modify 1 to selected:follower\n  └─ Selection Effect: give +1/+1 to selected:follower\nOn ally follower played (IF cost_changed=true): Draw 1 card(s)\nOn ally follower played (IF cost_changed=true): Countdown advance by 1",
+      "timestamp": "2025-12-26T13:27:22.736Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10342210",
+      "cardName": "Nation of Disdain",
+      "description": "Countdown (4)\nEngage (1): Deal 1 damage to all followers.",
+      "verdict": "PASS",
+      "reasoning": "Implementation includes countdown and Engage (1) dealing 1 damage to all followers, matching the description.",
+      "stateChanges": "Keyword: countdown\nKeyword: Engage (sacrifice: false)\nEngage: Deal 1 damage to all followers",
+      "timestamp": "2025-12-26T13:27:22.327Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10344120",
+      "cardName": "Galmieux, Ardor Manifest",
+      "description": "Fanfare: Gain Crest: Galmieux, Ardor Manifest.\nEnhance (7): Give this follower Storm.\nOnce on each of your turns, when this follower takes damage but isn't destroyed, deal 3 damage to a random enemy follower.",
+      "verdict": "FAIL",
+      "reasoning": "The description's fanfare grants a crest that triggers when THIS follower takes damage, dealing 3 damage to a random enemy follower; the implementation's crest triggers when ANY allied follower takes damage and adds a card to hand, which contradicts the description.",
+      "stateChanges": "Fanfare: Gain Crest: Galmieux, Ardor Manifest\n  └─ Definition: Once each of your turns: when an allied follower takes damage but isn't destroyed, add a Fangs of Ardent Destruction to your hand.\n--- Enhance (7) Path ---\nEnhance (7): give Storm to self\nOn self damaged (Once per turn) (IF still_alive=true, own_turn=true): Deal 3 damage to random enemy followers",
+      "timestamp": "2025-12-26T13:27:24.567Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10353110",
+      "cardName": "Congregant of Entwining",
+      "description": "Fanfare: Select a Mode to activate.\n1. Summon a Congregant of Entwining and give it and this follower Rush.\n2. Summon a Congregant of Entwining and give it and this follower Ward.\n3. Give all allied copies of Congregant of Entwining on the field +2/+2.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
+      "verdict": "FAIL",
+      "reasoning": "Option 3 in the implementation gives +2/+2 to all allied Congregant of Entwining AND to self, but the description only says +2/+2 to all allied copies (including self), so giving +2/+2 to self separately is redundant but acceptable; however, the description says 'give it and this follower Rush/Ward' for options 1 and 2, but the implementation gives Rush/Ward only to self and the summoned follower separately, which matches. The main issue is that the implementation's option 3 gives +2/+2 twice to self (once as part of all allied copies and once separately), which is not described. Therefore, the implementation adds an extra +2/+2 to self beyond the description, causing a mismatch.",
+      "stateChanges": "Fanfare: Choose a mode (3 options):\n  1. Option 1\n    └─ Effect: Summon 1x Congregant of Entwining with Rush\n    └─ Effect: give Rush to self\n  2. Option 2\n    └─ Effect: Summon 1x Congregant of Entwining with Ward\n    └─ Effect: give Ward to self\n  3. Option 3\n    └─ Effect: give +2/+2 to all allied followers named \"Congregant of Entwining\"\n    └─ Effect: give +2/+2 to self\nSuper-Evolve: Choose a mode (3 options):\n  1. Option 1\n    └─ Effect: Summon 1x Congregant of Entwining with Rush\n    └─ Effect: give Rush to self\n  2. Option 2\n    └─ Effect: Summon 1x Congregant of Entwining with Ward\n    └─ Effect: give Ward to self\n  3. Option 3\n    └─ Effect: give +2/+2 to all allied followers named \"Congregant of Entwining\"\n    └─ Effect: give +2/+2 to self",
+      "timestamp": "2025-12-26T13:27:25.932Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10401110",
+      "cardName": "Katalina, Sky's Protector",
+      "description": "Fanfare: Skybound Art- Deal 5 damage to 2 random enemy followers.\nWard \nCan't take more than 3 damage at a time.",
+      "verdict": "PASS",
+      "reasoning": "The implementation deals 5 damage twice to random enemy followers at Skybound Art 10, which matches the description's Skybound Art effect; Ward and damage cap keywords are present as described.",
+      "stateChanges": "Fanfare IF Skybound Art 10: Deal 5 damage to random enemy followers 2 times\nKeyword: Ward\nKeyword: MaxDamageCap",
+      "timestamp": "2025-12-26T13:27:27.249Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10414110",
+      "cardName": "Ewiyar, Wind Personified",
+      "description": "Fanfare: Skybound Art- Recover 1 evolution point.\nRush.",
+      "verdict": "PASS",
+      "reasoning": "Fanfare effect triggers only if Skybound Art 10 is active, matching 'Fanfare: Skybound Art- Recover 1 evolution point'; Rush keyword is present as described.",
+      "stateChanges": "Fanfare IF Skybound Art 10: ep effect\nKeyword: Rush",
+      "timestamp": "2025-12-26T13:27:27.517Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10443310",
+      "cardName": "Primal Beast Absorption",
+      "description": "Select an enemy card on the field, banish it, and add a copy of it to your hand.",
+      "verdict": "FAIL",
+      "reasoning": "The implementation only banishes enemy followers, but the description says 'enemy card' which includes all card types, not just followers.",
+      "stateChanges": "Spell: Select 1 enemy:any\n  └─ Selection Effect: Banish selected:follower\n  └─ Selection Effect: Add 1x [dynamic card] to hand",
+      "timestamp": "2025-12-26T13:27:28.691Z",
+      "retries": 0
+    },
+    {
+      "cardId": "10472120",
+      "cardName": "Ilsa, Brutal Drill Sergeant",
+      "description": "Fanfare: Select a Mode to activate.\n1. Do this 3 times: \"Deal 4 damage to a random enemy follower.\"\n2. Deal 4 damage to the enemy leader.",
+      "verdict": "PASS",
+      "reasoning": "The implementation correctly offers a mode choice with one option dealing 4 damage to random enemy followers 3 times and the other dealing 4 damage to the enemy leader, matching the description.",
+      "stateChanges": "Fanfare: Choose a mode (2 options):\n  1. Option 1\n    └─ Effect: Deal 4 damage to random enemy followers 3 times\n  2. Option 2\n    └─ Effect: Deal 4 damage to enemy leader",
+      "timestamp": "2025-12-26T13:27:29.683Z",
+      "retries": 0
+    },
+    {
+      "cardId": "90031210",
+      "cardName": "Magic Sediment",
+      "description": "Earth Sigil\nEngage (1): Gain an earth sigil.",
+      "verdict": "PASS",
+      "reasoning": "Implementation correctly includes Earth Sigil, Engage (1) with no sacrifice, and adds one earth counter as described.",
+      "stateChanges": "Keyword: Aura\nKeyword: Counter\nKeyword: Engage (sacrifice: false)\nEngage: add 1 to earth counter",
+      "timestamp": "2025-12-26T13:27:30.823Z",
+      "retries": 0
+    },
+    {
+      "cardId": "90051140",
+      "cardName": "Rotting Zombie",
+      "description": "Last Words: Summon a Rotting Zombie and remove Last Words from it.",
+      "verdict": "FAIL",
+      "reasoning": "The implementation removes 'unknown' from the last summoned ally instead of removing 'Last Words' from it as described.",
+      "stateChanges": "Last Words: Summon 1x Rotting Zombie\nLast Words: remove unknown to ally:last summoned",
+      "timestamp": "2025-12-26T13:27:30.777Z",
+      "retries": 0
+    },
+    {
+      "cardId": "90071210",
+      "cardName": "Gear of Ambition",
+      "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Striker Artifact.\nCan't be played.",
+      "verdict": "FAIL",
+      "reasoning": "The card has no programmed effects, but the description requires Fuse and transformation effects, which are missing.",
+      "stateChanges": "No programmed effects found",
+      "timestamp": "2025-12-26T13:27:32.142Z",
+      "retries": 0
+    },
+    {
+      "cardId": "90071220",
+      "cardName": "Gear of Remembrance",
+      "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Fortifier Artifact.\nCan't be played.",
+      "verdict": "FAIL",
+      "reasoning": "The card has no programmed effects, but the description requires a Fuse effect and transformation, which are missing.",
+      "stateChanges": "No programmed effects found",
+      "timestamp": "2025-12-26T13:27:31.916Z",
+      "retries": 0
+    },
+    {
+      "cardId": "90072110",
+      "cardName": "Striker Artifact",
+      "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nRush",
+      "verdict": "FAIL",
+      "reasoning": "The implementation only includes Rush keyword but lacks the Fuse mechanic and transformation effects based on fused cards' total cost.",
+      "stateChanges": "Keyword: Rush",
+      "timestamp": "2025-12-26T13:27:33.543Z",
+      "retries": 0
+    },
+    {
+      "cardId": "90074120",
+      "cardName": "Lloyd",
+      "description": "Ward\nYour opponent can't select any cards other than this one for abilities.",
+      "verdict": "FAIL",
+      "reasoning": "The description specifies 'Ward' and that opponent can't select any cards other than this one, but the implementation adds 'Taunt' which is not mentioned, indicating a mismatch.",
+      "stateChanges": "Keyword: Ward\nKeyword: Taunt",
+      "timestamp": "2025-12-26T13:27:33.447Z",
+      "retries": 0
+    }
+  ],
+  "generatedAt": "2025-12-26T13:27:33.544Z"
+}

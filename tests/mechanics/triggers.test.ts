@@ -65,7 +65,8 @@ describe("Mechanic Contract: triggers", () => {
         });
 
         it("ally_follower_enter trigger fires when ally enters", () => {
-            // GIVEN: A card on board with ally_follower_enter trigger that buffs all allies
+            // GIVEN: A card on board with ally_follower_enter trigger that buffs all OTHER allies
+            // (ally:follower excludes self by default in Shadowverse)
             givenGameState({ seed: 1 })
                 .withFirstBoard([
                     {
@@ -79,11 +80,17 @@ describe("Mechanic Contract: triggers", () => {
                             effects: [{ op: "stat", action: "give", target: "ally:follower", attack: 1, defense: 1 }],
                         }],
                     },
+                    {
+                        name: "AllyFollower",
+                        type: "Follower",
+                        attack: 3,
+                        defense: 3,
+                    },
                 ])
                 .build();
 
-            const buffCard = thenBoard("first").find(c => c.name === "BuffOnEnter");
-            const attackBefore = buffCard!.attack;
+            const allyBefore = thenBoard("first").find(c => c.name === "AllyFollower");
+            const attackBefore = allyBefore!.attack;
 
             // Simulate a new ally entering
             const enteringCard = {
@@ -95,11 +102,14 @@ describe("Mechanic Contract: triggers", () => {
             };
 
             // WHEN: Fire ally_follower_enter event
-            fireTrigger("ally_follower_enter", "first", { enteringCard: enteringCard as any });
+            fireTrigger("ally_follower_enter", "first", {
+                enteringCard: enteringCard as any,
+                enteringOwner: "first",
+            });
 
-            // THEN: BuffOnEnter should have +1 attack (from its own trigger)
-            const buffCardAfter = thenBoard("first").find(c => c.name === "BuffOnEnter");
-            expect(buffCardAfter!.attack).toBe((attackBefore as number) + 1);
+            // THEN: AllyFollower should have +1 attack (BuffOnEnter's trigger buffs other allies)
+            const allyAfter = thenBoard("first").find(c => c.name === "AllyFollower");
+            expect(allyAfter!.attack).toBe((attackBefore as number) + 1);
         });
     });
 

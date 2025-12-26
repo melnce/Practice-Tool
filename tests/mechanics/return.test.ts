@@ -38,6 +38,7 @@ describe("Mechanic Contract: return", () => {
 
             const effect = {
                 op: "return" as const,
+                destination: "hand" as const,
                 target: "enemy:follower",
             };
             whenRunEffects([effect], "first");
@@ -52,6 +53,7 @@ describe("Mechanic Contract: return", () => {
 
             const effect = {
                 op: "return" as const,
+                destination: "hand" as const,
                 target: "enemy:follower",
             };
             whenRunEffects([effect], "first");
@@ -68,6 +70,7 @@ describe("Mechanic Contract: return", () => {
 
             const effect = {
                 op: "return" as const,
+                destination: "hand" as const,
                 target: "enemy:follower",
             };
             whenRunEffects([effect], "first");
@@ -82,6 +85,7 @@ describe("Mechanic Contract: return", () => {
 
             const effect = {
                 op: "return" as const,
+                destination: "hand" as const,
                 target: "ally:follower",
             };
             whenRunEffects([effect], "first");
@@ -107,8 +111,9 @@ describe("Mechanic Contract: return", () => {
 
             const effect = {
                 op: "return" as const,
+                destination: "hand" as const,
                 target: "enemy:follower",
-                select: "all",
+                select: "all" as const,
             };
             whenRunEffects([effect], "first");
 
@@ -136,6 +141,7 @@ describe("Mechanic Contract: return", () => {
 
             const effect = {
                 op: "return" as const,
+                destination: "hand" as const,
                 target: "enemy:follower",
             };
             whenRunEffects([effect], "first");

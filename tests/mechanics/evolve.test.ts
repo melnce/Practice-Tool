@@ -38,7 +38,7 @@ describe("Mechanic Contract: evolve", () => {
                     type: "Follower",
                     attack: 2,
                     defense: 2,
-                    isEvolved: false,
+                    hasEvolved: false,
                     canEvolve: true,
                 }])
                 .build();
@@ -52,7 +52,7 @@ describe("Mechanic Contract: evolve", () => {
             whenRunEffects([effect], "first", card);
 
             const evolved = findOnBoard("first", "Target");
-            expect(evolved!.isEvolved).toBe(true);
+            expect(evolved!.hasEvolved).toBe(true);
         });
 
         it("increases attack by evolution bonus (default +2)", () => {
@@ -62,7 +62,7 @@ describe("Mechanic Contract: evolve", () => {
                     type: "Follower",
                     attack: 3,
                     defense: 3,
-                    isEvolved: false,
+                    hasEvolved: false,
                     canEvolve: true,
                     evoAttack: 2,
                     evoDefense: 2,
@@ -88,7 +88,7 @@ describe("Mechanic Contract: evolve", () => {
                     type: "Follower",
                     attack: 3,
                     defense: 3,
-                    isEvolved: false,
+                    hasEvolved: false,
                     canEvolve: true,
                     evoAttack: 2,
                     evoDefense: 2,
@@ -112,7 +112,7 @@ describe("Mechanic Contract: evolve", () => {
     // EVOLVE_FREE (NO EP COST)
     // ===========================================================================
 
-    describe("evolve_free operation", () => {
+    describe("evolve with spend_point: false (free evolution)", () => {
         it("evolves without consuming EP", () => {
             givenGameState({ seed: 1 })
                 .withFirstBoard([{
@@ -120,24 +120,25 @@ describe("Mechanic Contract: evolve", () => {
                     type: "Follower",
                     attack: 2,
                     defense: 2,
-                    isEvolved: false,
+                    hasEvolved: false,
                 }])
                 .build();
 
-            state.players.first.evolutionPoints = 2;
+            state.players.first.evoCharges = 2;
 
             const card = findOnBoard("first", "Target");
 
             const effect = {
-                op: "evolve_free" as const,
+                op: "evolve" as const,
                 target: "self",
+                spend_point: false, // Free evolution - no EP cost
             };
             whenRunEffects([effect], "first", card);
 
             // EP unchanged
-            expect(state.players.first.evolutionPoints).toBe(2);
+            expect(state.players.first.evoCharges).toBe(2);
             // Card evolved
-            expect(findOnBoard("first", "Target")!.isEvolved).toBe(true);
+            expect(findOnBoard("first", "Target")!.hasEvolved).toBe(true);
         });
     });
 
@@ -153,7 +154,7 @@ describe("Mechanic Contract: evolve", () => {
                     type: "Follower",
                     attack: 5,
                     defense: 5,
-                    isEvolved: true, // Already evolved
+                    hasEvolved: true, // Already evolved
                 }])
                 .build();
 

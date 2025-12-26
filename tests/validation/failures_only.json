@@ -1,0 +1,302 @@
+[
+  {
+    "cardId": "10052120",
+    "cardName": "Amorous Necromancer",
+    "description": "Evolve: Summon 2 copies of Ghost.\nSuper-Evolve: Give them Drain.",
+    "verdict": "FAIL",
+    "reasoning": "Super-Evolve should give Drain to the summoned Ghosts, but implementation grants Drain only to ally:last summoned, not both copies.",
+    "stateChanges": "Evolve: Summon 2x Ghost\nSuper-Evolve: Summon 2x Ghost\nSuper-Evolve: grant drain to ally:last summoned",
+    "timestamp": "2025-12-26T10:49:39.597Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10104120",
+    "cardName": "Ruler of Cocytus",
+    "description": "Fanfare: Replace your deck with the Apocalypse Deck.",
+    "verdict": "UNCLEAR",
+    "reasoning": "The effect replaces the deck but the mode is undefined, so it's unclear if the replacement is with the Apocalypse Deck as described.",
+    "stateChanges": "Fanfare: Deck: replace (mode=undefined)",
+    "timestamp": "2025-12-26T10:49:59.579Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10111140",
+    "cardName": "Workin' Grasshopper",
+    "description": "Fanfare: Draw an X-cost follower. X is your Combo.",
+    "verdict": "FAIL",
+    "reasoning": "The description specifies drawing an X-cost follower where X equals your Combo, but the implementation only searches for 1 follower regardless of Combo value, missing the variable X-cost condition.",
+    "stateChanges": "Fanfare: Search for 1 card(s) (type=Follower)",
+    "timestamp": "2025-12-26T10:50:03.974Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10162130",
+    "cardName": "Maeve, Guardian of Earth",
+    "description": "Ward\nLast Words: Summon a copy of a random allied amulet destroyed this match with the highest base cost.",
+    "verdict": "UNCLEAR",
+    "reasoning": "The programmed effect 'Reanimate (X)' is ambiguous and does not clearly specify summoning a copy of a random allied amulet destroyed this match with the highest base cost, so it's unclear if the Last Words effect matches the description.",
+    "stateChanges": "Keyword: Ward\nLast Words: Reanimate (X)",
+    "timestamp": "2025-12-26T10:51:32.320Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10163130",
+    "cardName": "Lapis, Shining Seraph",
+    "description": "Last Words: Gain Crest: Lapis, Shining Seraph.",
+    "verdict": "FAIL",
+    "reasoning": "The description states 'Last Words: Gain Crest: Lapis, Shining Seraph,' but the implementation triggers a Last Words effect that summons a Lapis, Shining Seraph with Storm instead of gaining the Crest.",
+    "stateChanges": "Keyword: lastwords\nlastwords: Gain Crest: Lapis, Shining Seraph\n  └─ Definition: Countdown (2) Last Words: Summon a Lapis, Shining Seraph and give it Storm",
+    "timestamp": "2025-12-26T10:51:35.606Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10163220",
+    "cardName": "Unholy Vessel",
+    "description": "Engage: Destroy this card and all followers.",
+    "verdict": "FAIL",
+    "reasoning": "Implementation destroys all followers but does not destroy this card itself as required by the description.",
+    "stateChanges": "Keyword: Engage (sacrifice: true)\nEngage: Destroy all all followerss",
+    "timestamp": "2025-12-26T10:51:36.847Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10172320",
+    "cardName": "Doomwright Resurgence",
+    "description": "Select 2 Artifact followers in your hand that cost 5 or less, summon an exact copy of each, and give the exact copies \"At the end of your opponent's turn, destroy this card.\"",
+    "verdict": "FAIL",
+    "reasoning": "The description requires summoning copies of 2 selected Artifact followers, but the implementation only summons 1 copy.",
+    "stateChanges": "Spell: Summon 1x copy of selected card from hand (type=Artifact) (max cost 5) (destroy at end of turn)",
+    "timestamp": "2025-12-26T10:51:49.955Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10174130",
+    "cardName": "Ralmia, Sonic Boom",
+    "description": "Fanfare: Select 3 Artifact followers in your hand that cost 5 or less and summon an exact copy of each.\nSuper-Evolve: Give all allied Artifact followers +1/+1.",
+    "verdict": "FAIL",
+    "reasoning": "Fanfare effect summons only 1 copy instead of 3 copies as described.",
+    "stateChanges": "Fanfare: Summon 1x copy of selected card from hand (type=Artifact) (max cost 5)\nSuper-Evolve: give +1/+1 to Artifact all allied followers",
+    "timestamp": "2025-12-26T10:51:57.115Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10222110",
+    "cardName": "Gelt, Intrepid Vice-Captain",
+    "description": "Ward\nAt the end of your turn, if there's a super-evolved allied follower on the field, give all allied followers on the field +1/+1.",
+    "verdict": "FAIL",
+    "reasoning": "The description states all allied followers get +1/+1, but the implementation gives +1/+1 to self and all allied followers, effectively giving Gelt +1/+1 twice, which contradicts the description.",
+    "stateChanges": "Keyword: Ward\nOn trigger: Conditional (super_evolved_allied )\n  └─ If met: give +1/+1 to self\n  └─ If met: give +1/+1 to all allied followers",
+    "timestamp": "2025-12-26T10:52:18.241Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10344120",
+    "cardName": "Galmieux, Ardor Manifest",
+    "description": "Fanfare: Gain Crest: Galmieux, Ardor Manifest.\nEnhance (7): Give this follower Storm.\nOnce on each of your turns, when this follower takes damage but isn't destroyed, deal 3 damage to a random enemy follower.",
+    "verdict": "FAIL",
+    "reasoning": "The fanfare effect in the implementation triggers on any allied follower taking damage and adds a card to hand, whereas the description states it should only gain the Crest: Galmieux, Ardor Manifest. This is a missing and contradictory effect.",
+    "stateChanges": "Fanfare: Gain Crest: Galmieux, Ardor Manifest\n  └─ Definition: Once each of your turns: when an allied follower takes damage but isn't destroyed, add a Fangs of Ardent Destruction to your hand.\n--- Enhance (7) Path ---\nEnhance (7): give Storm to self\nOn self damaged (Once per turn) (IF still_alive=true, own_turn=true): Deal 3 damage to random enemy followers",
+    "timestamp": "2025-12-26T10:53:42.742Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10352210",
+    "cardName": "Castle of Entwining",
+    "description": "Fanfare: Select a Mode to activate.\n1. Draw a card.\n2. Give a random allied follower on the field +1/+1.\nEngage (1): Destroy this card. Replicate the effects of this card's Fanfare ability.",
+    "verdict": "FAIL",
+    "reasoning": "The description states the +1/+1 buff is given to a random allied follower, but the implementation applies +1/+1 to all allied followers, which contradicts the description.",
+    "stateChanges": "Fanfare: Choose a mode (2 options):\n  1. Option 1\n    └─ Effect: Draw 1 card(s)\n  2. Option 2\n    └─ Effect: give +1/+1 to all allied followers\nKeyword: engage\nengage: Choose a mode (2 options):\n  1. Option 1\n    └─ Effect: Draw 1 card(s)\n  2. Option 2\n    └─ Effect: give +1/+1 to all allied followers",
+    "timestamp": "2025-12-26T10:53:48.694Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10353110",
+    "cardName": "Congregant of Entwining",
+    "description": "Fanfare: Select a Mode to activate.\n1. Summon a Congregant of Entwining and give it and this follower Rush.\n2. Summon a Congregant of Entwining and give it and this follower Ward.\n3. Give all allied copies of Congregant of Entwining on the field +2/+2.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
+    "verdict": "FAIL",
+    "reasoning": "Option 3 incorrectly buffs all allied followers instead of only allied copies of Congregant of Entwining as described.",
+    "stateChanges": "Fanfare: Choose a mode (3 options):\n  1. Option 1\n    └─ Effect: Summon 1x Congregant of Entwining with Rush\n    └─ Effect: give Rush to self\n  2. Option 2\n    └─ Effect: Summon 1x Congregant of Entwining with Ward\n    └─ Effect: give Ward to self\n  3. Option 3\n    └─ Effect: give +2/+2 to all allied followers\n    └─ Effect: give +2/+2 to self\nSuper-Evolve: Choose a mode (3 options):\n  1. Option 1\n    └─ Effect: Summon 1x Congregant of Entwining with Rush\n    └─ Effect: give Rush to self\n  2. Option 2\n    └─ Effect: Summon 1x Congregant of Entwining with Ward\n    └─ Effect: give Ward to self\n  3. Option 3\n    └─ Effect: give +2/+2 to all allied followers\n    └─ Effect: give +2/+2 to self",
+    "timestamp": "2025-12-26T10:53:50.004Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10404110",
+    "cardName": "Sandalphon, Primarch Successor",
+    "description": "Activates in deck. At the start of your turn, if allied followers have evolved at least 6 times this match, Invoke this card.\nWhen this card is Invoked, gain Crest: Sandalphon, Primarch Successor and return this card to hand\nFanfare: Super Skybound Art- Do this 5 times: \"Deal 2 damage to a random enemy.\"",
+    "verdict": "FAIL",
+    "reasoning": "Fanfare triggers only if Skybound Art is 15, not 5 times as described; also, the condition for invocation based on evolved followers is missing.",
+    "stateChanges": "Fanfare IF Skybound Art 15: Deal 2 damage to random enemy 5 times\nOn invoke (IF is_self=true): Gain Crest: Sandalphon, Primarch Successor\n  └─ Definition: Countdown (2). At the end of your turn, restore 1 defense to all allies.\nOn invoke (IF is_self=true): Return self to hand",
+    "timestamp": "2025-12-26T10:54:14.484Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10414110",
+    "cardName": "Ewiyar, Wind Personified",
+    "description": "Fanfare: Skybound Art- Recover 1 evolution point.\nRush.",
+    "verdict": "UNCLEAR",
+    "reasoning": "The implementation shows a conditional Fanfare effect only if Skybound Art 10 is active, but the description states 'Fanfare: Skybound Art- Recover 1 evolution point' without specifying a condition; it's unclear if the effect triggers unconditionally or only at 10 stacks.",
+    "stateChanges": "Fanfare IF Skybound Art 10: ep effect\nKeyword: Rush",
+    "timestamp": "2025-12-26T10:54:22.938Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10423310",
+    "cardName": "Knightly Ardor",
+    "description": "Select a Mode to activate.\n1. Give the leftmost allied Swordcraft follower on the field \"Can attack 2 times per turn\".\n2. Give all allied Swordcraft followers on the field +1/+1 and Barrier.\n3. Recover 2 play points and 1 evolution point.\n4. Restore 6 defense to your leader.",
+    "verdict": "FAIL",
+    "reasoning": "Mode 1 incorrectly gives the effect to all allied Swordcraft followers instead of only the leftmost one.",
+    "stateChanges": "Spell: Choose a mode (4 options):\n  1. \"Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\"\"\n    └─ Effect: give  to Swordcraft all allied followers\n  2. \"Give all allied Swordcraft followers +1/+1 and Barrier\"\n    └─ Effect: give +1/+1 and Barrier to Swordcraft all allied followers\n  3. \"Recover 2 play points and 1 evolution point\"\n    └─ Effect: Recover 2 PP\n    └─ Effect: ep effect\n  4. \"Restore 6 defense to your leader\"\n    └─ Effect: Restore 6 to leader",
+    "timestamp": "2025-12-26T10:54:28.322Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10452110",
+    "cardName": "Nezha, Soaring War God",
+    "description": "Rush.\nAt the end of your turn, deal 4 damage to a random enemy follower, then deal 2 damage to a random enemy follower.",
+    "verdict": "FAIL",
+    "reasoning": "The description specifies dealing damage at the end of your turn, but the implementation triggers damage without specifying timing; also, the description deals damage to random enemy followers twice separately (4 then 2), but the implementation's wording is ambiguous and may not reflect the sequential damage at end of turn.",
+    "stateChanges": "Keyword: Rush\nOn trigger: Deal 4 damage to random enemy followers\nOn trigger: Deal 2 damage to random enemy followers",
+    "timestamp": "2025-12-26T10:54:49.270Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10464120",
+    "cardName": "Vira, Luminous Primal Knight",
+    "description": "Fanfare: Select 2 enemy followers on the field and banish them.\nSuper Skybound Art- Super-evolve this follower.\nWard\nCan't take more than 3 damage at a time.",
+    "verdict": "FAIL",
+    "reasoning": "Fanfare only banishes one enemy follower instead of two as described.",
+    "stateChanges": "Fanfare: Banish enemy follower\nFanfare IF Skybound Art 15: Super-evolve self\nKeyword: Ward\nKeyword: max_damage_cap",
+    "timestamp": "2025-12-26T10:55:02.990Z",
+    "retries": 0
+  },
+  {
+    "cardId": "10472120",
+    "cardName": "Ilsa, Brutal Drill Sergeant",
+    "description": "Fanfare: Select a Mode to activate.\n1. Do this 3 times: \"Deal 4 damage to a random enemy follower.\"\n2. Deal 4 damage to the enemy leader.",
+    "verdict": "FAIL",
+    "reasoning": "The description states that both effects happen after selecting a mode: either deal 4 damage to random enemy followers 3 times or deal 4 damage to the enemy leader. The implementation splits these into two separate modes, each with only one effect, missing the combined effect of option 1 and option 2 together.",
+    "stateChanges": "Fanfare: Choose a mode (2 options):\n  1. Option 1\n    └─ Effect: Deal 4 damage to random enemy followers 3 times\n  2. Option 2\n    └─ Effect: Deal 4 damage to enemy leader",
+    "timestamp": "2025-12-26T10:55:08.259Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90004130",
+    "cardName": "Demon of Purgatory",
+    "description": "Fanfare: Select 2 enemy followers on the field and deal 6 damage to them and the enemy leader.",
+    "verdict": "FAIL",
+    "reasoning": "The implementation only selects and damages one enemy follower, but the description requires selecting and dealing damage to two enemy followers.",
+    "stateChanges": "Fanfare: Select enemy:follower\n  └─ Selection Effect: Deal 6 damage to selected:follower\nFanfare: Deal 6 damage to enemy leader",
+    "timestamp": "2025-12-26T10:55:15.386Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90054130",
+    "cardName": "One-Tailed Fox",
+    "description": "Rush\nWard\nLast Words: Give a random allied Ginsetsu & Yuzuki, Twin Calamities on the field +1/+0.",
+    "verdict": "FAIL",
+    "reasoning": "Last Words effect incorrectly buffs all allied followers instead of only a random allied Ginsetsu & Yuzuki, Twin Calamities.",
+    "stateChanges": "Keyword: Rush\nKeyword: Ward\nLast Words: give +1/0 to all allied followers",
+    "timestamp": "2025-12-26T10:55:38.772Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90071210",
+    "cardName": "Gear of Ambition",
+    "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Striker Artifact.\nCan't be played.",
+    "verdict": "FAIL",
+    "reasoning": "No effects are programmed, but the card requires a Fuse effect and transformation upon Fuse, which are missing.",
+    "stateChanges": "No programmed effects found",
+    "timestamp": "2025-12-26T10:55:43.265Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90071220",
+    "cardName": "Gear of Remembrance",
+    "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Fortifier Artifact.\nCan't be played.",
+    "verdict": "FAIL",
+    "reasoning": "No effects are programmed, but the card requires a Fuse action and transformation into a Fortifier Artifact, which are missing.",
+    "stateChanges": "No programmed effects found",
+    "timestamp": "2025-12-26T10:55:44.343Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90072110",
+    "cardName": "Striker Artifact",
+    "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nRush",
+    "verdict": "UNCLEAR",
+    "reasoning": "Only the Rush keyword is implemented; no information on Fuse or transformation effects is provided.",
+    "stateChanges": "Keyword: Rush",
+    "timestamp": "2025-12-26T10:55:45.098Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90072120",
+    "cardName": "Fortifier Artifact",
+    "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nWard",
+    "verdict": "UNCLEAR",
+    "reasoning": "Only the Ward keyword is confirmed; the Fuse mechanic and transformation effects based on fused cards' total cost are not shown.",
+    "stateChanges": "Keyword: Ward",
+    "timestamp": "2025-12-26T10:55:46.401Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90073110",
+    "cardName": "Ominous Artifact α",
+    "description": "Fuse: Ominous Artifact β and Ominous Artifact γ\nWhen you've Fused both to this card, transform it into a Masterwork Artifact Ω.\nAt the end of your turn, restore 3 defense to your leader.",
+    "verdict": "UNCLEAR",
+    "reasoning": "The programmed effect includes the end of turn healing, but fusion and transformation mechanics are not shown, so completeness cannot be confirmed.",
+    "stateChanges": "On end of turn (IF whose_turn=owner): Restore 3 to leader",
+    "timestamp": "2025-12-26T10:55:47.882Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90074120",
+    "cardName": "Lloyd",
+    "description": "Ward\nYour opponent can't select any cards other than this one for abilities.",
+    "verdict": "FAIL",
+    "reasoning": "The description specifies 'Your opponent can't select any cards other than this one for abilities,' but the implementation only includes 'Taunt' instead of this unique selection restriction.",
+    "stateChanges": "Keyword: Ward\nKeyword: Taunt",
+    "timestamp": "2025-12-26T10:55:50.943Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90024310",
+    "cardName": "Remnant of Hollowness",
+    "description": "Deal 4 damage split between all enemies.",
+    "verdict": "FAIL",
+    "reasoning": "Damage is split between undefined or enemy leader, not all enemies as described.",
+    "stateChanges": "Spell: Deal 4 damage to split between undefined or enemy leader",
+    "timestamp": "2025-12-26T10:55:56.828Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90054310",
+    "cardName": "Scream Diffusion",
+    "description": "Summon 2 copies of Rulenye & Valnareik and give them Rush.",
+    "verdict": "FAIL",
+    "reasoning": "The implementation summons 2 copies of Rulenye & Valnareik but does not grant them Rush as described.",
+    "stateChanges": "Spell: Summon 2x Rulenye & Valnareik\nPassive Keyword: Rush",
+    "timestamp": "2025-12-26T10:56:00.140Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90054320",
+    "cardName": "Wings of Desire",
+    "description": "Select an allied Rulenye & Valnareik on the field and give it Storm.",
+    "verdict": "UNCLEAR",
+    "reasoning": "The implementation grants storm to an allied follower but does not specify if it targets both Rulenye and Valnareik as required.",
+    "stateChanges": "Spell: grant storm to allied follower",
+    "timestamp": "2025-12-26T10:56:00.179Z",
+    "retries": 0
+  },
+  {
+    "cardId": "90064310",
+    "cardName": "Torrent of Despair",
+    "description": "Banish a random enemy follower from the field. Delay the counts of all your crests by 1.",
+    "verdict": "FAIL",
+    "reasoning": "Implementation banishes all enemy followers instead of banishing a random one, and gains a crest instead of delaying crest counts by 1.",
+    "stateChanges": "Fanfare: Banish all enemy followers\nFanfare: Gain Crest: Unknown Crest",
+    "timestamp": "2025-12-26T10:56:01.784Z",
+    "retries": 0
+  }
+]
