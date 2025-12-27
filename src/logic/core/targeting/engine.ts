@@ -1,6 +1,6 @@
 // src/logic/core/targeting/engine.ts
-import { GameState } from "../../../core/types/index.js";
-import { TargetingResult } from "./types.js";
+import type { GameState } from "../../../core/types/index.js";
+import type { TargetingResult } from "./types.js";
 import { validateTargetSelection } from "./validation.js";
 import { toggleSelectionUid } from "./selection.js";
 import { getBoard, getHand } from "../../../core/playerHelpers.js";

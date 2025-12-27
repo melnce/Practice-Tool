@@ -1,7 +1,7 @@
 // src/logic/effects/repeat.ts
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../core/types/index.js";
 import { getHand, getCrests } from "../../core/playerHelpers.js";
 
 export function handleRepeatEffect(

@@ -2,10 +2,10 @@
 // Amulet resolution logic. Pure logic, no rendering.
 
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player, Effect } from "../../../core/types/index.js";
+import type { CardInstance, Player, Effect } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
 import { pushPlayedHistory } from "./history.js";
-import { PlayOutcome } from "./types.js";
+import type { PlayOutcome } from "./types.js";
 
 import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
 import { applyKeywordsFromList } from "../keywords.js";

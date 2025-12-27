@@ -4,7 +4,7 @@
 // - "named": Create from card database by name (token generation)
 // - "copy": Duplicate from an existing target card
 
-import { Effect } from "../../../../core/types/index.js";
+import type { Effect } from "../../../../core/types/index.js";
 
 /**
  * CANONICAL FORMAT for add_to_hand op:

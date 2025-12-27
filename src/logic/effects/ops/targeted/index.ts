@@ -18,19 +18,14 @@ import { summonExactCopyFromHand } from "../summon_ops/hand.js";
 import { setStatsBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
-import { CardInstance } from "../../../../core/types/index.js";
+import type { CardInstance } from "../../../../core/types/index.js";
 import { getHand, getGraveyard, getBoard, addShadows, getHP, setHP, opponentOf } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
-import {
+import type {
   TargetedOpContext,
   DispatchResult,
 } from "../../../core/targeting/types.js";
-import {
-  startDispatch,
-  endDispatch,
-  runWithBypass,
-} from "../../../core/targeting/guards.js";
-
+import { startDispatch, endDispatch, runWithBypass } from "../../../core/targeting/guards.js";
 type TargetedOpHandler = (ctx: TargetedOpContext) => DispatchResult;
 const TARGETED_OP_HANDLERS: Map<string, TargetedOpHandler> = new Map();
 

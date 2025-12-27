@@ -5,8 +5,9 @@ import { banishCard } from "../effects/ops/banish/index.js";
 // import { runEffects } from "./effects/index.js"; // Breaking cycle
 import { logEvent } from "../../core/logger.js";
 import { fireTrigger } from "./triggers.js";
-import { CardInstance, Player, Effect } from "../../core/types/index.js";
+import type { CardInstance, Player, Effect } from "../../core/types/index.js";
 import { isFirstPlayer, opponentOf, getBoard, getGraveyard, addShadows, getDestroyedHistory } from "../../core/playerHelpers.js";
+import { bumpZoneVersion } from "./triggers/utils.js";
 
 // Dependency Injection for runEffects
 let runEffects: (
@@ -20,20 +21,42 @@ export function registerRunEffectsInCleanup(fn: any) {
 }
 
 export function cleanupDead() {
-  // Skip cleanup while a “batch” (like crest EOT) is running.
+  // Skip cleanup while a "batch" (like crest EOT) is running.
   if (state.suppressCleanup) return;
+
+  // PERF: Fast numeric coercion helper (avoids parseInt/String)
+  const toNum = (v: any): number => typeof v === "number" ? v : (v == null ? 0 : +v);
+
+  // PERF: Fast early-exit if nothing needs cleanup
+  const needsCleanup = (board: CardInstance[]) => {
+    for (let i = 0; i < board.length; i++) {
+      const c = board[i];
+      if (!c || typeof c !== "object") return true; // sparse hole needs cleanup
+      if ((c as any).pendingDestruction) return true;
+      if (c.type === "Follower" && toNum(c.defense) <= 0) return true;
+      if (c.type === "Amulet" && c.hasCountdown && toNum(c.countdown) <= 0) return true;
+    }
+    return false;
+  };
+
+  const firstBoard = getBoard(state, "first");
+  const secondBoard = getBoard(state, "second");
+  if (!needsCleanup(firstBoard) && !needsCleanup(secondBoard)) {
+    return; // Fast path: nothing to clean
+  }
 
   const triggerLastWords = (card: CardInstance, owner: Player) => {
     if ((card as any)._lwFired) return; // guard against re-entry
     if (!card?.hasLastWords) return;
-    const lw = card.keywordState?.lastWordsEffects || card.lastWordsEffects;
+    const kw = card.keywordState;
+    const lw = kw?.lastWordsEffects || card.lastWordsEffects;
     if (!Array.isArray(lw)) return;
     if (!runEffects) {
       console.warn("cleanupDead: runEffects not registered!");
       return;
     }
     (card as any)._lwFired = true; // mark fired
-    runEffects([...lw], owner, card);
+    runEffects(lw, owner, card); // PERF: Pass directly, no spread
   };
 
   const cleanSide = (
@@ -41,35 +64,35 @@ export function cleanupDead() {
     grave: CardInstance[],
     owner: Player,
   ) => {
+    // PERF: Backward iteration for correct death order, null-mark instead of splice
     for (let i = board.length - 1; i >= 0; i--) {
       const c = board[i];
 
       // Guard against sparse / null slots created by other ops
       if (!c || typeof c !== "object") {
-        // remove accidental holes to keep board dense
-        board.splice(i, 1);
+        // Mark for removal instead of splice
+        (board as any)[i] = null;
         continue;
       }
 
-      const isFollower = c.type === "Follower";
-      const isAmulet = c.type === "Amulet";
-      const defLE0 = isFollower && (parseInt(String(c.defense)) || 0) <= 0;
-      const countdown0 =
-        isAmulet && c.hasCountdown && (parseInt(String(c.countdown)) || 0) <= 0;
+      // PERF: Cache type checks and use fast numeric coercion
+      const cardType = c.type;
+      const isFollower = cardType === "Follower";
+      const isAmulet = cardType === "Amulet";
+      const defVal = toNum(c.defense);
+      const defLE0 = isFollower && defVal <= 0;
+      const countdown0 = isAmulet && c.hasCountdown && toNum(c.countdown) <= 0;
       const markedForDeath = !!(c as any).pendingDestruction;
-      if (markedForDeath)
-        console.log(`[cleanupDead] Found marked card: ${c.name} (${c.uid})`);
       const shouldDestroy = defLE0 || countdown0 || markedForDeath;
 
       if (!shouldDestroy) continue;
 
       // Log only when we actually destroy something
-      const cause = defLE0
-        ? "defense<=0"
-        : countdown0
-          ? "countdown==0"
-          : "unknown";
-      logEvent("destroyQueued", { card: c.name, owner, type: c.type, cause });
+      const cause = defLE0 ? "defense<=0" : countdown0 ? "countdown==0" : "unknown";
+      logEvent("destroyQueued", { card: c.name, owner, type: cardType, cause });
+
+      // Cache keywordState for repeated access
+      const kw = c.keywordState;
 
       if (isFollower) {
         // Fire ally trigger for the owner, enemy trigger for the opponent
@@ -97,10 +120,8 @@ export function cleanupDead() {
         }
 
         // Emit only for destroyed (not banish/bounce) Wards
-        // Use keywordState for banishOnDeath check
-        const isBanishedOnDeath =
-          c.keywordState?.banishOnDeath || (c as any).banishOnDeath;
-        if (defLE0 && c.hasWard && !isBanishedOnDeath) {
+        const isBanishedOnDeathForWard = kw?.banishOnDeath || (c as any).banishOnDeath;
+        if (defLE0 && c.hasWard && !isBanishedOnDeathForWard) {
           fireTrigger("ally_ward_destroyed", owner as any, {
             destroyedCard: c,
           });
@@ -113,36 +134,33 @@ export function cleanupDead() {
       delete (c as any).potential_defense;
       delete (c as any)._death_snapshot;
 
-      const isBanishedOnDeath =
-        c.keywordState?.banishOnDeath || (c as any).banishOnDeath;
+      const isBanishedOnDeath = kw?.banishOnDeath || (c as any).banishOnDeath;
       if (isBanishedOnDeath) {
         logEvent("banishOnDeath", { card: c.name, owner });
-        // handleBanish will remove the card from the correct board.
-        // Only splice here if, for some reason, it didn't.
-        const before = board[i];
-        banishCard(c); // Banish instead of moving to graveyard
-        // Prevent double-splice: only remove if the same object still sits at i.
-        if (board[i] === before) board.splice(i, 1);
+        // banishCard will remove the card from the board
+        banishCard(c);
+        // PERF: Null-mark instead of splice (if still there)
+        if (board[i] === c) (board as any)[i] = null;
       } else {
         logEvent("death", { card: c.name, owner });
-        // History: mark as destroyed (only true deaths, not banish/bounce)
-        // P2-3 FIX: Use deterministic game tick instead of Date.now() for replay
+        // History: mark as destroyed
         const gameTick = (state as any).gameTick ??
           ((state.roundCount || 0) * 1000 + (state.activePlayer === "first" ? 0 : 500));
         const histEntry = {
           uid: c.uid,
           name: c.name,
-          type: c.type,
+          type: cardType,
           cost: Number(c?.cost) || 0,
           base_image: c?.base_image || null,
           ts: gameTick,
-          id: c.id, // Preserve card id for history
+          id: c.id,
         };
         getDestroyedHistory(state, owner).push(histEntry as any);
-        // Remove from board before LWs
-        board.splice(i, 1);
 
-        const lw = c.keywordState?.lastWordsEffects || c.lastWordsEffects;
+        // PERF: Null-mark BEFORE LWs (preserves "removed before LWs" semantics)
+        (board as any)[i] = null;
+
+        const lw = kw?.lastWordsEffects || c.lastWordsEffects;
         const lwCount = Array.isArray(lw) ? lw.length : 0;
         if (lwCount > 0)
           logEvent("lastWords", { card: c.name, owner, count: lwCount });
@@ -150,13 +168,26 @@ export function cleanupDead() {
         // Run LWs and then move to grave
         triggerLastWords(c, owner);
         c.zone = "graveyard";
-        // Reset cost modification when moving to graveyard (same as returning to hand)
         c.cost_mod = 0;
         grave.push(c);
 
         // shadows
         addShadows(state, owner, 1);
       }
+    }
+
+    // PERF: Single compaction pass instead of per-element splice
+    let w = 0;
+    for (let r = 0; r < board.length; r++) {
+      const x = board[r];
+      if (x && typeof x === "object") {
+        board[w++] = x;
+      }
+    }
+    if (w < board.length) {
+      board.length = w;
+      // PERF: Invalidate candidate cache when zone mutates
+      bumpZoneVersion();
     }
   };
 

@@ -1,5 +1,5 @@
-import { Player } from "../../../../core/types/index.js";
-import { TriggerContext, TriggerEventName } from "../types.js";
+import type { Player } from "../../../../core/types/index.js";
+import type { TriggerContext, TriggerEventName } from "../types.js";
 import { getAllZoneCandidates, getCrestCandidates } from "../utils.js";
 import { processCandidateTriggers } from "../process.js";
 

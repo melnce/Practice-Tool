@@ -1,4 +1,4 @@
-import {
+import type {
   CardInstance,
   Player,
   Effect,
@@ -6,8 +6,8 @@ import {
   EffectByOp,
   EffectResult,
 } from "../../../core/types/index.js";
-import { EffectTraceSink } from "./trace.js";
-export { EffectResult };
+import type { EffectTraceSink } from "./trace.js";
+export type { EffectResult };
 
 // Context passed to every effect handler
 export interface EffectCtx {

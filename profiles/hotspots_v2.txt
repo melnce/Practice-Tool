@@ -1,0 +1,44 @@
+
+=== NORMAL TOP 20 (self-time) ===
+ 1.  1501 fireTrigger                         core/triggers.js:42
+ 2.  1152 cleanSide                           core/cleanup.js:32
+ 3.   791 fireTrigger                         core/triggers.js:42
+ 4.   686 fireTrigger                         core/triggers.js:42
+ 5.   541 fireTrigger                         core/triggers.js:42
+ 6.   421 fireTrigger                         core/triggers.js:42
+ 7.   405 fireTrigger                         core/triggers.js:42
+ 8.   396 playFollower                        playCard/follower.js:11
+ 9.   388 getLegalActions                     bench/benchEnv.js:144
+10.   355 handleRestrictedZoneEvent           handlers/zones.js:4
+11.   284 handleGenericEvent                  handlers/common.js:2
+12.   241 handleCombatEvent                   handlers/combat.js:17
+13.   235 cleanupDead                         core/cleanup.js:13
+14.   225 canPlayCard                         playCard/preflight.js:45
+15.   207 _endTurnCore                        core/turns.js:164
+16.   197 handleCombatEvent                   handlers/combat.js:17
+17.   196 handlePlayEvent                     handlers/play.js:40
+18.   183 _attackFollowerCore                 core/combat.js:133
+19.   179 _endTurnCore                        core/turns.js:164
+20.   161 fireTrigger                         core/triggers.js:42
+
+=== PLAYCARD TOP 20 (self-time) ===
+ 1.  1326 fireTrigger                         core/triggers.js:42
+ 2.  1123 cleanSide                           core/cleanup.js:32
+ 3.   784 fireTrigger                         core/triggers.js:42
+ 4.   608 fireTrigger                         core/triggers.js:42
+ 5.   599 fireTrigger                         core/triggers.js:42
+ 6.   394 fireTrigger                         core/triggers.js:42
+ 7.   379 playFollower                        playCard/follower.js:11
+ 8.   379 fireTrigger                         core/triggers.js:42
+ 9.   304 getLegalActions                     bench/benchEnv.js:144
+10.   296 handleRestrictedZoneEvent           handlers/zones.js:4
+11.   282 handleGenericEvent                  handlers/common.js:2
+12.   212 handleCombatEvent                   handlers/combat.js:17
+13.   187 _endTurnCore                        core/turns.js:164
+14.   186 fireTrigger                         core/triggers.js:42
+15.   180 _endTurnCore                        core/turns.js:164
+16.   171 handleCombatEvent                   handlers/combat.js:17
+17.   171 cleanupDead                         core/cleanup.js:13
+18.   170 playCardCore                        playCard/core.js:14
+19.   166 _attackFollowerCore                 core/combat.js:133
+20.   162 dispatchEvent                       triggers/dispatcher.js:44

@@ -1,7 +1,7 @@
 // src/logic/effects/ops/fuse/types.ts
 // Unified fuse operation types
 
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 
 /**
  * Action field values for unified fuse op

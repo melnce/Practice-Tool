@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { createInitialState } from "../../core/gameState.js";
 import { dispatchAction } from "./dispatch.js";
-import { GameState, PlayCardAction } from "../../core/types/index.js";
+import type { GameState, PlayCardAction } from "../../core/types/index.js";
 
 describe("UID Dispatch Hardening", () => {
   it("throws specific error when UID is not found in hand", () => {

@@ -1,15 +1,10 @@
 // src/logic/effects/ops/crest/unified.ts
 // Unified crest handler - handles crest operations
 
-import { Effect, Player } from "../../../../core/types/index.js";
-import {
-  handleGainCrest,
-  crestAddCounter,
-  crestSpendCounter,
-  destroyCrest,
-  completeCrest,
-  Crest,
-} from "../../crest.js";
+import type { Effect, Player } from "../../../../core/types/index.js";
+import type { completeCrest, Crest } from "../../crest.js";
+
+import { handleGainCrest, crestAddCounter, crestSpendCounter, destroyCrest } from "../../crest.js";
 import { runEffects } from "../../../core/effects/index.js";
 import { handleCountdown } from "../countdown/unified.js";
 

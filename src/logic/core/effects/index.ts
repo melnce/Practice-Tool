@@ -7,7 +7,7 @@
 import { state } from "../../../core/gameState.js";
 import { adapter } from "../../../core/adapter.js";
 import { registerRunEffects } from "../triggers.js";
-import {
+import type {
   CardInstance,
   Effect,
   Player,
@@ -21,14 +21,15 @@ import { registerRunEffectsForSpellboost } from "../../effects/ops/spellboost.js
 import { recordEvent } from "../../../core/debugTimeline.js";
 
 // Registry
-import { getOp, EffectCtx, sealRegistry } from "./registry.js";
+import type { EffectCtx } from "./registry.js";
+
+import { getOp, sealRegistry } from "./registry.js";
 import { getGlobalTrace } from "./trace.js";
 import { registerCombatEffects } from "./domains/combat.js";
 import { registerResourceEffects } from "./domains/resources.js";
 import { registerBoardEffects } from "./domains/board.js";
 import { registerBuffEffects } from "./domains/buffs.js";
 import { registerMiscEffects } from "./domains/misc.js";
-
 // Initialize Registry
 registerCombatEffects();
 registerResourceEffects();
@@ -39,7 +40,6 @@ registerMiscEffects();
 // Bootstrap Integrity Check
 import { ALL_OPS } from "./opTypes.js";
 import { listOps } from "./registry.js";
-
 const registered = new Set(listOps());
 const expected = new Set(ALL_OPS);
 

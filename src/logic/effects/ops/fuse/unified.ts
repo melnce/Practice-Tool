@@ -1,9 +1,9 @@
 // src/logic/effects/ops/fuse/unified.ts
 // Unified fuse operation handler
 
-import { Player, CardInstance, Effect, EffectContext } from "../../../../core/types/index.js";
+import type { Player, CardInstance, Effect, EffectContext } from "../../../../core/types/index.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
-import { FuseOp } from "./types.js";
+import type { FuseOp } from "./types.js";
 
 // Import existing handlers
 import { opStartFuseFromCard, fuse_finalize_generic } from "./fuse.js";

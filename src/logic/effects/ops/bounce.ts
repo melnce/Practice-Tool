@@ -7,7 +7,7 @@ import { fireTrigger } from "../../core/triggers.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../core/logger.js";
-import { CardInstance, Effect, Player, EffectContext } from "../../../core/types/index.js";
+import type { CardInstance, Effect, Player, EffectContext } from "../../../core/types/index.js";
 import { getBoard, getHand, getGraveyard, opponentOf } from "../../../core/playerHelpers.js";
 
 // Create a fresh base copy (new uid)

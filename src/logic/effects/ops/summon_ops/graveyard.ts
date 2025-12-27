@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 
-import { Player } from "../../../../core/types/index.js";
+import type { Player } from "../../../../core/types/index.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { summonNamed } from "./direct.js";
 import { getGraveyard } from "../../../../core/playerHelpers.js";

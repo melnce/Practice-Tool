@@ -1,9 +1,10 @@
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types/index.js";
-import { TargetQuery, TargetingEnv } from "./types.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
+import type { TargetQuery, TargetingEnv } from "./types.js";
 import { getBoard, getHand } from "../../../core/playerHelpers.js";
-import { evaluateCardCondition, CardCondition } from "../conditions/evaluator.js";
+import type { CardCondition } from "../conditions/evaluator.js";
 
+import { evaluateCardCondition } from "../conditions/evaluator.js";
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------

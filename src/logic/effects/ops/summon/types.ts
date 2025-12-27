@@ -1,7 +1,7 @@
 // src/logic/effects/ops/summon/types.ts
 // Unified summon types and normalization.
 
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 
 // ============================================================================
 // SOURCE & SCOPE TYPES

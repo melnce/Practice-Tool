@@ -1,12 +1,16 @@
 // src/logic/effects/ops/banish/index.ts
 // Barrel exports for unified banish module.
 
-// Types
-export {
+// Types (type-only exports for tsx compatibility)
+export type {
   UnifiedBanishSpec,
   BanishDistribution,
   BanishScope,
   BanishContext,
+} from "./types.js";
+
+// Runtime exports from types
+export {
   normalizeToUnifiedSpec,
   validateUnifiedSpec,
 } from "./types.js";

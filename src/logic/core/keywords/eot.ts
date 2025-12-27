@@ -1,4 +1,4 @@
-import { Player } from "../../../core/types/index.js";
+import type { Player } from "../../../core/types/index.js";
 import { state } from "../../../core/gameState.js";
 import { clearCantAttack } from "./remove.js";
 import { getBoard } from "../../../core/playerHelpers.js";

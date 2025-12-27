@@ -1,11 +1,11 @@
 // src/logic/effects/ops/summon/handlers.ts
 // Source-specific summon handlers - separated for modularity
 
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { logEvent } from "../../../../core/logger.js";
 import { getPool } from "../../../core/targeting.js";
 
-import { UnifiedSummonSpec, SummonContext } from "./types.js";
+import type { UnifiedSummonSpec, SummonContext } from "./types.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 import {
     summonNamed,

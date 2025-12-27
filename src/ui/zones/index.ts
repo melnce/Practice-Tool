@@ -1,12 +1,12 @@
 // src/ui/zones/index.ts
 import { byId } from "../dom.js";
-import { GameState, CardInstance } from "../../core/types/index.js";
+import type { GameState, CardInstance } from "../../core/types/index.js";
 import { enableBoardDropForOwnSide } from "../drag.js";
 import { buildZoneContext } from "./selectors.js";
 import { getMemoizedViewModel } from "./memoization.js";
 import { renderCardDOM } from "./dom.js";
 import { attachHandlers } from "./handlers.js";
-import { CardViewModel } from "./types.js";
+import type { CardViewModel } from "./types.js";
 
 // Helper to track VM on DOM
 interface ReconcilableElement extends HTMLElement {

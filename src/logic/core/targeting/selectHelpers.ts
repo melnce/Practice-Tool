@@ -2,8 +2,8 @@
  * Pure helper functions for target selection.
  * Extracted from handleSelect for single responsibility.
  */
-import { CardInstance, Effect } from "../../../core/types/index.js";
-import { RNG } from "../../../core/rng.js";
+import type { CardInstance, Effect } from "../../../core/types/index.js";
+import type { RNG } from "../../../core/rng.js";
 
 // -----------------------------------------------------------------------------
 // Configuration Parsing

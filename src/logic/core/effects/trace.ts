@@ -1,4 +1,4 @@
-import { EffectOp, GameState } from "../../../core/types/index.js";
+import type { EffectOp, GameState } from "../../../core/types/index.js";
 import { hashGameState } from "../../../core/stateHash.js";
 
 // =============================================================================

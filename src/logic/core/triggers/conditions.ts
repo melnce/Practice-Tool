@@ -1,8 +1,9 @@
-import { TriggerContext, TriggerSpec } from "./types.js";
+import type { TriggerContext, TriggerSpec } from "./types.js";
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types/index.js";
-import { evaluateCardCondition, CardCondition } from "../conditions/evaluator.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
+import type { CardCondition } from "../conditions/evaluator.js";
 
+import { evaluateCardCondition } from "../conditions/evaluator.js";
 // Helper to normalize "subject" card (entering, played, leaving, etc.)
 export function getSubjectCard(context: TriggerContext): CardInstance | null {
   return (

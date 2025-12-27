@@ -2,7 +2,7 @@
 // Barrel exports for unified summon module.
 
 // Types
-export {
+export type {
   UnifiedSummonSpec,
   SummonSource,
   CopyScope,

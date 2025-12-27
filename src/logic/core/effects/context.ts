@@ -1,6 +1,6 @@
-import { GameState } from "../../../core/types/index.js";
-import { EffectCtx } from "./registry.js";
-import { TargetContext } from "../targeting.js";
+import type { GameState } from "../../../core/types/index.js";
+import type { EffectCtx } from "./registry.js";
+import type { TargetContext } from "../targeting.js";
 import { adapter } from "../../../core/adapter.js";
 
 type Adapter = typeof adapter;

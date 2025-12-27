@@ -1,10 +1,12 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player, Effect } from "../../../../core/types/index.js";
+import type { CardInstance, Player, Effect } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
-import { UnifiedCostSpec, normalizeToCostSpec } from "./types.js";
+import type { UnifiedCostSpec } from "./types.js";
+
+import { normalizeToCostSpec } from "./types.js";
 import { opponentOf, getHand } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 

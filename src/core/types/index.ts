@@ -15,8 +15,8 @@ export type {
 // Card types
 export type { KeywordEntry, CardTemplate, CardInstance } from "./cards.js";
 
-// Effect types
-export { EffectOp } from "./effects.js";
+// Effect types (type-only to avoid circular dep)
+export type { EffectOp } from "./effects.js";
 export type {
     BaseEffect,
     Effect,

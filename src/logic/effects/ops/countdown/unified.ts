@@ -1,10 +1,12 @@
 // src/logic/effects/ops/countdown/unified.ts
 // Unified countdown handler - works for both amulets and crests
 
-import { CardInstance, Effect, Player } from "../../../../core/types/index.js";
+import type { CardInstance, Effect, Player } from "../../../../core/types/index.js";
 import { logEvent } from "../../../../core/logger.js";
 import { state } from "../../../../core/gameState.js";
-import { Crest, completeCrest } from "../../crest.js";
+import type { Crest } from "../../crest.js";
+
+import { completeCrest } from "../../crest.js";
 import { getCrests } from "../../../../core/playerHelpers.js";
 
 export type CountdownAction = "advance" | "delay";

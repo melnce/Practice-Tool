@@ -4,10 +4,30 @@ import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 import type { GameState } from "./types/index.js";
 import { validateGameState } from "./stateValidation.js";
-import { hashGameState, ReplayStep } from "./stateHash.js";
-
+import type { ReplayStep } from "./stateHash.js";
+import { hashGameState } from "./stateHash.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
+
+// --- History Enable/Disable Switch ---
+// When disabled, history skips expensive structuredClone for performance.
+// Use DISABLE_HISTORY=1 env var or call setHistoryEnabled(false).
+let _historyEnabled = true;
+
+/** Explicitly enable or disable history snapshots. */
+export function setHistoryEnabled(enabled: boolean): void {
+  _historyEnabled = enabled;
+}
+
+/** Check if history is currently enabled. */
+export function isHistoryEnabled(): boolean {
+  return _historyEnabled;
+}
+
+// Check env var at module load (for benchmarks)
+if (typeof process !== "undefined" && process.env?.DISABLE_HISTORY === "1") {
+  _historyEnabled = false;
+}
 
 // --- Types ---
 interface HistoryEntry {
@@ -21,7 +41,7 @@ interface HistoryEntry {
 
 interface ActionContext {
   name: string;
-  before: GameState;
+  before: GameState | null; // null when history disabled (no snapshot taken)
   meta: any;
 }
 
@@ -32,25 +52,39 @@ let inAction: ActionContext | null = null; // { name, before, meta }
 let onChange:
   | ((status: { canUndo: boolean; canRedo: boolean }) => void)
   | null = null; // optional listener
+// --- Internal Cache Keys (excluded from snapshots) ---
+// These are implementation details that should not pollute history.
+// Add new cache keys here if needed.
+// EXPORTED for testing - tests can verify no unexpected underscore keys appear.
+export const INTERNAL_CACHE_KEYS = new Set([
+  "_triggerCache",     // Trigger candidate cache (auto-reinitializes on access)
+]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
-// Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
 function snapshot(): GameState {
-  // Exclude RNG from structuredClone because it contains methods/closures
-  const { rng, ...rest } = state;
+  // Exclude RNG (has methods, must be handled separately) and internal caches
+  const { rng, ...rest } = state as any;
+
+  // Remove only explicit internal cache keys (not blanket underscore filtering)
+  const cleaned: Record<string, any> = {};
+  for (const [k, v] of Object.entries(rest)) {
+    if (!INTERNAL_CACHE_KEYS.has(k)) {
+      cleaned[k] = v;
+    }
+  }
 
   // Try structuredClone first
   try {
-    const snap = structuredClone(rest) as GameState;
-    // Persist RNG internal state
-    if (rng) {
+    const snap = structuredClone(cleaned) as GameState;
+    // Persist RNG internal state (seed, cursor, uidCounter)
+    if (rng && typeof rng.snapshot === "function") {
       (snap as any).__rng = rng.snapshot();
     }
     return snap;
   } catch (e) {
     // Fallback: manually clone, skipping non-cloneable properties
     console.warn("[History] structuredClone failed, using fallback. Error:", e);
-    return manualSnapshot(rest, rng);
+    return manualSnapshot(cleaned, rng);
   }
 }
 
@@ -160,14 +194,29 @@ function notify() {
 export function beginAction(name: string, meta: any = {}) {
   if (inAction)
     throw new Error("history.beginAction called while another action is open");
+  // When history disabled, set before=null to skip expensive snapshot
+  // SAFETY: abortAction checks for null and won't corrupt state
+  if (!_historyEnabled) {
+    inAction = { name, before: null, meta };
+    return;
+  }
   inAction = { name, before: snapshot(), meta };
 }
 
 /** Commit the current action (captures after-snapshot; clears redo). */
 export function commitAction({ autoRender = true } = {}) {
   if (!inAction) return; // no-op if nothing open
+
+  // When history disabled, just clear inAction without snapshotting
+  // Still call notify() for UI consistency (undo/redo button state)
+  if (!_historyEnabled || inAction.before === null) {
+    inAction = null;
+    notify();
+    return;
+  }
+
   const after = snapshot();
-  const entry: HistoryEntry = { ...inAction, after };
+  const entry: HistoryEntry = { ...inAction, after } as HistoryEntry;
   past.push(entry);
   trimRing();
   future = []; // new branch clears redo
@@ -176,7 +225,7 @@ export function commitAction({ autoRender = true } = {}) {
   logEvent("history_commit", {
     name: entry.name,
     meta: entry.meta || {},
-    before_hash: entry.before_hash, // optional if you store it
+    before_hash: entry.before_hash,
     after_hash: entry.after_hash,
   });
 
@@ -188,11 +237,25 @@ export function commitAction({ autoRender = true } = {}) {
 }
 
 /** Abort current action (revert mutations to 'before'). */
-export function abortAction() {
+export function abortAction({ autoRender = true } = {}) {
   if (!inAction) return;
-  replaceState(inAction.before);
+
+  // REENTRY SAFETY: Copy before and clear inAction FIRST
+  // This prevents errors if adapter.render() calls doAction/beginAction
+  const before = inAction.before;
   inAction = null;
-  adapter.render();
+
+  // Revert state if we have a real snapshot (history was enabled)
+  if (before !== null) {
+    replaceState(before);
+    // Respect autoRender and HEADLESS/AI_SUPPRESS_RENDER
+    const suppress =
+      (globalThis as any).HEADLESS === true ||
+      (globalThis as any).AI_SUPPRESS_RENDER === true;
+    if (autoRender && !suppress) adapter.render();
+  }
+
+  // Always notify for consistency (even if history disabled)
   notify();
 }
 
@@ -244,7 +307,7 @@ export function doAction(
       });
     }
   } catch (e) {
-    abortAction();
+    abortAction({ autoRender });
     throw e;
   }
 

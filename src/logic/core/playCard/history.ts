@@ -1,6 +1,6 @@
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types/index.js";
-import { PlayedHistoryEntry } from "./types.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
+import type { PlayedHistoryEntry } from "./types.js";
 import { getPlayedHistory } from "../../../core/playerHelpers.js";
 
 export function pushPlayedHistory(owner: Player, card: CardInstance) {

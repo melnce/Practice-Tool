@@ -8,7 +8,7 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { pushToHand, MAX_HAND } from "../../../../core/utils.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { normalizeToAddToHandSpec } from "./types.js";
 
 /**

@@ -5,7 +5,7 @@ import { highlightSelectable } from "../core/targeting.js";
 import { setPendingTarget } from "../core/pendingTarget/index.js";
 
 import { logEvent } from "../../core/logger.js";
-import { Player, Effect } from "../../core/types/index.js";
+import type { Player, Effect } from "../../core/types/index.js";
 import { getHand, getGraveyard, addShadows } from "../../core/playerHelpers.js";
 import { toUids } from "../../core/uidResolver.js";
 

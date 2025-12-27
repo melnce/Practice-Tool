@@ -8,21 +8,21 @@ import { getPool } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
 import { applyLeaderDamage } from "../../leader.js";
-import {
+import type {
   Effect,
   CardInstance,
   Player,
   DamageEffect,
 } from "../../../../core/types/index.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
-import { DamageContext } from "./types.js";
+import type { DamageContext } from "./types.js";
 import { getHand, getBoard, getCrests, opponentOf } from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // TYPES (re-export for convenience, additional types only)
 // ============================================================================
 
-export { DamageContext } from "./types.js";
+export type { DamageContext } from "./types.js";
 
 export interface SplitSpilloverRules {
   /** If true, remaining damage after followers die goes to leader */

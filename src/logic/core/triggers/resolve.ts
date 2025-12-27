@@ -1,7 +1,7 @@
-import { CardInstance, Player } from "../../../core/types/index.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
 import { state } from "../../../core/gameState.js";
 import { getBoard, getHand, getGraveyard } from "../../../core/playerHelpers.js";
-import { TriggerContext } from "./types.js";
+import type { TriggerContext } from "./types.js";
 
 // =============================================================================
 // UID RESOLUTION HELPERS

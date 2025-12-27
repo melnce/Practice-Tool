@@ -3,7 +3,7 @@ import { state } from "../../../core/gameState.js";
 // Legacy spellboost transform removed: getCardDetails import no longer needed
 
 import { logEvent } from "../../../core/logger.js";
-import { Player, CardInstance } from "../../../core/types/index.js";
+import type { Player, CardInstance } from "../../../core/types/index.js";
 import { getHand } from "../../../core/playerHelpers.js";
 
 // CIRCULAR DEPENDENCY FIX:

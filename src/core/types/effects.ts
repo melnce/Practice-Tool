@@ -5,8 +5,8 @@
 import type { CardInstance } from "./cards.js";
 import type { Player } from "./player.js";
 
-// Re-export EffectOp from domain definitions
-export { EffectOp } from "../../logic/core/effects/opTypes.js";
+// Re-export EffectOp from domain definitions (type-only to avoid circular dep)
+export type { EffectOp } from "../../logic/core/effects/opTypes.js";
 import type { EffectOp } from "../../logic/core/effects/opTypes.js";
 
 // =============================================================================

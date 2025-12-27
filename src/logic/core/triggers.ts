@@ -1,6 +1,6 @@
 import { state } from "../../core/gameState.js";
-import { Player } from "../../core/types/index.js";
-import { TriggerContext, TriggerEventName } from "./triggers/types.js";
+import type { Player } from "../../core/types/index.js";
+import type { TriggerContext, TriggerEventName } from "./triggers/types.js";
 import { dispatchEvent } from "./triggers/dispatcher.js";
 import { registerRunEffectsInProcess } from "./triggers/process.js";
 import { handleLootFusedDedupe } from "./triggers/tracking.js";
@@ -70,7 +70,10 @@ export function fireTrigger(
 
   try {
     // P0-2 FIX: Enrich context with UIDs for deterministic serialization
-    enrichContextWithUids(context);
+    // PERF: Skip enrichment when DISABLE_UID_ENRICH is set (benchmarks/training)
+    if (process.env.DISABLE_UID_ENRICH !== "1") {
+      enrichContextWithUids(context);
+    }
 
     const _turnToken = Number.isFinite(state.turnNumber)
       ? state.turnNumber

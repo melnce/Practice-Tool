@@ -10,9 +10,10 @@ import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player } from "../../../../core/types/index.js";
-import { alreadyFusedThisTurn, handOf, FuseOp } from "./types.js";
+import type { CardInstance, Player } from "../../../../core/types/index.js";
+import type { FuseOp } from "./types.js";
 
+import { alreadyFusedThisTurn, handOf } from "./types.js";
 // Class-specific modules
 import {
   startGearMultiSelect,

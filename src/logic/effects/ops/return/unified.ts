@@ -1,7 +1,7 @@
 // src/logic/effects/ops/return/unified.ts
 // Unified return handler - replaces return_to_hand, bounce, return_hand_to_deck
 
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { handleReturnToHand } from "../bounce.js";
 import { handleReturnHandToDeck } from "../returnHandToDeck.js";
 

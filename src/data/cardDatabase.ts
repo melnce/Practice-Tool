@@ -1,15 +1,7 @@
 // src/data/cardDatabase.ts
-import { CardTemplate } from "../core/types/index.js";
-import {
-  initCardDatabase,
-  getCardDetails as getCardFromIndex,
-  getCardById as getCardByIdFromIndex,
-  injectCardForTest as injectForTest,
-  resetCardIndex,
-  BuildCardIndexInput,
-  RawCardData,
-} from "./cardIndex.js";
-
+import type { CardTemplate } from "../core/types/index.js";
+import type { BuildCardIndexInput, RawCardData } from "./cardIndex.js";
+import { getCardDetails as getCardFromIndex, getCardById as getCardByIdFromIndex, injectCardForTest as injectForTest, initCardDatabase, resetCardIndex } from "./cardIndex.js";
 // Re-export types if needed
 export { getCardDetails, getCardById } from "./cardIndex.js";
 

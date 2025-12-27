@@ -1,4 +1,4 @@
-import { CardInstance, Effect } from "../../../core/types/index.js";
+import type { CardInstance, Effect } from "../../../core/types/index.js";
 
 // =============================================================================
 // TRIGGER EVENT TYPES

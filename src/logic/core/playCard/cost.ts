@@ -1,4 +1,4 @@
-import { CardInstance, Effect } from "../../../core/types/index.js";
+import type { CardInstance, Effect } from "../../../core/types/index.js";
 
 export function getEffectiveCost(card: CardInstance): number {
   if (typeof card.effectiveCost === "number") return card.effectiveCost;

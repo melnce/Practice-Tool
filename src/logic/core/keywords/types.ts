@@ -1,4 +1,4 @@
-import { CardInstance, Effect, Player } from "../../../core/types/index.js";
+import type { CardInstance, Effect, Player } from "../../../core/types/index.js";
 
 export interface PendingTargetRequest {
   eff: Effect;
@@ -14,9 +14,9 @@ export type KeywordEffectResult =
   | { kind: "no-valid-targets" }
   | { kind: "request_target"; request: PendingTargetRequest };
 
-import { KeywordName } from "./registry.js";
+import type { KeywordName } from "./registry.js";
 
-export { KeywordName };
+export type { KeywordName };
 
 export interface KeywordState {
   // Combat / Defense

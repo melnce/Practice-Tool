@@ -3,7 +3,7 @@
 // For token generation, use "add" op
 // For card duplication, use "copy" op
 
-import { Effect } from "../../../../core/types/index.js";
+import type { Effect } from "../../../../core/types/index.js";
 
 // ============================================================================
 // CANONICAL UNIFIED TYPES

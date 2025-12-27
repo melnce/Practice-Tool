@@ -11,7 +11,7 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import {
     normalizeCardFilter,
     buildCardPredicate,
@@ -21,7 +21,8 @@ import { MAX_HAND, pushToHand } from "../../../../core/utils.js";
 import { getDeck, getHand, getGraveyard, opponentOf } from "../../../../core/playerHelpers.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 
-import { SearchSpec, normalizeSearchSpec } from "./types.js";
+import type { SearchSpec } from "./types.js";
+import { normalizeSearchSpec } from "./types.js";
 
 // ============================================================================
 // UNIFIED HANDLER
@@ -146,4 +147,5 @@ export function handleSearch(
 // EXPORTS
 // ============================================================================
 
-export { SearchSpec, normalizeSearchSpec } from "./types.js";
+export type { SearchSpec } from "./types.js";
+export { normalizeSearchSpec } from "./types.js";

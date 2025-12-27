@@ -1,7 +1,7 @@
 // src/logic/effects/ops/damage/types.ts
 // Shared types for the damage module.
 
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 
 // ============================================================================
 // LEGACY TYPES (backwards compat)

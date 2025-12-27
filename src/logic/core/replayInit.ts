@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { state, resetStateInstance } from "../../core/gameState.js";
-import { CardInstance, GameState, Player } from "../../core/types/index.js";
+import type { CardInstance, GameState, Player } from "../../core/types/index.js";
 import { drawCard } from "../../core/utils.js";
 import {
   getCardDetails,

@@ -1,5 +1,5 @@
-import { CardInstance, GameState } from "../../core/types/index.js";
-import { ZoneContext, CardViewModel } from "./types.js";
+import type { CardInstance, GameState } from "../../core/types/index.js";
+import type { ZoneContext, CardViewModel } from "./types.js";
 import { createCardViewModel } from "./viewModel.js";
 
 interface CacheEntry {

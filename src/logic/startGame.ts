@@ -10,8 +10,8 @@ import { loadCardDatabase } from "../data/cardDatabase.js";
 import { beginMulligan } from "./mulligan.js";
 import { runEffects } from "./core/effects/index.js";
 import { logEvent } from "../core/logger.js";
-import { CardInstance } from "../core/types/index.js";
-import { StartGameOptions } from "../core/types/index.js";
+import type { CardInstance } from "../core/types/index.js";
+import type { StartGameOptions } from "../core/types/index.js";
 import { setAnyAllyAttackedThisTurn, setEvoCharges, setSuperEvoCharges, setEvoUsedThisTurn, getDeck, getHand } from "../core/playerHelpers.js";
 
 function resetEvoButtons() {

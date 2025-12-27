@@ -3,7 +3,7 @@ import { state } from "../../../core/gameState.js";
 import { reanimateSummon } from "./summon.js";
 
 import { logEvent } from "../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../core/types/index.js";
 import { getGraveyard } from "../../../core/playerHelpers.js";
 
 // Local type to avoid 'any'

@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { fireTrigger } from "./triggers.js";
 import { logEvent } from "../../core/logger.js";
-import { CardInstance, Player } from "../../core/types/index.js";
+import type { CardInstance, Player } from "../../core/types/index.js";
 import { getBoard, toSlot } from "../../core/playerHelpers.js";
 
 // Helper interface for card with barrier properties

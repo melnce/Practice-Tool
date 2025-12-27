@@ -3,13 +3,13 @@
 // Contract: docs/playcard-contract.md
 
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types/index.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
 import { canPlayCard } from "./preflight.js";
 import { pickEnhanceTier } from "./cost.js";
 import { playSpell } from "./spell.js";
 import { playFollower } from "./follower.js";
 import { playAmulet } from "./amulet.js";
-import { PlayOutcome } from "./types.js";
+import type { PlayOutcome } from "./types.js";
 import { getPP, setPP, getPlaysThisTurn, setPlaysThisTurn, isFirstPlayer } from "../../../core/playerHelpers.js";
 
 /**

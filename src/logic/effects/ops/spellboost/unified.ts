@@ -1,6 +1,6 @@
 // src/logic/effects/ops/spellboost/unified.ts
 
-import { CardInstance, Player, Effect } from "../../../../core/types/index.js";
+import type { CardInstance, Player, Effect } from "../../../../core/types/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 import { normalizeToSpellboostSpec } from "./types.js";
 

@@ -1,7 +1,7 @@
 // src/logic/effects/ops/countdown/types.ts
 // Types for unified countdown operation
 
-import { Effect } from "../../../../core/types/index.js";
+import type { Effect } from "../../../../core/types/index.js";
 
 export type CountdownAction = "advance" | "increase";
 

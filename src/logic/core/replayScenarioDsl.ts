@@ -3,7 +3,7 @@
 // REPLAY SCENARIO DSL - Selectors and action builders for UID-free scenarios
 // ─────────────────────────────────────────────────────────────────────────────
 
-import {
+import type {
   GameState,
   CardInstance,
   Player,

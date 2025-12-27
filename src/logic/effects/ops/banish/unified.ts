@@ -3,15 +3,15 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
-import {
+import type {
   UnifiedBanishSpec,
   BanishContext,
-  normalizeToUnifiedSpec,
 } from "./types.js";
+import { normalizeToUnifiedSpec } from "./types.js";
 import {
   banishCard,
   banishSelf,

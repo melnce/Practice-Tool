@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { state } from "../../core/gameState.js";
-import {
+import type {
   GameState,
   PlayerAction,
   ActionType,
@@ -17,7 +17,9 @@ import { attackFollower, attackLeader } from "./combat.js";
 import { resolvePendingTarget } from "./resolveTarget.js";
 import { undo, redo, resetHistory } from "../../core/history.js";
 import { assertValidGameState } from "../../core/stateValidation.js";
-import { hashGameState, ReplayStep } from "../../core/stateHash.js";
+import type { ReplayStep } from "../../core/stateHash.js";
+
+import { hashGameState } from "../../core/stateHash.js";
 import { isFirstPlayer, getHand, getBoard, opponentOf } from "../../core/playerHelpers.js";
 
 /**

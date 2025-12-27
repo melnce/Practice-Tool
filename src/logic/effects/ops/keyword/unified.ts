@@ -1,7 +1,7 @@
 // src/logic/effects/ops/keyword/unified.ts
 // Unified keyword handler - replaces keyword, remove_keyword, remove_abilities, grant_trigger
 
-import { CardInstance, Effect, Player } from "../../../../core/types/index.js";
+import type { CardInstance, Effect, Player } from "../../../../core/types/index.js";
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { applyKeyword } from "../../../core/keywords/apply.js";
@@ -9,7 +9,7 @@ import {
     removeKeywordFromSingleCard,
     removeAllAbilitiesFromCard,
 } from "../../../core/keywords/remove.js";
-import { KeywordEffectResult } from "../../../core/keywords/types.js";
+import type { KeywordEffectResult } from "../../../core/keywords/types.js";
 import { grantLeaderBarrier } from "../../leader.js";
 
 export interface KeywordHandlerContext {

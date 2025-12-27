@@ -1,4 +1,4 @@
-import { TriggerSpec, TriggerEventName } from "./types.js";
+import type { TriggerSpec, TriggerEventName } from "./types.js";
 
 export function makeOncePerTurnKey(
   trigger: TriggerSpec,

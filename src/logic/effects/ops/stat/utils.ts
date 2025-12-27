@@ -1,5 +1,5 @@
-import { CardInstance } from "../../../../core/types/index.js";
-import { StatOp } from "./types.js";
+import type { CardInstance } from "../../../../core/types/index.js";
+import type { StatOp } from "./types.js";
 
 function hasKeyword(card: CardInstance, kw: any) {
   const k = String(kw || "").toLowerCase();

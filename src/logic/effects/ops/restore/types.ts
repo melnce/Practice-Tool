@@ -1,7 +1,7 @@
 // src/logic/effects/ops/restore/types.ts
 // Unified restore types and normalization.
 
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 
 // ============================================================================
 // TARGET & AMOUNT SOURCE TYPES

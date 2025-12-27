@@ -23,6 +23,7 @@
     "test:all": "vitest run -c vitest.all.config.ts",
     "test:dev": "vitest run -c vitest.dev.config.ts --passWithNoTests",
     "test:golden": "vitest run tests/golden",
+    "test:legacy": "vitest run --dir tests/legacy --passWithNoTests",
     "replay:check": "npx tsx scripts/replay.ts",
     "replay:update": "npx tsx scripts/replay.ts --update",
     "cards:update": "npx tsx scripts/mergeSets.ts",

@@ -5,8 +5,8 @@ import { state } from "../../../core/gameState.js";
 import { hasNecromancy, spendShadows } from "../../../helpers/necromancy.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import { logEvent } from "../../../core/logger.js";
-import { Player, CardInstance } from "../../../core/types/index.js";
-import { UnifiedGateSpec } from "./types.js";
+import type { Player, CardInstance } from "../../../core/types/index.js";
+import type { UnifiedGateSpec } from "./types.js";
 import {
     isFirstPlayer,
     getMaxPP,

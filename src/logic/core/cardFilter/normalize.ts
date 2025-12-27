@@ -1,7 +1,7 @@
 // src/logic/core/cardFilter/normalize.ts
 // Normalizes raw filter specs into a canonical format.
 
-import { CardFilterSpec, NormalizedCardFilter } from "./types.js";
+import type { CardFilterSpec, NormalizedCardFilter } from "./types.js";
 
 function toLowerSafe(s: any): string {
   return String(s || "")

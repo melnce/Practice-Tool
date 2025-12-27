@@ -1,6 +1,6 @@
-import { CardInstance } from "../../../core/types/index.js";
+import type { CardInstance } from "../../../core/types/index.js";
 import { makeOncePerTurnKey } from "./keys.js";
-import { TriggerSpec, TriggerEventName, TriggerContext } from "./types.js";
+import type { TriggerSpec, TriggerEventName, TriggerContext } from "./types.js";
 import { logEvent } from "../../../core/logger.js";
 
 // --- Dedupe map for "one fuse → one ping" invariant ---

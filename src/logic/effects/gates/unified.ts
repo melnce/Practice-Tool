@@ -2,7 +2,7 @@
 // Unified gate handler - evaluates conditions via registry and queues effects
 
 import { logEvent } from "../../../core/logger.js";
-import { Player, CardInstance, Effect } from "../../../core/types/index.js";
+import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
 import { normalizeToGateSpec } from "./types.js";
 import { evaluateCondition } from "./conditions.js";
 

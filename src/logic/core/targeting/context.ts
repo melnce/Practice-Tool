@@ -1,6 +1,6 @@
 import { state } from "../../../core/gameState.js";
-import { CardInstance } from "../../../core/types/index.js";
-import { TargetQuery, TargetingEnv, TargetContextKey } from "./types.js";
+import type { CardInstance } from "../../../core/types/index.js";
+import type { TargetQuery, TargetingEnv, TargetContextKey } from "./types.js";
 import { getHand, getBoard, opponentOf } from "../../../core/playerHelpers.js";
 import { resolveUid, resolveUids } from "../../../core/uidResolver.js";
 

@@ -3,7 +3,7 @@
 // All ops should use these helpers instead of directly writing to state.pendingTargetEffect.
 
 import { state } from "../../../core/gameState.js";
-import { PendingTargetRequest } from "./types.js";
+import type { PendingTargetRequest } from "./types.js";
 import { toUids, toUid } from "../../../core/uidResolver.js";
 
 /**

@@ -1,6 +1,6 @@
 // src/logic/effects/ops/spellboost/index.ts
 
-export {
+export type {
   UnifiedSpellboostSpec,
   SpellboostTarget,
   SpellboostMode,

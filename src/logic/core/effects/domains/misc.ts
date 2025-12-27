@@ -1,5 +1,8 @@
-import { registerOp, EffectCtx as _EffectCtx } from "../registry.js";
-import { handleSelect, TargetContext } from "../../targeting.js";
+import type { EffectCtx as _EffectCtx } from "../registry.js";
+import { registerOp } from "../registry.js";
+import type { TargetContext } from "../../targeting.js";
+
+import { handleSelect } from "../../targeting.js";
 import { runEffects } from "../index.js";
 import { handleMode } from "../../../effects/ops/mode.js";
 import { handleModeBonus } from "../../../effects/ops/misc.js";
@@ -8,7 +11,7 @@ import { handleEvolve } from "../../../effects/ops/evolve/unified.js";
 import { handleGate } from "../../../effects/gates/unified.js";
 import { incrementSkyboundArt } from "../../../effects/skybound.js";
 import { state } from "../../../../core/gameState.js";
-import { Effect as _Effect } from "../../../../core/types/index.js";
+import type { Effect as _Effect } from "../../../../core/types/index.js";
 
 export function registerMiscEffects() {
   registerOp("mode", handleMode as any);

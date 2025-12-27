@@ -1,6 +1,6 @@
 // src/ui/zones/handlers.ts
-import { CardViewModel, ZoneContext } from "./types.js";
-import { GameState } from "../../core/types/index.js";
+import type { CardViewModel, ZoneContext } from "./types.js";
+import type { GameState } from "../../core/types/index.js";
 import * as actions from "./actions.js";
 import {
   enableCardDragFromHand,

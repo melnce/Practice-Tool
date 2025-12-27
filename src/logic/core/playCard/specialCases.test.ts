@@ -3,7 +3,7 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { state, resetGameState } from "../../../core/gameState.js";
-import { CardInstance } from "../../../core/types/index.js";
+import type { CardInstance } from "../../../core/types/index.js";
 import { canPlayCard } from "./preflight.js";
 import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
 

@@ -2,7 +2,7 @@
 import { state } from "../../../core/gameState.js";
 import { shuffleInPlace } from "../../../core/utils.js";
 import { logEvent } from "../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../core/types/index.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 import { getHand, getDeck } from "../../../core/playerHelpers.js";
 

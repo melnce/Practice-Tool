@@ -1,7 +1,7 @@
-import { CardInstance, Player, Effect } from "../../../core/types/index.js";
+import type { CardInstance, Player, Effect } from "../../../core/types/index.js";
 
-// Re-export shared types
-export { CardInstance, Player, Effect };
+// Re-export shared types (type-only to avoid circular deps)
+export type { CardInstance, Player, Effect };
 
 // -----------------------------------------------------------------------------
 // Modern Targeting Types (UID-Only)

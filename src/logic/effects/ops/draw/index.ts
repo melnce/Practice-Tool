@@ -2,7 +2,7 @@
 // Barrel exports for unified draw module.
 
 // Types
-export {
+export type {
   UnifiedDrawSpec,
   DrawPlayer,
   DrawCount,

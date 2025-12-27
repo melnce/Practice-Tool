@@ -1,6 +1,6 @@
 // src/ui/evo.ts
 import { byId } from "./dom.js";
-import { GameState } from "../core/types/index.js";
+import type { GameState } from "../core/types/index.js";
 
 export function updateEvoButtonsUI(state: GameState) {
   /** @type {HTMLButtonElement} */

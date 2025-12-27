@@ -1,4 +1,4 @@
-import { CardInstance } from "../../../../core/types/index.js";
+import type { CardInstance } from "../../../../core/types/index.js";
 import { applyKeywordsFromList } from "../../../core/keywords.js";
 import { isEarthSigil } from "./earth.js";
 import { normalizeCardStats } from "../../../../core/cardStats.js";

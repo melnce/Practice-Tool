@@ -3,7 +3,7 @@ import { state } from "../../../core/gameState.js";
 import { hasNecromancy, spendShadows } from "../../../helpers/necromancy.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import { logEvent } from "../../../core/logger.js";
-import { Player, CardInstance, Effect } from "../../../core/types/index.js";
+import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
 import { isFirstPlayer, getBoard, getDeck, getRally, getMaxPP, getAnyAllyAttackedThisTurn } from "../../../core/playerHelpers.js";
 
 export function handleOverflowGate(owner: Player) {

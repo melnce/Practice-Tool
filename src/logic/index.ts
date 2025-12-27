@@ -30,7 +30,7 @@ import "../data/cardDatabase.js";
 import { summonNamed as _summonNamed } from "./effects/ops/summon.js";
 import { getCardDetails as _getCardDetails } from "../data/cardDatabase.js";
 import { state } from "../core/gameState.js";
-import { Player } from "../core/types/index.js";
+import type { Player } from "../core/types/index.js";
 
 export function startFuseFromHand(owner: Player, initiatorUid: string) {
   runEffects(

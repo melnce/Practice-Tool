@@ -6,10 +6,11 @@
 import { state } from "../../../../core/gameState.js";
 import { drawCard } from "../../../../core/utils.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 
-import { UnifiedDrawSpec, normalizeToUnifiedSpec, DrawCount } from "./types.js";
+import type { UnifiedDrawSpec, DrawCount } from "./types.js";
 
+import { normalizeToUnifiedSpec } from "./types.js";
 // ============================================================================
 // INTERNAL HELPERS
 // ============================================================================
@@ -82,4 +83,4 @@ function resolveCount(count: DrawCount, player: Player): number {
 // EXPORTS
 // ============================================================================
 
-export { normalizeToUnifiedSpec, UnifiedDrawSpec } from "./types.js";
+export type { normalizeToUnifiedSpec, UnifiedDrawSpec } from "./types.js";

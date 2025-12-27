@@ -1,12 +1,8 @@
-import { PlayerAction, GameState } from "../../core/types/index.js";
+import type { PlayerAction, GameState } from "../../core/types/index.js";
 import { playCard } from "./replayScenarioDsl.js";
-import {
-  ReplayInvariant,
-  invHandSize,
-  invBoardSize,
-  invCardMoved,
-  invCardMovedByUid,
-} from "./replayInvariants.js";
+import type { ReplayInvariant } from "./replayInvariants.js";
+
+import { invHandSize, invBoardSize, invCardMoved, invCardMovedByUid } from "./replayInvariants.js";
 import { getHand, getPP } from "../../core/playerHelpers.js";
 
 /**

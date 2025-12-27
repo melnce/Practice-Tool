@@ -1,7 +1,7 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 
-import { CardInstance, Effect, Player } from "../../../../core/types/index.js";
+import type { CardInstance, Effect, Player } from "../../../../core/types/index.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
 import { boardOf, deckOf } from "./utils.js";

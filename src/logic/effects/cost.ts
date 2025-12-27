@@ -2,7 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { getPool } from "../core/targeting.js";
 import { logEvent } from "../../core/logger.js";
-import { CardInstance, Effect, Player } from "../../core/types/index.js";
+import type { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { getHand, getDeck, opponentOf } from "../../core/playerHelpers.js";
 import { resolveUids } from "../../core/uidResolver.js";
 

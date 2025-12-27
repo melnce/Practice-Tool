@@ -1,7 +1,7 @@
 // src/logic/effects/gates/combo.ts
 import { state } from "../../../core/gameState.js";
 import { logEvent } from "../../../core/logger.js";
-import { Player } from "../../../core/types/index.js";
+import type { Player } from "../../../core/types/index.js";
 import { getPlaysThisTurn, setPlaysThisTurn } from "../../../core/playerHelpers.js";
 
 interface ComboEffect {

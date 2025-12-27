@@ -7,11 +7,11 @@ import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
 import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
-import { Effect, CardInstance, Player } from "../../../../core/types/index.js";
+import type { Effect, CardInstance, Player } from "../../../../core/types/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getBoard, getHP } from "../../../../core/playerHelpers.js";
 
-import { UnifiedDamageSpec, DamageContext } from "./types.js";
+import type { UnifiedDamageSpec, DamageContext } from "./types.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
 import { resolveDamageAmountExtended } from "./primitives.js";
 

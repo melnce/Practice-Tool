@@ -10,9 +10,10 @@ import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../../core/logger.js";
-import { Player, CardInstance } from "../../../../core/types/index.js";
-import { alreadyFusedThisTurn, handOf, FuseOp } from "./types.js";
+import type { Player, CardInstance } from "../../../../core/types/index.js";
+import type { FuseOp } from "./types.js";
 
+import { alreadyFusedThisTurn, handOf } from "./types.js";
 // ---------- starters ----------
 export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
   const hand = handOf(owner);

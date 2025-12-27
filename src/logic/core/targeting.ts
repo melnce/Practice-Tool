@@ -1,18 +1,14 @@
 import { state } from "../../core/gameState.js";
 // import { logEvent } from "../../core/logger.js";
-import { CardInstance, Effect, Player } from "../../core/types/index.js";
+import type { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { guardLifecycle } from "./targeting/guards.js";
 import { getBoard, getHand, getGraveyard } from "../../core/playerHelpers.js";
 import { toUids, toUid } from "../../core/uidResolver.js";
 
 // Refactored Imports
-import {
-  parseTargetQuery,
-  resolveBasePool,
-  applyFilters,
-  TargetContext,
-} from "./targeting/index.js";
+import type { TargetContext } from "./targeting/index.js";
 
+import { parseTargetQuery, resolveBasePool, applyFilters } from "./targeting/index.js";
 // Re-export Context for consumers
 export type { TargetContext };
 

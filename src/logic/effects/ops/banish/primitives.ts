@@ -4,8 +4,9 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { fireTrigger } from "../../../core/triggers.js";
-import { CardInstance, Player } from "../../../../core/types/index.js";
+import type { CardInstance, Player } from "../../../../core/types/index.js";
 import { getBoard as getPlayerBoard, getDeck, getBanish } from "../../../../core/playerHelpers.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 
 // ============================================================================
 // CORE PRIMITIVES
@@ -27,6 +28,7 @@ export function banishCard(
   const bi = firstBoard.indexOf(card);
   if (bi !== -1) {
     firstBoard.splice(bi, 1);
+    bumpZoneVersion(); // PERF: Invalidate cache before triggers
     // Fire ally trigger for first, enemy trigger for second
     fireTrigger("ally_follower_leaves_field", "first");
     fireTrigger("enemy_follower_leaves_field", "second");
@@ -45,6 +47,7 @@ export function banishCard(
   const ri = secondBoard.indexOf(card);
   if (ri !== -1) {
     secondBoard.splice(ri, 1);
+    bumpZoneVersion(); // PERF: Invalidate cache before triggers
     // Fire ally trigger for second, enemy trigger for first
     fireTrigger("ally_follower_leaves_field", "second");
     fireTrigger("enemy_follower_leaves_field", "first");

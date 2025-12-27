@@ -6,8 +6,8 @@ import { state } from "../../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player, Effect, EffectContext } from "../../../../core/types/index.js";
-import { StatOp } from "./types.js";
+import type { CardInstance, Player, Effect, EffectContext } from "../../../../core/types/index.js";
+import type { StatOp } from "./types.js";
 import { filterBuffCandidates } from "./utils.js";
 import { withBuffDuration } from "./duration.js";
 import {

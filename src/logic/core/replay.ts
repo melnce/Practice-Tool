@@ -1,6 +1,7 @@
-import { GameState, PlayerAction } from "../../core/types/index.js";
-import { EffectTraceEvent, createArrayTrace } from "./effects/trace.js";
+import type { GameState, PlayerAction } from "../../core/types/index.js";
+import type { EffectTraceEvent } from "./effects/trace.js";
 
+import { createArrayTrace } from "./effects/trace.js";
 // We will use PlayerAction as the Action type
 type Action = PlayerAction;
 

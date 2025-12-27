@@ -1,5 +1,5 @@
 // src/ui/zones/dom.ts
-import { CardViewModel } from "./types.js";
+import type { CardViewModel } from "./types.js";
 import { applyKeywordOverlays, applyBarrierOverlay } from "../overlays.js";
 import { attachTooltip } from "../tooltips.js";
 

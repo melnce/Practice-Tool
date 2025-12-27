@@ -3,7 +3,7 @@ import { state } from "../../../../core/gameState.js";
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Player, CardInstance } from "../../../../core/types/index.js";
+import type { Player, CardInstance } from "../../../../core/types/index.js";
 import { alreadyFusedThisTurn, handOf, graveOf } from "./types.js";
 
 // Returning Slash, etc.

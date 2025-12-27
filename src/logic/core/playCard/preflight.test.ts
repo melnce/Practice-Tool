@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { canPlayCard } from "./preflight.js";
 import { playCardNoRender } from "./index.js";
 import { state, resetGameState } from "../../../core/gameState.js";
-import { CardInstance } from "../../../core/types/index.js";
+import type { CardInstance } from "../../../core/types/index.js";
 
 describe("Preflight System", () => {
   beforeEach(() => {

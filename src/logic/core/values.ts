@@ -1,5 +1,5 @@
 import { state } from "../../core/gameState.js";
-import { CardInstance, Player } from "../../core/types/index.js";
+import type { CardInstance, Player } from "../../core/types/index.js";
 import { getHand, getBoard, getPlaysThisTurn } from "../../core/playerHelpers.js";
 
 interface ResolveContext {

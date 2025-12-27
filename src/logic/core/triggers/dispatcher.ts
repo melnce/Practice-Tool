@@ -1,5 +1,5 @@
-import { Player } from "../../../core/types/index.js";
-import { TriggerContext, TriggerEventName } from "./types.js";
+import type { Player } from "../../../core/types/index.js";
+import type { TriggerContext, TriggerEventName } from "./types.js";
 import { handleGenericEvent } from "./handlers/common.js";
 import { handleCombatEvent } from "./handlers/combat.js";
 import { handlePlayEvent } from "./handlers/play.js";

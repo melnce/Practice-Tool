@@ -7,8 +7,8 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { RawCardData, BuildCardIndexInput, initCardDatabase } from "./cardIndex.js";
-
+import type { RawCardData, BuildCardIndexInput } from "./cardIndex.js";
+import { initCardDatabase } from "./cardIndex.js";
 // Get directory path for relative imports
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

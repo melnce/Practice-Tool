@@ -1,5 +1,5 @@
 // src/ui/zones/types.ts
-import { CardInstance, Player } from "../../core/types/index.js";
+import type { CardInstance, Player } from "../../core/types/index.js";
 
 export type ZoneId = "blueHand" | "redHand" | "blueBoard" | "redBoard";
 

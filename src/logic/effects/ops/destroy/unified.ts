@@ -3,18 +3,16 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 
-import {
-  UnifiedDestroySpec,
-  DestroyContext,
-  normalizeToUnifiedSpec,
-} from "./types.js";
-import { destroyTarget, getBoard } from "./primitives.js";
+import type { UnifiedDestroySpec, DestroyContext } from "./types.js";
 
+
+import { normalizeToUnifiedSpec } from "./types.js";
+import { destroyTarget, getBoard } from "./primitives.js";
 // ============================================================================
 // CONTEXT VARIABLE HELPERS
 // ============================================================================
@@ -352,7 +350,7 @@ function runThenEffects(
 // EXPORTS
 // ============================================================================
 
-export { normalizeToUnifiedSpec, UnifiedDestroySpec } from "./types.js";
+export type { normalizeToUnifiedSpec, UnifiedDestroySpec } from "./types.js";
 
 
 

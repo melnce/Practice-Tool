@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Public API for playCard. This is the ONLY layer that handles rendering.
 
-import { CardInstance, Player } from "../../../core/types/index.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
 import {
   beginAction,
   commitAction,
@@ -14,7 +14,7 @@ import {
 } from "../../../core/history.js";
 import { playCardCore } from "./core.js";
 import { logEvent } from "../../../core/logger.js";
-import { PlayOutcome } from "./types.js";
+import type { PlayOutcome } from "./types.js";
 
 /**
  * Play a card from hand. This is the main entry point.

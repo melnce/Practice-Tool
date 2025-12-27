@@ -1,5 +1,5 @@
-import { Effect } from "../../../core/types/index.js";
-import { EffectCtx } from "./registry.js";
+import type { Effect } from "../../../core/types/index.js";
+import type { EffectCtx } from "./registry.js";
 
 function validateOp(eff: Effect) {
   if (!eff || typeof eff.op !== "string") {

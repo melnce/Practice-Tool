@@ -1,7 +1,7 @@
 // src/logic/effects/ops/evolve/index.ts
 
 export { handleEvolve } from "./unified.js";
-export {
+export type {
   UnifiedEvolveSpec,
   EvolveTarget,
   EvolveMode,

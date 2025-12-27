@@ -1,0 +1,21 @@
+=== POST-CLEANUP-OPT TOP 20 ===
+ 1.  1474 fireTrigger                    triggers.js:42
+ 2.  1162 cleanSide                      cleanup.js:53
+ 3.   832 fireTrigger                    triggers.js:42
+ 4.   666 fireTrigger                    triggers.js:42
+ 5.   517 fireTrigger                    triggers.js:42
+ 6.   450 fireTrigger                    triggers.js:42
+ 7.   429 fireTrigger                    triggers.js:42
+ 8.   390 playFollower                   follower.js:11
+ 9.   380 getLegalActions                benchEnv.js:144
+10.   338 handleRestrictedZoneEvent      zones.js:4
+11.   306 handleGenericEvent             common.js:2
+12.   265 canPlayCard                    preflight.js:45
+13.   223 handleCombatEvent              combat.js:17
+14.   217 _attackFollowerCore            combat.js:133
+15.   213 _endTurnCore                   turns.js:164
+16.   209 handleCombatEvent              combat.js:17
+17.   196 handlePlayEvent                play.js:40
+18.   195 _endTurnCore                   turns.js:164
+19.   188 fireTrigger                    triggers.js:42
+20.   180 cleanupDead                    cleanup.js:13

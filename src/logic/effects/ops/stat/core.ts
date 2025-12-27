@@ -2,8 +2,8 @@ import { state } from "../../../../core/gameState.js";
 
 import { applyKeyword } from "../../../core/keywords.js";
 import { logEvent } from "../../../../core/logger.js";
-import { CardInstance, Player } from "../../../../core/types/index.js";
-import { StatOp } from "./types.js";
+import type { CardInstance, Player } from "../../../../core/types/index.js";
+import type { StatOp } from "./types.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getBoard } from "../../../../core/playerHelpers.js";
 

@@ -2,7 +2,7 @@
 // Barrel exports for unified restore module.
 
 // Types
-export {
+export type {
   UnifiedRestoreSpec,
   RestoreTarget,
   RestoreAmountSource,

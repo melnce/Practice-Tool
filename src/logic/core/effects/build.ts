@@ -3,7 +3,7 @@
 // EFFECT BUILDER - Provides type-safe effect construction with compile-time checks
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { EffectOp, EffectByOp, Effect } from "../../../core/types/index.js";
+import type { EffectOp, EffectByOp, Effect } from "../../../core/types/index.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Type helpers for conditional payload requirements

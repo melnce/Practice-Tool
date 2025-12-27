@@ -5,14 +5,13 @@ import { getPool } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
-import { Effect, CardInstance, Player } from "../../../../core/types/index.js";
+import type { Effect, CardInstance, Player } from "../../../../core/types/index.js";
 import { opponentOf } from "../../../../core/playerHelpers.js";
 
-import {
-  UnifiedDamageSpec,
-  DamageContext,
-  normalizeToUnifiedSpec,
-} from "./types.js";
+import type { UnifiedDamageSpec, DamageContext } from "./types.js";
+
+
+import { normalizeToUnifiedSpec } from "./types.js";
 import {
   applyDirectDamage,
   applyRandomHits,
@@ -154,7 +153,7 @@ export function handleDamage(
 // EXPORTS
 // ============================================================================
 
-export { normalizeToUnifiedSpec, UnifiedDamageSpec } from "./types.js";
+export type { normalizeToUnifiedSpec, UnifiedDamageSpec } from "./types.js";
 
 
 

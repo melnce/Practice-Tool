@@ -8,8 +8,8 @@ export interface RNG {
   pick<T>(arr: readonly T[]): T | null; // null if empty
   shuffle<T>(arr: readonly T[]): T[]; // returns new array
   makeUid(prefix?: string): string; // deterministic UID
-  snapshot(): { seed: number; cursor: number };
-  restore(s: { seed: number; cursor: number }): void;
+  snapshot(): { seed: number; cursor: number; uidCounter: number };
+  restore(s: { seed: number; cursor: number; uidCounter?: number }): void;
 }
 
 // --- PRNG core: mulberry32 ---------------------------------------------------
@@ -43,10 +43,12 @@ class MulberryRNG implements RNG {
   // P1-1 FIX: Checkpoint cache for O(1) restore during MCTS rollbacks
   private static readonly CHECKPOINT_INTERVAL = 1000;
   private _checkpoints: Map<number, number> = new Map(); // cursor -> internal state (seed offset)
+  private _uidCounter: number = 0; // PERF: Monotonic UID counter (faster than RNG)
 
   constructor(seedLike: number | string | bigint) {
     this._seed = toSeed(seedLike);
     this._cursor = 0;
+    this._uidCounter = 0; // PERF: Monotonic UID counter
     this._gen = mulberry32(this._seed);
     // Store initial checkpoint
     this._checkpoints.set(0, this._seed);
@@ -96,18 +98,18 @@ class MulberryRNG implements RNG {
     return copy;
   }
 
+  // PERF: Monotonic counter instead of RNG-based UID generation
   makeUid(prefix = "uid_"): string {
-    const from = 36 ** 8;
-    const num = this.nextInt(from);
-    return prefix + num.toString(36).padStart(8, "0");
+    return prefix + (++this._uidCounter).toString(36);
   }
 
   snapshot() {
-    return { seed: this._seed, cursor: this._cursor };
+    return { seed: this._seed, cursor: this._cursor, uidCounter: this._uidCounter };
   }
 
-  restore(s: { seed: number; cursor: number }): void {
+  restore(s: { seed: number; cursor: number; uidCounter?: number }): void {
     this._seed = s.seed;
+    this._uidCounter = s.uidCounter ?? 0; // Restore UID counter for determinism
 
     // P1-1 FIX: Use checkpoints for O(1) restore when possible
     // Find the nearest checkpoint at or before the target cursor

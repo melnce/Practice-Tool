@@ -1,0 +1,51 @@
+
+=== NORMAL (Top 15 by self-time) ===
+  1799 enrichContextWithUids                    triggers/resolve.js:73
+  1093 enrichContextWithUids                    triggers/resolve.js:73
+   981 cleanSide                                core/cleanup.js:32
+   803 enrichContextWithUids                    triggers/resolve.js:73
+   643 enrichContextWithUids                    triggers/resolve.js:73
+   535 getAllZoneCandidates                     triggers/utils.js:12
+   510 getAllZoneCandidates                     triggers/utils.js:12
+   506 playFollower                             playCard/follower.js:11
+   497 enrichContextWithUids                    triggers/resolve.js:73
+   432 enrichContextWithUids                    triggers/resolve.js:73
+   321 handleCombatEvent                        handlers/combat.js:17
+   280 getLegalActions                          bench/benchEnv.js:144
+   275 handleCombatEvent                        handlers/combat.js:17
+   271 getAllZoneCandidates                     triggers/utils.js:12
+   255 handleRestrictedZoneEvent                handlers/zones.js:4
+
+=== ENDTURN (Top 15 by self-time) ===
+  2174 enrichContextWithUids                    triggers/resolve.js:73
+  1945 enrichContextWithUids                    triggers/resolve.js:73
+  1256 fireTrigger                              core/triggers.js:42
+  1223 fireTrigger                              core/triggers.js:42
+   806 _endTurnCore                             core/turns.js:164
+   772 _endTurnCore                             core/turns.js:164
+   682 makeUid                                  core/rng.js:72
+   530 getLegalActions                          bench/benchEnv.js:144
+   447 clearTempHandCostMods                    core/turns.js:71
+   443 clearTempHandCostMods                    core/turns.js:71
+   434 canPlayCard                              playCard/preflight.js:45
+   348 scanDeckForInvokes                       core/turns.js:116
+   202 setupPlayer                              bench/benchEnv.js:91
+   169 scanDeckForInvokes                       core/turns.js:116
+   148 mapToCandidate                           triggers/utils.js:2
+
+=== PLAYCARD (Top 15 by self-time) ===
+  1656 enrichContextWithUids                    triggers/resolve.js:73
+   973 enrichContextWithUids                    triggers/resolve.js:73
+   885 cleanSide                                core/cleanup.js:32
+   782 enrichContextWithUids                    triggers/resolve.js:73
+   755 enrichContextWithUids                    triggers/resolve.js:73
+   548 playFollower                             playCard/follower.js:11
+   461 getAllZoneCandidates                     triggers/utils.js:12
+   447 enrichContextWithUids                    triggers/resolve.js:73
+   427 enrichContextWithUids                    triggers/resolve.js:73
+   405 handleRestrictedZoneEvent                handlers/zones.js:4
+   367 getAllZoneCandidates                     triggers/utils.js:12
+   332 getAllZoneCandidates                     triggers/utils.js:12
+   249 _attackFollowerCore                      core/combat.js:133
+   246 enrichContextWithUids                    triggers/resolve.js:73
+   238 handlePlayEvent                          handlers/play.js:40

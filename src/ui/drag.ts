@@ -1,7 +1,7 @@
 // src/ui/drag.ts
 import { getDragData, setDragData } from "./dom.js";
 import { doAction } from "../core/history.js";
-import { CardInstance, GameState, Player } from "../core/types/index.js";
+import type { CardInstance, GameState, Player } from "../core/types/index.js";
 
 // External game logic hooks (keep same import paths as your project)
 const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");

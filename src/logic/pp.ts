@@ -1,7 +1,7 @@
 // src/logic/pp.ts
 import { state } from "../core/gameState.js";
 import { logEvent } from "../core/logger.js";
-import { Player } from "../core/types/index.js";
+import type { Player } from "../core/types/index.js";
 import { getPermPP, setPermPP, setMaxPP } from "../core/playerHelpers.js";
 
 export function increaseMaxPP(

@@ -9,7 +9,7 @@ import { runEffects } from "../../core/effects/index.js";
 import { fireTrigger } from "../../core/triggers.js";
 import { logEvent } from "../../../core/logger.js";
 import { doAction, appendStep } from "../../../core/history.js";
-import { Effect } from "../../../core/types/index.js";
+import type { Effect } from "../../../core/types/index.js";
 import { getModeBonus } from "../../../core/playerHelpers.js";
 
 // Import types if needed, or define locally if specific to mode
@@ -18,7 +18,7 @@ import { getModeBonus } from "../../../core/playerHelpers.js";
 // Actually, I should use Effect & { options?: any[], select_count?: number, unique?: boolean }
 // But for now, safe property access is enough.
 
-import { EffectCtx } from "../../core/effects/registry.js";
+import type { EffectCtx } from "../../core/effects/registry.js";
 
 export function handleMode(eff: Effect, ctx: EffectCtx) {
   const { owner, sourceCard, queue: effectsQueue } = ctx;

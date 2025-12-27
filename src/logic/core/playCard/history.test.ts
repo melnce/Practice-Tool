@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { pushPlayedHistory } from "./history.js";
 import { state } from "../../../core/gameState.js";
-import { CardInstance } from "../../../core/types/index.js";
+import type { CardInstance } from "../../../core/types/index.js";
 
 describe("Played History", () => {
   it("pushes a lightweight entry, not full card", () => {

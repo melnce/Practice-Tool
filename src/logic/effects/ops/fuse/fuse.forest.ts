@@ -1,7 +1,7 @@
 // src/logic/effects/ops/fuse/fuse.forest.ts
 import { clearSelectableFlags } from "../../../core/targeting.js";
 import { logEvent } from "../../../../core/logger.js";
-import { Player, CardInstance, Effect } from "../../../../core/types/index.js";
+import type { Player, CardInstance, Effect } from "../../../../core/types/index.js";
 import { alreadyFusedThisTurn, handOf, graveOf } from "./types.js";
 import { state } from "../../../../core/gameState.js";
 

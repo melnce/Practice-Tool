@@ -3,7 +3,7 @@ import { isOverflow } from "../../helpers/overflow.js";
 import { comboReadyInHand } from "../../helpers/combo.js";
 import { hasNecromancy } from "../../helpers/necromancy.js";
 import { handleSuperEvoGate } from "../../logic/effects/gates/gates.js";
-import { CardInstance, GameState, Player, Effect } from "../../core/types/index.js";
+import type { CardInstance, GameState, Player, Effect } from "../../core/types/index.js";
 
 // ---- local helpers ported from zones.js ----
 

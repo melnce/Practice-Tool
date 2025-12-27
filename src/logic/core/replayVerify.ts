@@ -1,5 +1,5 @@
-import { ReplayCapsule } from "./replay.js";
-import { EffectTraceEvent } from "./effects/trace.js";
+import type { ReplayCapsule } from "./replay.js";
+import type { EffectTraceEvent } from "./effects/trace.js";
 
 // --- 1. Types ---
 

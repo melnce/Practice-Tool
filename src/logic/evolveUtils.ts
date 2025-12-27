@@ -4,7 +4,7 @@ import { handleEvolveSelf } from "./effects/ops/evolve.js";
 import { state } from "../core/gameState.js";
 import { fireTrigger } from "./core/triggers.js";
 import { logEvent } from "../core/logger.js";
-import { CardInstance, Player, Effect } from "../core/types/index.js";
+import type { CardInstance, Player, Effect } from "../core/types/index.js";
 import { isFirstPlayer, getEvoCharges, setEvoCharges, getSuperEvoCharges, setSuperEvoCharges, getEvoUsedThisTurn, setEvoUsedThisTurn, getEvoCount, incrementEvoCount, getBoard, getBackrow, opponentOf } from "../core/playerHelpers.js";
 import { resolveUid } from "../core/uidResolver.js";
 

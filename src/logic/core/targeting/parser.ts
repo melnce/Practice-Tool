@@ -1,4 +1,4 @@
-import { TargetQuery } from "./types.js";
+import type { TargetQuery } from "./types.js";
 
 /**
  * Parses a raw target string into a normalized Query object.

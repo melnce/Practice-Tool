@@ -1,9 +1,10 @@
 import { state } from "../../../../core/gameState.js";
 import { fireTrigger } from "../../../core/triggers.js";
-import { CardInstance, CardTemplate, Player } from "../../../../core/types/index.js";
+import type { CardInstance, CardTemplate, Player } from "../../../../core/types/index.js";
 import { initAmulet, initFollower } from "./init.js";
 import { isFollower, isAmulet } from "./utils.js";
 import { opponentOf, setRally, getRally } from "../../../../core/playerHelpers.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 
 // =============== Core Summon Routines ===============
 
@@ -35,6 +36,8 @@ export function pushToBoard(
   // Uses gameTick for replay compatibility, falls back to array length for stability
   (card as any).insertionTs = state.gameTick ?? board.length;
   board.push(card);
+  // PERF: Invalidate candidate cache when zone mutates
+  bumpZoneVersion();
 
   // Increment Rally if follower
   if (card.type === "Follower") {

@@ -1,6 +1,6 @@
 import { state } from "../../../../core/gameState.js";
-import { CardInstance } from "../../../../core/types/index.js";
-import { StatOp } from "./types.js";
+import type { CardInstance } from "../../../../core/types/index.js";
+import type { StatOp } from "./types.js";
 
 /**
  * Wraps an operation with duration logic (Permanent vs Temporary).

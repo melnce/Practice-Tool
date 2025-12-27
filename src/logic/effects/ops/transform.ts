@@ -4,7 +4,7 @@ import { getCardDetails } from "../../../data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../core/keywords.js";
 
 import { logEvent } from "../../../core/logger.js";
-import { Player, CardInstance, Effect } from "../../../core/types/index.js";
+import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
 import { getHand, getBoard } from "../../../core/playerHelpers.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 

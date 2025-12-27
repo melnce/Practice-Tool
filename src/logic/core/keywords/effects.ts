@@ -1,10 +1,10 @@
-import { Effect, Player, CardInstance } from "../../../core/types/index.js";
+import type { Effect, Player, CardInstance } from "../../../core/types/index.js";
 import {
   removeKeywordFromSingleCard,
   removeAllAbilitiesFromCard,
 } from "./remove.js";
 import { applyKeyword } from "./apply.js";
-import { KeywordEffectResult } from "./types.js";
+import type { KeywordEffectResult } from "./types.js";
 
 // Helper to construct request
 function createSelectionRequest(

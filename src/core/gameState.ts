@@ -1,7 +1,7 @@
-import { logEvent } from "./logger.js";
 import type { GameState, PlayerSlot } from "./types/index.js";
 import { createPlayerState } from "./playerState.js";
 import { createRng } from "./rng.js";
+// NOTE: Trigger caches stored on state._triggerCache (auto-reset when state is reset)
 
 // -- 1. Canonical Defaults (Single Source of Truth) --
 // Global defaults that are not per-player
@@ -87,13 +87,22 @@ export function resetStateInstance(
   // D) Reset RNG
   target.rng = createRng(seed);
 
-  // E) Debug Identity
+  // E) Reset meta counters for determinism
+  (target as any).actionSeq = 0;
+  (target as any).zoneVersion = 0;
+
+  // F) Reset trigger caches (stored on state, so just null them)
+  (target as any)._triggerCache = null;
+
+  // G) Debug Identity
   target.__debugId = target.rng.nextFloat();
 
-  // Log
-  logEvent("resetStateInstance", {
-    seed: seed,
-    debugId: target.__debugId,
+  // Log (lazy import to avoid circular dependency with logger.ts)
+  void import("./logger.js").then(({ logEvent }) => {
+    logEvent("resetStateInstance", {
+      seed: seed,
+      debugId: target.__debugId,
+    });
   });
 }
 

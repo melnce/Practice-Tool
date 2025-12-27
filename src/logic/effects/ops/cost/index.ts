@@ -1,6 +1,6 @@
 // src/logic/effects/ops/cost/index.ts
 
-export {
+export type {
   UnifiedCostSpec,
   CostTarget,
   CostMode,

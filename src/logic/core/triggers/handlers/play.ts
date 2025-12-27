@@ -1,8 +1,9 @@
-import { Player } from "../../../../core/types/index.js";
-import { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
+import type { Player } from "../../../../core/types/index.js";
+import type { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
 import { getAllZoneCandidates, getCrestCandidates } from "../utils.js";
-import { processCandidateTriggers, ProcessingCandidate } from "../process.js";
+import type { ProcessingCandidate } from "../process.js";
 
+import { processCandidateTriggers } from "../process.js";
 function checkPlayConditions(
   trigger: TriggerSpec,
   context: TriggerContext,

@@ -2,7 +2,7 @@
 // Barrel exports for unified destroy module.
 
 // Types
-export {
+export type {
   UnifiedDestroySpec,
   DestroyDistribution,
   DestroyScope,

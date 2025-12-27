@@ -1,4 +1,4 @@
-import { CardInstance } from "../../../core/types/index.js";
+import type { CardInstance } from "../../../core/types/index.js";
 import { normalizeKeywordName } from "./registry.js";
 import { getKS } from "./internal.js";
 import { grantBarrier } from "../barrier.js";

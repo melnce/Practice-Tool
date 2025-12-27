@@ -4,7 +4,7 @@
 // Only amulet merging and similar post-play behaviors belong here.
 
 import { state } from "../../../core/gameState.js";
-import { CardInstance, Player } from "../../../core/types/index.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
 import { getBoard, getGraveyard, addShadows } from "../../../core/playerHelpers.js";
 
 // ─────────────────────────────────────────────────────────────────────────────

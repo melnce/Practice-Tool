@@ -1,6 +1,6 @@
-import { CardInstance, Effect, Player } from "../../../core/types/index.js";
+import type { CardInstance, Effect, Player } from "../../../core/types/index.js";
 import { logEvent } from "../../../core/logger.js";
-import { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
+import type { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";
 import { evalCommonConditions } from "./conditions.js";
 import { DEBUG_TRIGGERS } from "./debug.js";
@@ -146,7 +146,8 @@ export function processCandidateTriggers(
       });
       logEvent("trigger", { event: event, card: card?.name });
 
-      runEffects([...(trigger.effects || [])], owner, card, context);
+      // PERF: Pass effects array directly without spread (runEffects doesn't mutate it)
+      runEffects(trigger.effects || [], owner, card, context);
 
       // 6. Mark Fired
       if (!options.skipTracking) {

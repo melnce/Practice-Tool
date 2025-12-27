@@ -27,7 +27,7 @@ describe("Wamdus Logic", () => {
       // Check Fanfare
       expect(wamdus.fanfare.length).toBeGreaterThan(0);
       expect(wamdus.fanfare[0].op).toBe("spellboost");
-      expect(wamdus.fanfare[0].target).toBe("hand");
+      expect(wamdus.fanfare[0].target).toBe("ally:hand");
 
       // Check Triggers
       // Check Spellboost Keyword

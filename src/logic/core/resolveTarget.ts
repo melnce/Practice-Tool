@@ -5,7 +5,9 @@ import { runEffects } from "./effects/index.js";
 import { clearSelectableFlags } from "./targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { doAction } from "../../core/history.js";
-import { applyTargetClick, TargetedOpContext } from "./targeting/index.js";
+import type { TargetedOpContext } from "./targeting/index.js";
+
+import { applyTargetClick } from "./targeting/index.js";
 import { resolveUids } from "../../core/uidResolver.js";
 import {
   dispatchTargetedOp,

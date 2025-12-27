@@ -9,7 +9,7 @@
  * @module conditions/evaluator
  */
 
-import { CardInstance } from "../../../core/types/index.js";
+import type { CardInstance } from "../../../core/types/index.js";
 import { hasKeyword, hasAllKeywords } from "../keywords/has.js";
 
 // -----------------------------------------------------------------------------
