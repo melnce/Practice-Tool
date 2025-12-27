@@ -143,9 +143,10 @@ export function normalizeToUnifiedSpec(
     spec.owner = "enemy";
   }
 
-  // Derive from op name
+  // Derive source from legacy op names (only if not already set)
+  // NOTE: spec.source is already set from eff.source on line 112
+  // These cases handle legacy op names that imply a source
   switch (op) {
-    case "summon":
     case "summon_named":
     case "summon_named_enemy":
       spec.source = "named";
@@ -168,17 +169,13 @@ export function normalizeToUnifiedSpec(
       spec.source = "graveyard";
       break;
 
+    // For op="summon", use the explicit source from the effect (already set)
     default:
-      // Use explicit source if provided
-      if (eff.source) spec.source = eff.source as SummonSource;
       break;
   }
 
   return spec;
 }
-
-
-
 
 
 

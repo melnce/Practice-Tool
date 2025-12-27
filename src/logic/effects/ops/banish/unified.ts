@@ -44,12 +44,15 @@ export function handleBanish(
   }
 
   // Get target pool
+  // isTargetedEffect should only be true when player selects targets (spec.select > 0)
+  // AoE/random effects should bypass Ambush protection
+  const isSelectBased = spec.select != null && spec.select > 0;
   const pool = getPool(
     spec.target || "",
     owner,
     ctx.sourceCard,
     spec.condition,
-    { ...ctx, isTargetedEffect: true },
+    { ...ctx, isTargetedEffect: isSelectBased },
   ).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
 
   // Apply filters

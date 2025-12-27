@@ -238,7 +238,7 @@
     "superevolve": [
       {
         "op": "evolve",
-        "target": "selected:follower",
+        "target": "ally:follower",
         "select": 1,
         "mode": "super",
         "filter": {
@@ -368,33 +368,39 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Fairy"
+        "name": "Fairy",
+        "count": 1
       },
       {
         "op": "add_to_hand",
-        "name": "Fairy"
+        "name": "Fairy",
+        "count": 1
       }
     ],
     "superevolve": [
       {
         "op": "summon",
         "source": "named",
-        "name": "Fairy"
+        "name": "Fairy",
+        "count": 1
       },
       {
         "op": "add_to_hand",
-        "name": "Fairy"
+        "name": "Fairy",
+        "count": 1
       }
     ],
     "fanfare": [
       {
         "op": "summon",
         "source": "named",
-        "name": "Fairy"
+        "name": "Fairy",
+        "count": 1
       },
       {
         "op": "add_to_hand",
-        "name": "Fairy"
+        "name": "Fairy",
+        "count": 1
       }
     ],
     "keywords": []
@@ -424,7 +430,7 @@
       },
       {
         "op": "restore",
-        "target": "leader",
+        "target": "ally:leader",
         "amount_source": "hand_size"
       }
     ],
@@ -1021,7 +1027,7 @@
         "target": "ally:hand",
         "filter": {
           "class": "Forestcraft",
-          "costLte": 2
+          "cost_lte": 2
         },
         "into": "Bramble Burst"
       }
@@ -1983,10 +1989,7 @@
         "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "amount": "{self.attack}",
-        "condition": {
-          "not_self": true
-        }
+        "amount": "{self.attack}"
       }
     ],
     "keywords": [
@@ -3504,6 +3507,7 @@
       {
         "op": "damage",
         "target": "enemy:follower",
+        "distribution": "all",
         "amount": "{last_discarded_cost}"
       }
     ],
@@ -4878,9 +4882,9 @@
     "fanfare": [
       {
         "op": "destroy",
-        "scope": "allied_amulets",
-        "store_count_as": "destroy_count",
-        "target": "enemy:follower"
+        "distribution": "all",
+        "target": "ally:amulet",
+        "store_count_as": "destroy_count"
       },
       {
         "op": "damage",
@@ -4966,7 +4970,7 @@
               {
                 "op": "stat",
                 "action": "give",
-                "target": "self",
+                "target": "ally:last_summoned",
                 "keywords": [
                   "Storm"
                 ]
@@ -5886,11 +5890,8 @@
             "effects": [
               {
                 "op": "gate",
-                "condition": {
-                  "op": "<=",
-                  "value": 5,
-                  "owner": "self"
-                },
+                "condition": "hand_count_lte",
+                "count": 5,
                 "effects": [
                   {
                     "op": "draw",
@@ -5901,7 +5902,7 @@
                 "else_effects": [
                   {
                     "op": "restore",
-                    "target": "leader",
+                    "target": "ally:leader",
                     "amount": 1
                   }
                 ]
@@ -5925,11 +5926,8 @@
             "effects": [
               {
                 "op": "gate",
-                "condition": {
-                  "op": "<=",
-                  "value": 5,
-                  "owner": "self"
-                },
+                "condition": "hand_count_lte",
+                "count": 5,
                 "effects": [
                   {
                     "op": "draw",
@@ -5940,7 +5938,7 @@
                 "else_effects": [
                   {
                     "op": "restore",
-                    "target": "leader",
+                    "target": "ally:leader",
                     "amount": 1
                   }
                 ]

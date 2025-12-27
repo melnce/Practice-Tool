@@ -125,47 +125,20 @@ export function enableCardEvoDrop(
     doAction(
       isSuper ? "Super Evolve" : "Evolve",
       () => {
-        const boost = isSuper ? 3 : 2;
-
-        // ensure buff container, then apply evo stats
-        if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
-        card.buffs.attack = (card.buffs.attack ?? 0) + boost;
-        card.buffs.defense = (card.buffs.defense ?? 0) + boost;
-
-        card.attack = (parseInt(String(card.attack)) || 0) + boost;
-        card.defense = (parseInt(String(card.defense)) || 0) + boost;
-        card.peak_defense = Math.max(
-          card.peak_defense ?? parseInt(String(card.defense)),
-          parseInt(String(card.defense)),
-        );
-        if (card.evo_image) card.base_image = card.evo_image;
-
-        if (card.hasStorm) {
-          card.isRush = false;
-          if (!card.hasAttacked) card.can_attack = true;
-        } else {
-          card.hasRush = true;
-          card.isRush = true;
-          if (!card.hasAttacked) card.can_attack = true;
-        }
-        card.hasEvolved = true;
-        card.evoType = isSuper ? "super" : "normal";
-
-        // REMOVE THE MANUAL CHARGE DECREMENTING HERE
-        // The onEvolve function will handle charge spending
-        if (isBlueSide) {
-          state.players.first.evoUsedThisTurn = true; // Just track turn usage
-        } else {
-          state.players.second.evoUsedThisTurn = true; // Just track turn usage
-        }
-
-        // fire evolve hooks (does its own logging AND charge spending)
-        void logic().then(({ onEvolve }) => onEvolve(card, owner, mode));
+        // Use handleEvolveSelf as single source of truth for all evolve logic:
+        // - Applies stat boosts (+2/+2 or +3/+3)
+        // - Sets hasEvolved, evoType, rush/storm flags
+        // - Spends evo charges and sets evoUsedThisTurn
+        // - Runs evolve/superevolve effects
+        // Rerender is called after evolve completes for immediate visual feedback
+        void logic().then(({ handleEvolveSelf }) => {
+          handleEvolveSelf(card, owner, { mode, spendPoint: true, runEvoEffects: true });
+          rerender();
+        });
       },
       {},
       { autoRender: false },
     );
-    rerender();
   };
 }
 

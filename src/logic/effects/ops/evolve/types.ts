@@ -35,6 +35,17 @@ export interface UnifiedEvolveSpec {
 
   /** Whether to spend evolution point (default: false for effect-triggered evolutions) */
   spend_point?: boolean;
+
+  /** Number of targets to select (triggers selection UI) */
+  select?: number;
+
+  /** Filter conditions for selection pool */
+  filter?: {
+    unevolved?: boolean;
+    not_self?: boolean;
+    type?: string;
+    tribe?: string;
+  };
 }
 
 /**
@@ -72,6 +83,8 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
     mode: effAny.mode,
     name: effAny.name,
     spend_point: effAny.spend_point,
+    select: effAny.select,
+    filter: effAny.filter,
   };
 
   return spec;

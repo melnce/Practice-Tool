@@ -1,12 +1,12 @@
-// src/logic/effects/ops/cost/unified.ts
-
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { CardInstance, Player, Effect } from "../../../../core/types/index.js";
-import { getPool } from "../../../core/targeting.js";
+import { getPool, highlightSelectable } from "../../../core/targeting.js";
+import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 import { UnifiedCostSpec, normalizeToCostSpec } from "./types.js";
 import { opponentOf, getHand } from "../../../../core/playerHelpers.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 
 /**
  * Unified cost handler - handles all cost modification variants.
@@ -17,9 +17,68 @@ export function handleCost(
   owner: Player,
   sourceCard: CardInstance | null,
   context: any = {},
-): "done" {
+): "done" | "pending" {
   const spec = normalizeToCostSpec(eff);
-  const targets = resolveTargets(spec, owner, sourceCard, context);
+
+  // If we're resuming after selection, use selected targets
+  if (context?.targetUids?.length && spec.select) {
+    const targets = resolveUids(context.targetUids);
+    const amount = resolveDynamicValue(spec.amount, {
+      owner,
+      sourceCard,
+      ...context,
+    });
+
+    for (const target of targets) {
+      applyCostChange(target, spec, amount);
+    }
+
+    logEvent("costChange", {
+      owner,
+      mode: spec.mode,
+      target: spec.target,
+      amount,
+      count: targets.length,
+    });
+
+    return "done";
+  }
+
+  let targets = resolveTargets(spec, owner, sourceCard, context);
+
+  // Apply filter if specified
+  if (spec.filter && targets.length > 0) {
+    targets = targets.filter((c) => {
+      if (spec.filter?.type && c.type?.toLowerCase() !== spec.filter.type.toLowerCase()) return false;
+      if (spec.filter?.class && c.class !== spec.filter.class) return false;
+      if (spec.filter?.tribe && (!Array.isArray(c.tribes) || !c.tribes.includes(spec.filter.tribe))) return false;
+      return true;
+    });
+  }
+
+  // Handle selection if required
+  if (spec.select && spec.select > 0 && targets.length > 0) {
+    const selectCount = Math.min(spec.select, targets.length);
+
+    setPendingTarget({
+      eff: eff as any,
+      owner,
+      sourceCard,
+      resumeEffects: context?.queue || [],
+      pool: targets,
+      targets: [],
+      selectCount,
+    });
+
+    highlightSelectable(targets);
+    logEvent("cost_select", {
+      owner,
+      pool: targets.length,
+      select: selectCount,
+    });
+    return "pending";
+  }
+
   const amount = resolveDynamicValue(spec.amount, {
     owner,
     sourceCard,
@@ -57,14 +116,9 @@ function resolveTargets(
       return sourceCard ? [sourceCard] : [];
 
     case "selected": {
-      if (Array.isArray(context?.targets) && context.targets.length) {
-        return context.targets;
-      }
-      if (context?.selectedCard) {
-        return [context.selectedCard];
-      }
-      if (context?.targetCard) {
-        return [context.targetCard];
+      // UID-based selection only
+      if (context?.targetUids?.length) {
+        return resolveUids(context.targetUids);
       }
       return [];
     }

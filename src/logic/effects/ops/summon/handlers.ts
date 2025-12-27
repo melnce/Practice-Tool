@@ -6,6 +6,7 @@ import { logEvent } from "../../../../core/logger.js";
 import { getPool } from "../../../core/targeting.js";
 
 import { UnifiedSummonSpec, SummonContext } from "./types.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 import {
     summonNamed,
     summonExactCopy,
@@ -48,8 +49,9 @@ export function handleSummonCopy(
 
     if (spec.copy_scope === "self" && context.sourceCard) {
         targets = [context.sourceCard];
-    } else if (context.targets?.length) {
-        targets = context.targets;
+    } else if (context.targetUids?.length) {
+        // UID-based selection only
+        targets = resolveUids(context.targetUids);
     } else {
         // Try to get from targeting pool
         const pool = getPool(

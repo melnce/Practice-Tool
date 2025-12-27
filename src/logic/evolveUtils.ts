@@ -6,6 +6,7 @@ import { fireTrigger } from "./core/triggers.js";
 import { logEvent } from "../core/logger.js";
 import { CardInstance, Player, Effect } from "../core/types/index.js";
 import { isFirstPlayer, getEvoCharges, setEvoCharges, getSuperEvoCharges, setSuperEvoCharges, getEvoUsedThisTurn, setEvoUsedThisTurn, getEvoCount, incrementEvoCount, getBoard, getBackrow, opponentOf } from "../core/playerHelpers.js";
+import { resolveUid } from "../core/uidResolver.js";
 
 // Note: Rendering removed from logic layer - UI orchestrator handles all rendering
 
@@ -150,11 +151,9 @@ export function superEvolveAllyFromContext(
   sourceCard: CardInstance | null,
   context: any,
 ) {
-  // Prefer selected target; allow bare uid or stale object
-  const sel =
-    (context &&
-      (context.selectedCard || (context.targets && context.targets[0]))) ||
-    null;
+  // UID-based selection only
+  if (!context?.targetUids?.length) return;
+  const sel = resolveUid(context.targetUids[0]);
   if (!sel) return;
 
   function findOnBoardByUid(uid: number) {
@@ -169,8 +168,8 @@ export function superEvolveAllyFromContext(
 
   const target =
     typeof sel === "string"
-      ? findOnBoardByUid(Number(sel)) // Convert string uid to number if needed? Wait, uids are numbers usually. Assuming string for now.
-      : findOnBoardByUid(sel.uid) || sel;
+      ? findOnBoardByUid(Number(sel))
+      : findOnBoardByUid(Number(sel.uid)) || sel;
 
   if (!target) return;
   if (sourceCard && target.uid === sourceCard.uid) return; // not self

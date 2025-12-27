@@ -108,6 +108,11 @@ registerCondition("hand_count", (spec, owner) => {
     return getHand(state, owner).length >= need;
 });
 
+registerCondition("hand_count_lte", (spec, owner) => {
+    const max = spec.count ?? 5;
+    return getHand(state, owner).length <= max;
+});
+
 registerCondition("amulet_count", (spec, owner) => {
     const need = spec.count ?? 1;
     const board = getBoard(state, owner);

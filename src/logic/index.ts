@@ -10,6 +10,7 @@ export {
 export { grantBarrier, dealDamage } from "./core/barrier.js";
 export { startGame } from "./startGame.js";
 export { onEvolve } from "./evolveUtils.js";
+export { handleEvolveSelf } from "./effects/ops/evolve.js";
 import { onFanfare, runEffects } from "./core/effects/index.js";
 export { onFanfare, runEffects };
 export { engageAmulet } from "./effects/ops/engage.js";

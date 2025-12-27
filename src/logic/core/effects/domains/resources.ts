@@ -121,7 +121,9 @@ export function registerResourceEffects() {
 
     // Earth Rite
     registerOp("earth_rite", (eff, ctx) => {
-        if (consumeEarthSigils(ctx.owner, (eff.amount as number) || 1)) {
+        // Accept both "cost" and "amount" fields for the sigil cost
+        const sigilCost = (eff.cost as number) ?? (eff.amount as number) ?? 1;
+        if (consumeEarthSigils(ctx.owner, sigilCost)) {
             if (eff.effects) enqueueManyFront(ctx, eff.effects);
         }
     });

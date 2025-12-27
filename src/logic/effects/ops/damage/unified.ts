@@ -104,8 +104,11 @@ export function handleDamage(
   }
 
   // Resolve recipient pool
+  // isTargetedEffect should only be true when player selects targets (spec.select > 0)
+  // AoE/random effects should bypass Ambush protection
+  const isSelectBased = spec.select != null && spec.select > 0;
   const pool = getPool(spec.target || "", owner, sourceCard, spec.condition, {
-    isTargetedEffect: true,
+    isTargetedEffect: isSelectBased,
   }).filter((c) => c.type === "Follower");
 
   // Handle selection requirement
@@ -115,6 +118,7 @@ export function handleDamage(
 
   // Dispatch by distribution mode
   switch (spec.distribution) {
+    case "random":
     case "random_hits":
       applyRandomHits(spec.count || 1, amount, spec.target || "", owner, {
         includeLeader: spec.include_leader ?? false,
@@ -132,9 +136,15 @@ export function handleDamage(
       break;
 
     case "direct":
-    default:
+    default: {
       applyDirectDamage(amount, pool, "damage");
+      // For "enemy:any" or "all" distribution, also damage the enemy leader
+      const targetStr = String(spec.target || "").toLowerCase();
+      if (targetStr.includes("enemy") && targetStr.includes("any")) {
+        applyLeaderDamage(opponentOf(owner), amount);
+      }
       break;
+    }
   }
 
   return "done";

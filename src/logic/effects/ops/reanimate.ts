@@ -19,9 +19,11 @@ export function handleReanimate(eff: Effect, owner: Player) {
   // Resolve prioritization: max_cost > cost > x > 0
   const rawCost = rEff.max_cost ?? rEff.cost ?? rEff.x ?? 0;
   const maxCost = parseInt(String(rawCost)) || 0;
+  console.log("[REANIMATE DEBUG]", { owner, maxCost, rawCost, eff: rEff });
 
   // Determine graveyard
   const grave = getGraveyard(state, owner);
+  console.log("[REANIMATE DEBUG] Graveyard:", grave.length, "cards", grave.map(c => c.name + " (" + c.cost + ")"));
 
   // Find all followers in graveyard with cost <= maxCost
   const eligible = grave.filter((card) => {

@@ -1,5 +1,6 @@
 // src/logic/effects/ops/fuse/fuse.ts
 import { state } from "../../../../core/gameState.js";
+import { adapter } from "../../../../core/adapter.js";
 import {
   highlightSelectable,
   clearSelectableFlags,
@@ -168,7 +169,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
       finalize: `fuse:${finalizeType}`,
     });
     highlightSelectable(info.pool);
-    // Render removed - UI layer
+    adapter.render();
     return "pending";
   }
 
@@ -200,7 +201,7 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
     finalize: info?.recipe?.finalize_op || "fuse_finalize_generic",
   });
   highlightSelectable(info.pool);
-  // Render removed - UI layer
+  adapter.render();
   return "pending";
 }
 

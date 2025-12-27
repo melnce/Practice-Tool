@@ -8,6 +8,7 @@ export function registerBoardEffects() {
   // UNIFIED SUMMON - single entry point for all summon variants
   // ========================================================================
   registerOp("summon", (eff, ctx) => {
+    console.log("[SUMMON DEBUG] summon op called", { eff, owner: ctx.owner });
     const summonCtx = {
       owner: ctx.owner,
       sourceCard: ctx.sourceCard,

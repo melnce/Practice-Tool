@@ -39,9 +39,20 @@ export function normalizeSearchSpec(eff: Effect & Record<string, any>): SearchSp
         );
     }
 
+    // Parse count - support "all" string for drawing all matching cards
+    let count: number;
+    const rawCount = eff.count as string | number;
+    if (rawCount === "all") {
+        count = Infinity; // Will be clamped to actual matches in handler
+    } else if (typeof rawCount === "number") {
+        count = rawCount;
+    } else {
+        count = 1;
+    }
+
     return {
         filters: eff.filter || eff.filters || {},
-        count: typeof eff.count === "number" ? eff.count : 1,
+        count,
         keywords: Array.isArray(eff.keywords) ? eff.keywords : [],
         player: eff.player === "opponent" ? "opponent" : "self",
     };

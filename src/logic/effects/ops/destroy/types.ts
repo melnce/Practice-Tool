@@ -135,7 +135,7 @@ export function normalizeToUnifiedSpec(
     count: 1,
     stat: "attack",
     select: 0,
-    scope: null,
+    scope: eff.scope || null, // Parse explicit scope field
     condition: eff.condition || null,
     then_effects: [],
     exclude: [],
@@ -159,6 +159,14 @@ export function normalizeToUnifiedSpec(
   // Parse stat
   if (eff.stat) {
     spec.stat = eff.stat === "defense" ? "defense" : "attack";
+  }
+
+  // Parse distribution from effect field (before op-name overrides)
+  if (eff.distribution) {
+    const dist = String(eff.distribution).toLowerCase();
+    if (["direct", "all", "random", "highest"].includes(dist)) {
+      spec.distribution = dist as DestroyDistribution;
+    }
   }
 
   // Parse then_effects

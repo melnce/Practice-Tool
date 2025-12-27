@@ -50,6 +50,7 @@ export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
     if (c && keepSet.has(String(c.name))) continue; // keep
     const removed = hand.splice(i, 1)[0];
     if (removed) {
+      removed.cost_mod = 0; // Reset cost when entering graveyard
       grave.push(removed); // discard
       discarded++;
     }

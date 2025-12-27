@@ -6,6 +6,9 @@ import { CardInstance, Player, Effect } from "../../../../core/types/index.js";
 import { UnifiedEvolveSpec, normalizeToEvolveSpec } from "./types.js";
 import { onEvolve } from "../../../evolveUtils.js";
 import { getBoard, isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../../core/playerHelpers.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
+import { highlightSelectable } from "../../../core/targeting.js";
+import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 
 /**
  * Unified evolve handler - handles all evolve variants.
@@ -16,8 +19,58 @@ export function handleEvolve(
   owner: Player,
   sourceCard: CardInstance | null,
   context: any = {},
-): "done" {
+): "done" | "pending" {
   const spec = normalizeToEvolveSpec(eff);
+
+  // If we're resuming after selection, use selected targets
+  if (context?.targetUids?.length) {
+    const targets = resolveUids(context.targetUids);
+
+    for (const target of targets) {
+      applyEvolution(target, owner, spec);
+    }
+
+    logEvent("evolve", {
+      owner,
+      target: spec.target,
+      mode: spec.mode || "normal",
+      count: targets.length,
+    });
+
+    return "done";
+  }
+
+  // Handle selection if required
+  if (spec.select && spec.select > 0) {
+    const pool = buildSelectionPool(spec, owner, sourceCard);
+
+    if (pool.length === 0) {
+      // No valid targets, skip silently
+      return "done";
+    }
+
+    const selectCount = Math.min(spec.select, pool.length);
+
+    setPendingTarget({
+      eff: eff as any,
+      owner,
+      sourceCard,
+      resumeEffects: context?.queue || [],
+      pool,
+      targets: [],
+      selectCount,
+    });
+
+    highlightSelectable(pool);
+    logEvent("evolve_select", {
+      owner,
+      pool: pool.length,
+      select: selectCount,
+      mode: spec.mode,
+    });
+    return "pending";
+  }
+
   const targets = resolveTargets(spec, owner, sourceCard, context);
 
   for (const target of targets) {
@@ -35,6 +88,36 @@ export function handleEvolve(
 }
 
 /**
+ * Builds a pool of valid targets for selection.
+ */
+function buildSelectionPool(
+  spec: UnifiedEvolveSpec,
+  owner: Player,
+  sourceCard: CardInstance | null,
+): CardInstance[] {
+  const board = getBoard(state, owner);
+  let pool = board.filter((c) => c.type === "Follower");
+
+  // Apply filter conditions
+  if (spec.filter) {
+    if (spec.filter.unevolved) {
+      pool = pool.filter((c) => !c.hasEvolved);
+    }
+    if (spec.filter.not_self && sourceCard) {
+      pool = pool.filter((c) => c.uid !== sourceCard.uid);
+    }
+    if (spec.filter.type) {
+      pool = pool.filter((c) => c.type?.toLowerCase() === spec.filter!.type!.toLowerCase());
+    }
+    if (spec.filter.tribe) {
+      pool = pool.filter((c) => Array.isArray(c.tribes) && c.tribes.includes(spec.filter!.tribe!));
+    }
+  }
+
+  return pool;
+}
+
+/**
  * Resolves targets based on the evolve spec.
  */
 function resolveTargets(
@@ -49,14 +132,13 @@ function resolveTargets(
     case "self":
       return sourceCard ? [sourceCard] : [];
 
-    case "selected": {
-      const selected =
-        context?.targetCard ||
-        context?.selectedCard ||
-        context?.playedCard ||
-        context?.enteringCard ||
-        context?.targets?.[0];
-      return selected ? [selected] : [];
+    case "selected":
+    case "selected:follower": {
+      // UID-based selection only
+      if (context?.targetUids?.length) {
+        return resolveUids(context.targetUids);
+      }
+      return [];
     }
 
     case "last_summoned":

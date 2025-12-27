@@ -42,6 +42,7 @@ export interface DamageContext {
  */
 export type DamageDistribution =
   | "direct"
+  | "random"        // Alias for random_hits (used in card definitions)
   | "random_hits"
   | "split_sequential"
   | "by_stat";
@@ -90,7 +91,8 @@ export interface UnifiedDamageSpec {
   distribution: DamageDistribution;
 
   // Amount configuration
-  amount?: number;
+  amount?: number | string; // Can be number or dynamic string like "{self.attack}"
+  add_amount?: number | string; // Additional amount (e.g., spellboost count)
   amount_source: DamageAmountSource;
 
   // Distribution-specific options
@@ -188,10 +190,16 @@ export function normalizeToUnifiedSpec(
     );
   }
 
+  // Preserve dynamic amount strings (e.g., "{self.attack}") for later resolution
+  // Only parse as integer if it's a plain number
+  const rawAmount = eff.amount ?? 0;
+  const isDynamicAmount = typeof rawAmount === "string" && rawAmount.startsWith("{");
+
   const spec: UnifiedDamageSpec = {
     target: eff.target as string,
     distribution: "direct",
-    amount: parseInt(String(eff.amount ?? 0), 10) || 0,
+    amount: isDynamicAmount ? rawAmount : (parseInt(String(rawAmount), 10) || 0),
+    add_amount: eff.add_amount, // Preserve dynamic add_amount for spellboost etc.
     amount_source: "fixed",
     condition: eff.condition,
   };

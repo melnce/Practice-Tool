@@ -75,6 +75,12 @@ export function processCandidateTriggers(
 
       if (checkEvent !== event) continue;
 
+      // Ownership check for ally/enemy events:
+      // ally_* events should only fire for cards whose owner matches activePlayer
+      // enemy_* events should only fire for cards whose owner is the opponent of activePlayer
+      if (event.startsWith("ally_") && owner !== activePlayer) continue;
+      if (event.startsWith("enemy_") && owner === activePlayer) continue;
+
       // Shorthand Logic: end_of_turn_own means must be owner's turn
       if (trigger.type === "end_of_turn_own") {
         if (activePlayer !== owner) continue;

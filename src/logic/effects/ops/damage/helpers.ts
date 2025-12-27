@@ -51,8 +51,9 @@ export function resolveAmount(spec: UnifiedDamageSpec, ctx: DamageContext): numb
         case "fixed":
         default:
             // Use amount field, with overflow support
+            // Include add_amount for effects like Stormy Blast that add to base damage
             return resolveAmountWithOverflow(
-                { amount: spec.amount } as any,
+                { amount: spec.amount, add_amount: spec.add_amount } as any,
                 ctx.owner,
                 { sourceCard: ctx.sourceCard },
             );

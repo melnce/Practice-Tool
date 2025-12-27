@@ -76,10 +76,12 @@ export function resolveDynamicValue(
   if (s === "{earth_counter_sum}") {
     if (context.owner) {
       const board = getBoard(state, context.owner);
-      return board
+      const sum = board
         .filter((c) => c?.type === "Amulet" && (c.counters?.earth || 0) > 0)
-        .reduce((sum, c) => sum + (c.counters?.earth || 0), 0);
+        .reduce((acc, c) => acc + (c.counters?.earth || 0), 0);
+      return sum;
     }
+    return 0; // No owner = no sigils
   }
 
   if (s === "{combo}") {

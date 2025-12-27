@@ -108,7 +108,9 @@ export function registerBuffEffects() {
     // UNIFIED COST - replaces 6 legacy cost ops
     // ==========================================================================
     registerOp("cost", (eff, ctx) => {
-        handleCost(eff as any, ctx.owner, ctx.sourceCard, ctx.context);
+        const costCtx = { ...(ctx.context || {}), queue: ctx.queue };
+        const result = handleCost(eff as any, ctx.owner, ctx.sourceCard, costCtx);
+        if (result === "pending") return "pending";
     });
 
     // ==========================================================================

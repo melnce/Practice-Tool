@@ -44,14 +44,16 @@ window.addEventListener("DOMContentLoaded", () => {
     const deckAId = blueSelect?.value || "sample_blue";
     const deckBId = redSelect?.value || "sample_red";
 
-    // Parse seed
-    let seed: number | undefined;
+    // Parse seed - default to 0 for reproducibility
+    let seed: number;
     if (
       seedInput &&
       seedInput.value.trim() !== "" &&
       !Number.isNaN(Number(seedInput.value))
     ) {
       seed = Number(seedInput.value);
+    } else {
+      seed = 0;
     }
 
     await engine.startNewGame({ deckAId, deckBId, seed });

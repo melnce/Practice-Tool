@@ -99,31 +99,20 @@ export function handleTransform(
 
     case "board":
     default: {
-      // Board transform - get target from context or resolve via select
-      let t: CardInstance | null = null;
-
-      // First check for UID-based targeting from context
-      if (ctx.context?.targetUids?.length) {
-        t = resolveUid(ctx.context.targetUids[0]);
+      // Board transform - UID-based targeting only
+      if (!ctx.context?.targetUids?.length) {
+        if (ctx.sourceCard && (eff.target === "self" || targetStr === "self")) {
+          transformTarget(ctx.sourceCard, into);
+        } else {
+          console.warn("transform: no targetUids in context.");
+        }
+        return;
       }
-
-      // Fallback to deprecated object refs
-      if (!t) {
-        t =
-          ctx.context?.selectedCard ||
-          ctx.context?.targetCard ||
-          ctx.context?.targets?.[0] ||
-          null;
-      }
-
+      const t = resolveUid(ctx.context.targetUids[0]);
       if (t) {
         transformTarget(t, into);
-      } else if (ctx.sourceCard && (eff.target === "self" || targetStr === "self")) {
-        transformTarget(ctx.sourceCard, into);
       } else {
-        // No target in context - this means selection wasn't done
-        // Log for debugging but don't throw
-        console.warn("transform: no target in context. Ensure selection is performed before transform.");
+        console.warn("transform: could not resolve target from UID.");
       }
       return;
     }
@@ -137,8 +126,16 @@ export function handleTransform(
 /**
  * Check if a card matches the filter criteria.
  */
-function matchesFilter(card: CardInstance, filter: TransformFilter): boolean {
+function matchesFilter(card: CardInstance, filter: any): boolean {
   if (!card) return false;
+
+  // DEBUG: Log filter check
+  console.log("[matchesFilter DEBUG]", {
+    cardName: card.name,
+    cardCost: card.cost,
+    cardClass: (card as any).class,
+    filter: JSON.stringify(filter),
+  });
 
   // Check type filter (Spell, Follower, Amulet)
   if (filter.type && (card as any).type !== filter.type) {
@@ -150,9 +147,31 @@ function matchesFilter(card: CardInstance, filter: TransformFilter): boolean {
     return false;
   }
 
-  // Check cost filter
-  if (filter.cost) {
-    const cardCost = parseInt(card.cost as any, 10) || 0;
+  const cardCost = parseInt(card.cost as any, 10) || 0;
+
+  // Check flat cost filters - support both snake_case (cost_lte) and camelCase (costLte)
+  const costLte = filter.cost_lte ?? filter.costLte;
+  const costGte = filter.cost_gte ?? filter.costGte;
+  const costEq = filter.cost_eq ?? filter.costEq;
+
+  if (costLte !== undefined) {
+    const maxCost = parseInt(String(costLte), 10);
+    console.log("[matchesFilter DEBUG] cost_lte check:", { cardName: card.name, cardCost, maxCost, willReject: cardCost > maxCost });
+    if (cardCost > maxCost) return false;
+  }
+
+  if (costGte !== undefined) {
+    const minCost = parseInt(String(costGte), 10);
+    if (cardCost < minCost) return false;
+  }
+
+  if (costEq !== undefined) {
+    const exactCost = parseInt(String(costEq), 10);
+    if (cardCost !== exactCost) return false;
+  }
+
+  // Check nested cost filter (legacy format: cost: { op: "<=", value: 2 })
+  if (filter.cost && typeof filter.cost === "object") {
     const filterValue = parseInt(String(filter.cost.value), 10) || 0;
 
     switch (filter.cost.op) {

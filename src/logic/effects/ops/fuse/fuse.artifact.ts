@@ -1,5 +1,6 @@
 // src/logic/effects/ops/fuse/fuse.artifact.ts
 import { state } from "../../../../core/gameState.js";
+import { adapter } from "../../../../core/adapter.js";
 import {
   highlightSelectable,
   clearSelectableFlags,
@@ -54,7 +55,7 @@ export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
   });
 
   highlightSelectable(pool);
-  // Render removed - UI layer
+  adapter.render();
   return "pending";
 }
 
@@ -100,7 +101,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
   });
 
   highlightSelectable(pool);
-  // Render removed - UI layer
+  adapter.render();
   return "pending";
 }
 
@@ -139,7 +140,7 @@ export function startAlphaSelect(owner: Player, initiator: CardInstance) {
   });
 
   highlightSelectable(pool);
-  // Render removed - UI layer
+  adapter.render();
   return "pending";
 }
 

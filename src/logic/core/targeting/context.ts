@@ -49,18 +49,15 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
   // -------------------------------------------------------------------------
 
   selected: (q, env) => {
-    // Prefer UID-based selection
+    // UID-based selection only
     if (env.context?.targetUids?.length) {
       return resolveUids(env.context.targetUids);
     }
-    // Fallback to deprecated object refs
-    const chosen = Array.isArray(env.context?.targets)
-      ? env.context.targets
-      : Array.isArray(state.pendingTargetEffect?.targetUids)
-        ? resolveUids(state.pendingTargetEffect!.targetUids)
-        : [];
-
-    return (chosen || []).filter(Boolean);
+    // Check pending target state
+    if (Array.isArray(state.pendingTargetEffect?.targetUids)) {
+      return resolveUids(state.pendingTargetEffect!.targetUids);
+    }
+    return [];
   },
 
   // -------------------------------------------------------------------------

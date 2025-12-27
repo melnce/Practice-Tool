@@ -4,6 +4,7 @@ import { getPool } from "../core/targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { getHand, getDeck, opponentOf } from "../../core/playerHelpers.js";
+import { resolveUids } from "../../core/uidResolver.js";
 
 /**
  * Reduces the cost of the card that owns the effect.
@@ -135,7 +136,7 @@ export function handleHalveDeckCost(owner: Player) {
 /**
  * Generic cost modifier for selected target(s).
  * Uses cost_mod so "cost_changed" triggers fire on enter.
- * Expects the selected card(s) in context.targets / context.selectedCard.
+ * Expects the selected card(s) in context.targetUids.
  * Positive amount increases cost; negative decreases.
  */
 import { resolveDynamicValue } from "../core/values.js";
@@ -145,7 +146,7 @@ import { resolveDynamicValue } from "../core/values.js";
 /**
  * Generic cost modifier for selected target(s).
  * Uses cost_mod so "cost_changed" triggers fire on enter.
- * Expects the selected card(s) in context.targets / context.selectedCard.
+ * Expects the selected card(s) in context.targetUids.
  * Positive amount increases cost; negative decreases.
  */
 export function handleModifyCost(
@@ -162,33 +163,31 @@ export function handleModifyCost(
   });
   if (!amount) return;
 
-  const targets =
-    Array.isArray(context?.targets) && context.targets.length
-      ? context.targets
-      : context?.selectedCard
-        ? [context.selectedCard]
-        : [];
+  // UID-based selection only
+  const targets = context?.targetUids?.length
+    ? resolveUids(context.targetUids)
+    : [];
 
   if (!targets || !targets.length) return;
 
   for (const t of targets) {
     // Ensure base_cost is recorded once
     if (t.base_cost === undefined) {
-      t.base_cost = parseInt(t.cost, 10) || 0;
+      t.base_cost = parseInt(String(t.cost), 10) || 0;
     }
     // Only adjust modifier; don't touch t.cost directly
-    t.cost_mod = (parseInt(t.cost_mod, 10) || 0) + amount;
+    t.cost_mod = (parseInt(String(t.cost_mod ?? 0), 10) || 0) + amount;
     logEvent("costChange", {
       card: t.name,
       uid: t.uid,
-      newCost: (parseInt(t.cost, 10) || 0) + t.cost_mod,
+      newCost: (parseInt(String(t.cost), 10) || 0) + t.cost_mod,
       type: "mod",
     });
 
     // TEMP support
     if (eff.until_eot) {
       t.temp_cost_mod_until_eot =
-        (parseInt(t.temp_cost_mod_until_eot, 10) || 0) + amount;
+        (parseInt(String(t.temp_cost_mod_until_eot ?? 0), 10) || 0) + amount;
     }
   }
 }

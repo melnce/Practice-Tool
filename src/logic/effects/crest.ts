@@ -103,6 +103,8 @@ export function handleGainCrest(eff: Effect, owner: Player) {
       condition: t.condition ?? null,
     })),
     owner: targetOwner,
+    // Keywords (e.g., ["LastWords"]) - needed for Last Words detection
+    keywords: Array.isArray((eff as any).keywords) ? (eff as any).keywords : [],
     __onceByTurn: {}, // Initialize tracking store
   } as Crest;
 
@@ -211,7 +213,24 @@ export function processCrestEvent(owner: Player, event: string) {
     const triggers = crest.triggers;
 
     triggers.forEach((t, i) => {
-      if (t.event !== event) return;
+      // Check event field first
+      let isMatch = t.event === event;
+
+      // Handle type shorthand (e.g., "end_of_turn_own")
+      // "end_of_turn_own" means "end_of_turn" but only when it's the crest owner's turn
+      if (!isMatch && t.type) {
+        if (t.type === "end_of_turn_own" && event === "end_of_turn") {
+          // Crest triggers are always processed for the owner, so this matches
+          isMatch = true;
+        } else if (t.type === "start_of_turn_own" && event === "start_of_turn") {
+          isMatch = true;
+        } else if (t.type === event) {
+          // Direct match on type field
+          isMatch = true;
+        }
+      }
+
+      if (!isMatch) return;
 
       // Check once_per_turn using store
       if (t.once_per_turn) {
@@ -291,8 +310,15 @@ export function destroyCrest(owner: Player, crestName: string) {
 
   // Trigger Last Words effects
   if (hasLastWords && Array.isArray(crest.effects) && crest.effects.length) {
+    console.log("[destroyCrest DEBUG] Crest Last Words firing:", {
+      crestName,
+      effectCount: crest.effects.length,
+      effects: JSON.stringify(crest.effects),
+      lastSummonedBefore: state.lastSummoned?.length || 0
+    });
     logEvent("crestLastWords", { owner, crest: crestName, effectCount: crest.effects.length });
     runEffects([...crest.effects], owner, null);
+    console.log("[destroyCrest DEBUG] After effects, lastSummoned:", state.lastSummoned?.map((c: any) => c.name));
   }
 
   // Remove crest from list

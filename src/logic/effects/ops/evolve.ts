@@ -4,6 +4,7 @@ import { logEvent } from "../../../core/logger.js";
 import { state } from "../../../core/gameState.js";
 import { CardInstance, Player } from "../../../core/types/index.js";
 import { isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../core/playerHelpers.js";
+import { resolveUid } from "../../../core/uidResolver.js";
 
 function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
   if (!card || card.type !== "Follower" || card.hasEvolved) return false;
@@ -69,16 +70,14 @@ export function handleEvolveSelf(
 }
 
 export function handleEvolveTarget(eff: any, owner: Player, context: any = {}) {
-  const target =
-    (context &&
-      (context.targetCard ||
-        context.selectedCard ||
-        context.playedCard ||
-        context.enteringCard ||
-        (context.targets && context.targets[0]))) ||
-    null;
+  // UID-based selection only
+  if (!context?.targetUids?.length) {
+    console.warn("handleEvolveTarget: No targetUids in context.");
+    return;
+  }
+  const target = resolveUid(context.targetUids[0]);
   if (!target) {
-    console.warn("handleEvolveTarget: No target found in context.");
+    console.warn("handleEvolveTarget: Could not resolve target from UID.");
     return;
   }
   const mode = eff.mode || "normal";

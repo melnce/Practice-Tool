@@ -2,6 +2,7 @@
 // Unified fuse operation handler
 
 import { Player, CardInstance, Effect, EffectContext } from "../../../../core/types/index.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 import { FuseOp } from "./types.js";
 
 // Import existing handlers
@@ -59,7 +60,11 @@ export function handleFuse(
     if (action === "finalize") {
         const type = eff.type || "generic";
         const initiatorUid = eff.initiator_uid || "";
-        const partners = context.targets || [];
+
+        // UID-based selection only
+        const partners = context.targetUids?.length
+            ? resolveUids(context.targetUids)
+            : [];
 
         switch (type) {
             case "generic": {

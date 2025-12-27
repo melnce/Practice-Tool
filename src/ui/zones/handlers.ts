@@ -65,10 +65,15 @@ export function attachHandlers(
       const hasFortifierFuse =
         Array.isArray(card.fuse) &&
         card.fuse.some((op) => op?.op === "fuse" && op?.type === "fortifier");
+      // Gears and Ominous Artifact α have special hardcoded fuse logic by name
+      const hasSpecialFuse =
+        card.name === "Gear of Ambition" ||
+        card.name === "Gear of Remembrance" ||
+        card.name === "Ominous Artifact α";
 
-      if (hasFuseRecipes || hasFortifierFuse) {
+      if (hasFuseRecipes || hasFortifierFuse || hasSpecialFuse) {
         e.stopPropagation();
-        actions.handleFuse(ctx.owner, card.uid, !!hasFuseRecipes, card);
+        actions.handleFuse(ctx.owner, card.uid, !!(hasFuseRecipes || hasSpecialFuse), card);
       }
     });
 

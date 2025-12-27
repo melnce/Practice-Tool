@@ -219,6 +219,10 @@ export function handleSelectHandSummonArtifactCopy(
 
   if (!pool.length) return;
 
+  // Ralmia-style selection: if 3 or fewer in hand, must select all; if 4+, choose 3
+  const maxRequired = parseInt((eff.select ?? (eff as any).select_count ?? 3) as any, 10);
+  const selectCount = pool.length <= maxRequired ? pool.length : maxRequired;
+
   setPendingTarget({
     eff: { ...eff, op: "select_hand_summon_artifact_copy" } as any, // resolved in resolveTarget.js
     owner,
@@ -226,13 +230,12 @@ export function handleSelectHandSummonArtifactCopy(
     resumeEffects: effectsQueue,
     pool,
     targets: [],
-    // ← respect JSON-specified select count
-    selectCount: Math.max(
-      1,
-      parseInt((eff.select ?? (eff as any).select_count ?? 1) as any, 10),
-    ),
-    // optional: let user confirm multi-selects (shows the confirm button)
-    requiresConfirmation: parseInt((eff.select ?? 1) as any, 10) > 1,
+    selectCount,
+    // Always require confirmation since order matters for board placement
+    requiresConfirmation: true,
+    // Enforce that user MUST select exactly selectCount cards (no less, no more)
+    enforceMinSelectCount: true,
+    enforceMaxSelectCount: true,
   });
 
   highlightSelectable(pool);

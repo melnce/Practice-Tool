@@ -2,24 +2,24 @@
 import { state } from "../core/gameState.js";
 import { logEvent } from "../core/logger.js";
 import { Player } from "../core/types/index.js";
+import { getPermPP, setPermPP, setMaxPP } from "../core/playerHelpers.js";
 
 export function increaseMaxPP(
   owner: Player,
   amount = 1,
   { cap = 10, recalcNow = true } = {},
 ) {
-  const permPPKey = owner === "first" ? "bluePermPP" : "redPermPP";
-  const maxPPKey = owner === "first" ? "blueMaxPP" : "redMaxPP";
-
-  state[permPPKey] = Math.min(cap, (state[permPPKey] || 0) + amount);
+  const currentPerm = getPermPP(state, owner);
+  const newPerm = Math.min(cap, currentPerm + amount);
+  setPermPP(state, owner, newPerm);
 
   if (recalcNow) {
-    state[maxPPKey] = Math.min(cap, state.roundCount + (state[permPPKey] || 0));
+    setMaxPP(state, owner, Math.min(cap, state.roundCount + newPerm));
   }
   logEvent("maxPP", {
     owner,
-    newPerm: state[permPPKey],
-    newMax: state[maxPPKey],
+    newPerm,
+    newMax: Math.min(cap, state.roundCount + newPerm),
   });
 }
 

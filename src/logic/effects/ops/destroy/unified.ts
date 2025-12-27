@@ -67,12 +67,15 @@ export function handleDestroy(
   }
 
   // Get target pool
+  // isTargetedEffect should only be true when player selects targets (spec.select > 0)
+  // AoE/random effects should bypass Ambush protection
+  const isSelectBased = spec.select != null && spec.select > 0;
   const pool = getPool(
     spec.target || "",
     owner,
     ctx.sourceCard,
     spec.condition,
-    { ...ctx, isTargetedEffect: true },
+    { ...ctx, isTargetedEffect: isSelectBased },
   ).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
 
   // Apply excludes
@@ -100,8 +103,13 @@ export function handleDestroy(
   }
 
   // Store count in context.variables if requested
+  // IMPORTANT: Store in the ORIGINAL context object, not the local ctx copy,
+  // so variables propagate back to the caller for cross-effect communication
   if (result !== "pending" && spec.store_count_as) {
-    storeInContext(ctx, spec.store_count_as, result);
+    if (!context.variables) {
+      context.variables = {};
+    }
+    context.variables[spec.store_count_as] = result;
   }
 
   return result;

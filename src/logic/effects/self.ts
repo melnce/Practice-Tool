@@ -143,8 +143,9 @@ export function handleDynamicStatSelf(
     const pool = isFirstPlayer(owner)
       ? state.players.first.shikigamiDeathsThisTurn || []
       : state.players.second.shikigamiDeathsThisTurn || [];
+    // Use base_attack for Noble Shikigami effect (stats at summoning, not after buffs/death)
     const sum = pool.reduce(
-      (acc: number, x: any) => acc + (Number(x.attack) || 0),
+      (acc: number, x: any) => acc + (Number(x.base_attack ?? x.attack) || 0),
       0,
     );
     a += sum;
@@ -177,8 +178,9 @@ export function handleDynamicStatSelf(
     const pool = isFirstPlayer(owner)
       ? state.players.first.shikigamiDeathsThisTurn || []
       : state.players.second.shikigamiDeathsThisTurn || [];
+    // Use base_defense for Noble Shikigami effect (stats at summoning, not after buffs/death)
     const sum = pool.reduce(
-      (acc: number, x: any) => acc + (Number(x.defense) || 0),
+      (acc: number, x: any) => acc + (Number(x.base_defense ?? x.defense) || 0),
       0,
     );
     d += sum;

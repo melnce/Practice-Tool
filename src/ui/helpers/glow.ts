@@ -1,9 +1,7 @@
 // src/ui/helpers/glow.ts
-import { state } from "../../core/gameState.js";
 import { isOverflow } from "../../helpers/overflow.js";
 import { comboReadyInHand } from "../../helpers/combo.js";
 import { hasNecromancy } from "../../helpers/necromancy.js";
-import { getPool } from "../../logic/core/targeting.js";
 import { handleSuperEvoGate } from "../../logic/effects/gates/gates.js";
 import { CardInstance, GameState, Player, Effect } from "../../core/types/index.js";
 
@@ -16,7 +14,8 @@ function earthRiteCostInFanfare(effects: Effect[] | unknown): number {
     for (const e of effs) {
       if (!e || typeof e !== "object") continue;
       if (e.op === "earth_rite") {
-        const c = Math.max(1, Number(e.amount ?? 1) || 1);
+        // Card schema uses "cost", not "amount"
+        const c = Math.max(1, Number(e.cost ?? e.amount ?? 1) || 1);
         best = Math.min(best, c);
       }
       if (Array.isArray(e.effects)) best = Math.min(best, scan(e.effects));
@@ -69,59 +68,64 @@ function hasSuperEvoAllyOnBoard(state: GameState, owner: Player) {
   );
 }
 
-function needsUnmetTarget(
-  list: unknown,
-  owner: Player,
-  card: CardInstance | null,
-): boolean {
-  if (!Array.isArray(list)) return false;
-  for (const eff of list) {
+/**
+ * Check if any effect in the list has a select requirement with no valid targets.
+ * Returns true if spell should be blocked from glowing.
+ */
+function spellHasUnmetSelectTarget(effects: any[], owner: Player, state: GameState): boolean {
+  if (!Array.isArray(effects)) return false;
+
+  const ownerBoard = owner === "first" ? state.players.first.board : state.players.second.board;
+  const enemyBoard = owner === "first" ? state.players.second.board : state.players.first.board;
+  const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
+
+  for (const eff of effects) {
     if (!eff || typeof eff !== "object") continue;
 
-    if (eff.op === "gate" && (eff as any).condition === "overflow") {
-      if (isOverflow(owner) && needsUnmetTarget(eff.effects, owner, card))
+    // Detect select requirement in two forms:
+    // 1. eff.select: 1 (inline select on damage/destroy/etc)
+    // 2. op: "select" with select_count: 1 (explicit select operation)
+    const hasNumericSelect = typeof eff.select === "number" && eff.select > 0;
+    const isSelectOp = eff.op === "select" && typeof eff.select_count === "number" && eff.select_count > 0;
+
+    if (!hasNumericSelect && !isSelectOp) {
+      // Recurse into nested effects
+      if (Array.isArray(eff.effects) && spellHasUnmetSelectTarget(eff.effects, owner, state)) {
         return true;
+      }
       continue;
     }
-    if (eff.op === "select_hand_summon_artifact_copies_eot_destroy") {
-      continue; // custom op that selects from hand
+
+    // Parse target to determine required pool
+    const target = String(eff.target || "").toLowerCase();
+
+    if (target.includes("enemy:follower") || target === "enemy:any") {
+      const hasValidEnemy = enemyBoard.some((c: any) => c?.type === "Follower" && !c?.hasAmbush);
+      if (!hasValidEnemy) return true;
+    }
+    if (target.includes("ally:follower") || target === "ally:any") {
+      const hasValidAlly = ownerBoard.some((c: any) => c?.type === "Follower");
+      if (!hasValidAlly) return true;
+    }
+    if (target.includes("ally:hand")) {
+      // Need at least select+1 cards (the spell being played doesn't count)
+      if (ownerHand.length <= eff.select) return true;
+    }
+    if (target.includes("enemy:amulet")) {
+      const hasEnemyAmulet = enemyBoard.some((c: any) => c?.type === "Amulet");
+      if (!hasEnemyAmulet) return true;
+    }
+    if (target.includes("ally:amulet")) {
+      const hasAllyAmulet = ownerBoard.some((c: any) => c?.type === "Amulet");
+      if (!hasAllyAmulet) return true;
     }
 
-    if (eff.select || eff.op === "select") {
-      const pool = getPool(eff.target, owner, null, eff.condition || {}, {
-        isTargetedEffect: true,
-      });
-      if (!pool || pool.length === 0) return true;
-    }
-
-    if (
-      eff.op === "stormy_blast_damage" ||
-      (card?.name && card.name.toLowerCase() === "snowman army")
-    ) {
-      // needs enemy follower
-      // owner here is "blue"/"red"
-      const stateAny = state as any; // Need access to opponent board from state if card.__state missing
-      const enemyBoard =
-        owner === "first" ? stateAny.redBoard : stateAny.blueBoard;
-      const hasEnemyFollower =
-        Array.isArray(enemyBoard) &&
-        enemyBoard.some((c: any) => c.type === "Follower");
-      if (!hasEnemyFollower) return true;
-    }
-
-    if (
-      Array.isArray(eff.effects) &&
-      needsUnmetTarget(eff.effects, owner, card)
-    )
+    // Recurse into nested effects
+    if (Array.isArray(eff.effects) && spellHasUnmetSelectTarget(eff.effects, owner, state)) {
       return true;
-
-    if (eff.op === "mode" && Array.isArray(eff.options)) {
-      const allBlocked = eff.options.every((opt: any) =>
-        needsUnmetTarget(opt.effects || [], owner, card),
-      );
-      if (allBlocked) return true;
     }
   }
+
   return false;
 }
 
@@ -158,12 +162,6 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
   // Spell-specific preconditions
   if (isSpell) {
-    const list =
-      Array.isArray((card as any).spell) && (card as any).spell.length
-        ? (card as any).spell
-        : Array.isArray(card.fanfare)
-          ? card.fanfare
-          : [];
 
     // Doomwright Resurgence: need >=2 eligible artifacts in hand
     if (card.name === "Doomwright Resurgence") {
@@ -182,38 +180,11 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
       if (eligible < 2) canAfford = false;
     }
 
-    // Needs ally on board if it returns ally to hand
-    const needsAlly = list.some(
-      (eff: any) =>
-        eff &&
-        eff.select &&
-        String(eff.op).toLowerCase() === "return_to_hand" &&
-        String(eff.target || "")
-          .toLowerCase()
-          .startsWith("ally"),
-    );
-    if (needsAlly) {
-      const ownerBoard = owner === "first" ? state.players.first.board : state.players.second.board;
-      if (ownerBoard.length === 0) canAfford = false;
-    }
-
-    // Needs another hand pick (return_hand_to_deck with select)
-    const needsHandPick = list.some(
-      (e: any) =>
-        String(e.op).toLowerCase() === "return_hand_to_deck" && e.select,
-    );
-    if (needsHandPick) {
-      const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
-      if (ownerHand.length <= 1) canAfford = false;
-    }
-
-    // If all select-targets have no valid pool, block (except when leader is explicitly targetable)
-    const canTargetLeader = list.some(
-      (eff: any) => eff?.op === "damage" && eff?.fallback_leader,
-    );
-    if (needsUnmetTarget(list, owner, card) && !canTargetLeader)
+    // Generic: spells with select targets require valid targets
+    const spellEffects = Array.isArray((card as any).spell) ? (card as any).spell : [];
+    if (spellHasUnmetSelectTarget(spellEffects, owner, state)) {
       canAfford = false;
-
+    }
     // Radiant Rainbow: require a Spellboost card in hand
     if (card.name && card.name.toLowerCase() === "radiant rainbow") {
       const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;

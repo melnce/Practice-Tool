@@ -30,7 +30,9 @@ export function registerMiscEffects() {
   // UNIFIED EVOLVE - replaces 8 legacy evolve_* ops
   // ==========================================================================
   registerOp("evolve", (eff, ctx) => {
-    handleEvolve(eff as any, ctx.owner, ctx.sourceCard, ctx.context);
+    const evolveCtx = { ...(ctx.context || {}), queue: ctx.queue };
+    const result = handleEvolve(eff as any, ctx.owner, ctx.sourceCard, evolveCtx);
+    if (result === "pending") return "pending";
   });
 
   // ==========================================================================

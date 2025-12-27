@@ -17,6 +17,7 @@ import {
     applyAttacksPerTurnBuff,
     checkPostBuffTriggers,
 } from "./core.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import {
     handleStatSelf,
@@ -103,6 +104,21 @@ export function handleStatOrchestrator(
         return "done";
     }
 
+    // Handle "selected" or "selected:follower" - use targetUids directly
+    const targetStr = String(eff.target || "").toLowerCase();
+    if (targetStr === "selected" || targetStr.startsWith("selected:")) {
+        if (context?.targetUids?.length) {
+            const targets = resolveUids(context.targetUids);
+            if (targets.length) {
+                applyBuffsToTargets(targets, eff, owner);
+                cleanupDead();
+                return "done";
+            }
+        }
+        // No targetUids - nothing to buff
+        return "done";
+    }
+
     // 4. Standard pool-based path
     return handlePoolBasedBuff(eff, owner, sourceCard, effectsQueue, context);
 }
@@ -175,7 +191,20 @@ function handlePoolBasedBuff(
 
     if (!pool.length) return "done";
 
-    // 2. Handle user selection
+    // 2. Check for random distribution - auto-select instead of user selection
+    const distribution = (eff as any).distribution;
+    const isRandomDistribution = distribution === "random" || eff.random;
+
+    // 3. Handle random selection (distribution: "random" bypasses user selection)
+    if (isRandomDistribution) {
+        const count = Math.max(1, parseInt((eff as any).select ?? (eff.count as any) ?? 1, 10));
+        const chosen = pickRandomFromPool(pool, count);
+        applyBuffsToTargets(chosen, eff, owner);
+        cleanupDead();
+        return "done";
+    }
+
+    // 4. Handle user selection (only when no random distribution)
     if ((eff as any).select) {
         setPendingTarget({
             eff,
@@ -184,25 +213,17 @@ function handlePoolBasedBuff(
             resumeEffects: effectsQueue,
             pool,
             targets: [],
-            selectCount: parseInt((eff as any).select_count ?? 1),
+            selectCount: parseInt((eff as any).select_count ?? (eff as any).select ?? 1),
             context,
         } as any);
         highlightSelectable(pool);
         return "pending";
     }
 
-    // 3. Handle random selection
-    let chosen = pool;
-    if (eff.random) {
-        const count = Math.max(0, parseInt((eff.count as any) ?? 1, 10));
-        if (count <= 0) return "done";
-        chosen = pickRandomFromPool(pool, count);
-    }
+    // 5. Apply buffs to all in pool
+    applyBuffsToTargets(pool, eff, owner);
 
-    // 4. Apply buffs
-    applyBuffsToTargets(chosen, eff, owner);
-
-    // 5. Cleanup
+    // 6. Cleanup
     cleanupDead();
     return "done";
 }

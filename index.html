@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <script type="importmap">
+
+<head>
+  <script type="importmap">
       {
         "imports": {
           "main": "/dist/boot/boot.js",
@@ -17,455 +18,401 @@
       }
     </script>
 
-    <base href="/" />
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E"
-    />
-    <title>Shadowverse Practice Tool</title>
-    <script>
-      window.APP_ROOT = "/";
-    </script>
+  <base href="/" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" />
+  <title>Shadowverse Practice Tool</title>
+  <script>
+    window.APP_ROOT = "/";
+  </script>
 
-    <!-- existing styles (unchanged order) -->
-    <link rel="stylesheet" href="./css/base.css" />
-    <link rel="stylesheet" href="./css/buttons.css" />
-    <link rel="stylesheet" href="./css/cards.css" />
-    <link rel="stylesheet" href="./css/layout.css" />
-    <link rel="stylesheet" href="./css/utility.css" />
+  <!-- existing styles (unchanged order) -->
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/buttons.css" />
+  <link rel="stylesheet" href="./css/cards.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/utility.css" />
 
-    <!-- new modern theme overrides (must be last) -->
-    <link rel="stylesheet" href="./css/modern-theme.css" />
-    <style>
-      /* Lightweight drawer + hamburger (no extra CSS files needed) */
-      .hamburger-btn {
-        position: fixed;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 350;
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: linear-gradient(180deg, #1a1f27, #141821);
-        color: #e9edf1;
-        font-weight: 800;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-      }
+  <!-- new modern theme overrides (must be last) -->
+  <link rel="stylesheet" href="./css/modern-theme.css" />
+  <style>
+    /* Lightweight drawer + hamburger (no extra CSS files needed) */
+    .hamburger-btn {
+      position: fixed;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 350;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, #1a1f27, #141821);
+      color: #e9edf1;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    }
 
-      .hamburger-btn span {
-        display: block;
-        width: 20px;
-        height: 2px;
-        background: #e9edf1;
-        position: relative;
-      }
+    .hamburger-btn span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: #e9edf1;
+      position: relative;
+    }
 
-      .hamburger-btn span::before,
-      .hamburger-btn span::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        width: 20px;
-        height: 2px;
-        background: #e9edf1;
-      }
+    .hamburger-btn span::before,
+    .hamburger-btn span::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 20px;
+      height: 2px;
+      background: #e9edf1;
+    }
 
-      .hamburger-btn span::before {
-        top: -6px;
-      }
+    .hamburger-btn span::before {
+      top: -6px;
+    }
 
-      .hamburger-btn span::after {
-        top: 6px;
-      }
+    .hamburger-btn span::after {
+      top: 6px;
+    }
 
-      .drawer {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 360px;
-        z-index: 340;
-        transform: translateX(-100%);
-        transition: transform 0.18s ease;
-        background: rgba(24, 26, 32, 0.92);
-        backdrop-filter: blur(8px);
-        border-right: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 18px 34px rgba(0, 0, 0, 0.45);
-        padding: 14px 14px 18px 14px;
-        overflow: auto;
-      }
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 360px;
+      z-index: 340;
+      transform: translateX(-100%);
+      transition: transform 0.18s ease;
+      background: rgba(24, 26, 32, 0.92);
+      backdrop-filter: blur(8px);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.45);
+      padding: 14px 14px 18px 14px;
+      overflow: auto;
+    }
 
-      .drawer.open {
-        transform: none;
-      }
+    .drawer.open {
+      transform: none;
+    }
 
-      .drawer h3 {
-        margin: 6px 0 4px;
-      }
+    .drawer h3 {
+      margin: 6px 0 4px;
+    }
 
-      .drawer hr {
-        border-color: rgba(255, 255, 255, 0.08);
-      }
+    .drawer hr {
+      border-color: rgba(255, 255, 255, 0.08);
+    }
 
-      .drawer ul {
-        margin: 6px 0 0 18px;
-      }
+    .drawer ul {
+      margin: 6px 0 0 18px;
+    }
 
-      .drawer li {
-        margin: 4px 0;
-      }
+    .drawer li {
+      margin: 4px 0;
+    }
 
-      .drawer .title {
-        font-weight: 900;
-        letter-spacing: 0.3px;
-        margin: 4px 0 8px;
-      }
+    .drawer .title {
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      margin: 4px 0 8px;
+    }
 
-      .scrim {
-        position: fixed;
-        inset: 0;
-        background: transparent;
-        z-index: 330;
-        display: none;
-      }
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: transparent;
+      z-index: 330;
+      display: none;
+    }
 
-      .scrim.show {
-        display: block;
-      }
+    .scrim.show {
+      display: block;
+    }
 
-      .hist-list {
-        list-style: none;
-        padding-left: 0;
-        margin-left: 0;
-      }
+    .hist-list {
+      list-style: none;
+      padding-left: 0;
+      margin-left: 0;
+    }
 
-      .hist-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 6px 0;
-      }
+    .hist-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+    }
 
-      .hist-label {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 280px;
-        /* gives room for long names before ellipsis */
-      }
+    .hist-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+      /* gives room for long names before ellipsis */
+    }
 
-      .cost-badge {
-        display: inline-grid;
-        place-items: center;
-        min-width: 22px;
-        height: 22px;
-        padding: 0 6px;
-        border-radius: 6px;
-        font-weight: 800;
-        font-size: 12px;
-        background: linear-gradient(180deg, #262c36, #1a1f27);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        color: #e9edf1;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-      }
+    .cost-badge {
+      display: inline-grid;
+      place-items: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 12px;
+      background: linear-gradient(180deg, #262c36, #1a1f27);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e9edf1;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    }
 
-      #historyImgPreview img {
-        max-width: 198px;
-        height: auto;
-      }
-    </style>
-  </head>
+    #historyImgPreview img {
+      max-width: 198px;
+      height: auto;
+    }
+  </style>
+</head>
 
-  <body>
-    <!-- targeting confirm -->
-    <div
-      id="targetingConfirmation"
-      style="
+<body>
+  <!-- targeting confirm -->
+  <div id="targetingConfirmation" style="
         position: fixed;
         bottom: 20px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 1000;
         display: none;
-      "
-    ></div>
+      "></div>
 
-    <!-- sticky control bar -->
-    <header id="controlPanel">
-      <div id="deckSelection">
-        <label for="blueDeckSelect">Blue Deck:</label>
-        <select id="blueDeckSelect">
-          <option value="example_deck">example_deck</option>
-        </select>
+  <!-- sticky control bar -->
+  <header id="controlPanel">
+    <div id="deckSelection">
+      <label for="blueDeckSelect">Blue Deck:</label>
+      <select id="blueDeckSelect">
+        <option value="example_deck">example_deck</option>
+      </select>
 
-        <label for="redDeckSelect">Red Deck:</label>
-        <select id="redDeckSelect">
-          <option value="example_deck">example_deck</option>
-        </select>
+      <label for="redDeckSelect">Red Deck:</label>
+      <select id="redDeckSelect">
+        <option value="example_deck">example_deck</option>
+      </select>
 
-        <label for="seedInput">Seed:</label>
-        <input id="seedInput" type="number" placeholder="random if empty" />
+      <label for="seedInput">Seed:</label>
+      <input id="seedInput" type="number" placeholder="random if empty" />
 
-        <button id="startGameBtn">Start Game</button>
+      <button id="startGameBtn">Start Game</button>
+    </div>
+  </header>
+  <!-- Hamburger to open history drawer -->
+  <button id="historyToggle" class="hamburger-btn" title="History (cards played & graveyards)">
+    <span></span>
+  </button>
+  <div id="historyScrim" class="scrim"></div>
+
+  <aside id="historyDrawer" class="drawer" aria-hidden="true">
+    <div class="title">History & Graveyards</div>
+
+    <!-- Red on top -->
+    <section>
+      <h3>Red — Played</h3>
+      <div id="redPlayedList"></div>
+    </section>
+    <section>
+      <h3>Red — Destroyed</h3>
+      <div id="redDestroyedList"></div>
+    </section>
+    <hr />
+    <!-- Blue below -->
+    <section>
+      <h3>Blue — Played</h3>
+      <div id="bluePlayedList"></div>
+    </section>
+    <section>
+      <h3>Blue — Destroyed</h3>
+      <div id="blueDestroyedList"></div>
+    </section>
+  </aside>
+
+  <main id="appRoot">
+    <!-- Red side -->
+    <section class="side side-red">
+      <div id="redHand" class="zone hand-zone"></div>
+      <button id="redMulliganConfirm" style="display: none; margin: 8px 0 16px 0">
+        Confirm Mulligan (Red)
+      </button>
+
+      <div class="floating-stats" id="redStatsContainer">
+        <div id="redStats">
+          <span>🃏 <span id="redHandCount">0</span></span>
+          <span>📦 <span id="redDeckCount">0</span></span>
+          <span>💀 <span id="redGraveCount">0</span></span>
+          <span>☠️ <span id="redShadows">0</span></span>
+        </div>
+        <div id="redCrests" class="crest-container">
+          <div class="crest-row">
+            <div class="crest-slot"></div>
+            <div class="crest-slot"></div>
+            <div class="crest-slot"></div>
+          </div>
+          <div class="crest-row">
+            <div class="crest-slot"></div>
+            <div class="crest-slot"></div>
+          </div>
+        </div>
       </div>
-    </header>
-    <!-- Hamburger to open history drawer -->
-    <button
-      id="historyToggle"
-      class="hamburger-btn"
-      title="History (cards played & graveyards)"
-    >
-      <span></span>
+
+      <div class="leader-container">
+        <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
+        <div class="leader red-leader" id="redLeader">
+          <span id="redHP" class="hp-value">20</span>
+        </div>
+        <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
+      </div>
+
+      <div id="redBoard" class="zone board-zone"></div>
+    </section>
+
+    <!-- Blue side -->
+    <section class="side side-blue">
+      <div id="blueBoard" class="zone board-zone"></div>
+
+      <div class="leader-container">
+        <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
+        <div class="leader blue-leader" id="blueLeader">
+          <span id="blueHP" class="hp-value">20</span>
+        </div>
+        <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
+      </div>
+
+      <div class="floating-stats" id="blueStatsContainer">
+        <div id="blueCrests" class="crest-container">
+          <div class="crest-row">
+            <div class="crest-slot"></div>
+            <div class="crest-slot"></div>
+          </div>
+          <div class="crest-row">
+            <div class="crest-slot"></div>
+            <div class="crest-slot"></div>
+            <div class="crest-slot"></div>
+          </div>
+        </div>
+        <div id="blueStats">
+          <span>🃏 <span id="blueHandCount">0</span></span>
+          <span>📦 <span id="blueDeckCount">0</span></span>
+          <span>💀 <span id="blueGraveCount">0</span></span>
+          <span>☠️ <span id="blueShadows">0</span></span>
+        </div>
+      </div>
+
+      <div id="blueHand" class="zone hand-zone"></div>
+      <button id="blueMulliganConfirm" style="display: none; margin: 8px 0 16px 0">
+        Confirm Mulligan (Blue)
+      </button>
+    </section>
+  </main>
+
+  <!-- Turn controls (unchanged IDs/handlers) -->
+  <aside id="turnControls">
+    <div class="red-pp-wrapper">
+      <button id="redBoost" onclick="useRedBoost()">+1 PP Boost</button>
+      <div class="pp-floating" id="redPPBox">
+        PP: <span id="redPP">1</span>
+      </div>
+    </div>
+    <button id="endTurnRed" onclick="endTurnRed()" style="display: none">
+      End Turn (Red)
     </button>
-    <div id="historyScrim" class="scrim"></div>
+    <button id="endTurnBlue" onclick="endTurnBlue()" style="display: none">
+      End Turn (Blue)
+    </button>
+    <div class="pp-floating" id="bluePPBox">
+      PP: <span id="bluePP">1</span>
+    </div>
 
-    <aside id="historyDrawer" class="drawer" aria-hidden="true">
-      <div class="title">History & Graveyards</div>
-
-      <!-- Red on top -->
-      <section>
-        <h3>Red — Played</h3>
-        <div id="redPlayedList"></div>
-      </section>
-      <section>
-        <h3>Red — Destroyed</h3>
-        <div id="redDestroyedList"></div>
-      </section>
-      <hr />
-      <!-- Blue below -->
-      <section>
-        <h3>Blue — Played</h3>
-        <div id="bluePlayedList"></div>
-      </section>
-      <section>
-        <h3>Blue — Destroyed</h3>
-        <div id="blueDestroyedList"></div>
-      </section>
-    </aside>
-
-    <main id="appRoot">
-      <!-- Red side -->
-      <section class="side side-red">
-        <div id="redHand" class="zone hand-zone"></div>
-        <button
-          id="redMulliganConfirm"
-          style="display: none; margin: 8px 0 16px 0"
-        >
-          Confirm Mulligan (Red)
-        </button>
-
-        <div class="floating-stats" id="redStatsContainer">
-          <div id="redStats">
-            <span>🃏 <span id="redHandCount">0</span></span>
-            <span>📦 <span id="redDeckCount">0</span></span>
-            <span>💀 <span id="redGraveCount">0</span></span>
-            <span>☠️ <span id="redShadows">0</span></span>
-          </div>
-          <div id="redCrests" class="crest-container">
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="leader-container">
-          <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
-          <div class="leader red-leader" id="redLeader">
-            <span id="redHP" class="hp-value">20</span>
-          </div>
-          <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
-        </div>
-
-        <div id="redBoard" class="zone board-zone"></div>
-      </section>
-
-      <!-- Blue side -->
-      <section class="side side-blue">
-        <div id="blueBoard" class="zone board-zone"></div>
-
-        <div class="leader-container">
-          <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
-          <div class="leader blue-leader" id="blueLeader">
-            <span id="blueHP" class="hp-value">20</span>
-          </div>
-          <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
-        </div>
-
-        <div class="floating-stats" id="blueStatsContainer">
-          <div id="blueCrests" class="crest-container">
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-          </div>
-          <div id="blueStats">
-            <span>🃏 <span id="blueHandCount">0</span></span>
-            <span>📦 <span id="blueDeckCount">0</span></span>
-            <span>💀 <span id="blueGraveCount">0</span></span>
-            <span>☠️ <span id="blueShadows">0</span></span>
-          </div>
-        </div>
-
-        <div id="blueHand" class="zone hand-zone"></div>
-        <button
-          id="blueMulliganConfirm"
-          style="display: none; margin: 8px 0 16px 0"
-        >
-          Confirm Mulligan (Blue)
-        </button>
-      </section>
-    </main>
-
-    <!-- Turn controls (unchanged IDs/handlers) -->
-    <aside id="turnControls">
-      <div class="red-pp-wrapper">
-        <button id="redBoost" onclick="useRedBoost()">+1 PP Boost</button>
-        <div class="pp-floating" id="redPPBox">
-          PP: <span id="redPP">1</span>
-        </div>
-      </div>
-      <button id="endTurnRed" onclick="endTurnRed()" style="display: none">
-        End Turn (Red)
-      </button>
-      <button id="endTurnBlue" onclick="endTurnBlue()" style="display: none">
-        End Turn (Blue)
-      </button>
-      <div class="pp-floating" id="bluePPBox">
-        PP: <span id="bluePP">1</span>
-      </div>
-
-      <!-- God Mode Controls (Hidden by default) -->
-      <div
-        id="blueGodMode"
-        style="
+    <!-- God Mode Controls (Hidden by default) -->
+    <div id="blueGodMode" style="
           display: none;
           margin-top: 10px;
           background: rgba(0, 0, 0, 0.5);
           padding: 8px;
           border-radius: 6px;
           border: 1px solid rgba(136, 68, 68, 0.4);
-        "
-      >
-        <div
-          style="
+        ">
+      <div style="
             font-size: 0.8rem;
             font-weight: bold;
             color: #aaa;
             margin-bottom: 6px;
             text-align: center;
-          "
-        >
-          GOD MODE
-        </div>
-        <div
-          style="
+          ">
+        GOD MODE
+      </div>
+      <div style="
             display: flex;
             gap: 4px;
             flex-wrap: wrap;
             justify-content: center;
-          "
-        >
-          <button id="godMinus" class="mini-btn" style="width: 30px">-</button>
-          <button id="godPlus" class="mini-btn" style="width: 30px">+</button>
-          <button id="godRefill" class="mini-btn" style="flex: 1">
-            Refill PP
-          </button>
-        </div>
-        <div
-          style="
+          ">
+        <button id="godMinus" class="mini-btn" style="width: 30px">-</button>
+        <button id="godPlus" class="mini-btn" style="width: 30px">+</button>
+        <button id="godRefill" class="mini-btn" style="flex: 1">
+          Refill PP
+        </button>
+      </div>
+      <div style="
             margin-top: 6px;
             display: flex;
             gap: 4px;
             flex-wrap: wrap;
             justify-content: center;
-          "
-        >
-          <button id="godEPMinus" class="mini-btn" style="width: 30px">
-            -
-          </button>
-          <button id="godEPPlus" class="mini-btn" style="width: 30px">+</button>
-          <button id="godEPRefill" class="mini-btn" style="flex: 1">
-            Refill EP
-          </button>
-        </div>
-        <div style="margin-top: 6px; display: flex; gap: 4px">
-          <button id="godSetMax" class="mini-btn" style="flex: 1">
-            Set Max
-          </button>
-        </div>
-        <div
-          style="margin-top: 6px; display: flex; gap: 4px; align-items: center"
-        >
-          <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-            >Evolves:</span
-          >
-          <input
-            id="godEvoCountVal"
-            type="number"
-            style="width: 40px; padding: 2px"
-            value="0"
-          />
-          <button id="godSetEvoCount" class="mini-btn" style="flex: 1">
-            Set
-          </button>
-        </div>
-        <div
-          style="margin-top: 6px; display: flex; gap: 4px; align-items: center"
-        >
-          <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-            >Combo:</span
-          >
-          <input
-            id="godComboCountVal"
-            type="number"
-            style="width: 40px; padding: 2px"
-            value="0"
-          />
-          <button id="godSetComboCount" class="mini-btn" style="flex: 1">
-            Set
-          </button>
-        </div>
-        <div
-          style="margin-top: 6px; display: flex; gap: 4px; align-items: center"
-        >
-          <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-            >Shadows:</span
-          >
-          <input
-            id="godShadowsVal"
-            type="number"
-            style="width: 40px; padding: 2px"
-            value="0"
-          />
-          <button id="godSetShadows" class="mini-btn" style="flex: 1">
-            Set
-          </button>
-        </div>
+          ">
+        <button id="godEPMinus" class="mini-btn" style="width: 30px">
+          -
+        </button>
+        <button id="godEPPlus" class="mini-btn" style="width: 30px">+</button>
+        <button id="godEPRefill" class="mini-btn" style="flex: 1">
+          Refill EP
+        </button>
       </div>
-    </aside>
+      <div style="margin-top: 6px; display: flex; gap: 4px">
+        <button id="godSetMax" class="mini-btn" style="flex: 1">
+          Set Max
+        </button>
+      </div>
+      <div style="margin-top: 6px; display: flex; gap: 4px; align-items: center">
+        <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px">Evolves:</span>
+        <input id="godEvoCountVal" type="number" style="width: 40px; padding: 2px" value="0" />
+        <button id="godSetEvoCount" class="mini-btn" style="flex: 1">
+          Set
+        </button>
+      </div>
+      <div style="margin-top: 6px; display: flex; gap: 4px; align-items: center">
+        <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px">Combo:</span>
+        <input id="godComboCountVal" type="number" style="width: 40px; padding: 2px" value="0" />
+        <button id="godSetComboCount" class="mini-btn" style="flex: 1">
+          Set
+        </button>
+      </div>
+      <div style="margin-top: 6px; display: flex; gap: 4px; align-items: center">
+        <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px">Shadows:</span>
+        <input id="godShadowsVal" type="number" style="width: 40px; padding: 2px" value="0" />
+        <button id="godSetShadows" class="mini-btn" style="flex: 1">
+          Set
+        </button>
+      </div>
+    </div>
+  </aside>
 
-    <!-- burn preview -->
-    <div
-      id="burnPreview"
-      style="
+  <!-- burn preview -->
+  <div id="burnPreview" style="
         position: fixed;
         top: 50%;
         left: 20px;
@@ -473,27 +420,19 @@
         z-index: 9999;
         display: none;
         pointer-events: none;
-      "
-    >
-      <img
-        id="burnPreviewImg"
-        src=""
-        alt="Burned card"
-        style="
+      ">
+    <img id="burnPreviewImg" src="" alt="Burned card" style="
           width: 120px;
           height: auto;
           border: 2px solid orange;
           border-radius: 8px;
           box-shadow: 0 0 12px orange;
           opacity: 0.9;
-        "
-      />
-    </div>
+        " />
+  </div>
 
-    <!-- card tooltip -->
-    <div
-      id="cardTooltip"
-      style="
+  <!-- card tooltip -->
+  <div id="cardTooltip" style="
         display: none;
         position: fixed;
         z-index: 9999;
@@ -506,64 +445,63 @@
         white-space: pre-wrap;
         font-size: 0.9rem;
         pointer-events: none;
-      "
-    ></div>
+      "></div>
 
-    <script type="module" src="./dist/boot/boot.js"></script>
-    <!-- Hotkeys only (Ctrl+Z / Ctrl+Y) + Drawer open/close -->
-    <script type="module">
-      import { initHistoryHotkeys } from "@core/history.js";
-      initHistoryHotkeys({ target: document });
+  <script type="module" src="./dist/boot/boot.js"></script>
+  <!-- Hotkeys only (Ctrl+Z / Ctrl+Y) + Drawer open/close -->
+  <script type="module">
+    // Note: Hotkeys (Ctrl+Z/Y) are registered in boot.ts - do not duplicate here
 
-      const toggle = document.getElementById("historyToggle");
-      const drawer = document.getElementById("historyDrawer");
-      const scrim = document.getElementById("historyScrim");
+    const toggle = document.getElementById("historyToggle");
+    const drawer = document.getElementById("historyDrawer");
+    const scrim = document.getElementById("historyScrim");
 
-      function openDrawer() {
-        drawer.classList.add("open");
-        drawer.setAttribute("aria-hidden", "false");
-        scrim.classList.add("show");
+    function openDrawer() {
+      drawer.classList.add("open");
+      drawer.setAttribute("aria-hidden", "false");
+      scrim.classList.add("show");
+    }
+    function closeDrawer() {
+      drawer.classList.remove("open");
+      drawer.setAttribute("aria-hidden", "true");
+      scrim.classList.remove("show");
+    }
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (drawer.classList.contains("open")) {
+        closeDrawer();
+      } else {
+        openDrawer();
       }
-      function closeDrawer() {
-        drawer.classList.remove("open");
-        drawer.setAttribute("aria-hidden", "true");
-        scrim.classList.remove("show");
+    });
+    scrim.addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeDrawer();
+    });
+    // Prevent clicks inside the drawer from closing it via event bubbling
+    drawer.addEventListener("click", (e) => e.stopPropagation());
+    document.addEventListener("click", (e) => {
+      // If click happens outside the drawer while it's open, close it
+      if (
+        drawer.classList.contains("open") &&
+        !drawer.contains(e.target) &&
+        e.target !== toggle
+      ) {
+        closeDrawer();
       }
-      toggle.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (drawer.classList.contains("open")) {
-          closeDrawer();
-        } else {
-          openDrawer();
-        }
-      });
-      scrim.addEventListener("click", closeDrawer);
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeDrawer();
-      });
-      // Prevent clicks inside the drawer from closing it via event bubbling
-      drawer.addEventListener("click", (e) => e.stopPropagation());
-      document.addEventListener("click", (e) => {
-        // If click happens outside the drawer while it's open, close it
-        if (
-          drawer.classList.contains("open") &&
-          !drawer.contains(e.target) &&
-          e.target !== toggle
-        ) {
-          closeDrawer();
-        }
-      });
-    </script>
+    });
+  </script>
 
-    <script>
-      window.resolvePath = (path) => {
-        const script = document.currentScript.src;
-        const base = script.substring(0, script.lastIndexOf("/"));
-        console.log(`Resolving ${path} from ${base}`);
-        return new URL(path, base + "/").href;
-      };
-    </script>
+  <script>
+    window.resolvePath = (path) => {
+      const script = document.currentScript.src;
+      const base = script.substring(0, script.lastIndexOf("/"));
+      console.log(`Resolving ${path} from ${base}`);
+      return new URL(path, base + "/").href;
+    };
+  </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
-  </body>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+</body>
+
 </html>

@@ -17,6 +17,7 @@ import {
 } from "../../../core/types/index.js";
 import { guardLifecycle } from "../targeting/guards.js";
 import { registerRunEffectsInCleanup } from "../cleanup.js";
+import { registerRunEffectsForSpellboost } from "../../effects/ops/spellboost.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
 
 // Registry
@@ -67,7 +68,12 @@ sealRegistry();
  */
 export function onFanfare(card: CardInstance, owner: Player) {
   const list = card.fanfare || [];
-  if (Array.isArray(list) && list.length) runEffects([...list], owner, card);
+  if (Array.isArray(list) && list.length) {
+    // Pass shared context for variable propagation between effects
+    // (e.g., store_count_as from destroy -> amount_source in damage)
+    const sharedContext = { variables: {} };
+    runEffects([...list], owner, card, sharedContext);
+  }
 }
 
 export function getEffectiveCost(card: CardInstance) {
@@ -216,6 +222,8 @@ export function runEffects(
 registerRunEffectsInCleanup(runEffects);
 // Register runEffects with triggers/process.ts so board/hand triggers can execute effects
 registerRunEffects(runEffects);
+// Register runEffects with spellboost.ts so in-hand Spellboost keyword effects can execute
+registerRunEffectsForSpellboost(runEffects);
 
 
 

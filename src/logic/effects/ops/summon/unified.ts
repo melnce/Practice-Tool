@@ -30,7 +30,15 @@ export function handleSummon(
   _effectsQueue: Effect[] = [],
   context: SummonContext = { owner, sourceCard: null },
 ): string | void {
-  const spec = normalizeToUnifiedSpec(eff);
+  console.log("[SUMMON UNIFIED] handleSummon called", { eff, owner });
+  let spec;
+  try {
+    spec = normalizeToUnifiedSpec(eff);
+    console.log("[SUMMON UNIFIED] normalized spec", { spec });
+  } catch (e) {
+    console.error("[SUMMON UNIFIED] normalizeToUnifiedSpec threw:", e);
+    return;
+  }
 
   // Resolve target owner
   const targetOwner: Player =
@@ -47,6 +55,7 @@ export function handleSummon(
   // ========================================================================
   // SOURCE-BASED ROUTING
   // ========================================================================
+  console.log("[SUMMON UNIFIED] routing to source:", spec.source);
   switch (spec.source) {
     case "named":
       handleSummonNamed(eff, spec, targetOwner);
@@ -64,6 +73,7 @@ export function handleSummon(
       return handleSummonFromHand(eff, targetOwner, context);
 
     case "graveyard":
+      console.log("[SUMMON UNIFIED] calling handleReanimateWrapper");
       handleReanimateWrapper(eff, targetOwner);
       break;
 
@@ -71,12 +81,6 @@ export function handleSummon(
       logEvent("summon_unknown_source", { source: spec.source });
   }
 }
-
-
-
-
-
-
 
 
 

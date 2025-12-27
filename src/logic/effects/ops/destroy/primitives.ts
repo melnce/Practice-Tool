@@ -110,6 +110,7 @@ export function destroyTarget(
     if (!removed) return false;
 
     removed.zone = "graveyard";
+    removed.cost_mod = 0; // Reset cost when entering graveyard
     grave.push(removed);
 
     // Add shadow

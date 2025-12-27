@@ -14,7 +14,6 @@ export function reanimateSummon(c: any, owner: Player) {
   const base = getCardDetails(c.id) || getCardDetails(c.name);
   if (!base) return;
   const copy = makeCardFromDB(base, owner);
-  pushToBoard(board, owner, copy);
 
   // Reanimates enter 'justPlayed', but Rush/Storm should still work this turn:
   // - Storm: can attack leaders & followers
@@ -32,12 +31,11 @@ export function reanimateSummon(c: any, owner: Player) {
     copy.isRush = true;
   }
 
-  // ✅ Ensure reanimated units gain the Departed tribe
+  // Ensure reanimated units gain the Departed tribe
   copy.tribes = Array.isArray(copy.tribes) ? copy.tribes : [];
   if (!copy.tribes.includes("Departed")) copy.tribes.push("Departed");
-  // (Optional) mark provenance if you ever need it:
-  // copy.wasReanimated = true;
 
+  // Push to board and track lastSummoned
   if (pushToBoard(board, owner, copy)) {
     logEvent("reanimateSummon", { owner, card: copy.name, uid: copy.uid });
     if (state.lastSummoned) {
@@ -45,20 +43,4 @@ export function reanimateSummon(c: any, owner: Player) {
       state.lastSummoned.push(copy);
     }
   }
-  // Render removed - UI orchestrator handles rendering
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -17,6 +17,8 @@ export interface UnifiedCostSpec {
   amount: number | string;
   pool?: string; // for target: "pool" - e.g. "ally:hand"
   condition?: any; // filter for pool
+  filter?: { type?: string; tribe?: string; class?: string }; // additional pool filter
+  select?: number; // number of targets to select (triggers selection UI)
   min_cost?: number; // floor for reduce
   until_eot?: boolean; // temporary mod, revert at end of turn
 }
@@ -37,7 +39,7 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
     // ====================================================================
     if ((eff as any).target === undefined) {
       throw new Error(
-        `[cost] Missing required field: "target". Must be "self", "selected", "pool", "opponent_hand", or "last_drawn". Effect: ${JSON.stringify(eff)}`,
+        `[cost] Missing required field: "target". Must be "self", "selected", "pool", "opponent_hand", "last_drawn", or a pool spec like "ally:hand". Effect: ${JSON.stringify(eff)}`,
       );
     }
     if ((eff as any).mode === undefined) {
@@ -46,14 +48,25 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
       );
     }
 
+    const rawTarget = (eff as any).target as string;
+    const validTargets = ["self", "selected", "pool", "opponent_hand", "last_drawn"];
+
+    // Detect pool-style targets (e.g., "ally:hand", "enemy:follower")
+    const isPoolTarget = rawTarget.includes(":") && !validTargets.includes(rawTarget);
+
+    // Normalize minCost to min_cost
+    const minCost = (eff as any).min_cost ?? (eff as any).minCost;
+
     return {
       op: "cost",
-      target: (eff as any).target,
+      target: isPoolTarget ? "pool" : rawTarget as CostTarget,
       mode: (eff as any).mode,
       amount,
-      pool: (eff as any).pool,
+      pool: isPoolTarget ? rawTarget : (eff as any).pool,
       condition: (eff as any).condition,
-      min_cost: (eff as any).min_cost,
+      filter: (eff as any).filter,
+      select: (eff as any).select,
+      min_cost: minCost,
       until_eot: (eff as any).until_eot,
     };
   }

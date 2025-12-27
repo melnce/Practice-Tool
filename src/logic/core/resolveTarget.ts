@@ -68,6 +68,9 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
     if (opCtx.resumeEffects?.length) {
       runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
     }
+
+    // Render after targeted op completes for immediate visual feedback
+    adapter.render();
   }
   // If paused, orchestrator relinquishes control (no cleanup).
 }
@@ -80,11 +83,28 @@ export function confirmTargetsIfNeeded() {
 // Internal UI helper
 function showConfirmationButton(pending: any) {
   const onConfirm = () => {
+    const targetUids = pending.targetUids || [];
+
+    // Guard: only enforce minimum selectCount if explicitly flagged (e.g., Ralmia)
+    // Most selections (fuse, etc.) use selectCount as a soft max, not a required min
+    if (pending.enforceMinSelectCount) {
+      const requiredCount =
+        typeof pending.selectCount === "number" &&
+          Number.isFinite(pending.selectCount) &&
+          pending.selectCount > 0
+          ? pending.selectCount
+          : 1;
+
+      if (targetUids.length < requiredCount) {
+        console.warn(`[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`);
+        return; // Don't execute, keep selecting
+      }
+    }
+
     doAction(
       "Confirm Targets",
       () => {
         // Build UID-only opCtx
-        const targetUids = pending.targetUids || [];
         const opCtx: TargetedOpContext = {
           eff: pending.eff,
           owner: pending.owner,

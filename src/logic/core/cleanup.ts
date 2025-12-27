@@ -150,6 +150,8 @@ export function cleanupDead() {
         // Run LWs and then move to grave
         triggerLastWords(c, owner);
         c.zone = "graveyard";
+        // Reset cost modification when moving to graveyard (same as returning to hand)
+        c.cost_mod = 0;
         grave.push(c);
 
         // shadows

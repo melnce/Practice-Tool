@@ -82,21 +82,7 @@ export function applyTargetClick(
     }
   }
 
-  // 5. Toggle Selection (using UIDs)
-  const outcome = toggleSelectionUid(pending.targetUids, uid);
-
-  if (outcome === "removed") {
-    if (pending.requiresConfirmation) {
-      return { kind: "confirm_needed" };
-    }
-    return { kind: "continue" };
-  }
-
-  // 6. Check Completion
-  if (pending.requiresConfirmation) {
-    return { kind: "confirm_needed" };
-  }
-
+  // 5. Calculate required/max count first
   const requiredCount =
     typeof pending.selectCount === "number" &&
       Number.isFinite(pending.selectCount) &&
@@ -104,11 +90,44 @@ export function applyTargetClick(
       ? pending.selectCount
       : 1;
 
-  if (pending.targetUids.length < requiredCount) {
+  // 6. Guard: prevent adding more than max allowed (only if flag is set)
+  const alreadySelected = pending.targetUids.includes(uid);
+  if (pending.enforceMaxSelectCount && !alreadySelected && pending.targetUids.length >= requiredCount) {
+    // Already at max - can't add more (but could deselect)
+    return { kind: "invalid", reason: `Max ${requiredCount} selections reached` };
+  }
+
+  // 7. Toggle Selection (using UIDs)
+  const outcome = toggleSelectionUid(pending.targetUids, uid);
+
+  // 7. If removed a selection, continue or show updated confirm state
+  if (outcome === "removed") {
+    // Still need more selections
+    if (pending.targetUids.length < requiredCount) {
+      return { kind: "continue" };
+    }
+    // Have enough, show confirm if required
+    if (pending.requiresConfirmation) {
+      return { kind: "confirm_needed" };
+    }
     return { kind: "continue" };
   }
 
-  // 7. Complete & Auto-Execute
+  // 8. Check if we have enough selections
+  if (pending.targetUids.length < requiredCount) {
+    // Need more - show confirm button (for partial progress) or continue
+    if (pending.requiresConfirmation) {
+      return { kind: "confirm_needed" };
+    }
+    return { kind: "continue" };
+  }
+
+  // 9. We have enough selections - either confirm or auto-execute
+  if (pending.requiresConfirmation) {
+    return { kind: "confirm_needed" };
+  }
+
+  // 10. Complete & Auto-Execute
   return {
     kind: "execute",
     opCtx: {
