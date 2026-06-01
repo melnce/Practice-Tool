@@ -17,9 +17,9 @@ import { useRedBoost } from "../logic/boosts.js";
 import { state } from "../core/gameState.js";
 
 // Expose globals for UI onclick handlers
-(window as any).endTurnBlue = endTurnBlue;
-(window as any).endTurnRed = endTurnRed;
-(window as any).useRedBoost = useRedBoost;
+window.endTurnBlue = endTurnBlue;
+window.endTurnRed = endTurnRed;
+window.useRedBoost = useRedBoost;
 
 // Initialize Logic -> UI Adapter (wire ALL targeting UI functions)
 injectAdapter({
