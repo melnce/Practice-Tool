@@ -2,7 +2,7 @@
 
 ## Where to start
 
-- **New Card**: Add entry to specific set file in `cards/sets/`.
+- **New Card**: Add entry to the set file under `cards/sets/` (canonical source), then run `npm run cards:update` to regenerate `cards/all.json`.
 - **New Effect**: Check `src/logic/effects/ops/`. If operation (e.g., `banish`) exists, reuse it. If not, add new `.ts` file in `ops/`.
 - **Rule Change**: Modify `src/logic/core/turns.ts` or `src/logic/index.ts`.
 - **UI Bug**: Check `src/ui/render.ts` or `src/ui/zones.ts`.
@@ -66,3 +66,15 @@
 - **Test**: `npm test` (runs `vitest`).
 - **Type Check**: `npm run typecheck` (checks types without emitting).
 - **Replay**: `npm run replay:check` (deterministic shuffle + golden scenarios).
+- **Card data sync**: `npm run check:cards` (verifies `cards/all.json` matches merged `cards/sets/`).
+
+## Card data (canonical)
+
+| Path | Role |
+|---|---|
+| `cards/sets/*.json` | **Source of truth** — one file per expansion set. Edit here. |
+| `npm run cards:update` | Merges sets → `cards/all.json` + `cards/index.json`. |
+| `cards/all.json` | Generated runtime database (loaded by `src/data/cardDatabase.ts`). |
+| `npm run check:cards` | CI guard — fails if `all.json` / `index.json` drift from sets. |
+
+**Not used by the runtime:** `cards/card_sets/`, `cards/card_details.json`, and `cards/classes/` are alternate/legacy export layouts (see `.gitignore`). Do not edit them expecting the game to pick up changes — use `cards/sets/` instead.

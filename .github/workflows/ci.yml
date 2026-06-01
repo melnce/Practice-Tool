@@ -35,3 +35,6 @@ jobs:
 
       - name: Architecture Guardrails
         run: npm run check:arch
+
+      - name: Card Data Sync
+        run: npm run check:cards
