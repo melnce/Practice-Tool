@@ -2,9 +2,11 @@
 import { state } from "../core/gameState.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { adapter } from "../core/adapter.js";
-import { getCardDetails } from "./cardDatabase.js";
+import { getCardDetails, getGlobalCardIndex } from "./cardIndex.js";
 import { logEvent } from "../core/logger.js";
 import type { CardInstance } from "../core/types/index.js";
+import { expandDeckEntries } from "./deckExpand.js";
+import { findUnknownCards } from "./deckValidation.js";
 import type {
   FetchedDeck,
   RawDeck,
@@ -13,28 +15,11 @@ import type {
 import { isRawDeckObject } from "./rawDeck.js";
 
 function normalizeDeck(raw: RawDeck, deckFile?: string): RawDeckCardEntry[] {
-  const expanded: RawDeckCardEntry[] = [];
+  const expanded = expandDeckEntries(raw);
   const isOrdered = isRawDeckObject(raw) && !!raw.ordered;
-
-  // Testing decks: skip shuffle to preserve deterministic order
   const isTestDeck = deckFile?.toLowerCase().includes("0_testing");
 
-  if (Array.isArray(raw)) {
-    for (const item of raw) {
-      expanded.push(typeof item === "string" ? { name: item } : item);
-    }
-  } else if (raw.cards && Array.isArray(raw.cards)) {
-    for (const entry of raw.cards) {
-      const count = entry.count ?? 1;
-      for (let i = 0; i < count; i++) {
-        const { count: _omit, ...rest } = entry;
-        expanded.push(rest);
-      }
-    }
-  }
-
   if (isOrdered || isTestDeck) {
-    // We draw with deck.pop(), so reverse to make JSON[0] the first drawn.
     return expanded.reverse();
   }
 
@@ -42,7 +27,26 @@ function normalizeDeck(raw: RawDeck, deckFile?: string): RawDeckCardEntry[] {
   return expanded;
 }
 
+function assertDeckCardsResolvable(
+  raw: RawDeck,
+  deckFile: string,
+): void {
+  const index = getGlobalCardIndex();
+  if (!index) return;
+
+  const unknown = findUnknownCards(expandDeckEntries(raw), index);
+  const realUnknown = unknown.filter((c) => c !== "(empty entry)");
+  if (realUnknown.length === 0) return;
+
+  const deckId = deckFile.replace(/\.json$/i, "");
+  throw new Error(
+    `Deck "${deckId}": unknown card(s): ${realUnknown.join(", ")} (not in card database)`,
+  );
+}
+
 function enrichDeck(rawDeck: RawDeck, deckFile?: string): CardInstance[] {
+  assertDeckCardsResolvable(rawDeck, deckFile ?? "unknown");
+
   const deck = normalizeDeck(rawDeck, deckFile);
   return deck.map((card) => {
     const fullData =
@@ -69,7 +73,12 @@ async function fetchDeck(deckId: string): Promise<FetchedDeck> {
       `Deck not found at ${url} (server returned HTML — check the deck name and that decks/${file} exists)`,
     );
   }
-  const obj = (await res.json()) as RawDeck;
+  let obj: RawDeck;
+  try {
+    obj = (await res.json()) as RawDeck;
+  } catch {
+    throw new Error(`Deck "${file.replace(/\.json$/i, "")}": invalid JSON`);
+  }
   return Object.assign(obj as object, { __deckFile: file }) as FetchedDeck;
 }
 

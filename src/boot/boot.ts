@@ -15,6 +15,7 @@ import { injectAdapter } from "../core/adapter.js";
 import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
 import { useRedBoost } from "../logic/boosts.js";
 import { state } from "../core/gameState.js";
+import type { DeckManifest, DeckManifestEntry } from "../data/deckManifest.js";
 
 // Expose globals for UI onclick handlers
 window.endTurnBlue = endTurnBlue;
@@ -189,104 +190,73 @@ document.addEventListener(
   { capture: true },
 );
 
-function toLabel(file: string) {
-  return file
-    .replace(/^.*\//, "")
-    .replace(/\.json$/i, "")
-    .replace(/_deck$/i, "")
-    .replace(/_/g, " ");
+function appendDeckOption(select: HTMLElement, entry: DeckManifestEntry) {
+  const opt = document.createElement("option");
+  opt.value = entry.id;
+  opt.textContent = entry.label;
+  select.appendChild(opt);
 }
 
-async function listDeckFiles() {
-  // 1) Tracked index (works under Vite — no directory listing)
+function populateSelectFromManifest(select: HTMLElement, entries: DeckManifestEntry[]) {
+  select.innerHTML = "";
+
+  const decks = entries.filter((e) => e.category === "deck");
+  const tests = entries.filter((e) => e.category === "test");
+
+  if (decks.length > 0 && tests.length > 0) {
+    const deckGroup = document.createElement("optgroup");
+    deckGroup.label = "Decks";
+    for (const entry of decks) appendDeckOption(deckGroup, entry);
+
+    const testGroup = document.createElement("optgroup");
+    testGroup.label = "Test decks";
+    for (const entry of tests) appendDeckOption(testGroup, entry);
+
+    select.appendChild(deckGroup);
+    select.appendChild(testGroup);
+    return;
+  }
+
+  for (const entry of entries) appendDeckOption(select, entry);
+}
+
+async function listDeckEntries(): Promise<DeckManifestEntry[]> {
   try {
-    const r = await fetch("decks/index.json", { cache: "no-cache" });
+    const r = await fetch("decks/manifest.json", { cache: "no-cache" });
     if (r.ok) {
       const contentType = r.headers.get("content-type") || "";
       if (!contentType.includes("text/html")) {
-        const arr = await r.json();
-        if (Array.isArray(arr) && arr.length) {
-          return [
-            ...new Set(
-              arr.map((x) =>
-                String(x)
-                  .replace(/^decks\//, "")
-                  .split("/")
-                  .pop(),
-              ),
-            ),
-          ];
+        const manifest = (await r.json()) as DeckManifest;
+        if (Array.isArray(manifest.entries) && manifest.entries.length) {
+          return manifest.entries;
         }
       }
     }
   } catch {
     /* ignore */
   }
-  // 2) Directory listing HTML (Live Server / nginx autoindex)
-  try {
-    const r = await fetch("decks/", { cache: "no-cache" });
-    if (r.ok) {
-      const contentType = r.headers.get("content-type") || "";
-      if (contentType.includes("text/html") && !contentType.includes("json")) {
-        const html = await r.text();
-        const files = [...html.matchAll(/href="([^"]+\.json)"/gi)]
-          .map((m) => m[1])
-          .filter((name): name is string => name !== undefined)
-          .map((name) => decodeURIComponent(name))
-          .map((name) => name.split("/").pop())
-          .filter(
-            (name): name is string =>
-              !!name &&
-              !/manifest\.json$/i.test(name) &&
-              !/index\.json$/i.test(name) &&
-              !/decks_index\.json$/i.test(name),
-          );
-        if (files.length) return [...new Set(files)];
-      }
-    }
-  } catch {
-    /* ignore */
-  }
-  // 3) Legacy decks_index.json
-  try {
-    const r = await fetch("decks/decks_index.json", { cache: "no-cache" });
-    if (r.ok) {
-      const arr = await r.json();
-      if (Array.isArray(arr) && arr.length) {
-        return [
-          ...new Set(
-            arr.map((x) =>
-              String(x)
-                .replace(/^decks\//, "")
-                .split("/")
-                .pop(),
-            ),
-          ),
-        ];
-      }
-    }
-  } catch {
-    /* ignore */
-  }
-  return ["starter_deck.json"];
+
+  console.warn(
+    "[Decks] decks/manifest.json missing — run npm run decks:discover (or npm run dev, which runs it automatically)",
+  );
+  return [
+    {
+      file: "starter_deck.json",
+      id: "starter_deck",
+      label: "Starter",
+      category: "deck",
+    },
+  ];
 }
 
 async function populateDeckSelects() {
-  const files = await listDeckFiles(); // array of filenames like "Sword_Midrange_deck.json"
+  const entries = await listDeckEntries();
   const blue = document.getElementById("blueDeckSelect");
   const red = document.getElementById("redDeckSelect");
   if (!blue || !red) return;
 
-  for (const el of [blue, red]) {
-    el.innerHTML = "";
-    for (const f of files) {
-      if (!f) continue;
-      const opt = document.createElement("option");
-      opt.value = f.replace(/\.json$/i, ""); // loader tolerates base or full
-      opt.textContent = toLabel(f);
-      el.appendChild(opt);
-    }
-  }
+  populateSelectFromManifest(blue, entries);
+  populateSelectFromManifest(red, entries);
 }
 
 window.addEventListener("DOMContentLoaded", populateDeckSelects);
