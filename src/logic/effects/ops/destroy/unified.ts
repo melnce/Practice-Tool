@@ -13,6 +13,9 @@ import type { UnifiedDestroySpec, DestroyContext } from "./types.js";
 
 import { normalizeToUnifiedSpec } from "./types.js";
 import { destroyTarget, getBoard } from "./primitives.js";
+import { resolveContextCard } from "../../../core/triggers/resolve.js";
+import type { TriggerContext } from "../../../core/triggers/types.js";
+import { isDamaged } from "../../../core/combat/damageState.js";
 // ============================================================================
 // CONTEXT VARIABLE HELPERS
 // ============================================================================
@@ -270,19 +273,20 @@ function handleSpecialScope(
       destroyed = destroyAlliedAmulets(owner);
       break;
 
-    case "defender":
-      if (ctx.defender) {
-        // Check only_if_damaged
-        if (spec.only_if_damaged) {
-          const def = ctx.defender as any;
-          const current = parseInt(String(def.defense), 10) || 0;
-          const peak = def.peak_defense ?? def.base_defense ?? current;
-          if (current >= peak) break; // Not damaged
+    case "defender": {
+      const triggerCtx = ctx as DestroyContext & TriggerContext;
+      const defender =
+        ctx.defender ?? resolveContextCard(triggerCtx, "defender") ?? null;
+
+      if (defender) {
+        if (spec.only_if_damaged && !isDamaged(defender)) {
+          break;
         }
-        if (destroyTarget(ctx.defender, owner, "defender")) destroyed++;
+        if (destroyTarget(defender, owner, "defender")) destroyed++;
         cleanupDead();
       }
       break;
+    }
   }
 
   runThenEffects(spec, destroyed, owner, effectsQueue, ctx);

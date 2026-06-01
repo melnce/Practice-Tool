@@ -139,7 +139,8 @@ export function normalizeToUnifiedSpec(
     condition: eff.condition || null,
     then_effects: [],
     exclude: [],
-    only_if_damaged: false,
+    only_if_damaged:
+      eff.only_if_damaged === true || eff.only_if_damaged === "true" || eff.only_if_damaged === 1,
     store_count_as:
       typeof eff.store_count_as === "string" ? eff.store_count_as : null,
   };
