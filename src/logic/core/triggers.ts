@@ -1,4 +1,5 @@
 import { state } from "../../core/gameState.js";
+import { isUidEnrichDisabled } from "../../core/env.js";
 import type { Player } from "../../core/types/index.js";
 import type { TriggerContext, TriggerEventName } from "./triggers/types.js";
 import { dispatchEvent } from "./triggers/dispatcher.js";
@@ -71,7 +72,7 @@ export function fireTrigger(
   try {
     // P0-2 FIX: Enrich context with UIDs for deterministic serialization
     // PERF: Skip enrichment when DISABLE_UID_ENRICH is set (benchmarks/training)
-    if (process.env.DISABLE_UID_ENRICH !== "1") {
+    if (!isUidEnrichDisabled()) {
       enrichContextWithUids(context);
     }
 

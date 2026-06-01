@@ -4,6 +4,7 @@ import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 import type { GameState } from "./types/index.js";
 import { validateGameState } from "./stateValidation.js";
+import { isHistoryDisabled } from "./env.js";
 import type { ReplayStep } from "./stateHash.js";
 import { hashGameState } from "./stateHash.js";
 // --- Config ---
@@ -25,7 +26,7 @@ export function isHistoryEnabled(): boolean {
 }
 
 // Check env var at module load (for benchmarks)
-if (typeof process !== "undefined" && process.env?.DISABLE_HISTORY === "1") {
+if (isHistoryDisabled()) {
   _historyEnabled = false;
 }
 

@@ -4,13 +4,11 @@
  * DO NOT add new bypasses. DO NOT add lifecycle logic to handlers.
  * Refer to docs/targeting-contract.md before making changes.
  */
+import { isDev } from "../../../core/env.js";
+
 const ALLOWED_BYPASS_OPS = new Set(["nested_effects", "safe_but_nested"]);
 let _currentOp: string | null = null;
 let _isTargetedOpDispatchActive = false;
-
-// Environment check helper
-const isDev = () =>
-  typeof process !== "undefined" && process?.env?.NODE_ENV !== "production";
 
 /**
  * Marks the start of a targeted operation dispatch.
