@@ -27,3 +27,25 @@ Thumbs.db
 !.vscode/settings.json
 !.vscode/extensions.json
 reports/
+
+# ── Legacy / alternate layouts (hand-maintained; not used by runtime) ──
+cards/card_sets/
+cards/card_details.json
+cards/classes/
+cards/seperate_sets.py
+cards/seperate_classes.py
+
+# ── Legacy pre-src codebase (may be reused for AI/bots work) ──
+/main.js
+/gameLogic.js
+/gamelogic/
+/ai/
+/bots/
+/cardDatabase.js
+/deckLoader.js
+/logger.js
+/rng.js
+/history.js
+/utils.js
+/scripts/node-fetch-shim.mjs
+/scripts/run-selfplay.mjs
