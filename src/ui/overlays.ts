@@ -17,10 +17,11 @@ export function applyKeywordOverlays(
   }
 
   const addIcon = (src: string, extraClass: string) => {
+    if (!stack) return;
     const img = document.createElement("img");
     img.src = src;
     img.className = `keyword-icon ${extraClass || ""}`;
-    stack!.appendChild(img);
+    stack.appendChild(img);
   };
 
   if (isBoard && card.hasWard) {
@@ -128,12 +129,12 @@ export function applyBarrierOverlay(div: HTMLElement, card: CardInstance) {
   if (card.__uiFlashBarrier) {
     wrap.classList.add("barrier-flash");
     delete card.__uiFlashBarrier;
-    setTimeout(() => wrap!.classList.remove("barrier-flash"), 250);
+    setTimeout(() => wrap.classList.remove("barrier-flash"), 250);
   }
   if (card.__uiPopBarrier) {
     wrap.classList.add("barrier-pop");
     delete card.__uiPopBarrier;
-    setTimeout(() => wrap!.classList.remove("barrier-pop"), 350);
+    setTimeout(() => wrap.classList.remove("barrier-pop"), 350);
   }
 }
 

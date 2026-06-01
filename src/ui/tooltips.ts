@@ -191,7 +191,7 @@ export function attachTooltip(
                 ? state.players.second.rally | 0
                 : 0;
           if (curr !== lastRally) {
-            rallyValue!.textContent =
+            rallyValue.textContent =
               rNeed != null ? `${curr} / ${rNeed}` : `${curr}`;
             lastRally = curr;
           }
@@ -202,7 +202,7 @@ export function attachTooltip(
           const witnesses = card.skyboundArtEvolvesWitnessed || 0;
           const curr = (state.roundCount || 1) + witnesses;
           if (curr !== lastSkybound) {
-            skyboundValue!.textContent = `${curr} / ${sReq}`;
+            skyboundValue.textContent = `${curr} / ${sReq}`;
             lastSkybound = curr;
           }
         }
