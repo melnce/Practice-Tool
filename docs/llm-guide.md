@@ -17,23 +17,21 @@
 
 ### Engine API
 
-### Engine API
-
 - `startNewGame(options: StartGameOptions)`: Resets game. Options:
-  - `deckAId` (string): Filename for Blue deck (e.g. "sample_blue").
-  - `deckBId` (string): Filename for Red deck.
-  - `seed?` (number): Optional generic seed for RNG determinism.
+  - `deckAId` (string): Deck filename without path (e.g. `"starter_deck"`).
+  - `deckBId` (string): Deck filename without path.
+  - `seed` (number | string): **Required** for determinism. Browser entry (`boot.ts`) generates one when the seed field is empty.
   ```typescript
   await startNewGame({
-    deckAId: "sample_blue",
-    deckBId: "sample_red",
+    deckAId: "starter_deck",
+    deckBId: "starter_deck",
     seed: 12345,
   });
   ```
 - `dispatch(state, action)`: Mutates state. Use `PlayerAction` types.
-  - `PLAY_CARD`: Play a card from hand. `{ type: "PLAY_CARD", player: "blue", cardUid: "..." }`
-  - `ATTACK`: Attack a target. `{ type: "ATTACK", player: "blue", attackerUid: "...", defender: { type: "card", uid: "..." } }`
-  - `CHOOSE_TARGET`: Select a target for pending effect. `{ type: "CHOOSE_TARGET", player: "blue", target: { type: "card", uid: "..." } }`
+  - `PLAY_CARD`: Play a card from hand. `{ type: "PLAY_CARD", player: "first", cardUid: "..." }`
+  - `ATTACK`: Attack a target. `{ type: "ATTACK", player: "first", attackerUid: "...", defender: { type: "card", uid: "..." } }`
+  - `CHOOSE_TARGET`: Select a target for pending effect. `{ type: "CHOOSE_TARGET", player: "first", target: { type: "card", uid: "..." } }`
 - `getState()`: Returns current state (Read-Only).
 - **Do not mutate state directly** in UI or Boot.
 - **Invariants**: `dispatch` enforces GameState validity in dev/test (throws errors if state is corrupted).
@@ -46,9 +44,8 @@
 ### DO NOT
 
 - **Do NOT edit `node_modules/`**.
-- **Do NOT touch `dist/`**. It is generated.
 - **Do NOT import DOM types** in `src/core/` or `src/logic/` (keep logic pure).
-- **Do NOT introduce path aliases** in `tsconfig.json`. Use strict relative paths.
+- **Do NOT introduce path aliases** in `tsconfig.json`. Use strict relative paths (Vite/vitest may use aliases for convenience; source imports stay relative).
 
 ## Invariants
 
@@ -60,11 +57,12 @@
 
 1.  Read `src/engine.ts` to understand available actions.
 2.  Make changes in `src/`.
-3.  Run `npm run build`.
+3.  Run `npm run dev` and open `http://localhost:5173/` (Vite serves `index.html` + transforms `src/`).
 4.  Run `npm test`.
 
 ## Commands
 
-- **Build**: `npm run build` (runs `tsc`).
+- **Dev Server**: `npm run dev` (starts Vite with HMR).
 - **Test**: `npm test` (runs `vitest`).
-- **Serve**: Use a static server (e.g., Live Server) on the root directory. Open `http://localhost:5500/dist/`.
+- **Type Check**: `npm run typecheck` (checks types without emitting).
+- **Replay**: `npm run replay:check` (deterministic shuffle + golden scenarios).
