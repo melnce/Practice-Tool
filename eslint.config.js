@@ -101,6 +101,23 @@ export default defineConfig([
   },
 
   // ---------------------------------------------------------------------------
+  // Browser-reachable src: never use Node `process` (not defined in browser)
+  // ---------------------------------------------------------------------------
+  {
+    files: ["src/**/*.ts"],
+    rules: {
+      "no-restricted-globals": [
+        "error",
+        {
+          name: "process",
+          message:
+            "Use src/core/env.ts (readEnv, isDev, etc.) instead of the Node process global.",
+        },
+      ],
+    },
+  },
+
+  // ---------------------------------------------------------------------------
   // Scripts and Tools overrides (CLI environment)
   // ---------------------------------------------------------------------------
   {
