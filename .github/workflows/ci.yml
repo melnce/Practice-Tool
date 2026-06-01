@@ -38,3 +38,6 @@ jobs:
 
       - name: Card Data Sync
         run: npm run check:cards
+
+      - name: Deck Validation
+        run: npm run check:decks

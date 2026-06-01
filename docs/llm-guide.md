@@ -78,3 +78,13 @@
 | `npm run check:cards` | CI guard — fails if `all.json` / `index.json` drift from sets. |
 
 **Not used by the runtime:** `cards/card_sets/`, `cards/card_details.json`, and `cards/classes/` are alternate/legacy export layouts (see `.gitignore`). Do not edit them expecting the game to pick up changes — use `cards/sets/` instead.
+
+## Deck files (canonical)
+
+| Path | Role |
+|---|---|
+| `decks/*.json` | Deck lists (most are gitignored locally; `starter_deck.json` is tracked). |
+| `npm run decks:discover` | Scans `decks/*.json` and writes `decks/manifest.json` for the UI dropdown (runs automatically on `npm run dev` / `npm run build`). |
+| `npm run check:decks` | Validates every discovered deck parses cleanly and every card resolves against `cards/all.json`. |
+
+Excluded from discovery: `index.json`, `all_cards.json`, `manifest.json`. Files matching `0_testing_*` appear under a **Test decks** optgroup in the UI.
