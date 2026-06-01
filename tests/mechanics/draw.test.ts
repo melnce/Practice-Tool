@@ -9,7 +9,7 @@
  * - Deck size decreases by draw count
  * - Named tokens are created in hand with correct properties
  * - Drawing doesn't affect opponent
- * - Empty deck handling
+ * - Empty deck: no card drawn, no HP change, drawing player defeated on draw attempt
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -21,6 +21,7 @@ import {
     resetUidCounter,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
+import { isPlayerDefeated } from "../../src/core/playerHelpers.js";
 
 describe("Mechanic Contract: draw", () => {
     beforeEach(() => {
@@ -113,18 +114,20 @@ describe("Mechanic Contract: draw", () => {
             expect(state.players.first.deck.length).toBe(0);
         });
 
-        it("drawing from empty deck draws nothing", () => {
+        it("drawing from empty deck draws nothing and defeats the drawing player", () => {
             givenGameState({ seed: 1 }).build();
-            // Deck is empty by default
+            const hpBefore = state.players.first.hp;
 
             const effect = {
                 op: "draw" as const,
                 source: "deck",
-                count: 3,
+                count: 1,
             };
             whenRunEffects([effect], "first");
 
             expect(thenHand("first").length).toBe(0);
+            expect(state.players.first.hp).toBe(hpBefore);
+            expect(isPlayerDefeated(state, "first")).toBe(true);
         });
 
         it("draw does NOT affect opponent's hand", () => {

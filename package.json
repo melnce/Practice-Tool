@@ -15,7 +15,7 @@
     "lint": "eslint . --cache --cache-location .cache/eslint",
     "lint:fix": "eslint . --fix --cache --cache-location .cache/eslint",
     "typecheck": "tsc --noEmit",
-    "build": "tsc",
+    "build": "vite build",
     "check:boundaries": "npx tsx scripts/check-boundaries.ts && npx tsx scripts/check-triggers.ts",
     "check:arch": "npx tsx scripts/check-architecture.ts",
     "test": "vitest run -c vitest.config.ts",
@@ -31,12 +31,15 @@
     "check:fast": "npm run format:check && npm run lint && npm run typecheck && npm run test:dev",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run check:boundaries && npm run check:arch && npm run test && npm run replay:check",
     "check:deep": "npm run check && npm run test:all",
-    "ci": "npm run check"
+    "ci": "npm run check",
+    "dev": "vite",
+    "preview": "vite preview"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "vite": "^6.3.5",
     "@eslint/js": "^9.39.2",
     "@types/node": "^25.0.1",
     "dotenv": "^17.2.3",

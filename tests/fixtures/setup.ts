@@ -58,45 +58,62 @@ if (typeof window === "undefined") {
   const fs = await import("fs");
   const path = await import("path");
 
+  const MIME: Record<string, string> = {
+    ".json": "application/json",
+    ".html": "text/html",
+    ".css": "text/css",
+  };
+
+  function mockResponse(
+    ok: boolean,
+    body: string,
+    filePath?: string,
+    status = ok ? 200 : 404,
+  ) {
+    const ext = filePath ? path.extname(filePath).toLowerCase() : ".json";
+    const contentType = MIME[ext] ?? "application/octet-stream";
+    return {
+      ok,
+      status,
+      statusText: ok ? "OK" : "Not Found",
+      headers: {
+        get(name: string) {
+          if (name.toLowerCase() === "content-type") return contentType;
+          return null;
+        },
+      },
+      text: async () => body,
+      json: async () => JSON.parse(body),
+    };
+  }
+
   (global as any).fetch = async (url: string) => {
-    // Handle /decks/... or /all_cards.json
-    // Map URL path to local project root
-
-    let valid = false;
-    let filePath = "";
-
     const cleanUrl = url
       .split("?")[0]
       .replace(/^[./]+/, "")
       .replace(/^\//, "");
 
-    // Try resolving relative to CWD (Project Root)
     const potentialPath = path.resolve(process.cwd(), cleanUrl);
 
-    if (fs.existsSync(potentialPath)) {
-      filePath = potentialPath;
-      valid = true;
+    if (fs.existsSync(potentialPath) && fs.statSync(potentialPath).isFile()) {
+      const content = fs.readFileSync(potentialPath, "utf-8");
+      return mockResponse(true, content, potentialPath);
     }
 
-    if (!valid) {
-      // Fallback for missing decks
-      if (url.includes("sample_blue") || url.includes("sample_red")) {
-        return {
-          ok: true,
-          json: async () => ({
-            cards: [{ name: "Goblin", count: 40 }],
-          }),
-        };
-      }
-      console.warn(`Mock fetch 404: ${url} -> ${potentialPath}`);
-      return { ok: false, status: 404, statusText: "Not Found" };
+    // Fallback stub decks for integration tests
+    if (
+      url.includes("sample_blue") ||
+      url.includes("sample_red") ||
+      url.includes("starter_deck")
+    ) {
+      const stub = JSON.stringify({
+        cards: [{ name: "Goblin", count: 40 }],
+      });
+      return mockResponse(true, stub, "stub.json");
     }
 
-    const content = fs.readFileSync(filePath, "utf-8");
-    return {
-      ok: true,
-      json: async () => JSON.parse(content),
-    };
+    console.warn(`Mock fetch 404: ${url} -> ${potentialPath}`);
+    return mockResponse(false, "", undefined, 404);
   };
 }
 

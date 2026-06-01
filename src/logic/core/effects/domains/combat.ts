@@ -75,6 +75,25 @@ export function registerCombatEffects() {
         handleRestore(eff, ctx.owner, ctx.queue, restoreCtx);
     });
 
+    // Legacy shim — heal_leader → restore ally:leader (card JSON uses "restore")
+    registerOp("heal_leader", (eff, ctx) => {
+        const restoreCtx = {
+            ...((ctx.context as object) || {}),
+            sourceCard: ctx.sourceCard,
+            owner: ctx.owner,
+        };
+        handleRestore(
+            {
+                op: "restore",
+                target: "ally:leader",
+                amount: (eff as any).amount ?? 0,
+            } as any,
+            ctx.owner,
+            ctx.queue,
+            restoreCtx,
+        );
+    });
+
     // ========================================================================
     // REMOVED: clash_damage
     // Now handled by unified damage op with target: "clash_opponent"

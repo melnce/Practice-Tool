@@ -160,6 +160,7 @@ export function confirmMulligan(owner: Player) {
 
 function startFirstTurn() {
   logEvent("startFirstTurn", { active: "first" });
+  state.turnNumber = 1;
   // First player draws 1 as the first turn draw
   const firstHand = getHand(state, "first");
   const firstDeck = getDeck(state, "first");

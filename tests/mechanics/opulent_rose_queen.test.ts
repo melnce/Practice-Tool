@@ -1,5 +1,6 @@
 /**
  * @file Regression Test: Opulent Rose Queen
+ * UNVERIFIED — owner to audit card-text correctness post-overhaul.
  * Tests the transform filter cost_lte functionality.
  */
 

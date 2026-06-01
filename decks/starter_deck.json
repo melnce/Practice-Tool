@@ -1,0 +1,21 @@
+{
+  "class": "Neutral",
+  "deckName": "Starter",
+  "size": 40,
+  "cards": [
+    { "name": "Marsh Wyrmling", "count": 3 },
+    { "name": "Scaled Lurker", "count": 3 },
+    { "name": "Dune Scorpion", "count": 3 },
+    { "name": "Mountain Behemoth", "count": 3 },
+    { "name": "Cliff Stalker", "count": 3 },
+    { "name": "Primal Gorger", "count": 3 },
+    { "name": "Shade Howler", "count": 3 },
+    { "name": "Ridgewatch Sentinel", "count": 3 },
+    { "name": "Stone Colossus", "count": 3 },
+    { "name": "Sandskitter Scorpion", "count": 3 },
+    { "name": "Fen Devourer", "count": 3 },
+    { "name": "Ledge Warden", "count": 3 },
+    { "name": "Cursed Idol", "count": 2 },
+    { "name": "Ravine Shade", "count": 2 }
+  ]
+}

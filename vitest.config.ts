@@ -1,31 +1,42 @@
 import path from "path";
 import { fileURLToPath } from "url";
-import { defineConfig } from "vitest/config";
+import { defineConfig, mergeConfig } from "vitest/config";
+import viteConfig from "./vite.config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export default defineConfig({
-  test: {
-    environment: "node",
-    include: [
-      // Trusted test suites only
-      "tests/invariants/**/*.test.ts",
-      "tests/mechanics/**/*.test.ts",
-      "tests/integration/**/*.test.ts",
-      "tests/unit/**/*.test.ts", // Remaining unit tests (non-card expectation)
-    ],
-    exclude: [
-      // Quarantined test suites
-      "tests/legacy/**",
-      "tests/_dev/**",
-      "tests/regression/**",
-      "tests/golden/**", // Golden tests may be stale
-      "tests/scenarios/**",
-      "tests/specs/**",
-      "tests/manual/**",
-    ],
-    setupFiles: ["./tests/fixtures/setup.ts"],
-  },
-  resolve: {},
-});
+export default mergeConfig(
+  viteConfig,
+  defineConfig({
+    test: {
+      environment: "node",
+      include: [
+        "tests/invariants/**/*.test.ts",
+        "tests/mechanics/**/*.test.ts",
+        "tests/integration/**/*.test.ts",
+        "tests/unit/**/*.test.ts",
+      ],
+      exclude: [
+        "tests/legacy/**",
+        "tests/_dev/**",
+        "tests/regression/**",
+        "tests/golden/**",
+        "tests/scenarios/**",
+        "tests/specs/**",
+        "tests/manual/**",
+      ],
+      setupFiles: ["./tests/fixtures/setup.ts"],
+    },
+    resolve: {
+      alias: {
+        "@core": path.resolve(__dirname, "src/core"),
+        "@data": path.resolve(__dirname, "src/data"),
+        "@logic": path.resolve(__dirname, "src/logic"),
+        "@ui": path.resolve(__dirname, "src/ui"),
+        "@helpers": path.resolve(__dirname, "src/helpers"),
+        "@ops": path.resolve(__dirname, "src/logic/effects/ops"),
+      },
+    },
+  }),
+);

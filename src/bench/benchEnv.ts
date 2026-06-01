@@ -374,7 +374,12 @@ function applyActionCore(action: BenchAction): void {
  * Check if the game is in a terminal state (either player HP <= 0).
  */
 export function isTerminal(): boolean {
-    return getHP(state, "first") <= 0 || getHP(state, "second") <= 0;
+    return (
+        getHP(state, "first") <= 0 ||
+        getHP(state, "second") <= 0 ||
+        state.players.first.defeated ||
+        state.players.second.defeated
+    );
 }
 
 /**

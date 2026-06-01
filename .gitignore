@@ -1,5 +1,7 @@
 # Personal data / notes (do not track)
-decks/
+decks/*
+!decks/index.json
+!decks/starter_deck.json
 game_rules/
 
 # Node dependencies

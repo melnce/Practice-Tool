@@ -5,7 +5,8 @@
  *
  * COVERAGE:
  * - boost_skybound_art_hand
- * - set_deckout_victory 
+ * - set_deckout_victory
+ * - deckout loss on forced draw (owner-confirmed rule)
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -17,6 +18,8 @@ import {
     resetUidCounter,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
+import { drawCard } from "../../src/core/utils.js";
+import { isPlayerDefeated, getWinner } from "../../src/core/playerHelpers.js";
 
 describe("Mechanic Contract: special", () => {
     beforeEach(() => {
@@ -99,6 +102,57 @@ describe("Mechanic Contract: special", () => {
 
             expect(state.players.first.deckoutWins).toBe(true);
             expect(state.players.second.deckoutWins).toBeFalsy();
+        });
+    });
+
+    // ===========================================================================
+    // DECKOUT LOSS (owner-confirmed: loss on draw attempt, not on empty deck alone)
+    // ===========================================================================
+
+    describe("deckout loss condition", () => {
+        it("emptying the deck alone does not cause a loss", () => {
+            givenGameState({ seed: 1 }).build();
+            state.players.first.deck.length = 0;
+            state.players.first.hp = 20;
+
+            expect(state.players.first.hp).toBe(20);
+        });
+
+        it("draw attempt on empty deck is instant loss for that player", () => {
+            givenGameState({ seed: 1 }).build();
+            state.players.first.deck.length = 0;
+            state.players.first.hand.length = 0;
+            state.players.first.hp = 20;
+
+            drawCard(state.players.first.hand, state.players.first.deck, "first");
+
+            expect(isPlayerDefeated(state, "first")).toBe(true);
+            expect(state.players.first.hp).toBe(20);
+        });
+
+        it("draw attempt on empty deck does not defeat opponent by default", () => {
+            givenGameState({ seed: 1 }).build();
+            state.players.first.deck.length = 0;
+            state.players.second.hp = 20;
+
+            drawCard(state.players.first.hand, state.players.first.deck, "first");
+
+            expect(isPlayerDefeated(state, "second")).toBe(false);
+            expect(state.players.second.hp).toBe(20);
+        });
+
+        it("deckout declares the other player as winner while decked-out HP stays unchanged", () => {
+            givenGameState({ seed: 1 }).build();
+            state.players.first.deck.length = 0;
+            state.players.first.hp = 20;
+            state.players.second.hp = 18;
+
+            drawCard(state.players.first.hand, state.players.first.deck, "first");
+
+            expect(isPlayerDefeated(state, "first")).toBe(true);
+            expect(state.players.first.hp).toBe(20);
+            expect(getWinner(state)).toBe("second");
+            expect(isPlayerDefeated(state, "second")).toBe(false);
         });
     });
 });

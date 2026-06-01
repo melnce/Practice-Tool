@@ -7,6 +7,7 @@ import type { Effect } from "../../../../core/types/index.js";
  */
 export type EvolveTarget =
   | "self" // Source card
+  | "played_card" // Card being played (alias for self during fanfare/spell)
   | "selected" // Player-selected target (from context)
   | "last_summoned" // Cards in state.lastSummoned
   | "all_allies" // All allied unevolved followers

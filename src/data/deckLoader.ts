@@ -59,6 +59,12 @@ async function fetchDeck(deckId: string) {
   const url = `${root}decks/${file}`;
   const res = await fetch(url, { cache: "no-cache" });
   if (!res.ok) throw new Error(`Deck not found at ${url}`);
+  const contentType = res.headers.get("content-type") || "";
+  if (contentType.includes("text/html")) {
+    throw new Error(
+      `Deck not found at ${url} (server returned HTML — check the deck name and that decks/${file} exists)`,
+    );
+  }
   const obj = await res.json();
   obj.__deckFile = file; // keep filename for later checks
   return obj;

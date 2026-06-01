@@ -66,5 +66,6 @@ export function createPlayerState(isSecond: boolean = false): PlayerState {
         totalCardsDrawn: 0,
         followersDestroyed: 0,
         deckoutWins: false,
+        defeated: false,
     };
 }

@@ -3,6 +3,9 @@
  *
  * DESIGN: Tests the keyword operation with rigorous edge cases.
  *
+ * NOTE (shallow coverage): Grant/remove tests assert flag fields on board cards,
+ * not combat behavior (Storm attack rules, Ward blocking, etc.). Deepen later.
+ *
  * INVARIANTS UNDER TEST:
  * - Keywords are correctly added
  * - Keywords are correctly removed

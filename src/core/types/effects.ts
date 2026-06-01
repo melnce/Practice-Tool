@@ -65,7 +65,7 @@ export interface BanishEffect extends BaseEffect {
     target?: string;
 }
 
-export type RestoreOps = Extract<EffectOp, "restore">;
+export type RestoreOps = Extract<EffectOp, "restore" | "heal_leader">;
 export interface RestoreEffect extends BaseEffect {
     op: RestoreOps;
     amount?: number | string;
@@ -331,8 +331,11 @@ export interface MiscEffect extends BaseEffect {
     unique?: boolean;
 }
 
-/** Unified evolve op */
-export type EvolveOps = Extract<EffectOp, "evolve">;
+/** Unified evolve op (+ legacy self-evolve shims) */
+export type EvolveOps = Extract<
+  EffectOp,
+  "evolve" | "evolve_self" | "super_evolve_self"
+>;
 export interface EvolveEffect extends BaseEffect {
     op: EvolveOps;
     name?: string;

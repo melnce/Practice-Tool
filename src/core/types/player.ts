@@ -94,6 +94,7 @@ export interface PlayerState {
     totalCardsDrawn: number;
     followersDestroyed: number; // Enemy followers this player killed
     deckoutWins: boolean; // If true, this player wins on deckout
+    defeated: boolean; // Set when the player loses (e.g. deckout); distinct from HP damage
 
     // === Deck Metadata ===
     deckFile?: string; // Original deck file path

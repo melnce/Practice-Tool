@@ -3,6 +3,10 @@
  *
  * DESIGN: Tests EVERY keyword in the registry.
  *
+ * NOTE (shallow coverage): Combat-keyword tests below assert flag presence only
+ * (e.g. hasStorm === true), not in-game behavior (can attack leader turn 1, etc.).
+ * Behavioral keyword tests are deferred to a later pass.
+ *
  * KEYWORDS COVERED (29 total):
  * - rush, storm, ward, bane, drain, ambush, barrier (combat)
  * - intimidate, aura (special combat)

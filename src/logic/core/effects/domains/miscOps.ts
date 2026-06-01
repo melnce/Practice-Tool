@@ -4,6 +4,9 @@ export const MISC_OPS = [
   "mode_bonus",
   // Unified evolve - replaces 8 legacy evolve_* ops
   "evolve",
+  // Legacy shims (delegate to unified evolve) — card JSON uses "evolve"; tests/old data may use these
+  "evolve_self",
+  "super_evolve_self",
 
   // Unified gate - replaces 17 legacy *_gate ops
   "gate",

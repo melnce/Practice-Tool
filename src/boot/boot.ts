@@ -41,10 +41,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const seedInput = document.getElementById("seedInput") as HTMLInputElement;
 
     // Default or read value
-    const deckAId = blueSelect?.value || "sample_blue";
-    const deckBId = redSelect?.value || "sample_red";
+    const deckAId = blueSelect?.value || "starter_deck";
+    const deckBId = redSelect?.value || "starter_deck";
 
-    // Parse seed - default to 0 for reproducibility
+    // Empty seed → generate one so games stay reproducible once surfaced to the user
     let seed: number;
     if (
       seedInput &&
@@ -53,7 +53,9 @@ window.addEventListener("DOMContentLoaded", () => {
     ) {
       seed = Number(seedInput.value);
     } else {
-      seed = 0;
+      seed = Date.now();
+      if (seedInput) seedInput.value = String(seed);
+      console.log(`[RNG] Generated seed: ${seed}`);
     }
 
     await engine.startNewGame({ deckAId, deckBId, seed });
@@ -192,28 +194,56 @@ function toLabel(file: string) {
 }
 
 async function listDeckFiles() {
-  // 1) Preferred: parse directory listing HTML (works on Live Server/Express/nginx autoindex)
+  // 1) Tracked index (works under Vite — no directory listing)
   try {
-    const r = await fetch("decks/", { cache: "no-cache" });
+    const r = await fetch("decks/index.json", { cache: "no-cache" });
     if (r.ok) {
-      const html = await r.text();
-      const files = [...html.matchAll(/href="([^"]+\.json)"/gi)]
-        .map((m) => m[1])
-        .filter((name): name is string => name !== undefined)
-        .map((name) => decodeURIComponent(name))
-        .map((name) => name.split("/").pop()) // keep only filename
-        .filter(
-          (name): name is string =>
-            !!name &&
-            !/manifest\.json$/i.test(name) &&
-            !/decks_index\.json$/i.test(name),
-        );
-      if (files.length) return [...new Set(files)];
+      const contentType = r.headers.get("content-type") || "";
+      if (!contentType.includes("text/html")) {
+        const arr = await r.json();
+        if (Array.isArray(arr) && arr.length) {
+          return [
+            ...new Set(
+              arr.map((x) =>
+                String(x)
+                  .replace(/^decks\//, "")
+                  .split("/")
+                  .pop(),
+              ),
+            ),
+          ];
+        }
+      }
     }
   } catch {
     /* ignore */
   }
-  // 2) Fallback: decks_index.json (if your deckbuilder created it)
+  // 2) Directory listing HTML (Live Server / nginx autoindex)
+  try {
+    const r = await fetch("decks/", { cache: "no-cache" });
+    if (r.ok) {
+      const contentType = r.headers.get("content-type") || "";
+      if (contentType.includes("text/html") && !contentType.includes("json")) {
+        const html = await r.text();
+        const files = [...html.matchAll(/href="([^"]+\.json)"/gi)]
+          .map((m) => m[1])
+          .filter((name): name is string => name !== undefined)
+          .map((name) => decodeURIComponent(name))
+          .map((name) => name.split("/").pop())
+          .filter(
+            (name): name is string =>
+              !!name &&
+              !/manifest\.json$/i.test(name) &&
+              !/index\.json$/i.test(name) &&
+              !/decks_index\.json$/i.test(name),
+          );
+        if (files.length) return [...new Set(files)];
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  // 3) Legacy decks_index.json
   try {
     const r = await fetch("decks/decks_index.json", { cache: "no-cache" });
     if (r.ok) {
@@ -234,8 +264,7 @@ async function listDeckFiles() {
   } catch {
     /* ignore */
   }
-  // 3) Last resort: still show example so UI works
-  return ["example_deck.json"];
+  return ["starter_deck.json"];
 }
 
 async function populateDeckSelects() {

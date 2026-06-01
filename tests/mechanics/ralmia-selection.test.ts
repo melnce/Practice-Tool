@@ -1,4 +1,5 @@
 // tests/mechanics/ralmia-selection.test.ts
+// UNVERIFIED — owner to audit card-text correctness post-overhaul.
 // Tests for Ralmia artifact selection behavior
 
 import { describe, it, expect, beforeEach } from "vitest";

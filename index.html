@@ -2,23 +2,7 @@
 <html lang="en">
 
 <head>
-  <script type="importmap">
-      {
-        "imports": {
-          "main": "/dist/boot/boot.js",
-          "gameLogic": "/dist/logic/index.js",
 
-          "@core/": "/dist/core/",
-          "@data/": "/dist/data/",
-          "@logic/": "/dist/logic/",
-          "@ui/": "/dist/ui/",
-          "@helpers/": "/dist/helpers/",
-          "@ops/": "/dist/logic/effects/ops/"
-        }
-      }
-    </script>
-
-  <base href="/" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" />
@@ -197,12 +181,12 @@
     <div id="deckSelection">
       <label for="blueDeckSelect">Blue Deck:</label>
       <select id="blueDeckSelect">
-        <option value="example_deck">example_deck</option>
+        <option value="starter_deck">starter_deck</option>
       </select>
 
       <label for="redDeckSelect">Red Deck:</label>
       <select id="redDeckSelect">
-        <option value="example_deck">example_deck</option>
+        <option value="starter_deck">starter_deck</option>
       </select>
 
       <label for="seedInput">Seed:</label>
@@ -447,7 +431,7 @@
         pointer-events: none;
       "></div>
 
-  <script type="module" src="./dist/boot/boot.js"></script>
+  <script type="module" src="./src/boot/boot.ts"></script>
   <!-- Hotkeys only (Ctrl+Z / Ctrl+Y) + Drawer open/close -->
   <script type="module">
     // Note: Hotkeys (Ctrl+Z/Y) are registered in boot.ts - do not duplicate here

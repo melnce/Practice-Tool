@@ -38,6 +38,27 @@ export function registerMiscEffects() {
     if (result === "pending") return "pending";
   });
 
+  // Legacy shims — delegate to unified evolve (effect-triggered: no EP spend, no turn gate)
+  registerOp("evolve_self", (eff, ctx) => {
+    const evolveCtx = { ...(ctx.context || {}), queue: ctx.queue };
+    handleEvolve(
+      { ...(eff as any), op: "evolve", target: "self", mode: "normal", spend_point: false },
+      ctx.owner,
+      ctx.sourceCard,
+      evolveCtx,
+    );
+  });
+
+  registerOp("super_evolve_self", (eff, ctx) => {
+    const evolveCtx = { ...(ctx.context || {}), queue: ctx.queue };
+    handleEvolve(
+      { ...(eff as any), op: "evolve", target: "self", mode: "super", spend_point: false },
+      ctx.owner,
+      ctx.sourceCard,
+      evolveCtx,
+    );
+  });
+
   // ==========================================================================
   // UNIFIED GATE - replaces 17 legacy *_gate ops
   // ==========================================================================

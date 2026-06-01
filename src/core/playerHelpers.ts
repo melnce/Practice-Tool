@@ -310,6 +310,24 @@ export function setDeckoutWins(state: GameState, player: PlayerSlot, value: bool
     state.players[player].deckoutWins = value;
 }
 
+export function isPlayerDefeated(state: GameState, player: PlayerSlot): boolean {
+    return state.players[player].defeated === true;
+}
+
+/** Returns the defeated player slot, or null if the game is ongoing. */
+export function getDefeatedPlayer(state: GameState): PlayerSlot | null {
+    if (state.players.first.defeated || state.players.first.hp <= 0) return "first";
+    if (state.players.second.defeated || state.players.second.hp <= 0) return "second";
+    return null;
+}
+
+/** Returns the winning player slot, or null if the game is ongoing. */
+export function getWinner(state: GameState): PlayerSlot | null {
+    const defeated = getDefeatedPlayer(state);
+    if (!defeated) return null;
+    return defeated === "first" ? "second" : "first";
+}
+
 // ============================================================================
 // DECK METADATA
 // ============================================================================

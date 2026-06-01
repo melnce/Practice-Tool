@@ -3,6 +3,7 @@ export const COMBAT_OPS = [
     "destroy", // Unified destroy op - handles all destroy variants via distribution/scope fields
     "banish", // Unified banish op - handles all banish variants via distribution/scope fields
     "restore", // Unified restore op - handles leader heal + follower defense restore
+    "heal_leader", // Legacy shim → restore (ally:leader)
 
     // Leader state now handled by:
     // - stat op with target: ally:leader / enemy:leader (for defense/max HP)

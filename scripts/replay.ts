@@ -78,26 +78,26 @@ async function main() {
 
   console.log("Importing engine modules from core...");
 
-  // Dynamic imports from compiled dist/ output
+  // Dynamic imports from src/ (run via tsx — no separate tsc build required)
   const { runWithReplay } =
-    (await import("../dist/logic/core/replay.js")) as any;
+    (await import("../src/logic/core/replay.js")) as any;
   const { diffReplays, formatReplayDiff } =
-    (await import("../dist/logic/core/replayVerify.js")) as any;
+    (await import("../src/logic/core/replayVerify.js")) as any;
   const { REPLAY_SCENARIOS } =
-    (await import("../dist/logic/core/replayScenarios.js")) as any;
+    (await import("../src/logic/core/replayScenarios.js")) as any;
   const { dispatchAction } =
-    (await import("../dist/logic/core/dispatch.js")) as any;
+    (await import("../src/logic/core/dispatch.js")) as any;
   const { resetGameState, state, createInitialState, resetStateInstance } =
-    (await import("../dist/core/gameState.js")) as any;
+    (await import("../src/core/gameState.js")) as any;
   const { setGlobalTrace, getGlobalTrace } =
-    (await import("../dist/logic/core/effects/trace.js")) as any;
+    (await import("../src/logic/core/effects/trace.js")) as any;
   const { initReplayState } =
-    (await import("../dist/logic/core/replayInit.js")) as any;
+    (await import("../src/logic/core/replayInit.js")) as any;
 
   const { initCardDatabaseNode } =
-    (await import("../dist/data/cardLoaderNode.js")) as any;
+    (await import("../src/data/cardLoaderNode.js")) as any;
   const { ReplayInvariantError } =
-    (await import("../dist/logic/core/replayInvariants.js")) as any;
+    (await import("../src/logic/core/replayInvariants.js")) as any;
 
   console.log("Engine modules loaded successfully.");
 
@@ -143,19 +143,22 @@ async function main() {
   const actualA = checkStateA.players.first.deck.slice(0, 5).map((c: any) => c.name);
   const actualB = checkStateB.players.first.deck.slice(0, 5).map((c: any) => c.name);
 
-  // Expected values - populate these after first run triggers failure with actuals
+  // Canonical shuffle regression (owner-approved baseline 2026-05-31):
+  //   initReplayState({ seed, deckId: "standard" (default), initialDraw: 0, strict: verify-mode })
+  //   Deck: REPLAY_DECK_STANDARD in src/logic/core/replayInit.ts (fixed card-name list, seeded shuffle)
+  //   Assert: top 5 of first player's deck after shuffle, before any draws.
   const goldenA: string[] = [
     "Goblin",
+    "Goblin",
+    "Goblin",
+    "Bug Alert",
+    "Goblin",
+  ];
+  const goldenB: string[] = [
+    "Bug Alert",
     "Centaur Centurion",
     "Goblin",
     "Goblin",
-    "May, Journey Elf",
-  ];
-  const goldenB: string[] = [
-    "Flashstep Quickblader",
-    "May, Journey Elf",
-    "Indomitable Fighter",
-    "Bug Alert",
     "Goblin",
   ];
 

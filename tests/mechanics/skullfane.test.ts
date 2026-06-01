@@ -1,5 +1,6 @@
 /**
  * @file Regression Test: Skullfane of Demise
+ * UNVERIFIED — owner to audit card-text correctness post-overhaul.
  *
  * Tests the store_count_as -> amount_source variable propagation between 
  * destroy and damage effects in chained fanfare.

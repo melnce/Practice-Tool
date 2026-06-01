@@ -7,8 +7,8 @@ import { createRng } from "./rng.js";
 // Global defaults that are not per-player
 const DEFAULTS = {
   roundCount: 1,
-  // P0-3 FIX: Explicit turn number for once-per-turn tracking
-  turnNumber: 1,
+  // Mulligan is turn 0; first turn begins at startFirstTurn().
+  turnNumber: 0,
   // P2-3 FIX: Deterministic game tick for history timestamps
   gameTick: 0,
   activePlayer: "first" as PlayerSlot, // Sole source of truth for player turn
@@ -77,7 +77,7 @@ export function resetStateInstance(
   // B) Reset global scalars
   Object.assign(target, DEFAULTS);
   // P0-3/P2-3: Ensure these are explicitly reset (not just spread)
-  target.turnNumber = 1;
+  target.turnNumber = 0;
   target.gameTick = 0;
 
   // C) Reset ephemeral arrays

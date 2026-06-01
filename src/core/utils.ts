@@ -89,11 +89,36 @@ function burnPreview(card: CardInstance | any) {
   setTimeout(() => (box.style.display = "none"), 900);
 }
 
-/**
- * Helper to check if player is first player (accepts both legacy and new format).
- */
 function isFirstPlayer(owner: Player | null): boolean {
   return owner === "first";
+}
+
+/** Apply deckout result when a draw is attempted on an empty deck. */
+function applyDeckoutLoss(owner: Player): void {
+  const isFirst = isFirstPlayer(owner);
+  const iHaveCrest = isFirst
+    ? (state.players.first.crests || []).some(
+        (c) => c.name === "Mjerrabaine, Great Manifest",
+      )
+    : (state.players.second.crests || []).some(
+        (c) => c.name === "Mjerrabaine, Great Manifest",
+      );
+
+  const iWinOnDeckout =
+    iHaveCrest ||
+    (isFirst
+      ? !!state.players.first.deckoutWins
+      : !!state.players.second.deckoutWins);
+
+  const opp: Player = isFirst ? "second" : "first";
+
+  if (iWinOnDeckout) {
+    state.players[opp].defeated = true;
+    logEvent("deckout", { loser: opp, winner: owner });
+  } else {
+    state.players[owner].defeated = true;
+    logEvent("deckout", { loser: owner, winner: opp });
+  }
 }
 
 export function pushToHand(
@@ -133,42 +158,28 @@ export function drawCard(
   }
 
   if (!deck || deck.length === 0) {
-    if (typeof document !== "undefined") {
-      const isFirst = isFirstPlayer(owner);
-      const iHaveCrest = isFirst
-        ? (state.players.first.crests || []).some(
-          (c) => c.name === "Mjerrabaine, Great Manifest",
-        )
-        : (state.players.second.crests || []).some(
-          (c) => c.name === "Mjerrabaine, Great Manifest",
-        );
+    if (owner) {
+      applyDeckoutLoss(owner);
 
-      const overlayImages = iHaveCrest
-        ? ["/images/victory_card.png"]
-        : REAPER_URLS;
-      showImageOverlayWithFallback(overlayImages);
+      if (typeof document !== "undefined") {
+        const isFirst = isFirstPlayer(owner);
+        const iHaveCrest = isFirst
+          ? (state.players.first.crests || []).some(
+              (c) => c.name === "Mjerrabaine, Great Manifest",
+            )
+          : (state.players.second.crests || []).some(
+              (c) => c.name === "Mjerrabaine, Great Manifest",
+            );
 
-      const iWinOnDeckout =
-        iHaveCrest ||
-        (isFirst ? !!state.players.first.deckoutWins : !!state.players.second.deckoutWins);
-
-      if (iWinOnDeckout) {
-        // I win, opponent loses
-        if (isFirst) state.players.second.hp = 0;
-        else state.players.first.hp = 0;
-      } else {
-        // I lose
-        if (isFirst) state.players.first.hp = 0;
-        else state.players.second.hp = 0;
+        const overlayImages = iHaveCrest
+          ? ["/images/victory_card.png"]
+          : REAPER_URLS;
+        showImageOverlayWithFallback(overlayImages);
       }
 
-      // Log the deckout event
-      const opp = isFirst ? "second" : "first";
-      logEvent("deckout", { loser: owner, winner: opp });
-
       adapter.render();
-      return false;
     }
+    return false;
   }
   // draw from the END of the array (top of deck)
   const top = deck.pop();

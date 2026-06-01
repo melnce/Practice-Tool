@@ -69,6 +69,7 @@ vi.mock("../../src/data/cardDatabase.js", async (importOriginal) => {
 });
 
 describe("Set 104: Skybound Dragons", () => {
+  // UNVERIFIED assertions — infra-only fix (explicit seed). Owner audits card rules post-overhaul.
   let state: GameState;
 
   beforeEach(async () => {
@@ -93,6 +94,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     // Inject Arthur manually into hand
     const arthur = {
@@ -141,6 +143,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
 
     const spell = { uid: "deck_1", type: "Spell", name: "Target Spell" } as any;
@@ -175,6 +178,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
 
     // Setup enemies
@@ -216,6 +220,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     const randall = {
       uid: "hand_1",
@@ -247,6 +252,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     const ally = {
       uid: "b1",
@@ -285,6 +291,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     state.players.second.board = [{ uid: "e1", defense: 3, type: "Follower" }] as any;
 
@@ -312,6 +319,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     // Setup 2 enemies
     state.players.second.board = [
@@ -374,6 +382,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     state.players.second.board = [{ uid: "e1", defense: 6, type: "Follower" }] as any;
 
@@ -414,6 +423,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     const bigFollower = {
       uid: "deck_1",
@@ -464,6 +474,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     state.players.second.board = [{ uid: "e1", defense: 5, type: "Follower" }] as any;
 
@@ -510,6 +521,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     const unleashed = {
       uid: "hand_1",
@@ -543,6 +555,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     const evolvedAlly = {
       uid: "b1",
@@ -584,6 +597,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     state.players.first.maxPP = 10;
     state.players.first.pp = 10;
@@ -617,6 +631,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     // We assume mergeSets has run, so Vyrn is in the DB
     const vyrnData = getCardDetails("Vyrn, Li'l Red Dragon");
@@ -648,6 +663,7 @@ describe("Set 104: Skybound Dragons", () => {
     state = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
+      seed: 104,
     });
     const knightData = getCardDetails("Golden Knight, True King's Blade");
     if (!knightData) throw new Error("Golden Knight not found");

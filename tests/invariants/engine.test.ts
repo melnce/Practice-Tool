@@ -50,28 +50,15 @@ beforeAll(async () => {
     process.env.DISABLE_HISTORY = "1";
     process.env.DISABLE_UID_ENRICH = "1";
 
-    // Tie both imports to the same source (src or dist)
-    let loadedFromSrc = false;
+    const srcBenchPath = resolve(__dirname, "../../src/bench/benchEnv.ts");
+    benchEnv = await import(pathToFileURL(srcBenchPath).href);
 
-    try {
-        const srcBenchPath = resolve(__dirname, "../../src/bench/benchEnv.ts");
-        benchEnv = await import(pathToFileURL(srcBenchPath).href);
-        loadedFromSrc = true;
-    } catch {
-        const distBenchPath = resolve(__dirname, "../../dist/bench/benchEnv.js");
-        benchEnv = await import(pathToFileURL(distBenchPath).href);
-    }
-
-    // Use same source for state to ensure module identity
-    const statePath = loadedFromSrc
-        ? resolve(__dirname, "../../src/core/gameState.ts")
-        : resolve(__dirname, "../../dist/core/gameState.js");
-
+    const statePath = resolve(__dirname, "../../src/core/gameState.ts");
     try {
         const stateModule = await import(pathToFileURL(statePath).href);
         state = stateModule.state;
     } catch {
-        state = null; // Graceful degradation if state unavailable
+        state = null;
     }
 });
 

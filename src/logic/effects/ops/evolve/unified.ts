@@ -132,6 +132,7 @@ function resolveTargets(
 
   switch (target) {
     case "self":
+    case "played_card":
       return sourceCard ? [sourceCard] : [];
 
     case "selected":
