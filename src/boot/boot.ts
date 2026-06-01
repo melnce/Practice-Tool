@@ -58,7 +58,11 @@ window.addEventListener("DOMContentLoaded", () => {
       console.log(`[RNG] Generated seed: ${seed}`);
     }
 
-    await engine.startNewGame({ deckAId, deckBId, seed });
+    try {
+      await engine.startNewGame({ deckAId, deckBId, seed });
+    } catch (err) {
+      console.error("[Start Game] Failed to start:", err);
+    }
   });
 
   try {
