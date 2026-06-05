@@ -81,6 +81,16 @@ export function processCandidateTriggers(
       if (event.startsWith("ally_") && owner !== activePlayer) continue;
       if (event.startsWith("enemy_") && owner === activePlayer) continue;
 
+      // Rulebook §317: a dying follower does not observe its own leave/destruction.
+      if (
+        (event === "ally_follower_leaves_field" ||
+          event === "enemy_follower_leaves_field") &&
+        context.leavingCard &&
+        cand.card?.uid === context.leavingCard.uid
+      ) {
+        continue;
+      }
+
       // Shorthand Logic: end_of_turn_own means must be owner's turn
       if (trigger.type === "end_of_turn_own") {
         if (activePlayer !== owner) continue;
@@ -124,8 +134,18 @@ export function processCandidateTriggers(
         }
       }
 
-      // 4. Tracking / Once Per Turn
-      if (!options.skipTracking) {
+      // 4. Tracking / Once Per Turn (max_per_turn always enforced)
+      if (trigger.max_per_turn != null && trigger.max_per_turn > 0) {
+        if (!shouldFire(trigger, card, event, currentTurn, context)) {
+          DEBUG_TRIGGERS.log({
+            event,
+            card: card.name,
+            triggerId: trigger.event,
+            result: "skip_max_per_turn",
+          });
+          continue;
+        }
+      } else if (!options.skipTracking) {
         if (!shouldFire(trigger, card, event, currentTurn, context)) {
           DEBUG_TRIGGERS.log({
             event,
@@ -150,7 +170,10 @@ export function processCandidateTriggers(
       runEffects(trigger.effects || [], owner, card, context);
 
       // 6. Mark Fired
-      if (!options.skipTracking) {
+      if (
+        !options.skipTracking ||
+        (trigger.max_per_turn != null && trigger.max_per_turn > 0)
+      ) {
         markFired(trigger, card, event, currentTurn, context);
       }
       // Phase 4: REMOVED legacy usedThisTurn fallback in skipTracking branch

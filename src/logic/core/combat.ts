@@ -17,9 +17,17 @@ import { handleRestore } from "../effects/ops/restore/index.js";
 
 /* ------------------------------- helpers ------------------------------- */
 
-function hasWardOn(board: CardInstance[]) {
-  return board.some((c) => c && c.type === "Follower" && c.hasWard);
+function hasActiveWardOn(board: CardInstance[]) {
+  return board.some(
+    (c) =>
+      c &&
+      c.type === "Follower" &&
+      c.hasWard &&
+      !c.hasAmbush &&
+      !(c.keywordState?.hasIntimidate || (c as any).hasIntimidate),
+  );
 }
+
 function canTargetFollower(
   defender: CardInstance,
   defenderBoard: CardInstance[],
@@ -28,8 +36,19 @@ function canTargetFollower(
   if (defender.hasAmbush) return false;
   if (defender.keywordState?.hasIntimidate || (defender as any).hasIntimidate)
     return false; // Check both for safety/migration
-  if (hasWardOn(defenderBoard) && !defender.hasWard) return false;
+  if (hasActiveWardOn(defenderBoard) && !defender.hasWard) return false;
   return true;
+}
+
+export function canAttackFollowerTarget(
+  defender: CardInstance,
+  defenderBoard: CardInstance[],
+): boolean {
+  return canTargetFollower(defender, defenderBoard);
+}
+
+export function canAttackLeaderWhileWardActive(defenderBoard: CardInstance[]): boolean {
+  return !hasActiveWardOn(defenderBoard);
 }
 function effectiveAtk(card: CardInstance) {
   return Math.max(0, parseInt(card?.attack as any, 10) || 0);
@@ -91,9 +110,9 @@ function hasCardTrigger(
 }
 
 /* ------------------------ superevolve convenience checks ------------------------ */
-function isInvincibleOnAttack(attacker: CardInstance) {
+function isInvincibleOnAttack(attacker: CardInstance, attackerOwner: Player) {
   return (
-    attacker?.evoType === "super" ||
+    (attacker?.evoType === "super" && state.activePlayer === attackerOwner) ||
     !!attacker.keywordState?.isInvincibleOnAttack
   );
 }
@@ -302,7 +321,7 @@ function _attackFollowerCore(
   resolveBane(attacker, defender, defenderPlayer, dealtToDef, dmgResultDef.barrierPopped);
 
   // Defender deals back, unless attacker is invincible on attack this swing
-  if (!isInvincibleOnAttack(attacker)) {
+  if (!isInvincibleOnAttack(attacker, attackerPlayer)) {
     const dmgResultAtk = dealDamage(attacker, defDmg, defender);
     dealtToAtk = dmgResultAtk.damage;
 
@@ -334,13 +353,21 @@ export function attackFollower(
   const meta = { attackerIdx, defenderIdx, attackerPlayer, defenderPlayer };
   return doAction(
     "Attack Follower",
-    () =>
-      _attackFollowerCore(
-        attackerIdx,
-        defenderIdx,
-        attackerPlayer,
-        defenderPlayer,
-      ),
+    () => {
+      (state as any).combatResolutionDepth =
+        ((state as any).combatResolutionDepth ?? 0) + 1;
+      try {
+        return _attackFollowerCore(
+          attackerIdx,
+          defenderIdx,
+          attackerPlayer,
+          defenderPlayer,
+        );
+      } finally {
+        (state as any).combatResolutionDepth =
+          ((state as any).combatResolutionDepth ?? 1) - 1;
+      }
+    },
     meta,
     { autoRender: true },
   );
@@ -375,7 +402,7 @@ function _attackLeaderCore(
   )
     return;
   if (isAttackForbidden(attacker)) return;
-  if (hasWardOn(defenderBoard)) return;
+  if (hasActiveWardOn(defenderBoard)) return;
 
   stripAmbushOnSelfAttack(attacker);
 

@@ -16,8 +16,10 @@ import type {
   EffectResult,
 } from "../../../core/types/index.js";
 import { guardLifecycle } from "../targeting/guards.js";
-import { registerRunEffectsInCleanup } from "../cleanup.js";
-import { registerRunEffectsForSpellboost } from "../../effects/ops/spellboost.js";
+import {
+  registerRunEffectsInCleanup,
+  flushDeferredDeathBatch,
+} from "../cleanup.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
 
 // Registry
@@ -142,13 +144,25 @@ export function runEffects(
 
   const queue = [...effects]; // Shallow copy to process
 
+  const runDepth = ((state as any)._runEffectsDepth ?? 0) as number;
+  (state as any)._runEffectsDepth = runDepth + 1;
+  const combatDepth = ((state as any).combatResolutionDepth ?? 0) as number;
+  const enableDeathDefer =
+    runDepth === 0 &&
+    combatDepth === 0 &&
+    context?.deferDeathTriggers !== false;
+
+  if (enableDeathDefer) {
+    (state as any).deferDeathTriggers = true;
+  }
+
   // Trace: dispatch_start
-  // Access trace from context if available, or fall back to global trace (for replay injection)
   const trace = context?.trace ?? getGlobalTrace();
   if (trace) trace.emit({ kind: "dispatch_start", queueSize: queue.length });
 
   let processedCount = 0;
 
+  try {
   while (queue.length > 0) {
     const eff = queue.shift()!;
 
@@ -208,7 +222,15 @@ export function runEffects(
     }
   }
 
-  // Trace: dispatch_end
+  } finally {
+    (state as any)._runEffectsDepth = runDepth;
+    if (enableDeathDefer) {
+      (state as any).deferDeathTriggers = false;
+      flushDeferredDeathBatch();
+      (state as any)._deferredDeath = { lw: [], leave: [] };
+    }
+  }
+
   if (trace)
     trace.emit({
       kind: "dispatch_end",
@@ -222,10 +244,6 @@ export function runEffects(
 registerRunEffectsInCleanup(runEffects);
 // Register runEffects with triggers/process.ts so board/hand triggers can execute effects
 registerRunEffects(runEffects);
-// Register runEffects with spellboost.ts so in-hand Spellboost keyword effects can execute
-registerRunEffectsForSpellboost(runEffects);
-
-
 
 
 
