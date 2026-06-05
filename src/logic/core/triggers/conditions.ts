@@ -6,6 +6,7 @@ import type { CardCondition } from "../conditions/evaluator.js";
 import { evaluateCardCondition } from "../conditions/evaluator.js";
 import { mergeEnteringKeywordSnapshot } from "../enterKeywords.js";
 import { handleSuperEvoGate } from "../../effects/gates/gates.js";
+import { opponentOf, getBoard } from "../../../core/playerHelpers.js";
 // Helper to normalize "subject" card (entering, played, leaving, etc.)
 export function getSubjectCard(context: TriggerContext): CardInstance | null {
   return (
@@ -77,6 +78,14 @@ export function evalCommonConditions(
   if (typeof cond.defense_gte === "number" && def < cond.defense_gte)
     return false;
   if (cond.still_alive === true && def <= 0) return false;
+
+  if (typeof (cond as any).enemy_follower_count_gte === "number") {
+    const need = (cond as any).enemy_follower_count_gte as number;
+    const count = getBoard(state, opponentOf(owner)).filter(
+      (c) => c?.type === "Follower",
+    ).length;
+    if (count < need) return false;
+  }
 
   // =========================================================================
   // SUBJECT CARD CONDITIONS (delegate to unified evaluator)

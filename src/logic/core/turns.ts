@@ -2,15 +2,15 @@
 import { state } from "../../core/gameState.js";
 import { drawCard } from "../../core/utils.js";
 import { recordEvent } from "../../core/debugTimeline.js";
-import { fireTrigger } from "./triggers.js";
 import { cleanupDead } from "./cleanup.js";
-import { clearTemporaryBuffs } from "../effects/self.js";
-import { runEffects } from "./effects/index.js";
 import {
   tickCrests,
-  processCrestEvent,
   resetCrestOncePerTurn,
 } from "../effects/crest.js";
+import {
+  runEndOfTurnBoundary,
+  runStartOfTurnBoundary,
+} from "./turnBoundary.js";
 import { clearExpiredCantAttackAtEOT } from "./keywords/eot.js";
 import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 import { handleInvoke } from "../effects/ops/summon.js";
@@ -152,8 +152,7 @@ function scanDeckForInvokes(
     if (!inv || !inv.condition) continue;
 
     // Check timing (default to start_of_turn of NOT specified, for backward compat, or require explicit?)
-    // User wants explicit. Let's strict match if present, else default?
-    // Better: strict match. Sandalphon now has explicit.
+    // User wants explicit. Sandalphon now has explicit.
     const cardTiming = inv.timing || "start_of_turn";
 
     if (cardTiming !== timing) continue;
@@ -199,17 +198,13 @@ function _endTurnCore(endingPlayer: Player) {
   recordEvent({ type: "end_turn", payload: { player: endingPlayer } });
   beginAction(`End Turn (${endingLabel})`);
 
-  // === PHASE 1: End-of-Turn Cleanup for Ending Player ===
-  // P1-3 FIX: Batch cleanup - suppress during phase, run once at end
-  state.suppressCleanup = true;
-
+  // === PHASE 1: End-of-Turn boundary (C1: deferDeathTriggers, not suppressCleanup) ===
   clearTempHandCostMods(endingPlayer);
-  getBoard(state, endingPlayer).forEach((card) => clearTemporaryBuffs(card));
 
   try {
-    fireTrigger("end_of_turn", endingPlayer);
+    runEndOfTurnBoundary(endingPlayer);
   } catch (e) {
-    console.error(`Error firing end_of_turn triggers (${endingLabel}):`, e);
+    console.error(`Error in end-of-turn boundary (${endingLabel}):`, e);
   }
 
   try {
@@ -218,18 +213,6 @@ function _endTurnCore(endingPlayer: Player) {
     console.error(`Error in ${endingLabel} Invoke EOT:`, e);
   }
 
-  // Crest effects (atomic batch)
-  try {
-    const fx = processCrestEvent(endingPlayer, "end_of_turn");
-    if (fx.length) {
-      for (const eff of fx) runEffects([eff], endingPlayer, null);
-    }
-  } catch (e) {
-    console.error(`Error in ${endingLabel} Crest EOT:`, e);
-  }
-
-  // P1-3 FIX: Single cleanup at end of Phase 1
-  state.suppressCleanup = false;
   cleanupDead();
 
   clearExpiredCantAttackAtEOT(endingPlayer);
@@ -247,9 +230,6 @@ function _endTurnCore(endingPlayer: Player) {
   }
 
   // === PHASE 3: Prepare Next Player's Turn ===
-  // P1-3 FIX: Batch cleanup during turn prep
-  state.suppressCleanup = true;
-
   setMaxPP(state, nextPlayer, Math.min(state.roundCount + getPermPP(state, nextPlayer), 10));
   setPP(state, nextPlayer, getMaxPP(state, nextPlayer));
 
@@ -261,54 +241,38 @@ function _endTurnCore(endingPlayer: Player) {
   resetCrestOncePerTurn(nextPlayer);
   resetEngageFlagsAtTurnStart(nextPlayer);
 
-  try {
-    const startFx = processCrestEvent(nextPlayer, "start_of_turn");
-    if (startFx.length) runEffects([...startFx], nextPlayer, null);
-  } catch (e) {
-    console.error(`Error in ${nextPlayer} start effects:`, e);
-  }
+  setPlaysThisTurn(state, nextPlayer, 0);
+  refreshBoardForNewTurn(getBoard(state, nextPlayer));
 
   try {
-    // tickCrests now handles destruction internally (no effects returned)
-    tickCrests(nextPlayer);
+    runStartOfTurnBoundary(nextPlayer, {
+      tickCrests,
+      tickAmulets: tickAmuletCountdowns,
+    });
   } catch (e) {
-    console.error(`Error in ${nextPlayer} tick crests:`, e);
+    console.error(`Error in start-of-turn boundary (${nextPlayer}):`, e);
   }
 
-  // Draw for next player
+  // Draw step 8 ? after SOT queue resolves
   drawCard(getHand(state, nextPlayer), getDeck(state, nextPlayer), nextPlayer);
   logEvent("draw", { player: nextPlayer, count: 1 });
 
-  // Invoke Phase (Start of Turn)
   try {
     scanDeckForInvokes(nextPlayer, "start_of_turn");
   } catch (e) {
     console.error(`Error in ${nextPlayer} Start Invoke:`, e);
   }
 
-  setPlaysThisTurn(state, nextPlayer, 0);
-  refreshBoardForNewTurn(getBoard(state, nextPlayer));
-  tickAmuletCountdowns(nextPlayer);
-
-  // P1-3 FIX: Single cleanup at end of Phase 3
-  state.suppressCleanup = false;
   cleanupDead();
 
   // === PHASE 4: Switch Active Player ===
   state.activePlayer = nextPlayer;
-  // P0-3 FIX: Increment turn number atomically for deterministic tracking
   state.turnNumber = (state.turnNumber || 0) + 1;
   logEvent("startTurn", {
     player: state.activePlayer,
     round: state.roundCount,
     turn: state.turnNumber,
   });
-
-  try {
-    fireTrigger("start_of_turn", nextPlayer);
-  } catch (e) {
-    console.error(`Error firing start_of_turn triggers (${nextPlayer}):`, e);
-  }
 
   setAnyAllyAttackedThisTurn(state, nextPlayer, false);
   setEvoUsedThisTurn(state, nextPlayer, false);
@@ -361,18 +325,3 @@ function resetShikigamiDeathLogs() {
   state.players.first.shikigamiDeathsThisTurn = [];
   state.players.second.shikigamiDeathsThisTurn = [];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

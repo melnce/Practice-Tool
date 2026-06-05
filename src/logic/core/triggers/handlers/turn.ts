@@ -7,10 +7,7 @@ export function handleTurnEvent(
   activePlayer: Player,
   context: TriggerContext,
 ) {
-  // C1 TODO: drop excludeSources crest interim — fold crests into the turn-boundary
-  // queued step order (Grimnir crest → board → opponent path). Until C1, turn-boundary
-  // crests still fire via processCrestEvent in turns.ts (ordering not yet unified).
-  dispatchOrderedTriggers(event, activePlayer, context, {
-    excludeSources: ["crest"],
-  });
+  // Turn-boundary events are handled by turnBoundary.ts (two-phase queue → resolve).
+  // Mid-turn fireTrigger calls for start/end_of_turn are unexpected; keep generic path.
+  dispatchOrderedTriggers(event, activePlayer, context);
 }

@@ -24,8 +24,10 @@ export function grantBarrier(card: BarrierCard) {
 }
 
 function consumeBarrier(card: BarrierCard) {
-  if (card.hasBarrier) {
+  const ks = (card as CardInstance).keywordState;
+  if (card.hasBarrier || ks?.hasBarrier) {
     card.hasBarrier = false;
+    if (ks) ks.hasBarrier = false;
     card.__uiPopBarrier = true; // optional UI flag
     return true;
   }
@@ -54,7 +56,7 @@ export function dealDamage(
 
   // Handle barrier if present
   let barrierConsumed = false;
-  if (target.hasBarrier) {
+  if (target.hasBarrier || (target as CardInstance).keywordState?.hasBarrier) {
     const used = consumeBarrier(target);
     if (used) {
       barrierConsumed = true;

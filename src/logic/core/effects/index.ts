@@ -147,12 +147,14 @@ export function runEffects(
   const runDepth = ((state as any)._runEffectsDepth ?? 0) as number;
   (state as any)._runEffectsDepth = runDepth + 1;
   const combatDepth = ((state as any).combatResolutionDepth ?? 0) as number;
+  const batchTurnBoundary = !!(context?.batchTurnBoundary && runDepth === 0);
   const enableDeathDefer =
     runDepth === 0 &&
     combatDepth === 0 &&
-    context?.deferDeathTriggers !== false;
+    context?.deferDeathTriggers !== false &&
+    !batchTurnBoundary;
 
-  if (enableDeathDefer) {
+  if (enableDeathDefer || batchTurnBoundary) {
     (state as any).deferDeathTriggers = true;
   }
 
@@ -228,6 +230,8 @@ export function runEffects(
       (state as any).deferDeathTriggers = false;
       flushDeferredDeathBatch();
       (state as any)._deferredDeath = { lw: [], leave: [] };
+    } else if (batchTurnBoundary) {
+      (state as any).deferDeathTriggers = false;
     }
   }
 
