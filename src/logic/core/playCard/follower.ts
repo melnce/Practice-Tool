@@ -9,6 +9,8 @@ import { pushPlayedHistory } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
 import { incrementRally, getBoard, opponentOf } from "../../../core/playerHelpers.js";
+import { stampBoardEntryTs } from "../triggers/utils.js";
+import { snapshotEnteringKeywords } from "../enterKeywords.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -55,18 +57,13 @@ export function playFollower(
   card.hasAttacked = false;
 
   const toBoard = getBoard(state, player);
+  stampBoardEntryTs(card, { advance: true });
   toBoard.push(card);
 
-  // Fire ally trigger for owner, enemy trigger for opponent
   const opponent = opponentOf(player);
-  fireTrigger("ally_follower_played", player as any, {
-    playedCard: card,
-    costChanged: costChangedOnPlay,
-  });
-  fireTrigger("ally_follower_enter", player as any, { enteringCard: card });
-  fireTrigger("enemy_follower_enter", opponent as any, { enteringCard: card });
+  const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
 
-  // Fanfare
+  // Rulebook §242–256: Fanfare (step 1) before play/enter-reactive triggers (steps 2–5).
   const skipFanfareForEnhance =
     chosenTier && (card as any).enhance_replaces_fanfare;
   if (
@@ -80,6 +77,19 @@ export function playFollower(
     }
     runEffects([...card.fanfare], player, card, { enteringCard: card });
   }
+
+  fireTrigger("ally_follower_played", player as any, {
+    playedCard: card,
+    costChanged: costChangedOnPlay,
+  });
+
+  const enterCtx = {
+    enteringCard: card,
+    enteringOwner: player,
+    enteringKeywordSnapshot,
+  };
+  fireTrigger("ally_follower_enter", player as any, enterCtx);
+  fireTrigger("enemy_follower_enter", opponent as any, enterCtx);
 
   // Enhance
   if (

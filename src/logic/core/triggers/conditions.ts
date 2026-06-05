@@ -4,6 +4,8 @@ import type { CardInstance, Player } from "../../../core/types/index.js";
 import type { CardCondition } from "../conditions/evaluator.js";
 
 import { evaluateCardCondition } from "../conditions/evaluator.js";
+import { mergeEnteringKeywordSnapshot } from "../enterKeywords.js";
+import { handleSuperEvoGate } from "../../effects/gates/gates.js";
 // Helper to normalize "subject" card (entering, played, leaving, etc.)
 export function getSubjectCard(context: TriggerContext): CardInstance | null {
   return (
@@ -57,10 +59,7 @@ export function evalCommonConditions(
 
   // 6. Super Evolution Unlocked (for triggers/gates)
   if (cond.super_evolution_unlocked) {
-    // From evolveUtils: Blue >= 7, Red >= 6
-    const isBlue = owner === "first";
-    const unlocked = isBlue ? state.roundCount >= 7 : state.roundCount >= 6;
-    if (!unlocked) return false;
+    if (!handleSuperEvoGate(owner)) return false;
   }
 
   // =========================================================================
@@ -95,7 +94,15 @@ export function evalCommonConditions(
 
     // Apply shared conditions via unified evaluator
     if (Object.keys(sharedCond).length > 0) {
-      if (!evaluateCardCondition(subjectCard, sharedCond)) return false;
+      const subjectForCheck =
+        context.enteringKeywordSnapshot &&
+        context.enteringCard?.uid === subjectCard.uid
+          ? mergeEnteringKeywordSnapshot(
+              subjectCard,
+              context.enteringKeywordSnapshot,
+            )
+          : subjectCard;
+      if (!evaluateCardCondition(subjectForCheck, sharedCond)) return false;
     }
   }
 
