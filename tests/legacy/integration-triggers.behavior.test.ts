@@ -54,7 +54,7 @@ describe("Trigger Module Invariants", () => {
     } as unknown as CardInstance;
   }
 
-  it("Invariant: Execution Order (Crests -> Board -> Hand)", () => {
+  it("Invariant: Execution Order (C2 eight-tier priority)", () => {
     const event = "TEST_EVENT";
     const crest = {
       name: "Crest",
@@ -86,7 +86,7 @@ describe("Trigger Module Invariants", () => {
 
     expect(effectSpy).toHaveBeenCalledTimes(4);
     const calls = effectSpy.mock.calls.map((c: any) => c[0][0].value);
-    expect(calls).toEqual(["CREST", "BLUE_BOARD", "RED_BOARD", "BLUE_HAND"]);
+    expect(calls).toEqual(["BLUE_HAND", "CREST", "BLUE_BOARD", "RED_BOARD"]);
   });
 
   it("Invariant: Loot Fused Dedupe (Once per turn per initiator)", () => {

@@ -1,9 +1,8 @@
 import type { Player } from "../../../../core/types/index.js";
 import type { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
-import { getAllZoneCandidates, getCrestCandidates } from "../utils.js";
 import type { ProcessingCandidate } from "../process.js";
+import { dispatchOrderedTriggers } from "./common.js";
 
-import { processCandidateTriggers } from "../process.js";
 function checkPlayConditions(
   trigger: TriggerSpec,
   context: TriggerContext,
@@ -12,9 +11,7 @@ function checkPlayConditions(
   const played = context.playedCard;
   if (!played) return false;
 
-  // cost_changed
   if (cond.cost_changed) {
-    // Replicate legacy logic exactly
     let changed = !!context.costChanged;
     if (!changed) {
       const printed = Number.isFinite((played as any).base_cost)
@@ -29,7 +26,6 @@ function checkPlayConditions(
     if (!changed) return false;
   }
 
-  // tribe
   if (cond.tribe) {
     const want = String(cond.tribe).toLowerCase();
     const tribes = Array.isArray(played.tribes)
@@ -38,7 +34,6 @@ function checkPlayConditions(
     if (!tribes.includes(want)) return false;
   }
 
-  // name
   if (cond.name) {
     if (String(played.name) !== String(cond.name)) return false;
   }
@@ -51,23 +46,8 @@ export function handlePlayEvent(
   activePlayer: Player,
   context: TriggerContext,
 ) {
-  // 1. Crests (Generic)
-  const crests = getCrestCandidates(activePlayer);
-  processCandidateTriggers(crests, { event, activePlayer, context });
-
-  // 2. Zones (Specific legacy logic)
-  const zones = getAllZoneCandidates();
-  processCandidateTriggers(zones, {
-    event,
-    activePlayer,
-    context,
-    // P1-1 RATIONALE: Play triggers bypass common conditions because:
-    // 1. They use custom checkPlayConditions() which handles tribe/cost/name checks
-    // 2. Already filters by owner + board source in predicate
+  dispatchOrderedTriggers(event, activePlayer, context, {
     skipCommonConditions: true,
-    // P1-1 RATIONALE: Play triggers bypass tracking because:
-    // 1. Each play is a unique action - implicit once-per-play semantics
-    // 2. The same card playing twice = two distinct events
     skipTracking: true,
     predicate: (trigger: TriggerSpec, cand: ProcessingCandidate) => {
       if (cand.owner !== activePlayer) return false;
@@ -79,18 +59,3 @@ export function handlePlayEvent(
     },
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

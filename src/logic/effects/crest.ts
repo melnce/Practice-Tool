@@ -4,6 +4,7 @@ import { runEffects } from "../core/effects/index.js";
 import { logEvent } from "../../core/logger.js";
 import type { Effect, Player } from "../../core/types/index.js";
 import { isFirstPlayer, opponentOf, getCrests as getCrestsHelper } from "../../core/playerHelpers.js";
+import { allocateInsertionTs } from "../core/triggers/utils.js";
 
 // =============================================================================
 // CREST TYPES
@@ -106,6 +107,7 @@ export function handleGainCrest(eff: Effect, owner: Player) {
     // Keywords (e.g., ["LastWords"]) - needed for Last Words detection
     keywords: Array.isArray((eff as any).keywords) ? (eff as any).keywords : [],
     __onceByTurn: {}, // Initialize tracking store
+    insertionTs: allocateInsertionTs(),
   } as Crest;
 
   crests.push(newCrest);

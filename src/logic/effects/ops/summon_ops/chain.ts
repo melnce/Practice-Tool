@@ -5,6 +5,8 @@ import { fireTrigger } from "../../../core/triggers.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import { boardOf } from "./utils.js";
 import { setRally, getRally, opponentOf } from "../../../../core/playerHelpers.js";
+import { bumpZoneVersion, stampBoardEntryTs } from "../../../core/triggers/utils.js";
+import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 
 // =============== Generic Board Fill Chain ===============
 
@@ -130,7 +132,9 @@ export function handleFillBoardChainDecay(
 
     // Respect max board size
     if (board.length >= 5) break;
+    stampBoardEntryTs(clone);
     board.push(clone);
+    bumpZoneVersion();
     logEvent("chainSpawn", {
       owner,
       name: clone.name,
@@ -144,8 +148,13 @@ export function handleFillBoardChainDecay(
     // Per-enter hooks & triggers (keep parity with pushToBoard)
     // Fire ally trigger for owner, enemy trigger for opponent
     const opponent = opponentOf(owner);
-    fireTrigger("ally_follower_enter", owner, { enteringCard: clone });
-    fireTrigger("enemy_follower_enter", opponent, { enteringCard: clone });
+    const enterCtx = {
+      enteringCard: clone,
+      enteringOwner: owner,
+      enteringKeywordSnapshot: snapshotEnteringKeywords(clone),
+    };
+    fireTrigger("ally_follower_enter", owner, enterCtx);
+    fireTrigger("enemy_follower_enter", opponent, enterCtx);
 
     // Next link in the chain is the clone we just placed
     prev = clone;

@@ -4,7 +4,8 @@ import type { CardInstance, CardTemplate, Player } from "../../../../core/types/
 import { initAmulet, initFollower } from "./init.js";
 import { isFollower, isAmulet } from "./utils.js";
 import { opponentOf, setRally, getRally } from "../../../../core/playerHelpers.js";
-import { bumpZoneVersion } from "../../../core/triggers/utils.js";
+import { bumpZoneVersion, stampBoardEntryTs } from "../../../core/triggers/utils.js";
+import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 
 // =============== Core Summon Routines ===============
 
@@ -25,41 +26,48 @@ export function pushToBoard(
   board: CardInstance[],
   owner: Player,
   card: CardInstance,
+  opts?: { deferEnter?: boolean },
 ) {
-  // Respect max board size 5 (and prevent duplicates)
-  if (board.length >= 5) return false;
-  // Prevention: If card is already on board (e.g. reanimate logic artifact where object is reused),
-  // we silently ignore the push to preserve idempotency and prevent duplicates.
   if (board.includes(card)) return true;
-  card.zone = "board";
-  // P1-3 FIX: Record insertion timestamp for deterministic ordering
-  // Uses gameTick for replay compatibility, falls back to array length for stability
-  (card as any).insertionTs = state.gameTick ?? board.length;
-  board.push(card);
-  // PERF: Invalidate candidate cache when zone mutates
-  bumpZoneVersion();
 
-  // Increment Rally if follower
+  card.zone = "board";
+  stampBoardEntryTs(card);
+
+  // Fill a null hole left during cleanup (LW summon before board compaction)
+  for (let i = 0; i < board.length; i++) {
+    const slot = board[i];
+    if (!slot || typeof slot !== "object") {
+      board[i] = card;
+      bumpZoneVersion();
+      if (!opts?.deferEnter) finishFollowerEnter(card, owner);
+      return true;
+    }
+  }
+
+  // Respect max board size 5 occupied slots
+  if (board.length >= 5) return false;
+
+  board.push(card);
+  bumpZoneVersion();
+  if (!opts?.deferEnter) finishFollowerEnter(card, owner);
+  return true;
+}
+
+export function finishFollowerEnter(card: CardInstance, owner: Player) {
   if (card.type === "Follower") {
     setRally(state, owner, getRally(state, owner) + 1);
   }
 
-  // MEDICAL ASSASSIN TRIGGER - ADD THIS LINE
-  // Hook removed - replaced by JSON trigger
-  // medicalAssassinOnFollowerEnter(owner, card);
-
-  // follower enter triggers
   if (isFollower(card)) {
-    // Fire ally trigger for owner, enemy trigger for opponent
     const opponent = opponentOf(owner);
-    fireTrigger("ally_follower_enter", owner, { enteringCard: card });
-    fireTrigger("enemy_follower_enter", opponent, { enteringCard: card });
-
-    // >>> Congregant chain (runs once when the first instance enters)
-    // Legacy Support REMOVED: Managed by JSON Trigger now
-    // if (normalizeName(card.name) === "congregant of unkilling") ...
+    const enterCtx = {
+      enteringCard: card,
+      enteringOwner: owner,
+      enteringKeywordSnapshot: snapshotEnteringKeywords(card),
+    };
+    fireTrigger("ally_follower_enter", owner, enterCtx);
+    fireTrigger("enemy_follower_enter", opponent, enterCtx);
   }
-  return true;
 }
 
 

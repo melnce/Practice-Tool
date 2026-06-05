@@ -6,6 +6,7 @@ import { applyKeywordsFromList } from "../../core/keywords.js";
 import { logEvent } from "../../../core/logger.js";
 import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
 import { getHand, getBoard } from "../../../core/playerHelpers.js";
+import { getPool } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 
 // ========================================================================
@@ -99,6 +100,22 @@ export function handleTransform(
 
     case "board":
     default: {
+      const selectN = parseInt(String(eff.select ?? 0), 10) || 0;
+      if (selectN > 0 && !ctx.context?.targetUids?.length) {
+        const pool = getPool(
+          eff.target || "ally:follower",
+          owner,
+          ctx.sourceCard ?? null,
+          eff.condition,
+          ctx.context ?? {},
+        );
+        if (pool.length > 0) {
+          const picks = pool.slice(0, Math.min(selectN, pool.length));
+          for (const t of picks) transformTarget(t, into);
+          return;
+        }
+      }
+
       // Board transform - UID-based targeting only
       if (!ctx.context?.targetUids?.length) {
         if (ctx.sourceCard && (eff.target === "self" || targetStr === "self")) {
@@ -342,6 +359,9 @@ export function transformTarget(target: CardInstance, intoName: string) {
   const c: CardInstance = structuredClone(base);
   c.uid = target.uid;
   c.owner = owner;
+  if ((target as any).insertionTs != null) {
+    (c as any).insertionTs = (target as any).insertionTs;
+  }
 
   // Initialize basics depending on type
   if (c.type === "Follower") {

@@ -7,11 +7,26 @@ import type { CardInstance, Effect, Player } from "../../../../core/types/index.
 import { highlightSelectable } from "../../../core/targeting.js"; // Targeting is external
 import { initAmulet } from "./init.js";
 import { pushToBoard } from "./core.js";
+import { bumpZoneVersion, stampBoardEntryTs } from "../../../core/triggers/utils.js";
+import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 import { getEffectiveCost, nextId } from "./utils.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getHand, getBoard, opponentOf } from "../../../../core/playerHelpers.js";
 
 // =============== Hand Operations ===============
+
+/** Parse select / select_count / boolean select for hand Artifact copy ops. */
+function parseHandArtifactSelectCount(
+  eff: Effect & Record<string, any>,
+  defaultMax: number,
+): number {
+  const raw = eff.select ?? eff.select_count;
+  if (raw === true) return 1;
+  if (typeof raw === "number" && Number.isFinite(raw) && raw > 0) return raw;
+  const n = parseInt(String(raw), 10);
+  if (Number.isFinite(n) && n > 0) return n;
+  return defaultMax;
+}
 
 export function filterArtifactFollowersHand(owner: Player, maxCost: number) {
   const hand = getHand(state, owner);
@@ -172,8 +187,10 @@ export function summonExactCopyFromHand(
   const board = getBoard(state, owner);
   if (!Array.isArray(board) || board.length >= 5) return null;
 
+  stampBoardEntryTs(clone);
   if (position === "left") board.unshift(clone);
   else board.push(clone);
+  bumpZoneVersion();
 
   logEvent("summonExactCopy", { owner, from: srcCard.name, uid: clone.uid });
   // Track last summoned
@@ -186,13 +203,60 @@ export function summonExactCopyFromHand(
   if (clone.type === "Follower") {
     // Fire ally trigger for owner, enemy trigger for opponent
     const opponent = opponentOf(owner);
-    fireTrigger("ally_follower_enter", owner, { enteringCard: clone });
-    fireTrigger("enemy_follower_enter", opponent, { enteringCard: clone });
+    const enterCtx = {
+      enteringCard: clone,
+      enteringOwner: owner,
+      enteringKeywordSnapshot: snapshotEnteringKeywords(clone),
+    };
+    fireTrigger("ally_follower_enter", owner, enterCtx);
+    fireTrigger("enemy_follower_enter", opponent, enterCtx);
     // Ensure effect-based summons also trigger the Congregrant chain
     // handleCongregantOnEnter(owner, clone);
   }
 
   return clone;
+}
+
+export function handleSelectHandSummonFollower(
+  eff: Effect,
+  owner: Player,
+  sourceCard: CardInstance | null,
+  effectsQueue: any,
+): string | void {
+  const hand = getHand(state, owner);
+  const pool = (hand || []).filter((c) => c?.type === "Follower");
+  if (!pool.length) return;
+
+  const selectCount = Math.max(
+    1,
+    parseInt(String(eff.select ?? (eff as any).select_count ?? 1), 10) || 1,
+  );
+
+  if (pool.length === 1 && selectCount === 1) {
+    summonFromHand(pool[0]!, owner);
+    return;
+  }
+
+  if (pool.length === 1 && selectCount === 1) {
+    summonExactCopyFromHand(pool[0]!, owner);
+    return;
+  }
+
+  setPendingTarget({
+    eff: { ...eff, op: "select_hand_summon_follower" } as any,
+    owner,
+    sourceCard,
+    resumeEffects: effectsQueue,
+    pool,
+    targets: [],
+    selectCount,
+    requiresConfirmation: false,
+    enforceMinSelectCount: selectCount > 1,
+    enforceMaxSelectCount: true,
+  });
+
+  highlightSelectable(pool);
+  return "pending";
 }
 
 export function handleSelectHandSummonArtifactCopy(
@@ -219,9 +283,13 @@ export function handleSelectHandSummonArtifactCopy(
 
   if (!pool.length) return;
 
-  // Ralmia-style selection: if 3 or fewer in hand, must select all; if 4+, choose 3
-  const maxRequired = parseInt((eff.select ?? (eff as any).select_count ?? 3) as any, 10);
+  const maxRequired = parseHandArtifactSelectCount(eff, 3);
   const selectCount = pool.length <= maxRequired ? pool.length : maxRequired;
+
+  if (pool.length === 1 && selectCount === 1) {
+    summonExactCopyFromHand(pool[0]!, owner);
+    return;
+  }
 
   setPendingTarget({
     eff: { ...eff, op: "select_hand_summon_artifact_copy" } as any, // resolved in resolveTarget.js
@@ -231,10 +299,8 @@ export function handleSelectHandSummonArtifactCopy(
     pool,
     targets: [],
     selectCount,
-    // Always require confirmation since order matters for board placement
-    requiresConfirmation: true,
-    // Enforce that user MUST select exactly selectCount cards (no less, no more)
-    enforceMinSelectCount: true,
+    requiresConfirmation: false,
+    enforceMinSelectCount: selectCount > 1,
     enforceMaxSelectCount: true,
   });
 

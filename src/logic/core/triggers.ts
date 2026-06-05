@@ -42,7 +42,8 @@ export function resetTriggerChainDepth(): void {
 //    - `handlers/*.ts` contain domain-specific logic (e.g., Combat, Fuse).
 //
 // 3. INVARIANTS:
-//    - Execution Order: Crests -> Board -> Hand (Hand is last).
+//    - Execution Order (C2): active hand → reactive hand → active crest →
+//      active board → reactive crest → reactive board → active deck → reactive deck.
 //    - Trace hooks are available via `DEBUG_TRIGGERS` (see `debug.ts`).
 //    - Chain depth is limited to MAX_TRIGGER_CHAIN_DEPTH (100).
 // --------------------------------
