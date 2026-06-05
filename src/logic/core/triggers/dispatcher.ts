@@ -27,6 +27,10 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   // Combat - Clash (follower combat, both parties eligible)
   clash: handleCombatEvent,
 
+  // Combat - Attack watchers (after Strike/Clash, before damage)
+  ally_follower_attacked: handleGenericEvent,
+  enemy_follower_attacked: handleGenericEvent,
+
   // Combat - Defense
   leader_attacked: handleCombatEvent,
   leader_damaged: handleGenericEvent,

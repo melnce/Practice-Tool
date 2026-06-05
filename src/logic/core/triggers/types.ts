@@ -29,6 +29,9 @@ export type TriggerEventName =
   | "leader_strike"   // Attacking the leader only
   // Combat - Clash (both parties eligible, follower combat only)
   | "clash"
+  // Combat - Attack watchers (after Strike/Clash, before damage)
+  | "ally_follower_attacked"
+  | "enemy_follower_attacked"
   // Combat - Defense
   | "leader_attacked"
   | "leader_damaged"
@@ -126,6 +129,8 @@ export interface TriggerSpec {
   effects: Effect[];
   source?: "board" | "hand" | "deck" | "banish" | "graveyard" | null;
   once_per_turn?: boolean;
+  /** Max times this trigger may fire per turn (e.g. Azurifrit: 3). */
+  max_per_turn?: number;
   once_key?: string;
   your_turn_only?: boolean;
   // Phase 4: REMOVED usedThisTurn - use __onceByTurn store on CardInstance

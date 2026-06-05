@@ -4,6 +4,10 @@ import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 
 import { fireTrigger } from "./triggers.js";
+import {
+  fireAttackerCombatTriggers,
+  fireDefenderClashTriggers,
+} from "./triggers/handlers/combat.js";
 import { recordEvent } from "../../core/debugTimeline.js";
 import { getBoard, opponentOf, setHP, getHP, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
 
@@ -222,30 +226,20 @@ function _attackFollowerCore(
   stripAmbushOnSelfAttack(attacker);
 
   // ========================================================================
-  // COMBAT TRIGGERS - Fire BEFORE damage
+  // COMBAT TRIGGERS - Fire BEFORE damage (rulebook §228–232)
   // ========================================================================
-  // Combat triggers fire in this sequence:
-  // 1. Clash (both parties, simultaneously - neither dies until both resolve)
-  // 2. Strike (attacker only)
-  // 3. Follower Strike (if applicable, attacker only)
-  // 4. Damage exchange
+  // 1. Attacker Strike/Clash in card-text order
+  // 2. Defender Clash (queued even if attacker's Clash would kill)
+  // 3. ally_follower_attacked / enemy_follower_attacked (C2 ordered path)
+  // 4. Damage exchange (no cleanup between pre-damage triggers and damage)
   // ========================================================================
 
-  // Clash: Fires for BOTH parties in follower combat
-  // SEMANTICS: Both Clash triggers fire "simultaneously" - if attacker's Clash
-  // would kill the defender, defender's Clash still fires before cleanup.
-  // This ensures fair resolution when both combatants have Clash.
-  state.suppressCleanup = true; // Defer deaths until both Clash triggers resolve
-  fireTrigger("clash", attackerPlayer, { attacker, defender });
-  fireTrigger("clash", defenderPlayer, { attacker, defender });
+  state.suppressCleanup = true;
+  fireAttackerCombatTriggers(attacker, attackerPlayer, { attacker, defender });
+  fireDefenderClashTriggers(defender, defenderPlayer, { attacker, defender });
+  fireTrigger("ally_follower_attacked", attackerPlayer, { attacker, defender });
+  fireTrigger("enemy_follower_attacked", attackerPlayer, { attacker, defender });
   state.suppressCleanup = false;
-  cleanupDead(); // Now process any deaths from Clash effects
-
-  // Strike: Fires when attacking ANYTHING (follower or leader)
-  fireTrigger("strike", attackerPlayer, { attacker, defender });
-
-  // Follower Strike: Fires ONLY when attacking a follower (not leader)
-  // Note: Already gated by hasCardTrigger check below for efficiency
 
   // Ensure swing counter exists
   if ((attacker as any).attacks_left == null) {
@@ -265,11 +259,9 @@ function _attackFollowerCore(
   const atkDmg = effectiveAtk(attacker);
   const defDmg = effectiveAtk(defender);
 
-  // Follower Strike: Fires ONLY when attacking a follower (before damage)
+  // Follower Strike may have fired in card-text order above; if it removed the
+  // defender before damage exchange, award piercing and end combat early.
   if (hasCardTrigger(attacker, "follower_strike", "board")) {
-    fireTrigger("follower_strike", attackerPlayer, { attacker, defender });
-
-    // IMMEDIATE CLEANUP so 0-DEF units vanish before damage exchange
     cleanupDead();
 
     // If the defender was removed or died due to follower_strike, award piercing now.

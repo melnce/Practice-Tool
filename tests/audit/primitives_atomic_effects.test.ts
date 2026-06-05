@@ -161,6 +161,73 @@ describe("Rulebook §317 — simultaneous deaths: observer draws once per death"
     expect(thenHand("first").length).toBe(handBefore);
   });
 
+  it("bilateral wipe: active-side leave observers resolve before reactive-side", () => {
+    state.players.first.crests = [
+      {
+        name: "ActiveObserverCrest",
+        owner: "first",
+        insertionTs: 1,
+        triggers: [
+          {
+            event: "enemy_follower_leaves_field",
+            effects: [{ op: "draw", source: "deck", count: 1 }],
+          },
+        ],
+      },
+    ] as any;
+    state.players.second.crests = [
+      {
+        name: "ReactiveObserverCrest",
+        owner: "second",
+        insertionTs: 1,
+        triggers: [
+          {
+            event: "enemy_follower_leaves_field",
+            effects: [{ op: "draw", source: "deck", count: 1 }],
+          },
+        ],
+      },
+    ] as any;
+    state.players.first.deck = [
+      createCard({ name: "ActiveDraw", type: "Follower", attack: 1, defense: 1 }, "deck", "first"),
+    ];
+    state.players.second.deck = [
+      createCard({ name: "ReactiveDraw", type: "Follower", attack: 1, defense: 1 }, "deck", "second"),
+    ];
+    state.players.first.board = [
+      createCard(
+        { name: "AllyVictim", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "board",
+        "first",
+      ),
+    ];
+    state.players.second.board = [
+      createCard(
+        { name: "EnemyVictim", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "board",
+        "second",
+      ),
+    ];
+
+    const drawOrder: string[] = [];
+    runEffects(
+      [
+        { op: "destroy", target: "ally:follower", distribution: "all" },
+        { op: "destroy", target: "enemy:follower", distribution: "all" },
+      ] as any,
+      "first",
+      null,
+    );
+
+    const firstHandNames = thenHand("first").map((c) => c.name);
+    const secondHandNames = thenHand("second").map((c) => c.name);
+    if (firstHandNames.includes("ActiveDraw")) drawOrder.push("active");
+    if (secondHandNames.includes("ReactiveDraw")) drawOrder.push("reactive");
+
+    expect(drawOrder[0]).toBe("active");
+    expect(drawOrder).toContain("reactive");
+  });
+
   it("leaving card does not trigger its own leave listener (self-exclusion)", () => {
     const selfWatcher = createCard(
       {

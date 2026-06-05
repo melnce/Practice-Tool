@@ -1,7 +1,69 @@
-import type { Player } from "../../../../core/types/index.js";
+import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
-import type { ProcessingCandidate } from "../process.js";
+import { processCandidateTriggers, type ProcessingCandidate } from "../process.js";
 import { dispatchOrderedTriggers } from "./common.js";
+
+const ATTACKER_SELF_EVENTS = new Set(["strike", "follower_strike", "clash"]);
+
+/** Attacker Strike/Clash triggers in card-text order (rulebook §228). */
+export function fireAttackerCombatTriggers(
+  attacker: CardInstance,
+  attackerPlayer: Player,
+  context: TriggerContext,
+) {
+  for (const spec of attacker.triggers ?? []) {
+    if (!ATTACKER_SELF_EVENTS.has(spec.event)) continue;
+    processCandidateTriggers(
+      [
+        {
+          card: attacker,
+          owner: attackerPlayer,
+          source: spec.source ?? "board",
+          triggers: [spec],
+        },
+      ],
+      {
+        event: spec.event as TriggerEventName,
+        activePlayer: attackerPlayer,
+        context,
+        skipCommonConditions: true,
+        skipTracking: true,
+        predicate: (_: TriggerSpec, cand: ProcessingCandidate) =>
+          cand.card.uid === attacker.uid,
+      },
+    );
+  }
+}
+
+/** Defender Clash triggers in card-text order, after attacker's pre-damage triggers. */
+export function fireDefenderClashTriggers(
+  defender: CardInstance,
+  defenderPlayer: Player,
+  context: TriggerContext,
+) {
+  for (const spec of defender.triggers ?? []) {
+    if (spec.event !== "clash") continue;
+    processCandidateTriggers(
+      [
+        {
+          card: defender,
+          owner: defenderPlayer,
+          source: spec.source ?? "board",
+          triggers: [spec],
+        },
+      ],
+      {
+        event: "clash",
+        activePlayer: defenderPlayer,
+        context,
+        skipCommonConditions: true,
+        skipTracking: true,
+        predicate: (_: TriggerSpec, cand: ProcessingCandidate) =>
+          cand.card.uid === defender.uid,
+      },
+    );
+  }
+}
 
 /**
  * Handle combat-related trigger events.
