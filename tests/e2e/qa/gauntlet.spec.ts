@@ -18,7 +18,41 @@ async function shot(page: import("@playwright/test").Page, name: string) {
 }
 
 test.describe("S1 — fundamentals", () => {
-  test("mulligan, draw, play, attack, turns, lethal", async ({ page }) => {
+  test("mulligan flow with real startGame", async ({ page }) => {
+    const tracker = trackConsole(page);
+    const po = new SvwbPage(page);
+    await po.gotoTestMode();
+    await po.loadDb();
+    await po.startGameFull(42100);
+
+    await qaStep(page, tracker, async () => {
+      await page.waitForFunction(() => (window as any).gameState?.phase === "mulligan");
+      await po.toggleMulliganCard("#blueHand", 0);
+      await po.confirmMulligan("blue");
+      await po.confirmMulligan("red");
+      await page.waitForFunction(() => (window as any).gameState?.phase === "main");
+    }, "s1-mulligan");
+
+    const handLen = await po.readState<number>("state.players.first.hand.length");
+    expect(handLen).toBeGreaterThan(0);
+    await shot(page, "s1-mulligan-done");
+  });
+
+  test("opening draw via loadDecks", async ({ page }) => {
+    const tracker = trackConsole(page);
+    const po = new SvwbPage(page);
+    await po.gotoTestMode();
+    await po.loadDb();
+    await po.seedRng(42101);
+
+    await qaStep(page, tracker, async () => {
+      await po.loadDecks(blueFund as any, redFund as any, true);
+      const len = await po.readState<number>("state.players.first.hand.length");
+      expect(len).toBeGreaterThan(0);
+    }, "s1-opening-draw");
+  });
+
+  test("play, attack, turns, lethal", async ({ page }) => {
     const tracker = trackConsole(page);
     const po = new SvwbPage(page);
     await po.gotoTestMode();
@@ -112,6 +146,22 @@ test.describe("S2 — targeting", () => {
     }, "s2-single-spell");
 
     await qaStep(page, tracker, async () => {
+      await po.god({ clearHand: ["first"] });
+      await po.god({
+        addToHand: [{ player: "first", cardId: "10041310" }],
+        setPP: [{ player: "first", pp: 10, maxPP: 10 }],
+        summon: [{ player: "second", cardId: "10001110" }],
+      });
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      await po.waitForPendingTarget();
+      const pendingBefore = await po.readState<boolean>("!!state.pendingTargetEffect");
+      expect(pendingBefore).toBe(true);
+      await po.clickInvalidTargetWhilePending();
+      const stillPending = await po.readState<boolean>("!!state.pendingTargetEffect");
+      expect(stillPending).toBe(true);
+    }, "s2-cancel-invalid");
+
+    await qaStep(page, tracker, async () => {
       await po.god({
         clearHand: ["first"],
         addToHand: [
@@ -126,6 +176,22 @@ test.describe("S2 — targeting", () => {
       await po.clickSelectableHand("#blueHand", 0);
       await po.clickSelectableHand("#blueHand", 1);
     }, "s2-ralmia-multi");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearHand: ["first"],
+        addToHand: [
+          { player: "first", cardId: "10174130" },
+          { player: "first", cardId: "90072110", count: 4 },
+        ],
+        setPP: [{ player: "first", pp: 10, maxPP: 10 }],
+      });
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      await po.waitForPendingSelectCount(3);
+      await po.clickSelectableHand("#blueHand", 0);
+      await po.clickSelectableHand("#blueHand", 1);
+      await po.clickSelectableHand("#blueHand", 2);
+    }, "s2-ralmia-cap-3");
 
     await qaStep(page, tracker, async () => {
       await po.god({
@@ -155,6 +221,28 @@ test.describe("S3 — fuse gauntlet", () => {
     await po.gotoTestMode();
     await po.loadDb();
     await po.seedRng(42003);
+
+    // Drag-then-click suppressor: aborted drag must not block fuse; exactly one fuse open, zero plays
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearHand: ["first"],
+        advanceToTurn: { round: 6, activePlayer: "first" },
+        addToHand: [
+          { player: "first", cardId: "90071210" },
+          { player: "first", cardId: "90071220" },
+        ],
+      });
+      const handBefore = await po.readState<number>("state.players.first.hand.length");
+      await po.dragHandCardThenClick("#blueHand", 0);
+      const handAfter = await po.readState<number>("state.players.first.hand.length");
+      expect(handAfter).toBe(handBefore);
+      const fusePending = await po.readState<boolean>(
+        "!!(state.pendingTargetEffect?.eff?.op === 'fuse')",
+      );
+      expect(fusePending).toBe(true);
+      const boardLen = await po.readState<number>("state.players.first.board.length");
+      expect(boardLen).toBe(0);
+    }, "s3-drag-then-click-suppressor");
 
     // Loot: Returning Slash 10323310 + Gilded Blade 90021310 (Loot tribe)
     await qaStep(page, tracker, async () => {
@@ -244,11 +332,51 @@ test.describe("S4 — resources / evolve", () => {
 
     await qaStep(page, tracker, async () => {
       await po.god({
-        advanceToTurn: { round: 5, activePlayer: "second" },
-        setPP: [{ player: "second", pp: 5, maxPP: 5 }],
+        advanceToTurn: { round: 4, activePlayer: "second" },
+        resetBonusPP: true,
+        setPP: [{ player: "second", pp: 3, maxPP: 4 }],
+      });
+      const ppBefore = await po.readState<number>("state.players.second.pp");
+      await po.useBonusPP();
+      const ppAfter = await po.readState<number>("state.players.second.pp");
+      expect(ppAfter).toBe(ppBefore + 1);
+    }, "s4-bonus-pp-early");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        advanceToTurn: { round: 7, activePlayer: "second" },
+        resetBonusPP: true,
+        setPP: [{ player: "second", pp: 6, maxPP: 7 }],
       });
       await po.useBonusPP();
-    }, "s4-bonus-pp");
+      await po.endTurn("red");
+      const usedLate = await po.readState<boolean>("state.secondPlayerPPBoostUsedLate");
+      expect(usedLate).toBe(true);
+    }, "s4-bonus-pp-late");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearHand: ["first"],
+        clearBoard: ["first"],
+        advanceToTurn: { round: 5, activePlayer: "first" },
+        addToHand: [{ player: "first", cardId: "10001110" }],
+        setPP: [{ player: "first", pp: 3, maxPP: 10 }],
+      });
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      const atk = await po.readState<number>("state.players.first.board[0]?.attack");
+      expect(Number(atk)).toBe(2);
+    }, "s4-enhance-below");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearBoard: ["first"],
+        addToHand: [{ player: "first", cardId: "10001110" }],
+        setPP: [{ player: "first", pp: 10, maxPP: 10 }],
+      });
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      const atk = await po.readState<number>("state.players.first.board[0]?.attack");
+      expect(Number(atk)).toBe(5);
+    }, "s4-enhance-at-threshold");
 
     await shot(page, "s4-done");
   });
@@ -278,6 +406,28 @@ test.describe("S5 — amulets", () => {
       );
       expect(engaged).toBe(true);
     }, "s5-engage-noop");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearBoard: ["first"],
+        advanceToTurn: { round: 5, activePlayer: "first" },
+        addToDeck: [{ player: "first", cardId: "10001110", count: 5 }],
+        summon: [{ player: "first", cardId: "10161210" }],
+      });
+      await page.evaluate(() => {
+        const s = window.__svwbTest!.getState();
+        const am = s.players.first.board[0];
+        if (am) am.countdown = 1;
+        window.__svwbTest!.render();
+      });
+      const handBefore = await po.readState<number>("state.players.first.hand.length");
+      await po.endTurn("blue");
+      await po.endTurn("red");
+      const onBoard = await po.readState<number>("state.players.first.board.length");
+      expect(onBoard).toBe(0);
+      const handAfter = await po.readState<number>("state.players.first.hand.length");
+      expect(handAfter).toBeGreaterThanOrEqual(handBefore + 2);
+    }, "s5-countdown-lastwords");
 
     await shot(page, "s5-done");
   });
@@ -318,6 +468,65 @@ test.describe("S6 — edges", () => {
       expect(ok).toBe(false);
     }, "s6-full-board");
 
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearHand: ["first"],
+        clearBoard: ["second"],
+        advanceToTurn: { round: 5, activePlayer: "first" },
+        setPP: [{ player: "first", pp: 10, maxPP: 10 }],
+        addToHand: [{ player: "first", cardId: "10041310" }],
+        summon: [
+          { player: "second", cardId: "10001130" },
+          { player: "second", cardId: "10001110" },
+        ],
+      });
+      const hpBefore = await po.readState<number>("state.players.second.hp");
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      await po.waitForPendingTarget();
+      await page.locator("#redBoard .card.selectable").first().click();
+      await page.waitForTimeout(200);
+      const hpAfterLeader = await po.readState<number>("state.players.second.hp");
+      expect(hpAfterLeader).toBe(hpBefore);
+      const wardDef = await po.readState<number>(
+        "state.players.second.board.find((c) => c.name === 'Quake Goliath')?.defense ?? 99",
+      );
+      const backDef = await po.readState<number>(
+        "state.players.second.board.find((c) => c.name === 'Indomitable Fighter')?.defense ?? 99",
+      );
+      expect(Math.min(Number(wardDef), Number(backDef))).toBeLessThan(5);
+    }, "s6-ward");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearHand: ["first"],
+        clearBoard: ["second"],
+        addToHand: [{ player: "first", cardId: "10041310" }],
+        summon: [{ player: "second", cardId: "10161140", attackReady: true }],
+        setPP: [{ player: "first", pp: 10, maxPP: 10 }],
+      });
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      await page.waitForTimeout(300);
+      const pending = await po.readState<boolean>("!!state.pendingTargetEffect");
+      expect(pending).toBe(false);
+      const selectable = await page.locator("#redBoard .card.selectable").count();
+      expect(selectable).toBe(0);
+    }, "s6-aura-spell");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearHand: ["first"],
+        clearBoard: ["first", "second"],
+        summon: [
+          { player: "first", cardId: "10021110", attackReady: true },
+          { player: "second", cardId: "10144120", attackReady: true },
+        ],
+        advanceToTurn: { round: 6, activePlayer: "first" },
+      });
+      await po.dragAttackerToTarget("#blueBoard", 0, page.locator("#redBoard .card").first());
+      const fortDef = await po.readState<number>("state.players.second.board[0]?.defense");
+      expect(Number(fortDef)).toBe(2);
+    }, "s6-intimidate-attack");
+
     await shot(page, "s6-done");
   });
 });
@@ -350,6 +559,97 @@ test.describe("S7 — keyword smoke", () => {
       expect(attacked).toBe(true);
     }, "s7-rush");
 
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearBoard: ["first", "second"],
+        advanceToTurn: { round: 6, activePlayer: "first" },
+        summon: [
+          { player: "first", cardId: "10153110", attackReady: true },
+          { player: "second", cardId: "10001110", attackReady: true },
+        ],
+      });
+      await page.evaluate(() => {
+        const s = window.__svwbTest!.getState();
+        const prey = s.players.second.board[0];
+        const bane = s.players.first.board[0];
+        if (prey) {
+          prey.attack = 4;
+          prey.defense = 4;
+        }
+        if (bane) {
+          bane.attack = 1;
+          bane.defense = 1;
+        }
+        window.__svwbTest!.render();
+      });
+      await po.dragAttackerToTarget("#blueBoard", 0, page.locator("#redBoard .card").first());
+      await page.waitForTimeout(300);
+      const baneAlive = await po.readState<number>(
+        "state.players.first.board.length + state.players.second.board.length",
+      );
+      expect(baneAlive).toBe(0);
+    }, "s7-bane-trade");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearBoard: ["first", "second"],
+        setLeaderHP: [{ player: "first", hp: 12 }],
+        advanceToTurn: { round: 6, activePlayer: "first" },
+        summon: [{ player: "first", cardId: "10453110", attackReady: true }],
+      });
+      const hpBefore = await po.readState<number>("state.players.first.hp");
+      await po.dragAttackerToTarget("#blueBoard", 0, page.locator("#redLeader"));
+      const hpAfter = await po.readState<number>("state.players.first.hp");
+      expect(hpAfter).toBeGreaterThan(hpBefore);
+    }, "s7-drain-attack");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearBoard: ["first", "second"],
+        setLeaderHP: [{ player: "first", hp: 12 }],
+        summon: [
+          { player: "second", cardId: "10453110", attackReady: true },
+          { player: "first", cardId: "10001110", attackReady: true },
+        ],
+        advanceToTurn: { round: 6, activePlayer: "second" },
+      });
+      const hpBefore = await po.readState<number>("state.players.first.hp");
+      await po.dragAttackerToTarget("#redBoard", 0, page.locator("#blueBoard .card").first());
+      const hpAfter = await po.readState<number>("state.players.first.hp");
+      expect(hpAfter).toBe(hpBefore);
+    }, "s7-drain-defend");
+
+    await qaStep(page, tracker, async () => {
+      await po.god({
+        clearHand: ["first"],
+        clearBoard: ["second"],
+        addToHand: [{ player: "first", cardId: "10041310" }],
+        setPP: [{ player: "first", pp: 10, maxPP: 10 }],
+        summon: [{ player: "second", cardId: "10161120" }],
+        advanceToTurn: { round: 5, activePlayer: "first" },
+      });
+      const barrierBefore = await po.readState<boolean>(
+        "!!state.players.second.board[0]?.hasBarrier",
+      );
+      expect(barrierBefore).toBe(true);
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      await po.waitForPendingTarget();
+      const targetUid = await po.readState<string>("state.players.second.board[0]?.uid ?? ''");
+      await page.locator(`#redBoard .card.selectable[data-uid="${targetUid}"]`).click();
+      await page.waitForTimeout(300);
+      const barrierMid = await po.readState<boolean>(
+        "!!state.players.second.board[0]?.hasBarrier",
+      );
+      expect(barrierMid).toBe(false);
+      await po.god({ addToHand: [{ player: "first", cardId: "10041310" }] });
+      await po.rightClickPlayHandCard("#blueHand", 0);
+      await po.waitForPendingTarget();
+      await page.locator(`#redBoard .card.selectable[data-uid="${targetUid}"]`).click();
+      await page.waitForTimeout(300);
+      const onBoard = await po.readState<number>("state.players.second.board.length");
+      expect(onBoard).toBe(0);
+    }, "s7-barrier-pop");
+
     await shot(page, "s7-done");
   });
 });
@@ -368,8 +668,11 @@ test.describe("S8 — stability", () => {
         setPP: [{ player: "first", pp: 10, maxPP: 10 }],
         addToHand: [{ player: "first", cardId: "10001110", count: 3 }],
       });
+      const card = page.locator("#blueHand .card").first();
       for (let i = 0; i < 5; i++) {
-        await po.rightClickPlayHandCard("#blueHand", 0).catch(() => {});
+        if (!(await card.isVisible())) break;
+        await card.click({ button: "right", force: true, timeout: 2_000 }).catch(() => {});
+        await page.waitForTimeout(50);
       }
     }, "s8-spam");
 

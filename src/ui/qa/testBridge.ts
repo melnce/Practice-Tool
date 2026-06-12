@@ -15,6 +15,7 @@ export interface SvwbTestBridge {
   seedRng(seed: number | string): void;
   loadDecks(blue: RawDeck, red: RawDeck, opts?: { drawOpening?: boolean }): void;
   addToHand(player: Player, cardId: string, count?: number): void;
+  addToDeck(player: Player, cardId: string, count?: number): void;
   summonToBoard(player: Player, cardId: string, attackReady?: boolean): boolean;
   setPP(player: Player, pp: number, maxPP?: number): void;
   setEP(player: Player, charges: number): void;
@@ -52,6 +53,14 @@ function installBridge(): void {
       const hand = state.players[player].hand;
       for (let i = 0; i < count; i++) {
         hand.push(makeCard(cardId, player));
+      }
+      adapter.render();
+    },
+
+    addToDeck(player, cardId, count = 1) {
+      const deck = state.players[player].deck;
+      for (let i = 0; i < count; i++) {
+        deck.push(makeCard(cardId, player));
       }
       adapter.render();
     },

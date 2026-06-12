@@ -6,7 +6,7 @@ export interface ConsoleTracker {
   errors: string[];
 }
 
-/** Dev-guard console errors from pre-overhaul fuse finalize paths on main (not gameplay failures). */
+/** Dev-guard from fuse finalize on legacy main (engine contract fix is on ui-overhaul). */
 const MAIN_KNOWN_CONSOLE_ERRORS = [
   "Targeted op handler illegally invoked lifecycle function: clearSelectableFlags",
 ];

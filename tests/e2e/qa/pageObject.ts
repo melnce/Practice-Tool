@@ -60,39 +60,111 @@ export class SvwbPage {
     await this.page.evaluate((s) => window.__svwbTest!.seedRng(s), seed);
   }
 
-  async loadDecks(blue: RawDeck, red: RawDeck): Promise<void> {
+  async loadDecks(blue: RawDeck, red: RawDeck, drawOpening = false): Promise<void> {
     await this.page.evaluate(
-      ([b, r]) => window.__svwbTest!.loadDecks(b, r, { drawOpening: false }),
-      [blue, red] as const,
+      ([b, r, draw]) => window.__svwbTest!.loadDecks(b, r, { drawOpening: draw }),
+      [blue, red, drawOpening] as const,
     );
+  }
+
+  async startGameFull(
+    seed: number,
+    blueDeck = "starter_deck",
+    redDeck = "starter_deck",
+  ): Promise<void> {
+    await this.page.selectOption("#blueDeckSelect", blueDeck);
+    await this.page.selectOption("#redDeckSelect", redDeck);
+    await this.page.locator(SEL.seedInput).fill(String(seed));
+    await this.page.locator(SEL.startGameBtn).click();
+    await this.page.waitForFunction(() => {
+      const s = (window as any).gameState;
+      return s?.phase === "mulligan" || s?.gameStarted === true;
+    });
+  }
+
+  async waitForPendingTarget(timeout = 5_000): Promise<void> {
+    await this.page.waitForFunction(
+      () => !!window.__svwbTest!.getState().pendingTargetEffect,
+      undefined,
+      { timeout },
+    );
+  }
+
+  async dragHandCardThenClick(zone: "#blueHand" | "#redHand", index = 0): Promise<void> {
+    const card = this.page.locator(SEL.handCardByIndex(zone, index));
+    const box = await card.boundingBox();
+    if (!box) throw new Error("hand card not visible for drag-then-click");
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    await this.page.mouse.move(cx, cy);
+    await this.page.mouse.down();
+    await this.page.mouse.move(cx + 16, cy + 8, { steps: 4 });
+    await this.page.mouse.up();
+    // Native HTML5 drag may leave the suppressor latched without dragend; complete the gesture.
+    await card.evaluate((el) => {
+      el.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
+    });
+    await this.page.waitForTimeout(50);
+    await this.leftClickHandCard(zone, index);
+  }
+
+  async clickInvalidTargetWhilePending(): Promise<void> {
+    await this.page.locator(SEL.blueLeader).click();
   }
 
   async god(opts: {
     clearHand?: Player[];
     addToHand?: { player: Player; cardId: string; count?: number }[];
+    addToDeck?: { player: Player; cardId: string; count?: number }[];
     clearBoard?: Player[];
+    clearPending?: boolean;
     summon?: { player: Player; cardId: string; attackReady?: boolean }[];
     setPP?: { player: Player; pp: number; maxPP?: number }[];
     setEP?: { player: Player; charges: number }[];
     setSEP?: { player: Player; charges: number }[];
     setLeaderHP?: { player: Player; hp: number }[];
+    resetBonusPP?: boolean;
     advanceToTurn?: { round: number; activePlayer?: Player };
   }): Promise<void> {
     await this.page.evaluate((o) => {
       const t = window.__svwbTest!;
+      const s = t.getState();
+      const clearUiFlags = () => {
+        for (const p of ["first", "second"] as const) {
+          for (const c of [...s.players[p].hand, ...s.players[p].board]) {
+            delete c.__uiSelectable;
+            delete c.__mulliganSelectable;
+            delete c.__mulliganSelected;
+          }
+        }
+      };
+      if (o.clearPending) {
+        s.pendingTargetEffect = null;
+        clearUiFlags();
+      }
       o.clearHand?.forEach((p) => {
-        t.getState().players[p].hand = [];
+        s.players[p].hand = [];
       });
       o.clearBoard?.forEach((p) => {
-        t.getState().players[p].board = [];
+        s.players[p].board = [];
       });
+      if (o.clearHand || o.clearBoard) {
+        s.pendingTargetEffect = null;
+        clearUiFlags();
+      }
       o.addToHand?.forEach((x) => t.addToHand(x.player, x.cardId, x.count));
+      o.addToDeck?.forEach((x) => t.addToDeck(x.player, x.cardId, x.count));
       o.summon?.forEach((x) => t.summonToBoard(x.player, x.cardId, x.attackReady));
+      if (o.advanceToTurn) t.advanceToTurn(o.advanceToTurn.round, o.advanceToTurn.activePlayer);
       o.setPP?.forEach((x) => t.setPP(x.player, x.pp, x.maxPP));
       o.setEP?.forEach((x) => t.setEP(x.player, x.charges));
       o.setSEP?.forEach((x) => t.setSEP(x.player, x.charges));
       o.setLeaderHP?.forEach((x) => t.setLeaderHP(x.player, x.hp));
-      if (o.advanceToTurn) t.advanceToTurn(o.advanceToTurn.round, o.advanceToTurn.activePlayer);
+      if (o.resetBonusPP) {
+        s.secondPlayerPPBoostUsedEarly = false;
+        s.secondPlayerPPBoostUsedLate = false;
+        s.secondPlayerPPBoostPending = false;
+      }
       t.render();
     }, opts);
   }
@@ -123,10 +195,12 @@ export class SvwbPage {
   async rightClickPlayHandCard(zone: "#blueHand" | "#redHand", index = 0): Promise<void> {
     const card = this.page.locator(SEL.handCardByIndex(zone, index));
     await card.click({ button: "right", force: true });
+    await this.page.waitForTimeout(200);
   }
 
   async leftClickHandCard(zone: "#blueHand" | "#redHand", index = 0): Promise<void> {
     await this.page.locator(SEL.handCardByIndex(zone, index)).click({ force: true });
+    await this.page.waitForTimeout(200);
   }
 
   async dragHandToBoard(handZone: "#blueHand" | "#redHand", boardZone: "#blueBoard" | "#redBoard", handIndex = 0): Promise<void> {
@@ -200,7 +274,7 @@ export class SvwbPage {
   }
 
   async toggleMulliganCard(zone: "#blueHand" | "#redHand", index: number): Promise<void> {
-    await this.page.locator(`${zone} ${SEL.cardSelectable}`).nth(index).click();
+    await this.page.locator(SEL.handCardByIndex(zone, index)).click();
   }
 
   async confirmTargets(): Promise<void> {
