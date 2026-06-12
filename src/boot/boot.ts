@@ -16,6 +16,7 @@ import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
 import { useRedBoost } from "../logic/boosts.js";
 import { state } from "../core/gameState.js";
 import type { DeckManifest, DeckManifestEntry } from "../data/deckManifest.js";
+import { initTestBridgeIfRequested } from "../ui/qa/testBridge.js";
 
 // Expose globals for UI onclick handlers
 window.endTurnBlue = endTurnBlue;
@@ -32,6 +33,8 @@ injectAdapter({
 });
 
 window.addEventListener("DOMContentLoaded", () => {
+  void initTestBridgeIfRequested();
+
   wireClick("startGameBtn", async () => {
     const blueSelect = document.getElementById(
       "blueDeckSelect",

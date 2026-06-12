@@ -131,3 +131,48 @@ export async function loadRedDeck(deckName: string) {
 
   adapter.render();
 }
+
+/** QA harness: load a deck from in-memory JSON (no fetch). */
+export function loadPlayerDeckFromRaw(
+  owner: "first" | "second",
+  raw: RawDeck,
+  deckFile = "qa_deck.json",
+  drawOpening = true,
+): void {
+  const player = state.players[owner];
+  player.deckFile = deckFile;
+  const enriched = enrichDeck(raw, deckFile);
+
+  player.deck.length = 0;
+  player.deck.push(...enriched);
+  player.hand.length = 0;
+  player.board.length = 0;
+  player.graveyard.length = 0;
+
+  player.hp = 20;
+  player.pp = 1;
+  player.maxPP = 1;
+
+  if (drawOpening) {
+    for (let i = 0; i < 4; i++) drawCard(player.hand, player.deck, owner);
+  }
+
+  logEvent("deckLoad", {
+    owner,
+    file: deckFile,
+    count: player.deck.length,
+    source: "qa_raw",
+  });
+
+  adapter.render();
+}
+
+export function loadDecksFromRaw(
+  blue: RawDeck,
+  red: RawDeck,
+  options?: { drawOpening?: boolean },
+): void {
+  const draw = options?.drawOpening !== false;
+  loadPlayerDeckFromRaw("first", blue, "qa_blue.json", draw);
+  loadPlayerDeckFromRaw("second", red, "qa_red.json", draw);
+}
