@@ -41,6 +41,10 @@ The UI overhaul freeze commit `2782efb` squashed **pre-overhaul engine work** an
 
 Minimal change: import `createHandDragClickSuppressor` and route hand-card **left-click fuse** through `guard.attach()` instead of a raw `click` listener. Right-click play, target selection, board interactions unchanged. Left-click fuse behavior at `75f4b4e` is preserved; the guard only suppresses the spurious click after an aborted drag.
 
+## Post-recovery UI fix (memoization)
+
+`src/ui/zones/memoization.ts` on composed main: invalidate cached card VMs when `pendingTargetEffect.targetUids`, `__mulliganSelectable`, or `phase`/`mulliganStage` change. Required so legacy UI shows selectable/selected state for multi-select (Ralmia), mulligan toggles, and fuse partner highlights under engine contracts from `2782efb`.
+
 ## Import verification
 
 Grep on `src/logic`, `src/core`, `src/helpers`, `tests/audit`, `tests/mechanics`: **no** imports of `src/ui/motion`, `src/ui/render/reconcile`, or `src/ui/styles`. Expected UI import in mechanics: `hand-drag-click-guard.test.ts` → `dragClickGuard.ts`.
