@@ -6,6 +6,7 @@ import { logEvent } from "../../../../core/logger.js";
 import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 
 import type {
   UnifiedBanishSpec,
@@ -37,6 +38,18 @@ export function handleBanish(
 ): "pending" | number {
   const spec = normalizeToUnifiedSpec(eff);
   const ctx: BanishContext = { ...context, owner };
+
+  const targetStr = String(spec.target || "").toLowerCase();
+  if (targetStr.startsWith("selected") && context.targetUids?.length) {
+    const targets = resolveUids(context.targetUids).filter(
+      (c) => c && (c.type === "Follower" || c.type === "Amulet"),
+    );
+    let count = 0;
+    for (const t of targets) {
+      if (banishCard(t, "direct")) count++;
+    }
+    return count;
+  }
 
   // Handle special scopes first
   if (spec.scope) {
@@ -97,8 +110,8 @@ function handleSpecialScope(
       return banishDeckDuplicates(owner);
 
     case "all_enemy_copies": {
-      // Requires selected card from context
-      const selected = ctx.selectedCard;
+      // "Copies of it" — uses evolve selection (context or last targeted banish)
+      const selected = ctx.selectedCard ?? state.__lastSelected ?? null;
       if (!selected) {
         logEvent("banish_all_copies_no_selected", { owner });
         return 0;

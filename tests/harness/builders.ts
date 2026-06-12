@@ -24,6 +24,7 @@ import type {
     Effect,
 } from "../../src/core/types/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
+import { normalizeCardStats } from "../../src/core/cardStats.js";
 import { playCardNoRender, PlayOutcome } from "../../src/logic/core/playCard/index.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getBoard, getHand, getHP, getPP } from "../../src/core/playerHelpers.js";
@@ -142,6 +143,7 @@ export function createCard(
         owner,
     } as CardInstance;
 
+    normalizeCardStats(card);
     return card;
 }
 

@@ -19,7 +19,7 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
   if (space <= 0) return;
 
   // -------- Filters --------
-  const f = (eff as any)?.filters || {};
+  const f = (eff as any)?.filters || (eff as any)?.filter || {};
   const wantType = String(f.type ?? "").toLowerCase(); // "amulet" | "follower" | "spell"
   const cls = String(f.class ?? f.class_eq ?? "").toLowerCase();
   const costLte = Number.isFinite(Number(f.cost_lte))

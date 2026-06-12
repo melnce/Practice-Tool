@@ -11,6 +11,8 @@ import { logEvent } from "../../../core/logger.js";
 import { doAction, appendStep } from "../../../core/history.js";
 import type { Effect } from "../../../core/types/index.js";
 import { getModeBonus } from "../../../core/playerHelpers.js";
+import { consumePlayFollowerResume } from "../../core/playCard/followerResume.js";
+import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
 
 // Import types if needed, or define locally if specific to mode
 // ChooseEffect?
@@ -20,6 +22,20 @@ import { getModeBonus } from "../../../core/playerHelpers.js";
 
 import type { EffectCtx } from "../../core/effects/registry.js";
 
+/** Modes pick count = base (select / select_count) + leader modeBonus (Faith Sham-Nacha). */
+export function resolveModeSelectCount(
+  eff: Effect & { select_count?: number; select?: number },
+  owner: Player,
+): number {
+  const options = Array.isArray((eff as any)?.options) ? (eff as any).options : [];
+  const baseSelect = Math.max(
+    1,
+    parseInt(String((eff as any)?.select_count ?? (eff as any)?.select ?? 1), 10) || 1,
+  );
+  const bonus = getModeBonus(state, owner);
+  return Math.min(options.length, baseSelect + bonus);
+}
+
 export function handleMode(eff: Effect, ctx: EffectCtx) {
   const { owner, sourceCard, queue: effectsQueue } = ctx;
 
@@ -27,10 +43,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   const options = Array.isArray((eff as any)?.options)
     ? (eff as any).options
     : [];
-  const baseSelect = Math.max(1, parseInt((eff as any)?.select_count ?? 1));
-  const bonus = getModeBonus(state, owner);
-  // Clamp to available options
-  const selectCount = Math.min(options.length, baseSelect + bonus);
+  const selectCount = resolveModeSelectCount(eff, owner);
   logEvent("chooseOpen", { owner, options: options.length, selectCount });
   const unique = (eff as any)?.unique !== false; // default true
 
@@ -123,10 +136,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       requiresER: picked.map((p) => !!p?.requires?.earth_rite),
     });
     logEvent("chooseFinalize", { owner, picked: picked.length, ai: true });
-    // Fire select_mode trigger for each mode chosen (used by Faith crest)
-    for (let i = 0; i < picked.length; i++) {
-      fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
-    }
+    fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
     const combined: Effect[] = [];
     for (const opt of picked) {
       const fizzled = opt?.requires?.earth_rite && paidByOpt.get(opt) === false;
@@ -157,11 +167,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       "Confirm Choice",
       () => {
         logEvent("chooseFinalize", { owner, picked: picked.length });
-
-        // Fire select_mode trigger for each mode chosen (used by Faith crest)
-        for (let i = 0; i < picked.length; i++) {
-          fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
-        }
+        fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
 
         // Flatten effects of all picked options in pick order
         const combined: Effect[] = [];
@@ -179,10 +185,10 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
 
         if (effectsQueue && effectsQueue.length) {
           runEffects([...effectsQueue], owner, sourceCard);
-        } else {
-          // Render removed - UI layer
         }
-        // console.groupEnd();
+
+        consumePlayFollowerResume();
+        resumeDeferredDeathIfIdle();
       },
       { owner, picks: picked.map((p) => p?.label || p?.name || "(opt)") },
       { autoRender: true },

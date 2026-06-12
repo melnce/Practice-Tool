@@ -7,6 +7,7 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { pushToHand, MAX_HAND } from "../../../../core/utils.js";
+import { normalizeCardStats } from "../../../../core/cardStats.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { normalizeToAddToHandSpec } from "./types.js";
@@ -72,6 +73,7 @@ function addNamedCards(
         copy.uid = state.rng.makeUid();
         copy.owner = receivingPlayer;
         copy.zone = "hand";
+        normalizeCardStats(copy);
 
         // Apply keywords if specified
         if (spec.keywords.length > 0) {
@@ -105,10 +107,15 @@ function addCopiedCards(
         case "self":
             cardToCopy = sourceCard;
             break;
-        case "selected":
-            // Try context first, then fall back to state.lastSelected (array)
-            cardToCopy = context.selected?.[0] ?? (state as any).lastSelected?.[0] ?? null;
+        case "selected": {
+            const picks = context.selected;
+            cardToCopy =
+                (Array.isArray(picks) ? picks[0] : picks) ??
+                (state as any).lastSelected?.[0] ??
+                (state as any).__lastSelected ??
+                null;
             break;
+        }
         case "last_drawn":
             // Try context first, then fall back to state.lastDrawnCards (array)
             cardToCopy = context.lastDrawn ?? (state as any).lastDrawnCards?.[0] ?? (state as any).lastDrawnCard ?? null;
@@ -131,6 +138,7 @@ function addCopiedCards(
         copy.uid = state.rng.makeUid();
         copy.owner = receivingPlayer;
         copy.zone = "hand";
+        normalizeCardStats(copy);
 
         // Apply keywords if specified
         if (spec.keywords.length > 0) {

@@ -6,7 +6,13 @@ import { banishCard } from "./ops/banish/index.js";
 
 import { logEvent } from "../../core/logger.js";
 import type { CardInstance, Effect, Player } from "../../core/types/index.js";
-import { getPlaysThisTurn, getHand, getBoard, isFirstPlayer } from "../../core/playerHelpers.js";
+import {
+  getPlaysThisTurn,
+  getHand,
+  getBoard,
+  isFirstPlayer,
+} from "../../core/playerHelpers.js";
+import { checkPostBuffTriggers } from "./ops/stat/core.js";
 
 export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {
   const a = parseInt((eff.attack as any) || 0) || 0;
@@ -36,6 +42,14 @@ export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {
     sourceCard.peak_defense ?? (sourceCard.defense as number),
     sourceCard.defense as number,
   );
+
+  if (
+    (a > 0 || d > 0) &&
+    sourceCard.type === "Follower" &&
+    sourceCard.owner
+  ) {
+    checkPostBuffTriggers(sourceCard, a, d, sourceCard.owner);
+  }
 
   // Track temporary buffs if specified
   if (eff.until_end_of_turn) {

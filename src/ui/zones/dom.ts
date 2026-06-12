@@ -1,206 +1,271 @@
 // src/ui/zones/dom.ts
 import type { CardViewModel } from "./types.js";
-import { applyKeywordOverlays, applyBarrierOverlay } from "../overlays.js";
 import { attachTooltip } from "../tooltips.js";
+import { state } from "../../core/gameState.js";
 
-function createElement(
-  tag: string,
-  className?: string,
-  text?: string,
-): HTMLElement {
-  const el = document.createElement(tag);
-  if (className) el.className = className;
-  if (text !== undefined) el.textContent = text;
+const CLASS_SLUG: Record<string, string> = {
+  forestcraft: "forest",
+  swordcraft: "sword",
+  runecraft: "rune",
+  dragoncraft: "dragon",
+  abysscraft: "abyss",
+  havencraft: "haven",
+  portalcraft: "portal",
+  neutral: "neutral",
+};
+
+const KEYWORD_CHIPS = [
+  "storm",
+  "rush",
+  "bane",
+  "drain",
+  "ambush",
+  "aura",
+  "intimidate",
+  "barrier",
+] as const;
+
+function classSlug(raw?: string): string {
+  if (!raw) return "neutral";
+  const key = String(raw).toLowerCase().replace(/\s+/g, "");
+  return CLASS_SLUG[key] ?? "neutral";
+}
+
+function raritySlug(card: CardViewModel["card"]): string {
+  const r = String((card as { rarity?: string }).rarity ?? "").toLowerCase();
+  if (r.includes("legend")) return "legendary";
+  if (r.includes("gold")) return "gold";
+  if (r.includes("silver")) return "silver";
+  return "bronze";
+}
+
+function skyboundGauge(card: CardViewModel["card"]): { current: number; req: number } | null {
+  const witnesses = Number(card.skyboundArtEvolvesWitnessed ?? 0);
+  const req = Number((card as { skyboundArtRequired?: number }).skyboundArtRequired ?? 0);
+  if (!req) return null;
+  const current = (state.roundCount || 1) + witnesses;
+  return { current, req };
+}
+
+function baseCost(card: CardViewModel["card"]): number {
+  return Number(card.base_cost ?? card.cost ?? 0);
+}
+
+function ensureChild(parent: HTMLElement, selector: string, tag: string, className: string): HTMLElement {
+  let el = parent.querySelector(selector) as HTMLElement | null;
+  if (!el) {
+    el = document.createElement(tag);
+    el.className = className;
+    parent.appendChild(el);
+  }
   return el;
 }
 
-export function renderCardDOM(
-  vm: CardViewModel,
-  elementId: string,
-  tooltipContainer: HTMLElement | null,
-  isBoard = false,
-): HTMLElement {
+function syncKeywordChips(wrapper: HTMLElement, vm: CardViewModel, isBoard: boolean): void {
+  let chips = wrapper.querySelector(".keyword-chips") as HTMLElement | null;
+  if (!isBoard || vm.card.type !== "Follower") {
+    chips?.remove();
+    return;
+  }
+  if (!chips) {
+    chips = document.createElement("div");
+    chips.className = "keyword-chips";
+    wrapper.appendChild(chips);
+  }
+  chips.replaceChildren();
+  const card = vm.card;
+  const flags: Record<string, boolean> = {
+    storm: !!card.hasStorm,
+    rush: !!(card.hasRush || card.isRush),
+    bane: !!card.hasBane,
+    drain: !!card.hasDrain,
+    ambush: !!card.hasAmbush,
+    aura: !!card.hasAura,
+    intimidate: !!card.hasIntimidate,
+    barrier: !!card.hasBarrier,
+  };
+  for (const key of KEYWORD_CHIPS) {
+    if (!flags[key]) continue;
+    const chip = document.createElement("span");
+    chip.className = "keyword-chip";
+    chip.dataset.keyword = key;
+    chip.textContent = key.slice(0, 1);
+    chips.appendChild(chip);
+  }
+}
+
+function applyCardDataAttributes(div: HTMLElement, vm: CardViewModel, ctx: { isBoard: boolean; isMyHand: boolean }): void {
   const { card } = vm;
+  const slug = classSlug(card.class);
+  div.dataset.class = slug;
+  div.style.setProperty("--card-accent", `var(--c-${slug})`);
 
-  const div = createElement("div", "card");
+  div.dataset.type = String(card.type ?? "Follower").toLowerCase();
+  div.dataset.rarity = raritySlug(card);
+  div.dataset.zone = ctx.isBoard ? "board" : "hand";
+
+  const setFlag = (key: string, on: boolean) => {
+    if (on) div.dataset[key] = "true";
+    else delete div.dataset[key];
+  };
+
+  setFlag("evolved", !!vm.isEvo);
+  setFlag("superEvolved", !!vm.isSuperEvo);
+  setFlag("ready", !!(ctx.isBoard && vm.canAttack));
+  setFlag("exhausted", !!(ctx.isBoard && card.type === "Follower" && card.hasAttacked));
+  setFlag("ward", !!(ctx.isBoard && vm.hasWard));
+  setFlag("selectable", !!vm.isSelectable);
+  setFlag("selected", !!vm.isSelected);
+  setFlag("engageReady", !!vm.canEngage);
+  setFlag(
+    "engageUsed",
+    !!(card.type === "Amulet" && card.keywordState?.engagedThisTurn),
+  );
+  setFlag("playable", !!(ctx.isMyHand && !!vm.glowClass));
+  setFlag("spell", !!vm.isSpell);
+}
+
+export function createCardElement(
+  vm: CardViewModel,
+  ctx: { isBoard: boolean; isMyHand: boolean; isAlly: boolean },
+  tooltipContainer: HTMLElement | null,
+): HTMLElement {
+  const div = document.createElement("div");
+  div.className = "card hidpi";
+  div.dataset.instanceId = vm.uid;
   div.dataset.uid = vm.uid;
-  div.id = elementId;
-  div.classList.add("hidpi");
 
-  // Glow
-  if (vm.glowClass) div.classList.add(vm.glowClass);
-  if (vm.isSpell) div.classList.add("spell");
-
-  // Interactions
-  if (vm.isSelectable) div.classList.add("selectable");
-  if (vm.isSelected) div.classList.add("selected");
-
-  // Engage
-  if (vm.canEngage) {
-    div.classList.add("engage-ready");
-    div.style.cursor = "pointer";
+  if (!ctx.isMyHand && !ctx.isBoard) {
+    div.classList.add("card-back");
+    return div;
   }
 
-  // Board specific
-  if (vm.isSuperEvo) div.classList.add("super-evo");
+  const frame = document.createElement("div");
+  frame.className = "card-frame";
+  div.appendChild(frame);
 
-  if (vm.canAttack) {
-    if (vm.isRush) div.classList.add("rush-glow");
-    else div.classList.add("can-attack");
-  }
-
-  // Image Wrapper
-  const imageWrapper = createElement("div", "card-image-wrapper");
-  const imgSrc = card.base_image || card.image || "placeholder.jpg";
+  const imageWrapper = document.createElement("div");
+  imageWrapper.className = "card-image-wrapper";
   const img = document.createElement("img");
+  const imgSrc = vm.card.base_image || vm.card.image || "placeholder.jpg";
   img.src = String(imgSrc);
-  img.alt = card.name;
+  img.alt = vm.card.name;
   imageWrapper.appendChild(img);
 
-  // Icarus Badge
-  if (vm.icarusBuff) {
-    const badge = createElement("div", "icarus-badge", "!");
-    Object.assign(badge.style, {
-      position: "absolute",
-      top: "28px",
-      left: "6px",
-      width: "18px",
-      height: "18px",
-      lineHeight: "18px",
-      borderRadius: "50%",
-      background: "rgba(255, 215, 0, 0.95)",
-      color: "#000",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontWeight: "900",
-      fontSize: "12px",
-      boxShadow: "0 0 4px rgba(0,0,0,0.6)",
-      zIndex: "3",
-    });
-    imageWrapper.appendChild(badge);
-  }
+  const nameEl = document.createElement("div");
+  nameEl.className = "card-name";
+  nameEl.textContent = vm.card.name;
+  imageWrapper.appendChild(nameEl);
 
-  // Selection Check
-  if (vm.isSelected) {
-    const check = createElement("div", "selected-check", "✓");
-    Object.assign(check.style, {
-      position: "absolute",
-      top: "6px",
-      right: "8px",
-      fontSize: "24px",
-      fontWeight: "900",
-      color: "#2ecc71",
-      textShadow: "0 0 4px rgba(0,0,0,0.9), 0 0 8px rgba(46,204,113,0.8)",
-      zIndex: "100",
-      pointerEvents: "none",
-    });
-    imageWrapper.appendChild(check);
-  }
-
-  // Stats
-  const topLeft = createElement(
-    "div",
-    "card-stats top-left",
-    String(vm.shownCost),
-  );
-  const bottomLeft = createElement("div", "card-stats bottom-left");
-  const bottomRight = createElement("div", "card-stats bottom-right");
-
-  // Stat logic
-  if (card.type === "Follower") {
-    bottomLeft.textContent = String(vm.atkDisp);
-    bottomRight.textContent = String(vm.defDisp);
-
-    // Colors via classes
-    // Attack
-    if (vm.isAtkBuffed) bottomLeft.classList.add("stat-buffed");
-    else if (vm.isAtkDebuffed) bottomLeft.classList.add("stat-damaged");
-
-    // Defense
-    if (vm.isDamaged) bottomRight.classList.add("stat-damaged");
-    else if (vm.isDefBuffed) bottomRight.classList.add("stat-buffed");
-  } else if (card.type === "Amulet") {
-    bottomLeft.style.display = "none";
-
-    if (vm.countdown !== null) {
-      bottomRight.style.display = "block";
-      bottomRight.className = "card-stats bottom-right countdown-badge";
-      bottomRight.textContent = String(vm.countdown);
-    } else {
-      // Logic for any named counter from original zones.ts
-      // We can check card.counters in VM but let's replicate logic here or in VM.
-      // VM has access to card.counters. Let's do a quick check if VM didn't handle it fully.
-      // Actually VM does check `card.counters`. But let's refine this in VM next time or assume VM logic is decent.
-      // In zones.ts logic was: if countdown found use it, else if counter found use it.
-      // In my VM I mapped countdown. I didn't map "other counters" explicitly in VM props except via `card`.
-      // Doing it here for safety to match behavior exactly.
-      let shown = false;
-      if (card.counters && typeof card.counters === "object") {
-        const entries = Object.entries(card.counters).filter(([, v]) =>
-          Number.isFinite(Number(v)),
-        );
-        if (entries.length) {
-          const entry = entries[0];
-          if (entry) {
-            bottomRight.style.display = "block";
-            bottomRight.className = "card-stats bottom-right countdown-badge";
-            bottomRight.textContent = String(Number(entry[1]));
-            shown = true;
-          }
-        }
-      }
-      if (!shown) bottomRight.style.display = "none";
-    }
-  } else {
-    // Spell
-    bottomLeft.style.display = "none";
-    bottomRight.style.display = "none";
-  }
-
-  // Spellboost
-  const sbContainer = createElement("div", "spellboost-container");
-  if (vm.spellboostCount !== null && vm.spellboostCount > 0) {
-    const sb = createElement(
-      "div",
-      "spellboost-badge",
-      String(vm.spellboostCount),
-    );
-    sbContainer.appendChild(sb);
-  }
-
-  imageWrapper.append(img, topLeft, sbContainer, bottomLeft, bottomRight);
   div.appendChild(imageWrapper);
 
-  // Overlays
-  applyKeywordOverlays(div, card, isBoard);
-  applyBarrierOverlay(div, card);
-
-  // Tooltip
   if (tooltipContainer) {
-    // Original logic checks (containerId.includes("first")) for `isAlly`.
-    // We need that context. `attachTooltip` uses it for "Can evolve" checks etc.
-    // We'll pass it in or infer.
-    // `attachTooltip(div, tooltipEl, card, containerId.includes("first"));`
-    // We need `isBlue` passed to `renderCardDOM` or derive it.
-    // Let's rely on `id` prefix or pass a boolean.
-    const isBlue = elementId.includes("first");
-    attachTooltip(div, tooltipContainer, card, isBlue);
+    attachTooltip(div, tooltipContainer, vm.card, ctx.isAlly);
   }
 
+  updateCardElement(div, vm, ctx);
   return div;
 }
 
+export function updateCardElement(
+  div: HTMLElement,
+  vm: CardViewModel,
+  ctx: { isBoard: boolean; isMyHand: boolean; isAlly?: boolean },
+): void {
+  if (!ctx.isMyHand && !ctx.isBoard) {
+    div.classList.add("card-back");
+    div.replaceChildren();
+    return;
+  }
 
+  div.classList.remove("card-back");
+  applyCardDataAttributes(div, vm, ctx);
 
+  const wrapper = div.querySelector(".card-image-wrapper") as HTMLElement | null;
+  if (!wrapper) return;
 
+  const nameEl = ensureChild(wrapper, ".card-name", "div", "card-name");
+  nameEl.textContent = vm.card.name;
 
+  const costGem = ensureChild(wrapper, ".cost-gem", "div", "cost-gem");
+  costGem.textContent = String(vm.shownCost);
+  const bc = baseCost(vm.card);
+  if (vm.shownCost < bc) costGem.dataset.costTint = "buff";
+  else if (vm.shownCost > bc) costGem.dataset.costTint = "dmg";
+  else delete costGem.dataset.costTint;
 
+  const gauge = skyboundGauge(vm.card);
+  let meter = wrapper.querySelector(".skybound-meter") as HTMLElement | null;
+  if (gauge) {
+    meter = meter ?? document.createElement("div");
+    meter.className = "skybound-meter";
+    meter.textContent = `${gauge.current}/${gauge.req}`;
+    if (!meter.parentElement) wrapper.appendChild(meter);
+  } else {
+    meter?.remove();
+  }
 
+  let atkPlate = wrapper.querySelector('.stat-plate[data-stat="attack"]') as HTMLElement | null;
+  let defPlate = wrapper.querySelector('.stat-plate[data-stat="defense"]') as HTMLElement | null;
+  let cdChip = wrapper.querySelector(".countdown-chip") as HTMLElement | null;
 
+  if (vm.card.type === "Follower" && ctx.isBoard) {
+    atkPlate = atkPlate ?? document.createElement("div");
+    atkPlate.className = "stat-plate";
+    atkPlate.dataset.stat = "attack";
+    atkPlate.textContent = String(vm.atkDisp);
+    if (vm.isAtkBuffed) atkPlate.dataset.statTint = "buff";
+    else if (vm.isAtkDebuffed) atkPlate.dataset.statTint = "dmg";
+    else delete atkPlate.dataset.statTint;
+    if (!atkPlate.parentElement) wrapper.appendChild(atkPlate);
 
+    defPlate = defPlate ?? document.createElement("div");
+    defPlate.className = "stat-plate";
+    defPlate.dataset.stat = "defense";
+    defPlate.textContent = String(vm.defDisp);
+    if (vm.isDamaged) defPlate.dataset.statTint = "dmg";
+    else if (vm.isDefBuffed) defPlate.dataset.statTint = "buff";
+    else delete defPlate.dataset.statTint;
+    if (!defPlate.parentElement) wrapper.appendChild(defPlate);
+    cdChip?.remove();
+  } else if (vm.card.type === "Amulet" && ctx.isBoard) {
+    atkPlate?.remove();
+    defPlate?.remove();
+    if (vm.countdown !== null) {
+      cdChip = cdChip ?? document.createElement("div");
+      cdChip.className = "countdown-chip";
+      cdChip.textContent = String(vm.countdown);
+      if (!cdChip.parentElement) wrapper.appendChild(cdChip);
+    } else {
+      cdChip?.remove();
+    }
+  } else {
+    atkPlate?.remove();
+    defPlate?.remove();
+    cdChip?.remove();
+  }
 
+  let check = wrapper.querySelector(".selected-check") as HTMLElement | null;
+  if (vm.isSelected) {
+    check = check ?? document.createElement("div");
+    check.className = "selected-check";
+    check.textContent = "✓";
+    if (!check.parentElement) wrapper.appendChild(check);
+  } else {
+    check?.remove();
+  }
 
+  syncKeywordChips(wrapper, vm, ctx.isBoard);
+}
 
-
-
+/** @deprecated Use createCardElement — kept for transitional imports */
+export function renderCardDOM(
+  vm: CardViewModel,
+  _elementId: string,
+  tooltipContainer: HTMLElement | null,
+  isBoard = false,
+  isMyHand = true,
+  isAlly = true,
+): HTMLElement {
+  return createCardElement(vm, { isBoard, isMyHand, isAlly }, tooltipContainer);
+}

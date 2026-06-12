@@ -311,6 +311,7 @@
           {
             "op": "restore",
             "target": "allies",
+            "player": "self",
             "amount": 3
           }
         ]
@@ -354,13 +355,7 @@
         "amount": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 1
-      }
-    ],
+    "superevolve": [],
     "keywords": []
   },
   {
@@ -424,9 +419,11 @@
         "effects": [
           {
             "op": "summon",
-            "target": "hand:follower",
-            "select": 1,
-            "source": "named"
+            "source": "hand",
+            "filter": {
+              "type": "Follower"
+            },
+            "select": 1
           },
           {
             "op": "return",
@@ -582,15 +579,7 @@
         "distribution": "random_hits"
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 1,
-        "count": 7,
-        "distribution": "random_hits"
-      }
-    ],
+    "superevolve": [],
     "keywords": []
   },
   {
@@ -626,6 +615,7 @@
           {
             "op": "restore",
             "target": "leader",
+            "player": "self",
             "amount": 1
           },
           {
@@ -663,6 +653,7 @@
                   {
                     "op": "restore",
                     "target": "leader",
+                    "player": "self",
                     "amount": 1
                   }
                 ]
@@ -849,13 +840,7 @@
         "name": "Mordred, Illusory Lion"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Mordred, Illusory Lion"
-      }
-    ],
+    "superevolve": [],
     "triggers": []
   },
   {
@@ -883,13 +868,7 @@
         "name": "Arthur, Staunch Dragon"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Arthur, Staunch Dragon"
-      }
-    ],
+    "superevolve": [],
     "triggers": []
   },
   {
@@ -998,6 +977,7 @@
           {
             "op": "restore",
             "target": "leader",
+            "player": "self",
             "amount": 4
           }
         ]
@@ -1034,6 +1014,7 @@
               {
                 "op": "restore",
                 "target": "leader",
+                "player": "self",
                 "amount": 4
               }
             ]
@@ -1298,16 +1279,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "self",
-        "keywords": [
-          "cant_attack"
-        ]
-      }
-    ],
+    "superevolve": [],
     "keywords": []
   },
   {
@@ -1361,7 +1333,7 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "count": 2,
+        "select": 2,
         "effects": [
           {
             "op": "damage",
@@ -1509,7 +1481,7 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "count": 1,
+        "select": 1,
         "effects": [
           {
             "op": "keyword",
@@ -1794,15 +1766,16 @@
     "triggers": [
       {
         "event": "ally_super_evolve",
+        "source": "hand",
         "condition": {
           "base_cost_eq": 3
         },
         "effects": [
           {
             "op": "cost",
-            "mode": "modify",
+            "mode": "set",
             "target": "self",
-            "amount": "-{self.cost}",
+            "amount": 0,
             "until_eot": true
           }
         ]
@@ -1914,13 +1887,7 @@
         "amount": 3
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 3
-      }
-    ],
+    "superevolve": [],
     "keywords": [],
     "triggers": []
   },
@@ -1986,6 +1953,7 @@
       {
         "op": "select",
         "target": "enemy:follower",
+        "select": 1,
         "effects": [
           {
             "op": "damage",
@@ -2081,6 +2049,7 @@
       {
         "op": "select",
         "target": "enemy:any",
+        "select": 1,
         "effects": [
           {
             "op": "banish",
@@ -2089,7 +2058,7 @@
           {
             "op": "add_to_hand",
             "source": "copy",
-            "target": "selection:any",
+            "target": "selected:any",
             "count": 1
           }
         ]
@@ -2124,20 +2093,11 @@
     ],
     "evolve": [
       {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 8,
-        "select": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 8,
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "keywords": [
       "Intimidate"
     ],
@@ -2865,16 +2825,7 @@
         }
       }
     ],
-    "superevolve": [
-      {
-        "op": "destroy",
-        "target": "enemy:follower",
-        "select": 1,
-        "filter": {
-          "damaged": true
-        }
-      }
-    ],
+    "superevolve": [],
     "triggers": []
   },
   {
@@ -2896,8 +2847,9 @@
       {
         "op": "summon",
         "source": "deck",
-        "filters": {
-          "type": "Follower",
+        "count": 1,
+        "filter": {
+          "type": "follower",
           "class": "Havencraft",
           "cost_lte": 2
         }
@@ -2992,14 +2944,7 @@
         "amount": 3
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "select": 1,
-        "amount": 3
-      }
-    ],
+    "superevolve": [],
     "keywords": [],
     "triggers": [
       {
@@ -3008,6 +2953,7 @@
           {
             "op": "restore",
             "target": "leader",
+            "player": "self",
             "amount": 1
           }
         ]
@@ -3561,7 +3507,7 @@
     "fanfare": [
       {
         "op": "select",
-        "count": 2,
+        "select": 2,
         "target": "enemy:follower",
         "effects": [
           {

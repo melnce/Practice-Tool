@@ -19,7 +19,7 @@ let runEffects: (
   owner: Player,
   source: any,
   context?: any,
-) => void;
+) => "pending" | void;
 export function registerRunEffectsInCleanup(fn: any) {
   runEffects = fn;
 }
@@ -105,7 +105,7 @@ function dispatchLeaveTriggers(owner: Player, card: CardInstance, defer: boolean
   fireTrigger("enemy_follower_leaves_field", owner as any, enemyCtx);
 }
 
-function triggerLastWords(card: CardInstance, owner: Player) {
+function triggerLastWords(card: CardInstance, owner: Player): "pending" | void {
   if ((card as any)._lwFired) return;
   if (!card?.hasLastWords) return;
   const kw = card.keywordState;
@@ -115,8 +115,11 @@ function triggerLastWords(card: CardInstance, owner: Player) {
     console.warn("cleanupDead: runEffects not registered!");
     return;
   }
+  const result = runEffects(lw, owner, card);
+  if (result === "pending" || state.pendingTargetEffect) {
+    return "pending";
+  }
   (card as any)._lwFired = true;
-  runEffects(lw, owner, card);
 }
 
 function sendToGrave(card: CardInstance, owner: Player) {
@@ -145,8 +148,20 @@ export function flushDeferredDeathBatch() {
     const lwBatch = q.lw.splice(0);
     if (lwBatch.length > 0) {
       sortLwQueue(lwBatch);
-      for (const { card: c, owner } of lwBatch) {
-        triggerLastWords(c, owner);
+      for (let i = 0; i < lwBatch.length; i++) {
+        const { card: c, owner } = lwBatch[i]!;
+        const paused = triggerLastWords(c, owner);
+        if (paused === "pending" || state.pendingTargetEffect) {
+          q.lw.unshift(...lwBatch.slice(i));
+          if (state.pendingTargetEffect) {
+            state.pendingTargetEffect.deferredLwComplete = {
+              cardUid: c.uid,
+              owner,
+            };
+          }
+          compactAllBoards();
+          return;
+        }
         sendToGrave(c, owner);
       }
     }
@@ -157,6 +172,27 @@ export function flushDeferredDeathBatch() {
   }
 
   compactAllBoards();
+}
+
+/** Finish a deferred LW that paused mid-flush for interactive selection. */
+export function completeDeferredLwAfterSelection(
+  request?: { cardUid: string; owner: Player },
+): void {
+  if (!request) return;
+  const q = getDeferredQueues();
+  const idx = q.lw.findIndex((item) => item.card.uid === request.cardUid);
+  if (idx < 0) return;
+  const { card, owner } = q.lw.splice(idx, 1)[0]!;
+  (card as any)._lwFired = true;
+  sendToGrave(card, owner);
+}
+
+/** Resume deferred death flush after interactive LW/target resolution completes. */
+export function resumeDeferredDeathIfIdle(): void {
+  if (state.pendingTargetEffect) return;
+  const q = getDeferredQueues();
+  if (q.leave.length === 0 && q.lw.length === 0) return;
+  flushDeferredDeathBatch();
 }
 
 export function cleanupDead() {
@@ -235,7 +271,13 @@ export function cleanupDead() {
       : c.type === "Amulet"
         ? "countdown==0"
         : "unknown";
-    logEvent("destroyQueued", { card: c.name, owner, type: cardType, cause });
+    logEvent("destroyQueued", {
+      card: c.name,
+      owner,
+      type: cardType,
+      cause,
+      uid: c.uid,
+    });
 
     if (isFollower) {
       dispatchLeaveTriggers(owner, c, defer);
@@ -282,7 +324,7 @@ export function cleanupDead() {
       continue;
     }
 
-    logEvent("death", { card: c.name, owner });
+    logEvent("death", { card: c.name, owner, uid: c.uid });
     const gameTick =
       (state as any).gameTick ??
       ((state.roundCount || 0) * 1000 +
@@ -302,7 +344,7 @@ export function cleanupDead() {
     const lw = kw?.lastWordsEffects || c.lastWordsEffects;
     const lwCount = Array.isArray(lw) ? lw.length : 0;
     if (lwCount > 0) {
-      logEvent("lastWords", { card: c.name, owner, count: lwCount });
+      logEvent("lastWords", { card: c.name, owner, count: lwCount, uid: c.uid });
       lwQueue.push({ card: c, owner });
     } else {
       sendToGrave(c, owner);
@@ -311,8 +353,13 @@ export function cleanupDead() {
 
   if (!defer) {
     sortLwQueue(lwQueue);
-    for (const { card: c, owner } of lwQueue) {
-      triggerLastWords(c, owner);
+    for (let i = 0; i < lwQueue.length; i++) {
+      const { card: c, owner } = lwQueue[i]!;
+      const paused = triggerLastWords(c, owner);
+      if (paused === "pending" || state.pendingTargetEffect) {
+        getDeferredQueues().lw.push(...lwQueue.slice(i));
+        return;
+      }
       sendToGrave(c, owner);
     }
     compactAllBoards();

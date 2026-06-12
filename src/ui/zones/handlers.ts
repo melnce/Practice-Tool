@@ -1,6 +1,7 @@
 // src/ui/zones/handlers.ts
 import type { CardViewModel, ZoneContext } from "./types.js";
-import type { GameState } from "../../core/types/index.js";
+import type { CardInstance, GameState } from "../../core/types/index.js";
+import { state } from "../../core/gameState.js";
 import * as actions from "./actions.js";
 import {
   enableCardDragFromHand,
@@ -8,64 +9,86 @@ import {
   enableAttackerDrag,
   enableEnemyFollowerDrop,
 } from "../drag.js";
+import { createHandDragClickSuppressor } from "./dragClickGuard.js";
 
-export function attachHandlers(
+const attachedHandlers = new WeakSet<HTMLElement>();
+const fuseCardFallback = new WeakMap<HTMLElement, CardInstance>();
+
+function isLegacyVm(value: unknown): value is CardViewModel {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    "uid" in value &&
+    "card" in value &&
+    typeof (value as CardViewModel).uid === "string"
+  );
+}
+
+function wireHandlers(
   div: HTMLElement,
-  vm: CardViewModel,
   ctx: ZoneContext,
-  state: GameState,
   rerender: () => void,
-  onPlayClick?: (i: number) => void,
+  onPlayByUid?: (uid: string) => void,
 ): void {
-  const { card, idx } = vm;
+  if (attachedHandlers.has(div)) return;
+  attachedHandlers.add(div);
 
-  // 1. Mulligan Interactions
+  const instanceId = () => div.dataset.instanceId ?? div.dataset.uid ?? "";
+
   if (ctx.isMulligan) {
-    if (vm.isSelectable) {
-      div.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const owner = ctx.isBlueHand ? "first" : "second";
-        actions.handleMulliganToggle(owner, card.uid);
-      });
-      div.oncontextmenu = (e) => e.preventDefault();
-    }
+    div.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const uid = instanceId();
+      if (!uid) return;
+      const owner = ctx.isBlueHand ? "first" : "second";
+      actions.handleMulliganToggle(owner, uid);
+    });
+    div.oncontextmenu = (e) => e.preventDefault();
     return;
   }
 
-  // 2. Target Selection (Resolving pending target) - includes toggle for already-selected
-  if ((vm.isSelectable || vm.isSelected) && !ctx.isMulligan) {
-    div.addEventListener("click", (e) => {
-      e.stopPropagation();
-      actions.handleResolveTarget(card.uid);
-    });
-    // Dont return, might need drag if implemented for selectable cards?
-    // usually selection locks other interactions but lets keep consistent with orig file
-  }
+  div.addEventListener("click", (e) => {
+    const uid = instanceId();
+    if (!uid) return;
+    const owner = ctx.owner;
+    const zone = ctx.isHand ? state.players[owner].hand : state.players[owner].board;
+    const card = zone.find((c) => c.uid === uid);
+    if (!card) return;
+    const selected =
+      Array.isArray(state.pendingTargetEffect?.targets) &&
+      state.pendingTargetEffect.targets.some((t) => t?.uid === uid);
+    const inTargets = state.pendingTargetEffect?.targetUids?.includes(uid);
+    if (!state.pendingTargetEffect || (!card.__uiSelectable && !inTargets && !selected)) return;
+    e.stopPropagation();
+    actions.handleResolveTarget(uid);
+  });
 
-  // 3. Hand Interactions (Play, Fuse)
   if (ctx.isHand) {
-    // Right-click to play (via callback from renderZone)
-    if (onPlayClick) {
+    if (onPlayByUid) {
       div.addEventListener("contextmenu", (e) => {
         e.preventDefault();
-        onPlayClick(idx);
+        const uid = instanceId();
+        if (uid) onPlayByUid(uid);
       });
     }
 
-    // Left-click for Fuse
-    div.addEventListener("click", (e) => {
-      if (vm.isSelectable || vm.isSelected) return; // handled above
+    const dragClickGuard = createHandDragClickSuppressor();
+    dragClickGuard.attach(div, (e) => {
+      const uid = instanceId();
+      if (!uid) return;
 
-      // Check turn
-      const isPlayersTurn = ctx.isMyHand; // calculated in selector
-      if (!isPlayersTurn) return;
+      const hand = state.players[ctx.owner].hand;
+      let card = hand.find((c) => c.uid === uid) ?? fuseCardFallback.get(div);
+      if (!card) return;
+
+      if (card.__uiSelectable || state.pendingTargetEffect?.targetUids?.includes(uid)) return;
+      if (ctx.owner !== state.activePlayer) return;
 
       const hasFuseRecipes =
         Array.isArray(card.fuse_recipes) && card.fuse_recipes.length > 0;
       const hasFortifierFuse =
         Array.isArray(card.fuse) &&
         card.fuse.some((op) => op?.op === "fuse" && op?.type === "fortifier");
-      // Gears and Ominous Artifact α have special hardcoded fuse logic by name
       const hasSpecialFuse =
         card.name === "Gear of Ambition" ||
         card.name === "Gear of Remembrance" ||
@@ -73,65 +96,93 @@ export function attachHandlers(
 
       if (hasFuseRecipes || hasFortifierFuse || hasSpecialFuse) {
         e.stopPropagation();
-        actions.handleFuse(ctx.owner, card.uid, !!(hasFuseRecipes || hasSpecialFuse), card);
+        actions.handleFuse(
+          ctx.owner,
+          uid,
+          !!(hasFuseRecipes || hasSpecialFuse),
+          card,
+        );
       }
     });
 
-    // Drag
-    enableCardDragFromHand(div, card, ctx.containerId);
+    enableCardDragFromHand(div, ctx.containerId);
   }
 
-  // 4. Board Interactions
   if (ctx.isBoard) {
-    // Evo Drop
-    if (vm.card.type === "Follower") {
-      enableCardEvoDrop(div, ctx.containerId, card, state, rerender);
-    }
+    const owner = ctx.owner;
 
-    // Combat Drag / Drop
-    if (vm.card.type === "Follower") {
-      if (ctx.isMyBoard && vm.canAttack) {
-        // enableAttackerDrag expects 'blue'/'red' string
-        enableAttackerDrag(div, ctx.owner, idx);
-      }
-      if (!ctx.isMyBoard) {
-        // enemy drop target
-        // enableEnemyFollowerDrop expects isRedBoard boolean
-        enableEnemyFollowerDrop(
-          div,
-          null,
-          idx,
-          state,
-          ctx.containerId === "redBoard",
-        );
-      }
-    }
+    div.addEventListener("contextmenu", (e) => {
+      const id = instanceId();
+      if (!id) return;
+      const board = state.players[owner].board;
+      const card = board.find((c) => c.uid === id);
+      if (!card || card.type !== "Amulet" || !card.hasEngage) return;
+      const ks = card.keywordState || {};
+      const engageCost = Number(ks.engageCost ?? card.engageCost ?? 0);
+      const pp = state.players[owner].pp;
+      const oncePerTurn = card.engageOncePerTurn !== false;
+      const alreadyEngaged = !!ks.engagedThisTurn;
+      const isMyTurn = owner === state.activePlayer;
+      if (!isMyTurn || pp < engageCost || (oncePerTurn && alreadyEngaged)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const idx = board.findIndex((c) => c.uid === id);
+      if (idx !== -1) actions.handleEngage(owner, idx);
+    });
 
-    // Engage
-    if (vm.canEngage) {
-      div.addEventListener(
-        "contextmenu",
-        (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          actions.handleEngage(ctx.owner, idx);
-        },
-        { once: true },
-      );
+    enableCardEvoDrop(div, ctx.containerId, rerender);
+
+    const boardCard = () => {
+      const id = instanceId();
+      return state.players[owner].board.find((c) => c.uid === id);
+    };
+
+    if (ctx.isMyBoard) {
+      enableAttackerDrag(div, owner, () => {
+        const card = boardCard();
+        if (!card) return -1;
+        return state.players[owner].board.findIndex((c) => c.uid === card.uid);
+      });
+    } else {
+      enableEnemyFollowerDrop(div, owner, () => {
+        const card = boardCard();
+        if (!card) return -1;
+        return state.players[owner].board.findIndex((c) => c.uid === card.uid);
+      });
     }
   }
 }
 
+/** Supports legacy (div, vm, ctx, state, rerender) and modern (div, ctx, rerender, onPlayByUid). */
+export function attachHandlers(
+  div: HTMLElement,
+  vmOrCtx: CardViewModel | ZoneContext,
+  ctxOrRerender: ZoneContext | (() => void),
+  stateOrOnPlay?: GameState | (() => void) | ((uid: string) => void),
+  rerenderArg?: () => void,
+): void {
+  const isLegacy =
+    isLegacyVm(vmOrCtx) &&
+    typeof ctxOrRerender === "object" &&
+    ctxOrRerender !== null &&
+    "containerId" in ctxOrRerender;
 
+  if (isLegacy) {
+    const vm = vmOrCtx as CardViewModel;
+    const ctx = ctxOrRerender as ZoneContext;
+    const rerender = rerenderArg ?? (() => {});
+    div.dataset.instanceId = vm.uid;
+    div.dataset.uid = vm.uid;
+    fuseCardFallback.set(div, vm.card);
+    wireHandlers(div, ctx, rerender);
+    return;
+  }
 
-
-
-
-
-
-
-
-
-
-
-
+  const ctx = vmOrCtx as ZoneContext;
+  const rerender = ctxOrRerender as () => void;
+  const onPlayByUid =
+    typeof stateOrOnPlay === "function" && stateOrOnPlay.length === 1
+      ? (stateOrOnPlay as (uid: string) => void)
+      : undefined;
+  wireHandlers(div, ctx, rerender, onPlayByUid);
+}

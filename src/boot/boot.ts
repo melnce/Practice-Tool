@@ -1,9 +1,18 @@
 // src/boot/boot.ts
 // Ensure global handlers (useRedBoost, endTurnBlue/Red) are registered
+import "@fontsource/cinzel/400.css";
+import "@fontsource/cinzel/700.css";
+import "@fontsource-variable/inter/wght.css";
+import "../ui/styles/tokens.css";
+import "../ui/styles/arena.css";
+import "../ui/styles/chrome.css";
+import "../ui/styles/motion.css";
 import * as engine from "../engine.js";
 
 // Entry points
-import { render } from "../ui/render.js";
+import { render as baseRender } from "../ui/render.js";
+import { wrapRender } from "../ui/motion/wrapRender.js";
+import { wireMotionSettingsUi } from "../ui/motion/motion.js";
 import { wireClick } from "../ui/dom.js";
 import { showChoiceModal } from "../ui/choiceModal.js";
 import {
@@ -22,6 +31,8 @@ window.endTurnBlue = endTurnBlue;
 window.endTurnRed = endTurnRed;
 window.useRedBoost = useRedBoost;
 
+const render = wrapRender(baseRender);
+
 // Initialize Logic -> UI Adapter (wire ALL targeting UI functions)
 injectAdapter({
   render,
@@ -32,6 +43,8 @@ injectAdapter({
 });
 
 window.addEventListener("DOMContentLoaded", () => {
+  wireMotionSettingsUi();
+
   wireClick("startGameBtn", async () => {
     const blueSelect = document.getElementById(
       "blueDeckSelect",

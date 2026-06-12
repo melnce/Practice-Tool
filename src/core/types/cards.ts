@@ -75,6 +75,12 @@ export interface CardTemplate {
     evoType?: "normal" | "super";
     evolve?: Effect[] | { effects: Effect[] };
     superevolve?: Effect[] | { effects: Effect[] };
+    /** When true, super-evolve fires superevolve[] only (replaces Evolve line). */
+    superEvolveReplaces?: boolean;
+    /**
+     * Card text "When this follower evolves" — entire evolve[] runs on effect-granted
+     * evolves, not only on player EP. Distinct from plain "Evolve:" lines (82 cards).
+     */
     evolve_trigger_always?: boolean;
     lastWordsEffects?: Effect[];
     // Buff tracking

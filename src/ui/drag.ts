@@ -1,15 +1,32 @@
 // src/ui/drag.ts
 import { getDragData, setDragData } from "./dom.js";
 import { doAction } from "../core/history.js";
-import type { CardInstance, GameState, Player } from "../core/types/index.js";
+import { state } from "../core/gameState.js";
+import type { CardInstance, Player } from "../core/types/index.js";
 
-// External game logic hooks (keep same import paths as your project)
 const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
+
+export function wireFieldSlotDragHighlight(slots: HTMLElement[]): void {
+  for (const slot of slots) {
+    if (slot.dataset.dragHighlightWired) continue;
+    slot.dataset.dragHighlightWired = "1";
+    slot.addEventListener("dragenter", (e) => {
+      e.preventDefault();
+      const data = getDragData(e);
+      if (data.startsWith("hand,")) slot.dataset.droppable = "true";
+    });
+    slot.addEventListener("dragleave", () => {
+      delete slot.dataset.droppable;
+    });
+    slot.addEventListener("drop", () => {
+      delete slot.dataset.droppable;
+    });
+  }
+}
 
 export function makeLeaderDroppable(
   leaderEl: HTMLElement,
   targetPlayer: Player,
-  state: GameState,
 ) {
   leaderEl.ondragover = (e) => e.preventDefault();
   leaderEl.ondrop = (e) => {
@@ -17,8 +34,6 @@ export function makeLeaderDroppable(
     const data = getDragData(e);
     const [attackerPlayer, attackerIndex] = data.split(",");
 
-    // Only allow dropping attacker onto the opposite leader on the correct turn
-    // Use activePlayer as source of truth
     const isFirstActive = state.activePlayer === "first";
     if (
       (targetPlayer === "first" && isFirstActive) ||
@@ -29,7 +44,7 @@ export function makeLeaderDroppable(
 
     void logic().then(({ attackLeader }) => {
       attackLeader(
-        parseInt(attackerIndex || "0"),
+        parseInt(attackerIndex || "0", 10),
         attackerPlayer as Player,
         targetPlayer,
       );
@@ -39,43 +54,49 @@ export function makeLeaderDroppable(
 
 export function enableCardDragFromHand(
   div: HTMLElement,
-  card: CardInstance,
   containerId: string,
 ) {
   div.draggable = true;
-  div.ondragstart = (e) => setDragData(e, `hand,${containerId},${card.uid}`);
+  div.ondragstart = (e) => {
+    const uid = div.dataset.instanceId ?? div.dataset.uid ?? "";
+    setDragData(e, `hand,${containerId},${uid}`);
+  };
 }
 
 export function enableAttackerDrag(
   div: HTMLElement,
   player: Player,
-  boardIndex: number,
+  resolveIndex: () => number,
 ) {
   div.draggable = true;
-  div.ondragstart = (e) => setDragData(e, `${player},${boardIndex}`);
+  div.ondragstart = (e) => {
+    const idx = resolveIndex();
+    if (idx < 0) {
+      e.preventDefault();
+      return;
+    }
+    setDragData(e, `${player},${idx}`);
+  };
 }
 
 export function enableBoardDropForOwnSide(
   div: HTMLElement,
   containerId: string,
-  state: GameState,
 ) {
   div.ondragover = (e) => e.preventDefault();
   div.ondrop = (e) => {
     e.preventDefault();
     const data = getDragData(e);
 
-    // Evo button drag payload
-    if (data.includes("NormalEvo") || data.includes("SuperEvo")) return; // handled at card level
+    if (data.includes("NormalEvo") || data.includes("SuperEvo")) return;
 
-    // Hand -> board
     const [sourceType, sourceId, cardUid] = data.split(",");
     if (
       sourceType === "hand" &&
       sourceId === containerId.replace("Board", "Hand")
     ) {
       const player: Player = containerId === "blueBoard" ? "first" : "second";
-      const hand = player === "first" ? state.players.first.hand : state.players.second.hand;
+      const hand = state.players[player].hand;
       const index = hand.findIndex((c: CardInstance) => c.uid === cardUid);
       if (index !== -1)
         void logic().then(({ playCard }) => playCard(hand, player, index));
@@ -86,8 +107,6 @@ export function enableBoardDropForOwnSide(
 export function enableCardEvoDrop(
   div: HTMLElement,
   containerId: string,
-  card: CardInstance,
-  state: GameState,
   rerender: () => void,
 ) {
   div.ondragover = (e) => e.preventDefault();
@@ -95,14 +114,17 @@ export function enableCardEvoDrop(
     e.preventDefault();
     const data = getDragData(e);
     if (!(data.includes("NormalEvo") || data.includes("SuperEvo"))) return;
-    if (card.hasEvolved) return;
 
+    const cardUid = div.dataset.instanceId ?? div.dataset.uid ?? "";
     const isBlueSide = containerId === "blueBoard";
-    const isNormal = data.includes("NormalEvo");
-    const isSuper = data.includes("SuperEvo");
+    const owner: Player = isBlueSide ? "first" : "second";
+    const board = state.players[owner].board;
+    const card = board.find((c) => c.uid === cardUid);
+    if (!card || card.hasEvolved) return;
 
-    // Turn + charges + per-turn lock - use activePlayer as source of truth
+    const isNormal = data.includes("NormalEvo");
     const isFirstPlayerActive = state.activePlayer === "first";
+
     if (isBlueSide) {
       if (!isFirstPlayerActive) return;
       if (isNormal) {
@@ -116,21 +138,15 @@ export function enableCardEvoDrop(
       if (isNormal) {
         if (state.players.second.evoUsedThisTurn || !(state.players.second.evoCharges > 0)) return;
       } else {
-        if (state.players.second.evoUsedThisTurn || !(state.players.second.superEvoCharges > 0)) return;
+        if (state.players.second.evoUsedThisTurn || !(state.players.second.superEvoCharges > 0))
+          return;
       }
     }
 
-    const owner: Player = isBlueSide ? "first" : "second";
     const mode = isNormal ? "normal" : "super";
     doAction(
-      isSuper ? "Super Evolve" : "Evolve",
+      isNormal ? "Evolve" : "Super Evolve",
       () => {
-        // Use handleEvolveSelf as single source of truth for all evolve logic:
-        // - Applies stat boosts (+2/+2 or +3/+3)
-        // - Sets hasEvolved, evoType, rush/storm flags
-        // - Spends evo charges and sets evoUsedThisTurn
-        // - Runs evolve/superevolve effects
-        // Rerender is called after evolve completes for immediate visual feedback
         void logic().then(({ handleEvolveSelf }) => {
           handleEvolveSelf(card, owner, { mode, spendPoint: true, runEvoEffects: true });
           rerender();
@@ -144,20 +160,18 @@ export function enableCardEvoDrop(
 
 export function enableEnemyFollowerDrop(
   div: HTMLElement,
-  attackerData: any,
-  defenderIndex: number,
-  state: GameState,
-  isRedBoard: boolean,
+  defenderPlayer: Player,
+  resolveDefenderIndex: () => number,
 ) {
   div.ondragover = (e) => e.preventDefault();
   div.ondrop = (e) => {
     e.preventDefault();
     const data = getDragData(e);
     const [attackerPlayer, attackerIndex] = data.split(",");
+    const defenderIndex = resolveDefenderIndex();
+    if (defenderIndex < 0) return;
 
-    const defenderPlayer = isRedBoard ? "second" : "first";
-    const defenders =
-      defenderPlayer === "first" ? state.players.first.board : state.players.second.board;
+    const defenders = state.players[defenderPlayer].board;
     const defender = defenders[defenderIndex];
     if (!defender) return;
 
@@ -169,7 +183,7 @@ export function enableEnemyFollowerDrop(
 
     void logic().then(({ attackFollower }) => {
       attackFollower(
-        parseInt(attackerIndex || "0"),
+        parseInt(attackerIndex || "0", 10),
         defenderIndex,
         attackerPlayer as Player,
         defenderPlayer,
@@ -177,17 +191,3 @@ export function enableEnemyFollowerDrop(
     });
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

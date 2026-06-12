@@ -29,6 +29,12 @@
     "cards:update": "npx tsx scripts/mergeSets.ts",
     "cards:watch": "npx tsx scripts/watch_cards.ts",
     "check:cards": "npx tsx scripts/check-cards-sync.ts",
+    "check:tokens": "npx tsx scripts/check-tokens-sync.ts",
+    "check:card-text": "npx tsx scripts/check-card-text.ts",
+    "audit:superevolve-dedup": "npx tsx scripts/audit-super-evolve-dedup.ts",
+    "test:audit": "vitest run -c vitest.audit.config.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "decks:discover": "npx tsx scripts/generate-deck-manifest.ts",
     "check:decks": "npm run decks:discover && npx tsx scripts/check-decks.ts",
     "predev": "npm run decks:discover",
@@ -45,6 +51,7 @@
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^25.0.1",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
@@ -60,5 +67,9 @@
     "typescript-eslint": "^8.50.0",
     "vite": "^6.3.5",
     "vitest": "^4.0.15"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource/cinzel": "^5.2.8"
   }
 }

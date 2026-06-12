@@ -56,14 +56,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "draw",
-        "source": "deck",
-        "player": "self",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       "Ward",
@@ -170,7 +163,8 @@
       }
     ],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "superEvolveReplaces": true
   },
   {
     "id": "10002120",
@@ -867,6 +861,7 @@
       {
         "op": "select",
         "target": "ally:follower",
+        "select": 1,
         "condition": {
           "tribe": "Golem"
         },
@@ -1096,7 +1091,8 @@
       }
     ],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "superEvolveReplaces": true
   },
   {
     "id": "10042120",
@@ -1358,12 +1354,6 @@
     ],
     "superevolve": [
       {
-        "op": "summon",
-        "source": "named",
-        "name": "Ghost",
-        "count": 2
-      },
-      {
         "op": "keyword",
         "action": "grant",
         "target": "ally:last_summoned",
@@ -1474,24 +1464,11 @@
     "url": "https://shadowverse.gg/cards/10061130-winged-warrior",
     "evolve": [
       {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "select": 1,
-        "attack": 1,
-        "defense": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "select": 1,
-        "attack": 1,
-        "defense": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "stat",
@@ -1583,7 +1560,8 @@
       }
     ],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "superEvolveReplaces": true
   },
   {
     "id": "10062120",
@@ -1847,7 +1825,8 @@
     "fanfare": [],
     "keywords": [
       "Ward"
-    ]
+    ],
+    "superEvolveReplaces": true
   },
   {
     "id": "10072210",

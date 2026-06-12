@@ -24,6 +24,7 @@ export function createPlayerState(isSecond: boolean = false): PlayerState {
         deck: [],
         board: [],
         graveyard: [],
+        banish: [],
 
         // Counters
         shadows: 0,

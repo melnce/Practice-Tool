@@ -9,8 +9,9 @@ import { normalizeToEvolveSpec } from "./types.js";
 import { onEvolve } from "../../../evolveUtils.js";
 import { getBoard, isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
-import { highlightSelectable } from "../../../core/targeting.js";
+import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import { evaluateCardCondition } from "../../../core/conditions/evaluator.js";
 
 /**
  * Unified evolve handler - handles all evolve variants.
@@ -52,6 +53,26 @@ export function handleEvolve(
     }
 
     const selectCount = Math.min(spec.select, pool.length);
+
+    if (spec.select_mode === "random") {
+      const picks: CardInstance[] = [];
+      const bag = pool.slice();
+      for (let i = 0; i < selectCount && bag.length; i++) {
+        const j = state.rng.nextInt(bag.length);
+        picks.push(bag.splice(j, 1)[0]!);
+      }
+      for (const target of picks) {
+        applyEvolution(target, owner, spec);
+      }
+      logEvent("evolve", {
+        owner,
+        target: spec.target,
+        mode: spec.mode || "normal",
+        count: picks.length,
+        select_mode: "random",
+      });
+      return "done";
+    }
 
     setPendingTarget({
       eff: eff as any,
@@ -97,10 +118,12 @@ function buildSelectionPool(
   owner: Player,
   sourceCard: CardInstance | null,
 ): CardInstance[] {
-  const board = getBoard(state, owner);
-  let pool = board.filter((c) => c.type === "Follower");
+  const target = spec.target || "ally:follower";
+  let pool =
+    target === "ally:follower" || target.startsWith("ally:")
+      ? getPool(target, owner, sourceCard, spec.filter ?? {})
+      : getBoard(state, owner).filter((c) => c.type === "Follower");
 
-  // Apply filter conditions
   if (spec.filter) {
     if (spec.filter.unevolved) {
       pool = pool.filter((c) => !c.hasEvolved);
@@ -108,11 +131,21 @@ function buildSelectionPool(
     if (spec.filter.not_self && sourceCard) {
       pool = pool.filter((c) => c.uid !== sourceCard.uid);
     }
+    if (spec.filter.did_not_attack_this_turn) {
+      pool = pool.filter((c) =>
+        evaluateCardCondition(c, { did_not_attack_this_turn: true }, owner),
+      );
+    }
     if (spec.filter.type) {
-      pool = pool.filter((c) => c.type?.toLowerCase() === spec.filter!.type!.toLowerCase());
+      pool = pool.filter(
+        (c) => c.type?.toLowerCase() === spec.filter!.type!.toLowerCase(),
+      );
     }
     if (spec.filter.tribe) {
-      pool = pool.filter((c) => Array.isArray(c.tribes) && c.tribes.includes(spec.filter!.tribe!));
+      pool = pool.filter(
+        (c) =>
+          Array.isArray(c.tribes) && c.tribes.includes(spec.filter!.tribe!),
+      );
     }
   }
 
@@ -163,6 +196,21 @@ function resolveTargets(
         );
       }
       return candidates;
+    }
+
+    case "ally:follower": {
+      let pool = getPool("ally:follower", owner, sourceCard, spec.filter ?? {});
+      if (spec.filter?.unevolved) pool = pool.filter((c) => !c.hasEvolved);
+      if (spec.filter?.did_not_attack_this_turn) {
+        pool = pool.filter((c) =>
+          evaluateCardCondition(
+            c,
+            { did_not_attack_this_turn: true },
+            owner,
+          ),
+        );
+      }
+      return pool;
     }
 
     default:

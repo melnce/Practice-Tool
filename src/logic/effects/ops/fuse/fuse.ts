@@ -314,7 +314,9 @@ export function fuse_finalize_generic(
     owner,
     kind: "generic",
     initiator: iCard?.name,
+    initiatorUid: iCard?.uid,
     partner: pCard?.name,
+    partnerUid: pCard?.uid,
     result:
       resultSpec?.result_card_name || state?.lastFuse?.result_name || "wasted",
     targets,

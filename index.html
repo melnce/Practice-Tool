@@ -11,15 +11,12 @@
     window.APP_ROOT = "/";
   </script>
 
-  <!-- existing styles (unchanged order) -->
+  <!-- Legacy stylesheets (Phase 1.1 audit — modern-theme.css unhooked) -->
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/buttons.css" />
   <link rel="stylesheet" href="./css/cards.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/utility.css" />
-
-  <!-- new modern theme overrides (must be last) -->
-  <link rel="stylesheet" href="./css/modern-theme.css" />
   <style>
     /* Lightweight drawer + hamburger (no extra CSS files needed) */
     .hamburger-btn {
@@ -193,6 +190,15 @@
       <input id="seedInput" type="number" placeholder="random if empty" />
 
       <button id="startGameBtn">Start Game</button>
+
+      <div class="motion-settings" id="motionSettings">
+        <button type="button" id="motionGearBtn" class="motion-gear-btn" title="Animation speed" aria-label="Animation speed">⚙</button>
+        <div id="motionPopover" class="motion-popover" hidden>
+          <label><input type="radio" name="motionSpeed" value="normal" checked> Normal</label>
+          <label><input type="radio" name="motionSpeed" value="fast"> Fast</label>
+          <label><input type="radio" name="motionSpeed" value="instant"> Instant</label>
+        </div>
+      </div>
     </div>
   </header>
   <!-- Hamburger to open history drawer -->
@@ -226,81 +232,115 @@
   </aside>
 
   <main id="appRoot">
-    <!-- Red side -->
-    <section class="side side-red">
-      <div id="redHand" class="zone hand-zone"></div>
-      <button id="redMulliganConfirm" style="display: none; margin: 8px 0 16px 0">
-        Confirm Mulligan (Red)
-      </button>
+    <div id="arena">
+      <div class="arena-scale">
+        <div class="arena-bg" aria-hidden="true"></div>
 
-      <div class="floating-stats" id="redStatsContainer">
-        <div id="redStats">
-          <span>🃏 <span id="redHandCount">0</span></span>
-          <span>📦 <span id="redDeckCount">0</span></span>
-          <span>💀 <span id="redGraveCount">0</span></span>
-          <span>☠️ <span id="redShadows">0</span></span>
-        </div>
-        <div id="redCrests" class="crest-container">
-          <div class="crest-row">
-            <div class="crest-slot"></div>
-            <div class="crest-slot"></div>
-            <div class="crest-slot"></div>
+        <div class="arena-layer" data-layer="board">
+          <div class="arena-enemy-leader">
+            <div id="redLeaderPlate" class="leader-plate" data-side="enemy">
+              <div class="leader-portrait" aria-hidden="true">R</div>
+              <div class="leader-body">
+                <div class="leader-defense"><span id="redHP">20</span></div>
+                <div class="leader-meta">
+                  <span>Deck <strong data-leader-deck>0</strong></span>
+                  <span>☠️ <span id="redShadows">0</span></span>
+                  <span>🃏 <span id="redHandCount">0</span></span>
+                </div>
+                <div class="ep-pips" data-ep-pips></div>
+              </div>
+              <div class="leader-hand-backs" data-hand-backs aria-hidden="true"></div>
+              <div id="redCrests" class="crest-container">
+                <div class="crest-row">
+                  <div class="crest-slot"></div>
+                  <div class="crest-slot"></div>
+                  <div class="crest-slot"></div>
+                </div>
+                <div class="crest-row">
+                  <div class="crest-slot"></div>
+                  <div class="crest-slot"></div>
+                </div>
+              </div>
+              <div class="leader-container">
+                <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
+                <div class="leader red-leader" id="redLeader" title="Red Leader"></div>
+                <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
+              </div>
+            </div>
           </div>
-          <div class="crest-row">
-            <div class="crest-slot"></div>
-            <div class="crest-slot"></div>
+
+          <div class="arena-enemy-field">
+            <div id="redBoard" class="zone board-zone"></div>
+          </div>
+
+          <div class="arena-center">
+            <div class="arena-turn-indicator" aria-live="polite"></div>
+            <div class="arena-divider" aria-hidden="true"></div>
+          </div>
+
+          <div class="arena-player-field">
+            <div id="blueBoard" class="zone board-zone"></div>
+          </div>
+
+          <div class="arena-player-leader">
+            <div id="blueLeaderPlate" class="leader-plate" data-side="player">
+              <div class="leader-portrait" aria-hidden="true">B</div>
+              <div class="leader-body">
+                <div class="leader-defense"><span id="blueHP">20</span></div>
+                <div class="leader-meta">
+                  <span>Deck <strong data-leader-deck>0</strong></span>
+                  <span>☠️ <span id="blueShadows">0</span></span>
+                  <span>🃏 <span id="blueHandCount">0</span></span>
+                </div>
+                <div class="pp-orb-track">
+                  <div class="pp-orb" id="bluePPOrb"><span id="bluePP">0/0</span></div>
+                </div>
+                <div class="ep-pips" data-ep-pips></div>
+              </div>
+              <div id="blueCrests" class="crest-container">
+                <div class="crest-row">
+                  <div class="crest-slot"></div>
+                  <div class="crest-slot"></div>
+                </div>
+                <div class="crest-row">
+                  <div class="crest-slot"></div>
+                  <div class="crest-slot"></div>
+                  <div class="crest-slot"></div>
+                </div>
+              </div>
+              <div class="leader-container">
+                <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
+                <div class="leader blue-leader" id="blueLeader" title="Blue Leader"></div>
+                <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="leader-container">
-        <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
-        <div class="leader red-leader" id="redLeader">
-          <span id="redHP" class="hp-value">20</span>
-        </div>
-        <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
-      </div>
-
-      <div id="redBoard" class="zone board-zone"></div>
-    </section>
-
-    <!-- Blue side -->
-    <section class="side side-blue">
-      <div id="blueBoard" class="zone board-zone"></div>
-
-      <div class="leader-container">
-        <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
-        <div class="leader blue-leader" id="blueLeader">
-          <span id="blueHP" class="hp-value">20</span>
-        </div>
-        <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
-      </div>
-
-      <div class="floating-stats" id="blueStatsContainer">
-        <div id="blueCrests" class="crest-container">
-          <div class="crest-row">
-            <div class="crest-slot"></div>
-            <div class="crest-slot"></div>
+        <div class="arena-layer" data-layer="hand">
+          <div class="arena-enemy-hand">
+            <div id="redHand" class="zone hand-zone"></div>
           </div>
-          <div class="crest-row">
-            <div class="crest-slot"></div>
-            <div class="crest-slot"></div>
-            <div class="crest-slot"></div>
+          <div class="arena-player-hand">
+            <p id="playHint" class="play-hint" title="Right-click or drag a glowing hand card to play it; left-click to fuse">Tip: right-click or drag glowing hand cards to play; left-click to fuse</p>
+            <div id="blueHand" class="zone hand-zone"></div>
+            <button id="blueMulliganConfirm" style="display: none">Confirm Mulligan (Blue)</button>
+            <button id="redMulliganConfirm" style="display: none">Confirm Mulligan (Red)</button>
           </div>
         </div>
-        <div id="blueStats">
-          <span>🃏 <span id="blueHandCount">0</span></span>
-          <span>📦 <span id="blueDeckCount">0</span></span>
-          <span>💀 <span id="blueGraveCount">0</span></span>
-          <span>☠️ <span id="blueShadows">0</span></span>
-        </div>
-      </div>
 
-      <div id="blueHand" class="zone hand-zone"></div>
-      <button id="blueMulliganConfirm" style="display: none; margin: 8px 0 16px 0">
-        Confirm Mulligan (Blue)
-      </button>
-    </section>
+        <div class="arena-layer" data-layer="preview" id="arenaPreview"></div>
+        <div class="arena-layer" data-layer="drag" id="arenaDrag"></div>
+        <div class="arena-layer" data-layer="fx" id="arenaFx"></div>
+        <div class="arena-layer" data-layer="overlay" id="arenaOverlay"></div>
+        <div class="arena-layer" data-layer="banner" id="arenaBanner"></div>
+      </div>
+    </div>
+
+    <span id="redDeckCount" hidden>0</span>
+    <span id="redGraveCount" hidden>0</span>
+    <span id="blueDeckCount" hidden>0</span>
+    <span id="blueGraveCount" hidden>0</span>
   </main>
 
   <!-- Turn controls (unchanged IDs/handlers) -->

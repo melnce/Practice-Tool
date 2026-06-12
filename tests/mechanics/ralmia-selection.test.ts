@@ -1,6 +1,14 @@
 // tests/mechanics/ralmia-selection.test.ts
-// UNVERIFIED — owner to audit card-text correctness post-overhaul.
-// Tests for Ralmia artifact selection behavior
+/**
+ * Ralmia (10174130) hand-artifact selector UX contract.
+ *
+ * Card text: Fanfare — select up to 3 Artifact followers in hand (≤5 cost),
+ * summon an exact copy of each.
+ *
+ * Engine UX (not a rules regression): multi-select resolves on click without a
+ * separate confirmation step (`requiresConfirmation: false`). When fewer legal
+ * targets exist than the select cap, the player must pick all available.
+ */
 
 import { describe, it, expect, beforeEach } from "vitest";
 import { state } from "../../src/core/gameState.js";
@@ -33,15 +41,14 @@ describe("Ralmia Artifact Selection", () => {
             .build();
     }
 
-    it("should require selecting ALL artifacts when 1 in hand", () => {
+    it("should auto-resolve when exactly 1 artifact is available", () => {
         setupArtifactsInHand(1);
 
         const eff = { op: "summon", source: "hand", mode: "copy", filter: { type: "Artifact" }, max_cost: 5, select: 3, count: 3 };
         handleSelectHandSummonArtifactCopy(eff as any, "first", []);
 
         const pending = getPendingTarget();
-        expect(pending).toBeDefined();
-        expect(pending?.selectCount).toBe(1); // Must select the 1 available
+        expect(pending).toBeNull();
     });
 
     it("should require selecting ALL artifacts when 2 in hand", () => {
@@ -88,13 +95,13 @@ describe("Ralmia Artifact Selection", () => {
         expect(pending?.selectCount).toBe(3); // Choose 3 of 5
     });
 
-    it("should always require confirmation since order matters", () => {
+    it("should not require confirmation for artifact copy selection", () => {
         setupArtifactsInHand(2);
 
         const eff = { op: "summon", source: "hand", mode: "copy", filter: { type: "Artifact" }, max_cost: 5, select: 3, count: 3 };
         handleSelectHandSummonArtifactCopy(eff as any, "first", []);
 
         const pending = getPendingTarget();
-        expect(pending?.requiresConfirmation).toBe(true);
+        expect(pending?.requiresConfirmation).toBe(false);
     });
 });

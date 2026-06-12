@@ -1,0 +1,131 @@
+/* Motion FX — Phase 2 tokens only (no legacy css/* edits) */
+
+#arenaFx {
+  pointer-events: none;
+  overflow: visible;
+}
+
+.motion-corpse {
+  z-index: var(--z-fx);
+  transform-origin: center center;
+}
+
+.motion-corpse[data-motion-corpse="dissolve"] {
+  filter: brightness(0.85);
+}
+
+.motion-corpse[data-motion-corpse="banish"] {
+  filter: brightness(1.4);
+}
+
+.motion-pop {
+  position: absolute;
+  transform: translate(-50%, 0);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+  z-index: calc(var(--z-fx) + 2);
+}
+
+.motion-pop--damage {
+  color: var(--dmg);
+}
+
+.motion-pop--heal {
+  color: var(--heal);
+}
+
+.motion-barrier-ring {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border: 2px solid var(--ward);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: calc(var(--z-fx) + 1);
+  box-shadow: 0 0 12px rgba(127, 183, 255, 0.55);
+}
+
+/* Hand slot wrapper — FLIP target; fan rotation on inner card */
+.hand-slot {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 -14px;
+}
+
+.hand-slot > .card {
+  transform-origin: center bottom;
+  transform: rotate(var(--fan-rot, 0deg));
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.hand-zone .hand-slot:hover > .card {
+  transform: translateY(-28px) rotate(0deg) !important;
+  box-shadow: var(--shadow-lift);
+  z-index: 5;
+}
+
+/* Motion settings gear */
+.motion-settings {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+.motion-gear-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  color: var(--text-mid);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.motion-gear-btn:hover {
+  color: var(--text-hi);
+  border-color: rgba(150, 170, 230, 0.28);
+}
+
+.motion-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 120px;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-lift);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--text-mid);
+}
+
+.motion-popover[hidden] {
+  display: none;
+}
+
+.motion-popover label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.motion-popover label:hover {
+  color: var(--text-hi);
+}

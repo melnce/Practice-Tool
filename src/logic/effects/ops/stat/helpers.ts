@@ -53,6 +53,7 @@ export type SpecialTarget =
     | "enemy:leader"
     | "hand"
     | "last_added_to_hand"
+    | "entering_follower"
     | null;
 
 export function detectSpecialTarget(eff: StatOp): SpecialTarget {
@@ -63,6 +64,7 @@ export function detectSpecialTarget(eff: StatOp): SpecialTarget {
     if (target === "enemy:leader") return "enemy:leader";
     if (target === "hand") return "hand";
     if (target === "last_added_to_hand") return "last_added_to_hand";
+    if (target === "entering_follower") return "entering_follower";
 
     return null;
 }

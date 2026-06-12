@@ -5,21 +5,19 @@ import { isOverflow } from "../../../helpers/overflow.js";
 import { logEvent } from "../../../core/logger.js";
 import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
 import { isFirstPlayer, getBoard, getDeck, getRally, getMaxPP, getAnyAllyAttackedThisTurn } from "../../../core/playerHelpers.js";
+import { meetsSkyboundArtThreshold } from "../skybound.js";
 
 export function handleOverflowGate(owner: Player) {
   return isOverflow(owner);
 }
 
 export function handleSkyboundArtGate(
-  owner: string,
+  _owner: string,
   eff: any,
   sourceCard: any,
 ) {
-  const witnesses = sourceCard?.skyboundArtEvolvesWitnessed || 0;
-  const gauge = (state.roundCount || 1) + witnesses;
   const req = parseInt(eff.requirement || eff.count || 10, 10);
-
-  return gauge >= req;
+  return meetsSkyboundArtThreshold(sourceCard, req);
 }
 
 export function handleNecromancyGate(owner: Player, eff: any) {

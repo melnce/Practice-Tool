@@ -61,6 +61,13 @@
   justify-content: flex-end;
 }
 
+.play-hint {
+  font-size: 0.75rem;
+  opacity: 0.65;
+  margin: 2px 16px 0;
+  text-align: right;
+}
+
 .leader-zone {
   margin: 6px 0;
 }

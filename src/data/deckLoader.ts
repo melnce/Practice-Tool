@@ -5,6 +5,7 @@ import { adapter } from "../core/adapter.js";
 import { getCardDetails, getGlobalCardIndex } from "./cardIndex.js";
 import { logEvent } from "../core/logger.js";
 import type { CardInstance } from "../core/types/index.js";
+import { normalizeCardStats } from "../core/cardStats.js";
 import { expandDeckEntries } from "./deckExpand.js";
 import { findUnknownCards } from "./deckValidation.js";
 import type {
@@ -54,7 +55,9 @@ function enrichDeck(rawDeck: RawDeck, deckFile?: string): CardInstance[] {
       (card.name != null && getCardDetails(card.name));
 
     const base = fullData ? { ...fullData, ...card } : { ...card };
-    return { ...base, uid: state.rng.makeUid() } as CardInstance;
+    const inst = { ...base, uid: state.rng.makeUid() } as CardInstance;
+    normalizeCardStats(inst);
+    return inst;
   });
 }
 

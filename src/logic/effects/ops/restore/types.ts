@@ -126,13 +126,18 @@ export function normalizeToUnifiedSpec(
     // Simple target (leader, self, allies)
     spec.target = targetStr as RestoreTarget;
 
-    // Require player field for simple targets
+    // Fanfare/heal on your leader omits player in card JSON; default to self.
+    // Bare "allies" on your cards means allied leader + followers for this owner.
     if (eff.player === undefined && targetStr !== "self") {
-      throw new Error(
-        `[restore] Missing required field: "player" for target "${targetStr}". ` +
-        `Use composite targets like "ally:leader" or "enemy:leader" for cleaner schema. ` +
-        `Effect: ${JSON.stringify(eff)}`,
-      );
+      if (targetStr === "leader" || targetStr === "allies") {
+        spec.player = "self";
+      } else {
+        throw new Error(
+          `[restore] Missing required field: "player" for target "${targetStr}". ` +
+            `Use composite targets like "ally:leader" or "enemy:leader" for cleaner schema. ` +
+            `Effect: ${JSON.stringify(eff)}`,
+        );
+      }
     }
     if (eff.player !== undefined) {
       spec.player = eff.player as "self" | "opponent";

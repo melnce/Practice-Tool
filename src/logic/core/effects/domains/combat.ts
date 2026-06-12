@@ -8,18 +8,21 @@ export function registerCombatEffects() {
     // Unified damage handler - the single canonical damage op
     // All damage effects use "op": "damage" with distribution/amount_source fields
     registerOp("damage", (eff, ctx) => {
-        // Build damage context with variables from shared context
-        const damageCtx: any = {
-            ...((ctx.context as object) || {}),
-            sourceCard: ctx.sourceCard,
-            owner: ctx.owner,
-        };
+        if (!ctx.context || typeof ctx.context !== "object") {
+            (ctx as { context: Record<string, unknown> }).context = {};
+        }
+        const damageCtx = ctx.context as Record<string, unknown>;
+        damageCtx.sourceCard = ctx.sourceCard;
+        damageCtx.owner = ctx.owner;
+        if ((ctx.context as any)?.selectedCard) {
+            damageCtx.selectedCard = (ctx.context as any).selectedCard;
+        }
         const result = handleDamage(
             eff,
             ctx.owner,
             ctx.sourceCard,
             ctx.queue,
-            damageCtx,
+            damageCtx as any,
         );
         if (result === "pending") return "pending";
     });
@@ -54,12 +57,13 @@ export function registerCombatEffects() {
     // Unified banish handler - the single canonical banish op
     // All banish effects use "op": "banish" with distribution/scope fields
     registerOp("banish", (eff, ctx) => {
-        const banishCtx = {
-            ...((ctx.context as object) || {}),
-            sourceCard: ctx.sourceCard,
-            owner: ctx.owner,
-        };
-        const result = handleBanish(eff, ctx.owner, ctx.queue, banishCtx);
+        if (!ctx.context || typeof ctx.context !== "object") {
+            (ctx as { context: Record<string, unknown> }).context = {};
+        }
+        const banishCtx = ctx.context as Record<string, unknown>;
+        banishCtx.sourceCard = ctx.sourceCard;
+        banishCtx.owner = ctx.owner;
+        const result = handleBanish(eff, ctx.owner, ctx.queue, banishCtx as any);
         if (result === "pending") return "pending";
     });
 
@@ -67,12 +71,13 @@ export function registerCombatEffects() {
     // All restore effects use "op": "restore" with target/amount_source fields
     // NOTE: leader_restored trigger fires from restoreLeaderHP primitive
     registerOp("restore", (eff, ctx) => {
-        const restoreCtx = {
-            ...((ctx.context as object) || {}),
-            sourceCard: ctx.sourceCard,
-            owner: ctx.owner,
-        };
-        handleRestore(eff, ctx.owner, ctx.queue, restoreCtx);
+        if (!ctx.context || typeof ctx.context !== "object") {
+            (ctx as { context: Record<string, unknown> }).context = {};
+        }
+        const restoreCtx = ctx.context as Record<string, unknown>;
+        restoreCtx.sourceCard = ctx.sourceCard;
+        restoreCtx.owner = ctx.owner;
+        handleRestore(eff, ctx.owner, ctx.queue, restoreCtx as any);
     });
 
     // Legacy shim — heal_leader → restore ally:leader (card JSON uses "restore")

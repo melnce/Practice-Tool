@@ -4,8 +4,9 @@ import { exec } from "child_process";
 
 const setsDir = path.resolve("cards/sets");
 const tokenFile = path.resolve("cards/token_details.json");
+const vanillaFile = path.resolve("cards/vanilla_lab_set.json");
 
-console.log(`Watching for changes in ${setsDir} and ${tokenFile}...`);
+console.log(`Watching for changes in ${setsDir}, ${tokenFile}, and ${vanillaFile}...`);
 
 let debounceTimer: NodeJS.Timeout | null = null;
 
@@ -39,6 +40,13 @@ try {
       watcherCallback("change", "token_details.json");
     }
   });
+  if (fs.existsSync(vanillaFile)) {
+    fs.watchFile(vanillaFile, (curr, prev) => {
+      if (curr.mtime !== prev.mtime) {
+        watcherCallback("change", "vanilla_lab_set.json");
+      }
+    });
+  }
 
   // Run once immediately on startup
   runMerge();

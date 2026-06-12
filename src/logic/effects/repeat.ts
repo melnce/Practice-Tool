@@ -2,7 +2,15 @@
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 import type { Effect, Player, CardInstance } from "../../core/types/index.js";
-import { getHand, getCrests } from "../../core/playerHelpers.js";
+import { getHand, getCrests, getPlaysThisTurn } from "../../core/playerHelpers.js";
+
+function repeatPayload(eff: Effect): Effect | Effect[] | null {
+  if (Array.isArray((eff as any).effects) && (eff as any).effects.length) {
+    return (eff as any).effects as Effect[];
+  }
+  if ((eff as any).effect) return (eff as any).effect as Effect;
+  return null;
+}
 
 export function handleRepeatEffect(
   eff: Effect,
@@ -10,7 +18,8 @@ export function handleRepeatEffect(
   sourceCard: CardInstance | null,
   effectsQueue: Effect[],
 ) {
-  if (!eff.effect || !effectsQueue) return;
+  const payload = repeatPayload(eff);
+  if (!payload || !effectsQueue) return;
   let count = 0;
 
   switch (eff.count_source) {
@@ -24,9 +33,12 @@ export function handleRepeatEffect(
       }
       break;
 
-    // NEW: number of crests you have
     case "crest_count":
       count = (getCrests(state, owner) || []).length | 0;
+      break;
+
+    case "combo":
+      count = getPlaysThisTurn(state, owner);
       break;
 
     default:
@@ -37,8 +49,11 @@ export function handleRepeatEffect(
     logEvent("repeatExpand", { owner, count, source: sourceCard?.name });
   }
 
+  const steps = Array.isArray(payload) ? payload : [payload];
   for (let i = 0; i < count; i++) {
-    effectsQueue.push(structuredClone(eff.effect));
+    for (const step of steps) {
+      effectsQueue.push(structuredClone(step));
+    }
   }
 }
 

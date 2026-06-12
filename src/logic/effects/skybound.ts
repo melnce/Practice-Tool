@@ -55,6 +55,24 @@ export function hasSkyboundArt(card: any): boolean {
   return false;
 }
 
+/** Gauge when a Skybound Art card is played: turn# + in-hand allied evolves witnessed. */
+export function getSkyboundArtGauge(
+  card: { skyboundArtEvolvesWitnessed?: number },
+  turnNumber?: number,
+): number {
+  const witnesses = card?.skyboundArtEvolvesWitnessed || 0;
+  const turn = turnNumber ?? state.roundCount ?? 1;
+  return turn + witnesses;
+}
+
+export function meetsSkyboundArtThreshold(
+  card: { skyboundArtEvolvesWitnessed?: number },
+  requirement: number,
+  turnNumber?: number,
+): boolean {
+  return getSkyboundArtGauge(card, turnNumber) >= requirement;
+}
+
 /**
  * Called whenever an ally evolves.
  * Increments the 'evolves witnessed' counter on all "Skybound Art" cards in hand.

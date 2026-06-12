@@ -13,6 +13,15 @@ import {
   dispatchTargetedOp,
   __getRegisteredTargetedOps,
 } from "../effects/ops/targeted/index.js";
+import {
+  consumePlayFollowerResume,
+  runPlayFollowerPostFanfare,
+  type PlayFollowerResume,
+} from "./playCard/followerResume.js";
+import {
+  completeDeferredLwAfterSelection,
+  resumeDeferredDeathIfIdle,
+} from "./cleanup.js";
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
@@ -35,11 +44,13 @@ export function resolvePendingTarget(uid: string | "leader") {
   }
 
   if (result.kind === "continue") {
+    adapter.render();
     return;
   }
 
   if (result.kind === "confirm_needed") {
     showConfirmationButton(pending);
+    adapter.render();
     return;
   }
 
@@ -62,14 +73,27 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
   const result = dispatchTargetedOp(opCtx);
 
   if (result.kind === "handled") {
+    const playFollowerResume = (state.pendingTargetEffect?.resumePlayFollower ??
+      (state as any).resumePlayFollower) as PlayFollowerResume | undefined;
+    const deferredLwComplete = state.pendingTargetEffect?.deferredLwComplete as
+      | { cardUid: string; owner: Player }
+      | undefined;
+
     // Standard cleanup for ALL handled ops (Contract Step 3)
     delete state.pendingTargetEffect;
+    delete (state as any).resumePlayFollower;
     clearSelectableFlags();
     adapter.hideTargetConfirmation();
 
     if (opCtx.resumeEffects?.length) {
       runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
     }
+
+    if (playFollowerResume) {
+      runPlayFollowerPostFanfare(playFollowerResume);
+    }
+    completeDeferredLwAfterSelection(deferredLwComplete);
+    resumeDeferredDeathIfIdle();
 
     // Render after targeted op completes for immediate visual feedback
     adapter.render();

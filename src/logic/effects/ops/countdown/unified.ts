@@ -99,6 +99,7 @@ function handleAmuletCountdown(card: CardInstance, action: CountdownAction, amou
         card: card.name,
         owner: card.owner,
         value: card.countdown,
+        uid: card.uid,
     });
 
     // Render removed - UI layer

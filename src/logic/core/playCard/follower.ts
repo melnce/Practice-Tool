@@ -4,13 +4,17 @@
 import { state } from "../../../core/gameState.js";
 import type { CardInstance, Player, Effect } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
-import { fireTrigger } from "../triggers.js";
 import { pushPlayedHistory } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
-import { incrementRally, getBoard, opponentOf } from "../../../core/playerHelpers.js";
+import { incrementRally, getBoard } from "../../../core/playerHelpers.js";
 import { stampBoardEntryTs } from "../triggers/utils.js";
 import { snapshotEnteringKeywords } from "../enterKeywords.js";
+import {
+  stashPlayFollowerResume,
+  runPlayFollowerPostFanfare,
+  type PlayFollowerResume,
+} from "./followerResume.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -60,7 +64,6 @@ export function playFollower(
   stampBoardEntryTs(card, { advance: true });
   toBoard.push(card);
 
-  const opponent = opponentOf(player);
   const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
 
   // Rulebook §242–256: Fanfare (step 1) before play/enter-reactive triggers (steps 2–5).
@@ -75,68 +78,36 @@ export function playFollower(
       state.lastSummoned.length = 0;
       state.lastSummoned.push(card);
     }
-    runEffects([...card.fanfare], player, card, { enteringCard: card });
+    const fanfarePaused =
+      runEffects([...card.fanfare], player, card, { enteringCard: card }) ===
+      "pending";
+
+    if (fanfarePaused || state.pendingTargetEffect) {
+      const resume: PlayFollowerResume = {
+        player,
+        cardUid: card.uid,
+        chosenTierEffects:
+          chosenTier && Array.isArray(chosenTier.effects)
+            ? [...chosenTier.effects]
+            : null,
+        costChangedOnPlay,
+        enteringKeywordSnapshot,
+      };
+      stashPlayFollowerResume(resume);
+      return { kind: "paused" };
+    }
   }
 
-  fireTrigger("ally_follower_played", player as any, {
-    playedCard: card,
-    costChanged: costChangedOnPlay,
-  });
-
-  const enterCtx = {
-    enteringCard: card,
-    enteringOwner: player,
+  runPlayFollowerPostFanfare({
+    player,
+    cardUid: card.uid,
+    chosenTierEffects:
+      chosenTier && Array.isArray(chosenTier.effects)
+        ? [...chosenTier.effects]
+        : null,
+    costChangedOnPlay,
     enteringKeywordSnapshot,
-  };
-  fireTrigger("ally_follower_enter", player as any, enterCtx);
-  fireTrigger("enemy_follower_enter", opponent as any, enterCtx);
-
-  // Enhance
-  if (
-    chosenTier &&
-    Array.isArray(chosenTier.effects) &&
-    chosenTier.effects.length
-  ) {
-    runEffects([...chosenTier.effects], player, card);
-  }
-
-  // Re-apply keywords
-  applyKeywordsFromList(card);
-  card.can_attack = !!card.hasStorm || !!card.hasRush;
-  card.isRush = !!card.hasRush && !card.hasStorm;
-
-  // Ally-enter amulets (e.g. Ancestral Crown)
-  const myBoard = getBoard(state, player);
-  for (const perm of myBoard) {
-    if (perm === card || perm.type !== "Amulet") continue;
-
-    // Check keywordState (where applyKeywordsFromList stores ally_enter data)
-    const ks = perm.keywordState;
-    if (ks?.hasAllyEnter && Array.isArray(ks.allyEnterEffects)) {
-      for (const eff of ks.allyEnterEffects) {
-        if (eff.op === "stat" && eff.target === "trigger") {
-          card.attack =
-            (Number(card.attack) || 0) + (Number((eff as any).attack) || 0);
-          card.defense =
-            (Number(card.defense) || 0) + (Number((eff as any).defense) || 0);
-        }
-      }
-    }
-  }
-
-  // Pixie-enter
-  if (Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
-    for (const perm of myBoard) {
-      const ks = perm.keywordState || {};
-      if (
-        perm.type === "Amulet" &&
-        ks.hasPixieEnter &&
-        Array.isArray(ks.pixieEnterEffects)
-      ) {
-        runEffects([...ks.pixieEnterEffects], player, perm);
-      }
-    }
-  }
+  });
 
   if (state.pendingTargetEffect) {
     return { kind: "paused" };

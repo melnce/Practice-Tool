@@ -109,7 +109,11 @@ export function normalizeToUnifiedSpec(
     );
   }
 
-  const source = eff.source as SummonSource;
+  const rawSource = String(eff.source).toLowerCase();
+  const source: SummonSource =
+    rawSource === "self"
+      ? "copy"
+      : (eff.source as SummonSource);
 
   // For named source, name is required
   if (source === "named" && !eff.name) {

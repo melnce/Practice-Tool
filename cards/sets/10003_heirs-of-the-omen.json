@@ -242,48 +242,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "crest",
-        "action": "gain",
-        "name": "Mjerrabaine, Great Manifest",
-        "image": "images/crests/mjerrabaine_great_manifest.png",
-        "description": "On gain: replace your deck with the Mjerrabaine deck and flip deckout into a victory.\nAt the end of your turn, discard all cards not named Great Testimony and draw 6.",
-        "on_gain": [
-          {
-            "op": "deck",
-            "action": "replace",
-            "from_set": "10003_heirs-of-the-omen",
-            "exclude": [
-              "Mjerrabaine, Great Manifest"
-            ]
-          },
-          {
-            "op": "set_deckout_victory",
-            "enabled": true
-          }
-        ],
-        "triggers": [
-          {
-            "type": "end_of_turn_own",
-            "effects": [
-              {
-                "op": "discard",
-                "mode": "except_named",
-                "names": [
-                  "Great Testimony"
-                ]
-              },
-              {
-                "op": "draw",
-                "source": "deck",
-                "count": 6
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -320,17 +279,7 @@
         "defense": -2
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "all:follower",
-        "select": 1,
-        "include_self": true,
-        "attack": 2,
-        "defense": -2
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "gate",
@@ -375,24 +324,11 @@
     "url": "https://shadowverse.gg/cards/10311110-devotee-of-unkilling",
     "evolve": [
       {
-        "op": "stat",
-        "action": "give",
-        "target": "enemy:follower",
-        "select": 1,
-        "attack": 0,
-        "defense": -1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "enemy:follower",
-        "select": 1,
-        "attack": 0,
-        "defense": -1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "stat",
@@ -503,11 +439,8 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "stat",
-        "action": "give",
-        "target": "enemy:follower",
-        "attack": 0,
-        "defense": -3
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
     "fanfare": [
@@ -787,13 +720,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "add_to_hand",
-        "name": "Annihilating Onslaught",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "stat",
@@ -982,21 +909,15 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
         "attack": 2,
         "defense": 2,
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "attack": 2,
-        "defense": 2,
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -1097,14 +1018,7 @@
         "amount": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "pp",
-        "action": "recover",
-        "player": "self",
-        "amount": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -1291,18 +1205,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "add_to_hand",
-        "name": "Gilded Blade",
-        "count": 1
-      },
-      {
-        "op": "add_to_hand",
-        "name": "Gilded Necklace",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "crest",
@@ -1402,20 +1305,11 @@
     "url": "https://shadowverse.gg/cards/10331120-ascetic-of-wuxing",
     "evolve": [
       {
-        "op": "summon",
-        "source": "named",
-        "name": "Paper Shikigami",
-        "count": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Paper Shikigami",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -1768,7 +1662,7 @@
     "fanfare": [
       {
         "op": "cost",
-        "action": "reduce",
+        "mode": "reduce",
         "filter": {
           "type": "Follower"
         },
@@ -1934,7 +1828,7 @@
           },
           {
             "op": "restore",
-            "target": "leader",
+            "target": "ally:leader",
             "amount_source": "context.restore_amount"
           }
         ]
@@ -2218,6 +2112,7 @@
     "triggers": [
       {
         "event": "self_damaged",
+        "max_per_turn": 3,
         "condition": {
           "still_alive": true
         },
@@ -2325,62 +2220,11 @@
     "url": "https://shadowverse.gg/cards/10351110-devotee-of-entwining",
     "evolve": [
       {
-        "op": "mode",
-        "options": [
-          {
-            "label": "Deal 1 damage to all enemy followers",
-            "effects": [
-              {
-                "op": "damage",
-                "target": "enemy:follower",
-                "amount": 1
-              }
-            ]
-          },
-          {
-            "label": "Give this follower +2/+2",
-            "effects": [
-              {
-                "op": "stat",
-                "action": "give",
-                "target": "self",
-                "attack": 2,
-                "defense": 2
-              }
-            ]
-          }
-        ]
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "mode",
-        "options": [
-          {
-            "label": "Deal 1 damage to all enemy followers",
-            "effects": [
-              {
-                "op": "damage",
-                "target": "enemy:follower",
-                "amount": 1
-              }
-            ]
-          },
-          {
-            "label": "Give this follower +2/+2",
-            "effects": [
-              {
-                "op": "stat",
-                "action": "give",
-                "target": "self",
-                "attack": 2,
-                "defense": 2
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "mode",
@@ -2498,64 +2342,11 @@
     "url": "https://shadowverse.gg/cards/10352110-supplicant-of-entwining",
     "evolve": [
       {
-        "op": "mode",
-        "options": [
-          {
-            "label": "Deal 3 damage to a random enemy follower",
-            "effects": [
-              {
-                "op": "damage",
-                "target": "enemy:follower",
-                "amount": 3,
-                "count": 1,
-                "distribution": "random_hits"
-              }
-            ]
-          },
-          {
-            "label": "Restore 2 defense to your leader",
-            "effects": [
-              {
-                "op": "restore",
-                "target": "leader",
-                "player": "self",
-                "amount": 2
-              }
-            ]
-          }
-        ]
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "mode",
-        "options": [
-          {
-            "label": "Deal 3 damage to a random enemy follower",
-            "effects": [
-              {
-                "op": "damage",
-                "target": "enemy:follower",
-                "amount": 3,
-                "count": 1,
-                "distribution": "random_hits"
-              }
-            ]
-          },
-          {
-            "label": "Restore 2 defense to your leader",
-            "effects": [
-              {
-                "op": "restore",
-                "target": "leader",
-                "player": "self",
-                "amount": 2
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "mode",
@@ -3030,7 +2821,8 @@
             "effects": [
               {
                 "op": "add_to_hand",
-                "name": "Scream Diffusion"
+                "name": "Scream Diffusion",
+                "count": 1
               }
             ]
           },
@@ -3039,7 +2831,8 @@
             "effects": [
               {
                 "op": "add_to_hand",
-                "name": "Wings of Desire"
+                "name": "Wings of Desire",
+                "count": 1
               }
             ]
           }
@@ -3134,6 +2927,7 @@
           {
             "op": "restore",
             "target": "leader",
+            "player": "self",
             "amount": 1
           }
         ]
@@ -3161,12 +2955,13 @@
       {
         "op": "damage",
         "target": "enemy:follower",
+        "distribution": "all",
         "amount": 3
       }
     ],
     "keywords": [
       {
-        "name": "enhance",
+        "name": "Enhance",
         "cost": 8,
         "effects": [
           {
@@ -3177,11 +2972,13 @@
           {
             "op": "restore",
             "target": "leader",
+            "player": "self",
             "amount": 3
           },
           {
             "op": "damage",
             "target": "enemy:follower",
+            "distribution": "all",
             "amount": 3
           }
         ]
@@ -3391,38 +3188,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "crest",
-        "action": "gain",
-        "name": "Congregant of Repose",
-        "image": "images/crests/congregant_of_repose.png",
-        "description": "Countdown (4). At the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.",
-        "countdown": 4,
-        "triggers": [
-          {
-            "type": "end_of_turn_own",
-            "effects": [
-              {
-                "op": "gate",
-                "condition": "no_ally_attacked",
-                "effects": [
-                  {
-                    "op": "draw",
-                    "source": "deck",
-                    "count": 1,
-                    "filters": {
-                      "type": "follower",
-                      "defense_eq": 4
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "destroy",
@@ -3469,6 +3235,7 @@
           {
             "op": "restore",
             "target": "leader",
+            "player": "self",
             "amount": 4
           }
         ]
@@ -3625,39 +3392,12 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "crest",
-        "action": "gain",
-        "name": "Marwynn, Despair Manifest",
-        "image": "images/crests/marwynn_despair_manifest.png",
-        "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
-        "triggers": [
-          {
-            "type": "end_of_turn_own",
-            "effects": [
-              {
-                "op": "gate",
-                "condition": "no_ally_attacked",
-                "effects": [
-                  {
-                    "op": "damage",
-                    "distribution": "split_sequential",
-                    "spill_to_leader": true,
-                    "amount_source": "crest_count",
-                    "target": "enemy:follower"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
-        "name": "Torrent of Despair"
+        "name": "Torrent of Despair",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -3731,19 +3471,7 @@
         "defense": 3
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "select": 1,
-        "condition": {
-          "tribe": "Artifact"
-        },
-        "attack": 3,
-        "defense": 3
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -3803,38 +3531,11 @@
     "url": "https://shadowverse.gg/cards/10372110-supplicant-of-destruction",
     "evolve": [
       {
-        "op": "destroy",
-        "target": "ally:card",
-        "not_self": true,
-        "select": 1,
-        "then": [
-          {
-            "op": "damage",
-            "target": "enemy:follower",
-            "amount": 2,
-            "distribution": "random_hits",
-            "count": 1
-          }
-        ]
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "destroy",
-        "target": "ally:card",
-        "not_self": true,
-        "select": 1,
-        "then": [
-          {
-            "op": "damage",
-            "target": "enemy:follower",
-            "amount": 2,
-            "distribution": "random_hits",
-            "count": 1
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "destroy",
@@ -4062,17 +3763,12 @@
         "name": "White Psalm, New Revelation"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "White Psalm, New Revelation"
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
-        "name": "Melodious Monody"
+        "name": "Melodious Monody",
+        "count": 1
       }
     ],
     "keywords": [

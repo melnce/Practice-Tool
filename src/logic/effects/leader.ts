@@ -73,17 +73,33 @@ export function popLeaderBarrier(owner: Player, reason = "damage_prevent") {
   return true;
 }
 
+function getLeaderMaxDamageCap(owner: Player): number | null {
+  const capKey = isFirstPlayer(owner)
+    ? "blueLeaderMaxDamageCap"
+    : "redLeaderMaxDamageCap";
+  const rootCap = (state as any)[capKey];
+  if (typeof rootCap === "number" && Number.isFinite(rootCap)) {
+    return rootCap;
+  }
+  const playerCap = state.players[owner].leaderMaxDamageCap;
+  if (typeof playerCap === "number" && Number.isFinite(playerCap)) {
+    return playerCap;
+  }
+  return null;
+}
+
 /** Centralized leader damage that respects barrier and max HP */
 export function applyLeaderDamage(owner: Player, amount: number) {
-  if ((amount | 0) <= 0) return 0;
+  amount = amount | 0;
+  if (amount < 0) return 0;
 
   logEvent("leaderDamage", { owner, amount });
 
   // Barrier soaks the *whole packet* and consumes 1 charge
   if (popLeaderBarrier(owner, "leader_hit")) return 0;
 
-  // NEW: Check Max Damage Cap (Zooey) - now from nested state
-  const cap = state.players[owner].leaderMaxDamageCap;
+  // Max damage cap (Zooey) — root state keys + per-player fallback
+  const cap = getLeaderMaxDamageCap(owner);
 
   // NEW: Leader damage modifier (Beelzebub) - now from nested state
   const mod = state.players[owner].leaderDamageTakenBonus || 0;
@@ -100,6 +116,8 @@ export function applyLeaderDamage(owner: Player, amount: number) {
       amount = cap;
     }
   }
+
+  if (amount <= 0) return 0;
 
   const cur = getHP(state, owner);
   const next = Math.max(0, cur - (amount | 0));

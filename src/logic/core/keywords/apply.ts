@@ -78,18 +78,29 @@ export const KEYWORD_MAP: {
 
     if (opts && Array.isArray(opts.effects)) {
       ks.lastWordsEffects = opts.effects;
+      c.lastWordsEffects = opts.effects;
     } else if (!ks.lastWordsEffects && !c.lastWordsEffects) {
       ks.lastWordsEffects = [];
+      c.lastWordsEffects = [];
     }
   },
   cant_be_destroyed: (c) => {
     getKS(c).cannotBeDestroyed = true;
   },
   trigger: (c, opts) => {
-    if (!opts?.trigger) return;
     const ks = getKS(c);
     if (!Array.isArray(ks.triggers)) ks.triggers = [];
-    ks.triggers.push(opts.trigger);
+    if (!Array.isArray(c.triggers)) c.triggers = [];
+    const add = (t: any) => {
+      if (!t) return;
+      ks.triggers.push(t);
+      c.triggers.push(t);
+    };
+    if (opts?.trigger) add(opts.trigger);
+    if (Array.isArray(opts?.triggers)) {
+      for (const t of opts.triggers) add(t);
+    }
+    if (!opts?.trigger && !Array.isArray(opts?.triggers)) return;
   },
   rally: (c, opts) => {
     const ks = getKS(c);
@@ -160,6 +171,8 @@ export const KEYWORD_MAP: {
 
     ks.hasBleed = true;
     ks.bleed = { toLeader, toSelf };
+    (c as any).hasBleed = true;
+    (c as any).bleed = { toLeader, toSelf };
   },
   ally_enter: (c, opts) => {
     const ks = getKS(c);
@@ -171,6 +184,9 @@ export const KEYWORD_MAP: {
     ks.cantAttack = true;
     ks.cantAttackFollowers = true;
     ks.cantAttackLeaders = true;
+    c.cantAttack = true;
+    c.cantAttackFollowers = true;
+    c.cantAttackLeaders = true;
 
     if (opts?.expires_on_turn != null) {
       ks.cantAttackExpiresOnTurn = Number(opts.expires_on_turn);

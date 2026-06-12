@@ -1,0 +1,60 @@
+:root {
+  /* Surfaces */
+  --bg-deep: #0a0d18;
+  --bg-arena: radial-gradient(120% 90% at 50% 38%, #161d33 0%, #0e1322 55%, #0a0d18 100%);
+  --surface: rgba(22, 28, 48, 0.72);
+  --surface-border: rgba(150, 170, 230, 0.14);
+  --text-hi: #e9edf7;
+  --text-mid: #9aa6c4;
+  --text-dim: #5d6884;
+
+  /* Class accents (applied via [data-class] on leaders, frames, banner) */
+  --c-forest: #4caf6d;
+  --c-sword: #d9a93f;
+  --c-rune: #5b8def;
+  --c-dragon: #d9703f;
+  --c-abyss: #9b5bd9;
+  --c-haven: #e3d9a8;
+  --c-portal: #46c2c9;
+  --c-neutral: #8d97ad;
+
+  /* Rarity frames */
+  --r-bronze: #b08a4f;
+  --r-silver: #c8cfdb;
+  --r-gold: #e8c558;
+  --r-legendary: linear-gradient(135deg, #e8c558, #e87ad9, #e8c558);
+
+  /* Semantic */
+  --dmg: #ff5d5d;
+  --heal: #5ddc7f;
+  --buff: #67d9a0;
+  --ward: #7fb7ff;
+  --ready: #79e0a2;
+  --evolved: #f0c95c;
+  --super: #c07ef0;
+
+  /* Type */
+  --font-display: "Cinzel", Georgia, serif;
+  --font-ui: "Inter Variable", system-ui, sans-serif;
+
+  /* Geometry & depth */
+  --radius-card: 10px;
+  --radius-panel: 14px;
+  --shadow-card: 0 4px 14px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --z-board: 10;
+  --z-hand: 20;
+  --z-preview: 30;
+  --z-drag: 40;
+  --z-fx: 50;
+  --z-overlay: 60;
+  --z-banner: 70;
+
+  /* Motion tokens — consumed in Phase 2 */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+  --dur-cine: 650ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.4, 1);
+}

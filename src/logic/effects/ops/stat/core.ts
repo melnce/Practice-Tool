@@ -23,21 +23,28 @@ export function applyStatBuff(
 
   (target as any).attack = (parseInt(String(target.attack)) || 0) + a;
   (target as any).defense = (parseInt(String(target.defense)) || 0) + d;
-  target.peak_defense = Math.max(
-    target.peak_defense ?? Number(target.defense),
-    Number(target.defense),
-  );
-
   if (!target.potential_attack)
     target.potential_attack = (target.base_attack ||
       Number(target.attack) ||
       0) as number;
-  if (!target.potential_defense)
-    target.potential_defense = (target.base_defense ||
-      Number(target.defense) ||
-      0) as number;
   target.potential_attack! += a;
-  target.potential_defense! += d;
+
+  if (d < 0) {
+    // Rulebook: "-N defense" lowers max defense; follower sits at full new max.
+    const newDef = Number(target.defense);
+    target.peak_defense = newDef;
+    target.potential_defense = newDef;
+  } else {
+    target.peak_defense = Math.max(
+      target.peak_defense ?? Number(target.defense),
+      Number(target.defense),
+    );
+    if (!target.potential_defense)
+      target.potential_defense = (target.base_defense ||
+        Number(target.defense) ||
+        0) as number;
+    target.potential_defense! += d;
+  }
 }
 
 /**

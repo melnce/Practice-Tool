@@ -1,0 +1,340 @@
+/* Card & board chrome — driven by data-* attributes */
+
+.card {
+  width: 100px;
+  height: 150px;
+  position: relative;
+  flex-shrink: 0;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-ui);
+  background: #141a2c;
+  overflow: visible;
+}
+
+.card[data-zone="hand"] {
+  cursor: default;
+}
+
+.card[data-playable="true"] {
+  animation: playable-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes playable-breathe {
+  0%,
+  100% {
+    box-shadow: var(--shadow-card), 0 0 0 1px rgba(150, 170, 230, 0.15);
+  }
+  50% {
+    box-shadow:
+      var(--shadow-card),
+      0 0 0 2px color-mix(in srgb, var(--card-accent, var(--c-neutral)) 55%, transparent);
+  }
+}
+
+.card-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+  pointer-events: none;
+  border: 2px solid var(--r-bronze);
+  z-index: 2;
+}
+
+.card[data-rarity="silver"] .card-frame {
+  border-color: var(--r-silver);
+}
+.card[data-rarity="gold"] .card-frame {
+  border-color: var(--r-gold);
+}
+.card[data-rarity="legendary"] .card-frame {
+  border-image: var(--r-legendary) 1;
+  border-width: 2px;
+  border-style: solid;
+}
+
+.card[data-type="amulet"] .card-frame {
+  clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+}
+
+.card[data-evolved="true"] .card-frame {
+  border-color: var(--evolved);
+  box-shadow: 0 0 10px rgba(240, 201, 92, 0.35);
+}
+
+.card[data-super-evolved="true"] .card-frame {
+  border-color: var(--super);
+  box-shadow: 0 0 14px rgba(192, 126, 240, 0.5);
+}
+
+.card[data-ready="true"] {
+  box-shadow: var(--shadow-card), 0 0 14px rgba(121, 224, 162, 0.45);
+}
+
+.card[data-exhausted="true"] {
+  filter: saturate(0.8);
+}
+
+.card[data-ward="true"]::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: calc(var(--radius-card) + 4px);
+  border: 2px solid color-mix(in srgb, var(--ward) 65%, transparent);
+  box-shadow: 0 0 12px rgba(127, 183, 255, 0.35);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.card-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-name {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  line-height: 1.1;
+  color: var(--text-hi);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card[data-zone="hand"] .card-name,
+.card.card-back .card-name {
+  display: none;
+}
+
+.cost-gem {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.8rem;
+  background: rgba(10, 13, 24, 0.85);
+  border: 2px solid var(--text-mid);
+  color: var(--text-hi);
+  z-index: 3;
+}
+
+.cost-gem[data-cost-tint="buff"] {
+  border-color: var(--buff);
+  color: var(--buff);
+}
+
+.cost-gem[data-cost-tint="dmg"] {
+  border-color: var(--dmg);
+  color: var(--dmg);
+}
+
+.stat-plate {
+  position: absolute;
+  bottom: 6px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: rgba(10, 13, 24, 0.88);
+  border: 1px solid var(--surface-border);
+  color: var(--text-hi);
+  z-index: 3;
+}
+
+.stat-plate[data-stat="attack"] {
+  left: 6px;
+}
+
+.stat-plate[data-stat="defense"] {
+  right: 6px;
+}
+
+.stat-plate[data-stat-tint="buff"] {
+  color: var(--buff);
+  border-color: color-mix(in srgb, var(--buff) 50%, transparent);
+}
+
+.stat-plate[data-stat-tint="dmg"] {
+  color: var(--dmg);
+  border-color: color-mix(in srgb, var(--dmg) 50%, transparent);
+}
+
+.countdown-chip {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 1rem;
+  background: rgba(10, 13, 24, 0.9);
+  border: 2px solid var(--c-portal);
+  color: var(--text-hi);
+  z-index: 3;
+}
+
+.card[data-engage-ready="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 2px rgba(121, 224, 162, 0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.card[data-engage-used="true"]::after {
+  box-shadow: inset 0 0 0 2px rgba(93, 104, 132, 0.25);
+  opacity: 0.6;
+}
+
+.skybound-meter {
+  position: absolute;
+  top: 32px;
+  left: 6px;
+  font-size: 0.6rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(10, 13, 24, 0.85);
+  border: 1px solid var(--evolved);
+  color: var(--evolved);
+  font-variant-numeric: tabular-nums;
+  z-index: 3;
+}
+
+.keyword-chips {
+  position: absolute;
+  bottom: 34px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+  z-index: 3;
+}
+
+.keyword-chip {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: rgba(10, 13, 24, 0.8);
+  border: 1px solid var(--surface-border);
+  font-size: 0.45rem;
+  display: grid;
+  place-items: center;
+  color: var(--text-mid);
+  text-transform: uppercase;
+}
+
+.card.card-back {
+  background: linear-gradient(145deg, #2a3350 0%, #141a2c 100%);
+  border: 2px solid var(--surface-border);
+}
+
+.card.card-back .card-image-wrapper {
+  display: none;
+}
+
+.card.card-back::after {
+  content: "✦";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  color: var(--text-dim);
+}
+
+.selected-check {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--ready);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.leader.selectable,
+.card[data-selectable="true"] {
+  cursor: pointer;
+}
+
+.crest-countdown {
+  font-variant-numeric: tabular-nums;
+}
+
+.crest-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.crest-row {
+  display: flex;
+  gap: 6px;
+}
+
+.crest-slot {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(10, 13, 24, 0.6);
+  border: 1px solid var(--surface-border);
+  position: relative;
+}
+
+.crest-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.leader.has-leader-barrier::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 3px solid color-mix(in srgb, var(--ward) 75%, transparent);
+  box-shadow: 0 0 12px rgba(127, 183, 255, 0.45);
+  pointer-events: none;
+  z-index: 10;
+}
+
+body.select-mode .card:not([data-selectable="true"]):not([data-selected="true"]) {
+  filter: saturate(0.65) brightness(0.88);
+}

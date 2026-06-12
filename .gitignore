@@ -8,6 +8,14 @@ node_modules/
 
 # Build output (generated JS)
 dist/
+build/
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# Tool caches
+.cache/
 
 # Logs and temp files
 *.log
@@ -27,12 +35,8 @@ Thumbs.db
 !.vscode/extensions.json
 reports/
 
-# ── Legacy / alternate layouts (hand-maintained; not used by runtime) ──
-cards/card_sets/
-cards/card_details.json
-cards/classes/
-cards/seperate_sets.py
-cards/seperate_classes.py
+# ── Legacy / alternate layouts (removed; do not recreate by hand) ──
+# cards/card_sets/ cards/card_details.json cards/classes/ cards/seperate_*.py
 
 # ── Legacy pre-src codebase (may be reused for AI/bots work) ──
 /main.js

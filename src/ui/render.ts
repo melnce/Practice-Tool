@@ -31,13 +31,17 @@ export function render() {
 
   // zones - use activePlayer as source of truth for turn state
   const isFirstActive = state.activePlayer === "first";
-  renderZone("blueHand", state.players.first.hand, state, render, isFirstActive, (i) =>
-    logic().then(({ playCard }) => playCard(state.players.first.hand, "first", i)),
-  );
+  renderZone("blueHand", state.players.first.hand, state, render, isFirstActive, (uid) => {
+    const hand = state.players.first.hand;
+    const i = hand.findIndex((c) => c.uid === uid);
+    if (i !== -1) void logic().then(({ playCard }) => playCard(hand, "first", i));
+  });
   renderZone("blueBoard", state.players.first.board, state, render);
-  renderZone("redHand", state.players.second.hand, state, render, !isFirstActive, (i) =>
-    logic().then(({ playCard }) => playCard(state.players.second.hand, "second", i)),
-  );
+  renderZone("redHand", state.players.second.hand, state, render, !isFirstActive, (uid) => {
+    const hand = state.players.second.hand;
+    const i = hand.findIndex((c) => c.uid === uid);
+    if (i !== -1) void logic().then(({ playCard }) => playCard(hand, "second", i));
+  });
   renderZone("redBoard", state.players.second.board, state, render);
 
   updateCounts(state);
@@ -72,9 +76,13 @@ export function render() {
 
   // Leader drag-drop setup (disabled during mulligan)
   if (state.phase !== "mulligan") {
-    makeLeaderDroppable(byId("blueLeader")!, "first", state);
-    makeLeaderDroppable(byId("redLeader")!, "second", state);
+    makeLeaderDroppable(byId("blueLeader")!, "first");
+    makeLeaderDroppable(byId("redLeader")!, "second");
   }
+
+  document.body.dataset.activePlayer = state.activePlayer;
+
+  updateLeaderPlates(state);
 
   // PP Boost button for second player - ID is "redBoost" in HTML
   const ppBoostBtn = byId("redBoost") as HTMLButtonElement;
@@ -155,10 +163,12 @@ function setEndTurnDisabled(disabled: boolean) {
     if (blueBtn) {
       blueBtn.style.display = isFirstActive ? "inline-block" : "none";
       blueBtn.disabled = false;
+      blueBtn.dataset.yourTurn = isFirstActive ? "true" : "false";
     }
     if (redBtn) {
       redBtn.style.display = isFirstActive ? "none" : "inline-block";
       redBtn.disabled = false;
+      redBtn.dataset.yourTurn = !isFirstActive ? "true" : "false";
     }
   }
 
@@ -414,6 +424,55 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
           tooltipEl.style.display = "none";
         };
       }
+    }
+  }
+}
+
+function updateLeaderPlates(gs: GameState) {
+  updateOneLeaderPlate("first", gs);
+  updateOneLeaderPlate("second", gs);
+}
+
+function updateOneLeaderPlate(side: Player, gs: GameState) {
+  const prefix = domPrefix(side);
+  const plate = byId(`${prefix}LeaderPlate`);
+  const hpEl = byId(`${prefix}HP`);
+  if (!plate || !hpEl) return;
+
+  const p = gs.players[side];
+  hpEl.textContent = String(p.hp);
+  plate.dataset.class = "neutral";
+  plate.toggleAttribute("data-damaged", p.hp < 20);
+
+  const deckEl = plate.querySelector(`[data-leader-deck]`);
+  if (deckEl) deckEl.textContent = String(p.deck.length);
+
+  const handBacks = plate.querySelector("[data-hand-backs]");
+  if (handBacks) {
+    handBacks.replaceChildren();
+    const n = Math.min(p.hand.length, 5);
+    for (let i = 0; i < n; i++) {
+      const b = document.createElement("span");
+      b.className = "hand-back";
+      handBacks.appendChild(b);
+    }
+  }
+
+  const epRow = plate.querySelector("[data-ep-pips]");
+  if (epRow) {
+    epRow.replaceChildren();
+    for (let i = 0; i < 3; i++) {
+      const pip = document.createElement("span");
+      pip.className = "ep-pip";
+      pip.dataset.filled = i < (p.evoCharges ?? 0) ? "true" : "false";
+      epRow.appendChild(pip);
+    }
+    for (let i = 0; i < 2; i++) {
+      const pip = document.createElement("span");
+      pip.className = "ep-pip";
+      pip.dataset.super = "true";
+      pip.dataset.filled = i < (p.superEvoCharges ?? 0) ? "true" : "false";
+      epRow.appendChild(pip);
     }
   }
 }

@@ -47,6 +47,7 @@ export function initFollower(card: CardInstance) {
 }
 
 export function initAmulet(card: CardInstance) {
+  normalizeCardStats(card);
   // bring in keyword flags and keyword-defined params (e.g., countdown)
   applyKeywordsFromList(card);
 

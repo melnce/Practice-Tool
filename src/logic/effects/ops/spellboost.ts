@@ -3,14 +3,11 @@ import { state } from "../../../core/gameState.js";
 // Legacy spellboost transform removed: getCardDetails import no longer needed
 
 import { logEvent } from "../../../core/logger.js";
-import type { Player, CardInstance } from "../../../core/types/index.js";
+import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
 import { getHand } from "../../../core/playerHelpers.js";
-
-// CIRCULAR DEPENDENCY FIX:
-let runEffects: any = null;
-export function registerRunEffectsForSpellboost(fn: any) {
-  runEffects = fn;
-}
+import { runEffects } from "../../core/effects/index.js";
+import { handleStat } from "./stat.js";
+import { handleCost } from "./cost/unified.js";
 
 /* ------------------------ helpers ------------------------ */
 
@@ -53,19 +50,31 @@ function normTimes(x: any) {
  * Handle all Spellboost keyword effects for ONE in-hand card.
  * All effects are passed to runEffects - gate conditions handle thresholds.
  */
+function dispatchSpellboostKeywordEffect(
+  owner: Player,
+  card: CardInstance,
+  effect: Effect,
+) {
+  // Stat/cost on self avoid the effects index cycle (index → buffs → spellboost → index).
+  if (effect.op === "stat" && String(effect.target ?? "").toLowerCase() === "self") {
+    handleStat(effect, owner, card, []);
+    return;
+  }
+  if (effect.op === "cost" && String(effect.target ?? "").toLowerCase() === "self") {
+    handleCost(effect, owner, card, {});
+    return;
+  }
+  runEffects([effect], owner, card);
+}
+
 function handleSpellboostKeywordEffects(owner: Player, c: CardInstance) {
   const kws = Array.isArray(c.keywords) ? c.keywords : [];
   for (const kw of kws) {
-    if (
-      (kw as any)?.name !== "Spellboost" ||
-      !Array.isArray((kw as any).effects)
-    )
-      continue;
+    const name = String((kw as any)?.name ?? "").toLowerCase();
+    if (name !== "spellboost" || !Array.isArray((kw as any).effects)) continue;
 
-    // All spellboost effects are now handled by the generic effect system
-    // Gate conditions (e.g. spellboost_count) will check thresholds automatically
-    for (const effect of (kw as any).effects) {
-      runEffects([effect], owner, c);
+    for (const effect of (kw as any).effects as Effect[]) {
+      dispatchSpellboostKeywordEffect(owner, c, effect);
     }
   }
 }

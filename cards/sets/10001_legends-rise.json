@@ -107,18 +107,11 @@
     "url": "https://shadowverse.gg/cards/10102110-apollo-heavens-envoy",
     "evolve": [
       {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "damage",
@@ -176,13 +169,7 @@
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "destroy",
-        "target": "enemy:follower",
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": []
   },
@@ -366,30 +353,11 @@
     "url": "https://shadowverse.gg/cards/10111120-capricious-sprite",
     "evolve": [
       {
-        "op": "summon",
-        "source": "named",
-        "name": "Fairy",
-        "count": 1
-      },
-      {
-        "op": "add_to_hand",
-        "name": "Fairy",
-        "count": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Fairy",
-        "count": 1
-      },
-      {
-        "op": "add_to_hand",
-        "name": "Fairy",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -754,19 +722,7 @@
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "draw",
-        "source": "deck",
-        "count": 1
-      },
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 1,
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "gate",
@@ -809,15 +765,7 @@
         "amount_source": "hand_size"
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount_dynamic": "hand_size",
-        "distribution": "split_sequential",
-        "amount_source": "hand_size"
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "draw",
@@ -1150,28 +1098,11 @@
     "url": "https://shadowverse.gg/cards/10121120-ernesta-peace-hawker",
     "evolve": [
       {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
-        "attack": 1,
-        "defense": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
-        "attack": 1,
-        "defense": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "stat",
@@ -1361,14 +1292,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Knight",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [],
     "triggers": [
@@ -1514,14 +1438,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Shinobi Squirrel",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       "Ambush"
@@ -1714,24 +1631,7 @@
         "defense": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Knight",
-        "count": 2
-      },
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "condition": {
-          "not_self": true
-        },
-        "attack": 1,
-        "defense": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": []
   },
@@ -2068,14 +1968,7 @@
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 5,
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -2107,13 +2000,7 @@
         "count": 2
       }
     ],
-    "superevolve": [
-      {
-        "op": "spellboost",
-        "target": "ally:hand",
-        "count": 2
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "draw",
@@ -2227,19 +2114,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 3,
-        "select": 1
-      },
-      {
-        "op": "spellboost",
-        "target": "ally:hand",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "spellboost",
@@ -2276,18 +2151,7 @@
         "amount_source": "golem_count"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Clay Golem"
-      },
-      {
-        "op": "damage",
-        "target": "enemy_board",
-        "amount_source": "golem_count"
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       {
@@ -2340,13 +2204,7 @@
         "count": 2
       }
     ],
-    "superevolve": [
-      {
-        "op": "spellboost",
-        "target": "ally:hand",
-        "count": 2
-      }
-    ]
+    "superevolve": []
   },
   {
     "id": "10132310",
@@ -2509,34 +2367,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "crest",
-        "action": "gain",
-        "name": "Juno, Visionary Alchemist",
-        "image": "images/crests/juno_visionary_alchemist.png",
-        "description": "Countdown (3). At the end of your turn: Earth Rite (1) – Summon a Guardian Golem.",
-        "countdown": 3,
-        "triggers": [
-          {
-            "type": "end_of_turn_own",
-            "effects": [
-              {
-                "op": "earth_rite",
-                "cost": 1,
-                "effects": [
-                  {
-                    "op": "summon",
-                    "source": "named",
-                    "name": "Guardian Golem"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "keywords": []
   },
   {
@@ -2615,21 +2446,7 @@
         "amount": 2
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 4,
-        "distribution": "random_hits",
-        "count": 1
-      },
-      {
-        "op": "pp",
-        "action": "recover",
-        "player": "self",
-        "amount": 2
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "earth_rite",
@@ -2822,14 +2639,7 @@
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 3,
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -3005,20 +2815,11 @@
     "url": "https://shadowverse.gg/cards/10141140-little-dragon-nanny",
     "evolve": [
       {
-        "op": "summon",
-        "source": "named",
-        "name": "Fire Drake Whelp",
-        "count": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Fire Drake Whelp",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -3363,13 +3164,7 @@
         "amount": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "pp",
-        "action": "gain_max",
-        "amount": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "gate",
@@ -3663,14 +3458,7 @@
         "count": 2
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Bat",
-        "count": 2
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": []
   },
@@ -3755,14 +3543,7 @@
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 6,
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "draw",
@@ -3884,14 +3665,7 @@
         "amount": 5
       }
     ],
-    "superevolve": [
-      {
-        "op": "restore",
-        "target": "leader",
-        "player": "self",
-        "amount": 5
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "damage",
@@ -4106,22 +3880,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "gate",
-        "condition": "necromancy",
-        "cost": 4,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "enemy:follower",
-            "amount": 2,
-            "count": 2,
-            "distribution": "random_hits"
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_shadows",
@@ -4157,14 +3916,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Ghost",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "gate",
@@ -4405,18 +4157,7 @@
         "amount": 3
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "ally:leader",
-        "amount": 3
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
-        "amount": 3
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "damage",
@@ -4464,19 +4205,7 @@
         }
       }
     ],
-    "superevolve": [
-      {
-        "op": "cost",
-        "target": "ally:hand",
-        "select": 1,
-        "mode": "reduce",
-        "amount": 1,
-        "minCost": 0,
-        "filter": {
-          "type": "Amulet"
-        }
-      }
-    ],
+    "superevolve": [],
     "keywords": []
   },
   {
@@ -4679,16 +4408,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "self",
-        "keywords": [
-          "Barrier"
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [],
     "triggers": [
@@ -4917,13 +4637,7 @@
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "destroy",
-        "target": "enemy:follower",
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       "Ambush"
@@ -5053,7 +4767,7 @@
           {
             "op": "destroy",
             "distribution": "all",
-            "target": "all:follower"
+            "target": "any:follower"
           }
         ]
       }
@@ -5169,13 +4883,7 @@
         "amount": 3
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 3
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "restore",
@@ -5269,14 +4977,7 @@
         "select": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 3,
-        "select": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -5413,14 +5114,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Striker Artifact",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -5452,18 +5146,11 @@
     "url": "https://shadowverse.gg/cards/10172120-lovestruck-puppeteer",
     "evolve": [
       {
-        "op": "add_to_hand",
-        "name": "Puppet",
-        "count": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "add_to_hand",
-        "name": "Puppet",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -5589,28 +5276,11 @@
     "url": "https://shadowverse.gg/cards/10173110-miriam-the-resolute",
     "evolve": [
       {
-        "op": "add_to_hand",
-        "name": "Gear of Ambition",
-        "count": 1
-      },
-      {
-        "op": "add_to_hand",
-        "name": "Gear of Remembrance",
-        "count": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "add_to_hand",
-        "name": "Gear of Ambition",
-        "count": 1
-      },
-      {
-        "op": "add_to_hand",
-        "name": "Gear of Remembrance",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -5682,7 +5352,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "superEvolveReplaces": true
   },
   {
     "id": "10173130",
@@ -5724,31 +5395,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "keyword",
-        "action": "grant",
-        "target": "ally:follower",
-        "condition": {
-          "tribe": "Puppetry"
-        },
-        "keywords": [
-          {
-            "name": "Ward"
-          },
-          {
-            "name": "LastWords",
-            "effects": [
-              {
-                "op": "damage",
-                "target": "enemy:leader",
-                "amount": 2
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -5786,18 +5433,7 @@
         "max_cost": 5
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "hand",
-        "mode": "copy",
-        "filter": {
-          "type": "Artifact"
-        },
-        "select": true,
-        "max_cost": 5
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -5912,42 +5548,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "crest",
-        "action": "gain",
-        "name": "Eudie, Maiden Reborn",
-        "image": "images/crests/eudie_maiden_reborn.png",
-        "description": "Countdown (3) At the end of your turn, if you have 5 cards or less in your hand, draw a card. If you have at least 6, restore 1 defense to your leader.",
-        "countdown": 3,
-        "triggers": [
-          {
-            "type": "end_of_turn_own",
-            "effects": [
-              {
-                "op": "gate",
-                "condition": "hand_count_lte",
-                "count": 5,
-                "effects": [
-                  {
-                    "op": "draw",
-                    "source": "deck",
-                    "count": 1
-                  }
-                ],
-                "else_effects": [
-                  {
-                    "op": "restore",
-                    "target": "ally:leader",
-                    "amount": 1
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "keywords": [],
     "triggers": []
   },

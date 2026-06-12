@@ -170,8 +170,10 @@ export function normalizeToUnifiedSpec(
     }
   }
 
-  // Parse then_effects
-  if (eff.effects && Array.isArray(eff.effects)) {
+  // Parse then_effects (then[] alias used on fanfare destroy+draw cards)
+  if (eff.then && Array.isArray(eff.then)) {
+    spec.then_effects = eff.then;
+  } else if (eff.effects && Array.isArray(eff.effects)) {
     spec.then_effects = eff.effects;
   }
 

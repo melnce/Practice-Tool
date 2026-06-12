@@ -64,7 +64,7 @@ export function parseTargetQuery(
   // Mapping aliases
   // LEGACY: if side is "ally" and type is "hand", it means "hand"
   // This handles old card definitions that used "ally:hand" before standardization
-  if (sideRaw === "ally" && typeRaw === "hand") {
+  if (sideRaw === "ally" && (typeRaw === "hand" || typeRaw === "hand_card")) {
     sideRaw = "hand";
     typeRaw = ""; // "hand" usually implies type is handled elsewhere or implicitly
   }
@@ -88,8 +88,8 @@ export function parseTargetQuery(
   } else if (sideRaw === "any" || sideRaw === "both" || sideRaw === "all") {
     side = "any";
   } else if (sideRaw === "other") {
-    // "other" means ally followers excluding self
-    side = "ally";
+    // "other:follower" = all followers on the field except the source (both sides)
+    side = "any";
     excludeSelf = true;
   } else {
     side = "ally"; // default

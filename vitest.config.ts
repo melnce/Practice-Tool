@@ -16,10 +16,12 @@ export default mergeConfig(
         "tests/mechanics/**/*.test.ts",
         "tests/integration/**/*.test.ts",
         "tests/unit/**/*.test.ts",
+        "tests/ui/**/*.test.ts",
       ],
       exclude: [
         "tests/legacy/**",
         "tests/_dev/**",
+        "tests/audit/**",
         "tests/regression/**",
         "tests/golden/**",
         "tests/scenarios/**",

@@ -1,9 +1,12 @@
 // src/logic/effects/ops/summon/handlers.ts
 // Source-specific summon handlers - separated for modularity
 
+import { state } from "../../../../core/gameState.js";
 import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
 import { logEvent } from "../../../../core/logger.js";
 import { getPool } from "../../../core/targeting.js";
+import { runEffects } from "../../../core/effects/index.js";
+import { finishFollowerEnter } from "../summon_ops/core.js";
 
 import type { UnifiedSummonSpec, SummonContext } from "./types.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
@@ -15,7 +18,11 @@ import {
 } from "./primitives.js";
 
 // Import specialized handlers
-import { handleSelectHandSummonArtifactCopy, handleSelectHandSummonArtifactCopiesEOT } from "../summon_ops/hand.js";
+import {
+  handleSelectHandSummonArtifactCopy,
+  handleSelectHandSummonArtifactCopiesEOT,
+  handleSelectHandSummonFollower,
+} from "../summon_ops/hand.js";
 import { handleSummonDestroyedAmuletHighestBaseCost } from "../summon_ops/graveyard.js";
 
 // =============================================================================
@@ -44,6 +51,7 @@ export function handleSummonCopy(
     owner: Player,
     context: SummonContext,
     eff: Effect & Record<string, any>,
+    effectsQueue: Effect[] = [],
 ): void {
     let targets: CardInstance[] = [];
 
@@ -64,10 +72,18 @@ export function handleSummonCopy(
         targets = pool.filter((c) => c?.type === "Follower");
     }
 
+    const thenSteps = Array.isArray(eff.then) ? eff.then : [];
+
     for (const target of targets) {
         if (!target) continue;
         for (let i = 0; i < spec.count; i++) {
-            summonExactCopy(target, owner);
+            const clone = summonExactCopy(target, owner, { deferEnter: !!thenSteps.length });
+            if (!clone) continue;
+            if (thenSteps.length) {
+                state.lastSummoned = [clone];
+                runEffects(structuredClone(thenSteps) as Effect[], owner, clone);
+            }
+            finishFollowerEnter(clone, owner);
         }
     }
 }
@@ -88,18 +104,29 @@ export function handleSummonFromHand(
     eff: Effect & Record<string, any>,
     owner: Player,
     context: SummonContext,
+    effectsQueue: Effect[] = [],
 ): string | void {
-    // Route based on mode/flags
-    if (eff.mode === "copy" || !eff.mode) {
-        // Check for artifact filter (existing behavior)
-        const isArtifact = eff.filter?.type === "Artifact";
+    const isArtifact = eff.filter?.type === "Artifact";
+    const isFollowerHand =
+        eff.filter?.type === "Follower" ||
+        String(eff.target || "").includes("hand:follower");
 
+    if (isFollowerHand && (eff.select || eff.select_count)) {
+        return handleSelectHandSummonFollower(
+            eff,
+            owner,
+            context.sourceCard,
+            effectsQueue,
+        );
+    }
+
+    if (eff.mode === "copy" || !eff.mode) {
         if (isArtifact) {
             if (eff.eot_destroy) {
-                handleSelectHandSummonArtifactCopiesEOT(eff, owner, context.sourceCard);
+                handleSelectHandSummonArtifactCopiesEOT(eff, owner, effectsQueue);
                 return "pending";
             } else {
-                handleSelectHandSummonArtifactCopy(eff, owner, context.sourceCard);
+                handleSelectHandSummonArtifactCopy(eff, owner, effectsQueue);
                 return "pending";
             }
         }

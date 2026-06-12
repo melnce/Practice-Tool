@@ -9,7 +9,7 @@ import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
 import type { Effect, CardInstance, Player } from "../../../../core/types/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
-import { getBoard, getHP } from "../../../../core/playerHelpers.js";
+import { getBoard, getHP, getMaxHP } from "../../../../core/playerHelpers.js";
 
 import type { UnifiedDamageSpec, DamageContext } from "./types.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
@@ -55,7 +55,10 @@ export function resolveAmount(spec: UnifiedDamageSpec, ctx: DamageContext): numb
             return resolveAmountWithOverflow(
                 { amount: spec.amount, add_amount: spec.add_amount } as any,
                 ctx.owner,
-                { sourceCard: ctx.sourceCard },
+                {
+                    sourceCard: ctx.sourceCard,
+                    selectedCard: ctx.selectedCard,
+                },
             );
     }
 }
@@ -146,10 +149,29 @@ export function handleByStatDamage(
         return;
     }
 
-    if (targetType === "leader") {
-        const blueHP = getHP(state, "first");
-        const redHP = getHP(state, "second");
-        const enemy = blueHP >= redHP ? "first" : "second";
-        applyLeaderDamage(enemy, amount);
+    if (targetType === "leader" || targetType === "all:leader") {
+        const statKey = stat === "defense" ? "maxHP" : "hp";
+        const leaders: Array<{ owner: import("../../../../core/types/index.js").Player; value: number }> = [
+            {
+                owner: "first",
+                value:
+                    statKey === "maxHP"
+                        ? getMaxHP(state, "first")
+                        : getHP(state, "first"),
+            },
+            {
+                owner: "second",
+                value:
+                    statKey === "maxHP"
+                        ? getMaxHP(state, "second")
+                        : getHP(state, "second"),
+            },
+        ];
+        const maxVal = Math.max(...leaders.map((l) => l.value));
+        for (const l of leaders) {
+            if (l.value === maxVal) {
+                applyLeaderDamage(l.owner, amount);
+            }
+        }
     }
 }

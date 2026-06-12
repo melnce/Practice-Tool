@@ -1,4 +1,5 @@
 import type { CardInstance, GameState } from "../../core/types/index.js";
+import { state as gameState } from "../../core/gameState.js";
 import type { ZoneContext, CardViewModel } from "./types.js";
 import { createCardViewModel } from "./viewModel.js";
 
@@ -11,7 +12,7 @@ interface CacheEntry {
 type StateArgs = {
   pp: number;
   turn: boolean;
-  activePlayer: string; // <-- Added this
+  activePlayer: string;
   rally: string;
   shadows: string;
   boardLens: string;
@@ -20,21 +21,116 @@ type StateArgs = {
 
 type CardArgs = {
   cost: number;
+  costMod: number;
   atk: number;
   def: number;
+  baseAtk: number;
+  baseDef: number;
   buffs: string;
   selectable: boolean;
+  targetSelected: boolean;
   mulligan: boolean;
   attacked: boolean;
   evolved: boolean;
+  evoType: string;
+  cardType: string;
+  rarity: string;
+  classKey: string;
+  keywordFlags: string;
+  canAttackFlag: boolean;
+  justPlayed: boolean;
+  hasEngage: boolean;
   counters: string;
   keywordsLen: number;
   kwStateHash: string;
   countdown: number;
+  spellboost: string;
+  skybound: number;
+  icarusBuff: number;
   idx: number;
 };
 
 const vmCache = new WeakMap<CardInstance, CacheEntry>();
+
+function isCardTargetSelected(card: CardInstance): boolean {
+  const uids = gameState.pendingTargetEffect?.targetUids;
+  return Array.isArray(uids) && uids.includes(card.uid);
+}
+
+function spellboostSnapshot(card: CardInstance): string {
+  const keys = [
+    "spellboostCount",
+    "spellBoostCount",
+    "spellboosts",
+    "spell_boosts",
+    "spellboost_counter",
+  ] as const;
+  for (const key of keys) {
+    if (key in card) return `${key}:${(card as Record<string, unknown>)[key]}`;
+  }
+  return "";
+}
+
+function keywordFlagsHash(card: CardInstance): string {
+  return [
+    card.hasStorm,
+    card.hasRush || card.isRush,
+    card.hasBane,
+    card.hasDrain,
+    card.hasAmbush,
+    card.hasAura,
+    card.hasIntimidate,
+    card.hasBarrier,
+    card.hasWard,
+  ]
+    .map((v) => (v ? "1" : "0"))
+    .join("");
+}
+
+function kwStateHash(card: CardInstance): string {
+  const ks = card.keywordState || {};
+  return [
+    ks.engagedThisTurn ?? "f",
+    ks.cantAttack ?? "f",
+    ks.cantAttackFollowers ?? "f",
+    ks.cantAttackLeaders ?? "f",
+    ks.hasCantAttack ?? "f",
+    ks.engageCost ?? "",
+  ].join("|");
+}
+
+function buildCardArgs(card: CardInstance, idx: number): CardArgs {
+  return {
+    cost: Number(card.cost ?? 0),
+    costMod: Number(card.cost_mod ?? 0),
+    atk: Number(card.attack ?? 0),
+    def: Number(card.defense ?? 0),
+    baseAtk: Number(card.base_attack ?? card.attack ?? 0),
+    baseDef: Number(card.base_defense ?? card.defense ?? 0),
+    buffs: `${card.buffs?.attack ?? 0}|${card.buffs?.defense ?? 0}`,
+    selectable: !!card.__uiSelectable,
+    targetSelected: isCardTargetSelected(card),
+    mulligan: !!card.__mulliganSelected,
+    attacked: !!card.hasAttacked,
+    evolved: !!card.hasEvolved,
+    evoType: String(card.evoType ?? ""),
+    cardType: String(card.type ?? ""),
+    rarity: String((card as { rarity?: string }).rarity ?? ""),
+    classKey: String(card.class ?? ""),
+    keywordFlags: keywordFlagsHash(card),
+    canAttackFlag: !!card.can_attack,
+    justPlayed: !!card.justPlayed,
+    hasEngage: !!card.hasEngage,
+    countdown: Number(card.countdown ?? -1),
+    keywordsLen: card.keywords?.length ?? 0,
+    kwStateHash: kwStateHash(card),
+    counters: card.counters ? JSON.stringify(card.counters) : "",
+    spellboost: spellboostSnapshot(card),
+    skybound: Number(card.skyboundArtEvolvesWitnessed ?? 0),
+    icarusBuff: Number(card.__icarusBuff ?? 0),
+    idx,
+  };
+}
 
 function isStateSame(
   prev: StateArgs,
@@ -43,12 +139,10 @@ function isStateSame(
 ): boolean {
   const isBlue = ctx.owner === "first";
   const pp = isBlue ? state.players.first.pp : state.players.second.pp;
-  // Use activePlayer as source of truth
   const isFirstActive = state.activePlayer === "first";
   const isMyTurn = (isBlue && isFirstActive) || (!isBlue && !isFirstActive);
 
   if (prev.pp !== pp) return false;
-  // We keep the old turn check but also enforce strict activePlayer check
   if (prev.turn !== isMyTurn) return false;
   if (prev.activePlayer !== state.activePlayer) return false;
 
@@ -65,35 +159,8 @@ function isStateSame(
 }
 
 function isCardSame(prev: CardArgs, card: CardInstance, idx: number): boolean {
-  // Index Check
-  if (prev.idx !== idx) return false;
-
-  // Primitive Checks
-  if (prev.cost !== (card.cost ?? 0)) return false;
-  if (prev.atk !== (card.attack ?? 0)) return false;
-  if (prev.def !== (card.defense ?? 0)) return false;
-  if (prev.selectable !== !!card.__uiSelectable) return false;
-  if (prev.mulligan !== !!card.__mulliganSelected) return false;
-  if (prev.attacked !== !!card.hasAttacked) return false;
-  if (prev.evolved !== !!card.hasEvolved) return false;
-  if (prev.countdown !== (card.countdown ?? -1)) return false;
-
-  // Composite Checks
-  const currBuffs = `${card.buffs?.attack ?? 0}|${card.buffs?.defense ?? 0}`;
-  if (prev.buffs !== currBuffs) return false;
-
-  // Keyword Checks
-  if (prev.keywordsLen !== (card.keywords?.length ?? 0)) return false;
-
-  const ks = card.keywordState || {};
-  const ksHash = `${ks.engagedThisTurn ?? "f"}|${ks.cantAttack ?? "f"}|${ks.engageCost ?? ""}`;
-  if (prev.kwStateHash !== ksHash) return false;
-
-  // Counters
-  const currCounters = card.counters ? JSON.stringify(card.counters) : "";
-  if (prev.counters !== currCounters) return false;
-
-  return true;
+  const next = buildCardArgs(card, idx);
+  return (Object.keys(prev) as Array<keyof CardArgs>).every((k) => prev[k] === next[k]);
 }
 
 export function getMemoizedViewModel(
@@ -114,53 +181,22 @@ export function getMemoizedViewModel(
   }
 
   const vm = createCardViewModel(card, idx, ctx, state);
-
   const isBlue = ctx.owner === "first";
-  const ks = card.keywordState || {};
 
   const newEntry: CacheEntry = {
     viewModel: vm,
     lastStateArgs: {
       pp: isBlue ? state.players.first.pp : state.players.second.pp,
-      // Use activePlayer as source of truth
       turn: (isBlue && state.activePlayer === "first") || (!isBlue && state.activePlayer === "second"),
-      activePlayer: state.activePlayer, // <-- Track this
+      activePlayer: state.activePlayer,
       rally: `${state.players.first.rally}|${state.players.second.rally}`,
       shadows: `${state.players.first.shadows}|${state.players.second.shadows}`,
       boardLens: `${state.players.first.board.length}|${state.players.second.board.length}`,
       targetId: state.pendingTargetEffect?.eff?.op ?? "",
     },
-    lastCardArgs: {
-      cost: Number(card.cost ?? 0),
-      atk: Number(card.attack ?? 0),
-      def: Number(card.defense ?? 0),
-      buffs: `${card.buffs?.attack ?? 0}|${card.buffs?.defense ?? 0}`,
-      selectable: !!card.__uiSelectable,
-      mulligan: !!card.__mulliganSelected,
-      attacked: !!card.hasAttacked,
-      evolved: !!card.hasEvolved,
-      countdown: Number(card.countdown ?? -1),
-      keywordsLen: card.keywords?.length ?? 0,
-      kwStateHash: `${ks.engagedThisTurn ?? "f"}|${ks.cantAttack ?? "f"}|${ks.engageCost ?? ""}`,
-      counters: card.counters ? JSON.stringify(card.counters) : "",
-      idx,
-    },
+    lastCardArgs: buildCardArgs(card, idx),
   };
 
   vmCache.set(card, newEntry);
   return vm;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

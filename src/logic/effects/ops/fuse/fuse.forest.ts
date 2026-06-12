@@ -45,17 +45,21 @@ export function fuse_finalize_gardens_allure(
     owner,
     kind: "forest",
     initiator: initiator.name,
+    initiatorUid: initiator.uid,
     used: (partners || []).map((x) => x.name),
+    consumedUids: (partners || []).map((x) => x.uid),
   });
 
   initiator.isFused = true;
-  initiator.spell = [{ op: "draw", count: 2 }] as Effect[];
+  initiator.spell = [{ op: "draw", source: "deck", count: 2 }] as Effect[];
   initiator.lastFuseRound = state.roundCount;
 
   logEvent("fuseFinalize", {
     owner,
     kind: "forest",
     initiator: initiator.name,
+    initiatorUid: initiator.uid,
+    partnerUids: (partners || []).map((x) => x.uid),
     result: "gardens_allure_mutate",
   });
 

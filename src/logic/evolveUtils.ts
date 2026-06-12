@@ -8,6 +8,50 @@ import type { CardInstance, Player, Effect } from "../core/types/index.js";
 import { isFirstPlayer, getEvoCharges, setEvoCharges, getSuperEvoCharges, setSuperEvoCharges, getEvoUsedThisTurn, setEvoUsedThisTurn, getEvoCount, incrementEvoCount, getBoard, getBackrow, opponentOf } from "../core/playerHelpers.js";
 import { resolveUid } from "../core/uidResolver.js";
 
+function collectEvolveEffects(obj: unknown): Effect[] {
+  if (Array.isArray(obj)) return [...obj];
+  if (obj && typeof obj === "object" && Array.isArray((obj as { effects?: Effect[] }).effects)) {
+    return [...(obj as { effects: Effect[] }).effects];
+  }
+  return [];
+}
+
+/** Card text "Super-Evolve: … instead" replaces the Evolve line (owner + §747 exception). */
+function superEvolveReplacesEvolveLine(card: CardInstance): boolean {
+  if (card.superEvolveReplaces === true) return true;
+  return /super-evolve:[^\n]*\binstead\b/i.test(String(card.description ?? ""));
+}
+
+/** Resolve effect lists for normal vs super evolve (exported for audit tests). */
+export function resolveEvolveEffects(card: CardInstance, mode: "normal" | "super"): Effect[] {
+  const normalFx = collectEvolveEffects(card.evolve);
+  if (mode === "normal") return normalFx;
+
+  const superFx = collectEvolveEffects(card.superevolve);
+  if (superEvolveReplacesEvolveLine(card) || normalFx.length === 0) {
+    return superFx;
+  }
+  // Rulebook §747: both Evolve and Super-Evolve fire on super-evolve
+  return [...normalFx, ...superFx];
+}
+
+/**
+ * Subset of evolve[] / superevolve[] that may run for this evolve invocation.
+ * - Player EP evolve (spendPoint): full script ("Evolve:" + "When this evolves" entries).
+ * - Effect evolve: only "When this follower evolves" — card-level evolve_trigger_always,
+ *   or per-effect on_any_evolve (reserved; none in data yet).
+ */
+export function resolveEvolveScriptToRun(
+  card: CardInstance,
+  mode: "normal" | "super",
+  spendPoint: boolean,
+): Effect[] {
+  const all = resolveEvolveEffects(card, mode);
+  if (spendPoint) return all;
+  if (card.evolve_trigger_always === true) return all;
+  return all.filter((e) => (e as any).on_any_evolve === true);
+}
+
 // Note: Rendering removed from logic layer - UI orchestrator handles all rendering
 
 export function canEvolve(
@@ -48,8 +92,6 @@ export function onEvolve(
   card.hasEvolved = true;
   card.evoType = mode === "super" ? "super" : "normal";
 
-  // Get the correct evolve object based on mode
-  const evolveObj = mode === "super" ? card.superevolve : card.evolve;
   const spendCounters = () => {
     if (!spendPoint) return;
     if (mode === "super") {
@@ -65,10 +107,11 @@ export function onEvolve(
 
   const fireEvoTriggers = () => {
     if (mode === "super") {
-      // Fire ally trigger for owner, enemy trigger for opponent
-      const opponent = opponentOf(owner);
+      // Ally listeners: cards on the super-evolver's side.
       fireTrigger("ally_super_evolve", owner, { enteringCard: card });
-      fireTrigger("enemy_super_evolve", opponent, { enteringCard: card });
+      // Enemy listeners: cards on the opponent's side (hand/board/deck).
+      // activePlayer must be the super-evolver so process/zones route to owner !== evolver.
+      fireTrigger("enemy_super_evolve", owner, { enteringCard: card });
     }
   };
 
@@ -86,8 +129,10 @@ export function onEvolve(
     return;
   }
 
+  const effectsToRun = resolveEvolveScriptToRun(card, mode, spendPoint);
+
   // Even with no evolve effects defined, we still spend counters & fire triggers once.
-  if (!evolveObj) {
+  if (effectsToRun.length === 0) {
     spendCounters();
     fireEvoTriggers();
     logEvent("evolve", {
@@ -100,26 +145,7 @@ export function onEvolve(
     return;
   }
 
-  let effectsToRun: Effect[] = [];
-
-  // Back-compat: either array or {effects:[]}
-  if (Array.isArray(evolveObj)) {
-    effectsToRun = [...evolveObj];
-  } else if (Array.isArray(evolveObj.effects)) {
-    effectsToRun = [...evolveObj.effects];
-  }
-
-  // Determine if evolve effects should run:
-  // - Player-initiated evolves (spendPoint=true) always run effects ("Evolve:" cards)
-  // - Effect-initiated evolves only run if card has evolve_trigger_always flag ("When this evolves" cards)
-  const fromPlayer = spendPoint;
-  const alwaysTrigger = card.evolve_trigger_always === true;
-  const shouldRunScript = fromPlayer || alwaysTrigger;
-
-  // Run effects only if conditions are met
-  if (effectsToRun.length > 0 && shouldRunScript) {
-    runEffects(effectsToRun, owner, card);
-  }
+  runEffects(effectsToRun, owner, card);
 
   // NEW: Notify Skybound Art cards in hand
   import("./effects/skybound.js")

@@ -4,7 +4,7 @@ import { clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
 import type { Player, CardInstance } from "../../../../core/types/index.js";
-import { alreadyFusedThisTurn, handOf, graveOf } from "./types.js";
+import { alreadyFusedThisTurn, handOf } from "./types.js";
 
 // Returning Slash, etc.
 export function fuse_finalize_loot(
@@ -13,7 +13,6 @@ export function fuse_finalize_loot(
   partners: CardInstance[],
 ) {
   const hand = handOf(owner);
-  const grave = graveOf(owner);
 
   const initiator = hand.find((c) => c?.uid === initiator_uid);
   if (!initiator) {
@@ -61,8 +60,7 @@ export function fuse_finalize_loot(
   for (const p of used) {
     const idx = hand.findIndex((c) => c?.uid === p.uid);
     if (idx !== -1) {
-      const [taken] = hand.splice(idx, 1);
-      if (taken) grave.push(taken);
+      hand.splice(idx, 1);
     }
   }
 
@@ -70,7 +68,9 @@ export function fuse_finalize_loot(
     owner,
     kind: "loot",
     initiator: initiator.name,
+    initiatorUid: initiator.uid,
     used: used.map((x) => x.name),
+    consumedUids: used.map((x) => x.uid),
   });
 
   // Fire exactly ONCE per fuse action on this initiator this TURN.
@@ -91,10 +91,22 @@ export function fuse_finalize_loot(
 
   // Mutate spell text/effects on this copy
   const baseSpell: any[] = [
-    { op: "damage_random", target: "enemy:follower", amount: 2 },
+    {
+      op: "damage",
+      target: "enemy:follower",
+      amount: 2,
+      distribution: "random_hits",
+      count: 1,
+    },
     { op: "add_to_hand", name: "Gilded Blade", count: 1 },
   ];
-  if (used.length >= 1) baseSpell.push({ op: "draw", count: 1 });
+  if (used.length >= 1) {
+    baseSpell.push({
+      op: "gate",
+      condition: "has_fuse_materials",
+      effects: [{ op: "draw", source: "deck", count: 1 }],
+    });
+  }
 
   initiator.spell = baseSpell;
   initiator.isFused = used.length >= 1;
@@ -105,7 +117,9 @@ export function fuse_finalize_loot(
     owner,
     kind: "loot",
     initiator: initiator.name,
+    initiatorUid: initiator.uid,
     partners: used.length,
+    partnerUids: used.map((x) => x.uid),
     result: "fused_loot",
   });
 
