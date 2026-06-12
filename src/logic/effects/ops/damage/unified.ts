@@ -6,7 +6,8 @@ import { cleanupDead } from "../../../core/cleanup.js";
 import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
 import type { Effect, CardInstance, Player } from "../../../../core/types/index.js";
-import { opponentOf } from "../../../../core/playerHelpers.js";
+import { opponentOf, getHP, getMaxHP } from "../../../../core/playerHelpers.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 
 import type { UnifiedDamageSpec, DamageContext } from "./types.js";
 
@@ -94,8 +95,28 @@ export function handleDamage(
     return "done";
   }
 
+  // Post-selection follower damage (e.g. Maximum Love Bomb nested effects)
+  const targetStr = String(spec.target || "").toLowerCase();
+  if (targetStr.startsWith("selected")) {
+    const uids = ctx.targetUids;
+    if (uids?.length) {
+      const targets = resolveUids(uids).filter((c) => c?.type === "Follower");
+      if (targets.length) {
+        applyDirectDamage(amount, targets, "damage");
+        cleanupDead();
+      }
+      return "done";
+    }
+  }
+
+  // by_stat must run before generic leader routing (e.g. Raging Lightning Overflow)
+  if (spec.distribution === "by_stat") {
+    handleByStatDamage(spec, amount, owner);
+    return "done";
+  }
+
   // Leader targeting
-  if (String(spec.target || "").includes("leader")) {
+  if (targetStr.includes("leader")) {
     const isEnemy = String(spec.target || "").includes("enemy");
     const targetPlayer = isEnemy ? opponentOf(owner) : owner;
     applyLeaderDamage(targetPlayer, amount);

@@ -2,7 +2,7 @@
 import { state } from "../core/gameState.js";
 import { logEvent } from "../core/logger.js";
 import type { Player } from "../core/types/index.js";
-import { getPermPP, setPermPP, setMaxPP } from "../core/playerHelpers.js";
+import { getPermPP, setPermPP, setMaxPP, getMaxPP } from "../core/playerHelpers.js";
 
 export function increaseMaxPP(
   owner: Player,
@@ -14,16 +14,15 @@ export function increaseMaxPP(
   setPermPP(state, owner, newPerm);
 
   if (recalcNow) {
-    setMaxPP(state, owner, Math.min(cap, state.roundCount + newPerm));
+    setMaxPP(state, owner, Math.min(state.roundCount + newPerm, cap));
   }
   logEvent("maxPP", {
     owner,
     newPerm,
-    newMax: Math.min(cap, state.roundCount + newPerm),
+    newMax: getMaxPP(state, owner),
   });
 }
 
-// ✅ New, thin alias for effect-ops to call (doesn't change Dragonsign behavior)
 export function addMaxPP(owner: Player, amount = 1, opts = {}) {
   return increaseMaxPP(owner, amount, opts);
 }

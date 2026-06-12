@@ -9,7 +9,7 @@ import {
   fireDefenderClashTriggers,
 } from "./triggers/handlers/combat.js";
 import { recordEvent } from "../../core/debugTimeline.js";
-import { getBoard, opponentOf, setHP, getHP, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
+import { getBoard, opponentOf, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
 
 // Imported from JS still
 import { applyLeaderDamage } from "../effects/leader.js";
@@ -144,7 +144,12 @@ function resolveBane(
 
   // Route through centralized destroy (respects cannotBeDestroyed & super-protect)
   destroyTarget(target, targetOwner, "bane");
-  logEvent("baneDestroy", { killer: source.name, victim: target.name });
+  logEvent("baneDestroy", {
+    killer: source.name,
+    victim: target.name,
+    killerUid: source.uid,
+    victimUid: target.uid,
+  });
 }
 
 /**
@@ -190,8 +195,7 @@ function resolvePiercing(
   const defenderDef = parseInt(defender.defense as any) || 0;
   if (defenderDef > 0) return; // Defender survived, no piercing
 
-  const currentHP = getHP(state, defenderOwner);
-  setHP(state, defenderOwner, Math.max(0, currentHP - 1));
+  applyLeaderDamage(defenderOwner, 1);
   logEvent("piercingPing", {
     attacker: attacker.name,
     targetLeader: defenderOwner,
@@ -266,15 +270,14 @@ function _attackFollowerCore(
 
     // If the defender was removed or died due to follower_strike, award piercing now.
     const stillThere = defenderBoard[defenderIdx];
-    if (
-      !stillThere ||
-      stillThere !== defender ||
-      (defender.defense as any) <= 0
-    ) {
-      if (hasPiercingOne(attacker)) {
-        const currentHP = getHP(state, defenderPlayer);
-        setHP(state, defenderPlayer, Math.max(0, currentHP - 1));
-      }
+      if (
+        !stillThere ||
+        stillThere !== defender ||
+        (defender.defense as any) <= 0
+      ) {
+        if (hasPiercingOne(attacker)) {
+          applyLeaderDamage(defenderPlayer, 1);
+        }
       spendAttack(attacker);
       recomputeAttackFlags(attacker);
       return;
@@ -297,6 +300,8 @@ function _attackFollowerCore(
   logEvent("attack", {
     attacker: attacker.name,
     defender: defender?.name,
+    attackerUid: attacker.uid,
+    defenderUid: defender?.uid,
     atkDmg,
     defDmg,
   });
@@ -439,6 +444,7 @@ function _attackLeaderCore(
         player: attackerPlayer,
         amount: restored,
         source: attacker.name,
+        sourceUid: attacker.uid,
       });
     }
   }

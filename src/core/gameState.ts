@@ -94,7 +94,15 @@ export function resetStateInstance(
   // F) Reset trigger caches (stored on state, so just null them)
   (target as any)._triggerCache = null;
 
-  // G) Debug Identity
+  // G) Death-defer / combat / resume ephemeral (not in DEFAULTS — must clear explicitly)
+  (target as any).deferDeathTriggers = false;
+  (target as any)._deferredDeath = { lw: [], leave: [] };
+  (target as any).suppressCleanup = false;
+  (target as any)._runEffectsDepth = 0;
+  (target as any).combatResolutionDepth = 0;
+  delete (target as any).resumePlayFollower;
+
+  // H) Debug Identity
   target.__debugId = target.rng.nextFloat();
 
   // Log (lazy import to avoid circular dependency with logger.ts)

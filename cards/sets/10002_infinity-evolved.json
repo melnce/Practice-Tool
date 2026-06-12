@@ -116,12 +116,7 @@
         "target": "all_allies"
       }
     ],
-    "superevolve": [
-      {
-        "op": "evolve",
-        "target": "all_allies"
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": []
   },
@@ -437,7 +432,7 @@
             "op": "damage",
             "target": "enemy:follower",
             "amount": 2,
-            "distribution": "random",
+            "distribution": "random_hits",
             "count": 2
           }
         ],
@@ -481,18 +476,7 @@
         "defense": 0
       }
     ],
-    "superevolve": [
-      {
-        "op": "stat",
-        "action": "give",
-        "target": "ally:follower",
-        "condition": {
-          "tribe": "Pixie"
-        },
-        "attack": 1,
-        "defense": 0
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -605,14 +589,7 @@
         "into": "Fairy"
       }
     ],
-    "superevolve": [
-      {
-        "op": "transform",
-        "target": "enemy:follower",
-        "select": 1,
-        "into": "Fairy"
-      }
-    ],
+    "superevolve": [],
     "keywords": []
   },
   {
@@ -816,14 +793,7 @@
         "amount": 2
       }
     ],
-    "superevolve": [
-      {
-        "op": "pp",
-        "action": "recover",
-        "player": "self",
-        "amount": 2
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "search",
@@ -1004,17 +974,7 @@
         "count": 2
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Steelclad Knight",
-        "keywords": [
-          "Rush"
-        ],
-        "count": 2
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "gate",
@@ -1255,28 +1215,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "crest",
-        "action": "gain",
-        "name": "Bergent, Rejected Artes",
-        "image": "images/crests/bergent_rejected_artes.png",
-        "description": "At the start of your turn, summon an Onion Patch",
-        "triggers": [
-          {
-            "event": "start_of_turn",
-            "effects": [
-              {
-                "op": "summon",
-                "source": "named",
-                "name": "Onion Patch",
-                "count": 1
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -1304,32 +1243,11 @@
     "url": "https://shadowverse.gg/cards/10232120-enchanting-perfumer",
     "evolve": [
       {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 3,
-        "select": 1
-      },
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Magic Sediment",
-        "count": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 3,
-        "select": 1
-      },
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Magic Sediment",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "damage",
@@ -1404,15 +1322,7 @@
         }
       }
     ],
-    "superevolve": [
-      {
-        "op": "search",
-        "count": 2,
-        "filter": {
-          "type": "Follower"
-        }
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       "Ward"
@@ -1556,124 +1466,11 @@
     "url": "https://shadowverse.gg/cards/10234120-norman-adamant-alchemist",
     "evolve": [
       {
-        "op": "mode",
-        "options": [
-          {
-            "label": "Summon a Guardian Golem and give it Barrier",
-            "effects": [
-              {
-                "op": "earth_rite",
-                "cost": 1,
-                "effects": [
-                  {
-                    "op": "summon",
-                    "source": "named",
-                    "name": "Guardian Golem",
-                    "keywords": [
-                      "Barrier"
-                    ],
-                    "count": 1
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "label": "Draw 3 cards",
-            "effects": [
-              {
-                "op": "earth_rite",
-                "cost": 1,
-                "effects": [
-                  {
-                    "op": "draw",
-                    "source": "deck",
-                    "count": 3
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "label": "Restore 4 defense to your leader",
-            "effects": [
-              {
-                "op": "earth_rite",
-                "cost": 1,
-                "effects": [
-                  {
-                    "op": "restore",
-                    "target": "leader",
-                    "player": "self",
-                    "amount": 4
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "mode",
-        "options": [
-          {
-            "label": "Summon a Guardian Golem and give it Barrier",
-            "effects": [
-              {
-                "op": "earth_rite",
-                "cost": 1,
-                "effects": [
-                  {
-                    "op": "summon",
-                    "source": "named",
-                    "name": "Guardian Golem",
-                    "keywords": [
-                      "Barrier"
-                    ],
-                    "count": 1
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "label": "Draw 3 cards",
-            "effects": [
-              {
-                "op": "earth_rite",
-                "cost": 1,
-                "effects": [
-                  {
-                    "op": "draw",
-                    "source": "deck",
-                    "count": 3
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "label": "Restore 4 defense to your leader",
-            "effects": [
-              {
-                "op": "earth_rite",
-                "cost": 1,
-                "effects": [
-                  {
-                    "op": "restore",
-                    "target": "leader",
-                    "player": "self",
-                    "amount": 4
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "mode",
@@ -1906,14 +1703,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Majestic Megalorca",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -2064,9 +1854,9 @@
         "op": "cost",
         "target": "ally:hand",
         "select": 1,
-        "action": "reduce",
+        "mode": "reduce",
         "amount": 2,
-        "minCost": 0
+        "min_cost": 0
       },
       {
         "op": "damage",
@@ -2098,13 +1888,7 @@
         "amount": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "gate",
@@ -2175,18 +1959,7 @@
         "amount": 2
       }
     ],
-    "superevolve": [
-      {
-        "op": "destroy",
-        "target": "enemy:follower",
-        "select": 2
-      },
-      {
-        "op": "damage",
-        "target": "ally:leader",
-        "amount": 2
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       "Bane"
@@ -2597,16 +2370,7 @@
         }
       }
     ],
-    "superevolve": [
-      {
-        "op": "destroy",
-        "target": "enemy:follower",
-        "select": 1,
-        "condition": {
-          "is_super_evolved": true
-        }
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       "Ward"
@@ -2633,27 +2397,21 @@
     "fanfare": [
       {
         "op": "keyword",
-        "action": "grant",
+        "action": "grant_trigger",
         "target": "enemy:follower",
-        "keywords": [
+        "select": 1,
+        "triggers": [
           {
-            "name": "trigger",
-            "triggers": [
+            "type": "end_of_turn_own",
+            "source": "board",
+            "effects": [
               {
-                "type": "end_of_turn_own",
-                "source": "board",
-                "effects": [
-                  {
-                    "op": "destroy",
-                    "scope": "self",
-                    "target": "enemy:follower"
-                  }
-                ]
+                "op": "destroy",
+                "scope": "self"
               }
             ]
           }
-        ],
-        "select": 1
+        ]
       }
     ],
     "keywords": []
@@ -2989,43 +2747,14 @@
                 "action": "give",
                 "target": "entering_follower",
                 "attack": 1,
-                "defense": 2,
-                "has_keyword": "Ward"
+                "defense": 2
               }
             ]
           }
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "crest",
-        "action": "gain",
-        "name": "Wilbert, Desolate Paladin",
-        "image": "images/crests/wilbert_desolate_paladin.png",
-        "description": "Whenever an allied follower with Ward enters the field, give it +1/+2",
-        "triggers": [
-          {
-            "event": "ally_follower_enter",
-            "source": "board",
-            "condition": {
-              "has_keyword": "Ward",
-              "not_self": true
-            },
-            "effects": [
-              {
-                "op": "stat",
-                "action": "give",
-                "target": "entering_follower",
-                "attack": 1,
-                "defense": 2,
-                "has_keyword": "Ward"
-              }
-            ]
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": [
       "Ward",
@@ -3059,28 +2788,11 @@
     "url": "https://shadowverse.gg/cards/10271110-engineblade-maven",
     "evolve": [
       {
-        "op": "summon",
-        "source": "named",
-        "name": "Striker Artifact"
-      },
-      {
-        "op": "add_to_hand",
-        "name": "Gear of Remembrance",
-        "count": 1
+        "op": "replicate",
+        "zone": "fanfare"
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Striker Artifact"
-      },
-      {
-        "op": "add_to_hand",
-        "name": "Gear of Remembrance",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",
@@ -3250,27 +2962,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "select",
-        "target": "enemy:follower",
-        "condition": {
-          "attack_lte": 4
-        },
-        "select_count": 1,
-        "effects": [
-          {
-            "op": "banish",
-            "target": "selected:follower"
-          },
-          {
-            "op": "summon",
-            "source": "copy",
-            "target": "selected:follower"
-          }
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [],
     "keywords": []
   },
@@ -3349,22 +3041,7 @@
         ]
       }
     ],
-    "superevolve": [
-      {
-        "op": "keyword",
-        "action": "grant",
-        "target": "ally:hand",
-        "condition": {
-          "type_eq": "Follower",
-          "tribe": "Artifact"
-        },
-        "select": 1,
-        "keywords": [
-          "Ward",
-          "cant_be_destroyed"
-        ]
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "add_to_hand",
@@ -3431,14 +3108,7 @@
         "count": 1
       }
     ],
-    "superevolve": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Enhanced Puppet",
-        "count": 1
-      }
-    ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "summon",

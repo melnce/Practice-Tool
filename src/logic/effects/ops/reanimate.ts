@@ -1,6 +1,7 @@
 // src/logic/effects/ops/reanimate.ts
 import { state } from "../../../core/gameState.js";
 import { reanimateSummon } from "./summon.js";
+import { handleEvolveLastSummoned } from "./evolve.js";
 
 import { logEvent } from "../../../core/logger.js";
 import type { Effect, Player, CardInstance } from "../../../core/types/index.js";
@@ -80,9 +81,7 @@ export function handleReanimate(eff: Effect, owner: Player) {
   logEvent("reanimateSummon", { owner, name: selected.name });
 
   if (rEff.evolve_summons) {
-    void import("./evolve.js").then(({ handleEvolveLastSummoned }) => {
-      handleEvolveLastSummoned(owner);
-    });
+    handleEvolveLastSummoned(owner);
   }
 }
 

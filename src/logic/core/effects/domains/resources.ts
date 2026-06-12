@@ -13,7 +13,8 @@ import { handleFuse } from "../../../effects/ops/fuse/unified.js";
 import { handleCrest } from "../../../effects/ops/crest/unified.js";
 import { handleDeck } from "../../../effects/deck.js";
 import { logEvent } from "../../../../core/logger.js";
-import { getAdapter } from "../context.js";
+import { getAdapter, getTargetingContext } from "../context.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 import { enqueueManyFront } from "../queue.js";
 import { addMaxPP } from "../../../pp.js";
 import type { Effect, Player, EffectContext } from "../../../../core/types/index.js";
@@ -140,10 +141,21 @@ export function registerResourceEffects() {
     // source: "named" (default) = create token from database
     // source: "copy" = duplicate existing card from target
     // ========================================================================
-    registerOp("add_to_hand", (eff, ctx) => handleAddToHand(eff, ctx.owner, ctx.sourceCard, {
-        selected: (ctx.context as any)?.selected,
-        lastDrawn: (state as any).lastDrawnCard,
-    }));
+    registerOp("add_to_hand", (eff, ctx) => {
+        const tCtx = getTargetingContext(ctx);
+        const fromUids =
+            tCtx.targetUids?.length ?
+                resolveUids(tCtx.targetUids)
+            :   [];
+        const selected =
+            fromUids.length > 0 ?
+                fromUids
+            :   (ctx.context as any)?.selected;
+        handleAddToHand(eff, ctx.owner, ctx.sourceCard, {
+            selected,
+            lastDrawn: (state as any).lastDrawnCard,
+        });
+    });
 
     // ========================================================================
     // SEARCH - distinct from draw for AI training semantics

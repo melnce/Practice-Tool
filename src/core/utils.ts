@@ -3,6 +3,7 @@
 import { state } from "./gameState.js";
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
+import { addShadows } from "./playerHelpers.js";
 // Pull *once* from rng and re-export locally-used helpers
 // (Refactored to use state.rng directly)
 
@@ -132,6 +133,7 @@ export function pushToHand(
     if (hand === state.players.first.hand) owner = "first";
     else if (hand === state.players.second.hand) owner = "second";
     logEvent("burn", { owner, card: card.name });
+    if (owner) addShadows(state, owner, 1);
 
     burnPreview(card); // burn visual
     return false; // goes to void

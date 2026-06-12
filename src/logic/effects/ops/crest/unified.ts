@@ -43,6 +43,7 @@ export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
       }
       break;
     }
+    case "advance":
     case "advance_countdown":
     case "delay_countdown": {
       // Route to unified countdown handler

@@ -112,66 +112,74 @@ export function compareBoardEntryOrder(a: CardInstance, b: CardInstance): number
 
 
 
+/**
+ * Whether a trigger may fire from a given candidate tier (hand/board/deck/crest).
+ * Follower/amulet triggers default to board unless `trigger.source` says otherwise.
+ */
+export function triggerMatchesCandidateZone(
+  trigger: TriggerSpec,
+  candidateSource: string,
+  card: { type?: string } | null | undefined,
+): boolean {
+  if (candidateSource === "crest") return true;
+
+  const defaultSource =
+    card?.type === "Follower" || card?.type === "Amulet" ? "board" : null;
+  const requiredSource = trigger.source ?? defaultSource;
+  if (!requiredSource || requiredSource === "self") return true;
+  return requiredSource === candidateSource;
+}
+
+export function filterTriggersForZone(
+  triggers: TriggerSpec[],
+  candidateSource: string,
+  card: { type?: string } | null | undefined,
+): TriggerSpec[] {
+  return triggers.filter((t) =>
+    triggerMatchesCandidateZone(t, candidateSource, card),
+  );
+}
+
 function mapToCandidate(
-
   card: CardInstance,
-
   owner: Player,
-
   source: string,
-
-): ProcessingCandidate {
-
+): ProcessingCandidate | null {
   const mainTriggers = (card.triggers || []) as TriggerSpec[];
-
   const stateTriggers = (card.keywordState?.triggers || []) as TriggerSpec[];
 
-
-
-  // PERF: Avoid spread if one is empty
-
-  const triggers =
-
+  const merged =
     stateTriggers.length === 0
-
       ? mainTriggers
-
       : mainTriggers.length === 0
-
         ? stateTriggers
-
         : mainTriggers.concat(stateTriggers);
 
-
+  const triggers = filterTriggersForZone(merged, source, card);
+  if (triggers.length === 0) return null;
 
   return {
-
     card,
-
     owner,
-
     source,
-
     triggers,
-
   };
-
 }
 
 
 
 // PERF: Skip cards with no triggers (avoid allocating candidate objects)
 
-function hasTriggers(card: CardInstance | null | undefined): boolean {
-
+function hasTriggersForZone(
+  card: CardInstance | null | undefined,
+  zone: string,
+): boolean {
   if (!card || typeof card !== "object") return false;
-
-  const mainLen = card.triggers?.length ?? 0;
-
-  const stateLen = card.keywordState?.triggers?.length ?? 0;
-
-  return mainLen > 0 || stateLen > 0;
-
+  const main = (card.triggers || []) as TriggerSpec[];
+  const kw = (card.keywordState?.triggers || []) as TriggerSpec[];
+  const merged =
+    kw.length === 0 ? main : main.length === 0 ? kw : main.concat(kw);
+  return filterTriggersForZone(merged, zone, card).length > 0;
 }
 
 
@@ -223,41 +231,34 @@ function mapCrestCandidates(owner: Player): ProcessingCandidate[] {
 
 
 function mapBoardCandidates(owner: Player): ProcessingCandidate[] {
-
-  return getBoard(state, owner)
-
-    .filter((c) => c && hasTriggers(c))
-
-    .slice()
-
-    .sort(compareBoardEntryOrder)
-
-    .map((c) => mapToCandidate(c, owner, "board"));
-
+  const out: ProcessingCandidate[] = [];
+  for (const c of getBoard(state, owner)) {
+    if (!c || !hasTriggersForZone(c, "board")) continue;
+    const cand = mapToCandidate(c, owner, "board");
+    if (cand) out.push(cand);
+  }
+  out.sort((a, b) => compareBoardEntryOrder(a.card, b.card));
+  return out;
 }
-
-
 
 function mapHandCandidates(owner: Player): ProcessingCandidate[] {
-
-  return getHand(state, owner)
-
-    .filter((c) => c && hasTriggers(c))
-
-    .map((c) => mapToCandidate(c, owner, "hand"));
-
+  const out: ProcessingCandidate[] = [];
+  for (const c of getHand(state, owner)) {
+    if (!c || !hasTriggersForZone(c, "hand")) continue;
+    const cand = mapToCandidate(c, owner, "hand");
+    if (cand) out.push(cand);
+  }
+  return out;
 }
 
-
-
 function mapDeckCandidates(owner: Player): ProcessingCandidate[] {
-
-  return getDeck(state, owner)
-
-    .filter((c) => c && hasTriggers(c))
-
-    .map((c) => mapToCandidate(c, owner, "deck"));
-
+  const out: ProcessingCandidate[] = [];
+  for (const c of getDeck(state, owner)) {
+    if (!c || !hasTriggersForZone(c, "deck")) continue;
+    const cand = mapToCandidate(c, owner, "deck");
+    if (cand) out.push(cand);
+  }
+  return out;
 }
 
 
@@ -274,7 +275,15 @@ export type OrderedTriggerOptions = {
 
 /**
 
- * Rulebook 8-tier trigger candidate order (C2):
+ * Rulebook 8-tier trigger candidate order (C2).
+
+ * Single collection point for zone-tier candidates — runtime paths use this
+
+ * (dispatchOrderedTriggers / getOrderedTriggerCandidates) or apply the same
+
+ * triggerMatchesCandidateZone filter (turnBoundary, combat strike/clash).
+
+ *
 
  * active hand → reactive hand → active crest → active board →
 

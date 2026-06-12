@@ -134,7 +134,12 @@ function handleDestroyDirect(
     const selectCount = Math.min(spec.select, pool.length);
 
     setPendingTarget({
-      eff: { op: "destroy", target: spec.target, select: selectCount } as any,
+      eff: {
+        op: "destroy",
+        target: spec.target,
+        select: selectCount,
+        then: spec.then_effects.length ? spec.then_effects : undefined,
+      } as any,
       owner,
       sourceCard: ctx.sourceCard,
       resumeEffects: effectsQueue,

@@ -1,6 +1,7 @@
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
 import { processCandidateTriggers, type ProcessingCandidate } from "../process.js";
+import { triggerMatchesCandidateZone } from "../utils.js";
 import { dispatchOrderedTriggers } from "./common.js";
 
 const ATTACKER_SELF_EVENTS = new Set(["strike", "follower_strike", "clash"]);
@@ -13,12 +14,13 @@ export function fireAttackerCombatTriggers(
 ) {
   for (const spec of attacker.triggers ?? []) {
     if (!ATTACKER_SELF_EVENTS.has(spec.event)) continue;
+    if (!triggerMatchesCandidateZone(spec, "board", attacker)) continue;
     processCandidateTriggers(
       [
         {
           card: attacker,
           owner: attackerPlayer,
-          source: spec.source ?? "board",
+          source: "board",
           triggers: [spec],
         },
       ],
@@ -43,12 +45,13 @@ export function fireDefenderClashTriggers(
 ) {
   for (const spec of defender.triggers ?? []) {
     if (spec.event !== "clash") continue;
+    if (!triggerMatchesCandidateZone(spec, "board", defender)) continue;
     processCandidateTriggers(
       [
         {
           card: defender,
           owner: defenderPlayer,
-          source: spec.source ?? "board",
+          source: "board",
           triggers: [spec],
         },
       ],

@@ -104,6 +104,15 @@ export function handleStatOrchestrator(
         return "done";
     }
 
+    if (specialTarget === "entering_follower") {
+        const entering = context.enteringCard;
+        if (entering) {
+            applyBuffsToTargets([entering], eff, owner);
+            cleanupDead();
+        }
+        return "done";
+    }
+
     // Handle "selected" or "selected:follower" - use targetUids directly
     const targetStr = String(eff.target || "").toLowerCase();
     if (targetStr === "selected" || targetStr.startsWith("selected:")) {
@@ -193,7 +202,10 @@ function handlePoolBasedBuff(
 
     // 2. Check for random distribution - auto-select instead of user selection
     const distribution = (eff as any).distribution;
-    const isRandomDistribution = distribution === "random" || eff.random;
+    const isRandomDistribution =
+      distribution === "random" ||
+      eff.random ||
+      String((eff as any).select_mode || "").toLowerCase() === "random";
 
     // 3. Handle random selection (distribution: "random" bypasses user selection)
     if (isRandomDistribution) {

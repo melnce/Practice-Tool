@@ -8,6 +8,7 @@ import {
   enableAttackerDrag,
   enableEnemyFollowerDrop,
 } from "../drag.js";
+import { createHandDragClickSuppressor } from "./dragClickGuard.js";
 
 export function attachHandlers(
   div: HTMLElement,
@@ -52,12 +53,11 @@ export function attachHandlers(
       });
     }
 
-    // Left-click for Fuse
-    div.addEventListener("click", (e) => {
-      if (vm.isSelectable || vm.isSelected) return; // handled above
+    const dragClickGuard = createHandDragClickSuppressor();
+    dragClickGuard.attach(div, () => {
+      if (vm.isSelectable || vm.isSelected) return;
 
-      // Check turn
-      const isPlayersTurn = ctx.isMyHand; // calculated in selector
+      const isPlayersTurn = ctx.isMyHand;
       if (!isPlayersTurn) return;
 
       const hasFuseRecipes =
@@ -65,14 +65,12 @@ export function attachHandlers(
       const hasFortifierFuse =
         Array.isArray(card.fuse) &&
         card.fuse.some((op) => op?.op === "fuse" && op?.type === "fortifier");
-      // Gears and Ominous Artifact α have special hardcoded fuse logic by name
       const hasSpecialFuse =
         card.name === "Gear of Ambition" ||
         card.name === "Gear of Remembrance" ||
         card.name === "Ominous Artifact α";
 
       if (hasFuseRecipes || hasFortifierFuse || hasSpecialFuse) {
-        e.stopPropagation();
         actions.handleFuse(ctx.owner, card.uid, !!(hasFuseRecipes || hasSpecialFuse), card);
       }
     });

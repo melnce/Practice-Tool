@@ -7,6 +7,7 @@ import { isOverflow } from "../../../helpers/overflow.js";
 import { logEvent } from "../../../core/logger.js";
 import type { Player, CardInstance } from "../../../core/types/index.js";
 import type { UnifiedGateSpec } from "./types.js";
+import { handleSuperEvoGate } from "./gates.js";
 import {
     isFirstPlayer,
     getMaxPP,
@@ -158,7 +159,14 @@ registerCondition("super_evolved_allied", (_spec, owner) => {
 });
 
 registerCondition("super_evo_unlocked", (_spec, owner) => {
-    return isFirstPlayer(owner) ? state.roundCount >= 7 : state.roundCount >= 6;
+    return handleSuperEvoGate(owner);
+});
+
+registerCondition("has_fuse_materials", (_spec, _owner, sourceCard) => {
+    if (!sourceCard) return false;
+    const fusedNames = (sourceCard as any)._fusedLootNames;
+    if (Array.isArray(fusedNames) && fusedNames.length > 0) return true;
+    return !!(sourceCard as any).isFused;
 });
 
 // =============================================================================

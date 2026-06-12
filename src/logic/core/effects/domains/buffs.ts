@@ -10,6 +10,7 @@ import { handleCounter } from "../../../effects/ops/counter/unified.js";
 import { handleCountdown } from "../../../effects/ops/countdown/unified.js";
 import { applyAttacksPerTurn } from "../../../effects/attacks.js";
 import { getTargetingContext } from "../context.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 
 // import { BuffEffect } from "../../../../core/types/index.js";
 
@@ -60,6 +61,20 @@ export function registerBuffEffects() {
                     eff.condition,
                     opCtx,
                 );
+
+        const effTarget = String((eff as any).target || "").toLowerCase();
+        if (
+            !targets.length &&
+            merged.targetUids?.length &&
+            effTarget.startsWith("selected")
+        ) {
+            targets = resolveUids(merged.targetUids);
+            if (effTarget === "selected:follower") {
+                targets = targets.filter((c) => c?.type === "Follower");
+            } else if (effTarget === "selected:amulet") {
+                targets = targets.filter((c) => c?.type === "Amulet");
+            }
+        }
 
         // Apply filters if specified
         if ((eff as any).filters) {

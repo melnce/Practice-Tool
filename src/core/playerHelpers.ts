@@ -349,9 +349,8 @@ export function getBackrow(_state: GameState, _player: PlayerSlot): CardInstance
     return [];
 }
 
-export function getBanish(_state: GameState, _player: PlayerSlot): CardInstance[] {
-    // TODO: Add banish zone to PlayerState if needed
-    return [];
+export function getBanish(state: GameState, player: PlayerSlot): CardInstance[] {
+    return state.players[player].banish ?? [];
 }
 
 

@@ -22,7 +22,13 @@ export function resolveDynamicValue(
   if (val == null) return 0;
   if (typeof val === "number") return val | 0;
 
-  const s = String(val).trim().toLowerCase();
+  const raw = String(val).trim();
+  if (raw.startsWith("-{") && raw.endsWith("}")) {
+    const inner = raw.slice(2, -1).trim();
+    return -resolveDynamicValue(`{${inner}}`, context);
+  }
+
+  const s = raw.toLowerCase();
 
   // 1. {self.*}
   if (s.startsWith("{self.")) {

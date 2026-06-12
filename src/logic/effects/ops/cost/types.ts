@@ -34,6 +34,14 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
 
   // Handle new unified format
   if (op === "cost") {
+    // Card JSON sometimes uses "action" where the unified op expects "mode"
+    if ((eff as any).mode === undefined && (eff as any).action) {
+      const act = String((eff as any).action).toLowerCase();
+      if (act === "reduce" || act === "set" || act === "modify" || act === "increase") {
+        (eff as any).mode = act;
+      }
+    }
+
     // ====================================================================
     // STRICT VALIDATION
     // ====================================================================
@@ -48,8 +56,13 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
       );
     }
 
-    const rawTarget = (eff as any).target as string;
+    let rawTarget = (eff as any).target as string;
     const validTargets = ["self", "selected", "pool", "opponent_hand", "last_drawn"];
+
+    // Card JSON uses selected:follower / selected:amulet; unified op uses "selected" + targetUids
+    if (rawTarget.startsWith("selected:")) {
+      rawTarget = "selected";
+    }
 
     // Detect pool-style targets (e.g., "ally:hand", "enemy:follower")
     const isPoolTarget = rawTarget.includes(":") && !validTargets.includes(rawTarget);

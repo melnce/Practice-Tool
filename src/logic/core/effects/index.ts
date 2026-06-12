@@ -121,7 +121,7 @@ export function runEffects(
   owner: Player,
   sourceCard: CardInstance | null,
   context?: any,
-) {
+): "pending" | void {
   guardLifecycle("runEffects");
 
   // Runtime Assertion: Registry must be sealed
@@ -163,6 +163,7 @@ export function runEffects(
   if (trace) trace.emit({ kind: "dispatch_start", queueSize: queue.length });
 
   let processedCount = 0;
+  let paused = false;
 
   try {
   while (queue.length > 0) {
@@ -210,7 +211,8 @@ export function runEffects(
         // Paused execution (e.g. targeting waiting for input)
         // The queue state is preserved in the closure references if passed to targeting,
         // otherwise it is lost here (which is correct for "pause").
-        return;
+        paused = true;
+        return "pending";
       }
 
       // Trace: effect_end
@@ -228,8 +230,11 @@ export function runEffects(
     (state as any)._runEffectsDepth = runDepth;
     if (enableDeathDefer) {
       (state as any).deferDeathTriggers = false;
-      flushDeferredDeathBatch();
-      (state as any)._deferredDeath = { lw: [], leave: [] };
+      // Interactive pause: defer flush until target/mode resolution completes.
+      if (!paused && !state.pendingTargetEffect) {
+        flushDeferredDeathBatch();
+        (state as any)._deferredDeath = { lw: [], leave: [] };
+      }
     } else if (batchTurnBoundary) {
       (state as any).deferDeathTriggers = false;
     }

@@ -43,13 +43,20 @@ export function applyFilters(
   //  - query.side is "self"
   //  - cond.include_self is true
   //  - cond.not_self is explicitly false
+  // Special contexts (last_summoned, entering_follower) must not exclude the
+  // resolved card when sourceCard is that same instance (e.g. Congregant then-buff).
+  const skipSelfExclusion =
+    query.specialContext === "last_summoned" ||
+    query.specialContext === "entering_follower";
+
   const forceExcludeSelf = query.excludeSelf === true;
   const allowSelf =
-    !forceExcludeSelf && (
+    skipSelfExclusion ||
+    (!forceExcludeSelf && (
       query.side === "self" ||
       cond.not_self === false ||
       cond.include_self === true
-    );
+    ));
 
   if (!allowSelf && env.sourceCard) {
     filtered = filtered.filter((c) => c?.uid !== env.sourceCard!.uid);

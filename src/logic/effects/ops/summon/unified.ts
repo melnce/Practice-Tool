@@ -65,7 +65,7 @@ export function handleSummon(
       break;
 
     case "copy":
-      handleSummonCopy(spec, targetOwner, context, eff);
+      handleSummonCopy(spec, targetOwner, context, eff, _effectsQueue);
       break;
 
     case "deck":
@@ -73,7 +73,7 @@ export function handleSummon(
       break;
 
     case "hand":
-      return handleSummonFromHand(eff, targetOwner, context);
+      return handleSummonFromHand(eff, targetOwner, context, _effectsQueue);
 
     case "graveyard":
       console.log("[SUMMON UNIFIED] calling handleReanimateWrapper");

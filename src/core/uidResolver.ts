@@ -4,7 +4,7 @@
 
 import { state } from "./gameState.js";
 import type { CardInstance, Player } from "./types/index.js";
-import { getHand, getBoard, getDeck, getGraveyard } from "./playerHelpers.js";
+import { getHand, getBoard, getDeck, getGraveyard, getBanish } from "./playerHelpers.js";
 
 // =============================================================================
 // CORE RESOLUTION
@@ -36,6 +36,11 @@ export function resolveUid(uid: string): CardInstance | null {
         const graveyard = getGraveyard(state, player);
         const inGraveyard = graveyard.find(c => c?.uid === uid);
         if (inGraveyard) return inGraveyard;
+
+        // Check banish (needed for copy-after-banish effects)
+        const banish = getBanish(state, player);
+        const inBanish = banish.find((c) => c?.uid === uid);
+        if (inBanish) return inBanish;
 
         // Check deck (less common)
         const deck = getDeck(state, player);

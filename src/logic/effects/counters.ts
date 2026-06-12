@@ -118,6 +118,7 @@ export function handleReduceCountdown(
       card: sourceCard?.name,
       owner: sourceCard.owner,
       value: sourceCard.countdown,
+      uid: sourceCard.uid,
     });
     // Render removed - UI layer
     return;
@@ -141,6 +142,7 @@ export function handleReduceCountdown(
       card: sourceCard?.name,
       owner,
       value: sourceCard.countdown,
+      uid: sourceCard.uid,
     });
 
     // NEW: resolve immediately when it hits 0

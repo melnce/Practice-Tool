@@ -43,7 +43,22 @@ export function shouldFire(
   currentTurn: number,
   _context?: TriggerContext,
 ): boolean {
-  // 1. Once Per Turn
+  // 1. Max activations per turn (count stored in __onceByTurn)
+  if (trigger.max_per_turn != null && trigger.max_per_turn > 0) {
+    const key = `${makeOncePerTurnKey(trigger, event)}:count:${currentTurn}`;
+    const store = getOnceByTurnStore(hostCard);
+    const count = (store[key] as number) || 0;
+    if (count >= trigger.max_per_turn) {
+      logEvent("triggerSkip", {
+        event: event,
+        card: hostCard?.name,
+        reason: "max_per_turn",
+      });
+      return false;
+    }
+  }
+
+  // 2. Once Per Turn
   if (trigger.once_per_turn) {
     const key = makeOncePerTurnKey(trigger, event);
     const store = getOnceByTurnStore(hostCard);
@@ -73,6 +88,12 @@ export function markFired(
     const store = getOnceByTurnStore(hostCard);
     store[key] = currentTurn;
     // Phase 4: REMOVED trigger.usedThisTurn assignment
+  }
+
+  if (trigger.max_per_turn != null && trigger.max_per_turn > 0) {
+    const key = `${makeOncePerTurnKey(trigger, event)}:count:${currentTurn}`;
+    const store = getOnceByTurnStore(hostCard);
+    store[key] = ((store[key] as number) || 0) + 1;
   }
 }
 

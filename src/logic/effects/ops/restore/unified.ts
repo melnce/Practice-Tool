@@ -53,7 +53,7 @@ export function handleRestore(
       break;
 
     case "allies":
-      restored = handleRestoreAllies(owner, amount);
+      restored = handleRestoreAllies(targetPlayer, amount);
       break;
 
     case "followers":

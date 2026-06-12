@@ -9,8 +9,9 @@ import { handleModeBonus } from "../../../effects/ops/misc.js";
 import { handleRepeatEffect } from "../../../effects/repeat.js";
 import { handleEvolve } from "../../../effects/ops/evolve/unified.js";
 import { handleGate } from "../../../effects/gates/unified.js";
-import { incrementSkyboundArt } from "../../../effects/skybound.js";
+import { handleReplicate } from "../../../effects/ops/replicate.js";
 import { state } from "../../../../core/gameState.js";
+import { getHand } from "../../../../core/playerHelpers.js";
 import type { Effect as _Effect } from "../../../../core/types/index.js";
 
 export function registerMiscEffects() {
@@ -72,6 +73,11 @@ export function registerMiscEffects() {
     handleRepeatEffect(eff, ctx.owner, ctx.sourceCard, ctx.queue),
   );
 
+  registerOp("replicate", (eff, ctx) => {
+    const result = handleReplicate(eff as any, ctx);
+    if (result === "pending") return "pending";
+  });
+
   // set_deckout_victory - enables alternate win condition when opponent decks out
   registerOp("set_deckout_victory", (_eff, ctx) => {
     state.players[ctx.owner].deckoutWins = true;
@@ -81,7 +87,11 @@ export function registerMiscEffects() {
   // NOTE: Synchronous import ensures deterministic effect execution order
   registerOp("boost_skybound_art_hand", (eff, ctx) => {
     const amt = Number(eff.amount ?? 1);
-    incrementSkyboundArt(ctx.owner, amt);
+    const hand = getHand(state, ctx.owner);
+    for (const card of hand) {
+      card.skyboundArtEvolvesWitnessed =
+        (card.skyboundArtEvolvesWitnessed || 0) + amt;
+    }
   });
 }
 

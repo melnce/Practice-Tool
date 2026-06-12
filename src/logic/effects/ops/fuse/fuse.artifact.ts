@@ -213,7 +213,9 @@ export function fuse_finalize_gear_multi(
     owner,
     kind: "artifact",
     initiator: initiator?.name,
+    initiatorUid: initiator?.uid,
     partners: (partners || []).map((p) => p.name),
+    partnerUids: (partners || []).map((p) => p.uid),
     result: resultName,
   });
 
@@ -298,7 +300,9 @@ export function fuse_finalize_fortifier(
     owner,
     kind: "artifact",
     initiator: initiator?.name,
+    initiatorUid: initiator?.uid,
     partners: (partners || []).map((p) => p.name),
+    partnerUids: (partners || []).map((p) => p.uid),
     result: resultName,
   });
 
@@ -389,7 +393,9 @@ export function fuse_finalize_alpha(
       owner,
       kind: "artifact_alpha",
       initiator: "Ominous Artifact α",
+      initiatorUid: initiator?.uid,
       partners: (partners || []).map((p) => p.name),
+      partnerUids: (partners || []).map((p) => p.uid),
       result: "wasted",
     });
   }
@@ -412,7 +418,9 @@ export function fuse_finalize_alpha(
       owner,
       kind: "artifact_alpha",
       initiator: "Ominous Artifact α",
+      initiatorUid: initiator?.uid,
       partners: (partners || []).map((p) => p.name),
+      partnerUids: (partners || []).map((p) => p.uid),
       result: "Masterwork Artifact Ω",
     });
   }

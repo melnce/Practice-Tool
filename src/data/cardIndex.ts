@@ -5,6 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import type { CardTemplate } from "../core/types/index.js";
+import { toNumber } from "../core/cardStats.js";
 import {
   hasInherentStorm,
   hasInherentRush,
@@ -90,6 +91,14 @@ export function processCard(raw: RawCardData): CardTemplate | null {
         card.countdown = parseInt(String(countdownKeyword.turns)) || 0;
       }
     }
+  }
+
+  // JSON stores cost/attack/defense as strings; coerce once at index build.
+  if (card.cost !== undefined) card.cost = toNumber(card.cost);
+  if (card.attack !== undefined) card.attack = toNumber(card.attack);
+  if (card.defense !== undefined) card.defense = toNumber(card.defense);
+  if (card.base_cost === undefined && card.cost !== undefined) {
+    card.base_cost = card.cost;
   }
 
   return card as CardTemplate;

@@ -34,7 +34,9 @@ export type GateCondition =
   // Special gates
   | "skybound_art" // Turn + evolves witnessed >= requirement
   | "no_ally_attacked" // No ally has attacked this turn
-  | "highlander"; // No duplicate cards in deck
+  | "highlander" // No duplicate cards in deck
+  | "has_fuse_materials" // Host has fused loot (or other fuse material) this copy
+  | "fused_this_turn";
 
 /**
  * Unified specification for all gate operations.

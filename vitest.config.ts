@@ -20,6 +20,7 @@ export default mergeConfig(
       exclude: [
         "tests/legacy/**",
         "tests/_dev/**",
+        "tests/audit/**",
         "tests/regression/**",
         "tests/golden/**",
         "tests/scenarios/**",

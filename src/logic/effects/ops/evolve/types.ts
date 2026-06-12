@@ -44,9 +44,13 @@ export interface UnifiedEvolveSpec {
   filter?: {
     unevolved?: boolean;
     not_self?: boolean;
+    did_not_attack_this_turn?: boolean;
     type?: string;
     tribe?: string;
   };
+
+  /** When set with select, pick targets randomly instead of opening selection UI */
+  select_mode?: "random";
 }
 
 /**
@@ -85,6 +89,7 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
     name: effAny.name,
     spend_point: effAny.spend_point,
     select: effAny.select,
+    select_mode: effAny.select_mode,
     filter: effAny.filter,
   };
 

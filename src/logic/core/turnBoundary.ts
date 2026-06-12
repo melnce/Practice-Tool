@@ -5,7 +5,10 @@
 import type { CardInstance, Player } from "../../core/types/index.js";
 import { state } from "../../core/gameState.js";
 import { opponentOf, getBoard } from "../../core/playerHelpers.js";
-import { getOrderedTriggerCandidates } from "./triggers/utils.js";
+import {
+  getOrderedTriggerCandidates,
+  triggerMatchesCandidateZone,
+} from "./triggers/utils.js";
 import { evalCommonConditions } from "./triggers/conditions.js";
 import { shouldFire, markFired } from "./triggers/tracking.js";
 import type { ProcessingCandidate } from "./triggers/process.js";
@@ -112,6 +115,10 @@ function queueTurnBoundaryTriggers(
       if (!stepDef.sources.includes(cand.source)) continue;
 
       for (const trigger of cand.triggers) {
+        if (!triggerMatchesCandidateZone(trigger, cand.source, cand.card)) {
+          continue;
+        }
+
         const ev = resolveTurnEventName(trigger);
         if (ev !== event) continue;
 

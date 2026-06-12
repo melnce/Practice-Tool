@@ -83,7 +83,20 @@ export function handleEvolveTarget(eff: any, owner: Player, context: any = {}) {
   const mode = eff.mode || "normal";
   const spendPoint = eff.spendPoint === true;
 
-  handleEvolveSelf(target, owner, { mode, spendPoint, runEvoEffects: true });
+  handleEvolveSelf(target, owner, { mode, spendPoint, runEvoEffects: false });
+}
+
+/** Effect-granted evolve: stats + flags only; never runs the card's evolve[] / superevolve[] script. */
+export function evolveFollowerByEffect(
+  sourceCard: CardInstance,
+  owner: Player,
+  mode: "normal" | "super" = "normal",
+) {
+  handleEvolveSelf(sourceCard, owner, {
+    spendPoint: false,
+    mode,
+    runEvoEffects: true,
+  });
 }
 
 export function handleEvolveLastSummoned(owner: Player) {
@@ -100,7 +113,7 @@ export function handleEvolveLastSummoned(owner: Player) {
       `[evolve_last_summoned] Checking card: ${card.name} (${card.uid}) Zone: ${card.zone} Type: ${card.type} Evolved: ${card.hasEvolved}`,
     );
     if (card.zone === "board" && card.type === "Follower" && !card.hasEvolved) {
-      handleEvolveSelf(card, owner, { spendPoint: false });
+      evolveFollowerByEffect(card, owner);
     }
   }
 }

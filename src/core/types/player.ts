@@ -52,6 +52,7 @@ export interface PlayerState {
     deck: CardInstance[];
     board: CardInstance[];
     graveyard: CardInstance[];
+    banish: CardInstance[];
 
     // === Counters ===
     shadows: number;

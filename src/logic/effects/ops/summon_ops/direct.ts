@@ -67,7 +67,11 @@ export function summonNamed(eff: Effect, owner: Player) {
   // Render removed - UI orchestrator handles rendering
 }
 
-export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
+export function summonExactCopy(
+  sourceCard: CardInstance,
+  owner: Player,
+  opts?: { deferEnter?: boolean },
+) {
   if (!sourceCard || sourceCard.type !== "Follower") return null;
 
   const board = boardOf(owner);
@@ -126,7 +130,7 @@ export function summonExactCopy(sourceCard: CardInstance, owner: Player) {
     clone.isRush = false;
   }
 
-  if (!pushToBoard(board, owner, clone)) return null;
+  if (!pushToBoard(board, owner, clone, opts)) return null;
 
   logEvent("summonExactCopy", { owner, from: sourceCard.name, uid: clone.uid });
   // >>> Congregant chain managed by JSON triggers now

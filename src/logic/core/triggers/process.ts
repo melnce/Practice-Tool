@@ -4,6 +4,7 @@ import type { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";
 import { evalCommonConditions } from "./conditions.js";
 import { DEBUG_TRIGGERS } from "./debug.js";
+import { triggerMatchesCandidateZone } from "./utils.js";
 
 // Cycle breaker for runEffects
 let runEffects: (
@@ -96,16 +97,8 @@ export function processCandidateTriggers(
         if (activePlayer !== owner) continue;
       }
 
-      // 1. Source Check
-      // Legacy: Default source for followers/amulets is board-only unless specified
-      // Special case: "self" means self-triggered, not a zone
-      if (cand.source !== "crest") {
-        const defaultSource =
-          card.type === "Follower" || card.type === "Amulet" ? "board" : null;
-        const requiredSource = trigger.source || defaultSource;
-        // "self" means the trigger is on the card itself - treat as always matching the card's zone
-        if (requiredSource && (requiredSource as string) !== "self" && requiredSource !== source) continue;
-      }
+      // 1. Zone scope — board triggers do not fire from hand (C2/C1)
+      if (!triggerMatchesCandidateZone(trigger, source, card)) continue;
 
       // 2. Custom Predicate (Event-specific logic)
       if (predicate && !predicate(trigger, cand)) {
@@ -164,7 +157,7 @@ export function processCandidateTriggers(
         triggerId: trigger.event,
         result: "fire",
       });
-      logEvent("trigger", { event: event, card: card?.name });
+      logEvent("trigger", { event: event, card: card?.name, cardUid: card?.uid });
 
       // PERF: Pass effects array directly without spread (runEffects doesn't mutate it)
       runEffects(trigger.effects || [], owner, card, context);

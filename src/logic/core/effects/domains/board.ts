@@ -16,7 +16,8 @@ export function registerBoardEffects() {
       targetUids: (ctx.context as any)?.targetUids || [],
       ...((ctx.context as object) || {}),
     };
-    handleSummon(eff, ctx.owner, ctx.queue, summonCtx);
+    const res = handleSummon(eff, ctx.owner, ctx.queue, summonCtx);
+    if (res === "pending") return "pending";
   });
 
   // ========================================================================
