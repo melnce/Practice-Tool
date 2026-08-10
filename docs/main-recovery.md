@@ -6,27 +6,27 @@ The UI overhaul freeze commit `2782efb` squashed **pre-overhaul engine work** an
 
 ## Source matrix
 
-| Path | Source | Notes |
-|------|--------|-------|
-| `src/logic/**` | `2782efb` | Full engine layer |
-| `src/core/**` | `2782efb` | Includes ralmia/targeting/combat fixes |
-| `src/helpers/**` | `2782efb` | |
-| `cards/**` | `2782efb` | Card data + sync |
-| `tests/audit/**` | `2782efb` | 569 audit tests |
-| `tests/mechanics/**` | `2782efb` | 305 mechanics tests incl. guard + hand-trigger-scope |
-| `docs/**` (except `ui_overhaul/`) | `2782efb` | Rulebook, audit reports, llm-guide |
-| `docs/ui_overhaul/**` | **Excluded** | Removed after checkout |
-| `src/ui/zones/dragClickGuard.ts` | `2782efb` verbatim | Frozen suppressor module |
-| `src/ui/zones/handlers.ts` | `75f4b4e` + patch | Guard attach only (see below) |
-| All other `src/ui/**` | `75f4b4e` | Legacy rebuild-every-render UI |
-| `src/boot/**`, `index.html`, `css/**` | `75f4b4e` | |
-| `src/data/**` | `75f4b4e` except `cardIndex.ts` | Harness adds `loadDecksFromRaw` later |
-| `src/data/cardIndex.ts` | `2782efb` | Required for card stat coercion; audit 569/569 |
-| `tests/e2e/**` | `75f4b4e` | None at base; harness cherry-pick adds specs |
-| `package.json` | Hand-merge | `test:audit`, audit scripts; **no** fontsource |
-| `vitest.config.ts` | Hand-merge | `tests/audit/**` excluded; **no** `tests/ui/**` |
-| `vitest.audit.config.ts` | `2782efb` | |
-| Audit scripts | `2782efb` | `check-tokens-sync`, `check-card-text`, `audit-super-evolve-dedup` |
+| Path                                  | Source                          | Notes                                                              |
+| ------------------------------------- | ------------------------------- | ------------------------------------------------------------------ |
+| `src/logic/**`                        | `2782efb`                       | Full engine layer                                                  |
+| `src/core/**`                         | `2782efb`                       | Includes ralmia/targeting/combat fixes                             |
+| `src/helpers/**`                      | `2782efb`                       |                                                                    |
+| `cards/**`                            | `2782efb`                       | Card data + sync                                                   |
+| `tests/audit/**`                      | `2782efb`                       | 569 audit tests                                                    |
+| `tests/mechanics/**`                  | `2782efb`                       | 305 mechanics tests incl. guard + hand-trigger-scope               |
+| `docs/**` (except `ui_overhaul/`)     | `2782efb`                       | Rulebook, audit reports, llm-guide                                 |
+| `docs/ui_overhaul/**`                 | **Excluded**                    | Removed after checkout                                             |
+| `src/ui/zones/dragClickGuard.ts`      | `2782efb` verbatim              | Frozen suppressor module                                           |
+| `src/ui/zones/handlers.ts`            | `75f4b4e` + patch               | Guard attach only (see below)                                      |
+| All other `src/ui/**`                 | `75f4b4e`                       | Legacy rebuild-every-render UI                                     |
+| `src/boot/**`, `index.html`, `css/**` | `75f4b4e`                       |                                                                    |
+| `src/data/**`                         | `75f4b4e` except `cardIndex.ts` | Harness adds `loadDecksFromRaw` later                              |
+| `src/data/cardIndex.ts`               | `2782efb`                       | Required for card stat coercion; audit 569/569                     |
+| `tests/e2e/**`                        | `75f4b4e`                       | None at base; harness cherry-pick adds specs                       |
+| `package.json`                        | Hand-merge                      | `test:audit`, audit scripts; **no** fontsource                     |
+| `vitest.config.ts`                    | Hand-merge                      | `tests/audit/**` excluded; **no** `tests/ui/**`                    |
+| `vitest.audit.config.ts`              | `2782efb`                       |                                                                    |
+| Audit scripts                         | `2782efb`                       | `check-tokens-sync`, `check-card-text`, `audit-super-evolve-dedup` |
 
 ### Excluded from main entirely
 

@@ -10,7 +10,7 @@ export type EffectTraceEvent =
   | { kind: "effect_start"; op: EffectOp; depth: number }
   | { kind: "effect_end"; op: EffectOp }
   | { kind: "effect_pending"; op: EffectOp }
-  | { kind: "effect_hash"; op: EffectOp; hash: string }  // NEW: Per-op hash for determinism
+  | { kind: "effect_hash"; op: EffectOp; hash: string } // NEW: Per-op hash for determinism
   | { kind: "dispatch_end"; processed: number; remaining: number };
 
 export interface EffectTraceSink {
@@ -78,7 +78,15 @@ export function createHashTraceSink(
 export function compareHashArrays(
   expected: Array<{ op: EffectOp; hash: string }>,
   actual: Array<{ op: EffectOp; hash: string }>,
-): { mismatch: false } | { mismatch: true; index: number; expected: string; actual: string; op: EffectOp } {
+):
+  | { mismatch: false }
+  | {
+      mismatch: true;
+      index: number;
+      expected: string;
+      actual: string;
+      op: EffectOp;
+    } {
   if (expected.length !== actual.length) {
     return {
       mismatch: true,
@@ -130,19 +138,3 @@ export function setHashVerificationMode(enabled: boolean) {
 export function isHashVerificationEnabled(): boolean {
   return hashVerificationEnabled;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -5,8 +5,18 @@ import { cleanupDead } from "../../core/cleanup.js";
 import { fireTrigger } from "../../core/triggers.js";
 import { logEvent } from "../../../core/logger.js";
 import { doAction } from "../../../core/history.js";
-import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
-import { getBoard, getGraveyard, getPP, setPP, addShadows } from "../../../core/playerHelpers.js";
+import type {
+  Player,
+  CardInstance,
+  Effect,
+} from "../../../core/types/index.js";
+import {
+  getBoard,
+  getGraveyard,
+  getPP,
+  setPP,
+  addShadows,
+} from "../../../core/playerHelpers.js";
 
 // --- Helpers ---
 function boardOf(owner: Player) {
@@ -182,18 +192,3 @@ export function resetEngageFlagsAtTurnStart(owner: Player) {
       c.keywordState.engagedThisTurn = false;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

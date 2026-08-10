@@ -3,7 +3,12 @@ import { isOverflow } from "../../helpers/overflow.js";
 import { comboReadyInHand } from "../../helpers/combo.js";
 import { hasNecromancy } from "../../helpers/necromancy.js";
 import { handleSuperEvoGate } from "../../logic/effects/gates/gates.js";
-import type { CardInstance, GameState, Player, Effect } from "../../core/types/index.js";
+import type {
+  CardInstance,
+  GameState,
+  Player,
+  Effect,
+} from "../../core/types/index.js";
 
 // ---- local helpers ported from zones.js ----
 
@@ -36,7 +41,8 @@ function earthRiteCostInFanfare(effects: Effect[] | unknown): number {
 }
 
 function hasEarthOnBoard(state: GameState, owner: Player, n = 1) {
-  const board = owner === "first" ? state.players.first.board : state.players.second.board;
+  const board =
+    owner === "first" ? state.players.first.board : state.players.second.board;
   return board.some(
     (c) => c?.type === "Amulet" && Number(c?.counters?.earth) >= n,
   );
@@ -62,7 +68,8 @@ function hasOverflowInTree(effs: unknown): boolean {
 }
 
 function hasSuperEvoAllyOnBoard(state: GameState, owner: Player) {
-  const board = owner === "first" ? state.players.first.board : state.players.second.board;
+  const board =
+    owner === "first" ? state.players.first.board : state.players.second.board;
   return board.some(
     (c) => c?.type === "Follower" && c.hasEvolved && c.evoType === "super",
   );
@@ -72,12 +79,19 @@ function hasSuperEvoAllyOnBoard(state: GameState, owner: Player) {
  * Check if any effect in the list has a select requirement with no valid targets.
  * Returns true if spell should be blocked from glowing.
  */
-function spellHasUnmetSelectTarget(effects: any[], owner: Player, state: GameState): boolean {
+function spellHasUnmetSelectTarget(
+  effects: any[],
+  owner: Player,
+  state: GameState,
+): boolean {
   if (!Array.isArray(effects)) return false;
 
-  const ownerBoard = owner === "first" ? state.players.first.board : state.players.second.board;
-  const enemyBoard = owner === "first" ? state.players.second.board : state.players.first.board;
-  const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
+  const ownerBoard =
+    owner === "first" ? state.players.first.board : state.players.second.board;
+  const enemyBoard =
+    owner === "first" ? state.players.second.board : state.players.first.board;
+  const ownerHand =
+    owner === "first" ? state.players.first.hand : state.players.second.hand;
 
   for (const eff of effects) {
     if (!eff || typeof eff !== "object") continue;
@@ -86,11 +100,17 @@ function spellHasUnmetSelectTarget(effects: any[], owner: Player, state: GameSta
     // 1. eff.select: 1 (inline select on damage/destroy/etc)
     // 2. op: "select" with select_count: 1 (explicit select operation)
     const hasNumericSelect = typeof eff.select === "number" && eff.select > 0;
-    const isSelectOp = eff.op === "select" && typeof eff.select_count === "number" && eff.select_count > 0;
+    const isSelectOp =
+      eff.op === "select" &&
+      typeof eff.select_count === "number" &&
+      eff.select_count > 0;
 
     if (!hasNumericSelect && !isSelectOp) {
       // Recurse into nested effects
-      if (Array.isArray(eff.effects) && spellHasUnmetSelectTarget(eff.effects, owner, state)) {
+      if (
+        Array.isArray(eff.effects) &&
+        spellHasUnmetSelectTarget(eff.effects, owner, state)
+      ) {
         return true;
       }
       continue;
@@ -100,7 +120,9 @@ function spellHasUnmetSelectTarget(effects: any[], owner: Player, state: GameSta
     const target = String(eff.target || "").toLowerCase();
 
     if (target.includes("enemy:follower") || target === "enemy:any") {
-      const hasValidEnemy = enemyBoard.some((c: any) => c?.type === "Follower" && !c?.hasAmbush);
+      const hasValidEnemy = enemyBoard.some(
+        (c: any) => c?.type === "Follower" && !c?.hasAmbush,
+      );
       if (!hasValidEnemy) return true;
     }
     if (target.includes("ally:follower") || target === "ally:any") {
@@ -121,7 +143,10 @@ function spellHasUnmetSelectTarget(effects: any[], owner: Player, state: GameSta
     }
 
     // Recurse into nested effects
-    if (Array.isArray(eff.effects) && spellHasUnmetSelectTarget(eff.effects, owner, state)) {
+    if (
+      Array.isArray(eff.effects) &&
+      spellHasUnmetSelectTarget(eff.effects, owner, state)
+    ) {
       return true;
     }
   }
@@ -149,7 +174,8 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
   let canAfford = isPlayersTurn && availablePP >= shownCost;
 
   // ---- board capacity hard block (max 5) ----
-  const ownerBoard = owner === "first" ? state.players.first.board : state.players.second.board;
+  const ownerBoard =
+    owner === "first" ? state.players.first.board : state.players.second.board;
   const isBoardCard =
     !isSpell && (card?.type === "Follower" || card?.type === "Amulet");
   if (
@@ -162,10 +188,12 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
   // Spell-specific preconditions
   if (isSpell) {
-
     // Doomwright Resurgence: need >=2 eligible artifacts in hand
     if (card.name === "Doomwright Resurgence") {
-      const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
+      const ownerHand =
+        owner === "first"
+          ? state.players.first.hand
+          : state.players.second.hand;
       const getEffectiveCost = (c: any) =>
         Number.isFinite(c?.effectiveCost)
           ? c.effectiveCost
@@ -181,13 +209,18 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
     }
 
     // Generic: spells with select targets require valid targets
-    const spellEffects = Array.isArray((card as any).spell) ? (card as any).spell : [];
+    const spellEffects = Array.isArray((card as any).spell)
+      ? (card as any).spell
+      : [];
     if (spellHasUnmetSelectTarget(spellEffects, owner, state)) {
       canAfford = false;
     }
     // Radiant Rainbow: require a Spellboost card in hand
     if (card.name && card.name.toLowerCase() === "radiant rainbow") {
-      const ownerHand = owner === "first" ? state.players.first.hand : state.players.second.hand;
+      const ownerHand =
+        owner === "first"
+          ? state.players.first.hand
+          : state.players.second.hand;
       const hasSB = ownerHand.some(
         (c: CardInstance) =>
           Array.isArray(c.keywords) &&
@@ -317,7 +350,9 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
   // --- Faith (crest) gate: Sham-Nacha glows when Faith >= 10 ---
   const crests =
-    owner === "first" ? state.players.first.crests || [] : state.players.second.crests || [];
+    owner === "first"
+      ? state.players.first.crests || []
+      : state.players.second.crests || [];
   const faith = (() => {
     const c = crests.find(
       (x: CardInstance) =>
@@ -349,17 +384,3 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
 
   return { glowClass: "playable-glow" };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

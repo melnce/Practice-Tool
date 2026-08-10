@@ -83,9 +83,3 @@ describe("Scenario: Selection Resolution", () => {
     expect(state.pendingSelection?.op).toBe("damage");
   });
 });
-
-
-
-
-
-

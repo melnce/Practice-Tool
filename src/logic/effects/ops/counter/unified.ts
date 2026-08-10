@@ -3,10 +3,17 @@
 // Also handles special game state counters like "combo"
 
 import { state } from "../../../../core/gameState.js";
-import type { CardInstance, Effect, Player } from "../../../../core/types/index.js";
+import type {
+  CardInstance,
+  Effect,
+  Player,
+} from "../../../../core/types/index.js";
 import { addCounter, spendCounter, setCounter } from "../../counters.js";
 import { logEvent } from "../../../../core/logger.js";
-import { getPlaysThisTurn, setPlaysThisTurn } from "../../../../core/playerHelpers.js";
+import {
+  getPlaysThisTurn,
+  setPlaysThisTurn,
+} from "../../../../core/playerHelpers.js";
 
 export interface CounterHandlerContext {
   owner: Player;
@@ -83,18 +90,3 @@ function handleComboCounter(
     console.warn(`[counter] Unsupported action for combo: ${action}`);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -7,27 +7,18 @@ import type { ProcessingCandidate } from "./process.js";
 import type { TriggerSpec } from "./types.js";
 
 import {
-
   getBoard,
-
   getHand,
-
   getCrests,
-
   getDeck,
-
   opponentOf,
-
 } from "../../../core/playerHelpers.js";
-
-
 
 // PERF: Helper to get/initialize trigger cache on state
 
 // Storing on state ensures automatic reset when state is reset
 
 function getTriggerCache(): {
-
   candidates: ProcessingCandidate[] | null;
 
   actionSeq: number;
@@ -37,13 +28,9 @@ function getTriggerCache(): {
   activePlayer: Player | null;
 
   excludeKey: string;
-
 } {
-
   if (!(state as any)._triggerCache) {
-
     (state as any)._triggerCache = {
-
       candidates: null,
 
       actionSeq: -1,
@@ -53,37 +40,26 @@ function getTriggerCache(): {
       activePlayer: null,
 
       excludeKey: "",
-
     };
-
   }
 
   return (state as any)._triggerCache;
-
 }
-
-
 
 // PERF: Centralized zone version increment - call this after any zone mutation
 
 export function bumpZoneVersion() {
-
   (state as any).zoneVersion = ((state as any).zoneVersion ?? 0) + 1;
-
 }
-
-
 
 /** Monotonic entry timestamp for board/crest ordering (C2/C7). */
 
 export function allocateInsertionTs(): number {
-
   const ts = state.gameTick ?? 0;
 
   state.gameTick = ts + 1;
 
   return ts;
-
 }
 
 /**
@@ -102,15 +78,12 @@ export function stampBoardEntryTs(
   return ts;
 }
 
-
-
-export function compareBoardEntryOrder(a: CardInstance, b: CardInstance): number {
-
+export function compareBoardEntryOrder(
+  a: CardInstance,
+  b: CardInstance,
+): number {
   return ((a as any).insertionTs ?? 0) - ((b as any).insertionTs ?? 0);
-
 }
-
-
 
 /**
  * Whether a trigger may fire from a given candidate tier (hand/board/deck/crest).
@@ -166,8 +139,6 @@ function mapToCandidate(
   };
 }
 
-
-
 // PERF: Skip cards with no triggers (avoid allocating candidate objects)
 
 function hasTriggersForZone(
@@ -182,23 +153,16 @@ function hasTriggersForZone(
   return filterTriggersForZone(merged, zone, card).length > 0;
 }
 
-
-
-function hasCrestTriggers(crest: { triggers?: unknown[] } | null | undefined): boolean {
-
+function hasCrestTriggers(
+  crest: { triggers?: unknown[] } | null | undefined,
+): boolean {
   return Array.isArray(crest?.triggers) && crest.triggers.length > 0;
-
 }
 
-
-
 function mapCrestCandidates(owner: Player): ProcessingCandidate[] {
-
   const crests = getCrests(state, owner);
 
   if (!Array.isArray(crests)) return [];
-
-
 
   return crests
 
@@ -207,15 +171,10 @@ function mapCrestCandidates(owner: Player): ProcessingCandidate[] {
     .slice()
 
     .sort(
-
-      (a, b) =>
-
-        ((a as any).insertionTs ?? 0) - ((b as any).insertionTs ?? 0),
-
+      (a, b) => ((a as any).insertionTs ?? 0) - ((b as any).insertionTs ?? 0),
     )
 
     .map((crest) => ({
-
       card: crest,
 
       owner,
@@ -223,12 +182,8 @@ function mapCrestCandidates(owner: Player): ProcessingCandidate[] {
       source: "crest",
 
       triggers: (crest.triggers || []) as TriggerSpec[],
-
     }));
-
 }
-
-
 
 function mapBoardCandidates(owner: Player): ProcessingCandidate[] {
   const out: ProcessingCandidate[] = [];
@@ -261,17 +216,11 @@ function mapDeckCandidates(owner: Player): ProcessingCandidate[] {
   return out;
 }
 
-
-
 export type OrderedTriggerOptions = {
-
   /** Skip tiers whose ProcessingCandidate.source matches (e.g. crest for turn events). */
 
   excludeSources?: string[];
-
 };
-
-
 
 /**
 
@@ -292,20 +241,15 @@ export type OrderedTriggerOptions = {
  */
 
 export function getOrderedTriggerCandidates(
-
   activePlayer: Player,
 
   options?: OrderedTriggerOptions,
-
 ): ProcessingCandidate[] {
-
   const reactivePlayer = opponentOf(activePlayer);
 
   const exclude = new Set(options?.excludeSources ?? []);
 
   const excludeKey = [...exclude].sort().join(",");
-
-
 
   const actionSeq = (state as any).actionSeq ?? 0;
 
@@ -313,77 +257,47 @@ export function getOrderedTriggerCandidates(
 
   const cache = getTriggerCache();
 
-
-
   if (
-
     cache.candidates &&
-
     cache.actionSeq === actionSeq &&
-
     cache.zoneVersion === zoneVersion &&
-
     cache.activePlayer === activePlayer &&
-
     cache.excludeKey === excludeKey
-
   ) {
-
     return cache.candidates;
-
   }
-
-
 
   const tiers: ProcessingCandidate[][] = [];
 
-
-
   if (!exclude.has("hand")) {
-
     tiers.push(mapHandCandidates(activePlayer));
 
     tiers.push(mapHandCandidates(reactivePlayer));
-
   }
 
   if (!exclude.has("crest")) {
-
     tiers.push(mapCrestCandidates(activePlayer));
-
   }
 
   if (!exclude.has("board")) {
-
     tiers.push(mapBoardCandidates(activePlayer));
-
   }
 
   if (!exclude.has("crest")) {
-
     tiers.push(mapCrestCandidates(reactivePlayer));
-
   }
 
   if (!exclude.has("board")) {
-
     tiers.push(mapBoardCandidates(reactivePlayer));
-
   }
 
   if (!exclude.has("deck")) {
-
     tiers.push(mapDeckCandidates(activePlayer));
 
     tiers.push(mapDeckCandidates(reactivePlayer));
-
   }
 
-
-
   const result = tiers.flat();
-
-
 
   cache.candidates = result;
 
@@ -395,48 +309,31 @@ export function getOrderedTriggerCandidates(
 
   cache.excludeKey = excludeKey;
 
-
-
   return result;
-
 }
-
-
 
 /** @deprecated Use getOrderedTriggerCandidates(activePlayer) — zone tiers only subset. */
 
 export function getAllZoneCandidates(): ProcessingCandidate[] {
-
   const activePlayer = state.activePlayer ?? "first";
 
   return getOrderedTriggerCandidates(activePlayer, {
-
     excludeSources: ["crest"],
-
   });
-
 }
-
-
 
 /** @deprecated Use getOrderedTriggerCandidates — returns active crest tier only. */
 
-export function getCrestCandidates(activePlayer: Player): ProcessingCandidate[] {
-
+export function getCrestCandidates(
+  activePlayer: Player,
+): ProcessingCandidate[] {
   return mapCrestCandidates(activePlayer);
-
 }
-
-
 
 // Deprecated: use bumpZoneVersion instead for explicit zone mutations
 
 export function invalidateZoneCandidatesCache() {
-
   const cache = getTriggerCache();
 
   cache.candidates = null;
-
 }
-
-

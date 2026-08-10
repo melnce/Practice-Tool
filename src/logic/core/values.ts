@@ -1,6 +1,10 @@
 import { state } from "../../core/gameState.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
-import { getHand, getBoard, getPlaysThisTurn } from "../../core/playerHelpers.js";
+import {
+  getHand,
+  getBoard,
+  getPlaysThisTurn,
+} from "../../core/playerHelpers.js";
 
 interface ResolveContext {
   sourceCard?: CardInstance | null;
@@ -100,18 +104,3 @@ export function resolveDynamicValue(
   const n = parseInt(s, 10);
   return Number.isFinite(n) ? n : 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

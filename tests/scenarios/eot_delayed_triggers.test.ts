@@ -80,9 +80,3 @@ describe("Scenario: End of Turn Delayed Triggers", () => {
     expect(state.players.first.hp).toBe(20);
   });
 });
-
-
-
-
-
-

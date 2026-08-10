@@ -11,6 +11,6 @@ import type { PlayerSlot, LegacyPlayer } from "./types/player.js";
  * Use ONLY for UI display purposes (labels, CSS classes, etc).
  */
 export const SLOT_TO_LEGACY: Record<PlayerSlot, LegacyPlayer> = {
-    first: "blue",
-    second: "red",
+  first: "blue",
+  second: "red",
 };

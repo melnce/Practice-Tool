@@ -63,7 +63,9 @@ function sortLwQueue(queue: { card: CardInstance; owner: Player }[]) {
     const aActive = a.owner === activePlayer ? 0 : 1;
     const bActive = b.owner === activePlayer ? 0 : 1;
     if (aActive !== bActive) return aActive - bActive;
-    return ((a.card as any).insertionTs ?? 0) - ((b.card as any).insertionTs ?? 0);
+    return (
+      ((a.card as any).insertionTs ?? 0) - ((b.card as any).insertionTs ?? 0)
+    );
   });
 }
 
@@ -80,7 +82,11 @@ function sortLeaveQueue(queue: DeferredLeave[]) {
   });
 }
 
-function dispatchLeaveTriggers(owner: Player, card: CardInstance, defer: boolean) {
+function dispatchLeaveTriggers(
+  owner: Player,
+  card: CardInstance,
+  defer: boolean,
+) {
   const opponent = opponentOf(owner);
   const allyCtx: TriggerContext = { leavingOwner: owner, leavingCard: card };
   const enemyCtx: TriggerContext = { leavingOwner: owner, leavingCard: card };
@@ -175,9 +181,10 @@ export function flushDeferredDeathBatch() {
 }
 
 /** Finish a deferred LW that paused mid-flush for interactive selection. */
-export function completeDeferredLwAfterSelection(
-  request?: { cardUid: string; owner: Player },
-): void {
+export function completeDeferredLwAfterSelection(request?: {
+  cardUid: string;
+  owner: Player;
+}): void {
   if (!request) return;
   const q = getDeferredQueues();
   const idx = q.lw.findIndex((item) => item.card.uid === request.cardUid);
@@ -327,8 +334,8 @@ export function cleanupDead() {
     logEvent("death", { card: c.name, owner, uid: c.uid });
     const gameTick =
       (state as any).gameTick ??
-      ((state.roundCount || 0) * 1000 +
-        (state.activePlayer === "first" ? 0 : 500));
+      (state.roundCount || 0) * 1000 +
+        (state.activePlayer === "first" ? 0 : 500);
     getDestroyedHistory(state, owner).push({
       uid: c.uid,
       name: c.name,
@@ -344,7 +351,12 @@ export function cleanupDead() {
     const lw = kw?.lastWordsEffects || c.lastWordsEffects;
     const lwCount = Array.isArray(lw) ? lw.length : 0;
     if (lwCount > 0) {
-      logEvent("lastWords", { card: c.name, owner, count: lwCount, uid: c.uid });
+      logEvent("lastWords", {
+        card: c.name,
+        owner,
+        count: lwCount,
+        uid: c.uid,
+      });
       lwQueue.push({ card: c, owner });
     } else {
       sendToGrave(c, owner);
@@ -388,4 +400,3 @@ export function resetDeferredDeathState() {
   (state as any).deferDeathTriggers = false;
   clearDeferredQueues();
 }
-

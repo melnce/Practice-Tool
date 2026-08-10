@@ -38,17 +38,3 @@ export const adapter = {
 export function injectAdapter(impl: Partial<typeof adapter>) {
   Object.assign(adapter, impl);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

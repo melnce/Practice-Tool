@@ -10,7 +10,13 @@ import { playSpell } from "./spell.js";
 import { playFollower } from "./follower.js";
 import { playAmulet } from "./amulet.js";
 import type { PlayOutcome } from "./types.js";
-import { getPP, setPP, getPlaysThisTurn, setPlaysThisTurn, isFirstPlayer } from "../../../core/playerHelpers.js";
+import {
+  getPP,
+  setPP,
+  getPlaysThisTurn,
+  setPlaysThisTurn,
+  isFirstPlayer,
+} from "../../../core/playerHelpers.js";
 
 /**
  * Core play card logic. Returns a PlayOutcome without any rendering.
@@ -72,18 +78,3 @@ export function playCardCore(
 
   return { kind: "done" };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

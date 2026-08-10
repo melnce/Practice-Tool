@@ -59,11 +59,16 @@ describe("C3 fanfare-select resume", () => {
     const outcome = playCardNoRender(hand, "first", 0);
     expect(outcome.kind).toBe("paused");
 
-    const marion = getBoard(state, "first").find((c) => c.name?.includes("Marion"));
+    const marion = getBoard(state, "first").find((c) =>
+      c.name?.includes("Marion"),
+    );
     expect(marion).toBeDefined();
     expect(Number(marion!.attack)).toBe(3);
 
-    dispatch(state, { type: "CHOOSE_TARGET", target: { type: "card", uid: ally.uid } });
+    dispatch(state, {
+      type: "CHOOSE_TARGET",
+      target: { type: "card", uid: ally.uid },
+    });
 
     expect(Number(marion!.attack)).toBe(12);
     expect(Number(ally.attack)).toBeGreaterThan(1);
@@ -84,7 +89,9 @@ describe("C3 fanfare-select resume", () => {
     const hand = getHand(state, "first");
     whenPlayAndResolve(hand);
 
-    const valse = getBoard(state, "first").find((c) => c.name?.includes("Valse"));
+    const valse = getBoard(state, "first").find((c) =>
+      c.name?.includes("Valse"),
+    );
     expect(valse).toBeDefined();
     expect(valse!.hasAmbush).toBe(true);
     expect(Number(enemy.defense)).toBe(5);
@@ -97,5 +104,8 @@ function whenPlayAndResolve(hand: ReturnType<typeof getHand>) {
   const pending = state.pendingTargetEffect;
   expect(pending).toBeDefined();
   const uid = pending?.pool?.[0]?.uid ?? state.players.second.board[0]?.uid;
-  dispatch(state, { type: "CHOOSE_TARGET", target: { type: "card", uid: uid! } });
+  dispatch(state, {
+    type: "CHOOSE_TARGET",
+    target: { type: "card", uid: uid! },
+  });
 }

@@ -137,17 +137,3 @@ export function applyBarrierOverlay(div: HTMLElement, card: CardInstance) {
     setTimeout(() => wrap.classList.remove("barrier-pop"), 350);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

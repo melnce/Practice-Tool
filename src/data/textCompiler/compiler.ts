@@ -184,16 +184,3 @@ function parseEffect(clause: string): Effect | null {
 
   return null;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

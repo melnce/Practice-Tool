@@ -4,12 +4,12 @@
 
 The default `npm test` command runs only high-signal, reliable tests:
 
-| Suite | Purpose |
-|-------|---------|
-| `tests/invariants/` | Engine correctness: determinism, state validity, no-crash |
-| `tests/mechanics/` | Curated mechanic tests (summon, damage, etc.) |
-| `tests/integration/` | Cross-system integration tests |
-| `tests/unit/` | Remaining unit tests (non-card-expectation) |
+| Suite                | Purpose                                                   |
+| -------------------- | --------------------------------------------------------- |
+| `tests/invariants/`  | Engine correctness: determinism, state validity, no-crash |
+| `tests/mechanics/`   | Curated mechanic tests (summon, damage, etc.)             |
+| `tests/integration/` | Cross-system integration tests                            |
+| `tests/unit/`        | Remaining unit tests (non-card-expectation)               |
 
 ### Invariant Tests Guarantee:
 
@@ -23,17 +23,18 @@ The default `npm test` command runs only high-signal, reliable tests:
 ## Quarantined/Legacy Tests
 
 These tests are **excluded from default runs** because they are:
+
 - Brittle card JSON expectation tests
 - Validation tests that depend on external data
 - Stale regression tests
 
-| Folder | Status |
-|--------|--------|
-| `tests/legacy/` | Quarantined - may fail |
-| `tests/golden/` | Excluded - may be stale |
-| `tests/scenarios/` | Excluded - manual tests |
-| `tests/regression/` | Excluded - historical |
-| `tests/_dev/` | Dev-only scratchpad |
+| Folder              | Status                  |
+| ------------------- | ----------------------- |
+| `tests/legacy/`     | Quarantined - may fail  |
+| `tests/golden/`     | Excluded - may be stale |
+| `tests/scenarios/`  | Excluded - manual tests |
+| `tests/regression/` | Excluded - historical   |
+| `tests/_dev/`       | Dev-only scratchpad     |
 
 ### Run Legacy Tests (Optional)
 
@@ -48,6 +49,7 @@ npx vitest run --dir tests/legacy
 ### For Engine Mechanics
 
 Add to `tests/mechanics/`:
+
 ```typescript
 // tests/mechanics/my-mechanic.test.ts
 describe("My Mechanic", () => {
@@ -58,6 +60,7 @@ describe("My Mechanic", () => {
 ### For Invariants/Correctness
 
 Add to `tests/invariants/`:
+
 ```typescript
 // Use benchEnv for state creation
 // Focus on properties, not specific card behaviors
@@ -66,6 +69,7 @@ Add to `tests/invariants/`:
 ### For Card-Specific Behavior
 
 **Avoid card JSON expectation tests.** Use ScenarioRunner instead:
+
 ```typescript
 // Good: Test behavior
 scenario.playCard("Card Name");
@@ -79,9 +83,9 @@ expect(card.fanfare[0].op).toBe("draw");
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm test` | Run trusted tests only |
-| `npm run test:legacy` | Run legacy tests (may fail) |
-| `npm run test:all` | Run all tests including legacy |
-| `npm run test:watch` | Watch mode for trusted tests |
+| Command               | Description                    |
+| --------------------- | ------------------------------ |
+| `npm test`            | Run trusted tests only         |
+| `npm run test:legacy` | Run legacy tests (may fail)    |
+| `npm run test:all`    | Run all tests including legacy |
+| `npm run test:watch`  | Watch mode for trusted tests   |

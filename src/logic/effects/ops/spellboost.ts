@@ -3,7 +3,11 @@ import { state } from "../../../core/gameState.js";
 // Legacy spellboost transform removed: getCardDetails import no longer needed
 
 import { logEvent } from "../../../core/logger.js";
-import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
+import type {
+  Player,
+  CardInstance,
+  Effect,
+} from "../../../core/types/index.js";
 import { getHand } from "../../../core/playerHelpers.js";
 import { runEffects } from "../../core/effects/index.js";
 import { handleStat } from "./stat.js";
@@ -56,11 +60,17 @@ function dispatchSpellboostKeywordEffect(
   effect: Effect,
 ) {
   // Stat/cost on self avoid the effects index cycle (index → buffs → spellboost → index).
-  if (effect.op === "stat" && String(effect.target ?? "").toLowerCase() === "self") {
+  if (
+    effect.op === "stat" &&
+    String(effect.target ?? "").toLowerCase() === "self"
+  ) {
     handleStat(effect, owner, card, []);
     return;
   }
-  if (effect.op === "cost" && String(effect.target ?? "").toLowerCase() === "self") {
+  if (
+    effect.op === "cost" &&
+    String(effect.target ?? "").toLowerCase() === "self"
+  ) {
     handleCost(effect, owner, card, {});
     return;
   }
@@ -207,18 +217,3 @@ export function spellboostHand(
 
   // Render removed - UI layer
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

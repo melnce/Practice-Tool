@@ -7,8 +7,18 @@ import { fireTrigger } from "../../core/triggers.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../core/logger.js";
-import type { CardInstance, Effect, Player, EffectContext } from "../../../core/types/index.js";
-import { getBoard, getHand, getGraveyard, opponentOf } from "../../../core/playerHelpers.js";
+import type {
+  CardInstance,
+  Effect,
+  Player,
+  EffectContext,
+} from "../../../core/types/index.js";
+import {
+  getBoard,
+  getHand,
+  getGraveyard,
+  opponentOf,
+} from "../../../core/playerHelpers.js";
 
 // Create a fresh base copy (new uid)
 function freshBaseCopyByName(name: string) {
@@ -149,18 +159,3 @@ export function handleReturnToHand(
   // non-select → bounce all matching
   for (const t of pool) bounceToHand(t);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

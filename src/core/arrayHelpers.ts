@@ -52,17 +52,3 @@ export function spliceOne<T>(arr: T[], index: number): T | undefined {
   if (index < 0 || index >= arr.length) return undefined;
   return arr.splice(index, 1)[0];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

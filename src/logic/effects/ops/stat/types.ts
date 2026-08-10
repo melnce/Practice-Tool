@@ -1,4 +1,9 @@
-import type { Effect, Player, CardInstance, EffectContext } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+  EffectContext,
+} from "../../../../core/types/index.js";
 
 export interface StatContext {
   owner: Player;
@@ -18,11 +23,11 @@ export type StatOp = Effect & {
   defense?: number | string;
 
   // Keyword fields
-  keywords?: (string | { name: string;[key: string]: any })[];
+  keywords?: (string | { name: string; [key: string]: any })[];
   keyword?:
-  | string
-  | { name: string;[key: string]: any }
-  | (string | { name: string;[key: string]: any })[];
+    | string
+    | { name: string; [key: string]: any }
+    | (string | { name: string; [key: string]: any })[];
   has_keyword?: string | string[];
 
   // Filters
@@ -66,18 +71,3 @@ export function isKeywordBuff(op: StatOp): boolean {
 export function isSpecialBuff(op: StatOp): boolean {
   return op.attacks_per_turn !== undefined;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

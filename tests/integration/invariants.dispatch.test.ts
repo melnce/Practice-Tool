@@ -13,10 +13,10 @@ vi.mock("../../src/ui/render.js", () => ({
 }));
 vi.mock("../../src/ui/dom.js", () => ({
   byId: () => document.createElement("div"),
-  clear: () => { },
-  wireClick: () => { },
+  clear: () => {},
+  wireClick: () => {},
   getDragData: () => "",
-  setDragData: () => { },
+  setDragData: () => {},
 }));
 
 describe("Engine Invariants", () => {

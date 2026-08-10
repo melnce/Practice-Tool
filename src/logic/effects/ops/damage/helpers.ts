@@ -7,7 +7,11 @@ import { cleanupDead } from "../../../core/cleanup.js";
 import { logEvent } from "../../../../core/logger.js";
 import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
-import type { Effect, CardInstance, Player } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  CardInstance,
+  Player,
+} from "../../../../core/types/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getBoard, getHP, getMaxHP } from "../../../../core/playerHelpers.js";
 
@@ -23,44 +27,49 @@ import { resolveDamageAmountExtended } from "./primitives.js";
  * Resolves the damage amount based on spec and context.
  * Handles various amount_source values like hand_size, golem_count, etc.
  */
-export function resolveAmount(spec: UnifiedDamageSpec, ctx: DamageContext): number {
-    const source = spec.amount_source as string;
+export function resolveAmount(
+  spec: UnifiedDamageSpec,
+  ctx: DamageContext,
+): number {
+  const source = spec.amount_source as string;
 
-    // Handle context.* pattern - read from ctx.variables
-    if (source && source.startsWith("context.")) {
-        const varName = source.substring(8); // Remove "context." prefix
-        const value = (ctx as any).variables?.[varName];
-        if (value === undefined) {
-            console.warn(`[Context] Variable '${varName}' not found, defaulting to 0`);
-            return 0;
-        }
-        return typeof value === "number" ? value : Number(value) || 0;
+  // Handle context.* pattern - read from ctx.variables
+  if (source && source.startsWith("context.")) {
+    const varName = source.substring(8); // Remove "context." prefix
+    const value = (ctx as any).variables?.[varName];
+    if (value === undefined) {
+      console.warn(
+        `[Context] Variable '${varName}' not found, defaulting to 0`,
+      );
+      return 0;
     }
+    return typeof value === "number" ? value : Number(value) || 0;
+  }
 
-    switch (spec.amount_source) {
-        case "hand_size":
-            return resolveDamageAmountExtended({} as Effect, ctx, "hand_size");
-        case "selected_defense":
-            return resolveDamageAmountExtended({} as Effect, ctx, "selected_defense");
-        case "golem_count":
-            return resolveDamageAmountExtended({} as Effect, ctx, "golem_count");
-        case "crest_count":
-            return resolveDamageAmountExtended({} as Effect, ctx, "crest_count");
-        case "other_allies":
-            return resolveDamageAmountExtended({} as Effect, ctx, "other_allies");
-        case "fixed":
-        default:
-            // Use amount field, with overflow support
-            // Include add_amount for effects like Stormy Blast that add to base damage
-            return resolveAmountWithOverflow(
-                { amount: spec.amount, add_amount: spec.add_amount } as any,
-                ctx.owner,
-                {
-                    sourceCard: ctx.sourceCard,
-                    selectedCard: ctx.selectedCard,
-                },
-            );
-    }
+  switch (spec.amount_source) {
+    case "hand_size":
+      return resolveDamageAmountExtended({} as Effect, ctx, "hand_size");
+    case "selected_defense":
+      return resolveDamageAmountExtended({} as Effect, ctx, "selected_defense");
+    case "golem_count":
+      return resolveDamageAmountExtended({} as Effect, ctx, "golem_count");
+    case "crest_count":
+      return resolveDamageAmountExtended({} as Effect, ctx, "crest_count");
+    case "other_allies":
+      return resolveDamageAmountExtended({} as Effect, ctx, "other_allies");
+    case "fixed":
+    default:
+      // Use amount field, with overflow support
+      // Include add_amount for effects like Stormy Blast that add to base damage
+      return resolveAmountWithOverflow(
+        { amount: spec.amount, add_amount: spec.add_amount } as any,
+        ctx.owner,
+        {
+          sourceCard: ctx.sourceCard,
+          selectedCard: ctx.selectedCard,
+        },
+      );
+  }
 }
 
 // =============================================================================
@@ -71,43 +80,43 @@ export function resolveAmount(spec: UnifiedDamageSpec, ctx: DamageContext): numb
  * Sets up pending target selection for damage effects that require user choice.
  */
 export function handleSelection(
-    eff: Effect,
-    spec: UnifiedDamageSpec,
-    pool: CardInstance[],
-    amount: number,
-    owner: Player,
-    sourceCard: CardInstance | null,
-    effectsQueue: Effect[],
+  eff: Effect,
+  spec: UnifiedDamageSpec,
+  pool: CardInstance[],
+  amount: number,
+  owner: Player,
+  sourceCard: CardInstance | null,
+  effectsQueue: Effect[],
 ): "pending" | "done" {
-    const selectCount = Math.min(spec.select || 1, pool.length);
+  const selectCount = Math.min(spec.select || 1, pool.length);
 
-    if (selectCount === 0 && !spec.fallback_leader) {
-        return "done";
-    }
+  if (selectCount === 0 && !spec.fallback_leader) {
+    return "done";
+  }
 
-    setPendingTarget({
-        eff: { ...eff, amount } as any,
-        owner,
-        sourceCard,
-        targets: [],
-        selectCount: selectCount || 1,
-        pool,
-        resumeEffects: effectsQueue,
-        canTargetLeader: spec.fallback_leader ?? false,
-    });
+  setPendingTarget({
+    eff: { ...eff, amount } as any,
+    owner,
+    sourceCard,
+    targets: [],
+    selectCount: selectCount || 1,
+    pool,
+    resumeEffects: effectsQueue,
+    canTargetLeader: spec.fallback_leader ?? false,
+  });
 
-    logEvent("damage_select", {
-        owner,
-        pool: pool.length,
-        select: selectCount,
-        amount,
-    });
+  logEvent("damage_select", {
+    owner,
+    pool: pool.length,
+    select: selectCount,
+    amount,
+  });
 
-    if (pool.length) {
-        highlightSelectable(pool);
-    }
+  if (pool.length) {
+    highlightSelectable(pool);
+  }
 
-    return "pending";
+  return "pending";
 }
 
 // =============================================================================
@@ -118,60 +127,63 @@ export function handleSelection(
  * Handles damage distribution based on stat values (e.g., highest defense).
  */
 export function handleByStatDamage(
-    spec: UnifiedDamageSpec,
-    amount: number,
-    _owner: Player,
+  spec: UnifiedDamageSpec,
+  amount: number,
+  _owner: Player,
 ): void {
-    const stat = spec.stat || "defense";
-    const targetType = spec.target || "follower";
+  const stat = spec.stat || "defense";
+  const targetType = spec.target || "follower";
 
-    if (
-        targetType === "follower" ||
-        targetType === "enemy:follower" ||
-        targetType === "all:follower"
-    ) {
-        const allFollowers = [
-            ...getBoard(state, "first"),
-            ...getBoard(state, "second"),
-        ].filter((c) => c && c.type === "Follower");
+  if (
+    targetType === "follower" ||
+    targetType === "enemy:follower" ||
+    targetType === "all:follower"
+  ) {
+    const allFollowers = [
+      ...getBoard(state, "first"),
+      ...getBoard(state, "second"),
+    ].filter((c) => c && c.type === "Follower");
 
-        if (!allFollowers.length) return;
+    if (!allFollowers.length) return;
 
-        const getValue = (c: CardInstance) =>
-            parseInt(String(stat === "defense" ? c.defense : c.attack), 10) || 0;
-        const maxVal = Math.max(...allFollowers.map(getValue));
-        const targets = allFollowers.filter((c) => getValue(c) === maxVal);
+    const getValue = (c: CardInstance) =>
+      parseInt(String(stat === "defense" ? c.defense : c.attack), 10) || 0;
+    const maxVal = Math.max(...allFollowers.map(getValue));
+    const targets = allFollowers.filter((c) => getValue(c) === maxVal);
 
-        for (const t of targets) {
-            dealDamage(t, amount);
-        }
-        cleanupDead();
-        return;
+    for (const t of targets) {
+      dealDamage(t, amount);
     }
+    cleanupDead();
+    return;
+  }
 
-    if (targetType === "leader" || targetType === "all:leader") {
-        const statKey = stat === "defense" ? "maxHP" : "hp";
-        const leaders: Array<{ owner: import("../../../../core/types/index.js").Player; value: number }> = [
-            {
-                owner: "first",
-                value:
-                    statKey === "maxHP"
-                        ? getMaxHP(state, "first")
-                        : getHP(state, "first"),
-            },
-            {
-                owner: "second",
-                value:
-                    statKey === "maxHP"
-                        ? getMaxHP(state, "second")
-                        : getHP(state, "second"),
-            },
-        ];
-        const maxVal = Math.max(...leaders.map((l) => l.value));
-        for (const l of leaders) {
-            if (l.value === maxVal) {
-                applyLeaderDamage(l.owner, amount);
-            }
-        }
+  if (targetType === "leader" || targetType === "all:leader") {
+    const statKey = stat === "defense" ? "maxHP" : "hp";
+    const leaders: Array<{
+      owner: import("../../../../core/types/index.js").Player;
+      value: number;
+    }> = [
+      {
+        owner: "first",
+        value:
+          statKey === "maxHP"
+            ? getMaxHP(state, "first")
+            : getHP(state, "first"),
+      },
+      {
+        owner: "second",
+        value:
+          statKey === "maxHP"
+            ? getMaxHP(state, "second")
+            : getHP(state, "second"),
+      },
+    ];
+    const maxVal = Math.max(...leaders.map((l) => l.value));
+    for (const l of leaders) {
+      if (l.value === maxVal) {
+        applyLeaderDamage(l.owner, amount);
+      }
     }
+  }
 }

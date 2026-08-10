@@ -255,17 +255,3 @@ if (typeof window !== "undefined") {
   (window as any).computeStateHash = computeStateHash;
   (window as any).setGameLogSession = setSessionTag;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

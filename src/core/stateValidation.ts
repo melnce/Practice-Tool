@@ -5,8 +5,8 @@ import type { GameState, CardInstance } from "./types/index.js";
 
 export interface GameStateValidationResult {
   valid: boolean;
-  fails: string[];  // HARD FAIL - game state is corrupt
-  warns: string[];  // WARNING - suspicious but recoverable
+  fails: string[]; // HARD FAIL - game state is corrupt
+  warns: string[]; // WARNING - suspicious but recoverable
   issues: string[]; // Legacy compatibility - combines fails + warns
 }
 
@@ -19,7 +19,12 @@ export function validateGameState(state: GameState): GameStateValidationResult {
   const warns: string[] = [];
 
   if (!state || typeof state !== "object") {
-    return { valid: false, fails: ["State is null or not an object"], warns: [], issues: ["State is null or not an object"] };
+    return {
+      valid: false,
+      fails: ["State is null or not an object"],
+      warns: [],
+      issues: ["State is null or not an object"],
+    };
   }
 
   // Check players structure exists
@@ -62,7 +67,9 @@ export function validateGameState(state: GameState): GameStateValidationResult {
       // Check owner matches zone location
       for (const card of arr) {
         if (card && card.owner && card.owner !== player) {
-          warns.push(`H3: Card ${card.name} (${card.uid}) in ${player}.${zone} has owner=${card.owner}`);
+          warns.push(
+            `H3: Card ${card.name} (${card.uid}) in ${player}.${zone} has owner=${card.owner}`,
+          );
         }
       }
     }
@@ -73,10 +80,14 @@ export function validateGameState(state: GameState): GameStateValidationResult {
   // =========================================================================
   const BOARD_MAX = 5;
   if (state.players.first.board.length > BOARD_MAX) {
-    fails.push(`H4: First board exceeds ${BOARD_MAX}: ${state.players.first.board.length}`);
+    fails.push(
+      `H4: First board exceeds ${BOARD_MAX}: ${state.players.first.board.length}`,
+    );
   }
   if (state.players.second.board.length > BOARD_MAX) {
-    fails.push(`H4: Second board exceeds ${BOARD_MAX}: ${state.players.second.board.length}`);
+    fails.push(
+      `H4: Second board exceeds ${BOARD_MAX}: ${state.players.second.board.length}`,
+    );
   }
 
   // =========================================================================
@@ -135,7 +146,9 @@ export function validateGameState(state: GameState): GameStateValidationResult {
       if (card?.type === "Amulet" && card.hasCountdown) {
         const cd = Number(card.countdown);
         if (!Number.isFinite(cd) || cd < 0) {
-          warns.push(`W1: Amulet ${card.name} has invalid countdown: ${card.countdown}`);
+          warns.push(
+            `W1: Amulet ${card.name} has invalid countdown: ${card.countdown}`,
+          );
         }
       }
     }
@@ -150,7 +163,9 @@ export function validateGameState(state: GameState): GameStateValidationResult {
         const atk = Number(card.attack);
         const def = Number(card.defense);
         if (typeof card.defense !== "number") {
-          warns.push(`W3: ${player}.board: ${card.name} has non-numeric defense: ${typeof card.defense}`);
+          warns.push(
+            `W3: ${player}.board: ${card.name} has non-numeric defense: ${typeof card.defense}`,
+          );
         }
         if (atk < 0) {
           warns.push(`W3: ${card.name} has negative attack: ${atk}`);
@@ -210,11 +225,13 @@ export function assertValidGameState(
 }
 
 // Legacy compatibility - returns {valid, issues} format
-export function validateGameStateLegacy(state: GameState): { valid: boolean; issues: string[] } {
+export function validateGameStateLegacy(state: GameState): {
+  valid: boolean;
+  issues: string[];
+} {
   const result = validateGameState(state);
   return {
     valid: result.valid,
     issues: [...result.fails, ...result.warns],
   };
 }
-

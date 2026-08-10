@@ -171,7 +171,9 @@ describe("Set 104: Skybound Dragons", () => {
     });
 
     // Should have drawn the spell
-    expect(state.players.first.hand.some((c) => c.name === "Target Spell")).toBe(true);
+    expect(
+      state.players.first.hand.some((c) => c.name === "Target Spell"),
+    ).toBe(true);
   });
 
   it("Rune Portal should damage all and heal leader", async () => {
@@ -293,7 +295,9 @@ describe("Set 104: Skybound Dragons", () => {
       deckBId: "sample_red",
       seed: 104,
     });
-    state.players.second.board = [{ uid: "e1", defense: 3, type: "Follower" }] as any;
+    state.players.second.board = [
+      { uid: "e1", defense: 3, type: "Follower" },
+    ] as any;
 
     const aglovale = {
       uid: "hand_1",
@@ -374,7 +378,8 @@ describe("Set 104: Skybound Dragons", () => {
 
     // Sigils?
     expect(
-      state.players.first.board.filter((c) => c.name === "Magic Sediment").length,
+      state.players.first.board.filter((c) => c.name === "Magic Sediment")
+        .length,
     ).toBe(2);
   });
 
@@ -384,7 +389,9 @@ describe("Set 104: Skybound Dragons", () => {
       deckBId: "sample_red",
       seed: 104,
     });
-    state.players.second.board = [{ uid: "e1", defense: 6, type: "Follower" }] as any;
+    state.players.second.board = [
+      { uid: "e1", defense: 6, type: "Follower" },
+    ] as any;
 
     const flare = {
       uid: "hand_1",
@@ -416,7 +423,9 @@ describe("Set 104: Skybound Dragons", () => {
     });
 
     expect((state.players.second.board[0] as any).defense).toBe(2); // 6-4
-    expect(state.players.first.board.some((c) => c.name === "Magic Sediment")).toBe(true);
+    expect(
+      state.players.first.board.some((c) => c.name === "Magic Sediment"),
+    ).toBe(true);
   });
 
   it("Lyria should Enhance(8) to Draw and Recover PP", async () => {
@@ -467,7 +476,9 @@ describe("Set 104: Skybound Dragons", () => {
     // Cost 8 paid -> 0 left. Recover 7 -> 7 left.
     expect(state.players.first.pp).toBe(7);
     // Drawn?
-    expect(state.players.first.hand.some((c) => c.name === "Big Guy")).toBe(true);
+    expect(state.players.first.hand.some((c) => c.name === "Big Guy")).toBe(
+      true,
+    );
   });
 
   it("Nezha should deal EOT damage", async () => {
@@ -476,7 +487,9 @@ describe("Set 104: Skybound Dragons", () => {
       deckBId: "sample_red",
       seed: 104,
     });
-    state.players.second.board = [{ uid: "e1", defense: 5, type: "Follower" }] as any;
+    state.players.second.board = [
+      { uid: "e1", defense: 5, type: "Follower" },
+    ] as any;
 
     const nezha = {
       uid: "b1",
@@ -589,7 +602,9 @@ describe("Set 104: Skybound Dragons", () => {
     });
 
     expect(state.players.first.board.length).toBe(2);
-    const satyrOnBoard = state.players.first.board.find((c) => c.name === "Satyr");
+    const satyrOnBoard = state.players.first.board.find(
+      (c) => c.name === "Satyr",
+    );
     expect(satyrOnBoard?.hasEvolved).toBe(true);
   });
 
@@ -624,7 +639,9 @@ describe("Set 104: Skybound Dragons", () => {
       cardUid: "hand_1",
     });
 
-    const izmirOnBoard = state.players.first.board.find((c) => c.name === "Izmir");
+    const izmirOnBoard = state.players.first.board.find(
+      (c) => c.name === "Izmir",
+    );
     expect(izmirOnBoard?.hasEvolved).toBe(true);
   });
   it("Vyrn should evolve if super evo is active", async () => {
@@ -712,9 +729,3 @@ describe("Set 104: Skybound Dragons", () => {
     // We'll see. If it fails, we know we need to pass option index.
   });
 });
-
-
-
-
-
-

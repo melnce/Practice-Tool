@@ -250,18 +250,3 @@ export function reduceDeckFollowersCost(owner: Player, amount = 1) {
     logEvent("costChangeBulk", { owner, type: "reduceDeckFollowers", amount });
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -5,7 +5,11 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import type { Player, CardInstance } from "../../../../core/types/index.js";
 import { runEffects } from "../../../core/effects/index.js";
-import { getBoard as getBoardHelper, getGraveyard as getGraveyardHelper, addShadows } from "../../../../core/playerHelpers.js";
+import {
+  getBoard as getBoardHelper,
+  getGraveyard as getGraveyardHelper,
+  addShadows,
+} from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // PROTECTION CHECKS
@@ -146,18 +150,3 @@ export function getBoard(owner: Player): CardInstance[] {
 export function getGraveyard(owner: Player): CardInstance[] {
   return getGraveyardHelper(state, owner);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

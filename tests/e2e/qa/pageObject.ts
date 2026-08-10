@@ -38,7 +38,8 @@ export const SEL = {
     const id = zone.slice(1);
     return `#${id}-${i}`;
   },
-  boardCardByIndex: (zone: "#blueBoard" | "#redBoard", i: number) => `${zone} .card:nth-child(${i + 1})`,
+  boardCardByIndex: (zone: "#blueBoard" | "#redBoard", i: number) =>
+    `${zone} .card:nth-child(${i + 1})`,
 } as const;
 
 export class SvwbPage {
@@ -60,9 +61,14 @@ export class SvwbPage {
     await this.page.evaluate((s) => window.__svwbTest!.seedRng(s), seed);
   }
 
-  async loadDecks(blue: RawDeck, red: RawDeck, drawOpening = false): Promise<void> {
+  async loadDecks(
+    blue: RawDeck,
+    red: RawDeck,
+    drawOpening = false,
+  ): Promise<void> {
     await this.page.evaluate(
-      ([b, r, draw]) => window.__svwbTest!.loadDecks(b, r, { drawOpening: draw }),
+      ([b, r, draw]) =>
+        window.__svwbTest!.loadDecks(b, r, { drawOpening: draw }),
       [blue, red, drawOpening] as const,
     );
   }
@@ -90,7 +96,10 @@ export class SvwbPage {
     );
   }
 
-  async dragHandCardThenClick(zone: "#blueHand" | "#redHand", index = 0): Promise<void> {
+  async dragHandCardThenClick(
+    zone: "#blueHand" | "#redHand",
+    index = 0,
+  ): Promise<void> {
     const card = this.page.locator(SEL.handCardByIndex(zone, index));
     const box = await card.boundingBox();
     if (!box) throw new Error("hand card not visible for drag-then-click");
@@ -154,8 +163,11 @@ export class SvwbPage {
       }
       o.addToHand?.forEach((x) => t.addToHand(x.player, x.cardId, x.count));
       o.addToDeck?.forEach((x) => t.addToDeck(x.player, x.cardId, x.count));
-      o.summon?.forEach((x) => t.summonToBoard(x.player, x.cardId, x.attackReady));
-      if (o.advanceToTurn) t.advanceToTurn(o.advanceToTurn.round, o.advanceToTurn.activePlayer);
+      o.summon?.forEach((x) =>
+        t.summonToBoard(x.player, x.cardId, x.attackReady),
+      );
+      if (o.advanceToTurn)
+        t.advanceToTurn(o.advanceToTurn.round, o.advanceToTurn.activePlayer);
       o.setPP?.forEach((x) => t.setPP(x.player, x.pp, x.maxPP));
       o.setEP?.forEach((x) => t.setEP(x.player, x.charges));
       o.setSEP?.forEach((x) => t.setSEP(x.player, x.charges));
@@ -171,7 +183,8 @@ export class SvwbPage {
 
   async waitForPendingSelectCount(count: number): Promise<void> {
     await this.page.waitForFunction(
-      (n) => window.__svwbTest!.getState().pendingTargetEffect?.selectCount === n,
+      (n) =>
+        window.__svwbTest!.getState().pendingTargetEffect?.selectCount === n,
       count,
       { timeout: 10_000 },
     );
@@ -192,50 +205,91 @@ export class SvwbPage {
     return this.page.locator(zone);
   }
 
-  async rightClickPlayHandCard(zone: "#blueHand" | "#redHand", index = 0): Promise<void> {
+  async rightClickPlayHandCard(
+    zone: "#blueHand" | "#redHand",
+    index = 0,
+  ): Promise<void> {
     const card = this.page.locator(SEL.handCardByIndex(zone, index));
     await card.click({ button: "right", force: true });
     await this.page.waitForTimeout(200);
   }
 
-  async leftClickHandCard(zone: "#blueHand" | "#redHand", index = 0): Promise<void> {
-    await this.page.locator(SEL.handCardByIndex(zone, index)).click({ force: true });
+  async leftClickHandCard(
+    zone: "#blueHand" | "#redHand",
+    index = 0,
+  ): Promise<void> {
+    await this.page
+      .locator(SEL.handCardByIndex(zone, index))
+      .click({ force: true });
     await this.page.waitForTimeout(200);
   }
 
-  async dragHandToBoard(handZone: "#blueHand" | "#redHand", boardZone: "#blueBoard" | "#redBoard", handIndex = 0): Promise<void> {
+  async dragHandToBoard(
+    handZone: "#blueHand" | "#redHand",
+    boardZone: "#blueBoard" | "#redBoard",
+    handIndex = 0,
+  ): Promise<void> {
     await this.dragLocatorToLocator(
       this.page.locator(SEL.handCardByIndex(handZone, handIndex)),
       this.page.locator(boardZone),
     );
   }
 
-  async dragAttackerToTarget(attackerBoard: "#blueBoard" | "#redBoard", attackerIndex: number, target: Locator): Promise<void> {
+  async dragAttackerToTarget(
+    attackerBoard: "#blueBoard" | "#redBoard",
+    attackerIndex: number,
+    target: Locator,
+  ): Promise<void> {
     await this.dragLocatorToLocator(
       this.page.locator(SEL.boardCardByIndex(attackerBoard, attackerIndex)),
       target,
     );
   }
 
-  async dragEvoToFollower(evoBtn: "#blueNormalEvo" | "#blueSuperEvo" | "#redNormalEvo" | "#redSuperEvo", boardZone: "#blueBoard" | "#redBoard", index = 0): Promise<void> {
-    await this.dragLocatorToLocator(this.page.locator(evoBtn), this.page.locator(SEL.boardCardByIndex(boardZone, index)));
+  async dragEvoToFollower(
+    evoBtn:
+      | "#blueNormalEvo"
+      | "#blueSuperEvo"
+      | "#redNormalEvo"
+      | "#redSuperEvo",
+    boardZone: "#blueBoard" | "#redBoard",
+    index = 0,
+  ): Promise<void> {
+    await this.dragLocatorToLocator(
+      this.page.locator(evoBtn),
+      this.page.locator(SEL.boardCardByIndex(boardZone, index)),
+    );
   }
 
-  async clickSelectableBoard(zone: "#blueBoard" | "#redBoard", nth = 0): Promise<void> {
+  async clickSelectableBoard(
+    zone: "#blueBoard" | "#redBoard",
+    nth = 0,
+  ): Promise<void> {
     await this.page.locator(`${zone} ${SEL.cardSelectable}`).nth(nth).click();
   }
 
-  async clickSelectableHand(zone: "#blueHand" | "#redHand", nth = 0): Promise<void> {
-    await this.page.locator(`${zone} ${SEL.cardSelectable}`).nth(nth).click({ force: true });
+  async clickSelectableHand(
+    zone: "#blueHand" | "#redHand",
+    nth = 0,
+  ): Promise<void> {
+    await this.page
+      .locator(`${zone} ${SEL.cardSelectable}`)
+      .nth(nth)
+      .click({ force: true });
   }
 
-  async fuseWithHandPartner(zone: "#blueHand" | "#redHand", partnerIndex: number): Promise<void> {
+  async fuseWithHandPartner(
+    zone: "#blueHand" | "#redHand",
+    partnerIndex: number,
+  ): Promise<void> {
     const partnerSel = SEL.handCardByIndex(zone, partnerIndex);
     const confirmSel = `${SEL.targetingConfirmation} .confirm-targets-btn`;
     await this.page.waitForFunction(
       ([p, c]) => {
         const el = document.querySelector(p);
-        return el?.classList.contains("selectable") || !!document.querySelector(c);
+        return (
+          el?.classList.contains("selectable") || !!document.querySelector(c)
+        );
       },
       [partnerSel, confirmSel],
       { timeout: 10_000 },
@@ -253,15 +307,24 @@ export class SvwbPage {
   }
 
   async clickLeader(side: "blue" | "red"): Promise<void> {
-    await this.page.locator(side === "blue" ? SEL.blueLeader : SEL.redLeader).click();
+    await this.page
+      .locator(side === "blue" ? SEL.blueLeader : SEL.redLeader)
+      .click();
   }
 
-  async engageBoardCard(zone: "#blueBoard" | "#redBoard", index = 0): Promise<void> {
-    await this.page.locator(SEL.boardCardByIndex(zone, index)).click({ button: "right" });
+  async engageBoardCard(
+    zone: "#blueBoard" | "#redBoard",
+    index = 0,
+  ): Promise<void> {
+    await this.page
+      .locator(SEL.boardCardByIndex(zone, index))
+      .click({ button: "right" });
   }
 
   async endTurn(side: "blue" | "red"): Promise<void> {
-    await this.page.locator(side === "blue" ? SEL.endTurnBlue : SEL.endTurnRed).click();
+    await this.page
+      .locator(side === "blue" ? SEL.endTurnBlue : SEL.endTurnRed)
+      .click();
   }
 
   async useBonusPP(): Promise<void> {
@@ -269,16 +332,22 @@ export class SvwbPage {
   }
 
   async confirmMulligan(side: "blue" | "red"): Promise<void> {
-    const id = side === "blue" ? SEL.blueMulliganConfirm : SEL.redMulliganConfirm;
+    const id =
+      side === "blue" ? SEL.blueMulliganConfirm : SEL.redMulliganConfirm;
     await this.page.locator(id).click();
   }
 
-  async toggleMulliganCard(zone: "#blueHand" | "#redHand", index: number): Promise<void> {
+  async toggleMulliganCard(
+    zone: "#blueHand" | "#redHand",
+    index: number,
+  ): Promise<void> {
     await this.page.locator(SEL.handCardByIndex(zone, index)).click();
   }
 
   async confirmTargets(): Promise<void> {
-    const btn = this.page.locator(`${SEL.targetingConfirmation} button`).first();
+    const btn = this.page
+      .locator(`${SEL.targetingConfirmation} button`)
+      .first();
     if (await btn.isVisible()) await btn.click();
   }
 
@@ -286,7 +355,11 @@ export class SvwbPage {
     await this.page.locator(".choice-modal .choice-option").nth(index).click();
   }
 
-  async startGame(seed: number, deckA = "starter_deck", deckB = "starter_deck"): Promise<void> {
+  async startGame(
+    seed: number,
+    deckA = "starter_deck",
+    deckB = "starter_deck",
+  ): Promise<void> {
     await this.page.locator(SEL.seedInput).fill(String(seed));
     await this.page.locator(SEL.startGameBtn).click();
     await this.page.waitForFunction(() => {
@@ -295,13 +368,18 @@ export class SvwbPage {
     });
   }
 
-  private async dragLocatorToLocator(source: Locator, target: Locator): Promise<void> {
+  private async dragLocatorToLocator(
+    source: Locator,
+    target: Locator,
+  ): Promise<void> {
     const s = await source.boundingBox();
     const t = await target.boundingBox();
     if (!s || !t) throw new Error("drag targets not visible");
     await this.page.mouse.move(s.x + s.width / 2, s.y + s.height / 2);
     await this.page.mouse.down();
-    await this.page.mouse.move(t.x + t.width / 2, t.y + t.height / 2, { steps: 12 });
+    await this.page.mouse.move(t.x + t.width / 2, t.y + t.height / 2, {
+      steps: 12,
+    });
     await this.page.mouse.up();
   }
 }

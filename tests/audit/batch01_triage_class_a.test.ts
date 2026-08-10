@@ -38,7 +38,11 @@ import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { getHP, getBoard, getPlaysThisTurn } from "../../src/core/playerHelpers.js";
+import {
+  getHP,
+  getBoard,
+  getPlaysThisTurn,
+} from "../../src/core/playerHelpers.js";
 import { isOverflow } from "../../src/helpers/overflow.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -71,7 +75,9 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
 
   it("Arms Peddler — Last Words draws 1 card", () => {
     givenGameState({ seed: 1 })
-      .withFirstDeck([{ name: "DeckCard", type: "Follower", attack: 1, defense: 1 }])
+      .withFirstDeck([
+        { name: "DeckCard", type: "Follower", attack: 1, defense: 1 },
+      ])
       .build();
 
     const peddler = createCard("10021120", "board", "first");
@@ -88,8 +94,20 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
     givenGameState({ seed: 1, activePlayer: "first" })
       .withFirstHand(["10021310", { name: "ToReturn", type: "Spell", cost: 1 }])
       .withFirstDeck([
-        { name: "SwordFollower", type: "Follower", class: "Swordcraft", attack: 1, defense: 1 },
-        { name: "SwordFollower2", type: "Follower", class: "Swordcraft", attack: 1, defense: 1 },
+        {
+          name: "SwordFollower",
+          type: "Follower",
+          class: "Swordcraft",
+          attack: 1,
+          defense: 1,
+        },
+        {
+          name: "SwordFollower2",
+          type: "Follower",
+          class: "Swordcraft",
+          attack: 1,
+          defense: 1,
+        },
       ])
       .withFirstPP(10, 10)
       .build();
@@ -97,13 +115,17 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
     whenPlayCard("first", 0);
     resolvePendingTarget(state.players.first.hand[0]!.uid);
 
-    expect(thenHand("first").filter((c) => c.type === "Follower")).toHaveLength(2);
+    expect(thenHand("first").filter((c) => c.type === "Follower")).toHaveLength(
+      2,
+    );
   });
 
   it("Witch's New Brew — Fanfare draws 1 card", () => {
     givenGameState({ seed: 1, activePlayer: "first" })
       .withFirstHand(["10031210"])
-      .withFirstDeck([{ name: "Drawn", type: "Follower", attack: 1, defense: 1 }])
+      .withFirstDeck([
+        { name: "Drawn", type: "Follower", attack: 1, defense: 1 },
+      ])
       .withFirstPP(5, 5)
       .build();
 
@@ -213,7 +235,9 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
       .build();
 
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Vastwing Dragon")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Vastwing Dragon")).toBe(
+      true,
+    );
   });
 
   it("Night Fiend — Fanfare deals 1 to your leader", () => {
@@ -278,7 +302,9 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
       .build();
 
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Gear of Ambition")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Gear of Ambition")).toBe(
+      true,
+    );
   });
 
   it("Puppet Lancer — Fanfare adds Enhanced Puppet", () => {
@@ -288,7 +314,9 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
       .build();
 
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Enhanced Puppet")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Enhanced Puppet")).toBe(
+      true,
+    );
   });
 
   it("Bullet from Beyond — destroys enemy follower and adds both gears", () => {
@@ -309,8 +337,12 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
     resolvePendingTarget("bullet_victim");
 
     expect(getBoard(state, "second")).toHaveLength(0);
-    expect(thenHand("first").some((c) => c.name === "Gear of Ambition")).toBe(true);
-    expect(thenHand("first").some((c) => c.name === "Gear of Remembrance")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Gear of Ambition")).toBe(
+      true,
+    );
+    expect(
+      thenHand("first").some((c) => c.name === "Gear of Remembrance"),
+    ).toBe(true);
   });
 
   it("Electric Whip Lass — Fanfare adds Gear of Remembrance", () => {
@@ -320,7 +352,9 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
       .build();
 
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Gear of Remembrance")).toBe(true);
+    expect(
+      thenHand("first").some((c) => c.name === "Gear of Remembrance"),
+    ).toBe(true);
   });
 });
 
@@ -338,10 +372,14 @@ describe("Puppet Theater — migrated audit (owner: countdown + EOT puppet)", ()
       .build();
 
     whenPlayCard("first", 0);
-    const afterFanfare = thenHand("first").filter((c) => c.name === "Puppet").length;
+    const afterFanfare = thenHand("first").filter(
+      (c) => c.name === "Puppet",
+    ).length;
     expect(afterFanfare).toBeGreaterThanOrEqual(1);
 
     whenEndTurn();
-    expect(thenHand("first").filter((c) => c.name === "Puppet").length).toBeGreaterThan(afterFanfare);
+    expect(
+      thenHand("first").filter((c) => c.name === "Puppet").length,
+    ).toBeGreaterThan(afterFanfare);
   });
 });

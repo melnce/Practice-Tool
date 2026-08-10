@@ -30,8 +30,16 @@ describe("GameState Validation", () => {
   it("detects duplicate UIDs in zones (H1 invariant)", () => {
     resetGameState(1);
     // Use the same UID for both cards - this should trigger H1 violation
-    const card1 = { uid: "duplicate-uid", name: "Card1", instanceId: 100 } as any;
-    const card2 = { uid: "duplicate-uid", name: "Card2", instanceId: 101 } as any;
+    const card1 = {
+      uid: "duplicate-uid",
+      name: "Card1",
+      instanceId: 100,
+    } as any;
+    const card2 = {
+      uid: "duplicate-uid",
+      name: "Card2",
+      instanceId: 101,
+    } as any;
 
     state.players.first.hand.push(card1);
     state.players.second.board.push(card2);
@@ -67,6 +75,8 @@ describe("GameState Validation", () => {
 
     const result = validateGameState(brokenState);
     expect(result.valid).toBe(false);
-    expect(result.issues[0]).toContain("H3: Missing or invalid array: players.first.deck");
+    expect(result.issues[0]).toContain(
+      "H3: Missing or invalid array: players.first.deck",
+    );
   });
 });

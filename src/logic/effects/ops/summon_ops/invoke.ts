@@ -62,18 +62,3 @@ export function handleInvoke(owner: Player, card: CardInstance): boolean {
     return false;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

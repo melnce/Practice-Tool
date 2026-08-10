@@ -40,7 +40,10 @@ describe("Bane vs Barrier Interaction", () => {
     };
     const f = makeCardFromDB(template, owner);
     Object.assign(f, traits);
-    const board = owner === "first" ? state.players.first.board : state.players.second.board;
+    const board =
+      owner === "first"
+        ? state.players.first.board
+        : state.players.second.board;
     pushToBoard(board, owner, f);
     return f;
   };
@@ -78,13 +81,8 @@ describe("Bane vs Barrier Interaction", () => {
 
     // Bane should destroy it.
     const defenderIsDead =
-      (defender.defense as number) <= 0 || !state.players.second.board.includes(defender);
+      (defender.defense as number) <= 0 ||
+      !state.players.second.board.includes(defender);
     expect(defenderIsDead).toBe(true);
   });
 });
-
-
-
-
-
-

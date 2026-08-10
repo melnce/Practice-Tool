@@ -2,7 +2,11 @@
 import { state } from "../../../core/gameState.js";
 import { logEvent } from "../../../core/logger.js";
 import type { Player, CardInstance } from "../../../core/types/index.js";
-import { getBoard, getGraveyard, addShadows } from "../../../core/playerHelpers.js";
+import {
+  getBoard,
+  getGraveyard,
+  addShadows,
+} from "../../../core/playerHelpers.js";
 
 function board(owner: Player) {
   return getBoard(state, owner);
@@ -49,18 +53,3 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
   }
   return false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

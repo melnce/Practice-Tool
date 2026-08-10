@@ -20,7 +20,10 @@ function trackConsole(page: Page) {
 
 async function shot(page: Page, name: string) {
   fs.mkdirSync(OUT, { recursive: true });
-  await page.screenshot({ path: path.join(OUT, `${name}.png`), fullPage: true });
+  await page.screenshot({
+    path: path.join(OUT, `${name}.png`),
+    fullPage: true,
+  });
 }
 
 async function loadDb(page: Page) {
@@ -34,9 +37,8 @@ async function setupTargetingScenario(page: Page) {
   await page.evaluate(async () => {
     const { resetGameState, state } = await import("/src/core/gameState.ts");
     const { getCardById } = await import("/src/data/cardDatabase.ts");
-    const { applyKeywordsFromList } = await import(
-      "/src/logic/core/keywords.ts"
-    );
+    const { applyKeywordsFromList } =
+      await import("/src/logic/core/keywords.ts");
     const { render } = await import("/src/ui/render.ts");
 
     resetGameState(99);
@@ -73,7 +75,9 @@ test.describe("Interactive play paths", () => {
     fs.mkdirSync(OUT, { recursive: true });
   });
 
-  test("full start-game flow with test deck (god mode visible)", async ({ page }) => {
+  test("full start-game flow with test deck (god mode visible)", async ({
+    page,
+  }) => {
     const errors = trackConsole(page);
     await page.goto(BASE);
     await page.waitForLoadState("networkidle");
@@ -85,9 +89,9 @@ test.describe("Interactive play paths", () => {
     await page.waitForTimeout(1500);
     await shot(page, "start-game-01");
 
-    const godVisible = await page.locator("#blueGodMode").evaluate(
-      (el) => (el as HTMLElement).style.display !== "none",
-    );
+    const godVisible = await page
+      .locator("#blueGodMode")
+      .evaluate((el) => (el as HTMLElement).style.display !== "none");
     expect(godVisible).toBe(true);
 
     const phase = await page.evaluate(async () => {
@@ -99,7 +103,9 @@ test.describe("Interactive play paths", () => {
     expect(errors).toEqual([]);
   });
 
-  test("targeted spell via right-click play + board click", async ({ page }) => {
+  test("targeted spell via right-click play + board click", async ({
+    page,
+  }) => {
     const errors = trackConsole(page);
     await page.goto(BASE);
     await loadDb(page);
@@ -116,7 +122,7 @@ test.describe("Interactive play paths", () => {
       ),
     ).toBe(true);
 
-    await page.locator('#redBoard .card.selectable').first().click();
+    await page.locator("#redBoard .card.selectable").first().click();
     await page.waitForTimeout(200);
     await shot(page, "targeted-spell-03-resolved");
 
@@ -138,9 +144,8 @@ test.describe("Interactive play paths", () => {
     await page.evaluate(async () => {
       const { resetGameState, state } = await import("/src/core/gameState.ts");
       const { getCardById } = await import("/src/data/cardDatabase.ts");
-      const { applyKeywordsFromList } = await import(
-        "/src/logic/core/keywords.ts"
-      );
+      const { applyKeywordsFromList } =
+        await import("/src/logic/core/keywords.ts");
       const { render } = await import("/src/ui/render.ts");
 
       resetGameState(7);
@@ -174,12 +179,12 @@ test.describe("Interactive play paths", () => {
     await page.waitForTimeout(200);
     await shot(page, "select-op-01-pending");
 
-    const selectable = await page.locator(
-      '#blueBoard .card.selectable',
-    ).count();
+    const selectable = await page
+      .locator("#blueBoard .card.selectable")
+      .count();
     expect(selectable).toBe(1);
 
-    await page.locator('#blueBoard .card.selectable').first().click();
+    await page.locator("#blueBoard .card.selectable").first().click();
     await page.waitForTimeout(200);
     await shot(page, "select-op-02-resolved");
 
@@ -202,9 +207,8 @@ test.describe("Interactive play paths", () => {
     await page.evaluate(async () => {
       const { resetGameState, state } = await import("/src/core/gameState.ts");
       const { getCardById } = await import("/src/data/cardDatabase.ts");
-      const { applyKeywordsFromList } = await import(
-        "/src/logic/core/keywords.ts"
-      );
+      const { applyKeywordsFromList } =
+        await import("/src/logic/core/keywords.ts");
       const { render } = await import("/src/ui/render.ts");
 
       resetGameState(8);
@@ -247,12 +251,12 @@ test.describe("Interactive play paths", () => {
     await shot(page, "ward-spell-01-pending");
 
     // Both enemy followers should be selectable for spells (Ward does not gate spells)
-    const selectableCount = await page.locator(
-      '#redBoard .card.selectable',
-    ).count();
+    const selectableCount = await page
+      .locator("#redBoard .card.selectable")
+      .count();
     expect(selectableCount).toBe(2);
 
-    await page.locator('#redBoard .card.selectable').nth(1).click();
+    await page.locator("#redBoard .card.selectable").nth(1).click();
     await page.waitForTimeout(200);
 
     const pending = await page.evaluate(async () => {
@@ -301,7 +305,9 @@ test.describe("Interactive play paths", () => {
     });
 
     await page.locator("#blueHand .card").first().click({ button: "right" });
-    await expect(page.locator(".choice-modal .choice-option").first()).toBeVisible({
+    await expect(
+      page.locator(".choice-modal .choice-option").first(),
+    ).toBeVisible({
       timeout: 5000,
     });
     await shot(page, "mode-modal-01");
@@ -338,9 +344,8 @@ test.describe("Interactive play paths", () => {
     await page.evaluate(async () => {
       const { resetGameState, state } = await import("/src/core/gameState.ts");
       const { getCardById } = await import("/src/data/cardDatabase.ts");
-      const { applyKeywordsFromList } = await import(
-        "/src/logic/core/keywords.ts"
-      );
+      const { applyKeywordsFromList } =
+        await import("/src/logic/core/keywords.ts");
       const { render } = await import("/src/ui/render.ts");
 
       resetGameState(77);
@@ -379,18 +384,18 @@ test.describe("Interactive play paths", () => {
     await page.waitForTimeout(300);
     await shot(page, "super-evo-01-pending");
 
-    await expect(
-      page.locator('#blueBoard .card.selectable'),
-    ).toBeVisible({
+    await expect(page.locator("#blueBoard .card.selectable")).toBeVisible({
       timeout: 5000,
     });
-    await page.locator('#blueBoard .card.selectable').first().click();
+    await page.locator("#blueBoard .card.selectable").first().click();
     await page.waitForTimeout(300);
     await shot(page, "super-evo-02-resolved");
 
     const result = await page.evaluate(async () => {
       const { state } = await import("/src/core/gameState.ts");
-      const golem = state.players.first.board.find((c) => c?.uid === "golem_uid");
+      const golem = state.players.first.board.find(
+        (c) => c?.uid === "golem_uid",
+      );
       const remi = state.players.first.board.find((c) => c?.uid === "remi_uid");
       return {
         pending: !!state.pendingTargetEffect,
@@ -480,7 +485,9 @@ test.describe("Interactive play paths", () => {
     expect(errors).toEqual([]);
   });
 
-  test("left-click fusable hand card enters fuse selection", async ({ page }) => {
+  test("left-click fusable hand card enters fuse selection", async ({
+    page,
+  }) => {
     const errors = trackConsole(page);
     await page.goto(BASE);
     await loadDb(page);
@@ -534,9 +541,9 @@ test.describe("Interactive play paths", () => {
     expect(fuseState.action).toBe("finalize");
     expect(fuseState.hand).toBe(2);
 
-    const selectablePartners = await page.locator(
-      '#blueHand .card.selectable',
-    ).count();
+    const selectablePartners = await page
+      .locator("#blueHand .card.selectable")
+      .count();
     expect(selectablePartners).toBeGreaterThan(0);
     expect(errors).toEqual([]);
   });

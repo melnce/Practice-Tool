@@ -1,4 +1,8 @@
-import type { CardInstance, Effect, Player } from "../../../core/types/index.js";
+import type {
+  CardInstance,
+  Effect,
+  Player,
+} from "../../../core/types/index.js";
 
 export interface PendingTargetRequest {
   eff: Effect;
@@ -88,18 +92,3 @@ export interface KeywordState {
   // Barrier
   hasBarrier?: boolean;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

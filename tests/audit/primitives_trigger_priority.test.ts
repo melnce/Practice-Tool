@@ -11,7 +11,11 @@ import { state, resetGameState } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
-import { givenGameState, resetUidCounter, createCard } from "../harness/builders.js";
+import {
+  givenGameState,
+  resetUidCounter,
+  createCard,
+} from "../harness/builders.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
 import "./setup.ts";
@@ -74,14 +78,18 @@ describe("C2 — trigger priority (8-source tiers)", () => {
         name: "Reactive Crest",
         owner: "second",
         insertionTs: 1,
-        triggers: [{ event: SYNTH, effects: [{ op: "noop", tag: "REACTIVE_CREST" }] }],
+        triggers: [
+          { event: SYNTH, effects: [{ op: "noop", tag: "REACTIVE_CREST" }] },
+        ],
       },
     ] as any;
 
     fireTrigger(SYNTH as any, "first", {});
 
     expect(effectSpy).toHaveBeenCalledTimes(1);
-    expect(effectSpy.mock.calls[0][0][0]).toMatchObject({ tag: "REACTIVE_CREST" });
+    expect(effectSpy.mock.calls[0][0][0]).toMatchObject({
+      tag: "REACTIVE_CREST",
+    });
   });
 
   it("cross-zone simultaneous triggers resolve hand-before-board (active side)", () => {
@@ -89,7 +97,11 @@ describe("C2 — trigger priority (8-source tiers)", () => {
       { event: SYNTH, effects: [{ op: "noop", tag: "HAND" }], source: "hand" },
     ]);
     const boardCard = stubCard(2, "first", "board", "BOARD", [
-      { event: SYNTH, effects: [{ op: "noop", tag: "BOARD" }], source: "board" },
+      {
+        event: SYNTH,
+        effects: [{ op: "noop", tag: "BOARD" }],
+        source: "board",
+      },
     ]);
     (boardCard as any).insertionTs = 1;
 
@@ -108,7 +120,11 @@ describe("C2 — trigger priority (8-source tiers)", () => {
       { event: SYNTH, effects: [{ op: "noop", tag: "OLD" }], source: "board" },
     ]);
     const young = stubCard(11, "first", "board", "YOUNG", [
-      { event: SYNTH, effects: [{ op: "noop", tag: "YOUNG" }], source: "board" },
+      {
+        event: SYNTH,
+        effects: [{ op: "noop", tag: "YOUNG" }],
+        source: "board",
+      },
     ]);
     (old as any).insertionTs = 1;
     (young as any).insertionTs = 2;
@@ -124,12 +140,20 @@ describe("C2 — trigger priority (8-source tiers)", () => {
   it("full 8-tier ordering: active hand → reactive hand → crests → boards → decks", () => {
     state.players.first.hand = [
       stubCard(1, "first", "hand", "A_HAND", [
-        { event: SYNTH, effects: [{ op: "noop", tag: "A_HAND" }], source: "hand" },
+        {
+          event: SYNTH,
+          effects: [{ op: "noop", tag: "A_HAND" }],
+          source: "hand",
+        },
       ]),
     ];
     state.players.second.hand = [
       stubCard(2, "second", "hand", "R_HAND", [
-        { event: SYNTH, effects: [{ op: "noop", tag: "R_HAND" }], source: "hand" },
+        {
+          event: SYNTH,
+          effects: [{ op: "noop", tag: "R_HAND" }],
+          source: "hand",
+        },
       ]),
     ];
     state.players.first.crests = [
@@ -151,7 +175,11 @@ describe("C2 — trigger priority (8-source tiers)", () => {
     state.players.first.board = [
       Object.assign(
         stubCard(3, "first", "board", "A_BOARD", [
-          { event: SYNTH, effects: [{ op: "noop", tag: "A_BOARD" }], source: "board" },
+          {
+            event: SYNTH,
+            effects: [{ op: "noop", tag: "A_BOARD" }],
+            source: "board",
+          },
         ]),
         { insertionTs: 1 },
       ),
@@ -159,19 +187,31 @@ describe("C2 — trigger priority (8-source tiers)", () => {
     state.players.second.board = [
       Object.assign(
         stubCard(4, "second", "board", "R_BOARD", [
-          { event: SYNTH, effects: [{ op: "noop", tag: "R_BOARD" }], source: "board" },
+          {
+            event: SYNTH,
+            effects: [{ op: "noop", tag: "R_BOARD" }],
+            source: "board",
+          },
         ]),
         { insertionTs: 1 },
       ),
     ];
     state.players.first.deck = [
       stubCard(5, "first", "deck", "A_DECK", [
-        { event: SYNTH, effects: [{ op: "noop", tag: "A_DECK" }], source: "deck" },
+        {
+          event: SYNTH,
+          effects: [{ op: "noop", tag: "A_DECK" }],
+          source: "deck",
+        },
       ]),
     ];
     state.players.second.deck = [
       stubCard(6, "second", "deck", "R_DECK", [
-        { event: SYNTH, effects: [{ op: "noop", tag: "R_DECK" }], source: "deck" },
+        {
+          event: SYNTH,
+          effects: [{ op: "noop", tag: "R_DECK" }],
+          source: "deck",
+        },
       ]),
     ];
 

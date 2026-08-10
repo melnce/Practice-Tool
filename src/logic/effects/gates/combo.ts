@@ -2,7 +2,10 @@
 import { state } from "../../../core/gameState.js";
 import { logEvent } from "../../../core/logger.js";
 import type { Player } from "../../../core/types/index.js";
-import { getPlaysThisTurn, setPlaysThisTurn } from "../../../core/playerHelpers.js";
+import {
+  getPlaysThisTurn,
+  setPlaysThisTurn,
+} from "../../../core/playerHelpers.js";
 
 interface ComboEffect {
   amount?: number;
@@ -39,18 +42,3 @@ export function handleComboGate(
 
   return "done";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

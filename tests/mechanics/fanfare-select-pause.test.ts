@@ -37,10 +37,15 @@ describe("Fanfare select pause", () => {
     expect(outcome.kind).toBe("paused");
     expect(state.pendingTargetEffect).toBeDefined();
 
-    const marion = getBoard(state, "first").find((c) => c.name?.includes("Marion"));
+    const marion = getBoard(state, "first").find((c) =>
+      c.name?.includes("Marion"),
+    );
     expect(marion).toBeDefined();
 
-    dispatch(state, { type: "CHOOSE_TARGET", target: { type: "card", uid: ally.uid } });
+    dispatch(state, {
+      type: "CHOOSE_TARGET",
+      target: { type: "card", uid: ally.uid },
+    });
 
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(Number(ally.attack)).toBeGreaterThan(1);

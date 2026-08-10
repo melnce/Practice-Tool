@@ -55,18 +55,3 @@ export interface NormalizedCardFilter {
 }
 
 export type CardPredicate = (card: CardInstance) => boolean;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -211,10 +211,7 @@ export function createCardViewModel(
       targets.some((t: { uid?: string }) => t?.uid === card.uid)
     ) {
       isSelected = true;
-    } else if (
-      Array.isArray(targetUids) &&
-      targetUids.includes(card.uid)
-    ) {
+    } else if (Array.isArray(targetUids) && targetUids.includes(card.uid)) {
       isSelected = true;
     }
   }
@@ -254,17 +251,3 @@ export function createCardViewModel(
     isMulliganSelected: !!card.__mulliganSelected,
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

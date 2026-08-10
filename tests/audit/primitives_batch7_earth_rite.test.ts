@@ -15,8 +15,7 @@ import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
-  const uid =
-    pending?.poolUids?.[0] ?? String(pending?.pool?.[0]?.uid ?? "");
+  const uid = pending?.poolUids?.[0] ?? String(pending?.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 import { state } from "../../src/core/gameState.js";

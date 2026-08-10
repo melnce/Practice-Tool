@@ -9,18 +9,26 @@ import { toUids, toUid } from "../../../core/uidResolver.js";
 /**
  * Sets the pending target selection state.
  * This is the ONLY approved way for ops to initiate target selection.
- * 
+ *
  * Auto-populates UID fields from object refs if not provided.
  *
  * @param request - The selection request specification
  */
-export function setPendingTarget(request: Partial<PendingTargetRequest> & { eff: any; owner: any; selectCount: number }): void {
+export function setPendingTarget(
+  request: Partial<PendingTargetRequest> & {
+    eff: any;
+    owner: any;
+    selectCount: number;
+  },
+): void {
   // Auto-populate UID fields from object refs if not provided
   const normalized: any = { ...request };
 
   // Ensure targetUids exists (default empty)
   if (!normalized.targetUids) {
-    normalized.targetUids = normalized.targets ? toUids(normalized.targets) : [];
+    normalized.targetUids = normalized.targets
+      ? toUids(normalized.targets)
+      : [];
   }
 
   // Ensure poolUids exists
@@ -59,18 +67,3 @@ export function getPendingTarget(): PendingTargetRequest | null {
 export function isPendingTarget(): boolean {
   return !!state.pendingTargetEffect;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

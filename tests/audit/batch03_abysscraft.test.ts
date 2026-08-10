@@ -55,9 +55,7 @@ const R15 = 15;
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -73,8 +71,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck) b = b.withFirstDeck(opts.deck);
   if (opts.shadows !== undefined) b = b.withFirstShadows(opts.shadows);
@@ -142,9 +143,9 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
       createCard("10151130", "graveyard", "first"),
     );
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Little Miss Bonemancer")).toBe(
-      true,
-    );
+    expect(
+      thenBoard("first").some((c) => c.name === "Little Miss Bonemancer"),
+    ).toBe(true);
   });
 
   it("Darkseal Demon — Fanfare draw 2 and 2 damage to your leader; Evolve 6 to selected enemy", () => {
@@ -287,7 +288,8 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
       mukan,
     );
     const departed = thenBoard("first").find(
-      (c) => c.tribes?.includes("Departed") && c.name === "Little Miss Bonemancer",
+      (c) =>
+        c.tribes?.includes("Departed") && c.name === "Little Miss Bonemancer",
     );
     expect(departed?.hasBane).toBe(true);
   });
@@ -418,7 +420,9 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
   it("Undead Soldier — Fanfare summons 2 Rotting Zombies", () => {
     setupTurn(R8, { hand: ["10252120"], pp: 7 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").filter((c) => c.name === "Rotting Zombie").length).toBe(2);
+    expect(
+      thenBoard("first").filter((c) => c.name === "Rotting Zombie").length,
+    ).toBe(2);
   });
 
   it("Winged Servants — summons a Bat", () => {
@@ -472,7 +476,9 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
       createCard("10151120", "graveyard", "first"),
     );
     whenPlayCard("first", 0);
-    const departed = thenBoard("first").filter((c) => c.tribes?.includes("Departed"));
+    const departed = thenBoard("first").filter((c) =>
+      c.tribes?.includes("Departed"),
+    );
     expect(departed.length).toBeGreaterThanOrEqual(1);
     expect(departed.every((c) => c.hasWard)).toBe(true);
   });
@@ -503,7 +509,9 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
     resolvePendingTarget(String(b.uid));
     expect(getBoard(state, "second")).toHaveLength(0);
     expect(getHP(state, "first")).toBe(16);
-    expect(findOnBoard("first", "Ephemeral Demon Princess")?.hasStorm).toBe(true);
+    expect(findOnBoard("first", "Ephemeral Demon Princess")?.hasStorm).toBe(
+      true,
+    );
   });
 
   it("March of the Brutes — damages all enemy followers twice", () => {
@@ -538,7 +546,8 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
       pp: 3,
       deck: [{ name: "Top", type: "Follower", attack: 1, defense: 1 }],
     });
-    const drawFx = (getCardById("10352210")!.fanfare![0] as any).options[0].effects;
+    const drawFx = (getCardById("10352210")!.fanfare![0] as any).options[0]
+      .effects;
     runEffects(drawFx, "first", null);
     expect(thenHand("first").some((c) => c.name === "Top")).toBe(true);
   });
@@ -546,8 +555,13 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
   it("Congregant of Entwining — Fanfare mode 1 summons copy with Rush on both", () => {
     setupTurn(R6, { hand: ["10353110"], pp: 6 });
     whenPlayCard("first", 0);
-    const mode1 = (getCardById("10353110")!.fanfare![0] as any).options[0].effects;
-    runEffects(mode1, "first", findOnBoard("first", "Congregant of Entwining")!);
+    const mode1 = (getCardById("10353110")!.fanfare![0] as any).options[0]
+      .effects;
+    runEffects(
+      mode1,
+      "first",
+      findOnBoard("first", "Congregant of Entwining")!,
+    );
     const copies = thenBoard("first").filter(
       (c) => c.name === "Congregant of Entwining",
     );
@@ -560,7 +574,8 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
     whenPlayCard("first", 0);
     const handNames = thenHand("first").map((c) => c.name);
     expect(
-      handNames.includes("Scream Diffusion") || handNames.includes("Wings of Desire"),
+      handNames.includes("Scream Diffusion") ||
+        handNames.includes("Wings of Desire"),
     ).toBe(true);
   });
 });
@@ -589,8 +604,10 @@ describe("Batch 3 — Abysscraft [10004] Skybound Dragons", () => {
     expect(vas.hasIntimidate).toBe(true);
     vas.defense = 0;
     cleanupDead();
-    expect(thenBoard("first").filter((c) => c.name === "Vaseraga, Unyielding Scythe").length)
-      .toBe(1);
+    expect(
+      thenBoard("first").filter((c) => c.name === "Vaseraga, Unyielding Scythe")
+        .length,
+    ).toBe(1);
     expect(getHP(state, "first")).toBe(18);
   });
 
@@ -599,9 +616,9 @@ describe("Batch 3 — Abysscraft [10004] Skybound Dragons", () => {
     state.players.first.hp = 20;
     whenPlayCard("first", 0);
     expect(getHP(state, "first")).toBe(18);
-    expect(getCrests(state, "first").some((c) => c.name?.includes("Valiant Edge"))).toBe(
-      true,
-    );
+    expect(
+      getCrests(state, "first").some((c) => c.name?.includes("Valiant Edge")),
+    ).toBe(true);
   });
 
   it("Satyr — Fanfare evolves when an evolved ally is on field", () => {
@@ -614,7 +631,9 @@ describe("Batch 3 — Abysscraft [10004] Skybound Dragons", () => {
     evolved.hasEvolved = true;
     state.players.first.board = [evolved];
     whenPlayCard("first", 0);
-    expect(findOnBoard("first", "Satyr, Open-Hearted Rover")?.hasEvolved).toBe(true);
+    expect(findOnBoard("first", "Satyr, Open-Hearted Rover")?.hasEvolved).toBe(
+      true,
+    );
   });
 
   it("Baal — Fanfare mode buffs Baal and another ally +1/+1", () => {
@@ -627,7 +646,8 @@ describe("Batch 3 — Abysscraft [10004] Skybound Dragons", () => {
     state.players.first.board = [ally];
     const baal = createCard("10452130", "board", "first");
     state.players.first.board.push(baal);
-    const mode1 = (getCardById("10452130")!.fanfare![0] as any).options[0].effects;
+    const mode1 = (getCardById("10452130")!.fanfare![0] as any).options[0]
+      .effects;
     runEffects(mode1, "first", baal);
     expect(baal.attack).toBe(3);
     expect(ally.attack).toBe(3);
@@ -711,8 +731,8 @@ describe("Batch 3 — Abysscraft [10004] Skybound Dragons", () => {
     whenPlayCard("first", 0);
     expect(ally.defense).toBe(0);
     expect(e.defense).toBe(0);
-    expect(findOnBoard("first", "Belial, Archangel of Cunning")?.defense).toBeGreaterThan(
-      0,
-    );
+    expect(
+      findOnBoard("first", "Belial, Archangel of Cunning")?.defense,
+    ).toBeGreaterThan(0);
   });
 });

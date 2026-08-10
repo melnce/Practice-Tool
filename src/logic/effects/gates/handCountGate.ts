@@ -14,8 +14,7 @@ import { getHand, opponentOf } from "../../../core/playerHelpers.js";
  */
 export function handCountGate(owner: Player, eff: any) {
   const cond = eff?.condition || {};
-  const side =
-    cond.owner === "opponent" ? opponentOf(owner) : owner;
+  const side = cond.owner === "opponent" ? opponentOf(owner) : owner;
 
   const n = getHand(state, side)?.length || 0;
 
@@ -39,18 +38,3 @@ export function handCountGate(owner: Player, eff: any) {
       return false;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

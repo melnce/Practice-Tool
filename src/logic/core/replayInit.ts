@@ -5,7 +5,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { state, resetStateInstance } from "../../core/gameState.js";
-import type { CardInstance, GameState, Player } from "../../core/types/index.js";
+import type {
+  CardInstance,
+  GameState,
+  Player,
+} from "../../core/types/index.js";
 import { drawCard } from "../../core/utils.js";
 import {
   getCardDetails,
@@ -236,18 +240,3 @@ export function setPP(player: Player, current: number, max?: number): void {
   setPPHelper(state, player, current);
   setMaxPP(state, player, max ?? current);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

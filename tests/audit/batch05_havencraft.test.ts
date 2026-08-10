@@ -53,9 +53,7 @@ const R10 = 10;
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -69,8 +67,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -178,7 +179,9 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     whenPlayCard("first", 0);
     const reno = findOnBoard("first", "Reno, Luxwing Featherfolk")!;
     const clashFx = (reno.triggers ?? []).find((t: any) => t.event === "clash");
-    runEffects((clashFx as any).effects, "first", reno, { defender: enemyFollower(3) });
+    runEffects((clashFx as any).effects, "first", reno, {
+      defender: enemyFollower(3),
+    });
     expect(getHP(state, "second")).toBe(19);
 
     resetUidCounter();
@@ -224,7 +227,9 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     expect(pact.countdown).toBe(1);
     pact.countdown = 0;
     cleanupDead();
-    expect(thenBoard("first").some((c) => c.name === "Holyflame Tiger")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Holyflame Tiger")).toBe(
+      true,
+    );
   });
 
   it("Unholy Vessel — Engage destroys all followers", () => {
@@ -436,7 +441,15 @@ describe("Batch 5 — Havencraft [10003] Heirs of the Omen", () => {
     expect(knight.hasWard).toBe(true);
     state.players.first.hp = 18;
     runEffects(
-      [{ op: "stat", action: "give", target: "self", attack: 1, defense: 0 } as any],
+      [
+        {
+          op: "stat",
+          action: "give",
+          target: "self",
+          attack: 1,
+          defense: 0,
+        } as any,
+      ],
       "first",
       knight,
     );

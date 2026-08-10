@@ -19,13 +19,25 @@ import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
 import type { CardInstance } from "../../../../core/types/index.js";
-import { getHand, getGraveyard, getBoard, addShadows, getHP, setHP, opponentOf } from "../../../../core/playerHelpers.js";
+import {
+  getHand,
+  getGraveyard,
+  getBoard,
+  addShadows,
+  getHP,
+  setHP,
+  opponentOf,
+} from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 import type {
   TargetedOpContext,
   DispatchResult,
 } from "../../../core/targeting/types.js";
-import { startDispatch, endDispatch, runWithBypass } from "../../../core/targeting/guards.js";
+import {
+  startDispatch,
+  endDispatch,
+  runWithBypass,
+} from "../../../core/targeting/guards.js";
 type TargetedOpHandler = (ctx: TargetedOpContext) => DispatchResult;
 const TARGETED_OP_HANDLERS: Map<string, TargetedOpHandler> = new Map();
 
@@ -125,7 +137,8 @@ TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
     for (const target of targets) {
       for (const kw of keywordsToRemove) {
         const name = (typeof kw === "string" ? kw : kw?.name) || "";
-        if (name) handleRemoveKeyword({ keywords: [name] } as any, owner, [target]);
+        if (name)
+          handleRemoveKeyword({ keywords: [name] } as any, owner, [target]);
       }
     }
   } else {
@@ -390,7 +403,12 @@ TARGETED_OP_HANDLERS.set("evolve", (ctx) => {
 
   for (const target of targets) {
     if (!target || target.type !== "Follower" || target.hasEvolved) continue;
-    if (sourceCard && (eff as any).filter?.not_self && target.uid === sourceCard.uid) continue;
+    if (
+      sourceCard &&
+      (eff as any).filter?.not_self &&
+      target.uid === sourceCard.uid
+    )
+      continue;
 
     handleEvolveSelf(target, owner, { mode, spendPoint: false });
     logEvent("evolve", { owner, target: target.name, mode });
@@ -537,25 +555,28 @@ TARGETED_OP_HANDLERS.set("select_hand_summon_artifact_copy", (ctx) => {
 });
 
 // Handler for summoning copies from hand with EOT destroy (Doomwright Resurgence)
-TARGETED_OP_HANDLERS.set("select_hand_summon_artifact_copies_eot_destroy", (ctx) => {
-  const { owner, targetUids } = ctx;
-  const targets = resolveUids(targetUids);
+TARGETED_OP_HANDLERS.set(
+  "select_hand_summon_artifact_copies_eot_destroy",
+  (ctx) => {
+    const { owner, targetUids } = ctx;
+    const targets = resolveUids(targetUids);
 
-  for (const target of targets) {
-    const copy = summonExactCopyFromHand(target, owner, "right");
-    if (copy) {
-      // Grant "destroy at end of opponent's turn" trigger
-      if (!Array.isArray(copy.triggers)) {
-        copy.triggers = [];
+    for (const target of targets) {
+      const copy = summonExactCopyFromHand(target, owner, "right");
+      if (copy) {
+        // Grant "destroy at end of opponent's turn" trigger
+        if (!Array.isArray(copy.triggers)) {
+          copy.triggers = [];
+        }
+        copy.triggers.push({
+          type: "end_of_turn",
+          condition: { whose_turn: "opponent" },
+          effects: [{ op: "destroy", target: "self" }],
+        } as any);
       }
-      copy.triggers.push({
-        type: "end_of_turn",
-        condition: { whose_turn: "opponent" },
-        effects: [{ op: "destroy", target: "self" }],
-      } as any);
     }
-  }
 
-  cleanupDead();
-  return { kind: "handled" };
-});
+    cleanupDead();
+    return { kind: "handled" };
+  },
+);

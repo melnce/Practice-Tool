@@ -84,9 +84,9 @@ describe("hand trigger zone scope", () => {
 
     expect(Number(blocker.attack)).toBe(2);
     expect(Number(blocker.defense)).toBe(5);
-    expect(getHand(state, "first").some((c) => c.name?.includes("Fediel"))).toBe(
-      true,
-    );
+    expect(
+      getHand(state, "first").some((c) => c.name?.includes("Fediel")),
+    ).toBe(true);
   });
 
   it("hand-scoped EOT trigger still fires from hand", () => {

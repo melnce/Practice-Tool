@@ -109,9 +109,15 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
 
       onEvolve(onBoard, "first", "super");
 
-      const rustyInHand = getHand(state, "first").filter((c) => c.name === "Rusty, Luxcard Trickster");
+      const rustyInHand = getHand(state, "first").filter(
+        (c) => c.name === "Rusty, Luxcard Trickster",
+      );
       expect(rustyInHand.length).toBe(handBefore + deckBefore);
-      expect(getGraveyard(state, "first").filter((c) => c.name === "Rusty, Luxcard Trickster")).toHaveLength(1);
+      expect(
+        getGraveyard(state, "first").filter(
+          (c) => c.name === "Rusty, Luxcard Trickster",
+        ),
+      ).toHaveLength(1);
 
       const deckDrawn = rustyInHand.filter((c) => !handUidsBefore.has(c.uid));
       expect(deckDrawn.length).toBe(deckBefore);
@@ -155,7 +161,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
     it("9 max PP → gain 1 → 10 max PP draws a card", () => {
       givenGameState({ seed: 1, activePlayer: "first", roundCount: 9 })
         .withFirstHand([DRAGONSIGN])
-        .withFirstDeck([{ name: "DrawMe", type: "Follower", attack: 1, defense: 1 }])
+        .withFirstDeck([
+          { name: "DrawMe", type: "Follower", attack: 1, defense: 1 },
+        ])
         .withFirstPP(10, 9)
         .build();
 
@@ -170,7 +178,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
     it("already at 10 max PP still draws (owner: at 10 only draw)", () => {
       givenGameState({ seed: 1, activePlayer: "first", roundCount: 10 })
         .withFirstHand([DRAGONSIGN])
-        .withFirstDeck([{ name: "DrawMe", type: "Follower", attack: 1, defense: 1 }])
+        .withFirstDeck([
+          { name: "DrawMe", type: "Follower", attack: 1, defense: 1 },
+        ])
         .withFirstPP(10, 10)
         .build();
 
@@ -183,7 +193,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
     it("8 max PP → 9 does not draw (turn 8, no ramp)", () => {
       givenGameState({ seed: 1, activePlayer: "first", roundCount: 8 })
         .withFirstHand([DRAGONSIGN])
-        .withFirstDeck([{ name: "DrawMe", type: "Follower", attack: 1, defense: 1 }])
+        .withFirstDeck([
+          { name: "DrawMe", type: "Follower", attack: 1, defense: 1 },
+        ])
         .withFirstPP(10, 8)
         .build();
 
@@ -307,7 +319,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
 
       expect(getBoard(state, "second")).toHaveLength(1);
       expect(getBoard(state, "second")[0]!.uid).toBe("enemy_b");
-      expect(getHand(state, "second").some((c) => c.name === "EnemyA")).toBe(true);
+      expect(getHand(state, "second").some((c) => c.name === "EnemyA")).toBe(
+        true,
+      );
     });
   });
 
@@ -325,7 +339,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
         createCard(DAZZLING, "hand", "first"),
       );
 
-      expect(blaze.keywordState?.spellboostCount ?? blaze.spellboostCount).toBe(2);
+      expect(blaze.keywordState?.spellboostCount ?? blaze.spellboostCount).toBe(
+        2,
+      );
     });
 
     it("Mode 2 without earth sigil: choosable but no +2/+2/Ward", () => {
@@ -341,8 +357,19 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
             op: "earth_rite",
             cost: 1,
             effects: [
-              { op: "stat", action: "give", target: "self", attack: 2, defense: 2 },
-              { op: "stat", action: "give", target: "self", keywords: ["Ward"] },
+              {
+                op: "stat",
+                action: "give",
+                target: "self",
+                attack: 2,
+                defense: 2,
+              },
+              {
+                op: "stat",
+                action: "give",
+                target: "self",
+                keywords: ["Ward"],
+              },
             ],
           } as any,
         ],
@@ -443,7 +470,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
       whenPlayCard("first", 0);
       resolvePendingTarget("ally_return");
 
-      expect(getHand(state, "first").some((c) => c.name === "Indomitable Fighter")).toBe(true);
+      expect(
+        getHand(state, "first").some((c) => c.name === "Indomitable Fighter"),
+      ).toBe(true);
       expect(getBoard(state, "first")).toHaveLength(0);
       expect(enemy.defense).toBe(3);
       expect(getHP(state, "second")).toBe(20);
@@ -457,7 +486,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
         .withFirstPP(10, 10)
         .build();
 
-      const blaze = getHand(state, "first").find((c) => c.name === "Blaze Destroyer")!;
+      const blaze = getHand(state, "first").find(
+        (c) => c.name === "Blaze Destroyer",
+      )!;
       whenPlayCard("first", 1);
       expect(Number(blaze.cost)).toBe(9);
 
@@ -480,7 +511,14 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
       state.players.first.board = [remi];
 
       const golem = createCard(
-        { name: "Guardian Golem", type: "Follower", cost: 3, attack: 3, defense: 3, tribes: ["Golem"] },
+        {
+          name: "Guardian Golem",
+          type: "Follower",
+          cost: 3,
+          attack: 3,
+          defense: 3,
+          tribes: ["Golem"],
+        },
         "board",
         "first",
       );
@@ -550,7 +588,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
 
       onEvolve(mecha, "first", "super");
 
-      const tokens = thenBoard("first").filter((c) => c.name === "Mecha Cavalier");
+      const tokens = thenBoard("first").filter(
+        (c) => c.name === "Mecha Cavalier",
+      );
       expect(tokens).toHaveLength(3);
       const summoned = tokens.filter((c) => c.uid !== mecha.uid);
       expect(summoned).toHaveLength(2);
@@ -568,8 +608,12 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
 
       cleanupDead();
 
-      expect(thenBoard("first").some((c) => c.name === "Holy Falcon")).toBe(true);
-      expect(thenBoard("first").find((c) => c.name === "Winged Statue")).toBeUndefined();
+      expect(thenBoard("first").some((c) => c.name === "Holy Falcon")).toBe(
+        true,
+      );
+      expect(
+        thenBoard("first").find((c) => c.name === "Winged Statue"),
+      ).toBeUndefined();
     });
   });
 
@@ -616,7 +660,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
         .build();
 
       whenPlayCard("first", 0);
-      expect(findOnBoard("first", "Devious Lesser Mummy")!.hasStorm).toBeFalsy();
+      expect(
+        findOnBoard("first", "Devious Lesser Mummy")!.hasStorm,
+      ).toBeFalsy();
       expect(state.players.first.shadows).toBe(3);
     });
   });
@@ -630,7 +676,9 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
 
       whenPlayCard("first", 0);
       whenPlayCard("first", 0);
-      expect(thenBoard("first").filter((c) => c.name === "Ancestral Crown")).toHaveLength(2);
+      expect(
+        thenBoard("first").filter((c) => c.name === "Ancestral Crown"),
+      ).toHaveLength(2);
 
       whenPlayCard("first", 0);
       const buffed = findOnBoard("first", "Flashstep Quickblader")!;
@@ -658,13 +706,23 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
     it("Engage grants Rush; returning to hand removes granted Rush", () => {
       givenGameState({ seed: 1, activePlayer: "first" })
         .withFirstHand([ADVENTURERS_GUILD])
-        .withFirstDeck([{ name: "Indomitable Fighter", type: "Follower", cost: 2, attack: 2, defense: 2 }])
+        .withFirstDeck([
+          {
+            name: "Indomitable Fighter",
+            type: "Follower",
+            cost: 2,
+            attack: 2,
+            defense: 2,
+          },
+        ])
         .withFirstPP(10, 10)
         .build();
 
       whenPlayCard("first", 0);
 
-      const guildIdx = getBoard(state, "first").findIndex((c) => c.name === "Adventurers' Guild");
+      const guildIdx = getBoard(state, "first").findIndex(
+        (c) => c.name === "Adventurers' Guild",
+      );
       const fighter = createCard("10001110", "board", "first");
       fighter.uid = "rush_target";
       fighter.peak_defense = fighter.defense;

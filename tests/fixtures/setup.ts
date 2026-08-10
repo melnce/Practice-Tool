@@ -1,6 +1,6 @@
 // Mock global window object for browser-dependent code
 if (typeof window === "undefined") {
-  const noop = () => { };
+  const noop = () => {};
   const win: any = {
     addEventListener: noop,
     removeEventListener: noop,
@@ -122,10 +122,4 @@ if (typeof window === "undefined") {
 // which would wipe the DB before each test runs. Individual test files should handle their own
 // reset if needed.
 
-export { };
-
-
-
-
-
-
+export {};

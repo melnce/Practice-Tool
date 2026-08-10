@@ -64,17 +64,3 @@ export function updateEvoButtonsUI(state: GameState) {
     };
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

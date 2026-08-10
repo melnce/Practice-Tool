@@ -16,7 +16,12 @@ import type {
 } from "../../../../core/types/index.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
 import type { DamageContext } from "./types.js";
-import { getHand, getBoard, getCrests, opponentOf } from "../../../../core/playerHelpers.js";
+import {
+  getHand,
+  getBoard,
+  getCrests,
+  opponentOf,
+} from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // TYPES (re-export for convenience, additional types only)
@@ -257,18 +262,3 @@ export function applySplitSpillover(
   });
   cleanupDead();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

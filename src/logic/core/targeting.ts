@@ -8,7 +8,11 @@ import { toUids, toUid } from "../../core/uidResolver.js";
 // Refactored Imports
 import type { TargetContext } from "./targeting/index.js";
 
-import { parseTargetQuery, resolveBasePool, applyFilters } from "./targeting/index.js";
+import {
+  parseTargetQuery,
+  resolveBasePool,
+  applyFilters,
+} from "./targeting/index.js";
 // Re-export Context for consumers
 export type { TargetContext };
 
@@ -38,7 +42,6 @@ export function getPool(
 
   return finalPool;
 }
-
 
 export function highlightSelectable(cards: CardInstance[]) {
   cards.forEach((c) => (c.__uiSelectable = true));
@@ -125,7 +128,8 @@ export function handleSelect(
     if (Array.isArray(eff.effects) && eff.effects.length) {
       const runner =
         context.runner ||
-        ((..._args: any[]) => console.warn("Missing runner for handleSelect auto"));
+        ((..._args: any[]) =>
+          console.warn("Missing runner for handleSelect auto"));
       runner([...eff.effects], owner, sourceCard, selectedCtx);
     }
 
@@ -151,19 +155,3 @@ export function handleSelect(
   highlightSelectable(pool);
   return "pending";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

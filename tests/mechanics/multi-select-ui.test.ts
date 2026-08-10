@@ -3,7 +3,11 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "../audit/setup.js";
-import { givenGameState, createCard, resetUidCounter } from "../harness/builders.js";
+import {
+  givenGameState,
+  createCard,
+  resetUidCounter,
+} from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { setPendingTarget } from "../../src/logic/core/pendingTarget/index.js";
 import { highlightSelectable } from "../../src/logic/core/targeting.js";

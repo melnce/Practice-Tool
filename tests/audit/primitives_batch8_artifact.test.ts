@@ -38,14 +38,14 @@ const ARTIFACT_TOKEN_IDS = [
   "90074110", // Masterwork Artifact Ω
 ];
 
-function setupTurn(
-  round: number,
-  opts: { hand?: string[]; pp?: number } = {},
-) {
+function setupTurn(round: number, opts: { hand?: string[]; pp?: number } = {}) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   b.build();
 }
@@ -147,7 +147,9 @@ describe("Portal fuse — transform results (no Loot draw)", () => {
 
     fuse_finalize_alpha("first", alpha.uid, [beta]);
 
-    expect(thenHand("first").map((c) => c.name)).toEqual(["Ominous Artifact α"]);
+    expect(thenHand("first").map((c) => c.name)).toEqual([
+      "Ominous Artifact α",
+    ]);
     expect(state.lastFuse?.result_name).toBe("wasted");
   });
 });
@@ -160,26 +162,33 @@ describe("Artifact hand ops — Flight of Icarus + summon copy", () => {
   });
 
   it("Flight of Icarus grants Rush and Last Words draw on selected Artifact in hand", () => {
-    setupTurn(R6, { hand: ["10272310", "90072110"], pp: 2, deck: ["10171320"] });
-    const striker = thenHand("first").find((c) => c.name === "Striker Artifact")!;
+    setupTurn(R6, {
+      hand: ["10272310", "90072110"],
+      pp: 2,
+      deck: ["10171320"],
+    });
+    const striker = thenHand("first").find(
+      (c) => c.name === "Striker Artifact",
+    )!;
     whenPlayCard("first", 0);
     resolvePendingTarget(striker.uid);
     const updated = thenHand("first").find((c) => c.uid === striker.uid)!;
     expect(updated.hasRush || updated.keywordState?.hasRush).toBe(true);
-    const lw = updated.lastwords ?? updated.keywordState?.lastwordsEffects ?? [];
+    const lw =
+      updated.lastwords ?? updated.keywordState?.lastwordsEffects ?? [];
     const hasDrawLw = Array.isArray(lw)
       ? lw.some((e: { op?: string }) => e?.op === "draw")
       : false;
-    expect(hasDrawLw || (updated as { hasLastWords?: boolean }).hasLastWords).toBe(
-      true,
-    );
+    expect(
+      hasDrawLw || (updated as { hasLastWords?: boolean }).hasLastWords,
+    ).toBe(true);
   });
 
   it("Dirk Fanfare summons Fortifier Artifact from real play", () => {
     setupTurn(R6, { hand: ["10171120"], pp: 5 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Fortifier Artifact")).toBe(
-      true,
-    );
+    expect(
+      thenBoard("first").some((c) => c.name === "Fortifier Artifact"),
+    ).toBe(true);
   });
 });

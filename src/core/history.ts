@@ -58,7 +58,9 @@ let onChange:
 // Add new cache keys here if needed.
 // EXPORTED for testing - tests can verify no unexpected underscore keys appear.
 export const INTERNAL_CACHE_KEYS = new Set([
-  "_triggerCache",     // Trigger candidate cache (auto-reinitializes on access)
+  "_triggerCache", // Trigger candidate cache (auto-reinitializes on access)
+  "_deferredDeath", // Deferred LW / leave-play batch during death deferral
+  "_runEffectsDepth", // Nested runEffects depth counter for deferred flush
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
@@ -279,8 +281,7 @@ export function doAction(
   const { autoRender = true, checkInvariants, replayLog } = options;
 
   // Determine if we should check invariants
-  const shouldCheck = checkInvariants ??
-    !!(globalThis as any).CHECK_INVARIANTS;
+  const shouldCheck = checkInvariants ?? !!(globalThis as any).CHECK_INVARIANTS;
 
   // Pre-action invariant check
   if (shouldCheck) {
@@ -333,7 +334,7 @@ export function isInAction() {
 export function appendStep(name: string, meta: any = {}) {
   if (!inAction) {
     // No action open → record a zero-mutation action so the step is still visible in history.
-    doAction(name, () => { }, { step: true, ...meta }, { autoRender: false });
+    doAction(name, () => {}, { step: true, ...meta }, { autoRender: false });
     return;
   }
   if (!inAction.meta) inAction.meta = {};
@@ -423,17 +424,3 @@ export function initHistoryHotkeys({
     }
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

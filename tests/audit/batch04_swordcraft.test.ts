@@ -47,9 +47,7 @@ const R10 = 10;
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -63,8 +61,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -106,7 +107,9 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     setupTurn(R6, { hand: ["10121130", "10122130"], pp: 5 });
     state.players.first.hp = 18;
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(
+      true,
+    );
     expect(getHP(state, "first")).toBe(19);
     whenPlayCard("first", 0);
     expect(getHP(state, "first")).toBe(20);
@@ -127,7 +130,9 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     whenPlayCard("first", 0);
     resolveFirstPending();
     expect(getBoard(state, "second")).toHaveLength(0);
-    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(
+      true,
+    );
   });
 
   it("Luminous Commander — Officer enter +1/+0 EOT; Evolve summons Knight", () => {
@@ -201,7 +206,9 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     attackFollower(0, 0, "first", "second");
     // Strike grants Barrier before damage; counter-damage pops it (§412).
     expect(jeno.hasBarrier || jeno.keywordState?.hasBarrier).toBeFalsy();
-    expect((jeno as any).__uiPopBarrier || (jeno as any).__barrierPopReason).toBeTruthy();
+    expect(
+      (jeno as any).__uiPopBarrier || (jeno as any).__barrierPopReason,
+    ).toBeTruthy();
     expect(thenBoard("first").some((c) => c.name === "Knight")).toBe(true);
   });
 
@@ -227,7 +234,9 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     zir.peak_defense = zir.defense;
     state.players.first.board = [ally, zir];
     onEvolve(zir, "first", "normal");
-    expect(thenBoard("first").filter((c) => c.name === "Knight").length).toBe(2);
+    expect(thenBoard("first").filter((c) => c.name === "Knight").length).toBe(
+      2,
+    );
     expect(ally.attack).toBe(3);
   });
 
@@ -283,9 +292,30 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
       hand: ["10124120"],
       pp: 6,
       deck: [
-        { name: "S1", type: "Follower", class: "Swordcraft", cost: 2, attack: 1, defense: 1 },
-        { name: "S2", type: "Follower", class: "Swordcraft", cost: 3, attack: 1, defense: 1 },
-        { name: "S3", type: "Follower", class: "Dragoncraft", cost: 2, attack: 1, defense: 1 },
+        {
+          name: "S1",
+          type: "Follower",
+          class: "Swordcraft",
+          cost: 2,
+          attack: 1,
+          defense: 1,
+        },
+        {
+          name: "S2",
+          type: "Follower",
+          class: "Swordcraft",
+          cost: 3,
+          attack: 1,
+          defense: 1,
+        },
+        {
+          name: "S3",
+          type: "Follower",
+          class: "Dragoncraft",
+          cost: 2,
+          attack: 1,
+          defense: 1,
+        },
       ],
     });
     const ppBefore = state.players.first.pp;
@@ -304,7 +334,9 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     state.players.first.board = [kag];
     cleanupDead();
     expect(
-      getCrests(state, "first").some((c) => c.name === "Kagemitsu, Enduring Warrior"),
+      getCrests(state, "first").some(
+        (c) => c.name === "Kagemitsu, Enduring Warrior",
+      ),
     ).toBe(true);
 
     resetUidCounter();
@@ -406,7 +438,9 @@ describe("Batch 4 — Swordcraft [10002] Infinity Evolved", () => {
     expect(thenHand("first").some((c) => c.name === "Nonja, Silent Maid")).toBe(
       true,
     );
-    expect(findOnBoard("first", "Prim, Princess's Picnic")?.hasAmbush).toBe(true);
+    expect(findOnBoard("first", "Prim, Princess's Picnic")?.hasAmbush).toBe(
+      true,
+    );
 
     resetUidCounter();
     setupTurn(R7);
@@ -427,13 +461,15 @@ describe("Batch 4 — Swordcraft [10002] Infinity Evolved", () => {
   it("Yurius — Fanfare 2 enemy Knights; enemy enter cant attack + ping/heal", () => {
     setupTurn(R8, { hand: ["10224120"], pp: 8 });
     whenPlayCard("first", 0);
-    expect(getBoard(state, "second").filter((c) => c.name === "Knight").length).toBe(
-      2,
-    );
+    expect(
+      getBoard(state, "second").filter((c) => c.name === "Knight").length,
+    ).toBe(2);
     const yurius = findOnBoard("first", "Yurius, Levin Authority")!;
     state.players.second.hp = 20;
     state.players.first.hp = 15;
-    const foeKnight = getBoard(state, "second").find((c) => c.name === "Knight");
+    const foeKnight = getBoard(state, "second").find(
+      (c) => c.name === "Knight",
+    );
     const enterTrig = (yurius.triggers ?? []).find(
       (t: any) => t.event === "enemy_follower_enter",
     );
@@ -464,7 +500,9 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
     const dev = findOnBoard("first", "Devotee of Usurpation")!;
     dev.defense = 0;
     cleanupDead();
-    expect(thenHand("first").some((c) => c.name === "Gilded Goblet")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Gilded Goblet")).toBe(
+      true,
+    );
   });
 
   it("Comrade of the Swordmaster — Last Words summons copy without Last Words", () => {
@@ -499,7 +537,9 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
   it("Supplicant of Usurpation — Fanfare Necklace; Last Words Blade", () => {
     setupTurn(R6, { hand: ["10322110"], pp: 2 });
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Gilded Necklace")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Gilded Necklace")).toBe(
+      true,
+    );
     const sup = findOnBoard("first", "Supplicant of Usurpation")!;
     sup.defense = 0;
     cleanupDead();
@@ -513,9 +553,9 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
       deck: ["10121110"],
     });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Ian, Lovebound Knight")).toBe(
-      true,
-    );
+    expect(
+      thenBoard("first").some((c) => c.name === "Ian, Lovebound Knight"),
+    ).toBe(true);
     const scout = findOnBoard("first", "Peppy Scout")!;
     const ally = createCard(
       { name: "Ally", type: "Follower", cost: 2, attack: 2, defense: 2 },
@@ -532,7 +572,9 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
   it("Congregant of Usurpation — Fanfare Goblet+Boots; loot play deals 3", () => {
     setupTurn(R6, { hand: ["10323110"], pp: 4 });
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Gilded Goblet")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Gilded Goblet")).toBe(
+      true,
+    );
     expect(thenHand("first").some((c) => c.name === "Gilded Boots")).toBe(true);
     const cong = findOnBoard("first", "Congregant of Usurpation")!;
     enemyFollower(5);
@@ -543,7 +585,9 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
     );
     state.players.first.hand.push(blade);
     whenPlayCard("first", state.players.first.hand.length - 1);
-    const trig = (cong.triggers ?? []).find((t: any) => t.event === "loot_played");
+    const trig = (cong.triggers ?? []).find(
+      (t: any) => t.event === "loot_played",
+    );
     runEffects((trig as any).effects, "first", cong);
     expect(state.players.second.board[0]!.defense).toBe(2);
   });
@@ -582,9 +626,9 @@ describe("Batch 4 — Swordcraft [10004] Skybound Dragons", () => {
     state.players.first.board = [arthur];
     expect(arthur.hasWard).toBe(true);
     onEvolve(arthur, "first", "normal");
-    expect(thenBoard("first").some((c) => c.name === "Mordred, Illusory Lion")).toBe(
-      true,
-    );
+    expect(
+      thenBoard("first").some((c) => c.name === "Mordred, Illusory Lion"),
+    ).toBe(true);
   });
 
   it("Mordred — Storm; Evolve summons Arthur", () => {
@@ -595,9 +639,9 @@ describe("Batch 4 — Swordcraft [10004] Skybound Dragons", () => {
     state.players.first.board = [mord];
     expect(mord.hasStorm).toBe(true);
     onEvolve(mord, "first", "normal");
-    expect(thenBoard("first").some((c) => c.name === "Arthur, Staunch Dragon")).toBe(
-      true,
-    );
+    expect(
+      thenBoard("first").some((c) => c.name === "Arthur, Staunch Dragon"),
+    ).toBe(true);
   });
 
   it("Aglovale — Fanfare 3 damage all enemy followers; Intimidate", () => {
@@ -606,14 +650,18 @@ describe("Batch 4 — Swordcraft [10004] Skybound Dragons", () => {
     enemyFollower(5, "B");
     whenPlayCard("first", 0);
     expect(state.players.second.board.every((c) => c.defense === 2)).toBe(true);
-    expect(findOnBoard("first", "Aglovale, Lord of Frost")?.hasIntimidate).toBe(true);
+    expect(findOnBoard("first", "Aglovale, Lord of Frost")?.hasIntimidate).toBe(
+      true,
+    );
   });
 
   it("Zeta & Bea — Fanfare copy; Enhance (6) Storm self and Bane on copy", () => {
     setupTurn(R6, { hand: ["10424110"], pp: 6 });
     whenPlayCard("first", 0);
     expect(
-      thenBoard("first").filter((c) => c.name === "Zeta & Bea, Crimson and Blue").length,
+      thenBoard("first").filter(
+        (c) => c.name === "Zeta & Bea, Crimson and Blue",
+      ).length,
     ).toBe(2);
     const zeta = findOnBoard("first", "Zeta & Bea, Crimson and Blue")!;
     expect(zeta.hasStorm).toBe(true);

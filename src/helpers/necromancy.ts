@@ -8,7 +8,9 @@ import type { Player } from "../core/types/index.js";
  */
 export function hasNecromancy(owner: Player, cost: number = 1): boolean {
   const isFirst = owner === "first";
-  const shadows = isFirst ? state.players.first.shadows : state.players.second.shadows;
+  const shadows = isFirst
+    ? state.players.first.shadows
+    : state.players.second.shadows;
   return shadows >= cost;
 }
 
@@ -19,22 +21,14 @@ export function hasNecromancy(owner: Player, cost: number = 1): boolean {
 export function spendShadows(owner: Player, cost: number = 1): void {
   const isFirst = owner === "first";
   if (isFirst) {
-    state.players.first.shadows = Math.max(0, state.players.first.shadows - cost);
+    state.players.first.shadows = Math.max(
+      0,
+      state.players.first.shadows - cost,
+    );
   } else {
-    state.players.second.shadows = Math.max(0, state.players.second.shadows - cost);
+    state.players.second.shadows = Math.max(
+      0,
+      state.players.second.shadows - cost,
+    );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

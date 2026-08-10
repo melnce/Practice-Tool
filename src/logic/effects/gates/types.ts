@@ -1,6 +1,10 @@
 // src/logic/effects/gates/types.ts
 
-import type { Effect, Player, CardInstance } from "../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../core/types/index.js";
 
 /**
  * Gate condition types - unified from 17 legacy gate ops.
@@ -133,18 +137,3 @@ export function normalizeToGateSpec(eff: Effect): UnifiedGateSpec {
 
   return spec;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

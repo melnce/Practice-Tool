@@ -5,6 +5,7 @@ import { runEffects } from "./effects/index.js";
 import { clearSelectableFlags } from "./targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { doAction } from "../../core/history.js";
+import type { Player } from "../../core/types/index.js";
 import type { TargetedOpContext } from "./targeting/index.js";
 
 import { applyTargetClick } from "./targeting/index.js";
@@ -116,13 +117,15 @@ function showConfirmationButton(pending: any) {
     if (pending.enforceMinSelectCount) {
       const requiredCount =
         typeof pending.selectCount === "number" &&
-          Number.isFinite(pending.selectCount) &&
-          pending.selectCount > 0
+        Number.isFinite(pending.selectCount) &&
+        pending.selectCount > 0
           ? pending.selectCount
           : 1;
 
       if (targetUids.length < requiredCount) {
-        console.warn(`[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`);
+        console.warn(
+          `[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`,
+        );
         return; // Don't execute, keep selecting
       }
     }

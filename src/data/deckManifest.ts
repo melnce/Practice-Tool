@@ -35,7 +35,9 @@ export function deckLabelFromFilename(file: string): string {
 }
 
 /** Build a manifest from bare filenames (no filesystem access — safe for tests). */
-export function buildManifestFromFilenames(files: readonly string[]): DeckManifest {
+export function buildManifestFromFilenames(
+  files: readonly string[],
+): DeckManifest {
   const entries = files
     .filter((f) => f.endsWith(".json") && !DECK_FILE_EXCLUDE.has(f))
     .sort((a, b) => {

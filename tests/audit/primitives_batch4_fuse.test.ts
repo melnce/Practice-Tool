@@ -72,9 +72,9 @@ describe("Loot fuse — fuse_recipes primitive", () => {
     ) as any;
     runEffects([...(getCardById("10323310")!.spell ?? [])], "first", host);
     expect(thenHand("first").some((c) => c.name === "Drawn")).toBe(true);
-    expect(getGraveyard(state, "first").some((c) => c.name === "Gilded Boots")).toBe(
-      false,
-    );
+    expect(
+      getGraveyard(state, "first").some((c) => c.name === "Gilded Boots"),
+    ).toBe(false);
   });
 
   it("loot_fused advances Octrice crest countdown", () => {

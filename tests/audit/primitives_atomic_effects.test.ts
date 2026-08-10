@@ -189,21 +189,41 @@ describe("Rulebook §317 — simultaneous deaths: observer draws once per death"
       },
     ] as any;
     state.players.first.deck = [
-      createCard({ name: "ActiveDraw", type: "Follower", attack: 1, defense: 1 }, "deck", "first"),
+      createCard(
+        { name: "ActiveDraw", type: "Follower", attack: 1, defense: 1 },
+        "deck",
+        "first",
+      ),
     ];
     state.players.second.deck = [
-      createCard({ name: "ReactiveDraw", type: "Follower", attack: 1, defense: 1 }, "deck", "second"),
+      createCard(
+        { name: "ReactiveDraw", type: "Follower", attack: 1, defense: 1 },
+        "deck",
+        "second",
+      ),
     ];
     state.players.first.board = [
       createCard(
-        { name: "AllyVictim", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        {
+          name: "AllyVictim",
+          type: "Follower",
+          cost: 2,
+          attack: 2,
+          defense: 2,
+        },
         "board",
         "first",
       ),
     ];
     state.players.second.board = [
       createCard(
-        { name: "EnemyVictim", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        {
+          name: "EnemyVictim",
+          type: "Follower",
+          cost: 2,
+          attack: 2,
+          defense: 2,
+        },
         "board",
         "second",
       ),

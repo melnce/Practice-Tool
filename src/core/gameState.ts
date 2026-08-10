@@ -127,11 +127,3 @@ if (typeof window !== "undefined") {
   (window as any).gameState = state;
   (window as any).debugSummon = () => import("../logic/effects/ops/summon.js");
 }
-
-
-
-
-
-
-
-

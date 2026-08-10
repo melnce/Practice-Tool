@@ -1,6 +1,10 @@
 // Continuation after fanfare pauses for interactive resolution (C3).
 import { state } from "../../../core/gameState.js";
-import type { CardInstance, Player, Effect } from "../../../core/types/index.js";
+import type {
+  CardInstance,
+  Player,
+  Effect,
+} from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
 import { fireTrigger } from "../triggers.js";
 import { applyKeywordsFromList } from "../keywords.js";

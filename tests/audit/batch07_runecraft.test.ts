@@ -56,8 +56,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -66,9 +69,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -130,20 +131,32 @@ describe("Batch 7 — Runecraft [10001] Legends Rise", () => {
   });
 
   it("Starry-Eyed Penguin Wizard — Fanfare draws 2 cards", () => {
-    setupTurn(R6, { hand: ["10131140"], pp: 4, deck: ["10131310", "10131320"] });
+    setupTurn(R6, {
+      hand: ["10131140"],
+      pp: 4,
+      deck: ["10131310", "10131320"],
+    });
     whenPlayCard("first", 0);
     expect(thenHand("first").length).toBe(2);
   });
 
   it("Radiant Rainbow — spellboosts On Spellboost card in hand and draws", () => {
-    setupTurn(R6, { hand: ["10131310", "10131320"], pp: 2, deck: ["10131310"] });
+    setupTurn(R6, {
+      hand: ["10131310", "10131320"],
+      pp: 2,
+      deck: ["10131310"],
+    });
     const blast = thenHand("first").find((c) => c.id === "10131320")!;
     const count0 =
-      blast.keywordState?.spellboostCount ?? (blast as { spellboostCount?: number }).spellboostCount ?? 0;
+      blast.keywordState?.spellboostCount ??
+      (blast as { spellboostCount?: number }).spellboostCount ??
+      0;
     whenPlayCard("first", 0);
     resolveFirstPending();
     const count1 =
-      blast.keywordState?.spellboostCount ?? (blast as { spellboostCount?: number }).spellboostCount ?? 0;
+      blast.keywordState?.spellboostCount ??
+      (blast as { spellboostCount?: number }).spellboostCount ??
+      0;
     expect(count1).toBeGreaterThan(count0);
     expect(thenHand("first").length).toBeGreaterThan(1);
   });
@@ -203,13 +216,17 @@ describe("Batch 7 — Runecraft [10001] Legends Rise", () => {
   it("Demonic Call — summons a Demonic Shikigami", () => {
     setupTurn(R8, { hand: ["10133320"], pp: 7 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Demonic Shikigami")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Demonic Shikigami")).toBe(
+      true,
+    );
   });
 
   it("Anne & Grea — Fanfare summons Anne's Summoning", () => {
     setupTurn(R8, { hand: ["10134120"], pp: 5 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Anne's Summoning")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Anne's Summoning")).toBe(
+      true,
+    );
   });
 });
 
@@ -243,7 +260,9 @@ describe("Batch 7 — Runecraft [10002] Infinity Evolved", () => {
   it("Bergent — Fanfare summons 2 Onion Patch", () => {
     setupTurn(R8, { hand: ["10232110"], pp: 5 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").filter((c) => c.name === "Onion Patch").length).toBe(2);
+    expect(
+      thenBoard("first").filter((c) => c.name === "Onion Patch").length,
+    ).toBe(2);
   });
 
   it("Flames of Chaos — deals spellboosted X split among enemies", () => {
@@ -266,9 +285,9 @@ describe("Batch 7 — Runecraft [10002] Infinity Evolved", () => {
     setupTurn(R6, { hand: ["10233310"], pp: 2 });
     whenPlayCard("first", 0);
     expect(earthSigilOnBoard()).toBeDefined();
-    expect(getCrests(state, "first").some((c) => c.name?.includes("Pascale"))).toBe(
-      true,
-    );
+    expect(
+      getCrests(state, "first").some((c) => c.name?.includes("Pascale")),
+    ).toBe(true);
   });
 
   it("Lilanthim — has Aura on field", () => {
@@ -289,9 +308,9 @@ describe("Batch 7 — Runecraft [10003] Heirs of the Omen", () => {
   it("Crystal Gazing — gains Crest: Crystal Gazing", () => {
     setupTurn(R6, { hand: ["10331310"], pp: 4 });
     whenPlayCard("first", 0);
-    expect(getCrests(state, "first").some((c) => c.name === "Crystal Gazing")).toBe(
-      true,
-    );
+    expect(
+      getCrests(state, "first").some((c) => c.name === "Crystal Gazing"),
+    ).toBe(true);
   });
 
   it("Institute of Truth — Engage buffs hand follower +1/+1", () => {
@@ -299,7 +318,9 @@ describe("Batch 7 — Runecraft [10003] Heirs of the Omen", () => {
     const follower = thenHand("first").find((c) => c.type === "Follower")!;
     const atk0 = Number(follower.attack);
     whenPlayCard("first", 0);
-    const idx = state.players.first.board.findIndex((c) => c.name === "Institute of Truth");
+    const idx = state.players.first.board.findIndex(
+      (c) => c.name === "Institute of Truth",
+    );
     engageAmulet("first", idx);
     resolveFirstPending();
     expect(Number(follower.attack)).toBe(atk0 + 1);
@@ -309,7 +330,9 @@ describe("Batch 7 — Runecraft [10003] Heirs of the Omen", () => {
   it("Risky Amalgamation — summons Guardian Golem and Clay Golem", () => {
     setupTurn(R6, { hand: ["10332310"], pp: 4 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Guardian Golem")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Guardian Golem")).toBe(
+      true,
+    );
     expect(thenBoard("first").some((c) => c.name === "Clay Golem")).toBe(true);
   });
 
@@ -328,7 +351,11 @@ describe("Batch 7 — Runecraft [10004] Skybound Dragons", () => {
   });
 
   it("Philosophia — Fanfare draws a spell", () => {
-    setupTurn(R6, { hand: ["10431110"], pp: 3, deck: ["10131310", "10131320"] });
+    setupTurn(R6, {
+      hand: ["10431110"],
+      pp: 3,
+      deck: ["10131310", "10131320"],
+    });
     whenPlayCard("first", 0);
     expect(thenHand("first").some((c) => c.type === "Spell")).toBe(true);
   });
@@ -354,9 +381,9 @@ describe("Batch 7 — Runecraft [10004] Skybound Dragons", () => {
     enemyFollower(6, "A");
     enemyFollower(6, "B");
     runEffects([getCardById("10431310")!.spell![0]], "first", null);
-    expect(state.players.second.board.every((c) => Number(c.defense) <= 0)).toBe(
-      true,
-    );
+    expect(
+      state.players.second.board.every((c) => Number(c.defense) <= 0),
+    ).toBe(true);
   });
 
   it("Ezecrain — Fanfare deals 4 damage and gains 2 earth sigils", () => {

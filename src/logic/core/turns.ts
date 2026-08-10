@@ -3,10 +3,7 @@ import { state } from "../../core/gameState.js";
 import { drawCard } from "../../core/utils.js";
 import { recordEvent } from "../../core/debugTimeline.js";
 import { cleanupDead } from "./cleanup.js";
-import {
-  tickCrests,
-  resetCrestOncePerTurn,
-} from "../effects/crest.js";
+import { tickCrests, resetCrestOncePerTurn } from "../effects/crest.js";
 import {
   runEndOfTurnBoundary,
   runStartOfTurnBoundary,
@@ -18,7 +15,23 @@ import { dealDamage } from "./barrier.js";
 import { logEvent } from "../../core/logger.js";
 import { beginAction, commitAction } from "../../core/history.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
-import { isFirstPlayer, getHand, getBoard, getDeck, setHP, getHP, getEvoCount, getPP, setPP, getMaxPP, setMaxPP, getPermPP, setPlaysThisTurn, setEvoUsedThisTurn, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
+import {
+  isFirstPlayer,
+  getHand,
+  getBoard,
+  getDeck,
+  setHP,
+  getHP,
+  getEvoCount,
+  getPP,
+  setPP,
+  getMaxPP,
+  setMaxPP,
+  getPermPP,
+  setPlaysThisTurn,
+  setEvoUsedThisTurn,
+  setAnyAllyAttackedThisTurn,
+} from "../../core/playerHelpers.js";
 
 /**
  * Helper: at the start of a player's turn, refresh their followers.
@@ -37,11 +50,18 @@ function refreshBoardForNewTurn(board: CardInstance[]) {
     (card as any).attacks_per_turn = perTurn;
     (card as any).attacks_left = perTurn;
 
-    // Respect summoning sickness unless Rush/Storm, but never allow attacking while locked
-    const isLocked =
+    // Respect summoning sickness unless Rush/Storm, but never allow attacking while locked.
+    // Canonical lock lives on keywordState (combat.isAttackForbidden); also honor root
+    // mirrors set by applyKeyword so both stay consistent until clearCantAttack runs.
+    const ks = card.keywordState;
+    const isLocked = !!(
+      ks?.cantAttack ||
+      ks?.cantAttackFollowers ||
+      ks?.cantAttackLeaders ||
       (card as any).cantAttack ||
       (card as any).cantAttackFollowers ||
-      (card as any).cantAttackLeaders;
+      (card as any).cantAttackLeaders
+    );
     const canSwing = !card.justPlayed || card.hasRush || card.hasStorm;
     (card as any).can_attack = canSwing && !isLocked;
 
@@ -230,7 +250,11 @@ function _endTurnCore(endingPlayer: Player) {
   }
 
   // === PHASE 3: Prepare Next Player's Turn ===
-  setMaxPP(state, nextPlayer, Math.min(state.roundCount + getPermPP(state, nextPlayer), 10));
+  setMaxPP(
+    state,
+    nextPlayer,
+    Math.min(state.roundCount + getPermPP(state, nextPlayer), 10),
+  );
   setPP(state, nextPlayer, getMaxPP(state, nextPlayer));
 
   // Reset evolution usage flag for ending player

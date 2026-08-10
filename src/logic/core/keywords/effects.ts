@@ -1,4 +1,8 @@
-import type { Effect, Player, CardInstance } from "../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../core/types/index.js";
 import {
   removeKeywordFromSingleCard,
   removeAllAbilitiesFromCard,
@@ -74,8 +78,8 @@ export function handleKeyword(
   // Fix: Basic "until_end_of_turn: true" on the generic effect should propagate to keywords that support it (like cant_attack)
   const genericExpiryOpts = eff.until_end_of_turn
     ? {
-      expires_on_turn: state.roundCount ?? 0,
-    }
+        expires_on_turn: state.roundCount ?? 0,
+      }
     : undefined;
 
   for (const target of targets) {
@@ -162,7 +166,10 @@ export function handleRemoveAbilities(
 }
 
 import { state } from "../../../core/gameState.js";
-import { getEvoCharges, getSuperEvoCharges } from "../../../core/playerHelpers.js";
+import {
+  getEvoCharges,
+  getSuperEvoCharges,
+} from "../../../core/playerHelpers.js";
 
 // ... (existing imports are fine, just fixing the functions at the end)
 
@@ -203,18 +210,3 @@ export function handleConditionalKeyword(eff: Effect, owner: Player) {
       return false;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

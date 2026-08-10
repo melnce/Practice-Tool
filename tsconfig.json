@@ -15,19 +15,10 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2020"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "baseUrl": ".",
     "verbatimModuleSyntax": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

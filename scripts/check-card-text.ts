@@ -24,7 +24,12 @@ type CardJson = {
   triggers?: unknown[];
 };
 
-type Issue = { id: string; name: string; kind: "error" | "warn"; message: string };
+type Issue = {
+  id: string;
+  name: string;
+  kind: "error" | "warn";
+  message: string;
+};
 
 function listSetFiles(setFilter?: string): string[] {
   const files = fs
@@ -44,11 +49,14 @@ function listSetFiles(setFilter?: string): string[] {
 
 function keywordNames(keywords: unknown[] | undefined): string[] {
   if (!Array.isArray(keywords)) return [];
-  return keywords.map((k) => {
-    if (typeof k === "string") return k;
-    if (k && typeof k === "object" && "name" in k) return String((k as { name: string }).name);
-    return "";
-  }).filter(Boolean);
+  return keywords
+    .map((k) => {
+      if (typeof k === "string") return k;
+      if (k && typeof k === "object" && "name" in k)
+        return String((k as { name: string }).name);
+      return "";
+    })
+    .filter(Boolean);
 }
 
 function hasKeyword(keywords: unknown[] | undefined, name: string): boolean {
@@ -59,7 +67,11 @@ function hasKeyword(keywords: unknown[] | undefined, name: string): boolean {
 function lastWordsEffects(keywords: unknown[] | undefined): unknown[] {
   if (!Array.isArray(keywords)) return [];
   for (const k of keywords) {
-    if (k && typeof k === "object" && (k as { name?: string }).name === "LastWords") {
+    if (
+      k &&
+      typeof k === "object" &&
+      (k as { name?: string }).name === "LastWords"
+    ) {
       return Array.isArray((k as { effects?: unknown[] }).effects)
         ? (k as { effects: unknown[] }).effects
         : [];
@@ -114,7 +126,9 @@ function checkCard(card: CardJson): Issue[] {
   const expectKw = (label: string, present: boolean, linePattern?: RegExp) => {
     const lines = desc.split("\n");
     const mentionsOnOwnLine = lines.some((line) =>
-      linePattern ? linePattern.test(line.trim()) : new RegExp(`^${label}\\b`, "i").test(line.trim()),
+      linePattern
+        ? linePattern.test(line.trim())
+        : new RegExp(`^${label}\\b`, "i").test(line.trim()),
     );
     if (mentionsOnOwnLine && !present) {
       issues.push({
@@ -159,7 +173,9 @@ function checkCard(card: CardJson): Issue[] {
   }
 
   // Evolve: on its own line (not Super-Evolve, not "Combo - Evolve this follower" fanfare text only)
-  const hasEvoLine = desc.split("\n").some((line) => /^evolve:/i.test(line.trim()));
+  const hasEvoLine = desc
+    .split("\n")
+    .some((line) => /^evolve:/i.test(line.trim()));
   if (hasEvoLine && !(card.evolve?.length ?? 0)) {
     issues.push({
       id: card.id,
@@ -200,7 +216,8 @@ function checkCard(card: CardJson): Issue[] {
       id: card.id,
       name: card.name,
       kind: "warn",
-      message: "Description mentions Countdown but Countdown keyword missing (may use inline field)",
+      message:
+        "Description mentions Countdown but Countdown keyword missing (may use inline field)",
     });
   }
 
@@ -231,7 +248,10 @@ function checkCard(card: CardJson): Issue[] {
     });
   }
 
-  if (!desc.trim() && (card.fanfare?.length || card.spell?.length || lastWordsEffects(kws).length)) {
+  if (
+    !desc.trim() &&
+    (card.fanfare?.length || card.spell?.length || lastWordsEffects(kws).length)
+  ) {
     issues.push({
       id: card.id,
       name: card.name,
@@ -244,8 +264,11 @@ function checkCard(card: CardJson): Issue[] {
 }
 
 function main() {
-  const setArg = process.argv.find((a) => a.startsWith("--set="))?.split("=")[1]
-    ?? (process.argv.includes("--set") ? process.argv[process.argv.indexOf("--set") + 1] : undefined);
+  const setArg =
+    process.argv.find((a) => a.startsWith("--set="))?.split("=")[1] ??
+    (process.argv.includes("--set")
+      ? process.argv[process.argv.indexOf("--set") + 1]
+      : undefined);
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -281,9 +304,13 @@ function main() {
   }
 
   if (!errors.length && !warns.length) {
-    console.log(`✅ ${cardCount} cards — no description/JSON mismatches found.\n`);
+    console.log(
+      `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+    );
   } else {
-    console.log(`   Scanned ${cardCount} cards in ${files.length} set file(s).`);
+    console.log(
+      `   Scanned ${cardCount} cards in ${files.length} set file(s).`,
+    );
     console.log("   Errors fail CI; warnings are informational.\n");
   }
 

@@ -64,8 +64,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -210,9 +209,9 @@ describe("B/C — Tablet deck_duplicates banish (10303210)", () => {
     expect(deck.filter((c) => c.name === "Dup")).toHaveLength(1);
     expect(deck.filter((c) => c.name === "Unique")).toHaveLength(1);
     expect(deck.length).toBe(2);
-    expect(getBanish(state, "first").filter((c) => c.name === "Dup")).toHaveLength(
-      2,
-    );
+    expect(
+      getBanish(state, "first").filter((c) => c.name === "Dup"),
+    ).toHaveLength(2);
     const tabletIdx = thenBoard("first").findIndex(
       (c) => c.name === "Tablet of Tribulations",
     );
@@ -389,16 +388,20 @@ describe("B/C — Sandalphon invoke from deck (10404110)", () => {
     state.players.first.evoCount = 6;
     whenEndTurn();
     whenEndTurn();
-    expect(thenDeck("first").some((c) => c.name === "Sandalphon, Primarch Successor")).toBe(
-      false,
-    );
+    expect(
+      thenDeck("first").some(
+        (c) => c.name === "Sandalphon, Primarch Successor",
+      ),
+    ).toBe(false);
     expect(
       getCrests(state, "first").some(
         (c) => c.name === "Sandalphon, Primarch Successor",
       ),
     ).toBe(true);
     expect(
-      thenHand("first").some((c) => c.name === "Sandalphon, Primarch Successor"),
+      thenHand("first").some(
+        (c) => c.name === "Sandalphon, Primarch Successor",
+      ),
     ).toBe(true);
     expect(thenBoard("first").length).toBe(0);
   });

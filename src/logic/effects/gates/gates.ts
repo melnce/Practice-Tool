@@ -3,8 +3,19 @@ import { state } from "../../../core/gameState.js";
 import { hasNecromancy, spendShadows } from "../../../helpers/necromancy.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import { logEvent } from "../../../core/logger.js";
-import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
-import { isFirstPlayer, getBoard, getDeck, getRally, getMaxPP, getAnyAllyAttackedThisTurn } from "../../../core/playerHelpers.js";
+import type {
+  Player,
+  CardInstance,
+  Effect,
+} from "../../../core/types/index.js";
+import {
+  isFirstPlayer,
+  getBoard,
+  getDeck,
+  getRally,
+  getMaxPP,
+  getAnyAllyAttackedThisTurn,
+} from "../../../core/playerHelpers.js";
 import { meetsSkyboundArtThreshold } from "../skybound.js";
 
 export function handleOverflowGate(owner: Player) {
@@ -134,7 +145,8 @@ export function handleBothMaxPPGate(eff: Effect, effectsQueue: Effect[]) {
   const need = Number.isFinite((eff as any).at_least)
     ? (eff as any).at_least
     : 10;
-  const ok = getMaxPP(state, "first") >= need && getMaxPP(state, "second") >= need;
+  const ok =
+    getMaxPP(state, "first") >= need && getMaxPP(state, "second") >= need;
   const next = ok ? eff.effects || [] : eff.else_effects || [];
   if (next.length) {
     if (Array.isArray(effectsQueue)) {
@@ -221,18 +233,3 @@ export function handleEvolvedAlliedGate(
   const next = (hasEvolved ? eff.effects : eff.else_effects) || [];
   if (next.length) effectsQueue.unshift(...next);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

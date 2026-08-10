@@ -2,8 +2,16 @@
 
 import { state } from "../../../core/gameState.js";
 import { applyLeaderDamage } from "../leader.js";
-import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
-import { getBoard, opponentOf, addModeBonus } from "../../../core/playerHelpers.js";
+import type {
+  Player,
+  CardInstance,
+  Effect,
+} from "../../../core/types/index.js";
+import {
+  getBoard,
+  opponentOf,
+  addModeBonus,
+} from "../../../core/playerHelpers.js";
 
 // damage_enemy_leader_by_other_allies
 export function handleDamageEnemyLeaderByOtherAllies(
@@ -43,17 +51,3 @@ export function handleSetCostLastDrawn(eff: Effect) {
     target.cost = Math.max(0, v);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

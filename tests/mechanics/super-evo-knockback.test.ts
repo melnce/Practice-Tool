@@ -29,7 +29,13 @@ describe("super-evo knockback damage pipeline", () => {
       .build();
 
     const attacker = createCard(
-      { name: "Super Striker", type: "Follower", cost: 3, attack: 5, defense: 5 },
+      {
+        name: "Super Striker",
+        type: "Follower",
+        cost: 3,
+        attack: 5,
+        defense: 5,
+      },
       "board",
       "first",
     );

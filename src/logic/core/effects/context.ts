@@ -40,18 +40,3 @@ export function getTargetingContext(ctx: EffectCtx): TargetContext {
   }
   return {};
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

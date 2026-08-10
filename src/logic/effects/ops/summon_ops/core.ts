@@ -1,10 +1,21 @@
 import { state } from "../../../../core/gameState.js";
 import { fireTrigger } from "../../../core/triggers.js";
-import type { CardInstance, CardTemplate, Player } from "../../../../core/types/index.js";
+import type {
+  CardInstance,
+  CardTemplate,
+  Player,
+} from "../../../../core/types/index.js";
 import { initAmulet, initFollower } from "./init.js";
 import { isFollower, isAmulet } from "./utils.js";
-import { opponentOf, setRally, getRally } from "../../../../core/playerHelpers.js";
-import { bumpZoneVersion, stampBoardEntryTs } from "../../../core/triggers/utils.js";
+import {
+  opponentOf,
+  setRally,
+  getRally,
+} from "../../../../core/playerHelpers.js";
+import {
+  bumpZoneVersion,
+  stampBoardEntryTs,
+} from "../../../core/triggers/utils.js";
 import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 
 // =============== Core Summon Routines ===============
@@ -69,18 +80,3 @@ export function finishFollowerEnter(card: CardInstance, owner: Player) {
     fireTrigger("enemy_follower_enter", opponent, enterCtx);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

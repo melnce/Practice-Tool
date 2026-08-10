@@ -88,7 +88,9 @@ describe("Foundations — Combo (playsThisTurn)", () => {
     whenPlayCard("first", 0);
     whenPlayCard("first", 0);
     whenPlayCard("first", 0);
-    const drawn = thenHand("first").find((c) => c.name === "Killer Rhinoceroach");
+    const drawn = thenHand("first").find(
+      (c) => c.name === "Killer Rhinoceroach",
+    );
     expect(drawn).toBeTruthy();
   });
 });

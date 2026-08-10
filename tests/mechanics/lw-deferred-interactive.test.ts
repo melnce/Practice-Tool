@@ -3,13 +3,20 @@
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "../audit/setup.js";
-import { givenGameState, createCard, resetUidCounter } from "../harness/builders.js";
+import {
+  givenGameState,
+  createCard,
+  resetUidCounter,
+} from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getBoard, getHand } from "../../src/core/playerHelpers.js";
-import { cleanupDead, flushDeferredDeathBatch } from "../../src/logic/core/cleanup.js";
+import {
+  cleanupDead,
+  flushDeferredDeathBatch,
+} from "../../src/logic/core/cleanup.js";
 import "../../src/logic/core/effects/index.js";
 
 describe("Deferred LW interactive pause", () => {
@@ -73,14 +80,20 @@ describe("Deferred LW interactive pause", () => {
     flushDeferredDeathBatch();
 
     expect(state.pendingTargetEffect).toBeDefined();
-    expect(getBoard(state, "first").some((c) => c?.uid === victim.uid)).toBe(false);
+    expect(getBoard(state, "first").some((c) => c?.uid === victim.uid)).toBe(
+      false,
+    );
     expect(victim.zone).not.toBe("graveyard");
-    expect(Number(buffTarget.attack)).toBe(Number(buffTarget.base_attack ?? buffTarget.attack));
+    expect(Number(buffTarget.attack)).toBe(
+      Number(buffTarget.base_attack ?? buffTarget.attack),
+    );
 
     resolvePendingTarget(buffTarget.uid);
 
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(Number(buffTarget.attack)).toBeGreaterThan(2);
-    expect(getBoard(state, "first").some((c) => c.uid === victim.uid)).toBe(false);
+    expect(getBoard(state, "first").some((c) => c.uid === victim.uid)).toBe(
+      false,
+    );
   });
 });

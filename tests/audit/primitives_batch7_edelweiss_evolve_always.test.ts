@@ -24,7 +24,9 @@ describe("Edelweiss — evolve_trigger_always on effect-evolve", () => {
   it("card data marks evolve_trigger_always; evolve[] is When-this-evolves script", () => {
     const ed = createCard("10133130", "hand", "first");
     expect(ed.evolve_trigger_always).toBe(true);
-    expect(ed.evolve?.some((e: { op?: string }) => e.op === "damage")).toBe(true);
+    expect(ed.evolve?.some((e: { op?: string }) => e.op === "damage")).toBe(
+      true,
+    );
     expect(ed.evolve?.some((e: { op?: string }) => e.op === "pp")).toBe(true);
   });
 
@@ -41,14 +43,20 @@ describe("Edelweiss — evolve_trigger_always on effect-evolve", () => {
     enemy.peak_defense = 5;
     state.players.second.board = [enemy];
     state.players.first.board = [
-      createCard({ name: "Sediment", type: "Amulet", cost: 1 }, "board", "first"),
+      createCard(
+        { name: "Sediment", type: "Amulet", cost: 1 },
+        "board",
+        "first",
+      ),
     ];
     const sigil = state.players.first.board[0]!;
     sigil.counters = { earth: 2 };
 
     whenPlayCard("first", 0);
 
-    const ed = state.players.first.board.find((c) => c.name?.includes("Edelweiss"));
+    const ed = state.players.first.board.find((c) =>
+      c.name?.includes("Edelweiss"),
+    );
     expect(ed?.hasEvolved).toBe(true);
     expect(enemy.defense).toBe(1);
     // Paid 4 PP for a 4-cost card, then recover 2 (not restore to pre-play total)

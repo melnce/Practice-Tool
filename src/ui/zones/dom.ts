@@ -190,17 +190,3 @@ export function renderCardDOM(
 
   return div;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

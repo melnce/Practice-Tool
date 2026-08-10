@@ -34,9 +34,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90004110-silent-rider",
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -137,17 +135,13 @@
     "type": "Follower",
     "class": "Forestcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Pixie"
-    ],
+    "tribes": ["Pixie"],
     "description": "Rush",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90011110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90011110-fairy",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -219,9 +213,7 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Officer"
-    ],
+    "tribes": ["Officer"],
     "description": null,
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021110_evo.webp",
@@ -241,9 +233,7 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Officer"
-    ],
+    "tribes": ["Officer"],
     "description": null,
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021120_evo.webp",
@@ -263,9 +253,7 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Gold",
-    "tribes": [
-      "Officer"
-    ],
+    "tribes": ["Officer"],
     "description": "Fanfare: If there's an allied Prim, Princess's Picnic on the field, give this follower +1/+1 and Bane.\nWard",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90023110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90023110_evo.webp",
@@ -288,16 +276,12 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": [
-              "Bane"
-            ]
+            "keywords": ["Bane"]
           }
         ]
       }
     ],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -311,9 +295,7 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Golem"
-    ],
+    "tribes": ["Golem"],
     "description": null,
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90031110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031110_evo.webp",
@@ -333,17 +315,13 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Golem"
-    ],
+    "tribes": ["Golem"],
     "description": "Ward",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90031120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90031120-guardian-golem",
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -357,9 +335,7 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Shikigami"
-    ],
+    "tribes": ["Shikigami"],
     "description": "Rush\nLast Words: Spellboost your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90031130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031130_evo.webp",
@@ -391,9 +367,7 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Shikigami"
-    ],
+    "tribes": ["Shikigami"],
     "description": "Rush\nLast Words: Spellboost your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90031140.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031140_evo.webp",
@@ -425,9 +399,7 @@
     "type": "Amulet",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Earth Sigil"
-    ],
+    "tribes": ["Earth Sigil"],
     "description": "Earth Sigil\nEngage (1): Gain an earth sigil.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90031210.webp",
     "evo_image": "",
@@ -474,9 +446,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90032110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90032110-onion-patch",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [
       {
         "event": "strike",
@@ -502,9 +472,7 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": [
-      "Mysteria"
-    ],
+    "tribes": ["Mysteria"],
     "description": "Draw 2 cards. Deal 2 damage to a random enemy follower.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90033310.webp",
     "evo_image": "",
@@ -538,9 +506,7 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Shikigami"
-    ],
+    "tribes": ["Shikigami"],
     "description": "Ward\nLast Words: Spellboost your hand 3 times.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90034110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034110_evo.webp",
@@ -572,18 +538,13 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Shikigami"
-    ],
+    "tribes": ["Shikigami"],
     "description": "When this follower enters the field, give it +X/+Y. X/Y is the total base attack/defense of allied Shikigami followers destroyed this turn.\nWard\nAura",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90034120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90034120-noble-shikigami",
-    "keywords": [
-      "Ward",
-      "Aura"
-    ],
+    "keywords": ["Ward", "Aura"],
     "triggers": [
       {
         "event": "ally_follower_enter",
@@ -614,19 +575,14 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Mysteria"
-    ],
+    "tribes": ["Mysteria"],
     "description": "Rush\nWard\nAt the end of your opponent's turn, destroy this card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90034130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90034130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90034130-annes-summoning",
     "hasOngoing": true,
-    "keywords": [
-      "Rush",
-      "Ward"
-    ],
+    "keywords": ["Rush", "Ward"],
     "triggers": [
       {
         "event": "end_of_turn",
@@ -660,9 +616,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90041110-fire-drake-whelp",
-    "keywords": [
-      "Intimidate"
-    ],
+    "keywords": ["Intimidate"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -682,9 +636,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90041120-vastwing-dragon",
-    "keywords": [
-      "Intimidate"
-    ],
+    "keywords": ["Intimidate"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -698,17 +650,13 @@
     "type": "Follower",
     "class": "Dragoncraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Marine"
-    ],
+    "tribes": ["Marine"],
     "description": "Rush",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90041130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90041130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90041130-majestic-megalorca",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -722,18 +670,13 @@
     "type": "Follower",
     "class": "Dragoncraft",
     "rarity": "Gold",
-    "tribes": [
-      "Marine"
-    ],
+    "tribes": ["Marine"],
     "description": "Storm\nWard",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90043110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90043110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90043110-otohimes-bodyguard",
-    "keywords": [
-      "Storm",
-      "Ward"
-    ],
+    "keywords": ["Storm", "Ward"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -753,9 +696,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90044110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90044110-supreme-golden-dragon",
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -775,9 +716,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90044120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90044120-supreme-silver-dragon",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -843,9 +782,7 @@
     "type": "Follower",
     "class": "Abysscraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Departed"
-    ],
+    "tribes": ["Departed"],
     "description": null,
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90051110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051110_evo.webp",
@@ -871,9 +808,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90051120-bat",
-    "keywords": [
-      "Drain"
-    ],
+    "keywords": ["Drain"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -887,19 +822,14 @@
     "type": "Follower",
     "class": "Abysscraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Departed"
-    ],
+    "tribes": ["Departed"],
     "description": "Storm\nWhen this card leaves the field, banish it.\nAt the end of your turn, banish this card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90051130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90051130-ghost",
     "hasOngoing": true,
-    "keywords": [
-      "Storm",
-      "BanishOnDeath"
-    ],
+    "keywords": ["Storm", "BanishOnDeath"],
     "triggers": [
       {
         "event": "end_of_turn",
@@ -927,9 +857,7 @@
     "type": "Follower",
     "class": "Abysscraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Departed"
-    ],
+    "tribes": ["Departed"],
     "description": "Last Words: Summon a Rotting Zombie and remove Last Words from it.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90051140.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051140_evo.webp",
@@ -1076,9 +1004,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90061110-holy-falcon",
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -1098,9 +1024,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90061120-holyflame-tiger",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -1120,9 +1044,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90061130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90061130-regal-falcon",
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -1142,9 +1064,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90064110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90064110-holy-cavalier",
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "evolve": [],
     "superevolve": [],
     "triggers": []
@@ -1158,18 +1078,14 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Puppetry"
-    ],
+    "tribes": ["Puppetry"],
     "description": "Rush\nAt the end of your opponent's turn, destroy this card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90071110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90071110-puppet",
     "hasOngoing": true,
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [
       {
         "event": "end_of_turn",
@@ -1197,18 +1113,14 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Puppetry"
-    ],
+    "tribes": ["Puppetry"],
     "description": "Rush\nAt the end of your opponent's turn, destroy this card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90071120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90071120-enhanced-puppet",
     "hasOngoing": true,
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [
       {
         "event": "end_of_turn",
@@ -1236,9 +1148,7 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Striker Artifact.\nCan't be played.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90071210.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
@@ -1252,10 +1162,7 @@
         "partner_filters": [
           {
             "zone": "hand",
-            "name_in": [
-              "Gear of Ambition",
-              "Gear of Remembrance"
-            ]
+            "name_in": ["Gear of Ambition", "Gear of Remembrance"]
           }
         ],
         "result": {
@@ -1278,9 +1185,7 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "Fuse: Artifact amulets\nWhen you Fuse to this card, transform it into a Fortifier Artifact.\nCan't be played.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90071220.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072120_evo.webp",
@@ -1294,10 +1199,7 @@
         "partner_filters": [
           {
             "zone": "hand",
-            "name_in": [
-              "Gear of Ambition",
-              "Gear of Remembrance"
-            ]
+            "name_in": ["Gear of Ambition", "Gear of Remembrance"]
           }
         ],
         "result": {
@@ -1320,17 +1222,13 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Silver",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nRush",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90072110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072110_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90072110-striker-artifact",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [],
     "fuse": [
       {
@@ -1350,17 +1248,13 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Silver",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "Fuse: Artifact cards\nWhen you Fuse to this card, transform it based on the total cost of the cards fused.\n1: Ominous Artifact α\n2: Ominous Artifact β\n3 or more: Ominous Artifact γ\nWard",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90072120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90072120-fortifier-artifact",
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [],
     "fuse": [
       {
@@ -1380,9 +1274,7 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Silver",
-    "tribes": [
-      "Puppetry"
-    ],
+    "tribes": ["Puppetry"],
     "description": "Ambush\nLast Words: Summon a Vier, Heart Slayer.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90072130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90072130_evo.webp",
@@ -1414,9 +1306,7 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Gold",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "Fuse: Ominous Artifact β and Ominous Artifact γ\nWhen you've Fused both to this card, transform it into a Masterwork Artifact Ω.\nAt the end of your turn, restore 3 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90073110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073110_evo.webp",
@@ -1447,10 +1337,7 @@
         "partner_filters": [
           {
             "zone": "hand",
-            "name_in": [
-              "Ominous Artifact β",
-              "Ominous Artifact γ"
-            ]
+            "name_in": ["Ominous Artifact β", "Ominous Artifact γ"]
           }
         ],
         "result": {
@@ -1464,9 +1351,7 @@
         "partner_filters": [
           {
             "zone": "hand",
-            "name_in": [
-              "Ominous Artifact β"
-            ]
+            "name_in": ["Ominous Artifact β"]
           }
         ],
         "result": {
@@ -1479,9 +1364,7 @@
         "partner_filters": [
           {
             "zone": "hand",
-            "name_in": [
-              "Ominous Artifact γ"
-            ]
+            "name_in": ["Ominous Artifact γ"]
           }
         ],
         "result": {
@@ -1502,9 +1385,7 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Gold",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "At the end of your turn, deal 3 damage to the enemy leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90073120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073120_evo.webp",
@@ -1540,9 +1421,7 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Gold",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "At the end of your turn, deal 3 damage to all enemy followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90073130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90073130_evo.webp",
@@ -1578,9 +1457,7 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Artifact"
-    ],
+    "tribes": ["Artifact"],
     "description": "Fanfare: Deal 5 damage to all enemy followers. Restore 5 defense to your leader.\nStorm\nWard\nAura",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90074110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074110_evo.webp",
@@ -1599,11 +1476,7 @@
         "amount": 5
       }
     ],
-    "keywords": [
-      "Storm",
-      "Ward",
-      "Aura"
-    ],
+    "keywords": ["Storm", "Ward", "Aura"],
     "triggers": [],
     "evolve": [],
     "superevolve": []
@@ -1617,18 +1490,13 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Puppetry"
-    ],
+    "tribes": ["Puppetry"],
     "description": "Ward\nYour opponent can't select any cards other than this one for abilities.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90074120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074120_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90074120-lloyd",
-    "keywords": [
-      "Ward",
-      "Taunt"
-    ],
+    "keywords": ["Ward", "Taunt"],
     "triggers": [],
     "evolve": [],
     "superevolve": []
@@ -1642,17 +1510,13 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Puppetry"
-    ],
+    "tribes": ["Puppetry"],
     "description": "Rush\nFollower Strike: Deal X damage to the opposing follower. X is this follower's attack.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90074130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074130_evo.webp",
     "set": "[90000] Basic A",
     "url": "https://shadowverse.gg/cards/90074130-victoria",
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [
       {
         "event": "follower_strike",
@@ -1796,9 +1660,7 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Loot"
-    ],
+    "tribes": ["Loot"],
     "description": "Select an enemy follower on the field or the enemy leader and deal it 1 damage.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021310.webp",
     "evo_image": "",
@@ -1828,9 +1690,7 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Loot"
-    ],
+    "tribes": ["Loot"],
     "description": "Restore 2 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021320.webp",
     "evo_image": "",
@@ -1858,9 +1718,7 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Loot"
-    ],
+    "tribes": ["Loot"],
     "description": "Select an allied follower on the field and give it +1/+0 and Rush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021330.webp",
     "evo_image": "",
@@ -1885,9 +1743,7 @@
             "op": "keyword",
             "action": "grant",
             "target": "selected",
-            "keywords": [
-              "Rush"
-            ]
+            "keywords": ["Rush"]
           }
         ]
       }
@@ -1904,9 +1760,7 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Loot"
-    ],
+    "tribes": ["Loot"],
     "description": "Select an allied follower on the field and give it +0/+1 and Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021340.webp",
     "evo_image": "",
@@ -1931,9 +1785,7 @@
             "op": "keyword",
             "action": "grant",
             "target": "selected",
-            "keywords": [
-              "Ward"
-            ]
+            "keywords": ["Ward"]
           }
         ]
       }
@@ -2056,9 +1908,7 @@
         "source": "named",
         "name": "Rulenye & Valnareik",
         "count": 2,
-        "keywords": [
-          "Rush"
-        ]
+        "keywords": ["Rush"]
       }
     ],
     "keywords": [],
@@ -2089,9 +1939,7 @@
         "condition": {
           "name": "Rulenye & Valnareik"
         },
-        "keywords": [
-          "storm"
-        ],
+        "keywords": ["storm"],
         "select": 1
       }
     ],

@@ -129,7 +129,7 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
       expect(leah.hasWard).toBe(true);
     });
 
-    it('Last Words: Draw a card — when destroyed, owner draws 1', () => {
+    it("Last Words: Draw a card — when destroyed, owner draws 1", () => {
       expect(cardText(LEAH)).toMatch(/last words:\s*draw a card/i);
 
       givenGameState({ seed: 1 })
@@ -150,7 +150,7 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
       expect(thenBoard("first").length).toBe(0);
     });
 
-    it('Evolve: Draw a card — evolving Leah draws 1', () => {
+    it("Evolve: Draw a card — evolving Leah draws 1", () => {
       expect(cardText(LEAH)).toMatch(/evolve:\s*draw a card/i);
 
       givenGameState({ seed: 1, roundCount: 5 })
@@ -173,8 +173,10 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
   });
 
   describe("Royal Coachwoman (10022110)", () => {
-    it('Last Words: Summon a Knight — when destroyed, summons Knight', () => {
-      expect(cardText(ROYAL_COACHWOMAN)).toMatch(/last words:\s*summon a knight/i);
+    it("Last Words: Summon a Knight — when destroyed, summons Knight", () => {
+      expect(cardText(ROYAL_COACHWOMAN)).toMatch(
+        /last words:\s*summon a knight/i,
+      );
 
       givenGameState({ seed: 1 }).build();
 
@@ -193,17 +195,14 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
     it("Last Words summon fills slot freed by death even on a full board (owner)", () => {
       givenGameState({ seed: 1 }).build();
 
-      const fillers = [
-        "10001110",
-        "10001130",
-        "10021110",
-        "10021130",
-      ].map((id, i) => {
-        const c = createCard(id, "board", "first");
-        c.uid = `filler_${i}`;
-        c.peak_defense = c.defense;
-        return c;
-      });
+      const fillers = ["10001110", "10001130", "10021110", "10021130"].map(
+        (id, i) => {
+          const c = createCard(id, "board", "first");
+          c.uid = `filler_${i}`;
+          c.peak_defense = c.defense;
+          return c;
+        },
+      );
 
       const coach = createCard(ROYAL_COACHWOMAN, "board", "first");
       applyKeywordsFromList(coach);

@@ -12,7 +12,11 @@ import {
 import { evalCommonConditions } from "./triggers/conditions.js";
 import { shouldFire, markFired } from "./triggers/tracking.js";
 import type { ProcessingCandidate } from "./triggers/process.js";
-import type { TriggerContext, TriggerEventName, TriggerSpec } from "./triggers/types.js";
+import type {
+  TriggerContext,
+  TriggerEventName,
+  TriggerSpec,
+} from "./triggers/types.js";
 import { runEffects } from "./effects/index.js";
 import { flushDeferredDeathBatch, cleanupDead } from "./cleanup.js";
 import { clearTemporaryBuffs } from "../effects/self.js";
@@ -64,11 +68,15 @@ function ownerRoleForTrigger(
     return owner === opponent ? "reactive" : null;
   }
 
-  if (trigger.type === "end_of_turn_own" || trigger.type === "start_of_turn_own") {
+  if (
+    trigger.type === "end_of_turn_own" ||
+    trigger.type === "start_of_turn_own"
+  ) {
     return owner === focalPlayer ? "active" : null;
   }
 
-  if (cond.own_turn === true) {
+  // own_turn:true means owner's turn only (same as *_own type shorthands).
+  if (cond.own_turn) {
     return owner === focalPlayer ? "active" : null;
   }
 
@@ -76,7 +84,7 @@ function ownerRoleForTrigger(
   if (event === "end_of_turn" || event === "start_of_turn") {
     const isBare =
       !cond.whose_turn &&
-      cond.own_turn !== true &&
+      !cond.own_turn &&
       trigger.type !== "end_of_turn_own" &&
       trigger.type !== "start_of_turn_own";
     if (isBare) {
@@ -125,11 +133,20 @@ function queueTurnBoundaryTriggers(
         const role = ownerRoleForTrigger(trigger, cand, event, focalPlayer);
         if (role !== stepDef.role) continue;
 
-        if (!evalCommonConditions(trigger, cand.card, cand.owner, focalPlayer, context)) {
+        if (
+          !evalCommonConditions(
+            trigger,
+            cand.card,
+            cand.owner,
+            focalPlayer,
+            context,
+          )
+        ) {
           continue;
         }
 
-        if (!shouldFire(trigger, cand.card, event, turnToken, context)) continue;
+        if (!shouldFire(trigger, cand.card, event, turnToken, context))
+          continue;
 
         queued.push({
           step: stepDef.step,
@@ -144,8 +161,14 @@ function queueTurnBoundaryTriggers(
 
   queued.sort((a, b) => {
     if (a.step !== b.step) return a.step - b.step;
-    const srcA = sourceOrder(a.candidate.source, stepDefs.find((s) => s.step === a.step)?.sources ?? []);
-    const srcB = sourceOrder(b.candidate.source, stepDefs.find((s) => s.step === b.step)?.sources ?? []);
+    const srcA = sourceOrder(
+      a.candidate.source,
+      stepDefs.find((s) => s.step === a.step)?.sources ?? [],
+    );
+    const srcB = sourceOrder(
+      b.candidate.source,
+      stepDefs.find((s) => s.step === b.step)?.sources ?? [],
+    );
     if (srcA !== srcB) return srcA - srcB;
     return a.order - b.order;
   });
@@ -186,7 +209,11 @@ function resolveTurnBoundaryQueue(
 
 /** End-of-turn: queue steps 1–4, resolve under deferral, then clear temp buffs on both boards. */
 export function runEndOfTurnBoundary(endingPlayer: Player) {
-  const queue = queueTurnBoundaryTriggers("end_of_turn", endingPlayer, EOT_STEPS);
+  const queue = queueTurnBoundaryTriggers(
+    "end_of_turn",
+    endingPlayer,
+    EOT_STEPS,
+  );
   resolveTurnBoundaryQueue(queue, "end_of_turn", endingPlayer);
 
   for (const side of ["first", "second"] as Player[]) {
@@ -202,7 +229,11 @@ export function runStartOfTurnBoundary(
     tickAmulets?: (player: Player) => void;
   },
 ) {
-  const queue = queueTurnBoundaryTriggers("start_of_turn", startingPlayer, SOT_STEPS);
+  const queue = queueTurnBoundaryTriggers(
+    "start_of_turn",
+    startingPlayer,
+    SOT_STEPS,
+  );
   const steps = [2, 3, 4, 5];
 
   for (const step of steps) {

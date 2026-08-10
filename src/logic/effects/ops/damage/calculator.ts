@@ -3,7 +3,11 @@
 
 import { isOverflow } from "../../../../helpers/overflow.js";
 import { resolveDynamicValue } from "../../../core/values.js";
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 
 export interface DamageAmountContext {
   owner: Player;
@@ -67,18 +71,3 @@ export function resolveAmountWithOverflow(
   const ctx: DamageAmountContext = { ...context, owner };
   return resolveDamageAmount(eff, ctx).finalAmount;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

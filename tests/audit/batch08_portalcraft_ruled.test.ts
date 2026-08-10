@@ -20,9 +20,7 @@ import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import {
-  fuse_finalize_gear_multi,
-} from "../../src/logic/effects/ops/fuse/fuse.artifact.js";
+import { fuse_finalize_gear_multi } from "../../src/logic/effects/ops/fuse/fuse.artifact.js";
 import {
   getHP,
   getCrests,
@@ -45,8 +43,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -55,8 +56,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -81,7 +81,9 @@ describe("B/C — Medical-Grade Assassin Puppetry Bane (10171140)", () => {
   it("Fanfare adds Enhanced Puppet; Puppet enter grants Bane once per turn", () => {
     setupTurn(R6, { hand: ["10171140", "90071110"], pp: 3 });
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Enhanced Puppet")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Enhanced Puppet")).toBe(
+      true,
+    );
     whenPlayCard("first", 0);
     const puppet = findOnBoard("first", "Puppet")!;
     expect(puppet.hasBane || puppet.keywordState?.hasBane).toBe(true);
@@ -98,12 +100,14 @@ describe("B/C — replicate fanfare (10172120, 10173110, 10271110)", () => {
   it("Lovestruck Puppeteer Evolve replicates Fanfare Puppet to hand", () => {
     setupTurn(R6, { hand: ["10172120"], pp: 2 });
     whenPlayCard("first", 0);
-    const puppets0 = thenHand("first").filter((c) => c.name === "Puppet").length;
+    const puppets0 = thenHand("first").filter(
+      (c) => c.name === "Puppet",
+    ).length;
     const card = findOnBoard("first", "Lovestruck Puppeteer")!;
     onEvolve(card, "first", "normal");
-    expect(thenHand("first").filter((c) => c.name === "Puppet").length).toBeGreaterThan(
-      puppets0,
-    );
+    expect(
+      thenHand("first").filter((c) => c.name === "Puppet").length,
+    ).toBeGreaterThan(puppets0);
   });
 
   it("Miriam Evolve replicates Fanfare gears to hand", () => {
@@ -122,8 +126,9 @@ describe("B/C — replicate fanfare (10172120, 10173110, 10271110)", () => {
   it("Engineblade Maven Evolve replicates Fanfare Striker + Remembrance", () => {
     setupTurn(R6, { hand: ["10271110"], pp: 6 });
     whenPlayCard("first", 0);
-    const strikers0 = thenBoard("first").filter((c) => c.name === "Striker Artifact")
-      .length;
+    const strikers0 = thenBoard("first").filter(
+      (c) => c.name === "Striker Artifact",
+    ).length;
     const maven = findOnBoard("first", "Engineblade Maven")!;
     onEvolve(maven, "first", "normal");
     expect(
@@ -170,7 +175,11 @@ describe("B/C — Sylvia mode (10173120)", () => {
   });
 
   it("Mode 1 draws 2 cards", () => {
-    setupTurn(R6, { hand: ["10173120"], pp: 6, deck: ["10171320", "10171310"] });
+    setupTurn(R6, {
+      hand: ["10173120"],
+      pp: 6,
+      deck: ["10171320", "10171310"],
+    });
     whenPlayCard("first", 0);
     if (state.pendingModeChoice) state.pendingModeChoice.selectedIndex = 0;
     expect(thenHand("first").length).toBeGreaterThan(1);
@@ -219,10 +228,14 @@ describe("B/C — Ralmia triple summon (10174130)", () => {
   });
 
   it("Ralmia Fanfare selects up to 3 Artifact ≤5 and summons copies", () => {
-    setupTurn(R10, { hand: ["10174130", "90072110", "90072120", "90073110"], pp: 9 });
+    setupTurn(R10, {
+      hand: ["10174130", "90072110", "90072120", "90073110"],
+      pp: 9,
+    });
     whenPlayCard("first", 0);
     const pending = state.pendingTargetEffect;
-    const pool = pending?.poolUids ?? pending?.pool?.map((c) => String(c.uid)) ?? [];
+    const pool =
+      pending?.poolUids ?? pending?.pool?.map((c) => String(c.uid)) ?? [];
     for (let i = 0; i < Math.min(3, pool.length); i++) {
       resolvePendingTarget(String(pool[i]));
     }
@@ -285,12 +298,16 @@ describe("B/C — Artifact Catapult sacrifice Engage (10271210)", () => {
       (c) => c.name === "Artifact Catapult",
     );
     engageAmulet("first", idx);
-    const striker = thenHand("first").find((c) => c.name === "Striker Artifact")!;
+    const striker = thenHand("first").find(
+      (c) => c.name === "Striker Artifact",
+    )!;
     resolvePendingTarget(striker.uid);
-    expect(state.players.first.board.some((c) => c.name === "Artifact Catapult")).toBe(
-      false,
+    expect(
+      state.players.first.board.some((c) => c.name === "Artifact Catapult"),
+    ).toBe(false);
+    expect(thenBoard("first").some((c) => c.name === "Striker Artifact")).toBe(
+      true,
     );
-    expect(thenBoard("first").some((c) => c.name === "Striker Artifact")).toBe(true);
     expect(getPP(state, "first")).toBe(1);
   });
 });
@@ -342,7 +359,9 @@ describe("B/C — Carnelia hand buff (10273110)", () => {
     whenPlayCard("first", 0);
     const carn = findOnBoard("first", "Carnelia, Ember of Darkness")!;
     onEvolve(carn, "first", "normal");
-    const striker = thenHand("first").find((c) => c.name === "Striker Artifact")!;
+    const striker = thenHand("first").find(
+      (c) => c.name === "Striker Artifact",
+    )!;
     resolvePendingTarget(striker.uid);
     const updated = thenHand("first").find((c) => c.uid === striker.uid)!;
     expect(updated.hasWard || updated.keywordState?.hasWard).toBe(true);
@@ -404,7 +423,11 @@ describe("B/C — Destruction line (10371110, 10372110, 10372210, 10373110, 1037
   });
 
   it("Wasteland Fanfare destroys ally and draws 2", () => {
-    setupTurn(R6, { hand: ["10372210"], pp: 2, deck: ["10171320", "10171310"] });
+    setupTurn(R6, {
+      hand: ["10372210"],
+      pp: 2,
+      deck: ["10171320", "10171310"],
+    });
     const ally = createCard(
       { name: "Token", type: "Follower", cost: 1, attack: 1, defense: 1 },
       "board",
@@ -473,7 +496,9 @@ describe("B/C — Destruction line (10371110, 10372110, 10372210, 10373110, 1037
   it("Lishenna Fanfare adds Melodious Monody; Evolve summons White Psalm", () => {
     setupTurn(R6, { hand: ["10374120"], pp: 4 });
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Melodious Monody")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Melodious Monody")).toBe(
+      true,
+    );
     const lish = findOnBoard("first", "Lishenna, Melody Manifest")!;
     onEvolve(lish, "first", "normal");
     expect(
@@ -553,7 +578,9 @@ describe("B/C — Skybound / modes / bosses (10471120, 10472120, 10473110, 10473
     setupTurn(R6, { hand: ["10473110", "90072110"], pp: 5 });
     enemyFollower(2, 6);
     whenPlayCard("first", 0);
-    const striker = thenHand("first").find((c) => c.name === "Striker Artifact")!;
+    const striker = thenHand("first").find(
+      (c) => c.name === "Striker Artifact",
+    )!;
     resolvePendingTarget(striker.uid);
     const foe = state.players.second.board[0]!;
     expect(Number(foe.defense)).toBeLessThan(6);

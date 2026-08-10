@@ -45,18 +45,3 @@ describe("Played History", () => {
     expect((entry as any).zone).toBeUndefined();
   });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

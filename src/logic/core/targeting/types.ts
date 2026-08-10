@@ -1,4 +1,8 @@
-import type { CardInstance, Player, Effect } from "../../../core/types/index.js";
+import type {
+  CardInstance,
+  Player,
+  Effect,
+} from "../../../core/types/index.js";
 
 // Re-export shared types (type-only to avoid circular deps)
 export type { CardInstance, Player, Effect };
@@ -9,7 +13,7 @@ export type { CardInstance, Player, Effect };
 
 /**
  * Context passed through effect execution.
- * 
+ *
  * Uses UID-only targeting for determinism and serialization.
  * Use resolveUid() to get CardInstance when needed.
  */
@@ -17,7 +21,7 @@ export interface TargetContext {
   // UID-based targeting (preferred - use when available)
   targetUids?: string[];
 
-  // Source card (kept for convenience - frequently accessed)  
+  // Source card (kept for convenience - frequently accessed)
   sourceCard?: CardInstance | null;
   sourceCardUid?: string;
 
@@ -64,18 +68,22 @@ export interface TargetingEnv {
 export interface TargetQuery {
   raw: string;
   side:
-  | "ally"
-  | "enemy"
-  | "hand"
-  | "any"
-  | "self"
-  | "selected"
-  | "special"
-  | "attacker";
-  specialContext?: "entering_follower" | "last_summoned" | "played_card" | undefined;
+    | "ally"
+    | "enemy"
+    | "hand"
+    | "any"
+    | "self"
+    | "selected"
+    | "special"
+    | "attacker";
+  specialContext?:
+    | "entering_follower"
+    | "last_summoned"
+    | "played_card"
+    | undefined;
   typeFilter?: "follower" | "amulet" | "spell" | undefined;
   condition: any;
-  excludeSelf?: boolean;  // "other:X" targets exclude the source card
+  excludeSelf?: boolean; // "other:X" targets exclude the source card
 }
 
 // Closed union for Context Resolvers
@@ -120,18 +128,3 @@ export type DispatchResult =
   | { kind: "handled" }
   | { kind: "paused" }
   | { kind: "error"; reason: string };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -21,14 +21,16 @@ import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
 import { attackLeader } from "../../src/logic/core/combat.js";
 import { handleRestore } from "../../src/logic/effects/ops/restore/index.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
-import { getHP, getMaxHP, getHand, getBoard } from "../../src/core/playerHelpers.js";
+import {
+  getHP,
+  getMaxHP,
+  getHand,
+  getBoard,
+} from "../../src/core/playerHelpers.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import "../../src/logic/core/effects/index.js";
 
-function setupTurn(
-  round: number,
-  opts: { hand?: string[]; pp?: number } = {},
-) {
+function setupTurn(round: number, opts: { hand?: string[]; pp?: number } = {}) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
   givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
@@ -142,7 +144,9 @@ describe("Owner ruling — Mari (10441120)", () => {
     liu.peak_defense = liu.defense;
     state.players.first.board = [liu];
 
-    const mari = getHand(state, "first").find((c) => c.name === "Mari, Meg's Bestie")!;
+    const mari = getHand(state, "first").find(
+      (c) => c.name === "Mari, Meg's Bestie",
+    )!;
     const base = mari.cost;
 
     onEvolve(liu, "first", "super");

@@ -32,7 +32,12 @@ const R10 = 10;
 
 function setupTurn(
   round: number,
-  opts: { hand?: string[]; pp?: number; deck?: string[]; active?: "first" | "second" } = {},
+  opts: {
+    hand?: string[];
+    pp?: number;
+    deck?: string[];
+    active?: "first" | "second";
+  } = {},
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
@@ -50,8 +55,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -158,9 +162,9 @@ describe("Batch 9 — Neutral [10001] Legends Rise", () => {
     expect(thenBoard("second").some((c) => c.name === "High")).toBe(false);
     expect(Number(mid.defense)).toBe(4);
     expect(Number(high.defense ?? 0)).toBeLessThanOrEqual(0);
-    expect(Number(thenBoard("second").find((c) => c.name === "Low")!.defense)).toBe(
-      4,
-    );
+    expect(
+      Number(thenBoard("second").find((c) => c.name === "Low")!.defense),
+    ).toBe(4);
   });
 
   it("Ruler of Cocytus — Fanfare replaces deck with Apocalypse Deck", () => {
@@ -250,7 +254,9 @@ describe("Batch 9 — Neutral [10002] Infinity Evolved", () => {
     setupTurn(R6, { hand: ["10204120"], pp: 3 });
     whenPlayCard("first", 0);
     expect(
-      getCrests(state, "first").some((c) => c.name === "Grimnir, Heavenly Gale"),
+      getCrests(state, "first").some(
+        (c) => c.name === "Grimnir, Heavenly Gale",
+      ),
     ).toBe(true);
   });
 });

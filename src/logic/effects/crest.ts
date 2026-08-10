@@ -3,7 +3,11 @@ import { state } from "../../core/gameState.js";
 import { runEffects } from "../core/effects/index.js";
 import { logEvent } from "../../core/logger.js";
 import type { Effect, Player } from "../../core/types/index.js";
-import { isFirstPlayer, opponentOf, getCrests as getCrestsHelper } from "../../core/playerHelpers.js";
+import {
+  isFirstPlayer,
+  opponentOf,
+  getCrests as getCrestsHelper,
+} from "../../core/playerHelpers.js";
 import { allocateInsertionTs } from "../core/triggers/utils.js";
 
 // =============================================================================
@@ -24,7 +28,7 @@ export interface CrestTrigger {
 
 /**
  * Crest - represents an active effect/aura on a player.
- * 
+ *
  * Crests can have:
  * - countdown: Decrements at start of turn, fires effects when reaching 0
  * - triggers: Event-based effects (e.g., end_of_turn_own)
@@ -72,7 +76,8 @@ function findCrest(owner: Player, name: string) {
 
 export function handleGainCrest(eff: Effect, owner: Player) {
   // NEW: allow giving to opponent
-  const targetOwner = (eff as any).player === "opponent" ? opponentOf(owner) : owner;
+  const targetOwner =
+    (eff as any).player === "opponent" ? opponentOf(owner) : owner;
 
   const crests = getCrestsHelper(state, targetOwner);
   const crestName = (eff as any).name?.trim();
@@ -95,14 +100,16 @@ export function handleGainCrest(eff: Effect, owner: Player) {
     // countdown-based “expiry effects” (legacy path)
     effects: Array.isArray(eff.effects) ? eff.effects : [],
     // multi-event triggers
-    triggers: (triggers || []).map((t: any): CrestTrigger => ({
-      event: t.event,
-      type: t.type, // Include type field (e.g., "end_of_turn_own")
-      effects: Array.isArray(t.effects) ? t.effects : [],
-      once_per_turn: !!t.once_per_turn,
-      // REMOVED: usedThisTurn initialization - uses crest.__onceByTurn now
-      condition: t.condition ?? null,
-    })),
+    triggers: (triggers || []).map(
+      (t: any): CrestTrigger => ({
+        event: t.event,
+        type: t.type, // Include type field (e.g., "end_of_turn_own")
+        effects: Array.isArray(t.effects) ? t.effects : [],
+        once_per_turn: !!t.once_per_turn,
+        // REMOVED: usedThisTurn initialization - uses crest.__onceByTurn now
+        condition: t.condition ?? null,
+      }),
+    ),
     owner: targetOwner,
     // Keywords (e.g., ["LastWords"]) - needed for Last Words detection
     keywords: Array.isArray((eff as any).keywords) ? (eff as any).keywords : [],
@@ -114,7 +121,9 @@ export function handleGainCrest(eff: Effect, owner: Player) {
   logEvent("gainCrest", { owner: targetOwner, crest: crestName });
 
   // Run on_gain effects AFTER crest is successfully added
-  const onGainEffects = Array.isArray((eff as any).on_gain) ? (eff as any).on_gain : [];
+  const onGainEffects = Array.isArray((eff as any).on_gain)
+    ? (eff as any).on_gain
+    : [];
   if (onGainEffects.length > 0) {
     runEffects(onGainEffects, targetOwner, null, {});
   }
@@ -150,7 +159,7 @@ export function crestSpendCounter(
   return true;
 }
 
-/** 
+/**
  * Start-of-turn countdown tick.
  * When countdown reaches 0, the crest is DESTROYED (triggers Last Words if present).
  * Effects do NOT fire just because countdown completed - only Last Words triggers on destruction.
@@ -163,7 +172,8 @@ export function tickCrests(owner: Player) {
   const toDestroy: string[] = [];
 
   for (const c of crests) {
-    if (typeof c?.countdown !== "number" || !Number.isFinite(c.countdown)) continue;
+    if (typeof c?.countdown !== "number" || !Number.isFinite(c.countdown))
+      continue;
 
     c.countdown -= 1;
 
@@ -224,7 +234,10 @@ export function processCrestEvent(owner: Player, event: string) {
         if (t.type === "end_of_turn_own" && event === "end_of_turn") {
           // Crest triggers are always processed for the owner, so this matches
           isMatch = true;
-        } else if (t.type === "start_of_turn_own" && event === "start_of_turn") {
+        } else if (
+          t.type === "start_of_turn_own" &&
+          event === "start_of_turn"
+        ) {
           isMatch = true;
         } else if (t.type === event) {
           // Direct match on type field
@@ -282,10 +295,10 @@ export function removeCrest(owner: Player, crestName: string) {
 
 /**
  * Destroy a crest, triggering its Last Words effects if present.
- * 
+ *
  * Like follower/amulet death: destroy → Last Words fire automatically if present.
  * No separate "WithLastWord" variant needed.
- * 
+ *
  * Last Words trigger when:
  * 1. Crest has "Last Words" in its keywords array, OR
  * 2. Crest description contains "Last Words:"
@@ -303,9 +316,10 @@ export function destroyCrest(owner: Player, crestName: string) {
   // Accepts: string "LastWords"/"lastwords" OR object {name: "LastWords"}
   const hasLastWords =
     (Array.isArray(crest.keywords) &&
-      crest.keywords.some((k: any) =>
-        (typeof k === "string" && k.toLowerCase() === "lastwords") ||
-        (typeof k === "object" && k !== null && k.name === "LastWords")
+      crest.keywords.some(
+        (k: any) =>
+          (typeof k === "string" && k.toLowerCase() === "lastwords") ||
+          (typeof k === "object" && k !== null && k.name === "LastWords"),
       )) ||
     (crest.description &&
       crest.description.toLowerCase().includes("last words"));
@@ -316,11 +330,18 @@ export function destroyCrest(owner: Player, crestName: string) {
       crestName,
       effectCount: crest.effects.length,
       effects: JSON.stringify(crest.effects),
-      lastSummonedBefore: state.lastSummoned?.length || 0
+      lastSummonedBefore: state.lastSummoned?.length || 0,
     });
-    logEvent("crestLastWords", { owner, crest: crestName, effectCount: crest.effects.length });
+    logEvent("crestLastWords", {
+      owner,
+      crest: crestName,
+      effectCount: crest.effects.length,
+    });
     runEffects([...crest.effects], owner, null);
-    console.log("[destroyCrest DEBUG] After effects, lastSummoned:", state.lastSummoned?.map((c: any) => c.name));
+    console.log(
+      "[destroyCrest DEBUG] After effects, lastSummoned:",
+      state.lastSummoned?.map((c: any) => c.name),
+    );
   }
 
   // Remove crest from list
@@ -369,18 +390,3 @@ export function crestIncreaseCountdown(owner: Player, amount: number = 1) {
   }
   // Render removed - UI layer
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

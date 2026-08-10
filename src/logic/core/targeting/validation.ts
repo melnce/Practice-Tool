@@ -40,18 +40,18 @@ export function validateTargetSelection(
       // We verify opponent-side status by board membership
       const myBoard = getBoard(state, me) || [];
       const poolHasOpponent = (pending.pool || []).some(
-        (c: any) =>
-          !myBoard.includes(c) && oppBoard.includes(c),
+        (c: any) => !myBoard.includes(c) && oppBoard.includes(c),
       );
 
       if (poolHasOpponent) {
         const lloydUids = new Set(lloyds.map((l) => l.uid));
-        const firstPick = !pending.targetUids || pending.targetUids.length === 0;
+        const firstPick =
+          !pending.targetUids || pending.targetUids.length === 0;
 
         const safeCount =
           typeof pending.selectCount === "number" &&
-            Number.isFinite(pending.selectCount) &&
-            pending.selectCount > 0
+          Number.isFinite(pending.selectCount) &&
+          pending.selectCount > 0
             ? pending.selectCount
             : 1;
 
@@ -81,18 +81,3 @@ export function validateTargetSelection(
   // All checks passed
   return { ok: true };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

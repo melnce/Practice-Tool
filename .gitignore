@@ -1,3 +1,8 @@
+# Secrets / local env (never commit real keys)
+.env
+.env.*
+!.env.example
+
 # Personal data / notes (do not track)
 decks/*
 !decks/starter_deck.json
@@ -48,3 +53,6 @@ cards/seperate_classes.py
 /utils.js
 /scripts/node-fetch-shim.mjs
 /scripts/run-selfplay.mjs
+
+# Tool caches
+.cache/

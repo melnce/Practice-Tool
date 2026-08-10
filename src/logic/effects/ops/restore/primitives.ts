@@ -5,7 +5,13 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import { fireTrigger } from "../../../core/triggers.js";
-import { getHP, setHP, getMaxHP, getHand, getBoard } from "../../../../core/playerHelpers.js";
+import {
+  getHP,
+  setHP,
+  getMaxHP,
+  getHand,
+  getBoard,
+} from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // LEADER RESTORE
@@ -117,18 +123,3 @@ export function getAlliedFollowers(owner: Player): CardInstance[] {
   const board = getBoard(state, owner);
   return board.filter((c) => c && c.type === "Follower");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

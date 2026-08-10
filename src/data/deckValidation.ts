@@ -8,7 +8,11 @@ export const REFERENCE_DECK_SIZE = 40;
 /** Typical per-card copy limit — informational only; owner must confirm rule. */
 export const REFERENCE_COPY_LIMIT = 3;
 
-export type DeckIssueKind = "parse" | "empty" | "missing_identifier" | "unknown_card";
+export type DeckIssueKind =
+  | "parse"
+  | "empty"
+  | "missing_identifier"
+  | "unknown_card";
 
 export interface DeckValidationIssue {
   kind: DeckIssueKind;
@@ -45,9 +49,7 @@ export function resolveCardRef(
     return true;
   }
   if (entry.name) {
-    return (
-      index.byName.has(entry.name) || index.tokensByName.has(entry.name)
-    );
+    return index.byName.has(entry.name) || index.tokensByName.has(entry.name);
   }
   return false;
 }
@@ -73,8 +75,7 @@ function countByKey(entries: readonly RawDeckCardEntry[]): Map<string, number> {
   const counts = new Map<string, number>();
   for (const entry of entries) {
     const key =
-      entry.name ??
-      (entry.id != null ? `id:${entry.id}` : "(empty entry)");
+      entry.name ?? (entry.id != null ? `id:${entry.id}` : "(empty entry)");
     counts.set(key, (counts.get(key) ?? 0) + 1);
   }
   return counts;

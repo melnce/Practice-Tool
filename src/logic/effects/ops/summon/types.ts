@@ -1,7 +1,11 @@
 // src/logic/effects/ops/summon/types.ts
 // Unified summon types and normalization.
 
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 
 // ============================================================================
 // SOURCE & SCOPE TYPES
@@ -111,9 +115,7 @@ export function normalizeToUnifiedSpec(
 
   const rawSource = String(eff.source).toLowerCase();
   const source: SummonSource =
-    rawSource === "self"
-      ? "copy"
-      : (eff.source as SummonSource);
+    rawSource === "self" ? "copy" : (eff.source as SummonSource);
 
   // For named source, name is required
   if (source === "named" && !eff.name) {
@@ -180,15 +182,3 @@ export function normalizeToUnifiedSpec(
 
   return spec;
 }
-
-
-
-
-
-
-
-
-
-
-
-

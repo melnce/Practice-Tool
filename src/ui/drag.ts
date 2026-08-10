@@ -75,7 +75,10 @@ export function enableBoardDropForOwnSide(
       sourceId === containerId.replace("Board", "Hand")
     ) {
       const player: Player = containerId === "blueBoard" ? "first" : "second";
-      const hand = player === "first" ? state.players.first.hand : state.players.second.hand;
+      const hand =
+        player === "first"
+          ? state.players.first.hand
+          : state.players.second.hand;
       const index = hand.findIndex((c: CardInstance) => c.uid === cardUid);
       if (index !== -1)
         void logic().then(({ playCard }) => playCard(hand, player, index));
@@ -106,17 +109,32 @@ export function enableCardEvoDrop(
     if (isBlueSide) {
       if (!isFirstPlayerActive) return;
       if (isNormal) {
-        if (state.players.first.evoUsedThisTurn || !(state.players.first.evoCharges > 0)) return;
+        if (
+          state.players.first.evoUsedThisTurn ||
+          !(state.players.first.evoCharges > 0)
+        )
+          return;
       } else {
-        if (state.players.first.evoUsedThisTurn || !(state.players.first.superEvoCharges > 0))
+        if (
+          state.players.first.evoUsedThisTurn ||
+          !(state.players.first.superEvoCharges > 0)
+        )
           return;
       }
     } else {
       if (isFirstPlayerActive) return;
       if (isNormal) {
-        if (state.players.second.evoUsedThisTurn || !(state.players.second.evoCharges > 0)) return;
+        if (
+          state.players.second.evoUsedThisTurn ||
+          !(state.players.second.evoCharges > 0)
+        )
+          return;
       } else {
-        if (state.players.second.evoUsedThisTurn || !(state.players.second.superEvoCharges > 0)) return;
+        if (
+          state.players.second.evoUsedThisTurn ||
+          !(state.players.second.superEvoCharges > 0)
+        )
+          return;
       }
     }
 
@@ -132,7 +150,11 @@ export function enableCardEvoDrop(
         // - Runs evolve/superevolve effects
         // Rerender is called after evolve completes for immediate visual feedback
         void logic().then(({ handleEvolveSelf }) => {
-          handleEvolveSelf(card, owner, { mode, spendPoint: true, runEvoEffects: true });
+          handleEvolveSelf(card, owner, {
+            mode,
+            spendPoint: true,
+            runEvoEffects: true,
+          });
           rerender();
         });
       },
@@ -157,7 +179,9 @@ export function enableEnemyFollowerDrop(
 
     const defenderPlayer = isRedBoard ? "second" : "first";
     const defenders =
-      defenderPlayer === "first" ? state.players.first.board : state.players.second.board;
+      defenderPlayer === "first"
+        ? state.players.first.board
+        : state.players.second.board;
     const defender = defenders[defenderIndex];
     if (!defender) return;
 
@@ -177,17 +201,3 @@ export function enableEnemyFollowerDrop(
     });
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

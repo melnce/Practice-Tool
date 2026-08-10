@@ -1,6 +1,10 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import type { CardInstance, Player, Effect } from "../../../../core/types/index.js";
+import type {
+  CardInstance,
+  Player,
+  Effect,
+} from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
@@ -51,9 +55,17 @@ export function handleCost(
   // Apply filter if specified
   if (spec.filter && targets.length > 0) {
     targets = targets.filter((c) => {
-      if (spec.filter?.type && c.type?.toLowerCase() !== spec.filter.type.toLowerCase()) return false;
+      if (
+        spec.filter?.type &&
+        c.type?.toLowerCase() !== spec.filter.type.toLowerCase()
+      )
+        return false;
       if (spec.filter?.class && c.class !== spec.filter.class) return false;
-      if (spec.filter?.tribe && (!Array.isArray(c.tribes) || !c.tribes.includes(spec.filter.tribe))) return false;
+      if (
+        spec.filter?.tribe &&
+        (!Array.isArray(c.tribes) || !c.tribes.includes(spec.filter.tribe))
+      )
+        return false;
       return true;
     });
   }
@@ -200,18 +212,3 @@ function applyCostChange(
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

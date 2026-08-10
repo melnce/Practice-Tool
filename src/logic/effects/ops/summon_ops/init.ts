@@ -68,18 +68,3 @@ export function initAmulet(card: CardInstance) {
     card.countdown = Number(card.countdown || 0);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

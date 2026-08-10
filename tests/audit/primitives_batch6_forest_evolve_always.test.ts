@@ -75,7 +75,9 @@ describe("Foundations — Manamel & Cupitan evolve_trigger_always", () => {
   });
 
   it("Cupitan — Skybound effect-evolve runs 7×1 random follower damage", () => {
-    expect(createCard("10413110", "hand", "first").evolve_trigger_always).toBe(true);
+    expect(createCard("10413110", "hand", "first").evolve_trigger_always).toBe(
+      true,
+    );
 
     const e1 = createCard(
       { name: "E1", type: "Follower", cost: 2, attack: 2, defense: 5 },

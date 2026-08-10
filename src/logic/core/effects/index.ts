@@ -166,66 +166,65 @@ export function runEffects(
   let paused = false;
 
   try {
-  while (queue.length > 0) {
-    const eff = queue.shift()!;
+    while (queue.length > 0) {
+      const eff = queue.shift()!;
 
-    // P2-3 FIX: Increment game tick for deterministic ordering
-    state.gameTick = (state.gameTick || 0) + 1;;
+      // P2-3 FIX: Increment game tick for deterministic ordering
+      state.gameTick = (state.gameTick || 0) + 1;
 
-    // Runtime Assertion: Op must be valid string
-    if (!eff.op || typeof eff.op !== "string") {
-      throw new Error(
-        `[Dispatcher] Invalid operation: ${JSON.stringify(eff)} in card ${sourceCard?.name || "unknown"}`,
-      );
-    }
-
-    recordEvent({
-      type: "run_effect",
-      payload: { op: eff.op, owner, source: sourceCard?.name },
-    });
-
-    // Trace: effect_start
-    if (trace) trace.emit({ kind: "effect_start", op: eff.op, depth: 0 }); // Depth not tracked yet
-
-    // Build context for the handler
-    const ctx: EffectCtx = {
-      state,
-      owner,
-      sourceCard,
-      queue,
-      context,
-      adapter: { ...adapter, render: () => { } } as any, // Prevent render loops
-      trace, // Pass it down
-    };
-
-    try {
-      const result = dispatchEffect(eff.op, eff, ctx);
-
-      // Protocol: "pending" stops the queue. Anything else continues.
-      // We do not wait for Promises (fire-and-forget for animations/async side effects),
-      // UNLESS the handler explicitly paused by returning "pending".
-      if (result === "pending") {
-        // Trace: effect_pending
-        if (trace) trace.emit({ kind: "effect_pending", op: eff.op });
-
-        // Paused execution (e.g. targeting waiting for input)
-        // The queue state is preserved in the closure references if passed to targeting,
-        // otherwise it is lost here (which is correct for "pause").
-        paused = true;
-        return "pending";
+      // Runtime Assertion: Op must be valid string
+      if (!eff.op || typeof eff.op !== "string") {
+        throw new Error(
+          `[Dispatcher] Invalid operation: ${JSON.stringify(eff)} in card ${sourceCard?.name || "unknown"}`,
+        );
       }
 
-      // Trace: effect_end
-      if (trace) trace.emit({ kind: "effect_end", op: eff.op });
-      processedCount++;
-    } catch (e) {
-      // Contextualize error
-      const err = e instanceof Error ? e : new Error(String(e));
-      err.message = `[Dispatcher] Error in op '${eff.op}': ${err.message}`;
-      throw err;
-    }
-  }
+      recordEvent({
+        type: "run_effect",
+        payload: { op: eff.op, owner, source: sourceCard?.name },
+      });
 
+      // Trace: effect_start
+      if (trace) trace.emit({ kind: "effect_start", op: eff.op, depth: 0 }); // Depth not tracked yet
+
+      // Build context for the handler
+      const ctx: EffectCtx = {
+        state,
+        owner,
+        sourceCard,
+        queue,
+        context,
+        adapter: { ...adapter, render: () => {} } as any, // Prevent render loops
+        trace, // Pass it down
+      };
+
+      try {
+        const result = dispatchEffect(eff.op, eff, ctx);
+
+        // Protocol: "pending" stops the queue. Anything else continues.
+        // We do not wait for Promises (fire-and-forget for animations/async side effects),
+        // UNLESS the handler explicitly paused by returning "pending".
+        if (result === "pending") {
+          // Trace: effect_pending
+          if (trace) trace.emit({ kind: "effect_pending", op: eff.op });
+
+          // Paused execution (e.g. targeting waiting for input)
+          // The queue state is preserved in the closure references if passed to targeting,
+          // otherwise it is lost here (which is correct for "pause").
+          paused = true;
+          return "pending";
+        }
+
+        // Trace: effect_end
+        if (trace) trace.emit({ kind: "effect_end", op: eff.op });
+        processedCount++;
+      } catch (e) {
+        // Contextualize error
+        const err = e instanceof Error ? e : new Error(String(e));
+        err.message = `[Dispatcher] Error in op '${eff.op}': ${err.message}`;
+        throw err;
+      }
+    }
   } finally {
     (state as any)._runEffectsDepth = runDepth;
     if (enableDeathDefer) {
@@ -253,16 +252,3 @@ export function runEffects(
 registerRunEffectsInCleanup(runEffects);
 // Register runEffects with triggers/process.ts so board/hand triggers can execute effects
 registerRunEffects(runEffects);
-
-
-
-
-
-
-
-
-
-
-
-
-

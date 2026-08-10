@@ -12,18 +12,3 @@ export interface PlayedHistoryEntry {
   base_image?: string | null;
   ts: number;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

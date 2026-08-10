@@ -97,18 +97,3 @@ export function handleDiscardSelectHand(
 }
 
 // Legacy handleTransformInHand was removed - now handled by unified transform op with zone: "hand"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

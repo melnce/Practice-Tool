@@ -43,11 +43,7 @@ export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {
     sourceCard.defense as number,
   );
 
-  if (
-    (a > 0 || d > 0) &&
-    sourceCard.type === "Follower" &&
-    sourceCard.owner
-  ) {
+  if ((a > 0 || d > 0) && sourceCard.type === "Follower" && sourceCard.owner) {
     checkPostBuffTriggers(sourceCard, a, d, sourceCard.owner);
   }
 
@@ -247,18 +243,3 @@ export function handleBanishSelf(sourceCard: CardInstance, _owner: Player) {
   logEvent("banishSelf", { card: sourceCard.name, uid: sourceCard.uid });
   banishCard(sourceCard);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

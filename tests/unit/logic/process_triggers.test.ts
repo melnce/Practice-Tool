@@ -52,9 +52,3 @@ describe("processCandidateTriggers", () => {
     expect(runEffects).not.toHaveBeenCalled();
   });
 });
-
-
-
-
-
-

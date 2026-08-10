@@ -144,18 +144,3 @@ export function fuse_finalize_loot(
   clearSelectableFlags();
   // Render removed - UI layer
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

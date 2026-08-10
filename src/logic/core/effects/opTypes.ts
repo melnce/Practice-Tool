@@ -18,18 +18,3 @@ export type EffectOp = (typeof ALL_OPS)[number];
 export function isValidOp(op: string): op is EffectOp {
   return (ALL_OPS as readonly string[]).includes(op);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

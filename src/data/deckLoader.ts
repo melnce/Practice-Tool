@@ -7,11 +7,7 @@ import { logEvent } from "../core/logger.js";
 import type { CardInstance } from "../core/types/index.js";
 import { expandDeckEntries } from "./deckExpand.js";
 import { findUnknownCards } from "./deckValidation.js";
-import type {
-  FetchedDeck,
-  RawDeck,
-  RawDeckCardEntry,
-} from "./rawDeck.js";
+import type { FetchedDeck, RawDeck, RawDeckCardEntry } from "./rawDeck.js";
 import { isRawDeckObject } from "./rawDeck.js";
 
 function normalizeDeck(raw: RawDeck, deckFile?: string): RawDeckCardEntry[] {
@@ -27,10 +23,7 @@ function normalizeDeck(raw: RawDeck, deckFile?: string): RawDeckCardEntry[] {
   return expanded;
 }
 
-function assertDeckCardsResolvable(
-  raw: RawDeck,
-  deckFile: string,
-): void {
+function assertDeckCardsResolvable(raw: RawDeck, deckFile: string): void {
   const index = getGlobalCardIndex();
   if (!index) return;
 
@@ -96,7 +89,8 @@ export async function loadBlueDeck(deckName: string) {
   state.players.first.hp = 20;
   state.players.first.pp = 1;
   state.players.first.maxPP = 1;
-  for (let i = 0; i < 4; i++) drawCard(state.players.first.hand, state.players.first.deck);
+  for (let i = 0; i < 4; i++)
+    drawCard(state.players.first.hand, state.players.first.deck);
 
   logEvent("deckLoad", {
     owner: "first",
@@ -121,7 +115,8 @@ export async function loadRedDeck(deckName: string) {
   state.players.second.hp = 20;
   state.players.second.pp = 1;
   state.players.second.maxPP = 1;
-  for (let i = 0; i < 4; i++) drawCard(state.players.second.hand, state.players.second.deck);
+  for (let i = 0; i < 4; i++)
+    drawCard(state.players.second.hand, state.players.second.deck);
 
   logEvent("deckLoad", {
     owner: "second",

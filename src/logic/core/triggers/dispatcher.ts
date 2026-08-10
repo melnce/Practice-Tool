@@ -20,9 +20,9 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   end_of_turn: handleTurnEvent,
 
   // Combat - Strike family (attacker only)
-  strike: handleCombatEvent,          // Any attack target
+  strike: handleCombatEvent, // Any attack target
   follower_strike: handleCombatEvent, // Attacking follower only
-  leader_strike: handleCombatEvent,   // Attacking leader only
+  leader_strike: handleCombatEvent, // Attacking leader only
 
   // Combat - Clash (follower combat, both parties eligible)
   clash: handleCombatEvent,
@@ -61,7 +61,7 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   enemy_follower_leaves_field: handleGenericEvent,
   enemy_follower_defense_down: handleGenericEvent,
   ally_ward_destroyed: handleGenericEvent,
-  select_mode: handleGenericEvent,  // Mode selection (used by Faith crest)
+  select_mode: handleGenericEvent, // Mode selection (used by Faith crest)
 };
 
 export function dispatchEvent(
@@ -73,23 +73,10 @@ export function dispatchEvent(
 
   // P2-5: Dev-mode warning for events without explicit handler registration
   if (!handler && typeof window !== "undefined" && (window as any).__DEV__) {
-    console.warn(`[Triggers] Event "${event}" has no explicit handler, using generic fallback.`);
+    console.warn(
+      `[Triggers] Event "${event}" has no explicit handler, using generic fallback.`,
+    );
   }
 
   (handler || handleGenericEvent)(event, activePlayer, context);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

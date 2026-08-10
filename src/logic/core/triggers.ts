@@ -61,7 +61,8 @@ export function fireTrigger(
 ) {
   // P0-1 FIX: Chain depth protection
   if (_triggerChainDepth >= MAX_TRIGGER_CHAIN_DEPTH) {
-    const msg = `[Triggers] Chain depth exceeded ${MAX_TRIGGER_CHAIN_DEPTH}. ` +
+    const msg =
+      `[Triggers] Chain depth exceeded ${MAX_TRIGGER_CHAIN_DEPTH}. ` +
       `Event: ${eventName}, Player: ${activePlayer}. ` +
       `This indicates an infinite loop in trigger effects.`;
     console.error(msg);
@@ -119,18 +120,3 @@ export function hasCrest(player: Player, crestName: string) {
   const crests = getCrests(state, player);
   return crests.some((c: any) => c.name === crestName);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

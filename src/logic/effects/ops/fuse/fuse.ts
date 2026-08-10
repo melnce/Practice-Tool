@@ -324,18 +324,3 @@ export function fuse_finalize_generic(
   clearSelectableFlags();
   // Render removed - UI layer
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -74,8 +74,8 @@ export function normalizeToUnifiedSpec(
   if (eff.source === undefined) {
     throw new Error(
       `[draw] Missing required field: "source". Must be "deck". ` +
-      `For token generation, use "add" op. For duplication, use "copy" op. ` +
-      `Effect: ${JSON.stringify(eff)}`,
+        `For token generation, use "add" op. For duplication, use "copy" op. ` +
+        `Effect: ${JSON.stringify(eff)}`,
     );
   }
 
@@ -83,9 +83,9 @@ export function normalizeToUnifiedSpec(
   if (sourceRaw !== "deck") {
     throw new Error(
       `[draw] Invalid source: "${eff.source}". Must be "deck". ` +
-      `For token generation (source: "named"), use { "op": "add", "name": "...", "count": N }. ` +
-      `For duplication (source: "copy"), use { "op": "copy", "target": "...", "count": N }. ` +
-      `Effect: ${JSON.stringify(eff)}`,
+        `For token generation (source: "named"), use { "op": "add", "name": "...", "count": N }. ` +
+        `For duplication (source: "copy"), use { "op": "copy", "target": "...", "count": N }. ` +
+        `Effect: ${JSON.stringify(eff)}`,
     );
   }
 
@@ -113,7 +113,9 @@ export function normalizeToUnifiedSpec(
   // ========================================================================
   // OPTIONAL: player (default: "self")
   // ========================================================================
-  const playerRaw = String(eff.player || "self").toLowerCase().trim();
+  const playerRaw = String(eff.player || "self")
+    .toLowerCase()
+    .trim();
   const player: DrawPlayer = playerRaw === "opponent" ? "opponent" : "self";
 
   return {

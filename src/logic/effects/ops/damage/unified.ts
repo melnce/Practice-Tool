@@ -5,12 +5,15 @@ import { getPool } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
-import type { Effect, CardInstance, Player } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  CardInstance,
+  Player,
+} from "../../../../core/types/index.js";
 import { opponentOf, getHP, getMaxHP } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 
 import type { UnifiedDamageSpec, DamageContext } from "./types.js";
-
 
 import { normalizeToUnifiedSpec } from "./types.js";
 import {
@@ -70,9 +73,11 @@ export function handleDamage(
   // Special case: clash_opponent targeting (Clash triggers)
   if (spec.target === "clash_opponent" && sourceCard) {
     const opponent =
-      sourceCard.uid === ctx.attacker?.uid ? ctx.defender :
-        sourceCard.uid === ctx.defender?.uid ? ctx.attacker :
-          null;
+      sourceCard.uid === ctx.attacker?.uid
+        ? ctx.defender
+        : sourceCard.uid === ctx.defender?.uid
+          ? ctx.attacker
+          : null;
     if (opponent) {
       dealDamage(opponent, amount);
       cleanupDead();
@@ -133,10 +138,19 @@ export function handleDamage(
 
   // Handle selection requirement
   if (spec.select && spec.select > 0) {
-    return handleSelection(eff, spec, pool, amount, owner, sourceCard, effectsQueue);
+    return handleSelection(
+      eff,
+      spec,
+      pool,
+      amount,
+      owner,
+      sourceCard,
+      effectsQueue,
+    );
   }
 
   // Dispatch by distribution mode
+  // Note: "by_stat" is handled above (early return) before this switch.
   switch (spec.distribution) {
     case "random":
     case "random_hits":
@@ -149,10 +163,6 @@ export function handleDamage(
       applySplitSpillover(amount, pool, owner, {
         spillToLeader: spec.spill_to_leader ?? false,
       });
-      break;
-
-    case "by_stat":
-      handleByStatDamage(spec, amount, owner);
       break;
 
     case "direct":
@@ -175,19 +185,3 @@ export function handleDamage(
 // ============================================================================
 
 export type { normalizeToUnifiedSpec, UnifiedDamageSpec } from "./types.js";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

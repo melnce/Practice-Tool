@@ -13,12 +13,12 @@ export interface ReplayDiff {
   finalStateHashMatch: boolean;
 
   firstTraceDiff?:
-  | {
-    index: number;
-    left: EffectTraceEvent | undefined;
-    right: EffectTraceEvent | undefined;
-  }
-  | undefined;
+    | {
+        index: number;
+        left: EffectTraceEvent | undefined;
+        right: EffectTraceEvent | undefined;
+      }
+    | undefined;
 
   summary: {
     leftEvents: number;
@@ -272,18 +272,3 @@ if (!diff.ok) {
     console.log(formatReplayDiff(diff));
 }
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

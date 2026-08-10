@@ -94,9 +94,3 @@ describe("Golden: PendingTarget Lifecycle", () => {
     expect(pending?.targets.length).toBe(1);
   });
 });
-
-
-
-
-
-

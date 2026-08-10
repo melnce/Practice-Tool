@@ -91,10 +91,12 @@ export const KEYWORD_MAP: {
     const ks = getKS(c);
     if (!Array.isArray(ks.triggers)) ks.triggers = [];
     if (!Array.isArray(c.triggers)) c.triggers = [];
+    const ksTriggers = ks.triggers;
+    const cardTriggers = c.triggers;
     const add = (t: any) => {
       if (!t) return;
-      ks.triggers.push(t);
-      c.triggers.push(t);
+      ksTriggers.push(t);
+      cardTriggers.push(t);
     };
     if (opts?.trigger) add(opts.trigger);
     if (Array.isArray(opts?.triggers)) {
@@ -158,7 +160,7 @@ export const KEYWORD_MAP: {
     const add = Number(opts.count ?? 0);
     ks.counters[key] = (ks.counters[key] || 0) + add;
   },
-  skybound_art: () => { },
+  skybound_art: () => {},
   pixie_enter: (c, opts) => {
     const ks = getKS(c);
     ks.hasPixieEnter = true;
@@ -193,7 +195,6 @@ export const KEYWORD_MAP: {
       ks.cantAttackIsTemporary = true;
     }
     if (opts?.until_opponent_eot) {
-      ks.cantAttackUntilOpponentEOT = true;
       ks.cantAttackUntilOpponentEOT = true;
       ks.cantAttackIsTemporary = true;
       // Use the caster if provided, otherwise fallback to card owner (for self-buffs)
@@ -260,18 +261,3 @@ export function applyKeywordsFromList(card: CardInstance) {
   }
   __initializingKeywords = false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

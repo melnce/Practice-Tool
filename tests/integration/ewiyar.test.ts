@@ -56,9 +56,3 @@ describe("Ewiyar - recover_ep operation", () => {
     expect(state.players.second.evoCharges).toBe(1);
   });
 });
-
-
-
-
-
-

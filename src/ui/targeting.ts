@@ -56,17 +56,3 @@ export function triggerConfirmButtonClick(): boolean {
   }
   return false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

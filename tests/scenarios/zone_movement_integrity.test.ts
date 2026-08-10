@@ -78,9 +78,3 @@ describe("Scenario: Zone Movement Integrity", () => {
     expect(card.zone).toBe("void");
   });
 });
-
-
-
-
-
-

@@ -27,14 +27,14 @@ const PUPPETRY_TOKEN_NAMES = [
   "Victoria",
 ];
 
-function setupTurn(
-  round: number,
-  opts: { hand?: string[]; pp?: number } = {},
-) {
+function setupTurn(round: number, opts: { hand?: string[]; pp?: number } = {}) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   b.build();
 }
@@ -72,9 +72,7 @@ describe("Puppetry — real play", () => {
 
   it("Noah Fanfare adds 3 Puppets and +1/+0 to Puppetry cards in hand", () => {
     setupTurn(R8, { hand: ["10172130", "90071120"], pp: 6 });
-    const enhancedBefore = thenHand("first").find(
-      (c) => c.id === "90071120",
-    )!;
+    const enhancedBefore = thenHand("first").find((c) => c.id === "90071120")!;
     const atk0 = Number(enhancedBefore.attack);
     whenPlayCard("first", 0);
     const puppets = thenHand("first").filter((c) => c.name === "Puppet");
@@ -89,7 +87,9 @@ describe("Puppetry — real play", () => {
     whenPlayCard("first", 0);
     resolvePendingTarget(puppet.uid);
     expect(
-      thenHand("first").some((c) => c.name === "Doll Slayer" && c.uid === puppet.uid),
+      thenHand("first").some(
+        (c) => c.name === "Doll Slayer" && c.uid === puppet.uid,
+      ),
     ).toBe(true);
   });
 });

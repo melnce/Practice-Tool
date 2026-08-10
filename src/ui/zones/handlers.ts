@@ -71,7 +71,12 @@ export function attachHandlers(
         card.name === "Ominous Artifact α";
 
       if (hasFuseRecipes || hasFortifierFuse || hasSpecialFuse) {
-        actions.handleFuse(ctx.owner, card.uid, !!(hasFuseRecipes || hasSpecialFuse), card);
+        actions.handleFuse(
+          ctx.owner,
+          card.uid,
+          !!(hasFuseRecipes || hasSpecialFuse),
+          card,
+        );
       }
     });
 
@@ -119,17 +124,3 @@ export function attachHandlers(
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

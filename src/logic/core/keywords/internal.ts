@@ -7,18 +7,3 @@ export function getKS(c: CardInstance): KeywordState {
   if (!c.keywordState) c.keywordState = {};
   return c.keywordState;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

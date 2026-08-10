@@ -6,7 +6,6 @@ import { logEvent } from "../../../../core/logger.js";
 
 import type { SummonContext } from "./types.js";
 
-
 import { normalizeToUnifiedSpec } from "./types.js";
 import { handleFillBoardChainDecay } from "../summon_ops/chain.js";
 import {
@@ -84,13 +83,3 @@ export function handleSummon(
       logEvent("summon_unknown_source", { source: spec.source });
   }
 }
-
-
-
-
-
-
-
-
-
-

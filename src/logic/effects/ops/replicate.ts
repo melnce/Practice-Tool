@@ -12,15 +12,16 @@ export type ReplicateEffect = {
   zone?: "fanfare" | "spell" | string;
 };
 
-function collectZoneEffects(
-  card: CardInstance,
-  zone: string,
-): Effect[] {
+function collectZoneEffects(card: CardInstance, zone: string): Effect[] {
   const template = card.id ? getCardById(String(card.id)) : null;
   const def = template ?? card;
   const raw = (def as Record<string, unknown>)[zone];
   if (Array.isArray(raw)) return structuredClone(raw) as Effect[];
-  if (raw && typeof raw === "object" && Array.isArray((raw as { effects?: Effect[] }).effects)) {
+  if (
+    raw &&
+    typeof raw === "object" &&
+    Array.isArray((raw as { effects?: Effect[] }).effects)
+  ) {
     return structuredClone((raw as { effects: Effect[] }).effects);
   }
   return [];

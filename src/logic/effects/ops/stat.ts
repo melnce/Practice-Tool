@@ -2,7 +2,12 @@
 // Entry point for stat operation - delegates to orchestrator
 
 import { handleStatOrchestrator } from "./stat/orchestrator.js";
-import type { Effect, Player, CardInstance, EffectContext } from "../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+  EffectContext,
+} from "../../../core/types/index.js";
 
 /**
  * Unified stat handler.
@@ -10,7 +15,7 @@ import type { Effect, Player, CardInstance, EffectContext } from "../../../core/
  * - Special modes (combo_repeat, double)
  * - Special targets (self, leader, hand, last_added_to_hand)
  * - Pool-based targeting with selection
- * 
+ *
  * See stat/README.md for full documentation.
  */
 export function handleStat(
@@ -28,19 +33,3 @@ export function handleStat(
     context,
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

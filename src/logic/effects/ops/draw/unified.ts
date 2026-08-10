@@ -6,7 +6,11 @@
 import { state } from "../../../../core/gameState.js";
 import { drawCard } from "../../../../core/utils.js";
 import { logEvent } from "../../../../core/logger.js";
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 
 import type { UnifiedDrawSpec, DrawCount } from "./types.js";
 
@@ -33,7 +37,7 @@ function getComboCount(player: Player): number {
 
 /**
  * Unified draw handler - deck only.
- * 
+ *
  * Semantic: Stochastic card acquisition from deck. Thins deck.
  * For token generation, use "add" op.
  * For card duplication, use "copy" op.
@@ -49,7 +53,11 @@ export function handleDraw(
 
   // Determine who draws
   const drawingPlayer: Player =
-    spec.player === "opponent" ? (owner === "first" ? "second" : "first") : owner;
+    spec.player === "opponent"
+      ? owner === "first"
+        ? "second"
+        : "first"
+      : owner;
 
   const hand = getHand(drawingPlayer);
   const deck = getDeck(drawingPlayer);

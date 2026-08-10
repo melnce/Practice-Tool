@@ -88,7 +88,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // God Mode Handlers
   wireClick("godPlus", () => {
-    state.players.first.pp = Math.min(state.players.first.maxPP, state.players.first.pp + 1);
+    state.players.first.pp = Math.min(
+      state.players.first.maxPP,
+      state.players.first.pp + 1,
+    );
     render();
   });
   wireClick("godMinus", () => {
@@ -117,7 +120,10 @@ window.addEventListener("DOMContentLoaded", () => {
     render();
   });
   wireClick("godEPMinus", () => {
-    state.players.first.evoCharges = Math.max(0, (state.players.first.evoCharges || 0) - 1);
+    state.players.first.evoCharges = Math.max(
+      0,
+      (state.players.first.evoCharges || 0) - 1,
+    );
     render();
   });
   wireClick("godEPRefill", () => {
@@ -200,7 +206,10 @@ function appendDeckOption(select: HTMLElement, entry: DeckManifestEntry) {
   select.appendChild(opt);
 }
 
-function populateSelectFromManifest(select: HTMLElement, entries: DeckManifestEntry[]) {
+function populateSelectFromManifest(
+  select: HTMLElement,
+  entries: DeckManifestEntry[],
+) {
   select.innerHTML = "";
 
   const decks = entries.filter((e) => e.category === "deck");
@@ -263,17 +272,3 @@ async function populateDeckSelects() {
 }
 
 window.addEventListener("DOMContentLoaded", populateDeckSelects);
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -256,17 +256,3 @@ window.addEventListener("visibilitychange", () => {
     });
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-

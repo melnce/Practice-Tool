@@ -23,7 +23,11 @@ describe("C1 — Grimnir EOT: LW deferred until step batch resolves (§217)", ()
       .withFirstDeck([{ name: "CastleDraw", type: "Spell", cost: 0 }])
       .build();
     state.players.second.deck = [
-      createCard({ name: "CastleDraw", type: "Spell", cost: 0 }, "deck", "second"),
+      createCard(
+        { name: "CastleDraw", type: "Spell", cost: 0 },
+        "deck",
+        "second",
+      ),
     ];
 
     handleGainCrest(
@@ -39,7 +43,12 @@ describe("C1 — Grimnir EOT: LW deferred until step batch resolves (§217)", ()
                 op: "gate",
                 condition: "super_evolved_allied",
                 effects: [
-                  { op: "damage", target: "enemy:follower", amount: 2, distribution: "all" },
+                  {
+                    op: "damage",
+                    target: "enemy:follower",
+                    amount: 2,
+                    distribution: "all",
+                  },
                 ],
               },
             ],
@@ -88,11 +97,21 @@ describe("C1 — Grimnir EOT: LW deferred until step batch resolves (§217)", ()
         hasLastWords: true,
         keywordState: {
           lastWordsEffects: [
-            { op: "damage", target: "enemy:follower", amount: 2, distribution: "all" },
+            {
+              op: "damage",
+              target: "enemy:follower",
+              amount: 2,
+              distribution: "all",
+            },
           ],
         },
         lastWordsEffects: [
-          { op: "damage", target: "enemy:follower", amount: 2, distribution: "all" },
+          {
+            op: "damage",
+            target: "enemy:follower",
+            amount: 2,
+            distribution: "all",
+          },
         ],
       },
       "board",
@@ -137,9 +156,15 @@ describe("C1 — Grimnir EOT: LW deferred until step batch resolves (§217)", ()
 
     whenEndTurn();
 
-    const celesAfter = getBoard(state, "first").find((c) => c.name === "Celes")!;
-    expect(getBoard(state, "second").find((c) => c.name === "Funikar & Yavnhar")).toBeUndefined();
-    expect(celesAfter.keywordState?.hasBarrier || (celesAfter as any).hasBarrier).toBeFalsy();
+    const celesAfter = getBoard(state, "first").find(
+      (c) => c.name === "Celes",
+    )!;
+    expect(
+      getBoard(state, "second").find((c) => c.name === "Funikar & Yavnhar"),
+    ).toBeUndefined();
+    expect(
+      celesAfter.keywordState?.hasBarrier || (celesAfter as any).hasBarrier,
+    ).toBeFalsy();
     expect(Number(celesAfter.defense)).toBe(defBefore);
     expect(thenHand("second").length).toBe(handBefore + 1);
   });
@@ -150,7 +175,9 @@ describe("C1 — condition snapshot at queue time (§221)", () => {
     resetUidCounter();
     state.gameStarted = true;
     givenGameState({ seed: 1, activePlayer: "first" })
-      .withFirstDeck([{ name: "SnapDraw", type: "Follower", attack: 1, defense: 1 }])
+      .withFirstDeck([
+        { name: "SnapDraw", type: "Follower", attack: 1, defense: 1 },
+      ])
       .build();
   });
 
@@ -170,7 +197,11 @@ describe("C1 — condition snapshot at queue time (§221)", () => {
       },
     ] as any;
     state.players.second.board = [
-      createCard({ name: "Lone", type: "Follower", cost: 2, attack: 2, defense: 2 }, "board", "second"),
+      createCard(
+        { name: "Lone", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "board",
+        "second",
+      ),
     ];
 
     const handBefore = thenHand("first").length;
@@ -213,8 +244,16 @@ describe("C1 — condition snapshot at queue time (§221)", () => {
       ],
     } as any);
     state.players.second.board = [
-      createCard({ name: "E1", type: "Follower", cost: 2, attack: 2, defense: 2 }, "board", "second"),
-      createCard({ name: "E2", type: "Follower", cost: 2, attack: 2, defense: 2 }, "board", "second"),
+      createCard(
+        { name: "E1", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "board",
+        "second",
+      ),
+      createCard(
+        { name: "E2", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "board",
+        "second",
+      ),
     ];
 
     const handBefore = thenHand("first").length;

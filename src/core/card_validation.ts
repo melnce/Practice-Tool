@@ -76,17 +76,3 @@ export function validateCardDatabase() {
   }
   console.log(`Validated ${count} cards/tokens.`);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

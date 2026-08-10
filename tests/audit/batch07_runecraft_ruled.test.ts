@@ -40,8 +40,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -50,9 +53,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -82,8 +83,11 @@ describe("B/C — Sagelight Teachings mode (10132310)", () => {
 
   it("Mode 1 gains 4 earth sigils", () => {
     setupTurn(R6, { hand: ["10132310"], pp: 3 });
-    const mode1 = (getCardById("10132310")!.spell![0] as { options: { effects: unknown[] }[] })
-      .options[0].effects;
+    const mode1 = (
+      getCardById("10132310")!.spell![0] as {
+        options: { effects: unknown[] }[];
+      }
+    ).options[0].effects;
     runEffects(mode1, "first", null);
     expect(earthSigilOnBoard()?.counters?.earth).toBeGreaterThanOrEqual(4);
   });
@@ -91,8 +95,11 @@ describe("B/C — Sagelight Teachings mode (10132310)", () => {
   it("Mode 2 restores 4 defense to your leader", () => {
     setupTurn(R6, { hand: ["10132310"], pp: 3 });
     state.players.first.hp = 10;
-    const mode2 = (getCardById("10132310")!.spell![0] as { options: { effects: unknown[] }[] })
-      .options[1].effects;
+    const mode2 = (
+      getCardById("10132310")!.spell![0] as {
+        options: { effects: unknown[] }[];
+      }
+    ).options[1].effects;
     runEffects(mode2, "first", null);
     expect(getHP(state, "first")).toBe(14);
   });
@@ -161,7 +168,9 @@ describe("B/C — Edelweiss Earth Rite evolve (10133130)", () => {
     sigil.counters = { earth: 2 };
     state.players.first.board = [sigil];
     whenPlayCard("first", 0);
-    const ed = state.players.first.board.find((c) => c.name?.includes("Edelweiss"));
+    const ed = state.players.first.board.find((c) =>
+      c.name?.includes("Edelweiss"),
+    );
     expect(ed?.hasEvolved).toBe(true);
     expect(enemy.defense).toBe(1);
     expect(getPP(state, "first")).toBe(2);
@@ -176,12 +185,16 @@ describe("B/C — Homework Time transform at 5 boost (10133310)", () => {
   });
 
   it("After 5 spellboosts in hand, transforms to Looking Smart!", () => {
-    setupTurn(R6, { hand: ["10133310"], pp: 3, deck: ["10131310", "10131310"] });
+    setupTurn(R6, {
+      hand: ["10133310"],
+      pp: 3,
+      deck: ["10131310", "10131310"],
+    });
     const homework = thenHand("first")[0]!;
     spellboostHand("first", 5, homework);
-    expect(
-      thenHand("first").some((c) => c.name === "Looking Smart!"),
-    ).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Looking Smart!")).toBe(
+      true,
+    );
   });
 });
 
@@ -233,14 +246,18 @@ describe("B/C — Melvie brew + super-evolved gate (10231110)", () => {
     ally.peak_defense = ally.defense;
     state.players.first.board = [ally];
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Witch's New Brew")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Witch's New Brew")).toBe(
+      true,
+    );
     expect(earthSigilOnBoard()?.counters?.earth).toBeGreaterThanOrEqual(2);
   });
 
   it("Without super-evolved ally, Fanfare adds brew only", () => {
     setupTurn(R6, { hand: ["10231110"], pp: 2 });
     whenPlayCard("first", 0);
-    expect(thenHand("first").some((c) => c.name === "Witch's New Brew")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Witch's New Brew")).toBe(
+      true,
+    );
     expect(earthSigilOnBoard()).toBeUndefined();
   });
 });
@@ -308,11 +325,7 @@ describe("B/C — restore leader default (engine scope)", () => {
     setupTurn(R6);
     state.players.first.hp = 10;
     state.players.second.hp = 10;
-    runEffects(
-      [{ op: "restore", target: "leader", amount: 2 }],
-      "first",
-      null,
-    );
+    runEffects([{ op: "restore", target: "leader", amount: 2 }], "first", null);
     expect(getHP(state, "first")).toBe(12);
     expect(getHP(state, "second")).toBe(10);
 
@@ -358,7 +371,11 @@ describe("B/C — Supplicant cost gate (10332110)", () => {
   });
 
   it("If cost isn't 5, Fanfare draws 2 after damaging others", () => {
-    setupTurn(R8, { hand: ["10332110"], pp: 4, deck: ["10131310", "10131320"] });
+    setupTurn(R8, {
+      hand: ["10332110"],
+      pp: 4,
+      deck: ["10131310", "10131320"],
+    });
     const ally = createCard(
       { name: "Ally", type: "Follower", cost: 2, attack: 2, defense: 4 },
       "board",
@@ -374,7 +391,11 @@ describe("B/C — Supplicant cost gate (10332110)", () => {
   });
 
   it("At printed cost 5, Fanfare does not draw 2", () => {
-    setupTurn(R8, { hand: ["10332110"], pp: 5, deck: ["10131310", "10131320"] });
+    setupTurn(R8, {
+      hand: ["10332110"],
+      pp: 5,
+      deck: ["10131310", "10131320"],
+    });
     const deckBefore = state.players.first.deck.length;
     whenPlayCard("first", 0);
     expect(state.players.first.deck.length).toBe(deckBefore);
@@ -420,8 +441,9 @@ describe("B/C — Ascetic replicate shikigami (10331120)", () => {
     setupTurn(R6, { hand: ["10331120"], pp: 4 });
     whenPlayCard("first", 0);
     const asc = findOnBoard("first", "Ascetic of Wuxing")!;
-    const countBefore = thenBoard("first").filter((c) => c.name === "Paper Shikigami")
-      .length;
+    const countBefore = thenBoard("first").filter(
+      (c) => c.name === "Paper Shikigami",
+    ).length;
     onEvolve(asc, "first", "normal");
     expect(
       thenBoard("first").filter((c) => c.name === "Paper Shikigami").length,
@@ -472,7 +494,9 @@ describe("B/C — Illusory Conjuration (10333310)", () => {
     whenPlayCard("first", 0);
     // Drive hand-follower selection explicitly (same nested_effects path as Institute Engage cost)
     const pending = state.pendingTargetEffect;
-    expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
+    expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(
+      0,
+    );
     resolvePendingTarget(String(dev.uid));
     expect(getEffectiveCost(dev)).toBe(cost0 + 1);
     expect(getBoard(state, "second")).toHaveLength(0);
@@ -489,9 +513,9 @@ describe("B/C — Raio hand transform (10334120)", () => {
   it("Fanfare transforms a random spell in hand into Ersatz Elimination", () => {
     setupTurn(R10, { hand: ["10334120", "10131310", "10131320"], pp: 9 });
     whenPlayCard("first", 0);
-    expect(
-      thenHand("first").some((c) => c.name === "Ersatz Elimination"),
-    ).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Ersatz Elimination")).toBe(
+      true,
+    );
   });
 });
 
@@ -530,9 +554,7 @@ describe("B/C — Mireille Earth Rite evolve (10432120)", () => {
     sigil.counters = { earth: 2 };
     state.players.first.board = [sigil];
     whenPlayCard("first", 0);
-    const duo = thenBoard("first").filter((c) =>
-      c.name?.includes("Mireille"),
-    );
+    const duo = thenBoard("first").filter((c) => c.name?.includes("Mireille"));
     expect(duo.some((c) => c.hasEvolved)).toBe(true);
   });
 });

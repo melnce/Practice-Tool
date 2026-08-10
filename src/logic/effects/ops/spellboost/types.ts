@@ -32,14 +32,14 @@ export function normalizeToSpellboostSpec(eff: Effect): UnifiedSpellboostSpec {
   const target = (eff as any).target;
   if (target !== "ally:hand" && target !== "self") {
     throw new Error(
-      `[spellboost] Invalid target: "${target}". Must be "ally:hand" or "self". Effect: ${JSON.stringify(eff)}`
+      `[spellboost] Invalid target: "${target}". Must be "ally:hand" or "self". Effect: ${JSON.stringify(eff)}`,
     );
   }
 
   const mode = (eff as any).mode || "boost";
   if (mode !== "boost" && mode !== "set") {
     throw new Error(
-      `[spellboost] Invalid mode: "${mode}". Must be "boost" or "set". Effect: ${JSON.stringify(eff)}`
+      `[spellboost] Invalid mode: "${mode}". Must be "boost" or "set". Effect: ${JSON.stringify(eff)}`,
     );
   }
 

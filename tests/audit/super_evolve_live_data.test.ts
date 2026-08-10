@@ -23,9 +23,7 @@ import type { CardInstance } from "../../src/core/types/index.js";
 function resolveFirstPendingPoolTarget(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -38,7 +36,9 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
 
   it("Leah (10001120): super-evolve draws 1 from live card data", () => {
     givenGameState({ seed: 1, roundCount: 7 })
-      .withFirstDeck([{ name: "DeckFodder", type: "Follower", attack: 1, defense: 1 }])
+      .withFirstDeck([
+        { name: "DeckFodder", type: "Follower", attack: 1, defense: 1 },
+      ])
       .build();
 
     const leah = createCard("10001120", "board", "first");
@@ -66,7 +66,9 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
     state.players.first.board = [amorous];
 
     onEvolve(amorous, "first", "normal");
-    const normalGhosts = getBoard(state, "first").filter((c) => c.name === "Ghost");
+    const normalGhosts = getBoard(state, "first").filter(
+      (c) => c.name === "Ghost",
+    );
     expect(normalGhosts).toHaveLength(2);
     expect(normalGhosts.every((g) => !g.hasDrain)).toBe(true);
 
@@ -76,7 +78,9 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
     state.players.first.board = [amorous2];
 
     onEvolve(amorous2, "first", "super");
-    const superGhosts = getBoard(state, "first").filter((c) => c.name === "Ghost");
+    const superGhosts = getBoard(state, "first").filter(
+      (c) => c.name === "Ghost",
+    );
     expect(superGhosts).toHaveLength(2);
     expect(superGhosts.every((g) => g.hasDrain)).toBe(true);
   });
@@ -100,7 +104,11 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
     expect(state.pendingTargetEffect).toBeDefined();
     resolveFirstPendingPoolTarget();
 
-    expect(getBoard(state, "second").filter((c) => c?.name === "Indomitable Fighter")).toHaveLength(0);
+    expect(
+      getBoard(state, "second").filter(
+        (c) => c?.name === "Indomitable Fighter",
+      ),
+    ).toHaveLength(0);
   });
 });
 
