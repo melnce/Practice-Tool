@@ -1,4 +1,8 @@
-import type { CardInstance, Effect, Player } from "../../../core/types/index.js";
+import type {
+  CardInstance,
+  Effect,
+  Player,
+} from "../../../core/types/index.js";
 import { logEvent } from "../../../core/logger.js";
 import type { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";
@@ -53,7 +57,7 @@ export function processCandidateTriggers(
   if (currentDepth > MAX_CHAIN_DEPTH) {
     console.error(
       `[Triggers] Chain depth exceeded ${MAX_CHAIN_DEPTH} for event "${event}". ` +
-      `Possible infinite loop. Aborting trigger processing.`
+        `Possible infinite loop. Aborting trigger processing.`,
     );
     return;
   }
@@ -157,7 +161,11 @@ export function processCandidateTriggers(
         triggerId: trigger.event,
         result: "fire",
       });
-      logEvent("trigger", { event: event, card: card?.name, cardUid: card?.uid });
+      logEvent("trigger", {
+        event: event,
+        card: card?.name,
+        cardUid: card?.uid,
+      });
 
       // PERF: Pass effects array directly without spread (runEffects doesn't mutate it)
       runEffects(trigger.effects || [], owner, card, context);
@@ -173,18 +181,3 @@ export function processCandidateTriggers(
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

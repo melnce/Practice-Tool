@@ -38,17 +38,3 @@ export function useSecondPlayerPPBoost() {
 
 // Legacy export for backwards compatibility during transition
 export const useRedBoost = useSecondPlayerPPBoost;
-
-
-
-
-
-
-
-
-
-
-
-
-
-

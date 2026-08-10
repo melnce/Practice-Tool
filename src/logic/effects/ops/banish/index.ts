@@ -10,10 +10,7 @@ export type {
 } from "./types.js";
 
 // Runtime exports from types
-export {
-  normalizeToUnifiedSpec,
-  validateUnifiedSpec,
-} from "./types.js";
+export { normalizeToUnifiedSpec, validateUnifiedSpec } from "./types.js";
 
 // Unified handler
 export { handleBanish } from "./unified.js";
@@ -27,18 +24,3 @@ export {
   getCardOwner,
   getBoard,
 } from "./primitives.js";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

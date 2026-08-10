@@ -17,17 +17,3 @@ export function pushPlayedHistory(owner: Player, card: CardInstance) {
   };
   getPlayedHistory(state, owner).push(entry);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

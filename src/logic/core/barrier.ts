@@ -89,7 +89,11 @@ export function dealDamage(
     // Use typed activePlayer from GameState
     const currentActive = state.activePlayer;
 
-    if (owner && toSlot(currentActive) === toSlot(owner) && target?.evoType === "super") {
+    if (
+      owner &&
+      toSlot(currentActive) === toSlot(owner) &&
+      target?.evoType === "super"
+    ) {
       // Only *reduce* the damage; don't undo a barrier pop that already happened.
       if (amount > 0) {
         damageDealt = 0;
@@ -218,18 +222,3 @@ export function setPotentialFromBasePlus(
   card.isDamaged =
     (parseInt(card.defense as string, 10) || 0) < card.potential_defense;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

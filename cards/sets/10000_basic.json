@@ -91,9 +91,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10001210",
@@ -122,9 +120,7 @@
             "op": "keyword",
             "action": "remove",
             "target": "enemy:follower",
-            "keywords": [
-              "Ward"
-            ],
+            "keywords": ["Ward"],
             "select": 1
           }
         ]
@@ -222,9 +218,7 @@
             "action": "grant",
             "target": "ally:follower",
             "select": 1,
-            "keywords": [
-              "Rush"
-            ]
+            "keywords": ["Rush"]
           }
         ]
       }
@@ -433,9 +427,7 @@
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10012310",
@@ -487,9 +479,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10021120",
@@ -541,9 +531,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Storm"
-    ]
+    "keywords": ["Storm"]
   },
   {
     "id": "10021310",
@@ -630,9 +618,7 @@
       {
         "op": "search",
         "count": "all",
-        "keywords": [
-          "Storm"
-        ],
+        "keywords": ["Storm"],
         "filter": {
           "name": "Rusty, Luxcard Trickster"
         }
@@ -724,9 +710,7 @@
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": [
-                  "Ward"
-                ]
+                "keywords": ["Ward"]
               }
             ]
           }
@@ -743,9 +727,7 @@
     "type": "Amulet",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": [
-      "Earth Sigil"
-    ],
+    "tribes": ["Earth Sigil"],
     "description": "Fanfare: Draw a card.\nEarth Sigil\nEngage (1): Gain an earth sigil.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10031210.webp",
     "evo_image": "",
@@ -990,9 +972,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10041130",
@@ -1183,10 +1163,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Storm",
-      "Bane"
-    ]
+    "keywords": ["Storm", "Bane"]
   },
   {
     "id": "10051120",
@@ -1241,9 +1218,7 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": [
-              "Storm"
-            ]
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -1357,9 +1332,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:last_summoned",
-        "keywords": [
-          "drain"
-        ]
+        "keywords": ["drain"]
       }
     ],
     "fanfare": [],
@@ -1421,9 +1394,7 @@
         "amount": 5
       }
     ],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10061120",
@@ -1443,9 +1414,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ]
+    "keywords": ["Ward"]
   },
   {
     "id": "10061130",
@@ -1582,9 +1551,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [
       {
         "event": "engage",
@@ -1598,9 +1565,7 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": [
-              "Storm"
-            ]
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -1676,9 +1641,7 @@
         "count": 1
       }
     ],
-    "keywords": [
-      "Rush"
-    ]
+    "keywords": ["Rush"]
   },
   {
     "id": "10071120",
@@ -1724,10 +1687,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Bane",
-      "Ward"
-    ]
+    "keywords": ["Bane", "Ward"]
   },
   {
     "id": "10071310",
@@ -1823,9 +1783,7 @@
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "superEvolveReplaces": true
   },
   {

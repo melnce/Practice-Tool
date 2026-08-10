@@ -60,7 +60,8 @@ describe("Runecraft — Spellboost stress", () => {
     whenPlayCard("first", 0);
     const emmylou = thenHand("first").find((c) => c.id === "10132120");
     expect(
-      emmylou?.keywordState?.spellboostCount ?? (emmylou as any)?.spellboostCount,
+      emmylou?.keywordState?.spellboostCount ??
+        (emmylou as any)?.spellboostCount,
     ).toBeGreaterThanOrEqual(1);
   });
 });

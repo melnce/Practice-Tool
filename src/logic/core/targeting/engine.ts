@@ -9,7 +9,7 @@ import { getBoard, getHand } from "../../../core/playerHelpers.js";
  * Core Targeting Engine (UID-Only).
  * Processes a click on a target (card or leader) and determines the next state.
  * Pure-ish: Mutates 'pending' state but has no side effects on game state otherwise.
- * 
+ *
  * Now uses targetUids instead of targets for UID-only targeting.
  */
 export function applyTargetClick(
@@ -85,16 +85,23 @@ export function applyTargetClick(
   // 5. Calculate required/max count first
   const requiredCount =
     typeof pending.selectCount === "number" &&
-      Number.isFinite(pending.selectCount) &&
-      pending.selectCount > 0
+    Number.isFinite(pending.selectCount) &&
+    pending.selectCount > 0
       ? pending.selectCount
       : 1;
 
   // 6. Guard: prevent adding more than max allowed (only if flag is set)
   const alreadySelected = pending.targetUids.includes(uid);
-  if (pending.enforceMaxSelectCount && !alreadySelected && pending.targetUids.length >= requiredCount) {
+  if (
+    pending.enforceMaxSelectCount &&
+    !alreadySelected &&
+    pending.targetUids.length >= requiredCount
+  ) {
     // Already at max - can't add more (but could deselect)
-    return { kind: "invalid", reason: `Max ${requiredCount} selections reached` };
+    return {
+      kind: "invalid",
+      reason: `Max ${requiredCount} selections reached`,
+    };
   }
 
   // 7. Toggle Selection (using UIDs)

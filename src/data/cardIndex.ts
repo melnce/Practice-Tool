@@ -197,11 +197,7 @@ export function getCardDetails(nameOrId: string): CardTemplate | null {
   }
 
   // 2. Name match (main cards first, then tokens)
-  return (
-    index.byName.get(nameOrId) ??
-    index.tokensByName.get(nameOrId) ??
-    null
-  );
+  return index.byName.get(nameOrId) ?? index.tokensByName.get(nameOrId) ?? null;
 }
 
 /**
@@ -246,22 +242,6 @@ export function injectCardForTest(card: CardTemplate): void {
   // Cast to mutable for injection
   (index.byName as Map<string, CardTemplate>).set(card.name, card);
   if (card.id) {
-    (index.byId as Map<string, CardTemplate>).set(
-      String(card.id),
-      card,
-    );
+    (index.byId as Map<string, CardTemplate>).set(String(card.id), card);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

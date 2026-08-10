@@ -1,7 +1,11 @@
 // src/logic/effects/ops/banish/types.ts
 // Unified banish types and normalization.
 
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 
 // ============================================================================
 // DISTRIBUTION & SCOPE TYPES
@@ -194,18 +198,3 @@ export function validateUnifiedSpec(spec: UnifiedBanishSpec): string[] {
 
   return errors;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

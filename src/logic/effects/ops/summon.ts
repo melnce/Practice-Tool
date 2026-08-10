@@ -17,18 +17,3 @@ export * from "./summon_ops/chain.js";
 import { handleFillBoardChainDecay } from "./summon_ops/chain.js";
 export { handleFillBoardChainDecay as handleFillCongregantCopies };
 export * from "./summon_ops/invoke.js";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

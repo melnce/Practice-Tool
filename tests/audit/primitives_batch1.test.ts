@@ -12,7 +12,10 @@ import {
   whenEndTurn,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
-import { applyKeywordsFromList, applyKeyword } from "../../src/logic/core/keywords.js";
+import {
+  applyKeywordsFromList,
+  applyKeyword,
+} from "../../src/logic/core/keywords.js";
 import {
   attackFollower,
   attackLeader,
@@ -238,9 +241,15 @@ describe("Rulebook §757 / owner — Spellboost (hand only)", () => {
 
     whenPlayCard("first", 1);
 
-    const inHand = getHand(state, "first").find((c) => c.name === "Blaze Destroyer");
-    expect(inHand?.keywordState?.spellboostCount ?? inHand?.spellboostCount).toBe(1);
-    expect(boardCopy.spellboostCount ?? boardCopy.keywordState?.spellboostCount).toBeFalsy();
+    const inHand = getHand(state, "first").find(
+      (c) => c.name === "Blaze Destroyer",
+    );
+    expect(
+      inHand?.keywordState?.spellboostCount ?? inHand?.spellboostCount,
+    ).toBe(1);
+    expect(
+      boardCopy.spellboostCount ?? boardCopy.keywordState?.spellboostCount,
+    ).toBeFalsy();
   });
 
   it("Spellboost keyword effects[] — stat buff on bearer in hand", () => {
@@ -262,15 +271,21 @@ describe("Rulebook §757 / owner — Spellboost (hand only)", () => {
       .withFirstPP(10, 10)
       .build();
 
-    const blaze = getHand(state, "first").find((c) => c.name === "Blaze Destroyer")!;
+    const blaze = getHand(state, "first").find(
+      (c) => c.name === "Blaze Destroyer",
+    )!;
     expect(Number(blaze.cost)).toBe(10);
 
     whenPlayCard("first", 1);
     expect(Number(blaze.cost)).toBe(9);
-    expect(blaze.keywordState?.spellboostCount ?? blaze.spellboostCount).toBe(1);
+    expect(blaze.keywordState?.spellboostCount ?? blaze.spellboostCount).toBe(
+      1,
+    );
 
     spellboostHand("first", 2, blaze);
-    expect(blaze.keywordState?.spellboostCount ?? blaze.spellboostCount).toBe(3);
+    expect(blaze.keywordState?.spellboostCount ?? blaze.spellboostCount).toBe(
+      3,
+    );
     expect(Number(blaze.cost)).toBe(7);
   });
 });
@@ -341,8 +356,12 @@ describe("Rulebook §769 / owner — Countdown(N)", () => {
 
     cleanupDead();
 
-    expect(getBoard(state, "first").find((c) => c.name === "Avian Statue")).toBeUndefined();
-    expect(getBoard(state, "first").some((c) => c.name === "Regal Falcon")).toBe(true);
+    expect(
+      getBoard(state, "first").find((c) => c.name === "Avian Statue"),
+    ).toBeUndefined();
+    expect(
+      getBoard(state, "first").some((c) => c.name === "Regal Falcon"),
+    ).toBe(true);
   });
 });
 
@@ -391,9 +410,11 @@ describe("Owner / general — zero damage still counts as taking damage", () => 
 
     dealDamage(az, 0, "first");
     expect(getHP(state, "second")).toBe(19);
-    expect(getBoard(state, "first").some((c) => c.name === "Azurifrit, Heir to Disdain")).toBe(
-      true,
-    );
+    expect(
+      getBoard(state, "first").some(
+        (c) => c.name === "Azurifrit, Heir to Disdain",
+      ),
+    ).toBe(true);
   });
 });
 
@@ -408,7 +429,9 @@ describe("Rulebook §763 / owner — Reanimate(N) token behavior", () => {
       .withFirstHP(20, 20)
       .build();
 
-    state.players.first.graveyard = [createCard("10001110", "graveyard", "first")];
+    state.players.first.graveyard = [
+      createCard("10001110", "graveyard", "first"),
+    ];
 
     handleReanimate({ op: "reanimate", max_cost: 2 } as any, "first");
 
@@ -476,7 +499,10 @@ describe("Owner / cemetery — shadow fuel (Necromancy & Reanimate)", () => {
       "first",
     );
     state.players.first.hand.push(toDiscard);
-    handleDiscardAllExceptNamed({ op: "discard", mode: "except_named", names: [] } as any, "first");
+    handleDiscardAllExceptNamed(
+      { op: "discard", mode: "except_named", names: [] } as any,
+      "first",
+    );
     expect(getShadows(state, "first")).toBe(3);
 
     const banishTarget = createCard(
@@ -496,7 +522,12 @@ describe("Owner / cemetery — shadow fuel (Necromancy & Reanimate)", () => {
     );
     state.players.second.board = [transformTarget];
     handleTransform(
-      { op: "transform", target: "enemy:follower", select: 1, into: "Skeleton" } as any,
+      {
+        op: "transform",
+        target: "enemy:follower",
+        select: 1,
+        into: "Skeleton",
+      } as any,
       "first",
       { sourceCard: null },
     );

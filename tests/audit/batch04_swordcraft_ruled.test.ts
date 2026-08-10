@@ -45,8 +45,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -133,7 +136,9 @@ describe("B/C — Ironcrown Majesty mode (10122310)", () => {
     setupTurn(R6, { pp: 3 });
     const modeBlock = getCardById("10122310")!.spell![0] as any;
     runEffects(modeBlock.options[0].effects, "first", null);
-    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(
+      true,
+    );
     expect(thenBoard("first").some((c) => c.name === "Knight")).toBe(true);
 
     resetUidCounter();
@@ -289,7 +294,11 @@ describe("B/C — Returning Slash fuse gate (10323310)", () => {
         fusedSlash,
       ),
     ).toBe(true);
-    runEffects([...(getCardById("10323310")!.spell ?? [])], "first", fusedSlash);
+    runEffects(
+      [...(getCardById("10323310")!.spell ?? [])],
+      "first",
+      fusedSlash,
+    );
     expect(thenHand("first").map((c) => c.name)).toContain("DrawMe");
   });
 });
@@ -327,7 +336,9 @@ describe("B/C — Octrice crest (10324120)", () => {
     setupTurn(R6, { hand: ["10324120"], pp: 3 });
     whenPlayCard("first", 0);
     expect(
-      getCrests(state, "first").some((c) => c.name === "Octrice, Hollowness Manifest"),
+      getCrests(state, "first").some(
+        (c) => c.name === "Octrice, Hollowness Manifest",
+      ),
     ).toBe(true);
 
     const oct = findOnBoard("first", "Octrice, Hollowness Manifest")!;

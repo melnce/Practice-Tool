@@ -69,7 +69,10 @@ class MulberryRNG implements RNG {
     if (this._cursor % MulberryRNG.CHECKPOINT_INTERVAL === 0) {
       // The internal state after N calls is seed + N * 0x6d2b79f5
       // We can compute this directly rather than storing huge state
-      this._checkpoints.set(this._cursor, this._seed + this._cursor * 0x6d2b79f5);
+      this._checkpoints.set(
+        this._cursor,
+        this._seed + this._cursor * 0x6d2b79f5,
+      );
     }
 
     return r;
@@ -104,7 +107,11 @@ class MulberryRNG implements RNG {
   }
 
   snapshot() {
-    return { seed: this._seed, cursor: this._cursor, uidCounter: this._uidCounter };
+    return {
+      seed: this._seed,
+      cursor: this._cursor,
+      uidCounter: this._uidCounter,
+    };
   }
 
   restore(s: { seed: number; cursor: number; uidCounter?: number }): void {
@@ -146,17 +153,3 @@ class MulberryRNG implements RNG {
 export function createRng(seedLike: number | string | bigint): RNG {
   return new MulberryRNG(seedLike);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

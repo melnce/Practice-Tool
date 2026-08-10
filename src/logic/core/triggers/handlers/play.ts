@@ -1,5 +1,9 @@
 import type { Player } from "../../../../core/types/index.js";
-import type { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
+import type {
+  TriggerContext,
+  TriggerEventName,
+  TriggerSpec,
+} from "../types.js";
 import type { ProcessingCandidate } from "../process.js";
 import { dispatchOrderedTriggers } from "./common.js";
 

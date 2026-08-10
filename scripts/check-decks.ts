@@ -8,7 +8,10 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { buildCardIndex, type BuildCardIndexInput } from "../src/data/cardIndex.js";
+import {
+  buildCardIndex,
+  type BuildCardIndexInput,
+} from "../src/data/cardIndex.js";
 import {
   buildManifestFromFilenames,
   DECK_FILE_EXCLUDE,
@@ -119,7 +122,9 @@ function main() {
     results.push(validateDeckRaw(raw, entry.file, index));
   }
 
-  console.log(`Found ${entries.length} deck file(s) (excluded: ${[...DECK_FILE_EXCLUDE].join(", ")})\n`);
+  console.log(
+    `Found ${entries.length} deck file(s) (excluded: ${[...DECK_FILE_EXCLUDE].join(", ")})\n`,
+  );
 
   let pass = 0;
   let fail = 0;
@@ -129,7 +134,9 @@ function main() {
     else fail++;
   }
 
-  console.log(`\nSummary: ${pass} passed, ${fail} failed (${parseFailures} parse error(s))`);
+  console.log(
+    `\nSummary: ${pass} passed, ${fail} failed (${parseFailures} parse error(s))`,
+  );
 
   if (fail > 0) {
     console.error(

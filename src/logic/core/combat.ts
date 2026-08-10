@@ -9,7 +9,11 @@ import {
   fireDefenderClashTriggers,
 } from "./triggers/handlers/combat.js";
 import { recordEvent } from "../../core/debugTimeline.js";
-import { getBoard, opponentOf, setAnyAllyAttackedThisTurn } from "../../core/playerHelpers.js";
+import {
+  getBoard,
+  opponentOf,
+  setAnyAllyAttackedThisTurn,
+} from "../../core/playerHelpers.js";
 
 // Imported from JS still
 import { applyLeaderDamage } from "../effects/leader.js";
@@ -51,7 +55,9 @@ export function canAttackFollowerTarget(
   return canTargetFollower(defender, defenderBoard);
 }
 
-export function canAttackLeaderWhileWardActive(defenderBoard: CardInstance[]): boolean {
+export function canAttackLeaderWhileWardActive(
+  defenderBoard: CardInstance[],
+): boolean {
   return !hasActiveWardOn(defenderBoard);
 }
 function effectiveAtk(card: CardInstance) {
@@ -242,7 +248,10 @@ function _attackFollowerCore(
   fireAttackerCombatTriggers(attacker, attackerPlayer, { attacker, defender });
   fireDefenderClashTriggers(defender, defenderPlayer, { attacker, defender });
   fireTrigger("ally_follower_attacked", attackerPlayer, { attacker, defender });
-  fireTrigger("enemy_follower_attacked", attackerPlayer, { attacker, defender });
+  fireTrigger("enemy_follower_attacked", attackerPlayer, {
+    attacker,
+    defender,
+  });
   state.suppressCleanup = false;
 
   // Ensure swing counter exists
@@ -270,14 +279,14 @@ function _attackFollowerCore(
 
     // If the defender was removed or died due to follower_strike, award piercing now.
     const stillThere = defenderBoard[defenderIdx];
-      if (
-        !stillThere ||
-        stillThere !== defender ||
-        (defender.defense as any) <= 0
-      ) {
-        if (hasPiercingOne(attacker)) {
-          applyLeaderDamage(defenderPlayer, 1);
-        }
+    if (
+      !stillThere ||
+      stillThere !== defender ||
+      (defender.defense as any) <= 0
+    ) {
+      if (hasPiercingOne(attacker)) {
+        applyLeaderDamage(defenderPlayer, 1);
+      }
       spendAttack(attacker);
       recomputeAttackFlags(attacker);
       return;
@@ -315,7 +324,13 @@ function _attackFollowerCore(
   dealtToDef = dmgResultDef.damage;
 
   // Resolve Bane for attacker
-  resolveBane(attacker, defender, defenderPlayer, dealtToDef, dmgResultDef.barrierPopped);
+  resolveBane(
+    attacker,
+    defender,
+    defenderPlayer,
+    dealtToDef,
+    dmgResultDef.barrierPopped,
+  );
 
   // Defender deals back, unless attacker is invincible on attack this swing
   if (!isInvincibleOnAttack(attacker, attackerPlayer)) {
@@ -323,7 +338,13 @@ function _attackFollowerCore(
     dealtToAtk = dmgResultAtk.damage;
 
     // Resolve Bane for defender
-    resolveBane(defender, attacker, attackerPlayer, dealtToAtk, dmgResultAtk.barrierPopped);
+    resolveBane(
+      defender,
+      attacker,
+      attackerPlayer,
+      dealtToAtk,
+      dmgResultAtk.barrierPopped,
+    );
   } else if (
     attacker.keywordState?.hasBarrier ||
     (attacker as any).hasBarrier
@@ -475,18 +496,3 @@ export function handleDropOnLeader(
 ) {
   return attackLeader(attackerIdx, attackerPlayer, opponentOf(attackerPlayer));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -135,9 +135,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:follower",
-            "keywords": [
-              "Rush"
-            ]
+            "keywords": ["Rush"]
           }
         ]
       }
@@ -783,9 +781,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:last_summoned",
-            "keywords": [
-              "drain"
-            ]
+            "keywords": ["drain"]
           }
         ]
       }
@@ -2051,9 +2047,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Ward"
-            ]
+            "keywords": ["Ward"]
           }
         ]
       }
@@ -2082,9 +2076,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Rush"
-            ]
+            "keywords": ["Rush"]
           }
         ]
       }
@@ -2263,10 +2255,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Rush",
-              "Ward"
-            ]
+            "keywords": ["Rush", "Ward"]
           },
           {
             "type": "buff",
@@ -2344,9 +2333,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:follower",
-            "keywords": [
-              "Barrier"
-            ]
+            "keywords": ["Barrier"]
           }
         ]
       }
@@ -3253,16 +3240,12 @@
           {
             "type": "keyword_granted",
             "target": "ally:follower",
-            "keywords": [
-              "Storm"
-            ]
+            "keywords": ["Storm"]
           },
           {
             "type": "keyword_granted",
             "target": "ally:follower",
-            "keywords": [
-              "Barrier"
-            ]
+            "keywords": ["Barrier"]
           }
         ]
       }
@@ -3691,9 +3674,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Bane"
-            ]
+            "keywords": ["Bane"]
           }
         ]
       }
@@ -4397,9 +4378,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Bane"
-            ]
+            "keywords": ["Bane"]
           }
         ]
       }
@@ -4896,10 +4875,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Storm",
-              "Bane"
-            ]
+            "keywords": ["Storm", "Bane"]
           }
         ]
       }
@@ -6336,9 +6312,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Ward"
-            ]
+            "keywords": ["Ward"]
           }
         ]
       }
@@ -6527,9 +6501,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:follower",
-            "keywords": [
-              "Aura"
-            ]
+            "keywords": ["Aura"]
           }
         ]
       }
@@ -6736,10 +6708,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:hand",
-            "keywords": [
-              "Ward",
-              "cant_be_destroyed"
-            ]
+            "keywords": ["Ward", "cant_be_destroyed"]
           }
         ]
       },
@@ -6749,10 +6718,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:hand",
-            "keywords": [
-              "Ward",
-              "cant_be_destroyed"
-            ]
+            "keywords": ["Ward", "cant_be_destroyed"]
           }
         ]
       }
@@ -6825,9 +6791,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Ward"
-            ]
+            "keywords": ["Ward"]
           }
         ]
       }
@@ -7358,9 +7322,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:follower",
-            "keywords": [
-              "Ward"
-            ]
+            "keywords": ["Ward"]
           },
           {
             "type": "damage",
@@ -7913,9 +7875,7 @@
           {
             "type": "keyword_granted",
             "target": "entering_follower",
-            "keywords": [
-              "Ward"
-            ]
+            "keywords": ["Ward"]
           }
         ]
       }
@@ -8437,9 +8397,7 @@
           {
             "type": "keyword_granted",
             "target": "leader",
-            "keywords": [
-              "Barrier"
-            ]
+            "keywords": ["Barrier"]
           }
         ]
       }
@@ -9763,9 +9721,7 @@
           {
             "type": "keyword_granted",
             "target": "self",
-            "keywords": [
-              "Storm"
-            ]
+            "keywords": ["Storm"]
           }
         ]
       },
@@ -11488,9 +11444,7 @@
           {
             "type": "keyword_granted",
             "target": "ally:follower",
-            "keywords": [
-              "storm"
-            ]
+            "keywords": ["storm"]
           }
         ]
       }

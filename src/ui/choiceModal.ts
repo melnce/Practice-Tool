@@ -37,17 +37,3 @@ export function showChoiceModal(
   // Add to DOM and show
   document.body.appendChild(modal);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

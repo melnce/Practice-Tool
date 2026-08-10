@@ -16,11 +16,12 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
-import {
-  evolveFollowerByEffect,
-} from "../../src/logic/effects/ops/evolve.js";
+import { evolveFollowerByEffect } from "../../src/logic/effects/ops/evolve.js";
 import { handleGainCrest, tickCrests } from "../../src/logic/effects/crest.js";
-import { handleMode, resolveModeSelectCount } from "../../src/logic/effects/ops/mode.js";
+import {
+  handleMode,
+  resolveModeSelectCount,
+} from "../../src/logic/effects/ops/mode.js";
 import { handleCrest } from "../../src/logic/effects/ops/crest/unified.js";
 import {
   incrementSkyboundArt,
@@ -128,9 +129,9 @@ describe("Foundations — Crest countdown / Last Words / EOT", () => {
 
     tickCrests("first");
     expect(getHP(state, "second")).toBe(5);
-    expect(getCrests(state, "first").some((c) => c.name === "Crest: Belial (test)")).toBe(
-      false,
-    );
+    expect(
+      getCrests(state, "first").some((c) => c.name === "Crest: Belial (test)"),
+    ).toBe(false);
   });
 });
 
@@ -172,10 +173,18 @@ describe("Foundations — Skybound Art gauge (turn# + in-hand evolves)", () => {
     expect(meetsSkyboundArtThreshold(belial, 15, 15)).toBe(true);
 
     expect(
-      handleSkyboundArtGate("first", { condition: "skybound_art", requirement: 10 }, belial),
+      handleSkyboundArtGate(
+        "first",
+        { condition: "skybound_art", requirement: 10 },
+        belial,
+      ),
     ).toBe(true);
     expect(
-      handleSkyboundArtGate("first", { condition: "skybound_art", requirement: 15 }, belial),
+      handleSkyboundArtGate(
+        "first",
+        { condition: "skybound_art", requirement: 15 },
+        belial,
+      ),
     ).toBe(false);
   });
 });
@@ -192,10 +201,24 @@ describe("Foundations — Faith counter + variable Modes selection", () => {
     select: 2,
     unique: true,
     options: [
-      { label: "A", effects: [{ op: "pp", action: "recover", player: "self", amount: 1 }] },
-      { label: "B", effects: [{ op: "damage", target: "enemy:leader", amount: 1 }] },
-      { label: "C", effects: [{ op: "restore", target: "leader", player: "self", amount: 1 }] },
-      { label: "D", effects: [{ op: "damage", target: "enemy:leader", amount: 2 }] },
+      {
+        label: "A",
+        effects: [{ op: "pp", action: "recover", player: "self", amount: 1 }],
+      },
+      {
+        label: "B",
+        effects: [{ op: "damage", target: "enemy:leader", amount: 1 }],
+      },
+      {
+        label: "C",
+        effects: [
+          { op: "restore", target: "leader", player: "self", amount: 1 },
+        ],
+      },
+      {
+        label: "D",
+        effects: [{ op: "damage", target: "enemy:leader", amount: 2 }],
+      },
     ],
   };
 
@@ -225,10 +248,18 @@ describe("Foundations — Faith counter + variable Modes selection", () => {
     gainFaithCrest();
     expect(faithCount()).toBe(0);
 
-    handleMode(fourModeEff as any, { owner: "first", sourceCard: null, queue: [] });
+    handleMode(fourModeEff as any, {
+      owner: "first",
+      sourceCard: null,
+      queue: [],
+    });
     expect(faithCount()).toBe(1);
 
-    handleMode(fourModeEff as any, { owner: "first", sourceCard: null, queue: [] });
+    handleMode(fourModeEff as any, {
+      owner: "first",
+      sourceCard: null,
+      queue: [],
+    });
     expect(faithCount()).toBe(2);
   });
 

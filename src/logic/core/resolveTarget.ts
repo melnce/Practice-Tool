@@ -116,13 +116,15 @@ function showConfirmationButton(pending: any) {
     if (pending.enforceMinSelectCount) {
       const requiredCount =
         typeof pending.selectCount === "number" &&
-          Number.isFinite(pending.selectCount) &&
-          pending.selectCount > 0
+        Number.isFinite(pending.selectCount) &&
+        pending.selectCount > 0
           ? pending.selectCount
           : 1;
 
       if (targetUids.length < requiredCount) {
-        console.warn(`[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`);
+        console.warn(
+          `[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`,
+        );
         return; // Don't execute, keep selecting
       }
     }

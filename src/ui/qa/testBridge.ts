@@ -6,14 +6,22 @@ import { getCardDetails } from "../../data/cardIndex.js";
 import { loadDecksFromRaw } from "../../data/deckLoader.js";
 import { loadCardDatabase } from "../../data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../logic/core/keywords/apply.js";
-import type { CardInstance, GameState, Player } from "../../core/types/index.js";
+import type {
+  CardInstance,
+  GameState,
+  Player,
+} from "../../core/types/index.js";
 import type { RawDeck } from "../../data/rawDeck.js";
 import { endTurnBlue, endTurnRed } from "../../logic/core/turns.js";
 
 export interface SvwbTestBridge {
   getState(): GameState;
   seedRng(seed: number | string): void;
-  loadDecks(blue: RawDeck, red: RawDeck, opts?: { drawOpening?: boolean }): void;
+  loadDecks(
+    blue: RawDeck,
+    red: RawDeck,
+    opts?: { drawOpening?: boolean },
+  ): void;
   addToHand(player: Player, cardId: string, count?: number): void;
   addToDeck(player: Player, cardId: string, count?: number): void;
   summonToBoard(player: Player, cardId: string, attackReady?: boolean): boolean;
@@ -111,7 +119,10 @@ function installBridge(): void {
 
       const tune = (player: Player, isSecond: boolean) => {
         const p = state.players[player];
-        const max = Math.min(10, isSecond ? Math.max(1, round) : Math.max(1, round));
+        const max = Math.min(
+          10,
+          isSecond ? Math.max(1, round) : Math.max(1, round),
+        );
         p.maxPP = max;
         p.pp = max;
         p.evoUsedThisTurn = false;

@@ -49,18 +49,28 @@ describe("Rulebook §780 — Rally count", () => {
       .build();
     whenPlayCard("first", 0);
     expect(getRally(state, "first")).toBe(2);
-    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Steelclad Knight")).toBe(
+      true,
+    );
   });
 
   it("handleRallyGate fires at threshold and not below", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();
     setRally(state, "first", 4);
     const queue: any[] = [];
-    handleRallyGate("first", { count: 5, effects: [{ op: "draw", count: 1 }] }, queue);
+    handleRallyGate(
+      "first",
+      { count: 5, effects: [{ op: "draw", count: 1 }] },
+      queue,
+    );
     expect(queue.length).toBe(0);
 
     setRally(state, "first", 5);
-    handleRallyGate("first", { count: 5, effects: [{ op: "draw", count: 1 }] }, queue);
+    handleRallyGate(
+      "first",
+      { count: 5, effects: [{ op: "draw", count: 1 }] },
+      queue,
+    );
     expect(queue.length).toBe(1);
   });
 
@@ -104,7 +114,9 @@ describe("Foundations — Gildaria evolve_trigger_always (10224110)", () => {
     gild.peak_defense = gild.defense;
     state.players.first.board = [gild];
     evolveFollowerByEffect(gild, "first");
-    const knights = thenBoard("first").filter((c) => c.name === "Steelclad Knight");
+    const knights = thenBoard("first").filter(
+      (c) => c.name === "Steelclad Knight",
+    );
     expect(knights.length).toBe(2);
     expect(knights.every((k) => k.hasRush)).toBe(true);
 
@@ -116,6 +128,8 @@ describe("Foundations — Gildaria evolve_trigger_always (10224110)", () => {
     byEp.peak_defense = byEp.defense;
     state.players.first.board = [byEp];
     onEvolve(byEp, "first", "normal", { spendPoint: true });
-    expect(thenBoard("first").filter((c) => c.name === "Steelclad Knight").length).toBe(2);
+    expect(
+      thenBoard("first").filter((c) => c.name === "Steelclad Knight").length,
+    ).toBe(2);
   });
 });

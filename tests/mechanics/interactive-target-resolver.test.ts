@@ -58,7 +58,10 @@ describe("Interactive target resolver (UI handshake)", () => {
     expect(renderCalls).toBeGreaterThan(0);
 
     const beforeDef = Number(enemy.defense);
-    dispatch(state, { type: "CHOOSE_TARGET", target: { type: "card", uid: enemy.uid } });
+    dispatch(state, {
+      type: "CHOOSE_TARGET",
+      target: { type: "card", uid: enemy.uid },
+    });
 
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(enemy.__uiSelectable).toBeUndefined();
@@ -72,7 +75,14 @@ describe("Interactive target resolver (UI handshake)", () => {
       .build();
 
     const golem = createCard(
-      { name: "Golem", type: "Follower", cost: 2, attack: 2, defense: 2, tribes: ["Golem"] },
+      {
+        name: "Golem",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 2,
+        tribes: ["Golem"],
+      },
       "board",
       "first",
     );
@@ -82,7 +92,8 @@ describe("Interactive target resolver (UI handshake)", () => {
 
     // Simulate super-evolve select effect (Remi Rami pattern)
     state.pendingTargetEffect = undefined;
-    const { runEffects } = await import("../../src/logic/core/effects/index.js");
+    const { runEffects } =
+      await import("../../src/logic/core/effects/index.js");
     runEffects(
       [
         {
@@ -91,7 +102,13 @@ describe("Interactive target resolver (UI handshake)", () => {
           select: 1,
           condition: { tribe: "Golem" },
           effects: [
-            { op: "stat", action: "give", target: "selected:follower", attack: 3, defense: 3 },
+            {
+              op: "stat",
+              action: "give",
+              target: "selected:follower",
+              attack: 3,
+              defense: 3,
+            },
           ],
         },
       ],
@@ -102,7 +119,10 @@ describe("Interactive target resolver (UI handshake)", () => {
     expect(state.pendingTargetEffect).toBeDefined();
     expect(golem.__uiSelectable).toBe(true);
 
-    dispatch(state, { type: "CHOOSE_TARGET", target: { type: "card", uid: golem.uid } });
+    dispatch(state, {
+      type: "CHOOSE_TARGET",
+      target: { type: "card", uid: golem.uid },
+    });
 
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(Number(golem.attack)).toBe(5);

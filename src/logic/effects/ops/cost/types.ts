@@ -37,7 +37,12 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
     // Card JSON sometimes uses "action" where the unified op expects "mode"
     if ((eff as any).mode === undefined && (eff as any).action) {
       const act = String((eff as any).action).toLowerCase();
-      if (act === "reduce" || act === "set" || act === "modify" || act === "increase") {
+      if (
+        act === "reduce" ||
+        act === "set" ||
+        act === "modify" ||
+        act === "increase"
+      ) {
         (eff as any).mode = act;
       }
     }
@@ -57,7 +62,13 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
     }
 
     let rawTarget = (eff as any).target as string;
-    const validTargets = ["self", "selected", "pool", "opponent_hand", "last_drawn"];
+    const validTargets = [
+      "self",
+      "selected",
+      "pool",
+      "opponent_hand",
+      "last_drawn",
+    ];
 
     // Card JSON uses selected:follower / selected:amulet; unified op uses "selected" + targetUids
     if (rawTarget.startsWith("selected:")) {
@@ -65,14 +76,15 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
     }
 
     // Detect pool-style targets (e.g., "ally:hand", "enemy:follower")
-    const isPoolTarget = rawTarget.includes(":") && !validTargets.includes(rawTarget);
+    const isPoolTarget =
+      rawTarget.includes(":") && !validTargets.includes(rawTarget);
 
     // Normalize minCost to min_cost
     const minCost = (eff as any).min_cost ?? (eff as any).minCost;
 
     return {
       op: "cost",
-      target: isPoolTarget ? "pool" : rawTarget as CostTarget,
+      target: isPoolTarget ? "pool" : (rawTarget as CostTarget),
       mode: (eff as any).mode,
       amount,
       pool: isPoolTarget ? rawTarget : (eff as any).pool,
@@ -140,18 +152,3 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
       };
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

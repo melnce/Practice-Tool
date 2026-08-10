@@ -37,8 +37,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -47,8 +50,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -76,17 +78,17 @@ describe("Batch 8 — Portalcraft [10001] Legends Rise", () => {
     const elise = findOnBoard("first", "Elise, Electrifying Inventor")!;
     elise.defense = 0;
     cleanupDead();
-    expect(thenHand("first").some((c) => c.name === "Gear of Remembrance")).toBe(
-      true,
-    );
+    expect(
+      thenHand("first").some((c) => c.name === "Gear of Remembrance"),
+    ).toBe(true);
   });
 
   it("Dirk — Fanfare summons Fortifier Artifact", () => {
     setupTurn(R6, { hand: ["10171120"], pp: 5 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Fortifier Artifact")).toBe(
-      true,
-    );
+    expect(
+      thenBoard("first").some((c) => c.name === "Fortifier Artifact"),
+    ).toBe(true);
   });
 
   it("Ironheart Hunter — Fanfare adds Gear of Ambition", () => {
@@ -111,9 +113,9 @@ describe("Batch 8 — Portalcraft [10001] Legends Rise", () => {
     expect(thenHand("first").some((c) => c.name === "Gear of Ambition")).toBe(
       true,
     );
-    expect(thenHand("first").some((c) => c.name === "Gear of Remembrance")).toBe(
-      true,
-    );
+    expect(
+      thenHand("first").some((c) => c.name === "Gear of Remembrance"),
+    ).toBe(true);
   });
 
   it("Rukina — Fanfare adds both Gears", () => {
@@ -122,9 +124,9 @@ describe("Batch 8 — Portalcraft [10001] Legends Rise", () => {
     expect(thenHand("first").some((c) => c.name === "Gear of Ambition")).toBe(
       true,
     );
-    expect(thenHand("first").some((c) => c.name === "Gear of Remembrance")).toBe(
-      true,
-    );
+    expect(
+      thenHand("first").some((c) => c.name === "Gear of Remembrance"),
+    ).toBe(true);
   });
 
   it("Noah — Fanfare adds 3 Puppets and buffs Puppetry in hand", () => {
@@ -142,9 +144,9 @@ describe("Batch 8 — Portalcraft [10001] Legends Rise", () => {
     whenPlayCard("first", 0);
     resolveFirstPending();
     expect(e.defense).toBe(2);
-    expect(thenHand("first").some((c) => c.name === "Gear of Remembrance")).toBe(
-      true,
-    );
+    expect(
+      thenHand("first").some((c) => c.name === "Gear of Remembrance"),
+    ).toBe(true);
   });
 
   it("Ancient Cannon — Fanfare adds Gear of Ambition", () => {
@@ -186,14 +188,16 @@ describe("Batch 8 — Portalcraft [10002] Infinity Evolved", () => {
     expect(thenBoard("first").some((c) => c.name === "Striker Artifact")).toBe(
       true,
     );
-    expect(thenHand("first").some((c) => c.name === "Gear of Remembrance")).toBe(
-      true,
-    );
+    expect(
+      thenHand("first").some((c) => c.name === "Gear of Remembrance"),
+    ).toBe(true);
   });
 
   it("Flight of Icarus — Rush on selected Artifact in hand", () => {
     setupTurn(R6, { hand: ["10272310", "90072110"], pp: 2 });
-    const striker = thenHand("first").find((c) => c.name === "Striker Artifact")!;
+    const striker = thenHand("first").find(
+      (c) => c.name === "Striker Artifact",
+    )!;
     whenPlayCard("first", 0);
     resolvePendingTarget(striker.uid);
     const updated = thenHand("first").find((c) => c.uid === striker.uid)!;
@@ -224,9 +228,9 @@ describe("Batch 8 — Portalcraft [10003] Heirs of the Omen", () => {
   it("Supersonic Fighter — Fanfare summons Ominous Artifact γ", () => {
     setupTurn(R8, { hand: ["10371120"], pp: 7 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").some((c) => c.name === "Ominous Artifact γ")).toBe(
-      true,
-    );
+    expect(
+      thenBoard("first").some((c) => c.name === "Ominous Artifact γ"),
+    ).toBe(true);
   });
 
   it("Wired Assault — destroys enemy and adds 2 Puppets", () => {

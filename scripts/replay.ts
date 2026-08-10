@@ -140,8 +140,12 @@ async function main() {
     checkStateB,
   );
 
-  const actualA = checkStateA.players.first.deck.slice(0, 5).map((c: any) => c.name);
-  const actualB = checkStateB.players.first.deck.slice(0, 5).map((c: any) => c.name);
+  const actualA = checkStateA.players.first.deck
+    .slice(0, 5)
+    .map((c: any) => c.name);
+  const actualB = checkStateB.players.first.deck
+    .slice(0, 5)
+    .map((c: any) => c.name);
 
   // Canonical shuffle regression (owner-approved baseline 2026-05-31):
   //   initReplayState({ seed, deckId: "standard" (default), initialDraw: 0, strict: verify-mode })

@@ -115,7 +115,9 @@ describe("follower_strike only_if_damaged destroy", () => {
 
       attackFollower(0, 0, "first", "second");
 
-      const stillThere = getBoard(state, "second").find((c) => c.uid === "enemy");
+      const stillThere = getBoard(state, "second").find(
+        (c) => c.uid === "enemy",
+      );
       expect(stillThere).toBeUndefined();
     });
 

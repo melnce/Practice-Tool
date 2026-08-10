@@ -31,12 +31,28 @@ export function render() {
 
   // zones - use activePlayer as source of truth for turn state
   const isFirstActive = state.activePlayer === "first";
-  renderZone("blueHand", state.players.first.hand, state, render, isFirstActive, (i) =>
-    logic().then(({ playCard }) => playCard(state.players.first.hand, "first", i)),
+  renderZone(
+    "blueHand",
+    state.players.first.hand,
+    state,
+    render,
+    isFirstActive,
+    (i) =>
+      logic().then(({ playCard }) =>
+        playCard(state.players.first.hand, "first", i),
+      ),
   );
   renderZone("blueBoard", state.players.first.board, state, render);
-  renderZone("redHand", state.players.second.hand, state, render, !isFirstActive, (i) =>
-    logic().then(({ playCard }) => playCard(state.players.second.hand, "second", i)),
+  renderZone(
+    "redHand",
+    state.players.second.hand,
+    state,
+    render,
+    !isFirstActive,
+    (i) =>
+      logic().then(({ playCard }) =>
+        playCard(state.players.second.hand, "second", i),
+      ),
   );
   renderZone("redBoard", state.players.second.board, state, render);
 
@@ -121,8 +137,14 @@ export function render() {
   //sidebars/lists
   renderListIfPresent("bluePlayedList", state.players.first.playedHistory);
   renderListIfPresent("redPlayedList", state.players.second.playedHistory);
-  renderListIfPresent("blueDestroyedList", state.players.first.destroyedHistory);
-  renderListIfPresent("redDestroyedList", state.players.second.destroyedHistory);
+  renderListIfPresent(
+    "blueDestroyedList",
+    state.players.first.destroyedHistory,
+  );
+  renderListIfPresent(
+    "redDestroyedList",
+    state.players.second.destroyedHistory,
+  );
 
   // God Mode Visibility
   const godPanel = byId("blueGodMode");
@@ -334,7 +356,9 @@ function orderedCrestSlots(container: HTMLElement, side: Player) {
 // render.js — REPLACE updateCrestsUI with this
 function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
   const crests =
-    playerPrefix === "first" ? state.players.first.crests || [] : state.players.second.crests || [];
+    playerPrefix === "first"
+      ? state.players.first.crests || []
+      : state.players.second.crests || [];
   // Use visual DOM prefix (blue/red) not semantic (first/second)
   const container = byId(`${domPrefix(playerPrefix)}Crests`);
   const tooltipEl = byId("cardTooltip");
@@ -434,17 +458,3 @@ function renderLeaderBarrierBadge(side: Player) {
     host.classList.remove("has-leader-barrier");
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

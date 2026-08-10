@@ -1,7 +1,11 @@
 // src/logic/effects/ops/destroy/types.ts
 // Unified types for destroy operations.
 
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 
 // ============================================================================
 // DISTRIBUTION MODES
@@ -140,7 +144,9 @@ export function normalizeToUnifiedSpec(
     then_effects: [],
     exclude: [],
     only_if_damaged:
-      eff.only_if_damaged === true || eff.only_if_damaged === "true" || eff.only_if_damaged === 1,
+      eff.only_if_damaged === true ||
+      eff.only_if_damaged === "true" ||
+      eff.only_if_damaged === 1,
     store_count_as:
       typeof eff.store_count_as === "string" ? eff.store_count_as : null,
   };
@@ -253,18 +259,3 @@ export function validateUnifiedSpec(spec: UnifiedDestroySpec): string[] {
 
   return warnings;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

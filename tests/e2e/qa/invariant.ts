@@ -28,7 +28,10 @@ export function trackConsole(page: Page): ConsoleTracker {
 }
 
 export function assertConsoleClean(tracker: ConsoleTracker): void {
-  expect(tracker.errors, `console errors: ${tracker.errors.join("; ")}`).toEqual([]);
+  expect(
+    tracker.errors,
+    `console errors: ${tracker.errors.join("; ")}`,
+  ).toEqual([]);
 }
 
 export async function qaStep(
@@ -37,7 +40,11 @@ export async function qaStep(
   action: () => Promise<void>,
   label?: string,
 ): Promise<void> {
-  if (label) await page.screenshot({ path: `test-results/qa/steps/${label}.png`, fullPage: true });
+  if (label)
+    await page.screenshot({
+      path: `test-results/qa/steps/${label}.png`,
+      fullPage: true,
+    });
   await action();
   await awaitMotionSettled(page);
   await verifyDomMatchesState(page);
@@ -57,7 +64,9 @@ export async function verifyDomMatchesState(page: Page): Promise<void> {
 
     const boardUids = (player: "first" | "second") => {
       const zone = player === "first" ? "blueBoard" : "redBoard";
-      const engine = st.players[player].board.map((c: { uid: string }) => c.uid);
+      const engine = st.players[player].board.map(
+        (c: { uid: string }) => c.uid,
+      );
       const dom = readUids(zone);
       if (engine.join("|") !== dom.join("|")) {
         out.push(`${zone} uid order: engine=[${engine}] dom=[${dom}]`);
@@ -70,7 +79,8 @@ export async function verifyDomMatchesState(page: Page): Promise<void> {
       const el = document.getElementById(countId);
       const shown = Number(el?.textContent ?? -1);
       const actual = st.players[player].hand.length;
-      if (shown !== actual) out.push(`${countId}: shown=${shown} engine=${actual}`);
+      if (shown !== actual)
+        out.push(`${countId}: shown=${shown} engine=${actual}`);
     };
 
     const leaderHp = (player: "first" | "second") => {
@@ -97,10 +107,22 @@ export async function verifyDomMatchesState(page: Page): Promise<void> {
       if (shown !== actual) out.push(`${id}: shown=${shown} engine=${actual}`);
     };
 
-    const cardStats = (zoneId: string, cards: { uid: string; type: string; attack?: number; defense?: number; cost?: number; countdown?: number }[]) => {
+    const cardStats = (
+      zoneId: string,
+      cards: {
+        uid: string;
+        type: string;
+        attack?: number;
+        defense?: number;
+        cost?: number;
+        countdown?: number;
+      }[],
+    ) => {
       for (let i = 0; i < cards.length; i++) {
         const c = cards[i]!;
-        const el = document.querySelector(`#${zoneId} .card[data-uid="${c.uid}"]`) as HTMLElement | null;
+        const el = document.querySelector(
+          `#${zoneId} .card[data-uid="${c.uid}"]`,
+        ) as HTMLElement | null;
         if (!el) {
           out.push(`${zoneId} missing card uid=${c.uid}`);
           continue;
@@ -115,14 +137,20 @@ export async function verifyDomMatchesState(page: Page): Promise<void> {
           if (atk && c.attack != null && atk.textContent !== String(c.attack)) {
             out.push(`${c.uid} atk dom=${atk.textContent} engine=${c.attack}`);
           }
-          if (def && c.defense != null && def.textContent !== String(c.defense)) {
+          if (
+            def &&
+            c.defense != null &&
+            def.textContent !== String(c.defense)
+          ) {
             out.push(`${c.uid} def dom=${def.textContent} engine=${c.defense}`);
           }
         }
         if (c.type === "Amulet" && c.countdown != null) {
           const cd = el.querySelector(".countdown-badge");
           if (cd && cd.textContent !== String(c.countdown)) {
-            out.push(`${c.uid} countdown dom=${cd.textContent} engine=${c.countdown}`);
+            out.push(
+              `${c.uid} countdown dom=${cd.textContent} engine=${c.countdown}`,
+            );
           }
         }
       }
@@ -144,7 +172,8 @@ export async function verifyDomMatchesState(page: Page): Promise<void> {
 
     const epText = (btnId: string, charges: number, kind: "Evo" | "Super") => {
       const btn = document.getElementById(btnId);
-      const expected = kind === "Evo" ? `Evo (${charges})` : `Super (${charges})`;
+      const expected =
+        kind === "Evo" ? `Evo (${charges})` : `Super (${charges})`;
       if (btn && btn.textContent !== expected) {
         out.push(`${btnId}: shown=${btn.textContent} expected=${expected}`);
       }

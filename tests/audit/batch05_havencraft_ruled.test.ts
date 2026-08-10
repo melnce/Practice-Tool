@@ -43,8 +43,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -53,9 +56,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -86,7 +87,9 @@ describe("B/C — Skullfane destroy-count damage (10163110)", () => {
     enemyFollower(5);
     state.players.second.hp = 20;
     whenPlayCard("first", 0);
-    expect(getBoard(state, "first").filter((c) => c.type === "Amulet")).toHaveLength(0);
+    expect(
+      getBoard(state, "first").filter((c) => c.type === "Amulet"),
+    ).toHaveLength(0);
     expect(getHP(state, "second")).toBe(18);
     expect(state.players.second.board[0]!.defense).toBe(3);
   });
@@ -110,7 +113,9 @@ describe("B/C — Maeve Last Words amulet copy (10162130)", () => {
     maeve.defense = 0;
     state.players.first.board = [maeve];
     cleanupDead();
-    expect(thenBoard("first").some((c) => c.name === "Darkhaven Grace")).toBe(true);
+    expect(thenBoard("first").some((c) => c.name === "Darkhaven Grace")).toBe(
+      true,
+    );
   });
 });
 
@@ -145,7 +150,9 @@ describe("B/C — Rodeo discard + amulet summon / super (10164110)", () => {
     state.players.first.board = [rodeo];
     state.players.first.superEvoPoints = 1;
     onEvolve(rodeo, "first", "super");
-    expect(getBoard(state, "second").some((c) => c.name === "High")).toBe(false);
+    expect(getBoard(state, "second").some((c) => c.name === "High")).toBe(
+      false,
+    );
     expect(state.players.second.board[0]!.defense).toBe(2);
   });
 });
@@ -342,7 +349,9 @@ describe("B/C — Himeka crest + super set attack 4 (10364110)", () => {
     setupTurn(R6, { hand: ["10364110"], pp: 6 });
     whenPlayCard("first", 0);
     expect(
-      getCrests(state, "first").some((c) => c.name === "Himeka, Heir to Repose"),
+      getCrests(state, "first").some(
+        (c) => c.name === "Himeka, Heir to Repose",
+      ),
     ).toBe(true);
     const himeka = findOnBoard("first", "Himeka, Heir to Repose")!;
     const foe = enemyFollower(5);
@@ -369,7 +378,9 @@ describe("B/C — Marwynn Torrent + crest (10364120)", () => {
     const mar = findOnBoard("first", "Marwynn, Despair Manifest")!;
     onEvolve(mar, "first", "normal");
     expect(
-      getCrests(state, "first").some((c) => c.name === "Marwynn, Despair Manifest"),
+      getCrests(state, "first").some(
+        (c) => c.name === "Marwynn, Despair Manifest",
+      ),
     ).toBe(true);
   });
 });

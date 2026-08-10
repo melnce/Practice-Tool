@@ -12,7 +12,14 @@ import { runEffects } from "./core/effects/index.js";
 import { logEvent } from "../core/logger.js";
 import type { CardInstance } from "../core/types/index.js";
 import type { StartGameOptions } from "../core/types/index.js";
-import { setAnyAllyAttackedThisTurn, setEvoCharges, setSuperEvoCharges, setEvoUsedThisTurn, getDeck, getHand } from "../core/playerHelpers.js";
+import {
+  setAnyAllyAttackedThisTurn,
+  setEvoCharges,
+  setSuperEvoCharges,
+  setEvoUsedThisTurn,
+  getDeck,
+  getHand,
+} from "../core/playerHelpers.js";
 
 function resetEvoButtons() {
   ["blueNormalEvo", "blueSuperEvo", "redNormalEvo", "redSuperEvo"].forEach(
@@ -39,7 +46,7 @@ export async function startGame(options: StartGameOptions) {
     // Browser/dev can still pass Date.now() explicitly if desired.
     throw new Error(
       "[startGame] Seed is required for determinism. " +
-      "Pass { seed: Date.now() } for casual play or a fixed seed for reproducibility."
+        "Pass { seed: Date.now() } for casual play or a fixed seed for reproducibility.",
     );
   }
 
@@ -158,18 +165,3 @@ export async function startGame(options: StartGameOptions) {
   // Enter mulligan phase (pauses before turn 1)
   beginMulligan();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

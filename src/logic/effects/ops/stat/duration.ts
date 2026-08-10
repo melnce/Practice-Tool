@@ -29,18 +29,3 @@ export function withBuffDuration(
   //    temporary removal logic subtracts them later)
   applyFn({ attack: a, defense: d });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

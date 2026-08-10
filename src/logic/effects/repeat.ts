@@ -2,7 +2,11 @@
 import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 import type { Effect, Player, CardInstance } from "../../core/types/index.js";
-import { getHand, getCrests, getPlaysThisTurn } from "../../core/playerHelpers.js";
+import {
+  getHand,
+  getCrests,
+  getPlaysThisTurn,
+} from "../../core/playerHelpers.js";
 
 function repeatPayload(eff: Effect): Effect | Effect[] | null {
   if (Array.isArray((eff as any).effects) && (eff as any).effects.length) {
@@ -56,18 +60,3 @@ export function handleRepeatEffect(
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

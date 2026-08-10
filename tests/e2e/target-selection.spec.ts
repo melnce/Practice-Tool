@@ -26,13 +26,10 @@ test.describe("Interactive target selection", () => {
       const { loadCardDatabase } = await import("/src/data/cardDatabase.ts");
       await loadCardDatabase();
 
-      const { resetGameState, state } = await import(
-        "/src/core/gameState.ts"
-      );
+      const { resetGameState, state } = await import("/src/core/gameState.ts");
       const { getCardById } = await import("/src/data/cardDatabase.ts");
-      const { applyKeywordsFromList } = await import(
-        "/src/logic/core/keywords.ts"
-      );
+      const { applyKeywordsFromList } =
+        await import("/src/logic/core/keywords.ts");
       const { render } = await import("/src/ui/render.ts");
 
       resetGameState(42);
@@ -67,7 +64,10 @@ test.describe("Interactive target selection", () => {
       render();
     });
 
-    await page.screenshot({ path: "test-results/01-setup.png", fullPage: true });
+    await page.screenshot({
+      path: "test-results/01-setup.png",
+      fullPage: true,
+    });
 
     // Play spell (right-click hand card ÔÇö game convention)
     const handCard = page.locator("#blueHand .card").first();
@@ -85,13 +85,13 @@ test.describe("Interactive target selection", () => {
     );
     expect(selectMode).toBe(true);
 
-    const enemySelectable = await page.locator(
-      '#redBoard .card.selectable',
-    ).count();
+    const enemySelectable = await page
+      .locator("#redBoard .card.selectable")
+      .count();
     expect(enemySelectable).toBeGreaterThan(0);
 
     // Click enemy follower to resolve target
-    await page.locator('#redBoard .card.selectable').first().click();
+    await page.locator("#redBoard .card.selectable").first().click();
     await page.waitForTimeout(300);
     await page.screenshot({
       path: "test-results/03-after-target-click.png",

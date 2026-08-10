@@ -38,18 +38,3 @@ export function toggleSelectionUid(
     return "added";
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

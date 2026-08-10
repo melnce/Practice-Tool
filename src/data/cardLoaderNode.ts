@@ -55,16 +55,3 @@ export async function initCardDatabaseNode(): Promise<void> {
   const cards = loadCardsNode();
   initCardDatabase(cards);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -127,8 +127,10 @@ export function handleReduceCountdown(
   // Crest path
   const blueCrests = getCrests(state, "first");
   const redCrests = getCrests(state, "second");
-  const inBlue = Array.isArray(blueCrests) && blueCrests.includes(sourceCard as any);
-  const inRed = Array.isArray(redCrests) && redCrests.includes(sourceCard as any);
+  const inBlue =
+    Array.isArray(blueCrests) && blueCrests.includes(sourceCard as any);
+  const inRed =
+    Array.isArray(redCrests) && redCrests.includes(sourceCard as any);
   const isCrestObject =
     !!sourceCard && Number.isFinite(sourceCard.countdown) && (inBlue || inRed);
 
@@ -175,18 +177,3 @@ export function handleIncreaseCountdown(owner: Player, amount = 1) {
   }
   // Render removed - UI layer
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -40,8 +40,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -50,9 +53,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -200,8 +201,9 @@ describe("B/C — Lymaga debuff + Super-Evolve (10214120)", () => {
     resolveFirstPending();
     const pendingFanfare = state.pendingTargetEffect;
     const secondFanfareUid =
-      pendingFanfare?.poolUids?.find((id) => id !== pendingFanfare.poolUids?.[0]) ??
-      pendingFanfare?.pool?.[1]?.uid;
+      pendingFanfare?.poolUids?.find(
+        (id) => id !== pendingFanfare.poolUids?.[0],
+      ) ?? pendingFanfare?.pool?.[1]?.uid;
     if (secondFanfareUid) resolvePendingTarget(String(secondFanfareUid));
     expect(a.keywordState?.cantAttackUntilOpponentEOT).toBe(true);
     expect(b.keywordState?.cantAttackUntilOpponentEOT).toBe(true);
@@ -315,9 +317,9 @@ describe("B/C — Krulle Ambush + crest on Super (10314110)", () => {
     state.players.first.board = [kr];
     state.players.first.superEvoPoints = 1;
     onEvolve(kr, "first", "super");
-    expect(getCrests(state, "second").some((c) => c.name?.includes("Krulle"))).toBe(
-      true,
-    );
+    expect(
+      getCrests(state, "second").some((c) => c.name?.includes("Krulle")),
+    ).toBe(true);
   });
 });
 
@@ -329,7 +331,11 @@ describe("B/C — Alfheimr Mode + SSA (10413310)", () => {
   });
 
   it("Below SSA: mode UI pending; at 15 SSA runs bundled effects (card text)", () => {
-    setupTurn(R6, { hand: ["10413310"], pp: 2, deck: ["10111310", "10111310"] });
+    setupTurn(R6, {
+      hand: ["10413310"],
+      pp: 2,
+      deck: ["10111310", "10111310"],
+    });
     state.players.first.hp = 18;
     whenPlayCard("first", 0);
     if (state.pendingModeChoice) {

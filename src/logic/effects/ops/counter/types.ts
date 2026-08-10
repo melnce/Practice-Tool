@@ -44,18 +44,3 @@ export function normalizeToCounterSpec(eff: any): UnifiedCounterSpec {
       throw new Error(`Unknown counter op: ${eff.op}`);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

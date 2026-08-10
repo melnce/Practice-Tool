@@ -24,9 +24,9 @@ export type TriggerEventName =
   | "start_of_turn"
   | "end_of_turn"
   // Combat - Strike family (attacker only, fires before damage)
-  | "strike"          // Any attack target (follower OR leader)
+  | "strike" // Any attack target (follower OR leader)
   | "follower_strike" // Attacking a follower only
-  | "leader_strike"   // Attacking the leader only
+  | "leader_strike" // Attacking the leader only
   // Combat - Clash (both parties eligible, follower combat only)
   | "clash"
   // Combat - Attack watchers (after Strike/Clash, before damage)
@@ -41,8 +41,8 @@ export type TriggerEventName =
   | "ally_follower_enter"
   | "enemy_follower_enter"
   | "ally_follower_played"
-  | "ally_follower_leaves_field"   // When YOUR follower leaves the field
-  | "enemy_follower_leaves_field"  // When ENEMY follower leaves the field
+  | "ally_follower_leaves_field" // When YOUR follower leaves the field
+  | "enemy_follower_leaves_field" // When ENEMY follower leaves the field
   | "ally_ward_destroyed"
   | "enemy_follower_defense_down"
   // Self state changes
@@ -57,7 +57,7 @@ export type TriggerEventName =
   | "loot_fused"
   | "loot_played"
   | "invoke"
-  | "select_mode";  // Mode selection (used by Faith crest)
+  | "select_mode"; // Mode selection (used by Faith crest)
 
 // =============================================================================
 // TRIGGER CONTEXT
@@ -135,18 +135,3 @@ export interface TriggerSpec {
   your_turn_only?: boolean;
   // Phase 4: REMOVED usedThisTurn - use __onceByTurn store on CardInstance
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

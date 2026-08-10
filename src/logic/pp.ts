@@ -2,7 +2,12 @@
 import { state } from "../core/gameState.js";
 import { logEvent } from "../core/logger.js";
 import type { Player } from "../core/types/index.js";
-import { getPermPP, setPermPP, setMaxPP, getMaxPP } from "../core/playerHelpers.js";
+import {
+  getPermPP,
+  setPermPP,
+  setMaxPP,
+  getMaxPP,
+} from "../core/playerHelpers.js";
 
 export function increaseMaxPP(
   owner: Player,
@@ -26,18 +31,3 @@ export function increaseMaxPP(
 export function addMaxPP(owner: Player, amount = 1, opts = {}) {
   return increaseMaxPP(owner, amount, opts);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

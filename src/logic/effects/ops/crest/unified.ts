@@ -4,7 +4,12 @@
 import type { Effect, Player } from "../../../../core/types/index.js";
 import type { completeCrest, Crest } from "../../crest.js";
 
-import { handleGainCrest, crestAddCounter, crestSpendCounter, destroyCrest } from "../../crest.js";
+import {
+  handleGainCrest,
+  crestAddCounter,
+  crestSpendCounter,
+  destroyCrest,
+} from "../../crest.js";
 import { runEffects } from "../../../core/effects/index.js";
 import { handleCountdown } from "../countdown/unified.js";
 
@@ -16,7 +21,7 @@ export interface CrestHandlerContext {
 /**
  * Unified crest handler.
  * Routes to appropriate crest primitive based on action field.
- * 
+ *
  * Countdown operations are delegated to the unified countdown handler.
  */
 export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
@@ -59,18 +64,3 @@ export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
       console.warn(`[crest] Unknown action: ${action}`);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

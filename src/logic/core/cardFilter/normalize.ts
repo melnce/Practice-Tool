@@ -23,7 +23,6 @@ export function normalizeCardFilter(
 ): NormalizedCardFilter {
   const f = spec || {};
 
-
   // Name (exact match)
   const name = toLowerSafe(f.name) || null;
 
@@ -71,18 +70,3 @@ export function normalizeCardFilter(
     tribeList,
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

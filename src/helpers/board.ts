@@ -46,11 +46,3 @@ export function getZoneOwner(zoneId: string): Player | null {
   if (zoneId.startsWith("red")) return "second";
   return null;
 }
-
-
-
-
-
-
-
-

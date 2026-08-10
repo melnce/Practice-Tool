@@ -117,18 +117,3 @@ export function evalCommonConditions(
 
   return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

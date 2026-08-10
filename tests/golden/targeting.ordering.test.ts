@@ -71,9 +71,3 @@ describe("Golden: Targeting Pool Ordering", () => {
     expect(pool.map((c) => c.uid)).toEqual(["b1", "b2", "r1"]);
   });
 });
-
-
-
-
-
-

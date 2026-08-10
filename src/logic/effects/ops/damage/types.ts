@@ -1,7 +1,11 @@
 // src/logic/effects/ops/damage/types.ts
 // Shared types for the damage module.
 
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 
 // ============================================================================
 // LEGACY TYPES (backwards compat)
@@ -42,7 +46,7 @@ export interface DamageContext {
  */
 export type DamageDistribution =
   | "direct"
-  | "random"        // Alias for random_hits (used in card definitions)
+  | "random" // Alias for random_hits (used in card definitions)
   | "random_hits"
   | "split_sequential"
   | "by_stat";
@@ -193,12 +197,13 @@ export function normalizeToUnifiedSpec(
   // Preserve dynamic amount strings (e.g., "{self.attack}") for later resolution
   // Only parse as integer if it's a plain number
   const rawAmount = eff.amount ?? 0;
-  const isDynamicAmount = typeof rawAmount === "string" && rawAmount.startsWith("{");
+  const isDynamicAmount =
+    typeof rawAmount === "string" && rawAmount.startsWith("{");
 
   const spec: UnifiedDamageSpec = {
     target: eff.target as string,
     distribution: "direct",
-    amount: isDynamicAmount ? rawAmount : (parseInt(String(rawAmount), 10) || 0),
+    amount: isDynamicAmount ? rawAmount : parseInt(String(rawAmount), 10) || 0,
     add_amount: eff.add_amount, // Preserve dynamic add_amount for spellboost etc.
     amount_source: "fixed",
     condition: eff.condition,
@@ -304,18 +309,3 @@ export function normalizeToUnifiedSpec(
 
   return spec;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

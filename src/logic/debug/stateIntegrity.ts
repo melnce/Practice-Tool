@@ -1,5 +1,10 @@
 import type { GameState, CardInstance } from "../../core/types/index.js";
-import { getHand, getBoard, getDeck, getGraveyard } from "../../core/playerHelpers.js";
+import {
+  getHand,
+  getBoard,
+  getDeck,
+  getGraveyard,
+} from "../../core/playerHelpers.js";
 
 export function checkStateIntegrity(state: GameState) {
   const seen = new Map<CardInstance, string>();
@@ -49,21 +54,11 @@ export function checkStateIntegrity(state: GameState) {
   checkCollection(getBoard(state, "first"), "firstBoard", "board");
   checkCollection(getBoard(state, "second"), "secondBoard", "board");
   checkCollection(getGraveyard(state, "first"), "firstGraveyard", "graveyard");
-  checkCollection(getGraveyard(state, "second"), "secondGraveyard", "graveyard");
+  checkCollection(
+    getGraveyard(state, "second"),
+    "secondGraveyard",
+    "graveyard",
+  );
   checkCollection(getDeck(state, "first"), "firstDeck", "deck");
   checkCollection(getDeck(state, "second"), "secondDeck", "deck");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

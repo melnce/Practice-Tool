@@ -2,7 +2,11 @@
 // Amulet resolution logic. Pure logic, no rendering.
 
 import { state } from "../../../core/gameState.js";
-import type { CardInstance, Player, Effect } from "../../../core/types/index.js";
+import type {
+  CardInstance,
+  Player,
+  Effect,
+} from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
 import { pushPlayedHistory } from "./history.js";
 import type { PlayOutcome } from "./types.js";
@@ -54,18 +58,3 @@ export function playAmulet(
 
   return { kind: "done" };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

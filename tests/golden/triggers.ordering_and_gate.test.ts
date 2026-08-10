@@ -77,9 +77,3 @@ describe("Golden: Trigger Keys and Ordering", () => {
     });
   });
 });
-
-
-
-
-
-

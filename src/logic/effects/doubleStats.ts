@@ -33,18 +33,3 @@ export function doubleStatsAllies(owner: Player) {
   cleanupDead();
   // Render removed - UI layer
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

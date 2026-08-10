@@ -2,12 +2,22 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import type { CardInstance, Player, Effect } from "../../../../core/types/index.js";
+import type {
+  CardInstance,
+  Player,
+  Effect,
+} from "../../../../core/types/index.js";
 import type { UnifiedEvolveSpec } from "./types.js";
 
 import { normalizeToEvolveSpec } from "./types.js";
 import { onEvolve } from "../../../evolveUtils.js";
-import { getBoard, isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../../core/playerHelpers.js";
+import {
+  getBoard,
+  isFirstPlayer,
+  getEvoUsedThisTurn,
+  getEvoCharges,
+  getSuperEvoCharges,
+} from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
@@ -203,11 +213,7 @@ function resolveTargets(
       if (spec.filter?.unevolved) pool = pool.filter((c) => !c.hasEvolved);
       if (spec.filter?.did_not_attack_this_turn) {
         pool = pool.filter((c) =>
-          evaluateCardCondition(
-            c,
-            { did_not_attack_this_turn: true },
-            owner,
-          ),
+          evaluateCardCondition(c, { did_not_attack_this_turn: true }, owner),
         );
       }
       return pool;
@@ -304,18 +310,3 @@ function canEvolve(owner: Player, card: CardInstance, mode: string): boolean {
     return normalUnlocked && !usedThisTurn && charges > 0;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

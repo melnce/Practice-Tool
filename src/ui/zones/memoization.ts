@@ -64,7 +64,10 @@ function isStateSame(
   if (prev.phase !== state.phase) return false;
   if (prev.mulliganStage !== (state.mulliganStage ?? "")) return false;
 
-  if (prev.boardLens !== `${state.players.first.board.length}|${state.players.second.board.length}`)
+  if (
+    prev.boardLens !==
+    `${state.players.first.board.length}|${state.players.second.board.length}`
+  )
     return false;
 
   const targetOp = state.pendingTargetEffect?.eff?.op ?? "";
@@ -73,13 +76,25 @@ function isStateSame(
   const targetUids = (state.pendingTargetEffect?.targetUids ?? []).join(",");
   if (prev.targetUids !== targetUids) return false;
 
-  if (prev.rally !== `${state.players.first.rally}|${state.players.second.rally}`) return false;
-  if (prev.shadows !== `${state.players.first.shadows}|${state.players.second.shadows}`) return false;
+  if (
+    prev.rally !== `${state.players.first.rally}|${state.players.second.rally}`
+  )
+    return false;
+  if (
+    prev.shadows !==
+    `${state.players.first.shadows}|${state.players.second.shadows}`
+  )
+    return false;
 
   return true;
 }
 
-function isCardSame(prev: CardArgs, card: CardInstance, idx: number, state: GameState): boolean {
+function isCardSame(
+  prev: CardArgs,
+  card: CardInstance,
+  idx: number,
+  state: GameState,
+): boolean {
   // Index Check
   if (prev.idx !== idx) return false;
 
@@ -140,7 +155,9 @@ export function getMemoizedViewModel(
     lastStateArgs: {
       pp: isBlue ? state.players.first.pp : state.players.second.pp,
       // Use activePlayer as source of truth
-      turn: (isBlue && state.activePlayer === "first") || (!isBlue && state.activePlayer === "second"),
+      turn:
+        (isBlue && state.activePlayer === "first") ||
+        (!isBlue && state.activePlayer === "second"),
       activePlayer: state.activePlayer,
       phase: state.phase,
       mulliganStage: state.mulliganStage ?? "",
@@ -172,17 +189,3 @@ export function getMemoizedViewModel(
   vmCache.set(card, newEntry);
   return vm;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

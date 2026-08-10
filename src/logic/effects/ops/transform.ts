@@ -4,7 +4,11 @@ import { getCardDetails } from "../../../data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../core/keywords.js";
 
 import { logEvent } from "../../../core/logger.js";
-import type { Player, CardInstance, Effect } from "../../../core/types/index.js";
+import type {
+  Player,
+  CardInstance,
+  Effect,
+} from "../../../core/types/index.js";
 import { getHand, getBoard } from "../../../core/playerHelpers.js";
 import { getPool } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
@@ -23,9 +27,9 @@ export interface TransformFilter {
 }
 
 export interface TransformSpec {
-  target: string;           // REQUIRED: unified target (e.g., "enemy:follower", "ally:hand")
+  target: string; // REQUIRED: unified target (e.g., "enemy:follower", "ally:hand")
   mode?: TransformMode;
-  into?: string;            // REQUIRED for board/self
+  into?: string; // REQUIRED for board/self
   name?: string;
   filter?: TransformFilter;
   select?: number;
@@ -54,8 +58,8 @@ export function handleTransform(
   if (!eff.target) {
     throw new Error(
       `[transform] Missing required field: "target". ` +
-      `Use "enemy:follower", "ally:hand", or "self". ` +
-      `Effect: ${JSON.stringify(eff)}`
+        `Use "enemy:follower", "ally:hand", or "self". ` +
+        `Effect: ${JSON.stringify(eff)}`,
     );
   }
 
@@ -76,7 +80,7 @@ export function handleTransform(
   if (!into && zone !== "hand") {
     throw new Error(
       `[transform] Missing required field: "into". ` +
-      `Effect: ${JSON.stringify(eff)}`
+        `Effect: ${JSON.stringify(eff)}`,
     );
   }
 
@@ -173,7 +177,12 @@ function matchesFilter(card: CardInstance, filter: any): boolean {
 
   if (costLte !== undefined) {
     const maxCost = parseInt(String(costLte), 10);
-    console.log("[matchesFilter DEBUG] cost_lte check:", { cardName: card.name, cardCost, maxCost, willReject: cardCost > maxCost });
+    console.log("[matchesFilter DEBUG] cost_lte check:", {
+      cardName: card.name,
+      cardCost,
+      maxCost,
+      willReject: cardCost > maxCost,
+    });
     if (cardCost > maxCost) return false;
   }
 
@@ -245,9 +254,9 @@ function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
       // PRESERVE UID, owner, zone - only replace card properties
       const newCard = {
         ...structuredClone(cardTemplate),
-        uid: card.uid,          // PRESERVE original UID
-        owner: card.owner,      // PRESERVE owner
-        zone: card.zone,        // PRESERVE zone
+        uid: card.uid, // PRESERVE original UID
+        owner: card.owner, // PRESERVE owner
+        zone: card.zone, // PRESERVE zone
       };
       logEvent("transformInHand", { owner, from: card.name, to: newCard.name });
       hand[i] = newCard as CardInstance;
@@ -283,9 +292,7 @@ function transformRandomInHand(
 
   // If the original transformRandomSpellInHand set cost to 0, replicate that behavior
   // (This is specific to the Raio card behavior)
-  const updated = getHand(state, owner).find(
-    (c) => c && c.uid === uid,
-  );
+  const updated = getHand(state, owner).find((c) => c && c.uid === uid);
   if (!updated) return;
 
   const printed = parseInt(updated.cost as string, 10) || 0;
@@ -478,18 +485,3 @@ export function transformAnywhere(target: CardInstance, intoName: string) {
 
 // Legacy transformRandomSpellInHand was removed - now handled by:
 // { op: "transform", zone: "hand", mode: "random", filter: { type: "Spell" }, into: "..." }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

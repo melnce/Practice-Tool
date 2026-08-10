@@ -40,63 +40,63 @@ export type Player = PlayerSlot;
  * - Perspective-agnostic logic
  */
 export interface PlayerState {
-    // === Resources ===
-    hp: number;
-    maxHP: number;
-    pp: number;
-    maxPP: number;
-    permPP: number; // Permanent PP bonus (e.g., from Zooey)
+  // === Resources ===
+  hp: number;
+  maxHP: number;
+  pp: number;
+  maxPP: number;
+  permPP: number; // Permanent PP bonus (e.g., from Zooey)
 
-    // === Zones ===
-    hand: CardInstance[];
-    deck: CardInstance[];
-    board: CardInstance[];
-    graveyard: CardInstance[];
-    banish: CardInstance[];
+  // === Zones ===
+  hand: CardInstance[];
+  deck: CardInstance[];
+  board: CardInstance[];
+  graveyard: CardInstance[];
+  banish: CardInstance[];
 
-    // === Counters ===
-    shadows: number;
-    rally: number;
-    evoCharges: number;
-    superEvoCharges: number;
-    modeBonus: number;
+  // === Counters ===
+  shadows: number;
+  rally: number;
+  evoCharges: number;
+  superEvoCharges: number;
+  modeBonus: number;
 
-    // === Evolution ===
-    evoUsedThisTurn: boolean;
-    evoCount: number; // Total successful evolves this match
+  // === Evolution ===
+  evoUsedThisTurn: boolean;
+  evoCount: number; // Total successful evolves this match
 
-    // === Per-Turn State ===
-    playsThisTurn: number;
-    anyAllyAttackedThisTurn: boolean;
-    shikigamiDeathsThisTurn: CardInstance[]; // For Kuon effect
+  // === Per-Turn State ===
+  playsThisTurn: number;
+  anyAllyAttackedThisTurn: boolean;
+  shikigamiDeathsThisTurn: CardInstance[]; // For Kuon effect
 
-    // === Boost (second player only) ===
-    hasBoost: boolean; // True for second player
-    boostPending: boolean;
-    boostUsedEarly: boolean;
-    boostUsedLate: boolean;
+  // === Boost (second player only) ===
+  hasBoost: boolean; // True for second player
+  boostPending: boolean;
+  boostUsedEarly: boolean;
+  boostUsedLate: boolean;
 
-    // === History (for RL/analysis) ===
-    playedHistory: PlayedHistoryEntry[];
-    destroyedHistory: CardInstance[];
+  // === History (for RL/analysis) ===
+  playedHistory: PlayedHistoryEntry[];
+  destroyedHistory: CardInstance[];
 
-    // === Crests ===
-    crests: Crest[];
+  // === Crests ===
+  crests: Crest[];
 
-    // === Leader State ===
-    leaderBarrier: number;
-    leaderDamageTakenBonus: number; // Beelzebub effect
-    leaderMaxDamageCap: number | null; // Zooey effect (null = no cap)
+  // === Leader State ===
+  leaderBarrier: number;
+  leaderDamageTakenBonus: number; // Beelzebub effect
+  leaderMaxDamageCap: number | null; // Zooey effect (null = no cap)
 
-    // === RL Metrics (accumulated during game) ===
-    totalDamageDealt: number;
-    totalDamageTaken: number;
-    totalCardsPlayed: number;
-    totalCardsDrawn: number;
-    followersDestroyed: number; // Enemy followers this player killed
-    deckoutWins: boolean; // If true, this player wins on deckout
-    defeated: boolean; // Set when the player loses (e.g. deckout); distinct from HP damage
+  // === RL Metrics (accumulated during game) ===
+  totalDamageDealt: number;
+  totalDamageTaken: number;
+  totalCardsPlayed: number;
+  totalCardsDrawn: number;
+  followersDestroyed: number; // Enemy followers this player killed
+  deckoutWins: boolean; // If true, this player wins on deckout
+  defeated: boolean; // Set when the player loses (e.g. deckout); distinct from HP damage
 
-    // === Deck Metadata ===
-    deckFile?: string; // Original deck file path
+  // === Deck Metadata ===
+  deckFile?: string; // Original deck file path
 }

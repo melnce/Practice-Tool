@@ -63,8 +63,11 @@ function setupTurn(
 ) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -73,9 +76,7 @@ function setupTurn(
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
-  const uid =
-    pending!.poolUids?.[0] ??
-    String(pending!.pool?.[0]?.uid ?? "");
+  const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
   resolvePendingTarget(uid);
 }
 
@@ -104,7 +105,11 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
   });
 
   it("Deepwood Fairy Beast — Fanfare draw + restore X = hand size", () => {
-    setupTurn(R8, { hand: ["10111130", "10111310"], pp: 8, deck: ["10111310"] });
+    setupTurn(R8, {
+      hand: ["10111130", "10111310"],
+      pp: 8,
+      deck: ["10111310"],
+    });
     state.players.first.hp = 15;
     whenPlayCard("first", 0);
     expect(thenHand("first").length).toBeGreaterThan(1);
@@ -138,7 +143,9 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     resolveFirstPending();
     expect(getBoard(state, "second")).toHaveLength(0);
     expect(getHP(state, "first")).toBe(20);
-    expect(findOnBoard("first", "Aerin, Crystalian Frostward")!.hasWard).toBe(true);
+    expect(findOnBoard("first", "Aerin, Crystalian Frostward")!.hasWard).toBe(
+      true,
+    );
   });
 
   it("Good Fairy of the Pond — Last Words adds Fairy", () => {
@@ -172,7 +179,9 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
   it("Lambent Cairn — Combo (3) Deepwood Bounty; Engage +1/+1 ally", () => {
     setupTurn(R6, { hand: [FILLER, FILLER, "10112210"], pp: 4 });
     playCombo3(0);
-    expect(thenHand("first").some((c) => c.name === "Deepwood Bounty")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Deepwood Bounty")).toBe(
+      true,
+    );
 
     resetUidCounter();
     setupTurn(R6, { hand: ["10112210"], pp: 2 });
@@ -196,11 +205,17 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     const handBefore = 1;
     whenPlayCard("first", 0);
     expect(thenHand("first").length).toBeGreaterThan(handBefore);
-    expect(thenHand("first").some((c) => c.name === "Deepwood Bounty")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Deepwood Bounty")).toBe(
+      true,
+    );
   });
 
   it("Lily — Combo (3) sets enemy DEF 1; Evolve draw + 1 damage", () => {
-    setupTurn(R6, { hand: [FILLER, FILLER, "10113110"], pp: 4, deck: ["10111310"] });
+    setupTurn(R6, {
+      hand: [FILLER, FILLER, "10113110"],
+      pp: 4,
+      deck: ["10111310"],
+    });
     const e = enemyFollower(5);
     playCombo3(0);
     resolveFirstPending();
@@ -212,7 +227,11 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
   });
 
   it("Glade — Fanfare draw 2; Evolve split damage by hand size", () => {
-    setupTurn(R8, { hand: ["10113120", "10111310", "10111310"], pp: 5, deck: ["10111310"] });
+    setupTurn(R8, {
+      hand: ["10113120", "10111310", "10111310"],
+      pp: 5,
+      deck: ["10111310"],
+    });
     whenPlayCard("first", 0);
     expect(thenHand("first").length).toBeGreaterThan(2);
     const glade = findOnBoard("first", "Glade, Fragrantwood Ward")!;
@@ -250,7 +269,9 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     ally.peak_defense = 2;
     state.players.first.board = [ally];
     whenPlayCard("first", 0);
-    const idx = state.players.first.board.findIndex((c) => c.name === "Godwood Staff");
+    const idx = state.players.first.board.findIndex(
+      (c) => c.name === "Godwood Staff",
+    );
     engageAmulet("first", idx);
     resolveFirstPending();
     expect(thenHand("first").some((c) => c.name === "Ally")).toBe(true);
@@ -259,7 +280,9 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
   it("Aria — Fanfare crest; Super-Evolve 3 Fairies", () => {
     setupTurn(R7, { hand: ["10114110"], pp: 6 });
     whenPlayCard("first", 0);
-    expect(getCrests(state, "first").some((c) => c.name?.includes("Aria"))).toBe(true);
+    expect(
+      getCrests(state, "first").some((c) => c.name?.includes("Aria")),
+    ).toBe(true);
     const aria = findOnBoard("first", "Aria, Lady of the Woods")!;
     state.players.first.superEvoPoints = 1;
     onEvolve(aria, "first", "super");
@@ -285,19 +308,25 @@ describe("Batch 6 — Forestcraft [10002] Infinity Evolved", () => {
     enemyFollower(5, "A");
     enemyFollower(5, "B");
     playCombo3(0);
-    expect(state.players.second.board.every((c) => Number(c.defense) < 5)).toBe(true);
+    expect(state.players.second.board.every((c) => Number(c.defense) < 5)).toBe(
+      true,
+    );
   });
 
   it("Woodwalkers — summons 3 Gentle Treant", () => {
     setupTurn(R10, { hand: ["10211310"], pp: 7 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").filter((c) => c.name === "Gentle Treant").length).toBe(3);
+    expect(
+      thenBoard("first").filter((c) => c.name === "Gentle Treant").length,
+    ).toBe(3);
   });
 
   it("Lionel — Fanfare 2 Baby Carbuncle; Ward", () => {
     setupTurn(R8, { hand: ["10212110"], pp: 6 });
     whenPlayCard("first", 0);
-    expect(thenBoard("first").filter((c) => c.name === "Baby Carbuncle").length).toBe(2);
+    expect(
+      thenBoard("first").filter((c) => c.name === "Baby Carbuncle").length,
+    ).toBe(2);
     expect(findOnBoard("first", "Lionel, Ardent Elf")!.hasWard).toBe(true);
   });
 
@@ -324,11 +353,15 @@ describe("Batch 6 — Forestcraft [10002] Infinity Evolved", () => {
     setupTurn(R6, { hand: ["10214110"], pp: 4 });
     enemyFollower(4);
     whenPlayCard("first", 0);
-    expect(getCrests(state, "first").some((c) => c.name?.includes("Titania"))).toBe(true);
+    expect(
+      getCrests(state, "first").some((c) => c.name?.includes("Titania")),
+    ).toBe(true);
     const titania = findOnBoard("first", "Titania, Queen of Fairies")!;
     onEvolve(titania, "first", "normal");
     if (state.pendingTargetEffect) resolveFirstPending();
-    expect(state.players.second.board.some((c) => c.name === "Fairy")).toBe(true);
+    expect(state.players.second.board.some((c) => c.name === "Fairy")).toBe(
+      true,
+    );
   });
 });
 
@@ -349,7 +382,11 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
   });
 
   it("Bestial Swipe — Combo (3) draws a card", () => {
-    setupTurn(R6, { hand: [FILLER, FILLER, "10311310"], pp: 4, deck: ["10111310"] });
+    setupTurn(R6, {
+      hand: [FILLER, FILLER, "10311310"],
+      pp: 4,
+      deck: ["10111310"],
+    });
     enemyFollower(5);
     playCombo3(0);
     resolveFirstPending();
@@ -362,17 +399,25 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     const gw = findOnBoard("first", "Greatwood Warrior")!;
     gw.defense = 0;
     cleanupDead();
-    expect(thenHand("first").some((c) => c.name === "Deepwood Bounty")).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Deepwood Bounty")).toBe(
+      true,
+    );
     expect(thenHand("first").some((c) => c.name === "Fairy")).toBe(true);
   });
 
   it("Hamlet of Unkilling — Fanfare discard 1 draw 2; Engage -0/-2", () => {
-    setupTurn(R6, { hand: ["10312210", "10111310", "10111310"], pp: 3, deck: ["10111310"] });
+    setupTurn(R6, {
+      hand: ["10312210", "10111310", "10111310"],
+      pp: 3,
+      deck: ["10111310"],
+    });
     const e = enemyFollower(4);
     whenPlayCard("first", 0);
     resolveFirstPending();
     expect(thenHand("first").length).toBeGreaterThan(1);
-    const idx = state.players.first.board.findIndex((c) => c.name === "Hamlet of Unkilling");
+    const idx = state.players.first.board.findIndex(
+      (c) => c.name === "Hamlet of Unkilling",
+    );
     engageAmulet("first", idx);
     resolveFirstPending();
     expect(e.defense).toBe(2);
@@ -394,7 +439,9 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     expect(e.defense).toBe(2);
     const iz = findOnBoard("first", "Izudia, Annihilation Manifest")!;
     onEvolve(iz, "first", "normal");
-    expect(thenHand("first").some((c) => c.name === "Annihilating Onslaught")).toBe(true);
+    expect(
+      thenHand("first").some((c) => c.name === "Annihilating Onslaught"),
+    ).toBe(true);
   });
 });
 
@@ -418,7 +465,9 @@ describe("Batch 6 — Forestcraft [10004] Skybound Dragons", () => {
     whenPlayCard("first", 0);
     const kou = findOnBoard("first", "Kou & You, Love and Hatred")!;
     kou.justPlayed = false;
-    const strike = (kou.triggers ?? []).find((t: { event?: string }) => t.event === "strike");
+    const strike = (kou.triggers ?? []).find(
+      (t: { event?: string }) => t.event === "strike",
+    );
     runEffects((strike as { effects: unknown[] }).effects, "first", kou);
     expect(ally.defense).toBeGreaterThanOrEqual(3);
   });
@@ -440,8 +489,12 @@ describe("Batch 6 — Forestcraft [10004] Skybound Dragons", () => {
     setupTurn(R10, { hand: ["10412110", "10112120"], pp: 8 });
     whenPlayCard("first", 0);
     if (state.pendingTargetEffect) resolveFirstPending();
-    expect(thenBoard("first").some((c) => c.name === "Good Fairy of the Pond")).toBe(true);
-    expect(thenHand("first").some((c) => c.name === "Chloe, What a Gal")).toBe(true);
+    expect(
+      thenBoard("first").some((c) => c.name === "Good Fairy of the Pond"),
+    ).toBe(true);
+    expect(thenHand("first").some((c) => c.name === "Chloe, What a Gal")).toBe(
+      true,
+    );
   });
 
   it("Anthuria — Fanfare Barrier on all allies", () => {
@@ -464,9 +517,9 @@ describe("Batch 6 — Forestcraft [10004] Skybound Dragons", () => {
     });
     for (let i = 0; i < 4; i++) whenPlayCard("first", 0);
     whenPlayCard("first", 0);
-    expect(getCrests(state, "first").some((c) => c.name?.includes("Starry Sky"))).toBe(
-      true,
-    );
+    expect(
+      getCrests(state, "first").some((c) => c.name?.includes("Starry Sky")),
+    ).toBe(true);
   });
 
   it("Ewiyar — Skybound Art (10) recovers 1 EP; Rush", () => {
@@ -476,7 +529,9 @@ describe("Batch 6 — Forestcraft [10004] Skybound Dragons", () => {
       .withFirstEvo(0)
       .build();
     whenPlayCard("first", 0);
-    expect(findOnBoard("first", "Ewiyar, Wind Personified")!.hasRush).toBe(true);
+    expect(findOnBoard("first", "Ewiyar, Wind Personified")!.hasRush).toBe(
+      true,
+    );
     expect(state.players.first.evoCharges).toBe(1);
   });
 
@@ -497,6 +552,8 @@ describe("Batch 6 — Forestcraft [10004] Skybound Dragons", () => {
     state.players.first.board = [yuel];
     state.players.first.superEvoPoints = 1;
     onEvolve(yuel, "first", "super");
-    expect(getCrests(state, "first").some((c) => c.name?.includes("Yuel"))).toBe(true);
+    expect(
+      getCrests(state, "first").some((c) => c.name?.includes("Yuel")),
+    ).toBe(true);
   });
 });

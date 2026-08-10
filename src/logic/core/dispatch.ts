@@ -20,7 +20,12 @@ import { assertValidGameState } from "../../core/stateValidation.js";
 import type { ReplayStep } from "../../core/stateHash.js";
 
 import { hashGameState } from "../../core/stateHash.js";
-import { isFirstPlayer, getHand, getBoard, opponentOf } from "../../core/playerHelpers.js";
+import {
+  isFirstPlayer,
+  getHand,
+  getBoard,
+  opponentOf,
+} from "../../core/playerHelpers.js";
 
 /**
  * Dependencies that can be injected for testing/replay.
@@ -167,18 +172,3 @@ export function dispatchAction<T extends ActionType>(
 
   return nextState;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

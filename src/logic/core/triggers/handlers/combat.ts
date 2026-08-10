@@ -1,6 +1,13 @@
 import type { CardInstance, Player } from "../../../../core/types/index.js";
-import type { TriggerContext, TriggerEventName, TriggerSpec } from "../types.js";
-import { processCandidateTriggers, type ProcessingCandidate } from "../process.js";
+import type {
+  TriggerContext,
+  TriggerEventName,
+  TriggerSpec,
+} from "../types.js";
+import {
+  processCandidateTriggers,
+  type ProcessingCandidate,
+} from "../process.js";
 import { triggerMatchesCandidateZone } from "../utils.js";
 import { dispatchOrderedTriggers } from "./common.js";
 
@@ -101,7 +108,11 @@ export function handleCombatEvent(
         );
       }
 
-      if (event === "strike" || event === "follower_strike" || event === "leader_strike") {
+      if (
+        event === "strike" ||
+        event === "follower_strike" ||
+        event === "leader_strike"
+      ) {
         return cand.card.uid === context.attacker?.uid;
       }
 

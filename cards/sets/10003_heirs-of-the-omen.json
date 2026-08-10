@@ -88,9 +88,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [
       {
         "event": "enemy_super_evolve",
@@ -100,9 +98,7 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": [
-              "Bane"
-            ]
+            "keywords": ["Bane"]
           }
         ]
       }
@@ -126,9 +122,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": [
       {
         "event": "enemy_super_evolve",
@@ -138,9 +132,7 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": [
-              "Storm"
-            ]
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -212,9 +204,7 @@
             "op": "deck",
             "action": "replace",
             "from_set": "10003_heirs-of-the-omen",
-            "exclude": [
-              "Mjerrabaine, Great Manifest"
-            ]
+            "exclude": ["Mjerrabaine, Great Manifest"]
           },
           {
             "op": "set_deckout_victory",
@@ -228,9 +218,7 @@
               {
                 "op": "discard",
                 "mode": "except_named",
-                "names": [
-                  "Great Testimony"
-                ]
+                "names": ["Great Testimony"]
               },
               {
                 "op": "draw",
@@ -302,9 +290,7 @@
         "defense": -2
       }
     ],
-    "keywords": [
-      "Drain"
-    ],
+    "keywords": ["Drain"],
     "triggers": []
   },
   {
@@ -558,10 +544,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Rush",
-      "Ward"
-    ],
+    "keywords": ["Rush", "Ward"],
     "triggers": [
       {
         "event": "ally_follower_enter",
@@ -677,9 +660,7 @@
         "defense": -2
       }
     ],
-    "keywords": [
-      "Ambush"
-    ],
+    "keywords": ["Ambush"],
     "triggers": [
       {
         "event": "enemy_follower_defense_down",
@@ -804,9 +785,7 @@
             "op": "keyword",
             "action": "remove",
             "target": "ally:last_summoned",
-            "keywords": [
-              "LastWords"
-            ]
+            "keywords": ["LastWords"]
           }
         ]
       }
@@ -835,9 +814,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "keywords": [
-          "Ward"
-        ],
+        "keywords": ["Ward"],
         "select": 1
       },
       {
@@ -1214,9 +1191,7 @@
         "image": "images/crests/octrice_hollowness_manifest.png",
         "description": "Countdown (8). Whenever you play or Fuse a Loot card, advance this crest's count by 1.\nLast Words: Add a Remnant of Hollowness to your hand.",
         "countdown": 8,
-        "keywords": [
-          "LastWords"
-        ],
+        "keywords": ["LastWords"],
         "effects": [
           {
             "op": "add_to_hand",
@@ -1346,9 +1321,7 @@
         "image": "images/crests/crystal_gazing.png",
         "description": "Countdown (2) Last Words: Draw 2 cards. Deal 4 damage to all enemy followers.",
         "countdown": 2,
-        "keywords": [
-          "LastWords"
-        ],
+        "keywords": ["LastWords"],
         "effects": [
           {
             "op": "draw",
@@ -1553,9 +1526,7 @@
         ]
       }
     ],
-    "keywords": [
-      "Rush"
-    ],
+    "keywords": ["Rush"],
     "triggers": []
   },
   {
@@ -1812,10 +1783,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Rush",
-      "Ward"
-    ],
+    "keywords": ["Rush", "Ward"],
     "triggers": [
       {
         "type": "end_of_turn_own",
@@ -1888,9 +1856,7 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": [
-              "Ward"
-            ],
+            "keywords": ["Ward"],
             "target": "entering_follower"
           }
         ]
@@ -2106,9 +2072,7 @@
         "amount": 2
       }
     ],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [
       {
         "event": "self_damaged",
@@ -2176,9 +2140,7 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": [
-              "Storm"
-            ]
+            "keywords": ["Storm"]
           }
         ]
       }
@@ -2286,9 +2248,7 @@
         "amount": 4
       }
     ],
-    "keywords": [
-      "Storm"
-    ],
+    "keywords": ["Storm"],
     "triggers": []
   },
   {
@@ -2533,17 +2493,13 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": [
-                  "Rush"
-                ]
+                "keywords": ["Rush"]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": [
-                  "Rush"
-                ]
+                "keywords": ["Rush"]
               }
             ]
           },
@@ -2554,17 +2510,13 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": [
-                  "Ward"
-                ]
+                "keywords": ["Ward"]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": [
-                  "Ward"
-                ]
+                "keywords": ["Ward"]
               }
             ]
           },
@@ -2602,17 +2554,13 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": [
-                  "Rush"
-                ]
+                "keywords": ["Rush"]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": [
-                  "Rush"
-                ]
+                "keywords": ["Rush"]
               }
             ]
           },
@@ -2623,17 +2571,13 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": [
-                  "Ward"
-                ]
+                "keywords": ["Ward"]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": [
-                  "Ward"
-                ]
+                "keywords": ["Ward"]
               }
             ]
           },
@@ -2749,9 +2693,7 @@
     "type": "Follower",
     "class": "Abysscraft",
     "rarity": "Legendary",
-    "tribes": [
-      "Encroacher"
-    ],
+    "tribes": ["Encroacher"],
     "description": "Fanfare: Reduce the faith of Faith: Sham-Nacha, Heir to Entwining by 10 to give it \"Increase the number of Modes you can select by 1.\"\nSuper-Evolve: Select an enemy follower on the field, destroy it, and add a copy of it to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10354110.webp",
     "evo_image": "",
@@ -2883,9 +2825,7 @@
                     "count": 1,
                     "attack": -2,
                     "defense": 0,
-                    "keywords": [
-                      "Ward"
-                    ]
+                    "keywords": ["Ward"]
                   }
                 ]
               }
@@ -2916,9 +2856,7 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": [
       {
         "event": "self_buffed_up",
@@ -3068,9 +3006,7 @@
           {
             "op": "keyword",
             "target": "leader",
-            "keywords": [
-              "Barrier"
-            ],
+            "keywords": ["Barrier"],
             "action": "grant"
           }
         ]
@@ -3311,9 +3247,7 @@
                         {
                           "op": "stat",
                           "action": "give",
-                          "keywords": [
-                            "Can't Attack"
-                          ],
+                          "keywords": ["Can't Attack"],
                           "duration": "opponent_turn_end",
                           "target": "selected:follower"
                         },
@@ -3438,9 +3372,7 @@
         }
       }
     ],
-    "keywords": [
-      "Ward"
-    ],
+    "keywords": ["Ward"],
     "triggers": []
   },
   {
@@ -3735,10 +3667,7 @@
       }
     ],
     "fanfare": [],
-    "keywords": [
-      "Ward",
-      "cant_be_destroyed"
-    ],
+    "keywords": ["Ward", "cant_be_destroyed"],
     "triggers": []
   },
   {
@@ -3771,9 +3700,7 @@
         "count": 1
       }
     ],
-    "keywords": [
-      "cant_be_destroyed"
-    ],
+    "keywords": ["cant_be_destroyed"],
     "triggers": []
   }
 ]

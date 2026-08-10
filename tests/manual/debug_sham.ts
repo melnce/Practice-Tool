@@ -42,9 +42,3 @@ try {
 } catch (e) {
   console.error("CRASHED:", e);
 }
-
-
-
-
-
-

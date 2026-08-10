@@ -110,18 +110,3 @@ export function resolveBasePool(
   // Fallback (legacy seemed to default to ally/board if unknown, but parser forces valid side)
   return [];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

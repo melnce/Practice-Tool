@@ -5,7 +5,11 @@ import { state } from "../../../../core/gameState.js";
 import { pushToHand, MAX_HAND } from "../../../../core/utils.js";
 import { applyKeyword } from "../../../core/keywords.js";
 import type { Player, CardInstance } from "../../../../core/types/index.js";
-import { getDeck as getDeckHelper, getHand as getHandHelper, getPlaysThisTurn } from "../../../../core/playerHelpers.js";
+import {
+  getDeck as getDeckHelper,
+  getHand as getHandHelper,
+  getPlaysThisTurn,
+} from "../../../../core/playerHelpers.js";
 
 // ============================================================================
 // DECK OPERATIONS
@@ -88,18 +92,3 @@ export function trackLastDrawn(card: CardInstance): void {
 export function getComboCount(player: Player): number {
   return getPlaysThisTurn(state, player);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

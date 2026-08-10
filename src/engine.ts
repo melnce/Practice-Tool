@@ -1,6 +1,10 @@
 // src/engine.ts
 import { state } from "./core/gameState.js";
-import type { GameState, StartGameOptions, PlayerAction } from "./core/types/index.js";
+import type {
+  GameState,
+  StartGameOptions,
+  PlayerAction,
+} from "./core/types/index.js";
 import { startGame } from "./logic/startGame.js";
 import { endTurnBlue, endTurnRed } from "./logic/core/turns.js";
 import {
@@ -79,7 +83,9 @@ function _dispatchInternal(
       break;
     case "PLAY_CARD": {
       const hand =
-        action.player === "first" ? currentState.players.first.hand : currentState.players.second.hand;
+        action.player === "first"
+          ? currentState.players.first.hand
+          : currentState.players.second.hand;
       const index = hand.findIndex((c) => c.uid === action.cardUid);
       if (index !== -1) {
         playCard(hand, action.player, index);
@@ -112,7 +118,9 @@ function _dispatchInternal(
       } else {
         const defPlayer = action.player === "first" ? "second" : "first";
         const defBoard =
-          defPlayer === "first" ? currentState.players.first.board : currentState.players.second.board;
+          defPlayer === "first"
+            ? currentState.players.first.board
+            : currentState.players.second.board;
         const defIdx = defBoard.findIndex((c) => c.uid === defender.uid);
 
         if (defIdx !== -1) {
@@ -190,17 +198,3 @@ export function onHistoryUpdate(
 ) {
   onHistoryChange(cb);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

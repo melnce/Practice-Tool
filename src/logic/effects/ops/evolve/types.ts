@@ -65,8 +65,8 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
   if (op !== "evolve") {
     throw new Error(
       `[evolve] Invalid op: "${op}". Legacy ops are removed. ` +
-      `Use { "op": "evolve", "target": "...", "mode": "..." }. ` +
-      `Effect: ${JSON.stringify(eff)}`
+        `Use { "op": "evolve", "target": "...", "mode": "..." }. ` +
+        `Effect: ${JSON.stringify(eff)}`,
     );
   }
 
@@ -77,8 +77,8 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
   if (effAny.target === undefined) {
     throw new Error(
       `[evolve] Missing required field: "target". ` +
-      `Use "self", "selected:follower", "last_summoned", "all_allies", or "ally:follower". ` +
-      `Effect: ${JSON.stringify(eff)}`
+        `Use "self", "selected:follower", "last_summoned", "all_allies", or "ally:follower". ` +
+        `Effect: ${JSON.stringify(eff)}`,
     );
   }
 
@@ -95,19 +95,3 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
 
   return spec;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

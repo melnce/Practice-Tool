@@ -2,7 +2,6 @@ import { state } from "../../core/gameState.js";
 import type { Player } from "../../core/types/index.js";
 import { getHand } from "../../core/playerHelpers.js";
 
-
 // Helper to check for the keyword OR the gate op (allows removing explicit keyword)
 export function hasSkyboundArt(card: any): boolean {
   if (!card) return false;
@@ -95,18 +94,3 @@ export function incrementSkyboundArt(owner: Player, amount: number = 1) {
     // Render removed - UI layer
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

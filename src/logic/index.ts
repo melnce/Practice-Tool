@@ -55,18 +55,3 @@ export function startFuseFromHand(owner: Player, initiatorUid: string) {
 (window as any)._gameState = state;
 (window as any).getGameState = () => state;
 (window as any).startFuseFromHand = startFuseFromHand;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

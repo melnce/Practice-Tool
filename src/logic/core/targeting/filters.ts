@@ -52,11 +52,10 @@ export function applyFilters(
   const forceExcludeSelf = query.excludeSelf === true;
   const allowSelf =
     skipSelfExclusion ||
-    (!forceExcludeSelf && (
-      query.side === "self" ||
-      cond.not_self === false ||
-      cond.include_self === true
-    ));
+    (!forceExcludeSelf &&
+      (query.side === "self" ||
+        cond.not_self === false ||
+        cond.include_self === true));
 
   if (!allowSelf && env.sourceCard) {
     filtered = filtered.filter((c) => c?.uid !== env.sourceCard!.uid);
@@ -70,7 +69,8 @@ export function applyFilters(
   if (cond.has_keyword) sharedCond.has_keyword = cond.has_keyword;
   if (cond.exclude_keyword) sharedCond.exclude_keyword = cond.exclude_keyword;
   if (cond.unevolved) sharedCond.unevolved = cond.unevolved;
-  if (cond.is_super_evolved) sharedCond.is_super_evolved = cond.is_super_evolved;
+  if (cond.is_super_evolved)
+    sharedCond.is_super_evolved = cond.is_super_evolved;
   if (cond.attack_lte != null) sharedCond.attack_lte = cond.attack_lte;
   if (cond.attack_gte != null) sharedCond.attack_gte = cond.attack_gte;
   if (cond.attack_eq != null) sharedCond.attack_eq = cond.attack_eq;
@@ -79,7 +79,8 @@ export function applyFilters(
   if (cond.defense_eq != null) sharedCond.defense_eq = cond.defense_eq;
   if (cond.base_cost_eq != null) sharedCond.base_cost_eq = cond.base_cost_eq;
   if (cond.damaged != null) sharedCond.damaged = cond.damaged;
-  if (cond.did_not_attack_this_turn) sharedCond.did_not_attack_this_turn = cond.did_not_attack_this_turn;
+  if (cond.did_not_attack_this_turn)
+    sharedCond.did_not_attack_this_turn = cond.did_not_attack_this_turn;
 
   // Apply shared conditions via unified evaluator
   if (Object.keys(sharedCond).length > 0) {
@@ -121,18 +122,3 @@ export function applyFilters(
 
   return filtered;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

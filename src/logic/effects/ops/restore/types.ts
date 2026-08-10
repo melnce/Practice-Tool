@@ -1,7 +1,11 @@
 // src/logic/effects/ops/restore/types.ts
 // Unified restore types and normalization.
 
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 
 // ============================================================================
 // TARGET & AMOUNT SOURCE TYPES
@@ -109,7 +113,7 @@ export function normalizeToUnifiedSpec(
     // Parse composite target
     const parts = targetStr.split(":");
     const ownership = parts[0]; // "ally" or "enemy"
-    const zone = parts[1];      // "leader", "follower", etc.
+    const zone = parts[1]; // "leader", "follower", etc.
 
     // Derive player from ownership
     spec.player = ownership === "ally" ? "self" : "opponent";
@@ -162,18 +166,3 @@ export function normalizeToUnifiedSpec(
 
   return spec;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

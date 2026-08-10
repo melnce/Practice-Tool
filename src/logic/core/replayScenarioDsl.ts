@@ -92,7 +92,7 @@ export function selectCardInHand(
       .join(", ");
     throw new Error(
       `selectCardInHand: No card found matching criteria ${JSON.stringify(selector)} for ${owner}.\n` +
-      `Available cards: ${available || "(empty hand)"}`,
+        `Available cards: ${available || "(empty hand)"}`,
     );
   }
 
@@ -101,7 +101,7 @@ export function selectCardInHand(
     if (selector.index < 0 || selector.index >= candidates.length) {
       throw new Error(
         `selectCardInHand: Index ${selector.index} out of bounds for matches of ${JSON.stringify(selector)}.\n` +
-        `Found ${candidates.length} matches.`,
+          `Found ${candidates.length} matches.`,
       );
     }
     return candidates[selector.index]!;
@@ -112,8 +112,8 @@ export function selectCardInHand(
     const matches = candidates.map((c) => `${c.name} (${c.uid})`).join(", ");
     throw new Error(
       `selectCardInHand: Multiple cards match ${JSON.stringify(selector)} for ${owner}.\n` +
-      `Matches: ${matches}\n` +
-      `Specify 'index' to disambiguate (e.g. index: 0 for the first one).`,
+        `Matches: ${matches}\n` +
+        `Specify 'index' to disambiguate (e.g. index: 0 for the first one).`,
     );
   }
 
@@ -148,7 +148,7 @@ export function selectFollowerOnBoard(
       .join(", ");
     throw new Error(
       `selectFollowerOnBoard: No card found matching ${JSON.stringify(selector)} for ${selector.owner}.\n` +
-      `Available on board: ${available || "(empty board)"}`,
+        `Available on board: ${available || "(empty board)"}`,
     );
   }
 
@@ -156,7 +156,7 @@ export function selectFollowerOnBoard(
     if (selector.index < 0 || selector.index >= candidates.length) {
       throw new Error(
         `selectFollowerOnBoard: Index ${selector.index} out of bounds for matches of ${JSON.stringify(selector)}.\n` +
-        `Found ${candidates.length} matches.`,
+          `Found ${candidates.length} matches.`,
       );
     }
     return candidates[selector.index]!;
@@ -166,8 +166,8 @@ export function selectFollowerOnBoard(
     const matches = candidates.map((c) => `${c.name} (${c.uid})`).join(", ");
     throw new Error(
       `selectFollowerOnBoard: Multiple cards match ${JSON.stringify(selector)} for ${selector.owner}.\n` +
-      `Matches: ${matches}\n` +
-      `Specify 'index' to disambiguate.`,
+        `Matches: ${matches}\n` +
+        `Specify 'index' to disambiguate.`,
     );
   }
 
@@ -277,18 +277,3 @@ export function describeBoard(state: GameState, owner: Player): string {
     )
     .join("\n");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

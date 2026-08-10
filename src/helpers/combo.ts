@@ -27,17 +27,3 @@ export function comboReadyInHand(
       futurePlays >= (Number((e as any).count ?? 1) || 1),
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

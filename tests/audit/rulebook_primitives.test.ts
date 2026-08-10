@@ -16,16 +16,32 @@ import { state } from "../../src/core/gameState.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
 import { bounceToHand } from "../../src/logic/effects/ops/bounce.js";
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
-import { destroyTarget, canBeDestroyed } from "../../src/logic/effects/ops/destroy/primitives.js";
+import {
+  destroyTarget,
+  canBeDestroyed,
+} from "../../src/logic/effects/ops/destroy/primitives.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
-import { isDamaged, getMaxDefense } from "../../src/logic/core/combat/damageState.js";
-import { setStatsBuff, applyStatBuff } from "../../src/logic/effects/ops/stat/core.js";
+import {
+  isDamaged,
+  getMaxDefense,
+} from "../../src/logic/core/combat/damageState.js";
+import {
+  setStatsBuff,
+  applyStatBuff,
+} from "../../src/logic/effects/ops/stat/core.js";
 import { onEvolve, resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { isOverflow } from "../../src/helpers/overflow.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { getBoard, getHP, getMaxPP, getPermPP, getShadows, setMaxPP } from "../../src/core/playerHelpers.js";
+import {
+  getBoard,
+  getHP,
+  getMaxPP,
+  getPermPP,
+  getShadows,
+  setMaxPP,
+} from "../../src/core/playerHelpers.js";
 import { addMaxPP } from "../../src/logic/pp.js";
 import "../../src/logic/core/effects/index.js";
 import type { CardInstance } from "../../src/core/types/index.js";
@@ -53,7 +69,11 @@ describe("Rulebook §62 — Hand limit burn creates a shadow", () => {
       .build();
 
     const beforeShadows = getShadows(state, "first");
-    drawCard(state.players.first.hand as any, state.players.first.deck as any, "first");
+    drawCard(
+      state.players.first.hand as any,
+      state.players.first.deck as any,
+      "first",
+    );
 
     expect(state.players.first.hand.length).toBe(9);
     expect(getShadows(state, "first")).toBe(beforeShadows + 1);
@@ -85,7 +105,14 @@ describe("Rulebook §763 — Reanimate (X): cost search is strictly downward", (
     givenGameState({ seed: 42 }).build();
 
     state.players.first.graveyard = [
-      { uid: "g1", name: "FiveDrop", type: "Follower", cost: 5, attack: 5, defense: 5 },
+      {
+        uid: "g1",
+        name: "FiveDrop",
+        type: "Follower",
+        cost: 5,
+        attack: 5,
+        defense: 5,
+      },
     ] as CardInstance[];
 
     handleReanimate({ op: "reanimate", max_cost: 2 } as any, "first");
@@ -104,7 +131,14 @@ describe("Rulebook §891 — Bounce: follower reverts to base stats; granted key
     givenGameState({ seed: 1 }).build();
 
     const fighter = createCard(
-      { name: "Indomitable Fighter", id: "10001110", type: "Follower", cost: 2, attack: 2, defense: 2 },
+      {
+        name: "Indomitable Fighter",
+        id: "10001110",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 2,
+      },
       "board",
       "first",
     );
@@ -152,7 +186,15 @@ describe("Rulebook §933 — Super-Evolve: +3/+3, owner-turn protection, pierce 
     givenGameState({ seed: 1, activePlayer: "first" }).build();
 
     const card = createCard(
-      { name: "SuperUnit", type: "Follower", cost: 3, attack: 3, defense: 3, evoType: "super", hasEvolved: true },
+      {
+        name: "SuperUnit",
+        type: "Follower",
+        cost: 3,
+        attack: 3,
+        defense: 3,
+        evoType: "super",
+        hasEvolved: true,
+      },
       "board",
       "first",
     );
@@ -167,7 +209,16 @@ describe("Rulebook §933 — Super-Evolve: +3/+3, owner-turn protection, pierce 
     givenGameState({ seed: 1, activePlayer: "first" }).build();
 
     const card = createCard(
-      { name: "SuperUnit", type: "Follower", cost: 3, attack: 3, defense: 5, evoType: "super", hasEvolved: true, peak_defense: 5 },
+      {
+        name: "SuperUnit",
+        type: "Follower",
+        cost: 3,
+        attack: 3,
+        defense: 5,
+        evoType: "super",
+        hasEvolved: true,
+        peak_defense: 5,
+      },
       "board",
       "first",
     );
@@ -183,7 +234,11 @@ describe("Rulebook §933 — Super-Evolve: +3/+3, owner-turn protection, pierce 
     givenGameState({ seed: 1, activePlayer: "second", phase: "main" }).build();
 
     const attacker: CardInstance = {
-      ...createCard({ name: "SuperAtk", type: "Follower", cost: 5, attack: 4, defense: 5 }, "board", "first"),
+      ...createCard(
+        { name: "SuperAtk", type: "Follower", cost: 5, attack: 4, defense: 5 },
+        "board",
+        "first",
+      ),
       evoType: "super",
       hasEvolved: true,
       can_attack: true,
@@ -194,7 +249,11 @@ describe("Rulebook §933 — Super-Evolve: +3/+3, owner-turn protection, pierce 
     };
 
     const defender: CardInstance = {
-      ...createCard({ name: "Defender", type: "Follower", cost: 2, attack: 2, defense: 3 }, "board", "second"),
+      ...createCard(
+        { name: "Defender", type: "Follower", cost: 2, attack: 2, defense: 3 },
+        "board",
+        "second",
+      ),
       can_attack: false,
       peak_defense: 3,
     };
@@ -211,7 +270,11 @@ describe("Rulebook §933 — Super-Evolve: +3/+3, owner-turn protection, pierce 
     givenGameState({ seed: 1, activePlayer: "first", phase: "main" }).build();
 
     const attacker: CardInstance = {
-      ...createCard({ name: "SuperAtk", type: "Follower", cost: 5, attack: 5, defense: 5 }, "board", "first"),
+      ...createCard(
+        { name: "SuperAtk", type: "Follower", cost: 5, attack: 5, defense: 5 },
+        "board",
+        "first",
+      ),
       uid: "super-atk",
       evoType: "super",
       hasEvolved: true,
@@ -248,7 +311,14 @@ describe("Rulebook §923–929 — Set defense resets baseline; isDamaged uses n
 
   it('after "set defense to 1", follower at 1/1 is not damaged; +0/+2 buff raises max to 3', () => {
     const card = createCard(
-      { name: "Target", type: "Follower", cost: 2, attack: 2, defense: 5, peak_defense: 5 },
+      {
+        name: "Target",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 5,
+        peak_defense: 5,
+      },
       "board",
       "first",
     );
@@ -265,7 +335,14 @@ describe("Rulebook §923–929 — Set defense resets baseline; isDamaged uses n
 
   it('after "-0/-2" defense reduction, follower is at full new max (not damaged)', () => {
     const card = createCard(
-      { name: "Target", type: "Follower", cost: 2, attack: 2, defense: 5, peak_defense: 5 },
+      {
+        name: "Target",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 5,
+        peak_defense: 5,
+      },
       "board",
       "first",
     );
@@ -278,7 +355,14 @@ describe("Rulebook §923–929 — Set defense resets baseline; isDamaged uses n
 
   it('after "-0/-2" defense reduction, restore cannot exceed the new max', () => {
     const card = createCard(
-      { name: "Target", type: "Follower", cost: 2, attack: 2, defense: 5, peak_defense: 5 },
+      {
+        name: "Target",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 5,
+        peak_defense: 5,
+      },
       "board",
       "first",
     );
@@ -339,7 +423,9 @@ function lwFollower(
   );
   card.insertionTs = insertionTs;
   card.hasLastWords = true;
-  const lw = [{ op: "summon", source: "named", name: summonName, count: 1 } as any];
+  const lw = [
+    { op: "summon", source: "named", name: summonName, count: 1 } as any,
+  ];
   card.keywordState = { lastWordsEffects: lw };
   card.lastWordsEffects = lw;
   return card;
@@ -371,7 +457,9 @@ describe("Rulebook §317/#9 — Last Words resolve oldest-first, active side fir
     givenGameState({ seed: 1, activePlayer: "first" }).build();
 
     state.players.first.board = [lwFollower("first", "ActiveLW", 1, "Bat")];
-    state.players.second.board = [lwFollower("second", "ReactiveLW", 1, "Knight")];
+    state.players.second.board = [
+      lwFollower("second", "ReactiveLW", 1, "Knight"),
+    ];
 
     cleanupDead();
 
@@ -396,7 +484,9 @@ describe("Rulebook §747 + owner — Super-Evolve effect lines", () => {
       "first",
     );
     card.evolve = [{ op: "draw", source: "deck", count: 1 } as any];
-    card.superevolve = [{ op: "summon", source: "named", name: "Ghost", count: 1 } as any];
+    card.superevolve = [
+      { op: "summon", source: "named", name: "Ghost", count: 1 } as any,
+    ];
 
     const fx = resolveEvolveEffects(card, "super");
     expect(fx).toHaveLength(2);
@@ -406,9 +496,7 @@ describe("Rulebook §747 + owner — Super-Evolve effect lines", () => {
 
   it("Leah: super-evolve draws 1 (deduped live data: empty superevolve[])", () => {
     givenGameState({ seed: 1, roundCount: 7 })
-      .withFirstDeck([
-        { name: "A", type: "Follower", attack: 1, defense: 1 },
-      ])
+      .withFirstDeck([{ name: "A", type: "Follower", attack: 1, defense: 1 }])
       .build();
 
     const leah = createCard("10001120", "board", "first");
@@ -434,7 +522,9 @@ describe("Rulebook §747 + owner — Super-Evolve effect lines", () => {
       "first",
     );
     card.evolve = [{ op: "draw", source: "deck", count: 1 } as any];
-    card.superevolve = [{ op: "summon", source: "named", name: "Ghost", count: 1 } as any];
+    card.superevolve = [
+      { op: "summon", source: "named", name: "Ghost", count: 1 } as any,
+    ];
     card.peak_defense = 1;
     state.players.first.board = [card];
 
@@ -508,7 +598,9 @@ describe("Rulebook §757 — Necromancy: optional if shadows ≥ X; auto-spend",
     const mummy = getCardById("10051130");
     expect(mummy?.description).toMatch(/necromancy \(4\)/i);
 
-    const fanfare = mummy?.fanfare?.[0] as { op?: string; condition?: string; cost?: number } | undefined;
+    const fanfare = mummy?.fanfare?.[0] as
+      | { op?: string; condition?: string; cost?: number }
+      | undefined;
     expect(fanfare?.op).toBe("gate");
     expect(fanfare?.condition).toBe("necromancy");
     expect(fanfare?.cost).toBe(4);

@@ -49,18 +49,3 @@ export function applyAttacksPerTurn(
     sourceCard.can_attack = (sourceCard.attacks_left ?? 0) > 0;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -57,7 +57,9 @@ async function main() {
 
   const { allCards, indexData } = mergeSetsFromDisk();
 
-  for (const file of fs.readdirSync(SETS_DIR).filter((f) => f.endsWith(".json"))) {
+  for (const file of fs
+    .readdirSync(SETS_DIR)
+    .filter((f) => f.endsWith(".json"))) {
     const filePath = path.join(SETS_DIR, file);
     const json = JSON.parse(fs.readFileSync(filePath, "utf-8"));
     if (Array.isArray(json)) {
@@ -76,7 +78,8 @@ async function main() {
 
 const isMain =
   process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+  path.resolve(process.argv[1]) ===
+    path.resolve(fileURLToPath(import.meta.url));
 
 if (isMain) {
   main().catch((e) => {

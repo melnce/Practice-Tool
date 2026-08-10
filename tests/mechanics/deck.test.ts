@@ -17,55 +17,53 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
 import {
-    givenGameState,
-    whenRunEffects,
-    resetUidCounter,
+  givenGameState,
+  whenRunEffects,
+  resetUidCounter,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 
 describe("Mechanic Contract: deck", () => {
-    beforeEach(() => {
-        resetUidCounter();
+  beforeEach(() => {
+    resetUidCounter();
+  });
+
+  // ===========================================================================
+  // REPLACE DECK
+  // Canonical: { op: "deck", action: "replace", cards: [{ name: "X", count: N }] }
+  // ===========================================================================
+
+  describe("deck action: replace", () => {
+    it("replaces deck with specified cards", () => {
+      givenGameState({ seed: 1 }).build();
+      state.players.first.deck = [];
+
+      const effect = {
+        op: "deck" as const,
+        action: "replace",
+        cards: [{ name: "Fairy", count: 3 }],
+      };
+      whenRunEffects([effect], "first");
+
+      expect(state.players.first.deck.length).toBe(3);
     });
+  });
 
-    // ===========================================================================
-    // REPLACE DECK
-    // Canonical: { op: "deck", action: "replace", cards: [{ name: "X", count: N }] }
-    // ===========================================================================
+  // ===========================================================================
+  // DECK STRUCTURE
+  // ===========================================================================
 
-    describe("deck action: replace", () => {
-        it("replaces deck with specified cards", () => {
-            givenGameState({ seed: 1 }).build();
-            state.players.first.deck = [];
+  describe("deck structure", () => {
+    it("deck contains CardInstance objects", () => {
+      givenGameState({ seed: 1 })
+        .withFirstDeck([
+          { name: "A", type: "Follower", attack: 1, defense: 1 },
+          { name: "B", type: "Follower", attack: 2, defense: 2 },
+        ])
+        .build();
 
-            const effect = {
-                op: "deck" as const,
-                action: "replace",
-                cards: [
-                    { name: "Fairy", count: 3 },
-                ],
-            };
-            whenRunEffects([effect], "first");
-
-            expect(state.players.first.deck.length).toBe(3);
-        });
+      expect(state.players.first.deck.length).toBe(2);
+      expect(state.players.first.deck[0].name).toBeDefined();
     });
-
-    // ===========================================================================
-    // DECK STRUCTURE
-    // ===========================================================================
-
-    describe("deck structure", () => {
-        it("deck contains CardInstance objects", () => {
-            givenGameState({ seed: 1 })
-                .withFirstDeck([
-                    { name: "A", type: "Follower", attack: 1, defense: 1 },
-                    { name: "B", type: "Follower", attack: 2, defense: 2 },
-                ])
-                .build();
-
-            expect(state.players.first.deck.length).toBe(2);
-            expect(state.players.first.deck[0].name).toBeDefined();
-        });
-    });
+  });
 });

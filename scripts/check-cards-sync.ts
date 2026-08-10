@@ -22,7 +22,9 @@ function readJson(file: string): unknown {
 }
 
 function main() {
-  console.log("🔍 Checking card data sync (cards/sets/ → all.json + index.json)...\n");
+  console.log(
+    "🔍 Checking card data sync (cards/sets/ → all.json + index.json)...\n",
+  );
 
   const { allCards: expectedCards, indexData: expectedIndex } =
     mergeSetsFromDisk();
@@ -41,7 +43,9 @@ function main() {
     console.error("   Run: npm run cards:update");
     failed = true;
   } else {
-    console.log(`✅ cards/all.json matches merged sets (${expectedCards.length} cards)`);
+    console.log(
+      `✅ cards/all.json matches merged sets (${expectedCards.length} cards)`,
+    );
   }
 
   if (!isDeepStrictEqual(expectedIndex, actualIndex)) {
@@ -49,7 +53,9 @@ function main() {
     console.error("   Run: npm run cards:update");
     failed = true;
   } else {
-    console.log(`✅ cards/index.json matches (${Object.keys(expectedIndex).length} sets)`);
+    console.log(
+      `✅ cards/index.json matches (${Object.keys(expectedIndex).length} sets)`,
+    );
   }
 
   if (failed) {

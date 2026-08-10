@@ -38,9 +38,3 @@ describe("Card Text Compiler", () => {
     expect(result.unresolved[0]).toBe("Gain +1/+1.");
   });
 });
-
-
-
-
-
-

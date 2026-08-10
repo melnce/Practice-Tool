@@ -50,7 +50,9 @@ describe("C5 — Strike/Clash order before damage (§228–240)", () => {
     resetUidCounter();
     state.gameStarted = true;
     givenGameState({ seed: 1, activePlayer: "first" })
-      .withFirstDeck([{ name: "Drawn", type: "Follower", attack: 1, defense: 1 }])
+      .withFirstDeck([
+        { name: "Drawn", type: "Follower", attack: 1, defense: 1 },
+      ])
       .build();
     state.players.second.hp = 20;
   });
@@ -64,9 +66,7 @@ describe("C5 — Strike/Clash order before damage (§228–240)", () => {
         {
           event: "strike",
           source: "board",
-          effects: [
-            { op: "damage", target: "enemy:leader", amount: 1 },
-          ],
+          effects: [{ op: "damage", target: "enemy:leader", amount: 1 }],
         },
       ],
     });
@@ -77,9 +77,7 @@ describe("C5 — Strike/Clash order before damage (§228–240)", () => {
         {
           event: "clash",
           source: "board",
-          effects: [
-            { op: "damage", target: "clash_opponent", amount: 2 },
-          ],
+          effects: [{ op: "damage", target: "clash_opponent", amount: 2 }],
         },
       ],
     });
@@ -105,9 +103,7 @@ describe("C5 — Strike/Clash order before damage (§228–240)", () => {
         {
           event: "clash",
           source: "board",
-          effects: [
-            { op: "damage", target: "clash_opponent", amount: 10 },
-          ],
+          effects: [{ op: "damage", target: "clash_opponent", amount: 10 }],
         },
       ],
     });
@@ -118,9 +114,7 @@ describe("C5 — Strike/Clash order before damage (§228–240)", () => {
         {
           event: "clash",
           source: "board",
-          effects: [
-            { op: "damage", target: "clash_opponent", amount: 2 },
-          ],
+          effects: [{ op: "damage", target: "clash_opponent", amount: 2 }],
         },
       ],
     });
@@ -150,8 +144,14 @@ describe("C5 — Strike/Clash order before damage (§228–240)", () => {
       },
     ] as any;
 
-    const attacker = combatFollower("Raider", "first", { attack: 2, defense: 2 });
-    const defender = combatFollower("Dummy", "second", { attack: 1, defense: 5 });
+    const attacker = combatFollower("Raider", "first", {
+      attack: 2,
+      defense: 2,
+    });
+    const defender = combatFollower("Dummy", "second", {
+      attack: 1,
+      defense: 5,
+    });
 
     state.players.first.board = [attacker];
     state.players.second.board = [defender];

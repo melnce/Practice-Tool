@@ -3,10 +3,10 @@
 
 export { handleAddToHand } from "./handler.js";
 export type {
-    normalizeToAddToHandSpec,
-    UnifiedAddToHandSpec,
-    AddToHandSource,
-    AddToHandPlayer,
-    CopyTargetBase,
-    CopyTargetFilter
+  normalizeToAddToHandSpec,
+  UnifiedAddToHandSpec,
+  AddToHandSource,
+  AddToHandPlayer,
+  CopyTargetBase,
+  CopyTargetFilter,
 } from "./types.js";

@@ -5,7 +5,11 @@
 
 import { state } from "../../../core/gameState.js";
 import type { CardInstance, Player } from "../../../core/types/index.js";
-import { getBoard, getGraveyard, addShadows } from "../../../core/playerHelpers.js";
+import {
+  getBoard,
+  getGraveyard,
+  addShadows,
+} from "../../../core/playerHelpers.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Witch's New Brew Merge Logic
@@ -67,18 +71,3 @@ export function mergeWitchsNewBrewOnPlay(newCard: CardInstance, owner: Player) {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

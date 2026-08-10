@@ -14,7 +14,7 @@ import { initCardDatabaseNode } from "../../src/data/cardLoaderNode.js";
 
 // Initialize card database once before all mechanic tests
 beforeAll(async () => {
-    await initCardDatabaseNode();
+  await initCardDatabaseNode();
 });
 
-export { };
+export {};

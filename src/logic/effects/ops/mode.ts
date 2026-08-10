@@ -27,10 +27,15 @@ export function resolveModeSelectCount(
   eff: Effect & { select_count?: number; select?: number },
   owner: Player,
 ): number {
-  const options = Array.isArray((eff as any)?.options) ? (eff as any).options : [];
+  const options = Array.isArray((eff as any)?.options)
+    ? (eff as any).options
+    : [];
   const baseSelect = Math.max(
     1,
-    parseInt(String((eff as any)?.select_count ?? (eff as any)?.select ?? 1), 10) || 1,
+    parseInt(
+      String((eff as any)?.select_count ?? (eff as any)?.select ?? 1),
+      10,
+    ) || 1,
   );
   const bonus = getModeBonus(state, owner);
   return Math.min(options.length, baseSelect + bonus);
@@ -245,18 +250,3 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   pickOnce(available);
   return "pending"; // Return pending to pause effect chain while modal is shown
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

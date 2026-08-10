@@ -2,7 +2,18 @@ import { state } from "../../core/gameState.js";
 import { logEvent } from "../../core/logger.js";
 import type { Effect, Player } from "../../core/types/index.js";
 import { fireTrigger } from "../core/triggers.js";
-import { isFirstPlayer, getHP, setHP, setMaxHP, getPP, setPP, getMaxPP, opponentOf, getEvoCharges, setEvoCharges } from "../../core/playerHelpers.js";
+import {
+  isFirstPlayer,
+  getHP,
+  setHP,
+  setMaxHP,
+  getPP,
+  setPP,
+  getMaxPP,
+  opponentOf,
+  getEvoCharges,
+  setEvoCharges,
+} from "../../core/playerHelpers.js";
 
 // ============================================================================
 // NOTE: "heal" operations are DEPRECATED. Use "restore" instead.
@@ -160,7 +171,9 @@ export function handleSetLeaderMaxDamageCap(eff: Effect, owner: Player) {
   const isOpponent = targetPlayerString === "opponent";
   const targetOwner: Player = isOpponent ? opponentOf(owner) : owner;
 
-  const key = isFirstPlayer(targetOwner) ? "blueLeaderMaxDamageCap" : "redLeaderMaxDamageCap";
+  const key = isFirstPlayer(targetOwner)
+    ? "blueLeaderMaxDamageCap"
+    : "redLeaderMaxDamageCap";
   const expiryKey = isFirstPlayer(targetOwner)
     ? "blueLeaderMaxDamageCapExpiry"
     : "redLeaderMaxDamageCapExpiry";
@@ -199,18 +212,3 @@ export function handleModifyLeaderDamageReceived(eff: Effect, owner: Player) {
     total: state.players[targetOwner].leaderDamageTakenBonus,
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

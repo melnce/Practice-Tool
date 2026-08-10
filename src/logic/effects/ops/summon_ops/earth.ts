@@ -1,4 +1,7 @@
-import type { CardInstance, CardTemplate } from "../../../../core/types/index.js";
+import type {
+  CardInstance,
+  CardTemplate,
+} from "../../../../core/types/index.js";
 import { isAmulet, normalizeName } from "./utils.js";
 
 // =============== Utilities ===============
@@ -111,18 +114,3 @@ export function dedupeEarthSigils(board: CardInstance[]) {
     mergeSigils(board, sediments);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -30,7 +30,10 @@ export default defineConfig({
         baseURL: process.env.PW_BASE_URL ?? "http://localhost:5174?test=1",
         headless: true,
       },
-      reporter: [["list"], ["html", { outputFolder: "test-results/qa/html", open: "never" }]],
+      reporter: [
+        ["list"],
+        ["html", { outputFolder: "test-results/qa/html", open: "never" }],
+      ],
       outputDir: "test-results/qa/artifacts",
     },
   ],

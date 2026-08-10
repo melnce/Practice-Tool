@@ -3,7 +3,12 @@ import { onEvolve } from "../../evolveUtils.js";
 import { logEvent } from "../../../core/logger.js";
 import { state } from "../../../core/gameState.js";
 import type { CardInstance, Player } from "../../../core/types/index.js";
-import { isFirstPlayer, getEvoUsedThisTurn, getEvoCharges, getSuperEvoCharges } from "../../../core/playerHelpers.js";
+import {
+  isFirstPlayer,
+  getEvoUsedThisTurn,
+  getEvoCharges,
+  getSuperEvoCharges,
+} from "../../../core/playerHelpers.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 
 function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
@@ -117,18 +122,3 @@ export function handleEvolveLastSummoned(owner: Player) {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

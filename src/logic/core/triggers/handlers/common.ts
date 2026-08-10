@@ -16,7 +16,9 @@ export function dispatchOrderedTriggers(
   options?: DispatchOrderedOptions,
 ) {
   const { excludeSources, ...processOptions } = options ?? {};
-  const candidates = getOrderedTriggerCandidates(activePlayer, { excludeSources });
+  const candidates = getOrderedTriggerCandidates(activePlayer, {
+    excludeSources,
+  });
   processCandidateTriggers(candidates, {
     event,
     activePlayer,

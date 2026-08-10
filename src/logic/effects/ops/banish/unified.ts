@@ -3,15 +3,16 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import type { Effect, Player, CardInstance } from "../../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 
-import type {
-  UnifiedBanishSpec,
-  BanishContext,
-} from "./types.js";
+import type { UnifiedBanishSpec, BanishContext } from "./types.js";
 import { normalizeToUnifiedSpec } from "./types.js";
 import {
   banishCard,
@@ -237,18 +238,3 @@ function applyFilters(
 
   return result;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

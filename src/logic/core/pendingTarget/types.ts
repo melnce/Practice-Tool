@@ -1,7 +1,11 @@
 // src/logic/core/pendingTarget/types.ts
 // Types for pending target selection state
 
-import type { Effect, Player, CardInstance } from "../../../core/types/index.js";
+import type {
+  Effect,
+  Player,
+  CardInstance,
+} from "../../../core/types/index.js";
 
 /**
  * Shape of a pending target selection request.
@@ -30,18 +34,3 @@ export interface PendingTargetRequest {
 export type PendingTargetResult =
   | { status: "pending" }
   | { status: "resolved"; targetUids: string[] };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

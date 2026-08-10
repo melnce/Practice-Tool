@@ -5,7 +5,11 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
-import { getBoard as getPlayerBoard, getDeck, getBanish } from "../../../../core/playerHelpers.js";
+import {
+  getBoard as getPlayerBoard,
+  getDeck,
+  getBanish,
+} from "../../../../core/playerHelpers.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 
 // ============================================================================
@@ -147,7 +151,10 @@ export function banishAllEnemyCopies(
 ): number {
   if (!selected || !selected.name) return 0;
 
-  const oppBoard = getPlayerBoard(state, owner === "first" ? "second" : "first");
+  const oppBoard = getPlayerBoard(
+    state,
+    owner === "first" ? "second" : "first",
+  );
   const hits = oppBoard.filter((c) => c?.name === selected.name);
 
   let count = 0;
@@ -175,18 +182,3 @@ export function getCardOwner(card: CardInstance): Player | null {
 export function getBoard(owner: Player): CardInstance[] {
   return getPlayerBoard(state, owner);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

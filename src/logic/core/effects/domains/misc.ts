@@ -35,7 +35,12 @@ export function registerMiscEffects() {
   // ==========================================================================
   registerOp("evolve", (eff, ctx) => {
     const evolveCtx = { ...(ctx.context || {}), queue: ctx.queue };
-    const result = handleEvolve(eff as any, ctx.owner, ctx.sourceCard, evolveCtx);
+    const result = handleEvolve(
+      eff as any,
+      ctx.owner,
+      ctx.sourceCard,
+      evolveCtx,
+    );
     if (result === "pending") return "pending";
   });
 
@@ -43,7 +48,13 @@ export function registerMiscEffects() {
   registerOp("evolve_self", (eff, ctx) => {
     const evolveCtx = { ...(ctx.context || {}), queue: ctx.queue };
     handleEvolve(
-      { ...(eff as any), op: "evolve", target: "self", mode: "normal", spend_point: false },
+      {
+        ...(eff as any),
+        op: "evolve",
+        target: "self",
+        mode: "normal",
+        spend_point: false,
+      },
       ctx.owner,
       ctx.sourceCard,
       evolveCtx,
@@ -53,7 +64,13 @@ export function registerMiscEffects() {
   registerOp("super_evolve_self", (eff, ctx) => {
     const evolveCtx = { ...(ctx.context || {}), queue: ctx.queue };
     handleEvolve(
-      { ...(eff as any), op: "evolve", target: "self", mode: "super", spend_point: false },
+      {
+        ...(eff as any),
+        op: "evolve",
+        target: "self",
+        mode: "super",
+        spend_point: false,
+      },
       ctx.owner,
       ctx.sourceCard,
       evolveCtx,
@@ -94,18 +111,3 @@ export function registerMiscEffects() {
     }
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

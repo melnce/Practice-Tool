@@ -8,7 +8,12 @@ import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
 import { doAction } from "../core/history.js";
 import type { Player } from "../core/types/index.js";
-import { getHand, getDeck, isFirstPlayer, getDeckFile } from "../core/playerHelpers.js";
+import {
+  getHand,
+  getDeck,
+  isFirstPlayer,
+  getDeckFile,
+} from "../core/playerHelpers.js";
 import { adapter } from "../core/adapter.js";
 
 function ownerZones(owner: Player) {
@@ -180,10 +185,10 @@ function startFirstTurn() {
 // ---- Simple UI helpers (browser only) ----
 function showMulliganUI() {
   const firstBtn = document.getElementById(
-    "blueMulliganConfirm",  // Keep DOM IDs for backward compatibility
+    "blueMulliganConfirm", // Keep DOM IDs for backward compatibility
   ) as HTMLButtonElement | null;
   const secondBtn = document.getElementById(
-    "redMulliganConfirm",   // Keep DOM IDs for backward compatibility
+    "redMulliganConfirm", // Keep DOM IDs for backward compatibility
   ) as HTMLButtonElement | null;
   document.body.classList.add("mulligan-active");
   if (firstBtn) {

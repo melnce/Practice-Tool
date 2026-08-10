@@ -5,12 +5,29 @@ import { state } from "../core/gameState.js";
 import { fireTrigger } from "./core/triggers.js";
 import { logEvent } from "../core/logger.js";
 import type { CardInstance, Player, Effect } from "../core/types/index.js";
-import { isFirstPlayer, getEvoCharges, setEvoCharges, getSuperEvoCharges, setSuperEvoCharges, getEvoUsedThisTurn, setEvoUsedThisTurn, getEvoCount, incrementEvoCount, getBoard, getBackrow, opponentOf } from "../core/playerHelpers.js";
+import {
+  isFirstPlayer,
+  getEvoCharges,
+  setEvoCharges,
+  getSuperEvoCharges,
+  setSuperEvoCharges,
+  getEvoUsedThisTurn,
+  setEvoUsedThisTurn,
+  getEvoCount,
+  incrementEvoCount,
+  getBoard,
+  getBackrow,
+  opponentOf,
+} from "../core/playerHelpers.js";
 import { resolveUid } from "../core/uidResolver.js";
 
 function collectEvolveEffects(obj: unknown): Effect[] {
   if (Array.isArray(obj)) return [...obj];
-  if (obj && typeof obj === "object" && Array.isArray((obj as { effects?: Effect[] }).effects)) {
+  if (
+    obj &&
+    typeof obj === "object" &&
+    Array.isArray((obj as { effects?: Effect[] }).effects)
+  ) {
     return [...(obj as { effects: Effect[] }).effects];
   }
   return [];
@@ -23,7 +40,10 @@ function superEvolveReplacesEvolveLine(card: CardInstance): boolean {
 }
 
 /** Resolve effect lists for normal vs super evolve (exported for audit tests). */
-export function resolveEvolveEffects(card: CardInstance, mode: "normal" | "super"): Effect[] {
+export function resolveEvolveEffects(
+  card: CardInstance,
+  mode: "normal" | "super",
+): Effect[] {
   const normalFx = collectEvolveEffects(card.evolve);
   if (mode === "normal") return normalFx;
 
@@ -96,7 +116,11 @@ export function onEvolve(
     if (!spendPoint) return;
     if (mode === "super") {
       // Only decrement super evolution charges for super evolves
-      setSuperEvoCharges(state, owner, Math.max(0, getSuperEvoCharges(state, owner) - 1));
+      setSuperEvoCharges(
+        state,
+        owner,
+        Math.max(0, getSuperEvoCharges(state, owner) - 1),
+      );
       setEvoUsedThisTurn(state, owner, true);
     } else {
       // Only decrement normal evolution charges for normal evolves
@@ -210,18 +234,3 @@ export function superEvolveAllyFromContext(
 
   logEvent("superEvolve", { owner, card: target.name, uid: target.uid });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

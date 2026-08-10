@@ -53,17 +53,3 @@ export function updateCounts(state: GameState) {
   endBlue.style.color = isFirstActive ? "white" : "black";
   endRed.style.color = !isFirstActive ? "white" : "black";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -35,11 +35,17 @@ const R10 = 10;
 const R15 = 15;
 const FAITH_CREST = "Faith: Sham-Nacha, Heir to Entwining";
 
-function setupTurn(round: number, opts: { hand?: string[]; pp?: number; deck?: string[] } = {}) {
+function setupTurn(
+  round: number,
+  opts: { hand?: string[]; pp?: number; deck?: string[] } = {},
+) {
   const max = Math.min(round, 10);
   const pp = opts.pp ?? max;
-  let b = givenGameState({ seed: 1, activePlayer: "first", roundCount: round })
-    .withFirstPP(pp, max);
+  let b = givenGameState({
+    seed: 1,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
   b.build();
@@ -121,7 +127,13 @@ describe("B/C — Screaming and Loathing (10353310)", () => {
     setupTurn(R6, { pp: 4 });
     state.players.first.deck.unshift(
       createCard(
-        { name: "DeckFollower", type: "Follower", cost: 2, attack: 1, defense: 1 },
+        {
+          name: "DeckFollower",
+          type: "Follower",
+          cost: 2,
+          attack: 1,
+          defense: 1,
+        },
         "deck",
         "first",
       ),
@@ -131,7 +143,9 @@ describe("B/C — Screaming and Loathing (10353310)", () => {
     runEffects(modeBlock.options[0].effects, "first", null);
     runEffects(modeBlock.options[1].effects, "first", null);
     expect(state.players.first.pp).toBe(5);
-    expect(getHand(state, "first").some((c) => c.name === "DeckFollower")).toBe(true);
+    expect(getHand(state, "first").some((c) => c.name === "DeckFollower")).toBe(
+      true,
+    );
   });
 });
 
@@ -173,9 +187,9 @@ describe("B/C — Corruption dual crest + SSA (10453310)", () => {
     state.players.first.hp = 20;
     state.players.second.hp = 20;
     whenPlayCard("first", 0);
-    expect(getCrests(state, "second").some((c) => c.name?.includes("Corruption"))).toBe(
-      true,
-    );
+    expect(
+      getCrests(state, "second").some((c) => c.name?.includes("Corruption")),
+    ).toBe(true);
     expect(getCrests(state, "first").length).toBe(0);
 
     givenGameState({ seed: 2, activePlayer: "first", roundCount: 6 })
@@ -220,10 +234,9 @@ describe("B/C — Sham-Nacha faith + super-evolve (10354110)", () => {
     whenPlayCard("first", 0);
     expect(faithCount()).toBe(2);
     getCrests(state, "first")[0]!.counters = { faith: 10 };
-    handleCrest(
-      (getCardById("10354110")!.fanfare![0] as any),
-      { owner: "first" },
-    );
+    handleCrest(getCardById("10354110")!.fanfare![0] as any, {
+      owner: "first",
+    });
     expect(faithCount()).toBe(0);
     expect(getModeBonus(state, "first")).toBe(1);
 
@@ -268,7 +281,9 @@ describe("B/C — Belial SSA crest (10454120)", () => {
     belialHand.skyboundArtEvolvesWitnessed = 5;
     whenPlayCard("first", 0);
     expect(
-      getCrests(state, "first").some((c) => c.name?.includes("Belial, Archangel")),
+      getCrests(state, "first").some((c) =>
+        c.name?.includes("Belial, Archangel"),
+      ),
     ).toBe(true);
 
     const onBoard = findOnBoard("first", "Belial, Archangel of Cunning")!;
@@ -283,7 +298,9 @@ describe("B/C — Belial SSA crest (10454120)", () => {
     setupTurn(R8, { hand: ["10454120"], pp: 8 });
     whenPlayCard("first", 0);
     expect(
-      getCrests(state, "first").some((c) => c.name?.includes("Belial, Archangel")),
+      getCrests(state, "first").some((c) =>
+        c.name?.includes("Belial, Archangel"),
+      ),
     ).toBe(false);
   });
 });
