@@ -16,7 +16,10 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
-import { evolveFollowerByEffect } from "../../src/logic/effects/ops/evolve.js";
+import {
+  evolveFollowerByEffect,
+  handleEvolveSelf,
+} from "../../src/logic/effects/ops/evolve.js";
 import { handleGainCrest, tickCrests } from "../../src/logic/effects/crest.js";
 import {
   handleMode,
@@ -35,6 +38,7 @@ import {
   getCrests,
   getModeBonus,
   getHand,
+  getEvoCount,
 } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -142,7 +146,29 @@ describe("Foundations — Skybound Art gauge (turn# + in-hand evolves)", () => {
     state.activePlayer = "first";
   });
 
-  it("gauge = roundCount + witnesses; SA ≥10, SSA ≥15; pre-hand evolves do not count", () => {
+  it("pre-hand: evolves before the Skybound card enters hand do not count", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 8 })
+      .withFirstPP(8, 8)
+      .build();
+
+    const ally = createCard(
+      { name: "EvoAlly", type: "Follower", cost: 2, attack: 2, defense: 2 },
+      "board",
+      "first",
+    );
+    ally.peak_defense = ally.defense;
+    state.players.first.board = [ally];
+
+    onEvolve(ally, "first", "normal", { spendPoint: false });
+
+    const belial = createCard("10454120", "hand", "first");
+    state.players.first.hand.push(belial);
+    expect(hasSkyboundArt(belial)).toBe(true);
+    expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(0);
+    expect(getSkyboundArtGauge(belial, 8)).toBe(8);
+  });
+
+  it("in-hand: allied evolve while Skybound card is in hand counts; SA ≥10, SSA ≥15", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 8 })
       .withFirstPP(8, 8)
       .build();
@@ -159,11 +185,11 @@ describe("Foundations — Skybound Art gauge (turn# + in-hand evolves)", () => {
     expect(hasSkyboundArt(belial)).toBe(true);
 
     onEvolve(ally, "first", "normal", { spendPoint: false });
-    expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(0);
-    expect(getSkyboundArtGauge(belial, 8)).toBe(8);
+    // Sync: witness visible before onEvolve returns (static import, not microtask).
+    expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(1);
+    expect(getSkyboundArtGauge(belial, 8)).toBe(9);
     expect(meetsSkyboundArtThreshold(belial, 10, 8)).toBe(false);
 
-    incrementSkyboundArt("first");
     incrementSkyboundArt("first");
     incrementSkyboundArt("first");
     expect(belial.skyboundArtEvolvesWitnessed).toBe(3);
@@ -186,6 +212,61 @@ describe("Foundations — Skybound Art gauge (turn# + in-hand evolves)", () => {
         belial,
       ),
     ).toBe(false);
+  });
+
+  it("EP-evolving empty evolve[] charges gauge and evoCount synchronously", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 })
+      .withFirstEvo(2)
+      .build();
+
+    const fighter = createCard("10001110", "board", "first");
+    fighter.peak_defense = fighter.defense;
+    state.players.first.board = [fighter];
+    const belial = createCard("10454120", "hand", "first");
+    state.players.first.hand.push(belial);
+
+    expect(Array.isArray(fighter.evolve) ? fighter.evolve.length : 0).toBe(0);
+    expect(getEvoCount(state, "first")).toBe(0);
+
+    onEvolve(fighter, "first", "normal", { spendPoint: true });
+    expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(1);
+    expect(getEvoCount(state, "first")).toBe(1);
+  });
+
+  it("effect-granted evolve (runEvoEffects:false / skipEffects) charges gauge and evoCount", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 }).build();
+
+    const fighter = createCard("10001110", "board", "first");
+    fighter.peak_defense = fighter.defense;
+    state.players.first.board = [fighter];
+    const belial = createCard("10454120", "hand", "first");
+    state.players.first.hand.push(belial);
+
+    handleEvolveSelf(fighter, "first", {
+      spendPoint: false,
+      runEvoEffects: false,
+    });
+    expect(fighter.hasEvolved).toBe(true);
+    expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(1);
+    expect(getEvoCount(state, "first")).toBe(1);
+  });
+
+  it("effect evolve whose script filters to empty still charges gauge and evoCount", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 }).build();
+
+    // Nameless Demon: has Evolve: summon Bats, but not evolve_trigger_always —
+    // effect-granted path filters the script to empty, yet the evolve still happened.
+    const nameless = createCard("10151120", "board", "first");
+    nameless.peak_defense = nameless.defense;
+    state.players.first.board = [nameless];
+    const belial = createCard("10454120", "hand", "first");
+    state.players.first.hand.push(belial);
+
+    expect(nameless.evolve_trigger_always).toBeFalsy();
+    evolveFollowerByEffect(nameless, "first");
+    expect(nameless.hasEvolved).toBe(true);
+    expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(1);
+    expect(getEvoCount(state, "first")).toBe(1);
   });
 });
 
