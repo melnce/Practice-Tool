@@ -1,5 +1,6 @@
 // src/logic/evolveUtils.ts
 import { runEffects } from "./core/effects/index.js";
+import { incrementSkyboundArt } from "./effects/skybound.js";
 import { state } from "../core/gameState.js";
 import { fireTrigger } from "./core/triggers.js";
 import { logEvent } from "../core/logger.js";
@@ -15,6 +16,21 @@ import {
   getEvoCount,
   incrementEvoCount,
 } from "../core/playerHelpers.js";
+
+/**
+ * Bookkeeping for every completed allied evolve (EP-spent or effect-granted,
+ * with or without an Evolve: script). Bible: Skybound gauge counts "allied
+ * followers that evolved" while the card was in hand — not whether a script ran.
+ * Couples evoCount + Skybound so they cannot drift apart.
+ */
+function recordAlliedEvolve(owner: Player) {
+  incrementEvoCount(state, owner);
+  incrementSkyboundArt(owner);
+  logEvent("evolveCount", {
+    owner,
+    count: getEvoCount(state, owner),
+  });
+}
 
 function collectEvolveEffects(obj: unknown): Effect[] {
   if (Array.isArray(obj)) return [...obj];
@@ -136,6 +152,7 @@ export function onEvolve(
 
   if (skipEffects) {
     // Just spend counters & trigger, no card effects
+    recordAlliedEvolve(owner);
     spendCounters();
     fireEvoTriggers();
     logEvent("evolve", {
@@ -152,6 +169,7 @@ export function onEvolve(
 
   // Even with no evolve effects defined, we still spend counters & fire triggers once.
   if (effectsToRun.length === 0) {
+    recordAlliedEvolve(owner);
     spendCounters();
     fireEvoTriggers();
     logEvent("evolve", {
@@ -166,20 +184,7 @@ export function onEvolve(
 
   runEffects(effectsToRun, owner, card);
 
-  // NEW: Notify Skybound Art cards in hand
-  import("./effects/skybound.js")
-    .then(({ incrementSkyboundArt }) => {
-      incrementSkyboundArt(owner);
-    })
-    .catch((e) => console.error("Failed to load skybound module:", e));
-
-  // Track total evolves (Moved from effects/ops/evolve.ts)
-  incrementEvoCount(state, owner);
-  logEvent("evolveCount", {
-    owner,
-    count: getEvoCount(state, owner),
-  });
-
+  recordAlliedEvolve(owner);
   spendCounters();
   fireEvoTriggers();
   logEvent("evolve", {
