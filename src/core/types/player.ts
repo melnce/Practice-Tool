@@ -87,6 +87,8 @@ export interface PlayerState {
   leaderBarrier: number;
   leaderDamageTakenBonus: number; // Beelzebub effect
   leaderMaxDamageCap: number | null; // Zooey effect (null = no cap)
+  /** When set (e.g. "opponent_turn_end"), clears leaderMaxDamageCap at that boundary. */
+  leaderMaxDamageCapExpiry: string | null;
 
   // === RL Metrics (accumulated during game) ===
   totalDamageDealt: number;

@@ -1,6 +1,5 @@
 // src/logic/evolveUtils.ts
 import { runEffects } from "./core/effects/index.js";
-import { handleEvolveSelf } from "./effects/ops/evolve.js";
 import { state } from "../core/gameState.js";
 import { fireTrigger } from "./core/triggers.js";
 import { logEvent } from "../core/logger.js";
@@ -15,11 +14,7 @@ import {
   setEvoUsedThisTurn,
   getEvoCount,
   incrementEvoCount,
-  getBoard,
-  getBackrow,
-  opponentOf,
 } from "../core/playerHelpers.js";
-import { resolveUid } from "../core/uidResolver.js";
 
 function collectEvolveEffects(obj: unknown): Effect[] {
   if (Array.isArray(obj)) return [...obj];
@@ -194,43 +189,4 @@ export function onEvolve(
     mode,
     via: "withEffects",
   });
-}
-
-export function superEvolveAllyFromContext(
-  owner: Player,
-  sourceCard: CardInstance | null,
-  context: any,
-) {
-  // UID-based selection only
-  if (!context?.targetUids?.length) return;
-  const sel = resolveUid(context.targetUids[0]);
-  if (!sel) return;
-
-  function findOnBoardByUid(uid: number) {
-    const zones = [
-      ...getBoard(state, "first"),
-      ...getBoard(state, "second"),
-      ...getBackrow(state, "first"),
-      ...getBackrow(state, "second"),
-    ];
-    return zones.find((c) => c && Number(c.uid) === uid) || null;
-  }
-
-  const target =
-    typeof sel === "string"
-      ? findOnBoardByUid(Number(sel))
-      : findOnBoardByUid(Number(sel.uid)) || sel;
-
-  if (!target) return;
-  if (sourceCard && target.uid === sourceCard.uid) return; // not self
-  if (target.hasEvolved) return; // must be unevolved
-
-  // Single source of truth: +3/+3, evo flags, rush-if-no-storm, triggers (skip card script)
-  handleEvolveSelf(target, owner, {
-    mode: "super",
-    spendPoint: false,
-    runEvoEffects: false,
-  });
-
-  logEvent("superEvolve", { owner, card: target.name, uid: target.uid });
 }

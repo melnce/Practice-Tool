@@ -9,7 +9,6 @@ import {
   getEvoCharges,
   getSuperEvoCharges,
 } from "../../../core/playerHelpers.js";
-import { resolveUid } from "../../../core/uidResolver.js";
 
 function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
   if (!card || card.type !== "Follower" || card.hasEvolved) return false;
@@ -72,23 +71,6 @@ export function handleEvolveSelf(
     spendPoint,
     skipEffects: !runEvoEffects,
   });
-}
-
-export function handleEvolveTarget(eff: any, owner: Player, context: any = {}) {
-  // UID-based selection only
-  if (!context?.targetUids?.length) {
-    console.warn("handleEvolveTarget: No targetUids in context.");
-    return;
-  }
-  const target = resolveUid(context.targetUids[0]);
-  if (!target) {
-    console.warn("handleEvolveTarget: Could not resolve target from UID.");
-    return;
-  }
-  const mode = eff.mode || "normal";
-  const spendPoint = eff.spendPoint === true;
-
-  handleEvolveSelf(target, owner, { mode, spendPoint, runEvoEffects: false });
 }
 
 /** Effect-granted evolve: stats + flags only; never runs the card's evolve[] / superevolve[] script. */

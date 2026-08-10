@@ -175,4 +175,87 @@ describe("follower_strike only_if_damaged destroy", () => {
       expect(getBoard(state, "second")).toHaveLength(0);
     });
   });
+
+  /**
+   * Hardening: cleanupDead() after follower_strike may splice a bystander and
+   * shift board indices. Identity (not defenderIdx) must decide whether the
+   * combat target is still present — otherwise damage exchange is skipped and
+   * super-evo knockback can falsely fire.
+   */
+  describe("follower_strike AoE bystander death (index shift hardening)", () => {
+    it("still exchanges combat damage when a bystander dies and shifts the defender index", () => {
+      givenGameState({ seed: 1, activePlayer: "first", phase: "main" }).build();
+
+      const striker: CardInstance = {
+        uid: "striker",
+        name: "Probe AoE Striker",
+        type: "Follower",
+        cost: 3,
+        attack: 4,
+        defense: 5,
+        peak_defense: 5,
+        can_attack: true,
+        hasRush: true,
+        // Super-evo: knockback must NOT fire when the combat target survives.
+        evoType: "super",
+        hasEvolved: true,
+        triggers: [
+          {
+            event: "follower_strike",
+            source: "board",
+            effects: [
+              {
+                // Chip all enemies: kills 1-def bystander, leaves 10-def defender alive.
+                op: "damage",
+                target: "enemy:follower",
+                amount: 1,
+              },
+            ],
+          },
+        ],
+      };
+
+      const bystander: CardInstance = {
+        uid: "bystander",
+        name: "Bystander",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        peak_defense: 1,
+      };
+
+      const defender: CardInstance = {
+        uid: "defender",
+        name: "Surviving Defender",
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 10,
+        peak_defense: 10,
+      };
+
+      state.players.first.board = [striker];
+      // Bystander at index 0; defender at index 1 — strike AoE kills bystander,
+      // cleanupDead shifts defender to index 0 while combat still targets idx 1.
+      state.players.second.board = [bystander, defender];
+      state.players.second.hp = 20;
+      state.gameStarted = true;
+
+      attackFollower(0, 1, "first", "second");
+
+      expect(
+        getBoard(state, "second").find((c) => c.uid === "bystander"),
+      ).toBeUndefined();
+      const surviving = getBoard(state, "second").find(
+        (c) => c.uid === "defender",
+      );
+      expect(surviving).toBeDefined();
+      // Strike chipped 1 → 9; combat must deal 4 more → 5.
+      // Index-lookup bug early-returns and leaves defense at 9.
+      expect(Number(surviving!.defense)).toBe(5);
+      // Super-evo knockback must NOT fire — defender survived.
+      expect(state.players.second.hp).toBe(20);
+    });
+  });
 });

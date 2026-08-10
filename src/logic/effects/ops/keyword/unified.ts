@@ -139,18 +139,13 @@ function handleGrant(
       if (nameLower === "barrier") {
         grantLeaderBarrier(targetOwner);
       } else if (nameLower === "maxdamagecap") {
-        // Set max damage cap (Zooey-style effect)
-        const capKey =
-          targetOwner === "first"
-            ? "blueLeaderMaxDamageCap"
-            : "redLeaderMaxDamageCap";
-        const expiryKey =
-          targetOwner === "first"
-            ? "blueLeaderMaxDamageCapExpiry"
-            : "redLeaderMaxDamageCapExpiry";
-        s[capKey] = value ?? 0;
+        // Set max damage cap (Zooey-style) on reset-covered PlayerState
+        state.players[targetOwner].leaderMaxDamageCap = value ?? 0;
         if (duration === "opponent_turn_end") {
-          s[expiryKey] = "opponent_turn_end";
+          state.players[targetOwner].leaderMaxDamageCapExpiry =
+            "opponent_turn_end";
+        } else {
+          state.players[targetOwner].leaderMaxDamageCapExpiry = null;
         }
         logEvent("setLeaderMaxDamageCap", {
           owner: targetOwner,
@@ -159,6 +154,8 @@ function handleGrant(
         });
       } else if (nameLower === "vulnerable") {
         // Increase damage taken (Beelzebub-style debuff)
+        // NOTE: still writes legacy root keys (unread by applyLeaderDamage);
+        // reset strips them. Do not migrate here — would change shipped Beelzebub.
         const modKey =
           targetOwner === "first"
             ? "blueLeaderDamagePlus"
