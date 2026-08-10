@@ -27,6 +27,7 @@ import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import { applyKeyword } from "../../src/logic/core/keywords/apply.js";
 import { getKS } from "../../src/logic/core/keywords/internal.js";
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
+import { getBanish } from "../../src/core/playerHelpers.js";
 
 function setupLateGame() {
   givenGameState({
@@ -180,6 +181,68 @@ describe("Himeka can't-attack crest / temporary lock", () => {
 
     attackFollower(0, 0, "second", "first");
     expect(Number(ally.defense)).toBeLessThan(defBefore);
+  });
+
+  it("crest EOT lock then banishes the locked enemy at their end of turn (card text banish tail)", () => {
+    // Crest text: give Can't Attack until opponent's EOT, then banish them.
+    // Engine models the banish as grant_trigger end_of_turn_own on the locked
+    // follower (fires when that follower's owner ends their turn).
+    setupLateGame();
+    const himeka = createCard("10364110", "hand", "first");
+    state.players.first.hand = [himeka];
+
+    const foe = createCard(
+      {
+        name: "BanishFoe",
+        type: "Follower",
+        cost: 2,
+        attack: 3,
+        defense: 5,
+      },
+      "board",
+      "second",
+    );
+    foe.justPlayed = false;
+    foe.peak_defense = 5;
+    foe.uid = "banish-foe";
+    state.players.second.board = [foe];
+
+    whenPlayCard("first", 0);
+    expect(
+      getCrests(state, "first").some(
+        (c) => c.name === "Himeka, Heir to Repose",
+      ),
+    ).toBe(true);
+
+    // P1 EOT → crest locks the ≤4-ATK enemy and grants delayed banish
+    endTurnBlue();
+    expect(state.activePlayer).toBe("second");
+    const locked = getBoard(state, "second").find(
+      (c) => c.uid === "banish-foe",
+    );
+    expect(locked).toBeTruthy();
+    expect(
+      locked!.cantAttack ||
+        locked!.keywordState?.cantAttack ||
+        locked!.keywordState?.cantAttackUntilOpponentEOT,
+    ).toBeTruthy();
+    expect(
+      (locked!.triggers || []).some(
+        (t: any) =>
+          t?.type === "end_of_turn_own" &&
+          JSON.stringify(t.effects || []).includes('"banish"'),
+      ),
+    ).toBe(true);
+
+    // P2 EOT → delayed banish must fire (not merely clear the lock)
+    endTurnRed();
+    expect(state.activePlayer).toBe("first");
+    expect(getBoard(state, "second").some((c) => c.uid === "banish-foe")).toBe(
+      false,
+    );
+    expect(getBanish(state, "second").some((c) => c.uid === "banish-foe")).toBe(
+      true,
+    );
   });
 
   it("evolving grants Rush-like follower attacks but not leader (rulebook §145) — sanity for Himeka herself", () => {
