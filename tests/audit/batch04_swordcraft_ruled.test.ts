@@ -191,7 +191,9 @@ describe("B/C — Gildaria Rally(20) super + enter ping (10224110)", () => {
     state.activePlayer = "first";
   });
 
-  it("Rally(20) Fanfare super-evolves; ally enter deals 1 to all enemy followers", () => {
+  it("Rally(20) Fanfare does not count self; ally enter deals 1 to all enemy followers", () => {
+    // §372: Fanfare Rally(N) sees the count from just before this card entered.
+    // setRally(19) → Fanfare sees 19 → no super-evolve; rally is exactly 20 afterwards.
     setupTurn(R7, { hand: ["10224110"], pp: 6 });
     setRally(state, "first", 19);
     state.players.first.superEvoPoints = 1;
@@ -199,20 +201,27 @@ describe("B/C — Gildaria Rally(20) super + enter ping (10224110)", () => {
     enemyFollower(3, "B");
     whenPlayCard("first", 0);
     const gild = findOnBoard("first", "Gildaria, Anathema of Peace")!;
-    expect(gild.evoType).toBe("super");
-    expect(getRally(state, "first")).toBeGreaterThanOrEqual(20);
+    expect(gild.evoType).not.toBe("super");
+    expect(gild.hasEvolved).toBeFalsy();
+    expect(getRally(state, "first")).toBe(20);
 
-    const ally = createCard(
-      { name: "Ally", type: "Follower", cost: 1, attack: 1, defense: 1 },
-      "board",
-      "first",
-    );
     runEffects(
       [{ op: "summon", source: "named", name: "Knight", count: 1 } as any],
       "first",
       gild,
     );
     expect(state.players.second.board.every((c) => c.defense === 2)).toBe(true);
+  });
+
+  it("Rally(20) Fanfare super-evolves when threshold already met before play", () => {
+    setupTurn(R7, { hand: ["10224110"], pp: 6 });
+    setRally(state, "first", 20);
+    state.players.first.superEvoPoints = 1;
+    whenPlayCard("first", 0);
+    const gild = findOnBoard("first", "Gildaria, Anathema of Peace")!;
+    expect(gild.evoType).toBe("super");
+    // Self + 2 Steelclad Knights from evolve_trigger_always on super-evolve.
+    expect(getRally(state, "first")).toBe(23);
   });
 });
 

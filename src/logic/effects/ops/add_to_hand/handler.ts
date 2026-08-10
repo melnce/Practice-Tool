@@ -6,7 +6,7 @@
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
-import { pushToHand, MAX_HAND } from "../../../../core/utils.js";
+import { pushToHand } from "../../../../core/utils.js";
 import { normalizeCardStats } from "../../../../core/cardStats.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import type {
@@ -77,10 +77,8 @@ function addNamedCards(
     return;
   }
 
-  // Create and add cards
+  // Create and add cards (overflow burns via pushToHand → burnHandOverflow)
   for (let i = 0; i < spec.count; i++) {
-    if (hand.length >= MAX_HAND) break;
-
     const copy: CardInstance = structuredClone(base);
     copy.uid = state.rng.makeUid();
     copy.owner = receivingPlayer;
@@ -100,8 +98,6 @@ function addNamedCards(
         uid: copy.uid,
         source: "named",
       });
-    } else {
-      break;
     }
   }
 }
@@ -155,10 +151,8 @@ function addCopiedCards(
     return;
   }
 
-  // Create copies
+  // Create copies (overflow burns via pushToHand → burnHandOverflow)
   for (let i = 0; i < spec.count; i++) {
-    if (hand.length >= MAX_HAND) break;
-
     const copy: CardInstance = structuredClone(cardToCopy);
     copy.uid = state.rng.makeUid();
     copy.owner = receivingPlayer;
@@ -182,8 +176,6 @@ function addCopiedCards(
         source: "copy",
         from: cardToCopy.uid,
       });
-    } else {
-      break;
     }
   }
 }
