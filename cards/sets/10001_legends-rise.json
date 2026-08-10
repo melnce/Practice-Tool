@@ -1007,24 +1007,7 @@
         }
       }
     ],
-    "superevolve": {
-      "effects": [
-        {
-          "op": "repeat_effect",
-          "count_source": "count_in_hand",
-          "filter": {
-            "tribe": "Pixie"
-          },
-          "effect": {
-            "op": "damage",
-            "amount": 1,
-            "target": "enemy:follower",
-            "distribution": "random_hits",
-            "count": 1
-          }
-        }
-      ]
-    },
+    "superevolve": [],
     "fanfare": [
       {
         "op": "stat",

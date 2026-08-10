@@ -16,7 +16,7 @@ import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { onEvolve, resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getSkyboundArtGauge } from "../../src/logic/effects/skybound.js";
 import { fuse_finalize_gardens_allure } from "../../src/logic/effects/ops/fuse/fuse.forest.js";
@@ -135,11 +135,35 @@ describe("B/C — Amataz Pixie hand scaling (10114130)", () => {
   });
 
   it("Fanfare: +X/+X where X = Pixie followers in hand", () => {
-    setupTurn(R6, { hand: ["10111310", "10114130"], pp: 4 });
-    whenPlayCard("first", 0);
-    whenPlayCard("first", 0);
+    // Fairy token (90011110) has tribe Pixie; filter:{tribe:"Pixie"} on count_in_hand.
+    setupTurn(R6, { hand: ["90011110", "90011110", "10114130"], pp: 5 });
+    whenPlayCard("first", 2);
     const amataz = findOnBoard("first", "Amataz, Origin Blader")!;
-    expect(amataz.attack).toBeGreaterThan(2);
+    expect(Number(amataz.attack)).toBe(4);
+    expect(Number(amataz.defense)).toBe(4);
+  });
+
+  // Bible (Data note §747): identical evolve/superevolve → empty superevolve so
+  // super-evolve resolves the effect once (not twice).
+  it("Super-evolve: Pixie-scaled damage resolves once (not duplicated via object-shaped superevolve)", () => {
+    setupTurn(R7, {
+      hand: ["90011110", "90011110", "10114130"],
+      pp: 5,
+    });
+    whenPlayCard("first", 2);
+    const amataz = findOnBoard("first", "Amataz, Origin Blader")!;
+    const enemy = createCard(
+      { name: "Target", type: "Follower", cost: 1, attack: 1, defense: 10 },
+      "board",
+      "second",
+    );
+    state.players.second.board = [enemy];
+    state.players.first.superEvoPoints = 1;
+    const defBefore = Number(enemy.defense);
+    onEvolve(amataz, "first", "super");
+    // 2 Pixies in hand → 2 damage total (not 4 if evolve+superevolve both fired)
+    expect(defBefore - Number(enemy.defense)).toBe(2);
+    expect(resolveEvolveEffects(amataz, "super").length).toBe(1);
   });
 });
 

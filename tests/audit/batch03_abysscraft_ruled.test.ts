@@ -20,6 +20,7 @@ import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { handleGainCrest, tickCrests } from "../../src/logic/effects/crest.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
+import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
 import {
   getHP,
   getCrests,
@@ -146,6 +147,53 @@ describe("B/C — Screaming and Loathing (10353310)", () => {
     expect(getHand(state, "first").some((c) => c.name === "DeckFollower")).toBe(
       true,
     );
+  });
+
+  // Preflight must not treat mode `select` as a targeting select (bible Faith/Modes;
+  // Screaming is the only card using select instead of select_count on mode).
+  it("can be played from hand when enemy followers are on board (mode select ≠ target)", () => {
+    setupTurn(R6, { hand: ["10353310"], pp: 3 });
+    state.players.second.board = [
+      createCard(
+        { name: "Enemy", type: "Follower", cost: 1, attack: 1, defense: 3 },
+        "board",
+        "second",
+      ),
+    ];
+    const card = getHand(state, "first")[0]!;
+    const pre = canPlayCard(card, "first");
+    expect(pre.ok).toBe(true);
+    whenPlayCard("first", 0);
+    expect(getHand(state, "first").some((c) => c.id === "10353310")).toBe(
+      false,
+    );
+  });
+});
+
+describe("B/C — Baal filter not_self on random ally buff (10452130)", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    state.gameStarted = true;
+    state.activePlayer = "first";
+    (globalThis as any).HEADLESS = true;
+  });
+
+  // Object filter:{not_self:true} must reach getPool (same root cause as Mari filter).
+  it("Mode 1: self +1/+1 and another random allied follower +1/+1 (not self twice)", () => {
+    setupTurn(R6, { pp: 3 });
+    const baal = createCard("10452130", "board", "first");
+    const ally = createCard(
+      { name: "Ally", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "board",
+      "first",
+    );
+    state.players.first.board = [baal, ally];
+    const mode1 = (getCardById("10452130")!.fanfare![0] as any).options[0];
+    const baalAtk = Number(baal.attack);
+    const allyAtk = Number(ally.attack);
+    runEffects(mode1.effects, "first", baal);
+    expect(Number(baal.attack)).toBe(baalAtk + 1);
+    expect(Number(ally.attack)).toBe(allyAtk + 1);
   });
 });
 

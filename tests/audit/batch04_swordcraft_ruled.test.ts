@@ -32,6 +32,7 @@ import {
   setRally,
   getRally,
 } from "../../src/core/playerHelpers.js";
+import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
 import "../../src/logic/core/effects/index.js";
 
 const R6 = 6;
@@ -405,6 +406,13 @@ describe("B/C — Knightly Ardor mode + EP (10423310)", () => {
     state.players.first.board = [ally];
     runEffects(spell.options[1].effects, "first", null);
     expect(ally.attack).toBeGreaterThanOrEqual(3);
+  });
+
+  // Control: select_count mode cards must remain playable after mode-select preflight fix.
+  it("can be played from hand (select_count mode is not a targeting select)", () => {
+    setupTurn(R6, { hand: ["10423310"], pp: 2 });
+    const card = getHand(state, "first")[0]!;
+    expect(canPlayCard(card, "first").ok).toBe(true);
   });
 });
 

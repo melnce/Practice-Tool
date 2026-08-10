@@ -13,7 +13,7 @@ import type {
   Player,
 } from "../../../../core/types/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
-import { getBoard, getHP, getMaxHP } from "../../../../core/playerHelpers.js";
+import { getBoard, getHP } from "../../../../core/playerHelpers.js";
 
 import type { UnifiedDamageSpec, DamageContext } from "./types.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
@@ -159,25 +159,17 @@ export function handleByStatDamage(
   }
 
   if (targetType === "leader" || targetType === "all:leader") {
-    const statKey = stat === "defense" ? "maxHP" : "hp";
+    // Leader "defense" / "hp" compare **current** defense (getHP), not maxHP.
+    // Raging Lightning (10341310) is the only by_stat→leader card; bible Owner
+    // ruling requires current defense. If a future effect needs max defense,
+    // add an explicit opt-in (e.g. stat: "max_defense") rather than overloading
+    // "defense".
     const leaders: Array<{
       owner: import("../../../../core/types/index.js").Player;
       value: number;
     }> = [
-      {
-        owner: "first",
-        value:
-          statKey === "maxHP"
-            ? getMaxHP(state, "first")
-            : getHP(state, "first"),
-      },
-      {
-        owner: "second",
-        value:
-          statKey === "maxHP"
-            ? getMaxHP(state, "second")
-            : getHP(state, "second"),
-      },
+      { owner: "first", value: getHP(state, "first") },
+      { owner: "second", value: getHP(state, "second") },
     ];
     const maxVal = Math.max(...leaders.map((l) => l.value));
     for (const l of leaders) {

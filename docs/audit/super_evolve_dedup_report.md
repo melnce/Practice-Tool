@@ -38,3 +38,4 @@ Keep both arrays; engine fires `evolve[]` then `superevolve[]` on super-evolve.
 - Dedup **executed** in `cards/sets/` (80 DUPLICATE emptied, Amorous Drain-only, 5 INSTEAD flagged).
 - **Replicate op** migrated for 16 fanfare-replicate cards.
 - Post-dedup counts above reflect remaining dual-array cards only (INSTEAD + DISTINCT).
+- Object-shaped `superevolve: { effects: [...] }` is normalised the same as arrays (Amataz-class duplicates).
