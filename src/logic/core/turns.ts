@@ -50,11 +50,18 @@ function refreshBoardForNewTurn(board: CardInstance[]) {
     (card as any).attacks_per_turn = perTurn;
     (card as any).attacks_left = perTurn;
 
-    // Respect summoning sickness unless Rush/Storm, but never allow attacking while locked
-    const isLocked =
+    // Respect summoning sickness unless Rush/Storm, but never allow attacking while locked.
+    // Canonical lock lives on keywordState (combat.isAttackForbidden); also honor root
+    // mirrors set by applyKeyword so both stay consistent until clearCantAttack runs.
+    const ks = card.keywordState;
+    const isLocked = !!(
+      ks?.cantAttack ||
+      ks?.cantAttackFollowers ||
+      ks?.cantAttackLeaders ||
       (card as any).cantAttack ||
       (card as any).cantAttackFollowers ||
-      (card as any).cantAttackLeaders;
+      (card as any).cantAttackLeaders
+    );
     const canSwing = !card.justPlayed || card.hasRush || card.hasStorm;
     (card as any).can_attack = canSwing && !isLocked;
 

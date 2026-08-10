@@ -87,10 +87,16 @@ function spendAttack(attacker: CardInstance) {
 function isAttackForbidden(card: CardInstance) {
   if (!card) return false;
   const ks = card.keywordState;
-  // Fix: Do NOT clear it here.
-  // Clearing happens in turns.ts at End of Turn.
-  // Clearing here causes it to vanish the moment the owner tries to attack.
-  return !!(ks?.cantAttack || ks?.cantAttackFollowers || ks?.cantAttackLeaders);
+  // Canonical flags live on keywordState; root mirrors are set by applyKeyword.
+  // Do NOT clear locks here — expiry is owned by turns/keywords EOT helpers.
+  return !!(
+    ks?.cantAttack ||
+    ks?.cantAttackFollowers ||
+    ks?.cantAttackLeaders ||
+    (card as any).cantAttack ||
+    (card as any).cantAttackFollowers ||
+    (card as any).cantAttackLeaders
+  );
 }
 
 function recomputeAttackFlags(card: CardInstance) {

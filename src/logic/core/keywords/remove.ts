@@ -5,16 +5,23 @@ import { normalizeKeywordName } from "./registry.js";
 
 // Helper to clear the lock flags on a single card
 export function clearCantAttack(card: CardInstance) {
-  if (!card || !card.keywordState) return;
-  const ks = card.keywordState;
-  delete ks.hasCantAttack;
-  delete ks.cantAttack;
-  delete ks.cantAttackFollowers;
-  delete ks.cantAttackLeaders;
-  delete ks.cantAttackUntilOpponentEOT;
-  delete ks.cantAttackExpiresOnTurn;
-  delete ks.cantAttackIsTemporary;
-  delete ks.cantAttackOwner;
+  if (!card) return;
+  if (card.keywordState) {
+    const ks = card.keywordState;
+    delete ks.hasCantAttack;
+    delete ks.cantAttack;
+    delete ks.cantAttackFollowers;
+    delete ks.cantAttackLeaders;
+    delete ks.cantAttackUntilOpponentEOT;
+    delete ks.cantAttackExpiresOnTurn;
+    delete ks.cantAttackIsTemporary;
+    delete ks.cantAttackOwner;
+  }
+  // applyKeyword mirrors flags onto the card root; clear both so turn refresh
+  // (which historically checked root flags) cannot keep a stale lock forever.
+  delete (card as any).cantAttack;
+  delete (card as any).cantAttackFollowers;
+  delete (card as any).cantAttackLeaders;
 }
 
 export function removeKeywordFromSingleCard(

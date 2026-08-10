@@ -196,7 +196,6 @@ export const KEYWORD_MAP: {
     }
     if (opts?.until_opponent_eot) {
       ks.cantAttackUntilOpponentEOT = true;
-      ks.cantAttackUntilOpponentEOT = true;
       ks.cantAttackIsTemporary = true;
       // Use the caster if provided, otherwise fallback to card owner (for self-buffs)
       ks.cantAttackOwner = opts.request_owner || c.owner || null;
