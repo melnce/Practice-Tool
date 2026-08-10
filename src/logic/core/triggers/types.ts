@@ -127,7 +127,7 @@ export interface TriggerSpec {
     [key: string]: any;
   };
   effects: Effect[];
-  source?: "board" | "hand" | "deck" | "banish" | "graveyard" | null;
+  source?: "board" | "hand" | "deck" | "banish" | "graveyard" | "self" | null;
   once_per_turn?: boolean;
   /** Max times this trigger may fire per turn (e.g. Azurifrit: 3). */
   max_per_turn?: number;

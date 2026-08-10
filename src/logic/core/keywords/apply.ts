@@ -91,10 +91,12 @@ export const KEYWORD_MAP: {
     const ks = getKS(c);
     if (!Array.isArray(ks.triggers)) ks.triggers = [];
     if (!Array.isArray(c.triggers)) c.triggers = [];
+    const ksTriggers = ks.triggers;
+    const cardTriggers = c.triggers;
     const add = (t: any) => {
       if (!t) return;
-      ks.triggers.push(t);
-      c.triggers.push(t);
+      ksTriggers.push(t);
+      cardTriggers.push(t);
     };
     if (opts?.trigger) add(opts.trigger);
     if (Array.isArray(opts?.triggers)) {

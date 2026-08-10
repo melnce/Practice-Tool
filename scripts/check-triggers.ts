@@ -74,6 +74,8 @@ function main() {
     const handlers = fs
       .readdirSync(HANDLERS_DIR)
       .filter((f) => f.endsWith(".ts"));
+    // Shared helpers in handlers/ (not event handlers themselves).
+    const SHARED_HANDLER_MODULES = new Set(["common", "types", "utils"]);
     for (const h of handlers) {
       const fullPath = path.join(HANDLERS_DIR, h);
       // Deny importing other handlers.
@@ -91,7 +93,8 @@ function main() {
       // Actually, we can just ban importing any OTHER handler by name
       const otherHandlers = handlers
         .filter((x) => x !== h)
-        .map((x) => x.replace(".ts", ""));
+        .map((x) => x.replace(".ts", ""))
+        .filter((name) => !SHARED_HANDLER_MODULES.has(name));
       const specificDeny = otherHandlers.map(
         (oh) => new RegExp(`from\\s+['"].*${oh}(\\.js)?['"]`),
       );

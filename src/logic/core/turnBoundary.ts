@@ -75,7 +75,8 @@ function ownerRoleForTrigger(
     return owner === focalPlayer ? "active" : null;
   }
 
-  if (cond.own_turn === true) {
+  // own_turn:true means owner's turn only (same as *_own type shorthands).
+  if (cond.own_turn) {
     return owner === focalPlayer ? "active" : null;
   }
 
@@ -83,7 +84,7 @@ function ownerRoleForTrigger(
   if (event === "end_of_turn" || event === "start_of_turn") {
     const isBare =
       !cond.whose_turn &&
-      cond.own_turn !== true &&
+      !cond.own_turn &&
       trigger.type !== "end_of_turn_own" &&
       trigger.type !== "start_of_turn_own";
     if (isBare) {

@@ -59,6 +59,8 @@ let onChange:
 // EXPORTED for testing - tests can verify no unexpected underscore keys appear.
 export const INTERNAL_CACHE_KEYS = new Set([
   "_triggerCache", // Trigger candidate cache (auto-reinitializes on access)
+  "_deferredDeath", // Deferred LW / leave-play batch during death deferral
+  "_runEffectsDepth", // Nested runEffects depth counter for deferred flush
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.

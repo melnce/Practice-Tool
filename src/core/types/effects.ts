@@ -360,7 +360,8 @@ type MappedOps = { [K in DamageOps]: Exact<DamageEffect, K> } & {
   [K in DestroyOps]: Exact<DestroyEffect, K>;
 } & { [K in BanishOps]: Exact<BanishEffect, K> } & {
   [K in RestoreOps]: Exact<RestoreEffect, K>;
-} & { [K in ResourceOps]: Exact<ResourceEffect, K> } & { // Note: LeaderOps = never (deprecated), so omitted from MappedOps
+} & { [K in ResourceOps]: Exact<ResourceEffect, K> } & {
+  // Note: LeaderOps = never (deprecated), so omitted from MappedOps
   [K in GateOps]: Exact<GateEffect, K>;
 } & { [K in DrawOps]: Exact<DrawEffect, K> } & {
   [K in SearchOps]: Exact<SearchEffect, K>;

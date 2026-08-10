@@ -60,6 +60,16 @@ export interface GameState {
         sourceCardUid?: string;
         poolUids?: string[];
         targetUids?: string[];
+        /** Stashed when fanfare pauses mid-play for interactive targeting. */
+        resumePlayFollower?: {
+          player: Player;
+          cardUid: string;
+          chosenTierEffects: Effect[] | null;
+          costChangedOnPlay: boolean;
+          enteringKeywordSnapshot: unknown;
+        };
+        /** Stashed when Last Words pauses for interactive selection mid-flush. */
+        deferredLwComplete?: { cardUid: string; owner: Player };
       }
     | undefined;
   lastSummoned: CardInstance[];

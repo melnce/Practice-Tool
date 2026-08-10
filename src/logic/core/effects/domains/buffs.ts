@@ -11,6 +11,7 @@ import { handleCountdown } from "../../../effects/ops/countdown/unified.js";
 import { applyAttacksPerTurn } from "../../../effects/attacks.js";
 import { getTargetingContext } from "../context.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
+import type { CardInstance } from "../../../../core/types/index.js";
 
 // import { BuffEffect } from "../../../../core/types/index.js";
 
@@ -51,9 +52,9 @@ export function registerBuffEffects() {
       isTargetedEffect: !!(eff.select || eff.select_count),
     };
 
-    let targets =
+    let targets: CardInstance[] =
       merged.targets && merged.targets.length > 0 && !eff.target
-        ? merged.targets
+        ? (merged.targets as CardInstance[])
         : getPool(
             eff.target || "",
             ctx.owner,

@@ -159,7 +159,7 @@ export function getMemoizedViewModel(
         (isBlue && state.activePlayer === "first") ||
         (!isBlue && state.activePlayer === "second"),
       activePlayer: state.activePlayer,
-      phase: state.phase,
+      phase: state.phase ?? "",
       mulliganStage: state.mulliganStage ?? "",
       rally: `${state.players.first.rally}|${state.players.second.rally}`,
       shadows: `${state.players.first.shadows}|${state.players.second.shadows}`,

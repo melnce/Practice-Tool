@@ -150,6 +150,7 @@ export function handleDamage(
   }
 
   // Dispatch by distribution mode
+  // Note: "by_stat" is handled above (early return) before this switch.
   switch (spec.distribution) {
     case "random":
     case "random_hits":
@@ -162,10 +163,6 @@ export function handleDamage(
       applySplitSpillover(amount, pool, owner, {
         spillToLeader: spec.spill_to_leader ?? false,
       });
-      break;
-
-    case "by_stat":
-      handleByStatDamage(spec, amount, owner);
       break;
 
     case "direct":

@@ -9,7 +9,7 @@ import { runEffects } from "../../core/effects/index.js";
 import { fireTrigger } from "../../core/triggers.js";
 import { logEvent } from "../../../core/logger.js";
 import { doAction, appendStep } from "../../../core/history.js";
-import type { Effect } from "../../../core/types/index.js";
+import type { Effect, Player } from "../../../core/types/index.js";
 import { getModeBonus } from "../../../core/playerHelpers.js";
 import { consumePlayFollowerResume } from "../../core/playCard/followerResume.js";
 import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
@@ -23,10 +23,7 @@ import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
 import type { EffectCtx } from "../../core/effects/registry.js";
 
 /** Modes pick count = base (select / select_count) + leader modeBonus (Faith Sham-Nacha). */
-export function resolveModeSelectCount(
-  eff: Effect & { select_count?: number; select?: number },
-  owner: Player,
-): number {
+export function resolveModeSelectCount(eff: Effect, owner: Player): number {
   const options = Array.isArray((eff as any)?.options)
     ? (eff as any).options
     : [];

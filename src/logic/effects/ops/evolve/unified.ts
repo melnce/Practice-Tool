@@ -143,7 +143,7 @@ function buildSelectionPool(
     }
     if (spec.filter.did_not_attack_this_turn) {
       pool = pool.filter((c) =>
-        evaluateCardCondition(c, { did_not_attack_this_turn: true }, owner),
+        evaluateCardCondition(c, { did_not_attack_this_turn: true }),
       );
     }
     if (spec.filter.type) {
@@ -213,7 +213,7 @@ function resolveTargets(
       if (spec.filter?.unevolved) pool = pool.filter((c) => !c.hasEvolved);
       if (spec.filter?.did_not_attack_this_turn) {
         pool = pool.filter((c) =>
-          evaluateCardCondition(c, { did_not_attack_this_turn: true }, owner),
+          evaluateCardCondition(c, { did_not_attack_this_turn: true }),
         );
       }
       return pool;
