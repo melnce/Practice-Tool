@@ -260,6 +260,25 @@ export function processCrestEvent(owner: Player, event: string) {
   return out;
 }
 
+/** True if crest destruction should fire its effects payload (Last Words only). */
+function crestHasLastWords(crest: Crest): boolean {
+  // Accepts: string "LastWords"/"lastwords" OR object {name: "LastWords"}
+  return (
+    (Array.isArray(crest.keywords) &&
+      crest.keywords.some(
+        (k: any) =>
+          (typeof k === "string" && k.toLowerCase() === "lastwords") ||
+          (typeof k === "object" && k !== null && k.name === "LastWords"),
+      )) ||
+    (!!crest.description &&
+      crest.description.toLowerCase().includes("last words"))
+  );
+}
+
+/**
+ * Countdown reached 0 (advance or tick). This is destruction, not a free payout:
+ * effects fire only when the crest has Last Words (parity with destroyCrest / tickCrests).
+ */
 export function completeCrest(crest: Crest, owner: Player, context: any = {}) {
   if (!crest) return;
   const list = getCrests(owner);
@@ -267,8 +286,16 @@ export function completeCrest(crest: Crest, owner: Player, context: any = {}) {
 
   logEvent("crestComplete", { owner, crest: crest.name });
 
-  // Pay out the crest's reward/effects
-  if (Array.isArray(crest.effects) && crest.effects.length) {
+  if (
+    crestHasLastWords(crest) &&
+    Array.isArray(crest.effects) &&
+    crest.effects.length
+  ) {
+    logEvent("crestLastWords", {
+      owner,
+      crest: crest.name,
+      effectCount: crest.effects.length,
+    });
     runEffects([...crest.effects], owner, null, context);
   }
 
@@ -312,20 +339,12 @@ export function destroyCrest(owner: Player, crestName: string) {
 
   logEvent("crestDestroy", { owner, crest: crestName });
 
-  // Check if crest has Last Words keyword (same pattern as followers/amulets)
-  // Accepts: string "LastWords"/"lastwords" OR object {name: "LastWords"}
-  const hasLastWords =
-    (Array.isArray(crest.keywords) &&
-      crest.keywords.some(
-        (k: any) =>
-          (typeof k === "string" && k.toLowerCase() === "lastwords") ||
-          (typeof k === "object" && k !== null && k.name === "LastWords"),
-      )) ||
-    (crest.description &&
-      crest.description.toLowerCase().includes("last words"));
-
-  // Trigger Last Words effects
-  if (hasLastWords && Array.isArray(crest.effects) && crest.effects.length) {
+  // Trigger Last Words effects (same gate as completeCrest / tickCrests)
+  if (
+    crestHasLastWords(crest) &&
+    Array.isArray(crest.effects) &&
+    crest.effects.length
+  ) {
     console.log("[destroyCrest DEBUG] Crest Last Words firing:", {
       crestName,
       effectCount: crest.effects.length,

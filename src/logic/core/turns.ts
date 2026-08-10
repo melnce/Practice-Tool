@@ -68,13 +68,12 @@ function clearExpiredLeaderEffects(endedPlayer: Player) {
   // If endedPlayer just ended their turn, process expirations.
   // "opponent_turn_end" means if I am the opponent of the effect holder, and I ended my turn, it expires.
   const isFirst = isFirstPlayer(endedPlayer);
-  const s = state as any;
 
   // Check first player's effects (if second player ended turn)
   if (!isFirst) {
-    if (s.blueLeaderMaxDamageCapExpiry === "opponent_turn_end") {
-      delete s.blueLeaderMaxDamageCap;
-      delete s.blueLeaderMaxDamageCapExpiry;
+    if (state.players.first.leaderMaxDamageCapExpiry === "opponent_turn_end") {
+      state.players.first.leaderMaxDamageCap = null;
+      state.players.first.leaderMaxDamageCapExpiry = null;
       logEvent("leaderEffectExpired", {
         owner: "first",
         effect: "max_damage_cap",
@@ -84,9 +83,9 @@ function clearExpiredLeaderEffects(endedPlayer: Player) {
 
   // Check second player's effects (if first player ended turn)
   if (isFirst) {
-    if (s.redLeaderMaxDamageCapExpiry === "opponent_turn_end") {
-      delete s.redLeaderMaxDamageCap;
-      delete s.redLeaderMaxDamageCapExpiry;
+    if (state.players.second.leaderMaxDamageCapExpiry === "opponent_turn_end") {
+      state.players.second.leaderMaxDamageCap = null;
+      state.players.second.leaderMaxDamageCapExpiry = null;
       logEvent("leaderEffectExpired", {
         owner: "second",
         effect: "max_damage_cap",

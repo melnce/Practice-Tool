@@ -275,12 +275,10 @@ function _attackFollowerCore(
     cleanupDead();
 
     // If the defender was removed or died due to follower_strike, award piercing now.
-    const stillThere = defenderBoard[defenderIdx];
-    if (
-      !stillThere ||
-      stillThere !== defender ||
-      (defender.defense as any) <= 0
-    ) {
+    // Use identity, not defenderIdx: cleanupDead() may have spliced a bystander and
+    // shifted indices while the combat target is still alive on the board.
+    const stillThere = defenderBoard.includes(defender);
+    if (!stillThere || (defender.defense as any) <= 0) {
       if (hasPiercingOne(attacker)) {
         applyLeaderDamage(defenderPlayer, 1);
       }

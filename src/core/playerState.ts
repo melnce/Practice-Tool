@@ -59,6 +59,7 @@ export function createPlayerState(isSecond: boolean = false): PlayerState {
     leaderBarrier: 0,
     leaderDamageTakenBonus: 0,
     leaderMaxDamageCap: null,
+    leaderMaxDamageCapExpiry: null,
 
     // RL Metrics
     totalDamageDealt: 0,

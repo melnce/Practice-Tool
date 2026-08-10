@@ -3,7 +3,6 @@ import { logEvent } from "../../core/logger.js";
 import type { Effect, Player } from "../../core/types/index.js";
 import { fireTrigger } from "../core/triggers.js";
 import {
-  isFirstPlayer,
   getHP,
   setHP,
   setMaxHP,
@@ -85,13 +84,6 @@ export function popLeaderBarrier(owner: Player, reason = "damage_prevent") {
 }
 
 function getLeaderMaxDamageCap(owner: Player): number | null {
-  const capKey = isFirstPlayer(owner)
-    ? "blueLeaderMaxDamageCap"
-    : "redLeaderMaxDamageCap";
-  const rootCap = (state as any)[capKey];
-  if (typeof rootCap === "number" && Number.isFinite(rootCap)) {
-    return rootCap;
-  }
   const playerCap = state.players[owner].leaderMaxDamageCap;
   if (typeof playerCap === "number" && Number.isFinite(playerCap)) {
     return playerCap;
@@ -171,21 +163,14 @@ export function handleSetLeaderMaxDamageCap(eff: Effect, owner: Player) {
   const isOpponent = targetPlayerString === "opponent";
   const targetOwner: Player = isOpponent ? opponentOf(owner) : owner;
 
-  const key = isFirstPlayer(targetOwner)
-    ? "blueLeaderMaxDamageCap"
-    : "redLeaderMaxDamageCap";
-  const expiryKey = isFirstPlayer(targetOwner)
-    ? "blueLeaderMaxDamageCapExpiry"
-    : "redLeaderMaxDamageCapExpiry";
-
-  const s = state as any;
-  s[key] = amount;
+  // Store on PlayerState (reset-covered) — never root ad-hoc keys
+  state.players[targetOwner].leaderMaxDamageCap = amount;
 
   // Handle duration (Zooey uses "opponent_turn_end")
   if (eff.duration === "opponent_turn_end") {
-    s[expiryKey] = "opponent_turn_end";
+    state.players[targetOwner].leaderMaxDamageCapExpiry = "opponent_turn_end";
   } else {
-    delete s[expiryKey];
+    state.players[targetOwner].leaderMaxDamageCapExpiry = null;
   }
 
   logEvent("setLeaderMaxDamageCap", {

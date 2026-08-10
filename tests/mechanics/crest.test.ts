@@ -25,8 +25,13 @@ import {
   resetUidCounter,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
-import { destroyCrest, tickCrests } from "../../src/logic/effects/crest.js";
+import {
+  destroyCrest,
+  tickCrests,
+  completeCrest,
+} from "../../src/logic/effects/crest.js";
 import type { Crest } from "../../src/logic/effects/crest.js";
+import { getCrests } from "../../src/core/playerHelpers.js";
 
 describe("Mechanic Contract: crest", () => {
   beforeEach(() => {
@@ -239,6 +244,86 @@ describe("Mechanic Contract: crest", () => {
 
       expect(state.players.first.crests.length).toBe(1);
       expect(state.players.first.crests[0].countdown).toBe(2);
+    });
+  });
+
+  // ===========================================================================
+  // ADVANCE PATH (must match tick path Last Words gate)
+  // ===========================================================================
+
+  describe("crest action: advance → 0", () => {
+    it("does NOT fire effects without Last Words (parity with tickCrests)", () => {
+      givenGameState({ seed: 1 }).build();
+      state.players.second.hp = 20;
+      state.players.first.crests = [
+        {
+          name: "No Keywords Advance",
+          owner: "first",
+          countdown: 1,
+          effects: [{ op: "damage", target: "enemy:leader", amount: 5 }],
+        } as Crest,
+      ];
+
+      whenRunEffects(
+        [
+          {
+            op: "crest",
+            action: "advance",
+            name: "No Keywords Advance",
+            amount: 1,
+          },
+        ],
+        "first",
+      );
+
+      expect(state.players.first.crests.length).toBe(0);
+      expect(state.players.second.hp).toBe(20); // No damage — no Last Words
+    });
+
+    it("Belial-shaped crest WITH Last Words still deals damage on advance→0", () => {
+      givenGameState({ seed: 1 }).build();
+      state.players.second.hp = 20;
+      state.players.first.crests = [
+        {
+          name: "Crest: Belial, Archangel of Cunning",
+          owner: "first",
+          countdown: 1,
+          keywords: ["LastWords"],
+          effects: [{ op: "damage", target: "enemy:leader", amount: 20 }],
+        } as Crest,
+      ];
+
+      whenRunEffects(
+        [
+          {
+            op: "crest",
+            action: "advance",
+            name: "Crest: Belial, Archangel of Cunning",
+            amount: 1,
+          },
+        ],
+        "first",
+      );
+
+      expect(getCrests(state, "first").length).toBe(0);
+      expect(state.players.second.hp).toBe(0); // Last Words dealt 20
+    });
+
+    it("completeCrest itself does not fire effects without Last Words", () => {
+      givenGameState({ seed: 1 }).build();
+      state.players.second.hp = 20;
+      const crest = {
+        name: "Direct Complete",
+        owner: "first",
+        countdown: 0,
+        effects: [{ op: "damage", target: "enemy:leader", amount: 5 }],
+      } as Crest;
+      state.players.first.crests = [crest];
+
+      completeCrest(crest, "first");
+
+      expect(state.players.first.crests.length).toBe(0);
+      expect(state.players.second.hp).toBe(20);
     });
   });
 });

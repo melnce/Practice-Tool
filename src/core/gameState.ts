@@ -24,6 +24,38 @@ const DEFAULTS = {
   lastFuse: undefined,
 } as const;
 
+/**
+ * Root keys allowed to survive resetStateInstance.
+ * Anything else (ad-hoc Zooey caps, Vulnerable root keys, debug flags, etc.)
+ * is deleted so a prior match cannot leak into the next.
+ */
+const KNOWN_ROOT_KEYS = new Set<string>([
+  "rng",
+  "players",
+  ...Object.keys(DEFAULTS),
+  "lastSummoned",
+  "lastDrawnCards",
+  "lastDiscardedCosts",
+  "lastDiscardedCost",
+  "phase",
+  "mulliganStage",
+  "mulliganFirstSelected",
+  "mulliganSecondSelected",
+  "suppressCleanup",
+  "__debugId",
+  "actionSeq",
+  "zoneVersion",
+  "_triggerCache",
+  "deferDeathTriggers",
+  "_deferredDeath",
+  "_runEffectsDepth",
+  "combatResolutionDepth",
+  "resumePlayFollower",
+  // Mid-match ephemerals that must clear on reset (listed so we delete values below)
+  "lastAddedToHand",
+  "lastSearchedCards",
+]);
+
 // -- 2. Factory --
 // IMPORTANT: seed is REQUIRED for determinism. No Date.now() fallback.
 // For tests/dev, use a fixed seed. For production, caller must provide seed.
@@ -102,7 +134,24 @@ export function resetStateInstance(
   (target as any).combatResolutionDepth = 0;
   delete (target as any).resumePlayFollower;
 
-  // H) Debug Identity
+  // H) Clear optional / mid-match root ephemerals
+  delete (target as any).phase;
+  delete (target as any).mulliganStage;
+  delete (target as any).mulliganFirstSelected;
+  delete (target as any).mulliganSecondSelected;
+  delete (target as any).lastDiscardedCosts;
+  delete (target as any).lastDiscardedCost;
+  delete (target as any).lastAddedToHand;
+  delete (target as any).lastSearchedCards;
+
+  // I) Drop unknown ad-hoc root keys (e.g. legacy blueLeaderMaxDamageCap)
+  for (const key of Object.keys(target)) {
+    if (!KNOWN_ROOT_KEYS.has(key)) {
+      delete (target as any)[key];
+    }
+  }
+
+  // J) Debug Identity
   target.__debugId = target.rng.nextFloat();
 
   // Log (lazy import to avoid circular dependency with logger.ts)
