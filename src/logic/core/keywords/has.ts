@@ -12,6 +12,21 @@
 import type { CardInstance } from "../../../core/types/index.js";
 
 /**
+ * Single-source "Can't Attack" lock check.
+ *
+ * Per docs/keywords-contract.md §3, keyword data lives only on
+ * `card.keywordState`. Combat / turn refresh must use this helper rather than
+ * reading ad-hoc root mirrors (`card.cantAttack`, etc.).
+ */
+export function isCantAttackLocked(
+  card: CardInstance | null | undefined,
+): boolean {
+  const ks = card?.keywordState;
+  if (!ks) return false;
+  return !!(ks.cantAttack || ks.cantAttackFollowers || ks.cantAttackLeaders);
+}
+
+/**
  * Normalize keyword name for comparison.
  */
 function normalizeKeyword(name: string): string {

@@ -3,7 +3,7 @@ import { normalizeKeywordName } from "./registry.js";
 // import { getKS } from "./internal.js";
 // import { state } from "../../../core/gameState.js";
 
-// Helper to clear the lock flags on a single card
+// Helper to clear the lock flags on a single card (keywordState is SoT).
 export function clearCantAttack(card: CardInstance) {
   if (!card) return;
   if (card.keywordState) {
@@ -17,8 +17,7 @@ export function clearCantAttack(card: CardInstance) {
     delete ks.cantAttackIsTemporary;
     delete ks.cantAttackOwner;
   }
-  // applyKeyword mirrors flags onto the card root; clear both so turn refresh
-  // (which historically checked root flags) cannot keep a stale lock forever.
+  // Defensive scrub of legacy root mirrors (no longer written by applyKeyword).
   delete (card as any).cantAttack;
   delete (card as any).cantAttackFollowers;
   delete (card as any).cantAttackLeaders;

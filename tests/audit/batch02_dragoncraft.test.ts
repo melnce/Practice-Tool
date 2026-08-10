@@ -772,9 +772,9 @@ describe("Batch 2 — Dragoncraft [10004] Skybound Dragons", () => {
     whenPlayCard("first", 0);
     resolvePendingTarget(String(e.uid));
     expect(e.defense).toBe(2);
-    expect(
-      e.cantAttack || e.cantAttackFollowers || e.cantAttackLeaders,
-    ).toBeTruthy();
+    // Can't Attack SoT is keywordState (not root mirrors)
+    expect(e.keywordState?.cantAttack).toBe(true);
+    expect(e.keywordState?.cantAttackUntilOpponentEOT).toBe(true);
   });
 
   it("Meg — Skybound Art (10) super-evolves on Fanfare", () => {

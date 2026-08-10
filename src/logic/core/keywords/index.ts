@@ -5,3 +5,9 @@ export * from "./apply.js";
 export * from "./remove.js";
 export * from "./effects.js";
 export * from "./eot.js";
+export {
+  isCantAttackLocked,
+  hasKeyword,
+  hasAllKeywords,
+  hasAnyKeyword,
+} from "./has.js";
