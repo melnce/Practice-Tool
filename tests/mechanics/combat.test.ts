@@ -15,11 +15,10 @@ import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
 import {
   givenGameState,
-  whenRunEffects,
-  thenHP,
   findOnBoard,
   resetUidCounter,
 } from "../harness/builders.js";
+import { attackFollower } from "../../src/logic/core/combat.js";
 
 describe("Mechanic Contract: combat", () => {
   beforeEach(() => {
@@ -111,21 +110,38 @@ describe("Mechanic Contract: combat", () => {
   // ===========================================================================
 
   describe("bane keyword", () => {
-    it("follower with Bane has hasBane flag", () => {
-      givenGameState({ seed: 1 })
+    it("0-attack Bane attacker destroys the defender", () => {
+      givenGameState({ seed: 1, activePlayer: "first" })
         .withFirstBoard([
           {
             name: "Assassin",
             type: "Follower",
-            attack: 1,
-            defense: 1,
+            attack: 0,
+            defense: 5,
             hasBane: true,
+            hasRush: true,
+            can_attack: true,
+            can_attack_followers: true,
+            attacks_left: 1,
+            justPlayed: false,
+          },
+        ])
+        .withSecondBoard([
+          {
+            name: "Tank",
+            type: "Follower",
+            attack: 1,
+            defense: 10,
           },
         ])
         .build();
 
       const assassin = findOnBoard("first", "Assassin");
       expect(assassin!.hasBane).toBe(true);
+
+      attackFollower(0, 0, "first", "second");
+
+      expect(findOnBoard("second", "Tank")).toBeUndefined();
     });
   });
 

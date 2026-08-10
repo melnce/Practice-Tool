@@ -95,6 +95,43 @@ describe("C5 — Strike/Clash order before damage (§228–240)", () => {
     expect(getBoard(state, "second").length).toBe(0);
   });
 
+  it("0-attack Bane attacker destroys defender after Strike/Clash (§477)", () => {
+    const attacker = combatFollower("ZeroBane", "first", {
+      attack: 0,
+      defense: 5,
+      hasBane: true,
+      triggers: [
+        {
+          event: "strike",
+          source: "board",
+          effects: [{ op: "damage", target: "enemy:leader", amount: 1 }],
+        },
+      ],
+    });
+    const defender = combatFollower("Wall", "second", {
+      attack: 1,
+      defense: 10,
+      triggers: [
+        {
+          event: "clash",
+          source: "board",
+          effects: [{ op: "damage", target: "clash_opponent", amount: 1 }],
+        },
+      ],
+    });
+
+    state.players.first.board = [attacker];
+    state.players.second.board = [defender];
+
+    attackFollower(0, 0, "first", "second");
+
+    expect(state.players.second.hp).toBe(19);
+    // Clash dealt 1; defender's 1 counter-damage dealt 1 more → 3 remaining.
+    // Attacker's 0 combat damage still triggers Bane.
+    expect(Number(attacker.defense)).toBe(3);
+    expect(getBoard(state, "second").length).toBe(0);
+  });
+
   it("defender Clash still fires when attacker's Clash would kill it first", () => {
     const attacker = combatFollower("HeavyClash", "first", {
       attack: 1,

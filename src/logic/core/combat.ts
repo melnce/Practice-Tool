@@ -133,17 +133,20 @@ function hasPiercingOne(attacker: CardInstance) {
 // =============================================================================
 
 /**
- * Resolves Bane keyword effect: destroys target if damage was dealt or barrier popped.
+ * Resolves Bane keyword effect after the combat damage step.
+ *
+ * Bible §346 / §443 / §477: any combat damage amount (including 0) destroys.
+ * Call sites invoke this only after dealDamage in the damage exchange, so a
+ * Bane follower whose attack was cancelled before the damage step never
+ * reaches here (e.g. follower_strike removed the defender). The dealt amount
+ * and barrier pop are irrelevant — Barrier does not save from Bane either.
  */
 function resolveBane(
   source: CardInstance,
   target: CardInstance,
   targetOwner: Player,
-  damageDealt: number,
-  barrierPopped: boolean,
 ): void {
   if (!source.hasBane) return;
-  if (damageDealt <= 0 && !barrierPopped) return;
 
   // Route through centralized destroy (respects cannotBeDestroyed & super-protect)
   destroyTarget(target, targetOwner, "bane");
@@ -312,34 +315,20 @@ function _attackFollowerCore(
 
   // --- Simultaneous damage exchange ---
   let dealtToDef = 0;
-  let dealtToAtk = 0;
 
   // Attacker deals damage to defender
   const dmgResultDef = dealDamage(defender, atkDmg, attacker);
   dealtToDef = dmgResultDef.damage;
 
-  // Resolve Bane for attacker
-  resolveBane(
-    attacker,
-    defender,
-    defenderPlayer,
-    dealtToDef,
-    dmgResultDef.barrierPopped,
-  );
+  // Resolve Bane for attacker (0 damage still counts — see resolveBane)
+  resolveBane(attacker, defender, defenderPlayer);
 
   // Defender deals back, unless attacker is invincible on attack this swing
   if (!isInvincibleOnAttack(attacker, attackerPlayer)) {
-    const dmgResultAtk = dealDamage(attacker, defDmg, defender);
-    dealtToAtk = dmgResultAtk.damage;
+    dealDamage(attacker, defDmg, defender);
 
-    // Resolve Bane for defender
-    resolveBane(
-      defender,
-      attacker,
-      attackerPlayer,
-      dealtToAtk,
-      dmgResultAtk.barrierPopped,
-    );
+    // Resolve Bane for defender (0 counter-damage still counts)
+    resolveBane(defender, attacker, attackerPlayer);
   } else if (
     attacker.keywordState?.hasBarrier ||
     (attacker as any).hasBarrier

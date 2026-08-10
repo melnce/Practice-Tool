@@ -27,6 +27,7 @@ import {
   findOnBoard,
   resetUidCounter,
 } from "../harness/builders.js";
+import { attackFollower } from "../../src/logic/core/combat.js";
 
 describe("Mechanic Contract: all keywords", () => {
   beforeEach(() => {
@@ -89,21 +90,37 @@ describe("Mechanic Contract: all keywords", () => {
       expect(card!.hasWard).toBe(true);
     });
 
-    it("bane keyword destroys on any damage", () => {
-      givenGameState({ seed: 1 })
+    it("bane keyword destroys on any damage including 0", () => {
+      givenGameState({ seed: 1, activePlayer: "first" })
         .withFirstBoard([
           {
             name: "BaneFollower",
             type: "Follower",
-            attack: 1,
-            defense: 1,
+            attack: 0,
+            defense: 5,
             hasBane: true,
+            hasRush: true,
+            can_attack: true,
+            can_attack_followers: true,
+            attacks_left: 1,
+            justPlayed: false,
+          },
+        ])
+        .withSecondBoard([
+          {
+            name: "Victim",
+            type: "Follower",
+            attack: 1,
+            defense: 10,
           },
         ])
         .build();
 
       const card = findOnBoard("first", "BaneFollower");
       expect(card!.hasBane).toBe(true);
+
+      attackFollower(0, 0, "first", "second");
+      expect(findOnBoard("second", "Victim")).toBeUndefined();
     });
 
     it("drain keyword restores HP equal to damage", () => {
