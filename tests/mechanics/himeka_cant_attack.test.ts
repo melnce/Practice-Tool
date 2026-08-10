@@ -83,11 +83,9 @@ describe("Himeka can't-attack crest / temporary lock", () => {
       (c) => c.name === "LockedFoe",
     );
     expect(locked).toBeTruthy();
-    expect(
-      locked!.cantAttack ||
-        locked!.keywordState?.cantAttack ||
-        locked!.keywordState?.cantAttackUntilOpponentEOT,
-    ).toBeTruthy();
+    // Single source of truth: keywordState (not root mirrors)
+    expect(getKS(locked!).cantAttack).toBe(true);
+    expect(getKS(locked!).cantAttackUntilOpponentEOT).toBe(true);
 
     // Place a P1 target and attempt attack — must be blocked (rulebook §138)
     const bait = createCard(
@@ -221,11 +219,9 @@ describe("Himeka can't-attack crest / temporary lock", () => {
       (c) => c.uid === "banish-foe",
     );
     expect(locked).toBeTruthy();
-    expect(
-      locked!.cantAttack ||
-        locked!.keywordState?.cantAttack ||
-        locked!.keywordState?.cantAttackUntilOpponentEOT,
-    ).toBeTruthy();
+    // Single source of truth: keywordState (not root mirrors)
+    expect(getKS(locked!).cantAttack).toBe(true);
+    expect(getKS(locked!).cantAttackUntilOpponentEOT).toBe(true);
     expect(
       (locked!.triggers || []).some(
         (t: any) =>

@@ -9,6 +9,7 @@ import {
   runStartOfTurnBoundary,
 } from "./turnBoundary.js";
 import { clearExpiredCantAttackAtEOT } from "./keywords/eot.js";
+import { isCantAttackLocked } from "./keywords/has.js";
 import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 import { handleInvoke } from "../effects/ops/summon.js";
 import { dealDamage } from "./barrier.js";
@@ -51,17 +52,8 @@ function refreshBoardForNewTurn(board: CardInstance[]) {
     (card as any).attacks_left = perTurn;
 
     // Respect summoning sickness unless Rush/Storm, but never allow attacking while locked.
-    // Canonical lock lives on keywordState (combat.isAttackForbidden); also honor root
-    // mirrors set by applyKeyword so both stay consistent until clearCantAttack runs.
-    const ks = card.keywordState;
-    const isLocked = !!(
-      ks?.cantAttack ||
-      ks?.cantAttackFollowers ||
-      ks?.cantAttackLeaders ||
-      (card as any).cantAttack ||
-      (card as any).cantAttackFollowers ||
-      (card as any).cantAttackLeaders
-    );
+    // Lock SoT is keywordState via isCantAttackLocked (keywords-contract §3).
+    const isLocked = isCantAttackLocked(card);
     const canSwing = !card.justPlayed || card.hasRush || card.hasStorm;
     (card as any).can_attack = canSwing && !isLocked;
 

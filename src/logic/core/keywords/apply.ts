@@ -182,13 +182,12 @@ export const KEYWORD_MAP: {
     ks.allyEnterEffects = Array.isArray(opts?.effects) ? opts.effects : [];
   },
   cant_attack: (c, opts) => {
+    // Single source of truth: keywordState only (keywords-contract §3).
+    // Do not mirror onto card root — combat/turns read via isCantAttackLocked.
     const ks = getKS(c);
     ks.cantAttack = true;
     ks.cantAttackFollowers = true;
     ks.cantAttackLeaders = true;
-    c.cantAttack = true;
-    c.cantAttackFollowers = true;
-    c.cantAttackLeaders = true;
 
     if (opts?.expires_on_turn != null) {
       ks.cantAttackExpiresOnTurn = Number(opts.expires_on_turn);
