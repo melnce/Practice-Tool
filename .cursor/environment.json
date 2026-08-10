@@ -1,0 +1,10 @@
+{
+  "name": "Shadowverse Practice Tool",
+  "install": "npm ci",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev"
+    }
+  ]
+}
