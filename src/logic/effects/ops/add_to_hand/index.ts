@@ -2,6 +2,7 @@
 // Public exports for the add_to_hand operation.
 
 export { handleAddToHand } from "./handler.js";
+export { normalizeInstanceEnteringHandAsCopy } from "./normalizeHandCopy.js";
 export type {
   normalizeToAddToHandSpec,
   UnifiedAddToHandSpec,

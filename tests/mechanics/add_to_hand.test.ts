@@ -271,5 +271,83 @@ describe("Mechanic Contract: add_to_hand", () => {
       const copies = hand.filter((c) => c.name === "Nature's Guidance");
       expect(copies.length).toBeGreaterThanOrEqual(1);
     });
+
+    it("copy into hand resets skybound witnesses and board combat state", () => {
+      givenGameState({ seed: 1 }).build();
+
+      const follower = {
+        uid: "enemy-board-1",
+        name: "Water Fairy",
+        type: "Follower",
+        owner: "second" as const,
+        zone: "board" as const,
+        attack: 1,
+        defense: 1,
+        peak_defense: 3,
+        cost: 1,
+        skyboundArtEvolvesWitnessed: 5,
+        hasAttacked: true,
+        attacks_left: 0,
+        attacks_used_this_turn: 1,
+        justPlayed: false,
+        can_attack: false,
+        isDamaged: true,
+        insertionTs: 42,
+        __onceByTurn: { foo: 1 },
+        __uiSelectable: true,
+        __uiFlashBarrier: true,
+      };
+      state.players.second.board.push(follower as any);
+      state.lastSelected = [follower as any];
+
+      whenRunEffects(
+        [
+          {
+            op: "add_to_hand" as const,
+            source: "copy",
+            target: "selected:follower",
+            count: 1,
+          },
+        ],
+        "first",
+      );
+
+      const copy = thenHand("first")[0]!;
+      expect(copy.name).toBe("Water Fairy");
+      expect(copy.uid).not.toBe("enemy-board-1");
+      expect(copy.owner).toBe("first");
+      expect(copy.zone).toBe("hand");
+      // Bible: evolves before the card entered hand do not increase the witness counter.
+      expect(copy.skyboundArtEvolvesWitnessed ?? 0).toBe(0);
+      // Board combat / ephemeral runtime must not leak onto a hand card.
+      expect(copy.hasAttacked ?? false).toBe(false);
+      expect(copy.attacks_left).toBeUndefined();
+      expect(copy.attacks_used_this_turn).toBeUndefined();
+      expect(copy.justPlayed).toBeUndefined();
+      expect(copy.can_attack).toBeUndefined();
+      expect(copy.isDamaged ?? false).toBe(false);
+      expect(copy.defense).toBe(3); // damage undone via peak_defense
+      expect(copy.insertionTs).toBeUndefined();
+      expect(copy.__onceByTurn).toBeUndefined();
+      expect(copy.__uiSelectable).toBeUndefined();
+      expect(copy.__uiFlashBarrier).toBeUndefined();
+    });
+  });
+
+  describe("source: named still fresh (no witness leak from template path)", () => {
+    it("named token starts at 0 skybound witnesses", () => {
+      givenGameState({ seed: 1 }).build();
+
+      whenRunEffects(
+        [{ op: "add_to_hand" as const, name: "Fairy", count: 1 }],
+        "first",
+      );
+
+      const hand = thenHand("first");
+      expect(hand).toHaveLength(1);
+      expect(hand[0]!.name).toBe("Fairy");
+      expect(hand[0]!.skyboundArtEvolvesWitnessed ?? 0).toBe(0);
+      expect(hand[0]!.zone).toBe("hand");
+    });
   });
 });

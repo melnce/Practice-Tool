@@ -15,6 +15,7 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { normalizeToAddToHandSpec } from "./types.js";
+import { normalizeInstanceEnteringHandAsCopy } from "./normalizeHandCopy.js";
 
 /**
  * Handle the add_to_hand operation.
@@ -162,6 +163,9 @@ function addCopiedCards(
     copy.uid = state.rng.makeUid();
     copy.owner = receivingPlayer;
     copy.zone = "hand";
+    // structuredClone carries board runtime (witnesses, damage, combat flags…).
+    // A card entering hand as a copy must start clean for those fields.
+    normalizeInstanceEnteringHandAsCopy(copy);
     normalizeCardStats(copy);
 
     // Apply keywords if specified

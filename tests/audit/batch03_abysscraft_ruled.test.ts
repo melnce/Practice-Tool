@@ -312,6 +312,34 @@ describe("B/C — Sham-Nacha faith + super-evolve (10354110)", () => {
     expect(getBoard(state, "second")).toHaveLength(0);
     expect(getHand(state, "first").some((c) => c.name === "Prey")).toBe(true);
   });
+
+  it("Super-evolve hand-copy starts at 0 skybound witnesses (not source's)", () => {
+    setupTurn(R10, { hand: ["10354110"], pp: 10 });
+    const sham = createCard("10354110", "board", "first");
+    applyKeywordsFromList(sham);
+    sham.peak_defense = sham.defense;
+    const prey = enemyFollower(4, "Prey");
+    // Accrued while the enemy held / fielded the original — must not transfer.
+    prey.skyboundArtEvolvesWitnessed = 5;
+    prey.hasAttacked = true;
+    prey.attacks_left = 0;
+    prey.isDamaged = true;
+    prey.defense = 2;
+    prey.peak_defense = 4;
+    state.players.first.board = [sham];
+    state.players.first.evoPoints = 2;
+    state.players.first.superEvoPoints = 1;
+    onEvolve(sham, "first", "super");
+    resolvePendingTarget(String(prey.uid));
+    const copy = getHand(state, "first").find((c) => c.name === "Prey");
+    expect(copy).toBeTruthy();
+    expect(copy!.skyboundArtEvolvesWitnessed ?? 0).toBe(0);
+    expect(copy!.owner).toBe("first");
+    expect(copy!.zone).toBe("hand");
+    expect(copy!.hasAttacked ?? false).toBe(false);
+    expect(copy!.isDamaged ?? false).toBe(false);
+    expect(copy!.defense).toBe(4);
+  });
 });
 
 describe("B/C — Belial SSA crest (10454120)", () => {
