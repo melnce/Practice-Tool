@@ -188,6 +188,11 @@ function applyCostChange(
 
     case "set": {
       card.cost = Math.max(0, amount);
+      // Honour until_eot generally: stamp so clearTempHandCostMods can restore
+      // from base_cost (already recorded above). Used by Mari (10441120) et al.
+      if (spec.until_eot) {
+        (card as any).temp_cost_set_until_eot = true;
+      }
       break;
     }
 

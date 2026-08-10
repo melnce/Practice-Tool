@@ -129,6 +129,34 @@ describe("Owner ruling — Raging Lightning Overflow leaders (10341310)", () => 
     expect(getHP(state, "first")).toBe(17);
     expect(getHP(state, "second")).toBe(17);
   });
+
+  // Bible (Owner ruling, Raging Lightning): compare **current** defense among ALL
+  // leaders (own included); ties all take 3. Asymmetric cases diverge from maxHP.
+  it("Overflow: only the leader(s) with highest *current* defense take 3 (20/20 vs 15/20)", () => {
+    setupTurn(7, { hand: ["10341310"], pp: 3 });
+    state.players.first.hp = 20;
+    state.players.first.maxHP = 20;
+    state.players.second.hp = 15;
+    state.players.second.maxHP = 20;
+
+    whenPlayCard("first", 0);
+
+    expect(getHP(state, "first")).toBe(17);
+    expect(getHP(state, "second")).toBe(15);
+  });
+
+  it("Overflow: tie on current defense despite different max (20/25 vs 20/20 → both 17)", () => {
+    setupTurn(7, { hand: ["10341310"], pp: 3 });
+    state.players.first.hp = 20;
+    state.players.first.maxHP = 25;
+    state.players.second.hp = 20;
+    state.players.second.maxHP = 20;
+
+    whenPlayCard("first", 0);
+
+    expect(getHP(state, "first")).toBe(17);
+    expect(getHP(state, "second")).toBe(17);
+  });
 });
 
 describe("Owner ruling — Mari (10441120)", () => {
@@ -161,6 +189,75 @@ describe("Owner ruling — Mari (10441120)", () => {
     expect(base).toBeGreaterThan(0);
   });
 
+  // Bible (Owner ruling, Mari): cost becomes 0 **until your end of turn**.
+  it("hand: until-EOT cost set reverts to base after whenEndTurn()", () => {
+    setupTurn(7, { hand: ["10441120", "10143120"] });
+    const liu = createCard("10143120", "board", "first");
+    liu.peak_defense = liu.defense;
+    state.players.first.board = [liu];
+
+    const mari = getHand(state, "first").find(
+      (c) => c.name === "Mari, Meg's Bestie",
+    )!;
+    expect(getEffectiveCost(mari)).toBe(2);
+
+    onEvolve(liu, "first", "super");
+    expect(getEffectiveCost(mari)).toBe(0);
+
+    whenEndTurn();
+    expect(getEffectiveCost(mari)).toBe(2);
+  });
+
+  // Bible (Owner ruling, Mari): EOT +1/+1 to one random **super-evolved** ally.
+  // Seed 2 previously buffed PlainA when object filter was ignored.
+  it("board: EOT +1/+1 targets only a super-evolved ally (seed 2 must not hit PlainA)", () => {
+    givenGameState({ seed: 2, activePlayer: "first", roundCount: 7 })
+      .withFirstPP(7, 7)
+      .build();
+
+    const superGuy = createCard("10042110", "board", "first");
+    superGuy.peak_defense = superGuy.defense;
+    onEvolve(superGuy, "first", "super");
+    expect(superGuy.evoType).toBe("super");
+
+    const plainA = createCard(
+      { name: "PlainA", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "board",
+      "first",
+    );
+    const plainB = createCard(
+      { name: "PlainB", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "board",
+      "first",
+    );
+    const plainC = createCard(
+      { name: "PlainC", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "board",
+      "first",
+    );
+    const mari = createCard("10441120", "board", "first");
+    state.players.first.board = [superGuy, plainA, plainB, plainC, mari];
+
+    const before = {
+      superAtk: Number(superGuy.attack),
+      superDef: Number(superGuy.defense),
+      a: Number(plainA.attack),
+      b: Number(plainB.attack),
+      c: Number(plainC.attack),
+      m: Number(mari.attack),
+    };
+
+    const eot = (mari.triggers as any[]).find((t) => t.event === "end_of_turn");
+    runEffects(eot.effects, "first", mari);
+
+    expect(Number(superGuy.attack)).toBe(before.superAtk + 1);
+    expect(Number(superGuy.defense)).toBe(before.superDef + 1);
+    expect(Number(plainA.attack)).toBe(before.a);
+    expect(Number(plainB.attack)).toBe(before.b);
+    expect(Number(plainC.attack)).toBe(before.c);
+    expect(Number(mari.attack)).toBe(before.m);
+  });
+
   it("board: EOT +1/+1 to a random super-evolved ally (any turn it super-evolved)", () => {
     setupTurn(7);
     const oldSuper = createCard("10042110", "board", "first");
@@ -168,15 +265,24 @@ describe("Owner ruling — Mari (10441120)", () => {
     onEvolve(oldSuper, "first", "super");
     expect(oldSuper.evoType).toBe("super");
 
+    const plain = createCard(
+      { name: "Plain", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "board",
+      "first",
+    );
     const mari = createCard("10441120", "board", "first");
-    state.players.first.board.push(mari);
+    state.players.first.board = [oldSuper, plain, mari];
 
     const atkBefore = parseInt(String(oldSuper.attack), 10);
     const defBefore = parseInt(String(oldSuper.defense), 10);
-    whenEndTurn();
-    const atkAfter = parseInt(String(oldSuper.attack), 10);
-    const defAfter = parseInt(String(oldSuper.defense), 10);
-    expect(atkAfter + defAfter).toBeGreaterThanOrEqual(atkBefore + defBefore);
+    const plainAtkBefore = parseInt(String(plain.attack), 10);
+
+    const eot = (mari.triggers as any[]).find((t) => t.event === "end_of_turn");
+    runEffects(eot.effects, "first", mari);
+
+    expect(parseInt(String(oldSuper.attack), 10)).toBe(atkBefore + 1);
+    expect(parseInt(String(oldSuper.defense), 10)).toBe(defBefore + 1);
+    expect(parseInt(String(plain.attack), 10)).toBe(plainAtkBefore);
   });
 });
 

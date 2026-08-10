@@ -195,8 +195,16 @@ function checkEffectsHaveValidTargets(
       // Skip summon ops that handle their own UI (select from hand)
       if (eff?.op === "summon" && eff?.source === "hand") continue;
 
-      // Check select operations
-      if (eff?.select || eff?.op === "select") {
+      // Check select operations.
+      // Mode ops use `select` / `select_count` as the *mode pick count*, not a
+      // targeting requirement (e.g. Screaming and Loathing 10353310 select:2).
+      // Treating mode.select as a target select yields getPool(undefined) → empty
+      // and falsely bricks the card.
+      if (eff?.op === "mode") {
+        // Still recurse into nested option effects below via eff.effects if any.
+        // Mode options live under `options`; targeting inside them is validated
+        // when that mode is chosen, not at play preflight.
+      } else if (eff?.select || eff?.op === "select") {
         const pool = getPool(eff.target, player, sourceCard, eff.condition, {
           isTargetedEffect: true,
         });

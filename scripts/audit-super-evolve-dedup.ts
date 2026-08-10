@@ -22,14 +22,32 @@ type CardJson = {
   name: string;
   set?: string;
   description?: string;
-  evolve?: unknown[];
-  superevolve?: unknown[];
+  evolve?: unknown;
+  superevolve?: unknown;
+  superEvolveReplaces?: boolean;
 };
 
 type Bucket = "DUPLICATE" | "INSTEAD" | "DISTINCT";
 
-function normEffects(arr: unknown[] | undefined): string {
-  return JSON.stringify(arr ?? []);
+/**
+ * Normalise evolve / superevolve payloads for comparison.
+ * Accepts both a bare effect array and the `{ effects: [...] }` object shape
+ * (Amataz 10114130 shipped the latter and was invisible to the old Array.isArray filter).
+ */
+function asEffectList(value: unknown): unknown[] {
+  if (Array.isArray(value)) return value;
+  if (
+    value &&
+    typeof value === "object" &&
+    Array.isArray((value as { effects?: unknown[] }).effects)
+  ) {
+    return (value as { effects: unknown[] }).effects;
+  }
+  return [];
+}
+
+function normEffects(value: unknown): string {
+  return JSON.stringify(asEffectList(value));
 }
 
 function hasInstead(text: string): boolean {
@@ -57,13 +75,11 @@ function recommendedAction(bucket: Bucket): string {
 
 function main() {
   const cards = JSON.parse(fs.readFileSync(ALL_FILE, "utf-8")) as CardJson[];
-  const dual = cards.filter(
-    (c) =>
-      Array.isArray(c.evolve) &&
-      c.evolve.length > 0 &&
-      Array.isArray(c.superevolve) &&
-      c.superevolve.length > 0,
-  );
+  const dual = cards.filter((c) => {
+    const evo = asEffectList(c.evolve);
+    const superEvo = asEffectList(c.superevolve);
+    return evo.length > 0 && superEvo.length > 0;
+  });
 
   const byBucket: Record<Bucket, CardJson[]> = {
     DUPLICATE: [],
@@ -96,8 +112,8 @@ function main() {
     lines.push(`## ${bucket} (${byBucket[bucket].length})`, "");
     lines.push(recommendedAction(bucket), "");
     for (const c of byBucket[bucket].sort((a, b) => a.id.localeCompare(b.id))) {
-      const evoLen = c.evolve?.length ?? 0;
-      const seLen = c.superevolve?.length ?? 0;
+      const evoLen = asEffectList(c.evolve).length;
+      const seLen = asEffectList(c.superevolve).length;
       const superLine =
         (c.description ?? "")
           .split("\n")
@@ -118,6 +134,9 @@ function main() {
   lines.push(
     "- Post-dedup counts above reflect remaining dual-array cards only (INSTEAD + DISTINCT).",
   );
+  lines.push(
+    "- Object-shaped `superevolve: { effects: [...] }` is normalised the same as arrays (Amataz-class duplicates).",
+  );
   lines.push("");
 
   fs.mkdirSync(path.dirname(REPORT_FILE), { recursive: true });
@@ -127,6 +146,9 @@ function main() {
   console.log(
     `DUPLICATE=${byBucket.DUPLICATE.length} INSTEAD=${byBucket.INSTEAD.length} DISTINCT=${byBucket.DISTINCT.length}`,
   );
+  if (byBucket.DUPLICATE.some((c) => c.id === "10114130")) {
+    console.log("FLAGGED: 10114130 Amataz is DUPLICATE");
+  }
 }
 
 main();

@@ -485,3 +485,26 @@ describe("B/C — Vira fanfare banish + SSA super (10464120)", () => {
     expect(vira.hasWard).toBe(true);
   });
 });
+
+describe("B/C — Sophia filter not_self Barrier (10462120)", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    state.gameStarted = true;
+    state.activePlayer = "first";
+  });
+
+  // Object filter:{not_self:true} on stat must exclude Sophia (same root cause as Mari).
+  it("Super-Evolve: Barrier to all *other* allied followers, not Sophia herself", () => {
+    setupTurn(R7, { pp: 4 });
+    const sophia = createCard("10462120", "board", "first");
+    const ally = createCard(
+      { name: "Ally", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "board",
+      "first",
+    );
+    state.players.first.board = [sophia, ally];
+    runEffects(sophia.superevolve as any, "first", sophia);
+    expect(!!(sophia as any).hasBarrier).toBe(false);
+    expect(!!(ally as any).hasBarrier).toBe(true);
+  });
+});

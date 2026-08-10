@@ -83,7 +83,7 @@ export function filterBuffCandidates(
     );
   }
 
-  // Leftmost filtering
+  // Leftmost filtering (string form only; object filters go through getPool condition)
   if (eff.filter === "leftmost" && candidates.length > 0) {
     const first = candidates[0];
     candidates = first ? [first] : [];

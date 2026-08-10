@@ -36,7 +36,8 @@ export type StatOp = Effect & {
   name_filter?: string;
   name_in?: string[];
   include_self?: boolean;
-  filter?: string; // "leftmost"
+  /** "leftmost" string, or an object condition merged into getPool (is_super_evolved, tribe, not_self, …). */
+  filter?: string | Record<string, unknown>;
 
   // Special
   attacks_per_turn?: number | string;

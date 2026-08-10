@@ -201,6 +201,23 @@ function handleDoubleStats(
 // Pool-Based Buff Handler
 // -----------------------------------------------------------------------------
 
+/**
+ * Merge object-valued `filter` into the condition passed to getPool.
+ * Card JSON often uses `filter:{is_super_evolved:true}` / `{not_self:true}` /
+ * `{tribe:"Pixie"}` on stat ops; previously only `eff.condition` reached getPool
+ * and object filters were silently ignored (Mari, Baal, Sophia, …).
+ * String filters like `"leftmost"` stay in filterBuffCandidates.
+ */
+function conditionWithObjectFilter(eff: StatOp): any {
+  const base =
+    eff.condition && typeof eff.condition === "object" ? eff.condition : {};
+  const filter = (eff as any).filter;
+  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
+    return { ...base, ...filter };
+  }
+  return base;
+}
+
 function handlePoolBasedBuff(
   eff: StatOp,
   owner: Player,
@@ -210,11 +227,13 @@ function handlePoolBasedBuff(
 ): "done" | "pending" {
   // 1. Get and filter pool
   // BUG FIX: Must pass sourceCard to getPool for correct ally:follower targeting
+  // Engine-side: honour object `filter` via condition (evaluateCardCondition /
+  // applyFilters already support is_super_evolved, tribe, not_self, …).
   const rawPool = getPool(
     eff.target as any,
     owner,
     sourceCard,
-    eff.condition,
+    conditionWithObjectFilter(eff),
     context,
   );
   const pool = filterBuffCandidates(rawPool, eff, sourceCard);
