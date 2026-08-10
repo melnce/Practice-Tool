@@ -11,6 +11,7 @@ import {
   createCard,
   resetUidCounter,
   thenHand,
+  whenRunEffects,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
@@ -77,6 +78,42 @@ describe("Rulebook §62 — Hand limit burn creates a shadow", () => {
 
     expect(state.players.first.hand.length).toBe(9);
     expect(getShadows(state, "first")).toBe(beforeShadows + 1);
+  });
+
+  it("drawn overflow card is in the cemetery (not void) — Reanimate-sensitive", () => {
+    givenGameState({ seed: 1 })
+      .withFirstHand([
+        { name: "H1", type: "Follower", attack: 1, defense: 1 },
+        { name: "H2", type: "Follower", attack: 1, defense: 1 },
+        { name: "H3", type: "Follower", attack: 1, defense: 1 },
+        { name: "H4", type: "Follower", attack: 1, defense: 1 },
+        { name: "H5", type: "Follower", attack: 1, defense: 1 },
+        { name: "H6", type: "Follower", attack: 1, defense: 1 },
+        { name: "H7", type: "Follower", attack: 1, defense: 1 },
+        { name: "H8", type: "Follower", attack: 1, defense: 1 },
+        { name: "H9", type: "Follower", attack: 1, defense: 1 },
+      ])
+      .withFirstDeck([
+        { name: "BurnMe", type: "Follower", cost: 2, attack: 2, defense: 2 },
+      ])
+      .build();
+
+    drawCard(
+      state.players.first.hand as any,
+      state.players.first.deck as any,
+      "first",
+    );
+
+    expect(state.players.first.hand.length).toBe(9);
+    expect(getShadows(state, "first")).toBe(1);
+    expect(state.players.first.graveyard.map((c) => c.name)).toContain(
+      "BurnMe",
+    );
+    expect(state.players.first.graveyard).toHaveLength(1);
+    expect(state.players.first.deck).toHaveLength(0);
+    expect(state.players.first.hand.some((c) => c.name === "BurnMe")).toBe(
+      false,
+    );
   });
 });
 
@@ -406,6 +443,98 @@ describe("Rulebook §62 — Bounce into full hand burns and creates a shadow", (
 
     expect(state.players.first.hand.length).toBe(9);
     expect(getShadows(state, "first")).toBe(beforeShadows + 1);
+    expect(getBoard(state, "first")).toHaveLength(0);
+    expect(state.players.first.graveyard.length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("Rulebook §62 — add_to_hand into a full hand burns (cemetery + shadow)", () => {
+  beforeEach(() => resetUidCounter());
+
+  it("named add_to_hand past 9 creates the card, burns it to cemetery, and adds a shadow", () => {
+    givenGameState({ seed: 1 })
+      .withFirstHand([
+        { name: "H1", type: "Follower", attack: 1, defense: 1 },
+        { name: "H2", type: "Follower", attack: 1, defense: 1 },
+        { name: "H3", type: "Follower", attack: 1, defense: 1 },
+        { name: "H4", type: "Follower", attack: 1, defense: 1 },
+        { name: "H5", type: "Follower", attack: 1, defense: 1 },
+        { name: "H6", type: "Follower", attack: 1, defense: 1 },
+        { name: "H7", type: "Follower", attack: 1, defense: 1 },
+        { name: "H8", type: "Follower", attack: 1, defense: 1 },
+        { name: "H9", type: "Follower", attack: 1, defense: 1 },
+      ])
+      .build();
+
+    const beforeShadows = getShadows(state, "first");
+    whenRunEffects(
+      [{ op: "add_to_hand", name: "Fairy", count: 1 } as any],
+      "first",
+    );
+
+    expect(state.players.first.hand.length).toBe(9);
+    expect(getShadows(state, "first")).toBe(beforeShadows + 1);
+    expect(state.players.first.graveyard.some((c) => c.name === "Fairy")).toBe(
+      true,
+    );
+  });
+});
+
+describe("Owner ruling — hand-overflow burn does NOT fire Last Words", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    state.gameStarted = true;
+  });
+
+  it("draw overflow: card with Last Words goes to cemetery without firing LW", () => {
+    givenGameState({ seed: 1, activePlayer: "first" })
+      .withFirstHand([
+        { name: "H1", type: "Follower", attack: 1, defense: 1 },
+        { name: "H2", type: "Follower", attack: 1, defense: 1 },
+        { name: "H3", type: "Follower", attack: 1, defense: 1 },
+        { name: "H4", type: "Follower", attack: 1, defense: 1 },
+        { name: "H5", type: "Follower", attack: 1, defense: 1 },
+        { name: "H6", type: "Follower", attack: 1, defense: 1 },
+        { name: "H7", type: "Follower", attack: 1, defense: 1 },
+        { name: "H8", type: "Follower", attack: 1, defense: 1 },
+        { name: "H9", type: "Follower", attack: 1, defense: 1 },
+      ])
+      .build();
+
+    const burnMe = createCard(
+      {
+        name: "LWBurn",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 2,
+        hasLastWords: true,
+        lastWordsEffects: [
+          { op: "damage", target: "enemy:leader", amount: 5 } as any,
+        ],
+      },
+      "deck",
+      "first",
+    );
+    burnMe.keywordState = {
+      lastWordsEffects: [
+        { op: "damage", target: "enemy:leader", amount: 5 } as any,
+      ],
+    };
+    state.players.first.deck = [burnMe];
+
+    const enemyHpBefore = getHP(state, "second");
+    drawCard(
+      state.players.first.hand as any,
+      state.players.first.deck as any,
+      "first",
+    );
+
+    expect(state.players.first.graveyard.some((c) => c.name === "LWBurn")).toBe(
+      true,
+    );
+    expect(getShadows(state, "first")).toBe(1);
+    expect(getHP(state, "second")).toBe(enemyHpBefore);
     expect(getBoard(state, "first")).toHaveLength(0);
   });
 });

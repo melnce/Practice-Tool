@@ -13,12 +13,7 @@ import type {
   Player,
   EffectContext,
 } from "../../../core/types/index.js";
-import {
-  getBoard,
-  getHand,
-  getGraveyard,
-  opponentOf,
-} from "../../../core/playerHelpers.js";
+import { getBoard, getHand, opponentOf } from "../../../core/playerHelpers.js";
 
 // Create a fresh base copy (new uid)
 function freshBaseCopyByName(name: string) {
@@ -81,17 +76,7 @@ export function bounceToHand(card: CardInstance) {
   }
 
   const pushed = pushToHand(toHand, fresh);
-  if (!pushed) {
-    // Hand full -> Burn to graveyard
-    // Shadowverse: Bounced cards that trigger burn go to graveyard (shadows +1)
-    const grave = owner ? getGraveyard(state, owner) : null;
-
-    if (grave) {
-      fresh.zone = "graveyard";
-      grave.push(fresh);
-      logEvent("burn_to_grave", { owner, card: fresh.name, uid: fresh.uid });
-    }
-  } else {
+  if (pushed) {
     logEvent("bounceToHand", {
       from: owner,
       name: removed.name,
@@ -99,6 +84,7 @@ export function bounceToHand(card: CardInstance) {
       newUid: fresh.uid,
     });
   }
+  // Overflow: pushToHand → burnHandOverflow (cemetery + shadow, no Last Words).
 }
 
 // Handle "return_to_hand" effect

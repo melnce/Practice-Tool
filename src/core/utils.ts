@@ -3,7 +3,7 @@
 import { state } from "./gameState.js";
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
-import { addShadows } from "./playerHelpers.js";
+import { addShadows, getGraveyard } from "./playerHelpers.js";
 // Pull *once* from rng and re-export locally-used helpers
 // (Refactored to use state.rng directly)
 
@@ -94,6 +94,32 @@ function isFirstPlayer(owner: Player | null): boolean {
   return owner === "first";
 }
 
+/**
+ * Hand-overflow burn (§62): card is destroyed into the cemetery as a shadow.
+ * Owner ruling: does NOT fire Last Words — treat as a burn, not true destruction.
+ * Shared by draw (`pushToHand`) and bounce overflow.
+ */
+export function burnHandOverflow(
+  card: CardInstance | any,
+  owner: Player | null,
+): void {
+  if (!card) return;
+  if (owner) {
+    card.zone = "graveyard";
+    card.owner = owner;
+    getGraveyard(state, owner).push(card);
+    addShadows(state, owner, 1);
+    logEvent("burn_to_grave", {
+      owner,
+      card: card.name,
+      uid: card.uid,
+    });
+  } else {
+    logEvent("burn", { owner: null, card: card?.name });
+  }
+  burnPreview(card);
+}
+
 /** Apply deckout result when a draw is attempted on an empty deck. */
 function applyDeckoutLoss(owner: Player): void {
   const isFirst = isFirstPlayer(owner);
@@ -128,15 +154,14 @@ export function pushToHand(
 ): boolean {
   if (!card) return false;
   if (hand.length >= MAX_HAND) {
-    // Log the burn effect
     let owner: Player | null = null;
     if (hand === state.players.first.hand) owner = "first";
     else if (hand === state.players.second.hand) owner = "second";
-    logEvent("burn", { owner, card: card.name });
-    if (owner) addShadows(state, owner, 1);
-
-    burnPreview(card); // burn visual
-    return false; // goes to void
+    else if (card.owner === "first" || card.owner === "second") {
+      owner = card.owner;
+    }
+    burnHandOverflow(card, owner);
+    return false;
   }
   card.zone = "hand";
   hand.push(card);

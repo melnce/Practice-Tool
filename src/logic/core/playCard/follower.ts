@@ -11,7 +11,7 @@ import { runEffects } from "../effects/index.js";
 import { pushPlayedHistory } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
-import { incrementRally, getBoard } from "../../../core/playerHelpers.js";
+import { getBoard } from "../../../core/playerHelpers.js";
 import { stampBoardEntryTs } from "../triggers/utils.js";
 import { snapshotEnteringKeywords } from "../enterKeywords.js";
 import {
@@ -42,14 +42,8 @@ export function playFollower(
   card.attack = parseInt(String(card.attack), 10) || 0;
   card.defense = parseInt(String(card.defense), 10) || 0;
 
-  // Rally check
-  const hasRallyFanfare =
-    Array.isArray(card.fanfare) &&
-    card.fanfare.some((e: any) => String(e.op).toLowerCase() === "rally_gate");
-
-  if (!hasRallyFanfare) {
-    incrementRally(state, player);
-  }
+  // Rally: incremented in runPlayFollowerPostFanfare (after Fanfare) so
+  // rally-conditioned Fanfare gates (§372) see the pre-entry count.
 
   if ((card as any).base_attack === undefined)
     (card as any).base_attack = card.attack;

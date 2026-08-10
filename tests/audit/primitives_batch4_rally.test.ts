@@ -10,15 +10,11 @@ import {
   createCard,
   resetUidCounter,
   thenBoard,
+  findOnBoard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
 import { handleRallyGate } from "../../src/logic/effects/gates/gates.js";
-import {
-  getRally,
-  incrementRally,
-  setRally,
-} from "../../src/core/playerHelpers.js";
+import { getRally, setRally } from "../../src/core/playerHelpers.js";
 import { evolveFollowerByEffect } from "../../src/logic/effects/ops/evolve.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import "../../src/logic/core/effects/index.js";
@@ -74,28 +70,39 @@ describe("Rulebook §780 — Rally count", () => {
     expect(queue.length).toBe(1);
   });
 
-  it("Fanfare Rally(5): 5th follower does not count self (§780 FAQ)", () => {
-    // No Swordcraft card has Rally(5) fanfare in sets 10001–10004. Rulebook: at Fanfare
-    // resolution rally excludes the card being played; playFollower increments rally before
-    // fanfare unless fanfare op is literally `rally_gate` (Gildaria uses gate+condition rally).
-    givenGameState({ seed: 1, activePlayer: "first" }).build();
-    setRally(state, "first", 4);
-    const queue: any[] = [];
-    handleRallyGate(
-      "first",
-      { count: 5, effects: [{ op: "draw", source: "deck", count: 2 }] },
-      queue,
-    );
-    expect(queue.length).toBe(0);
+  it("Fanfare Rally gate does not count the played card itself (§372 / §780 FAQ)", () => {
+    // Gildaria (10224110): Fanfare gate condition:"rally" count:20 → super-evolve.
+    // With rally 19 before play, Fanfare must see 19 (no super); counter reads 20 after.
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 7 })
+      .withFirstHand(["10224110"])
+      .withFirstPP(6, 7)
+      .build();
+    setRally(state, "first", 19);
+    state.players.first.superEvoPoints = 1;
 
-    incrementRally(state, "first");
-    expect(getRally(state, "first")).toBe(5);
-    handleRallyGate(
-      "first",
-      { count: 5, effects: [{ op: "draw", source: "deck", count: 2 }] },
-      queue,
-    );
-    expect(queue.length).toBe(1);
+    whenPlayCard("first", 0);
+
+    const gild = findOnBoard("first", "Gildaria, Anathema of Peace");
+    expect(gild).toBeTruthy();
+    expect(gild!.evoType).not.toBe("super");
+    expect(gild!.hasEvolved).toBeFalsy();
+    expect(getRally(state, "first")).toBe(20);
+  });
+
+  it("Fanfare Rally gate fires when threshold was already met before play", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 7 })
+      .withFirstHand(["10224110"])
+      .withFirstPP(6, 7)
+      .build();
+    setRally(state, "first", 20);
+    state.players.first.superEvoPoints = 1;
+
+    whenPlayCard("first", 0);
+
+    const gild = findOnBoard("first", "Gildaria, Anathema of Peace")!;
+    expect(gild.evoType).toBe("super");
+    // Self + 2 Steelclad Knights from evolve_trigger_always on super-evolve.
+    expect(getRally(state, "first")).toBe(23);
   });
 });
 
