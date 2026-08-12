@@ -37,9 +37,23 @@ function setupLateGame() {
   })
     .withFirstPP(10, 10)
     .withSecondPP(10, 10)
+    // Pad decks so turn draws do not accidental-deckout (game-over now locks End Turn).
+    .withFirstDeck([
+      { name: "Pad1", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      { name: "Pad2", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      { name: "Pad3", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      { name: "Pad4", type: "Follower", cost: 1, attack: 1, defense: 1 },
+    ])
+    .withSecondDeck([
+      { name: "PadA", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      { name: "PadB", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      { name: "PadC", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      { name: "PadD", type: "Follower", cost: 1, attack: 1, defense: 1 },
+    ])
     .build();
   state.gameStarted = true;
   state.activePlayer = "first";
+  state.phase = "main";
 }
 
 describe("Himeka can't-attack crest / temporary lock", () => {

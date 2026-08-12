@@ -13,6 +13,7 @@ import {
   getEvoCharges,
   setEvoCharges,
 } from "../../core/playerHelpers.js";
+import { applyGameOverIfNeeded, isGameOver } from "../../core/gameOver.js";
 
 // ============================================================================
 // NOTE: "heal" operations are DEPRECATED. Use "restore" instead.
@@ -95,6 +96,8 @@ function getLeaderMaxDamageCap(owner: Player): number | null {
 export function applyLeaderDamage(owner: Player, amount: number) {
   amount = amount | 0;
   if (amount < 0) return 0;
+  // Match already over — no further leader damage (bible continuous lethal).
+  if (isGameOver()) return 0;
 
   logEvent("leaderDamage", { owner, amount });
 
@@ -128,7 +131,13 @@ export function applyLeaderDamage(owner: Player, amount: number) {
 
   const actualDamage = cur - next;
 
-  // Fire leader_damaged trigger AFTER damage is applied
+  // Continuous lethal check (bible §219): first time a leader reaches 0, match ends.
+  if (next <= 0) {
+    applyGameOverIfNeeded("lethal");
+  }
+
+  // Damage triggers still fire for this packet so Last Words / reactions from the
+  // same hit can observe it; further packets are blocked by isGameOver() above.
   if (actualDamage > 0) {
     fireTrigger("leader_damaged", owner, {
       damagedLeader: owner,

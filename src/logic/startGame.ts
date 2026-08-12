@@ -143,13 +143,8 @@ export async function startGame(options: StartGameOptions) {
     );
   }
 
-  // Reset second player PP boost button (DOM)
-  const ppBoostBtn = document.getElementById("secondPlayerPPBoost");
-  ppBoostBtn?.classList.remove("used");
-  if (ppBoostBtn) {
-    ppBoostBtn.removeAttribute("disabled");
-    (ppBoostBtn as HTMLElement).style.backgroundColor = "orange";
-  }
+  // Faith crest bootstrap done above — PP boost DOM reset removed
+  // (legacy #secondPlayerPPBoost never existed; #redBoost is driven by render).
 
   // ✅ evolve charges & turn locks
   setEvoCharges(state, "first", 2);

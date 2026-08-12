@@ -14,6 +14,7 @@ import {
   opponentOf,
   setAnyAllyAttackedThisTurn,
 } from "../../core/playerHelpers.js";
+import { isGameOver } from "../../core/gameOver.js";
 
 // Imported from JS still
 import { applyLeaderDamage } from "../effects/leader.js";
@@ -23,6 +24,29 @@ import { dealDamage, popBarrier } from "./barrier.js";
 import { doAction } from "../../core/history.js";
 import { handleRestore } from "../effects/ops/restore/index.js";
 import { isCantAttackLocked } from "./keywords/has.js";
+
+/** Engine-level attack ownership / turn guard (mirrors playCardCore). */
+export type AttackOutcome =
+  | { kind: "done" }
+  | { kind: "blocked"; reason: string };
+
+function guardAttackerOwnership(
+  attackerPlayer: Player,
+  attackerIdx: number,
+): AttackOutcome | null {
+  if (isGameOver()) {
+    return { kind: "blocked", reason: "Game over" };
+  }
+  if (state.activePlayer !== attackerPlayer) {
+    return { kind: "blocked", reason: "Not your turn" };
+  }
+  const board = getBoard(state, attackerPlayer);
+  const attacker = board[attackerIdx];
+  if (!attacker || attacker.type !== "Follower") {
+    return { kind: "blocked", reason: "Invalid attacker" };
+  }
+  return null;
+}
 
 /* ------------------------------- helpers ------------------------------- */
 
@@ -254,6 +278,13 @@ function _attackFollowerCore(
   });
   state.suppressCleanup = false;
 
+  // Strike / Clash may have dealt lethal — stop combat (bible §342).
+  if (isGameOver()) {
+    spendAttack(attacker);
+    recomputeAttackFlags(attacker);
+    return;
+  }
+
   // Ensure swing counter exists
   if ((attacker as any).attacks_left == null) {
     (attacker as any).attacks_left = Number.isFinite(
@@ -285,6 +316,12 @@ function _attackFollowerCore(
       if (hasPiercingOne(attacker)) {
         applyLeaderDamage(defenderPlayer, 1);
       }
+      spendAttack(attacker);
+      recomputeAttackFlags(attacker);
+      return;
+    }
+
+    if (isGameOver()) {
       spendAttack(attacker);
       recomputeAttackFlags(attacker);
       return;
@@ -351,9 +388,12 @@ export function attackFollower(
   defenderIdx: number,
   attackerPlayer: Player,
   defenderPlayer: Player,
-) {
+): AttackOutcome {
+  const blocked = guardAttackerOwnership(attackerPlayer, attackerIdx);
+  if (blocked) return blocked;
+
   const meta = { attackerIdx, defenderIdx, attackerPlayer, defenderPlayer };
-  return doAction(
+  doAction(
     "Attack Follower",
     () => {
       (state as any).combatResolutionDepth =
@@ -373,6 +413,7 @@ export function attackFollower(
     meta,
     { autoRender: true },
   );
+  return { kind: "done" };
 }
 
 /* ----------------------------- follower -> leader ---------------------------- */
@@ -426,6 +467,12 @@ function _attackLeaderCore(
   // Leader Strike: Fires ONLY when attacking the leader (not followers)
   fireTrigger("leader_strike", attackerPlayer, { attacker });
 
+  if (isGameOver()) {
+    spendAttack(attacker);
+    recomputeAttackFlags(attacker);
+    return;
+  }
+
   attacker.attack = parseInt(attacker.attack as any) || 0;
   attacker.defense = parseInt(attacker.defense as any) || 0;
 
@@ -433,10 +480,16 @@ function _attackLeaderCore(
   // Synchronous execution ensures any debuffs (e.g. Lu Woh) apply before effectiveAtk()
   fireTrigger("leader_attacked", defenderPlayer, { attacker });
 
+  if (isGameOver()) {
+    spendAttack(attacker);
+    recomputeAttackFlags(attacker);
+    return;
+  }
+
   const damage = effectiveAtk(attacker);
   applyLeaderDamage(defenderPlayer, damage);
 
-  if ((attacker as any).hasDrain && damage > 0) {
+  if ((attacker as any).hasDrain && damage > 0 && !isGameOver()) {
     // Route through unified restore handler with proper spec format
     const restored = handleRestore(
       { op: "restore", target: "leader", player: "self", amount: damage },
@@ -463,14 +516,18 @@ export function attackLeader(
   attackerIdx: number,
   attackerPlayer: Player,
   defenderPlayer: Player,
-) {
+): AttackOutcome {
+  const blocked = guardAttackerOwnership(attackerPlayer, attackerIdx);
+  if (blocked) return blocked;
+
   const meta = { attackerIdx, attackerPlayer, defenderPlayer };
-  return doAction(
+  doAction(
     "Attack Leader",
     () => _attackLeaderCore(attackerIdx, attackerPlayer, defenderPlayer),
     meta,
     { autoRender: true },
   );
+  return { kind: "done" };
 }
 
 /* ------------------------------ drag-drop hook ------------------------------ */

@@ -4,6 +4,7 @@ import { state } from "./gameState.js";
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 import { addShadows, getGraveyard } from "./playerHelpers.js";
+import { applyGameOverIfNeeded } from "./gameOver.js";
 // Pull *once* from rng and re-export locally-used helpers
 // (Refactored to use state.rng directly)
 
@@ -146,6 +147,8 @@ function applyDeckoutLoss(owner: Player): void {
     state.players[owner].defeated = true;
     logEvent("deckout", { loser: owner, winner: opp });
   }
+
+  applyGameOverIfNeeded("deckout");
 }
 
 export function pushToHand(

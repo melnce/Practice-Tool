@@ -38,6 +38,8 @@ const KNOWN_ROOT_KEYS = new Set<string>([
   "lastDiscardedCosts",
   "lastDiscardedCost",
   "phase",
+  "gameOverReason",
+  "winner",
   "mulliganStage",
   "mulliganFirstSelected",
   "mulliganSecondSelected",
@@ -136,6 +138,8 @@ export function resetStateInstance(
 
   // H) Clear optional / mid-match root ephemerals
   delete (target as any).phase;
+  delete (target as any).gameOverReason;
+  delete (target as any).winner;
   delete (target as any).mulliganStage;
   delete (target as any).mulliganFirstSelected;
   delete (target as any).mulliganSecondSelected;

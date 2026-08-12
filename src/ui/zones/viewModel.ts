@@ -160,7 +160,8 @@ export function createCardViewModel(
     card.can_attack &&
     !card.hasAttacked &&
     isMyBoard &&
-    isMyTurn
+    isMyTurn &&
+    state.phase !== "gameover"
   ) {
     const ks = card.keywordState || {};
     const hasCantAttack = !!(

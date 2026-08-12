@@ -83,6 +83,7 @@ export function renderZone(
       `${containerId}-${i}`,
       tooltipEl,
       ctx.isBoard,
+      ctx.owner === "first",
     ) as ReconcilableElement;
     newEl.__cachedVM = vm; // Tag it
 

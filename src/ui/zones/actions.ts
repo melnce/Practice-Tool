@@ -54,6 +54,11 @@ export function handlePlayCard(
   index: number,
 ): void {
   void logic()
-    .then(({ playCard }) => playCard(handArray, owner, index))
+    .then(({ playCard }) => {
+      const outcome = playCard(handArray, owner, index);
+      void import("../outcomes.js").then(({ reportBlockedOutcome }) =>
+        reportBlockedOutcome(outcome),
+      );
+    })
     .catch(reportError);
 }

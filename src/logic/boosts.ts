@@ -8,6 +8,7 @@ export function useSecondPlayerPPBoost() {
   return doAction(
     "Second Player PP Boost",
     () => {
+      if (state.phase === "gameover") return;
       if (state.activePlayer === "first") return;
 
       // Button ID is "redBoost" in the HTML

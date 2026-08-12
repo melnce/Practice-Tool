@@ -19,6 +19,7 @@ export function renderCardDOM(
   elementId: string,
   tooltipContainer: HTMLElement | null,
   isBoard = false,
+  ownerIsFirst = false,
 ): HTMLElement {
   const { card } = vm;
 
@@ -176,16 +177,9 @@ export function renderCardDOM(
   applyKeywordOverlays(div, card, isBoard);
   applyBarrierOverlay(div, card);
 
-  // Tooltip
+  // Tooltip — owner comes from ZoneContext, not element id sniffing
   if (tooltipContainer) {
-    // Original logic checks (containerId.includes("first")) for `isAlly`.
-    // We need that context. `attachTooltip` uses it for "Can evolve" checks etc.
-    // We'll pass it in or infer.
-    // `attachTooltip(div, tooltipEl, card, containerId.includes("first"));`
-    // We need `isBlue` passed to `renderCardDOM` or derive it.
-    // Let's rely on `id` prefix or pass a boolean.
-    const isBlue = elementId.includes("first");
-    attachTooltip(div, tooltipContainer, card, isBlue);
+    attachTooltip(div, tooltipContainer, card, ownerIsFirst);
   }
 
   return div;

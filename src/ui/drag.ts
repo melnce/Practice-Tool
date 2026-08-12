@@ -2,6 +2,7 @@
 import { getDragData, setDragData } from "./dom.js";
 import { doAction } from "../core/history.js";
 import type { CardInstance, GameState, Player } from "../core/types/index.js";
+import { reportBlockedOutcome } from "./outcomes.js";
 
 // External game logic hooks (keep same import paths as your project)
 const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
@@ -14,6 +15,7 @@ export function makeLeaderDroppable(
   leaderEl.ondragover = (e) => e.preventDefault();
   leaderEl.ondrop = (e) => {
     e.preventDefault();
+    if (state.phase === "gameover") return;
     const data = getDragData(e);
     const [attackerPlayer, attackerIndex] = data.split(",");
 
@@ -27,12 +29,19 @@ export function makeLeaderDroppable(
       return;
     if (!attackerIndex) return;
 
+    // Attacker must belong to the active player (engine also enforces this)
+    if (attackerPlayer !== state.activePlayer) {
+      reportBlockedOutcome({ kind: "blocked", reason: "Not your turn" });
+      return;
+    }
+
     void logic().then(({ attackLeader }) => {
-      attackLeader(
+      const outcome = attackLeader(
         parseInt(attackerIndex || "0"),
         attackerPlayer as Player,
         targetPlayer,
       );
+      reportBlockedOutcome(outcome);
     });
   };
 }
@@ -41,8 +50,13 @@ export function enableCardDragFromHand(
   div: HTMLElement,
   card: CardInstance,
   containerId: string,
+  draggable = true,
 ) {
-  div.draggable = true;
+  div.draggable = draggable;
+  if (!draggable) {
+    div.ondragstart = null;
+    return;
+  }
   div.ondragstart = (e) => setDragData(e, `hand,${containerId},${card.uid}`);
 }
 
@@ -81,7 +95,10 @@ export function enableBoardDropForOwnSide(
           : state.players.second.hand;
       const index = hand.findIndex((c: CardInstance) => c.uid === cardUid);
       if (index !== -1)
-        void logic().then(({ playCard }) => playCard(hand, player, index));
+        void logic().then(({ playCard }) => {
+          const outcome = playCard(hand, player, index);
+          reportBlockedOutcome(outcome);
+        });
     }
   };
 }
@@ -176,8 +193,15 @@ export function enableEnemyFollowerDrop(
   div.ondragover = (e) => e.preventDefault();
   div.ondrop = (e) => {
     e.preventDefault();
+    if (state.phase === "gameover") return;
     const data = getDragData(e);
     const [attackerPlayer, attackerIndex] = data.split(",");
+
+    // Attacker must belong to the active player (engine also enforces this)
+    if (attackerPlayer !== state.activePlayer) {
+      reportBlockedOutcome({ kind: "blocked", reason: "Not your turn" });
+      return;
+    }
 
     const defenderPlayer = isRedBoard ? "second" : "first";
     const defenders =
@@ -194,12 +218,13 @@ export function enableEnemyFollowerDrop(
     if (defender.hasIntimidate && !defender.hasWard) return;
 
     void logic().then(({ attackFollower }) => {
-      attackFollower(
+      const outcome = attackFollower(
         parseInt(attackerIndex || "0"),
         defenderIndex,
         attackerPlayer as Player,
         defenderPlayer,
       );
+      reportBlockedOutcome(outcome);
     });
   };
 }

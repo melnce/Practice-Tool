@@ -37,8 +37,12 @@ export interface GameState {
   secondPlayerPPBoostUsedLate: boolean;
   secondPlayerPPBoostPending: boolean;
 
-  // === MULLIGAN STATE ===
-  phase?: "mulligan" | "playing" | "main" | undefined;
+  // === MULLIGAN / MATCH PHASE ===
+  phase?: "mulligan" | "playing" | "main" | "gameover" | undefined;
+  /** Set when phase === "gameover" — why the match ended */
+  gameOverReason?: "lethal" | "deckout" | undefined;
+  /** Set when phase === "gameover" — winning player slot */
+  winner?: PlayerSlot | undefined;
   mulliganStage?: "first" | "second" | "done" | undefined;
   mulliganFirstSelected?: Set<string>;
   mulliganSecondSelected?: Set<string>;

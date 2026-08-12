@@ -696,7 +696,33 @@ describe("Batch 3 — Abysscraft [10004] Skybound Dragons", () => {
       ],
       pp: 10,
     });
+    // Round trips must not deck-out (game-over locks End Turn). Spell pads keep
+    // draws from injecting followers ahead of the scripted hand; strip pads from
+    // hand so Cultivator LW Ghosts do not burn on overflow (extra shadows).
+    state.players.first.deck = Array.from({ length: 20 }, (_, i) =>
+      createCard(
+        { name: `SpellPad${i}`, type: "Spell", cost: 0 },
+        "deck",
+        "first",
+      ),
+    );
+    state.players.second.deck = Array.from({ length: 20 }, (_, i) =>
+      createCard(
+        {
+          name: `EnemyPad${i}`,
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+        },
+        "deck",
+        "second",
+      ),
+    );
     const tradeIntoGraveyard = () => {
+      state.players.first.hand = state.players.first.hand.filter(
+        (c) => !String(c.name).startsWith("SpellPad"),
+      );
       if (!state.players.second.board.length) enemyFollower(5, "Blocker");
       whenPlayCard("first", 0);
       whenEndTurn();
