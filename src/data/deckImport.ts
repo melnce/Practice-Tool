@@ -51,7 +51,7 @@ export type DecklistMatchResult = {
 export type ImportCoverageFlag = {
   name: string;
   id: string;
-  status: Exclude<ImplementationStatus, "implemented">;
+  status: Exclude<ImplementationStatus, "ops_present">;
 };
 
 export type DeckImportResult = {
@@ -154,7 +154,7 @@ export function listImportCoverageFlags(
     const status =
       (m.card.implementationStatus as ImplementationStatus | undefined) ??
       getImplementationStatus(m.card);
-    if (status !== "unimplemented" && status !== "partial") continue;
+    if (status !== "unimplemented" && status !== "unknown_ops") continue;
     const id = String(m.id ?? m.name);
     if (seen.has(id)) continue;
     seen.add(id);
@@ -365,16 +365,16 @@ export function importDecklistFromText(
   const coverage = listImportCoverageFlags(match.matched);
   if (coverage.length > 0) {
     const n = coverage.filter((c) => c.status === "unimplemented").length;
-    const p = coverage.filter((c) => c.status === "partial").length;
+    const p = coverage.filter((c) => c.status === "unknown_ops").length;
     const parts: string[] = [];
     if (n > 0) {
-      parts.push(`${n} card${n === 1 ? "" : "s"} have no implemented effects`);
+      parts.push(`${n} card${n === 1 ? "" : "s"} have no programmed effects`);
     }
     if (p > 0) {
       parts.push(`${p} card${p === 1 ? "" : "s"} use unknown effect ops`);
     }
     messages.push(
-      `Coverage warning: ${parts.join(" · ")} — results may be misleading`,
+      `Coverage warning: ${parts.join(" · ")} — other cards may still have incomplete clauses; results may be misleading`,
     );
   }
 

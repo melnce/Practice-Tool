@@ -7,17 +7,28 @@
  * errors — they are expected to have rules text without ops. Evergreen keyword
  * presence is still checked when the ingest extracted them.
  *
+ * Also gates add_to_hand field contracts (name/count/source) across the whole card
+ * tree — including crest definitions nested under fanfare — so play-time throws
+ * from misspelled fields become check failures instead.
+ *
+ * Clause-fidelity heuristics (until-EOT without duration, unjustified max_per_turn)
+ * are written to reports/clause-fidelity-hints.json as a REPORT, not a gate.
+ *
  * Run: npm run check:card-text
  *      npm run check:card-text -- --set 10000_basic
  */
 
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import { SETS_DIR } from "./mergeSets.js";
 import {
   getImplementationStatus,
   type ImplementationStatus,
 } from "../src/data/cardImplementationStatus.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const ROOT = path.resolve(path.dirname(__filename), "..");
 
 type CardJson = {
   id: string;
@@ -39,6 +50,32 @@ type Issue = {
   message: string;
   status?: ImplementationStatus;
 };
+
+type ClauseHint = {
+  id: string;
+  name: string;
+  kind: "until_eot_missing" | "max_per_turn_without_ruling";
+  message: string;
+};
+
+/** Owner rulings that justify a max_per_turn cap (bible overrides printed text). */
+const MAX_PER_TURN_RULING_IDS = new Set([
+  "10344110", // Azurifrit — bible line 422: up to 3 activations per turn
+]);
+
+/** Fields accepted on add_to_hand (plus op). Unknown keys fail the check. */
+const ADD_TO_HAND_ALLOWED = new Set([
+  "op",
+  "source",
+  "name",
+  "count",
+  "target",
+  "player",
+  "keywords",
+  // occasional authoring that the normalizer ignores but is not a crash typo
+  "filter",
+  "condition",
+]);
 
 function listSetFiles(setFilter?: string): string[] {
   const files = fs
@@ -129,11 +166,179 @@ function allEffectRoots(card: CardJson): unknown[] {
   return roots;
 }
 
+/** Walk every object in the card JSON (including crest defs) for add_to_hand ops. */
+function collectAddToHandOps(
+  node: unknown,
+  pathStr: string,
+  out: { path: string; eff: Record<string, unknown> }[],
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) => collectAddToHandOps(n, `${pathStr}[${i}]`, out));
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.op === "add_to_hand") {
+    out.push({ path: pathStr, eff: obj });
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    collectAddToHandOps(v, `${pathStr}.${k}`, out);
+  }
+}
+
+function nodeHasUntilEotOrDuration(node: unknown): boolean {
+  if (!node || typeof node !== "object") return false;
+  if (Array.isArray(node)) {
+    return node.some((n) => nodeHasUntilEotOrDuration(n));
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.until_eot === true) return true;
+  if (typeof obj.duration === "string" || typeof obj.duration === "number")
+    return true;
+  if (
+    typeof obj.duration === "string" &&
+    /eot|end.?of.?turn/i.test(obj.duration)
+  )
+    return true;
+  return Object.values(obj).some((v) => nodeHasUntilEotOrDuration(v));
+}
+
+function collectMaxPerTurn(
+  node: unknown,
+  out: { path: string; max: number }[],
+  pathStr = "",
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) => collectMaxPerTurn(n, out, `${pathStr}[${i}]`));
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  if (typeof obj.max_per_turn === "number" && obj.max_per_turn > 0) {
+    out.push({ path: pathStr || "root", max: obj.max_per_turn });
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    collectMaxPerTurn(v, out, pathStr ? `${pathStr}.${k}` : k);
+  }
+}
+
+function checkAddToHand(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const found: { path: string; eff: Record<string, unknown> }[] = [];
+  collectAddToHandOps(card, card.id, found);
+
+  for (const { path: opPath, eff } of found) {
+    const keys = Object.keys(eff);
+    const unknownKeys = keys.filter((k) => !ADD_TO_HAND_ALLOWED.has(k));
+    // Classic footgun: card_name instead of name
+    if (unknownKeys.length) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `add_to_hand at ${opPath} has unknown/misspelled field(s): ${unknownKeys.join(", ")} (allowed: ${[...ADD_TO_HAND_ALLOWED].filter((k) => k !== "op").join(", ")})`,
+      });
+    }
+
+    const sourceRaw = String(eff.source || "named")
+      .toLowerCase()
+      .trim();
+    const source = sourceRaw === "copy" ? "copy" : "named";
+
+    if (source === "named") {
+      if (
+        !(typeof eff.name === "string" && eff.name.trim()) &&
+        !unknownKeys.includes("card_name")
+      ) {
+        // If card_name was present we already errored on unknown keys; still
+        // require name when it's simply missing.
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "error",
+          message: `add_to_hand at ${opPath} (source=named) requires "name"`,
+        });
+      }
+    } else if (!eff.target) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `add_to_hand at ${opPath} (source=copy) requires "target"`,
+      });
+    }
+
+    if (eff.count === undefined) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `add_to_hand at ${opPath} requires "count"`,
+      });
+    } else {
+      const count = parseInt(String(eff.count), 10);
+      if (!Number.isFinite(count) || count < 0) {
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "error",
+          message: `add_to_hand at ${opPath} has invalid count: ${JSON.stringify(eff.count)}`,
+        });
+      }
+    }
+  }
+  return issues;
+}
+
+function clauseHintsForCard(card: CardJson): ClauseHint[] {
+  const hints: ClauseHint[] = [];
+  const desc = card.description ?? "";
+  const descLower = desc.toLowerCase();
+  const roots = allEffectRoots(card);
+  // Crests / nested fanfare trees also count as ops evidence for until_eot
+  const wholeCardHasUntil = nodeHasUntilEotOrDuration(card);
+
+  if (
+    /until (the )?end of (the |your |this )?turn/.test(descLower) &&
+    !wholeCardHasUntil
+  ) {
+    hints.push({
+      id: card.id,
+      name: card.name,
+      kind: "until_eot_missing",
+      message:
+        'Description says "until end of turn" but no until_eot/duration found in authored ops',
+    });
+  }
+
+  const caps: { path: string; max: number }[] = [];
+  collectMaxPerTurn(card, caps);
+  if (caps.length && !MAX_PER_TURN_RULING_IDS.has(card.id)) {
+    // Only flag when text looks like an unbounded repeating trigger
+    const repeating =
+      /\b(whenever|each time|every time)\b/i.test(desc) &&
+      !/\b(once|up to \d+|at most \d+)\b/i.test(desc);
+    if (repeating) {
+      for (const cap of caps) {
+        hints.push({
+          id: card.id,
+          name: card.name,
+          kind: "max_per_turn_without_ruling",
+          message: `Ops set max_per_turn=${cap.max} at ${cap.path} but description looks uncapped and no owner ruling id is listed`,
+        });
+      }
+    }
+  }
+
+  void roots;
+  return hints;
+}
+
 function checkCard(card: CardJson): Issue[] {
   const issues: Issue[] = [];
   const status = getImplementationStatus(card);
   const desc = card.description ?? "";
-  const descLower = desc.toLowerCase();
   const kws = card.keywords;
   const ops = new Set<string>();
   for (const root of allEffectRoots(card)) collectOps(root, ops);
@@ -300,7 +505,9 @@ function checkCard(card: CardJson): Issue[] {
     });
   }
 
-  void descLower;
+  // Gate: add_to_hand field contracts (includes crest-nested ops)
+  issues.push(...checkAddToHand(card));
+
   return issues;
 }
 
@@ -311,17 +518,31 @@ function main() {
       ? process.argv[process.argv.indexOf("--set") + 1]
       : undefined);
 
+  const gateAddToHand =
+    process.argv.includes("--gate=add-to-hand") ||
+    process.argv.includes("--gate=add_to_hand");
+
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
+  const allHints: ClauseHint[] = [];
   let cardCount = 0;
 
-  console.log("🔍 Checking card description ↔ JSON structure...\n");
+  console.log(
+    gateAddToHand
+      ? "🔍 Checking add_to_hand field contracts...\n"
+      : "🔍 Checking card description ↔ JSON structure...\n",
+  );
 
   for (const file of files) {
     const cards = JSON.parse(fs.readFileSync(file, "utf-8")) as CardJson[];
     cardCount += cards.length;
     for (const card of cards) {
-      allIssues.push(...checkCard(card));
+      if (gateAddToHand) {
+        allIssues.push(...checkAddToHand(card));
+      } else {
+        allIssues.push(...checkCard(card));
+        allHints.push(...clauseHintsForCard(card));
+      }
     }
   }
 
@@ -344,9 +565,31 @@ function main() {
     console.log("");
   }
 
+  if (!gateAddToHand) {
+    const reportPath = path.join(ROOT, "reports", "clause-fidelity-hints.json");
+    fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+    fs.writeFileSync(
+      reportPath,
+      JSON.stringify(
+        {
+          note: "Informational only — not a CI gate. High-signal heuristics with known false-positive risk.",
+          count: allHints.length,
+          hints: allHints,
+        },
+        null,
+        2,
+      ) + "\n",
+    );
+    console.log(
+      `📝 Clause-fidelity hints: ${allHints.length} (report only) → ${path.relative(ROOT, reportPath)}`,
+    );
+  }
+
   if (!errors.length && !warns.length) {
     console.log(
-      `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+      gateAddToHand
+        ? `✅ ${cardCount} cards — all add_to_hand ops have valid fields.\n`
+        : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(

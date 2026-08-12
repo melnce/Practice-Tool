@@ -3397,7 +3397,8 @@
         "effects": [
           {
             "op": "add_to_hand",
-            "card_name": "Fortifier Artifact"
+            "name": "Fortifier Artifact",
+            "count": 1
           }
         ]
       }

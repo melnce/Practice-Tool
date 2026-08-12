@@ -17,7 +17,7 @@ export interface UnifiedCostSpec {
   amount: number | string;
   pool?: string; // for target: "pool" - e.g. "ally:hand"
   condition?: any; // filter for pool
-  filter?: { type?: string; tribe?: string; class?: string }; // additional pool filter
+  filter?: { type?: string; tribe?: string; class?: string; name?: string }; // additional pool filter
   select?: number; // number of targets to select (triggers selection UI)
   min_cost?: number; // floor for reduce
   until_eot?: boolean; // temporary mod, revert at end of turn

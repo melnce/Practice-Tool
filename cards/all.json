@@ -12079,7 +12079,8 @@
         "effects": [
           {
             "op": "add_to_hand",
-            "name": "Remnant of Hollowness"
+            "name": "Remnant of Hollowness",
+            "count": 1
           }
         ],
         "triggers": [
@@ -12548,6 +12549,16 @@
           "type": "Spell"
         },
         "into": "Ersatz Elimination"
+      },
+      {
+        "op": "cost",
+        "mode": "set",
+        "target": "ally:hand",
+        "amount": 0,
+        "until_eot": true,
+        "filter": {
+          "name": "Ersatz Elimination"
+        }
       }
     ],
     "keywords": [],
@@ -13021,7 +13032,8 @@
             "effects": [
               {
                 "op": "add_to_hand",
-                "name": "Fangs of Ardent Destruction"
+                "name": "Fangs of Ardent Destruction",
+                "count": 1
               }
             ],
             "condition": {
@@ -18060,7 +18072,8 @@
         "effects": [
           {
             "op": "add_to_hand",
-            "card_name": "Fortifier Artifact"
+            "name": "Fortifier Artifact",
+            "count": 1
           }
         ]
       }

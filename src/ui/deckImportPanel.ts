@@ -80,7 +80,7 @@ function formatImportStatus(result: DeckImportResult): {
     lines.push(
       `<strong class="deck-import-coverage">Coverage warning:</strong> ${escapeHtml(
         names,
-      )} — practice results may be misleading because these cards have no (or unknown) implemented effects.`,
+      )} — these cards have no programmed effects or use unknown ops; remaining cards are not claimed text-faithful either.`,
     );
   }
   if (result.ok) {

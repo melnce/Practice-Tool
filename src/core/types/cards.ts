@@ -87,7 +87,7 @@ export interface CardTemplate {
    * Derived at index build from description + ops (not stored in set JSON).
    * See src/data/cardImplementationStatus.ts.
    */
-  implementationStatus?: "implemented" | "partial" | "unimplemented";
+  implementationStatus?: "ops_present" | "unknown_ops" | "unimplemented";
   // Buff tracking
   buffs?:
     | {

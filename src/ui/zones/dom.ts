@@ -97,18 +97,19 @@ export function renderCardDOM(
     imageWrapper.appendChild(badge);
   }
 
-  // Unimplemented / partial coverage badge — honest signal that effects are stubs
+  // Unimplemented / unknown-op coverage badge — honest signal that effects are stubs
   if (
     vm.implementationStatus === "unimplemented" ||
-    vm.implementationStatus === "partial"
+    vm.implementationStatus === "unknown_ops"
   ) {
     div.classList.add("card-unimplemented");
-    const label = vm.implementationStatus === "partial" ? "PARTIAL" : "UNIMPL";
+    const label =
+      vm.implementationStatus === "unknown_ops" ? "UNKNOWN OP" : "UNIMPL";
     const badge = createElement("div", "unimplemented-badge", label);
     badge.title =
-      vm.implementationStatus === "partial"
+      vm.implementationStatus === "unknown_ops"
         ? "Card JSON contains an unknown effect op"
-        : "This card has no implemented effects — results may be misleading";
+        : "This card has no programmed effects — results may be misleading";
     imageWrapper.appendChild(badge);
   }
 

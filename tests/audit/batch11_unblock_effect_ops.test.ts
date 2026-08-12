@@ -87,7 +87,7 @@ describe("Unblock effect ops — tokens / Faith / base_cost_gte", () => {
     for (const id of UNBLOCKED) {
       const card = getCardById(id);
       expect(card, id).toBeTruthy();
-      expect(getImplementationStatus(card!), id).toBe("implemented");
+      expect(getImplementationStatus(card!), id).toBe("ops_present");
     }
   });
 

@@ -586,6 +586,21 @@ describe("B/C — Skybound / modes / bosses (10471120, 10472120, 10473110, 10473
     expect(Number(foe.defense)).toBeLessThan(6);
   });
 
+  it("Cassius Last Words adds Fortifier Artifact to hand", () => {
+    setupTurn(R6, { hand: ["10473110", "90072110"], pp: 5 });
+    whenPlayCard("first", 0);
+    const striker = thenHand("first").find(
+      (c) => c.name === "Striker Artifact",
+    )!;
+    resolvePendingTarget(striker.uid);
+    const cassius = findOnBoard("first", "Cassius, Sky-Yearning Arrival")!;
+    cassius.defense = 0;
+    cleanupDead();
+    expect(thenHand("first").some((c) => c.name === "Fortifier Artifact")).toBe(
+      true,
+    );
+  });
+
   it("Chaos Legion deals 3 to all enemies", () => {
     setupTurn(R10, { hand: ["10473310"], pp: 6 });
     enemyFollower(2, 5);
