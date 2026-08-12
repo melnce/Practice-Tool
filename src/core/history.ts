@@ -180,6 +180,8 @@ function replaceState(next: GameState) {
   if (state.rng && (next as any).__rng) {
     state.rng.restore((next as any).__rng);
   }
+  // __rng is snapshot-only metadata — never leave it on the live state root
+  delete (state as any).__rng;
 }
 
 function trimRing() {
@@ -195,8 +197,13 @@ function notify() {
 
 /** Begin an action. Wrap mutations between beginAction/commitAction OR use doAction(). */
 export function beginAction(name: string, meta: any = {}) {
-  if (inAction)
-    throw new Error("history.beginAction called while another action is open");
+  if (inAction) {
+    // Recover instead of bricking the session — one bad action must not wedge history.
+    console.warn(
+      `[History] beginAction("${name}") while "${inAction.name}" is open; aborting previous action`,
+    );
+    abortAction({ autoRender: false });
+  }
   // When history disabled, set before=null to skip expensive snapshot
   // SAFETY: abortAction checks for null and won't corrupt state
   if (!_historyEnabled) {
@@ -346,6 +353,7 @@ export function appendStep(name: string, meta: any = {}) {
 
 /** Undo last action. */
 export function undo({ autoRender = true } = {}) {
+  if (isInAction()) return false;
   if (past.length === 0) return false;
   const entry = past.pop();
   if (entry) {
@@ -361,6 +369,7 @@ export function undo({ autoRender = true } = {}) {
 
 /** Redo last undone action. */
 export function redo({ autoRender = true } = {}) {
+  if (isInAction()) return false;
   if (future.length === 0) return false;
   const entry = future.pop();
   if (entry) {
@@ -402,6 +411,19 @@ export function initHistoryHotkeys({
   target = document,
 }: { target?: Document | HTMLElement } = {}) {
   target.addEventListener("keydown", (e: any) => {
+    const el = e.target as HTMLElement | null | undefined;
+    if (el) {
+      const tag = (el.tagName || "").toUpperCase();
+      if (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        (el as any).isContentEditable
+      ) {
+        return;
+      }
+    }
+
     const isMac =
       typeof navigator !== "undefined" &&
       navigator.platform &&

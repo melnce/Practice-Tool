@@ -14,7 +14,7 @@ import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 import { handleInvoke } from "../effects/ops/summon.js";
 import { dealDamage } from "./barrier.js";
 import { logEvent } from "../../core/logger.js";
-import { beginAction, commitAction } from "../../core/history.js";
+import { beginAction, commitAction, abortAction } from "../../core/history.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
 import {
   isFirstPlayer,
@@ -216,92 +216,101 @@ function _endTurnCore(endingPlayer: Player) {
   recordEvent({ type: "end_turn", payload: { player: endingPlayer } });
   beginAction(`End Turn (${endingLabel})`);
 
-  // === PHASE 1: End-of-Turn boundary (C1: deferDeathTriggers, not suppressCleanup) ===
-  clearTempHandCostMods(endingPlayer);
-
   try {
-    runEndOfTurnBoundary(endingPlayer);
-  } catch (e) {
-    console.error(`Error in end-of-turn boundary (${endingLabel}):`, e);
-  }
+    // === PHASE 1: End-of-Turn boundary (C1: deferDeathTriggers, not suppressCleanup) ===
+    clearTempHandCostMods(endingPlayer);
 
-  try {
-    scanDeckForInvokes(endingPlayer, "end_of_turn");
-  } catch (e) {
-    console.error(`Error in ${endingLabel} Invoke EOT:`, e);
-  }
-
-  cleanupDead();
-
-  clearExpiredCantAttackAtEOT(endingPlayer);
-  applyBleedAllBoardsAtEndOfTurn();
-  clearExpiredLeaderEffects(endingPlayer);
-
-  // === PHASE 2: Special Second Player Logic (PP Boost, Round Increment) ===
-  if (endingPlayer === "second") {
-    if (state.secondPlayerPPBoostPending) {
-      if (state.roundCount <= 5) state.secondPlayerPPBoostUsedEarly = true;
-      else state.secondPlayerPPBoostUsedLate = true;
-      state.secondPlayerPPBoostPending = false;
+    try {
+      runEndOfTurnBoundary(endingPlayer);
+    } catch (e) {
+      console.error(`Error in end-of-turn boundary (${endingLabel}):`, e);
     }
-    state.roundCount++;
-  }
 
-  // === PHASE 3: Prepare Next Player's Turn ===
-  setMaxPP(
-    state,
-    nextPlayer,
-    Math.min(state.roundCount + getPermPP(state, nextPlayer), 10),
-  );
-  setPP(state, nextPlayer, getMaxPP(state, nextPlayer));
+    try {
+      scanDeckForInvokes(endingPlayer, "end_of_turn");
+    } catch (e) {
+      console.error(`Error in ${endingLabel} Invoke EOT:`, e);
+    }
 
-  // Reset evolution usage flag for ending player
-  setEvoUsedThisTurn(state, endingPlayer, false);
+    cleanupDead();
 
-  clearSummoningSickness(getBoard(state, nextPlayer));
+    clearExpiredCantAttackAtEOT(endingPlayer);
+    applyBleedAllBoardsAtEndOfTurn();
+    clearExpiredLeaderEffects(endingPlayer);
 
-  resetCrestOncePerTurn(nextPlayer);
-  resetEngageFlagsAtTurnStart(nextPlayer);
+    // === PHASE 2: Special Second Player Logic (PP Boost, Round Increment) ===
+    if (endingPlayer === "second") {
+      if (state.secondPlayerPPBoostPending) {
+        if (state.roundCount <= 5) state.secondPlayerPPBoostUsedEarly = true;
+        else state.secondPlayerPPBoostUsedLate = true;
+        state.secondPlayerPPBoostPending = false;
+      }
+      state.roundCount++;
+    }
 
-  setPlaysThisTurn(state, nextPlayer, 0);
-  refreshBoardForNewTurn(getBoard(state, nextPlayer));
+    // === PHASE 3: Prepare Next Player's Turn ===
+    setMaxPP(
+      state,
+      nextPlayer,
+      Math.min(state.roundCount + getPermPP(state, nextPlayer), 10),
+    );
+    setPP(state, nextPlayer, getMaxPP(state, nextPlayer));
 
-  try {
-    runStartOfTurnBoundary(nextPlayer, {
-      tickCrests,
-      tickAmulets: tickAmuletCountdowns,
+    // Reset evolution usage flag for ending player
+    setEvoUsedThisTurn(state, endingPlayer, false);
+
+    clearSummoningSickness(getBoard(state, nextPlayer));
+
+    resetCrestOncePerTurn(nextPlayer);
+    resetEngageFlagsAtTurnStart(nextPlayer);
+
+    setPlaysThisTurn(state, nextPlayer, 0);
+    refreshBoardForNewTurn(getBoard(state, nextPlayer));
+
+    try {
+      runStartOfTurnBoundary(nextPlayer, {
+        tickCrests,
+        tickAmulets: tickAmuletCountdowns,
+      });
+    } catch (e) {
+      console.error(`Error in start-of-turn boundary (${nextPlayer}):`, e);
+    }
+
+    // Draw step 8 ? after SOT queue resolves
+    drawCard(
+      getHand(state, nextPlayer),
+      getDeck(state, nextPlayer),
+      nextPlayer,
+    );
+    logEvent("draw", { player: nextPlayer, count: 1 });
+
+    try {
+      scanDeckForInvokes(nextPlayer, "start_of_turn");
+    } catch (e) {
+      console.error(`Error in ${nextPlayer} Start Invoke:`, e);
+    }
+
+    cleanupDead();
+
+    // === PHASE 4: Switch Active Player ===
+    state.activePlayer = nextPlayer;
+    state.turnNumber = (state.turnNumber || 0) + 1;
+    logEvent("startTurn", {
+      player: state.activePlayer,
+      round: state.roundCount,
+      turn: state.turnNumber,
     });
+
+    setAnyAllyAttackedThisTurn(state, nextPlayer, false);
+    setEvoUsedThisTurn(state, nextPlayer, false);
+    resetShikigamiDeathLogs();
+
+    logEvent("endTurn", { from: endingPlayer });
+    commitAction({ autoRender: true });
   } catch (e) {
-    console.error(`Error in start-of-turn boundary (${nextPlayer}):`, e);
+    abortAction({ autoRender: false });
+    throw e;
   }
-
-  // Draw step 8 ? after SOT queue resolves
-  drawCard(getHand(state, nextPlayer), getDeck(state, nextPlayer), nextPlayer);
-  logEvent("draw", { player: nextPlayer, count: 1 });
-
-  try {
-    scanDeckForInvokes(nextPlayer, "start_of_turn");
-  } catch (e) {
-    console.error(`Error in ${nextPlayer} Start Invoke:`, e);
-  }
-
-  cleanupDead();
-
-  // === PHASE 4: Switch Active Player ===
-  state.activePlayer = nextPlayer;
-  state.turnNumber = (state.turnNumber || 0) + 1;
-  logEvent("startTurn", {
-    player: state.activePlayer,
-    round: state.roundCount,
-    turn: state.turnNumber,
-  });
-
-  setAnyAllyAttackedThisTurn(state, nextPlayer, false);
-  setEvoUsedThisTurn(state, nextPlayer, false);
-  resetShikigamiDeathLogs();
-
-  logEvent("endTurn", { from: endingPlayer });
-  commitAction({ autoRender: true });
 }
 
 /**

@@ -1,24 +1,40 @@
-// @vitest-environment node
 /**
+ * @vitest-environment jsdom
+ *
  * History Snapshot & Undo/Redo Determinism Tests
  *
  * Verifies:
  * 1. Internal caches (_triggerCache) are excluded from snapshots
  * 2. RNG state is properly saved and restored
  * 3. Undo/redo produces deterministic results
+ * 4. Undo/redo reliability (evolve, attack, pending target, open-action, end-turn throw)
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { state, resetGameState } from "../../src/core/gameState.js";
 import {
   beginAction,
   commitAction,
+  abortAction,
   canUndo,
+  canRedo,
   undo,
   redo,
+  doAction,
+  isInAction,
   setHistoryEnabled,
+  resetHistory,
+  initHistoryHotkeys,
   INTERNAL_CACHE_KEYS,
 } from "../../src/core/history.js";
 import { getAllZoneCandidates } from "../../src/logic/core/triggers/utils.js";
+import { givenGameState, resetUidCounter } from "../harness/builders.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
+import { attackFollower } from "../../src/logic/core/combat.js";
+import { endTurnBlue } from "../../src/logic/core/turns.js";
+import * as cleanupMod from "../../src/logic/core/cleanup.js";
+import { enableCardEvoDrop } from "../../src/ui/drag.js";
+import * as dom from "../../src/ui/dom.js";
+import { setPendingTarget } from "../../src/logic/core/pendingTarget/index.js";
 
 // Mock window for card database
 if (typeof window === "undefined") {
@@ -65,8 +81,8 @@ describe("Snapshot Omission", () => {
 
     // Special keys that are allowed (not internal caches):
     // - __debugId: Debug identity for the state instance
-    // - __rng: RNG snapshot stored during undo/redo restoration
-    const ALLOWED_UNDERSCORE_KEYS = new Set(["__debugId", "__rng"]);
+    // __rng must NOT leak onto the live state root after restore (H4)
+    const ALLOWED_UNDERSCORE_KEYS = new Set(["__debugId"]);
 
     const unexpectedUnderscoreKeys = stateKeys.filter(
       (k) =>
@@ -76,6 +92,17 @@ describe("Snapshot Omission", () => {
     );
 
     expect(unexpectedUnderscoreKeys).toEqual([]);
+  });
+
+  it("should not leave __rng on the live state root after undo (H4)", () => {
+    beginAction("checkpoint");
+    state.players.first.hp -= 1;
+    commitAction({ autoRender: false });
+
+    undo({ autoRender: false });
+
+    expect(Object.prototype.hasOwnProperty.call(state, "__rng")).toBe(false);
+    expect((state as any).__rng).toBeUndefined();
   });
 
   it("should include RNG state in snapshots", () => {
@@ -266,5 +293,307 @@ describe("Undo/Redo Determinism", () => {
         redo({ autoRender: false });
       }
     }
+  });
+});
+
+describe("Undo/Redo Reliability", () => {
+  beforeEach(() => {
+    setHistoryEnabled(true);
+    resetUidCounter();
+    resetHistory();
+    (globalThis as any).HEADLESS = true;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (isInAction()) abortAction({ autoRender: false });
+    resetHistory();
+  });
+
+  it("undo/redo after evolve via UI drop restores evolved state (H1)", async () => {
+    // Reproduces drag.ts enableCardEvoDrop: doAction must not wrap a dynamic import.
+    givenGameState({ seed: 42, activePlayer: "first", roundCount: 5 })
+      .withFirstBoard([
+        {
+          name: "Evo Target",
+          type: "Follower",
+          attack: 2,
+          defense: 2,
+          hasEvolved: false,
+        },
+      ])
+      .withFirstEvo(2)
+      .build();
+
+    const card = state.players.first.board[0]!;
+    const atkBefore = Number(card.attack);
+    const div = document.createElement("div");
+    enableCardEvoDrop(div, "blueBoard", card, state, () => {});
+
+    const getDragSpy = vi
+      .spyOn(dom, "getDragData")
+      .mockReturnValue("NormalEvo");
+    div.ondrop?.({ preventDefault() {} } as any);
+    getDragSpy.mockRestore();
+
+    await vi.waitFor(() => {
+      expect(state.players.first.board[0]?.hasEvolved).toBe(true);
+    });
+
+    expect(Number(state.players.first.board[0]!.attack)).toBe(atkBefore + 2);
+
+    undo({ autoRender: false });
+    expect(state.players.first.board[0]?.hasEvolved).toBeFalsy();
+    expect(Number(state.players.first.board[0]!.attack)).toBe(atkBefore);
+
+    const redid = redo({ autoRender: false });
+    expect(redid).toBe(true);
+    // H1: redo must re-apply the evolve that was committed as the action's after-state
+    expect(state.players.first.board[0]?.hasEvolved).toBe(true);
+    expect(Number(state.players.first.board[0]!.attack)).toBe(atkBefore + 2);
+  });
+
+  it("undo/redo after attack follower round-trips board damage", () => {
+    givenGameState({ seed: 7, activePlayer: "first" })
+      .withFirstBoard([
+        {
+          name: "Attacker",
+          type: "Follower",
+          attack: 3,
+          defense: 4,
+          can_attack: true,
+          hasAttacked: false,
+          justPlayed: false,
+          attacks_left: 1,
+        },
+      ])
+      .withSecondBoard([
+        {
+          name: "Defender",
+          type: "Follower",
+          attack: 1,
+          defense: 5,
+          peak_defense: 5,
+        },
+      ])
+      .build();
+
+    const defBefore = Number(state.players.second.board[0]!.defense);
+    attackFollower(0, 0, "first", "second");
+    expect(Number(state.players.second.board[0]!.defense)).toBe(defBefore - 3);
+    expect(canUndo()).toBe(true);
+
+    undo({ autoRender: false });
+    expect(Number(state.players.second.board[0]!.defense)).toBe(defBefore);
+    expect(state.players.first.board[0]!.hasAttacked).toBeFalsy();
+
+    redo({ autoRender: false });
+    expect(Number(state.players.second.board[0]!.defense)).toBe(defBefore - 3);
+  });
+
+  it("undo while a pending-target prompt is open restores pre-prompt state", () => {
+    givenGameState({ seed: 3, activePlayer: "first" })
+      .withFirstPP(5, 5)
+      .build();
+
+    const initialPP = state.players.first.pp;
+    doAction(
+      "Play Card",
+      () => {
+        state.players.first.pp -= 2;
+        setPendingTarget({
+          eff: { op: "damage", amount: 1 },
+          owner: "first",
+          selectCount: 1,
+          targetUids: [],
+        } as any);
+      },
+      {},
+      { autoRender: false },
+    );
+
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(state.players.first.pp).toBe(initialPP - 2);
+
+    undo({ autoRender: false });
+    expect(state.pendingTargetEffect).toBeUndefined();
+    expect(state.players.first.pp).toBe(initialPP);
+  });
+
+  it("redo round-trips multiple committed actions", () => {
+    resetGameState(11);
+    setHistoryEnabled(true);
+    resetHistory();
+
+    const base = state.players.first.hp;
+    doAction(
+      "dmg1",
+      () => {
+        state.players.first.hp -= 1;
+      },
+      {},
+      { autoRender: false },
+    );
+    doAction(
+      "dmg2",
+      () => {
+        state.players.first.hp -= 2;
+      },
+      {},
+      { autoRender: false },
+    );
+    expect(state.players.first.hp).toBe(base - 3);
+
+    undo({ autoRender: false });
+    undo({ autoRender: false });
+    expect(state.players.first.hp).toBe(base);
+
+    redo({ autoRender: false });
+    expect(state.players.first.hp).toBe(base - 1);
+    redo({ autoRender: false });
+    expect(state.players.first.hp).toBe(base - 3);
+  });
+
+  it("undo/redo return false while an action is open (H3)", () => {
+    resetGameState(99);
+    setHistoryEnabled(true);
+    resetHistory();
+
+    doAction(
+      "baseline",
+      () => {
+        state.players.first.hp -= 1;
+      },
+      {},
+      { autoRender: false },
+    );
+
+    beginAction("open");
+    expect(isInAction()).toBe(true);
+
+    const hpDuring = state.players.first.hp;
+    expect(undo({ autoRender: false })).toBe(false);
+    expect(redo({ autoRender: false })).toBe(false);
+    expect(isInAction()).toBe(true);
+    expect(state.players.first.hp).toBe(hpDuring);
+
+    abortAction({ autoRender: false });
+  });
+
+  it("beginAction recovers instead of throwing when another action is open (H3)", () => {
+    resetGameState(5);
+    setHistoryEnabled(true);
+    resetHistory();
+
+    beginAction("stuck");
+    state.players.first.hp -= 3;
+    expect(isInAction()).toBe(true);
+
+    expect(() => beginAction("recovery")).not.toThrow();
+    expect(isInAction()).toBe(true);
+    // Prior mutations aborted back to baseline
+    expect(state.players.first.hp).toBe(20);
+
+    state.players.first.hp -= 1;
+    commitAction({ autoRender: false });
+    expect(canUndo()).toBe(true);
+  });
+
+  it("recovers after a throw inside end-turn so later actions work (H2)", () => {
+    givenGameState({ seed: 21, activePlayer: "first", roundCount: 2 })
+      .withFirstDeck([{ name: "Draw Filler", type: "Follower", cost: 1 }])
+      .withSecondDeck([{ name: "Draw Filler", type: "Follower", cost: 1 }])
+      .build();
+
+    const spy = vi
+      .spyOn(cleanupMod, "cleanupDead")
+      .mockImplementationOnce(() => {
+        throw new Error("simulated end-turn failure");
+      });
+
+    endTurnBlue();
+    spy.mockRestore();
+
+    expect(isInAction()).toBe(false);
+    expect(() => {
+      doAction(
+        "after_crash",
+        () => {
+          state.players.first.hp -= 1;
+        },
+        {},
+        { autoRender: false },
+      );
+    }).not.toThrow();
+    expect(canUndo()).toBe(true);
+  });
+
+  it("hotkeys ignore Ctrl+Z when focus is in an input (H5)", () => {
+    resetGameState(1);
+    setHistoryEnabled(true);
+    resetHistory();
+    doAction(
+      "move",
+      () => {
+        state.players.first.hp -= 1;
+      },
+      {},
+      { autoRender: false },
+    );
+    expect(canUndo()).toBe(true);
+
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+
+    initHistoryHotkeys({ target: document });
+    input.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "z",
+        ctrlKey: true,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    expect(canUndo()).toBe(true);
+    expect(canRedo()).toBe(false);
+
+    document.body.removeChild(input);
+  });
+
+  it("synchronous evolve via doAction still undoes cleanly", () => {
+    givenGameState({ seed: 8, activePlayer: "first", roundCount: 5 })
+      .withFirstBoard([
+        {
+          name: "Sync Evo",
+          type: "Follower",
+          attack: 1,
+          defense: 1,
+          hasEvolved: false,
+        },
+      ])
+      .withFirstEvo(1)
+      .build();
+
+    const beforeAtk = Number(state.players.first.board[0]!.attack);
+    doAction(
+      "Evolve",
+      () => {
+        handleEvolveSelf(state.players.first.board[0]!, "first", {
+          mode: "normal",
+          spendPoint: true,
+          runEvoEffects: true,
+        });
+      },
+      {},
+      { autoRender: false },
+    );
+
+    expect(state.players.first.board[0]!.hasEvolved).toBe(true);
+    undo({ autoRender: false });
+    expect(state.players.first.board[0]!.hasEvolved).toBeFalsy();
+    redo({ autoRender: false });
+    expect(state.players.first.board[0]!.hasEvolved).toBe(true);
+    expect(Number(state.players.first.board[0]!.attack)).toBe(beforeAtk + 2);
   });
 });

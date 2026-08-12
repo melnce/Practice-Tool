@@ -15,6 +15,7 @@ import { injectAdapter } from "../core/adapter.js";
 import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
 import { useRedBoost } from "../logic/boosts.js";
 import { state } from "../core/gameState.js";
+import { doAction, undo, redo } from "../core/history.js";
 import type { DeckManifest, DeckManifestEntry } from "../data/deckManifest.js";
 import { initTestBridgeIfRequested } from "../ui/qa/testBridge.js";
 
@@ -78,7 +79,14 @@ window.addEventListener("DOMContentLoaded", () => {
   // Ctrl/Cmd+Z (undo), Ctrl+Y or Cmd+Shift+Z (redo)
   engine.initHotkeys();
 
-  // If you later add buttons with IDs 'undoBtn'/'redoBtn', this will enable/disable them
+  wireClick("undoBtn", () => {
+    undo();
+  });
+  wireClick("redoBtn", () => {
+    redo();
+  });
+
+  // Enable/disable undo/redo buttons from history stack
   engine.onHistoryUpdate(({ canUndo, canRedo }) => {
     const u = document.getElementById("undoBtn") as HTMLButtonElement | null;
     const r = document.getElementById("redoBtn") as HTMLButtonElement | null;
@@ -86,49 +94,92 @@ window.addEventListener("DOMContentLoaded", () => {
     if (r) r.disabled = !canRedo;
   });
 
-  // God Mode Handlers
+  // God Mode Handlers — wrapped so they are undoable practice tools
   wireClick("godPlus", () => {
-    state.players.first.pp = Math.min(
-      state.players.first.maxPP,
-      state.players.first.pp + 1,
+    doAction(
+      "God Mode: +PP",
+      () => {
+        state.players.first.pp = Math.min(
+          state.players.first.maxPP,
+          state.players.first.pp + 1,
+        );
+      },
+      {},
+      { autoRender: true },
     );
-    render();
   });
   wireClick("godMinus", () => {
-    state.players.first.pp = Math.max(0, state.players.first.pp - 1);
-    render();
+    doAction(
+      "God Mode: -PP",
+      () => {
+        state.players.first.pp = Math.max(0, state.players.first.pp - 1);
+      },
+      {},
+      { autoRender: true },
+    );
   });
   wireClick("godRefill", () => {
-    state.players.first.pp = state.players.first.maxPP;
-    render();
+    doAction(
+      "God Mode: Refill PP",
+      () => {
+        state.players.first.pp = state.players.first.maxPP;
+      },
+      {},
+      { autoRender: true },
+    );
   });
   wireClick("godSetMax", () => {
     const val = prompt("Set Max PP (and fill):", "10");
     if (val) {
       const n = parseInt(val, 10);
       if (Number.isFinite(n) && n >= 0) {
-        state.players.first.maxPP = n;
-        state.players.first.pp = n;
-        render();
+        doAction(
+          "God Mode: Set Max PP",
+          () => {
+            state.players.first.maxPP = n;
+            state.players.first.pp = n;
+          },
+          {},
+          { autoRender: true },
+        );
       }
     }
   });
 
   // God Mode: EP
   wireClick("godEPPlus", () => {
-    state.players.first.evoCharges = (state.players.first.evoCharges || 0) + 1;
-    render();
+    doAction(
+      "God Mode: +EP",
+      () => {
+        state.players.first.evoCharges =
+          (state.players.first.evoCharges || 0) + 1;
+      },
+      {},
+      { autoRender: true },
+    );
   });
   wireClick("godEPMinus", () => {
-    state.players.first.evoCharges = Math.max(
-      0,
-      (state.players.first.evoCharges || 0) - 1,
+    doAction(
+      "God Mode: -EP",
+      () => {
+        state.players.first.evoCharges = Math.max(
+          0,
+          (state.players.first.evoCharges || 0) - 1,
+        );
+      },
+      {},
+      { autoRender: true },
     );
-    render();
   });
   wireClick("godEPRefill", () => {
-    state.players.first.evoCharges = 3; // Max EP for P2 is 3, usually enough.
-    render();
+    doAction(
+      "God Mode: Refill EP",
+      () => {
+        state.players.first.evoCharges = 3; // Max EP for P2 is 3, usually enough.
+      },
+      {},
+      { autoRender: true },
+    );
   });
 
   wireClick("godSetEvoCount", () => {
@@ -136,24 +187,34 @@ window.addEventListener("DOMContentLoaded", () => {
     if (inp) {
       const val = parseInt(inp.value, 10);
       if (Number.isFinite(val)) {
-        // Determine delta to update Skybound Art (SBA)
         const oldVal = state.players.first.evoCount || 0;
-        state.players.first.evoCount = val;
-
-        // If we increased evolutions, manually trigger SBA increments
-        // so cards in hand "witness" these god-mode evolutions.
         const delta = val - oldVal;
         if (delta > 0) {
+          // Resolve async import before opening the action (same rule as evolve)
           void import("../logic/effects/skybound.js").then(
             ({ incrementSkyboundArt }) => {
-              for (let i = 0; i < delta; i++) {
-                incrementSkyboundArt("first");
-              }
-              render();
+              doAction(
+                "God Mode: Set Evo Count",
+                () => {
+                  state.players.first.evoCount = val;
+                  for (let i = 0; i < delta; i++) {
+                    incrementSkyboundArt("first");
+                  }
+                },
+                {},
+                { autoRender: true },
+              );
             },
           );
         } else {
-          render();
+          doAction(
+            "God Mode: Set Evo Count",
+            () => {
+              state.players.first.evoCount = val;
+            },
+            {},
+            { autoRender: true },
+          );
         }
       }
     }
@@ -164,8 +225,14 @@ window.addEventListener("DOMContentLoaded", () => {
     if (inp) {
       const val = parseInt(inp.value, 10);
       if (Number.isFinite(val)) {
-        state.players.first.playsThisTurn = val;
-        render();
+        doAction(
+          "God Mode: Set Combo",
+          () => {
+            state.players.first.playsThisTurn = val;
+          },
+          {},
+          { autoRender: true },
+        );
       }
     }
   });
@@ -175,8 +242,14 @@ window.addEventListener("DOMContentLoaded", () => {
     if (inp) {
       const val = parseInt(inp.value, 10);
       if (Number.isFinite(val) && val >= 0) {
-        state.players.first.shadows = val;
-        render();
+        doAction(
+          "God Mode: Set Shadows",
+          () => {
+            state.players.first.shadows = val;
+          },
+          {},
+          { autoRender: true },
+        );
       }
     }
   });
