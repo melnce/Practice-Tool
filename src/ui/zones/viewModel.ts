@@ -241,6 +241,7 @@ export function createCardViewModel(
         ? Number(card.countdown)
         : null,
     icarusBuff: card.__icarusBuff,
+    implementationStatus: card.implementationStatus,
     canAttack,
     isRush,
     canEngage,

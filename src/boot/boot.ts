@@ -18,6 +18,8 @@ import { state } from "../core/gameState.js";
 import { doAction, undo, redo } from "../core/history.js";
 import type { DeckManifest, DeckManifestEntry } from "../data/deckManifest.js";
 import { initTestBridgeIfRequested } from "../ui/qa/testBridge.js";
+import { reportDeckCoverage } from "../ui/coverageBanner.js";
+import { getDeck, getHand } from "../core/playerHelpers.js";
 
 // Expose globals for UI onclick handlers
 window.endTurnBlue = endTurnBlue;
@@ -68,6 +70,11 @@ window.addEventListener("DOMContentLoaded", () => {
       void import("../core/positionStore.js").then(({ setSessionDeckIds }) => {
         setSessionDeckIds(deckAId, deckBId);
       });
+      // Honest coverage signal once both decks are loaded
+      reportDeckCoverage(
+        [...getDeck(state, "first"), ...getHand(state, "first")],
+        [...getDeck(state, "second"), ...getHand(state, "second")],
+      );
     } catch (err) {
       console.error("[Start Game] Failed to start:", err);
     }

@@ -83,6 +83,11 @@ export interface CardTemplate {
    */
   evolve_trigger_always?: boolean;
   lastWordsEffects?: Effect[];
+  /**
+   * Derived at index build from description + ops (not stored in set JSON).
+   * See src/data/cardImplementationStatus.ts.
+   */
+  implementationStatus?: "implemented" | "partial" | "unimplemented";
   // Buff tracking
   buffs?:
     | {

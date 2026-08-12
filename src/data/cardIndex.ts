@@ -17,6 +17,7 @@ import {
   hasInherentLastWords,
   hasInherentCountdown,
 } from "./keywords.js";
+import { getImplementationStatus } from "./cardImplementationStatus.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -92,6 +93,9 @@ export function processCard(raw: RawCardData): CardTemplate | null {
       }
     }
   }
+
+  // Derived — never trust a hand-maintained flag on disk.
+  card.implementationStatus = getImplementationStatus(card as RawCardData);
 
   // JSON stores cost/attack/defense as strings; coerce once at index build.
   if (card.cost !== undefined) card.cost = toNumber(card.cost);

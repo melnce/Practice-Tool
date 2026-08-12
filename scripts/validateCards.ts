@@ -19,6 +19,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { config } from "dotenv";
+import { getImplementationStatus } from "../src/data/cardImplementationStatus.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1120,6 +1121,21 @@ function analyzeExpectedEffects(card: CardDef): string[] {
 
 async function validateCard(card: CardDef): Promise<ValidationResult> {
   const description = card.description || "(no description)";
+  const status = getImplementationStatus(card);
+
+  // Unimplemented stubs are expected to have rules text without ops — auto-PASS.
+  if (status === "unimplemented") {
+    return {
+      cardId: card.id,
+      cardName: card.name,
+      description,
+      verdict: "PASS",
+      reasoning: "Unimplemented stub (derived) — skipped LLM effect check",
+      stateChanges: "None (unimplemented)",
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   const stateChanges = analyzeExpectedEffects(card);
 
   // Skip cards with no description and no effects

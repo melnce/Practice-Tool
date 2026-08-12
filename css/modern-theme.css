@@ -532,6 +532,56 @@ body.gameover .leader {
   transform: translateX(-50%) translateY(0);
 }
 
+#coverageBanner {
+  position: fixed;
+  left: 50%;
+  top: 12px;
+  transform: translateX(-50%) translateY(-6px);
+  z-index: 3600;
+  max-width: min(640px, 92vw);
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(72, 28, 12, 0.94);
+  border: 1px solid rgba(255, 170, 90, 0.45);
+  color: #ffe7d1;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+#coverageBanner.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.card.card-unimplemented {
+  outline: 2px solid rgba(255, 140, 60, 0.85);
+  outline-offset: 1px;
+}
+
+.unimplemented-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 4;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(40, 16, 8, 0.92);
+  color: #ffb070;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  pointer-events: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
 #gameOverOverlay {
   position: fixed;
   inset: 0;
