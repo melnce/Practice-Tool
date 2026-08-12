@@ -179,7 +179,7 @@ export function clearScript(): void {
 export function startRecording(opts: {
   name: string;
   scriptedSide: Player;
-  seed?: number;
+  seed?: number | string;
   deckAId?: string;
   deckBId?: string;
 }): void {

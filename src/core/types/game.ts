@@ -3,12 +3,21 @@
 // =============================================================================
 
 import type { RNG } from "../rng.js";
+import type { SeedLiteral } from "../seed.js";
 import type { PlayerSlot, PlayerState, Player } from "./player.js";
 import type { CardInstance } from "./cards.js";
 import type { Effect } from "./effects.js";
 
 export interface GameState {
   rng: RNG;
+
+  /**
+   * Literal seed the user supplied (or that was generated) for this match.
+   * Distinct from `rng.seed`, which is the `>>> 0` uint32 the PRNG uses.
+   * Digit-only strings are normalised to numbers at the start boundary so
+   * `"12345"` and `12345` are the same game.
+   */
+  seed: SeedLiteral;
 
   // === PLAYER DATA (nested) ===
   players: {
@@ -95,5 +104,6 @@ export interface GameState {
 export interface StartGameOptions {
   deckAId: string;
   deckBId: string;
-  seed?: number | undefined;
+  /** Accepted as number | string; normalised once inside startGame / reset. */
+  seed?: SeedLiteral | undefined;
 }

@@ -135,10 +135,13 @@ function notifyCheckpoint(): void {
 
 function buildMeta(extra?: Partial<PositionMeta>): PositionMeta {
   const rngSnap = state.rng.snapshot();
+  // Prefer literal match seed for display/metadata; fall back to rng uint32
+  const literalSeed =
+    typeof state.seed === "number" ? state.seed : rngSnap.seed;
   const meta: PositionMeta = {
     turnNumber: extra?.turnNumber ?? state.turnNumber ?? 0,
     roundCount: extra?.roundCount ?? state.roundCount ?? 1,
-    seed: extra?.seed ?? rngSnap.seed,
+    seed: extra?.seed ?? literalSeed,
     activePlayer: extra?.activePlayer ?? state.activePlayer,
     phase: extra?.phase !== undefined ? extra.phase : (state.phase ?? null),
   };

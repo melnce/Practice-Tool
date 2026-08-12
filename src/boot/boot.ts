@@ -23,6 +23,9 @@ import {
   bonusPpAction,
   maybeAdvanceScriptFromUi,
 } from "../ui/playerDispatch.js";
+import { parseSeedInput } from "../core/seed.js";
+import { readShareParams, writeShareParams } from "./shareUrl.js";
+import { wireSeedCopyControl, syncSeedDisplay } from "../ui/seedDisplay.js";
 
 // Expose globals for UI onclick handlers — routed through PlayerAction dispatch
 window.endTurnBlue = () => {
@@ -48,6 +51,7 @@ injectAdapter({
 
 window.addEventListener("DOMContentLoaded", () => {
   void initTestBridgeIfRequested();
+  wireSeedCopyControl();
 
   wireClick("startGameBtn", async () => {
     const blueSelect = document.getElementById(
@@ -63,13 +67,10 @@ window.addEventListener("DOMContentLoaded", () => {
     const deckBId = redSelect?.value || "starter_deck";
 
     // Empty seed → generate one so games stay reproducible once surfaced to the user
-    let seed: number;
-    if (
-      seedInput &&
-      seedInput.value.trim() !== "" &&
-      !Number.isNaN(Number(seedInput.value))
-    ) {
-      seed = Number(seedInput.value);
+    let seed: number | string;
+    const parsed = seedInput ? parseSeedInput(seedInput.value) : null;
+    if (parsed !== null) {
+      seed = parsed;
     } else {
       seed = Date.now();
       if (seedInput) seedInput.value = String(seed);
@@ -78,6 +79,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
     try {
       await engine.startNewGame({ deckAId, deckBId, seed });
+      // Address bar is the share + reload persistence format
+      writeShareParams({ seed: state.seed, deckAId, deckBId });
+      if (seedInput) seedInput.value = String(state.seed);
+      syncSeedDisplay();
       void import("../core/positionStore.js").then(({ setSessionDeckIds }) => {
         setSessionDeckIds(deckAId, deckBId);
       });
@@ -396,6 +401,30 @@ async function populateDeckSelects() {
 
   populateSelectFromManifest(blue, entries);
   populateSelectFromManifest(red, entries);
+
+  // Prefill from ?seed=&a=&b= (URL is the reload/share persistence)
+  applyShareParamsFromUrl(blue as HTMLSelectElement, red as HTMLSelectElement);
+}
+
+function applyShareParamsFromUrl(
+  blue: HTMLSelectElement,
+  red: HTMLSelectElement,
+): void {
+  const share = readShareParams();
+  const seedInput = document.getElementById(
+    "seedInput",
+  ) as HTMLInputElement | null;
+  if (share.seed !== undefined && seedInput) {
+    seedInput.value = String(share.seed);
+  }
+  if (share.deckAId) {
+    const opt = [...blue.options].find((o) => o.value === share.deckAId);
+    if (opt) blue.value = share.deckAId;
+  }
+  if (share.deckBId) {
+    const opt = [...red.options].find((o) => o.value === share.deckBId);
+    if (opt) red.value = share.deckBId;
+  }
 }
 
 window.addEventListener("DOMContentLoaded", populateDeckSelects);

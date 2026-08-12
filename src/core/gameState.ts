@@ -1,6 +1,7 @@
 import type { GameState, PlayerSlot } from "./types/index.js";
 import { createPlayerState } from "./playerState.js";
-import { createRng } from "./rng.js";
+import { createRng, normalizeSeed } from "./rng.js";
+import type { SeedLiteral } from "./seed.js";
 // NOTE: Trigger caches stored on state._triggerCache (auto-reset when state is reset)
 
 // -- 1. Canonical Defaults (Single Source of Truth) --
@@ -31,6 +32,7 @@ const DEFAULTS = {
  */
 const KNOWN_ROOT_KEYS = new Set<string>([
   "rng",
+  "seed",
   "players",
   ...Object.keys(DEFAULTS),
   "lastSummoned",
@@ -66,10 +68,12 @@ export function createInitialState(seed: number | string): GameState {
     throw new Error("createInitialState requires a seed for determinism");
   }
 
-  const rng = createRng(seed);
+  const literal: SeedLiteral = normalizeSeed(seed);
+  const rng = createRng(literal);
 
   return {
     rng,
+    seed: literal,
     ...DEFAULTS,
 
     // Players (nested)
@@ -118,8 +122,10 @@ export function resetStateInstance(
   target.lastSummoned = [];
   target.lastDrawnCards = [];
 
-  // D) Reset RNG
-  target.rng = createRng(seed);
+  // D) Reset RNG + literal user-facing seed (survives KNOWN_ROOT_KEYS scrub)
+  const literal: SeedLiteral = normalizeSeed(seed);
+  target.rng = createRng(literal);
+  target.seed = literal;
 
   // E) Reset meta counters for determinism
   (target as any).actionSeq = 0;
@@ -161,7 +167,8 @@ export function resetStateInstance(
   // Log (lazy import to avoid circular dependency with logger.ts)
   void import("./logger.js").then(({ logEvent }) => {
     logEvent("resetStateInstance", {
-      seed: seed,
+      seed: literal,
+      rngSeed: target.rng.seed,
       debugId: target.__debugId,
     });
   });
