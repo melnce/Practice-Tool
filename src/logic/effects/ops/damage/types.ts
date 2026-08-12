@@ -67,7 +67,8 @@ export type DamageAmountSource =
   | "selected_defense"
   | "golem_count"
   | "crest_count"
-  | "other_allies";
+  | "other_allies"
+  | "ally_matches"; // Count allied board cards matching `filter` / condition fields
 
 /**
  * Canonical unified damage effect spec.
@@ -111,6 +112,8 @@ export interface UnifiedDamageSpec {
 
   // Standard fields
   condition?: any;
+  /** Card filter for amount_source: "ally_matches" (and similar count sources) */
+  filter?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -215,6 +218,9 @@ export function normalizeToUnifiedSpec(
   }
   if (eff.amount_source) {
     spec.amount_source = eff.amount_source as DamageAmountSource;
+  }
+  if ((eff as any).filter && typeof (eff as any).filter === "object") {
+    spec.filter = (eff as any).filter as Record<string, unknown>;
   }
   if (eff.count !== undefined) {
     spec.count = parseInt(String(eff.count), 10) || 1;

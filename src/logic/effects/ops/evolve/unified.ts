@@ -157,6 +157,24 @@ function buildSelectionPool(
           Array.isArray(c.tribes) && c.tribes.includes(spec.filter!.tribe!),
       );
     }
+    if (
+      spec.filter.base_cost_eq != null ||
+      spec.filter.base_cost_gte != null ||
+      spec.filter.base_cost_lte != null
+    ) {
+      const costCond: {
+        base_cost_eq?: number;
+        base_cost_gte?: number;
+        base_cost_lte?: number;
+      } = {};
+      if (spec.filter.base_cost_eq != null)
+        costCond.base_cost_eq = spec.filter.base_cost_eq;
+      if (spec.filter.base_cost_gte != null)
+        costCond.base_cost_gte = spec.filter.base_cost_gte;
+      if (spec.filter.base_cost_lte != null)
+        costCond.base_cost_lte = spec.filter.base_cost_lte;
+      pool = pool.filter((c) => evaluateCardCondition(c, costCond));
+    }
   }
 
   return pool;
@@ -191,6 +209,19 @@ function resolveTargets(
       return (state.lastSummoned || []).filter(
         (c) => c.zone === "board" && c.type === "Follower" && !c.hasEvolved,
       );
+
+    case "entering_follower": {
+      const entering = context?.enteringCard as CardInstance | undefined;
+      if (
+        entering &&
+        entering.type === "Follower" &&
+        entering.zone === "board" &&
+        !entering.hasEvolved
+      ) {
+        return [entering];
+      }
+      return [];
+    }
 
     case "all_allies": {
       const board = getBoard(state, owner);

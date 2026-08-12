@@ -8,6 +8,7 @@ import {
   handleGainCrest,
   crestAddCounter,
   crestSpendCounter,
+  crestAppendTriggers,
   destroyCrest,
 } from "../../crest.js";
 import { runEffects } from "../../../core/effects/index.js";
@@ -45,6 +46,14 @@ export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
       const ok = crestSpendCounter(ctx.owner, name, counter, amount);
       if (ok && Array.isArray((eff as any).on_success_effects)) {
         runEffects((eff as any).on_success_effects, ctx.owner, null);
+      }
+      break;
+    }
+    case "append_triggers": {
+      const triggers =
+        (eff as any).triggers ?? (eff as any).append_triggers ?? [];
+      if (Array.isArray(triggers) && triggers.length) {
+        crestAppendTriggers(ctx.owner, name, triggers);
       }
       break;
     }

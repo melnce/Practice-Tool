@@ -157,11 +157,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10611110_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10611110-motherly-forestdweller",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Springbloom Fairy",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Springbloom Fairy",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10611120",
@@ -215,7 +228,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 4
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Springbloom Fairy",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10612110",
@@ -236,7 +261,13 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Springbloom Fairy",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10612120",
@@ -277,8 +308,27 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "event": "ally_evolve",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "reduce",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "draw",
+        "count": 2,
+        "source": "deck"
+      }
+    ]
   },
   {
     "id": "10613110",
@@ -298,8 +348,28 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_evolve",
+        "source": "board",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Springbloom Fairy",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10613310",
@@ -320,7 +390,36 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Destroy a random enemy follower with the highest attack",
+            "effects": [
+              {
+                "op": "destroy",
+                "distribution": "highest",
+                "stat": "attack",
+                "target": "enemy:follower",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Summon a Springbloom Fairy",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Springbloom Fairy",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10614110",
@@ -338,10 +437,30 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10614110-althenia-nurturing-bloom",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected:follower"
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Springbloom Fairy",
+        "count": 3
+      }
+    ],
+    "attacks_per_turn": 2
   },
   {
     "id": "10614120",
@@ -362,7 +481,44 @@
     "superevolve": [],
     "keywords": ["Drain"],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "crest",
+        "action": "pay_counter",
+        "crest": "Faith: Sathanid, Eld Lance",
+        "counter": "faith",
+        "amount": 10,
+        "on_success_effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Depths of the Eld Lance",
+            "count": 1
+          },
+          {
+            "op": "crest",
+            "action": "append_triggers",
+            "crest": "Faith: Sathanid, Eld Lance",
+            "triggers": [
+              {
+                "event": "ally_evolve",
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:follower",
+                    "amount": 1
+                  },
+                  {
+                    "op": "damage",
+                    "target": "enemy:leader",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 4,
@@ -789,11 +945,46 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10624120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10624120-yidmetra-eld-sword",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "pay_counter",
+        "crest": "Faith: Yidmetra, Eld Sword",
+        "counter": "faith",
+        "amount": 5,
+        "on_success_effects": [
+          {
+            "op": "crest",
+            "action": "append_triggers",
+            "crest": "Faith: Yidmetra, Eld Sword",
+            "triggers": [
+              {
+                "event": "enhanced_play",
+                "effects": [
+                  {
+                    "op": "stat",
+                    "action": "give",
+                    "target": "ally:follower",
+                    "attack": 1,
+                    "defense": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Depths of the Eld Sword",
+        "count": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 4,
@@ -1197,11 +1388,41 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10634120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10634120-calge-danthla-eld-crystals",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Depths of the Eld Crystals",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "hand",
+        "condition": {
+          "name": "Crystalspawn"
+        },
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "reduce",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Crystalspawn",
+        "count": 2,
+        "keywords": ["Storm"]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 4,
@@ -1525,11 +1746,32 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10644120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10644120-vorlalai-eld-blades",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Depths of the Eld Blades",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Depths of the Eld Blades",
+        "count": 3
+      }
+    ],
     "keywords": ["Bane"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [],
+    "on_discard": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Vorlalai, Eld Blades",
+        "count": 1
+      }
+    ],
+    "superEvolveReplaces": true
   },
   {
     "id": "10651110",
@@ -1886,11 +2128,30 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10654120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10654120-bibatii-eld-sight",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Depths of the Eld Sight",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "necromancy",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
+    "evolve_trigger_always": true
   },
   {
     "id": "10661110",
@@ -2297,11 +2558,41 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10664120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10664120-lyanthoth-eld-tome",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "pay_counter",
+        "crest": "Faith: Lyanthoth, Eld Tome",
+        "counter": "faith",
+        "amount": 10,
+        "on_success_effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Depths of the Eld Tome",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "any:any",
+        "select": 3,
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 4,
@@ -2408,7 +2699,32 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "selected:follower",
+            "amount": 4
+          },
+          {
+            "op": "gate",
+            "condition": "ally_matches",
+            "base_cost_gte": 5,
+            "effects": [
+              {
+                "op": "draw",
+                "count": 1,
+                "source": "deck"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10672110",
@@ -2645,8 +2961,43 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "hand",
+        "condition": {
+          "base_cost_gte": 5
+        },
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "modify",
+            "target": "self",
+            "amount": -1,
+            "until_eot": true
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "evolve",
+        "target": "ally:follower",
+        "select": 1,
+        "select_mode": "random",
+        "filter": {
+          "unevolved": true,
+          "base_cost_gte": 5
+        }
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6,
+        "count": 1,
+        "distribution": "random_hits"
+      }
+    ]
   },
   {
     "id": "10674110",
@@ -2664,10 +3015,47 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10674110-camiscilla-unfeeling-heart",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount_source": "ally_matches",
+        "filter": {
+          "base_cost_gte": 5
+        }
+      }
+    ],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "base_cost_gte": 5,
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Shoddy Plaything",
+        "count": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Substandard Puppet",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10674120",
@@ -2688,6 +3076,19 @@
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "ally_matches",
+        "base_cost_gte": 5,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Depths of the Eld Axe",
+            "count": 1
+          }
+        ]
+      }
+    ]
   }
 ]

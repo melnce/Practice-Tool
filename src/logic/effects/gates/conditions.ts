@@ -18,6 +18,10 @@ import {
   getRally,
   getAnyAllyAttackedThisTurn,
 } from "../../../core/playerHelpers.js";
+import {
+  evaluateCardCondition,
+  type CardCondition,
+} from "../../core/conditions/evaluator.js";
 
 // =============================================================================
 // CONDITION EVALUATOR TYPE
@@ -181,6 +185,18 @@ registerCondition("board_name", (spec, owner) => {
   if (!want) return false;
   const myBoard = getBoard(state, owner);
   return (myBoard || []).some((c) => String(c?.name) === want);
+});
+
+registerCondition("ally_matches", (spec, owner) => {
+  const board = getBoard(state, owner) || [];
+  const filter: CardCondition = {};
+  if (spec.type) filter.type = spec.type;
+  else filter.type = "Follower";
+  if (spec.base_cost_eq != null) filter.base_cost_eq = spec.base_cost_eq;
+  if (spec.base_cost_gte != null) filter.base_cost_gte = spec.base_cost_gte;
+  if (spec.base_cost_lte != null) filter.base_cost_lte = spec.base_cost_lte;
+  if (spec.name) filter.name = spec.name;
+  return board.some((c) => evaluateCardCondition(c, filter));
 });
 
 registerCondition("self_cost", (spec, _owner, sourceCard) => {

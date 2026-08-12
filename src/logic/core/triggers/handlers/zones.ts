@@ -13,6 +13,7 @@ export function handleRestrictedZoneEvent(
     predicate: (trigger, cand) => {
       if (event === "ally_super_evolve") return cand.owner === activePlayer;
       if (event === "enemy_super_evolve") return cand.owner !== activePlayer;
+      if (event === "ally_evolve") return cand.owner === activePlayer;
       if (event === "engage") return cand.owner === activePlayer;
 
       const enteringCard = context.enteringCard ?? context.invokedCard ?? null;
@@ -21,7 +22,13 @@ export function handleRestrictedZoneEvent(
       if (event === "ally_follower_enter") {
         if (!enteringCard) return false;
         if (cand.owner !== enteringOwner) return false;
-        if (cand.source !== "board" && cand.source !== "crest") return false;
+        // Hand "activates in hand" cards (Calge, Unfeeling Eld Axe, …) listen too.
+        if (
+          cand.source !== "board" &&
+          cand.source !== "crest" &&
+          cand.source !== "hand"
+        )
+          return false;
         return true;
       }
 

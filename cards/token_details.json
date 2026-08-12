@@ -127,6 +127,67 @@
     "triggers": []
   },
   {
+    "id": "90004320",
+    "name": "Great Testimony",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an enemy follower on the field and destroy it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004320-great-testimony",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90004330",
+    "name": "Sweetness of Voracity",
+    "cost": "5",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Neutral",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Deal 5 damage to a random enemy follower and the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90004330-sweetness-of-voracity",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 5,
+        "distribution": "random_hits",
+        "count": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 5
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
     "id": "90011110",
     "name": "Fairy",
     "cost": "1",
@@ -145,6 +206,37 @@
     "evolve": [],
     "superevolve": [],
     "triggers": []
+  },
+  {
+    "id": "90011120",
+    "name": "Springbloom Fairy",
+    "cost": "2",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Bronze",
+    "tribes": ["Pixie"],
+    "description": "Ward\nAt the end of your turn, evolve this follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90011120.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90011120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90011120-springbloom-fairy",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Ward"],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "90011310",
@@ -205,6 +297,99 @@
     "triggers": []
   },
   {
+    "id": "90014320",
+    "name": "Annihilating Onslaught",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Activates in hand. At the end of your turn, reduce the cost of this card by 1.\nDeal 6 damage to the enemy leader. If there's an allied Izudia, Annihilation Manifest on the field, deal 20 damage instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90014320.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10314120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90014320-annihilating-onslaught",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "gate",
+        "condition": "board_name",
+        "name": "Izudia, Annihilation Manifest",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 20
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 6
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "hand",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "cost",
+            "target": "self",
+            "mode": "reduce",
+            "amount": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "90014330",
+    "name": "Depths of the Eld Lance",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": ["Encroacher"],
+    "description": "Select an unevolved allied follower on the field and evolve it.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90014330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90014330-depths-of-the-eld-lance",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": 1,
+        "condition": {
+          "unevolved": true
+        },
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "selected:follower"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "90021110",
     "name": "Knight",
     "cost": "0",
@@ -242,6 +427,148 @@
     "keywords": [],
     "evolve": [],
     "superevolve": [],
+    "triggers": []
+  },
+  {
+    "id": "90021310",
+    "name": "Gilded Blade",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": ["Loot"],
+    "description": "Select an enemy follower on the field or the enemy leader and deal it 1 damage.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021310-gilded-blade",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 1,
+        "select": 1,
+        "can_target_leader": true,
+        "fallback_leader": true
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90021320",
+    "name": "Gilded Goblet",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": ["Loot"],
+    "description": "Restore 2 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021320-gilded-goblet",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 2
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90021330",
+    "name": "Gilded Boots",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": ["Loot"],
+    "description": "Select an allied follower on the field and give it +1/+0 and Rush.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021330-gilded-boots",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "selected",
+            "attack": 1,
+            "defense": 0
+          },
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "selected",
+            "keywords": ["Rush"]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90021340",
+    "name": "Gilded Necklace",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": ["Loot"],
+    "description": "Select an allied follower on the field and give it +0/+1 and Ward.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021340.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021340-gilded-necklace",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "selected",
+            "attack": 0,
+            "defense": 1
+          },
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "selected",
+            "keywords": ["Ward"]
+          }
+        ]
+      }
+    ],
+    "keywords": [],
     "triggers": []
   },
   {
@@ -285,6 +612,88 @@
     "evolve": [],
     "superevolve": [],
     "triggers": []
+  },
+  {
+    "id": "90024310",
+    "name": "Remnant of Hollowness",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Deal 4 damage split between all enemies.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90024310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90024310-remnant-of-hollowness",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "all:enemy",
+        "amount": 4,
+        "distribution": "split_sequential",
+        "spill_to_leader": true
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90024320",
+    "name": "Depths of the Eld Sword",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": ["Encroacher"],
+    "description": "Select an enemy follower on the field and deal it 1 damage.\nEnhance (1): Deal 3 damage instead.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90024320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90024320-depths-of-the-eld-sword",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "select",
+            "target": "enemy:follower",
+            "select": 1,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "selected:follower",
+                "amount": 3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "selected:follower",
+            "amount": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "90031110",
@@ -602,6 +1011,110 @@
     "superevolve": []
   },
   {
+    "id": "90034310",
+    "name": "Ersatz Elimination",
+    "cost": "4",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Increase the cost of all followers in your hand by 1. Destroy all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034310-ersatz-elimination",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "cost",
+        "mode": "modify",
+        "target": "ally:hand",
+        "amount": 1,
+        "condition": {
+          "type": "Follower"
+        }
+      },
+      {
+        "op": "destroy",
+        "distribution": "all",
+        "target": "enemy:follower"
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90034320",
+    "name": "Ars Magna",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an enemy and deal it 2 damage. Restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034320-ars-magna",
+    "spell": [
+      {
+        "op": "select",
+        "target": "enemy:any",
+        "count": 1,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "selected",
+            "amount": 2
+          },
+          {
+            "op": "restore",
+            "target": "leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90034330",
+    "name": "Depths of the Eld Crystals",
+    "cost": "6",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": ["Encroacher"],
+    "description": "Summon a Crystalspawn and give it +X/+X. Restore Y defense to your leader. Deal Z damage to the enemy leader. X, Y, and Z are determined randomly and add up to your faith's value.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034330-depths-of-the-eld-crystals",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 4,
+        "cost": 0,
+        "skill_text": "This faith's value starts at 0.\n<hr>Whenever an allied <b><i><color=Keyword>Crystalspawn</color></i></b> enters the field, increase this faith's value by 1.",
+        "name": "Faith"
+      }
+    ]
+  },
+  {
     "id": "90041110",
     "name": "Fire Drake Whelp",
     "cost": "1",
@@ -772,6 +1285,79 @@
     "evolve": [],
     "superevolve": [],
     "triggers": []
+  },
+  {
+    "id": "90044320",
+    "name": "Fangs of Ardent Destruction",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Deal 1 damage to all followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90044320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90044320-fangs-of-ardent-destruction",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "all:follower",
+        "amount": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90044330",
+    "name": "Depths of the Eld Blades",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Dragoncraft",
+    "rarity": "Legendary",
+    "tribes": ["Encroacher"],
+    "description": "When this card is discarded, deal 1 damage to the enemy leader and restore 1 defense to your leader.\nDeal 1 damage to the enemy leader. Restore 1 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90044330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90044330-depths-of-the-eld-blades",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 1
+      },
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 1
+      }
+    ],
+    "on_discard": [
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 1
+      },
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 1
+      }
+    ]
   },
   {
     "id": "90051110",
@@ -990,6 +1576,93 @@
     "triggers": []
   },
   {
+    "id": "90054310",
+    "name": "Scream Diffusion",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Summon 2 copies of Rulenye & Valnareik and give them Rush.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054310.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054310-scream-diffusion",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Rulenye & Valnareik",
+        "count": 2,
+        "keywords": ["Rush"]
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90054320",
+    "name": "Wings of Desire",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an allied Rulenye & Valnareik on the field and give it Storm.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054320.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054320-wings-of-desire",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "keyword",
+        "action": "grant",
+        "target": "ally:follower",
+        "condition": {
+          "name": "Rulenye & Valnareik"
+        },
+        "keywords": ["storm"],
+        "select": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90054330",
+    "name": "Depths of the Eld Sight",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Abysscraft",
+    "rarity": "Legendary",
+    "tribes": ["Encroacher"],
+    "description": "Draw 2 cards.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90054330-depths-of-the-eld-sight",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "draw",
+        "count": 2
+      }
+    ]
+  },
+  {
     "id": "90061110",
     "name": "Holy Falcon",
     "cost": "3",
@@ -1068,6 +1741,72 @@
     "evolve": [],
     "superevolve": [],
     "triggers": []
+  },
+  {
+    "id": "90064310",
+    "name": "Torrent of Despair",
+    "cost": "2",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Banish a random enemy follower from the field. Delay the counts of all your crests by 1.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90064310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90064310-torrent-of-despair",
+    "evolve": [],
+    "superevolve": [],
+    "spell": [
+      {
+        "op": "banish",
+        "distribution": "random",
+        "target": "enemy:follower",
+        "count": 1
+      },
+      {
+        "op": "crest",
+        "action": "delay",
+        "amount": 1
+      }
+    ],
+    "keywords": [],
+    "triggers": []
+  },
+  {
+    "id": "90064320",
+    "name": "Depths of the Eld Tome",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": ["Encroacher"],
+    "description": "Select a card on the field and destroy it. If you selected an allied amulet, deal 2 damage to the enemy leader and add a Depths of the Eld Tome to your hand.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90064320.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90064320-depths-of-the-eld-tome",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "any:any",
+        "select": 1,
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "90071110",
@@ -1534,452 +2273,6 @@
     "superevolve": []
   },
   {
-    "id": "90004320",
-    "name": "Great Testimony",
-    "cost": "1",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Neutral",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Select an enemy follower on the field and destroy it.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004320.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90004320-great-testimony",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "destroy",
-        "target": "enemy:follower",
-        "select": 1
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90004330",
-    "name": "Sweetness of Voracity",
-    "cost": "5",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Neutral",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Deal 5 damage to a random enemy follower and the enemy leader.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90004330.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90004330-sweetness-of-voracity",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 5,
-        "distribution": "random_hits",
-        "count": 1
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
-        "amount": 5
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90014320",
-    "name": "Annihilating Onslaught",
-    "cost": "6",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Forestcraft",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Activates in hand. At the end of your turn, reduce the cost of this card by 1.\nDeal 6 damage to the enemy leader. If there's an allied Izudia, Annihilation Manifest on the field, deal 20 damage instead.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90014320.webp",
-    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10314120_evo.webp",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90014320-annihilating-onslaught",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "gate",
-        "condition": "board_name",
-        "name": "Izudia, Annihilation Manifest",
-        "effects": [
-          {
-            "op": "damage",
-            "target": "enemy:leader",
-            "amount": 20
-          }
-        ],
-        "else_effects": [
-          {
-            "op": "damage",
-            "target": "enemy:leader",
-            "amount": 6
-          }
-        ]
-      }
-    ],
-    "keywords": [],
-    "triggers": [
-      {
-        "event": "end_of_turn",
-        "source": "hand",
-        "condition": {
-          "whose_turn": "owner"
-        },
-        "effects": [
-          {
-            "op": "cost",
-            "target": "self",
-            "mode": "reduce",
-            "amount": 1
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "90021310",
-    "name": "Gilded Blade",
-    "cost": "1",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Swordcraft",
-    "rarity": "Bronze",
-    "tribes": ["Loot"],
-    "description": "Select an enemy follower on the field or the enemy leader and deal it 1 damage.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021310.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90021310-gilded-blade",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 1,
-        "select": 1,
-        "can_target_leader": true,
-        "fallback_leader": true
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90021320",
-    "name": "Gilded Goblet",
-    "cost": "1",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Swordcraft",
-    "rarity": "Bronze",
-    "tribes": ["Loot"],
-    "description": "Restore 2 defense to your leader.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021320.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90021320-gilded-goblet",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "restore",
-        "target": "leader",
-        "player": "self",
-        "amount": 2
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90021330",
-    "name": "Gilded Boots",
-    "cost": "1",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Swordcraft",
-    "rarity": "Bronze",
-    "tribes": ["Loot"],
-    "description": "Select an allied follower on the field and give it +1/+0 and Rush.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021330.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90021330-gilded-boots",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "select",
-        "target": "ally:follower",
-        "select": 1,
-        "effects": [
-          {
-            "op": "stat",
-            "action": "give",
-            "target": "selected",
-            "attack": 1,
-            "defense": 0
-          },
-          {
-            "op": "keyword",
-            "action": "grant",
-            "target": "selected",
-            "keywords": ["Rush"]
-          }
-        ]
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90021340",
-    "name": "Gilded Necklace",
-    "cost": "1",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Swordcraft",
-    "rarity": "Bronze",
-    "tribes": ["Loot"],
-    "description": "Select an allied follower on the field and give it +0/+1 and Ward.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021340.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90021340-gilded-necklace",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "select",
-        "target": "ally:follower",
-        "select": 1,
-        "effects": [
-          {
-            "op": "stat",
-            "action": "give",
-            "target": "selected",
-            "attack": 0,
-            "defense": 1
-          },
-          {
-            "op": "keyword",
-            "action": "grant",
-            "target": "selected",
-            "keywords": ["Ward"]
-          }
-        ]
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90024310",
-    "name": "Remnant of Hollowness",
-    "cost": "1",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Swordcraft",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Deal 4 damage split between all enemies.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90024310.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90024310-remnant-of-hollowness",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "damage",
-        "target": "all:enemy",
-        "amount": 4,
-        "distribution": "split_sequential",
-        "spill_to_leader": true
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90034310",
-    "name": "Ersatz Elimination",
-    "cost": "4",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Runecraft",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Increase the cost of all followers in your hand by 1. Destroy all enemy followers.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034310.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90034310-ersatz-elimination",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "cost",
-        "mode": "modify",
-        "target": "ally:hand",
-        "amount": 1,
-        "condition": {
-          "type": "Follower"
-        }
-      },
-      {
-        "op": "destroy",
-        "distribution": "all",
-        "target": "enemy:follower"
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90044320",
-    "name": "Fangs of Ardent Destruction",
-    "cost": "0",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Dragoncraft",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Deal 1 damage to all followers.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90044320.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90044320-fangs-of-ardent-destruction",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "damage",
-        "target": "all:follower",
-        "amount": 1
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90054310",
-    "name": "Scream Diffusion",
-    "cost": "0",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Abysscraft",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Summon 2 copies of Rulenye & Valnareik and give them Rush.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054310.webp",
-    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90054310-scream-diffusion",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "summon",
-        "source": "named",
-        "name": "Rulenye & Valnareik",
-        "count": 2,
-        "keywords": ["Rush"]
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90054320",
-    "name": "Wings of Desire",
-    "cost": "0",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Abysscraft",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Select an allied Rulenye & Valnareik on the field and give it Storm.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90054320.webp",
-    "evo_image": "https://static.dotgg.gg/shadowverse/cards/10354120_evo.webp",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90054320-wings-of-desire",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "keyword",
-        "action": "grant",
-        "target": "ally:follower",
-        "condition": {
-          "name": "Rulenye & Valnareik"
-        },
-        "keywords": ["storm"],
-        "select": 1
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
-    "id": "90064310",
-    "name": "Torrent of Despair",
-    "cost": "2",
-    "attack": "0",
-    "defense": "0",
-    "type": "Spell",
-    "class": "Havencraft",
-    "rarity": "Legendary",
-    "tribes": [],
-    "description": "Banish a random enemy follower from the field. Delay the counts of all your crests by 1.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90064310.webp",
-    "evo_image": "",
-    "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90064310-torrent-of-despair",
-    "evolve": [],
-    "superevolve": [],
-    "spell": [
-      {
-        "op": "banish",
-        "distribution": "random",
-        "target": "enemy:follower",
-        "count": 1
-      },
-      {
-        "op": "crest",
-        "action": "delay",
-        "amount": 1
-      }
-    ],
-    "keywords": [],
-    "triggers": []
-  },
-  {
     "id": "90074210",
     "name": "White Psalm, New Revelation",
     "cost": "3",
@@ -2096,42 +2389,42 @@
     "triggers": []
   },
   {
-    "id": "90034320",
-    "name": "Ars Magna",
-    "cost": "1",
+    "id": "90074320",
+    "name": "Depths of the Eld Axe",
+    "cost": "0",
     "attack": "0",
     "defense": "0",
     "type": "Spell",
-    "class": "Runecraft",
+    "class": "Portalcraft",
     "rarity": "Legendary",
-    "tribes": [],
-    "description": "Select an enemy and deal it 2 damage. Restore 1 defense to your leader.",
-    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034320.webp",
+    "tribes": ["Encroacher"],
+    "description": "Select an allied follower on the field with a base cost of 5 or more, add a copy of it to your hand without revealing it, and reduce the cost of the copy by 3.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074320.webp",
     "evo_image": "",
     "set": "[90000] Basic A",
-    "url": "https://shadowverse.gg/cards/90034320-ars-magna",
-    "spell": [
-      {
-        "op": "select",
-        "target": "enemy:any",
-        "count": 1,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected",
-            "amount": 2
-          },
-          {
-            "op": "restore",
-            "target": "leader",
-            "amount": 1
-          }
-        ]
-      }
-    ],
+    "url": "https://shadowverse.gg/cards/90074320-depths-of-the-eld-axe",
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select": 1,
+        "condition": {
+          "base_cost_gte": 5
+        },
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "source": "copy",
+            "target": "selected:follower",
+            "count": 1,
+            "reveal": false
+          }
+        ]
+      }
+    ]
   }
 ]

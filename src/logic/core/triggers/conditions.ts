@@ -99,6 +99,10 @@ export function evalCommonConditions(
     if (cond.has_keyword) sharedCond.has_keyword = cond.has_keyword;
     if (cond.keywords) sharedCond.keywords = cond.keywords;
     if (cond.base_cost_eq != null) sharedCond.base_cost_eq = cond.base_cost_eq;
+    if (cond.base_cost_gte != null)
+      sharedCond.base_cost_gte = cond.base_cost_gte;
+    if (cond.base_cost_lte != null)
+      sharedCond.base_cost_lte = cond.base_cost_lte;
     if (cond.cost_changed) sharedCond.cost_changed = cond.cost_changed;
 
     // Apply shared conditions via unified evaluator

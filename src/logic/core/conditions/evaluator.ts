@@ -42,6 +42,8 @@ export interface CardCondition {
 
   // Cost filters
   base_cost_eq?: number;
+  base_cost_gte?: number;
+  base_cost_lte?: number;
   cost_changed?: boolean;
 
   // Evolution state
@@ -179,6 +181,14 @@ export function evaluateCardCondition(
   if (cond.base_cost_eq != null) {
     const lim = toNum(cond.base_cost_eq);
     if (lim != null && getBaseCost(card) !== lim) return false;
+  }
+  if (cond.base_cost_gte != null) {
+    const lim = toNum(cond.base_cost_gte);
+    if (lim != null && getBaseCost(card) < lim) return false;
+  }
+  if (cond.base_cost_lte != null) {
+    const lim = toNum(cond.base_cost_lte);
+    if (lim != null && getBaseCost(card) > lim) return false;
   }
 
   // Cost changed
