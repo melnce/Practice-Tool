@@ -50,17 +50,12 @@ describe("Bane vs Barrier Interaction", () => {
 
   it("Barrier should block damage but NOT prevent Bane destruction", () => {
     // 1. Create Attacker with Bane (1/1)
-    const attacker = makeTestFollower(
-      "first",
-      "Bane Attacker",
-      { attack: 1, defense: 1 },
-      {
-        hasBane: true,
-        hasRush: true,
-        can_attack: true,
-        attacks_left: 1,
-      } as any,
-    );
+    makeTestFollower("first", "Bane Attacker", { attack: 1, defense: 1 }, {
+      hasBane: true,
+      hasRush: true,
+      can_attack: true,
+      attacks_left: 1,
+    } as any);
 
     // 2. Create Defender with Barrier (2/2)
     const defender = makeTestFollower("second", "Barrier Defender", {
@@ -84,5 +79,30 @@ describe("Bane vs Barrier Interaction", () => {
       (defender.defense as number) <= 0 ||
       !state.players.second.board.includes(defender);
     expect(defenderIsDead).toBe(true);
+  });
+
+  it("0-attack Bane still destroys through Barrier", () => {
+    makeTestFollower("first", "Zero Bane", { attack: 0, defense: 5 }, {
+      hasBane: true,
+      hasRush: true,
+      can_attack: true,
+      attacks_left: 1,
+    } as any);
+
+    const defender = makeTestFollower("second", "Barrier Tank", {
+      attack: 1,
+      defense: 10,
+    });
+    grantBarrier(defender);
+    expect(defender.hasBarrier).toBe(true);
+
+    attackFollower(0, 0, "first", "second");
+
+    expect(defender.hasBarrier).toBe(false);
+    // 0 combat damage absorbed by Barrier still counts for Bane (§346 / §477)
+    expect(
+      (defender.defense as number) <= 0 ||
+        !state.players.second.board.includes(defender),
+    ).toBe(true);
   });
 });
