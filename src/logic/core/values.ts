@@ -75,6 +75,11 @@ export function resolveDynamicValue(
   if (s === "{last_discarded_cost}") {
     return parseInt((state as any).lastDiscardedCost, 10) || 0;
   }
+  if (s === "{last_drawn_cost}") {
+    const last =
+      (state as any).lastDrawnCards?.[0] ?? (state as any).lastDrawnCard;
+    return parseInt(String(last?.cost ?? 0), 10) || 0;
+  }
   if (s === "{hand_size}") {
     // if owner provided, resolve for them. If not, default to 0 or derive from source?
     // Safer to require owner in context for non-dependent ops.
@@ -97,6 +102,32 @@ export function resolveDynamicValue(
   if (s === "{combo}") {
     if (context.owner) {
       return getPlaysThisTurn(state, context.owner);
+    }
+  }
+
+  // Enemy follower count minus allied follower count (floored at 0).
+  if (s === "{enemy_minus_ally_followers}") {
+    const owner = context.owner;
+    if (owner) {
+      const ally = owner;
+      const enemy = owner === "first" ? "second" : "first";
+      const allyN = getBoard(state, ally).filter(
+        (c) => c?.type === "Follower",
+      ).length;
+      const enemyN = getBoard(state, enemy).filter(
+        (c) => c?.type === "Follower",
+      ).length;
+      return Math.max(0, enemyN - allyN);
+    }
+  }
+
+  // Allied Ward followers on the owner's board.
+  if (s === "{ward_allies}") {
+    const owner = context.owner;
+    if (owner) {
+      return getBoard(state, owner).filter(
+        (c) => c?.type === "Follower" && !!c.hasWard,
+      ).length;
     }
   }
 

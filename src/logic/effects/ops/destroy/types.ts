@@ -59,8 +59,11 @@ export interface UnifiedDestroySpec {
   /** Distribution mode. Default: "direct" */
   distribution: DestroyDistribution;
 
-  /** Number of targets. Default: 1 */
+  /** Number of targets. Default: 1. May be resolved from a dynamic string. */
   count: number;
+
+  /** Raw count expression when dynamic (e.g. "{enemy_minus_ally_followers}") */
+  count_raw?: string | null;
 
   /** Stat to check for "highest" distribution. Default: "attack" */
   stat: "attack" | "defense";
@@ -151,10 +154,16 @@ export function normalizeToUnifiedSpec(
       typeof eff.store_count_as === "string" ? eff.store_count_as : null,
   };
 
-  // Parse count
+  // Parse count (allow dynamic templates; resolved later with owner context)
   if (eff.count !== undefined) {
-    const n = parseInt(String(eff.count), 10);
-    spec.count = Number.isFinite(n) && n > 0 ? n : 1;
+    const raw = String(eff.count).trim();
+    if (raw.includes("{")) {
+      spec.count_raw = raw;
+      spec.count = 1; // placeholder until resolve
+    } else {
+      const n = parseInt(raw, 10);
+      spec.count = Number.isFinite(n) && n > 0 ? n : 1;
+    }
   }
 
   // Parse select

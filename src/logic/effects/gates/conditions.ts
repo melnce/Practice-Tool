@@ -272,6 +272,21 @@ registerCondition("last_discarded_type", (spec) => {
   );
 });
 
+/** True if the hand has ≥ `count` cards that share one common cost. */
+registerCondition("hand_same_cost_gte", (spec, owner) => {
+  const need = spec.count ?? spec.at_least ?? 4;
+  const hand = getHand(state, owner) || [];
+  const byCost = new Map<number, number>();
+  for (const c of hand) {
+    const cost = Number(c?.cost) || 0;
+    byCost.set(cost, (byCost.get(cost) || 0) + 1);
+  }
+  for (const n of byCost.values()) {
+    if (n >= need) return true;
+  }
+  return false;
+});
+
 registerCondition("self_cost", (spec, _owner, sourceCard) => {
   if (!sourceCard) return false;
   const effCost = getEffectiveCost(sourceCard);

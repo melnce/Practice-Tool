@@ -10,6 +10,7 @@ import {
   crestSpendCounter,
   crestAppendTriggers,
   destroyCrest,
+  banishAllCrests,
 } from "../../crest.js";
 import { runEffects } from "../../../core/effects/index.js";
 import { handleCountdown } from "../countdown/unified.js";
@@ -67,6 +68,24 @@ export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
     case "destroy": {
       // Destroy crest - Last Words fires automatically if present
       destroyCrest(ctx.owner, name);
+      break;
+    }
+    case "banish_all": {
+      // Banish every crest on the chosen player (default: self)
+      const targetOwner =
+        (eff as any).player === "opponent" || (eff as any).player === "enemy"
+          ? ctx.owner === "first"
+            ? "second"
+            : "first"
+          : (eff as any).player === "all"
+            ? null
+            : ctx.owner;
+      if (targetOwner == null) {
+        banishAllCrests("first");
+        banishAllCrests("second");
+      } else {
+        banishAllCrests(targetOwner);
+      }
       break;
     }
     default:

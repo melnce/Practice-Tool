@@ -126,11 +126,27 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10803110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10803110-aika-elegy-of-loss",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "source": "destroyed_match",
+        "count": 1,
+        "filter": {
+          "type": "Follower"
+        },
+        "distribution": "random"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10803310",
@@ -212,7 +228,47 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Banish all other followers from the field",
+            "effects": [
+              {
+                "op": "banish",
+                "target": "all:follower",
+                "distribution": "all",
+                "condition": {
+                  "not_self": true
+                }
+              }
+            ]
+          },
+          {
+            "label": "Banish all amulets from the field",
+            "effects": [
+              {
+                "op": "banish",
+                "target": "all:amulet",
+                "distribution": "all"
+              }
+            ]
+          },
+          {
+            "label": "Banish all crests",
+            "effects": [
+              {
+                "op": "crest",
+                "action": "banish_all",
+                "player": "all"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10804120",
@@ -260,7 +316,15 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "distribution": "random",
+        "count": "{enemy_minus_ally_followers}"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10811120",
@@ -793,9 +857,35 @@
     "url": "https://shadowverse.gg/cards/10822310-shared-existence",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Wretch",
+            "count": 3
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "enemy:follower",
+        "attack": -10,
+        "defense": -10,
+        "distribution": "highest",
+        "stat": "attack",
+        "pick": "random",
+        "select": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10823110",
@@ -883,7 +973,38 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "activate_all_if_ally_board_gte": 2,
+        "options": [
+          {
+            "label": "Deal 4 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 4,
+                "count": 1,
+                "distribution": "random_hits"
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10824110",
@@ -1187,7 +1308,33 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 8,
+        "distribution": "by_stat",
+        "stat": "attack",
+        "pick": "random"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 2
+      },
+      {
+        "op": "earth_rite",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Earth-Shattering Bolt",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10833110",
@@ -1905,9 +2052,10 @@
     "url": "https://shadowverse.gg/cards/10851110-anisage-clear-resolve",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": ["Storm", "Ignores Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10851120",
@@ -3010,7 +3158,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "source": "destroyed_match",
+        "count": 1,
+        "filter": {
+          "type": "Follower",
+          "tribe": "Artifact"
+        },
+        "distribution": "random"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10872110",

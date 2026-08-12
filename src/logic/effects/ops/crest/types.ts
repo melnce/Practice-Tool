@@ -7,7 +7,8 @@ export type CrestAction =
   | "pay_counter"
   | "append_triggers"
   | "advance_countdown"
-  | "destroy";
+  | "destroy"
+  | "banish_all";
 
 export interface UnifiedCrestSpec {
   op: "crest";

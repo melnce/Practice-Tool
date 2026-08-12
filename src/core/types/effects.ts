@@ -90,7 +90,7 @@ export type LeaderOps = Extract<EffectOp, "leader">; // = never
 /** Unified PP/EP ops use action field for variants */
 export type ResourceOps = Extract<
   EffectOp,
-  "pp" | "ep" | "add_shadows" | "earth_rite"
+  "pp" | "ep" | "add_shadows" | "earth_rite" | "combo"
 >;
 export interface ResourceEffect extends BaseEffect {
   op: ResourceOps;

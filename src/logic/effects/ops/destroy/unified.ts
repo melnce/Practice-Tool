@@ -19,6 +19,7 @@ import { destroyTarget, getBoard } from "./primitives.js";
 import { resolveContextCard } from "../../../core/triggers/resolve.js";
 import type { TriggerContext } from "../../../core/triggers/types.js";
 import { isDamaged } from "../../../core/combat/damageState.js";
+import { resolveDynamicValue } from "../../../core/values.js";
 // ============================================================================
 // CONTEXT VARIABLE HELPERS
 // ============================================================================
@@ -52,6 +53,14 @@ export function handleDestroy(
 ): "pending" | number {
   const spec = normalizeToUnifiedSpec(eff);
   const ctx: DestroyContext = { ...context, owner };
+
+  if (spec.count_raw) {
+    const resolved = resolveDynamicValue(spec.count_raw, {
+      owner,
+      sourceCard: ctx.sourceCard,
+    });
+    spec.count = Math.max(0, resolved | 0);
+  }
 
   // Handle special scopes first
   if (spec.scope) {

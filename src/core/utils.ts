@@ -223,6 +223,10 @@ export function drawCard(
 
   const drawn = pushToHand(hand, top);
   if (drawn && top && owner) {
+    if (!state.lastDrawnCards) state.lastDrawnCards = [];
+    state.lastDrawnCards.unshift(top);
+    if (state.lastDrawnCards.length > 5) state.lastDrawnCards.length = 5;
+    (state as any).lastDrawnCard = top;
     bumpZoneVersion();
     fireTrigger("ally_draw", owner, { drawnCard: top, enteringCard: top });
     fireTrigger("when_drawn", owner, {

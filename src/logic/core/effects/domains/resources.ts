@@ -164,6 +164,21 @@ export function registerResourceEffects() {
     }
   });
 
+  // Combo counter (playsThisTurn) — "Increase your Combo by X"
+  registerOp("combo", (eff, ctx) => {
+    const action = String((eff as any).action || "increase").toLowerCase();
+    const amt = Math.max(
+      0,
+      parseInt(String((eff as any).amount ?? 1), 10) || 0,
+    );
+    if (action === "increase" || action === "add") {
+      for (let i = 0; i < amt; i++) {
+        state.players[ctx.owner].playsThisTurn++;
+      }
+      logEvent("comboIncrease", { owner: ctx.owner, amount: amt });
+    }
+  });
+
   // ========================================================================
   // DRAW - deck only, thins deck (stochastic card acquisition)
   // For token generation, use "add_to_hand" op

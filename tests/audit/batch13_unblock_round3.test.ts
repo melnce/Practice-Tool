@@ -4,6 +4,8 @@ import {
   createCard,
   givenGameState,
   resetUidCounter,
+  whenRunEffects,
+  whenPlayCard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import {
@@ -12,11 +14,21 @@ import {
   getHP,
   getPP,
   getShadows,
+  getCrests,
 } from "../../src/core/playerHelpers.js";
 import { drawCard } from "../../src/core/utils.js";
 import { consumeEarthSigils } from "../../src/logic/effects/ops/earth.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { evaluateCondition } from "../../src/logic/effects/gates/conditions.js";
+import {
+  recordDestroyed,
+  type DestroyedRecord,
+} from "../../src/logic/core/destroyedHistory.js";
+import { applyKeyword } from "../../src/logic/core/keywords/apply.js";
+import { attackFollower } from "../../src/logic/core/combat.js";
+import { getImplementationStatus } from "../../src/data/cardImplementationStatus.js";
+import { getCardById } from "../../src/data/cardDatabase.js";
+import "../../src/logic/core/effects/index.js";
 
 function setup(seed = 13): void {
   givenGameState({ seed, activePlayer: "first", roundCount: 5 })
@@ -25,6 +37,50 @@ function setup(seed = 13): void {
   state.gameStarted = true;
   state.phase = "main";
 }
+
+const AUTHORED = [
+  "10501110",
+  "10521110",
+  "10521310",
+  "10522110",
+  "10532310",
+  "10541310",
+  "10542310",
+  "10544120",
+  "10552310",
+  "10553110",
+  "10553310",
+  "10561120",
+  "10561310",
+  "10562120",
+  "10562210",
+  "10563210",
+  "10572310",
+  "10573110",
+  "10603110",
+  "10603210",
+  "10604110",
+  "10622310",
+  "10634110",
+  "10641310",
+  "10643310",
+  "10654110",
+  "10704110",
+  "10731310",
+  "10733310",
+  "10741310",
+  "10761210",
+  "10762210",
+  "10763210",
+  "10803110",
+  "10804110",
+  "10811110",
+  "10822310",
+  "10823310",
+  "10832320",
+  "10851110",
+  "10871130",
+] as const;
 
 describe("Unblock round 3 — general engine capabilities", () => {
   beforeEach(() => {
@@ -273,26 +329,6 @@ describe("Unblock round 3 — general engine capabilities", () => {
     expect(getPP(state, "first")).toBe(2);
   });
 });
-/**
- * Round 3 unblock: rich destroyed history and Ward-ignoring attacks.
- */
-import { beforeEach, describe, expect, it } from "vitest";
-import "./setup.js";
-import {
-  createCard,
-  givenGameState,
-  resetUidCounter,
-  whenRunEffects,
-} from "../harness/builders.js";
-import { state } from "../../src/core/gameState.js";
-import { getBoard, getHand } from "../../src/core/playerHelpers.js";
-import {
-  recordDestroyed,
-  type DestroyedRecord,
-} from "../../src/logic/core/destroyedHistory.js";
-import { applyKeyword } from "../../src/logic/core/keywords/apply.js";
-import { attackFollower } from "../../src/logic/core/combat.js";
-import "../../src/logic/core/effects/index.js";
 
 describe("Unblock round 3 — destroyed history / ignores Ward", () => {
   beforeEach(() => {
@@ -396,5 +432,56 @@ describe("Unblock round 3 — destroyed history / ignores Ward", () => {
     expect(getBoard(state, "second")[0]?.name).toBe("Ward");
     expect(getBoard(state, "second")[1]?.defense).toBe(2);
     expect(attacker.attacks_left).toBe(0);
+  });
+});
+
+describe("Unblock round 3 — authored cards", () => {
+  beforeEach(() => {
+    resetUidCounter();
+  });
+
+  it("newly authored cards classify as ops_present", () => {
+    for (const id of AUTHORED) {
+      const card = getCardById(id);
+      expect(card, id).toBeTruthy();
+      expect(getImplementationStatus(card!), id).toBe("ops_present");
+    }
+  });
+
+  it("Engage Haven amulets are Amulets with Engage", () => {
+    for (const id of [
+      "10562210",
+      "10563210",
+      "10761210",
+      "10762210",
+      "10763210",
+    ]) {
+      const card = getCardById(id)!;
+      expect(card.type).toBe("Amulet");
+      const kw = (card.keywords || []).some((k) =>
+        (typeof k === "string" ? k : (k as any)?.name || "")
+          .toLowerCase()
+          .includes("engage"),
+      );
+      expect(kw, id).toBe(true);
+    }
+  });
+
+  it("Rigor crest gains on play", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 })
+      .withFirstPP(5, 5)
+      .withFirstHand(["10553310"])
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+    whenPlayCard("first", 0);
+    expect(
+      getCrests(state, "first").some((c) => c.name.includes("Rigor")),
+    ).toBe(true);
+  });
+
+  it("Anisage has Ignores Ward", () => {
+    const card = getCardById("10851110")!;
+    expect(JSON.stringify(card.keywords)).toMatch(/Ignores Ward/i);
   });
 });
