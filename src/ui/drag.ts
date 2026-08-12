@@ -140,27 +140,29 @@ export function enableCardEvoDrop(
 
     const owner: Player = isBlueSide ? "first" : "second";
     const mode = isNormal ? "normal" : "super";
-    doAction(
-      isSuper ? "Super Evolve" : "Evolve",
-      () => {
-        // Use handleEvolveSelf as single source of truth for all evolve logic:
-        // - Applies stat boosts (+2/+2 or +3/+3)
-        // - Sets hasEvolved, evoType, rush/storm flags
-        // - Spends evo charges and sets evoUsedThisTurn
-        // - Runs evolve/superevolve effects
-        // Rerender is called after evolve completes for immediate visual feedback
-        void logic().then(({ handleEvolveSelf }) => {
+    const actionName = isSuper ? "Super Evolve" : "Evolve";
+    // Resolve dynamic import BEFORE opening history — doAction callbacks must be sync.
+    void logic().then(({ handleEvolveSelf }) => {
+      doAction(
+        actionName,
+        () => {
+          // Use handleEvolveSelf as single source of truth for all evolve logic:
+          // - Applies stat boosts (+2/+2 or +3/+3)
+          // - Sets hasEvolved, evoType, rush/storm flags
+          // - Spends evo charges and sets evoUsedThisTurn
+          // - Runs evolve/superevolve effects
+          // Rerender is called after evolve completes for immediate visual feedback
           handleEvolveSelf(card, owner, {
             mode,
             spendPoint: true,
             runEvoEffects: true,
           });
           rerender();
-        });
-      },
-      {},
-      { autoRender: false },
-    );
+        },
+        {},
+        { autoRender: false },
+      );
+    });
   };
 }
 

@@ -15,6 +15,7 @@ const SCRIPTS = [
   { name: "CleanupDead", script: "scripts/check-cleanupdead.ts" },
   { name: "PendingTarget", script: "scripts/check-pendingtarget.ts" },
   { name: "EffectsRegistry", script: "scripts/check-effects-registry.ts" },
+  { name: "DoActionSync", script: "scripts/check-doaction-sync.ts" },
 ];
 
 console.log("🏛️  Running Architecture Guardrails...\n");

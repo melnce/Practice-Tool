@@ -6,7 +6,7 @@
 import { state } from "../core/gameState.js";
 import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
-import { doAction } from "../core/history.js";
+import { doAction, resetHistory } from "../core/history.js";
 import type { Player } from "../core/types/index.js";
 import {
   getHand,
@@ -105,7 +105,7 @@ export function toggleMulliganPick(owner: Player, uid: string) {
 }
 
 export function confirmMulligan(owner: Player) {
-  return doAction(
+  const result = doAction(
     "Confirm Mulligan",
     () => {
       console.log("[MULLIGAN] confirm clicked", {
@@ -161,6 +161,14 @@ export function confirmMulligan(owner: Player) {
     { owner, stage: "mulligan" },
     { autoRender: true },
   );
+
+  // Mulligan is the undo floor: once the match starts, undo must not re-reveal
+  // deck order or allow unlimited re-mulligans.
+  if (state.phase === "main") {
+    resetHistory();
+  }
+
+  return result;
 }
 
 function startFirstTurn() {
