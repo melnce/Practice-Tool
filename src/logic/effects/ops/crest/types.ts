@@ -5,6 +5,7 @@ export type CrestAction =
   | "gain"
   | "add_counter"
   | "pay_counter"
+  | "append_triggers"
   | "advance_countdown"
   | "destroy";
 
@@ -29,6 +30,10 @@ export interface UnifiedCrestSpec {
 
   // For "pay_counter" action
   on_success_effects?: any[];
+
+  // For "append_triggers" action — additive triggers on an existing crest
+  // (e.g. Eld Faith payoffs after a successful pay_counter).
+  append_triggers?: any[];
 }
 
 /**

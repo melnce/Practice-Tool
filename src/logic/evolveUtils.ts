@@ -141,6 +141,8 @@ export function onEvolve(
   };
 
   const fireEvoTriggers = () => {
+    // Ally evolve fires for both normal and super (EP-spent or effect-granted).
+    fireTrigger("ally_evolve", owner, { enteringCard: card });
     if (mode === "super") {
       // Ally listeners: cards on the super-evolver's side.
       fireTrigger("ally_super_evolve", owner, { enteringCard: card });

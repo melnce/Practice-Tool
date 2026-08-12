@@ -49,6 +49,7 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   // Restricted Generic
   ally_super_evolve: handleRestrictedZoneEvent,
   enemy_super_evolve: handleRestrictedZoneEvent,
+  ally_evolve: handleRestrictedZoneEvent,
   engage: handleRestrictedZoneEvent,
   ally_follower_enter: handleRestrictedZoneEvent,
   enemy_follower_enter: handleRestrictedZoneEvent,
@@ -61,7 +62,9 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   enemy_follower_leaves_field: handleGenericEvent,
   enemy_follower_defense_down: handleGenericEvent,
   ally_ward_destroyed: handleGenericEvent,
+  ally_amulet_destroyed: handleGenericEvent,
   select_mode: handleGenericEvent, // Mode selection (used by Faith crest)
+  enhanced_play: handleGenericEvent,
 };
 
 export function dispatchEvent(

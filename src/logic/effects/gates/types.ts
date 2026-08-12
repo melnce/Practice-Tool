@@ -34,6 +34,7 @@ export type GateCondition =
   | "board_name" // Named card exists on board
   | "amulet_count" // Number of amulets >= count
   | "self_cost" // Source card's effective cost equals value
+  | "ally_matches" // Any allied board card matches filter (base_cost_gte, type, …)
 
   // Special gates
   | "skybound_art" // Turn + evolves witnessed >= requirement
@@ -66,6 +67,14 @@ export interface UnifiedGateSpec {
 
   /** Named card for board_name gate */
   name?: string;
+
+  /** Card type filter for ally_matches (default Follower) */
+  type?: string;
+
+  /** Printed base-cost comparisons for ally_matches / filters */
+  base_cost_eq?: number;
+  base_cost_gte?: number;
+  base_cost_lte?: number;
 
   /** Effects to run if condition passes */
   effects?: Effect[];
@@ -134,6 +143,13 @@ export function normalizeToGateSpec(eff: Effect): UnifiedGateSpec {
   if ((eff as any).requirement !== undefined)
     spec.requirement = parseInt((eff as any).requirement);
   if ((eff as any).name !== undefined) spec.name = (eff as any).name;
+  if ((eff as any).type !== undefined) spec.type = String((eff as any).type);
+  if ((eff as any).base_cost_eq !== undefined)
+    spec.base_cost_eq = parseInt((eff as any).base_cost_eq);
+  if ((eff as any).base_cost_gte !== undefined)
+    spec.base_cost_gte = parseInt((eff as any).base_cost_gte);
+  if ((eff as any).base_cost_lte !== undefined)
+    spec.base_cost_lte = parseInt((eff as any).base_cost_lte);
 
   return spec;
 }

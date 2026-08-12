@@ -9,9 +9,7 @@ import { loadCardDatabase } from "../data/cardDatabase.js";
 import { normalizeSeed } from "../core/seed.js";
 
 import { beginMulligan } from "./mulligan.js";
-import { runEffects } from "./core/effects/index.js";
 import { logEvent } from "../core/logger.js";
-import type { CardInstance } from "../core/types/index.js";
 import type { StartGameOptions } from "../core/types/index.js";
 import {
   setAnyAllyAttackedThisTurn,
@@ -21,6 +19,7 @@ import {
   getDeck,
   getHand,
 } from "../core/playerHelpers.js";
+import { bootstrapFaithForPlayer } from "./faith/bootstrap.js";
 
 function resetEvoButtons() {
   ["blueNormalEvo", "blueSuperEvo", "redNormalEvo", "redSuperEvo"].forEach(
@@ -75,84 +74,17 @@ export async function startGame(options: StartGameOptions) {
   await loadBlueDeck(blueChoice);
   await loadRedDeck(redChoice);
 
-  // === Faith crest bootstrap: if Sham-Nacha is in a deck, that player starts with Faith ===
-  const hasSham = (deck: CardInstance[], hand: CardInstance[]) => {
-    const check = (arr: CardInstance[]) =>
-      (arr || []).some(
-        (c) =>
-          String(c?.name).toLowerCase() === "sham-nacha, heir to entwining",
-      );
-    return check(deck) || check(hand);
-  };
-
-  if (hasSham(getDeck(state, "first"), getHand(state, "first"))) {
-    runEffects(
-      [
-        {
-          op: "crest",
-          action: "gain",
-          name: "Faith: Sham-Nacha, Heir to Entwining",
-          image: "images/crests/faith.png",
-          description:
-            "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
-          triggers: [
-            {
-              event: "select_mode",
-              condition: { own_turn: true },
-              effects: [
-                {
-                  op: "crest",
-                  action: "add_counter",
-                  crest: "Faith: Sham-Nacha, Heir to Entwining",
-                  counter: "faith",
-                  amount: 1,
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      "first",
-      null,
-      { targets: [], targetUids: [] },
-    );
-  }
-
-  if (hasSham(getDeck(state, "second"), getHand(state, "second"))) {
-    runEffects(
-      [
-        {
-          op: "crest",
-          action: "gain",
-          name: "Faith: Sham-Nacha, Heir to Entwining",
-          image: "images/crests/faith.png",
-          description:
-            "Faith starts at 0. Whenever you select Modes, increase Faith by 1.",
-          triggers: [
-            {
-              event: "select_mode",
-              condition: { own_turn: true },
-              effects: [
-                {
-                  op: "crest",
-                  action: "add_counter",
-                  crest: "Faith: Sham-Nacha, Heir to Entwining",
-                  counter: "faith",
-                  amount: 1,
-                },
-              ],
-            },
-          ],
-        },
-      ],
-      "second",
-      null,
-      { targets: [], targetUids: [] },
-    );
-  }
-
-  // Faith crest bootstrap done above — PP boost DOM reset removed
-  // (legacy #secondPlayerPPBoost never existed; #redBoost is driven by render).
+  // === Faith crest bootstrap (any specific_effect_type: 4 in deck/hand) ===
+  bootstrapFaithForPlayer(
+    "first",
+    getDeck(state, "first"),
+    getHand(state, "first"),
+  );
+  bootstrapFaithForPlayer(
+    "second",
+    getDeck(state, "second"),
+    getHand(state, "second"),
+  );
 
   // ✅ evolve charges & turn locks
   setEvoCharges(state, "first", 2);

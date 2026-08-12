@@ -14,6 +14,7 @@ import type {
 } from "../../../../core/types/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getBoard, getHP } from "../../../../core/playerHelpers.js";
+import { evaluateCardCondition } from "../../../core/conditions/evaluator.js";
 
 import type { UnifiedDamageSpec, DamageContext } from "./types.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
@@ -57,6 +58,17 @@ export function resolveAmount(
       return resolveDamageAmountExtended({} as Effect, ctx, "crest_count");
     case "other_allies":
       return resolveDamageAmountExtended({} as Effect, ctx, "other_allies");
+    case "ally_matches": {
+      const filter = {
+        type: "Follower",
+        ...(spec.condition && typeof spec.condition === "object"
+          ? spec.condition
+          : {}),
+        ...(spec.filter && typeof spec.filter === "object" ? spec.filter : {}),
+      };
+      const board = getBoard(state, ctx.owner) || [];
+      return board.filter((c) => evaluateCardCondition(c, filter)).length;
+    }
     case "fixed":
     default:
       // Use amount field, with overflow support

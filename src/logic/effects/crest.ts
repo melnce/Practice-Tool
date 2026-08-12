@@ -160,6 +160,37 @@ export function crestSpendCounter(
 }
 
 /**
+ * Append trigger specs onto an existing crest (Faith payoffs, etc.).
+ * Does not replace existing triggers — additive only.
+ */
+export function crestAppendTriggers(
+  owner: Player,
+  crestName: string,
+  triggers: CrestTrigger[],
+): boolean {
+  const crest = findCrest(owner, crestName);
+  if (!crest) return false;
+  if (!Array.isArray(crest.triggers)) crest.triggers = [];
+  for (const t of triggers || []) {
+    if (!t) continue;
+    const next: CrestTrigger = {
+      effects: Array.isArray(t.effects) ? t.effects : [],
+      once_per_turn: !!t.once_per_turn,
+      condition: t.condition ?? null,
+    };
+    if (t.event !== undefined) next.event = t.event;
+    if (t.type !== undefined) next.type = t.type;
+    crest.triggers.push(next);
+  }
+  logEvent("crestAppendTriggers", {
+    owner,
+    crest: crestName,
+    added: (triggers || []).length,
+  });
+  return true;
+}
+
+/**
  * Start-of-turn countdown tick.
  * When countdown reaches 0, the crest is DESTROYED (triggers Last Words if present).
  * Effects do NOT fire just because countdown completed - only Last Words triggers on destruction.

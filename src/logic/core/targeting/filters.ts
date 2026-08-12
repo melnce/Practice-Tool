@@ -78,6 +78,8 @@ export function applyFilters(
   if (cond.defense_gte != null) sharedCond.defense_gte = cond.defense_gte;
   if (cond.defense_eq != null) sharedCond.defense_eq = cond.defense_eq;
   if (cond.base_cost_eq != null) sharedCond.base_cost_eq = cond.base_cost_eq;
+  if (cond.base_cost_gte != null) sharedCond.base_cost_gte = cond.base_cost_gte;
+  if (cond.base_cost_lte != null) sharedCond.base_cost_lte = cond.base_cost_lte;
   if (cond.damaged != null) sharedCond.damaged = cond.damaged;
   if (cond.did_not_attack_this_turn)
     sharedCond.did_not_attack_this_turn = cond.did_not_attack_this_turn;

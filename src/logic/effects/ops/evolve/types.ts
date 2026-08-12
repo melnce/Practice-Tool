@@ -47,6 +47,9 @@ export interface UnifiedEvolveSpec {
     did_not_attack_this_turn?: boolean;
     type?: string;
     tribe?: string;
+    base_cost_eq?: number;
+    base_cost_gte?: number;
+    base_cost_lte?: number;
   };
 
   /** When set with select, pick targets randomly instead of opening selection UI */
@@ -88,10 +91,24 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
     mode: effAny.mode,
     name: effAny.name,
     spend_point: effAny.spend_point,
-    select: effAny.select,
+    select:
+      effAny.select ??
+      (effAny.count != null ? Number(effAny.count) : undefined),
     select_mode: effAny.select_mode,
-    filter: effAny.filter,
+    // Honour object `condition` as filter (same merge pattern as stat op)
+    filter: {
+      ...(effAny.condition && typeof effAny.condition === "object"
+        ? effAny.condition
+        : {}),
+      ...(effAny.filter && typeof effAny.filter === "object"
+        ? effAny.filter
+        : {}),
+    },
   };
+
+  if (spec.filter && Object.keys(spec.filter).length === 0) {
+    delete spec.filter;
+  }
 
   return spec;
 }

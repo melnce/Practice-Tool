@@ -272,6 +272,7 @@ export function cleanupDead() {
   for (const death of allDeaths) {
     const { card: c, owner, board, index, isFollower, defLE0, kw } = death;
     const cardType = c.type;
+    const isAmulet = c.type === "Amulet";
 
     const cause = defLE0
       ? "defense<=0"
@@ -315,6 +316,24 @@ export function cleanupDead() {
             destroyedCard: c,
           });
         }
+      }
+    } else if (isAmulet) {
+      if (defer) {
+        getDeferredQueues().leave.push({
+          event: "ally_amulet_destroyed",
+          activePlayer: owner,
+          context: {
+            destroyedCard: c,
+            leavingCard: c,
+            leavingOwner: owner,
+          },
+        });
+      } else {
+        fireTrigger("ally_amulet_destroyed", owner as any, {
+          destroyedCard: c,
+          leavingCard: c,
+          leavingOwner: owner,
+        });
       }
     }
 

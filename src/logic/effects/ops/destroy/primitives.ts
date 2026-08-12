@@ -5,6 +5,7 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import type { Player, CardInstance } from "../../../../core/types/index.js";
 import { runEffects } from "../../../core/effects/index.js";
+import { fireTrigger } from "../../../core/triggers.js";
 import {
   getBoard as getBoardHelper,
   getGraveyard as getGraveyardHelper,
@@ -119,6 +120,13 @@ export function destroyTarget(
 
     // Add shadow
     addShadows(state, cardOwner, 1);
+
+    // Faith / board watchers: allied amulet destroyed
+    fireTrigger("ally_amulet_destroyed", cardOwner, {
+      destroyedCard: removed,
+      leavingCard: removed,
+      leavingOwner: cardOwner,
+    });
 
     // Fire Last Words
     fireLastWords(removed, cardOwner);

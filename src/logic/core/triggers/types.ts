@@ -49,8 +49,13 @@ export type TriggerEventName =
   | "self_damaged"
   | "self_buffed_up"
   // Evolution
+  | "ally_evolve" // Allied follower evolves (EP-spent or effect-granted; normal or super)
   | "ally_super_evolve"
   | "enemy_super_evolve"
+  // Play
+  | "enhanced_play" // A card was played paying its Enhance cost
+  // Board state changes
+  | "ally_amulet_destroyed" // Allied amulet destroyed (effect or countdown)
   // Mechanics
   | "engage"
   | "on_fuse"
