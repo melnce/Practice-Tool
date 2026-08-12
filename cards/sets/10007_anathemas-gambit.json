@@ -14,7 +14,15 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10701110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10701110-altaro-superfan",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "search",
+        "count": 1,
+        "filter": {
+          "class": "Neutral"
+        }
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
@@ -39,7 +47,13 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "banish",
+        "target": "enemy:card",
+        "select": 1
+      }
+    ]
   },
   {
     "id": "10702110",
@@ -57,8 +71,27 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10702110-intrepid-newshound",
     "evolve": [],
-    "superevolve": [],
-    "keywords": [],
+    "superevolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Intrepid Newshound",
+        "count": 2
+      }
+    ],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "player": "self",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -81,7 +114,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "distribution": "all",
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10703210",
@@ -151,8 +196,22 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Ambush"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "player": "self",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "hasOngoing": true
   },
   {
     "id": "10711110",
@@ -171,9 +230,23 @@
     "url": "https://shadowverse.gg/cards/10711110-macrobear",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Rush"],
+    "keywords": [
+      "Rush",
+      "Ward",
+      {
+        "name": "MaxDamageCap",
+        "amount": 3
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "copy",
+        "target": "self",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10711120",
@@ -194,7 +267,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": 1,
+        "target": "ally:hand"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Fairy",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10711310",
@@ -215,7 +300,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": 2,
+        "target": "ally:hand"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "player": "self",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10712110",
@@ -236,7 +334,21 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10712120",
@@ -253,11 +365,29 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10712120_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10712120-hawkeyed-tactician",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 4
+      },
+      {
+        "op": "counter",
+        "action": "add",
+        "key": "combo",
+        "amount": 1
+      }
+    ]
   },
   {
     "id": "10712310",
@@ -278,7 +408,37 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": [],
+    "spell": [
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 1
+      },
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Minimized Anxiety",
+            "image": "images/crests/minimized_anxiety.png",
+            "description": "Countdown (1)\nLast Words: Add a Magnified Malice to your hand.",
+            "countdown": 1,
+            "keywords": ["LastWords"],
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Magnified Malice",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -306,8 +466,36 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "combo",
+            "count": 3,
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "player": "self",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": "{self.attack}"
+      }
+    ],
+    "hasOngoing": true
   },
   {
     "id": "10713310",
@@ -328,7 +516,38 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 2,
+        "distribution": "random_hits",
+        "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Magnified Malice",
+            "image": "images/crests/magnified_malice.png",
+            "description": "Countdown (1)\nLast Words: Add a Minimized Anxiety to your hand.",
+            "countdown": 1,
+            "keywords": ["LastWords"],
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Minimized Anxiety",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -383,10 +602,57 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10714120-great-hart-of-the-glacial-realm",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Great Hart of the Glacial Realm",
+        "image": "images/crests/great_hart_of_the_glacial_realm.png",
+        "description": "Countdown (3)\nAt the end of your turn, Combo (3) - Add a Deepwood Bounty to your hand.",
+        "countdown": 3,
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "gate",
+                "condition": "combo",
+                "count": 3,
+                "effects": [
+                  {
+                    "op": "add_to_hand",
+                    "name": "Deepwood Bounty",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
-    "triggers": [],
-    "fanfare": [],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": "{self.attack}",
+            "distribution": "split_sequential"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Deepwood Bounty",
+        "count": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -394,7 +660,8 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (3)</b>\nAt the end of your turn, <b><color=Keyword>Combo</color> (3)</b> - Add a <b><i><color=Keyword>Deepwood Bounty</color></i></b> to your hand.",
         "name": "Crest"
       }
-    ]
+    ],
+    "hasOngoing": true
   },
   {
     "id": "10721110",
@@ -414,8 +681,28 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_super_evolve",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "target": "self",
+            "mode": "set",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 3
+      }
+    ]
   },
   {
     "id": "10721120",
@@ -436,7 +723,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Knight",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Steelclad Knight",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10721310",
@@ -457,7 +756,34 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "selected:follower",
+            "amount": 3
+          },
+          {
+            "op": "gate",
+            "condition": "rally",
+            "count": 10,
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "keywords": ["Can't Attack"],
+                "duration": "opponent_turn_end",
+                "target": "selected:follower"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10722110",
@@ -474,9 +800,28 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10722110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10722110-sharp-eared-operative",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 3
+      }
+    ],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Knight",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -495,11 +840,31 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10722120_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10722120-metronomic-medic",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 3
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "player": "self",
+        "count": 2
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Knight",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10722310",
@@ -520,7 +885,29 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "gate",
+        "condition": "rally",
+        "count": 10,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Steelclad Knight",
+            "count": 2,
+            "keywords": ["Rush"]
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Steelclad Knight",
+            "count": 1,
+            "keywords": ["Rush"]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10723110",
@@ -541,7 +928,51 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Knight",
+        "count": 3
+      },
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Give all other allied followers +1/+0 and Rush",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "ally:follower",
+                "attack": 1,
+                "defense": 0,
+                "keywords": ["Rush"],
+                "condition": {
+                  "not_self": true
+                }
+              }
+            ]
+          },
+          {
+            "label": "Give all other allied followers +0/+1 and Ward",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "ally:follower",
+                "attack": 0,
+                "defense": 1,
+                "keywords": ["Ward"],
+                "condition": {
+                  "not_self": true
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10723310",
@@ -562,7 +993,27 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 6
+      },
+      {
+        "op": "gate",
+        "condition": "rally",
+        "count": 10,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "distribution": "all",
+            "amount_source": "other_allies"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10724110",
@@ -579,11 +1030,67 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10724110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10724110-gildaria-anathema-of-attunement",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Steelclad Knight",
+        "count": 2
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "keywords": ["Rush"],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "rally",
+        "count": 20,
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Gildaria, Anathema of Attunement",
+            "image": "images/crests/gildaria_anathema_of_attunement.png",
+            "description": "Countdown (1)\nDuring your turn, whenever an allied follower enters the field, deal 1 damage to the enemy leader.",
+            "countdown": 1,
+            "triggers": [
+              {
+                "event": "ally_follower_enter",
+                "source": "board",
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:leader",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -591,7 +1098,9 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (1)</b>\nDuring your turn, whenever an allied follower enters the field, deal 1 damage to the enemy leader.",
         "name": "Crest"
       }
-    ]
+    ],
+    "evolve_trigger_always": true,
+    "hasOngoing": true
   },
   {
     "id": "10724120",
@@ -609,10 +1118,35 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10724120-cesar-accordant-major",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Steelclad Knight",
+        "count": 2
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "attack": 1,
+        "defense": 3,
+        "keywords": ["Ward"],
+        "condition": {
+          "class": "Swordcraft",
+          "not_self": true
+        }
+      }
+    ]
   },
   {
     "id": "10731110",
@@ -633,7 +1167,18 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "earth_rite",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10731120",
@@ -650,11 +1195,29 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10731120_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10731120-little-beastie",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Magic Sediment",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10731310",
@@ -693,8 +1256,34 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10732110-charming-monster",
     "evolve": [],
-    "superevolve": [],
-    "keywords": ["Rush"],
+    "superevolve": [
+      {
+        "op": "earth_rite",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Charming Monster",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Magic Sediment",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -717,7 +1306,14 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Magic Sediment",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10732310",
@@ -738,7 +1334,38 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Gain 4 earth sigils",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Magic Sediment",
+                "count": 4
+              }
+            ]
+          },
+          {
+            "label": "Earth Rite (2) - Deal 2 damage to all enemy followers",
+            "requires": {
+              "earth_rite": 2
+            },
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "distribution": "all",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10733110",
@@ -755,11 +1382,50 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10733110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10733110-sweet-abomination",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "earth_rite",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "mode",
+            "options": [
+              {
+                "label": "Deal 3 damage to all enemy followers",
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:follower",
+                    "distribution": "all",
+                    "amount": 3
+                  }
+                ]
+              },
+              {
+                "label": "Draw 2 cards",
+                "effects": [
+                  {
+                    "op": "draw",
+                    "source": "deck",
+                    "player": "self",
+                    "count": 2
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10733310",
@@ -797,11 +1463,57 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10734110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10734110-lilanthim-anathema-of-predation",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "earth_rite",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "select": 1
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": ["Aura"],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "earth_rite",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Lilanthim, Anathema of Predation",
+            "image": "images/crests/lilanthim_anathema_of_predation.png",
+            "description": "Countdown (1)\nAt the end of your opponent's turn, summon a Lilanthim, Anathema of Predation and evolve it.",
+            "countdown": 1,
+            "triggers": [
+              {
+                "event": "end_of_turn",
+                "condition": {
+                  "whose_turn": "opponent"
+                },
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Lilanthim, Anathema of Predation"
+                  },
+                  {
+                    "op": "evolve",
+                    "target": "last_summoned"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -827,10 +1539,42 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10734120-beloved-masterpiece",
     "evolve": [],
-    "superevolve": [],
-    "keywords": ["Ward"],
+    "superevolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Beloved Masterpiece",
+        "count": 1
+      }
+    ],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "earth_rite",
+            "cost": 2,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 3
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "distribution": "all",
+        "amount": 6
+      }
+    ]
   },
   {
     "id": "10741110",
@@ -849,7 +1593,21 @@
     "url": "https://shadowverse.gg/cards/10741110-dragonewt-promoter",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Dragonewt Promoter",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -868,11 +1626,41 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10741120_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10741120-carrier-wyvern",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "select": 1,
+        "condition": {
+          "type": "Follower"
+        },
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "attack": 2,
+            "defense": 2,
+            "target": "selected:follower"
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 1,
+        "attack": 2,
+        "defense": 2,
+        "filter": {
+          "not_self": true
+        }
+      }
+    ]
   },
   {
     "id": "10741310",
@@ -914,7 +1702,13 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ]
   },
   {
     "id": "10742120",
@@ -934,8 +1728,48 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 2
+              }
+            ],
+            "else_effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "max_pp",
+        "at_least": 10,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
+    "hasOngoing": true
   },
   {
     "id": "10742310",
@@ -956,7 +1790,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 3
+      },
+      {
+        "op": "gate",
+        "condition": "overflow",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "player": "self",
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10743110",
@@ -977,7 +1830,40 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Evolve this follower",
+            "effects": [
+              {
+                "op": "evolve",
+                "target": "self"
+              }
+            ]
+          },
+          {
+            "label": "Give this follower Ambush",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "keywords": ["Ambush"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "destroy",
+        "distribution": "highest",
+        "stat": "attack",
+        "target": "enemy:follower",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10743310",
@@ -998,7 +1884,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "distribution": "all",
+        "amount": 5
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 3
+      }
+    ]
   },
   {
     "id": "10744110",
@@ -1016,10 +1914,49 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10744110-burnite-anathema-of-ash",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Burnite, Anathema of Ash",
+        "image": "images/crests/burnite_anathema_of_ash.png",
+        "description": "At the start of your turn, deal 2 damage to your leader.\nOnce on each of your turns, when your leader's defense is restored, deal 1 damage to it.",
+        "player": "opponent",
+        "triggers": [
+          {
+            "event": "start_of_turn",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "event": "leader_restored",
+            "once_per_turn": true,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "distribution": "all",
+        "amount": 9
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1045,10 +1982,45 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10744120-dragons-vale-elder",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "delay_countdown",
+        "name": "Dragon's Vale Elder",
+        "amount": 2
+      }
+    ],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Vastwing Dragon",
+        "count": 1
+      },
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Dragon's Vale Elder",
+        "image": "images/crests/dragons_vale_elder.png",
+        "description": "Countdown (2)\nAt the end of your turn, summon a Vastwing Dragon.",
+        "countdown": 2,
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Vastwing Dragon",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1075,7 +2047,19 @@
     "url": "https://shadowverse.gg/cards/10751110-lulumi-vamp-on-the-keys",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Bat",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1094,9 +2078,28 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10751120_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10751120-raz-demon-on-the-drums",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 3
+      }
+    ],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Skeleton",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1119,7 +2122,22 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 2,
+        "attack": 0,
+        "defense": 1
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "player": "self",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10752110",
@@ -1136,11 +2154,29 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10752110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10752110-highwire-feline",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 3
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Skeleton",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10752120",
@@ -1161,7 +2197,18 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "summon",
+        "source": "graveyard",
+        "max_cost": 2
+      }
+    ]
   },
   {
     "id": "10752310",
@@ -1182,7 +2229,38 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Ghost",
+        "count": 1
+      },
+      {
+        "op": "evolve",
+        "target": "last_summoned"
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Bat",
+        "count": 1
+      },
+      {
+        "op": "evolve",
+        "target": "last_summoned"
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Skeleton",
+        "count": 1
+      },
+      {
+        "op": "evolve",
+        "target": "last_summoned"
+      }
+    ]
   },
   {
     "id": "10753110",
@@ -1200,10 +2278,55 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10753110-beastmaster-bones",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "ally:follower",
+        "not_self": true,
+        "select": 1,
+        "then": [
+          {
+            "op": "destroy",
+            "distribution": "random",
+            "count": 1,
+            "target": "enemy:follower"
+          }
+        ]
+      }
+    ],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Departed"
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "keywords": ["Storm"],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Rotting Zombie",
+        "count": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Skeleton",
+        "count": 1
+      }
+    ],
+    "hasOngoing": true
   },
   {
     "id": "10753310",
@@ -1224,7 +2347,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6,
+        "distribution": "split_sequential"
+      },
+      {
+        "op": "gate",
+        "condition": "necromancy",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10754110",
@@ -1265,8 +2407,46 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Departed"
+        },
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "entering_follower",
+            "attack": 1,
+            "defense": 0,
+            "keywords": ["Rush", "Ward"]
+          },
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "necromancy",
+        "cost": 10,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Rotting Zombie",
+            "count": 3
+          }
+        ]
+      }
+    ],
+    "hasOngoing": true
   },
   {
     "id": "10761110",
@@ -1285,9 +2465,36 @@
     "url": "https://shadowverse.gg/cards/10761110-reverend-of-finance",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "player": "self",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "amulet_count",
+        "count": 3,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Reverend of Finance",
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10761120",
@@ -1350,7 +2557,21 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "amulet_count",
+        "count": 3,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "select": 1,
+            "amount": 5
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10762120",
@@ -1371,7 +2592,26 @@
     "superevolve": [],
     "keywords": ["Storm"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "banish",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "gate",
+        "condition": "amulet_count",
+        "count": 3,
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 3
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10762210",
@@ -1411,9 +2651,40 @@
     "url": "https://shadowverse.gg/cards/10763110-deacon-of-security",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 3
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "amulet_count",
+        "count": 3,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Barrier"]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10763210",
@@ -1473,10 +2744,34 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10764120-initia-chief-ordination-officer",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": ["Ward", "Aura"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "banish",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "gate",
+        "condition": "amulet_count",
+        "count": 3,
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 3
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10771110",
@@ -1602,7 +2897,28 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "attack": 1,
+        "defense": 0
+      },
+      {
+        "op": "gate",
+        "condition": "super_evo_unlocked",
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "hand",
+            "attack": 1,
+            "defense": 0
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10773110",
