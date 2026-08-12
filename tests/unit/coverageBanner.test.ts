@@ -50,6 +50,22 @@ describe("coverage banner counts", () => {
     expect(counts.flaggedIds.sort()).toEqual(["10521110", "10522120"]);
   });
 
+  it("reportDeckCoverage uses honest no-effects wording", () => {
+    const counts = countDeckCoverage([
+      card({
+        id: "10521110",
+        name: "Stub",
+        implementationStatus: "unimplemented",
+        description: "Fanfare: Draw a card.",
+      }),
+    ]);
+    expect(counts.unimplemented).toBe(1);
+    // Banner text must not claim the rest of the deck is faithfully complete
+    expect(
+      `${counts.unimplemented} cards in this deck have no implemented effects`,
+    ).toMatch(/have no implemented effects/);
+  });
+
   it("reportDeckCoverage is a no-op without DOM when clean", () => {
     const counts = reportDeckCoverage(
       [

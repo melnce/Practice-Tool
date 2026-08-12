@@ -92,8 +92,8 @@ export function renderCardDOM(
     const badge = createElement("div", "unimplemented-badge", label);
     badge.title =
       vm.implementationStatus === "partial"
-        ? "Card effects are only partially implemented"
-        : "Card effects are not implemented — results may be misleading";
+        ? "Card JSON contains an unknown effect op"
+        : "This card has no implemented effects — results may be misleading";
     imageWrapper.appendChild(badge);
   }
 

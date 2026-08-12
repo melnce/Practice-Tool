@@ -3,9 +3,18 @@
  *
  * Never hand-maintain a flag on card JSON — recompute from description + ops.
  *
- * - implemented: vanilla / evergreen-only, or has programmed effects with known ops
- * - partial: has at least one unknown/unregistered op in its effect trees
- * - unimplemented: non-evergreen rules text but no programmed effects
+ * WHAT THESE LABELS GUARANTEE (and what they do not):
+ * - unimplemented: non-evergreen rules text with no programmed effects / configured
+ *   keywords. Safe claim: "this card has no implemented effects."
+ * - partial: at least one unknown/unregistered `op` in the effect trees. On the
+ *   current pool this is effectively unreachable (every authored op is registered);
+ *   it exists for forward detection when a bad op slips in.
+ * - implemented: vanilla / evergreen-only, OR has some programmed content with only
+ *   known ops. THIS DOES NOT MEAN THE CARD IS FAITHFUL TO ITS FULL RULES TEXT.
+ *   A card with Fanfare authored but Evolve missing still counts as "implemented".
+ *   Do not treat the count of "implemented" cards as a fidelity / coverage metric.
+ *
+ * A real text-vs-ops fidelity audit of the implemented pool is a separate job.
  */
 
 import { ALL_OPS } from "../logic/core/effects/opTypes.js";

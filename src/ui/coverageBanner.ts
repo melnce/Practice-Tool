@@ -82,14 +82,16 @@ export function reportDeckCoverage(
     return counts;
   }
   const parts: string[] = [];
+  // Wording must not imply the remaining cards are faithfully complete —
+  // "implemented" only means "has some executable content" (see classifier).
   if (counts.unimplemented > 0) {
     parts.push(
-      `${counts.unimplemented} card${counts.unimplemented === 1 ? "" : "s"} in this deck are unimplemented`,
+      `${counts.unimplemented} card${counts.unimplemented === 1 ? "" : "s"} in this deck have no implemented effects`,
     );
   }
   if (counts.partial > 0) {
     parts.push(
-      `${counts.partial} card${counts.partial === 1 ? "" : "s"} are only partially implemented`,
+      `${counts.partial} card${counts.partial === 1 ? "" : "s"} use unknown effect ops`,
     );
   }
   showCoverageBanner(parts.join(" · ") + " — results may be misleading");
