@@ -62,6 +62,7 @@ export type CardLike = {
   invoke?: unknown;
   on_discard?: unknown;
   keywords?: unknown[];
+  specific_effects?: unknown[];
   [key: string]: unknown;
 };
 
@@ -93,8 +94,22 @@ function effectRoots(card: CardLike): unknown[] {
 
   for (const k of card.keywords ?? []) {
     if (!k || typeof k !== "object") continue;
-    const kw = k as { name?: string; effects?: unknown[] };
+    const kw = k as {
+      name?: string;
+      effects?: unknown[];
+      amuletKeywords?: unknown[];
+      keywords?: unknown[];
+    };
     if (Array.isArray(kw.effects)) roots.push(...kw.effects);
+    // Crystallize nests Countdown / LastWords under amuletKeywords
+    for (const nested of [
+      ...asArray(kw.amuletKeywords),
+      ...asArray(kw.keywords),
+    ]) {
+      if (!nested || typeof nested !== "object") continue;
+      const nk = nested as { effects?: unknown[] };
+      if (Array.isArray(nk.effects)) roots.push(...nk.effects);
+    }
   }
   return roots;
 }
@@ -128,6 +143,45 @@ export function unknownCardOps(card: CardLike): string[] {
   return [...collectCardOps(card)].filter((op) => !KNOWN_OPS.has(op)).sort();
 }
 
+function hasAuthoredAlternateForm(
+  card: CardLike,
+  kind: "accelerate" | "crystallize",
+): boolean {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as Record<string, unknown>;
+    if (String(kw.name ?? "").toLowerCase() !== kind) continue;
+    if (kw.cost == null) continue;
+    if (kind === "accelerate") {
+      if (Array.isArray(kw.effects) && kw.effects.length > 0) return true;
+    } else {
+      const nested = asArray(kw.amuletKeywords).concat(asArray(kw.keywords));
+      if (nested.length > 0) return true;
+      if (Array.isArray(kw.effects) && kw.effects.length > 0) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * DotGG specific_effects may list Accelerate / Crystallize before ops are authored.
+ * Treat unauthored catalog entries as requiring implementation.
+ */
+export function hasUnauthoredAlternateForms(card: CardLike): boolean {
+  for (const raw of asArray(card.specific_effects)) {
+    if (!raw || typeof raw !== "object") continue;
+    const name = String((raw as { name?: string }).name ?? "").toLowerCase();
+    if (name === "accelerate" && !hasAuthoredAlternateForm(card, "accelerate"))
+      return true;
+    if (
+      name === "crystallize" &&
+      !hasAuthoredAlternateForm(card, "crystallize")
+    )
+      return true;
+  }
+  return false;
+}
+
 /**
  * Keyword objects that encode behavior without nested `op` trees
  * (e.g. Spellboost reduceCostBy, Countdown turns, MaxDamageCap).
@@ -145,6 +199,8 @@ function hasConfiguredKeyword(card: CardLike): boolean {
     )
       return true;
     if (name === "enhance" && kw.cost != null) return true;
+    if ((name === "accelerate" || name === "crystallize") && kw.cost != null)
+      return true;
     if (
       name === "countdown" &&
       (kw.turns != null || kw.count != null || kw.countdown != null)
@@ -166,6 +222,8 @@ export function hasProgrammedEffects(card: CardLike): boolean {
 export function getImplementationStatus(card: CardLike): ImplementationStatus {
   const unknown = unknownCardOps(card);
   if (unknown.length > 0) return "partial";
+
+  if (hasUnauthoredAlternateForms(card)) return "unimplemented";
 
   const remaining = nonEvergreenText(card.description);
   if (!remaining) return "implemented";

@@ -1027,7 +1027,19 @@
     "url": "https://shadowverse.gg/cards/10844120-lumiore-argente-shining-wings",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Accelerate",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "pp",
+            "action": "gain_max",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [

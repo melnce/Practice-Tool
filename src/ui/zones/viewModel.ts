@@ -41,6 +41,8 @@ interface TierPreview {
   atkDisp?: number;
   defDisp?: number;
   tier?: { cost: number; effects?: unknown[] };
+  alternate?: { kind: string; cost: number } | null;
+  formLabel?: string | null;
 }
 
 export function createCardViewModel(
@@ -64,6 +66,8 @@ export function createCardViewModel(
   let defDisp = Number(card.defense) || 0;
 
   let tier: { cost: number; effects?: unknown[] } | null = null;
+  let alternate: { kind: string; cost: number } | null = null;
+  let formLabel: string | null = null;
 
   if (ctx.isHand) {
     // Explicitly cast the result of previewHandStats to expected shape
@@ -76,11 +80,14 @@ export function createCardViewModel(
     if (preview.tier) {
       tier = preview.tier;
     }
-
-    if (!tier) {
-      const handMod = Number(card.cost_mod) || 0;
-      shownCost = Math.max(0, shownCost + handMod);
+    if (preview.alternate) {
+      alternate = preview.alternate;
     }
+    if (preview.formLabel) {
+      formLabel = preview.formLabel;
+    }
+    // previewHandStats already folds cost_mod into shownCost for normal /
+    // alternate forms; Enhance uses the printed tier cost as before.
   }
 
   // Glow Logic
@@ -89,8 +96,6 @@ export function createCardViewModel(
     // Fix: Use activePlayer for strictness, avoids boolean desync
     const isPlayersTurn = ctx.owner === state.activePlayer;
 
-    // Debug Log (remove later if spammy, but needed for bug)
-    // if (card.name === "Test") console.log("[VM] Glow Check:", { owner: ctx.owner, active: state.activePlayer, isPlayersTurn });
     const { glowClass: gc } = computeHandGlow(card, {
       state,
       owner: ctx.owner,
@@ -98,6 +103,7 @@ export function createCardViewModel(
       availablePP,
       isSpell,
       tier,
+      alternate,
       shownCost,
     });
     glowClass = gc || undefined;
@@ -241,6 +247,7 @@ export function createCardViewModel(
         ? Number(card.countdown)
         : null,
     icarusBuff: card.__icarusBuff,
+    formLabel,
     implementationStatus: card.implementationStatus,
     canAttack,
     isRush,

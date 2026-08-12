@@ -135,6 +135,14 @@ export function renderCardDOM(
     "card-stats top-left",
     String(vm.shownCost),
   );
+  if (vm.formLabel) {
+    const formBadge = createElement(
+      "div",
+      "alternate-form-badge",
+      `${vm.formLabel} ${vm.shownCost}`,
+    );
+    imageWrapper.appendChild(formBadge);
+  }
   const bottomLeft = createElement("div", "card-stats bottom-left");
   const bottomRight = createElement("div", "card-stats bottom-right");
 

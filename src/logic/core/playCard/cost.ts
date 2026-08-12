@@ -1,4 +1,9 @@
 import type { CardInstance, Effect } from "../../../core/types/index.js";
+import {
+  getEffectivePlayCost,
+  pickAlternateForm,
+  type AlternateForm,
+} from "../../../helpers/alternateForm.js";
 
 export function getEffectiveCost(card: CardInstance): number {
   if (typeof card.effectiveCost === "number") return card.effectiveCost;
@@ -36,4 +41,64 @@ export function pickEnhanceTier(
       return { cost: t.cost, effects: t.effects || [] }; // highest affordable
   }
   return null;
+}
+
+export type PlayCostMode = "enhance" | "normal" | "accelerate" | "crystallize";
+
+export interface PlayCostPlan {
+  mode: PlayCostMode;
+  /** PP to spend for this play. */
+  cost: number;
+  enhanceTier: { cost: number; effects: Effect[] } | null;
+  alternate: AlternateForm | null;
+  /** Effective printed-form cost (base + hand mod). */
+  effectivePlayCost: number;
+}
+
+/**
+ * Resolve which form/cost a play will use.
+ * Priority: Enhance (if affordable) → normal (if affordable) →
+ * highest payable Accelerate/Crystallize → else normal (will fail PP check).
+ */
+export function resolvePlayCost(
+  card: CardInstance,
+  availablePP: number,
+): PlayCostPlan {
+  const effectivePlayCost = getEffectivePlayCost(card);
+  const enhanceTier = pickEnhanceTier(card, availablePP);
+  if (enhanceTier) {
+    return {
+      mode: "enhance",
+      cost: enhanceTier.cost,
+      enhanceTier,
+      alternate: null,
+      effectivePlayCost,
+    };
+  }
+  if (availablePP >= effectivePlayCost) {
+    return {
+      mode: "normal",
+      cost: effectivePlayCost,
+      enhanceTier: null,
+      alternate: null,
+      effectivePlayCost,
+    };
+  }
+  const alternate = pickAlternateForm(card, availablePP, effectivePlayCost);
+  if (alternate) {
+    return {
+      mode: alternate.kind,
+      cost: alternate.cost,
+      enhanceTier: null,
+      alternate,
+      effectivePlayCost,
+    };
+  }
+  return {
+    mode: "normal",
+    cost: effectivePlayCost,
+    enhanceTier: null,
+    alternate: null,
+    effectivePlayCost,
+  };
 }

@@ -5,6 +5,12 @@ import type {
   Effect,
   KeywordEntry,
 } from "../core/types/index.js";
+import {
+  alternateFormLabel,
+  getEffectivePlayCost,
+  pickAlternateForm,
+  type AlternateForm,
+} from "./alternateForm.js";
 
 // Helper type for enhance tier
 interface EnhanceTier {
@@ -55,6 +61,36 @@ export function previewHandStats(card: CardInstance, availablePP: number) {
         defDisp += Number((eff as any).defense) || 0;
       }
     }
+    return {
+      shownCost,
+      atkDisp,
+      defDisp,
+      tier,
+      alternate: null as AlternateForm | null,
+      formLabel: null as string | null,
+    };
   }
-  return { shownCost, atkDisp, defDisp, tier };
+
+  const effectivePlayCost = getEffectivePlayCost(card);
+  const alternate = pickAlternateForm(card, availablePP, effectivePlayCost);
+  if (alternate) {
+    return {
+      shownCost: alternate.cost,
+      atkDisp,
+      defDisp,
+      tier: null,
+      alternate,
+      formLabel: alternateFormLabel(alternate),
+    };
+  }
+
+  shownCost = effectivePlayCost;
+  return {
+    shownCost,
+    atkDisp,
+    defDisp,
+    tier: null,
+    alternate: null as AlternateForm | null,
+    formLabel: null as string | null,
+  };
 }

@@ -50,6 +50,8 @@ export interface CardViewModel {
   spellboostCount: number | null;
   countdown: number | null;
   icarusBuff?: boolean | undefined;
+  /** Hand: "Accelerate" / "Crystallize" when alternate form is the payable play. */
+  formLabel?: string | null | undefined;
   /** Derived implementation coverage — mark stubs so practice lines stay honest. */
   implementationStatus?:
     | "implemented"

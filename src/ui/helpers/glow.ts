@@ -176,8 +176,14 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
   // ---- board capacity hard block (max 5) ----
   const ownerBoard =
     owner === "first" ? state.players.first.board : state.players.second.board;
+  const alternate = ctx.alternate ?? null;
+  const isAcceleratePlay = alternate?.kind === "accelerate";
   const isBoardCard =
-    !isSpell && (card?.type === "Follower" || card?.type === "Amulet");
+    !isSpell &&
+    !isAcceleratePlay &&
+    (card?.type === "Follower" ||
+      card?.type === "Amulet" ||
+      alternate?.kind === "crystallize");
   if (
     isBoardCard &&
     Array.isArray(ownerBoard) &&
@@ -238,6 +244,7 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
   const comboReady = isPlayersTurn && comboReadyInHand(card, owner, state);
   const tier = ctx.tier ?? null; // caller may pass
   const enhanceReady = isPlayersTurn && !!tier;
+  const alternateReady = isPlayersTurn && !!alternate;
   const fusedAllureReady =
     isPlayersTurn && card?.name === "Garden's Allure" && card?.isFused === true;
 
@@ -364,6 +371,10 @@ export function computeHandGlow(card: CardInstance, ctx: any) {
   const isShamNacha =
     String(card?.name || "").toLowerCase() === "sham-nacha, heir to entwining";
   const faithReady = isPlayersTurn && isShamNacha && faith >= 10;
+
+  if (alternateReady) {
+    return { glowClass: "alternate-ready" };
+  }
 
   if (
     enhanceReady ||

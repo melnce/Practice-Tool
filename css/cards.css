@@ -514,6 +514,45 @@
   animation: enhPulse 1s ease-in-out infinite alternate;
 }
 
+/* CYAN: Accelerate / Crystallize alternate form payable */
+.card.alternate-ready .card-image-wrapper {
+  outline: 3px solid rgba(64, 200, 220, 0.95);
+  box-shadow:
+    0 0 14px rgba(64, 200, 220, 0.65),
+    inset 0 0 10px rgba(64, 200, 220, 0.4);
+  border-radius: 10px;
+  animation: altPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes altPulse {
+  0% {
+    box-shadow:
+      0 0 8px rgba(64, 200, 220, 0.5),
+      inset 0 0 6px rgba(64, 200, 220, 0.3);
+  }
+  100% {
+    box-shadow:
+      0 0 16px rgba(64, 200, 220, 0.85),
+      inset 0 0 12px rgba(64, 200, 220, 0.55);
+  }
+}
+
+.card .alternate-form-badge {
+  position: absolute;
+  top: 28px;
+  left: 6px;
+  z-index: 5;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #0b2a30;
+  background: rgba(120, 230, 245, 0.92);
+  border-radius: 3px;
+  pointer-events: none;
+  text-shadow: none;
+}
+
 .enhance-glow {
   box-shadow: 0 0 20px 6px rgba(255, 215, 0, 0.9);
   animation: enhancePulse 1s infinite alternate;
