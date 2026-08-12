@@ -16,7 +16,18 @@
     "url": "https://shadowverse.gg/cards/10601110-muddled-onlooker",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -39,7 +50,13 @@
     "superevolve": [],
     "keywords": ["Bane"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ]
   },
   {
     "id": "10602210",
@@ -165,7 +182,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10611310",
@@ -360,7 +389,22 @@
     "url": "https://shadowverse.gg/cards/10621110-fearless-soldier",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "Enhance",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -383,7 +427,22 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": 1,
+        "target": "ally:hand"
+      },
+      {
+        "op": "search",
+        "count": 2,
+        "filter": {
+          "type": "follower",
+          "class": "Swordcraft"
+        }
+      }
+    ]
   },
   {
     "id": "10621310",
@@ -402,9 +461,37 @@
     "url": "https://shadowverse.gg/cards/10621310-advent-of-the-eld-sword",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Fearless Soldier",
+            "count": 3
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:last_summoned",
+            "attack": 2,
+            "defense": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Fearless Soldier",
+        "count": 3
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10622110",
@@ -421,9 +508,31 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10622110_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10622110-loyal-guard",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 3
+      }
+    ],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 2,
+            "defense": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -446,7 +555,16 @@
     "superevolve": [],
     "keywords": ["Storm"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "distribution": "all",
+        "condition": {
+          "defense_eq": 1
+        }
+      }
+    ]
   },
   {
     "id": "10622310",
@@ -494,9 +612,33 @@
     "url": "https://shadowverse.gg/cards/10623110-heartless-strategist",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "pp",
+            "action": "recover",
+            "player": "self",
+            "amount": 3
+          },
+          {
+            "op": "add_to_hand",
+            "name": "Fearless Soldier",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ]
   },
   {
     "id": "10623310",
@@ -515,9 +657,57 @@
     "url": "https://shadowverse.gg/cards/10623310-ruthless-eld-sword",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3,
+            "distribution": "random_hits",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Draw a card",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3,
+                "distribution": "random_hits",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10624110",
@@ -535,10 +725,54 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10624110-noel-iv-ruthless-warlord",
     "evolve": [],
-    "superevolve": [],
-    "keywords": [],
+    "superevolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "exclude_self": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 8,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Fearless Soldier",
+            "count": 1,
+            "keywords": ["Storm"]
+          }
+        ]
+      },
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Fearless Soldier",
+            "count": 1,
+            "keywords": ["Drain"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Fearless Soldier",
+        "count": 1,
+        "keywords": ["Bane"]
+      }
+    ]
   },
   {
     "id": "10624120",
@@ -606,10 +840,25 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10631120-daydream-librarian",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "keyword",
+        "action": "grant",
+        "target": "ally:follower",
+        "exclude_self": true,
+        "keywords": ["Rush"]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Caravan Mammoth",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10631310",
@@ -630,7 +879,15 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Crystalspawn",
+        "count": 2
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10632110",
@@ -650,8 +907,31 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "name": "Crystalspawn"
+        },
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Crystalspawn",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10632120",
@@ -670,7 +950,31 @@
     "url": "https://shadowverse.gg/cards/10632120-adventurous-grimoire",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Adventurous Grimoire",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "spellboost",
+            "target": "ally:hand",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -693,7 +997,25 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "ally:follower",
+        "select": 1,
+        "condition": {
+          "name": "Crystalspawn"
+        }
+      },
+      {
+        "op": "search",
+        "count": 2,
+        "filter": {
+          "type": "follower",
+          "class": "Runecraft"
+        }
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10633110",
@@ -710,11 +1032,27 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10633110_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10633110-spellbound-professor",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "name_filter": "Crystalspawn",
+        "attack": 1,
+        "defense": 0
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Crystalspawn",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10633310",
@@ -733,9 +1071,87 @@
     "url": "https://shadowverse.gg/cards/10633310-bewitching-eld-crystals",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Crystalspawn",
+            "count": 1,
+            "keywords": ["Storm"]
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:last_summoned",
+            "attack": 1,
+            "defense": 0
+          },
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Crystalspawn",
+            "count": 2
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:last_summoned",
+            "attack": 1,
+            "defense": 0
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Summon a Crystalspawn and give it +1/+0 and Storm",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Crystalspawn",
+                "count": 1,
+                "keywords": ["Storm"]
+              },
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "ally:last_summoned",
+                "attack": 1,
+                "defense": 0
+              }
+            ]
+          },
+          {
+            "label": "Summon 2 copies of Crystalspawn and give them +1/+0",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Crystalspawn",
+                "count": 2
+              },
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "ally:last_summoned",
+                "attack": 1,
+                "defense": 0
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10634110",
@@ -812,9 +1228,26 @@
     "url": "https://shadowverse.gg/cards/10641110-resolute-dragonewt",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10641120",
@@ -833,7 +1266,31 @@
     "url": "https://shadowverse.gg/cards/10641120-fruitfish",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Fruitfish",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -877,7 +1334,13 @@
     "superevolve": [],
     "keywords": ["Rush", "Barrier"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10642120",
@@ -894,11 +1357,33 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10642120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10642120-spiked-dragon",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 3
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "evolve_trigger_always": true
   },
   {
     "id": "10642310",
@@ -919,7 +1404,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10643110",
@@ -936,11 +1433,29 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10643110_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10643110-impeding-pugilist",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": ["Ward", "Barrier"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6,
+        "distribution": "random_hits",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10643310",
@@ -982,7 +1497,18 @@
     "superevolve": [],
     "keywords": ["Storm", "Bane", "Aura"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Spilling Red",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10644120",
@@ -1022,7 +1548,23 @@
     "url": "https://shadowverse.gg/cards/10651110-reverent-demon",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "damage",
+            "target": "ally:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1043,7 +1585,19 @@
     "url": "https://shadowverse.gg/cards/10651120-ghost-dodger",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Ghost",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1066,7 +1620,27 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "gate",
+        "condition": "necromancy",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10652110",
@@ -1085,7 +1659,20 @@
     "url": "https://shadowverse.gg/cards/10652110-yearnful-necromancer",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "Enhance",
+        "cost": 8,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "graveyard",
+            "max_cost": 9
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1104,9 +1691,29 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10652120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10652120-devilish-heartbreaker",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 4
+      }
+    ],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1129,7 +1736,25 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "banish",
+            "target": "selected:follower"
+          },
+          {
+            "op": "summon",
+            "source": "copy",
+            "target": "selected:follower"
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10653110",
@@ -1146,11 +1771,36 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10653110_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10653110-deprived-destroyer",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Bat",
+        "count": 1
+      },
+      {
+        "op": "evolve",
+        "target": "last_summoned"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "ally:follower",
+        "not_self": true,
+        "select": 1,
+        "then": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
+    "evolve_trigger_always": true
   },
   {
     "id": "10653310",
@@ -1171,7 +1821,34 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Recover 1 evolution point",
+            "effects": [
+              {
+                "op": "ep",
+                "action": "recover",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Deal 2 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10654110",
@@ -1239,7 +1916,10 @@
         "name": "Crystallize",
         "cost": 2,
         "amuletKeywords": [
-          { "name": "Countdown", "turns": 3 },
+          {
+            "name": "Countdown",
+            "turns": 3
+          },
           {
             "name": "LastWords",
             "effects": [
@@ -1253,7 +1933,22 @@
         ]
       }
     ],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "condition": {
+          "is_self": true
+        },
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "fanfare": [],
     "specific_effects": [
       {
@@ -1281,7 +1976,40 @@
     "url": "https://shadowverse.gg/cards/10661210-unholy-water",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 3
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "distribution": "random",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "countdown",
+            "action": "advance",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1304,7 +2032,16 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "search",
+        "count": 2,
+        "filter": {
+          "type": "amulet"
+        }
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10662110",
@@ -1330,7 +2067,10 @@
         "name": "Crystallize",
         "cost": 1,
         "amuletKeywords": [
-          { "name": "Countdown", "turns": 3 },
+          {
+            "name": "Countdown",
+            "turns": 3
+          },
           {
             "name": "LastWords",
             "effects": [
@@ -1370,11 +2110,23 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10662120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10662120-pegasus-rider",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Holy Falcon",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10662210",
@@ -1393,7 +2145,33 @@
     "url": "https://shadowverse.gg/cards/10662210-scripture-of-salvation",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 4
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          },
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 2
+          },
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1412,7 +2190,13 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10663110_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10663110-worshipful-crusader",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [
       "Bane",
@@ -1421,7 +2205,10 @@
         "name": "Crystallize",
         "cost": 1,
         "amuletKeywords": [
-          { "name": "Countdown", "turns": 3 },
+          {
+            "name": "Countdown",
+            "turns": 3
+          },
           {
             "name": "LastWords",
             "effects": [
@@ -1436,7 +2223,14 @@
       }
     ],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Worshipful Crusader",
+        "count": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 2,
@@ -1550,7 +2344,13 @@
       }
     ],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 3
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 3,
@@ -1579,7 +2379,15 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Ominous Artifact α",
+        "count": 1,
+        "keywords": ["Bane", "Ward"]
+      }
+    ]
   },
   {
     "id": "10671310",
@@ -1634,7 +2442,22 @@
       }
     ],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Substandard Puppet",
+        "count": 1
+      },
+      {
+        "op": "evolve",
+        "target": "last_summoned"
+      },
+      {
+        "op": "evolve",
+        "target": "self"
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 3,
@@ -1663,7 +2486,16 @@
     "superevolve": [],
     "keywords": ["Ambush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "banish",
+        "target": "enemy:follower",
+        "select": 1,
+        "condition": {
+          "defense_lte": 3
+        }
+      }
+    ]
   },
   {
     "id": "10672310",
@@ -1684,7 +2516,48 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Ludicrous Ordnance",
+        "count": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:last_summoned",
+        "attack": 0,
+        "defense": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Shoddy Plaything",
+        "count": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:last_summoned",
+        "attack": 0,
+        "defense": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Substandard Puppet",
+        "count": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:last_summoned",
+        "attack": 0,
+        "defense": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10673110",
@@ -1701,7 +2574,14 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10673110_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10673110-ludicrous-ordnance",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "distribution": "split_sequential"
+      }
+    ],
     "superevolve": [],
     "keywords": [
       {
@@ -1717,8 +2597,27 @@
         ]
       }
     ],
-    "triggers": [],
-    "fanfare": [],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3,
+            "distribution": "split_sequential"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Ludicrous Ordnance",
+        "count": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 3,
