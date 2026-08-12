@@ -196,7 +196,10 @@ export function handleByStatDamage(
     if (!allFollowers.length) return;
 
     const getValue = (c: CardInstance) =>
-      parseInt(String(stat === "defense" ? c.defense : c.attack), 10) || 0;
+      parseInt(
+        String(stat === "defense" || stat === "hp" ? c.defense : c.attack),
+        10,
+      ) || 0;
     const extreme = (useLowest ? Math.min : Math.max)(
       ...allFollowers.map(getValue),
     );

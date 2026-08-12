@@ -265,7 +265,13 @@ function handlePoolBasedBuff(
   if (isRandomDistribution) {
     const count = Math.max(
       1,
-      parseInt((eff as any).select ?? (eff.count as any) ?? 1, 10),
+      parseInt(
+        (eff as any).select_count ??
+          (eff as any).select ??
+          (eff.count as any) ??
+          1,
+        10,
+      ),
     );
     const chosen = pickRandomFromPool(pool, count);
     applyBuffsToTargets(chosen, eff, owner);
