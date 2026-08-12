@@ -149,7 +149,7 @@ export function handleFillBoardChainDecay(
       base_defense: clone.base_defense,
     } as any);
 
-    // Rally for followers
+    // Rally for followers (parity with finishFollowerEnter / pushToBoard)
     setRally(state, owner, getRally(state, owner) + 1);
 
     // Per-enter hooks & triggers (keep parity with pushToBoard)

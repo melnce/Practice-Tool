@@ -13,7 +13,8 @@
  * - Bonus PP can unlock normal vs alternate mid-turn
  * - Crystallize amulet Countdown → Last Words summons the follower
  * - Alternate play does not increment Rally for the played card itself
- *   (owner question flagged in rulebook — engine treats as amulet/spell play)
+ *   (Owner ruling — Rally 2026-08-12: only a follower successfully entering
+ *   the field counts; Crystallize/Accelerate alternate forms are amulet/spell)
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
@@ -130,7 +131,7 @@ describe("Crystallize / Accelerate", () => {
       const board = getBoard(state, "first");
       expect(board.some((c) => c.name === "Shoddy Plaything")).toBe(true);
       // Summoned copy increments Rally; the Accelerate play itself does not
-      // add an extra Rally beyond summons (owner question in rulebook).
+      // add an extra Rally beyond summons (Owner ruling — Rally 2026-08-12).
       expect(getRally(state, "first")).toBe(rallyBefore + board.length);
     });
 
@@ -295,7 +296,7 @@ describe("Crystallize / Accelerate", () => {
     });
   });
 
-  describe("Rally (owner question — engine treats alternate play as non-follower)", () => {
+  describe("Rally (Owner ruling — Rally 2026-08-12)", () => {
     it("Crystallize play does not increment Rally; Last Words summon does", () => {
       givenGameState({ seed: 1, activePlayer: "first" })
         .withFirstHand(["10662110"])
@@ -312,6 +313,36 @@ describe("Crystallize / Accelerate", () => {
       cleanupDead();
 
       expect(getRally(state, "first")).toBe(1);
+    });
+
+    it("Accelerate play with no follower summons does not increment Rally", () => {
+      // Lumiore & Argente Accelerate: gain max PP only — no follower entry
+      givenGameState({ seed: 1, activePlayer: "first", roundCount: 8 })
+        .withFirstHand(["10844120"])
+        .withFirstPP(3, 8)
+        .build();
+
+      expect(getRally(state, "first")).toBe(0);
+      playCardNoRender(getHand(state, "first"), "first", 0);
+      expect(getBoard(state, "first").every((c) => c.type !== "Follower")).toBe(
+        true,
+      );
+      expect(getRally(state, "first")).toBe(0);
+    });
+
+    it("Accelerate play that summons a follower increments Rally for the summon only", () => {
+      givenGameState({ seed: 1, activePlayer: "first" })
+        .withFirstHand(["10671110"])
+        .withFirstPP(2, 6)
+        .build();
+
+      expect(getRally(state, "first")).toBe(0);
+      playCardNoRender(getHand(state, "first"), "first", 0);
+      const followers = getBoard(state, "first").filter(
+        (c) => c.type === "Follower",
+      );
+      expect(followers.length).toBeGreaterThanOrEqual(1);
+      expect(getRally(state, "first")).toBe(followers.length);
     });
   });
 

@@ -65,6 +65,9 @@ export function pushToBoard(
 }
 
 export function finishFollowerEnter(card: CardInstance, owner: Player) {
+  // Owner ruling — Rally (2026-08-12): any successful follower entry increments
+  // Rally (route-agnostic). Callers that place without a successful entry
+  // (full board) must not reach here; control-change uses changeFollowerControl.
   if (card.type === "Follower") {
     setRally(state, owner, getRally(state, owner) + 1);
   }
