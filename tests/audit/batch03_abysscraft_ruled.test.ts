@@ -126,7 +126,8 @@ describe("B/C — Screaming and Loathing (10353310)", () => {
 
   it("Select 2 modes: recover 1 PP and draw a follower (modes 1 + 2)", () => {
     setupTurn(R6, { pp: 4 });
-    state.players.first.deck.unshift(
+    // Controlled deck: draw-follower must find this card (no filler pads).
+    state.players.first.deck = [
       createCard(
         {
           name: "DeckFollower",
@@ -138,7 +139,7 @@ describe("B/C — Screaming and Loathing (10353310)", () => {
         "deck",
         "first",
       ),
-    );
+    ];
     const modeBlock = getCardById("10353310")!.spell![0] as any;
     expect(modeBlock.select).toBe(2);
     runEffects(modeBlock.options[0].effects, "first", null);

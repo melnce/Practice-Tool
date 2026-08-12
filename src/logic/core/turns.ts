@@ -210,6 +210,7 @@ function scanDeckForInvokes(
  * @param endingPlayer - The player whose turn is ending
  */
 function _endTurnCore(endingPlayer: Player) {
+  if (state.phase === "gameover") return;
   const nextPlayer = endingPlayer === "first" ? "second" : "first";
   const endingLabel = endingPlayer === "first" ? "Blue" : "Red";
 
@@ -317,6 +318,7 @@ function _endTurnCore(endingPlayer: Player) {
  * Handles the end of the first player's (blue) turn and sets up the second player's turn.
  */
 export function endTurnBlue() {
+  if (state.phase === "gameover") return;
   if (state.activePlayer !== "first") return;
 
   try {
@@ -332,6 +334,7 @@ export function endTurnBlue() {
  * Handles the end of the second player's (red) turn and sets up the first player's turn.
  */
 export function endTurnRed() {
+  if (state.phase === "gameover") return;
   if (state.activePlayer === "first") return;
 
   try {

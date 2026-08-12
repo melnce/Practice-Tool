@@ -5,9 +5,11 @@ import { updateCounts } from "./counts.js";
 import { updateEvoButtonsUI } from "./evo.js";
 import { makeLeaderDroppable } from "./drag.js";
 import { byId } from "./dom.js";
+import { reportBlockedOutcome } from "./outcomes.js";
 
 import { state } from "../core/gameState.js";
 import type { GameState, Player, CardInstance } from "../core/types/index.js";
+import { getWinner } from "../core/playerHelpers.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -15,6 +17,34 @@ function domPrefix(player: Player): "blue" | "red" {
 }
 
 const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
+
+const ACTIVE_ON_BOTTOM_KEY = "svwb.activeOnBottom";
+
+export function isActiveOnBottom(): boolean {
+  try {
+    return localStorage.getItem(ACTIVE_ON_BOTTOM_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setActiveOnBottom(on: boolean): void {
+  try {
+    localStorage.setItem(ACTIVE_ON_BOTTOM_KEY, on ? "1" : "0");
+  } catch {
+    /* ignore */
+  }
+  syncBodyTurnClasses();
+}
+
+function syncBodyTurnClasses(): void {
+  const body = document.body;
+  if (!body) return;
+  body.classList.toggle("active-first", state.activePlayer === "first");
+  body.classList.toggle("active-second", state.activePlayer === "second");
+  body.classList.toggle("active-on-bottom", isActiveOnBottom());
+  body.classList.toggle("gameover", state.phase === "gameover");
+}
 
 export function render() {
   // headers
@@ -29,18 +59,22 @@ export function render() {
   setText("blueShadows", state.players.first.shadows);
   setText("redShadows", state.players.second.shadows);
 
+  syncBodyTurnClasses();
+
   // zones - use activePlayer as source of truth for turn state
   const isFirstActive = state.activePlayer === "first";
+  const gameLocked = state.phase === "gameover";
   renderZone(
     "blueHand",
     state.players.first.hand,
     state,
     render,
-    isFirstActive,
+    isFirstActive && !gameLocked,
     (i) =>
-      logic().then(({ playCard }) =>
-        playCard(state.players.first.hand, "first", i),
-      ),
+      logic().then(({ playCard }) => {
+        const outcome = playCard(state.players.first.hand, "first", i);
+        reportBlockedOutcome(outcome);
+      }),
   );
   renderZone("blueBoard", state.players.first.board, state, render);
   renderZone(
@@ -48,11 +82,12 @@ export function render() {
     state.players.second.hand,
     state,
     render,
-    !isFirstActive,
+    !isFirstActive && !gameLocked,
     (i) =>
-      logic().then(({ playCard }) =>
-        playCard(state.players.second.hand, "second", i),
-      ),
+      logic().then(({ playCard }) => {
+        const outcome = playCard(state.players.second.hand, "second", i);
+        reportBlockedOutcome(outcome);
+      }),
   );
   renderZone("redBoard", state.players.second.board, state, render);
 
@@ -64,6 +99,7 @@ export function render() {
 
   if (
     state.phase !== "mulligan" &&
+    state.phase !== "gameover" &&
     state.pendingTargetEffect?.canTargetLeader
   ) {
     // Show enemy leader as targetable - use activePlayer as source of truth
@@ -86,39 +122,24 @@ export function render() {
   renderLeaderBarrierBadge("first");
   renderLeaderBarrierBadge("second");
 
-  // Leader drag-drop setup (disabled during mulligan)
-  if (state.phase !== "mulligan") {
+  // Leader drag-drop setup (disabled during mulligan / gameover)
+  if (state.phase !== "mulligan" && state.phase !== "gameover") {
     makeLeaderDroppable(byId("blueLeader")!, "first", state);
     makeLeaderDroppable(byId("redLeader")!, "second", state);
-  }
-
-  // PP Boost button for second player - ID is "redBoost" in HTML
-  const ppBoostBtn = byId("redBoost") as HTMLButtonElement;
-  if (ppBoostBtn) {
-    // Determine if boost has been used for this round tier
-    const alreadyUsed =
-      (state.roundCount <= 5 && state.secondPlayerPPBoostUsedEarly) ||
-      (state.roundCount > 5 && state.secondPlayerPPBoostUsedLate);
-
-    // Only enable on second player's turn
-    const isSecondPlayerTurn = state.activePlayer === "second";
-
-    if (alreadyUsed) {
-      // Permanently greyed out after use
-      ppBoostBtn.disabled = true;
-      ppBoostBtn.classList.add("used", "disabled");
-    } else if (!isSecondPlayerTurn) {
-      // Greyed out during first player's turn
-      ppBoostBtn.disabled = true;
-      ppBoostBtn.classList.remove("used");
-      ppBoostBtn.classList.add("disabled");
-    } else {
-      // Available on second player's turn
-      ppBoostBtn.disabled = false;
-      ppBoostBtn.classList.remove("disabled");
-      ppBoostBtn.classList.toggle("used", !!state.secondPlayerPPBoostPending);
+  } else {
+    const bl = byId("blueLeader");
+    const rl = byId("redLeader");
+    if (bl) {
+      bl.ondragover = null;
+      bl.ondrop = null;
+    }
+    if (rl) {
+      rl.ondragover = null;
+      rl.ondrop = null;
     }
   }
+
+  updateBoostPipsUI();
 
   // Selection mode visual state
   if (state.phase !== "mulligan" && state.pendingTargetEffect) {
@@ -132,7 +153,7 @@ export function render() {
   updateCrestsUI("second", state);
 
   // Disable/enable End Turn controls based on phase
-  setEndTurnDisabled(state.phase === "mulligan");
+  setEndTurnDisabled(state.phase === "mulligan" || state.phase === "gameover");
 
   //sidebars/lists
   renderListIfPresent("bluePlayedList", state.players.first.playedHistory);
@@ -146,13 +167,152 @@ export function render() {
     state.players.second.destroyedHistory,
   );
 
-  // God Mode Visibility
+  // God Mode Visibility — either side on a test deck
   const godPanel = byId("blueGodMode");
   if (godPanel) {
-    const file = String(state.players.first.deckFile || "");
-    const isTesting = /^0_.*\.json$/i.test(file) || /testing/i.test(file);
-    godPanel.style.display = isTesting ? "block" : "none";
+    const isTesting = (file: string) =>
+      /^0_.*\.json$/i.test(file) || /testing/i.test(file);
+    const show =
+      isTesting(String(state.players.first.deckFile || "")) ||
+      isTesting(String(state.players.second.deckFile || ""));
+    godPanel.style.display = show ? "block" : "none";
+    const label = godPanel.querySelector(".god-target-label");
+    if (label) {
+      label.textContent =
+        state.activePlayer === "first"
+          ? "Target: Blue (1st)"
+          : "Target: Red (2nd)";
+    }
   }
+
+  updateGameOverOverlay();
+}
+
+function updateBoostPipsUI() {
+  const ppBoostBtn = byId("redBoost") as HTMLButtonElement | null;
+  const earlyPip = byId("boostPipEarly");
+  const latePip = byId("boostPipLate");
+
+  const earlyUsed = !!state.secondPlayerPPBoostUsedEarly;
+  const lateUsed = !!state.secondPlayerPPBoostUsedLate;
+  const isEarlyTier = state.roundCount <= 5;
+
+  if (earlyPip) {
+    earlyPip.classList.toggle("used", earlyUsed);
+    earlyPip.classList.toggle("active-tier", isEarlyTier && !earlyUsed);
+    earlyPip.title = earlyUsed
+      ? "Early Bonus PP used (rounds 1–5)"
+      : "Early Bonus PP (rounds 1–5)";
+  }
+  if (latePip) {
+    latePip.classList.toggle("used", lateUsed);
+    latePip.classList.toggle("active-tier", !isEarlyTier && !lateUsed);
+    latePip.title = lateUsed
+      ? "Late Bonus PP used (round 6+)"
+      : "Late Bonus PP (round 6+)";
+  }
+
+  if (!ppBoostBtn) return;
+
+  const alreadyUsed = (isEarlyTier && earlyUsed) || (!isEarlyTier && lateUsed);
+  const isSecondPlayerTurn = state.activePlayer === "second";
+  const locked = state.phase === "gameover" || state.phase === "mulligan";
+
+  if (locked || alreadyUsed) {
+    ppBoostBtn.disabled = true;
+    ppBoostBtn.classList.add("disabled");
+    if (alreadyUsed) ppBoostBtn.classList.add("used");
+    else ppBoostBtn.classList.remove("used");
+  } else if (!isSecondPlayerTurn) {
+    ppBoostBtn.disabled = true;
+    ppBoostBtn.classList.remove("used");
+    ppBoostBtn.classList.add("disabled");
+  } else {
+    ppBoostBtn.disabled = false;
+    ppBoostBtn.classList.remove("disabled");
+    ppBoostBtn.classList.toggle("used", !!state.secondPlayerPPBoostPending);
+  }
+}
+
+function updateGameOverOverlay() {
+  let overlay = byId("gameOverOverlay");
+  if (state.phase !== "gameover") {
+    if (overlay) overlay.style.display = "none";
+    return;
+  }
+
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "gameOverOverlay";
+    overlay.innerHTML = `
+      <div class="gameover-card">
+        <div class="gameover-title" id="gameOverTitle"></div>
+        <div class="gameover-reason" id="gameOverReason"></div>
+        <div class="gameover-actions">
+          <button type="button" id="rematchSameSeedBtn">Rematch (same seed)</button>
+          <button type="button" id="rematchNewSeedBtn">Rematch (new seed)</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay
+      .querySelector("#rematchSameSeedBtn")
+      ?.addEventListener("click", () => void rematch(true));
+    overlay
+      .querySelector("#rematchNewSeedBtn")
+      ?.addEventListener("click", () => void rematch(false));
+  }
+
+  const winner = state.winner ?? getWinner(state);
+  const title = byId("gameOverTitle");
+  const reasonEl = byId("gameOverReason");
+  if (title) {
+    title.textContent =
+      winner === "first"
+        ? "First wins"
+        : winner === "second"
+          ? "Second wins"
+          : "Draw";
+  }
+  if (reasonEl) {
+    const why = state.gameOverReason === "deckout" ? "Deck-out" : "Lethal";
+    reasonEl.textContent = why;
+  }
+  overlay.style.display = "flex";
+}
+
+async function rematch(keepSeed: boolean) {
+  const blueSelect = document.getElementById(
+    "blueDeckSelect",
+  ) as HTMLSelectElement | null;
+  const redSelect = document.getElementById(
+    "redDeckSelect",
+  ) as HTMLSelectElement | null;
+  const seedInput = document.getElementById(
+    "seedInput",
+  ) as HTMLInputElement | null;
+
+  const deckAId =
+    blueSelect?.value ||
+    state.players.first.deckFile?.replace(/\.json$/i, "") ||
+    "starter_deck";
+  const deckBId =
+    redSelect?.value ||
+    state.players.second.deckFile?.replace(/\.json$/i, "") ||
+    "starter_deck";
+
+  let seed: number;
+  if (keepSeed && seedInput && seedInput.value.trim() !== "") {
+    seed = Number(seedInput.value);
+  } else if (keepSeed) {
+    // Prefer the seed already shown in the input; fall back to a fresh one
+    seed = seedInput?.value ? Number(seedInput.value) : Date.now();
+  } else {
+    seed = Date.now();
+    if (seedInput) seedInput.value = String(seed);
+  }
+
+  const engine = await import(/* webpackIgnore: true */ "../engine.js");
+  await engine.startNewGame({ deckAId, deckBId, seed });
 }
 
 // Helper: toggle End Turn buttons visibility and disabled state
@@ -160,7 +320,7 @@ function setEndTurnDisabled(disabled: boolean) {
   const blueBtn = document.getElementById("endTurnBlue") as HTMLButtonElement;
   const redBtn = document.getElementById("endTurnRed") as HTMLButtonElement;
 
-  // During mulligan, hide both buttons
+  // During mulligan / gameover, hide both buttons
   if (disabled) {
     if (blueBtn) {
       blueBtn.style.display = "none";

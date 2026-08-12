@@ -9,7 +9,7 @@ export function updateCounts(state: GameState) {
     if (!el) {
       console.warn(`Element with id "${id}" not found - creating it`);
       // Create the element if it doesn't exist (fallback)
-      const statsDiv = id.includes("first")
+      const statsDiv = id.startsWith("blue")
         ? byId("blueStats")
         : byId("redStats");
       if (statsDiv) {

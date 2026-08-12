@@ -94,15 +94,15 @@ window.addEventListener("DOMContentLoaded", () => {
     if (r) r.disabled = !canRedo;
   });
 
-  // God Mode Handlers — wrapped so they are undoable practice tools
+  // God Mode Handlers — target the active player; wrapped for undo
+  const godTarget = () => state.players[state.activePlayer];
+
   wireClick("godPlus", () => {
     doAction(
       "God Mode: +PP",
       () => {
-        state.players.first.pp = Math.min(
-          state.players.first.maxPP,
-          state.players.first.pp + 1,
-        );
+        const p = godTarget();
+        p.pp = Math.min(p.maxPP, p.pp + 1);
       },
       {},
       { autoRender: true },
@@ -112,7 +112,8 @@ window.addEventListener("DOMContentLoaded", () => {
     doAction(
       "God Mode: -PP",
       () => {
-        state.players.first.pp = Math.max(0, state.players.first.pp - 1);
+        const p = godTarget();
+        p.pp = Math.max(0, p.pp - 1);
       },
       {},
       { autoRender: true },
@@ -122,7 +123,8 @@ window.addEventListener("DOMContentLoaded", () => {
     doAction(
       "God Mode: Refill PP",
       () => {
-        state.players.first.pp = state.players.first.maxPP;
+        const p = godTarget();
+        p.pp = p.maxPP;
       },
       {},
       { autoRender: true },
@@ -136,8 +138,9 @@ window.addEventListener("DOMContentLoaded", () => {
         doAction(
           "God Mode: Set Max PP",
           () => {
-            state.players.first.maxPP = n;
-            state.players.first.pp = n;
+            const p = godTarget();
+            p.maxPP = n;
+            p.pp = n;
           },
           {},
           { autoRender: true },
@@ -146,13 +149,13 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // God Mode: EP
+  // God Mode: EP — Worlds Beyond gives both players 2 EP (bible §163)
   wireClick("godEPPlus", () => {
     doAction(
       "God Mode: +EP",
       () => {
-        state.players.first.evoCharges =
-          (state.players.first.evoCharges || 0) + 1;
+        const p = godTarget();
+        p.evoCharges = (p.evoCharges || 0) + 1;
       },
       {},
       { autoRender: true },
@@ -162,10 +165,8 @@ window.addEventListener("DOMContentLoaded", () => {
     doAction(
       "God Mode: -EP",
       () => {
-        state.players.first.evoCharges = Math.max(
-          0,
-          (state.players.first.evoCharges || 0) - 1,
-        );
+        const p = godTarget();
+        p.evoCharges = Math.max(0, (p.evoCharges || 0) - 1);
       },
       {},
       { autoRender: true },
@@ -175,7 +176,8 @@ window.addEventListener("DOMContentLoaded", () => {
     doAction(
       "God Mode: Refill EP",
       () => {
-        state.players.first.evoCharges = 3; // Max EP for P2 is 3, usually enough.
+        // Worlds Beyond: both players have 2 EP (not 3).
+        godTarget().evoCharges = 2;
       },
       {},
       { autoRender: true },
@@ -187,7 +189,8 @@ window.addEventListener("DOMContentLoaded", () => {
     if (inp) {
       const val = parseInt(inp.value, 10);
       if (Number.isFinite(val)) {
-        const oldVal = state.players.first.evoCount || 0;
+        const slot = state.activePlayer;
+        const oldVal = state.players[slot].evoCount || 0;
         const delta = val - oldVal;
         if (delta > 0) {
           // Resolve async import before opening the action (same rule as evolve)
@@ -196,9 +199,9 @@ window.addEventListener("DOMContentLoaded", () => {
               doAction(
                 "God Mode: Set Evo Count",
                 () => {
-                  state.players.first.evoCount = val;
+                  state.players[slot].evoCount = val;
                   for (let i = 0; i < delta; i++) {
-                    incrementSkyboundArt("first");
+                    incrementSkyboundArt(slot);
                   }
                 },
                 {},
@@ -210,7 +213,7 @@ window.addEventListener("DOMContentLoaded", () => {
           doAction(
             "God Mode: Set Evo Count",
             () => {
-              state.players.first.evoCount = val;
+              state.players[slot].evoCount = val;
             },
             {},
             { autoRender: true },
@@ -228,7 +231,7 @@ window.addEventListener("DOMContentLoaded", () => {
         doAction(
           "God Mode: Set Combo",
           () => {
-            state.players.first.playsThisTurn = val;
+            godTarget().playsThisTurn = val;
           },
           {},
           { autoRender: true },
@@ -245,7 +248,7 @@ window.addEventListener("DOMContentLoaded", () => {
         doAction(
           "God Mode: Set Shadows",
           () => {
-            state.players.first.shadows = val;
+            godTarget().shadows = val;
           },
           {},
           { autoRender: true },
@@ -253,6 +256,21 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  // Perspective flip toggle (default OFF)
+  const flipToggle = document.getElementById(
+    "activeOnBottomToggle",
+  ) as HTMLInputElement | null;
+  if (flipToggle) {
+    void import("../ui/render.js").then(
+      ({ isActiveOnBottom, setActiveOnBottom }) => {
+        flipToggle.checked = isActiveOnBottom();
+        flipToggle.addEventListener("change", () => {
+          setActiveOnBottom(flipToggle.checked);
+        });
+      },
+    );
+  }
 });
 
 // Suppress browser context menu on game surface (cards/boards/leaders/buttons)

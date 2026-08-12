@@ -268,39 +268,45 @@ describe("Rulebook §933 — Super-Evolve: +3/+3, owner-turn protection, pierce 
   });
 
   it("super-evolved attacker takes normal counter-damage off owner's turn", () => {
+    // Super-evo damage immunity is owner's-turn only. Verify by attacking INTO the
+    // super-evolved follower during the opponent's turn (legal), not by swinging
+    // off-turn (now correctly refused by the engine ownership guard).
     givenGameState({ seed: 1, activePlayer: "second", phase: "main" }).build();
 
-    const attacker: CardInstance = {
+    const superDefender: CardInstance = {
       ...createCard(
-        { name: "SuperAtk", type: "Follower", cost: 5, attack: 4, defense: 5 },
+        { name: "SuperDef", type: "Follower", cost: 5, attack: 4, defense: 5 },
         "board",
         "first",
       ),
       evoType: "super",
       hasEvolved: true,
-      can_attack: true,
+      can_attack: false,
       hasAttacked: false,
-      attacks_left: 1,
       justPlayed: false,
       peak_defense: 5,
     };
 
-    const defender: CardInstance = {
+    const attacker: CardInstance = {
       ...createCard(
-        { name: "Defender", type: "Follower", cost: 2, attack: 2, defense: 3 },
+        { name: "Attacker", type: "Follower", cost: 2, attack: 2, defense: 3 },
         "board",
         "second",
       ),
-      can_attack: false,
+      can_attack: true,
+      hasAttacked: false,
+      attacks_left: 1,
+      justPlayed: false,
       peak_defense: 3,
     };
 
-    state.players.first.board = [attacker];
-    state.players.second.board = [defender];
+    state.players.first.board = [superDefender];
+    state.players.second.board = [attacker];
 
-    attackFollower(0, 0, "first", "second");
+    attackFollower(0, 0, "second", "first");
 
-    expect(Number(attacker.defense)).toBe(3);
+    // Off owner's turn: super takes the 2 counter-damage (no 0-damage shield)
+    expect(Number(superDefender.defense)).toBe(3);
   });
 
   it("super-evolved follower that kills an enemy follower deals 1 to enemy leader", () => {

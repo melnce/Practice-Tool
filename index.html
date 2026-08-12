@@ -203,6 +203,19 @@
         <button id="redoBtn" title="Redo (Ctrl+Y / Ctrl+Shift+Z)" disabled>
           Redo
         </button>
+        <label
+          for="activeOnBottomToggle"
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 8px;
+          "
+          title="When on, the active player's side moves to the bottom of the board"
+        >
+          <input type="checkbox" id="activeOnBottomToggle" />
+          Active on bottom
+        </label>
       </div>
     </header>
     <!-- Hamburger to open history drawer -->
@@ -326,6 +339,26 @@
     <!-- Turn controls (unchanged IDs/handlers) -->
     <aside id="turnControls">
       <div class="red-pp-wrapper">
+        <div
+          id="boostPips"
+          class="boost-pips"
+          aria-label="Second player Bonus PP charges"
+        >
+          <span
+            id="boostPipEarly"
+            class="boost-pip"
+            data-tier="early"
+            title="Early Bonus PP (rounds 1–5)"
+            >1–5</span
+          >
+          <span
+            id="boostPipLate"
+            class="boost-pip"
+            data-tier="late"
+            title="Late Bonus PP (round 6+)"
+            >6+</span
+          >
+        </div>
         <button id="redBoost" onclick="useRedBoost()">+1 PP Boost</button>
         <div class="pp-floating" id="redPPBox">
           PP: <span id="redPP">1</span>
@@ -363,6 +396,17 @@
           "
         >
           GOD MODE
+        </div>
+        <div
+          class="god-target-label"
+          style="
+            font-size: 0.7rem;
+            color: #ccc;
+            margin-bottom: 6px;
+            text-align: center;
+          "
+        >
+          Target: Blue (1st)
         </div>
         <div
           style="

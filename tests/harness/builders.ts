@@ -49,6 +49,21 @@ export type CardSpec =
   | string // Card ID - will be looked up from registry
   | (Partial<CardInstance> & { name: string }); // Inline spec with required name
 
+/** Deterministic filler cards so turn draws don't accidental-deckout in mechanic tests. */
+function makeFillerDeck(prefix: string, n: number): CardSpec[] {
+  const out: CardSpec[] = [];
+  for (let i = 0; i < n; i++) {
+    out.push({
+      name: `${prefix}${i}`,
+      type: "Follower",
+      cost: 1,
+      attack: 1,
+      defense: 1,
+    });
+  }
+  return out;
+}
+
 /**
  * Configuration for game state builder.
  */
@@ -313,6 +328,15 @@ export class GameStateBuilder {
     state.activePlayer = this.config.activePlayer!;
     state.turnNumber = this.config.turn!;
     state.roundCount = this.config.roundCount!;
+
+    // Default filler decks so turn draws do not accidental-deckout.
+    // Explicit `.withFirstDeck([])` / `.withSecondDeck([])` keeps empty for deck-out tests.
+    if (this.firstPlayer.deck === undefined) {
+      this.firstPlayer.deck = makeFillerDeck("PadF", 30);
+    }
+    if (this.secondPlayer.deck === undefined) {
+      this.secondPlayer.deck = makeFillerDeck("PadS", 30);
+    }
 
     // Apply first player config
     this.applyPlayerConfig("first", this.firstPlayer);

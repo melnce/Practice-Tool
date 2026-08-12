@@ -17,6 +17,7 @@ import {
   setPlaysThisTurn,
   isFirstPlayer,
 } from "../../../core/playerHelpers.js";
+import { isGameOver } from "../../../core/gameOver.js";
 
 /**
  * Core play card logic. Returns a PlayOutcome without any rendering.
@@ -27,6 +28,10 @@ export function playCardCore(
   player: Player,
   index: number,
 ): PlayOutcome {
+  if (isGameOver()) {
+    return { kind: "blocked", reason: "Game over" };
+  }
+
   // 1) Turn guard
   const first = isFirstPlayer(player);
   if (

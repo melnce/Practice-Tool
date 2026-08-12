@@ -115,7 +115,7 @@ describe("Mechanic Contract: draw", () => {
     });
 
     it("drawing from empty deck draws nothing and defeats the drawing player", () => {
-      givenGameState({ seed: 1 }).build();
+      givenGameState({ seed: 1 }).withFirstDeck([]).build();
       const hpBefore = state.players.first.hp;
 
       const effect = {

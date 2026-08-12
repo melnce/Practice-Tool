@@ -50,7 +50,7 @@ body {
 #controlPanel {
   position: sticky;
   top: 0;
-  z-index: 200;
+  z-index: 4000;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -461,4 +461,163 @@ body {
   pointer-events: none;
   /* don’t block clicks */
   z-index: 10;
+}
+
+/* ===== Hot-seat: active side + perspective flip + game over ===== */
+
+#appRoot {
+  display: flex;
+  flex-direction: column;
+}
+
+.side-red {
+  order: 1;
+}
+
+.side-blue {
+  order: 2;
+}
+
+/* Optional: put the active player's section at the bottom (default OFF) */
+body.active-on-bottom.active-second .side-red {
+  order: 2;
+}
+
+body.active-on-bottom.active-second .side-blue {
+  order: 1;
+}
+
+body.active-first .side-blue .hand-zone,
+body.active-second .side-red .hand-zone {
+  box-shadow: inset 0 0 0 2px rgba(57, 217, 138, 0.55);
+  background: rgba(57, 217, 138, 0.06);
+  border-radius: 10px;
+}
+
+body.active-first .blue-leader,
+body.active-second .red-leader {
+  box-shadow:
+    0 0 0 3px rgba(57, 217, 138, 0.65),
+    0 6px 16px rgba(0, 0, 0, 0.35),
+    0 0 0 4px rgba(0, 0, 0, 0.25) inset;
+}
+
+body.gameover .zone,
+body.gameover .leader {
+  pointer-events: none;
+  opacity: 0.72;
+}
+
+#actionToast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(8px);
+  z-index: 4000;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(20, 22, 28, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+#actionToast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+#gameOverOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  /* Let the sticky control bar (undo/redo/rematch seed) stay clickable */
+  pointer-events: none;
+}
+
+.gameover-card {
+  min-width: 280px;
+  max-width: 90vw;
+  padding: 22px 26px;
+  border-radius: 12px;
+  background: rgba(24, 26, 32, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.gameover-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.gameover-reason {
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.gameover-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.gameover-actions button {
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.gameover-actions button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.boost-pips {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.boost-pip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 180, 80, 0.45);
+  color: rgba(255, 210, 140, 0.95);
+  background: rgba(80, 40, 10, 0.45);
+  opacity: 0.85;
+}
+
+.boost-pip.active-tier {
+  opacity: 1;
+  box-shadow: 0 0 0 1px rgba(255, 180, 80, 0.35);
+}
+
+.boost-pip.used {
+  opacity: 0.35;
+  text-decoration: line-through;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--muted);
 }

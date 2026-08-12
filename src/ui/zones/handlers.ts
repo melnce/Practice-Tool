@@ -80,8 +80,10 @@ export function attachHandlers(
       }
     });
 
-    // Drag
-    enableCardDragFromHand(div, card, ctx.containerId);
+    // Drag — off-turn hand cards are not draggable (silent refusal without toast spam)
+    const canDragHand =
+      ctx.isMyHand && state.phase !== "gameover" && state.phase !== "mulligan";
+    enableCardDragFromHand(div, card, ctx.containerId, canDragHand);
   }
 
   // 4. Board Interactions
