@@ -10,8 +10,7 @@ import type {
 } from "../../../core/types/index.js";
 import { getPool } from "../targeting.js";
 import { isOverflow } from "../../../helpers/overflow.js";
-import { pickEnhanceTier } from "./cost.js";
-import { getEffectiveCost } from "./cost.js";
+import { resolvePlayCost, getEffectiveCost } from "./cost.js";
 import {
   getPP,
   getHand,
@@ -92,9 +91,9 @@ export function canPlayCard(
   const myBoard = getBoard(state, player);
   const enemyBoard = getBoard(state, opponentOf(player));
 
-  // Determine effect list (enhanced or base)
-  const chosenTier = pickEnhanceTier(card, availablePP);
-  const effectList = getEffectList(card, chosenTier);
+  // Resolve play form (Enhance / normal / Accelerate / Crystallize)
+  const plan = resolvePlayCost(card, availablePP);
+  const effectList = getEffectList(card, plan);
 
   const ctx: PreflightContext = {
     card,
@@ -118,28 +117,31 @@ export function canPlayCard(
     if (!result.ok) return result;
   }
 
-  // 2) Generic effect-driven checks (for spells only - followers can play even if fanfare targets miss)
-  if (card.type === "Spell") {
-    // Check if any effect requires a target that doesn't exist
+  // 2) Generic effect-driven checks for spell-like plays
+  //    (printed spells, or Accelerate which resolves as a spell)
+  const playsAsSpell = card.type === "Spell" || plan.mode === "accelerate";
+  if (playsAsSpell) {
     const targetCheck = checkEffectsHaveValidTargets(effectList, player, card);
     if (!targetCheck.ok) return targetCheck;
 
-    // Check if spell needs a hand card to return (return_hand_to_deck with select)
     const handReturnCheck = checkHandReturnRequirement(effectList, hand);
     if (!handReturnCheck.ok) return handReturnCheck;
 
-    // Check if spell needs ally on board (return_to_hand targeting ally)
     const allyOnBoardCheck = checkAllyOnBoardRequirement(effectList, myBoard);
     if (!allyOnBoardCheck.ok) return allyOnBoardCheck;
 
-    // Check artifact pair requirement (select_hand_summon_artifact_copies_eot_destroy)
     const artifactPairCheck = checkArtifactPairRequirement(effectList, hand);
     if (!artifactPairCheck.ok) return artifactPairCheck;
   }
 
-  // 3) Board space check for permanents
-  const isPermanent = card.type === "Follower" || card.type === "Amulet";
-  if (isPermanent && myBoard.length >= 5) {
+  // 3) Board space for permanents (Accelerate is a spell — no slot needed)
+  const playsAsPermanent =
+    plan.mode === "accelerate"
+      ? false
+      : plan.mode === "crystallize"
+        ? true
+        : card.type === "Follower" || card.type === "Amulet";
+  if (playsAsPermanent && myBoard.length >= 5) {
     return { ok: false, reason: "Board is full." };
   }
 
@@ -152,14 +154,25 @@ export function canPlayCard(
 
 function getEffectList(
   card: CardInstance,
-  chosenTier: { effects: Effect[] } | null,
+  plan: {
+    mode: string;
+    enhanceTier: { effects: Effect[] } | null;
+    alternate: { effects: Effect[] } | null;
+  },
 ): Effect[] {
   if (
-    chosenTier &&
-    Array.isArray(chosenTier.effects) &&
-    chosenTier.effects.length
+    plan.mode === "accelerate" &&
+    plan.alternate &&
+    Array.isArray(plan.alternate.effects)
   ) {
-    return chosenTier.effects;
+    return plan.alternate.effects;
+  }
+  if (
+    plan.enhanceTier &&
+    Array.isArray(plan.enhanceTier.effects) &&
+    plan.enhanceTier.effects.length
+  ) {
+    return plan.enhanceTier.effects;
   }
   const baseList = (
     Array.isArray(card.spell) && card.spell.length ? card.spell : []

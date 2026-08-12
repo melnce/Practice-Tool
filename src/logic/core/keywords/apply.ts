@@ -141,6 +141,34 @@ export const KEYWORD_MAP: {
     });
     c.enhanceTiers.sort((a, b) => b.cost - a.cost);
   },
+  accelerate: (c, opts) => {
+    if (opts?.cost == null) return;
+    if (!(c as any).accelerateTiers) (c as any).accelerateTiers = [];
+    (c as any).accelerateTiers.push({
+      cost: Number(opts.cost),
+      effects: opts.effects || [],
+    });
+    (c as any).accelerateTiers.sort(
+      (a: { cost: number }, b: { cost: number }) => b.cost - a.cost,
+    );
+  },
+  crystallize: (c, opts) => {
+    if (opts?.cost == null) return;
+    if (!(c as any).crystallizeTiers) (c as any).crystallizeTiers = [];
+    const amuletKeywords = Array.isArray(opts.amuletKeywords)
+      ? opts.amuletKeywords
+      : Array.isArray(opts.keywords)
+        ? opts.keywords
+        : [];
+    (c as any).crystallizeTiers.push({
+      cost: Number(opts.cost),
+      amuletKeywords,
+      effects: opts.effects || [],
+    });
+    (c as any).crystallizeTiers.sort(
+      (a: { cost: number }, b: { cost: number }) => b.cost - a.cost,
+    );
+  },
   spellboost: (c, opts) => {
     if (!opts) return;
     const ks = getKS(c);

@@ -1232,7 +1232,27 @@
     "url": "https://shadowverse.gg/cards/10661110-prostrating-coward",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Bane"],
+    "keywords": [
+      "Ward",
+      "Bane",
+      {
+        "name": "Crystallize",
+        "cost": 2,
+        "amuletKeywords": [
+          { "name": "Countdown", "turns": 3 },
+          {
+            "name": "LastWords",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Prostrating Coward"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
@@ -1303,7 +1323,27 @@
     "url": "https://shadowverse.gg/cards/10662110-venerating-dyer",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush", "Bane"],
+    "keywords": [
+      "Rush",
+      "Bane",
+      {
+        "name": "Crystallize",
+        "cost": 1,
+        "amuletKeywords": [
+          { "name": "Countdown", "turns": 3 },
+          {
+            "name": "LastWords",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Venerating Dyer"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
@@ -1374,7 +1414,27 @@
     "url": "https://shadowverse.gg/cards/10663110-worshipful-crusader",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Bane", "Aura"],
+    "keywords": [
+      "Bane",
+      "Aura",
+      {
+        "name": "Crystallize",
+        "cost": 1,
+        "amuletKeywords": [
+          { "name": "Countdown", "turns": 3 },
+          {
+            "name": "LastWords",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Worshipful Crusader"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
@@ -1474,7 +1534,21 @@
     "url": "https://shadowverse.gg/cards/10671110-shoddy-plaything",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "Accelerate",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Shoddy Plaything",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
@@ -1545,7 +1619,20 @@
     "url": "https://shadowverse.gg/cards/10672110-substandard-puppet",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Accelerate",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Substandard Puppet",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
@@ -1616,7 +1703,20 @@
     "url": "https://shadowverse.gg/cards/10673110-ludicrous-ordnance",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Accelerate",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Ludicrous Ordnance",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
