@@ -62,7 +62,6 @@ type PlayOutcome =
 5. **Alternate forms (Accelerate / Crystallize)**  
    Cost resolution lives in `resolvePlayCost()` (`cost.ts`). Enhance still wins when affordable; otherwise normal play is preferred when the effective cost is payable; only when PP is below that cost may the highest-payable Accelerate or Crystallize activate. Accelerate dispatches through `playSpell`; Crystallize rewrites the instance to an amulet then `playAmulet`. See rulebook entries.
 
-
 ---
 
 ## When NOT to Use `playCardNoRender`

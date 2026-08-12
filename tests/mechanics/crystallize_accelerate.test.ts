@@ -265,9 +265,7 @@ describe("Crystallize / Accelerate", () => {
 
       useSecondPlayerPPBoost();
       expect(getPP(state, "second")).toBe(4);
-      expect(resolvePlayCost(card, getPP(state, "second")).mode).toBe(
-        "normal",
-      );
+      expect(resolvePlayCost(card, getPP(state, "second")).mode).toBe("normal");
     });
   });
 
@@ -291,9 +289,9 @@ describe("Crystallize / Accelerate", () => {
           (c) => c.name === "Venerating Dyer" && c.type === "Follower",
         ),
       ).toBe(true);
-      expect(
-        getBoard(state, "first").some((c) => c.type === "Amulet"),
-      ).toBe(false);
+      expect(getBoard(state, "first").some((c) => c.type === "Amulet")).toBe(
+        false,
+      );
     });
   });
 

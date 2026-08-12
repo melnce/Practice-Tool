@@ -43,11 +43,7 @@ export function pickEnhanceTier(
   return null;
 }
 
-export type PlayCostMode =
-  | "enhance"
-  | "normal"
-  | "accelerate"
-  | "crystallize";
+export type PlayCostMode = "enhance" | "normal" | "accelerate" | "crystallize";
 
 export interface PlayCostPlan {
   mode: PlayCostMode;

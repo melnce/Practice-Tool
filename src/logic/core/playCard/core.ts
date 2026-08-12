@@ -100,7 +100,6 @@ export function playCardCore(
     (card as any).originalPrintedType = card.type;
     card.type = "Spell";
     return playSpell(card, player, plan.cost, {
-      cost: plan.alternate.cost,
       effects: plan.alternate.effects,
     });
   }

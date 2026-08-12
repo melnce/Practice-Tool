@@ -173,7 +173,10 @@ export function hasUnauthoredAlternateForms(card: CardLike): boolean {
     const name = String((raw as { name?: string }).name ?? "").toLowerCase();
     if (name === "accelerate" && !hasAuthoredAlternateForm(card, "accelerate"))
       return true;
-    if (name === "crystallize" && !hasAuthoredAlternateForm(card, "crystallize"))
+    if (
+      name === "crystallize" &&
+      !hasAuthoredAlternateForm(card, "crystallize")
+    )
       return true;
   }
   return false;
@@ -196,10 +199,7 @@ function hasConfiguredKeyword(card: CardLike): boolean {
     )
       return true;
     if (name === "enhance" && kw.cost != null) return true;
-    if (
-      (name === "accelerate" || name === "crystallize") &&
-      kw.cost != null
-    )
+    if ((name === "accelerate" || name === "crystallize") && kw.cost != null)
       return true;
     if (
       name === "countdown" &&
