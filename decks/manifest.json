@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-08-12T11:35:17.824Z",
+  "entries": [
+    {
+      "file": "abysscraft_necromancy.json",
+      "id": "abysscraft_necromancy",
+      "label": "Abyss Necromancy Reanimate",
+      "category": "deck"
+    },
+    {
+      "file": "dragoncraft_overflow.json",
+      "id": "dragoncraft_overflow",
+      "label": "Dragon Overflow Ramp",
+      "category": "deck"
+    },
+    {
+      "file": "forestcraft_combo.json",
+      "id": "forestcraft_combo",
+      "label": "Forest Combo Fairies",
+      "category": "deck"
+    },
+    {
+      "file": "havencraft_countdown.json",
+      "id": "havencraft_countdown",
+      "label": "Haven Countdown Amulets",
+      "category": "deck"
+    },
+    {
+      "file": "portalcraft_artifacts.json",
+      "id": "portalcraft_artifacts",
+      "label": "Portal Artifact Forge",
+      "category": "deck"
+    },
+    {
+      "file": "runecraft_spellboost.json",
+      "id": "runecraft_spellboost",
+      "label": "Rune Spellboost",
+      "category": "deck"
+    },
+    {
+      "file": "starter_deck.json",
+      "id": "starter_deck",
+      "label": "Starter",
+      "category": "deck"
+    },
+    {
+      "file": "swordcraft_rally.json",
+      "id": "swordcraft_rally",
+      "label": "Sword Rally Officers",
+      "category": "deck"
+    }
+  ]
+}

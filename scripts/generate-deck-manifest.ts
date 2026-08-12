@@ -7,13 +7,31 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { buildManifestFromFilenames } from "../src/data/deckManifest.js";
+import {
+  buildManifestFromFilenames,
+  type DeckManifest,
+} from "../src/data/deckManifest.js";
+import { isRawDeckObject, type RawDeck } from "../src/data/rawDeck.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, "../");
 const DECKS_DIR = path.join(ROOT, "decks");
 const MANIFEST_FILE = path.join(DECKS_DIR, "manifest.json");
+
+function deckNameFromFile(file: string): string | undefined {
+  const filePath = path.join(DECKS_DIR, file);
+  try {
+    const raw = JSON.parse(fs.readFileSync(filePath, "utf-8")) as RawDeck;
+    if (isRawDeckObject(raw) && typeof raw.deckName === "string") {
+      const name = raw.deckName.trim();
+      return name || undefined;
+    }
+  } catch {
+    /* ignore unreadable / invalid JSON — check:decks will surface it */
+  }
+  return undefined;
+}
 
 function main() {
   if (!fs.existsSync(DECKS_DIR)) {
@@ -22,7 +40,12 @@ function main() {
   }
 
   const files = fs.readdirSync(DECKS_DIR);
-  const manifest = buildManifestFromFilenames(files);
+  const manifest: DeckManifest = buildManifestFromFilenames(files);
+
+  for (const entry of manifest.entries) {
+    const deckName = deckNameFromFile(entry.file);
+    if (deckName) entry.label = deckName;
+  }
 
   fs.writeFileSync(MANIFEST_FILE, JSON.stringify(manifest, null, 2));
 

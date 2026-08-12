@@ -1,0 +1,83 @@
+{
+  "class": "Dragoncraft",
+  "deckName": "Dragon Overflow Ramp",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Soaring Ivory Dragon",
+      "count": 3
+    },
+    {
+      "name": "Strike of the Dragonewt",
+      "count": 3
+    },
+    {
+      "name": "Little Dragon Nanny",
+      "count": 3
+    },
+    {
+      "name": "Filene, Whitefrost Bloom",
+      "count": 2
+    },
+    {
+      "name": "Dragonsign",
+      "count": 3
+    },
+    {
+      "name": "Eyfa, Windrider",
+      "count": 2
+    },
+    {
+      "name": "Liu Feng, Goldennote Ward",
+      "count": 2
+    },
+    {
+      "name": "Ocean Rider",
+      "count": 2
+    },
+    {
+      "name": "Raging Lightning",
+      "count": 2
+    },
+    {
+      "name": "Whitescale Herald",
+      "count": 2
+    },
+    {
+      "name": "Fledgling Dragonslayer",
+      "count": 2
+    },
+    {
+      "name": "Zooey, Ally of the World",
+      "count": 2
+    },
+    {
+      "name": "Swordsnout Trencher",
+      "count": 2
+    },
+    {
+      "name": "Galmieux, Ardor Manifest",
+      "count": 2
+    },
+    {
+      "name": "Forte, Blackwing Dragoon",
+      "count": 2
+    },
+    {
+      "name": "Wilnas, Flame Personified",
+      "count": 1
+    },
+    {
+      "name": "Neptune, Arbiter of Tides",
+      "count": 1
+    },
+    {
+      "name": "Leah, Bellringer Angel",
+      "count": 2
+    },
+    {
+      "name": "Seraphic Tidings",
+      "count": 2
+    }
+  ]
+}

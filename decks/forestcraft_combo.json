@@ -1,0 +1,79 @@
+{
+  "class": "Forestcraft",
+  "deckName": "Forest Combo Fairies",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Fairy Convocation",
+      "count": 3
+    },
+    {
+      "name": "May, Journey Elf",
+      "count": 3
+    },
+    {
+      "name": "Fairy Tamer",
+      "count": 3
+    },
+    {
+      "name": "Stray Beastman",
+      "count": 3
+    },
+    {
+      "name": "Bestial Swipe",
+      "count": 3
+    },
+    {
+      "name": "Garden's Allure",
+      "count": 2
+    },
+    {
+      "name": "Capricious Sprite",
+      "count": 3
+    },
+    {
+      "name": "Fay Twinkletoes",
+      "count": 2
+    },
+    {
+      "name": "Killer Rhinoceroach",
+      "count": 2
+    },
+    {
+      "name": "Wildheart",
+      "count": 2
+    },
+    {
+      "name": "Gentle Treant",
+      "count": 3
+    },
+    {
+      "name": "Cynthia, Chivalrous Elf",
+      "count": 2
+    },
+    {
+      "name": "Amataz, Origin Blader",
+      "count": 2
+    },
+    {
+      "name": "Comet Drive",
+      "count": 2
+    },
+    {
+      "name": "Glade, Fragrantwood Ward",
+      "count": 2
+    },
+    {
+      "name": "Titania, Queen of Fairies",
+      "count": 1
+    },
+    {
+      "name": "Aria, Lady of the Woods",
+      "count": 1
+    },
+    {
+      "name": "Leah, Bellringer Angel",
+      "count": 1
+    }
+  ]
+}
