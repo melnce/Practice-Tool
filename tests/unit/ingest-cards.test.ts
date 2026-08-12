@@ -206,7 +206,7 @@ describe("implementation status derivation", () => {
         keywords: ["Ward"],
         fanfare: [],
       }),
-    ).toBe("implemented");
+    ).toBe("ops_present");
 
     expect(
       getImplementationStatus({
@@ -225,6 +225,6 @@ describe("implementation status derivation", () => {
         description: "Fanfare: Do a mystery.",
         fanfare: [{ op: "not_a_real_op", amount: 1 }],
       }),
-    ).toBe("partial");
+    ).toBe("unknown_ops");
   });
 });

@@ -66,6 +66,12 @@ export function handleCost(
         (!Array.isArray(c.tribes) || !c.tribes.includes(spec.filter.tribe))
       )
         return false;
+      if (
+        spec.filter?.name &&
+        String(c.name ?? "").toLowerCase() !==
+          String(spec.filter.name).toLowerCase()
+      )
+        return false;
       return true;
     });
   }

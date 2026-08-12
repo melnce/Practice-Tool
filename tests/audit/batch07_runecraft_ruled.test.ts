@@ -11,6 +11,7 @@ import {
   findOnBoard,
   thenHand,
   thenBoard,
+  whenEndTurn,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
@@ -516,6 +517,24 @@ describe("B/C — Raio hand transform (10334120)", () => {
     expect(thenHand("first").some((c) => c.name === "Ersatz Elimination")).toBe(
       true,
     );
+  });
+
+  it("transformed Ersatz Elimination costs 0 until end of turn", () => {
+    setupTurn(R10, { hand: ["10334120", "10131310", "10131320"], pp: 9 });
+    whenPlayCard("first", 0);
+    const ersatz = thenHand("first").find(
+      (c) => c.name === "Ersatz Elimination",
+    )!;
+    expect(getEffectiveCost(ersatz)).toBe(0);
+    expect((ersatz as any).temp_cost_set_until_eot).toBe(true);
+    whenEndTurn();
+    // After own EOT, clearTempHandCostMods restores base cost
+    const after = thenHand("first").find(
+      (c) => c.name === "Ersatz Elimination",
+    );
+    if (after) {
+      expect(getEffectiveCost(after)).toBe(4);
+    }
   });
 });
 

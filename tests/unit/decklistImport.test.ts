@@ -189,7 +189,7 @@ describe("decklist import", () => {
     const vanillas = [...index.byName.values()].filter(
       (c) =>
         c.class === "Neutral" &&
-        c.implementationStatus === "implemented" &&
+        c.implementationStatus === "ops_present" &&
         c.type === "Follower",
     );
     const cards: { name: string; count: number }[] = [];

@@ -34,19 +34,19 @@ describe("coverage banner counts", () => {
       card({
         id: "10001120",
         name: "B",
-        implementationStatus: "implemented",
+        implementationStatus: "ops_present",
         description: "Ward",
       }),
       card({
         id: "10522120",
         name: "C",
-        implementationStatus: "partial",
+        implementationStatus: "unknown_ops",
         description: "Fanfare: Mystery.",
       }),
     ];
     const counts = countDeckCoverage(deck);
     expect(counts.unimplemented).toBe(1);
-    expect(counts.partial).toBe(1);
+    expect(counts.unknown_ops).toBe(1);
     expect(counts.flaggedIds.sort()).toEqual(["10521110", "10522120"]);
   });
 
@@ -62,8 +62,8 @@ describe("coverage banner counts", () => {
     expect(counts.unimplemented).toBe(1);
     // Banner text must not claim the rest of the deck is faithfully complete
     expect(
-      `${counts.unimplemented} cards in this deck have no implemented effects`,
-    ).toMatch(/have no implemented effects/);
+      `${counts.unimplemented} cards in this deck have no programmed effects`,
+    ).toMatch(/have no programmed effects/);
   });
 
   it("reportDeckCoverage is a no-op without DOM when clean", () => {
@@ -72,7 +72,7 @@ describe("coverage banner counts", () => {
         card({
           id: "1",
           name: "Ok",
-          implementationStatus: "implemented",
+          implementationStatus: "ops_present",
         }),
       ],
       [],

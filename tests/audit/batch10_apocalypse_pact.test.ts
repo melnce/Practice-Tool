@@ -88,7 +88,7 @@ describe("Set 10006 — Apocalypse Pact", () => {
     for (const id of AUTHORED_SAMPLE) {
       const card = getCardById(id);
       expect(card, id).toBeTruthy();
-      expect(getImplementationStatus(card!), id).toBe("implemented");
+      expect(getImplementationStatus(card!), id).toBe("ops_present");
     }
   });
 

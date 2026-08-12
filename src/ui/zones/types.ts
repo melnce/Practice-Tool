@@ -54,8 +54,8 @@ export interface CardViewModel {
   formLabel?: string | null | undefined;
   /** Derived implementation coverage — mark stubs so practice lines stay honest. */
   implementationStatus?:
-    | "implemented"
-    | "partial"
+    | "ops_present"
+    | "unknown_ops"
     | "unimplemented"
     | undefined;
 

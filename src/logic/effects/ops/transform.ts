@@ -285,25 +285,12 @@ function transformRandomInHand(
   // Pick one randomly
   const pick = state.rng.pick(candidates);
   if (!pick) return;
-  const uid = pick.uid;
 
   // Transform in hand (preserves uid/cost_mod/etc.)
   transformHandTarget(pick, intoName);
 
-  // If the original transformRandomSpellInHand set cost to 0, replicate that behavior
-  // (This is specific to the Raio card behavior)
-  const updated = getHand(state, owner).find((c) => c && c.uid === uid);
-  if (!updated) return;
-
-  const printed = parseInt(updated.cost as string, 10) || 0;
-  const existingM = parseInt(String(updated.cost_mod || 0), 10) || 0;
-  const current = printed + existingM;
-  const delta = 0 - current; // bring to zero
-
-  if (updated.base_cost === undefined) updated.base_cost = printed;
-  updated.cost_mod = existingM + delta;
-  updated.temp_cost_mod_until_eot =
-    (parseInt(String(updated.temp_cost_mod_until_eot ?? 0), 10) || 0) + delta;
+  // Temporary cost-0 (Raio et al.) is authored as a follow-up `cost` set+until_eot —
+  // do not hardcode it here or every random hand transform silently gets free cost.
   logEvent("transformRandomInHand", { owner, to: intoName });
 }
 

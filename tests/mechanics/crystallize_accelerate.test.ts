@@ -63,7 +63,7 @@ describe("Crystallize / Accelerate", () => {
       for (const id of [...CRYSTALLIZE_IDS, ...ACCELERATE_IDS]) {
         const card = getCardById(id);
         expect(card, id).toBeTruthy();
-        expect(getImplementationStatus(card!), id).toBe("implemented");
+        expect(getImplementationStatus(card!), id).toBe("ops_present");
       }
     });
   });

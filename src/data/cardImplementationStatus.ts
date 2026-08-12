@@ -6,20 +6,24 @@
  * WHAT THESE LABELS GUARANTEE (and what they do not):
  * - unimplemented: non-evergreen rules text with no programmed effects / configured
  *   keywords. Safe claim: "this card has no implemented effects."
- * - partial: at least one unknown/unregistered `op` in the effect trees. On the
+ * - unknown_ops: at least one unknown/unregistered `op` in the effect trees. On the
  *   current pool this is effectively unreachable (every authored op is registered);
  *   it exists for forward detection when a bad op slips in.
- * - implemented: vanilla / evergreen-only, OR has some programmed content with only
+ * - ops_present: vanilla / evergreen-only, OR has some programmed content with only
  *   known ops. THIS DOES NOT MEAN THE CARD IS FAITHFUL TO ITS FULL RULES TEXT.
- *   A card with Fanfare authored but Evolve missing still counts as "implemented".
- *   Do not treat the count of "implemented" cards as a fidelity / coverage metric.
+ *   A card with Fanfare authored but Evolve missing still counts as "ops_present".
+ *   Do not treat the count of "ops_present" cards as a fidelity / coverage metric.
  *
- * A real text-vs-ops fidelity audit of the implemented pool is a separate job.
+ * Historical aliases "implemented" / "partial" were renamed because they overclaimed.
+ * A real text-vs-ops fidelity audit of the ops_present pool is a separate job.
  */
 
 import { ALL_OPS } from "../logic/core/effects/opTypes.js";
 
-export type ImplementationStatus = "implemented" | "partial" | "unimplemented";
+export type ImplementationStatus =
+  | "ops_present"
+  | "unknown_ops"
+  | "unimplemented";
 
 /** Evergreen keywords that the engine applies from keywords[] / description lines. */
 export const EVERGREEN_KEYWORDS = [
@@ -221,24 +225,24 @@ export function hasProgrammedEffects(card: CardLike): boolean {
 
 export function getImplementationStatus(card: CardLike): ImplementationStatus {
   const unknown = unknownCardOps(card);
-  if (unknown.length > 0) return "partial";
+  if (unknown.length > 0) return "unknown_ops";
 
   if (hasUnauthoredAlternateForms(card)) return "unimplemented";
 
   const remaining = nonEvergreenText(card.description);
-  if (!remaining) return "implemented";
+  if (!remaining) return "ops_present";
 
   if (!hasProgrammedEffects(card)) return "unimplemented";
 
-  return "implemented";
+  return "ops_present";
 }
 
 export function summarizeImplementationStatus(
   cards: CardLike[],
 ): Record<ImplementationStatus, number> {
   const out: Record<ImplementationStatus, number> = {
-    implemented: 0,
-    partial: 0,
+    ops_present: 0,
+    unknown_ops: 0,
     unimplemented: 0,
   };
   for (const card of cards) {
