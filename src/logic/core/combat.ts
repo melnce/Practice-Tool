@@ -61,29 +61,41 @@ function hasActiveWardOn(board: CardInstance[]) {
   );
 }
 
+function attackerIgnoresWard(attacker?: CardInstance): boolean {
+  return !!(attacker?.ignoresWard || attacker?.keywordState?.ignoresWard);
+}
+
 function canTargetFollower(
   defender: CardInstance,
   defenderBoard: CardInstance[],
+  attacker?: CardInstance,
 ) {
   if (!defender || defender.type !== "Follower") return false;
   if (defender.hasAmbush) return false;
   if (defender.keywordState?.hasIntimidate || (defender as any).hasIntimidate)
     return false; // Check both for safety/migration
-  if (hasActiveWardOn(defenderBoard) && !defender.hasWard) return false;
+  if (
+    !attackerIgnoresWard(attacker) &&
+    hasActiveWardOn(defenderBoard) &&
+    !defender.hasWard
+  )
+    return false;
   return true;
 }
 
 export function canAttackFollowerTarget(
   defender: CardInstance,
   defenderBoard: CardInstance[],
+  attacker?: CardInstance,
 ): boolean {
-  return canTargetFollower(defender, defenderBoard);
+  return canTargetFollower(defender, defenderBoard, attacker);
 }
 
 export function canAttackLeaderWhileWardActive(
   defenderBoard: CardInstance[],
+  attacker?: CardInstance,
 ): boolean {
-  return !hasActiveWardOn(defenderBoard);
+  return attackerIgnoresWard(attacker) || !hasActiveWardOn(defenderBoard);
 }
 function effectiveAtk(card: CardInstance) {
   return Math.max(0, parseInt(card?.attack as any, 10) || 0);
@@ -254,7 +266,7 @@ function _attackFollowerCore(
   )
     return;
   if (isAttackForbidden(attacker)) return; // Checks keywordState inside
-  if (!canTargetFollower(defender, defenderBoard)) return;
+  if (!canTargetFollower(defender, defenderBoard, attacker)) return;
 
   // Ambush breaks on own attack
   stripAmbushOnSelfAttack(attacker);
@@ -445,7 +457,7 @@ function _attackLeaderCore(
   )
     return;
   if (isAttackForbidden(attacker)) return;
-  if (hasActiveWardOn(defenderBoard)) return;
+  if (!attackerIgnoresWard(attacker) && hasActiveWardOn(defenderBoard)) return;
 
   stripAmbushOnSelfAttack(attacker);
 

@@ -44,6 +44,7 @@ export interface CardTemplate {
   hasRush?: boolean;
   isRush?: boolean;
   hasWard?: boolean;
+  ignoresWard?: boolean;
   hasIntimidate?: boolean;
   hasBane?: boolean;
   hasLastWords?: boolean;

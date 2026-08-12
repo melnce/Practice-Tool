@@ -10,9 +10,9 @@ import {
   getBoard,
   getGraveyard,
   addShadows,
-  getDestroyedHistory,
 } from "../../core/playerHelpers.js";
 import { bumpZoneVersion } from "./triggers/utils.js";
+import { recordDestroyed } from "./destroyedHistory.js";
 
 let runEffects: (
   effects: Effect[],
@@ -351,19 +351,7 @@ export function cleanupDead() {
     }
 
     logEvent("death", { card: c.name, owner, uid: c.uid });
-    const gameTick =
-      (state as any).gameTick ??
-      (state.roundCount || 0) * 1000 +
-        (state.activePlayer === "first" ? 0 : 500);
-    getDestroyedHistory(state, owner).push({
-      uid: c.uid,
-      name: c.name,
-      type: cardType,
-      cost: Number(c?.cost) || 0,
-      base_image: c?.base_image || null,
-      ts: gameTick,
-      id: c.id,
-    } as any);
+    recordDestroyed(state, owner, c);
 
     (board as any)[index] = null;
 

@@ -74,6 +74,9 @@ const ADD_TO_HAND_ALLOWED = new Set([
   "keywords",
   // occasional authoring that the normalizer ignores but is not a crash typo
   "filter",
+  "distinct_by",
+  "distribution",
+  "select",
   "condition",
 ]);
 
@@ -244,7 +247,12 @@ function checkAddToHand(card: CardJson): Issue[] {
     const sourceRaw = String(eff.source || "named")
       .toLowerCase()
       .trim();
-    const source = sourceRaw === "copy" ? "copy" : "named";
+    const source =
+      sourceRaw === "copy"
+        ? "copy"
+        : sourceRaw === "destroyed_match"
+          ? "destroyed_match"
+          : "named";
 
     if (source === "named") {
       if (
@@ -260,7 +268,7 @@ function checkAddToHand(card: CardJson): Issue[] {
           message: `add_to_hand at ${opPath} (source=named) requires "name"`,
         });
       }
-    } else if (!eff.target) {
+    } else if (source === "copy" && !eff.target) {
       issues.push({
         id: card.id,
         name: card.name,

@@ -2,6 +2,7 @@ export type KeywordName =
   | "rush"
   | "storm"
   | "ward"
+  | "ignores_ward"
   | "bane"
   | "drain"
   | "intimidate"
@@ -35,6 +36,8 @@ export const KEYWORD_ALIASES: Record<string, KeywordName> = {
   pixieenter: "pixie_enter",
   allyenter: "ally_enter",
   maxdamagecap: "max_damage_cap",
+  ignoresward: "ignores_ward",
+  "ignores ward": "ignores_ward",
   cantattack: "cant_attack",
   "can't attack": "cant_attack",
   cannotbedestroyed: "cant_be_destroyed",

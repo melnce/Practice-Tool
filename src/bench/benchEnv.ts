@@ -292,6 +292,7 @@ export function getLegalActions(): BenchAction[] {
     const hasEnemyWard = enemyBoard.some(
       (c: CardInstance) => c && c.type === "Follower" && hasWard(c),
     );
+    const ignoresEnemyWard = ignoresWard(attacker);
 
     // Attack enemy followers
     for (let j = 0; j < enemyBoard.length; j++) {
@@ -301,13 +302,13 @@ export function getLegalActions(): BenchAction[] {
       if (hasAmbush(defender)) continue;
 
       // If enemy has Ward, can only attack Ward followers
-      if (hasEnemyWard && !hasWard(defender)) continue;
+      if (hasEnemyWard && !ignoresEnemyWard && !hasWard(defender)) continue;
 
       actions.push({ type: "ATTACK_FOLLOWER", attackerIdx: i, defenderIdx: j });
     }
 
     // Attack enemy leader (only if no Ward)
-    if (!hasEnemyWard) {
+    if (!hasEnemyWard || ignoresEnemyWard) {
       actions.push({ type: "ATTACK_LEADER", attackerIdx: i });
     }
   }
@@ -450,6 +451,16 @@ function hasWard(card: CardInstance): boolean {
   return card.keywords.some((k: any) => {
     const name = typeof k === "string" ? k : k?.name;
     return name?.toLowerCase() === "ward";
+  });
+}
+
+function ignoresWard(card: CardInstance): boolean {
+  if (card.ignoresWard || card.keywordState?.ignoresWard) return true;
+  if (!card.keywords) return false;
+  return card.keywords.some((k: any) => {
+    const name = typeof k === "string" ? k : k?.name;
+    const normalized = name?.toLowerCase().replace(/[\s_]/g, "");
+    return normalized === "ignoresward";
   });
 }
 

@@ -4,6 +4,7 @@
 
 import type { PlayedHistoryEntry } from "../../logic/core/playCard/types.js";
 import type { Crest } from "../../logic/effects/crest.js";
+import type { DestroyedRecord } from "../../logic/core/destroyedHistory.js";
 import type { CardInstance } from "./cards.js";
 
 /**
@@ -78,7 +79,7 @@ export interface PlayerState {
 
   // === History (for RL/analysis) ===
   playedHistory: PlayedHistoryEntry[];
-  destroyedHistory: CardInstance[];
+  destroyedHistory: DestroyedRecord[];
   /** Successful follower enters this match (name/tribes/id). See followerEnterHistory.ts. */
   followerEnterHistory: Array<{
     name: string;

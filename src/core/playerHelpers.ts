@@ -81,7 +81,7 @@ export function getGraveyard(
 export function getDestroyedHistory(
   state: GameState,
   player: PlayerSlot,
-): CardInstance[] {
+): import("../logic/core/destroyedHistory.js").DestroyedRecord[] {
   return state.players[player].destroyedHistory;
 }
 

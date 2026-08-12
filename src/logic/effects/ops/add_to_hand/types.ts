@@ -3,8 +3,10 @@
 // Source determines where the card comes from:
 // - "named": Create from card database by name (token generation)
 // - "copy": Duplicate from an existing target card
+// - "destroyed_match": Recreate cards matching the owner's destroyed history
 
 import type { Effect } from "../../../../core/types/index.js";
+import type { DestroyedMatchFilter } from "../../../core/destroyedHistory.js";
 
 /**
  * CANONICAL FORMAT for add_to_hand op:
@@ -16,7 +18,7 @@ import type { Effect } from "../../../../core/types/index.js";
  * { "op": "add_to_hand", "source": "copy", "target": "selected", "count": 1 }
  */
 
-export type AddToHandSource = "named" | "copy";
+export type AddToHandSource = "named" | "copy" | "destroyed_match";
 export type AddToHandPlayer = "ally" | "enemy";
 // Base copy target - where to copy from
 export type CopyTargetBase = "selected" | "last_drawn" | "trigger" | "self";
@@ -29,6 +31,9 @@ export interface UnifiedAddToHandSpec {
   name: string | null; // Card name (required when source=named)
   target: CopyTargetBase | null; // What to copy (required when source=copy)
   targetFilter: CopyTargetFilter; // Type filter on target (e.g., follower, any)
+  filter: DestroyedMatchFilter;
+  distinctBy: string | null;
+  distribution: string | null;
   count: number; // How many to add - REQUIRED
   player: AddToHandPlayer; // Who receives - default: ally
   keywords: string[]; // Keywords to apply
@@ -42,12 +47,17 @@ export function normalizeToAddToHandSpec(
   eff: Effect & Record<string, any>,
 ): UnifiedAddToHandSpec {
   // ========================================================================
-  // Determine source: "named" (default) or "copy"
+  // Determine source: "named" (default), "copy", or "destroyed_match"
   // ========================================================================
   const sourceRaw = String(eff.source || "named")
     .toLowerCase()
     .trim();
-  const source: AddToHandSource = sourceRaw === "copy" ? "copy" : "named";
+  const source: AddToHandSource =
+    sourceRaw === "copy"
+      ? "copy"
+      : sourceRaw === "destroyed_match"
+        ? "destroyed_match"
+        : "named";
 
   // ========================================================================
   // Validate based on source
@@ -55,6 +65,14 @@ export function normalizeToAddToHandSpec(
   let name: string | null = null;
   let target: CopyTargetBase | null = null;
   let targetFilter: CopyTargetFilter = null;
+  const filter: DestroyedMatchFilter =
+    eff.filter && typeof eff.filter === "object" && !Array.isArray(eff.filter)
+      ? { ...eff.filter }
+      : {};
+  const distinctBy =
+    typeof eff.distinct_by === "string" ? eff.distinct_by.trim() : null;
+  const distribution =
+    typeof eff.distribution === "string" ? eff.distribution.trim() : null;
 
   if (source === "named") {
     // REQUIRED: name
@@ -164,6 +182,9 @@ export function normalizeToAddToHandSpec(
     name,
     target,
     targetFilter,
+    filter,
+    distinctBy,
+    distribution,
     count,
     player,
     keywords,
