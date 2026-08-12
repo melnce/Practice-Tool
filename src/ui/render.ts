@@ -9,6 +9,8 @@ import { byId } from "./dom.js";
 import { state } from "../core/gameState.js";
 import type { GameState, Player, CardInstance } from "../core/types/index.js";
 import { getWinner } from "../core/playerHelpers.js";
+import { getGlobalCardIndex } from "../data/cardIndex.js";
+import { collectSetIds, formatSetBadge } from "../data/formats.js";
 import { maybeAdvanceScriptFromUi } from "./playerDispatch.js";
 import { syncSeedDisplay } from "./seedDisplay.js";
 
@@ -388,6 +390,15 @@ function renderListIfPresent(id: string, arr: any[]) {
   list.className = "hist-list";
   const items = Array.isArray(arr) ? arr : [];
 
+  const index = getGlobalCardIndex();
+  const allSetIds = index
+    ? collectSetIds(
+        [...index.byName.values()].map((c) => ({
+          set: (c as { set?: unknown }).set,
+        })),
+      )
+    : [];
+
   // Normalize and group by (name + cost) so variants with different costs won’t merge.
   const groups = new Map();
   for (const it of items) {
@@ -402,9 +413,11 @@ function renderListIfPresent(id: string, arr: any[]) {
       cost,
       count: 0,
       base_image: it?.base_image || null,
+      set: it?.set,
     };
     g.count += 1;
     if (!g.base_image && it?.base_image) g.base_image = it.base_image;
+    if (!g.set && it?.set) g.set = it.set;
     groups.set(key, g);
   }
 
@@ -426,6 +439,17 @@ function renderListIfPresent(id: string, arr: any[]) {
     const label = document.createElement("span");
     label.className = "hist-label";
     label.textContent = `${g.name} ×${g.count}`;
+
+    const setBadge = formatSetBadge({ set: g.set }, allSetIds);
+    if (setBadge) {
+      const setEl = document.createElement("span");
+      setEl.className = "hist-set";
+      setEl.textContent = setBadge.text;
+      setEl.title = setBadge.text;
+      if (!setBadge.inRotation) setEl.dataset.older = "1";
+      label.appendChild(document.createTextNode(" "));
+      label.appendChild(setEl);
+    }
 
     li.appendChild(badge);
     li.appendChild(label);
