@@ -4,199 +4,31 @@
 // Core/replay code never imports this module.
 // ─────────────────────────────────────────────────────────────────────────────
 import { state } from "../core/gameState.js";
-import { drawCard, shuffleInPlace } from "../core/utils.js";
 import { logEvent } from "../core/logger.js";
-import { doAction, resetHistory } from "../core/history.js";
 import type { Player } from "../core/types/index.js";
-import {
-  getHand,
-  getDeck,
-  isFirstPlayer,
-  getDeckFile,
-} from "../core/playerHelpers.js";
+import { getHand, getDeckFile } from "../core/playerHelpers.js";
 import { adapter } from "../core/adapter.js";
-
-function ownerZones(owner: Player) {
-  return {
-    hand: getHand(state, owner),
-    deck: getDeck(state, owner),
-  };
-}
-
-export function beginMulligan() {
-  // Skip mulligan entirely if testing deck is used by either side
-  const firstDeckFile = getDeckFile(state, "first");
-  const secondDeckFile = getDeckFile(state, "second");
-  const usingTestDeck =
-    (firstDeckFile && firstDeckFile.toLowerCase().includes("0_testing_")) ||
-    (secondDeckFile && secondDeckFile.toLowerCase().includes("0_testing_"));
-
-  if (usingTestDeck) {
-    console.log("[MULLIGAN] Skipping mulligan for testing deck");
-    startFirstTurn();
-    return;
-  }
-
-  // Normal mulligan flow
-  logEvent("mulliganStart", {});
-  state.phase = "mulligan";
-  state.mulliganStage = "first";
-  state.mulliganFirstSelected = new Set();
-  state.mulliganSecondSelected = new Set();
-
-  [...getHand(state, "first"), ...getHand(state, "second")].forEach((c) => {
-    delete (c as any).__mulliganSelectable;
-    delete (c as any).__mulliganSelected;
-  });
-
-  markSelectable("first");
-  // Render to show selectable cards in UI
-  adapter.render();
-  showMulliganUI();
-}
-
-// Debug/global fallback (browser only)
-if (typeof window !== "undefined") {
-  (window as any).confirmMulligan = confirmMulligan;
-  (window as any).toggleMulliganPick = toggleMulliganPick;
-}
+import {
+  toggleMulliganPickCore,
+  confirmMulliganCore,
+  startFirstTurnCore,
+  setMulliganUiHooks,
+} from "./core/mulliganCore.js";
+import { occurrenceOf } from "../core/script/identity.js";
 
 function markSelectable(owner: Player) {
-  const { hand } = ownerZones(owner);
-  hand.forEach((c) => {
+  getHand(state, owner).forEach((c) => {
     (c as any).__mulliganSelectable = true;
     (c as any).__mulliganSelected = false;
   });
 }
 
-function clearSelectable(owner: Player) {
-  const { hand } = ownerZones(owner);
-  hand.forEach((c) => {
-    delete (c as any).__mulliganSelectable;
-    delete (c as any).__mulliganSelected;
-  });
-}
-
-export function toggleMulliganPick(owner: Player, uid: string) {
-  if (state.phase !== "mulligan") return;
-  // Stage must match the owner slot directly
-  if (state.mulliganStage !== owner) return;
-
-  const { hand } = ownerZones(owner);
-  const card = hand.find((c) => c.uid === uid);
-  if (!card || !(card as any).__mulliganSelectable) return;
-
-  const bag = isFirstPlayer(owner)
-    ? state.mulliganFirstSelected
-    : state.mulliganSecondSelected;
-  if (!bag) return;
-
-  if ((card as any).__mulliganSelected) {
-    (card as any).__mulliganSelected = false;
-    bag.delete(uid);
-  } else {
-    // Limit: up to 4
-    if (bag.size >= 4) return;
-    (card as any).__mulliganSelected = true;
-    bag.add(uid);
-  }
-  // Re-render to show selection state
-  adapter.render();
-}
-
-export function confirmMulligan(owner: Player) {
-  const result = doAction(
-    "Confirm Mulligan",
-    () => {
-      console.log("[MULLIGAN] confirm clicked", {
-        owner,
-        stage: state.mulliganStage,
-      });
-      if (state.phase !== "mulligan") return;
-      // Stage must match the owner slot directly
-      if (state.mulliganStage !== owner) return;
-
-      const bag = isFirstPlayer(owner)
-        ? state.mulliganFirstSelected
-        : state.mulliganSecondSelected;
-      if (!bag) return;
-      const { hand, deck } = ownerZones(owner);
-
-      if (bag.size > 0) {
-        // Put selected back into deck
-        const toPutBack = [];
-        for (let i = hand.length - 1; i >= 0; i--) {
-          const c = hand[i];
-          if (c && bag.has(c.uid)) {
-            toPutBack.push(hand.splice(i, 1)[0]!);
-          }
-        }
-        // Return & shuffle
-        deck.push(...toPutBack);
-        shuffleInPlace(deck);
-        // Draw replacements to 4
-        while (hand.length < 4 && deck.length > 0) {
-          drawCard(hand, deck, owner);
-        }
-      }
-
-      logEvent("mulligan", { owner, kept: [...hand.map((c) => c.name)] });
-
-      // Clean flags on this owner's hand
-      clearSelectable(owner);
-      bag.clear();
-
-      // Next owner or start the game proper
-      if (isFirstPlayer(owner)) {
-        state.mulliganStage = "second";
-        markSelectable("second");
-        // Render to show second player's selectable cards
-        adapter.render();
-        showMulliganUI();
-      } else {
-        // Both done → start first turn
-        startFirstTurn();
-      }
-    },
-    { owner, stage: "mulligan" },
-    { autoRender: true },
-  );
-
-  // Mulligan is the undo floor: once the match starts, undo must not re-reveal
-  // deck order or allow unlimited re-mulligans.
-  if (state.phase === "main") {
-    resetHistory();
-  }
-
-  return result;
-}
-
-function startFirstTurn() {
-  logEvent("startFirstTurn", { active: "first" });
-  state.turnNumber = 1;
-  // First player draws 1 as the first turn draw
-  const firstHand = getHand(state, "first");
-  const firstDeck = getDeck(state, "first");
-  drawCard(firstHand, firstDeck, "first");
-
-  // Switch to main phase / normal turn rules
-  state.phase = "main";
-  state.activePlayer = "first";
-
-  // Cleanup UI
-  hideMulliganUI();
-
-  // Render to show game state ready for play
-  adapter.render();
-}
-
-// ---- Simple UI helpers (browser only) ----
 function showMulliganUI() {
   const firstBtn = document.getElementById(
-    "blueMulliganConfirm", // Keep DOM IDs for backward compatibility
+    "blueMulliganConfirm",
   ) as HTMLButtonElement | null;
   const secondBtn = document.getElementById(
-    "redMulliganConfirm", // Keep DOM IDs for backward compatibility
+    "redMulliganConfirm",
   ) as HTMLButtonElement | null;
   document.body.classList.add("mulligan-active");
   if (firstBtn) {
@@ -219,4 +51,74 @@ function hideMulliganUI() {
   if (firstBtn) firstBtn.style.display = "none";
   if (secondBtn) secondBtn.style.display = "none";
   document.body.classList.remove("mulligan-active");
+}
+
+setMulliganUiHooks({
+  onAdvanceToSecond: () => showMulliganUI(),
+  onStartFirstTurn: () => startFirstTurnCore({ hideUi: hideMulliganUI }),
+  hideUi: hideMulliganUI,
+});
+
+function maybeRecordMulligan(
+  owner: Player,
+  step:
+    | { op: "CONFIRM_MULLIGAN" }
+    | { op: "TOGGLE_MULLIGAN"; card: { cardId: string; occ?: number } },
+): void {
+  void import("./script/runtime.js").then((rt) => {
+    if (!rt.isScriptRecordingActive()) return;
+    if (rt.getScriptedSide() !== owner) return;
+    rt.recordScriptStep(step);
+  });
+}
+
+export function beginMulligan() {
+  const firstDeckFile = getDeckFile(state, "first");
+  const secondDeckFile = getDeckFile(state, "second");
+  const usingTestDeck =
+    (firstDeckFile && firstDeckFile.toLowerCase().includes("0_testing_")) ||
+    (secondDeckFile && secondDeckFile.toLowerCase().includes("0_testing_"));
+
+  if (usingTestDeck) {
+    console.log("[MULLIGAN] Skipping mulligan for testing deck");
+    startFirstTurnCore({ hideUi: hideMulliganUI });
+    return;
+  }
+
+  logEvent("mulliganStart", {});
+  state.phase = "mulligan";
+  state.mulliganStage = "first";
+  state.mulliganFirstSelected = new Set();
+  state.mulliganSecondSelected = new Set();
+
+  [...getHand(state, "first"), ...getHand(state, "second")].forEach((c) => {
+    delete (c as any).__mulliganSelectable;
+    delete (c as any).__mulliganSelected;
+  });
+
+  markSelectable("first");
+  adapter.render();
+  showMulliganUI();
+}
+
+if (typeof window !== "undefined") {
+  (window as any).confirmMulligan = confirmMulligan;
+  (window as any).toggleMulliganPick = toggleMulliganPick;
+}
+
+export function toggleMulliganPick(owner: Player, uid: string) {
+  const hand = getHand(state, owner);
+  const ref = occurrenceOf(hand, uid);
+  toggleMulliganPickCore(owner, uid);
+  if (ref) maybeRecordMulligan(owner, { op: "TOGGLE_MULLIGAN", card: ref });
+}
+
+export function confirmMulligan(owner: Player) {
+  console.log("[MULLIGAN] confirm clicked", {
+    owner,
+    stage: state.mulliganStage,
+  });
+  const result = confirmMulliganCore(owner);
+  maybeRecordMulligan(owner, { op: "CONFIRM_MULLIGAN" });
+  return result;
 }

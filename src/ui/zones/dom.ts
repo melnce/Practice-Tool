@@ -20,10 +20,25 @@ export function renderCardDOM(
   tooltipContainer: HTMLElement | null,
   isBoard = false,
   ownerIsFirst = false,
+  opts?: { faceDown?: boolean },
 ): HTMLElement {
   const { card } = vm;
+  const faceDown = !!opts?.faceDown;
 
-  const div = createElement("div", "card");
+  const div = createElement("div", faceDown ? "card card-back" : "card");
+  // Face-down: opaque DOM identity — no real uid / name / image leak.
+  if (faceDown) {
+    div.dataset.faceDown = "1";
+    div.dataset.slot = String(vm.idx);
+    div.id = elementId;
+    const imageWrapper = createElement("div", "card-image-wrapper");
+    const back = createElement("div", "card-back-face", "");
+    back.setAttribute("aria-label", "Face-down card");
+    imageWrapper.appendChild(back);
+    div.appendChild(imageWrapper);
+    return div;
+  }
+
   div.dataset.uid = vm.uid;
   div.id = elementId;
   div.classList.add("hidpi");

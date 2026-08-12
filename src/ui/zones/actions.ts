@@ -1,16 +1,20 @@
 // src/ui/zones/actions.ts
 import type { Player, CardInstance } from "../../core/types/index.js";
 import { reportError } from "../errors.js";
+import {
+  playCardAtIndex,
+  chooseTargetAction,
+  engageAction,
+} from "../playerDispatch.js";
+import { state } from "../../core/gameState.js";
+import { getBoard } from "../../core/playerHelpers.js";
 
-// Lazy imports for logic
+// Lazy imports for logic still needed for fuse
 const logic = () => import(/* webpackIgnore: true */ "../../logic/index.js");
-const mulliganLogic = () =>
-  import(/* webpackIgnore: true */ "../../logic/mulligan.js");
-const engageLogic = () =>
-  import(/* webpackIgnore: true */ "../../logic/effects/ops/engage.js");
 
 export function handleMulliganToggle(owner: Player, uid: string): void {
-  void mulliganLogic()
+  // Mulligan stays on the browser mulligan module (records into the script runtime).
+  void import(/* webpackIgnore: true */ "../../logic/mulligan.js")
     .then(({ toggleMulliganPick }) => {
       toggleMulliganPick(owner, uid);
     })
@@ -23,6 +27,7 @@ export function handleFuse(
   hasFuseRecipes: boolean,
   card: CardInstance,
 ): void {
+  // Fuse is deliberately not routed through PlayerAction yet (left alone).
   void logic()
     .then(({ startFuseFromHand, runEffects }) => {
       if (hasFuseRecipes) startFuseFromHand(owner, uid);
@@ -37,15 +42,27 @@ export function handleFuse(
 }
 
 export function handleResolveTarget(uid: string): void {
-  void logic()
-    .then(({ resolvePendingTarget }) => resolvePendingTarget(uid))
-    .catch(reportError);
+  try {
+    const player = state.activePlayer;
+    if (uid === "leader") {
+      const enemy = player === "first" ? "second" : "first";
+      chooseTargetAction(player, { type: "leader", player: enemy });
+    } else {
+      chooseTargetAction(player, { type: "card", uid });
+    }
+  } catch (e) {
+    reportError(e);
+  }
 }
 
 export function handleEngage(owner: Player, index: number): void {
-  void engageLogic()
-    .then(({ engageAmulet }) => engageAmulet(owner, index))
-    .catch(reportError);
+  try {
+    const card = getBoard(state, owner)[index];
+    if (!card) return;
+    engageAction(owner, card.uid);
+  } catch (e) {
+    reportError(e);
+  }
 }
 
 export function handlePlayCard(
@@ -53,12 +70,10 @@ export function handlePlayCard(
   owner: Player,
   index: number,
 ): void {
-  void logic()
-    .then(({ playCard }) => {
-      const outcome = playCard(handArray, owner, index);
-      void import("../outcomes.js").then(({ reportBlockedOutcome }) =>
-        reportBlockedOutcome(outcome),
-      );
-    })
-    .catch(reportError);
+  void handArray;
+  try {
+    playCardAtIndex(owner, index);
+  } catch (e) {
+    reportError(e);
+  }
 }

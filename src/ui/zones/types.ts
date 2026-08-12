@@ -15,6 +15,8 @@ export interface ZoneContext {
   isBlueBoard: boolean;
   isRedBoard: boolean;
   isMulligan: boolean;
+  /** Face-down hand for sparring-line hidden-hand mode. */
+  hideHandFaces: boolean;
 }
 
 export interface CardViewModel {

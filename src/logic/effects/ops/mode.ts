@@ -21,6 +21,10 @@ import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
 // But for now, safe property access is enough.
 
 import type { EffectCtx } from "../../core/effects/registry.js";
+import {
+  getScriptedModePicks,
+  recordScriptedModePicks,
+} from "../../script/modeHook.js";
 
 /** Modes pick count = base (select / select_count) + leader modeBonus (Faith Sham-Nacha). */
 export function resolveModeSelectCount(eff: Effect, owner: Player): number {
@@ -58,9 +62,61 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
     return;
   }
 
+  // ==== Scripted sparring line (explicit indices; never the heuristic AI) ====
+  const scriptedPicks = getScriptedModePicks({
+    owner,
+    optionCount: available.length,
+    selectCount,
+  });
+  if (scriptedPicks) {
+    const picked: any[] = [];
+    const paidByOpt = new Map();
+    for (const idx of scriptedPicks) {
+      const chosen = available[idx];
+      if (!chosen) {
+        throw new Error(
+          `[Script] CHOOSE_MODE index ${idx} out of range (options=${available.length})`,
+        );
+      }
+      let paid = true;
+      if (chosen?.requires?.earth_rite) {
+        const need = parseInt(chosen.requires.earth_rite) || 1;
+        paid = consumeEarthSigils(owner, need);
+      }
+      picked.push(chosen);
+      paidByOpt.set(chosen, paid);
+      if (unique && picked.filter((p) => p === chosen).length > 1) {
+        /* allow duplicate object refs only when unique=false */
+      }
+    }
+    appendStep("Script Choice", {
+      owner,
+      picks: picked.map((p) => p?.label || p?.name || "(opt)"),
+      indices: scriptedPicks,
+    });
+    logEvent("chooseFinalize", {
+      owner,
+      picked: picked.length,
+      scripted: true,
+    });
+    fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
+    const combined: Effect[] = [];
+    for (const opt of picked) {
+      const fizzled = opt?.requires?.earth_rite && paidByOpt.get(opt) === false;
+      if (fizzled) continue;
+      if (Array.isArray(opt.effects) && opt.effects.length)
+        combined.push(...opt.effects);
+    }
+    if (combined.length) runEffects(combined, owner, sourceCard);
+    if (effectsQueue && effectsQueue.length) {
+      runEffects(effectsQueue, owner, sourceCard);
+    }
+    return "done";
+  }
+
   // ==== AI / Headless path (no modal) ====
   const isAIMode = () => {
-    // Your spectator sets these during AI searches/turns (see AlphaVanillaSpectator) :contentReference[oaicite:3]{index=3}
+    // Your spectator sets these during AI searches/turns (see AlphaVanillaSpectator)
     // If you later run bots without the spectator, you can flip HEADLESS yourself before resolving effects.
     return !!(
       globalThis &&
@@ -164,6 +220,10 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   const paidByOpt = new Map();
 
   const finalize = () => {
+    // Record indices relative to the original available pool for scripts.
+    const indices = picked.map((p) => available.indexOf(p));
+    recordScriptedModePicks(owner, indices);
+
     // One undo step for the whole choice confirmation
     doAction(
       "Confirm Choice",

@@ -18,6 +18,9 @@ export function attachHandlers(
   rerender: () => void,
   onPlayClick?: (i: number) => void,
 ): void {
+  // Face-down scripted hand: no tooltips, no play/fuse/mulligan handlers.
+  if (ctx.hideHandFaces) return;
+
   const { card, idx } = vm;
 
   // 1. Mulligan Interactions

@@ -20,6 +20,10 @@ import {
   type SavedPosition,
 } from "../core/positionStore.js";
 import { showToast } from "./toast.js";
+import {
+  getScriptProgressForPosition,
+  applyScriptProgressFromPosition,
+} from "./scriptPanel.js";
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -102,8 +106,26 @@ function readDeckMeta(): { deckAId?: string; deckBId?: string } {
 function onSave(): void {
   const chosen = prompt("Name this position:", "Position");
   if (chosen === null) return;
+  const progress = getScriptProgressForPosition();
+  const metaExtra: Partial<import("../core/positionStore.js").PositionMeta> = {
+    ...readDeckMeta(),
+  };
+  if (progress) {
+    metaExtra.scriptProgress = {
+      schemaVersion: progress.schemaVersion,
+      name: progress.name,
+      scriptedSide: progress.scriptedSide,
+      cursor: progress.cursor,
+      ...(progress.diverged !== undefined
+        ? { diverged: progress.diverged }
+        : {}),
+      ...(progress.divergeReason !== undefined
+        ? { divergeReason: progress.divergeReason }
+        : {}),
+    };
+  }
   const record = savePosition(chosen.trim() || "Untitled position", {
-    meta: readDeckMeta(),
+    meta: metaExtra,
   });
   refreshPositionSelect();
   const sel = $("positionSelect") as HTMLSelectElement | null;
@@ -117,6 +139,19 @@ function onLoad(): void {
   if (!id) return;
   try {
     const record = loadPosition(id);
+    if (record.meta.scriptProgress) {
+      const sp = record.meta.scriptProgress;
+      applyScriptProgressFromPosition({
+        schemaVersion: 1,
+        name: sp.name,
+        scriptedSide: sp.scriptedSide,
+        cursor: sp.cursor,
+        ...(sp.diverged !== undefined ? { diverged: sp.diverged } : {}),
+        ...(sp.divergeReason !== undefined
+          ? { divergeReason: sp.divergeReason }
+          : {}),
+      });
+    }
     showToast(`Loaded “${record.name}”`);
   } catch (e) {
     showToast(e instanceof Error ? e.message : String(e));

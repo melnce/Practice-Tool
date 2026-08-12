@@ -53,6 +53,33 @@ let inAction: ActionContext | null = null; // { name, before, meta }
 let onChange:
   | ((status: { canUndo: boolean; canRedo: boolean }) => void)
   | null = null; // optional listener
+
+export type HistoryEvent =
+  | { type: "commit"; name: string; meta: unknown }
+  | { type: "undo"; name: string; meta: unknown }
+  | { type: "redo"; name: string; meta: unknown }
+  | { type: "reset" };
+
+type HistoryEventListener = (event: HistoryEvent) => void;
+const historyEventListeners = new Set<HistoryEventListener>();
+
+function emitHistoryEvent(event: HistoryEvent): void {
+  for (const cb of historyEventListeners) {
+    try {
+      cb(event);
+    } catch (e) {
+      console.error("[History] event listener error", e);
+    }
+  }
+}
+
+/** Subscribe to commit/undo/redo/reset for script cursor sync etc. */
+export function onHistoryEvent(cb: HistoryEventListener): () => void {
+  historyEventListeners.add(cb);
+  return () => {
+    historyEventListeners.delete(cb);
+  };
+}
 // --- Internal Cache Keys (excluded from snapshots) ---
 // These are implementation details that should not pollute history.
 // Add new cache keys here if needed.
@@ -317,6 +344,11 @@ export function commitAction({ autoRender = true } = {}) {
     before_hash: entry.before_hash,
     after_hash: entry.after_hash,
   });
+  emitHistoryEvent({
+    type: "commit",
+    name: entry.name,
+    meta: entry.meta || {},
+  });
 
   const suppress =
     (globalThis as any).HEADLESS === true ||
@@ -439,6 +471,11 @@ export function undo({ autoRender = true } = {}) {
     future.push(entry);
     replaceState(entry.before);
     logEvent("history_undo", { name: entry.name, meta: entry.meta || {} });
+    emitHistoryEvent({
+      type: "undo",
+      name: entry.name,
+      meta: entry.meta || {},
+    });
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -455,6 +492,11 @@ export function redo({ autoRender = true } = {}) {
     past.push(entry);
     if (entry.after) replaceState(entry.after);
     logEvent("history_redo", { name: entry.name, meta: entry.meta || {} });
+    emitHistoryEvent({
+      type: "redo",
+      name: entry.name,
+      meta: entry.meta || {},
+    });
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -482,6 +524,7 @@ export function resetHistory() {
   past = [];
   future = [];
   inAction = null;
+  emitHistoryEvent({ type: "reset" });
   notify();
 }
 

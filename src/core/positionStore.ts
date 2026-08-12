@@ -40,6 +40,20 @@ export interface PositionMeta {
   seed: number;
   activePlayer: PlayerSlot;
   phase?: string | null;
+  /**
+   * Optional sparring-line cursor when a script is loaded.
+   * TODO(scripted-opponent): full round-trip of the script body inside a
+   * position export is larger than this PR needs — we store progress only;
+   * the line JSON must still be loaded separately before Load Pos.
+   */
+  scriptProgress?: {
+    schemaVersion: number;
+    name: string;
+    scriptedSide: PlayerSlot;
+    cursor: number;
+    diverged?: boolean;
+    divergeReason?: string;
+  };
 }
 
 export interface SavedPosition {

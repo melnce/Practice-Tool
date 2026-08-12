@@ -299,8 +299,74 @@
           <input type="checkbox" id="activeOnBottomToggle" />
           Active on bottom
         </label>
+        <span class="practice-sep" aria-hidden="true"></span>
+        <button
+          id="scriptRecordBtn"
+          title="Record a sparring line for one side (hot-seat → fixture)"
+        >
+          Rec Line
+        </button>
+        <button
+          id="scriptStopRecordBtn"
+          title="Stop recording the sparring line"
+        >
+          Stop Rec
+        </button>
+        <select id="scriptSideSelect" title="Which side the line drives">
+          <option value="second">Line: Red</option>
+          <option value="first">Line: Blue</option>
+        </select>
+        <button id="scriptExportBtn" title="Export sparring line JSON">
+          Export Line
+        </button>
+        <button id="scriptImportBtn" title="Import sparring line JSON">
+          Import Line
+        </button>
+        <input
+          id="scriptImportInput"
+          type="file"
+          accept="application/json,.json,.svwb-line.json"
+          hidden
+        />
+        <button id="scriptClearBtn" title="Clear loaded/recording line">
+          Clear Line
+        </button>
+        <label
+          for="scriptHiddenHandToggle"
+          style="
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 4px;
+          "
+          title="Render the scripted side's hand face-down (count stays public)"
+        >
+          <input type="checkbox" id="scriptHiddenHandToggle" />
+          Hide line hand
+        </label>
+        <span
+          id="scriptStatus"
+          class="checkpoint-status"
+          title="Sparring line status"
+          >Line: none</span
+        >
       </div>
     </header>
+    <div
+      id="scriptDivergeBanner"
+      style="
+        display: none;
+        position: sticky;
+        top: 52px;
+        z-index: 200;
+        background: #5c1f1f;
+        color: #ffe8e8;
+        padding: 8px 14px;
+        font-weight: 700;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      "
+    ></div>
     <!-- Hamburger to open history drawer -->
     <button
       id="historyToggle"
