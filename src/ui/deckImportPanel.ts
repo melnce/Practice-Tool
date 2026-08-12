@@ -74,8 +74,18 @@ function formatImportStatus(result: DeckImportResult): {
     );
   }
   if (result.coverage.length > 0) {
+    const byName = new Map(result.matched.map((m) => [m.name, m.card]));
     const names = result.coverage
-      .map((c) => `${c.name} (${c.status})`)
+      .map((c) => {
+        const card = byName.get(c.name);
+        const set =
+          typeof card?.set === "string"
+            ? card.set.replace(/^\[[^\]]+\]\s*/, "").trim()
+            : "";
+        return set
+          ? `${c.name} (${c.status}, ${set})`
+          : `${c.name} (${c.status})`;
+      })
       .join(", ");
     lines.push(
       `<strong class="deck-import-coverage">Coverage warning:</strong> ${escapeHtml(

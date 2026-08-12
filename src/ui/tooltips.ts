@@ -1,6 +1,8 @@
 // src/ui/tooltips.ts
 import { state } from "../core/gameState.js";
 import type { CardInstance, Player } from "../core/types/index.js";
+import { getGlobalCardIndex } from "../data/cardIndex.js";
+import { collectSetIds, formatSetBadge } from "../data/formats.js";
 
 // NEW: show +A/+D based only on buffs/debuffs (not damage)
 function formatBuffDelta(card: CardInstance) {
@@ -16,6 +18,22 @@ function formatBuffDelta(card: CardInstance) {
   const color = a < 0 || d < 0 ? "#ff6666" : "#66ff66";
 
   return `<br><br><span class="buff-delta" style="color:${color};font-weight:700;">${sa}/${sd}</span>`;
+}
+
+function formatSetLine(card: CardInstance): string {
+  const index = getGlobalCardIndex();
+  const setIds = index
+    ? collectSetIds(
+        [...index.byName.values()].map((c) => ({
+          set: (c as { set?: unknown }).set,
+        })),
+      )
+    : [];
+  const badge = formatSetBadge(card as { set?: unknown }, setIds);
+  if (!badge) return "";
+  // Quiet in-game-style set label; older sets get a soft marker (not a warning).
+  const color = badge.inRotation ? "#9aa3b2" : "#7a8494";
+  return `<br><span class="card-set-line" style="color:${color};font-size:0.9em;">${badge.text}</span>`;
 }
 
 // Helper to check for the keyword OR the gate op
@@ -128,7 +146,7 @@ export function formatCardTooltip(
 
   return `${name}
   
-${classLine}
+${classLine}${formatSetLine(card)}
 
 ${desc}${extraText}${buffDelta}`;
 }
