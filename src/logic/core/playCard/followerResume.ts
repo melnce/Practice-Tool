@@ -40,10 +40,11 @@ export function stashPlayFollowerResume(ctx: PlayFollowerResume): void {
 
 /** Run play/enter-reactive triggers and Enhance after fanfare fully resolves. */
 export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
-  // §372: Fanfare Rally(N) sees the count from just before this card entered.
-  // Increment after Fanfare (before enter/play triggers) so rally-conditioned
-  // Fanfare gates exclude self; tokens/summons during Fanfare still count via
-  // summon_ops. Always increment even if the follower left play during Fanfare.
+  // §372 / Owner ruling — Rally (2026-08-12): Fanfare Rally(N) sees the count
+  // from just before this card entered (timing). Increment after Fanfare
+  // (before enter/play triggers) so rally-conditioned Fanfare gates exclude
+  // self; tokens/summons during Fanfare still count via summon_ops. Always
+  // increment even if the follower left play during Fanfare.
   incrementRally(state, resume.player);
 
   const card = findFollowerOnBoard(resume.cardUid, resume.player);

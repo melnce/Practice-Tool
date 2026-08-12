@@ -1,7 +1,6 @@
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 
-import { fireTrigger } from "../../../core/triggers.js";
 import { applyKeywordsFromList } from "../../../core/keywords.js";
 import type {
   CardInstance,
@@ -10,19 +9,14 @@ import type {
 } from "../../../../core/types/index.js";
 import { highlightSelectable } from "../../../core/targeting.js"; // Targeting is external
 import { initAmulet } from "./init.js";
-import { pushToBoard } from "./core.js";
+import { finishFollowerEnter, pushToBoard } from "./core.js";
 import {
   bumpZoneVersion,
   stampBoardEntryTs,
 } from "../../../core/triggers/utils.js";
-import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 import { getEffectiveCost, nextId } from "./utils.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
-import {
-  getHand,
-  getBoard,
-  opponentOf,
-} from "../../../../core/playerHelpers.js";
+import { getHand, getBoard } from "../../../../core/playerHelpers.js";
 
 // =============== Hand Operations ===============
 
@@ -210,20 +204,9 @@ export function summonExactCopyFromHand(
     state.lastSummoned.push(clone);
   }
 
-  // Fire follower-enter hooks exactly like other summon paths
-  if (clone.type === "Follower") {
-    // Fire ally trigger for owner, enemy trigger for opponent
-    const opponent = opponentOf(owner);
-    const enterCtx = {
-      enteringCard: clone,
-      enteringOwner: owner,
-      enteringKeywordSnapshot: snapshotEnteringKeywords(clone),
-    };
-    fireTrigger("ally_follower_enter", owner, enterCtx);
-    fireTrigger("enemy_follower_enter", opponent, enterCtx);
-    // Ensure effect-based summons also trigger the Congregrant chain
-    // handleCongregantOnEnter(owner, clone);
-  }
+  // Rally + enter triggers — same as pushToBoard / finishFollowerEnter
+  // (Owner ruling — Rally 2026-08-12: any successful follower entry counts).
+  finishFollowerEnter(clone, owner);
 
   return clone;
 }
