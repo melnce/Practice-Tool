@@ -193,6 +193,27 @@
           <option value="starter_deck">starter_deck</option>
         </select>
 
+        <button
+          type="button"
+          id="importDeckBtn"
+          title="Paste a community decklist into the tool"
+        >
+          Import Deck
+        </button>
+        <button
+          type="button"
+          id="exportDecklistBtn"
+          title="Export the Blue deck as paste text (Nx Name)"
+        >
+          Export List
+        </button>
+        <input
+          id="deckImportFileInput"
+          type="file"
+          accept="application/json,.json,.svwb-deck.json,.txt,text/plain"
+          hidden
+        />
+
         <label for="seedInput">Seed:</label>
         <input
           id="seedInput"
@@ -751,6 +772,79 @@
         }
       });
     </script>
+
+    <!-- Decklist import panel -->
+    <div
+      id="deckImportPanel"
+      class="deck-import-panel"
+      hidden
+      aria-hidden="true"
+      role="dialog"
+      aria-labelledby="deckImportTitle"
+    >
+      <div id="deckImportBackdrop" class="deck-import-backdrop"></div>
+      <div class="deck-import-dialog">
+        <header class="deck-import-header">
+          <h2 id="deckImportTitle">Import decklist</h2>
+          <button type="button" id="deckImportCloseBtn" title="Close">×</button>
+        </header>
+        <p class="deck-import-help">
+          Paste a list as <code>3x Card Name</code>, <code>3 Card Name</code>,
+          <code>Card Name x3</code>, or one name per line. Blank lines and
+          section headers are ignored. Unmatched names are reported — nothing is
+          silently dropped. Session memory only; export JSON/txt to keep a
+          durable copy (localStorage is not used).
+        </p>
+        <div class="deck-import-meta">
+          <label>
+            Name
+            <input
+              id="deckImportName"
+              type="text"
+              placeholder="My meta deck"
+              autocomplete="off"
+            />
+          </label>
+          <label>
+            Class
+            <select id="deckImportClass">
+              <option value="">Auto-detect</option>
+              <option value="Forestcraft">Forestcraft</option>
+              <option value="Swordcraft">Swordcraft</option>
+              <option value="Runecraft">Runecraft</option>
+              <option value="Dragoncraft">Dragoncraft</option>
+              <option value="Abysscraft">Abysscraft</option>
+              <option value="Havencraft">Havencraft</option>
+              <option value="Portalcraft">Portalcraft</option>
+              <option value="Neutral">Neutral</option>
+            </select>
+          </label>
+        </div>
+        <label class="deck-import-textarea-label" for="deckImportText"
+          >Decklist</label
+        >
+        <textarea
+          id="deckImportText"
+          rows="14"
+          spellcheck="false"
+          placeholder="3x May, Journey Elf&#10;3 Fairy Tamer&#10;Bestial Swipe x3&#10;…"
+        ></textarea>
+        <div id="deckImportStatus" class="deck-import-status info"></div>
+        <footer class="deck-import-actions">
+          <button type="button" id="deckImportValidateBtn">Validate</button>
+          <button type="button" id="deckImportSaveBtn">
+            Save to selectors
+          </button>
+          <button type="button" id="deckImportDownloadTxtBtn">
+            Download .txt
+          </button>
+          <button type="button" id="deckImportDownloadJsonBtn">
+            Export JSON
+          </button>
+          <button type="button" id="deckImportFromFileBtn">Load file…</button>
+        </footer>
+      </div>
+    </div>
 
     <script>
       window.resolvePath = (path) => {

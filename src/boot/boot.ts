@@ -26,6 +26,7 @@ import {
 import { parseSeedInput } from "../core/seed.js";
 import { readShareParams, writeShareParams } from "./shareUrl.js";
 import { wireSeedCopyControl, syncSeedDisplay } from "../ui/seedDisplay.js";
+import { importedDeckManifestEntries } from "../data/importedDeckStore.js";
 
 // Expose globals for UI onclick handlers — routed through PlayerAction dispatch
 window.endTurnBlue = () => {
@@ -118,6 +119,15 @@ window.addEventListener("DOMContentLoaded", () => {
   // Sparring line (scripted dummy) panel
   void import("../ui/scriptPanel.js").then(({ initScriptPanel }) => {
     initScriptPanel();
+  });
+
+  // Decklist paste import / export
+  void import("../ui/deckImportPanel.js").then(({ initDeckImportPanel }) => {
+    initDeckImportPanel({
+      refreshSelects: async () => {
+        await populateDeckSelects({ preserveSelection: true });
+      },
+    });
   });
 
   wireClick("undoBtn", () => {
@@ -365,6 +375,7 @@ function populateSelectFromManifest(
 }
 
 async function listDeckEntries(): Promise<DeckManifestEntry[]> {
+  let shipped: DeckManifestEntry[] = [];
   try {
     const r = await fetch("decks/manifest.json", { cache: "no-cache" });
     if (r.ok) {
@@ -372,7 +383,7 @@ async function listDeckEntries(): Promise<DeckManifestEntry[]> {
       if (!contentType.includes("text/html")) {
         const manifest = (await r.json()) as DeckManifest;
         if (Array.isArray(manifest.entries) && manifest.entries.length) {
-          return manifest.entries;
+          shipped = manifest.entries;
         }
       }
     }
@@ -380,30 +391,62 @@ async function listDeckEntries(): Promise<DeckManifestEntry[]> {
     /* ignore */
   }
 
-  console.warn(
-    "[Decks] decks/manifest.json missing — run npm run decks:discover (or npm run dev, which runs it automatically)",
-  );
-  return [
-    {
-      file: "starter_deck.json",
-      id: "starter_deck",
-      label: "Starter",
-      category: "deck",
-    },
-  ];
+  if (shipped.length === 0) {
+    console.warn(
+      "[Decks] decks/manifest.json missing — run npm run decks:discover (or npm run dev, which runs it automatically)",
+    );
+    shipped = [
+      {
+        file: "starter_deck.json",
+        id: "starter_deck",
+        label: "Starter",
+        category: "deck",
+      },
+    ];
+  }
+
+  // Session-imported decks sit alongside shipped ones (not on disk / not in git)
+  const imported = importedDeckManifestEntries();
+  if (imported.length === 0) return shipped;
+
+  // Keep tests grouped; put imported with playable decks
+  const decks = shipped.filter((e) => e.category === "deck");
+  const tests = shipped.filter((e) => e.category === "test");
+  return [...decks, ...imported, ...tests];
 }
 
-async function populateDeckSelects() {
-  const entries = await listDeckEntries();
-  const blue = document.getElementById("blueDeckSelect");
-  const red = document.getElementById("redDeckSelect");
+async function populateDeckSelects(opts?: {
+  preserveSelection?: boolean;
+  applyShareParams?: boolean;
+}) {
+  const blue = document.getElementById(
+    "blueDeckSelect",
+  ) as HTMLSelectElement | null;
+  const red = document.getElementById(
+    "redDeckSelect",
+  ) as HTMLSelectElement | null;
   if (!blue || !red) return;
+
+  const prevBlue = blue.value;
+  const prevRed = red.value;
+  const entries = await listDeckEntries();
 
   populateSelectFromManifest(blue, entries);
   populateSelectFromManifest(red, entries);
 
+  if (opts?.preserveSelection) {
+    if (prevBlue && [...blue.options].some((o) => o.value === prevBlue)) {
+      blue.value = prevBlue;
+    }
+    if (prevRed && [...red.options].some((o) => o.value === prevRed)) {
+      red.value = prevRed;
+    }
+  }
+
   // Prefill from ?seed=&a=&b= (URL is the reload/share persistence)
-  applyShareParamsFromUrl(blue as HTMLSelectElement, red as HTMLSelectElement);
+  if (opts?.applyShareParams !== false && !opts?.preserveSelection) {
+    applyShareParamsFromUrl(blue, red);
+  }
 }
 
 function applyShareParamsFromUrl(
@@ -427,4 +470,6 @@ function applyShareParamsFromUrl(
   }
 }
 
-window.addEventListener("DOMContentLoaded", populateDeckSelects);
+window.addEventListener("DOMContentLoaded", () => {
+  void populateDeckSelects();
+});

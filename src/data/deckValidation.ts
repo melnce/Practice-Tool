@@ -12,7 +12,12 @@ export type DeckIssueKind =
   | "parse"
   | "empty"
   | "missing_identifier"
-  | "unknown_card";
+  | "unknown_card"
+  /** Import-strict: promoted from size/copy warnings, or class legality. */
+  | "size"
+  | "copy_limit"
+  | "class_illegal"
+  | "unmatched_line";
 
 export interface DeckValidationIssue {
   kind: DeckIssueKind;

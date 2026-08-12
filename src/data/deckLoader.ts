@@ -9,6 +9,7 @@ import { expandDeckEntries } from "./deckExpand.js";
 import { findUnknownCards } from "./deckValidation.js";
 import type { FetchedDeck, RawDeck, RawDeckCardEntry } from "./rawDeck.js";
 import { isRawDeckObject } from "./rawDeck.js";
+import { getImportedDeckRaw } from "./importedDeckStore.js";
 
 function normalizeDeck(raw: RawDeck, deckFile?: string): RawDeckCardEntry[] {
   const expanded = expandDeckEntries(raw);
@@ -52,11 +53,21 @@ function enrichDeck(rawDeck: RawDeck, deckFile?: string): CardInstance[] {
 }
 
 async function fetchDeck(deckId: string): Promise<FetchedDeck> {
-  const root = window.APP_ROOT ?? "/";
   let file = String(deckId)
     .replace(/^\/?decks\//i, "")
     .replace(/^\/+/, "");
   if (!/\.json$/i.test(file)) file += ".json";
+  const id = file.replace(/\.json$/i, "");
+
+  // Session-imported decks (paste / JSON file) — not fetched from decks/
+  const imported = getImportedDeckRaw(id);
+  if (imported) {
+    return Object.assign({ ...imported } as object, {
+      __deckFile: file,
+    }) as FetchedDeck;
+  }
+
+  const root = window.APP_ROOT ?? "/";
   const url = `${root}decks/${file}`;
   const res = await fetch(url, { cache: "no-cache" });
   if (!res.ok) throw new Error(`Deck not found at ${url}`);
