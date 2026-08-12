@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consistency & Mulligan Trainer — SVWB</title>
+    <script>
+      window.APP_ROOT = "/";
+    </script>
+    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./css/modern-theme.css" />
+    <style>
+      :root {
+        --ct-ink: #1a1510;
+        --ct-paper: #f3ebe0;
+        --ct-panel: #fff8ef;
+        --ct-line: #c9b8a0;
+        --ct-accent: #0f6b5c;
+        --ct-accent-2: #b33b2c;
+        --ct-muted: #6e6256;
+        --ct-good: #1f7a4c;
+        --ct-warn: #a15c12;
+        --ct-font-display:
+          "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
+          Georgia, serif;
+        --ct-font-body: "Segoe UI", "Helvetica Neue", sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ct-ink);
+        font-family: var(--ct-font-body);
+        background:
+          radial-gradient(
+            1200px 600px at 10% -10%,
+            #dfe9e4 0%,
+            transparent 55%
+          ),
+          radial-gradient(900px 500px at 100% 0%, #f0ddd4 0%, transparent 50%),
+          linear-gradient(180deg, #ebe2d4 0%, var(--ct-paper) 40%, #e7dccf 100%);
+      }
+      header.ct-hero {
+        padding: 28px 24px 18px;
+        border-bottom: 1px solid var(--ct-line);
+      }
+      header.ct-hero .brand {
+        font-family: var(--ct-font-display);
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        letter-spacing: 0.02em;
+        margin: 0 0 6px;
+        animation: ct-rise 0.6s ease-out both;
+      }
+      header.ct-hero p {
+        margin: 0;
+        max-width: 46rem;
+        color: var(--ct-muted);
+        animation: ct-rise 0.7s 0.08s ease-out both;
+      }
+      header.ct-hero a {
+        color: var(--ct-accent);
+      }
+      @keyframes ct-rise {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes ct-fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      main {
+        display: grid;
+        gap: 20px;
+        padding: 20px 24px 48px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .tabs button {
+        font: inherit;
+        border: 1px solid var(--ct-line);
+        background: var(--ct-panel);
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .tabs button.active {
+        background: var(--ct-accent);
+        border-color: var(--ct-accent);
+        color: #fff;
+      }
+      section.panel {
+        background: color-mix(in srgb, var(--ct-panel) 92%, white);
+        border: 1px solid var(--ct-line);
+        border-radius: 10px;
+        padding: 16px 18px 20px;
+        animation: ct-fade 0.35s ease-out;
+      }
+      section.panel h2 {
+        font-family: var(--ct-font-display);
+        margin: 0 0 4px;
+        font-size: 1.35rem;
+      }
+      section.panel .lede {
+        margin: 0 0 14px;
+        color: var(--ct-muted);
+        font-size: 0.95rem;
+      }
+      .grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+      label.field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.82rem;
+        color: var(--ct-muted);
+      }
+      label.field > span {
+        font-weight: 600;
+      }
+      select,
+      input[type="text"],
+      input[type="number"] {
+        font: inherit;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid var(--ct-line);
+        background: #fff;
+        color: var(--ct-ink);
+      }
+      .cond-box {
+        display: grid;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        border: 1px solid var(--ct-line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        user-select: none;
+      }
+      .chip.on {
+        background: #d8efe8;
+        border-color: var(--ct-accent);
+        color: var(--ct-accent);
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 14px;
+      }
+      button.primary {
+        font: inherit;
+        font-weight: 650;
+        background: var(--ct-accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        padding: 10px 16px;
+        cursor: pointer;
+      }
+      button.primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+      button.ghost {
+        font: inherit;
+        background: transparent;
+        border: 1px solid var(--ct-line);
+        border-radius: 6px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      .meta {
+        font-size: 0.85rem;
+        color: var(--ct-muted);
+      }
+      table.results {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+        font-variant-numeric: tabular-nums;
+      }
+      table.results th,
+      table.results td {
+        text-align: left;
+        padding: 6px 8px;
+        border-bottom: 1px solid var(--ct-line);
+      }
+      table.results th {
+        color: var(--ct-muted);
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+      .spark {
+        height: 64px;
+        margin-top: 10px;
+        border: 1px dashed var(--ct-line);
+        border-radius: 8px;
+        background: #fffaf3;
+        position: relative;
+        overflow: hidden;
+      }
+      .spark svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .hand {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin: 12px 0;
+      }
+      @media (max-width: 640px) {
+        .hand {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .card-tile {
+        border: 2px solid var(--ct-line);
+        background: #fff;
+        border-radius: 8px;
+        padding: 10px;
+        cursor: pointer;
+        min-height: 88px;
+        transition:
+          transform 0.15s ease,
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+      .card-tile:hover {
+        transform: translateY(-2px);
+      }
+      .card-tile.keep {
+        border-color: var(--ct-good);
+        background: #e8f6ee;
+      }
+      .card-tile.mull {
+        border-color: var(--ct-accent-2);
+        background: #fbeceb;
+        opacity: 0.85;
+      }
+      .card-tile .cost {
+        font-size: 0.75rem;
+        color: var(--ct-muted);
+      }
+      .card-tile .name {
+        font-weight: 650;
+        margin-top: 4px;
+        line-height: 1.25;
+      }
+      .card-tile .hint {
+        margin-top: 8px;
+        font-size: 0.75rem;
+        color: var(--ct-muted);
+      }
+      .compare {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .compare h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+        font-family: var(--ct-font-display);
+      }
+      .draw-list {
+        margin: 0;
+        padding-left: 1.1rem;
+        font-size: 0.92rem;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .note {
+        font-size: 0.8rem;
+        color: var(--ct-muted);
+        margin-top: 10px;
+      }
+      .error {
+        color: var(--ct-accent-2);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="ct-hero">
+      <h1 class="brand">Consistency Trainer</h1>
+      <p>
+        Draw-only Monte Carlo for Shadowverse Worlds Beyond — shuffles and
+        draws, never gameplay.
+        <a href="./index.html">← Practice tool</a>
+      </p>
+    </header>
+
+    <main>
+      <div class="tabs" role="tablist">
+        <button type="button" class="active" data-tab="stats" id="tabStats">
+          Consistency stats
+        </button>
+        <button type="button" data-tab="drill" id="tabDrill">
+          Mulligan drill
+        </button>
+      </div>
+
+      <section class="panel" id="panelStats">
+        <h2>Consistency statistics</h2>
+        <p class="lede">
+          Estimate P(condition) by turn from opening hand + turn draws. Target
+          100k iterations in a Web Worker.
+        </p>
+
+        <div class="grid">
+          <label class="field">
+            <span>Deck</span>
+            <select id="statsDeck"></select>
+          </label>
+          <label class="field">
+            <span>Seat</span>
+            <select id="statsSeat">
+              <option value="play">On the play (first)</option>
+              <option value="draw">On the draw (second)</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Mulligan policy</span>
+            <select id="statsMull">
+              <option value="keep_all">Keep everything</option>
+              <option value="keep_list">
+                Mulligan anything not in keep-list
+              </option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Turn horizon</span>
+            <input id="statsHorizon" type="number" min="1" max="20" value="8" />
+          </label>
+          <label class="field">
+            <span>Iterations</span>
+            <input
+              id="statsIters"
+              type="number"
+              min="1000"
+              max="500000"
+              step="1000"
+              value="100000"
+            />
+          </label>
+          <label class="field">
+            <span>Seed</span>
+            <input id="statsSeed" type="text" value="42" />
+          </label>
+        </div>
+
+        <div class="cond-box" id="keepListBox">
+          <div class="meta">Keep-list (click cards to toggle)</div>
+          <div class="chip-row" id="keepChips"></div>
+        </div>
+
+        <div class="cond-box">
+          <div class="meta">Condition</div>
+          <div class="grid">
+            <label class="field">
+              <span>Mode</span>
+              <select id="condMode">
+                <option value="cards_at_least">
+                  At least N of selected cards
+                </option>
+                <option value="cost_and">
+                  A cost-A drop AND a cost-B drop
+                </option>
+                <option value="specific">Specific card (at least 1)</option>
+                <option value="cards_or_costs">
+                  Selected cards OR (cost combo)
+                </option>
+              </select>
+            </label>
+            <label class="field" id="atLeastWrap">
+              <span>At least N</span>
+              <input
+                id="condAtLeast"
+                type="number"
+                min="1"
+                max="10"
+                value="2"
+              />
+            </label>
+            <label class="field" id="costAWrap">
+              <span>Cost A</span>
+              <input id="condCostA" type="number" min="0" max="10" value="2" />
+            </label>
+            <label class="field" id="costBWrap">
+              <span>Cost B</span>
+              <input id="condCostB" type="number" min="0" max="10" value="3" />
+            </label>
+          </div>
+          <div class="meta" style="margin-top: 8px">Card set for condition</div>
+          <div class="chip-row" id="condChips"></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="primary" id="runStats">
+            Run simulation
+          </button>
+          <span class="meta" id="statsMeta"></span>
+        </div>
+        <p class="error hidden" id="statsError"></p>
+        <p class="note">
+          On the play vs on the draw: Worlds Beyond both draw 1 on turn 1, so
+          draw counts match. Second-player Bonus PP affects tempo only and is
+          not modelled here.
+        </p>
+
+        <table class="results hidden" id="statsTable">
+          <thead>
+            <tr>
+              <th>Turn</th>
+              <th>P(condition)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="spark hidden" id="statsSpark" aria-hidden="true"></div>
+      </section>
+
+      <section class="panel hidden" id="panelDrill">
+        <h2>Mulligan drill</h2>
+        <p class="lede">
+          Deal a 4-card opener, pick keeps, then see the next draws for your
+          choice versus keeping everything — same shuffle.
+        </p>
+
+        <div class="grid">
+          <label class="field">
+            <span>Deck</span>
+            <select id="drillDeck"></select>
+          </label>
+          <label class="field">
+            <span>Opponent class (optional)</span>
+            <select id="drillOpp">
+              <option value="">— none declared —</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Reveal turns</span>
+            <input id="drillTurns" type="number" min="1" max="15" value="8" />
+          </label>
+          <label class="field">
+            <span>Seed (optional)</span>
+            <input id="drillSeed" type="text" placeholder="random" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="primary" id="dealHand">Deal hand</button>
+          <button type="button" class="ghost" id="revealBtn" disabled>
+            Reveal draws
+          </button>
+          <button type="button" class="ghost" id="nextHand" disabled>
+            Next hand
+          </button>
+          <span class="meta" id="drillMeta"></span>
+        </div>
+
+        <div class="hand" id="drillHand"></div>
+        <p class="meta">
+          Click a card to toggle keep / mulligan. Green = keep.
+        </p>
+
+        <div class="compare hidden" id="drillCompare"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./src/boot/consistencyBoot.ts"></script>
+  </body>
+</html>
