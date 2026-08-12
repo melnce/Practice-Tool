@@ -120,8 +120,8 @@ function addDestroyedMatchCards(
 ): void {
   const records = pickDestroyedMatch(state, owner, {
     filter: spec.filter,
-    distinct_by: spec.distinctBy ?? undefined,
-    distribution: spec.distribution ?? undefined,
+    ...(spec.distinctBy ? { distinct_by: spec.distinctBy } : {}),
+    ...(spec.distribution ? { distribution: spec.distribution } : {}),
     count: spec.count,
   });
 
