@@ -65,6 +65,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     try {
       await engine.startNewGame({ deckAId, deckBId, seed });
+      void import("../core/positionStore.js").then(({ setSessionDeckIds }) => {
+        setSessionDeckIds(deckAId, deckBId);
+      });
     } catch (err) {
       console.error("[Start Game] Failed to start:", err);
     }
@@ -78,6 +81,16 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Ctrl/Cmd+Z (undo), Ctrl+Y or Cmd+Shift+Z (redo)
   engine.initHotkeys();
+
+  // Checkpoint F6 / Reroll F8
+  void import("../core/positionStore.js").then(({ initCheckpointHotkeys }) => {
+    initCheckpointHotkeys();
+  });
+
+  // Save/Load positions + checkpoint buttons
+  void import("../ui/positionPanel.js").then(({ initPositionPanel }) => {
+    initPositionPanel();
+  });
 
   wireClick("undoBtn", () => {
     undo();

@@ -184,6 +184,85 @@ function replaceState(next: GameState) {
   delete (state as any).__rng;
 }
 
+/**
+ * Capture a deep clone of the current game state for undo, save, or checkpoint.
+ * RNG is stored as plain `__rng` metadata (seed/cursor/uidCounter), not the live instance.
+ */
+export function captureSnapshot(): GameState {
+  return snapshot();
+}
+
+/**
+ * Clone a snapshot so applying it does not alias the caller's stored copy into live state.
+ */
+function cloneSnapshot(snap: GameState): GameState {
+  const rngMeta = (snap as any).__rng;
+  const { rng: _rng, __rng: _ignored, ...rest } = snap as any;
+  void _rng;
+  void _ignored;
+  const cleaned: Record<string, any> = {};
+  for (const [k, v] of Object.entries(rest)) {
+    if (!INTERNAL_CACHE_KEYS.has(k)) {
+      cleaned[k] = v;
+    }
+  }
+  try {
+    const clone = structuredClone(cleaned) as GameState;
+    if (rngMeta) {
+      (clone as any).__rng = {
+        seed: rngMeta.seed,
+        cursor: rngMeta.cursor,
+        uidCounter: rngMeta.uidCounter,
+      };
+    }
+    return clone;
+  } catch (e) {
+    console.warn(
+      "[History] structuredClone failed in cloneSnapshot, using fallback. Error:",
+      e,
+    );
+    const clone = manualSnapshot(cleaned, null);
+    if (rngMeta) {
+      (clone as any).__rng = {
+        seed: rngMeta.seed,
+        cursor: rngMeta.cursor,
+        uidCounter: rngMeta.uidCounter,
+      };
+    }
+    return clone;
+  }
+}
+
+export interface ApplySnapshotOptions {
+  autoRender?: boolean;
+  /** When true (default), clear undo/redo so the applied position is the new floor. */
+  resetHistory?: boolean;
+}
+
+/**
+ * Replace live state with a snapshot (save load, checkpoint restore, etc.).
+ * Clones first so the stored snapshot is not mutated by subsequent play.
+ */
+export function applySnapshot(
+  next: GameState,
+  options: ApplySnapshotOptions = {},
+): void {
+  const { autoRender = true, resetHistory: shouldResetHistory = true } =
+    options;
+  if (isInAction()) {
+    abortAction({ autoRender: false });
+  }
+  replaceState(cloneSnapshot(next));
+  if (shouldResetHistory) {
+    resetHistory();
+  }
+  const suppress =
+    (globalThis as any).HEADLESS === true ||
+    (globalThis as any).AI_SUPPRESS_RENDER === true;
+  if (autoRender && !suppress) adapter.render();
+  notify();
+}
+
 function trimRing() {
   if (past.length > MAX_HISTORY) past = past.slice(past.length - MAX_HISTORY);
 }
