@@ -12,19 +12,30 @@ import {
   triggerConfirmButtonClick,
 } from "../ui/targeting.js";
 import { injectAdapter } from "../core/adapter.js";
-import { endTurnBlue, endTurnRed } from "../logic/core/turns.js";
-import { useRedBoost } from "../logic/boosts.js";
 import { state } from "../core/gameState.js";
 import { doAction, undo, redo } from "../core/history.js";
 import type { DeckManifest, DeckManifestEntry } from "../data/deckManifest.js";
 import { initTestBridgeIfRequested } from "../ui/qa/testBridge.js";
 import { reportDeckCoverage } from "../ui/coverageBanner.js";
 import { getDeck, getHand } from "../core/playerHelpers.js";
+import {
+  endTurnAction,
+  bonusPpAction,
+  maybeAdvanceScriptFromUi,
+} from "../ui/playerDispatch.js";
 
-// Expose globals for UI onclick handlers
-window.endTurnBlue = endTurnBlue;
-window.endTurnRed = endTurnRed;
-window.useRedBoost = useRedBoost;
+// Expose globals for UI onclick handlers — routed through PlayerAction dispatch
+window.endTurnBlue = () => {
+  endTurnAction();
+  maybeAdvanceScriptFromUi();
+};
+window.endTurnRed = () => {
+  endTurnAction();
+  maybeAdvanceScriptFromUi();
+};
+window.useRedBoost = () => {
+  bonusPpAction("second");
+};
 
 // Initialize Logic -> UI Adapter (wire ALL targeting UI functions)
 injectAdapter({
@@ -97,6 +108,11 @@ window.addEventListener("DOMContentLoaded", () => {
   // Save/Load positions + checkpoint buttons
   void import("../ui/positionPanel.js").then(({ initPositionPanel }) => {
     initPositionPanel();
+  });
+
+  // Sparring line (scripted dummy) panel
+  void import("../ui/scriptPanel.js").then(({ initScriptPanel }) => {
+    initScriptPanel();
   });
 
   wireClick("undoBtn", () => {

@@ -28,6 +28,42 @@ export interface ChooseTargetAction {
   target: TargetSpec;
 }
 
+export type EvolveAction = {
+  type: "EVOLVE";
+  player: Player;
+  cardUid: string;
+  mode: "normal" | "super";
+};
+
+export type EngageAction = {
+  type: "ENGAGE";
+  player: Player;
+  cardUid: string;
+};
+
+export type BonusPpAction = {
+  type: "BONUS_PP";
+  player: Player;
+};
+
+export type ChooseModeAction = {
+  type: "CHOOSE_MODE";
+  player: Player;
+  /** 0-based indices into the filtered option pool, in pick order. */
+  indices: number[];
+};
+
+export type ToggleMulliganAction = {
+  type: "TOGGLE_MULLIGAN";
+  player: Player;
+  cardUid: string;
+};
+
+export type ConfirmMulliganAction = {
+  type: "CONFIRM_MULLIGAN";
+  player: Player;
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION TYPE MAPPING - Closed-world union with type-level assertions
 // ─────────────────────────────────────────────────────────────────────────────
@@ -40,7 +76,13 @@ export type ActionType =
   | "END_TURN"
   | "PLAY_CARD"
   | "ATTACK"
-  | "CHOOSE_TARGET";
+  | "CHOOSE_TARGET"
+  | "EVOLVE"
+  | "ENGAGE"
+  | "BONUS_PP"
+  | "CHOOSE_MODE"
+  | "TOGGLE_MULLIGAN"
+  | "CONFIRM_MULLIGAN";
 
 // Step 2: Define the canonical type mapping (ActionType -> Action interface)
 export interface ActionByType {
@@ -51,6 +93,12 @@ export interface ActionByType {
   PLAY_CARD: PlayCardAction;
   ATTACK: AttackAction;
   CHOOSE_TARGET: ChooseTargetAction;
+  EVOLVE: EvolveAction;
+  ENGAGE: EngageAction;
+  BONUS_PP: BonusPpAction;
+  CHOOSE_MODE: ChooseModeAction;
+  TOGGLE_MULLIGAN: ToggleMulliganAction;
+  CONFIRM_MULLIGAN: ConfirmMulliganAction;
 }
 
 // Step 3: Type assertions to enforce totality and exactness

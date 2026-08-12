@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "name": "example-red-curve",
+  "scriptedSide": "second",
+  "seed": 12345,
+  "deckAId": "starter_deck",
+  "deckBId": "starter_deck",
+  "notes": "Hand-writable sparring line. cardId+occ identity; never raw uids.",
+  "steps": [
+    { "op": "CONFIRM_MULLIGAN" },
+    { "op": "END_TURN" },
+    { "op": "PLAY_CARD", "card": { "cardId": "10001110", "occ": 0 } },
+    { "op": "END_TURN" },
+    {
+      "op": "EVOLVE",
+      "card": { "cardId": "10001110", "occ": 0 },
+      "mode": "normal"
+    },
+    {
+      "op": "ATTACK",
+      "attacker": { "cardId": "10001110", "occ": 0 },
+      "defender": { "kind": "leader" }
+    },
+    { "op": "END_TURN" }
+  ]
+}

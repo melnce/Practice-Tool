@@ -1,11 +1,14 @@
 // src/ui/drag.ts
 import { getDragData, setDragData } from "./dom.js";
-import { doAction } from "../core/history.js";
 import type { CardInstance, GameState, Player } from "../core/types/index.js";
 import { reportBlockedOutcome } from "./outcomes.js";
-
-// External game logic hooks (keep same import paths as your project)
-const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
+import {
+  playCardAction,
+  attackAction,
+  evolveAction,
+  maybeAdvanceScriptFromUi,
+} from "./playerDispatch.js";
+import { getBoard } from "../core/playerHelpers.js";
 
 export function makeLeaderDroppable(
   leaderEl: HTMLElement,
@@ -19,8 +22,6 @@ export function makeLeaderDroppable(
     const data = getDragData(e);
     const [attackerPlayer, attackerIndex] = data.split(",");
 
-    // Only allow dropping attacker onto the opposite leader on the correct turn
-    // Use activePlayer as source of truth
     const isFirstActive = state.activePlayer === "first";
     if (
       (targetPlayer === "first" && isFirstActive) ||
@@ -29,20 +30,20 @@ export function makeLeaderDroppable(
       return;
     if (!attackerIndex) return;
 
-    // Attacker must belong to the active player (engine also enforces this)
     if (attackerPlayer !== state.activePlayer) {
       reportBlockedOutcome({ kind: "blocked", reason: "Not your turn" });
       return;
     }
 
-    void logic().then(({ attackLeader }) => {
-      const outcome = attackLeader(
-        parseInt(attackerIndex || "0"),
-        attackerPlayer as Player,
-        targetPlayer,
-      );
-      reportBlockedOutcome(outcome);
+    const attacker = getBoard(state, attackerPlayer as Player)[
+      parseInt(attackerIndex || "0", 10)
+    ];
+    if (!attacker) return;
+    attackAction(attackerPlayer as Player, attacker.uid, {
+      type: "leader",
+      player: targetPlayer,
     });
+    maybeAdvanceScriptFromUi();
   };
 }
 
@@ -72,33 +73,23 @@ export function enableAttackerDrag(
 export function enableBoardDropForOwnSide(
   div: HTMLElement,
   containerId: string,
-  state: GameState,
+  _state: GameState,
 ) {
   div.ondragover = (e) => e.preventDefault();
   div.ondrop = (e) => {
     e.preventDefault();
     const data = getDragData(e);
 
-    // Evo button drag payload
-    if (data.includes("NormalEvo") || data.includes("SuperEvo")) return; // handled at card level
+    if (data.includes("NormalEvo") || data.includes("SuperEvo")) return;
 
-    // Hand -> board
     const [sourceType, sourceId, cardUid] = data.split(",");
     if (
       sourceType === "hand" &&
-      sourceId === containerId.replace("Board", "Hand")
+      sourceId === containerId.replace("Board", "Hand") &&
+      cardUid
     ) {
       const player: Player = containerId === "blueBoard" ? "first" : "second";
-      const hand =
-        player === "first"
-          ? state.players.first.hand
-          : state.players.second.hand;
-      const index = hand.findIndex((c: CardInstance) => c.uid === cardUid);
-      if (index !== -1)
-        void logic().then(({ playCard }) => {
-          const outcome = playCard(hand, player, index);
-          reportBlockedOutcome(outcome);
-        });
+      playCardAction(player, cardUid);
     }
   };
 }
@@ -108,7 +99,7 @@ export function enableCardEvoDrop(
   containerId: string,
   card: CardInstance,
   state: GameState,
-  rerender: () => void,
+  _rerender: () => void,
 ) {
   div.ondragover = (e) => e.preventDefault();
   div.ondrop = (e) => {
@@ -119,9 +110,7 @@ export function enableCardEvoDrop(
 
     const isBlueSide = containerId === "blueBoard";
     const isNormal = data.includes("NormalEvo");
-    const isSuper = data.includes("SuperEvo");
 
-    // Turn + charges + per-turn lock - use activePlayer as source of truth
     const isFirstPlayerActive = state.activePlayer === "first";
     if (isBlueSide) {
       if (!isFirstPlayerActive) return;
@@ -157,35 +146,14 @@ export function enableCardEvoDrop(
 
     const owner: Player = isBlueSide ? "first" : "second";
     const mode = isNormal ? "normal" : "super";
-    const actionName = isSuper ? "Super Evolve" : "Evolve";
-    // Resolve dynamic import BEFORE opening history — doAction callbacks must be sync.
-    void logic().then(({ handleEvolveSelf }) => {
-      doAction(
-        actionName,
-        () => {
-          // Use handleEvolveSelf as single source of truth for all evolve logic:
-          // - Applies stat boosts (+2/+2 or +3/+3)
-          // - Sets hasEvolved, evoType, rush/storm flags
-          // - Spends evo charges and sets evoUsedThisTurn
-          // - Runs evolve/superevolve effects
-          // Rerender is called after evolve completes for immediate visual feedback
-          handleEvolveSelf(card, owner, {
-            mode,
-            spendPoint: true,
-            runEvoEffects: true,
-          });
-          rerender();
-        },
-        {},
-        { autoRender: false },
-      );
-    });
+    // Sync path: evolveAction → engine.dispatch → doAction (no await inside).
+    evolveAction(owner, card.uid, mode);
   };
 }
 
 export function enableEnemyFollowerDrop(
   div: HTMLElement,
-  attackerData: any,
+  _attackerData: any,
   defenderIndex: number,
   state: GameState,
   isRedBoard: boolean,
@@ -197,7 +165,6 @@ export function enableEnemyFollowerDrop(
     const data = getDragData(e);
     const [attackerPlayer, attackerIndex] = data.split(",");
 
-    // Attacker must belong to the active player (engine also enforces this)
     if (attackerPlayer !== state.activePlayer) {
       reportBlockedOutcome({ kind: "blocked", reason: "Not your turn" });
       return;
@@ -217,14 +184,13 @@ export function enableEnemyFollowerDrop(
     if (hasWard && !defender.hasWard) return;
     if (defender.hasIntimidate && !defender.hasWard) return;
 
-    void logic().then(({ attackFollower }) => {
-      const outcome = attackFollower(
-        parseInt(attackerIndex || "0"),
-        defenderIndex,
-        attackerPlayer as Player,
-        defenderPlayer,
-      );
-      reportBlockedOutcome(outcome);
+    const attacker = getBoard(state, attackerPlayer as Player)[
+      parseInt(attackerIndex || "0", 10)
+    ];
+    if (!attacker) return;
+    attackAction(attackerPlayer as Player, attacker.uid, {
+      type: "card",
+      uid: defender.uid,
     });
   };
 }

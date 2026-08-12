@@ -15,7 +15,7 @@ import { endTurnBlue, endTurnRed } from "./turns.js";
 import { playCardNoRender } from "./playCard/index.js";
 import { attackFollower, attackLeader } from "./combat.js";
 import { resolvePendingTarget } from "./resolveTarget.js";
-import { undo, redo, resetHistory } from "../../core/history.js";
+import { undo, redo, resetHistory, doAction } from "../../core/history.js";
 import { assertValidGameState } from "../../core/stateValidation.js";
 import type { ReplayStep } from "../../core/stateHash.js";
 
@@ -26,6 +26,14 @@ import {
   getBoard,
   opponentOf,
 } from "../../core/playerHelpers.js";
+import { handleEvolveSelf } from "../effects/ops/evolve.js";
+import { engageAmulet } from "../effects/ops/engage.js";
+import { toggleSecondPlayerBonusPp } from "../../core/bonusPp.js";
+import { toggleMulliganPickCore, confirmMulliganCore } from "./mulliganCore.js";
+import {
+  getScriptedModePicks,
+  setScriptedModePickProvider,
+} from "../script/modeHook.js";
 
 /**
  * Dependencies that can be injected for testing/replay.
@@ -69,10 +77,6 @@ function dispatchInternal(
       const index = hand.findIndex((c) => c.uid === action.cardUid);
 
       if (index !== -1) {
-        // Determine if we can play
-        // Note: playCardNoRender logic handles validation internally but silent return?
-        // Let's call it and rely on its internal effects.
-        // We are trusting playCardNoRender works.
         playCardNoRender(hand, action.player, index);
       } else {
         throw new Error(
@@ -109,6 +113,74 @@ function dispatchInternal(
       } else {
         resolvePendingTarget(target.uid);
       }
+      break;
+    }
+    case "EVOLVE": {
+      const board = getBoard(currentState, action.player);
+      const card = board.find((c) => c.uid === action.cardUid);
+      if (!card) {
+        throw new Error(
+          `[DISPATCH_UID_FAIL] Evolve target not on board: ${action.cardUid}`,
+        );
+      }
+      const actionName = action.mode === "super" ? "Super Evolve" : "Evolve";
+      doAction(
+        actionName,
+        () => {
+          handleEvolveSelf(card, action.player, {
+            mode: action.mode,
+            spendPoint: true,
+            runEvoEffects: true,
+          });
+        },
+        { player: action.player, uid: action.cardUid, mode: action.mode },
+        { autoRender: false },
+      );
+      break;
+    }
+    case "ENGAGE": {
+      const board = getBoard(currentState, action.player);
+      const index = board.findIndex((c) => c.uid === action.cardUid);
+      if (index === -1) {
+        throw new Error(
+          `[DISPATCH_UID_FAIL] Engage target not on board: ${action.cardUid}`,
+        );
+      }
+      engageAmulet(action.player, index);
+      break;
+    }
+    case "BONUS_PP": {
+      if (action.player !== "second") {
+        throw new Error("[DISPATCH] BONUS_PP is second-player only");
+      }
+      toggleSecondPlayerBonusPp();
+      break;
+    }
+    case "CHOOSE_MODE": {
+      // Mode effects pause for a modal. Scripted playback pre-loads indices via
+      // the modeHook provider; dispatching CHOOSE_MODE installs those picks so
+      // the *next* mode effect (or an already-queued one) consumes them.
+      // For headless scripts that emit CHOOSE_MODE as a standalone step before
+      // the play that needs it, we stash indices for the provider.
+      const prev = getScriptedModePicks;
+      void prev;
+      const indices = action.indices.slice();
+      let consumed = false;
+      setScriptedModePickProvider((req) => {
+        if (req.owner !== action.player) return null;
+        if (consumed) return null;
+        consumed = true;
+        setScriptedModePickProvider(null);
+        return indices;
+      });
+      break;
+    }
+    case "TOGGLE_MULLIGAN": {
+      toggleMulliganPickCore(action.player, action.cardUid);
+      break;
+    }
+    case "CONFIRM_MULLIGAN": {
+      confirmMulliganCore(action.player);
       break;
     }
     // No default - TypeScript will error if a case is missing (exhaustiveness check)

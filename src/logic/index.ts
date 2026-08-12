@@ -21,11 +21,6 @@ export { getCardDetails } from "../data/cardDatabase.js";
 // Expose to window
 
 import { startGame as _startGame } from "./startGame.js";
-import {
-  endTurnBlue as _endTurnBlue,
-  endTurnRed as _endTurnRed,
-} from "./core/turns.js";
-import { useRedBoost as _useRedBoost } from "./boosts.js";
 import "../data/cardDatabase.js";
 import { summonNamed as _summonNamed } from "./effects/ops/summon.js";
 import { getCardDetails as _getCardDetails } from "../data/cardDatabase.js";
@@ -47,9 +42,8 @@ export function startFuseFromHand(owner: Player, initiatorUid: string) {
 }
 
 (window as any).startGame = _startGame;
-(window as any).endTurnBlue = _endTurnBlue;
-(window as any).endTurnRed = _endTurnRed;
-(window as any).useRedBoost = _useRedBoost;
+// End-turn / Bonus PP window hooks are owned by boot.ts (routed through
+// PlayerAction dispatch for sparring-line recording). Do not overwrite here.
 (window as any).summonNamed = _summonNamed;
 (window as any).getCardDetails = _getCardDetails;
 (window as any)._gameState = state;

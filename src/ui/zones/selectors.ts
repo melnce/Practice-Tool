@@ -2,6 +2,11 @@
 import type { GameState, Player } from "../../core/types/index.js";
 import { isOwnBoard, isBoardZone } from "../../helpers/board.js";
 import type { ZoneContext } from "./types.js";
+import {
+  isHiddenHandEnabled,
+  getScriptedSide,
+  getScriptRuntimeSnapshot,
+} from "../../logic/script/runtime.js";
 
 export function buildZoneContext(
   containerId: string,
@@ -21,6 +26,15 @@ export function buildZoneContext(
   const isMyHand =
     (isBlueHand && isFirstActive) || (isRedHand && !isFirstActive);
 
+  const snap = getScriptRuntimeSnapshot();
+  const scripted = getScriptedSide();
+  const hideHandFaces =
+    isHand &&
+    isHiddenHandEnabled() &&
+    !!scripted &&
+    owner === scripted &&
+    (snap.mode === "playing" || snap.mode === "recording");
+
   return {
     containerId,
     owner,
@@ -33,5 +47,6 @@ export function buildZoneContext(
     isBlueBoard,
     isRedBoard,
     isMulligan,
+    hideHandFaces,
   };
 }

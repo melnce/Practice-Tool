@@ -5,18 +5,16 @@ import { updateCounts } from "./counts.js";
 import { updateEvoButtonsUI } from "./evo.js";
 import { makeLeaderDroppable } from "./drag.js";
 import { byId } from "./dom.js";
-import { reportBlockedOutcome } from "./outcomes.js";
 
 import { state } from "../core/gameState.js";
 import type { GameState, Player, CardInstance } from "../core/types/index.js";
 import { getWinner } from "../core/playerHelpers.js";
+import { maybeAdvanceScriptFromUi } from "./playerDispatch.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
   return player === "first" ? "blue" : "red";
 }
-
-const logic = () => import(/* webpackIgnore: true */ "../logic/index.js");
 
 const ACTIVE_ON_BOTTOM_KEY = "svwb.activeOnBottom";
 
@@ -70,11 +68,11 @@ export function render() {
     state,
     render,
     isFirstActive && !gameLocked,
-    (i) =>
-      logic().then(({ playCard }) => {
-        const outcome = playCard(state.players.first.hand, "first", i);
-        reportBlockedOutcome(outcome);
-      }),
+    (i) => {
+      void import("./playerDispatch.js").then(({ playCardAtIndex }) => {
+        playCardAtIndex("first", i);
+      });
+    },
   );
   renderZone("blueBoard", state.players.first.board, state, render);
   renderZone(
@@ -83,11 +81,11 @@ export function render() {
     state,
     render,
     !isFirstActive && !gameLocked,
-    (i) =>
-      logic().then(({ playCard }) => {
-        const outcome = playCard(state.players.second.hand, "second", i);
-        reportBlockedOutcome(outcome);
-      }),
+    (i) => {
+      void import("./playerDispatch.js").then(({ playCardAtIndex }) => {
+        playCardAtIndex("second", i);
+      });
+    },
   );
   renderZone("redBoard", state.players.second.board, state, render);
 
@@ -107,9 +105,13 @@ export function render() {
     enemyLeader.classList.add("selectable");
     enemyLeader.onclick = (e) => {
       e.stopPropagation();
-      void logic().then(({ resolvePendingTarget }) =>
-        resolvePendingTarget("leader"),
-      );
+      void import("./playerDispatch.js").then(({ chooseTargetAction }) => {
+        const enemy = state.activePlayer === "first" ? "second" : "first";
+        chooseTargetAction(state.activePlayer, {
+          type: "leader",
+          player: enemy,
+        });
+      });
     };
   } else {
     blueLeader.classList.remove("selectable");
@@ -186,6 +188,15 @@ export function render() {
   }
 
   updateGameOverOverlay();
+
+  // After paint, drive the sparring line if it's that side's turn.
+  queueMicrotask(() => {
+    try {
+      maybeAdvanceScriptFromUi();
+    } catch (e) {
+      console.error("[Script] auto-advance failed", e);
+    }
+  });
 }
 
 function updateBoostPipsUI() {

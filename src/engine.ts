@@ -17,6 +17,7 @@ import {
   canRedo,
   captureSnapshot,
   applySnapshot,
+  doAction,
 } from "./core/history.js";
 
 export { captureSnapshot, applySnapshot, canUndo, canRedo };
@@ -47,7 +48,6 @@ export type {
   CheckpointInfo,
 } from "./core/positionStore.js";
 
-// Re-exports for consumers (UI/Tests)
 // Re-exports for consumers (UI/Tests)
 export type { GameState } from "./core/types/index.js";
 // Do not export mutable state directly. Use getState().
@@ -80,6 +80,14 @@ export function getState(): GameState {
 import { playCard } from "./logic/core/playCard/index.js";
 import { attackFollower, attackLeader } from "./logic/core/combat.js";
 import { resolvePendingTarget } from "./logic/core/resolveTarget.js";
+import { handleEvolveSelf } from "./logic/effects/ops/evolve.js";
+import { engageAmulet } from "./logic/effects/ops/engage.js";
+import { toggleSecondPlayerBonusPp } from "./core/bonusPp.js";
+import {
+  toggleMulliganPickCore,
+  confirmMulliganCore,
+} from "./logic/core/mulliganCore.js";
+import { setScriptedModePickProvider } from "./logic/script/modeHook.js";
 
 /**
  * Dispatch a centralized action to mutate state.
@@ -170,6 +178,70 @@ function _dispatchInternal(
       }
       break;
     }
+    case "EVOLVE": {
+      const board =
+        action.player === "first"
+          ? currentState.players.first.board
+          : currentState.players.second.board;
+      const card = board.find((c) => c.uid === action.cardUid);
+      if (!card) {
+        console.warn(`[Engine] Evolve: ${action.cardUid} not on board.`);
+        break;
+      }
+      const actionName = action.mode === "super" ? "Super Evolve" : "Evolve";
+      doAction(
+        actionName,
+        () => {
+          handleEvolveSelf(card, action.player, {
+            mode: action.mode,
+            spendPoint: true,
+            runEvoEffects: true,
+          });
+        },
+        { player: action.player, uid: action.cardUid, mode: action.mode },
+        { autoRender: true },
+      );
+      break;
+    }
+    case "ENGAGE": {
+      const board =
+        action.player === "first"
+          ? currentState.players.first.board
+          : currentState.players.second.board;
+      const index = board.findIndex((c) => c.uid === action.cardUid);
+      if (index === -1) {
+        console.warn(`[Engine] Engage: ${action.cardUid} not on board.`);
+        break;
+      }
+      engageAmulet(action.player, index);
+      break;
+    }
+    case "BONUS_PP": {
+      if (action.player !== "second") {
+        console.warn("[Engine] BONUS_PP is second-player only");
+        break;
+      }
+      toggleSecondPlayerBonusPp();
+      break;
+    }
+    case "CHOOSE_MODE": {
+      const indices = action.indices.slice();
+      let consumed = false;
+      setScriptedModePickProvider((req) => {
+        if (req.owner !== action.player) return null;
+        if (consumed) return null;
+        consumed = true;
+        setScriptedModePickProvider(null);
+        return indices;
+      });
+      break;
+    }
+    case "TOGGLE_MULLIGAN":
+      toggleMulliganPickCore(action.player, action.cardUid);
+      break;
+    case "CONFIRM_MULLIGAN":
+      confirmMulliganCore(action.player);
+      break;
     default:
       // Comprehensive check for unknown actions (or union members not handled)
       console.warn("Unknown action dispatched:", action as any);
