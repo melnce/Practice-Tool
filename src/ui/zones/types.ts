@@ -48,6 +48,12 @@ export interface CardViewModel {
   spellboostCount: number | null;
   countdown: number | null;
   icarusBuff?: boolean | undefined;
+  /** Derived implementation coverage — mark stubs so practice lines stay honest. */
+  implementationStatus?:
+    | "implemented"
+    | "partial"
+    | "unimplemented"
+    | undefined;
 
   // Interaction states
   canAttack?: boolean | undefined;

@@ -3,6 +3,10 @@
  * Mechanical check: card JSON structure vs written description.
  * Flags authoring mismatches (wrong/missing ops, keywords). Does NOT assert engine behavior.
  *
+ * Unimplemented stubs (derived via cardImplementationStatus) skip effect-completeness
+ * errors — they are expected to have rules text without ops. Evergreen keyword
+ * presence is still checked when the ingest extracted them.
+ *
  * Run: npm run check:card-text
  *      npm run check:card-text -- --set 10000_basic
  */
@@ -10,6 +14,10 @@
 import fs from "fs";
 import path from "path";
 import { SETS_DIR } from "./mergeSets.js";
+import {
+  getImplementationStatus,
+  type ImplementationStatus,
+} from "../src/data/cardImplementationStatus.js";
 
 type CardJson = {
   id: string;
@@ -29,6 +37,7 @@ type Issue = {
   name: string;
   kind: "error" | "warn";
   message: string;
+  status?: ImplementationStatus;
 };
 
 function listSetFiles(setFilter?: string): string[] {
@@ -59,9 +68,13 @@ function keywordNames(keywords: unknown[] | undefined): string[] {
     .filter(Boolean);
 }
 
+function normalizeKwName(name: string): string {
+  return name.toLowerCase().replace(/[\s_-]+/g, "");
+}
+
 function hasKeyword(keywords: unknown[] | undefined, name: string): boolean {
-  const lower = name.toLowerCase();
-  return keywordNames(keywords).some((k) => k.toLowerCase() === lower);
+  const target = normalizeKwName(name);
+  return keywordNames(keywords).some((k) => normalizeKwName(k) === target);
 }
 
 function lastWordsEffects(keywords: unknown[] | undefined): unknown[] {
@@ -70,7 +83,8 @@ function lastWordsEffects(keywords: unknown[] | undefined): unknown[] {
     if (
       k &&
       typeof k === "object" &&
-      (k as { name?: string }).name === "LastWords"
+      normalizeKwName(String((k as { name?: string }).name ?? "")) ===
+        "lastwords"
     ) {
       return Array.isArray((k as { effects?: unknown[] }).effects)
         ? (k as { effects: unknown[] }).effects
@@ -117,11 +131,17 @@ function allEffectRoots(card: CardJson): unknown[] {
 
 function checkCard(card: CardJson): Issue[] {
   const issues: Issue[] = [];
+  const status = getImplementationStatus(card);
   const desc = card.description ?? "";
   const descLower = desc.toLowerCase();
   const kws = card.keywords;
   const ops = new Set<string>();
   for (const root of allEffectRoots(card)) collectOps(root, ops);
+
+  // Unimplemented stubs: skip effect-completeness errors (text without ops is expected).
+  // Still surface evergreen keyword mismatches as warnings so ingest quality is visible.
+  const effectCompletenessKind: "error" | "warn" =
+    status === "unimplemented" ? "warn" : "error";
 
   const expectKw = (label: string, present: boolean, linePattern?: RegExp) => {
     const lines = desc.split("\n");
@@ -134,7 +154,8 @@ function checkCard(card: CardJson): Issue[] {
       issues.push({
         id: card.id,
         name: card.name,
-        kind: "error",
+        kind: status === "unimplemented" ? "warn" : "error",
+        status,
         message: `Description mentions "${label}" as card keyword but keyword is missing from JSON`,
       });
     }
@@ -145,11 +166,15 @@ function checkCard(card: CardJson): Issue[] {
   expectKw("Rush", hasKeyword(kws, "Rush"), /^rush\b/i);
   expectKw("Bane", hasKeyword(kws, "Bane"), /^bane\b/i);
 
-  if (/last words:/i.test(desc) && !hasKeyword(kws, "LastWords")) {
+  if (
+    desc.split("\n").some((line) => /^last words:/i.test(line.trim())) &&
+    !hasKeyword(kws, "LastWords")
+  ) {
     issues.push({
       id: card.id,
       name: card.name,
-      kind: "error",
+      kind: effectCompletenessKind,
+      status,
       message: "Description has Last Words but JSON lacks LastWords keyword",
     });
   }
@@ -158,7 +183,8 @@ function checkCard(card: CardJson): Issue[] {
     issues.push({
       id: card.id,
       name: card.name,
-      kind: "error",
+      kind: effectCompletenessKind,
+      status,
       message: "Description has Fanfare but fanfare[] is empty",
     });
   }
@@ -167,7 +193,8 @@ function checkCard(card: CardJson): Issue[] {
     issues.push({
       id: card.id,
       name: card.name,
-      kind: "error",
+      kind: effectCompletenessKind,
+      status,
       message: "Description has Super-Evolve but superevolve[] is empty",
     });
   }
@@ -180,7 +207,8 @@ function checkCard(card: CardJson): Issue[] {
     issues.push({
       id: card.id,
       name: card.name,
-      kind: "error",
+      kind: effectCompletenessKind,
+      status,
       message: "Description has Evolve: line but evolve[] is empty",
     });
   }
@@ -192,13 +220,14 @@ function checkCard(card: CardJson): Issue[] {
       (k) =>
         k &&
         typeof k === "object" &&
-        (k as { name?: string }).name === "Enhance",
+        String((k as { name?: string }).name ?? "").toLowerCase() === "enhance",
     ) as { cost?: number } | undefined;
     if (!enhanceKw) {
       issues.push({
         id: card.id,
         name: card.name,
-        kind: "error",
+        kind: effectCompletenessKind,
+        status,
         message: `Description has Enhance (${cost}) but JSON lacks Enhance keyword`,
       });
     } else if (Number(enhanceKw.cost) !== cost) {
@@ -206,6 +235,7 @@ function checkCard(card: CardJson): Issue[] {
         id: card.id,
         name: card.name,
         kind: "error",
+        status,
         message: `Enhance cost in text (${cost}) != JSON (${enhanceKw.cost})`,
       });
     }
@@ -216,6 +246,7 @@ function checkCard(card: CardJson): Issue[] {
       id: card.id,
       name: card.name,
       kind: "warn",
+      status,
       message:
         "Description mentions Countdown but Countdown keyword missing (may use inline field)",
     });
@@ -226,6 +257,7 @@ function checkCard(card: CardJson): Issue[] {
       id: card.id,
       name: card.name,
       kind: "warn",
+      status,
       message: "Description mentions Engage but Engage keyword missing",
     });
   }
@@ -234,16 +266,23 @@ function checkCard(card: CardJson): Issue[] {
     issues.push({
       id: card.id,
       name: card.name,
-      kind: "error",
+      kind: effectCompletenessKind,
+      status,
       message: 'Description says "Draw a card" but no draw/search op in JSON',
     });
   }
 
-  if (card.type === "Spell" && desc.trim() && !(card.spell?.length ?? 0)) {
+  if (
+    card.type === "Spell" &&
+    desc.trim() &&
+    !(card.spell?.length ?? 0) &&
+    !(card.fanfare?.length ?? 0)
+  ) {
     issues.push({
       id: card.id,
       name: card.name,
-      kind: "error",
+      kind: effectCompletenessKind,
+      status,
       message: "Spell has description but spell[] is empty",
     });
   }
@@ -256,10 +295,12 @@ function checkCard(card: CardJson): Issue[] {
       id: card.id,
       name: card.name,
       kind: "warn",
+      status,
       message: "Card has effects in JSON but empty description",
     });
   }
 
+  void descLower;
   return issues;
 }
 

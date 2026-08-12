@@ -175,7 +175,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "10304110",
@@ -239,7 +240,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "When you gain this crest, replace your deck with the <b><color=Keyword>Mjerrabaine Deck</color></b> and transform the Reaper Card at the bottom of your deck into a Victory Card.\n<hr>At the end of your turn, discard all cards not named <b><i><color=Keyword>Great Testimony</color></i></b> and draw 6 cards.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10304120",
@@ -524,7 +533,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "10313110",
@@ -676,6 +686,14 @@
             "amount": 1
           }
         ]
+      }
+    ],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nWhenever an allied follower enters the field, give it -1/-1.",
+        "name": "Crest"
       }
     ]
   },
@@ -969,7 +987,10 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "spell": [],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "10323110",
@@ -1227,7 +1248,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (8)</b>\nWhenever you play or <b><color=Keyword>Fuse</color></b> a Loot card, advance this crest's count by 1.\n<b><color=Keyword>Last Words</color></b>: Add a <b><i><color=Keyword>Remnant of Hollowness</color></i></b> to your hand.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10331110",
@@ -1337,7 +1366,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\n<b><color=Keyword>Last Words</color></b>: Draw 2 cards. Deal 4 damage to all enemy followers.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10332110",
@@ -2163,6 +2200,15 @@
           }
         ]
       }
+    ],
+    "evolve": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "Once on each of your turns, when an allied follower takes damage but isn't destroyed, add a <b><i><color=Keyword>Fangs of Ardent Destruction</color></i></b> to your hand.",
+        "name": "Crest"
+      }
     ]
   },
   {
@@ -2464,7 +2510,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "10353110",
@@ -2735,7 +2782,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 4,
+        "cost": 0,
+        "skill_text": "This faith's value starts at 0.\n<hr>Whenever you select <b><color=Keyword>Mode</color><color=Keyword>s</color></b>, increase this faith's value by 1.",
+        "name": "Faith"
+      }
+    ]
   },
   {
     "id": "10354120",
@@ -2835,7 +2890,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nAt the end of your turn, if allied followers didn't attack this turn, give a random allied follower on your field -2/-0 and <b><color=Keyword>Ward</color></b>.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10361120",
@@ -2969,8 +3032,16 @@
         ]
       }
     ],
-    "keywords": [],
-    "triggers": []
+    "keywords": ["Ward"],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nAt the end of your turn, if allied followers didn't attack this turn, restore 1 defense to your leader.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10362210",
@@ -3133,7 +3204,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nAt the end of your turn, if allied followers didn't attack this turn, draw a follower with 4 defense.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10363210",
@@ -3280,7 +3359,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nAt the end of your turn, if there's an allied <b><i><color=Keyword>Himeka, Heir to Repose</color></i></b> on the field, give X random enemy followers on the field with 4 attack or less \"Can't attack followers or leaders\" and \"At the end of your turn, banish this card.\" X is the number of crests you have.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10364120",
@@ -3335,7 +3422,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10371110",
@@ -3565,7 +3660,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "10373110",

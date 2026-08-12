@@ -82,6 +82,21 @@ export function renderCardDOM(
     imageWrapper.appendChild(badge);
   }
 
+  // Unimplemented / partial coverage badge — honest signal that effects are stubs
+  if (
+    vm.implementationStatus === "unimplemented" ||
+    vm.implementationStatus === "partial"
+  ) {
+    div.classList.add("card-unimplemented");
+    const label = vm.implementationStatus === "partial" ? "PARTIAL" : "UNIMPL";
+    const badge = createElement("div", "unimplemented-badge", label);
+    badge.title =
+      vm.implementationStatus === "partial"
+        ? "Card JSON contains an unknown effect op"
+        : "This card has no implemented effects — results may be misleading";
+    imageWrapper.appendChild(badge);
+  }
+
   // Selection Check
   if (vm.isSelected) {
     const check = createElement("div", "selected-check", "✓");

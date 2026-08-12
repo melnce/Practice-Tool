@@ -30,7 +30,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10201310",
@@ -59,7 +60,8 @@
         "defense": -2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10202110",
@@ -93,7 +95,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10203110",
@@ -118,7 +121,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10203120",
@@ -167,7 +171,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10204110",
@@ -193,7 +198,8 @@
         "select": 1
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10204120",
@@ -240,7 +246,16 @@
         ]
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "At the end of your turn, if there's a super-evolved allied follower on the field, deal 2 damage to all enemy followers.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10211110",
@@ -260,7 +275,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"]
+    "keywords": ["Rush"],
+    "triggers": []
   },
   {
     "id": "10211120",
@@ -301,7 +317,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10211310",
@@ -328,7 +345,8 @@
         "count": 3
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10212110",
@@ -355,7 +373,8 @@
         "count": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10212120",
@@ -439,7 +458,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10213110",
@@ -477,7 +497,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10213310",
@@ -529,7 +550,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10214110",
@@ -582,7 +604,16 @@
       }
     ],
     "superevolve": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "At the start of your turn, add a <b><i><color=Keyword>Fairy</color></i></b> to your hand.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10214120",
@@ -625,7 +656,8 @@
         "select": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10221110",
@@ -660,7 +692,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10221120",
@@ -680,7 +713,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ambush"]
+    "keywords": ["Ambush"],
+    "triggers": []
   },
   {
     "id": "10221310",
@@ -712,7 +746,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10222110",
@@ -789,7 +824,8 @@
         }
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10222310",
@@ -831,7 +867,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10223110",
@@ -926,7 +963,8 @@
         "count": 1
       }
     ],
-    "keywords": ["Ambush"]
+    "keywords": ["Ambush"],
+    "triggers": []
   },
   {
     "id": "10224110",
@@ -1082,7 +1120,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10231120",
@@ -1117,7 +1156,8 @@
         }
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10231310",
@@ -1154,7 +1194,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10232110",
@@ -1202,7 +1243,16 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "At the start of your turn, summon an <b><i><color=Keyword>Onion Patch</color></i></b>.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10232120",
@@ -1240,7 +1290,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10232310",
@@ -1272,7 +1323,8 @@
         "amount": "{self.spellboostCount}",
         "distribution": "split_sequential"
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10233110",
@@ -1372,7 +1424,16 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (1)</b>\nAt the end of your turn, draw a card. <b><color=Keyword>Earth Rite</color> (10)</b> - Double the attack and defense of all allied followers on the field.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10234110",
@@ -1417,7 +1478,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10234120",
@@ -1499,7 +1561,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10241110",
@@ -1572,7 +1635,8 @@
         ]
       }
     ],
-    "keywords": ["Rush"]
+    "keywords": ["Rush"],
+    "triggers": []
   },
   {
     "id": "10241310",
@@ -1612,7 +1676,9 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10242110",
@@ -1644,7 +1710,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10242120",
@@ -1678,7 +1745,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10242210",
@@ -1735,7 +1803,11 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10243110",
@@ -1794,7 +1866,16 @@
         "count": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "Whenever an allied Marine follower enters the field, restore 1 defense to your leader.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10243310",
@@ -1828,7 +1909,8 @@
         "amount": 3
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10244110",
@@ -1866,7 +1948,8 @@
         ]
       }
     ],
-    "keywords": ["Bane"]
+    "keywords": ["Bane"],
+    "triggers": []
   },
   {
     "id": "10244120",
@@ -1892,7 +1975,8 @@
         "mode": "halve"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10251110",
@@ -1923,7 +2007,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Bane"]
+    "keywords": ["Bane"],
+    "triggers": []
   },
   {
     "id": "10251120",
@@ -1954,7 +2039,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10251310",
@@ -1990,7 +2076,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10252110",
@@ -2063,7 +2150,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10252310",
@@ -2090,7 +2178,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10253110",
@@ -2140,7 +2229,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10253120",
@@ -2173,7 +2263,8 @@
         "amount": 2
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10254110",
@@ -2227,7 +2318,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10254120",
@@ -2297,6 +2389,14 @@
           }
         ]
       }
+    ],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nAt the start of your turn, <b><color=Keyword>Reanimate</color> (3)</b>.",
+        "name": "Crest"
+      }
     ]
   },
   {
@@ -2326,7 +2426,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10261120",
@@ -2366,7 +2467,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10261210",
@@ -2400,7 +2502,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10262110",
@@ -2444,7 +2548,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10262120",
@@ -2470,7 +2575,8 @@
         "select": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10262310",
@@ -2515,7 +2621,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10263110",
@@ -2600,7 +2707,16 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\n<b><color=Keyword>Last Words</color></b>: Deal 10 damage to your leader.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10264110",
@@ -2651,7 +2767,8 @@
         },
         "keywords": ["Aura"]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10264120",
@@ -2711,6 +2828,15 @@
           }
         ]
       }
+    ],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "Whenever an allied follower with <b><color=Keyword>Ward</color></b> enters the field, give it +1/+2.",
+        "name": "Crest"
+      }
     ]
   },
   {
@@ -2747,7 +2873,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10271120",
@@ -2786,7 +2913,8 @@
         ]
       }
     ],
-    "keywords": ["Rush"]
+    "keywords": ["Rush"],
+    "triggers": []
   },
   {
     "id": "10271210",
@@ -2832,7 +2960,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10272110",
@@ -2862,7 +2992,8 @@
         "into": "Doll Slayer"
       }
     ],
-    "keywords": ["Bane"]
+    "keywords": ["Bane"],
+    "triggers": []
   },
   {
     "id": "10272120",
@@ -2902,7 +3033,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10272310",
@@ -2946,7 +3078,9 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10273110",
@@ -2984,7 +3118,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10273310",
@@ -3017,7 +3152,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10274110",
@@ -3106,6 +3242,7 @@
         "max_cost": 5
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   }
 ]
