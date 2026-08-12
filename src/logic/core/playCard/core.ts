@@ -20,6 +20,7 @@ import {
 import { isGameOver } from "../../../core/gameOver.js";
 import type { AlternateForm } from "../../../helpers/alternateForm.js";
 import { fireTrigger } from "../triggers.js";
+import { bumpZoneVersion } from "../triggers/utils.js";
 
 /**
  * Transform a follower into its Crystallize amulet form for this play.
@@ -93,6 +94,7 @@ export function playCardCore(
 
   // 5) Remove from hand and count play
   fromHand.splice(index, 1);
+  bumpZoneVersion();
   setPlaysThisTurn(state, player, getPlaysThisTurn(state, player) + 1);
 
   // Enhanced-play watchers (Faith / crests) — fire once the Enhance cost is paid.

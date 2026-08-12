@@ -626,11 +626,33 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10521120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10521120-smoke-shrouded-beauty",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Glittering Gold",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "hand_matches",
+        "type": "Spell",
+        "count": 2,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10521310",
@@ -689,10 +711,39 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10522120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10522120-amphibian-goldmuncher",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Glittering Gold",
+        "count": 2
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "hand_matches",
+            "type": "Spell",
+            "count": 2,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 5
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -803,9 +854,27 @@
     "url": "https://shadowverse.gg/cards/10523310-splendor-of-the-goldbloom",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Glittering Gold",
+            "count": 4
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "add_to_hand",
+        "name": "Glittering Gold",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10524110",
@@ -844,10 +913,45 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10524120-unkei-goldbloom",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Unkei, Goldbloom",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10524120_token.webp",
+        "description": "Countdown (4)\nAt the end of your turn, add a Glittering Gold to your hand.",
+        "countdown": 4,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            },
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Glittering Gold",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "banish",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Glittering Gold",
+        "count": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1160,10 +1264,41 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10534110-lhynkal-wandering-fool",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "deck",
+        "action": "add",
+        "name": "Lhynkal, Wandering Fool",
+        "count": 10
+      }
+    ],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Lhynkal, Wandering Fool",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10534110_token.webp",
+        "description": "Whenever an allied Lhynkal, Wandering Fool enters the field, reduce the enemy leader's max defense by 2.",
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "condition": {
+              "name": "Lhynkal, Wandering Fool"
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "enemy:leader",
+                "defense": -2
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1678,7 +1813,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 5
+      },
+      {
+        "op": "deck",
+        "action": "add",
+        "name": "Valor of the Nightblossom",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10552110",
@@ -2293,8 +2441,29 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_spell_played",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1,
+        "filters": {
+          "type": "Spell"
+        }
+      }
+    ]
   },
   {
     "id": "10571310",
@@ -2381,7 +2550,18 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Ward"],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_spell_played",
+        "source": "board",
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -2445,7 +2625,14 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "transform",
+        "target": "any:any",
+        "select": 1,
+        "into": "Imari's Little Buddies"
+      }
+    ]
   },
   {
     "id": "10574110",

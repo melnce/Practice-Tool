@@ -17,11 +17,17 @@ import {
   getDeck,
   getRally,
   getAnyAllyAttackedThisTurn,
+  getHP,
+  opponentOf,
 } from "../../../core/playerHelpers.js";
 import {
   evaluateCardCondition,
   type CardCondition,
 } from "../../core/conditions/evaluator.js";
+import {
+  countUniqueTribeEnters,
+  countNamedEnters,
+} from "../../core/followerEnterHistory.js";
 
 // =============================================================================
 // CONDITION EVALUATOR TYPE
@@ -196,7 +202,45 @@ registerCondition("ally_matches", (spec, owner) => {
   if (spec.base_cost_gte != null) filter.base_cost_gte = spec.base_cost_gte;
   if (spec.base_cost_lte != null) filter.base_cost_lte = spec.base_cost_lte;
   if (spec.name) filter.name = spec.name;
+  if ((spec as any).class) filter.class = String((spec as any).class);
+  if (spec.tribe) filter.tribe = spec.tribe;
   return board.some((c) => evaluateCardCondition(c, filter));
+});
+
+registerCondition("unique_tribe_enters", (spec, owner) => {
+  const tribe = String(spec.tribe || "Artifact");
+  const need = spec.count ?? spec.at_least ?? 1;
+  return countUniqueTribeEnters(state, owner, tribe) >= need;
+});
+
+registerCondition("named_enter_count", (spec, owner, sourceCard) => {
+  const name = String(spec.name || sourceCard?.name || "");
+  const need = spec.count ?? spec.at_least ?? 1;
+  return countNamedEnters(state, owner, name) >= need;
+});
+
+registerCondition("hand_matches", (spec, owner) => {
+  const hand = getHand(state, owner) || [];
+  const filter: CardCondition = {};
+  if (spec.type) filter.type = spec.type;
+  if (spec.tribe) filter.tribe = spec.tribe;
+  if (spec.name) filter.name = spec.name;
+  if ((spec as any).class) filter.class = String((spec as any).class);
+  if (spec.base_cost_eq != null) filter.base_cost_eq = spec.base_cost_eq;
+  if (spec.base_cost_gte != null) filter.base_cost_gte = spec.base_cost_gte;
+  if (spec.base_cost_lte != null) filter.base_cost_lte = spec.base_cost_lte;
+  const n = hand.filter((c) => evaluateCardCondition(c, filter)).length;
+  return n >= (spec.count ?? 1);
+});
+
+registerCondition("leader_defense_lte", (spec, owner) => {
+  const lim = spec.count ?? spec.at_least ?? 0;
+  return getHP(state, owner) <= lim;
+});
+
+registerCondition("leader_defense_gt_enemy", (spec, owner) => {
+  void spec;
+  return getHP(state, owner) > getHP(state, opponentOf(owner));
 });
 
 registerCondition("self_cost", (spec, _owner, sourceCard) => {

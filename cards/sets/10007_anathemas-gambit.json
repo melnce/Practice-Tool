@@ -2384,10 +2384,51 @@
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10754110-adahime-anathema-of-death",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "condition": {
+          "class": "Abysscraft"
+        },
+        "exclude_self": true,
+        "attack": 2,
+        "defense": 2
+      }
+    ],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "not_self": true,
+          "class": "Abysscraft"
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "entering_follower",
+            "keywords": ["Rush"]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "deck",
+        "count": 2,
+        "distinct_by": "name",
+        "filters": {
+          "type": "Follower",
+          "class": "Abysscraft",
+          "cost_lte": 2
+        }
+      }
+    ]
   },
   {
     "id": "10754120",
@@ -2511,11 +2552,26 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10761120_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10761120-missionary-of-recruitment",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount_source": "amulets_in_hand"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2,
+        "filters": {
+          "type": "Amulet"
+        }
+      }
+    ]
   },
   {
     "id": "10761210",
@@ -2722,11 +2778,27 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10764110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10764110-rodeo-anathema-of-adjudication",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "countdown",
+        "action": "delay",
+        "board_name": "Rings of Moonlight",
+        "select": 1,
+        "select_mode": "random",
+        "amount": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Rings of Moonlight",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10764120",
@@ -2788,10 +2860,33 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10771110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10771110-brusque-barkeep",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Mystic Artifact",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Artifact"
+        },
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -2813,7 +2908,30 @@
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "unique_tribe_enters",
+        "tribe": "Artifact",
+        "count": 3,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Beat Breaker",
+            "count": 2
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Beat Breaker",
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10771310",
@@ -2834,7 +2952,53 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "gate",
+        "condition": "unique_tribe_enters",
+        "tribe": "Artifact",
+        "count": 3,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Analyzing Artifact",
+            "count": 1
+          },
+          {
+            "op": "add_to_hand",
+            "name": "Ancient Artifact",
+            "count": 1
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "mode",
+            "options": [
+              {
+                "label": "Add an Analyzing Artifact to your hand",
+                "effects": [
+                  {
+                    "op": "add_to_hand",
+                    "name": "Analyzing Artifact",
+                    "count": 1
+                  }
+                ]
+              },
+              {
+                "label": "Add an Ancient Artifact to your hand",
+                "effects": [
+                  {
+                    "op": "add_to_hand",
+                    "name": "Ancient Artifact",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10772110",
@@ -2851,11 +3015,22 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10772110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10772110-cool-courier",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Ancient Artifact",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10772120",
@@ -2876,7 +3051,33 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "gate",
+        "condition": "unique_tribe_enters",
+        "tribe": "Artifact",
+        "count": 3,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Ancient Artifact",
+            "count": 1
+          },
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Mystic Artifact",
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10772310",
@@ -2937,9 +3138,45 @@
     "url": "https://shadowverse.gg/cards/10773110-brazen-broadcaster",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Mystic Artifact",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Artifact"
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "entering_follower",
+            "keywords": ["Rush"]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Analyzing Artifact",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10773310",
@@ -2960,7 +3197,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount_source": "unique_tribe_enters",
+        "tribe": "Artifact"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 1
+      }
+    ]
   },
   {
     "id": "10774110",
@@ -2979,9 +3228,16 @@
     "url": "https://shadowverse.gg/cards/10774110-scarlet-anathema-of-dislocation",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Storm"],
+    "keywords": ["Storm", "Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount_source": "unique_tribe_enters",
+        "tribe": "Artifact"
+      }
+    ]
   },
   {
     "id": "10774120",
@@ -2998,10 +3254,49 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10774120_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10774120-myuu-hot-on-his-heels",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Ancient Artifact",
+        "count": 1
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "gate",
+        "condition": "unique_tribe_enters",
+        "tribe": "Artifact",
+        "count": 3,
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Artifact"
+        },
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3,
+            "distribution": "random_hits",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "fanfare": []
   }
 ]

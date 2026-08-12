@@ -79,6 +79,12 @@ export interface PlayerState {
   // === History (for RL/analysis) ===
   playedHistory: PlayedHistoryEntry[];
   destroyedHistory: CardInstance[];
+  /** Successful follower enters this match (name/tribes/id). See followerEnterHistory.ts. */
+  followerEnterHistory: Array<{
+    name: string;
+    tribes: string[];
+    cardId: string;
+  }>;
 
   // === Crests ===
   crests: Crest[];

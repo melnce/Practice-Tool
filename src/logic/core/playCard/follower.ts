@@ -12,7 +12,7 @@ import { pushPlayedHistory } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
 import { getBoard } from "../../../core/playerHelpers.js";
-import { stampBoardEntryTs } from "../triggers/utils.js";
+import { bumpZoneVersion, stampBoardEntryTs } from "../triggers/utils.js";
 import { snapshotEnteringKeywords } from "../enterKeywords.js";
 import {
   stashPlayFollowerResume,
@@ -61,6 +61,8 @@ export function playFollower(
   const toBoard = getBoard(state, player);
   stampBoardEntryTs(card, { advance: true });
   toBoard.push(card);
+  // Invalidate trigger-candidate cache (mid-turn scans must see this follower).
+  bumpZoneVersion();
 
   const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
 

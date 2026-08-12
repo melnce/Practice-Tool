@@ -163,6 +163,11 @@ function resolveTargets(
       return lastDrawn ? [lastDrawn] : [];
     }
 
+    case "last_added_to_hand": {
+      const last = (state as any).lastAddedToHand;
+      return last ? [last] : [];
+    }
+
     default:
       return [];
   }

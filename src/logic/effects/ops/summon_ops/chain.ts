@@ -14,6 +14,7 @@ import {
   stampBoardEntryTs,
 } from "../../../core/triggers/utils.js";
 import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
+import { recordFollowerEnter } from "../../../core/followerEnterHistory.js";
 
 // =============== Generic Board Fill Chain ===============
 
@@ -151,6 +152,7 @@ export function handleFillBoardChainDecay(
 
     // Rally for followers (parity with finishFollowerEnter / pushToBoard)
     setRally(state, owner, getRally(state, owner) + 1);
+    recordFollowerEnter(state, owner, clone);
 
     // Per-enter hooks & triggers (keep parity with pushToBoard)
     // Fire ally trigger for owner, enemy trigger for opponent

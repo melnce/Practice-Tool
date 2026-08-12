@@ -51,6 +51,7 @@ export function createPlayerState(isSecond: boolean = false): PlayerState {
     // History
     playedHistory: [],
     destroyedHistory: [],
+    followerEnterHistory: [],
 
     // Crests
     crests: [],

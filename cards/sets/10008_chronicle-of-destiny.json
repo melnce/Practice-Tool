@@ -233,7 +233,13 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "ep",
+        "action": "recover_super",
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10811110",
@@ -558,8 +564,39 @@
     "url": "https://shadowverse.gg/cards/10814120-tia-eternal-crystalian",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
-    "triggers": [],
+    "keywords": [
+      "Rush",
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:follower",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "self_buffed_up",
+        "source": "board",
+        "once_per_turn": true,
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Eve, Blade of Crystalia",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -578,10 +615,27 @@
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10821110-naht-vince-force-and-order",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Naht's Henchman",
+        "count": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3
+      }
+    ]
   },
   {
     "id": "10821120",
@@ -665,10 +719,34 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10822110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10822110-katze-magical-thief",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Glittering Gold",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_spell_played",
+        "source": "board",
+        "once_per_turn": true,
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 2,
+            "distribution": "random_hits",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -822,11 +900,36 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10824110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10824110-bunny-baron-fates-bullet",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Desperados' Shot",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Bunny & Baron, Fate's Bullet",
+        "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "rally",
+        "count": 20,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 4
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10824120",
@@ -945,7 +1048,13 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Mysterian Missile",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10831310",
@@ -1095,11 +1204,51 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10833110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10833110-tico-mysterian-spellcrafter",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "cost",
+        "target": "ally:hand",
+        "mode": "reduce",
+        "amount": 1,
+        "filter": {
+          "type": "Spell",
+          "tribe": "Mysteria"
+        }
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Tico, Mysterian Spellcrafter",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10833110_token.webp",
+        "description": "Whenever you play a Mysteria spell, deal 1 damage to the enemy leader.",
+        "triggers": [
+          {
+            "event": "ally_spell_played",
+            "condition": {
+              "tribe": "Mysteria"
+            },
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Mysterian Missile",
+        "count": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1177,9 +1326,40 @@
     "url": "https://shadowverse.gg/cards/10834110-tetra-ladica-forest-bffs",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm",
+      {
+        "name": "Spellboost",
+        "effects": []
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "spellboost_count",
+        "count": 10,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Delta Cannon",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "op": "gate",
+        "condition": "spellboost_count",
+        "count": 20,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Send 'Em Packing",
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10834120",
@@ -1254,9 +1434,21 @@
     "url": "https://shadowverse.gg/cards/10841110-gido-leader-of-the-pack",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Bane"],
+    "keywords": ["Bane", "Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "leader_defense_lte",
+        "count": 10,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10841120",
@@ -1486,7 +1678,31 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush", "Intimidate"],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Barrier"]
+          }
+        ]
+      },
+      {
+        "event": "follower_strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "attacks_per_turn",
+            "value": 2,
+            "until_eot": true
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -1508,7 +1724,32 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "can_target_leader": true,
+        "amount": 1
+      },
+      {
+        "op": "deck",
+        "action": "add",
+        "name": "Ephemeral Foxfire",
+        "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "overflow",
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1,
+            "source": "deck"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10844110",
@@ -1527,9 +1768,59 @@
     "url": "https://shadowverse.gg/cards/10844110-drache-aluzard-burning-blood",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Drache & Aluzard, Burning Blood",
+            "image": "https://static.dotgg.gg/shadowverse/cards/10844110_token.webp",
+            "description": "Countdown (2)\nLast Words: Add a Drache & Aluzard, Burning Blood to your hand and set its cost to 2.",
+            "countdown": 2,
+            "keywords": ["LastWords"],
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Drache & Aluzard, Burning Blood",
+                "count": 1
+              },
+              {
+                "op": "cost",
+                "target": "last_added_to_hand",
+                "mode": "set",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "attack_source": "named_enter_count",
+        "defense_source": "named_enter_count",
+        "name": "Drache & Aluzard, Burning Blood"
+      },
+      {
+        "op": "gate",
+        "condition": "named_enter_count",
+        "name": "Drache & Aluzard, Burning Blood",
+        "count": 2,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1682,11 +1973,29 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10851130_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10851130-limil-devilish-bunny",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "leader_defense_gt_enemy",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Bat",
+            "count": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10852110",
@@ -2467,10 +2776,49 @@
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10864110-verdilia-castelle-sisters",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Verdilia & Castelle, Sisters",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10864110_token.webp",
+        "description": "Whenever a super-evolved allied follower attacks a follower, give the allied follower \"Can attack 2 times per turn\" until the end of the turn.",
+        "triggers": [
+          {
+            "event": "ally_follower_attacked",
+            "condition": {
+              "is_super_evolved": true
+            },
+            "effects": [
+              {
+                "op": "attacks_per_turn",
+                "target": "attacker",
+                "value": 2,
+                "until_eot": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "deck",
+        "count": 1,
+        "filters": {
+          "type": "Follower",
+          "cost_lte": 2
+        }
+      },
+      {
+        "op": "evolve",
+        "target": "ally:last_summoned",
+        "mode": "super"
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -2681,7 +3029,19 @@
     "url": "https://shadowverse.gg/cards/10872110-layla-artificial-gift-of-life",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Ancient Artifact",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -2704,7 +3064,13 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Radiant Artifact",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10872310",
@@ -2764,7 +3130,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Radiant Artifact",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10873310",
@@ -2785,7 +3163,27 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 6
+      },
+      {
+        "op": "gate",
+        "condition": "unique_tribe_enters",
+        "tribe": "Artifact",
+        "count": 3,
+        "effects": [
+          {
+            "op": "ep",
+            "action": "recover",
+            "amount": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10874110",
@@ -2859,10 +3257,26 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10874120_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10874120-eudie-your-dependable-mentor",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "evolve",
+        "target": "ally:follower",
+        "select": 1,
+        "filter": {
+          "unevolved": true,
+          "not_self": true
+        }
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Analyzing Artifact",
+        "count": 1
+      }
+    ]
   }
 ]

@@ -8,7 +8,7 @@ import { handleCost } from "../../../effects/ops/cost/unified.js";
 import { handleSpellboost } from "../../../effects/ops/spellboost/unified.js";
 import { handleCounter } from "../../../effects/ops/counter/unified.js";
 import { handleCountdown } from "../../../effects/ops/countdown/unified.js";
-import { applyAttacksPerTurn } from "../../../effects/attacks.js";
+import { handleAttacksPerTurn } from "../../../effects/attacks.js";
 import { getTargetingContext } from "../context.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 import type { CardInstance } from "../../../../core/types/index.js";
@@ -32,9 +32,15 @@ export function registerBuffEffects() {
   // Legacy combo_repeat_buff was removed - now handled by:
   // { op: "stat", mode: "combo_repeat", target: "...", attack: N, defense: N }
 
-  registerOp("attacks_per_turn", (eff, ctx) =>
-    applyAttacksPerTurn(eff as any, ctx.sourceCard),
-  );
+  registerOp("attacks_per_turn", (eff, ctx) => {
+    const tCtx = getTargetingContext(ctx);
+    const res = handleAttacksPerTurn(eff as any, ctx.owner, ctx.sourceCard, {
+      ...(ctx.context as any),
+      targets: (ctx.context as any)?.targets ?? tCtx.targets,
+      targetUids: (ctx.context as any)?.targetUids ?? tCtx.targetUids,
+    });
+    if (res === "pending") return "pending";
+  });
 
   // ==========================================================================
   // UNIFIED KEYWORD - replaces keyword, remove_keyword, remove_abilities, grant_trigger

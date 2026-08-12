@@ -68,6 +68,11 @@ export function playSpell(
     }
   }
 
+  // General spell-play trigger (board/crest listeners; Katze / Lunar Bunny / …)
+  fireTrigger("ally_spell_played", owner as any, {
+    playedCard: spellCard,
+  });
+
   // Effect List Logic
   let list: Effect[] = [];
   if (

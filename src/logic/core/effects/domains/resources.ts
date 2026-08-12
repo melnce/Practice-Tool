@@ -31,6 +31,8 @@ import {
   addShadows,
   getEvoCharges,
   setEvoCharges,
+  getSuperEvoCharges,
+  setSuperEvoCharges,
 } from "../../../../core/playerHelpers.js";
 
 const doLog = (event: string, payload: any) => logEvent(event, payload);
@@ -40,7 +42,7 @@ const doLog = (event: string, payload: any) => logEvent(event, payload);
 // ========================================================================
 
 type PPAction = "gain_max" | "recover";
-type EPAction = "recover";
+type EPAction = "recover" | "recover_super";
 
 function handlePP(eff: Effect & { action?: PPAction }, owner: Player) {
   const action = eff.action;
@@ -91,21 +93,28 @@ function handlePP(eff: Effect & { action?: PPAction }, owner: Player) {
 function handleEP(eff: Effect & { action?: EPAction }, owner: Player) {
   const action = eff.action;
   if (!action) {
-    console.warn("ep op: action field is mandatory (recover)");
+    console.warn("ep op: action field is mandatory (recover | recover_super)");
     return;
   }
 
   const targetPlayer: Player =
     (eff.player || "self") === "self" ? owner : opponentOf(owner);
   const MAX_EP = 2;
+  const MAX_SEP = 2;
 
   switch (action) {
     case "recover": {
       const amt = parseInt(String(eff.amount)) || 0;
-      const MAX_EP = 2;
       const current = getEvoCharges(state, targetPlayer);
       setEvoCharges(state, targetPlayer, Math.min(MAX_EP, current + amt));
       logEvent("recoverEP", { owner: targetPlayer, amount: amt });
+      break;
+    }
+    case "recover_super": {
+      const amt = parseInt(String(eff.amount)) || 0;
+      const current = getSuperEvoCharges(state, targetPlayer);
+      setSuperEvoCharges(state, targetPlayer, Math.min(MAX_SEP, current + amt));
+      logEvent("recoverSEP", { owner: targetPlayer, amount: amt });
       break;
     }
     default:

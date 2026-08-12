@@ -11,7 +11,7 @@ import { state } from "../../../../core/gameState.js";
 import type { Crest } from "../../crest.js";
 
 import { completeCrest } from "../../crest.js";
-import { getCrests } from "../../../../core/playerHelpers.js";
+import { getCrests, getBoard } from "../../../../core/playerHelpers.js";
 
 export type CountdownAction = "advance" | "delay";
 
@@ -30,7 +30,9 @@ export interface CountdownHandlerContext {
  *
  * Targeting:
  * - target: "self" → uses ctx.source (amulet or crest)
- * - name: "CrestName" → finds crest by name
+ * - name: "CrestName" → finds crest by name (legacy)
+ * - board_name / filter.name + target ally:amulet → board amulets
+ * - select_mode: "random" with select: 1 picks via seeded RNG
  */
 export function handleCountdown(
   eff: Effect,
@@ -40,6 +42,23 @@ export function handleCountdown(
   const amount = Number((eff as any).amount ?? 1);
   const targetSpec = (eff as any).target;
   const crestName = (eff as any).name;
+  const boardName =
+    (eff as any).board_name ??
+    (eff as any).filter?.name ??
+    (targetSpec && String(targetSpec).includes("amulet")
+      ? (eff as any).name
+      : undefined);
+
+  // Board amulet targeting (e.g. delay random Rings of Moonlight)
+  if (
+    boardName ||
+    (typeof targetSpec === "string" &&
+      targetSpec.includes("amulet") &&
+      targetSpec !== "self")
+  ) {
+    handleBoardAmuletCountdown(ctx.owner, eff, action, amount);
+    return;
+  }
 
   // Route to appropriate handler
   if (targetSpec === "self" && ctx.source) {
@@ -87,6 +106,43 @@ function isCrest(obj: any): obj is Crest {
 function findCrestByName(owner: Player, name: string): Crest | undefined {
   const crests = getCrests(state, owner);
   return crests.find((c) => c.name?.toLowerCase() === name?.toLowerCase());
+}
+
+function handleBoardAmuletCountdown(
+  owner: Player,
+  eff: Effect,
+  action: CountdownAction,
+  amount: number,
+): void {
+  const board = getBoard(state, owner) || [];
+  const wantName = String(
+    (eff as any).board_name ??
+      (eff as any).filter?.name ??
+      (eff as any).name ??
+      "",
+  ).trim();
+  const pool = board.filter(
+    (c) =>
+      c?.type === "Amulet" &&
+      c.hasCountdown &&
+      (!wantName || String(c.name) === wantName),
+  );
+  if (!pool.length) return;
+
+  const need = Math.max(1, parseInt(String((eff as any).select ?? 1), 10) || 1);
+  const picks: CardInstance[] = [];
+  if ((eff as any).select_mode === "random" || (eff as any).random) {
+    const copy = [...pool];
+    for (let i = 0; i < need && copy.length; i++) {
+      const idx = state.rng.nextInt(copy.length);
+      picks.push(copy.splice(idx, 1)[0]!);
+    }
+  } else {
+    picks.push(...pool.slice(0, need));
+  }
+  for (const card of picks) {
+    handleAmuletCountdown(card, action, amount);
+  }
 }
 
 // =============================================================================

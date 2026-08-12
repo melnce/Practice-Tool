@@ -68,7 +68,10 @@ export type DamageAmountSource =
   | "golem_count"
   | "crest_count"
   | "other_allies"
-  | "ally_matches"; // Count allied board cards matching `filter` / condition fields
+  | "ally_matches" // Count allied board cards matching `filter` / condition fields
+  | "unique_tribe_enters" // Distinct named allied tribe enters this match (`tribe` / filter.tribe)
+  | "named_enter_count" // Count of named allied follower enters this match (`name`)
+  | "amulets_in_hand"; // Count of amulets currently in owner's hand
 
 /**
  * Canonical unified damage effect spec.

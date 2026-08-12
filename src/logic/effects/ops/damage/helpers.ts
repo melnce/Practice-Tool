@@ -13,8 +13,12 @@ import type {
   Player,
 } from "../../../../core/types/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
-import { getBoard, getHP } from "../../../../core/playerHelpers.js";
+import { getBoard, getHP, getHand } from "../../../../core/playerHelpers.js";
 import { evaluateCardCondition } from "../../../core/conditions/evaluator.js";
+import {
+  countUniqueTribeEnters,
+  countNamedEnters,
+} from "../../../core/followerEnterHistory.js";
 
 import type { UnifiedDamageSpec, DamageContext } from "./types.js";
 import { resolveAmountWithOverflow } from "./calculator.js";
@@ -68,6 +72,26 @@ export function resolveAmount(
       };
       const board = getBoard(state, ctx.owner) || [];
       return board.filter((c) => evaluateCardCondition(c, filter)).length;
+    }
+    case "unique_tribe_enters": {
+      const tribe =
+        (spec as any).tribe ??
+        (spec.filter as any)?.tribe ??
+        (spec.condition as any)?.tribe ??
+        "Artifact";
+      return countUniqueTribeEnters(state, ctx.owner, String(tribe));
+    }
+    case "named_enter_count": {
+      const name =
+        (spec as any).name ??
+        (spec.filter as any)?.name ??
+        (spec.condition as any)?.name ??
+        ctx.sourceCard?.name;
+      return countNamedEnters(state, ctx.owner, String(name ?? ""));
+    }
+    case "amulets_in_hand": {
+      const hand = getHand(state, ctx.owner) || [];
+      return hand.filter((c) => String(c.type) === "Amulet").length;
     }
     case "fixed":
     default:

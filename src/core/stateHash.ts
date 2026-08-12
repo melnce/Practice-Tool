@@ -45,6 +45,12 @@ function canonicalizeState(state: GameState): object {
     redShadows: state.players.second.shadows,
     blueRally: state.players.first.rally,
     redRally: state.players.second.rally,
+    blueFollowerEnterHistory: (
+      state.players.first.followerEnterHistory ?? []
+    ).map((r) => `${r.cardId}:${r.name}`),
+    redFollowerEnterHistory: (
+      state.players.second.followerEnterHistory ?? []
+    ).map((r) => `${r.cardId}:${r.name}`),
 
     // Evo state
     blueEvoCharges: state.players.first.evoCharges,

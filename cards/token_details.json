@@ -2426,5 +2426,405 @@
         ]
       }
     ]
+  },
+  {
+    "id": "90021350",
+    "name": "Glittering Gold",
+    "cost": "0",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Select a Mode to activate.\n1. Draw a card.\n2. Deal 2 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021350.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021350-glittering-gold",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Draw a card",
+            "effects": [
+              {
+                "op": "draw",
+                "count": 1,
+                "source": "deck"
+              }
+            ]
+          },
+          {
+            "label": "Deal 2 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 2,
+                "distribution": "random_hits",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "90074140",
+    "name": "Imari's Little Buddies",
+    "cost": "2",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074140_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074140-imaris-little-buddies",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Rush"],
+    "triggers": [],
+    "fanfare": []
+  },
+  {
+    "id": "90071150",
+    "name": "Mystic Artifact",
+    "cost": "3",
+    "attack": "4",
+    "defense": "5",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": ["Artifact"],
+    "description": "Ward",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071150.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071150_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071150-mystic-artifact",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Ward"],
+    "triggers": [],
+    "fanfare": []
+  },
+  {
+    "id": "90071130",
+    "name": "Analyzing Artifact",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": ["Artifact"],
+    "description": "When this card enters the field, draw a card.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071130-analyzing-artifact",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "is_self": true
+        },
+        "effects": [
+          {
+            "op": "draw",
+            "count": 1,
+            "source": "deck"
+          }
+        ]
+      }
+    ],
+    "fanfare": []
+  },
+  {
+    "id": "90071140",
+    "name": "Ancient Artifact",
+    "cost": "1",
+    "attack": "3",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": ["Artifact"],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071140.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071140_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071140-ancient-artifact",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Rush"],
+    "triggers": [],
+    "fanfare": []
+  },
+  {
+    "id": "90071160",
+    "name": "Radiant Artifact",
+    "cost": "3",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Bronze",
+    "tribes": ["Artifact"],
+    "description": "Storm",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90071160.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90071160_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90071160-radiant-artifact",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Storm"],
+    "triggers": [],
+    "fanfare": []
+  },
+  {
+    "id": "90064210",
+    "name": "Rings of Moonlight",
+    "cost": "8",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Havencraft",
+    "rarity": "Legendary",
+    "tribes": ["Anathema"],
+    "description": "Countdown (1)\nAura\nAt the end of your turn, if there are at least 3 allied amulets on the field, deal 3 damage to all enemies.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90064210.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90064210-rings-of-moonlight",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 1
+      },
+      "Aura"
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "amulet_count",
+            "count": 3,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:all",
+                "amount": 3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
+  },
+  {
+    "id": "90014110",
+    "name": "Eve, Blade of Crystalia",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Forestcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Storm\nWard",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90014110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90014110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90014110-eve-blade-of-crystalia",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Storm", "Ward"],
+    "triggers": [],
+    "fanfare": []
+  },
+  {
+    "id": "90021130",
+    "name": "Naht's Henchman",
+    "cost": "3",
+    "attack": "4",
+    "defense": "4",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": ["Officer"],
+    "description": "",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021130.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021130_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021130-nahts-henchman",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "fanfare": []
+  },
+  {
+    "id": "90031310",
+    "name": "Mysterian Missile",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Bronze",
+    "tribes": ["Mysteria"],
+    "description": "Deal 3 damage to a random enemy follower.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90031310.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90031310-mysterian-missile",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "distribution": "random_hits",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "id": "90024330",
+    "name": "Desperados' Shot",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Swordcraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Do this 2 times: \"Deal 4 damage to a random enemy follower.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90024330.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90024330-desperados-shot",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "repeat_effect",
+        "count": 2,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "distribution": "random_hits",
+            "count": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "90034340",
+    "name": "Delta Cannon",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Deal 5 damage to all enemy followers.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034340.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034340-delta-cannon",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 5
+      }
+    ]
+  },
+  {
+    "id": "90034350",
+    "name": "Send 'Em Packing",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Spell",
+    "class": "Runecraft",
+    "rarity": "Legendary",
+    "tribes": [],
+    "description": "Select an allied follower on the field and give it \"Can attack 2 times per turn.\"",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90034350.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90034350-send-em-packing",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [],
+    "triggers": [],
+    "spell": [
+      {
+        "op": "attacks_per_turn",
+        "target": "ally:follower",
+        "select": 1,
+        "value": 2
+      }
+    ]
+  },
+  {
+    "id": "90022110",
+    "name": "Wretch",
+    "cost": "2",
+    "attack": "4",
+    "defense": "1",
+    "type": "Follower",
+    "class": "Swordcraft",
+    "rarity": "Silver",
+    "tribes": [],
+    "description": "Rush",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90022110.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90022110_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90022110-wretch",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Rush"],
+    "triggers": [],
+    "fanfare": []
   }
 ]

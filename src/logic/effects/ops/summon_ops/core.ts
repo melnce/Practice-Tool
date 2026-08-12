@@ -17,6 +17,7 @@ import {
   stampBoardEntryTs,
 } from "../../../core/triggers/utils.js";
 import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
+import { recordFollowerEnter } from "../../../core/followerEnterHistory.js";
 
 // =============== Core Summon Routines ===============
 
@@ -70,6 +71,7 @@ export function finishFollowerEnter(card: CardInstance, owner: Player) {
   // (full board) must not reach here; control-change uses changeFollowerControl.
   if (card.type === "Follower") {
     setRally(state, owner, getRally(state, owner) + 1);
+    recordFollowerEnter(state, owner, card);
   }
 
   if (isFollower(card)) {

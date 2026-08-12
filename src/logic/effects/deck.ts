@@ -46,6 +46,11 @@ export function handleDeck(
       }
       break;
 
+    case "add":
+      // Add named card(s) into the deck (does not clear). Default: shuffle after.
+      handleAddToDeck(owner, eff);
+      break;
+
     default:
       console.warn(`[deck] Unknown action: ${action}`);
   }
@@ -124,4 +129,44 @@ function handleReplaceDeckFromList(
 
   shuffleInPlace(deck);
   logEvent("deckReplace", { owner, count: deck.length });
+}
+
+// ========================================================================
+// ADD NAMED CARDS
+// Append copies by name (or self via name from source) without clearing.
+//
+// Examples:
+//   { "op": "deck", "action": "add", "name": "Ephemeral Foxfire", "count": 1 }
+//   { "op": "deck", "action": "add", "name": "Lhynkal, Wandering Fool", "count": 10 }
+// ========================================================================
+function handleAddToDeck(owner: Player, eff: any): void {
+  const deck = getDeck(state, owner);
+  const count = Math.max(1, parseInt(String(eff.count ?? 1), 10) || 1);
+  const name = String(eff.name || "").trim();
+  if (!name) {
+    console.warn("[deck] add requires name");
+    return;
+  }
+  const cardData = getCardDetails(name);
+  if (!cardData) {
+    console.warn(`[deck] add: card not found: ${name}`);
+    return;
+  }
+  for (let i = 0; i < count; i++) {
+    const copy = structuredClone(cardData);
+    copy.uid = state.rng.makeUid();
+    // Optional cost override (e.g. Drache crest sets cost to 2)
+    if (eff.set_cost !== undefined) {
+      const c = parseInt(String(eff.set_cost), 10);
+      if (Number.isFinite(c)) {
+        copy.cost = c;
+        (copy as any).base_cost = c;
+      }
+    }
+    deck.push(copy);
+  }
+  if (eff.shuffle !== false) {
+    shuffleInPlace(deck);
+  }
+  logEvent("deckAdd", { owner, name, count });
 }

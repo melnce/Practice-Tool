@@ -16,7 +16,7 @@ import { applyKeywordsFromList } from "../keywords.js";
 
 import { initAmulet } from "../../effects/ops/summon_ops/init.js";
 import { getBoard } from "../../../core/playerHelpers.js";
-import { stampBoardEntryTs } from "../triggers/utils.js";
+import { bumpZoneVersion, stampBoardEntryTs } from "../triggers/utils.js";
 
 /**
  * Play an amulet card. Returns PlayOutcome without rendering.
@@ -33,6 +33,8 @@ export function playAmulet(
   const toBoard = getBoard(state, player);
   stampBoardEntryTs(card, { advance: true });
   toBoard.push(card);
+  // Invalidate trigger-candidate cache (ally_spell_played / mid-turn scans).
+  bumpZoneVersion();
 
   mergeWitchsNewBrewOnPlay(card, player);
 
