@@ -699,3 +699,141 @@ body.gameover .leader {
   border-color: rgba(255, 255, 255, 0.15);
   color: var(--muted);
 }
+
+/* ── Decklist import panel ─────────────────────────────────────────────── */
+.deck-import-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8vh 16px 24px;
+}
+.deck-import-panel[hidden] {
+  display: none !important;
+}
+.deck-import-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 10, 14, 0.62);
+}
+.deck-import-dialog {
+  position: relative;
+  width: min(560px, 96vw);
+  max-height: min(84vh, 900px);
+  overflow: auto;
+  background: #1a222c;
+  border: 1px solid rgba(154, 215, 200, 0.28);
+  border-radius: 10px;
+  padding: 16px 18px 14px;
+  color: #e8eef4;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+.deck-import-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.deck-import-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+#deckImportCloseBtn {
+  font-size: 1.4rem;
+  line-height: 1;
+  padding: 2px 10px;
+}
+.deck-import-help {
+  margin: 0 0 12px;
+  font-size: 0.86rem;
+  opacity: 0.85;
+  line-height: 1.45;
+}
+.deck-import-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.deck-import-meta label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+.deck-import-meta input,
+.deck-import-meta select {
+  min-width: 160px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #121820;
+  color: inherit;
+}
+.deck-import-textarea-label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+#deckImportText {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 180px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: #121820;
+  color: #e8eef4;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.deck-import-status {
+  margin: 10px 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  max-height: 180px;
+  overflow: auto;
+}
+.deck-import-status:empty {
+  display: none;
+}
+.deck-import-status.ok {
+  background: rgba(40, 90, 60, 0.35);
+  border: 1px solid rgba(120, 200, 140, 0.35);
+}
+.deck-import-status.warn {
+  background: rgba(90, 55, 20, 0.45);
+  border: 1px solid rgba(255, 170, 90, 0.4);
+  color: #ffe7d1;
+}
+.deck-import-status.err {
+  background: rgba(90, 28, 28, 0.45);
+  border: 1px solid rgba(255, 120, 120, 0.4);
+}
+.deck-import-status.info {
+  background: rgba(40, 55, 75, 0.4);
+  border: 1px solid rgba(140, 180, 220, 0.3);
+}
+.deck-import-status ul {
+  margin: 6px 0 0;
+  padding-left: 1.2em;
+}
+.deck-import-coverage {
+  color: #ffc48a;
+}
+.deck-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
