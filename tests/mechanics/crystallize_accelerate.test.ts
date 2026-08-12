@@ -15,6 +15,9 @@
  * - Alternate play does not increment Rally for the played card itself
  *   (Owner ruling — Rally 2026-08-12: only a follower successfully entering
  *   the field counts; Crystallize/Accelerate alternate forms are amulet/spell)
+ * - Accelerate/Crystallize preserve printed base cost (Owner ruling —
+ *   Accelerate / Crystallize original cost 2026-08-12); see
+ *   accelerate_original_cost.test.ts for the Eld Axe proof interaction
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
