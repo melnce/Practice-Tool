@@ -203,6 +203,77 @@
         <button id="redoBtn" title="Redo (Ctrl+Y / Ctrl+Shift+Z)" disabled>
           Redo
         </button>
+        <span class="practice-sep" aria-hidden="true"></span>
+        <button
+          id="savePositionBtn"
+          title="Save current board as a named position"
+        >
+          Save Pos
+        </button>
+        <select
+          id="positionSelect"
+          title="Saved positions (session memory — export to keep)"
+          disabled
+        >
+          <option value="">(no saved positions)</option>
+        </select>
+        <button id="loadPositionBtn" title="Load selected position" disabled>
+          Load
+        </button>
+        <button
+          id="renamePositionBtn"
+          title="Rename selected position"
+          disabled
+        >
+          Rename
+        </button>
+        <button
+          id="deletePositionBtn"
+          title="Delete selected position"
+          disabled
+        >
+          Del
+        </button>
+        <button
+          id="exportPositionBtn"
+          title="Export selected position as JSON file"
+          disabled
+        >
+          Export
+        </button>
+        <button id="importPositionBtn" title="Import position JSON file">
+          Import
+        </button>
+        <input
+          id="importPositionInput"
+          type="file"
+          accept="application/json,.json,.svwb-position.json"
+          hidden
+        />
+        <span class="practice-sep" aria-hidden="true"></span>
+        <button id="setCheckpointBtn" title="Set checkpoint (F6)">
+          Checkpoint
+        </button>
+        <button
+          id="restoreCheckpointBtn"
+          title="Restore checkpoint exactly"
+          disabled
+        >
+          Restore CP
+        </button>
+        <button
+          id="rerollCheckpointBtn"
+          title="Restore checkpoint with a new RNG branch (F8)"
+          disabled
+        >
+          Reroll
+        </button>
+        <span
+          id="checkpointStatus"
+          class="checkpoint-status"
+          title="Checkpoint / reroll depth"
+          >Checkpoint: none</span
+        >
         <label
           for="activeOnBottomToggle"
           style="

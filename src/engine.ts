@@ -15,7 +15,37 @@ import {
   onHistoryChange,
   canUndo,
   canRedo,
+  captureSnapshot,
+  applySnapshot,
 } from "./core/history.js";
+
+export { captureSnapshot, applySnapshot, canUndo, canRedo };
+
+export {
+  savePosition,
+  listPositions,
+  loadPosition,
+  renamePosition,
+  deletePosition,
+  exportPositionToJson,
+  importPositionFromJson,
+  parsePositionJson,
+  setCheckpoint,
+  restoreCheckpoint,
+  rerollFromCheckpoint,
+  applyRerollBranch,
+  getCheckpointInfo,
+  deriveRerollSeed,
+  POSITION_SCHEMA_VERSION,
+  setSessionDeckIds,
+  initCheckpointHotkeys,
+} from "./core/positionStore.js";
+
+export type {
+  SavedPosition,
+  PositionMeta,
+  CheckpointInfo,
+} from "./core/positionStore.js";
 
 // Re-exports for consumers (UI/Tests)
 // Re-exports for consumers (UI/Tests)

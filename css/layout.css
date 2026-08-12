@@ -8,8 +8,34 @@
 #deckSelection {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 10px 0;
+}
+
+.practice-sep {
+  display: inline-block;
+  width: 1px;
+  height: 1.4em;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 0 4px;
+}
+
+#positionSelect {
+  max-width: 220px;
+  min-width: 140px;
+}
+
+.checkpoint-status {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+.checkpoint-status.active {
+  opacity: 1;
+  font-weight: 600;
+  color: #f0d78c;
 }
 
 #turnControls {

@@ -64,3 +64,4 @@ cards/seperate_classes.py
 
 # Tool caches
 .cache/
+test-results/
