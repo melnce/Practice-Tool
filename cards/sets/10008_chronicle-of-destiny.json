@@ -14,7 +14,15 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10801110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10801110-hamsa-sculpted-divinity",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "attack": 5,
+        "defense": 5
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
@@ -39,7 +47,13 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "ep",
+        "action": "recover",
+        "amount": 1
+      }
+    ]
   },
   {
     "id": "10802110",
@@ -56,11 +70,25 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10802110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10802110-alfied-squire-of-joy",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "keyword",
+        "action": "grant",
+        "target": "self",
+        "keywords": ["Storm"]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 4
+      }
+    ]
   },
   {
     "id": "10802310",
@@ -123,7 +151,47 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1,
+                "distribution": "random_hits"
+              }
+            ]
+          },
+          {
+            "label": "Reanimate (2)",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "graveyard",
+                "max_cost": 2
+              }
+            ]
+          },
+          {
+            "label": "Give all allied followers +1/+0",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "ally:follower",
+                "attack": 1,
+                "defense": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10804110",
@@ -203,11 +271,23 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10811120_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10811120-citrus-heretical-hermit",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Fairy",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10811130",
@@ -228,7 +308,19 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": 1,
+        "target": "ally:hand"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10812110",
@@ -247,8 +339,36 @@
     "url": "https://shadowverse.gg/cards/10812110-ruflet-primeval-fairy",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Fairy",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "self_buffed_up",
+        "source": "board",
+        "once_per_turn": true,
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Fairy",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -270,7 +390,14 @@
     "superevolve": [],
     "keywords": ["Rush", "Bane"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Michelle, Kind Mindreader",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10812310",
@@ -291,7 +418,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10813110",
@@ -312,7 +451,21 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Lycoris, Barbs of Passion",
+        "count": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "keywords": ["Barrier"],
+        "include_self": true
+      }
+    ]
   },
   {
     "id": "10813310",
@@ -333,7 +486,25 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "deck",
+        "count": 2,
+        "distinct_by": "name",
+        "filters": {
+          "type": "Follower",
+          "cost_lte": 2
+        }
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "attack": 1,
+        "defense": 1
+      }
+    ]
   },
   {
     "id": "10814110",
@@ -354,7 +525,21 @@
     "superevolve": [],
     "keywords": ["Ward", "Storm"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "exclude_self": true,
+        "attack": 1,
+        "defense": 1
+      }
+    ]
   },
   {
     "id": "10814120",
@@ -413,7 +598,16 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10821120_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10821120-shaili-prowling-assassin",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "enemy:follower",
+        "select": 1,
+        "keywords": ["Can't Attack"],
+        "duration": "opponent_turn_end"
+      }
+    ],
     "superevolve": [],
     "keywords": ["Ambush"],
     "triggers": [],
@@ -434,11 +628,27 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10821130_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10821130-sasha-knight-everlasting",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Steelclad Knight",
+        "count": 1,
+        "keywords": ["Ward"]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Steelclad Knight",
+        "count": 1,
+        "keywords": ["Rush"]
+      }
+    ]
   },
   {
     "id": "10822110",
@@ -480,7 +690,13 @@
     "superevolve": [],
     "keywords": ["Intimidate"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6
+      }
+    ]
   },
   {
     "id": "10822310",
@@ -521,8 +737,54 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "follower_strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "defender",
+                "amount": 3
+              },
+              {
+                "op": "damage",
+                "target": "defender",
+                "amount": 3
+              },
+              {
+                "op": "damage",
+                "target": "defender",
+                "amount": 3
+              }
+            ],
+            "else_effects": [
+              {
+                "op": "damage",
+                "target": "defender",
+                "amount": 3
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "super_evo_unlocked",
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10823310",
@@ -582,10 +844,49 @@
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10824120-mars-conflagrant-commander",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Knight",
+        "count": 1
+      }
+    ],
     "keywords": ["Storm", "Bane"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Officer"
+        },
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "entering_follower",
+            "attack": 2,
+            "defense": 0,
+            "keywords": ["Rush"]
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 1,
+            "defense": 0
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Knight",
+        "count": 3
+      }
+    ]
   },
   {
     "id": "10831110",
@@ -602,11 +903,28 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10831110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10831110-meowskers-roly-poly-mk-ii-djeana",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 1
+      },
+      {
+        "op": "spellboost",
+        "target": "ally:hand",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10831120",
@@ -646,9 +964,22 @@
     "url": "https://shadowverse.gg/cards/10831310-stormy-blast",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "effects": []
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 2,
+        "add_amount": "{self.spellboostCount}"
+      }
+    ]
   },
   {
     "id": "10832110",
@@ -667,9 +998,33 @@
     "url": "https://shadowverse.gg/cards/10832110-sammy-marie-flowers-of-joy",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "effects": [
+          {
+            "op": "cost",
+            "target": "self",
+            "mode": "reduce",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1,
+        "player": "opponent"
+      }
+    ]
   },
   {
     "id": "10832310",
@@ -690,7 +1045,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 2
+      },
+      {
+        "op": "spellboost",
+        "target": "ally:hand",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10832320",
@@ -759,9 +1126,39 @@
     "url": "https://shadowverse.gg/cards/10833310-amethysts-naptime",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "effects": []
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "gate",
+        "condition": "spellboost_count",
+        "count": 5,
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          },
+          {
+            "op": "pp",
+            "action": "recover",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10834110",
@@ -799,11 +1196,46 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10834120_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10834120-ginger-disastrous-word",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Guardian Golem",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "keywords": ["Rush"],
+            "target": "entering_follower"
+          },
+          {
+            "op": "spellboost",
+            "target": "ally:hand",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Guardian Golem",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10841110",
@@ -843,7 +1275,19 @@
     "url": "https://shadowverse.gg/cards/10841120-sandstorm-watchdragon",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 3
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -862,11 +1306,42 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10841130_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10841130-spirit-of-wadatsumi",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Spirit of Wadatsumi",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10841130_token.webp",
+        "description": "Whenever an allied Marine follower enters the field, give it +1/+1.",
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "condition": {
+              "tribe": "Marine"
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "entering_follower",
+                "attack": 1,
+                "defense": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Majestic Megalorca",
+        "count": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -894,8 +1369,27 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Majestic Megalorca",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Reef & Lolo, Serene Sirens",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10842120",
@@ -912,11 +1406,33 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10842120_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10842120-kimika-cook-of-happiness",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      },
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 1
+      }
+    ]
   },
   {
     "id": "10842310",
@@ -937,7 +1453,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 4,
+        "count": 1,
+        "distribution": "random_hits"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 4
+      }
+    ]
   },
   {
     "id": "10843110",
@@ -1026,7 +1555,13 @@
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10844120-lumiore-argente-shining-wings",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 3
+      }
+    ],
     "keywords": [
       {
         "name": "Accelerate",
@@ -1041,7 +1576,18 @@
       }
     ],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 2
+      },
+      {
+        "op": "damage",
+        "target": "enemy:all",
+        "amount": 4
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 3,
@@ -1089,8 +1635,36 @@
     "url": "https://shadowverse.gg/cards/10851120-lilith-devilish-cutie",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Bat",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "ally:leader",
+            "amount": 1
+          },
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -1132,8 +1706,32 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "name": "Bat",
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "keywords": ["Rush"],
+            "target": "entering_follower"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Bat",
+        "count": 3
+      }
+    ]
   },
   {
     "id": "10852120",
@@ -1150,11 +1748,32 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10852120_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10852120-marsha-dark-knight",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 1
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 1
+      }
+    ]
   },
   {
     "id": "10852310",
@@ -1175,7 +1794,57 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "select": 2,
+        "unique": true,
+        "options": [
+          {
+            "label": "Deal 1 damage to the enemy leader",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 1
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1,
+                "distribution": "random_hits"
+              }
+            ]
+          },
+          {
+            "label": "Gain 4 shadows",
+            "effects": [
+              {
+                "op": "add_shadows",
+                "amount": 4
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10853110",
@@ -1192,11 +1861,32 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10853110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10853110-suzy-sincere-hexcaster",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:hand",
+        "condition": {
+          "type": "Follower"
+        },
+        "select": 1,
+        "attack": 3,
+        "defense": 0
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "enemy:follower",
+        "select": 1,
+        "attack": 0,
+        "defense": -3
+      }
+    ]
   },
   {
     "id": "10853310",
@@ -1217,7 +1907,51 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": 1,
+        "target": "ally:hand"
+      },
+      {
+        "op": "gate",
+        "condition": "super_evo_unlocked",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_drawn",
+            "mode": "reduce",
+            "amount": 1,
+            "min_cost": 0
+          },
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_drawn",
+            "mode": "reduce",
+            "amount": 1,
+            "min_cost": 0
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10854110",
@@ -1234,11 +1968,75 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10854110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10854110-itsurugi-taketsumi-brothers",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Draw 2 cards",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 2
+              }
+            ]
+          },
+          {
+            "label": "Recover 2 play points",
+            "effects": [
+              {
+                "op": "pp",
+                "action": "recover",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Deal 4 damage to the enemy leader. Restore 4 defense to your leader.",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 4
+              },
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 4
+              }
+            ]
+          },
+          {
+            "label": "Deal 5 damage to all enemy followers. Recover 1 evolution point.",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 5
+              },
+              {
+                "op": "ep",
+                "action": "recover",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10854120",
@@ -1258,8 +2056,50 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "clash",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "clash_opponent",
+            "amount": 4
+          }
+        ]
+      },
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 4
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "necromancy",
+        "cost": 20,
+        "effects": [
+          {
+            "op": "cost",
+            "target": "ally:hand",
+            "mode": "reduce",
+            "amount": 2,
+            "min_cost": 0,
+            "filter": {
+              "class": "Abysscraft"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10861110",
@@ -1276,9 +2116,38 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10861110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10861110-lilium-witch-of-the-tomes",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select": 1,
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "silence",
+            "target": "selected:follower"
+          },
+          {
+            "op": "damage",
+            "target": "selected:follower",
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1301,7 +2170,22 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Soulcure Sister",
+        "count": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:last_summoned",
+        "attack": 2,
+        "defense": -2,
+        "keywords": ["Storm"]
+      }
+    ]
   },
   {
     "id": "10861130",
@@ -1318,11 +2202,22 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10861130_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10861130-grant-hunter-of-undeath",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ]
   },
   {
     "id": "10862110",
@@ -1340,8 +2235,34 @@
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10862110-edeth-voice-of-heaven",
     "evolve": [],
-    "superevolve": [],
-    "keywords": ["Ward", "Aura"],
+    "superevolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
+    "keywords": [
+      "Ward",
+      "Aura",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Edeth, Voice of Heaven",
+            "count": 1
+          },
+          {
+            "op": "keyword",
+            "action": "remove",
+            "target": "ally:last_summoned",
+            "keywords": ["LastWords"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1363,7 +2284,21 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush", "Bane"],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_super_evolve",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "target": "self",
+            "mode": "reduce",
+            "amount": 3,
+            "min_cost": 0
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -1383,9 +2318,33 @@
     "url": "https://shadowverse.gg/cards/10862310-lingering-threat",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "banish",
+            "select": false,
+            "target": "enemy:follower",
+            "filters": {
+              "defense_lte": 3
+            }
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "banish",
+        "select": 1,
+        "target": "enemy:follower",
+        "filters": {
+          "defense_lte": 3
+        }
+      }
+    ]
   },
   {
     "id": "10863110",
@@ -1402,11 +2361,31 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10863110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10863110-colette-holy-exorcist",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 1,
+        "count": 2,
+        "distribution": "random_hits"
+      }
+    ],
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "evolved_allied",
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
+    "evolve_trigger_always": true
   },
   {
     "id": "10863210",
@@ -1425,8 +2404,51 @@
     "url": "https://shadowverse.gg/cards/10863210-academy-hijinks",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      }
+    ],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "gate",
+            "condition": "super_evolved_allied",
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 2
+              }
+            ],
+            "else_effects": [
+              {
+                "op": "gate",
+                "condition": "evolved_allied",
+                "effects": [
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -1473,11 +2495,75 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10864120_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10864120-zoe-dazzling-hope",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Zoe, Dazzling Hope",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10864120_token.webp",
+        "description": "Countdown (1). Last Words: Summon a Zoe, Dazzling Hope and evolve it.",
+        "countdown": 1,
+        "keywords": ["LastWords"],
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Zoe, Dazzling Hope",
+            "count": 1
+          },
+          {
+            "op": "evolve",
+            "target": "ally:last_summoned"
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Deal 3 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3
+              }
+            ]
+          },
+          {
+            "label": "Deal 3 damage to the enemy leader",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 3
+              }
+            ]
+          },
+          {
+            "label": "Restore 3 defense to your leader",
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 3
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "damage",
+        "target": "self",
+        "amount": 3
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1504,7 +2590,26 @@
     "url": "https://shadowverse.gg/cards/10871110-kratos-everyday-joy",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Kratos, Everyday Joy",
+            "count": 1
+          },
+          {
+            "op": "keyword",
+            "action": "remove",
+            "target": "ally:last_summoned",
+            "keywords": ["LastWords"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1524,7 +2629,16 @@
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10871120-leona-overbearing-guardian",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "keyword",
+        "action": "grant",
+        "target": "ally:follower",
+        "exclude_self": true,
+        "select": 1,
+        "keywords": ["Ambush"]
+      }
+    ],
     "keywords": ["Ward"],
     "triggers": [],
     "fanfare": []
@@ -1611,7 +2725,25 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "gate",
+        "condition": "super_evo_unlocked",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10873110",
@@ -1670,11 +2802,47 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10874110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10874110-asher-lydia-paths-beyond",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "distribution": "random",
+        "count": 2,
+        "condition": {
+          "has_keyword": "Ward"
+        }
+      }
+    ],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 9,
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          },
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "keyword",
+        "action": "grant",
+        "target": "enemy:follower",
+        "select": 1,
+        "keywords": ["Ward"]
+      }
+    ],
+    "evolve_trigger_always": true
   },
   {
     "id": "10874120",
