@@ -100,9 +100,47 @@
     "url": "https://shadowverse.gg/cards/10503310-fate-of-the-world",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 10,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          },
+          {
+            "op": "destroy",
+            "distribution": "highest",
+            "target": "enemy:follower",
+            "count": 1,
+            "stat": "attack"
+          },
+          {
+            "op": "damage",
+            "target": "enemy:any",
+            "amount": 4
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "destroy",
+        "distribution": "highest",
+        "target": "enemy:follower",
+        "count": 1,
+        "stat": "attack"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10504110",
@@ -123,7 +161,57 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "except_named",
+        "names": []
+      },
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Draw 8 cards",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 8
+              }
+            ]
+          },
+          {
+            "label": "Draw 2 cards and reduce their costs by 8",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 1
+              },
+              {
+                "op": "cost",
+                "target": "last_drawn",
+                "mode": "reduce",
+                "amount": 8,
+                "min_cost": 0
+              },
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 1
+              },
+              {
+                "op": "cost",
+                "target": "last_drawn",
+                "mode": "reduce",
+                "amount": 8,
+                "min_cost": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10511110",
@@ -140,7 +228,13 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10511110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10511110-prudent-tanuki",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": ["Ambush"],
     "triggers": [],
@@ -161,11 +255,38 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10511120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10511120-battledore-woodsmaiden",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Pixie"
+        },
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Fairy",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10511310",
@@ -186,7 +307,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "distribution": "split_sequential"
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Fairy",
+        "count": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10512110",
@@ -207,7 +341,29 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 5,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Flowering Friendship",
+            "count": 1
+          },
+          {
+            "op": "evolve",
+            "target": "last_summoned"
+          },
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10512120",
@@ -249,7 +405,28 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:any",
+            "amount": 2
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:any",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10513110",
@@ -266,11 +443,33 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10513110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10513110-spirited-skipper",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "condition": {
+          "tribe": "Pixie"
+        },
+        "keywords": ["Bane"]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Fairy",
+        "count": 3
+      }
+    ]
   },
   {
     "id": "10513310",
@@ -291,7 +490,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "repeat_effect",
+        "count_source": "combo",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10514110",
@@ -329,11 +541,54 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10514120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10514120-miroku-swarmpetal",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Add 2 copies of Fairy to your hand",
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Fairy",
+                "count": 2
+              }
+            ]
+          },
+          {
+            "label": "Recover 2 play points",
+            "effects": [
+              {
+                "op": "pp",
+                "action": "recover",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "label": "Deal 3 damage split between all enemy followers",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3,
+                "distribution": "split_sequential"
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10521110",
@@ -457,9 +712,30 @@
     "url": "https://shadowverse.gg/cards/10522310-serenitys-shield",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Knight",
+            "count": 4
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Knight",
+        "count": 2
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10523110",
@@ -477,9 +753,37 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10523110-unmoving-tactician",
     "evolve": [],
-    "superevolve": [],
-    "keywords": [],
-    "triggers": [],
+    "superevolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "condition": {
+          "not_self": true
+        },
+        "attack": 3,
+        "defense": 3
+      }
+    ],
+    "keywords": [
+      {
+        "name": "cant_attack"
+      }
+    ],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Steelclad Knight",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -569,10 +873,24 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10531110-terraforming-wizard",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Guardian Golem",
+        "count": 2
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Magic Sediment",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10531120",
@@ -593,7 +911,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "count": 3,
+        "distribution": "random_hits"
+      },
+      {
+        "op": "spellboost",
+        "target": "ally:hand",
+        "count": 3
+      }
+    ]
   },
   {
     "id": "10531310",
@@ -614,7 +945,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10532110",
@@ -631,11 +974,34 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10532110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10532110-insomniac-witch",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "destroy",
+        "name": "Insomniac Witch"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Insomniac Witch",
+        "image": "images/crests/insomniac_witch.png",
+        "description": "Countdown (2). Last Words: Deal 3 damage to all followers.",
+        "countdown": 2,
+        "keywords": ["LastWords"],
+        "effects": [
+          {
+            "op": "damage",
+            "target": "all:follower",
+            "amount": 3
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -662,9 +1028,31 @@
     "url": "https://shadowverse.gg/cards/10532120-woodsong-haikumaster",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "reduceCostBy": 1,
+        "minCost": 0
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "spellboost",
+            "target": "ally:hand",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10532310",
@@ -705,8 +1093,35 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Golem"
+        },
+        "effects": [
+          {
+            "op": "earth_rite",
+            "cost": 1,
+            "effects": [
+              {
+                "op": "evolve",
+                "target": "entering_follower"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Guardian Golem",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10533310",
@@ -773,11 +1188,34 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10534120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10534120-ara-dawnblossom",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "transform",
+        "target": "any:follower",
+        "select": 1,
+        "condition": {
+          "not_self": true
+        },
+        "into": "Regal Falcon"
+      }
+    ],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "reduceCostBy": 1,
+        "minCost": 0
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 10
+      }
+    ]
   },
   {
     "id": "10541110",
@@ -794,8 +1232,22 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10541110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10541110-springwell-steward",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 5
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 2,
+        "amount": 5
+      }
+    ],
     "keywords": [],
     "triggers": [],
     "fanfare": []
@@ -818,8 +1270,31 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Marine"
+        },
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Majestic Megalorca",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10541310",
@@ -861,7 +1336,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 7
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Vastwing Dragon",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10542120",
@@ -881,8 +1369,36 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Marine"
+        },
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Rush"]
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Bane"]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Majestic Megalorca",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10542310",
@@ -945,7 +1461,27 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 2,
+        "count": 2,
+        "distribution": "random_hits"
+      },
+      {
+        "op": "gate",
+        "condition": "overflow",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10544110",
@@ -962,10 +1498,56 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10544110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10544110-erntz-governing-justice",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "keyword",
+        "action": "remove",
+        "target": "self",
+        "keywords": ["Ward"]
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "keywords": ["Intimidate"]
+      }
+    ],
     "superevolve": [],
     "keywords": ["Ward"],
-    "triggers": [],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 8
+              }
+            ],
+            "else_effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 8,
+                "count": 2,
+                "distribution": "random_hits"
+              },
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 8
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -1014,7 +1596,34 @@
     "url": "https://shadowverse.gg/cards/10551110-support-wolf",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 0,
+            "defense": 6
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Bane"]
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Barrier"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1033,11 +1642,22 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10551120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10551120-crimson-soulmancer",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "graveyard",
+        "max_cost": 2
+      }
+    ]
   },
   {
     "id": "10551310",
@@ -1075,11 +1695,31 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10552110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10552110-fickle-necromancer",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Rotting Zombie",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Ghost",
+        "count": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Skeleton",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10552120",
@@ -1096,11 +1736,36 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10552120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10552120-friendly-blue-ogre",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "enemy:follower",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "keywords": ["Can't Attack"],
+            "duration": "opponent_turn_end",
+            "target": "selected:follower"
+          }
+        ]
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10552310",
@@ -1238,11 +1903,23 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10561110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10561110-prescient-priestess",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10561120",
@@ -1305,7 +1982,14 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Immovable Paladin",
+        "count": 3
+      }
+    ]
   },
   {
     "id": "10562120",
@@ -1364,11 +2048,44 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10563110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10563110-saint-of-rehabilitation",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": ["Ward"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "leader_restored",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Fox of Purity",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 1
+      }
+    ]
   },
   {
     "id": "10563210",
@@ -1409,8 +2126,75 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Ward"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "all:follower",
+                "condition": {
+                  "not_self": true
+                },
+                "attack": -1,
+                "defense": -1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Evolve this follower",
+            "effects": [
+              {
+                "op": "evolve",
+                "target": "self"
+              }
+            ]
+          },
+          {
+            "label": "Evolve another random unevolved allied follower with Ward and give it +1/+1",
+            "effects": [
+              {
+                "op": "select",
+                "target": "ally:follower",
+                "select": 1,
+                "select_mode": "random",
+                "condition": {
+                  "unevolved": true,
+                  "has_keyword": "ward",
+                  "not_self": true
+                },
+                "effects": [
+                  {
+                    "op": "evolve",
+                    "target": "selected:follower"
+                  },
+                  {
+                    "op": "stat",
+                    "action": "give",
+                    "target": "selected:follower",
+                    "attack": 1,
+                    "defense": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10564120",
@@ -1458,9 +2242,38 @@
     "url": "https://shadowverse.gg/cards/10571110-marionette-master",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "ally:follower",
+            "condition": {
+              "tribe": "Puppetry"
+            },
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Enhanced Puppet",
+        "count": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Puppet",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10571120",
@@ -1502,7 +2315,14 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10572110",
@@ -1520,10 +2340,28 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10572110-new-age-cartographer",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "summon",
+        "source": "hand",
+        "mode": "copy",
+        "filter": {
+          "type": "Artifact"
+        },
+        "select": 1,
+        "count": 1,
+        "max_cost": 5
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Ominous Artifact β",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10572120",
