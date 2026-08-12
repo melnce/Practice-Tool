@@ -194,7 +194,23 @@
         </select>
 
         <label for="seedInput">Seed:</label>
-        <input id="seedInput" type="number" placeholder="random if empty" />
+        <input
+          id="seedInput"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          placeholder="random if empty"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <span id="gameSeedPanel" class="game-seed-panel" hidden>
+          <span class="game-seed-label"
+            >Game seed: <code id="gameSeedValue"></code
+          ></span>
+          <button type="button" id="copySeedBtn" title="Copy game seed">
+            Copy
+          </button>
+        </span>
 
         <button id="startGameBtn">Start Game</button>
         <a

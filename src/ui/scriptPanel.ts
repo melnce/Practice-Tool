@@ -17,6 +17,7 @@ import { parseScriptDocument, scriptToJson } from "../core/script/parse.js";
 import { ScriptSchemaError } from "../core/script/types.js";
 import { showToast } from "./toast.js";
 import { adapter } from "../core/adapter.js";
+import { state } from "../core/gameState.js";
 import type { Player } from "../core/types/index.js";
 
 function $(id: string): HTMLElement | null {
@@ -87,11 +88,15 @@ export function initScriptPanel(): void {
     const opts: {
       name: string;
       scriptedSide: Player;
-      seed?: number;
+      seed?: number | string;
       deckAId?: string;
       deckBId?: string;
     } = { name, scriptedSide: readSide() };
-    if (seedInput?.value) opts.seed = Number(seedInput.value);
+    if (state.seed !== undefined && state.seed !== null) {
+      opts.seed = state.seed;
+    } else if (seedInput?.value) {
+      opts.seed = Number(seedInput.value);
+    }
     if (blue?.value) opts.deckAId = blue.value;
     if (red?.value) opts.deckBId = red.value;
     startRecording(opts);

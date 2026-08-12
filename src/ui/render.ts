@@ -10,6 +10,7 @@ import { state } from "../core/gameState.js";
 import type { GameState, Player, CardInstance } from "../core/types/index.js";
 import { getWinner } from "../core/playerHelpers.js";
 import { maybeAdvanceScriptFromUi } from "./playerDispatch.js";
+import { syncSeedDisplay } from "./seedDisplay.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -58,6 +59,7 @@ export function render() {
   setText("redShadows", state.players.second.shadows);
 
   syncBodyTurnClasses();
+  syncSeedDisplay();
 
   // zones - use activePlayer as source of truth for turn state
   const isFirstActive = state.activePlayer === "first";
@@ -311,12 +313,16 @@ async function rematch(keepSeed: boolean) {
     state.players.second.deckFile?.replace(/\.json$/i, "") ||
     "starter_deck";
 
-  let seed: number;
-  if (keepSeed && seedInput && seedInput.value.trim() !== "") {
-    seed = Number(seedInput.value);
-  } else if (keepSeed) {
-    // Prefer the seed already shown in the input; fall back to a fresh one
-    seed = seedInput?.value ? Number(seedInput.value) : Date.now();
+  let seed: number | string;
+  if (keepSeed) {
+    // Prefer the literal match seed, then the input box
+    if (state.seed !== undefined && state.seed !== null) {
+      seed = state.seed;
+    } else if (seedInput && seedInput.value.trim() !== "") {
+      seed = Number(seedInput.value);
+    } else {
+      seed = Date.now();
+    }
   } else {
     seed = Date.now();
     if (seedInput) seedInput.value = String(seed);
@@ -324,6 +330,12 @@ async function rematch(keepSeed: boolean) {
 
   const engine = await import(/* webpackIgnore: true */ "../engine.js");
   await engine.startNewGame({ deckAId, deckBId, seed });
+  void import("../boot/shareUrl.js").then(({ writeShareParams }) => {
+    writeShareParams({ seed: state.seed, deckAId, deckBId });
+  });
+  void import("../core/positionStore.js").then(({ setSessionDeckIds }) => {
+    setSessionDeckIds(deckAId, deckBId);
+  });
 }
 
 // Helper: toggle End Turn buttons visibility and disabled state

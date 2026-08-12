@@ -9,6 +9,7 @@
  */
 
 import type { Player } from "../types/player.js";
+import type { SeedLiteral } from "../seed.js";
 
 /** Incompatible bumps must reject old files rather than mis-apply them. */
 export const SCRIPT_SCHEMA_VERSION = 1 as const;
@@ -44,7 +45,7 @@ export type ScriptDocument = {
   /** Side the line drives. */
   scriptedSide: Player;
   /** Opening seed used when the line was recorded (optional for mid-game loads). */
-  seed?: number;
+  seed?: SeedLiteral;
   deckAId?: string;
   deckBId?: string;
   steps: ScriptStep[];

@@ -1,5 +1,7 @@
 // src/core/rng.ts
 
+import { normalizeSeed } from "./seed.js";
+
 export interface RNG {
   readonly seed: number;
   readonly cursor: number;
@@ -11,6 +13,9 @@ export interface RNG {
   snapshot(): { seed: number; cursor: number; uidCounter: number };
   restore(s: { seed: number; cursor: number; uidCounter?: number }): void;
 }
+
+export { normalizeSeed, parseSeedInput, isNumericSeed } from "./seed.js";
+export type { SeedLiteral } from "./seed.js";
 
 // --- PRNG core: mulberry32 ---------------------------------------------------
 // Keep internal state as uint32 (>>> 0). Checkpoint arithmetic uses the same
@@ -27,11 +32,16 @@ function mulberry32(a: number) {
   };
 }
 
-// Simple string/number -> 32-bit seed
+/**
+ * Map a seed-like value to the uint32 the PRNG advances from.
+ * Digit-only strings are normalised to numbers first so createRng("12345")
+ * matches createRng(12345). Non-digit strings are FNV-1a hashed.
+ */
 function toSeed(v: number | string | bigint): number {
-  if (typeof v === "number" && Number.isFinite(v)) return v >>> 0;
   if (typeof v === "bigint") return Number(v & 0xffffffffn) >>> 0;
-  const s = String(v);
+  const literal = normalizeSeed(v);
+  if (typeof literal === "number") return literal >>> 0;
+  const s = literal;
   let h = 2166136261 >>> 0; // FNV-1a
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);

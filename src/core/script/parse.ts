@@ -7,6 +7,7 @@ import {
   type ScriptDefenderRef,
 } from "./types.js";
 import type { Player } from "../types/player.js";
+import { normalizeSeed } from "../seed.js";
 
 function isPlayer(v: unknown): v is Player {
   return v === "first" || v === "second";
@@ -134,7 +135,15 @@ export function parseScriptDocument(raw: unknown): ScriptDocument {
     scriptedSide: o.scriptedSide,
     steps: o.steps.map((s, i) => parseStep(s, i)),
   };
-  if (typeof o.seed === "number" && Number.isFinite(o.seed)) doc.seed = o.seed;
+  if (typeof o.seed === "number" && Number.isFinite(o.seed)) {
+    doc.seed = o.seed;
+  } else if (typeof o.seed === "string" && o.seed.trim() !== "") {
+    try {
+      doc.seed = normalizeSeed(o.seed);
+    } catch {
+      /* ignore invalid */
+    }
+  }
   if (typeof o.deckAId === "string") doc.deckAId = o.deckAId;
   if (typeof o.deckBId === "string") doc.deckBId = o.deckBId;
   if (typeof o.notes === "string") doc.notes = o.notes;

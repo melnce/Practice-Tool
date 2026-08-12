@@ -6,6 +6,7 @@
 import { state, resetGameState } from "../core/gameState.js";
 import { loadBlueDeck, loadRedDeck } from "../data/deckLoader.js";
 import { loadCardDatabase } from "../data/cardDatabase.js";
+import { normalizeSeed } from "../core/seed.js";
 
 import { beginMulligan } from "./mulligan.js";
 import { runEffects } from "./core/effects/index.js";
@@ -37,10 +38,17 @@ export async function startGame(options: StartGameOptions) {
   const blueChoice = options.deckAId;
   const redChoice = options.deckBId;
 
-  let finalSeed: number | string;
+  // Normalise once at the start boundary: "12345" and 12345 are the same game.
+  // resetGameState stores the literal on state.seed and derives rng.seed (>>> 0).
+  let finalSeed: ReturnType<typeof normalizeSeed>;
   if (options.seed !== undefined && options.seed !== null) {
-    finalSeed = options.seed;
-    console.log(`[RNG] Using provided seed: ${options.seed}`);
+    finalSeed = normalizeSeed(options.seed);
+    console.log(
+      `[RNG] Using provided seed: ${finalSeed}` +
+        (typeof options.seed === "string" && finalSeed !== options.seed
+          ? ` (normalised from ${JSON.stringify(options.seed)})`
+          : ""),
+    );
   } else {
     // P0-3 FIX: For AI training readiness, require explicit seed.
     // Browser/dev can still pass Date.now() explicitly if desired.
