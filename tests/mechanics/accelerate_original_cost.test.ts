@@ -70,10 +70,10 @@ describe("Owner ruling — Accelerate original cost (2026-08-12)", () => {
     state.activePlayer = "first";
   });
 
-  it("Yog-Zentha and Depths of the Eld Axe are implemented (not stubs)", () => {
+  it("Yog-Zentha and Depths of the Eld Axe have authored ops (not bare stubs)", () => {
     const yog = getCardById(YOG);
     expect(yog?.name).toBe("Yog-Zentha, Eld Axe");
-    expect(getImplementationStatus(yog!)).toBe("implemented");
+    expect(getImplementationStatus(yog!)).toBe("ops_present");
 
     const depths = getCardById("90074320");
     expect(depths?.name).toBe(DEPTHS_NAME);
