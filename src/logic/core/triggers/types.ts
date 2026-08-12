@@ -55,6 +55,8 @@ export type TriggerEventName =
   // Play
   | "enhanced_play" // A card was played paying its Enhance cost
   | "ally_spell_played" // An allied spell was played (from hand)
+  | "ally_draw" // Owner drew a card (board/crest listeners)
+  | "when_drawn" // The drawn card itself (source: "hand")
   // Board state changes
   | "ally_amulet_destroyed" // Allied amulet destroyed (effect or countdown)
   // Mechanics
@@ -62,6 +64,7 @@ export type TriggerEventName =
   | "on_fuse"
   | "loot_fused"
   | "loot_played"
+  | "ally_earth_rite"
   | "invoke"
   | "select_mode"; // Mode selection (used by Faith crest)
 

@@ -236,18 +236,31 @@ function handlePoolBasedBuff(
     conditionWithObjectFilter(eff),
     context,
   );
-  const pool = filterBuffCandidates(rawPool, eff, sourceCard);
+  let pool = filterBuffCandidates(rawPool, eff, sourceCard);
 
   if (!pool.length) return "done";
 
-  // 2. Check for random distribution - auto-select instead of user selection
+  // 2. Restrict highest-stat effects before resolving tied targets.
   const distribution = (eff as any).distribution;
+  if (String(distribution).toLowerCase() === "highest") {
+    const stat = String((eff as any).stat || "attack").toLowerCase();
+    const getValue = (card: CardInstance) =>
+      Number(stat === "defense" || stat === "hp" ? card.defense : card.attack) ||
+      0;
+    const highest = Math.max(...pool.map(getValue));
+    pool = pool.filter((card) => getValue(card) === highest);
+  }
+
+  // 3. Check for random distribution - auto-select instead of user selection
   const isRandomDistribution =
     distribution === "random" ||
     eff.random ||
-    String((eff as any).select_mode || "").toLowerCase() === "random";
+    String((eff as any).select_mode || "").toLowerCase() === "random" ||
+    String((eff as any).pick || "").toLowerCase() === "random" ||
+    (String(distribution).toLowerCase() === "highest" &&
+      (eff as any).select != null);
 
-  // 3. Handle random selection (distribution: "random" bypasses user selection)
+  // 4. Handle random selection (including random resolution among highest ties)
   if (isRandomDistribution) {
     const count = Math.max(
       1,
@@ -259,7 +272,7 @@ function handlePoolBasedBuff(
     return "done";
   }
 
-  // 4. Handle user selection (only when no random distribution)
+  // 5. Handle user selection (only when no random distribution)
   if ((eff as any).select) {
     setPendingTarget({
       eff,
@@ -277,10 +290,10 @@ function handlePoolBasedBuff(
     return "pending";
   }
 
-  // 5. Apply buffs to all in pool
+  // 6. Apply buffs to all in pool
   applyBuffsToTargets(pool, eff, owner);
 
-  // 6. Cleanup
+  // 7. Cleanup
   cleanupDead();
   return "done";
 }

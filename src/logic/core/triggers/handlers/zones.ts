@@ -15,6 +15,15 @@ export function handleRestrictedZoneEvent(
       if (event === "enemy_super_evolve") return cand.owner !== activePlayer;
       if (event === "ally_evolve") return cand.owner === activePlayer;
       if (event === "engage") return cand.owner === activePlayer;
+      if (event === "when_drawn") {
+        const drawnCard = context.sourceCard ?? context.drawnCard;
+        return (
+          cand.owner === activePlayer &&
+          cand.source === "hand" &&
+          !!drawnCard &&
+          cand.card.uid === drawnCard.uid
+        );
+      }
 
       const enteringCard = context.enteringCard ?? context.invokedCard ?? null;
       const enteringOwner = context.enteringOwner;

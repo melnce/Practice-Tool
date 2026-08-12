@@ -7,6 +7,7 @@ import {
   getGraveyard,
   addShadows,
 } from "../../../core/playerHelpers.js";
+import { fireTrigger } from "../../core/triggers.js";
 
 function board(owner: Player) {
   return getBoard(state, owner);
@@ -48,6 +49,7 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
           // Render removed - UI layer
         }
       }
+      fireTrigger("ally_earth_rite", owner, { sourceCard: c });
       return true;
     }
   }

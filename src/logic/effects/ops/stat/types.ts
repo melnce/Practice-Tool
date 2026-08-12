@@ -43,6 +43,14 @@ export type StatOp = Effect & {
   attacks_per_turn?: number | string;
   random?: boolean;
   count?: number | string;
+  /** "highest" restricts the pool to cards tied for the maximum stat. */
+  distribution?: "random" | "highest";
+  /** Stat used by distribution: "highest" (defaults to attack). */
+  stat?: "attack" | "defense" | "hp";
+  /** Random auto-selection alias, including among highest-stat ties. */
+  pick?: "random";
+  select?: number | string;
+  select_count?: number | string;
 
   // Duration
   until_end_of_turn?: boolean;

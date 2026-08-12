@@ -62,6 +62,10 @@ export function resolveAmount(
       return resolveDamageAmountExtended({} as Effect, ctx, "crest_count");
     case "other_allies":
       return resolveDamageAmountExtended({} as Effect, ctx, "other_allies");
+    case "followers_on_field":
+      return [...getBoard(state, "first"), ...getBoard(state, "second")].filter(
+        (card) => card?.type === "Follower",
+      ).length;
     case "ally_matches": {
       const filter = {
         type: "Follower",
@@ -165,27 +169,41 @@ export function handleSelection(
 export function handleByStatDamage(
   spec: UnifiedDamageSpec,
   amount: number,
-  _owner: Player,
+  owner: Player,
 ): void {
   const stat = spec.stat || "defense";
   const targetType = spec.target || "follower";
+  const useLowest = spec.rank === "lowest";
+  const chooseTiedTarget = spec.pick === "random" || spec.select === 1;
 
   if (
     targetType === "follower" ||
     targetType === "enemy:follower" ||
+    targetType === "ally:follower" ||
     targetType === "all:follower"
   ) {
-    const allFollowers = [
-      ...getBoard(state, "first"),
-      ...getBoard(state, "second"),
-    ].filter((c) => c && c.type === "Follower");
+    const opponent = owner === "first" ? "second" : "first";
+    const boards =
+      targetType === "enemy:follower"
+        ? [getBoard(state, opponent)]
+        : targetType === "ally:follower"
+          ? [getBoard(state, owner)]
+          : [getBoard(state, "first"), getBoard(state, "second")];
+    const allFollowers = boards
+      .flat()
+      .filter((c) => c && c.type === "Follower");
 
     if (!allFollowers.length) return;
 
     const getValue = (c: CardInstance) =>
       parseInt(String(stat === "defense" ? c.defense : c.attack), 10) || 0;
-    const maxVal = Math.max(...allFollowers.map(getValue));
-    const targets = allFollowers.filter((c) => getValue(c) === maxVal);
+    const extreme = (useLowest ? Math.min : Math.max)(
+      ...allFollowers.map(getValue),
+    );
+    let targets = allFollowers.filter((c) => getValue(c) === extreme);
+    if (chooseTiedTarget && targets.length > 1) {
+      targets = [targets[state.rng.nextInt(targets.length)]!];
+    }
 
     for (const t of targets) {
       dealDamage(t, amount);
@@ -194,24 +212,38 @@ export function handleByStatDamage(
     return;
   }
 
-  if (targetType === "leader" || targetType === "all:leader") {
+  if (
+    targetType === "leader" ||
+    targetType === "ally:leader" ||
+    targetType === "enemy:leader" ||
+    targetType === "all:leader"
+  ) {
     // Leader "defense" / "hp" compare **current** defense (getHP), not maxHP.
     // Raging Lightning (10341310) is the only by_stat→leader card; bible Owner
     // ruling requires current defense. If a future effect needs max defense,
     // add an explicit opt-in (e.g. stat: "max_defense") rather than overloading
     // "defense".
-    const leaders: Array<{
+    let leaders: Array<{
       owner: import("../../../../core/types/index.js").Player;
       value: number;
     }> = [
       { owner: "first", value: getHP(state, "first") },
       { owner: "second", value: getHP(state, "second") },
     ];
-    const maxVal = Math.max(...leaders.map((l) => l.value));
-    for (const l of leaders) {
-      if (l.value === maxVal) {
-        applyLeaderDamage(l.owner, amount);
-      }
+    if (targetType === "enemy:leader") {
+      leaders = leaders.filter((leader) => leader.owner !== owner);
+    } else if (targetType === "ally:leader") {
+      leaders = leaders.filter((leader) => leader.owner === owner);
+    }
+    const extreme = (useLowest ? Math.min : Math.max)(
+      ...leaders.map((leader) => leader.value),
+    );
+    let targets = leaders.filter((leader) => leader.value === extreme);
+    if (chooseTiedTarget && targets.length > 1) {
+      targets = [targets[state.rng.nextInt(targets.length)]!];
+    }
+    for (const leader of targets) {
+      applyLeaderDamage(leader.owner, amount);
     }
   }
 }

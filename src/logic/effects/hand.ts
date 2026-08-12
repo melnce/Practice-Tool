@@ -5,7 +5,7 @@ import { highlightSelectable } from "../core/targeting.js";
 import { setPendingTarget } from "../core/pendingTarget/index.js";
 
 import { logEvent } from "../../core/logger.js";
-import type { Player, Effect } from "../../core/types/index.js";
+import type { Player, Effect, CardInstance } from "../../core/types/index.js";
 import { getHand, getGraveyard, addShadows } from "../../core/playerHelpers.js";
 import { toUids } from "../../core/uidResolver.js";
 
@@ -14,6 +14,16 @@ import { toUids } from "../../core/uidResolver.js";
 // ========================================================================
 
 export type DiscardMode = "select" | "except_named";
+
+function rememberDiscardedCards(discarded: CardInstance[]): void {
+  if (!discarded.length) return;
+  state.lastDiscardedCosts = discarded.map(
+    (card) => parseInt(String(card.cost), 10) || 0,
+  );
+  state.lastDiscardedCost = state.lastDiscardedCosts[0] || 0;
+  state.lastDiscardedTypes = discarded.map((card) => String(card.type || ""));
+  state.lastDiscardedType = state.lastDiscardedTypes[0] || "";
+}
 
 export function handleDiscard(
   eff: Effect & { mode?: DiscardMode },
@@ -43,7 +53,7 @@ export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
   const hand = getHand(state, owner);
   const grave = getGraveyard(state, owner);
 
-  let discarded = 0;
+  const discarded: CardInstance[] = [];
 
   for (let i = hand.length - 1; i >= 0; i--) {
     const c = hand[i];
@@ -52,13 +62,14 @@ export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
     if (removed) {
       removed.cost_mod = 0; // Reset cost when entering graveyard
       grave.push(removed); // discard
-      discarded++;
+      discarded.push(removed);
     }
   }
 
-  if (discarded > 0) {
-    logEvent("discard", { owner, count: discarded });
-    addShadows(state, owner, discarded);
+  if (discarded.length > 0) {
+    rememberDiscardedCards(discarded);
+    logEvent("discard", { owner, count: discarded.length });
+    addShadows(state, owner, discarded.length);
   }
 }
 
@@ -75,8 +86,12 @@ export function handleDiscardSelectHand(
   const hand = getHand(state, owner);
   if (n <= 0 || hand.length === 0) return;
 
-  const selectCount = Math.min(n, hand.length);
-  const pool = [...hand];
+  const filterType = String((eff as any).filter?.type || "").toLowerCase();
+  const pool = filterType
+    ? hand.filter((card) => String(card.type).toLowerCase() === filterType)
+    : [...hand];
+  if (pool.length === 0) return;
+  const selectCount = Math.min(n, pool.length);
 
   setPendingTarget({
     op: "discard_select_hand",

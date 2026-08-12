@@ -1,3 +1,282 @@
+import { beforeEach, describe, expect, it } from "vitest";
+import "./setup.js";
+import {
+  createCard,
+  givenGameState,
+  resetUidCounter,
+} from "../harness/builders.js";
+import { state } from "../../src/core/gameState.js";
+import {
+  getBoard,
+  getHand,
+  getHP,
+  getPP,
+  getShadows,
+} from "../../src/core/playerHelpers.js";
+import { drawCard } from "../../src/core/utils.js";
+import { consumeEarthSigils } from "../../src/logic/effects/ops/earth.js";
+import { runEffects } from "../../src/logic/core/effects/index.js";
+import { evaluateCondition } from "../../src/logic/effects/gates/conditions.js";
+
+function setup(seed = 13): void {
+  givenGameState({ seed, activePlayer: "first", roundCount: 5 })
+    .withFirstPP(0, 5)
+    .build();
+  state.gameStarted = true;
+  state.phase = "main";
+}
+
+describe("Unblock round 3 — general engine capabilities", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    setup();
+  });
+
+  it("resolves random mode picks deterministically from the game seed", () => {
+    const effect = {
+      op: "mode",
+      pick: "random",
+      select_count: 2,
+      options: [1, 10, 100].map((amount) => ({
+        label: String(amount),
+        effects: [{ op: "add_shadows", amount }],
+      })),
+    } as any;
+
+    runEffects([effect], "first", null);
+    const firstResult = getShadows(state, "first");
+    expect(state.pendingTargetEffect).toBeUndefined();
+
+    setup();
+    runEffects([effect], "first", null);
+    expect(getShadows(state, "first")).toBe(firstResult);
+    expect([11, 101, 110]).toContain(firstResult);
+  });
+
+  it("fires ally_draw on board listeners and when_drawn on the drawn hand card", () => {
+    const listener = createCard(
+      {
+        name: "Draw Listener",
+        triggers: [
+          {
+            event: "ally_draw",
+            effects: [{ op: "add_shadows", amount: 1 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    const drawn = createCard(
+      {
+        name: "Drawn Trigger",
+        type: "Spell",
+        cost: 5,
+        triggers: [
+          {
+            event: "when_drawn",
+            source: "hand",
+            effects: [
+              {
+                op: "cost",
+                mode: "reduce",
+                target: "self",
+                amount: 2,
+              },
+            ],
+          },
+        ],
+      },
+      "deck",
+      "first",
+    );
+    getBoard(state, "first").push(listener);
+    state.players.first.deck.push(drawn);
+
+    expect(
+      drawCard(
+        state.players.first.hand,
+        state.players.first.deck,
+        "first",
+      ),
+    ).toBe(true);
+
+    expect(getShadows(state, "first")).toBe(1);
+    expect(getHand(state, "first")[0]?.cost).toBe(3);
+  });
+
+  it("fires ally_earth_rite for cost reduction triggers in hand", () => {
+    const sigil = createCard(
+      {
+        name: "Earth Sigil",
+        type: "Amulet",
+        counters: { earth: 2 },
+      },
+      "board",
+      "first",
+    );
+    const listener = createCard(
+      {
+        name: "Earth Rite Listener",
+        type: "Spell",
+        cost: 4,
+        triggers: [
+          {
+            event: "ally_earth_rite",
+            source: "hand",
+            effects: [
+              {
+                op: "cost",
+                mode: "reduce",
+                target: "self",
+                amount: 1,
+              },
+            ],
+          },
+        ],
+      },
+      "hand",
+      "first",
+    );
+    getBoard(state, "first").push(sigil);
+    getHand(state, "first").push(listener);
+
+    expect(consumeEarthSigils("first")).toBe(true);
+    expect(listener.cost).toBe(3);
+  });
+
+  it("damages the leader with the lowest current defense", () => {
+    state.players.first.hp = 10;
+    state.players.second.hp = 15;
+
+    runEffects(
+      [
+        {
+          op: "damage",
+          target: "all:leader",
+          amount: 2,
+          distribution: "by_stat",
+          stat: "defense",
+          rank: "lowest",
+        },
+      ],
+      "first",
+      null,
+    );
+
+    expect(getHP(state, "first")).toBe(8);
+    expect(getHP(state, "second")).toBe(15);
+  });
+
+  it("uses seeded random choice among followers tied for highest attack", () => {
+    const enemies = [5, 5, 3].map((attack, index) =>
+      createCard(
+        {
+          name: `Enemy ${index}`,
+          attack,
+          defense: 5,
+        },
+        "board",
+        "second",
+      ),
+    );
+    getBoard(state, "second").push(...enemies);
+
+    runEffects(
+      [
+        {
+          op: "damage",
+          target: "enemy:follower",
+          amount: 1,
+          distribution: "by_stat",
+          stat: "attack",
+          pick: "random",
+        },
+      ],
+      "first",
+      null,
+    );
+    expect(enemies.filter((card) => card.defense === 4)).toHaveLength(1);
+    expect(enemies[2]?.defense).toBe(5);
+
+    runEffects(
+      [
+        {
+          op: "stat",
+          action: "give",
+          target: "enemy:follower",
+          attack: 1,
+          defense: 0,
+          distribution: "highest",
+          stat: "attack",
+          select: 1,
+        },
+      ],
+      "first",
+      null,
+    );
+    expect(enemies.filter((card) => card.attack === 6)).toHaveLength(1);
+    expect(enemies[2]?.attack).toBe(3);
+  });
+
+  it("field_matches counts both boards and can exclude the source", () => {
+    const source = createCard({ name: "Source" }, "board", "first");
+    const enemy = createCard({ name: "Enemy" }, "board", "second");
+    getBoard(state, "first").push(source);
+    getBoard(state, "second").push(enemy);
+
+    expect(
+      evaluateCondition(
+        {
+          op: "gate",
+          condition: "field_matches",
+          type: "Card",
+          count: 1,
+          exclude_self: true,
+        },
+        "first",
+        source,
+      ),
+    ).toBe(true);
+    expect(
+      evaluateCondition(
+        {
+          op: "gate",
+          condition: "field_matches",
+          type: "Card",
+          count: 2,
+          exclude_self: true,
+        },
+        "first",
+        source,
+      ),
+    ).toBe(false);
+  });
+
+  it("recovers PP from the number of other allied followers", () => {
+    const source = createCard({ name: "Source" }, "board", "first");
+    getBoard(state, "first").push(
+      source,
+      createCard({ name: "Ally 1" }, "board", "first"),
+      createCard({ name: "Ally 2" }, "board", "first"),
+      createCard({ name: "Amulet", type: "Amulet" }, "board", "first"),
+    );
+
+    runEffects(
+      [
+        {
+          op: "pp",
+          action: "recover",
+          amount_source: "other_allies",
+        },
+      ],
+      "first",
+      source,
+    );
+
+    expect(getPP(state, "first")).toBe(2);
+  });
+});
 /**
  * Round 3 unblock: rich destroyed history and Ward-ignoring attacks.
  */

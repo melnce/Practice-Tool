@@ -34,12 +34,14 @@ export type GateCondition =
   | "board_name" // Named card exists on board
   | "amulet_count" // Number of amulets >= count
   | "self_cost" // Source card's effective cost equals value
-  | "ally_matches" // Any allied board card matches filter (base_cost_gte, type, …)
+  | "ally_matches" // Allied board cards matching filter meet count
+  | "field_matches" // Cards across both boards matching filter meet count
   | "unique_tribe_enters" // Distinct named tribe enters this match (tribe + count)
   | "named_enter_count" // Named follower enters this match >= count
   | "hand_matches" // Hand cards matching filter (type/tribe/…) >= count
   | "leader_defense_lte" // Owner leader HP <= count
   | "leader_defense_gt_enemy" // Owner leader HP > enemy leader HP
+  | "last_discarded_type" // Most recently discarded card has `type`
 
   // Special gates
   | "skybound_art" // Turn + evolves witnessed >= requirement
@@ -73,8 +75,14 @@ export interface UnifiedGateSpec {
   /** Named card for board_name gate */
   name?: string;
 
-  /** Card type filter for ally_matches (default Follower) */
+  /** Card type filter; "Card" or omitted matches every board card type */
   type?: string;
+
+  /** Exclude the source card from ally_matches / field_matches */
+  exclude_self?: boolean;
+
+  /** Class filter for board/hand matching conditions */
+  class?: string;
 
   /** Printed base-cost comparisons for ally_matches / filters */
   base_cost_eq?: number;
@@ -152,6 +160,9 @@ export function normalizeToGateSpec(eff: Effect): UnifiedGateSpec {
     spec.requirement = parseInt((eff as any).requirement);
   if ((eff as any).name !== undefined) spec.name = (eff as any).name;
   if ((eff as any).type !== undefined) spec.type = String((eff as any).type);
+  if ((eff as any).exclude_self !== undefined)
+    spec.exclude_self = Boolean((eff as any).exclude_self);
+  if ((eff as any).class !== undefined) spec.class = String((eff as any).class);
   if ((eff as any).base_cost_eq !== undefined)
     spec.base_cost_eq = parseInt((eff as any).base_cost_eq);
   if ((eff as any).base_cost_gte !== undefined)
