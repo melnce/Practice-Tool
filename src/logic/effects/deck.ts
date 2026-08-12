@@ -5,6 +5,7 @@
 
 import { state } from "../../core/gameState.js";
 import { getCardDetails } from "../../data/cardDatabase.js";
+import { getSetCards } from "../../data/cardSets.js";
 import { shuffleInPlace } from "../../core/utils.js";
 import { logEvent } from "../../core/logger.js";
 import type { Effect as _Effect, Player } from "../../core/types/index.js";
@@ -24,10 +25,10 @@ export function handleDeck(
   switch (action) {
     case "replace":
       // from_set: Replace deck with all cards from a set (one copy each)
+      // Fully synchronous — set JSON is preloaded at card-DB init (no post-await RNG).
       if (eff.from_set) {
-        void replaceDeckFromSet(owner, eff.from_set, eff.exclude).then(() => {
-          context.adapter?.render?.();
-        });
+        replaceDeckFromSet(owner, eff.from_set, eff.exclude);
+        context.adapter?.render?.();
       }
       // cards: Explicit card list with counts
       else if (eff.cards) {
@@ -57,28 +58,32 @@ export function handleDeck(
 // Example:
 //   { "op": "deck", "action": "replace", "from_set": "10003_heirs-of-the-omen", "exclude": ["Card Name"] }
 // ========================================================================
-async function replaceDeckFromSet(
+function replaceDeckFromSet(
   owner: Player,
   setId: string,
   exclude?: string[],
-): Promise<void> {
-  const setFile = `/cards/sets/${setId}.json`;
-  const excludeSet = new Set((exclude || []).map((s) => String(s)));
-
-  const res = await fetch(setFile, { cache: "no-cache" });
-  if (!res.ok) {
-    console.warn(`[deck] Set not found: ${setId} (${setFile})`);
+): void {
+  const setCards = getSetCards(setId);
+  if (!setCards) {
+    console.warn(
+      `[deck] Set not preloaded: ${setId} (load card sets at DB init)`,
+    );
     return;
   }
-  const cards = await res.json();
 
+  const excludeSet = new Set((exclude || []).map((s) => String(s)));
   const deck = getDeck(state, owner);
   deck.length = 0;
 
-  for (const base of Array.isArray(cards) ? cards : []) {
+  for (const base of setCards) {
     if (!base?.name) continue;
     if (excludeSet.has(String(base.name))) continue;
-    const copy = structuredClone(base);
+    // Prefer indexed/processed card data (keyword flags) like handleReplaceDeckFromList
+    const cardData =
+      getCardDetails(String(base.id ?? "")) ??
+      getCardDetails(String(base.name));
+    if (!cardData) continue;
+    const copy = structuredClone(cardData);
     copy.uid = state.rng.makeUid();
     deck.push(copy);
   }

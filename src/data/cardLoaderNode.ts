@@ -9,9 +9,14 @@ import path from "path";
 import { fileURLToPath } from "url";
 import type { RawCardData, BuildCardIndexInput } from "./cardIndex.js";
 import { initCardDatabase } from "./cardIndex.js";
+import { initCardSets } from "./cardSets.js";
 // Get directory path for relative imports
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+function cardsDirPath(): string {
+  return path.resolve(__dirname, "../../cards");
+}
 
 /**
  * Load cards synchronously from the file system.
@@ -20,7 +25,7 @@ const __dirname = path.dirname(__filename);
 export function loadCardsNode(): BuildCardIndexInput {
   // Resolve paths relative to project root
   // From src/data/ we need to go up to project root, then into cards/
-  const cardsDir = path.resolve(__dirname, "../../cards");
+  const cardsDir = cardsDirPath();
 
   // Load main cards
   const allJsonPath = path.join(cardsDir, "all.json");
@@ -46,6 +51,23 @@ export function loadCardsNode(): BuildCardIndexInput {
   };
 }
 
+/** Load every set listed in cards/index.json, keyed by filename stem. */
+export function loadCardSetsNode(): Record<string, RawCardData[]> {
+  const cardsDir = cardsDirPath();
+  const indexPath = path.join(cardsDir, "index.json");
+  const index = JSON.parse(fs.readFileSync(indexPath, "utf-8")) as Record<
+    string,
+    string
+  >;
+  const sets: Record<string, RawCardData[]> = {};
+  for (const rel of Object.values(index)) {
+    const setPath = path.join(cardsDir, rel);
+    const setId = path.basename(rel, ".json");
+    sets[setId] = JSON.parse(fs.readFileSync(setPath, "utf-8"));
+  }
+  return sets;
+}
+
 /**
  * Initialize card database using Node loader.
  * Convenience function for scripts and tests.
@@ -54,4 +76,5 @@ export function loadCardsNode(): BuildCardIndexInput {
 export async function initCardDatabaseNode(): Promise<void> {
   const cards = loadCardsNode();
   initCardDatabase(cards);
+  initCardSets(loadCardSetsNode());
 }

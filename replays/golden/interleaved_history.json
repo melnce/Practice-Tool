@@ -1,6 +1,38 @@
 {
-  "final": "{\n  \"__DEBUG_CREST_COUNT\": 0,\n  \"__DEBUG_CREST_LOOP_STARTED\": true,\n  \"__debugId\": 0.6944895177148283,\n  \"__rng\": {\n    \"cursor\": 1,\n    \"seed\": 31337\n  },\n  \"activePlayer\": \"first\",\n  \"gameStarted\": false,\n  \"lastDrawnCards\": [],\n  \"lastSummoned\": [],\n  \"players\": {\n    \"first\": {\n      \"anyAllyAttackedThisTurn\": false,\n      \"board\": [],\n      \"boostPending\": false,\n      \"boostUsedEarly\": false,\n      \"boostUsedLate\": false,\n      \"crests\": [],\n      \"deck\": [],\n      \"deckoutWins\": false,\n      \"destroyedHistory\": [],\n      \"evoCharges\": 0,\n      \"evoCount\": 0,\n      \"evoUsedThisTurn\": false,\n      \"followersDestroyed\": 0,\n      \"graveyard\": [],\n      \"hand\": [],\n      \"hasBoost\": false,\n      \"hp\": 20,\n      \"leaderBarrier\": 0,\n      \"leaderDamageTakenBonus\": 0,\n      \"leaderMaxDamageCap\": null,\n      \"maxHP\": 20,\n      \"maxPP\": 2,\n      \"modeBonus\": 0,\n      \"permPP\": 0,\n      \"playedHistory\": [],\n      \"playsThisTurn\": 0,\n      \"pp\": 2,\n      \"rally\": 0,\n      \"shadows\": 0,\n      \"shikigamiDeathsThisTurn\": [],\n      \"superEvoCharges\": 0,\n      \"totalCardsDrawn\": 0,\n      \"totalCardsPlayed\": 0,\n      \"totalDamageDealt\": 0,\n      \"totalDamageTaken\": 0\n    },\n    \"second\": {\n      \"anyAllyAttackedThisTurn\": false,\n      \"board\": [],\n      \"boostPending\": false,\n      \"boostUsedEarly\": false,\n      \"boostUsedLate\": false,\n      \"crests\": [],\n      \"deck\": [],\n      \"deckoutWins\": false,\n      \"destroyedHistory\": [],\n      \"evoCharges\": 0,\n      \"evoCount\": 0,\n      \"evoUsedThisTurn\": false,\n      \"followersDestroyed\": 0,\n      \"graveyard\": [],\n      \"hand\": [],\n      \"hasBoost\": true,\n      \"hp\": 20,\n      \"leaderBarrier\": 0,\n      \"leaderDamageTakenBonus\": 0,\n      \"leaderMaxDamageCap\": null,\n      \"maxHP\": 20,\n      \"maxPP\": 1,\n      \"modeBonus\": 0,\n      \"permPP\": 0,\n      \"playedHistory\": [],\n      \"playsThisTurn\": 0,\n      \"pp\": 1,\n      \"rally\": 0,\n      \"shadows\": 0,\n      \"shikigamiDeathsThisTurn\": [],\n      \"superEvoCharges\": 0,\n      \"totalCardsDrawn\": 0,\n      \"totalCardsPlayed\": 0,\n      \"totalDamageDealt\": 0,\n      \"totalDamageTaken\": 0\n    }\n  },\n  \"rng\": {\n    \"_cursor\": 1,\n    \"_seed\": 31337\n  },\n  \"roundCount\": 2,\n  \"secondPlayerPPBoostPending\": false,\n  \"secondPlayerPPBoostUsedEarly\": false,\n  \"secondPlayerPPBoostUsedLate\": false\n}",
+  "actions": [
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "UNDO"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "UNDO"
+    },
+    {
+      "type": "REDO"
+    },
+    {
+      "type": "UNDO"
+    },
+    {
+      "type": "REDO"
+    }
+  ],
+  "final": {
+    "stateHash": "2665ecc8"
+  },
   "id": "interleaved_history",
-  "initial": "{\n  \"__DEBUG_CREST_COUNT\": 0,\n  \"__DEBUG_CREST_LOOP_STARTED\": true,\n  \"__debugId\": 0.6944895177148283,\n  \"__rng\": {\n    \"cursor\": 1,\n    \"seed\": 42\n  },\n  \"activePlayer\": \"first\",\n  \"gameStarted\": false,\n  \"lastDrawnCards\": [],\n  \"lastSummoned\": [],\n  \"players\": {\n    \"first\": {\n      \"anyAllyAttackedThisTurn\": false,\n      \"board\": [],\n      \"boostPending\": false,\n      \"boostUsedEarly\": false,\n      \"boostUsedLate\": false,\n      \"crests\": [],\n      \"deck\": [],\n      \"deckoutWins\": false,\n      \"destroyedHistory\": [],\n      \"evoCharges\": 0,\n      \"evoCount\": 0,\n      \"evoUsedThisTurn\": false,\n      \"followersDestroyed\": 0,\n      \"graveyard\": [],\n      \"hand\": [],\n      \"hasBoost\": false,\n      \"hp\": 20,\n      \"leaderBarrier\": 0,\n      \"leaderDamageTakenBonus\": 0,\n      \"leaderMaxDamageCap\": null,\n      \"maxHP\": 20,\n      \"maxPP\": 0,\n      \"modeBonus\": 0,\n      \"permPP\": 0,\n      \"playedHistory\": [],\n      \"playsThisTurn\": 0,\n      \"pp\": 0,\n      \"rally\": 0,\n      \"shadows\": 0,\n      \"shikigamiDeathsThisTurn\": [],\n      \"superEvoCharges\": 0,\n      \"totalCardsDrawn\": 0,\n      \"totalCardsPlayed\": 0,\n      \"totalDamageDealt\": 0,\n      \"totalDamageTaken\": 0\n    },\n    \"second\": {\n      \"anyAllyAttackedThisTurn\": false,\n      \"board\": [],\n      \"boostPending\": false,\n      \"boostUsedEarly\": false,\n      \"boostUsedLate\": false,\n      \"crests\": [],\n      \"deck\": [],\n      \"deckoutWins\": false,\n      \"destroyedHistory\": [],\n      \"evoCharges\": 0,\n      \"evoCount\": 0,\n      \"evoUsedThisTurn\": false,\n      \"followersDestroyed\": 0,\n      \"graveyard\": [],\n      \"hand\": [],\n      \"hasBoost\": true,\n      \"hp\": 20,\n      \"leaderBarrier\": 0,\n      \"leaderDamageTakenBonus\": 0,\n      \"leaderMaxDamageCap\": null,\n      \"maxHP\": 20,\n      \"maxPP\": 0,\n      \"modeBonus\": 0,\n      \"permPP\": 0,\n      \"playedHistory\": [],\n      \"playsThisTurn\": 0,\n      \"pp\": 0,\n      \"rally\": 0,\n      \"shadows\": 0,\n      \"shikigamiDeathsThisTurn\": [],\n      \"superEvoCharges\": 0,\n      \"totalCardsDrawn\": 0,\n      \"totalCardsPlayed\": 0,\n      \"totalDamageDealt\": 0,\n      \"totalDamageTaken\": 0\n    }\n  },\n  \"rng\": {\n    \"_cursor\": 1,\n    \"_seed\": 31337\n  },\n  \"roundCount\": 1,\n  \"secondPlayerPPBoostPending\": false,\n  \"secondPlayerPPBoostUsedEarly\": false,\n  \"secondPlayerPPBoostUsedLate\": false\n}",
-  "trace": []
+  "initial": {
+    "stateHash": "12955520"
+  },
+  "seed": 31337,
+  "trace": [],
+  "version": "1.0.0"
 }

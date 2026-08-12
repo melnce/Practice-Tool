@@ -13,9 +13,14 @@ export interface RNG {
 }
 
 // --- PRNG core: mulberry32 ---------------------------------------------------
+// Keep internal state as uint32 (>>> 0). Checkpoint arithmetic uses the same
+// truncation so restore() matches the forward stream past the float64 boundary
+// (~2^53 / 0x6d2b79f5 ≈ 4,917,758 draws).
 function mulberry32(a: number) {
+  let state = a >>> 0;
   return function () {
-    let t = (a += 0x6d2b79f5);
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296; // [0,1)
@@ -67,11 +72,10 @@ class MulberryRNG implements RNG {
 
     // P1-1 FIX: Auto-checkpoint at intervals for fast restore
     if (this._cursor % MulberryRNG.CHECKPOINT_INTERVAL === 0) {
-      // The internal state after N calls is seed + N * 0x6d2b79f5
-      // We can compute this directly rather than storing huge state
+      // Internal state after N calls is (seed + N * 0x6d2b79f5) >>> 0
       this._checkpoints.set(
         this._cursor,
-        this._seed + this._cursor * 0x6d2b79f5,
+        (this._seed + Math.imul(this._cursor, 0x6d2b79f5)) >>> 0,
       );
     }
 
@@ -115,7 +119,13 @@ class MulberryRNG implements RNG {
   }
 
   restore(s: { seed: number; cursor: number; uidCounter?: number }): void {
-    this._seed = s.seed;
+    // Checkpoints were computed under the previous seed — drop them on seed change
+    if (s.seed !== this._seed) {
+      this._checkpoints.clear();
+      this._checkpoints.set(0, s.seed >>> 0);
+    }
+
+    this._seed = s.seed >>> 0;
     this._uidCounter = s.uidCounter ?? 0; // Restore UID counter for determinism
 
     // P1-1 FIX: Use checkpoints for O(1) restore when possible
@@ -123,10 +133,10 @@ class MulberryRNG implements RNG {
     let nearestCheckpoint = 0;
     let nearestState = this._seed;
 
-    for (const [cursor, state] of this._checkpoints) {
+    for (const [cursor, checkpointState] of this._checkpoints) {
       if (cursor <= s.cursor && cursor > nearestCheckpoint) {
         nearestCheckpoint = cursor;
-        nearestState = state;
+        nearestState = checkpointState;
       }
     }
 

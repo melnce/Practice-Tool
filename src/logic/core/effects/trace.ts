@@ -114,17 +114,18 @@ export function compareHashArrays(
 
 // =============================================================================
 // GLOBAL TRACE CONTEXT
+// Use globalThis to avoid ESM split-brain (tsx/vitest can load two module copies).
 // =============================================================================
 
-let globalTrace: EffectTraceSink | undefined;
-let hashVerificationEnabled = false;
+const TRACE_KEY = "__EFFECT_TRACE_SINK__";
+const HASH_MODE_KEY = "__EFFECT_HASH_VERIFICATION__";
 
 export function setGlobalTrace(sink: EffectTraceSink | undefined) {
-  globalTrace = sink;
+  (globalThis as any)[TRACE_KEY] = sink;
 }
 
 export function getGlobalTrace(): EffectTraceSink | undefined {
-  return globalTrace;
+  return (globalThis as any)[TRACE_KEY] as EffectTraceSink | undefined;
 }
 
 /**
@@ -132,9 +133,9 @@ export function getGlobalTrace(): EffectTraceSink | undefined {
  * When enabled, every effect completion triggers state hashing.
  */
 export function setHashVerificationMode(enabled: boolean) {
-  hashVerificationEnabled = enabled;
+  (globalThis as any)[HASH_MODE_KEY] = enabled;
 }
 
 export function isHashVerificationEnabled(): boolean {
-  return hashVerificationEnabled;
+  return !!(globalThis as any)[HASH_MODE_KEY];
 }

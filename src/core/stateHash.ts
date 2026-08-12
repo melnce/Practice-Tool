@@ -29,6 +29,10 @@ function canonicalizeState(state: GameState): object {
     // Turn state
     activePlayer: state.activePlayer,
     roundCount: state.roundCount,
+    turnNumber: state.turnNumber,
+    gameTick: state.gameTick,
+    phase: state.phase ?? null,
+    gameStarted: !!state.gameStarted,
 
     // Resources
     blueHP: state.players.first.hp,
@@ -47,6 +51,16 @@ function canonicalizeState(state: GameState): object {
     redEvoCharges: state.players.second.evoCharges,
     blueSuperEvoCharges: state.players.first.superEvoCharges,
     redSuperEvoCharges: state.players.second.superEvoCharges,
+    blueEvoCount: state.players.first.evoCount,
+    redEvoCount: state.players.second.evoCount,
+
+    // Leader / crest / metrics
+    blueLeaderBarrier: state.players.first.leaderBarrier,
+    redLeaderBarrier: state.players.second.leaderBarrier,
+    blueCrests: state.players.first.crests.map(canonicalizeCrest),
+    redCrests: state.players.second.crests.map(canonicalizeCrest),
+    blueTotalDamageDealt: state.players.first.totalDamageDealt,
+    redTotalDamageDealt: state.players.second.totalDamageDealt,
 
     // Zones (canonicalized cards)
     blueHand: state.players.first.hand.map(canonicalizeCard),
@@ -59,6 +73,23 @@ function canonicalizeState(state: GameState): object {
     // P1-4: Use canonicalizeCard for graveyard (was ID only)
     blueGraveyard: state.players.first.graveyard.map(canonicalizeCard),
     redGraveyard: state.players.second.graveyard.map(canonicalizeCard),
+    blueBanish: state.players.first.banish.map(canonicalizeCard),
+    redBanish: state.players.second.banish.map(canonicalizeCard),
+
+    // RNG cursor — required so advanced draws change the hash
+    rng: state.rng.snapshot(),
+  };
+}
+
+function canonicalizeCrest(crest: {
+  name?: string;
+  countdown?: number;
+  counters?: Record<string, number>;
+}): object {
+  return {
+    name: crest.name ?? null,
+    countdown: crest.countdown ?? null,
+    counters: crest.counters ?? {},
   };
 }
 

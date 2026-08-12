@@ -62,7 +62,10 @@ export async function startGame(options: StartGameOptions) {
   await import("../core/card_validation.js").then(({ validateCardDatabase }) =>
     validateCardDatabase(),
   );
-  await Promise.all([loadBlueDeck(blueChoice), loadRedDeck(redChoice)]);
+  // Sequential loads: both enrichers share state.rng (shuffle + makeUid).
+  // Promise.all raced whichever fetch resolved first onto the RNG stream.
+  await loadBlueDeck(blueChoice);
+  await loadRedDeck(redChoice);
 
   // === Faith crest bootstrap: if Sham-Nacha is in a deck, that player starts with Faith ===
   const hasSham = (deck: CardInstance[], hand: CardInstance[]) => {
