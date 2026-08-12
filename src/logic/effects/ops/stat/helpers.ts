@@ -11,6 +11,7 @@ import {
   getHand,
   getHP,
   setHP,
+  getMaxHP,
   setMaxHP,
 } from "../../../../core/playerHelpers.js";
 
@@ -88,6 +89,17 @@ export function applyLeaderStat(
     setMaxHP(state, targetOwner, defense);
     setHP(state, targetOwner, Math.min(getHP(state, targetOwner), defense));
     logEvent("setLeaderMaxHP", { owner: targetOwner, maxHP: defense });
+  } else if (action === "give" || action === "modify" || !action) {
+    // Relative change to max defense (e.g. Lhynkal crest −2)
+    const curMax = getMaxHP(state, targetOwner);
+    const next = Math.max(1, curMax + defense);
+    setMaxHP(state, targetOwner, next);
+    setHP(state, targetOwner, Math.min(getHP(state, targetOwner), next));
+    logEvent("modifyLeaderMaxHP", {
+      owner: targetOwner,
+      delta: defense,
+      maxHP: next,
+    });
   }
 }
 

@@ -24,6 +24,9 @@ export interface CardCondition {
   // Type filters
   type?: string;
 
+  // Class filter (e.g. Abysscraft)
+  class?: string;
+
   // Tribe filter
   tribe?: string;
 
@@ -124,6 +127,11 @@ export function evaluateCardCondition(
     const want = String(cond.type).toLowerCase();
     const have = String(card.type || "").toLowerCase();
     if (have !== want) return false;
+  }
+
+  // Class filter
+  if (cond.class) {
+    if (String(card.class || "") !== String(cond.class)) return false;
   }
 
   // Tribe filter

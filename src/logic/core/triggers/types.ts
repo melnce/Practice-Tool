@@ -54,6 +54,7 @@ export type TriggerEventName =
   | "enemy_super_evolve"
   // Play
   | "enhanced_play" // A card was played paying its Enhance cost
+  | "ally_spell_played" // An allied spell was played (from hand)
   // Board state changes
   | "ally_amulet_destroyed" // Allied amulet destroyed (effect or countdown)
   // Mechanics

@@ -14,6 +14,7 @@ export function getSubjectCard(context: TriggerContext): CardInstance | null {
     context.leavingCard ??
     context.invokedCard ??
     context.playedCard ??
+    context.attacker ??
     null
   );
 }
@@ -96,6 +97,7 @@ export function evalCommonConditions(
     // Extract conditions that apply to the subject card
     if (cond.tribe) sharedCond.tribe = cond.tribe;
     if (cond.name) sharedCond.name = cond.name;
+    if ((cond as any).class) sharedCond.class = String((cond as any).class);
     if (cond.has_keyword) sharedCond.has_keyword = cond.has_keyword;
     if (cond.keywords) sharedCond.keywords = cond.keywords;
     if (cond.base_cost_eq != null) sharedCond.base_cost_eq = cond.base_cost_eq;
@@ -104,6 +106,10 @@ export function evalCommonConditions(
     if (cond.base_cost_lte != null)
       sharedCond.base_cost_lte = cond.base_cost_lte;
     if (cond.cost_changed) sharedCond.cost_changed = cond.cost_changed;
+    if ((cond as any).is_super_evolved != null)
+      sharedCond.is_super_evolved = !!(cond as any).is_super_evolved;
+    if ((cond as any).unevolved != null)
+      sharedCond.unevolved = !!(cond as any).unevolved;
 
     // Apply shared conditions via unified evaluator
     if (Object.keys(sharedCond).length > 0) {

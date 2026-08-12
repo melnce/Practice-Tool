@@ -7,7 +7,8 @@ export type CostTarget =
   | "selected"
   | "pool"
   | "opponent_hand"
-  | "last_drawn";
+  | "last_drawn"
+  | "last_added_to_hand";
 export type CostMode = "reduce" | "set" | "modify" | "increase";
 
 export interface UnifiedCostSpec {
@@ -52,7 +53,7 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
     // ====================================================================
     if ((eff as any).target === undefined) {
       throw new Error(
-        `[cost] Missing required field: "target". Must be "self", "selected", "pool", "opponent_hand", "last_drawn", or a pool spec like "ally:hand". Effect: ${JSON.stringify(eff)}`,
+        `[cost] Missing required field: "target". Must be "self", "selected", "pool", "opponent_hand", "last_drawn", "last_added_to_hand", or a pool spec like "ally:hand". Effect: ${JSON.stringify(eff)}`,
       );
     }
     if ((eff as any).mode === undefined) {
@@ -68,6 +69,7 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
       "pool",
       "opponent_hand",
       "last_drawn",
+      "last_added_to_hand",
     ];
 
     // Card JSON uses selected:follower / selected:amulet; unified op uses "selected" + targetUids

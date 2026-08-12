@@ -15,6 +15,7 @@ import {
 } from "../../../core/playerHelpers.js";
 import type { EnteringKeywordSnapshot } from "../enterKeywords.js";
 import { resumeDeferredDeathIfIdle } from "../cleanup.js";
+import { recordFollowerEnter } from "../followerEnterHistory.js";
 
 export interface PlayFollowerResume {
   player: Player;
@@ -52,6 +53,9 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
 
   const player = resume.player;
   const opponent = opponentOf(player);
+
+  // Match Rally timing: record after Fanfare so X-from-prior-enters excludes self.
+  recordFollowerEnter(state, player, card);
 
   fireTrigger("ally_follower_played", player as any, {
     playedCard: card,

@@ -20,6 +20,7 @@ import type {
 import { runEffects } from "./effects/index.js";
 import { flushDeferredDeathBatch, cleanupDead } from "./cleanup.js";
 import { clearTemporaryBuffs } from "../effects/self.js";
+import { clearTemporaryAttacksPerTurn } from "../effects/attacks.js";
 
 export type TurnBoundaryEvent = "end_of_turn" | "start_of_turn";
 
@@ -217,7 +218,10 @@ export function runEndOfTurnBoundary(endingPlayer: Player) {
   resolveTurnBoundaryQueue(queue, "end_of_turn", endingPlayer);
 
   for (const side of ["first", "second"] as Player[]) {
-    getBoard(state, side).forEach((card) => clearTemporaryBuffs(card));
+    getBoard(state, side).forEach((card) => {
+      clearTemporaryBuffs(card);
+      clearTemporaryAttacksPerTurn(card);
+    });
   }
 }
 

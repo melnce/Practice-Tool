@@ -35,6 +35,11 @@ export type GateCondition =
   | "amulet_count" // Number of amulets >= count
   | "self_cost" // Source card's effective cost equals value
   | "ally_matches" // Any allied board card matches filter (base_cost_gte, type, …)
+  | "unique_tribe_enters" // Distinct named tribe enters this match (tribe + count)
+  | "named_enter_count" // Named follower enters this match >= count
+  | "hand_matches" // Hand cards matching filter (type/tribe/…) >= count
+  | "leader_defense_lte" // Owner leader HP <= count
+  | "leader_defense_gt_enemy" // Owner leader HP > enemy leader HP
 
   // Special gates
   | "skybound_art" // Turn + evolves witnessed >= requirement
@@ -75,6 +80,9 @@ export interface UnifiedGateSpec {
   base_cost_eq?: number;
   base_cost_gte?: number;
   base_cost_lte?: number;
+
+  /** Tribe for unique_tribe_enters / hand_matches filters */
+  tribe?: string;
 
   /** Effects to run if condition passes */
   effects?: Effect[];
@@ -150,6 +158,7 @@ export function normalizeToGateSpec(eff: Effect): UnifiedGateSpec {
     spec.base_cost_gte = parseInt((eff as any).base_cost_gte);
   if ((eff as any).base_cost_lte !== undefined)
     spec.base_cost_lte = parseInt((eff as any).base_cost_lte);
+  if ((eff as any).tribe !== undefined) spec.tribe = String((eff as any).tribe);
 
   return spec;
 }

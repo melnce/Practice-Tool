@@ -13,6 +13,7 @@ import {
   isFirstPlayer,
 } from "../../core/playerHelpers.js";
 import { checkPostBuffTriggers } from "./ops/stat/core.js";
+import { countNamedEnters } from "../core/followerEnterHistory.js";
 
 export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {
   const a = parseInt((eff.attack as any) || 0) || 0;
@@ -161,6 +162,11 @@ export function handleDynamicStatSelf(
     a += sum;
   }
 
+  if (eff.attack_source === "named_enter_count") {
+    const name = String((eff as any).name || sourceCard.name || "");
+    a += countNamedEnters(state, owner, name);
+  }
+
   // Check for dynamic defense source - ADD THIS SECTION
   if (eff.defense_source === "combo") {
     const combo = getPlaysThisTurn(state, owner);
@@ -194,6 +200,11 @@ export function handleDynamicStatSelf(
       0,
     );
     d += sum;
+  }
+
+  if (eff.defense_source === "named_enter_count") {
+    const name = String((eff as any).name || sourceCard.name || "");
+    d += countNamedEnters(state, owner, name);
   }
 
   if (a === 0 && d === 0) return; // No buff to apply

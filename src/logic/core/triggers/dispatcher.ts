@@ -58,6 +58,7 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   invoke: handleGenericEvent,
   loot_fused: handleGenericEvent,
   loot_played: handleGenericEvent,
+  ally_spell_played: handleGenericEvent,
   ally_follower_leaves_field: handleGenericEvent,
   enemy_follower_leaves_field: handleGenericEvent,
   enemy_follower_defense_down: handleGenericEvent,

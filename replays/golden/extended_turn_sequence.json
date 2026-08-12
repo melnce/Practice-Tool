@@ -32,11 +32,11 @@
     }
   ],
   "final": {
-    "stateHash": "52acafa4"
+    "stateHash": "fc70f1dc"
   },
   "id": "extended_turn_sequence",
   "initial": {
-    "stateHash": "e71fe716"
+    "stateHash": "380680b0"
   },
   "seed": 77777,
   "trace": [],

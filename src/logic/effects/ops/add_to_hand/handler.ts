@@ -16,6 +16,7 @@ import type {
 } from "../../../../core/types/index.js";
 import { normalizeToAddToHandSpec } from "./types.js";
 import { normalizeInstanceEnteringHandAsCopy } from "./normalizeHandCopy.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 
 /**
  * Handle the add_to_hand operation.
@@ -78,6 +79,7 @@ function addNamedCards(
   }
 
   // Create and add cards (overflow burns via pushToHand → burnHandOverflow)
+  let added = 0;
   for (let i = 0; i < spec.count; i++) {
     const copy: CardInstance = structuredClone(base);
     copy.uid = state.rng.makeUid();
@@ -91,6 +93,7 @@ function addNamedCards(
     }
 
     if (pushToHand(hand, copy)) {
+      added++;
       (state as any).lastAddedToHand = copy;
       logEvent("add_to_hand", {
         owner: receivingPlayer,
@@ -100,6 +103,7 @@ function addNamedCards(
       });
     }
   }
+  if (added > 0) bumpZoneVersion();
 }
 
 /**
@@ -152,6 +156,7 @@ function addCopiedCards(
   }
 
   // Create copies (overflow burns via pushToHand → burnHandOverflow)
+  let added = 0;
   for (let i = 0; i < spec.count; i++) {
     const copy: CardInstance = structuredClone(cardToCopy);
     copy.uid = state.rng.makeUid();
@@ -168,6 +173,7 @@ function addCopiedCards(
     }
 
     if (pushToHand(hand, copy)) {
+      added++;
       (state as any).lastAddedToHand = copy;
       logEvent("add_to_hand", {
         owner: receivingPlayer,
@@ -178,6 +184,7 @@ function addCopiedCards(
       });
     }
   }
+  if (added > 0) bumpZoneVersion();
 }
 
 /**
