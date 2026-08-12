@@ -245,8 +245,9 @@ function handlePoolBasedBuff(
   if (String(distribution).toLowerCase() === "highest") {
     const stat = String((eff as any).stat || "attack").toLowerCase();
     const getValue = (card: CardInstance) =>
-      Number(stat === "defense" || stat === "hp" ? card.defense : card.attack) ||
-      0;
+      Number(
+        stat === "defense" || stat === "hp" ? card.defense : card.attack,
+      ) || 0;
     const highest = Math.max(...pool.map(getValue));
     pool = pool.filter((card) => getValue(card) === highest);
   }

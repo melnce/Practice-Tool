@@ -266,8 +266,10 @@ registerCondition("leader_defense_gt_enemy", (spec, owner) => {
 
 registerCondition("last_discarded_type", (spec) => {
   if (!spec.type) return false;
-  return String(state.lastDiscardedType || "").toLowerCase() ===
-    String(spec.type).toLowerCase();
+  return (
+    String(state.lastDiscardedType || "").toLowerCase() ===
+    String(spec.type).toLowerCase()
+  );
 });
 
 registerCondition("self_cost", (spec, _owner, sourceCard) => {

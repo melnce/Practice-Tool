@@ -58,7 +58,8 @@ function runAutomaticModePicks(
       const need = parseInt(String(option.requires.earth_rite), 10) || 1;
       paid = consumeEarthSigils(owner, need);
     }
-    if (paid && Array.isArray(option?.effects)) combined.push(...option.effects);
+    if (paid && Array.isArray(option?.effects))
+      combined.push(...option.effects);
   }
 
   appendStep(reason === "random" ? "Random Choice" : "Activate All Modes", {
@@ -133,7 +134,10 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   if (isRandomPick) {
     const picked: any[] = [];
     const bag = available.slice();
-    while (picked.length < selectCount && (unique ? bag.length : available.length)) {
+    while (
+      picked.length < selectCount &&
+      (unique ? bag.length : available.length)
+    ) {
       const pool = unique ? bag : available;
       const index = state.rng.nextInt(pool.length);
       const chosen = pool[index];

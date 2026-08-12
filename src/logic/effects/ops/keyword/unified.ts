@@ -105,10 +105,7 @@ function handleGrant(
     String((eff as any).distribution || "").toLowerCase() === "random";
   if (randomKeywordPool && keywordList.length > 0) {
     const requested =
-      parseInt(
-        String((eff as any).count ?? (eff as any).select ?? 1),
-        10,
-      ) || 1;
+      parseInt(String((eff as any).count ?? (eff as any).select ?? 1), 10) || 1;
     const bag = keywordList.slice();
     const chosen: typeof keywordList = [];
     while (chosen.length < Math.min(requested, bag.length) && bag.length) {

@@ -94,11 +94,7 @@ describe("Unblock round 3 — general engine capabilities", () => {
     state.players.first.deck.push(drawn);
 
     expect(
-      drawCard(
-        state.players.first.hand,
-        state.players.first.deck,
-        "first",
-      ),
+      drawCard(state.players.first.hand, state.players.first.deck, "first"),
     ).toBe(true);
 
     expect(getShadows(state, "first")).toBe(1);
