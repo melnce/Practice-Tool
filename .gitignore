@@ -6,6 +6,14 @@
 # Personal data / notes (do not track)
 decks/*
 !decks/starter_deck.json
+!decks/manifest.json
+!decks/forestcraft_combo.json
+!decks/swordcraft_rally.json
+!decks/runecraft_spellboost.json
+!decks/dragoncraft_overflow.json
+!decks/abysscraft_necromancy.json
+!decks/havencraft_countdown.json
+!decks/portalcraft_artifacts.json
 game_rules/
 
 # Node dependencies

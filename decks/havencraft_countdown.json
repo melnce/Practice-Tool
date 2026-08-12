@@ -1,0 +1,83 @@
+{
+  "class": "Havencraft",
+  "deckName": "Haven Countdown Amulets",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Serene Sanctuary",
+      "count": 3
+    },
+    {
+      "name": "Winged Statue",
+      "count": 3
+    },
+    {
+      "name": "Tikoh, Asclepian Surgeon",
+      "count": 2
+    },
+    {
+      "name": "Pact of the Beast Princess",
+      "count": 3
+    },
+    {
+      "name": "Fox of Purity",
+      "count": 2
+    },
+    {
+      "name": "Mainyu, Darkdweller",
+      "count": 2
+    },
+    {
+      "name": "Winged Lion Statue",
+      "count": 3
+    },
+    {
+      "name": "Holy Shieldmaiden",
+      "count": 2
+    },
+    {
+      "name": "Colette, Barrage Exorcist",
+      "count": 2
+    },
+    {
+      "name": "Angelic Prism Priestess",
+      "count": 2
+    },
+    {
+      "name": "Temple of Repose",
+      "count": 2
+    },
+    {
+      "name": "Avian Statue",
+      "count": 2
+    },
+    {
+      "name": "Shining Disenchantment",
+      "count": 2
+    },
+    {
+      "name": "Agnes, the Swiftblade",
+      "count": 2
+    },
+    {
+      "name": "Salefa, Guardian of Water",
+      "count": 2
+    },
+    {
+      "name": "Wilbert, Desolate Paladin",
+      "count": 2
+    },
+    {
+      "name": "Jeanne, Saintly Knight",
+      "count": 1
+    },
+    {
+      "name": "Leah, Bellringer Angel",
+      "count": 2
+    },
+    {
+      "name": "Seraphic Tidings",
+      "count": 1
+    }
+  ]
+}
