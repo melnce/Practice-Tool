@@ -8,6 +8,7 @@ import {
   initCardDatabase,
   resetCardIndex,
 } from "./cardIndex.js";
+import { initCardSets, resetCardSets } from "./cardSets.js";
 // Re-export types if needed
 export { getCardDetails, getCardById } from "./cardIndex.js";
 
@@ -15,11 +16,7 @@ export { getCardDetails, getCardById } from "./cardIndex.js";
 // Browser Card Loader
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Load cards via fetch (Browser Only).
- * Returns raw data suitable for initCardDatabase.
- */
-export async function loadCardsBrowser(): Promise<BuildCardIndexInput> {
+function browserRoot(): string {
   const win = typeof window !== "undefined" ? (window as any) : {};
   let root = win.APP_ROOT || "/";
 
@@ -32,7 +29,15 @@ export async function loadCardsBrowser(): Promise<BuildCardIndexInput> {
     console.warn("Detected invalid APP_ROOT (5500). Fallback to /");
     root = "/";
   }
+  return root;
+}
 
+/**
+ * Load cards via fetch (Browser Only).
+ * Returns raw data suitable for initCardDatabase.
+ */
+export async function loadCardsBrowser(): Promise<BuildCardIndexInput> {
+  const root = browserRoot();
   const ts = Date.now();
 
   // Parallel fetch for main cards and tokens
@@ -63,14 +68,45 @@ export async function loadCardsBrowser(): Promise<BuildCardIndexInput> {
   };
 }
 
+/** Prefetch every set in cards/index.json for synchronous from_set deck replace. */
+export async function loadCardSetsBrowser(): Promise<
+  Record<string, RawCardData[]>
+> {
+  const root = browserRoot();
+  const ts = Date.now();
+  const indexRes = await fetch(`${root}cards/index.json?v=${ts}`);
+  if (!indexRes.ok) {
+    console.warn(`Card set index failed: ${indexRes.status}`);
+    return {};
+  }
+  const index = (await indexRes.json()) as Record<string, string>;
+  const entries = await Promise.all(
+    Object.values(index).map(async (rel) => {
+      const setId = rel.replace(/^sets\//, "").replace(/\.json$/i, "");
+      const res = await fetch(`${root}cards/${rel}?v=${ts}`);
+      if (!res.ok) {
+        console.warn(`Card set failed: ${rel} (${res.status})`);
+        return [setId, [] as RawCardData[]] as const;
+      }
+      const cards = (await res.json()) as RawCardData[];
+      return [setId, cards] as const;
+    }),
+  );
+  return Object.fromEntries(entries);
+}
+
 /**
  * Main entry point for browser app.
  * Loads cards and initializes the global index.
  */
 export async function loadCardDatabase() {
   try {
-    const data = await loadCardsBrowser();
+    const [data, sets] = await Promise.all([
+      loadCardsBrowser(),
+      loadCardSetsBrowser(),
+    ]);
     initCardDatabase(data);
+    initCardSets(sets);
   } catch (e) {
     console.error("Failed to load card database:", e);
     throw e;
@@ -88,6 +124,7 @@ export function injectCardForTest(card: CardTemplate) {
 
 export function resetCardDatabaseForTests() {
   resetCardIndex();
+  resetCardSets();
 }
 
 // Expose globals for debugging/console access

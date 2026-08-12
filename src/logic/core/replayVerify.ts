@@ -71,18 +71,31 @@ function traceEventEqual(
 // --- 3. Diff Logic ---
 
 export function diffReplays(a: ReplayCapsule, b: ReplayCapsule): ReplayDiff {
-  const seedMatch = a.seed === b.seed;
-  const actionsA = a.actions || [];
-  const actionsB = b.actions || [];
-  const actionCountMatch = actionsA.length === actionsB.length;
+  // Require real numeric seeds — undefined === undefined must not pass
+  const seedMatch = typeof a.seed === "number" && a.seed === b.seed;
+
+  const actionsA = a.actions;
+  const actionsB = b.actions;
+  const actionCountMatch =
+    Array.isArray(actionsA) &&
+    Array.isArray(actionsB) &&
+    actionsA.length === actionsB.length;
 
   const initialHashA = a.initial?.stateHash;
   const initialHashB = b.initial?.stateHash;
-  const initialStateHashMatch = initialHashA === initialHashB;
+  // Require real hash strings — string-shaped capsules previously compared
+  // undefined === undefined and passed vacuously
+  const initialStateHashMatch =
+    typeof initialHashA === "string" &&
+    typeof initialHashB === "string" &&
+    initialHashA === initialHashB;
 
   const finalHashA = a.final?.stateHash;
   const finalHashB = b.final?.stateHash;
-  const finalStateHashMatch = finalHashA === finalHashB;
+  const finalStateHashMatch =
+    typeof finalHashA === "string" &&
+    typeof finalHashB === "string" &&
+    finalHashA === finalHashB;
 
   const traceA = a.trace || [];
   const traceB = b.trace || [];

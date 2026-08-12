@@ -79,8 +79,6 @@ async function main() {
   console.log("Importing engine modules from core...");
 
   // Dynamic imports from src/ (run via tsx — no separate tsc build required)
-  const { runWithReplay } =
-    (await import("../src/logic/core/replay.js")) as any;
   const { diffReplays, formatReplayDiff } =
     (await import("../src/logic/core/replayVerify.js")) as any;
   const { REPLAY_SCENARIOS } =
@@ -89,7 +87,7 @@ async function main() {
     (await import("../src/logic/core/dispatch.js")) as any;
   const { resetGameState, state, createInitialState, resetStateInstance } =
     (await import("../src/core/gameState.js")) as any;
-  const { setGlobalTrace, getGlobalTrace } =
+  const { setGlobalTrace, createArrayTrace } =
     (await import("../src/logic/core/effects/trace.js")) as any;
   const { initReplayState } =
     (await import("../src/logic/core/replayInit.js")) as any;
@@ -98,6 +96,7 @@ async function main() {
     (await import("../src/data/cardLoaderNode.js")) as any;
   const { ReplayInvariantError } =
     (await import("../src/logic/core/replayInvariants.js")) as any;
+  const { hashGameState } = (await import("../src/core/stateHash.js")) as any;
 
   console.log("Engine modules loaded successfully.");
 
@@ -106,18 +105,14 @@ async function main() {
   await initCardDatabaseNode();
   console.log("Card database loaded.");
 
-  // Adapter for dispatch - injects trace globally
+  // Dispatch with a live effect-trace sink (was defined but never called before)
   const applyAction = (
     currentState: unknown,
     action: unknown,
-    traceCtx?: { trace: unknown },
+    sink: unknown,
   ) => {
-    setGlobalTrace(traceCtx?.trace);
-    try {
-      return dispatchAction(currentState as unknown, action as unknown, null);
-    } finally {
-      setGlobalTrace(undefined);
-    }
+    setGlobalTrace(sink);
+    return dispatchAction(currentState as unknown, action as unknown, null);
   };
 
   let failureCount = 0;
@@ -211,7 +206,6 @@ async function main() {
     } else {
       resetGameState(scenario.seed);
     }
-    const initialStateHash = stablePrettyStringify(state);
 
     // Generate actions if dynamic
     let actions: readonly unknown[];
@@ -241,7 +235,11 @@ async function main() {
       actions = scenario.actions!;
     }
 
-    // Execute actions
+    // Real capsule fields — seed/actions/stateHash (not stringified whole-state blobs)
+    const { sink, events } = createArrayTrace();
+    const initialStateHash = hashGameState(state);
+
+    // Execute actions through applyAction so the effect trace is recorded
     fs.appendFileSync(
       logFile,
       `\n[DEBUG] Scenario ${scenario.id} Actions: ${JSON.stringify(actions)} \n`,
@@ -255,15 +253,19 @@ async function main() {
     }
 
     for (const action of actions) {
-      dispatchAction(state, action as any);
+      applyAction(state, action as any, sink);
     }
+    setGlobalTrace(undefined);
 
     const capsule = {
+      version: "1.0.0",
       id: scenario.id,
-      initial: initialStateHash,
-      // Store strict JSON-safe trace
-      trace: JSON.parse(JSON.stringify(getGlobalTrace()?.events ?? [])),
-      final: stablePrettyStringify(state),
+      seed: scenario.seed,
+      actions,
+      initial: { stateHash: initialStateHash },
+      final: { stateHash: hashGameState(state) },
+      // Store strict JSON-safe trace (events live on the createArrayTrace wrapper)
+      trace: JSON.parse(JSON.stringify(events)),
     };
 
     // Compare with golden
