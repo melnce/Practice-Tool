@@ -103,7 +103,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Aura"]
+    "keywords": ["Aura"],
+    "fanfare": []
   },
   {
     "id": "10403110",
@@ -165,7 +166,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10403120",
@@ -283,6 +285,14 @@
           }
         ]
       }
+    ],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nAt the end of your turn, restore 1 defense to all allies.",
+        "name": "Crest"
+      }
     ]
   },
   {
@@ -317,7 +327,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": []
+    "keywords": [],
+    "fanfare": []
   },
   {
     "id": "10411120",
@@ -354,7 +365,8 @@
       }
     ],
     "superevolve": [],
-    "keywords": []
+    "keywords": [],
+    "fanfare": []
   },
   {
     "id": "10411310",
@@ -520,7 +532,15 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (1)</b>\n<b><color=Keyword>Last Words</color></b>: Deal 1 damage to the enemy leader. Add a <b><i><color=Keyword>Starry Sky</color></i></b> to your hand.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10413110",
@@ -761,7 +781,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nOnce on each of your turns, when you play a follower, evolve it.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10421110",
@@ -821,7 +849,8 @@
       }
     ],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10421130",
@@ -847,7 +876,8 @@
       }
     ],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10422110",
@@ -886,7 +916,7 @@
     "class": "Swordcraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10422120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10422120_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -894,7 +924,8 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10422130",
@@ -914,7 +945,8 @@
     "keywords": ["Ambush", "Bane"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10423110",
@@ -1245,7 +1277,8 @@
       }
     ],
     "superevolve": [],
-    "keywords": []
+    "keywords": [],
+    "fanfare": []
   },
   {
     "id": "10431310",
@@ -1487,7 +1520,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "At the start of your turn, deal 1 damage to the enemy leader.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10433310",
@@ -1682,7 +1723,15 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "At the start of your turn, <b><color=Keyword>Earth Rite</color> (1)</b> - Add an <b><i><color=Keyword>Ars Magna</color></i></b> to your hand.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10441110",
@@ -1702,7 +1751,8 @@
     "keywords": ["Ward", "Aura"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10441120",
@@ -1760,7 +1810,8 @@
           }
         ]
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10441310",
@@ -1809,7 +1860,16 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "spell": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nAt the end of your turn, give a random allied follower on the field +1/+1.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10442110",
@@ -2020,7 +2080,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "keywords": []
   },
   {
     "id": "10444110",
@@ -2150,7 +2211,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10451120",
@@ -2187,7 +2249,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10451310",
@@ -2242,7 +2305,15 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nAt the end of your turn, deal 2 damage to a random enemy follower and restore 1 defense to your leader.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10452110",
@@ -2283,7 +2354,8 @@
           }
         ]
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10452120",
@@ -2491,6 +2563,15 @@
           }
         ]
       }
+    ],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nAt the end of your turn, deal 2 damage to your leader.",
+        "name": "Crest"
+      }
     ]
   },
   {
@@ -2603,7 +2684,15 @@
       }
     ],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\n<b><color=Keyword>Last Words</color></b>: Deal 20 damage to the enemy leader.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10461110",
@@ -2637,7 +2726,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "10461120",
@@ -2679,7 +2769,8 @@
       }
     ],
     "superevolve": [],
-    "keywords": []
+    "keywords": [],
+    "fanfare": []
   },
   {
     "id": "10461210",
@@ -2718,7 +2809,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "10462110",
@@ -2852,7 +2944,8 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10463110",
@@ -2892,7 +2985,8 @@
           }
         ]
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10463210",
@@ -2945,7 +3039,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "10464110",
@@ -2990,7 +3085,8 @@
           }
         ]
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10464120",
@@ -3126,7 +3222,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "10472110",
@@ -3177,7 +3274,9 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "10472120",
@@ -3302,7 +3401,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10473310",
@@ -3413,7 +3513,15 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nWhenever an enemy follower with <b><color=Keyword>Storm</color></b> attacks a leader, give it -3/-0 until the end of the turn.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10474120",

@@ -30,7 +30,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10101120",
@@ -61,7 +62,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10101310",
@@ -88,7 +90,8 @@
         "count": 5
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10102110",
@@ -119,7 +122,8 @@
         "amount": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10102310",
@@ -145,7 +149,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10103110",
@@ -171,7 +176,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10103310",
@@ -204,7 +210,8 @@
         "amount": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10104110",
@@ -253,7 +260,8 @@
         "amount": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10104120",
@@ -296,7 +304,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10111110",
@@ -334,7 +343,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10111120",
@@ -371,7 +381,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10111130",
@@ -402,7 +413,8 @@
         "amount_source": "hand_size"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10111140",
@@ -431,7 +443,8 @@
         }
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10111150",
@@ -475,7 +488,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10111310",
@@ -501,7 +515,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10112110",
@@ -533,7 +548,8 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10112120",
@@ -564,7 +580,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10112130",
@@ -598,7 +615,8 @@
         "select": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10112210",
@@ -659,7 +677,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10112310",
@@ -690,7 +710,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10113110",
@@ -737,7 +758,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10113120",
@@ -771,7 +793,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10113130",
@@ -840,7 +863,8 @@
         "defense": 0
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10113210",
@@ -892,7 +916,10 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "evolve": [],
+    "superevolve": []
   },
   {
     "id": "10114110",
@@ -943,7 +970,16 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "Whenever an allied Pixie follower enters the field, give it <b><color=Keyword>Storm</color></b>.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10114120",
@@ -974,7 +1010,8 @@
         "into": "Bramble Burst"
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10114130",
@@ -1020,7 +1057,8 @@
         }
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10121110",
@@ -1050,7 +1088,8 @@
         "defense": 1
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10121120",
@@ -1086,7 +1125,8 @@
         "defense": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10121130",
@@ -1164,7 +1204,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10121150",
@@ -1197,7 +1238,8 @@
         ]
       }
     ],
-    "keywords": ["Rush"]
+    "keywords": ["Rush"],
+    "triggers": []
   },
   {
     "id": "10121310",
@@ -1229,7 +1271,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10122110",
@@ -1395,7 +1438,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ambush"]
+    "keywords": ["Ambush"],
+    "triggers": []
   },
   {
     "id": "10122310",
@@ -1448,7 +1492,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10123110",
@@ -1542,7 +1587,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10123130",
@@ -1579,7 +1625,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10123140",
@@ -1666,7 +1713,8 @@
         "amount": 5
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10124110",
@@ -1703,7 +1751,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10124120",
@@ -1749,7 +1798,8 @@
         "amount": 3
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10124130",
@@ -1798,6 +1848,15 @@
           }
         ]
       }
+    ],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\n<b><color=Keyword>Last Words</color></b>: Summon a <b><i><color=Keyword>Kagemitsu, Enduring Warrior</color></i></b>.",
+        "name": "Crest"
+      }
     ]
   },
   {
@@ -1838,7 +1897,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10131120",
@@ -1876,7 +1936,8 @@
         "name": "Magic Sediment"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10131130",
@@ -1909,7 +1970,8 @@
         "name": "Magic Sediment"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10131140",
@@ -1941,7 +2003,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10131310",
@@ -1982,7 +2045,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10131320",
@@ -2015,7 +2079,8 @@
         "amount": 2,
         "add_amount": "{self.spellboostCount}"
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10132110",
@@ -2053,7 +2118,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10132120",
@@ -2096,7 +2162,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10132130",
@@ -2133,7 +2200,8 @@
         "count": 2
       }
     ],
-    "superevolve": []
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10132310",
@@ -2194,7 +2262,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10132320",
@@ -2241,7 +2310,8 @@
         "reduceCostBy": 1,
         "minCost": 0
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10133110",
@@ -2295,7 +2365,16 @@
       }
     ],
     "superevolve": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (3)</b>\nAt the end of your turn, <b><color=Keyword>Earth Rite</color> (1)</b> - Summon a <b><i><color=Keyword>Guardian Golem</color></i></b>.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10133120",
@@ -2340,7 +2419,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10133130",
@@ -2386,7 +2466,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10133310",
@@ -2430,7 +2511,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10133320",
@@ -2462,7 +2544,8 @@
         "reduceCostBy": 1,
         "minCost": 0
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10134110",
@@ -2537,7 +2620,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10134120",
@@ -2576,7 +2660,8 @@
         "count": 3
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10134310",
@@ -2625,7 +2710,8 @@
         "reduceCostBy": 1,
         "minCost": 0
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10141110",
@@ -2658,7 +2744,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10141120",
@@ -2691,7 +2778,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10141130",
@@ -2717,7 +2805,8 @@
         "select": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10141140",
@@ -2749,7 +2838,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10141150",
@@ -2782,7 +2872,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10141310",
@@ -2808,7 +2899,8 @@
         "amount": 5
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10143210",
@@ -2845,7 +2937,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10142110",
@@ -2876,7 +2970,8 @@
         "select": 1,
         "distribution": "random"
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10142120",
@@ -2909,7 +3004,8 @@
         ]
       }
     ],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10142130",
@@ -2944,7 +3040,8 @@
       }
     ],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10142140",
@@ -2994,7 +3091,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10142310",
@@ -3032,7 +3130,9 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10143110",
@@ -3052,7 +3152,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10143120",
@@ -3090,7 +3191,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10143130",
@@ -3117,7 +3219,8 @@
         "count": 1
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10143140",
@@ -3151,7 +3254,8 @@
         "defense": -9
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10144110",
@@ -3215,7 +3319,16 @@
         "amount": "{last_discarded_cost}"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "At the start of your turn, deal 1 damage to your leader.\nOnce on each of your turns, when your leader's defense is restored, deal 1 damage to it.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10144120",
@@ -3235,7 +3348,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm", "Intimidate"]
+    "keywords": ["Storm", "Intimidate"],
+    "triggers": []
   },
   {
     "id": "10144130",
@@ -3281,7 +3395,8 @@
         "name": "Supreme Silver Dragon"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10151110",
@@ -3362,7 +3477,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10151130",
@@ -3394,7 +3510,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10151140",
@@ -3420,7 +3537,8 @@
         "max_cost": 4
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10151150",
@@ -3458,7 +3576,8 @@
         "amount": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10151310",
@@ -3489,7 +3608,8 @@
         "select": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10152110",
@@ -3538,7 +3658,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10152120",
@@ -3571,7 +3692,8 @@
         "amount": 3
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10152130",
@@ -3608,7 +3730,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10152140",
@@ -3641,7 +3764,8 @@
         "amount": 5
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10152210",
@@ -3679,7 +3803,9 @@
         "op": "add_shadows",
         "amount": 2
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10153110",
@@ -3781,7 +3907,8 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10153130",
@@ -3885,7 +4012,16 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (4)</b>\nAt the end of your turn, deal 1 damage to both leaders.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10153310",
@@ -3919,7 +4055,8 @@
         "amount": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10154110",
@@ -3980,7 +4117,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10154120",
@@ -4054,7 +4192,8 @@
         "distribution": "split_sequential"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10161110",
@@ -4094,7 +4233,8 @@
       }
     ],
     "superevolve": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10161120",
@@ -4114,7 +4254,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward", "Barrier"]
+    "keywords": ["Ward", "Barrier"],
+    "triggers": []
   },
   {
     "id": "10161130",
@@ -4146,7 +4287,8 @@
         "amount": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10161140",
@@ -4232,7 +4374,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10161310",
@@ -4263,7 +4406,8 @@
         "name": "Holy Falcon"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10162110",
@@ -4383,7 +4527,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10162210",
@@ -4425,7 +4570,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10162220",
@@ -4461,7 +4608,11 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10163110",
@@ -4494,7 +4645,8 @@
         "amount_source": "context.destroy_count"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10163120",
@@ -4520,7 +4672,8 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ambush"]
+    "keywords": ["Ambush"],
+    "triggers": []
   },
   {
     "id": "10163130",
@@ -4568,6 +4721,15 @@
           }
         ]
       }
+    ],
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\n<b><color=Keyword>Last Words</color></b>: Summon a <b><i><color=Keyword>Lapis, Shining Seraph</color></i></b> and give it <b><color=Keyword>Storm</color></b>.",
+        "name": "Crest"
+      }
     ]
   },
   {
@@ -4614,7 +4776,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10163220",
@@ -4646,7 +4809,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10164110",
@@ -4694,7 +4859,8 @@
         }
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10164120",
@@ -4730,7 +4896,8 @@
         "defense": 4
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10164130",
@@ -4763,7 +4930,8 @@
         "amount": 3
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10171110",
@@ -4794,7 +4962,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10171120",
@@ -4821,7 +4990,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10171130",
@@ -4854,7 +5024,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10171140",
@@ -4925,7 +5096,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10171320",
@@ -4956,7 +5128,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10172110",
@@ -4994,7 +5167,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10172120",
@@ -5025,7 +5199,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10172130",
@@ -5059,7 +5234,8 @@
         "defense": 0
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10172310",
@@ -5091,7 +5267,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10172320",
@@ -5124,7 +5301,8 @@
         "max_cost": 5
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10173110",
@@ -5160,7 +5338,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10173120",
@@ -5220,7 +5399,8 @@
       }
     ],
     "keywords": [],
-    "superEvolveReplaces": true
+    "superEvolveReplaces": true,
+    "triggers": []
   },
   {
     "id": "10173130",
@@ -5271,7 +5451,8 @@
         "count": 3
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10173140",
@@ -5313,7 +5494,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10173210",
@@ -5355,7 +5537,8 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10174110",
@@ -5417,7 +5600,15 @@
     ],
     "superevolve": [],
     "keywords": [],
-    "triggers": []
+    "triggers": [],
+    "specific_effects": [
+      {
+        "specific_effect_type": 1,
+        "cost": 0,
+        "skill_text": "<b><color=Keyword>Countdown</color> (3)</b>\nAt the end of your turn, if you have 5 cards or less in your hand, draw a card. If you have at least 6, restore 1 defense to your leader.",
+        "name": "Crest"
+      }
+    ]
   },
   {
     "id": "10174120",
@@ -5511,6 +5702,8 @@
         "attack": 1,
         "defense": 1
       }
-    ]
+    ],
+    "evolve": [],
+    "triggers": []
   }
 ]

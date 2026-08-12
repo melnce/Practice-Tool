@@ -31,7 +31,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10001120",
@@ -71,7 +72,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10001130",
@@ -91,7 +93,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10001210",
@@ -125,7 +128,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10002110",
@@ -160,7 +165,8 @@
     ],
     "fanfare": [],
     "keywords": [],
-    "superEvolveReplaces": true
+    "superEvolveReplaces": true,
+    "triggers": []
   },
   {
     "id": "10002120",
@@ -172,7 +178,7 @@
     "class": "Neutral",
     "rarity": "Silver",
     "tribes": [],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10002120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10002120_evo.webp",
     "set": "[10000] Basic",
@@ -180,7 +186,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10002210",
@@ -222,7 +229,9 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "triggers": []
   },
   {
     "id": "10011110",
@@ -248,7 +257,8 @@
         "count": 2
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10011120",
@@ -275,7 +285,8 @@
         "amount": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10011130",
@@ -366,7 +377,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10012110",
@@ -400,7 +412,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10012120",
@@ -427,7 +440,8 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10012310",
@@ -459,7 +473,10 @@
         "distribution": "random_hits"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10021110",
@@ -479,7 +496,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10021120",
@@ -511,7 +529,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10021130",
@@ -531,7 +550,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"]
+    "keywords": ["Storm"],
+    "triggers": []
   },
   {
     "id": "10021310",
@@ -564,7 +584,10 @@
         }
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10022110",
@@ -596,7 +619,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10022120",
@@ -625,7 +649,8 @@
       }
     ],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10022210",
@@ -663,7 +688,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10031110",
@@ -716,7 +742,12 @@
           }
         ]
       }
-    ]
+    ],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": [],
+    "keywords": [],
+    "url": "https://shadowverse.gg/cards/10031110-dazzling-runeknight"
   },
   {
     "id": "10031210",
@@ -759,7 +790,12 @@
           }
         ]
       }
-    ]
+    ],
+    "spell": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": [],
+    "url": "https://shadowverse.gg/cards/10031210-witchs-new-brew"
   },
   {
     "id": "10031310",
@@ -783,7 +819,10 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10031320",
@@ -807,7 +846,10 @@
         "name": "Clay Golem"
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10032110",
@@ -862,7 +904,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10032120",
@@ -888,7 +931,8 @@
         "reduceCostBy": 1,
         "minCost": 0
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10032310",
@@ -925,7 +969,9 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": [],
+    "keywords": []
   },
   {
     "id": "10041110",
@@ -952,7 +998,8 @@
         "select": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10041120",
@@ -972,7 +1019,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10041130",
@@ -998,7 +1046,8 @@
         "amount": 6
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10041310",
@@ -1038,7 +1087,9 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": [],
+    "keywords": []
   },
   {
     "id": "10042110",
@@ -1072,7 +1123,8 @@
     ],
     "fanfare": [],
     "keywords": [],
-    "superEvolveReplaces": true
+    "superEvolveReplaces": true,
+    "triggers": []
   },
   {
     "id": "10042120",
@@ -1105,7 +1157,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10042310",
@@ -1143,7 +1196,9 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": [],
+    "keywords": []
   },
   {
     "id": "10051110",
@@ -1163,7 +1218,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm", "Bane"]
+    "keywords": ["Storm", "Bane"],
+    "triggers": []
   },
   {
     "id": "10051120",
@@ -1189,7 +1245,8 @@
         "amount": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10051130",
@@ -1223,7 +1280,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10051310",
@@ -1271,7 +1329,8 @@
         ]
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10052110",
@@ -1302,7 +1361,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10052120",
@@ -1336,7 +1396,8 @@
       }
     ],
     "fanfare": [],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10052310",
@@ -1367,7 +1428,9 @@
         "source": "deck",
         "count": 2
       }
-    ]
+    ],
+    "triggers": [],
+    "keywords": []
   },
   {
     "id": "10061110",
@@ -1394,7 +1457,8 @@
         "amount": 5
       }
     ],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10061120",
@@ -1414,7 +1478,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"]
+    "keywords": ["Ward"],
+    "triggers": []
   },
   {
     "id": "10061130",
@@ -1448,7 +1513,8 @@
         "defense": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10061210",
@@ -1491,7 +1557,11 @@
           }
         ]
       }
-    ]
+    ],
+    "fanfare": [],
+    "evolve": [],
+    "superevolve": [],
+    "triggers": []
   },
   {
     "id": "10062110",
@@ -1530,7 +1600,8 @@
     ],
     "fanfare": [],
     "keywords": [],
-    "superEvolveReplaces": true
+    "superEvolveReplaces": true,
+    "triggers": []
   },
   {
     "id": "10062120",
@@ -1615,7 +1686,8 @@
           }
         ]
       }
-    ]
+    ],
+    "triggers": []
   },
   {
     "id": "10071110",
@@ -1641,7 +1713,8 @@
         "count": 1
       }
     ],
-    "keywords": ["Rush"]
+    "keywords": ["Rush"],
+    "triggers": []
   },
   {
     "id": "10071120",
@@ -1667,7 +1740,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10071130",
@@ -1687,7 +1761,8 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Bane", "Ward"]
+    "keywords": ["Bane", "Ward"],
+    "triggers": []
   },
   {
     "id": "10071310",
@@ -1723,7 +1798,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10072110",
@@ -1749,7 +1825,8 @@
         "count": 1
       }
     ],
-    "keywords": []
+    "keywords": [],
+    "triggers": []
   },
   {
     "id": "10072120",
@@ -1784,7 +1861,8 @@
     ],
     "fanfare": [],
     "keywords": ["Ward"],
-    "superEvolveReplaces": true
+    "superEvolveReplaces": true,
+    "triggers": []
   },
   {
     "id": "10072210",
