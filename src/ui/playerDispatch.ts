@@ -17,6 +17,7 @@ import {
   isScriptPlaybackActive,
 } from "../logic/script/runtime.js";
 import { reportBlockedOutcome } from "./outcomes.js";
+import { notePuzzlePpBeforePlay } from "../core/puzzle/session.js";
 
 let advancing = false;
 
@@ -47,6 +48,10 @@ export function dispatchPlayerAction(action: PlayerAction): void {
         enemyBoard: [...getBoard(state, opponentOf(side))],
       };
     }
+  }
+
+  if (action.type === "PLAY_CARD") {
+    notePuzzlePpBeforePlay(action.player);
   }
 
   engineDispatch(state, action);

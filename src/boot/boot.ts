@@ -121,6 +121,11 @@ window.addEventListener("DOMContentLoaded", () => {
     initScriptPanel();
   });
 
+  // Puzzle mode (position + goal + checker)
+  void import("../ui/puzzlePanel.js").then(({ initPuzzlePanel }) => {
+    initPuzzlePanel();
+  });
+
   // Decklist paste import / export
   void import("../ui/deckImportPanel.js").then(({ initDeckImportPanel }) => {
     initDeckImportPanel({

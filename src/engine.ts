@@ -48,6 +48,32 @@ export type {
   CheckpointInfo,
 } from "./core/positionStore.js";
 
+export {
+  savePuzzle,
+  listPuzzles,
+  getPuzzle,
+  deletePuzzle,
+  parsePuzzleJson,
+  importPuzzleFromJson,
+  exportPuzzleToJson,
+  startPuzzle,
+  retryPuzzle,
+  stopPuzzle,
+  getPuzzleSessionSnapshot,
+  PUZZLE_SCHEMA_VERSION,
+} from "./core/puzzle/index.js";
+
+export type {
+  PuzzleDefinition,
+  PuzzleGoal,
+  PuzzleSessionSnapshot,
+} from "./core/puzzle/index.js";
+
+export {
+  beginPuzzleAttempt,
+  retryPuzzleAttempt,
+} from "./logic/puzzle/runtime.js";
+
 // Re-exports for consumers (UI/Tests)
 export type { GameState } from "./core/types/index.js";
 // Do not export mutable state directly. Use getState().
