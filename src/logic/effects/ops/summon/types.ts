@@ -17,10 +17,17 @@ import type {
  * - `named`: Summon by card name (token/named card)
  * - `copy`: Copy an existing card on board
  * - `deck`: Random follower from deck
- * - `graveyard`: Reanimate from graveyard (includes "destroyed this match")
+ * - `graveyard`: Reanimate from graveyard
  * - `hand`: Select from hand and summon copy
+ * - `destroyed_match`: Fresh copies from destroyed-this-match history
  */
-export type SummonSource = "named" | "copy" | "deck" | "graveyard" | "hand";
+export type SummonSource =
+  | "named"
+  | "copy"
+  | "deck"
+  | "graveyard"
+  | "hand"
+  | "destroyed_match";
 
 /**
  * Target scope for copy source.
@@ -44,6 +51,7 @@ export type CopyScope = "self" | "target";
  * `{ "op": "summon", "source": "copy", "copy_scope": "self" }`
  * `{ "op": "summon", "source": "deck", "filter": { "type": "Follower" } }`
  * `{ "op": "summon", "source": "graveyard", "cost": 5 }`
+ * `{ "op": "summon", "source": "destroyed_match", "count": 2, "filter": {...}, "distinct_by": "name" }`
  */
 export interface UnifiedSummonSpec {
   /** Source of summon. Default: "named" */
@@ -61,11 +69,17 @@ export interface UnifiedSummonSpec {
   /** Scope for copy source. Default: "self" */
   copy_scope: CopyScope;
 
-  /** Filter criteria (for deck summon). */
+  /** Filter criteria (for deck / destroyed_match summon). */
   filter: SummonFilter | null;
 
   /** Max cost for reanimate. */
   cost: number | null;
+
+  /** Distinct-by key for destroyed_match (e.g. "name"). */
+  distinct_by: string | null;
+
+  /** Distribution hint (random). */
+  distribution: string | null;
 }
 
 /**
@@ -109,7 +123,7 @@ export function normalizeToUnifiedSpec(
   // ========================================================================
   if (eff.source === undefined) {
     throw new Error(
-      `[summon] Missing required field: "source". Must be "named", "copy", "deck", "graveyard", or "hand". Effect: ${JSON.stringify(eff)}`,
+      `[summon] Missing required field: "source". Must be "named", "copy", "deck", "graveyard", "hand", or "destroyed_match". Effect: ${JSON.stringify(eff)}`,
     );
   }
 
@@ -132,6 +146,8 @@ export function normalizeToUnifiedSpec(
     copy_scope: "self",
     filter: null,
     cost: null,
+    distinct_by: null,
+    distribution: null,
   };
 
   // Parse common fields
@@ -143,6 +159,12 @@ export function normalizeToUnifiedSpec(
   // Parse filter
   if (eff.filter) spec.filter = eff.filter as SummonFilter;
   if (eff.condition) spec.filter = eff.condition as SummonFilter;
+  if (typeof eff.distinct_by === "string") {
+    spec.distinct_by = eff.distinct_by.trim() || null;
+  }
+  if (typeof eff.distribution === "string") {
+    spec.distribution = eff.distribution.trim() || null;
+  }
 
   // Parse owner
   if (eff.owner === "enemy" || op === "summon_named_enemy") {

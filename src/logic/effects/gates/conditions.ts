@@ -228,6 +228,54 @@ registerCondition("field_matches", (spec, _owner, sourceCard) => {
   return countBoardMatches(field, spec, sourceCard) >= (spec.count ?? 1);
 });
 
+/**
+ * True if the field has a card other than playedCard/source whose base cost
+ * matches the played card's base cost. Used by World of Games.
+ */
+registerCondition("field_other_same_base_cost", (spec, _owner, sourceCard) => {
+  const played =
+    (spec as any).playedCard ||
+    (state as any).__lastPlayedCard ||
+    sourceCard ||
+    null;
+  if (!played) return false;
+  const base =
+    played.base_cost !== undefined
+      ? Number(played.base_cost)
+      : parseInt(String(played.cost), 10) || 0;
+  const field = [
+    ...(getBoard(state, "first") || []),
+    ...(getBoard(state, "second") || []),
+  ];
+  return field.some((c) => {
+    if (!c || c.uid === played.uid) return false;
+    const cb =
+      c.base_cost !== undefined
+        ? Number(c.base_cost)
+        : parseInt(String(c.cost), 10) || 0;
+    return cb === base;
+  });
+});
+
+/** True if the most recently selected card matches type/ally filters. */
+registerCondition("selected_matches", (spec, owner) => {
+  const selected =
+    (state as any).__lastSelected || (state as any).lastSelected?.[0] || null;
+  if (!selected) return false;
+  if (spec.type) {
+    if (
+      String(selected.type || "").toLowerCase() !==
+      String(spec.type).toLowerCase()
+    ) {
+      return false;
+    }
+  }
+  if (spec.is_ally === true && selected.owner !== owner) return false;
+  if (spec.is_ally === false && selected.owner === owner) return false;
+  if ((spec as any).ally === true && selected.owner !== owner) return false;
+  return true;
+});
+
 registerCondition("unique_tribe_enters", (spec, owner) => {
   const tribe = String(spec.tribe || "Artifact");
   const need = spec.count ?? spec.at_least ?? 1;

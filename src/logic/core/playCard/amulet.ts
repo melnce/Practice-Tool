@@ -17,6 +17,7 @@ import { applyKeywordsFromList } from "../keywords.js";
 import { initAmulet } from "../../effects/ops/summon_ops/init.js";
 import { getBoard } from "../../../core/playerHelpers.js";
 import { bumpZoneVersion, stampBoardEntryTs } from "../triggers/utils.js";
+import { fireTrigger } from "../triggers.js";
 
 /**
  * Play an amulet card. Returns PlayOutcome without rendering.
@@ -53,6 +54,11 @@ export function playAmulet(
     }
     runEffects([...card.fanfare], player, card, { enteringCard: card });
   }
+
+  (state as any).__lastPlayedCard = card;
+  fireTrigger("ally_card_played", player as any, {
+    playedCard: card,
+  });
 
   if (state.pendingTargetEffect) {
     return { kind: "paused" };

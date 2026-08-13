@@ -51,6 +51,8 @@ Split an op into sub-modules when:
 | `targeting/` (core)  | `parser.ts`, `context.ts`, `filters.ts`, `types.ts` | Full split           |
 | `cardFilter/` (core) | `types.ts`, `normalize.ts`, `predicates.ts`         | Pure filter module   |
 | `draw.ts`            | Facade using CardFilter                             | Uses external module |
+| `summon/`            | includes `destroyed_match` source                   | Match history summon |
+| `sequence.ts`        | Sticky EOT ability index                            | Per-card counters    |
 
 ## 5. Guardrails
 

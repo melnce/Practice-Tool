@@ -81,10 +81,12 @@ export function handleTransform(
 
   const mode = (eff.mode || "all") as TransformMode;
   const into = String(eff.into || eff.name || "").trim();
+  const hasIntoSource =
+    (eff as any).into_source && typeof (eff as any).into_source === "object";
 
-  if (!into && zone !== "hand" && zone !== "deck") {
+  if (!into && !hasIntoSource && zone !== "hand" && zone !== "deck") {
     throw new Error(
-      `[transform] Missing required field: "into". ` +
+      `[transform] Missing required field: "into" (or into_source). ` +
         `Effect: ${JSON.stringify(eff)}`,
     );
   }
@@ -134,6 +136,20 @@ export function handleTransform(
         targets = targets.filter((c) => c.uid !== ctx.sourceCard?.uid);
       }
 
+      // into_source: sample transform destination from a zone (per-target RNG)
+      const intoSource = (eff as any).into_source;
+      if (intoSource && typeof intoSource === "object") {
+        transformBoardFromSource(targets, owner, intoSource);
+        return;
+      }
+
+      if (!into) {
+        throw new Error(
+          `[transform] Missing required field: "into" (or into_source). ` +
+            `Effect: ${JSON.stringify(eff)}`,
+        );
+      }
+
       if (wantAll) {
         for (const t of targets) transformTarget(t, into);
         return;
@@ -173,6 +189,55 @@ export function handleTransform(
 // ========================================================================
 // INTERNAL TRANSFORM HELPERS
 // ========================================================================
+
+/**
+ * Transform each board target into a random card sampled from a source zone.
+ * Each target gets an independent RNG roll (per_target defaults true).
+ *
+ * into_source: {
+ *   zone: "ally:deck",
+ *   filter: { type: "Follower" },
+ *   pick: "random",
+ *   per_target: true
+ * }
+ */
+function transformBoardFromSource(
+  targets: CardInstance[],
+  owner: Player,
+  intoSource: Record<string, any>,
+): void {
+  const zoneRaw = String(intoSource.zone || "ally:deck").toLowerCase();
+  const sourceOwner: Player = zoneRaw.includes("enemy")
+    ? owner === "first"
+      ? "second"
+      : "first"
+    : owner;
+  const sourceDeck = getDeck(state, sourceOwner);
+  const filter = intoSource.filter || {};
+  const perTarget = intoSource.per_target !== false;
+
+  const candidates = sourceDeck.filter((c) => c && matchesFilter(c, filter));
+  if (!candidates.length || !targets.length) return;
+
+  if (!perTarget) {
+    const pick = candidates[state.rng.nextInt(candidates.length)];
+    if (!pick) return;
+    for (const t of targets) transformTarget(t, String(pick.name));
+    return;
+  }
+
+  for (const t of targets) {
+    // Re-read live deck each roll so identity stays faithful if deck mutates;
+    // for Grandeur the deck is unchanged, but rolls remain independent.
+    const live = getDeck(state, sourceOwner).filter(
+      (c) => c && matchesFilter(c, filter),
+    );
+    if (!live.length) continue;
+    const pick = live[state.rng.nextInt(live.length)];
+    if (!pick) continue;
+    transformTarget(t, String(pick.name));
+  }
+}
 
 /**
  * Check if a card matches the filter criteria.

@@ -55,6 +55,7 @@ export type TriggerEventName =
   // Play
   | "enhanced_play" // A card was played paying its Enhance cost
   | "ally_spell_played" // An allied spell was played (from hand)
+  | "ally_card_played" // Any allied card was played (follower/spell/amulet)
   | "ally_draw" // Owner drew a card (board/crest listeners)
   | "when_drawn" // The drawn card itself (source: "hand")
   // Board state changes

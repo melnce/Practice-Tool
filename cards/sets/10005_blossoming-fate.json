@@ -98,9 +98,42 @@
     "url": "https://shadowverse.gg/cards/10503210-world-of-games",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "keywords": [
+      {
+        "name": "countdown",
+        "count": 5
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "ally_card_played",
+        "source": "board",
+        "condition": {
+          "not_self": true,
+          "field_other_same_base_cost": true
+        },
+        "effects": [
+          {
+            "op": "countdown",
+            "action": "advance",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10503310",
@@ -1392,7 +1425,22 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "transform",
+        "target": "ally:follower",
+        "distribution": "all",
+        "into_source": {
+          "zone": "ally:deck",
+          "filter": {
+            "type": "Follower"
+          },
+          "pick": "random",
+          "per_target": true
+        }
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10534110",
@@ -1741,10 +1789,27 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10543110-ruinbringer",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "banish",
+        "target": "ally:deck",
+        "distribution": "all",
+        "filters": {
+          "cost_in": [1, 3, 5, 7, 9]
+        },
+        "store_count_as": "banish_count"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "distribution": "split_sequential",
+        "amount_source": "context.banish_count"
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10543310",
@@ -2304,11 +2369,51 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10554110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10554110-milteo-luzen",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "destroy",
+        "target": "all:follower",
+        "distribution": "random",
+        "count": 6,
+        "exclude": ["context.sourceCard"]
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Milteo & Luzen",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10554110_token.webp",
+        "description": "Allied followers' Fanfare and Enhance abilities don't activate.\nWhenever you play a follower, evolve it.",
+        "passives": ["suppress_fanfare_enhance"],
+        "triggers": [
+          {
+            "event": "ally_follower_played",
+            "effects": [
+              {
+                "op": "evolve",
+                "target": "played_card",
+                "mode": "normal"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "graveyard",
+        "max_cost": 4
+      },
+      {
+        "op": "summon",
+        "source": "graveyard",
+        "max_cost": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -2316,7 +2421,8 @@
         "skill_text": "Allied followers' <b><color=Keyword>Fanfare</color></b> and <b><color=Keyword>Enhance</color></b> abilities don't activate.\nWhenever you play a follower, evolve it.",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10554120",
@@ -2334,10 +2440,47 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10554120-shakdoh-nightblossom",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "repeat_effect",
+        "count": 2,
+        "effects": [
+          {
+            "op": "return",
+            "destination": "deck",
+            "select": "all",
+            "target": "ally:hand"
+          },
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": "{last_returned}"
+          },
+          {
+            "op": "gate",
+            "condition": "hand_same_cost_gte",
+            "count": 4,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:any",
+                "amount": 4,
+                "distribution": "all"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10561110",
@@ -2777,7 +2920,107 @@
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Kukishiro, Mistbloom",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10564120_token.webp",
+        "description": "During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a Fox of Purity or Holy Falcon at random.\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy Fox of Purity or Holy Falcon at random.",
+        "triggers": [
+          {
+            "event": "ally_draw",
+            "condition": {
+              "whose_turn": "owner",
+              "cost_in": [1, 3, 5]
+            },
+            "effects": [
+              {
+                "op": "mode",
+                "pick": "random",
+                "select_count": 1,
+                "options": [
+                  {
+                    "label": "Fox of Purity",
+                    "effects": [
+                      {
+                        "op": "summon",
+                        "source": "named",
+                        "name": "Fox of Purity",
+                        "count": 1
+                      }
+                    ]
+                  },
+                  {
+                    "label": "Holy Falcon",
+                    "effects": [
+                      {
+                        "op": "summon",
+                        "source": "named",
+                        "name": "Holy Falcon",
+                        "count": 1
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "event": "ally_draw",
+            "condition": {
+              "whose_turn": "owner",
+              "cost_in": [2, 4, 6]
+            },
+            "effects": [
+              {
+                "op": "mode",
+                "pick": "random",
+                "select_count": 1,
+                "options": [
+                  {
+                    "label": "Enemy Fox of Purity",
+                    "effects": [
+                      {
+                        "op": "summon",
+                        "source": "named",
+                        "name": "Fox of Purity",
+                        "count": 1,
+                        "owner": "enemy"
+                      }
+                    ]
+                  },
+                  {
+                    "label": "Enemy Holy Falcon",
+                    "effects": [
+                      {
+                        "op": "summon",
+                        "source": "named",
+                        "name": "Holy Falcon",
+                        "count": 1,
+                        "owner": "enemy"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "op": "return",
+        "destination": "deck",
+        "target": "ally:hand",
+        "select": 2,
+        "select_mode": "random"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -2785,7 +3028,8 @@
         "skill_text": "During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10571110",
@@ -3129,9 +3373,54 @@
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10574120-imari-dewdrop",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2,
+        "filters": {
+          "type": "Spell",
+          "cost_eq": 1
+        },
+        "distinct_by": "name"
+      }
+    ],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_spell_played",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Imari's Little Buddies",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1,
+        "filters": {
+          "type": "Spell"
+        }
+      }
+    ],
+    "spell": []
   }
 ]

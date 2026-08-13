@@ -319,6 +319,7 @@ export type MiscOps = Extract<
   | "mode_bonus"
   | "nested_effects"
   | "repeat_effect"
+  | "sequence"
   | "replicate"
   | "boost_skybound_art_hand"
 >;

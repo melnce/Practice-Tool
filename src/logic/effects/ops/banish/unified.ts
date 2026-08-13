@@ -19,6 +19,7 @@ import {
   banishSelf,
   banishDeckDuplicates,
   banishAllEnemyCopies,
+  banishFilteredFromDeck,
 } from "./primitives.js";
 
 // ============================================================================
@@ -49,12 +50,22 @@ export function handleBanish(
     for (const t of targets) {
       if (banishCard(t, "direct")) count++;
     }
+    storeBanishCount(spec, ctx, count);
     return count;
   }
 
-  // Handle special scopes first
+  // Handle special scopes before zone routes (deck_duplicates uses ally:deck target)
   if (spec.scope) {
-    return handleSpecialScope(spec, owner, ctx);
+    const count = handleSpecialScope(spec, owner, ctx);
+    if (count !== "pending") storeBanishCount(spec, ctx, count);
+    return count;
+  }
+
+  // Filtered deck banish (e.g. all odd-cost cards) — requires filters
+  if (targetStr.includes(":deck")) {
+    const count = banishFilteredFromDeck(owner, spec.filters);
+    storeBanishCount(spec, ctx, count);
+    return count;
   }
 
   // Get target pool
@@ -72,7 +83,10 @@ export function handleBanish(
   // Apply filters
   const filtered = applyFilters(pool, spec.filters);
 
-  if (!filtered.length) return 0;
+  if (!filtered.length) {
+    storeBanishCount(spec, ctx, 0);
+    return 0;
+  }
 
   // Dispatch by distribution
   let result: "pending" | number;
@@ -91,7 +105,18 @@ export function handleBanish(
       break;
   }
 
+  if (result !== "pending") storeBanishCount(spec, ctx, result);
   return result;
+}
+
+function storeBanishCount(
+  spec: UnifiedBanishSpec,
+  context: BanishContext,
+  count: number,
+): void {
+  if (!spec.store_count_as) return;
+  if (!context.variables) context.variables = {};
+  context.variables[spec.store_count_as] = count;
 }
 
 // ============================================================================

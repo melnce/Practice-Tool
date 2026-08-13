@@ -59,10 +59,20 @@ export function registerCombatEffects() {
     if (!ctx.context || typeof ctx.context !== "object") {
       (ctx as { context: Record<string, unknown> }).context = {};
     }
-    const banishCtx = ctx.context as Record<string, unknown>;
-    banishCtx.sourceCard = ctx.sourceCard;
-    banishCtx.owner = ctx.owner;
-    const result = handleBanish(eff, ctx.owner, ctx.queue, banishCtx as any);
+    const banishCtx = {
+      ...(ctx.context as object),
+      sourceCard: ctx.sourceCard,
+      owner: ctx.owner,
+    } as any;
+    const result = handleBanish(eff, ctx.owner, ctx.queue, banishCtx);
+
+    // Propagate store_count_as variables like destroy
+    if (banishCtx.variables) {
+      const sharedCtx = ctx.context as any;
+      if (!sharedCtx.variables) sharedCtx.variables = {};
+      Object.assign(sharedCtx.variables, banishCtx.variables);
+    }
+
     if (result === "pending") return "pending";
   });
 

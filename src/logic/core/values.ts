@@ -80,6 +80,9 @@ export function resolveDynamicValue(
       (state as any).lastDrawnCards?.[0] ?? (state as any).lastDrawnCard;
     return parseInt(String(last?.cost ?? 0), 10) || 0;
   }
+  if (s === "{last_returned}" || s === "{last_returned_count}") {
+    return parseInt(String((state as any).lastReturnedCount ?? 0), 10) || 0;
+  }
   if (s === "{hand_size}") {
     // if owner provided, resolve for them. If not, default to 0 or derive from source?
     // Safer to require owner in context for non-dependent ops.

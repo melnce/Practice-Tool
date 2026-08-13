@@ -60,6 +60,12 @@ export interface Crest {
   // Keywords (e.g., ["Last Words"])
   keywords?: string[];
 
+  /**
+   * Continuous crest passives (general; no hardcoded crest names).
+   * Example: "suppress_fanfare_enhance"
+   */
+  passives?: string[];
+
   // Phase 1: Unified tracking store (same pattern as CardInstance)
   __onceByTurn?: Record<string, number>;
 }
@@ -71,6 +77,20 @@ function findCrest(owner: Player, name: string) {
   const list = getCrests(owner) || [];
   return list.find(
     (c) => String(c.name).toLowerCase() === String(name).toLowerCase(),
+  );
+}
+
+/** True if any of the owner's crests declares the given continuous passive. */
+export function playerHasCrestPassive(owner: Player, passive: string): boolean {
+  const want = String(passive || "")
+    .trim()
+    .toLowerCase();
+  if (!want) return false;
+  const crests = getCrests(owner) || [];
+  return crests.some(
+    (c) =>
+      Array.isArray(c.passives) &&
+      c.passives.some((p) => String(p).toLowerCase() === want),
   );
 }
 
@@ -113,6 +133,9 @@ export function handleGainCrest(eff: Effect, owner: Player) {
     owner: targetOwner,
     // Keywords (e.g., ["LastWords"]) - needed for Last Words detection
     keywords: Array.isArray((eff as any).keywords) ? (eff as any).keywords : [],
+    passives: Array.isArray((eff as any).passives)
+      ? (eff as any).passives.map(String)
+      : [],
     __onceByTurn: {}, // Initialize tracking store
     insertionTs: allocateInsertionTs(),
   } as Crest;

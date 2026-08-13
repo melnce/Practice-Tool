@@ -142,6 +142,14 @@ export function runEffects(
 
   if (effects.length === 0) return;
 
+  // Durable shared context so store_count_as / amount_source survive across ops
+  // even when the caller omitted a context object (e.g. whenRunEffects).
+  if (!context || typeof context !== "object") {
+    context = { variables: {} };
+  } else if (!context.variables || typeof context.variables !== "object") {
+    context.variables = {};
+  }
+
   const queue = [...effects]; // Shallow copy to process
 
   const runDepth = ((state as any)._runEffectsDepth ?? 0) as number;

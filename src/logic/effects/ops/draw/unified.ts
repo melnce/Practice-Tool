@@ -12,6 +12,10 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
+import {
+  normalizeCardFilter,
+  buildCardPredicate,
+} from "../../../core/cardFilter/index.js";
 
 import type { UnifiedDrawSpec, DrawCount } from "./types.js";
 
@@ -32,6 +36,51 @@ function getComboCount(player: Player): number {
   return (state as any).turnData?.[player]?.cardsPlayedThisTurn ?? 0;
 }
 
+/**
+ * Draw filtered cards from deck via seeded RNG (without replacement).
+ * Moves each pick to the top of the deck then uses drawCard so overflow,
+ * lastDrawn tracking, and ally_draw / when_drawn triggers stay consistent.
+ */
+function drawFiltered(
+  drawingPlayer: Player,
+  count: number,
+  filters: Record<string, any>,
+  distinctBy: string | null,
+): number {
+  const hand = getHand(drawingPlayer);
+  const deck = getDeck(drawingPlayer);
+  const predicate = buildCardPredicate(normalizeCardFilter(filters));
+  const distinctNames = distinctBy?.toLowerCase() === "name";
+  const seenNames = new Set<string>();
+  let drawn = 0;
+
+  for (let i = 0; i < count; i++) {
+    const candidates: number[] = [];
+    for (let idx = 0; idx < deck.length; idx++) {
+      const card = deck[idx];
+      if (!card || !predicate(card)) continue;
+      if (distinctNames && seenNames.has(String(card.name))) continue;
+      candidates.push(idx);
+    }
+    if (!candidates.length) break;
+
+    const pickPos = state.rng.nextInt(candidates.length);
+    const deckIdx = candidates[pickPos]!;
+    const card = deck[deckIdx];
+    if (!card) break;
+
+    if (distinctNames) seenNames.add(String(card.name));
+
+    // Move chosen card to top of deck (end of array), then draw normally.
+    if (deckIdx !== deck.length - 1) {
+      deck.splice(deckIdx, 1);
+      deck.push(card);
+    }
+    if (drawCard(hand, deck, drawingPlayer)) drawn++;
+  }
+  return drawn;
+}
+
 // ============================================================================
 // UNIFIED HANDLER
 // ============================================================================
@@ -42,6 +91,9 @@ function getComboCount(player: Player): number {
  * Semantic: Stochastic card acquisition from deck. Thins deck.
  * For token generation, use "add" op.
  * For card duplication, use "copy" op.
+ *
+ * When filters are present, picks randomly among matching deck cards
+ * (seeded RNG). Supports distinct_by: "name".
  *
  * @param eff - The draw effect from card JSON
  * @param owner - The player who triggered the effect
@@ -66,6 +118,22 @@ export function handleDraw(
   // Resolve count
   const count = resolveCount(spec.count, drawingPlayer);
   if (count <= 0) return;
+
+  if (spec.filters && Object.keys(spec.filters).length > 0) {
+    const n = drawFiltered(
+      drawingPlayer,
+      count,
+      spec.filters,
+      spec.distinct_by,
+    );
+    logEvent("draw_filtered", {
+      owner: drawingPlayer,
+      count: n,
+      filters: spec.filters,
+      distinct_by: spec.distinct_by,
+    });
+    return;
+  }
 
   // Execute draw
   logEvent("draw", { owner: drawingPlayer, count });
