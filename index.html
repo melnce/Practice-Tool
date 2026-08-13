@@ -400,6 +400,63 @@
           title="Sparring line status"
           >Line: none</span
         >
+        <span class="practice-sep" aria-hidden="true"></span>
+        <button
+          id="savePuzzleBtn"
+          title="Save current position as a puzzle (goal + turn limit)"
+        >
+          Save Puzzle
+        </button>
+        <select id="puzzleSolverSelect" title="Which side solves the puzzle">
+          <option value="first">Solver: Blue</option>
+          <option value="second">Solver: Red</option>
+        </select>
+        <select
+          id="puzzleSelect"
+          title="Saved puzzles (session memory — export to keep)"
+          disabled
+        >
+          <option value="">(no puzzles)</option>
+        </select>
+        <button
+          id="loadPuzzleBtn"
+          title="Load and attempt selected puzzle"
+          disabled
+        >
+          Play
+        </button>
+        <button
+          id="retryPuzzleBtn"
+          title="Retry puzzle from the exact starting position"
+          disabled
+        >
+          Retry
+        </button>
+        <button id="deletePuzzleBtn" title="Delete selected puzzle" disabled>
+          Del Puzzle
+        </button>
+        <button
+          id="exportPuzzleBtn"
+          title="Export selected puzzle as JSON"
+          disabled
+        >
+          Export Puzzle
+        </button>
+        <button id="importPuzzleBtn" title="Import puzzle JSON file">
+          Import Puzzle
+        </button>
+        <input
+          id="importPuzzleInput"
+          type="file"
+          accept="application/json,.json,.svwb-puzzle.json"
+          hidden
+        />
+        <span
+          id="puzzleStatus"
+          class="checkpoint-status"
+          title="Active puzzle status"
+          >Puzzle: none</span
+        >
       </div>
     </header>
     <div

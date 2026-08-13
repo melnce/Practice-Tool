@@ -13,6 +13,7 @@ import { getGlobalCardIndex } from "../data/cardIndex.js";
 import { collectSetIds, formatSetBadge } from "../data/formats.js";
 import { maybeAdvanceScriptFromUi } from "./playerDispatch.js";
 import { syncSeedDisplay } from "./seedDisplay.js";
+import { getPuzzleSessionSnapshot } from "../core/puzzle/session.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -251,7 +252,14 @@ function updateBoostPipsUI() {
 
 function updateGameOverOverlay() {
   let overlay = byId("gameOverOverlay");
-  if (state.phase !== "gameover") {
+  // Puzzle attempt owns the terminal UI — keep rematch from fighting Retry.
+  const puzzleStatus = getPuzzleSessionSnapshot().status;
+  const puzzleBusy =
+    puzzleStatus === "active" ||
+    puzzleStatus === "solved" ||
+    puzzleStatus === "failed";
+
+  if (state.phase !== "gameover" || puzzleBusy) {
     if (overlay) overlay.style.display = "none";
     return;
   }

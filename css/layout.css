@@ -38,6 +38,38 @@
   color: #f0d78c;
 }
 
+.checkpoint-status.diverged {
+  opacity: 1;
+  font-weight: 600;
+  color: #f0a0a0;
+}
+
+.checkpoint-status.solved {
+  opacity: 1;
+  font-weight: 600;
+  color: #9ad7c8;
+}
+
+#puzzleSelect {
+  max-width: 240px;
+  min-width: 140px;
+}
+
+#puzzleResultOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3600;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+#puzzleResultOverlay .puzzle-result-card {
+  pointer-events: auto;
+}
+
 #turnControls {
   position: fixed;
   top: 50%;
