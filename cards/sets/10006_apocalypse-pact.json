@@ -2773,9 +2773,60 @@
     "url": "https://shadowverse.gg/cards/10663210-sublime-eld-tome",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "countdown",
+        "count": 2
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "destroyed_match",
+            "count": 1,
+            "filter": {
+              "type": "Amulet",
+              "hasLastWords": true,
+              "base_cost_lte": 2
+            },
+            "distribution": "random"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "select",
+        "target": "any:any",
+        "select": 1,
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          },
+          {
+            "op": "gate",
+            "condition": "selected_matches",
+            "type": "Amulet",
+            "is_ally": true,
+            "effects": [
+              {
+                "op": "pp",
+                "action": "recover",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10664110",
@@ -2793,10 +2844,53 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10664110-kandima-sublime-hatred",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "select",
+        "target": "any:any",
+        "select": 1,
+        "condition": {
+          "not_self": true
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "selected"
+          },
+          {
+            "op": "gate",
+            "condition": "selected_matches",
+            "type": "Amulet",
+            "is_ally": true,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3,
+                "distribution": "all"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "destroyed_match",
+        "count": 2,
+        "filter": {
+          "type": "Amulet",
+          "hasLastWords": true,
+          "base_cost_lte": 2
+        },
+        "distinct_by": "name",
+        "distribution": "random"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10664120",

@@ -142,6 +142,64 @@ export function banishDeckDuplicates(owner: Player): number {
 }
 
 /**
+ * Banish all deck cards matching a filter (cost_in / type / etc).
+ * Does not fire leave-field triggers (cards were never on field).
+ * @returns count banished
+ */
+export function banishFilteredFromDeck(
+  owner: Player,
+  filters: Record<string, any> | null,
+): number {
+  const [deck, bzone] = getDeckAndBanish(owner);
+  if (!deck.length) return 0;
+
+  const costInRaw = filters?.cost_in ?? filters?.base_cost_in ?? null;
+  const costIn = Array.isArray(costInRaw)
+    ? costInRaw.map((n) => parseInt(String(n), 10)).filter(Number.isFinite)
+    : null;
+  const wantType = filters?.type ? String(filters.type).toLowerCase() : null;
+
+  // Refuse unfiltered deck wipe — callers must supply cost_in / type / etc.
+  if (!filters || (!wantType && !(costIn && costIn.length))) {
+    logEvent("banishFilteredFromDeck_noFilter", { owner, filters });
+    return 0;
+  }
+
+  const kept: CardInstance[] = [];
+  const removed: CardInstance[] = [];
+
+  for (const card of deck) {
+    if (!card) continue;
+    const cost = parseInt(String(card.cost), 10) || 0;
+    const typeOk =
+      !wantType || String(card.type || "").toLowerCase() === wantType;
+    const costOk = !costIn || costIn.includes(cost);
+    if (typeOk && costOk) {
+      removed.push(card);
+    } else {
+      kept.push(card);
+    }
+  }
+
+  deck.length = 0;
+  deck.push(...kept);
+
+  if (bzone && removed.length) {
+    for (const card of removed) {
+      card.zone = "banished";
+      bzone.push(card);
+    }
+  }
+
+  logEvent("banishFilteredFromDeck", {
+    owner,
+    removed: removed.length,
+    filters,
+  });
+  return removed.length;
+}
+
+/**
  * Banish all enemy cards with same name as selected card.
  * @returns count of cards banished
  */

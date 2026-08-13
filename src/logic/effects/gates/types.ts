@@ -36,6 +36,8 @@ export type GateCondition =
   | "self_cost" // Source card's effective cost equals value
   | "ally_matches" // Allied board cards matching filter meet count
   | "field_matches" // Cards across both boards matching filter meet count
+  | "field_other_same_base_cost" // Field has another card with playedCard's base cost
+  | "selected_matches" // __lastSelected / selectedCard matches filter
   | "unique_tribe_enters" // Distinct named tribe enters this match (tribe + count)
   | "named_enter_count" // Named follower enters this match >= count
   | "hand_matches" // Hand cards matching filter (type/tribe/…) >= count
@@ -81,6 +83,10 @@ export interface UnifiedGateSpec {
 
   /** Exclude the source card from ally_matches / field_matches */
   exclude_self?: boolean;
+
+  /** Ally/enemy filter for selected_matches */
+  is_ally?: boolean;
+  ally?: boolean;
 
   /** Class filter for board/hand matching conditions */
   class?: string;

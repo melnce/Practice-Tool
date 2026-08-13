@@ -48,6 +48,7 @@ export function handleReturnHandToDeck(
       if (!first) break;
       putBack(first, owner);
     }
+    (state as any).lastReturnedCount = returnedCount;
     logEvent("returnHandToDeckAll", { owner, count: returnedCount });
     // Render removed - UI layer
     return "done";
@@ -85,6 +86,7 @@ export function handleReturnHandToDeck(
       if (card) chosen.push(card);
     }
     for (const card of chosen) putBack(card, owner);
+    (state as any).lastReturnedCount = chosen.length;
     logEvent("returnHandToDeckRandom", { owner, count: chosen.length });
     return "done";
   }

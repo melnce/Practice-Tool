@@ -60,6 +60,7 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   loot_fused: handleGenericEvent,
   loot_played: handleGenericEvent,
   ally_spell_played: handleGenericEvent,
+  ally_card_played: handleGenericEvent,
   ally_draw: handleGenericEvent,
   ally_earth_rite: handleGenericEvent,
   ally_follower_leaves_field: handleGenericEvent,

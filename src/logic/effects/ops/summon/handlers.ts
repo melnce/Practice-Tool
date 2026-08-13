@@ -28,6 +28,8 @@ import {
   handleSelectHandSummonFollower,
 } from "../summon_ops/hand.js";
 import { handleSummonDestroyedAmuletHighestBaseCost } from "../summon_ops/graveyard.js";
+import { pickDestroyedMatch } from "../../../core/destroyedHistory.js";
+import { getCardById, getCardDetails } from "../../../../data/cardDatabase.js";
 
 // =============================================================================
 // NAMED SUMMON
@@ -139,6 +141,55 @@ export function handleSummonFromHand(
   }
 
   logEvent("summon_hand_unhandled", { mode: eff.mode, filter: eff.filter });
+}
+
+// =============================================================================
+// DESTROYED-THIS-MATCH SUMMON
+// =============================================================================
+
+/**
+ * Summon fresh board copies from the owner's destroyed-this-match history.
+ * Reuses pickDestroyedMatch (same filters as add_to_hand destroyed_match).
+ */
+export function handleSummonDestroyedMatch(
+  eff: Effect & Record<string, any>,
+  spec: UnifiedSummonSpec,
+  owner: Player,
+): void {
+  const filter = {
+    ...(spec.filter || {}),
+    ...((eff.filter as object) || {}),
+  } as Record<string, unknown>;
+
+  const records = pickDestroyedMatch(state, owner, {
+    filter: filter as any,
+    ...(spec.distinct_by ? { distinct_by: spec.distinct_by } : {}),
+    ...(spec.distribution ? { distribution: spec.distribution } : {}),
+    count: spec.count,
+  });
+
+  for (const record of records) {
+    const base =
+      getCardById(record.cardId || record.id) ?? getCardDetails(record.name);
+    if (!base) {
+      logEvent("summon_destroyed_match_notFound", {
+        name: record.name,
+        id: record.cardId || record.id,
+        owner,
+      });
+      continue;
+    }
+    summonNamed(
+      {
+        op: "summon",
+        source: "named",
+        name: base.name,
+        count: 1,
+        ...(Array.isArray(eff.keywords) ? { keywords: eff.keywords } : {}),
+      } as any,
+      owner,
+    );
+  }
 }
 
 // =============================================================================

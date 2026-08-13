@@ -72,6 +72,10 @@ export function playSpell(
   fireTrigger("ally_spell_played", owner as any, {
     playedCard: spellCard,
   });
+  (state as any).__lastPlayedCard = spellCard;
+  fireTrigger("ally_card_played", owner as any, {
+    playedCard: spellCard,
+  });
 
   // Effect List Logic
   let list: Effect[] = [];

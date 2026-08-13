@@ -56,6 +56,29 @@ export function evalCommonConditions(
   if (cond.not_self && subjectCard && subjectCard.uid === hostCard.uid)
     return false;
 
+  // 4b. field_other_same_base_cost — another field card shares subject's base cost
+  if (cond.field_other_same_base_cost) {
+    const played = subjectCard;
+    if (!played) return false;
+    const base =
+      played.base_cost !== undefined
+        ? Number(played.base_cost)
+        : parseInt(String(played.cost), 10) || 0;
+    const field = [
+      ...(getBoard(state, "first") || []),
+      ...(getBoard(state, "second") || []),
+    ];
+    const found = field.some((c) => {
+      if (!c || c.uid === played.uid) return false;
+      const cb =
+        c.base_cost !== undefined
+          ? Number(c.base_cost)
+          : parseInt(String(c.cost), 10) || 0;
+      return cb === base;
+    });
+    if (!found) return false;
+  }
+
   // 5. own_turn
   if (cond.own_turn && owner !== activePlayer) return false;
 
@@ -105,6 +128,10 @@ export function evalCommonConditions(
       sharedCond.base_cost_gte = cond.base_cost_gte;
     if (cond.base_cost_lte != null)
       sharedCond.base_cost_lte = cond.base_cost_lte;
+    if (Array.isArray((cond as any).base_cost_in))
+      sharedCond.base_cost_in = (cond as any).base_cost_in;
+    if (Array.isArray((cond as any).cost_in))
+      sharedCond.cost_in = (cond as any).cost_in;
     if (cond.cost_changed) sharedCond.cost_changed = cond.cost_changed;
     if ((cond as any).is_super_evolved != null)
       sharedCond.is_super_evolved = !!(cond as any).is_super_evolved;

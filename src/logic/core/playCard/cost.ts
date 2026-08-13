@@ -4,6 +4,8 @@ import {
   pickAlternateForm,
   type AlternateForm,
 } from "../../../helpers/alternateForm.js";
+import { playerHasCrestPassive } from "../../effects/crest.js";
+import { state } from "../../../core/gameState.js";
 
 export function getEffectiveCost(card: CardInstance): number {
   if (typeof card.effectiveCost === "number") return card.effectiveCost;
@@ -59,13 +61,24 @@ export interface PlayCostPlan {
  * Resolve which form/cost a play will use.
  * Priority: Enhance (if affordable) → normal (if affordable) →
  * highest payable Accelerate/Crystallize → else normal (will fail PP check).
+ *
+ * Crest passive `suppress_fanfare_enhance` skips Enhance so the ability
+ * does not activate (play at normal cost instead).
  */
 export function resolvePlayCost(
   card: CardInstance,
   availablePP: number,
 ): PlayCostPlan {
   const effectivePlayCost = getEffectivePlayCost(card);
-  const enhanceTier = pickEnhanceTier(card, availablePP);
+  const owner =
+    card.owner === "first" || card.owner === "second"
+      ? card.owner
+      : state.activePlayer;
+  const suppressEnhance =
+    !!owner && playerHasCrestPassive(owner, "suppress_fanfare_enhance");
+  const enhanceTier = suppressEnhance
+    ? null
+    : pickEnhanceTier(card, availablePP);
   if (enhanceTier) {
     return {
       mode: "enhance",

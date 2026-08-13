@@ -53,6 +53,12 @@ export interface UnifiedDrawSpec {
 
   /** Who draws - owner or opponent. Default: "self" */
   player: DrawPlayer;
+
+  /** Optional deck filter (type/cost/etc). When set, draws randomly among matches. */
+  filters: Record<string, any> | null;
+
+  /** When "name", each successive draw excludes already-drawn names. */
+  distinct_by: string | null;
 }
 
 // ============================================================================
@@ -120,10 +126,24 @@ export function normalizeToUnifiedSpec(
     .trim();
   const player: DrawPlayer = playerRaw === "opponent" ? "opponent" : "self";
 
+  const filters =
+    eff.filters && typeof eff.filters === "object"
+      ? (eff.filters as Record<string, any>)
+      : eff.filter && typeof eff.filter === "object"
+        ? (eff.filter as Record<string, any>)
+        : null;
+
+  const distinct_by =
+    typeof eff.distinct_by === "string" && eff.distinct_by.trim()
+      ? eff.distinct_by.trim()
+      : null;
+
   return {
     source: "deck",
     count,
     player,
+    filters,
+    distinct_by,
   };
 }
 

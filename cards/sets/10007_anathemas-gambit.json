@@ -145,9 +145,80 @@
     "url": "https://shadowverse.gg/cards/10703210-city-of-babelon",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "keywords": [
+      {
+        "name": "countdown",
+        "count": 1
+      },
+      {
+        "name": "Engage",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "discard",
+            "mode": "select",
+            "count": 1
+          },
+          {
+            "op": "countdown",
+            "action": "delay",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "sequence",
+            "key": "babelon",
+            "advance": true,
+            "steps": [
+              {
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:follower",
+                    "amount": 2,
+                    "count": 1,
+                    "distribution": "random_hits"
+                  }
+                ]
+              },
+              {
+                "effects": [
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 2
+                  }
+                ]
+              },
+              {
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:leader",
+                    "amount": 2
+                  },
+                  {
+                    "op": "destroy",
+                    "scope": "self"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10704110",

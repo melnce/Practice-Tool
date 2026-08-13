@@ -61,6 +61,10 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
     playedCard: card,
     costChanged: resume.costChangedOnPlay,
   });
+  (state as any).__lastPlayedCard = card;
+  fireTrigger("ally_card_played", player as any, {
+    playedCard: card,
+  });
 
   const enterCtx = {
     enteringCard: card,

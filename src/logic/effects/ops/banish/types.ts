@@ -72,8 +72,11 @@ export interface UnifiedBanishSpec {
   /** Optional filter condition */
   condition: any;
 
-  /** Additional filters (e.g., defense_lte) */
+  /** Additional filters (e.g., defense_lte, cost_in) */
   filters: Record<string, any> | null;
+
+  /** Store banished count in context.variables under this key */
+  store_count_as: string | null;
 }
 
 /**
@@ -125,7 +128,9 @@ export function normalizeToUnifiedSpec(
     select: 0,
     scope: null,
     condition: eff.condition || null,
-    filters: eff.filters || null,
+    filters: eff.filters || eff.filter || null,
+    store_count_as:
+      typeof eff.store_count_as === "string" ? eff.store_count_as : null,
   };
 
   // Parse count

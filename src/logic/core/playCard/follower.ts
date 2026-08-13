@@ -19,6 +19,7 @@ import {
   runPlayFollowerPostFanfare,
   type PlayFollowerResume,
 } from "./followerResume.js";
+import { playerHasCrestPassive } from "../../effects/crest.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -66,10 +67,17 @@ export function playFollower(
 
   const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
 
+  // Crest passive: suppress Fanfare (and Enhance is gated in resolvePlayCost).
+  const suppressFanfareEnhance = playerHasCrestPassive(
+    player,
+    "suppress_fanfare_enhance",
+  );
+
   // Rulebook §242–256: Fanfare (step 1) before play/enter-reactive triggers (steps 2–5).
   const skipFanfareForEnhance =
     chosenTier && (card as any).enhance_replaces_fanfare;
   if (
+    !suppressFanfareEnhance &&
     !skipFanfareForEnhance &&
     Array.isArray(card.fanfare) &&
     card.fanfare.length
@@ -101,8 +109,10 @@ export function playFollower(
   runPlayFollowerPostFanfare({
     player,
     cardUid: card.uid,
-    chosenTierEffects:
-      chosenTier && Array.isArray(chosenTier.effects)
+    // Suppress Enhance ability activation while crest passive is active.
+    chosenTierEffects: suppressFanfareEnhance
+      ? null
+      : chosenTier && Array.isArray(chosenTier.effects)
         ? [...chosenTier.effects]
         : null,
     costChangedOnPlay,

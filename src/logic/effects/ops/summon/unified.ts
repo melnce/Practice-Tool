@@ -14,6 +14,7 @@ import {
   handleSummonFromDeck,
   handleSummonFromHand,
   handleReanimateWrapper,
+  handleSummonDestroyedMatch,
 } from "./handlers.js";
 
 // ============================================================================
@@ -77,6 +78,10 @@ export function handleSummon(
     case "graveyard":
       console.log("[SUMMON UNIFIED] calling handleReanimateWrapper");
       handleReanimateWrapper(eff, targetOwner);
+      break;
+
+    case "destroyed_match":
+      handleSummonDestroyedMatch(eff, spec, targetOwner);
       break;
 
     default:

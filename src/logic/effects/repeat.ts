@@ -26,27 +26,36 @@ export function handleRepeatEffect(
   if (!payload || !effectsQueue) return;
   let count = 0;
 
-  switch (eff.count_source) {
-    case "count_in_hand":
-      if (eff.filter?.tribe) {
-        const hand = getHand(state, owner);
-        count = hand.filter(
-          (c) =>
-            Array.isArray(c.tribes) && c.tribes.includes(eff.filter!.tribe!),
-        ).length;
-      }
-      break;
+  // Fixed count takes precedence when provided
+  if (eff.count !== undefined && eff.count !== null && !eff.count_source) {
+    count = Math.max(0, parseInt(String(eff.count), 10) || 0);
+  } else {
+    switch (eff.count_source) {
+      case "count_in_hand":
+        if (eff.filter?.tribe) {
+          const hand = getHand(state, owner);
+          count = hand.filter(
+            (c) =>
+              Array.isArray(c.tribes) && c.tribes.includes(eff.filter!.tribe!),
+          ).length;
+        }
+        break;
 
-    case "crest_count":
-      count = (getCrests(state, owner) || []).length | 0;
-      break;
+      case "crest_count":
+        count = (getCrests(state, owner) || []).length | 0;
+        break;
 
-    case "combo":
-      count = getPlaysThisTurn(state, owner);
-      break;
+      case "combo":
+        count = getPlaysThisTurn(state, owner);
+        break;
 
-    default:
-      return;
+      default:
+        if (eff.count !== undefined) {
+          count = Math.max(0, parseInt(String(eff.count), 10) || 0);
+        } else {
+          return;
+        }
+    }
   }
 
   if (count > 0) {

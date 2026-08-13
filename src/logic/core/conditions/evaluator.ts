@@ -49,6 +49,10 @@ export interface CardCondition {
   base_cost_eq?: number;
   base_cost_gte?: number;
   base_cost_lte?: number;
+  /** Match if base cost is one of these values. */
+  base_cost_in?: number[];
+  /** Match if current cost is one of these values. */
+  cost_in?: number[];
   cost_changed?: boolean;
 
   // Evolution state
@@ -208,6 +212,20 @@ export function evaluateCardCondition(
   if (cond.base_cost_lte != null) {
     const lim = toNum(cond.base_cost_lte);
     if (lim != null && getBaseCost(card) > lim) return false;
+  }
+  if (Array.isArray(cond.base_cost_in) && cond.base_cost_in.length) {
+    const base = getBaseCost(card);
+    const allowed = cond.base_cost_in
+      .map((n) => toNum(n))
+      .filter((n): n is number => n != null);
+    if (!allowed.includes(base)) return false;
+  }
+  if (Array.isArray(cond.cost_in) && cond.cost_in.length) {
+    const cost = parseInt(String(card.cost), 10) || 0;
+    const allowed = cond.cost_in
+      .map((n) => toNum(n))
+      .filter((n): n is number => n != null);
+    if (!allowed.includes(cost)) return false;
   }
 
   // Cost changed

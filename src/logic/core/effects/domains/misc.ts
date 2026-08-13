@@ -10,6 +10,7 @@ import { handleRepeatEffect } from "../../../effects/repeat.js";
 import { handleEvolve } from "../../../effects/ops/evolve/unified.js";
 import { handleGate } from "../../../effects/gates/unified.js";
 import { handleReplicate } from "../../../effects/ops/replicate.js";
+import { handleSequence } from "../../../effects/ops/sequence.js";
 import { state } from "../../../../core/gameState.js";
 import { getHand } from "../../../../core/playerHelpers.js";
 import type { Effect as _Effect } from "../../../../core/types/index.js";
@@ -89,6 +90,10 @@ export function registerMiscEffects() {
   registerOp("repeat_effect", (eff, ctx) =>
     handleRepeatEffect(eff, ctx.owner, ctx.sourceCard, ctx.queue),
   );
+
+  registerOp("sequence", (eff, ctx) => {
+    handleSequence(eff as any, ctx.owner, ctx.sourceCard);
+  });
 
   registerOp("replicate", (eff, ctx) => {
     const result = handleReplicate(eff as any, ctx);
