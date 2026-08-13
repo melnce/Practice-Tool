@@ -180,32 +180,55 @@ describe("decklist import", () => {
   });
 
   it("produces a coverage warning for unimplemented cards", () => {
-    // Build a 40-card Neutral list that includes unimplemented cards
-    const unimplemented = [...index.byName.values()].filter(
-      (c) =>
-        c.implementationStatus === "unimplemented" && c.class === "Neutral",
-    );
-    expect(unimplemented.length).toBeGreaterThan(0);
-    const vanillas = [...index.byName.values()].filter(
+    // Live pool may be fully authored (0 unimplemented). Inject a synthetic
+    // stub into a probe index so the coverage-warning path stays covered
+    // independently of current set completeness.
+    const stubName = "Synthetic Unimplemented Probe";
+    const mainCards = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as BuildCardIndexInput["mainCards"];
+    const tokenCards = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/token_details.json"), "utf-8"),
+    ) as BuildCardIndexInput["tokenCards"];
+    const probeIndex = buildCardIndex({
+      mainCards: [
+        ...mainCards,
+        {
+          id: "test-unimplemented-probe",
+          name: stubName,
+          class: "Neutral",
+          type: "Follower",
+          cost: "1",
+          attack: "1",
+          defense: "1",
+          description:
+            "Fanfare: Choose an enemy follower and do a mysterious thing.",
+        },
+      ],
+      tokenCards,
+    });
+    const stub = probeIndex.byName.get(stubName);
+    expect(stub?.implementationStatus).toBe("unimplemented");
+
+    const vanillas = [...probeIndex.byName.values()].filter(
       (c) =>
         c.class === "Neutral" &&
         c.implementationStatus === "ops_present" &&
-        c.type === "Follower",
+        c.type === "Follower" &&
+        c.name !== stubName,
     );
     const cards: { name: string; count: number }[] = [];
-    // 3 copies of first unimplemented
-    cards.push({ name: unimplemented[0]!.name!, count: 3 });
+    cards.push({ name: stubName, count: 3 });
     let need = 37;
     for (const v of vanillas) {
       if (need <= 0) break;
-      if (v.name === unimplemented[0]!.name) continue;
       const n = Math.min(3, need);
       cards.push({ name: v.name!, count: n });
       need -= n;
     }
     expect(need).toBe(0);
     const text = formatDecklistText(cards);
-    const result = importDecklistFromText(text, index, {
+    const result = importDecklistFromText(text, probeIndex, {
       deckName: "Coverage Probe",
       deckClass: "Neutral",
     });

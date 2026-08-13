@@ -161,20 +161,35 @@ export function applyDirectDamage(
  * SEMANTICS (preserved from legacy):
  * - Pool is rebuilt each hit (accounts for deaths mid-sequence)
  * - Same target CAN be hit multiple times (with replacement)
- * - Can include leader if target spec allows
+ * - Can include leader(s) if target spec / includeLeader allows
  */
 export function applyRandomHits(
   hitCount: number,
   amountPerHit: number,
   targetSpec: string,
   owner: Player,
-  options?: { includeLeader?: boolean },
+  options?: {
+    includeLeader?: boolean | "enemy" | "ally" | "both";
+    sourceCard?: CardInstance | null;
+  },
 ): void {
+  const includeLeaderOpt = options?.includeLeader;
   const includeLeader =
-    options?.includeLeader ??
-    (targetSpec === "enemy" ||
-      targetSpec === "enemy:all" ||
-      targetSpec === "all");
+    includeLeaderOpt === true ||
+    includeLeaderOpt === "enemy" ||
+    includeLeaderOpt === "ally" ||
+    includeLeaderOpt === "both" ||
+    (includeLeaderOpt == null &&
+      (targetSpec === "enemy" ||
+        targetSpec === "enemy:all" ||
+        targetSpec === "all"));
+
+  const leaderMode: "enemy" | "ally" | "both" | false =
+    includeLeaderOpt === "both" || includeLeaderOpt === "ally"
+      ? includeLeaderOpt
+      : includeLeader
+        ? "enemy"
+        : false;
 
   let remaining = hitCount;
   while (remaining-- > 0) {
@@ -182,15 +197,21 @@ export function applyRandomHits(
     const pool: (
       | CardInstance
       | { type: "Leader"; owner: Player; name: string }
-    )[] = [...getPool(targetSpec, owner)];
+    )[] = [...getPool(targetSpec, owner, options?.sourceCard ?? null)];
 
-    // Optionally add leader
-    if (includeLeader) {
+    if (leaderMode === "enemy" || leaderMode === "both") {
       const targetOwner = opponentOf(owner);
       pool.push({
         type: "Leader",
         owner: targetOwner,
         name: "Enemy Leader",
+      } as any);
+    }
+    if (leaderMode === "ally" || leaderMode === "both") {
+      pool.push({
+        type: "Leader",
+        owner,
+        name: "Allied Leader",
       } as any);
     }
 

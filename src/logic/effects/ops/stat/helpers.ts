@@ -9,6 +9,7 @@ import { logEvent } from "../../../../core/logger.js";
 import {
   getPlaysThisTurn,
   getHand,
+  getDeck,
   getHP,
   setHP,
   getMaxHP,
@@ -59,6 +60,7 @@ export type SpecialTarget =
   | "ally:leader"
   | "enemy:leader"
   | "hand"
+  | "ally:deck"
   | "last_added_to_hand"
   | "entering_follower"
   | null;
@@ -70,6 +72,7 @@ export function detectSpecialTarget(eff: StatOp): SpecialTarget {
   if (target === "ally:leader") return "ally:leader";
   if (target === "enemy:leader") return "enemy:leader";
   if (target === "hand") return "hand";
+  if (target === "ally:deck" || target === "deck") return "ally:deck";
   if (target === "last_added_to_hand") return "last_added_to_hand";
   if (target === "entering_follower") return "entering_follower";
 
@@ -125,8 +128,41 @@ export function applyHandBuff(owner: Player, eff: StatOp): void {
   }
 }
 
+/** Buff follower instances in the owner's deck (Thestae crest). Persists on draw. */
+export function applyDeckBuff(owner: Player, eff: StatOp): void {
+  const deck = getDeck(state, owner);
+  const a = parseInt((eff.attack as any) ?? 0) || 0;
+  const d = parseInt((eff.defense as any) ?? 0) || 0;
+
+  for (const card of deck) {
+    if (!matchesHandFilter(card, eff)) continue;
+
+    if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
+    card.buffs.attack = Number(card.buffs.attack ?? 0) + a;
+    card.buffs.defense = Number(card.buffs.defense ?? 0) + d;
+    card.attack = (parseInt(String(card.attack)) || 0) + a;
+    card.defense = (parseInt(String(card.defense)) || 0) + d;
+    if (typeof card.peak_defense === "number") {
+      card.peak_defense = Math.max(
+        card.peak_defense,
+        Number(card.defense) || 0,
+      );
+    } else {
+      card.peak_defense = Number(card.defense) || 0;
+    }
+
+    logEvent("buffDeck", { owner, target: card.name, uid: card.uid, a, d });
+  }
+}
+
 function matchesHandFilter(card: CardInstance, eff: StatOp): boolean {
   if (card.type !== "Follower") return false;
+  const filter = (eff as any).filter;
+  const typeFilter = filter?.type ?? (eff as any).type;
+  if (typeFilter && String(typeFilter).toLowerCase() !== "follower") {
+    // Explicit non-follower filter → no match (deck/hand buffs are follower-only today)
+    if (String(typeFilter).toLowerCase() !== "card") return false;
+  }
   if ((eff as any).class && card.class !== (eff as any).class) return false;
   if (
     (eff as any).tribe &&

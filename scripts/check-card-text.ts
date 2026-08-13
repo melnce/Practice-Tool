@@ -70,6 +70,7 @@ const ADD_TO_HAND_ALLOWED = new Set([
   "name",
   "count",
   "target",
+  "from", // exact-copy zone sample (ally/enemy hand|deck)
   "player",
   "keywords",
   // occasional authoring that the normalizer ignores but is not a crash typo
@@ -268,12 +269,12 @@ function checkAddToHand(card: CardJson): Issue[] {
           message: `add_to_hand at ${opPath} (source=named) requires "name"`,
         });
       }
-    } else if (source === "copy" && !eff.target) {
+    } else if (source === "copy" && !eff.target && !eff.from) {
       issues.push({
         id: card.id,
         name: card.name,
         kind: "error",
-        message: `add_to_hand at ${opPath} (source=copy) requires "target"`,
+        message: `add_to_hand at ${opPath} (source=copy) requires "target" or "from"`,
       });
     }
 

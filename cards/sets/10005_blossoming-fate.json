@@ -54,7 +54,20 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10502110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10502110-goddess-of-starlight",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 3
+      },
+      {
+        "op": "add_to_hand",
+        "source": "copy",
+        "from": "ally:hand",
+        "distribution": "leftmost",
+        "count": 3
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
@@ -75,7 +88,20 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10502120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10502120-behemoth-general",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "gate",
+        "condition": "hand_top_base_costs_gt_enemy",
+        "count": 3,
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "distribution": "all"
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
@@ -572,11 +598,32 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10514110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10514110-wolfraud-skybound-hanged-man",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "discard",
+        "mode": "except_named",
+        "names": []
+      },
+      {
+        "op": "add_to_hand",
+        "source": "copy",
+        "from": "enemy:deck",
+        "distribution": "random",
+        "count": 5
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "attack_source": "combo",
+        "defense_source": "combo"
+      }
+    ]
   },
   {
     "id": "10514120",
@@ -1025,7 +1072,35 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "other:follower",
+                "amount": 7,
+                "distribution": "random_hits",
+                "count": 3,
+                "include_leader": "both"
+              }
+            ],
+            "else_effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 7
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -3161,7 +3236,7 @@
     "class": "Portalcraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Add an Ominous Artifact \u03b2 to your hand.\nSuper-Evolve: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.",
+    "description": "Fanfare: Add an Ominous Artifact β to your hand.\nSuper-Evolve: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10572110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10572110_evo.webp",
     "set": "[10005] Blossoming Fate",
@@ -3185,7 +3260,7 @@
     "fanfare": [
       {
         "op": "add_to_hand",
-        "name": "Ominous Artifact \u03b2",
+        "name": "Ominous Artifact β",
         "count": 1
       }
     ]
@@ -3346,7 +3421,129 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Ambush"],
-    "triggers": [],
+    "triggers": [
+      {
+        "type": "start_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "mode",
+            "pick": "random_unused",
+            "select_count": 1,
+            "options": [
+              {
+                "label": "Reduce the cost of all cards in your hand by 1 until the end of the turn",
+                "effects": [
+                  {
+                    "op": "cost",
+                    "target": "ally:hand",
+                    "mode": "reduce",
+                    "amount": 1,
+                    "until_eot": true
+                  }
+                ]
+              },
+              {
+                "label": "Give all allied followers on the field +2/+2",
+                "effects": [
+                  {
+                    "op": "stat",
+                    "action": "give",
+                    "target": "ally:follower",
+                    "attack": 2,
+                    "defense": 2
+                  }
+                ]
+              },
+              {
+                "label": "Restore 3 defense to your leader",
+                "effects": [
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 3
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "crest",
+                "action": "gain",
+                "player": "opponent",
+                "name": "Slaus, Revolving Wheel of Fortune",
+                "image": "https://static.dotgg.gg/shadowverse/cards/10574110_token.webp",
+                "description": "Countdown (3)\nAt the start of your turn, activate a random ability that hasn't been activated yet from the following.\n1. Increase the cost of all cards in your hand by 1 until the end of the turn.\n2. Give all allied followers on the field -2/-2.\n3. Deal 3 damage to your leader.",
+                "countdown": 3,
+                "triggers": [
+                  {
+                    "type": "start_of_turn_own",
+                    "effects": [
+                      {
+                        "op": "mode",
+                        "pick": "random_unused",
+                        "select_count": 1,
+                        "options": [
+                          {
+                            "label": "Increase the cost of all cards in your hand by 1 until the end of the turn",
+                            "effects": [
+                              {
+                                "op": "cost",
+                                "target": "ally:hand",
+                                "mode": "increase",
+                                "amount": 1,
+                                "until_eot": true
+                              }
+                            ]
+                          },
+                          {
+                            "label": "Give all allied followers on the field -2/-2",
+                            "effects": [
+                              {
+                                "op": "stat",
+                                "action": "give",
+                                "target": "ally:follower",
+                                "attack": -2,
+                                "defense": -2
+                              }
+                            ]
+                          },
+                          {
+                            "label": "Deal 3 damage to your leader",
+                            "effects": [
+                              {
+                                "op": "damage",
+                                "target": "ally:leader",
+                                "amount": 3
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "banish",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": [],
     "specific_effects": [
       {

@@ -24,13 +24,21 @@ export type AddToHandPlayer = "ally" | "enemy";
 export type CopyTargetBase = "selected" | "last_drawn" | "trigger" | "self";
 // Type filter for copy target (what type of card can be selected)
 export type CopyTargetFilter = "follower" | "spell" | "amulet" | "any" | null;
+/** Zone to sample exact copies from (instance clones). */
+export type AddToHandFromZone =
+  | "ally:hand"
+  | "enemy:hand"
+  | "ally:deck"
+  | "enemy:deck";
 
 export interface UnifiedAddToHandSpec {
   op: "add_to_hand";
   source: AddToHandSource; // Where the card comes from - default: "named"
   name: string | null; // Card name (required when source=named)
-  target: CopyTargetBase | null; // What to copy (required when source=copy)
+  target: CopyTargetBase | null; // What to copy (required when source=copy without from)
   targetFilter: CopyTargetFilter; // Type filter on target (e.g., follower, any)
+  /** Exact-copy sample zone (Goddess / Wolfraud / Legacy). Implies source=copy. */
+  from: AddToHandFromZone | null;
   filter: DestroyedMatchFilter;
   distinctBy: string | null;
   distribution: string | null;
@@ -48,12 +56,33 @@ export function normalizeToAddToHandSpec(
 ): UnifiedAddToHandSpec {
   // ========================================================================
   // Determine source: "named" (default), "copy", or "destroyed_match"
+  // A `from` zone sample implies exact-copy sampling.
   // ========================================================================
-  const sourceRaw = String(eff.source || "named")
+  const fromRaw =
+    typeof eff.from === "string" ? String(eff.from).toLowerCase().trim() : "";
+  const validFrom: AddToHandFromZone[] = [
+    "ally:hand",
+    "enemy:hand",
+    "ally:deck",
+    "enemy:deck",
+  ];
+  const from: AddToHandFromZone | null = validFrom.includes(
+    fromRaw as AddToHandFromZone,
+  )
+    ? (fromRaw as AddToHandFromZone)
+    : null;
+  if (fromRaw && !from) {
+    throw new Error(
+      `[add_to_hand] Invalid "from" zone: "${eff.from}". ` +
+        `Must be: ${validFrom.join(", ")}. Effect: ${JSON.stringify(eff)}`,
+    );
+  }
+
+  const sourceRaw = String(eff.source || (from ? "copy" : "named"))
     .toLowerCase()
     .trim();
   const source: AddToHandSource =
-    sourceRaw === "copy"
+    sourceRaw === "copy" || from
       ? "copy"
       : sourceRaw === "destroyed_match"
         ? "destroyed_match"
@@ -83,12 +112,13 @@ export function normalizeToAddToHandSpec(
       );
     }
     name = eff.name.trim();
-  } else if (source === "copy") {
+  } else if (source === "copy" && !from) {
     // REQUIRED: target (can be composite like "selected:follower")
+    // Skipped when sampling a zone via `from` (exact copies of zone instances).
     if (!eff.target) {
       throw new Error(
-        `[add_to_hand] source="copy" requires "target" field. ` +
-          `Must be: "selected", "selected:follower", "selected:any", "last_drawn", "trigger", or "self". ` +
+        `[add_to_hand] source="copy" requires "target" or "from" field. ` +
+          `Target must be: "selected", "selected:follower", "selected:any", "last_drawn", "trigger", or "self". ` +
           `Effect: ${JSON.stringify(eff)}`,
       );
     }
@@ -182,6 +212,7 @@ export function normalizeToAddToHandSpec(
     name,
     target,
     targetFilter,
+    from,
     filter,
     distinctBy,
     distribution,

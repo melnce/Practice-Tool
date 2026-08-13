@@ -2,6 +2,8 @@
 import { state } from "../../../core/gameState.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../core/keywords.js";
+import { normalizeCardStats } from "../../../core/cardStats.js";
+import { normalizeInstanceEnteringHandAsCopy } from "./add_to_hand/normalizeHandCopy.js";
 
 import { logEvent } from "../../../core/logger.js";
 import type {
@@ -9,7 +11,12 @@ import type {
   CardInstance,
   Effect,
 } from "../../../core/types/index.js";
-import { getHand, getBoard, getDeck } from "../../../core/playerHelpers.js";
+import {
+  getHand,
+  getBoard,
+  getDeck,
+  opponentOf,
+} from "../../../core/playerHelpers.js";
 import { getPool } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 
@@ -30,7 +37,21 @@ export interface TransformFilter {
 export interface TransformSpec {
   target: string; // REQUIRED: unified target (e.g., "enemy:follower", "ally:hand")
   mode?: TransformMode;
-  into?: string; // REQUIRED for board/self
+  into?: string; // REQUIRED for board/self unless into_source
+  /**
+   * Destination from a live zone instead of a fixed `into` name.
+   * - string `"enemy:deck"`: Encroached World — exact-copy one random enemy deck follower.
+   * - object: Round 4+ board transforms (e.g. Grandeur) — pick destination card(s) from a zone.
+   */
+  into_source?:
+    | string
+    | {
+        zone: string;
+        filter?: unknown;
+        pick?: { count?: number | string; random?: boolean; unique?: boolean };
+        /** When true, each selected board target gets its own independently resolved destination card. */
+        per_target?: boolean;
+      };
   name?: string;
   filter?: TransformFilter;
   select?: number;
@@ -81,14 +102,54 @@ export function handleTransform(
 
   const mode = (eff.mode || "all") as TransformMode;
   const into = String(eff.into || eff.name || "").trim();
-  const hasIntoSource =
-    (eff as any).into_source && typeof (eff as any).into_source === "object";
+  const intoSourceRaw = (eff as any).into_source;
+  const intoSource =
+    typeof intoSourceRaw === "string"
+      ? intoSourceRaw.toLowerCase().trim()
+      : "";
+  const hasIntoSourceObject =
+    !!intoSourceRaw && typeof intoSourceRaw === "object";
 
-  if (!into && !hasIntoSource && zone !== "hand" && zone !== "deck") {
+  if (
+    !into &&
+    !intoSource &&
+    !hasIntoSourceObject &&
+    zone !== "hand" &&
+    zone !== "deck"
+  ) {
     throw new Error(
-      `[transform] Missing required field: "into" (or into_source). ` +
+      `[transform] Missing required field: "into" or "into_source". ` +
         `Effect: ${JSON.stringify(eff)}`,
     );
+  }
+
+  // Exact-copy transform into a sampled zone instance (Encroached World)
+  if (intoSource === "enemy:deck") {
+    const resolveTargets = (): CardInstance[] => {
+      if (ctx.context?.targetUids?.length) {
+        return ctx.context.targetUids
+          .map((uid: string) => resolveUid(uid))
+          .filter(Boolean) as CardInstance[];
+      }
+      if (zone === "self" && ctx.sourceCard) return [ctx.sourceCard];
+      const selectN = parseInt(String(eff.select ?? 0), 10) || 0;
+      const pool = getPool(
+        eff.target || "ally:hand",
+        owner,
+        ctx.sourceCard ?? null,
+        (eff as any).condition,
+        {
+          ...(ctx.context ?? {}),
+          isTargetedEffect: selectN > 0,
+        },
+      );
+      if (selectN > 0) return pool.slice(0, Math.min(selectN, pool.length));
+      return pool;
+    };
+    for (const t of resolveTargets()) {
+      transformIntoExactFromEnemyDeck(t, owner);
+    }
+    return;
   }
 
   switch (zone) {
@@ -182,6 +243,59 @@ export function handleTransform(
         console.warn("transform: could not resolve target from UID.");
       }
       return;
+    }
+  }
+}
+
+/** Exact-copy transform: replace target with a clone of a random enemy deck card. */
+function transformIntoExactFromEnemyDeck(
+  target: CardInstance,
+  owner: Player,
+): void {
+  const deck = getDeck(state, opponentOf(owner)) || [];
+  if (!deck.length || !target) return;
+  const src = deck[state.rng.nextInt(deck.length)];
+  if (!src) return;
+
+  const zone = locateZone(target);
+  const clone: CardInstance = structuredClone(src);
+  clone.uid = target.uid;
+  if (target.owner) clone.owner = target.owner;
+  if (target.zone) clone.zone = target.zone;
+  else if (zone === "firstHand" || zone === "secondHand") clone.zone = "hand";
+  else if (zone === "firstBoard" || zone === "secondBoard")
+    clone.zone = "board";
+
+  if (zone === "firstHand" || zone === "secondHand") {
+    normalizeInstanceEnteringHandAsCopy(clone);
+    normalizeCardStats(clone);
+    const hand = getHand(state, zone === "firstHand" ? "first" : "second");
+    const idx = hand.indexOf(target);
+    if (idx !== -1) {
+      hand[idx] = clone;
+      logEvent("transformHandExact", {
+        owner,
+        from: target.name,
+        to: clone.name,
+        uid: target.uid,
+      });
+    }
+    return;
+  }
+
+  if (zone === "firstBoard" || zone === "secondBoard") {
+    normalizeCardStats(clone);
+    applyKeywordsFromList(clone);
+    const board = getBoard(state, zone === "firstBoard" ? "first" : "second");
+    const idx = board.indexOf(target);
+    if (idx !== -1) {
+      board[idx] = clone;
+      logEvent("transformExact", {
+        owner,
+        from: target.name,
+        to: clone.name,
+        uid: target.uid,
+      });
     }
   }
 }

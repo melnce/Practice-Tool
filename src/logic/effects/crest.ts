@@ -68,6 +68,9 @@ export interface Crest {
 
   // Phase 1: Unified tracking store (same pattern as CardInstance)
   __onceByTurn?: Record<string, number>;
+
+  /** Indices of mode options already activated (Slaus unused pool). */
+  usedModeIndices?: number[];
 }
 
 function getCrests(owner: Player) {

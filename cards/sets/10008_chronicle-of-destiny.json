@@ -109,7 +109,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "add_to_hand",
+        "source": "copy",
+        "from": "enemy:hand",
+        "distribution": "random",
+        "count": 1
+      },
+      {
+        "op": "cost",
+        "target": "last_added_to_hand",
+        "mode": "reduce",
+        "amount": 1
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10803110",
