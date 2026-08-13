@@ -30,6 +30,7 @@ export interface KeywordState {
   isInvincibleOnAttack?: boolean;
   hasPiercing?: boolean;
   hasIntimidate?: boolean;
+  ignoresWard?: boolean;
 
   // Death / Cleanup
   banishOnDeath?: boolean;

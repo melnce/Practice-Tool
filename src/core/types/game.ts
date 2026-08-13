@@ -90,6 +90,8 @@ export interface GameState {
   lastFuse?: { result_name: string; [key: string]: any } | undefined;
   lastDiscardedCosts?: number[];
   lastDiscardedCost?: number;
+  lastDiscardedTypes?: string[];
+  lastDiscardedType?: string;
 
   // === CLEANUP CONTROL ===
   suppressCleanup?: boolean;

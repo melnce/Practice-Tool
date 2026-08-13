@@ -33,6 +33,7 @@ import {
   setEvoCharges,
   getSuperEvoCharges,
   setSuperEvoCharges,
+  getBoard,
 } from "../../../../core/playerHelpers.js";
 
 const doLog = (event: string, payload: any) => logEvent(event, payload);
@@ -44,7 +45,11 @@ const doLog = (event: string, payload: any) => logEvent(event, payload);
 type PPAction = "gain_max" | "recover";
 type EPAction = "recover" | "recover_super";
 
-function handlePP(eff: Effect & { action?: PPAction }, owner: Player) {
+function handlePP(
+  eff: Effect & { action?: PPAction },
+  owner: Player,
+  sourceCard: import("../../../../core/types/index.js").CardInstance | null,
+) {
   const action = eff.action;
   if (!action) {
     console.warn("pp op: action field is mandatory (gain_max, recover)");
@@ -68,7 +73,13 @@ function handlePP(eff: Effect & { action?: PPAction }, owner: Player) {
       const max = getMaxPP(state, targetPlayer);
 
       let amt;
-      if (
+      if ((eff as any).amount_source === "other_allies") {
+        amt = getBoard(state, targetPlayer).filter(
+          (card) =>
+            card.type === "Follower" &&
+            (!sourceCard || card.uid !== sourceCard.uid),
+        ).length;
+      } else if (
         typeof eff.amount === "string" &&
         eff.amount.toLowerCase() === "currentmaxpp"
       ) {
@@ -128,7 +139,9 @@ export function registerResourceEffects() {
   // action: "gain_max" = increase max PP
   // action: "recover" = restore current PP
   // ========================================================================
-  registerOp("pp", (eff, ctx) => handlePP(eff as any, ctx.owner));
+  registerOp("pp", (eff, ctx) =>
+    handlePP(eff as any, ctx.owner, ctx.sourceCard),
+  );
 
   // ========================================================================
   // UNIFIED EP - replaces recover_ep
@@ -148,6 +161,21 @@ export function registerResourceEffects() {
     const sigilCost = (eff.cost as number) ?? (eff.amount as number) ?? 1;
     if (consumeEarthSigils(ctx.owner, sigilCost)) {
       if (eff.effects) enqueueManyFront(ctx, eff.effects);
+    }
+  });
+
+  // Combo counter (playsThisTurn) — "Increase your Combo by X"
+  registerOp("combo", (eff, ctx) => {
+    const action = String((eff as any).action || "increase").toLowerCase();
+    const amt = Math.max(
+      0,
+      parseInt(String((eff as any).amount ?? 1), 10) || 0,
+    );
+    if (action === "increase" || action === "add") {
+      for (let i = 0; i < amt; i++) {
+        state.players[ctx.owner].playsThisTurn++;
+      }
+      logEvent("comboIncrease", { owner: ctx.owner, amount: amt });
     }
   });
 

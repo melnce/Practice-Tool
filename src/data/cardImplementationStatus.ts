@@ -38,12 +38,15 @@ export const EVERGREEN_KEYWORDS = [
   "Intimidate",
   "BanishOnDeath",
   "Taunt",
+  "Ignores Ward",
 ] as const;
 
 const EVERGREEN_LINE = new Set(
   EVERGREEN_KEYWORDS.map((k) => k.toLowerCase()).concat([
     "cant_be_destroyed",
     "strike",
+    "ignores ward",
+    "ignores_ward",
   ]),
 );
 

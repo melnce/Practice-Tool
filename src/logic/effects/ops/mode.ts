@@ -13,6 +13,8 @@ import type { Effect, Player } from "../../../core/types/index.js";
 import { getModeBonus } from "../../../core/playerHelpers.js";
 import { consumePlayFollowerResume } from "../../core/playCard/followerResume.js";
 import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
+import { evaluateCondition } from "../gates/conditions.js";
+import type { UnifiedGateSpec } from "../gates/types.js";
 
 // Import types if needed, or define locally if specific to mode
 // ChooseEffect?
@@ -42,6 +44,35 @@ export function resolveModeSelectCount(eff: Effect, owner: Player): number {
   return Math.min(options.length, baseSelect + bonus);
 }
 
+function runAutomaticModePicks(
+  picked: any[],
+  owner: Player,
+  sourceCard: any,
+  effectsQueue: Effect[],
+  reason: "random" | "activate_all",
+): "done" {
+  const combined: Effect[] = [];
+  for (const option of picked) {
+    let paid = true;
+    if (option?.requires?.earth_rite) {
+      const need = parseInt(String(option.requires.earth_rite), 10) || 1;
+      paid = consumeEarthSigils(owner, need);
+    }
+    if (paid && Array.isArray(option?.effects))
+      combined.push(...option.effects);
+  }
+
+  appendStep(reason === "random" ? "Random Choice" : "Activate All Modes", {
+    owner,
+    picks: picked.map((p) => p?.label || p?.name || "(opt)"),
+  });
+  logEvent("chooseFinalize", { owner, picked: picked.length, [reason]: true });
+  fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
+  if (combined.length) runEffects(combined, owner, sourceCard);
+  if (effectsQueue.length) runEffects(effectsQueue, owner, sourceCard);
+  return "done";
+}
+
 export function handleMode(eff: Effect, ctx: EffectCtx) {
   const { owner, sourceCard, queue: effectsQueue } = ctx;
 
@@ -60,6 +91,67 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
     // console.warn("No options configured");
     // console.groupEnd();
     return;
+  }
+
+  const activateAllGate = (eff as any).activate_all_if;
+  const activateAllByCount = Number(
+    (eff as any).activate_all_if_ally_board_gte,
+  );
+  const shouldActivateAll =
+    (activateAllGate &&
+      typeof activateAllGate === "object" &&
+      evaluateCondition(
+        { op: "gate", ...activateAllGate } as UnifiedGateSpec,
+        owner,
+        sourceCard,
+      )) ||
+    (Number.isFinite(activateAllByCount) &&
+      activateAllByCount > 0 &&
+      evaluateCondition(
+        {
+          op: "gate",
+          condition: "ally_matches",
+          type: "Card",
+          count: activateAllByCount,
+        },
+        owner,
+        sourceCard,
+      ));
+
+  if (shouldActivateAll) {
+    return runAutomaticModePicks(
+      available,
+      owner,
+      sourceCard,
+      effectsQueue ?? [],
+      "activate_all",
+    );
+  }
+
+  const isRandomPick =
+    String((eff as any).pick || "").toLowerCase() === "random" ||
+    String((eff as any).distribution || "").toLowerCase() === "random";
+  if (isRandomPick) {
+    const picked: any[] = [];
+    const bag = available.slice();
+    while (
+      picked.length < selectCount &&
+      (unique ? bag.length : available.length)
+    ) {
+      const pool = unique ? bag : available;
+      const index = state.rng.nextInt(pool.length);
+      const chosen = pool[index];
+      if (!chosen) break;
+      picked.push(chosen);
+      if (unique) bag.splice(index, 1);
+    }
+    return runAutomaticModePicks(
+      picked,
+      owner,
+      sourceCard,
+      effectsQueue ?? [],
+      "random",
+    );
   }
 
   // ==== Scripted sparring line (explicit indices; never the heuristic AI) ====

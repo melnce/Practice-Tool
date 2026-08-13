@@ -60,6 +60,7 @@ export type DamageDistribution =
  * - `golem_count`: Count of allied Golem followers
  * - `crest_count`: Owner's crest count
  * - `other_allies`: Count of other allied followers (excluding source)
+ * - `followers_on_field`: Count followers across both boards
  */
 export type DamageAmountSource =
   | "fixed"
@@ -68,6 +69,7 @@ export type DamageAmountSource =
   | "golem_count"
   | "crest_count"
   | "other_allies"
+  | "followers_on_field"
   | "ally_matches" // Count allied board cards matching `filter` / condition fields
   | "unique_tribe_enters" // Distinct named allied tribe enters this match (`tribe` / filter.tribe)
   | "named_enter_count" // Count of named allied follower enters this match (`name`)
@@ -105,7 +107,11 @@ export interface UnifiedDamageSpec {
 
   // Distribution-specific options
   count?: number; // For random_hits only
-  stat?: "defense" | "hp"; // For by_stat only
+  stat?: "attack" | "defense" | "hp"; // For by_stat only
+  /** Extreme to use for by_stat; defaults to highest. */
+  rank?: "highest" | "lowest";
+  /** Randomly choose from tied extreme-stat targets instead of hitting all. */
+  pick?: "random";
   spill_to_leader?: boolean; // For split_sequential only
 
   // Targeting modifiers
@@ -229,7 +235,13 @@ export function normalizeToUnifiedSpec(
     spec.count = parseInt(String(eff.count), 10) || 1;
   }
   if (eff.stat) {
-    spec.stat = eff.stat as "defense" | "hp";
+    spec.stat = eff.stat as "attack" | "defense" | "hp";
+  }
+  if (eff.rank === "lowest" || eff.rank === "highest") {
+    spec.rank = eff.rank;
+  }
+  if (eff.pick === "random") {
+    spec.pick = "random";
   }
   if (eff.spill_to_leader !== undefined) {
     spec.spill_to_leader = Boolean(eff.spill_to_leader);

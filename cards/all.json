@@ -18268,7 +18268,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "field_matches",
+        "type": "Card",
+        "base_cost_eq": 1,
+        "count": 1,
+        "exclude_self": true,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10502110",
@@ -18859,7 +18878,35 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "last_discarded_type",
+        "type": "Spell",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 6
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10521120",
@@ -18923,7 +18970,31 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1,
+        "filter": {
+          "type": "Spell"
+        }
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "count": 1,
+        "distribution": "random_hits"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "count": 1,
+        "distribution": "random_hits"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10522110",
@@ -18943,8 +19014,35 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "when_drawn",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "set",
+            "target": "self",
+            "amount": 3,
+            "until_eot": true
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      },
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 3
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10522120",
@@ -19427,7 +19525,55 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "earth_rite",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "mode",
+            "pick": "random",
+            "select_count": 2,
+            "options": [
+              {
+                "label": "Summon a Clay Golem",
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Clay Golem",
+                    "count": 1
+                  }
+                ]
+              },
+              {
+                "label": "Restore 2 defense to your leader",
+                "effects": [
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 2
+                  }
+                ]
+              },
+              {
+                "label": "Gain 3 earth sigils",
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Magic Sediment",
+                    "count": 3
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10533110",
@@ -19700,7 +19846,23 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "search",
+        "count": 1,
+        "filter": {
+          "type": "Follower"
+        }
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": "{last_drawn_cost}",
+        "count": 1,
+        "distribution": "random_hits"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10542110",
@@ -19804,7 +19966,14 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "all:follower",
+        "amount_source": "followers_on_field"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10543110",
@@ -19950,11 +20119,63 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10544120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10544120-yube-crestpetal",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Yube, Crestpetal",
+        "image": "images/crests/yube_crestpetal.png",
+        "description": "Whenever an allied Marine follower attacks, give it +1/+0 until the end of the turn and, once on each of your turns, add a Majestic Megalorca to your hand.",
+        "triggers": [
+          {
+            "event": "ally_follower_attacked",
+            "condition": {
+              "tribe": "Marine"
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "attacker",
+                "attack": 1,
+                "defense": 0,
+                "until_eot": true
+              }
+            ]
+          },
+          {
+            "event": "ally_follower_attacked",
+            "condition": {
+              "tribe": "Marine"
+            },
+            "once_per_turn": true,
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Majestic Megalorca",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Majestic Megalorca",
+        "count": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -19962,7 +20183,8 @@
         "skill_text": "Whenever an allied Marine follower attacks, give it +1/+0 until the end of the turn and, once on each of your turns, add a <b><i><color=Keyword>Majestic Megalorca</color></i></b> to your hand.",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10551110",
@@ -20184,7 +20406,17 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "all:leader",
+        "amount": 3,
+        "distribution": "by_stat",
+        "stat": "defense",
+        "rank": "lowest"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10553110",
@@ -20201,11 +20433,46 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10553110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10553110-lifestealer",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "all:follower",
+        "exclude_self": true,
+        "amount": 1,
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_leaves_field",
+        "source": "board",
+        "condition": {
+          "name": "Skeleton"
+        },
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "transform",
+        "target": "all:follower",
+        "distribution": "all",
+        "exclude_self": true,
+        "into": "Skeleton"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10553310",
@@ -20226,7 +20493,42 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": [],
+    "spell": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Rigor of the Nightblossom",
+        "image": "images/crests/rigor_of_the_nightblossom.png",
+        "description": "Countdown (2)\nAt the end of your turn, draw a card. Then, if you have at least 4 cards with the same cost in your hand, summon a Skeleton and give it Ward.",
+        "countdown": 2,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 1
+              },
+              {
+                "op": "gate",
+                "condition": "hand_same_cost_gte",
+                "count": 4,
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Skeleton",
+                    "count": 1,
+                    "keywords": ["Ward"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -20234,7 +20536,8 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nAt the end of your turn, draw a card. Then, if you have at least 4 cards with the same cost in your hand, summon a <b><i><color=Keyword>Skeleton</color></i></b> and give it <b><color=Keyword>Ward</color></b>.",
         "name": "Crest"
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10554110",
@@ -20336,9 +20639,41 @@
     "url": "https://shadowverse.gg/cards/10561120-bouquet-believer",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Bane"]
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "ally_draw",
+        "source": "board",
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Rush"]
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10561310",
@@ -20359,7 +20694,21 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "target": "ally:hand",
+        "select": 1,
+        "select_mode": "random"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 3
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10562110",
@@ -20404,11 +20753,36 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10562120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10562120-desperate-shrinemouse",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_draw",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 1,
+            "distribution": "all"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10562210",
@@ -20416,7 +20790,7 @@
     "cost": "2",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": [],
@@ -20427,9 +20801,22 @@
     "url": "https://shadowverse.gg/cards/10562210-protective-shell",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": "{ward_allies}"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": []
   },
   {
     "id": "10563110",
@@ -20491,7 +20878,7 @@
     "cost": "3",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Gold",
     "tribes": [],
@@ -20502,9 +20889,36 @@
     "url": "https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "return",
+            "destination": "deck",
+            "target": "ally:hand",
+            "select": 2,
+            "select_mode": "random"
+          },
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 5
+      }
+    ]
   },
   {
     "id": "10564110",
@@ -20833,7 +21247,24 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "source": "destroyed_match",
+        "count": 2,
+        "filter": {
+          "type": "Follower"
+        },
+        "distinct_by": "name",
+        "distribution": "random"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10573110",
@@ -20852,9 +21283,28 @@
     "url": "https://shadowverse.gg/cards/10573110-neuron-disrupter",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "pp",
+        "action": "recover",
+        "amount_source": "other_allies"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10573310",
@@ -21033,7 +21483,17 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "keyword",
+        "action": "grant",
+        "target": "self",
+        "pick": "random",
+        "count": 3,
+        "keywords": ["Storm", "Bane", "Intimidate", "Drain", "Aura", "Barrier"]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10603210",
@@ -21052,9 +21512,30 @@
     "url": "https://shadowverse.gg/cards/10603210-dark-dimensions",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      }
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "all:follower",
+            "amount": 2,
+            "condition": {
+              "exclude_tribe": "Encroacher"
+            }
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10604110",
@@ -21072,10 +21553,71 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10604110-omegotep-the-dreaded-one",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "pick": "random",
+        "select_count": 2,
+        "options": [
+          {
+            "label": "Destroy a random enemy follower",
+            "effects": [
+              {
+                "op": "destroy",
+                "target": "enemy:follower",
+                "distribution": "random",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Deal 2 damage to the enemy leader",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "label": "Recover 2 play points",
+            "effects": [
+              {
+                "op": "pp",
+                "action": "recover",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +4/+4 and activate its Fanfare ability",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "attack": 4,
+                "defense": 4
+              },
+              {
+                "op": "replicate",
+                "zone": "fanfare"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10611110",
@@ -21674,9 +22216,44 @@
     "url": "https://shadowverse.gg/cards/10622310-majestic-conquest",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "crest",
+            "action": "delay_countdown",
+            "name": "Majestic Conquest",
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": [],
+    "spell": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Majestic Conquest",
+        "image": "images/crests/majestic_conquest.png",
+        "description": "Countdown (2)\nWhenever you play an Enhanced card, summon a Fearless Soldier.",
+        "countdown": 2,
+        "triggers": [
+          {
+            "event": "enhanced_play",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Fearless Soldier",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -21684,7 +22261,8 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nWhenever you play an <b><color=Keyword>Enhance</color><color=Keyword>d</color></b> card, summon a <b><i><color=Keyword>Fearless Soldier</color></i></b>.",
         "name": "Crest"
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10623110",
@@ -22295,10 +22873,42 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10634110-shymm-love-bewitched",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Shymm, Love Bewitched",
+        "image": "images/crests/shymm_love_bewitched.png",
+        "description": "Whenever an allied Crystalspawn attacks, give it +1/+0.",
+        "triggers": [
+          {
+            "event": "ally_follower_attacked",
+            "condition": {
+              "name": "Crystalspawn"
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "attacker",
+                "attack": 1,
+                "defense": 0
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": ["Drain"],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Crystalspawn",
+        "count": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -22306,7 +22916,8 @@
         "skill_text": "Whenever an allied <b><i><color=Keyword>Crystalspawn</color></i></b> attacks, give it +1/+0.",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10634120",
@@ -22469,7 +23080,37 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 1,
+        "attack": 2,
+        "defense": 2
+      }
+    ],
+    "on_discard": [
+      {
+        "op": "gate",
+        "condition": "self_cost",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Advent of the Eld Blades",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "set",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10642110",
@@ -22632,7 +23273,53 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "distribution": "all",
+        "amount": "{self.cost}"
+      }
+    ],
+    "on_discard": [
+      {
+        "op": "gate",
+        "condition": "self_cost",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Beheading Eld Blades",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "set",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "op": "gate",
+        "condition": "self_cost",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Beheading Eld Blades",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "set",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10644110",
@@ -23043,10 +23730,28 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10654110-armes-depletive-demon",
     "evolve": [],
-    "superevolve": [],
-    "keywords": ["Aura"],
-    "triggers": [],
-    "fanfare": []
+    "superevolve": [
+      {
+        "op": "attacks_per_turn",
+        "target": "self",
+        "amount": 3
+      }
+    ],
+    "keywords": ["Aura", "cant_be_destroyed"],
+    "triggers": [
+      {
+        "event": "clash",
+        "source": "board",
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "clash_opponent"
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10654120",
@@ -24193,8 +24898,68 @@
     "url": "https://shadowverse.gg/cards/10704110-illamrita-designated-target",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Illamrita, Designated Target",
+            "image": "images/crests/illamrita_designated_target.png",
+            "description": "Countdown (2)\nLast Words: Summon an Illamrita, Designated Target and evolve it.",
+            "countdown": 2,
+            "keywords": ["Last Words"],
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Illamrita, Designated Target",
+                "count": 1,
+                "evolve_summons": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "follower_strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Barrier"]
+          },
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "clash_opponent",
+            "keywords": ["cant_attack"]
+          },
+          {
+            "op": "keyword",
+            "action": "grant_trigger",
+            "target": "clash_opponent",
+            "triggers": [
+              {
+                "event": "end_of_turn",
+                "source": "board",
+                "effects": [
+                  {
+                    "op": "banish",
+                    "scope": "self"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": [],
     "specific_effects": [
       {
@@ -24203,7 +24968,8 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\n<b><color=Keyword>Last Words</color></b>: Summon an <b><i><color=Keyword>Illamrita, Designated Target</color></i></b> and evolve it. ",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10704120",
@@ -25264,8 +26030,34 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "event": "ally_earth_rite",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "reduce",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Magic Sediment",
+        "count": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10732110",
@@ -25472,8 +26264,34 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "event": "ally_earth_rite",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "reduce",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Magic Sediment",
+        "count": 2
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10734110",
@@ -25708,7 +26526,30 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "pp",
+        "action": "gain_max",
+        "amount": 1
+      },
+      {
+        "op": "transform",
+        "target": "ally:hand",
+        "filter": {
+          "name": "Apathetic Gaze"
+        },
+        "into": "Lazing Flame"
+      },
+      {
+        "op": "transform",
+        "target": "ally:deck",
+        "filter": {
+          "name": "Apathetic Gaze"
+        },
+        "into": "Lazing Flame"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10742110",
@@ -26606,7 +27447,7 @@
     "cost": "1",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Bronze",
     "tribes": ["Anathema"],
@@ -26617,9 +27458,33 @@
     "url": "https://shadowverse.gg/cards/10761210-earrings-of-sunlight",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "replicate",
+            "zone": "fanfare"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": 1,
+        "target": "ally:hand"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10762110",
@@ -26702,7 +27567,7 @@
     "cost": "2",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": ["Anathema"],
@@ -26713,9 +27578,35 @@
     "url": "https://shadowverse.gg/cards/10762210-timepiece-of-perfection",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 1,
+            "distribution": "all"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 1,
+            "distribution": "all"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": []
   },
   {
     "id": "10763110",
@@ -26775,7 +27666,7 @@
     "cost": "3",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Gold",
     "tribes": ["Anathema"],
@@ -26786,9 +27677,30 @@
     "url": "https://shadowverse.gg/cards/10763210-trident-of-eroding-tides",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "select": 1,
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 4
+      }
+    ]
   },
   {
     "id": "10764110",
@@ -27453,11 +28365,27 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10803110_evo.webp",
     "set": "[10008] Chronicle of Destiny",
     "url": "https://shadowverse.gg/cards/10803110-aika-elegy-of-loss",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "source": "destroyed_match",
+        "count": 1,
+        "filter": {
+          "type": "Follower"
+        },
+        "distribution": "random"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10803310",
@@ -27539,7 +28467,47 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Banish all other followers from the field",
+            "effects": [
+              {
+                "op": "banish",
+                "target": "all:follower",
+                "distribution": "all",
+                "condition": {
+                  "not_self": true
+                }
+              }
+            ]
+          },
+          {
+            "label": "Banish all amulets from the field",
+            "effects": [
+              {
+                "op": "banish",
+                "target": "all:amulet",
+                "distribution": "all"
+              }
+            ]
+          },
+          {
+            "label": "Banish all crests",
+            "effects": [
+              {
+                "op": "crest",
+                "action": "banish_all",
+                "player": "all"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10804120",
@@ -27587,7 +28555,15 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "distribution": "random",
+        "count": "{enemy_minus_ally_followers}"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10811120",
@@ -28120,9 +29096,35 @@
     "url": "https://shadowverse.gg/cards/10822310-shared-existence",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Wretch",
+            "count": 3
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "enemy:follower",
+        "attack": -10,
+        "defense": -10,
+        "distribution": "highest",
+        "stat": "attack",
+        "pick": "random",
+        "select": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10823110",
@@ -28210,7 +29212,38 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "activate_all_if_ally_board_gte": 2,
+        "options": [
+          {
+            "label": "Deal 4 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 4,
+                "count": 1,
+                "distribution": "random_hits"
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10824110",
@@ -28514,7 +29547,33 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 8,
+        "distribution": "by_stat",
+        "stat": "attack",
+        "pick": "random"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 2
+      },
+      {
+        "op": "earth_rite",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Earth-Shattering Bolt",
+            "count": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10833110",
@@ -29232,9 +30291,10 @@
     "url": "https://shadowverse.gg/cards/10851110-anisage-clear-resolve",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": ["Storm", "Ignores Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10851120",
@@ -30337,7 +31397,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "source": "destroyed_match",
+        "count": 1,
+        "filter": {
+          "type": "Follower",
+          "tribe": "Artifact"
+        },
+        "distribution": "random"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10872110",

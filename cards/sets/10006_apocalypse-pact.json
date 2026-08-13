@@ -98,7 +98,17 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "keyword",
+        "action": "grant",
+        "target": "self",
+        "pick": "random",
+        "count": 3,
+        "keywords": ["Storm", "Bane", "Intimidate", "Drain", "Aura", "Barrier"]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10603210",
@@ -117,9 +127,30 @@
     "url": "https://shadowverse.gg/cards/10603210-dark-dimensions",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 2
+      }
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "all:follower",
+            "amount": 2,
+            "condition": {
+              "exclude_tribe": "Encroacher"
+            }
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10604110",
@@ -137,10 +168,71 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10604110-omegotep-the-dreaded-one",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "pick": "random",
+        "select_count": 2,
+        "options": [
+          {
+            "label": "Destroy a random enemy follower",
+            "effects": [
+              {
+                "op": "destroy",
+                "target": "enemy:follower",
+                "distribution": "random",
+                "count": 1
+              }
+            ]
+          },
+          {
+            "label": "Deal 2 damage to the enemy leader",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "label": "Recover 2 play points",
+            "effects": [
+              {
+                "op": "pp",
+                "action": "recover",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "label": "Give this follower +4/+4 and activate its Fanfare ability",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "attack": 4,
+                "defense": 4
+              },
+              {
+                "op": "replicate",
+                "zone": "fanfare"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10611110",
@@ -739,9 +831,44 @@
     "url": "https://shadowverse.gg/cards/10622310-majestic-conquest",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "crest",
+            "action": "delay_countdown",
+            "name": "Majestic Conquest",
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": [],
+    "spell": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Majestic Conquest",
+        "image": "images/crests/majestic_conquest.png",
+        "description": "Countdown (2)\nWhenever you play an Enhanced card, summon a Fearless Soldier.",
+        "countdown": 2,
+        "triggers": [
+          {
+            "event": "enhanced_play",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Fearless Soldier",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -749,7 +876,8 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nWhenever you play an <b><color=Keyword>Enhance</color><color=Keyword>d</color></b> card, summon a <b><i><color=Keyword>Fearless Soldier</color></i></b>.",
         "name": "Crest"
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10623110",
@@ -1360,10 +1488,42 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10634110-shymm-love-bewitched",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Shymm, Love Bewitched",
+        "image": "images/crests/shymm_love_bewitched.png",
+        "description": "Whenever an allied Crystalspawn attacks, give it +1/+0.",
+        "triggers": [
+          {
+            "event": "ally_follower_attacked",
+            "condition": {
+              "name": "Crystalspawn"
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "attacker",
+                "attack": 1,
+                "defense": 0
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": ["Drain"],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Crystalspawn",
+        "count": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1371,7 +1531,8 @@
         "skill_text": "Whenever an allied <b><i><color=Keyword>Crystalspawn</color></i></b> attacks, give it +1/+0.",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10634120",
@@ -1534,7 +1695,37 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 1,
+        "attack": 2,
+        "defense": 2
+      }
+    ],
+    "on_discard": [
+      {
+        "op": "gate",
+        "condition": "self_cost",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Advent of the Eld Blades",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "set",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10642110",
@@ -1697,7 +1888,53 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "distribution": "all",
+        "amount": "{self.cost}"
+      }
+    ],
+    "on_discard": [
+      {
+        "op": "gate",
+        "condition": "self_cost",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Beheading Eld Blades",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "set",
+            "amount": 5
+          }
+        ]
+      },
+      {
+        "op": "gate",
+        "condition": "self_cost",
+        "cost": 5,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Beheading Eld Blades",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "set",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10644110",
@@ -2108,10 +2345,28 @@
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10654110-armes-depletive-demon",
     "evolve": [],
-    "superevolve": [],
-    "keywords": ["Aura"],
-    "triggers": [],
-    "fanfare": []
+    "superevolve": [
+      {
+        "op": "attacks_per_turn",
+        "target": "self",
+        "amount": 3
+      }
+    ],
+    "keywords": ["Aura", "cant_be_destroyed"],
+    "triggers": [
+      {
+        "event": "clash",
+        "source": "board",
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "clash_opponent"
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10654120",
@@ -2661,7 +2916,7 @@
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Summon an Ominous Artifact α and give it Bane and Ward.",
+    "description": "Fanfare: Summon an Ominous Artifact \u03b1 and give it Bane and Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10671120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10671120_evo.webp",
     "set": "[10006] Apocalypse Pact",
@@ -2674,7 +2929,7 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Ominous Artifact α",
+        "name": "Ominous Artifact \u03b1",
         "count": 1,
         "keywords": ["Bane", "Ward"]
       }

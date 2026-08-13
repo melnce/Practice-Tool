@@ -41,6 +41,16 @@ import {
 type TargetedOpHandler = (ctx: TargetedOpContext) => DispatchResult;
 const TARGETED_OP_HANDLERS: Map<string, TargetedOpHandler> = new Map();
 
+function rememberDiscardedCards(discarded: CardInstance[]): void {
+  if (!discarded.length) return;
+  state.lastDiscardedCosts = discarded.map(
+    (card) => parseInt(String(card.cost), 10) || 0,
+  );
+  state.lastDiscardedCost = state.lastDiscardedCosts[0] || 0;
+  state.lastDiscardedTypes = discarded.map((card) => String(card.type || ""));
+  state.lastDiscardedType = state.lastDiscardedTypes[0] || "";
+}
+
 // Accessors for testing
 export function __getRegisteredTargetedOps(): string[] {
   return Array.from(TARGETED_OP_HANDLERS.keys());
@@ -176,10 +186,7 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
     addShadows(state, owner, targetUids.length);
   }
   if (discarded.length) {
-    state.lastDiscardedCosts = discarded.map(
-      (c) => parseInt(c.cost as any, 10) || 0,
-    );
-    state.lastDiscardedCost = state.lastDiscardedCosts[0] || 0;
+    rememberDiscardedCards(discarded);
   }
   for (const dc of discarded) {
     if (Array.isArray((dc as any).on_discard))
@@ -210,10 +217,7 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
     addShadows(state, owner, targetUids.length);
   }
   if (discarded.length) {
-    state.lastDiscardedCosts = discarded.map(
-      (c) => parseInt(c.cost as any, 10) || 0,
-    );
-    state.lastDiscardedCost = state.lastDiscardedCosts[0] || 0;
+    rememberDiscardedCards(discarded);
   }
   for (const dc of discarded) {
     if (Array.isArray((dc as any).on_discard))

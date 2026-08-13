@@ -10,6 +10,7 @@ export const RESOURCE_OPS = [
 
   "add_shadows",
   "earth_rite",
+  "combo",
 
   // Draw - deck only, thins deck (stochastic card acquisition)
   "draw",

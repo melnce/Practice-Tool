@@ -18,7 +18,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "field_matches",
+        "type": "Card",
+        "base_cost_eq": 1,
+        "count": 1,
+        "exclude_self": true,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 1,
+            "defense": 1
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10502110",
@@ -609,7 +628,35 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "last_discarded_type",
+        "type": "Spell",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 6
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 3
+          }
+        ]
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10521120",
@@ -673,7 +720,31 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1,
+        "filter": {
+          "type": "Spell"
+        }
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "count": 1,
+        "distribution": "random_hits"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "count": 1,
+        "distribution": "random_hits"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10522110",
@@ -693,8 +764,35 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "when_drawn",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "set",
+            "target": "self",
+            "amount": 3,
+            "until_eot": true
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      },
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 3
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10522120",
@@ -1177,7 +1275,55 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "earth_rite",
+        "cost": 2,
+        "effects": [
+          {
+            "op": "mode",
+            "pick": "random",
+            "select_count": 2,
+            "options": [
+              {
+                "label": "Summon a Clay Golem",
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Clay Golem",
+                    "count": 1
+                  }
+                ]
+              },
+              {
+                "label": "Restore 2 defense to your leader",
+                "effects": [
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 2
+                  }
+                ]
+              },
+              {
+                "label": "Gain 3 earth sigils",
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Magic Sediment",
+                    "count": 3
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10533110",
@@ -1450,7 +1596,23 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "search",
+        "count": 1,
+        "filter": {
+          "type": "Follower"
+        }
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": "{last_drawn_cost}",
+        "count": 1,
+        "distribution": "random_hits"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10542110",
@@ -1554,7 +1716,14 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "all:follower",
+        "amount_source": "followers_on_field"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10543110",
@@ -1700,11 +1869,63 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10544120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10544120-yube-crestpetal",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Yube, Crestpetal",
+        "image": "images/crests/yube_crestpetal.png",
+        "description": "Whenever an allied Marine follower attacks, give it +1/+0 until the end of the turn and, once on each of your turns, add a Majestic Megalorca to your hand.",
+        "triggers": [
+          {
+            "event": "ally_follower_attacked",
+            "condition": {
+              "tribe": "Marine"
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "attacker",
+                "attack": 1,
+                "defense": 0,
+                "until_eot": true
+              }
+            ]
+          },
+          {
+            "event": "ally_follower_attacked",
+            "condition": {
+              "tribe": "Marine"
+            },
+            "once_per_turn": true,
+            "effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Majestic Megalorca",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Majestic Megalorca",
+        "count": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1712,7 +1933,8 @@
         "skill_text": "Whenever an allied Marine follower attacks, give it +1/+0 until the end of the turn and, once on each of your turns, add a <b><i><color=Keyword>Majestic Megalorca</color></i></b> to your hand.",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10551110",
@@ -1934,7 +2156,17 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "all:leader",
+        "amount": 3,
+        "distribution": "by_stat",
+        "stat": "defense",
+        "rank": "lowest"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10553110",
@@ -1951,11 +2183,46 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10553110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10553110-lifestealer",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "damage",
+        "target": "all:follower",
+        "exclude_self": true,
+        "amount": 1,
+        "condition": {
+          "not_self": true
+        }
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_leaves_field",
+        "source": "board",
+        "condition": {
+          "name": "Skeleton"
+        },
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "transform",
+        "target": "all:follower",
+        "distribution": "all",
+        "exclude_self": true,
+        "into": "Skeleton"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10553310",
@@ -1976,7 +2243,42 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": [],
+    "spell": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Rigor of the Nightblossom",
+        "image": "images/crests/rigor_of_the_nightblossom.png",
+        "description": "Countdown (2)\nAt the end of your turn, draw a card. Then, if you have at least 4 cards with the same cost in your hand, summon a Skeleton and give it Ward.",
+        "countdown": 2,
+        "triggers": [
+          {
+            "event": "end_of_turn",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 1
+              },
+              {
+                "op": "gate",
+                "condition": "hand_same_cost_gte",
+                "count": 4,
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Skeleton",
+                    "count": 1,
+                    "keywords": ["Ward"]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1984,7 +2286,8 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\nAt the end of your turn, draw a card. Then, if you have at least 4 cards with the same cost in your hand, summon a <b><i><color=Keyword>Skeleton</color></i></b> and give it <b><color=Keyword>Ward</color></b>.",
         "name": "Crest"
       }
-    ]
+    ],
+    "fanfare": []
   },
   {
     "id": "10554110",
@@ -2086,9 +2389,41 @@
     "url": "https://shadowverse.gg/cards/10561120-bouquet-believer",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Bane"]
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "ally_draw",
+        "source": "board",
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Rush"]
+          }
+        ]
+      }
+    ],
+    "fanfare": [],
+    "spell": []
   },
   {
     "id": "10561310",
@@ -2109,7 +2444,21 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "target": "ally:hand",
+        "select": 1,
+        "select_mode": "random"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 3
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10562110",
@@ -2154,11 +2503,36 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10562120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10562120-desperate-shrinemouse",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_draw",
+        "source": "board",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 1,
+            "distribution": "all"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10562210",
@@ -2166,7 +2540,7 @@
     "cost": "2",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": [],
@@ -2177,9 +2551,22 @@
     "url": "https://shadowverse.gg/cards/10562210-protective-shell",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": "{ward_allies}"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": []
   },
   {
     "id": "10563110",
@@ -2241,7 +2628,7 @@
     "cost": "3",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Gold",
     "tribes": [],
@@ -2252,9 +2639,36 @@
     "url": "https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "return",
+            "destination": "deck",
+            "target": "ally:hand",
+            "select": 2,
+            "select_mode": "random"
+          },
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 5
+      }
+    ]
   },
   {
     "id": "10564110",
@@ -2503,7 +2917,7 @@
     "class": "Portalcraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Fanfare: Add an Ominous Artifact β to your hand.\nSuper-Evolve: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.",
+    "description": "Fanfare: Add an Ominous Artifact \u03b2 to your hand.\nSuper-Evolve: Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10572110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10572110_evo.webp",
     "set": "[10005] Blossoming Fate",
@@ -2527,7 +2941,7 @@
     "fanfare": [
       {
         "op": "add_to_hand",
-        "name": "Ominous Artifact β",
+        "name": "Ominous Artifact \u03b2",
         "count": 1
       }
     ]
@@ -2583,7 +2997,24 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "source": "destroyed_match",
+        "count": 2,
+        "filter": {
+          "type": "Follower"
+        },
+        "distinct_by": "name",
+        "distribution": "random"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10573110",
@@ -2602,9 +3033,28 @@
     "url": "https://shadowverse.gg/cards/10573110-neuron-disrupter",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "pp",
+        "action": "recover",
+        "amount_source": "other_allies"
+      }
+    ],
+    "spell": []
   },
   {
     "id": "10573310",

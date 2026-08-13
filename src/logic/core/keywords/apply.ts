@@ -38,6 +38,10 @@ export const KEYWORD_MAP: {
   ward: (c) => {
     c.hasWard = true;
   },
+  ignores_ward: (c) => {
+    c.ignoresWard = true;
+    getKS(c).ignoresWard = true;
+  },
   bane: (c) => {
     c.hasBane = true;
   },

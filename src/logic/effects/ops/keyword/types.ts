@@ -11,6 +11,10 @@ export interface UnifiedKeywordSpec {
   target?: string;
   select?: number | string;
   select_count?: number;
+  /** Number of distinct keywords to grant when pick/distribution is random. */
+  count?: number | string;
+  pick?: "random";
+  distribution?: "random";
   condition?: any;
   filters?: { class?: string; type?: string; tribe?: string };
   exclude_self?: boolean;

@@ -3,12 +3,13 @@
 // Source determines where the card comes from:
 // - "named": Create from card database by name (token generation)
 // - "copy": Duplicate from an existing target card
+// - "destroyed_match": Recreate cards selected from destroyed history
 
 import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import { pushToHand } from "../../../../core/utils.js";
 import { normalizeCardStats } from "../../../../core/cardStats.js";
-import { getCardDetails } from "../../../../data/cardDatabase.js";
+import { getCardById, getCardDetails } from "../../../../data/cardDatabase.js";
 import type {
   Effect,
   Player,
@@ -17,6 +18,7 @@ import type {
 import { normalizeToAddToHandSpec } from "./types.js";
 import { normalizeInstanceEnteringHandAsCopy } from "./normalizeHandCopy.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
+import { pickDestroyedMatch } from "../../../core/destroyedHistory.js";
 
 /**
  * Handle the add_to_hand operation.
@@ -24,6 +26,7 @@ import { bumpZoneVersion } from "../../../core/triggers/utils.js";
  * Semantics:
  * - source="named": Create token from database, does NOT thin deck
  * - source="copy": Duplicate existing card, does NOT thin deck
+ * - source="destroyed_match": Create fresh cards from destroyed-history records
  *
  * @param eff - The add_to_hand effect
  * @param owner - The player who triggered the effect
@@ -55,6 +58,8 @@ export function handleAddToHand(
     addNamedCards(spec, receivingPlayer, hand);
   } else if (spec.source === "copy") {
     addCopiedCards(spec, owner, receivingPlayer, hand, sourceCard, context);
+  } else if (spec.source === "destroyed_match") {
+    addDestroyedMatchCards(spec, owner, receivingPlayer, hand);
   }
 }
 
@@ -100,6 +105,59 @@ function addNamedCards(
         name: copy.name,
         uid: copy.uid,
         source: "named",
+      });
+    }
+  }
+  if (added > 0) bumpZoneVersion();
+}
+
+/** Add fresh card instances selected from the owner's destroyed history. */
+function addDestroyedMatchCards(
+  spec: ReturnType<typeof normalizeToAddToHandSpec>,
+  owner: Player,
+  receivingPlayer: Player,
+  hand: CardInstance[],
+): void {
+  const records = pickDestroyedMatch(state, owner, {
+    filter: spec.filter,
+    ...(spec.distinctBy ? { distinct_by: spec.distinctBy } : {}),
+    ...(spec.distribution ? { distribution: spec.distribution } : {}),
+    count: spec.count,
+  });
+
+  let added = 0;
+  for (const record of records) {
+    const base =
+      getCardById(record.cardId || record.id) ?? getCardDetails(record.name);
+    if (!base) {
+      logEvent("add_to_hand_notFound", {
+        name: record.name,
+        id: record.cardId || record.id,
+        player: receivingPlayer,
+        source: "destroyed_match",
+      });
+      continue;
+    }
+
+    const copy: CardInstance = structuredClone(base);
+    copy.uid = state.rng.makeUid();
+    copy.owner = receivingPlayer;
+    copy.zone = "hand";
+    normalizeCardStats(copy);
+
+    if (spec.keywords.length > 0) {
+      applyKeywords(copy, spec.keywords);
+    }
+
+    if (pushToHand(hand, copy)) {
+      added++;
+      (state as any).lastAddedToHand = copy;
+      logEvent("add_to_hand", {
+        owner: receivingPlayer,
+        name: copy.name,
+        uid: copy.uid,
+        source: "destroyed_match",
+        from: record.uid,
       });
     }
   }

@@ -97,9 +97,24 @@ function handleGrant(
   ctx: KeywordHandlerContext,
 ): KeywordEffectResult {
   // STRICT: Only accept keywords array
-  const keywordList = Array.isArray((eff as any).keywords)
+  let keywordList = Array.isArray((eff as any).keywords)
     ? (eff as any).keywords
     : [];
+  const randomKeywordPool =
+    String((eff as any).pick || "").toLowerCase() === "random" ||
+    String((eff as any).distribution || "").toLowerCase() === "random";
+  if (randomKeywordPool && keywordList.length > 0) {
+    const requested =
+      parseInt(String((eff as any).count ?? (eff as any).select ?? 1), 10) || 1;
+    const bag = keywordList.slice();
+    const chosen: typeof keywordList = [];
+    while (chosen.length < Math.min(requested, bag.length) && bag.length) {
+      const index = state.rng.nextInt(bag.length);
+      const keyword = bag.splice(index, 1)[0];
+      if (keyword !== undefined) chosen.push(keyword);
+    }
+    keywordList = chosen;
+  }
 
   // ========================================================================
   // LEADER KEYWORD SUPPORT
@@ -192,7 +207,7 @@ function handleGrant(
   if (!targets.length) return { kind: "done" };
 
   const __selRaw = eff.select ?? eff.select_count;
-  if (__selRaw) {
+  if (__selRaw && !randomKeywordPool) {
     return createSelectionRequest(
       eff,
       ctx.owner,

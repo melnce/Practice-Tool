@@ -11,6 +11,7 @@ import type {
   Player,
   CardInstance,
 } from "../../../../core/types/index.js";
+import { resolveDynamicValue } from "../../../core/values.js";
 
 import type { UnifiedDrawSpec, DrawCount } from "./types.js";
 
@@ -83,6 +84,9 @@ function resolveCount(count: DrawCount, player: Player): number {
   }
   if (count === "all") {
     return 999; // Handled by deck size naturally
+  }
+  if (typeof count === "string" && count.includes("{")) {
+    return Math.max(0, resolveDynamicValue(count, { owner: player }) | 0);
   }
   return typeof count === "number" ? count : 1;
 }

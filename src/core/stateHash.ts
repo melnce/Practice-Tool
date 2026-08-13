@@ -51,6 +51,12 @@ function canonicalizeState(state: GameState): object {
     redFollowerEnterHistory: (
       state.players.second.followerEnterHistory ?? []
     ).map((r) => `${r.cardId}:${r.name}`),
+    blueDestroyedHistory: (state.players.first.destroyedHistory ?? []).map(
+      (r) => `${r.name}:${r.id}`,
+    ),
+    redDestroyedHistory: (state.players.second.destroyedHistory ?? []).map(
+      (r) => `${r.name}:${r.id}`,
+    ),
 
     // Evo state
     blueEvoCharges: state.players.first.evoCharges,
@@ -113,6 +119,7 @@ function canonicalizeCard(card: CardInstance): object {
     defense: card.defense,
     cost: card.cost,
     hasWard: !!card.hasWard,
+    ignoresWard: !!card.ignoresWard,
     hasBane: !!card.hasBane,
     hasDrain: !!card.hasDrain,
     hasStorm: !!card.hasStorm,

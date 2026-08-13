@@ -5,6 +5,8 @@ import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 import { addShadows, getGraveyard } from "./playerHelpers.js";
 import { applyGameOverIfNeeded } from "./gameOver.js";
+import { fireTrigger } from "../logic/core/triggers.js";
+import { bumpZoneVersion } from "../logic/core/triggers/utils.js";
 // Pull *once* from rng and re-export locally-used helpers
 // (Refactored to use state.rng directly)
 
@@ -219,5 +221,19 @@ export function drawCard(
     logEvent("draw", { owner, card: top.name, uid: top.uid });
   }
 
-  return pushToHand(hand, top);
+  const drawn = pushToHand(hand, top);
+  if (drawn && top && owner) {
+    if (!state.lastDrawnCards) state.lastDrawnCards = [];
+    state.lastDrawnCards.unshift(top);
+    if (state.lastDrawnCards.length > 5) state.lastDrawnCards.length = 5;
+    (state as any).lastDrawnCard = top;
+    bumpZoneVersion();
+    fireTrigger("ally_draw", owner, { drawnCard: top, enteringCard: top });
+    fireTrigger("when_drawn", owner, {
+      sourceCard: top,
+      drawnCard: top,
+      enteringCard: top,
+    });
+  }
+  return drawn;
 }

@@ -178,16 +178,17 @@ export function enableEnemyFollowerDrop(
     const defender = defenders[defenderIndex];
     if (!defender) return;
 
-    const hasWard = defenders.some(
-      (c: CardInstance) => (c.hasWard ?? false) && Number(c.defense ?? 0) > 0,
-    );
-    if (hasWard && !defender.hasWard) return;
-    if (defender.hasIntimidate && !defender.hasWard) return;
-
     const attacker = getBoard(state, attackerPlayer as Player)[
       parseInt(attackerIndex || "0", 10)
     ];
     if (!attacker) return;
+
+    const hasWard = defenders.some(
+      (c: CardInstance) => (c.hasWard ?? false) && Number(c.defense ?? 0) > 0,
+    );
+    if (hasWard && !defender.hasWard && !attacker.ignoresWard) return;
+    if (defender.hasIntimidate && !defender.hasWard) return;
+
     attackAction(attackerPlayer as Player, attacker.uid, {
       type: "card",
       uid: defender.uid,

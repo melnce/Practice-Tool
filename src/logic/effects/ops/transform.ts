@@ -9,7 +9,7 @@ import type {
   CardInstance,
   Effect,
 } from "../../../core/types/index.js";
-import { getHand, getBoard } from "../../../core/playerHelpers.js";
+import { getHand, getBoard, getDeck } from "../../../core/playerHelpers.js";
 import { getPool } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 
@@ -17,12 +17,13 @@ import { resolveUid } from "../../../core/uidResolver.js";
 // UNIFIED TRANSFORM HANDLER - target field REQUIRED
 // ========================================================================
 
-export type TransformZone = "board" | "hand" | "self";
+export type TransformZone = "board" | "hand" | "deck" | "self";
 export type TransformMode = "all" | "random";
 
 export interface TransformFilter {
   type?: string;
   class?: string;
+  name?: string;
   cost?: { op: string; value: number };
 }
 
@@ -41,9 +42,11 @@ export interface TransformSpec {
  * CANONICAL FORMAT (target field REQUIRED):
  *   { "op": "transform", "target": "enemy:follower", "select": 1, "into": "Fairy" }
  *   { "op": "transform", "target": "ally:hand", "filter": {...}, "into": "Token" }
+ *   { "op": "transform", "target": "ally:deck", "filter": { "name": "X" }, "into": "Y" }
  *
  * Zone derivation from target:
  *   - target contains ":hand" → zone = "hand"
+ *   - target contains ":deck" → zone = "deck"
  *   - target === "self" → zone = "self"
  *   - otherwise → zone = "board"
  */
@@ -58,7 +61,7 @@ export function handleTransform(
   if (!eff.target) {
     throw new Error(
       `[transform] Missing required field: "target". ` +
-        `Use "enemy:follower", "ally:hand", or "self". ` +
+        `Use "enemy:follower", "ally:hand", "ally:deck", or "self". ` +
         `Effect: ${JSON.stringify(eff)}`,
     );
   }
@@ -68,6 +71,8 @@ export function handleTransform(
 
   if (targetStr.includes(":hand")) {
     zone = "hand";
+  } else if (targetStr.includes(":deck")) {
+    zone = "deck";
   } else if (targetStr === "self") {
     zone = "self";
   } else {
@@ -77,7 +82,7 @@ export function handleTransform(
   const mode = (eff.mode || "all") as TransformMode;
   const into = String(eff.into || eff.name || "").trim();
 
-  if (!into && zone !== "hand") {
+  if (!into && zone !== "hand" && zone !== "deck") {
     throw new Error(
       `[transform] Missing required field: "into". ` +
         `Effect: ${JSON.stringify(eff)}`,
@@ -94,6 +99,10 @@ export function handleTransform(
       }
       return;
 
+    case "deck":
+      transformInDeckByFilter(eff, owner);
+      return;
+
     case "self":
       if (ctx.sourceCard) {
         transformAnywhere(ctx.sourceCard, into);
@@ -105,16 +114,34 @@ export function handleTransform(
     case "board":
     default: {
       const selectN = parseInt(String(eff.select ?? 0), 10) || 0;
+      const wantAll =
+        String((eff as any).distribution || "").toLowerCase() === "all" ||
+        targetStr.startsWith("all:") ||
+        targetStr === "all:follower";
+
+      const pool = getPool(
+        eff.target || "ally:follower",
+        owner,
+        ctx.sourceCard ?? null,
+        (eff as any).condition,
+        {
+          ...(ctx.context ?? {}),
+          isTargetedEffect: selectN > 0 && !wantAll,
+        },
+      );
+      let targets = pool.filter((c) => c && c.type === "Follower");
+      if ((eff as any).exclude_self && ctx.sourceCard) {
+        targets = targets.filter((c) => c.uid !== ctx.sourceCard?.uid);
+      }
+
+      if (wantAll) {
+        for (const t of targets) transformTarget(t, into);
+        return;
+      }
+
       if (selectN > 0 && !ctx.context?.targetUids?.length) {
-        const pool = getPool(
-          eff.target || "ally:follower",
-          owner,
-          ctx.sourceCard ?? null,
-          eff.condition,
-          ctx.context ?? {},
-        );
-        if (pool.length > 0) {
-          const picks = pool.slice(0, Math.min(selectN, pool.length));
+        if (targets.length > 0) {
+          const picks = targets.slice(0, Math.min(selectN, targets.length));
           for (const t of picks) transformTarget(t, into);
           return;
         }
@@ -124,6 +151,9 @@ export function handleTransform(
       if (!ctx.context?.targetUids?.length) {
         if (ctx.sourceCard && (eff.target === "self" || targetStr === "self")) {
           transformTarget(ctx.sourceCard, into);
+        } else if (targets.length && selectN === 0) {
+          // AoE-style: transform entire matching pool when no select requested
+          for (const t of targets) transformTarget(t, into);
         } else {
           console.warn("transform: no targetUids in context.");
         }
@@ -165,6 +195,11 @@ function matchesFilter(card: CardInstance, filter: any): boolean {
 
   // Check class filter
   if (filter.class && (card as any).class !== filter.class) {
+    return false;
+  }
+
+  // Check exact name filter
+  if (filter.name && String(card.name) !== String(filter.name)) {
     return false;
   }
 
@@ -261,6 +296,40 @@ function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
       logEvent("transformInHand", { owner, from: card.name, to: newCard.name });
       hand[i] = newCard as CardInstance;
     }
+  }
+}
+
+/**
+ * Transform all cards in deck matching the filter (same semantics as hand).
+ */
+function transformInDeckByFilter(eff: Effect & TransformSpec, owner: Player) {
+  const deck = getDeck(state, owner);
+  const filter = eff.filter || {};
+  const targetCardName = eff.into || (eff as any).target_card_name;
+
+  if (!targetCardName) {
+    console.error("transform zone:deck requires 'into' or 'target_card_name'");
+    return;
+  }
+
+  const cardTemplate = getCardDetails(targetCardName);
+  if (!cardTemplate) {
+    console.error(`Card template not found for: ${targetCardName}`);
+    return;
+  }
+
+  for (let i = deck.length - 1; i >= 0; i--) {
+    const card = deck[i];
+    if (!card) continue;
+    if (!matchesFilter(card, filter)) continue;
+    const newCard = {
+      ...structuredClone(cardTemplate),
+      uid: card.uid,
+      owner: card.owner,
+      zone: card.zone ?? "deck",
+    };
+    logEvent("transformInDeck", { owner, from: card.name, to: newCard.name });
+    deck[i] = newCard as CardInstance;
   }
 }
 

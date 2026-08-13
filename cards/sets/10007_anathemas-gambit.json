@@ -166,8 +166,68 @@
     "url": "https://shadowverse.gg/cards/10704110-illamrita-designated-target",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Illamrita, Designated Target",
+            "image": "images/crests/illamrita_designated_target.png",
+            "description": "Countdown (2)\nLast Words: Summon an Illamrita, Designated Target and evolve it.",
+            "countdown": 2,
+            "keywords": ["Last Words"],
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Illamrita, Designated Target",
+                "count": 1,
+                "evolve_summons": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "follower_strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "self",
+            "keywords": ["Barrier"]
+          },
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "clash_opponent",
+            "keywords": ["cant_attack"]
+          },
+          {
+            "op": "keyword",
+            "action": "grant_trigger",
+            "target": "clash_opponent",
+            "triggers": [
+              {
+                "event": "end_of_turn",
+                "source": "board",
+                "effects": [
+                  {
+                    "op": "banish",
+                    "scope": "self"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": [],
     "specific_effects": [
       {
@@ -176,7 +236,8 @@
         "skill_text": "<b><color=Keyword>Countdown</color> (2)</b>\n<b><color=Keyword>Last Words</color></b>: Summon an <b><i><color=Keyword>Illamrita, Designated Target</color></i></b> and evolve it. ",
         "name": "Crest"
       }
-    ]
+    ],
+    "spell": []
   },
   {
     "id": "10704120",
@@ -1237,8 +1298,34 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "event": "ally_earth_rite",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "reduce",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Magic Sediment",
+        "count": 1
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10732110",
@@ -1445,8 +1532,34 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "event": "ally_earth_rite",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "reduce",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Magic Sediment",
+        "count": 2
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10734110",
@@ -1681,7 +1794,30 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "pp",
+        "action": "gain_max",
+        "amount": 1
+      },
+      {
+        "op": "transform",
+        "target": "ally:hand",
+        "filter": {
+          "name": "Apathetic Gaze"
+        },
+        "into": "Lazing Flame"
+      },
+      {
+        "op": "transform",
+        "target": "ally:deck",
+        "filter": {
+          "name": "Apathetic Gaze"
+        },
+        "into": "Lazing Flame"
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10742110",
@@ -2579,7 +2715,7 @@
     "cost": "1",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Bronze",
     "tribes": ["Anathema"],
@@ -2590,9 +2726,33 @@
     "url": "https://shadowverse.gg/cards/10761210-earrings-of-sunlight",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "replicate",
+            "zone": "fanfare"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": 1,
+        "target": "ally:hand"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10762110",
@@ -2675,7 +2835,7 @@
     "cost": "2",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": ["Anathema"],
@@ -2686,9 +2846,35 @@
     "url": "https://shadowverse.gg/cards/10762210-timepiece-of-perfection",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 1,
+            "distribution": "all"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 1,
+            "distribution": "all"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": []
   },
   {
     "id": "10763110",
@@ -2748,7 +2934,7 @@
     "cost": "3",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Gold",
     "tribes": ["Anathema"],
@@ -2759,9 +2945,30 @@
     "url": "https://shadowverse.gg/cards/10763210-trident-of-eroding-tides",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "select": 1,
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "select": 1,
+        "amount": 4
+      }
+    ]
   },
   {
     "id": "10764110",

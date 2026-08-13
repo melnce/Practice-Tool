@@ -39,6 +39,8 @@ const KNOWN_ROOT_KEYS = new Set<string>([
   "lastDrawnCards",
   "lastDiscardedCosts",
   "lastDiscardedCost",
+  "lastDiscardedTypes",
+  "lastDiscardedType",
   "phase",
   "gameOverReason",
   "winner",
@@ -151,6 +153,8 @@ export function resetStateInstance(
   delete (target as any).mulliganSecondSelected;
   delete (target as any).lastDiscardedCosts;
   delete (target as any).lastDiscardedCost;
+  delete (target as any).lastDiscardedTypes;
+  delete (target as any).lastDiscardedType;
   delete (target as any).lastAddedToHand;
   delete (target as any).lastSearchedCards;
 

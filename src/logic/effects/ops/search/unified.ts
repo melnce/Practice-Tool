@@ -127,6 +127,10 @@ export function handleSearch(
       if (pushToHand(hand, card)) {
         searched.push(card);
         (state as any).lastAddedToHand = card;
+        if (!state.lastDrawnCards) state.lastDrawnCards = [];
+        state.lastDrawnCards.unshift(card);
+        if (state.lastDrawnCards.length > 5) state.lastDrawnCards.length = 5;
+        (state as any).lastDrawnCard = card;
       }
     } else {
       // Hand full - card goes to graveyard (overdraw/search overflow)

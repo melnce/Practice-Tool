@@ -32,7 +32,7 @@ export type DrawPlayer = "self" | "opponent";
  * - `"all"`: Draw all matching cards
  * - `"combo"`: Draw equal to combo count
  */
-export type DrawCount = number | "all" | "combo";
+export type DrawCount = number | "all" | "combo" | string;
 
 /**
  * CANONICAL FORMAT for draw op:
@@ -100,11 +100,13 @@ export function normalizeToUnifiedSpec(
   let count: DrawCount;
   if (eff.count === "all" || eff.count === "combo") {
     count = eff.count;
+  } else if (typeof eff.count === "string" && String(eff.count).includes("{")) {
+    count = String(eff.count);
   } else {
     const n = parseInt(String(eff.count), 10);
     if (!Number.isFinite(n) || n < 0) {
       throw new Error(
-        `[draw] Invalid count: "${eff.count}". Must be non-negative number, "all", or "combo".`,
+        `[draw] Invalid count: "${eff.count}". Must be non-negative number, "all", "combo", or a {dynamic} value.`,
       );
     }
     count = n;

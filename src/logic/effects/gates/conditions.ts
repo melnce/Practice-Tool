@@ -193,18 +193,39 @@ registerCondition("board_name", (spec, owner) => {
   return (myBoard || []).some((c) => String(c?.name) === want);
 });
 
-registerCondition("ally_matches", (spec, owner) => {
-  const board = getBoard(state, owner) || [];
+function countBoardMatches(
+  cards: CardInstance[],
+  spec: UnifiedGateSpec,
+  sourceCard: CardInstance | null,
+): number {
   const filter: CardCondition = {};
-  if (spec.type) filter.type = spec.type;
-  else filter.type = "Follower";
+  if (spec.type && String(spec.type).toLowerCase() !== "card") {
+    filter.type = spec.type;
+  }
   if (spec.base_cost_eq != null) filter.base_cost_eq = spec.base_cost_eq;
   if (spec.base_cost_gte != null) filter.base_cost_gte = spec.base_cost_gte;
   if (spec.base_cost_lte != null) filter.base_cost_lte = spec.base_cost_lte;
   if (spec.name) filter.name = spec.name;
   if ((spec as any).class) filter.class = String((spec as any).class);
   if (spec.tribe) filter.tribe = spec.tribe;
-  return board.some((c) => evaluateCardCondition(c, filter));
+  return cards.filter(
+    (card) =>
+      !(spec.exclude_self && sourceCard && card.uid === sourceCard.uid) &&
+      evaluateCardCondition(card, filter),
+  ).length;
+}
+
+registerCondition("ally_matches", (spec, owner, sourceCard) => {
+  const board = getBoard(state, owner) || [];
+  return countBoardMatches(board, spec, sourceCard) >= (spec.count ?? 1);
+});
+
+registerCondition("field_matches", (spec, _owner, sourceCard) => {
+  const field = [
+    ...(getBoard(state, "first") || []),
+    ...(getBoard(state, "second") || []),
+  ];
+  return countBoardMatches(field, spec, sourceCard) >= (spec.count ?? 1);
 });
 
 registerCondition("unique_tribe_enters", (spec, owner) => {
@@ -241,6 +262,29 @@ registerCondition("leader_defense_lte", (spec, owner) => {
 registerCondition("leader_defense_gt_enemy", (spec, owner) => {
   void spec;
   return getHP(state, owner) > getHP(state, opponentOf(owner));
+});
+
+registerCondition("last_discarded_type", (spec) => {
+  if (!spec.type) return false;
+  return (
+    String(state.lastDiscardedType || "").toLowerCase() ===
+    String(spec.type).toLowerCase()
+  );
+});
+
+/** True if the hand has ≥ `count` cards that share one common cost. */
+registerCondition("hand_same_cost_gte", (spec, owner) => {
+  const need = spec.count ?? spec.at_least ?? 4;
+  const hand = getHand(state, owner) || [];
+  const byCost = new Map<number, number>();
+  for (const c of hand) {
+    const cost = Number(c?.cost) || 0;
+    byCost.set(cost, (byCost.get(cost) || 0) + 1);
+  }
+  for (const n of byCost.values()) {
+    if (n >= need) return true;
+  }
+  return false;
 });
 
 registerCondition("self_cost", (spec, _owner, sourceCard) => {

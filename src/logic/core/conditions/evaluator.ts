@@ -29,6 +29,8 @@ export interface CardCondition {
 
   // Tribe filter
   tribe?: string;
+  /** Fail if the card has this tribe (case-insensitive). */
+  exclude_tribe?: string;
 
   // Keyword filters
   has_keyword?: string | string[];
@@ -141,6 +143,15 @@ export function evaluateCardCondition(
       ? card.tribes.map((t) => String(t).toLowerCase())
       : [];
     if (!tribes.includes(want)) return false;
+  }
+
+  // Exclude tribe
+  if (cond.exclude_tribe) {
+    const want = String(cond.exclude_tribe).toLowerCase();
+    const tribes = Array.isArray(card.tribes)
+      ? card.tribes.map((t) => String(t).toLowerCase())
+      : [];
+    if (tribes.includes(want)) return false;
   }
 
   // Keyword filters (has_keyword or keywords)

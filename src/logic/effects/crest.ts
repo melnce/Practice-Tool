@@ -361,6 +361,14 @@ export function removeCrest(owner: Player, crestName: string) {
  * 1. Crest has "Last Words" in its keywords array, OR
  * 2. Crest description contains "Last Words:"
  */
+/** Banish every crest on a player (no Last Words — banish, not destroy). */
+export function banishAllCrests(owner: Player) {
+  const list = getCrests(owner);
+  if (!Array.isArray(list) || list.length === 0) return;
+  logEvent("crestBanishAll", { owner, count: list.length });
+  list.length = 0;
+}
+
 export function destroyCrest(owner: Player, crestName: string) {
   const list = getCrests(owner);
   if (!Array.isArray(list)) return;

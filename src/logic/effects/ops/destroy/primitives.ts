@@ -11,6 +11,7 @@ import {
   getGraveyard as getGraveyardHelper,
   addShadows,
 } from "../../../../core/playerHelpers.js";
+import { recordDestroyed } from "../../../core/destroyedHistory.js";
 
 // ============================================================================
 // PROTECTION CHECKS
@@ -114,6 +115,7 @@ export function destroyTarget(
     const removed = board.splice(idx, 1)[0];
     if (!removed) return false;
 
+    recordDestroyed(state, cardOwner, removed);
     removed.zone = "graveyard";
     removed.cost_mod = 0; // Reset cost when entering graveyard
     grave.push(removed);
