@@ -116,7 +116,7 @@ export interface UnifiedDamageSpec {
 
   // Targeting modifiers
   select?: number; // Require N user selections
-  include_leader?: boolean; // Random hits can target leader
+  include_leader?: boolean | "enemy" | "ally" | "both"; // Random hits can target leader(s)
   fallback_leader?: boolean; // If no followers, allow leader selection
 
   // Standard fields
@@ -250,7 +250,12 @@ export function normalizeToUnifiedSpec(
     spec.select = parseInt(String(eff.select), 10) || 0;
   }
   if (eff.include_leader !== undefined) {
-    spec.include_leader = Boolean(eff.include_leader);
+    const raw = eff.include_leader;
+    if (raw === "both" || raw === "ally" || raw === "enemy") {
+      spec.include_leader = raw;
+    } else {
+      spec.include_leader = Boolean(raw);
+    }
   }
   if (
     eff.fallback_leader !== undefined ||

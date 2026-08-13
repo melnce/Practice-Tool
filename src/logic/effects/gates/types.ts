@@ -45,6 +45,7 @@ export type GateCondition =
   | "leader_defense_gt_enemy" // Owner leader HP > enemy leader HP
   | "last_discarded_type" // Most recently discarded card has `type`
   | "hand_same_cost_gte" // Hand has ≥count cards sharing one cost
+  | "hand_top_base_costs_gt_enemy" // Σ of N highest base costs in hand > enemy's
 
   // Special gates
   | "skybound_art" // Turn + evolves witnessed >= requirement

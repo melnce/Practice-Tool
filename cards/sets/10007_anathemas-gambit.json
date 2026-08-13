@@ -704,11 +704,59 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10714110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10714110-thestae-anathema-of-distortion",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Thestae, Anathema of Distortion",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10714110_token.webp",
+        "description": "Countdown (3)\nAt the end of your turn, Combo (3) - Give all followers in your deck +1/+1.",
+        "countdown": 3,
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "gate",
+                "condition": "combo",
+                "count": 3,
+                "effects": [
+                  {
+                    "op": "stat",
+                    "action": "give",
+                    "target": "ally:deck",
+                    "filter": {
+                      "type": "Follower"
+                    },
+                    "attack": 1,
+                    "defense": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "enemy:follower",
+        "select": 1,
+        "attack": 0,
+        "defense": "-{self.attack}"
+      },
+      {
+        "op": "counter",
+        "action": "add",
+        "key": "combo",
+        "amount": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,

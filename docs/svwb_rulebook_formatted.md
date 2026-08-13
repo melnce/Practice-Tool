@@ -39,6 +39,7 @@ An engine-oriented rules reference for Shadowverse: Worlds Beyond (SVWB). It cov
 - [Continuous Effects and Modifiers](#continuous-effects-and-modifiers)
   - [Stat Modification Hierarchy](#stat-modification-hierarchy)
 - [Hidden Information and Reveal Mechanics](#hidden-information-and-reveal-mechanics)
+- [Copy semantics (exact copy vs copy)](#copy-semantics-exact-copy-vs-copy)
 
 ---
 
@@ -78,6 +79,8 @@ Random effects ("deal damage to a random enemy", "summon a random follower from 
 ## Hidden Information
 
 Each player's hand contents and deck order are hidden from the opponent. Hand size is public (the UI shows the opponent's card count), and deck count is shown as well — so decking-out the opponent is plannable, and deck count must be accessible for win-condition checks. Card identities in hand and deck are private unless an effect reveals them; "reveal" typically means both players see the card, and revealed hand cards return to hidden afterward unless continuously revealed. The cemetery exposes only the shadow count, not distinct cards, so its contents are effectively hidden. Both players can consult the Battle Log, which lists actions taken (cards played, deaths, etc.).
+
+**Owner ruling — Hidden information always visible (2026-08-13):** In this practice tool the player is playing against themselves, so card text that says "without revealing them/it" does **not** hide anything. Exact copies added to hand (and any effect that would read the opponent's hand or deck under a reveal restriction) remain fully visible to the player, and effects may freely inspect both hands and both decks. Do **not** build a hidden-copy variant or gate this on the sparring hidden-hand UI toggle — the owner judged a bot/scripted-opponent hidden mode not worth the complexity. Cards unblocked by this ruling include Goddess of Starlight, Wolfraud, Skybound Hanged Man, Legacy of the Brave, and Behemoth General.
 
 ## Time and Priority
 
@@ -407,6 +410,8 @@ This section enumerates the keyword abilities and major mechanics of SVWB. Each 
 
 **Crests (Countdown / Last Words / end of turn).** Crests use the same timing machinery as amulets. A Countdown (N) on a crest ticks −1 at the start of its owner's turn (the same window as amulet countdowns), and the crest is destroyed at 0. Last Words on a crest fire when it is destroyed (including by countdown reaching 0). "At the end of your turn" on a crest fires at that owner's end of turn (e.g. Corruption: deal 2 to your leader each end of turn while active). _Example Last Words:_ Belial's crest — Countdown (4), Last Words: deal 20 to the enemy leader when it reaches 0.
 
+**Owner ruling — Slaus unused-ability pool (PROVISIONAL, 2026-08-13):** For _Slaus, Revolving Wheel of Fortune_ (body and Crest), "activate a random ability that hasn't been activated yet" draws **without replacement** from the printed three options. The unused pool is **not** replenished: at most three activations occur; on a fourth start-of-turn (if the body somehow survived, or if the Crest's Countdown (3) were somehow still present), **nothing happens**. The Crest's Countdown (3) already caps Crest activations at three in normal play. **PROVISIONAL** — the owner flagged uncertainty: the Crest countdown makes the three-cap clear in practice, but the body effect is hard to observe in a real match because followers rarely survive three turns in a row. A future in-game observation may overturn this; keep the provisional mark until confirmed.
+
 **Skybound Art / Super Skybound Art.** Evaluated per card in hand when it is played: gauge = the current turn number + the number of allied followers that evolved while this card was in your hand. Skybound Art activates at gauge ≥ 10, Super Skybound Art at ≥ 15. Evolves that happened before the card entered your hand do not count.
 
 **Faith and Modes.** Faith is a leader counter on the crest _Faith: Sham-Nacha, Heir to Entwining_ (active while Sham-Nacha is in your deck), starting at 0. It increases by 1 per Modes-selection event (one completed mode-choice resolution), not per individual mode picked — Screaming and Loathing (pick 2 modes at once) adds 1, while a card that selects Modes on both Fanfare and Evolve adds 2. The selectable-mode count = the card's base (usually 1, Screaming 2) + the leader's `modeBonus`. Sham-Nacha's Fanfare spends 10 Faith (`pay_counter` must be ≥ 10 or the pay fizzles; on success `mode_bonus` +1, stacking), and a second successful spend gives +2 total (so Screaming caps at 2 + 2 = 4 picks).
@@ -425,6 +430,9 @@ A player's EP evolve always runs the full `evolve[]` / `superevolve[]` script fo
 - _Zooey, Enhance (10):_ (a) setting leader max defense to 1 is a set — current HP is clamped down to the new maximum, repeated sets stay at 1/1, and healing cannot raise current HP above 1; (b) "can't take more than 0 damage at a time" until the opponent's end of turn caps each individual damage instance to the leader at 0 (combat or effect), expiring after the opponent's turn ends (the leader may still be at 1/1).
 - _Mari, Meg's Bestie:_ in hand — when a 3 base-cost allied follower super-evolves, Mari's cost becomes 0 until your end of turn (the first such trigger that turn; it stays 0 if more allies super-evolve); on board — at your end of turn, give +1/+1 to one random super-evolved allied follower (any base cost; one super-evolved on a prior turn still qualifies).
 - _Azurifrit:_ on your turn, whenever this follower takes damage (including 0) and is not destroyed, deal 1 damage to the enemy leader; each damage instance is a separate trigger, up to 3 activations per turn.
+- _Oluon, Raging Chariot (2026-08-13):_ when evolved, "Deal 7 damage to another random ally or enemy" three times means each hit independently chooses among **all characters except Oluon itself** (both leaders and all other followers on both sides). Previously hit targets remain eligible, so the same follower or leader can be struck more than once, and all three hits can land on the enemy leader (21 total). "Another" exempts only Oluon.
+- _Thestae, Anathema of Distortion (2026-08-13):_ the Crest's "Give all followers in your deck +1/+1" applies **only** to follower instances currently in the deck (not cards already in hand or on the field). Those buffs **persist when the card is drawn** (otherwise the Crest would be pointless).
+- _Encroached World (2026-08-13):_ Engage and Transform are separate mechanics — Engage activates, and the transform is simply that Engage's effect. There is no special engage-transform interaction to model.
 
 ### Damage Events (General)
 
@@ -506,3 +514,14 @@ Hidden information mainly concerns cards in hand and deck:
 - **Drawn cards:** only the drawing player learns the identity; the opponent sees only that the hand count rose by one.
 - **Created tokens added to hand:** only that player knows which token it is, unless explicitly revealed.
 - **Cemetery:** which cards died is visible to the opponent (via the Battle Log), as is the shadow count (relevant for Abysscraft).
+
+**Practice-tool exception:** see **Owner ruling — Hidden information always visible (2026-08-13)** under Hidden Information. "Without revealing" text does not hide copies in this tool.
+
+## Copy semantics (exact copy vs copy)
+
+**Owner ruling — Exact copy vs copy (2026-08-13):** This is a **general** rule for every copy effect in the game, not a per-card note:
+
+- **"an exact copy"** (or "exact copies") copies the **instance**, including its current stats and modifications (buffs, cost mods, granted keywords, evolve state where applicable, and other lasting instance fields). The copy is still a new object (new uid; board combat / summoning-sick / Skybound gauge witnesses are reset when entering hand as appropriate).
+- **"a copy"** / **"copies of"** (without "exact") copies the **base/printed card** — a fresh template from the card database (destroyed-history recreations, named token summons, etc.).
+
+When card text says "Summon 2 copies of Fairy," that is base copies of the named card. When it says "summon an exact copy of this card" or "add an exact copy of a random card in your opponent's hand," that is an instance clone of the referenced card.

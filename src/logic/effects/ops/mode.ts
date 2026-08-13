@@ -131,6 +131,37 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   const isRandomPick =
     String((eff as any).pick || "").toLowerCase() === "random" ||
     String((eff as any).distribution || "").toLowerCase() === "random";
+  const isRandomUnused =
+    String((eff as any).pick || "").toLowerCase() === "random_unused";
+  if (isRandomUnused) {
+    // Persistent without-replacement pool on the host (follower or crest).
+    // Owner ruling (Slaus, provisional): pool is never replenished.
+    const host = sourceCard as { usedModeIndices?: number[] } | null;
+    if (!host) return;
+    if (!Array.isArray(host.usedModeIndices)) host.usedModeIndices = [];
+    const used = new Set(host.usedModeIndices);
+    const remaining = available
+      .map((opt: any, index: number) => ({ opt, index }))
+      .filter((entry: { opt: any; index: number }) => !used.has(entry.index));
+    if (!remaining.length) {
+      logEvent("chooseUnusedEmpty", {
+        owner,
+        options: available.length,
+        used: host.usedModeIndices.length,
+      });
+      return;
+    }
+    const chosenEntry = remaining[state.rng.nextInt(remaining.length)];
+    if (!chosenEntry) return;
+    host.usedModeIndices.push(chosenEntry.index);
+    return runAutomaticModePicks(
+      [chosenEntry.opt],
+      owner,
+      sourceCard,
+      effectsQueue ?? [],
+      "random",
+    );
+  }
   if (isRandomPick) {
     const picked: any[] = [];
     const bag = available.slice();

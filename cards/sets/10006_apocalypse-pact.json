@@ -64,7 +64,7 @@
     "cost": "3",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Neutral",
     "rarity": "Silver",
     "tribes": [],
@@ -75,7 +75,26 @@
     "url": "https://shadowverse.gg/cards/10602210-encroached-world",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "select",
+            "target": "ally:hand",
+            "select": 1,
+            "effects": [
+              {
+                "op": "transform",
+                "target": "selected:any",
+                "into_source": "enemy:deck"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "spell": []
   },
@@ -3010,7 +3029,7 @@
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Summon an Ominous Artifact \u03b1 and give it Bane and Ward.",
+    "description": "Fanfare: Summon an Ominous Artifact α and give it Bane and Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10671120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10671120_evo.webp",
     "set": "[10006] Apocalypse Pact",
@@ -3023,7 +3042,7 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Ominous Artifact \u03b1",
+        "name": "Ominous Artifact α",
         "count": 1,
         "keywords": ["Bane", "Ward"]
       }

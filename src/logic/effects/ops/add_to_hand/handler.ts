@@ -16,16 +16,22 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { normalizeToAddToHandSpec } from "./types.js";
+import type { AddToHandFromZone } from "./types.js";
 import { normalizeInstanceEnteringHandAsCopy } from "./normalizeHandCopy.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import { pickDestroyedMatch } from "../../../core/destroyedHistory.js";
+import {
+  getHand,
+  getDeck,
+  opponentOf,
+} from "../../../../core/playerHelpers.js";
 
 /**
  * Handle the add_to_hand operation.
  *
  * Semantics:
  * - source="named": Create token from database, does NOT thin deck
- * - source="copy": Duplicate existing card, does NOT thin deck
+ * - source="copy": Duplicate existing card (target or `from` zone sample), does NOT thin deck
  * - source="destroyed_match": Create fresh cards from destroyed-history records
  *
  * @param eff - The add_to_hand effect
@@ -57,7 +63,11 @@ export function handleAddToHand(
   if (spec.source === "named") {
     addNamedCards(spec, receivingPlayer, hand);
   } else if (spec.source === "copy") {
-    addCopiedCards(spec, owner, receivingPlayer, hand, sourceCard, context);
+    if (spec.from) {
+      addZoneSampleCopies(spec, owner, receivingPlayer, hand);
+    } else {
+      addCopiedCards(spec, owner, receivingPlayer, hand, sourceCard, context);
+    }
   } else if (spec.source === "destroyed_match") {
     addDestroyedMatchCards(spec, owner, receivingPlayer, hand);
   }
@@ -162,6 +172,89 @@ function addDestroyedMatchCards(
     }
   }
   if (added > 0) bumpZoneVersion();
+}
+
+/**
+ * Add exact copies sampled from a hand or deck zone.
+ * Does not remove the source cards (copies only).
+ */
+function addZoneSampleCopies(
+  spec: ReturnType<typeof normalizeToAddToHandSpec>,
+  owner: Player,
+  receivingPlayer: Player,
+  hand: CardInstance[],
+): void {
+  const zone = spec.from as AddToHandFromZone;
+  const sources = resolveFromZone(zone, owner);
+  if (!sources.length || spec.count <= 0) {
+    logEvent("add_to_hand_noTarget", { from: zone, player: owner });
+    return;
+  }
+
+  const dist = String(spec.distribution || "random").toLowerCase();
+  let picks: CardInstance[] = [];
+  if (dist === "leftmost") {
+    picks = sources.slice(0, Math.min(spec.count, sources.length));
+  } else {
+    // random with replacement across independent picks (Wolfraud ×5 from deck)
+    const bag = sources.slice();
+    for (let i = 0; i < spec.count && bag.length; i++) {
+      const idx = state.rng.nextInt(bag.length);
+      const pick = bag[idx];
+      if (!pick) break;
+      picks.push(pick);
+      // Without replacement within one call when sampling distinct slots;
+      // deck/hand identity copies of the same card id remain possible via duplicates.
+      bag.splice(idx, 1);
+    }
+  }
+
+  let added = 0;
+  for (const cardToCopy of picks) {
+    const copy: CardInstance = structuredClone(cardToCopy);
+    copy.uid = state.rng.makeUid();
+    copy.owner = receivingPlayer;
+    copy.zone = "hand";
+    normalizeInstanceEnteringHandAsCopy(copy);
+    normalizeCardStats(copy);
+
+    if (spec.keywords.length > 0) {
+      applyKeywords(copy, spec.keywords);
+    }
+
+    if (pushToHand(hand, copy)) {
+      added++;
+      (state as any).lastAddedToHand = copy;
+      logEvent("add_to_hand", {
+        owner: receivingPlayer,
+        name: copy.name,
+        uid: copy.uid,
+        source: "copy",
+        from: cardToCopy.uid,
+        from_zone: zone,
+      });
+    }
+  }
+  if (added > 0) bumpZoneVersion();
+}
+
+function resolveFromZone(
+  zone: AddToHandFromZone,
+  owner: Player,
+): CardInstance[] {
+  const enemy = opponentOf(owner);
+  switch (zone) {
+    case "ally:hand":
+      return (getHand(state, owner) || []).filter(Boolean);
+    case "enemy:hand":
+      return (getHand(state, enemy) || []).filter(Boolean);
+    case "ally:deck":
+      return (getDeck(state, owner) || []).filter(Boolean);
+    case "enemy:deck":
+      return (getDeck(state, enemy) || []).filter(Boolean);
+    default:
+      return [];
+  }
 }
 
 /**

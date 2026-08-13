@@ -335,6 +335,28 @@ registerCondition("hand_same_cost_gte", (spec, owner) => {
   return false;
 });
 
+/**
+ * Sum of the N highest printed/base costs in owner's hand
+ * vs the same sum for the opponent. Used by Behemoth General.
+ */
+registerCondition("hand_top_base_costs_gt_enemy", (spec, owner) => {
+  const n = Math.max(1, spec.count ?? 3);
+  const sumTop = (player: Player): number => {
+    const hand = getHand(state, player) || [];
+    const costs = hand
+      .map((c) => {
+        const base = (c as any)?.base_cost;
+        if (base !== undefined && base !== null && base !== "") {
+          return parseInt(String(base), 10) || 0;
+        }
+        return parseInt(String(c?.cost), 10) || 0;
+      })
+      .sort((a, b) => b - a);
+    return costs.slice(0, n).reduce((s, v) => s + v, 0);
+  };
+  return sumTop(owner) > sumTop(opponentOf(owner));
+});
+
 registerCondition("self_cost", (spec, _owner, sourceCard) => {
   if (!sourceCard) return false;
   const effCost = getEffectiveCost(sourceCard);

@@ -156,6 +156,7 @@ export function handleDamage(
     case "random_hits":
       applyRandomHits(spec.count || 1, amount, spec.target || "", owner, {
         includeLeader: spec.include_leader ?? false,
+        sourceCard,
       });
       break;
 

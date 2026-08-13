@@ -35,9 +35,11 @@ import {
   detectSpecialTarget,
   applyLeaderStat,
   applyHandBuff,
+  applyDeckBuff,
   applyLastAddedToHandBuff,
   pickRandomFromPool,
 } from "./helpers.js";
+import { resolveDynamicValue } from "../../../core/values.js";
 
 /**
  * Orchestrates stat operations.
@@ -108,6 +110,11 @@ export function handleStatOrchestrator(
     return "done";
   }
 
+  if (specialTarget === "ally:deck") {
+    applyDeckBuff(owner, eff);
+    return "done";
+  }
+
   if (specialTarget === "last_added_to_hand") {
     applyLastAddedToHandBuff(owner, eff);
     return "done";
@@ -128,7 +135,7 @@ export function handleStatOrchestrator(
     if (context?.targetUids?.length) {
       const targets = resolveUids(context.targetUids);
       if (targets.length) {
-        applyBuffsToTargets(targets, eff, owner);
+        applyBuffsToTargets(targets, eff, owner, sourceCard);
         cleanupDead();
         return "done";
       }
@@ -274,7 +281,7 @@ function handlePoolBasedBuff(
       ),
     );
     const chosen = pickRandomFromPool(pool, count);
-    applyBuffsToTargets(chosen, eff, owner);
+    applyBuffsToTargets(chosen, eff, owner, sourceCard);
     cleanupDead();
     return "done";
   }
@@ -298,7 +305,7 @@ function handlePoolBasedBuff(
   }
 
   // 6. Apply buffs to all in pool
-  applyBuffsToTargets(pool, eff, owner);
+  applyBuffsToTargets(pool, eff, owner, sourceCard);
 
   // 7. Cleanup
   cleanupDead();
@@ -313,6 +320,7 @@ function applyBuffsToTargets(
   targets: CardInstance[],
   eff: StatOp,
   owner: Player,
+  sourceCard: CardInstance | null = null,
 ): void {
   const action = eff.action;
   const mode = eff.random ? "random" : "all";
@@ -320,23 +328,32 @@ function applyBuffsToTargets(
   for (const target of targets) {
     if (action === "set") {
       const setA =
-        eff.attack !== undefined ? parseInt(eff.attack as any) || 0 : null;
+        eff.attack !== undefined
+          ? resolveDynamicValue(eff.attack as any, { owner, sourceCard })
+          : null;
       const setD =
-        eff.defense !== undefined ? parseInt(eff.defense as any) || 0 : null;
+        eff.defense !== undefined
+          ? resolveDynamicValue(eff.defense as any, { owner, sourceCard })
+          : null;
       setStatsBuff(target, setA, setD, owner);
     } else if (action === "give") {
-      withBuffDuration(target, eff, ({ attack: a, defense: d }) => {
-        applyStatBuff(target, a, d, owner);
-        logEvent("buff", {
-          owner,
-          target: target.name,
-          uid: target.uid,
-          a,
-          d,
-          mode,
-        });
-        checkPostBuffTriggers(target, a, d, owner);
-      });
+      withBuffDuration(
+        target,
+        eff,
+        ({ attack: a, defense: d }) => {
+          applyStatBuff(target, a, d, owner);
+          logEvent("buff", {
+            owner,
+            target: target.name,
+            uid: target.uid,
+            a,
+            d,
+            mode,
+          });
+          checkPostBuffTriggers(target, a, d, owner);
+        },
+        { owner, sourceCard },
+      );
     }
 
     applyKeywordBuff(target, eff, owner);

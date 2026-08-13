@@ -19,15 +19,19 @@ import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
 import type { CardInstance } from "../../../../core/types/index.js";
+import { resolveDynamicValue } from "../../../core/values.js";
 import {
   getHand,
   getGraveyard,
   getBoard,
+  getDeck,
   addShadows,
   getHP,
   setHP,
   opponentOf,
 } from "../../../../core/playerHelpers.js";
+import { normalizeCardStats } from "../../../../core/cardStats.js";
+import { normalizeInstanceEnteringHandAsCopy } from "../add_to_hand/normalizeHandCopy.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 import type {
   TargetedOpContext,
@@ -124,9 +128,33 @@ TARGETED_OP_HANDLERS.set("damage", (ctx) => {
 TARGETED_OP_HANDLERS.set("transform", (ctx) => {
   const { eff, owner, targetUids } = ctx;
   const targets = resolveUids(targetUids);
-  const intoName = String(eff.into ?? (eff as any).name ?? "").trim();
   const target = targets?.[0];
-  if (!target || !intoName) return { kind: "handled" };
+  if (!target) return { kind: "handled" };
+
+  const intoSource = String((eff as any).into_source || "")
+    .toLowerCase()
+    .trim();
+  if (intoSource === "enemy:deck") {
+    const deck = getDeck(state, opponentOf(owner)) || [];
+    if (!deck.length) return { kind: "handled" };
+    const src = deck[state.rng.nextInt(deck.length)];
+    if (!src) return { kind: "handled" };
+    const firstHand = getHand(state, "first");
+    const secondHand = getHand(state, "second");
+    const inHand = firstHand.includes(target) || secondHand.includes(target);
+    transformIntoExactInstance(target, src, inHand ? "hand" : "board");
+    logEvent("transform", {
+      owner,
+      target: target.name,
+      into: src.name,
+      into_source: intoSource,
+      exact: true,
+    });
+    return { kind: "handled" };
+  }
+
+  const intoName = String(eff.into ?? (eff as any).name ?? "").trim();
+  if (!intoName) return { kind: "handled" };
   const firstHand = getHand(state, "first");
   const secondHand = getHand(state, "second");
   if (firstHand.includes(target) || secondHand.includes(target))
@@ -135,6 +163,30 @@ TARGETED_OP_HANDLERS.set("transform", (ctx) => {
   logEvent("transform", { owner, target: target.name, into: intoName });
   return { kind: "handled" };
 });
+
+/** Replace `target` with an exact clone of `source` (Encroached World). */
+function transformIntoExactInstance(
+  target: CardInstance,
+  source: CardInstance,
+  zone: "hand" | "board",
+): void {
+  const clone: CardInstance = structuredClone(source);
+  clone.uid = target.uid;
+  if (target.owner) clone.owner = target.owner;
+  clone.zone = target.zone ?? zone;
+  if (zone === "hand") {
+    normalizeInstanceEnteringHandAsCopy(clone);
+    normalizeCardStats(clone);
+    const hand = getHand(state, target.owner as any);
+    const idx = hand.indexOf(target);
+    if (idx !== -1) hand[idx] = clone;
+  } else {
+    normalizeCardStats(clone);
+    const board = getBoard(state, target.owner as any);
+    const idx = board.indexOf(target);
+    if (idx !== -1) board[idx] = clone;
+  }
+}
 
 TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
   const { eff, targetUids, owner } = ctx;
@@ -227,11 +279,11 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("stat", (ctx) => {
-  const { eff, owner, targetUids } = ctx;
+  const { eff, owner, targetUids, sourceCard } = ctx;
   const targets = resolveUids(targetUids);
   const action = (eff as any).action || "give";
-  const a = parseInt((eff as any).attack || 0) || 0;
-  const d = parseInt((eff as any).defense || 0) || 0;
+  const a = resolveDynamicValue((eff as any).attack, { owner, sourceCard });
+  const d = resolveDynamicValue((eff as any).defense, { owner, sourceCard });
   const rawTribes = (eff as any).tribes
     ? Array.isArray((eff as any).tribes)
       ? (eff as any).tribes
@@ -262,16 +314,22 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
     target.buffs.defense = (target.buffs.defense ?? 0) + d;
     target.attack = Math.max(0, (parseInt(target.attack as any) || 0) + a);
     target.defense = (parseInt(target.defense as any) || 0) + d;
-    target.peak_defense = Math.max(
-      target.peak_defense ?? (target.defense as number),
-      target.defense as number,
-    );
+    if (d < 0) {
+      // Rulebook: "-N defense" lowers max defense; follower sits at full new max.
+      target.peak_defense = Number(target.defense);
+      target.potential_defense = Number(target.defense);
+    } else {
+      target.peak_defense = Math.max(
+        target.peak_defense ?? (target.defense as number),
+        target.defense as number,
+      );
+    }
     if (!target.potential_attack)
       target.potential_attack = Number(target.base_attack || target.attack);
     if (!target.potential_defense)
       target.potential_defense = Number(target.base_defense || target.defense);
     target.potential_attack += a;
-    target.potential_defense += d;
+    if (d >= 0) target.potential_defense += d;
     if (d < 0 && target.type === "Follower") {
       const firstBoard = getBoard(state, "first");
       const secondBoard = getBoard(state, "second");

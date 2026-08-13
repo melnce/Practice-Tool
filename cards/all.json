@@ -18304,7 +18304,20 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10502110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10502110-goddess-of-starlight",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 3
+      },
+      {
+        "op": "add_to_hand",
+        "source": "copy",
+        "from": "ally:hand",
+        "distribution": "leftmost",
+        "count": 3
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
@@ -18325,7 +18338,20 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10502120_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10502120-behemoth-general",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "gate",
+        "condition": "hand_top_base_costs_gt_enemy",
+        "count": 3,
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "distribution": "all"
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
@@ -18822,11 +18848,32 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10514110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10514110-wolfraud-skybound-hanged-man",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "discard",
+        "mode": "except_named",
+        "names": []
+      },
+      {
+        "op": "add_to_hand",
+        "source": "copy",
+        "from": "enemy:deck",
+        "distribution": "random",
+        "count": 5
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "attack_source": "combo",
+        "defense_source": "combo"
+      }
+    ]
   },
   {
     "id": "10514120",
@@ -19275,7 +19322,35 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "other:follower",
+                "amount": 7,
+                "distribution": "random_hits",
+                "count": 3,
+                "include_leader": "both"
+              }
+            ],
+            "else_effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 7
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -21596,7 +21671,129 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Ambush"],
-    "triggers": [],
+    "triggers": [
+      {
+        "type": "start_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "mode",
+            "pick": "random_unused",
+            "select_count": 1,
+            "options": [
+              {
+                "label": "Reduce the cost of all cards in your hand by 1 until the end of the turn",
+                "effects": [
+                  {
+                    "op": "cost",
+                    "target": "ally:hand",
+                    "mode": "reduce",
+                    "amount": 1,
+                    "until_eot": true
+                  }
+                ]
+              },
+              {
+                "label": "Give all allied followers on the field +2/+2",
+                "effects": [
+                  {
+                    "op": "stat",
+                    "action": "give",
+                    "target": "ally:follower",
+                    "attack": 2,
+                    "defense": 2
+                  }
+                ]
+              },
+              {
+                "label": "Restore 3 defense to your leader",
+                "effects": [
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 3
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "crest",
+                "action": "gain",
+                "player": "opponent",
+                "name": "Slaus, Revolving Wheel of Fortune",
+                "image": "https://static.dotgg.gg/shadowverse/cards/10574110_token.webp",
+                "description": "Countdown (3)\nAt the start of your turn, activate a random ability that hasn't been activated yet from the following.\n1. Increase the cost of all cards in your hand by 1 until the end of the turn.\n2. Give all allied followers on the field -2/-2.\n3. Deal 3 damage to your leader.",
+                "countdown": 3,
+                "triggers": [
+                  {
+                    "type": "start_of_turn_own",
+                    "effects": [
+                      {
+                        "op": "mode",
+                        "pick": "random_unused",
+                        "select_count": 1,
+                        "options": [
+                          {
+                            "label": "Increase the cost of all cards in your hand by 1 until the end of the turn",
+                            "effects": [
+                              {
+                                "op": "cost",
+                                "target": "ally:hand",
+                                "mode": "increase",
+                                "amount": 1,
+                                "until_eot": true
+                              }
+                            ]
+                          },
+                          {
+                            "label": "Give all allied followers on the field -2/-2",
+                            "effects": [
+                              {
+                                "op": "stat",
+                                "action": "give",
+                                "target": "ally:follower",
+                                "attack": -2,
+                                "defense": -2
+                              }
+                            ]
+                          },
+                          {
+                            "label": "Deal 3 damage to your leader",
+                            "effects": [
+                              {
+                                "op": "damage",
+                                "target": "ally:leader",
+                                "amount": 3
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "banish",
+                "target": "self"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": [],
     "specific_effects": [
       {
@@ -21738,7 +21935,7 @@
     "cost": "3",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Neutral",
     "rarity": "Silver",
     "tribes": [],
@@ -21749,7 +21946,26 @@
     "url": "https://shadowverse.gg/cards/10602210-encroached-world",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 0,
+        "effects": [
+          {
+            "op": "select",
+            "target": "ally:hand",
+            "select": 1,
+            "effects": [
+              {
+                "op": "transform",
+                "target": "selected:any",
+                "into_source": "enemy:deck"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "spell": []
   },
@@ -25819,11 +26035,59 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10714110_evo.webp",
     "set": "[10007] Anathema's Gambit",
     "url": "https://shadowverse.gg/cards/10714110-thestae-anathema-of-distortion",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Thestae, Anathema of Distortion",
+        "image": "https://static.dotgg.gg/shadowverse/cards/10714110_token.webp",
+        "description": "Countdown (3)\nAt the end of your turn, Combo (3) - Give all followers in your deck +1/+1.",
+        "countdown": 3,
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "gate",
+                "condition": "combo",
+                "count": 3,
+                "effects": [
+                  {
+                    "op": "stat",
+                    "action": "give",
+                    "target": "ally:deck",
+                    "filter": {
+                      "type": "Follower"
+                    },
+                    "attack": 1,
+                    "defense": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "enemy:follower",
+        "select": 1,
+        "attack": 0,
+        "defense": "-{self.attack}"
+      },
+      {
+        "op": "counter",
+        "action": "add",
+        "key": "combo",
+        "amount": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -28802,7 +29066,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "add_to_hand",
+        "source": "copy",
+        "from": "enemy:hand",
+        "distribution": "random",
+        "count": 1
+      },
+      {
+        "op": "cost",
+        "target": "last_added_to_hand",
+        "mode": "reduce",
+        "amount": 1
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10803110",

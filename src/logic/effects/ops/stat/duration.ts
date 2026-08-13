@@ -1,6 +1,7 @@
 import { state } from "../../../../core/gameState.js";
-import type { CardInstance } from "../../../../core/types/index.js";
+import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { StatOp } from "./types.js";
+import { resolveDynamicValue } from "../../../core/values.js";
 
 /**
  * Wraps an operation with duration logic (Permanent vs Temporary).
@@ -10,10 +11,11 @@ export function withBuffDuration(
   target: CardInstance,
   eff: StatOp,
   applyFn: (stats: { attack: number; defense: number }) => void,
+  ctx: { owner?: Player; sourceCard?: CardInstance | null } = {},
 ) {
-  // 1. Resolve stat changes if any
-  const a = parseInt((eff.attack as any) ?? 0) || 0;
-  const d = parseInt((eff.defense as any) ?? 0) || 0;
+  // 1. Resolve stat changes if any (supports "-{self.attack}" etc.)
+  const a = resolveDynamicValue(eff.attack as any, ctx);
+  const d = resolveDynamicValue(eff.defense as any, ctx);
 
   // 2. Determine duration
   if (eff.until_end_of_turn) {
