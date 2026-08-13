@@ -104,9 +104,7 @@ export function handleTransform(
   const into = String(eff.into || eff.name || "").trim();
   const intoSourceRaw = (eff as any).into_source;
   const intoSource =
-    typeof intoSourceRaw === "string"
-      ? intoSourceRaw.toLowerCase().trim()
-      : "";
+    typeof intoSourceRaw === "string" ? intoSourceRaw.toLowerCase().trim() : "";
   const hasIntoSourceObject =
     !!intoSourceRaw && typeof intoSourceRaw === "object";
 
