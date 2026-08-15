@@ -47,7 +47,7 @@ function main() {
     if (deckName) entry.label = deckName;
   }
 
-  fs.writeFileSync(MANIFEST_FILE, JSON.stringify(manifest, null, 2));
+  fs.writeFileSync(MANIFEST_FILE, JSON.stringify(manifest, null, 2) + "\n");
 
   const decks = manifest.entries.filter((e) => e.category === "deck").length;
   const tests = manifest.entries.filter((e) => e.category === "test").length;
