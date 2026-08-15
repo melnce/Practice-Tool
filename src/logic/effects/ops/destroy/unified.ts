@@ -36,6 +36,28 @@ function storeInContext(ctx: DestroyContext, key: string, value: number): void {
 }
 
 // ============================================================================
+// POOL CONDITION
+// ============================================================================
+
+/**
+ * Merge object-valued `filter` into the condition passed to getPool.
+ * Card JSON uses `filter:{not_self:true}` on destroy ops; previously only
+ * `eff.condition` reached getPool and object filters were silently ignored.
+ */
+function destroyPoolCondition(
+  eff: Effect & Record<string, any>,
+  spec: UnifiedDestroySpec,
+): any {
+  const base =
+    spec.condition && typeof spec.condition === "object" ? spec.condition : {};
+  const filter = eff.filter;
+  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
+    return { ...base, ...filter };
+  }
+  return Object.keys(base).length ? base : spec.condition;
+}
+
+// ============================================================================
 // UNIFIED HANDLER
 // ============================================================================
 
@@ -67,9 +89,11 @@ export function handleDestroy(
     return handleSpecialScope(spec, owner, ctx, effectsQueue);
   }
 
+  const poolCondition = destroyPoolCondition(eff, spec);
+
   // Handle "selected" target (from previous selection)
   if (spec.target.toLowerCase().startsWith("selected")) {
-    const targets = getPool(spec.target, owner, null, spec.condition, ctx);
+    const targets = getPool(spec.target, owner, null, poolCondition, ctx);
     let count = 0;
     for (const target of targets) {
       if (destroyTarget(target, owner, "selected")) count++;
@@ -87,7 +111,7 @@ export function handleDestroy(
     spec.target || "",
     owner,
     ctx.sourceCard,
-    spec.condition,
+    poolCondition,
     { ...ctx, isTargetedEffect: isSelectBased },
   ).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
 

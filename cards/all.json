@@ -14442,7 +14442,9 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "not_self": true,
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -14512,7 +14514,9 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "not_self": true,
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -24159,7 +24163,9 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "not_self": true,
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -27868,7 +27874,9 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "not_self": true,
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {

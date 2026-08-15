@@ -602,6 +602,31 @@ describe("Batch 5 — Havencraft [10004] Skybound Dragons", () => {
     expect(getBoard(state, "second")).toHaveLength(0);
   });
 
+  // Object filter:{damaged:true} on destroy must reach getPool — unfixed main lets Sara
+  // target any enemy follower (only spec.condition was passed; filter was ignored).
+  it("Sara — Evolve selection pool is damaged enemies only", () => {
+    setupTurn(R6);
+    const damaged = enemyFollower(2, "DamagedFoe");
+    damaged.defense = 1;
+    damaged.peak_defense = 2;
+    const healthy = enemyFollower(3, "HealthyFoe");
+    healthy.defense = 3;
+    healthy.peak_defense = 3;
+    const sara = createCard("10462110", "board", "first");
+    sara.peak_defense = sara.defense;
+    state.players.first.board = [sara];
+    onEvolve(sara, "first", "normal");
+    const pending = state.pendingTargetEffect;
+    const poolUids =
+      pending?.poolUids ?? pending?.pool?.map((c) => String(c.uid)) ?? [];
+    expect(poolUids).toContain(String(damaged.uid));
+    expect(poolUids).not.toContain(String(healthy.uid));
+    resolvePendingTarget(String(damaged.uid));
+    cleanupDead();
+    expect(findOnBoard("second", "DamagedFoe")).toBeFalsy();
+    expect(findOnBoard("second", "HealthyFoe")).toBeTruthy();
+  });
+
   it("Sophia — Fanfare summons Havencraft ≤2; Super-Evolve Barrier on others", () => {
     setupTurn(R6, { pp: 4 });
     state.players.first.deck = [createCard("10162110", "deck", "first")];

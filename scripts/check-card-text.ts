@@ -248,6 +248,44 @@ function checkStatOpFilters(card: CardJson): Issue[] {
   return issues;
 }
 
+function collectDestroyOps(
+  node: unknown,
+  pathStr: string,
+  out: { path: string; eff: Record<string, unknown> }[],
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) => collectDestroyOps(n, `${pathStr}[${i}]`, out));
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.op === "destroy") {
+    out.push({ path: pathStr, eff: obj });
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    collectDestroyOps(v, `${pathStr}.${k}`, out);
+  }
+}
+
+function checkDestroyOpFilters(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const found: { path: string; eff: Record<string, unknown> }[] = [];
+  collectDestroyOps(card, card.id, found);
+
+  for (const { path: opPath, eff } of found) {
+    if (eff.not_self !== undefined) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `destroy op at ${opPath} uses top-level "not_self" (ignored by engine) — use "filter": {"not_self": true} instead`,
+      });
+    }
+  }
+  return issues;
+}
+
 function nodeHasUntilEotOrDuration(node: unknown): boolean {
   if (!node || typeof node !== "object") return false;
   if (Array.isArray(node)) {
@@ -591,7 +629,10 @@ function main() {
   const gateStatOp =
     process.argv.includes("--gate=stat-op") ||
     process.argv.includes("--gate=stat_op");
-  const gateMode = gateAddToHand || gateStatOp;
+  const gateDestroyOp =
+    process.argv.includes("--gate=destroy-op") ||
+    process.argv.includes("--gate=destroy_op");
+  const gateMode = gateAddToHand || gateStatOp || gateDestroyOp;
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -603,7 +644,9 @@ function main() {
       ? "🔍 Checking add_to_hand field contracts...\n"
       : gateStatOp
         ? "🔍 Checking stat op filter field contracts...\n"
-        : "🔍 Checking card description ↔ JSON structure...\n",
+        : gateDestroyOp
+          ? "🔍 Checking destroy op filter field contracts...\n"
+          : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
@@ -613,6 +656,7 @@ function main() {
       if (gateMode) {
         if (gateAddToHand) allIssues.push(...checkAddToHand(card));
         if (gateStatOp) allIssues.push(...checkStatOpFilters(card));
+        if (gateDestroyOp) allIssues.push(...checkDestroyOpFilters(card));
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
@@ -665,7 +709,9 @@ function main() {
         ? `✅ ${cardCount} cards — all add_to_hand ops have valid fields.\n`
         : gateStatOp
           ? `✅ ${cardCount} cards — all stat ops use supported filter fields.\n`
-          : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+          : gateDestroyOp
+            ? `✅ ${cardCount} cards — all destroy ops use supported filter fields.\n`
+            : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(
