@@ -1041,7 +1041,7 @@
     "keywords": [
       {
         "name": "Enhance",
-        "cost": 8,
+        "cost": 7,
         "effects": [
           {
             "op": "summon",

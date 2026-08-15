@@ -58,7 +58,48 @@ type ClauseHint = {
   message: string;
 };
 
-/** Owner rulings that justify a max_per_turn cap (bible overrides printed text). */
+type NumericDriftHint = {
+  id: string;
+  name: string;
+  check:
+    | "countdown"
+    | "enhance_multiset"
+    | "necromancy"
+    | "earth_rite"
+    | "accelerate"
+    | "crystallize"
+    | "damage_amount"
+    | "stat_bonus"
+    | "draw_count";
+  message: string;
+  textValue: string | number;
+  jsonValue: string | number;
+};
+
+type NumericDriftScanStat = {
+  check: NumericDriftHint["check"];
+  scanned: number;
+  flagged: number;
+};
+
+const NUMERIC_DRIFT_CHECKS: NumericDriftHint["check"][] = [
+  "countdown",
+  "enhance_multiset",
+  "necromancy",
+  "earth_rite",
+  "accelerate",
+  "crystallize",
+  "damage_amount",
+  "stat_bonus",
+  "draw_count",
+];
+
+/** Drift checks with known baseline findings — report-only until individually triaged. */
+const NUMERIC_DRIFT_HINT_ONLY_CHECKS = new Set<NumericDriftHint["check"]>([
+  "damage_amount",
+  "stat_bonus",
+  "enhance_multiset",
+]);
 const MAX_PER_TURN_RULING_IDS = new Set([
   "10344110", // Azurifrit — bible line 422: up to 3 activations per turn
 ]);
@@ -439,6 +480,395 @@ function clauseHintsForCard(card: CardJson): ClauseHint[] {
   return hints;
 }
 
+function sortedNumericList(values: number[]): number[] {
+  return [...values].sort((a, b) => a - b);
+}
+
+function listsEqual(a: number[], b: number[]): boolean {
+  if (a.length !== b.length) return false;
+  return a.every((v, i) => v === b[i]);
+}
+
+function walkEffectNodes(
+  node: unknown,
+  visitor: (obj: Record<string, unknown>, path: string) => void,
+  path = "",
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) => walkEffectNodes(n, visitor, `${path}[${i}]`));
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  visitor(obj, path);
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    walkEffectNodes(v, visitor, path ? `${path}.${k}` : k);
+  }
+}
+
+function isConditionalContainer(obj: Record<string, unknown>): boolean {
+  if (obj.condition != null && obj.condition !== "") return true;
+  if (obj.op === "gate" && obj.condition != null) return true;
+  if (obj.op === "if") return true;
+  return false;
+}
+
+function collectKeywordCosts(
+  keywords: unknown[] | undefined,
+  keywordName: string,
+): number[] {
+  const target = normalizeKwName(keywordName);
+  const costs: number[] = [];
+  for (const k of keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const name = normalizeKwName(String((k as { name?: string }).name ?? ""));
+    if (name === target) {
+      const cost = Number((k as { cost?: number }).cost);
+      if (Number.isFinite(cost)) costs.push(cost);
+    }
+  }
+  return costs;
+}
+
+function collectCountdownFromJson(card: CardJson): number[] {
+  const values: number[] = [];
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const name = normalizeKwName(String((k as { name?: string }).name ?? ""));
+    if (name === "countdown") {
+      const turns = Number(
+        (k as { turns?: number; value?: number }).turns ??
+          (k as { value?: number }).value,
+      );
+      if (Number.isFinite(turns)) values.push(turns);
+    }
+  }
+  const inline = Number((card as { countdown?: number }).countdown);
+  if (Number.isFinite(inline)) values.push(inline);
+  return values;
+}
+
+function collectNecromancyCosts(card: CardJson): number[] {
+  const costs: number[] = [];
+  walkEffectNodes(card, (obj) => {
+    if (obj.op !== "gate") return;
+    const cond = String(obj.condition ?? "").toLowerCase();
+    if (cond !== "necromancy") return;
+    const cost = Number(obj.cost);
+    if (Number.isFinite(cost)) costs.push(cost);
+  });
+  return costs;
+}
+
+function collectEarthRiteCosts(card: CardJson): number[] {
+  const costs: number[] = [];
+  walkEffectNodes(card, (obj) => {
+    if (obj.op !== "earth_rite") return;
+    const cost = Number(obj.cost);
+    if (Number.isFinite(cost)) costs.push(cost);
+  });
+  return costs;
+}
+
+function collectUnconditionalDamageOps(card: CardJson): number[] {
+  const amounts: number[] = [];
+  walkEffectNodes(card, (obj, path) => {
+    if (obj.op !== "damage") return;
+    if (obj.condition != null && obj.condition !== "") return;
+    if (isInsideConditionalGate(card, path)) return;
+    const amount = Number(obj.amount);
+    if (Number.isFinite(amount)) amounts.push(amount);
+  });
+  return amounts;
+}
+
+function collectUnconditionalDrawOps(card: CardJson): number[] {
+  const counts: number[] = [];
+  walkEffectNodes(card, (obj, path) => {
+    if (obj.op !== "draw") return;
+    if (obj.condition != null && obj.condition !== "") return;
+    if (isInsideConditionalGate(card, path)) return;
+    const count = Number(obj.count);
+    if (Number.isFinite(count)) counts.push(count);
+  });
+  return counts;
+}
+
+function collectUnconditionalStatOps(
+  card: CardJson,
+): { attack: number; defense: number }[] {
+  const stats: { attack: number; defense: number }[] = [];
+  walkEffectNodes(card, (obj, path) => {
+    if (obj.op !== "stat") return;
+    if (obj.condition != null && obj.condition !== "") return;
+    if (isInsideConditionalGate(card, path)) return;
+    const attack = Number(obj.attack);
+    const defense = Number(obj.defense);
+    if (Number.isFinite(attack) && Number.isFinite(defense)) {
+      stats.push({ attack, defense });
+    }
+  });
+  return stats;
+}
+
+function isInsideConditionalGate(card: CardJson, opPath: string): boolean {
+  let inside = false;
+  walkEffectNodes(card, (obj, path) => {
+    if (obj.op !== "gate") return;
+    if (obj.condition == null || obj.condition === "") return;
+    const effectsPrefix = `${path}.effects`;
+    if (opPath.startsWith(effectsPrefix)) inside = true;
+  });
+  return inside;
+}
+
+function extractTextCosts(desc: string, pattern: RegExp): number[] {
+  const costs: number[] = [];
+  const re = new RegExp(
+    pattern.source,
+    pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g",
+  );
+  for (const m of desc.matchAll(re)) {
+    const n = Number(m[1]);
+    if (Number.isFinite(n)) costs.push(n);
+  }
+  return costs;
+}
+
+function extractUnconditionalDealDamageClauses(desc: string): number[] {
+  const amounts: number[] = [];
+  for (const line of desc.split("\n")) {
+    const trimmed = line.trim();
+    if (/^\d+\./.test(trimmed)) continue; // mode list item
+    if (/\b(random|split between|up to)\b/i.test(trimmed)) continue;
+    const m = trimmed.match(/\bdeal (\d+) damage\b/i);
+    if (m) amounts.push(Number(m[1]));
+  }
+  return amounts;
+}
+
+function extractStatBonusClauses(
+  desc: string,
+): { attack: number; defense: number }[] {
+  const stats: { attack: number; defense: number }[] = [];
+  for (const line of desc.split("\n")) {
+    const trimmed = line.trim();
+    if (/^\d+\./.test(trimmed)) continue;
+    const m = trimmed.match(/\+(\d+)\/\+(\d+)/);
+    if (m) stats.push({ attack: Number(m[1]), defense: Number(m[2]) });
+  }
+  return stats;
+}
+
+function extractDrawCountClauses(desc: string): number[] {
+  const counts: number[] = [];
+  for (const line of desc.split("\n")) {
+    const trimmed = line.trim();
+    if (/^\d+\./.test(trimmed)) continue;
+    const m = trimmed.match(/\bdraw (\d+) cards?\b/i);
+    if (m) counts.push(Number(m[1]));
+  }
+  return counts;
+}
+
+function pushNumericDriftHint(
+  hints: NumericDriftHint[],
+  stats: Map<NumericDriftHint["check"], NumericDriftScanStat>,
+  check: NumericDriftHint["check"],
+  card: CardJson,
+  message: string,
+  textValue: string | number,
+  jsonValue: string | number,
+): void {
+  const stat = stats.get(check) ?? { check, scanned: 0, flagged: 0 };
+  stat.flagged += 1;
+  stats.set(check, stat);
+  hints.push({
+    id: card.id,
+    name: card.name,
+    check,
+    message,
+    textValue,
+    jsonValue,
+  });
+}
+
+function markScanned(
+  stats: Map<NumericDriftHint["check"], NumericDriftScanStat>,
+  check: NumericDriftHint["check"],
+): void {
+  const stat = stats.get(check) ?? { check, scanned: 0, flagged: 0 };
+  stat.scanned += 1;
+  stats.set(check, stat);
+}
+
+function checkNumericDrift(
+  card: CardJson,
+  stats: Map<NumericDriftHint["check"], NumericDriftScanStat>,
+): { hints: NumericDriftHint[]; errors: Issue[] } {
+  const hints: NumericDriftHint[] = [];
+  const errors: Issue[] = [];
+  const desc = card.description ?? "";
+
+  const recordDrift = (
+    check: NumericDriftHint["check"],
+    message: string,
+    textValue: string | number,
+    jsonValue: string | number,
+  ) => {
+    if (NUMERIC_DRIFT_HINT_ONLY_CHECKS.has(check)) {
+      pushNumericDriftHint(
+        hints,
+        stats,
+        check,
+        card,
+        message,
+        textValue,
+        jsonValue,
+      );
+    } else {
+      const stat = stats.get(check) ?? { check, scanned: 0, flagged: 0 };
+      stat.flagged += 1;
+      stats.set(check, stat);
+      errors.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message,
+      });
+    }
+  };
+
+  // Countdown (N) vs JSON countdown value — one text clause, one JSON value
+  const textCountdowns = extractTextCosts(desc, /countdown\s*\((\d+)\)/gi);
+  const jsonCountdowns = collectCountdownFromJson(card);
+  if (textCountdowns.length === 1 && jsonCountdowns.length === 1) {
+    markScanned(stats, "countdown");
+    if (textCountdowns[0] !== jsonCountdowns[0]) {
+      recordDrift(
+        "countdown",
+        `Countdown in text (${textCountdowns[0]}) != JSON (${jsonCountdowns[0]})`,
+        textCountdowns[0],
+        jsonCountdowns[0],
+      );
+    }
+  }
+
+  // Multi-Enhance multiset — only when 2+ tiers on both sides (single-tier uses error gate)
+  const textEnhance = sortedNumericList(
+    extractTextCosts(desc, /enhance\s*\((\d+)\):/gi),
+  );
+  const jsonEnhance = sortedNumericList(
+    collectKeywordCosts(card.keywords, "Enhance"),
+  );
+  if (textEnhance.length >= 2 && jsonEnhance.length >= 2) {
+    markScanned(stats, "enhance_multiset");
+    if (!listsEqual(textEnhance, jsonEnhance)) {
+      recordDrift(
+        "enhance_multiset",
+        `Enhance costs in text [${textEnhance.join(", ")}] != JSON [${jsonEnhance.join(", ")}]`,
+        textEnhance.join(","),
+        jsonEnhance.join(","),
+      );
+    }
+  }
+
+  const compareCostMultiset = (
+    check: NumericDriftHint["check"],
+    textPattern: RegExp,
+    jsonCosts: number[],
+    label: string,
+  ) => {
+    const textCosts = sortedNumericList(extractTextCosts(desc, textPattern));
+    const jsonSorted = sortedNumericList(jsonCosts);
+    if (!textCosts.length || textCosts.length !== jsonSorted.length) return;
+    markScanned(stats, check);
+    if (!listsEqual(textCosts, jsonSorted)) {
+      recordDrift(
+        check,
+        `${label} costs in text [${textCosts.join(", ")}] != JSON [${jsonSorted.join(", ")}]`,
+        textCosts.join(","),
+        jsonSorted.join(","),
+      );
+    }
+  };
+
+  compareCostMultiset(
+    "necromancy",
+    /necromancy\s*\((\d+)\)/gi,
+    collectNecromancyCosts(card),
+    "Necromancy",
+  );
+  compareCostMultiset(
+    "earth_rite",
+    /earth rite\s*\((\d+)\)/gi,
+    collectEarthRiteCosts(card),
+    "Earth Rite",
+  );
+  compareCostMultiset(
+    "accelerate",
+    /accelerate\s*\((\d+)\)/gi,
+    collectKeywordCosts(card.keywords, "Accelerate"),
+    "Accelerate",
+  );
+  compareCostMultiset(
+    "crystallize",
+    /crystallize\s*\((\d+)\)/gi,
+    collectKeywordCosts(card.keywords, "Crystallize"),
+    "Crystallize",
+  );
+
+  // Single unconditional "Deal N damage" vs one damage.amount
+  const textDamage = extractUnconditionalDealDamageClauses(desc);
+  const jsonDamage = collectUnconditionalDamageOps(card);
+  if (textDamage.length === 1 && jsonDamage.length === 1) {
+    markScanned(stats, "damage_amount");
+    if (textDamage[0] !== jsonDamage[0]) {
+      recordDrift(
+        "damage_amount",
+        `Deal damage in text (${textDamage[0]}) != JSON damage.amount (${jsonDamage[0]})`,
+        textDamage[0],
+        jsonDamage[0],
+      );
+    }
+  }
+
+  // Single +X/+Y vs one stat op
+  const textStats = extractStatBonusClauses(desc);
+  const jsonStats = collectUnconditionalStatOps(card);
+  if (textStats.length === 1 && jsonStats.length === 1) {
+    markScanned(stats, "stat_bonus");
+    const t = textStats[0]!;
+    const j = jsonStats[0]!;
+    if (t.attack !== j.attack || t.defense !== j.defense) {
+      recordDrift(
+        "stat_bonus",
+        `Stat bonus in text (+${t.attack}/+${t.defense}) != JSON stat op (+${j.attack}/+${j.defense})`,
+        `+${t.attack}/+${t.defense}`,
+        `+${j.attack}/+${j.defense}`,
+      );
+    }
+  }
+
+  // Single "Draw N card(s)" vs one draw.count
+  const textDraws = extractDrawCountClauses(desc);
+  const jsonDraws = collectUnconditionalDrawOps(card);
+  if (textDraws.length === 1 && jsonDraws.length === 1) {
+    markScanned(stats, "draw_count");
+    if (textDraws[0] !== jsonDraws[0]) {
+      recordDrift(
+        "draw_count",
+        `Draw count in text (${textDraws[0]}) != JSON draw.count (${jsonDraws[0]})`,
+        textDraws[0],
+        jsonDraws[0],
+      );
+    }
+  }
+
+  return { hints, errors };
+}
+
 function checkCard(card: CardJson): Issue[] {
   const issues: Issue[] = [];
   const status = getImplementationStatus(card);
@@ -637,6 +1067,11 @@ function main() {
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
   const allHints: ClauseHint[] = [];
+  const allNumericDriftHints: NumericDriftHint[] = [];
+  const numericDriftStats = new Map<
+    NumericDriftHint["check"],
+    NumericDriftScanStat
+  >();
   let cardCount = 0;
 
   console.log(
@@ -660,6 +1095,9 @@ function main() {
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
+        const drift = checkNumericDrift(card, numericDriftStats);
+        allNumericDriftHints.push(...drift.hints);
+        allIssues.push(...drift.errors);
       }
     }
   }
@@ -686,13 +1124,25 @@ function main() {
   if (!gateMode) {
     const reportPath = path.join(ROOT, "reports", "clause-fidelity-hints.json");
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+    const driftStatsList = NUMERIC_DRIFT_CHECKS.map((check) => {
+      const s = numericDriftStats.get(check);
+      return s ?? { check, scanned: 0, flagged: 0 };
+    });
     fs.writeFileSync(
       reportPath,
       JSON.stringify(
         {
           note: "Informational only — not a CI gate. High-signal heuristics with known false-positive risk.",
-          count: allHints.length,
-          hints: allHints,
+          clause_fidelity: {
+            count: allHints.length,
+            hints: allHints,
+          },
+          numeric_drift: {
+            note: "Precision-first text↔JSON numeric cross-checks. Drift hints are report-only until individually triaged.",
+            count: allNumericDriftHints.length,
+            scan_stats: driftStatsList,
+            hints: allNumericDriftHints,
+          },
         },
         null,
         2,
@@ -701,6 +1151,15 @@ function main() {
     console.log(
       `📝 Clause-fidelity hints: ${allHints.length} (report only) → ${path.relative(ROOT, reportPath)}`,
     );
+    console.log("📊 Numeric-drift scan stats (report only):");
+    for (const s of driftStatsList) {
+      console.log(`   ${s.check}: scanned ${s.scanned}, flagged ${s.flagged}`);
+    }
+    if (allNumericDriftHints.length) {
+      console.log(
+        `📝 Numeric-drift hints: ${allNumericDriftHints.length} (report only)`,
+      );
+    }
   }
 
   if (!errors.length && !warns.length) {

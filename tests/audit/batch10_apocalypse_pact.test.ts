@@ -130,8 +130,8 @@ describe("Set 10006 — Apocalypse Pact", () => {
     expect(soldier?.hasBane).toBe(true);
   });
 
-  it("Noel IV Enhance (8) — summons Storm Fearless in addition to fanfare", () => {
-    setupTurn(8, { hand: ["10624110"], pp: 8 });
+  it("Noel IV Enhance (7) — at 7 PP summons Storm Fearless in addition to fanfare", () => {
+    setupTurn(7, { hand: ["10624110"], pp: 7 });
     whenPlayCard("first", 0);
     const soldiers = getBoard(state, "first").filter(
       (c) => c.name === "Fearless Soldier",
@@ -139,6 +139,17 @@ describe("Set 10006 — Apocalypse Pact", () => {
     expect(soldiers).toHaveLength(2);
     expect(soldiers.some((c) => c.hasStorm)).toBe(true);
     expect(soldiers.some((c) => c.hasBane)).toBe(true);
+  });
+
+  it("Noel IV — at 6 PP Enhance does not summon Storm Fearless", () => {
+    setupTurn(6, { hand: ["10624110"], pp: 6 });
+    whenPlayCard("first", 0);
+    const soldiers = getBoard(state, "first").filter(
+      (c) => c.name === "Fearless Soldier",
+    );
+    expect(soldiers).toHaveLength(1);
+    expect(soldiers[0]?.hasBane).toBe(true);
+    expect(soldiers.some((c) => c.hasStorm)).toBe(false);
   });
 
   it("Navy Cat — destroys all enemy followers with 1 defense", () => {
