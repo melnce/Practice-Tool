@@ -123,22 +123,40 @@ describe("Set 10006 — Apocalypse Pact", () => {
     expect(monkey?.hasEvolved).toBe(true);
   });
 
-  it("Noel IV — Fanfare summons Fearless Soldier with Bane", () => {
+  it("Noel IV — at 6 PP fanfare only (Bane soldier, no Enhance tier)", () => {
     setupTurn(6, { hand: ["10624110"], pp: 6 });
     whenPlayCard("first", 0);
-    const soldier = findOnBoard("first", "Fearless Soldier");
-    expect(soldier?.hasBane).toBe(true);
+    const soldiers = getBoard(state, "first").filter(
+      (c) => c.name === "Fearless Soldier",
+    );
+    expect(soldiers).toHaveLength(1);
+    expect(soldiers[0]?.hasBane).toBe(true);
+    expect(soldiers.some((c) => c.hasDrain)).toBe(false);
+    expect(soldiers.some((c) => c.hasStorm)).toBe(false);
   });
 
-  it("Noel IV Enhance (8) — summons Storm Fearless in addition to fanfare", () => {
+  it("Noel IV — at 7 PP Enhance (7) Drain soldier, not Storm", () => {
+    setupTurn(7, { hand: ["10624110"], pp: 7 });
+    whenPlayCard("first", 0);
+    const soldiers = getBoard(state, "first").filter(
+      (c) => c.name === "Fearless Soldier",
+    );
+    expect(soldiers).toHaveLength(2);
+    expect(soldiers.some((c) => c.hasBane)).toBe(true);
+    expect(soldiers.some((c) => c.hasDrain)).toBe(true);
+    expect(soldiers.some((c) => c.hasStorm)).toBe(false);
+  });
+
+  it("Noel IV — at 8 PP Enhance (8) Storm soldier, not Drain", () => {
     setupTurn(8, { hand: ["10624110"], pp: 8 });
     whenPlayCard("first", 0);
     const soldiers = getBoard(state, "first").filter(
       (c) => c.name === "Fearless Soldier",
     );
     expect(soldiers).toHaveLength(2);
-    expect(soldiers.some((c) => c.hasStorm)).toBe(true);
     expect(soldiers.some((c) => c.hasBane)).toBe(true);
+    expect(soldiers.some((c) => c.hasStorm)).toBe(true);
+    expect(soldiers.some((c) => c.hasDrain)).toBe(false);
   });
 
   it("Navy Cat — destroys all enemy followers with 1 defense", () => {
