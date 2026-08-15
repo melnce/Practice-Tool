@@ -32,7 +32,7 @@ export function filterBuffCandidates(
 ): CardInstance[] {
   // Self-exclusion is already handled by the targeting system (applyFilters)
   // filterBuffCandidates only applies additional buff-specific filters
-  let candidates = pool.filter((c) => c.type === "Follower");
+  let candidates = pool.filter((c) => c != null && c.type === "Follower");
 
   // Tribe filtering
   const rawTribes = eff.tribes

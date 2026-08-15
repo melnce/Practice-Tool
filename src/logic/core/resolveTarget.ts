@@ -22,6 +22,7 @@ import {
 import {
   completeDeferredLwAfterSelection,
   resumeDeferredDeathIfIdle,
+  cleanupDead,
 } from "./cleanup.js";
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
@@ -86,6 +87,10 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
     clearSelectableFlags();
     adapter.hideTargetConfirmation();
 
+    // Deaths from the targeted mutation resolve here — not inside handlers
+    // (handlers must not call cleanupDead / runEffects; see targeting-contract).
+    cleanupDead();
+
     if (opCtx.resumeEffects?.length) {
       runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
     }
@@ -105,6 +110,53 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
 // UI Bridge
 export function confirmTargetsIfNeeded() {
   adapter.triggerConfirmButtonClick();
+}
+
+/**
+ * Force-complete a stuck pending selection (pool emptied mid-pick).
+ * Executes with whatever targets are already selected; if none, fizzles
+ * (clears pending, resumes deferred death / play-follower resume).
+ */
+export function forceCompleteOrFizzlePendingTarget(): void {
+  const pending = state.pendingTargetEffect;
+  if (!pending) return;
+
+  const targetUids = pending.targetUids || [];
+  if (targetUids.length > 0) {
+    const opCtx: TargetedOpContext = {
+      eff: pending.eff,
+      owner: pending.owner,
+      sourceCard: pending.sourceCard,
+      targetUids: [...targetUids],
+      resumeEffects: pending.resumeEffects,
+    };
+    orchestrateExecution(opCtx);
+    return;
+  }
+
+  // Fizzle: nothing selected and nothing left to pick.
+  const playFollowerResume = (pending.resumePlayFollower ??
+    (state as any).resumePlayFollower) as PlayFollowerResume | undefined;
+  const deferredLwComplete = pending.deferredLwComplete as
+    | { cardUid: string; owner: Player }
+    | undefined;
+  const resumeEffects = pending.resumeEffects;
+
+  delete state.pendingTargetEffect;
+  delete (state as any).resumePlayFollower;
+  clearSelectableFlags();
+  adapter.hideTargetConfirmation();
+
+  if (resumeEffects?.length) {
+    runEffects(resumeEffects, pending.owner, pending.sourceCard);
+  }
+  if (playFollowerResume) {
+    runPlayFollowerPostFanfare(playFollowerResume);
+  }
+  completeDeferredLwAfterSelection(deferredLwComplete);
+  resumeDeferredDeathIfIdle();
+  cleanupDead();
+  adapter.render();
 }
 
 // Internal UI helper

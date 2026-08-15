@@ -75,18 +75,11 @@ export function normalizeToUnifiedSpec(
   eff: Effect & Record<string, any>,
 ): UnifiedDrawSpec {
   // ========================================================================
-  // REQUIRED: source must be "deck"
+  // REQUIRED: source must be "deck" (legacy `{op:"draw",count:N}` ⇒ deck)
   // ========================================================================
-  if (eff.source === undefined) {
-    throw new Error(
-      `[draw] Missing required field: "source". Must be "deck". ` +
-        `For token generation, use "add" op. For duplication, use "copy" op. ` +
-        `Effect: ${JSON.stringify(eff)}`,
-    );
-  }
-
-  const sourceRaw = String(eff.source).toLowerCase().trim();
-  if (sourceRaw !== "deck") {
+  const sourceField =
+    eff.source === undefined ? "deck" : String(eff.source).toLowerCase().trim();
+  if (sourceField !== "deck") {
     throw new Error(
       `[draw] Invalid source: "${eff.source}". Must be "deck". ` +
         `For token generation (source: "named"), use { "op": "add", "name": "...", "count": N }. ` +

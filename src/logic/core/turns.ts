@@ -13,6 +13,7 @@ import { isCantAttackLocked } from "./keywords/has.js";
 import { resetEngageFlagsAtTurnStart } from "../effects/ops/engage.js";
 import { handleInvoke } from "../effects/ops/summon.js";
 import { dealDamage } from "./barrier.js";
+import { applyLeaderDamage } from "../effects/leader.js";
 import { logEvent } from "../../core/logger.js";
 import { beginAction, commitAction, abortAction } from "../../core/history.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
@@ -21,8 +22,6 @@ import {
   getHand,
   getBoard,
   getDeck,
-  setHP,
-  getHP,
   getEvoCount,
   getPP,
   setPP,
@@ -127,8 +126,7 @@ function applyBleedAllBoardsAtEndOfTurn() {
       const toSelf = Number((card as any).bleed.toSelf || 0);
 
       if (toLeader > 0) {
-        const currentHP = getHP(state, owner);
-        setHP(state, owner, Math.max(0, currentHP - toLeader));
+        applyLeaderDamage(owner, toLeader);
       }
       if (toSelf > 0) dealDamage(card, toSelf); // the follower itself
     }

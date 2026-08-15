@@ -32,7 +32,7 @@ const ALLOWED_FILES = new Set([
   "effects/ops/destroy.ts",
   "effects/ops/destroy/unified.ts",
   "effects/ops/engage.ts",
-  "effects/ops/targeted/index.ts",
+  "core/resolveTarget.ts",
   "effects/ops/buff.ts",
   "effects/ops/buff/core.ts",
   "effects/ops/buff/orchestrator.ts",

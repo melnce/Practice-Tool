@@ -109,7 +109,8 @@ function canonicalizeCrest(crest: {
  * Canonicalize a card for hashing.
  * Only include game-relevant properties.
  */
-function canonicalizeCard(card: CardInstance): object {
+function canonicalizeCard(card: CardInstance | null | undefined): object {
+  if (!card) return { id: null, uid: null, name: null };
   return {
     id: card.id,
     uid: card.uid,
