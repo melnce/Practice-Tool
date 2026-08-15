@@ -156,7 +156,7 @@ function getEffectList(
   card: CardInstance,
   plan: {
     mode: string;
-    enhanceTier: { effects: Effect[] } | null;
+    enhanceTiers: { effects: Effect[] }[];
     alternate: { effects: Effect[] } | null;
   },
 ): Effect[] {
@@ -167,12 +167,10 @@ function getEffectList(
   ) {
     return plan.alternate.effects;
   }
-  if (
-    plan.enhanceTier &&
-    Array.isArray(plan.enhanceTier.effects) &&
-    plan.enhanceTier.effects.length
-  ) {
-    return plan.enhanceTier.effects;
+  if (plan.enhanceTiers.length) {
+    return plan.enhanceTiers.flatMap((tier) =>
+      Array.isArray(tier.effects) ? tier.effects : [],
+    );
   }
   const baseList = (
     Array.isArray(card.spell) && card.spell.length ? card.spell : []

@@ -107,22 +107,22 @@ export function playCardCore(
     (card as any).playedAs = "accelerate";
     (card as any).originalPrintedType = card.type;
     card.type = "Spell";
-    return playSpell(card, player, plan.cost, {
-      effects: plan.alternate.effects,
-    });
+    return playSpell(card, player, plan.cost, [
+      { effects: plan.alternate.effects },
+    ]);
   }
 
   if (plan.mode === "crystallize" && plan.alternate) {
     applyCrystallizeTransform(card, plan.alternate);
-    return playAmulet(card, player, null);
+    return playAmulet(card, player, []);
   }
 
   if (card.type === "Spell") {
-    return playSpell(card, player, plan.cost, plan.enhanceTier);
+    return playSpell(card, player, plan.cost, plan.enhanceTiers);
   } else if (card.type === "Follower") {
-    return playFollower(card, player, plan.enhanceTier);
+    return playFollower(card, player, plan.enhanceTiers);
   } else if (card.type === "Amulet") {
-    return playAmulet(card, player, plan.enhanceTier);
+    return playAmulet(card, player, plan.enhanceTiers);
   }
 
   return { kind: "done" };

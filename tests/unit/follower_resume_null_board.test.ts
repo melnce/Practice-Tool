@@ -33,7 +33,7 @@ describe("followerResume null-board safety", () => {
       runPlayFollowerPostFanfare({
         player: "first",
         cardUid: "alive_1",
-        chosenTierEffects: null,
+        chosenTierEffectGroups: null,
         costChangedOnPlay: false,
         enteringKeywordSnapshot: {},
       }),
@@ -48,7 +48,7 @@ describe("followerResume null-board safety", () => {
       runPlayFollowerPostFanfare({
         player: "first",
         cardUid: "gone",
-        chosenTierEffects: null,
+        chosenTierEffectGroups: null,
         costChangedOnPlay: false,
         enteringKeywordSnapshot: {},
       }),

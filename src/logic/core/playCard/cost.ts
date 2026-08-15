@@ -19,10 +19,10 @@ export function getEffectiveCost(card: CardInstance): number {
   return parseInt(String(card.cost), 10) || 0;
 }
 
-export function pickEnhanceTier(
+export function pickEnhanceTiers(
   card: CardInstance,
   availablePP: number,
-): { cost: number; effects: Effect[] } | null {
+): { cost: number; effects: Effect[] }[] {
   const tiers = Array.isArray(card.enhanceTiers) ? card.enhanceTiers : [];
   if (!tiers.length && Array.isArray(card.keywords)) {
     const tmp = [];
@@ -38,11 +38,23 @@ export function pickEnhanceTier(
     tmp.sort((a: any, b: any) => b.cost - a.cost);
     (card as any).enhanceTiers = tmp;
   }
+  const affordable: { cost: number; effects: Effect[] }[] = [];
   for (const t of card.enhanceTiers || []) {
-    if (availablePP >= t.cost)
-      return { cost: t.cost, effects: t.effects || [] }; // highest affordable
+    if (availablePP >= t.cost) {
+      affordable.push({ cost: t.cost, effects: t.effects || [] });
+    }
   }
-  return null;
+  affordable.sort((a, b) => a.cost - b.cost);
+  return affordable;
+}
+
+/** @deprecated Use pickEnhanceTiers — returns highest affordable tier only. */
+export function pickEnhanceTier(
+  card: CardInstance,
+  availablePP: number,
+): { cost: number; effects: Effect[] } | null {
+  const tiers = pickEnhanceTiers(card, availablePP);
+  return tiers.length ? tiers[tiers.length - 1]! : null;
 }
 
 export type PlayCostMode = "enhance" | "normal" | "accelerate" | "crystallize";
@@ -51,7 +63,8 @@ export interface PlayCostPlan {
   mode: PlayCostMode;
   /** PP to spend for this play. */
   cost: number;
-  enhanceTier: { cost: number; effects: Effect[] } | null;
+  /** All affordable Enhance tiers, ascending cost order. Empty when not enhancing. */
+  enhanceTiers: { cost: number; effects: Effect[] }[];
   alternate: AlternateForm | null;
   /** Effective printed-form cost (base + hand mod). */
   effectivePlayCost: number;
@@ -61,6 +74,10 @@ export interface PlayCostPlan {
  * Resolve which form/cost a play will use.
  * Priority: Enhance (if affordable) → normal (if affordable) →
  * highest payable Accelerate/Crystallize → else normal (will fail PP check).
+ *
+ * When multiple Enhance tiers are affordable, all tiers with cost ≤ paid PP
+ * activate (ascending cost order after Fanfare). Play cost is the highest
+ * affordable tier's cost.
  *
  * Crest passive `suppress_fanfare_enhance` skips Enhance so the ability
  * does not activate (play at normal cost instead).
@@ -76,14 +93,15 @@ export function resolvePlayCost(
       : state.activePlayer;
   const suppressEnhance =
     !!owner && playerHasCrestPassive(owner, "suppress_fanfare_enhance");
-  const enhanceTier = suppressEnhance
-    ? null
-    : pickEnhanceTier(card, availablePP);
-  if (enhanceTier) {
+  const enhanceTiers = suppressEnhance
+    ? []
+    : pickEnhanceTiers(card, availablePP);
+  if (enhanceTiers.length) {
+    const highest = enhanceTiers[enhanceTiers.length - 1]!;
     return {
       mode: "enhance",
-      cost: enhanceTier.cost,
-      enhanceTier,
+      cost: highest.cost,
+      enhanceTiers,
       alternate: null,
       effectivePlayCost,
     };
@@ -92,7 +110,7 @@ export function resolvePlayCost(
     return {
       mode: "normal",
       cost: effectivePlayCost,
-      enhanceTier: null,
+      enhanceTiers: [],
       alternate: null,
       effectivePlayCost,
     };
@@ -102,7 +120,7 @@ export function resolvePlayCost(
     return {
       mode: alternate.kind,
       cost: alternate.cost,
-      enhanceTier: null,
+      enhanceTiers: [],
       alternate,
       effectivePlayCost,
     };
@@ -110,7 +128,7 @@ export function resolvePlayCost(
   return {
     mode: "normal",
     cost: effectivePlayCost,
-    enhanceTier: null,
+    enhanceTiers: [],
     alternate: null,
     effectivePlayCost,
   };

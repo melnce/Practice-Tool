@@ -20,7 +20,7 @@ import { recordFollowerEnter } from "../followerEnterHistory.js";
 export interface PlayFollowerResume {
   player: Player;
   cardUid: string;
-  chosenTierEffects: Effect[] | null;
+  chosenTierEffectGroups: Effect[][] | null;
   costChangedOnPlay: boolean;
   enteringKeywordSnapshot: EnteringKeywordSnapshot;
 }
@@ -74,8 +74,12 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
   fireTrigger("ally_follower_enter", player as any, enterCtx);
   fireTrigger("enemy_follower_enter", opponent as any, enterCtx);
 
-  if (resume.chosenTierEffects?.length) {
-    runEffects([...resume.chosenTierEffects], player, card);
+  if (resume.chosenTierEffectGroups?.length) {
+    for (const effects of resume.chosenTierEffectGroups) {
+      if (effects.length) {
+        runEffects([...effects], player, card);
+      }
+    }
   }
 
   applyKeywordsFromList(card);

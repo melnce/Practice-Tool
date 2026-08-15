@@ -77,7 +77,7 @@ export interface GameState {
         resumePlayFollower?: {
           player: Player;
           cardUid: string;
-          chosenTierEffects: Effect[] | null;
+          chosenTierEffectGroups: Effect[][] | null;
           costChangedOnPlay: boolean;
           enteringKeywordSnapshot: unknown;
         };

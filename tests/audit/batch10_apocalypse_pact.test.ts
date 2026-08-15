@@ -147,16 +147,18 @@ describe("Set 10006 — Apocalypse Pact", () => {
     expect(soldiers.some((c) => c.hasStorm)).toBe(false);
   });
 
-  it("Noel IV — at 8 PP Enhance (8) Storm soldier, not Drain", () => {
+  it("Noel IV — at 8 PP Fanfare plus Enhance (7) Drain and Enhance (8) Storm soldiers", () => {
     setupTurn(8, { hand: ["10624110"], pp: 8 });
     whenPlayCard("first", 0);
     const soldiers = getBoard(state, "first").filter(
       (c) => c.name === "Fearless Soldier",
     );
-    expect(soldiers).toHaveLength(2);
+    expect(soldiers).toHaveLength(3);
     expect(soldiers.some((c) => c.hasBane)).toBe(true);
+    expect(soldiers.some((c) => c.hasDrain)).toBe(true);
     expect(soldiers.some((c) => c.hasStorm)).toBe(true);
-    expect(soldiers.some((c) => c.hasDrain)).toBe(false);
+    expect(findOnBoard("first", "Noel IV, Ruthless Warlord")).toBeTruthy();
+    expect(getBoard(state, "first")).toHaveLength(4);
   });
 
   it("Navy Cat — destroys all enemy followers with 1 defense", () => {
