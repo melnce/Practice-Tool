@@ -251,7 +251,9 @@ function updateBoostPipsUI() {
 }
 
 function updateGameOverOverlay() {
-  let overlay = byId("gameOverOverlay");
+  // Overlay is created lazily — use getElementById so missing-id does not warn
+  // on every render during normal play (byId logs available IDs on miss).
+  let overlay = document.getElementById("gameOverOverlay");
   // Puzzle attempt owns the terminal UI — keep rematch from fighting Retry.
   const puzzleStatus = getPuzzleSessionSnapshot().status;
   const puzzleBusy =
@@ -286,8 +288,8 @@ function updateGameOverOverlay() {
   }
 
   const winner = state.winner ?? getWinner(state);
-  const title = byId("gameOverTitle");
-  const reasonEl = byId("gameOverReason");
+  const title = document.getElementById("gameOverTitle");
+  const reasonEl = document.getElementById("gameOverReason");
   if (title) {
     title.textContent =
       winner === "first"

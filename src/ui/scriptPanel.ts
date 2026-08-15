@@ -75,6 +75,13 @@ export function initScriptPanel(): void {
     hiddenToggle.checked = isHiddenHandEnabled();
     hiddenToggle.addEventListener("change", () => {
       setHiddenHandEnabled(hiddenToggle.checked);
+      if (hiddenToggle.checked) {
+        const tip = document.getElementById("cardTooltip");
+        if (tip) {
+          tip.style.display = "none";
+          tip.textContent = "";
+        }
+      }
       adapter.render();
     });
   }
@@ -107,8 +114,10 @@ export function initScriptPanel(): void {
   stopBtn?.addEventListener("click", () => {
     const doc = stopRecording();
     if (doc) {
-      showToast(`Stopped · ${doc.steps.length} steps`);
-      // Keep doc loaded for export; switch to idle but retain via getRecordingDocument
+      showToast(`Stopped · ${doc.steps.length} steps · armed for playback`);
+      // Arm the just-recorded line so the next Start Game plays against it
+      // (previously Stop left the line export-only; playback required re-import).
+      loadScriptForPlayback(doc);
     }
     refreshScriptStatus();
   });
