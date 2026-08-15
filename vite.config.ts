@@ -2,13 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
+import { ROOT_STATIC_DIRS, copyRootStaticDirs } from "./vite.root-static.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = __dirname;
 
+export { ROOT_STATIC_DIRS, copyRootStaticDirs } from "./vite.root-static.js";
+
 /** Serve css/cards/decks/images from repo root without exposing src/ as raw static files. */
-function serveRootStaticDirs(dirs: string[]): Plugin {
+function serveRootStaticDirs(dirs: readonly string[]): Plugin {
   const MIME: Record<string, string> = {
     ".css": "text/css",
     ".json": "application/json",
@@ -20,8 +23,15 @@ function serveRootStaticDirs(dirs: string[]): Plugin {
     ".html": "text/html",
   };
 
+  let outDirAbs = path.join(ROOT, "build");
+  let isBuild = false;
+
   return {
     name: "serve-root-static-dirs",
+    configResolved(config) {
+      outDirAbs = path.resolve(config.root, config.build.outDir);
+      isBuild = config.command === "build";
+    },
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const raw = (req.url ?? "").split("?")[0];
@@ -43,6 +53,11 @@ function serveRootStaticDirs(dirs: string[]): Plugin {
         fs.createReadStream(abs).pipe(res);
       });
     },
+    closeBundle() {
+      // Build only — keep configureServer middleware unchanged for dev.
+      if (!isBuild) return;
+      copyRootStaticDirs(ROOT, outDirAbs, dirs);
+    },
   };
 }
 
@@ -55,7 +70,7 @@ export default defineConfig({
     open: true,
     fs: { allow: [ROOT] },
   },
-  plugins: [serveRootStaticDirs(["css", "cards", "decks", "images"])],
+  plugins: [serveRootStaticDirs(ROOT_STATIC_DIRS)],
   resolve: {
     // TS sources use `.js` extensions in import specifiers (NodeNext ESM convention).
     // Vite resolves `./foo.js` → `foo.ts` when only the `.ts` file exists.
