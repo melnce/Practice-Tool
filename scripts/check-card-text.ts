@@ -98,7 +98,6 @@ const NUMERIC_DRIFT_CHECKS: NumericDriftHint["check"][] = [
 const NUMERIC_DRIFT_HINT_ONLY_CHECKS = new Set<NumericDriftHint["check"]>([
   "damage_amount",
   "stat_bonus",
-  "enhance_multiset",
 ]);
 const MAX_PER_TURN_RULING_IDS = new Set([
   "10344110", // Azurifrit — bible line 422: up to 3 activations per turn
@@ -755,14 +754,14 @@ function checkNumericDrift(
     }
   }
 
-  // Multi-Enhance multiset — only when 2+ tiers on both sides (single-tier uses error gate)
+  // Enhance tier-set: compare sorted text costs vs JSON keyword costs as multisets
   const textEnhance = sortedNumericList(
     extractTextCosts(desc, /enhance\s*\((\d+)\):/gi),
   );
   const jsonEnhance = sortedNumericList(
     collectKeywordCosts(card.keywords, "Enhance"),
   );
-  if (textEnhance.length >= 2 && jsonEnhance.length >= 2) {
+  if (textEnhance.length > 0 && jsonEnhance.length > 0) {
     markScanned(stats, "enhance_multiset");
     if (!listsEqual(textEnhance, jsonEnhance)) {
       recordDrift(
@@ -952,32 +951,18 @@ function checkCard(card: CardJson): Issue[] {
     });
   }
 
-  const enhanceMatch = desc.match(/enhance \((\d+)\):/i);
-  if (enhanceMatch) {
-    const cost = Number(enhanceMatch[1]);
-    const enhanceKw = (kws ?? []).find(
-      (k) =>
-        k &&
-        typeof k === "object" &&
-        String((k as { name?: string }).name ?? "").toLowerCase() === "enhance",
-    ) as { cost?: number } | undefined;
-    if (!enhanceKw) {
-      issues.push({
-        id: card.id,
-        name: card.name,
-        kind: effectCompletenessKind,
-        status,
-        message: `Description has Enhance (${cost}) but JSON lacks Enhance keyword`,
-      });
-    } else if (Number(enhanceKw.cost) !== cost) {
-      issues.push({
-        id: card.id,
-        name: card.name,
-        kind: "error",
-        status,
-        message: `Enhance cost in text (${cost}) != JSON (${enhanceKw.cost})`,
-      });
-    }
+  const textEnhanceCosts = extractTextCosts(desc, /enhance\s*\((\d+)\):/gi);
+  if (
+    textEnhanceCosts.length > 0 &&
+    !collectKeywordCosts(kws, "Enhance").length
+  ) {
+    issues.push({
+      id: card.id,
+      name: card.name,
+      kind: effectCompletenessKind,
+      status,
+      message: `Description has Enhance (${textEnhanceCosts[0]}) but JSON lacks Enhance keyword`,
+    });
   }
 
   if (/countdown \(\d+\)/i.test(desc) && !hasKeyword(kws, "Countdown")) {
