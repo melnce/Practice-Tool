@@ -27,8 +27,9 @@ import { playerHasCrestPassive } from "../../effects/crest.js";
 export function playFollower(
   card: CardInstance,
   player: Player,
-  chosenTier: { effects: Effect[] } | null,
+  chosenTiers: { effects: Effect[] }[] | null = [],
 ): PlayOutcome {
+  const tiers = chosenTiers ?? [];
   pushPlayedHistory(player, card);
 
   // Snapshot cost for triggers
@@ -73,9 +74,15 @@ export function playFollower(
     "suppress_fanfare_enhance",
   );
 
+  const chosenTierEffectGroups = suppressFanfareEnhance
+    ? null
+    : tiers
+        .map((tier) => (Array.isArray(tier.effects) ? [...tier.effects] : []))
+        .filter((effects) => effects.length);
+
   // Rulebook §242–256: Fanfare (step 1) before play/enter-reactive triggers (steps 2–5).
   const skipFanfareForEnhance =
-    chosenTier && (card as any).enhance_replaces_fanfare;
+    chosenTierEffectGroups?.length && (card as any).enhance_replaces_fanfare;
   if (
     !suppressFanfareEnhance &&
     !skipFanfareForEnhance &&
@@ -94,10 +101,7 @@ export function playFollower(
       const resume: PlayFollowerResume = {
         player,
         cardUid: card.uid,
-        chosenTierEffects:
-          chosenTier && Array.isArray(chosenTier.effects)
-            ? [...chosenTier.effects]
-            : null,
+        chosenTierEffectGroups,
         costChangedOnPlay,
         enteringKeywordSnapshot,
       };
@@ -110,11 +114,7 @@ export function playFollower(
     player,
     cardUid: card.uid,
     // Suppress Enhance ability activation while crest passive is active.
-    chosenTierEffects: suppressFanfareEnhance
-      ? null
-      : chosenTier && Array.isArray(chosenTier.effects)
-        ? [...chosenTier.effects]
-        : null,
+    chosenTierEffectGroups,
     costChangedOnPlay,
     enteringKeywordSnapshot,
   });

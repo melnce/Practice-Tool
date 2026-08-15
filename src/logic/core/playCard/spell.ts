@@ -26,8 +26,9 @@ export function playSpell(
   card: CardInstance,
   player: Player,
   effectiveCost: number,
-  chosenTier: { effects: Effect[] } | null,
+  chosenTiers: { effects: Effect[] }[] | null = [],
 ): PlayOutcome {
+  const tiers = chosenTiers ?? [];
   const owner = isFirstPlayer(state.activePlayer) ? "first" : "second";
 
   // Spellboost hand
@@ -79,12 +80,11 @@ export function playSpell(
 
   // Effect List Logic
   let list: Effect[] = [];
-  if (
-    chosenTier &&
-    Array.isArray(chosenTier.effects) &&
-    chosenTier.effects.length
-  ) {
-    list = [...chosenTier.effects];
+  const tierEffects = tiers.flatMap((tier) =>
+    Array.isArray(tier.effects) ? tier.effects : [],
+  );
+  if (tierEffects.length) {
+    list = [...tierEffects];
   } else {
     list =
       Array.isArray(card.spell) && card.spell.length

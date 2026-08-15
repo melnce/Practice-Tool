@@ -25,8 +25,9 @@ import { fireTrigger } from "../triggers.js";
 export function playAmulet(
   card: CardInstance,
   player: Player,
-  chosenTier: { effects: Effect[] } | null,
+  chosenTiers: { effects: Effect[] }[] | null = [],
 ): PlayOutcome {
+  const tiers = chosenTiers ?? [];
   pushPlayedHistory(player, card);
   initAmulet(card);
   applyKeywordsFromList(card);
@@ -39,12 +40,10 @@ export function playAmulet(
 
   mergeWitchsNewBrewOnPlay(card, player);
 
-  if (
-    chosenTier &&
-    Array.isArray(chosenTier.effects) &&
-    chosenTier.effects.length
-  ) {
-    runEffects([...chosenTier.effects], player, card);
+  for (const tier of tiers) {
+    if (Array.isArray(tier.effects) && tier.effects.length) {
+      runEffects([...tier.effects], player, card);
+    }
   }
 
   if (Array.isArray(card.fanfare) && card.fanfare.length) {
