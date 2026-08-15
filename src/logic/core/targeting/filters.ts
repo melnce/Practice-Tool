@@ -66,6 +66,7 @@ export function applyFilters(
   const sharedCond: CardCondition = {};
   if (cond.type) sharedCond.type = cond.type;
   if (cond.tribe) sharedCond.tribe = cond.tribe;
+  if (cond.exclude_tribe) sharedCond.exclude_tribe = cond.exclude_tribe;
   if (cond.has_keyword) sharedCond.has_keyword = cond.has_keyword;
   if (cond.exclude_keyword) sharedCond.exclude_keyword = cond.exclude_keyword;
   if (cond.unevolved) sharedCond.unevolved = cond.unevolved;
