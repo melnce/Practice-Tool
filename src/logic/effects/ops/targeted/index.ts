@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { state } from "../../../../core/gameState.js";
 import { runEffects } from "../../../core/effects/index.js";
-import { cleanupDead } from "../../../core/cleanup.js";
+import { applyLeaderDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
 import { applyKeyword, handleRemoveKeyword } from "../../../core/keywords.js";
 import { transformTarget, transformHandTarget } from "../transform.js";
@@ -26,8 +26,6 @@ import {
   getBoard,
   getDeck,
   addShadows,
-  getHP,
-  setHP,
   opponentOf,
 } from "../../../../core/playerHelpers.js";
 import { normalizeCardStats } from "../../../../core/cardStats.js";
@@ -109,7 +107,7 @@ TARGETED_OP_HANDLERS.set("damage", (ctx) => {
   const oppOwner = opponentOf(owner);
   if (!targets.length) {
     if ((eff as any).fallback_leader && amt) {
-      setHP(state, oppOwner, Math.max(0, getHP(state, oppOwner) - amt));
+      applyLeaderDamage(oppOwner, amt);
     }
     return { kind: "handled" };
   }
@@ -117,10 +115,9 @@ TARGETED_OP_HANDLERS.set("damage", (ctx) => {
     for (const target of targets) {
       if (target.type === "Follower") dealDamage(target, amt);
       else if (target.type === "Leader") {
-        setHP(state, oppOwner, Math.max(0, getHP(state, oppOwner) - amt));
+        applyLeaderDamage(oppOwner, amt);
       }
     }
-    cleanupDead();
   }
   return { kind: "handled" };
 });
@@ -218,7 +215,7 @@ TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
-  const { owner, targetUids } = ctx;
+  const { owner, targetUids, resumeEffects } = ctx;
   const hand = getHand(state, owner);
   const grave = getGraveyard(state, owner);
   const discarded: CardInstance[] = [];
@@ -240,16 +237,21 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
   if (discarded.length) {
     rememberDiscardedCards(discarded);
   }
-  for (const dc of discarded) {
-    if (Array.isArray((dc as any).on_discard))
-      runEffects([...(dc as any).on_discard], owner, dc);
+  if (resumeEffects) {
+    for (const dc of discarded) {
+      const fx = (dc as any).on_discard;
+      if (!Array.isArray(fx) || !fx.length) continue;
+      for (let i = fx.length - 1; i >= 0; i--) {
+        resumeEffects.unshift(fx[i]);
+      }
+    }
   }
   return { kind: "handled" };
 });
 
 // Unified discard op - same logic as discard_select_hand
 TARGETED_OP_HANDLERS.set("discard", (ctx) => {
-  const { owner, targetUids } = ctx;
+  const { owner, targetUids, resumeEffects } = ctx;
   const hand = getHand(state, owner);
   const grave = getGraveyard(state, owner);
   const discarded: CardInstance[] = [];
@@ -271,9 +273,14 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
   if (discarded.length) {
     rememberDiscardedCards(discarded);
   }
-  for (const dc of discarded) {
-    if (Array.isArray((dc as any).on_discard))
-      runEffects([...(dc as any).on_discard], owner, dc);
+  if (resumeEffects) {
+    for (const dc of discarded) {
+      const fx = (dc as any).on_discard;
+      if (!Array.isArray(fx) || !fx.length) continue;
+      for (let i = fx.length - 1; i >= 0; i--) {
+        resumeEffects.unshift(fx[i]);
+      }
+    }
   }
   return { kind: "handled" };
 });
@@ -343,7 +350,6 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
     }
     applyKeywordBuff(target, eff as any, owner);
   }
-  cleanupDead();
   return { kind: "handled" };
 });
 
@@ -401,7 +407,6 @@ TARGETED_OP_HANDLERS.set("destroy", (ctx) => {
       logEvent("destroy", { owner, target: target.name });
     }
   }
-  cleanupDead();
   const thenEffects = Array.isArray((eff as any).then) ? (eff as any).then : [];
   if (destroyed > 0 && thenEffects.length && resumeEffects) {
     for (let i = thenEffects.length - 1; i >= 0; i--) {
@@ -412,7 +417,7 @@ TARGETED_OP_HANDLERS.set("destroy", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("destroy_then", (ctx) => {
-  const { eff, owner, sourceCard, targetUids } = ctx;
+  const { eff, owner, targetUids, resumeEffects } = ctx;
   const targets = resolveUids(targetUids);
   let destroyedCount = 0;
   for (const target of targets) {
@@ -428,11 +433,13 @@ TARGETED_OP_HANDLERS.set("destroy_then", (ctx) => {
       logEvent("destroy", { owner, target: target.name });
     }
   }
-  cleanupDead();
-  if (destroyedCount > 0 && Array.isArray((eff as any).effects)) {
-    runEffects([...(eff as any).effects], owner, sourceCard, {
-      targetUids,
-    });
+  const thenFx = Array.isArray((eff as any).effects)
+    ? (eff as any).effects
+    : [];
+  if (destroyedCount > 0 && thenFx.length && resumeEffects) {
+    for (let i = thenFx.length - 1; i >= 0; i--) {
+      resumeEffects.unshift(thenFx[i]!);
+    }
   }
   return { kind: "handled" };
 });
@@ -599,7 +606,6 @@ TARGETED_OP_HANDLERS.set("select_hand_summon_follower", (ctx) => {
   for (const target of targets) {
     summonFromHand(target, owner);
   }
-  cleanupDead();
   return { kind: "handled" };
 });
 
@@ -611,8 +617,6 @@ TARGETED_OP_HANDLERS.set("select_hand_summon_artifact_copy", (ctx) => {
   for (const target of targets) {
     summonExactCopyFromHand(target, owner, "right");
   }
-
-  cleanupDead();
   return { kind: "handled" };
 });
 
@@ -637,8 +641,6 @@ TARGETED_OP_HANDLERS.set(
         } as any);
       }
     }
-
-    cleanupDead();
     return { kind: "handled" };
   },
 );

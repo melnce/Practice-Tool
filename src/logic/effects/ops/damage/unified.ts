@@ -134,7 +134,7 @@ export function handleDamage(
   const isSelectBased = spec.select != null && spec.select > 0;
   const pool = getPool(spec.target || "", owner, sourceCard, spec.condition, {
     isTargetedEffect: isSelectBased,
-  }).filter((c) => c.type === "Follower");
+  }).filter((c) => c != null && c.type === "Follower");
 
   // Handle selection requirement
   if (spec.select && spec.select > 0) {

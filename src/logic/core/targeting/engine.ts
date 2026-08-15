@@ -48,7 +48,7 @@ export function applyTargetClick(
     ...getHand(state, "first"),
     ...getHand(state, "second"),
   ];
-  const clickedTarget = all.find((c) => c.uid === uid);
+  const clickedTarget = all.find((c) => c != null && c.uid === uid);
 
   if (!clickedTarget) {
     return { kind: "invalid", reason: `Target not found: ${uid}` };

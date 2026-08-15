@@ -27,7 +27,7 @@ export interface PlayFollowerResume {
 
 function findFollowerOnBoard(uid: string, player: Player): CardInstance | null {
   const board = getBoard(state, player);
-  return board.find((c) => c.uid === uid) ?? null;
+  return board.find((c) => c != null && c.uid === uid) ?? null;
 }
 
 /** Stash post-fanfare tail while fanfare awaits UI (target pick or mode modal). */
@@ -84,7 +84,7 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
 
   const myBoard = getBoard(state, player);
   for (const perm of myBoard) {
-    if (perm === card || perm.type !== "Amulet") continue;
+    if (!perm || perm === card || perm.type !== "Amulet") continue;
     const ks = perm.keywordState;
     if (ks?.hasAllyEnter && Array.isArray(ks.allyEnterEffects)) {
       for (const eff of ks.allyEnterEffects) {
@@ -100,6 +100,7 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
 
   if (Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
     for (const perm of myBoard) {
+      if (!perm) continue;
       const ks = perm.keywordState || {};
       if (
         perm.type === "Amulet" &&
