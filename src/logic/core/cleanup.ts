@@ -128,10 +128,40 @@ function triggerLastWords(card: CardInstance, owner: Player): "pending" | void {
   (card as any)._lwFired = true;
 }
 
+/**
+ * Detach a card from a board array by object identity.
+ * Must not use a previously collected index — destroy triggers / nested
+ * cleanup can compact or reorder the board before we write the hole.
+ * Null placeholders keep slot positions for LW summons (pushToBoard).
+ */
+function detachFromBoardAsNull(
+  board: CardInstance[],
+  card: CardInstance,
+): boolean {
+  let found = false;
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === card) {
+      (board as any)[i] = null;
+      found = true;
+    }
+  }
+  return found;
+}
+
+/**
+ * Move a destroyed card into the graveyard. Enforces single-zone: if the
+ * instance is still listed on the owner's board (stale slot), detach it.
+ */
 function sendToGrave(card: CardInstance, owner: Player) {
+  detachFromBoardAsNull(getBoard(state, owner), card);
+  const grave = getGraveyard(state, owner);
+  if (grave.includes(card)) {
+    card.zone = "graveyard";
+    return;
+  }
   card.zone = "graveyard";
   card.cost_mod = 0;
-  getGraveyard(state, owner).push(card);
+  grave.push(card);
   addShadows(state, owner, 1);
 }
 
@@ -270,7 +300,7 @@ export function cleanupDead() {
     : [];
 
   for (const death of allDeaths) {
-    const { card: c, owner, board, index, isFollower, defLE0, kw } = death;
+    const { card: c, owner, board, isFollower, defLE0, kw } = death;
     const cardType = c.type;
     const isAmulet = c.type === "Amulet";
 
@@ -286,6 +316,28 @@ export function cleanupDead() {
       cause,
       uid: c.uid,
     });
+
+    // Zone transfer FIRST (by identity, not collected index). Destroy/leave
+    // triggers and nested cleanup may reorder the board; a stale index would
+    // null the wrong slot (or extend the array) and leave the instance in
+    // two zones when sendToGrave runs. Matches destroyTarget / bounce:
+    // remove from the source zone, then fire observers.
+    const isBanishedOnDeath = kw?.banishOnDeath || (c as any).banishOnDeath;
+    detachFromBoardAsNull(board, c);
+
+    delete (c as any).buffs;
+    delete (c as any).potential_attack;
+    delete (c as any).potential_defense;
+    delete (c as any)._death_snapshot;
+
+    if (isBanishedOnDeath) {
+      logEvent("banishOnDeath", { card: c.name, owner });
+      banishCard(c);
+      continue;
+    }
+
+    logEvent("death", { card: c.name, owner, uid: c.uid });
+    recordDestroyed(state, owner, c);
 
     if (isFollower) {
       dispatchLeaveTriggers(owner, c, defer);
@@ -337,23 +389,8 @@ export function cleanupDead() {
       }
     }
 
-    delete (c as any).buffs;
-    delete (c as any).potential_attack;
-    delete (c as any).potential_defense;
-    delete (c as any)._death_snapshot;
-
-    const isBanishedOnDeath = kw?.banishOnDeath || (c as any).banishOnDeath;
-    if (isBanishedOnDeath) {
-      logEvent("banishOnDeath", { card: c.name, owner });
-      banishCard(c);
-      if (board[index] === c) (board as any)[index] = null;
-      continue;
-    }
-
-    logEvent("death", { card: c.name, owner, uid: c.uid });
-    recordDestroyed(state, owner, c);
-
-    (board as any)[index] = null;
+    // Re-detach after triggers: nested effects must not re-seat the corpse.
+    detachFromBoardAsNull(board, c);
 
     const lw = kw?.lastWordsEffects || c.lastWordsEffects;
     const lwCount = Array.isArray(lw) ? lw.length : 0;

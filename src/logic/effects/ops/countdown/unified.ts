@@ -84,10 +84,10 @@ export function handleCountdown(
  * Normalize action string to canonical form (advance or delay)
  */
 function normalizeAction(action: string): CountdownAction {
-  if (action === "advance") {
+  if (action === "advance" || action === "advance_countdown") {
     return "advance";
   }
-  if (action === "delay") {
+  if (action === "delay" || action === "delay_countdown") {
     return "delay";
   }
   return "advance"; // default

@@ -46,7 +46,8 @@ function effectsNeedSelection(effects: Effect[] = []) {
 function removeWithLastWords(card: CardInstance, owner: Player) {
   const board = getBoard(state, owner);
   const grave = getGraveyard(state, owner);
-  const idx = board.findIndex((c) => c?.uid === card.uid);
+  // Find by identity at removal time (indices go stale if LW/triggers mutate).
+  const idx = board.indexOf(card);
   if (idx === -1) {
     return;
   }
@@ -57,8 +58,19 @@ function removeWithLastWords(card: CardInstance, owner: Player) {
     runEffects([...removed.lastWordsEffects], owner, removed);
   }
 
-  grave.push(removed);
-  addShadows(state, owner, 1);
+  // Single-zone: LW/triggers must not re-seat the corpse on the board.
+  for (let i = board.length - 1; i >= 0; i--) {
+    if (board[i] === removed) board.splice(i, 1);
+  }
+
+  if (!grave.includes(removed)) {
+    removed.zone = "graveyard";
+    removed.cost_mod = 0;
+    grave.push(removed);
+    addShadows(state, owner, 1);
+  } else {
+    removed.zone = "graveyard";
+  }
 }
 
 // --- Main API ---

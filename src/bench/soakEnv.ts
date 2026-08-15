@@ -380,6 +380,11 @@ export function pickSoakAction(
   // Bias away from always ending turn when other options exist (~70% play when available)
   const nonEnd = sorted.filter((a) => a.type !== "END_TURN");
   if (nonEnd.length > 0 && policyRng.nextFloat() < 0.72) {
+    // Soft preference for PLAY_CARD so high-cost spotlight cards get cast when legal.
+    const plays = nonEnd.filter((a) => a.type === "PLAY_CARD");
+    if (plays.length > 0 && policyRng.nextFloat() < 0.55) {
+      return plays[policyRng.nextInt(plays.length)]!;
+    }
     return nonEnd[policyRng.nextInt(nonEnd.length)]!;
   }
   return sorted[policyRng.nextInt(sorted.length)]!;
