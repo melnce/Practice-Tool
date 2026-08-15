@@ -51,10 +51,12 @@ export function registerBoardEffects() {
   // zone: "self" = transform the source card itself
   // ==========================================================================
   registerOp("transform", (eff, ctx) => {
-    handleTransform(eff as any, ctx.owner, {
+    const result = handleTransform(eff as any, ctx.owner, {
       sourceCard: ctx.sourceCard,
       context: ctx.context,
+      effectsQueue: ctx.queue,
     });
+    if (result === "pending") return "pending";
   });
 
   // NOTE: "amulet" op removed - use "countdown" op instead

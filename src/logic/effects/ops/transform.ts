@@ -17,8 +17,9 @@ import {
   getDeck,
   opponentOf,
 } from "../../../core/playerHelpers.js";
-import { getPool } from "../../core/targeting.js";
+import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
+import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
 // ========================================================================
 // UNIFIED TRANSFORM HANDLER - target field REQUIRED
@@ -74,8 +75,12 @@ export interface TransformSpec {
 export function handleTransform(
   eff: Effect & TransformSpec,
   owner: Player,
-  ctx: { sourceCard?: CardInstance | null; context?: any },
-): void {
+  ctx: {
+    sourceCard?: CardInstance | null;
+    context?: any;
+    effectsQueue?: Effect[];
+  },
+): "pending" | void {
   // ========================================================================
   // STRICT: target field is REQUIRED
   // ========================================================================
@@ -155,8 +160,7 @@ export function handleTransform(
       if (mode === "random") {
         transformRandomInHand(eff, owner, into);
       } else {
-        // all mode (default for hand)
-        transformInHandByFilter(eff, owner);
+        return transformInHandByFilter(eff, owner, ctx);
       }
       return;
 
@@ -352,22 +356,39 @@ function transformBoardFromSource(
 }
 
 /**
+ * Merge object-valued `filter` into the condition passed to getPool.
+ * Card JSON uses `filter:{tribe:"Puppetry"}` on hand transforms; previously
+ * only `eff.condition` reached getPool and object filters were ignored on the
+ * select path (Vier).
+ */
+function transformPoolCondition(eff: Effect & TransformSpec): any {
+  const base =
+    eff.condition && typeof eff.condition === "object" ? eff.condition : {};
+  const filter = eff.filter;
+  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
+    return { ...base, ...filter };
+  }
+  return base;
+}
+
+/**
  * Check if a card matches the filter criteria.
  */
 function matchesFilter(card: CardInstance, filter: any): boolean {
   if (!card) return false;
 
-  // DEBUG: Log filter check
-  console.log("[matchesFilter DEBUG]", {
-    cardName: card.name,
-    cardCost: card.cost,
-    cardClass: (card as any).class,
-    filter: JSON.stringify(filter),
-  });
-
   // Check type filter (Spell, Follower, Amulet)
   if (filter.type && (card as any).type !== filter.type) {
     return false;
+  }
+
+  // Check tribe filter
+  if (filter.tribe) {
+    const want = String(filter.tribe).toLowerCase();
+    const tribes = Array.isArray(card.tribes)
+      ? card.tribes.map((t) => String(t).toLowerCase())
+      : [];
+    if (!tribes.includes(want)) return false;
   }
 
   // Check class filter
@@ -389,12 +410,6 @@ function matchesFilter(card: CardInstance, filter: any): boolean {
 
   if (costLte !== undefined) {
     const maxCost = parseInt(String(costLte), 10);
-    console.log("[matchesFilter DEBUG] cost_lte check:", {
-      cardName: card.name,
-      cardCost,
-      maxCost,
-      willReject: cardCost > maxCost,
-    });
     if (cardCost > maxCost) return false;
   }
 
@@ -438,17 +453,22 @@ function matchesFilter(card: CardInstance, filter: any): boolean {
 }
 
 /**
- * Transform all cards in hand matching the filter.
- * mode: "all" (default)
- * Preserves UID, owner, and zone to maintain card identity.
+ * Transform cards in hand matching the filter.
+ * When `select` is set, builds a selection pool and pauses for user pick.
+ * Otherwise transforms every matching card (AoE hand transform).
  */
-function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
-  const hand = getHand(state, owner);
-  const filter = eff.filter || {};
-  const targetCardName = eff.into || eff.target_card_name;
-
+function transformInHandByFilter(
+  eff: Effect & TransformSpec,
+  owner: Player,
+  ctx: {
+    sourceCard?: CardInstance | null;
+    context?: any;
+    effectsQueue?: Effect[];
+  },
+): "pending" | void {
+  const targetCardName = eff.into || eff.name;
   if (!targetCardName) {
-    console.error("transform zone:hand requires 'into' or 'target_card_name'");
+    console.error("transform zone:hand requires 'into' or 'name'");
     return;
   }
 
@@ -458,20 +478,53 @@ function transformInHandByFilter(eff: Effect & TransformSpec, owner: Player) {
     return;
   }
 
+  const selectN = parseInt(String(eff.select ?? 0), 10) || 0;
+
+  if (selectN > 0) {
+    const pool = getPool(
+      eff.target || "ally:hand",
+      owner,
+      ctx.sourceCard ?? null,
+      transformPoolCondition(eff),
+      {
+        ...(ctx.context ?? {}),
+        isTargetedEffect: true,
+      },
+    );
+
+    if (ctx.context?.targetUids?.length) {
+      for (const uid of ctx.context.targetUids) {
+        const card = resolveUid(uid);
+        if (card && pool.some((c) => c.uid === card.uid)) {
+          transformHandTarget(card, targetCardName);
+        }
+      }
+      return;
+    }
+
+    if (!pool.length) return;
+
+    const selectCount = Math.min(selectN, pool.length);
+    setPendingTarget({
+      eff: { ...eff, op: "transform", into: targetCardName },
+      owner,
+      sourceCard: ctx.sourceCard ?? null,
+      resumeEffects: ctx.effectsQueue ?? [],
+      pool,
+      targets: [],
+      selectCount,
+    });
+    highlightSelectable(pool);
+    return "pending";
+  }
+
+  const hand = getHand(state, owner);
+  const filter = eff.filter || {};
   for (let i = hand.length - 1; i >= 0; i--) {
     const card = hand[i];
     if (!card) continue;
-
     if (matchesFilter(card, filter)) {
-      // PRESERVE UID, owner, zone - only replace card properties
-      const newCard = {
-        ...structuredClone(cardTemplate),
-        uid: card.uid, // PRESERVE original UID
-        owner: card.owner, // PRESERVE owner
-        zone: card.zone, // PRESERVE zone
-      };
-      logEvent("transformInHand", { owner, from: card.name, to: newCard.name });
-      hand[i] = newCard as CardInstance;
+      transformHandTarget(card, targetCardName);
     }
   }
 }

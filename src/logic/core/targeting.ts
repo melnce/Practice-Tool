@@ -13,6 +13,12 @@ import {
   resolveBasePool,
   applyFilters,
 } from "./targeting/index.js";
+import {
+  parseSelectConfig,
+  applyPositionFilter,
+  pickRandomTargets,
+  shouldAutoSelect,
+} from "./targeting/selectHelpers.js";
 // Re-export Context for consumers
 export type { TargetContext };
 
@@ -68,12 +74,26 @@ export function clearSelectableFlags() {
 // handleSelect (Orchestrator for Selection Effects)
 // -----------------------------------------------------------------------------
 
-import {
-  parseSelectConfig,
-  applyPositionFilter,
-  pickRandomTargets,
-  shouldAutoSelect,
-} from "./targeting/selectHelpers.js";
+/**
+ * Merge object-valued `filter` into the condition passed to getPool.
+ * Card JSON uses `filter:{tribe:"Artifact",type:"Follower"}` on select ops;
+ * string filters like "leftmost"/"rightmost" stay in applyPositionFilter.
+ */
+function selectPoolCondition(eff: Effect): any {
+  const base =
+    eff.condition && typeof eff.condition === "object" ? eff.condition : {};
+  const filter = eff.filter;
+  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
+    return { ...base, ...filter };
+  }
+  return base;
+}
+
+function positionFilterFromEffect(eff: Effect): string | undefined {
+  const filter = eff.filter;
+  if (filter === "leftmost" || filter === "rightmost") return filter;
+  return undefined;
+}
 
 /**
  * Orchestrates target selection for effects.
@@ -103,8 +123,14 @@ export function handleSelect(
   };
 
   // 3. Get and filter pool
-  let pool = getPool(eff.target, owner, sourceCard, eff.condition, targetedCtx);
-  pool = applyPositionFilter(pool, eff.filter);
+  let pool = getPool(
+    eff.target,
+    owner,
+    sourceCard,
+    selectPoolCondition(eff),
+    targetedCtx,
+  );
+  pool = applyPositionFilter(pool, positionFilterFromEffect(eff));
 
   // 4. Early exit if no valid targets
   if (!pool.length) return;
