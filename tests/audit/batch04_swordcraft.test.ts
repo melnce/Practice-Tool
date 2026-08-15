@@ -655,19 +655,47 @@ describe("Batch 4 — Swordcraft [10004] Skybound Dragons", () => {
     );
   });
 
-  it("Zeta & Bea — Fanfare copy; Enhance (6) Storm self and Bane on copy", () => {
+  it("Zeta & Bea — Fanfare copy; Enhance (6) Storm self and Bane on copy only", () => {
     setupTurn(R6, { hand: ["10424110"], pp: 6 });
+    const bystander = createCard("10122130", "board", "first");
+    applyKeywordsFromList(bystander);
+    bystander.peak_defense = bystander.defense;
+    state.players.first.board = [bystander];
     whenPlayCard("first", 0);
     expect(
       thenBoard("first").filter(
         (c) => c.name === "Zeta & Bea, Crimson and Blue",
       ).length,
     ).toBe(2);
-    const zeta = findOnBoard("first", "Zeta & Bea, Crimson and Blue")!;
-    expect(zeta.hasStorm).toBe(true);
+    const zeta = thenBoard("first").find(
+      (c) =>
+        c.name === "Zeta & Bea, Crimson and Blue" && c.uid !== bystander.uid,
+    )!;
     const copy = thenBoard("first").find(
-      (c) => c.name === "Zeta & Bea, Crimson and Blue" && c.uid !== zeta.uid,
-    );
-    expect(copy?.hasBane).toBe(true);
+      (c) =>
+        c.name === "Zeta & Bea, Crimson and Blue" &&
+        c.uid !== zeta.uid &&
+        c.uid !== bystander.uid,
+    )!;
+    expect(bystander.hasBane).toBe(false);
+    expect(zeta.hasBane).toBe(false);
+    expect(zeta.hasStorm).toBe(true);
+    expect(copy.hasBane).toBe(true);
+    expect(copy.hasStorm).toBe(false);
+    expect(state.lastSummoned?.[0]?.uid).toBe(copy.uid);
+  });
+
+  it("Zeta & Bea — at 4 PP: Fanfare summon only; no Storm or Bane", () => {
+    setupTurn(R6, { hand: ["10424110"], pp: 4 });
+    whenPlayCard("first", 0);
+    expect(
+      thenBoard("first").filter(
+        (c) => c.name === "Zeta & Bea, Crimson and Blue",
+      ).length,
+    ).toBe(2);
+    for (const c of thenBoard("first")) {
+      expect(c.hasStorm).toBe(false);
+      expect(c.hasBane).toBe(false);
+    }
   });
 });

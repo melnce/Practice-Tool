@@ -31,6 +31,7 @@ import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
+import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import {
   getBoard,
   getHand,
@@ -437,5 +438,27 @@ describe("Batch 7 — Runecraft [10004] Skybound Dragons", () => {
       blast?.keywordState?.spellboostCount ??
         (blast as { spellboostCount?: number })?.spellboostCount,
     ).toBeGreaterThanOrEqual(1);
+  });
+
+  it("Wamdus — Super-Evolve Mode 1 Barrier on other allies only", () => {
+    setupTurn(R7, { pp: 6 });
+    const ally = createCard(
+      { name: "Ally", type: "Follower", cost: 2, attack: 2, defense: 2 },
+      "board",
+      "first",
+    );
+    ally.peak_defense = ally.defense;
+    const wamdus = createCard("10434110", "board", "first");
+    applyKeywordsFromList(wamdus);
+    wamdus.peak_defense = wamdus.defense;
+    state.players.first.board = [ally, wamdus];
+    state.players.first.superEvoCharges = 1;
+
+    setScriptedModePickProvider(() => [0]);
+    onEvolve(wamdus, "first", "super");
+    setScriptedModePickProvider(null);
+
+    expect(ally.hasBarrier).toBe(true);
+    expect(wamdus.hasBarrier).toBe(false);
   });
 });

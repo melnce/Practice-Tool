@@ -191,6 +191,63 @@ function collectAddToHandOps(
   }
 }
 
+/** Walk every object in the card JSON for stat ops with legacy top-level filters. */
+function collectStatOps(
+  node: unknown,
+  pathStr: string,
+  out: { path: string; eff: Record<string, unknown> }[],
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) => collectStatOps(n, `${pathStr}[${i}]`, out));
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.op === "stat") {
+    out.push({ path: pathStr, eff: obj });
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    collectStatOps(v, `${pathStr}.${k}`, out);
+  }
+}
+
+const STAT_NAME_VALUE_SOURCES = new Set(["named_enter_count"]);
+
+function statNameConsumedAsValue(eff: Record<string, unknown>): boolean {
+  const atkSrc = String(eff.attack_source ?? "").toLowerCase();
+  const defSrc = String(eff.defense_source ?? "").toLowerCase();
+  return (
+    STAT_NAME_VALUE_SOURCES.has(atkSrc) || STAT_NAME_VALUE_SOURCES.has(defSrc)
+  );
+}
+
+function checkStatOpFilters(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const found: { path: string; eff: Record<string, unknown> }[] = [];
+  collectStatOps(card, card.id, found);
+
+  for (const { path: opPath, eff } of found) {
+    if (eff.not_self !== undefined) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `stat op at ${opPath} uses top-level "not_self" (ignored by engine) — use "filter": {"not_self": true} instead`,
+      });
+    }
+    if (eff.name !== undefined && !statNameConsumedAsValue(eff)) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `stat op at ${opPath} uses top-level "name" for targeting (ignored by engine) — use "name_filter" or "target": "ally:last_summoned" instead`,
+      });
+    }
+  }
+  return issues;
+}
+
 function nodeHasUntilEotOrDuration(node: unknown): boolean {
   if (!node || typeof node !== "object") return false;
   if (Array.isArray(node)) {
@@ -516,6 +573,7 @@ function checkCard(card: CardJson): Issue[] {
 
   // Gate: add_to_hand field contracts (includes crest-nested ops)
   issues.push(...checkAddToHand(card));
+  issues.push(...checkStatOpFilters(card));
 
   return issues;
 }
@@ -530,6 +588,10 @@ function main() {
   const gateAddToHand =
     process.argv.includes("--gate=add-to-hand") ||
     process.argv.includes("--gate=add_to_hand");
+  const gateStatOp =
+    process.argv.includes("--gate=stat-op") ||
+    process.argv.includes("--gate=stat_op");
+  const gateMode = gateAddToHand || gateStatOp;
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -539,15 +601,18 @@ function main() {
   console.log(
     gateAddToHand
       ? "🔍 Checking add_to_hand field contracts...\n"
-      : "🔍 Checking card description ↔ JSON structure...\n",
+      : gateStatOp
+        ? "🔍 Checking stat op filter field contracts...\n"
+        : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
     const cards = JSON.parse(fs.readFileSync(file, "utf-8")) as CardJson[];
     cardCount += cards.length;
     for (const card of cards) {
-      if (gateAddToHand) {
-        allIssues.push(...checkAddToHand(card));
+      if (gateMode) {
+        if (gateAddToHand) allIssues.push(...checkAddToHand(card));
+        if (gateStatOp) allIssues.push(...checkStatOpFilters(card));
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
@@ -574,7 +639,7 @@ function main() {
     console.log("");
   }
 
-  if (!gateAddToHand) {
+  if (!gateMode) {
     const reportPath = path.join(ROOT, "reports", "clause-fidelity-hints.json");
     fs.mkdirSync(path.dirname(reportPath), { recursive: true });
     fs.writeFileSync(
@@ -598,7 +663,9 @@ function main() {
     console.log(
       gateAddToHand
         ? `✅ ${cardCount} cards — all add_to_hand ops have valid fields.\n`
-        : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+        : gateStatOp
+          ? `✅ ${cardCount} cards — all stat ops use supported filter fields.\n`
+          : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(
