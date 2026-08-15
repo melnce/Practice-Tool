@@ -5,7 +5,7 @@ export default defineConfig({
   retries: 0,
   webServer: {
     command: "npm run dev",
-    url: "http://localhost:5174",
+    url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
@@ -16,7 +16,7 @@ export default defineConfig({
       testMatch: /.*\.spec\.ts$/,
       testIgnore: /qa\//,
       use: {
-        baseURL: process.env.PW_BASE_URL ?? "http://localhost:5174",
+        baseURL: process.env.PW_BASE_URL ?? "http://localhost:5173",
         headless: true,
       },
       reporter: [["list"]],
@@ -27,7 +27,7 @@ export default defineConfig({
       testDir: "tests/e2e/qa",
       testMatch: /.*\.spec\.ts$/,
       use: {
-        baseURL: process.env.PW_BASE_URL ?? "http://localhost:5174?test=1",
+        baseURL: process.env.PW_BASE_URL ?? "http://localhost:5173?test=1",
         headless: true,
       },
       reporter: [

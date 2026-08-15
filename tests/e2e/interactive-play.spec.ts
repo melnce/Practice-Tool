@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 
 const OUT = path.join("test-results", "interactive-play");
-const BASE = process.env.PW_BASE_URL ?? "http://localhost:5174";
+const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
 
 function trackConsole(page: Page) {
   const errors: string[] = [];
