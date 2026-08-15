@@ -9,6 +9,7 @@ import type {
 import { logEvent } from "../../../../core/logger.js";
 import { state } from "../../../../core/gameState.js";
 import type { Crest } from "../../crest.js";
+import { resolveEffectAmount } from "../../../core/values.js";
 
 import { completeCrest } from "../../crest.js";
 import { getCrests, getBoard } from "../../../../core/playerHelpers.js";
@@ -18,6 +19,7 @@ export type CountdownAction = "advance" | "delay";
 export interface CountdownHandlerContext {
   owner: Player;
   source?: any; // CardInstance | Crest | null - using any for caller flexibility
+  context?: Record<string, unknown>;
 }
 
 /**
@@ -39,7 +41,18 @@ export function handleCountdown(
   ctx: CountdownHandlerContext,
 ): void {
   const action = normalizeAction((eff as any).action);
-  const amount = Number((eff as any).amount ?? 1);
+  const sourceCard =
+    ctx.source && !isCrest(ctx.source) ? (ctx.source as CardInstance) : null;
+  const amount = resolveEffectAmount(
+    eff as any,
+    {
+      owner: ctx.owner,
+      sourceCard,
+      selectedCard: (ctx.context as any)?.selected ?? null,
+      variables: (ctx.context as any)?.variables,
+    },
+    1,
+  );
   const targetSpec = (eff as any).target;
   const crestName = (eff as any).name;
   const boardName =

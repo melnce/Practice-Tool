@@ -155,7 +155,13 @@ export function registerBuffEffects() {
   // Standalone op eliminating the amulet/crest redirect pattern
   // ==========================================================================
   registerOp("countdown", (eff, ctx) => {
-    handleCountdown(eff as any, { owner: ctx.owner, source: ctx.sourceCard });
+    handleCountdown(eff as any, {
+      owner: ctx.owner,
+      source: ctx.sourceCard,
+      ...(ctx.context && typeof ctx.context === "object"
+        ? { context: ctx.context as Record<string, unknown> }
+        : {}),
+    });
   });
 }
 

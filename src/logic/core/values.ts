@@ -5,6 +5,7 @@ import {
   getBoard,
   getPlaysThisTurn,
 } from "../../core/playerHelpers.js";
+import { resolveDamageAmountExtended } from "../effects/ops/damage/primitives.js";
 
 interface ResolveContext {
   sourceCard?: CardInstance | null;
@@ -12,6 +13,7 @@ interface ResolveContext {
   defender?: CardInstance | null;
   selectedCard?: CardInstance | null;
   owner?: Player;
+  variables?: Record<string, unknown>;
   [key: string]: any;
 }
 
@@ -137,4 +139,52 @@ export function resolveDynamicValue(
   // 5. Raw number parse
   const n = parseInt(s, 10);
   return Number.isFinite(n) ? n : 0;
+}
+
+/**
+ * Resolves an effect's numeric amount from `amount`, `amount_source`, or dynamic strings.
+ * Shared by countdown and other ops that mirror damage-style amount sources.
+ */
+export function resolveEffectAmount(
+  eff: { amount?: number | string; amount_source?: string },
+  context: ResolveContext = {},
+  defaultAmount = 1,
+): number {
+  const src = eff.amount_source;
+  if (src) {
+    if (String(src).startsWith("context.")) {
+      const varName = String(src).slice("context.".length);
+      const val =
+        context.variables?.[varName] ??
+        (context as Record<string, unknown>)[varName];
+      if (typeof val === "number" && Number.isFinite(val)) {
+        return val;
+      }
+      console.warn(
+        `[amount] Missing context variable: ${varName}, defaulting to 0`,
+      );
+      return 0;
+    }
+    if (context.owner) {
+      return resolveDamageAmountExtended(
+        {} as any,
+        {
+          owner: context.owner,
+          sourceCard: context.sourceCard ?? null,
+          ...(context.selectedCard
+            ? { selectedCard: context.selectedCard }
+            : {}),
+        },
+        src as any,
+      );
+    }
+    return 0;
+  }
+
+  if (eff.amount != null && eff.amount !== "") {
+    const resolved = resolveDynamicValue(eff.amount, context);
+    return Number.isFinite(resolved) ? resolved : defaultAmount;
+  }
+
+  return defaultAmount;
 }

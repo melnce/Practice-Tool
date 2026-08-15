@@ -178,6 +178,9 @@ export function normalizeToGateSpec(eff: Effect): UnifiedGateSpec {
   if ((eff as any).base_cost_lte !== undefined)
     spec.base_cost_lte = parseInt((eff as any).base_cost_lte);
   if ((eff as any).tribe !== undefined) spec.tribe = String((eff as any).tribe);
+  if ((eff as any).is_ally !== undefined)
+    spec.is_ally = Boolean((eff as any).is_ally);
+  if ((eff as any).ally !== undefined) spec.ally = Boolean((eff as any).ally);
 
   return spec;
 }
