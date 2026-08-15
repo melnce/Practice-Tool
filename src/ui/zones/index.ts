@@ -41,6 +41,13 @@ export function renderZone(
 
   // Face-down hands: destroy and rebuild by slot — never key by real uid.
   if (ctx.hideHandFaces) {
+    // Clear any leftover tooltip from the other (face-up) hand so hovering
+    // card-backs cannot appear to "leak" a previously shown card name.
+    const tip = document.getElementById("cardTooltip");
+    if (tip) {
+      tip.style.display = "none";
+      tip.textContent = "";
+    }
     container.replaceChildren();
     cards.forEach((card, i) => {
       const vm = getMemoizedViewModel(card, i, ctx, state);
@@ -54,7 +61,15 @@ export function renderZone(
       ) as ReconcilableElement;
       newEl.__cachedVM = vm;
       newEl.__faceDown = true;
-      // No handlers — face-down must not be interactive.
+      // No handlers — face-down must not be interactive. Also keep tooltip down
+      // if the pointer enters a back (stale tooltip from the opposite hand).
+      newEl.onmouseenter = () => {
+        const t = document.getElementById("cardTooltip");
+        if (t) {
+          t.style.display = "none";
+          t.textContent = "";
+        }
+      };
       container.appendChild(newEl);
     });
     return;

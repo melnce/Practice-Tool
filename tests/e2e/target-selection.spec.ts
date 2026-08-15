@@ -4,7 +4,7 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
 
-const BASE = process.env.PW_BASE_URL ?? "http://localhost:5174";
+const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
 
 test.describe("Interactive target selection", () => {
   test("targeted spell: picker appears and click resolves damage", async ({
