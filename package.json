@@ -26,6 +26,8 @@
     "test:legacy": "vitest run --dir tests/legacy --passWithNoTests",
     "replay:check": "npx tsx scripts/replay.ts",
     "replay:update": "npx tsx scripts/replay.ts --update",
+    "soak": "npx tsx scripts/soak.ts",
+    "soak:smoke": "npx tsx scripts/soak.ts --smoke",
     "cards:update": "npx tsx scripts/mergeSets.ts",
     "cards:watch": "npx tsx scripts/watch_cards.ts",
     "ingest:cards": "npx tsx scripts/ingest-cards.ts",
