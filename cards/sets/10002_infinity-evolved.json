@@ -3059,7 +3059,7 @@
         "action": "grant",
         "target": "ally:hand",
         "condition": {
-          "type_eq": "Follower",
+          "type": "Follower",
           "tribe": "Artifact"
         },
         "select": 1,
@@ -3103,7 +3103,7 @@
         "action": "grant",
         "target": "ally:hand",
         "condition": {
-          "type_eq": "Follower",
+          "type": "Follower",
           "tribe": "Artifact"
         },
         "select": 1,

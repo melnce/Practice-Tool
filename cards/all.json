@@ -10676,7 +10676,7 @@
         "action": "grant",
         "target": "ally:hand",
         "condition": {
-          "type_eq": "Follower",
+          "type": "Follower",
           "tribe": "Artifact"
         },
         "select": 1,
@@ -10720,7 +10720,7 @@
         "action": "grant",
         "target": "ally:hand",
         "condition": {
-          "type_eq": "Follower",
+          "type": "Follower",
           "tribe": "Artifact"
         },
         "select": 1,
@@ -12453,7 +12453,7 @@
         "target": "ally:hand",
         "select": 1,
         "condition": {
-          "card_type": "Follower"
+          "type": "Follower"
         },
         "effects": [
           {
