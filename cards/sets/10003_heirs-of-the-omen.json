@@ -208,8 +208,7 @@
             "exclude": ["Mjerrabaine, Great Manifest"]
           },
           {
-            "op": "set_deckout_victory",
-            "enabled": true
+            "op": "set_deckout_victory"
           }
         ],
         "triggers": [
@@ -3328,7 +3327,6 @@
                     "effect": {
                       "op": "select",
                       "mode": "random",
-                      "qty": 1,
                       "target": "enemy:follower",
                       "condition": {
                         "attack_lte": 4,
@@ -3615,9 +3613,7 @@
     "fanfare": [
       {
         "op": "discard",
-        "select": 1,
-        "target": "ally:hand",
-        "optional": true
+        "count": 1
       },
       {
         "op": "draw",
@@ -3696,7 +3692,6 @@
       {
         "op": "destroy",
         "distribution": "random",
-        "count_source": "other_allies",
         "target": "enemy:follower"
       },
       {

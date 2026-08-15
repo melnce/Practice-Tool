@@ -3527,8 +3527,7 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_source": "unique_tribe_enters",
-        "tribe": "Artifact"
+        "amount_source": "unique_tribe_enters"
       },
       {
         "op": "damage",
@@ -3560,8 +3559,7 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_source": "unique_tribe_enters",
-        "tribe": "Artifact"
+        "amount_source": "unique_tribe_enters"
       }
     ]
   },

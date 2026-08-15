@@ -2690,7 +2690,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_dynamic": "hand_size",
         "distribution": "split_sequential",
         "amount_source": "hand_size"
       }
@@ -11071,8 +11070,7 @@
             "exclude": ["Mjerrabaine, Great Manifest"]
           },
           {
-            "op": "set_deckout_victory",
-            "enabled": true
+            "op": "set_deckout_victory"
           }
         ],
         "triggers": [
@@ -14191,7 +14189,6 @@
                     "effect": {
                       "op": "select",
                       "mode": "random",
-                      "qty": 1,
                       "target": "enemy:follower",
                       "condition": {
                         "attack_lte": 4,
@@ -14480,9 +14477,7 @@
     "fanfare": [
       {
         "op": "discard",
-        "select": 1,
-        "target": "ally:hand",
-        "optional": true
+        "count": 1
       },
       {
         "op": "draw",
@@ -14563,7 +14558,6 @@
       {
         "op": "destroy",
         "distribution": "random",
-        "count_source": "other_allies",
         "target": "enemy:follower"
       },
       {
@@ -15444,7 +15438,6 @@
         "image": "images/crests/yuel_societte_dancing_duo.png",
         "description": "Countdown (4). Once on each of your turns, when you play a follower, evolve it.",
         "countdown": 4,
-        "once_per_turn": true,
         "triggers": [
           {
             "event": "ally_follower_played",
@@ -16972,7 +16965,6 @@
               },
               {
                 "op": "restore",
-                "target_type": "leader",
                 "target": "ally:leader",
                 "amount": 1
               }
@@ -20581,7 +20573,6 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "exclude_self": true,
         "amount": 1,
         "condition": {
           "not_self": true
@@ -21204,7 +21195,7 @@
                 "op": "select",
                 "target": "ally:follower",
                 "select": 1,
-                "select_mode": "random",
+                "mode": "random",
                 "condition": {
                   "unevolved": true,
                   "has_keyword": "ward",
@@ -28866,8 +28857,7 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_source": "unique_tribe_enters",
-        "tribe": "Artifact"
+        "amount_source": "unique_tribe_enters"
       },
       {
         "op": "damage",
@@ -28899,8 +28889,7 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_source": "unique_tribe_enters",
-        "tribe": "Artifact"
+        "amount_source": "unique_tribe_enters"
       }
     ]
   },

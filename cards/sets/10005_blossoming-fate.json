@@ -2327,7 +2327,6 @@
       {
         "op": "damage",
         "target": "all:follower",
-        "exclude_self": true,
         "amount": 1,
         "condition": {
           "not_self": true
@@ -2950,7 +2949,7 @@
                 "op": "select",
                 "target": "ally:follower",
                 "select": 1,
-                "select_mode": "random",
+                "mode": "random",
                 "condition": {
                   "unevolved": true,
                   "has_keyword": "ward",
