@@ -14477,7 +14477,8 @@
     "fanfare": [
       {
         "op": "discard",
-        "count": 1
+        "select": 1,
+        "optional": true
       },
       {
         "op": "draw",
@@ -14558,6 +14559,7 @@
       {
         "op": "destroy",
         "distribution": "random",
+        "count_source": "other_allies",
         "target": "enemy:follower"
       },
       {

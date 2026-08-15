@@ -150,6 +150,11 @@ export const REJECTED_NESTED_KEYS = new Set(["card_type", "type_eq"]);
 
 const STAT_NAME_VALUE_SOURCES = new Set(["named_enter_count"]);
 
+// PENDING: destroy count_source unimplemented — fix brief follows (Congregant 10373110)
+const OP_WARN_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
+  destroy: new Set(["count_source"]),
+};
+
 // ---------------------------------------------------------------------------
 // Per-op top-level allowlists (excluding "op")
 // ---------------------------------------------------------------------------
@@ -380,7 +385,15 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "condition",
   ]),
   search: new Set(["filter", "filters", "count", "keywords", "player"]),
-  discard: new Set(["mode", "count", "filter", "names", "name"]),
+  discard: new Set([
+    "mode",
+    "count",
+    "filter",
+    "names",
+    "name",
+    "select",
+    "optional",
+  ]),
   deck: new Set([
     "action",
     "from_set",
@@ -730,6 +743,16 @@ export function checkOpKeysForCard(card: CardJson): Issue[] {
 
       // stat: name only when named_enter_count sources
       if (op === "stat" && key === "name" && statNameAllowed(eff)) continue;
+
+      if (OP_WARN_TOP_LEVEL_KEYS[op]?.has(key)) {
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "warn",
+          message: `${op} op at ${opPath} uses top-level "${key}" (PENDING: destroy count_source unimplemented — fix brief follows (Congregant 10373110)) — ${descSnippet(card.description)}`,
+        });
+        continue;
+      }
 
       const alt = nearestKey(key, allowed);
       issues.push({
