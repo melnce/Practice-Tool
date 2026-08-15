@@ -1144,9 +1144,7 @@
           {
             "op": "stat",
             "action": "give",
-            "target": "ally:follower",
-            "name": "Zeta & Bea, Crimson and Blue",
-            "not_self": true,
+            "target": "ally:last_summoned",
             "keywords": ["Bane"]
           }
         ]
@@ -1611,7 +1609,7 @@
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "not_self": true,
+                "filter": { "not_self": true },
                 "keywords": ["Barrier"]
               }
             ]
