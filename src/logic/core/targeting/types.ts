@@ -39,6 +39,13 @@ export interface TargetContext {
   // Cross-effect communication
   variables?: Record<string, number | string>;
 
+  /**
+   * Play preflight only: uid of the card being evaluated for play.
+   * While checking playability the card is treated as in no zone — excluded
+   * from every target pool (hand pools especially).
+   */
+  playingCardUid?: string;
+
   // Adapter for rendering
   adapter?: { render: () => void };
 

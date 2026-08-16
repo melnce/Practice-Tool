@@ -61,6 +61,12 @@ export function applyFilters(
     filtered = filtered.filter((c) => c?.uid !== env.sourceCard!.uid);
   }
 
+  // Play preflight: the card being played is in no zone yet.
+  const playingUid = env.context.playingCardUid;
+  if (playingUid) {
+    filtered = filtered.filter((c) => c?.uid !== playingUid);
+  }
+
   // 3-9. Use unified condition evaluator for shared conditions
   // Extract conditions that the evaluator handles
   const sharedCond: CardCondition = {};
