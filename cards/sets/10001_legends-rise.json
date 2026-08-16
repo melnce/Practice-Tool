@@ -780,7 +780,6 @@
       {
         "op": "damage",
         "target": "enemy:follower",
-        "amount_dynamic": "hand_size",
         "distribution": "split_sequential",
         "amount_source": "hand_size"
       }

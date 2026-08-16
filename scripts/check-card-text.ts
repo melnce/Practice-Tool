@@ -22,6 +22,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { SETS_DIR } from "./mergeSets.js";
+import { checkOpKeysForCard } from "./op-keys-gate.js";
 import {
   getImplementationStatus,
   type ImplementationStatus,
@@ -1047,7 +1048,10 @@ function main() {
   const gateDestroyOp =
     process.argv.includes("--gate=destroy-op") ||
     process.argv.includes("--gate=destroy_op");
-  const gateMode = gateAddToHand || gateStatOp || gateDestroyOp;
+  const gateOpKeys =
+    process.argv.includes("--gate=op-keys") ||
+    process.argv.includes("--gate=op_keys");
+  const gateMode = gateAddToHand || gateStatOp || gateDestroyOp || gateOpKeys;
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -1066,7 +1070,9 @@ function main() {
         ? "🔍 Checking stat op filter field contracts...\n"
         : gateDestroyOp
           ? "🔍 Checking destroy op filter field contracts...\n"
-          : "🔍 Checking card description ↔ JSON structure...\n",
+          : gateOpKeys
+            ? "🔍 Checking op-keys field contracts...\n"
+            : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
@@ -1077,6 +1083,7 @@ function main() {
         if (gateAddToHand) allIssues.push(...checkAddToHand(card));
         if (gateStatOp) allIssues.push(...checkStatOpFilters(card));
         if (gateDestroyOp) allIssues.push(...checkDestroyOpFilters(card));
+        if (gateOpKeys) allIssues.push(...checkOpKeysForCard(card));
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
@@ -1155,7 +1162,9 @@ function main() {
           ? `✅ ${cardCount} cards — all stat ops use supported filter fields.\n`
           : gateDestroyOp
             ? `✅ ${cardCount} cards — all destroy ops use supported filter fields.\n`
-            : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+            : gateOpKeys
+              ? `✅ ${cardCount} cards — all ops use supported keys.\n`
+              : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(

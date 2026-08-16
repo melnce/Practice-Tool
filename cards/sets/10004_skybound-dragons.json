@@ -765,7 +765,6 @@
         "image": "images/crests/yuel_societte_dancing_duo.png",
         "description": "Countdown (4). Once on each of your turns, when you play a follower, evolve it.",
         "countdown": 4,
-        "once_per_turn": true,
         "triggers": [
           {
             "event": "ally_follower_played",
@@ -2291,7 +2290,6 @@
               },
               {
                 "op": "restore",
-                "target_type": "leader",
                 "target": "ally:leader",
                 "amount": 1
               }
