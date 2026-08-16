@@ -11,6 +11,25 @@
   --good: #39d98a;
   --warn: #ffd400;
   --danger: #ff5c5c;
+  --toolbar-height: 128px;
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --toolbar-height: 210px;
+  }
+}
+
+@media (min-width: 1900px) {
+  :root {
+    --toolbar-height: 200px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --toolbar-height: 168px;
+  }
 }
 
 html,
@@ -448,16 +467,12 @@ body {
 
 /* --- Header should NOT stick while scrolling --- */
 #controlPanel {
-  position: static !important;
-  /* was sticky */
-  top: auto !important;
-  z-index: 1 !important;
-  box-shadow: none;
-  /* optional: remove drop shadow */
-  backdrop-filter: none;
-  /* optional: lighter on GPU */
-  -webkit-backdrop-filter: none;
-  /* optional */
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 5000 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 /* remove any extra top spacing from earlier themes */

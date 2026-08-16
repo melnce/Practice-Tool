@@ -225,12 +225,11 @@
   gap: 16px;
   font-size: 1.1rem;
   font-weight: bold;
-  z-index: 50;
+  z-index: 100;
 }
 
 #redStatsContainer {
-  top: 120px;
-  /* adjust as needed */
+  top: calc(var(--toolbar-height, 168px) + 8px);
 }
 
 #blueStatsContainer {
@@ -335,7 +334,7 @@
   /* Space between stats bar and crests */
   font-size: 1.1rem;
   font-weight: bold;
-  z-index: 50;
+  z-index: 100;
 }
 
 /* Re-apply styling to the inner stats bar */
