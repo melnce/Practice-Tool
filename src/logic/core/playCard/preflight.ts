@@ -8,7 +8,7 @@ import type {
   Player,
   Effect,
 } from "../../../core/types/index.js";
-import { getPool } from "../targeting.js";
+import { getPool, selectPoolCondition } from "../targeting.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import { resolvePlayCost, getEffectiveCost } from "./cost.js";
 import {
@@ -37,44 +37,17 @@ export interface PreflightContext {
 // ─────────────────────────────────────────────────────────────────────────────
 // ID-based Bespoke Registry
 // Cards that require truly bespoke preflight logic keyed by card ID.
-// Keep this minimal. Document why it can't be generic.
+// Keep this minimal — only add an entry when a play requirement cannot be
+// inferred from the card's effect ops (select targets, conditions, etc.).
+// The generic path treats the card being played as in no zone and evaluates
+// target pools via getPool with the op's condition.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CARD_PREFLIGHT: Record<
   string,
   (ctx: PreflightContext) => PreflightResult
 > = {
-  // Radiant Rainbow (10131310):
-  // Requires a card in hand with Spellboost keyword. Can't be inferred from
-  // effect structure alone because the select target is "ally:hand" with
-  // condition "has_keyword: Spellboost", but we need to check BEFORE the spell
-  // is removed from hand. Generic pool check would include this card itself.
-  "10131310": (ctx) => {
-    const hasSpellboostCard = ctx.hand.some(
-      (c) =>
-        c.uid !== ctx.card.uid && // Exclude the spell being played
-        Array.isArray(c.keywords) &&
-        c.keywords.some((k: any) => {
-          const kwName =
-            typeof k === "string" ? k.toLowerCase() : k?.name?.toLowerCase();
-          return kwName === "spellboost";
-        }),
-    );
-    if (!hasSpellboostCard) {
-      return {
-        ok: false,
-        reason: "Radiant Rainbow requires a card in hand with Spellboost.",
-      };
-    }
-    return { ok: true };
-  },
-
-  // Stormy Blast (10131320) & Snowman Army (10132320):
-  // Both require an enemy follower on the field. This COULD be inferred from
-  // the effect's select target ("enemy:follower"), but the generic pool check
-  // already handles it. These entries are kept as explicit documentation that
-  // these cards were previously hardcoded and now rely on generic checks.
-  // Actually, the generic spellNeedsTarget already handles this, so we can remove these.
+  // Empty — all current cards are covered by generic effect-driven checks.
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -124,13 +97,17 @@ export function canPlayCard(
     const targetCheck = checkEffectsHaveValidTargets(effectList, player, card);
     if (!targetCheck.ok) return targetCheck;
 
-    const handReturnCheck = checkHandReturnRequirement(effectList, hand);
+    const handReturnCheck = checkHandReturnRequirement(effectList, hand, card);
     if (!handReturnCheck.ok) return handReturnCheck;
 
     const allyOnBoardCheck = checkAllyOnBoardRequirement(effectList, myBoard);
     if (!allyOnBoardCheck.ok) return allyOnBoardCheck;
 
-    const artifactPairCheck = checkArtifactPairRequirement(effectList, hand);
+    const artifactPairCheck = checkArtifactPairRequirement(
+      effectList,
+      hand,
+      card,
+    );
     if (!artifactPairCheck.ok) return artifactPairCheck;
   }
 
@@ -179,13 +156,46 @@ function getEffectList(
 }
 
 /**
+ * Human-readable reason when a mandatory select has no legal targets.
+ * Derived from the failing clause so the UI can explain why play is blocked.
+ */
+function describeEmptyTargetPool(eff: Effect): string {
+  const condition = selectPoolCondition(eff);
+  const target = String(eff.target || "").toLowerCase();
+
+  if (condition.has_keyword) {
+    const keywords = Array.isArray(condition.has_keyword)
+      ? condition.has_keyword
+      : [condition.has_keyword];
+    const kwLabel = keywords.map((k: string | number) => String(k)).join(", ");
+    if (target.includes("hand")) {
+      return `Spell requires a card in hand with ${kwLabel}.`;
+    }
+    return `Spell requires a target with ${kwLabel}.`;
+  }
+
+  if (condition.tribe) {
+    const tribe = String(condition.tribe);
+    if (target.includes("follower") || condition.type === "Follower") {
+      return `Spell requires a ${tribe} follower target but none are available.`;
+    }
+    return `Spell requires a target with tribe ${tribe} but none are available.`;
+  }
+
+  return "Spell requires a target but none are available.";
+}
+
+/**
  * Recursively check if any effect requires a target (select/choose) that has an empty pool.
+ * The card being played is excluded from every pool — it is in no zone during evaluation.
  */
 function checkEffectsHaveValidTargets(
   effects: Effect[],
   player: Player,
   sourceCard: CardInstance | null,
 ): PreflightResult {
+  const playingCardUid = sourceCard?.uid;
+
   // Allow damage effects with fallback_leader (can always target leader)
   const hasFollowerOrLeaderEffect = effects.some(
     (eff: Effect) => eff?.op === "damage" && (eff as any)?.fallback_leader,
@@ -216,13 +226,20 @@ function checkEffectsHaveValidTargets(
         // Mode options live under `options`; targeting inside them is validated
         // when that mode is chosen, not at play preflight.
       } else if (eff?.select || eff?.op === "select") {
-        const pool = getPool(eff.target, player, sourceCard, eff.condition, {
-          isTargetedEffect: true,
-        });
+        const pool = getPool(
+          eff.target,
+          player,
+          sourceCard,
+          selectPoolCondition(eff),
+          {
+            isTargetedEffect: true,
+            ...(playingCardUid ? { playingCardUid } : {}),
+          },
+        );
         if (!pool || pool.length === 0) {
           return {
             ok: false,
-            reason: "Spell requires a target but none are available.",
+            reason: describeEmptyTargetPool(eff),
           };
         }
       }
@@ -245,6 +262,7 @@ function checkEffectsHaveValidTargets(
 function checkHandReturnRequirement(
   effects: Effect[],
   hand: CardInstance[],
+  playingCard: CardInstance,
 ): PreflightResult {
   const needsHandReturn = effects.some(
     (e: Effect) =>
@@ -252,7 +270,8 @@ function checkHandReturnRequirement(
       (e as any).destination === "deck" &&
       e.select,
   );
-  if (needsHandReturn && hand.length <= 1) {
+  const otherHandCards = hand.filter((c) => c?.uid !== playingCard.uid);
+  if (needsHandReturn && otherHandCards.length < 1) {
     return {
       ok: false,
       reason: "Spell needs a different hand card to return.",
@@ -290,6 +309,7 @@ function checkAllyOnBoardRequirement(
 function checkArtifactPairRequirement(
   effects: Effect[],
   hand: CardInstance[],
+  playingCard: CardInstance,
 ): PreflightResult {
   const usesArtifactCopyOp = effects.some(
     (e: any) => e && e.op === "select_hand_summon_artifact_copies_eot_destroy",
@@ -297,7 +317,7 @@ function checkArtifactPairRequirement(
   if (usesArtifactCopyOp) {
     let artifactCount = 0;
     for (const c of hand) {
-      if (!c || c.type !== "Follower") continue;
+      if (!c || c.uid === playingCard.uid || c.type !== "Follower") continue;
       const tribes = Array.isArray(c.tribes)
         ? c.tribes.map((t) => String(t).toLowerCase())
         : [];

@@ -79,7 +79,7 @@ export function clearSelectableFlags() {
  * Card JSON uses `filter:{tribe:"Artifact",type:"Follower"}` on select ops;
  * string filters like "leftmost"/"rightmost" stay in applyPositionFilter.
  */
-function selectPoolCondition(eff: Effect): any {
+export function selectPoolCondition(eff: Effect): any {
   const base =
     eff.condition && typeof eff.condition === "object" ? eff.condition : {};
   const filter = eff.filter;
