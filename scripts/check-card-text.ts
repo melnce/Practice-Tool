@@ -27,6 +27,7 @@ import {
   getImplementationStatus,
   type ImplementationStatus,
 } from "../src/data/cardImplementationStatus.js";
+import { spellAmuletMarkerIssues } from "./lib/typeAudit.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
@@ -1028,6 +1029,15 @@ function checkCard(card: CardJson): Issue[] {
   // Gate: add_to_hand field contracts (includes crest-nested ops)
   issues.push(...checkAddToHand(card));
   issues.push(...checkStatOpFilters(card));
+
+  for (const msg of spellAmuletMarkerIssues(card)) {
+    issues.push({
+      id: card.id,
+      name: card.name,
+      kind: "error",
+      message: msg,
+    });
+  }
 
   return issues;
 }
