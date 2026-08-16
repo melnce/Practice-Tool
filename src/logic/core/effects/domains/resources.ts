@@ -33,8 +33,8 @@ import {
   setEvoCharges,
   getSuperEvoCharges,
   setSuperEvoCharges,
-  getBoard,
 } from "../../../../core/playerHelpers.js";
+import { resolveEffectAmount } from "../../values.js";
 
 const doLog = (event: string, payload: any) => logEvent(event, payload);
 
@@ -72,13 +72,12 @@ function handlePP(
       const cur = getPP(state, targetPlayer);
       const max = getMaxPP(state, targetPlayer);
 
-      let amt;
-      if ((eff as any).amount_source === "other_allies") {
-        amt = getBoard(state, targetPlayer).filter(
-          (card) =>
-            card.type === "Follower" &&
-            (!sourceCard || card.uid !== sourceCard.uid),
-        ).length;
+      let amt: number;
+      if ((eff as any).amount_source) {
+        amt = resolveEffectAmount(eff as any, {
+          owner: targetPlayer,
+          sourceCard,
+        });
       } else if (
         typeof eff.amount === "string" &&
         eff.amount.toLowerCase() === "currentmaxpp"

@@ -146,11 +146,15 @@ export function resolveDynamicValue(
  * Shared by countdown and other ops that mirror damage-style amount sources.
  */
 export function resolveEffectAmount(
-  eff: { amount?: number | string; amount_source?: string },
+  eff: {
+    amount?: number | string;
+    amount_source?: string;
+    count_source?: string;
+  },
   context: ResolveContext = {},
   defaultAmount = 1,
 ): number {
-  const src = eff.amount_source;
+  const src = eff.amount_source ?? eff.count_source;
   if (src) {
     if (String(src).startsWith("context.")) {
       const varName = String(src).slice("context.".length);

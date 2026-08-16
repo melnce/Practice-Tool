@@ -19,7 +19,10 @@ import { destroyTarget, getBoard } from "./primitives.js";
 import { resolveContextCard } from "../../../core/triggers/resolve.js";
 import type { TriggerContext } from "../../../core/triggers/types.js";
 import { isDamaged } from "../../../core/combat/damageState.js";
-import { resolveDynamicValue } from "../../../core/values.js";
+import {
+  resolveDynamicValue,
+  resolveEffectAmount,
+} from "../../../core/values.js";
 // ============================================================================
 // CONTEXT VARIABLE HELPERS
 // ============================================================================
@@ -82,6 +85,19 @@ export function handleDestroy(
       sourceCard: ctx.sourceCard,
     });
     spec.count = Math.max(0, resolved | 0);
+  } else if (eff.count_source) {
+    spec.count = Math.max(
+      0,
+      resolveEffectAmount(
+        eff as any,
+        {
+          owner,
+          sourceCard: ctx.sourceCard,
+          variables: context.variables,
+        },
+        1,
+      ),
+    );
   }
 
   // Handle special scopes first

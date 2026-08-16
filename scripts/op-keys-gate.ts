@@ -150,10 +150,7 @@ export const REJECTED_NESTED_KEYS = new Set(["card_type", "type_eq"]);
 
 const STAT_NAME_VALUE_SOURCES = new Set(["named_enter_count"]);
 
-// PENDING: destroy count_source unimplemented — fix brief follows (Congregant 10373110)
-const OP_WARN_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
-  destroy: new Set(["count_source"]),
-};
+const OP_WARN_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {};
 
 // ---------------------------------------------------------------------------
 // Per-op top-level allowlists (excluding "op")
@@ -326,6 +323,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "target",
     "distribution",
     "count",
+    "count_source",
     "stat",
     "select",
     "scope",
