@@ -1,55 +1,17 @@
 /* ===== Modern, non-breaking overrides ===== */
 
-/* Palette + defaults */
-:root {
-  --bg-1: #0e0f12;
-  --panel: rgba(24, 26, 32, 0.72);
-  --stroke: rgba(255, 255, 255, 0.08);
-  --ink: #e9edf1;
-  --muted: #9aa3ad;
-  --accent: #61dafb;
-  --good: #39d98a;
-  --warn: #ffd400;
-  --danger: #ff5c5c;
-  --toolbar-height: 128px;
-}
-
-@media (min-width: 1440px) {
-  :root {
-    --toolbar-height: 210px;
-  }
-}
-
-@media (min-width: 1900px) {
-  :root {
-    --toolbar-height: 200px;
-  }
-}
-
-@media (min-width: 2560px) {
-  :root {
-    --toolbar-height: 168px;
-  }
-}
+/* Palette + defaults — tokens live in design-tokens.css */
 
 html,
 body {
   background: radial-gradient(
     1200px 600px at 50% -10%,
-    #1a1e26 0%,
-    var(--bg-1) 45%,
-    #0b0c0f 100%
+    var(--color-bg-highlight) 0%,
+    var(--color-bg-base) 45%,
+    var(--color-bg-canvas) 100%
   );
   color: var(--ink);
-  font-family:
-    ui-sans-serif,
-    system-ui,
-    Segoe UI,
-    Roboto,
-    Helvetica,
-    Arial,
-    "Apple Color Emoji",
-    "Segoe UI Emoji";
+  font-family: var(--font-family-sans);
 }
 
 /* Layout wrappers (new, but harmless) */
@@ -69,39 +31,208 @@ body {
 #controlPanel {
   position: sticky;
   top: 0;
-  z-index: 4000;
+  z-index: var(--z-toolbar);
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px !important;
+  align-items: stretch;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-6) !important;
   background: linear-gradient(
     180deg,
-    rgba(30, 32, 38, 0.75),
-    rgba(30, 32, 38, 0.55)
+    var(--color-glass-toolbar-top),
+    var(--color-glass-toolbar-bottom)
   );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
   border-bottom: 1px solid var(--stroke);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-toolbar);
 }
 
 #deckSelection {
   display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: var(--toolbar-cluster-gap);
+  width: 100%;
+}
+
+/* Toolbar clusters — glassy grouped control strips */
+.toolbar-cluster {
+  display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-3);
+  padding: var(--toolbar-cluster-padding-y) var(--toolbar-cluster-padding-x);
+  min-height: var(--toolbar-control-height);
+  background: var(--color-glass-fill-toolbar);
+  backdrop-filter: blur(var(--blur-glass-strong));
+  -webkit-backdrop-filter: blur(var(--blur-glass-strong));
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-inset-subtle);
+  transition:
+    border-color var(--duration-normal) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.toolbar-cluster:hover {
+  border-color: var(--color-border-default);
+}
+
+.toolbar-cluster--game {
+  border-color: rgba(97, 218, 251, 0.12);
+}
+
+.toolbar-cluster--game:hover {
+  border-color: rgba(97, 218, 251, 0.22);
+  box-shadow:
+    var(--shadow-inset-subtle),
+    0 0 20px rgba(97, 218, 251, 0.06);
+}
+
+.toolbar-cluster--practice {
+  border-color: rgba(57, 217, 138, 0.1);
+}
+
+.toolbar-cluster--practice:hover {
+  border-color: rgba(57, 217, 138, 0.2);
+  box-shadow:
+    var(--shadow-inset-subtle),
+    0 0 20px rgba(57, 217, 138, 0.05);
+}
+
+.toolbar-cluster--line {
+  border-color: rgba(255, 212, 0, 0.1);
+}
+
+.toolbar-cluster--line:hover {
+  border-color: rgba(255, 212, 0, 0.2);
+  box-shadow:
+    var(--shadow-inset-subtle),
+    0 0 20px rgba(255, 212, 0, 0.05);
+}
+
+.toolbar-cluster--puzzle {
+  border-color: rgba(154, 215, 200, 0.12);
+}
+
+.toolbar-cluster--puzzle:hover {
+  border-color: rgba(154, 215, 200, 0.22);
+  box-shadow:
+    var(--shadow-inset-subtle),
+    0 0 20px rgba(154, 215, 200, 0.06);
+}
+
+.toolbar-cluster label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.toolbar-link {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-2);
+  color: var(--color-text-link);
+  text-decoration: none;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  transition: var(--transition-color), var(--transition-bg);
+}
+
+.toolbar-link:hover {
+  color: var(--color-text-link-hover);
+  background: rgba(154, 215, 200, 0.08);
+}
+
+.toolbar-link:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.toolbar-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.toolbar-check-label--compact {
+  margin-left: var(--space-2);
+}
+
+.toolbar-check-label input[type="checkbox"] {
+  accent-color: var(--color-accent-blue-bright);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
 }
 
 #deckSelection select,
 #controlPanel select,
 #controlPanel button,
 #seedInput {
-  background: #1f232a;
+  background: var(--color-bg-control-hover);
   color: var(--ink);
   border: 1px solid var(--stroke);
-  border-radius: 8px;
-  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  min-height: var(--toolbar-control-height);
+  margin: 0;
+  transition:
+    var(--transition-bg),
+    var(--transition-color),
+    border-color var(--duration-normal) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-default);
+}
+
+#controlPanel button:hover:not(:disabled),
+#controlPanel select:hover:not(:disabled) {
+  background: var(--color-bg-control-active);
+  border-color: var(--color-border-strong);
+}
+
+#controlPanel button:focus-visible,
+#controlPanel select:focus-visible,
+#seedInput:focus-visible {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 2px rgba(97, 218, 251, 0.2);
+}
+
+#controlPanel button:disabled,
+#controlPanel select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+#startGameBtn {
+  background: linear-gradient(
+    180deg,
+    var(--color-accent-blue),
+    var(--color-accent-blue-deep)
+  );
+  border-color: rgba(74, 140, 255, 0.4);
+  color: #fff;
+  font-weight: var(--font-weight-bold);
+}
+
+#startGameBtn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  border-color: rgba(74, 140, 255, 0.55);
+  box-shadow: var(--glow-blue-soft);
 }
 
 #seedInput {
@@ -465,14 +596,14 @@ body {
   height: 44px;
 }
 
-/* --- Header should NOT stick while scrolling --- */
+/* --- Header sticky reinforcement --- */
 #controlPanel {
   position: sticky !important;
   top: 0 !important;
-  z-index: 5000 !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  z-index: var(--z-toolbar) !important;
+  box-shadow: var(--shadow-toolbar);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
 }
 
 /* remove any extra top spacing from earlier themes */
