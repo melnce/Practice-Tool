@@ -15,11 +15,14 @@ No major "God Object" issues were found with `gameState`, though its global natu
 **Status**: **Correct by Design**, with clear distinction between Death and Displacement.
 
 ### Policy & Invariants
+
 The "Frozen" architecture requires `cleanupDead` to be called **once** after any batch of mutations that could reduce Follower defense to <= 0.
+
 - **Authorized Callers**: Orchestrators (`damage.ts`, `destroy.ts`, `combat.ts`, etc.).
 - **Timing**: Post-execution loop.
 
 ### Lifecycle Diagram
+
 ```
 [Op Execution] -> [State Mutation (defense -= X)] -> [cleanupDead()]
                                                          |
@@ -34,27 +37,31 @@ The "Frozen" architecture requires `cleanupDead` to be called **once** after any
 ```
 
 ### Call Site Inventory
-| Module | Context | Status |
-|--------|---------|--------|
-| `damage.ts` | After damage loops | ✅ Compliant |
+
+| Module       | Context             | Status       |
+| ------------ | ------------------- | ------------ |
+| `damage.ts`  | After damage loops  | ✅ Compliant |
 | `destroy.ts` | After destroy loops | ✅ Compliant |
-| `combat.ts` | End of combat | ✅ Compliant |
-| `turns.ts` | Start/End of turn | ✅ Compliant |
+| `combat.ts`  | End of combat       | ✅ Compliant |
+| `turns.ts`   | Start/End of turn   | ✅ Compliant |
 
 ### Intentional Displacement Operations
+
 The following modules perform direct `splice` operations on board arrays. These are **NOT** violations but intentional architectural patterns:
 
-*   **Banish (`banish.ts`)**
-*   **Bounce (`bounce.ts`)**
-*   **Return to Deck (`returnHandToDeck.ts`)**
+- **Banish (`banish.ts`)**
+- **Bounce (`bounce.ts`)**
+- **Return to Deck (`returnHandToDeck.ts`)**
 
 **Why this is safe**:
 These operations represent **Displacement**, not Death.
-*   They **MUST NOT** call `cleanupDead` because the entities are not "dying" (0 defense).
-*   They **MUST NOT** fire Last Words or Death triggers.
-*   They correctly handle their own lifecycle events (e.g., `follower_leaves_field`) and state removal.
+
+- They **MUST NOT** call `cleanupDead` because the entities are not "dying" (0 defense).
+- They **MUST NOT** fire Last Words or Death triggers.
+- They correctly handle their own lifecycle events (e.g., `follower_leaves_field`) and state removal.
 
 ### Recommendation
+
 **Low Effort / High Impact**: Add a `check-bypass` script that forbids `splice` on board arrays outside of these specific "Displacement" and "Cleanup" modules. This prevents ad-hoc removal logic (which might accidentally skip death triggers) from creeping into other parts of the codebase.
 
 ## 2. Deep Dive: System Capability Gap (Leader Damage)
@@ -62,25 +69,32 @@ These operations represent **Displacement**, not Death.
 **Status**: **Functional Gap**.
 
 ### The Problem
+
 The current Trigger System is fully consistent but incomplete.
-*   **`applyLeaderDamage`**: Correctly updates state (`blueHP`/`redHP`), logs events, and checks barriers. It is the single source of truth for leader damage.
-*   **Trigger System**: Has no event definition for leader damage. The existing `self_damaged` event is explicitly scoped to **Followers only** (via logic in `src/logic/core/triggers/handlers/self.ts`).
+
+- **`applyLeaderDamage`**: Correctly updates state (`blueHP`/`redHP`), logs events, and checks barriers. It is the single source of truth for leader damage.
+- **Trigger System**: Has no event definition for leader damage. The existing `self_damaged` event is explicitly scoped to **Followers only** (via logic in `src/logic/core/triggers/handlers/self.ts`).
 
 ### Consequence
+
 While the current code works perfectly for simple state updates, it blocks the implementation of an entire class of card mechanics:
-*   *Impossible to implement*: "When your leader takes damage, draw a card."
-*   *Impossible to implement*: "When your leader takes damage, give +1/+1 to all allies."
+
+- _Impossible to implement_: "When your leader takes damage, draw a card."
+- _Impossible to implement_: "When your leader takes damage, give +1/+1 to all allies."
 
 ### Comparison: Follower vs Leader Damage
-| Feature | Follower Damage (`dealDamage`) | Leader Damage (`applyLeaderDamage`) |
-|---------|--------------------------------|-------------------------------------|
-| State Update | ✅ | ✅ |
-| Logging | ✅ | ✅ |
-| Barrier Check | ✅ | ✅ |
-| **Triggers** | ✅ (`self_damaged`) | ❌ **NONE** (Gap) |
+
+| Feature       | Follower Damage (`dealDamage`) | Leader Damage (`applyLeaderDamage`) |
+| ------------- | ------------------------------ | ----------------------------------- |
+| State Update  | ✅                             | ✅                                  |
+| Logging       | ✅                             | ✅                                  |
+| Barrier Check | ✅                             | ✅                                  |
+| **Triggers**  | ✅ (`self_damaged`)            | ❌ **NONE** (Gap)                   |
 
 ### Recommendation
+
 **Architectural Fix**:
+
 1.  **Define Event**: Add a new trigger event `leader_damaged` (or generalize `self_damaged` to accept a `Leader` target).
 2.  **Emit Event**: Update `applyLeaderDamage` to fire this new event.
 3.  **Enforce**: Ensure all leader damage flows through this primitive (currently does, so this is just maintenance).
