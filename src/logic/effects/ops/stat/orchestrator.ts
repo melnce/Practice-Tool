@@ -219,10 +219,14 @@ function conditionWithObjectFilter(eff: StatOp): any {
   const base =
     eff.condition && typeof eff.condition === "object" ? eff.condition : {};
   const filter = (eff as any).filter;
-  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
-    return { ...base, ...filter };
+  let merged =
+    filter && typeof filter === "object" && !Array.isArray(filter)
+      ? { ...base, ...filter }
+      : base;
+  if ((eff as any).include_self === true) {
+    merged = { ...merged, include_self: true };
   }
-  return base;
+  return merged;
 }
 
 function handlePoolBasedBuff(
