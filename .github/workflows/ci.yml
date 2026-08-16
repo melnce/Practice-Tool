@@ -5,9 +5,17 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# PR runs share a group per PR number so superseded pushes cancel in-flight work.
+# Push-to-main uses github.run_id so each merge commit keeps its own run (no cross-cancel).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   build-test-check:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
     steps:
