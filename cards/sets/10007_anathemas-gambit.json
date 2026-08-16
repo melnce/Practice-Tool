@@ -2179,7 +2179,7 @@
         "player": "opponent",
         "triggers": [
           {
-            "event": "start_of_turn",
+            "type": "start_of_turn_own",
             "effects": [
               {
                 "op": "damage",

@@ -215,9 +215,14 @@ export function applyRandomHits(
       } as any);
     }
 
-    const valid = pool.filter(
-      (c) => c && (c.type === "Follower" || c.type === "Leader"),
-    );
+    const valid = pool.filter((c) => {
+      if (!c) return false;
+      if (c.type === "Leader") return true;
+      if (c.type === "Follower") {
+        return (parseInt(String((c as CardInstance).defense), 10) || 0) > 0;
+      }
+      return false;
+    });
     if (!valid.length) break;
 
     const pick = valid[state.rng.nextInt(valid.length)];
