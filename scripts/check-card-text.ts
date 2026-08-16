@@ -532,6 +532,96 @@ function collectKeywordCosts(
   return costs;
 }
 
+type AlternateKind = "accelerate" | "crystallize";
+
+function hasAuthoredAlternateForm(
+  card: CardJson,
+  kind: AlternateKind,
+): { cost: number } | null {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as Record<string, unknown>;
+    if (normalizeKwName(String(kw.name ?? "")) !== kind) continue;
+    if (kw.cost == null) continue;
+    const cost = Number(kw.cost);
+    if (!Number.isFinite(cost)) continue;
+    if (kind === "accelerate") {
+      if (Array.isArray(kw.effects) && kw.effects.length > 0) return { cost };
+    } else {
+      const nested = asArray(kw.amuletKeywords).concat(asArray(kw.keywords));
+      if (nested.length > 0) return { cost };
+      if (Array.isArray(kw.effects) && kw.effects.length > 0) return { cost };
+    }
+  }
+  return null;
+}
+
+function descriptionHasAlternateClause(
+  desc: string,
+  kind: AlternateKind,
+  cost: number,
+): boolean {
+  const label = kind === "accelerate" ? "Accelerate" : "Crystallize";
+  return new RegExp(`\\b${label}\\s*\\(${cost}\\)`, "i").test(desc);
+}
+
+function checkAlternateFormClauses(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const desc = card.description ?? "";
+  for (const kind of ["accelerate", "crystallize"] as const) {
+    const authored = hasAuthoredAlternateForm(card, kind);
+    if (!authored) continue;
+    if (!descriptionHasAlternateClause(desc, kind, authored.cost)) {
+      const label = kind === "accelerate" ? "Accelerate" : "Crystallize";
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `Card has authored ${label} alternate-form ops but description lacks "${label} (${authored.cost})" clause`,
+      });
+    }
+  }
+  return issues;
+}
+
+/** Last Words / Countdown nested inside a Crystallize (N): clause are amulet text, not card keywords. */
+function lineIsCrystallizeClauseContext(
+  lines: string[],
+  lineIndex: number,
+): boolean {
+  for (let i = lineIndex; i >= 0; i--) {
+    const t = lines[i]!.trim();
+    if (/^crystallize\s*\(\d+\)/i.test(t)) return true;
+    if (
+      t &&
+      !/^countdown\s*\(\d+\)/i.test(t) &&
+      !/^last words:/i.test(t) &&
+      !/^crystallize\s*\(\d+\)/i.test(t)
+    ) {
+      return false;
+    }
+  }
+  return false;
+}
+
+function descriptionMentionsLastWordsOutsideCrystallize(desc: string): boolean {
+  const lines = desc.split("\n");
+  return lines.some(
+    (line, i) =>
+      /^last words:/i.test(line.trim()) &&
+      !lineIsCrystallizeClauseContext(lines, i),
+  );
+}
+
+function descriptionMentionsCountdownOutsideCrystallize(desc: string): boolean {
+  const lines = desc.split("\n");
+  return lines.some(
+    (line, i) =>
+      /countdown\s*\(\d+\)/i.test(line) &&
+      !lineIsCrystallizeClauseContext(lines, i),
+  );
+}
+
 function collectCountdownFromJson(card: CardJson): number[] {
   const values: number[] = [];
   for (const k of card.keywords ?? []) {
@@ -907,7 +997,7 @@ function checkCard(card: CardJson): Issue[] {
   expectKw("Bane", hasKeyword(kws, "Bane"), /^bane\b/i);
 
   if (
-    desc.split("\n").some((line) => /^last words:/i.test(line.trim())) &&
+    descriptionMentionsLastWordsOutsideCrystallize(desc) &&
     !hasKeyword(kws, "LastWords")
   ) {
     issues.push({
@@ -967,7 +1057,10 @@ function checkCard(card: CardJson): Issue[] {
     });
   }
 
-  if (/countdown \(\d+\)/i.test(desc) && !hasKeyword(kws, "Countdown")) {
+  if (
+    descriptionMentionsCountdownOutsideCrystallize(desc) &&
+    !hasKeyword(kws, "Countdown")
+  ) {
     issues.push({
       id: card.id,
       name: card.name,
@@ -1029,6 +1122,7 @@ function checkCard(card: CardJson): Issue[] {
   // Gate: add_to_hand field contracts (includes crest-nested ops)
   issues.push(...checkAddToHand(card));
   issues.push(...checkStatOpFilters(card));
+  issues.push(...checkAlternateFormClauses(card));
 
   for (const msg of spellAmuletMarkerIssues(card)) {
     issues.push({
