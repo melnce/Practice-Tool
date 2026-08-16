@@ -1,0 +1,63 @@
+{
+  "class": "Dragoncraft",
+  "deckName": "Dragon Meta (owner ladder list)",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Lyria, Skydestined",
+      "count": 3
+    },
+    {
+      "name": "Vorlalai, Eld Blades",
+      "count": 3
+    },
+    {
+      "name": "Dragonewt Promoter",
+      "count": 3
+    },
+    {
+      "name": "Sloth of the Crestpetal",
+      "count": 3
+    },
+    {
+      "name": "Nation of Disdain",
+      "count": 3
+    },
+    {
+      "name": "Gilnelise, Voracity Manifest",
+      "count": 1
+    },
+    {
+      "name": "Dragonsign",
+      "count": 3
+    },
+    {
+      "name": "Fate of the World",
+      "count": 3
+    },
+    {
+      "name": "Galmieux, Ardor Manifest",
+      "count": 3
+    },
+    {
+      "name": "Zooey, Ally of the World",
+      "count": 3
+    },
+    {
+      "name": "Sagatsumatsu, Fair Beheader",
+      "count": 3
+    },
+    {
+      "name": "Lumiore & Argente, Shining Wings",
+      "count": 3
+    },
+    {
+      "name": "Burnite, Anathema of Ash",
+      "count": 3
+    },
+    {
+      "name": "Erntz, Governing Justice",
+      "count": 3
+    }
+  ]
+}

@@ -458,6 +458,9 @@ export type RunSoakGameOptions = {
   coverage?: CoverageTracker;
   /** When true, skip invariant checks (used only for timing). */
   skipInvariants?: boolean;
+  /** Override deck pairing (skips deckSpecForSeed when both are set). */
+  deckAId?: string;
+  deckBId?: string;
 };
 
 /**
@@ -471,7 +474,15 @@ export async function runSoakGame(
 
   const turnCap = opts.turnCap ?? DEFAULT_TURN_CAP;
   const actionCap = opts.actionCap ?? DEFAULT_ACTION_CAP;
-  const deckSpec = deckSpecForSeed(opts.seed, opts.gameIndex);
+  const pinned =
+    opts.deckAId != null && opts.deckBId != null
+      ? {
+          regime: "shipped" as const,
+          deckAId: opts.deckAId,
+          deckBId: opts.deckBId,
+        }
+      : null;
+  const deckSpec = pinned ?? deckSpecForSeed(opts.seed, opts.gameIndex);
   const policyRng = createRng(`soak-policy-${opts.seed}-${opts.gameIndex}`);
   const trace: SoakAction[] = [];
 
@@ -484,8 +495,12 @@ export async function runSoakGame(
     regime: deckSpec.regime,
     deckAId: deckSpec.deckAId,
     deckBId: deckSpec.deckBId,
-    ...(deckSpec.deckARaw ? { deckARaw: deckSpec.deckARaw } : {}),
-    ...(deckSpec.deckBRaw ? { deckBRaw: deckSpec.deckBRaw } : {}),
+    ...("deckARaw" in deckSpec && deckSpec.deckARaw
+      ? { deckARaw: deckSpec.deckARaw }
+      : {}),
+    ...("deckBRaw" in deckSpec && deckSpec.deckBRaw
+      ? { deckBRaw: deckSpec.deckBRaw }
+      : {}),
     trace,
   };
 

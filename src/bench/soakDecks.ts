@@ -17,6 +17,7 @@ export const SHIPPED_DECK_IDS = [
   "swordcraft_rally",
   "runecraft_spellboost",
   "dragoncraft_overflow",
+  "dragoncraft_meta",
   "abysscraft_necromancy",
   "havencraft_countdown",
   "portalcraft_artifacts",

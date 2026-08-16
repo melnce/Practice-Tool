@@ -11,6 +11,7 @@ decks/*
 !decks/swordcraft_rally.json
 !decks/runecraft_spellboost.json
 !decks/dragoncraft_overflow.json
+!decks/dragoncraft_meta.json
 !decks/abysscraft_necromancy.json
 !decks/havencraft_countdown.json
 !decks/portalcraft_artifacts.json
