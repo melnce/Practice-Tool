@@ -691,19 +691,32 @@ describe("Negative-space — conditional / counting exclusions", () => {
     expect(Number(other.attack)).toBe(1);
   });
 
-  it.fails(
-    "10573110 Neuron Disrupter — Fanfare PP recovery counts other allies not self",
-    () => {
-      // KNOWN BUG: other_allies amount_source returns 0 at Fanfare despite bystander on field
-      setupTurn(R6, { hand: ["10573110"], pp: 5 });
-      allyFollower(2, "Bystander", 2);
-      state.players.first.pp = 0;
-      whenPlayCard("first", 0);
-      expect(getPP(state, "first")).toBe(1);
-      expect(findOnBoard("first", "Neuron Disrupter")).toBeTruthy();
-      expect(findOnBoard("first", "Bystander")).toBeTruthy();
-    },
-  );
+  it("10573110 Neuron Disrupter — Fanfare PP recovery counts other allies not self", () => {
+    setupTurn(R6, { hand: ["10573110"], pp: 5 });
+    allyFollower(2, "Bystander", 2);
+    whenPlayCard("first", 0);
+    expect(getPP(state, "first")).toBe(1);
+    expect(findOnBoard("first", "Neuron Disrupter")).toBeTruthy();
+    expect(findOnBoard("first", "Bystander")).toBeTruthy();
+  });
+
+  it("10573110 Neuron Disrupter — recovers 0 PP with no other allied followers", () => {
+    setupTurn(R6, { hand: ["10573110"], pp: 5 });
+    whenPlayCard("first", 0);
+    expect(getPP(state, "first")).toBe(0);
+    expect(findOnBoard("first", "Neuron Disrupter")).toBeTruthy();
+  });
+
+  it("10573110 Neuron Disrupter — recovers 3 PP from three other followers (capped at max)", () => {
+    setupTurn(R6, { hand: ["10573110"], pp: 6 });
+    allyFollower(1, "Ally1", 1, 1);
+    allyFollower(1, "Ally2", 1, 1);
+    allyFollower(1, "Ally3", 1, 1);
+    whenPlayCard("first", 0);
+    // Paid 5 PP (6→1), recovered 3 → 4 (max PP at round 6 is 6, so no cap here)
+    expect(getPP(state, "first")).toBe(4);
+    expect(thenBoard("first").length).toBe(4);
+  });
 
   it("10524110 Oluon — evolved EOT random hits exclude Oluon herself", () => {
     setupTurn(9);
@@ -784,5 +797,40 @@ describe("Negative-space — additional exclusions", () => {
       enteringOwner: "first",
     });
     expect(adahime.hasRush).toBeFalsy();
+  });
+});
+
+describe("Congregant of Destruction — destroy count_source", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    state.gameStarted = true;
+    state.activePlayer = "first";
+    (globalThis as any).HEADLESS = true;
+  });
+
+  it("10373110 — with 2 other allies destroys exactly 2 random enemies (seeded) and wipes allies", () => {
+    setupTurn(R8, { hand: ["10373110"], pp: 6 });
+    enemyFollower(4, "EnemyA");
+    enemyFollower(4, "EnemyB");
+    enemyFollower(4, "EnemyC");
+    allyFollower(1, "Ally1", 1, 1);
+    allyFollower(1, "Ally2", 1, 1);
+    whenPlayCard("first", 0);
+    expect(thenBoard("second").map((c) => c.name)).toEqual(["EnemyB"]);
+    expect(thenBoard("first").map((c) => c.name)).toEqual([
+      "Congregant of Destruction",
+    ]);
+  });
+
+  it("10373110 — with 0 other allies destroys no enemies but still enters", () => {
+    setupTurn(R8, { hand: ["10373110"], pp: 6 });
+    enemyFollower(4, "EnemyA");
+    enemyFollower(4, "EnemyB");
+    enemyFollower(4, "EnemyC");
+    whenPlayCard("first", 0);
+    expect(thenBoard("second").length).toBe(3);
+    expect(thenBoard("first").map((c) => c.name)).toEqual([
+      "Congregant of Destruction",
+    ]);
   });
 });
