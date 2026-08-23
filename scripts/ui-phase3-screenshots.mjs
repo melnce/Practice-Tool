@@ -150,6 +150,17 @@ const FURNITURE_CARD_PAIRS = [
   ["blueStats", "blueBoard", "blue stats×board"],
 ];
 
+/** Leader HP pill vs adjacent Evo / Super buttons (siblings in leader-container). */
+const LEADER_EVO_PAIRS = [
+  ["redLeader", "redNormalEvo", "red leader×evo"],
+  ["redLeader", "redSuperEvo", "red leader×super"],
+  ["blueLeader", "blueNormalEvo", "blue leader×evo"],
+  ["blueLeader", "blueSuperEvo", "blue leader×super"],
+];
+
+const LEADER_HITBOX_MIN_WIDTH_RATIO = 2.4;
+const LEADER_HITBOX_HEIGHT_TOLERANCE = 3;
+
 async function runFurnitureIntersectionAssertions(page, label, context = "") {
   const suffix = context ? ` ${context}` : "";
   for (const [idA, idB, pairLabel] of FURNITURE_CARD_PAIRS) {
@@ -161,6 +172,72 @@ async function runFurnitureIntersectionAssertions(page, label, context = "") {
     }
     console.log(`✓ ${label}${suffix} ${pairLabel}`);
   }
+}
+
+async function runLeaderEvoIntersectionAssertions(page, label, context = "") {
+  const suffix = context ? ` ${context}` : "";
+  for (const [idA, idB, pairLabel] of LEADER_EVO_PAIRS) {
+    const result = await assertNoBoxIntersection(page, idA, idB, pairLabel);
+    if (!result.ok) {
+      throw new Error(
+        `Leader/evo intersection at ${label}${suffix}: ${result.reason}`,
+      );
+    }
+    console.log(`✓ ${label}${suffix} ${pairLabel}`);
+  }
+}
+
+function assertLeaderHitboxDimensions(page) {
+  return page.evaluate(
+    ({ minWidthRatio, heightTolerance }) => {
+      const root = getComputedStyle(document.documentElement);
+      const barSize = parseFloat(root.getPropertyValue("--leader-bar-size"));
+      const measurements = {};
+      for (const id of ["blueLeader", "redLeader"]) {
+        const el = document.getElementById(id);
+        if (!el) {
+          return { ok: false, reason: `missing #${id}` };
+        }
+        const cs = getComputedStyle(el);
+        const width = parseFloat(cs.width);
+        const height = parseFloat(cs.height);
+        const hitbox = el.getBoundingClientRect();
+        measurements[id] = {
+          width,
+          height,
+          hitboxWidth: Math.round(hitbox.width * 10) / 10,
+          hitboxHeight: Math.round(hitbox.height * 10) / 10,
+          barSize,
+        };
+        if (width < height * minWidthRatio) {
+          return {
+            ok: false,
+            reason: `#${id} width ${width}px < ${minWidthRatio}× height ${height}px`,
+            measurements,
+          };
+        }
+        if (Math.abs(height - barSize) > heightTolerance) {
+          return {
+            ok: false,
+            reason: `#${id} height ${height}px != --leader-bar-size ${barSize}px (±${heightTolerance})`,
+            measurements,
+          };
+        }
+        if (width <= height) {
+          return {
+            ok: false,
+            reason: `#${id} not wider than tall: ${width}×${height}px`,
+            measurements,
+          };
+        }
+      }
+      return { ok: true, measurements };
+    },
+    {
+      minWidthRatio: LEADER_HITBOX_MIN_WIDTH_RATIO,
+      heightTolerance: LEADER_HITBOX_HEIGHT_TOLERANCE,
+    },
+  );
 }
 
 function assertNoPageScroll(page) {
@@ -618,7 +695,19 @@ async function runOverlapAssertions(page, viewportLabel, context = "") {
   }
 
   await runFurnitureIntersectionAssertions(page, viewportLabel, context);
+  await runLeaderEvoIntersectionAssertions(page, viewportLabel, context);
   await runRegionPairwiseAssertions(page, viewportLabel, context);
+
+  const leaderHitbox = await assertLeaderHitboxDimensions(page);
+  if (!leaderHitbox.ok) {
+    throw new Error(
+      `Leader hitbox at ${viewportLabel}${suffix}: ${leaderHitbox.reason}`,
+    );
+  }
+  const m = leaderHitbox.measurements;
+  console.log(
+    `✓ ${viewportLabel}${suffix} leader hitbox blue=${m.blueLeader.width}×${m.blueLeader.height} red=${m.redLeader.width}×${m.redLeader.height}`,
+  );
 
   for (const side of ["red", "blue"]) {
     const mulliganOverlap = await assertNoMulliganHandOverlap(page, side);
