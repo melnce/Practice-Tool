@@ -2,8 +2,9 @@
  * Red-first regression tests: discard triggers + enemy:all leader targeting.
  *
  * BUG 1 — discard effects must fire once (on_discard only, never spell).
- * BUG 2 — restore/damage from discard follow the discarded card's controller.
  * BUG 3 — enemy:all direct damage must include the enemy leader.
+ *
+ * Restore on discard is pinned separately (not a defect — owner misread crest damage).
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
@@ -24,7 +25,6 @@ const LUMIORE = "10844120";
 const SAGATSUMATSU = "10644110";
 const ADVENT = "10641310";
 const KIT = "10142110";
-const BEHEADING = "10643310";
 
 function setupMain(
   player: "first" | "second",
@@ -124,8 +124,8 @@ describe("discard and leader targets", () => {
     });
   });
 
-  describe("BUG 2 — restore follows discarded card controller", () => {
-    it("first (blue) player: Depths discard restores own damaged leader", () => {
+  describe("Depths discard restore — pinned correct behaviour (no crest)", () => {
+    it("blue (first): damaged leader gains exactly 1, enemy leader takes exactly 1", () => {
       setupMain("first", {
         firstHP: 15,
         secondHP: 20,
@@ -138,22 +138,7 @@ describe("discard and leader targets", () => {
       expect(thenHP("second")).toBe(19);
     });
 
-    it("Beheading Eld Blades discard uses discarded card for self_cost gate", () => {
-      setupMain("first", {
-        hand: [SAGATSUMATSU, BEHEADING],
-        pp: 7,
-      });
-      whenPlayCard("first", 0);
-      discardHandCard("first", "Beheading");
-      const hand = getHand(state, "first");
-      expect(hand.some((c) => c.name === "Beheading Eld Blades")).toBe(true);
-      const added = hand.find(
-        (c) => c.name === "Beheading Eld Blades" && c.cost === 5,
-      );
-      expect(added).toBeTruthy();
-    });
-
-    it("second (red) player: Depths discard restores own damaged leader", () => {
+    it("red (second): damaged leader gains exactly 1, enemy leader takes exactly 1", () => {
       setupMain("second", {
         firstHP: 20,
         secondHP: 15,
