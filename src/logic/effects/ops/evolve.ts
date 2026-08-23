@@ -36,17 +36,27 @@ export function handleEvolveSelf(
   const attackBonus = mode === "super" ? 3 : 2;
   const defenseBonus = mode === "super" ? 3 : 2;
 
+  const preEvoAtk = parseInt(String(sourceCard.attack)) || 0;
+  const preEvoDef = parseInt(String(sourceCard.defense)) || 0;
+
   if (!sourceCard.buffs) sourceCard.buffs = { attack: 0, defense: 0 };
   sourceCard.buffs.attack = (sourceCard.buffs.attack ?? 0) + attackBonus;
   sourceCard.buffs.defense = (sourceCard.buffs.defense ?? 0) + defenseBonus;
 
-  sourceCard.attack = (parseInt(String(sourceCard.attack)) || 0) + attackBonus;
-  sourceCard.defense =
-    (parseInt(String(sourceCard.defense)) || 0) + defenseBonus;
+  sourceCard.attack = preEvoAtk + attackBonus;
+  sourceCard.defense = preEvoDef + defenseBonus;
+
+  const prePeak = sourceCard.peak_defense ?? preEvoDef;
   sourceCard.peak_defense = Math.max(
-    sourceCard.peak_defense ?? (sourceCard.defense as number),
+    prePeak + defenseBonus,
     sourceCard.defense as number,
   );
+  if (sourceCard.potential_defense != null) {
+    sourceCard.potential_defense = Math.max(
+      sourceCard.potential_defense + defenseBonus,
+      sourceCard.peak_defense,
+    );
+  }
   logEvent("evolve", {
     owner,
     name: sourceCard.name,
