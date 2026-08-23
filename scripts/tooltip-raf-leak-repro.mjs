@@ -68,7 +68,7 @@ async function runRepro() {
     headless: true,
     args: ["--no-sandbox", "--disable-gpu"],
   });
-  const page = await browser.newPage();
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 
   await page.addInitScript(() => {
     window.__rafAudit = {
@@ -136,9 +136,8 @@ async function runRepro() {
 
     const zone = process.env.RAF_ZONE === "board" ? "#blueBoard" : "#blueHand";
     const card = page.locator(`${zone} .card`).first();
-    const box = await card.boundingBox();
-    if (!box) throw new Error("card not visible for hover");
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await card.waitFor({ state: "visible" });
+    await card.hover();
     await page.waitForTimeout(50);
 
     // Let RAF loop spin up (~12 frames at 60fps)
