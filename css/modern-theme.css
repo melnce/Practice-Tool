@@ -376,30 +376,40 @@ body {
 }
 
 .side-red #redHand,
-.side-red #redMulliganConfirm,
 .side-red .leader-container,
 .side-red #redBoard,
 .side-blue #blueBoard,
 .side-blue .leader-container,
-.side-blue #blueHand,
-.side-blue #blueMulliganConfirm {
+.side-blue #blueHand {
   grid-column: 2;
   justify-self: stretch;
   width: 100%;
   max-width: 100%;
 }
 
-.side-red #redHand,
-.side-red #redMulliganConfirm {
+.side-red #redMulliganConfirm,
+.side-blue #blueMulliganConfirm {
+  grid-column: 2;
+  justify-self: center;
+  align-self: center;
+  width: auto;
+  max-width: min(420px, 100%);
+}
+
+.side-red #redHand {
   grid-row: 1;
 }
 
-.side-red .leader-container {
+.side-red #redMulliganConfirm {
   grid-row: 2;
 }
 
-.side-red #redBoard {
+.side-red .leader-container {
   grid-row: 3;
+}
+
+.side-red #redBoard {
+  grid-row: 4;
 }
 
 .side-blue #blueBoard {
@@ -414,14 +424,17 @@ body {
   grid-row: 2;
 }
 
-.side-blue #blueHand,
-.side-blue #blueMulliganConfirm {
+.side-blue #blueHand {
   grid-row: 3;
+}
+
+.side-blue #blueMulliganConfirm {
+  grid-row: 4;
 }
 
 #redStatsContainer {
   grid-column: 1;
-  grid-row: 2;
+  grid-row: 3;
   justify-self: start;
   align-self: center;
 }
@@ -468,6 +481,18 @@ body.active-second .side-red {
   padding: var(--space-4) var(--space-6);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-inset-subtle), var(--shadow-inset-well);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#redBoard,
+#blueBoard {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .hand-zone {

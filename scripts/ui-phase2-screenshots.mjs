@@ -149,6 +149,82 @@ async function runFurnitureIntersectionAssertions(page, width, context = "") {
   }
 }
 
+function assertNoMulliganHandOverlap(page, sidePrefix) {
+  return page.evaluate((prefix) => {
+    const btn = document.getElementById(`${prefix}MulliganConfirm`);
+    const hand = document.getElementById(`${prefix}Hand`);
+    if (!btn || !hand) {
+      return {
+        ok: false,
+        reason: `missing ${prefix}MulliganConfirm or ${prefix}Hand`,
+      };
+    }
+    const style = getComputedStyle(btn);
+    if (style.display === "none" || btn.hidden) {
+      return { ok: false, reason: `${prefix} mulligan button not visible` };
+    }
+    const br = btn.getBoundingClientRect();
+    if (br.width === 0 || br.height === 0) {
+      return { ok: false, reason: `${prefix} mulligan button has zero size` };
+    }
+    const cards = [...hand.querySelectorAll(".card")];
+    for (const card of cards) {
+      const cr = card.getBoundingClientRect();
+      const overlapX =
+        Math.min(br.right, cr.right) - Math.max(br.left, cr.left);
+      const overlapY =
+        Math.min(br.bottom, cr.bottom) - Math.max(br.top, cr.top);
+      if (overlapX > 2 && overlapY > 2) {
+        return {
+          ok: false,
+          reason: `${prefix} mulligan×hand overlap ${overlapX.toFixed(1)}×${overlapY.toFixed(1)}px`,
+        };
+      }
+    }
+    return { ok: true };
+  }, sidePrefix);
+}
+
+function assertBoardZonesSymmetric(page) {
+  return page.evaluate(() => {
+    const red = document.getElementById("redBoard");
+    const blue = document.getElementById("blueBoard");
+    if (!red || !blue) {
+      return { ok: false, reason: "missing redBoard or blueBoard" };
+    }
+    const rr = red.getBoundingClientRect();
+    const br = blue.getBoundingClientRect();
+    const dw = Math.abs(rr.width - br.width);
+    const dl = Math.abs(rr.left - br.left);
+    const dr = Math.abs(rr.right - br.right);
+    if (dw > 2 || dl > 2 || dr > 2) {
+      return {
+        ok: false,
+        reason: `board zones asymmetric: red ${rr.width.toFixed(1)}px @${rr.left.toFixed(1)}-${rr.right.toFixed(1)} blue ${br.width.toFixed(1)}px @${br.left.toFixed(1)}-${br.right.toFixed(1)} (Δw=${dw.toFixed(1)} Δl=${dl.toFixed(1)} Δr=${dr.toFixed(1)})`,
+      };
+    }
+    return { ok: true, width: Math.round(rr.width) };
+  });
+}
+
+async function showMulliganButtons(page) {
+  await page.evaluate(() => {
+    for (const id of ["redMulliganConfirm", "blueMulliganConfirm"]) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "inline-flex";
+    }
+  });
+}
+
+async function hideMulliganButtons(page) {
+  await page.evaluate(() => {
+    for (const id of ["redMulliganConfirm", "blueMulliganConfirm"]) {
+      const el = document.getElementById(id);
+      if (el) el.style.display = "none";
+    }
+  });
+}
+
 function assertPlayAreaInView(page) {
   return page.evaluate(() => {
     const ids = [
@@ -495,6 +571,8 @@ async function stageTargeting(page) {
 async function runOverlapAssertions(page, width, context = "") {
   const suffix = context ? ` ${context}` : "";
 
+  await showMulliganButtons(page);
+
   const headerOverlap = await assertNoHeaderStatsOverlap(page);
   if (!headerOverlap.ok) {
     throw new Error(
@@ -516,6 +594,26 @@ async function runOverlapAssertions(page, width, context = "") {
   }
 
   await runFurnitureIntersectionAssertions(page, width, context);
+
+  for (const side of ["red", "blue"]) {
+    const mulliganOverlap = await assertNoMulliganHandOverlap(page, side);
+    if (!mulliganOverlap.ok) {
+      throw new Error(
+        `Mulligan/hand overlap at ${width}px${suffix}: ${mulliganOverlap.reason}`,
+      );
+    }
+    console.log(`✓ ${width}px${suffix} ${side} mulligan×hand`);
+  }
+
+  const boardSymmetry = await assertBoardZonesSymmetric(page);
+  if (!boardSymmetry.ok) {
+    throw new Error(
+      `Board symmetry at ${width}px${suffix}: ${boardSymmetry.reason}`,
+    );
+  }
+  console.log(
+    `✓ ${width}px${suffix} board zones symmetric (${boardSymmetry.width}px)`,
+  );
 
   const inView = await assertPlayAreaInView(page);
   if (!inView.ok) {
@@ -558,6 +656,7 @@ async function main() {
       await startGame(page);
       await stageMidGameBoard(page);
       await runOverlapAssertions(page, width);
+      await hideMulliganButtons(page);
 
       await screenshot(page, `baseline-${width}.png`);
     }
@@ -571,6 +670,7 @@ async function main() {
         await startGame(page);
         await stageRedHandSize(page, handSize);
         await runOverlapAssertions(page, width, `hand-${handSize}`);
+        await hideMulliganButtons(page);
         await screenshot(page, `state-red-hand-${handSize}-${width}.png`);
       }
     }
