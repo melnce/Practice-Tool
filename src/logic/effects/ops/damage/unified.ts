@@ -183,9 +183,13 @@ export function handleDamage(
     case "direct":
     default: {
       applyDirectDamage(amount, pool, "damage");
-      // For "enemy:any" or "all" distribution, also damage the enemy leader
+      // Direct AoE to all enemies includes the enemy leader (followers-only pool).
       const targetStr = String(spec.target || "").toLowerCase();
-      if (targetStr.includes("enemy") && targetStr.includes("any")) {
+      const hitsEnemyLeader =
+        (targetStr.includes("enemy") &&
+          (targetStr.includes("any") || targetStr.endsWith(":all"))) ||
+        targetStr === "all";
+      if (hitsEnemyLeader) {
         applyLeaderDamage(opponentOf(owner), amount);
       }
       break;
