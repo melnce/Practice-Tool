@@ -2,7 +2,7 @@
 // Shared primitives for damage operations.
 // These are internal implementation details - legacy ops remain as thin wrappers.
 
-import { dealDamage } from "../../../core/barrier.js";
+import { dealDamage, withDamageBatch } from "../../../core/barrier.js";
 import { state } from "../../../../core/gameState.js";
 import { getPool } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
@@ -147,13 +147,14 @@ export function applyDirectDamage(
   recipients: CardInstance[],
   logTag: string = "damage",
 ): void {
-  for (const target of recipients) {
-    if (target.type === "Follower") {
-      logEvent(logTag, { target: target.name, uid: target.uid, amount });
-      dealDamage(target, amount);
+  withDamageBatch(() => {
+    for (const target of recipients) {
+      if (target.type === "Follower") {
+        logEvent(logTag, { target: target.name, uid: target.uid, amount });
+        dealDamage(target, amount);
+      }
     }
-  }
-  cleanupDead();
+  });
 }
 
 /**
@@ -191,56 +192,57 @@ export function applyRandomHits(
         ? "enemy"
         : false;
 
-  let remaining = hitCount;
-  while (remaining-- > 0) {
-    // Rebuild pool each hit
-    const pool: (
-      | CardInstance
-      | { type: "Leader"; owner: Player; name: string }
-    )[] = [...getPool(targetSpec, owner, options?.sourceCard ?? null)];
+  withDamageBatch(() => {
+    let remaining = hitCount;
+    while (remaining-- > 0) {
+      // Rebuild pool each hit
+      const pool: (
+        | CardInstance
+        | { type: "Leader"; owner: Player; name: string }
+      )[] = [...getPool(targetSpec, owner, options?.sourceCard ?? null)];
 
-    if (leaderMode === "enemy" || leaderMode === "both") {
-      const targetOwner = opponentOf(owner);
-      pool.push({
-        type: "Leader",
-        owner: targetOwner,
-        name: "Enemy Leader",
-      } as any);
-    }
-    if (leaderMode === "ally" || leaderMode === "both") {
-      pool.push({
-        type: "Leader",
-        owner,
-        name: "Allied Leader",
-      } as any);
-    }
-
-    const valid = pool.filter((c) => {
-      if (!c) return false;
-      if (c.type === "Leader") return true;
-      if (c.type === "Follower") {
-        return (parseInt(String((c as CardInstance).defense), 10) || 0) > 0;
+      if (leaderMode === "enemy" || leaderMode === "both") {
+        const targetOwner = opponentOf(owner);
+        pool.push({
+          type: "Leader",
+          owner: targetOwner,
+          name: "Enemy Leader",
+        } as any);
       }
-      return false;
-    });
-    if (!valid.length) break;
+      if (leaderMode === "ally" || leaderMode === "both") {
+        pool.push({
+          type: "Leader",
+          owner,
+          name: "Allied Leader",
+        } as any);
+      }
 
-    const pick = valid[state.rng.nextInt(valid.length)];
-    if (!pick) break;
+      const valid = pool.filter((c) => {
+        if (!c) return false;
+        if (c.type === "Leader") return true;
+        if (c.type === "Follower") {
+          return (parseInt(String((c as CardInstance).defense), 10) || 0) > 0;
+        }
+        return false;
+      });
+      if (!valid.length) break;
 
-    logEvent("damageRandom", {
-      target: (pick as any).name,
-      uid: (pick as any).uid,
-      amount: amountPerHit,
-    });
+      const pick = valid[state.rng.nextInt(valid.length)];
+      if (!pick) break;
 
-    if (pick.type === "Leader") {
-      applyLeaderDamage((pick as any).owner, amountPerHit);
-    } else {
-      dealDamage(pick as CardInstance, amountPerHit);
+      logEvent("damageRandom", {
+        target: (pick as any).name,
+        uid: (pick as any).uid,
+        amount: amountPerHit,
+      });
+
+      if (pick.type === "Leader") {
+        applyLeaderDamage((pick as any).owner, amountPerHit);
+      } else {
+        dealDamage(pick as CardInstance, amountPerHit);
+      }
     }
-    cleanupDead();
-  }
+  });
 }
 
 /**

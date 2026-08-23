@@ -21,6 +21,7 @@ const SRC_ROOT = path.join(process.cwd(), "src/logic");
 const ALLOWED_FILES = new Set([
   "core/cleanup.ts",
   "core/cleanup/index.ts",
+  "core/barrier.ts",
   "core/turns.ts",
   "core/turnBoundary.ts",
   "core/combat.ts",

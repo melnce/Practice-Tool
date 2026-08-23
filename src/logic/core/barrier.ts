@@ -3,7 +3,9 @@ import { state } from "../../core/gameState.js";
 import { fireTrigger } from "./triggers.js";
 import { logEvent } from "../../core/logger.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
+import type { TriggerContext } from "./triggers/types.js";
 import { getBoard, toSlot } from "../../core/playerHelpers.js";
+import { cleanupDead } from "./cleanup.js";
 
 // Helper interface for card with barrier properties
 interface BarrierCard extends CardInstance {
@@ -40,6 +42,68 @@ export function popBarrier(card: BarrierCard, reason = "forced_pop") {
   // optional: telemetry
   card.__barrierPopReason = reason;
   return consumeBarrier(card);
+}
+
+type PendingSelfDamaged = {
+  owner: Player;
+  context: TriggerContext;
+};
+
+function getPendingSelfDamagedQueue(): PendingSelfDamaged[] {
+  if (!(state as any)._pendingSelfDamaged) {
+    (state as any)._pendingSelfDamaged = [];
+  }
+  return (state as any)._pendingSelfDamaged;
+}
+
+function getDamageBatchDepth(): number {
+  return ((state as any)._damageBatchDepth ?? 0) as number;
+}
+
+/** Begin deferring self_damaged until the batch ends (multi-target damage). */
+export function enterDamageBatch(): void {
+  (state as any)._damageBatchDepth = getDamageBatchDepth() + 1;
+}
+
+/** End a damage batch: settle deaths, then flush queued self_damaged triggers. */
+export function exitDamageBatch(): void {
+  const depth = getDamageBatchDepth();
+  if (depth <= 0) return;
+  (state as any)._damageBatchDepth = depth - 1;
+  if (depth - 1 <= 0) {
+    flushPendingSelfDamagedTriggers();
+  }
+}
+
+export function flushPendingSelfDamagedTriggers(): void {
+  cleanupDead();
+  const queue = getPendingSelfDamagedQueue();
+  while (queue.length > 0) {
+    const item = queue.shift()!;
+    fireTrigger("self_damaged", item.owner, item.context);
+    cleanupDead();
+  }
+}
+
+/** Run multi-target damage with batched self_damaged resolution. */
+export function withDamageBatch<T>(fn: () => T): T {
+  enterDamageBatch();
+  try {
+    const result = fn();
+    cleanupDead();
+    return result;
+  } finally {
+    exitDamageBatch();
+  }
+}
+
+function emitSelfDamaged(owner: Player, context: TriggerContext): void {
+  if (getDamageBatchDepth() > 0) {
+    getPendingSelfDamagedQueue().push({ owner, context });
+    return;
+  }
+  cleanupDead();
+  fireTrigger("self_damaged", owner, context);
 }
 
 export function dealDamage(
@@ -150,7 +214,7 @@ export function dealDamage(
         : null;
 
     if (owner && toSlot(state.activePlayer) === toSlot(owner)) {
-      fireTrigger("self_damaged", owner, {
+      emitSelfDamaged(owner, {
         damagedCard: target,
         sourceCard: source,
       });
