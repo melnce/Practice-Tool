@@ -4,6 +4,10 @@
  * Extends phase 2c assertions with full region pairwise intersection checks.
  */
 import { chromium } from "@playwright/test";
+import {
+  closeSettingsDrawer,
+  openSettingsDrawer,
+} from "./settings-drawer-helpers.mjs";
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -29,6 +33,7 @@ const HAND_SIZES = [4, 7, 10];
 /** Region ids checked for zero overlap (phase 3 layout). */
 const REGION_IDS = [
   "settingsToggle",
+  "quickActions",
   "historyToggle",
   "redHand",
   "redLeader",
@@ -277,8 +282,7 @@ async function hideMulliganButtons(page) {
 }
 
 async function startGame(page, seed = SEED) {
-  await page.click("#settingsToggle");
-  await page.waitForSelector("#settingsDrawer.open", { timeout: 5000 });
+  await openSettingsDrawer(page);
   await page.fill("#seedInput", String(seed));
   await page.click("#startGameBtn");
   await page.waitForFunction(
@@ -287,7 +291,7 @@ async function startGame(page, seed = SEED) {
     { timeout: 20000 },
   );
   await page.waitForTimeout(400);
-  await page.keyboard.press("Escape");
+  await closeSettingsDrawer(page);
   await page.waitForTimeout(150);
 }
 
@@ -534,12 +538,11 @@ async function stageHiddenHand(page) {
     window.__svwbTest?.render();
   });
 
-  await page.click("#settingsToggle");
-  await page.waitForSelector("#settingsDrawer.open", { timeout: 5000 });
+  await openSettingsDrawer(page);
   await page.selectOption("#scriptSideSelect", "second");
   await page.click("#scriptRecordBtn");
   await page.check("#scriptHiddenHandToggle");
-  await page.keyboard.press("Escape");
+  await closeSettingsDrawer(page);
   await page.waitForTimeout(400);
 }
 
