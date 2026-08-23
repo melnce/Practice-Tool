@@ -21,6 +21,11 @@ import {
   flushDeferredDeathBatch,
 } from "../cleanup.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
+import { resolveUid } from "../../../core/uidResolver.js";
+import {
+  DISCARD_CONTROLLER_KEY,
+  DISCARD_SOURCE_UID_KEY,
+} from "../../effects/discardTriggers.js";
 
 // Registry
 import type { EffectCtx } from "./registry.js";
@@ -177,19 +182,31 @@ export function runEffects(
     while (queue.length > 0) {
       const eff = queue.shift()!;
 
+      // Discard triggers run as the discarded card's controller (not the initiator).
+      const discardController = (eff as Record<string, unknown>)[
+        DISCARD_CONTROLLER_KEY
+      ] as Player | undefined;
+      const discardSourceUid = (eff as Record<string, unknown>)[
+        DISCARD_SOURCE_UID_KEY
+      ] as string | undefined;
+      const effectOwner: Player = discardController ?? owner;
+      const effectSource: CardInstance | null = discardSourceUid
+        ? (resolveUid(discardSourceUid) ?? sourceCard)
+        : sourceCard;
+
       // P2-3 FIX: Increment game tick for deterministic ordering
       state.gameTick = (state.gameTick || 0) + 1;
 
       // Runtime Assertion: Op must be valid string
       if (!eff.op || typeof eff.op !== "string") {
         throw new Error(
-          `[Dispatcher] Invalid operation: ${JSON.stringify(eff)} in card ${sourceCard?.name || "unknown"}`,
+          `[Dispatcher] Invalid operation: ${JSON.stringify(eff)} in card ${effectSource?.name || "unknown"}`,
         );
       }
 
       recordEvent({
         type: "run_effect",
-        payload: { op: eff.op, owner, source: sourceCard?.name },
+        payload: { op: eff.op, owner: effectOwner, source: effectSource?.name },
       });
 
       // Trace: effect_start
@@ -198,8 +215,8 @@ export function runEffects(
       // Build context for the handler
       const ctx: EffectCtx = {
         state,
-        owner,
-        sourceCard,
+        owner: effectOwner,
+        sourceCard: effectSource,
         queue,
         context,
         adapter: { ...adapter, render: () => {} } as any, // Prevent render loops

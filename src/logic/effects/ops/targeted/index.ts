@@ -40,6 +40,7 @@ import {
   endDispatch,
   runWithBypass,
 } from "../../../core/targeting/guards.js";
+import { queueDiscardTriggerEffects } from "../../discardTriggers.js";
 type TargetedOpHandler = (ctx: TargetedOpContext) => DispatchResult;
 const TARGETED_OP_HANDLERS: Map<string, TargetedOpHandler> = new Map();
 
@@ -238,13 +239,7 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
     rememberDiscardedCards(discarded);
   }
   if (resumeEffects) {
-    for (const dc of discarded) {
-      const fx = (dc as any).on_discard;
-      if (!Array.isArray(fx) || !fx.length) continue;
-      for (let i = fx.length - 1; i >= 0; i--) {
-        resumeEffects.unshift(fx[i]);
-      }
-    }
+    queueDiscardTriggerEffects(discarded, resumeEffects);
   }
   return { kind: "handled" };
 });
@@ -274,13 +269,7 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
     rememberDiscardedCards(discarded);
   }
   if (resumeEffects) {
-    for (const dc of discarded) {
-      const fx = (dc as any).on_discard;
-      if (!Array.isArray(fx) || !fx.length) continue;
-      for (let i = fx.length - 1; i >= 0; i--) {
-        resumeEffects.unshift(fx[i]);
-      }
-    }
+    queueDiscardTriggerEffects(discarded, resumeEffects);
   }
   return { kind: "handled" };
 });
