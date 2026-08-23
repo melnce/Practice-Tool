@@ -284,17 +284,25 @@ function applyEvolution(
   const attackBonus = mode === "super" ? 3 : 2;
   const defenseBonus = mode === "super" ? 3 : 2;
 
+  const preEvoAtk = parseInt(String(card.attack)) || 0;
+  const preEvoDef = parseInt(String(card.defense)) || 0;
+
   // Apply stat buffs
   if (!card.buffs) card.buffs = { attack: 0, defense: 0 };
   card.buffs.attack = (card.buffs.attack ?? 0) + attackBonus;
   card.buffs.defense = (card.buffs.defense ?? 0) + defenseBonus;
 
-  card.attack = (parseInt(String(card.attack)) || 0) + attackBonus;
-  card.defense = (parseInt(String(card.defense)) || 0) + defenseBonus;
-  card.peak_defense = Math.max(
-    card.peak_defense ?? (card.defense as number),
-    card.defense as number,
-  );
+  card.attack = preEvoAtk + attackBonus;
+  card.defense = preEvoDef + defenseBonus;
+
+  const prePeak = card.peak_defense ?? preEvoDef;
+  card.peak_defense = Math.max(prePeak + defenseBonus, card.defense as number);
+  if (card.potential_defense != null) {
+    card.potential_defense = Math.max(
+      card.potential_defense + defenseBonus,
+      card.peak_defense,
+    );
+  }
 
   // Swap to evolved image
   if (card.evo_image) card.base_image = card.evo_image;

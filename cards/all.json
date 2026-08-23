@@ -12985,7 +12985,6 @@
     "triggers": [
       {
         "event": "self_damaged",
-        "max_per_turn": 3,
         "condition": {
           "still_alive": true
         },

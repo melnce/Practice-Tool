@@ -101,8 +101,8 @@ const NUMERIC_DRIFT_HINT_ONLY_CHECKS = new Set<NumericDriftHint["check"]>([
   "damage_amount",
   "stat_bonus",
 ]);
-const MAX_PER_TURN_RULING_IDS = new Set([
-  "10344110", // Azurifrit — bible line 422: up to 3 activations per turn
+const MAX_PER_TURN_RULING_IDS = new Set<string>([
+  // Cards with owner-ruling max_per_turn caps are listed here.
 ]);
 
 /** Fields accepted on add_to_hand (plus op). Unknown keys fail the check. */
