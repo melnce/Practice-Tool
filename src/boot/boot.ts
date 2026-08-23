@@ -11,6 +11,7 @@ import { initSidePanels } from "./sidePanels.js";
 import { initUndoRedo } from "./undoRedo.js";
 import { initGodMode } from "./godMode.js";
 import { initPerspectiveFlip } from "./perspectiveFlip.js";
+import { initSettingsDrawer } from "./settingsDrawer.js";
 
 // Module-load: globals + adapter before any DOMContentLoaded (onclick handlers / engine)
 initWindowGlobals();
@@ -26,6 +27,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initUndoRedo();
   initGodMode();
   initPerspectiveFlip();
+  initSettingsDrawer();
 });
 
 // Context menu listener sits between the two DOMContentLoaded registrations (original boot.ts order)

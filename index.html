@@ -25,55 +25,14 @@
 
     <!-- new modern theme overrides -->
     <link rel="stylesheet" href="./css/modern-theme.css" />
+    <!-- phase 3: settings drawer + fixed-viewport shell (revertible modules) -->
+    <link rel="stylesheet" href="./css/settings-drawer.css" />
+    <link rel="stylesheet" href="./css/quick-actions.css" />
+    <link rel="stylesheet" href="./css/phase3-layout.css" />
     <!-- tooltip presentation (after theme sheets) -->
     <link rel="stylesheet" href="./css/tooltip.css" />
     <style>
-      /* Lightweight drawer + hamburger (no extra CSS files needed) */
-      .hamburger-btn {
-        position: fixed;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 350;
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: linear-gradient(180deg, #1a1f27, #141821);
-        color: #e9edf1;
-        font-weight: 800;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-      }
-
-      .hamburger-btn span {
-        display: block;
-        width: 20px;
-        height: 2px;
-        background: #e9edf1;
-        position: relative;
-      }
-
-      .hamburger-btn span::before,
-      .hamburger-btn span::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        width: 20px;
-        height: 2px;
-        background: #e9edf1;
-      }
-
-      .hamburger-btn span::before {
-        top: -6px;
-      }
-
-      .hamburger-btn span::after {
-        top: 6px;
-      }
-
+      /* Drawer chrome (history + shared scrim) */
       .drawer {
         position: fixed;
         top: 0;
@@ -185,7 +144,7 @@
     </style>
   </head>
 
-  <body>
+  <body class="phase3-fixed-viewport">
     <!-- targeting confirm -->
     <div
       id="targetingConfirmation"
@@ -199,278 +158,349 @@
       "
     ></div>
 
-    <!-- sticky control bar -->
-    <header id="controlPanel">
-      <div id="deckSelection">
-        <div
-          class="toolbar-cluster toolbar-cluster--game"
-          data-toolbar-cluster="game"
-        >
-          <label for="blueDeckSelect">Blue Deck:</label>
-          <select id="blueDeckSelect">
-            <option value="starter_deck">starter_deck</option>
-          </select>
+    <!-- Settings hamburger (phase 3) — Ctrl+Shift+M -->
+    <button
+      id="settingsToggle"
+      type="button"
+      title="Settings (Ctrl+Shift+M)"
+      aria-label="Open settings"
+    >
+      <span></span>
+    </button>
 
-          <label for="redDeckSelect">Red Deck:</label>
-          <select id="redDeckSelect">
-            <option value="starter_deck">starter_deck</option>
-          </select>
+    <nav
+      id="quickActions"
+      class="quick-actions"
+      aria-label="Quick practice actions"
+    >
+      <button
+        type="button"
+        id="undoBtn"
+        class="quick-action-btn"
+        title="Undo (Ctrl+Z / Cmd+Z)"
+        aria-label="Undo"
+        disabled
+      >
+        <span class="quick-action-glyph" aria-hidden="true">↶</span>
+      </button>
+      <button
+        type="button"
+        id="redoBtn"
+        class="quick-action-btn"
+        title="Redo (Ctrl+Y / Ctrl+Shift+Z)"
+        aria-label="Redo"
+        disabled
+      >
+        <span class="quick-action-glyph" aria-hidden="true">↷</span>
+      </button>
+      <button
+        type="button"
+        id="setCheckpointBtn"
+        class="quick-action-btn"
+        title="Set checkpoint (F6)"
+        aria-label="Set checkpoint"
+      >
+        <span class="quick-action-glyph" aria-hidden="true">⏺</span>
+      </button>
+      <button
+        type="button"
+        id="restoreCheckpointBtn"
+        class="quick-action-btn"
+        title="Restore checkpoint exactly"
+        aria-label="Restore checkpoint"
+        disabled
+      >
+        <span class="quick-action-glyph" aria-hidden="true">↺</span>
+      </button>
+      <button
+        type="button"
+        id="rerollCheckpointBtn"
+        class="quick-action-btn"
+        title="Restore checkpoint with a new RNG branch (F8)"
+        aria-label="Reroll checkpoint"
+        disabled
+      >
+        <span class="quick-action-glyph" aria-hidden="true">⎋</span>
+      </button>
+    </nav>
 
-          <button
-            type="button"
-            id="importDeckBtn"
-            title="Paste a community decklist into the tool"
-          >
-            Import Deck
-          </button>
-          <button
-            type="button"
-            id="exportDecklistBtn"
-            title="Export the Blue deck as paste text (Nx Name)"
-          >
-            Export List
-          </button>
-          <input
-            id="deckImportFileInput"
-            type="file"
-            accept="application/json,.json,.svwb-deck.json,.txt,text/plain"
-            hidden
-          />
+    <div id="settingsScrim" class="scrim"></div>
 
-          <label for="seedInput">Seed:</label>
-          <input
-            id="seedInput"
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            placeholder="random if empty"
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <span id="gameSeedPanel" class="game-seed-panel" hidden>
-            <span class="game-seed-label"
-              >Game seed: <code id="gameSeedValue"></code
-            ></span>
-            <button type="button" id="copySeedBtn" title="Copy game seed">
-              Copy
-            </button>
-          </span>
+    <aside id="settingsDrawer" class="drawer" aria-hidden="true">
+      <div class="drawer-title">Settings</div>
+      <header id="controlPanel">
+        <div id="deckSelection">
+          <div class="settings-drawer-section">
+            <h3>Game</h3>
+            <div
+              class="toolbar-cluster toolbar-cluster--game"
+              data-toolbar-cluster="game"
+            >
+              <label for="blueDeckSelect">Blue Deck:</label>
+              <select id="blueDeckSelect">
+                <option value="starter_deck">starter_deck</option>
+              </select>
 
-          <button id="startGameBtn">Start Game</button>
-          <a
-            href="./consistency.html"
-            class="toolbar-link"
-            title="Draw-only consistency stats and mulligan drill"
-            >Consistency Trainer</a
-          >
-          <button id="undoBtn" title="Undo (Ctrl+Z / Cmd+Z)" disabled>
-            Undo
-          </button>
-          <button id="redoBtn" title="Redo (Ctrl+Y / Ctrl+Shift+Z)" disabled>
-            Redo
-          </button>
+              <label for="redDeckSelect">Red Deck:</label>
+              <select id="redDeckSelect">
+                <option value="starter_deck">starter_deck</option>
+              </select>
+
+              <button
+                type="button"
+                id="importDeckBtn"
+                title="Paste a community decklist into the tool"
+              >
+                Import Deck
+              </button>
+              <button
+                type="button"
+                id="exportDecklistBtn"
+                title="Export the Blue deck as paste text (Nx Name)"
+              >
+                Export List
+              </button>
+              <input
+                id="deckImportFileInput"
+                type="file"
+                accept="application/json,.json,.svwb-deck.json,.txt,text/plain"
+                hidden
+              />
+
+              <label for="seedInput">Seed:</label>
+              <input
+                id="seedInput"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                placeholder="random if empty"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <span id="gameSeedPanel" class="game-seed-panel" hidden>
+                <span class="game-seed-label"
+                  >Game seed: <code id="gameSeedValue"></code
+                ></span>
+                <button type="button" id="copySeedBtn" title="Copy game seed">
+                  Copy
+                </button>
+              </span>
+
+              <button id="startGameBtn">Start Game</button>
+              <a
+                href="./consistency.html"
+                class="toolbar-link"
+                title="Draw-only consistency stats and mulligan drill"
+                >Consistency Trainer</a
+              >
+            </div>
+          </div>
+          <div class="settings-drawer-section">
+            <h3>Practice &amp; Positions</h3>
+            <div
+              class="toolbar-cluster toolbar-cluster--practice"
+              data-toolbar-cluster="practice"
+            >
+              <button
+                id="savePositionBtn"
+                title="Save current board as a named position"
+              >
+                Save Pos
+              </button>
+              <select
+                id="positionSelect"
+                title="Saved positions (session memory — export to keep)"
+                disabled
+              >
+                <option value="">(no saved positions)</option>
+              </select>
+              <button
+                id="loadPositionBtn"
+                title="Load selected position"
+                disabled
+              >
+                Load
+              </button>
+              <button
+                id="renamePositionBtn"
+                title="Rename selected position"
+                disabled
+              >
+                Rename
+              </button>
+              <button
+                id="deletePositionBtn"
+                title="Delete selected position"
+                disabled
+              >
+                Del
+              </button>
+              <button
+                id="exportPositionBtn"
+                title="Export selected position as JSON file"
+                disabled
+              >
+                Export
+              </button>
+              <button id="importPositionBtn" title="Import position JSON file">
+                Import
+              </button>
+              <input
+                id="importPositionInput"
+                type="file"
+                accept="application/json,.json,.svwb-position.json"
+                hidden
+              />
+              <span
+                id="checkpointStatus"
+                class="checkpoint-status"
+                title="Checkpoint / reroll depth"
+                >Checkpoint: none</span
+              >
+              <label
+                for="activeOnBottomToggle"
+                class="toolbar-check-label"
+                title="When on, the active player's side moves to the bottom of the board"
+              >
+                <input type="checkbox" id="activeOnBottomToggle" />
+                Active on bottom
+              </label>
+            </div>
+          </div>
+          <div class="settings-drawer-section">
+            <h3>Line</h3>
+            <div
+              class="toolbar-cluster toolbar-cluster--line"
+              data-toolbar-cluster="line"
+            >
+              <button
+                id="scriptRecordBtn"
+                title="Record a sparring line for one side (hot-seat → fixture)"
+              >
+                Rec Line
+              </button>
+              <button
+                id="scriptStopRecordBtn"
+                title="Stop recording the sparring line"
+              >
+                Stop Rec
+              </button>
+              <select id="scriptSideSelect" title="Which side the line drives">
+                <option value="second">Line: Red</option>
+                <option value="first">Line: Blue</option>
+              </select>
+              <button id="scriptExportBtn" title="Export sparring line JSON">
+                Export Line
+              </button>
+              <button id="scriptImportBtn" title="Import sparring line JSON">
+                Import Line
+              </button>
+              <input
+                id="scriptImportInput"
+                type="file"
+                accept="application/json,.json,.svwb-line.json"
+                hidden
+              />
+              <button id="scriptClearBtn" title="Clear loaded/recording line">
+                Clear Line
+              </button>
+              <label
+                for="scriptHiddenHandToggle"
+                class="toolbar-check-label toolbar-check-label--compact"
+                title="Render the scripted side's hand face-down (count stays public)"
+              >
+                <input type="checkbox" id="scriptHiddenHandToggle" />
+                Hide line hand
+              </label>
+              <span
+                id="scriptStatus"
+                class="checkpoint-status"
+                title="Sparring line status"
+                >Line: none</span
+              >
+            </div>
+          </div>
+          <div class="settings-drawer-section">
+            <h3>Puzzle</h3>
+            <div
+              class="toolbar-cluster toolbar-cluster--puzzle"
+              data-toolbar-cluster="puzzle"
+            >
+              <button
+                id="savePuzzleBtn"
+                title="Save current position as a puzzle (goal + turn limit)"
+              >
+                Save Puzzle
+              </button>
+              <select
+                id="puzzleSolverSelect"
+                title="Which side solves the puzzle"
+              >
+                <option value="first">Solver: Blue</option>
+                <option value="second">Solver: Red</option>
+              </select>
+              <select
+                id="puzzleSelect"
+                title="Saved puzzles (session memory — export to keep)"
+                disabled
+              >
+                <option value="">(no puzzles)</option>
+              </select>
+              <button
+                id="loadPuzzleBtn"
+                title="Load and attempt selected puzzle"
+                disabled
+              >
+                Play
+              </button>
+              <button
+                id="retryPuzzleBtn"
+                title="Retry puzzle from the exact starting position"
+                disabled
+              >
+                Retry
+              </button>
+              <button
+                id="deletePuzzleBtn"
+                title="Delete selected puzzle"
+                disabled
+              >
+                Del Puzzle
+              </button>
+              <button
+                id="exportPuzzleBtn"
+                title="Export selected puzzle as JSON"
+                disabled
+              >
+                Export Puzzle
+              </button>
+              <button id="importPuzzleBtn" title="Import puzzle JSON file">
+                Import Puzzle
+              </button>
+              <input
+                id="importPuzzleInput"
+                type="file"
+                accept="application/json,.json,.svwb-puzzle.json"
+                hidden
+              />
+              <span
+                id="puzzleStatus"
+                class="checkpoint-status"
+                title="Active puzzle status"
+                >Puzzle: none</span
+              >
+            </div>
+          </div>
         </div>
-        <div
-          class="toolbar-cluster toolbar-cluster--practice"
-          data-toolbar-cluster="practice"
-        >
-          <button
-            id="savePositionBtn"
-            title="Save current board as a named position"
-          >
-            Save Pos
-          </button>
-          <select
-            id="positionSelect"
-            title="Saved positions (session memory — export to keep)"
-            disabled
-          >
-            <option value="">(no saved positions)</option>
-          </select>
-          <button id="loadPositionBtn" title="Load selected position" disabled>
-            Load
-          </button>
-          <button
-            id="renamePositionBtn"
-            title="Rename selected position"
-            disabled
-          >
-            Rename
-          </button>
-          <button
-            id="deletePositionBtn"
-            title="Delete selected position"
-            disabled
-          >
-            Del
-          </button>
-          <button
-            id="exportPositionBtn"
-            title="Export selected position as JSON file"
-            disabled
-          >
-            Export
-          </button>
-          <button id="importPositionBtn" title="Import position JSON file">
-            Import
-          </button>
-          <input
-            id="importPositionInput"
-            type="file"
-            accept="application/json,.json,.svwb-position.json"
-            hidden
-          />
-          <button id="setCheckpointBtn" title="Set checkpoint (F6)">
-            Checkpoint
-          </button>
-          <button
-            id="restoreCheckpointBtn"
-            title="Restore checkpoint exactly"
-            disabled
-          >
-            Restore CP
-          </button>
-          <button
-            id="rerollCheckpointBtn"
-            title="Restore checkpoint with a new RNG branch (F8)"
-            disabled
-          >
-            Reroll
-          </button>
-          <span
-            id="checkpointStatus"
-            class="checkpoint-status"
-            title="Checkpoint / reroll depth"
-            >Checkpoint: none</span
-          >
-          <label
-            for="activeOnBottomToggle"
-            class="toolbar-check-label"
-            title="When on, the active player's side moves to the bottom of the board"
-          >
-            <input type="checkbox" id="activeOnBottomToggle" />
-            Active on bottom
-          </label>
-        </div>
-        <div
-          class="toolbar-cluster toolbar-cluster--line"
-          data-toolbar-cluster="line"
-        >
-          <button
-            id="scriptRecordBtn"
-            title="Record a sparring line for one side (hot-seat → fixture)"
-          >
-            Rec Line
-          </button>
-          <button
-            id="scriptStopRecordBtn"
-            title="Stop recording the sparring line"
-          >
-            Stop Rec
-          </button>
-          <select id="scriptSideSelect" title="Which side the line drives">
-            <option value="second">Line: Red</option>
-            <option value="first">Line: Blue</option>
-          </select>
-          <button id="scriptExportBtn" title="Export sparring line JSON">
-            Export Line
-          </button>
-          <button id="scriptImportBtn" title="Import sparring line JSON">
-            Import Line
-          </button>
-          <input
-            id="scriptImportInput"
-            type="file"
-            accept="application/json,.json,.svwb-line.json"
-            hidden
-          />
-          <button id="scriptClearBtn" title="Clear loaded/recording line">
-            Clear Line
-          </button>
-          <label
-            for="scriptHiddenHandToggle"
-            class="toolbar-check-label toolbar-check-label--compact"
-            title="Render the scripted side's hand face-down (count stays public)"
-          >
-            <input type="checkbox" id="scriptHiddenHandToggle" />
-            Hide line hand
-          </label>
-          <span
-            id="scriptStatus"
-            class="checkpoint-status"
-            title="Sparring line status"
-            >Line: none</span
-          >
-        </div>
-        <div
-          class="toolbar-cluster toolbar-cluster--puzzle"
-          data-toolbar-cluster="puzzle"
-        >
-          <button
-            id="savePuzzleBtn"
-            title="Save current position as a puzzle (goal + turn limit)"
-          >
-            Save Puzzle
-          </button>
-          <select id="puzzleSolverSelect" title="Which side solves the puzzle">
-            <option value="first">Solver: Blue</option>
-            <option value="second">Solver: Red</option>
-          </select>
-          <select
-            id="puzzleSelect"
-            title="Saved puzzles (session memory — export to keep)"
-            disabled
-          >
-            <option value="">(no puzzles)</option>
-          </select>
-          <button
-            id="loadPuzzleBtn"
-            title="Load and attempt selected puzzle"
-            disabled
-          >
-            Play
-          </button>
-          <button
-            id="retryPuzzleBtn"
-            title="Retry puzzle from the exact starting position"
-            disabled
-          >
-            Retry
-          </button>
-          <button id="deletePuzzleBtn" title="Delete selected puzzle" disabled>
-            Del Puzzle
-          </button>
-          <button
-            id="exportPuzzleBtn"
-            title="Export selected puzzle as JSON"
-            disabled
-          >
-            Export Puzzle
-          </button>
-          <button id="importPuzzleBtn" title="Import puzzle JSON file">
-            Import Puzzle
-          </button>
-          <input
-            id="importPuzzleInput"
-            type="file"
-            accept="application/json,.json,.svwb-puzzle.json"
-            hidden
-          />
-          <span
-            id="puzzleStatus"
-            class="checkpoint-status"
-            title="Active puzzle status"
-            >Puzzle: none</span
-          >
-        </div>
-      </div>
-    </header>
+      </header>
+    </aside>
+
     <div
       id="scriptDivergeBanner"
       style="
         display: none;
-        position: sticky;
-        top: 52px;
+        position: fixed;
+        top: 56px;
         z-index: 200;
         background: #5c1f1f;
         color: #ffe8e8;
@@ -480,13 +510,37 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       "
     ></div>
-    <!-- Hamburger to open history drawer -->
+    <!-- History battle-log toggle (left edge) -->
     <button
       id="historyToggle"
-      class="hamburger-btn"
-      title="History (cards played & graveyards)"
+      class="battle-log-btn"
+      type="button"
+      title="Battle log — cards played & graveyards"
+      aria-label="Open battle log"
     >
-      <span></span>
+      <svg
+        class="battle-log-glyph"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <rect
+          x="5"
+          y="3"
+          width="14"
+          height="18"
+          rx="2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+        <path
+          d="M8 8h8M8 12h8M8 16h5"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
     </button>
     <div id="historyScrim" class="scrim"></div>
 
@@ -514,250 +568,271 @@
       </section>
     </aside>
 
-    <main id="appRoot">
-      <!-- Red side -->
-      <section class="side side-red">
-        <div id="redHand" class="zone hand-zone"></div>
-        <button
-          id="redMulliganConfirm"
-          class="play-area-btn mulligan-confirm-btn mulligan-confirm-btn--red"
-          style="display: none; margin: 8px 0 16px 0"
-        >
-          Confirm Mulligan (Red)
+    <div id="gameShell">
+      <main id="appRoot">
+        <!-- Red side -->
+        <section class="side side-red">
+          <div id="redHand" class="zone hand-zone"></div>
+          <button
+            id="redMulliganConfirm"
+            class="play-area-btn mulligan-confirm-btn mulligan-confirm-btn--red"
+            style="display: none; margin: 8px 0 16px 0"
+          >
+            Confirm Mulligan (Red)
+          </button>
+
+          <div class="floating-stats" id="redStatsContainer">
+            <div id="redStats">
+              <span>🃏 <span id="redHandCount">0</span></span>
+              <span>📦 <span id="redDeckCount">0</span></span>
+              <span>💀 <span id="redGraveCount">0</span></span>
+              <span>☠️ <span id="redShadows">0</span></span>
+            </div>
+            <div id="redCrests" class="crest-container">
+              <div class="crest-row">
+                <div class="crest-slot"></div>
+                <div class="crest-slot"></div>
+                <div class="crest-slot"></div>
+              </div>
+              <div class="crest-row">
+                <div class="crest-slot"></div>
+                <div class="crest-slot"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="leader-container">
+            <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
+            <div class="leader red-leader" id="redLeader">
+              <span id="redHP" class="hp-value">20</span>
+            </div>
+            <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
+          </div>
+
+          <div id="redBoard" class="zone board-zone"></div>
+        </section>
+
+        <!-- Blue side -->
+        <section class="side side-blue">
+          <div id="blueBoard" class="zone board-zone"></div>
+
+          <div class="leader-container">
+            <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
+            <div class="leader blue-leader" id="blueLeader">
+              <span id="blueHP" class="hp-value">20</span>
+            </div>
+            <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
+          </div>
+
+          <div class="floating-stats" id="blueStatsContainer">
+            <div id="blueCrests" class="crest-container">
+              <div class="crest-row">
+                <div class="crest-slot"></div>
+                <div class="crest-slot"></div>
+              </div>
+              <div class="crest-row">
+                <div class="crest-slot"></div>
+                <div class="crest-slot"></div>
+                <div class="crest-slot"></div>
+              </div>
+            </div>
+            <div id="blueStats">
+              <span>🃏 <span id="blueHandCount">0</span></span>
+              <span>📦 <span id="blueDeckCount">0</span></span>
+              <span>💀 <span id="blueGraveCount">0</span></span>
+              <span>☠️ <span id="blueShadows">0</span></span>
+            </div>
+          </div>
+
+          <div id="blueHand" class="zone hand-zone"></div>
+          <button
+            id="blueMulliganConfirm"
+            class="play-area-btn mulligan-confirm-btn mulligan-confirm-btn--blue"
+            style="display: none; margin: 8px 0 16px 0"
+          >
+            Confirm Mulligan (Blue)
+          </button>
+        </section>
+      </main>
+
+      <!-- Turn controls (unchanged IDs/handlers) -->
+      <aside id="turnControls">
+        <div class="red-pp-wrapper">
+          <div
+            id="boostPips"
+            class="boost-pips"
+            aria-label="Second player Bonus PP charges"
+          >
+            <span
+              id="boostPipEarly"
+              class="boost-pip"
+              data-tier="early"
+              title="Early Bonus PP (rounds 1–5)"
+              >1–5</span
+            >
+            <span
+              id="boostPipLate"
+              class="boost-pip"
+              data-tier="late"
+              title="Late Bonus PP (round 6+)"
+              >6+</span
+            >
+          </div>
+          <button id="redBoost" onclick="useRedBoost()">+1 PP Boost</button>
+          <div class="pp-floating" id="redPPBox">
+            PP: <span id="redPP">1</span>
+          </div>
+        </div>
+        <button id="endTurnRed" onclick="endTurnRed()" style="display: none">
+          End Turn (Red)
         </button>
-
-        <div class="floating-stats" id="redStatsContainer">
-          <div id="redStats">
-            <span>🃏 <span id="redHandCount">0</span></span>
-            <span>📦 <span id="redDeckCount">0</span></span>
-            <span>💀 <span id="redGraveCount">0</span></span>
-            <span>☠️ <span id="redShadows">0</span></span>
-          </div>
-          <div id="redCrests" class="crest-container">
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="leader-container">
-          <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
-          <div class="leader red-leader" id="redLeader">
-            <span id="redHP" class="hp-value">20</span>
-          </div>
-          <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
-        </div>
-
-        <div id="redBoard" class="zone board-zone"></div>
-      </section>
-
-      <!-- Blue side -->
-      <section class="side side-blue">
-        <div id="blueBoard" class="zone board-zone"></div>
-
-        <div class="leader-container">
-          <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
-          <div class="leader blue-leader" id="blueLeader">
-            <span id="blueHP" class="hp-value">20</span>
-          </div>
-          <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
-        </div>
-
-        <div class="floating-stats" id="blueStatsContainer">
-          <div id="blueCrests" class="crest-container">
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-            <div class="crest-row">
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-              <div class="crest-slot"></div>
-            </div>
-          </div>
-          <div id="blueStats">
-            <span>🃏 <span id="blueHandCount">0</span></span>
-            <span>📦 <span id="blueDeckCount">0</span></span>
-            <span>💀 <span id="blueGraveCount">0</span></span>
-            <span>☠️ <span id="blueShadows">0</span></span>
-          </div>
-        </div>
-
-        <div id="blueHand" class="zone hand-zone"></div>
-        <button
-          id="blueMulliganConfirm"
-          class="play-area-btn mulligan-confirm-btn mulligan-confirm-btn--blue"
-          style="display: none; margin: 8px 0 16px 0"
-        >
-          Confirm Mulligan (Blue)
+        <button id="endTurnBlue" onclick="endTurnBlue()" style="display: none">
+          End Turn (Blue)
         </button>
-      </section>
-    </main>
+        <div class="pp-floating" id="bluePPBox">
+          PP: <span id="bluePP">1</span>
+        </div>
 
-    <!-- Turn controls (unchanged IDs/handlers) -->
-    <aside id="turnControls">
-      <div class="red-pp-wrapper">
+        <!-- God Mode Controls (Hidden by default) -->
         <div
-          id="boostPips"
-          class="boost-pips"
-          aria-label="Second player Bonus PP charges"
-        >
-          <span
-            id="boostPipEarly"
-            class="boost-pip"
-            data-tier="early"
-            title="Early Bonus PP (rounds 1–5)"
-            >1–5</span
-          >
-          <span
-            id="boostPipLate"
-            class="boost-pip"
-            data-tier="late"
-            title="Late Bonus PP (round 6+)"
-            >6+</span
-          >
-        </div>
-        <button id="redBoost" onclick="useRedBoost()">+1 PP Boost</button>
-        <div class="pp-floating" id="redPPBox">
-          PP: <span id="redPP">1</span>
-        </div>
-      </div>
-      <button id="endTurnRed" onclick="endTurnRed()" style="display: none">
-        End Turn (Red)
-      </button>
-      <button id="endTurnBlue" onclick="endTurnBlue()" style="display: none">
-        End Turn (Blue)
-      </button>
-      <div class="pp-floating" id="bluePPBox">
-        PP: <span id="bluePP">1</span>
-      </div>
-
-      <!-- God Mode Controls (Hidden by default) -->
-      <div
-        id="blueGodMode"
-        style="
-          display: none;
-          margin-top: 10px;
-          background: rgba(0, 0, 0, 0.5);
-          padding: 8px;
-          border-radius: 6px;
-          border: 1px solid rgba(136, 68, 68, 0.4);
-        "
-      >
-        <div
+          id="blueGodMode"
           style="
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #aaa;
-            margin-bottom: 6px;
-            text-align: center;
+            display: none;
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(136, 68, 68, 0.4);
           "
         >
-          GOD MODE
-        </div>
-        <div
-          class="god-target-label"
-          style="
-            font-size: 0.7rem;
-            color: #ccc;
-            margin-bottom: 6px;
-            text-align: center;
-          "
-        >
-          Target: Blue (1st)
-        </div>
-        <div
-          style="
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            justify-content: center;
-          "
-        >
-          <button id="godMinus" class="mini-btn" style="width: 30px">-</button>
-          <button id="godPlus" class="mini-btn" style="width: 30px">+</button>
-          <button id="godRefill" class="mini-btn" style="flex: 1">
-            Refill PP
-          </button>
-        </div>
-        <div
-          style="
-            margin-top: 6px;
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            justify-content: center;
-          "
-        >
-          <button id="godEPMinus" class="mini-btn" style="width: 30px">
-            -
-          </button>
-          <button id="godEPPlus" class="mini-btn" style="width: 30px">+</button>
-          <button id="godEPRefill" class="mini-btn" style="flex: 1">
-            Refill EP
-          </button>
-        </div>
-        <div style="margin-top: 6px; display: flex; gap: 4px">
-          <button id="godSetMax" class="mini-btn" style="flex: 1">
-            Set Max
-          </button>
-        </div>
-        <div
-          style="margin-top: 6px; display: flex; gap: 4px; align-items: center"
-        >
-          <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-            >Evolves:</span
+          <div
+            style="
+              font-size: 0.8rem;
+              font-weight: bold;
+              color: #aaa;
+              margin-bottom: 6px;
+              text-align: center;
+            "
           >
-          <input
-            id="godEvoCountVal"
-            type="number"
-            style="width: 40px; padding: 2px"
-            value="0"
-          />
-          <button id="godSetEvoCount" class="mini-btn" style="flex: 1">
-            Set
-          </button>
-        </div>
-        <div
-          style="margin-top: 6px; display: flex; gap: 4px; align-items: center"
-        >
-          <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-            >Combo:</span
+            GOD MODE
+          </div>
+          <div
+            class="god-target-label"
+            style="
+              font-size: 0.7rem;
+              color: #ccc;
+              margin-bottom: 6px;
+              text-align: center;
+            "
           >
-          <input
-            id="godComboCountVal"
-            type="number"
-            style="width: 40px; padding: 2px"
-            value="0"
-          />
-          <button id="godSetComboCount" class="mini-btn" style="flex: 1">
-            Set
-          </button>
-        </div>
-        <div
-          style="margin-top: 6px; display: flex; gap: 4px; align-items: center"
-        >
-          <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-            >Shadows:</span
+            Target: Blue (1st)
+          </div>
+          <div
+            style="
+              display: flex;
+              gap: 4px;
+              flex-wrap: wrap;
+              justify-content: center;
+            "
           >
-          <input
-            id="godShadowsVal"
-            type="number"
-            style="width: 40px; padding: 2px"
-            value="0"
-          />
-          <button id="godSetShadows" class="mini-btn" style="flex: 1">
-            Set
-          </button>
+            <button id="godMinus" class="mini-btn" style="width: 30px">
+              -
+            </button>
+            <button id="godPlus" class="mini-btn" style="width: 30px">+</button>
+            <button id="godRefill" class="mini-btn" style="flex: 1">
+              Refill PP
+            </button>
+          </div>
+          <div
+            style="
+              margin-top: 6px;
+              display: flex;
+              gap: 4px;
+              flex-wrap: wrap;
+              justify-content: center;
+            "
+          >
+            <button id="godEPMinus" class="mini-btn" style="width: 30px">
+              -
+            </button>
+            <button id="godEPPlus" class="mini-btn" style="width: 30px">
+              +
+            </button>
+            <button id="godEPRefill" class="mini-btn" style="flex: 1">
+              Refill EP
+            </button>
+          </div>
+          <div style="margin-top: 6px; display: flex; gap: 4px">
+            <button id="godSetMax" class="mini-btn" style="flex: 1">
+              Set Max
+            </button>
+          </div>
+          <div
+            style="
+              margin-top: 6px;
+              display: flex;
+              gap: 4px;
+              align-items: center;
+            "
+          >
+            <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
+              >Evolves:</span
+            >
+            <input
+              id="godEvoCountVal"
+              type="number"
+              style="width: 40px; padding: 2px"
+              value="0"
+            />
+            <button id="godSetEvoCount" class="mini-btn" style="flex: 1">
+              Set
+            </button>
+          </div>
+          <div
+            style="
+              margin-top: 6px;
+              display: flex;
+              gap: 4px;
+              align-items: center;
+            "
+          >
+            <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
+              >Combo:</span
+            >
+            <input
+              id="godComboCountVal"
+              type="number"
+              style="width: 40px; padding: 2px"
+              value="0"
+            />
+            <button id="godSetComboCount" class="mini-btn" style="flex: 1">
+              Set
+            </button>
+          </div>
+          <div
+            style="
+              margin-top: 6px;
+              display: flex;
+              gap: 4px;
+              align-items: center;
+            "
+          >
+            <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
+              >Shadows:</span
+            >
+            <input
+              id="godShadowsVal"
+              type="number"
+              style="width: 40px; padding: 2px"
+              value="0"
+            />
+            <button id="godSetShadows" class="mini-btn" style="flex: 1">
+              Set
+            </button>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </div>
 
     <!-- burn preview -->
     <div
@@ -816,6 +891,7 @@
       const scrim = document.getElementById("historyScrim");
 
       function openDrawer() {
+        if (window.__svwbCloseSettings) window.__svwbCloseSettings();
         drawer.classList.add("open");
         drawer.setAttribute("aria-hidden", "false");
         scrim.classList.add("show");

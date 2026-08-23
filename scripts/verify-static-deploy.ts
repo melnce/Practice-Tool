@@ -3,6 +3,10 @@
  * Usage: APP_URL=http://127.0.0.1:8877/ npx tsx scripts/verify-static-deploy.ts
  */
 import { chromium, type Page } from "@playwright/test";
+import {
+  closeSettingsDrawer,
+  openSettingsDrawer,
+} from "./settings-drawer-helpers.mjs";
 import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
@@ -135,10 +139,12 @@ async function main() {
   const options = await page.locator("#blueDeckSelect option").count();
   log(`- blueDeckSelect options: ${options}`);
 
+  await openSettingsDrawer(page);
   await page.selectOption("#blueDeckSelect", "forestcraft_combo");
   await page.selectOption("#redDeckSelect", "swordcraft_rally");
   await page.fill("#seedInput", "424242");
   await page.click("#startGameBtn");
+  await closeSettingsDrawer(page);
 
   await page.waitForFunction(
     () => {

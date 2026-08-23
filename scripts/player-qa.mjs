@@ -5,6 +5,11 @@
 import { chromium } from "@playwright/test";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  closeSettingsDrawer,
+  openSettingsDrawer,
+  withSettingsDrawer,
+} from "./settings-drawer-helpers.mjs";
 
 const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
 const REPORT_DIR = path.resolve("reports");
@@ -85,6 +90,7 @@ function installDialogHandler(page) {
 }
 
 async function shot(page, name) {
+  await closeSettingsDrawer(page);
   const p = path.join(REPORT_DIR, "player-qa-shots", `${name}.png`);
   await page.screenshot({ path: p, fullPage: true }).catch(() => {});
   return p;
@@ -514,10 +520,12 @@ async function autoplayGame(
 }
 
 async function startGame(page, { blue, red, seed }) {
-  await page.selectOption("#blueDeckSelect", blue);
-  await page.selectOption("#redDeckSelect", red);
-  await page.locator("#seedInput").fill(String(seed));
-  await page.locator("#startGameBtn").click();
+  await withSettingsDrawer(page, async () => {
+    await page.selectOption("#blueDeckSelect", blue);
+    await page.selectOption("#redDeckSelect", red);
+    await page.locator("#seedInput").fill(String(seed));
+    await page.locator("#startGameBtn").click();
+  });
   await waitState(
     page,
     () =>
@@ -528,24 +536,26 @@ async function startGame(page, { blue, red, seed }) {
 }
 
 async function importDeck(page, { name, className, list }) {
-  await page.locator("#importDeckBtn").click();
-  await page.waitForSelector("#deckImportPanel:not([hidden])");
-  await page.locator("#deckImportName").fill(name);
-  if (className) await page.selectOption("#deckImportClass", className);
-  await page.locator("#deckImportText").fill(list);
-  await page.locator("#deckImportValidateBtn").click();
-  await page.waitForTimeout(500);
-  const status = await page.locator("#deckImportStatus").innerText();
-  await page.locator("#deckImportSaveBtn").click();
-  await page.waitForTimeout(500);
-  // Ensure panel closed
-  if (await page.locator("#deckImportPanel:not([hidden])").count()) {
-    await page
-      .locator("#deckImportCloseBtn")
-      .click()
-      .catch(() => {});
-  }
-  return status;
+  return await withSettingsDrawer(page, async () => {
+    await page.locator("#importDeckBtn").click();
+    await page.waitForSelector("#deckImportPanel:not([hidden])");
+    await page.locator("#deckImportName").fill(name);
+    if (className) await page.selectOption("#deckImportClass", className);
+    await page.locator("#deckImportText").fill(list);
+    await page.locator("#deckImportValidateBtn").click();
+    await page.waitForTimeout(500);
+    const status = await page.locator("#deckImportStatus").innerText();
+    await page.locator("#deckImportSaveBtn").click();
+    await page.waitForTimeout(500);
+    // Ensure panel closed
+    if (await page.locator("#deckImportPanel:not([hidden])").count()) {
+      await page
+        .locator("#deckImportCloseBtn")
+        .click()
+        .catch(() => {});
+    }
+    return status;
+  });
 }
 
 async function checkImages(page) {
@@ -1058,7 +1068,9 @@ async function main() {
     const handBefore = beforeCp.first.hand.map((c) => c.uid);
     await page.locator("#setCheckpointBtn").click();
     await page.waitForTimeout(150);
-    const cpStatus = await page.locator("#checkpointStatus").innerText();
+    const cpStatus = await page.evaluate(
+      () => document.getElementById("checkpointStatus")?.innerText ?? "",
+    );
 
     await autoplayGame(page, { maxActions: 6, flags: {} });
     await page.keyboard.press("F8");
@@ -1068,18 +1080,22 @@ async function main() {
     const handUnchanged =
       JSON.stringify(handAfterReroll) === JSON.stringify(handBefore);
 
-    await page.locator("#savePositionBtn").click();
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#savePositionBtn").click();
+    });
     await page.waitForTimeout(300);
     await autoplayGame(page, { maxActions: 4, flags: {} });
     const beforeLoad = await getState(page);
-    const posVal = await page
-      .locator("#positionSelect option")
-      .evaluateAll((os) => {
-        const hit = os.find((o) => /qa-pos/i.test(o.textContent || ""));
-        return hit?.value || os[1]?.value || "";
-      });
-    if (posVal) await page.selectOption("#positionSelect", posVal);
-    await page.locator("#loadPositionBtn").click();
+    await withSettingsDrawer(page, async () => {
+      const posVal = await page
+        .locator("#positionSelect option")
+        .evaluateAll((os) => {
+          const hit = os.find((o) => /qa-pos/i.test(o.textContent || ""));
+          return hit?.value || os[1]?.value || "";
+        });
+      if (posVal) await page.selectOption("#positionSelect", posVal);
+      await page.locator("#loadPositionBtn").click();
+    });
     await page.waitForTimeout(250);
     const afterLoad = await getState(page);
 
@@ -1107,14 +1123,14 @@ async function main() {
       () => !document.getElementById("undoBtn")?.disabled,
     );
     if (undoEnabled) {
-      await page.locator("#undoBtn").click({ force: true });
+      await page.locator("#undoBtn").click();
       await page.waitForTimeout(80);
-      await page.locator("#undoBtn").click({ force: true });
+      await page.locator("#undoBtn").click();
       await page.waitForTimeout(80);
       if (
         await page.evaluate(() => !document.getElementById("undoBtn")?.disabled)
       ) {
-        await page.locator("#undoBtn").click({ force: true });
+        await page.locator("#undoBtn").click();
         await page.waitForTimeout(80);
       }
     }
@@ -1131,8 +1147,12 @@ async function main() {
       .locator("#gameSeedValue")
       .innerText()
       .catch(() => "");
-    const seedInputVal = await page.locator("#seedInput").inputValue();
-    await page.locator("#copySeedBtn").click();
+    const seedInputVal = await withSettingsDrawer(page, async () =>
+      page.locator("#seedInput").inputValue(),
+    );
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#copySeedBtn").click();
+    });
     await page.waitForTimeout(150);
     const copied = await page.evaluate(async () => {
       try {
@@ -1149,14 +1169,20 @@ async function main() {
         waitUntil: "networkidle",
       },
     );
-    await page.waitForSelector("#seedInput");
+    await page.waitForSelector("#seedInput", { state: "attached" });
     await page.waitForTimeout(400);
-    const seedFromUrl = await page.locator("#seedInput").inputValue();
-    const deckFromUrl = await page.evaluate(() => ({
-      blue: document.getElementById("blueDeckSelect")?.value,
-      red: document.getElementById("redDeckSelect")?.value,
-    }));
-    await page.locator("#startGameBtn").click();
+    const seedFromUrl = await withSettingsDrawer(page, async () =>
+      page.locator("#seedInput").inputValue(),
+    );
+    const deckFromUrl = await withSettingsDrawer(page, async () =>
+      page.evaluate(() => ({
+        blue: document.getElementById("blueDeckSelect")?.value,
+        red: document.getElementById("redDeckSelect")?.value,
+      })),
+    );
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#startGameBtn").click();
+    });
     await waitState(
       page,
       () =>
@@ -1240,16 +1266,24 @@ async function main() {
       t.render();
     });
     const puzzlePos = await getState(page);
-    await page.locator("#savePuzzleBtn").click();
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#savePuzzleBtn").click();
+    });
     await page.waitForTimeout(400);
-    await page.locator("#loadPuzzleBtn").click();
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#loadPuzzleBtn").click();
+    });
     await page.waitForTimeout(300);
 
     await endTurn(page);
     await page.waitForTimeout(300);
-    const failStatus = await page.locator("#puzzleStatus").innerText();
+    const failStatus = await page.evaluate(
+      () => document.getElementById("puzzleStatus")?.innerText ?? "",
+    );
 
-    await page.locator("#retryPuzzleBtn").click();
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#retryPuzzleBtn").click();
+    });
     await page.waitForTimeout(400);
     const retryState = await getState(page);
     const retryRestored =
@@ -1311,13 +1345,19 @@ async function main() {
       seed: 8001,
     });
     await confirmMulligans(page);
-    await page.selectOption("#scriptSideSelect", "second");
-    await page.locator("#scriptRecordBtn").click();
+    await withSettingsDrawer(page, async () => {
+      await page.selectOption("#scriptSideSelect", "second");
+      await page.locator("#scriptRecordBtn").click();
+    });
     await page.waitForTimeout(200);
     await autoplayGame(page, { maxActions: 10, flags: {} });
-    await page.locator("#scriptStopRecordBtn").click();
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#scriptStopRecordBtn").click();
+    });
     await page.waitForTimeout(200);
-    const scriptStatus = await page.locator("#scriptStatus").innerText();
+    const scriptStatus = await page.evaluate(
+      () => document.getElementById("scriptStatus")?.innerText ?? "",
+    );
 
     const loaded = await page.evaluate(async () => {
       const mod = await import("/src/logic/script/runtime.ts");
@@ -1327,9 +1367,11 @@ async function main() {
       return { ok: true, steps: doc.steps.length, side: doc.scriptedSide };
     });
 
-    await page.locator("#scriptHiddenHandToggle").check();
-    await page.locator("#seedInput").fill("8001");
-    await page.locator("#startGameBtn").click();
+    await withSettingsDrawer(page, async () => {
+      await page.locator("#scriptHiddenHandToggle").check();
+      await page.locator("#seedInput").fill("8001");
+      await page.locator("#startGameBtn").click();
+    });
     await waitState(
       page,
       () =>
@@ -1432,7 +1474,9 @@ async function main() {
         redTop: document.getElementById("redHand")?.getBoundingClientRect().top,
         bodyClass: document.body.className,
       }));
-      await toggle.check();
+      await withSettingsDrawer(page, async () => {
+        await toggle.check();
+      });
       await page.waitForTimeout(200);
       await endTurn(page); // second becomes active → layout should flip
       await page.waitForTimeout(300);
