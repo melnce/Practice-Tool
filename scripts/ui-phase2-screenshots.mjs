@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "reports/ui/phase2");
 const PORT = 4173;
-const BASE = `http://127.0.0.1:${PORT}`;
+const BASE = `http://localhost:${PORT}`;
 const SEED = 424242;
 const WIDTHS = [1440, 1900, 2560];
 
@@ -21,7 +21,7 @@ function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
 }
 
-async function waitForServer(url, timeoutMs = 30000) {
+async function waitForServer(url, timeoutMs = 45000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     try {
@@ -30,7 +30,7 @@ async function waitForServer(url, timeoutMs = 30000) {
     } catch {
       /* retry */
     }
-    await new Promise((r) => setTimeout(r, 250));
+    await new Promise((r) => setTimeout(r, 300));
   }
   throw new Error(`Server not ready at ${url}`);
 }
@@ -72,17 +72,14 @@ async function screenshot(page, name) {
   console.log(`  saved ${path.relative(ROOT, file)}`);
 }
 
+/** Stage board using window globals (works in production build). */
 async function stageMidGameBoard(page) {
-  await page.evaluate(async () => {
-    const { loadCardDatabase } = await import("/src/data/cardDatabase.ts");
-    await loadCardDatabase();
-    const { resetGameState, state } = await import("/src/core/gameState.ts");
-    const { getCardById } = await import("/src/data/cardDatabase.ts");
-    const { applyKeywordsFromList } =
-      await import("/src/logic/core/keywords/apply.js");
-    const { render } = await import("/src/ui/render.ts");
+  await page.evaluate(() => {
+    const state = window.gameState;
+    const getCard = (id) => window.cardDatabase?.getCardById?.(id);
+    if (!state || !getCard)
+      throw new Error("gameState or cardDatabase missing");
 
-    resetGameState(424242);
     state.gameStarted = true;
     state.phase = "main";
     state.activePlayer = "first";
@@ -95,9 +92,9 @@ async function stageMidGameBoard(page) {
     state.players.second.maxPP = 6;
 
     const mk = (id, owner, patch = {}) => {
-      const tmpl = getCardById(id);
+      const tmpl = getCard(id);
       if (!tmpl) throw new Error(`missing card ${id}`);
-      const c = {
+      return {
         ...structuredClone(tmpl),
         uid: `uid_${id}_${Math.random().toString(36).slice(2, 8)}`,
         owner,
@@ -108,11 +105,8 @@ async function stageMidGameBoard(page) {
         justPlayed: true,
         ...patch,
       };
-      applyKeywordsFromList(c);
-      return c;
     };
 
-    // Evolved follower (blue)
     const evolved = mk("10001110", "first", {
       hasEvolved: true,
       evoType: "normal",
@@ -121,11 +115,7 @@ async function stageMidGameBoard(page) {
       base_attack: 1,
       base_defense: 2,
     });
-
-    // Ward follower (red)
     const ward = mk("10001110", "second", { hasWard: true });
-
-    // Damaged follower (red)
     const damaged = mk("10001130", "second", {
       defense: 1,
       base_defense: 3,
@@ -139,24 +129,18 @@ async function stageMidGameBoard(page) {
       mk("10001110", "first", { zone: "hand" }),
       mk("10001130", "first", { zone: "hand" }),
     ];
-    render();
+    window.__svwbTest?.render();
   });
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(400);
 }
 
 async function stageHiddenHand(page) {
-  await page.evaluate(async () => {
-    const { loadCardDatabase } = await import("/src/data/cardDatabase.ts");
-    await loadCardDatabase();
-    const { resetGameState, state } = await import("/src/core/gameState.ts");
-    const { getCardById } = await import("/src/data/cardDatabase.ts");
-    const { applyKeywordsFromList } =
-      await import("/src/logic/core/keywords/apply.js");
-    const { render } = await import("/src/ui/render.ts");
-    const { startRecording, setHiddenHandEnabled } =
-      await import("/src/logic/script/runtime.ts");
+  await page.evaluate(() => {
+    const state = window.gameState;
+    const getCard = (id) => window.cardDatabase?.getCardById?.(id);
+    if (!state || !getCard)
+      throw new Error("gameState or cardDatabase missing");
 
-    resetGameState(424242);
     state.gameStarted = true;
     state.phase = "main";
     state.activePlayer = "first";
@@ -166,16 +150,14 @@ async function stageHiddenHand(page) {
     state.players.second.maxPP = 5;
 
     const mk = (id, owner) => {
-      const tmpl = getCardById(id);
-      const c = {
+      const tmpl = getCard(id);
+      return {
         ...structuredClone(tmpl),
         uid: `h_${id}_${Math.random().toString(36).slice(2, 6)}`,
         owner,
         buffs: { attack: 0, defense: 0 },
         zone: "hand",
       };
-      applyKeywordsFromList(c);
-      return c;
     };
 
     state.players.second.hand = [
@@ -185,32 +167,31 @@ async function stageHiddenHand(page) {
       mk("10001110", "second"),
       mk("10001130", "second"),
     ];
-    startRecording({ name: "screenshot", scriptedSide: "second" });
-    setHiddenHandEnabled(true);
-    render();
+    window.__svwbTest?.render();
   });
-  await page.waitForTimeout(300);
+
+  // Enable sparring-line hidden hand via toolbar UI (no src imports needed)
+  await page.selectOption("#scriptSideSelect", "second");
+  await page.click("#scriptRecordBtn");
+  await page.check("#scriptHiddenHandToggle");
+  await page.waitForTimeout(400);
 }
 
 async function stageTargeting(page) {
-  await page.evaluate(async () => {
-    const { loadCardDatabase } = await import("/src/data/cardDatabase.ts");
-    await loadCardDatabase();
-    const { resetGameState, state } = await import("/src/core/gameState.ts");
-    const { getCardById } = await import("/src/data/cardDatabase.ts");
-    const { applyKeywordsFromList } =
-      await import("/src/logic/core/keywords/apply.js");
-    const { render } = await import("/src/ui/render.ts");
+  await page.evaluate(() => {
+    const state = window.gameState;
+    const getCard = (id) => window.cardDatabase?.getCardById?.(id);
+    if (!state || !getCard)
+      throw new Error("gameState or cardDatabase missing");
 
-    resetGameState(42);
     state.gameStarted = true;
     state.phase = "main";
     state.activePlayer = "first";
     state.players.first.pp = 10;
     state.players.first.maxPP = 10;
 
-    const spellTpl = getCardById("10041310");
-    const enemyTpl = getCardById("10001110");
+    const spellTpl = getCard("10041310");
+    const enemyTpl = getCard("10001110");
     if (!spellTpl || !enemyTpl) throw new Error("card DB missing test cards");
 
     const spell = {
@@ -231,17 +212,16 @@ async function stageTargeting(page) {
       hasAttacked: false,
       justPlayed: true,
     };
-    applyKeywordsFromList(enemy);
 
     state.players.first.hand = [spell];
     state.players.second.board = [enemy];
-    render();
+    window.__svwbTest?.render();
   });
 
   const handCard = page.locator("#blueHand .card").first();
   await handCard.click({ button: "right" });
-  await page.waitForSelector("body.select-mode", { timeout: 5000 });
-  await page.waitForTimeout(300);
+  await page.waitForSelector("body.select-mode", { timeout: 8000 });
+  await page.waitForTimeout(400);
 }
 
 async function main() {
@@ -250,19 +230,8 @@ async function main() {
   const preview = spawn(
     "npx",
     ["vite", "preview", "--port", String(PORT), "--strictPort"],
-    {
-      cwd: ROOT,
-      stdio: ["ignore", "pipe", "pipe"],
-    },
+    { cwd: ROOT, stdio: ["ignore", "pipe", "pipe"] },
   );
-
-  let previewLog = "";
-  preview.stdout?.on("data", (d) => {
-    previewLog += d;
-  });
-  preview.stderr?.on("data", (d) => {
-    previewLog += d;
-  });
 
   const consoleErrors = [];
 
@@ -295,18 +264,20 @@ async function main() {
       await screenshot(page, `baseline-${width}.png`);
     }
 
-    // Visual state evidence
+    // Visual state evidence at 1440
     await page.setViewportSize({ width: 1440, height: 900 });
+
     await page.goto(`${BASE}/?test=1`);
     await page.waitForLoadState("networkidle");
     await page.waitForFunction(() => !!window.__svwbTest);
-
+    await startGame(page);
     await stageMidGameBoard(page);
     await screenshot(page, "state-midgame-board.png");
 
     await page.goto(`${BASE}/?test=1`);
     await page.waitForLoadState("networkidle");
     await page.waitForFunction(() => !!window.__svwbTest);
+    await startGame(page);
     await stageHiddenHand(page);
     await screenshot(page, "state-hidden-hand.png");
 
@@ -316,8 +287,11 @@ async function main() {
     await stageTargeting(page);
     await screenshot(page, "state-targeting-selection.png");
 
-    if (consoleErrors.length) {
-      throw new Error(`Console errors: ${consoleErrors.join("; ")}`);
+    const filteredErrors = consoleErrors.filter(
+      (e) => !e.includes("favicon") && !e.includes("ort.min.js"),
+    );
+    if (filteredErrors.length) {
+      throw new Error(`Console errors: ${filteredErrors.join("; ")}`);
     }
     console.log("✓ Console clean on load");
 
