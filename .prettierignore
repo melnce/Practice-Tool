@@ -4,6 +4,9 @@ coverage
 node_modules
 .cache
 
+# Machine-generated report artifacts (scripts under scripts/)
+reports/
+
 tests/legacy
 tests/_dev
 
