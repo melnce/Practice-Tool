@@ -108,8 +108,8 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 0;
-  padding: var(--space-4) var(--space-8);
-  min-height: 158px;
+  padding: var(--space-3) var(--space-8);
+  min-height: var(--hand-zone-min-height, 158px);
   align-items: flex-end;
   justify-content: center;
 }
@@ -149,16 +149,13 @@
   z-index: 10;
 }
 
-#redHand {
-  justify-content: flex-start;
-}
-
+#redHand,
 #blueHand {
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .leader-zone {
-  margin: 6px 0;
+  margin: var(--play-row-gap, 4px) 0;
 }
 
 .leader {
@@ -207,7 +204,7 @@
   justify-content: center;
   flex-wrap: nowrap;
   gap: var(--space-3);
-  min-height: 168px;
+  min-height: var(--board-zone-min-height, 168px);
   min-width: 575px;
   padding: var(--space-5) var(--space-6);
   border: 1px dashed var(--color-border-default);

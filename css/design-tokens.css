@@ -221,13 +221,29 @@
   --glow-enhance: 0 0 14px rgba(255, 212, 0, 0.55);
   --glow-alternate: 0 0 14px rgba(97, 218, 251, 0.5);
 
+  /* ── Play area — card footprint (phase 2b: slightly larger in tighter stack) */
+  --card-width: 106px;
+  --card-height: 159px;
+  --hand-zone-min-height: 142px;
+  --board-zone-min-height: 156px;
+  --play-side-gap: 6px;
+  --play-row-gap: 4px;
+
   /* ── Play area — hand overlap & unplayable ─────────────────────────── */
-  --hand-card-overlap: -28px;
+  --hand-card-overlap: -26px;
+  --hand-card-overlap-medium: -22px;
+  --hand-card-overlap-tight: -18px;
   --hand-unplayable-opacity: 0.52;
   --hand-unplayable-saturate: 0.45;
 
   /* ── Play area — leader portrait ─────────────────────────────────────── */
-  --leader-frame-size: 88px;
+  --leader-frame-size: 86px;
+  --leader-meta-gap: 10px;
+  --crest-slot-size: 30px;
+  --crest-row-gap: 3px;
+  --crest-slot-empty-ring: rgba(154, 163, 173, 0.22);
+  --crest-slot-empty-fill: rgba(12, 16, 22, 0.72);
+  --crest-slot-filled-glow: rgba(57, 217, 138, 0.45);
   --leader-red-fill: rgba(92, 18, 28, 0.85);
   --leader-blue-fill: rgba(14, 28, 92, 0.85);
   --leader-red-ring: var(--color-accent-red);

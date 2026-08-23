@@ -24,7 +24,8 @@ body {
 .side {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--play-side-gap, 6px);
+  padding: var(--space-1) 0;
 }
 
 /* Control panel */
@@ -308,6 +309,18 @@ body {
   padding: 8px 10px;
 }
 
+#turnControls .mini-btn {
+  background: var(--color-bg-control-hover) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-default) !important;
+}
+
+#turnControls input[type="number"] {
+  background: var(--color-bg-inset) !important;
+  color: var(--color-text-primary) !important;
+  border: 1px solid var(--color-border-default) !important;
+}
+
 #endTurnBlue,
 #endTurnRed {
   width: 200px !important;
@@ -380,24 +393,47 @@ body.active-second .side-red {
 }
 
 .board-zone {
-  min-height: 172px;
-  padding: var(--space-5) var(--space-6);
+  min-height: var(--board-zone-min-height, 172px);
+  padding: var(--space-4) var(--space-6);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-inset-subtle), var(--shadow-inset-well);
 }
 
 .hand-zone {
   gap: 0;
-  padding: var(--space-5) var(--space-10);
+  padding: var(--space-3) var(--space-8);
+  min-height: var(--hand-zone-min-height, 142px);
+  max-width: 100%;
+  overflow: visible;
+}
+
+/* Symmetric hand fan — overlap tightens as count grows */
+.hand-zone:has(.card:nth-child(7)) .card:not(:first-child) {
+  margin-left: var(--hand-card-overlap-medium);
+}
+
+.hand-zone:has(.card:nth-child(10)) .card:not(:first-child) {
+  margin-left: var(--hand-card-overlap-tight);
+}
+
+#redHand {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-1);
+}
+
+#blueHand {
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-2);
 }
 
 /* Leaders — portrait frames */
 .leader-container {
   display: flex;
   align-items: center;
-  gap: var(--space-5);
+  gap: var(--space-4);
   justify-content: center;
-  padding: var(--space-2) 0;
+  padding: var(--space-1) 0;
+  margin: 0;
 }
 
 .leader {
@@ -443,34 +479,125 @@ body.active-second .side-red {
   letter-spacing: var(--letter-spacing-wider);
 }
 
+.leader {
+  margin-bottom: 0 !important;
+}
+
+/* Leader stats + crests — stacked column, in-flow (no collision with leader) */
+.floating-stats {
+  position: relative;
+  left: auto;
+  top: auto;
+  bottom: auto;
+  right: auto;
+  margin: var(--space-1) auto;
+  width: fit-content;
+  max-width: min(100%, 220px);
+  padding: 0;
+  background: transparent;
+  border: none;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: var(--leader-meta-gap);
+  align-items: center;
+  justify-items: center;
+  z-index: var(--z-board-stats);
+}
+
+#redStatsContainer {
+  top: auto;
+}
+
+#blueStatsContainer {
+  bottom: auto;
+}
+
+#redStats,
+#blueStats {
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+  row-gap: var(--space-2);
+}
+
+#blueCrests {
+  order: 2;
+}
+
+#blueStats {
+  order: 1;
+}
+
+#redCrests {
+  order: 2;
+}
+
+#redStats {
+  order: 1;
+}
+
 /* Crests */
 .crest-container {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
   align-items: center;
+  gap: var(--crest-row-gap);
+  width: fit-content;
+  min-height: calc(var(--crest-slot-size) * 2 + var(--crest-row-gap));
 }
 
 .crest-row {
   display: flex;
-  gap: 6px;
+  justify-content: center;
+  gap: var(--space-2);
 }
 
 .crest-slot {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: #11161d;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+  position: relative;
+  width: var(--crest-slot-size);
+  height: var(--crest-slot-size);
+  border-radius: 50%;
+  background: var(--crest-slot-empty-fill);
+  border: 1px solid var(--color-border-default);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px var(--crest-slot-empty-ring);
+  transition:
+    background var(--duration-normal) var(--ease-default),
+    border-color var(--duration-normal) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.crest-slot:not(.active)::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  border: 1px dashed var(--crest-slot-empty-ring);
+  opacity: 0.85;
+  pointer-events: none;
 }
 
 .crest-slot.active {
   background: radial-gradient(
-    50% 50% at 50% 40%,
-    rgba(0, 255, 170, 0.5),
-    rgba(0, 120, 90, 0.35)
+    55% 55% at 50% 38%,
+    rgba(57, 217, 138, 0.55),
+    rgba(18, 72, 52, 0.75)
   ) !important;
-  border-color: rgba(160, 255, 230, 0.6) !important;
+  border-color: rgba(154, 215, 200, 0.65) !important;
+  box-shadow:
+    0 0 10px var(--crest-slot-filled-glow),
+    inset 0 0 0 1px rgba(184, 232, 220, 0.35) !important;
+}
+
+.crest-slot.active::before {
+  display: none;
+}
+
+.crest-countdown {
+  background: var(--color-bg-inset);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
 }
 
 /* Cards — coherent frame; art stays hero */

@@ -2,6 +2,9 @@
 /**
  * Phase 2 UI screenshot pass — headless Chromium, built app, fixed seed.
  * Asserts header/stats overlap clearance; captures required visual states.
+ *
+ * Phase 2b: stats-vs-crest overlap assertion, 1440px viewport height checks,
+ * hand-size evidence screenshots (4 / 7 / 10).
  */
 import { chromium } from "@playwright/test";
 import { spawn } from "node:child_process";
@@ -11,11 +14,14 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
-const OUT = path.join(ROOT, "reports/ui/phase2");
+const OUT = process.env.UI_SCREENSHOT_OUT
+  ? path.resolve(ROOT, process.env.UI_SCREENSHOT_OUT)
+  : path.join(ROOT, "reports/ui/phase2");
 const PORT = 4173;
 const BASE = `http://localhost:${PORT}`;
 const SEED = 424242;
 const WIDTHS = [1440, 1900, 2560];
+const VIEWPORT_HEIGHT = Number(process.env.UI_SCREENSHOT_HEIGHT || 1440);
 
 function ensureDir(p) {
   fs.mkdirSync(p, { recursive: true });
@@ -52,6 +58,72 @@ function assertNoHeaderStatsOverlap(page) {
       };
     }
     return { ok: true, gap: Math.round(gap) };
+  });
+}
+
+function assertNoStatsCrestOverlap(page, sidePrefix) {
+  return page.evaluate((prefix) => {
+    const stats = document.getElementById(`${prefix}Stats`);
+    const crests = document.getElementById(`${prefix}Crests`);
+    if (!stats || !crests) {
+      return {
+        ok: false,
+        reason: `missing ${prefix}Stats or ${prefix}Crests`,
+      };
+    }
+    const s = stats.getBoundingClientRect();
+    const c = crests.getBoundingClientRect();
+    const overlapX = Math.min(s.right, c.right) - Math.max(s.left, c.left);
+    const overlapY = Math.min(s.bottom, c.bottom) - Math.max(s.top, c.top);
+    if (overlapX > 2 && overlapY > 2) {
+      return {
+        ok: false,
+        reason: `${prefix}: stats/crest box overlap ${overlapX.toFixed(1)}×${overlapY.toFixed(1)}px`,
+      };
+    }
+    const verticalGap = c.top >= s.bottom ? c.top - s.bottom : s.top - c.bottom;
+    if (overlapY > 2) {
+      return {
+        ok: false,
+        reason: `${prefix}: stats/crest vertical overlap ${overlapY.toFixed(1)}px`,
+      };
+    }
+    return { ok: true, gap: Math.round(verticalGap) };
+  }, sidePrefix);
+}
+
+function assertPlayAreaInView(page) {
+  return page.evaluate(() => {
+    const ids = [
+      "redHand",
+      "blueHand",
+      "redBoard",
+      "blueBoard",
+      "redLeader",
+      "blueLeader",
+      "turnControls",
+      "redStatsContainer",
+      "blueStatsContainer",
+    ];
+    const vh = window.innerHeight;
+    for (const id of ids) {
+      const el = document.getElementById(id);
+      if (
+        !el ||
+        (el.offsetParent === null && getComputedStyle(el).display === "none")
+      ) {
+        continue;
+      }
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      if (r.top < -2 || r.bottom > vh + 2) {
+        return {
+          ok: false,
+          reason: `#${id} out of view: top=${r.top.toFixed(1)} bottom=${r.bottom.toFixed(1)} vh=${vh}`,
+        };
+      }
+    }
+    return { ok: true };
   });
 }
 
@@ -134,6 +206,55 @@ async function stageMidGameBoard(page) {
   await page.waitForTimeout(400);
 }
 
+async function stageRedHandSize(page, handCount) {
+  await page.evaluate((count) => {
+    const state = window.gameState;
+    const getCard = (id) => window.cardDatabase?.getCardById?.(id);
+    if (!state || !getCard)
+      throw new Error("gameState or cardDatabase missing");
+
+    const cardIds = [
+      "10001110",
+      "10001130",
+      "10041310",
+      "10001110",
+      "10001130",
+    ];
+    state.gameStarted = true;
+    state.phase = "main";
+    state.activePlayer = "first";
+    state.roundCount = 4;
+    state.players.first.pp = 5;
+    state.players.first.maxPP = 5;
+    state.players.first.hand = [];
+    state.players.second.hand = [];
+    state.players.first.board = [];
+    state.players.second.board = [];
+
+    const mkHand = (owner, n) => {
+      const hand = [];
+      for (let i = 0; i < n; i++) {
+        const id = cardIds[i % cardIds.length];
+        const tmpl = getCard(id);
+        if (!tmpl) throw new Error(`missing card ${id}`);
+        hand.push({
+          ...structuredClone(tmpl),
+          uid: `hand_${owner}_${i}_${Math.random().toString(36).slice(2, 6)}`,
+          owner,
+          buffs: { attack: 0, defense: 0 },
+          zone: "hand",
+        });
+      }
+      return hand;
+    };
+
+    state.players.second.hand = mkHand("second", count);
+    state.players.first.hand = mkHand("first", 3);
+    window.__svwbTest?.render();
+  });
+  await page.waitForTimeout(500);
+}
+
 async function stageHiddenHand(page) {
   await page.evaluate(() => {
     const state = window.gameState;
@@ -170,7 +291,6 @@ async function stageHiddenHand(page) {
     window.__svwbTest?.render();
   });
 
-  // Enable sparring-line hidden hand via toolbar UI (no src imports needed)
   await page.selectOption("#scriptSideSelect", "second");
   await page.click("#scriptRecordBtn");
   await page.check("#scriptHiddenHandToggle");
@@ -224,6 +344,30 @@ async function stageTargeting(page) {
   await page.waitForTimeout(400);
 }
 
+async function runOverlapAssertions(page, width) {
+  const headerOverlap = await assertNoHeaderStatsOverlap(page);
+  if (!headerOverlap.ok) {
+    throw new Error(`Header overlap at ${width}px: ${headerOverlap.reason}`);
+  }
+  console.log(`✓ ${width}px header/stats gap=${headerOverlap.gap}px`);
+
+  for (const side of ["red", "blue"]) {
+    const crestOverlap = await assertNoStatsCrestOverlap(page, side);
+    if (!crestOverlap.ok) {
+      throw new Error(
+        `Stats/crest overlap at ${width}px: ${crestOverlap.reason}`,
+      );
+    }
+    console.log(`✓ ${width}px ${side} stats/crest gap=${crestOverlap.gap}px`);
+  }
+
+  const inView = await assertPlayAreaInView(page);
+  if (!inView.ok) {
+    throw new Error(`Play area out of view at ${width}px: ${inView.reason}`);
+  }
+  console.log(`✓ ${width}px play area in view`);
+}
+
 async function main() {
   ensureDir(OUT);
 
@@ -248,24 +392,19 @@ async function main() {
     page.on("pageerror", (err) => consoleErrors.push(String(err)));
 
     for (const width of WIDTHS) {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize({ width, height: VIEWPORT_HEIGHT });
       await page.goto(`${BASE}/?test=1`);
       await page.waitForLoadState("networkidle");
       await page.waitForFunction(() => !!window.__svwbTest);
 
       await startGame(page);
-
-      const overlap = await assertNoHeaderStatsOverlap(page);
-      if (!overlap.ok) {
-        throw new Error(`Overlap at ${width}px: ${overlap.reason}`);
-      }
-      console.log(`✓ ${width}px overlap check passed (gap=${overlap.gap}px)`);
+      await stageMidGameBoard(page);
+      await runOverlapAssertions(page, width);
 
       await screenshot(page, `baseline-${width}.png`);
     }
 
-    // Visual state evidence at 1440
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.setViewportSize({ width: 1440, height: VIEWPORT_HEIGHT });
 
     await page.goto(`${BASE}/?test=1`);
     await page.waitForLoadState("networkidle");
@@ -273,6 +412,15 @@ async function main() {
     await startGame(page);
     await stageMidGameBoard(page);
     await screenshot(page, "state-midgame-board.png");
+
+    for (const handSize of [4, 7, 10]) {
+      await page.goto(`${BASE}/?test=1`);
+      await page.waitForLoadState("networkidle");
+      await page.waitForFunction(() => !!window.__svwbTest);
+      await startGame(page);
+      await stageRedHandSize(page, handSize);
+      await screenshot(page, `state-red-hand-${handSize}.png`);
+    }
 
     await page.goto(`${BASE}/?test=1`);
     await page.waitForLoadState("networkidle");

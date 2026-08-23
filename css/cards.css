@@ -1,6 +1,6 @@
 .card {
-  width: 100px;
-  height: 150px;
+  width: var(--card-width, 100px);
+  height: var(--card-height, 150px);
   background-color: var(--color-bg-surface);
   position: relative;
   overflow: visible;

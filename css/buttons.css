@@ -211,6 +211,101 @@
 .confirm-targets-btn:active {
   transform: translateY(0);
 }
+/* mulligan confirm — themed play-area controls */
+.mulligan-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--toolbar-control-height);
+  padding: var(--space-3) var(--space-8);
+  margin: var(--space-2) auto var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-default);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    var(--transition-bg),
+    var(--transition-transform),
+    border-color var(--duration-normal) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.mulligan-confirm-btn--red {
+  background: linear-gradient(
+    180deg,
+    var(--color-accent-red-bright),
+    var(--color-accent-red-deep)
+  );
+  border-color: rgba(255, 92, 92, 0.45);
+  color: #fff;
+}
+
+.mulligan-confirm-btn--red:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--shadow-md), var(--glow-red-soft);
+}
+
+.mulligan-confirm-btn--blue {
+  background: linear-gradient(
+    180deg,
+    var(--color-accent-blue),
+    var(--color-accent-blue-deep)
+  );
+  border-color: rgba(74, 140, 255, 0.45);
+  color: #fff;
+}
+
+.mulligan-confirm-btn--blue:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--shadow-md), var(--glow-blue-soft);
+}
+
+.mulligan-confirm-btn:focus-visible {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 2px rgba(97, 218, 251, 0.25);
+}
+
+/* Turn-control mini buttons (god mode) */
+#turnControls .mini-btn {
+  background: var(--color-bg-control-hover);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  min-height: 28px;
+  transition:
+    var(--transition-bg),
+    border-color var(--duration-normal) var(--ease-default);
+}
+
+#turnControls .mini-btn:hover:not(:disabled) {
+  background: var(--color-bg-control-active);
+  border-color: var(--color-border-strong);
+}
+
+#turnControls input[type="number"] {
+  background: var(--color-bg-inset);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+#turnControls input[type="number"]:focus-visible {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 2px rgba(97, 218, 251, 0.2);
+}
+
 /* mulligan selectable glow */
 .card.selectable {
   outline: 2px dashed rgba(46, 204, 113, 0.75);
