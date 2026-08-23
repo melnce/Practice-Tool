@@ -602,11 +602,28 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
       return Number.isFinite(Number(v)) ? Number(v) : null;
     };
 
-    if (crestData && crestData.image) {
+    if (crestData) {
       const img = document.createElement("img");
-      img.src = crestData.image;
       img.className = "crest-image";
-      slot.appendChild(img);
+      const primaryImage = crestData.image || "";
+      const cardIdFromUrl =
+        primaryImage.match(/\/(\d+)(?:_token)?\.webp(?:\?|$)/i)?.[1] ?? null;
+      const fallbackCardId = cardIdFromUrl ?? "";
+      if (primaryImage) {
+        img.src = primaryImage;
+        if (fallbackCardId) {
+          const fallback = `https://static.dotgg.gg/shadowverse/cards/${fallbackCardId}.webp`;
+          img.dataset.fallbackSrc = fallback;
+          img.onerror = () => {
+            if (img.dataset.fallbackApplied) return;
+            img.dataset.fallbackApplied = "1";
+            img.src = img.dataset.fallbackSrc || fallback;
+          };
+        }
+      } else if (fallbackCardId) {
+        img.src = `https://static.dotgg.gg/shadowverse/cards/${fallbackCardId}.webp`;
+      }
+      if (img.src) slot.appendChild(img);
 
       // bottom-right countdown badge
       const cd = getCrestCountdown(crestData);
