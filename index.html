@@ -27,7 +27,6 @@
     <link rel="stylesheet" href="./css/modern-theme.css" />
     <!-- phase 3: settings drawer + fixed-viewport shell (revertible modules) -->
     <link rel="stylesheet" href="./css/settings-drawer.css" />
-    <link rel="stylesheet" href="./css/quick-actions.css" />
     <link rel="stylesheet" href="./css/phase3-layout.css" />
     <!-- tooltip presentation (after theme sheets) -->
     <link rel="stylesheet" href="./css/tooltip.css" />
@@ -168,62 +167,6 @@
       <span></span>
     </button>
 
-    <nav
-      id="quickActions"
-      class="quick-actions"
-      aria-label="Quick practice actions"
-    >
-      <button
-        type="button"
-        id="undoBtn"
-        class="quick-action-btn"
-        title="Undo (Ctrl+Z / Cmd+Z)"
-        aria-label="Undo"
-        disabled
-      >
-        <span class="quick-action-glyph" aria-hidden="true">↶</span>
-      </button>
-      <button
-        type="button"
-        id="redoBtn"
-        class="quick-action-btn"
-        title="Redo (Ctrl+Y / Ctrl+Shift+Z)"
-        aria-label="Redo"
-        disabled
-      >
-        <span class="quick-action-glyph" aria-hidden="true">↷</span>
-      </button>
-      <button
-        type="button"
-        id="setCheckpointBtn"
-        class="quick-action-btn"
-        title="Set checkpoint (F6)"
-        aria-label="Set checkpoint"
-      >
-        <span class="quick-action-glyph" aria-hidden="true">⏺</span>
-      </button>
-      <button
-        type="button"
-        id="restoreCheckpointBtn"
-        class="quick-action-btn"
-        title="Restore checkpoint exactly"
-        aria-label="Restore checkpoint"
-        disabled
-      >
-        <span class="quick-action-glyph" aria-hidden="true">↺</span>
-      </button>
-      <button
-        type="button"
-        id="rerollCheckpointBtn"
-        class="quick-action-btn"
-        title="Restore checkpoint with a new RNG branch (F8)"
-        aria-label="Reroll checkpoint"
-        disabled
-      >
-        <span class="quick-action-glyph" aria-hidden="true">⎋</span>
-      </button>
-    </nav>
-
     <div id="settingsScrim" class="scrim"></div>
 
     <aside id="settingsDrawer" class="drawer" aria-hidden="true">
@@ -236,15 +179,20 @@
               class="toolbar-cluster toolbar-cluster--game"
               data-toolbar-cluster="game"
             >
-              <label for="blueDeckSelect">Blue Deck:</label>
-              <select id="blueDeckSelect">
-                <option value="starter_deck">starter_deck</option>
-              </select>
-
-              <label for="redDeckSelect">Red Deck:</label>
-              <select id="redDeckSelect">
-                <option value="starter_deck">starter_deck</option>
-              </select>
+              <div class="deck-picker-row">
+                <div class="deck-picker-field">
+                  <label for="blueDeckSelect">Blue Deck:</label>
+                  <select id="blueDeckSelect">
+                    <option value="starter_deck">starter_deck</option>
+                  </select>
+                </div>
+                <div class="deck-picker-field">
+                  <label for="redDeckSelect">Red Deck:</label>
+                  <select id="redDeckSelect">
+                    <option value="starter_deck">starter_deck</option>
+                  </select>
+                </div>
+              </div>
 
               <button
                 type="button"
@@ -293,6 +241,16 @@
                 title="Draw-only consistency stats and mulligan drill"
                 >Consistency Trainer</a
               >
+              <button id="undoBtn" title="Undo (Ctrl+Z / Cmd+Z)" disabled>
+                Undo
+              </button>
+              <button
+                id="redoBtn"
+                title="Redo (Ctrl+Y / Ctrl+Shift+Z)"
+                disabled
+              >
+                Redo
+              </button>
             </div>
           </div>
           <div class="settings-drawer-section">
@@ -351,6 +309,23 @@
                 accept="application/json,.json,.svwb-position.json"
                 hidden
               />
+              <button id="setCheckpointBtn" title="Set checkpoint (F6)">
+                Checkpoint
+              </button>
+              <button
+                id="restoreCheckpointBtn"
+                title="Restore checkpoint exactly"
+                disabled
+              >
+                Restore CP
+              </button>
+              <button
+                id="rerollCheckpointBtn"
+                title="Restore checkpoint with a new RNG branch (F8)"
+                disabled
+              >
+                Reroll
+              </button>
               <span
                 id="checkpointStatus"
                 class="checkpoint-status"

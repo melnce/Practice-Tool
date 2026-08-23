@@ -415,7 +415,7 @@ body.active-second .side-red {
   max-width: var(--side-rail-width);
 }
 
-/* Corner stats + crests — horizontal stack to avoid board overlap */
+/* Corner stats + crests — horizontal stack; crest rows stay pyramid (column) */
 #gameShell #redStatsContainer.floating-stats,
 #gameShell #blueStatsContainer.floating-stats {
   flex-direction: row;
@@ -428,10 +428,10 @@ body.active-second .side-red {
 
 #gameShell #redCrests,
 #gameShell #blueCrests {
-  order: 0;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: var(--space-1);
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--crest-row-gap, 2px);
 }
 
 #gameShell #redStats,
@@ -440,7 +440,9 @@ body.active-second .side-red {
 }
 
 #gameShell .crest-row {
-  flex-wrap: wrap;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 
 /* Override phase 2 side-internal grid placement */

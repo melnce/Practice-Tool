@@ -533,43 +533,6 @@ function wireHistoryImagePreview(scopeEl: HTMLElement) {
   });
 }
 
-// render.js — add this helper above updateCrestsUI
-function orderedCrestSlots(container: HTMLElement, side: Player) {
-  const slots = Array.from(container.querySelectorAll(".crest-slot"));
-  if (!slots.length) return [];
-
-  // Group by visual row using Y (top) and sort deterministic by X (left)
-  const rows: { top: number; items: { el: Element; left: number }[] }[] = [];
-  const EPS = 2; // tolerate tiny pixel differences
-  for (const el of slots) {
-    const r = el.getBoundingClientRect();
-    const top = r.top;
-    const left = r.left;
-    let row = rows.find((x) => Math.abs(x.top - top) < EPS);
-    if (!row) {
-      row = { top, items: [] };
-      rows.push(row);
-    }
-    row.items.push({ el, left });
-  }
-
-  // Sort rows by screen Y:
-  //  - BLUE: lower row (bigger top) first (near the player), then upper row
-  //  - RED:  upper row (smaller top) first, then lower row (mirror)
-  rows.sort((a, b) => (side === "first" ? b.top - a.top : a.top - b.top));
-
-  // In each row:
-  //  - BLUE: left → right
-  //  - RED:  right → left (mirror across vertical axis)
-  const ordered: Element[] = [];
-  for (const row of rows) {
-    row.items.sort((a, b) => a.left - b.left);
-    if (side === "second") row.items.reverse();
-    for (const it of row.items) ordered.push(it.el);
-  }
-  return ordered;
-}
-
 // render.js — REPLACE updateCrestsUI with this
 function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
   const crests =
@@ -581,11 +544,8 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
   const tooltipEl = byId("cardTooltip");
   if (!container || !tooltipEl) return;
 
-  // Determine true on-screen order of slots
-  const slotOrder = orderedCrestSlots(container, playerPrefix);
-  const slots = slotOrder.length
-    ? slotOrder
-    : container.querySelectorAll(".crest-slot");
+  // DOM order must match engine crest array order (firing order).
+  const slots = Array.from(container.querySelectorAll(".crest-slot"));
 
   for (let i = 0; i < slots.length; i++) {
     const slot = slots[i] as HTMLElement;

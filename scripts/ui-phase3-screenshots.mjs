@@ -17,7 +17,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const OUT = process.env.UI_SCREENSHOT_OUT
   ? path.resolve(ROOT, process.env.UI_SCREENSHOT_OUT)
-  : path.join(ROOT, "reports/ui/phase3");
+  : path.join(ROOT, "reports/ui/phase3b");
 const PORT = 4173;
 const BASE = `http://localhost:${PORT}`;
 const SEED = 424242;
@@ -33,7 +33,6 @@ const HAND_SIZES = [4, 7, 10];
 /** Region ids checked for zero overlap (phase 3 layout). */
 const REGION_IDS = [
   "settingsToggle",
-  "quickActions",
   "historyToggle",
   "redHand",
   "redLeader",
@@ -650,6 +649,29 @@ async function runOverlapAssertions(page, viewportLabel, context = "") {
   console.log(`✓ ${viewportLabel}${suffix} play area in view`);
 }
 
+async function stageCrestPyramid(page) {
+  await page.evaluate(() => {
+    const state = window.gameState;
+    if (!state) throw new Error("gameState missing");
+    const names = [
+      "Crest Slot 1",
+      "Crest Slot 2",
+      "Crest Slot 3",
+      "Crest Slot 4",
+      "Crest Slot 5",
+    ];
+    state.players.first.crests = names.map((name, i) => ({
+      name,
+      image: `/images/crests/pyramid_${i + 1}.png`,
+      description: name,
+      counters: {},
+      triggers: [],
+    }));
+    window.__svwbTest?.render();
+  });
+  await page.waitForTimeout(400);
+}
+
 async function main() {
   ensureDir(OUT);
 
@@ -716,6 +738,14 @@ async function main() {
     await startGame(page);
     await stageMidGameBoard(page);
     await screenshot(page, "state-midgame-board.png");
+
+    await page.goto(`${BASE}/?test=1`);
+    await page.waitForLoadState("networkidle");
+    await page.waitForFunction(() => !!window.__svwbTest);
+    await startGame(page);
+    await stageCrestPyramid(page);
+    await runOverlapAssertions(page, "1440x900", "crest-pyramid");
+    await screenshot(page, "state-crest-pyramid-filled.png");
 
     await page.goto(`${BASE}/?test=1`);
     await page.waitForLoadState("networkidle");
