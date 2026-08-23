@@ -20,7 +20,7 @@ import { isGameOver } from "../../core/gameOver.js";
 import { applyLeaderDamage } from "../effects/leader.js";
 import { destroyTarget } from "../effects/ops/destroy/index.js";
 import { cleanupDead } from "./cleanup.js";
-import { dealDamage, popBarrier } from "./barrier.js";
+import { dealDamage } from "./barrier.js";
 import { doAction } from "../../core/history.js";
 import { handleRestore } from "../effects/ops/restore/index.js";
 import { isCantAttackLocked } from "./keywords/has.js";
@@ -152,13 +152,6 @@ function hasCardTrigger(
   );
 }
 
-/* ------------------------ superevolve convenience checks ------------------------ */
-function isInvincibleOnAttack(attacker: CardInstance, attackerOwner: Player) {
-  return (
-    (attacker?.evoType === "super" && state.activePlayer === attackerOwner) ||
-    !!attacker.keywordState?.isInvincibleOnAttack
-  );
-}
 function hasPiercingOne(attacker: CardInstance) {
   return attacker?.evoType === "super" || !!attacker.keywordState?.hasPiercing;
 }
@@ -372,18 +365,12 @@ function _attackFollowerCore(
   // Resolve Bane for attacker (0 damage still counts — see resolveBane)
   resolveBane(attacker, defender, defenderPlayer);
 
-  // Defender deals back, unless attacker is invincible on attack this swing
-  if (!isInvincibleOnAttack(attacker, attackerPlayer)) {
-    dealDamage(attacker, defDmg, defender);
+  // Defender deals back. Always route through dealDamage so zeroed hits (super-evolve
+  // protection, barrier) still emit self_damaged; prevention is handled inside.
+  dealDamage(attacker, defDmg, defender);
 
-    // Resolve Bane for defender (0 counter-damage still counts)
-    resolveBane(defender, attacker, attackerPlayer);
-  } else if (
-    attacker.keywordState?.hasBarrier ||
-    (attacker as any).hasBarrier
-  ) {
-    popBarrier(attacker, "invincible_simul_zero");
-  }
+  // Resolve Bane for defender (0 counter-damage still counts)
+  resolveBane(defender, attacker, attackerPlayer);
 
   // Resolve Drain and Piercing
   resolveDrain(attacker, attackerPlayer, dealtToDef);

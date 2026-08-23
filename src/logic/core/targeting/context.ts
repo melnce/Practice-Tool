@@ -84,18 +84,20 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
 
   ally: (q, env) => {
     const myBoard = getBoard(state, env.owner);
-    return myBoard || [];
+    return (myBoard || []).filter((c) => c != null && typeof c === "object");
   },
 
   enemy: (q, env) => {
     const oppBoard = getBoard(state, opponentOf(env.owner));
-    return oppBoard || [];
+    return (oppBoard || []).filter((c) => c != null && typeof c === "object");
   },
 
   any: (q, env) => {
     const myBoard = getBoard(state, env.owner);
     const oppBoard = getBoard(state, opponentOf(env.owner));
-    return [...(myBoard || []), ...(oppBoard || [])];
+    return [...(myBoard || []), ...(oppBoard || [])].filter(
+      (c) => c != null && typeof c === "object",
+    );
   },
 };
 
