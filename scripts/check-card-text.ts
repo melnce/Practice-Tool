@@ -328,6 +328,115 @@ function checkDestroyOpFilters(card: CardJson): Issue[] {
   return issues;
 }
 
+function collectDamageOps(
+  node: unknown,
+  pathStr: string,
+  out: { path: string; eff: Record<string, unknown>; contextText: string }[],
+  inheritedLabel = "",
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) =>
+      collectDamageOps(n, `${pathStr}[${i}]`, out, inheritedLabel),
+    );
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  const label =
+    typeof obj.label === "string"
+      ? obj.label
+      : typeof obj.name === "string"
+        ? obj.name
+        : inheritedLabel;
+  if (obj.op === "damage") {
+    out.push({ path: pathStr, eff: obj, contextText: label });
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    collectDamageOps(v, `${pathStr}.${k}`, out, label);
+  }
+}
+
+function cardTextHasDoThisNTimes(text: string, count: number): boolean {
+  for (const m of text.matchAll(/do\s+(?:this|it)\s+(\d+)\s+times/gi)) {
+    if (Number(m[1]) === count) return true;
+  }
+  return false;
+}
+
+function cardTextHasPluralRandomFollowers(
+  text: string,
+  count: number,
+): boolean {
+  const patterns = [
+    new RegExp(`\\b${count}\\s+random\\s+(?:enemy\\s+)?followers\\b`, "i"),
+    new RegExp(
+      `damage\\s+to\\s+${count}\\s+random\\s+(?:enemy\\s+)?followers\\b`,
+      "i",
+    ),
+    new RegExp(
+      `deal\\s+\\d+\\s+damage\\s+to\\s+${count}\\s+random\\s+(?:enemy\\s+)?followers\\b`,
+      "i",
+    ),
+  ];
+  return patterns.some((re) => re.test(text));
+}
+
+function expectedRandomDamageDistribution(
+  card: CardJson,
+  eff: Record<string, unknown>,
+  contextText: string,
+): "random_hits" | "random_distinct" | null {
+  const count = Number(eff.count);
+  if (!Number.isFinite(count) || count <= 1) return null;
+  const dist = String(eff.distribution ?? "").toLowerCase();
+  if (dist !== "random_hits" && dist !== "random" && dist !== "random_distinct")
+    return null;
+
+  const text = [card.description ?? "", contextText].filter(Boolean).join("\n");
+
+  if (cardTextHasDoThisNTimes(text, count)) return "random_hits";
+  if (cardTextHasPluralRandomFollowers(text, count)) return "random_distinct";
+
+  return null;
+}
+
+function checkRandomDamageDistribution(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const found: {
+    path: string;
+    eff: Record<string, unknown>;
+    contextText: string;
+  }[] = [];
+  for (const root of allEffectRoots(card)) {
+    collectDamageOps(root, "effects", found);
+  }
+
+  for (const { path: opPath, eff, contextText } of found) {
+    const expected = expectedRandomDamageDistribution(card, eff, contextText);
+    if (!expected) continue;
+    const actual = String(eff.distribution ?? "random_hits").toLowerCase();
+    const actualNorm =
+      actual === "random"
+        ? "random_hits"
+        : actual === "random_distinct"
+          ? "random_distinct"
+          : actual;
+    if (actualNorm !== expected) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message:
+          expected === "random_distinct"
+            ? `damage op at ${opPath}: count=${eff.count} uses "${eff.distribution}" but card text implies distinct random targets — use distribution="random_distinct"`
+            : `damage op at ${opPath}: count=${eff.count} uses "${eff.distribution}" but card text implies "do this N times" repeats — use distribution="random_hits"`,
+      });
+    }
+  }
+  return issues;
+}
+
 function nodeHasUntilEotOrDuration(node: unknown): boolean {
   if (!node || typeof node !== "object") return false;
   if (Array.isArray(node)) {
@@ -1122,6 +1231,7 @@ function checkCard(card: CardJson): Issue[] {
   // Gate: add_to_hand field contracts (includes crest-nested ops)
   issues.push(...checkAddToHand(card));
   issues.push(...checkStatOpFilters(card));
+  issues.push(...checkRandomDamageDistribution(card));
   issues.push(...checkAlternateFormClauses(card));
 
   for (const msg of spellAmuletMarkerIssues(card)) {

@@ -19,6 +19,7 @@ import { normalizeToUnifiedSpec } from "./types.js";
 import {
   applyDirectDamage,
   applyRandomHits,
+  applyRandomDistinctHits,
   applySplitSpillover,
 } from "./primitives.js";
 import {
@@ -158,6 +159,19 @@ export function handleDamage(
         includeLeader: spec.include_leader ?? false,
         sourceCard,
       });
+      break;
+
+    case "random_distinct":
+      applyRandomDistinctHits(
+        spec.count || 1,
+        amount,
+        spec.target || "",
+        owner,
+        {
+          includeLeader: spec.include_leader ?? false,
+          sourceCard,
+        },
+      );
       break;
 
     case "split_sequential":

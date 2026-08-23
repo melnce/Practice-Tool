@@ -2384,7 +2384,7 @@
             "target": "enemy:follower",
             "amount": 3,
             "count": 3,
-            "distribution": "random"
+            "distribution": "random_distinct"
           }
         ],
         "else_effects": [
@@ -8479,7 +8479,7 @@
             "target": "enemy:follower",
             "amount": 4,
             "count": 3,
-            "distribution": "random"
+            "distribution": "random_distinct"
           }
         ]
       }
@@ -13192,7 +13192,7 @@
         "target": "enemy:follower",
         "amount": 2,
         "count": 2,
-        "distribution": "random"
+        "distribution": "random_distinct"
       },
       {
         "op": "damage",
@@ -14709,7 +14709,7 @@
             "target": "enemy:follower",
             "amount": 5,
             "count": 2,
-            "distribution": "random_hits"
+            "distribution": "random_distinct"
           }
         ]
       }
@@ -16114,7 +16114,7 @@
                 "target": "enemy:follower",
                 "amount": 4,
                 "count": 2,
-                "distribution": "random_hits"
+                "distribution": "random_distinct"
               },
               {
                 "op": "damage",
@@ -19474,7 +19474,7 @@
         "target": "enemy:follower",
         "amount": 3,
         "count": 3,
-        "distribution": "random_hits"
+        "distribution": "random_distinct"
       },
       {
         "op": "spellboost",
@@ -20226,7 +20226,7 @@
                 "target": "enemy:follower",
                 "amount": 8,
                 "count": 2,
-                "distribution": "random_hits"
+                "distribution": "random_distinct"
               },
               {
                 "op": "restore",
