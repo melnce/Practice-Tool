@@ -191,6 +191,58 @@
   --toolbar-cluster-padding-x: var(--space-4);
   --toolbar-cluster-padding-y: var(--space-2);
 
+  /* ── Play area — card stat chips ─────────────────────────────────────── */
+  --color-stat-cost-bg: #1e5c32;
+  --color-stat-cost-border: rgba(57, 217, 138, 0.45);
+  --color-stat-atk-bg: #123a6e;
+  --color-stat-atk-border: rgba(97, 218, 251, 0.45);
+  --color-stat-def-bg: #6e1a24;
+  --color-stat-def-border: rgba(255, 92, 92, 0.45);
+  --color-stat-text: #f4f7fa;
+  --color-stat-buffed: var(--color-success);
+  --color-stat-damaged: #ffb366;
+
+  /* ── Play area — board zones (per-side tint) ───────────────────────── */
+  --color-board-surface: rgba(16, 18, 24, 0.55);
+  --color-board-empty-label: rgba(154, 163, 173, 0.35);
+  --color-board-blue-tint: rgba(74, 140, 255, 0.06);
+  --color-board-blue-border: rgba(74, 140, 255, 0.22);
+  --color-board-blue-active: rgba(74, 140, 255, 0.12);
+  --color-board-red-tint: rgba(255, 92, 92, 0.06);
+  --color-board-red-border: rgba(255, 92, 92, 0.22);
+  --color-board-red-active: rgba(255, 92, 92, 0.12);
+
+  /* ── Play area — card frame & evolved ring ─────────────────────────── */
+  --color-card-frame: rgba(255, 255, 255, 0.1);
+  --color-card-back-border: rgba(90, 110, 140, 0.45);
+  --color-evolved-ring: rgba(255, 212, 0, 0.85);
+  --glow-evolved: 0 0 14px rgba(255, 212, 0, 0.45);
+  --glow-playable: 0 0 14px rgba(57, 217, 138, 0.55);
+  --glow-enhance: 0 0 14px rgba(255, 212, 0, 0.55);
+  --glow-alternate: 0 0 14px rgba(97, 218, 251, 0.5);
+
+  /* ── Play area — hand overlap & unplayable ─────────────────────────── */
+  --hand-card-overlap: -28px;
+  --hand-unplayable-opacity: 0.52;
+  --hand-unplayable-saturate: 0.45;
+
+  /* ── Play area — leader portrait ─────────────────────────────────────── */
+  --leader-frame-size: 88px;
+  --leader-red-fill: rgba(92, 18, 28, 0.85);
+  --leader-blue-fill: rgba(14, 28, 92, 0.85);
+  --leader-red-ring: var(--color-accent-red);
+  --leader-blue-ring: var(--color-accent-blue);
+
+  /* ── Play area — PP / EP / bonus pips ──────────────────────────────── */
+  --color-pp-surface: var(--color-bg-surface);
+  --color-pp-border: var(--color-border-default);
+  --color-ep-available: var(--color-warn);
+  --color-ep-used: var(--color-text-disabled);
+  --color-sep-available: #b07cff;
+  --color-sep-used: var(--color-text-disabled);
+  --color-boost-pip-available: rgba(255, 180, 80, 0.95);
+  --color-boost-pip-used: var(--color-text-disabled);
+
   /* ── Legacy aliases (consumed by existing stylesheets) ───────────────── */
   --bg-1: var(--color-bg-base);
   --panel: var(--color-glass-fill);
