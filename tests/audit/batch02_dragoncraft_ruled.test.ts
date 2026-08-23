@@ -293,7 +293,9 @@ describe("Owner ruling — Azurifrit on-damage (10344110)", () => {
     state.activePlayer = "first";
   });
 
-  it("during your turn: each damage instance (including 0) hits enemy leader; 3-activation cap per turn", () => {
+  // Owner ruling (2026-08-23): printed text has no cap — "No cap — fires every time."
+  // Prior test wrongly enshrined max_per_turn: 3 (Fanfare "Do this 3 times" was mistaken for a trigger cap).
+  it("during your turn: each damage instance (including 0) hits enemy leader; no per-turn cap", () => {
     setupTurn(6);
     const az = createCard("10344110", "board", "first");
     az.peak_defense = az.defense;
@@ -310,9 +312,9 @@ describe("Owner ruling — Azurifrit on-damage (10344110)", () => {
     expect(getHP(state, "second")).toBe(17);
 
     dealDamage(az, 0, "first");
-    expect(getHP(state, "second")).toBe(17);
+    expect(getHP(state, "second")).toBe(16);
 
     dealDamage(az, 1, "first");
-    expect(getHP(state, "second")).toBe(17);
+    expect(getHP(state, "second")).toBe(15);
   });
 });

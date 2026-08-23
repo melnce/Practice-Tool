@@ -21,6 +21,7 @@ import {
   resetUidCounter,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 
 describe("Mechanic Contract: restore", () => {
   beforeEach(() => {
@@ -129,6 +130,36 @@ describe("Mechanic Contract: restore", () => {
 
       const card = findOnBoard("first", "Damaged");
       expect(card!.defense).toBe(5);
+    });
+
+    it("amount_source full restores to evolved maximum (+2/+2 buff included)", () => {
+      givenGameState({ seed: 1, roundCount: 7 })
+        .withFirstBoard([
+          {
+            name: "Damaged",
+            type: "Follower",
+            attack: 3,
+            defense: 2,
+            peak_defense: 5,
+          },
+        ])
+        .build();
+
+      const card = findOnBoard("first", "Damaged")!;
+      state.players.first.evoCharges = 1;
+      handleEvolveSelf(card, "first", { mode: "normal", spendPoint: true });
+
+      expect(Number(card.defense)).toBe(4);
+      expect(Number(card.peak_defense)).toBe(7);
+
+      const effect = {
+        op: "restore" as const,
+        target: "self",
+        amount_source: "full" as const,
+      };
+      whenRunEffects([effect], "first", card);
+
+      expect(Number(card.defense)).toBe(7);
     });
 
     it("restore does NOT exceed original defense", () => {

@@ -16,6 +16,7 @@ import { state } from "../../src/core/gameState.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import {
   getBoard,
   getHand,
@@ -263,5 +264,86 @@ describe("BUG 4 — Burnite Ash crest damage schedule", () => {
 
     runStartOfTurnBoundary("second");
     expect(getHP(state, "second")).toBe(hpAfterHeal - 2);
+  });
+});
+
+describe("BUG — Azurifrit (10344110) no per-turn cap + same-turn super-evolve pings", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    state.gameStarted = true;
+    state.activePlayer = "first";
+  });
+
+  it("play + super-evolve same turn deals 6 leader damage (3 fanfare self-hits + 3 super-evolve self-hits)", () => {
+    setupTurn(7, { hand: ["10344110"], pp: 9 });
+    state.players.first.superEvoCharges = 1;
+    state.players.second.hp = 20;
+
+    whenPlayCard("first", 0);
+    const az = findOnBoard("first", "Azurifrit, Heir to Disdain")!;
+    expect(az).toBeTruthy();
+    // Fanfare: 3×2 self-damage → 3 leader pings
+    expect(getHP(state, "second")).toBe(17);
+
+    handleEvolveSelf(az, "first", { mode: "super", spendPoint: true });
+    // Super-Evolve: 3×2 self-damage (0 actual via protection) → 3 more leader pings
+    expect(getHP(state, "second")).toBe(14);
+  });
+
+  it("super-evolve protection (0 damage) still fires the on-damage leader ping", () => {
+    setupTurn(7, { hand: ["10344110"], pp: 9 });
+    state.players.first.superEvoCharges = 1;
+    state.players.second.hp = 20;
+
+    whenPlayCard("first", 0);
+    const az = findOnBoard("first", "Azurifrit, Heir to Disdain")!;
+    const hpAfterFanfare = getHP(state, "second");
+
+    handleEvolveSelf(az, "first", { mode: "super", spendPoint: true });
+    // 3 super-evolve AoE hits on self are reduced to 0 but must still ping
+    expect(getHP(state, "second")).toBe(hpAfterFanfare - 3);
+  });
+});
+
+describe("BUG — Azurifrit super-evolve fully restores buffed max defense", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    state.gameStarted = true;
+    state.activePlayer = "first";
+    state.roundCount = 7;
+  });
+
+  it("fresh 5/7 super-evolves to 8/10 (restore uses post-buff maximum)", () => {
+    givenGameState({ seed: 42, activePlayer: "first", roundCount: 7 })
+      .withFirstPP(9, 9)
+      .build();
+
+    const az = createCard("10344110", "board", "first");
+    az.peak_defense = az.defense;
+    state.players.first.board = [az];
+    state.players.first.superEvoCharges = 1;
+
+    handleEvolveSelf(az, "first", { mode: "super", spendPoint: true });
+
+    expect(Number(az.attack)).toBe(8);
+    expect(Number(az.defense)).toBe(10);
+    expect(Number(az.peak_defense)).toBe(10);
+  });
+
+  it("damaged before super-evolve still ends at 8/10", () => {
+    givenGameState({ seed: 42, activePlayer: "first", roundCount: 7 })
+      .withFirstPP(9, 9)
+      .build();
+
+    const az = createCard("10344110", "board", "first");
+    az.peak_defense = az.defense;
+    az.defense = 3;
+    state.players.first.board = [az];
+    state.players.first.superEvoCharges = 1;
+
+    handleEvolveSelf(az, "first", { mode: "super", spendPoint: true });
+
+    expect(Number(az.attack)).toBe(8);
+    expect(Number(az.defense)).toBe(10);
   });
 });
