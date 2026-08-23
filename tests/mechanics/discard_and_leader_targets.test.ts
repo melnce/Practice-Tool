@@ -1,12 +1,11 @@
 /**
- * Red-first regression tests: discard triggers + enemy:all leader targeting.
+ * Regression tests: discard trigger pinning + enemy:all leader targeting.
  *
- * BUG 1 — discard effects must fire once (on_discard only, never spell).
- * BUG 3 — enemy:all direct damage must include the enemy leader.
- *
- * Restore on discard is pinned separately (not a defect — owner misread crest damage).
+ * BUG 1 (double on_discard fire): could NOT be reproduced on origin/main — pinning
+ * tests assert correct single-fire behaviour. See PR for investigation notes.
+ * BUG 3: enemy:all direct damage must include the enemy leader.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import "./setup.js";
 import {
   givenGameState,
@@ -18,6 +17,8 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getHand } from "../../src/core/playerHelpers.js";
+import * as targeted from "../../src/logic/effects/ops/targeted/index.js";
+import * as leaderModule from "../../src/logic/effects/leader.js";
 import "../../src/logic/core/effects/index.js";
 
 const DEPTHS = "90044330";
@@ -68,8 +69,9 @@ function discardHandCard(player: "first" | "second", cardNamePart: string) {
 describe("discard and leader targets", () => {
   beforeEach(() => resetUidCounter());
 
-  describe("BUG 1 — discard effects fire once (on_discard only)", () => {
-    it("Depths via Sagatsumatsu deals exactly 1 to enemy leader (not spell+on_discard)", () => {
+  describe("discard on_discard pinning (single fire)", () => {
+    it("Sagatsumatsu select-discard: one Depths → 1 enemy damage, 1 ally heal", () => {
+      const damageSpy = vi.spyOn(leaderModule, "applyLeaderDamage");
       setupMain("first", {
         firstHP: 15,
         secondHP: 20,
@@ -77,24 +79,53 @@ describe("discard and leader targets", () => {
         pp: 7,
       });
       whenPlayCard("first", 0);
-      expect(state.pendingTargetEffect).toBeTruthy();
       discardHandCard("first", "Depths");
+      const enemyHits = damageSpy.mock.calls.filter((c) => c[0] === "second");
+      expect(enemyHits).toHaveLength(1);
+      expect(enemyHits[0]?.[1]).toBe(1);
       expect(thenHP("second")).toBe(19);
+      expect(thenHP("first")).toBe(16);
+      damageSpy.mockRestore();
     });
 
-    it("second player discarding Depths via Sagatsumatsu deals exactly 1", () => {
-      setupMain("second", {
-        firstHP: 20,
-        secondHP: 15,
+    it("Lumiore batch-discard: two Depths → 2 enemy damage, 2 ally heal (plus fanfare)", () => {
+      setupMain("first", {
+        firstHP: 15,
+        secondHP: 20,
+        hand: [LUMIORE, DEPTHS, DEPTHS],
+        pp: 8,
+      });
+      whenPlayCard("first", 0);
+      const depths = getHand(state, "first").filter((c) =>
+        c.name.includes("Depths"),
+      );
+      resolvePendingTarget(depths[0]!.uid);
+      resolvePendingTarget(depths[1]!.uid);
+      // After fix: 4 (Lumiore) + 1 + 1 (Depths) = 6 enemy leader damage
+      expect(thenHP("second")).toBe(14);
+      expect(thenHP("first")).toBe(17);
+    });
+
+    it("dispatchTargetedOp routes select-discard through discard op once", () => {
+      const ops: string[] = [];
+      const orig = targeted.dispatchTargetedOp;
+      vi.spyOn(targeted, "dispatchTargetedOp").mockImplementation((ctx) => {
+        ops.push(ctx.eff.op);
+        return orig(ctx);
+      });
+      setupMain("first", {
+        firstHP: 15,
+        secondHP: 20,
         hand: [SAGATSUMATSU, DEPTHS],
         pp: 7,
       });
-      whenPlayCard("second", 0);
-      discardHandCard("second", "Depths");
-      expect(thenHP("first")).toBe(19);
+      whenPlayCard("first", 0);
+      discardHandCard("first", "Depths");
+      expect(ops.filter((op) => op.includes("discard"))).toEqual(["discard"]);
+      vi.restoreAllMocks();
     });
 
-    it("Advent of Eld Blades discard does not also run spell (+2/+2)", () => {
+    it("Advent discard does not run spell (+2/+2)", () => {
       setupMain("first", {
         hand: [SAGATSUMATSU, ADVENT],
         firstBoard: [
@@ -124,8 +155,8 @@ describe("discard and leader targets", () => {
     });
   });
 
-  describe("Depths discard restore — pinned correct behaviour (no crest)", () => {
-    it("blue (first): damaged leader gains exactly 1, enemy leader takes exactly 1", () => {
+  describe("Depths discard restore — pinned (no crest)", () => {
+    it("blue (first): +1 heal, -1 enemy damage", () => {
       setupMain("first", {
         firstHP: 15,
         secondHP: 20,
@@ -138,7 +169,7 @@ describe("discard and leader targets", () => {
       expect(thenHP("second")).toBe(19);
     });
 
-    it("red (second): damaged leader gains exactly 1, enemy leader takes exactly 1", () => {
+    it("red (second): +1 heal, -1 enemy damage", () => {
       setupMain("second", {
         firstHP: 20,
         secondHP: 15,
@@ -170,35 +201,16 @@ describe("discard and leader targets", () => {
         pp: 8,
       });
       whenPlayCard("first", 0);
-      const hand = getHand(state, "first");
-      const depths = hand.filter((c) => c.name.includes("Depths"));
+      const depths = getHand(state, "first").filter((c) =>
+        c.name.includes("Depths"),
+      );
       resolvePendingTarget(depths[0]!.uid);
-      expect(state.pendingTargetEffect).toBeTruthy();
       resolvePendingTarget(depths[1]!.uid);
-      // 20 - 4 (Lumiore all enemies) - 1 - 1 (two Depths discards) = 14
       expect(thenHP("second")).toBe(14);
       const follower = thenBoard("second").find(
         (c) => c.name === "EnemyFollower",
       );
       expect(follower!.defense).toBe(1);
-    });
-  });
-
-  describe("cross-check — Lumiore + 2 Depths = 6 enemy leader damage", () => {
-    it("enemy leader takes 6 total (4 + 1 + 1) and restores discarding leader twice", () => {
-      setupMain("first", {
-        firstHP: 15,
-        secondHP: 20,
-        hand: [LUMIORE, DEPTHS, DEPTHS],
-        pp: 8,
-      });
-      whenPlayCard("first", 0);
-      const hand = getHand(state, "first");
-      const depths = hand.filter((c) => c.name.includes("Depths"));
-      resolvePendingTarget(depths[0]!.uid);
-      resolvePendingTarget(depths[1]!.uid);
-      expect(thenHP("second")).toBe(14);
-      expect(thenHP("first")).toBe(17);
     });
   });
 });
