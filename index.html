@@ -31,52 +31,7 @@
     <!-- tooltip presentation (after theme sheets) -->
     <link rel="stylesheet" href="./css/tooltip.css" />
     <style>
-      /* Lightweight drawer + hamburger (no extra CSS files needed) */
-      .hamburger-btn {
-        position: fixed;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 350;
-        width: 42px;
-        height: 42px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: linear-gradient(180deg, #1a1f27, #141821);
-        color: #e9edf1;
-        font-weight: 800;
-        display: grid;
-        place-items: center;
-        cursor: pointer;
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-      }
-
-      .hamburger-btn span {
-        display: block;
-        width: 20px;
-        height: 2px;
-        background: #e9edf1;
-        position: relative;
-      }
-
-      .hamburger-btn span::before,
-      .hamburger-btn span::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        width: 20px;
-        height: 2px;
-        background: #e9edf1;
-      }
-
-      .hamburger-btn span::before {
-        top: -6px;
-      }
-
-      .hamburger-btn span::after {
-        top: 6px;
-      }
-
+      /* Drawer chrome (history + shared scrim) */
       .drawer {
         position: fixed;
         top: 0;
@@ -527,12 +482,34 @@
     <!-- History battle-log toggle (left edge) -->
     <button
       id="historyToggle"
-      class="hamburger-btn"
+      class="battle-log-btn"
       type="button"
-      title="History (cards played & graveyards)"
+      title="Battle log — cards played & graveyards"
       aria-label="Open battle log"
     >
-      <span></span>
+      <svg
+        class="battle-log-glyph"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <rect
+          x="5"
+          y="3"
+          width="14"
+          height="18"
+          rx="2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        />
+        <path
+          d="M8 8h8M8 12h8M8 16h5"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
     </button>
     <div id="historyScrim" class="scrim"></div>
 

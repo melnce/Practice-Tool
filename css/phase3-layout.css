@@ -319,12 +319,55 @@ body.active-on-bottom.active-second .side-red #redHand {
   box-sizing: border-box;
 }
 
-/* History toggle — left edge battle-log position */
-#historyToggle {
-  top: auto !important;
+/* Battle log toggle — left edge (document glyph, not hamburger) */
+#historyToggle.battle-log-btn {
+  position: fixed;
+  left: 12px;
   bottom: 88px;
-  left: 12px !important;
-  transform: none !important;
+  top: auto;
+  transform: none;
+  z-index: var(--z-hamburger);
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-strong);
+  background: linear-gradient(
+    180deg,
+    var(--color-bg-control-hover),
+    var(--color-bg-control)
+  );
+  color: var(--color-text-primary);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  transition:
+    background var(--duration-normal) var(--ease-default),
+    border-color var(--duration-normal) var(--ease-default),
+    box-shadow var(--duration-normal) var(--ease-default);
+}
+
+#historyToggle.battle-log-btn:hover {
+  background: var(--color-bg-control-active);
+  border-color: var(--color-border-default);
+  box-shadow: var(--shadow-lg);
+}
+
+#historyToggle.battle-log-btn:focus-visible {
+  outline: none;
+  border-color: var(--color-border-focus);
+  box-shadow:
+    var(--shadow-md),
+    0 0 0 2px rgba(97, 218, 251, 0.25);
+}
+
+#historyToggle .battle-log-glyph {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
 /* Turn controls — right rail */
