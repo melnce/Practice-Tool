@@ -45,6 +45,11 @@ export function renderCardDOM(
 
   // Glow
   if (vm.glowClass) div.classList.add(vm.glowClass);
+  if (vm.playBlockedReason) {
+    div.dataset.playBlockedReason = vm.playBlockedReason;
+  } else {
+    delete div.dataset.playBlockedReason;
+  }
   if (vm.isSpell) div.classList.add("spell");
 
   // Interactions

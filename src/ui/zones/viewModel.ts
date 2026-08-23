@@ -92,11 +92,12 @@ export function createCardViewModel(
 
   // Glow Logic
   let glowClass: string | undefined;
+  let playBlockedReason: string | undefined;
   if (!ctx.isBoard) {
     // Fix: Use activePlayer for strictness, avoids boolean desync
     const isPlayersTurn = ctx.owner === state.activePlayer;
 
-    const { glowClass: gc } = computeHandGlow(card, {
+    const { glowClass: gc, blockedReason } = computeHandGlow(card, {
       state,
       owner: ctx.owner,
       isPlayersTurn,
@@ -107,6 +108,7 @@ export function createCardViewModel(
       shownCost,
     });
     glowClass = gc || undefined;
+    playBlockedReason = blockedReason;
   }
 
   // Stat colors (Follower only)
@@ -231,6 +233,7 @@ export function createCardViewModel(
     atkDisp,
     defDisp,
     glowClass,
+    playBlockedReason,
     isDamaged,
     isBuffed,
     isDebuffed,
