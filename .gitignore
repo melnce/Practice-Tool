@@ -61,6 +61,9 @@ reports/ui/phase3/*
 !reports/ui/phase3b/
 reports/ui/phase3b/*
 !reports/ui/phase3b/**
+!reports/ui/leader-hitbox/
+reports/ui/leader-hitbox/*
+!reports/ui/leader-hitbox/**
 
 # ── Legacy / alternate layouts (hand-maintained; not used by runtime) ──
 cards/card_sets/

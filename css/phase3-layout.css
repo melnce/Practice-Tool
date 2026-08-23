@@ -10,6 +10,7 @@
   --shell-bottom-gutter: 8px;
   --game-bar-row-height: auto;
   --leader-bar-size: 52px;
+  --leader-bar-width: calc(var(--leader-bar-size) * 2.75);
   --hand-scale-top: 0.72;
   --hand-scale-bottom: 1;
   --board-card-scale: 1.12;
@@ -91,7 +92,7 @@
 .side-blue {
   grid-template-columns:
     minmax(0, 1.2fr)
-    minmax(var(--leader-bar-size), auto)
+    minmax(var(--leader-bar-width), auto)
     minmax(0, 1.2fr);
 }
 
@@ -269,9 +270,11 @@ body.active-on-bottom.active-second .side-red .hand-zone {
 }
 
 .side .leader {
-  width: var(--leader-bar-size) !important;
+  width: var(--leader-bar-width) !important;
   height: var(--leader-bar-size) !important;
-  min-width: var(--leader-bar-size);
+  min-width: var(--leader-bar-width);
+  max-height: var(--leader-bar-size);
+  border-radius: var(--radius-pill) !important;
   font-size: var(--font-size-xl) !important;
 }
 
