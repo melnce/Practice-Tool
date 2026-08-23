@@ -217,24 +217,28 @@
   --color-card-back-border: rgba(90, 110, 140, 0.45);
   --color-evolved-ring: rgba(255, 212, 0, 0.85);
   --glow-evolved: 0 0 14px rgba(255, 212, 0, 0.45);
-  --glow-playable: 0 0 14px rgba(57, 217, 138, 0.55);
-  --glow-enhance: 0 0 14px rgba(255, 212, 0, 0.55);
-  --glow-alternate: 0 0 14px rgba(97, 218, 251, 0.5);
+  --glow-playable:
+    0 0 18px rgba(57, 217, 138, 0.72), 0 0 6px rgba(57, 217, 138, 0.9);
+  --glow-enhance:
+    0 0 18px rgba(255, 212, 0, 0.72), 0 0 6px rgba(255, 212, 0, 0.9);
+  --glow-alternate:
+    0 0 18px rgba(255, 212, 0, 0.68), 0 0 6px rgba(255, 200, 80, 0.85);
 
-  /* ── Play area — card footprint (phase 2b: slightly larger in tighter stack) */
-  --card-width: 106px;
-  --card-height: 159px;
-  --hand-zone-min-height: 142px;
-  --board-zone-min-height: 156px;
+  /* ── Play area — card footprint (phase 2c: wider board, larger readable cards) */
+  --play-area-max-width: 1920px;
+  --side-rail-width: 132px;
+  --crest-slot-size: 26px;
+  --card-width: 108px;
+  --card-height: 162px;
+  --hand-zone-min-height: 148px;
+  --board-zone-min-height: 162px;
   --play-side-gap: 6px;
   --play-row-gap: 4px;
 
-  /* ── Play area — hand overlap & unplayable ─────────────────────────── */
-  --hand-card-overlap: -26px;
-  --hand-card-overlap-medium: -22px;
-  --hand-card-overlap-tight: -18px;
-  --hand-unplayable-opacity: 0.52;
-  --hand-unplayable-saturate: 0.45;
+  /* ── Play area — hand overlap (loose at small hands, tighter as count grows) */
+  --hand-card-overlap-loose: -8px;
+  --hand-card-overlap-medium: -16px;
+  --hand-card-overlap-tight: -24px;
 
   /* ── Play area — leader portrait ─────────────────────────────────────── */
   --leader-frame-size: 86px;
@@ -275,12 +279,28 @@
 @media (min-width: 1440px) {
   :root {
     --toolbar-height: 261px;
+    --card-width: 114px;
+    --card-height: 171px;
+    --hand-zone-min-height: 156px;
+    --board-zone-min-height: 168px;
+    --hand-card-overlap-loose: -10px;
+    --hand-card-overlap-medium: -18px;
+    --hand-card-overlap-tight: -26px;
   }
 }
 
 @media (min-width: 1900px) {
   :root {
     --toolbar-height: 229px;
+    --card-width: 118px;
+    --card-height: 177px;
+    --hand-zone-min-height: 162px;
+    --board-zone-min-height: 174px;
+    --side-rail-width: 140px;
+    --crest-slot-size: 28px;
+    --hand-card-overlap-loose: -12px;
+    --hand-card-overlap-medium: -20px;
+    --hand-card-overlap-tight: -28px;
   }
 }
 

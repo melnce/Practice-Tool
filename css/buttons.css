@@ -216,6 +216,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: auto;
+  max-width: min(420px, 100%);
   min-height: var(--toolbar-control-height);
   padding: var(--space-3) var(--space-8);
   margin: var(--space-2) auto var(--space-4);

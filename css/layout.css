@@ -124,7 +124,7 @@
 }
 
 .hand-zone .card:not(:first-child) {
-  margin-left: var(--hand-card-overlap);
+  margin-left: var(--hand-card-overlap-loose);
 }
 
 .hand-zone .card:hover {
@@ -132,20 +132,9 @@
   transform: translateY(-6px) scale(1.03);
 }
 
-/* Unplayable hand cards (no glow class on opponent turn or unaffordable) */
-.hand-zone
-  .card:not(.playable-glow):not(.enhance-ready):not(.alternate-ready):not(
-    .card-back
-  ):not(.selectable):not(.selected) {
-  opacity: var(--hand-unplayable-opacity);
-  filter: saturate(var(--hand-unplayable-saturate)) brightness(0.92);
-}
-
 .hand-zone .card.playable-glow,
 .hand-zone .card.enhance-ready,
 .hand-zone .card.alternate-ready {
-  opacity: 1;
-  filter: none;
   z-index: 10;
 }
 
@@ -205,7 +194,7 @@
   flex-wrap: nowrap;
   gap: var(--space-3);
   min-height: var(--board-zone-min-height, 168px);
-  min-width: 575px;
+  min-width: 0;
   padding: var(--space-5) var(--space-6);
   border: 1px dashed var(--color-border-default);
   border-radius: var(--radius-xl);
@@ -279,28 +268,7 @@
   text-align: center;
 }
 
-.floating-stats {
-  position: absolute;
-  left: 20px;
-  background-color: #111;
-  padding: 8px 12px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  display: flex;
-  gap: 16px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  z-index: 100;
-}
-
-#redStatsContainer {
-  top: calc(var(--toolbar-height, 168px) + 8px);
-}
-
-#blueStatsContainer {
-  bottom: 120px;
-  /* adjust as needed */
-}
+/* floating-stats / crest rail layout: modern-theme.css (phase 2c) */
 
 #turnControls #redBoost {
   background-color: orange;
@@ -398,21 +366,6 @@
 }
 
 /* --- Crest UI Styles --- */
-
-/* Modify the main floating stats container to be a flex column */
-.floating-stats {
-  position: absolute;
-  left: var(--space-10);
-  background-color: transparent;
-  border: none;
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  z-index: var(--z-board-stats);
-}
 
 /* Re-apply styling to the inner stats bar */
 #redStats,

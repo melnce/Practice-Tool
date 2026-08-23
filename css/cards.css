@@ -562,12 +562,12 @@
   animation: enhPulse 1s ease-in-out infinite alternate;
 }
 
-/* CYAN: Accelerate / Crystallize alternate form payable */
+/* AMBER: Accelerate / Crystallize alternate form payable */
 .card.alternate-ready .card-image-wrapper {
-  outline: 3px solid var(--color-accent-blue-bright);
+  outline: 3px solid var(--color-warn);
   box-shadow:
     var(--glow-alternate),
-    inset 0 0 10px rgba(97, 218, 251, 0.25);
+    inset 0 0 10px var(--color-warn-surface);
   border-radius: var(--radius-lg);
   animation: altPulse 1s ease-in-out infinite alternate;
 }
@@ -575,13 +575,13 @@
 @keyframes altPulse {
   0% {
     box-shadow:
-      0 0 8px rgba(64, 200, 220, 0.5),
-      inset 0 0 6px rgba(64, 200, 220, 0.3);
+      0 0 10px rgba(255, 212, 0, 0.55),
+      inset 0 0 6px rgba(255, 212, 0, 0.3);
   }
   100% {
     box-shadow:
-      0 0 16px rgba(64, 200, 220, 0.85),
-      inset 0 0 12px rgba(64, 200, 220, 0.55);
+      0 0 20px rgba(255, 212, 0, 0.9),
+      inset 0 0 12px rgba(255, 212, 0, 0.55);
   }
 }
 
