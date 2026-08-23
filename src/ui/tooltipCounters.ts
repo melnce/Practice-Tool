@@ -214,7 +214,7 @@ function walkForSources(
 }
 
 /** Scan a card's effect tree for dynamic count sources (deduped). */
-export function collectTooltipCounters(
+function collectTooltipCountersUncached(
   card: CardInstance,
 ): TooltipCounterSpec[] {
   const hits: Array<{ source: string; params: CounterParams }> = [];
@@ -247,6 +247,26 @@ export function collectTooltipCounters(
   }
 
   return [...byKey.values()];
+}
+
+const tooltipCounterCache = new Map<string, TooltipCounterSpec[]>();
+
+/** Card-definition counter specs (stable per card id). */
+export function collectTooltipCounters(
+  card: CardInstance,
+): TooltipCounterSpec[] {
+  const id = String(card.id ?? "");
+  if (!id) return collectTooltipCountersUncached(card);
+  const cached = tooltipCounterCache.get(id);
+  if (cached) return cached;
+  const specs = collectTooltipCountersUncached(card);
+  tooltipCounterCache.set(id, specs);
+  return specs;
+}
+
+/** Test / repro helper. */
+export function clearTooltipCounterCache(): void {
+  tooltipCounterCache.clear();
 }
 
 export type ResolvedCounterValue =
