@@ -1,0 +1,440 @@
+/**
+ * Phase 3 — fixed-viewport game-client shell (100dvh grid layout).
+ * Revert by removing this file and the index.html link + gameShell wrapper.
+ */
+
+:root {
+  --shell-left-gutter: 68px;
+  --shell-right-gutter: 232px;
+  --shell-top-gutter: 8px;
+  --shell-bottom-gutter: 8px;
+  --game-bar-row-height: auto;
+  --leader-bar-size: 52px;
+  --hand-scale-top: 0.72;
+  --hand-scale-bottom: 1;
+  --board-card-scale: 1.12;
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --hand-scale-top: 0.8;
+    --board-card-scale: 1.14;
+    --leader-bar-size: 56px;
+  }
+}
+
+@media (min-width: 1900px) {
+  :root {
+    --hand-scale-top: 0.82;
+    --board-card-scale: 1.16;
+    --leader-bar-size: 58px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --board-card-scale: 1.18;
+    --leader-bar-size: 60px;
+  }
+}
+
+@media (min-height: 800px) {
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    min-height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+#gameShell {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#gameShell #appRoot {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: var(--shell-top-gutter) var(--shell-right-gutter)
+    var(--shell-bottom-gutter) var(--shell-left-gutter);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#gameShell #appRoot > .side {
+  flex: 1 1 0;
+  min-height: 0;
+  display: grid;
+  column-gap: clamp(var(--space-4), 1.2vw, var(--space-10));
+  row-gap: var(--play-row-gap, 4px);
+  align-items: center;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.side-red,
+.side-blue {
+  grid-template-columns:
+    minmax(0, 1.2fr)
+    minmax(var(--leader-bar-size), auto)
+    minmax(0, 1.2fr);
+}
+
+.side-red {
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    "hand leader stats"
+    "board board board";
+}
+
+.side-blue {
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "board board board"
+    "stats leader hand";
+}
+
+body:not(.active-on-bottom.active-second) .side-blue #blueHand {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: stretch;
+  justify-content: flex-end;
+}
+
+body.active-on-bottom.active-second .side-blue #blueHand {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: stretch;
+}
+
+body.active-on-bottom.active-second .side-red #redHand {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: stretch;
+  justify-content: flex-end;
+}
+
+.side-red #redHand {
+  grid-area: hand;
+  grid-row: 1;
+  grid-column: 1;
+  justify-self: stretch;
+  align-self: end;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.side-blue #blueHand {
+  grid-area: hand;
+  grid-row: 2;
+  grid-column: 3;
+  justify-self: stretch;
+  align-self: end;
+}
+
+.side-red .leader-container {
+  grid-area: leader;
+  grid-row: 1;
+  grid-column: 2;
+  justify-self: center;
+  align-self: end;
+}
+
+.side-blue .leader-container {
+  grid-area: leader;
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: center;
+  align-self: start;
+}
+
+.side-red #redBoard {
+  grid-area: board;
+  grid-row: 2;
+  grid-column: 1 / -1;
+  align-self: stretch;
+  min-height: 0;
+}
+
+.side-blue #blueBoard {
+  grid-area: board;
+  grid-row: 1;
+  grid-column: 1 / -1;
+  align-self: stretch;
+  min-height: 0;
+}
+
+#gameShell .zone {
+  margin: 0 !important;
+}
+
+.side-red,
+.side-blue {
+  row-gap: var(--space-3);
+}
+
+#redMulliganConfirm {
+  grid-area: board;
+  grid-row: 2;
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-self: center;
+  z-index: 5;
+}
+
+#blueStatsContainer {
+  grid-area: stats;
+  justify-self: start;
+  align-self: end;
+}
+
+#blueMulliganConfirm {
+  grid-area: hand;
+  justify-self: center;
+  align-self: center;
+  z-index: 5;
+}
+
+/* Perspective flip — side order (preserved from phase 2) */
+#appRoot {
+  display: flex;
+  flex-direction: column;
+}
+
+.side-red {
+  order: 1;
+}
+
+.side-blue {
+  order: 2;
+}
+
+body.active-on-bottom.active-second .side-red {
+  order: 2;
+}
+
+body.active-on-bottom.active-second .side-blue {
+  order: 1;
+}
+
+/* Compact top hand vs larger bottom hand */
+body:not(.active-on-bottom.active-second) .side-red .hand-zone {
+  --hand-local-scale: var(--hand-scale-top);
+}
+
+body:not(.active-on-bottom.active-second) .side-blue .hand-zone {
+  --hand-local-scale: var(--hand-scale-bottom);
+}
+
+body.active-on-bottom.active-second .side-blue .hand-zone {
+  --hand-local-scale: var(--hand-scale-top);
+}
+
+body.active-on-bottom.active-second .side-red .hand-zone {
+  --hand-local-scale: var(--hand-scale-bottom);
+}
+
+.hand-zone {
+  transform-origin: bottom center;
+}
+
+.hand-zone .card {
+  transform: scale(var(--hand-local-scale, 1));
+  transform-origin: bottom center;
+}
+
+.hand-zone .card:hover {
+  transform: scale(calc(var(--hand-local-scale, 1) * 1.03)) translateY(-6px);
+}
+
+/* Compact leader bars (HP badge + evo buttons) */
+.side .leader-container {
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+}
+
+.side .leader {
+  width: var(--leader-bar-size) !important;
+  height: var(--leader-bar-size) !important;
+  min-width: var(--leader-bar-size);
+  font-size: var(--font-size-xl) !important;
+}
+
+.side .hp-value {
+  font-size: var(--font-size-xl) !important;
+}
+
+.side .evo-btn {
+  font-size: var(--font-size-2xs);
+  padding: 4px 6px;
+  min-height: 28px;
+}
+
+/* Larger board cards */
+.board-zone .card {
+  width: calc(var(--card-width) * var(--board-card-scale)) !important;
+  height: calc(var(--card-height) * var(--board-card-scale)) !important;
+}
+
+.board-zone {
+  min-height: 0 !important;
+  height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  padding: var(--space-3) var(--space-4);
+}
+
+.hand-zone {
+  min-height: 0;
+  max-height: calc(var(--card-height) * var(--hand-local-scale, 1) + 24px);
+  padding: var(--space-2) var(--space-3);
+}
+
+/* Top-row hands: keep fan from overlapping left chrome */
+body:not(.active-on-bottom.active-second) .side-red #redHand,
+body.active-on-bottom.active-second .side-blue #blueHand {
+  padding-left: var(--space-6);
+  box-sizing: border-box;
+}
+
+/* Bottom-row hands: keep fan clear of right rail */
+body:not(.active-on-bottom.active-second) .side-blue #blueHand,
+body.active-on-bottom.active-second .side-red #redHand {
+  padding-right: var(--space-8);
+  box-sizing: border-box;
+}
+
+/* History toggle — left edge battle-log position */
+#historyToggle {
+  top: auto !important;
+  bottom: 88px;
+  left: 12px !important;
+  transform: none !important;
+}
+
+/* Turn controls — right rail */
+#gameShell #turnControls {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-turn-controls);
+}
+
+/* Script diverge banner — below settings hamburger, not sticky header */
+#scriptDivergeBanner {
+  position: fixed;
+  top: 56px;
+  left: var(--shell-left-gutter);
+  right: var(--shell-right-gutter);
+  z-index: var(--z-banner);
+}
+
+/* Active side highlights (phase 2 preserved) */
+body.active-first .side-blue,
+body.active-second .side-red {
+  background: transparent;
+}
+
+body.active-first .side-blue {
+  background: linear-gradient(
+    180deg,
+    var(--color-board-blue-active),
+    transparent 55%
+  );
+}
+
+body.active-second .side-red {
+  background: linear-gradient(
+    180deg,
+    var(--color-board-red-active),
+    transparent 55%
+  );
+}
+
+/* Floating stats in corner rails */
+.floating-stats {
+  max-width: var(--side-rail-width);
+}
+
+/* Corner stats + crests — horizontal stack to avoid board overlap */
+#gameShell #redStatsContainer.floating-stats,
+#gameShell #blueStatsContainer.floating-stats {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  max-width: min(200px, 100%);
+}
+
+#gameShell #redCrests,
+#gameShell #blueCrests {
+  order: 0;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+#gameShell #redStats,
+#gameShell #blueStats {
+  order: 0;
+}
+
+#gameShell .crest-row {
+  flex-wrap: wrap;
+}
+
+/* Override phase 2 side-internal grid placement */
+#redStatsContainer {
+  grid-area: stats;
+  grid-row: 1;
+  grid-column: 3;
+  align-self: start;
+  justify-self: end;
+}
+
+#blueStatsContainer {
+  grid-area: stats;
+  grid-row: 2;
+  grid-column: 1;
+  align-self: end;
+  justify-self: start;
+}
+
+.side-red #redMulliganConfirm,
+.side-blue #blueMulliganConfirm {
+  /* grid placement set above */
+}
+
+/* No page scroll assertion helper */
+body.phase3-fixed-viewport {
+  overflow: hidden;
+}
+
+@media (max-height: 799px) {
+  #gameShell {
+    height: auto;
+    max-height: none;
+  }
+
+  html,
+  body {
+    overflow: auto;
+  }
+}
