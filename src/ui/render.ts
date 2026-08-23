@@ -15,6 +15,7 @@ import { maybeAdvanceScriptFromUi } from "./playerDispatch.js";
 import { syncSeedDisplay } from "./seedDisplay.js";
 import { refreshActiveTooltips } from "./tooltips.js";
 import { getPuzzleSessionSnapshot } from "../core/puzzle/session.js";
+import { syncFloatingCombatTextFromLogs } from "./floatingCombatText.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -195,6 +196,7 @@ export function render() {
 
   updateGameOverOverlay();
   refreshActiveTooltips();
+  syncFloatingCombatTextFromLogs();
 
   // After paint, drive the sparring line if it's that side's turn.
   queueMicrotask(() => {

@@ -6,6 +6,12 @@ import { getCardDetails } from "../../data/cardIndex.js";
 import { loadDecksFromRaw } from "../../data/deckLoader.js";
 import { loadCardDatabase } from "../../data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../logic/core/keywords/apply.js";
+import { logEvent } from "../../core/logger.js";
+import {
+  _getActiveFloaterCount,
+  _getFallbackTimerCount,
+  syncFloatingCombatTextFromLogs,
+} from "../floatingCombatText.js";
 import type {
   CardInstance,
   GameState,
@@ -29,6 +35,15 @@ export interface SvwbTestBridge {
   setEP(player: Player, charges: number): void;
   setSEP(player: Player, charges: number): void;
   setLeaderHP(player: Player, hp: number): void;
+  burstCombatFloaters(burst?: number): { peak: number };
+  emitLeaderCombatLogs(
+    events: Array<{ type: "heal" | "damage"; amount: number; player?: Player }>,
+  ): void;
+  getCombatFloaterStats(): {
+    dom: number;
+    tracked: number;
+    timers: number;
+  };
   advanceToTurn(round: number, activePlayer?: Player): void;
   render(): void;
   endTurn(): void;
@@ -109,6 +124,42 @@ function installBridge(): void {
     setLeaderHP(player, hp) {
       state.players[player].hp = hp;
       adapter.render();
+    },
+
+    burstCombatFloaters(burst = 60) {
+      for (let i = 0; i < burst; i++) {
+        logEvent("restoreLeader", { player: "first", amount: 1 });
+        logEvent("leaderDamage", { owner: "first", amount: 1 });
+      }
+      syncFloatingCombatTextFromLogs();
+      return { peak: _getActiveFloaterCount() };
+    },
+
+    emitLeaderCombatLogs(events) {
+      for (const ev of events) {
+        const player = ev.player ?? "first";
+        if (ev.type === "heal") {
+          const before = state.players[player].hp;
+          state.players[player].hp = Math.min(20, before + ev.amount);
+          const healed = state.players[player].hp - before;
+          if (healed > 0) {
+            logEvent("restoreLeader", { player, amount: healed });
+          }
+        } else {
+          const before = state.players[player].hp;
+          logEvent("leaderDamage", { owner: player, amount: ev.amount });
+          state.players[player].hp = Math.max(0, before - ev.amount);
+        }
+      }
+      adapter.render();
+    },
+
+    getCombatFloaterStats() {
+      return {
+        dom: document.querySelectorAll(".floating-combat-text").length,
+        tracked: _getActiveFloaterCount(),
+        timers: _getFallbackTimerCount(),
+      };
     },
 
     advanceToTurn(round, activePlayer = "first") {
