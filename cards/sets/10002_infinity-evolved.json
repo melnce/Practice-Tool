@@ -863,7 +863,7 @@
             "target": "enemy:follower",
             "amount": 4,
             "count": 3,
-            "distribution": "random"
+            "distribution": "random_distinct"
           }
         ]
       }

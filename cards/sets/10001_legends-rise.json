@@ -474,7 +474,7 @@
             "target": "enemy:follower",
             "amount": 3,
             "count": 3,
-            "distribution": "random"
+            "distribution": "random_distinct"
           }
         ],
         "else_effects": [

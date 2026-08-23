@@ -41,6 +41,7 @@ export interface DamageContext {
  *
  * - `direct`: Each target receives the full amount (default)
  * - `random_hits`: Random target selection, `count` times (with replacement)
+ * - `random_distinct`: Random target selection, `count` times (without replacement; sequential re-pool)
  * - `split_sequential`: Damage dealt sequentially until depleted, optional leader spillover
  * - `by_stat`: Target(s) with highest value of specified `stat`
  */
@@ -48,6 +49,7 @@ export type DamageDistribution =
   | "direct"
   | "random" // Alias for random_hits (used in card definitions)
   | "random_hits"
+  | "random_distinct"
   | "split_sequential"
   | "by_stat";
 
@@ -81,9 +83,9 @@ export type DamageAmountSource =
  *
  * ## Field Compatibility Matrix
  *
- * | Field             | direct | random_hits | split_sequential | by_stat |
- * |-------------------|--------|-------------|------------------|---------|
- * | count             | ❌     | ✅ required | ❌               | ❌      |
+ * | Field             | direct | random_hits | random_distinct | split_sequential | by_stat |
+ * |-------------------|--------|-------------|-----------------|------------------|---------|
+ * | count             | ❌     | ✅ required | ✅ required     | ❌               | ❌      |
  * | stat              | ❌     | ❌          | ❌               | ✅ req  |
  * | spill_to_leader   | ❌     | ❌          | ✅ optional      | ❌      |
  * | include_leader    | ❌     | ✅ optional | ❌               | ❌      |
@@ -137,10 +139,14 @@ export interface UnifiedDamageSpec {
 export function validateUnifiedSpec(spec: UnifiedDamageSpec): string[] {
   const warnings: string[] = [];
 
-  // count only valid for random_hits
-  if (spec.count !== undefined && spec.distribution !== "random_hits") {
+  // count only valid for random_hits / random_distinct
+  if (
+    spec.count !== undefined &&
+    spec.distribution !== "random_hits" &&
+    spec.distribution !== "random_distinct"
+  ) {
     warnings.push(
-      `'count' field only applies to distribution='random_hits', not '${spec.distribution}'`,
+      `'count' field only applies to distribution='random_hits' or 'random_distinct', not '${spec.distribution}'`,
     );
   }
 
@@ -166,13 +172,14 @@ export function validateUnifiedSpec(spec: UnifiedDamageSpec): string[] {
     );
   }
 
-  // include_leader only valid for random_hits
+  // include_leader only valid for random_hits / random_distinct
   if (
     spec.include_leader !== undefined &&
-    spec.distribution !== "random_hits"
+    spec.distribution !== "random_hits" &&
+    spec.distribution !== "random_distinct"
   ) {
     warnings.push(
-      `'include_leader' field only applies to distribution='random_hits'`,
+      `'include_leader' field only applies to distribution='random_hits' or 'random_distinct'`,
     );
   }
 

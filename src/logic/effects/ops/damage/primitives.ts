@@ -158,6 +158,107 @@ export function applyDirectDamage(
 }
 
 /**
+ * Apply damage to random distinct targets N times.
+ * SEMANTICS (rulebook sequential random):
+ * - Pool is rebuilt each hit (accounts for deaths mid-sequence)
+ * - Same target CANNOT be hit twice (without replacement among living targets)
+ * - If fewer valid targets remain than hits left, extra hits do nothing
+ * - Can include leader(s) if target spec / includeLeader allows (each leader at most once)
+ */
+export function applyRandomDistinctHits(
+  hitCount: number,
+  amountPerHit: number,
+  targetSpec: string,
+  owner: Player,
+  options?: {
+    includeLeader?: boolean | "enemy" | "ally" | "both";
+    sourceCard?: CardInstance | null;
+  },
+): void {
+  const includeLeaderOpt = options?.includeLeader;
+  const includeLeader =
+    includeLeaderOpt === true ||
+    includeLeaderOpt === "enemy" ||
+    includeLeaderOpt === "ally" ||
+    includeLeaderOpt === "both" ||
+    (includeLeaderOpt == null &&
+      (targetSpec === "enemy" ||
+        targetSpec === "enemy:all" ||
+        targetSpec === "all"));
+
+  const leaderMode: "enemy" | "ally" | "both" | false =
+    includeLeaderOpt === "both" || includeLeaderOpt === "ally"
+      ? includeLeaderOpt
+      : includeLeader
+        ? "enemy"
+        : false;
+
+  const pickedFollowerUids = new Set<string>();
+  const pickedLeaders = new Set<Player>();
+
+  withDamageBatch(() => {
+    let remaining = hitCount;
+    while (remaining-- > 0) {
+      const pool: (
+        | CardInstance
+        | { type: "Leader"; owner: Player; name: string }
+      )[] = [...getPool(targetSpec, owner, options?.sourceCard ?? null)];
+
+      if (leaderMode === "enemy" || leaderMode === "both") {
+        const targetOwner = opponentOf(owner);
+        if (!pickedLeaders.has(targetOwner)) {
+          pool.push({
+            type: "Leader",
+            owner: targetOwner,
+            name: "Enemy Leader",
+          } as any);
+        }
+      }
+      if (leaderMode === "ally" || leaderMode === "both") {
+        if (!pickedLeaders.has(owner)) {
+          pool.push({
+            type: "Leader",
+            owner,
+            name: "Allied Leader",
+          } as any);
+        }
+      }
+
+      const valid = pool.filter((c) => {
+        if (!c) return false;
+        if (c.type === "Leader") return true;
+        if (c.type === "Follower") {
+          const card = c as CardInstance;
+          if (pickedFollowerUids.has(card.uid)) return false;
+          return (parseInt(String(card.defense), 10) || 0) > 0;
+        }
+        return false;
+      });
+      if (!valid.length) break;
+
+      const pick = valid[state.rng.nextInt(valid.length)];
+      if (!pick) break;
+
+      logEvent("damageRandomDistinct", {
+        target: (pick as any).name,
+        uid: (pick as any).uid,
+        amount: amountPerHit,
+      });
+
+      if (pick.type === "Leader") {
+        const leaderOwner = (pick as any).owner as Player;
+        pickedLeaders.add(leaderOwner);
+        applyLeaderDamage(leaderOwner, amountPerHit);
+      } else {
+        const card = pick as CardInstance;
+        pickedFollowerUids.add(card.uid);
+        dealDamage(card, amountPerHit);
+      }
+    }
+  });
+}
+
+/**
  * Apply damage to random targets N times.
  * SEMANTICS (preserved from legacy):
  * - Pool is rebuilt each hit (accounts for deaths mid-sequence)

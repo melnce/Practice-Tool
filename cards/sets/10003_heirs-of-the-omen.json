@@ -2330,7 +2330,7 @@
         "target": "enemy:follower",
         "amount": 2,
         "count": 2,
-        "distribution": "random"
+        "distribution": "random_distinct"
       },
       {
         "op": "damage",

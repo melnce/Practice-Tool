@@ -37,7 +37,12 @@ export interface DamageEffect extends BaseEffect {
   target?: string;
   condition?: any;
   select?: number | string;
-  distribution?: "direct" | "random_hits" | "split_sequential" | "by_stat";
+  distribution?:
+    | "direct"
+    | "random_hits"
+    | "random_distinct"
+    | "split_sequential"
+    | "by_stat";
   amount_source?:
     | "fixed"
     | "hand_size"
