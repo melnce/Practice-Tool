@@ -68,7 +68,9 @@ async function runRepro() {
     headless: true,
     args: ["--no-sandbox", "--disable-gpu"],
   });
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const page = await browser.newPage({
+    viewport: { width: 1280, height: 900 },
+  });
 
   await page.addInitScript(() => {
     window.__rafAudit = {
