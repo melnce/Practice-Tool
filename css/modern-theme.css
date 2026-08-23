@@ -16,9 +16,9 @@ body {
 
 /* Layout wrappers (new, but harmless) */
 #appRoot {
-  max-width: 1200px;
+  max-width: var(--play-area-max-width, 1920px);
   margin: 0 auto;
-  padding: 8px 16px;
+  padding: 8px clamp(12px, 2vw, 28px);
 }
 
 .side {
@@ -362,6 +362,77 @@ body {
     box-shadow var(--duration-moderate) var(--ease-default);
 }
 
+/* Per-side play column + flanking stat/crest rails (zero overlap with cards) */
+.side-red,
+.side-blue {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--side-rail-width), max-content)
+    minmax(0, 1fr)
+    minmax(var(--side-rail-width), max-content);
+  column-gap: clamp(var(--space-6), 1.6vw, var(--space-14));
+  row-gap: var(--play-row-gap, 4px);
+  align-items: center;
+}
+
+.side-red #redHand,
+.side-red #redMulliganConfirm,
+.side-red .leader-container,
+.side-red #redBoard,
+.side-blue #blueBoard,
+.side-blue .leader-container,
+.side-blue #blueHand,
+.side-blue #blueMulliganConfirm {
+  grid-column: 2;
+  justify-self: stretch;
+  width: 100%;
+  max-width: 100%;
+}
+
+.side-red #redHand,
+.side-red #redMulliganConfirm {
+  grid-row: 1;
+}
+
+.side-red .leader-container {
+  grid-row: 2;
+}
+
+.side-red #redBoard {
+  grid-row: 3;
+}
+
+.side-blue #blueBoard {
+  grid-row: 1;
+}
+
+.side-blue .leader-container {
+  grid-row: 2;
+}
+
+.side-blue #blueStatsContainer {
+  grid-row: 2;
+}
+
+.side-blue #blueHand,
+.side-blue #blueMulliganConfirm {
+  grid-row: 3;
+}
+
+#redStatsContainer {
+  grid-column: 1;
+  grid-row: 2;
+  justify-self: start;
+  align-self: center;
+}
+
+#blueStatsContainer {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: end;
+  align-self: center;
+}
+
 .side-red {
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
@@ -401,13 +472,13 @@ body.active-second .side-red {
 
 .hand-zone {
   gap: 0;
-  padding: var(--space-3) var(--space-8);
-  min-height: var(--hand-zone-min-height, 142px);
+  padding: var(--space-3) var(--space-6);
+  min-height: var(--hand-zone-min-height, 148px);
   max-width: 100%;
   overflow: visible;
 }
 
-/* Symmetric hand fan — overlap tightens as count grows */
+/* Hand fan — overlap tightens only as card count grows */
 .hand-zone:has(.card:nth-child(7)) .card:not(:first-child) {
   margin-left: var(--hand-card-overlap-medium);
 }
@@ -483,33 +554,44 @@ body.active-second .side-red {
   margin-bottom: 0 !important;
 }
 
-/* Leader stats + crests — stacked column, in-flow (no collision with leader) */
+/* Leader stats + crests — side rails beside the play column */
 .floating-stats {
   position: relative;
   left: auto;
   top: auto;
   bottom: auto;
   right: auto;
-  margin: var(--space-1) auto;
+  margin: 0;
   width: fit-content;
-  max-width: min(100%, 220px);
+  max-width: var(--side-rail-width);
   padding: 0;
   background: transparent;
   border: none;
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: var(--leader-meta-gap);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
   align-items: center;
-  justify-items: center;
+  justify-content: center;
   z-index: var(--z-board-stats);
+  pointer-events: none;
+}
+
+.floating-stats > * {
+  pointer-events: auto;
 }
 
 #redStatsContainer {
   top: auto;
+  bottom: auto;
+  left: auto;
+  right: auto;
 }
 
 #blueStatsContainer {
   bottom: auto;
+  top: auto;
+  left: auto;
+  right: auto;
 }
 
 #redStats,
@@ -518,6 +600,9 @@ body.active-second .side-red {
   justify-content: center;
   flex-wrap: wrap;
   row-gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
 }
 
 #blueCrests {
@@ -543,7 +628,7 @@ body.active-second .side-red {
   align-items: center;
   gap: var(--crest-row-gap);
   width: fit-content;
-  min-height: calc(var(--crest-slot-size) * 2 + var(--crest-row-gap));
+  min-height: 0;
 }
 
 .crest-row {
