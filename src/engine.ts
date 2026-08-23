@@ -104,6 +104,7 @@ export function getState(): GameState {
  * Currently wraps history commands.
  */
 import { playCard } from "./logic/core/playCard/index.js";
+import { reportBlockedOutcome } from "./ui/outcomes.js";
 import { attackFollower, attackLeader } from "./logic/core/combat.js";
 import { resolvePendingTarget } from "./logic/core/resolveTarget.js";
 import { handleEvolveSelf } from "./logic/effects/ops/evolve.js";
@@ -152,7 +153,8 @@ function _dispatchInternal(
           : currentState.players.second.hand;
       const index = hand.findIndex((c) => c.uid === action.cardUid);
       if (index !== -1) {
-        playCard(hand, action.player, index);
+        const outcome = playCard(hand, action.player, index);
+        reportBlockedOutcome(outcome);
       } else {
         console.warn(
           `[Engine] PlayCard: Card ${action.cardUid} not found in ${action.player} hand.`,

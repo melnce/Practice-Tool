@@ -201,8 +201,16 @@ function paintTooltip(
   tooltipEl: HTMLElement,
   card: CardInstance,
   owner: Player,
+  anchor?: HTMLElement | null,
 ) {
-  tooltipEl.innerHTML = formatCardTooltip(card, owner);
+  let html = formatCardTooltip(card, owner);
+  const blockedReason = anchor?.dataset?.playBlockedReason?.trim();
+  if (blockedReason) {
+    html +=
+      `<div class="tooltip-play-blocked" style="color:#ff8888;margin-top:0.5em;font-weight:600;">` +
+      `Cannot play: ${blockedReason}</div>`;
+  }
+  tooltipEl.innerHTML = html;
   tooltipEl.style.whiteSpace = "normal";
   tooltipEl.style.display = "block";
 }
@@ -239,7 +247,7 @@ export function refreshActiveTooltips(): void {
   }
 
   activeSession = { anchor: hovered, owner, uid };
-  paintTooltip(tooltipEl, card, owner);
+  paintTooltip(tooltipEl, card, owner, hovered);
 }
 
 export function attachTooltip(
@@ -256,7 +264,7 @@ export function attachTooltip(
     const liveCard = resolveCardForAnchor(div, card);
     if (!liveCard) return;
     activeSession = { anchor: div, owner, uid: liveCard.uid };
-    paintTooltip(tooltipEl, liveCard, owner);
+    paintTooltip(tooltipEl, liveCard, owner, div);
   };
   div.onmousemove = (e: MouseEvent) => {
     const isBottomHalf = e.clientY > window.innerHeight / 2;

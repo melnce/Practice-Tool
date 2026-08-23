@@ -50,10 +50,13 @@ export function playCard(
       });
     }
 
-    // Commit the action with autoRender to update UI
-    commitAction({ autoRender: true });
+    // Refused plays must not create undo entries — abort the open action.
+    if (outcome.kind === "blocked") {
+      abortAction({ autoRender: true });
+      return outcome;
+    }
 
-    // Render is handled by autoRender in commitAction
+    commitAction({ autoRender: true });
 
     return outcome;
   } catch (e) {

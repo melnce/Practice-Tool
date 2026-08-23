@@ -31,6 +31,8 @@ export interface CardViewModel {
 
   // Visual states
   glowClass?: string | undefined;
+  /** Why this card cannot be played (active player's turn only). Shown in tooltip. */
+  playBlockedReason?: string | undefined;
 
   // Status Flags (Granular)
   isDamaged?: boolean | undefined;

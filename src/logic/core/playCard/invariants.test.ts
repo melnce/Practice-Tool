@@ -4,8 +4,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { state, resetGameState } from "../../../core/gameState.js";
 import type { CardInstance } from "../../../core/types/index.js";
-import { playCardNoRender, playCardCore } from "./index.js";
+import { playCardNoRender, playCardCore, playCard } from "./index.js";
 import { canPlayCard } from "./preflight.js";
+import {
+  canUndo,
+  resetHistory,
+  setHistoryEnabled,
+} from "../../../core/history.js";
 
 describe("PlayCard Invariants", () => {
   beforeEach(() => {
@@ -114,6 +119,40 @@ describe("PlayCard Invariants", () => {
 
       expect(result.kind).toBe("blocked");
       expect(state.players.first.playedHistory.length).toBe(0);
+    });
+
+    it("Blocked playCard does not push undo history entry", () => {
+      setHistoryEnabled(true);
+      resetHistory();
+
+      const follower: CardInstance = {
+        id: "legal-follower",
+        uid: "lf-1",
+        name: "Legal Follower",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+      };
+      const spell: CardInstance = {
+        id: "blocked-spell",
+        uid: "bs-2",
+        name: "Blocked Spell",
+        type: "Spell",
+        cost: 1,
+        spell: [
+          { op: "damage", target: "enemy:follower", select: 1, amount: 5 },
+        ],
+      };
+
+      state.players.first.hand = [spell, follower];
+      state.players.second.board = [];
+
+      playCard(state.players.first.hand, "first", 1);
+      expect(canUndo()).toBe(true);
+
+      playCard(state.players.first.hand, "first", 0);
+      expect(canUndo()).toBe(true);
     });
   });
 
