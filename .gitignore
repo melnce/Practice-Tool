@@ -46,6 +46,9 @@ reports/ui/*
 !reports/ui/phase1/
 reports/ui/phase1/*
 !reports/ui/phase1/**
+!reports/ui/phase2/
+reports/ui/phase2/*
+!reports/ui/phase2/**
 
 # ── Legacy / alternate layouts (hand-maintained; not used by runtime) ──
 cards/card_sets/

@@ -106,9 +106,47 @@
 
 .hand-zone {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 16px;
+  flex-wrap: nowrap;
+  gap: 0;
+  padding: var(--space-4) var(--space-8);
+  min-height: 158px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.hand-zone .card {
+  margin: 0;
+  transition:
+    var(--transition-transform),
+    var(--transition-shadow),
+    filter var(--duration-normal) var(--ease-default),
+    opacity var(--duration-normal) var(--ease-default);
+}
+
+.hand-zone .card:not(:first-child) {
+  margin-left: var(--hand-card-overlap);
+}
+
+.hand-zone .card:hover {
+  z-index: 20;
+  transform: translateY(-6px) scale(1.03);
+}
+
+/* Unplayable hand cards (no glow class on opponent turn or unaffordable) */
+.hand-zone
+  .card:not(.playable-glow):not(.enhance-ready):not(.alternate-ready):not(
+    .card-back
+  ):not(.selectable):not(.selected) {
+  opacity: var(--hand-unplayable-opacity);
+  filter: saturate(var(--hand-unplayable-saturate)) brightness(0.92);
+}
+
+.hand-zone .card.playable-glow,
+.hand-zone .card.enhance-ready,
+.hand-zone .card.alternate-ready {
+  opacity: 1;
+  filter: none;
+  z-index: 10;
 }
 
 #redHand {
@@ -168,25 +206,55 @@
   display: flex;
   justify-content: center;
   flex-wrap: nowrap;
-  gap: 6px;
-  min-height: 160px;
+  gap: var(--space-3);
+  min-height: 168px;
   min-width: 575px;
-  /*perfect width */
-  padding: 8px;
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  /* optional visual aid */
+  padding: var(--space-5) var(--space-6);
+  border: 1px dashed var(--color-border-default);
+  border-radius: var(--radius-xl);
+  background: var(--color-board-surface);
+  box-shadow: var(--shadow-inset-subtle), var(--shadow-inset-well);
+  position: relative;
 }
 
-.board-zone.drag-over {
-  background-color: rgba(255, 255, 255, 0.05);
+.board-zone:empty::before {
+  content: "Play zone";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-board-empty-label);
+  pointer-events: none;
 }
 
 #redBoard {
   flex-direction: row-reverse;
+  background: linear-gradient(
+    180deg,
+    var(--color-board-red-tint),
+    var(--color-board-surface)
+  );
+  border-color: var(--color-board-red-border);
 }
 
 #blueBoard {
   flex-direction: row;
+  background: linear-gradient(
+    180deg,
+    var(--color-board-blue-tint),
+    var(--color-board-surface)
+  );
+  border-color: var(--color-board-blue-border);
+}
+
+.board-zone.drag-over {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-style: solid;
 }
 
 #turnControls {
@@ -256,32 +324,41 @@
 }
 
 .leader {
-  width: 80px;
-  height: 80px;
+  width: var(--leader-frame-size);
+  height: var(--leader-frame-size);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  font-weight: bold;
-  color: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-extrabold);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-md);
   margin: auto;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-5);
 }
 
 .red-leader {
-  background-color: #800000;
-  border: 4px solid red;
+  background: radial-gradient(
+    80% 80% at 50% 25%,
+    rgba(255, 120, 120, 0.2),
+    var(--leader-red-fill)
+  );
+  border: 3px solid var(--leader-red-ring);
 }
 
 .blue-leader {
-  background-color: #000066;
-  border: 4px solid blue;
+  background: radial-gradient(
+    80% 80% at 50% 25%,
+    rgba(120, 170, 255, 0.2),
+    var(--leader-blue-fill)
+  );
+  border: 3px solid var(--leader-blue-ring);
 }
 
 .hp-value {
-  font-size: 2.2rem;
+  font-size: var(--font-size-5xl);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
 }
 
 .leader-container {
@@ -309,12 +386,18 @@
 
 #redStats,
 #blueStats {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 4px 8px;
-  border-radius: 12px;
-  color: white;
+  background: var(--color-glass-fill);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
   display: flex;
-  gap: 8px;
+  gap: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-sm);
 }
 
 /* --- Crest UI Styles --- */
@@ -322,30 +405,33 @@
 /* Modify the main floating stats container to be a flex column */
 .floating-stats {
   position: absolute;
-  left: 20px;
+  left: var(--space-10);
   background-color: transparent;
-  /* Remove background from parent */
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  /* Stack stats and crests vertically */
-  gap: 6px;
-  /* Space between stats bar and crests */
-  font-size: 1.1rem;
-  font-weight: bold;
-  z-index: 100;
+  gap: var(--space-3);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  z-index: var(--z-board-stats);
 }
 
 /* Re-apply styling to the inner stats bar */
 #redStats,
 #blueStats {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 4px 8px;
-  border-radius: 12px;
-  color: white;
+  background: var(--color-glass-fill);
+  backdrop-filter: blur(var(--blur-glass));
+  -webkit-backdrop-filter: blur(var(--blur-glass));
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-secondary);
   display: flex;
-  gap: 8px;
+  gap: var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-sm);
 }
 
 /* The main container now stacks the rows vertically and centers them */

@@ -59,6 +59,7 @@ export function renderCardDOM(
 
   // Board specific
   if (vm.isSuperEvo) div.classList.add("super-evo");
+  else if (vm.isEvo) div.classList.add("evolved");
 
   if (vm.canAttack) {
     if (vm.isRush) div.classList.add("rush-glow");
