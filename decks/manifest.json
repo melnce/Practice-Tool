@@ -1,10 +1,16 @@
 {
-  "generatedAt": "2026-08-16T13:35:20.767Z",
+  "generatedAt": "2026-08-23T11:47:30.059Z",
   "entries": [
     {
       "file": "abysscraft_necromancy.json",
       "id": "abysscraft_necromancy",
       "label": "Abyss Necromancy Reanimate",
+      "category": "deck"
+    },
+    {
+      "file": "dragoncraft_meta_v2.json",
+      "id": "dragoncraft_meta_v2",
+      "label": "Dragon Meta v2 (owner ladder list)",
       "category": "deck"
     },
     {
