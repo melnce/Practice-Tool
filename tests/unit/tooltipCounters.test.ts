@@ -8,6 +8,7 @@ import {
   counterLabel,
   formatCounterValueText,
   resolveCounterValue,
+  clearTooltipCounterCache,
 } from "../../src/ui/tooltipCounters.js";
 import {
   extractCardCrests,
@@ -68,6 +69,29 @@ describe("tooltipCounters", () => {
 
   it("labels combo counters", () => {
     expect(counterLabel("combo", {})).toBe("Combo");
+  });
+
+  it("caches collectTooltipCounters by card id", () => {
+    clearTooltipCounterCache();
+    const card = cardFromId("10844110");
+    const first = collectTooltipCounters(card);
+    const second = collectTooltipCounters(card);
+    expect(second).toBe(first);
+
+    const t0 = performance.now();
+    for (let i = 0; i < 500; i++) {
+      clearTooltipCounterCache();
+      collectTooltipCounters(card);
+    }
+    const uncachedMs = performance.now() - t0;
+
+    clearTooltipCounterCache();
+    collectTooltipCounters(card);
+    const t1 = performance.now();
+    for (let i = 0; i < 500; i++) collectTooltipCounters(card);
+    const cachedMs = performance.now() - t1;
+
+    expect(cachedMs).toBeLessThan(uncachedMs / 3);
   });
 });
 

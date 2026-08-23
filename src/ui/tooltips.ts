@@ -1,13 +1,12 @@
 // src/ui/tooltips.ts
 import { state } from "../core/gameState.js";
 import type { CardInstance, Player } from "../core/types/index.js";
+import { resolveUid } from "../core/uidResolver.js";
 import { getGlobalCardIndex } from "../data/cardIndex.js";
 import { collectSetIds, formatSetBadge } from "../data/formats.js";
 import {
   collectTooltipCounters,
   formatCounterLines,
-  formatCounterValueText,
-  type TooltipCounterSpec,
 } from "./tooltipCounters.js";
 import {
   extractCardCrests,
@@ -177,13 +176,70 @@ export function formatCardTooltip(
   );
 }
 
-function findCounterSpec(
+type TooltipSession = {
+  anchor: HTMLElement;
+  owner: Player;
+  uid: string;
+};
+
+let activeSession: TooltipSession | null = null;
+
+function hideTooltip(tooltipEl: HTMLElement) {
+  tooltipEl.style.display = "none";
+}
+
+function resolveCardForAnchor(
+  anchor: HTMLElement,
+  fallback: CardInstance,
+): CardInstance | null {
+  const uid = anchor.dataset.uid;
+  if (!uid) return fallback;
+  return resolveUid(uid) ?? fallback;
+}
+
+function paintTooltip(
+  tooltipEl: HTMLElement,
   card: CardInstance,
-  el: HTMLElement,
-): TooltipCounterSpec | null {
-  const key = el.getAttribute("data-counter-key");
-  if (!key) return null;
-  return collectTooltipCounters(card).find((spec) => spec.key === key) ?? null;
+  owner: Player,
+) {
+  tooltipEl.innerHTML = formatCardTooltip(card, owner);
+  tooltipEl.style.whiteSpace = "normal";
+  tooltipEl.style.display = "block";
+}
+
+/** Event-driven refresh — called from render() after each state paint. */
+export function refreshActiveTooltips(): void {
+  const tooltipEl = document.getElementById(
+    "cardTooltip",
+  ) as HTMLElement | null;
+  if (!tooltipEl) return;
+
+  const hoveredFromCss = document.querySelector(
+    '[data-has-tooltip="1"]:hover',
+  ) as HTMLElement | null;
+  const hovered =
+    hoveredFromCss ??
+    (activeSession?.anchor?.isConnected ? activeSession.anchor : null);
+
+  if (!hovered) {
+    if (activeSession) activeSession = null;
+    if (tooltipEl.style.display !== "none") hideTooltip(tooltipEl);
+    return;
+  }
+
+  const uid = hovered.dataset.uid;
+  if (!uid) return;
+
+  const owner = (hovered.dataset.tooltipOwner as Player | undefined) ?? "first";
+  const card = resolveUid(uid);
+  if (!card) {
+    activeSession = null;
+    hideTooltip(tooltipEl);
+    return;
+  }
+
+  activeSession = { anchor: hovered, owner, uid };
+  paintTooltip(tooltipEl, card, owner);
 }
 
 export function attachTooltip(
@@ -194,101 +250,13 @@ export function attachTooltip(
 ) {
   div.dataset.hasTooltip = "1";
   const owner: Player = isBlueSide ? "first" : "second";
+  div.dataset.tooltipOwner = owner;
+
   div.onmouseenter = () => {
-    // Render once so layout is stable
-    tooltipEl.innerHTML = formatCardTooltip(card, owner);
-    tooltipEl.style.whiteSpace = "normal";
-    tooltipEl.style.display = "block";
-
-    // Live refresh elements
-    const rallyLine = tooltipEl.querySelector(".rally-line");
-    const rallyValue = tooltipEl.querySelector(".rally-value");
-    const skyboundLine = tooltipEl.querySelector(".skybound-line");
-    const skyboundValue = tooltipEl.querySelector(".skybound-value");
-    const dynamicLines = tooltipEl.querySelectorAll(".dynamic-counter-line");
-
-    const needsLive =
-      (rallyLine && rallyValue) ||
-      (skyboundLine && skyboundValue) ||
-      dynamicLines.length > 0;
-
-    // === Safe live update (auto-stop) ===
-    if (needsLive) {
-      // Rally Data
-      const rSide = rallyLine?.getAttribute("data-side");
-      const rNeedAttr = rallyLine?.getAttribute("data-need");
-      const rNeed = rNeedAttr ? parseInt(rNeedAttr, 10) : null;
-
-      // Skybound Data
-      const sReqAttr = skyboundLine?.getAttribute("data-req");
-      const sReq = sReqAttr ? parseInt(sReqAttr, 10) : 10;
-
-      let lastRally = NaN;
-      let lastSkybound = NaN;
-      const lastDynamic = new Map<string, string>();
-      const stopAt = Date.now() + 120000; // hard cap: 2 min
-
-      function tick() {
-        // stop reasons: not hovered, node gone, tab hidden, time cap
-        if (
-          !div.isConnected ||
-          !tooltipEl.isConnected ||
-          document.hidden ||
-          !div.matches(":hover") ||
-          Date.now() > stopAt
-        ) {
-          cancelAnimationFrame((div as any).__ttRaf || 0);
-          (div as any).__ttRaf = null;
-          return;
-        }
-
-        // Update Rally
-        if (rallyLine && rallyValue) {
-          const curr =
-            rSide === "first"
-              ? state.players.first.rally | 0
-              : rSide === "second"
-                ? state.players.second.rally | 0
-                : 0;
-          if (curr !== lastRally) {
-            rallyValue.textContent =
-              rNeed != null ? `${curr} / ${rNeed}` : `${curr}`;
-            lastRally = curr;
-          }
-        }
-
-        // Update Skybound
-        if (skyboundLine && skyboundValue) {
-          const witnesses = card.skyboundArtEvolvesWitnessed || 0;
-          const curr = (state.roundCount || 1) + witnesses;
-          if (curr !== lastSkybound) {
-            skyboundValue.textContent = `${curr} / ${sReq}`;
-            lastSkybound = curr;
-          }
-        }
-
-        dynamicLines.forEach((lineEl) => {
-          const el = lineEl as HTMLElement;
-          const spec = findCounterSpec(card, el);
-          if (!spec) return;
-          const valueEl = el.querySelector(".dynamic-counter-value");
-          if (!valueEl) return;
-          const text = formatCounterValueText(spec, owner, card);
-          const prev = lastDynamic.get(spec.key);
-          if (text !== prev) {
-            valueEl.textContent = text;
-            lastDynamic.set(spec.key, text);
-          }
-        });
-
-        (div as any).__ttRaf = requestAnimationFrame(tick);
-      }
-      cancelAnimationFrame((div as any).__ttRaf || 0);
-      (div as any).__ttRaf = requestAnimationFrame(tick);
-    } else {
-      cancelAnimationFrame((div as any).__ttRaf || 0);
-      (div as any).__ttRaf = null;
-    }
+    const liveCard = resolveCardForAnchor(div, card);
+    if (!liveCard) return;
+    activeSession = { anchor: div, owner, uid: liveCard.uid };
+    paintTooltip(tooltipEl, liveCard, owner);
   };
   div.onmousemove = (e: MouseEvent) => {
     const isBottomHalf = e.clientY > window.innerHeight / 2;
@@ -313,20 +281,7 @@ export function attachTooltip(
     tooltipEl.style.left = Math.max(0, left) + "px";
   };
   div.onmouseleave = () => {
-    tooltipEl.style.display = "none";
-    if ((div as any).__ttRaf) cancelAnimationFrame((div as any).__ttRaf);
-    (div as any).__ttRaf = null;
+    if (activeSession?.anchor === div) activeSession = null;
+    hideTooltip(tooltipEl);
   };
 }
-
-// Global safety: stop all running loops when page hides/unloads
-window.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    // cancel any stray RAF stored on hovered elements
-    document.querySelectorAll('[data-has-tooltip="1"]').forEach((el) => {
-      const anyEl = el as any;
-      cancelAnimationFrame(anyEl.__ttRaf || 0);
-      anyEl.__ttRaf = null;
-    });
-  }
-});
