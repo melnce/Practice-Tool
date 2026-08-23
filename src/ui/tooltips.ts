@@ -3,6 +3,17 @@ import { state } from "../core/gameState.js";
 import type { CardInstance, Player } from "../core/types/index.js";
 import { getGlobalCardIndex } from "../data/cardIndex.js";
 import { collectSetIds, formatSetBadge } from "../data/formats.js";
+import {
+  collectTooltipCounters,
+  formatCounterLines,
+  formatCounterValueText,
+  type TooltipCounterSpec,
+} from "./tooltipCounters.js";
+import {
+  extractCardCrests,
+  formatCrestPanels,
+  formatTooltipDescription,
+} from "./tooltipFormat.js";
 
 // NEW: show +A/+D based only on buffs/debuffs (not damage)
 function formatBuffDelta(card: CardInstance) {
@@ -33,7 +44,7 @@ function formatSetLine(card: CardInstance): string {
   if (!badge) return "";
   // Quiet in-game-style set label; older sets get a soft marker (not a warning).
   const color = badge.inRotation ? "#9aa3b2" : "#7a8494";
-  return `<br><span class="card-set-line" style="color:${color};font-size:0.9em;">${badge.text}</span>`;
+  return `<span class="card-set-line" style="color:${color};font-size:0.9em;">${badge.text}</span>`;
 }
 
 // Helper to check for the keyword OR the gate op
@@ -82,8 +93,18 @@ export function formatCardTooltip(
   const hasTribes = Array.isArray(card?.tribes) && card.tribes.length > 0;
   const tribes = hasTribes ? (card.tribes ?? []).join(", ") : "";
   const desc = (card?.description ?? "").trim();
+  const side = owner ?? state.activePlayer ?? "first";
 
   const classLine = hasTribes ? `${clazz}/${tribes}` : clazz;
+  const setLine = formatSetLine(card);
+
+  const counters = collectTooltipCounters(card);
+  const counterBlock = formatCounterLines(counters, side, card);
+  const descBlock = formatTooltipDescription(card, desc);
+  const crestBlock = formatCrestPanels(
+    extractCardCrests(card),
+    String(card.id ?? ""),
+  );
 
   // === Fused Loot (unique) section ===
   let extraText = "";
@@ -113,7 +134,6 @@ export function formatCardTooltip(
   const finalRallyReq = rallyReq || (rallyGate ? rallyGate.count : null);
 
   if (finalRallyReq) {
-    const side = owner ?? state.activePlayer ?? "first";
     extraText +=
       `<br><br><span class="rally-line" data-need="${finalRallyReq}" data-side="${side}" style="color: #7af;">` +
       `Rally: <span class="rally-value">0 / ${finalRallyReq}</span>` +
@@ -144,11 +164,26 @@ export function formatCardTooltip(
   // === Buff Delta ===
   const buffDelta = formatBuffDelta(card);
 
-  return `${name}
-  
-${classLine}${formatSetLine(card)}
+  const metaParts = [classLine, setLine].filter(Boolean).join("<br>");
 
-${desc}${extraText}${buffDelta}`;
+  return (
+    `<div class="tooltip-header-name">${name}</div>` +
+    (metaParts ? `<div class="tooltip-header-meta">${metaParts}</div>` : "") +
+    counterBlock +
+    descBlock +
+    crestBlock +
+    extraText +
+    buffDelta
+  );
+}
+
+function findCounterSpec(
+  card: CardInstance,
+  el: HTMLElement,
+): TooltipCounterSpec | null {
+  const key = el.getAttribute("data-counter-key");
+  if (!key) return null;
+  return collectTooltipCounters(card).find((spec) => spec.key === key) ?? null;
 }
 
 export function attachTooltip(
@@ -162,7 +197,7 @@ export function attachTooltip(
   div.onmouseenter = () => {
     // Render once so layout is stable
     tooltipEl.innerHTML = formatCardTooltip(card, owner);
-    tooltipEl.style.whiteSpace = "pre-line";
+    tooltipEl.style.whiteSpace = "normal";
     tooltipEl.style.display = "block";
 
     // Live refresh elements
@@ -170,9 +205,15 @@ export function attachTooltip(
     const rallyValue = tooltipEl.querySelector(".rally-value");
     const skyboundLine = tooltipEl.querySelector(".skybound-line");
     const skyboundValue = tooltipEl.querySelector(".skybound-value");
+    const dynamicLines = tooltipEl.querySelectorAll(".dynamic-counter-line");
+
+    const needsLive =
+      (rallyLine && rallyValue) ||
+      (skyboundLine && skyboundValue) ||
+      dynamicLines.length > 0;
 
     // === Safe live update (auto-stop) ===
-    if ((rallyLine && rallyValue) || (skyboundLine && skyboundValue)) {
+    if (needsLive) {
       // Rally Data
       const rSide = rallyLine?.getAttribute("data-side");
       const rNeedAttr = rallyLine?.getAttribute("data-need");
@@ -184,6 +225,7 @@ export function attachTooltip(
 
       let lastRally = NaN;
       let lastSkybound = NaN;
+      const lastDynamic = new Map<string, string>();
       const stopAt = Date.now() + 120000; // hard cap: 2 min
 
       function tick() {
@@ -224,6 +266,20 @@ export function attachTooltip(
             lastSkybound = curr;
           }
         }
+
+        dynamicLines.forEach((lineEl) => {
+          const el = lineEl as HTMLElement;
+          const spec = findCounterSpec(card, el);
+          if (!spec) return;
+          const valueEl = el.querySelector(".dynamic-counter-value");
+          if (!valueEl) return;
+          const text = formatCounterValueText(spec, owner, card);
+          const prev = lastDynamic.get(spec.key);
+          if (text !== prev) {
+            valueEl.textContent = text;
+            lastDynamic.set(spec.key, text);
+          }
+        });
 
         (div as any).__ttRaf = requestAnimationFrame(tick);
       }
