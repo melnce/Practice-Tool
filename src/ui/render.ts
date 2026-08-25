@@ -175,6 +175,7 @@ export function render() {
     "redDestroyedList",
     state.players.second.destroyedHistory,
   );
+  wireHistoryImagePreviewOnce();
 
   // God Mode Visibility — either side on a test deck
   const godPanel = byId("blueGodMode");
@@ -470,13 +471,12 @@ function renderListIfPresent(id: string, arr: any[]) {
     list.appendChild(li);
   }
   el.appendChild(list);
-
-  // Attach hover preview for any hist-item under this container
-  wireHistoryImagePreview(el);
 }
 
-// Create-once floating image preview
+// Create-once floating image preview + delegated document listeners
 let __histPreviewEl: HTMLElement | null = null;
+let __histPreviewWired = false;
+
 function ensureHistoryPreviewEl() {
   if (__histPreviewEl) return __histPreviewEl;
   const div = document.createElement("div");
@@ -495,29 +495,33 @@ function ensureHistoryPreviewEl() {
   return div;
 }
 
-function wireHistoryImagePreview(scopeEl: HTMLElement) {
+/** Attach hover preview handlers once (delegated on document). */
+function wireHistoryImagePreviewOnce(): void {
+  if (__histPreviewWired) return;
+  __histPreviewWired = true;
   const preview = ensureHistoryPreviewEl();
-  scopeEl.addEventListener("mousemove", (e) => {
+
+  document.addEventListener("mousemove", (e) => {
     if (preview.style.display === "none") return;
-    // position to the right of cursor, clamped to viewport
     const w = 210;
-    const h = 300; // preview size
+    const h = 300;
     let x = e.clientX + 18;
     let y = e.clientY + 18;
-    const vw = window.innerWidth,
-      vh = window.innerHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
     if (x + w > vw) x = vw - w - 12;
     if (y + h > vh) y = vh - h - 12;
     preview.style.left = x + "px";
     preview.style.top = y + "px";
   });
 
-  scopeEl.addEventListener("mouseover", (e) => {
-    const li = (e.target as HTMLElement).closest(".hist-item") as HTMLElement;
+  document.addEventListener("mouseover", (e) => {
+    const li = (e.target as HTMLElement).closest(
+      ".hist-item",
+    ) as HTMLElement | null;
     if (!li) return;
     const url = li.dataset.img;
     if (!url) return;
-    const preview = ensureHistoryPreviewEl();
     preview.innerHTML = "";
     const img = new Image();
     img.width = 198;
@@ -529,10 +533,9 @@ function wireHistoryImagePreview(scopeEl: HTMLElement) {
     preview.style.display = "block";
   });
 
-  scopeEl.addEventListener("mouseout", (e) => {
+  document.addEventListener("mouseout", (e) => {
     const li = (e.target as HTMLElement).closest(".hist-item");
     if (!li) return;
-    const preview = ensureHistoryPreviewEl();
     preview.style.display = "none";
   });
 }
