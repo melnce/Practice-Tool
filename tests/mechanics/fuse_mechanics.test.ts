@@ -5,7 +5,8 @@
  * - No recipe whitelist — any hand card may be fused to a Fuse: Cards host
  * - Once per turn per card instance (lastFuseRound on the host)
  * - Persistent isFused flag survives hand → field
- * - Sephie: on fuse, spend 2 PP to summon Obsessed Test Subject (if PP available)
+ * - Sephie: on-fuse spends 2 PP and summons only when PP ≥ 2 at fuse time
+ * - Fuse is always legal regardless of PP; material always consumed; isFused always set
  * - Ecstatic Scholar: super-evolve drain only when fused in hand
  */
 
@@ -67,6 +68,36 @@ function fuseToInitiator(initiatorUid: string, partnerUid: string) {
   resolvePendingTarget(partnerUid);
 }
 
+function subjectCount(): number {
+  return thenBoard("first").filter((c) => c.name === "Obsessed Test Subject")
+    .length;
+}
+
+function scholarDrainPayoff(scholarOnBoard: ReturnType<typeof findOnBoard>) {
+  const subject = createCard(TEST_SUBJECT, "board", "first");
+  state.players.first.board.push(subject);
+  scholarOnBoard!.peak_defense = scholarOnBoard!.defense;
+  state.players.first.superEvoPoints = 1;
+  onEvolve(scholarOnBoard!, "first", "super");
+
+  const pending = state.pendingTargetEffect;
+  expect(pending).toBeDefined();
+  const uid =
+    pending!.poolUids?.find((id) => id === subject.uid) ??
+    pending!.pool?.find((c) => c.uid === subject.uid)?.uid;
+  expect(uid).toBeTruthy();
+  resolvePendingTarget(String(uid));
+
+  const updated = state.players.first.board.find((c) => c.uid === subject.uid)!;
+  const hasDrain =
+    updated.hasDrain ||
+    updated.keywords?.some(
+      (k) => (typeof k === "string" ? k : k?.name) === "Drain",
+    ) ||
+    updated.keywordState?.hasDrain;
+  return hasDrain;
+}
+
 describe("Mechanic Contract: Fuse: Cards", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -76,6 +107,49 @@ describe("Mechanic Contract: Fuse: Cards", () => {
   });
 
   describe("Sephie, Maven Convict — on-fuse summon", () => {
+    it("with 0 PP: material consumed, isFused set, no spend, no token, fuse slot used", () => {
+      setupFuseTurn([SEPHIE, FILLER, FILLER], 0);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const [mat1, mat2] = thenHand("first").filter((c) => c.id === FILLER);
+
+      fuseToInitiator(sephie.uid, mat1.uid);
+
+      expect(sephie.isFused).toBe(true);
+      expect(sephie.lastFuseRound).toBe(state.roundCount);
+      expect(thenHand("first").some((c) => c.uid === mat1.uid)).toBe(false);
+      expect(getPP(state, "first")).toBe(0);
+      expect(subjectCount()).toBe(0);
+
+      fuseToInitiator(sephie.uid, mat2.uid);
+      expect(thenHand("first").some((c) => c.uid === mat2.uid)).toBe(true);
+    });
+
+    it("with exactly 2 PP: PP drops by exactly 2 and token is summoned", () => {
+      setupFuseTurn([SEPHIE, FILLER], 2);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+
+      fuseToInitiator(sephie.uid, material.uid);
+
+      expect(sephie.isFused).toBe(true);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+      expect(getPP(state, "first")).toBe(0);
+      expect(subjectCount()).toBe(1);
+    });
+
+    it("with 1 PP: material consumed, PP unchanged, no token", () => {
+      setupFuseTurn([SEPHIE, FILLER], 1);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+
+      fuseToInitiator(sephie.uid, material.uid);
+
+      expect(sephie.isFused).toBe(true);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+      expect(getPP(state, "first")).toBe(1);
+      expect(subjectCount()).toBe(0);
+    });
+
     it("with 2+ PP: fusing summons Obsessed Test Subject and spends 2 PP", () => {
       setupFuseTurn([SEPHIE, FILLER], 4);
       const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
@@ -87,14 +161,11 @@ describe("Mechanic Contract: Fuse: Cards", () => {
       expect(sephie.isFused).toBe(true);
       expect(sephie.lastFuseRound).toBe(state.roundCount);
       expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
-      expect(
-        thenBoard("first").filter((c) => c.name === "Obsessed Test Subject")
-          .length,
-      ).toBe(1);
+      expect(subjectCount()).toBe(1);
       expect(getPP(state, "first")).toBe(ppBefore - 2);
     });
 
-    it("with fewer than 2 PP: fuse still marks isFused but does not summon", () => {
+    it("with fewer than 2 PP: fuse still consumes material and marks isFused", () => {
       setupFuseTurn([SEPHIE, FILLER], 1);
       const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
       const material = thenHand("first").find((c) => c.id === FILLER)!;
@@ -103,10 +174,8 @@ describe("Mechanic Contract: Fuse: Cards", () => {
       fuseToInitiator(sephie.uid, material.uid);
 
       expect(sephie.isFused).toBe(true);
-      expect(
-        thenBoard("first").filter((c) => c.name === "Obsessed Test Subject")
-          .length,
-      ).toBe(0);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+      expect(subjectCount()).toBe(0);
       expect(getPP(state, "first")).toBe(ppBefore);
     });
 
@@ -186,6 +255,25 @@ describe("Mechanic Contract: Fuse: Cards", () => {
         ) ||
         updated.keywordState?.hasDrain;
       expect(hasDrain).toBe(true);
+    });
+
+    it("fused at 0 PP still grants Drain on super-evolve", () => {
+      setupFuseTurn([SCHOLAR, FILLER], 0, R6, [FILLER, FILLER, FILLER]);
+      const scholar = thenHand("first").find((c) => c.id === SCHOLAR)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+
+      fuseToInitiator(scholar.uid, material.uid);
+      expect(scholar.isFused).toBe(true);
+      expect(getPP(state, "first")).toBe(0);
+
+      state.players.first.pp = 6;
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.uid === scholar.uid),
+      );
+
+      const scholarOnBoard = findOnBoard("first", "Ecstatic Scholar")!;
+      expect(scholarDrainPayoff(scholarOnBoard)).toBe(true);
     });
 
     it("super-evolved without fuse grants no extra drain selection", () => {
