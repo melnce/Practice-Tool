@@ -9,7 +9,7 @@
     "class": "Neutral",
     "rarity": "Bronze",
     "tribes": [],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90001110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90001110_evo.webp",
     "set": "[90000] Basic A",
@@ -17,7 +17,8 @@
     "keywords": [],
     "triggers": [],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90004110",
@@ -37,7 +38,8 @@
     "keywords": ["Storm"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90004120",
@@ -49,7 +51,7 @@
     "class": "Neutral",
     "rarity": "Legendary",
     "tribes": [],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90004120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90004120_evo.webp",
     "set": "[90000] Basic A",
@@ -57,7 +59,8 @@
     "keywords": [],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90004130",
@@ -205,7 +208,8 @@
     "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90011120",
@@ -399,7 +403,7 @@
     "class": "Swordcraft",
     "rarity": "Bronze",
     "tribes": ["Officer"],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021110_evo.webp",
     "set": "[90000] Basic A",
@@ -407,7 +411,8 @@
     "keywords": [],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90021120",
@@ -419,7 +424,7 @@
     "class": "Swordcraft",
     "rarity": "Bronze",
     "tribes": ["Officer"],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90021120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90021120_evo.webp",
     "set": "[90000] Basic A",
@@ -427,7 +432,8 @@
     "keywords": [],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90021310",
@@ -705,7 +711,7 @@
     "class": "Runecraft",
     "rarity": "Bronze",
     "tribes": ["Golem"],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90031110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90031110_evo.webp",
     "set": "[90000] Basic A",
@@ -713,7 +719,8 @@
     "keywords": [],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90031120",
@@ -733,7 +740,8 @@
     "keywords": ["Ward"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90031130",
@@ -765,7 +773,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90031140",
@@ -797,7 +806,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90031210",
@@ -838,7 +848,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "90032110",
@@ -870,7 +881,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90033310",
@@ -936,7 +948,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90034120",
@@ -973,7 +986,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90034130",
@@ -1008,7 +1022,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90034310",
@@ -1132,7 +1147,8 @@
     "keywords": ["Intimidate"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90041120",
@@ -1152,7 +1168,8 @@
     "keywords": ["Intimidate"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90041130",
@@ -1172,7 +1189,8 @@
     "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90043110",
@@ -1192,7 +1210,8 @@
     "keywords": ["Storm", "Ward"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90044110",
@@ -1212,7 +1231,8 @@
     "keywords": ["Ward"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90044120",
@@ -1232,7 +1252,8 @@
     "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90044310",
@@ -1369,7 +1390,7 @@
     "class": "Abysscraft",
     "rarity": "Bronze",
     "tribes": ["Departed"],
-    "description": null,
+    "description": "",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/90051110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/90051110_evo.webp",
     "set": "[90000] Basic A",
@@ -1377,7 +1398,8 @@
     "keywords": [],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90051120",
@@ -1397,7 +1419,8 @@
     "keywords": ["Drain"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90051130",
@@ -1432,7 +1455,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90051140",
@@ -1470,7 +1494,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90054110",
@@ -1502,7 +1527,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90054120",
@@ -1535,7 +1561,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90054130",
@@ -1573,7 +1600,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90054310",
@@ -1680,7 +1708,8 @@
     "keywords": ["Storm"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90061120",
@@ -1700,7 +1729,8 @@
     "keywords": ["Rush"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90061130",
@@ -1720,7 +1750,8 @@
     "keywords": ["Storm"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90064110",
@@ -1740,7 +1771,8 @@
     "keywords": ["Ward"],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90064310",
@@ -1841,7 +1873,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90071120",
@@ -1876,7 +1909,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90071210",
@@ -1913,7 +1947,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "90071220",
@@ -1950,7 +1985,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "spell": []
   },
   {
     "id": "90072110",
@@ -1976,7 +2012,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90072120",
@@ -2002,7 +2039,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90072130",
@@ -2034,7 +2072,8 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "triggers": []
+    "triggers": [],
+    "fanfare": []
   },
   {
     "id": "90073110",
@@ -2113,7 +2152,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90073120",
@@ -2149,7 +2189,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90073130",
@@ -2185,7 +2226,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90074110",
@@ -2238,7 +2280,8 @@
     "keywords": ["Ward", "Taunt"],
     "triggers": [],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90074130",
@@ -2270,7 +2313,8 @@
       }
     ],
     "evolve": [],
-    "superevolve": []
+    "superevolve": [],
+    "fanfare": []
   },
   {
     "id": "90074210",
@@ -2824,6 +2868,89 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush"],
+    "triggers": [],
+    "fanfare": []
+  },
+  {
+    "id": "90021210",
+    "name": "Dread Pirate's Flag",
+    "cost": "1",
+    "attack": "0",
+    "defense": "0",
+    "type": "Amulet",
+    "class": "Swordcraft",
+    "rarity": "Bronze",
+    "tribes": [],
+    "description": "Countdown (7)\nWhenever you play a spell, advance this amulet's count by 1.\nLast Words: Deal 2 damage to the enemy leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90021210.webp",
+    "evo_image": "",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90021210-dread-pirates-flag",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 7
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 2
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "ally_spell_played",
+        "source": "board",
+        "effects": [
+          {
+            "op": "countdown",
+            "action": "advance",
+            "target": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": []
+  },
+  {
+    "id": "90074150",
+    "name": "Warden of the Trigger",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "class": "Portalcraft",
+    "rarity": "Legendary",
+    "tribes": ["Artifact"],
+    "description": "Ward\nLast Words: Restore 2 defense to your leader.",
+    "base_image": "https://static.dotgg.gg/shadowverse/cards/90074150.webp",
+    "evo_image": "https://static.dotgg.gg/shadowverse/cards/90074150_evo.webp",
+    "set": "[90000] Basic A",
+    "url": "https://shadowverse.gg/cards/90074150-warden-of-the-trigger",
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   }

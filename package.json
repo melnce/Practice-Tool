@@ -31,6 +31,7 @@
     "cards:update": "npx tsx scripts/mergeSets.ts",
     "cards:watch": "npx tsx scripts/watch_cards.ts",
     "ingest:cards": "npx tsx scripts/ingest-cards.ts",
+    "ingest:tokens": "npx tsx scripts/ingest-tokens.ts",
     "check:cards": "npx tsx scripts/check-cards-sync.ts",
     "check:tokens": "npx tsx scripts/check-tokens-sync.ts",
     "check:card-text": "npx tsx scripts/check-card-text.ts",

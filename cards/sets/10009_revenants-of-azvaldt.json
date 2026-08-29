@@ -248,7 +248,7 @@
     "cost": "3",
     "attack": "0",
     "defense": "0",
-    "type": "Spell",
+    "type": "Amulet",
     "class": "Forestcraft",
     "rarity": "Bronze",
     "tribes": [],
@@ -260,8 +260,23 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "event": "enemy_follower_enter",
+        "source": "board",
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "entering_follower"
+          },
+          {
+            "op": "destroy",
+            "scope": "self"
+          }
+        ]
+      }
+    ],
+    "fanfare": []
   },
   {
     "id": "10912110",
@@ -3094,9 +3109,37 @@
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10974120-aizeden-killshot-revenant",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Artifact"
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "count": 1,
+            "distribution": "random"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Warden of the Trigger",
+        "count": 1
+      }
+    ]
   }
 ]

@@ -41,12 +41,17 @@ export const RARITY_BY_ID: Record<string, string> = {
  */
 export const SET_NAME_FALLBACKS: Record<string, string> = {
   "10009": "Revenants of Azvaldt",
+  "90000": "Basic A",
 };
+
+/** Token set id on DotGG (all summoned / hand-token definitions). */
+export const TOKEN_SET_ID = "90000";
 
 /** DotGG `type: Spell` corrections (Engage / Countdown / Last Words amulets). */
 export const CARD_TYPE_OVERRIDES: Record<string, string> = {
   "10903210": "Amulet", // Azvaldt, Penitentiary of Chaos
   "10963210": "Amulet", // Juratio
+  "10911210": "Amulet", // Trap in the Woods (hand-trap amulet, not Spell)
 };
 
 /** Fields that encode authored executable content — NEVER overwrite if present. */
@@ -515,6 +520,164 @@ export function planIngest(
   }
 
   return { sets, warnings, collectibleCount, tokenCount };
+}
+
+/** Ops that reference another card by display name (must exist in pool or tokens). */
+export const NAMED_REFERENCE_OPS = new Set(["summon", "add_to_hand", "crest"]);
+
+/** Walk card JSON for summon/add_to_hand/crest name references. */
+export function collectNamedCardReferences(cards: RepoCard[]): Set<string> {
+  const names = new Set<string>();
+  function walk(obj: unknown): void {
+    if (!obj || typeof obj !== "object") return;
+    if (Array.isArray(obj)) {
+      for (const item of obj) walk(item);
+      return;
+    }
+    const o = obj as Record<string, unknown>;
+    const op = String(o.op ?? "");
+    if (
+      NAMED_REFERENCE_OPS.has(op) &&
+      typeof o.name === "string" &&
+      o.name.trim()
+    ) {
+      // crest advance ops reference crest name but do not summon a card
+      if (op === "crest" && o.action === "advance") return;
+      names.add(o.name.trim());
+    }
+    for (const v of Object.values(o)) walk(v);
+  }
+  for (const card of cards) walk(card);
+  return names;
+}
+
+export type DanglingReference = {
+  name: string;
+  refs: Array<{ id: string; cardName: string; op: string }>;
+};
+
+/** Scan pool cards for named references missing from all.json + token_details. */
+export function scanDanglingReferences(
+  poolCards: RepoCard[],
+  tokens: RepoCard[],
+): DanglingReference[] {
+  const knownNames = new Set<string>();
+  for (const c of [...poolCards, ...tokens]) {
+    if (c.name) knownNames.add(c.name);
+  }
+
+  const missing = new Map<string, DanglingReference["refs"]>();
+
+  function walk(obj: unknown, cardId: string, cardName: string): void {
+    if (!obj || typeof obj !== "object") return;
+    if (Array.isArray(obj)) {
+      for (const item of obj) walk(item, cardId, cardName);
+      return;
+    }
+    const o = obj as Record<string, unknown>;
+    const op = String(o.op ?? "");
+    if (
+      NAMED_REFERENCE_OPS.has(op) &&
+      typeof o.name === "string" &&
+      o.name.trim()
+    ) {
+      if (op === "crest" && o.action === "advance") {
+        // skip crest countdown advance
+      } else {
+        const name = o.name.trim();
+        if (!knownNames.has(name)) {
+          if (!missing.has(name)) missing.set(name, []);
+          missing.get(name)!.push({ id: cardId, cardName, op });
+        }
+      }
+    }
+    for (const v of Object.values(o)) walk(v, cardId, cardName);
+  }
+
+  for (const card of poolCards) {
+    walk(card, String(card.id), card.name);
+  }
+
+  return [...missing.entries()]
+    .map(([name, refs]) => ({ name, refs }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export type TokenIngestPlan = {
+  incoming: RepoCard[];
+  warnings: string[];
+  basicACount: number;
+  referencedPullCount: number;
+  danglingAfter: DanglingReference[];
+};
+
+/**
+ * Plan token ingest: full Basic A (90000) plus any token referenced by the pool.
+ */
+export function planTokenIngest(
+  apiCards: DotggCard[],
+  poolCards: RepoCard[],
+  existingTokens: RepoCard[],
+): TokenIngestPlan {
+  const warnings: string[] = [];
+  const referencedNames = collectNamedCardReferences(poolCards);
+  const poolNames = new Set(poolCards.map((c) => c.name));
+
+  const tokenByName = new Map<string, DotggCard>();
+  for (const raw of apiCards) {
+    if (isTokenCard(raw) || String(raw.setId) === TOKEN_SET_ID) {
+      tokenByName.set(raw.name, raw);
+    }
+  }
+
+  const toIngest = new Map<string, DotggCard>();
+  let basicACount = 0;
+
+  for (const raw of apiCards) {
+    if (String(raw.setId) !== TOKEN_SET_ID) continue;
+    toIngest.set(String(raw.id), raw);
+    basicACount++;
+  }
+
+  let referencedPullCount = 0;
+  for (const name of referencedNames) {
+    if (poolNames.has(name)) continue;
+    const raw = tokenByName.get(name);
+    if (!raw) {
+      warnings.push(
+        `Pool references "${name}" but no token/Basic A row in DotGG dump`,
+      );
+      continue;
+    }
+    const id = String(raw.id);
+    if (!toIngest.has(id)) {
+      referencedPullCount++;
+      toIngest.set(id, raw);
+    }
+  }
+
+  const incoming = [...toIngest.values()]
+    .map((raw) =>
+      mapDotggCardToRepo({
+        ...raw,
+        set_name:
+          String(raw.set_name ?? "").trim() ||
+          SET_NAME_FALLBACKS[TOKEN_SET_ID] ||
+          TOKEN_SET_ID,
+      }),
+    )
+    .sort((a, b) => String(a.id).localeCompare(String(b.id)));
+
+  const mergedPreview = mergeSetCards(existingTokens, incoming).cards;
+  const danglingAfter = scanDanglingReferences(poolCards, mergedPreview);
+
+  return {
+    incoming,
+    warnings,
+    basicACount,
+    referencedPullCount,
+    danglingAfter,
+  };
 }
 
 export function crossCheckCygamesSets(
