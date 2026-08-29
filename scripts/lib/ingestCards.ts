@@ -556,15 +556,40 @@ export type DanglingReference = {
   refs: Array<{ id: string; cardName: string; op: string }>;
 };
 
+/** Collect crest display names declared via crest gain ops in card JSON trees. */
+export function collectCrestNames(cards: RepoCard[]): Set<string> {
+  const names = new Set<string>();
+  function walk(obj: unknown): void {
+    if (!obj || typeof obj !== "object") return;
+    if (Array.isArray(obj)) {
+      for (const item of obj) walk(item);
+      return;
+    }
+    const o = obj as Record<string, unknown>;
+    if (
+      o.op === "crest" &&
+      o.action === "gain" &&
+      typeof o.name === "string" &&
+      o.name.trim()
+    ) {
+      names.add(o.name.trim());
+    }
+    for (const v of Object.values(o)) walk(v);
+  }
+  for (const card of cards) walk(card);
+  return names;
+}
+
 /** Scan pool cards for named references missing from all.json + token_details. */
 export function scanDanglingReferences(
   poolCards: RepoCard[],
   tokens: RepoCard[],
 ): DanglingReference[] {
-  const knownNames = new Set<string>();
+  const cardNames = new Set<string>();
   for (const c of [...poolCards, ...tokens]) {
-    if (c.name) knownNames.add(c.name);
+    if (c.name) cardNames.add(c.name);
   }
+  const crestNames = collectCrestNames([...poolCards, ...tokens]);
 
   const missing = new Map<string, DanglingReference["refs"]>();
 
@@ -581,14 +606,11 @@ export function scanDanglingReferences(
       typeof o.name === "string" &&
       o.name.trim()
     ) {
-      if (op === "crest" && o.action === "advance") {
-        // skip crest countdown advance
-      } else {
-        const name = o.name.trim();
-        if (!knownNames.has(name)) {
-          if (!missing.has(name)) missing.set(name, []);
-          missing.get(name)!.push({ id: cardId, cardName, op });
-        }
+      const name = o.name.trim();
+      const known = op === "crest" ? crestNames.has(name) : cardNames.has(name);
+      if (!known) {
+        if (!missing.has(name)) missing.set(name, []);
+        missing.get(name)!.push({ id: cardId, cardName, op });
       }
     }
     for (const v of Object.values(o)) walk(v, cardId, cardName);

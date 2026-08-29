@@ -23,6 +23,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { SETS_DIR } from "./mergeSets.js";
 import { checkOpKeysForCard } from "./op-keys-gate.js";
+import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import {
   getImplementationStatus,
   type ImplementationStatus,
@@ -444,6 +445,7 @@ function nodeHasUntilEotOrDuration(node: unknown): boolean {
   }
   const obj = node as Record<string, unknown>;
   if (obj.until_eot === true) return true;
+  if (obj.until_end_of_turn === true) return true;
   if (typeof obj.duration === "string" || typeof obj.duration === "number")
     return true;
   if (
@@ -1265,7 +1267,15 @@ function main() {
   const gateOpKeys =
     process.argv.includes("--gate=op-keys") ||
     process.argv.includes("--gate=op_keys");
-  const gateMode = gateAddToHand || gateStatOp || gateDestroyOp || gateOpKeys;
+  const gateDurationOp =
+    process.argv.includes("--gate=duration-op") ||
+    process.argv.includes("--gate=duration_op");
+  const gateMode =
+    gateAddToHand ||
+    gateStatOp ||
+    gateDestroyOp ||
+    gateOpKeys ||
+    gateDurationOp;
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -1286,7 +1296,9 @@ function main() {
           ? "🔍 Checking destroy op filter field contracts...\n"
           : gateOpKeys
             ? "🔍 Checking op-keys field contracts...\n"
-            : "🔍 Checking card description ↔ JSON structure...\n",
+            : gateDurationOp
+              ? "🔍 Checking duration-key op contracts...\n"
+              : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
@@ -1298,6 +1310,7 @@ function main() {
         if (gateStatOp) allIssues.push(...checkStatOpFilters(card));
         if (gateDestroyOp) allIssues.push(...checkDestroyOpFilters(card));
         if (gateOpKeys) allIssues.push(...checkOpKeysForCard(card));
+        if (gateDurationOp) allIssues.push(...checkDurationOpKeysForCard(card));
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
@@ -1378,7 +1391,9 @@ function main() {
             ? `✅ ${cardCount} cards — all destroy ops use supported filter fields.\n`
             : gateOpKeys
               ? `✅ ${cardCount} cards — all ops use supported keys.\n`
-              : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+              : gateDurationOp
+                ? `✅ ${cardCount} cards — duration keys only appear on ops that honour them.\n`
+                : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(

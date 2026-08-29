@@ -694,7 +694,7 @@
   {
     "id": "10031110",
     "name": "Dazzling Runeknight",
-    "cost": "2",
+    "cost": "3",
     "attack": "2",
     "defense": "2",
     "type": "Follower",
@@ -16133,7 +16133,7 @@
   },
   {
     "id": "10433110",
-    "name": "Elmott, Remembrance Alflame",
+    "name": "Elmott, Remembrance Aflame",
     "cost": "3",
     "attack": "2",
     "defense": "1",
@@ -16141,7 +16141,7 @@
     "class": "Runecraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.\nSuper-Evolve: Gain Crest: Elmott, Remembrance Alflame.",
+    "description": "Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.\nSuper-Evolve: Gain Crest: Elmott, Remembrance Aflame.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10433110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10433110_evo.webp",
     "set": "[10004] Skybound Dragons",
@@ -32453,6 +32453,14 @@
         "target": "enemy:follower",
         "amount": 6,
         "select": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 2,
+        "count": 1,
+        "distribution": "random_hits",
+        "exclude_selected": true
       }
     ],
     "specific_effects": [
@@ -33915,9 +33923,39 @@
     "url": "https://shadowverse.gg/cards/10941110-ripper-clawed-thief",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Ripper-Clawed Thief",
+            "count": 1
+          },
+          {
+            "op": "keyword",
+            "action": "remove",
+            "target": "last_added_to_hand",
+            "keywords": ["LastWords"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "ally_attacked_leader_last_turn",
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10941120",
@@ -34011,7 +34049,28 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Storm"],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "strike",
+        "source": "board",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "ally_attacked_leader_last_turn",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "attack": 1,
+                "defense": 0,
+                "until_eot": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -34158,7 +34217,20 @@
     "superevolve": [],
     "keywords": ["Rush", "Ignores Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "ally_attacked_leader_last_turn",
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10944120",
@@ -34343,7 +34415,7 @@
     "class": "Abysscraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Ward\nLast Words: Destroy a random enemy follower. Restore 2 defense to your leader.",
+    "description": "Ward\nLast Words: Destroy a random enemy follower. Restore 2 defense to your leader.\nCrystallize (2): Countdown (4)\nLast Words: Summon a Void Colonel.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10952110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10952110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
@@ -34352,6 +34424,26 @@
     "superevolve": [],
     "keywords": [
       "Ward",
+      {
+        "name": "Crystallize",
+        "cost": 2,
+        "amuletKeywords": [
+          {
+            "name": "Countdown",
+            "turns": 4
+          },
+          {
+            "name": "LastWords",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Void Colonel"
+              }
+            ]
+          }
+        ]
+      },
       {
         "name": "LastWords",
         "effects": [
@@ -34604,10 +34696,64 @@
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10954110-istyndet-vs-mitilykket",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Istyndet vs. Mitilykket",
+        "description": "At the end of your turn, if there's an allied card on the field with Last Words, destroy a random allied card with Last Words and a random enemy follower.",
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "gate",
+                "condition": "ally_matches",
+                "count": 1,
+                "has_keyword": "LastWords",
+                "effects": [
+                  {
+                    "op": "destroy",
+                    "target": "ally:card",
+                    "distribution": "random",
+                    "count": 1,
+                    "condition": {
+                      "has_keyword": "LastWords"
+                    }
+                  },
+                  {
+                    "op": "destroy",
+                    "target": "enemy:follower",
+                    "distribution": "random",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "repeat_effect",
+        "count": 3,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "graveyard",
+            "max_cost": 2
+          }
+        ]
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -34867,14 +35013,48 @@
     "class": "Havencraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Storm",
+    "description": "Storm\nCrystallize (1): Countdown (3)\nLast Words: Summon a Miraculous Al-mi'raj.\nEngage (1): Advance this amulet's count by 1.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10962120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10962120_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10962120-miraculous-al-miraj",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm",
+      {
+        "name": "Crystallize",
+        "cost": 1,
+        "amuletKeywords": [
+          {
+            "name": "Countdown",
+            "turns": 3
+          },
+          {
+            "name": "LastWords",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Miraculous Al-mi'raj"
+              }
+            ]
+          },
+          {
+            "name": "Engage",
+            "cost": 1,
+            "effects": [
+              {
+                "op": "countdown",
+                "action": "advance",
+                "target": "self",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
@@ -35521,7 +35701,39 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10974110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10974110-cutthroat-fluxblade-convict",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "banish",
+        "target": "ally:deck",
+        "filters": {
+          "name": "Cutthroat, Fluxblade Convict"
+        }
+      },
+      {
+        "op": "gate",
+        "condition": "highlander",
+        "effects": [
+          {
+            "op": "crest",
+            "action": "gain",
+            "name": "Cutthroat, Fluxblade Convict",
+            "description": "Once on each of your turns, when you play a follower, evolve it.",
+            "triggers": [
+              {
+                "event": "ally_follower_played",
+                "once_per_turn": true,
+                "effects": [
+                  {
+                    "op": "evolve",
+                    "target": "played_card"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": ["Bane"],
     "triggers": [],

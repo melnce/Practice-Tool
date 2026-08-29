@@ -131,14 +131,20 @@ export function processCandidateTriggers(
         }
       }
 
-      // 4. Tracking / Once Per Turn (max_per_turn always enforced)
-      if (trigger.max_per_turn != null && trigger.max_per_turn > 0) {
+      // 4. Tracking / Once Per Turn (always enforce once_per_turn and max_per_turn)
+      const enforceTracking =
+        trigger.once_per_turn ||
+        (trigger.max_per_turn != null && trigger.max_per_turn > 0);
+
+      if (enforceTracking) {
         if (!shouldFire(trigger, card, event, currentTurn, context)) {
           DEBUG_TRIGGERS.log({
             event,
             card: card.name,
             triggerId: trigger.event,
-            result: "skip_max_per_turn",
+            result: trigger.once_per_turn
+              ? "skip_once_per_turn"
+              : "skip_max_per_turn",
           });
           continue;
         }
@@ -171,10 +177,7 @@ export function processCandidateTriggers(
       runEffects(trigger.effects || [], owner, card, context);
 
       // 6. Mark Fired
-      if (
-        !options.skipTracking ||
-        (trigger.max_per_turn != null && trigger.max_per_turn > 0)
-      ) {
+      if (enforceTracking || !options.skipTracking) {
         markFired(trigger, card, event, currentTurn, context);
       }
       // Phase 4: REMOVED legacy usedThisTurn fallback in skipTracking branch

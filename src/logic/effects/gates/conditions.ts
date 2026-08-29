@@ -219,6 +219,7 @@ function countBoardMatches(
   if (spec.name) filter.name = spec.name;
   if ((spec as any).class) filter.class = String((spec as any).class);
   if (spec.tribe) filter.tribe = spec.tribe;
+  if (spec.has_keyword) filter.has_keyword = spec.has_keyword;
   return cards.filter(
     (card) =>
       !(spec.exclude_self && sourceCard && card.uid === sourceCard.uid) &&

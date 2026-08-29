@@ -18,7 +18,7 @@ export function withBuffDuration(
   const d = resolveDynamicValue(eff.defense as any, ctx);
 
   // 2. Determine duration
-  if (eff.until_end_of_turn) {
+  if (eff.until_end_of_turn || (eff as any).until_eot) {
     if (!target.temporaryBuffs) target.temporaryBuffs = [];
     target.temporaryBuffs.push({
       attack: a,

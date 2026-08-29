@@ -193,8 +193,13 @@ function resolveTargets(
 
   switch (target) {
     case "self":
-    case "played_card":
       return sourceCard ? [sourceCard] : [];
+
+    case "played_card": {
+      const played = context?.playedCard as CardInstance | undefined;
+      if (played?.type === "Follower") return [played];
+      return sourceCard?.type === "Follower" ? [sourceCard] : [];
+    }
 
     case "selected":
     case "selected:follower": {
