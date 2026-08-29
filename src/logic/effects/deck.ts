@@ -159,6 +159,7 @@ function handleAddToDeck(owner: Player, eff: any): void {
     console.warn(`[deck] add: card not found: ${name}`);
     return;
   }
+  const shuffleDeck = eff.shuffle !== false;
   for (let i = 0; i < count; i++) {
     const copy = structuredClone(cardData);
     copy.uid = state.rng.makeUid();
@@ -170,9 +171,14 @@ function handleAddToDeck(owner: Player, eff: any): void {
         (copy as any).base_cost = c;
       }
     }
-    deck.push(copy);
+    if (shuffleDeck) {
+      deck.push(copy);
+    } else {
+      const index = state.rng.nextInt(deck.length + 1);
+      deck.splice(index, 0, copy);
+    }
   }
-  if (eff.shuffle !== false) {
+  if (shuffleDeck) {
     shuffleInPlace(deck);
   }
   logEvent("deckAdd", { owner, name, count });
@@ -211,7 +217,13 @@ function handleAddDestroyedMatchToDeck(owner: Player, eff: any): void {
     copy.owner = owner;
     copy.zone = "deck";
     normalizeCardStats(copy);
-    deck.push(copy);
+    const shuffleDeck = eff.shuffle !== false;
+    if (shuffleDeck) {
+      deck.push(copy);
+    } else {
+      const index = state.rng.nextInt(deck.length + 1);
+      deck.splice(index, 0, copy);
+    }
     logEvent("deckAdd", {
       owner,
       name: copy.name,

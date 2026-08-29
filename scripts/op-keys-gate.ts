@@ -404,6 +404,11 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "amount",
     "name",
     "count",
+    "source",
+    "rank",
+    "stat",
+    "shuffle",
+    "set_cost",
   ]),
   crest: new Set([
     "action",
