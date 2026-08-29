@@ -1459,7 +1459,7 @@
   },
   {
     "id": "10433110",
-    "name": "Elmott, Remembrance Alflame",
+    "name": "Elmott, Remembrance Aflame",
     "cost": "3",
     "attack": "2",
     "defense": "1",
@@ -1467,7 +1467,7 @@
     "class": "Runecraft",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.\nSuper-Evolve: Gain Crest: Elmott, Remembrance Alflame.",
+    "description": "Fanfare: Select an enemy follower on the field, remove all abilities from it, and deal it 3 damage.\nSuper-Evolve: Gain Crest: Elmott, Remembrance Aflame.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10433110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10433110_evo.webp",
     "set": "[10004] Skybound Dragons",

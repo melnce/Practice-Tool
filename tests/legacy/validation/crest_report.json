@@ -277,7 +277,7 @@
     },
     {
       "crestName": "Elmott, Remembrance Aflame",
-      "sourceCard": "Elmott, Remembrance Alflame (10433110)",
+      "sourceCard": "Elmott, Remembrance Aflame (10433110)",
       "description": "At the start of your turn, deal 1 damage to the enemy leader.",
       "verdict": "PASS",
       "reasoning": "The programmed trigger 'start_of_turn_own' matches 'At the start of your turn' and deals 1 damage to the enemy leader as described.",
