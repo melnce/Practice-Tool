@@ -167,7 +167,9 @@ describe("Set 10009 batch A — C2 Ripper-Clawed Thief", () => {
     const thief = findOnBoard("first", "Ripper-Clawed Thief")!;
     thief.defense = 0;
     cleanupDead();
-    const copy = thenHand("first").find((c) => c.name === "Ripper-Clawed Thief");
+    const copy = thenHand("first").find(
+      (c) => c.name === "Ripper-Clawed Thief",
+    );
     expect(copy).toBeTruthy();
     expect(copy!.hasLastWords).toBeFalsy();
     const copyIdx = getHand(state, "first").findIndex(
@@ -239,7 +241,9 @@ describe("Set 10009 batch A — C5 Void Colonel Crystallize", () => {
     setupTurn(R6, { hand: ["10952110"], pp: 2 });
     playCardNoRender(getHand(state, "first"), "first", 0);
     expect(
-      thenBoard("first").some((c) => c.name === "Void Colonel" && c.type === "Follower"),
+      thenBoard("first").some(
+        (c) => c.name === "Void Colonel" && c.type === "Follower",
+      ),
     ).toBe(false);
     const amulet = findOnBoard("first", "Void Colonel")!;
     expect(amulet.type).toBe("Amulet");
