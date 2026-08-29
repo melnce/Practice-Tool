@@ -32483,7 +32483,25 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "deck",
+        "action": "add",
+        "source": "destroyed_match",
+        "rank": "highest",
+        "stat": "base_cost",
+        "filter": {
+          "type": "Follower"
+        },
+        "count": 1,
+        "shuffle": false
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10902110",
@@ -32569,8 +32587,50 @@
     "url": "https://shadowverse.gg/cards/10903210-azvaldt-penitentiary-of-chaos",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
-    "triggers": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "destroyed_match",
+            "count": 4,
+            "distinct_by": "name",
+            "filter": {
+              "type": "Follower"
+            }
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:follower",
+            "attack": 3,
+            "defense": 3
+          }
+        ]
+      }
+    ],
+    "triggers": [
+      {
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "played_base_cost_ladder",
+            "effects": [
+              {
+                "op": "destroy",
+                "scope": "self"
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -34112,11 +34172,41 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10943110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10943110-barren-earth-tyrant",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "High-Spirited Marauder",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "ally_attacked_leader_last_turn",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "count": 2,
+            "distribution": "random_hits"
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "count": 1,
+            "distribution": "random_hits"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10943310",
@@ -34137,7 +34227,28 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "gate",
+        "condition": "ally_attacked_leader_last_turn",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 6,
+            "distribution": "split_sequential"
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3,
+            "distribution": "split_sequential"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10944110",
