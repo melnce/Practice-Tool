@@ -39,6 +39,8 @@ const DOTGG_CORRECTED_AMULETS = [
   "10602210", // Encroached World — Engage
   "10001210", // Detective's Lens — Engage
   "10463210", // De La Fille's Gleaming Gems — Engage
+  "10903210", // Azvaldt, Penitentiary of Chaos — Last Words / board-persist
+  "10963210", // Juratio — Engage
 ] as const;
 
 function setupTurn(
@@ -59,14 +61,14 @@ function setupTurn(
   state.activePlayer = "first";
 }
 
-describe("Type audit — text-first derivation (202 non-Follower cards)", () => {
+describe("Type audit — text-first derivation (225 non-Follower cards)", () => {
   const rows = auditSpellAmuletTypes(
     cardsAll as Parameters<typeof auditSpellAmuletTypes>[0],
   );
   const contradictions = rows.filter((r) => r.contradiction);
 
-  it("scans 202 Spell/Amulet cards with zero text contradictions", () => {
-    expect(rows.length).toBe(202);
+  it("scans 225 Spell/Amulet cards with zero text contradictions", () => {
+    expect(rows.length).toBe(225);
     expect(contradictions).toEqual([]);
   });
 

@@ -35,6 +35,20 @@ export const RARITY_BY_ID: Record<string, string> = {
   "4": "Legendary",
 };
 
+/**
+ * DotGG getsets / card.set_name can lag a new release. Keys are set ids.
+ * Official name: Steam / Cygames set #9 (Aug 2026).
+ */
+export const SET_NAME_FALLBACKS: Record<string, string> = {
+  "10009": "Revenants of Azvaldt",
+};
+
+/** DotGG `type: Spell` corrections (Engage / Countdown / Last Words amulets). */
+export const CARD_TYPE_OVERRIDES: Record<string, string> = {
+  "10903210": "Amulet", // Azvaldt, Penitentiary of Chaos
+  "10963210": "Amulet", // Juratio
+};
+
 /** Fields that encode authored executable content — NEVER overwrite if present. */
 export const AUTHORED_EFFECT_KEYS = [
   "fanfare",
@@ -226,10 +240,11 @@ export function extractEvergreenKeywords(description: string): string[] {
 }
 
 export function mapDotggCardToRepo(card: DotggCard): RepoCard {
-  const type = mapCardType(card.type);
+  const type = CARD_TYPE_OVERRIDES[String(card.id)] ?? mapCardType(card.type);
   const description = stripSkillText(card.skill_text);
   const setId = String(card.setId ?? "");
-  const setName = String(card.set_name ?? setId);
+  const setName =
+    String(card.set_name ?? "").trim() || SET_NAME_FALLBACKS[setId] || setId;
   const baseImage =
     card.image || `https://static.dotgg.gg/shadowverse/cards/${card.id}.webp`;
   const evoImage =
@@ -460,7 +475,12 @@ export function planIngest(
     }
 
     const meta = setMeta.get(setId);
-    const setName = meta?.name_original || meta?.name || raw.set_name || setId;
+    const setName =
+      meta?.name_original ||
+      meta?.name ||
+      raw.set_name ||
+      SET_NAME_FALLBACKS[setId] ||
+      setId;
     const mapped = mapDotggCardToRepo({
       ...raw,
       set_name: String(setName).replace(/^Set\s*\d+\s*:\s*/i, ""),

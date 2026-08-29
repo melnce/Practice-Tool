@@ -11,6 +11,7 @@ import {
   mergeSetCards,
   planIngest,
   readSetFile,
+  setFileName,
   stripSkillText,
   writeSetFile,
   type DotggCard,
@@ -70,6 +71,53 @@ describe("card ingest mapping", () => {
         name: "Accelerate",
       },
     ]);
+  });
+
+  it("uses SET_NAME_FALLBACKS when DotGG set metadata is missing", () => {
+    const mapped = mapDotggCardToRepo({
+      id: "10901110",
+      name: "Jailor of Antiquity",
+      skill_text: "Fanfare: Deal 6.",
+      class: "0",
+      color: "Neutral",
+      type: "Follower",
+      cost: "6",
+      atk: "6",
+      life: "6",
+      rarity: "1",
+      tribes: [],
+      setId: "10009",
+      set_name: "",
+      is_token: "0",
+      image: "https://static.dotgg.gg/shadowverse/cards/10901110.webp",
+    });
+    expect(mapped.set).toBe("[10009] Revenants of Azvaldt");
+    expect(setFileName("10009", "Revenants of Azvaldt")).toBe(
+      "10009_revenants-of-azvaldt.json",
+    );
+  });
+
+  it("applies CARD_TYPE_OVERRIDES for DotGG Spell mislabels", () => {
+    const mapped = mapDotggCardToRepo({
+      id: "10963210",
+      name: "Juratio",
+      skill_text: "Engage (1): Destroy this card.",
+      class: "6",
+      color: "Havencraft",
+      type: "Spell",
+      cost: "6",
+      atk: "0",
+      life: "0",
+      rarity: "3",
+      tribes: [],
+      setId: "10009",
+      set_name: "Revenants of Azvaldt",
+      is_token: "0",
+      image: "https://static.dotgg.gg/shadowverse/cards/10963210.webp",
+    });
+    expect(mapped.type).toBe("Amulet");
+    expect(mapped).not.toHaveProperty("spell");
+    expect(mapped.fanfare).toEqual([]);
   });
 });
 
