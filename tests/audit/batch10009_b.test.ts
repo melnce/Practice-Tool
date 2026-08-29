@@ -23,6 +23,9 @@ import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { recordPlayedBaseCost } from "../../src/logic/core/playedBaseCostHistory.js";
 import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
+import { runEffects } from "../../src/logic/core/effects/index.js";
+import { getCardById } from "../../src/data/cardDatabase.js";
+import { getHP } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
 const R5 = 5;
@@ -116,8 +119,11 @@ function totalEnemyDefense(): number {
   );
 }
 
-describe("split_sequential — oldest-first spill (Aragavy contract)", () => {
-  beforeEach(() => resetUidCounter());
+describe("split_sequential — oldest-first spill (owner-pinned contract)", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    state.gameStarted = true;
+  });
 
   it("deals to oldest follower first and spills remainder after death", () => {
     givenGameState({ seed: 1 })
@@ -126,7 +132,6 @@ describe("split_sequential — oldest-first spill (Aragavy contract)", () => {
         { name: "Newest", type: "Follower", defense: 5, attack: 1 },
       ])
       .build();
-    state.gameStarted = true;
 
     whenRunEffects(
       [
@@ -142,6 +147,95 @@ describe("split_sequential — oldest-first spill (Aragavy contract)", () => {
 
     expect(findOnBoard("second", "Oldest")).toBeUndefined();
     expect(findOnBoard("second", "Newest")?.defense).toBe(3);
+  });
+
+  it("keeps oldest-first order after an intervening follower dies and is removed", () => {
+    givenGameState({ seed: 1 }).build();
+    state.gameStarted = true;
+    const oldest = enemyFollower(1, 2, "Oldest");
+    const middle = enemyFollower(1, 1, "Middle");
+    const newest = enemyFollower(1, 5, "Newest");
+    expect(state.players.second.board.indexOf(oldest)).toBe(0);
+    expect(state.players.second.board.indexOf(newest)).toBe(2);
+
+    middle.defense = 0;
+    cleanupDead();
+    expect(state.players.second.board.map((c) => c.name)).toEqual([
+      "Oldest",
+      "Newest",
+    ]);
+
+    whenRunEffects(
+      [
+        {
+          op: "damage",
+          target: "enemy:follower",
+          amount: 4,
+          distribution: "split_sequential",
+        },
+      ],
+      "first",
+    );
+
+    // Oldest-first: Oldest dies (2), Newest takes 2 → 3 def.
+    // Newest-first would leave Oldest at 2 and Newest at 1.
+    expect(findOnBoard("second", "Oldest")).toBeUndefined();
+    expect(findOnBoard("second", "Newest")?.defense).toBe(3);
+  });
+
+  it("Shining Disenchantment LW (10363210): leader takes leftover only after followers", () => {
+    const lwKw = (getCardById("10363210")!.keywords as any[]).find(
+      (k) => k?.name === "LastWords",
+    );
+    const splitLw = lwKw.effects[0];
+
+    givenGameState({ seed: 1 }).build();
+    state.gameStarted = true;
+    state.players.second.hp = 20;
+    enemyFollower(1, 4, "Soaker");
+    runEffects([splitLw], "first", null);
+    expect(getHP(state, "second")).toBe(20);
+    expect(thenBoard("second")).toHaveLength(0);
+
+    resetUidCounter();
+    givenGameState({ seed: 1 }).build();
+    state.gameStarted = true;
+    state.players.second.hp = 20;
+    enemyFollower(1, 2, "Partial");
+    runEffects([splitLw], "first", null);
+    expect(getHP(state, "second")).toBe(18);
+    expect(findOnBoard("second", "Partial")).toBeUndefined();
+  });
+
+  /**
+   * OWNER QUESTIONS — Barrier in split path (do not "fix" without owner sign-off):
+   * When a follower in the split path has Barrier, applySplitSpillover still
+   * subtracts min(remaining, its defense) from the pool even though dealDamage
+   * pops Barrier for 0 actual damage. This test pins current engine behaviour.
+   */
+  it("pins current engine: Barrier follower soaks full defense from split pool", () => {
+    givenGameState({ seed: 1 }).build();
+    state.gameStarted = true;
+    const ward = enemyFollower(1, 10, "BarrierWall");
+    ward.hasBarrier = true;
+    const behind = enemyFollower(1, 5, "Behind");
+    state.players.second.hp = 20;
+
+    whenRunEffects(
+      [
+        {
+          op: "damage",
+          target: "enemy:follower",
+          amount: 12,
+          distribution: "split_sequential",
+        },
+      ],
+      "first",
+    );
+
+    expect(ward.hasBarrier).toBe(false);
+    expect(ward.defense).toBe(10);
+    expect(behind.defense).toBe(3);
   });
 });
 
