@@ -33822,7 +33822,35 @@
       }
     ],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "on_fuse",
+        "source": "hand",
+        "condition": {
+          "is_fuse_initiator": true
+        },
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "pp_at_least",
+            "count": 2,
+            "effects": [
+              {
+                "op": "pp",
+                "action": "spend",
+                "amount": 2
+              },
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Obsessed Test Subject",
+                "count": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": [
       {
         "op": "summon",

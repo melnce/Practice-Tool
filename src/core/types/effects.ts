@@ -184,7 +184,8 @@ export interface FuseEffect extends BaseEffect {
     | "alpha"
     | "gear_multi"
     | "loot"
-    | "gardens_allure";
+    | "gardens_allure"
+    | "cards";
   initiator_uid?: string;
   partner?: any;
   result?: any;

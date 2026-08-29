@@ -1,191 +1,368 @@
 /**
- * @file Mechanic Contract Test: fuse mechanics
+ * @file Mechanic Contract Test: Fuse: Cards (generic fuse)
  *
- * DESIGN: Tests the fuse operation for combining cards.
- *
- * INVARIANTS UNDER TEST:
- * - Fuse combines material cards
- * - on_fuse trigger fires
- * - Fuse count tracked
- * - Loot fuse mechanics
- * - Artifact fuse mechanics
+ * Owner rulings:
+ * - No recipe whitelist — any hand card may be fused to a Fuse: Cards host
+ * - Once per turn per card instance (lastFuseRound on the host)
+ * - Persistent isFused flag survives hand → field
+ * - Sephie: on-fuse spends 2 PP and summons only when PP ≥ 2 at fuse time
+ * - Fuse is always legal regardless of PP; material always consumed; isFused always set
+ * - Ecstatic Scholar: super-evolve drain only when fused in hand
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
 import {
   givenGameState,
-  whenRunEffects,
-  thenHand,
-  findOnBoard,
+  createCard,
   resetUidCounter,
+  whenPlayCard,
+  thenHand,
+  thenBoard,
+  findOnBoard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
+import { startFuseFromHand } from "../../src/logic/index.js";
+import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import { fuse_finalize_cards } from "../../src/logic/effects/ops/fuse/fuse.cards.js";
+import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { getPP } from "../../src/core/playerHelpers.js";
+import {
+  undo,
+  redo,
+  beginAction,
+  commitAction,
+  resetHistory,
+  setHistoryEnabled,
+} from "../../src/core/history.js";
+import "../../src/logic/core/effects/index.js";
 
-describe("Mechanic Contract: fuse", () => {
+const R6 = 6;
+const FILLER = "10111310";
+const SEPHIE = "10934110";
+const SCHOLAR = "10933110";
+const TEST_SUBJECT = "10931110";
+
+function setupFuseTurn(
+  hand: string[],
+  pp: number,
+  round: number = R6,
+  deck: string[] = [FILLER, FILLER, FILLER],
+) {
+  const max = Math.min(round, 10);
+  givenGameState({
+    seed: 42,
+    activePlayer: "first",
+    roundCount: round,
+  })
+    .withFirstPP(pp, max)
+    .withFirstHand(hand)
+    .withFirstDeck(deck)
+    .build();
+  state.gameStarted = true;
+  state.phase = "main";
+}
+
+function fuseToInitiator(initiatorUid: string, partnerUid: string) {
+  startFuseFromHand("first", initiatorUid);
+  resolvePendingTarget(partnerUid);
+}
+
+function subjectCount(): number {
+  return thenBoard("first").filter((c) => c.name === "Obsessed Test Subject")
+    .length;
+}
+
+function summonedSubjects() {
+  return thenBoard("first").filter((c) => c.name === "Obsessed Test Subject");
+}
+
+function expectRealTestSubjectToken() {
+  const subjects = summonedSubjects();
+  expect(subjects.length).toBeGreaterThan(0);
+  for (const s of subjects) {
+    expect(s.id).toBe(TEST_SUBJECT);
+  }
+}
+
+function scholarDrainPayoff(scholarOnBoard: ReturnType<typeof findOnBoard>) {
+  const subject = createCard(TEST_SUBJECT, "board", "first");
+  state.players.first.board.push(subject);
+  scholarOnBoard!.peak_defense = scholarOnBoard!.defense;
+  state.players.first.superEvoPoints = 1;
+  onEvolve(scholarOnBoard!, "first", "super");
+
+  const pending = state.pendingTargetEffect;
+  expect(pending).toBeDefined();
+  const uid =
+    pending!.poolUids?.find((id) => id === subject.uid) ??
+    pending!.pool?.find((c) => c.uid === subject.uid)?.uid;
+  expect(uid).toBeTruthy();
+  resolvePendingTarget(String(uid));
+
+  const updated = state.players.first.board.find((c) => c.uid === subject.uid)!;
+  const hasDrain =
+    updated.hasDrain ||
+    updated.keywords?.some(
+      (k) => (typeof k === "string" ? k : k?.name) === "Drain",
+    ) ||
+    updated.keywordState?.hasDrain;
+  return hasDrain;
+}
+
+describe("Mechanic Contract: Fuse: Cards", () => {
   beforeEach(() => {
     resetUidCounter();
+    setHistoryEnabled(true);
+    resetHistory();
+    (globalThis as any).HEADLESS = true;
   });
 
-  // ===========================================================================
-  // BASIC FUSE STRUCTURE
-  // ===========================================================================
+  describe("Sephie, Maven Convict — on-fuse summon", () => {
+    it("with 0 PP: material consumed, isFused set, no spend, no token, fuse slot used", () => {
+      setupFuseTurn([SEPHIE, FILLER, FILLER], 0);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const [mat1, mat2] = thenHand("first").filter((c) => c.id === FILLER);
 
-  describe("fuse structure", () => {
-    it("card with fuse_recipes has valid structure", () => {
-      givenGameState({ seed: 1 })
-        .withFirstHand([
-          {
-            name: "FuseTarget",
-            type: "Follower",
-            attack: 3,
-            defense: 3,
-            fuse_recipes: [
-              {
-                materials: ["MaterialA", "MaterialB"],
-                effects: [{ op: "draw", source: "deck", count: 1 }],
-              },
-            ],
-          },
-        ])
-        .build();
+      fuseToInitiator(sephie.uid, mat1.uid);
 
-      const card = thenHand("first")[0];
-      expect(card.fuse_recipes).toBeDefined();
-      expect(card.fuse_recipes!.length).toBe(1);
+      expect(sephie.isFused).toBe(true);
+      expect(sephie.lastFuseRound).toBe(state.roundCount);
+      expect(thenHand("first").some((c) => c.uid === mat1.uid)).toBe(false);
+      expect(getPP(state, "first")).toBe(0);
+      expect(subjectCount()).toBe(0);
+
+      fuseToInitiator(sephie.uid, mat2.uid);
+      expect(thenHand("first").some((c) => c.uid === mat2.uid)).toBe(true);
     });
 
-    it("fusion count is tracked", () => {
-      givenGameState({ seed: 1 })
-        .withFirstBoard([
-          {
-            name: "FusedCard",
-            type: "Follower",
-            attack: 5,
-            defense: 5,
-            fusionCount: 2,
-          },
-        ])
-        .build();
+    it("with exactly 2 PP: PP drops by exactly 2 and token is summoned", () => {
+      setupFuseTurn([SEPHIE, FILLER], 2);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
 
-      const card = findOnBoard("first", "FusedCard");
-      expect(card!.fusionCount).toBe(2);
-    });
-  });
+      fuseToInitiator(sephie.uid, material.uid);
 
-  // ===========================================================================
-  // LOOT FUSE
-  // ===========================================================================
-
-  describe("loot fuse", () => {
-    it("loot_fused event trigger structure is valid", () => {
-      givenGameState({ seed: 1 })
-        .withFirstHand([
-          {
-            name: "LootFuseCard",
-            type: "Follower",
-            triggers: [
-              {
-                event: "loot_fused",
-                effects: [
-                  { op: "stat", action: "give", target: "self", attack: 1 },
-                ],
-              },
-            ],
-          },
-        ])
-        .build();
-
-      const card = thenHand("first")[0];
-      expect(card.triggers![0].event).toBe("loot_fused");
+      expect(sephie.isFused).toBe(true);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+      expect(getPP(state, "first")).toBe(0);
+      expect(subjectCount()).toBe(1);
+      expectRealTestSubjectToken();
     });
 
-    it("loot_played event trigger structure is valid", () => {
-      givenGameState({ seed: 1 })
-        .withFirstBoard([
-          {
-            name: "LootWatcher",
-            type: "Follower",
-            attack: 2,
-            defense: 2,
-            triggers: [
-              {
-                event: "loot_played",
-                effects: [{ op: "draw", source: "deck", count: 1 }],
-              },
-            ],
-          },
-        ])
-        .build();
+    it("with 1 PP: material consumed, PP unchanged, no token", () => {
+      setupFuseTurn([SEPHIE, FILLER], 1);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
 
-      const card = findOnBoard("first", "LootWatcher");
-      expect(card!.triggers![0].event).toBe("loot_played");
+      fuseToInitiator(sephie.uid, material.uid);
+
+      expect(sephie.isFused).toBe(true);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+      expect(getPP(state, "first")).toBe(1);
+      expect(subjectCount()).toBe(0);
     });
 
-    it("_fusedLootNames tracks fused loot", () => {
-      givenGameState({ seed: 1 })
-        .withFirstHand([
-          {
-            name: "LootFuseCard",
-            type: "Follower",
-            _fusedLootNames: ["Treasure Map", "Gold Coin"],
-          },
-        ])
-        .build();
+    it("with 2+ PP: fusing summons Obsessed Test Subject and spends 2 PP", () => {
+      setupFuseTurn([SEPHIE, FILLER], 4);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+      const ppBefore = getPP(state, "first");
 
-      const card = thenHand("first")[0];
-      expect(card._fusedLootNames).toBeDefined();
-      expect(card._fusedLootNames!.length).toBe(2);
+      fuseToInitiator(sephie.uid, material.uid);
+
+      expect(sephie.isFused).toBe(true);
+      expect(sephie.lastFuseRound).toBe(state.roundCount);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+      expect(subjectCount()).toBe(1);
+      expect(getPP(state, "first")).toBe(ppBefore - 2);
+      expectRealTestSubjectToken();
     });
-  });
 
-  // ===========================================================================
-  // ON_FUSE TRIGGER
-  // ===========================================================================
+    it("with fewer than 2 PP: fuse still consumes material and marks isFused", () => {
+      setupFuseTurn([SEPHIE, FILLER], 1);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+      const ppBefore = getPP(state, "first");
 
-  describe("on_fuse trigger", () => {
-    it("on_fuse trigger structure is valid", () => {
-      givenGameState({ seed: 1 })
-        .withFirstHand([
-          {
-            name: "FuseReactor",
-            type: "Follower",
-            triggers: [
-              {
-                event: "on_fuse",
-                effects: [
-                  { op: "stat", action: "give", target: "self", attack: 2 },
-                ],
-              },
-            ],
-          },
-        ])
-        .build();
+      fuseToInitiator(sephie.uid, material.uid);
 
-      const card = thenHand("first")[0];
-      expect(card.triggers![0].event).toBe("on_fuse");
+      expect(sephie.isFused).toBe(true);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+      expect(subjectCount()).toBe(0);
+      expect(getPP(state, "first")).toBe(ppBefore);
+    });
+
+    it("blocks a second fuse to the same Sephie in the same turn", () => {
+      setupFuseTurn([SEPHIE, FILLER, FILLER], 6);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const [mat1, mat2] = thenHand("first").filter((c) => c.id === FILLER);
+
+      fuseToInitiator(sephie.uid, mat1.uid);
+      const subjectsAfterFirst = thenBoard("first").filter(
+        (c) => c.name === "Obsessed Test Subject",
+      ).length;
+
+      fuseToInitiator(sephie.uid, mat2.uid);
+
+      expect(thenHand("first").some((c) => c.uid === mat2.uid)).toBe(true);
+      expect(
+        thenBoard("first").filter((c) => c.name === "Obsessed Test Subject")
+          .length,
+      ).toBe(subjectsAfterFirst);
+    });
+
+    it("allows fusing a different Sephie copy in the same turn", () => {
+      setupFuseTurn([SEPHIE, SEPHIE, FILLER, FILLER], 6);
+      const sephies = thenHand("first").filter((c) => c.id === SEPHIE);
+      const materials = thenHand("first").filter((c) => c.id === FILLER);
+      expect(sephies.length).toBe(2);
+
+      fuseToInitiator(sephies[0]!.uid, materials[0]!.uid);
+      fuseToInitiator(sephies[1]!.uid, materials[1]!.uid);
+
+      expect(sephies[0]!.isFused).toBe(true);
+      expect(sephies[1]!.isFused).toBe(true);
+      expect(
+        thenBoard("first").filter((c) => c.name === "Obsessed Test Subject")
+          .length,
+      ).toBe(2);
+      expectRealTestSubjectToken();
     });
   });
 
-  // ===========================================================================
-  // ARTIFACT FUSE (PORTAL)
-  // ===========================================================================
+  describe("Ecstatic Scholar — fused super-evolve drain", () => {
+    it("super-evolved after fuse grants Drain to a selected Test Subject", () => {
+      setupFuseTurn([SCHOLAR, FILLER], 6, R6, [FILLER, FILLER, FILLER]);
+      const scholar = thenHand("first").find((c) => c.id === SCHOLAR)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
 
-  describe("artifact fuse", () => {
-    it("artifact card can be fused", () => {
-      givenGameState({ seed: 1 })
-        .withFirstHand([
-          {
-            name: "Artifact",
-            type: "Follower",
-            tribes: ["Artifact"],
-            canBeFuseMaterial: true,
-          },
-        ])
-        .build();
+      fuseToInitiator(scholar.uid, material.uid);
+      expect(scholar.isFused).toBe(true);
 
-      const card = thenHand("first")[0];
-      expect(card.tribes).toContain("Artifact");
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.uid === scholar.uid),
+      );
+      const subject = createCard(TEST_SUBJECT, "board", "first");
+      state.players.first.board.push(subject);
+
+      const scholarOnBoard = findOnBoard("first", "Ecstatic Scholar")!;
+      scholarOnBoard.peak_defense = scholarOnBoard.defense;
+      state.players.first.superEvoPoints = 1;
+      onEvolve(scholarOnBoard, "first", "super");
+
+      const pending = state.pendingTargetEffect;
+      expect(pending).toBeDefined();
+      const uid =
+        pending!.poolUids?.find((id) => id === subject.uid) ??
+        pending!.pool?.find((c) => c.uid === subject.uid)?.uid;
+      expect(uid).toBeTruthy();
+      resolvePendingTarget(String(uid));
+
+      const updated = state.players.first.board.find(
+        (c) => c.uid === subject.uid,
+      )!;
+      const hasDrain =
+        updated.hasDrain ||
+        updated.keywords?.some(
+          (k) => (typeof k === "string" ? k : k?.name) === "Drain",
+        ) ||
+        updated.keywordState?.hasDrain;
+      expect(hasDrain).toBe(true);
+    });
+
+    it("fused at 0 PP still grants Drain on super-evolve", () => {
+      setupFuseTurn([SCHOLAR, FILLER], 0, R6, [FILLER, FILLER, FILLER]);
+      const scholar = thenHand("first").find((c) => c.id === SCHOLAR)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+
+      fuseToInitiator(scholar.uid, material.uid);
+      expect(scholar.isFused).toBe(true);
+      expect(getPP(state, "first")).toBe(0);
+
+      state.players.first.pp = 6;
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.uid === scholar.uid),
+      );
+
+      const scholarOnBoard = findOnBoard("first", "Ecstatic Scholar")!;
+      expect(scholarDrainPayoff(scholarOnBoard)).toBe(true);
+    });
+
+    it("super-evolved without fuse grants no extra drain selection", () => {
+      setupFuseTurn([SCHOLAR], 6);
+      whenPlayCard("first", 0);
+      const subject = createCard(TEST_SUBJECT, "board", "first");
+      state.players.first.board.push(subject);
+
+      const scholarOnBoard = findOnBoard("first", "Ecstatic Scholar")!;
+      scholarOnBoard.peak_defense = scholarOnBoard.defense;
+      state.players.first.superEvoPoints = 1;
+      onEvolve(scholarOnBoard, "first", "super");
+
+      expect(state.pendingTargetEffect).toBeUndefined();
+      const updated = state.players.first.board.find(
+        (c) => c.uid === subject.uid,
+      )!;
+      const hasDrain =
+        updated.hasDrain ||
+        updated.keywords?.some(
+          (k) => (typeof k === "string" ? k : k?.name) === "Drain",
+        ) ||
+        updated.keywordState?.hasDrain;
+      expect(hasDrain).toBeFalsy();
+    });
+
+    it("isFused survives playing the card from hand", () => {
+      setupFuseTurn([SCHOLAR, FILLER], 6);
+      const scholar = thenHand("first").find((c) => c.id === SCHOLAR)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+      fuseToInitiator(scholar.uid, material.uid);
+
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.uid === scholar.uid),
+      );
+      const onBoard = findOnBoard("first", "Ecstatic Scholar")!;
+      expect(onBoard.isFused).toBe(true);
+    });
+  });
+
+  describe("undo/redo restores fuse flags in snapshotted state", () => {
+    it("undo restores lastFuseRound and isFused; redo reapplies", () => {
+      setupFuseTurn([SEPHIE, FILLER], 4);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const material = thenHand("first").find((c) => c.id === FILLER)!;
+
+      beginAction("Fuse test");
+      fuse_finalize_cards("first", sephie.uid, [material]);
+      commitAction({ autoRender: false });
+
+      expect(sephie.isFused).toBe(true);
+      expect(sephie.lastFuseRound).toBe(state.roundCount);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
+
+      undo({ autoRender: false });
+      const sephieAfterUndo = thenHand("first").find(
+        (c) => c.uid === sephie.uid,
+      )!;
+      const materialAfterUndo = thenHand("first").find(
+        (c) => c.uid === material.uid,
+      );
+      expect(sephieAfterUndo.isFused).not.toBe(true);
+      expect(sephieAfterUndo.lastFuseRound).not.toBe(state.roundCount);
+      expect(materialAfterUndo).toBeDefined();
+
+      const redid = redo({ autoRender: false });
+      expect(redid).toBe(true);
+      const sephieAfterRedo = thenHand("first").find(
+        (c) => c.uid === sephie.uid,
+      )!;
+      expect(sephieAfterRedo.isFused).toBe(true);
+      expect(sephieAfterRedo.lastFuseRound).toBe(state.roundCount);
+      expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
     });
   });
 });

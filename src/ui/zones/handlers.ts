@@ -65,6 +65,10 @@ export function attachHandlers(
 
       const hasFuseRecipes =
         Array.isArray(card.fuse_recipes) && card.fuse_recipes.length > 0;
+      const hasFuseCards =
+        String(card.description ?? "").match(
+          /(?:^|\n)Fuse:\s*Cards(?:\s|$)/m,
+        ) != null || (card as any).fuse_capability === "cards";
       const hasFortifierFuse =
         Array.isArray(card.fuse) &&
         card.fuse.some((op) => op?.op === "fuse" && op?.type === "fortifier");
@@ -73,11 +77,16 @@ export function attachHandlers(
         card.name === "Gear of Remembrance" ||
         card.name === "Ominous Artifact α";
 
-      if (hasFuseRecipes || hasFortifierFuse || hasSpecialFuse) {
+      if (
+        hasFuseRecipes ||
+        hasFortifierFuse ||
+        hasSpecialFuse ||
+        hasFuseCards
+      ) {
         actions.handleFuse(
           ctx.owner,
           card.uid,
-          !!(hasFuseRecipes || hasSpecialFuse),
+          !!(hasFuseRecipes || hasSpecialFuse || hasFuseCards),
           card,
         );
       }

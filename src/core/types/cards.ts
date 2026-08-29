@@ -125,6 +125,7 @@ export interface CardInstance extends CardTemplate {
 
   // Fuse
   _fusedLootNames?: string[];
+  _fusedCards?: string[];
   __lootFuseTurn?: number;
   __lootFuseCount?: number;
   lastFuseRound?: number;
