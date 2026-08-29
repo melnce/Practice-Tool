@@ -1782,7 +1782,18 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 2
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10951120",
@@ -1801,7 +1812,33 @@
     "url": "https://shadowverse.gg/cards/10951120-netherworld-lieutenant",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Netherworld Lieutenant",
+            "count": 1
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:last_summoned",
+            "attack": 1,
+            "defense": 0,
+            "keywords": ["Rush"]
+          },
+          {
+            "op": "keyword",
+            "action": "remove",
+            "target": "ally:last_summoned",
+            "keywords": ["LastWords"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -1824,7 +1861,20 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Ghost",
+        "count": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Rotting Zombie",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10952110",
@@ -1843,7 +1893,26 @@
     "url": "https://shadowverse.gg/cards/10952110-void-colonel",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "count": 1,
+            "distribution": "random"
+          },
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 2
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [
@@ -1874,7 +1943,18 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10952310",
@@ -1893,9 +1973,63 @@
     "url": "https://shadowverse.gg/cards/10952310-chains-of-the-past",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 4,
+        "effects": [
+          {
+            "op": "repeat_effect",
+            "count": 2,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1,
+                "distribution": "random_hits"
+              },
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 1
+              },
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "repeat_effect",
+        "count": 1,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3,
+            "count": 1,
+            "distribution": "random_hits"
+          },
+          {
+            "op": "damage",
+            "target": "ally:leader",
+            "amount": 1
+          },
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10953110",
@@ -1913,10 +2047,42 @@
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10953110-rampaging-commander",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 1
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3
+      },
+      {
+        "op": "damage",
+        "target": "ally:leader",
+        "amount": 3
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 3
+      }
+    ]
   },
   {
     "id": "10953310",
@@ -1937,7 +2103,33 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "select",
+        "target": "ally:follower",
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "selected:follower",
+            "keywords": [
+              {
+                "name": "LastWords",
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "self",
+                    "mode": "copy",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10954110",
@@ -1958,7 +2150,24 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "repeat_effect",
+        "count": 3,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "graveyard",
+            "max_cost": 2
+          }
+        ]
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -1986,8 +2195,66 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "leader_defense_lte",
+            "count": 12,
+            "effects": [
+              {
+                "op": "cost",
+                "mode": "reduce",
+                "target": "self",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Give this follower Storm. Deal 2 damage to your leader.",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "keywords": ["Storm"]
+              },
+              {
+                "op": "damage",
+                "target": "ally:leader",
+                "amount": 2
+              }
+            ]
+          },
+          {
+            "label": "Give this follower Ward. Deal 8 damage to all enemy followers.",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "keywords": ["Ward"]
+              },
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 8
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10961110",
@@ -2007,7 +2274,21 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Ward"],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "leader_restored",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -2029,7 +2310,14 @@
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Peryton",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10961210",
@@ -2048,7 +2336,42 @@
     "url": "https://shadowverse.gg/cards/10961210-roaring-basilica",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Countdown",
+        "turns": 3
+      },
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Holyflame Tiger",
+            "count": 1
+          },
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "count": 1,
+            "distribution": "random_hits"
+          }
+        ]
+      },
+      {
+        "name": "Engage",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "countdown",
+            "action": "advance",
+            "target": "self",
+            "amount": 3
+          }
+        ]
+      }
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -2070,8 +2393,29 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "board",
+        "effects": [
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "keywords": ["Ambush"],
+        "duration": "opponent_turn_end"
+      }
+    ]
   },
   {
     "id": "10962120",
@@ -2121,7 +2465,42 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "activate_all_if": {
+          "condition": "ally_matches",
+          "type": "Card",
+          "count": 1,
+          "base_cost_gte": 6
+        },
+        "options": [
+          {
+            "label": "Deal 3 damage to a random enemy follower",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 3,
+                "count": 1,
+                "distribution": "random_hits"
+              }
+            ]
+          },
+          {
+            "label": "Restore 2 defense to your leader",
+            "effects": [
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10963110",
@@ -2139,10 +2518,38 @@
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10963110-executor-of-the-vow",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "keywords": ["Ward"],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "leader_restored",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "count": 1,
+            "distribution": "random"
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10963210",
@@ -2161,9 +2568,34 @@
     "url": "https://shadowverse.gg/cards/10963210-juratio",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Engage",
+        "cost": 1,
+        "sacrifice": true,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          },
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "distribution": "all",
+        "target": "any:follower"
+      }
+    ]
   },
   {
     "id": "10964110",
@@ -2180,11 +2612,51 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10964110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10964110-erralde-signet-convict",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Erralde, Signet Convict",
+        "description": "At the end of your turn, if there's an allied card on the field with a base cost of 6 or more, deal 1 damage to the enemy leader and restore 1 defense to your leader.",
+        "triggers": [
+          {
+            "type": "end_of_turn_own",
+            "effects": [
+              {
+                "op": "gate",
+                "condition": "ally_matches",
+                "type": "Card",
+                "count": 1,
+                "base_cost_gte": 6,
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:leader",
+                    "amount": 1
+                  },
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -2209,10 +2681,61 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10964120_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10964120-omerio-winged-revenant",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "destroy",
+        "distribution": "all",
+        "target": "ally:amulet"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_amulet_destroyed",
+        "source": "board",
+        "effects": [
+          {
+            "op": "sequence",
+            "key": "omerio",
+            "advance": true,
+            "steps": [
+              {
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:follower",
+                    "amount": 3,
+                    "count": 2,
+                    "distribution": "random_distinct"
+                  }
+                ]
+              },
+              {
+                "effects": [
+                  {
+                    "op": "restore",
+                    "target": "leader",
+                    "player": "self",
+                    "amount": 2
+                  }
+                ]
+              },
+              {
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Holy Falcon",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -2234,7 +2757,20 @@
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "highlander",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 5,
+            "select": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10971120",
@@ -2251,11 +2787,23 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10971120_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10971120-twindrone-engineer",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Analyzing Artifact",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10971310",
@@ -2276,7 +2824,34 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Deal 5 damage to all enemy followers",
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:follower",
+                "amount": 5
+              }
+            ]
+          },
+          {
+            "label": "Summon 2 copies of Mystic Artifact",
+            "effects": [
+              {
+                "op": "summon",
+                "source": "named",
+                "name": "Mystic Artifact",
+                "count": 2
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10972110",
@@ -2297,7 +2872,26 @@
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "highlander",
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "select": 1
+          },
+          {
+            "op": "restore",
+            "target": "leader",
+            "player": "self",
+            "amount": 4
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10972120",
@@ -2317,8 +2911,36 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "fanfare": []
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Puppetry"
+        },
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": 1
+          }
+        ]
+      }
+    ],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Enhanced Puppet",
+        "count": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Puppet",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10972310",
@@ -2339,7 +2961,31 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "highlander",
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 3
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10973110",
@@ -2360,7 +3006,25 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "gate",
+        "condition": "highlander",
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "keywords": ["Storm"]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10973310",
@@ -2381,7 +3045,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "gate",
+        "condition": "highlander",
+        "effects": [
+          {
+            "op": "destroy",
+            "distribution": "all",
+            "target": "enemy:follower"
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "destroy",
+            "target": "enemy:follower",
+            "select": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10974110",
