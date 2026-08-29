@@ -420,7 +420,7 @@
     "id": "10031110",
     "name": "Dazzling Runeknight",
     "type": "Follower",
-    "cost": 2,
+    "cost": 3,
     "description": "Fanfare: Select a Mode to activate.\n1. Spellboost your hand 2 times.\n2. Earth Rite (1) - Give this follower +2/+2 and Ward",
     "scenarios": []
   },
