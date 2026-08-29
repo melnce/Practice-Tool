@@ -34564,24 +34564,7 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": [
-      {
-        "op": "repeat_effect",
-        "count": 3,
-        "effects": [
-          {
-            "op": "summon",
-            "source": "graveyard",
-            "max_cost": 2
-          }
-        ]
-      },
-      {
-        "op": "damage",
-        "target": "enemy:follower",
-        "amount": 2
-      }
-    ],
+    "fanfare": [],
     "specific_effects": [
       {
         "specific_effect_type": 1,

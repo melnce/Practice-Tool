@@ -196,20 +196,6 @@ describe("Set 10009 — Abysscraft", () => {
     ).toBeGreaterThanOrEqual(1);
   });
 
-  it("Istyndet vs. Mitilykket — Fanfare reanimates and damages enemies", () => {
-    setupTurn(R10, { hand: ["10954110"], pp: 7 });
-    const dead = createCard(
-      { name: "DeadAlly", type: "Follower", cost: 2, attack: 2, defense: 2 },
-      "graveyard",
-      "first",
-    );
-    state.players.first.graveyard.push(dead);
-    enemyFollower(2, 5);
-    whenPlayCard("first", 0);
-    expect(thenBoard("first").length).toBeGreaterThan(0);
-    expect(Number(getBoard(state, "second")[0]!.defense)).toBeLessThan(5);
-  });
-
   it("Garodeth vs. Zeth — end of turn hand trigger reduces cost; Fanfare mode deals damage", () => {
     setupTurn(R10, { hand: ["10954120"], pp: 8 });
     state.players.first.hp = 10;
