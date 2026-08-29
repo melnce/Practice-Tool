@@ -208,12 +208,20 @@ describe("split_sequential — oldest-first spill (owner-pinned contract)", () =
   });
 
   /**
-   * OWNER QUESTIONS — Barrier in split path (do not "fix" without owner sign-off):
-   * When a follower in the split path has Barrier, applySplitSpillover still
-   * subtracts min(remaining, its defense) from the pool even though dealDamage
-   * pops Barrier for 0 actual damage. This test pins current engine behaviour.
+   * OWNER RULING — Barrier in split path (do not change without owner sign-off):
+   * > "if you have 10 points of split damage and a 1/6 with barrier and a 1/5
+   * > without barrier: the 1/6 with barrier will take 6 damage reduced to 0
+   * > cause of barrier (so still 1/6 but now barrier is gone) and the 1/5
+   * > without barrier will now be 1/1 as it takes 4 damage spilled over.
+   * > oldest to newest"
+   *
+   * Rule: split damage allocates against each follower's current defense,
+   * oldest to newest; allocated points leave the pool even when Barrier reduces
+   * dealt damage to 0 and is consumed.
+   * Worked example: 10 split damage — 1/6 Barrier absorbs an allocation of 6
+   * (stays 1/6, Barrier gone); the 1/5 behind it takes the remaining 4 → 1/1.
    */
-  it("pins current engine: Barrier follower soaks full defense from split pool", () => {
+  it("Barrier absorbs its full allocation from the split pool (owner ruling)", () => {
     givenGameState({ seed: 1 }).build();
     state.gameStarted = true;
     const ward = enemyFollower(1, 10, "BarrierWall");
@@ -236,6 +244,33 @@ describe("split_sequential — oldest-first spill (owner-pinned contract)", () =
     expect(ward.hasBarrier).toBe(false);
     expect(ward.defense).toBe(10);
     expect(behind.defense).toBe(3);
+  });
+
+  it("owner example: 10 split damage — 1/6 Barrier then 1/5, leader untouched", () => {
+    givenGameState({ seed: 1 }).build();
+    state.gameStarted = true;
+    state.players.second.hp = 20;
+    const oldest = enemyFollower(1, 6, "OldestBarrier");
+    oldest.hasBarrier = true;
+    const next = enemyFollower(1, 5, "Next");
+
+    whenRunEffects(
+      [
+        {
+          op: "damage",
+          target: "enemy:follower",
+          amount: 10,
+          distribution: "split_sequential",
+          spill_to_leader: false,
+        },
+      ],
+      "first",
+    );
+
+    expect(oldest.hasBarrier).toBe(false);
+    expect(oldest.defense).toBe(6);
+    expect(next.defense).toBe(1);
+    expect(state.players.second.hp).toBe(20);
   });
 });
 
