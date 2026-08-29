@@ -32423,16 +32423,38 @@
     "class": "Neutral",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Select an enemy follower on the field and deal it 6 damage. Deal 2 damage to a random unselected enemy follower.\nWard",
+    "description": "Fanfare: Select an enemy follower on the field and deal it 6 damage. Deal 2 damage to a random unselected enemy follower.\nAccelerate (1): Deal 2 damage to a random enemy follower.\nWard",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10901110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10901110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10901110-jailor-of-antiquity",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward",
+      {
+        "name": "Accelerate",
+        "cost": 1,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 2,
+            "count": 1,
+            "distribution": "random_hits"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 6,
+        "select": 1
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 3,
@@ -32482,7 +32504,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 2,
+        "condition": {
+          "not_self": true
+        },
+        "attack": 3,
+        "defense": 3
+      }
+    ]
   },
   {
     "id": "10903110",
@@ -32499,11 +32533,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10903110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10903110-warden-of-selflessness",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "pp",
+        "action": "recover",
+        "player": "self",
+        "amount": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Jailor of Antiquity",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10903210",
@@ -32545,7 +32592,14 @@
     "superevolve": [],
     "keywords": ["Intimidate"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 9,
+        "select": 1
+      }
+    ]
   },
   {
     "id": "10911110",
@@ -33225,7 +33279,18 @@
     "superevolve": [],
     "keywords": ["Ambush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "overflow",
+        "effects": [
+          {
+            "op": "evolve",
+            "target": "self"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10941310",
@@ -33244,9 +33309,30 @@
     "url": "https://shadowverse.gg/cards/10941310-drake-whelps-tantrum",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 3,
+            "count": 1,
+            "distribution": "random_hits"
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Fire Drake Whelp",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10942110",
@@ -33284,11 +33370,34 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10942120_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10942120-dragonfolk-butler",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 1,
+        "exclude_self": true,
+        "attack": 3,
+        "defense": 3
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "restore",
+        "target": "leader",
+        "player": "self",
+        "amount": 3
+      },
+      {
+        "op": "pp",
+        "action": "recover",
+        "player": "self",
+        "amount": 3
+      }
+    ]
   },
   {
     "id": "10942310",
@@ -33309,7 +33418,25 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "discard",
+        "mode": "select",
+        "count": 2
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "count": 1,
+        "distribution": "random_hits"
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 3
+      }
+    ]
   },
   {
     "id": "10943110",
@@ -33389,11 +33516,50 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10944120_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10944120-normagdala-ravening-revenant",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": ["Ward"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "mode",
+        "options": [
+          {
+            "label": "Draw a card. Restore 3 defense to your leader.",
+            "effects": [
+              {
+                "op": "draw",
+                "source": "deck",
+                "count": 1
+              },
+              {
+                "op": "restore",
+                "target": "leader",
+                "player": "self",
+                "amount": 3
+              }
+            ]
+          },
+          {
+            "label": "Give all enemy followers on the field -0/-4.",
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "enemy:follower",
+                "attack": 0,
+                "defense": -4
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10951110",
