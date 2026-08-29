@@ -73,6 +73,18 @@ function subjectCount(): number {
     .length;
 }
 
+function summonedSubjects() {
+  return thenBoard("first").filter((c) => c.name === "Obsessed Test Subject");
+}
+
+function expectRealTestSubjectToken() {
+  const subjects = summonedSubjects();
+  expect(subjects.length).toBeGreaterThan(0);
+  for (const s of subjects) {
+    expect(s.id).toBe(TEST_SUBJECT);
+  }
+}
+
 function scholarDrainPayoff(scholarOnBoard: ReturnType<typeof findOnBoard>) {
   const subject = createCard(TEST_SUBJECT, "board", "first");
   state.players.first.board.push(subject);
@@ -135,6 +147,7 @@ describe("Mechanic Contract: Fuse: Cards", () => {
       expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
       expect(getPP(state, "first")).toBe(0);
       expect(subjectCount()).toBe(1);
+      expectRealTestSubjectToken();
     });
 
     it("with 1 PP: material consumed, PP unchanged, no token", () => {
@@ -163,6 +176,7 @@ describe("Mechanic Contract: Fuse: Cards", () => {
       expect(thenHand("first").some((c) => c.uid === material.uid)).toBe(false);
       expect(subjectCount()).toBe(1);
       expect(getPP(state, "first")).toBe(ppBefore - 2);
+      expectRealTestSubjectToken();
     });
 
     it("with fewer than 2 PP: fuse still consumes material and marks isFused", () => {
@@ -213,6 +227,7 @@ describe("Mechanic Contract: Fuse: Cards", () => {
         thenBoard("first").filter((c) => c.name === "Obsessed Test Subject")
           .length,
       ).toBe(2);
+      expectRealTestSubjectToken();
     });
   });
 
