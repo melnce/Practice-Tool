@@ -32620,7 +32620,20 @@
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10911120",
@@ -32683,7 +32696,26 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "name": "Fairy",
+        "count": 1
+      },
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "keyword",
+            "action": "grant",
+            "target": "last_added_to_hand",
+            "keywords": ["Bane"]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10912120",
@@ -32700,11 +32732,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10912120_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10912120-primate-plotters",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "add_to_hand",
+        "source": "copy",
+        "from": "enemy:hand",
+        "distribution": "random",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10912310",
@@ -32725,7 +32770,66 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "count": 1,
+            "distribution": "random_hits"
+          },
+          {
+            "op": "add_to_hand",
+            "name": "Deepwood Bounty",
+            "count": 1
+          },
+          {
+            "op": "add_to_hand",
+            "name": "Fairy",
+            "count": 1
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "mode",
+            "options": [
+              {
+                "label": "Deal 4 damage to a random enemy follower.",
+                "effects": [
+                  {
+                    "op": "damage",
+                    "target": "enemy:follower",
+                    "amount": 4,
+                    "count": 1,
+                    "distribution": "random_hits"
+                  }
+                ]
+              },
+              {
+                "label": "Add a Deepwood Bounty and Fairy to your hand.",
+                "effects": [
+                  {
+                    "op": "add_to_hand",
+                    "name": "Deepwood Bounty",
+                    "count": 1
+                  },
+                  {
+                    "op": "add_to_hand",
+                    "name": "Fairy",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10913110",
@@ -32742,11 +32846,37 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10913110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10913110-virid-lieutenant",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 1,
+        "condition": {
+          "not_self": true
+        },
+        "attack": 1,
+        "defense": 1,
+        "keywords": ["Rush"]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "draw",
+            "source": "deck",
+            "count": 2
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10913310",
@@ -32766,8 +32896,39 @@
     "evolve": [],
     "superevolve": [],
     "keywords": [],
-    "triggers": [],
-    "spell": []
+    "triggers": [
+      {
+        "type": "end_of_turn_own",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "combo",
+            "count": 3,
+            "effects": [
+              {
+                "op": "cost",
+                "mode": "reduce",
+                "target": "self",
+                "amount": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "spell": [
+      {
+        "op": "destroy",
+        "target": "enemy:follower",
+        "select": 1
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10914110",
@@ -32785,10 +32946,38 @@
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10914110-magachiyo-aromatic-convict",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "self",
+        "keywords": ["Storm"]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "gate",
+        "condition": "combo",
+        "count": 3,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4
+          }
+        ],
+        "else_effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4,
+            "select": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10914120",
@@ -32807,9 +32996,28 @@
     "url": "https://shadowverse.gg/cards/10914120-hien-redolent-revenant",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "LastWords",
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Hien, Redolent Revenant",
+            "count": 1
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 4,
+        "select": 1
+      }
+    ]
   },
   {
     "id": "10921110",
@@ -32826,11 +33034,24 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10921110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10921110-open-sea-scout",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Boots",
+        "count": 1
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Dread Pirate's Flag",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10921120",
@@ -32870,9 +33091,31 @@
     "url": "https://shadowverse.gg/cards/10921310-phalanx",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Steelclad Knight",
+            "count": 5,
+            "keywords": ["Ward"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Steelclad Knight",
+        "count": 1,
+        "keywords": ["Ward"]
+      }
+    ]
   },
   {
     "id": "10922110",
@@ -32893,7 +33136,19 @@
     "superevolve": [],
     "keywords": ["Rush"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Dread Pirate's Flag",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Goblet",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10922120",
@@ -32912,9 +33167,39 @@
     "url": "https://shadowverse.gg/cards/10922120-ferocious-commander",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 7,
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "self",
+            "attack": 3,
+            "defense": 0,
+            "keywords": ["Rush"]
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:last_summoned",
+            "attack": 3,
+            "defense": 0,
+            "keywords": ["Rush"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Steelclad Knight",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10922310",
@@ -32935,7 +33220,32 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 5,
+        "select": 1
+      },
+      {
+        "op": "gate",
+        "condition": "self_cost",
+        "cost": 3,
+        "effects": [
+          {
+            "op": "add_to_hand",
+            "name": "Severed Ties",
+            "count": 1
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "set",
+            "amount": 1
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10923110",
@@ -32952,11 +33262,52 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10923110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10923110-roughwater-first-mate",
-    "evolve": [],
-    "superevolve": [],
+    "evolve": [
+      {
+        "op": "replicate",
+        "zone": "fanfare"
+      }
+    ],
+    "superevolve": [
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Blade",
+        "count": 1
+      },
+      {
+        "op": "cost",
+        "target": "last_added_to_hand",
+        "mode": "set",
+        "amount": 0
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gilded Necklace",
+        "count": 1
+      },
+      {
+        "op": "cost",
+        "target": "last_added_to_hand",
+        "mode": "set",
+        "amount": 0
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 3,
+        "select": 1
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Dread Pirate's Flag",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10923310",
@@ -32975,9 +33326,39 @@
     "url": "https://shadowverse.gg/cards/10923310-lage-dor",
     "evolve": [],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 6,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Dread Pirate's Flag",
+            "count": 2
+          },
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 4
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Dread Pirate's Flag",
+        "count": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 2
+      }
+    ]
   },
   {
     "id": "10924110",
@@ -32998,7 +33379,23 @@
     "superevolve": [],
     "keywords": ["Storm"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Dread Pirate's Flag",
+        "count": 1
+      },
+      {
+        "op": "countdown",
+        "action": "advance",
+        "target": "ally:amulet",
+        "filter": {
+          "name": "Dread Pirate's Flag"
+        },
+        "amount": 5
+      }
+    ]
   },
   {
     "id": "10924120",
@@ -33019,7 +33416,8 @@
     "superevolve": [],
     "keywords": ["Ward", "Storm", "Bane", "Aura"],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [],
+    "attacks_per_turn": 3
   },
   {
     "id": "10931110",
@@ -33039,7 +33437,32 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush"],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "is_self": true
+        },
+        "effects": [
+          {
+            "op": "gate",
+            "condition": "named_enter_count",
+            "name": "Obsessed Test Subject",
+            "count": 5,
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "self",
+                "attack": 3,
+                "defense": 3
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "fanfare": []
   },
   {
@@ -33057,11 +33480,39 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10931120_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10931120-key-spirit",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "select",
+        "target": "ally:hand",
+        "condition": {
+          "has_keyword": "Spellboost"
+        },
+        "select_count": 1,
+        "effects": [
+          {
+            "op": "spellboost",
+            "target": "self",
+            "count": 4
+          }
+        ]
+      }
+    ],
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 7,
+        "select": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:leader",
+        "amount": 4
+      }
+    ]
   },
   {
     "id": "10931310",
@@ -33082,7 +33533,13 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "add_to_hand",
+        "name": "Truth Summons",
+        "count": 3
+      }
+    ]
   },
   {
     "id": "10932110",
@@ -33099,11 +33556,43 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10932110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10932110-enamored-researcher",
-    "evolve": [],
+    "evolve": [
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:follower",
+        "select": 1,
+        "filter": {
+          "name": "Obsessed Test Subject"
+        },
+        "keywords": ["Bane"]
+      }
+    ],
     "superevolve": [],
-    "keywords": [],
+    "keywords": [
+      {
+        "name": "Enhance",
+        "cost": 8,
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Obsessed Test Subject",
+            "count": 3,
+            "keywords": ["Ward"]
+          }
+        ]
+      }
+    ],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Obsessed Test Subject",
+        "count": 2
+      }
+    ]
   },
   {
     "id": "10932120",
@@ -33124,7 +33613,19 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "return",
+        "destination": "deck",
+        "select": "all",
+        "target": "ally:hand"
+      },
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": "{last_returned}"
+      }
+    ]
   },
   {
     "id": "10932310",
@@ -33145,7 +33646,33 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Obsessed Test Subject",
+        "count": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "ally:last_summoned",
+        "attack": 1,
+        "defense": 0
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Obsessed Test Subject",
+        "count": 1
+      },
+      {
+        "op": "stat",
+        "action": "give",
+        "target": "last_added_to_hand",
+        "attack": 1,
+        "defense": 0
+      }
+    ]
   },
   {
     "id": "10933110",
@@ -33163,10 +33690,39 @@
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10933110-ecstatic-scholar",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "gate",
+        "condition": "has_fuse_materials",
+        "effects": [
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:follower",
+            "select": 1,
+            "filter": {
+              "name": "Obsessed Test Subject"
+            },
+            "keywords": ["Drain"]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": []
+    "fanfare": [
+      {
+        "op": "draw",
+        "source": "deck",
+        "count": 2
+      },
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Obsessed Test Subject",
+        "count": 1
+      }
+    ]
   },
   {
     "id": "10933310",
@@ -33187,7 +33743,27 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": []
+    "spell": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Obsessed Test Subject",
+        "count": 1
+      },
+      {
+        "op": "repeat_effect",
+        "count": 2,
+        "effects": [
+          {
+            "op": "damage",
+            "target": "enemy:follower",
+            "amount": 7,
+            "count": 1,
+            "distribution": "random_hits"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "10934110",
@@ -33205,10 +33781,41 @@
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10934110-sephie-maven-convict",
     "evolve": [],
-    "superevolve": [],
+    "superevolve": [
+      {
+        "op": "crest",
+        "action": "gain",
+        "name": "Sephie, Maven Convict",
+        "description": "Once on each of your turns, when an allied Obsessed Test Subject enters the field, give it Storm.",
+        "triggers": [
+          {
+            "event": "ally_follower_enter",
+            "once_per_turn": true,
+            "condition": {
+              "name": "Obsessed Test Subject"
+            },
+            "effects": [
+              {
+                "op": "stat",
+                "action": "give",
+                "target": "entering_follower",
+                "keywords": ["Storm"]
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "keywords": [],
     "triggers": [],
-    "fanfare": [],
+    "fanfare": [
+      {
+        "op": "summon",
+        "source": "named",
+        "name": "Obsessed Test Subject",
+        "count": 2
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 1,
@@ -33235,7 +33842,16 @@
     "url": "https://shadowverse.gg/cards/10934120-phylene-cleansing-revenant",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Bane", "Aura"],
+    "keywords": [
+      {
+        "name": "Spellboost",
+        "reduceCostBy": 1,
+        "minCost": 0
+      },
+      "Ward",
+      "Bane",
+      "Aura"
+    ],
     "triggers": [],
     "fanfare": []
   },
