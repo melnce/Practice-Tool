@@ -9,6 +9,7 @@ export interface PlayedHistoryEntry {
   name: string;
   type: string;
   cost: number;
+  base_cost?: number;
   base_image?: string | null;
   ts: number;
 }

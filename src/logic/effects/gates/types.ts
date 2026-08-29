@@ -50,6 +50,8 @@ export type GateCondition =
   // Special gates
   | "skybound_art" // Turn + evolves witnessed >= requirement
   | "no_ally_attacked" // No ally has attacked this turn
+  | "ally_attacked_leader_last_turn" // Ally attacked enemy leader on owner's previous turn
+  | "played_base_cost_ladder" // Played cards at each listed base cost this match
   | "highlander" // No duplicate cards in deck
   | "has_fuse_materials" // Host has fused loot (or other fuse material) this copy
   | "fused_this_turn";

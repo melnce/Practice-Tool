@@ -122,3 +122,55 @@ export function pickDestroyedMatch(
   }
   return picked;
 }
+
+/** Pick one random record among those with the highest base cost (ties broken by RNG). */
+export function pickDestroyedMatchHighestBaseCost(
+  state: GameState,
+  owner: Player,
+  opts: DestroyedMatchOptions = {},
+): DestroyedRecord | null {
+  const filter = { ...opts, ...(opts.filter ?? {}) };
+  const wantedType = String(filter.type ?? "").toLowerCase();
+  const wantedTribe = String(filter.tribe ?? "").toLowerCase();
+  const baseCostLimitRaw = filter.baseCost_lte ?? filter.base_cost_lte;
+  const baseCostLimit =
+    baseCostLimitRaw == null ? null : finiteNumber(baseCostLimitRaw, NaN);
+
+  const candidates = state.players[owner].destroyedHistory.filter((record) => {
+    if (wantedType && String(record.type ?? "").toLowerCase() !== wantedType) {
+      return false;
+    }
+    if (
+      wantedTribe &&
+      !(record.tribes ?? []).some(
+        (tribe) => String(tribe).toLowerCase() === wantedTribe,
+      )
+    ) {
+      return false;
+    }
+    if (
+      filter.hasLastWords != null &&
+      !!record.hasLastWords !== !!filter.hasLastWords
+    ) {
+      return false;
+    }
+    if (
+      baseCostLimit != null &&
+      finiteNumber(record.baseCost ?? record.cost) > baseCostLimit
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  if (!candidates.length) return null;
+
+  const maxBase = Math.max(
+    ...candidates.map((r) => finiteNumber(r.baseCost ?? r.cost)),
+  );
+  const top = candidates.filter(
+    (r) => finiteNumber(r.baseCost ?? r.cost) === maxBase,
+  );
+  if (!top.length) return null;
+  return top[state.rng.nextInt(top.length)] ?? null;
+}

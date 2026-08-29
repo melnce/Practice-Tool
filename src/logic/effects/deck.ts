@@ -11,6 +11,9 @@ import { logEvent } from "../../core/logger.js";
 import type { Effect as _Effect, Player } from "../../core/types/index.js";
 import { getDeck } from "../../core/playerHelpers.js";
 import { handleHalveDeckCost, reduceDeckFollowersCost } from "./cost.js";
+import { pickDestroyedMatchHighestBaseCost } from "../core/destroyedHistory.js";
+import { getCardById } from "../../data/cardDatabase.js";
+import { normalizeCardStats } from "../../core/cardStats.js";
 
 // ========================================================================
 // UNIFIED DECK HANDLER - routes by action field
@@ -47,8 +50,12 @@ export function handleDeck(
       break;
 
     case "add":
-      // Add named card(s) into the deck (does not clear). Default: shuffle after.
-      handleAddToDeck(owner, eff);
+      // Add named card(s) or destroyed_match picks into the deck (does not clear).
+      if (eff.source === "destroyed_match") {
+        handleAddDestroyedMatchToDeck(owner, eff);
+      } else {
+        handleAddToDeck(owner, eff);
+      }
       break;
 
     default:
@@ -169,4 +176,52 @@ function handleAddToDeck(owner: Player, eff: any): void {
     shuffleInPlace(deck);
   }
   logEvent("deckAdd", { owner, name, count });
+}
+
+function handleAddDestroyedMatchToDeck(owner: Player, eff: any): void {
+  const deck = getDeck(state, owner);
+  const count = Math.max(1, parseInt(String(eff.count ?? 1), 10) || 1);
+  const rank = String(eff.rank ?? eff.pick ?? "").toLowerCase();
+  const stat = String(eff.stat ?? "base_cost").toLowerCase();
+  if (rank !== "highest" || stat !== "base_cost") {
+    console.warn(
+      `[deck] destroyed_match add supports rank=highest stat=base_cost only`,
+    );
+    return;
+  }
+
+  for (let i = 0; i < count; i++) {
+    const record = pickDestroyedMatchHighestBaseCost(state, owner, {
+      filter: eff.filter,
+    });
+    if (!record) {
+      logEvent("deckAdd_destroyed_match_notFound", { owner });
+      continue;
+    }
+    const base =
+      getCardById(record.cardId || record.id) ?? getCardDetails(record.name);
+    if (!base) {
+      console.warn(
+        `[deck] destroyed_match add: card not found: ${record.name}`,
+      );
+      continue;
+    }
+    const copy = structuredClone(base);
+    copy.uid = state.rng.makeUid();
+    copy.owner = owner;
+    copy.zone = "deck";
+    normalizeCardStats(copy);
+    deck.push(copy);
+    logEvent("deckAdd", {
+      owner,
+      name: copy.name,
+      count: 1,
+      source: "destroyed_match",
+      from: record.uid,
+    });
+  }
+
+  if (eff.shuffle !== false) {
+    shuffleInPlace(deck);
+  }
 }

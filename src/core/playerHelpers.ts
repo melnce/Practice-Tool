@@ -380,6 +380,49 @@ export function setAnyAllyAttackedThisTurn(
   state.players[player].anyAllyAttackedThisTurn = value;
 }
 
+export function getAnyAllyAttackedLeaderThisTurn(
+  state: GameState,
+  player: PlayerSlot,
+): boolean {
+  return state.players[player].anyAllyAttackedLeaderThisTurn;
+}
+
+export function setAnyAllyAttackedLeaderThisTurn(
+  state: GameState,
+  player: PlayerSlot,
+  value: boolean,
+): void {
+  state.players[player].anyAllyAttackedLeaderThisTurn = value;
+}
+
+export function getAllyAttackedLeaderLastTurn(
+  state: GameState,
+  player: PlayerSlot,
+): boolean {
+  return state.players[player].allyAttackedLeaderLastTurn;
+}
+
+export function setAllyAttackedLeaderLastTurn(
+  state: GameState,
+  player: PlayerSlot,
+  value: boolean,
+): void {
+  state.players[player].allyAttackedLeaderLastTurn = value;
+}
+
+/** End-of-turn snapshot for "attacked leader on your last turn" gates. */
+export function commitAllyAttackedLeaderTurnSnapshot(
+  state: GameState,
+  player: PlayerSlot,
+): void {
+  setAllyAttackedLeaderLastTurn(
+    state,
+    player,
+    getAnyAllyAttackedLeaderThisTurn(state, player),
+  );
+  setAnyAllyAttackedLeaderThisTurn(state, player, false);
+}
+
 // ============================================================================
 // ACTIVE PLAYER HELPERS
 // ============================================================================

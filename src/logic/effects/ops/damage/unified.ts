@@ -1,6 +1,7 @@
 // src/logic/effects/ops/damage/unified.ts
 // Unified damage handler - thin router delegating to helpers and primitives
 
+import { state } from "../../../../core/gameState.js";
 import { getPool } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 import { applyLeaderDamage } from "../../leader.js";
@@ -10,7 +11,7 @@ import type {
   CardInstance,
   Player,
 } from "../../../../core/types/index.js";
-import { opponentOf, getHP, getMaxHP } from "../../../../core/playerHelpers.js";
+import { opponentOf } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 
 import type { UnifiedDamageSpec, DamageContext } from "./types.js";
@@ -27,6 +28,25 @@ import {
   handleSelection,
   handleByStatDamage,
 } from "./helpers.js";
+
+function collectExcludedSelectedUids(
+  spec: UnifiedDamageSpec,
+  ctx: DamageContext,
+): Set<string> {
+  if (!spec.exclude_selected) return new Set();
+  const uids = new Set<string>();
+  for (const uid of ctx.targetUids ?? []) {
+    if (uid) uids.add(String(uid));
+  }
+  const selected =
+    ctx.selectedCard ??
+    (state as any).__lastSelected ??
+    (Array.isArray((state as any).lastSelected)
+      ? (state as any).lastSelected[0]
+      : null);
+  if (selected?.uid) uids.add(String(selected.uid));
+  return uids;
+}
 
 // ============================================================================
 // UNIFIED HANDLER
@@ -137,6 +157,8 @@ export function handleDamage(
     isTargetedEffect: isSelectBased,
   }).filter((c) => c != null && c.type === "Follower");
 
+  const excludedUids = collectExcludedSelectedUids(spec, ctx);
+
   // Handle selection requirement
   if (spec.select && spec.select > 0) {
     return handleSelection(
@@ -150,6 +172,9 @@ export function handleDamage(
     );
   }
 
+  const filteredPool =
+    excludedUids.size > 0 ? pool.filter((c) => !excludedUids.has(c.uid)) : pool;
+
   // Dispatch by distribution mode
   // Note: "by_stat" is handled above (early return) before this switch.
   switch (spec.distribution) {
@@ -158,6 +183,7 @@ export function handleDamage(
       applyRandomHits(spec.count || 1, amount, spec.target || "", owner, {
         includeLeader: spec.include_leader ?? false,
         sourceCard,
+        excludeUids: excludedUids,
       });
       break;
 
@@ -170,12 +196,13 @@ export function handleDamage(
         {
           includeLeader: spec.include_leader ?? false,
           sourceCard,
+          excludeUids: excludedUids,
         },
       );
       break;
 
     case "split_sequential":
-      applySplitSpillover(amount, pool, owner, {
+      applySplitSpillover(amount, filteredPool, owner, {
         spillToLeader: spec.spill_to_leader ?? false,
       });
       break;

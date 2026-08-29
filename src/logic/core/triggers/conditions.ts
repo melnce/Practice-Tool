@@ -7,6 +7,10 @@ import { evaluateCardCondition } from "../conditions/evaluator.js";
 import { mergeEnteringKeywordSnapshot } from "../enterKeywords.js";
 import { handleSuperEvoGate } from "../../effects/gates/gates.js";
 import { opponentOf, getBoard } from "../../../core/playerHelpers.js";
+import {
+  hasPlayedBaseCostLadder,
+  DEFAULT_FULL_COST_LADDER,
+} from "../playedBaseCostHistory.js";
 // Helper to normalize "subject" card (entering, played, leaving, etc.)
 export function getSubjectCard(context: TriggerContext): CardInstance | null {
   return (
@@ -85,6 +89,14 @@ export function evalCommonConditions(
   // 6. Super Evolution Unlocked (for triggers/gates)
   if (cond.super_evolution_unlocked) {
     if (!handleSuperEvoGate(owner)) return false;
+  }
+
+  if ((cond as any).played_base_cost_ladder) {
+    const raw = (cond as any).played_base_cost_ladder;
+    const ladder = Array.isArray(raw)
+      ? raw.map((c: unknown) => Number(c)).filter(Number.isFinite)
+      : [...DEFAULT_FULL_COST_LADDER];
+    if (!hasPlayedBaseCostLadder(state, owner, ladder)) return false;
   }
 
   // =========================================================================
