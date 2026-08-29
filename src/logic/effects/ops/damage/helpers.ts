@@ -97,6 +97,17 @@ export function resolveAmount(
       const hand = getHand(state, ctx.owner) || [];
       return hand.filter((c) => String(c.type) === "Amulet").length;
     }
+    case "hand_class_count": {
+      const cls = String(
+        (spec as any).class ??
+          (spec.filter as any)?.class ??
+          (spec.condition as any)?.class ??
+          "Neutral",
+      ).toLowerCase();
+      const hand = getHand(state, ctx.owner) || [];
+      return hand.filter((c) => String(c.class ?? "").toLowerCase() === cls)
+        .length;
+    }
     case "fixed":
     default:
       // Use amount field, with overflow support

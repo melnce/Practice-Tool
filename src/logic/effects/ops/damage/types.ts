@@ -75,7 +75,8 @@ export type DamageAmountSource =
   | "ally_matches" // Count allied board cards matching `filter` / condition fields
   | "unique_tribe_enters" // Distinct named allied tribe enters this match (`tribe` / filter.tribe)
   | "named_enter_count" // Count of named allied follower enters this match (`name`)
-  | "amulets_in_hand"; // Count of amulets currently in owner's hand
+  | "amulets_in_hand" // Count of amulets currently in owner's hand
+  | "hand_class_count"; // Count of cards in hand matching `class` / filter.class
 
 /**
  * Canonical unified damage effect spec.
@@ -118,6 +119,8 @@ export interface UnifiedDamageSpec {
 
   // Targeting modifiers
   select?: number; // Require N user selections
+  /** Omit targets chosen earlier in the same effect chain (e.g. Jailor splash). */
+  exclude_selected?: boolean;
   include_leader?: boolean | "enemy" | "ally" | "both"; // Random hits can target leader(s)
   fallback_leader?: boolean; // If no followers, allow leader selection
 
@@ -255,6 +258,9 @@ export function normalizeToUnifiedSpec(
   }
   if (eff.select !== undefined) {
     spec.select = parseInt(String(eff.select), 10) || 0;
+  }
+  if ((eff as any).exclude_selected !== undefined) {
+    spec.exclude_selected = Boolean((eff as any).exclude_selected);
   }
   if (eff.include_leader !== undefined) {
     const raw = eff.include_leader;

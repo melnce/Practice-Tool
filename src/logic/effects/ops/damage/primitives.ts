@@ -134,6 +134,19 @@ export function resolveDamageAmountExtended(
   }
 }
 
+function buildFollowerPool(
+  targetSpec: string,
+  owner: Player,
+  sourceCard: CardInstance | null | undefined,
+  excludeUids?: Set<string>,
+): CardInstance[] {
+  return getPool(targetSpec, owner, sourceCard ?? null).filter((c) => {
+    if (!c || c.type !== "Follower") return false;
+    if (excludeUids?.has(c.uid)) return false;
+    return true;
+  });
+}
+
 // ============================================================================
 // DAMAGE APPLICATION PRIMITIVES
 // ============================================================================
@@ -173,6 +186,7 @@ export function applyRandomDistinctHits(
   options?: {
     includeLeader?: boolean | "enemy" | "ally" | "both";
     sourceCard?: CardInstance | null;
+    excludeUids?: Set<string>;
   },
 ): void {
   const includeLeaderOpt = options?.includeLeader;
@@ -202,7 +216,14 @@ export function applyRandomDistinctHits(
       const pool: (
         | CardInstance
         | { type: "Leader"; owner: Player; name: string }
-      )[] = [...getPool(targetSpec, owner, options?.sourceCard ?? null)];
+      )[] = [
+        ...buildFollowerPool(
+          targetSpec,
+          owner,
+          options?.sourceCard,
+          options?.excludeUids,
+        ),
+      ];
 
       if (leaderMode === "enemy" || leaderMode === "both") {
         const targetOwner = opponentOf(owner);
@@ -273,6 +294,7 @@ export function applyRandomHits(
   options?: {
     includeLeader?: boolean | "enemy" | "ally" | "both";
     sourceCard?: CardInstance | null;
+    excludeUids?: Set<string>;
   },
 ): void {
   const includeLeaderOpt = options?.includeLeader;
@@ -300,7 +322,14 @@ export function applyRandomHits(
       const pool: (
         | CardInstance
         | { type: "Leader"; owner: Player; name: string }
-      )[] = [...getPool(targetSpec, owner, options?.sourceCard ?? null)];
+      )[] = [
+        ...buildFollowerPool(
+          targetSpec,
+          owner,
+          options?.sourceCard,
+          options?.excludeUids,
+        ),
+      ];
 
       if (leaderMode === "enemy" || leaderMode === "both") {
         const targetOwner = opponentOf(owner);

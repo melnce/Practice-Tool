@@ -13,6 +13,7 @@ import {
   getBoard,
   opponentOf,
   setAnyAllyAttackedThisTurn,
+  setAnyAllyAttackedLeaderThisTurn,
 } from "../../core/playerHelpers.js";
 import { isGameOver } from "../../core/gameOver.js";
 
@@ -447,6 +448,7 @@ function _attackLeaderCore(
   if (!attackerIgnoresWard(attacker) && hasActiveWardOn(defenderBoard)) return;
 
   stripAmbushOnSelfAttack(attacker);
+  setAnyAllyAttackedLeaderThisTurn(state, attackerPlayer, true);
 
   if ((attacker as any).attacks_left == null) {
     (attacker as any).attacks_left = Number.isFinite(

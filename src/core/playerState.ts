@@ -40,6 +40,8 @@ export function createPlayerState(isSecond: boolean = false): PlayerState {
     // Per-Turn
     playsThisTurn: 0,
     anyAllyAttackedThisTurn: false,
+    anyAllyAttackedLeaderThisTurn: false,
+    allyAttackedLeaderLastTurn: false,
     shikigamiDeathsThisTurn: [],
 
     // Boost - only second player has it
@@ -52,6 +54,7 @@ export function createPlayerState(isSecond: boolean = false): PlayerState {
     playedHistory: [],
     destroyedHistory: [],
     followerEnterHistory: [],
+    playedBaseCostsThisMatch: [],
 
     // Crests
     crests: [],

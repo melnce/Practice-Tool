@@ -31,7 +31,12 @@ import {
   setPlaysThisTurn,
   setEvoUsedThisTurn,
   setAnyAllyAttackedThisTurn,
+  commitAllyAttackedLeaderTurnSnapshot,
 } from "../../core/playerHelpers.js";
+import {
+  hasPlayedBaseCostLadder,
+  DEFAULT_FULL_COST_LADDER,
+} from "./playedBaseCostHistory.js";
 
 /**
  * Helper: at the start of a player's turn, refresh their followers.
@@ -182,6 +187,14 @@ function scanDeckForInvokes(
       if (stat >= inv.condition.evolved_count_at_least) conditionMet = true;
     }
 
+    if (inv.condition.played_base_cost_ladder) {
+      const raw = inv.condition.played_base_cost_ladder;
+      const ladder = Array.isArray(raw)
+        ? raw.map((c: unknown) => Number(c)).filter(Number.isFinite)
+        : [...DEFAULT_FULL_COST_LADDER];
+      if (hasPlayedBaseCostLadder(state, owner, ladder)) conditionMet = true;
+    }
+
     if (conditionMet) {
       logEvent("invoke", { owner, card: card.name });
       invokedNames.add(card.name);
@@ -236,6 +249,7 @@ function _endTurnCore(endingPlayer: Player) {
     clearExpiredCantAttackAtEOT(endingPlayer);
     applyBleedAllBoardsAtEndOfTurn();
     clearExpiredLeaderEffects(endingPlayer);
+    commitAllyAttackedLeaderTurnSnapshot(state, endingPlayer);
 
     // === PHASE 2: Special Second Player Logic (PP Boost, Round Increment) ===
     if (endingPlayer === "second") {

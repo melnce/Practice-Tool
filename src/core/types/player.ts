@@ -69,6 +69,13 @@ export interface PlayerState {
   // === Per-Turn State ===
   playsThisTurn: number;
   anyAllyAttackedThisTurn: boolean;
+  /** True if any allied follower attacked the enemy leader this turn. */
+  anyAllyAttackedLeaderThisTurn: boolean;
+  /**
+   * Snapshot at end of owner's previous turn: did any ally attack the enemy
+   * leader during that turn? Used by "on your last turn" gate conditions.
+   */
+  allyAttackedLeaderLastTurn: boolean;
   shikigamiDeathsThisTurn: CardInstance[]; // For Kuon effect
 
   // === Boost (second player only) ===
@@ -86,6 +93,8 @@ export interface PlayerState {
     tribes: string[];
     cardId: string;
   }>;
+  /** Distinct printed base costs of cards played this match (cost-ladder conditions). */
+  playedBaseCostsThisMatch: number[];
 
   // === Crests ===
   crests: Crest[];

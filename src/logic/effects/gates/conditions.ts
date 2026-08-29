@@ -17,6 +17,7 @@ import {
   getDeck,
   getRally,
   getAnyAllyAttackedThisTurn,
+  getAllyAttackedLeaderLastTurn,
   getHP,
   opponentOf,
 } from "../../../core/playerHelpers.js";
@@ -28,6 +29,10 @@ import {
   countUniqueTribeEnters,
   countNamedEnters,
 } from "../../core/followerEnterHistory.js";
+import {
+  hasPlayedBaseCostLadder,
+  DEFAULT_FULL_COST_LADDER,
+} from "../../core/playedBaseCostHistory.js";
 
 // =============================================================================
 // CONDITION EVALUATOR TYPE
@@ -373,6 +378,17 @@ registerCondition("skybound_art", (spec, _owner, sourceCard) => {
   const gauge = (state.roundCount || 1) + witnesses;
   const req = spec.requirement ?? 10;
   return gauge >= req;
+});
+
+registerCondition("played_base_cost_ladder", (spec, owner) => {
+  const ladder = Array.isArray((spec as any).costs)
+    ? (spec as any).costs.map((c: unknown) => Number(c)).filter(Number.isFinite)
+    : [...DEFAULT_FULL_COST_LADDER];
+  return hasPlayedBaseCostLadder(state, owner, ladder);
+});
+
+registerCondition("ally_attacked_leader_last_turn", (_spec, owner) => {
+  return getAllyAttackedLeaderLastTurn(state, owner);
 });
 
 registerCondition("no_ally_attacked", (_spec, owner) => {
