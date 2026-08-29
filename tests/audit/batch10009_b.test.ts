@@ -249,7 +249,9 @@ describe("10901310 Initiation of Rebirth", () => {
       .find((c) => c.name === priceyA.name || c.name === priceyB.name)?.name;
     expect(addedName).toBeTruthy();
     expect(
-      thenDeck("first").concat(thenHand("first")).some((c) => c.name === cheap.name),
+      thenDeck("first")
+        .concat(thenHand("first"))
+        .some((c) => c.name === cheap.name),
     ).toBe(false);
   });
 
@@ -326,7 +328,9 @@ describe("10903210 Azvaldt, Penitentiary of Chaos", () => {
     for (let c = 1; c <= 7; c++) recordPlayedBaseCost(state, "first", c);
     whenPlayCard("first", 0);
     whenEndTurn();
-    expect(findOnBoard("first", "Azvaldt, Penitentiary of Chaos")).toBeUndefined();
+    expect(
+      findOnBoard("first", "Azvaldt, Penitentiary of Chaos"),
+    ).toBeUndefined();
   });
 
   it("Last Words summons up to 4 differently named destroyed followers", () => {
@@ -348,8 +352,16 @@ describe("10903210 Azvaldt, Penitentiary of Chaos", () => {
 
   it("Last Words summons only available distinct names when fewer than 4", () => {
     setupTurn(R10, { hand: ["10903210"], pp: 8, deck: [FILLER] });
-    recordDestroyed(state, "first", createCard("10001110", "graveyard", "first"));
-    recordDestroyed(state, "first", createCard("10001120", "graveyard", "first"));
+    recordDestroyed(
+      state,
+      "first",
+      createCard("10001110", "graveyard", "first"),
+    );
+    recordDestroyed(
+      state,
+      "first",
+      createCard("10001120", "graveyard", "first"),
+    );
     for (let c = 1; c <= 7; c++) recordPlayedBaseCost(state, "first", c);
     whenPlayCard("first", 0);
     whenEndTurn();
