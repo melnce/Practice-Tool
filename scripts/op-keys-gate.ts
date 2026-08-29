@@ -97,6 +97,7 @@ export const BANISH_FILTERS_KEYS = new Set([
   "cost_in",
   "base_cost_in",
   "type",
+  "name",
 ]);
 
 /** keyword op filters (buffs.ts). */
@@ -318,6 +319,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "can_target_leader",
     "condition",
     "filter",
+    "exclude_selected",
   ]),
   destroy: new Set([
     "target",
@@ -502,6 +504,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "tribe",
     "is_ally",
     "ally",
+    "has_keyword",
   ]),
   repeat_effect: new Set([
     "effects",
