@@ -119,6 +119,30 @@ describe("card ingest mapping", () => {
     expect(mapped).not.toHaveProperty("spell");
     expect(mapped.fanfare).toEqual([]);
   });
+
+  it("applies Trap in the Woods amulet override (not DotGG Spell)", () => {
+    const mapped = mapDotggCardToRepo({
+      id: "10911210",
+      name: "Trap in the Woods",
+      skill_text:
+        "Whenever an enemy follower enters the field, destroy it and this card.",
+      class: "1",
+      color: "Forestcraft",
+      type: "Spell",
+      cost: "3",
+      atk: "0",
+      life: "0",
+      rarity: "1",
+      tribes: [],
+      setId: "10009",
+      set_name: "Revenants of Azvaldt",
+      is_token: "0",
+      image: "https://static.dotgg.gg/shadowverse/cards/10911210.webp",
+    });
+    expect(mapped.type).toBe("Amulet");
+    expect(mapped).not.toHaveProperty("spell");
+    expect(mapped.fanfare).toEqual([]);
+  });
 });
 
 describe("merge-by-id never clobbers authored ops", () => {
