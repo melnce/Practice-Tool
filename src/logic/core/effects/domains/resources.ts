@@ -42,7 +42,7 @@ const doLog = (event: string, payload: any) => logEvent(event, payload);
 // UNIFIED PP/EP HANDLERS
 // ========================================================================
 
-type PPAction = "gain_max" | "recover";
+type PPAction = "gain_max" | "recover" | "spend";
 type EPAction = "recover" | "recover_super";
 
 function handlePP(
@@ -52,7 +52,7 @@ function handlePP(
 ) {
   const action = eff.action;
   if (!action) {
-    console.warn("pp op: action field is mandatory (gain_max, recover)");
+    console.warn("pp op: action field is mandatory (gain_max, recover, spend)");
     return;
   }
 
@@ -93,6 +93,21 @@ function handlePP(
         owner: targetPlayer,
         amount: amt,
       });
+      break;
+    }
+    case "spend": {
+      const cur = getPP(state, targetPlayer);
+      const amt = parseInt(String(eff.amount)) || 0;
+      if (cur < amt) {
+        logEvent("spendPPBlocked", {
+          owner: targetPlayer,
+          need: amt,
+          have: cur,
+        });
+        break;
+      }
+      setPP(state, targetPlayer, cur - amt);
+      logEvent("spendPP", { owner: targetPlayer, amount: amt });
       break;
     }
     default:

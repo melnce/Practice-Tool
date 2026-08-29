@@ -56,6 +56,16 @@ export function evalCommonConditions(
     if (subjectCard.uid !== hostCard.uid) return false;
   }
 
+  // 3b. is_fuse_initiator — host must be the fuse target (initiator)
+  if ((cond as any).is_fuse_initiator) {
+    const ctxInitiator =
+      context.initiator ??
+      (context.initiatorUid
+        ? ({ uid: context.initiatorUid } as CardInstance)
+        : null);
+    if (!ctxInitiator || ctxInitiator.uid !== hostCard.uid) return false;
+  }
+
   // 4. not_self
   if (cond.not_self && subjectCard && subjectCard.uid === hostCard.uid)
     return false;

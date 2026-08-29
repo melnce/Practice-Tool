@@ -24,6 +24,7 @@ import {
   resumeDeferredDeathIfIdle,
   cleanupDead,
 } from "./cleanup.js";
+import { flushDeferredOnFuse } from "../effects/ops/fuse/types.js";
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
@@ -75,6 +76,7 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
   const result = dispatchTargetedOp(opCtx);
 
   if (result.kind === "handled") {
+    flushDeferredOnFuse();
     const playFollowerResume = (state.pendingTargetEffect?.resumePlayFollower ??
       (state as any).resumePlayFollower) as PlayFollowerResume | undefined;
     const deferredLwComplete = state.pendingTargetEffect?.deferredLwComplete as

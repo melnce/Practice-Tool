@@ -24,6 +24,8 @@ import { fuse_finalize_gardens_allure } from "./fuse.forest.js";
 
 import { fuse_finalize_loot } from "./fuse.loot.js";
 
+import { fuse_finalize_cards } from "./fuse.cards.js";
+
 /**
  * Unified fuse handler
  *
@@ -103,6 +105,10 @@ export function handleFuse(
 
       case "gardens_allure":
         fuse_finalize_gardens_allure(owner, initiatorUid, partners);
+        break;
+
+      case "cards":
+        fuse_finalize_cards(owner, initiatorUid, partners);
         break;
 
       default:

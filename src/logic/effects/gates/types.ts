@@ -54,7 +54,8 @@ export type GateCondition =
   | "played_base_cost_ladder" // Played cards at each listed base cost this match
   | "highlander" // No duplicate cards in deck
   | "has_fuse_materials" // Host has fused loot (or other fuse material) this copy
-  | "fused_this_turn";
+  | "fused_this_turn"
+  | "pp_at_least"; // Current PP >= count (requirement only; does not spend)
 
 /**
  * Unified specification for all gate operations.

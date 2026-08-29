@@ -27,6 +27,11 @@ export function endDispatch() {
   if (isDev()) _currentOp = null;
 }
 
+/** True while a targeted-op handler is running (runEffects is forbidden). */
+export function isTargetedOpDispatchActive(): boolean {
+  return _isTargetedOpDispatchActive;
+}
+
 /**
  * Temporarily bypasses the lifecycle guard for legitimate reasons (e.g. nested effects).
  * ENFORCEMENT: Only allowed for specific operations.

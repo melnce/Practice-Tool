@@ -10,6 +10,17 @@ export function handleFuseEvent(
   dispatchOrderedTriggers(event, activePlayer, context, {
     skipCommonConditions: true,
     skipTracking: true,
-    predicate: (_trigger, cand) => cand.owner === activePlayer,
+    predicate: (trigger, cand) => {
+      if (cand.owner !== activePlayer) return false;
+      if ((trigger.condition as any)?.is_fuse_initiator) {
+        const ctxInitiator =
+          context.initiator ??
+          (context.initiatorUid
+            ? ({ uid: context.initiatorUid } as { uid: string })
+            : null);
+        if (!ctxInitiator || ctxInitiator.uid !== cand.card?.uid) return false;
+      }
+      return true;
+    },
   });
 }

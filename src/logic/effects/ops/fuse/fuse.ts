@@ -13,7 +13,11 @@ import { logEvent } from "../../../../core/logger.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { FuseOp } from "./types.js";
 
-import { alreadyFusedThisTurn, handOf } from "./types.js";
+import {
+  alreadyFusedThisTurn,
+  handOf,
+  hasFuseCardsCapability,
+} from "./types.js";
 // Class-specific modules
 import {
   startGearMultiSelect,
@@ -131,6 +135,38 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
   }
   if (initiator?.name === "Ominous Artifact α") {
     return startAlphaSelect(owner, initiator);
+  }
+
+  // --- Generic Fuse: Cards (any hand card, no recipe whitelist) ---
+  if (hasFuseCardsCapability(initiator)) {
+    const pool = hand.filter((c) => c?.uid !== initiator.uid);
+    if (!pool.length) return;
+
+    setPendingTarget({
+      eff: {
+        op: "fuse",
+        action: "finalize",
+        type: "cards",
+        initiator_uid: initiator.uid,
+      } as FuseOp,
+      owner,
+      sourceCard: initiator,
+      pool,
+      selectCount: 1,
+      targets: [],
+      resumeEffects: [],
+    });
+    logEvent("fuseOpen", {
+      owner,
+      initiator: initiator.name,
+      initiatorUid: initiator.uid,
+      recipe: null,
+      pool: pool.length,
+      finalize: "fuse:cards",
+    });
+    highlightSelectable(pool);
+    adapter.render();
+    return "pending";
   }
 
   // --- Generic single/multi partner path (honors recipe.finalize_op) ---
