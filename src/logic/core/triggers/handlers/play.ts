@@ -55,7 +55,7 @@ export function handlePlayEvent(
     skipTracking: true,
     predicate: (trigger: TriggerSpec, cand: ProcessingCandidate) => {
       if (cand.owner !== activePlayer) return false;
-      if (cand.source !== "board") return false;
+      if (cand.source !== "board" && cand.source !== "crest") return false;
       if (!context.playedCard || context.playedCard.type !== "Follower")
         return false;
 

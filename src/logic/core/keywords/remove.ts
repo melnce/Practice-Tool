@@ -39,9 +39,13 @@ export function removeKeywordFromSingleCard(
   else if (keywordToRemove === "bane") target.hasBane = false;
   else if (keywordToRemove === "intimidate") target.hasIntimidate = false;
   else if (keywordToRemove === "drain") target.hasDrain = false;
-  else if (keywordToRemove === "last_words")
+  else if (keywordToRemove === "last_words") {
     target.hasLastWords = false; // Canonical key
-  else if (keywordToRemove === "ambush") target.hasAmbush = false;
+    target.lastWordsEffects = [];
+    if (target.keywordState) {
+      target.keywordState.lastWordsEffects = [];
+    }
+  } else if (keywordToRemove === "ambush") target.hasAmbush = false;
 
   // Step 2: Remove from KeywordState if applicable
   // (Logic to clear specific keyword state bits could be expanded here)

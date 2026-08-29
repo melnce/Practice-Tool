@@ -1,5 +1,5 @@
 import { registerOp } from "../registry.js";
-// import { state } from "../../../../core/gameState.js";
+import { state } from "../../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../targeting.js";
 import { setPendingTarget } from "../../pendingTarget/index.js";
 import { handleStat } from "../../../effects/ops/stat.js";
@@ -58,16 +58,21 @@ export function registerBuffEffects() {
       isTargetedEffect: !!(eff.select || eff.select_count),
     };
 
+    const effTargetLower = String((eff as any).target || "").toLowerCase();
     let targets: CardInstance[] =
-      merged.targets && merged.targets.length > 0 && !eff.target
-        ? (merged.targets as CardInstance[])
-        : getPool(
-            eff.target || "",
-            ctx.owner,
-            ctx.sourceCard,
-            eff.condition,
-            opCtx,
-          );
+      effTargetLower === "last_added_to_hand"
+        ? (state as any).lastAddedToHand
+          ? [(state as any).lastAddedToHand as CardInstance]
+          : []
+        : merged.targets && merged.targets.length > 0 && !eff.target
+          ? (merged.targets as CardInstance[])
+          : getPool(
+              eff.target || "",
+              ctx.owner,
+              ctx.sourceCard,
+              eff.condition,
+              opCtx,
+            );
 
     const effTarget = String((eff as any).target || "").toLowerCase();
     if (

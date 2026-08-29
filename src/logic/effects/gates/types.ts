@@ -103,6 +103,9 @@ export interface UnifiedGateSpec {
   /** Tribe for unique_tribe_enters / hand_matches filters */
   tribe?: string;
 
+  /** Keyword filter for ally_matches / field_matches (e.g. LastWords) */
+  has_keyword?: string | string[];
+
   /** Effects to run if condition passes */
   effects?: Effect[];
 
@@ -181,6 +184,8 @@ export function normalizeToGateSpec(eff: Effect): UnifiedGateSpec {
   if ((eff as any).base_cost_lte !== undefined)
     spec.base_cost_lte = parseInt((eff as any).base_cost_lte);
   if ((eff as any).tribe !== undefined) spec.tribe = String((eff as any).tribe);
+  if ((eff as any).has_keyword !== undefined)
+    spec.has_keyword = (eff as any).has_keyword;
   if ((eff as any).is_ally !== undefined)
     spec.is_ally = Boolean((eff as any).is_ally);
   if ((eff as any).ally !== undefined) spec.ally = Boolean((eff as any).ally);

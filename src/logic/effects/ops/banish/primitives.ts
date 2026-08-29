@@ -158,9 +158,10 @@ export function banishFilteredFromDeck(
     ? costInRaw.map((n) => parseInt(String(n), 10)).filter(Number.isFinite)
     : null;
   const wantType = filters?.type ? String(filters.type).toLowerCase() : null;
+  const wantName = filters?.name ? String(filters.name).trim() : null;
 
-  // Refuse unfiltered deck wipe — callers must supply cost_in / type / etc.
-  if (!filters || (!wantType && !(costIn && costIn.length))) {
+  // Refuse unfiltered deck wipe — callers must supply cost_in / type / name / etc.
+  if (!filters || (!wantType && !(costIn && costIn.length) && !wantName)) {
     logEvent("banishFilteredFromDeck_noFilter", { owner, filters });
     return 0;
   }
@@ -174,7 +175,8 @@ export function banishFilteredFromDeck(
     const typeOk =
       !wantType || String(card.type || "").toLowerCase() === wantType;
     const costOk = !costIn || costIn.includes(cost);
-    if (typeOk && costOk) {
+    const nameOk = !wantName || String(card.name) === wantName;
+    if (typeOk && costOk && nameOk) {
       removed.push(card);
     } else {
       kept.push(card);

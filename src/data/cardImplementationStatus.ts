@@ -223,6 +223,8 @@ function hasConfiguredKeyword(card: CardLike): boolean {
 
 export function hasProgrammedEffects(card: CardLike): boolean {
   if (collectCardOps(card).size > 0) return true;
+  const apt = (card as { attacks_per_turn?: number }).attacks_per_turn;
+  if (typeof apt === "number" && Number.isFinite(apt) && apt > 1) return true;
   return hasConfiguredKeyword(card);
 }
 
