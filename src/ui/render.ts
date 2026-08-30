@@ -16,6 +16,7 @@ import { syncSeedDisplay } from "./seedDisplay.js";
 import { refreshActiveTooltips } from "./tooltips.js";
 import { getPuzzleSessionSnapshot } from "../core/puzzle/session.js";
 import { syncFloatingCombatTextFromLogs } from "./floatingCombatText.js";
+import { noteBlackboxRematch } from "./blackbox.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -320,6 +321,9 @@ async function rematch(keepSeed: boolean) {
   const seedInput = document.getElementById(
     "seedInput",
   ) as HTMLInputElement | null;
+
+  // Black-box boundary sample before state reset — rematch staircase diagnostic.
+  noteBlackboxRematch(keepSeed);
 
   const deckAId =
     blueSelect?.value ||

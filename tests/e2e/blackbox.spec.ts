@@ -59,6 +59,10 @@ test.describe("crash black-box", () => {
             turn: 1,
             round: 1,
             img: 0,
+            rm: 0,
+            rms: 0,
+            rmn: 0,
+            gp: 1,
             hu: 40e6,
             ht: 50e6,
             hl: 100e6,
@@ -69,9 +73,16 @@ test.describe("crash black-box", () => {
             turn: 2,
             round: 1,
             img: 2,
+            rm: 1,
+            rms: 1,
+            rmn: 0,
+            gp: 2,
             hu: 55e6,
             ht: 60e6,
             hl: 100e6,
+            ev: "rs",
+            ft: 18,
+            fr: 9,
           },
           {
             t: 10000,
@@ -79,13 +90,25 @@ test.describe("crash black-box", () => {
             turn: 4,
             round: 2,
             img: 7,
+            rm: 2,
+            rms: 2,
+            rmn: 0,
+            gp: 3,
             hu: 82e6,
             ht: 90e6,
             hl: 100e6,
+            ev: "rs",
+            ft: 22,
+            fr: 11,
           },
         ],
         peakNodes: 9800,
         peakHeap: 82e6,
+        rematchTotal: 2,
+        rematchSame: 2,
+        rematchNew: 0,
+        gamesStarted: 3,
+        gamesPlayed: 2,
       };
       localStorage.setItem("svwb.blackbox.ring", JSON.stringify(ring));
       localStorage.removeItem("svwb.blackbox.clean");
@@ -264,5 +287,49 @@ test.describe("crash black-box", () => {
 
     // Sampling itself should stay well under a frame budget (16ms).
     expect(timing.withSample).toBeLessThan(8);
+  });
+
+  test("rematch boundary samples tag same/new seed and preserve the ring", async ({
+    page,
+  }) => {
+    await page.goto(`${BASE}/?test=1`);
+    await page.waitForLoadState("networkidle");
+    await startMinimalGame(page);
+
+    const result = await page.evaluate(() => {
+      const t = window.__svwbTest!;
+      window.gameState.turnNumber = 14;
+      window.gameState.roundCount = 7;
+      t.forceBlackboxSample();
+      t.noteBlackboxRematch(true);
+      window.gameState.turnNumber = 9;
+      window.gameState.roundCount = 5;
+      t.noteBlackboxRematch(false);
+      t.flushBlackbox();
+      const raw = localStorage.getItem("svwb.blackbox.ring");
+      const ring = raw ? JSON.parse(raw) : null;
+      const boundaries = (ring?.samples ?? []).filter(
+        (s: { ev?: string }) => s.ev === "rs" || s.ev === "rn",
+      );
+      return {
+        rematchTotal: ring?.rematchTotal,
+        rematchSame: ring?.rematchSame,
+        rematchNew: ring?.rematchNew,
+        gamesPlayed: ring?.gamesPlayed,
+        sampleCount: ring?.samples?.length,
+        boundaries,
+      };
+    });
+
+    expect(result.rematchTotal).toBe(2);
+    expect(result.rematchSame).toBe(1);
+    expect(result.rematchNew).toBe(1);
+    expect(result.gamesPlayed).toBe(2);
+    expect(result.sampleCount).toBeGreaterThanOrEqual(3);
+    expect(result.boundaries).toHaveLength(2);
+    expect(result.boundaries[0].ev).toBe("rs");
+    expect(result.boundaries[0].ft).toBe(14);
+    expect(result.boundaries[1].ev).toBe("rn");
+    expect(result.boundaries[1].ft).toBe(9);
   });
 });

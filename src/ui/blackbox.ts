@@ -34,12 +34,29 @@ export interface BlackboxSample {
   n: number;
   turn: number;
   round: number;
-  /** Cumulative failed card-art image loads this session. */
+  /** Cumulative failed card-art image loads this page session. */
   img: number;
+  /** Total rematches this page session (same + new seed). */
+  rm: number;
+  /** Same-seed rematch count. */
+  rms: number;
+  /** New-seed rematch count. */
+  rmn: number;
+  /** Games started this page session (includes first + rematches). */
+  gp: number;
   /** Chrome performance.memory — omitted when unavailable. */
   hu?: number;
   ht?: number;
   hl?: number;
+  /**
+   * Boundary tag: `rs` = rematch same-seed, `rn` = rematch new-seed.
+   * Present only on rematch-boundary samples (immediate flush).
+   */
+  ev?: "rs" | "rn";
+  /** Finished game turnNumber at rematch boundary. */
+  ft?: number;
+  /** Finished game roundCount at rematch boundary. */
+  fr?: number;
 }
 
 export interface BlackboxRing {
@@ -49,6 +66,12 @@ export interface BlackboxRing {
   samples: BlackboxSample[];
   peakNodes: number;
   peakHeap?: number;
+  /** Page-session counters mirrored for crash export without scanning samples. */
+  rematchTotal?: number;
+  rematchSame?: number;
+  rematchNew?: number;
+  gamesStarted?: number;
+  gamesPlayed?: number;
 }
 
 export interface BlackboxCrashReport {
@@ -69,6 +92,14 @@ let samples: BlackboxSample[] = [];
 let peakNodes = 0;
 let peakHeap: number | undefined;
 let imgFailCount = 0;
+/** Page-session rematch / game counters — survive rematch; reset only on page load. */
+let rematchTotal = 0;
+let rematchSame = 0;
+let rematchNew = 0;
+let gamesStarted = 0;
+let gamesPlayed = 0;
+/** When rematch() is about to restart, skip wiping the ring on the next begin. */
+let expectRematchRestart = false;
 let sampleTimer: ReturnType<typeof setInterval> | null = null;
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
 let dirty = false;
@@ -148,6 +179,11 @@ function buildRing(): BlackboxRing {
     samples: samples.slice(),
     peakNodes,
     ...(peakHeap !== undefined ? { peakHeap } : {}),
+    rematchTotal,
+    rematchSame,
+    rematchNew,
+    gamesStarted,
+    gamesPlayed,
   };
 }
 
@@ -221,8 +257,17 @@ function scheduleFlush(): void {
   }, BLACKBOX_FLUSH_MS);
 }
 
-function takeSample(): BlackboxSample | null {
-  if (!state.gameStarted) return null;
+type SampleOpts = {
+  /** Allow sampling even if gameStarted is briefly false (rematch boundary). */
+  force?: boolean;
+  ev?: "rs" | "rn";
+  ft?: number;
+  fr?: number;
+};
+
+function takeSample(opts?: SampleOpts): BlackboxSample | null {
+  if (!opts?.force && !state.gameStarted) return null;
+  if (!sessionId) return null;
 
   const mem = readMemory();
   const nodes = countDomNodes();
@@ -235,7 +280,14 @@ function takeSample(): BlackboxSample | null {
     turn: state.turnNumber | 0,
     round: state.roundCount | 0,
     img: imgFailCount,
+    rm: rematchTotal,
+    rms: rematchSame,
+    rmn: rematchNew,
+    gp: gamesStarted,
   };
+  if (opts?.ev) sample.ev = opts.ev;
+  if (opts?.ft !== undefined) sample.ft = opts.ft;
+  if (opts?.fr !== undefined) sample.fr = opts.fr;
   if (mem) {
     sample.hu = mem.usedJSHeapSize;
     sample.ht = mem.totalJSHeapSize;
@@ -336,21 +388,75 @@ function stopSampler(): void {
   }
 }
 
-/** Begin / reset a recording session when a game becomes active. */
+/** Begin / continue a recording session when a game becomes active. */
 export function beginBlackboxSession(): void {
+  // Rematch restart: keep the ring + counters so a staircase is visible.
+  if (expectRematchRestart && sessionId) {
+    expectRematchRestart = false;
+    setCleanShutdown(false);
+    gamesStarted += 1;
+    startSampler();
+    return;
+  }
+
   if (dirty) flushBlackboxRing();
-  sessionId = newSessionId();
-  sessionStartedAt = Date.now();
-  sessionOriginNow =
-    typeof performance !== "undefined" ? performance.now() : Date.now();
-  samples = [];
-  peakNodes = 0;
-  peakHeap = undefined;
-  imgFailCount = 0;
-  dirty = false;
+
+  // Mid-page "Start Game" after an earlier session: keep page-session counters
+  // and prior samples so rematch staircases survive; only open a new ring id
+  // if we have never sampled this page.
+  if (!sessionId) {
+    sessionId = newSessionId();
+    sessionStartedAt = Date.now();
+    sessionOriginNow =
+      typeof performance !== "undefined" ? performance.now() : Date.now();
+    samples = [];
+    peakNodes = 0;
+    peakHeap = undefined;
+    imgFailCount = 0;
+    rematchTotal = 0;
+    rematchSame = 0;
+    rematchNew = 0;
+    gamesStarted = 0;
+    gamesPlayed = 0;
+    dirty = false;
+    safeRemove(BLACKBOX_RING_KEY);
+  }
+
+  gamesStarted += 1;
   setCleanShutdown(false);
-  safeRemove(BLACKBOX_RING_KEY);
   startSampler();
+}
+
+/**
+ * Call from rematch() BEFORE startNewGame resets state.
+ * Records a tagged boundary sample and preserves the ring across the restart.
+ */
+export function noteBlackboxRematch(keepSeed: boolean): void {
+  if (!sessionId) {
+    // Rematch without a prior blackbox session — open one lightly.
+    sessionId = newSessionId();
+    sessionStartedAt = Date.now();
+    sessionOriginNow =
+      typeof performance !== "undefined" ? performance.now() : Date.now();
+  }
+
+  const finishedTurns = state.turnNumber | 0;
+  const finishedRound = state.roundCount | 0;
+
+  rematchTotal += 1;
+  if (keepSeed) rematchSame += 1;
+  else rematchNew += 1;
+  gamesPlayed += 1;
+  expectRematchRestart = true;
+
+  takeSample({
+    force: true,
+    ev: keepSeed ? "rs" : "rn",
+    ft: finishedTurns,
+    fr: finishedRound,
+  });
+  // Rematch boundary must hit disk immediately — OOM may follow soon after.
+  flushBlackboxRing();
 }
 
 function watchGameStart(): void {
@@ -390,10 +496,34 @@ function refreshStatusUi(): void {
   status.dataset.crash = "1";
 }
 
+function buildPlotSeries(ring: BlackboxRing | null): Array<{
+  t: number;
+  rm: number;
+  hu: number | null;
+  n: number;
+  img: number;
+  ev?: string;
+  ft?: number;
+}> {
+  if (!ring) return [];
+  return ring.samples.map((s) => ({
+    t: s.t,
+    rm: s.rm ?? 0,
+    hu: s.hu ?? null,
+    n: s.n,
+    img: s.img,
+    ...(s.ev ? { ev: s.ev } : {}),
+    ...(s.ft !== undefined ? { ft: s.ft } : {}),
+  }));
+}
+
 function exportPayload(): string {
   const ring =
     lastCrash?.ring ??
     (sessionId ? buildRing() : parseRing(safeGet(BLACKBOX_RING_KEY)));
+  const boundaries = (ring?.samples ?? []).filter(
+    (s) => s.ev === "rs" || s.ev === "rn",
+  );
   return JSON.stringify(
     {
       schema: "svwb.blackbox.v1",
@@ -401,6 +531,16 @@ function exportPayload(): string {
       abnormal: !!lastCrash,
       cleanShutdown: isCleanShutdown(),
       imageFailCount: imgFailCount,
+      rematch: {
+        total: ring?.rematchTotal ?? rematchTotal,
+        sameSeed: ring?.rematchSame ?? rematchSame,
+        newSeed: ring?.rematchNew ?? rematchNew,
+        gamesStarted: ring?.gamesStarted ?? gamesStarted,
+        gamesPlayed: ring?.gamesPlayed ?? gamesPlayed,
+      },
+      /** Flat series for plotting heap / nodes vs rematch count. */
+      plot: buildPlotSeries(ring),
+      rematchBoundaries: boundaries,
       ring,
       crash: lastCrash,
     },
@@ -591,6 +731,12 @@ export function _resetBlackboxForTests(): void {
   peakNodes = 0;
   peakHeap = undefined;
   imgFailCount = 0;
+  rematchTotal = 0;
+  rematchSame = 0;
+  rematchNew = 0;
+  gamesStarted = 0;
+  gamesPlayed = 0;
+  expectRematchRestart = false;
   dirty = false;
   lastCrash = null;
   warnEnabled = false;

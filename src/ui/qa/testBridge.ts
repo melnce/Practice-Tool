@@ -14,6 +14,7 @@ import {
 } from "../floatingCombatText.js";
 import {
   beginBlackboxSession,
+  noteBlackboxRematch as recordBlackboxRematch,
   _forceBlackboxSampleForTest,
   _flushBlackboxForTest,
   _getBlackboxImageFailCount,
@@ -65,6 +66,7 @@ export interface SvwbTestBridge {
   getBlackboxLastCrash(): unknown;
   getBlackboxRingBytes(): number;
   getBlackboxMaxBytes(): number;
+  noteBlackboxRematch(keepSeed: boolean): void;
 }
 
 function makeCard(cardId: string, owner: Player): CardInstance {
@@ -248,6 +250,10 @@ function installBridge(): void {
 
     getBlackboxMaxBytes() {
       return BLACKBOX_MAX_BYTES;
+    },
+
+    noteBlackboxRematch(keepSeed: boolean) {
+      recordBlackboxRematch(keepSeed);
     },
   };
 

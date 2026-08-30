@@ -43,6 +43,10 @@ function makeSample(i: number): BlackboxSample {
     turn: i,
     round: Math.max(1, Math.floor(i / 2)),
     img: 0,
+    rm: 0,
+    rms: 0,
+    rmn: 0,
+    gp: 1,
     hu: 10_000_000 + i,
     ht: 20_000_000,
     hl: 100_000_000,
@@ -197,6 +201,63 @@ describe("blackbox", () => {
       turn: expect.any(Number),
       round: expect.any(Number),
       img: expect.any(Number),
+      rm: expect.any(Number),
+      rms: expect.any(Number),
+      rmn: expect.any(Number),
+      gp: expect.any(Number),
     });
+    expect(parsed.rematch).toMatchObject({
+      total: expect.any(Number),
+      sameSeed: expect.any(Number),
+      newSeed: expect.any(Number),
+      gamesStarted: expect.any(Number),
+      gamesPlayed: expect.any(Number),
+    });
+    expect(Array.isArray(parsed.plot)).toBe(true);
+  });
+
+  it("records rematch boundary samples without wiping the ring", async () => {
+    const { noteBlackboxRematch } = await import("../../src/ui/blackbox.js");
+    state.gameStarted = true;
+    state.turnNumber = 12;
+    state.roundCount = 6;
+    beginBlackboxSession();
+    _forceBlackboxSampleForTest();
+    const before = _getBlackboxSamples().length;
+    expect(before).toBeGreaterThanOrEqual(1);
+
+    noteBlackboxRematch(true);
+    const afterSame = _getBlackboxSamples();
+    expect(afterSame.length).toBe(before + 1);
+    const boundary = afterSame[afterSame.length - 1];
+    expect(boundary?.ev).toBe("rs");
+    expect(boundary?.rm).toBe(1);
+    expect(boundary?.rms).toBe(1);
+    expect(boundary?.rmn).toBe(0);
+    expect(boundary?.ft).toBe(12);
+    expect(boundary?.fr).toBe(6);
+
+    state.turnNumber = 8;
+    state.roundCount = 4;
+    noteBlackboxRematch(false);
+    const afterNew = _getBlackboxSamples();
+    expect(afterNew.length).toBe(before + 2);
+    const boundaryNew = afterNew[afterNew.length - 1];
+    expect(boundaryNew?.ev).toBe("rn");
+    expect(boundaryNew?.rm).toBe(2);
+    expect(boundaryNew?.rms).toBe(1);
+    expect(boundaryNew?.rmn).toBe(1);
+    expect(boundaryNew?.ft).toBe(8);
+
+    // Rematch restart must not wipe prior samples
+    beginBlackboxSession();
+    expect(_getBlackboxSamples().length).toBe(before + 2);
+
+    const parsed = JSON.parse(_exportBlackboxForTest());
+    expect(parsed.rematch.total).toBe(2);
+    expect(parsed.rematch.sameSeed).toBe(1);
+    expect(parsed.rematch.newSeed).toBe(1);
+    expect(parsed.rematchBoundaries.length).toBe(2);
+    expect(parsed.plot.some((p: { ev?: string }) => p.ev === "rs")).toBe(true);
   });
 });
