@@ -411,20 +411,9 @@ describe("Batch 7 — Runecraft [10004] Skybound Dragons", () => {
   });
 
   it("Alchemic Flare — 4 damage and gains earth sigil", () => {
-    setupTurn(R6, { pp: 2 });
+    setupTurn(R6, { hand: ["10433310"], pp: 2 });
     const e = enemyFollower(5);
-    runEffects(
-      [
-        {
-          op: "select",
-          target: "enemy:follower",
-          effects: [{ op: "damage", amount: 4, target: "selected:follower" }],
-        },
-        { op: "summon", source: "named", name: "Magic Sediment", count: 1 },
-      ],
-      "first",
-      null,
-    );
+    whenPlayCard("first", 0);
     resolveFirstPending();
     expect(e.defense).toBe(1);
     expect(earthSigilOnBoard()).toBeDefined();

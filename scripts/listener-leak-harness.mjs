@@ -28,7 +28,8 @@
  *   LISTENER_LEAK_CYCLES=30     stress cycles (default 30)
  *   LISTENER_LEAK_PORT=8882     static server port
  *   LISTENER_LEAK_SEED=424242   fixed game seed
- *   LISTENER_LEAK_DECK_INDEX=1  select option index for both decks (default 1)
+ *   LISTENER_LEAK_BLUE_DECK / LISTENER_LEAK_RED_DECK  deck ids (defaults:
+ *       runecraft_sephie_test_subject / portalcraft_artifact_rotation)
  *   LISTENER_LEAK_RETAIN=1      inject intentional retain-on-replace (self-test)
  *   LISTENER_LEAK_DUMP_SNAPSHOT=1  always dump detached retainer summary
  *   LISTENER_LEAK_PROBE=0       disable WeakRef probe entirely (metrics-only confound check)
@@ -39,15 +40,20 @@
  *       https://static.dotgg.gg/shadowverse/cards/<id>.webp — whether those
  *       requests succeed changes the post-GC curve dramatically:
  *         fulfil      → remote images replaced with a 1×1 PNG (CDN-independent PASS)
- *         fail        → leave remote image requests pending / hung (reproduces real
- *                       retention FAIL on main; start fingerprint ~1478/328).
- *                       Clean abort/404 does NOT reproduce — only hang/block-without-
- *                       response matches a sandbox that drops CDN packets.
+ *         fail        → leave remote image requests pending / hung (DEFAULT fail
+ *                       style). Before PR #103 this grew ~1,485→27,442 nodes over
+ *                       20 cycles; after cancel-on-detach it stays flat (~1,263).
+ *                       Clean abort/404 does NOT reproduce the pre-fix leak —
+ *                       only hang/block-without-response matches a sandbox that
+ *                       drops CDN packets. Do NOT default fail-style to abort.
  *         passthrough → real network (debug only; non-deterministic)
  *       Default fulfil so agent VM vs blocked-CDN sandbox can never disagree again.
- *       Self-tests: images-fail must FAIL on main; images-fulfil must PASS.
+ *       Gate: images-fail (hang) must PASS on fixed main; must FAIL if the
+ *       pending-ImageLoader cancel-on-detach fix is removed. images-fulfil PASS.
  *   LISTENER_LEAK_IMAGES_FAIL_STYLE=hang|abort|block|404|block+abort
  *       How fail breaks images (DEFAULT: hang). hang is the owner-sandbox regime.
+ *       abort/404/block settle cleanly and do NOT reproduce the leak — a gate
+ *       that used abort would give a false pass while the bug was present.
  *
  * Probe contract: window.__leakWeakProbe.refs holds WeakRef(node) ONLY — never
  * bare Element handles. A strongly-held Array of WeakRefs does not keep nodes
@@ -105,8 +111,11 @@ const PNG_1X1 = Buffer.from(
   "base64",
 );
 
-/** Match reporter: both deck selects by option index (default 1). */
-const DECK_INDEX = Number(process.env.LISTENER_LEAK_DECK_INDEX ?? 1);
+/** Surviving class decks after pre-rotation removal (PR #101 / origin/main). */
+const BLUE_DECK =
+  process.env.LISTENER_LEAK_BLUE_DECK || "runecraft_sephie_test_subject";
+const RED_DECK =
+  process.env.LISTENER_LEAK_RED_DECK || "portalcraft_artifact_rotation";
 const CHROME =
   process.env.CHROME_PATH ||
   (existsSync(
@@ -665,29 +674,39 @@ async function confirmMulligans(page) {
 }
 
 /**
- * Select decks by option index (reporter used { index: 1 } for both).
+ * Select decks by id (post PR #101: only rotation-legal class decks remain).
  * Returns the chosen { index, value, label } for each side so the soak log
  * can prove which decks actually ran.
  */
-async function startGame(page, { deckIndex, seed }) {
+async function startGame(page, { blue, red, seed }) {
   let selection;
   await withSettingsDrawer(page, async () => {
-    selection = await page.evaluate((idx) => {
-      const read = (id) => {
-        const sel = document.getElementById(id);
-        const opts = [...sel.options];
-        if (idx < 0 || idx >= opts.length || !opts[idx].value) {
-          throw new Error(
-            `${id}: no option at index ${idx} (have ${opts.length})`,
-          );
-        }
-        const o = opts[idx];
-        return { index: idx, value: o.value, label: o.textContent.trim() };
-      };
-      return { blue: read("blueDeckSelect"), red: read("redDeckSelect") };
-    }, deckIndex);
-    await page.selectOption("#blueDeckSelect", { index: deckIndex });
-    await page.selectOption("#redDeckSelect", { index: deckIndex });
+    selection = await page.evaluate(
+      ({ blueId, redId }) => {
+        const read = (id, want) => {
+          const sel = document.getElementById(id);
+          const opts = [...sel.options];
+          const o = opts.find((opt) => opt.value === want);
+          if (!o) {
+            throw new Error(
+              `${id}: no option value=${want} (have ${opts.map((x) => x.value).join(",")})`,
+            );
+          }
+          return {
+            index: opts.indexOf(o),
+            value: o.value,
+            label: o.textContent.trim(),
+          };
+        };
+        return {
+          blue: read("blueDeckSelect", blueId),
+          red: read("redDeckSelect", redId),
+        };
+      },
+      { blueId: blue, redId: red },
+    );
+    await page.selectOption("#blueDeckSelect", blue);
+    await page.selectOption("#redDeckSelect", red);
     await page.locator("#seedInput").fill(String(seed));
     await page.locator("#startGameBtn").click();
   });
@@ -1497,14 +1516,16 @@ async function dumpRetentionEvidence(
 
 /**
  * How LISTENER_LEAK_IMAGES=fail breaks remote images.
- *   hang   — never respond (DEFAULT). Matches sandbox that drops CDN packets;
- *            start fingerprint ~1478 nodes / 328 listeners; ~24× growth over 20 cycles.
+ *   hang   — never respond (DEFAULT). Matches sandbox that drops CDN packets.
+ *            Pre-PR-#103: start ~1478/328 → ~24× growth over 20 cycles.
+ *            Post-fix (cancel pending ImageLoaders on detach): flat ~1,263.
  *   abort  — Playwright route.abort (clean failure — does NOT reproduce the leak)
  *   block  — CDP Network.setBlockedURLs (also clean — does NOT reproduce)
  *   404    — fulfill HTTP 404 (clean — does NOT reproduce)
  *   block+abort — CDP block + route abort (clean — does NOT reproduce)
  *
  * Empirically only pending/hung loads reproduce the owner-reported retention.
+ * Keep hang as the default fail-style; an abort-based gate would false-pass.
  */
 const IMAGE_FAIL_STYLE = (() => {
   const raw = String(
@@ -1698,7 +1719,7 @@ async function runHarness() {
     console.log(
       `Image regime: ${IMAGE_MODE}` +
         (IMAGE_MODE === "fail"
-          ? ` (remote images BROKEN via ${IMAGE_FAIL_STYLE} — expect retention FAIL on main)`
+          ? ` (remote images BROKEN via ${IMAGE_FAIL_STYLE} — expect PASS on fixed main; FAIL if cancel-on-detach regresses)`
           : IMAGE_MODE === "fulfil"
             ? " (remote images → 1×1 PNG — CDN-independent healthy curve)"
             : " (passthrough — runner network dependent)"),
@@ -1736,7 +1757,8 @@ async function runHarness() {
     console.log("Live pre-start:", preStart.live, preStart);
 
     const deckSelection = await startGame(page, {
-      deckIndex: DECK_INDEX,
+      blue: BLUE_DECK,
+      red: RED_DECK,
       seed: SEED,
     });
     console.log("Decks selected:", JSON.stringify(deckSelection));
@@ -1936,7 +1958,7 @@ async function runHarness() {
 
     console.log("=== DOM / listener retention harness ===");
     console.log(
-      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  DeckIndex: ${DECK_INDEX}  Probe: ${ENABLE_PROBE ? "on" : "off"}  Snapshot: ${ENABLE_SNAPSHOT ? "on" : "off"}  Images: ${IMAGE_MODE}`,
+      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  Decks: ${BLUE_DECK}/${RED_DECK}  Probe: ${ENABLE_PROBE ? "on" : "off"}  Snapshot: ${ENABLE_SNAPSHOT ? "on" : "off"}  Images: ${IMAGE_MODE}`,
     );
     console.log(
       `Decks: blue=${deckSelection.blue.value} (${deckSelection.blue.label}) red=${deckSelection.red.value} (${deckSelection.red.label})`,

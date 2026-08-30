@@ -13,6 +13,7 @@ import { initGodMode } from "./godMode.js";
 import { initPerspectiveFlip } from "./perspectiveFlip.js";
 import { initSettingsDrawer } from "./settingsDrawer.js";
 import { initFloatingCombatText } from "./floatingCombatText.js";
+import { initBlackboxBoot } from "./blackbox.js";
 
 // Module-load: globals + adapter before any DOMContentLoaded (onclick handlers / engine)
 initWindowGlobals();
@@ -30,6 +31,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initPerspectiveFlip();
   initSettingsDrawer();
   initFloatingCombatText();
+  initBlackboxBoot();
 });
 
 // Context menu listener sits between the two DOMContentLoaded registrations (original boot.ts order)

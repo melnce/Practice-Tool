@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Pinned soak for dragoncraft_meta_v2 — mirror + vs dragoncraft_meta + vs swordcraft_rally.
+ * Pinned soak for dragoncraft_meta_v2 — mirror + vs dragoncraft_meta + vs portalcraft_artifact_rotation.
  * Run: npx tsx scripts/soak-deck-meta-v2.ts [--games=N] [--seed=N]
  *
  * Reports → reports/soak-deck-meta-v2/
@@ -20,7 +20,10 @@ const ROOT = resolve(__dirname, "..");
 const REPORT_DIR = join(ROOT, "reports", "soak-deck-meta-v2");
 
 const META_V2_DECK = "dragoncraft_meta_v2";
-const OPPONENTS = ["dragoncraft_meta", "swordcraft_rally"] as const;
+const OPPONENTS = [
+  "dragoncraft_meta",
+  "portalcraft_artifact_rotation",
+] as const;
 
 /** 16 distinct cards in dragoncraft_meta_v2 (id → name). */
 const META_V2_CARD_IDS: Record<string, string> = {

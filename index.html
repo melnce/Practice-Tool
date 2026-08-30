@@ -31,6 +31,7 @@
     <!-- tooltip presentation (after theme sheets) -->
     <link rel="stylesheet" href="./css/tooltip.css" />
     <link rel="stylesheet" href="./css/floating-combat-text.css" />
+    <link rel="stylesheet" href="./css/blackbox.css" />
     <style>
       /* Drawer chrome (history + shared scrim) */
       .drawer {
@@ -167,6 +168,14 @@
     >
       <span></span>
     </button>
+
+    <div
+      id="blackboxHeapReadout"
+      class="blackbox-heap-readout"
+      hidden
+      role="status"
+      aria-live="polite"
+    ></div>
 
     <div id="settingsScrim" class="scrim"></div>
 
@@ -348,6 +357,44 @@
               >
                 <input type="checkbox" id="floatingCombatTextToggle" checked />
                 Floating combat text
+              </label>
+            </div>
+          </div>
+          <div class="settings-drawer-section">
+            <h3>Diagnostics</h3>
+            <div
+              class="toolbar-cluster toolbar-cluster--diagnostics"
+              data-toolbar-cluster="diagnostics"
+            >
+              <p
+                id="blackboxStatus"
+                class="blackbox-status"
+                data-crash="0"
+                title="Crash black-box status from the previous session"
+              >
+                No unexpected exit recorded.
+              </p>
+              <button
+                type="button"
+                id="blackboxCopyBtn"
+                title="Copy black-box samples as JSON"
+              >
+                Copy Trace
+              </button>
+              <button
+                type="button"
+                id="blackboxExportBtn"
+                title="Download black-box samples as JSON"
+              >
+                Export Trace
+              </button>
+              <label
+                for="blackboxHeapWarnToggle"
+                class="toolbar-check-label"
+                title="Show a small heap warning when used JS heap exceeds ~70% of the limit (Chrome only). Off by default."
+              >
+                <input type="checkbox" id="blackboxHeapWarnToggle" />
+                Heap early warning
               </label>
             </div>
           </div>

@@ -31,7 +31,7 @@ describe("Alchemic Flare Logic", () => {
       expect(flare.spell[0].op).toBe("select");
       expect(flare.spell[0].target).toContain("enemy:follower");
       expect(flare.spell[0].effects[0].op).toBe("damage");
-      expect(flare.spell[0].effects[0].target).toBe("selected");
+      expect(flare.spell[0].effects[0].target).toMatch(/^selected(:follower)?$/);
       expect(flare.spell[0].effects[0].amount).toBe(4);
 
       // Effect 2: Summon Magic Sediment

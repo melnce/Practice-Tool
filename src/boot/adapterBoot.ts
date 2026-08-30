@@ -6,6 +6,7 @@ import {
   hideTargetConfirmation,
   triggerConfirmButtonClick,
 } from "../ui/targeting.js";
+import { showToast } from "../ui/toast.js";
 
 /** Initialize Logic -> UI Adapter (wire ALL targeting UI functions) */
 export function initAdapter(): void {
@@ -15,5 +16,6 @@ export function initAdapter(): void {
     showTargetConfirmationButton,
     hideTargetConfirmation,
     triggerConfirmButtonClick,
+    notifyBlocked: (reason) => showToast(reason),
   });
 }

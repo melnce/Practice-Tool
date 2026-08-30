@@ -1,0 +1,43 @@
+/**
+ * Crash black-box diagnostics — settings status + optional heap early warning.
+ * Warning readout sits under the hamburger; never in the play board.
+ */
+
+.blackbox-status {
+  flex: 1 1 100%;
+  margin: 0;
+  padding: 6px 8px;
+  font-size: var(--font-size-sm, 0.82rem);
+  line-height: 1.35;
+  color: var(--color-text-secondary, #b8c0cc);
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+}
+
+.blackbox-status[data-crash="1"] {
+  color: #f0d5a8;
+  border-color: rgba(200, 140, 60, 0.35);
+  background: rgba(80, 48, 12, 0.35);
+}
+
+.blackbox-heap-readout {
+  position: fixed;
+  left: 12px;
+  top: 60px;
+  z-index: var(--z-hamburger, 300);
+  max-width: min(220px, 70vw);
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(200, 140, 60, 0.45);
+  background: rgba(40, 28, 12, 0.92);
+  color: #f0d5a8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+.blackbox-heap-readout[hidden] {
+  display: none !important;
+}

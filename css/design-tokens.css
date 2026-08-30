@@ -311,3 +311,12 @@
     --toolbar-height: 198px;
   }
 }
+
+/* Short viewports — tighten hand/board floors so the fixed shell can compress.
+ * Placed after width tiers so max-height wins when both match. */
+@media (max-height: 799px) {
+  :root {
+    --hand-zone-min-height: 128px;
+    --board-zone-min-height: 140px;
+  }
+}

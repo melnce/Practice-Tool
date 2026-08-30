@@ -618,14 +618,8 @@ async function main() {
         opts.map((o) => ({ value: o.value, text: o.textContent?.trim() })),
       );
     const expected = [
-      "swordcraft_rally",
-      "abysscraft_necromancy",
-      "runecraft_spellboost",
-      "dragoncraft_overflow",
-      "starter_deck",
-      "forestcraft_combo",
-      "havencraft_countdown",
-      "portalcraft_artifacts",
+      "runecraft_sephie_test_subject",
+      "portalcraft_artifact_rotation",
     ];
     const values = blueOpts.map((o) => o.value);
     const missing = expected.filter((e) => !values.includes(e));
@@ -665,8 +659,8 @@ async function main() {
     await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
     const seed = 20260815;
     await startGame(page, {
-      blue: "swordcraft_rally",
-      red: "abysscraft_necromancy",
+      blue: "runecraft_sephie_test_subject",
+      red: "portalcraft_artifact_rotation",
       seed,
     });
     await shot(page, "02-mulligan");
@@ -799,8 +793,8 @@ async function main() {
   try {
     await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
     await startGame(page, {
-      blue: "runecraft_spellboost",
-      red: "dragoncraft_overflow",
+      blue: "runecraft_sephie_test_subject",
+      red: "portalcraft_artifact_rotation",
       seed: 20260816,
     });
     await confirmMulligans(page);
@@ -1057,8 +1051,8 @@ async function main() {
     await page.goto(`${BASE}/?test=1`, { waitUntil: "networkidle" });
     await page.waitForFunction(() => !!window.__svwbTest);
     await startGame(page, {
-      blue: "swordcraft_rally",
-      red: "abysscraft_necromancy",
+      blue: "runecraft_sephie_test_subject",
+      red: "portalcraft_artifact_rotation",
       seed: 555001,
     });
     await confirmMulligans(page);
@@ -1164,7 +1158,7 @@ async function main() {
 
     const seedNum = seedInputVal || seedShown || "555001";
     await page.goto(
-      `${BASE}/?seed=${seedNum}&a=swordcraft_rally&b=abysscraft_necromancy`,
+      `${BASE}/?seed=${seedNum}&a=runecraft_sephie_test_subject&b=portalcraft_artifact_rotation`,
       {
         waitUntil: "networkidle",
       },

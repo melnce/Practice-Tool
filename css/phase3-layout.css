@@ -504,19 +504,33 @@ body.active-second .side-red {
   /* grid placement set above */
 }
 
-/* No page scroll assertion helper */
+/* No page scroll — fixed game-client shell */
 body.phase3-fixed-viewport {
   overflow: hidden;
 }
 
+/*
+ * Short viewports (≤799px): keep the fixed 100dvh shell (compress, do not scroll).
+ *
+ * Prior fallback set `#gameShell { height: auto }` and `html, body { overflow: auto }`.
+ * Two independent failures followed:
+ * 1. Specificity — `body.phase3-fixed-viewport` (0,1,1) beat bare `body` (0,0,1), so
+ *    overflow stayed `hidden` and the page could not scroll.
+ * 2. Flex collapse — with an indefinite shell height, `#appRoot > .side` (`flex: 1 1 0;
+ *    min-height: 0`) resolved to 0px. Cards still painted (descendants overflow visible)
+ *    but outside `#appRoot`'s `overflow: hidden` clip, so `elementFromPoint` returned
+ *    `<body>` and hand clicks were silently dead.
+ *
+ * Compress via the same 100dvh flex distribution used at ≥800px. Match the selector
+ * specificity here so a future scroll fallback cannot lose to the base rule again.
+ */
 @media (max-height: 799px) {
-  #gameShell {
-    height: auto;
-    max-height: none;
+  body.phase3-fixed-viewport {
+    overflow: hidden;
   }
 
-  html,
-  body {
-    overflow: auto;
+  #gameShell {
+    height: 100dvh;
+    max-height: 100dvh;
   }
 }

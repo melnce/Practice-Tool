@@ -13,6 +13,17 @@ import {
   syncFloatingCombatTextFromLogs,
 } from "../floatingCombatText.js";
 import { __auditTooltipSessionForLeakHarness } from "../tooltips.js";
+import {
+  beginBlackboxSession,
+  noteBlackboxRematch as recordBlackboxRematch,
+  _forceBlackboxSampleForTest,
+  _flushBlackboxForTest,
+  _getBlackboxImageFailCount,
+  _getBlackboxSamples,
+  getBlackboxLastCrash,
+  getBlackboxRingByteLength,
+  BLACKBOX_MAX_BYTES,
+} from "../blackbox.js";
 import type {
   CardInstance,
   GameState,
@@ -57,6 +68,15 @@ export interface SvwbTestBridge {
   advanceToTurn(round: number, activePlayer?: Player): void;
   render(): void;
   endTurn(): void;
+  beginBlackboxSession(): void;
+  forceBlackboxSample(): unknown;
+  flushBlackbox(): number;
+  getBlackboxImageFailCount(): number;
+  getBlackboxSampleCount(): number;
+  getBlackboxLastCrash(): unknown;
+  getBlackboxRingBytes(): number;
+  getBlackboxMaxBytes(): number;
+  noteBlackboxRematch(keepSeed: boolean): void;
 }
 
 function makeCard(cardId: string, owner: Player): CardInstance {
@@ -220,6 +240,42 @@ function installBridge(): void {
     endTurn() {
       if (state.activePlayer === "first") endTurnBlue();
       else endTurnRed();
+    },
+
+    beginBlackboxSession() {
+      beginBlackboxSession();
+    },
+
+    forceBlackboxSample() {
+      return _forceBlackboxSampleForTest();
+    },
+
+    flushBlackbox() {
+      return _flushBlackboxForTest();
+    },
+
+    getBlackboxImageFailCount() {
+      return _getBlackboxImageFailCount();
+    },
+
+    getBlackboxSampleCount() {
+      return _getBlackboxSamples().length;
+    },
+
+    getBlackboxLastCrash() {
+      return getBlackboxLastCrash();
+    },
+
+    getBlackboxRingBytes() {
+      return getBlackboxRingByteLength();
+    },
+
+    getBlackboxMaxBytes() {
+      return BLACKBOX_MAX_BYTES;
+    },
+
+    noteBlackboxRematch(keepSeed: boolean) {
+      recordBlackboxRematch(keepSeed);
     },
   };
 

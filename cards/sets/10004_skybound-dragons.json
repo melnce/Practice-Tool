@@ -1544,10 +1544,12 @@
     "url": "https://shadowverse.gg/cards/10433310-alchemic-flare",
     "spell": [
       {
-        "op": "damage",
-        "target": "selected:follower",
+        "op": "select",
+        "target": "enemy:follower",
         "select": 1,
-        "amount": 4
+        "effects": [
+          { "op": "damage", "target": "selected:follower", "amount": 4 }
+        ]
       },
       {
         "op": "summon",
