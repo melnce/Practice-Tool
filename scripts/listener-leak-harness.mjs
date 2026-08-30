@@ -39,10 +39,15 @@
  *       https://static.dotgg.gg/shadowverse/cards/<id>.webp — whether those
  *       requests succeed changes the post-GC curve dramatically:
  *         fulfil      → remote images replaced with a 1×1 PNG (CDN-independent PASS)
- *         fail        → abort remote image requests (reproduces real retention FAIL on main)
+ *         fail        → leave remote image requests pending / hung (reproduces real
+ *                       retention FAIL on main; start fingerprint ~1478/328).
+ *                       Clean abort/404 does NOT reproduce — only hang/block-without-
+ *                       response matches a sandbox that drops CDN packets.
  *         passthrough → real network (debug only; non-deterministic)
  *       Default fulfil so agent VM vs blocked-CDN sandbox can never disagree again.
  *       Self-tests: images-fail must FAIL on main; images-fulfil must PASS.
+ *   LISTENER_LEAK_IMAGES_FAIL_STYLE=hang|abort|block|404|block+abort
+ *       How fail breaks images (DEFAULT: hang). hang is the owner-sandbox regime.
  *
  * Probe contract: window.__leakWeakProbe.refs holds WeakRef(node) ONLY — never
  * bare Element handles. A strongly-held Array of WeakRefs does not keep nodes
@@ -1459,55 +1464,118 @@ async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) 
 
 
 /**
+ * How LISTENER_LEAK_IMAGES=fail breaks remote images.
+ *   abort  — Playwright route.abort (clean net::ERR_FAILED)
+ *   block  — CDP Network.setBlockedURLs for *static.dotgg.gg* (sandbox-like)
+ *   hang   — never respond (pending loads; closer to some corporate proxies)
+ *   404    — fulfill HTTP 404
+ * Default: block+abort — block first (matches owner sandbox), abort as belt.
+ */
+const IMAGE_FAIL_STYLE = (() => {
+  const raw = String(process.env.LISTENER_LEAK_IMAGES_FAIL_STYLE || "block").toLowerCase();
+  if (["abort", "block", "hang", "404", "block+abort"].includes(raw)) return raw;
+  console.warn(
+    `LISTENER_LEAK_IMAGES_FAIL_STYLE=${raw} not recognized — using block`,
+  );
+  return "block";
+})();
+
+/**
  * Pin the remote-image regime so soak results do not depend on whether the
  * runner can reach static.dotgg.gg (the confound that split agent vs reporter).
  *
  * fulfil — every remote image response is a 1×1 PNG (deterministic healthy).
- * fail   — abort remote image requests (reproduces post-GC retention on main).
+ * fail   — break remote image requests (reproduces post-GC retention on main).
  * passthrough — real network (debug only; not for CI).
  *
  * Local app assets (same-origin) are never intercepted.
  */
-async function installImageRegime(page, { mode, appOrigin }) {
-  const stats = { mode, intercepted: 0, fulfilled: 0, aborted: 0, continued: 0 };
+async function installImageRegime(page, cdp, { mode, appOrigin }) {
+  const stats = {
+    mode,
+    failStyle: mode === "fail" ? IMAGE_FAIL_STYLE : null,
+    intercepted: 0,
+    fulfilled: 0,
+    aborted: 0,
+    continued: 0,
+    blockedUrls: false,
+  };
   if (mode === "passthrough") {
     return stats;
   }
 
-  await page.route("**/*", async (route) => {
-    const req = route.request();
-    const url = req.url();
-    const type = req.resourceType();
-    const isImage =
-      type === "image" || /\.(webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(url);
-    if (!isImage) {
-      return route.continue();
-    }
-    // Same-origin / local static server — leave alone.
-    if (
-      url.startsWith(appOrigin) ||
-      url.startsWith("http://127.0.0.1") ||
-      url.startsWith("http://localhost") ||
-      url.startsWith("data:") ||
-      url.startsWith("blob:")
-    ) {
-      stats.continued += 1;
-      return route.continue();
-    }
+  const useBlock =
+    mode === "fail" &&
+    (IMAGE_FAIL_STYLE === "block" || IMAGE_FAIL_STYLE === "block+abort");
+  const useRoute =
+    mode === "fulfil" ||
+    (mode === "fail" &&
+      (IMAGE_FAIL_STYLE === "abort" ||
+        IMAGE_FAIL_STYLE === "hang" ||
+        IMAGE_FAIL_STYLE === "404" ||
+        IMAGE_FAIL_STYLE === "block+abort"));
 
-    stats.intercepted += 1;
-    if (mode === "fail") {
-      stats.aborted += 1;
-      return route.abort("failed");
-    }
-    // fulfil
-    stats.fulfilled += 1;
-    return route.fulfill({
-      status: 200,
-      contentType: "image/png",
-      body: PNG_1X1,
+  if (useBlock && cdp) {
+    await cdp.send("Network.enable").catch(() => {});
+    await cdp.send("Network.setBlockedURLs", {
+      urls: [
+        "*static.dotgg.gg*",
+        "*://static.dotgg.gg/*",
+        "https://static.dotgg.gg/*",
+      ],
     });
-  });
+    stats.blockedUrls = true;
+  }
+
+  if (useRoute) {
+    await page.route("**/*", async (route) => {
+      const req = route.request();
+      const url = req.url();
+      const type = req.resourceType();
+      const isImage =
+        type === "image" || /\.(webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(url);
+      if (!isImage) {
+        return route.continue();
+      }
+      // Same-origin / local static server — leave alone.
+      if (
+        url.startsWith(appOrigin) ||
+        url.startsWith("http://127.0.0.1") ||
+        url.startsWith("http://localhost") ||
+        url.startsWith("data:") ||
+        url.startsWith("blob:")
+      ) {
+        stats.continued += 1;
+        return route.continue();
+      }
+
+      stats.intercepted += 1;
+      if (mode === "fail") {
+        if (IMAGE_FAIL_STYLE === "hang") {
+          // Never settle — pending image load (do not continue/abort/fulfill).
+          return;
+        }
+        if (IMAGE_FAIL_STYLE === "404") {
+          stats.aborted += 1;
+          return route.fulfill({
+            status: 404,
+            contentType: "text/plain",
+            body: "listener-leak-harness: image fail regime",
+          });
+        }
+        // abort or block+abort
+        stats.aborted += 1;
+        return route.abort("connectionfailed");
+      }
+      // fulfil
+      stats.fulfilled += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: "image/png",
+        body: PNG_1X1,
+      });
+    });
+  }
 
   return stats;
 }
@@ -1585,21 +1653,24 @@ async function runHarness() {
     }
 
     const appOrigin = `http://127.0.0.1:${PORT}`;
-    const imageStats = await installImageRegime(page, {
+    const imageStats = await installImageRegime(page, cdp, {
       mode: IMAGE_MODE,
       appOrigin,
     });
     console.log(
       `Image regime: ${IMAGE_MODE}` +
         (IMAGE_MODE === "fail"
-          ? " (remote images ABORTED — expect retention FAIL on main)"
+          ? ` (remote images BROKEN via ${IMAGE_FAIL_STYLE} — expect retention FAIL on main)`
           : IMAGE_MODE === "fulfil"
             ? " (remote images → 1×1 PNG — CDN-independent healthy curve)"
             : " (passthrough — runner network dependent)"),
     );
 
     await page.goto(`${appOrigin}/?test=1`, {
-      waitUntil: "networkidle",
+      waitUntil:
+        IMAGE_MODE === "fail" && IMAGE_FAIL_STYLE === "hang"
+          ? "domcontentloaded"
+          : "networkidle",
     });
     await page.waitForFunction(() => !!window.__svwbTest);
 
@@ -1839,7 +1910,7 @@ async function runHarness() {
     );
     printTable(rows);
     console.log(
-      `Image intercept stats: intercepted=${imageStats.intercepted} fulfilled=${imageStats.fulfilled} aborted=${imageStats.aborted} continuedLocal=${imageStats.continued}`,
+      `Image intercept stats: mode=${imageStats.mode} failStyle=${imageStats.failStyle} blockedUrls=${imageStats.blockedUrls} intercepted=${imageStats.intercepted} fulfilled=${imageStats.fulfilled} aborted=${imageStats.aborted} continuedLocal=${imageStats.continued}`,
     );
 
     const analysis = analyzePostGcTrend(rows);
