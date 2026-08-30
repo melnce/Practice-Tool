@@ -678,7 +678,21 @@
         ]
       }
     ],
-    "triggers": [],
+    "triggers": [
+      {
+        "event": "ally_card_played",
+        "source": "hand",
+        "effects": [
+          {
+            "op": "cost",
+            "mode": "reduce",
+            "target": "self",
+            "amount": 1,
+            "until_eot": true
+          }
+        ]
+      }
+    ],
     "fanfare": [
       {
         "op": "damage",
