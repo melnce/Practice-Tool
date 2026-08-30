@@ -1439,6 +1439,20 @@ async function runHarness() {
       await hoverAllCards(page);
       await undoRedo(page);
 
+      // Sample audit BEFORE forceGc mouse-away — a tooltip session holding a
+      // detached anchor only shows up while the pointer still implies hover.
+      if (cycle % SAMPLE_EVERY === 0 || cycle === CYCLES || cycle === 1) {
+        const preGcAudit = await readLiveState(page);
+        console.log(
+          `auditLeakRoots @ cycle ${cycle} pre-GC: tipExists=${preGcAudit.tipExists} tipConnected=${preGcAudit.tipConnected} tipUid=${preGcAudit.tipUid} floatTracked=${preGcAudit.floatTracked} floatDom=${preGcAudit.floatDom} floatTimers=${preGcAudit.floatTimers}`,
+        );
+        if (preGcAudit.tipExists && preGcAudit.tipConnected === false) {
+          console.log(
+            `SIGNAL: tooltip session exists with DETACHED anchor at cycle ${cycle} (uid=${preGcAudit.tipUid})`,
+          );
+        }
+      }
+
       if (cycle === 1) {
         const liveAfter1 = await readLiveState(page);
         const probeAfter1 = ENABLE_PROBE
