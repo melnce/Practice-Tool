@@ -262,6 +262,39 @@ async function readLiveState(page) {
       // Back-compat alias used by older log lines.
       handCards: blueHand + redHand,
       retainBucketLen: Array.isArray(retainBucket) ? retainBucket.length : null,
+      // Ablation / retainer signal: tooltip session + floating combat trackers.
+      ...(() => {
+        try {
+          const a = window.__svwbTest?.auditLeakRoots?.();
+          if (!a) {
+            return {
+              tipExists: null,
+              tipConnected: null,
+              tipUid: null,
+              floatTracked: null,
+              floatDom: null,
+              floatTimers: null,
+            };
+          }
+          return {
+            tipExists: !!a.tooltipSessionExists,
+            tipConnected: a.tooltipSessionConnected,
+            tipUid: a.tooltipSessionUid ?? null,
+            floatTracked: a.floatingTracked ?? null,
+            floatDom: a.floatingDom ?? null,
+            floatTimers: a.floatingTimers ?? null,
+          };
+        } catch {
+          return {
+            tipExists: null,
+            tipConnected: null,
+            tipUid: null,
+            floatTracked: null,
+            floatDom: null,
+            floatTimers: null,
+          };
+        }
+      })(),
     };
   });
 }
@@ -515,16 +548,21 @@ async function undoRedo(page) {
 
 function printTable(rows) {
   const header =
-    "| checkpoint | DOM nodes | JS event listeners | JS heap | hand(both) | blueH | redH | board | cards | phase | turn | retainBucket |";
-  const sep = "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|";
+    "| checkpoint | DOM nodes | JS event listeners | JS heap | hand(both) | blueH | redH | board | cards | phase | turn | retainBucket | tipExists | tipConnected | floatTracked | floatDom | floatTimers |";
+  const sep =
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---|---|---:|---:|---:|";
   console.log(header);
   console.log(sep);
   for (const r of rows) {
     const L = r.live || {};
     const bucket =
       L.retainBucketLen == null ? "—" : String(L.retainBucketLen);
+    const tipEx =
+      L.tipExists == null ? "?" : L.tipExists ? "yes" : "no";
+    const tipConn =
+      L.tipConnected == null ? "—" : L.tipConnected ? "yes" : "DETACHED";
     console.log(
-      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB | ${L.handCardsBoth ?? L.handCards ?? "?"} | ${L.blueHand ?? "?"} | ${L.redHand ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} | ${bucket} |`,
+      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB | ${L.handCardsBoth ?? L.handCards ?? "?"} | ${L.blueHand ?? "?"} | ${L.redHand ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} | ${bucket} | ${tipEx} | ${tipConn} | ${L.floatTracked ?? "?"} | ${L.floatDom ?? "?"} | ${L.floatTimers ?? "?"} |`,
     );
   }
 }
@@ -1351,6 +1389,9 @@ async function runHarness() {
       live: liveStart,
     });
     console.log("Live after start:", liveStart, rows[0]);
+    console.log(
+      `auditLeakRoots @ start: tipExists=${liveStart.tipExists} tipConnected=${liveStart.tipConnected} tipUid=${liveStart.tipUid} floatTracked=${liveStart.floatTracked} floatDom=${liveStart.floatDom} floatTimers=${liveStart.floatTimers} retainBucket=${liveStart.retainBucketLen}`,
+    );
 
     const startupNodeDelta = rows[0].nodes - preStart.nodes;
     const startupListenerDelta = rows[0].listeners - preStart.listeners;
@@ -1448,6 +1489,9 @@ async function runHarness() {
           rows[rows.length - 1],
           ENABLE_PROBE ? "weakRef" : "weakRef:off",
           ENABLE_PROBE ? probe : "(disabled)",
+        );
+        console.log(
+          `auditLeakRoots @ cycle ${cycle}: tipExists=${live.tipExists} tipConnected=${live.tipConnected} tipUid=${live.tipUid} floatTracked=${live.floatTracked} floatDom=${live.floatDom} floatTimers=${live.floatTimers} retainBucket=${live.retainBucketLen}`,
         );
 
         if (
