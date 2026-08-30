@@ -193,7 +193,11 @@ function applyCostChange(
 
   switch (spec.mode) {
     case "reduce": {
-      card.cost = Math.max(minCost, currentCost - amount);
+      const newCost = Math.max(minCost, currentCost - amount);
+      card.cost = newCost;
+      if (spec.until_eot) {
+        (card as any).temp_cost_reduce_until_eot = true;
+      }
       break;
     }
 
