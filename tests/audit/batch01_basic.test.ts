@@ -150,7 +150,7 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
       expect(thenBoard("first").length).toBe(0);
     });
 
-    it("Evolve: Draw a card — evolving Leah draws 1", () => {
+    it("Evolve: Draw a card — normal evolve draws exactly 1 (not 0, not 2)", () => {
       expect(cardText(LEAH)).toMatch(/evolve:\s*draw a card/i);
 
       givenGameState({ seed: 1, roundCount: 5 })
@@ -169,6 +169,31 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
       onEvolve(leah, "first", "normal");
 
       expect(thenHand("first").length).toBe(handBefore + 1);
+      expect(thenHand("first").length).not.toBe(handBefore);
+      expect(thenHand("first").length).not.toBe(handBefore + 2);
+    });
+
+    // Rulebook §747 / Evolve data note: superevolve[] is empty so super-evolve
+    // resolves the draw once (Leah draws 1 on super, not 2) — not an authoring omission.
+    it("Super-Evolve: Draw a card — super-evolve draws exactly 1 (not 0, not 2)", () => {
+      givenGameState({ seed: 1, roundCount: 7 })
+        .withFirstDeck([
+          { name: "DeckCard", type: "Follower", attack: 1, defense: 1 },
+        ])
+        .build();
+
+      const leah = createCard(LEAH, "board", "first");
+      applyKeywordsFromList(leah);
+      leah.peak_defense = leah.defense;
+      expect(leah.superevolve).toEqual([]);
+      state.players.first.board = [leah];
+
+      const handBefore = thenHand("first").length;
+      onEvolve(leah, "first", "super");
+
+      expect(thenHand("first").length).toBe(handBefore + 1);
+      expect(thenHand("first").length).not.toBe(handBefore);
+      expect(thenHand("first").length).not.toBe(handBefore + 2);
     });
   });
 
