@@ -34,6 +34,15 @@
  *   LISTENER_LEAK_PROBE=0       disable WeakRef probe entirely (metrics-only confound check)
  *   LISTENER_LEAK_SNAPSHOT=0    never take heap snapshots (also skips Debugger.enable)
  *   LISTENER_LEAK_ATTR=1        wrap addEventListener + IDL on* setters; tally by type+site
+ *   LISTENER_LEAK_IMAGES=fulfil|fail|passthrough
+ *       Image network regime (DEFAULT: fulfil). Card art loads from
+ *       https://static.dotgg.gg/shadowverse/cards/<id>.webp — whether those
+ *       requests succeed changes the post-GC curve dramatically:
+ *         fulfil      → remote images replaced with a 1×1 PNG (CDN-independent PASS)
+ *         fail        → abort remote image requests (reproduces real retention FAIL on main)
+ *         passthrough → real network (debug only; non-deterministic)
+ *       Default fulfil so agent VM vs blocked-CDN sandbox can never disagree again.
+ *       Self-tests: images-fail must FAIL on main; images-fulfil must PASS.
  *
  * Probe contract: window.__leakWeakProbe.refs holds WeakRef(node) ONLY — never
  * bare Element handles. A strongly-held Array of WeakRefs does not keep nodes
@@ -72,6 +81,22 @@ const DUMP_SNAPSHOT =
 const SAMPLE_EVERY = Number(process.env.LISTENER_LEAK_SAMPLE_EVERY || 10);
 /** Wrap addEventListener + IDL on* setters; dump tallies at each sample. */
 const ENABLE_LISTENER_ATTR = process.env.LISTENER_LEAK_ATTR === "1";
+/** Remote card-art regime. Default fulfil pins CDN-independent healthy curve. */
+const IMAGE_MODE = (() => {
+  const raw = String(process.env.LISTENER_LEAK_IMAGES || "fulfil").toLowerCase();
+  if (raw === "fail" || raw === "abort") return "fail";
+  if (raw === "fulfil" || raw === "fulfill" || raw === "ok") return "fulfil";
+  if (raw === "passthrough" || raw === "live") return "passthrough";
+  console.warn(
+    `LISTENER_LEAK_IMAGES=${raw} not recognized — using fulfil (CDN-independent)`,
+  );
+  return "fulfil";
+})();
+/** 1×1 transparent PNG for LISTENER_LEAK_IMAGES=fulfil. */
+const PNG_1X1 = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
 
 /** Match reporter: both deck selects by option index (default 1). */
 const DECK_INDEX = Number(process.env.LISTENER_LEAK_DECK_INDEX ?? 1);
@@ -1432,6 +1457,61 @@ async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) 
 }
 
 
+
+/**
+ * Pin the remote-image regime so soak results do not depend on whether the
+ * runner can reach static.dotgg.gg (the confound that split agent vs reporter).
+ *
+ * fulfil — every remote image response is a 1×1 PNG (deterministic healthy).
+ * fail   — abort remote image requests (reproduces post-GC retention on main).
+ * passthrough — real network (debug only; not for CI).
+ *
+ * Local app assets (same-origin) are never intercepted.
+ */
+async function installImageRegime(page, { mode, appOrigin }) {
+  const stats = { mode, intercepted: 0, fulfilled: 0, aborted: 0, continued: 0 };
+  if (mode === "passthrough") {
+    return stats;
+  }
+
+  await page.route("**/*", async (route) => {
+    const req = route.request();
+    const url = req.url();
+    const type = req.resourceType();
+    const isImage =
+      type === "image" || /\.(webp|png|jpe?g|gif|svg)(\?|#|$)/i.test(url);
+    if (!isImage) {
+      return route.continue();
+    }
+    // Same-origin / local static server — leave alone.
+    if (
+      url.startsWith(appOrigin) ||
+      url.startsWith("http://127.0.0.1") ||
+      url.startsWith("http://localhost") ||
+      url.startsWith("data:") ||
+      url.startsWith("blob:")
+    ) {
+      stats.continued += 1;
+      return route.continue();
+    }
+
+    stats.intercepted += 1;
+    if (mode === "fail") {
+      stats.aborted += 1;
+      return route.abort("failed");
+    }
+    // fulfil
+    stats.fulfilled += 1;
+    return route.fulfill({
+      status: 200,
+      contentType: "image/png",
+      body: PNG_1X1,
+    });
+  });
+
+  return stats;
+}
+
 async function runHarness() {
   if (!existsSync(join(BUILD, "index.html"))) {
     console.error("Missing build/ — run npm run build first");
@@ -1504,7 +1584,21 @@ async function runHarness() {
       );
     }
 
-    await page.goto(`http://127.0.0.1:${PORT}/?test=1`, {
+    const appOrigin = `http://127.0.0.1:${PORT}`;
+    const imageStats = await installImageRegime(page, {
+      mode: IMAGE_MODE,
+      appOrigin,
+    });
+    console.log(
+      `Image regime: ${IMAGE_MODE}` +
+        (IMAGE_MODE === "fail"
+          ? " (remote images ABORTED — expect retention FAIL on main)"
+          : IMAGE_MODE === "fulfil"
+            ? " (remote images → 1×1 PNG — CDN-independent healthy curve)"
+            : " (passthrough — runner network dependent)"),
+    );
+
+    await page.goto(`${appOrigin}/?test=1`, {
       waitUntil: "networkidle",
     });
     await page.waitForFunction(() => !!window.__svwbTest);
@@ -1735,7 +1829,7 @@ async function runHarness() {
 
     console.log("=== DOM / listener retention harness ===");
     console.log(
-      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  DeckIndex: ${DECK_INDEX}  Probe: ${ENABLE_PROBE ? "on" : "off"}  Snapshot: ${ENABLE_SNAPSHOT ? "on" : "off"}`,
+      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  DeckIndex: ${DECK_INDEX}  Probe: ${ENABLE_PROBE ? "on" : "off"}  Snapshot: ${ENABLE_SNAPSHOT ? "on" : "off"}  Images: ${IMAGE_MODE}`,
     );
     console.log(
       `Decks: blue=${deckSelection.blue.value} (${deckSelection.blue.label}) red=${deckSelection.red.value} (${deckSelection.red.label})`,
@@ -1744,6 +1838,9 @@ async function runHarness() {
       `Chrome: ${CHROME}  Ended turns: ${totalEnded}  Start cards: ${liveStart.cards} hand(both)=${liveStart.handCardsBoth ?? liveStart.handCards} blueH=${liveStart.blueHand} redH=${liveStart.redHand} board=${liveStart.boardCards}`,
     );
     printTable(rows);
+    console.log(
+      `Image intercept stats: intercepted=${imageStats.intercepted} fulfilled=${imageStats.fulfilled} aborted=${imageStats.aborted} continuedLocal=${imageStats.continued}`,
+    );
 
     const analysis = analyzePostGcTrend(rows);
     console.log("");
