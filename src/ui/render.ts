@@ -5,6 +5,7 @@ import { updateCounts } from "./counts.js";
 import { updateEvoButtonsUI } from "./evo.js";
 import { makeLeaderDroppable } from "./drag.js";
 import { byId } from "./dom.js";
+import { releaseImageLoads } from "./releaseImageLoads.js";
 
 import { state } from "../core/gameState.js";
 import type { GameState, Player, CardInstance } from "../core/types/index.js";
@@ -522,6 +523,8 @@ function wireHistoryImagePreviewOnce(): void {
     if (!li) return;
     const url = li.dataset.img;
     if (!url) return;
+    // Cancel any prior preview load before attaching a new one.
+    releaseImageLoads(preview);
     preview.innerHTML = "";
     const img = new Image();
     img.width = 198;
@@ -536,6 +539,8 @@ function wireHistoryImagePreviewOnce(): void {
   document.addEventListener("mouseout", (e) => {
     const li = (e.target as HTMLElement).closest(".hist-item");
     if (!li) return;
+    releaseImageLoads(preview);
+    preview.innerHTML = "";
     preview.style.display = "none";
   });
 }
@@ -558,7 +563,9 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
     const slot = slots[i] as HTMLElement;
     const crestData = crests[i];
 
-    // Clear previous content & listeners
+    // Clear previous content & listeners — cancel pending crest-art loads first
+    // so ImageLoader cannot retain the prior slot subtree across updates.
+    releaseImageLoads(slot);
     slot.innerHTML = "";
     slot.onmouseenter = null;
     slot.onmousemove = null;
@@ -582,9 +589,25 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
           const fallback = `https://static.dotgg.gg/shadowverse/cards/${fallbackCardId}.webp`;
           img.dataset.fallbackSrc = fallback;
           img.onerror = () => {
-            if (img.dataset.fallbackApplied) return;
+            if (img.dataset.fallbackApplied) {
+              // Final failure (fallback also failed) — drop loader + closure.
+              img.onerror = null;
+              img.onload = null;
+              return;
+            }
             img.dataset.fallbackApplied = "1";
-            img.src = img.dataset.fallbackSrc || fallback;
+            const next = img.dataset.fallbackSrc || fallback;
+            // Same URL as primary: don't start a second pending load.
+            if (!next || next === img.currentSrc || next === img.src) {
+              img.onerror = null;
+              img.onload = null;
+              return;
+            }
+            img.src = next;
+          };
+          img.onload = () => {
+            img.onerror = null;
+            img.onload = null;
           };
         }
       } else if (fallbackCardId) {

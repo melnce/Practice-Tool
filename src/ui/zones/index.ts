@@ -2,6 +2,7 @@
 import { byId } from "../dom.js";
 import type { GameState, CardInstance } from "../../core/types/index.js";
 import { enableBoardDropForOwnSide } from "../drag.js";
+import { releaseImageLoads } from "../releaseImageLoads.js";
 import { buildZoneContext } from "./selectors.js";
 import { getMemoizedViewModel } from "./memoization.js";
 import { renderCardDOM } from "./dom.js";
@@ -47,6 +48,10 @@ export function renderZone(
     if (tip) {
       tip.style.display = "none";
       tip.textContent = "";
+    }
+    // Cancel pending card-art loads before destroying the previous hand DOM.
+    for (const child of Array.from(container.children)) {
+      releaseImageLoads(child);
     }
     container.replaceChildren();
     cards.forEach((card, i) => {
@@ -126,6 +131,7 @@ export function renderZone(
     );
 
     if (el) {
+      releaseImageLoads(el);
       container.replaceChild(newEl, el);
       if (container.children[i] !== newEl) {
         container.insertBefore(newEl, container.children[i] || null);
@@ -135,5 +141,8 @@ export function renderZone(
     }
   });
 
-  childrenToRemove.forEach((el) => el.remove());
+  childrenToRemove.forEach((el) => {
+    releaseImageLoads(el);
+    el.remove();
+  });
 }
