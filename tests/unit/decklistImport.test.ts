@@ -47,10 +47,13 @@ function loadCardIndex() {
   return buildCardIndex({ mainCards, tokenCards });
 }
 
-/** Build a valid 40-card Forest paste from the shipped house deck. */
-function forestHousePaste(format: "nx" | "n" | "xn" | "plain"): string {
+/** Build a valid 40-card Runecraft paste from the shipped house deck. */
+function houseDeckPaste(format: "nx" | "n" | "xn" | "plain"): string {
   const raw = JSON.parse(
-    fs.readFileSync(path.join(ROOT, "decks/forestcraft_combo.json"), "utf-8"),
+    fs.readFileSync(
+      path.join(ROOT, "decks/runecraft_sephie_test_subject.json"),
+      "utf-8",
+    ),
   ) as RawDeckObject;
   const lines: string[] = ["Main Deck", ""];
   for (const c of raw.cards ?? []) {
@@ -116,7 +119,7 @@ describe("decklist import", () => {
   it("each accepted paste format parses to the same deck", () => {
     const formats = ["nx", "n", "xn", "plain"] as const;
     const results = formats.map((f) =>
-      importDecklistFromText(forestHousePaste(f), index, {
+      importDecklistFromText(houseDeckPaste(f), index, {
         deckName: "Forest Test",
       }),
     );
@@ -124,7 +127,7 @@ describe("decklist import", () => {
       expect(r.unmatched, r.messages.join("; ")).toEqual([]);
       expect(r.ok, r.messages.join("; ")).toBe(true);
       expect(r.validation.cardCount).toBe(REFERENCE_DECK_SIZE);
-      expect(r.raw?.class).toBe("Forestcraft");
+      expect(r.raw?.class).toBe("Runecraft");
     }
     const canonical = countsFromRaw(results[0]!.raw!);
     for (const r of results.slice(1)) {
@@ -163,17 +166,16 @@ describe("decklist import", () => {
   });
 
   it("fails validation for over-limit copies with a clear message", () => {
-    // 14 unique × 3 = 42 → trim to force 4 of one card inside a 40-ish list
-    const base = forestHousePaste("nx");
-    const text = base.replace(/3x May, Journey Elf/, "4x May, Journey Elf");
-    // 4+ rest: house deck was 40 with 3x May → now 41
+    const base = houseDeckPaste("nx");
+    const text = base.replace(/3x Stormy Blast/, "4x Stormy Blast");
+    // 4+ rest: house deck was 40 with 3x Stormy Blast → now 41
     const result = importDecklistFromText(text, index);
     expect(result.ok).toBe(false);
     expect(
       result.validation.issues.some(
         (i) =>
           i.kind === "copy_limit" &&
-          /May, Journey Elf/.test(i.message) &&
+          /Stormy Blast/.test(i.message) &&
           /4/.test(i.message),
       ),
     ).toBe(true);
@@ -242,7 +244,7 @@ describe("decklist import", () => {
   });
 
   it("round-trip: import → export → import yields an identical deck", () => {
-    const first = importDecklistFromText(forestHousePaste("n"), index, {
+    const first = importDecklistFromText(houseDeckPaste("n"), index, {
       deckName: "Round Trip",
     });
     expect(first.ok).toBe(true);
@@ -256,7 +258,7 @@ describe("decklist import", () => {
   });
 
   it("saves imported decks into the session library for selectors", () => {
-    const result = importDecklistFromText(forestHousePaste("nx"), index, {
+    const result = importDecklistFromText(houseDeckPaste("nx"), index, {
       deckName: "Meta Forest",
     });
     expect(result.ok).toBe(true);

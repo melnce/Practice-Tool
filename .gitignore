@@ -7,15 +7,10 @@
 decks/*
 !decks/starter_deck.json
 !decks/manifest.json
-!decks/forestcraft_combo.json
-!decks/swordcraft_rally.json
-!decks/runecraft_spellboost.json
-!decks/dragoncraft_overflow.json
 !decks/dragoncraft_meta.json
 !decks/dragoncraft_meta_v2.json
-!decks/abysscraft_necromancy.json
-!decks/havencraft_countdown.json
-!decks/portalcraft_artifacts.json
+!decks/portalcraft_artifact_rotation.json
+!decks/runecraft_sephie_test_subject.json
 game_rules/
 
 # Node dependencies

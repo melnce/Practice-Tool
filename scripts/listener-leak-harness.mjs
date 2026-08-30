@@ -28,7 +28,8 @@
  *   LISTENER_LEAK_CYCLES=30     stress cycles (default 30)
  *   LISTENER_LEAK_PORT=8882     static server port
  *   LISTENER_LEAK_SEED=424242   fixed game seed
- *   LISTENER_LEAK_DECK_INDEX=1  select option index for both decks (default 1)
+ *   LISTENER_LEAK_BLUE_DECK / LISTENER_LEAK_RED_DECK  deck ids (defaults:
+ *       runecraft_sephie_test_subject / portalcraft_artifact_rotation)
  *   LISTENER_LEAK_RETAIN=1      inject intentional retain-on-replace (self-test)
  *   LISTENER_LEAK_DUMP_SNAPSHOT=1  always dump detached retainer summary
  *   LISTENER_LEAK_PROBE=0       disable WeakRef probe entirely (metrics-only confound check)
@@ -95,8 +96,11 @@ const PNG_1X1 = Buffer.from(
   "base64",
 );
 
-/** Match reporter: both deck selects by option index (default 1). */
-const DECK_INDEX = Number(process.env.LISTENER_LEAK_DECK_INDEX ?? 1);
+/** Surviving class decks after pre-rotation removal (PR #101 / origin/main). */
+const BLUE_DECK =
+  process.env.LISTENER_LEAK_BLUE_DECK || "runecraft_sephie_test_subject";
+const RED_DECK =
+  process.env.LISTENER_LEAK_RED_DECK || "portalcraft_artifact_rotation";
 const CHROME =
   process.env.CHROME_PATH ||
   (existsSync(
@@ -818,25 +822,35 @@ async function confirmMulligans(page) {
  * Returns the chosen { index, value, label } for each side so the soak log
  * can prove which decks actually ran.
  */
-async function startGame(page, { deckIndex, seed }) {
+async function startGame(page, { blue, red, seed }) {
   let selection;
   await withSettingsDrawer(page, async () => {
-    selection = await page.evaluate((idx) => {
-      const read = (id) => {
-        const sel = document.getElementById(id);
-        const opts = [...sel.options];
-        if (idx < 0 || idx >= opts.length || !opts[idx].value) {
-          throw new Error(
-            `${id}: no option at index ${idx} (have ${opts.length})`,
-          );
-        }
-        const o = opts[idx];
-        return { index: idx, value: o.value, label: o.textContent.trim() };
-      };
-      return { blue: read("blueDeckSelect"), red: read("redDeckSelect") };
-    }, deckIndex);
-    await page.selectOption("#blueDeckSelect", { index: deckIndex });
-    await page.selectOption("#redDeckSelect", { index: deckIndex });
+    selection = await page.evaluate(
+      ({ blueId, redId }) => {
+        const read = (id, want) => {
+          const sel = document.getElementById(id);
+          const opts = [...sel.options];
+          const o = opts.find((opt) => opt.value === want);
+          if (!o) {
+            throw new Error(
+              `${id}: no option value=${want} (have ${opts.map((x) => x.value).join(",")})`,
+            );
+          }
+          return {
+            index: opts.indexOf(o),
+            value: o.value,
+            label: o.textContent.trim(),
+          };
+        };
+        return {
+          blue: read("blueDeckSelect", blueId),
+          red: read("redDeckSelect", redId),
+        };
+      },
+      { blueId: blue, redId: red },
+    );
+    await page.selectOption("#blueDeckSelect", blue);
+    await page.selectOption("#redDeckSelect", red);
     await page.locator("#seedInput").fill(String(seed));
     await page.locator("#startGameBtn").click();
   });
@@ -1799,8 +1813,10 @@ async function runHarness() {
     };
     console.log("Live pre-start:", preStart.live, preStart);
 
+    // Decks match origin/main post-#101 (pre-rotation decks removed).
     const deckSelection = await startGame(page, {
-      deckIndex: DECK_INDEX,
+      blue: BLUE_DECK,
+      red: RED_DECK,
       seed: SEED,
     });
     console.log("Decks selected:", JSON.stringify(deckSelection));
@@ -2016,7 +2032,7 @@ async function runHarness() {
 
     console.log("=== DOM / listener retention harness ===");
     console.log(
-      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  DeckIndex: ${DECK_INDEX}  Probe: ${ENABLE_PROBE ? "on" : "off"}  Snapshot: ${ENABLE_SNAPSHOT ? "on" : "off"}`,
+      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  Decks: ${BLUE_DECK}/${RED_DECK}  Probe: ${ENABLE_PROBE ? "on" : "off"}  Snapshot: ${ENABLE_SNAPSHOT ? "on" : "off"}`,
     );
     console.log(
       `Decks: blue=${deckSelection.blue.value} (${deckSelection.blue.label}) red=${deckSelection.red.value} (${deckSelection.red.label})`,
