@@ -2,6 +2,10 @@
 import type { CardViewModel } from "./types.js";
 import { applyKeywordOverlays, applyBarrierOverlay } from "../overlays.js";
 import { attachTooltip } from "../tooltips.js";
+import {
+  attachCardImageFallback,
+  cardIdFromImageUrl,
+} from "../imageFallback.js";
 
 function createElement(
   tag: string,
@@ -75,7 +79,13 @@ export function renderCardDOM(
   const imageWrapper = createElement("div", "card-image-wrapper");
   const imgSrc = card.base_image || card.image || "placeholder.jpg";
   const img = document.createElement("img");
-  img.src = String(imgSrc);
+  const cardId =
+    String(card.id ?? "") || cardIdFromImageUrl(String(imgSrc)) || "";
+  if (cardId && String(imgSrc).includes(".webp")) {
+    attachCardImageFallback(img, String(imgSrc), cardId);
+  } else {
+    img.src = String(imgSrc);
+  }
   img.alt = card.name;
   imageWrapper.appendChild(img);
 

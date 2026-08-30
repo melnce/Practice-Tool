@@ -16,6 +16,11 @@ import { syncSeedDisplay } from "./seedDisplay.js";
 import { refreshActiveTooltips } from "./tooltips.js";
 import { getPuzzleSessionSnapshot } from "../core/puzzle/session.js";
 import { syncFloatingCombatTextFromLogs } from "./floatingCombatText.js";
+import {
+  attachCardImageFallback,
+  cardIdFromImageUrl,
+  detachImageLoadHandlersIn,
+} from "./imageFallback.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -559,6 +564,7 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
     const crestData = crests[i];
 
     // Clear previous content & listeners
+    detachImageLoadHandlersIn(slot);
     slot.innerHTML = "";
     slot.onmouseenter = null;
     slot.onmousemove = null;
@@ -573,19 +579,13 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
       const img = document.createElement("img");
       img.className = "crest-image";
       const primaryImage = crestData.image || "";
-      const cardIdFromUrl =
-        primaryImage.match(/\/(\d+)(?:_token)?\.webp(?:\?|$)/i)?.[1] ?? null;
-      const fallbackCardId = cardIdFromUrl ?? "";
+      const cardIdFromUrl = cardIdFromImageUrl(primaryImage) ?? "";
+      const fallbackCardId = cardIdFromUrl;
       if (primaryImage) {
-        img.src = primaryImage;
         if (fallbackCardId) {
-          const fallback = `https://static.dotgg.gg/shadowverse/cards/${fallbackCardId}.webp`;
-          img.dataset.fallbackSrc = fallback;
-          img.onerror = () => {
-            if (img.dataset.fallbackApplied) return;
-            img.dataset.fallbackApplied = "1";
-            img.src = img.dataset.fallbackSrc || fallback;
-          };
+          attachCardImageFallback(img, primaryImage, fallbackCardId);
+        } else {
+          img.src = primaryImage;
         }
       } else if (fallbackCardId) {
         img.src = `https://static.dotgg.gg/shadowverse/cards/${fallbackCardId}.webp`;
