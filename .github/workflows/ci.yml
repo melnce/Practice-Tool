@@ -34,18 +34,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Test
-        # Includes unit, integration, and golden invariant tests
-        run: npm test
-
-      - name: Replay Determinism Check
-        run: npm run replay:check
-
-      - name: Architecture Guardrails
-        run: npm run check:arch
-
-      - name: Card Data Sync
-        run: npm run check:cards
-
-      - name: Deck Validation
-        run: npm run check:decks
+      - name: Check
+        run: npm run check
