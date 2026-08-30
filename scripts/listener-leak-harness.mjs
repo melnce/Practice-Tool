@@ -839,7 +839,7 @@ async function sampleSurvivorListenerLocations(cdp, page, limit = 24) {
     /* ignore */
   }
 
-  const scriptUrls = new Map();
+  const scriptUrls = cdp._leakScriptUrls instanceof Map ? cdp._leakScriptUrls : new Map();
   const onParsed = (p) => {
     if (p.scriptId) scriptUrls.set(p.scriptId, p.url || "(unknown)");
   };
@@ -1061,6 +1061,12 @@ async function runHarness() {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Performance.enable");
   await cdp.send("HeapProfiler.enable");
+  // Collect script URLs for later listener file:line attribution.
+  await cdp.send("Debugger.enable").catch(() => {});
+  cdp._leakScriptUrls = new Map();
+  cdp.on("Debugger.scriptParsed", (p) => {
+    if (p.scriptId) cdp._leakScriptUrls.set(p.scriptId, p.url || "(unknown)");
+  });
 
   const rows = [];
   let liveStart = null;
