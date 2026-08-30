@@ -1,6 +1,9 @@
 /**
- * Fuse left-click must win against HTML5 drag jitter, and the drag-click
- * suppressor must not latch across reconciles when dragend never fires.
+ * Fuse vs drag: zone rule.
+ *
+ * Critical ordering: browser may fire dragstart with no pointermove first.
+ * Tests that only use page.mouse.move() pass on broken threshold code —
+ * the no-pointermove case must be exercised explicitly via dispatched events.
  */
 import { test, expect } from "@playwright/test";
 
@@ -61,22 +64,95 @@ async function readFusePending(page: import("@playwright/test").Page) {
   });
 }
 
-test.describe("Fuse click vs drag at 1440×900", () => {
-  test("under-threshold press-move-release opens fuse picker", async ({
+test.describe("Fuse vs drag zone rule at 1440×900", () => {
+  test("dragstart with no prior pointermove is NOT cancelled", async ({
     page,
   }) => {
+    await seedSephieHand(page);
+
+    const result = await page.evaluate(() => {
+      const card = document.querySelector("#blueHand .card") as HTMLElement;
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      card.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          cancelable: true,
+          clientX: cx,
+          clientY: cy,
+          pointerId: 1,
+          button: 0,
+          buttons: 1,
+        }),
+      );
+      // Intentionally no pointermove — the ordering that cancelled drags on hardware.
+      const dragEv = new Event("dragstart", {
+        bubbles: true,
+        cancelable: true,
+      });
+      card.dispatchEvent(dragEv);
+      return { defaultPrevented: dragEv.defaultPrevented };
+    });
+
+    expect(result.defaultPrevented).toBe(false);
+  });
+
+  test("dragend inside hand (no pointermove before dragstart) opens fuse", async ({
+    page,
+  }) => {
+    await seedSephieHand(page);
+
+    await page.evaluate(() => {
+      const card = document.querySelector("#blueHand .card") as HTMLElement;
+      const hand = document.getElementById("blueHand")!;
+      const handRect = hand.getBoundingClientRect();
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      // Release still inside the hand zone.
+      const releaseX = handRect.left + handRect.width / 2;
+      const releaseY = handRect.top + handRect.height / 2;
+
+      card.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          cancelable: true,
+          clientX: cx,
+          clientY: cy,
+          pointerId: 1,
+          button: 0,
+          buttons: 1,
+        }),
+      );
+      // No pointermove before dragstart.
+      card.dispatchEvent(
+        new Event("dragstart", { bubbles: true, cancelable: true }),
+      );
+      card.dispatchEvent(
+        new DragEvent("dragend", {
+          bubbles: true,
+          cancelable: true,
+          clientX: releaseX,
+          clientY: releaseY,
+        }),
+      );
+    });
+    await page.waitForTimeout(200);
+
+    const fuse = await readFusePending(page);
+    expect(fuse.hasPending).toBe(true);
+    expect(fuse.op).toBe("fuse");
+    expect(fuse.type).toBe("cards");
+  });
+
+  test("plain left-click opens fuse picker", async ({ page }) => {
     await seedSephieHand(page);
     const card = page.locator("#blueHand .card").first();
     const box = await card.boundingBox();
     expect(box).toBeTruthy();
-    const cx = box!.x + box!.width / 2;
-    const cy = box!.y + box!.height / 2;
-
-    // 5px jitter — historically started HTML5 drag and ate the click.
-    await page.mouse.move(cx, cy);
-    await page.mouse.down();
-    await page.mouse.move(cx + 5, cy, { steps: 3 });
-    await page.mouse.up();
+    await page.mouse.click(box!.x + box!.width / 2, box!.y + box!.height / 2);
     await page.waitForTimeout(200);
 
     const fuse = await readFusePending(page);
@@ -99,7 +175,6 @@ test.describe("Fuse click vs drag at 1440×900", () => {
       // No dragend — latch stuck on the closure bound to this node.
 
       const { render } = await import("/src/ui/render.ts");
-      const { state } = await import("/src/core/gameState.ts");
       // VM unchanged → reconciler reuses the same DOM node (handlers not re-bound).
       render();
       render();
@@ -108,13 +183,10 @@ test.describe("Fuse click vs drag at 1440×900", () => {
       ) as HTMLElement;
       return {
         sameNode: sameBefore === sameAfter,
-        uid: state.players.first.hand[0]?.uid,
       };
     });
     expect(stuck.sameNode).toBe(true);
 
-    // Without pointerdown clearing the latch, a bare click would be eaten.
-    // A real user gesture always starts with pointerdown — that is the recovery.
     const card = page.locator("#blueHand .card").first();
     const box = await card.boundingBox();
     expect(box).toBeTruthy();
@@ -146,6 +218,53 @@ test.describe("Fuse click vs drag at 1440×900", () => {
     expect(counts.board).toBeGreaterThanOrEqual(1);
     expect(counts.hand).toBeLessThan(4);
     expect(counts.pendingFuse).toBe(false);
+  });
+
+  test("dragend outside hand does not open fuse (card stays, no pending)", async ({
+    page,
+  }) => {
+    await seedSephieHand(page);
+
+    await page.evaluate(() => {
+      const card = document.querySelector("#blueHand .card") as HTMLElement;
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      card.dispatchEvent(
+        new PointerEvent("pointerdown", {
+          bubbles: true,
+          cancelable: true,
+          clientX: cx,
+          clientY: cy,
+          pointerId: 1,
+          button: 0,
+          buttons: 1,
+        }),
+      );
+      card.dispatchEvent(
+        new Event("dragstart", { bubbles: true, cancelable: true }),
+      );
+      // Far outside the hand / window — lost or aborted play gesture.
+      card.dispatchEvent(
+        new DragEvent("dragend", {
+          bubbles: true,
+          cancelable: true,
+          clientX: 0,
+          clientY: 0,
+        }),
+      );
+    });
+    await page.waitForTimeout(200);
+
+    const fuse = await readFusePending(page);
+    expect(fuse.hasPending).toBe(false);
+
+    const handLen = await page.evaluate(async () => {
+      const { state } = await import("/src/core/gameState.ts");
+      return state.players.first.hand.length;
+    });
+    expect(handLen).toBe(4);
   });
 });
 
