@@ -31,6 +31,12 @@
  *   LISTENER_LEAK_DECK_INDEX=1  select option index for both decks (default 1)
  *   LISTENER_LEAK_RETAIN=1      inject intentional retain-on-replace (self-test)
  *   LISTENER_LEAK_DUMP_SNAPSHOT=1  always dump detached retainer summary
+ *   LISTENER_LEAK_PROBE=0       disable WeakRef probe entirely (metrics-only confound check)
+ *   LISTENER_LEAK_SNAPSHOT=0    never take heap snapshots (also skips Debugger.enable)
+ *
+ * Probe contract: window.__leakWeakProbe.refs holds WeakRef(node) ONLY — never
+ * bare Element handles. A strongly-held Array of WeakRefs does not keep nodes
+ * alive. LISTENER_LEAK_RETAIN is a separate intentional strong bucket.
  *
  * Cycle shape (fixed): 3 end-turns + hover every card in all four zones
  * + 4× Ctrl+Z + 4× Ctrl+Y. Samples after start and every 10 cycles.
@@ -50,8 +56,18 @@ const CYCLES = Number(process.env.LISTENER_LEAK_CYCLES || 30);
 const PORT = Number(process.env.LISTENER_LEAK_PORT || 8882);
 const SEED = Number(process.env.LISTENER_LEAK_SEED || 424242);
 const INJECT_RETAIN = process.env.LISTENER_LEAK_RETAIN === "1";
+/** WeakRef replace/remove probe. Default ON. Set LISTENER_LEAK_PROBE=0 for metrics-only. */
+const ENABLE_PROBE = process.env.LISTENER_LEAK_PROBE !== "0";
+/**
+ * Heap snapshots + Debugger.enable. Default ON when dumping.
+ * Set LISTENER_LEAK_SNAPSHOT=0 to never snapshot (confound check: CDP snapshot
+ * pinning). When off, WeakRef survivor early-exit is deferred to end-of-run
+ * logging only so the full metrics curve is collected.
+ */
+const ENABLE_SNAPSHOT = process.env.LISTENER_LEAK_SNAPSHOT !== "0";
 const DUMP_SNAPSHOT =
-  process.env.LISTENER_LEAK_DUMP_SNAPSHOT === "1" || INJECT_RETAIN;
+  ENABLE_SNAPSHOT &&
+  (process.env.LISTENER_LEAK_DUMP_SNAPSHOT === "1" || INJECT_RETAIN);
 const SAMPLE_EVERY = Number(process.env.LISTENER_LEAK_SAMPLE_EVERY || 10);
 /** Match reporter: both deck selects by option index (default 1). */
 const DECK_INDEX = Number(process.env.LISTENER_LEAK_DECK_INDEX ?? 1);
@@ -140,12 +156,19 @@ async function forceGc(cdp, page) {
   await new Promise((r) => setTimeout(r, 80));
 }
 
-/** Track replaced/removed nodes via WeakRef so post-GC survival is measurable. */
+/**
+ * Track replaced/removed nodes via WeakRef so post-GC survival is measurable.
+ *
+ * CRITICAL: probe.refs stores WeakRef(node) only — never the Element itself.
+ * The Array is strongly reachable from window.__leakWeakProbe, but WeakRef
+ * entries do not prevent GC of their targets. (Contrast LISTENER_LEAK_RETAIN,
+ * which strongly pushes nodes into __leakRetainBucket.)
+ */
 async function installWeakRefProbe(page) {
   await page.evaluate(() => {
     if (window.__leakWeakProbe) return;
     window.__leakWeakProbe = {
-      refs: [],
+      refs: [], // WeakRef<Element>[] — not Element[]
       replaces: 0,
       removes: 0,
     };
@@ -1060,13 +1083,19 @@ async function runHarness() {
 
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Performance.enable");
+  // collectGarbage needs HeapProfiler.enable; takeHeapSnapshot is separate.
+  // Debugger.enable can surface DevTools/global-handle retainers — skip when
+  // LISTENER_LEAK_SNAPSHOT=0 (confound check).
   await cdp.send("HeapProfiler.enable");
-  // Collect script URLs for later listener file:line attribution.
-  await cdp.send("Debugger.enable").catch(() => {});
   cdp._leakScriptUrls = new Map();
-  cdp.on("Debugger.scriptParsed", (p) => {
-    if (p.scriptId) cdp._leakScriptUrls.set(p.scriptId, p.url || "(unknown)");
-  });
+  if (ENABLE_SNAPSHOT) {
+    await cdp.send("Debugger.enable").catch(() => {});
+    cdp.on("Debugger.scriptParsed", (p) => {
+      if (p.scriptId) cdp._leakScriptUrls.set(p.scriptId, p.url || "(unknown)");
+    });
+  } else {
+    console.log("Debugger.enable skipped (LISTENER_LEAK_SNAPSHOT=0)");
+  }
 
   const rows = [];
   let liveStart = null;
@@ -1078,8 +1107,18 @@ async function runHarness() {
     });
     await page.waitForFunction(() => !!window.__svwbTest);
 
-    // Always install WeakRef probe (independent of INJECT_RETAIN).
-    await installWeakRefProbe(page);
+    // WeakRef probe (independent of INJECT_RETAIN). PROBE=0 → metrics-only confound check.
+    if (ENABLE_PROBE) {
+      await installWeakRefProbe(page);
+      console.log(
+        "WeakRef probe: ON (refs[] holds WeakRef(node) only — not Element handles)",
+      );
+    } else {
+      console.log("WeakRef probe: OFF (LISTENER_LEAK_PROBE=0) — metrics-only mode");
+    }
+    console.log(
+      `Heap snapshots: ${ENABLE_SNAPSHOT ? "ON (may dump at end/on fail)" : "OFF (LISTENER_LEAK_SNAPSHOT=0)"}`,
+    );
 
     await forceGc(cdp, page);
     const preStart = {
@@ -1153,7 +1192,9 @@ async function runHarness() {
 
       if (cycle === 1) {
         const liveAfter1 = await readLiveState(page);
-        const probeAfter1 = await readWeakRefProbe(page);
+        const probeAfter1 = ENABLE_PROBE
+          ? await readWeakRefProbe(page)
+          : { replaces: 0, removes: 0, tracked: 0, alive: 0 };
         assertLiveGame(
           "turn-progress-or-ends",
           totalEnded > 0 ||
@@ -1168,51 +1209,71 @@ async function runHarness() {
           liveAfter1.phase === "main" || liveAfter1.phase === "gameover",
           `phase=${liveAfter1.phase}`,
         );
-        assertLiveGame(
-          "dom-churn-happened",
-          probeAfter1.replaces + probeAfter1.removes > 0,
-          `replaces=${probeAfter1.replaces} removes=${probeAfter1.removes}`,
-        );
+        if (ENABLE_PROBE) {
+          assertLiveGame(
+            "dom-churn-happened",
+            probeAfter1.replaces + probeAfter1.removes > 0,
+            `replaces=${probeAfter1.replaces} removes=${probeAfter1.removes}`,
+          );
+        } else {
+          console.log(
+            "dom-churn assert skipped (probe off); live turn/card progress already checked",
+          );
+        }
       }
 
       if (cycle % SAMPLE_EVERY === 0 || cycle === CYCLES) {
         await forceGc(cdp, page);
         const live = await readLiveState(page);
-        const probe = await readWeakRefProbe(page);
+        const probe = ENABLE_PROBE
+          ? await readWeakRefProbe(page)
+          : { replaces: 0, removes: 0, tracked: 0, alive: 0 };
         rows.push({
           checkpoint: `after ${cycle} cycles + GC`,
           ...(await sampleMetrics(cdp)),
           live,
-          weakRef: probe,
+          weakRef: ENABLE_PROBE ? probe : undefined,
         });
         console.log(
           `Live after ${cycle}:`,
           live,
           rows[rows.length - 1],
-          "weakRef",
-          probe,
+          ENABLE_PROBE ? "weakRef" : "weakRef:off",
+          ENABLE_PROBE ? probe : "(disabled)",
         );
 
-        if (!INJECT_RETAIN && probe.alive > MAX_ALIVE_WEAKREFS) {
-          // Retention leak — dump retainers before failing (NOT a liveness failure).
-          console.error(
-            `FAIL: retention leak detected (weakref-survivors-cycle-${cycle}): alive=${probe.alive} tracked=${probe.tracked} replaces=${probe.replaces} (replaced nodes surviving GC)`,
-          );
-          await dumpRetentionEvidence(cdp, page, {
-            rows,
-            probe,
-            cycle,
-            reason: "weakref-survivors",
-          });
-          process.exitCode = 1;
-          return;
+        if (
+          ENABLE_PROBE &&
+          !INJECT_RETAIN &&
+          probe.alive > MAX_ALIVE_WEAKREFS
+        ) {
+          // Retention signal. With SNAPSHOT=0, log and CONTINUE so the full
+          // metrics curve can be compared against probe-off (confound check).
+          // Mid-soak heap dumps can themselves pin objects via DevTools handles.
+          if (!ENABLE_SNAPSHOT) {
+            console.warn(
+              `WARN: WeakRef survivors at cycle ${cycle}: alive=${probe.alive} tracked=${probe.tracked} replaces=${probe.replaces} (continuing — LISTENER_LEAK_SNAPSHOT=0; no mid-soak dump)`,
+            );
+          } else {
+            console.error(
+              `FAIL: retention leak detected (weakref-survivors-cycle-${cycle}): alive=${probe.alive} tracked=${probe.tracked} replaces=${probe.replaces} (replaced nodes surviving GC)`,
+            );
+            await dumpRetentionEvidence(cdp, page, {
+              rows,
+              probe,
+              cycle,
+              reason: "weakref-survivors",
+            });
+            process.exitCode = 1;
+            return;
+          }
         }
       }
     }
 
     console.log("=== DOM / listener retention harness ===");
     console.log(
-      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  DeckIndex: ${DECK_INDEX}`,
+      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}  DeckIndex: ${DECK_INDEX}  Probe: ${ENABLE_PROBE ? "on" : "off"}  Snapshot: ${ENABLE_SNAPSHOT ? "on" : "off"}`,
     );
     console.log(
       `Decks: blue=${deckSelection.blue.value} (${deckSelection.blue.label}) red=${deckSelection.red.value} (${deckSelection.red.label})`,
@@ -1227,7 +1288,10 @@ async function runHarness() {
     console.log("Analysis:");
     console.log(JSON.stringify(analysis, null, 2));
 
-    if (DUMP_SNAPSHOT || analysis.nodesLeaking || analysis.listenersLeaking) {
+    if (
+      ENABLE_SNAPSHOT &&
+      (DUMP_SNAPSHOT || analysis.nodesLeaking || analysis.listenersLeaking)
+    ) {
       console.log("\nTaking heap snapshot for detached retainer summary...");
       const snap = await takeHeapSnapshot(cdp);
       const summary = summarizeDetachedRetainers(snap);
@@ -1266,12 +1330,20 @@ async function runHarness() {
             " listenersLeaking=" +
             analysis.listenersLeaking,
         );
-        await dumpRetentionEvidence(cdp, page, {
-          rows,
-          probe: await readWeakRefProbe(page),
-          cycle: CYCLES,
-          reason: "trend-linear-growth",
-        });
+        if (ENABLE_SNAPSHOT) {
+          await dumpRetentionEvidence(cdp, page, {
+            rows,
+            probe: ENABLE_PROBE
+              ? await readWeakRefProbe(page)
+              : { replaces: 0, removes: 0, tracked: 0, alive: 0 },
+            cycle: CYCLES,
+            reason: "trend-linear-growth",
+          });
+        } else {
+          console.log(
+            "(Skipping retainer dump — LISTENER_LEAK_SNAPSHOT=0; metrics table above is the confound check.)",
+          );
+        }
       }
       process.exitCode = 1;
       return;
