@@ -1,13 +1,21 @@
 /**
- * Event-listener leak harness — drives the built app headlessly and samples
- * Chromium Performance.getMetrics (Nodes, JSEventListeners, JSHeapUsedSize).
+ * DOM / event-listener retention harness.
  *
- * Usage: npm run build && npx tsx scripts/listener-leak-harness.mjs
+ * Drives the built app headlessly through a fixed cycle shape, forces GC via
+ * CDP HeapProfiler.collectGarbage before every sample, and judges the TREND
+ * across checkpoints (linear post-GC growth) rather than pairwise % heuristics.
+ *
+ * Usage:
+ *   npm run build && npx tsx scripts/listener-leak-harness.mjs
  *
  * Env:
- *   LISTENER_LEAK_CYCLES=18   stress cycles (default 18)
- *   LISTENER_LEAK_PORT=8882   static server port
- *   LISTENER_LEAK_SEED=424242 fixed game seed
+ *   LISTENER_LEAK_CYCLES=30     stress cycles (default 30)
+ *   LISTENER_LEAK_PORT=8882     static server port
+ *   LISTENER_LEAK_SEED=424242   fixed game seed
+ *   LISTENER_LEAK_RETAIN=1      inject intentional retain-on-replace (self-test)
+ *
+ * Cycle shape (fixed): 3 end-turns + hover every card in all four zones
+ * + 4× Ctrl+Z + 4× Ctrl+Y. Samples after start and every 10 cycles.
  */
 import { chromium } from "@playwright/test";
 import { createServer } from "http";
@@ -19,9 +27,11 @@ import { withSettingsDrawer } from "./settings-drawer-helpers.mjs";
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const ROOT = join(__dirname, "..");
 const BUILD = join(ROOT, "build");
-const CYCLES = Number(process.env.LISTENER_LEAK_CYCLES || 18);
+const CYCLES = Number(process.env.LISTENER_LEAK_CYCLES || 30);
 const PORT = Number(process.env.LISTENER_LEAK_PORT || 8882);
 const SEED = Number(process.env.LISTENER_LEAK_SEED || 424242);
+const INJECT_RETAIN = process.env.LISTENER_LEAK_RETAIN === "1";
+const SAMPLE_EVERY = Number(process.env.LISTENER_LEAK_SAMPLE_EVERY || 10);
 const CHROME =
   process.env.CHROME_PATH ||
   (existsSync("/opt/pw-browsers/chromium/chrome")
@@ -29,6 +39,15 @@ const CHROME =
     : existsSync("/opt/google/chrome/chrome")
       ? "/opt/google/chrome/chrome"
       : "/usr/local/bin/google-chrome");
+
+/** Post-GC growth per 10-cycle interval that counts as "material". */
+const NODE_INTERVAL_THRESHOLD = 400;
+const LISTENER_INTERVAL_THRESHOLD = 200;
+/** Total post-GC growth start→end that counts as "material". */
+const NODE_TOTAL_THRESHOLD = 800;
+const LISTENER_TOTAL_THRESHOLD = 400;
+/** Need this many intervals with material growth to call it linear. */
+const MIN_GROWING_INTERVALS = 2;
 
 const MIME = {
   ".html": "text/html",
@@ -70,6 +89,17 @@ async function sampleMetrics(cdp) {
     listeners: Math.round(map.JSEventListeners ?? 0),
     heapMb: Number(((map.JSHeapUsedSize ?? 0) / (1024 * 1024)).toFixed(1)),
   };
+}
+
+async function forceGc(cdp, page) {
+  await page.mouse.move(5, 5).catch(() => {});
+  await page.evaluate(() => {
+    if (typeof gc === "function") gc();
+  });
+  await cdp.send("HeapProfiler.collectGarbage");
+  await new Promise((r) => setTimeout(r, 80));
+  await cdp.send("HeapProfiler.collectGarbage");
+  await new Promise((r) => setTimeout(r, 80));
 }
 
 async function dismissOverlays(page) {
@@ -168,34 +198,31 @@ async function startGame(page, { blue, red, seed }) {
   );
 }
 
-async function hoverAllCards(page, passes = 3) {
+async function hoverAllCards(page) {
   const zones = ["#blueHand", "#redHand", "#blueBoard", "#redBoard"];
-  for (let p = 0; p < passes; p++) {
-    for (const zone of zones) {
-      const cards = page.locator(`${zone} .card`);
-      const count = await cards.count();
-      for (let i = 0; i < count; i++) {
-        await cards
-          .nth(i)
-          .hover({ force: true })
-          .catch(() => {});
-        await page.waitForTimeout(8);
-      }
-    }
-    // History drawer items (hist preview path)
-    const histItems = page.locator(".hist-item");
-    const histCount = await histItems.count();
-    for (let i = 0; i < histCount; i++) {
-      await histItems
+  for (const zone of zones) {
+    const cards = page.locator(`${zone} .card`);
+    const count = await cards.count();
+    for (let i = 0; i < count; i++) {
+      await cards
         .nth(i)
         .hover({ force: true })
         .catch(() => {});
-      await page.waitForTimeout(8);
+      await page.waitForTimeout(5);
     }
+  }
+  const histItems = page.locator(".hist-item");
+  const histCount = await histItems.count();
+  for (let i = 0; i < Math.min(histCount, 30); i++) {
+    await histItems
+      .nth(i)
+      .hover({ force: true })
+      .catch(() => {});
+    await page.waitForTimeout(5);
   }
 }
 
-async function endTurns(page, count = 4) {
+async function endTurns(page, count = 3) {
   for (let i = 0; i < count; i++) {
     await dismissOverlays(page);
     const btn = page
@@ -207,19 +234,19 @@ async function endTurns(page, count = 4) {
     }
     if (await btn.isDisabled().catch(() => true)) break;
     await btn.click({ force: true });
-    await page.waitForTimeout(140);
+    await page.waitForTimeout(120);
     await dismissOverlays(page);
   }
 }
 
 async function undoRedo(page) {
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     await page.keyboard.press("Control+Z");
-    await page.waitForTimeout(35);
+    await page.waitForTimeout(30);
   }
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     await page.keyboard.press("Control+Y");
-    await page.waitForTimeout(35);
+    await page.waitForTimeout(30);
   }
 }
 
@@ -230,67 +257,69 @@ function printTable(rows) {
   console.log(sep);
   for (const r of rows) {
     console.log(
-      `| ${r.checkpoint} | ${r.nodes} | **${r.listeners}** | ${r.heapMb} MB |`,
+      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB |`,
     );
   }
 }
 
-function analyzeTrend(rows) {
-  const baseline = rows[0];
-  const checkpoints = rows.slice(1);
+/**
+ * Trend judge: after forced GC, is growth linear and material across intervals?
+ * Bounded one-time jumps (e.g. mid-game board filling) do not fail.
+ */
+export function analyzePostGcTrend(rows) {
+  if (rows.length < 3) {
+    return {
+      pass: false,
+      reason: "need at least 3 checkpoints",
+      nodeDeltas: [],
+      listenerDeltas: [],
+    };
+  }
 
-  // Flag listener growth at stable DOM counts (the leak signature).
-  const stableDomViolations = [];
+  const nodeDeltas = [];
+  const listenerDeltas = [];
   for (let i = 1; i < rows.length; i++) {
-    for (let j = 0; j < i; j++) {
-      const a = rows[j];
-      const b = rows[i];
-      const nodeDelta =
-        Math.abs(b.nodes - a.nodes) / Math.max(a.nodes, b.nodes, 1);
-      if (nodeDelta > 0.03) continue;
-      const listenerGrowth =
-        (b.listeners - a.listeners) / Math.max(a.listeners, 1);
-      if (listenerGrowth > 0.1) {
-        stableDomViolations.push({
-          from: a.checkpoint,
-          to: b.checkpoint,
-          nodes: b.nodes,
-          listenersBefore: a.listeners,
-          listenersAfter: b.listeners,
-          growthPct: Number((listenerGrowth * 100).toFixed(1)),
-        });
-      }
-    }
+    nodeDeltas.push(rows[i].nodes - rows[i - 1].nodes);
+    listenerDeltas.push(rows[i].listeners - rows[i - 1].listeners);
   }
 
-  // Listeners-per-node at high-DOM checkpoints should not drift upward forever.
-  const ratios = checkpoints.map((r) => ({
-    checkpoint: r.checkpoint,
-    ratio: r.listeners / Math.max(r.nodes, 1),
-    nodes: r.nodes,
-    listeners: r.listeners,
-  }));
-  const highDom = ratios.filter((r) => r.nodes >= baseline.nodes * 1.5);
-  let ratioDrift = 0;
-  if (highDom.length >= 4) {
-    const firstHalf = highDom.slice(0, Math.floor(highDom.length / 2));
-    const secondHalf = highDom.slice(Math.floor(highDom.length / 2));
-    const avg = (arr) =>
-      arr.reduce((s, r) => s + r.ratio, 0) / Math.max(arr.length, 1);
-    ratioDrift = avg(secondHalf) - avg(firstHalf);
-  }
+  const growingNodeIntervals = nodeDeltas.filter(
+    (d) => d > NODE_INTERVAL_THRESHOLD,
+  ).length;
+  const growingListenerIntervals = listenerDeltas.filter(
+    (d) => d > LISTENER_INTERVAL_THRESHOLD,
+  ).length;
 
-  const passStableDom = stableDomViolations.length === 0;
-  const passRatioDrift = ratioDrift <= 0.15;
-  const pass = passStableDom && passRatioDrift;
+  const totalNodeGrowth = rows[rows.length - 1].nodes - rows[0].nodes;
+  const totalListenerGrowth =
+    rows[rows.length - 1].listeners - rows[0].listeners;
+
+  const nodesLeaking =
+    growingNodeIntervals >= MIN_GROWING_INTERVALS &&
+    totalNodeGrowth > NODE_TOTAL_THRESHOLD;
+  const listenersLeaking =
+    growingListenerIntervals >= MIN_GROWING_INTERVALS &&
+    totalListenerGrowth > LISTENER_TOTAL_THRESHOLD;
+
+  const pass = !nodesLeaking && !listenersLeaking;
 
   return {
-    baseline,
-    stableDomViolations,
-    ratioDrift: Number(ratioDrift.toFixed(4)),
-    passStableDom,
-    passRatioDrift,
     pass,
+    nodesLeaking,
+    listenersLeaking,
+    nodeDeltas,
+    listenerDeltas,
+    totalNodeGrowth,
+    totalListenerGrowth,
+    growingNodeIntervals,
+    growingListenerIntervals,
+    thresholds: {
+      NODE_INTERVAL_THRESHOLD,
+      LISTENER_INTERVAL_THRESHOLD,
+      NODE_TOTAL_THRESHOLD,
+      LISTENER_TOTAL_THRESHOLD,
+      MIN_GROWING_INTERVALS,
+    },
   };
 }
 
@@ -304,13 +333,43 @@ async function runHarness() {
   const browser = await chromium.launch({
     executablePath: CHROME,
     headless: true,
-    args: ["--no-sandbox", "--disable-gpu"],
+    args: ["--no-sandbox", "--disable-gpu", "--js-flags=--expose-gc"],
   });
   const page = await browser.newPage({
     viewport: { width: 1280, height: 900 },
   });
+
+  if (INJECT_RETAIN) {
+    // Self-test only: retain every replaced child so post-GC metrics climb.
+    await page.addInitScript(() => {
+      window.__leakRetainBucket = [];
+      const origReplace = Element.prototype.replaceChild;
+      Element.prototype.replaceChild = function replaceChildLeak(
+        newNode,
+        oldNode,
+      ) {
+        try {
+          window.__leakRetainBucket.push(oldNode);
+        } catch {
+          /* ignore */
+        }
+        return origReplace.call(this, newNode, oldNode);
+      };
+      const origRemove = Element.prototype.removeChild;
+      Element.prototype.removeChild = function removeChildLeak(child) {
+        try {
+          window.__leakRetainBucket.push(child);
+        } catch {
+          /* ignore */
+        }
+        return origRemove.call(this, child);
+      };
+    });
+  }
+
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Performance.enable");
+  await cdp.send("HeapProfiler.enable");
 
   const rows = [];
 
@@ -332,61 +391,55 @@ async function runHarness() {
       { timeout: 15000 },
     );
 
-    // Open history drawer so hist-item hovers exercise preview path
     await page
       .locator("#historyToggle")
       .click()
       .catch(() => {});
     await page.waitForTimeout(100);
 
+    await forceGc(cdp, page);
     rows.push({
-      checkpoint: "after start",
+      checkpoint: "after start + GC",
       ...(await sampleMetrics(cdp)),
     });
 
     for (let cycle = 1; cycle <= CYCLES; cycle++) {
-      await hoverAllCards(page, 3);
-      await endTurns(page, 4);
+      await endTurns(page, 3);
+      await hoverAllCards(page);
       await undoRedo(page);
-      rows.push({
-        checkpoint: `cycle ${cycle}`,
-        ...(await sampleMetrics(cdp)),
-      });
+      if (cycle % SAMPLE_EVERY === 0 || cycle === CYCLES) {
+        await forceGc(cdp, page);
+        rows.push({
+          checkpoint: `after ${cycle} cycles + GC`,
+          ...(await sampleMetrics(cdp)),
+        });
+      }
     }
 
-    console.log("=== Event-listener leak harness ===");
-    console.log(`Seed: ${SEED}  Cycles: ${CYCLES}`);
+    console.log("=== DOM / listener retention harness ===");
+    console.log(
+      `Seed: ${SEED}  Cycles: ${CYCLES}  Sample every: ${SAMPLE_EVERY}  InjectRetain: ${INJECT_RETAIN}`,
+    );
     printTable(rows);
 
-    const analysis = analyzeTrend(rows);
+    const analysis = analyzePostGcTrend(rows);
     console.log("");
     console.log("Analysis:");
-    console.log(
-      JSON.stringify(
-        {
-          baselineListeners: analysis.baseline.listeners,
-          stableDomViolations: analysis.stableDomViolations.length,
-          stableDomViolationSamples: analysis.stableDomViolations.slice(0, 5),
-          highDomRatioDrift: analysis.ratioDrift,
-          passStableDom: analysis.passStableDom,
-          passRatioDrift: analysis.passRatioDrift,
-          pass: analysis.pass,
-        },
-        null,
-        2,
-      ),
-    );
+    console.log(JSON.stringify(analysis, null, 2));
 
     if (!analysis.pass) {
       console.error(
-        "FAIL: listeners grow at stable DOM counts (leak signature)",
+        "FAIL: post-GC node/listener counts grow linearly (retention leak)",
       );
-      process.exitCode = 1;
-      return;
+      await browser.close();
+      server.close();
+      process.exit(1);
     }
-    console.log("PASS: no listener growth at stable DOM counts");
+    console.log(
+      "PASS: post-GC node/listener trend is flat (within thresholds)",
+    );
   } finally {
-    await browser.close();
+    await browser.close().catch(() => {});
     server.close();
   }
 }
