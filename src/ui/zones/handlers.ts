@@ -57,40 +57,48 @@ export function attachHandlers(
     }
 
     const dragClickGuard = createHandDragClickSuppressor();
-    dragClickGuard.attach(div, () => {
-      if (vm.isSelectable || vm.isSelected) return;
+    dragClickGuard.attach(
+      div,
+      () => {
+        if (vm.isSelectable || vm.isSelected) return;
 
-      const isPlayersTurn = ctx.isMyHand;
-      if (!isPlayersTurn) return;
+        const isPlayersTurn = ctx.isMyHand;
+        if (!isPlayersTurn) return;
 
-      const hasFuseRecipes =
-        Array.isArray(card.fuse_recipes) && card.fuse_recipes.length > 0;
-      const hasFuseCards =
-        String(card.description ?? "").match(
-          /(?:^|\n)Fuse:\s*Cards(?:\s|$)/m,
-        ) != null || (card as any).fuse_capability === "cards";
-      const hasFortifierFuse =
-        Array.isArray(card.fuse) &&
-        card.fuse.some((op) => op?.op === "fuse" && op?.type === "fortifier");
-      const hasSpecialFuse =
-        card.name === "Gear of Ambition" ||
-        card.name === "Gear of Remembrance" ||
-        card.name === "Ominous Artifact α";
+        const hasFuseRecipes =
+          Array.isArray(card.fuse_recipes) && card.fuse_recipes.length > 0;
+        const hasFuseCards =
+          String(card.description ?? "").match(
+            /(?:^|\n)Fuse:\s*Cards(?:\s|$)/m,
+          ) != null || (card as any).fuse_capability === "cards";
+        const hasFortifierFuse =
+          Array.isArray(card.fuse) &&
+          card.fuse.some((op) => op?.op === "fuse" && op?.type === "fortifier");
+        const hasSpecialFuse =
+          card.name === "Gear of Ambition" ||
+          card.name === "Gear of Remembrance" ||
+          card.name === "Ominous Artifact α";
 
-      if (
-        hasFuseRecipes ||
-        hasFortifierFuse ||
-        hasSpecialFuse ||
-        hasFuseCards
-      ) {
-        actions.handleFuse(
-          ctx.owner,
-          card.uid,
-          !!(hasFuseRecipes || hasSpecialFuse || hasFuseCards),
-          card,
-        );
-      }
-    });
+        if (
+          hasFuseRecipes ||
+          hasFortifierFuse ||
+          hasSpecialFuse ||
+          hasFuseCards
+        ) {
+          actions.handleFuse(
+            ctx.owner,
+            card.uid,
+            !!(hasFuseRecipes || hasSpecialFuse || hasFuseCards),
+            card,
+          );
+        }
+      },
+      {
+        handContainerId: ctx.containerId,
+        isInitiatorStillInHand: () =>
+          state.players[ctx.owner].hand.some((c) => c.uid === card.uid),
+      },
+    );
 
     // Drag — off-turn hand cards are not draggable (silent refusal without toast spam)
     const canDragHand =
