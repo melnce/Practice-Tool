@@ -88,7 +88,9 @@ const SAMPLE_EVERY = Number(process.env.LISTENER_LEAK_SAMPLE_EVERY || 10);
 const ENABLE_LISTENER_ATTR = process.env.LISTENER_LEAK_ATTR === "1";
 /** Remote card-art regime. Default fulfil pins CDN-independent healthy curve. */
 const IMAGE_MODE = (() => {
-  const raw = String(process.env.LISTENER_LEAK_IMAGES || "fulfil").toLowerCase();
+  const raw = String(
+    process.env.LISTENER_LEAK_IMAGES || "fulfil",
+  ).toLowerCase();
   if (raw === "fail" || raw === "abort") return "fail";
   if (raw === "fulfil" || raw === "fulfill" || raw === "ok") return "fulfil";
   if (raw === "passthrough" || raw === "live") return "passthrough";
@@ -213,12 +215,15 @@ async function installListenerAttribution(page) {
 
     function siteFromStack(stack) {
       if (!stack) return "(no-stack)";
-      const lines = String(stack).split("\n").map((l) => l.trim());
+      const lines = String(stack)
+        .split("\n")
+        .map((l) => l.trim());
       for (const line of lines) {
         if (!line || line.startsWith("Error")) continue;
         if (line.includes("installListenerAttribution")) continue;
         if (line.includes("__leakListenerAttr")) continue;
-        if (line.includes("addEventListener") && line.includes("native")) continue;
+        if (line.includes("addEventListener") && line.includes("native"))
+          continue;
         // Strip leading "at "
         const cleaned = line.replace(/^at\s+/, "");
         // Prefer app bundle / src frames
@@ -275,7 +280,8 @@ async function installListenerAttribution(page) {
       "onerror",
     ];
     for (const prop of idlProps) {
-      const desc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, prop) ||
+      const desc =
+        Object.getOwnPropertyDescriptor(HTMLElement.prototype, prop) ||
         Object.getOwnPropertyDescriptor(Element.prototype, prop) ||
         Object.getOwnPropertyDescriptor(window, prop);
       // HTMLElement on* are typically on HTMLElement.prototype as accessors in Chrome
@@ -291,7 +297,12 @@ async function installListenerAttribution(page) {
           Object.defineProperty(HTMLElement.prototype, prop, {
             configurable: true,
             enumerable: true,
-            get: existing && existing.get ? existing.get : function () { return this["__" + prop]; },
+            get:
+              existing && existing.get
+                ? existing.get
+                : function () {
+                    return this["__" + prop];
+                  },
             set: function (fn) {
               try {
                 if (typeof fn === "function") {
@@ -314,7 +325,11 @@ async function installListenerAttribution(page) {
       Object.defineProperty(targetProto, prop, {
         configurable: true,
         enumerable: existing.enumerable,
-        get: origGet ? function () { return origGet.call(this); } : undefined,
+        get: origGet
+          ? function () {
+              return origGet.call(this);
+            }
+          : undefined,
         set: function (fn) {
           try {
             if (typeof fn === "function") {
@@ -549,7 +564,11 @@ async function auditKnownDomRoots(page) {
           continue;
         }
         if (!v) continue;
-        if (Array.isArray(v) && v.length > 0 && v.some((x) => x instanceof Element)) {
+        if (
+          Array.isArray(v) &&
+          v.length > 0 &&
+          v.some((x) => x instanceof Element)
+        ) {
           out.windowElementArrayProps.push({
             key,
             len: v.length,
@@ -746,10 +765,8 @@ function printTable(rows) {
   console.log(sep);
   for (const r of rows) {
     const L = r.live || {};
-    const bucket =
-      L.retainBucketLen == null ? "—" : String(L.retainBucketLen);
-    const tipEx =
-      L.tipExists == null ? "?" : L.tipExists ? "yes" : "no";
+    const bucket = L.retainBucketLen == null ? "—" : String(L.retainBucketLen);
+    const tipEx = L.tipExists == null ? "?" : L.tipExists ? "yes" : "no";
     const tipConn =
       L.tipConnected == null ? "—" : L.tipConnected ? "yes" : "DETACHED";
     console.log(
@@ -1260,7 +1277,8 @@ async function sampleSurvivorListenerLocations(cdp, page, limit = 24) {
     /* ignore */
   }
 
-  const scriptUrls = cdp._leakScriptUrls instanceof Map ? cdp._leakScriptUrls : new Map();
+  const scriptUrls =
+    cdp._leakScriptUrls instanceof Map ? cdp._leakScriptUrls : new Map();
   const onParsed = (p) => {
     if (p.scriptId) scriptUrls.set(p.scriptId, p.url || "(unknown)");
   };
@@ -1333,7 +1351,12 @@ async function sampleSurvivorListenerLocations(cdp, page, limit = 24) {
     .slice(0, 25)
     .map(([loc, count]) => ({ count, loc }));
 
-  return { sampled, listenerSampleCount: samples.length, topLocations, samples };
+  return {
+    sampled,
+    listenerSampleCount: samples.length,
+    topLocations,
+    samples,
+  };
 }
 
 /** Best-effort map from Vite build URL + line to a src/ file guess. */
@@ -1354,7 +1377,11 @@ function hintSrcFromListenerLoc(loc) {
  * On retention failure: mark WeakRef survivors, sample listener locations,
  * force GC again, snapshot, and print dominant detached retaining-path shapes.
  */
-async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) {
+async function dumpRetentionEvidence(
+  cdp,
+  page,
+  { rows, probe, cycle, reason },
+) {
   console.log("\n=== Phase 1 retainer dump (" + reason + ") ===");
   const knownRoots = await auditKnownDomRoots(page);
   console.log("Known DOM roots audit:", JSON.stringify(knownRoots, null, 2));
@@ -1376,13 +1403,20 @@ async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) 
   const listenerLocs = await sampleSurvivorListenerLocations(cdp, page);
   console.log(
     "Survivor listener locations (CDP DOMDebugger):",
-    JSON.stringify(listenerLocs.topLocations?.slice?.(0, 15) ?? listenerLocs, null, 2),
+    JSON.stringify(
+      listenerLocs.topLocations?.slice?.(0, 15) ?? listenerLocs,
+      null,
+      2,
+    ),
   );
 
   await forceGc(cdp, page);
   const snap = await takeHeapSnapshot(cdp);
   const summary = summarizeDetachedRetainers(snap);
-  const outPath = join(OUT_DIR, `retention-${reason}-c${cycle}-${Date.now()}.json`);
+  const outPath = join(
+    OUT_DIR,
+    `retention-${reason}-c${cycle}-${Date.now()}.json`,
+  );
   writeFileSync(
     outPath,
     JSON.stringify(
@@ -1461,23 +1495,27 @@ async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) 
   }
 }
 
-
-
 /**
  * How LISTENER_LEAK_IMAGES=fail breaks remote images.
- *   abort  — Playwright route.abort (clean net::ERR_FAILED)
- *   block  — CDP Network.setBlockedURLs for *static.dotgg.gg* (sandbox-like)
- *   hang   — never respond (pending loads; closer to some corporate proxies)
- *   404    — fulfill HTTP 404
- * Default: block+abort — block first (matches owner sandbox), abort as belt.
+ *   hang   — never respond (DEFAULT). Matches sandbox that drops CDN packets;
+ *            start fingerprint ~1478 nodes / 328 listeners; ~24× growth over 20 cycles.
+ *   abort  — Playwright route.abort (clean failure — does NOT reproduce the leak)
+ *   block  — CDP Network.setBlockedURLs (also clean — does NOT reproduce)
+ *   404    — fulfill HTTP 404 (clean — does NOT reproduce)
+ *   block+abort — CDP block + route abort (clean — does NOT reproduce)
+ *
+ * Empirically only pending/hung loads reproduce the owner-reported retention.
  */
 const IMAGE_FAIL_STYLE = (() => {
-  const raw = String(process.env.LISTENER_LEAK_IMAGES_FAIL_STYLE || "block").toLowerCase();
-  if (["abort", "block", "hang", "404", "block+abort"].includes(raw)) return raw;
+  const raw = String(
+    process.env.LISTENER_LEAK_IMAGES_FAIL_STYLE || "hang",
+  ).toLowerCase();
+  if (["abort", "block", "hang", "404", "block+abort"].includes(raw))
+    return raw;
   console.warn(
-    `LISTENER_LEAK_IMAGES_FAIL_STYLE=${raw} not recognized — using block`,
+    `LISTENER_LEAK_IMAGES_FAIL_STYLE=${raw} not recognized — using hang`,
   );
-  return "block";
+  return "hang";
 })();
 
 /**
@@ -1681,7 +1719,9 @@ async function runHarness() {
         "WeakRef probe: ON (refs[] holds WeakRef(node) only — not Element handles)",
       );
     } else {
-      console.log("WeakRef probe: OFF (LISTENER_LEAK_PROBE=0) — metrics-only mode");
+      console.log(
+        "WeakRef probe: OFF (LISTENER_LEAK_PROBE=0) — metrics-only mode",
+      );
     }
     console.log(
       `Heap snapshots: ${ENABLE_SNAPSHOT ? "ON (may dump at end/on fail)" : "OFF (LISTENER_LEAK_SNAPSHOT=0)"}`,
@@ -1728,9 +1768,7 @@ async function runHarness() {
     if (ENABLE_LISTENER_ATTR) {
       const attrStart = await readListenerAttribution(page);
       if (attrStart) {
-        console.log(
-          `listenerAttr @ start: totalInstalls=${attrStart.total}`,
-        );
+        console.log(`listenerAttr @ start: totalInstalls=${attrStart.total}`);
         console.log("listenerAttr byType:", JSON.stringify(attrStart.byType));
         console.log(
           "listenerAttr topSites:",
@@ -1738,7 +1776,6 @@ async function runHarness() {
         );
       }
     }
-
 
     const startupNodeDelta = rows[0].nodes - preStart.nodes;
     const startupListenerDelta = rows[0].listeners - preStart.listeners;
@@ -1867,7 +1904,6 @@ async function runHarness() {
             );
           }
         }
-
 
         if (
           ENABLE_PROBE &&
