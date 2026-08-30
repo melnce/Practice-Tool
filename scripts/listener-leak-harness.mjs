@@ -241,6 +241,9 @@ async function readLiveState(page) {
     const redHand = document.querySelectorAll("#redHand .card").length;
     const blueBoard = document.querySelectorAll("#blueBoard .card").length;
     const redBoard = document.querySelectorAll("#redBoard .card").length;
+    // Fail-closed: if LISTENER_LEAK_RETAIN injector is present, surface it in
+    // every sample so probe-off curves cannot be mistaken for an app leak.
+    const retainBucket = window.__leakRetainBucket;
     return {
       phase: s?.phase ?? null,
       gameStarted: !!s?.gameStarted,
@@ -258,7 +261,83 @@ async function readLiveState(page) {
       allElements: document.querySelectorAll("*").length,
       // Back-compat alias used by older log lines.
       handCards: blueHand + redHand,
+      retainBucketLen: Array.isArray(retainBucket) ? retainBucket.length : null,
     };
+  });
+}
+
+/**
+ * Audit known JS roots that can retain detached card DOM. Printed on every
+ * retention dump so we can name a file:line instead of DOMStringMap self-edges.
+ */
+async function auditKnownDomRoots(page) {
+  return page.evaluate(() => {
+    const out = {
+      retainBucketLen: Array.isArray(window.__leakRetainBucket)
+        ? window.__leakRetainBucket.length
+        : null,
+      weakProbeTracked: window.__leakWeakProbe?.refs?.length ?? null,
+      weakProbeAlive: null,
+      // Probe module-scope tooltip session via a temporary hook if exposed.
+      activeSessionConnected: null,
+      activeSessionExists: null,
+      floatingActiveTargets: null,
+      floatingActiveEls: null,
+      windowElementArrayProps: [],
+    };
+    try {
+      const refs = window.__leakWeakProbe?.refs;
+      if (Array.isArray(refs)) {
+        let alive = 0;
+        for (const r of refs) {
+          try {
+            if (r && typeof r.deref === "function" && r.deref()) alive += 1;
+          } catch {
+            /* ignore */
+          }
+        }
+        out.weakProbeAlive = alive;
+      }
+    } catch {
+      /* ignore */
+    }
+    try {
+      const audit = window.__svwbTest?.auditLeakRoots?.();
+      if (audit) {
+        out.activeSessionExists = !!audit.tooltipSessionExists;
+        out.activeSessionConnected = audit.tooltipSessionConnected;
+        out.floatingActiveTargets = audit.floatingTracked;
+        out.floatingActiveEls = audit.floatingDom;
+        out.floatingTimers = audit.floatingTimers;
+        out.tooltipSessionUid = audit.tooltipSessionUid ?? null;
+      }
+    } catch {
+      /* ignore */
+    }
+    // Scan enumerable window props for Arrays/Sets that hold Elements (common leak shape).
+    try {
+      for (const key of Object.getOwnPropertyNames(window)) {
+        if (key === "__leakRetainBucket" || key === "__leakWeakProbe") continue;
+        let v;
+        try {
+          v = window[key];
+        } catch {
+          continue;
+        }
+        if (!v) continue;
+        if (Array.isArray(v) && v.length > 0 && v.some((x) => x instanceof Element)) {
+          out.windowElementArrayProps.push({
+            key,
+            len: v.length,
+            detached: v.filter((x) => x instanceof Element && !x.isConnected)
+              .length,
+          });
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    return out;
   });
 }
 
@@ -436,14 +515,16 @@ async function undoRedo(page) {
 
 function printTable(rows) {
   const header =
-    "| checkpoint | DOM nodes | JS event listeners | JS heap | hand(both) | blueH | redH | board | cards | phase | turn |";
-  const sep = "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|";
+    "| checkpoint | DOM nodes | JS event listeners | JS heap | hand(both) | blueH | redH | board | cards | phase | turn | retainBucket |";
+  const sep = "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|";
   console.log(header);
   console.log(sep);
   for (const r of rows) {
     const L = r.live || {};
+    const bucket =
+      L.retainBucketLen == null ? "—" : String(L.retainBucketLen);
     console.log(
-      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB | ${L.handCardsBoth ?? L.handCards ?? "?"} | ${L.blueHand ?? "?"} | ${L.redHand ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} |`,
+      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB | ${L.handCardsBoth ?? L.handCards ?? "?"} | ${L.blueHand ?? "?"} | ${L.redHand ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} | ${bucket} |`,
     );
   }
 }
@@ -627,9 +708,53 @@ function summarizeDetachedRetainers(snap) {
     return detI >= 0 && nodes[ord * nfc + detI] === 2;
   }
 
+  /** Native DOM wrappers / internal nodes are self-edges of the element — walk past them. */
+  function isNativeDomWrapperName(name) {
+    if (typeof name !== "string") return false;
+    return (
+      name === "DOMStringMap" ||
+      name === "DOMTokenList" ||
+      name === "NamedNodeMap" ||
+      name === "CSSStyleDeclaration" ||
+      name === "HTMLCollection" ||
+      name === "NodeList" ||
+      name === "InternalNode" ||
+      name.startsWith("InternalNode") ||
+      name === "Detached InternalNode" ||
+      name === "system / Document" ||
+      name === "system / Node"
+    );
+  }
+
+  function isDevToolsNoiseName(name) {
+    if (typeof name !== "string") return false;
+    return (
+      name.includes("DevTools") ||
+      name.includes("devtools") ||
+      name === "(Global handles)" ||
+      name.includes("Global handles") ||
+      name.includes("V8EventListener") ||
+      name.includes("Inspector")
+    );
+  }
+
+  function isGcRootName(name) {
+    if (typeof name !== "string") return false;
+    return (
+      name === "Window" ||
+      name === "(GC roots)" ||
+      name.startsWith("Window /") ||
+      name.startsWith("Window [") ||
+      name.startsWith("Window / ") ||
+      name.includes("JSGlobalObject")
+    );
+  }
+
   /**
    * Lower is better. Prefer edges that ESCAPE the detached island toward a
-   * GC root (Window / Array / Map / Set / property), not sibling DOM walks.
+   * named JS root (Window property / Array / Map / Set / closure context),
+   * walking PAST native DOM wrappers (DOMStringMap / DOMTokenList / InternalNode)
+   * and preferring real app edges over DevTools Global-handle noise.
    */
   function edgeScore(r) {
     if (r.type === "weak") return 1000;
@@ -637,12 +762,29 @@ function summarizeDetachedRetainers(snap) {
     const islandPenalty = fromDet ? 200 : 0;
     const fromName = strings[nodes[r.from * nfc + nameI]];
     const fromType = nodeTypes[nodes[r.from * nfc + typeI]];
+    const edgeName = String(r.name || "");
+
+    // Strong preference for known app / injector roots by property name.
+    if (
+      r.type === "property" &&
+      (/__leakRetain/i.test(edgeName) ||
+        edgeName === "activeSession" ||
+        edgeName === "activeByTarget" ||
+        edgeName === "refs" ||
+        edgeName === "__leakWeakProbe")
+    ) {
+      return islandPenalty + (isGcRootName(fromName) ? 0 : 1);
+    }
+
+    if (isDevToolsNoiseName(fromName) || isDevToolsNoiseName(edgeName)) {
+      return islandPenalty + 500;
+    }
+    if (isNativeDomWrapperName(fromName)) {
+      return islandPenalty + 400;
+    }
+
     if (r.type === "property") {
-      if (
-        fromName === "Window" ||
-        (typeof fromName === "string" && fromName.startsWith("Window"))
-      )
-        return islandPenalty + 0;
+      if (isGcRootName(fromName)) return islandPenalty + 0;
       if (
         fromName === "Array" ||
         fromName === "Object" ||
@@ -651,50 +793,77 @@ function summarizeDetachedRetainers(snap) {
         fromName === "(GC roots)"
       )
         return islandPenalty + 1;
-      if (fromType === "object" || fromType === "closure")
-        return islandPenalty + 3;
+      if (fromType === "closure") return islandPenalty + 2;
+      if (fromType === "object") return islandPenalty + 3;
       return islandPenalty + 5;
     }
-    if (r.type === "context") return islandPenalty + 40;
+    if (r.type === "context") {
+      // Closure context — often the real retainer past the element.
+      return islandPenalty + (fromType === "closure" ? 8 : 20);
+    }
     if (r.type === "element" || r.type === "shortcut") {
       return islandPenalty + (fromDet ? 80 : 15);
     }
-    if (r.type === "internal") return islandPenalty + 30;
+    if (r.type === "internal") {
+      // Prefer skipping DevTools "internal: N / DevTools console" edges.
+      if (/devtools/i.test(edgeName) || /console/i.test(edgeName)) {
+        return islandPenalty + 480;
+      }
+      return islandPenalty + 30;
+    }
     return islandPenalty + 50;
   }
 
-  function walkRetainerPath(startOrd, maxDepth = 16) {
+  function walkRetainerPath(startOrd, maxDepth = 24) {
     const path = [];
     let cur = startOrd;
     const seen = new Set();
     for (let d = 0; d < maxDepth; d++) {
       if (seen.has(cur)) break;
       seen.add(cur);
+      const curName = strings[nodes[cur * nfc + nameI]];
       const cand = (retainers[cur] || []).filter(
         (r) => !seen.has(r.from) && r.type !== "weak",
       );
       if (!cand.length) {
-        path.push({ root: describe(cur) });
+        // Do not terminate on native wrappers — report as unresolved wrapper.
+        if (isNativeDomWrapperName(curName)) {
+          path.push({
+            root: describe(cur),
+            unresolvedNativeWrapper: true,
+          });
+        } else {
+          path.push({ root: describe(cur) });
+        }
         break;
       }
       cand.sort((a, b) => edgeScore(a) - edgeScore(b));
-      const pick = cand[0];
+      // Prefer non-wrapper / non-devtools parents when scores tie-ish.
+      let pick = cand[0];
+      for (const c of cand.slice(0, 8)) {
+        const fn = strings[nodes[c.from * nfc + nameI]];
+        if (isNativeDomWrapperName(fn) || isDevToolsNoiseName(fn)) continue;
+        if (edgeScore(c) <= edgeScore(pick) + 50) {
+          pick = c;
+          break;
+        }
+      }
       path.push({
         node: describe(cur),
         via: `${pick.type}:${pick.name}`,
         from: describe(pick.from),
         fromDetached: isDetachedOrd(pick.from),
+        fromNativeWrapper: isNativeDomWrapperName(
+          strings[nodes[pick.from * nfc + nameI]],
+        ),
       });
       cur = pick.from;
       const fromName = strings[nodes[cur * nfc + nameI]];
-      if (
-        fromName === "Window" ||
-        fromName === "(GC roots)" ||
-        (typeof fromName === "string" &&
-          (fromName.startsWith("Window /") ||
-            fromName.startsWith("Window [JSGlobalObject]")))
-      )
-        break;
+      // Keep walking through native wrappers even if they look "root-like".
+      if (isNativeDomWrapperName(fromName)) continue;
+      if (isGcRootName(fromName)) break;
+      // Meaningful Window property reached (e.g. Array <--property:__leakRetainBucket-- Window)
+      // already broken via isGcRootName when we step onto Window.
     }
     return path;
   }
@@ -958,6 +1127,20 @@ function hintSrcFromListenerLoc(loc) {
  */
 async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) {
   console.log("\n=== Phase 1 retainer dump (" + reason + ") ===");
+  const knownRoots = await auditKnownDomRoots(page);
+  console.log("Known DOM roots audit:", JSON.stringify(knownRoots, null, 2));
+  if (knownRoots.retainBucketLen != null && knownRoots.retainBucketLen > 0) {
+    console.log(
+      `NOTE: window.__leakRetainBucket length=${knownRoots.retainBucketLen} — LISTENER_LEAK_RETAIN injector is retaining replaced nodes (self-test only).`,
+    );
+  }
+  if (knownRoots.windowElementArrayProps?.length) {
+    console.log(
+      "Window props holding Elements:",
+      JSON.stringify(knownRoots.windowElementArrayProps, null, 2),
+    );
+  }
+
   const marked = await markWeakRefSurvivors(page);
   console.log("Marked WeakRef survivors:", marked);
 
@@ -973,7 +1156,11 @@ async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) 
   const outPath = join(OUT_DIR, `retention-${reason}-c${cycle}-${Date.now()}.json`);
   writeFileSync(
     outPath,
-    JSON.stringify({ reason, cycle, probe, rows, listenerLocs, summary }, null, 2),
+    JSON.stringify(
+      { reason, cycle, probe, rows, knownRoots, listenerLocs, summary },
+      null,
+      2,
+    ),
   );
   console.log(`Wrote ${outPath}`);
   console.log(
@@ -1010,6 +1197,15 @@ async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) 
       (sh.includes("system / Map") && sh.includes("floating"))
     ) {
       tag = "read-candidate: floatingCombatText.ts activeByTarget Map";
+    } else if (
+      /DOMStringMap|DOMTokenList|InternalNode|NamedNodeMap|CSSStyleDeclaration/.test(
+        sh,
+      )
+    ) {
+      tag =
+        "native-wrapper-self-edge (walker should have skipped — treat as unresolved)";
+    } else if (sh.includes("(Global handles)") || /DevTools/i.test(sh)) {
+      tag = "devtools/global-handle noise (not an app retainer)";
     } else if (sh.includes("system / Map") || sh.includes("system / Set")) {
       tag = "measured: Map/Set GC root — resolve property name on path";
     } else if (sh.includes("EventListener") || sh.includes("V8EventListener")) {
@@ -1161,6 +1357,18 @@ async function runHarness() {
     console.log(
       `Startup deltas (info): nodes +${startupNodeDelta}, listeners +${startupListenerDelta} (not a fail threshold; full hands add hundreds)`,
     );
+    if (INJECT_RETAIN) {
+      console.log(
+        `LISTENER_LEAK_RETAIN=1: retainBucketLen=${liveStart.retainBucketLen} — expect elevated start baseline (~1478 nodes / ~328 listeners) and linear growth (self-test).`,
+      );
+    } else if (
+      liveStart.retainBucketLen != null &&
+      liveStart.retainBucketLen > 0
+    ) {
+      throw new Error(
+        `FAIL: soak is not exercising a live game (retain-injector-active-without-flag): retainBucketLen=${liveStart.retainBucketLen} but LISTENER_LEAK_RETAIN!=1 — aborting to avoid false retention signal`,
+      );
+    }
 
     // --- Live-game assertions (false-negative guard) ---
     assertLiveGame(

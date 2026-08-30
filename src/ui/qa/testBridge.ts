@@ -12,6 +12,7 @@ import {
   _getFallbackTimerCount,
   syncFloatingCombatTextFromLogs,
 } from "../floatingCombatText.js";
+import { __auditTooltipSessionForLeakHarness } from "../tooltips.js";
 import type {
   CardInstance,
   GameState,
@@ -43,6 +44,15 @@ export interface SvwbTestBridge {
     dom: number;
     tracked: number;
     timers: number;
+  };
+  /** Leak-harness audit: named JS roots that can retain detached card DOM. */
+  auditLeakRoots(): {
+    tooltipSessionExists: boolean;
+    tooltipSessionConnected: boolean | null;
+    tooltipSessionUid: string | null;
+    floatingTracked: number;
+    floatingDom: number;
+    floatingTimers: number;
   };
   advanceToTurn(round: number, activePlayer?: Player): void;
   render(): void;
@@ -159,6 +169,18 @@ function installBridge(): void {
         dom: document.querySelectorAll(".floating-combat-text").length,
         tracked: _getActiveFloaterCount(),
         timers: _getFallbackTimerCount(),
+      };
+    },
+
+    auditLeakRoots() {
+      const tip = __auditTooltipSessionForLeakHarness();
+      return {
+        tooltipSessionExists: tip.exists,
+        tooltipSessionConnected: tip.connected,
+        tooltipSessionUid: tip.uid,
+        floatingTracked: _getActiveFloaterCount(),
+        floatingDom: document.querySelectorAll(".floating-combat-text").length,
+        floatingTimers: _getFallbackTimerCount(),
       };
     },
 

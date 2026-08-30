@@ -184,6 +184,20 @@ type TooltipSession = {
 
 let activeSession: TooltipSession | null = null;
 
+/** Test/harness-only: expose tooltip session so retainer dumps can name this root. */
+export function __auditTooltipSessionForLeakHarness(): {
+  exists: boolean;
+  connected: boolean | null;
+  uid: string | null;
+} {
+  if (!activeSession) return { exists: false, connected: null, uid: null };
+  return {
+    exists: true,
+    connected: !!activeSession.anchor?.isConnected,
+    uid: activeSession.uid ?? null,
+  };
+}
+
 function hideTooltip(tooltipEl: HTMLElement) {
   tooltipEl.style.display = "none";
 }
