@@ -33,6 +33,7 @@
  *   LISTENER_LEAK_DUMP_SNAPSHOT=1  always dump detached retainer summary
  *   LISTENER_LEAK_PROBE=0       disable WeakRef probe entirely (metrics-only confound check)
  *   LISTENER_LEAK_SNAPSHOT=0    never take heap snapshots (also skips Debugger.enable)
+ *   LISTENER_LEAK_ATTR=1        wrap addEventListener + IDL on* setters; tally by type+site
  *
  * Probe contract: window.__leakWeakProbe.refs holds WeakRef(node) ONLY — never
  * bare Element handles. A strongly-held Array of WeakRefs does not keep nodes
@@ -69,6 +70,9 @@ const DUMP_SNAPSHOT =
   ENABLE_SNAPSHOT &&
   (process.env.LISTENER_LEAK_DUMP_SNAPSHOT === "1" || INJECT_RETAIN);
 const SAMPLE_EVERY = Number(process.env.LISTENER_LEAK_SAMPLE_EVERY || 10);
+/** Wrap addEventListener + IDL on* setters; dump tallies at each sample. */
+const ENABLE_LISTENER_ATTR = process.env.LISTENER_LEAK_ATTR === "1";
+
 /** Match reporter: both deck selects by option index (default 1). */
 const DECK_INDEX = Number(process.env.LISTENER_LEAK_DECK_INDEX ?? 1);
 const CHROME =
@@ -164,6 +168,163 @@ async function forceGc(cdp, page) {
  * entries do not prevent GC of their targets. (Contrast LISTENER_LEAK_RETAIN,
  * which strongly pushes nodes into __leakRetainBucket.)
  */
+
+/**
+ * Attribute listener growth: wrap addEventListener AND IDL on* property
+ * setters (tooltips use onmouseenter/onmousemove/onmouseleave — not addEventListener).
+ * Tallies are cumulative installs since page load (not net of removes).
+ */
+async function installListenerAttribution(page) {
+  await page.addInitScript(() => {
+    if (window.__leakListenerAttr) return;
+    const tallies = new Map(); // key -> count
+    const byType = new Map();
+    let total = 0;
+
+    function siteFromStack(stack) {
+      if (!stack) return "(no-stack)";
+      const lines = String(stack).split("\n").map((l) => l.trim());
+      for (const line of lines) {
+        if (!line || line.startsWith("Error")) continue;
+        if (line.includes("installListenerAttribution")) continue;
+        if (line.includes("__leakListenerAttr")) continue;
+        if (line.includes("addEventListener") && line.includes("native")) continue;
+        // Strip leading "at "
+        const cleaned = line.replace(/^at\s+/, "");
+        // Prefer app bundle / src frames
+        if (
+          cleaned.includes("/assets/") ||
+          cleaned.includes("/src/") ||
+          cleaned.includes("main-") ||
+          cleaned.includes("index-")
+        ) {
+          return cleaned.slice(0, 180);
+        }
+      }
+      for (const line of lines) {
+        if (!line || line.startsWith("Error")) continue;
+        if (line.includes("__leakListenerAttr")) continue;
+        return line.replace(/^at\s+/, "").slice(0, 180);
+      }
+      return "(unknown)";
+    }
+
+    function record(kind, type, stack) {
+      total += 1;
+      byType.set(type, (byType.get(type) || 0) + 1);
+      const site = siteFromStack(stack);
+      const key = `${kind}:${type} @ ${site}`;
+      tallies.set(key, (tallies.get(key) || 0) + 1);
+    }
+
+    const proto = EventTarget.prototype;
+    const origAdd = proto.addEventListener;
+    proto.addEventListener = function leakAttrAdd(type, listener, options) {
+      try {
+        record("addEventListener", String(type), new Error().stack);
+      } catch {
+        /* ignore */
+      }
+      return origAdd.call(this, type, listener, options);
+    };
+
+    // IDL handler properties used by tooltips / face-down / crests / etc.
+    const idlProps = [
+      "onmouseenter",
+      "onmousemove",
+      "onmouseleave",
+      "onmouseover",
+      "onmouseout",
+      "onclick",
+      "oncontextmenu",
+      "ondragstart",
+      "ondragend",
+      "ondragover",
+      "ondrop",
+      "onanimationend",
+      "onerror",
+    ];
+    for (const prop of idlProps) {
+      const desc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, prop) ||
+        Object.getOwnPropertyDescriptor(Element.prototype, prop) ||
+        Object.getOwnPropertyDescriptor(window, prop);
+      // HTMLElement on* are typically on HTMLElement.prototype as accessors in Chrome
+      let targetProto = HTMLElement.prototype;
+      let existing = Object.getOwnPropertyDescriptor(targetProto, prop);
+      if (!existing) {
+        targetProto = Element.prototype;
+        existing = Object.getOwnPropertyDescriptor(targetProto, prop);
+      }
+      if (!existing || !existing.set) {
+        // Define a shadowing setter on HTMLElement that records then assigns
+        try {
+          Object.defineProperty(HTMLElement.prototype, prop, {
+            configurable: true,
+            enumerable: true,
+            get: existing && existing.get ? existing.get : function () { return this["__" + prop]; },
+            set: function (fn) {
+              try {
+                if (typeof fn === "function") {
+                  record("idl", prop.slice(2), new Error().stack);
+                }
+              } catch {
+                /* ignore */
+              }
+              if (existing && existing.set) existing.set.call(this, fn);
+              else this["__" + prop] = fn;
+            },
+          });
+        } catch {
+          /* ignore */
+        }
+        continue;
+      }
+      const origSet = existing.set;
+      const origGet = existing.get;
+      Object.defineProperty(targetProto, prop, {
+        configurable: true,
+        enumerable: existing.enumerable,
+        get: origGet ? function () { return origGet.call(this); } : undefined,
+        set: function (fn) {
+          try {
+            if (typeof fn === "function") {
+              record("idl", prop.slice(2), new Error().stack);
+            }
+          } catch {
+            /* ignore */
+          }
+          return origSet.call(this, fn);
+        },
+      });
+    }
+
+    window.__leakListenerAttr = {
+      total() {
+        return total;
+      },
+      snapshot() {
+        const top = [...tallies.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 25)
+          .map(([site, count]) => ({ count, site }));
+        const types = [...byType.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 20)
+          .map(([type, count]) => ({ count, type }));
+        return { total, topSites: top, byType: types };
+      },
+    };
+  });
+}
+
+async function readListenerAttribution(page) {
+  return page.evaluate(() => {
+    const a = window.__leakListenerAttr;
+    if (!a) return null;
+    return a.snapshot();
+  });
+}
+
 async function installWeakRefProbe(page) {
   await page.evaluate(() => {
     if (window.__leakWeakProbe) return;
@@ -1336,6 +1497,13 @@ async function runHarness() {
   let turnAtStart = null;
 
   try {
+    if (ENABLE_LISTENER_ATTR) {
+      await installListenerAttribution(page);
+      console.log(
+        "Listener attribution: ON (addEventListener + IDL on* setters; LISTENER_LEAK_ATTR=1)",
+      );
+    }
+
     await page.goto(`http://127.0.0.1:${PORT}/?test=1`, {
       waitUntil: "networkidle",
     });
@@ -1392,6 +1560,20 @@ async function runHarness() {
     console.log(
       `auditLeakRoots @ start: tipExists=${liveStart.tipExists} tipConnected=${liveStart.tipConnected} tipUid=${liveStart.tipUid} floatTracked=${liveStart.floatTracked} floatDom=${liveStart.floatDom} floatTimers=${liveStart.floatTimers} retainBucket=${liveStart.retainBucketLen}`,
     );
+    if (ENABLE_LISTENER_ATTR) {
+      const attrStart = await readListenerAttribution(page);
+      if (attrStart) {
+        console.log(
+          `listenerAttr @ start: totalInstalls=${attrStart.total}`,
+        );
+        console.log("listenerAttr byType:", JSON.stringify(attrStart.byType));
+        console.log(
+          "listenerAttr topSites:",
+          JSON.stringify(attrStart.topSites.slice(0, 15), null, 2),
+        );
+      }
+    }
+
 
     const startupNodeDelta = rows[0].nodes - preStart.nodes;
     const startupListenerDelta = rows[0].listeners - preStart.listeners;
@@ -1507,6 +1689,20 @@ async function runHarness() {
         console.log(
           `auditLeakRoots @ cycle ${cycle}: tipExists=${live.tipExists} tipConnected=${live.tipConnected} tipUid=${live.tipUid} floatTracked=${live.floatTracked} floatDom=${live.floatDom} floatTimers=${live.floatTimers} retainBucket=${live.retainBucketLen}`,
         );
+        if (ENABLE_LISTENER_ATTR) {
+          const attr = await readListenerAttribution(page);
+          if (attr) {
+            console.log(
+              `listenerAttr @ cycle ${cycle}: totalInstalls=${attr.total}`,
+            );
+            console.log("listenerAttr byType:", JSON.stringify(attr.byType));
+            console.log(
+              "listenerAttr topSites:",
+              JSON.stringify(attr.topSites.slice(0, 15), null, 2),
+            );
+          }
+        }
+
 
         if (
           ENABLE_PROBE &&
