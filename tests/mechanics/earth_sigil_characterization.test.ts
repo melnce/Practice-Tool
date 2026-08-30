@@ -12,6 +12,8 @@ import {
   whenRunEffects,
   thenBoard,
   findOnBoard,
+  thenHand,
+  thenDeck,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import {
@@ -19,7 +21,7 @@ import {
   hasEarthSigils,
 } from "../../src/logic/effects/ops/earth.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
-import { getShadows } from "../../src/core/playerHelpers.js";
+import { getGraveyard, getShadows } from "../../src/core/playerHelpers.js";
 import { initAmulet } from "../../src/logic/effects/ops/summon_ops/init.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -210,8 +212,79 @@ describe("Earth Sigil stack characterization", () => {
 
     const sigils = earthSigilsOnBoard();
     expect(sigils).toHaveLength(1);
+    expect(sigils[0]!.name).toBe("Witch's New Brew");
     expect(sigils[0]!.counters?.earth).toBe(3);
     expect(thenBoard("first")).toHaveLength(1);
+  });
+
+  describe("owner ruling — collectible Earth Sigil outranks token (2026-08-30)", () => {
+    it("Sediment stack 2 then play Brew: Brew survives at 3, Sediment to graveyard + 1 shadow", () => {
+      const sediment = createCard(MAGIC_SEDIMENT, "board", "first");
+      initAmulet(sediment);
+      sediment.counters = { earth: 2 };
+      state.players.first.board = [sediment];
+      state.players.first.graveyard = [];
+      state.players.first.shadows = 0;
+
+      givenGameState({ seed: 42, activePlayer: "first", roundCount: 6 })
+        .withFirstHand([WITCHS_NEW_BREW])
+        .withFirstPP(10, 10)
+        .withFirstBoard([sediment])
+        .build();
+      state.gameStarted = true;
+      state.phase = "main";
+      state.players.first.graveyard = [];
+      state.players.first.shadows = 0;
+
+      whenPlayCard("first", 0);
+
+      const brew = findOnBoard("first", "Witch's New Brew");
+      expect(brew).toBeDefined();
+      expect(brew!.counters?.earth).toBe(3);
+      expect(thenBoard("first")).toHaveLength(1);
+      expect(findOnBoard("first", "Magic Sediment")).toBeUndefined();
+      expect(getGraveyard(state, "first")).toHaveLength(1);
+      expect(getGraveyard(state, "first")[0]!.name).toBe("Magic Sediment");
+      expect(getShadows(state, "first")).toBe(1);
+    });
+
+    it("Brew on field then generate Sediment: Brew counter +1, board length unchanged", () => {
+      const brew = createCard(WITCHS_NEW_BREW, "board", "first");
+      initAmulet(brew);
+      brew.counters = { earth: 1 };
+      state.players.first.board = [brew];
+      const boardLenBefore = thenBoard("first").length;
+
+      summonMagicSediments(1);
+
+      expect(thenBoard("first")).toHaveLength(boardLenBefore);
+      expect(findOnBoard("first", "Witch's New Brew")).toBe(brew);
+      expect(findOnBoard("first", "Magic Sediment")).toBeUndefined();
+      expect(brew.counters?.earth).toBe(2);
+    });
+
+    it("Brew Fanfare (draw 1) still fires when absorbing an existing Sediment stack", () => {
+      const sediment = createCard(MAGIC_SEDIMENT, "board", "first");
+      initAmulet(sediment);
+      sediment.counters = { earth: 2 };
+
+      givenGameState({ seed: 42, activePlayer: "first", roundCount: 6 })
+        .withFirstHand([WITCHS_NEW_BREW])
+        .withFirstPP(10, 10)
+        .withFirstBoard([sediment])
+        .build();
+      state.gameStarted = true;
+      state.phase = "main";
+
+      const handBefore = thenHand("first").length;
+      const deckBefore = thenDeck("first").length;
+
+      whenPlayCard("first", 0);
+
+      expect(thenHand("first").length).toBe(handBefore);
+      expect(thenDeck("first").length).toBe(deckBefore - 1);
+      expect(findOnBoard("first", "Witch's New Brew")?.counters?.earth).toBe(3);
+    });
   });
 
   it("Magic Sediment Engage (1) adds 1 to the stack", () => {

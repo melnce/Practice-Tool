@@ -9,9 +9,14 @@ import {
   getGraveyard,
   addShadows,
 } from "../../../../core/playerHelpers.js";
+import { getGlobalCardIndex } from "../../../../data/cardIndex.js";
 import { isAmulet } from "./utils.js";
 
 const EARTH_SIGIL_TRIBE = "Earth Sigil";
+
+// Lower rank = higher merge priority (collectible outranks token).
+const RANK_COLLECTIBLE_EARTH_SIGIL = 0;
+const RANK_TOKEN_EARTH_SIGIL = 1;
 
 // =============== Earth Sigil identity (data-driven) ===============
 
@@ -21,6 +26,63 @@ export function isEarthSigil(
   if (!card || !isAmulet(card as CardInstance)) return false;
   const tribes = Array.isArray(card.tribes) ? card.tribes : [];
   return tribes.some((tribe) => String(tribe) === EARTH_SIGIL_TRIBE);
+}
+
+/** Token-registry Earth Sigil (e.g. Magic Sediment) vs collectible pool (e.g. Witch's New Brew). */
+export function isTokenEarthSigil(
+  card: CardInstance | CardTemplate | null | undefined,
+) {
+  if (!card) return false;
+
+  const index = getGlobalCardIndex();
+  const name = String(card.name ?? "");
+  if (index && name && index.tokensByName.has(name)) {
+    return true;
+  }
+
+  const id = String(card.id ?? "");
+  // Tokens are published in set Basic A (ids beginning with 9).
+  return /^9/.test(id);
+}
+
+function earthSigilSurvivorRank(card: CardInstance | CardTemplate): number {
+  return isTokenEarthSigil(card)
+    ? RANK_TOKEN_EARTH_SIGIL
+    : RANK_COLLECTIBLE_EARTH_SIGIL;
+}
+
+function boardIndexOf(board: CardInstance[], card: CardInstance) {
+  const idx = board.indexOf(card);
+  return idx >= 0 ? idx : Number.MAX_SAFE_INTEGER;
+}
+
+/** Pick the Earth Sigil that should survive a merge (collectible > token; tie = oldest on board). */
+export function pickEarthSigilSurvivor(
+  sigils: CardInstance[],
+  board: CardInstance[],
+) {
+  if (!sigils.length) return null;
+
+  let survivor = sigils[0]!;
+  let survivorRank = earthSigilSurvivorRank(survivor);
+  let survivorIndex = boardIndexOf(board, survivor);
+
+  for (let i = 1; i < sigils.length; i++) {
+    const candidate = sigils[i]!;
+    const candidateRank = earthSigilSurvivorRank(candidate);
+    const candidateIndex = boardIndexOf(board, candidate);
+
+    if (
+      candidateRank < survivorRank ||
+      (candidateRank === survivorRank && candidateIndex < survivorIndex)
+    ) {
+      survivor = candidate;
+      survivorRank = candidateRank;
+      survivorIndex = candidateIndex;
+    }
+  }
+
+  return survivor;
 }
 
 // Return how many earth counters a card *starts* with, based on its keywords
@@ -46,12 +108,13 @@ function earthSigilsOnBoard(board: CardInstance[]) {
   return board.filter(isEarthSigil);
 }
 
-// Oldest Earth Sigil on board (board order = entry order).
+// Preferred merge target: collectible Earth Sigil on board, else oldest token.
 export function findEarthSigilTarget(board: CardInstance[]) {
-  return earthSigilsOnBoard(board)[0] ?? null;
+  const sigils = earthSigilsOnBoard(board);
+  return pickEarthSigilSurvivor(sigils, board);
 }
 
-// Add one earth counter to the oldest Earth Sigil, if present.
+// Add one earth counter to the preferred Earth Sigil, if present.
 // Returns true if merged into an existing amulet (no new card should be created).
 export function tryMergeIntoExistingEarthSigil(board: CardInstance[]) {
   const target = findEarthSigilTarget(board);
@@ -90,65 +153,52 @@ function removeEarthSigilsFromBoard(
   }
 }
 
-// When an Earth Sigil amulet enters via play, merge counters from other
-// Earth Sigils on the board into the entering card and remove the old ones.
-export function mergeEarthSigilOnPlay(entering: CardInstance, owner: Player) {
-  if (!isEarthSigil(entering)) return;
-
-  const board = getBoard(state, owner);
-  const enteringIndex = board.lastIndexOf(entering);
-  if (enteringIndex < 0) return;
-
-  const toRemove: number[] = [];
-  for (let i = 0; i < board.length; i++) {
-    if (i === enteringIndex) continue;
-    const card = board[i];
-    if (card && isEarthSigil(card)) toRemove.push(i);
-  }
-  if (!toRemove.length) return;
-
-  const absorbed = sumCounters(
-    toRemove.map((idx) => board[idx]!).filter(Boolean),
-  );
-  entering.counters = entering.counters || {};
-  for (const [key, value] of Object.entries(absorbed)) {
-    entering.counters[key] = (entering.counters[key] || 0) + value;
-  }
-
-  removeEarthSigilsFromBoard(board, owner, toRemove);
-}
-
-// Helper function to merge sigils into the oldest survivor
-export function mergeSigils(
+function mergeEarthSigilsOntoSurvivor(
   board: CardInstance[],
-  sigilsToMerge: CardInstance[],
+  owner: Player,
+  sigils: CardInstance[],
 ) {
-  if (sigilsToMerge.length <= 1) return;
+  if (sigils.length <= 1) return;
 
-  const survivor = sigilsToMerge[0];
+  const survivor = pickEarthSigilSurvivor(sigils, board);
   if (!survivor) return;
 
-  const absorbed = sumCounters(sigilsToMerge);
+  const absorbed = sumCounters(sigils);
   survivor.counters = survivor.counters || {};
   for (const [key, value] of Object.entries(absorbed)) {
     survivor.counters[key] = value;
   }
 
   const toRemove: number[] = [];
-  for (let i = 1; i < sigilsToMerge.length; i++) {
-    const sigil = sigilsToMerge[i];
-    if (!sigil) continue;
+  for (const sigil of sigils) {
+    if (sigil === survivor) continue;
     const idx = board.indexOf(sigil);
     if (idx !== -1) toRemove.push(idx);
   }
   if (!toRemove.length) return;
 
-  const owner = survivor.owner ?? "first";
   removeEarthSigilsFromBoard(board, owner, toRemove);
 }
 
+// When an Earth Sigil amulet enters via play, merge all Earth Sigils on the
+// board into the ranked survivor (collectible outranks token).
+export function mergeEarthSigilOnPlay(_entering: CardInstance, owner: Player) {
+  const board = getBoard(state, owner);
+  const sigils = earthSigilsOnBoard(board);
+  mergeEarthSigilsOntoSurvivor(board, owner, sigils);
+}
+
+// Helper function to merge sigils into the ranked survivor
+export function mergeSigils(
+  board: CardInstance[],
+  sigilsToMerge: CardInstance[],
+) {
+  if (sigilsToMerge.length <= 1) return;
+  const owner = sigilsToMerge[0]?.owner ?? "first";
+  mergeEarthSigilsOntoSurvivor(board, owner, sigilsToMerge);
+}
+
 // After any summon that could touch Earth Sigils, merge duplicates down to one.
-// Oldest sigil on board survives; all earth counters are summed onto it.
 export function dedupeEarthSigils(board: CardInstance[]) {
   const sigils = earthSigilsOnBoard(board);
   if (sigils.length <= 1) return;
