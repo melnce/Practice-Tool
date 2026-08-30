@@ -59,7 +59,8 @@
     "test:e2e": "playwright test --project=e2e",
     "test:qa": "playwright test --project=qa",
     "test:listener-leak": "npx tsx scripts/listener-leak-harness.mjs",
-    "test:listener-leak:images-fail": "LISTENER_LEAK_REMOTE_IMAGES=hang LISTENER_LEAK_PROBE=0 LISTENER_LEAK_SNAPSHOT=0 LISTENER_LEAK_CYCLES=20 LISTENER_LEAK_PORT=8886 npx tsx scripts/listener-leak-harness.mjs"
+    "test:listener-leak:images-fail": "LISTENER_LEAK_IMAGES=fail LISTENER_LEAK_PROBE=0 LISTENER_LEAK_SNAPSHOT=0 LISTENER_LEAK_CYCLES=20 LISTENER_LEAK_PORT=8886 npx tsx scripts/listener-leak-harness.mjs",
+    "test:listener-leak:images-fulfil": "LISTENER_LEAK_IMAGES=fulfil LISTENER_LEAK_PROBE=0 LISTENER_LEAK_SNAPSHOT=0 LISTENER_LEAK_CYCLES=20 LISTENER_LEAK_PORT=8887 npx tsx scripts/listener-leak-harness.mjs"
   },
   "keywords": [],
   "author": "",
