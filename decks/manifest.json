@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-30T15:10:34.188Z",
+  "generatedAt": "2026-08-30T20:07:58.663Z",
   "entries": [
     {
       "file": "abysscraft_necromancy.json",
@@ -35,6 +35,12 @@
       "file": "havencraft_countdown.json",
       "id": "havencraft_countdown",
       "label": "Haven Countdown Amulets",
+      "category": "deck"
+    },
+    {
+      "file": "portalcraft_artifact_rotation.json",
+      "id": "portalcraft_artifact_rotation",
+      "label": "Portal Artifact (rotation)",
       "category": "deck"
     },
     {
