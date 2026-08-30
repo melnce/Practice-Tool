@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-29T22:53:43.095Z",
+  "generatedAt": "2026-08-30T14:20:53.550Z",
   "entries": [
     {
       "file": "abysscraft_necromancy.json",
@@ -41,6 +41,12 @@
       "file": "portalcraft_artifacts.json",
       "id": "portalcraft_artifacts",
       "label": "Portal Artifact Forge",
+      "category": "deck"
+    },
+    {
+      "file": "runecraft_sephie_test_subject.json",
+      "id": "runecraft_sephie_test_subject",
+      "label": "Rune Sephie Test Subject",
       "category": "deck"
     },
     {
