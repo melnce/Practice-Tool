@@ -109,20 +109,27 @@ function buildPartnerPool(owner: Player, initiator: CardInstance) {
 export function opStartFuseFromCard(eff: any, owner: Player) {
   const hand = handOf(owner);
   const initiatorUid = eff?.initiator_uid;
-  if (!initiatorUid) return;
+  if (!initiatorUid) {
+    adapter.notifyBlocked("Fuse failed: no initiator.");
+    return;
+  }
 
   const initiator = hand.find((c) => c?.uid === initiatorUid);
-  if (!initiator) return;
+  if (!initiator) {
+    adapter.notifyBlocked("Fuse failed: card is not in hand.");
+    return;
+  }
 
   if (alreadyFusedThisTurn(initiator)) {
-    console.warn("[Fuse] This copy already fused this turn.");
+    const reason = "Already fused this turn.";
+    console.warn("[Fuse]", reason);
+    adapter.notifyBlocked(reason);
     logEvent("fuseBlocked", {
       owner,
       reason: "already_fused_this_turn",
       initiator: initiator?.name,
     });
     clearSelectableFlags();
-    // Render removed - UI layer
     return "done";
   }
 
@@ -138,9 +145,14 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
   }
 
   // --- Generic Fuse: Cards (any hand card, no recipe whitelist) ---
+  // Owner ruling 2026-08-29: fuse as many cards as you want to ONE host ONCE
+  // per turn. Multi-select + confirm (same pattern as recipe finalize_op).
   if (hasFuseCardsCapability(initiator)) {
     const pool = hand.filter((c) => c?.uid !== initiator.uid);
-    if (!pool.length) return;
+    if (!pool.length) {
+      adapter.notifyBlocked("No other cards in hand to fuse.");
+      return;
+    }
 
     setPendingTarget({
       eff: {
@@ -152,9 +164,11 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
       owner,
       sourceCard: initiator,
       pool,
-      selectCount: 1,
+      selectCount: pool.length,
       targets: [],
       resumeEffects: [],
+      requiresConfirmation: true,
+      confirmationText: "Fuse Selected Cards",
     });
     logEvent("fuseOpen", {
       owner,
@@ -171,7 +185,10 @@ export function opStartFuseFromCard(eff: any, owner: Player) {
 
   // --- Generic single/multi partner path (honors recipe.finalize_op) ---
   const info = buildPartnerPool(owner, initiator);
-  if (!info) return;
+  if (!info) {
+    adapter.notifyBlocked("No valid fuse partners in hand.");
+    return;
+  }
 
   // If recipe provides a custom finalize op, use a confirmable multi-select
   if (info.recipe?.finalize_op) {

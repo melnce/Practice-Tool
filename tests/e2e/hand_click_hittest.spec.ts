@@ -147,6 +147,8 @@ test.describe("Hand click hit-testing across viewports", () => {
           op: eff?.op ?? null,
           action: eff?.action ?? null,
           type: eff?.type ?? null,
+          requiresConfirmation: !!pending?.requiresConfirmation,
+          selectCount: pending?.selectCount ?? null,
         };
       });
 
@@ -156,6 +158,8 @@ test.describe("Hand click hit-testing across viewports", () => {
       expect(fuse.op).toBe("fuse");
       expect(fuse.action).toBe("finalize");
       expect(fuse.type).toBe("cards");
+      expect(fuse.requiresConfirmation).toBe(true);
+      expect(fuse.selectCount).toBeGreaterThanOrEqual(1);
     });
   }
 });

@@ -23,7 +23,10 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { startFuseFromHand } from "../../src/logic/index.js";
-import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import {
+  resolvePendingTarget,
+  forceCompleteOrFizzlePendingTarget,
+} from "../../src/logic/core/resolveTarget.js";
 import { fuse_finalize_cards } from "../../src/logic/effects/ops/fuse/fuse.cards.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { getPP } from "../../src/core/playerHelpers.js";
@@ -66,6 +69,10 @@ function setupFuseTurn(
 function fuseToInitiator(initiatorUid: string, partnerUid: string) {
   startFuseFromHand("first", initiatorUid);
   resolvePendingTarget(partnerUid);
+  // Fuse: Cards uses multi-select + confirm; force-complete with selected targets.
+  if (state.pendingTargetEffect) {
+    forceCompleteOrFizzlePendingTarget();
+  }
 }
 
 function subjectCount(): number {
@@ -228,6 +235,31 @@ describe("Mechanic Contract: Fuse: Cards", () => {
           .length,
       ).toBe(2);
       expectRealTestSubjectToken();
+    });
+
+    it("multi-select consumes all partners once and summons once at ≥2 PP", () => {
+      setupFuseTurn([SEPHIE, FILLER, FILLER, FILLER], 4);
+      const sephie = thenHand("first").find((c) => c.id === SEPHIE)!;
+      const mats = thenHand("first").filter((c) => c.id === FILLER);
+      expect(mats.length).toBe(3);
+
+      startFuseFromHand("first", sephie.uid);
+      const pending = state.pendingTargetEffect;
+      expect(pending?.requiresConfirmation).toBe(true);
+      expect(pending?.selectCount).toBe(3);
+
+      resolvePendingTarget(mats[0]!.uid);
+      resolvePendingTarget(mats[1]!.uid);
+      expect(state.pendingTargetEffect?.targetUids?.length).toBe(2);
+      forceCompleteOrFizzlePendingTarget();
+
+      expect(sephie.isFused).toBe(true);
+      expect(thenHand("first").some((c) => c.uid === mats[0]!.uid)).toBe(false);
+      expect(thenHand("first").some((c) => c.uid === mats[1]!.uid)).toBe(false);
+      expect(thenHand("first").some((c) => c.uid === mats[2]!.uid)).toBe(true);
+      expect(subjectCount()).toBe(1);
+      expect(getPP(state, "first")).toBe(2);
+      expect(sephie._fusedCards?.length).toBe(2);
     });
   });
 
