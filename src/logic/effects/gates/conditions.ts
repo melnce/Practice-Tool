@@ -39,10 +39,16 @@ import {
 // CONDITION EVALUATOR TYPE
 // =============================================================================
 
+/** Options for condition evaluation. `peek: true` is read-only (no state mutation). */
+export type ConditionEvalOptions = {
+  peek?: boolean;
+};
+
 export type ConditionEvaluator = (
   spec: UnifiedGateSpec,
   owner: Player,
   sourceCard: CardInstance | null,
+  options?: ConditionEvalOptions,
 ) => boolean;
 
 // =============================================================================
@@ -67,32 +73,59 @@ export function getConditionEvaluator(
   return conditionRegistry.get(name);
 }
 
-export function evaluateCondition(
+function runCondition(
   spec: UnifiedGateSpec,
   owner: Player,
   sourceCard: CardInstance | null,
+  options?: ConditionEvalOptions,
 ): boolean {
   const evaluator = conditionRegistry.get(spec.condition);
   if (!evaluator) {
     console.warn(`[Gate] Unknown condition: ${spec.condition}`);
     return false;
   }
-  return evaluator(spec, owner, sourceCard);
+  return evaluator(spec, owner, sourceCard, options);
+}
+
+/** Evaluate a gate condition during real effect execution (may spend resources). */
+export function evaluateCondition(
+  spec: UnifiedGateSpec,
+  owner: Player,
+  sourceCard: CardInstance | null,
+): boolean {
+  return runCondition(spec, owner, sourceCard, { peek: false });
+}
+
+/**
+ * Read-only gate probe — must not mutate game state.
+ * Used by canPlayCard / UI glow; anything reachable from preflight stays pure.
+ */
+export function peekCondition(
+  spec: UnifiedGateSpec,
+  owner: Player,
+  sourceCard: CardInstance | null,
+): boolean {
+  return runCondition(spec, owner, sourceCard, { peek: true });
 }
 
 // =============================================================================
 // RESOURCE CONDITIONS
 // =============================================================================
 
-registerCondition("necromancy", (spec, owner) => {
+registerCondition("necromancy", (spec, owner, _sourceCard, options) => {
   const need = Math.max(1, spec.cost || 1);
-  if (hasNecromancy(owner, need)) {
-    spendShadows(owner, need);
-    logEvent("necromancySpend", { owner, cost: need });
+  if (!hasNecromancy(owner, need)) {
+    if (!options?.peek) {
+      logEvent("necromancyBlocked", { owner, need });
+    }
+    return false;
+  }
+  if (options?.peek) {
     return true;
   }
-  logEvent("necromancyBlocked", { owner, need });
-  return false;
+  spendShadows(owner, need);
+  logEvent("necromancySpend", { owner, cost: need });
+  return true;
 });
 
 registerCondition("overflow", (_spec, owner) => isOverflow(owner));

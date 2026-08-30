@@ -213,6 +213,53 @@ describe("Owner ruling — spell playability vs follower/amulet select fizzle", 
     });
   });
 
+  describe("Soulforge (10973310) — mandatory select on non-highlander branch", () => {
+    it("empty enemy board with duplicate deck: blocked at preflight", () => {
+      setupTurn(R6, {
+        hand: ["10973310"],
+        pp: 4,
+        deck: ["10031310", "10031310"],
+      });
+      const soulforge = thenHand("first").find((c) => c.id === "10973310")!;
+      const ppBefore = thenPP("first");
+
+      const preflight = canPlayCard(soulforge, "first");
+      expect(preflight.ok).toBe(false);
+      if (!preflight.ok) {
+        expect(preflight.reason).toMatch(/target/i);
+      }
+
+      const outcome = whenPlayCard(
+        "first",
+        getHand(state, "first").indexOf(soulforge),
+      );
+      expect(outcome.kind).toBe("blocked");
+      expect(thenHand("first").some((c) => c.id === "10973310")).toBe(true);
+      expect(thenPP("first")).toBe(ppBefore);
+    });
+
+    it("with enemy follower and duplicate deck: playable", () => {
+      setupTurn(R6, {
+        hand: ["10973310"],
+        pp: 4,
+        deck: ["10031310", "10031310"],
+      });
+      const soulforge = thenHand("first").find((c) => c.id === "10973310")!;
+      enemyFollower(4);
+
+      expect(canPlayCard(soulforge, "first").ok).toBe(true);
+    });
+  });
+
+  describe("Alfheimr (10413310) — mode else branch must stay playable", () => {
+    it("empty board below SSA: still playable (mode pick, not field select)", () => {
+      setupTurn(R6, { hand: ["10413310"], pp: 2, deck: ["10111310"] });
+      const alfheimr = thenHand("first").find((c) => c.id === "10413310")!;
+
+      expect(canPlayCard(alfheimr, "first").ok).toBe(true);
+    });
+  });
+
   // Wasteland of Destruction (10372210) no-target fizzle: select_forced_ruling.test.ts
   describe("Amulet contrast — select fizzles on play, spell would be blocked", () => {
     it("Earrings of Sunlight (10761210) alone in hand: plays; hand return fizzles, still draws 1", () => {
