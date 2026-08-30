@@ -297,7 +297,18 @@ registerCondition("unique_tribe_enters", (spec, owner) => {
 registerCondition("named_enter_count", (spec, owner, sourceCard) => {
   const name = String(spec.name || sourceCard?.name || "");
   const need = spec.count ?? spec.at_least ?? 1;
-  return countNamedEnters(state, owner, name) >= need;
+  let count = countNamedEnters(state, owner, name);
+  if (spec.exclude_self && sourceCard?.name === name && count > 0) {
+    // Enter-trigger route records the entering card before the gate runs; Fanfare
+    // records after, so exclude_self only subtracts when the latest history entry
+    // is this source card (avoids double-subtract on Fanfare path).
+    const history = state.players[owner].followerEnterHistory ?? [];
+    const last = history[history.length - 1];
+    if (last?.name === name && last?.cardId === String(sourceCard.id ?? "")) {
+      count -= 1;
+    }
+  }
+  return count >= need;
 });
 
 registerCondition("hand_matches", (spec, owner) => {

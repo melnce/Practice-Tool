@@ -33533,6 +33533,7 @@
             "condition": "named_enter_count",
             "name": "Obsessed Test Subject",
             "count": 5,
+            "exclude_self": true,
             "effects": [
               {
                 "op": "stat",
