@@ -33,6 +33,11 @@ export const adapter = {
   triggerConfirmButtonClick: () => {
     /* no-op */
   },
+
+  /** User-visible blocked-action feedback (wired to toast in the browser). */
+  notifyBlocked: (_reason: string) => {
+    /* no-op */
+  },
 };
 
 export function injectAdapter(impl: Partial<typeof adapter>) {
