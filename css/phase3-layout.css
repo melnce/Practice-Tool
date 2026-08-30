@@ -137,7 +137,7 @@ body.active-on-bottom.active-second .side-red #redHand {
   justify-self: stretch;
   align-self: end;
   max-width: 100%;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .side-blue #blueHand {
@@ -254,19 +254,53 @@ body.active-on-bottom.active-second .side-red .hand-zone {
   transform-origin: bottom center;
 }
 
+/* Scale affects layout width, not just paint (no transform: scale on cards) */
 .hand-zone .card {
-  transform: scale(var(--hand-local-scale, 1));
+  width: calc(var(--card-width) * var(--hand-local-scale, 1));
+  height: calc(var(--card-height) * var(--hand-local-scale, 1));
   transform-origin: bottom center;
 }
 
 .hand-zone .card:hover {
-  transform: scale(calc(var(--hand-local-scale, 1) * 1.03)) translateY(-6px);
+  transform: translateY(-6px) scale(1.03);
+}
+
+/* Fit full hands inside column — tighten overlap beyond token when needed */
+.hand-zone:has(.card:nth-child(7)):not(:has(.card:nth-child(8)))
+  .card:not(:first-child) {
+  margin-left: min(
+    var(--hand-card-overlap-active),
+    calc((100cqw - 7 * var(--hand-scaled-card-outer-width)) / 6)
+  );
+}
+
+.hand-zone:has(.card:nth-child(8)):not(:has(.card:nth-child(9)))
+  .card:not(:first-child) {
+  margin-left: min(
+    var(--hand-card-overlap-active),
+    calc((100cqw - 8 * var(--hand-scaled-card-outer-width)) / 7)
+  );
+}
+
+.hand-zone:has(.card:nth-child(9)) .card:not(:first-child) {
+  margin-left: min(
+    var(--hand-card-overlap-active),
+    calc((100cqw - 9 * var(--hand-scaled-card-outer-width)) / 8)
+  );
 }
 
 /* Compact leader bars (HP badge + evo buttons) */
 .side .leader-container {
   gap: var(--space-2);
   padding: var(--space-1) 0;
+  position: relative;
+  z-index: var(--z-leader-controls);
+}
+
+/* Top-row hands: pack toward leader column so any residual overflow spills outward */
+body:not(.active-on-bottom.active-second) .side-red #redHand,
+body.active-on-bottom.active-second .side-blue #blueHand {
+  justify-content: flex-end;
 }
 
 .side .leader {

@@ -501,15 +501,20 @@ body.active-second .side-red {
   min-height: var(--hand-zone-min-height, 148px);
   max-width: 100%;
   overflow: visible;
+  container-type: inline-size;
+  --hand-scaled-card-outer-width: calc(
+    var(--card-width) * var(--hand-local-scale, 1) + 2px
+  );
+  --hand-card-overlap-active: var(--hand-card-overlap-loose);
 }
 
-/* Hand fan — overlap tightens only as card count grows */
-.hand-zone:has(.card:nth-child(7)) .card:not(:first-child) {
-  margin-left: var(--hand-card-overlap-medium);
+/* Hand fan — overlap tightens as card count grows (MAX_HAND = 9) */
+.hand-zone:has(.card:nth-child(7)) {
+  --hand-card-overlap-active: var(--hand-card-overlap-medium);
 }
 
-.hand-zone:has(.card:nth-child(10)) .card:not(:first-child) {
-  margin-left: var(--hand-card-overlap-tight);
+.hand-zone:has(.card:nth-child(8)) {
+  --hand-card-overlap-active: var(--hand-card-overlap-tight);
 }
 
 #redHand {
@@ -530,6 +535,8 @@ body.active-second .side-red {
   justify-content: center;
   padding: var(--space-1) 0;
   margin: 0;
+  position: relative;
+  z-index: var(--z-leader-controls);
 }
 
 .leader {
