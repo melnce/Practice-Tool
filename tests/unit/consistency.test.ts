@@ -177,15 +177,18 @@ describe("deck resolve + drill", () => {
     const index = getGlobalCardIndex();
     expect(index).not.toBeNull();
     const raw = JSON.parse(
-      fs.readFileSync(path.resolve("decks/forestcraft_combo.json"), "utf8"),
+      fs.readFileSync(
+        path.resolve("decks/runecraft_sephie_test_subject.json"),
+        "utf8",
+      ),
     );
     const resolved = resolveDeckToSimCards(
       raw,
       index!,
-      "forestcraft_combo.json",
+      "runecraft_sephie_test_subject.json",
     );
     expect(resolved.cards.length).toBe(DECK_SIZE);
-    expect(resolved.className).toBe("Forestcraft");
+    expect(resolved.className).toBe("Runecraft");
   });
 
   it("drill reveals your path and keep-all alternative", () => {
