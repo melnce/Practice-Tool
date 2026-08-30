@@ -39,7 +39,7 @@ export type GateCondition =
   | "field_other_same_base_cost" // Field has another card with playedCard's base cost
   | "selected_matches" // __lastSelected / selectedCard matches filter
   | "unique_tribe_enters" // Distinct named tribe enters this match (tribe + count)
-  | "named_enter_count" // Named follower enters this match >= count
+  | "named_enter_count" // Named follower enters this match >= count (`exclude_self` for "other copies" on enter triggers)
   | "hand_matches" // Hand cards matching filter (type/tribe/…) >= count
   | "leader_defense_lte" // Owner leader HP <= count
   | "leader_defense_gt_enemy" // Owner leader HP > enemy leader HP
