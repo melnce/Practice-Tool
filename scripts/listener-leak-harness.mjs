@@ -34,7 +34,12 @@
  *   LISTENER_LEAK_PROBE=0       disable WeakRef probe entirely (metrics-only confound check)
  *   LISTENER_LEAK_SNAPSHOT=0    never take heap snapshots (also skips Debugger.enable)
  *   LISTENER_LEAK_ATTR=1        wrap addEventListener + IDL on* setters; tally by type+site
- *   LISTENER_LEAK_IMAGE_MODE=abort|fulfill  intercept static.dotgg.gg (abort=fail, fulfill=1x1 PNG)
+ *   LISTENER_LEAK_REMOTE_IMAGES=abort|hang|fulfill
+ *       abort   — settle every .webp with route.abort() (ImageLoader releases; not a leak repro)
+ *       hang    — never settle .webp routes (pending ImageLoader pins detached card trees)
+ *       fulfill — settle every .webp with a 1×1 PNG (success path; flat baseline)
+ *   LISTENER_LEAK_IMG_DIAG=1    WeakRef detached cards; sample remote-src survivors after GC
+ *   LISTENER_LEAK_CLEAR_IMG_SRC=1  with IMG_DIAG, clear img.src before detach (mechanism probe)
  *
  * Probe contract: window.__leakWeakProbe.refs holds WeakRef(node) ONLY — never
  * bare Element handles. A strongly-held Array of WeakRefs does not keep nodes
@@ -73,9 +78,18 @@ const DUMP_SNAPSHOT =
 const SAMPLE_EVERY = Number(process.env.LISTENER_LEAK_SAMPLE_EVERY || 10);
 /** Wrap addEventListener + IDL on* setters; dump tallies at each sample. */
 const ENABLE_LISTENER_ATTR = process.env.LISTENER_LEAK_ATTR === "1";
-/** abort | fulfill — CDN card art interception for image-failure retention regression */
-const IMAGE_MODE = process.env.LISTENER_LEAK_IMAGE_MODE || "";
-
+/**
+ * Remote card-art control (static.dotgg.gg *.webp):
+ *   abort   — route.abort() every remote .webp (immediate failure)
+ *   hang    — never settle the route (pending ImageLoader pins detached trees)
+ *   fulfill — fulfill every remote .webp with a 1×1 PNG (success path)
+ *   (unset) — real network (CDN reachable → usually flat; blocked → leak)
+ * This is the image-failure retention switch prior soaks lacked.
+ */
+const REMOTE_IMAGES = String(process.env.LISTENER_LEAK_REMOTE_IMAGES || "")
+  .trim()
+  .toLowerCase();
+/** 1×1 transparent PNG */
 const PNG_1X1 = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
   "base64",
@@ -114,6 +128,165 @@ const MIN_STARTUP_NODE_DELTA = 40;
 const MIN_CARDS_AT_START = 8;
 /** Without INJECT_RETAIN, surviving WeakRefs to replaced nodes after GC → leak. */
 const MAX_ALIVE_WEAKREFS = 5;
+
+/**
+ * Image-failure retention diagnostics (LISTENER_LEAK_IMG_DIAG=1):
+ *   - WeakRef every detached .card / crest-slot
+ *   - Optionally clear img.src before detach (LISTENER_LEAK_CLEAR_IMG_SRC=1)
+ *     to test whether pending/failed ImageLoader pins the parent chain.
+ */
+const ENABLE_IMG_DIAG = process.env.LISTENER_LEAK_IMG_DIAG === "1";
+const CLEAR_IMG_SRC_ON_DETACH = process.env.LISTENER_LEAK_CLEAR_IMG_SRC === "1";
+
+async function installImageDetachDiag(page) {
+  await page.evaluate(
+    ({ clearSrc }) => {
+      if (window.__leakImgDiag) return;
+      const refs = [];
+      const stats = {
+        detachedCards: 0,
+        clearedImgs: 0,
+        aliveCards: 0,
+        aliveWithRemoteSrc: 0,
+        aliveWithOnerror: 0,
+      };
+
+      function clearImgs(root) {
+        if (!root) return;
+        const imgs = [];
+        if (root.tagName === "IMG") imgs.push(root);
+        if (root.querySelectorAll) {
+          imgs.push(...root.querySelectorAll("img"));
+        }
+        for (const img of imgs) {
+          if (!(img instanceof HTMLImageElement)) continue;
+          if (clearSrc) {
+            img.onload = null;
+            img.onerror = null;
+            try {
+              img.removeAttribute("src");
+              img.src = "";
+            } catch {
+              /* ignore */
+            }
+            stats.clearedImgs += 1;
+          }
+        }
+      }
+
+      function trackIfCard(node) {
+        if (!(node instanceof Element)) return;
+        const cards = [];
+        if (
+          node.classList?.contains("card") ||
+          node.classList?.contains("crest-slot")
+        ) {
+          cards.push(node);
+        }
+        if (node.querySelectorAll) {
+          cards.push(...node.querySelectorAll(".card"));
+        }
+        for (const c of cards) {
+          stats.detachedCards += 1;
+          refs.push(new WeakRef(c));
+          if (refs.length > 12000) refs.splice(0, 3000);
+        }
+      }
+
+      function beforeDetach(node) {
+        clearImgs(node);
+        trackIfCard(node);
+      }
+
+      const origReplace = Element.prototype.replaceChild;
+      Element.prototype.replaceChild = function (newNode, oldNode) {
+        beforeDetach(oldNode);
+        return origReplace.call(this, newNode, oldNode);
+      };
+      const origRemoveChild = Element.prototype.removeChild;
+      Element.prototype.removeChild = function (child) {
+        beforeDetach(child);
+        return origRemoveChild.call(this, child);
+      };
+      const origRemove = Element.prototype.remove;
+      Element.prototype.remove = function () {
+        beforeDetach(this);
+        return origRemove.call(this);
+      };
+      const desc = Object.getOwnPropertyDescriptor(
+        Element.prototype,
+        "innerHTML",
+      );
+      if (desc?.set) {
+        Object.defineProperty(Element.prototype, "innerHTML", {
+          configurable: true,
+          enumerable: desc.enumerable,
+          get: desc.get,
+          set(value) {
+            if (this.childNodes?.length) {
+              for (const child of [...this.childNodes]) beforeDetach(child);
+            }
+            return desc.set.call(this, value);
+          },
+        });
+      }
+
+      window.__leakImgDiag = {
+        refs,
+        stats,
+        sample() {
+          let alive = 0;
+          let withRemote = 0;
+          let withOnerror = 0;
+          const survivors = [];
+          for (const ref of refs) {
+            const el = ref.deref();
+            if (!el) continue;
+            alive += 1;
+            const imgs =
+              el.tagName === "IMG" ? [el] : [...el.querySelectorAll("img")];
+            let remote = false;
+            let onerr = false;
+            for (const img of imgs) {
+              const src = String(img.currentSrc || img.src || "");
+              if (/static\.dotgg\.gg|\.webp/i.test(src)) remote = true;
+              if (typeof img.onerror === "function") onerr = true;
+            }
+            if (remote) withRemote += 1;
+            if (onerr) withOnerror += 1;
+            if (survivors.length < 5) {
+              survivors.push({
+                tag: el.tagName,
+                className: String(el.className || "").slice(0, 80),
+                connected: el.isConnected,
+                imgs: imgs.length,
+                srcs: imgs
+                  .slice(0, 2)
+                  .map((i) =>
+                    String(i.currentSrc || i.src || "").slice(0, 100),
+                  ),
+                hasOnerror: onerr,
+              });
+            }
+          }
+          stats.aliveCards = alive;
+          stats.aliveWithRemoteSrc = withRemote;
+          stats.aliveWithOnerror = withOnerror;
+          return { ...stats, tracked: refs.length, survivors };
+        },
+      };
+    },
+    { clearSrc: CLEAR_IMG_SRC_ON_DETACH },
+  );
+}
+
+async function readImageDetachDiag(page) {
+  return page.evaluate(() => {
+    const d = window.__leakImgDiag;
+    if (!d) return null;
+    return d.sample();
+  });
+}
 
 const MIME = {
   ".html": "text/html",
@@ -733,9 +906,10 @@ async function undoRedo(page) {
 }
 
 function printTable(rows) {
-  const imageCol = IMAGE_MODE ? " reqFailed |" : "";
-  const header = `| checkpoint | DOM nodes | JS event listeners | JS heap |${imageCol} hand(both) | blueH | redH | board | cards | phase | turn | retainBucket | tipExists | tipConnected | floatTracked | floatDom | floatTimers |`;
-  const sep = `|---|---:|---:|---:|${IMAGE_MODE ? "---:|" : ""}---:|---:|---:|---:|---:|---|---:|---:|---|---|---:|---:|---:|`;
+  const header =
+    "| checkpoint | DOM nodes | JS event listeners | JS heap | hand(both) | blueH | redH | board | cards | phase | turn | retainBucket | tipExists | tipConnected | floatTracked | floatDom | floatTimers |";
+  const sep =
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---|---|---:|---:|---:|";
   console.log(header);
   console.log(sep);
   for (const r of rows) {
@@ -744,9 +918,8 @@ function printTable(rows) {
     const tipEx = L.tipExists == null ? "?" : L.tipExists ? "yes" : "no";
     const tipConn =
       L.tipConnected == null ? "—" : L.tipConnected ? "yes" : "DETACHED";
-    const reqCol = IMAGE_MODE ? ` ${r.reqFailed ?? 0} |` : "";
     console.log(
-      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB |${reqCol} ${L.handCardsBoth ?? L.handCards ?? "?"} | ${L.blueHand ?? "?"} | ${L.redHand ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} | ${bucket} | ${tipEx} | ${tipConn} | ${L.floatTracked ?? "?"} | ${L.floatDom ?? "?"} | ${L.floatTimers ?? "?"} |`,
+      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB | ${L.handCardsBoth ?? L.handCards ?? "?"} | ${L.blueHand ?? "?"} | ${L.redHand ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} | ${bucket} | ${tipEx} | ${tipConn} | ${L.floatTracked ?? "?"} | ${L.floatDom ?? "?"} | ${L.floatTimers ?? "?"} |`,
     );
   }
 }
@@ -1489,25 +1662,52 @@ async function runHarness() {
   });
 
   let reqFailed = 0;
-  if (IMAGE_MODE === "abort" || IMAGE_MODE === "fulfill") {
-    await page.route("**/*", async (route) => {
+  let reqWebpAborted = 0;
+  let reqWebpFulfilled = 0;
+  page.on("requestfailed", (req) => {
+    const url = req.url();
+    if (/\.webp(\?|$)/i.test(url) || /static\.dotgg\.gg/i.test(url)) {
+      reqFailed += 1;
+    }
+  });
+
+  if (
+    REMOTE_IMAGES === "abort" ||
+    REMOTE_IMAGES === "fulfill" ||
+    REMOTE_IMAGES === "hang"
+  ) {
+    const handleWebp = async (route) => {
+      if (REMOTE_IMAGES === "hang") {
+        reqWebpAborted += 1; // count as "held open"
+        // Never settle — pending ImageLoader retains the <img> parent chain.
+        return;
+      }
+      if (REMOTE_IMAGES === "abort") {
+        reqWebpAborted += 1;
+        await route.abort("connectionfailed");
+        return;
+      }
+      reqWebpFulfilled += 1;
+      await route.fulfill({
+        status: 200,
+        contentType: "image/png",
+        body: PNG_1X1,
+      });
+    };
+    await page.route("**/*.{webp,WEBP}", handleWebp);
+    await page.route("**/static.dotgg.gg/**", async (route) => {
       const url = route.request().url();
-      if (!url.includes("static.dotgg.gg")) {
+      if (!/\.webp(\?|$)/i.test(url)) {
         await route.continue();
         return;
       }
-      if (IMAGE_MODE === "fulfill") {
-        await route.fulfill({
-          status: 200,
-          contentType: "image/png",
-          body: PNG_1X1,
-        });
-      } else {
-        reqFailed += 1;
-        await route.abort("connectionreset");
-      }
+      await handleWebp(route);
     });
-    console.log(`CDN image mode: ${IMAGE_MODE} (static.dotgg.gg)`);
+    console.log(
+      `Remote images: ${REMOTE_IMAGES} (LISTENER_LEAK_REMOTE_IMAGES=${REMOTE_IMAGES})`,
+    );
+  } else {
+    console.log("Remote images: passthrough (real CDN / network)");
   }
 
   if (INJECT_RETAIN) {
@@ -1581,6 +1781,12 @@ async function runHarness() {
         "WeakRef probe: OFF (LISTENER_LEAK_PROBE=0) — metrics-only mode",
       );
     }
+    if (ENABLE_IMG_DIAG) {
+      await installImageDetachDiag(page);
+      console.log(
+        `Image detach diag: ON (clearSrc=${CLEAR_IMG_SRC_ON_DETACH ? "1" : "0"})`,
+      );
+    }
     console.log(
       `Heap snapshots: ${ENABLE_SNAPSHOT ? "ON (may dump at end/on fail)" : "OFF (LISTENER_LEAK_SNAPSHOT=0)"}`,
     );
@@ -1618,9 +1824,14 @@ async function runHarness() {
       checkpoint: "after start + GC",
       ...(await sampleMetrics(cdp)),
       live: liveStart,
-      ...(IMAGE_MODE ? { reqFailed } : {}),
+      reqFailed,
+      reqWebpAborted,
+      reqWebpFulfilled,
     });
     console.log("Live after start:", liveStart, rows[0]);
+    console.log(
+      `images @ start: reqFailed=${reqFailed} webpAborted=${reqWebpAborted} webpFulfilled=${reqWebpFulfilled}`,
+    );
     console.log(
       `auditLeakRoots @ start: tipExists=${liveStart.tipExists} tipConnected=${liveStart.tipConnected} tipUid=${liveStart.tipUid} floatTracked=${liveStart.floatTracked} floatDom=${liveStart.floatDom} floatTimers=${liveStart.floatTimers} retainBucket=${liveStart.retainBucketLen}`,
     );
@@ -1739,7 +1950,9 @@ async function runHarness() {
           ...(await sampleMetrics(cdp)),
           live,
           weakRef: ENABLE_PROBE ? probe : undefined,
-          ...(IMAGE_MODE ? { reqFailed } : {}),
+          reqFailed,
+          reqWebpAborted,
+          reqWebpFulfilled,
         });
         console.log(
           `Live after ${cycle}:`,
@@ -1748,6 +1961,13 @@ async function runHarness() {
           ENABLE_PROBE ? "weakRef" : "weakRef:off",
           ENABLE_PROBE ? probe : "(disabled)",
         );
+        console.log(
+          `images @ cycle ${cycle}: reqFailed=${reqFailed} webpAborted=${reqWebpAborted} webpFulfilled=${reqWebpFulfilled}`,
+        );
+        if (ENABLE_IMG_DIAG) {
+          const imgDiag = await readImageDetachDiag(page);
+          console.log(`imgDiag @ cycle ${cycle}:`, JSON.stringify(imgDiag));
+        }
         console.log(
           `auditLeakRoots @ cycle ${cycle}: tipExists=${live.tipExists} tipConnected=${live.tipConnected} tipUid=${live.tipUid} floatTracked=${live.floatTracked} floatDom=${live.floatDom} floatTimers=${live.floatTimers} retainBucket=${live.retainBucketLen}`,
         );

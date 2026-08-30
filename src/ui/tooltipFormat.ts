@@ -1,6 +1,5 @@
 import type { CardInstance } from "../core/types/index.js";
 import { getGlobalCardIndex } from "../data/cardIndex.js";
-import { attachCardImageFallback } from "./imageFallback.js";
 
 export type CrestTooltipData = {
   name: string;
@@ -134,7 +133,9 @@ export function formatCrestPanels(
     return (
       `<div class="tooltip-crest-panel">` +
       `<img class="tooltip-crest-icon" src="${escapeHtml(image)}" alt="" ` +
-      `data-fallback-src="${escapeHtml(fallback)}">` +
+      `data-fallback-src="${escapeHtml(fallback)}" ` +
+      `onerror="if(this.dataset.fallbackApplied){this.onerror=null;this.onload=null;return;}this.dataset.fallbackApplied='1';var n=this.dataset.fallbackSrc||'';if(!n||n===this.currentSrc||n===this.src){this.onerror=null;this.onload=null;return;}this.src=n;" ` +
+      `onload="this.onerror=null;this.onload=null;">` +
       `<div class="tooltip-crest-body">` +
       `<div class="tooltip-crest-name">${escapeHtml(crest.name)}</div>` +
       `<div class="tooltip-crest-text">${descLines}</div>` +
@@ -152,11 +153,32 @@ export function cardIdFromCrestImage(url: string): string | null {
   return id ?? null;
 }
 
-/** @deprecated Use attachCardImageFallback from imageFallback.ts */
 export function attachCrestImageFallback(
   img: HTMLImageElement,
   primaryUrl: string,
   cardId: string,
 ): void {
-  attachCardImageFallback(img, primaryUrl, cardId);
+  const fallback = `https://static.dotgg.gg/shadowverse/cards/${cardId}.webp`;
+  img.src = primaryUrl;
+  img.dataset.fallbackSrc = fallback;
+  img.onerror = () => {
+    if (img.dataset.fallbackApplied) {
+      img.onerror = null;
+      img.onload = null;
+      return;
+    }
+    img.dataset.fallbackApplied = "1";
+    const next = img.dataset.fallbackSrc || fallback;
+    // Same URL as primary: don't start a second pending load on the same CDN path.
+    if (!next || next === img.currentSrc || next === img.src) {
+      img.onerror = null;
+      img.onload = null;
+      return;
+    }
+    img.src = next;
+  };
+  img.onload = () => {
+    img.onerror = null;
+    img.onload = null;
+  };
 }

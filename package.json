@@ -51,14 +51,14 @@
     "prebuild": "npm run decks:discover",
     "check:fast": "npm run format:check && npm run lint && npm run typecheck && npm run test:dev",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run check:boundaries && npm run check:arch && npm run check:cards && npm run check:dangling-refs && npm run check:card-text-full && npm run check:add-to-hand && npm run check:stat-op && npm run check:destroy-op && npm run check:duration-op && npm run check:op-keys && npm run check:decks && npm run test && npm run replay:check",
-    "check:deep": "npm run check && npm run test:all && npm run build && npm run test:listener-leak && npm run test:listener-leak:image-fail",
+    "check:deep": "npm run check && npm run test:all && npm run build && npm run test:listener-leak && npm run test:listener-leak:images-fail",
     "ci": "npm run check",
     "dev": "vite",
     "preview": "vite preview",
     "test:e2e": "playwright test --project=e2e",
     "test:qa": "playwright test --project=qa",
     "test:listener-leak": "npx tsx scripts/listener-leak-harness.mjs",
-    "test:listener-leak:image-fail": "npm run build && LISTENER_LEAK_PROBE=0 LISTENER_LEAK_SNAPSHOT=0 LISTENER_LEAK_CYCLES=20 LISTENER_LEAK_SAMPLE_EVERY=10 LISTENER_LEAK_DECK_INDEX=11 LISTENER_LEAK_IMAGE_MODE=abort npx tsx scripts/listener-leak-harness.mjs"
+    "test:listener-leak:images-fail": "LISTENER_LEAK_REMOTE_IMAGES=hang LISTENER_LEAK_PROBE=0 LISTENER_LEAK_SNAPSHOT=0 LISTENER_LEAK_CYCLES=20 LISTENER_LEAK_PORT=8886 npx tsx scripts/listener-leak-harness.mjs"
   },
   "keywords": [],
   "author": "",
