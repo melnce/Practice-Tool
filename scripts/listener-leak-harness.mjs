@@ -14,6 +14,13 @@
  * never by a hard-coded startup node budget (a full 9-card opening hand
  * legitimately adds hundreds of nodes).
  *
+ * FAIL taxonomy (do not conflate):
+ *   - "soak is not exercising a live game" → instrument/liveness failure
+ *   - "retention leak detected" → the soak WAS live; WeakRef survivors / linear growth
+ *
+ * handCards in the table is the SUM of both players' hands (MAX_HAND=9 each).
+ * Columns are labeled hand(both) / blueH / redH so 18 at mid-game is not an invariant break.
+ *
  * Usage:
  *   npm run build && npx tsx scripts/listener-leak-harness.mjs
  *
@@ -162,6 +169,24 @@ async function installWeakRefProbe(page) {
     };
     wrap(Element.prototype, "replaceChild", "replace");
     wrap(Element.prototype, "removeChild", "remove");
+    // Face-down hand rebuild uses replaceChildren — track those too.
+    const origRC = Element.prototype.replaceChildren;
+    Element.prototype.replaceChildren = function leakWeakReplaceChildren(
+      ...nodes
+    ) {
+      try {
+        for (const child of Array.from(this.children)) {
+          probe.removes += 1;
+          if (typeof WeakRef !== "undefined") {
+            probe.refs.push(new WeakRef(child));
+            if (probe.refs.length > 8000) probe.refs.splice(0, 2000);
+          }
+        }
+      } catch {
+        /* ignore */
+      }
+      return origRC.apply(this, nodes);
+    };
   });
 }
 
@@ -189,18 +214,27 @@ async function readWeakRefProbe(page) {
 async function readLiveState(page) {
   return page.evaluate(() => {
     const s = window.gameState;
+    const blueHand = document.querySelectorAll("#blueHand .card").length;
+    const redHand = document.querySelectorAll("#redHand .card").length;
+    const blueBoard = document.querySelectorAll("#blueBoard .card").length;
+    const redBoard = document.querySelectorAll("#redBoard .card").length;
     return {
       phase: s?.phase ?? null,
       gameStarted: !!s?.gameStarted,
       turn: s?.turnNumber ?? null,
       active: s?.activePlayer ?? null,
       cards: document.querySelectorAll(".card").length,
-      handCards: document.querySelectorAll("#blueHand .card, #redHand .card")
-        .length,
-      boardCards: document.querySelectorAll("#blueBoard .card, #redBoard .card")
-        .length,
+      // Sum of both players' hands (MAX_HAND is per-player; 18 is normal late-game).
+      handCardsBoth: blueHand + redHand,
+      blueHand,
+      redHand,
+      boardCards: blueBoard + redBoard,
+      blueBoard,
+      redBoard,
       histItems: document.querySelectorAll(".hist-item").length,
       allElements: document.querySelectorAll("*").length,
+      // Back-compat alias used by older log lines.
+      handCards: blueHand + redHand,
     };
   });
 }
@@ -379,14 +413,14 @@ async function undoRedo(page) {
 
 function printTable(rows) {
   const header =
-    "| checkpoint | DOM nodes | JS event listeners | JS heap | hand | board | cards | phase | turn |";
-  const sep = "|---|---:|---:|---:|---:|---:|---:|---|---:|";
+    "| checkpoint | DOM nodes | JS event listeners | JS heap | hand(both) | blueH | redH | board | cards | phase | turn |";
+  const sep = "|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|";
   console.log(header);
   console.log(sep);
   for (const r of rows) {
     const L = r.live || {};
     console.log(
-      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB | ${L.handCards ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} |`,
+      `| ${r.checkpoint} | ${r.nodes} | ${r.listeners} | ${r.heapMb} MB | ${L.handCardsBoth ?? L.handCards ?? "?"} | ${L.blueHand ?? "?"} | ${L.redHand ?? "?"} | ${L.boardCards ?? "?"} | ${L.cards ?? "?"} | ${L.phase ?? "?"} | ${L.turn ?? "?"} |`,
     );
   }
 }
@@ -457,6 +491,17 @@ function assertLiveGame(label, cond, detail) {
     const msg = `FAIL: soak is not exercising a live game (${label}): ${detail}`;
     console.error(msg);
     throw new Error(msg);
+  }
+}
+
+/** Retention failure — the soak DID exercise a live game; the app leaked. */
+function assertNoRetention(label, cond, detail) {
+  if (!cond) {
+    const msg = `FAIL: retention leak detected (${label}): ${detail}`;
+    console.error(msg);
+    const err = new Error(msg);
+    err.isRetentionLeak = true;
+    throw err;
   }
 }
 
@@ -555,23 +600,80 @@ function summarizeDetachedRetainers(snap) {
     }
   }
 
-  /** Lower is better. Prefer strong property edges toward Window/Array roots. */
+  function isDetachedOrd(ord) {
+    return detI >= 0 && nodes[ord * nfc + detI] === 2;
+  }
+
+  /**
+   * Lower is better. Prefer edges that ESCAPE the detached island toward a
+   * GC root (Window / Array / Map / Set / property), not sibling DOM walks.
+   */
   function edgeScore(r) {
     if (r.type === "weak") return 1000;
-    if (r.type === "context") return 80;
+    const fromDet = isDetachedOrd(r.from);
+    const islandPenalty = fromDet ? 200 : 0;
     const fromName = strings[nodes[r.from * nfc + nameI]];
+    const fromType = nodeTypes[nodes[r.from * nfc + typeI]];
     if (r.type === "property") {
-      if (fromName === "Window" || fromName === "Object") return 0;
+      if (
+        fromName === "Window" ||
+        (typeof fromName === "string" && fromName.startsWith("Window"))
+      )
+        return islandPenalty + 0;
       if (
         fromName === "Array" ||
+        fromName === "Object" ||
         fromName === "system / Map" ||
-        fromName === "system / Set"
+        fromName === "system / Set" ||
+        fromName === "(GC roots)"
       )
-        return 1;
-      return 2;
+        return islandPenalty + 1;
+      if (fromType === "object" || fromType === "closure")
+        return islandPenalty + 3;
+      return islandPenalty + 5;
     }
-    if (r.type === "element" || r.type === "shortcut") return 20;
-    return 40;
+    if (r.type === "context") return islandPenalty + 40;
+    if (r.type === "element" || r.type === "shortcut") {
+      return islandPenalty + (fromDet ? 80 : 15);
+    }
+    if (r.type === "internal") return islandPenalty + 30;
+    return islandPenalty + 50;
+  }
+
+  function walkRetainerPath(startOrd, maxDepth = 16) {
+    const path = [];
+    let cur = startOrd;
+    const seen = new Set();
+    for (let d = 0; d < maxDepth; d++) {
+      if (seen.has(cur)) break;
+      seen.add(cur);
+      const cand = (retainers[cur] || []).filter(
+        (r) => !seen.has(r.from) && r.type !== "weak",
+      );
+      if (!cand.length) {
+        path.push({ root: describe(cur) });
+        break;
+      }
+      cand.sort((a, b) => edgeScore(a) - edgeScore(b));
+      const pick = cand[0];
+      path.push({
+        node: describe(cur),
+        via: `${pick.type}:${pick.name}`,
+        from: describe(pick.from),
+        fromDetached: isDetachedOrd(pick.from),
+      });
+      cur = pick.from;
+      const fromName = strings[nodes[cur * nfc + nameI]];
+      if (
+        fromName === "Window" ||
+        fromName === "(GC roots)" ||
+        (typeof fromName === "string" &&
+          (fromName.startsWith("Window /") ||
+            fromName.startsWith("Window [JSGlobalObject]")))
+      )
+        break;
+    }
+    return path;
   }
 
   const edgeAgg = new Map();
@@ -588,43 +690,109 @@ function summarizeDetachedRetainers(snap) {
     }
   }
 
+  function normalizeDescribe(s) {
+    return String(s)
+      .replace(/#\d+/g, "#ID")
+      .replace(/uid_[a-zA-Z0-9_-]+/g, "uid_*")
+      .replace(/0x[0-9a-fA-F]+/g, "0x*")
+      .replace(/element:\[\d+\]/g, "element:[*]")
+      .replace(/id="[^"]+"/g, 'id="*"')
+      .replace(/\s+/g, " ");
+  }
+  function pathShape(path) {
+    return path
+      .map((step) => {
+        if (step.root) return `ROOT:${normalizeDescribe(step.root)}`;
+        const via = String(step.via || "").replace(
+          /element:\[\d+\]/g,
+          "element:[*]",
+        );
+        return `${normalizeDescribe(step.node)} --${via}--> ${normalizeDescribe(step.from)}`;
+      })
+      .join(" | ");
+  }
+  function rootTip(path) {
+    if (!path.length) return "(empty)";
+    const last = path[path.length - 1];
+    if (last.root) return normalizeDescribe(last.root);
+    return normalizeDescribe(last.from || "?");
+  }
+
+  // Prefer WeakRef-survivor-marked cards, then any card root, then divs.
+  const survivorOrds = [];
+  const cardLikeOrds = [];
+  for (const ord of detDivOrds) {
+    const name = strings[nodes[ord * nfc + nameI]];
+    if (typeof name !== "string") continue;
+    const isCard =
+      name.includes("data-uid") ||
+      name.includes('class="card') ||
+      name.includes('class=\\"card');
+    const isSurvivor =
+      name.includes("data-leak-survivor") ||
+      name.includes('data-leak-survivor="1"');
+    if (isSurvivor) survivorOrds.push(ord);
+    else if (isCard) cardLikeOrds.push(ord);
+  }
+  const walkOrds = survivorOrds.length
+    ? survivorOrds
+    : cardLikeOrds.length
+      ? cardLikeOrds
+      : detDivOrds;
+
   const samples = [];
-  for (const ord of detDivOrds.slice(0, 5)) {
-    const path = [];
-    let cur = ord;
-    const seen = new Set();
-    for (let d = 0; d < 12; d++) {
-      if (seen.has(cur)) break;
-      seen.add(cur);
-      const cand = (retainers[cur] || []).filter(
-        (r) => !seen.has(r.from) && r.type !== "weak",
-      );
-      if (!cand.length) {
-        path.push({ root: describe(cur) });
-        break;
-      }
-      cand.sort((a, b) => edgeScore(a) - edgeScore(b));
-      const pick = cand[0];
-      path.push({
-        node: describe(cur),
-        via: `${pick.type}:${pick.name}`,
-        from: describe(pick.from),
-      });
-      cur = pick.from;
-      const fromName = strings[nodes[cur * nfc + nameI]];
-      if (fromName === "Window" || fromName === "(GC roots)") break;
-    }
+  for (const ord of walkOrds.slice(0, 8)) {
+    const path = walkRetainerPath(ord);
     samples.push({
       node: describe(ord),
       retainerCount: (retainers[ord] || []).filter((r) => r.type !== "weak")
         .length,
+      immediateRetainers: (retainers[ord] || [])
+        .filter((r) => r.type !== "weak")
+        .map((r) => ({
+          via: `${r.type}:${r.name}`,
+          from: describe(r.from),
+          fromDetached: isDetachedOrd(r.from),
+          score: edgeScore(r),
+        }))
+        .sort((a, b) => a.score - b.score)
+        .slice(0, 12),
       path,
+      rootTip: rootTip(path),
     });
   }
+
+  const shapeAgg = new Map();
+  const shapeExamples = new Map();
+  const tipAgg = new Map();
+  const sampleLimit = Math.min(walkOrds.length, 200);
+  for (const ord of walkOrds.slice(0, sampleLimit)) {
+    const path = walkRetainerPath(ord);
+    const shape = pathShape(path);
+    shapeAgg.set(shape, (shapeAgg.get(shape) || 0) + 1);
+    if (!shapeExamples.has(shape)) shapeExamples.set(shape, path);
+    const tip = rootTip(path);
+    tipAgg.set(tip, (tipAgg.get(tip) || 0) + 1);
+  }
+  const topPathShapes = [...shapeAgg.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 12)
+    .map(([shape, count]) => ({
+      count,
+      shape,
+      examplePath: shapeExamples.get(shape),
+    }));
+  const topRootTips = [...tipAgg.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15)
+    .map(([tip, count]) => ({ count, tip }));
 
   return {
     detachedness2Count: det2,
     detachedDivLike: detDivOrds.length,
+    walkedNodeCount: sampleLimit,
+    survivorMarkedInSnap: survivorOrds.length,
+    cardLikeInSnap: cardLikeOrds.length,
     topDetachedNames: [...detNameCounts.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 20),
@@ -634,9 +802,217 @@ function summarizeDetachedRetainers(snap) {
     topRetainingFromNames: [...fromAgg.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 20),
+    topPathShapes,
+    topRootTips,
     samples,
   };
 }
+
+async function markWeakRefSurvivors(page) {
+  return page.evaluate(() => {
+    const p = window.__leakWeakProbe;
+    if (!p) return { marked: 0 };
+    let marked = 0;
+    for (const ref of p.refs) {
+      try {
+        const el = ref.deref();
+        if (!el || !el.dataset) continue;
+        el.dataset.leakSurvivor = "1";
+        marked += 1;
+      } catch {
+        /* ignore */
+      }
+    }
+    return { marked };
+  });
+}
+
+/**
+ * Sample DOMDebugger event-listener locations on WeakRef survivors (detached
+ * nodes are not queryable via document — walk the probe WeakRefs via CDP).
+ */
+async function sampleSurvivorListenerLocations(cdp, page, limit = 24) {
+  try {
+    await cdp.send("Runtime.enable");
+    await cdp.send("Debugger.enable");
+  } catch {
+    /* ignore */
+  }
+
+  const scriptUrls = new Map();
+  const onParsed = (p) => {
+    if (p.scriptId) scriptUrls.set(p.scriptId, p.url || "(unknown)");
+  };
+  cdp.on("Debugger.scriptParsed", onParsed);
+
+  const evalResult = await cdp.send("Runtime.evaluate", {
+    expression: `(() => {
+      const p = window.__leakWeakProbe;
+      if (!p) return null;
+      const els = [];
+      for (const ref of p.refs) {
+        try {
+          const el = ref.deref();
+          if (el) els.push(el);
+        } catch {}
+        if (els.length >= ${limit}) break;
+      }
+      return els;
+    })()`,
+    returnByValue: false,
+  });
+
+  const arrayId = evalResult?.result?.objectId;
+  if (!arrayId) {
+    cdp.off("Debugger.scriptParsed", onParsed);
+    return { sampled: 0, topLocations: [], samples: [] };
+  }
+
+  const props = await cdp.send("Runtime.getProperties", {
+    objectId: arrayId,
+    ownProperties: true,
+  });
+  const locCounts = new Map();
+  const samples = [];
+  let sampled = 0;
+
+  for (const prop of props.result || []) {
+    if (!/^\d+$/.test(prop.name) || !prop.value?.objectId) continue;
+    sampled += 1;
+    let listeners = [];
+    try {
+      const res = await cdp.send("DOMDebugger.getEventListeners", {
+        objectId: prop.value.objectId,
+      });
+      listeners = res.listeners || [];
+    } catch {
+      continue;
+    }
+    for (const L of listeners) {
+      const url = scriptUrls.get(L.scriptId) || `(scriptId:${L.scriptId})`;
+      const key = `${L.type} @ ${url}:${(L.lineNumber ?? 0) + 1}:${(L.columnNumber ?? 0) + 1}`;
+      locCounts.set(key, (locCounts.get(key) || 0) + 1);
+      if (samples.length < 40) {
+        samples.push({
+          type: L.type,
+          url,
+          line: (L.lineNumber ?? 0) + 1,
+          column: (L.columnNumber ?? 0) + 1,
+          once: !!L.once,
+          passive: !!L.passive,
+        });
+      }
+    }
+  }
+
+  cdp.off("Debugger.scriptParsed", onParsed);
+
+  const topLocations = [...locCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 25)
+    .map(([loc, count]) => ({ count, loc }));
+
+  return { sampled, listenerSampleCount: samples.length, topLocations, samples };
+}
+
+/** Best-effort map from Vite build URL + line to a src/ file guess. */
+function hintSrcFromListenerLoc(loc) {
+  const s = String(loc);
+  if (s.includes("dragClickGuard") || s.includes("zones/handlers")) {
+    return "src/ui/zones/handlers.ts / dragClickGuard.ts";
+  }
+  if (s.includes("floatingCombatText")) return "src/ui/floatingCombatText.ts";
+  if (s.includes("tooltips")) return "src/ui/tooltips.ts";
+  if (s.includes("/assets/") && s.includes(".js:")) {
+    return "bundled asset — use source map / listener type + retainer path";
+  }
+  return null;
+}
+
+/**
+ * On retention failure: mark WeakRef survivors, sample listener locations,
+ * force GC again, snapshot, and print dominant detached retaining-path shapes.
+ */
+async function dumpRetentionEvidence(cdp, page, { rows, probe, cycle, reason }) {
+  console.log("\n=== Phase 1 retainer dump (" + reason + ") ===");
+  const marked = await markWeakRefSurvivors(page);
+  console.log("Marked WeakRef survivors:", marked);
+
+  const listenerLocs = await sampleSurvivorListenerLocations(cdp, page);
+  console.log(
+    "Survivor listener locations (CDP DOMDebugger):",
+    JSON.stringify(listenerLocs.topLocations?.slice?.(0, 15) ?? listenerLocs, null, 2),
+  );
+
+  await forceGc(cdp, page);
+  const snap = await takeHeapSnapshot(cdp);
+  const summary = summarizeDetachedRetainers(snap);
+  const outPath = join(OUT_DIR, `retention-${reason}-c${cycle}-${Date.now()}.json`);
+  writeFileSync(
+    outPath,
+    JSON.stringify({ reason, cycle, probe, rows, listenerLocs, summary }, null, 2),
+  );
+  console.log(`Wrote ${outPath}`);
+  console.log(
+    JSON.stringify(
+      {
+        detachedness2Count: summary.detachedness2Count,
+        detachedDivLike: summary.detachedDivLike,
+        survivorMarkedInSnap: summary.survivorMarkedInSnap,
+        cardLikeInSnap: summary.cardLikeInSnap,
+        walkedNodeCount: summary.walkedNodeCount,
+        topRootTips: summary.topRootTips,
+        topDetachedNames: summary.topDetachedNames?.slice?.(0, 10),
+        topRetainingEdges: summary.topRetainingEdges?.slice?.(0, 10),
+        topRetainingFromNames: summary.topRetainingFromNames?.slice?.(0, 10),
+        topPathShapes: summary.topPathShapes,
+        sample0: summary.samples?.[0],
+        sample1: summary.samples?.[1],
+      },
+      null,
+      2,
+    ),
+  );
+
+  console.log("\nRetainer shape attribution hints:");
+  for (const s of summary.topPathShapes || []) {
+    let tag = "could-not-determine";
+    const sh = s.shape || "";
+    if (sh.includes("__leakRetainBucket") || sh.includes("__leakRetain")) {
+      tag = "measured: LISTENER_LEAK_RETAIN injector (self-test only)";
+    } else if (sh.includes("activeSession")) {
+      tag = "measured: tooltips.ts activeSession";
+    } else if (
+      sh.includes("activeByTarget") ||
+      (sh.includes("system / Map") && sh.includes("floating"))
+    ) {
+      tag = "read-candidate: floatingCombatText.ts activeByTarget Map";
+    } else if (sh.includes("system / Map") || sh.includes("system / Set")) {
+      tag = "measured: Map/Set GC root — resolve property name on path";
+    } else if (sh.includes("EventListener") || sh.includes("V8EventListener")) {
+      tag = "measured: EventListener retaining detached EventTarget";
+    } else if (sh.includes("__leakWeakProbe") || sh.includes("WeakRef")) {
+      tag = "instrument: WeakRef probe itself (ignore)";
+    }
+    console.log(`  [${s.count}x] ${tag}`);
+    console.log(`       ${sh.slice(0, 320)}`);
+  }
+  if (summary.topRootTips?.length) {
+    console.log("\nTop root tips:");
+    for (const t of summary.topRootTips.slice(0, 10)) {
+      console.log(`  [${t.count}x] ${t.tip}`);
+    }
+  }
+  if (listenerLocs.topLocations?.length) {
+    console.log("\nListener location → src hint:");
+    for (const L of listenerLocs.topLocations.slice(0, 12)) {
+      const hint = hintSrcFromListenerLoc(L.loc);
+      console.log(`  [${L.count}x] ${L.loc}`);
+      if (hint) console.log(`       → ${hint}`);
+    }
+  }
+}
+
 
 async function runHarness() {
   if (!existsSync(join(BUILD, "index.html"))) {
@@ -811,12 +1187,19 @@ async function runHarness() {
           probe,
         );
 
-        if (!INJECT_RETAIN) {
-          assertLiveGame(
-            `weakref-cleared-cycle-${cycle}`,
-            probe.alive <= MAX_ALIVE_WEAKREFS,
-            `alive=${probe.alive} tracked=${probe.tracked} replaces=${probe.replaces} (replaced nodes surviving GC)`,
+        if (!INJECT_RETAIN && probe.alive > MAX_ALIVE_WEAKREFS) {
+          // Retention leak — dump retainers before failing (NOT a liveness failure).
+          console.error(
+            `FAIL: retention leak detected (weakref-survivors-cycle-${cycle}): alive=${probe.alive} tracked=${probe.tracked} replaces=${probe.replaces} (replaced nodes surviving GC)`,
           );
+          await dumpRetentionEvidence(cdp, page, {
+            rows,
+            probe,
+            cycle,
+            reason: "weakref-survivors",
+          });
+          process.exitCode = 1;
+          return;
         }
       }
     }
@@ -829,7 +1212,7 @@ async function runHarness() {
       `Decks: blue=${deckSelection.blue.value} (${deckSelection.blue.label}) red=${deckSelection.red.value} (${deckSelection.red.label})`,
     );
     console.log(
-      `Chrome: ${CHROME}  Ended turns: ${totalEnded}  Start cards: ${liveStart.cards} hand=${liveStart.handCards} board=${liveStart.boardCards}`,
+      `Chrome: ${CHROME}  Ended turns: ${totalEnded}  Start cards: ${liveStart.cards} hand(both)=${liveStart.handCardsBoth ?? liveStart.handCards} blueH=${liveStart.blueHand} redH=${liveStart.redHand} board=${liveStart.boardCards}`,
     );
     printTable(rows);
 
@@ -872,8 +1255,17 @@ async function runHarness() {
         );
       } else {
         console.error(
-          "FAIL: post-GC node/listener counts grow linearly (retention leak)",
+          "FAIL: retention leak detected (post-GC linear growth): nodesLeaking=" +
+            analysis.nodesLeaking +
+            " listenersLeaking=" +
+            analysis.listenersLeaking,
         );
+        await dumpRetentionEvidence(cdp, page, {
+          rows,
+          probe: await readWeakRefProbe(page),
+          cycle: CYCLES,
+          reason: "trend-linear-growth",
+        });
       }
       process.exitCode = 1;
       return;
