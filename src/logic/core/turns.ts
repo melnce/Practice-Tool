@@ -108,6 +108,12 @@ function clearTempHandCostMods(endedPlayer: Player) {
       }
       delete (card as any).temp_cost_set_until_eot;
     }
+    if ((card as any).temp_cost_reduce_until_eot) {
+      if (card.base_cost !== undefined) {
+        card.cost = card.base_cost;
+      }
+      delete (card as any).temp_cost_reduce_until_eot;
+    }
     const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
     if (delta !== 0) {
       (card as any).cost_mod = (parseInt((card as any).cost_mod) || 0) - delta;

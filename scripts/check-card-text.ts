@@ -773,56 +773,240 @@ function collectEarthRiteCosts(card: CardJson): number[] {
   return costs;
 }
 
-function collectUnconditionalDamageOps(card: CardJson): number[] {
+const ABILITY_HEADER_RE =
+  /^(fanfare|evolve|super-evolve|super evolve|last words|engage)\s*:/i;
+
+const KEYWORD_ONLY_LINE_RE =
+  /^(ward|storm|rush|bane|drain|ambush|intimidation)\b/i;
+
+const TRIGGER_CLAUSE_LINE_RE =
+  /^(at the (end|start)|whenever|each time|activates in hand)/i;
+
+function parseDescriptionSections(desc: string): Map<string, string> {
+  const sections = new Map<string, string>();
+  const lines = desc.split("\n");
+  let currentKey = "body";
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const headerMatch = trimmed.match(ABILITY_HEADER_RE);
+    if (headerMatch) {
+      currentKey = headerMatch[1]!.toLowerCase().replace(/\s+/g, "_");
+      const rest = trimmed.replace(/^[^:]+:\s*/i, "").trim();
+      sections.set(currentKey, rest);
+      continue;
+    }
+
+    if (/^when this follower evolves/i.test(trimmed)) {
+      currentKey = "evolve";
+      sections.set(currentKey, trimmed);
+      continue;
+    }
+
+    if (KEYWORD_ONLY_LINE_RE.test(trimmed)) {
+      currentKey = `kw_${trimmed.split(/\s/)[0]!.toLowerCase()}`;
+      sections.set(currentKey, trimmed);
+      continue;
+    }
+
+    if (TRIGGER_CLAUSE_LINE_RE.test(trimmed)) {
+      currentKey = "trigger";
+      sections.set(currentKey, trimmed);
+      continue;
+    }
+
+    const prev = sections.get(currentKey) ?? "";
+    sections.set(currentKey, prev ? `${prev}\n${trimmed}` : trimmed);
+  }
+
+  return sections;
+}
+
+function sectionTextForKey(
+  sections: Map<string, string>,
+  key: string,
+  fullDesc = "",
+): string {
+  const direct = sections.get(key);
+  if (direct != null && direct !== "") return direct;
+  if (key === "body") return sections.get("body") ?? fullDesc;
+  if (key === "trigger") return sections.get("trigger") ?? "";
+  if (key === "last_words") return sections.get("last_words") ?? "";
+  return "";
+}
+
+function triggerEffectRoots(card: CardJson): unknown[] {
+  const roots: unknown[] = [];
+  for (const t of asArray(card.triggers)) {
+    if (!t || typeof t !== "object") continue;
+    const effs = (t as { effects?: unknown[] }).effects;
+    if (Array.isArray(effs)) roots.push(...effs);
+  }
+  return roots;
+}
+
+function effectSectionPairs(
+  card: CardJson,
+): { key: string; roots: unknown[] }[] {
+  const pairs: { key: string; roots: unknown[] }[] = [];
+
+  if (card.fanfare?.length) {
+    pairs.push({ key: "fanfare", roots: asArray(card.fanfare) });
+  }
+  if (card.evolve?.length) {
+    pairs.push({ key: "evolve", roots: asArray(card.evolve) });
+  }
+  if (card.superevolve?.length) {
+    pairs.push({ key: "super-evolve", roots: asArray(card.superevolve) });
+  }
+  if (card.spell?.length) {
+    pairs.push({ key: "body", roots: asArray(card.spell) });
+  }
+  const triggerRoots = triggerEffectRoots(card);
+  if (triggerRoots.length) {
+    pairs.push({ key: "trigger", roots: triggerRoots });
+  }
+  const lwRoots = lastWordsEffects(card.keywords);
+  if (lwRoots.length) {
+    pairs.push({ key: "last_words", roots: lwRoots });
+  }
+
+  return pairs;
+}
+
+function walkGateAwareNumericNodes(
+  node: unknown,
+  opName: string,
+  field: string,
+  out: number[],
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    for (const item of node)
+      walkGateAwareNumericNodes(item, opName, field, out);
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+
+  if (obj.op === "gate" && obj.condition != null && obj.condition !== "") {
+    if (Array.isArray(obj.effects)) {
+      for (const e of obj.effects) {
+        walkGateAwareNumericNodes(e, opName, field, out);
+      }
+    }
+    if (Array.isArray(obj.else_effects)) {
+      for (const e of obj.else_effects) {
+        walkGateAwareNumericNodes(e, opName, field, out);
+      }
+    }
+    return;
+  }
+
+  if (obj.op === opName) {
+    const cond = obj.condition;
+    if (typeof cond === "string" && cond !== "") return;
+    const n = Number(obj[field]);
+    if (Number.isFinite(n)) out.push(n);
+    return;
+  }
+
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    walkGateAwareNumericNodes(v, opName, field, out);
+  }
+}
+
+function collectDamageAmountsFromRoots(roots: unknown[]): number[] {
   const amounts: number[] = [];
-  walkEffectNodes(card, (obj, path) => {
-    if (obj.op !== "damage") return;
-    if (obj.condition != null && obj.condition !== "") return;
-    if (isInsideConditionalGate(card, path)) return;
-    const amount = Number(obj.amount);
-    if (Number.isFinite(amount)) amounts.push(amount);
-  });
+  for (const root of roots) {
+    walkGateAwareNumericNodes(root, "damage", "amount", amounts);
+  }
   return amounts;
 }
 
-function collectUnconditionalDrawOps(card: CardJson): number[] {
+function collectDrawCountsFromRoots(roots: unknown[]): number[] {
   const counts: number[] = [];
-  walkEffectNodes(card, (obj, path) => {
-    if (obj.op !== "draw") return;
-    if (obj.condition != null && obj.condition !== "") return;
-    if (isInsideConditionalGate(card, path)) return;
-    const count = Number(obj.count);
-    if (Number.isFinite(count)) counts.push(count);
-  });
+  for (const root of roots) {
+    walkGateAwareNumericNodes(root, "draw", "count", counts);
+  }
   return counts;
 }
 
-function collectUnconditionalStatOps(
-  card: CardJson,
+function collectStatBonusesFromRoots(
+  roots: unknown[],
 ): { attack: number; defense: number }[] {
   const stats: { attack: number; defense: number }[] = [];
-  walkEffectNodes(card, (obj, path) => {
-    if (obj.op !== "stat") return;
-    if (obj.condition != null && obj.condition !== "") return;
-    if (isInsideConditionalGate(card, path)) return;
-    const attack = Number(obj.attack);
-    const defense = Number(obj.defense);
-    if (Number.isFinite(attack) && Number.isFinite(defense)) {
-      stats.push({ attack, defense });
-    }
-  });
+  for (const root of roots) {
+    walkGateAwareStatNodes(root, stats);
+  }
   return stats;
 }
 
-function isInsideConditionalGate(card: CardJson, opPath: string): boolean {
-  let inside = false;
-  walkEffectNodes(card, (obj, path) => {
-    if (obj.op !== "gate") return;
-    if (obj.condition == null || obj.condition === "") return;
-    const effectsPrefix = `${path}.effects`;
-    if (opPath.startsWith(effectsPrefix)) inside = true;
-  });
-  return inside;
+function walkGateAwareStatNodes(
+  node: unknown,
+  out: { attack: number; defense: number }[],
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    for (const item of node) walkGateAwareStatNodes(item, out);
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+
+  if (obj.op === "gate" && obj.condition != null && obj.condition !== "") {
+    if (Array.isArray(obj.effects)) {
+      for (const e of obj.effects) walkGateAwareStatNodes(e, out);
+    }
+    if (Array.isArray(obj.else_effects)) {
+      for (const e of obj.else_effects) walkGateAwareStatNodes(e, out);
+    }
+    return;
+  }
+
+  if (obj.op === "stat") {
+    const cond = obj.condition;
+    if (typeof cond === "string" && cond !== "") return;
+    const attack = Number(obj.attack);
+    const defense = Number(obj.defense);
+    if (Number.isFinite(attack) && Number.isFinite(defense)) {
+      out.push({ attack, defense });
+    }
+    return;
+  }
+
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    walkGateAwareStatNodes(v, out);
+  }
+}
+
+function compareScopedNumericMultiset(
+  stats: Map<NumericDriftHint["check"], NumericDriftScanStat>,
+  check: NumericDriftHint["check"],
+  textValues: number[],
+  jsonValues: number[],
+  label: string,
+  recordDrift: (
+    check: NumericDriftHint["check"],
+    message: string,
+    textValue: string | number,
+    jsonValue: string | number,
+  ) => void,
+): void {
+  if (!textValues.length || textValues.length !== jsonValues.length) return;
+  markScanned(stats, check);
+  const textSorted = sortedNumericList(textValues);
+  const jsonSorted = sortedNumericList(jsonValues);
+  if (!listsEqual(textSorted, jsonSorted)) {
+    recordDrift(
+      check,
+      `${label} in text [${textSorted.join(", ")}] != JSON [${jsonSorted.join(", ")}]`,
+      textSorted.join(","),
+      jsonSorted.join(","),
+    );
+  }
 }
 
 function extractTextCosts(desc: string, pattern: RegExp): number[] {
@@ -838,40 +1022,53 @@ function extractTextCosts(desc: string, pattern: RegExp): number[] {
   return costs;
 }
 
-function extractUnconditionalDealDamageClauses(desc: string): number[] {
+function extractDealDamageFromText(text: string): number[] {
   const amounts: number[] = [];
-  for (const line of desc.split("\n")) {
+  for (const line of text.split("\n")) {
     const trimmed = line.trim();
-    if (/^\d+\./.test(trimmed)) continue; // mode list item
-    if (/\b(random|split between|up to)\b/i.test(trimmed)) continue;
-    const m = trimmed.match(/\bdeal (\d+) damage\b/i);
-    if (m) amounts.push(Number(m[1]));
+    if (!trimmed || /^\d+\./.test(trimmed)) continue;
+    const re = /\bdeal (?:it |them )?(\d+) damage\b/gi;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(trimmed)) !== null) {
+      amounts.push(Number(m[1]));
+    }
   }
   return amounts;
 }
 
-function extractStatBonusClauses(
-  desc: string,
+function extractStatBonusFromText(
+  text: string,
 ): { attack: number; defense: number }[] {
   const stats: { attack: number; defense: number }[] = [];
-  for (const line of desc.split("\n")) {
+  for (const line of text.split("\n")) {
     const trimmed = line.trim();
-    if (/^\d+\./.test(trimmed)) continue;
-    const m = trimmed.match(/\+(\d+)\/\+(\d+)/);
-    if (m) stats.push({ attack: Number(m[1]), defense: Number(m[2]) });
+    if (!trimmed || /^\d+\./.test(trimmed)) continue;
+    const m = trimmed.match(/([+-]\d+)\/([+-]\d+)/);
+    if (m) {
+      stats.push({ attack: Number(m[1]), defense: Number(m[2]) });
+    }
   }
   return stats;
 }
 
-function extractDrawCountClauses(desc: string): number[] {
+function extractDrawCountFromText(text: string): number[] {
   const counts: number[] = [];
-  for (const line of desc.split("\n")) {
+  for (const line of text.split("\n")) {
     const trimmed = line.trim();
-    if (/^\d+\./.test(trimmed)) continue;
+    if (!trimmed || /^\d+\./.test(trimmed)) continue;
     const m = trimmed.match(/\bdraw (\d+) cards?\b/i);
     if (m) counts.push(Number(m[1]));
   }
   return counts;
+}
+
+function hasInlineCountdownInOps(card: CardJson): boolean {
+  let found = false;
+  walkEffectNodes(card, (obj) => {
+    const cd = Number((obj as { countdown?: number }).countdown);
+    if (Number.isFinite(cd)) found = true;
+  });
+  return found;
 }
 
 function pushNumericDriftHint(
@@ -1021,51 +1218,51 @@ function checkNumericDrift(
     "Crystallize",
   );
 
-  // Single unconditional "Deal N damage" vs one damage.amount
-  const textDamage = extractUnconditionalDealDamageClauses(desc);
-  const jsonDamage = collectUnconditionalDamageOps(card);
-  if (textDamage.length === 1 && jsonDamage.length === 1) {
-    markScanned(stats, "damage_amount");
-    if (textDamage[0] !== jsonDamage[0]) {
-      recordDrift(
-        "damage_amount",
-        `Deal damage in text (${textDamage[0]}) != JSON damage.amount (${jsonDamage[0]})`,
-        textDamage[0],
-        jsonDamage[0],
-      );
+  // Single unconditional "Deal N damage" vs damage.amount — scoped per ability
+  const sections = parseDescriptionSections(desc);
+  for (const pair of effectSectionPairs(card)) {
+    const sectionText = sectionTextForKey(sections, pair.key, desc);
+    compareScopedNumericMultiset(
+      stats,
+      "damage_amount",
+      extractDealDamageFromText(sectionText),
+      collectDamageAmountsFromRoots(pair.roots),
+      "Deal damage",
+      recordDrift,
+    );
+  }
+
+  // +X/+Y vs stat op — scoped per ability
+  for (const pair of effectSectionPairs(card)) {
+    const sectionText = sectionTextForKey(sections, pair.key, desc);
+    const textStats = extractStatBonusFromText(sectionText);
+    const jsonStats = collectStatBonusesFromRoots(pair.roots);
+    if (textStats.length === 1 && jsonStats.length === 1) {
+      markScanned(stats, "stat_bonus");
+      const t = textStats[0]!;
+      const j = jsonStats[0]!;
+      if (t.attack !== j.attack || t.defense !== j.defense) {
+        recordDrift(
+          "stat_bonus",
+          `Stat bonus in text (${t.attack}/${t.defense}) != JSON stat op (${j.attack}/${j.defense})`,
+          `${t.attack}/${t.defense}`,
+          `${j.attack}/${j.defense}`,
+        );
+      }
     }
   }
 
-  // Single +X/+Y vs one stat op
-  const textStats = extractStatBonusClauses(desc);
-  const jsonStats = collectUnconditionalStatOps(card);
-  if (textStats.length === 1 && jsonStats.length === 1) {
-    markScanned(stats, "stat_bonus");
-    const t = textStats[0]!;
-    const j = jsonStats[0]!;
-    if (t.attack !== j.attack || t.defense !== j.defense) {
-      recordDrift(
-        "stat_bonus",
-        `Stat bonus in text (+${t.attack}/+${t.defense}) != JSON stat op (+${j.attack}/+${j.defense})`,
-        `+${t.attack}/+${t.defense}`,
-        `+${j.attack}/+${j.defense}`,
-      );
-    }
-  }
-
-  // Single "Draw N card(s)" vs one draw.count
-  const textDraws = extractDrawCountClauses(desc);
-  const jsonDraws = collectUnconditionalDrawOps(card);
-  if (textDraws.length === 1 && jsonDraws.length === 1) {
-    markScanned(stats, "draw_count");
-    if (textDraws[0] !== jsonDraws[0]) {
-      recordDrift(
-        "draw_count",
-        `Draw count in text (${textDraws[0]}) != JSON draw.count (${jsonDraws[0]})`,
-        textDraws[0],
-        jsonDraws[0],
-      );
-    }
+  // "Draw N card(s)" vs draw.count — scoped per ability
+  for (const pair of effectSectionPairs(card)) {
+    const sectionText = sectionTextForKey(sections, pair.key, desc);
+    compareScopedNumericMultiset(
+      stats,
+      "draw_count",
+      extractDrawCountFromText(sectionText),
+      collectDrawCountsFromRoots(pair.roots),
+      "Draw count",
+      recordDrift,
+    );
   }
 
   return { hints, errors };
@@ -1170,7 +1367,8 @@ function checkCard(card: CardJson): Issue[] {
 
   if (
     descriptionMentionsCountdownOutsideCrystallize(desc) &&
-    !hasKeyword(kws, "Countdown")
+    !hasKeyword(kws, "Countdown") &&
+    !hasInlineCountdownInOps(card)
   ) {
     issues.push({
       id: card.id,
