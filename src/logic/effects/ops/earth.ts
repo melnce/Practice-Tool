@@ -1,7 +1,7 @@
 // src/logic/effects/ops/earth.ts
 import { state } from "../../../core/gameState.js";
 import { logEvent } from "../../../core/logger.js";
-import type { Player, CardInstance } from "../../../core/types/index.js";
+import type { Player } from "../../../core/types/index.js";
 import {
   getBoard,
   getGraveyard,
@@ -11,10 +11,6 @@ import { fireTrigger } from "../../core/triggers.js";
 
 function board(owner: Player) {
   return getBoard(state, owner);
-}
-function isWitchsNewBrew(card: CardInstance) {
-  const n = String(card?.name || "").toLowerCase();
-  return n.includes("witch") && n.includes("brew");
 }
 
 export function hasEarthSigils(owner: Player, amount = 1) {
@@ -33,20 +29,16 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
     if (c?.type === "Amulet" && (c.counters?.earth || 0) >= amount) {
       c.counters!.earth! -= amount;
 
-      // Log the earth sigil consumption
       logEvent("earthConsume", { owner, amount, card: c.name, uid: c.uid });
 
-      if (c.counters!.earth! <= 0 && (isWitchsNewBrew(c) || c.destroyOnEmpty)) {
+      if (c.counters!.earth! <= 0 && c.destroyOnEmpty) {
         const removed = b.splice(i, 1)[0];
         if (removed) {
           grave.push(removed);
 
-          // Log the earth sigil destruction
           logEvent("earthSigilDestroyed", { owner, card: c.name, uid: c.uid });
 
-          // Increment shadows for the owner
           addShadows(state, owner, 1);
-          // Render removed - UI layer
         }
       }
       fireTrigger("ally_earth_rite", owner, { sourceCard: c });

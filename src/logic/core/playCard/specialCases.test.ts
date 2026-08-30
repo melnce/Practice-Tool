@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { state, resetGameState } from "../../../core/gameState.js";
 import type { CardInstance } from "../../../core/types/index.js";
 import { canPlayCard } from "./preflight.js";
-import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
+import { mergeEarthSigilOnPlay } from "../../effects/ops/summon_ops/earth.js";
 
 describe("Special Cases", () => {
   beforeEach(() => {
@@ -89,6 +89,7 @@ describe("Special Cases", () => {
         name: "Witch's New Brew",
         type: "Amulet",
         cost: 1,
+        tribes: ["Earth Sigil"],
         counters: { earth: 3 },
       } as any;
 
@@ -98,13 +99,14 @@ describe("Special Cases", () => {
         name: "Witch's New Brew",
         type: "Amulet",
         cost: 1,
+        tribes: ["Earth Sigil"],
       };
 
       state.players.first.board = [existingBrew, newBrew];
       state.players.first.graveyard = [];
       state.players.first.shadows = 0;
 
-      mergeWitchsNewBrewOnPlay(newBrew, "first");
+      mergeEarthSigilOnPlay(newBrew, "first");
 
       // Existing brew should be removed
       expect(state.players.first.board.length).toBe(1);
@@ -128,6 +130,7 @@ describe("Special Cases", () => {
         name: "Magic Sediment",
         type: "Amulet",
         cost: 0,
+        tribes: ["Earth Sigil"],
         counters: { earth: 1 },
       } as any;
 
@@ -137,13 +140,14 @@ describe("Special Cases", () => {
         name: "Witch's New Brew",
         type: "Amulet",
         cost: 1,
+        tribes: ["Earth Sigil"],
       };
 
       state.players.first.board = [sediment, newBrew];
       state.players.first.graveyard = [];
       state.players.first.shadows = 0;
 
-      mergeWitchsNewBrewOnPlay(newBrew, "first");
+      mergeEarthSigilOnPlay(newBrew, "first");
 
       expect(state.players.first.board.length).toBe(1);
       expect((newBrew as any).counters.earth).toBe(1);
@@ -164,12 +168,13 @@ describe("Special Cases", () => {
         name: "Witch's New Brew",
         type: "Amulet",
         cost: 1,
+        tribes: ["Earth Sigil"],
       };
 
       state.players.first.board = [otherAmulet, newBrew];
       state.players.first.graveyard = [];
 
-      mergeWitchsNewBrewOnPlay(newBrew, "first");
+      mergeEarthSigilOnPlay(newBrew, "first");
 
       expect(state.players.first.board.length).toBe(2);
       expect(state.players.first.graveyard.length).toBe(0);

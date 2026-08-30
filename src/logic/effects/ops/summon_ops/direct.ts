@@ -12,8 +12,8 @@ import {
   isCardDatabaseInitialized,
 } from "../../../../data/cardIndex.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
-import { boardOf, normalizeName, safeClone } from "./utils.js";
-import { findEarthSigilTarget } from "./earth.js";
+import { boardOf, safeClone } from "./utils.js";
+import { isEarthSigil, tryMergeIntoExistingEarthSigil } from "./earth.js";
 
 // =============== Public API ===============
 
@@ -36,19 +36,11 @@ export function summonNamed(eff: Effect, owner: Player) {
   }
 
   const board = boardOf(owner);
-  const isSedimentSummon = normalizeName(name) === "magic sediment";
+  const isEarthSigilSummon = isEarthSigil(data);
 
   for (let i = 0; i < count; i++) {
-    if (isSedimentSummon) {
-      // SPECIAL HANDLING FOR MAGIC SEDIMENT: Check if any Earth Sigil exists first
-      const existingEarthSigil = findEarthSigilTarget(board);
-      if (existingEarthSigil) {
-        // Add counter to existing Earth Sigil instead of summoning new one
-        existingEarthSigil.counters = existingEarthSigil.counters || {};
-        existingEarthSigil.counters.earth =
-          (existingEarthSigil.counters.earth || 0) + 1;
-        continue; // Skip summoning
-      }
+    if (isEarthSigilSummon && tryMergeIntoExistingEarthSigil(board)) {
+      continue;
     }
 
     const card = makeCardFromDB(data, owner);

@@ -55,7 +55,6 @@ export function initAmulet(card: CardInstance) {
   seedCountersFromKeywords(card);
 
   // Earth Sigils: auto-initialize earth counter to 1 if not set
-  // This ensures played earth sigils (Witch's New Brew, Magic Sediment) have a counter
   if (isEarthSigil(card)) {
     card.counters = card.counters || {};
     if (card.counters.earth === undefined || card.counters.earth === 0) {
