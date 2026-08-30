@@ -24,6 +24,7 @@ import { fileURLToPath } from "url";
 import { SETS_DIR } from "./mergeSets.js";
 import { checkOpKeysForCard } from "./op-keys-gate.js";
 import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
+import { checkSelectTargetForCard } from "./select-target-gate.js";
 import {
   getImplementationStatus,
   type ImplementationStatus,
@@ -1468,12 +1469,16 @@ function main() {
   const gateDurationOp =
     process.argv.includes("--gate=duration-op") ||
     process.argv.includes("--gate=duration_op");
+  const gateSelectTarget =
+    process.argv.includes("--gate=select-target") ||
+    process.argv.includes("--gate=select_target");
   const gateMode =
     gateAddToHand ||
     gateStatOp ||
     gateDestroyOp ||
     gateOpKeys ||
-    gateDurationOp;
+    gateDurationOp ||
+    gateSelectTarget;
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -1496,7 +1501,9 @@ function main() {
             ? "🔍 Checking op-keys field contracts...\n"
             : gateDurationOp
               ? "🔍 Checking duration-key op contracts...\n"
-              : "🔍 Checking card description ↔ JSON structure...\n",
+              : gateSelectTarget
+                ? "🔍 Checking select-target pool contracts...\n"
+                : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
@@ -1509,6 +1516,7 @@ function main() {
         if (gateDestroyOp) allIssues.push(...checkDestroyOpFilters(card));
         if (gateOpKeys) allIssues.push(...checkOpKeysForCard(card));
         if (gateDurationOp) allIssues.push(...checkDurationOpKeysForCard(card));
+        if (gateSelectTarget) allIssues.push(...checkSelectTargetForCard(card));
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
@@ -1591,7 +1599,9 @@ function main() {
               ? `✅ ${cardCount} cards — all ops use supported keys.\n`
               : gateDurationOp
                 ? `✅ ${cardCount} cards — duration keys only appear on ops that honour them.\n`
-                : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+                : gateSelectTarget
+                  ? `✅ ${cardCount} cards — selected targets always have a parent select.\n`
+                  : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(
