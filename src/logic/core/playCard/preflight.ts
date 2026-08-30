@@ -10,6 +10,11 @@ import type {
 } from "../../../core/types/index.js";
 import { getPool, selectPoolCondition } from "../targeting.js";
 import { isOverflow } from "../../../helpers/overflow.js";
+import {
+  evaluateCondition,
+  getConditionEvaluator,
+} from "../../effects/gates/conditions.js";
+import type { UnifiedGateSpec } from "../../effects/gates/types.js";
 import { resolvePlayCost, getEffectiveCost } from "./cost.js";
 import {
   getPP,
@@ -205,11 +210,30 @@ function checkEffectsHaveValidTargets(
   const checkArr = (arr: Effect[]): PreflightResult => {
     for (const eff of arr || []) {
       // Handle gated effects (unified gate format)
-      if (eff?.op === "gate" && (eff as any).condition === "overflow") {
-        if (isOverflow(player)) {
-          const nested = checkArr((eff as any).effects || []);
-          if (!nested.ok) return nested;
+      if (eff?.op === "gate") {
+        const gateSpec = eff as Effect & UnifiedGateSpec;
+        if (gateSpec.condition === "overflow") {
+          if (isOverflow(player)) {
+            const nested = checkArr(gateSpec.effects || []);
+            if (!nested.ok) return nested;
+          }
+          continue;
         }
+
+        // Evaluate branch that will run when the condition is known at preflight.
+        // Unknown conditions are skipped — a false "unplayable" is worse than a fizzle.
+        const evaluator = getConditionEvaluator(
+          String(gateSpec.condition ?? ""),
+        );
+        if (!evaluator) {
+          continue;
+        }
+        const passed = evaluateCondition(gateSpec, player, sourceCard);
+        const branch = passed
+          ? gateSpec.effects || []
+          : gateSpec.else_effects || [];
+        const nested = checkArr(branch);
+        if (!nested.ok) return nested;
         continue;
       }
 

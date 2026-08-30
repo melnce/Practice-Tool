@@ -389,24 +389,18 @@ describe("Set 104: Skybound Dragons", () => {
       deckBId: "sample_red",
       seed: 104,
     });
+
+    const { getCardById } = await import("../../src/data/cardDatabase.js");
+    const flareTemplate = getCardById("10433310");
+    expect(flareTemplate?.spell?.[0]?.op).toBe("select");
+
     state.players.second.board = [
       { uid: "e1", defense: 6, type: "Follower" },
     ] as any;
 
     const flare = {
+      ...flareTemplate!,
       uid: "hand_1",
-      id: "10433310",
-      name: "Alchemic Flare",
-      type: "Spell",
-      cost: 2,
-      spell: [
-        {
-          op: "select",
-          target: "enemy:follower",
-          effects: [{ op: "damage", amount: 4 }],
-        },
-        { op: "summon", name: "Magic Sediment" },
-      ],
     } as any;
     state.players.first.hand = [flare];
     state.players.first.pp = 2;
@@ -416,6 +410,7 @@ describe("Set 104: Skybound Dragons", () => {
       player: "first",
       cardUid: "hand_1",
     });
+    expect(state.pendingTargetEffect).toBeDefined();
     state = dispatch(state, {
       type: "CHOOSE_TARGET",
       player: "first",
