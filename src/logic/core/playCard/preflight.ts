@@ -11,7 +11,7 @@ import type {
 import { getPool, selectPoolCondition } from "../targeting.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import {
-  evaluateCondition,
+  peekCondition,
   getConditionEvaluator,
 } from "../../effects/gates/conditions.js";
 import type { UnifiedGateSpec } from "../../effects/gates/types.js";
@@ -222,13 +222,14 @@ function checkEffectsHaveValidTargets(
 
         // Evaluate branch that will run when the condition is known at preflight.
         // Unknown conditions are skipped — a false "unplayable" is worse than a fizzle.
+        // INVARIANT: preflight is read-only — use peekCondition, never evaluateCondition.
         const evaluator = getConditionEvaluator(
           String(gateSpec.condition ?? ""),
         );
         if (!evaluator) {
           continue;
         }
-        const passed = evaluateCondition(gateSpec, player, sourceCard);
+        const passed = peekCondition(gateSpec, player, sourceCard);
         const branch = passed
           ? gateSpec.effects || []
           : gateSpec.else_effects || [];
