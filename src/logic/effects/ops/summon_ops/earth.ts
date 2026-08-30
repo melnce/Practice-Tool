@@ -1,23 +1,26 @@
+import { state } from "../../../../core/gameState.js";
 import type {
   CardInstance,
   CardTemplate,
+  Player,
 } from "../../../../core/types/index.js";
-import { isAmulet, normalizeName } from "./utils.js";
+import {
+  getBoard,
+  getGraveyard,
+  addShadows,
+} from "../../../../core/playerHelpers.js";
+import { isAmulet } from "./utils.js";
 
-// =============== Utilities ===============
+const EARTH_SIGIL_TRIBE = "Earth Sigil";
 
-export function isWitchsNewBrew(card: CardInstance) {
-  const n = normalizeName(card?.name);
-  return isAmulet(card) && n.includes("witch") && n.includes("brew");
-}
+// =============== Earth Sigil identity (data-driven) ===============
 
-export function isMagicSediment(card: CardInstance) {
-  return isAmulet(card) && normalizeName(card?.name) === "magic sediment";
-}
-
-export function isEarthSigil(card: CardInstance) {
-  // In this engine, Earth Sigils on board are represented by either Brew or Sediment.
-  return isWitchsNewBrew(card) || isMagicSediment(card);
+export function isEarthSigil(
+  card: CardInstance | CardTemplate | null | undefined,
+) {
+  if (!card || !isAmulet(card as CardInstance)) return false;
+  const tribes = Array.isArray(card.tribes) ? card.tribes : [];
+  return tribes.some((tribe) => String(tribe) === EARTH_SIGIL_TRIBE);
 }
 
 // Return how many earth counters a card *starts* with, based on its keywords
@@ -39,22 +42,16 @@ export function startingEarthFromKeywords(cardData: CardTemplate) {
 
 // =============== Earth Sigil Merge + De-dup ===============
 
-// Find an existing Earth Sigil on board for the owner: prefer Brew (replacement rule), else Sediment.
-export function findEarthSigilTarget(board: CardInstance[]) {
-  let brew = null;
-  let sediment = null;
-  for (const c of board) {
-    if (!isAmulet(c)) continue;
-    if (isWitchsNewBrew(c)) {
-      brew = brew || c;
-    } else if (isMagicSediment(c)) {
-      sediment = sediment || c;
-    }
-  }
-  return brew || sediment || null;
+function earthSigilsOnBoard(board: CardInstance[]) {
+  return board.filter(isEarthSigil);
 }
 
-// Add "amount" earth counters to the preferred Earth Sigil target, if present.
+// Oldest Earth Sigil on board (board order = entry order).
+export function findEarthSigilTarget(board: CardInstance[]) {
+  return earthSigilsOnBoard(board)[0] ?? null;
+}
+
+// Add one earth counter to the oldest Earth Sigil, if present.
 // Returns true if merged into an existing amulet (no new card should be created).
 export function tryMergeIntoExistingEarthSigil(board: CardInstance[]) {
   const target = findEarthSigilTarget(board);
@@ -65,52 +62,95 @@ export function tryMergeIntoExistingEarthSigil(board: CardInstance[]) {
   return true;
 }
 
-// Helper function to merge sigils of the same type
+function sumCounters(cards: CardInstance[]) {
+  const totals: Record<string, number> = {};
+  for (const card of cards) {
+    const counters = card.counters;
+    if (!counters || typeof counters !== "object") continue;
+    for (const [key, value] of Object.entries(counters)) {
+      totals[key] = (totals[key] || 0) + (Number(value) || 0);
+    }
+  }
+  return totals;
+}
+
+function removeEarthSigilsFromBoard(
+  board: CardInstance[],
+  owner: Player,
+  indices: number[],
+) {
+  const grave = getGraveyard(state, owner);
+  indices.sort((a, b) => b - a);
+  for (const idx of indices) {
+    const removed = board.splice(idx, 1)[0];
+    if (removed) {
+      grave.push(removed);
+      addShadows(state, owner, 1);
+    }
+  }
+}
+
+// When an Earth Sigil amulet enters via play, merge counters from other
+// Earth Sigils on the board into the entering card and remove the old ones.
+export function mergeEarthSigilOnPlay(entering: CardInstance, owner: Player) {
+  if (!isEarthSigil(entering)) return;
+
+  const board = getBoard(state, owner);
+  const enteringIndex = board.lastIndexOf(entering);
+  if (enteringIndex < 0) return;
+
+  const toRemove: number[] = [];
+  for (let i = 0; i < board.length; i++) {
+    if (i === enteringIndex) continue;
+    const card = board[i];
+    if (card && isEarthSigil(card)) toRemove.push(i);
+  }
+  if (!toRemove.length) return;
+
+  const absorbed = sumCounters(
+    toRemove.map((idx) => board[idx]!).filter(Boolean),
+  );
+  entering.counters = entering.counters || {};
+  for (const [key, value] of Object.entries(absorbed)) {
+    entering.counters[key] = (entering.counters[key] || 0) + value;
+  }
+
+  removeEarthSigilsFromBoard(board, owner, toRemove);
+}
+
+// Helper function to merge sigils into the oldest survivor
 export function mergeSigils(
   board: CardInstance[],
   sigilsToMerge: CardInstance[],
 ) {
   if (sigilsToMerge.length <= 1) return;
 
-  // Choose the first one as survivor
   const survivor = sigilsToMerge[0];
   if (!survivor) return;
 
-  // Sum counters from the others
-  let totalEarth = Number(survivor.counters?.earth || 0);
-  for (let i = 1; i < sigilsToMerge.length; i++) {
-    const s = sigilsToMerge[i];
-    if (!s) continue;
-    totalEarth += Number(s.counters?.earth || 0);
-
-    // Remove from board
-    const idx = board.indexOf(s);
-    if (idx !== -1) board.splice(idx, 1);
+  const absorbed = sumCounters(sigilsToMerge);
+  survivor.counters = survivor.counters || {};
+  for (const [key, value] of Object.entries(absorbed)) {
+    survivor.counters[key] = value;
   }
 
-  // Update survivor counters
-  survivor.counters = survivor.counters || {};
-  survivor.counters.earth = totalEarth;
+  const toRemove: number[] = [];
+  for (let i = 1; i < sigilsToMerge.length; i++) {
+    const sigil = sigilsToMerge[i];
+    if (!sigil) continue;
+    const idx = board.indexOf(sigil);
+    if (idx !== -1) toRemove.push(idx);
+  }
+  if (!toRemove.length) return;
+
+  const owner = survivor.owner ?? "first";
+  removeEarthSigilsFromBoard(board, owner, toRemove);
 }
 
 // After any summon that could touch Earth Sigils, merge duplicates down to one.
-// Preferred survivor: Brew if present, else the oldest Sediment (first found).
-// All earth counters from the others are absorbed into the survivor; extras are removed.
+// Oldest sigil on board survives; all earth counters are summed onto it.
 export function dedupeEarthSigils(board: CardInstance[]) {
-  const sigils = board.filter(isEarthSigil);
+  const sigils = earthSigilsOnBoard(board);
   if (sigils.length <= 1) return;
-
-  // Group by type: Brews and Sediments
-  const brews = sigils.filter(isWitchsNewBrew);
-  const sediments = sigils.filter(isMagicSediment);
-
-  // If we have multiple Brews, merge them into one
-  if (brews.length > 1) {
-    mergeSigils(board, brews);
-  }
-
-  // If we have multiple Sediments, merge them into one
-  if (sediments.length > 1) {
-    mergeSigils(board, sediments);
-  }
+  mergeSigils(board, sigils);
 }

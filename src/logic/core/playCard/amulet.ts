@@ -11,7 +11,7 @@ import { runEffects } from "../effects/index.js";
 import { pushPlayedHistory } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 
-import { mergeWitchsNewBrewOnPlay } from "./specialCases.js";
+import { mergeEarthSigilOnPlay } from "../../effects/ops/summon_ops/earth.js";
 import { applyKeywordsFromList } from "../keywords.js";
 
 import { initAmulet } from "../../effects/ops/summon_ops/init.js";
@@ -38,7 +38,7 @@ export function playAmulet(
   // Invalidate trigger-candidate cache (ally_spell_played / mid-turn scans).
   bumpZoneVersion();
 
-  mergeWitchsNewBrewOnPlay(card, player);
+  mergeEarthSigilOnPlay(card, player);
 
   for (const tier of tiers) {
     if (Array.isArray(tier.effects) && tier.effects.length) {
