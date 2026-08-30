@@ -153,6 +153,8 @@
 
   /* ── Z-index ladder ──────────────────────────────────────────────────── */
   --z-base: 0;
+  /* Above hand-card hover (20) and playable glow (10) */
+  --z-leader-controls: 50;
   --z-board-stats: 100;
   --z-turn-controls: 300;
   --z-hamburger: 350;

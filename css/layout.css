@@ -124,7 +124,7 @@
 }
 
 .hand-zone .card:not(:first-child) {
-  margin-left: var(--hand-card-overlap-loose);
+  margin-left: var(--hand-card-overlap-active, var(--hand-card-overlap-loose));
 }
 
 .hand-zone .card:hover {
