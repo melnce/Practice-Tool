@@ -20,7 +20,10 @@ const ROOT = resolve(__dirname, "..");
 const REPORT_DIR = join(ROOT, "reports", "soak-deck-meta");
 
 const META_DECK = "dragoncraft_meta";
-const OPPONENTS = ["dragoncraft_overflow", "swordcraft_rally"] as const;
+const OPPONENTS = [
+  "dragoncraft_meta_v2",
+  "portalcraft_artifact_rotation",
+] as const;
 
 /** 14 distinct cards in dragoncraft_meta (id → name). */
 const META_CARD_IDS: Record<string, string> = {

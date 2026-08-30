@@ -13,19 +13,14 @@ import { loadMainPoolIds } from "./soakCoverage.js";
 
 export const SHIPPED_DECK_IDS = [
   "starter_deck",
-  "forestcraft_combo",
-  "swordcraft_rally",
-  "runecraft_spellboost",
-  "dragoncraft_overflow",
   "dragoncraft_meta",
-  "abysscraft_necromancy",
-  "havencraft_countdown",
-  "portalcraft_artifacts",
+  "portalcraft_artifact_rotation",
+  "runecraft_sephie_test_subject",
 ] as const;
 
 /**
  * Cards the uniform random soak historically never touched (high cost and/or
- * not present in the 8 shipped decks). Odd games rotate a spotlight insert so
+ * not present in the shipped decks). Odd games rotate a spotlight insert so
  * this class stays reachable without hard-coding play policies per card.
  */
 export const SOAK_SPOTLIGHT_CARD_IDS = [

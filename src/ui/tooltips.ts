@@ -13,6 +13,7 @@ import {
   formatCrestPanels,
   formatTooltipDescription,
 } from "./tooltipFormat.js";
+import { releaseImageLoads } from "./releaseImageLoads.js";
 
 // NEW: show +A/+D based only on buffs/debuffs (not damage)
 function formatBuffDelta(card: CardInstance) {
@@ -185,6 +186,7 @@ type TooltipSession = {
 let activeSession: TooltipSession | null = null;
 
 function hideTooltip(tooltipEl: HTMLElement) {
+  releaseImageLoads(tooltipEl);
   tooltipEl.style.display = "none";
 }
 
@@ -210,6 +212,7 @@ function paintTooltip(
       `<div class="tooltip-play-blocked" style="color:#ff8888;margin-top:0.5em;font-weight:600;">` +
       `Cannot play: ${blockedReason}</div>`;
   }
+  releaseImageLoads(tooltipEl);
   tooltipEl.innerHTML = html;
   tooltipEl.style.whiteSpace = "normal";
   tooltipEl.style.display = "block";

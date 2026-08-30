@@ -134,7 +134,8 @@ export function formatCrestPanels(
       `<div class="tooltip-crest-panel">` +
       `<img class="tooltip-crest-icon" src="${escapeHtml(image)}" alt="" ` +
       `data-fallback-src="${escapeHtml(fallback)}" ` +
-      `onerror="if(!this.dataset.fallbackApplied){this.dataset.fallbackApplied='1';this.src=this.dataset.fallbackSrc||'';}">` +
+      `onerror="if(this.dataset.fallbackApplied){this.onerror=null;this.onload=null;return;}this.dataset.fallbackApplied='1';var n=this.dataset.fallbackSrc||'';if(!n||n===this.currentSrc||n===this.src){this.onerror=null;this.onload=null;return;}this.src=n;" ` +
+      `onload="this.onerror=null;this.onload=null;">` +
       `<div class="tooltip-crest-body">` +
       `<div class="tooltip-crest-name">${escapeHtml(crest.name)}</div>` +
       `<div class="tooltip-crest-text">${descLines}</div>` +
@@ -161,8 +162,23 @@ export function attachCrestImageFallback(
   img.src = primaryUrl;
   img.dataset.fallbackSrc = fallback;
   img.onerror = () => {
-    if (img.dataset.fallbackApplied) return;
+    if (img.dataset.fallbackApplied) {
+      img.onerror = null;
+      img.onload = null;
+      return;
+    }
     img.dataset.fallbackApplied = "1";
-    img.src = img.dataset.fallbackSrc || fallback;
+    const next = img.dataset.fallbackSrc || fallback;
+    // Same URL as primary: don't start a second pending load on the same CDN path.
+    if (!next || next === img.currentSrc || next === img.src) {
+      img.onerror = null;
+      img.onload = null;
+      return;
+    }
+    img.src = next;
+  };
+  img.onload = () => {
+    img.onerror = null;
+    img.onload = null;
   };
 }
