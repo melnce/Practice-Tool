@@ -321,8 +321,8 @@ async function runHarness() {
     await page.waitForFunction(() => !!window.__svwbTest);
 
     await startGame(page, {
-      blue: "swordcraft_rally",
-      red: "abysscraft_necromancy",
+      blue: "runecraft_sephie_test_subject",
+      red: "portalcraft_artifact_rotation",
       seed: SEED,
     });
     await confirmMulligans(page);

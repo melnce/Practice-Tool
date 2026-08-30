@@ -20,13 +20,8 @@ import { isRawDeckObject, type RawDeck } from "../../src/data/rawDeck.js";
 
 /** One playable 40-card list per class — keep in sync with .gitignore exceptions. */
 export const COMMITTED_CLASS_DECKS = [
-  "forestcraft_combo.json",
-  "swordcraft_rally.json",
-  "runecraft_spellboost.json",
-  "dragoncraft_overflow.json",
-  "abysscraft_necromancy.json",
-  "havencraft_countdown.json",
-  "portalcraft_artifacts.json",
+  "portalcraft_artifact_rotation.json",
+  "runecraft_sephie_test_subject.json",
 ] as const;
 
 const ROOT = path.resolve(
@@ -121,16 +116,6 @@ describe("committed class deck library", () => {
       return isRawDeckObject(raw) ? raw.class : undefined;
     });
     expect(new Set(classes).size).toBe(COMMITTED_CLASS_DECKS.length);
-    expect(classes.sort()).toEqual(
-      [
-        "Abysscraft",
-        "Dragoncraft",
-        "Forestcraft",
-        "Havencraft",
-        "Portalcraft",
-        "Runecraft",
-        "Swordcraft",
-      ].sort(),
-    );
+    expect(classes.sort()).toEqual(["Portalcraft", "Runecraft"].sort());
   });
 });

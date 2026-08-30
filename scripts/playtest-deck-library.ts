@@ -17,13 +17,12 @@ const OUT = path.join(ROOT, "reports", "deck-library-playtest.json");
 const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
 
 const DECKS = [
-  { id: "forestcraft_combo", mechanic: "combo", seed: 424201 },
-  { id: "swordcraft_rally", mechanic: "rally", seed: 424202 },
-  { id: "runecraft_spellboost", mechanic: "spellboost", seed: 424203 },
-  { id: "dragoncraft_overflow", mechanic: "overflow", seed: 424204 },
-  { id: "abysscraft_necromancy", mechanic: "shadows", seed: 424205 },
-  { id: "havencraft_countdown", mechanic: "countdown_amulet", seed: 424206 },
-  { id: "portalcraft_artifacts", mechanic: "artifact_gear", seed: 424207 },
+  { id: "runecraft_sephie_test_subject", mechanic: "fuse_storm", seed: 424203 },
+  {
+    id: "portalcraft_artifact_rotation",
+    mechanic: "artifact_gear",
+    seed: 424207,
+  },
 ] as const;
 
 type Mechanic = (typeof DECKS)[number]["mechanic"];
