@@ -329,14 +329,29 @@ add pointless wrappers.
 
 ### Deviating card ids (nested + single `selected:*` consumer → should be flat)
 
-- `10432110` Ezecrain, Portent of Vengeance — nested select → damage
-- `10433310` Alchemic Flare — nested select → damage
-- `10552120` Friendly Blue Ogre — nested select → stat
-- `10602210` Encroached World — nested select → transform
-- `10614110` Althenia, Nurturing Bloom — nested select → destroy
-- `10664120` Lyanthoth, Eld Tome — nested select → destroy
-- `10741120` Carrier Wyvern — nested select → stat
-- `10953310` Reaper's Due — nested select → keyword
+**Migrated in PR 4** (nested single-consumer → flat):
+
+- `10432110` Ezecrain, Portent of Vengeance — flat damage+select:2
+- `10433310` Alchemic Flare — flat damage+select:1
+- `10552120` Friendly Blue Ogre — flat stat+select:1
+- `10614110` Althenia, Nurturing Bloom — flat destroy+select:1
+- `10664120` Lyanthoth, Eld Tome — flat destroy+select:3 + condition.not_self
+  (pool-equivalence proven: nested `handleSelect` pool ≡ flat `handleDestroy`
+  pool; play-path pending pool excludes Lyanthoth itself)
+- `10741120` Carrier Wyvern — evolve only → flat stat+select:1 (fanfare already flat)
+- `10953310` Reaper's Due — flat keyword+select:1
+
+### Deferred — needs engine support before flatten
+
+- `10602210` Encroached World — nested select → transform `into_source:enemy:deck`.
+  **Deferred — flat form is not behaviour-equivalent today.** Flat
+  `{op:transform, target:ally:hand, select:1, into_source:enemy:deck}` hits
+  `transform.ts`'s `into_source === "enemy:deck"` branch, which auto-slices the
+  pool (`pool.slice(0, selectN)`) and never calls `setPendingTarget`. Nested
+  `op:select` is what opens the hand-selection UI. Proven by
+  `batch14_owner_rulings_final8` (Encroached World Engage) going red under the
+  flat form and green when left nested. Gate excludes this id until the flat
+  `into_source` path learns pending select.
 
 ### Correctly nested (2+ shared consumers) — do not "fix"
 
@@ -444,7 +459,7 @@ step, then harden).
 
 ---
 
-## Gate (WARN mode)
+## Gate
 
 `npm run check:canonical-form` — exit 0 always unless `--fail`.
 
@@ -454,19 +469,16 @@ Per-family filters: `--gate=turn-scope|select-count|chosen-target`.
 (_"until the end of your opponent's turn"_) as trigger scope — that class of error is
 documented under Agent of the Testaments above.
 
-**Proposed (do not implement here) once a family is migrated:** add the matching
-`--gate=` to the `npm run check` chain in **error** mode (exit 1), one family at a time —
-e.g. after PR 3 lands `select-count`, wire
-`check:canonical-form --gate=select-count --fail` next to the existing
-`check:select-target` step. Do not hard-fail all families at once.
+**Hard-fail in `npm run check` (all three families migrated):**
+
+- `check:canonical-form:turn-scope` → `--gate=turn-scope --fail`
+- `check:canonical-form:select-count` → `--gate=select-count --fail`
+- `check:canonical-form:chosen-target` → `--gate=chosen-target --fail`
 
 ---
 
 ## Proposed later PR split
 
-1. **PR 2 — turn-scope migration** (spelling worklist) + baseline update; **separately
-   adjudicate** Dark Dimensions, Galleon, and Illamrita per printed text (Illamrita blocked
-   on granted-trigger ownership). Fragile codebase — one card at a time where behaviour
-   changes.
-2. **PR 3 — select_count → select**.
-3. **PR 4 — nested single-consumer → flat**.
+1. ~~**PR 2 — turn-scope migration**~~ — landed.
+2. ~~**PR 3 — select_count → select**~~ — landed.
+3. ~~**PR 4 — nested single-consumer → flat**~~ — landed.

@@ -2,7 +2,8 @@
 /**
  * Canonical-form gate for card-data drift families.
  *
- * Turn-scope is hard-fail once migrated (`--gate=turn-scope --fail`).
+ * Migrated families hard-fail via npm run check:
+ *   --gate=turn-scope|select-count|chosen-target --fail
  * Other families remain WARN-only until their own migration PRs land.
  *
  * SHAPE-ONLY: inspects JSON structure. Must never treat keyword-duration
@@ -12,8 +13,8 @@
  *
  *   npm run check:canonical-form
  *   npx tsx scripts/check-canonical-form.ts --gate=turn-scope --fail
- *   npx tsx scripts/check-canonical-form.ts --gate=select-count
- *   npx tsx scripts/check-canonical-form.ts --gate=chosen-target
+ *   npx tsx scripts/check-canonical-form.ts --gate=select-count --fail
+ *   npx tsx scripts/check-canonical-form.ts --gate=chosen-target --fail
  *
  * Optional `--fail` promotes the selected family's warnings to exit 1.
  */
@@ -196,6 +197,11 @@ function checkSelectCount(card: CardJson): Warning[] {
 }
 
 function checkChosenTarget(card: CardJson): Warning[] {
+  // Encroached World: flat transform+into_source does not open pending select
+  // yet (transform.ts auto-slices). See Family 3 deferred note in
+  // claude/card-data-drift-2026-08-31.md.
+  if (card.id === "10602210") return [];
+
   const out: Warning[] = [];
   walk(card, (obj) => {
     if (obj.op !== "select") return;
@@ -313,9 +319,13 @@ function main(): void {
     return true;
   });
 
+  const migrated =
+    gateFilter === "turn-scope" ||
+    gateFilter === "select-count" ||
+    gateFilter === "chosen-target";
   console.log(
-    gateFilter === "turn-scope"
-      ? "Canonical-form gate — turn-scope (error mode when --fail)"
+    migrated
+      ? `Canonical-form gate — ${gateFilter} (error mode when --fail)`
       : "Canonical-form gate — WARN mode for unmigrated families",
   );
   console.log(`scanned ${cards.length} cards from cards/sets/`);
