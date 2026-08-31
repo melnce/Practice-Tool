@@ -15,7 +15,6 @@ export interface DeckManifestEntry {
 }
 
 export interface DeckManifest {
-  generatedAt: string;
   entries: DeckManifestEntry[];
 }
 
@@ -55,5 +54,5 @@ export function buildManifestFromFilenames(
       }),
     );
 
-  return { generatedAt: new Date().toISOString(), entries };
+  return { entries };
 }
