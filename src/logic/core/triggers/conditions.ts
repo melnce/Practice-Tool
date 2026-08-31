@@ -42,9 +42,13 @@ export function evalCommonConditions(
   if (cond.whose_turn === "opponent" && activePlayer === owner) return false;
   if (trigger.your_turn_only && owner !== activePlayer) return false;
 
-  // 2. is_ally - check enteringOwner for enter events, leavingOwner for leave events
+  // 2. is_ally — subject owner from enter/leave context, else card.owner (combat)
   if (typeof cond.is_ally === "boolean" && subjectCard) {
-    const subjectOwner = context.enteringOwner ?? context.leavingOwner;
+    const subjectOwner =
+      context.enteringOwner ??
+      context.leavingOwner ??
+      (subjectCard as { owner?: Player }).owner ??
+      null;
     if (subjectOwner) {
       if (cond.is_ally && owner !== subjectOwner) return false;
       if (!cond.is_ally && owner === subjectOwner) return false;

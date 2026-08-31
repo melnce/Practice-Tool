@@ -10,6 +10,7 @@ import {
 } from "../process.js";
 import { triggerMatchesCandidateZone } from "../utils.js";
 import { dispatchOrderedTriggers } from "./common.js";
+import { evalCommonConditions } from "../conditions.js";
 
 const ATTACKER_SELF_EVENTS = new Set(["strike", "follower_strike", "clash"]);
 
@@ -114,6 +115,17 @@ export function handleCombatEvent(
         event === "leader_strike"
       ) {
         return cand.card.uid === context.attacker?.uid;
+      }
+
+      if (event === "leader_attacked") {
+        if (cand.source !== "crest") return false;
+        return evalCommonConditions(
+          trigger,
+          cand.card,
+          cand.owner,
+          activePlayer,
+          context,
+        );
       }
 
       return false;

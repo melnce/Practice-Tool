@@ -9,6 +9,7 @@ import {
   getOrderedTriggerCandidates,
   triggerMatchesCandidateZone,
 } from "./triggers/utils.js";
+import { crestTurnBoundaryRole } from "./triggers/crestScope.js";
 import { evalCommonConditions } from "./triggers/conditions.js";
 import { shouldFire, markFired } from "./triggers/tracking.js";
 import type { ProcessingCandidate } from "./triggers/process.js";
@@ -63,6 +64,11 @@ function ownerRoleForTrigger(
 ): OwnerRole | null {
   const opponent = opponentOf(focalPlayer);
   const { owner } = candidate;
+  // Crests: shared owner-scoping (default owner-only; whose_turn opponent → reactive).
+  if (candidate.source === "crest") {
+    return crestTurnBoundaryRole(trigger, owner, focalPlayer, opponent);
+  }
+
   const cond = trigger.condition || {};
 
   if (cond.whose_turn === "opponent") {
@@ -81,7 +87,7 @@ function ownerRoleForTrigger(
     return owner === focalPlayer ? "active" : null;
   }
 
-  // Bare "at the end/start of the turn" — fires on both players' boundaries.
+  // Bare board/hand "at the end/start of the turn" — fires on both boundaries (§213).
   if (event === "end_of_turn" || event === "start_of_turn") {
     const isBare =
       !cond.whose_turn &&

@@ -8,6 +8,7 @@ import type { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";
 import { evalCommonConditions } from "./conditions.js";
 import { DEBUG_TRIGGERS } from "./debug.js";
+import { shouldCrestTriggerFire } from "./crestScope.js";
 import { triggerMatchesCandidateZone } from "./utils.js";
 
 // Cycle breaker for runEffects
@@ -73,12 +74,25 @@ export function processCandidateTriggers(
     for (const trigger of cand.triggers) {
       let checkEvent = trigger.event;
 
-      // Shorthand: end_of_turn_own
+      // Shorthand: end_of_turn_own / start_of_turn_own
       if (trigger.type === "end_of_turn_own") {
         checkEvent = "end_of_turn";
       }
+      if (trigger.type === "start_of_turn_own") {
+        checkEvent = "start_of_turn";
+      }
 
       if (checkEvent !== event) continue;
+
+      // Crest triggers default to owner-only; ally_/enemy_* use prefix rules below.
+      if (
+        source === "crest" &&
+        !event.startsWith("ally_") &&
+        !event.startsWith("enemy_") &&
+        !shouldCrestTriggerFire(trigger, owner, activePlayer, event)
+      ) {
+        continue;
+      }
 
       // Ownership check for ally/enemy events:
       // ally_* events should only fire for cards whose owner matches activePlayer
@@ -96,8 +110,11 @@ export function processCandidateTriggers(
         continue;
       }
 
-      // Shorthand Logic: end_of_turn_own means must be owner's turn
-      if (trigger.type === "end_of_turn_own") {
+      // Shorthand Logic: *_own means must be owner's turn
+      if (
+        trigger.type === "end_of_turn_own" ||
+        trigger.type === "start_of_turn_own"
+      ) {
         if (activePlayer !== owner) continue;
       }
 
