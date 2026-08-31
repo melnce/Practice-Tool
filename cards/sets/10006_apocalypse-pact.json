@@ -3019,7 +3019,7 @@
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Summon an Ominous Artifact \u03b1 and give it Bane and Ward.",
+    "description": "Fanfare: Summon an Ominous Artifact α and give it Bane and Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10671120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10671120_evo.webp",
     "set": "[10006] Apocalypse Pact",
@@ -3032,7 +3032,7 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Ominous Artifact \u03b1",
+        "name": "Ominous Artifact α",
         "count": 1,
         "keywords": ["Bane", "Ward"]
       }
