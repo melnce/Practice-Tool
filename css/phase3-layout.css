@@ -60,6 +60,14 @@
   overflow: hidden;
   width: 100%;
   box-sizing: border-box;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: auto;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+html {
+  overscroll-behavior: none;
 }
 
 #gameShell #appRoot {
@@ -507,6 +515,7 @@ body.active-second .side-red {
 /* No page scroll — fixed game-client shell */
 body.phase3-fixed-viewport {
   overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /*

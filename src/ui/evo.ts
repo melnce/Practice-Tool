@@ -1,6 +1,7 @@
 // src/ui/evo.ts
 import { byId } from "./dom.js";
 import type { GameState } from "../core/types/index.js";
+import { enableEvoButtonDrag } from "./drag.js";
 
 export function updateEvoButtonsUI(state: GameState) {
   /** @type {HTMLButtonElement} */
@@ -53,14 +54,7 @@ export function updateEvoButtonsUI(state: GameState) {
   );
 
   [bNE, bSE, rNE, rSE].forEach((btn) => {
-    btn.draggable = !btn.disabled;
-    btn.ondragstart = (e) => {
-      const btnElem = e.currentTarget as HTMLButtonElement;
-      if (btnElem.disabled) {
-        e.preventDefault();
-        return;
-      }
-      e.dataTransfer?.setData("text/plain", btnElem.id);
-    };
+    btn.removeAttribute("draggable");
+    enableEvoButtonDrag(btn, !btn.disabled);
   });
 }

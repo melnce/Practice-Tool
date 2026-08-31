@@ -32,8 +32,7 @@ import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
 import { endTurnBlue } from "../../src/logic/core/turns.js";
 import * as cleanupMod from "../../src/logic/core/cleanup.js";
-import { enableCardEvoDrop } from "../../src/ui/drag.js";
-import * as dom from "../../src/ui/dom.js";
+import { enableCardEvoDrop, invokeDropOnElement } from "../../src/ui/drag.js";
 import { setPendingTarget } from "../../src/logic/core/pendingTarget/index.js";
 
 // Mock window for card database
@@ -330,11 +329,8 @@ describe("Undo/Redo Reliability", () => {
     const div = document.createElement("div");
     enableCardEvoDrop(div, "blueBoard", card, state, () => {});
 
-    const getDragSpy = vi
-      .spyOn(dom, "getDragData")
-      .mockReturnValue("NormalEvo");
-    div.ondrop?.({ preventDefault() {} } as any);
-    getDragSpy.mockRestore();
+    const dropped = invokeDropOnElement(div, "NormalEvo");
+    expect(dropped).toBe(true);
 
     await vi.waitFor(() => {
       expect(state.players.first.board[0]?.hasEvolved).toBe(true);

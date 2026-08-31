@@ -108,11 +108,17 @@ export class SvwbPage {
     await this.page.mouse.move(cx, cy);
     await this.page.mouse.down();
     await this.page.mouse.move(cx + 16, cy + 8, { steps: 4 });
-    await this.page.mouse.up();
-    // Native HTML5 drag may leave the suppressor latched without dragend; complete the gesture.
+    // Abort via pointercancel so the gesture does not fuse or play.
     await card.evaluate((el) => {
-      el.dispatchEvent(new DragEvent("dragend", { bubbles: true }));
+      el.dispatchEvent(
+        new PointerEvent("pointercancel", {
+          bubbles: true,
+          cancelable: true,
+          pointerId: 1,
+        }),
+      );
     });
+    await this.page.mouse.up();
     await this.page.waitForTimeout(50);
     await this.leftClickHandCard(zone, index);
   }

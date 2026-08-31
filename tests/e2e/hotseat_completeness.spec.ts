@@ -22,7 +22,8 @@ test.afterAll(() => {
 
 test("hot-seat completeness browser verification", async ({ page }) => {
   const po = new SvwbPage(page);
-  await page.goto("http://127.0.0.1:5173/?test=1");
+  const base = process.env.PW_BASE_URL ?? "http://localhost:5173";
+  await page.goto(`${base}/?test=1`);
   await page.waitForFunction(() => !!(window as any).__svwbTest);
   await po.loadDb();
   await po.seedRng(88001);
@@ -64,7 +65,7 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   ).toBe(4);
   log("6 PASS: god +PP hit active second (3→4); panel shows Red target");
 
-  // --- 3: off-turn hand not draggable ---
+  // --- 3: off-turn hand not pointer-draggable ---
   await po.god({
     advanceToTurn: { round: 4, activePlayer: "second" },
     addToHand: [{ player: "first", cardId: "10001110" }],
@@ -72,9 +73,9 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   const blueDraggable = await page
     .locator("#blueHand .card")
     .first()
-    .getAttribute("draggable");
+    .getAttribute("data-pointer-draggable");
   expect(blueDraggable).toBe("false");
-  log("3 PASS: off-turn blue hand card draggable=false");
+  log("3 PASS: off-turn blue hand card data-pointer-draggable=false");
 
   // --- 7: tooltip owner for blue hand is first (Rally counter) ---
   const tipOwner = await page.evaluate(() => {
