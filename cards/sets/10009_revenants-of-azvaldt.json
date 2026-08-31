@@ -1177,7 +1177,7 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "self",
+            "target": "selected",
             "count": 4
           }
         ],

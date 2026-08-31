@@ -201,6 +201,12 @@ function checkChosenTarget(card: CardJson): Warning[] {
   // yet (transform.ts auto-slices). See Family 3 deferred note in
   // claude/card-data-drift-2026-08-31.md.
   if (card.id === "10602210") return [];
+  // Key Spirit: nested select → spellboost target:"selected". Flattening would
+  // rewrite the child's target to the select's "ally:hand", but ally:hand means
+  // whole-hand to the spellboost handler — not behaviour-equivalent to boosting
+  // the one chosen card 4 times. See Family 3 deferred note in
+  // claude/card-data-drift-2026-08-31.md.
+  if (card.id === "10931120") return [];
 
   const out: Warning[] = [];
   walk(card, (obj) => {
