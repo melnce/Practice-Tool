@@ -961,7 +961,6 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "select_count": 1,
         "effects": [
           {
             "op": "damage",
@@ -982,7 +981,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ]
   },

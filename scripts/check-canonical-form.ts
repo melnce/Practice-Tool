@@ -189,7 +189,7 @@ function checkSelectCount(card: CardJson): Warning[] {
         op: obj.op ?? null,
         select: obj.select ?? obj.select_count,
       }),
-      note: "engine reads select ?? select_count; prefer the select spelling",
+      note: "`select` is canonical; `select_count` is accepted only as a legacy fallback",
     });
   });
   return out;

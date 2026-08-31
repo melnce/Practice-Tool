@@ -92,10 +92,16 @@ export function handleReturnHandToDeck(
   }
 
   if ((eff as any).select) {
+    // Canonical `select` wins; `select_count` is legacy fallback only.
+    const selectCount =
+      parseInt(
+        String((eff as any).select ?? (eff as any).select_count ?? 1),
+        10,
+      ) || 1;
     logEvent("returnHandToDeck_select", {
       owner,
       pool: hand.length,
-      select: parseInt((eff as any).select_count || 1),
+      select: selectCount,
     });
     const resume = effectsQueue ? Array.from(effectsQueue) : [];
     if (effectsQueue) effectsQueue.length = 0;
@@ -106,7 +112,7 @@ export function handleReturnHandToDeck(
       resumeEffects: resume,
       pool: hand, // <-- Add this (the pool is the hand)
       targets: [], // <-- Add this
-      selectCount: parseInt((eff as any).select_count || 1), // <-- Add this
+      selectCount,
     });
     hand.forEach((c) => ((c as any).__uiSelectable = true)); // This is effectively highlightSelectable(pool)
     // Render removed - UI layer

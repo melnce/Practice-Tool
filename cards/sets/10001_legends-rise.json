@@ -2032,7 +2032,6 @@
         "condition": {
           "has_keyword": "Spellboost"
         },
-        "select_count": 1,
         "effects": [
           {
             "op": "spellboost",
@@ -2044,7 +2043,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "keywords": [],
@@ -2288,7 +2288,6 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "select_count": 1,
         "effects": [
           {
             "op": "stat",
@@ -2303,7 +2302,8 @@
             "duration": "opponent_turn_end",
             "target": "selected:follower"
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "keywords": [

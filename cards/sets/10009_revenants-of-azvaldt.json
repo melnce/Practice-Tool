@@ -1174,14 +1174,14 @@
         "condition": {
           "has_keyword": "Spellboost"
         },
-        "select_count": 1,
         "effects": [
           {
             "op": "spellboost",
             "target": "self",
             "count": 4
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "superevolve": [],
@@ -2371,7 +2371,6 @@
       {
         "op": "select",
         "target": "ally:follower",
-        "select_count": 1,
         "effects": [
           {
             "op": "keyword",
@@ -2391,7 +2390,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ]
   },
