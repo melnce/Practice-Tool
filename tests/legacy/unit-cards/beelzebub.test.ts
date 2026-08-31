@@ -36,12 +36,20 @@ describe("Card: Beelzebub, Supreme King", () => {
       expect(state.players.second.hp).toBe(15);
     });
 
-    it("should NOT apply bonus for 0 damage or healing", () => {
+    // Owner ruling 2026-08-31: a 0-attack follower still produces a damage
+    // *event* that deals 0, so +N makes it N. Healing (amount < 0) is not a
+    // damage event and must not take the bonus.
+    it("applies the bonus to a 0-damage event (owner ruling 2026-08-31)", () => {
       state.players.second.leaderDamageTakenBonus = 5;
       state.players.second.hp = 20;
 
       applyLeaderDamage("second", 0);
-      expect(state.players.second.hp).toBe(20);
+      expect(state.players.second.hp).toBe(15);
+    });
+
+    it("does not apply the bonus to healing", () => {
+      state.players.second.leaderDamageTakenBonus = 5;
+      state.players.second.hp = 20;
 
       applyLeaderDamage("second", -5);
       expect(state.players.second.hp).toBe(20);
