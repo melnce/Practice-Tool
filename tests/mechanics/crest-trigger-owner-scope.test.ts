@@ -15,6 +15,7 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
+import { attackLeader } from "../../src/logic/core/combat.js";
 import { invalidateZoneCandidatesCache } from "../../src/logic/core/triggers/utils.js";
 import {
   runEndOfTurnBoundary,
@@ -330,5 +331,81 @@ describe("Crest trigger owner scoping — real cards", () => {
     );
     expect(firstBoard.length).toBe(0);
     expect(secondBoard.length).toBe(1);
+  });
+
+  function readyBoardAttacker(
+    owner: "first" | "second",
+    opts: {
+      name?: string;
+      attack?: number;
+      hasStorm?: boolean;
+    } = {},
+  ) {
+    const card = createCard(
+      {
+        name: opts.name ?? "Attacker",
+        type: "Follower",
+        attack: opts.attack ?? 5,
+        defense: 2,
+        hasStorm: opts.hasStorm ?? false,
+        justPlayed: false,
+        can_attack: true,
+        can_attack_followers: true,
+        attacks_left: 1,
+      },
+      "board",
+      owner,
+    );
+    card.peak_defense = Number(card.defense);
+    if (opts.hasStorm) (card as any).hasStorm = true;
+    getBoard(state, owner).push(card);
+    return card;
+  }
+
+  describe("Lu Woh 10474110 — leader_attacked crest", () => {
+    beforeEach(() => {
+      givenGameState({ seed: 1, activePlayer: "first" })
+        .withFirstHP(20, 20)
+        .withSecondHP(20, 20)
+        .build();
+      gainCardCrest("10474110", "second");
+    });
+
+    it("Storm enemy follower attacking defender leader gets -3 attack until end of turn", () => {
+      const attacker = readyBoardAttacker("first", {
+        name: "Storm Raider",
+        attack: 5,
+        hasStorm: true,
+      });
+
+      attackLeader(0, "first", "second");
+
+      expect(Number(attacker.attack)).toBe(2);
+    });
+
+    it("non-Storm enemy attacker is not debuffed", () => {
+      const attacker = readyBoardAttacker("first", {
+        name: "Plain Raider",
+        attack: 5,
+        hasStorm: false,
+      });
+
+      attackLeader(0, "first", "second");
+
+      expect(Number(attacker.attack)).toBe(5);
+    });
+
+    it("allied attacker on defender leader is not debuffed (crest only watches enemy attackers)", () => {
+      state.activePlayer = "second";
+      const ally = readyBoardAttacker("second", {
+        name: "Ally Raider",
+        attack: 4,
+        hasStorm: true,
+      });
+
+      attackLeader(0, "second", "first");
+
+      expect(Number(ally.attack)).toBe(4);
+    });
   });
 });
