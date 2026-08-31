@@ -340,18 +340,12 @@ add pointless wrappers.
   pool; play-path pending pool excludes Lyanthoth itself)
 - `10741120` Carrier Wyvern — evolve only → flat stat+select:1 (fanfare already flat)
 - `10953310` Reaper's Due — flat keyword+select:1
+- `10602210` Encroached World — flat transform+select:1 + `into_source:enemy:deck`
+  (engine: `into_source === "enemy:deck"` now opens pending select when
+  `select > 0` and no `targetUids`, mirroring `returnHandToDeck`; previously
+  auto-sliced the pool so flat was not behaviour-equivalent)
 
 ### Deferred — needs engine support before flatten
-
-- `10602210` Encroached World — nested select → transform `into_source:enemy:deck`.
-  **Deferred — flat form is not behaviour-equivalent today.** Flat
-  `{op:transform, target:ally:hand, select:1, into_source:enemy:deck}` hits
-  `transform.ts`'s `into_source === "enemy:deck"` branch, which auto-slices the
-  pool (`pool.slice(0, selectN)`) and never calls `setPendingTarget`. Nested
-  `op:select` is what opens the hand-selection UI. Proven by
-  `batch14_owner_rulings_final8` (Encroached World Engage) going red under the
-  flat form and green when left nested. Gate excludes this id until the flat
-  `into_source` path learns pending select.
 
 - `10931120` Key Spirit — nested select → spellboost `target:"selected"` count 4.
   **Deferred / not a flatten candidate — flat form is not behaviour-equivalent.**

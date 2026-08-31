@@ -128,28 +128,51 @@ export function handleTransform(
 
   // Exact-copy transform into a sampled zone instance (Encroached World)
   if (intoSource === "enemy:deck") {
-    const resolveTargets = (): CardInstance[] => {
-      if (ctx.context?.targetUids?.length) {
-        return ctx.context.targetUids
-          .map((uid: string) => resolveUid(uid))
-          .filter(Boolean) as CardInstance[];
+    if (ctx.context?.targetUids?.length) {
+      for (const uid of ctx.context.targetUids) {
+        const t = resolveUid(uid);
+        if (t) transformIntoExactFromEnemyDeck(t, owner);
       }
-      if (zone === "self" && ctx.sourceCard) return [ctx.sourceCard];
-      const selectN = parseInt(String(eff.select ?? 0), 10) || 0;
-      const pool = getPool(
-        eff.target || "ally:hand",
+      return;
+    }
+    if (zone === "self" && ctx.sourceCard) {
+      transformIntoExactFromEnemyDeck(ctx.sourceCard, owner);
+      return;
+    }
+
+    const selectN = parseInt(String(eff.select ?? 0), 10) || 0;
+    const pool = getPool(
+      eff.target || "ally:hand",
+      owner,
+      ctx.sourceCard ?? null,
+      (eff as any).condition,
+      {
+        ...(ctx.context ?? {}),
+        isTargetedEffect: selectN > 0,
+      },
+    );
+
+    // Flat transform+select must open a hand prompt (mirror returnHandToDeck).
+    // Empty pool: do not open an empty prompt — no-op like today's slice.
+    if (selectN > 0) {
+      if (!pool.length) return;
+      const resume = ctx.effectsQueue ? Array.from(ctx.effectsQueue) : [];
+      if (ctx.effectsQueue) ctx.effectsQueue.length = 0;
+      setPendingTarget({
+        eff,
         owner,
-        ctx.sourceCard ?? null,
-        (eff as any).condition,
-        {
-          ...(ctx.context ?? {}),
-          isTargetedEffect: selectN > 0,
-        },
-      );
-      if (selectN > 0) return pool.slice(0, Math.min(selectN, pool.length));
-      return pool;
-    };
-    for (const t of resolveTargets()) {
+        sourceCard: ctx.sourceCard ?? null,
+        resumeEffects: resume,
+        pool,
+        targets: [],
+        selectCount: selectN,
+      });
+      highlightSelectable(pool);
+      return "pending";
+    }
+
+    // selectN === 0 → AoE-style: transform the whole pool, no prompt
+    for (const t of pool) {
       transformIntoExactFromEnemyDeck(t, owner);
     }
     return;
