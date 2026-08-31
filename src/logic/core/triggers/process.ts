@@ -46,6 +46,15 @@ export interface ProcessOptions {
 // P0-4 FIX: Maximum trigger chain depth to prevent infinite loops
 const MAX_CHAIN_DEPTH = 100;
 
+/** Crest triggers on these events only fire for the acting player's crests. */
+const ACTIVE_PLAYER_CREST_EVENTS = new Set<TriggerEventName>([
+  "select_mode",
+  "enhanced_play",
+  "invoke",
+  "loot_fused",
+  "loot_played",
+]);
+
 export function processCandidateTriggers(
   candidates: ProcessingCandidate[],
   options: ProcessOptions,
@@ -79,6 +88,15 @@ export function processCandidateTriggers(
       }
 
       if (checkEvent !== event) continue;
+
+      // Player-action events: only the acting player's crests respond.
+      if (
+        source === "crest" &&
+        ACTIVE_PLAYER_CREST_EVENTS.has(event) &&
+        owner !== activePlayer
+      ) {
+        continue;
+      }
 
       // Ownership check for ally/enemy events:
       // ally_* events should only fire for cards whose owner matches activePlayer
