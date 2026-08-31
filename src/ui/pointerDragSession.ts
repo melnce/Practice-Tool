@@ -123,20 +123,26 @@ export function invokeDropOnElement(
   return false;
 }
 
-function isInsideHandZone(
+/**
+ * True when the pointer is over the hand — including cards that overflow the
+ * container box (fan negative margins). Rect tests miss those releases at
+ * narrow tablet widths (e.g. 1024×768).
+ */
+export function isPointerOverHandZone(
   handContainerId: string,
   clientX: number,
   clientY: number,
 ): boolean {
   const handEl = document.getElementById(handContainerId);
   if (!handEl) return false;
-  const rect = handEl.getBoundingClientRect();
-  return (
-    clientX >= rect.left &&
-    clientX <= rect.right &&
-    clientY >= rect.top &&
-    clientY <= rect.bottom
-  );
+  const hit = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
+  if (!hit) return false;
+  let node: HTMLElement | null = hit;
+  while (node) {
+    if (node === handEl) return true;
+    node = node.parentElement;
+  }
+  return false;
 }
 
 function clearHighlights(payload: string | null) {
@@ -288,7 +294,7 @@ function onPointerUp(ev: PointerEvent) {
     s.options.kind === "hand" &&
     s.options.handContainerId &&
     s.options.onFuseGesture &&
-    isInsideHandZone(s.options.handContainerId, clientX, clientY) &&
+    isPointerOverHandZone(s.options.handContainerId, clientX, clientY) &&
     (s.options.isInitiatorStillInHand?.() ?? false)
   ) {
     s.options.onFuseGesture(clientX, clientY);

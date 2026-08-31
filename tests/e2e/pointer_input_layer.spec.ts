@@ -511,22 +511,108 @@ for (const vp of TABLET_VIEWPORTS) {
       let fuse = await getState(page);
       expect(fuse.pendingOp).toBe("fuse");
 
-      // Reset and drag-release inside hand
+      // Reset and drag-release onto a hand *card* (not the container centre).
+      // At 1024×768 a card centre can sit outside #blueHand's bounding rect.
       await seedPlayable(page, { fuse: true });
-      const hand = await page.locator("#blueHand").boundingBox();
+      const geo = await page.evaluate(() => {
+        const hand = document.getElementById("blueHand")!;
+        const cards = [...hand.querySelectorAll(".card")] as HTMLElement[];
+        const handRect = hand.getBoundingClientRect();
+        const points = cards.map((c) => {
+          const r = c.getBoundingClientRect();
+          const x = r.left + r.width / 2;
+          const y = r.top + r.height / 2;
+          const insideRect =
+            x >= handRect.left &&
+            x <= handRect.right &&
+            y >= handRect.top &&
+            y <= handRect.bottom;
+          return { x, y, insideRect };
+        });
+        // Prefer a card centre outside the container rect when one exists.
+        const outside = points.find((p) => !p.insideRect);
+        const target = outside ?? points[0]!;
+        return {
+          handRect: {
+            left: handRect.left,
+            right: handRect.right,
+            top: handRect.top,
+            bottom: handRect.bottom,
+          },
+          release: target,
+          anyOutside: !!outside,
+        };
+      });
+
+      // Geometry pin at 1024×768: at least one hand-card centre must be
+      // outside the container rect (otherwise this viewport no longer
+      // exercises the overflow bug).
+      if (vp.width === 1024 && vp.height === 768) {
+        expect(geo.anyOutside).toBe(true);
+        expect(geo.release.insideRect).toBe(false);
+      }
+
       const c2 = await page.locator("#blueHand .card").first().boundingBox();
-      expect(hand && c2).toBeTruthy();
+      expect(c2).toBeTruthy();
       await cdpTouchDrag(
         page,
         c2!.x + c2!.width / 2,
         c2!.y + c2!.height / 2,
-        hand!.x + hand!.width / 2,
-        hand!.y + hand!.height / 2,
+        geo.release.x,
+        geo.release.y,
       );
       await page.waitForTimeout(250);
       fuse = await getState(page);
       expect(fuse.pendingOp).toBe("fuse");
       expect(fuse.hand).toBe(3); // not played
+      await context.close();
+    });
+
+    test("1024 geometry: release over overflowed hand card is inside hand", async () => {
+      // Skip on non-1024 viewports — only 1024×768 pins the overflow geometry.
+      if (vp.width !== 1024 || vp.height !== 768) return;
+
+      const { context, page } = await touchPage();
+      await seedPlayable(page, { fuse: true });
+      const result = await page.evaluate(async () => {
+        const { isPointerOverHandZone } =
+          await import("/src/ui/pointerDragSession.ts");
+        const hand = document.getElementById("blueHand")!;
+        const handRect = hand.getBoundingClientRect();
+        const cards = [...hand.querySelectorAll(".card")] as HTMLElement[];
+        const samples = cards.map((c) => {
+          const r = c.getBoundingClientRect();
+          const x = r.left + r.width / 2;
+          const y = r.top + r.height / 2;
+          const insideRect =
+            x >= handRect.left &&
+            x <= handRect.right &&
+            y >= handRect.top &&
+            y <= handRect.bottom;
+          return {
+            x,
+            y,
+            insideRect,
+            overHand: isPointerOverHandZone("blueHand", x, y),
+          };
+        });
+        const overflowed = samples.filter((s) => !s.insideRect);
+        return {
+          handRect: {
+            left: handRect.left,
+            right: handRect.right,
+          },
+          samples,
+          overflowed,
+        };
+      });
+
+      expect(result.overflowed.length).toBeGreaterThan(0);
+      for (const s of result.overflowed) {
+        // The defect: rect says no, elementFromPoint walk says yes.
+        expect(s.insideRect).toBe(false);
+        expect(s.overHand).toBe(true);
+      }
       await context.close();
     });
 

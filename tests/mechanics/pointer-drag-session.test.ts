@@ -76,10 +76,13 @@ describe("pointerDragSession", () => {
     document.body.append(hand, board, source);
     hand.appendChild(source);
 
-    // elementFromPoint stub — jsdom lacks this property
+    // elementFromPoint stub — jsdom lacks this property.
+    // Hand cards may sit outside the container rect (fan overflow).
     document.elementFromPoint = (x: number, y: number) => {
       if (y >= 300) return board;
-      if (y >= 0 && y < 200 && x >= 0 && x <= 400) return hand;
+      // Overflowed card hit (left of hand container box 0..400).
+      if (x >= -50 && x < 0 && y >= 0 && y < 200) return source;
+      if (y >= 0 && y < 200 && x >= 0 && x <= 400) return source;
       return document.body;
     };
   });
@@ -87,6 +90,41 @@ describe("pointerDragSession", () => {
   afterEach(() => {
     document.body.innerHTML = "";
     vi.restoreAllMocks();
+  });
+
+  it("isPointerOverHandZone is true over an overflowed hand card outside the container rect", async () => {
+    const { isPointerOverHandZone } =
+      await import("../../src/ui/pointerDragSession.js");
+    // Container box: 0..400. Point (-20, 50) is outside the rect but hits `source`
+    // (a child of #blueHand) via the elementFromPoint stub — the 1024×768 fan case.
+    const handRect = hand.getBoundingClientRect();
+    expect(-20 < handRect.left || -20 > handRect.right).toBe(true);
+    expect(isPointerOverHandZone("blueHand", -20, 50)).toBe(true);
+    expect(isPointerOverHandZone("blueHand", 500, 100)).toBe(false);
+  });
+
+  it("release on overflowed hand card (outside container rect) opens fuse", () => {
+    const onDrop = vi.fn();
+    const onFuse = vi.fn();
+    setDropTarget(board, () => true, onDrop);
+    attachPointerDragSource(
+      source,
+      {
+        payload: "hand,blueHand,u1",
+        kind: "hand",
+        handContainerId: "blueHand",
+        onFuseGesture: onFuse,
+        isInitiatorStillInHand: () => true,
+      },
+      true,
+    );
+
+    fire(source, "pointerdown", 50, 50);
+    fire(source, "pointermove", 80, 80);
+    // Outside #blueHand rect, but elementFromPoint returns the hand card.
+    fire(source, "pointerup", -20, 50);
+    expect(onFuse).toHaveBeenCalledTimes(1);
+    expect(onDrop).not.toHaveBeenCalled();
   });
 
   it("tap below threshold does not start drag or call drop", () => {
