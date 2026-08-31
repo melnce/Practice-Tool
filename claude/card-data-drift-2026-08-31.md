@@ -7,23 +7,130 @@ measured drift, the canonical forms chosen for later PRs, and places where varia
 Source pool: `cards/all.json` / `cards/sets/*.json` — **811 cards**.
 Op-node counts below are from a full-tree walk of every card object.
 
+**Standing instruction (owner, 2026-08-31):** card text is bible. Weight fragility —
+_"the codebase is very fragile as it was built on sand and hope originally"_ — in every
+judgement call. Prefer honest "blocked — needs X" over a plausible guess.
+
+---
+
+## Owner ruling — 2026-08-31
+
+> **"card text is bible. it says at the end of YOUR turn so yes thats correct."**
+
+A turn-boundary trigger whose printed text says _"at the start/end of YOUR turn"_ fires
+**only on its owner's boundary**. Absent a recorded owner ruling to the contrary, the
+printed text governs, and **the authored data is never itself evidence of intent**.
+
+Implication for this inventory: bare board/hand authoring that contradicts "your turn"
+text is a **bug**, not a deliberate both-boundaries choice — even if the JSON has been
+shipping that way for months.
+
+---
+
+## Text-vs-scope sweep (all turn-boundary triggers)
+
+Compared **all 82** turn-boundary triggers in the pool against the scoping sentence in
+their own printed text (for crest triggers: the **crest's** description, not the granting
+card's). **Do not re-derive these numbers** — they are the authoritative sweep for this
+PR.
+
+**78 of 82 already match.** Four did not:
+
+| card                                        | authored                                                        | printed text                                                                                                   | verdict                           |
+| ------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| **Dark Dimensions `10603210`**              | bare `event: end_of_turn`                                       | _"At the end of **your** turn, deal 2 damage to all non-Encroacher followers"_                                 | **BUG, reproduced**               |
+| **Galleon, Earth Personified `10464110`**   | bare `event: end_of_turn`                                       | _"At the end of **your** turn, if you've unlocked super-evolution, evolve a random unevolved allied follower"_ | **BUG, same class**               |
+| **Illamrita, Designated Target `10704110`** | bare `event: end_of_turn`, **granted to the opposing follower** | _"Give the opposing follower … 'At the end of **your** turn, banish this card.'"_                              | **subtle — open question below**  |
+| Agent of the Testaments `10962110`          | `type: end_of_turn_own` (already correct for "your turn")       | —                                                                                                              | **false positive of the scanner** |
+
+### Dark Dimensions `10603210` — BUG, reproduced
+
+Amulet owned by `first`; running the end-of-turn boundary for `second` dealt 2 damage to
+every follower on both boards. The AoE resolves **twice per round** instead of once.
+Harness `turn_boundary` scenario covers this card (fingerprint captures the double-fire);
+a later fix will fail `cards:verify` until the baseline is updated.
+
+### Galleon `10464110` — BUG, same class
+
+Same bare board `event: end_of_turn` vs _"your turn"_ text. Same engine path as Dark
+Dimensions. Not fixed here — PR 2, per-card, against printed text.
+
+### Illamrita `10704110` — open question (do not guess)
+
+The trigger is **granted** to the opposing follower:
+
+```json
+{
+  "event": "end_of_turn",
+  "source": "board",
+  "effects": [{ "op": "banish", "scope": "self" }]
+}
+```
+
+"Your turn" in the quoted ability is from the **granted follower's controller's**
+perspective — the opponent's turn as seen from Illamrita. Bare (both boundaries) is wrong
+relative to that text, but the right fix depends on whether the engine attributes a
+granted trigger's owner to the follower now carrying it.
+
+**Blocked — needs:** confirm owner-of-record for a granted board trigger before choosing
+`whose_turn: "owner"` vs any other spelling. Do not answer by guessing. Not fixed in PR 1.
+
+### Agent of the Testaments `10962110` — known false positive
+
+The text-vs-scope scanner grabbed _"Give this follower Ambush until the end of your
+opponent's turn"_ — that is a **duration on a keyword**, not a trigger-scope sentence.
+The card's actual turn trigger is already `type: end_of_turn_own` (owner-scoped; matches
+intent).
+
+**Recorded so nobody re-flags it.** The canonical-form gate is **shape-only** (JSON
+spelling); it must never treat keyword-duration phrasing as trigger scope. Agent remains
+on the turn-scope **spelling** worklist only because it uses `type: "*_own"` (canonical
+migrate), not because its behaviour is wrong.
+
 ---
 
 ## Family 1 — Turn scoping
 
 ### Spellings found
 
-| spelling                                                 | node count | notes                                                                                      |
-| -------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------ |
-| `type: "end_of_turn_own"`                                | 51         | `event` is **undefined** on all of them                                                    |
-| `type: "start_of_turn_own"`                              | 3          | same — `type` is the event carrier                                                         |
-| `event` + `condition.whose_turn: "owner"` (turn events)  | 4          | canonical form                                                                             |
-| `event` + `condition.whose_turn: "opponent"`             | 1          | canonical form for reactive                                                                |
-| `event` + `condition.own_turn: true` (turn events)       | 3          | synonym of `whose_turn: "owner"`                                                           |
-| bare `event: "end_of_turn"` / `start_of_turn` (no scope) | see below  | **deliberate** = fires on both players' boundaries for board/hand; crest bare = owner-only |
+| spelling                                                 | node count | notes                                                |
+| -------------------------------------------------------- | ---------- | ---------------------------------------------------- |
+| `type: "end_of_turn_own"`                                | 51         | `event` is **undefined** on all of them              |
+| `type: "start_of_turn_own"`                              | 3          | same — `type` is the event carrier                   |
+| `event` + `condition.whose_turn: "owner"` (turn events)  | 4          | canonical form                                       |
+| `event` + `condition.whose_turn: "opponent"`             | 1          | canonical form for reactive                          |
+| `event` + `condition.own_turn: true` (turn events)       | 3          | synonym of `whose_turn: "owner"`                     |
+| bare `event: "end_of_turn"` / `start_of_turn` (no scope) | see below  | **zone-ambiguous** — see "Bare is ambiguous by zone" |
 
-Confirmed: all 54 `type: "*_own"` nodes have `event: undefined`. Migrating
-is **add-event + add-condition.whose_turn + remove-type**, not a rename.
+### `type: "*_own"` carries `event: undefined` — not a rename
+
+All **54** `type: "*_own"` triggers have `event: undefined`. For those nodes, **`type` IS
+the event carrier**. Migration is:
+
+1. add `event: "end_of_turn"` or `"start_of_turn"`
+2. add `condition: { whose_turn: "owner" }` (merge into existing condition object if any)
+3. remove `type`
+
+**Not a rename.** A gate or migration that only rewrites the key name will leave
+`event: undefined` and break the card.
+
+### Bare is ambiguous by zone — the single most valuable fix
+
+Identical bare JSON means **opposite** things depending on zone:
+
+| zone           | bare `event: end_of_turn` / `start_of_turn` means                |
+| -------------- | ---------------------------------------------------------------- |
+| **crest**      | owner-only (PR #109 default scoping via `crestTurnBoundaryRole`) |
+| **board/hand** | **both** players' boundaries (`turnBoundary.ts` §213 bare path)  |
+
+That ambiguity is exactly what hid Dark Dimensions: crest-shaped intuition ("bare = my
+turn") does not apply on the board. **Canonical form must make intent explicit**
+(`whose_turn: "owner" | "opponent"`) rather than relying on zone context. That is the
+highest-value outcome of this whole exercise.
+
+Absence of scope remains expressible for a true both-boundaries board/hand trigger — but
+it must be **deliberate**, never inferred from shipping data when the printed text says
+"your turn".
 
 ### Canonical form (chosen)
 
@@ -35,22 +142,21 @@ is **add-event + add-condition.whose_turn + remove-type**, not a rename.
 }
 ```
 
-- **Absence of `whose_turn` / `own_turn` / `*_own` on a board/hand trigger means
-  "fires on both players' boundaries"** (`turnBoundary.ts` §213 bare path). That must
-  stay expressible and must be deliberate.
-- Crests differ: bare crest SOT/EOT is **owner-only** via `crestTurnBoundaryRole`. Do not
-  apply board bare semantics to crest payloads.
+- Explicit `whose_turn` for owner-only / opponent-only.
+- Bare board/hand only when text (or a recorded ruling) truly means both boundaries.
+- Crest payloads should also be explicit going forward; do not depend on crest-default bare.
 
 ### Why
 
-Engine already prefers `event` + `condition.whose_turn` in dual enforcement
-(`ownerRoleForTrigger` + `evalCommonConditions`). `type: "*_own"` is a shorthand that
-hides the missing `event` field and blocks grepping by event name. `own_turn` is a
-boolean synonym of `whose_turn: "owner"`.
+Printed text governs (owner ruling). Engine dual-path (`ownerRoleForTrigger` +
+`evalCommonConditions`) already understands `whose_turn`. `type: "*_own"` hides the
+missing `event` field. `own_turn` is a boolean synonym of `whose_turn: "owner"`. Explicit
+scope removes the crest-vs-board bare trap.
 
 ### Deviating card ids (`type: "*_own"` or `own_turn` on turn events)
 
-These are the WARN-mode gate worklist for turn-scope:
+WARN-mode gate worklist for **spelling** migration (not all are behaviour bugs — most
+already match "your turn" text via `*_own` / `own_turn`):
 
 - `10072210` Puppet Theater — type: end_of_turn_own
 - `10113210` Godwood Staff — type: end_of_turn_own
@@ -100,7 +206,7 @@ These are the WARN-mode gate worklist for turn-scope:
 - `10913310` Crimson Incense — type: end_of_turn_own
 - `10954110` Istyndet vs. Mitilykket — type: end_of_turn_own
 - `10954120` Garodeth vs. Zeth — type: end_of_turn_own
-- `10962110` Agent of the Testaments — type: end_of_turn_own
+- `10962110` Agent of the Testaments — type: end_of_turn_own (spelling only; behaviour OK — see false positive)
 - `10964110` Erralde, Signet Convict — type: end_of_turn_own
 
 - `10434120` Cagliostro, Genius Alchemist — own_turn on start_of_turn
@@ -115,6 +221,21 @@ These are the WARN-mode gate worklist for turn-scope:
 - `10903210` Azvaldt, Penitentiary of Chaos — whose_turn:owner on end_of_turn
 
 - `10734110` Lilanthim, Anathema of Predation — whose_turn:opponent on end_of_turn
+
+### Crest-nested bare turn events (text match via crest default — still migrate to explicit)
+
+These appear as bare `event` under crest payloads. Crest bare SOT/EOT is currently
+owner-scoped (PR #109), which is why most already match "your turn" in the crest text —
+but relying on that default is the trap. Prefer explicit `whose_turn` in PR 2+:
+
+- Sandalphon `10404110` (crest EOT restore)
+- Rigor of the Nightblossom `10553310` (crest EOT)
+- Burnite `10144110` (opponent crest SOT)
+- Titania `10214110` (crest SOT)
+- Bergent `10232110` (crest SOT)
+- Charon `10254120` (crest SOT)
+
+Do **not** apply the Dark Dimensions board fix blindly to these.
 
 ---
 
@@ -179,25 +300,28 @@ drop `count` only after confirming no other handler path).
 
 ### Spellings found
 
-| form                                     | role                                                        |
-| ---------------------------------------- | ----------------------------------------------------------- |
-| flat `op` + `select`                     | single effect consumes the selection (~230 flat select ops) |
-| nested `op: "select"` → `effects: [...]` | share one selection across 2+ consumers (21 multi-child)    |
+| form                                     | role                                                                                        |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| flat `damage`+`select` (and peers)       | single effect consumes the selection (~64 flat damage+select; ~230 flat select ops overall) |
+| nested `op: "select"` → `effects: [...]` | share one selection across 2+ consumers (10 nested→damage; 21 multi-child overall)          |
+
+Flat and nested are **not interchangeable**. Nested is **required** when 2+ effects share
+one selection (Elmott `10433110` silences _and_ damages the same target).
 
 ### Canonical rule (not a blanket conversion)
 
 - **Flat** `{ op, target, select }` when a **single** effect consumes the selection.
 - **Nested** `{ op: "select", effects: [A, B, ...] }` when **two or more** effects must
-  share one selection (e.g. Elmott silence + damage).
+  share one selection.
 - Nested with a single child that is `gate` / `mode` stays nested (branches share selection).
 - Nested with a single child that does **not** use `selected:*` is not a flat candidate
   (selection may feed a different field — e.g. Cassius).
 
 ### Why
 
-Flat and nested are **not interchangeable**. `check:select-target` already requires a
-selection ancestor for `selected:*` targets. Forcing everything nested (or everything
-flat) would either break multi-effect shares or add pointless wrappers.
+`check:select-target` already requires a selection ancestor for `selected:*` targets.
+Forcing everything nested (or everything flat) would either break multi-effect shares or
+add pointless wrappers.
 
 ### Deviating card ids (nested + single `selected:*` consumer → should be flat)
 
@@ -236,65 +360,18 @@ flat) would either break multi-effect shares or add pointless wrappers.
 
 ---
 
-## Non-synonyms / per-card adjudication
+## Deliberately NOT drift
 
 Variants that look similar but mean different things — **do not bulk-normalise**.
 
-### Confirmed behaviour bugs (owner sign-off required — not fixed in PR 1)
-
-#### Dark Dimensions `10603210`
-
-Printed: _"At the end of **your** turn, deal 2 damage to all non-Encroacher followers."_
-
-Authored: bare `event: "end_of_turn"` on a **board** amulet.
-
-Engine: `ownerRoleForTrigger` treats bare board turn events as firing on **both**
-players' boundaries. Reproduced with harness builders (`seed=42`): amulet owned by
-`first`, end-of-turn for `first` dealt 2 to all followers; end-of-turn for `second`
-dealt another 2. **Fires twice per round** instead of once.
-
-Harness covers this card via `turn_boundary` (fingerprint captures the double-fire).
-Fixing later will correctly fail `cards:verify` until the baseline is updated.
-
-#### Galleon, Earth Personified `10464110`
-
-Printed: _"At the end of **your** turn, if you've unlocked super-evolution, …"_
-
-Authored: bare `event: "end_of_turn"` on a **board** follower (same pattern as Dark
-Dimensions). Same engine path — very likely the same double-fire bug. Covered by
-`turn_boundary` scenario; not fixed here.
-
-#### Illamrita, Designated Target `10704110` (related)
-
-Follower Strike grants the **opposing** follower a board trigger
-`event: "end_of_turn"` (bare) _"At the end of your turn, banish this card."_
-On a board card, bare fires both boundaries — so the enchanted follower may banish
-at the end of **both** turns. Needs owner ruling against the printed text before any
-change.
-
-### Crest-nested bare turn events (usually OK)
-
-These appear as bare `event` in card JSON but live under crest payloads. Crest bare
-SOT/EOT is **owner-scoped**, which typically matches "your turn" for the crest owner:
-
-- Sandalphon `10404110` (crest EOT restore)
-- Rigor of the Nightblossom `10553310` (crest EOT)
-- Burnite `10144110` (opponent crest SOT)
-- Titania `10214110` (crest SOT)
-- Bergent `10232110` (crest SOT)
-- Charon `10254120` (crest SOT)
-
-Do not apply the Dark Dimensions fix blindly to these.
-
-### Deliberately not drift
-
-| pair                                                                                     | why not synonyms                                                                         |
-| ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `player: "opponent"` (7 uses) vs `target: "enemy:*"` (316 cards)                         | whole-player effect vs board/zone targeting                                              |
-| `condition: "string"` (169 cards, named gate) vs `condition: {…}` (130 cards, predicate) | different concepts; normalising either is a bug                                          |
-| `select` + `count` on summon (3 cards)                                                   | `count` is summon multiplicity / inert echo — not `select_count`                         |
-| nested `op:select` with 2+ effects                                                       | required for shared selection — not a minority bug                                       |
-| bare board turn event                                                                    | deliberate "both boundaries" spelling — only wrong when text says "your/opponent's turn" |
+| pair                                                                            | why not synonyms                                                                    |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `player: "opponent"` (7 uses) vs `target: "enemy:*"` (~400 uses)                | whole-player effect vs board/zone targeting                                         |
+| `condition: "string"` (~176, named gate) vs `condition: {obj}` (~68, predicate) | different concepts; normalising either is a bug                                     |
+| flat `damage`+`select` (~64) vs nested `op:"select"`→`damage` (~10)             | nested required when 2+ effects share one selection (Elmott)                        |
+| `select` + `count` on summon (3 cards)                                          | `count` is summon multiplicity / inert echo — not `select_count`                    |
+| keyword-duration _"until the end of your (opponent's) turn"_                    | **not** a turn-boundary trigger scope (Agent of the Testaments false positive)      |
+| crest bare vs board bare                                                        | same JSON, opposite engine meaning — migrate to explicit `whose_turn`, don't equate |
 
 `player: "opponent"` cards:
 
@@ -352,11 +429,17 @@ step, then harden).
 
 Per-family filters: `--gate=turn-scope|select-count|chosen-target`.
 
+**Shape-only.** Does not parse card text. Must not treat keyword-duration phrasing
+(_"until the end of your opponent's turn"_) as trigger scope — that class of error is
+documented under Agent of the Testaments above.
+
 ---
 
 ## Proposed later PR split
 
-1. **PR 2 — turn-scope migration** (worklist above) + baseline update; fix Dark Dimensions /
-   Galleon only with owner sign-off (may be a dedicated PR).
+1. **PR 2 — turn-scope migration** (spelling worklist) + baseline update; **separately
+   adjudicate** Dark Dimensions, Galleon, and Illamrita per printed text (Illamrita blocked
+   on granted-trigger ownership). Fragile codebase — one card at a time where behaviour
+   changes.
 2. **PR 3 — select_count → select**.
 3. **PR 4 — nested single-consumer → flat**.

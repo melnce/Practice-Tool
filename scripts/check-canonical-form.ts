@@ -5,6 +5,11 @@
  * Reports every card whose effect JSON diverges from the chosen canonical
  * spelling. Does NOT fail the build — migrations land in later PRs.
  *
+ * SHAPE-ONLY: inspects JSON structure. Must never treat keyword-duration
+ * phrasing ("until the end of your opponent's turn") as turn-trigger scope —
+ * that false positive is documented for Agent of the Testaments (10962110)
+ * in claude/card-data-drift-2026-08-31.md.
+ *
  *   npm run check:canonical-form
  *   npx tsx scripts/check-canonical-form.ts --gate=turn-scope
  *   npx tsx scripts/check-canonical-form.ts --gate=select-count
