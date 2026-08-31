@@ -22,6 +22,7 @@ import {
   runStartOfTurnBoundary,
 } from "../../src/logic/core/turnBoundary.js";
 import { restoreLeaderHP } from "../../src/logic/effects/ops/restore/primitives.js";
+import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import {
   getCrests,
@@ -268,6 +269,16 @@ describe("Crest trigger owner scoping — real cards", () => {
     return found;
   }
 
+  const BURNITE_ASH_CREST = "Burnite, Anathema of Ash";
+  const BURNITE_FLAME_CREST = "Burnite, Anathema of Flame";
+
+  function hasNamedCrest(
+    owner: "first" | "second",
+    crestName: string,
+  ): boolean {
+    return getCrests(state, owner).some((c) => c.name === crestName);
+  }
+
   it("Titania 10214110: mirror crest — only acting player's hand gains Fairy at SOT", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();
     gainCardCrest("10214110", "first");
@@ -286,32 +297,77 @@ describe("Crest trigger owner scoping — real cards", () => {
     );
   });
 
-  it("Burnite 10144110: mirror crest — SOT damages only the crest owner's leader", () => {
-    givenGameState({ seed: 1, activePlayer: "first" })
-      .withFirstHP(20, 20)
-      .withSecondHP(20, 20)
-      .build();
-    gainCardCrest("10144110", "first");
-    gainCardCrest("10144110", "second");
+  describe("Burnite opponent-gift crests — routing and trigger authoring", () => {
+    describe("10744110 Ash (start_of_turn_own)", () => {
+      it("super-evolve from first places crest on second, not first", () => {
+        givenGameState({ seed: 1, activePlayer: "first" }).build();
+        const burnite = createCard("10744110", "board", "first");
+        burnite.peak_defense = burnite.defense;
+        state.players.first.board = [burnite];
+        state.players.first.superEvoCharges = 1;
 
-    runStartOfTurnBoundary("first");
+        onEvolve(burnite, "first", "super");
 
-    expect(getHP(state, "first")).toBe(19);
-    expect(getHP(state, "second")).toBe(20);
-  });
+        expect(hasNamedCrest("first", BURNITE_ASH_CREST)).toBe(false);
+        expect(hasNamedCrest("second", BURNITE_ASH_CREST)).toBe(true);
+      });
 
-  it("Burnite 10144110: leader_restored damages only the restored player's leader", () => {
-    givenGameState({ seed: 1, activePlayer: "first" })
-      .withFirstHP(15, 20)
-      .withSecondHP(20, 20)
-      .build();
-    gainCardCrest("10144110", "first");
-    gainCardCrest("10144110", "second");
+      it("gain from first routes crest to second; SOT damages only crest owner", () => {
+        givenGameState({ seed: 1, activePlayer: "first" })
+          .withFirstHP(20)
+          .withSecondHP(20)
+          .build();
+        // Super-evolve gain op has player: "opponent" — gifter is first, recipient is second.
+        gainCardCrest("10744110", "first");
 
-    restoreLeaderHP("first", 3);
+        expect(hasNamedCrest("first", BURNITE_ASH_CREST)).toBe(false);
+        expect(hasNamedCrest("second", BURNITE_ASH_CREST)).toBe(true);
 
-    expect(getHP(state, "first")).toBe(17);
-    expect(getHP(state, "second")).toBe(20);
+        runStartOfTurnBoundary("first");
+        expect(getHP(state, "first")).toBe(20);
+        expect(getHP(state, "second")).toBe(20);
+
+        runStartOfTurnBoundary("second");
+        expect(getHP(state, "first")).toBe(20);
+        expect(getHP(state, "second")).toBe(18);
+      });
+    });
+
+    describe("10144110 Flame (start_of_turn)", () => {
+      it("gain from first routes crest to second; SOT damages only crest owner", () => {
+        givenGameState({ seed: 1, activePlayer: "first" })
+          .withFirstHP(20)
+          .withSecondHP(20)
+          .build();
+        // Super-evolve gain op has player: "opponent" — gifter is first, recipient is second.
+        gainCardCrest("10144110", "first");
+
+        expect(hasNamedCrest("first", BURNITE_FLAME_CREST)).toBe(false);
+        expect(hasNamedCrest("second", BURNITE_FLAME_CREST)).toBe(true);
+
+        runStartOfTurnBoundary("first");
+        expect(getHP(state, "first")).toBe(20);
+        expect(getHP(state, "second")).toBe(20);
+
+        runStartOfTurnBoundary("second");
+        expect(getHP(state, "first")).toBe(20);
+        expect(getHP(state, "second")).toBe(19);
+      });
+
+      it("leader_restored on crest owner deals damage only to that leader", () => {
+        givenGameState({ seed: 1, activePlayer: "first" })
+          .withFirstHP(20)
+          .withSecondHP(15)
+          .build();
+        gainCardCrest("10144110", "first"); // crest lands on second
+
+        restoreLeaderHP("second", 3);
+        expect(getHP(state, "second")).toBe(17);
+
+        restoreLeaderHP("first", 3);
+        expect(getHP(state, "first")).toBe(20);
+      });
+    });
   });
 
   it("Lilanthim 10734110: mirror crest — summons only on opponent's EOT", () => {
