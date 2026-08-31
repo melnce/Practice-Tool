@@ -392,7 +392,11 @@ describe("Set 104: Skybound Dragons", () => {
 
     const { getCardById } = await import("../../src/data/cardDatabase.js");
     const flareTemplate = getCardById("10433310");
-    expect(flareTemplate?.spell?.[0]?.op).toBe("select");
+    // Flat chosen-target form (PR 4): damage+select, not nested op:select
+    expect(flareTemplate?.spell?.[0]?.op).toBe("damage");
+    expect(flareTemplate?.spell?.[0]?.target).toBe("enemy:follower");
+    expect(flareTemplate?.spell?.[0]?.select).toBe(1);
+    expect(flareTemplate?.spell?.[0]?.amount).toBe(4);
 
     state.players.second.board = [
       { uid: "e1", defense: 6, type: "Follower" },
