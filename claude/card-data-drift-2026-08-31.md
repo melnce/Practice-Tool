@@ -255,8 +255,12 @@ Do **not** apply the Dark Dimensions board fix blindly to these.
 
 ### Why
 
-Engine reads `eff.select ?? eff.select_count ?? 1` in targeting, mode, keyword, summon-hand,
-and stat paths. One spelling; `select` is the majority.
+Most readers use `eff.select ?? eff.select_count ?? 1` (targeting, mode, keyword,
+summon-hand, stat). **Correction (PR 3):** that claim was false for
+`returnHandToDeck.ts` / `bounce.ts`, which gated on truthy `select` then read
+`select_count` only — so a card already authored as `select: N` (e.g. Cognitive
+Shift `10711310`) silently got count 1. Fixed to the same `select ?? select_count`
+order. One spelling; `select` is the majority and is now canonical in card data.
 
 ### Deviating card ids
 
@@ -272,8 +276,8 @@ and stat paths. One spelling; `select` is the majority.
 - `10452130` Baal, Elemental Resonance — op:mode select_count:1
 - `10532310` Kitty Cunning — op:mode select_count:2
 - `10552120` Friendly Blue Ogre — op:select select_count:1
-- `10564120` Kukishiro, Mistbloom — op:mode select_count:1
-- `10574110` Slaus, Revolving Wheel of Fortune — op:mode select_count:1
+- `10564120` Kukishiro, Mistbloom — op:mode select_count:1 (×2 nodes)
+- `10574110` Slaus, Revolving Wheel of Fortune — op:mode select_count:1 (×2 nodes)
 - `10604110` Omegotep, the Dreaded One — op:mode select_count:2
 - `10721310` Measured Attunement — op:select select_count:1
 - `10931120` Key Spirit — op:select select_count:1

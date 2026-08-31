@@ -124,6 +124,12 @@ export function handleReturnToHand(
 
   // Numeric select - use pending target for UI selection
   if ((eff as any).select) {
+    // Canonical `select` wins; `select_count` is legacy fallback only.
+    const selectCount =
+      parseInt(
+        String((eff as any).select ?? (eff as any).select_count ?? 1),
+        10,
+      ) || 1;
     setPendingTarget({
       eff,
       owner,
@@ -131,12 +137,12 @@ export function handleReturnToHand(
       resumeEffects: effectsQueue,
       pool,
       targets: [],
-      selectCount: parseInt((eff as any).select_count || 1),
+      selectCount,
     });
     logEvent("returnToHand_select", {
       owner,
       pool: pool.length,
-      select: parseInt((eff as any).select_count || 1),
+      select: selectCount,
     });
     highlightSelectable(pool);
     return "pending";
