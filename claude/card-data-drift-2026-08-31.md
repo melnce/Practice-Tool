@@ -353,6 +353,25 @@ add pointless wrappers.
   flat form and green when left nested. Gate excludes this id until the flat
   `into_source` path learns pending select.
 
+### Harness note — `gameTick` is dispatch-depth sensitive
+
+PR 4's flatten moved fingerprints for **5 cards / 6 scenarios**
+(Ezecrain play, Alchemic Flare play, Friendly Blue Ogre play+evolve,
+Lyanthoth play, Reaper's Due play). Diffing the full `fingerprintGameState`
+detail (not the hash) showed the **only** differing field was `gameTick`
+(flat is 1–3 ticks cheaper). Every board, hand, deck, graveyard, banish,
+crest, counter, keyword, HP, and `pending` field was byte-identical.
+`gameTick` counts internal effect-dispatch hops; removing the nested
+`op:select` wrapper removes a hop — so the move is expected and not
+player-visible. Baseline regenerated for that reason
+(`npm run cards:baseline`).
+
+A future shape-only refactor should expect the same and verify the same
+way: dump the fingerprint **detail** and diff the JSON — do not trust the
+hash alone. Possible follow-up: drop `gameTick` from `fingerprintGameState`
+so the harness ignores pure dispatch-depth changes — **do not do that in
+this series**; it would invalidate every baseline recorded so far.
+
 ### Correctly nested (2+ shared consumers) — do not "fix"
 
 - `10032110` Remi & Rami, Two-Faced Witch — effects: [evolve, stat]
