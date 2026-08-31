@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 /**
- * Canonical-form gate for card-data drift families (WARN mode only).
+ * Canonical-form gate for card-data drift families.
  *
- * Reports every card whose effect JSON diverges from the chosen canonical
- * spelling. Does NOT fail the build — migrations land in later PRs.
+ * Turn-scope is hard-fail once migrated (`--gate=turn-scope --fail`).
+ * Other families remain WARN-only until their own migration PRs land.
  *
  * SHAPE-ONLY: inspects JSON structure. Must never treat keyword-duration
  * phrasing ("until the end of your opponent's turn") as turn-trigger scope —
@@ -11,11 +11,11 @@
  * in claude/card-data-drift-2026-08-31.md.
  *
  *   npm run check:canonical-form
- *   npx tsx scripts/check-canonical-form.ts --gate=turn-scope
+ *   npx tsx scripts/check-canonical-form.ts --gate=turn-scope --fail
  *   npx tsx scripts/check-canonical-form.ts --gate=select-count
  *   npx tsx scripts/check-canonical-form.ts --gate=chosen-target
  *
- * Optional `--fail` promotes warnings to exit 1 (for a future hard gate).
+ * Optional `--fail` promotes the selected family's warnings to exit 1.
  */
 
 import fs from "fs";
@@ -313,7 +313,11 @@ function main(): void {
     return true;
   });
 
-  console.log("Canonical-form gate — WARN mode (does not fail the build)");
+  console.log(
+    gateFilter === "turn-scope"
+      ? "Canonical-form gate — turn-scope (error mode when --fail)"
+      : "Canonical-form gate — WARN mode for unmigrated families",
+  );
   console.log(`scanned ${cards.length} cards from cards/sets/`);
 
   printFamily("turn-scope", unique);
