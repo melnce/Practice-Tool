@@ -2369,29 +2369,23 @@
     "triggers": [],
     "spell": [
       {
-        "op": "select",
+        "op": "keyword",
+        "action": "grant",
         "target": "ally:follower",
-        "effects": [
+        "select": 1,
+        "keywords": [
           {
-            "op": "keyword",
-            "action": "grant",
-            "target": "selected:follower",
-            "keywords": [
+            "name": "LastWords",
+            "effects": [
               {
-                "name": "LastWords",
-                "effects": [
-                  {
-                    "op": "summon",
-                    "source": "self",
-                    "mode": "copy",
-                    "count": 1
-                  }
-                ]
+                "op": "summon",
+                "source": "self",
+                "mode": "copy",
+                "count": 1
               }
             ]
           }
-        ],
-        "select": 1
+        ]
       }
     ]
   },

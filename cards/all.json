@@ -16079,16 +16079,10 @@
     "url": "https://shadowverse.gg/cards/10432110-ezecrain-portent-of-vengeance",
     "fanfare": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
         "select": 2,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected:follower",
-            "amount": 4
-          }
-        ]
+        "amount": 4
       },
       {
         "op": "summon",
@@ -16297,16 +16291,10 @@
     "url": "https://shadowverse.gg/cards/10433310-alchemic-flare",
     "spell": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected:follower",
-            "amount": 4
-          }
-        ]
+        "amount": 4
       },
       {
         "op": "summon",
@@ -20621,17 +20609,11 @@
     "triggers": [],
     "fanfare": [
       {
-        "op": "select",
+        "op": "stat",
+        "action": "give",
+        "keywords": ["Can't Attack"],
+        "duration": "opponent_turn_end",
         "target": "enemy:follower",
-        "effects": [
-          {
-            "op": "stat",
-            "action": "give",
-            "keywords": ["Can't Attack"],
-            "duration": "opponent_turn_end",
-            "target": "selected:follower"
-          }
-        ],
         "select": 1
       },
       {
@@ -22552,15 +22534,9 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "enemy:follower",
-        "select": 1,
-        "effects": [
-          {
-            "op": "destroy",
-            "target": "selected:follower"
-          }
-        ]
+        "select": 1
       }
     ],
     "keywords": [],
@@ -24954,18 +24930,12 @@
     "triggers": [],
     "fanfare": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "any:any",
         "select": 3,
         "condition": {
           "not_self": true
-        },
-        "effects": [
-          {
-            "op": "destroy",
-            "target": "selected"
-          }
-        ]
+        }
       }
     ],
     "specific_effects": [
@@ -27351,21 +27321,15 @@
     "url": "https://shadowverse.gg/cards/10741120-carrier-wyvern",
     "evolve": [
       {
-        "op": "select",
+        "op": "stat",
+        "action": "give",
+        "attack": 2,
+        "defense": 2,
         "target": "ally:hand",
         "select": 1,
         "condition": {
           "type": "Follower"
-        },
-        "effects": [
-          {
-            "op": "stat",
-            "action": "give",
-            "attack": 2,
-            "defense": 2,
-            "target": "selected:follower"
-          }
-        ]
+        }
       }
     ],
     "superevolve": [],
@@ -34963,29 +34927,23 @@
     "triggers": [],
     "spell": [
       {
-        "op": "select",
+        "op": "keyword",
+        "action": "grant",
         "target": "ally:follower",
-        "effects": [
+        "select": 1,
+        "keywords": [
           {
-            "op": "keyword",
-            "action": "grant",
-            "target": "selected:follower",
-            "keywords": [
+            "name": "LastWords",
+            "effects": [
               {
-                "name": "LastWords",
-                "effects": [
-                  {
-                    "op": "summon",
-                    "source": "self",
-                    "mode": "copy",
-                    "count": 1
-                  }
-                ]
+                "op": "summon",
+                "source": "self",
+                "mode": "copy",
+                "count": 1
               }
             ]
           }
-        ],
-        "select": 1
+        ]
       }
     ]
   },

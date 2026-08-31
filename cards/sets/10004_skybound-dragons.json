@@ -1338,16 +1338,10 @@
     "url": "https://shadowverse.gg/cards/10432110-ezecrain-portent-of-vengeance",
     "fanfare": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
         "select": 2,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected:follower",
-            "amount": 4
-          }
-        ]
+        "amount": 4
       },
       {
         "op": "summon",
@@ -1556,16 +1550,10 @@
     "url": "https://shadowverse.gg/cards/10433310-alchemic-flare",
     "spell": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected:follower",
-            "amount": 4
-          }
-        ]
+        "amount": 4
       },
       {
         "op": "summon",
