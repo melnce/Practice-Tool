@@ -567,7 +567,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "hand",
         "effects": [
           {
@@ -583,7 +582,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "spell": [
@@ -2416,7 +2419,6 @@
         "description": "At the end of your turn, if there's an allied card on the field with Last Words, destroy a random allied card with Last Words and a random enemy follower.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -2441,7 +2443,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -2495,7 +2501,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "hand",
         "effects": [
           {
@@ -2511,7 +2516,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -2693,7 +2702,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -2702,7 +2710,11 @@
             "player": "self",
             "amount": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -2952,7 +2964,6 @@
         "description": "At the end of your turn, if there's an allied card on the field with a base cost of 6 or more, deal 1 damage to the enemy leader and restore 1 defense to your leader.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -2974,7 +2985,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }

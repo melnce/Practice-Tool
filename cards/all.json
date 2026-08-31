@@ -1891,8 +1891,11 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
+        "event": "end_of_turn",
         "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
             "op": "add_to_hand",
@@ -2793,7 +2796,6 @@
     "hasOngoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -2808,7 +2810,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "keywords": [
@@ -4255,7 +4261,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "earth_rite",
@@ -4268,7 +4273,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -5199,7 +5208,10 @@
                 "target": "ally:leader",
                 "amount": 1
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           },
           {
             "event": "leader_restored",
@@ -5737,7 +5749,6 @@
     "fanfare": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -5766,7 +5777,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "keywords": ["Bane"]
@@ -5904,7 +5919,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
@@ -5916,7 +5930,11 @@
                 "target": "enemy:leader",
                 "amount": 1
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -7481,7 +7499,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -7502,7 +7519,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -7843,7 +7864,6 @@
         "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -7857,7 +7877,11 @@
                 ],
                 "else_effects": []
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -8206,7 +8230,10 @@
                 "name": "Fairy",
                 "count": 1
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -8387,7 +8414,6 @@
     "keywords": ["Ward"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -8403,7 +8429,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ]
   },
@@ -8845,7 +8875,10 @@
                 "name": "Onion Patch",
                 "count": 1
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -9016,7 +9049,6 @@
         "countdown": 1,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "draw",
@@ -9035,7 +9067,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -9971,7 +10007,10 @@
                 "source": "graveyard",
                 "max_cost": 3
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -10071,14 +10110,17 @@
         "select": 1,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "source": "board",
             "effects": [
               {
                 "op": "destroy",
                 "scope": "self"
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -11075,7 +11117,6 @@
         ],
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "discard",
@@ -11087,7 +11128,11 @@
                 "source": "deck",
                 "count": 6
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -12695,7 +12740,6 @@
     "keywords": ["Rush", "Ward"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "restore",
@@ -12708,7 +12752,11 @@
             "target": "ally:leader",
             "amount_source": "context.restore_amount"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ]
   },
@@ -12840,10 +12888,10 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "condition": {
-          "defense_lte": 3
+          "defense_lte": 3,
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -12854,7 +12902,8 @@
             "attack": 1,
             "defense": 1
           }
-        ]
+        ],
+        "event": "end_of_turn"
       }
     ]
   },
@@ -13738,7 +13787,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -13756,7 +13804,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -13886,7 +13938,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -13899,7 +13950,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -14045,7 +14100,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -14062,7 +14116,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -14175,7 +14233,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -14206,14 +14263,17 @@
                           "action": "grant_trigger",
                           "triggers": [
                             {
-                              "type": "end_of_turn_own",
                               "effects": [
                                 {
                                   "op": "banish",
                                   "scope": "self",
                                   "target": "selected:follower"
                                 }
-                              ]
+                              ],
+                              "event": "end_of_turn",
+                              "condition": {
+                                "whose_turn": "owner"
+                              }
                             }
                           ],
                           "target": "selected:follower"
@@ -14224,7 +14284,11 @@
                 ],
                 "else_effects": []
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -14264,7 +14328,6 @@
         "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -14279,7 +14342,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -14765,14 +14832,17 @@
     "has_ongoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "restore",
             "target": "allies",
             "amount": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [],
@@ -14932,7 +15002,10 @@
                     "target": "allies",
                     "amount": 1
                   }
-                ]
+                ],
+                "condition": {
+                  "whose_turn": "owner"
+                }
               }
             ]
           },
@@ -15022,13 +15095,16 @@
     "evolve_trigger_always": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [
@@ -15929,14 +16005,17 @@
     "has_ongoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "spellboost",
             "target": "ally:hand",
             "count": "{self.attack}"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [
@@ -16378,7 +16457,7 @@
               {
                 "event": "start_of_turn",
                 "condition": {
-                  "own_turn": true
+                  "whose_turn": "owner"
                 },
                 "effects": [
                   {
@@ -16472,7 +16551,7 @@
       {
         "event": "end_of_turn",
         "condition": {
-          "own_turn": true
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -16519,7 +16598,7 @@
           {
             "event": "end_of_turn",
             "condition": {
-              "own_turn": true
+              "whose_turn": "owner"
             },
             "effects": [
               {
@@ -16961,7 +17040,6 @@
         "countdown": 2,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
@@ -16975,7 +17053,11 @@
                 "target": "ally:leader",
                 "amount": 1
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -17014,7 +17096,6 @@
     "keywords": ["Rush"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "damage",
@@ -17030,7 +17111,11 @@
             "distribution": "random",
             "count": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": []
@@ -17197,14 +17282,17 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       },
@@ -17218,14 +17306,17 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       },
@@ -17291,7 +17382,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "stat",
@@ -17300,7 +17390,11 @@
             "attack": -2,
             "defense": -2
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [],
@@ -17425,14 +17519,21 @@
     "has_ongoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
-        "op": "gate",
-        "condition": "evolved_self",
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
-            "op": "damage",
-            "amount": 2,
-            "target": "all:follower"
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "damage",
+                "amount": 2,
+                "target": "all:follower"
+              }
+            ]
           }
         ]
       }
@@ -17748,7 +17849,8 @@
       {
         "event": "end_of_turn",
         "condition": {
-          "super_evolution_unlocked": true
+          "super_evolution_unlocked": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -19254,7 +19356,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -19263,7 +19364,11 @@
             "name": "Steelclad Knight",
             "count": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": []
@@ -19327,7 +19432,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -19351,7 +19455,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": []
@@ -20213,7 +20321,6 @@
     "keywords": ["Ward"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -20242,7 +20349,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": []
@@ -20666,7 +20777,10 @@
                   }
                 ]
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -21160,7 +21274,6 @@
     "keywords": ["Ward"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -21179,7 +21292,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -21675,7 +21792,6 @@
     "keywords": ["Ambush"],
     "triggers": [
       {
-        "type": "start_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -21720,10 +21836,13 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "start_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       },
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -21740,7 +21859,6 @@
                 "countdown": 3,
                 "triggers": [
                   {
-                    "type": "start_of_turn_own",
                     "effects": [
                       {
                         "op": "mode",
@@ -21783,7 +21901,11 @@
                           }
                         ]
                       }
-                    ]
+                    ],
+                    "event": "start_of_turn",
+                    "condition": {
+                      "whose_turn": "owner"
+                    }
                   }
                 ]
               },
@@ -21793,7 +21915,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -22038,7 +22164,10 @@
               "exclude_tribe": "Encroacher"
             }
           }
-        ]
+        ],
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -23677,13 +23806,16 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -25158,7 +25290,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "damage",
@@ -25166,7 +25297,11 @@
             "amount": 3,
             "distribution": "split_sequential"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -25505,7 +25640,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -25549,7 +25683,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -25627,7 +25765,10 @@
                     "op": "banish",
                     "scope": "self"
                   }
-                ]
+                ],
+                "condition": {
+                  "whose_turn": "owner"
+                }
               }
             ]
           }
@@ -25665,7 +25806,6 @@
     "keywords": ["Ambush"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -25674,7 +25814,11 @@
             "player": "self",
             "count": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -25935,7 +26079,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -25951,7 +26094,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -26049,7 +26196,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -26068,7 +26214,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -26127,7 +26277,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -26141,7 +26290,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -26149,7 +26302,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -26158,7 +26310,11 @@
             "amount": "{self.attack}",
             "distribution": "split_sequential"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -27320,7 +27476,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -27343,7 +27498,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -27514,14 +27673,17 @@
         "player": "opponent",
         "triggers": [
           {
-            "type": "start_of_turn_own",
             "effects": [
               {
                 "op": "damage",
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "event": "start_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           },
           {
             "event": "leader_restored",
@@ -27598,7 +27760,6 @@
         "countdown": 2,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "summon",
@@ -27606,7 +27767,11 @@
                 "name": "Vastwing Dragon",
                 "count": 1
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -30690,7 +30855,6 @@
     "keywords": ["Rush"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -30698,7 +30862,11 @@
             "name": "Majestic Megalorca",
             "count": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -31506,7 +31674,6 @@
         ]
       },
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -31515,7 +31682,11 @@
             "player": "self",
             "amount": 4
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -31849,7 +32020,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -31883,7 +32053,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": []
@@ -32987,7 +33161,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "hand",
         "effects": [
           {
@@ -33003,7 +33176,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "spell": [
@@ -34836,7 +35013,6 @@
         "description": "At the end of your turn, if there's an allied card on the field with Last Words, destroy a random allied card with Last Words and a random enemy follower.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -34861,7 +35037,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -34915,7 +35095,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "hand",
         "effects": [
           {
@@ -34931,7 +35110,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -35113,7 +35296,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -35122,7 +35304,11 @@
             "player": "self",
             "amount": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -35372,7 +35558,6 @@
         "description": "At the end of your turn, if there's an allied card on the field with a base cost of 6 or more, deal 1 damage to the enemy leader and restore 1 defense to your leader.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -35394,7 +35579,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }

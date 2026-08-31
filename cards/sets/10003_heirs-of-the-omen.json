@@ -213,7 +213,6 @@
         ],
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "discard",
@@ -225,7 +224,11 @@
                 "source": "deck",
                 "count": 6
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -1833,7 +1836,6 @@
     "keywords": ["Rush", "Ward"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "restore",
@@ -1846,7 +1848,11 @@
             "target": "ally:leader",
             "amount_source": "context.restore_amount"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ]
   },
@@ -1978,10 +1984,10 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "condition": {
-          "defense_lte": 3
+          "defense_lte": 3,
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -1992,7 +1998,8 @@
             "attack": 1,
             "defense": 1
           }
-        ]
+        ],
+        "event": "end_of_turn"
       }
     ]
   },
@@ -2876,7 +2883,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -2894,7 +2900,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -3024,7 +3034,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -3037,7 +3046,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -3183,7 +3196,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -3200,7 +3212,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -3313,7 +3329,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -3344,14 +3359,17 @@
                           "action": "grant_trigger",
                           "triggers": [
                             {
-                              "type": "end_of_turn_own",
                               "effects": [
                                 {
                                   "op": "banish",
                                   "scope": "self",
                                   "target": "selected:follower"
                                 }
-                              ]
+                              ],
+                              "event": "end_of_turn",
+                              "condition": {
+                                "whose_turn": "owner"
+                              }
                             }
                           ],
                           "target": "selected:follower"
@@ -3362,7 +3380,11 @@
                 ],
                 "else_effects": []
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -3402,7 +3424,6 @@
         "description": "At the end of your turn, if allied followers didn't attack this turn, deal X damage split between all enemies. X is the number of crests you have.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -3417,7 +3438,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -3576,7 +3601,9 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "filter": { "not_self": true },
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -3645,7 +3672,9 @@
       {
         "op": "destroy",
         "target": "ally:card",
-        "filter": { "not_self": true },
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {

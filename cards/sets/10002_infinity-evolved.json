@@ -227,7 +227,6 @@
         "description": "End of your turn: If there's a super-evolved allied follower, deal 2 to all enemy followers.",
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -241,7 +240,11 @@
                 ],
                 "else_effects": []
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -590,7 +593,10 @@
                 "name": "Fairy",
                 "count": 1
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -771,7 +777,6 @@
     "keywords": ["Ward"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -787,7 +792,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ]
   },
@@ -1229,7 +1238,10 @@
                 "name": "Onion Patch",
                 "count": 1
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -1400,7 +1412,6 @@
         "countdown": 1,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "draw",
@@ -1419,7 +1430,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -2355,7 +2370,10 @@
                 "source": "graveyard",
                 "max_cost": 3
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -2455,14 +2473,17 @@
         "select": 1,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "source": "board",
             "effects": [
               {
                 "op": "destroy",
                 "scope": "self"
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
