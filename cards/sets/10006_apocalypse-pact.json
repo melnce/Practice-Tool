@@ -202,7 +202,6 @@
       {
         "op": "mode",
         "pick": "random",
-        "select_count": 2,
         "options": [
           {
             "label": "Destroy a random enemy follower",
@@ -251,7 +250,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 2
       }
     ],
     "spell": []

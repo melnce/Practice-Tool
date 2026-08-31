@@ -1787,7 +1787,6 @@
           {
             "op": "select",
             "target": "ally:follower",
-            "select_count": 1,
             "effects": [
               {
                 "op": "stat",
@@ -1814,7 +1813,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "select": 1
           }
         ]
       }
@@ -3038,7 +3038,6 @@
         "condition": {
           "attack_lte": 4
         },
-        "select_count": 1,
         "effects": [
           {
             "op": "banish",
@@ -3049,7 +3048,8 @@
             "source": "copy",
             "target": "selected:follower"
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "superevolve": [],

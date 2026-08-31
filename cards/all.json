@@ -3945,7 +3945,6 @@
         "condition": {
           "has_keyword": "Spellboost"
         },
-        "select_count": 1,
         "effects": [
           {
             "op": "spellboost",
@@ -3957,7 +3956,8 @@
             "source": "deck",
             "count": 1
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "keywords": [],
@@ -4201,7 +4201,6 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "select_count": 1,
         "effects": [
           {
             "op": "stat",
@@ -4216,7 +4215,8 @@
             "duration": "opponent_turn_end",
             "target": "selected:follower"
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "keywords": [
@@ -9424,7 +9424,6 @@
           {
             "op": "select",
             "target": "ally:follower",
-            "select_count": 1,
             "effects": [
               {
                 "op": "stat",
@@ -9451,7 +9450,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "select": 1
           }
         ]
       }
@@ -10675,7 +10675,6 @@
         "condition": {
           "attack_lte": 4
         },
-        "select_count": 1,
         "effects": [
           {
             "op": "banish",
@@ -10686,7 +10685,8 @@
             "source": "copy",
             "target": "selected:follower"
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "superevolve": [],
@@ -14871,7 +14871,6 @@
     "fanfare": [
       {
         "op": "mode",
-        "select_count": 1,
         "options": [
           {
             "name": "Deal 5 damage to a random enemy follower",
@@ -14897,7 +14896,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       },
       {
         "op": "gate",
@@ -15400,7 +15400,6 @@
         "else_effects": [
           {
             "op": "mode",
-            "select_count": 1,
             "options": [
               {
                 "name": "Draw a card. Restore 1 defense to your leader.",
@@ -15442,7 +15441,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "select": 1
           }
         ]
       }
@@ -15740,7 +15740,6 @@
     "fanfare": [
       {
         "op": "mode",
-        "select_count": 1,
         "options": [
           {
             "name": "Super-Evolve",
@@ -15773,7 +15772,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "evolve": [],
@@ -15798,7 +15798,6 @@
     "spell": [
       {
         "op": "mode",
-        "select_count": 1,
         "options": [
           {
             "name": "Give the leftmost allied Swordcraft follower \"Can attack 2 times per turn\"",
@@ -15856,7 +15855,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "evolve": [],
@@ -16161,7 +16161,6 @@
     "spell": [
       {
         "op": "mode",
-        "select_count": 1,
         "options": [
           {
             "name": "Draw a card. Deal 4 damage to a random enemy follower.",
@@ -16202,7 +16201,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "evolve": [],
@@ -17170,7 +17170,6 @@
     "fanfare": [
       {
         "op": "mode",
-        "select_count": 1,
         "options": [
           {
             "name": "Give this follower and another random allied follower on the field +1/+1",
@@ -17208,7 +17207,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "evolve": [],
@@ -19752,7 +19752,6 @@
           {
             "op": "mode",
             "pick": "random",
-            "select_count": 2,
             "options": [
               {
                 "label": "Summon a Clay Golem",
@@ -19787,7 +19786,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "select": 2
           }
         ]
       }
@@ -20623,7 +20623,6 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "select_count": 1,
         "effects": [
           {
             "op": "stat",
@@ -20632,7 +20631,8 @@
             "duration": "opponent_turn_end",
             "target": "selected:follower"
           }
-        ]
+        ],
+        "select": 1
       },
       {
         "op": "draw",
@@ -21382,7 +21382,6 @@
               {
                 "op": "mode",
                 "pick": "random",
-                "select_count": 1,
                 "options": [
                   {
                     "label": "Fox of Purity",
@@ -21406,7 +21405,8 @@
                       }
                     ]
                   }
-                ]
+                ],
+                "select": 1
               }
             ]
           },
@@ -21420,7 +21420,6 @@
               {
                 "op": "mode",
                 "pick": "random",
-                "select_count": 1,
                 "options": [
                   {
                     "label": "Enemy Fox of Purity",
@@ -21446,7 +21445,8 @@
                       }
                     ]
                   }
-                ]
+                ],
+                "select": 1
               }
             ]
           }
@@ -21797,7 +21797,6 @@
           {
             "op": "mode",
             "pick": "random_unused",
-            "select_count": 1,
             "options": [
               {
                 "label": "Reduce the cost of all cards in your hand by 1 until the end of the turn",
@@ -21834,7 +21833,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "select": 1
           }
         ],
         "event": "start_of_turn",
@@ -21863,7 +21863,6 @@
                       {
                         "op": "mode",
                         "pick": "random_unused",
-                        "select_count": 1,
                         "options": [
                           {
                             "label": "Increase the cost of all cards in your hand by 1 until the end of the turn",
@@ -21899,7 +21898,8 @@
                               }
                             ]
                           }
-                        ]
+                        ],
+                        "select": 1
                       }
                     ],
                     "event": "start_of_turn",
@@ -22201,7 +22201,6 @@
       {
         "op": "mode",
         "pick": "random",
-        "select_count": 2,
         "options": [
           {
             "label": "Destroy a random enemy follower",
@@ -22250,7 +22249,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 2
       }
     ],
     "spell": []
@@ -26431,7 +26431,6 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "select_count": 1,
         "effects": [
           {
             "op": "damage",
@@ -26452,7 +26451,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ]
   },
@@ -33768,14 +33768,14 @@
         "condition": {
           "has_keyword": "Spellboost"
         },
-        "select_count": 1,
         "effects": [
           {
             "op": "spellboost",
             "target": "self",
             "count": 4
           }
-        ]
+        ],
+        "select": 1
       }
     ],
     "superevolve": [],
@@ -34965,7 +34965,6 @@
       {
         "op": "select",
         "target": "ally:follower",
-        "select_count": 1,
         "effects": [
           {
             "op": "keyword",
@@ -34985,7 +34984,8 @@
               }
             ]
           }
-        ]
+        ],
+        "select": 1
       }
     ]
   },
