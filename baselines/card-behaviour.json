@@ -5331,12 +5331,12 @@
       "status": "covered"
     },
     "10461120": {
-      "fingerprint": "a00e0b80",
+      "fingerprint": "d0b0cf60",
       "gatesSatisfied": ["evolved_self"],
       "name": "Lamretta, Sisterly Shepherd",
       "scenarios": [
         {
-          "fingerprint": "e9559358",
+          "fingerprint": "662d06d0",
           "scenario": "turn_boundary"
         },
         {
@@ -5423,12 +5423,12 @@
       "status": "covered"
     },
     "10464110": {
-      "fingerprint": "6176d9b8",
+      "fingerprint": "af85b9a9",
       "gatesSatisfied": [],
       "name": "Galleon, Earth Personified",
       "scenarios": [
         {
-          "fingerprint": "649e8d80",
+          "fingerprint": "ee64e120",
           "scenario": "turn_boundary"
         }
       ],
@@ -6640,12 +6640,12 @@
       "status": "covered"
     },
     "10603210": {
-      "fingerprint": "8562bd0d",
+      "fingerprint": "cf0bd364",
       "gatesSatisfied": [],
       "name": "Dark Dimensions",
       "scenarios": [
         {
-          "fingerprint": "ca466590",
+          "fingerprint": "18dd0240",
           "scenario": "turn_boundary"
         }
       ],
