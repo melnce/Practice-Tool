@@ -4967,12 +4967,12 @@
       "status": "covered"
     },
     "10432110": {
-      "fingerprint": "aa9a1048",
+      "fingerprint": "ffb3fd08",
       "gatesSatisfied": [],
       "name": "Ezecrain, Portent of Vengeance",
       "scenarios": [
         {
-          "fingerprint": "2ed45ef8",
+          "fingerprint": "31cf1c2f",
           "scenario": "play"
         }
       ],
@@ -5019,12 +5019,12 @@
       "status": "covered"
     },
     "10433310": {
-      "fingerprint": "b97a7fec",
+      "fingerprint": "6d214b15",
       "gatesSatisfied": ["skybound_art"],
       "name": "Alchemic Flare",
       "scenarios": [
         {
-          "fingerprint": "ea4a1498",
+          "fingerprint": "d278923c",
           "scenario": "play"
         }
       ],
@@ -6244,16 +6244,16 @@
       "status": "covered"
     },
     "10552120": {
-      "fingerprint": "0440c03c",
+      "fingerprint": "ab66fcff",
       "gatesSatisfied": [],
       "name": "Friendly Blue Ogre",
       "scenarios": [
         {
-          "fingerprint": "fe77beb7",
+          "fingerprint": "2738e298",
           "scenario": "play"
         },
         {
-          "fingerprint": "ae314fb4",
+          "fingerprint": "a2bdeeef",
           "scenario": "evolve"
         }
       ],
@@ -7438,12 +7438,12 @@
       "unmetGates": ["selected_matches"]
     },
     "10664120": {
-      "fingerprint": "908abe47",
+      "fingerprint": "3e6beb9f",
       "gatesSatisfied": [],
       "name": "Lyanthoth, Eld Tome",
       "scenarios": [
         {
-          "fingerprint": "90efe45c",
+          "fingerprint": "5fbce5cc",
           "scenario": "play"
         },
         {
@@ -10317,12 +10317,12 @@
       "status": "covered"
     },
     "10953310": {
-      "fingerprint": "9a288cb8",
+      "fingerprint": "ba652420",
       "gatesSatisfied": [],
       "name": "Reaper's Due",
       "scenarios": [
         {
-          "fingerprint": "c2992db0",
+          "fingerprint": "9ea13414",
           "scenario": "play"
         }
       ],
