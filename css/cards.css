@@ -163,6 +163,41 @@
   cursor: grabbing;
 }
 
+/* Pointer-events drag layer (mouse + touch) */
+.card[data-pointer-draggable="true"],
+.evo-btn[data-pointer-draggable="true"],
+[data-pointer-draggable="true"] {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: grab;
+}
+
+.card[data-pointer-draggable="true"]:active,
+.evo-btn[data-pointer-draggable="true"]:active,
+[data-pointer-draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.pointer-drag-source {
+  opacity: 0.45;
+}
+
+.pointer-drag-preview {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transform: scale(1.05);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.pointer-drop-highlight {
+  outline: 2px solid rgba(80, 200, 120, 0.95) !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 12px rgba(80, 200, 120, 0.45);
+}
+
 .rush-glow {
   outline: 3px solid var(--color-warn);
   outline-offset: -3px;

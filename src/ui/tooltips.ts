@@ -185,6 +185,48 @@ type TooltipSession = {
 
 let activeSession: TooltipSession | null = null;
 
+/** While a pointer-drag is active, keep the card text panel visible. */
+let dragTooltipSession: {
+  card: CardInstance;
+  owner: Player;
+  anchor: HTMLElement | null;
+} | null = null;
+
+/**
+ * Show full card text for the duration of a pointer drag (touch + desktop).
+ * Reuses the same formatCardTooltip / paint path as hover.
+ */
+export function beginDragCardTooltip(
+  card: CardInstance,
+  owner: Player,
+  anchor?: HTMLElement | null,
+) {
+  const tooltipEl = document.getElementById(
+    "cardTooltip",
+  ) as HTMLElement | null;
+  if (!tooltipEl) return;
+  const live = anchor ? (resolveCardForAnchor(anchor, card) ?? card) : card;
+  dragTooltipSession = { card: live, owner, anchor: anchor ?? null };
+  paintTooltip(tooltipEl, live, owner, anchor ?? undefined);
+  // Park the panel away from the finger/cursor but on-screen.
+  tooltipEl.style.top = "12px";
+  tooltipEl.style.bottom = "auto";
+  tooltipEl.style.left = "12px";
+}
+
+export function endDragCardTooltip() {
+  dragTooltipSession = null;
+  const tooltipEl = document.getElementById(
+    "cardTooltip",
+  ) as HTMLElement | null;
+  if (!tooltipEl) return;
+  // If hover is still active, refreshActiveTooltips will repaint; otherwise hide.
+  const hovered = document.querySelector(
+    '[data-has-tooltip="1"]:hover',
+  ) as HTMLElement | null;
+  if (!hovered) hideTooltip(tooltipEl);
+}
+
 /** Test/harness-only: expose tooltip session so retainer dumps can name this root. */
 export function __auditTooltipSessionForLeakHarness(): {
   exists: boolean;
@@ -238,6 +280,14 @@ export function refreshActiveTooltips(): void {
     "cardTooltip",
   ) as HTMLElement | null;
   if (!tooltipEl) return;
+
+  // Pointer-drag pickup text wins over hover for the gesture duration.
+  if (dragTooltipSession) {
+    const { card, owner, anchor } = dragTooltipSession;
+    const live = anchor ? (resolveCardForAnchor(anchor, card) ?? card) : card;
+    paintTooltip(tooltipEl, live, owner, anchor ?? undefined);
+    return;
+  }
 
   const hoveredFromCss = document.querySelector(
     '[data-has-tooltip="1"]:hover',

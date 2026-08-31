@@ -28,7 +28,8 @@ function resetEvoButtons() {
       if (!el) return;
       el.removeAttribute("disabled");
       el.classList.remove("used", "spent", "disabled");
-      el.draggable = true;
+      el.removeAttribute("draggable");
+      el.dataset.pointerDraggable = "true";
     },
   );
 }

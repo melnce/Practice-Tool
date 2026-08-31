@@ -1,9 +1,9 @@
 /**
  * @vitest-environment jsdom
  *
- * Hand-card fuse vs drag: zone rule (never cancel dragstart; release inside
- * hand → fuse; release outside → drag/play). Suppress trailing click after
- * drag so one gesture cannot fuse twice.
+ * Hand-card fuse vs pointer-drag: click path + suppress after drag.
+ * Release-inside-hand → fuse is owned by the pointer drag session (see
+ * pointer-drag-session.test.ts).
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { createHandDragClickSuppressor } from "../../src/ui/zones/dragClickGuard.js";
@@ -27,6 +27,7 @@ vi.mock("../../src/ui/zones/actions.js", () => ({
 }));
 
 import * as actions from "../../src/ui/zones/actions.js";
+import * as drag from "../../src/ui/drag.js";
 
 const HAND_ID = "blueHand";
 
@@ -55,23 +56,6 @@ function mountHandContainer(
   return hand;
 }
 
-function fireDragStart(el: HTMLElement) {
-  const ev = new Event("dragstart", { bubbles: true, cancelable: true });
-  el.dispatchEvent(ev);
-  return ev;
-}
-
-function fireDragEnd(el: HTMLElement, clientX: number, clientY: number) {
-  // jsdom lacks DragEvent; Event + client coords is enough for our hit-test.
-  const ev = new Event("dragend", { bubbles: true, cancelable: true });
-  Object.defineProperties(ev, {
-    clientX: { value: clientX },
-    clientY: { value: clientY },
-  });
-  el.dispatchEvent(ev);
-  return ev;
-}
-
 function fireClick(el: HTMLElement) {
   el.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 }
@@ -98,244 +82,138 @@ function firePointer(
 function minimalHandVm(overrides: Partial<CardViewModel> = {}): CardViewModel {
   return {
     card: {
-      uid: "gear_uid",
-      name: "Gear of Ambition",
-      type: "Spell",
-      cost: 1,
-      fuse_recipes: [{ id: "gear→striker", partner_filters: [] }],
-    } as CardViewModel["card"],
+      uid: "u1",
+      name: "Sephie",
+      type: "Follower",
+      fuse_recipes: [{ materials: [] }],
+      description: "Fuse: Cards",
+      ...(overrides.card as object),
+    } as any,
     idx: 0,
-    uid: "gear_uid",
-    shownCost: 1,
-    atkDisp: 0,
-    defDisp: 0,
-    spellboostCount: null,
-    countdown: null,
+    isSelectable: false,
+    isSelected: false,
+    canAttack: false,
+    canEngage: false,
     ...overrides,
   };
 }
 
-function minimalHandCtx(): ZoneContext {
+function handCtx(overrides: Partial<ZoneContext> = {}): ZoneContext {
   return {
-    containerId: "blueHand",
+    containerId: HAND_ID,
     owner: "first",
-    isBoard: false,
     isHand: true,
-    isMyBoard: false,
+    isBoard: false,
     isMyHand: true,
+    isMyBoard: false,
     isBlueHand: true,
-    isRedHand: false,
-    isBlueBoard: false,
-    isRedBoard: false,
     isMulligan: false,
-  };
+    hideHandFaces: false,
+    ...overrides,
+  } as ZoneContext;
 }
 
-describe("HandDragClickSuppressor zone rule", () => {
+describe("createHandDragClickSuppressor (pointer era)", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
     document.body.innerHTML = "";
     mountHandContainer();
   });
-
   afterEach(() => {
-    vi.useRealTimers();
     document.body.innerHTML = "";
-  });
-
-  it("never cancels dragstart when no pointermove precedes it", () => {
-    const guard = createHandDragClickSuppressor();
-    const el = document.createElement("div");
-    const onFuse = vi.fn();
-    guard.attach(el, onFuse, {
-      handContainerId: HAND_ID,
-      isInitiatorStillInHand: () => true,
-    });
-
-    firePointer(el, "pointerdown", 100, 100);
-    // No pointermove — the hardware ordering that broke the threshold guard.
-    const drag = fireDragStart(el);
-    expect(drag.defaultPrevented).toBe(false);
-    expect(guard.isSuppressing()).toBe(true);
-  });
-
-  it("dragend inside hand with card still in hand opens fuse", () => {
-    const guard = createHandDragClickSuppressor();
-    const el = document.createElement("div");
-    const onFuse = vi.fn();
-    guard.attach(el, onFuse, {
-      handContainerId: HAND_ID,
-      isInitiatorStillInHand: () => true,
-    });
-
-    firePointer(el, "pointerdown", 50, 50);
-    fireDragStart(el);
-    fireDragEnd(el, 80, 80); // inside hand rect
-    expect(onFuse).toHaveBeenCalledTimes(1);
-  });
-
-  it("dragend outside hand does not open fuse", () => {
-    const guard = createHandDragClickSuppressor();
-    const el = document.createElement("div");
-    const onFuse = vi.fn();
-    guard.attach(el, onFuse, {
-      handContainerId: HAND_ID,
-      isInitiatorStillInHand: () => true,
-    });
-
-    firePointer(el, "pointerdown", 50, 50);
-    fireDragStart(el);
-    fireDragEnd(el, 500, 500); // outside hand
-    expect(onFuse).not.toHaveBeenCalled();
-  });
-
-  it("dragend at 0,0 (lost gesture) does not open fuse", () => {
-    const guard = createHandDragClickSuppressor();
-    const el = document.createElement("div");
-    const onFuse = vi.fn();
-    // Hand does not contain the origin.
-    document.body.innerHTML = "";
-    mountHandContainer({ left: 100, top: 100, right: 500, bottom: 300 });
-
-    guard.attach(el, onFuse, {
-      handContainerId: HAND_ID,
-      isInitiatorStillInHand: () => true,
-    });
-
-    firePointer(el, "pointerdown", 150, 150);
-    fireDragStart(el);
-    fireDragEnd(el, 0, 0);
-    expect(onFuse).not.toHaveBeenCalled();
-  });
-
-  it("dragend inside hand but card already consumed does not open fuse", () => {
-    const guard = createHandDragClickSuppressor();
-    const el = document.createElement("div");
-    const onFuse = vi.fn();
-    guard.attach(el, onFuse, {
-      handContainerId: HAND_ID,
-      isInitiatorStillInHand: () => false,
-    });
-
-    firePointer(el, "pointerdown", 50, 50);
-    fireDragStart(el);
-    fireDragEnd(el, 80, 80);
-    expect(onFuse).not.toHaveBeenCalled();
-  });
-
-  it("trailing click after dragstart is suppressed (one gesture, one action)", () => {
-    const guard = createHandDragClickSuppressor();
-    const el = document.createElement("div");
-    const onFuse = vi.fn();
-    guard.attach(el, onFuse, {
-      handContainerId: HAND_ID,
-      isInitiatorStillInHand: () => true,
-    });
-
-    firePointer(el, "pointerdown", 50, 50);
-    fireDragStart(el);
-    fireDragEnd(el, 80, 80); // fuse via dragend
-    fireClick(el); // must not double-fire
-    expect(onFuse).toHaveBeenCalledTimes(1);
-
-    vi.runAllTimers();
   });
 
   it("plain click with no drag opens fuse", () => {
-    const guard = createHandDragClickSuppressor();
     const el = document.createElement("div");
-    const onFuse = vi.fn();
-    guard.attach(el, onFuse, {
+    document.getElementById(HAND_ID)!.appendChild(el);
+    const fuse = vi.fn();
+    const guard = createHandDragClickSuppressor();
+    guard.attach(el, fuse, {
       handContainerId: HAND_ID,
       isInitiatorStillInHand: () => true,
     });
-
     firePointer(el, "pointerdown", 50, 50);
     fireClick(el);
-    expect(onFuse).toHaveBeenCalledTimes(1);
+    expect(fuse).toHaveBeenCalledTimes(1);
   });
 
-  it("missing dragend: next pointerdown clears the latch so click works", () => {
-    const guard = createHandDragClickSuppressor();
+  it("click suppressed when pointer-drag layer marks the element", () => {
     const el = document.createElement("div");
-    const onFuse = vi.fn();
-    guard.attach(el, onFuse, {
+    document.getElementById(HAND_ID)!.appendChild(el);
+    const fuse = vi.fn();
+    const guard = createHandDragClickSuppressor();
+    guard.attach(el, fuse, {
       handContainerId: HAND_ID,
       isInitiatorStillInHand: () => true,
     });
+    firePointer(el, "pointerdown", 50, 50);
+    el.dataset.pointerDragSuppressClick = "1";
+    fireClick(el);
+    expect(fuse).toHaveBeenCalledTimes(0);
+  });
 
+  it("missing end: next pointerdown clears latch so click works", () => {
+    const el = document.createElement("div");
+    document.getElementById(HAND_ID)!.appendChild(el);
+    const fuse = vi.fn();
+    const guard = createHandDragClickSuppressor();
+    guard.attach(el, fuse, {
+      handContainerId: HAND_ID,
+      isInitiatorStillInHand: () => true,
+    });
     firePointer(el, "pointerdown", 100, 100);
-    fireDragStart(el);
-    // Intentionally no dragend — latch stuck.
-    expect(guard.isSuppressing()).toBe(true);
-    fireClick(el);
-    expect(onFuse).not.toHaveBeenCalled();
-
+    el.dataset.pointerDragSuppressClick = "1";
+    // New press clears.
     firePointer(el, "pointerdown", 120, 120);
-    expect(guard.isSuppressing()).toBe(false);
     fireClick(el);
-    expect(onFuse).toHaveBeenCalledTimes(1);
+    expect(fuse).toHaveBeenCalledTimes(1);
   });
 });
 
-describe("attachHandlers hand fuse + zone drag guard", () => {
+describe("attachHandlers hand fuse wiring", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
-    vi.mocked(actions.handleFuse).mockClear();
     document.body.innerHTML = "";
     mountHandContainer();
+    vi.mocked(actions.handleFuse).mockClear();
+    vi.mocked(drag.enableCardDragFromHand).mockClear();
   });
-
   afterEach(() => {
-    vi.useRealTimers();
     document.body.innerHTML = "";
   });
 
-  it("release inside hand after dragstart opens fuse via handlers", () => {
+  it("wires enableCardDragFromHand with fuse gesture callback", () => {
     const div = document.createElement("div");
+    document.getElementById(HAND_ID)!.appendChild(div);
     const vm = minimalHandVm();
-    const ctx = minimalHandCtx();
     const state = {
+      phase: "main",
       activePlayer: "first",
-      players: {
-        first: { hand: [{ uid: "gear_uid" }] },
-        second: { hand: [] },
-      },
+      players: { first: { hand: [vm.card] }, second: { hand: [] } },
     } as unknown as GameState;
 
-    attachHandlers(div, vm, ctx, state, () => {});
+    attachHandlers(div, vm, handCtx(), state, () => {});
 
-    firePointer(div, "pointerdown", 50, 50);
-    const drag = fireDragStart(div);
-    expect(drag.defaultPrevented).toBe(false);
-    fireDragEnd(div, 80, 80);
-
-    expect(actions.handleFuse).toHaveBeenCalledTimes(1);
-    expect(actions.handleFuse).toHaveBeenCalledWith(
-      "first",
-      "gear_uid",
-      true,
-      vm.card,
-    );
+    expect(drag.enableCardDragFromHand).toHaveBeenCalled();
+    const args = vi.mocked(drag.enableCardDragFromHand).mock.calls[0]!;
+    expect(args[3]).toBe(true);
+    expect(args[4]).toMatchObject({
+      onFuseGesture: expect.any(Function),
+      isInitiatorStillInHand: expect.any(Function),
+    });
   });
 
-  it("plain click opens fuse", () => {
+  it("plain click opens fuse via handlers", () => {
     const div = document.createElement("div");
+    document.getElementById(HAND_ID)!.appendChild(div);
     const vm = minimalHandVm();
-    const ctx = minimalHandCtx();
     const state = {
+      phase: "main",
       activePlayer: "first",
-      players: {
-        first: { hand: [{ uid: "gear_uid" }] },
-        second: { hand: [] },
-      },
+      players: { first: { hand: [vm.card] }, second: { hand: [] } },
     } as unknown as GameState;
 
-    attachHandlers(div, vm, ctx, state, () => {});
-
+    attachHandlers(div, vm, handCtx(), state, () => {});
     firePointer(div, "pointerdown", 50, 50);
     fireClick(div);
-
-    expect(actions.handleFuse).toHaveBeenCalledTimes(1);
+    expect(actions.handleFuse).toHaveBeenCalled();
   });
 });

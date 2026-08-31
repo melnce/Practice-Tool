@@ -3,7 +3,7 @@
 import { renderZone } from "./zones.js";
 import { updateCounts } from "./counts.js";
 import { updateEvoButtonsUI } from "./evo.js";
-import { makeLeaderDroppable } from "./drag.js";
+import { makeLeaderDroppable, clearLeaderDroppable } from "./drag.js";
 import { byId } from "./dom.js";
 import { releaseImageLoads } from "./releaseImageLoads.js";
 
@@ -133,20 +133,16 @@ export function render() {
   renderLeaderBarrierBadge("first");
   renderLeaderBarrierBadge("second");
 
-  // Leader drag-drop setup (disabled during mulligan / gameover)
-  if (state.phase !== "mulligan" && state.phase !== "gameover") {
-    makeLeaderDroppable(byId("blueLeader")!, "first", state);
-    makeLeaderDroppable(byId("redLeader")!, "second", state);
-  } else {
+  // Leader drop targets (disabled during mulligan / gameover)
+  {
     const bl = byId("blueLeader");
     const rl = byId("redLeader");
-    if (bl) {
-      bl.ondragover = null;
-      bl.ondrop = null;
-    }
-    if (rl) {
-      rl.ondragover = null;
-      rl.ondrop = null;
+    if (state.phase !== "mulligan" && state.phase !== "gameover") {
+      if (bl) makeLeaderDroppable(bl, "first", state);
+      if (rl) makeLeaderDroppable(rl, "second", state);
+    } else {
+      if (bl) clearLeaderDroppable(bl);
+      if (rl) clearLeaderDroppable(rl);
     }
   }
 

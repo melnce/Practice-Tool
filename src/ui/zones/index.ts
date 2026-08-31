@@ -30,8 +30,8 @@ export function renderZone(
 
   // 1. One-time Interaction Setup (Do not re-bind on every render)
   if (ctx.isBoard && ctx.isMyBoard && !ctx.isMulligan) {
-    if (!container.ondragover) {
-      container.ondragover = (e) => e.preventDefault();
+    if (container.dataset.pointerDropBound !== "1") {
+      container.dataset.pointerDropBound = "1";
       enableBoardDropForOwnSide(container, containerId, state);
     }
   }
