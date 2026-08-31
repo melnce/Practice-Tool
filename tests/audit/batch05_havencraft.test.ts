@@ -541,7 +541,7 @@ describe("Batch 5 — Havencraft [10004] Skybound Dragons", () => {
     enemyFollower(3);
     state.players.first.board = [lam, ally];
     const eotFx = (lam.triggers ?? []).find(
-      (t: any) => t.type === "end_of_turn_own",
+      (t: any) => t.event === "end_of_turn" || t.type === "end_of_turn_own",
     );
     runEffects((eotFx as any).effects, "first", lam);
     expect(ally.defense).toBe(1);

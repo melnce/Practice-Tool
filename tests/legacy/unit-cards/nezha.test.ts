@@ -27,7 +27,8 @@ describe("Nezha JSON Definition", () => {
     expect(card.triggers).toHaveLength(1);
 
     const eot = card.triggers[0];
-    expect(eot.type).toBe("end_of_turn_own");
+    expect(eot.event).toBe("end_of_turn");
+    expect(eot.condition?.whose_turn).toBe("owner");
     expect(eot.effects).toHaveLength(2);
 
     // Effect 1: Deal 4 (migrated to canonical damage with random_hits)

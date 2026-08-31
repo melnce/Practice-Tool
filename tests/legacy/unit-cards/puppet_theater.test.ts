@@ -24,7 +24,8 @@ describe("Puppet Theater (10072210)", () => {
     expect(card.triggers).toHaveLength(1);
 
     const trigger = card.triggers[0];
-    expect(trigger.type).toBe("end_of_turn_own");
+    expect(trigger.event).toBe("end_of_turn");
+    expect(trigger.condition?.whose_turn).toBe("owner");
     expect(trigger.source).toBe("board"); // Important for amulets
     expect(trigger.effects).toBeDefined();
     expect(trigger.effects[0].op).toBe("draw");

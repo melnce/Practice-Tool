@@ -197,8 +197,8 @@ describe("Himeka can't-attack crest / temporary lock", () => {
 
   it("crest EOT lock then banishes the locked enemy at their end of turn (card text banish tail)", () => {
     // Crest text: give Can't Attack until opponent's EOT, then banish them.
-    // Engine models the banish as grant_trigger end_of_turn_own on the locked
-    // follower (fires when that follower's owner ends their turn).
+    // Engine models the banish as a grant_trigger on the locked follower
+    // scoped to that follower's owner turn (canonical whose_turn:owner).
     setupLateGame();
     const himeka = createCard("10364110", "hand", "first");
     state.players.first.hand = [himeka];
@@ -237,11 +237,15 @@ describe("Himeka can't-attack crest / temporary lock", () => {
     expect(getKS(locked!).cantAttack).toBe(true);
     expect(getKS(locked!).cantAttackUntilOpponentEOT).toBe(true);
     expect(
-      (locked!.triggers || []).some(
-        (t: any) =>
-          t?.type === "end_of_turn_own" &&
-          JSON.stringify(t.effects || []).includes('"banish"'),
-      ),
+      (locked!.triggers || []).some((t: any) => {
+        const isOwnerEot =
+          (t?.event === "end_of_turn" &&
+            t?.condition?.whose_turn === "owner") ||
+          t?.type === "end_of_turn_own";
+        return (
+          isOwnerEot && JSON.stringify(t.effects || []).includes('"banish"')
+        );
+      }),
     ).toBe(true);
 
     // P2 EOT → delayed banish must fire (not merely clear the lock)
