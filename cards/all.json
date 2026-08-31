@@ -3948,7 +3948,7 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "self",
+            "target": "selected",
             "count": 1
           },
           {
@@ -33735,7 +33735,7 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "self",
+            "target": "selected",
             "count": 4
           }
         ],

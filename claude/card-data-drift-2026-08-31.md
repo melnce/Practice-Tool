@@ -353,6 +353,17 @@ add pointless wrappers.
   flat form and green when left nested. Gate excludes this id until the flat
   `into_source` path learns pending select.
 
+- `10931120` Key Spirit — nested select → spellboost `target:"selected"` count 4.
+  **Deferred / not a flatten candidate — flat form is not behaviour-equivalent.**
+  Family 3 flatten would rewrite the child to
+  `{op:spellboost, target:ally:hand, select:1, condition:{has_keyword:Spellboost}, count:4}`.
+  For spellboost, `"ally:hand"` means **boost the entire hand**, not "the card
+  the player chose". The two namespaces collide on that string, so flattening
+  would silently turn "spellboost the one card you chose, 4 times" into
+  "spellboost your whole hand 4 times". Gate excludes this id permanently for
+  the chosen-target family (engine now accepts `target:"selected"` on the
+  nested child; keep the nested form).
+
 ### Harness note — `gameTick` is dispatch-depth sensitive
 
 PR 4's flatten moved fingerprints for **5 cards / 6 scenarios**

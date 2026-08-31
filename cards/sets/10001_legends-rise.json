@@ -2035,7 +2035,7 @@
         "effects": [
           {
             "op": "spellboost",
-            "target": "self",
+            "target": "selected",
             "count": 1
           },
           {

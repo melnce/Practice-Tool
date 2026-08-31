@@ -6,6 +6,7 @@ import type {
   Effect,
 } from "../../../../core/types/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
+import { resolveUids } from "../../../../core/uidResolver.js";
 import { normalizeToSpellboostSpec } from "./types.js";
 
 // Import existing spellboost logic to reuse
@@ -41,11 +42,20 @@ export function handleSpellboost(
     case "boost":
       // Apply spellboost to target(s)
       if (spec.target === "self" && sourceCard) {
-        // Single card spellboost
-        spellboostHand(owner, 1, sourceCard);
+        // Single card spellboost (ability owner). Honour count.
+        spellboostHand(owner, count, sourceCard);
       } else if (spec.target === "ally:hand") {
         // Whole hand spellboost
         spellboostHand(owner, count);
+      } else if (spec.target === "selected") {
+        // Chosen card(s) from a nested select — do not fall back if empty.
+        const uids = context?.targetUids;
+        if (!Array.isArray(uids) || uids.length === 0) {
+          return "done";
+        }
+        for (const card of resolveUids(uids)) {
+          spellboostHand(owner, count, card);
+        }
       }
       break;
   }
