@@ -8,6 +8,10 @@
  *   npm run cards:baseline   # write baselines/card-behaviour.json
  *   npm run cards:verify     # compare current behaviour to baseline
  *
+ * Coverage is three-way: covered / partial (unmet gates named) / skipped.
+ * Do NOT hand-edit the baseline — regenerate with cards:baseline (same rule
+ * as cards/all.json).
+ *
  * Not wired into `npm run check` yet — propose adding after the first
  * migration PR lands and the baseline proves stable.
  */
@@ -33,6 +37,9 @@ const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
 const BASELINE_PATH = path.join(ROOT, "baselines", "card-behaviour.json");
 const ALL_CARDS_PATH = path.join(ROOT, "cards", "all.json");
+
+const GENERATED_BANNER =
+  "DO NOT HAND-EDIT. Regenerate with: npm run cards:baseline";
 
 function loadPool(): { id: string; name: string; [k: string]: unknown }[] {
   const raw = JSON.parse(fs.readFileSync(ALL_CARDS_PATH, "utf-8"));
@@ -66,7 +73,9 @@ function runPool(): {
   const results: CardDriveResult[] = [];
   const cards: Record<string, BaselineCardEntry> = {};
   const skipReasons: Record<string, number> = {};
+  const unmetGateCounts: Record<string, number> = {};
   let covered = 0;
+  let partial = 0;
   let skipped = 0;
 
   for (const raw of pool) {
@@ -75,6 +84,11 @@ function runPool(): {
     cards[result.id] = toBaselineEntry(result);
     if (result.status === "covered") {
       covered++;
+    } else if (result.status === "partial") {
+      partial++;
+      for (const g of result.unmetGates) {
+        unmetGateCounts[g] = (unmetGateCounts[g] ?? 0) + 1;
+      }
     } else {
       skipped++;
       skipReasons[result.reason] = (skipReasons[result.reason] ?? 0) + 1;
@@ -82,12 +96,15 @@ function runPool(): {
   }
 
   const baseline: BehaviourBaseline = {
+    _generated: GENERATED_BANNER,
     version: HARNESS_VERSION,
     seed: HARNESS_SEED,
     cardCount: pool.length,
     covered,
+    partial,
     skipped,
     skipReasons,
+    unmetGateCounts,
     cards,
   };
 
@@ -98,14 +115,23 @@ function printSummary(baseline: BehaviourBaseline): void {
   console.log("\n=== Card behaviour harness summary ===");
   console.log(`seed=${baseline.seed}  version=${baseline.version}`);
   console.log(
-    `covered=${baseline.covered}  skipped=${baseline.skipped}  total=${baseline.cardCount}`,
+    `covered=${baseline.covered}  partial=${baseline.partial}  skipped=${baseline.skipped}  total=${baseline.cardCount}`,
   );
-  console.log("skip reasons:");
-  const reasons = Object.entries(baseline.skipReasons).sort(
-    (a, b) => b[1] - a[1],
-  );
-  for (const [reason, count] of reasons) {
-    console.log(`  ${reason}: ${count}`);
+  if (baseline.skipped > 0) {
+    console.log("skip reasons:");
+    for (const [reason, count] of Object.entries(baseline.skipReasons).sort(
+      (a, b) => b[1] - a[1],
+    )) {
+      console.log(`  ${reason}: ${count}`);
+    }
+  }
+  if (baseline.partial > 0) {
+    console.log("unmet gate conditions (partial cards):");
+    for (const [cond, count] of Object.entries(baseline.unmetGateCounts).sort(
+      (a, b) => b[1] - a[1],
+    )) {
+      console.log(`  ${cond}: ${count}`);
+    }
   }
 }
 
@@ -116,6 +142,7 @@ function record(): void {
   fs.mkdirSync(path.dirname(BASELINE_PATH), { recursive: true });
   fs.writeFileSync(BASELINE_PATH, stableStringify(baseline) + "\n", "utf-8");
   console.log(`\nWrote ${BASELINE_PATH}`);
+  console.log(`(${GENERATED_BANNER})`);
 }
 
 type DiffEntry = {
@@ -125,6 +152,7 @@ type DiffEntry = {
     | "fingerprint_changed"
     | "status_changed"
     | "scenario_changed"
+    | "unmet_gates_changed"
     | "missing_in_current"
     | "new_in_current";
   message: string;
@@ -193,7 +221,22 @@ function verify(): number {
       }
       continue;
     }
-    if (exp.status === "covered" && act.status === "covered") {
+    if (
+      (exp.status === "covered" || exp.status === "partial") &&
+      (act.status === "covered" || act.status === "partial")
+    ) {
+      if (
+        exp.status === "partial" &&
+        act.status === "partial" &&
+        JSON.stringify(exp.unmetGates) !== JSON.stringify(act.unmetGates)
+      ) {
+        diffs.push({
+          id,
+          name: act.name,
+          kind: "unmet_gates_changed",
+          message: `unmetGates [${exp.unmetGates.join(",")}] → [${act.unmetGates.join(",")}]`,
+        });
+      }
       if (exp.fingerprint !== act.fingerprint) {
         const expSc = new Map(
           exp.scenarios.map((s) => [s.scenario, s.fingerprint]),
@@ -251,10 +294,9 @@ function main(): void {
     process.exit(2);
   }
 
-  // Engine ops are chatty in HEADLESS; keep harness output scannable.
   const origLog = console.log;
-  console.log = (...args: unknown[]) => {
-    const head = String(args[0] ?? "");
+  console.log = (...logArgs: unknown[]) => {
+    const head = String(logArgs[0] ?? "");
     if (
       head.includes("[SUMMON") ||
       head.includes("SUMMON DEBUG") ||
@@ -264,7 +306,7 @@ function main(): void {
     ) {
       return;
     }
-    origLog(...args);
+    origLog(...logArgs);
   };
 
   console.log("Loading card database...");

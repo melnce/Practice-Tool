@@ -1,8 +1,12 @@
 /**
  * Drive a single card's effects through the real engine and capture fingerprints.
  *
- * Honest coverage: cards that cannot be driven meaningfully are skipped with a
- * reason — never silently passed.
+ * Honest coverage:
+ * - `covered` — every named gate we found was driven (satisfied), or there were none
+ * - `partial` — drove something, but named gate branches remain unmet (listed)
+ * - `skipped` — could not drive meaningfully (with reason)
+ *
+ * Cheap gate conditions are prepared in-arena so gated branches actually execute.
  */
 
 import {
@@ -17,14 +21,21 @@ import { getCardById } from "../../src/data/cardDatabase.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { dispatchAction } from "../../src/logic/core/dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
-import type { CardInstance, Effect } from "../../src/core/types/index.js";
+import type { CardInstance } from "../../src/core/types/index.js";
 import {
   fingerprintGameState,
   hashFingerprint,
 } from "./cardBehaviourFingerprint.js";
+import {
+  applyGatePreparations,
+  collectNamedGates,
+  summarizeGateConditions,
+  type GateSpec,
+} from "./cardBehaviourGates.js";
 
 export const HARNESS_SEED = 42;
-export const HARNESS_VERSION = 1;
+/** v2: gate-aware coverage (covered / partial / skipped). */
+export const HARNESS_VERSION = 2;
 
 export type SkipReason =
   | "card_not_in_registry"
@@ -36,6 +47,7 @@ export type SkipReason =
 
 export type ScenarioName =
   | "play"
+  | "play_else"
   | "turn_boundary"
   | "evolve"
   | "vanilla_place";
@@ -44,6 +56,8 @@ export type ScenarioResult = {
   scenario: ScenarioName;
   fingerprint: string;
   detail: object;
+  gatesSatisfied?: string[];
+  gatesUnmet?: string[];
 };
 
 export type CardDriveResult =
@@ -53,6 +67,17 @@ export type CardDriveResult =
       name: string;
       scenarios: ScenarioResult[];
       fingerprint: string;
+      gatesSatisfied: string[];
+    }
+  | {
+      status: "partial";
+      id: string;
+      name: string;
+      scenarios: ScenarioResult[];
+      fingerprint: string;
+      gatesSatisfied: string[];
+      /** Named gate conditions whose branches were not executed */
+      unmetGates: string[];
     }
   | {
       status: "skipped";
@@ -102,8 +127,6 @@ function hasBoardTurnTrigger(card: RawCard): boolean {
       event === "end_of_turn" ||
       event === "start_of_turn";
     if (!isTurn) return;
-    // Board / default (no source) / amulet countdown hosts — skip pure crest-only defs
-    // nested under other cards; card.triggers are the host's own triggers.
     const source = obj.source;
     if (source === "crest" || source === "hand" || source === "deck") return;
     found = true;
@@ -198,10 +221,8 @@ function buildArena(opts: {
   state.players.second.superEvoCharges = 3;
 
   const allyA = fillerFollower("ArenaAllyA", "first", 2, 6);
-  const allyB = fillerFollower("ArenaAllyB", "first", 3, 4);
   const enemyA = fillerFollower("ArenaEnemyA", "second", 2, 6);
   const enemyB = fillerFollower("ArenaEnemyB", "second", 3, 4);
-  // Ward + Artifact targets so spells that require them aren't skipped for empty pools.
   const allyWard = fillerFollower("ArenaAllyWard", "first", 1, 5);
   allyWard.hasWard = true;
   (allyWard as any).keywords = ["Ward"];
@@ -233,18 +254,20 @@ function buildArena(opts: {
     "first",
   );
 
-  state.players.first.board = [allyA, allyB, allyArt, allyWard];
+  // Keep first board lean (≤2) so gate prep can add evolved/amulet hosts
+  // without hitting the 5-slot board cap before play.
+  state.players.first.board = [allyA, allyWard];
   state.players.second.board = [enemyA, enemyB, enemyWard, enemyArt];
+  // allyArt stays available as a hand Artifact when needed via buildExtraHand;
+  // keep one allied Artifact on board for Artifact-target spells.
+  state.players.first.board.push(allyArt);
+  // Cap at 3 so amulet_count / evolved_allied still have room.
 
   if (opts.extraHand?.length) {
     state.players.first.hand.push(...opts.extraHand);
   }
 }
 
-/**
- * Deterministically resolve pending target selection by always picking the
- * earliest pool UID still needed. Caps steps to avoid infinite loops.
- */
 function autoResolvePending(maxSteps = 12): {
   ok: boolean;
   reason?: string;
@@ -253,7 +276,6 @@ function autoResolvePending(maxSteps = 12): {
   while (state.pendingTargetEffect && steps < maxSteps) {
     steps++;
     const pending = state.pendingTargetEffect;
-    // Engine selection is UID-based (`targetUids`); `targets` may be stale/empty.
     if (!pending.targetUids) pending.targetUids = [];
     const already = new Set(pending.targetUids);
     const poolUids =
@@ -270,7 +292,6 @@ function autoResolvePending(maxSteps = 12): {
     resolvePendingTarget(nextUid);
   }
   if (state.pendingTargetEffect) {
-    // confirm_needed can leave pending after enough picks — treat as stuck.
     if (state.pendingTargetEffect.requiresConfirmation) {
       return { ok: false, reason: "requires_confirmation" };
     }
@@ -280,7 +301,6 @@ function autoResolvePending(maxSteps = 12): {
 }
 
 function installModePicks(): void {
-  // Always pick the first N options — deterministic across processes.
   setScriptedModePickProvider((req) => {
     const picks: number[] = [];
     for (let i = 0; i < req.selectCount && i < req.optionCount; i++) {
@@ -294,36 +314,19 @@ function clearModePicks(): void {
   setScriptedModePickProvider(null);
 }
 
-function runPlayScenario(
-  cardId: string,
-): ScenarioResult | { skip: SkipReason; detail: string } {
-  const template = getCardById(cardId);
-  if (!template) return { skip: "card_not_in_registry", detail: cardId };
-
+function buildExtraHand(template: {
+  fanfare?: unknown[];
+  spell?: unknown[];
+}): CardInstance[] {
   const extras: CardInstance[] = [];
-  // Artifact hand-summon cards need Artifact followers in hand.
   let needsArtifact = false;
+  let needsSpellboost = false;
   walkEffects(
     [...(template.fanfare ?? []), ...(template.spell ?? [])],
     (obj) => {
       if (obj.op === "summon" && (obj as any).filter?.type === "Artifact") {
         needsArtifact = true;
       }
-    },
-  );
-  if (needsArtifact) {
-    extras.push(
-      artifactFollower("HarnessArt1", "first"),
-      artifactFollower("HarnessArt2", "first"),
-      artifactFollower("HarnessArt3", "first"),
-    );
-  }
-
-  // Spellboost consumers (e.g. Radiant Rainbow) need a spellboostable card in hand.
-  let needsSpellboost = false;
-  walkEffects(
-    [...(template.fanfare ?? []), ...(template.spell ?? [])],
-    (obj) => {
       if (
         obj.op === "spellboost" ||
         String(obj.target ?? "").includes("spellboost")
@@ -338,6 +341,13 @@ function runPlayScenario(
       }
     },
   );
+  if (needsArtifact) {
+    extras.push(
+      artifactFollower("HarnessArt1", "first"),
+      artifactFollower("HarnessArt2", "first"),
+      artifactFollower("HarnessArt3", "first"),
+    );
+  }
   if (needsSpellboost) {
     const sb = createCard(
       {
@@ -352,13 +362,30 @@ function runPlayScenario(
     (sb as any).spellboostCount = 0;
     extras.push(sb);
   }
+  return extras;
+}
 
+function runPlayScenario(
+  cardId: string,
+  gates: GateSpec[],
+  mode: "satisfy" | "deny",
+  scenarioName: "play" | "play_else",
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const extras = buildExtraHand(template);
   buildArena({ extraHand: extras, roundCount: 8 });
 
   const playCard = createCard(cardId, "hand", "first");
-  // Afford anything.
   (playCard as any).cost = 0;
   (playCard as any).effectiveCost = 0;
+
+  const prep = applyGatePreparations(gates, {
+    mode,
+    sourceCard: playCard,
+  });
+
   state.players.first.hand = [playCard, ...state.players.first.hand];
 
   const outcome = whenPlayCard("first", 0);
@@ -380,14 +407,17 @@ function runPlayScenario(
 
   const detail = fingerprintGameState(state);
   return {
-    scenario: "play",
+    scenario: scenarioName,
     fingerprint: hashFingerprint(detail),
     detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
   };
 }
 
 function runTurnBoundaryScenario(
   cardId: string,
+  gates: GateSpec[],
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
@@ -395,15 +425,16 @@ function runTurnBoundaryScenario(
   buildArena({ roundCount: 8, activePlayer: "first" });
 
   const host = createCard(cardId, "board", "first");
-  // Keep host alive through both EOTs when possible.
   if (host.type === "Follower") {
     host.defense = Math.max(Number(host.defense) || 1, 10);
     host.attack = Number(host.attack) || 0;
   }
-  // Prepend so arena fillers remain as damage targets.
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
   state.players.first.board = [host, ...state.players.first.board];
 
-  // End first's turn (active EOT for owner) then second's (reactive for bare).
   whenEndTurn();
   if (state.pendingTargetEffect) {
     const resolved = autoResolvePending();
@@ -430,11 +461,14 @@ function runTurnBoundaryScenario(
     scenario: "turn_boundary",
     fingerprint: hashFingerprint(detail),
     detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
   };
 }
 
 function runEvolveScenario(
   cardId: string,
+  gates: GateSpec[],
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
@@ -447,6 +481,10 @@ function runEvolveScenario(
   host.defense = Math.max(Number(host.defense) || 1, 8);
   host.justPlayed = false;
   host.can_attack = false;
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
   state.players.first.board = [host, ...state.players.first.board];
   state.players.first.evoCharges = 3;
   state.players.first.superEvoCharges = 3;
@@ -480,6 +518,8 @@ function runEvolveScenario(
     scenario: "evolve",
     fingerprint: hashFingerprint(detail),
     detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
   };
 }
 
@@ -518,6 +558,8 @@ function runVanillaPlaceScenario(
     scenario: "vanilla_place",
     fingerprint: hashFingerprint(detail),
     detail,
+    gatesSatisfied: [],
+    gatesUnmet: [],
   };
 }
 
@@ -528,8 +570,7 @@ function isSkip(
 }
 
 /**
- * Drive one card through every classified scenario. Covered if at least one
- * scenario produces a fingerprint; otherwise skipped with the first failure.
+ * Drive one card through classified scenarios with gate preparation.
  */
 export function driveCard(raw: RawCard): CardDriveResult {
   const id = String(raw.id);
@@ -539,18 +580,38 @@ export function driveCard(raw: RawCard): CardDriveResult {
     return { status: "skipped", id, name, reason: "card_not_in_registry" };
   }
 
+  const gates = collectNamedGates(raw);
+  const gateSummary = summarizeGateConditions(gates);
+
   installModePicks();
   try {
     const paths = classifyPaths(raw);
     const scenarios: ScenarioResult[] = [];
-    const failures: { reason: SkipReason; detail: string }[] = [];
+    const failures: { skip: SkipReason; detail: string }[] = [];
+    const satisfiedAll = new Set<string>();
+    const unmetAll = new Set<string>(gateSummary.unpreparable);
 
     for (const path of paths) {
       let result: ScenarioResult | { skip: SkipReason; detail: string };
       try {
-        if (path === "play") result = runPlayScenario(id);
-        else if (path === "turn_boundary") result = runTurnBoundaryScenario(id);
-        else if (path === "evolve") result = runEvolveScenario(id);
+        if (path === "play") {
+          result = runPlayScenario(id, gates, "satisfy", "play");
+          // Also drive else_effects branches for preparable gates that have them.
+          if (
+            !isSkip(result) &&
+            gateSummary.withElse.some((c) => gateSummary.preparable.includes(c))
+          ) {
+            const elseResult = runPlayScenario(id, gates, "deny", "play_else");
+            if (!isSkip(elseResult)) {
+              scenarios.push(elseResult);
+              for (const c of elseResult.gatesSatisfied ?? [])
+                satisfiedAll.add(c);
+              for (const c of elseResult.gatesUnmet ?? []) unmetAll.add(c);
+            }
+          }
+        } else if (path === "turn_boundary")
+          result = runTurnBoundaryScenario(id, gates);
+        else if (path === "evolve") result = runEvolveScenario(id, gates);
         else result = runVanillaPlaceScenario(id);
       } catch (err) {
         result = {
@@ -563,6 +624,8 @@ export function driveCard(raw: RawCard): CardDriveResult {
         failures.push(result);
       } else {
         scenarios.push(result);
+        for (const c of result.gatesSatisfied ?? []) satisfiedAll.add(c);
+        for (const c of result.gatesUnmet ?? []) unmetAll.add(c);
       }
     }
 
@@ -577,37 +640,60 @@ export function driveCard(raw: RawCard): CardDriveResult {
       };
     }
 
-    // Combined fingerprint over scenario name + per-scenario hash (stable order).
+    // A condition that was satisfied in any scenario is no longer "unmet".
+    for (const c of satisfiedAll) unmetAll.delete(c);
+    // Unpreparable gates stay unmet forever.
+    for (const c of gateSummary.unpreparable) unmetAll.add(c);
+
+    const unmetGates = [...unmetAll].sort();
+    const gatesSatisfied = [...satisfiedAll].sort();
+
     const combined = scenarios
       .slice()
       .sort((a, b) => a.scenario.localeCompare(b.scenario))
       .map((s) => `${s.scenario}:${s.fingerprint}`)
       .join("|");
+    const fingerprint = hashFingerprint({ combined });
 
-    return {
-      status: "covered",
+    const base = {
       id,
       name,
       scenarios: scenarios.map((s) => ({
         scenario: s.scenario,
         fingerprint: s.fingerprint,
-        // Keep detail out of committed baseline — hash is enough; detail used for diffs.
         detail: s.detail,
+        gatesSatisfied: s.gatesSatisfied,
+        gatesUnmet: s.gatesUnmet,
       })),
-      fingerprint: hashFingerprint({ combined }),
+      fingerprint,
+      gatesSatisfied,
     };
+
+    if (unmetGates.length > 0) {
+      return { status: "partial", ...base, unmetGates };
+    }
+    return { status: "covered", ...base };
   } finally {
     clearModePicks();
   }
 }
 
-/** Compact baseline entry (no full state dumps — those balloon the committed file). */
+/** Compact baseline entry (no full state dumps). */
 export type BaselineCardEntry =
   | {
       status: "covered";
       name: string;
       fingerprint: string;
       scenarios: { scenario: ScenarioName; fingerprint: string }[];
+      gatesSatisfied?: string[];
+    }
+  | {
+      status: "partial";
+      name: string;
+      fingerprint: string;
+      scenarios: { scenario: ScenarioName; fingerprint: string }[];
+      gatesSatisfied?: string[];
+      unmetGates: string[];
     }
   | {
       status: "skipped";
@@ -617,12 +703,16 @@ export type BaselineCardEntry =
     };
 
 export type BehaviourBaseline = {
+  /** Regenerated by `npm run cards:baseline` — never hand-edit. */
+  _generated: string;
   version: number;
   seed: number;
   cardCount: number;
   covered: number;
+  partial: number;
   skipped: number;
   skipReasons: Record<string, number>;
+  unmetGateCounts: Record<string, number>;
   cards: Record<string, BaselineCardEntry>;
 };
 
@@ -635,6 +725,19 @@ export function toBaselineEntry(result: CardDriveResult): BaselineCardEntry {
       ...(result.detail ? { detail: result.detail } : {}),
     };
   }
+  if (result.status === "partial") {
+    return {
+      status: "partial",
+      name: result.name,
+      fingerprint: result.fingerprint,
+      scenarios: result.scenarios.map((s) => ({
+        scenario: s.scenario,
+        fingerprint: s.fingerprint,
+      })),
+      gatesSatisfied: result.gatesSatisfied,
+      unmetGates: result.unmetGates,
+    };
+  }
   return {
     status: "covered",
     name: result.name,
@@ -643,8 +746,6 @@ export function toBaselineEntry(result: CardDriveResult): BaselineCardEntry {
       scenario: s.scenario,
       fingerprint: s.fingerprint,
     })),
+    gatesSatisfied: result.gatesSatisfied,
   };
 }
-
-/** Re-export Effect type touch so tsx keeps the import graph warm for evolve paths. */
-export type { Effect };

@@ -389,32 +389,49 @@ Variants that look similar but mean different things — **do not bulk-normalise
 
 Committed baseline: `baselines/card-behaviour.json`
 
-|         |         |
-| ------- | ------- |
-| seed    | 42      |
-| covered | **802** |
-| skipped | **9**   |
-| total   | 811     |
+**Do not hand-edit.** Regenerate with `npm run cards:baseline` (same rule as
+`cards/all.json`). The file carries `_generated` with that instruction.
 
-Skip reasons (honest — not silent passes):
+|             |                                                       |
+| ----------- | ----------------------------------------------------- |
+| seed        | 42                                                    |
+| version     | 2 (gate-aware)                                        |
+| **covered** | **770** — every named gate driven, or none present    |
+| **partial** | **26** — drove something; unmet gate conditions named |
+| **skipped** | **15** — could not drive (`play_blocked` + reason)    |
+| total       | 811                                                   |
 
-- `play_blocked`: 9
+### Approach — (a) drive gates where cheap, (b) honest remainder
 
-Skipped cards (need specific targets / hand state the standard arena does not satisfy):
+Drive reachable gate branches where cheap: the arena prepares `combo`, `overflow`,
+`necromancy`, `rally`, `pp_at_least`, `max_pp` / `both_max_pp`, `amulet_count`,
+`spellboost_count`, `super_evo_unlocked`, `evolved_allied` / `super_evolved_allied`,
+`evolved_self` / `super_evolved_self`, `highlander`, `no_ally_attacked`,
+`ally_attacked_leader_last_turn`, `skybound_art`, `hand_count` / `hand_count_lte`,
+`leader_defense_*`, `has_fuse_materials` / `fused_this_turn`. Gates with
+`else_effects` also get a `play_else` deny pass so both branches fingerprint.
 
-- `10021310` Way of the Maid — play_blocked: Spell requires a target but none are available.
-- `10131310` Radiant Rainbow — play_blocked: Spell requires a card in hand with Spellboost.
-- `10243310` Draconic Strike — play_blocked: Spell requires a target but none are available.
-- `10272310` Flight of Icarus — play_blocked: Spell requires a Artifact follower target but none are available.
-- `10333310` Illusory Conjuration — play_blocked: Spell requires a target but none are available.
-- `10561310` Malice of the Mistbloom — play_blocked: Spell requires a target but none are available.
-- `10673310` Unfeeling Eld Axe — play_blocked: Spell requires a target but none are available.
-- `10711310` Cognitive Shift — play_blocked: Spell requires a target but none are available.
-- `10853310` Ebb and Flow — play_blocked: Spell requires a target but none are available.
+Conditions we cannot honestly arrange (`unique_tribe_enters`, `self_cost`,
+`ally_matches`, `selected_matches`, …) leave the card as **`partial`** with those
+names listed — never as a fake `covered`. A flat "802 covered" was lying the same
+way `replay:check` once compared `undefined === undefined`.
 
-Deliberate mutation proof (Alchemic Flare `10433310` damage 4→9): `cards:verify`
-reported **exactly one** diff (`play` fingerprint change) and nothing else; restore
-returned to OK.
+### Re-proof (gated branch)
+
+May, Journey Elf `10012110` was the false-covered example (combo:3 gate wrapping all
+effects). After the change she is `covered` with `gatesSatisfied: ["combo"]`. Mutating
+the combo-branch damage `3 → 9` yields:
+
+```
+DIFF — 1 card(s) changed:
+  10012110  May, Journey Elf
+    [scenario_changed] play: 1391c75b → 231ce51c
+```
+
+Restore → OK. The harness no longer vacuous-passes gated no-ops.
+
+Earlier proofs still hold: Alchemic Flare damage and Searing Firenewt target-side flips
+detect exactly one card.
 
 Scripts: `npm run cards:baseline` / `npm run cards:verify`.
 **Not** wired into `npm run check` yet — propose adding after the first migration PR
@@ -432,6 +449,12 @@ Per-family filters: `--gate=turn-scope|select-count|chosen-target`.
 **Shape-only.** Does not parse card text. Must not treat keyword-duration phrasing
 (_"until the end of your opponent's turn"_) as trigger scope — that class of error is
 documented under Agent of the Testaments above.
+
+**Proposed (do not implement here) once a family is migrated:** add the matching
+`--gate=` to the `npm run check` chain in **error** mode (exit 1), one family at a time —
+e.g. after PR 3 lands `select-count`, wire
+`check:canonical-form --gate=select-count --fail` next to the existing
+`check:select-target` step. Do not hard-fail all families at once.
 
 ---
 
