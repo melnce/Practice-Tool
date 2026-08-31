@@ -8,7 +8,10 @@ import {
   opponentOf,
   getCrests as getCrestsHelper,
 } from "../../core/playerHelpers.js";
-import { allocateInsertionTs } from "../core/triggers/utils.js";
+import {
+  allocateInsertionTs,
+  bumpZoneVersion,
+} from "../core/triggers/utils.js";
 
 // =============================================================================
 // CREST TYPES
@@ -144,6 +147,7 @@ export function handleGainCrest(eff: Effect, owner: Player) {
   } as Crest;
 
   crests.push(newCrest);
+  bumpZoneVersion();
   logEvent("gainCrest", { owner: targetOwner, crest: crestName });
 
   // Run on_gain effects AFTER crest is successfully added

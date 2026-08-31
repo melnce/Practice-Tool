@@ -79,7 +79,11 @@ describe("C2 — trigger priority (8-source tiers)", () => {
         owner: "second",
         insertionTs: 1,
         triggers: [
-          { event: SYNTH, effects: [{ op: "noop", tag: "REACTIVE_CREST" }] },
+          {
+            event: SYNTH,
+            condition: { whose_turn: "opponent" },
+            effects: [{ op: "noop", tag: "REACTIVE_CREST" }],
+          },
         ],
       },
     ] as any;
@@ -169,7 +173,13 @@ describe("C2 — trigger priority (8-source tiers)", () => {
         name: "R Crest",
         owner: "second",
         insertionTs: 1,
-        triggers: [{ event: SYNTH, effects: [{ op: "noop", tag: "R_CREST" }] }],
+        triggers: [
+          {
+            event: SYNTH,
+            condition: { whose_turn: "opponent" },
+            effects: [{ op: "noop", tag: "R_CREST" }],
+          },
+        ],
       },
     ] as any;
     state.players.first.board = [

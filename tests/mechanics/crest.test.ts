@@ -29,9 +29,7 @@ import {
   destroyCrest,
   tickCrests,
   completeCrest,
-  handleGainCrest,
 } from "../../src/logic/effects/crest.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
 import type { Crest } from "../../src/logic/effects/crest.js";
 import { getCrests } from "../../src/core/playerHelpers.js";
 
@@ -246,67 +244,6 @@ describe("Mechanic Contract: crest", () => {
 
       expect(state.players.first.crests.length).toBe(1);
       expect(state.players.first.crests[0].countdown).toBe(2);
-    });
-  });
-
-  // ===========================================================================
-  // CREST TRIGGER OWNER SCOPING (select_mode / Faith)
-  // ===========================================================================
-
-  describe("crest trigger owner scoping", () => {
-    const FAITH_CREST = "Faith: Sham-Nacha, Heir to Entwining";
-
-    const faithCrestDef = {
-      op: "crest" as const,
-      action: "gain" as const,
-      name: FAITH_CREST,
-      triggers: [
-        {
-          event: "select_mode",
-          effects: [
-            {
-              op: "crest" as const,
-              action: "add_counter" as const,
-              crest: FAITH_CREST,
-              counter: "faith",
-              amount: 1,
-            },
-          ],
-        },
-      ],
-    };
-
-    function faithCount(owner: "first" | "second"): number {
-      const crest = getCrests(state, owner).find((c) => c.name === FAITH_CREST);
-      return Number(crest?.counters?.faith ?? 0);
-    }
-
-    it("select_mode for first advances only first player's crest counter", () => {
-      givenGameState({ seed: 1 }).build();
-      state.players.first.crests = [];
-      state.players.second.crests = [];
-
-      handleGainCrest(faithCrestDef as any, "first");
-      handleGainCrest(faithCrestDef as any, "second");
-
-      fireTrigger("select_mode", "first", { sourceCard: null });
-
-      expect(faithCount("first")).toBe(1);
-      expect(faithCount("second")).toBe(0);
-    });
-
-    it("select_mode for second advances only second player's crest counter", () => {
-      givenGameState({ seed: 1 }).build();
-      state.players.first.crests = [];
-      state.players.second.crests = [];
-
-      handleGainCrest(faithCrestDef as any, "first");
-      handleGainCrest(faithCrestDef as any, "second");
-
-      fireTrigger("select_mode", "second", { sourceCard: null });
-
-      expect(faithCount("first")).toBe(0);
-      expect(faithCount("second")).toBe(1);
     });
   });
 

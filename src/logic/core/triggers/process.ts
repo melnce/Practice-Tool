@@ -8,6 +8,7 @@ import type { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";
 import { evalCommonConditions } from "./conditions.js";
 import { DEBUG_TRIGGERS } from "./debug.js";
+import { shouldCrestTriggerFire } from "./crestScope.js";
 import { triggerMatchesCandidateZone } from "./utils.js";
 
 // Cycle breaker for runEffects
@@ -46,15 +47,6 @@ export interface ProcessOptions {
 // P0-4 FIX: Maximum trigger chain depth to prevent infinite loops
 const MAX_CHAIN_DEPTH = 100;
 
-/** Crest triggers on these events only fire for the acting player's crests. */
-const ACTIVE_PLAYER_CREST_EVENTS = new Set<TriggerEventName>([
-  "select_mode",
-  "enhanced_play",
-  "invoke",
-  "loot_fused",
-  "loot_played",
-]);
-
 export function processCandidateTriggers(
   candidates: ProcessingCandidate[],
   options: ProcessOptions,
@@ -82,18 +74,22 @@ export function processCandidateTriggers(
     for (const trigger of cand.triggers) {
       let checkEvent = trigger.event;
 
-      // Shorthand: end_of_turn_own
+      // Shorthand: end_of_turn_own / start_of_turn_own
       if (trigger.type === "end_of_turn_own") {
         checkEvent = "end_of_turn";
+      }
+      if (trigger.type === "start_of_turn_own") {
+        checkEvent = "start_of_turn";
       }
 
       if (checkEvent !== event) continue;
 
-      // Player-action events: only the acting player's crests respond.
+      // Crest triggers default to owner-only; ally_/enemy_* use prefix rules below.
       if (
         source === "crest" &&
-        ACTIVE_PLAYER_CREST_EVENTS.has(event) &&
-        owner !== activePlayer
+        !event.startsWith("ally_") &&
+        !event.startsWith("enemy_") &&
+        !shouldCrestTriggerFire(trigger, owner, activePlayer, event)
       ) {
         continue;
       }
@@ -114,8 +110,11 @@ export function processCandidateTriggers(
         continue;
       }
 
-      // Shorthand Logic: end_of_turn_own means must be owner's turn
-      if (trigger.type === "end_of_turn_own") {
+      // Shorthand Logic: *_own means must be owner's turn
+      if (
+        trigger.type === "end_of_turn_own" ||
+        trigger.type === "start_of_turn_own"
+      ) {
         if (activePlayer !== owner) continue;
       }
 

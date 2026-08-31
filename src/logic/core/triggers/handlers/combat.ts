@@ -116,6 +116,10 @@ export function handleCombatEvent(
         return cand.card.uid === context.attacker?.uid;
       }
 
+      if (event === "leader_attacked") {
+        return cand.source === "crest";
+      }
+
       return false;
     },
   });
