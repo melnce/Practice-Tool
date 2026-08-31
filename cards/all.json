@@ -22062,16 +22062,10 @@
         "cost": 0,
         "effects": [
           {
-            "op": "select",
+            "op": "transform",
             "target": "ally:hand",
             "select": 1,
-            "effects": [
-              {
-                "op": "transform",
-                "target": "selected:any",
-                "into_source": "enemy:deck"
-              }
-            ]
+            "into_source": "enemy:deck"
           }
         ]
       }
