@@ -20,6 +20,7 @@
 
 import fs from "fs";
 import path from "path";
+import { execFileSync } from "child_process";
 import { fileURLToPath } from "url";
 import { initCardDatabaseNode } from "../src/data/cardLoaderNode.js";
 import "../src/logic/core/effects/index.js";
@@ -141,6 +142,17 @@ function record(): void {
   printSummary(baseline);
   fs.mkdirSync(path.dirname(BASELINE_PATH), { recursive: true });
   fs.writeFileSync(BASELINE_PATH, stableStringify(baseline) + "\n", "utf-8");
+  // Match repo prettier rules so `npm run format:check` stays green.
+  const prettierBin = path.join(
+    ROOT,
+    "node_modules",
+    "prettier",
+    "bin",
+    "prettier.cjs",
+  );
+  execFileSync(process.execPath, [prettierBin, "--write", BASELINE_PATH], {
+    stdio: "inherit",
+  });
   console.log(`\nWrote ${BASELINE_PATH}`);
   console.log(`(${GENERATED_BANNER})`);
 }
