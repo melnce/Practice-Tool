@@ -2266,17 +2266,11 @@
     "triggers": [],
     "fanfare": [
       {
-        "op": "select",
+        "op": "stat",
+        "action": "give",
+        "keywords": ["Can't Attack"],
+        "duration": "opponent_turn_end",
         "target": "enemy:follower",
-        "effects": [
-          {
-            "op": "stat",
-            "action": "give",
-            "keywords": ["Can't Attack"],
-            "duration": "opponent_turn_end",
-            "target": "selected:follower"
-          }
-        ],
         "select": 1
       },
       {

@@ -27,12 +27,12 @@ describe("Alchemic Flare Logic", () => {
       // Check Flare Spell Effects
       expect(flare.spell.length).toBe(3);
 
-      // Effect 1: Damage Follower
-      expect(flare.spell[0].op).toBe("select");
-      expect(flare.spell[0].target).toContain("enemy:follower");
-      expect(flare.spell[0].effects[0].op).toBe("damage");
-      expect(flare.spell[0].effects[0].target).toMatch(/^selected(:follower)?$/);
-      expect(flare.spell[0].effects[0].amount).toBe(4);
+      // Effect 1: Damage Follower (flat chosen-target form)
+      expect(flare.spell[0].op).toBe("damage");
+      expect(flare.spell[0].target).toBe("enemy:follower");
+      expect(flare.spell[0].select).toBe(1);
+      expect(flare.spell[0].amount).toBe(4);
+      expect(flare.spell[0].effects).toBeUndefined();
 
       // Effect 2: Summon Magic Sediment
       expect(flare.spell[1].op).toBe("summon");

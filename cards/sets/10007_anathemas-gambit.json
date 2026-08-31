@@ -1881,21 +1881,15 @@
     "url": "https://shadowverse.gg/cards/10741120-carrier-wyvern",
     "evolve": [
       {
-        "op": "select",
+        "op": "stat",
+        "action": "give",
+        "attack": 2,
+        "defense": 2,
         "target": "ally:hand",
         "select": 1,
         "condition": {
           "type": "Follower"
-        },
-        "effects": [
-          {
-            "op": "stat",
-            "action": "give",
-            "attack": 2,
-            "defense": 2,
-            "target": "selected:follower"
-          }
-        ]
+        }
       }
     ],
     "superevolve": [],

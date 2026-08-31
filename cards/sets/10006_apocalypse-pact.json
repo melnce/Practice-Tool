@@ -553,15 +553,9 @@
     "evolve": [],
     "superevolve": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "enemy:follower",
-        "select": 1,
-        "effects": [
-          {
-            "op": "destroy",
-            "target": "selected:follower"
-          }
-        ]
+        "select": 1
       }
     ],
     "keywords": [],
@@ -2955,18 +2949,12 @@
     "triggers": [],
     "fanfare": [
       {
-        "op": "select",
+        "op": "destroy",
         "target": "any:any",
         "select": 3,
         "condition": {
           "not_self": true
-        },
-        "effects": [
-          {
-            "op": "destroy",
-            "target": "selected"
-          }
-        ]
+        }
       }
     ],
     "specific_effects": [
