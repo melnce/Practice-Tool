@@ -170,7 +170,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -214,7 +213,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -292,7 +295,10 @@
                     "op": "banish",
                     "scope": "self"
                   }
-                ]
+                ],
+                "condition": {
+                  "whose_turn": "owner"
+                }
               }
             ]
           }
@@ -330,7 +336,6 @@
     "keywords": ["Ambush"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -339,7 +344,11 @@
             "player": "self",
             "count": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -600,7 +609,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -616,7 +624,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -714,7 +726,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -733,7 +744,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -792,7 +807,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -806,7 +820,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -814,7 +832,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -823,7 +840,11 @@
             "amount": "{self.attack}",
             "distribution": "split_sequential"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -1985,7 +2006,6 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -2008,7 +2028,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -2179,14 +2203,17 @@
         "player": "opponent",
         "triggers": [
           {
-            "type": "start_of_turn_own",
             "effects": [
               {
                 "op": "damage",
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "event": "start_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           },
           {
             "event": "leader_restored",
@@ -2263,7 +2290,6 @@
         "countdown": 2,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "summon",
@@ -2271,7 +2297,11 @@
                 "name": "Vastwing Dragon",
                 "count": 1
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -2537,7 +2567,9 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "filter": { "not_self": true },
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {

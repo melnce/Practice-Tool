@@ -1729,7 +1729,6 @@
     "keywords": ["Rush"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -1737,7 +1736,11 @@
             "name": "Majestic Megalorca",
             "count": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -2545,7 +2548,6 @@
         ]
       },
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -2554,7 +2556,11 @@
             "player": "self",
             "amount": 4
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [
@@ -2888,7 +2894,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -2922,7 +2927,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": []

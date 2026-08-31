@@ -91,14 +91,17 @@
     "has_ongoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "restore",
             "target": "allies",
             "amount": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [],
@@ -258,7 +261,10 @@
                     "target": "allies",
                     "amount": 1
                   }
-                ]
+                ],
+                "condition": {
+                  "whose_turn": "owner"
+                }
               }
             ]
           },
@@ -348,13 +354,16 @@
     "evolve_trigger_always": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [
@@ -1255,14 +1264,17 @@
     "has_ongoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "spellboost",
             "target": "ally:hand",
             "count": "{self.attack}"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [
@@ -1548,7 +1560,11 @@
         "target": "enemy:follower",
         "select": 1,
         "effects": [
-          { "op": "damage", "target": "selected:follower", "amount": 4 }
+          {
+            "op": "damage",
+            "target": "selected:follower",
+            "amount": 4
+          }
         ]
       },
       {
@@ -1610,7 +1626,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "ally:follower",
-                "filter": { "not_self": true },
+                "filter": {
+                  "not_self": true
+                },
                 "keywords": ["Barrier"]
               }
             ]
@@ -1698,7 +1716,7 @@
               {
                 "event": "start_of_turn",
                 "condition": {
-                  "own_turn": true
+                  "whose_turn": "owner"
                 },
                 "effects": [
                   {
@@ -1792,7 +1810,7 @@
       {
         "event": "end_of_turn",
         "condition": {
-          "own_turn": true
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -1839,7 +1857,7 @@
           {
             "event": "end_of_turn",
             "condition": {
-              "own_turn": true
+              "whose_turn": "owner"
             },
             "effects": [
               {
@@ -2281,7 +2299,6 @@
         "countdown": 2,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
@@ -2295,7 +2312,11 @@
                 "target": "ally:leader",
                 "amount": 1
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -2334,7 +2355,6 @@
     "keywords": ["Rush"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "damage",
@@ -2350,7 +2370,11 @@
             "distribution": "random",
             "count": 1
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": []
@@ -2517,14 +2541,17 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       },
@@ -2538,14 +2565,17 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
                 "target": "ally:leader",
                 "amount": 2
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       },
@@ -2611,7 +2641,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "stat",
@@ -2620,7 +2649,11 @@
             "attack": -2,
             "defense": -2
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "evolve": [],
@@ -2745,14 +2778,21 @@
     "has_ongoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
-        "op": "gate",
-        "condition": "evolved_self",
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
-            "op": "damage",
-            "amount": 2,
-            "target": "all:follower"
+            "op": "gate",
+            "condition": "evolved_self",
+            "effects": [
+              {
+                "op": "damage",
+                "amount": 2,
+                "target": "all:follower"
+              }
+            ]
           }
         ]
       }
@@ -3068,7 +3108,8 @@
       {
         "event": "end_of_turn",
         "condition": {
-          "super_evolution_unlocked": true
+          "super_evolution_unlocked": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {

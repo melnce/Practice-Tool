@@ -165,7 +165,10 @@
               "exclude_tribe": "Encroacher"
             }
           }
-        ]
+        ],
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -1804,13 +1807,16 @@
     "keywords": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "evolve",
             "target": "self"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [],
@@ -2288,7 +2294,9 @@
       {
         "op": "destroy",
         "target": "ally:follower",
-        "filter": { "not_self": true },
+        "filter": {
+          "not_self": true
+        },
         "select": 1,
         "then": [
           {
@@ -3283,7 +3291,6 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "effects": [
           {
             "op": "damage",
@@ -3291,7 +3298,11 @@
             "amount": 3,
             "distribution": "split_sequential"
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "fanfare": [

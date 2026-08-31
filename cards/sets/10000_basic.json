@@ -1891,8 +1891,11 @@
     ],
     "triggers": [
       {
-        "type": "end_of_turn_own",
+        "event": "end_of_turn",
         "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
             "op": "add_to_hand",

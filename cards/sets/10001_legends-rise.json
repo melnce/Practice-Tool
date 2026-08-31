@@ -883,7 +883,6 @@
     "hasOngoing": true,
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -898,7 +897,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "keywords": [
@@ -2345,7 +2348,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "earth_rite",
@@ -2358,7 +2360,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -3289,7 +3295,10 @@
                 "target": "ally:leader",
                 "amount": 1
               }
-            ]
+            ],
+            "condition": {
+              "whose_turn": "owner"
+            }
           },
           {
             "event": "leader_restored",
@@ -3827,7 +3836,6 @@
     "fanfare": [],
     "triggers": [
       {
-        "type": "end_of_turn_own",
         "source": "board",
         "effects": [
           {
@@ -3856,7 +3864,11 @@
               }
             ]
           }
-        ]
+        ],
+        "event": "end_of_turn",
+        "condition": {
+          "whose_turn": "owner"
+        }
       }
     ],
     "keywords": ["Bane"]
@@ -3994,7 +4006,6 @@
         "countdown": 4,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "damage",
@@ -4006,7 +4017,11 @@
                 "target": "enemy:leader",
                 "amount": 1
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }
@@ -5571,7 +5586,6 @@
         "countdown": 3,
         "triggers": [
           {
-            "type": "end_of_turn_own",
             "effects": [
               {
                 "op": "gate",
@@ -5592,7 +5606,11 @@
                   }
                 ]
               }
-            ]
+            ],
+            "event": "end_of_turn",
+            "condition": {
+              "whose_turn": "owner"
+            }
           }
         ]
       }

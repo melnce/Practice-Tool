@@ -45,7 +45,8 @@ describe("Foundations — Manamel & Cupitan evolve_trigger_always", () => {
     state.players.first.board = [manamel];
 
     const eot = (manamel.triggers ?? []).find(
-      (t: { type?: string }) => t.type === "end_of_turn_own",
+      (t: { type?: string; event?: string }) =>
+        t.event === "end_of_turn" || t.type === "end_of_turn_own",
     );
     runEffects((eot as { effects: unknown[] }).effects, "first", manamel);
 

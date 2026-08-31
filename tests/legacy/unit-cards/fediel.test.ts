@@ -43,7 +43,8 @@ describe("Fediel, Darkness Personified (10454110)", () => {
     expect(card.triggers).toHaveLength(1);
 
     const eotTrigger = card.triggers[0];
-    expect(eotTrigger.type).toBe("end_of_turn_own");
+    expect(eotTrigger.event).toBe("end_of_turn");
+    expect(eotTrigger.condition?.whose_turn).toBe("owner");
     expect(eotTrigger.effects).toHaveLength(1);
 
     const debuff = eotTrigger.effects[0];

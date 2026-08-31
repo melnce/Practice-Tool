@@ -4,8 +4,11 @@ import { getCardDetails } from "../../../src/data/cardIndex";
 import { initCardDatabaseNode } from "../../../src/data/cardLoaderNode";
 import * as fs from "fs";
 
+const FUSE_DEBUG = "test-results/fuse_debug.txt";
+
 function log(msg: string) {
-  fs.appendFileSync("fuse_debug.txt", msg + "\n", "utf8");
+  fs.mkdirSync("test-results", { recursive: true });
+  fs.appendFileSync(FUSE_DEBUG, msg + "\n", "utf8");
 }
 
 function createCard(nameOrId: string, owner: "first" | "second") {
@@ -20,7 +23,8 @@ function createCard(nameOrId: string, owner: "first" | "second") {
 
 describe("Fuse Selection (Bug Repro)", () => {
   beforeAll(async () => {
-    fs.writeFileSync("fuse_debug.txt", "=== Fuse Debug ===\n", "utf8");
+    fs.mkdirSync("test-results", { recursive: true });
+    fs.writeFileSync(FUSE_DEBUG, "=== Fuse Debug ===\n", "utf8");
     await initCardDatabaseNode();
   });
 
