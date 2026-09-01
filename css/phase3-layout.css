@@ -319,8 +319,7 @@ body.active-on-bottom.active-second .side-red .hand-zone {
 }
 
 /* Compact leader HP readout in the right rail (not the attack strip) */
-#turnControls .leader-container,
-.side .leader-container {
+#turnControls .leader-container {
   gap: var(--space-2);
   padding: var(--space-1) 0;
   position: relative;
@@ -333,8 +332,7 @@ body.active-on-bottom.active-second .side-blue #blueHand {
   justify-content: flex-end;
 }
 
-#turnControls .leader-hp-readout,
-.side .leader-hp-readout {
+#turnControls .leader-hp-readout {
   width: auto !important;
   min-width: var(--leader-hp-badge-min-width) !important;
   max-width: none;
@@ -453,17 +451,18 @@ body.active-on-bottom.active-second .side-red .leader-attack-strip::before {
   opacity: 1;
 }
 
-#turnControls .hp-value,
-.side .hp-value {
-  font-size: var(--font-size-lg) !important;
+#turnControls .hp-value {
+  font-size: var(--font-size-xl) !important;
   line-height: 1;
+  font-weight: var(--font-weight-black);
 }
 
-#turnControls .evo-btn,
-.side .evo-btn {
+#turnControls .evo-btn {
   font-size: var(--font-size-2xs);
-  padding: 4px 6px;
-  min-height: 28px;
+  padding: 3px 4px;
+  min-height: 26px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Larger board cards */
@@ -552,8 +551,11 @@ body.active-on-bottom.active-second .side-red #redHand {
 }
 
 /* Turn controls — full-height right rail hosting HP/evo/stats + PP/End Turn.
-   Red cluster top, core centered, blue cluster bottom — no overlap. */
+   Red cluster top, core centered, blue cluster bottom — no overlap.
+   Shared content width: every primary control aligns to the rail inner edge. */
 #gameShell #turnControls {
+  --rail-stack-gap: var(--space-3);
+  --rail-cluster-gap: var(--space-2);
   position: fixed;
   right: 12px;
   top: max(56px, calc(var(--shell-top-gutter) + 48px)) !important;
@@ -563,8 +565,8 @@ body.active-on-bottom.active-second .side-red #redHand {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: stretch;
+  gap: var(--rail-stack-gap);
   width: calc(var(--shell-right-gutter) - 24px);
   max-width: calc(var(--shell-right-gutter) - 24px);
   box-sizing: border-box;
@@ -575,18 +577,124 @@ body.active-on-bottom.active-second .side-red #redHand {
   box-shadow: none;
 }
 
+/* Kill the legacy per-child vertical margins that fought the flex gap scale. */
+#gameShell #turnControls > * {
+  margin: 0;
+}
+
 #gameShell #turnControls .turn-controls-core {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+  gap: var(--rail-stack-gap);
   width: 100%;
   /* God mode expands this; scroll inside core so clusters cannot cover PP/god. */
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+#gameShell #turnControls .red-pp-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--rail-stack-gap);
+  width: 100%;
+}
+
+#gameShell #turnControls .boost-pips {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: stretch;
+  margin: 0;
+  width: 100%;
+}
+
+#gameShell #turnControls .boost-pip {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+#gameShell #turnControls #redBoost {
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  /* Secondary action — quieter than End Turn / HP */
+  padding: 6px 8px;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  background: rgba(255, 183, 3, 0.12);
+  border: 1px solid rgba(255, 183, 3, 0.35);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+}
+
+#gameShell #turnControls #redBoost:hover:not(.used) {
+  filter: none;
+  background: rgba(255, 183, 3, 0.2);
+  color: var(--color-text-primary);
+}
+
+#gameShell #turnControls #redBoost.used {
+  background: var(--color-bg-control) !important;
+  color: var(--color-text-disabled) !important;
+  border-color: var(--color-border-subtle) !important;
+}
+
+#gameShell #turnControls .pp-floating {
+  width: 100% !important;
+  max-width: 100%;
+  height: 36px;
+  margin: 0;
+  box-sizing: border-box;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+#gameShell #turnControls .pp-floating::before {
+  inset: -2px;
+  border-radius: calc(var(--radius-xl) + 1px);
+}
+
+/* Tie each PP box to its player (same colour language as HP rings / attack strips). */
+#gameShell #turnControls #redPPBox {
+  border-color: rgba(255, 92, 92, 0.55) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(92, 18, 28, 0.55),
+    var(--color-bg-inset)
+  ) !important;
+}
+
+#gameShell #turnControls #redPPBox::before {
+  box-shadow: 0 0 10px rgba(255, 92, 92, 0.22);
+}
+
+#gameShell #turnControls #bluePPBox {
+  border-color: rgba(74, 140, 255, 0.55) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 28, 92, 0.55),
+    var(--color-bg-inset)
+  ) !important;
+}
+
+#gameShell #turnControls #bluePPBox::before {
+  box-shadow: 0 0 10px rgba(74, 140, 255, 0.22);
+}
+
+#gameShell #turnControls #endTurnRed,
+#gameShell #turnControls #endTurnBlue {
+  width: 100% !important;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  padding: 10px 12px !important;
+  font-size: var(--font-size-sm);
 }
 
 /* Script diverge banner — below settings hamburger, not sticky header */
@@ -634,8 +742,8 @@ body.active-second .side-red {
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
+  align-items: stretch;
+  gap: var(--rail-cluster-gap, var(--space-2));
   z-index: var(--z-leader-controls);
   pointer-events: auto;
   box-sizing: border-box;
@@ -655,13 +763,15 @@ body.active-second .side-red {
   top: auto;
   bottom: auto;
   right: auto;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
   justify-content: center;
   gap: var(--space-2);
+  width: 100%;
   max-width: 100%;
   margin: 0;
+  opacity: 0.78;
 }
 
 #gameShell #redCrests,
@@ -672,9 +782,31 @@ body.active-second .side-red {
   gap: var(--crest-row-gap, 2px);
 }
 
+/* Crest pyramid is deliberate mirroring: wider row faces the leader,
+   narrower apex faces the rail core (red 3→2 top; blue 2→3 bottom). */
+#gameShell #redCrests,
+#gameShell #blueCrests {
+  flex-shrink: 0;
+}
+
 #gameShell #redStats,
 #gameShell #blueStats {
-  order: 0;
+  order: unset;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: var(--font-size-2xs);
+  opacity: 0.9;
+  padding: var(--space-1) 0;
+}
+
+/* Preserve DOM order so crest pyramids stay mirrored toward the core. */
+#gameShell #redCrests,
+#gameShell #blueCrests {
+  order: unset;
 }
 
 #gameShell .crest-row {
@@ -690,11 +822,45 @@ body.active-second .side-red {
   grid-column: unset;
 }
 
+/*
+ * Leader row: deliberate stack — HP prominent on top, Evo/Super a matched
+ * pair beneath (same width). Avoids the prior flex-wrap that parked Super
+ * alone on a second line with no shared edge.
+ */
 .side-rail-cluster .leader-container {
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "hp hp"
+    "evo super";
+  align-items: center;
+  justify-items: stretch;
+  column-gap: var(--space-2);
+  row-gap: var(--space-2);
   width: 100%;
   margin: 0;
+  flex-wrap: nowrap;
+}
+
+.side-rail-cluster .leader-hp-readout {
+  grid-area: hp;
+  justify-self: center;
+  min-width: 3.25em !important;
+  height: 34px !important;
+  max-height: 34px !important;
+  padding: 2px 12px !important;
+  outline-width: 3px;
+  box-shadow:
+    var(--shadow-md),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.25);
+}
+
+.side-rail-cluster .normal-evo {
+  grid-area: evo;
+}
+
+.side-rail-cluster .super-evo {
+  grid-area: super;
 }
 
 /* No page scroll — fixed game-client shell */

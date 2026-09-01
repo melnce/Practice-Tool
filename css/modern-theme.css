@@ -375,11 +375,11 @@ body {
   align-items: center;
 }
 
+/* .leader-container removed from .side-* in PR #121 (now in #turnControls);
+   confirmed zero matches for `.side-red/.side-blue .leader-container` at runtime. */
 .side-red #redHand,
-.side-red .leader-container,
 .side-red #redBoard,
 .side-blue #blueBoard,
-.side-blue .leader-container,
 .side-blue #blueHand {
   grid-column: 2;
   justify-self: stretch;
@@ -404,24 +404,12 @@ body {
   grid-row: 2;
 }
 
-.side-red .leader-container {
-  grid-row: 3;
-}
-
 .side-red #redBoard {
   grid-row: 4;
 }
 
 .side-blue #blueBoard {
   grid-row: 1;
-}
-
-.side-blue .leader-container {
-  grid-row: 2;
-}
-
-.side-blue #blueStatsContainer {
-  grid-row: 2;
 }
 
 .side-blue #blueHand {
