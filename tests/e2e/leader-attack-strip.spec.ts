@@ -315,7 +315,7 @@ test.describe("leader attack strip + freed hand row", () => {
     });
     expect(s).toBeTruthy();
     expect(hit.layoutH).toBe(8);
-    expect(hit.hitH).toBe(39);
+    expect(hit.hitH).toBe(23);
     await mouseDrag(
       page,
       s!.x + s!.width / 2,
@@ -421,7 +421,7 @@ test.describe("leader attack strip + freed hand row", () => {
     expect(layout.barrierOnHp).toBe(true);
     expect(layout.barrierOnStrip).toBe(false);
     expect(layout.stripHeight).toBe(8);
-    expect(layout.hitHeight).toBe(39);
+    expect(layout.hitHeight).toBe(23);
     expect(layout.hitOverlapsBoard).toBe(false);
     expect(layout.hitOverlapsHand).toBe(false);
   });
@@ -513,7 +513,7 @@ test.describe("leader attack strip + freed hand row", () => {
       };
     });
     expect(s2).toBeTruthy();
-    expect(aim2.hitH).toBeGreaterThanOrEqual(36);
+    expect(aim2.hitH).toBe(23);
     await mouseDrag(
       page,
       s2!.x + s2!.width / 2,

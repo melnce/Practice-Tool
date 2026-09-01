@@ -19,8 +19,9 @@
   --leader-attack-strip-height: 8px;
   /* Transparent corridor toward the hand (inside .board-stack, outside
      .board-zone / .hand-zone). Natural row-gap slack is only ~4px; without
-     this pad a safe hit region would be ~12px — too small for tablet. */
-  --leader-attack-hit-pad: 28px;
+     this pad a safe hit region would be ~12px. Owner chose 12px pad
+     (middle of the reclaim/comfort curve) over 28px. */
+  --leader-attack-hit-pad: 12px;
   /* Expand hit into the side row-gap (measured 4px); stay strictly inside. */
   --leader-attack-gap-outset: 3px;
   --hand-scale-top: 0.72;
