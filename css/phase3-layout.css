@@ -349,12 +349,6 @@ body.active-on-bottom.active-second .side-red .hand-zone {
   z-index: var(--z-leader-controls);
 }
 
-/* Top-row hands: pack toward the right so residual overflow spills left */
-body:not(.active-on-bottom.active-second) .side-red #redHand,
-body.active-on-bottom.active-second .side-blue #blueHand {
-  justify-content: flex-end;
-}
-
 #turnControls .leader-hp-readout,
 .side .leader-hp-readout {
   width: auto !important;
@@ -521,19 +515,6 @@ body.active-on-bottom.active-second .side-red .leader-attack-strip::before {
   min-height: 0;
   max-height: calc(var(--card-height) * var(--hand-local-scale, 1) + 24px);
   padding: var(--space-2) var(--space-3);
-}
-
-/* Top-row hands: keep fan from overlapping left chrome */
-body:not(.active-on-bottom.active-second) .side-red #redHand,
-body.active-on-bottom.active-second .side-blue #blueHand {
-  padding-left: var(--space-6);
-  box-sizing: border-box;
-}
-
-/* Bottom-row hands: keep fan clear of right rail */
-body:not(.active-on-bottom.active-second) .side-blue #blueHand,
-body.active-on-bottom.active-second .side-red #redHand {
-  padding-right: var(--space-8);
   box-sizing: border-box;
 }
 
