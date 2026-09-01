@@ -29763,7 +29763,8 @@
             "action": "give",
             "target": "ally:follower",
             "attack": 1,
-            "defense": 1
+            "defense": 1,
+            "include_self": true
           }
         ]
       }
