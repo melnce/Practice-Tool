@@ -3457,7 +3457,8 @@
                     "action": "give",
                     "target": "ally:follower",
                     "attack": 2,
-                    "defense": 2
+                    "defense": 2,
+                    "include_self": true
                   }
                 ]
               },
@@ -3523,7 +3524,8 @@
                                 "action": "give",
                                 "target": "ally:follower",
                                 "attack": -2,
-                                "defense": -2
+                                "defense": -2,
+                                "include_self": true
                               }
                             ]
                           },

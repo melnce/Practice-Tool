@@ -27,6 +27,7 @@ import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceReplacesFanfareForCard } from "./enhance-replaces-fanfare-gate.js";
 import { checkAdditiveEnhanceForCard } from "./additive-enhance-gate.js";
+import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
 import {
   getImplementationStatus,
   type ImplementationStatus,
@@ -1480,6 +1481,9 @@ function main() {
   const gateAdditiveEnhance =
     process.argv.includes("--gate=additive-enhance") ||
     process.argv.includes("--gate=additive_enhance");
+  const gateAllAlliedIncludeSelf =
+    process.argv.includes("--gate=all-allied-include-self") ||
+    process.argv.includes("--gate=all_allied_include_self");
   const gateMode =
     gateAddToHand ||
     gateStatOp ||
@@ -1488,7 +1492,8 @@ function main() {
     gateDurationOp ||
     gateSelectTarget ||
     gateEnhanceReplacesFanfare ||
-    gateAdditiveEnhance;
+    gateAdditiveEnhance ||
+    gateAllAlliedIncludeSelf;
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -1517,7 +1522,9 @@ function main() {
                   ? "🔍 Checking enhance_replaces_fanfare contracts...\n"
                   : gateAdditiveEnhance
                     ? "🔍 Checking additive Enhance base-op inclusion...\n"
-                    : "🔍 Checking card description ↔ JSON structure...\n",
+                    : gateAllAlliedIncludeSelf
+                      ? "🔍 Checking all-allied-followers include_self contracts...\n"
+                      : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
@@ -1535,6 +1542,8 @@ function main() {
           allIssues.push(...checkEnhanceReplacesFanfareForCard(card));
         if (gateAdditiveEnhance)
           allIssues.push(...checkAdditiveEnhanceForCard(card));
+        if (gateAllAlliedIncludeSelf)
+          allIssues.push(...checkAllAlliedIncludeSelfForCard(card));
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
@@ -1623,7 +1632,9 @@ function main() {
                     ? `✅ ${cardCount} cards — enhance_replaces_fanfare contracts hold.\n`
                     : gateAdditiveEnhance
                       ? `✅ ${cardCount} cards — additive Enhance tiers re-include base ops.\n`
-                      : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+                      : gateAllAlliedIncludeSelf
+                        ? `✅ ${cardCount} cards — all-allied-followers stat ops include self.\n`
+                        : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(
