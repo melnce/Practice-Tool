@@ -145,8 +145,13 @@ export function handleSelection(
     return "done";
   }
 
+  // `amount` is already the fully resolved total (primary + add_amount).
+  // Strip add_amount so the targeted resume handler cannot re-add it.
+  const { add_amount: _addAmount, ...effWithoutAdd } = eff as Effect & {
+    add_amount?: unknown;
+  };
   setPendingTarget({
-    eff: { ...eff, amount } as any,
+    eff: { ...effWithoutAdd, amount } as any,
     owner,
     sourceCard,
     targets: [],
