@@ -294,7 +294,7 @@ test.describe("leader attack strip + freed hand row", () => {
       () => window.__svwbTest!.getState().players.second.hp,
     );
     const s = await page.locator("#blueBoard .card").first().boundingBox();
-    // Aim at the expanded hit pad (bar is 32px; ::before adds pad+outset).
+    // Aim at the expanded hit band (bar 32px + gap-outset; pad is 0).
     const hit = await page.evaluate(() => {
       const strip = document.getElementById("redLeader")!;
       const root = getComputedStyle(document.documentElement);
@@ -315,7 +315,7 @@ test.describe("leader attack strip + freed hand row", () => {
     });
     expect(s).toBeTruthy();
     expect(hit.layoutH).toBe(32);
-    expect(hit.hitH).toBe(47);
+    expect(hit.hitH).toBe(35);
     await mouseDrag(
       page,
       s!.x + s!.width / 2,
@@ -424,7 +424,7 @@ test.describe("leader attack strip + freed hand row", () => {
     expect(layout.hpText).toBe("20");
     expect(layout.barrierOnHp).toBe(true);
     expect(layout.stripHeight).toBe(32);
-    expect(layout.hitHeight).toBe(47);
+    expect(layout.hitHeight).toBe(35);
     expect(layout.hitOverlapsBoard).toBe(false);
     expect(layout.hitOverlapsHand).toBe(false);
   });
@@ -457,10 +457,13 @@ test.describe("leader attack strip + freed hand row", () => {
         root.getPropertyValue("--leader-attack-gap-outset"),
       );
       const r = strip.getBoundingClientRect();
-      const hitTop = r.bottom - (r.height + pad + gapOut);
-      // Aim at the empty left of the bar (controls are centred) so the
-      // sabotage isolates ::before — not the Evo/HP/Super hit targets.
-      return { x: r.x + 24, y: (hitTop + r.bottom) / 2 };
+      // Empty left of the bar (controls are centred) — isolates ::before
+      // from the Evo/HP/Super hit targets. y = bar centre (pad is 0).
+      return {
+        x: r.x + 24,
+        y: r.top + r.height / 2,
+        hitH: r.height + pad + gapOut,
+      };
     });
     expect(s1).toBeTruthy();
     await mouseDrag(
@@ -510,15 +513,14 @@ test.describe("leader attack strip + freed hand row", () => {
         root.getPropertyValue("--leader-attack-gap-outset"),
       );
       const r = strip.getBoundingClientRect();
-      const hitTop = r.bottom - (r.height + pad + gapOut);
       return {
         x: r.x + 24,
-        y: (hitTop + r.bottom) / 2,
+        y: r.top + r.height / 2,
         hitH: r.height + pad + gapOut,
       };
     });
     expect(s2).toBeTruthy();
-    expect(aim2.hitH).toBe(47);
+    expect(aim2.hitH).toBe(35);
     await mouseDrag(
       page,
       s2!.x + s2!.width / 2,

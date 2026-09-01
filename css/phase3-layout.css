@@ -17,11 +17,14 @@
   /* Outer-edge leader bar — [Evo | HP | Super]; also the attack surface.
      Height = HP badge (32px); evo buttons (28px) centre inside. */
   --leader-attack-strip-height: 32px;
-  /* Transparent corridor toward the hand (inside .board-stack, outside
-     .board-zone / .hand-zone). Natural row-gap slack is only ~4px; without
-     this pad a safe hit region would be ~12px. Owner chose 12px pad
-     (middle of the reclaim/comfort curve) over 28px. */
-  --leader-attack-hit-pad: 12px;
+  /* Hit-pad corridor toward the hand (board-stack padding outside the bar).
+     Was 12px when the strip was an 8px line — needed invisible margin so
+     aiming at the visible band still hit. The bar is now 32px of visible,
+     aimable target; visible ≈ hittable, so the pad is redundant. Do not
+     reintroduce it to "help touch" — that was the wrong fix for an 8px
+     line, and it costs layout height. Gap-outset still covers the row-gap.
+     Must be `0px` (not unitless `0`) so calc() with px lengths stays valid. */
+  --leader-attack-hit-pad: 0px;
   /* Expand hit into the side row-gap (measured 4px); stay strictly inside. */
   --leader-attack-gap-outset: 3px;
   --hand-scale-top: 0.72;
@@ -410,7 +413,7 @@ body.active-on-bottom.active-second .side-blue #blueHand {
   margin: 0 !important;
 }
 
-/* Hit region: bar + board-stack pad corridor + gap outset. Must not enter
+/* Hit region: bar + optional pad corridor + gap outset. Must not enter
    .board-zone or .hand-zone rects — pad is board-stack padding, not either zone. */
 .leader-attack-strip::before {
   content: "";
