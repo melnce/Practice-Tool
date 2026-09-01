@@ -187,6 +187,25 @@ body.active-on-bottom.active-second .side-red .board-stack {
   padding-bottom: var(--leader-attack-hit-pad);
 }
 
+/* Followers face the centre line: push cards toward the shared inner edge.
+   Default: red on top → flex-end; blue on bottom → flex-start.
+   Flipped (active-on-bottom.active-second): reverse with the side swap. */
+.side-red #redBoard {
+  align-items: flex-end;
+}
+
+.side-blue #blueBoard {
+  align-items: flex-start;
+}
+
+body.active-on-bottom.active-second .side-blue #blueBoard {
+  align-items: flex-end;
+}
+
+body.active-on-bottom.active-second .side-red #redBoard {
+  align-items: flex-start;
+}
+
 .side-red #redBoard,
 .side-blue #blueBoard {
   flex: 1 1 auto;
