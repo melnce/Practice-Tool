@@ -23,6 +23,7 @@ import {
   getHand,
   getHP,
   getShadows,
+  getCrests,
 } from "../../src/core/playerHelpers.js";
 import { getImplementationStatus } from "../../src/data/cardImplementationStatus.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
@@ -274,5 +275,25 @@ describe("Set 10006 — Apocalypse Pact", () => {
     expect(
       getBoard(state, "first").filter((c) => c.name === "Worshipful Crusader"),
     ).toHaveLength(2);
+  });
+
+  it("Majestic Conquest — gains crest at base; Enhance (3) gains crest and delays by 2", () => {
+    setupTurn(6, { hand: ["10622310"], pp: 1 });
+    whenPlayCard("first", 0);
+    const baseCrest = (getCrests(state, "first") || []).find(
+      (c) => c.name === "Majestic Conquest",
+    );
+    expect(baseCrest).toBeTruthy();
+    expect(baseCrest!.countdown).toBe(2);
+
+    resetUidCounter();
+    setupTurn(6, { hand: ["10622310"], pp: 3 });
+    whenPlayCard("first", 0);
+    const enhanceCrest = (getCrests(state, "first") || []).find(
+      (c) => c.name === "Majestic Conquest",
+    );
+    expect(enhanceCrest).toBeTruthy();
+    // Gain countdown (2) then delay by 2 → countdown 4
+    expect(enhanceCrest!.countdown).toBe(4);
   });
 });

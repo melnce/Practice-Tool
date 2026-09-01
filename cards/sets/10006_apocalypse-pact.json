@@ -848,6 +848,27 @@
         "effects": [
           {
             "op": "crest",
+            "action": "gain",
+            "name": "Majestic Conquest",
+            "image": "images/crests/majestic_conquest.png",
+            "description": "Countdown (2)\nWhenever you play an Enhanced card, summon a Fearless Soldier.",
+            "countdown": 2,
+            "triggers": [
+              {
+                "event": "enhanced_play",
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Fearless Soldier",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "crest",
             "action": "delay_countdown",
             "name": "Majestic Conquest",
             "amount": 2

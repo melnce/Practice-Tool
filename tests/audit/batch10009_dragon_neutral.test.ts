@@ -171,7 +171,11 @@ describe("Set 10009 — Dragoncraft", () => {
     setupTurn(R6, { hand: ["10941310"], pp: 3 });
     const foe = enemyFollower(2, 5);
     whenPlayCard("first", 0);
-    expect(Number(foe.defense)).toBeLessThan(5);
+    // Printed Enhance is additive: still summon the Whelp, and deal 3 damage.
+    expect(thenBoard("first").some((c) => c.name === "Fire Drake Whelp")).toBe(
+      true,
+    );
+    expect(Number(foe.defense)).toBe(2);
   });
 
   it("Dragonfolk Butler — Fanfare restores 3 and recovers 3 PP; Evolve buffs ally", () => {

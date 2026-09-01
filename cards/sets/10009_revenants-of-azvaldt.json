@@ -1677,6 +1677,12 @@
         "cost": 3,
         "effects": [
           {
+            "op": "summon",
+            "source": "named",
+            "name": "Fire Drake Whelp",
+            "count": 1
+          },
+          {
             "op": "damage",
             "target": "enemy:follower",
             "amount": 3,
