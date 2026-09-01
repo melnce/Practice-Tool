@@ -56,5 +56,13 @@ export function updateEvoButtonsUI(state: GameState) {
   [bNE, bSE, rNE, rSE].forEach((btn) => {
     btn.removeAttribute("draggable");
     enableEvoButtonDrag(btn, !btn.disabled);
+    // Evo sits on the leader attack bar — stop clicks bubbling into
+    // canTargetLeader / leader onclick (evolve must never become an attack).
+    if (!btn.dataset.evoClickGuard) {
+      btn.dataset.evoClickGuard = "1";
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+    }
   });
 }

@@ -615,15 +615,25 @@
             Confirm Mulligan (Red)
           </button>
 
-          <!-- Board + leader attack strip (outer/far edge). #redLeader keeps
-               drop + spell-target contract for existing e2e. -->
+          <!-- Outer-edge leader bar: [Evo | HP | Super] — also the attack /
+               spell-target surface (#redLeader id unchanged). -->
           <div class="board-stack">
             <div
               id="redLeader"
               class="leader leader-attack-strip red-leader"
               role="button"
               aria-label="Red leader"
-            ></div>
+            >
+              <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
+              <div
+                class="leader leader-hp-readout red-leader"
+                id="redLeaderHp"
+                aria-label="Red leader HP"
+              >
+                <span id="redHP" class="hp-value">20</span>
+              </div>
+              <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
+            </div>
             <div id="redBoard" class="zone board-zone"></div>
           </div>
         </section>
@@ -637,7 +647,17 @@
               class="leader leader-attack-strip blue-leader"
               role="button"
               aria-label="Blue leader"
-            ></div>
+            >
+              <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
+              <div
+                class="leader leader-hp-readout blue-leader"
+                id="blueLeaderHp"
+                aria-label="Blue leader HP"
+              >
+                <span id="blueHP" class="hp-value">20</span>
+              </div>
+              <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
+            </div>
           </div>
 
           <div id="blueHand" class="zone hand-zone"></div>
@@ -651,20 +671,9 @@
         </section>
       </main>
 
-      <!-- Right rail: HP/evo/stats + PP/End Turn (IDs unchanged) -->
+      <!-- Right rail: crests/stats + PP/End Turn (HP/evo live on the edge bar) -->
       <aside id="turnControls">
         <div class="side-rail-cluster side-rail-cluster--red">
-          <div class="leader-container">
-            <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
-            <div
-              class="leader leader-hp-readout red-leader"
-              id="redLeaderHp"
-              aria-label="Red leader HP"
-            >
-              <span id="redHP" class="hp-value">20</span>
-            </div>
-            <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
-          </div>
           <div class="floating-stats" id="redStatsContainer">
             <div id="redStats">
               <span>🃏 <span id="redHandCount">0</span></span>
@@ -868,17 +877,6 @@
           </div>
         </div>
         <div class="side-rail-cluster side-rail-cluster--blue">
-          <div class="leader-container">
-            <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
-            <div
-              class="leader leader-hp-readout blue-leader"
-              id="blueLeaderHp"
-              aria-label="Blue leader HP"
-            >
-              <span id="blueHP" class="hp-value">20</span>
-            </div>
-            <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
-          </div>
           <div class="floating-stats" id="blueStatsContainer">
             <div id="blueCrests" class="crest-container">
               <div class="crest-row">
