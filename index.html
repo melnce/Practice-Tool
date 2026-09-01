@@ -615,6 +615,56 @@
             Confirm Mulligan (Red)
           </button>
 
+          <!-- Board + leader attack strip (outer/far edge). #redLeader keeps
+               drop + spell-target contract for existing e2e. -->
+          <div class="board-stack">
+            <div
+              id="redLeader"
+              class="leader leader-attack-strip red-leader"
+              role="button"
+              aria-label="Red leader"
+            ></div>
+            <div id="redBoard" class="zone board-zone"></div>
+          </div>
+        </section>
+
+        <!-- Blue side -->
+        <section class="side side-blue">
+          <div class="board-stack">
+            <div id="blueBoard" class="zone board-zone"></div>
+            <div
+              id="blueLeader"
+              class="leader leader-attack-strip blue-leader"
+              role="button"
+              aria-label="Blue leader"
+            ></div>
+          </div>
+
+          <div id="blueHand" class="zone hand-zone"></div>
+          <button
+            id="blueMulliganConfirm"
+            class="play-area-btn mulligan-confirm-btn mulligan-confirm-btn--blue"
+            style="display: none; margin: 8px 0 16px 0"
+          >
+            Confirm Mulligan (Blue)
+          </button>
+        </section>
+      </main>
+
+      <!-- Right rail: HP/evo/stats + PP/End Turn (IDs unchanged) -->
+      <aside id="turnControls">
+        <div class="side-rail-cluster side-rail-cluster--red">
+          <div class="leader-container">
+            <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
+            <div
+              class="leader leader-hp-readout red-leader"
+              id="redLeaderHp"
+              aria-label="Red leader HP"
+            >
+              <span id="redHP" class="hp-value">20</span>
+            </div>
+            <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
+          </div>
           <div class="floating-stats" id="redStatsContainer">
             <div id="redStats">
               <span>🃏 <span id="redHandCount">0</span></span>
@@ -634,30 +684,201 @@
               </div>
             </div>
           </div>
-
-          <div class="leader-container">
-            <button id="redNormalEvo" class="evo-btn normal-evo">Evo</button>
-            <div class="leader red-leader" id="redLeader">
-              <span id="redHP" class="hp-value">20</span>
+        </div>
+        <div class="turn-controls-core">
+          <div class="red-pp-wrapper">
+            <div
+              id="boostPips"
+              class="boost-pips"
+              aria-label="Second player Bonus PP charges"
+            >
+              <span
+                id="boostPipEarly"
+                class="boost-pip"
+                data-tier="early"
+                title="Early Bonus PP (rounds 1–5)"
+                >1–5</span
+              >
+              <span
+                id="boostPipLate"
+                class="boost-pip"
+                data-tier="late"
+                title="Late Bonus PP (round 6+)"
+                >6+</span
+              >
             </div>
-            <button id="redSuperEvo" class="evo-btn super-evo">Super</button>
+            <button id="redBoost" onclick="useRedBoost()">+1 PP Boost</button>
+            <div class="pp-floating" id="redPPBox">
+              PP: <span id="redPP">1</span>
+            </div>
+          </div>
+          <button id="endTurnRed" onclick="endTurnRed()" style="display: none">
+            End Turn (Red)
+          </button>
+          <button
+            id="endTurnBlue"
+            onclick="endTurnBlue()"
+            style="display: none"
+          >
+            End Turn (Blue)
+          </button>
+          <div class="pp-floating" id="bluePPBox">
+            PP: <span id="bluePP">1</span>
           </div>
 
-          <div id="redBoard" class="zone board-zone"></div>
-        </section>
-
-        <!-- Blue side -->
-        <section class="side side-blue">
-          <div id="blueBoard" class="zone board-zone"></div>
-
+          <!-- God Mode Controls (Hidden by default) -->
+          <div
+            id="blueGodMode"
+            style="
+              display: none;
+              margin-top: 10px;
+              background: rgba(0, 0, 0, 0.5);
+              padding: 8px;
+              border-radius: 6px;
+              border: 1px solid rgba(136, 68, 68, 0.4);
+            "
+          >
+            <div
+              style="
+                font-size: 0.8rem;
+                font-weight: bold;
+                color: #aaa;
+                margin-bottom: 6px;
+                text-align: center;
+              "
+            >
+              GOD MODE
+            </div>
+            <div
+              class="god-target-label"
+              style="
+                font-size: 0.7rem;
+                color: #ccc;
+                margin-bottom: 6px;
+                text-align: center;
+              "
+            >
+              Target: Blue (1st)
+            </div>
+            <div
+              style="
+                display: flex;
+                gap: 4px;
+                flex-wrap: wrap;
+                justify-content: center;
+              "
+            >
+              <button id="godMinus" class="mini-btn" style="width: 30px">
+                -
+              </button>
+              <button id="godPlus" class="mini-btn" style="width: 30px">
+                +
+              </button>
+              <button id="godRefill" class="mini-btn" style="flex: 1">
+                Refill PP
+              </button>
+            </div>
+            <div
+              style="
+                margin-top: 6px;
+                display: flex;
+                gap: 4px;
+                flex-wrap: wrap;
+                justify-content: center;
+              "
+            >
+              <button id="godEPMinus" class="mini-btn" style="width: 30px">
+                -
+              </button>
+              <button id="godEPPlus" class="mini-btn" style="width: 30px">
+                +
+              </button>
+              <button id="godEPRefill" class="mini-btn" style="flex: 1">
+                Refill EP
+              </button>
+            </div>
+            <div style="margin-top: 6px; display: flex; gap: 4px">
+              <button id="godSetMax" class="mini-btn" style="flex: 1">
+                Set Max
+              </button>
+            </div>
+            <div
+              style="
+                margin-top: 6px;
+                display: flex;
+                gap: 4px;
+                align-items: center;
+              "
+            >
+              <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
+                >Evolves:</span
+              >
+              <input
+                id="godEvoCountVal"
+                type="number"
+                style="width: 40px; padding: 2px"
+                value="0"
+              />
+              <button id="godSetEvoCount" class="mini-btn" style="flex: 1">
+                Set
+              </button>
+            </div>
+            <div
+              style="
+                margin-top: 6px;
+                display: flex;
+                gap: 4px;
+                align-items: center;
+              "
+            >
+              <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
+                >Combo:</span
+              >
+              <input
+                id="godComboCountVal"
+                type="number"
+                style="width: 40px; padding: 2px"
+                value="0"
+              />
+              <button id="godSetComboCount" class="mini-btn" style="flex: 1">
+                Set
+              </button>
+            </div>
+            <div
+              style="
+                margin-top: 6px;
+                display: flex;
+                gap: 4px;
+                align-items: center;
+              "
+            >
+              <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
+                >Shadows:</span
+              >
+              <input
+                id="godShadowsVal"
+                type="number"
+                style="width: 40px; padding: 2px"
+                value="0"
+              />
+              <button id="godSetShadows" class="mini-btn" style="flex: 1">
+                Set
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="side-rail-cluster side-rail-cluster--blue">
           <div class="leader-container">
             <button id="blueNormalEvo" class="evo-btn normal-evo">Evo</button>
-            <div class="leader blue-leader" id="blueLeader">
+            <div
+              class="leader leader-hp-readout blue-leader"
+              id="blueLeaderHp"
+              aria-label="Blue leader HP"
+            >
               <span id="blueHP" class="hp-value">20</span>
             </div>
             <button id="blueSuperEvo" class="evo-btn super-evo">Super</button>
           </div>
-
           <div class="floating-stats" id="blueStatsContainer">
             <div id="blueCrests" class="crest-container">
               <div class="crest-row">
@@ -676,193 +897,6 @@
               <span>💀 <span id="blueGraveCount">0</span></span>
               <span>☠️ <span id="blueShadows">0</span></span>
             </div>
-          </div>
-
-          <div id="blueHand" class="zone hand-zone"></div>
-          <button
-            id="blueMulliganConfirm"
-            class="play-area-btn mulligan-confirm-btn mulligan-confirm-btn--blue"
-            style="display: none; margin: 8px 0 16px 0"
-          >
-            Confirm Mulligan (Blue)
-          </button>
-        </section>
-      </main>
-
-      <!-- Turn controls (unchanged IDs/handlers) -->
-      <aside id="turnControls">
-        <div class="red-pp-wrapper">
-          <div
-            id="boostPips"
-            class="boost-pips"
-            aria-label="Second player Bonus PP charges"
-          >
-            <span
-              id="boostPipEarly"
-              class="boost-pip"
-              data-tier="early"
-              title="Early Bonus PP (rounds 1–5)"
-              >1–5</span
-            >
-            <span
-              id="boostPipLate"
-              class="boost-pip"
-              data-tier="late"
-              title="Late Bonus PP (round 6+)"
-              >6+</span
-            >
-          </div>
-          <button id="redBoost" onclick="useRedBoost()">+1 PP Boost</button>
-          <div class="pp-floating" id="redPPBox">
-            PP: <span id="redPP">1</span>
-          </div>
-        </div>
-        <button id="endTurnRed" onclick="endTurnRed()" style="display: none">
-          End Turn (Red)
-        </button>
-        <button id="endTurnBlue" onclick="endTurnBlue()" style="display: none">
-          End Turn (Blue)
-        </button>
-        <div class="pp-floating" id="bluePPBox">
-          PP: <span id="bluePP">1</span>
-        </div>
-
-        <!-- God Mode Controls (Hidden by default) -->
-        <div
-          id="blueGodMode"
-          style="
-            display: none;
-            margin-top: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid rgba(136, 68, 68, 0.4);
-          "
-        >
-          <div
-            style="
-              font-size: 0.8rem;
-              font-weight: bold;
-              color: #aaa;
-              margin-bottom: 6px;
-              text-align: center;
-            "
-          >
-            GOD MODE
-          </div>
-          <div
-            class="god-target-label"
-            style="
-              font-size: 0.7rem;
-              color: #ccc;
-              margin-bottom: 6px;
-              text-align: center;
-            "
-          >
-            Target: Blue (1st)
-          </div>
-          <div
-            style="
-              display: flex;
-              gap: 4px;
-              flex-wrap: wrap;
-              justify-content: center;
-            "
-          >
-            <button id="godMinus" class="mini-btn" style="width: 30px">
-              -
-            </button>
-            <button id="godPlus" class="mini-btn" style="width: 30px">+</button>
-            <button id="godRefill" class="mini-btn" style="flex: 1">
-              Refill PP
-            </button>
-          </div>
-          <div
-            style="
-              margin-top: 6px;
-              display: flex;
-              gap: 4px;
-              flex-wrap: wrap;
-              justify-content: center;
-            "
-          >
-            <button id="godEPMinus" class="mini-btn" style="width: 30px">
-              -
-            </button>
-            <button id="godEPPlus" class="mini-btn" style="width: 30px">
-              +
-            </button>
-            <button id="godEPRefill" class="mini-btn" style="flex: 1">
-              Refill EP
-            </button>
-          </div>
-          <div style="margin-top: 6px; display: flex; gap: 4px">
-            <button id="godSetMax" class="mini-btn" style="flex: 1">
-              Set Max
-            </button>
-          </div>
-          <div
-            style="
-              margin-top: 6px;
-              display: flex;
-              gap: 4px;
-              align-items: center;
-            "
-          >
-            <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-              >Evolves:</span
-            >
-            <input
-              id="godEvoCountVal"
-              type="number"
-              style="width: 40px; padding: 2px"
-              value="0"
-            />
-            <button id="godSetEvoCount" class="mini-btn" style="flex: 1">
-              Set
-            </button>
-          </div>
-          <div
-            style="
-              margin-top: 6px;
-              display: flex;
-              gap: 4px;
-              align-items: center;
-            "
-          >
-            <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-              >Combo:</span
-            >
-            <input
-              id="godComboCountVal"
-              type="number"
-              style="width: 40px; padding: 2px"
-              value="0"
-            />
-            <button id="godSetComboCount" class="mini-btn" style="flex: 1">
-              Set
-            </button>
-          </div>
-          <div
-            style="
-              margin-top: 6px;
-              display: flex;
-              gap: 4px;
-              align-items: center;
-            "
-          >
-            <span style="color: #aaa; font-size: 0.8rem; margin-right: 4px"
-              >Shadows:</span
-            >
-            <input
-              id="godShadowsVal"
-              type="number"
-              style="width: 40px; padding: 2px"
-              value="0"
-            />
-            <button id="godSetShadows" class="mini-btn" style="flex: 1">
-              Set
-            </button>
           </div>
         </div>
       </aside>

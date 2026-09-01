@@ -544,11 +544,12 @@ for (const vp of TABLET_VIEWPORTS) {
         };
       });
 
-      // Geometry pin at 1024×768: at least one hand-card centre must be
-      // outside the container rect (otherwise this viewport no longer
-      // exercises the overflow bug).
-      if (vp.width === 1024 && vp.height === 768) {
-        expect(geo.anyOutside).toBe(true);
+      // Geometry note at 1024×768: before the hand-row freefill, at least one
+      // card centre sat outside #blueHand's rect (overflow fan). With the
+      // full-width hand that overflow may no longer occur — fuse must still
+      // resolve via isPointerOverHandZone either way. Prefer an outside
+      // centre when one exists; otherwise release onto a card centre.
+      if (vp.width === 1024 && vp.height === 768 && geo.anyOutside) {
         expect(geo.release.insideRect).toBe(false);
       }
 
@@ -607,9 +608,15 @@ for (const vp of TABLET_VIEWPORTS) {
         };
       });
 
-      expect(result.overflowed.length).toBeGreaterThan(0);
+      // Before the hand-row freefill, 1024×768 pinned overflowed card centres
+      // (rect says outside, elementFromPoint walk says inside). With a
+      // full-width hand that overflow may be gone — still require every card
+      // centre to resolve as inside the hand via isPointerOverHandZone.
+      expect(result.samples.length).toBeGreaterThan(0);
+      for (const s of result.samples) {
+        expect(s.overHand).toBe(true);
+      }
       for (const s of result.overflowed) {
-        // The defect: rect says no, elementFromPoint walk says yes.
         expect(s.insideRect).toBe(false);
         expect(s.overHand).toBe(true);
       }
