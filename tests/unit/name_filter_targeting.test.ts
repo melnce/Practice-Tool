@@ -256,17 +256,32 @@ describe("name filter on targeted selection pools", () => {
         deck: ["10131110", "10132110", "10131120", "10132120", FILLER, FILLER],
       });
       const unrelated = allyFollower("Unrelated Ally");
-      const handBefore = getHand(state, "first").length;
+      const handBeforeCards = getHand(state, "first").map((c) => c.uid);
+      const handBeforeLen = handBeforeCards.length;
 
-      whenPlayCard("first", 0);
+      const outcome = whenPlayCard("first", 0);
 
+      // Rulebook (docs/svwb_rulebook_formatted.md §playing-cards): if no valid
+      // target exists, SVWB blocks the play rather than letting it fizzle. So
+      // the destroy clause never runs, and neither does Draw 2 Runecraft
+      // followers — the spell stays in hand unspent.
+      expect(outcome.kind).toBe("blocked");
       expect(state.pendingTargetEffect).toBeFalsy();
       expect(findOnBoard("first", "Unrelated Ally")).toBeTruthy();
       expect(Number(unrelated.defense)).toBe(3);
-      // Draw-2 still runs (second op) — board must not lose the unrelated ally.
-      expect(getHand(state, "first").length).toBeGreaterThanOrEqual(
-        handBefore - 1,
+
+      const handAfter = getHand(state, "first");
+      expect(handAfter.length).toBe(handBeforeLen);
+      expect(handAfter.map((c) => c.uid)).toEqual(handBeforeCards);
+      expect(handAfter.some((c) => c.id === REAVED_ORDER)).toBe(true);
+      // Draw did not happen: no new Runecraft followers entered hand.
+      const drawnRunecraft = handAfter.filter(
+        (c) =>
+          !handBeforeCards.includes(c.uid) &&
+          c.type === "Follower" &&
+          String((c as any).class ?? (c as any).cardClass) === "Runecraft",
       );
+      expect(drawnRunecraft).toEqual([]);
     });
   });
 });
