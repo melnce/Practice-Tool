@@ -2835,12 +2835,12 @@
       "status": "covered"
     },
     "10222110": {
-      "fingerprint": "f0e25878",
+      "fingerprint": "576498c0",
       "gatesSatisfied": ["super_evolved_allied"],
       "name": "Gelt, Intrepid Vice-Captain",
       "scenarios": [
         {
-          "fingerprint": "ace7fda8",
+          "fingerprint": "a15b5bc2",
           "scenario": "turn_boundary"
         }
       ],
