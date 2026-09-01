@@ -14,9 +14,9 @@
   /* Compact rail HP badge (number + padding); was leader-bar-width × size. */
   --leader-hp-badge-height: 32px;
   --leader-hp-badge-min-width: 2.75em;
-  /* Visible attack band — thin line at the board's outer border.
-     Layout height is this value only; finger hit comes from ::before + pad. */
-  --leader-attack-strip-height: 8px;
+  /* Outer-edge leader bar — [Evo | HP | Super]; also the attack surface.
+     Height = HP badge (32px); evo buttons (28px) centre inside. */
+  --leader-attack-strip-height: 32px;
   /* Transparent corridor toward the hand (inside .board-stack, outside
      .board-zone / .hand-zone). Natural row-gap slack is only ~4px; without
      this pad a safe hit region would be ~12px. Owner chose 12px pad
@@ -337,7 +337,7 @@ body.active-on-bottom.active-second .side-red .hand-zone {
   );
 }
 
-/* Compact leader HP readout in the right rail (not the attack strip) */
+/* Compact leader HP readout on the outer-edge bar (and any residual rail use) */
 #turnControls .leader-container,
 .side .leader-container {
   gap: var(--space-2);
@@ -367,8 +367,8 @@ body.active-on-bottom.active-second .side-blue #blueHand {
   outline-width: 2px;
 }
 
-/* Leader attack strip — thin full-width line at the outer board edge.
-   Sibling of .board-zone (not inside it) so cards/glows cannot cover hits.
+/* Outer-edge leader bar — [Evo | HP | Super], also the attack / spell-target
+   surface. Sibling of .board-zone so cards/glows cannot cover hits.
    Visible height is --leader-attack-strip-height; finger hit is ::before. */
 .leader-attack-strip {
   flex: 0 0 var(--leader-attack-strip-height);
@@ -379,23 +379,38 @@ body.active-on-bottom.active-second .side-blue #blueHand {
   min-width: 0 !important;
   max-width: none !important;
   box-sizing: border-box;
-  border-radius: 2px !important;
+  border-radius: var(--radius-md) !important;
   position: relative;
   z-index: var(--z-leader-controls);
-  /* Hit only via ::before so the expanded pad is the sole interactive surface
-     (sabotage-provable) and the layout box can stay an 8px line. */
+  /* Hit via ::before; controls above it take their own pointer events. */
   pointer-events: none;
   cursor: default;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  font-size: 0 !important;
+  gap: var(--space-2);
+  font-size: inherit !important;
   margin: 0 !important;
-  padding: 0 !important;
-  opacity: 0.92;
+  padding: 0 var(--space-2) !important;
+  opacity: 0.96;
 }
 
-/* Hit region: strip + board-stack pad corridor + gap outset. Must not enter
+/* Controls sit above the ::before hit layer so evo drag/click is distinct
+   from leader attack / canTargetLeader. Drop hit-tests walk ancestors, so a
+   release over a button still resolves to this bar. */
+.leader-attack-strip > .evo-btn,
+.leader-attack-strip > .leader-hp-readout {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  flex: 0 0 auto;
+  /* Kill layout.css `.leader { margin: auto }` and base `button { margin }`
+     that would space-between the trio across the full bar width. */
+  margin: 0 !important;
+}
+
+/* Hit region: bar + board-stack pad corridor + gap outset. Must not enter
    .board-zone or .hand-zone rects — pad is board-stack padding, not either zone. */
 .leader-attack-strip::before {
   content: "";
@@ -639,7 +654,8 @@ body.active-second .side-red {
   );
 }
 
-/* Floating stats + leader HP/evo live inside #turnControls (right rail). */
+/* Floating stats live inside #turnControls (right rail). HP/evo live on the
+   outer-edge leader bar. */
 .floating-stats {
   max-width: var(--side-rail-width);
 }
@@ -707,13 +723,6 @@ body.active-second .side-red {
   grid-area: unset;
   grid-row: unset;
   grid-column: unset;
-}
-
-.side-rail-cluster .leader-container {
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
-  margin: 0;
 }
 
 /* No page scroll — fixed game-client shell */

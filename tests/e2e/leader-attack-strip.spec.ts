@@ -1,8 +1,8 @@
 /**
- * Leader → right rail + board-edge attack strip.
+ * Outer-edge leader bar [Evo|HP|Super] — also the attack / spell-target surface.
  *
  * Acceptance: hand row spans full content width (no card shrink); attack and
- * spell targeting resolve via the strip; sabotage-prove the strip hit target.
+ * spell targeting resolve via the bar; sabotage-prove the bar hit target.
  */
 import { test, expect, type Browser, type Page } from "@playwright/test";
 import { existsSync } from "fs";
@@ -294,14 +294,14 @@ test.describe("leader attack strip + freed hand row", () => {
       () => window.__svwbTest!.getState().players.second.hp,
     );
     const s = await page.locator("#blueBoard .card").first().boundingBox();
-    // Aim at the expanded hit pad (layout box is only the 8px visible line).
+    // Aim at the expanded hit pad (bar is 32px; ::before adds pad+outset).
     const hit = await page.evaluate(() => {
       const strip = document.getElementById("redLeader")!;
-      const cs = getComputedStyle(strip);
+      const root = getComputedStyle(document.documentElement);
       const pad =
-        parseFloat(cs.getPropertyValue("--leader-attack-hit-pad")) || 0;
+        parseFloat(root.getPropertyValue("--leader-attack-hit-pad")) || 0;
       const gap =
-        parseFloat(cs.getPropertyValue("--leader-attack-gap-outset")) || 0;
+        parseFloat(root.getPropertyValue("--leader-attack-gap-outset")) || 0;
       const r = strip.getBoundingClientRect();
       // Red default: ::before extends upward from strip bottom through pad+gap.
       const hitTop = r.bottom - (r.height + pad + gap);
@@ -314,8 +314,8 @@ test.describe("leader attack strip + freed hand row", () => {
       };
     });
     expect(s).toBeTruthy();
-    expect(hit.layoutH).toBe(8);
-    expect(hit.hitH).toBe(23);
+    expect(hit.layoutH).toBe(32);
+    expect(hit.hitH).toBe(47);
     await mouseDrag(
       page,
       s!.x + s!.width / 2,
@@ -351,7 +351,7 @@ test.describe("leader attack strip + freed hand row", () => {
     expect(after.hp).toBeLessThan(before);
   });
 
-  test("evo buttons + HP readout live in right rail; barrier host on HP", async ({
+  test("evo+HP on outer-edge leader bar; barrier host on HP; hit clears zones", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1180, height: 820 });
@@ -392,8 +392,10 @@ test.describe("leader attack strip + freed hand row", () => {
       const hitOverlapsBoard = hitBottom > boardR.top + 0.5;
       const hitOverlapsHand = hitTop < handR.bottom - 0.5;
       return {
-        evoInRail: evoR.left >= contentRight - 4,
-        hpInRail: hpR.left >= contentRight - 4,
+        evoInBar: strip.contains(evo),
+        hpInBar: strip.contains(hp),
+        evoInContent: evoR.right <= contentRight + 2,
+        hpInContent: hpR.right <= contentRight + 2,
         stripInContent: stripR.right <= contentRight + 2,
         handFullWidth:
           handR.width >=
@@ -412,16 +414,17 @@ test.describe("leader attack strip + freed hand row", () => {
       };
     });
 
-    expect(layout.evoInRail).toBe(true);
-    expect(layout.hpInRail).toBe(true);
+    expect(layout.evoInBar).toBe(true);
+    expect(layout.hpInBar).toBe(true);
+    expect(layout.evoInContent).toBe(true);
+    expect(layout.hpInContent).toBe(true);
     expect(layout.stripInContent).toBe(true);
     expect(layout.handFullWidth).toBe(true);
     expect(layout.handWidth).toBeGreaterThan(700);
     expect(layout.hpText).toBe("20");
     expect(layout.barrierOnHp).toBe(true);
-    expect(layout.barrierOnStrip).toBe(false);
-    expect(layout.stripHeight).toBe(8);
-    expect(layout.hitHeight).toBe(23);
+    expect(layout.stripHeight).toBe(32);
+    expect(layout.hitHeight).toBe(47);
     expect(layout.hitOverlapsBoard).toBe(false);
     expect(layout.hitOverlapsHand).toBe(false);
   });
@@ -455,7 +458,9 @@ test.describe("leader attack strip + freed hand row", () => {
       );
       const r = strip.getBoundingClientRect();
       const hitTop = r.bottom - (r.height + pad + gapOut);
-      return { x: r.x + r.width / 2, y: (hitTop + r.bottom) / 2 };
+      // Aim at the empty left of the bar (controls are centred) so the
+      // sabotage isolates ::before — not the Evo/HP/Super hit targets.
+      return { x: r.x + 24, y: (hitTop + r.bottom) / 2 };
     });
     expect(s1).toBeTruthy();
     await mouseDrag(
@@ -507,13 +512,13 @@ test.describe("leader attack strip + freed hand row", () => {
       const r = strip.getBoundingClientRect();
       const hitTop = r.bottom - (r.height + pad + gapOut);
       return {
-        x: r.x + r.width / 2,
+        x: r.x + 24,
         y: (hitTop + r.bottom) / 2,
         hitH: r.height + pad + gapOut,
       };
     });
     expect(s2).toBeTruthy();
-    expect(aim2.hitH).toBe(23);
+    expect(aim2.hitH).toBe(47);
     await mouseDrag(
       page,
       s2!.x + s2!.width / 2,

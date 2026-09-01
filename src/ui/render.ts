@@ -667,8 +667,8 @@ function updateCrestsUI(playerPrefix: "first" | "second", state: GameState) {
 }
 
 function renderLeaderBarrierBadge(side: Player) {
-  // Barrier badge lives on the HP readout in the right rail (not the
-  // attack strip) — circular ring styling matches the pill, not a band.
+  // Barrier badge lives on the HP readout on the outer-edge leader bar
+  // (falls back to the bar itself if the readout is missing).
   const host =
     byId(`${domPrefix(side)}LeaderHp`) ?? byId(`${domPrefix(side)}Leader`);
   if (!host) return;

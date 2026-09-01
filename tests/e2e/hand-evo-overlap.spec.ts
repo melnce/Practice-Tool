@@ -1,7 +1,7 @@
 /**
  * Regression: hand cards must not cover the red Evo button (layout + click).
- * Evo lives in the right rail (`.side-rail-cluster--red`) after the
- * leader-to-right-rail layout — selector updated to match; assertion intent
+ * Evo lives on the outer-edge leader bar (`#redLeader`) after the
+ * rail→edge-bar move — selector updated to match; assertion intent
  * unchanged (no card/evo intersection, evo clickable, hand fits).
  */
 import { test, expect, type Page } from "@playwright/test";
@@ -47,15 +47,12 @@ async function assertEvoUnobstructed(page: Page) {
   const result = await page.evaluate(() => {
     const evo = document.querySelector("#redNormalEvo") as HTMLElement | null;
     const hand = document.querySelector("#redHand");
-    const leader = document.querySelector(
-      ".side-rail-cluster--red .leader-container",
-    );
+    const leader = document.querySelector("#redLeader");
     if (!evo || !hand || !leader) {
-      throw new Error("missing evo, hand, or leader container");
+      throw new Error("missing evo, hand, or leader bar");
     }
 
     const evoRect = evo.getBoundingClientRect();
-    const leaderRect = leader.getBoundingClientRect();
     const cards = [...hand.querySelectorAll(".card")];
 
     const evoBox = {
