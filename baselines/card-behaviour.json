@@ -9993,12 +9993,12 @@
       "status": "covered"
     },
     "10932110": {
-      "fingerprint": "7b9f0af0",
+      "fingerprint": "45db5d64",
       "gatesSatisfied": [],
       "name": "Enamored Researcher",
       "scenarios": [
         {
-          "fingerprint": "869a06ec",
+          "fingerprint": "f95fbf84",
           "scenario": "play"
         },
         {
