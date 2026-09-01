@@ -544,12 +544,12 @@ for (const vp of TABLET_VIEWPORTS) {
         };
       });
 
-      // Geometry pin at 1024×768: at least one hand-card centre must be
-      // outside the container rect (otherwise this viewport no longer
-      // exercises the overflow bug).
+      // Full-width hand eliminated the 1024×768 fan-overflow precondition
+      // (card centres no longer sit outside #blueHand's rect). Pin that
+      // behaviour change explicitly — do not soft-skip. Fuse must still
+      // resolve via isPointerOverHandZone onto a card centre.
       if (vp.width === 1024 && vp.height === 768) {
-        expect(geo.anyOutside).toBe(true);
-        expect(geo.release.insideRect).toBe(false);
+        expect(geo.anyOutside).toBe(false);
       }
 
       const c2 = await page.locator("#blueHand .card").first().boundingBox();
@@ -607,10 +607,13 @@ for (const vp of TABLET_VIEWPORTS) {
         };
       });
 
-      expect(result.overflowed.length).toBeGreaterThan(0);
-      for (const s of result.overflowed) {
-        // The defect: rect says no, elementFromPoint walk says yes.
-        expect(s.insideRect).toBe(false);
+      // Full-width hand eliminated rect-overflow at 1024×768 (pin that).
+      // Invariant under test: every card centre still hits the hand via
+      // isPointerOverHandZone (the path fuse-release relies on).
+      expect(result.overflowed.length).toBe(0);
+      expect(result.samples.length).toBeGreaterThan(0);
+      for (const s of result.samples) {
+        expect(s.insideRect).toBe(true);
         expect(s.overHand).toBe(true);
       }
       await context.close();
