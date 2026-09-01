@@ -168,13 +168,13 @@
   box-shadow: var(--glow-red-soft);
 }
 
-/* Attack strip: rectangular highlight matching the band shape */
+/* Attack strip: rectangular highlight matching the thin band shape */
 .leader-attack-strip.selectable::after {
-  border-radius: var(--radius-md);
-  top: -3px;
-  left: -3px;
-  right: -3px;
-  bottom: -3px;
+  border-radius: 2px;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
 }
 
 @keyframes pulse-glow {

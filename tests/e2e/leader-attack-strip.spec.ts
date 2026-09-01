@@ -294,16 +294,34 @@ test.describe("leader attack strip + freed hand row", () => {
       () => window.__svwbTest!.getState().players.second.hp,
     );
     const s = await page.locator("#blueBoard .card").first().boundingBox();
-    const t = await page.locator("#redLeader").boundingBox();
-    expect(s && t).toBeTruthy();
-    expect(t!.height).toBeGreaterThanOrEqual(40);
-    expect(t!.height).toBeLessThanOrEqual(48);
+    // Aim at the expanded hit pad (layout box is only the 8px visible line).
+    const hit = await page.evaluate(() => {
+      const strip = document.getElementById("redLeader")!;
+      const cs = getComputedStyle(strip);
+      const pad =
+        parseFloat(cs.getPropertyValue("--leader-attack-hit-pad")) || 0;
+      const gap =
+        parseFloat(cs.getPropertyValue("--leader-attack-gap-outset")) || 0;
+      const r = strip.getBoundingClientRect();
+      // Red default: ::before extends upward from strip bottom through pad+gap.
+      const hitTop = r.bottom - (r.height + pad + gap);
+      const hitBottom = r.bottom;
+      return {
+        x: r.x + r.width / 2,
+        y: (hitTop + hitBottom) / 2,
+        layoutH: r.height,
+        hitH: r.height + pad + gap,
+      };
+    });
+    expect(s).toBeTruthy();
+    expect(hit.layoutH).toBe(8);
+    expect(hit.hitH).toBe(23);
     await mouseDrag(
       page,
       s!.x + s!.width / 2,
       s!.y + s!.height / 2,
-      t!.x + t!.width / 2,
-      t!.y + t!.height / 2,
+      hit.x,
+      hit.y,
     );
     await page.waitForTimeout(300);
     const after = await page.evaluate(
@@ -352,15 +370,27 @@ test.describe("leader attack strip + freed hand row", () => {
       const hp = document.getElementById("redLeaderHp")!;
       const strip = document.getElementById("redLeader")!;
       const hand = document.getElementById("redHand")!;
+      const board = document.getElementById("redBoard")!;
       const app = document.getElementById("appRoot")!;
       const evoR = evo.getBoundingClientRect();
       const hpR = hp.getBoundingClientRect();
       const stripR = strip.getBoundingClientRect();
       const handR = hand.getBoundingClientRect();
+      const boardR = board.getBoundingClientRect();
       const appR = app.getBoundingClientRect();
       const cs = getComputedStyle(app);
+      const root = getComputedStyle(document.documentElement);
+      const pad = parseFloat(root.getPropertyValue("--leader-attack-hit-pad"));
+      const gapOut = parseFloat(
+        root.getPropertyValue("--leader-attack-gap-outset"),
+      );
       const padRight = parseFloat(cs.paddingRight) || 0;
       const contentRight = appR.right - padRight;
+      // Red default: hit extends upward from strip.bottom
+      const hitTop = stripR.bottom - (stripR.height + pad + gapOut);
+      const hitBottom = stripR.bottom;
+      const hitOverlapsBoard = hitBottom > boardR.top + 0.5;
+      const hitOverlapsHand = hitTop < handR.bottom - 0.5;
       return {
         evoInRail: evoR.left >= contentRight - 4,
         hpInRail: hpR.left >= contentRight - 4,
@@ -374,6 +404,11 @@ test.describe("leader attack strip + freed hand row", () => {
         barrierOnHp: hp.classList.contains("has-leader-barrier"),
         barrierOnStrip: strip.classList.contains("has-leader-barrier"),
         stripHeight: stripR.height,
+        hitHeight: stripR.height + pad + gapOut,
+        hitOverlapsBoard,
+        hitOverlapsHand,
+        hpW: hpR.width,
+        hpH: hpR.height,
       };
     });
 
@@ -385,7 +420,10 @@ test.describe("leader attack strip + freed hand row", () => {
     expect(layout.hpText).toBe("20");
     expect(layout.barrierOnHp).toBe(true);
     expect(layout.barrierOnStrip).toBe(false);
-    expect(layout.stripHeight).toBe(44);
+    expect(layout.stripHeight).toBe(8);
+    expect(layout.hitHeight).toBe(23);
+    expect(layout.hitOverlapsBoard).toBe(false);
+    expect(layout.hitOverlapsHand).toBe(false);
   });
 
   test("sabotage-prove: breaking strip hit target fails attack; restore passes", async ({
@@ -394,29 +432,38 @@ test.describe("leader attack strip + freed hand row", () => {
     await page.setViewportSize({ width: 1180, height: 820 });
     await seedAttackSetup(page);
 
-    // Sabotage: pointer-events none + zero size — elementFromPoint cannot hit
+    // Sabotage: disable the ::before hit pad (pointer-events:none on pseudo)
     await page.evaluate(() => {
-      const strip = document.getElementById("redLeader")!;
-      strip.style.pointerEvents = "none";
-      strip.style.height = "0px";
-      strip.style.minHeight = "0px";
-      strip.style.flexBasis = "0px";
-      strip.style.opacity = "0";
+      const style = document.createElement("style");
+      style.id = "sabotage-strip-hit";
+      style.textContent = `
+        .leader-attack-strip::before { pointer-events: none !important; }
+      `;
+      document.head.appendChild(style);
     });
 
     const beforeSab = await page.evaluate(
       () => window.__svwbTest!.getState().players.second.hp,
     );
     const s1 = await page.locator("#blueBoard .card").first().boundingBox();
-    // Aim at where the strip used to be (top of red board outer edge)
-    const board = await page.locator("#redBoard").boundingBox();
-    expect(s1 && board).toBeTruthy();
+    const aim = await page.evaluate(() => {
+      const strip = document.getElementById("redLeader")!;
+      const root = getComputedStyle(document.documentElement);
+      const pad = parseFloat(root.getPropertyValue("--leader-attack-hit-pad"));
+      const gapOut = parseFloat(
+        root.getPropertyValue("--leader-attack-gap-outset"),
+      );
+      const r = strip.getBoundingClientRect();
+      const hitTop = r.bottom - (r.height + pad + gapOut);
+      return { x: r.x + r.width / 2, y: (hitTop + r.bottom) / 2 };
+    });
+    expect(s1).toBeTruthy();
     await mouseDrag(
       page,
       s1!.x + s1!.width / 2,
       s1!.y + s1!.height / 2,
-      board!.x + board!.width / 2,
-      board!.y - 22,
+      aim.x,
+      aim.y,
     );
     await page.waitForTimeout(300);
     const afterSab = await page.evaluate(
@@ -426,17 +473,12 @@ test.describe("leader attack strip + freed hand row", () => {
       beforeSab,
     );
     console.log(
-      `SABOTAGE_FAIL_PROOF: attack with pointer-events:none strip → HP unchanged (${beforeSab}→${afterSab})`,
+      `SABOTAGE_FAIL_PROOF: attack with ::before pointer-events:none → HP unchanged (${beforeSab}→${afterSab})`,
     );
 
     // Restore
     await page.evaluate(() => {
-      const strip = document.getElementById("redLeader")!;
-      strip.style.pointerEvents = "";
-      strip.style.height = "";
-      strip.style.minHeight = "";
-      strip.style.flexBasis = "";
-      strip.style.opacity = "";
+      document.getElementById("sabotage-strip-hit")?.remove();
       window.__svwbTest!.render();
     });
     // Re-arm attacker (render may reset flags — force attackable)
@@ -455,15 +497,29 @@ test.describe("leader attack strip + freed hand row", () => {
       () => window.__svwbTest!.getState().players.second.hp,
     );
     const s2 = await page.locator("#blueBoard .card").first().boundingBox();
-    const t2 = await page.locator("#redLeader").boundingBox();
-    expect(s2 && t2).toBeTruthy();
-    expect(t2!.height).toBeGreaterThanOrEqual(40);
+    const aim2 = await page.evaluate(() => {
+      const strip = document.getElementById("redLeader")!;
+      const root = getComputedStyle(document.documentElement);
+      const pad = parseFloat(root.getPropertyValue("--leader-attack-hit-pad"));
+      const gapOut = parseFloat(
+        root.getPropertyValue("--leader-attack-gap-outset"),
+      );
+      const r = strip.getBoundingClientRect();
+      const hitTop = r.bottom - (r.height + pad + gapOut);
+      return {
+        x: r.x + r.width / 2,
+        y: (hitTop + r.bottom) / 2,
+        hitH: r.height + pad + gapOut,
+      };
+    });
+    expect(s2).toBeTruthy();
+    expect(aim2.hitH).toBe(23);
     await mouseDrag(
       page,
       s2!.x + s2!.width / 2,
       s2!.y + s2!.height / 2,
-      t2!.x + t2!.width / 2,
-      t2!.y + t2!.height / 2,
+      aim2.x,
+      aim2.y,
     );
     await page.waitForTimeout(300);
     const afterOk = await page.evaluate(
@@ -473,7 +529,7 @@ test.describe("leader attack strip + freed hand row", () => {
       beforeOk,
     );
     console.log(
-      `SABOTAGE_PASS_PROOF: attack with restored strip → HP dropped (${beforeOk}→${afterOk})`,
+      `SABOTAGE_PASS_PROOF: attack with restored ::before hit → HP dropped (${beforeOk}→${afterOk})`,
     );
   });
 });
@@ -503,8 +559,16 @@ test.describe("leader strip touch + row orientations", () => {
       await seedAttackSetup(page);
       if (flipped) {
         await page.evaluate(() => {
+          localStorage.setItem("svwb.activeOnBottom", "1");
+          window.__svwbTest!.render();
+          // Layout swap selector is active-on-bottom.active-second; keep
+          // state.activePlayer=first so the attack stays legal.
           document.body.classList.add("active-on-bottom", "active-second");
-          // Keep first player active for the attack; flip is visual only here
+          document.body.classList.remove("active-first");
+        });
+      } else {
+        await page.evaluate(() => {
+          localStorage.setItem("svwb.activeOnBottom", "0");
           window.__svwbTest!.render();
         });
       }
@@ -512,14 +576,31 @@ test.describe("leader strip touch + row orientations", () => {
         () => window.__svwbTest!.getState().players.second.hp,
       );
       const s = await page.locator("#blueBoard .card").first().boundingBox();
-      const t = await page.locator("#redLeader").boundingBox();
-      expect(s && t).toBeTruthy();
+      const aim = await page.evaluate((flipped) => {
+        const strip = document.getElementById("redLeader")!;
+        const root = getComputedStyle(document.documentElement);
+        const pad = parseFloat(
+          root.getPropertyValue("--leader-attack-hit-pad"),
+        );
+        const gapOut = parseFloat(
+          root.getPropertyValue("--leader-attack-gap-outset"),
+        );
+        const r = strip.getBoundingClientRect();
+        // Default red: hit above strip bottom. Flipped red (bottom): hit below strip top.
+        if (flipped) {
+          const hitBottom = r.top + r.height + pad + gapOut;
+          return { x: r.x + r.width / 2, y: (r.top + hitBottom) / 2 };
+        }
+        const hitTop = r.bottom - (r.height + pad + gapOut);
+        return { x: r.x + r.width / 2, y: (hitTop + r.bottom) / 2 };
+      }, flipped);
+      expect(s).toBeTruthy();
       await cdpTouchDrag(
         page,
         s!.x + s!.width / 2,
         s!.y + s!.height / 2,
-        t!.x + t!.width / 2,
-        t!.y + t!.height / 2,
+        aim.x,
+        aim.y,
       );
       await page.waitForTimeout(300);
       const after = await page.evaluate(
