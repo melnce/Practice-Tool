@@ -90,6 +90,7 @@ export function applyFilters(
   if (cond.damaged != null) sharedCond.damaged = cond.damaged;
   if (cond.did_not_attack_this_turn)
     sharedCond.did_not_attack_this_turn = cond.did_not_attack_this_turn;
+  if (cond.name) sharedCond.name = cond.name;
 
   // Apply shared conditions via unified evaluator
   if (Object.keys(sharedCond).length > 0) {

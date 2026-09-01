@@ -6988,16 +6988,10 @@
       "status": "covered"
     },
     "10632310": {
-      "fingerprint": "e11a9204",
-      "gatesSatisfied": [],
+      "detail": "Spell requires a target but none are available.",
       "name": "Reaved Order",
-      "scenarios": [
-        {
-          "fingerprint": "4c3c1210",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10633110": {
       "fingerprint": "31f103d4",
@@ -9993,7 +9987,7 @@
       "status": "covered"
     },
     "10932110": {
-      "fingerprint": "7b9f0af0",
+      "fingerprint": "d673a509",
       "gatesSatisfied": [],
       "name": "Enamored Researcher",
       "scenarios": [
@@ -10002,7 +9996,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "d0bd81ac",
+          "fingerprint": "ad31a184",
           "scenario": "evolve"
         }
       ],
@@ -10627,13 +10621,13 @@
       "status": "covered"
     }
   },
-  "covered": 770,
+  "covered": 769,
   "partial": 26,
   "seed": 42,
   "skipReasons": {
-    "play_blocked": 15
+    "play_blocked": 16
   },
-  "skipped": 15,
+  "skipped": 16,
   "unmetGateCounts": {
     "ally_matches": 4,
     "board_name": 1,
