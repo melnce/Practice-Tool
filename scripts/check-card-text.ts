@@ -26,6 +26,7 @@ import { checkOpKeysForCard } from "./op-keys-gate.js";
 import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceReplacesFanfareForCard } from "./enhance-replaces-fanfare-gate.js";
+import { checkAdditiveEnhanceForCard } from "./additive-enhance-gate.js";
 import {
   getImplementationStatus,
   type ImplementationStatus,
@@ -1476,6 +1477,9 @@ function main() {
   const gateEnhanceReplacesFanfare =
     process.argv.includes("--gate=enhance-replaces-fanfare") ||
     process.argv.includes("--gate=enhance_replaces_fanfare");
+  const gateAdditiveEnhance =
+    process.argv.includes("--gate=additive-enhance") ||
+    process.argv.includes("--gate=additive_enhance");
   const gateMode =
     gateAddToHand ||
     gateStatOp ||
@@ -1483,7 +1487,8 @@ function main() {
     gateOpKeys ||
     gateDurationOp ||
     gateSelectTarget ||
-    gateEnhanceReplacesFanfare;
+    gateEnhanceReplacesFanfare ||
+    gateAdditiveEnhance;
 
   const files = listSetFiles(setArg);
   const allIssues: Issue[] = [];
@@ -1510,7 +1515,9 @@ function main() {
                 ? "🔍 Checking select-target pool contracts...\n"
                 : gateEnhanceReplacesFanfare
                   ? "🔍 Checking enhance_replaces_fanfare contracts...\n"
-                  : "🔍 Checking card description ↔ JSON structure...\n",
+                  : gateAdditiveEnhance
+                    ? "🔍 Checking additive Enhance base-op inclusion...\n"
+                    : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
@@ -1526,6 +1533,8 @@ function main() {
         if (gateSelectTarget) allIssues.push(...checkSelectTargetForCard(card));
         if (gateEnhanceReplacesFanfare)
           allIssues.push(...checkEnhanceReplacesFanfareForCard(card));
+        if (gateAdditiveEnhance)
+          allIssues.push(...checkAdditiveEnhanceForCard(card));
       } else {
         allIssues.push(...checkCard(card));
         allHints.push(...clauseHintsForCard(card));
@@ -1612,7 +1621,9 @@ function main() {
                   ? `✅ ${cardCount} cards — selected targets always have a parent select.\n`
                   : gateEnhanceReplacesFanfare
                     ? `✅ ${cardCount} cards — enhance_replaces_fanfare contracts hold.\n`
-                    : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+                    : gateAdditiveEnhance
+                      ? `✅ ${cardCount} cards — additive Enhance tiers re-include base ops.\n`
+                      : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(

@@ -6856,12 +6856,12 @@
       "status": "covered"
     },
     "10622310": {
-      "fingerprint": "b432a305",
+      "fingerprint": "7b9ce398",
       "gatesSatisfied": [],
       "name": "Majestic Conquest",
       "scenarios": [
         {
-          "fingerprint": "d3c2b50c",
+          "fingerprint": "50eb1cc0",
           "scenario": "play"
         }
       ],
@@ -8860,12 +8860,12 @@
       "status": "covered"
     },
     "10822310": {
-      "fingerprint": "7c40bbc0",
+      "fingerprint": "963cdc70",
       "gatesSatisfied": [],
       "name": "Shared Existence",
       "scenarios": [
         {
-          "fingerprint": "5b91f624",
+          "fingerprint": "c3d1a3c0",
           "scenario": "play"
         }
       ],
@@ -10107,12 +10107,12 @@
       "status": "covered"
     },
     "10941310": {
-      "fingerprint": "d8c18cd7",
+      "fingerprint": "54b72468",
       "gatesSatisfied": [],
       "name": "Drake Whelp's Tantrum",
       "scenarios": [
         {
-          "fingerprint": "01a8ce14",
+          "fingerprint": "1ac1d7b8",
           "scenario": "play"
         }
       ],

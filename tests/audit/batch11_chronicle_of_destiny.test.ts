@@ -337,4 +337,26 @@ describe("Set 10008 — Chronicle of Destiny", () => {
     whenPlayCard("first", 0);
     expect(getEvoCharges(state, "first")).toBe(1);
   });
+
+  it("Shared Existence — -10/-10 highest enemy at base; Enhance (6) also summons 3 Wretches", () => {
+    setupTurn(6, { hand: ["10822310"], pp: 4 });
+    const baseFoe = enemyFollower(5, 3, "Bruiser");
+    whenPlayCard("first", 0);
+    expect(baseFoe.attack).toBeLessThanOrEqual(-5);
+    expect(baseFoe.defense).toBeLessThanOrEqual(-7);
+    cleanupDead();
+    expect(findOnBoard("second", "Bruiser")).toBeFalsy();
+
+    resetUidCounter();
+    setupTurn(6, { hand: ["10822310"], pp: 6 });
+    const enhanceFoe = enemyFollower(5, 3, "Bruiser");
+    whenPlayCard("first", 0);
+    expect(enhanceFoe.attack).toBeLessThanOrEqual(-5);
+    expect(enhanceFoe.defense).toBeLessThanOrEqual(-7);
+    cleanupDead();
+    expect(findOnBoard("second", "Bruiser")).toBeFalsy();
+    expect(
+      getBoard(state, "first").filter((c) => c.name === "Wretch"),
+    ).toHaveLength(3);
+  });
 });

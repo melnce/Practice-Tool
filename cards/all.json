@@ -22829,6 +22829,27 @@
         "effects": [
           {
             "op": "crest",
+            "action": "gain",
+            "name": "Majestic Conquest",
+            "image": "images/crests/majestic_conquest.png",
+            "description": "Countdown (2)\nWhenever you play an Enhanced card, summon a Fearless Soldier.",
+            "countdown": 2,
+            "triggers": [
+              {
+                "event": "enhanced_play",
+                "effects": [
+                  {
+                    "op": "summon",
+                    "source": "named",
+                    "name": "Fearless Soldier",
+                    "count": 1
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "crest",
             "action": "delay_countdown",
             "name": "Majestic Conquest",
             "amount": 2
@@ -29966,6 +29987,17 @@
         "cost": 6,
         "effects": [
           {
+            "op": "stat",
+            "action": "give",
+            "target": "enemy:follower",
+            "attack": -10,
+            "defense": -10,
+            "distribution": "highest",
+            "stat": "attack",
+            "pick": "random",
+            "select": 1
+          },
+          {
             "op": "summon",
             "source": "named",
             "name": "Wretch",
@@ -34228,6 +34260,12 @@
         "name": "Enhance",
         "cost": 3,
         "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Fire Drake Whelp",
+            "count": 1
+          },
           {
             "op": "damage",
             "target": "enemy:follower",
