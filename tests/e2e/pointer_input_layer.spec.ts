@@ -544,13 +544,12 @@ for (const vp of TABLET_VIEWPORTS) {
         };
       });
 
-      // Geometry note at 1024×768: before the hand-row freefill, at least one
-      // card centre sat outside #blueHand's rect (overflow fan). With the
-      // full-width hand that overflow may no longer occur — fuse must still
-      // resolve via isPointerOverHandZone either way. Prefer an outside
-      // centre when one exists; otherwise release onto a card centre.
-      if (vp.width === 1024 && vp.height === 768 && geo.anyOutside) {
-        expect(geo.release.insideRect).toBe(false);
+      // Full-width hand eliminated the 1024×768 fan-overflow precondition
+      // (card centres no longer sit outside #blueHand's rect). Pin that
+      // behaviour change explicitly — do not soft-skip. Fuse must still
+      // resolve via isPointerOverHandZone onto a card centre.
+      if (vp.width === 1024 && vp.height === 768) {
+        expect(geo.anyOutside).toBe(false);
       }
 
       const c2 = await page.locator("#blueHand .card").first().boundingBox();
@@ -608,16 +607,13 @@ for (const vp of TABLET_VIEWPORTS) {
         };
       });
 
-      // Before the hand-row freefill, 1024×768 pinned overflowed card centres
-      // (rect says outside, elementFromPoint walk says inside). With a
-      // full-width hand that overflow may be gone — still require every card
-      // centre to resolve as inside the hand via isPointerOverHandZone.
+      // Full-width hand eliminated rect-overflow at 1024×768 (pin that).
+      // Invariant under test: every card centre still hits the hand via
+      // isPointerOverHandZone (the path fuse-release relies on).
+      expect(result.overflowed.length).toBe(0);
       expect(result.samples.length).toBeGreaterThan(0);
       for (const s of result.samples) {
-        expect(s.overHand).toBe(true);
-      }
-      for (const s of result.overflowed) {
-        expect(s.insideRect).toBe(false);
+        expect(s.insideRect).toBe(true);
         expect(s.overHand).toBe(true);
       }
       await context.close();
