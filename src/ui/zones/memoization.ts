@@ -35,9 +35,41 @@ type CardArgs = {
   counters: string;
   keywordsLen: number;
   kwStateHash: string;
+  /** Runtime keyword flags overlays / board glow actually read. Fixed-length 0/1. */
+  overlayFlagHash: string;
   countdown: number;
   idx: number;
 };
+
+/**
+ * Hash of runtime keyword flags that flip without changing printed
+ * `keywords.length` or combat stats. Derived from branches in
+ * `applyBarrierOverlay` / `applyKeywordOverlays`, plus hasStorm/hasRush
+ * (board attack glow in the view model). `keywordState.cantAttack` is
+ * already in kwStateHash; cantAttackUntilOpponentEOT is not.
+ *
+ * Cost: 14 boolean coercions + one string concat + one string compare
+ * per card per render. No JSON.stringify, no per-field objects.
+ */
+function buildOverlayFlagHash(card: CardInstance): string {
+  const ks = card.keywordState || {};
+  return (
+    (card.hasBarrier ? "1" : "0") +
+    (card.hasWard ? "1" : "0") +
+    (card.hasBane ? "1" : "0") +
+    (card.hasAmbush ? "1" : "0") +
+    (card.hasAura ? "1" : "0") +
+    (card.hasStorm ? "1" : "0") +
+    (card.hasRush ? "1" : "0") +
+    (card.hasDrain ? "1" : "0") +
+    (card.hasIntimidate ? "1" : "0") +
+    (card.hasCantAttack ? "1" : "0") +
+    (ks.cantAttackUntilOpponentEOT ? "1" : "0") +
+    (card.hasLastWords ? "1" : "0") +
+    (card.hasOngoing ? "1" : "0") +
+    (card.cannotBeDestroyed ? "1" : "0")
+  );
+}
 
 const vmCache = new WeakMap<CardInstance, CacheEntry>();
 
@@ -121,6 +153,8 @@ function isCardSame(
   const ksHash = `${ks.engagedThisTurn ?? "f"}|${ks.cantAttack ?? "f"}|${ks.engageCost ?? ""}`;
   if (prev.kwStateHash !== ksHash) return false;
 
+  if (prev.overlayFlagHash !== buildOverlayFlagHash(card)) return false;
+
   // Counters
   const currCounters = card.counters ? JSON.stringify(card.counters) : "";
   if (prev.counters !== currCounters) return false;
@@ -181,6 +215,7 @@ export function getMemoizedViewModel(
       countdown: Number(card.countdown ?? -1),
       keywordsLen: card.keywords?.length ?? 0,
       kwStateHash: `${ks.engagedThisTurn ?? "f"}|${ks.cantAttack ?? "f"}|${ks.engageCost ?? ""}`,
+      overlayFlagHash: buildOverlayFlagHash(card),
       counters: card.counters ? JSON.stringify(card.counters) : "",
       idx,
     },
