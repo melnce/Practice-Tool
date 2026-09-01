@@ -9987,12 +9987,12 @@
       "status": "covered"
     },
     "10932110": {
-      "fingerprint": "d673a509",
+      "fingerprint": "b0eed93c",
       "gatesSatisfied": [],
       "name": "Enamored Researcher",
       "scenarios": [
         {
-          "fingerprint": "869a06ec",
+          "fingerprint": "f95fbf84",
           "scenario": "play"
         },
         {

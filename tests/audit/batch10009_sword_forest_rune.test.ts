@@ -347,6 +347,17 @@ describe("Set 10009 — Runecraft", () => {
     expect(subj.hasBane).toBe(true);
   });
 
+  it("Enamored Researcher — Enhance (8) summons 3 with Ward instead of Fanfare", () => {
+    setupTurn(R8, { hand: ["10932110"], pp: 8 });
+    whenPlayCard("first", 0);
+    const subjects = thenBoard("first").filter(
+      (c) => c.name === "Obsessed Test Subject",
+    );
+    expect(subjects.length).toBe(3);
+    expect(subjects.every((c) => c.hasWard === true)).toBe(true);
+    expect(thenBoard("first").length).toBe(4);
+  });
+
   it("Noble Philosopher — returns hand to deck and draws equal count", () => {
     setupTurn(R6, {
       hand: ["10932120", FILLER, FILLER],
