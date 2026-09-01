@@ -11,9 +11,18 @@
   --game-bar-row-height: auto;
   --leader-bar-size: 52px;
   --leader-bar-width: calc(var(--leader-bar-size) * 2.75);
-  /* 44px: finger-sized hit target (common touch minimum); sibling of
-     board-zone so board cards/glows cannot cover it. */
-  --leader-attack-strip-height: 44px;
+  /* Compact rail HP badge (number + padding); was leader-bar-width × size. */
+  --leader-hp-badge-height: 32px;
+  --leader-hp-badge-min-width: 2.75em;
+  /* Visible attack band — thin line at the board's outer border.
+     Layout height is this value only; finger hit comes from ::before + pad. */
+  --leader-attack-strip-height: 8px;
+  /* Transparent corridor toward the hand (inside .board-stack, outside
+     .board-zone / .hand-zone). Natural row-gap slack is only ~4px; without
+     this pad a safe hit region would be ~12px — too small for tablet. */
+  --leader-attack-hit-pad: 28px;
+  /* Expand hit into the side row-gap (measured 4px); stay strictly inside. */
+  --leader-attack-gap-outset: 3px;
   --hand-scale-top: 0.72;
   --hand-scale-bottom: 1;
   --board-card-scale: 1.12;
@@ -153,18 +162,28 @@ html {
 
 .side-red .board-stack {
   flex-direction: column; /* DOM: strip, board → strip on top */
+  padding-top: var(--leader-attack-hit-pad);
+  padding-bottom: 0;
+  box-sizing: border-box;
 }
 
 .side-blue .board-stack {
   flex-direction: column; /* DOM: board, strip → strip on bottom */
+  padding-top: 0;
+  padding-bottom: var(--leader-attack-hit-pad);
+  box-sizing: border-box;
 }
 
 body.active-on-bottom.active-second .side-blue .board-stack {
   flex-direction: column-reverse; /* blue on top → strip on top */
+  padding-top: var(--leader-attack-hit-pad);
+  padding-bottom: 0;
 }
 
 body.active-on-bottom.active-second .side-red .board-stack {
   flex-direction: column-reverse; /* red on bottom → strip on bottom */
+  padding-top: 0;
+  padding-bottom: var(--leader-attack-hit-pad);
 }
 
 .side-red #redBoard,
@@ -315,17 +334,22 @@ body.active-on-bottom.active-second .side-blue #blueHand {
 
 #turnControls .leader-hp-readout,
 .side .leader-hp-readout {
-  width: var(--leader-bar-width) !important;
-  height: var(--leader-bar-size) !important;
-  min-width: var(--leader-bar-width);
-  max-height: var(--leader-bar-size);
+  width: auto !important;
+  min-width: var(--leader-hp-badge-min-width) !important;
+  max-width: none;
+  height: var(--leader-hp-badge-height) !important;
+  max-height: var(--leader-hp-badge-height) !important;
+  padding: 2px 10px !important;
+  box-sizing: border-box !important;
   border-radius: var(--radius-pill) !important;
-  font-size: var(--font-size-xl) !important;
+  border-width: 2px !important;
+  font-size: var(--font-size-lg) !important;
+  outline-width: 2px;
 }
 
-/* Leader attack strip — thin full-width band at the outer board edge.
+/* Leader attack strip — thin full-width line at the outer board edge.
    Sibling of .board-zone (not inside it) so cards/glows cannot cover hits.
-   Height is a finger target; pointer-events stay auto. */
+   Visible height is --leader-attack-strip-height; finger hit is ::before. */
 .leader-attack-strip {
   flex: 0 0 var(--leader-attack-strip-height);
   width: 100% !important;
@@ -335,10 +359,12 @@ body.active-on-bottom.active-second .side-blue #blueHand {
   min-width: 0 !important;
   max-width: none !important;
   box-sizing: border-box;
-  border-radius: var(--radius-md) !important;
+  border-radius: 2px !important;
   position: relative;
   z-index: var(--z-leader-controls);
-  pointer-events: auto;
+  /* Hit only via ::before so the expanded pad is the sole interactive surface
+     (sabotage-provable) and the layout box can stay an 8px line. */
+  pointer-events: none;
   cursor: default;
   display: flex;
   align-items: center;
@@ -349,25 +375,76 @@ body.active-on-bottom.active-second .side-blue #blueHand {
   opacity: 0.92;
 }
 
+/* Hit region: strip + board-stack pad corridor + gap outset. Must not enter
+   .board-zone or .hand-zone rects — pad is board-stack padding, not either zone. */
+.leader-attack-strip::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 1;
+  background: transparent;
+}
+
+/* Default: red strip on top → hit extends up into padding-top; blue below → down */
+.side-red .leader-attack-strip::before {
+  bottom: 0;
+  top: auto;
+  height: calc(
+    var(--leader-attack-strip-height) + var(--leader-attack-hit-pad) +
+      var(--leader-attack-gap-outset)
+  );
+}
+
+.side-blue .leader-attack-strip::before {
+  top: 0;
+  bottom: auto;
+  height: calc(
+    var(--leader-attack-strip-height) + var(--leader-attack-hit-pad) +
+      var(--leader-attack-gap-outset)
+  );
+}
+
+/* Flipped: blue on top / red on bottom — hit still toward the hand. */
+body.active-on-bottom.active-second .side-blue .leader-attack-strip::before {
+  bottom: 0;
+  top: auto;
+  height: calc(
+    var(--leader-attack-strip-height) + var(--leader-attack-hit-pad) +
+      var(--leader-attack-gap-outset)
+  );
+}
+
+body.active-on-bottom.active-second .side-red .leader-attack-strip::before {
+  top: 0;
+  bottom: auto;
+  height: calc(
+    var(--leader-attack-strip-height) + var(--leader-attack-hit-pad) +
+      var(--leader-attack-gap-outset)
+  );
+}
+
 .leader-attack-strip.red-leader {
   background: linear-gradient(
     90deg,
-    rgba(255, 92, 92, 0.12),
-    rgba(255, 92, 92, 0.35),
-    rgba(255, 92, 92, 0.12)
+    rgba(255, 92, 92, 0.18),
+    rgba(255, 92, 92, 0.55),
+    rgba(255, 92, 92, 0.18)
   ) !important;
-  border: 2px solid var(--leader-red-ring) !important;
+  border: 1px solid var(--leader-red-ring) !important;
   outline: none;
 }
 
 .leader-attack-strip.blue-leader {
   background: linear-gradient(
     90deg,
-    rgba(74, 140, 255, 0.12),
-    rgba(74, 140, 255, 0.35),
-    rgba(74, 140, 255, 0.12)
+    rgba(74, 140, 255, 0.18),
+    rgba(74, 140, 255, 0.55),
+    rgba(74, 140, 255, 0.18)
   ) !important;
-  border: 2px solid var(--leader-blue-ring) !important;
+  border: 1px solid var(--leader-blue-ring) !important;
   outline: none;
 }
 
@@ -377,7 +454,8 @@ body.active-on-bottom.active-second .side-blue #blueHand {
 
 #turnControls .hp-value,
 .side .hp-value {
-  font-size: var(--font-size-xl) !important;
+  font-size: var(--font-size-lg) !important;
+  line-height: 1;
 }
 
 #turnControls .evo-btn,
