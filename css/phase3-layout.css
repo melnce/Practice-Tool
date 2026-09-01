@@ -258,6 +258,63 @@ body.active-on-bottom.active-second .side-red .hand-zone {
   --hand-local-scale: var(--hand-scale-bottom);
 }
 
+/*
+ * Tablet-class viewports: shrink high-count hands so each card keeps a ≥24px
+ * hit-testable strip. Derived from measured hand content width (cqw) at
+ * 1180×820 with --card-width 108px (below the 1440px token bump):
+ *
+ *   bottom (base scale 1, cqw≈244.44):
+ *     N=9 → s≤0.467 for 24px; use 0.45 → ≈24.2px
+ *     N=8 → s≤0.689 for 24px; use 0.67 → ≈24.3px
+ *     N=7 → s≤0.912 for 24px; use 0.90 → ≈24.2px  (measured shortfall 22.4px)
+ *   top (base scale 0.72, cqw≈248.44):
+ *     N=9 → s≤0.504 for 24px; use 0.48 → ≈24.3px
+ *     N=8 already ≈24.1px at 0.72 — no override
+ *     N=7 already ≈28.1px at 0.72 — no override
+ *
+ * Desktop (≥1440px / 1920×1080) is untouched — min strip stays ≈60–63px.
+ * Specificity beats the side scale rules above via :has(.card:nth-child(N)).
+ */
+@media (max-width: 1439px) {
+  /* Bottom-row (full-scale) hand — counts that fall short of 24px */
+  body:not(.active-on-bottom.active-second)
+    .side-blue
+    .hand-zone:has(.card:nth-child(7)):not(:has(.card:nth-child(8))),
+  body.active-on-bottom.active-second
+    .side-red
+    .hand-zone:has(.card:nth-child(7)):not(:has(.card:nth-child(8))) {
+    --hand-local-scale: 0.9;
+  }
+
+  body:not(.active-on-bottom.active-second)
+    .side-blue
+    .hand-zone:has(.card:nth-child(8)):not(:has(.card:nth-child(9))),
+  body.active-on-bottom.active-second
+    .side-red
+    .hand-zone:has(.card:nth-child(8)):not(:has(.card:nth-child(9))) {
+    --hand-local-scale: 0.67;
+  }
+
+  body:not(.active-on-bottom.active-second)
+    .side-blue
+    .hand-zone:has(.card:nth-child(9)),
+  body.active-on-bottom.active-second
+    .side-red
+    .hand-zone:has(.card:nth-child(9)) {
+    --hand-local-scale: 0.45;
+  }
+
+  /* Top-row (already scaled) hand — only N=9 falls short */
+  body:not(.active-on-bottom.active-second)
+    .side-red
+    .hand-zone:has(.card:nth-child(9)),
+  body.active-on-bottom.active-second
+    .side-blue
+    .hand-zone:has(.card:nth-child(9)) {
+    --hand-local-scale: 0.48;
+  }
+}
+
 .hand-zone {
   transform-origin: bottom center;
 }
