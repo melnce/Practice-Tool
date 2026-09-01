@@ -33795,6 +33795,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10932110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10932110-enamored-researcher",
+    "enhance_replaces_fanfare": true,
     "evolve": [
       {
         "op": "stat",
