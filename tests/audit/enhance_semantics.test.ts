@@ -24,6 +24,7 @@ import {
   getPP,
   getCrests,
 } from "../../src/core/playerHelpers.js";
+import { grantBarrier } from "../../src/logic/core/barrier.js";
 import "../../src/logic/core/effects/index.js";
 
 function setupTurn(
@@ -103,25 +104,37 @@ describe("Enhance semantics unify", () => {
   });
 
   describe("10923310 L'Age d'Or — flag-added instead (not cap-maskable)", () => {
-    it("base (4 PP): summons exactly 1 Flag; deals 2 to all enemy followers", () => {
+    it("base (4 PP): 1 Flag; one instance of 2 (Barrier absorbs; non-Barrier 6→4)", () => {
       setupTurn(6, { hand: ["10923310"], pp: 4 });
-      const foe = enemyFollower(2, 6, "Wall");
+      const shielded = enemyFollower(2, 6, "BarrierWall");
+      grantBarrier(shielded);
+      const open = enemyFollower(2, 6, "OpenWall");
       whenPlayCard("first", 0);
       expect(
         thenBoard("first").filter((c) => c.name === "Dread Pirate's Flag"),
       ).toHaveLength(1);
-      expect(Number(foe.defense)).toBe(4);
+      // One instance of 2: Barrier eats the whole hit.
+      expect(Number(shielded.defense)).toBe(6);
+      expect(shielded.hasBarrier).toBe(false);
+      expect(Number(open.defense)).toBe(4);
     });
 
-    it("Enhance (6): summons exactly 2 Flags; deals 4 once (not 2+4)", () => {
-      // Replace → 2 flags, foe 6→2. Additive would be 3 flags and 6→0.
+    it("Enhance (6): 2 Flags; one instance of 4 (not 2+2, not 2-then-4)", () => {
+      // Owner: "instead deal 4 damage... that should happen all at once not 2x2".
+      // Replace → 2 flags + one hit of 4. Additive would be 3 flags and 2 then 4
+      // (Barrier follower ends at 2, open at 0) or 2+2 (Barrier ends at 4).
       setupTurn(6, { hand: ["10923310"], pp: 6 });
-      const foe = enemyFollower(2, 6, "Wall");
+      const shielded = enemyFollower(2, 6, "BarrierWall");
+      grantBarrier(shielded);
+      const open = enemyFollower(2, 6, "OpenWall");
       whenPlayCard("first", 0);
       expect(
         thenBoard("first").filter((c) => c.name === "Dread Pirate's Flag"),
       ).toHaveLength(2);
-      expect(Number(foe.defense)).toBe(2);
+      // One instance of 4: Barrier absorbs entirely; open takes the full 4.
+      expect(Number(shielded.defense)).toBe(6);
+      expect(shielded.hasBarrier).toBe(false);
+      expect(Number(open.defense)).toBe(2);
     });
   });
 
