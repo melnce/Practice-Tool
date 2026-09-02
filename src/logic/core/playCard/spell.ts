@@ -22,12 +22,17 @@ import { enhanceReplacesBase } from "./enhancePlan.js";
 
 /**
  * Play a spell card. Returns PlayOutcome without rendering.
+ *
+ * @param replaceBase — when true with non-empty tiers, only tier effects run
+ *   (Accelerate alternate-form dispatch sets this at the call site in core.ts).
+ *   Enhance replacement still uses enhanceReplacesBase on the card.
  */
 export function playSpell(
   card: CardInstance,
   player: Player,
   effectiveCost: number,
   chosenTiers: { effects: Effect[] }[] | null = [],
+  opts: { replaceBase?: boolean } = {},
 ): PlayOutcome {
   const tiers = chosenTiers ?? [];
   const owner = isFirstPlayer(state.activePlayer) ? "first" : "second";
@@ -79,9 +84,8 @@ export function playSpell(
     playedCard: spellCard,
   });
 
-  // Effect list: additive by default; replace only when enhance_replaces_base.
-  // Accelerate reuses the tiers slot for its alternate-form effects (core.ts)
-  // and must keep replace semantics — only those effects run.
+  // Effect list: additive by default; replace when Enhance opts in or the
+  // caller passes replaceBase (Accelerate alternate-form in core.ts).
   // Single concatenated runEffects so a base clause that opens a pending
   // target still resumes into remaining (tier) effects.
   const tierEffects = tiers.flatMap((tier) =>
@@ -93,11 +97,9 @@ export function playSpell(
       : Array.isArray(card.fanfare)
         ? [...card.fanfare]
         : [];
-  const accelerateOnly =
-    (card as any).playedAs === "accelerate" && tierEffects.length > 0;
   const list: Effect[] =
-    accelerateOnly ||
-    (tierEffects.length > 0 && enhanceReplacesBase(card, tiers))
+    tierEffects.length > 0 &&
+    (opts.replaceBase === true || enhanceReplacesBase(card, tiers))
       ? [...tierEffects]
       : [...baseEffects, ...tierEffects];
 

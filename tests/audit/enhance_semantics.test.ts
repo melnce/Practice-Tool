@@ -13,6 +13,7 @@ import {
   createCard,
   resetUidCounter,
   thenBoard,
+  thenHand,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
@@ -23,7 +24,6 @@ import {
   getPP,
   getCrests,
 } from "../../src/core/playerHelpers.js";
-import { getCardById } from "../../src/data/cardDatabase.js";
 import "../../src/logic/core/effects/index.js";
 
 function setupTurn(
@@ -87,12 +87,10 @@ describe("Enhance semantics unify", () => {
       expect(knights[0]!.hasWard).toBe(true);
     });
 
-    it("Enhance (6): registry opts into replace; summons exactly 5 Steelclad Knights with Ward", () => {
+    it("Enhance (6): summons exactly 5 Steelclad Knights with Ward", () => {
       // Board cap is 5, so additive 1+5 and replace 5 both end at 5 knights.
-      // The replace contract is therefore asserted on the card flag as well as
-      // the final count (sabotage removing the flag fails this test).
-      expect((getCardById("10921310") as any).enhance_replaces_base).toBe(true);
-
+      // Replace-vs-additive for the flag-added bucket is guarded by L'Age d'Or
+      // / Splendor / Band of Battle below (not by a JSON flag read here).
       setupTurn(6, { hand: ["10921310"], pp: 6 });
       state.players.first.board = [];
       whenPlayCard("first", 0);
@@ -101,6 +99,50 @@ describe("Enhance semantics unify", () => {
       );
       expect(knights).toHaveLength(5);
       expect(knights.filter((k) => k.hasWard === true)).toHaveLength(5);
+    });
+  });
+
+  describe("10923310 L'Age d'Or — flag-added instead (not cap-maskable)", () => {
+    it("base (4 PP): summons exactly 1 Flag; deals 2 to all enemy followers", () => {
+      setupTurn(6, { hand: ["10923310"], pp: 4 });
+      const foe = enemyFollower(2, 6, "Wall");
+      whenPlayCard("first", 0);
+      expect(
+        thenBoard("first").filter((c) => c.name === "Dread Pirate's Flag"),
+      ).toHaveLength(1);
+      expect(Number(foe.defense)).toBe(4);
+    });
+
+    it("Enhance (6): summons exactly 2 Flags; deals 4 once (not 2+4)", () => {
+      // Replace → 2 flags, foe 6→2. Additive would be 3 flags and 6→0.
+      setupTurn(6, { hand: ["10923310"], pp: 6 });
+      const foe = enemyFollower(2, 6, "Wall");
+      whenPlayCard("first", 0);
+      expect(
+        thenBoard("first").filter((c) => c.name === "Dread Pirate's Flag"),
+      ).toHaveLength(2);
+      expect(Number(foe.defense)).toBe(2);
+    });
+  });
+
+  describe("10523310 Splendor of the Goldbloom — flag-added instead (hand count)", () => {
+    it("base (3 PP): adds exactly 2 Glittering Gold to hand", () => {
+      setupTurn(6, { hand: ["10523310"], pp: 3 });
+      whenPlayCard("first", 0);
+      expect(
+        thenHand("first").filter((c) => c.name === "Glittering Gold"),
+      ).toHaveLength(2);
+    });
+
+    it("Enhance (5): adds exactly 4 Glittering Gold (not 2+4=6)", () => {
+      // Spell leaves hand on play; start with only this card so MAX_HAND (9)
+      // cannot mask 4 vs 6.
+      setupTurn(6, { hand: ["10523310"], pp: 5 });
+      whenPlayCard("first", 0);
+      expect(
+        thenHand("first").filter((c) => c.name === "Glittering Gold"),
+      ).toHaveLength(4);
+      expect(thenHand("first")).toHaveLength(4);
     });
   });
 

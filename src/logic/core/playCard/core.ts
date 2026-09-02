@@ -107,9 +107,15 @@ export function playCardCore(
     (card as any).playedAs = "accelerate";
     (card as any).originalPrintedType = card.type;
     card.type = "Spell";
-    return playSpell(card, player, plan.cost, [
-      { effects: plan.alternate.effects },
-    ]);
+    // Accelerate reuses the tiers slot for alternate-form effects; pass
+    // replaceBase so only those effects run (not the printed follower text).
+    return playSpell(
+      card,
+      player,
+      plan.cost,
+      [{ effects: plan.alternate.effects }],
+      { replaceBase: true },
+    );
   }
 
   if (plan.mode === "crystallize" && plan.alternate) {
