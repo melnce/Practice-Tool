@@ -308,10 +308,33 @@ Every evolve of an allied follower counts for the Skybound gauge, regardless of 
 
 A card destroyed by hand overflow triggers **no** Last Words — "converted into a shadow" beats "destroyed".
 
+## Accelerate and spells — 2026-09-02
+
+Quoting the source the owner supplied:
+
+> "Accelerate will function properly with Spellboost and other mechanics that interact with spells.
+> However, Accelerate followers will not be affected by cards that would interact with spells while
+> they are in hand or deck, such as Wizardess of Oz."
+
+An Accelerate play **is** a spell play for Spellboost and every other spell-interacting mechanic. While the card is still in hand or deck, its **printed type** governs — an Accelerate follower is a follower there, not a spell, so hand/deck effects that filter on spells do not see it.
+
+**Reachability correction:** an earlier note in this file claimed the Accelerate × Spellboost interaction was unreachable because every Accelerate card was Portalcraft or Dragoncraft and every Spellboost card is Runecraft. That was **wrong**. **`10901110` Jailor of Antiquity** is Neutral (Follower, cost 6, Accelerate (1)), so it is legal in every craft — including Runecraft alongside Spellboost, and Abysscraft alongside Reanimate.
+
+## Alternate-form permanence (Accelerate / Crystallize) — 2026-09-02
+
+Asked whether an Accelerate-played follower in the cemetery should be reanimatable. Answer: **no**. The owner reasoned by analogy from Crystallize and quoted:
+
+> "Crystallize followers played as amulets are only treated as such while on the field. Any effect
+> that would interact with amulets in the hand or deck will not affect Crystallize. Creating/Returning
+> an amulet created by a Crystallize follower to the hand will not return it to being a follower and
+> it will remain an amulet."
+
+General rule in both directions: **the printed type governs while the card is in hand or deck; once the card has been played in its alternate form, it stays in that form and never reverts** — including in the cemetery. An Accelerate-played follower is a spell corpse and is invisible to Reanimate. A Crystallize-played card is an amulet for the rest of its life; bouncing it to hand does not restore the follower.
+
 ---
 
 ## Still open — Chris will test in game
 
 Whether a **cost reduction moves the Accelerate value N**, or only the normal cost. No official text exists in either game; the only material is player speculation reasoning by analogy from Enhance.
 
-Related and **unreachable in practice**: whether an Accelerate play triggers Spellboost. Every Accelerate card is Portalcraft or Dragoncraft, every Crystallize card Havencraft, and all 39 Spellboost entries are Runecraft — no legal deck can contain both. The evidence points to yes (the official wording calls the form an アクセラレートスペル, "an Accelerate _spell_"), but it cannot be observed in game.
+~~Related and **unreachable in practice**: whether an Accelerate play triggers Spellboost.~~ **Settled 2026-09-02 — yes.** Accelerate plays trigger Spellboost (and other spell-play mechanics). The earlier "unreachable in practice" reasoning was wrong: it assumed every Accelerate card is Portalcraft or Dragoncraft, but **Jailor of Antiquity (`10901110`) is Neutral**, so any Runecraft deck can contain both. See **Accelerate and spells — 2026-09-02** and **Alternate-form permanence — 2026-09-02** above.
