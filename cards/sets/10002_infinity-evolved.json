@@ -878,7 +878,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "enhance_replaces_base": true
   },
   {
     "id": "10223110",

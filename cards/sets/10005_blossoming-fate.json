@@ -184,18 +184,6 @@
         "cost": 10,
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
-            "count": 2
-          },
-          {
-            "op": "destroy",
-            "distribution": "highest",
-            "target": "enemy:follower",
-            "count": 1,
-            "stat": "attack"
-          },
-          {
             "op": "damage",
             "target": "enemy:any",
             "amount": 4
@@ -964,7 +952,8 @@
         "count": 2
       }
     ],
-    "fanfare": []
+    "fanfare": [],
+    "enhance_replaces_base": true
   },
   {
     "id": "10523110",
@@ -1055,7 +1044,8 @@
         "name": "Glittering Gold",
         "count": 2
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10524110",

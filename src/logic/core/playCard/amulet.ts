@@ -18,6 +18,7 @@ import { initAmulet } from "../../effects/ops/summon_ops/init.js";
 import { getBoard } from "../../../core/playerHelpers.js";
 import { bumpZoneVersion, stampBoardEntryTs } from "../triggers/utils.js";
 import { fireTrigger } from "../triggers.js";
+import { enhanceReplacesBase } from "./enhancePlan.js";
 
 /**
  * Play an amulet card. Returns PlayOutcome without rendering.
@@ -40,18 +41,25 @@ export function playAmulet(
 
   mergeEarthSigilOnPlay(card, player);
 
-  for (const tier of tiers) {
-    if (Array.isArray(tier.effects) && tier.effects.length) {
-      runEffects([...tier.effects], player, card);
-    }
-  }
-
-  if (Array.isArray(card.fanfare) && card.fanfare.length) {
+  // Shared decision: base (fanfare) then tiers, unless enhance_replaces_base.
+  // (Order flipped from the previous tiers-then-fanfare; only Timepiece of
+  // Perfection has an Enhance tier and it has no fanfare — unobservable.)
+  const runBase =
+    !enhanceReplacesBase(card, tiers) &&
+    Array.isArray(card.fanfare) &&
+    card.fanfare.length > 0;
+  if (runBase) {
     if (state.lastSummoned) {
       state.lastSummoned.length = 0;
       state.lastSummoned.push(card);
     }
-    runEffects([...card.fanfare], player, card, { enteringCard: card });
+    runEffects([...card.fanfare!], player, card, { enteringCard: card });
+  }
+
+  for (const tier of tiers) {
+    if (Array.isArray(tier.effects) && tier.effects.length) {
+      runEffects([...tier.effects], player, card);
+    }
   }
 
   (state as any).__lastPlayedCard = card;

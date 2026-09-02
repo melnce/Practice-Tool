@@ -66,7 +66,7 @@ export const AUTHORED_EFFECT_KEYS = [
   "on_discard",
   "fuse",
   "fuse_recipes",
-  "enhance_replaces_fanfare",
+  "enhance_replaces_base",
   "evolve_trigger_always",
   "superEvolveReplaces",
   "attacks_per_turn",

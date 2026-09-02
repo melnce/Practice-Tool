@@ -643,8 +643,7 @@ export function driveCard(raw: RawCard): CardDriveResult {
         } else if (path === "play_base") {
           const lowest = lowestEnhanceTierCost(raw);
           // PP strictly below the cheapest Enhance tier → base form only.
-          const firstPP =
-            lowest != null && lowest > 1 ? lowest - 1 : 0;
+          const firstPP = lowest != null && lowest > 1 ? lowest - 1 : 0;
           result = runPlayScenario(id, gates, "satisfy", "play_base", {
             firstPP,
           });

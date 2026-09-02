@@ -18,6 +18,7 @@ import {
   addShadows,
   isFirstPlayer,
 } from "../../../core/playerHelpers.js";
+import { enhanceReplacesBase } from "./enhancePlan.js";
 
 /**
  * Play a spell card. Returns PlayOutcome without rendering.
@@ -78,21 +79,27 @@ export function playSpell(
     playedCard: spellCard,
   });
 
-  // Effect List Logic
-  let list: Effect[] = [];
+  // Effect list: additive by default; replace only when enhance_replaces_base.
+  // Accelerate reuses the tiers slot for its alternate-form effects (core.ts)
+  // and must keep replace semantics — only those effects run.
+  // Single concatenated runEffects so a base clause that opens a pending
+  // target still resumes into remaining (tier) effects.
   const tierEffects = tiers.flatMap((tier) =>
     Array.isArray(tier.effects) ? tier.effects : [],
   );
-  if (tierEffects.length) {
-    list = [...tierEffects];
-  } else {
-    list =
-      Array.isArray(card.spell) && card.spell.length
-        ? [...card.spell]
-        : Array.isArray(card.fanfare)
-          ? [...card.fanfare]
-          : [];
-  }
+  const baseEffects: Effect[] =
+    Array.isArray(card.spell) && card.spell.length
+      ? [...card.spell]
+      : Array.isArray(card.fanfare)
+        ? [...card.fanfare]
+        : [];
+  const accelerateOnly =
+    (card as any).playedAs === "accelerate" && tierEffects.length > 0;
+  const list: Effect[] =
+    accelerateOnly ||
+    (tierEffects.length > 0 && enhanceReplacesBase(card, tiers))
+      ? [...tierEffects]
+      : [...baseEffects, ...tierEffects];
 
   if (list.length) {
     runEffects([...list], player, spellCard, { targets: [], targetUids: [] });

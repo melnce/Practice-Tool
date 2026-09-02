@@ -20,6 +20,7 @@ import {
   type PlayFollowerResume,
 } from "./followerResume.js";
 import { playerHasCrestPassive } from "../../effects/crest.js";
+import { enhanceReplacesBase } from "./enhancePlan.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -81,8 +82,9 @@ export function playFollower(
         .filter((effects) => effects.length);
 
   // Rulebook §242–256: Fanfare (step 1) before play/enter-reactive triggers (steps 2–5).
+  // Shared decision: additive unless enhance_replaces_base (ordering unchanged).
   const skipFanfareForEnhance =
-    chosenTierEffectGroups?.length && (card as any).enhance_replaces_fanfare;
+    !!chosenTierEffectGroups?.length && enhanceReplacesBase(card, tiers);
   if (
     !suppressFanfareEnhance &&
     !skipFanfareForEnhance &&

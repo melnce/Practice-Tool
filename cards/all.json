@@ -8515,7 +8515,8 @@
         ]
       }
     ],
-    "triggers": []
+    "triggers": [],
+    "enhance_replaces_base": true
   },
   {
     "id": "10223110",
@@ -13900,12 +13901,6 @@
             "target": "leader",
             "player": "self",
             "amount": 3
-          },
-          {
-            "op": "damage",
-            "target": "enemy:follower",
-            "distribution": "all",
-            "amount": 3
           }
         ]
       }
@@ -15713,7 +15708,7 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10423110-golden-knight-true-kings-blade",
-    "enhance_replaces_fanfare": true,
+    "enhance_replaces_base": true,
     "keywords": [
       {
         "name": "Enhance",
@@ -18528,18 +18523,6 @@
         "cost": 10,
         "effects": [
           {
-            "op": "draw",
-            "source": "deck",
-            "count": 2
-          },
-          {
-            "op": "destroy",
-            "distribution": "highest",
-            "target": "enemy:follower",
-            "count": 1,
-            "stat": "attack"
-          },
-          {
             "op": "damage",
             "target": "enemy:any",
             "amount": 4
@@ -19308,7 +19291,8 @@
         "count": 2
       }
     ],
-    "fanfare": []
+    "fanfare": [],
+    "enhance_replaces_base": true
   },
   {
     "id": "10523110",
@@ -19399,7 +19383,8 @@
         "name": "Glittering Gold",
         "count": 2
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10524110",
@@ -22709,12 +22694,6 @@
         "cost": 7,
         "effects": [
           {
-            "op": "summon",
-            "source": "named",
-            "name": "Fearless Soldier",
-            "count": 3
-          },
-          {
             "op": "stat",
             "action": "give",
             "target": "ally:last_summoned",
@@ -22830,27 +22809,6 @@
         "name": "Enhance",
         "cost": 3,
         "effects": [
-          {
-            "op": "crest",
-            "action": "gain",
-            "name": "Majestic Conquest",
-            "image": "images/crests/majestic_conquest.png",
-            "description": "Countdown (2)\nWhenever you play an Enhanced card, summon a Fearless Soldier.",
-            "countdown": 2,
-            "triggers": [
-              {
-                "event": "enhanced_play",
-                "effects": [
-                  {
-                    "op": "summon",
-                    "source": "named",
-                    "name": "Fearless Soldier",
-                    "count": 1
-                  }
-                ]
-              }
-            ]
-          },
           {
             "op": "crest",
             "action": "delay_countdown",
@@ -23006,7 +22964,8 @@
         ]
       }
     ],
-    "fanfare": []
+    "fanfare": [],
+    "enhance_replaces_base": true
   },
   {
     "id": "10624110",
@@ -23485,7 +23444,8 @@
         ]
       }
     ],
-    "fanfare": []
+    "fanfare": [],
+    "enhance_replaces_base": true
   },
   {
     "id": "10634110",
@@ -29991,17 +29951,6 @@
         "cost": 6,
         "effects": [
           {
-            "op": "stat",
-            "action": "give",
-            "target": "enemy:follower",
-            "attack": -10,
-            "defense": -10,
-            "distribution": "highest",
-            "stat": "attack",
-            "pick": "random",
-            "select": 1
-          },
-          {
             "op": "summon",
             "source": "named",
             "name": "Wretch",
@@ -31946,7 +31895,8 @@
           "defense_lte": 3
         }
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10863110",
@@ -33389,7 +33339,8 @@
         "count": 1,
         "keywords": ["Ward"]
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10922110",
@@ -33632,7 +33583,8 @@
         "target": "enemy:follower",
         "amount": 2
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10924110",
@@ -33831,7 +33783,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10932110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10932110-enamored-researcher",
-    "enhance_replaces_fanfare": true,
+    "enhance_replaces_base": true,
     "evolve": [
       {
         "op": "stat",
@@ -34264,12 +34216,6 @@
         "name": "Enhance",
         "cost": 3,
         "effects": [
-          {
-            "op": "summon",
-            "source": "named",
-            "name": "Fire Drake Whelp",
-            "count": 1
-          },
           {
             "op": "damage",
             "target": "enemy:follower",
@@ -34888,7 +34834,8 @@
           }
         ]
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10953110",
