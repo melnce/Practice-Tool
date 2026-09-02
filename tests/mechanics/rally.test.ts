@@ -24,6 +24,7 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { getRally, getBoard } from "../../src/core/playerHelpers.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { handleInvoke } from "../../src/logic/effects/ops/summon_ops/invoke.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
 import { summonExactCopyFromHand } from "../../src/logic/effects/ops/summon_ops/hand.js";
@@ -66,9 +67,9 @@ describe("Owner ruling — Rally (2026-08-12): entry routes", () => {
 
   it("reanimate increments Rally", () => {
     givenGameState({ seed: 1, activePlayer: "first" }).build();
-    state.players.first.graveyard = [
-      createCard("10001110", "graveyard", "first"),
-    ];
+    const corpse = createCard("10001110", "graveyard", "first");
+    state.players.first.graveyard = [corpse];
+    recordDestroyed(state, "first", corpse);
     expect(getRally(state, "first")).toBe(0);
     handleReanimate({ op: "reanimate", max_cost: 2 } as any, "first");
     expect(getBoard(state, "first")).toHaveLength(1);
