@@ -4,7 +4,9 @@ An engine-oriented rules reference for Shadowverse: Worlds Beyond (SVWB). It cov
 
 > **Owner rulings override this rulebook.** Verbatim owner rulings live in [`docs/owner-rulings.md`](owner-rulings.md). They override both printed card text and every passage here. Consult that file before deciding any card-behaviour question; where a ruling and this rulebook disagree, the ruling wins and this rulebook is what gets corrected.
 
-**Owner ruling — Card text is bible (2026-08-31):** > "card text is bible."
+**Owner ruling — Card text is bible (2026-08-31):**
+
+> "card text is bible."
 
 Printed card text governs over authored JSON wherever they disagree. The authored data is **never itself evidence of intent** — a card can ship wrong for months. (Owner rulings still override printed text when they explicitly disagree with it.)
 
@@ -76,11 +78,15 @@ Cards move through distinct zones during play:
 
 Many effects require selecting targets. A card or ability can be played only if all its targets are available and valid at the moment of activation — for example, you cannot cast "deal 3 damage to an enemy follower" while the opponent has no followers. If an effect's text does not use the word "target" (e.g. "destroy a random enemy follower", "give all allies +1/+1"), it requires no specific selection and may be played regardless of board state. In practice this targeting restriction applies almost exclusively to spells: you can nearly always play followers and amulets, and activate Engage abilities, even with no valid targets available. When you do select a target, it must meet the stated criteria (ally/enemy, follower/amulet/leader, etc.). Some abilities add restrictions — an Aura follower cannot be selected by enemy targeting, and an Ambush/Intimidate follower cannot be attacked — such followers are simply not valid targets for those actions. Cards that cannot be targeted say so explicitly (see Aura).
 
-**Owner ruling — "Select" is forced (2026-08-16):** > "In this game if it says 'select' then it's forced. You can't play him [Field Scientist] without discarding unless your hand is empty."
+**Owner ruling — "Select" is forced (2026-08-16):**
+
+> "In this game if it says 'select' then it's forced. You can't play him [Field Scientist] without discarding unless your hand is empty."
 
 A "Select …" clause is mandatory: while a legal target exists, the selection cannot be declined or cancelled. The only exception is when no legal target exists (empty hand / empty board), in which case the card still plays (for followers/amulets — see below) and the selection clause fizzles. In this codebase the `optional: true` key on hand-selection cards means "fizzle gracefully on empty zone", **not** "player may decline."
 
-**Owner ruling — Playability with no "Select" target (2026-08-16):** > "If it's something like select on the field but there is no target on the field, then you can still play amulets and followers without the effect. Spells tho — if it says select on the field you can't play the spell if there is no target. Radiant Rainbow sometimes is such a dead card…"
+**Owner ruling — Playability with no "Select" target (2026-08-16):**
+
+> "If it's something like select on the field but there is no target on the field, then you can still play amulets and followers without the effect. Spells tho — if it says select on the field you can't play the spell if there is no target. Radiant Rainbow sometimes is such a dead card…"
 
 A **spell** with a mandatory "Select …" clause requires at least one legal target to be playable at all — no target, no play (no Hearthstone-style burning mana on nothing). **Followers and amulets** with the same kind of clause stay playable; the selection clause simply fizzles. Accelerate plays are gated like spells (they resolve as spells). Radiant Rainbow (`10131310`) is the canonical dead-card case when no Spellboost card is in hand.
 
@@ -120,7 +126,7 @@ This section defines the fundamental terms and zones of SVWB, using official rul
 - **Amulet:** a card that occupies a field slot and provides a continuous effect or delayed trigger. Amulets have no Attack or Defense and cannot attack or be attacked. Many have a Countdown — a number that decreases at the start of the owner's turns and, at 0, destroys the amulet (usually firing a Last Words). Others have no countdown and persist until removed. Amulets may have Engage (activated) abilities; see Keywords. Followers and amulets share the 5-slot field. A destroyed amulet leaves play to the cemetery (unless banished) and triggers its Last Words. (Some crests also carry Last Words that fire on their destruction.)
 - **Spell:** a one-time-effect card. You pay its cost, resolve its text, then it goes to the cemetery (creating a shadow). Spells occupy no field slots and usually require valid targets if any. After resolution a spell is no longer active.
 - **Artifact and other traits:** some cards (especially Portalcraft) carry traits such as Artifact, or Officer for Swordcraft. A trait is a sub-classification that matters for deck-building and certain effects but does not change base rules.
-- **Token:** a card not in the original deck, generated by effects. Tokens may be followers, amulets, or spells and behave like normal cards once created. Last Words and spells often "summon a [token]" into the field or hand as instructed. **Owner ruling — Tokens live in set "Basic A" (90000) (2026-08-29):** > "the tokens are all in the set basic A for god knows what reason. you need cursor to get them from there. they are all starting with numbers with 9000" — Token cards are published under set **[90000] Basic A** with ids beginning `9000…`; any token a card references must be ingested from there (e.g. Dread Pirate's Flag `90021210`, Warden of the Trigger).
+- **Token:** a card not in the original deck, generated by effects. Tokens may be followers, amulets, or spells and behave like normal cards once created. Last Words and spells often "summon a [token]" into the field or hand as instructed. **Owner ruling — Tokens live in set "Basic A" (90000) (2026-08-29):** "the tokens are all in the set basic A for god knows what reason. you need cursor to get them from there. they are all starting with numbers with 9000" — Token cards are published under set **[90000] Basic A** with ids beginning `9000…`; any token a card references must be ingested from there (e.g. Dread Pirate's Flag `90021210`, Warden of the Trigger).
 - **Allied vs enemy:** always from the perspective of the effect's controller. "Destroy an allied follower" means one currently under your control; a follower you have taken control of counts as allied to you while you control it.
 - **Other (as in "other followers"):** excludes the card itself. "Give all other allied followers +1/+0" does not buff the source.
 - **This follower / itself:** "this follower" or "it" always refers to the card bearing the text.
@@ -202,7 +208,9 @@ Certain events cause triggered abilities to activate. To stay deterministic, SVW
 
 Once all queued triggers from an event are handled, the game returns to normal flow. Triggers often cause further events (damage, destruction) that queue still more triggers; the engine keeps resolving until the queue is empty, then proceeds.
 
-**Owner ruling — Deaths settle before dependent triggers pick targets (2026-08-23):** > "playing fangs of ardent destruction should kill the 2/1 at the same time as damaging galmieux. galmieux should then deal 3 dmg to the 5/2 ... but currently the 5/1 ward keeps standing. so either galmieux 3 damage didnt trigger or it targeted the corpse of the 2/1."
+**Owner ruling — Deaths settle before dependent triggers pick targets (2026-08-23):**
+
+> "playing fangs of ardent destruction should kill the 2/1 at the same time as damaging galmieux. galmieux should then deal 3 dmg to the 5/2 ... but currently the 5/1 ward keeps standing. so either galmieux 3 damage didnt trigger or it targeted the corpse of the 2/1."
 
 A follower reduced to 0 or less defense is dead and must never be a legal target for any effect that resolves afterwards — including effects triggered inside the same damage batch (an AoE that kills one follower and damages another). Settle deaths before dependent triggers choose targets.
 
@@ -352,7 +360,9 @@ A recap of random handling:
 - "Different random followers" requires distinct picks: choose one, then another from the remaining pool. If the first random kill removes a candidate for the second pick, the second picks from the survivors.
 - No random effect may resolve onto something invalid by the time it executes — if there were 3 candidates and one died to an earlier trigger, the pick is among the remaining 2.
 
-**Owner ruling — "N random followers" = distinct; "do this N times" = repeats allowed (2026-08-23):** > "if the text says 2 random followers it can do max 8 to 1 follower ... if it says 8 to A random follower TWICE it can hit the same target twice."
+**Owner ruling — "N random followers" = distinct; "do this N times" = repeats allowed (2026-08-23):**
+
+> "if the text says 2 random followers it can do max 8 to 1 follower ... if it says 8 to A random follower TWICE it can hit the same target twice."
 
 - **"deal X damage to N random enemy followers"** → N **distinct** followers, each hit once (surplus picks do nothing when fewer than N candidates remain).
 - **"Do this N times: deal X damage to a random enemy follower"** → N independent rolls; the same follower can be hit repeatedly (Oluon's ruling generalised; Barren-Earth Tyrant's "do it 2 times instead" is this shape).
@@ -442,7 +452,9 @@ This section enumerates the keyword abilities and major mechanics of SVWB. Each 
 
 **Fuse (hand fusion).** Some cards may be fused with other cards in hand. Fuse is a main-phase hand action, not a play.
 
-**Owner ruling — Fuse mechanics, Sephie and Ecstatic Scholar (2026-08-29):** > "sephie and ecstatic scholar do not need any recipes. … you can fuse (as many cards as you want to ONE sephie ONCE per turn (if you have 2 sephies in hand ofc you can fuse to both of them ONCE) but you need 2 playpoints available for it to do something."
+**Owner ruling — Fuse mechanics, Sephie and Ecstatic Scholar (2026-08-29):**
+
+> "sephie and ecstatic scholar do not need any recipes. … you can fuse (as many cards as you want to ONE sephie ONCE per turn (if you have 2 sephies in hand ofc you can fuse to both of them ONCE) but you need 2 playpoints available for it to do something."
 
 - **No recipe list** — any card may be fused into a Fuse card that accepts unrestricted partners.
 - **Once per turn per instance** — with two Sephies in hand you may fuse once to each in the same turn.
@@ -490,17 +502,23 @@ A player's EP evolve always runs the full `evolve[]` / `superevolve[]` script fo
 
 **Split damage (sequential).** When an effect deals split damage to enemy followers in sequence (`split_sequential`), the pool allocates against each follower's **current defense** in entry order (oldest to newest). Each follower consumes `min(remaining pool, its current defense)` from the pool before the next follower is considered; leftover pool after the last follower may spill to the enemy leader only when the effect sets `spill_to_leader`.
 
-**Owner ruling — Barrier in split damage (2026-08-29):** > "if you have 10 points of split damage and a 1/6 with barrier and a 1/5 without barrier: the 1/6 with barrier will take 6 damage reduced to 0 cause of barrier (so still 1/6 but now barrier is gone) and the 1/5 without barrier will now be 1/1 as it takes 4 damage spilled over. oldest to newest"
+**Owner ruling — Barrier in split damage (2026-08-29):**
+
+> "if you have 10 points of split damage and a 1/6 with barrier and a 1/5 without barrier: the 1/6 with barrier will take 6 damage reduced to 0 cause of barrier (so still 1/6 but now barrier is gone) and the 1/5 without barrier will now be 1/1 as it takes 4 damage spilled over. oldest to newest"
 
 Rule: split damage allocates against each follower's current defense, oldest to newest; allocated points are consumed from the pool even when Barrier reduces dealt damage to 0 and is consumed. Worked example: 10 split damage — a 1/6 with Barrier (oldest) absorbs an allocation of 6 (stays 1/6, Barrier gone); the 1/5 behind it takes the remaining 4 and becomes 1/1. Do not change without owner sign-off.
 
 A damage instance of **0** still counts as the follower **taking damage** for any "whenever this follower takes damage" trigger, as long as the follower remains on the field and is not destroyed by that event. (Barrier blocking a positive hit also counts as taking damage; see Combat.)
 
-**Owner ruling — Damage prevented by super-evolve still counts as "taking damage" (2026-08-23):** > "even if superevolved the followers 'take damage' even if it is reduced to 0."
+**Owner ruling — Damage prevented by super-evolve still counts as "taking damage" (2026-08-23):**
+
+> "even if superevolved the followers 'take damage' even if it is reduced to 0."
 
 A super-evolved follower's own-turn protection reduces incoming damage to 0 but does **not** cancel the damage event. Every "when this follower takes damage" trigger — Galmieux's 3-damage passive, her crest's Fangs of Ardent Destruction, Azurifrit's leader ping — must fire on such a hit (combat and effect damage alike). The combat path must still call into damage dealing when the attacker is invincible-on-attack; skipping the counter-damage call entirely would starve those triggers.
 
-**Owner ruling — "Takes N more damage" applies to a 0-damage event (2026-08-31):** > "id say so yes. since when i attack with a 0 attack in game it deals 0 damage so +1 would be 1. lets keep it until i ever see a situation where that contradicts itself."
+**Owner ruling — "Takes N more damage" applies to a 0-damage event (2026-08-31):**
+
+> "id say so yes. since when i attack with a 0 attack in game it deals 0 damage so +1 would be 1. lets keep it until i ever see a situation where that contradicts itself."
 
 A 0-damage event **does** take the bonus (0 + 1 = 1). Healing does not.
 
