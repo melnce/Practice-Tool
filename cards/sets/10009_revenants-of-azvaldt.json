@@ -801,7 +801,8 @@
         "count": 1,
         "keywords": ["Ward"]
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10922110",
@@ -1044,7 +1045,8 @@
         "target": "enemy:follower",
         "amount": 2
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10924110",
@@ -1243,7 +1245,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10932110_evo.webp",
     "set": "[10009] Revenants of Azvaldt",
     "url": "https://shadowverse.gg/cards/10932110-enamored-researcher",
-    "enhance_replaces_fanfare": true,
+    "enhance_replaces_base": true,
     "evolve": [
       {
         "op": "stat",
@@ -1676,12 +1678,6 @@
         "name": "Enhance",
         "cost": 3,
         "effects": [
-          {
-            "op": "summon",
-            "source": "named",
-            "name": "Fire Drake Whelp",
-            "count": 1
-          },
           {
             "op": "damage",
             "target": "enemy:follower",
@@ -2300,7 +2296,8 @@
           }
         ]
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10953110",

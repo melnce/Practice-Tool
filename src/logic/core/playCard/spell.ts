@@ -18,15 +18,21 @@ import {
   addShadows,
   isFirstPlayer,
 } from "../../../core/playerHelpers.js";
+import { enhanceReplacesBase } from "./enhancePlan.js";
 
 /**
  * Play a spell card. Returns PlayOutcome without rendering.
+ *
+ * @param replaceBase — when true with non-empty tiers, only tier effects run
+ *   (Accelerate alternate-form dispatch sets this at the call site in core.ts).
+ *   Enhance replacement still uses enhanceReplacesBase on the card.
  */
 export function playSpell(
   card: CardInstance,
   player: Player,
   effectiveCost: number,
   chosenTiers: { effects: Effect[] }[] | null = [],
+  opts: { replaceBase?: boolean } = {},
 ): PlayOutcome {
   const tiers = chosenTiers ?? [];
   const owner = isFirstPlayer(state.activePlayer) ? "first" : "second";
@@ -78,21 +84,24 @@ export function playSpell(
     playedCard: spellCard,
   });
 
-  // Effect List Logic
-  let list: Effect[] = [];
+  // Effect list: additive by default; replace when Enhance opts in or the
+  // caller passes replaceBase (Accelerate alternate-form in core.ts).
+  // Single concatenated runEffects so a base clause that opens a pending
+  // target still resumes into remaining (tier) effects.
   const tierEffects = tiers.flatMap((tier) =>
     Array.isArray(tier.effects) ? tier.effects : [],
   );
-  if (tierEffects.length) {
-    list = [...tierEffects];
-  } else {
-    list =
-      Array.isArray(card.spell) && card.spell.length
-        ? [...card.spell]
-        : Array.isArray(card.fanfare)
-          ? [...card.fanfare]
-          : [];
-  }
+  const baseEffects: Effect[] =
+    Array.isArray(card.spell) && card.spell.length
+      ? [...card.spell]
+      : Array.isArray(card.fanfare)
+        ? [...card.fanfare]
+        : [];
+  const list: Effect[] =
+    tierEffects.length > 0 &&
+    (opts.replaceBase === true || enhanceReplacesBase(card, tiers))
+      ? [...tierEffects]
+      : [...baseEffects, ...tierEffects];
 
   if (list.length) {
     runEffects([...list], player, spellCard, { targets: [], targetUids: [] });

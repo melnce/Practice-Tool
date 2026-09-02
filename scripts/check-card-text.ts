@@ -25,8 +25,7 @@ import { SETS_DIR } from "./mergeSets.js";
 import { checkOpKeysForCard } from "./op-keys-gate.js";
 import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
-import { checkEnhanceReplacesFanfareForCard } from "./enhance-replaces-fanfare-gate.js";
-import { checkAdditiveEnhanceForCard } from "./additive-enhance-gate.js";
+import { checkEnhanceSemanticsForCard } from "./enhance-semantics-gate.js";
 import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
 import {
   getImplementationStatus,
@@ -1475,12 +1474,9 @@ function main() {
   const gateSelectTarget =
     process.argv.includes("--gate=select-target") ||
     process.argv.includes("--gate=select_target");
-  const gateEnhanceReplacesFanfare =
-    process.argv.includes("--gate=enhance-replaces-fanfare") ||
-    process.argv.includes("--gate=enhance_replaces_fanfare");
-  const gateAdditiveEnhance =
-    process.argv.includes("--gate=additive-enhance") ||
-    process.argv.includes("--gate=additive_enhance");
+  const gateEnhanceSemantics =
+    process.argv.includes("--gate=enhance-semantics") ||
+    process.argv.includes("--gate=enhance_semantics");
   const gateAllAlliedIncludeSelf =
     process.argv.includes("--gate=all-allied-include-self") ||
     process.argv.includes("--gate=all_allied_include_self");
@@ -1491,8 +1487,7 @@ function main() {
     gateOpKeys ||
     gateDurationOp ||
     gateSelectTarget ||
-    gateEnhanceReplacesFanfare ||
-    gateAdditiveEnhance ||
+    gateEnhanceSemantics ||
     gateAllAlliedIncludeSelf;
 
   const files = listSetFiles(setArg);
@@ -1518,13 +1513,11 @@ function main() {
               ? "🔍 Checking duration-key op contracts...\n"
               : gateSelectTarget
                 ? "🔍 Checking select-target pool contracts...\n"
-                : gateEnhanceReplacesFanfare
-                  ? "🔍 Checking enhance_replaces_fanfare contracts...\n"
-                  : gateAdditiveEnhance
-                    ? "🔍 Checking additive Enhance base-op inclusion...\n"
-                    : gateAllAlliedIncludeSelf
-                      ? "🔍 Checking all-allied-followers include_self contracts...\n"
-                      : "🔍 Checking card description ↔ JSON structure...\n",
+                : gateEnhanceSemantics
+                  ? "🔍 Checking Enhance semantics contracts...\n"
+                  : gateAllAlliedIncludeSelf
+                    ? "🔍 Checking all-allied-followers include_self contracts...\n"
+                    : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const file of files) {
@@ -1538,10 +1531,8 @@ function main() {
         if (gateOpKeys) allIssues.push(...checkOpKeysForCard(card));
         if (gateDurationOp) allIssues.push(...checkDurationOpKeysForCard(card));
         if (gateSelectTarget) allIssues.push(...checkSelectTargetForCard(card));
-        if (gateEnhanceReplacesFanfare)
-          allIssues.push(...checkEnhanceReplacesFanfareForCard(card));
-        if (gateAdditiveEnhance)
-          allIssues.push(...checkAdditiveEnhanceForCard(card));
+        if (gateEnhanceSemantics)
+          allIssues.push(...checkEnhanceSemanticsForCard(card));
         if (gateAllAlliedIncludeSelf)
           allIssues.push(...checkAllAlliedIncludeSelfForCard(card));
       } else {
@@ -1628,13 +1619,11 @@ function main() {
                 ? `✅ ${cardCount} cards — duration keys only appear on ops that honour them.\n`
                 : gateSelectTarget
                   ? `✅ ${cardCount} cards — selected targets always have a parent select.\n`
-                  : gateEnhanceReplacesFanfare
-                    ? `✅ ${cardCount} cards — enhance_replaces_fanfare contracts hold.\n`
-                    : gateAdditiveEnhance
-                      ? `✅ ${cardCount} cards — additive Enhance tiers re-include base ops.\n`
-                      : gateAllAlliedIncludeSelf
-                        ? `✅ ${cardCount} cards — all-allied-followers stat ops include self.\n`
-                        : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+                  : gateEnhanceSemantics
+                    ? `✅ ${cardCount} cards — Enhance semantics contracts hold.\n`
+                    : gateAllAlliedIncludeSelf
+                      ? `✅ ${cardCount} cards — all-allied-followers stat ops include self.\n`
+                      : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     console.log(

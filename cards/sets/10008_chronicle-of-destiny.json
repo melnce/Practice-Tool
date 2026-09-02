@@ -883,17 +883,6 @@
         "cost": 6,
         "effects": [
           {
-            "op": "stat",
-            "action": "give",
-            "target": "enemy:follower",
-            "attack": -10,
-            "defense": -10,
-            "distribution": "highest",
-            "stat": "attack",
-            "pick": "random",
-            "select": 1
-          },
-          {
             "op": "summon",
             "source": "named",
             "name": "Wretch",
@@ -2838,7 +2827,8 @@
           "defense_lte": 3
         }
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "10863110",

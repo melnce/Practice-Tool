@@ -971,7 +971,7 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10423110-golden-knight-true-kings-blade",
-    "enhance_replaces_fanfare": true,
+    "enhance_replaces_base": true,
     "keywords": [
       {
         "name": "Enhance",

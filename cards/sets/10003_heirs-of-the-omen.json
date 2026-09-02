@@ -2995,12 +2995,6 @@
             "target": "leader",
             "player": "self",
             "amount": 3
-          },
-          {
-            "op": "damage",
-            "target": "enemy:follower",
-            "distribution": "all",
-            "amount": 3
           }
         ]
       }
