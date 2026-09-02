@@ -2,6 +2,12 @@
 
 An engine-oriented rules reference for Shadowverse: Worlds Beyond (SVWB). It covers match and turn flow, zones, timing windows, effect resolution, the keyword catalogue, and combat / continuous-effect rules, with test cases for implementation.
 
+> **Owner rulings override this rulebook.** Verbatim owner rulings live in [`docs/owner-rulings.md`](owner-rulings.md). They override both printed card text and every passage here. Consult that file before deciding any card-behaviour question; where a ruling and this rulebook disagree, the ruling wins and this rulebook is what gets corrected.
+
+**Owner ruling — Card text is bible (2026-08-31):** > "card text is bible."
+
+Printed card text governs over authored JSON wherever they disagree. The authored data is **never itself evidence of intent** — a card can ship wrong for months. (Owner rulings still override printed text when they explicitly disagree with it.)
+
 ## Table of Contents
 
 - [Match Flow](#match-flow)
@@ -60,7 +66,7 @@ The primary win condition is reducing the opponent's leader defense to 0, throug
 Cards move through distinct zones during play:
 
 - **Deck:** face-down and randomized; order and contents are hidden to both players. Cards are drawn or searched from here. Drawing from an empty deck causes a loss.
-- **Hand:** cards drawn but not yet played, hidden from the opponent. The hand limit is 9 — any card drawn beyond this is destroyed (burned to the cemetery as a shadow). _Test case:_ a player holding 9 cards draws one; the drawn card is destroyed and converted to a shadow rather than added to hand. The engine must never allow a 10th card in hand.
+- **Hand:** cards drawn but not yet played, hidden from the opponent. The hand limit is 9 — any card drawn beyond this is destroyed (burned to the cemetery as a shadow). _Test case:_ a player holding 9 cards draws one; the drawn card is destroyed and converted to a shadow rather than added to hand. The engine must never allow a 10th card in hand. **Owner ruling (2026-08-10):** a card destroyed by hand overflow triggers **no** Last Words — "converted into a shadow" beats "destroyed."
 - **Field (play area):** up to 5 cards per player. Followers and amulets in play occupy the field. If an effect would put a new follower into a full field, the summon simply fails for the excess units (they do not enter and do not queue). _Test case:_ a "summon 2 followers" spell cast with only 1 empty slot fills the one slot and skips the second summon, with no error.
 - **Cemetery (graveyard) and shadows:** destroyed followers/amulets and fully-played spells leave to the cemetery and become shadows. A shadow is a counter representing a destroyed or spent card; no card is returned from the graveyard except via special mechanics (e.g. Reanimate, which copies a card without removing it from the cemetery). Each player's shadow count is public and is consumed by certain effects (see Necromancy). Banished or transformed cards do not go to the cemetery and produce no shadows.
 - **Banish zone:** a banished card is removed from play entirely, with no death triggers and no shadow. Banished cards are out of the match for good (equivalent to exile in other games).
@@ -69,6 +75,14 @@ Cards move through distinct zones during play:
 ## Targeting Rules
 
 Many effects require selecting targets. A card or ability can be played only if all its targets are available and valid at the moment of activation — for example, you cannot cast "deal 3 damage to an enemy follower" while the opponent has no followers. If an effect's text does not use the word "target" (e.g. "destroy a random enemy follower", "give all allies +1/+1"), it requires no specific selection and may be played regardless of board state. In practice this targeting restriction applies almost exclusively to spells: you can nearly always play followers and amulets, and activate Engage abilities, even with no valid targets available. When you do select a target, it must meet the stated criteria (ally/enemy, follower/amulet/leader, etc.). Some abilities add restrictions — an Aura follower cannot be selected by enemy targeting, and an Ambush/Intimidate follower cannot be attacked — such followers are simply not valid targets for those actions. Cards that cannot be targeted say so explicitly (see Aura).
+
+**Owner ruling — "Select" is forced (2026-08-16):** > "In this game if it says 'select' then it's forced. You can't play him [Field Scientist] without discarding unless your hand is empty."
+
+A "Select …" clause is mandatory: while a legal target exists, the selection cannot be declined or cancelled. The only exception is when no legal target exists (empty hand / empty board), in which case the card still plays (for followers/amulets — see below) and the selection clause fizzles. In this codebase the `optional: true` key on hand-selection cards means "fizzle gracefully on empty zone", **not** "player may decline."
+
+**Owner ruling — Playability with no "Select" target (2026-08-16):** > "If it's something like select on the field but there is no target on the field, then you can still play amulets and followers without the effect. Spells tho — if it says select on the field you can't play the spell if there is no target. Radiant Rainbow sometimes is such a dead card…"
+
+A **spell** with a mandatory "Select …" clause requires at least one legal target to be playable at all — no target, no play (no Hearthstone-style burning mana on nothing). **Followers and amulets** with the same kind of clause stay playable; the selection clause simply fizzles. Accelerate plays are gated like spells (they resolve as spells). Radiant Rainbow (`10131310`) is the canonical dead-card case when no Spellboost card is in hand.
 
 Once an ability is activated with chosen targets, those targets are locked in; there is no interrupt or response window between selection and resolution. If a target becomes invalid mid-resolution (e.g. destroyed by an earlier part of a multi-step effect), the action on that target simply does nothing while the rest of the effect resolves on its other targets. Spells never "fizzle" entirely — each instruction does as much as it can. For example, "destroy an enemy follower, then draw a card": if the follower is already gone when the spell resolves, the destroy does nothing but the player still draws.
 
@@ -106,7 +120,7 @@ This section defines the fundamental terms and zones of SVWB, using official rul
 - **Amulet:** a card that occupies a field slot and provides a continuous effect or delayed trigger. Amulets have no Attack or Defense and cannot attack or be attacked. Many have a Countdown — a number that decreases at the start of the owner's turns and, at 0, destroys the amulet (usually firing a Last Words). Others have no countdown and persist until removed. Amulets may have Engage (activated) abilities; see Keywords. Followers and amulets share the 5-slot field. A destroyed amulet leaves play to the cemetery (unless banished) and triggers its Last Words. (Some crests also carry Last Words that fire on their destruction.)
 - **Spell:** a one-time-effect card. You pay its cost, resolve its text, then it goes to the cemetery (creating a shadow). Spells occupy no field slots and usually require valid targets if any. After resolution a spell is no longer active.
 - **Artifact and other traits:** some cards (especially Portalcraft) carry traits such as Artifact, or Officer for Swordcraft. A trait is a sub-classification that matters for deck-building and certain effects but does not change base rules.
-- **Token:** a card not in the original deck, generated by effects. Tokens may be followers, amulets, or spells and behave like normal cards once created. Last Words and spells often "summon a [token]" into the field or hand as instructed.
+- **Token:** a card not in the original deck, generated by effects. Tokens may be followers, amulets, or spells and behave like normal cards once created. Last Words and spells often "summon a [token]" into the field or hand as instructed. **Owner ruling — Tokens live in set "Basic A" (90000) (2026-08-29):** > "the tokens are all in the set basic A for god knows what reason. you need cursor to get them from there. they are all starting with numbers with 9000" — Token cards are published under set **[90000] Basic A** with ids beginning `9000…`; any token a card references must be ingested from there (e.g. Dread Pirate's Flag `90021210`, Warden of the Trigger).
 - **Allied vs enemy:** always from the perspective of the effect's controller. "Destroy an allied follower" means one currently under your control; a follower you have taken control of counts as allied to you while you control it.
 - **Other (as in "other followers"):** excludes the card itself. "Give all other allied followers +1/+0" does not buff the source.
 - **This follower / itself:** "this follower" or "it" always refers to the card bearing the text.
@@ -188,6 +202,10 @@ Certain events cause triggered abilities to activate. To stay deterministic, SVW
 
 Once all queued triggers from an event are handled, the game returns to normal flow. Triggers often cause further events (damage, destruction) that queue still more triggers; the engine keeps resolving until the queue is empty, then proceeds.
 
+**Owner ruling — Deaths settle before dependent triggers pick targets (2026-08-23):** > "playing fangs of ardent destruction should kill the 2/1 at the same time as damaging galmieux. galmieux should then deal 3 dmg to the 5/2 ... but currently the 5/1 ward keeps standing. so either galmieux 3 damage didnt trigger or it targeted the corpse of the 2/1."
+
+A follower reduced to 0 or less defense is dead and must never be a legal target for any effect that resolves afterwards — including effects triggered inside the same damage batch (an AoE that kills one follower and damages another). Settle deaths before dependent triggers choose targets.
+
 ### Start-of-Turn and End-of-Turn Sequences
 
 Both turn boundaries use a **two-phase** model: first, conditions are checked and triggered abilities are **queued** in a fixed step order; then the queue is **resolved** in that same order. Within a single step, crests that trigger at the same time resolve in the order they were granted (oldest first) and board abilities resolve in entry order (oldest first). If an ability is lost at the same step another ability triggers (e.g. via a Countdown reaching 0), losing it does **not** cancel the other ability.
@@ -215,6 +233,8 @@ Both turn boundaries use a **two-phase** model: first, conditions are checked an
 
 An ability worded just "at the end of the turn" — with no "your"/"your opponent's" — triggers on **both** players' turn ends.
 
+**Owner ruling — Turn-boundary triggers are owner-scoped (2026-08-31):** A turn-boundary trigger printed _"at the start/end of your turn"_ fires only on its owner's boundary. `whose_turn: "opponent"` is the explicit opt-out for cards printed _"at the end of your opponent's turn"_ (e.g. Lilanthim `10734110`). Absence of that key must **not** mean "fire for everyone" — that defect made a mirror match add a Fairy to both hands on your own turn start.
+
 _End-of-turn example._ Player A ends the turn with two followers reading "at the end of your turn, deal 1 damage to the enemy leader," while Player B has a card reading "at the end of your opponent's turn, gain 1 defense." All three trigger at once. Resolution: A's older follower deals 1, A's newer follower deals 1, then B's leader effect restores 1 — a net 2−1 = 1 damage to B's leader (active in-play effects before non-active).
 
 _Worked example (the canonical simultaneous case)._ You hold _Crest: Grimnir_, have a super-evolved Celes on board, and the opponent has an evolved 2-defense Funikar & Yavnhar plus a Castle Artifact (granted Icarus's Flight) made by Artifact Catapult. You end your turn. All three end-of-turn abilities trigger at once and queue as **your crest → your follower → opponent's follower**: (1) Grimnir, (2) Celes, (3) Castle Artifact. Resolving (1) deals 2 to all enemy followers, destroying Funikar & Yavnhar, which queues its Last Words (4). Resolving (2) gives Celes a Barrier. Resolving (3) destroys Castle Artifact, queuing the Icarus's-Flight Last Words (5). Resolving (4) would hit Celes, but Celes already has its Barrier (since (2) resolved earlier), so it pops harmlessly. Resolving (5) draws the opponent a card. Queue empty → the turn passes.
@@ -240,6 +260,8 @@ An attack is a multi-trigger event. The detailed damage/destruction rules live u
 6. **Last Words / death triggers:** all destroyed followers' Last Words fire, treated as in-play card effects of their controller. If both combatants died, the active player's Last Words resolves first, then the opponent's; multiple deaths on one side resolve in entry order (oldest first).
 7. The combat ends and the main phase resumes.
 
+**Owner ruling — "Attacked a leader last turn" counts the attack, not the damage (2026-08-29):** For cards reading _"If an allied follower attacked a leader on your last turn …"_: **"Attack committed counts."** An allied follower satisfies the condition the moment it commits an attack on the enemy leader. Damage is irrelevant — a swing that deals 0 still counts. A Ward-blocked attack does **not** count, because it never reaches the leader at all. Unlocks: Ripper-Clawed Thief, High-Spirited Marauder, Barren-Earth Tyrant, Artiglio, Antemaria.
+
 _Combat test case._ The active player attacks with a follower that has "Strike: deal 1 damage to the enemy leader" and Bane, targeting an enemy follower with "Clash: deal 2 damage to the attacker." Order: the attacker's Strike deals 1 to the leader; the defender's Clash deals 2 to the attacker; combat damage is exchanged; because the attacker has Bane, the defender is destroyed after damage regardless of its remaining defense. If both die (the attacker was already low and took lethal counter-damage), their Last Words trigger simultaneously, active player first. This verifies that Strike resolves before damage, Clash resolves in the right place, Bane applies even if the attacker's attack was reduced to 0 (Bane cares only that damage was dealt, 0 or more), and Last Words favor the active player.
 
 ### Fanfare and Enter-Play Trigger Order
@@ -258,6 +280,8 @@ Two enter-play rulings:
 
 - **A keyword granted by Fanfare/enter is not present at the instant of entering.** A follower given Ward by its _own_ Fanfare does **not** satisfy "when a Ward follower enters play" — it had no Ward at the moment it entered.
 - **Overflow and once-per-turn:** "when this enters play" abilities do **not** react to cards that overflowed the board (and so never actually entered). A "once per turn, when X enters play" ability reacts only to the **first** of several simultaneous entries.
+
+**Owner ruling — `named_enter_count` / "other" copies and enter-route timing (2026-08-30):** Cards gated on how many **other** allied copies have entered this match must not count the entering card itself when the gate is evaluated on an enter-trigger route. Obsessed Test Subject (`10931110`) — _"if at least 5 other allied copies … have entered"_ — buffs starting at the **6th** copy. The Fanfare route (Drache & Aluzard `10844110`) records the enter _after_ Fanfare and is already correct; a global "exclude self" would break it. Check the route, not just the key.
 
 ---
 
@@ -327,6 +351,11 @@ A recap of random handling:
 - Each random decision is independent unless stated. "Randomly deal damage 3 times" is three independent draws with replacement (the same target can be hit repeatedly) unless targets are removed between instances.
 - "Different random followers" requires distinct picks: choose one, then another from the remaining pool. If the first random kill removes a candidate for the second pick, the second picks from the survivors.
 - No random effect may resolve onto something invalid by the time it executes — if there were 3 candidates and one died to an earlier trigger, the pick is among the remaining 2.
+
+**Owner ruling — "N random followers" = distinct; "do this N times" = repeats allowed (2026-08-23):** > "if the text says 2 random followers it can do max 8 to 1 follower ... if it says 8 to A random follower TWICE it can hit the same target twice."
+
+- **"deal X damage to N random enemy followers"** → N **distinct** followers, each hit once (surplus picks do nothing when fewer than N candidates remain).
+- **"Do this N times: deal X damage to a random enemy follower"** → N independent rolls; the same follower can be hit repeatedly (Oluon's ruling generalised; Barren-Earth Tyrant's "do it 2 times instead" is this shape).
 
 In summary, every play and activation produces either an immediate action or queued triggered actions, processed in a well-defined order without interruption; ties are broken by the priority ordering above, yielding deterministic outcomes for identical inputs.
 
@@ -411,11 +440,22 @@ This section enumerates the keyword abilities and major mechanics of SVWB. Each 
 
 **Choose.** Some cards let you pick between two or more options when played; you choose the form at play time, and some options carry added costs.
 
+**Fuse (hand fusion).** Some cards may be fused with other cards in hand. Fuse is a main-phase hand action, not a play.
+
+**Owner ruling — Fuse mechanics, Sephie and Ecstatic Scholar (2026-08-29):** > "sephie and ecstatic scholar do not need any recipes. … you can fuse (as many cards as you want to ONE sephie ONCE per turn (if you have 2 sephies in hand ofc you can fuse to both of them ONCE) but you need 2 playpoints available for it to do something."
+
+- **No recipe list** — any card may be fused into a Fuse card that accepts unrestricted partners.
+- **Once per turn per instance** — with two Sephies in hand you may fuse once to each in the same turn.
+- **Fusing is always legal, even at 0 PP.** Owner clarification: _"if you fuse with less than 2 then you just fuse and you dont pay anything and nothing spawns. its important that you CAN fuse even if you dont have playpoints"_. The fused cards always leave hand and the "was fused" flag is always set. Sephie's **on-fuse effect** alone is conditional: with **≥2 PP available, exactly 2 PP are spent** and an Obsessed Test Subject is summoned; with fewer, nothing is spent and nothing spawns. A 0-PP fuse still consumes that Sephie's once-per-turn fuse and still satisfies Ecstatic Scholar's "was fused" requirement.
+- **"Was fused while in hand" is a persistent per-card flag** (not a recipe). Ecstatic Scholar's Super-Evolve grants its extra effect (select a Test Subject, give it Drain) **only if she was fused at least once while in hand**; otherwise super-evolution gives only the normal +3/+3. The same flag drives Garden's Allure and Returning Slash. The flag must survive the hand→field transition and belong inside the snapshotted state.
+
 **Crests (Countdown / Last Words / end of turn).** Crests use the same timing machinery as amulets. A Countdown (N) on a crest ticks −1 at the start of its owner's turn (the same window as amulet countdowns), and the crest is destroyed at 0. Last Words on a crest fire when it is destroyed (including by countdown reaching 0). "At the end of your turn" on a crest fires at that owner's end of turn (e.g. Corruption: deal 2 to your leader each end of turn while active). _Example Last Words:_ Belial's crest — Countdown (4), Last Words: deal 20 to the enemy leader when it reaches 0.
 
 **Owner ruling — Slaus unused-ability pool (PROVISIONAL, 2026-08-13):** For _Slaus, Revolving Wheel of Fortune_ (body and Crest), "activate a random ability that hasn't been activated yet" draws **without replacement** from the printed three options. The unused pool is **not** replenished: at most three activations occur; on a fourth start-of-turn (if the body somehow survived, or if the Crest's Countdown (3) were somehow still present), **nothing happens**. The Crest's Countdown (3) already caps Crest activations at three in normal play. **PROVISIONAL** — the owner flagged uncertainty: the Crest countdown makes the three-cap clear in practice, but the body effect is hard to observe in a real match because followers rarely survive three turns in a row. A future in-game observation may overturn this; keep the provisional mark until confirmed.
 
 **Skybound Art / Super Skybound Art.** Evaluated per card in hand when it is played: gauge = the current turn number + the number of allied followers that evolved while this card was in your hand. Skybound Art activates at gauge ≥ 10, Super Skybound Art at ≥ 15. Evolves that happened before the card entered your hand do not count.
+
+**Owner ruling — Skybound gauge, every allied evolve counts (2026-08-10):** Every evolve of an allied follower counts for the Skybound gauge, regardless of whether an `Evolve:` script fired or EP was spent (effect-granted evolves count the same as player-spent EP evolves).
 
 **Faith and Modes.** Faith is a leader counter on the crest _Faith: Sham-Nacha, Heir to Entwining_ (active while Sham-Nacha is in your deck), starting at 0. It increases by 1 per Modes-selection event (one completed mode-choice resolution), not per individual mode picked — Screaming and Loathing (pick 2 modes at once) adds 1, while a card that selects Modes on both Fanfare and Evolve adds 2. The selectable-mode count = the card's base (usually 1, Screaming 2) + the leader's `modeBonus`. Sham-Nacha's Fanfare spends 10 Faith (`pay_counter` must be ≥ 10 or the pay fizzles; on success `mode_bonus` +1, stacking), and a second successful spend gives +2 total (so Screaming caps at 2 + 2 = 4 picks).
 
@@ -432,10 +472,19 @@ A player's EP evolve always runs the full `evolve[]` / `superevolve[]` script fo
 - _Raging Lightning (Overflow leader branch):_ deal 3 damage to every leader whose current defense equals the highest defense among all leaders (both players) — your own leader included; if several tie, all tied leaders take 3.
 - _Zooey, Enhance (10):_ (a) setting leader max defense to 1 is a set — current HP is clamped down to the new maximum, repeated sets stay at 1/1, and healing cannot raise current HP above 1; (b) "can't take more than 0 damage at a time" until the opponent's end of turn caps each individual damage instance to the leader at 0 (combat or effect), expiring after the opponent's turn ends (the leader may still be at 1/1).
 - _Mari, Meg's Bestie:_ in hand — when a 3 base-cost allied follower super-evolves, Mari's cost becomes 0 until your end of turn (the first such trigger that turn; it stays 0 if more allies super-evolve); on board — at your end of turn, give +1/+1 to one random super-evolved allied follower (any base cost; one super-evolved on a prior turn still qualifies).
-- _Azurifrit:_ on your turn, whenever this follower takes damage (including 0) and is not destroyed, deal 1 damage to the enemy leader; each damage instance is a separate trigger, up to 3 activations per turn.
+- _Azurifrit, Heir to Disdain (`10344110`):_ ~~on your turn, whenever this follower takes damage (including 0) and is not destroyed, deal 1 damage to the enemy leader; each damage instance is a separate trigger, up to 3 activations per turn.~~ **Superseded (owner ruling 2026-08-23).** The trigger fires on **every** qualifying self-damage event during your turn — **no per-turn cap**. Owner: _"No cap — fires every time."_ Playing him (Fanfare 3× AoE hitting himself) and super-evolving him the same turn therefore produces **6** leader pings, not 3. The old `max_per_turn: 3` was an assumed ruling (Fanfare's "Do this 3 times" misread as a trigger cap) and is removed. Separately: his _"Super-Evolve: Fully restore the defense of this follower"_ restores to the **buffed** maximum after the +3/+3 (a 5/7 Azurifrit ends super-evolution at **8/10**, not 8/7).
 - _Oluon, Raging Chariot (2026-08-13):_ when evolved, "Deal 7 damage to another random ally or enemy" three times means each hit independently chooses among **all characters except Oluon itself** (both leaders and all other followers on both sides). Previously hit targets remain eligible, so the same follower or leader can be struck more than once, and all three hits can land on the enemy leader (21 total). "Another" exempts only Oluon.
 - _Thestae, Anathema of Distortion (2026-08-13):_ the Crest's "Give all followers in your deck +1/+1" applies **only** to follower instances currently in the deck (not cards already in hand or on the field). Those buffs **persist when the card is drawn** (otherwise the Crest would be pointless).
 - _Encroached World (2026-08-13):_ Engage and Transform are separate mechanics — Engage activates, and the transform is simply that Engage's effect. There is no special engage-transform interaction to model.
+- _Trap in the Woods (`10911210`) (2026-08-29):_ is an **Amulet**, not a Spell. Owner: _"trap in the woods is an amulet not a handtrap spell the fucking site is wrong for over a year now."_ Owner correction beats the scraped source (same class of defect as Azvaldt / Juratio type mistypes).
+- _Barren-Earth Tyrant (`10943110`) (2026-08-29):_ when "do it 2 times instead" fires, both hits may land on the same follower — _"Yes — same one can eat 8."_ Authored as independent rolls (`random_hits`), never distinct.
+- _Artiglio (`10943310`) / Aragavy (`10154130`) (2026-08-29):_ "Damage split between all enemy followers" is sequential by board age (oldest first, spill onward) — see Split damage. Artiglio deals 3, or **6 instead of 3** (not in addition) when an allied follower attacked a leader last turn; neither spills to the leader.
+- _Initiation of Rebirth (`10901310`) (2026-08-29):_ the destroyed-history copy is shuffled to a **random** deck position (not top/bottom), from the match RNG. The copy is added _before_ the draw resolves (theoretically drawable by the same spell). With an empty destroyed history, no card is added but **the draw still happens**. Ties on "highest base cost" are broken randomly among the tied cards (assumed, not contested). "Without revealing" is covered by the always-visible practice-tool ruling.
+- _Azvaldt, Penitentiary of Chaos (`10903210`) (2026-08-29):_ counts **itself** on its own ladder. Owner: _"azvaldt has to count itself since it says at end of turn if you played. so yes it should count itself at the end of turn."_ The `1…8` ladder can complete the turn Azvaldt lands. Last Words ordering is load-bearing: summon the 4 differently-named followers **first**, then "+3/+3 to all allied followers" catches them too.
+- _Elmott, Remembrance Aflame (`10433110`) (2026-08-29):_ card name is **"Elmott, Remembrance Aflame"** (not "Alflame"). Owner: _"elmott exists."_ Name typos break crest / summon / decklist matching keys.
+- _Dazzling Runeknight (`10031110`) (2026-08-29):_ costs **3**. Owner: _"dazzling runeknight is 3 cost"_ — local data had been wrong at 2; the scraped source was right.
+- _Hien, Redolent Revenant (`10914120`) vs Bayle, Luxglaive Warrior (`10113130`) (2026-08-30):_ same clause shape, different durations. Bayle — _"Whenever an allied follower leaves the field, reduce the cost of this card by 1"_ — **permanent**. Hien — _"Whenever you play a card, reduce the cost of this card by 1 until the end of the turn"_ — **expires each turn** (any allied card played, with `until_eot`). Owner: _"in his case the reduction is permanent in her case it is not permanent and also her reduction is if you just play any card not just if an allied follower leaves the field."_
+- _Yube, Crestpetal (`10544120`) / `until_eot` on stat ops (2026-08-29):_ "until the end of the turn" on a stat op must expire; the `until_eot` key is an alias of `until_end_of_turn`. A duration key on an op whose handler ignores it is a silent functional break (Yube's Marine-attack buff was permanent).
 
 ### Damage Events (General)
 
@@ -446,6 +495,14 @@ A player's EP evolve always runs the full `evolve[]` / `superevolve[]` script fo
 Rule: split damage allocates against each follower's current defense, oldest to newest; allocated points are consumed from the pool even when Barrier reduces dealt damage to 0 and is consumed. Worked example: 10 split damage — a 1/6 with Barrier (oldest) absorbs an allocation of 6 (stays 1/6, Barrier gone); the 1/5 behind it takes the remaining 4 and becomes 1/1. Do not change without owner sign-off.
 
 A damage instance of **0** still counts as the follower **taking damage** for any "whenever this follower takes damage" trigger, as long as the follower remains on the field and is not destroyed by that event. (Barrier blocking a positive hit also counts as taking damage; see Combat.)
+
+**Owner ruling — Damage prevented by super-evolve still counts as "taking damage" (2026-08-23):** > "even if superevolved the followers 'take damage' even if it is reduced to 0."
+
+A super-evolved follower's own-turn protection reduces incoming damage to 0 but does **not** cancel the damage event. Every "when this follower takes damage" trigger — Galmieux's 3-damage passive, her crest's Fangs of Ardent Destruction, Azurifrit's leader ping — must fire on such a hit (combat and effect damage alike). The combat path must still call into damage dealing when the attacker is invincible-on-attack; skipping the counter-damage call entirely would starve those triggers.
+
+**Owner ruling — "Takes N more damage" applies to a 0-damage event (2026-08-31):** > "id say so yes. since when i attack with a 0 attack in game it deals 0 damage so +1 would be 1. lets keep it until i ever see a situation where that contradicts itself."
+
+A 0-damage event **does** take the bonus (0 + 1 = 1). Healing does not.
 
 ---
 
@@ -501,7 +558,7 @@ Many effects modify stats or grant abilities, temporarily or permanently. Implem
 
 - **Base stats:** each follower/leader has base Attack/Defense. For leaders, base defense is the current maximum (20 by default, can be increased).
 - **Permanent buffs/debuffs:** effects that add, subtract, or set stats and are not marked "until end of turn" last for the match (or until the card leaves play), modifying stats on an ongoing basis.
-- **Temporary buffs/debuffs:** effects lasting "until end of turn" (or a stated duration) apply on top of the base and wear off at expiry.
+- **Temporary buffs/debuffs:** effects lasting "until end of turn" (or a stated duration) apply on top of the base and wear off at expiry. Card-data keys `until_end_of_turn` and `until_eot` are aliases — a handler that reads only one of them silently ignores the other (see Yube under Card-specific rulings).
 - **Set-value effects:** an effect that sets a stat to a specific number overrides other modifications at the moment it applies and persists as the new base. "Set defense to 1" overrides current and max defense to 1 regardless of prior buffs or damage (existing damage is cleared in that recalc, leaving the follower at full of the new max). The set does **not** lock the stat against future changes — a later buff stacks on the set base, so "set to 1" followed by "+0/+2" yields 3 defense — but the follower cannot be healed above its new max (1 becomes its new maximum).
 - **Evolution stat bonuses:** a normal evolve adds +2/+2 on top of current stats (unless otherwise specified). A super-evolve adds +3/+3 and, **on its owner's turn only**, makes the follower unable to be destroyed by abilities/effects and reduces any damage it takes to 0. (After the owner ends their turn, it takes damage and can be destroyed like any other follower.) A super-evolved follower also has a **knockback** effect: when it attacks and destroys the follower it is attacking (its combat target), the enemy leader takes 1 damage. Specifics:
   - It fires only for the **combat target** of the attack — destroying _other_ followers (e.g. via a Strike/attack effect that kills a different follower) does **not** deal the 1.
