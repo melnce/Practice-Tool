@@ -9,6 +9,13 @@
  *   5. Crystallize play stays an amulet; follower enter/Fanfare side does not run.
  *
  * Real cards only; exact expected values; driven through the real play path.
+ *
+ * Sabotage (red-before / green-after), 2026-09-02:
+ *   - Commented out spellboostHand(owner, 1) in playSpell → Accelerate spellboost
+ *     test failed: expected spellboostCount 1, received 0. Restored → green.
+ *   - Commented out `if (card.type !== "Follower") return false` in handleReanimate
+ *     → Yearnful test failed: board length 1 (Jailor selected at cost 6, then
+ *     reanimateSummon rejected the Spell instance). Restored → green.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
