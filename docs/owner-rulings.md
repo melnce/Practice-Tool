@@ -1,0 +1,317 @@
+> **In-repo mirror:** The canonical owner-rulings document lives in the owner's Claude project knowledge base. This file is the copy agents in this repo read. Keep both in sync — edit the Claude knowledge base and this mirror together.
+
+# Owner rulings — Shadowverse Worlds Beyond Practice Tool
+
+Rulings Chris has given during development, with the reasoning and evidence behind each.
+
+**Standing principle: owner rulings override printed card text.** When a card's printed text and a ruling here disagree, the ruling wins. This has already prevented one regression — a fidelity audit flagged Azurifrit's 3-per-turn cap as contradicting its text, and the cap is correct because it is a ruling.
+
+---
+
+## Rally — 2026-08-12
+
+> "It doesn't matter how, but only if a follower got successfully summoned to the field."
+
+The only trigger is a follower actually arriving on your field. Route is irrelevant: played from hand, summoned by an effect, token, reanimated, put into play by Last Words. Anything that does not put a follower on the field does not count, and a summon that **fails** (field already full) does not count either.
+
+Consequences: a Crystallize play puts down an _amulet_ and an Accelerate play resolves as a _spell_, so neither counts by itself — but a follower summoned by that text, or by a Crystallize amulet's Last Words, does.
+
+**Taking control** of an enemy follower does **not** count — a control change is not a summon. Verified empirically: **zero cards in the entire 735-card pool** take control of a follower, in any class, in either printed text or effect ops. The question is therefore unreachable in practice.
+
+Note the separate, pre-existing timing rule still stands: a "Fanfare: if Rally (N)" check does not count the card's own entry, because the count is read before that card arrived.
+
+## Accelerate — original cost preserved — 2026-08-12
+
+> "In the game there was a puzzle with Accelerate that said the units keep their original cost. Evolution Portalcraft with Shoddy Plaything and Yog-Zentha, Eld Axe abuses this specifically."
+
+Playing a card via Accelerate does **not** replace its original/base cost with the Accelerate value. The base cost stays as printed.
+
+**This overrides a contradicting official source**, deliberately: a Cygames tweet from 18 Sep 2018 states 「アクセラレート能力でカードをプレイした際、元のコストはアクセラレートの値となります」 — "when played via Accelerate, the original cost becomes the Accelerate value." That tweet is about the **original Shadowverse**, whose service ended June 2026. Worlds Beyond is a separate implementation and never restated the rule, so in-game observation of _this_ game wins. The contradicted source is named in the rulebook so nobody "corrects" it back later.
+
+The abuse case is also the regression test: Shoddy Plaything is base cost 6 with "Accelerate 2: Summon a Shoddy Plaything", so 2 PP buys a **base-cost-6 body**, switching on Portalcraft's whole "base cost 5 or more" package — Yog-Zentha adds Depths of the Eld Axe, Advent of the Eld Axe draws, Unfeeling Eld Axe drops 1 in hand.
+
+## Hidden information — always visible — 2026-08-13
+
+> "Should be always visible cause it's my practice tool and I'm playing against myself. The only time they should be hidden is if playing against a bot or scripted opponent, but that doesn't really have merit since the bot is going to be terrible."
+
+Card text saying "without revealing them" hides nothing in this tool. Copies are visible, and effects may read both hands freely. Not tied to the hidden-hand toggle — judged not worth the complexity.
+
+Settles four cards at once: Goddess of Starlight (`10502110`), Wolfraud (`10514110`), Legacy of the Brave (`10802310`), Behemoth General (`10502120`).
+
+## Oluon, Raging Chariot (`10524110`) — 2026-08-13
+
+> "'Another' means only Oluon is exempt. You can hit an 8 HP unit twice or the leader 3 times. I've seen clips of Oluon just one-shotting the enemy leader (really cancer card)."
+
+Each of the 3 hits picks independently from all characters except Oluon itself. Already-hit targets stay eligible, so all three can land on the leader for 21.
+
+## Slaus, Revolving Wheel of Fortune (`10574110`) — 2026-08-13 — **PROVISIONAL**
+
+> "Unsure. The crest is clear — it has a 3 turn CD so only 3 abilities max can happen. His card effect is hard to test in game because usually cards in Shadowverse don't survive 3 turns in a row. So I'd have said max 3 times and then it stops."
+
+The unused-ability pool is not replenished: three activations maximum, and nothing happens on a fourth start-of-turn. **Marked provisional** — the owner flagged it as uncertain and it is hard to observe in a real match, since a card surviving four turns usually means the game is already decided.
+
+## Thestae, Anathema of Distortion (`10714110`) — 2026-08-13
+
+> "It ONLY buffs cards IN deck, and yes they keep the stats otherwise it would be pointless."
+
+The crest buffs cards while in the deck, and the buff **persists after the card is drawn**. It does not touch cards already in hand or on the field.
+
+## Copy semantics — general rule — 2026-08-13
+
+> "EXACT copy means it has the same stats and modifications. Just copy means the base card."
+
+Applies to every copy effect in the game, not just the card that raised it:
+
+- **"an exact copy"** → the instance, including current stats and modifications.
+- **"a copy"** → the base/printed card.
+
+Also corrected a badly-formed question from a brief: _"Engage is its own thing. Transform is an effect that happens after engaging. Nothing to do with each other."_ There is no Engage-transform interaction to model — Engage activates, the transform is simply its effect, exactly as "Engage: give an ally +1/+1" would be.
+
+## Multi-tier Enhance — ALL affordable tiers activate — 2026-08-15
+
+> "If you play Noel for 8 play points, both his Enhance 8 and Enhance 7 abilities will activate." — "And his fanfare also activates no matter what — if played from hand ofc."
+
+When a card with multiple Enhance tiers is played **from hand** at a PP amount covering several tiers, **every tier whose cost is met activates** — they stack, not compete — **and the Fanfare activates as well** (Enhance never suppresses Fanfare unless a card explicitly says so). Noel IV, Ruthless Warlord (`10624110`) played from hand at 8 PP therefore summons THREE soldiers: the Fanfare Bane soldier, the Enhance(7) Drain soldier, AND the Enhance(8) Storm soldier. The from-hand qualifier is the standard rule: summoned-by-effect copies trigger neither Fanfare nor Enhance.
+
+Engine status at ruling time: the engine applied only the highest affordable tier — **wrong**, fix dispatched. The test added in PR #47 asserting "8 PP → Storm only, no Drain" enshrines the wrong behavior and must be rewritten by the fix. Blast radius: Noel IV is the only multi-tier Enhance card in the current 735-card pool (multiset linter scan), but the fix must be general.
+
+## "Select" is forced — 2026-08-16
+
+> "In this game if it says 'select' then it's forced. You can't play him [Field Scientist] without discarding unless your hand is empty."
+
+A "Select …" clause is mandatory: while a legal target exists, the selection cannot be declined or cancelled — the only exception is when no legal target exists (empty hand / empty board), in which case the card still plays and the selection clause fizzles.
+
+Engine status at ruling time: already correct de facto — there is no cancel path for pending selections anywhere in engine or UI, and the `optional: true` key on the four hand-selection cards (Ruby `10101110`, Apprentice Astrologer `10131120`, Arcane Archivist `10231120`, Field Scientist `10372120`) implements only the empty-zone fizzle, not a decline. Note for future readers: in this codebase `optional` means "fizzle gracefully on empty zone", NOT "player may decline". Tests pinning the ruling were dispatched (mandatory selection + empty-hand fizzle + the conditional-clause distinction: "If you selected one, …" effects must NOT run when nothing was selectable).
+
+## Playability with no "Select" target — spells blocked, followers/amulets fizzle — 2026-08-16
+
+> "If it's something like select on the field but there is no target on the field, then you can still play amulets and followers without the effect. Spells tho — if it says select on the field you can't play the spell if there is no target. Radiant Rainbow sometimes is such a dead card: when you don't have an On-Spellboost card in hand you just can't play it at all, compared to Hearthstone or something where you could just spend 2 mana on nothing to unclog hand."
+
+The rule: a **spell** with a mandatory "Select …" clause requires at least one legal target to be playable at all — no target, no play, the card sits dead in hand (no Hearthstone-style burning mana on nothing). **Followers and amulets** with the same kind of clause stay playable; the selection clause simply fizzles (see the "Select is forced" ruling above for the fizzle mechanics).
+
+Engine status at ruling time: already correct — `canPlayCard` (src/logic/core/playCard/preflight.ts) runs target-requirement checks only when `card.type === "Spell"` or the play is an Accelerate (which resolves as a spell), and Radiant Rainbow (`10131310`) has a bespoke preflight requiring a Spellboost card in hand (excluding itself), with a blocked-reason string. Verify-first tests dispatched to pin the boundary (spell blocked / follower fizzles / Radiant Rainbow dead-card case / Accelerate-as-spell gating).
+
+## Azurifrit, Heir to Disdain (`10344110`) — NO per-turn cap — 2026-08-23
+
+> Q: "In the real game, can Azurifrit ping the leader more than 3 times in one turn?" — A: **"No cap — fires every time."**
+
+The trigger _"During your turn, whenever this follower takes damage but isn't destroyed, deal 1 damage to the enemy leader"_ fires on **every** qualifying self-damage event during your turn. Playing him (Fanfare 3× AoE, hitting himself 3×) and super-evolving him on the same turn (3 more AoE) therefore produces **6** leader pings, not 3.
+
+**This CORRECTS an earlier assumed ruling.** The card data carried `max_per_turn: 3` on the trigger, and a fidelity audit that flagged it as contradicting the printed text was told the cap was an owner ruling — but no such ruling was ever recorded in Chris's words. It appears the "Do this 3 times" of the Fanfare was mistakenly modelled as a per-turn cap on the trigger. The cap is removed. **Lesson: a "ruling" that exists only as a second-hand note in a roadmap, with no owner quote, is an assumption — verify it before defending it.**
+
+Symptom that exposed it (Chris, live play): super-evolving Azurifrit on the turn he was played produced no leader damage, but super-evolving him a turn later did — the cap was silently consumed by the Fanfare's own self-hits.
+
+Also fixed alongside: _"Super-Evolve: Fully restore the defense of this follower"_ must restore to the **buffed** maximum, so a 5/7 Azurifrit ends super-evolution at **8/10**, not 8/7.
+
+## Damage prevented by super-evolve still counts as "taking damage" — 2026-08-23
+
+> "even if superevolved the followers 'take damage' even if it is reduced to 0."
+
+A super-evolved follower's own-turn protection reduces incoming damage to 0 but does **not** cancel the damage event. Every "when this follower takes damage" trigger — Galmieux's 3-damage passive, her crest's Fangs of Ardent Destruction, Azurifrit's leader ping — must fire on such a hit.
+
+Applies to combat as well as effect damage. Chris hit the combat case live: a super-evolved Galmieux attacking a follower took the counter-damage, was protected to 0, and fired **nothing** — no passive, no Fangs. Root cause found in review: `src/logic/core/combat.ts` skipped the counter-damage call entirely when the attacker was invincible-on-attack, so `dealDamage` (which already treats `preventedBySuper` as "counts as damaged") was never reached.
+
+## Deaths settle before dependent triggers pick targets — 2026-08-23
+
+> "playing fangs of ardent destruction should kill the 2/1 at the same time as damaging galmieux. galmieux should then deal 3 dmg to the 5/2 ... but currently the 5/1 ward keeps standing. so either galmieux 3 damage didnt trigger or it targeted the corpse of the 2/1."
+
+A follower reduced to 0 or less defense is dead and must never be a legal target for any effect that resolves afterwards — including effects triggered inside the same damage batch (an AoE that kills one follower and damages another). The general rule: settle deaths before dependent triggers choose targets.
+
+## "N random followers" = N distinct targets; "do this N times" = repeats allowed — 2026-08-23
+
+> "if the text says 2 random followers it can do max 8 to 1 follower ... if it says 8 to A random follower TWICE it can hit the same target twice."
+
+Two printed phrasings with different semantics, and they must be authored differently:
+
+- **"deal X damage to N random enemy followers"** → N **distinct** followers, each hit once. With fewer than N candidates, the surplus picks simply do nothing.
+- **"Do this N times: 'deal X damage to a random enemy follower'"** → N independent rolls; the same follower can be hit repeatedly (this is Oluon's ruling generalised).
+
+**The rulebook already said so** — Randomness: _"destroy two random enemy followers" against 3 followers — pick one at random and remove it, then pick from the remaining two; never pick the same follower twice._ The engine contradicted it: `random_hits` was documented and implemented as "with replacement", so both phrasings resolved identically.
+
+Symptom Chris hit: **Erntz, Governing Justice** (`10544110`, "deal 8 damage to 2 random enemy followers") rolled the same follower twice for 16 and killed an 8/10 Azurifrit that should have survived at 8/2.
+
+Blast radius found by scan — 7 cards were wrong (Erntz, Katalina `10401110`, March of the Brutes `10351310`, Unleashed `10432310`, Elder Sagebrush `10111150`, Band of Battle Princesses `10222310`, Waterbending Charmwielder `10531120`); 11 "do this N times" cards were already correct and must keep with-replacement behaviour.
+
+## "Attacked a leader last turn" — the attack counts, not the damage — 2026-08-29
+
+Ruling given on a direct question, for the five set-10009 cards reading _"If an allied follower attacked a leader on your last turn …"_: **"Attack committed counts."**
+
+An allied follower satisfies the condition the moment it commits an attack on the enemy leader. Damage is irrelevant — a swing that deals 0 still counts. A Ward-blocked attack does **not** count, because it never reaches the leader at all.
+
+Engine: `PlayerState.anyAllyAttackedLeaderThisTurn` / `allyAttackedLeaderLastTurn`, set post-validation when the attack commits, snapshotted at end of turn. The flags live **inside** the snapshotted state so undo/redo and replay stay correct (an out-of-snapshot flag is exactly what silently broke undo on Galmieux's passive). Unlocks: Ripper-Clawed Thief, High-Spirited Marauder, Barren-Earth Tyrant, Artiglio, Antemaria.
+
+## Fuse mechanics — Sephie and Ecstatic Scholar — 2026-08-29
+
+> "sephie and ecstatic scholar do not need any recipes. sephie needs effect on fuse. you can fuse (as many cards as you want to ONE sephie ONCE per turn (if you have 2 sephies in hand ofc you can fuse to both of them ONCE) but you need 2 playpoints available for it to do something. if you have 2 playpoints and you fuse a card to her she will spawn a obsessed test subject on the field."
+
+**Fuse needs no recipe list.** Any card may be fused. The limit is **once per turn per Sephie instance** — with two Sephies in hand you may fuse once to each in the same turn.
+
+**Fusing is always legal, even at 0 PP** — clarified 2026-08-29:
+
+> "the 2 playpoints are spent if you fuse yes and the test subject gets summoned. if you fuse with less than 2 then you just fuse and you dont pay anything and nothing spawns. its important that you CAN fuse even if you dont have playpoints just nothing happens really other than the cards you fused to it are gone from hand"
+
+So: the fuse action is never gated on play points, the fused cards always leave hand, and the "was fused" flag is always set. Only Sephie's **on-fuse effect** is conditional — with **≥2 PP available, exactly 2 PP are SPENT** and an **Obsessed Test Subject** is summoned; with fewer, nothing is spent and nothing spawns. A 0-PP fuse still consumes that Sephie's once-per-turn fuse, and still satisfies Ecstatic Scholar's "was fused" requirement.
+
+> "ecstatic scholar ... her superevolve only works if you fused a card to her when she was still in hand (similar to garden's allure and returning slash (those 2 are spells but also have an additional effect if you fused them). if ecstatic scholar was fused then if she superevolves she can select a test subject on the field and give it drain. only if she fused at least once. if she didnt nothing happens when superevolving (except for the +3/+3 and other superevo buffs ofc)"
+
+**"Was fused while in hand" is a persistent per-card flag**, not a recipe. Ecstatic Scholar's Super-Evolve grants its extra effect (select a Test Subject on the field, give it Drain) **only if she was fused at least once while in hand**; otherwise super-evolution gives only the normal +3/+3. The same flag drives **Garden's Allure** and **Returning Slash** (spells with an additional effect when fused). The flag must survive the hand→field transition and belongs inside the snapshotted state so undo stays correct.
+
+## Tokens live in set "Basic A" (90000) — 2026-08-29
+
+> "the tokens are all in the set basic A for god knows what reason. you need cursor to get them from there. they are all starting with numbers with 9000"
+
+Token cards (summoned/added-by-effect cards that are not in any collectible set) are published under set **[90000] Basic A** with ids beginning `9000…`. Any token a card references must be ingested from there — e.g. **Dread Pirate's Flag** `90021210` (Swordcraft Amulet, Countdown (7), "Whenever you play a spell, advance this amulet's count by 1. Last Words: Deal 2 damage to the enemy leader.") and **Warden of the Trigger** (Portalcraft Artifact Follower 3/3, Ward, "Last Words: Restore 2 defense to your leader.").
+
+## Trap in the Woods is an AMULET — the data source is wrong — 2026-08-29
+
+> "trap in the woods is an amulet not a handtrap spell the fucking site is wrong for over a year now."
+
+`10911210` Trap in the Woods is an **Amulet**, not a Spell. The scraped source has had this wrong for over a year. This is the same class of source defect as the Spell/Amulet mistypes the type linter already catches (Azvaldt, Juratio) — **owner correction beats the source**.
+
+## Set 10009 authoring rulings — 2026-08-29
+
+Four questions asked before authoring the last set-10009 cards; answers verbatim.
+
+**Barren-Earth Tyrant (`10943110`) — the repeat may hit the same follower twice.**
+
+> Q: When "do it 2 times instead" fires, can both hits land on the same follower? — A: **"Yes — same one can eat 8."**
+
+Confirms the general ruling above ("do this N times" = independent rolls, repeats allowed) against the contrasting "N random followers" = distinct rule. Authored as `distribution: "random_hits"` with `count: 2`, never `random_distinct`. A single enemy follower therefore takes 4 twice.
+
+**"Damage split between all enemy followers" — oldest first, spilling onward.**
+
+> "Aragavy, Eternal Hunter should have the logic on how it works. oldest follower gets hit first until it dies then second oldest follower etc."
+
+The split is **sequential by board age**, not even division and not random: damage pours into the oldest enemy follower until it dies, then the remainder continues into the next-oldest, and so on until the total is spent. `10154130` Aragavy, Eternal Hunter (`"distribution": "split_sequential"`, amount 7) is the reference implementation; **Artiglio** (`10943310`) uses the identical shape at amount 3, or 6 when an allied follower attacked a leader last turn — _instead of_ 3, not in addition. Neither card spills to the leader (`spill_to_leader` stays off): the text says followers.
+
+**Initiation of Rebirth (`10901310`) — the copy is shuffled to a random position.**
+
+> Q: Where in the deck does the copy go? — A: **"Shuffled to a random spot."**
+
+Not top, not bottom — a random position in the deck, drawn from the match RNG so replay and undo stay deterministic. Ties on "the highest base cost" are broken **randomly among the tied cards** (assumed, not contested). Ordering: the copy is added to the deck _before_ the draw resolves, so it is theoretically drawable by the card's own draw. With an empty destroyed history, no card is added but **the draw still happens** — the spell must not fizzle wholesale.
+
+Note this card's _"without revealing it"_ is settled by the standing **hidden information — always visible** ruling: nothing is actually concealed in this tool; the only requirement is that the battle log not name the card.
+
+**Azvaldt, Penitentiary of Chaos (`10903210`) — counts itself on its own ladder. CONFIRMED 2026-08-29.**
+
+> Q: Does playing the 8-cost Azvaldt tick the `8` slot? — A: **"never tested, but i assume so yes."**
+
+The owner confirmed it with the reasoning, not just an assumption: _"azvaldt has to count itself since it says at end of turn if you played. so yes it should count itself at the end of turn."_ The check happens at end of turn, by which point Azvaldt has itself been played, so its own base cost 8 is already in the played-this-match history. The ladder `1,2,3,4,5,6,7,8` can therefore complete on the very turn Azvaldt lands. This supersedes the earlier hedge — it is now a settled ruling and no longer needs live retesting.
+
+Its Last Words ordering is also load-bearing: the 4 differently-named followers are summoned **first**, then "+3/+3 to all allied followers on the field" catches them too.
+
+## Elmott, Remembrance Aflame (`10433110`) — name typo in the database — 2026-08-29
+
+> "elmott exists." (with the official card page)
+
+The card is **"Elmott, Remembrance Aflame"**. The database had **"Alflame"** (extra L) on the card record while the crest it grants was already named correctly — so the card's own Super-Evolve produced a crest whose name did not match any card, a dangling reference. Everything else on the record matched the source (Runecraft Follower, cost 3, 2/1, Gold, Skybound Dragons 10004; crest: "At the start of your turn, deal 1 damage to the enemy leader"). Card names are matching keys for decklist import, `add_to_hand`/`summon`/crest references and the dangling-reference scan, so a typo here is a silent functional break, not cosmetic. Fixed alongside a permanent gate that fails on any dangling card-name reference.
+
+## Dazzling Runeknight (`10031110`) costs 3 — the source was right, we were wrong — 2026-08-29
+
+> "dazzling runeknight is 3 cost"
+
+Local data had cost **2**; the scraped source said **3**. Owner confirmed **3**. Corrected in `cards/sets/10000_basic.json`.
+
+Worth recording because it runs the _opposite_ direction to the two nearby corrections. Trap in the Woods and the 29 Engage-amulet type rows are cases where the source is wrong and local wins; Elmott was our own typo. Here the source was simply right. The lesson is that "the site is often wrong" is not a licence to assume local is correct — each mismatch needs its own verdict, and the ones that cannot be settled from the card image go to the owner rather than being guessed. This card is in the Basic set, so it is legal in every Runecraft deck and the extra play point changes real curve decisions.
+
+## Third instance of the silently-ignored-key species — `until_eot` on stat ops — 2026-08-29
+
+Found while verifying the set-10009 batch A PR, not by live play. The engine read `until_eot` on **cost** ops (`src/logic/effects/cost.ts:188,224`) and on **attacks_per_turn** ops (`src/logic/effects/attacks.ts:81,105`), but **not** on **stat** ops — `ops/stat/duration.ts` and `ops/stat/core.ts` checked only `until_end_of_turn`.
+
+Scan over every card: ten use `until_eot`. Seven on cost ops and two on attacks_per_turn ops — all fine. Exactly one used it on a stat op:
+
+**`10544120` Yube, Crestpetal** — her Evolve crest reads _"Whenever an allied Marine follower attacks, give it +1/+0 until the end of the turn…"_. The buff was **permanent**, and stacked on every attack, for as long as the crest was out.
+
+This is the same species as **Zeta & Bea** (top-level `name`/`not_self` on a stat op) and **Sara** (`filter:{damaged:true}` on a destroy op): card data expressing an intent through a key no code path reads, with no error and no warning. Fixed by honouring `until_eot` as an alias, with a Yube regression test, and gated permanently by a new `check:duration-op` — a duration key on an op whose handler ignores it is now a CI error, with the allowlist derived from the engine's consumption paths rather than from what the data currently happens to contain.
+
+**Standing lesson, now three-for-three:** every time a new key is introduced in card data, the question "does anything actually read this?" has to be answered from the engine source, not from the fact that tests pass. Tests pass because they assert what the engine does.
+
+## Barrier inside split damage — allocation is spent even when absorbed — 2026-08-29
+
+> "if you have 10 points of split damage and a 1/6 with barrier and a 1/5 without barrier: the 1/6 with barrier will take 6 damage reduced to 0 cause of barrier (so still 1/6 but now barrier is gone) and the 1/5 without barrier will now be 1/1 as it takes 4 damage spilled over. oldest to newest"
+
+Split damage allocates against each follower's **current defense**, in board order oldest to newest, and the allocation is consumed whether or not the damage actually lands. Barrier reduces the _dealt_ damage to 0 and is itself consumed, but it does **not** hand the allocated points back to the pool.
+
+Worked example, 10 points of split damage:
+
+| Order  | Follower         | Allocated                 | Result                               |
+| ------ | ---------------- | ------------------------- | ------------------------------------ |
+| oldest | 1/6 with Barrier | 6 (= its current defense) | takes 0, still **1/6**, Barrier gone |
+| next   | 1/5 no Barrier   | 4 (the remaining spill)   | **1/1**                              |
+
+So a cheap high-defense Barrier body is a genuine soak against split damage — it eats its full defense worth of the pool and the followers behind it are protected by that much.
+
+**The engine was already correct.** `applySplitSpillover` (`src/logic/effects/ops/damage/primitives.ts:386`) walks recipients in pool order, deals `min(remaining, currentDefense)` to each, and decrements `remaining` by the allocation rather than by the damage actually dealt. This was raised as an open question during set-10009 authoring and pinned by a test _documenting the engine_; that test now pins a **ruling** and its comment should say so. Affects the 9 split-damage cards: Aragavy, Glade, Artiglio, Marwynn, Shining Disenchantment, Flight of the Swarmpetal, Miroku, Ruinbringer, Ludicrous Ordnance, Hark to the Night Song.
+
+## Witch's New Brew always wins an Earth Sigil merge — 2026-08-30
+
+> "witchs new brew is the one that wins when they merge. magic sediment is a 'magically' generated amulet. witchs new brew is an actual amulet you play from hand. so lets say magic sediment is on the field with 2 counters. you play witches new brew: magic sedmient amulet gets destroyed and replaced by the witches new brew that now has 3 counters 2 from before + the one from witches brew. if witches new brew is on the field and you play something that generates magic sediment it will just increase the counter of witches new brew. so witches new brew always wins"
+
+The ruling is **order-independent** — the Brew survives whether it arrives first or second:
+
+| Situation                                                                    | Result                                                                                 |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Magic Sediment on field with 2 counters, then **Witch's New Brew is played** | Sediment destroyed; Brew survives carrying **3** (the Sediment's 2 + the Brew's own 1) |
+| Witch's New Brew on field, then an effect **generates a Magic Sediment**     | No new amulet appears; the Brew's counter simply goes up by 1                          |
+
+This settles a question raised during the card-name cleanup. The engine had a `findEarthSigilTarget()` that preferred a Brew over a Sediment **by matching card-name strings**, and the obvious "general" replacement — oldest sigil survives — would have been **wrong in both directions**. The owner volunteered the rule before that landed.
+
+The cleanup therefore kept the behaviour and changed only how the ranking is expressed: **a collectible Earth Sigil outranks a token one**, derived from data (Witch's New Brew is `[10000] Basic` in the card pool; Magic Sediment is `[90000] Basic A` in `token_details.json`), which is exactly the distinction in the owner's own words — "an actual amulet you play from hand" versus "magically generated". Ranking by cost, rarity or "has a Fanfare" was explicitly rejected: those are incidental to these two cards and would break on the next printing.
+
+Related and already settled: the stacking itself is correct per the rulebook — _"Earth Sigils are a counted resource, not one-per-amulet ... sigils merge additively onto a single amulet rather than each taking a board slot."_
+
+## Hien vs Bayle — the same clause shape, two different durations — 2026-08-30
+
+> "Bayle, Luxglaive Warrior should already have cost reduction implemented whenever an allied follower leaves the field. in his case the reduction is permanent in her case it is not permanent and also her reduction is if you just play any card not just if an allied follower leaves the field."
+
+Two in-hand cost-reduction cards that must be authored differently:
+
+- **`10113130` Bayle, Luxglaive Warrior** — _"Whenever an allied follower leaves the field, reduce the cost of this card by 1."_ **Permanent.** Trigger `ally_follower_leaves_field`, no duration key.
+- **`10914120` Hien, Redolent Revenant** — _"Whenever you play a card, reduce the cost of this card by 1 **until the end of the turn**."_ **Expires each turn.** Trigger `ally_card_played` (any allied card — follower, spell or amulet, not just followers leaving), with `until_eot`.
+
+Hien's entire in-hand line was **unauthored** — she had only a Fanfare and Last Words, so a 9-cost 4/4 whose whole design is ramping herself down sat at 9 forever. She still reported as "implemented" by `check:card-status` because she had _some_ ops, which is exactly how it hid. The load-bearing test is the expiry: play three cards, Hien is at 6; next turn she is back at 9.
+
+## Fourth instance of the silently-ignored-key species — `named_enter_count` counts the entering card — 2026-08-30
+
+Reported by another session, then reproduced and measured before acting. `10931110` **Obsessed Test Subject** reads _"if at least 5 **other** allied copies ... have entered the field this match, give it +3/+3"_, so the 6th copy should be the first buffed. Measured on the old main: **the 5th was buffed.**
+
+Cause: `src/logic/effects/ops/summon_ops/core.ts` calls `recordFollowerEnter` **before** firing `ally_follower_enter`, so a card driven by an enter trigger is already in its own history when its gate evaluates.
+
+The blast-radius scan is what made the fix non-obvious. Only two cards use `named_enter_count`, they use the _identical_ English phrase, and they behave _differently_ because of the route:
+
+- **`10844110` Drache & Aluzard** — Fanfare route. **Already correct** (measured: 1st play +0/+0, 2nd +1/+1, 3rd +2/+2 then evolve). The play-from-hand path records the enter _after_ Fanfare, which `followerEnterHistory.ts` documents as deliberate.
+- **`10931110` Obsessed Test Subject** — enter-trigger route. Off by one.
+
+So a global "exclude self" would have broken Drache. Drache's three measured rows were pinned as a test before the fix went in. Lesson, now four-for-four with Zeta & Bea, Sara and Yube: **the same key can be honoured on one route and ignored on another — check the route, not just the key.**
+
+## Card text is bible — 2026-08-31
+
+> "card text is bible."
+
+Printed card text governs over authored JSON wherever they disagree. The authored data is **never itself evidence of intent** — a card can ship wrong for months.
+
+## Turn-boundary triggers are owner-scoped — 2026-08-31
+
+A turn-boundary trigger printed _"at the start/end of **your** turn"_ fires only on its owner's boundary. `whose_turn: "opponent"` is the explicit opt-out for cards printed _"at the end of your opponent's turn"_ (Lilanthim `10734110`). The defect being fixed was that _absence_ of the key meant "fire for everyone", which in a mirror made your own turn start add a Fairy to **both** hands.
+
+## "Takes N more damage" applies to a 0-damage event — 2026-08-31
+
+> "id say so yes. since when i attack with a 0 attack in game it deals 0 damage so +1 would be 1. lets keep it until i ever see a situation where that contradicts itself."
+
+A 0-damage event **does** take the bonus (0 + 1 = 1). Healing does not.
+
+## Skybound gauge — every allied evolve counts — 2026-08-10
+
+Every evolve of an allied follower counts for the Skybound gauge, regardless of whether an `Evolve:` script fired or EP was spent.
+
+## Hand overflow destroys without Last Words — 2026-08-10
+
+A card destroyed by hand overflow triggers **no** Last Words — "converted into a shadow" beats "destroyed".
+
+---
+
+## Still open — Chris will test in game
+
+Whether a **cost reduction moves the Accelerate value N**, or only the normal cost. No official text exists in either game; the only material is player speculation reasoning by analogy from Enhance.
+
+Related and **unreachable in practice**: whether an Accelerate play triggers Spellboost. Every Accelerate card is Portalcraft or Dragoncraft, every Crystallize card Havencraft, and all 39 Spellboost entries are Runecraft — no legal deck can contain both. The evidence points to yes (the official wording calls the form an アクセラレートスペル, "an Accelerate _spell_"), but it cannot be observed in game.
