@@ -35,11 +35,17 @@ export function handleReanimate(eff: Effect, owner: Player) {
     grave.map((c) => c.name + " (" + c.cost + ")"),
   );
 
-  // Find all followers in graveyard with cost <= maxCost
+  // Owner ruling 2026-09-02: Reanimate only sees followers that were destroyed
+  // on the field. destroyedHistory is written only at the two genuine
+  // destruction sites (cleanup.ts + destroy/primitives.ts) — match by uid.
+  const destroyedUids = new Set(
+    state.players[owner].destroyedHistory.map((r) => String(r.uid ?? "")),
+  );
+
+  // Find all field-destroyed followers in graveyard with cost <= maxCost
   const eligible = grave.filter((card) => {
     if (card.type !== "Follower") return false;
-    // cost on CardInstance might be number or string?
-    // Using explicit cast or check
+    if (!destroyedUids.has(String(card.uid ?? ""))) return false;
     const cCost = parseInt(String(card.cost ?? 0)) || 0;
     return cCost <= maxCost;
   });

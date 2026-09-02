@@ -6,17 +6,18 @@ import type {
   CardInstance,
   Effect,
 } from "../../../../core/types/index.js";
-import { alreadyFusedThisTurn, handOf, graveOf } from "./types.js";
+import { alreadyFusedThisTurn, handOf } from "./types.js";
 import { state } from "../../../../core/gameState.js";
+import { moveToBanishZone } from "../banish/primitives.js";
 
 // Finalize for Garden's Allure
+// Owner ruling 2026-09-02: fused partners are banished (not cemetery).
 export function fuse_finalize_gardens_allure(
   owner: Player,
   initiator_uid: string,
   partners: CardInstance[],
 ) {
   const hand = handOf(owner);
-  const grave = graveOf(owner);
 
   const initiator = hand.find((c) => c?.uid === initiator_uid);
   if (!initiator) {
@@ -41,7 +42,7 @@ export function fuse_finalize_gardens_allure(
     const idx = hand.findIndex((c) => c.uid === p.uid);
     if (idx !== -1) {
       const [used] = hand.splice(idx, 1);
-      if (used) grave.push(used);
+      if (used) moveToBanishZone(used, owner);
     }
   }
 

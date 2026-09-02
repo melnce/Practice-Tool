@@ -14,6 +14,7 @@ import type { Player, CardInstance } from "../../../../core/types/index.js";
 import type { FuseOp } from "./types.js";
 
 import { alreadyFusedThisTurn, handOf } from "./types.js";
+import { moveToBanishZone } from "../banish/primitives.js";
 // ---------- starters ----------
 export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
   const hand = handOf(owner);
@@ -192,7 +193,10 @@ export function fuse_finalize_gear_multi(
 
   for (const p of partners || []) {
     const idx = hand.findIndex((c) => c?.uid === p.uid);
-    if (idx !== -1) hand.splice(idx, 1);
+    if (idx !== -1) {
+      const [used] = hand.splice(idx, 1);
+      if (used) moveToBanishZone(used, owner);
+    }
   }
 
   state.lastFuse = {
@@ -281,7 +285,10 @@ export function fuse_finalize_fortifier(
   hand[iIdx] = newCard;
   for (const p of partners || []) {
     const idx = hand.findIndex((c) => c?.uid === p.uid);
-    if (idx !== -1) hand.splice(idx, 1);
+    if (idx !== -1) {
+      const [used] = hand.splice(idx, 1);
+      if (used) moveToBanishZone(used, owner);
+    }
   }
 
   state.lastFuse = {
@@ -364,7 +371,10 @@ export function fuse_finalize_alpha(
       .filter((ix) => ix !== -1 && ix !== iIdx)
       .sort((a, b) => b - a);
 
-    for (const ix of partnerIdxsDesc) hand.splice(ix, 1);
+    for (const ix of partnerIdxsDesc) {
+      const [used] = hand.splice(ix, 1);
+      if (used) moveToBanishZone(used, owner);
+    }
 
     state.lastFuse = {
       owner,
@@ -381,7 +391,10 @@ export function fuse_finalize_alpha(
       return;
     }
     const pIdx = idxOf(partner0.uid);
-    if (pIdx !== -1) hand.splice(pIdx, 1);
+    if (pIdx !== -1) {
+      const [used] = hand.splice(pIdx, 1);
+      if (used) moveToBanishZone(used, owner);
+    }
     state.lastFuse = {
       owner,
       initiator_name: "Ominous Artifact α",

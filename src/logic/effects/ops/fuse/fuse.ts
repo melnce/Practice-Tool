@@ -18,6 +18,7 @@ import {
   handOf,
   hasFuseCardsCapability,
 } from "./types.js";
+import { moveToBanishZone } from "../banish/primitives.js";
 // Class-specific modules
 import {
   startGearMultiSelect,
@@ -286,9 +287,11 @@ export function fuse_finalize_generic(
 
   if (resultSpec?.type === "waste") {
     if (resultSpec.consume === "partner") {
-      hand.splice(pIdx, 1);
+      const [used] = hand.splice(pIdx, 1);
+      if (used) moveToBanishZone(used, owner);
     } else if (resultSpec.consume === "initiator") {
-      hand.splice(iIdx, 1);
+      const [used] = hand.splice(iIdx, 1);
+      if (used) moveToBanishZone(used, owner);
     }
     state.lastFuse = {
       owner,
@@ -326,8 +329,11 @@ export function fuse_finalize_generic(
   if (targets === "merge") {
     const min = Math.min(iIdx, pIdx);
     const max = Math.max(iIdx, pIdx);
+    const removed = hand[max];
     hand[min] = mk();
     hand.splice(max, 1);
+    // The non-surviving fuse material is banished (owner ruling 2026-09-02).
+    if (removed) moveToBanishZone(removed, owner);
   } else if (targets === "initiator") {
     hand[iIdx] = mk();
   } else if (targets === "partner") {
@@ -335,8 +341,10 @@ export function fuse_finalize_generic(
   } else {
     const min = Math.min(iIdx, pIdx);
     const max = Math.max(iIdx, pIdx);
+    const removed = hand[max];
     hand[min] = mk();
     hand.splice(max, 1);
+    if (removed) moveToBanishZone(removed, owner);
   }
 
   // collapse accidental duplicates of same name next to each other
