@@ -28,6 +28,7 @@ import {
   getHand,
 } from "../../src/core/playerHelpers.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -104,10 +105,11 @@ describe("B/C — Maeve Last Words amulet copy (10162130)", () => {
 
   it("Last Words summons highest-cost destroyed allied amulet this match", () => {
     setupTurn(R6);
-    state.players.first.graveyard.push(
-      createCard("10161210", "graveyard", "first"),
-      createCard("10162210", "graveyard", "first"),
-    );
+    const amuletA = createCard("10161210", "graveyard", "first");
+    const amuletB = createCard("10162210", "graveyard", "first");
+    state.players.first.graveyard.push(amuletA, amuletB);
+    recordDestroyed(state, "first", amuletA);
+    recordDestroyed(state, "first", amuletB);
     const maeve = createCard("10162130", "board", "first");
     applyKeywordsFromList(maeve);
     maeve.defense = 0;

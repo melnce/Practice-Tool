@@ -23,6 +23,7 @@ import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import {
   getBoard,
@@ -623,10 +624,11 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
         .withFirstHP(20, 20)
         .build();
 
-      state.players.first.graveyard = [
-        createCard("10001110", "graveyard", "first"),
-        createCard("10001130", "graveyard", "first"),
-      ];
+      const corpseA = createCard("10001110", "graveyard", "first");
+      const corpseB = createCard("10001130", "graveyard", "first");
+      state.players.first.graveyard = [corpseA, corpseB];
+      recordDestroyed(state, "first", corpseA);
+      recordDestroyed(state, "first", corpseB);
 
       runEffects(
         [{ op: "summon", source: "graveyard", max_cost: 2 } as any],

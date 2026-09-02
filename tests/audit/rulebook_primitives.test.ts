@@ -17,6 +17,7 @@ import { state } from "../../src/core/gameState.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
 import { bounceToHand } from "../../src/logic/effects/ops/bounce.js";
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import {
   destroyTarget,
   canBeDestroyed,
@@ -126,10 +127,11 @@ describe("Rulebook §763 — Reanimate (X): cost search is strictly downward", (
   it("Reanimate(4) summons highest cost ≤4; if none at 4, tries 3, 2…", () => {
     givenGameState({ seed: 42 }).build();
 
-    state.players.first.graveyard = [
-      createCard("10001110", "graveyard", "first"), // cost 2
-      createCard("10001130", "graveyard", "first"), // Quake Goliath — cost 4
-    ] as CardInstance[];
+    const cost2 = createCard("10001110", "graveyard", "first"); // cost 2
+    const cost4 = createCard("10001130", "graveyard", "first"); // Quake Goliath — cost 4
+    state.players.first.graveyard = [cost2, cost4] as CardInstance[];
+    recordDestroyed(state, "first", cost2);
+    recordDestroyed(state, "first", cost4);
 
     handleReanimate({ op: "reanimate", max_cost: 4 } as any, "first");
 

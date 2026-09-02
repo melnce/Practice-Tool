@@ -33,6 +33,7 @@ import {
   getCrests,
 } from "../../src/core/playerHelpers.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import "../../src/logic/core/effects/index.js";
 
 const R6 = 6;
@@ -400,6 +401,7 @@ describe("Set 10009 batch A — C8 Istyndet vs. Mitilykket", () => {
       createCard("90031130", "graveyard", "first"),
     ];
     getGraveyard(state, "first").push(...cheap);
+    for (const corpse of cheap) recordDestroyed(state, "first", corpse);
     const foeA = enemyFollower(2, 5, "FoeA");
     const foeB = enemyFollower(2, 5, "FoeB");
     const hpBefore = getHP(state, "second");

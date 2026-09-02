@@ -29,6 +29,7 @@ import { getImplementationStatus } from "../../src/data/cardImplementationStatus
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import "../../src/logic/core/effects/index.js";
 
 function resolveFirstPending(): void {
@@ -328,20 +329,20 @@ describe("Set 10007 — Anathema's Gambit", () => {
   it("Juggler Corvid — destroy selected then Reanimate (2)", () => {
     setupTurn(6, { hand: ["10752120"], pp: 6 });
     enemyFollower(4, 4, "Boss");
-    state.players.first.graveyard.push(
-      createCard(
-        {
-          name: "Ghost",
-          type: "Follower",
-          cost: 1,
-          attack: 1,
-          defense: 1,
-          tribes: ["Departed"],
-        },
-        "graveyard",
-        "first",
-      ),
+    const ghost = createCard(
+      {
+        name: "Ghost",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        tribes: ["Departed"],
+      },
+      "graveyard",
+      "first",
     );
+    state.players.first.graveyard.push(ghost);
+    recordDestroyed(state, "first", ghost);
     whenPlayCard("first", 0);
     resolveFirstPending();
     cleanupDead();
