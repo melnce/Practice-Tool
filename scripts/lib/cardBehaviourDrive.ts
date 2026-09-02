@@ -47,6 +47,7 @@ export type SkipReason =
 
 export type ScenarioName =
   | "play"
+  | "play_base"
   | "play_else"
   | "turn_boundary"
   | "evolve"
@@ -96,6 +97,7 @@ type RawCard = {
   evolve?: unknown[];
   superevolve?: unknown[];
   triggers?: unknown[];
+  keywords?: unknown[];
 };
 
 function walkEffects(
@@ -114,6 +116,21 @@ function walkEffects(
 
 function hasNonEmptyEffects(arr: unknown[] | undefined): boolean {
   return Array.isArray(arr) && arr.length > 0;
+}
+
+/** Lowest Enhance-tier cost that carries effects, or null if none. */
+function lowestEnhanceTierCost(card: RawCard): number | null {
+  if (!Array.isArray(card.keywords)) return null;
+  let lowest = Infinity;
+  for (const k of card.keywords) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as { name?: unknown; cost?: unknown; effects?: unknown };
+    if (String(kw.name ?? "").toLowerCase() !== "enhance") continue;
+    if (!Array.isArray(kw.effects) || kw.effects.length === 0) continue;
+    const cost = Number(kw.cost);
+    if (Number.isFinite(cost) && cost > 0 && cost < lowest) lowest = cost;
+  }
+  return Number.isFinite(lowest) ? lowest : null;
 }
 
 function hasBoardTurnTrigger(card: RawCard): boolean {
@@ -143,6 +160,12 @@ function classifyPaths(card: RawCard): ScenarioName[] {
 
   if (playableEffects || isSpell) {
     paths.push("play");
+  }
+  // Base-cost branch for Enhance cards — PP held below the lowest tier so
+  // resolvePlayCost cannot prefer Enhance (the existing `play` scenario
+  // always affords every pool tier).
+  if (lowestEnhanceTierCost(card) != null) {
+    paths.push("play_base");
   }
   if (hasBoardTurnTrigger(card)) {
     paths.push("turn_boundary");
@@ -198,9 +221,12 @@ function buildArena(opts: {
   roundCount?: number;
   activePlayer?: "first" | "second";
   extraHand?: CardInstance[];
+  /** Override first-player PP (and maxPP). Default 10 — affords every Enhance tier. */
+  firstPP?: number;
 }): void {
   resetUidCounter();
   state.gameStarted = true;
+  const pp = opts.firstPP ?? 10;
   givenGameState({
     seed: HARNESS_SEED,
     activePlayer: opts.activePlayer ?? "first",
@@ -209,7 +235,7 @@ function buildArena(opts: {
   })
     .withFirstHP(20)
     .withSecondHP(20)
-    .withFirstPP(10, 10)
+    .withFirstPP(pp, pp)
     .withSecondPP(10, 10)
     .withFirstShadows(10)
     .withSecondShadows(10)
@@ -369,13 +395,18 @@ function runPlayScenario(
   cardId: string,
   gates: GateSpec[],
   mode: "satisfy" | "deny",
-  scenarioName: "play" | "play_else",
+  scenarioName: "play" | "play_else" | "play_base",
+  opts: { firstPP?: number } = {},
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
 
   const extras = buildExtraHand(template);
-  buildArena({ extraHand: extras, roundCount: 8 });
+  buildArena({
+    extraHand: extras,
+    roundCount: 8,
+    firstPP: opts.firstPP,
+  });
 
   const playCard = createCard(cardId, "hand", "first");
   (playCard as any).cost = 0;
@@ -609,6 +640,14 @@ export function driveCard(raw: RawCard): CardDriveResult {
               for (const c of elseResult.gatesUnmet ?? []) unmetAll.add(c);
             }
           }
+        } else if (path === "play_base") {
+          const lowest = lowestEnhanceTierCost(raw);
+          // PP strictly below the cheapest Enhance tier → base form only.
+          const firstPP =
+            lowest != null && lowest > 1 ? lowest - 1 : 0;
+          result = runPlayScenario(id, gates, "satisfy", "play_base", {
+            firstPP,
+          });
         } else if (path === "turn_boundary")
           result = runTurnBoundaryScenario(id, gates);
         else if (path === "evolve") result = runEvolveScenario(id, gates);
