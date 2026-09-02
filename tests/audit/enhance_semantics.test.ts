@@ -2,7 +2,7 @@
  * Enhance semantics unify — real-card proofs through the play path.
  *
  * Covers migration buckets (flag-added / dup-stripped / follower-unchanged),
- * Phalanx replace, Drake Whelp additive, Noel IV multi-tier owner ruling,
+ * Phalanx replace, Drake Whelp additive, Noel IV multi-tier (owner 2026-08-15),
  * and concatenated-list resume for a base select → Enhance tail.
  */
 import { describe, it, expect, beforeEach } from "vitest";
@@ -151,6 +151,10 @@ describe("Enhance semantics unify", () => {
   });
 
   // --- Migration bucket: follower unchanged (additive was already the default) ---
+  // Noel IV is load-bearing: base + multiple Enhance tiers in one play.
+  // Owner ruling 2026-08-15: "Enhance never suppresses Fanfare unless a card
+  // explicitly says so." At 8 PP from hand, Fanfare + Enhance(7) + Enhance(8)
+  // all fire → three Fearless Soldiers (Bane, Drain, Storm).
 
   describe("10624110 Noel IV — follower additive + multi-tier ruling", () => {
     it("base (6 PP): Fanfare only — exactly 1 Fearless Soldier with Bane", () => {
@@ -160,21 +164,35 @@ describe("Enhance semantics unify", () => {
         (c) => c.name === "Fearless Soldier",
       );
       expect(soldiers).toHaveLength(1);
-      expect(soldiers[0]!.hasBane).toBe(true);
-      expect(soldiers.filter((c) => c.hasDrain).length).toBe(0);
-      expect(soldiers.filter((c) => c.hasStorm).length).toBe(0);
+      expect(soldiers.filter((c) => c.hasBane === true)).toHaveLength(1);
+      expect(soldiers.filter((c) => c.hasDrain === true)).toHaveLength(0);
+      expect(soldiers.filter((c) => c.hasStorm === true)).toHaveLength(0);
     });
 
-    it("Enhance at 8 PP: Fanfare Bane + Enhance(7) Drain + Enhance(8) Storm", () => {
+    it("at 7 PP: Fanfare Bane + Enhance(7) Drain — exactly 2 soldiers", () => {
+      setupTurn(7, { hand: ["10624110"], pp: 7 });
+      whenPlayCard("first", 0);
+      const soldiers = getBoard(state, "first").filter(
+        (c) => c.name === "Fearless Soldier",
+      );
+      expect(soldiers).toHaveLength(2);
+      expect(soldiers.filter((c) => c.hasBane === true)).toHaveLength(1);
+      expect(soldiers.filter((c) => c.hasDrain === true)).toHaveLength(1);
+      expect(soldiers.filter((c) => c.hasStorm === true)).toHaveLength(0);
+    });
+
+    it("at 8 PP from hand: Fanfare Bane + Enhance(7) Drain + Enhance(8) Storm — exactly 3", () => {
+      // Owner 2026-08-15: both Enhance tiers activate; Fanfare also activates
+      // when played from hand. Three soldiers, not two.
       setupTurn(8, { hand: ["10624110"], pp: 8 });
       whenPlayCard("first", 0);
       const soldiers = getBoard(state, "first").filter(
         (c) => c.name === "Fearless Soldier",
       );
       expect(soldiers).toHaveLength(3);
-      expect(soldiers.filter((c) => c.hasBane).length).toBe(1);
-      expect(soldiers.filter((c) => c.hasDrain).length).toBe(1);
-      expect(soldiers.filter((c) => c.hasStorm).length).toBe(1);
+      expect(soldiers.filter((c) => c.hasBane === true)).toHaveLength(1);
+      expect(soldiers.filter((c) => c.hasDrain === true)).toHaveLength(1);
+      expect(soldiers.filter((c) => c.hasStorm === true)).toHaveLength(1);
     });
   });
 
