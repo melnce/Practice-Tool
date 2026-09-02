@@ -23,6 +23,12 @@
  *   green (still never the cheap corpse). Restored with
  *   `git checkout -- src/logic/core/destroyedHistory.ts`; porcelain clean for
  *   that path.
+ *
+ * Gates (measured after docs+tests landed; no engine changes):
+ *   npm run check — Success (audit 1037 passed / 1 skipped; unit 773 passed;
+ *     eslint 0 errors / 21 pre-existing warnings).
+ *   npm run cards:verify — OK, zero movement vs baseline (did not run baseline).
+ *   npm run test:all — 24 failed | 1905 passed | 1 skipped (known-red still 24).
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
