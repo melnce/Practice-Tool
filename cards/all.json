@@ -93,7 +93,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -123,7 +125,9 @@
             "op": "keyword",
             "action": "remove",
             "target": "enemy:follower",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "select": 1
           }
         ]
@@ -225,7 +229,9 @@
             "action": "grant",
             "target": "ally:follower",
             "select": 1,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           }
         ]
       }
@@ -440,7 +446,9 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -496,7 +504,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -550,7 +560,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -642,7 +654,9 @@
       {
         "op": "search",
         "count": "all",
-        "keywords": ["Storm"],
+        "keywords": [
+          "Storm"
+        ],
         "filter": {
           "name": "Rusty, Luxcard Trickster"
         }
@@ -736,7 +750,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Ward"]
+                "keywords": [
+                  "Ward"
+                ]
               }
             ]
           }
@@ -758,7 +774,9 @@
     "type": "Amulet",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": ["Earth Sigil"],
+    "tribes": [
+      "Earth Sigil"
+    ],
     "description": "Fanfare: Draw a card.\nEarth Sigil\nEngage (1): Gain an earth sigil.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10031210.webp",
     "evo_image": "",
@@ -1019,7 +1037,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -1218,7 +1238,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm", "Bane"],
+    "keywords": [
+      "Storm",
+      "Bane"
+    ],
     "triggers": []
   },
   {
@@ -1275,7 +1298,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -1392,7 +1417,9 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:last_summoned",
-        "keywords": ["drain"]
+        "keywords": [
+          "drain"
+        ]
       }
     ],
     "fanfare": [],
@@ -1457,7 +1484,9 @@
         "amount": 5
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -1478,7 +1507,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -1622,7 +1653,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "engage",
@@ -1636,7 +1669,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -1713,7 +1748,9 @@
         "count": 1
       }
     ],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -1761,7 +1798,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Bane", "Ward"],
+    "keywords": [
+      "Bane",
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -1860,7 +1900,9 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "superEvolveReplaces": true,
     "triggers": []
   },
@@ -2461,7 +2503,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -2775,7 +2819,9 @@
         "defense": 0
       }
     ],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -2877,7 +2923,9 @@
               {
                 "op": "keyword",
                 "action": "grant",
-                "keywords": ["Storm"],
+                "keywords": [
+                  "Storm"
+                ],
                 "target": "entering_follower"
               }
             ]
@@ -2925,7 +2973,9 @@
         "into": "Bramble Burst"
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -2972,7 +3022,9 @@
         }
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -3003,7 +3055,9 @@
         "defense": 1
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -3052,7 +3106,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Fanfare: Summon a Steelclad Knight.\nWhenever an allied Officer follower enters the field, restore 1 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10121130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10121130_evo.webp",
@@ -3148,12 +3204,16 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
     ],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -3198,7 +3258,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Silver",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Whenever an allied Officer follower enters the field, give this follower +1/+0 until the end of the turn.\nEvolve: Summon a Knight.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10122110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10122110_evo.webp",
@@ -3245,7 +3307,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Silver",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Fanfare: Summon 3 copies of Steelclad Knight.\nWhenever an allied Officer follower enters the field, give it Ward.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10122120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10122120_evo.webp",
@@ -3275,7 +3339,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -3291,7 +3357,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Silver",
-    "tribes": ["Luminous"],
+    "tribes": [
+      "Luminous"
+    ],
     "description": "Fanfare: Summon a Knight.\nWhenever an allied Officer follower enters the field, give it Rush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10122130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10122130_evo.webp",
@@ -3321,7 +3389,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Rush"],
+            "keywords": [
+              "Rush"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -3353,7 +3423,9 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": []
   },
   {
@@ -3419,7 +3491,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Gold",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Rush\nCan attack 2 times per turn.\nStrike: Give this follower Barrier. Summon a Knight.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10123110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10123110_evo.webp",
@@ -3430,7 +3504,10 @@
     "superevolve": [],
     "fanfare": [],
     "attacks_per_turn": 2,
-    "keywords": ["Rush", "Strike"],
+    "keywords": [
+      "Rush",
+      "Strike"
+    ],
     "triggers": [
       {
         "event": "strike",
@@ -3491,7 +3568,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Ambush"]
+            "keywords": [
+              "Ambush"
+            ]
           },
           {
             "op": "stat",
@@ -3581,7 +3660,10 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Rush", "Ward"],
+            "keywords": [
+              "Rush",
+              "Ward"
+            ],
             "target": "entering_follower"
           },
           {
@@ -3604,7 +3686,9 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Gold",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Select an enemy follower on the field or the enemy leader and deal it 5 damage. Restore 5 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10123310.webp",
     "evo_image": "",
@@ -3640,7 +3724,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Enhance (9): Deal 3 damage to all enemy followers. Give this follower \"Can attack 2 times per turn.\"\nStorm",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10124110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10124110_evo.webp",
@@ -3694,7 +3780,9 @@
           "class": "Swordcraft"
         },
         "exclude_self": true,
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "fanfare": [
@@ -3737,7 +3825,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       }
     ],
     "fanfare": [],
@@ -3752,7 +3842,9 @@
             "image": "images/crests/kagemitsu_enduring_warrior.png",
             "description": "Countdown (2) Last Words: Summon a Kagemitsu, Enduring Warrior",
             "countdown": 2,
-            "keywords": ["LastWords"],
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "summon",
@@ -4006,7 +4098,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Silver",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Spellboost your hand.\nEvolve: Select an enemy follower on the field and deal it 3 damage. Spellboost your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10132110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10132110_evo.webp",
@@ -4089,7 +4183,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Silver",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "X starts at 0.\nOn Spellboost: Increase X by 1.\nFanfare: Deal X damage to all enemy followers.\nEvolve: Spellboost your hand 2 times.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10132130.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10132130_evo.webp",
@@ -4211,7 +4307,9 @@
           {
             "op": "stat",
             "action": "give",
-            "keywords": ["Can't Attack"],
+            "keywords": [
+              "Can't Attack"
+            ],
             "duration": "opponent_turn_end",
             "target": "selected:follower"
           }
@@ -4396,7 +4494,9 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "X starts at 0.\nOn Spellboost: Increase X by 1. Then, if X is at least 5, transform this card into a Looking Smart!\nDraw 2 cards.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10133310.webp",
     "evo_image": "",
@@ -4550,7 +4650,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Summon an Anne's Summoning. Spellboost your hand 3 times.\nEvolve: Select an enemy follower on the field and deal it 3 damage.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10134120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10134120_evo.webp",
@@ -4691,7 +4793,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["storm"]
+            "keywords": [
+              "storm"
+            ]
           }
         ]
       }
@@ -4877,7 +4981,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "on_discard": [
       {
         "op": "stat",
@@ -4917,12 +5023,16 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Intimidate"]
+            "keywords": [
+              "Intimidate"
+            ]
           }
         ]
       }
     ],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -5070,7 +5180,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -5137,7 +5249,9 @@
         "count": 1
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -5184,7 +5298,9 @@
     "type": "Follower",
     "class": "Dragoncraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Select a card in your hand and discard it. Deal X damage to all enemy followers. X is the cost of the selected card.\nSuper-Evolve: Give your opponent Crest: Burnite, Anathema of Flame.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10144110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10144110_evo.webp",
@@ -5269,7 +5385,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm", "Intimidate"],
+    "keywords": [
+      "Storm",
+      "Intimidate"
+    ],
     "triggers": []
   },
   {
@@ -5294,14 +5413,18 @@
         "action": "grant",
         "target": "ally:follower",
         "name_filter": "Supreme Golden Dragon",
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       },
       {
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
         "name_filter": "Supreme Silver Dragon",
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "fanfare": [
@@ -5569,13 +5692,17 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
@@ -5765,7 +5892,9 @@
                 "op": "keyword",
                 "action": "grant",
                 "target": "self",
-                "keywords": ["Barrier"]
+                "keywords": [
+                  "Barrier"
+                ]
               }
             ],
             "else_effects": [
@@ -5784,7 +5913,9 @@
         }
       }
     ],
-    "keywords": ["Bane"]
+    "keywords": [
+      "Bane"
+    ]
   },
   {
     "id": "10153120",
@@ -5831,7 +5962,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -5884,7 +6017,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Bane"],
+            "keywords": [
+              "Bane"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -6067,7 +6202,9 @@
     "superevolve": [],
     "fanfare": [],
     "attacks_per_turn": 3,
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "follower_strike",
@@ -6181,7 +6318,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward", "Barrier"],
+    "keywords": [
+      "Ward",
+      "Barrier"
+    ],
     "triggers": []
   },
   {
@@ -6236,7 +6376,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Aura"],
+    "keywords": [
+      "Aura"
+    ],
     "triggers": [
       {
         "event": "engage",
@@ -6357,7 +6499,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Barrier"]
+        "keywords": [
+          "Barrier"
+        ]
       }
     ],
     "superevolve": [],
@@ -6599,7 +6743,9 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": []
   },
   {
@@ -6631,7 +6777,9 @@
             "image": "images/crests/lapis_shining_seraph.png",
             "description": "Countdown (2) Last Words: Summon a Lapis, Shining Seraph and give it Storm",
             "countdown": 2,
-            "keywords": ["LastWords"],
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "summon",
@@ -6642,7 +6790,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "ally:last_summoned",
-                "keywords": ["Storm"]
+                "keywords": [
+                  "Storm"
+                ]
               }
             ]
           }
@@ -6749,7 +6899,9 @@
     "type": "Follower",
     "class": "Havencraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Select a card in your hand and discard it. Summon 3 random differently named amulets from your deck that cost 3 or less.\nSuper-Evolve: Destroy a random enemy follower with the highest attack. Deal 1 damage to all enemy followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10164110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10164110_evo.webp",
@@ -6792,7 +6944,7 @@
   {
     "id": "10164120",
     "name": "Jeanne, Saintly Knight",
-    "cost": "8",
+    "cost": "7",
     "attack": "6",
     "defense": "6",
     "type": "Follower",
@@ -6823,7 +6975,9 @@
         "defense": 4
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -6857,7 +7011,9 @@
         "amount": 3
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -6981,7 +7137,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Bane"],
+            "keywords": [
+              "Bane"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -7585,7 +7743,10 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Storm", "Bane"],
+            "keywords": [
+              "Storm",
+              "Bane"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -7732,7 +7893,9 @@
         ]
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -7835,7 +7998,9 @@
         "select": 1
       }
     ],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -7886,7 +8051,9 @@
         ]
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "specific_effects": [
       {
@@ -7915,7 +8082,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -8013,7 +8182,9 @@
         "count": 2
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -8279,7 +8450,9 @@
         "op": "stat",
         "action": "give",
         "target": "enemy:follower",
-        "keywords": ["Can't Attack"],
+        "keywords": [
+          "Can't Attack"
+        ],
         "duration": "opponent_turn_end",
         "select": 2
       }
@@ -8356,7 +8529,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": []
   },
   {
@@ -8411,7 +8586,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "source": "board",
@@ -8611,7 +8788,9 @@
         "count": 1
       }
     ],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": []
   },
   {
@@ -8623,7 +8802,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Rally (20) - Super-evolve this follower.\nWhenever another allied follower enters the field, deal 1 damage to all enemy followers.\nWhen this follower evolves, summon 2 copies of Steelclad Knight and give them Rush.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10224110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224110_evo.webp",
@@ -8636,7 +8817,9 @@
         "op": "summon",
         "source": "named",
         "name": "Steelclad Knight",
-        "keywords": ["Rush"],
+        "keywords": [
+          "Rush"
+        ],
         "count": 2
       }
     ],
@@ -8682,7 +8865,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Levin"],
+    "tribes": [
+      "Levin"
+    ],
     "description": "Fanfare: Summon 2 enemy copies of Knight.\nWhenever an enemy follower enters the field, give it \"Can't attack followers or leaders\" until the end of your opponent's turn, deal 1 damage to the enemy leader, and restore 1 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10224120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10224120_evo.webp",
@@ -8986,7 +9171,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Ward\nClash: Spellboost your hand.\nEvolve: Draw 2 followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10233110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10233110_evo.webp",
@@ -9003,7 +9190,9 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "clash",
@@ -9098,7 +9287,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Aura\nLast Words: Earth Rite (2) - Summon a Lilanthim, Anathema of Edacity.\nSuper-Evolve: Select 2 enemy followers on the field and destroy them.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10234110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234110_evo.webp",
@@ -9144,7 +9335,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Earth Rite (1) - Select a Mode to activate.\n1. Summon a Guardian Golem and give it Barrier.\n2. Draw 3 cards.\n3. Restore 4 defense to your leader.\nEvolve: Replicate the effects of this card's Fanfare ability.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10234120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10234120_evo.webp",
@@ -9172,7 +9365,9 @@
                     "op": "summon",
                     "source": "named",
                     "name": "Guardian Golem",
-                    "keywords": ["Barrier"],
+                    "keywords": [
+                      "Barrier"
+                    ],
                     "count": 1
                   }
                 ]
@@ -9289,7 +9484,9 @@
         ]
       }
     ],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -9520,7 +9717,9 @@
         "count": 2
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "specific_effects": [
       {
@@ -9602,7 +9801,9 @@
         ]
       }
     ],
-    "keywords": ["Bane"],
+    "keywords": [
+      "Bane"
+    ],
     "triggers": []
   },
   {
@@ -9661,7 +9862,9 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Bane"],
+    "keywords": [
+      "Bane"
+    ],
     "triggers": []
   },
   {
@@ -9752,7 +9955,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "ally_super_evolve",
@@ -9917,7 +10122,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -10041,7 +10248,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -10083,7 +10292,9 @@
     ],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -10302,7 +10513,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [
       {
         "event": "strike",
@@ -10318,7 +10531,9 @@
                 "distribution": "random",
                 "count": 1,
                 "target": "enemy:follower",
-                "exclude": ["context.defender"]
+                "exclude": [
+                  "context.defender"
+                ]
               }
             ]
           }
@@ -10357,7 +10572,9 @@
         "image": "images/crests/maddening_benison.png",
         "description": "Countdown (2). Last Words: Deal 10 damage to your leader",
         "countdown": 2,
-        "keywords": ["LastWords"],
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "damage",
@@ -10394,7 +10611,9 @@
     "set": "[10002] Infinity Evolved",
     "url": "https://shadowverse.gg/cards/10264110-aether-empyrean-guardian",
     "evolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "fanfare": [
       {
         "op": "summon",
@@ -10425,7 +10644,9 @@
         "condition": {
           "not_self": true
         },
-        "keywords": ["Aura"]
+        "keywords": [
+          "Aura"
+        ]
       }
     ],
     "triggers": []
@@ -10573,7 +10794,9 @@
         ]
       }
     ],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -10652,7 +10875,9 @@
         "into": "Doll Slayer"
       }
     ],
-    "keywords": ["Bane"],
+    "keywords": [
+      "Bane"
+    ],
     "triggers": []
   },
   {
@@ -10767,7 +10992,10 @@
           "tribe": "Artifact"
         },
         "select": 1,
-        "keywords": ["Ward", "cant_be_destroyed"]
+        "keywords": [
+          "Ward",
+          "cant_be_destroyed"
+        ]
       }
     ],
     "superevolve": [],
@@ -10861,7 +11089,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -10994,7 +11224,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "enemy_super_evolve",
@@ -11004,7 +11236,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
@@ -11028,7 +11262,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "enemy_super_evolve",
@@ -11038,7 +11274,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -11111,7 +11349,9 @@
             "op": "deck",
             "action": "replace",
             "from_set": "10003_heirs-of-the-omen",
-            "exclude": ["Mjerrabaine, Great Manifest"]
+            "exclude": [
+              "Mjerrabaine, Great Manifest"
+            ]
           },
           {
             "op": "set_deckout_victory"
@@ -11123,7 +11363,9 @@
               {
                 "op": "discard",
                 "mode": "except_named",
-                "names": ["Great Testimony"]
+                "names": [
+                  "Great Testimony"
+                ]
               },
               {
                 "op": "draw",
@@ -11207,7 +11449,9 @@
         "defense": -2
       }
     ],
-    "keywords": ["Drain"],
+    "keywords": [
+      "Drain"
+    ],
     "triggers": []
   },
   {
@@ -11462,7 +11706,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush", "Ward"],
+    "keywords": [
+      "Rush",
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "ally_follower_enter",
@@ -11578,7 +11825,9 @@
         "defense": -2
       }
     ],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": [
       {
         "event": "enemy_follower_defense_down",
@@ -11711,7 +11960,9 @@
             "op": "keyword",
             "action": "remove",
             "target": "ally:last_summoned",
-            "keywords": ["LastWords"]
+            "keywords": [
+              "LastWords"
+            ]
           }
         ]
       }
@@ -11740,7 +11991,9 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "keywords": ["Ward"],
+        "keywords": [
+          "Ward"
+        ],
         "select": 1
       },
       {
@@ -11970,7 +12223,7 @@
   {
     "id": "10323310",
     "name": "Returning Slash",
-    "cost": "1",
+    "cost": "2",
     "attack": "0",
     "defense": "0",
     "type": "Spell",
@@ -12120,7 +12373,9 @@
         "image": "images/crests/octrice_hollowness_manifest.png",
         "description": "Countdown (8). Whenever you play or Fuse a Loot card, advance this crest's count by 1.\nLast Words: Add a Remnant of Hollowness to your hand.",
         "countdown": 8,
-        "keywords": ["LastWords"],
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "add_to_hand",
@@ -12259,7 +12514,9 @@
         "image": "images/crests/crystal_gazing.png",
         "description": "Countdown (2) Last Words: Draw 2 cards. Deal 4 damage to all enemy followers.",
         "countdown": 2,
-        "keywords": ["LastWords"],
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "draw",
@@ -12472,7 +12729,9 @@
         ]
       }
     ],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -12739,7 +12998,10 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Rush", "Ward"],
+    "keywords": [
+      "Rush",
+      "Ward"
+    ],
     "triggers": [
       {
         "effects": [
@@ -12815,7 +13077,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Ward"],
+            "keywords": [
+              "Ward"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -13032,7 +13296,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "self_damaged",
@@ -13100,7 +13366,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -13217,7 +13485,9 @@
         "amount": 4
       }
     ],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": []
   },
   {
@@ -13463,13 +13733,17 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Rush"]
+                "keywords": [
+                  "Rush"
+                ]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Rush"]
+                "keywords": [
+                  "Rush"
+                ]
               }
             ]
           },
@@ -13480,13 +13754,17 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Ward"]
+                "keywords": [
+                  "Ward"
+                ]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Ward"]
+                "keywords": [
+                  "Ward"
+                ]
               }
             ]
           },
@@ -13524,13 +13802,17 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Rush"]
+                "keywords": [
+                  "Rush"
+                ]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Rush"]
+                "keywords": [
+                  "Rush"
+                ]
               }
             ]
           },
@@ -13541,13 +13823,17 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Congregant of Entwining",
-                "keywords": ["Ward"]
+                "keywords": [
+                  "Ward"
+                ]
               },
               {
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Ward"]
+                "keywords": [
+                  "Ward"
+                ]
               }
             ]
           },
@@ -13663,7 +13949,9 @@
     "type": "Follower",
     "class": "Abysscraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Fanfare: Reduce the faith of Faith: Sham-Nacha, Heir to Entwining by 10 to give it \"Increase the number of Modes you can select by 1.\"\nSuper-Evolve: Select an enemy follower on the field, destroy it, and add a copy of it to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10354110.webp",
     "evo_image": "",
@@ -13802,7 +14090,9 @@
                     "count": 1,
                     "attack": -2,
                     "defense": 0,
-                    "keywords": ["Ward"]
+                    "keywords": [
+                      "Ward"
+                    ]
                   }
                 ]
               }
@@ -13845,7 +14135,9 @@
     "evolve": [],
     "superevolve": [],
     "fanfare": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "self_buffed_up",
@@ -13955,7 +14247,9 @@
         ]
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "specific_effects": [
       {
@@ -14000,7 +14294,9 @@
           {
             "op": "keyword",
             "target": "leader",
-            "keywords": ["Barrier"],
+            "keywords": [
+              "Barrier"
+            ],
             "action": "grant"
           }
         ]
@@ -14250,7 +14546,9 @@
                         {
                           "op": "stat",
                           "action": "give",
-                          "keywords": ["Can't Attack"],
+                          "keywords": [
+                            "Can't Attack"
+                          ],
                           "duration": "opponent_turn_end",
                           "target": "selected:follower"
                         },
@@ -14401,7 +14699,9 @@
         }
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": []
   },
   {
@@ -14700,7 +15000,10 @@
       }
     ],
     "fanfare": [],
-    "keywords": ["Ward", "cant_be_destroyed"],
+    "keywords": [
+      "Ward",
+      "cant_be_destroyed"
+    ],
     "triggers": []
   },
   {
@@ -14733,7 +15036,9 @@
         "count": 1
       }
     ],
-    "keywords": ["cant_be_destroyed"],
+    "keywords": [
+      "cant_be_destroyed"
+    ],
     "triggers": []
   },
   {
@@ -14843,7 +15148,9 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Aura"],
+    "keywords": [
+      "Aura"
+    ],
     "fanfare": []
   },
   {
@@ -15214,7 +15521,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"],
+        "keywords": [
+          "Barrier"
+        ],
         "include_self": true
       }
     ],
@@ -15258,7 +15567,9 @@
             "image": "images/crests/starry_sky.png",
             "description": "Countdown (1). Last Words: Deal 1 damage to the enemy leader. Add a Starry Sky to your hand.",
             "countdown": 1,
-            "keywords": ["LastWords"],
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "damage",
@@ -15383,14 +15694,18 @@
             "action": "give",
             "target": "ally:follower",
             "attack": 1,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "stat",
             "action": "give",
             "target": "ally:follower",
             "defense": 1,
-            "keywords": ["Ward"]
+            "keywords": [
+              "Ward"
+            ]
           }
         ],
         "else_effects": [
@@ -15421,7 +15736,9 @@
                     "action": "give",
                     "target": "ally:follower",
                     "attack": 1,
-                    "keywords": ["Rush"]
+                    "keywords": [
+                      "Rush"
+                    ]
                   }
                 ]
               },
@@ -15433,7 +15750,9 @@
                     "action": "give",
                     "target": "ally:follower",
                     "defense": 1,
-                    "keywords": ["Ward"]
+                    "keywords": [
+                      "Ward"
+                    ]
                   }
                 ]
               }
@@ -15475,7 +15794,9 @@
     ],
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": []
   },
   {
@@ -15560,7 +15881,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -15585,7 +15908,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10421120-arthur-staunch-dragon",
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "evolve": [
       {
         "op": "summon",
@@ -15612,7 +15937,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10421130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10421130-mordred-illusory-lion",
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "evolve": [
       {
         "op": "summon",
@@ -15639,7 +15966,9 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10422110-aglovale-lord-of-frost",
-    "keywords": ["Intimidate"],
+    "keywords": [
+      "Intimidate"
+    ],
     "fanfare": [
       {
         "op": "damage",
@@ -15687,7 +16016,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10422130_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10422130-fiorito-muscles-in-bloom",
-    "keywords": ["Ambush", "Bane"],
+    "keywords": [
+      "Ambush",
+      "Bane"
+    ],
     "evolve": [],
     "superevolve": [],
     "triggers": [],
@@ -15822,7 +16154,9 @@
                 },
                 "attack": 1,
                 "defense": 1,
-                "keywords": ["Barrier"]
+                "keywords": [
+                  "Barrier"
+                ]
               }
             ]
           },
@@ -15884,13 +16218,17 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           },
           {
             "op": "stat",
             "action": "give",
             "target": "ally:last_summoned",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       },
@@ -16019,7 +16357,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["cant_attack"]
+        "keywords": [
+          "cant_attack"
+        ]
       }
     ],
     "superevolve": [],
@@ -16354,7 +16694,9 @@
                 "filter": {
                   "not_self": true
                 },
-                "keywords": ["Barrier"]
+                "keywords": [
+                  "Barrier"
+                ]
               }
             ]
           },
@@ -16490,7 +16832,10 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10441110-joel-wave-chaser",
-    "keywords": ["Ward", "Aura"],
+    "keywords": [
+      "Ward",
+      "Aura"
+    ],
     "evolve": [],
     "superevolve": [],
     "triggers": [],
@@ -16677,7 +17022,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Storm"],
+            "keywords": [
+              "Storm"
+            ],
             "target": "self"
           }
         ]
@@ -16723,7 +17070,9 @@
           {
             "op": "stat",
             "action": "give",
-            "keywords": ["Can't Attack"],
+            "keywords": [
+              "Can't Attack"
+            ],
             "duration": "opponent_turn_end",
             "target": "selected:follower"
           }
@@ -16780,7 +17129,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Ward"]
+            "keywords": [
+              "Ward"
+            ]
           }
         ]
       }
@@ -16855,7 +17206,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Intimidate"],
+    "keywords": [
+      "Intimidate"
+    ],
     "triggers": []
   },
   {
@@ -16889,7 +17242,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           },
           {
             "op": "stat",
@@ -17077,7 +17432,9 @@
     "has_ongoing": true,
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "effects": [
@@ -17119,7 +17476,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10452120-satyr-open-hearted-rover",
-    "keywords": ["Aura"],
+    "keywords": [
+      "Aura"
+    ],
     "fanfare": [
       {
         "op": "gate",
@@ -17215,7 +17574,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10453110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10453110-nehan-dispenser-of-samsara",
-    "keywords": ["Drain"],
+    "keywords": [
+      "Drain"
+    ],
     "fanfare": [
       {
         "op": "evolve",
@@ -17418,7 +17779,9 @@
             "image": "images/crests/belial.png",
             "description": "Countdown (4). Last Words: Deal 20 damage to the enemy leader.",
             "countdown": 4,
-            "keywords": ["LastWords"],
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "damage",
@@ -17466,7 +17829,9 @@
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461110-troue-heroic-visionary",
     "has_ongoing": true,
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [
       {
         "event": "engage",
@@ -17476,7 +17841,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Drain"]
+            "keywords": [
+              "Drain"
+            ]
           }
         ]
       }
@@ -17527,7 +17894,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Can't Attack"],
+        "keywords": [
+          "Can't Attack"
+        ],
         "duration": "turn_end"
       }
     ],
@@ -17652,7 +18021,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"],
+        "keywords": [
+          "Barrier"
+        ],
         "filter": {
           "not_self": true
         }
@@ -17912,7 +18283,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471110-sho-reborn-night-king",
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "fanfare": [
       {
         "op": "gate",
@@ -17922,7 +18295,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Barrier"]
+            "keywords": [
+              "Barrier"
+            ]
           }
         ]
       }
@@ -17946,7 +18321,9 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10471120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10471120-tsubasa-blazing-gearcyclist",
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "fanfare": [
       {
         "op": "boost_skybound_art_hand",
@@ -18641,7 +19018,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -18787,7 +19166,11 @@
     "url": "https://shadowverse.gg/cards/10512120-fairy-beastwhisperer",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush", "Bane", "Drain"],
+    "keywords": [
+      "Rush",
+      "Bane",
+      "Drain"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -18862,7 +19245,9 @@
         "condition": {
           "tribe": "Pixie"
         },
-        "keywords": ["Bane"]
+        "keywords": [
+          "Bane"
+        ]
       }
     ],
     "keywords": [],
@@ -19170,7 +19555,9 @@
     "url": "https://shadowverse.gg/cards/10522110-swift-staffmaster",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "when_drawn",
@@ -19637,7 +20024,9 @@
         "image": "images/crests/insomniac_witch.png",
         "description": "Countdown (2). Last Words: Deal 3 damage to all followers.",
         "countdown": 2,
-        "keywords": ["LastWords"],
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "damage",
@@ -19876,7 +20265,9 @@
         "count": 10
       }
     ],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -20136,13 +20527,17 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
@@ -20205,7 +20600,13 @@
         "target": "ally:deck",
         "distribution": "all",
         "filters": {
-          "cost_in": [1, 3, 5, 7, 9]
+          "cost_in": [
+            1,
+            3,
+            5,
+            7,
+            9
+          ]
         },
         "store_count_as": "banish_count"
       },
@@ -20282,17 +20683,23 @@
         "op": "keyword",
         "action": "remove",
         "target": "self",
-        "keywords": ["Ward"]
+        "keywords": [
+          "Ward"
+        ]
       },
       {
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Intimidate"]
+        "keywords": [
+          "Intimidate"
+        ]
       }
     ],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "source": "board",
@@ -20448,13 +20855,17 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           },
           {
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Barrier"]
+            "keywords": [
+              "Barrier"
+            ]
           }
         ]
       }
@@ -20597,7 +21008,9 @@
       {
         "op": "stat",
         "action": "give",
-        "keywords": ["Can't Attack"],
+        "keywords": [
+          "Can't Attack"
+        ],
         "duration": "opponent_turn_end",
         "target": "enemy:follower",
         "select": 1
@@ -20741,7 +21154,9 @@
                     "source": "named",
                     "name": "Skeleton",
                     "count": 1,
-                    "keywords": ["Ward"]
+                    "keywords": [
+                      "Ward"
+                    ]
                   }
                 ]
               }
@@ -20784,7 +21199,9 @@
         "target": "all:follower",
         "distribution": "random",
         "count": 6,
-        "exclude": ["context.sourceCard"]
+        "exclude": [
+          "context.sourceCard"
+        ]
       }
     ],
     "superevolve": [
@@ -20794,7 +21211,9 @@
         "name": "Milteo & Luzen",
         "image": "https://static.dotgg.gg/shadowverse/cards/10554110_token.webp",
         "description": "Allied followers' Fanfare and Enhance abilities don't activate.\nWhenever you play a follower, evolve it.",
-        "passives": ["suppress_fanfare_enhance"],
+        "passives": [
+          "suppress_fanfare_enhance"
+        ],
         "triggers": [
           {
             "event": "ally_follower_played",
@@ -20913,7 +21332,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -20955,7 +21376,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "self",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
@@ -20969,7 +21392,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "self",
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           }
         ]
       }
@@ -21029,7 +21454,9 @@
     "url": "https://shadowverse.gg/cards/10562110-immovable-paladin",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -21147,7 +21574,9 @@
         "zone": "fanfare"
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "leader_restored",
@@ -21239,7 +21668,9 @@
     "url": "https://shadowverse.gg/cards/10564110-sofina-inspiring-strength",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "source": "board",
@@ -21330,7 +21761,9 @@
     "url": "https://shadowverse.gg/cards/10564120-kukishiro-mistbloom",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -21344,7 +21777,11 @@
             "event": "ally_draw",
             "condition": {
               "whose_turn": "owner",
-              "cost_in": [1, 3, 5]
+              "cost_in": [
+                1,
+                3,
+                5
+              ]
             },
             "effects": [
               {
@@ -21382,7 +21819,11 @@
             "event": "ally_draw",
             "condition": {
               "whose_turn": "owner",
-              "cost_in": [2, 4, 6]
+              "cost_in": [
+                2,
+                4,
+                6
+              ]
             },
             "effects": [
               {
@@ -21472,7 +21913,9 @@
             "condition": {
               "tribe": "Puppetry"
             },
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -21619,7 +22062,9 @@
     "url": "https://shadowverse.gg/cards/10572120-lunar-bunny",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "ally_spell_played",
@@ -21757,7 +22202,9 @@
     "url": "https://shadowverse.gg/cards/10574110-slaus-revolving-wheel-of-fortune",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": [
       {
         "source": "board",
@@ -22017,7 +22464,9 @@
     "url": "https://shadowverse.gg/cards/10601120-disrupted-commoner",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Bane"],
+    "keywords": [
+      "Bane"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -22087,7 +22536,14 @@
         "target": "self",
         "pick": "random",
         "count": 3,
-        "keywords": ["Storm", "Bane", "Intimidate", "Drain", "Aura", "Barrier"]
+        "keywords": [
+          "Storm",
+          "Bane",
+          "Intimidate",
+          "Drain",
+          "Aura",
+          "Barrier"
+        ]
       }
     ],
     "spell": []
@@ -22146,7 +22602,9 @@
     "type": "Follower",
     "class": "Neutral",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Fanfare: Activate 2 random abilities from the following.\n1. Destroy a random enemy follower.\n2. Deal 2 damage to the enemy leader.\n3. Recover 2 play points.\n4. Give this follower +4/+4 and activate its Fanfare ability.\nSuper-Evolve: Replicate the effects of this card's Fanfare ability.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10604110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10604110_evo.webp",
@@ -22295,7 +22753,9 @@
     "type": "Spell",
     "class": "Forestcraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Deal 4 damage to all enemy followers. Summon 2 copies of Springbloom Fairy.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10611310.webp",
     "evo_image": "",
@@ -22363,7 +22823,9 @@
     "url": "https://shadowverse.gg/cards/10612120-howling-wolfman",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -22457,7 +22919,9 @@
     "type": "Spell",
     "class": "Forestcraft",
     "rarity": "Gold",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Select a Mode to activate.\n1. Destroy a random enemy follower with the highest attack.\n2. Summon a Springbloom Fairy.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10613310.webp",
     "evo_image": "",
@@ -22542,7 +23006,9 @@
     "type": "Follower",
     "class": "Forestcraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Fanfare: Reduce your faith's value by 10 to add a Depths of the Eld Lance to your hand and give your faith \"Whenever an allied follower evolves, deal 1 damage to all enemies.\"\nDrain",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10614120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10614120_evo.webp",
@@ -22550,7 +23016,9 @@
     "url": "https://shadowverse.gg/cards/10614120-sathanid-eld-lance",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Drain"],
+    "keywords": [
+      "Drain"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -22680,7 +23148,9 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Summon 3 copies of Fearless Soldier.\nEnhance (7): Give them +2/+2.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10621310.webp",
     "evo_image": "",
@@ -22774,7 +23244,9 @@
     "url": "https://shadowverse.gg/cards/10622120-navy-cat",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -22906,7 +23378,9 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Gold",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Select a Mode to activate.\n1. Draw a card.\n2. Deal 3 damage to a random enemy follower.\nEnhance (3): Activate all of them instead.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10623310.webp",
     "evo_image": "",
@@ -23003,7 +23477,9 @@
             "source": "named",
             "name": "Fearless Soldier",
             "count": 1,
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       },
@@ -23016,7 +23492,9 @@
             "source": "named",
             "name": "Fearless Soldier",
             "count": 1,
-            "keywords": ["Drain"]
+            "keywords": [
+              "Drain"
+            ]
           }
         ]
       }
@@ -23028,7 +23506,9 @@
         "source": "named",
         "name": "Fearless Soldier",
         "count": 1,
-        "keywords": ["Bane"]
+        "keywords": [
+          "Bane"
+        ]
       }
     ]
   },
@@ -23041,7 +23521,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Fanfare: Add a Depths of the Eld Sword to your hand.\nEvolve: Reduce your faith's value by 5 to give it \"Whenever you play an Enhanced card, give all allied followers on the field +1/+1.\"",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10624120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10624120_evo.webp",
@@ -23105,7 +23587,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Rush",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10631110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10631110_evo.webp",
@@ -23113,7 +23597,9 @@
     "url": "https://shadowverse.gg/cards/10631110-crystalspawn",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -23139,7 +23625,9 @@
         "action": "grant",
         "target": "ally:follower",
         "exclude_self": true,
-        "keywords": ["Rush"]
+        "keywords": [
+          "Rush"
+        ]
       }
     ],
     "keywords": [],
@@ -23162,7 +23650,9 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Summon 2 copies of Crystalspawn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10631310.webp",
     "evo_image": "",
@@ -23356,7 +23846,9 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Select a Mode to activate.\n1. Summon a Crystalspawn and give it +1/+0 and Storm.\n2. Summon 2 copies of Crystalspawn and give them +1/+0.\nEnhance (5): Activate all of them instead.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10633310.webp",
     "evo_image": "",
@@ -23374,7 +23866,9 @@
             "source": "named",
             "name": "Crystalspawn",
             "count": 1,
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           },
           {
             "op": "stat",
@@ -23412,7 +23906,9 @@
                 "source": "named",
                 "name": "Crystalspawn",
                 "count": 1,
-                "keywords": ["Storm"]
+                "keywords": [
+                  "Storm"
+                ]
               },
               {
                 "op": "stat",
@@ -23489,7 +23985,9 @@
         ]
       }
     ],
-    "keywords": ["Drain"],
+    "keywords": [
+      "Drain"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -23518,7 +24016,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Activates in hand. Whenever an allied Crystalspawn enters the field, reduce the cost of this card by 1.\nFanfare: Summon 2 copies of Crystalspawn and give them Storm.\nEvolve: Add a Depths of the Eld Crystals to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10634120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10634120_evo.webp",
@@ -23556,7 +24056,9 @@
         "source": "named",
         "name": "Crystalspawn",
         "count": 2,
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       }
     ],
     "specific_effects": [
@@ -23660,7 +24162,9 @@
     "type": "Spell",
     "class": "Dragoncraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "When this card is discarded, if its cost is 4, add an Advent of the Eld Blades to your hand and set its cost to 2.\nSelect an allied follower on the field and give it +2/+2.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10641310.webp",
     "evo_image": "",
@@ -23719,7 +24223,10 @@
     "url": "https://shadowverse.gg/cards/10642110-decisive-swordmaster",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush", "Barrier"],
+    "keywords": [
+      "Rush",
+      "Barrier"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -23830,7 +24337,10 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Ward", "Barrier"],
+    "keywords": [
+      "Ward",
+      "Barrier"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -23856,7 +24366,9 @@
     "type": "Spell",
     "class": "Dragoncraft",
     "rarity": "Gold",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "When this card is discarded, if its cost is 7, add a Beheading Eld Blades to your hand and set its cost to 5. If this card's cost is 5, add a Beheading Eld Blades to your hand and set its cost to 3.\nDeal X damage to all enemy followers. X is this card's cost.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10643310.webp",
     "evo_image": "",
@@ -23931,7 +24443,11 @@
     "url": "https://shadowverse.gg/cards/10644110-sagatsumatsu-fair-beheader",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm", "Bane", "Aura"],
+    "keywords": [
+      "Storm",
+      "Bane",
+      "Aura"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -23955,7 +24471,9 @@
     "type": "Follower",
     "class": "Dragoncraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "When this card is discarded, summon a Vorlalai, Eld Blades.\nBane\nEvolve: Add a Depths of the Eld Blades to your hand.\nSuper-Evolve: Add 3 copies instead.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10644120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10644120_evo.webp",
@@ -23975,7 +24493,9 @@
         "count": 3
       }
     ],
-    "keywords": ["Bane"],
+    "keywords": [
+      "Bane"
+    ],
     "triggers": [],
     "fanfare": [],
     "on_discard": [
@@ -24067,7 +24587,9 @@
     "type": "Spell",
     "class": "Abysscraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Draw 2 cards. Necromancy (4) - Restore 2 defense to your leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10651310.webp",
     "evo_image": "",
@@ -24166,7 +24688,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -24270,7 +24794,9 @@
     "type": "Spell",
     "class": "Abysscraft",
     "rarity": "Gold",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Select a Mode to activate.\n1. Recover 1 evolution point.\n2. Deal 2 damage to all enemy followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10653310.webp",
     "evo_image": "",
@@ -24332,7 +24858,10 @@
         "amount": 3
       }
     ],
-    "keywords": ["Aura", "cant_be_destroyed"],
+    "keywords": [
+      "Aura",
+      "cant_be_destroyed"
+    ],
     "triggers": [
       {
         "event": "clash",
@@ -24351,13 +24880,15 @@
   {
     "id": "10654120",
     "name": "Bibatii, Eld Sight",
-    "cost": "3",
+    "cost": "4",
     "attack": "3",
     "defense": "3",
     "type": "Follower",
     "class": "Abysscraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Fanfare: Necromancy (4) - Evolve this follower.\nWhen this follower evolves, add a Depths of the Eld Sight to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10654120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10654120_evo.webp",
@@ -24518,7 +25049,9 @@
     "type": "Spell",
     "class": "Havencraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Draw 2 amulets.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10661310.webp",
     "evo_image": "",
@@ -24745,7 +25278,9 @@
     "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Gold",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Fanfare: Select another card on the field and destroy it. If you selected an allied amulet, recover 2 play points.\nCountdown (2)\nLast Words: Summon a copy of a random allied amulet destroyed this match with Last Words and a base cost of 2 or less.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10663210.webp",
     "evo_image": "",
@@ -24881,31 +25416,44 @@
     "type": "Follower",
     "class": "Havencraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
-    "description": "Fanfare: Select 3 other cards on the field and destroy them.\nEvolve: Reduce your faith's value by 10 to add a Depths of the Eld Tome to your hand.",
+    "tribes": [
+      "Encroacher"
+    ],
+    "description": "Fanfare: Select 3 other cards on the field and destroy them.\nWard\nAt the end of your turn, reduce your faith's value by 10 to add a Depths of the Eld Tome to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10664120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10664120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10664120-lyanthoth-eld-tome",
-    "evolve": [
+    "evolve": [],
+    "superevolve": [],
+    "keywords": [
+      "Ward"
+    ],
+    "triggers": [
       {
-        "op": "crest",
-        "action": "pay_counter",
-        "crest": "Faith: Lyanthoth, Eld Tome",
-        "counter": "faith",
-        "amount": 10,
-        "on_success_effects": [
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
           {
-            "op": "add_to_hand",
-            "name": "Depths of the Eld Tome",
-            "count": 1
+            "op": "crest",
+            "action": "pay_counter",
+            "crest": "Faith: Lyanthoth, Eld Tome",
+            "counter": "faith",
+            "amount": 10,
+            "on_success_effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Depths of the Eld Tome",
+                "count": 1
+              }
+            ]
           }
         ]
       }
     ],
-    "superevolve": [],
-    "keywords": [],
-    "triggers": [],
     "fanfare": [
       {
         "op": "destroy",
@@ -24999,7 +25547,10 @@
         "source": "named",
         "name": "Ominous Artifact α",
         "count": 1,
-        "keywords": ["Bane", "Ward"]
+        "keywords": [
+          "Bane",
+          "Ward"
+        ]
       }
     ]
   },
@@ -25012,7 +25563,9 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Select an enemy follower on the field and deal it 4 damage. If there's an allied follower on the field with a base cost of 5 or more, draw a card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10671310.webp",
     "evo_image": "",
@@ -25123,7 +25676,9 @@
     "url": "https://shadowverse.gg/cards/10672120-timid-pioneer",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -25278,7 +25833,9 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Gold",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Activates in hand. Whenever an allied follower with a base cost of 5 or more enters the field, reduce the cost of this card by 1 until the end of the turn.\nEvolve a random unevolved allied follower on the field with a base cost of 5 or more. Deal 6 damage to a random enemy follower.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10673310.webp",
     "evo_image": "",
@@ -25392,7 +25949,9 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Legendary",
-    "tribes": ["Encroacher"],
+    "tribes": [
+      "Encroacher"
+    ],
     "description": "Fanfare: If there's an allied follower on the field with a base cost of 5 or more, add a Depths of the Eld Axe to your hand.\nRush",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10674120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10674120_evo.webp",
@@ -25400,7 +25959,9 @@
     "url": "https://shadowverse.gg/cards/10674120-yog-zentha-eld-axe",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -25669,7 +26230,9 @@
             "image": "images/crests/illamrita_designated_target.png",
             "description": "Countdown (2)\nLast Words: Summon an Illamrita, Designated Target and evolve it.",
             "countdown": 2,
-            "keywords": ["Last Words"],
+            "keywords": [
+              "Last Words"
+            ],
             "effects": [
               {
                 "op": "summon",
@@ -25692,13 +26255,17 @@
             "op": "keyword",
             "action": "grant",
             "target": "self",
-            "keywords": ["Barrier"]
+            "keywords": [
+              "Barrier"
+            ]
           },
           {
             "op": "keyword",
             "action": "grant",
             "target": "clash_opponent",
-            "keywords": ["cant_attack"]
+            "keywords": [
+              "cant_attack"
+            ]
           },
           {
             "op": "keyword",
@@ -25751,7 +26318,9 @@
     "url": "https://shadowverse.gg/cards/10704120-altaro-mayor-of-babelon",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": [
       {
         "source": "board",
@@ -25849,7 +26418,9 @@
     "type": "Spell",
     "class": "Forestcraft",
     "rarity": "Bronze",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Select 2 cards in your hand and return them to deck. Draw 2 cards.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10711310.webp",
     "evo_image": "",
@@ -25903,7 +26474,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -25957,7 +26530,9 @@
     "type": "Spell",
     "class": "Forestcraft",
     "rarity": "Silver",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Restore 1 defense to your leader. Combo (3) - Gain Crest: Minimized Anxiety.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10712310.webp",
     "evo_image": "",
@@ -25986,7 +26561,9 @@
             "image": "images/crests/minimized_anxiety.png",
             "description": "Countdown (1)\nLast Words: Add a Magnified Malice to your hand.",
             "countdown": 1,
-            "keywords": ["LastWords"],
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "add_to_hand",
@@ -26068,7 +26645,9 @@
     "type": "Spell",
     "class": "Forestcraft",
     "rarity": "Gold",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Deal 2 damage to a random enemy follower. Combo (3) - Gain Crest: Magnified Malice.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10713310.webp",
     "evo_image": "",
@@ -26098,7 +26677,9 @@
             "image": "images/crests/magnified_malice.png",
             "description": "Countdown (1)\nLast Words: Add a Minimized Anxiety to your hand.",
             "countdown": 1,
-            "keywords": ["LastWords"],
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "add_to_hand",
@@ -26128,7 +26709,9 @@
     "type": "Follower",
     "class": "Forestcraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Select an enemy follower on the field and give it -0/-X. X is this follower's attack. Increase your Combo by 1.\nEvolve: Gain Crest: Thestae, Anathema of Distortion.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10714110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10714110_evo.webp",
@@ -26365,7 +26948,9 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Bronze",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Select an enemy follower on the field and deal it 3 damage. Rally (10) - Give it \"Can't attack followers or leaders\" until the end of your opponent's turn.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10721310.webp",
     "evo_image": "",
@@ -26393,7 +26978,9 @@
               {
                 "op": "stat",
                 "action": "give",
-                "keywords": ["Can't Attack"],
+                "keywords": [
+                  "Can't Attack"
+                ],
                 "duration": "opponent_turn_end",
                 "target": "selected:follower"
               }
@@ -26494,7 +27081,9 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Silver",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Add a Steelclad Knight to your hand and give it Rush. Rally (10) - Add 2 copies instead.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10722310.webp",
     "evo_image": "",
@@ -26514,7 +27103,9 @@
             "op": "add_to_hand",
             "name": "Steelclad Knight",
             "count": 2,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           }
         ],
         "else_effects": [
@@ -26522,7 +27113,9 @@
             "op": "add_to_hand",
             "name": "Steelclad Knight",
             "count": 1,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           }
         ]
       }
@@ -26566,7 +27159,9 @@
                 "target": "ally:follower",
                 "attack": 1,
                 "defense": 0,
-                "keywords": ["Rush"],
+                "keywords": [
+                  "Rush"
+                ],
                 "condition": {
                   "not_self": true
                 }
@@ -26582,7 +27177,9 @@
                 "target": "ally:follower",
                 "attack": 0,
                 "defense": 1,
-                "keywords": ["Ward"],
+                "keywords": [
+                  "Ward"
+                ],
                 "condition": {
                   "not_self": true
                 }
@@ -26602,7 +27199,9 @@
     "type": "Spell",
     "class": "Swordcraft",
     "rarity": "Gold",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Select an enemy follower on the field and deal it 6 damage. Rally (10) - Deal X damage to all enemy followers. X is the number of allied followers on the field.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10723310.webp",
     "evo_image": "",
@@ -26643,7 +27242,9 @@
     "type": "Follower",
     "class": "Swordcraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Rally (20) - Gain Crest: Gildaria, Anathema of Attunement. Evolve this follower.\nDuring your turn, whenever another allied follower enters the field, give it Rush.\nWhen this follower evolves, summon 2 copies of Steelclad Knight.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10724110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10724110_evo.webp",
@@ -26670,7 +27271,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Rush"],
+            "keywords": [
+              "Rush"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -26744,7 +27347,9 @@
         "select": 1
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -26759,7 +27364,9 @@
         "target": "ally:follower",
         "attack": 1,
         "defense": 3,
-        "keywords": ["Ward"],
+        "keywords": [
+          "Ward"
+        ],
         "condition": {
           "class": "Swordcraft",
           "not_self": true
@@ -26784,7 +27391,9 @@
     "url": "https://shadowverse.gg/cards/10731110-dainty-horror",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -26847,7 +27456,9 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Activates in hand. Whenever you perform Earth Rite, reduce the cost of this card by 1.\nDraw 2 cards. Gain an earth sigil.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10731310.webp",
     "evo_image": "",
@@ -26949,7 +27560,9 @@
     "url": "https://shadowverse.gg/cards/10732120-pretty-predator",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -26969,7 +27582,9 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Silver",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Select a Mode to activate.\n1. Gain 4 earth sigils.\n2. Earth Rite (2) - Deal 2 damage to all enemy followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10732310.webp",
     "evo_image": "",
@@ -27081,7 +27696,9 @@
     "type": "Spell",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Activates in hand. Whenever you perform Earth Rite, reduce the cost of this card by 1.\nSelect an enemy follower on the field and destroy it. Gain 2 earth sigils.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10733310.webp",
     "evo_image": "",
@@ -27128,7 +27745,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Earth Rite (1) - Gain Crest: Lilanthim, Anathema of Predation.\nAura\nEvolve: Earth Rite (1) - Select an enemy follower on the field and destroy it.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10734110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10734110_evo.webp",
@@ -27148,7 +27767,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Aura"],
+    "keywords": [
+      "Aura"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -27336,7 +27957,9 @@
     "type": "Spell",
     "class": "Dragoncraft",
     "rarity": "Bronze",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Gain 1 max play point. Transform all copies of Apathetic Gaze in your hand and deck into copies of Lazing Flame.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10741310.webp",
     "evo_image": "",
@@ -27388,7 +28011,9 @@
     "url": "https://shadowverse.gg/cards/10742110-gallant-gatekeeper",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -27471,7 +28096,9 @@
     "type": "Spell",
     "class": "Dragoncraft",
     "rarity": "Silver",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Restore 3 defense to your leader. If you're in Overflow, draw a card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10742310.webp",
     "evo_image": "",
@@ -27541,7 +28168,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Ambush"]
+                "keywords": [
+                  "Ambush"
+                ]
               }
             ]
           }
@@ -27565,7 +28194,9 @@
     "type": "Spell",
     "class": "Dragoncraft",
     "rarity": "Gold",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Deal 5 damage to all enemy followers. Deal 3 damage to the enemy leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10743310.webp",
     "evo_image": "",
@@ -27598,7 +28229,9 @@
     "type": "Follower",
     "class": "Dragoncraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Deal 9 damage to all enemy followers.\nSuper-Evolve: Give your opponent Crest: Burnite, Anathema of Ash.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10744110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10744110_evo.webp",
@@ -27684,7 +28317,9 @@
         "amount": 2
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -27809,7 +28444,9 @@
     "type": "Spell",
     "class": "Abysscraft",
     "rarity": "Bronze",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Select 2 allied followers on the field and give them +0/+1. Draw a card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10751310.webp",
     "evo_image": "",
@@ -27916,7 +28553,9 @@
     "type": "Spell",
     "class": "Abysscraft",
     "rarity": "Silver",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Summon a Ghost, Bat, and Skeleton and evolve them.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10752310.webp",
     "evo_image": "",
@@ -28005,7 +28644,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Storm"],
+            "keywords": [
+              "Storm"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -28036,7 +28677,9 @@
     "type": "Spell",
     "class": "Abysscraft",
     "rarity": "Gold",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Deal 6 damage split between all enemy followers. Necromancy (6) - Deal 2 damage to the enemy leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10753310.webp",
     "evo_image": "",
@@ -28076,7 +28719,9 @@
     "type": "Follower",
     "class": "Abysscraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Summon 2 random differently named Abysscraft followers that cost 2 or less from your deck.\nWhenever another allied Abysscraft follower enters the field, give it Rush.\nSuper-Evolve: Give all other allied Abysscraft followers on the field +2/+2.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10754110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10754110_evo.webp",
@@ -28110,7 +28755,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "entering_follower",
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           }
         ]
       }
@@ -28161,7 +28808,10 @@
             "target": "entering_follower",
             "attack": 1,
             "defense": 0,
-            "keywords": ["Rush", "Ward"]
+            "keywords": [
+              "Rush",
+              "Ward"
+            ]
           },
           {
             "op": "damage",
@@ -28281,7 +28931,9 @@
     "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Bronze",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Select a card in your hand and return it to deck. Draw a card.\nEngage: Destroy this card. Replicate the effects of this card's Fanfare ability.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10761210.webp",
     "evo_image": "",
@@ -28369,7 +29021,9 @@
     "url": "https://shadowverse.gg/cards/10762120-holy-hawk-of-communications",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -28401,7 +29055,9 @@
     "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Silver",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Enhance (4): Deal 1 damage to all enemy followers.\nEngage: Destroy this card. Deal 1 damage to all enemy followers.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10762210.webp",
     "evo_image": "",
@@ -28485,7 +29141,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Barrier"]
+            "keywords": [
+              "Barrier"
+            ]
           }
         ]
       }
@@ -28500,7 +29158,9 @@
     "type": "Amulet",
     "class": "Havencraft",
     "rarity": "Gold",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Select an enemy follower on the field and deal it 4 damage.\nEngage: Destroy this card. Select an enemy follower on the field and deal it 2 damage.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10763210.webp",
     "evo_image": "",
@@ -28542,7 +29202,9 @@
     "type": "Follower",
     "class": "Havencraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Summon a Rings of Moonlight.\nEvolve: Delay the count of a random allied Rings of Moonlight on the field by 1.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10764110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10764110_evo.webp",
@@ -28592,7 +29254,10 @@
         "zone": "fanfare"
       }
     ],
-    "keywords": ["Ward", "Aura"],
+    "keywords": [
+      "Ward",
+      "Aura"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -28676,7 +29341,9 @@
     "url": "https://shadowverse.gg/cards/10771120-beat-breaker",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -28712,7 +29379,9 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Bronze",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Select a Mode to activate. If at least 3 differently named allied Artifact followers have entered the field this match, activate all of them instead.\n1. Add an Analyzing Artifact to your hand.\n2. Add an Ancient Artifact to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10771310.webp",
     "evo_image": "",
@@ -28858,7 +29527,9 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Silver",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Give all allied followers on the field +1/+0. If you've unlocked super-evolution, give all followers in your hand +1/+0.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10772310.webp",
     "evo_image": "",
@@ -28934,7 +29605,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "entering_follower",
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           }
         ]
       }
@@ -28957,7 +29630,9 @@
     "type": "Spell",
     "class": "Portalcraft",
     "rarity": "Gold",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Deal X damage to all enemy followers. X is the number of differently named allied Artifact followers that have entered the field this match. Deal 1 damage to the enemy leader.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10773310.webp",
     "evo_image": "",
@@ -28989,7 +29664,9 @@
     "type": "Follower",
     "class": "Portalcraft",
     "rarity": "Legendary",
-    "tribes": ["Anathema"],
+    "tribes": [
+      "Anathema"
+    ],
     "description": "Fanfare: Deal X damage to all enemy followers. X is the number of differently named allied Artifact followers that have entered the field this match.\nStorm\nWard",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10774110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10774110_evo.webp",
@@ -28997,7 +29674,10 @@
     "url": "https://shadowverse.gg/cards/10774110-scarlet-anathema-of-dislocation",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm", "Ward"],
+    "keywords": [
+      "Storm",
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -29041,7 +29721,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -29143,7 +29825,9 @@
         "op": "keyword",
         "action": "grant",
         "target": "self",
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       }
     ],
     "superevolve": [],
@@ -29374,7 +30058,9 @@
     "url": "https://shadowverse.gg/cards/10804120-olivia-proud-dark-angel",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -29463,7 +30149,9 @@
     "url": "https://shadowverse.gg/cards/10811130-moelle-gloomy-maiden",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -29545,7 +30233,10 @@
     "url": "https://shadowverse.gg/cards/10812120-lycoris-barbs-of-passion",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush", "Bane"],
+    "keywords": [
+      "Rush",
+      "Bane"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -29606,7 +30297,9 @@
     "url": "https://shadowverse.gg/cards/10813110-michelle-kind-mindreader",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -29619,7 +30312,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:follower",
-        "keywords": ["Barrier"],
+        "keywords": [
+          "Barrier"
+        ],
         "include_self": true
       }
     ]
@@ -29680,7 +30375,10 @@
     "url": "https://shadowverse.gg/cards/10814110-setus-maisha-bladerights",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Storm"],
+    "keywords": [
+      "Ward",
+      "Storm"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -29810,12 +30508,16 @@
         "action": "give",
         "target": "enemy:follower",
         "select": 1,
-        "keywords": ["Can't Attack"],
+        "keywords": [
+          "Can't Attack"
+        ],
         "duration": "opponent_turn_end"
       }
     ],
     "superevolve": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -29840,7 +30542,9 @@
         "source": "named",
         "name": "Steelclad Knight",
         "count": 1,
-        "keywords": ["Ward"]
+        "keywords": [
+          "Ward"
+        ]
       }
     ],
     "superevolve": [],
@@ -29852,7 +30556,9 @@
         "source": "named",
         "name": "Steelclad Knight",
         "count": 1,
-        "keywords": ["Rush"]
+        "keywords": [
+          "Rush"
+        ]
       }
     ]
   },
@@ -29918,7 +30624,9 @@
     "url": "https://shadowverse.gg/cards/10822120-oda-nobunaga",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Intimidate"],
+    "keywords": [
+      "Intimidate"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -29992,7 +30700,9 @@
     "url": "https://shadowverse.gg/cards/10823110-okita-souji",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "follower_strike",
@@ -30117,7 +30827,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -30164,7 +30876,10 @@
         "count": 1
       }
     ],
-    "keywords": ["Storm", "Bane"],
+    "keywords": [
+      "Storm",
+      "Bane"
+    ],
     "triggers": [
       {
         "event": "ally_follower_enter",
@@ -30179,7 +30894,9 @@
             "target": "entering_follower",
             "attack": 2,
             "defense": 0,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "stat",
@@ -30247,7 +30964,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Bronze",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Add a Mysterian Missile to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10831120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10831120_evo.webp",
@@ -30433,7 +31152,9 @@
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Gold",
-    "tribes": ["Mysteria"],
+    "tribes": [
+      "Mysteria"
+    ],
     "description": "Fanfare: Add 2 copies of Mysterian Missile to your hand.\nEvolve: Reduce the cost of all Mysteria spells in your hand by 1.\nSuper-Evolve: Gain Crest: Tico, Mysterian Spellcrafter.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10833110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10833110_evo.webp",
@@ -30632,7 +31353,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Rush"],
+            "keywords": [
+              "Rush"
+            ],
             "target": "entering_follower"
           },
           {
@@ -30669,7 +31392,10 @@
     "url": "https://shadowverse.gg/cards/10841110-gido-leader-of-the-pack",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Bane", "Ward"],
+    "keywords": [
+      "Bane",
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -30795,7 +31521,9 @@
     "url": "https://shadowverse.gg/cards/10842110-reef-lolo-serene-sirens",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "source": "board",
@@ -30915,7 +31643,10 @@
     "url": "https://shadowverse.gg/cards/10843110-giada-peerless-flame-of-war",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush", "Intimidate"],
+    "keywords": [
+      "Rush",
+      "Intimidate"
+    ],
     "triggers": [
       {
         "event": "strike",
@@ -30925,7 +31656,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "self",
-            "keywords": ["Barrier"]
+            "keywords": [
+              "Barrier"
+            ]
           }
         ]
       },
@@ -31018,7 +31751,9 @@
             "image": "https://static.dotgg.gg/shadowverse/cards/10844110_token.webp",
             "description": "Countdown (2)\nLast Words: Add a Drache & Aluzard, Burning Blood to your hand and set its cost to 2.",
             "countdown": 2,
-            "keywords": ["LastWords"],
+            "keywords": [
+              "LastWords"
+            ],
             "effects": [
               {
                 "op": "add_to_hand",
@@ -31143,7 +31878,10 @@
     "url": "https://shadowverse.gg/cards/10851110-anisage-clear-resolve",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm", "Ignores Ward"],
+    "keywords": [
+      "Storm",
+      "Ignores Ward"
+    ],
     "triggers": [],
     "fanfare": [],
     "spell": []
@@ -31266,7 +32004,9 @@
           {
             "op": "keyword",
             "action": "grant",
-            "keywords": ["Rush"],
+            "keywords": [
+              "Rush"
+            ],
             "target": "entering_follower"
           }
         ]
@@ -31734,7 +32474,9 @@
         "target": "ally:last_summoned",
         "attack": 2,
         "defense": -2,
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       }
     ]
   },
@@ -31809,7 +32551,9 @@
             "op": "keyword",
             "action": "remove",
             "target": "ally:last_summoned",
-            "keywords": ["LastWords"]
+            "keywords": [
+              "LastWords"
+            ]
           }
         ]
       }
@@ -31834,7 +32578,10 @@
     "url": "https://shadowverse.gg/cards/10862120-viche-abyssal-researcher",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush", "Bane"],
+    "keywords": [
+      "Rush",
+      "Bane"
+    ],
     "triggers": [
       {
         "event": "ally_super_evolve",
@@ -31923,7 +32670,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -32097,7 +32846,9 @@
         "image": "https://static.dotgg.gg/shadowverse/cards/10864120_token.webp",
         "description": "Countdown (1). Last Words: Summon a Zoe, Dazzling Hope and evolve it.",
         "countdown": 1,
-        "keywords": ["LastWords"],
+        "keywords": [
+          "LastWords"
+        ],
         "effects": [
           {
             "op": "summon",
@@ -32199,7 +32950,9 @@
             "op": "keyword",
             "action": "remove",
             "target": "ally:last_summoned",
-            "keywords": ["LastWords"]
+            "keywords": [
+              "LastWords"
+            ]
           }
         ]
       }
@@ -32230,10 +32983,14 @@
         "target": "ally:follower",
         "exclude_self": true,
         "select": 1,
-        "keywords": ["Ambush"]
+        "keywords": [
+          "Ambush"
+        ]
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -32483,7 +33240,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -32495,7 +33254,9 @@
         "action": "grant",
         "target": "enemy:follower",
         "select": 1,
-        "keywords": ["Ward"]
+        "keywords": [
+          "Ward"
+        ]
       }
     ],
     "evolve_trigger_always": true
@@ -32782,7 +33543,9 @@
     "url": "https://shadowverse.gg/cards/10904110-zerael-sundered-rebirth",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Intimidate"],
+    "keywords": [
+      "Intimidate"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -32810,7 +33573,9 @@
     "url": "https://shadowverse.gg/cards/10911110-sprouting-initiate",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -32844,7 +33609,9 @@
     "url": "https://shadowverse.gg/cards/10911120-jungle-youth",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Intimidate"],
+    "keywords": [
+      "Intimidate"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -32918,7 +33685,9 @@
             "op": "keyword",
             "action": "grant",
             "target": "last_added_to_hand",
-            "keywords": ["Bane"]
+            "keywords": [
+              "Bane"
+            ]
           }
         ]
       }
@@ -33064,7 +33833,9 @@
         },
         "attack": 1,
         "defense": 1,
-        "keywords": ["Rush"]
+        "keywords": [
+          "Rush"
+        ]
       }
     ],
     "superevolve": [],
@@ -33161,7 +33932,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Storm"]
+        "keywords": [
+          "Storm"
+        ]
       }
     ],
     "keywords": [],
@@ -33294,7 +34067,10 @@
     "url": "https://shadowverse.gg/cards/10921120-kindred-cavalrywoman",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Rush"],
+    "keywords": [
+      "Ward",
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": []
   },
@@ -33325,7 +34101,9 @@
             "source": "named",
             "name": "Steelclad Knight",
             "count": 5,
-            "keywords": ["Ward"]
+            "keywords": [
+              "Ward"
+            ]
           }
         ]
       }
@@ -33337,7 +34115,9 @@
         "source": "named",
         "name": "Steelclad Knight",
         "count": 1,
-        "keywords": ["Ward"]
+        "keywords": [
+          "Ward"
+        ]
       }
     ],
     "enhance_replaces_base": true
@@ -33359,7 +34139,9 @@
     "url": "https://shadowverse.gg/cards/10922110-whirlpool-gunner",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -33403,7 +34185,9 @@
             "target": "self",
             "attack": 3,
             "defense": 0,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "stat",
@@ -33411,7 +34195,9 @@
             "target": "ally:last_summoned",
             "attack": 3,
             "defense": 0,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           }
         ]
       }
@@ -33603,7 +34389,9 @@
     "url": "https://shadowverse.gg/cards/10924110-barbaros-rebellious-convict",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -33640,7 +34428,12 @@
     "url": "https://shadowverse.gg/cards/10924120-beltezore-valorous-revenant",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward", "Storm", "Bane", "Aura"],
+    "keywords": [
+      "Ward",
+      "Storm",
+      "Bane",
+      "Aura"
+    ],
     "triggers": [],
     "fanfare": [],
     "attacks_per_turn": 3
@@ -33662,7 +34455,9 @@
     "url": "https://shadowverse.gg/cards/10931110-obsessed-test-subject",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [
       {
         "event": "ally_follower_enter",
@@ -33793,7 +34588,9 @@
         "filter": {
           "name": "Obsessed Test Subject"
         },
-        "keywords": ["Bane"]
+        "keywords": [
+          "Bane"
+        ]
       }
     ],
     "superevolve": [],
@@ -33807,7 +34604,9 @@
             "source": "named",
             "name": "Obsessed Test Subject",
             "count": 3,
-            "keywords": ["Ward"]
+            "keywords": [
+              "Ward"
+            ]
           }
         ]
       }
@@ -33931,7 +34730,9 @@
             "filter": {
               "name": "Obsessed Test Subject"
             },
-            "keywords": ["Drain"]
+            "keywords": [
+              "Drain"
+            ]
           }
         ]
       }
@@ -34027,7 +34828,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "entering_follower",
-                "keywords": ["Storm"]
+                "keywords": [
+                  "Storm"
+                ]
               }
             ]
           }
@@ -34141,7 +34944,9 @@
             "op": "keyword",
             "action": "remove",
             "target": "last_added_to_hand",
-            "keywords": ["LastWords"]
+            "keywords": [
+              "LastWords"
+            ]
           }
         ]
       }
@@ -34156,7 +34961,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -34179,7 +34986,9 @@
     "url": "https://shadowverse.gg/cards/10941120-cave-dragon",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ambush"],
+    "keywords": [
+      "Ambush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -34253,7 +35062,9 @@
     "url": "https://shadowverse.gg/cards/10942110-high-spirited-marauder",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Storm"],
+    "keywords": [
+      "Storm"
+    ],
     "triggers": [
       {
         "event": "strike",
@@ -34471,7 +35282,10 @@
     "url": "https://shadowverse.gg/cards/10944110-antemaria-piercing-convict",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush", "Ignores Ward"],
+    "keywords": [
+      "Rush",
+      "Ignores Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -34482,7 +35296,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -34510,7 +35326,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -34613,13 +35431,17 @@
             "target": "ally:last_summoned",
             "attack": 1,
             "defense": 0,
-            "keywords": ["Rush"]
+            "keywords": [
+              "Rush"
+            ]
           },
           {
             "op": "keyword",
             "action": "remove",
             "target": "ally:last_summoned",
-            "keywords": ["LastWords"]
+            "keywords": [
+              "LastWords"
+            ]
           }
         ]
       }
@@ -35070,7 +35892,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Storm"]
+                "keywords": [
+                  "Storm"
+                ]
               },
               {
                 "op": "damage",
@@ -35086,7 +35910,9 @@
                 "op": "stat",
                 "action": "give",
                 "target": "self",
-                "keywords": ["Ward"]
+                "keywords": [
+                  "Ward"
+                ]
               },
               {
                 "op": "damage",
@@ -35116,7 +35942,9 @@
     "url": "https://shadowverse.gg/cards/10961110-follower-of-the-tenets",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "leader_restored",
@@ -35151,7 +35979,9 @@
     "url": "https://shadowverse.gg/cards/10961120-peryton",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -35258,7 +36088,9 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["Ambush"],
+        "keywords": [
+          "Ambush"
+        ],
         "duration": "opponent_turn_end"
       }
     ]
@@ -35404,7 +36236,9 @@
         "zone": "fanfare"
       }
     ],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [
       {
         "event": "leader_restored",
@@ -35638,7 +36472,9 @@
     "url": "https://shadowverse.gg/cards/10971110-bluerust-underling",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Rush"],
+    "keywords": [
+      "Rush"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -35753,7 +36589,9 @@
     "url": "https://shadowverse.gg/cards/10972110-ironwork-bodyguard",
     "evolve": [],
     "superevolve": [],
-    "keywords": ["Ward"],
+    "keywords": [
+      "Ward"
+    ],
     "triggers": [],
     "fanfare": [
       {
@@ -35903,7 +36741,9 @@
             "op": "stat",
             "action": "give",
             "target": "self",
-            "keywords": ["Storm"]
+            "keywords": [
+              "Storm"
+            ]
           }
         ]
       }
@@ -35998,7 +36838,9 @@
       }
     ],
     "superevolve": [],
-    "keywords": ["Bane"],
+    "keywords": [
+      "Bane"
+    ],
     "triggers": [],
     "fanfare": [],
     "specific_effects": [

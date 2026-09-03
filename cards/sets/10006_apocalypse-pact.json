@@ -2382,7 +2382,7 @@
   {
     "id": "10654120",
     "name": "Bibatii, Eld Sight",
-    "cost": "3",
+    "cost": "4",
     "attack": "3",
     "defense": "3",
     "type": "Follower",
@@ -2913,30 +2913,39 @@
     "class": "Havencraft",
     "rarity": "Legendary",
     "tribes": ["Encroacher"],
-    "description": "Fanfare: Select 3 other cards on the field and destroy them.\nEvolve: Reduce your faith's value by 10 to add a Depths of the Eld Tome to your hand.",
+    "description": "Fanfare: Select 3 other cards on the field and destroy them.\nWard\nAt the end of your turn, reduce your faith's value by 10 to add a Depths of the Eld Tome to your hand.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10664120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10664120_evo.webp",
     "set": "[10006] Apocalypse Pact",
     "url": "https://shadowverse.gg/cards/10664120-lyanthoth-eld-tome",
-    "evolve": [
+    "evolve": [],
+    "superevolve": [],
+    "keywords": ["Ward"],
+    "triggers": [
       {
-        "op": "crest",
-        "action": "pay_counter",
-        "crest": "Faith: Lyanthoth, Eld Tome",
-        "counter": "faith",
-        "amount": 10,
-        "on_success_effects": [
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
+        "effects": [
           {
-            "op": "add_to_hand",
-            "name": "Depths of the Eld Tome",
-            "count": 1
+            "op": "crest",
+            "action": "pay_counter",
+            "crest": "Faith: Lyanthoth, Eld Tome",
+            "counter": "faith",
+            "amount": 10,
+            "on_success_effects": [
+              {
+                "op": "add_to_hand",
+                "name": "Depths of the Eld Tome",
+                "count": 1
+              }
+            ]
           }
         ]
       }
     ],
-    "superevolve": [],
-    "keywords": [],
-    "triggers": [],
     "fanfare": [
       {
         "op": "destroy",
