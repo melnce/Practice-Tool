@@ -188,7 +188,11 @@ The split is **sequential by board age**, not even division and not random: dama
 
 > Q: Where in the deck does the copy go? — A: **"Shuffled to a random spot."**
 
-Not top, not bottom — a random position in the deck, drawn from the match RNG so replay and undo stay deterministic. Ties on "the highest base cost" are broken **randomly among the tied cards** (assumed, not contested). Ordering: the copy is added to the deck _before_ the draw resolves, so it is theoretically drawable by the card's own draw. With an empty destroyed history, no card is added but **the draw still happens** — the spell must not fizzle wholesale.
+Not top, not bottom — a random position in the deck, drawn from the match RNG so replay and undo stay deterministic. Ordering: the copy is added to the deck _before_ the draw resolves, so it is theoretically drawable by the card's own draw. With an empty destroyed history, no card is added but **the draw still happens** — the spell must not fizzle wholesale.
+
+**`shuffle: false` does not mean "do not shuffle."** On the `deck` add op it means insert the copy at `state.rng.nextInt(deck.length + 1)` — a random index — leaving the rest of the deck order undisturbed. That is exactly this _"Shuffled to a random spot"_ ruling. The alternative branch (`shuffle` not false) pushes then shuffles the whole deck (`src/logic/effects/deck.ts`). Naming reads backwards; do not "fix" it to a no-shuffle append.
+
+~~Ties on "the highest base cost" are broken randomly among the tied cards (assumed, not contested).~~ **Settled 2026-09-02** — see **Initiation of Rebirth highest-base-cost ties** below. The printed word **random** already answered it; the "assumed" note should have prompted a re-read, not an escalation.
 
 Note this card's _"without revealing it"_ is settled by the standing **hidden information — always visible** ruling: nothing is actually concealed in this tool; the only requirement is that the battle log not name the card.
 
@@ -331,10 +335,24 @@ Asked whether an Accelerate-played follower in the cemetery should be reanimatab
 
 General rule in both directions: **the printed type governs while the card is in hand or deck; once the card has been played in its alternate form, it stays in that form and never reverts** — including in the cemetery. An Accelerate-played follower is a spell corpse and is invisible to Reanimate. A Crystallize-played card is an amulet for the rest of its life; bouncing it to hand does not restore the follower.
 
+## Initiation of Rebirth highest-base-cost ties — 2026-09-02
+
+Printed text: _"Add a copy of a **random** allied follower destroyed this match with the highest base cost to your deck without revealing it. Draw a card."_
+
+Owner, settling the old "assumed, not contested" open:
+
+> "it says random highest cost so that means if some are tied pick randomly between them"
+
+Uniformly at random among the destroyed allied followers that share the highest base cost. Cheaper corpses are never eligible. This was **never really open** — the printed text answered it, and the "assumed, not contested" note on the 2026-08-29 authoring ruling should have prompted a re-read of the card rather than an escalation. Worked example of **card text is bible** (2026-08-31).
+
+Engine already matched (`pickDestroyedMatchHighestBaseCost` keeps every record at `maxBase`, then `top[state.rng.nextInt(top.length)]`). Behaviour pinned; do not change without a new ruling.
+
 ---
 
 ## Still open — Chris will test in game
 
-Whether a **cost reduction moves the Accelerate value N**, or only the normal cost. No official text exists in either game; the only material is player speculation reasoning by analogy from Enhance.
+Whether a **cost reduction moves the Accelerate value N**, or only the normal cost. No official text exists in either game; the only material is player speculation reasoning by analogy from Enhance. **This is the only remaining open item.**
 
 ~~Related and **unreachable in practice**: whether an Accelerate play triggers Spellboost.~~ **Settled 2026-09-02 — yes.** Accelerate plays trigger Spellboost (and other spell-play mechanics). The earlier "unreachable in practice" reasoning was wrong: it assumed every Accelerate card is Portalcraft or Dragoncraft, but **Jailor of Antiquity (`10901110`) is Neutral**, so any Runecraft deck can contain both. See **Accelerate and spells — 2026-09-02** and **Alternate-form permanence — 2026-09-02** above.
+
+~~Initiation of Rebirth highest-base-cost ties (assumed, not contested).~~ **Settled 2026-09-02 — randomly among the tied cards.** See **Initiation of Rebirth highest-base-cost ties — 2026-09-02** above.
