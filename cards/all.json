@@ -22543,7 +22543,7 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": ["Encroacher"],
-    "description": "Fanfare: Reduce your faith's value by 10 to add a Depths of the Eld Lance to your hand and give your faith \"Whenever an allied follower evolves, deal 1 damage to all enemies.\"\nDrain",
+    "description": "Fanfare: Reduce your faith's value by 10 to add a Depths of the Eld Lance to your hand and give your faith \"Whenever an allied follower evolves, deal 1 damage to the enemy leader.\"\nDrain",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10614120.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10614120_evo.webp",
     "set": "[10006] Apocalypse Pact",
@@ -22573,11 +22573,6 @@
               {
                 "event": "ally_evolve",
                 "effects": [
-                  {
-                    "op": "damage",
-                    "target": "enemy:follower",
-                    "amount": 1
-                  },
                   {
                     "op": "damage",
                     "target": "enemy:leader",
