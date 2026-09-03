@@ -8,8 +8,16 @@ import { getGraveyard } from "../../../../core/playerHelpers.js";
 export function handleSummonDestroyedAmuletHighestBaseCost(owner: Player) {
   const grave = getGraveyard(state, owner);
 
-  // Only amulets that actually hit the graveyard (i.e., were destroyed, not banished/bounced)
-  const destroyedAmulets = grave.filter((c) => c?.type === "Amulet");
+  // Owner ruling 2026-09-02 (same provenance as Reanimate): only amulets that
+  // were destroyed on the field. destroyedHistory is written at the genuine
+  // destruction sites — discarded / Engage-consumed amulets land in the
+  // graveyard too but are NOT eligible. Match graveyard entries by uid.
+  const destroyedUids = new Set(
+    state.players[owner].destroyedHistory.map((r) => String(r.uid ?? "")),
+  );
+  const destroyedAmulets = grave.filter(
+    (c) => c?.type === "Amulet" && destroyedUids.has(String(c.uid ?? "")),
+  );
   if (!destroyedAmulets.length) return;
 
   // Compute base costs from DB (ignores temporary cost mods during play)

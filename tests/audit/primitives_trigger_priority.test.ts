@@ -18,6 +18,7 @@ import {
 } from "../harness/builders.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import "./setup.ts";
 
 vi.mock("../../src/ui/render.js", () => ({ logEvent: vi.fn() }));
@@ -251,9 +252,9 @@ describe("C2 — insertionTs on every board entry path", () => {
   });
 
   it("reanimate assigns insertionTs via pushToBoard", () => {
-    state.players.first.graveyard = [
-      createCard("10001110", "graveyard", "first"),
-    ];
+    const corpse = createCard("10001110", "graveyard", "first");
+    state.players.first.graveyard = [corpse];
+    recordDestroyed(state, "first", corpse);
 
     handleReanimate({ op: "reanimate", max_cost: 4 } as any, "first");
 

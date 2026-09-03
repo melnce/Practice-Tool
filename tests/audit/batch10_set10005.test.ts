@@ -23,6 +23,7 @@ import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { injectAdapter } from "../../src/core/adapter.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
 import { getHP, getCrests, getPP } from "../../src/core/playerHelpers.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import "../../src/logic/core/effects/index.js";
 
 const R6 = 6;
@@ -274,16 +275,16 @@ describe("Set 10005 — Blossoming Fate", () => {
 
   it("Crimson Soulmancer — Fanfare Reanimate (2); Evolve replicates", () => {
     setupTurn(R6, { hand: ["10551120"], pp: 4 });
-    state.players.first.graveyard.push(
-      createCard("90051110", "graveyard", "first"),
-    );
+    const skeletonA = createCard("90051110", "graveyard", "first");
+    state.players.first.graveyard.push(skeletonA);
+    recordDestroyed(state, "first", skeletonA);
     whenPlayCard("first", 0);
     expect(thenBoard("first").some((c) => c.name === "Skeleton")).toBe(true);
     const necro = findOnBoard("first", "Crimson Soulmancer")!;
     const before = thenBoard("first").length;
-    state.players.first.graveyard.push(
-      createCard("90051110", "graveyard", "first"),
-    );
+    const skeletonB = createCard("90051110", "graveyard", "first");
+    state.players.first.graveyard.push(skeletonB);
+    recordDestroyed(state, "first", skeletonB);
     onEvolve(necro, "first", "normal");
     expect(thenBoard("first").length).toBeGreaterThan(before);
   });

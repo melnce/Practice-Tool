@@ -38,6 +38,7 @@ import {
   setPP,
 } from "../../src/core/playerHelpers.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import "../../src/logic/core/effects/index.js";
 
 const JAILOR = "10901110"; // Neutral Follower — Accelerate (1)
@@ -183,9 +184,9 @@ describe("Owner rulings 2026-09-02 — Accelerate / Crystallize alternate forms"
       // Real-card corpse: Reanimate recreates from the DB, so synthetic cards
       // silently no-op. Cost 4 < Jailor's printed 6 so a broken type-filter
       // that admitted Jailor would prefer Jailor and summon nothing.
-      getGraveyard(state, "first").push(
-        createCard(AMOROUS, "graveyard", "first"),
-      );
+      const amorousCorpse = createCard(AMOROUS, "graveyard", "first");
+      getGraveyard(state, "first").push(amorousCorpse);
+      recordDestroyed(state, "first", amorousCorpse);
       enemyFollower(2, 5, "AccelPing");
 
       // Accelerate Jailor → GY as Spell (cost still 6, higher than Amorous).

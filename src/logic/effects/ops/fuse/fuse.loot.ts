@@ -5,8 +5,10 @@ import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
 import type { Player, CardInstance } from "../../../../core/types/index.js";
 import { alreadyFusedThisTurn, handOf } from "./types.js";
+import { moveToBanishZone } from "../banish/primitives.js";
 
 // Returning Slash, etc.
+// Owner ruling 2026-09-02: fused partners are banished (not nowhere / not cemetery).
 export function fuse_finalize_loot(
   owner: Player,
   initiator_uid: string,
@@ -56,11 +58,12 @@ export function fuse_finalize_loot(
   for (const p of used) next.add(String(p.name || ""));
   initiator._fusedLootNames = Array.from(next);
 
-  // Consume selected Loot cards
+  // Consume selected Loot cards → banish (owner ruling 2026-09-02)
   for (const p of used) {
     const idx = hand.findIndex((c) => c?.uid === p.uid);
     if (idx !== -1) {
-      hand.splice(idx, 1);
+      const [consumed] = hand.splice(idx, 1);
+      if (consumed) moveToBanishZone(consumed, owner);
     }
   }
 

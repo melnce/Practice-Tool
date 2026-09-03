@@ -77,9 +77,13 @@ export function banishSelf(sourceCard: CardInstance | null): boolean {
 }
 
 /**
- * Move card to banish zone if it exists.
+ * Move a card into the owner's banish zone and mark `zone = "banished"`.
+ * Does **not** search boards or fire leave-field triggers — callers must
+ * already have removed the card from its prior zone (hand / board / deck).
+ * Use this for hand/deck banishes; `banishCard` is for board removals only.
  */
-function moveToBanishZone(card: CardInstance, owner: Player): void {
+export function moveToBanishZone(card: CardInstance, owner: Player): void {
+  card.zone = "banished";
   const bzone = getBanish(state, owner);
   if (Array.isArray(bzone)) {
     bzone.push(card);

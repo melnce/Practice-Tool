@@ -40,6 +40,7 @@ import {
   getGraveyard,
   getBanish,
 } from "../../src/core/playerHelpers.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import "../../src/logic/core/effects/index.js";
 
 describe("Rulebook §176–269 / owner — Ward", () => {
@@ -429,9 +430,9 @@ describe("Rulebook §763 / owner — Reanimate(N) token behavior", () => {
       .withFirstHP(20, 20)
       .build();
 
-    state.players.first.graveyard = [
-      createCard("10001110", "graveyard", "first"),
-    ];
+    const corpse = createCard("10001110", "graveyard", "first");
+    state.players.first.graveyard = [corpse];
+    recordDestroyed(state, "first", corpse);
 
     handleReanimate({ op: "reanimate", max_cost: 2 } as any, "first");
 
@@ -443,9 +444,9 @@ describe("Rulebook §763 / owner — Reanimate(N) token behavior", () => {
   it("reanimated token enters exhausted (no attack unless Storm/Rush)", () => {
     givenGameState({ seed: 42 }).build();
 
-    state.players.first.graveyard = [
-      createCard("10001110", "graveyard", "first"),
-    ];
+    const corpse = createCard("10001110", "graveyard", "first");
+    state.players.first.graveyard = [corpse];
+    recordDestroyed(state, "first", corpse);
 
     handleReanimate({ op: "reanimate", max_cost: 2 } as any, "first");
 

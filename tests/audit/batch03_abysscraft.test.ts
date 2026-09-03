@@ -32,6 +32,7 @@ import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
@@ -139,9 +140,9 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
 
   it("Ghost Juggler — Fanfare Reanimate (4) from graveyard", () => {
     setupTurn(R8, { hand: ["10151140"], pp: 7 });
-    state.players.first.graveyard.push(
-      createCard("10151130", "graveyard", "first"),
-    );
+    const corpse = createCard("10151130", "graveyard", "first");
+    state.players.first.graveyard.push(corpse);
+    recordDestroyed(state, "first", corpse);
     whenPlayCard("first", 0);
     expect(
       thenBoard("first").some((c) => c.name === "Little Miss Bonemancer"),
@@ -279,9 +280,9 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(mukan.hasEvolved).toBe(true);
     expect(getShadows(state, "first")).toBe(0);
 
-    state.players.first.graveyard.push(
-      createCard("10151130", "graveyard", "first"),
-    );
+    const departedCorpse = createCard("10151130", "graveyard", "first");
+    state.players.first.graveyard.push(departedCorpse);
+    recordDestroyed(state, "first", departedCorpse);
     runEffects(
       [{ op: "summon", source: "graveyard", max_cost: 3 } as any],
       "first",
@@ -470,11 +471,13 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
 
   it("Charon — Fanfare Reanimate (2) and (1); Departed enter gains Ward", () => {
     setupTurn(R6, { hand: ["10254120"], pp: 6 });
-    state.players.first.graveyard.push(
+    const corpses = [
       createCard("10151130", "graveyard", "first"),
       createCard("10152110", "graveyard", "first"),
       createCard("10151120", "graveyard", "first"),
-    );
+    ];
+    state.players.first.graveyard.push(...corpses);
+    for (const corpse of corpses) recordDestroyed(state, "first", corpse);
     whenPlayCard("first", 0);
     const departed = thenBoard("first").filter((c) =>
       c.tribes?.includes("Departed"),
@@ -532,10 +535,12 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
 
   it("Spirited Gravekeeper — Enhance (7) Reanimate (5) and (3)", () => {
     setupTurn(R9, { hand: ["10352120"], pp: 9 });
-    state.players.first.graveyard.push(
+    const corpses = [
       createCard("10151130", "graveyard", "first"),
       createCard("10152110", "graveyard", "first"),
-    );
+    ];
+    state.players.first.graveyard.push(...corpses);
+    for (const corpse of corpses) recordDestroyed(state, "first", corpse);
     whenPlayCard("first", 0);
     expect(thenBoard("first").length).toBeGreaterThanOrEqual(2);
   });

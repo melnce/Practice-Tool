@@ -335,6 +335,25 @@ Asked whether an Accelerate-played follower in the cemetery should be reanimatab
 
 General rule in both directions: **the printed type governs while the card is in hand or deck; once the card has been played in its alternate form, it stays in that form and never reverts** — including in the cemetery. An Accelerate-played follower is a spell corpse and is invisible to Reanimate. A Crystallize-played card is an amulet for the rest of its life; bouncing it to hand does not restore the follower.
 
+## Fused cards are banished — 2026-09-02
+
+Live-game bug report (owner, verbatim):
+
+> "i fused lyria in turn1 with sephie to create a test subject. fused cards are banished- gone -fairy dust-fugazi. wills united reanimated lyria - massive bug!"
+
+**Fused partners are banished**, not sent to the cemetery. They produce **no shadow**. This clarifies the earlier **Fuse mechanics — Sephie and Ecstatic Scholar — 2026-08-29** ruling, which said only that fused cards are _"gone from hand"_ and did **not** say where they go — it does **not** reverse that ruling.
+
+## Reanimate only sees field-destroyed followers — 2026-09-02
+
+Same report, clarifying (owner, verbatim):
+
+> "she was never even on the field. not even discarded cards can get reanimated. so its extra
+> preposterous that a fused card got renanimated"
+
+**Reanimate (and any `source: "graveyard"` follower summon that is Reanimate)** may only pick followers that were **destroyed on the field**. A card that reached the cemetery any other way — discarded from hand, fused (now banished, so not even in the cemetery), burned / hand-overflow, Engage-consumed amulet material, etc. — is **not** a legal Reanimate target. It was never on the field, so it never died there.
+
+This matches the printed Reanimate keyword's "died this match" language and is enforced via `destroyedHistory` (written only at the genuine destruction sites). Discards still generate shadows exactly as before; this ruling is about **eligibility**, not the shadow count.
+
 ## Initiation of Rebirth highest-base-cost ties — 2026-09-02
 
 Printed text: _"Add a copy of a **random** allied follower destroyed this match with the highest base cost to your deck without revealing it. Draw a card."_
