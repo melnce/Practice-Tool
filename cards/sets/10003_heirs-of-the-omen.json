@@ -1064,7 +1064,7 @@
   {
     "id": "10323310",
     "name": "Returning Slash",
-    "cost": "1",
+    "cost": "2",
     "attack": "0",
     "defense": "0",
     "type": "Spell",
