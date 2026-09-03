@@ -80,6 +80,7 @@ async function main() {
   }
 
   console.log(`Writing combined file: ${ALL_FILE} (${allCards.length} cards)`);
+  console.log(`Writing index to ${INDEX_FILE}`);
   await writeMergedCardsToDisk(allCards, indexData);
 
   console.log("Done.");
