@@ -108,4 +108,6 @@ export interface StartGameOptions {
   deckBId: string;
   /** Accepted as number | string; normalised once inside startGame / reset. */
   seed?: SeedLiteral | undefined;
+  /** Skip mulligan and begin main phase (default false). */
+  skipMulligan?: boolean;
 }

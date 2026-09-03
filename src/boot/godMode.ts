@@ -3,6 +3,20 @@ import { state } from "../core/gameState.js";
 import { doAction } from "../core/history.js";
 
 export function initGodMode(): void {
+  const godToggle = document.getElementById(
+    "godModeToggle",
+  ) as HTMLInputElement | null;
+  if (godToggle) {
+    void import("../ui/render.js").then(
+      ({ isGodModeEnabled, setGodModeEnabled }) => {
+        godToggle.checked = isGodModeEnabled();
+        godToggle.addEventListener("change", () => {
+          setGodModeEnabled(godToggle.checked);
+        });
+      },
+    );
+  }
+
   // God Mode Handlers — target the active player; wrapped for undo
   const godTarget = () => state.players[state.activePlayer];
 
