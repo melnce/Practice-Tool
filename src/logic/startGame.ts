@@ -102,5 +102,5 @@ export async function startGame(options: StartGameOptions) {
   resetEvoButtons(); // ✅ reset evo UI
 
   // Enter mulligan phase (pauses before turn 1)
-  beginMulligan();
+  beginMulligan(options.skipMulligan ? { skipMulligan: true } : undefined);
 }

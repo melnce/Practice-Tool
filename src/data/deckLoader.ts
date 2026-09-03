@@ -14,9 +14,8 @@ import { getImportedDeckRaw } from "./importedDeckStore.js";
 function normalizeDeck(raw: RawDeck, deckFile?: string): RawDeckCardEntry[] {
   const expanded = expandDeckEntries(raw);
   const isOrdered = isRawDeckObject(raw) && !!raw.ordered;
-  const isTestDeck = deckFile?.toLowerCase().includes("0_testing");
 
-  if (isOrdered || isTestDeck) {
+  if (isOrdered) {
     return expanded.reverse();
   }
 

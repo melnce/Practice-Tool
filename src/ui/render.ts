@@ -26,6 +26,17 @@ function domPrefix(player: Player): "blue" | "red" {
 
 const ACTIVE_ON_BOTTOM_KEY = "svwb.activeOnBottom";
 
+let godModeEnabled = false;
+
+export function isGodModeEnabled(): boolean {
+  return godModeEnabled;
+}
+
+export function setGodModeEnabled(on: boolean): void {
+  godModeEnabled = on;
+  render();
+}
+
 export function isActiveOnBottom(): boolean {
   try {
     return localStorage.getItem(ACTIVE_ON_BOTTOM_KEY) === "1";
@@ -175,14 +186,10 @@ export function render() {
   );
   wireHistoryImagePreviewOnce();
 
-  // God Mode Visibility — either side on a test deck
+  // God Mode visibility — explicit in-page toggle (not filename-driven)
   const godPanel = byId("blueGodMode");
   if (godPanel) {
-    const isTesting = (file: string) =>
-      /^0_.*\.json$/i.test(file) || /testing/i.test(file);
-    const show =
-      isTesting(String(state.players.first.deckFile || "")) ||
-      isTesting(String(state.players.second.deckFile || ""));
+    const show = isGodModeEnabled();
     godPanel.style.display = show ? "block" : "none";
     const label = godPanel.querySelector(".god-target-label");
     if (label) {

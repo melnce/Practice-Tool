@@ -6,7 +6,7 @@
 import { state } from "../core/gameState.js";
 import { logEvent } from "../core/logger.js";
 import type { Player } from "../core/types/index.js";
-import { getHand, getDeckFile } from "../core/playerHelpers.js";
+import { getHand } from "../core/playerHelpers.js";
 import { adapter } from "../core/adapter.js";
 import {
   toggleMulliganPickCore,
@@ -72,15 +72,8 @@ function maybeRecordMulligan(
   });
 }
 
-export function beginMulligan() {
-  const firstDeckFile = getDeckFile(state, "first");
-  const secondDeckFile = getDeckFile(state, "second");
-  const usingTestDeck =
-    (firstDeckFile && firstDeckFile.toLowerCase().includes("0_testing_")) ||
-    (secondDeckFile && secondDeckFile.toLowerCase().includes("0_testing_"));
-
-  if (usingTestDeck) {
-    console.log("[MULLIGAN] Skipping mulligan for testing deck");
+export function beginMulligan(options?: { skipMulligan?: boolean }) {
+  if (options?.skipMulligan) {
     startFirstTurnCore({ hideUi: hideMulliganUI });
     return;
   }
