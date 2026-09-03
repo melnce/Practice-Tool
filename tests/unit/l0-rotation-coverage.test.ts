@@ -116,6 +116,16 @@ function enemyLastWordsFollower(name = "LWTarget") {
   return lw;
 }
 
+/** Card ids currently in hand (for identity assertions — not counts). */
+function handIds(player: "first" | "second" = "first"): string[] {
+  return thenHand(player).map((c) => String(c.id));
+}
+
+/** Card ids currently in deck. */
+function deckIds(player: "first" | "second" = "first"): string[] {
+  return thenDeck(player).map((c) => String(c.id));
+}
+
 describe("L0 rotation coverage — real-card L2 tests", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -128,47 +138,33 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
     const printed =
       "Select a card in your hand and return it to deck. Draw 2 Swordcraft followers.";
 
+    // Deck top → deeper: non-Swordcraft followers first, Swordcraft followers below.
+    const NON_SWORD_TOP = "10011110"; // Fairy Tamer (Forestcraft)
+    const NON_SWORD_DEEP = "10131110"; // Runeblade Conductor (Runecraft)
+    const SWORD_DEEP_A = "10021110"; // Flashstep Quickblader (Swordcraft)
+    const SWORD_DEEP_B = "10021120"; // Arms Peddler (Swordcraft)
+    const RETURN_SELECT = "10111310"; // Fairy Convocation
+
     it("returns the selected hand card to deck and draws only Swordcraft followers", () => {
       setupTurn(10, {
-        hand: [WAY_OF_MAID, { name: "ToReturn", type: "Spell", cost: 1 }],
-        deck: [
-          {
-            name: "ForestTop",
-            type: "Follower",
-            class: "Forestcraft",
-            attack: 1,
-            defense: 1,
-          },
-          {
-            name: "SwordA",
-            type: "Follower",
-            class: "Swordcraft",
-            attack: 1,
-            defense: 1,
-          },
-          {
-            name: "SwordB",
-            type: "Follower",
-            class: "Swordcraft",
-            attack: 1,
-            defense: 1,
-          },
-        ],
+        hand: [WAY_OF_MAID, RETURN_SELECT],
+        deck: [NON_SWORD_TOP, NON_SWORD_DEEP, SWORD_DEEP_A, SWORD_DEEP_B],
         pp: 10,
       });
 
-      const toReturn = thenHand("first").find((c) => c.name === "ToReturn")!;
+      const toReturn = thenHand("first").find((c) => c.id === RETURN_SELECT)!;
       whenPlayCard("first", 0);
       resolvePendingByUid(toReturn.uid);
 
+      const drawnIds = handIds();
       // "return it to deck"
-      expect(thenDeck("first").some((c) => c.uid === toReturn.uid)).toBe(true);
-      // "Draw 2 Swordcraft followers" — filtered search, not plain draw
-      const drawn = thenHand("first").filter(
-        (c) => c.name === "SwordA" || c.name === "SwordB",
-      );
-      expect(drawn).toHaveLength(2);
-      expect(thenHand("first").some((c) => c.name === "ForestTop")).toBe(false);
+      expect(deckIds()).toContain(RETURN_SELECT);
+      expect(drawnIds).not.toContain(RETURN_SELECT);
+      // "Draw 2 Swordcraft followers" — filtered search, not plain top-of-deck draw
+      expect(drawnIds).toContain(SWORD_DEEP_A);
+      expect(drawnIds).toContain(SWORD_DEEP_B);
+      expect(drawnIds).not.toContain(NON_SWORD_TOP);
+      expect(drawnIds).not.toContain(NON_SWORD_DEEP);
       expect(printed).toContain("Swordcraft followers");
     });
   });
@@ -177,28 +173,39 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
     const printed =
       "Return a random card from your hand to deck. Draw 3 cards.";
 
+    const RETURN_A = "10111310";
+    const RETURN_B = "10102110";
+    const DRAW_TOP = "10021110";
+    const DRAW_SECOND = "10021120";
+    const DRAW_THIRD = "10021130";
+
     // Printed order: return from hand, then draw 3. Engine draws first and returns a drawn card.
     it.fails(
-      "returns the only other hand card to deck before drawing 3 — 10561310: printed text requires return-then-draw; observed draw-then-random-return leaves OnlyOther in hand",
+      "returns one random hand card to deck before drawing 3 stacked cards — 10561310: printed text requires return-then-draw; observed draw-then-random-return",
       () => {
         setupTurn(10, {
-          hand: [MALICE, { name: "OnlyOther", type: "Spell", cost: 1 }],
-          deck: [
-            { name: "Draw1", type: "Follower", attack: 1, defense: 1 },
-            { name: "Draw2", type: "Follower", attack: 1, defense: 1 },
-            { name: "Draw3", type: "Follower", attack: 1, defense: 1 },
-          ],
+          hand: [MALICE, RETURN_A, RETURN_B],
+          deck: [DRAW_TOP, DRAW_SECOND, DRAW_THIRD],
           pp: 10,
         });
 
-        const other = thenHand("first").find((c) => c.name === "OnlyOther")!;
+        const returnCandidateIds = [RETURN_A, RETURN_B];
         whenPlayCard("first", 0);
 
-        expect(thenDeck("first").some((c) => c.uid === other.uid)).toBe(true);
-        expect(thenHand("first").some((c) => c.uid === other.uid)).toBe(false);
-        expect(thenHand("first").some((c) => c.name === "Draw1")).toBe(true);
-        expect(thenHand("first").some((c) => c.name === "Draw2")).toBe(true);
-        expect(thenHand("first").some((c) => c.name === "Draw3")).toBe(true);
+        const drawnIds = handIds();
+        // "Draw 3 cards" — identity from stacked deck top
+        expect(drawnIds).toContain(DRAW_TOP);
+        expect(drawnIds).toContain(DRAW_SECOND);
+        expect(drawnIds).toContain(DRAW_THIRD);
+        // "Return a random card from your hand to deck" — some candidate left hand for deck
+        expect(
+          returnCandidateIds.some(
+            (id) =>
+              deckIds().includes(id) &&
+              !drawnIds.includes(id) &&
+              !thenHand("first").some((c) => String(c.id) === id),
+          ),
+        ).toBe(true);
         expect(printed).toContain("Draw 3 cards");
       },
     );
@@ -208,26 +215,23 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
     const printed =
       "Select 2 cards in your hand and return them to deck. Draw 2 cards.";
 
+    const PICK_A = "10111310";
+    const PICK_B = "10112310";
+    const STAY = "10102110";
+    const DRAW_A = "10021110";
+    const DRAW_B = "10021120";
+
     it.fails(
-      "returns exactly 2 selected cards to deck then draws 2 — 10711310: multi-select return only puts the first selection into deck; second selection stays in hand",
+      "returns both selected cards to deck then draws 2 stacked cards — 10711310: multi-select return only puts the first selection into deck; second selection stays in hand",
       () => {
         setupTurn(10, {
-          hand: [
-            COGNITIVE_SHIFT,
-            { name: "PickA", type: "Spell", cost: 1 },
-            { name: "PickB", type: "Spell", cost: 2 },
-            { name: "Stay", type: "Spell", cost: 3 },
-          ],
-          deck: [
-            { name: "NewA", type: "Follower", attack: 1, defense: 1 },
-            { name: "NewB", type: "Follower", attack: 1, defense: 1 },
-          ],
+          hand: [COGNITIVE_SHIFT, PICK_A, PICK_B, STAY],
+          deck: [DRAW_A, DRAW_B],
           pp: 10,
         });
 
-        const pickA = thenHand("first").find((c) => c.name === "PickA")!;
-        const pickB = thenHand("first").find((c) => c.name === "PickB")!;
-        const stay = thenHand("first").find((c) => c.name === "Stay")!;
+        const pickA = thenHand("first").find((c) => c.id === PICK_A)!;
+        const pickB = thenHand("first").find((c) => c.id === PICK_B)!;
 
         whenPlayCard("first", 0);
         expect(state.pendingTargetEffect?.selectCount).toBe(2);
@@ -235,12 +239,16 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
         expect(state.pendingTargetEffect?.targetUids).toEqual([pickA.uid]);
         resolvePendingByUid(pickB.uid);
 
-        expect(thenHand("first")).toHaveLength(3);
-        expect(thenHand("first").some((c) => c.uid === stay.uid)).toBe(true);
-        expect(thenHand("first").some((c) => c.uid === pickA.uid)).toBe(false);
-        expect(thenHand("first").some((c) => c.uid === pickB.uid)).toBe(false);
-        expect(thenHand("first").some((c) => c.name === "NewA")).toBe(true);
-        expect(thenHand("first").some((c) => c.name === "NewB")).toBe(true);
+        const drawnIds = handIds();
+        // "return them to deck"
+        expect(deckIds()).toContain(PICK_A);
+        expect(deckIds()).toContain(PICK_B);
+        expect(drawnIds).not.toContain(PICK_A);
+        expect(drawnIds).not.toContain(PICK_B);
+        expect(drawnIds).toContain(STAY);
+        // "Draw 2 cards"
+        expect(drawnIds).toContain(DRAW_A);
+        expect(drawnIds).toContain(DRAW_B);
         expect(printed).toContain("Select 2 cards");
       },
     );
@@ -250,47 +258,59 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
     const printed =
       "Select a card in your hand and return it to deck. Draw 2 cards. If you've unlocked super-evolution, reduce their costs by 1.";
 
+    const RETURN_SELECT = "10111310";
+    const DRAW_TOP = "10102110";
+    const DRAW_SECOND = "10011110";
+
     it("without super-evolution unlocked: draws 2 without cost reduction", () => {
       setupTurn(6, {
-        hand: [EBB_AND_FLOW, { name: "ToReturn", type: "Spell", cost: 1 }],
-        deck: [
-          { name: "DrawA", type: "Follower", cost: 3, attack: 1, defense: 1 },
-          { name: "DrawB", type: "Follower", cost: 4, attack: 1, defense: 1 },
-        ],
+        hand: [EBB_AND_FLOW, RETURN_SELECT],
+        deck: [DRAW_TOP, DRAW_SECOND],
         pp: 6,
       });
       expect(handleSuperEvoGate("first")).toBe(false);
 
-      const toReturn = thenHand("first").find((c) => c.name === "ToReturn")!;
+      const toReturn = thenHand("first").find((c) => c.id === RETURN_SELECT)!;
       whenPlayCard("first", 0);
       resolvePendingByUid(toReturn.uid);
 
-      const drawA = thenHand("first").find((c) => c.name === "DrawA")!;
-      const drawB = thenHand("first").find((c) => c.name === "DrawB")!;
-      expect(getEffectiveCost(drawA)).toBe(3);
-      expect(getEffectiveCost(drawB)).toBe(4);
+      const drawnIds = handIds();
+      expect(deckIds()).toContain(RETURN_SELECT);
+      expect(drawnIds).not.toContain(RETURN_SELECT);
+      expect(drawnIds).toContain(DRAW_TOP);
+      expect(drawnIds).toContain(DRAW_SECOND);
+      expect(
+        getEffectiveCost(thenHand("first").find((c) => c.id === DRAW_TOP)!),
+      ).toBe(3);
+      expect(
+        getEffectiveCost(thenHand("first").find((c) => c.id === DRAW_SECOND)!),
+      ).toBe(2);
       expect(printed).toContain("super-evolution");
     });
 
     it("with super-evolution unlocked: drawn cards cost 1 less", () => {
       setupTurn(7, {
-        hand: [EBB_AND_FLOW, { name: "ToReturn", type: "Spell", cost: 1 }],
-        deck: [
-          { name: "DrawA", type: "Follower", cost: 3, attack: 1, defense: 1 },
-          { name: "DrawB", type: "Follower", cost: 4, attack: 1, defense: 1 },
-        ],
+        hand: [EBB_AND_FLOW, RETURN_SELECT],
+        deck: [DRAW_TOP, DRAW_SECOND],
         pp: 7,
       });
       expect(handleSuperEvoGate("first")).toBe(true);
 
-      const toReturn = thenHand("first").find((c) => c.name === "ToReturn")!;
+      const toReturn = thenHand("first").find((c) => c.id === RETURN_SELECT)!;
       whenPlayCard("first", 0);
       resolvePendingByUid(toReturn.uid);
 
-      const drawA = thenHand("first").find((c) => c.name === "DrawA")!;
-      const drawB = thenHand("first").find((c) => c.name === "DrawB")!;
-      expect(getEffectiveCost(drawA)).toBe(2);
-      expect(getEffectiveCost(drawB)).toBe(3);
+      const drawnIds = handIds();
+      expect(deckIds()).toContain(RETURN_SELECT);
+      expect(drawnIds).not.toContain(RETURN_SELECT);
+      expect(drawnIds).toContain(DRAW_TOP);
+      expect(drawnIds).toContain(DRAW_SECOND);
+      expect(
+        getEffectiveCost(thenHand("first").find((c) => c.id === DRAW_TOP)!),
+      ).toBe(2);
+      expect(
+        getEffectiveCost(thenHand("first").find((c) => c.id === DRAW_SECOND)!),
+      ).toBe(1);
       expect(printed).toContain("reduce their costs by 1");
     });
   });
@@ -314,9 +334,10 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
     });
 
     it("with 2 amulets: Fanfare does not summon; Rush and Last Words still apply", () => {
+      const LW_DRAW = "10021110";
       setupTurn(4, {
         hand: [REVEREND],
-        deck: [{ name: "LWDraw", type: "Follower", attack: 1, defense: 1 }],
+        deck: [LW_DRAW],
         pp: 4,
       });
       allyAmulet("A1");
@@ -330,11 +351,9 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
       const rev = findOnBoard("first", "Reverend of Finance")!;
       expect(rev.hasRush).toBe(true);
 
-      const handBefore = thenHand("first").length;
       rev.defense = 0;
       cleanupDead();
-      expect(thenHand("first").length).toBe(handBefore + 1);
-      expect(thenHand("first").some((c) => c.name === "LWDraw")).toBe(true);
+      expect(handIds()).toContain(LW_DRAW);
       expect(printed).toContain("Last Words: Draw a card");
     });
   });
