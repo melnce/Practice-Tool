@@ -264,7 +264,7 @@ describe("B/C — Returning Slash fuse gate (10323310)", () => {
     (globalThis as any).HEADLESS = true;
     setupTurn(R6, {
       hand: ["10323310"],
-      pp: 1,
+      pp: 2,
       deck: [{ name: "Top", type: "Follower", attack: 1, defense: 1 }],
     });
     enemyFollower(4);
