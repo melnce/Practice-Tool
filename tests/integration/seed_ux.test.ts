@@ -99,8 +99,8 @@ describe("startGame seed normalisation + determinism", () => {
 
   async function openWith(seed: number | string) {
     await startGame({
-      deckAId: "starter_deck",
-      deckBId: "starter_deck",
+      deckAId: "0_testing_vanilla",
+      deckBId: "0_testing_vanilla",
       seed,
     });
     if (state.phase === "mulligan") {
@@ -146,24 +146,24 @@ describe("share URL ?seed=&a=&b=", () => {
   it("formatShareQuery includes seed and both deck ids", () => {
     const q = formatShareQuery({
       seed: 1786012345678,
-      deckAId: "starter_deck",
+      deckAId: "0_testing_vanilla",
       deckBId: "aggro_forest",
     });
     expect(q).toContain("seed=1786012345678");
-    expect(q).toContain("a=starter_deck");
+    expect(q).toContain("a=0_testing_vanilla");
     expect(q).toContain("b=aggro_forest");
   });
 
   it("readShareParams round-trips the literal seed (not truncated)", () => {
     const q = formatShareQuery({
       seed: 1786012345678,
-      deckAId: "starter_deck",
-      deckBId: "starter_deck",
+      deckAId: "0_testing_vanilla",
+      deckBId: "0_testing_vanilla",
     });
     const parsed = readShareParams(q);
     expect(parsed.seed).toBe(1786012345678);
-    expect(parsed.deckAId).toBe("starter_deck");
-    expect(parsed.deckBId).toBe("starter_deck");
+    expect(parsed.deckAId).toBe("0_testing_vanilla");
+    expect(parsed.deckBId).toBe("0_testing_vanilla");
   });
 
   it("digit string in URL normalises like a number", () => {

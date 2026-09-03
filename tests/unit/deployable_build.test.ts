@@ -44,7 +44,7 @@ describe("deployable build static dirs", () => {
       "cards/all.json",
       "cards/token_details.json",
       "decks/manifest.json",
-      "decks/starter_deck.json",
+      "decks/rally_swordcraft.json",
       "css/base.css",
       "images/victory_card.png",
     ];

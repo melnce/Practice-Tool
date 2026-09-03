@@ -75,8 +75,8 @@ export class SvwbPage {
 
   async startGameFull(
     seed: number,
-    blueDeck = "starter_deck",
-    redDeck = "starter_deck",
+    blueDeck = "0_testing_vanilla",
+    redDeck = "0_testing_vanilla",
   ): Promise<void> {
     await this.page.selectOption("#blueDeckSelect", blueDeck);
     await this.page.selectOption("#redDeckSelect", redDeck);
@@ -363,8 +363,8 @@ export class SvwbPage {
 
   async startGame(
     seed: number,
-    deckA = "starter_deck",
-    deckB = "starter_deck",
+    deckA = "0_testing_vanilla",
+    deckB = "0_testing_vanilla",
   ): Promise<void> {
     await this.page.locator(SEL.seedInput).fill(String(seed));
     await this.page.locator(SEL.startGameBtn).click();

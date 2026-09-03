@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 /**
- * Pinned soak for dragoncraft_meta_v2 — mirror + vs dragoncraft_meta + vs portalcraft_artifact_rotation.
- * Run: npx tsx scripts/soak-deck-meta-v2.ts [--games=N] [--seed=N]
+ * Pinned soak for ramp_dragoncraft — mirror + vs antemaria_dragoncraft + vs artifact_portalcraft.
+ * Run: npx tsx scripts/soak-deck-ramp.ts [--games=N] [--seed=N]
  *
- * Reports → reports/soak-deck-meta-v2/
+ * Reports → reports/soak-deck-ramp/
  */
 
 (globalThis as any).HEADLESS = true;
@@ -17,32 +17,27 @@ import { performance } from "perf_hooks";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, "..");
-const REPORT_DIR = join(ROOT, "reports", "soak-deck-meta-v2");
+const REPORT_DIR = join(ROOT, "reports", "soak-deck-ramp");
 
-const META_V2_DECK = "dragoncraft_meta_v2";
-const OPPONENTS = [
-  "dragoncraft_meta",
-  "portalcraft_artifact_rotation",
-] as const;
+const META_V2_DECK = "ramp_dragoncraft";
+const OPPONENTS = ["antemaria_dragoncraft", "artifact_portalcraft"] as const;
 
-/** 16 distinct cards in dragoncraft_meta_v2 (id → name). */
+/** 14 distinct cards in ramp_dragoncraft (id → name). */
 const META_V2_CARD_IDS: Record<string, string> = {
+  "10042310": "Dragonsign",
   "10403120": "Lyria, Skydestined",
+  "10444120": "Zooey, Ally of the World",
+  "10543310": "Sloth of the Crestpetal",
+  "10544110": "Erntz, Governing Justice",
+  "10603210": "Dark Dimensions",
+  "10644110": "Sagatsumatsu, Fair Beheader",
   "10644120": "Vorlalai, Eld Blades",
   "10741110": "Dragonewt Promoter",
-  "10543310": "Sloth of the Crestpetal",
-  "10042310": "Dragonsign",
-  "10844110": "Drache & Aluzard, Burning Blood",
-  "10503310": "Fate of the World",
-  "10342110": "Supplicant of Disdain",
-  "10344120": "Galmieux, Ardor Manifest",
-  "10444120": "Zooey, Ally of the World",
-  "10842310": "Art of Decay",
-  "10644110": "Sagatsumatsu, Fair Beheader",
-  "10844120": "Lumiore & Argente, Shining Wings",
-  "10344110": "Azurifrit, Heir to Disdain",
   "10744110": "Burnite, Anathema of Ash",
-  "10544110": "Erntz, Governing Justice",
+  "10804110": "Alabaster Bahamut",
+  "10842120": "Kimika, Cook of Happiness",
+  "10844120": "Lumiore & Argente, Shining Wings",
+  "10944120": "Normagdala, Ravening Revenant",
 };
 
 type Matchup = { deckAId: string; deckBId: string; label: string };
@@ -189,14 +184,14 @@ async function main(): Promise<void> {
   }
 
   console.log("╔══════════════════════════════════════════════════════════╗");
-  console.log("║         DRAGON META V2 DECK — PINNED SOAK                ║");
+  console.log("║         RAMP DRAGON DECK — PINNED SOAK                   ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
     `games=${totalGames} (${gamesPerMatchup} per matchup) seed=${seed}`,
   );
   console.log(`reports → ${REPORT_DIR}\n`);
 
-  console.log("ops_present status for 16 deck cards:");
+  console.log("ops_present status for 14 deck cards:");
   for (const [id, name] of Object.entries(META_V2_CARD_IDS)) {
     console.log(`  [${id}] ${name}: ${opsStatus[id]}`);
   }
@@ -279,14 +274,11 @@ async function main(): Promise<void> {
   }
 
   const highCostNotes: Record<string, string> = {
-    "10842310":
-      "1-copy 6-cost spell — may not always be played under random soak policy",
     "10644110": "7-cost — may not always be played under random soak policy",
     "10844120": "8-cost — may not always be played under random soak policy",
-    "10344110": "1-copy 9-cost — rarely reached before game ends in soak",
     "10744110": "9-cost — rarely reached before game ends in soak",
     "10544110": "10-cost — rarely reached before game ends in soak",
-    "10342110": "2-copy 5-cost — lower exposure than 3-of lines",
+    "10603210": "2-copy 5-cost — lower exposure than 3-of lines",
     "10444120": "2-copy 5-cost — lower exposure than 3-of lines",
   };
 
@@ -322,7 +314,7 @@ async function main(): Promise<void> {
   console.log(`hangs:                ${summary.hangs}`);
   console.log(`invariantViolations:  ${summary.invariants}`);
   console.log(
-    `exercised (of 16):    ${Object.keys(summary.exercisedCards).length}`,
+    `exercised (of 14):    ${Object.keys(summary.exercisedCards).length}`,
   );
   if (summary.unexercisedCards.length) {
     console.log("unexercised:");

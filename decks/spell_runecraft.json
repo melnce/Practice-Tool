@@ -1,0 +1,21 @@
+{
+  "class": "Runecraft",
+  "deckName": "Spell Runecraft",
+  "size": 40,
+  "cards": [
+    { "name": "Foresight", "count": 3 },
+    { "name": "Miscalculated Experiment", "count": 3 },
+    { "name": "Stormy Blast", "count": 3 },
+    { "name": "Harmonious Meal", "count": 3 },
+    { "name": "Meowskers, Roly-Poly Mk II & Djeana", "count": 1 },
+    { "name": "Amethyst's Naptime", "count": 3 },
+    { "name": "Tico, Mysterian Spellcrafter", "count": 3 },
+    { "name": "Wamdus, Water Personified", "count": 3 },
+    { "name": "Sammy & Marie, Flowers of Joy", "count": 3 },
+    { "name": "Tetra & Ladica, Forest BFFs", "count": 3 },
+    { "name": "Woodsong Haikumaster", "count": 3 },
+    { "name": "Ginger, Disastrous Word", "count": 3 },
+    { "name": "Ara, Dawnblossom", "count": 3 },
+    { "name": "Phylene, Cleansing Revenant", "count": 3 }
+  ]
+}

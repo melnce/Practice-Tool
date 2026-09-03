@@ -1,0 +1,22 @@
+{
+  "class": "Swordcraft",
+  "deckName": "Barbaros Swordcraft",
+  "size": 40,
+  "cards": [
+    { "name": "Flashstep Quickblader", "count": 3 },
+    { "name": "Orchestrated Silence", "count": 3 },
+    { "name": "Ruthless Eld Sword", "count": 2 },
+    { "name": "Open-Sea Scout", "count": 3 },
+    { "name": "Slice of Domesticity", "count": 2 },
+    { "name": "Yidmetra, Eld Sword", "count": 2 },
+    { "name": "Severed Ties", "count": 3 },
+    { "name": "Splendor of the Goldbloom", "count": 3 },
+    { "name": "Whirlpool Gunner", "count": 3 },
+    { "name": "L'Age d'Or", "count": 3 },
+    { "name": "Zeta & Bea, Crimson and Blue", "count": 3 },
+    { "name": "Roughwater First Mate", "count": 3 },
+    { "name": "Unkei, Goldbloom", "count": 3 },
+    { "name": "Barbaros, Rebellious Convict", "count": 3 },
+    { "name": "Mars, Conflagrant Commander", "count": 1 }
+  ]
+}

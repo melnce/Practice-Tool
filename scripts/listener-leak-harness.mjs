@@ -29,7 +29,7 @@
  *   LISTENER_LEAK_PORT=8882     static server port
  *   LISTENER_LEAK_SEED=424242   fixed game seed
  *   LISTENER_LEAK_BLUE_DECK / LISTENER_LEAK_RED_DECK  deck ids (defaults:
- *       runecraft_sephie_test_subject / portalcraft_artifact_rotation)
+ *       sephie_runecraft / artifact_portalcraft)
  *   LISTENER_LEAK_RETAIN=1      inject intentional retain-on-replace (self-test)
  *   LISTENER_LEAK_DUMP_SNAPSHOT=1  always dump detached retainer summary
  *   LISTENER_LEAK_PROBE=0       disable WeakRef probe entirely (metrics-only confound check)
@@ -112,10 +112,8 @@ const PNG_1X1 = Buffer.from(
 );
 
 /** Surviving class decks after pre-rotation removal (PR #101 / origin/main). */
-const BLUE_DECK =
-  process.env.LISTENER_LEAK_BLUE_DECK || "runecraft_sephie_test_subject";
-const RED_DECK =
-  process.env.LISTENER_LEAK_RED_DECK || "portalcraft_artifact_rotation";
+const BLUE_DECK = process.env.LISTENER_LEAK_BLUE_DECK || "sephie_runecraft";
+const RED_DECK = process.env.LISTENER_LEAK_RED_DECK || "artifact_portalcraft";
 const CHROME =
   process.env.CHROME_PATH ||
   (existsSync(

@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 /**
- * Pinned soak for dragoncraft_meta — mirror + vs two other shipped decks.
- * Run: npx tsx scripts/soak-deck-meta.ts [--games=N] [--seed=N]
+ * Pinned soak for antemaria_dragoncraft — mirror + vs two other shipped decks.
+ * Run: npx tsx scripts/soak-deck-antemaria.ts [--games=N] [--seed=N]
  *
- * Reports → reports/soak-deck-meta/
+ * Reports → reports/soak-deck-antemaria/
  */
 
 (globalThis as any).HEADLESS = true;
@@ -17,30 +17,27 @@ import { performance } from "perf_hooks";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, "..");
-const REPORT_DIR = join(ROOT, "reports", "soak-deck-meta");
+const REPORT_DIR = join(ROOT, "reports", "soak-deck-antemaria");
 
-const META_DECK = "dragoncraft_meta";
-const OPPONENTS = [
-  "dragoncraft_meta_v2",
-  "portalcraft_artifact_rotation",
-] as const;
+const META_DECK = "antemaria_dragoncraft";
+const OPPONENTS = ["ramp_dragoncraft", "artifact_portalcraft"] as const;
 
-/** 14 distinct cards in dragoncraft_meta (id → name). */
+/** 14 distinct cards in antemaria_dragoncraft (id → name). */
 const META_CARD_IDS: Record<string, string> = {
-  "10403120": "Lyria, Skydestined",
-  "10644120": "Vorlalai, Eld Blades",
-  "10741110": "Dragonewt Promoter",
+  "10542120": "Jellyfish Dancer",
   "10543310": "Sloth of the Crestpetal",
-  "10342210": "Nation of Disdain",
-  "10304120": "Gilnelise, Voracity Manifest",
-  "10042310": "Dragonsign",
-  "10503310": "Fate of the World",
-  "10344120": "Galmieux, Ardor Manifest",
-  "10444120": "Zooey, Ally of the World",
+  "10641110": "Resolute Dragonewt",
+  "10641310": "Advent of the Eld Blades",
   "10644110": "Sagatsumatsu, Fair Beheader",
-  "10844120": "Lumiore & Argente, Shining Wings",
-  "10744110": "Burnite, Anathema of Ash",
-  "10544110": "Erntz, Governing Justice",
+  "10644120": "Vorlalai, Eld Blades",
+  "10741120": "Carrier Wyvern",
+  "10842120": "Kimika, Cook of Happiness",
+  "10941110": "Ripper-Clawed Thief",
+  "10941310": "Drake Whelp's Tantrum",
+  "10942110": "High-Spirited Marauder",
+  "10943110": "Barren-Earth Tyrant",
+  "10943310": "Artiglio",
+  "10944110": "Antemaria, Piercing Convict",
 };
 
 type Matchup = { deckAId: string; deckBId: string; label: string };
@@ -187,7 +184,7 @@ async function main(): Promise<void> {
   }
 
   console.log("╔══════════════════════════════════════════════════════════╗");
-  console.log("║         DRAGON META DECK — PINNED SOAK                   ║");
+  console.log("║         ANTEMARIA DRAGON DECK — PINNED SOAK              ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
     `games=${totalGames} (${gamesPerMatchup} per matchup) seed=${seed}`,
@@ -277,11 +274,10 @@ async function main(): Promise<void> {
   }
 
   const highCostNotes: Record<string, string> = {
-    "10644110": "7-cost — may not always be played under random soak policy",
-    "10844120": "8-cost — may not always be played under random soak policy",
-    "10744110": "9-cost — rarely reached before game ends in soak",
-    "10544110": "10-cost — rarely reached before game ends in soak",
-    "10304120": "1-copy 3-cost — lower exposure than 3-of lines",
+    "10644110":
+      "2-copy 7-cost — may not always be played under random soak policy",
+    "10741120": "2-copy 4-cost — lower exposure than 3-of lines",
+    "10944110": "3-cost finisher — may finish games before full line exposure",
   };
 
   for (const [id, name] of Object.entries(META_CARD_IDS)) {

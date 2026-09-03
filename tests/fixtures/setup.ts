@@ -104,7 +104,7 @@ if (typeof window === "undefined") {
     if (
       url.includes("sample_blue") ||
       url.includes("sample_red") ||
-      url.includes("starter_deck")
+      url.includes("0_testing_vanilla")
     ) {
       const stub = JSON.stringify({
         cards: [{ name: "Goblin", count: 40 }],

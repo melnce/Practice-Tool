@@ -128,7 +128,7 @@ async function main() {
   await page.goto(BASE, { waitUntil: "networkidle", timeout: 60_000 });
   await page.waitForSelector("#blueDeckSelect", { timeout: 20_000 });
   await page.waitForSelector(
-    '#blueDeckSelect option[value="runecraft_sephie_test_subject"]',
+    '#blueDeckSelect option[value="sephie_runecraft"]',
     {
       state: "attached",
       timeout: 15_000,
@@ -140,8 +140,8 @@ async function main() {
   log(`- blueDeckSelect options: ${options}`);
 
   await openSettingsDrawer(page);
-  await page.selectOption("#blueDeckSelect", "runecraft_sephie_test_subject");
-  await page.selectOption("#redDeckSelect", "portalcraft_artifact_rotation");
+  await page.selectOption("#blueDeckSelect", "sephie_runecraft");
+  await page.selectOption("#redDeckSelect", "artifact_portalcraft");
   await page.fill("#seedInput", "424242");
   await page.click("#startGameBtn");
   await closeSettingsDrawer(page);
@@ -159,9 +159,7 @@ async function main() {
     { timeout: 20_000 },
   );
 
-  log(
-    `\n## Game started (runecraft_sephie_test_subject vs portalcraft_artifact_rotation)`,
-  );
+  log(`\n## Game started (sephie_runecraft vs artifact_portalcraft)`);
   const started = await page.evaluate(() => {
     const s = (window as any).gameState;
     return {

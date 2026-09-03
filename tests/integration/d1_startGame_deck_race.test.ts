@@ -56,8 +56,8 @@ async function loadBothDecksWithFetchOrder(order: Order) {
   };
 
   try {
-    const pBlue = loadBlueDeck("starter_deck");
-    const pRed = loadRedDeck("starter_deck");
+    const pBlue = loadBlueDeck("0_testing_vanilla");
+    const pRed = loadRedDeck("0_testing_vanilla");
 
     if (order === "blue-first") {
       releaseBlue();
@@ -95,8 +95,8 @@ describe("D1: startGame deck-load determinism", () => {
 
   it("startGame with the same seed produces identical post-load fingerprints twice", async () => {
     await startGame({
-      deckAId: "starter_deck",
-      deckBId: "starter_deck",
+      deckAId: "0_testing_vanilla",
+      deckBId: "0_testing_vanilla",
       seed: SEED,
     });
     const a = {
@@ -107,8 +107,8 @@ describe("D1: startGame deck-load determinism", () => {
     };
 
     await startGame({
-      deckAId: "starter_deck",
-      deckBId: "starter_deck",
+      deckAId: "0_testing_vanilla",
+      deckBId: "0_testing_vanilla",
       seed: SEED,
     });
     const b = {
@@ -152,13 +152,13 @@ describe("D1: startGame deck-load determinism", () => {
       };
 
       // Sequential (the fixed startGame contract)
-      const blueP = loadBlueDeck("starter_deck");
+      const blueP = loadBlueDeck("0_testing_vanilla");
       // Release blue regardless of "order" — red has not started yet
       releaseBlue();
       await blueP;
 
       phase = "red";
-      const redP = loadRedDeck("starter_deck");
+      const redP = loadRedDeck("0_testing_vanilla");
       releaseRed();
       await redP;
 

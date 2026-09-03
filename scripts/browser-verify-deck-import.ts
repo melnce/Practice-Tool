@@ -18,11 +18,7 @@ const CHROME =
       ? "/opt/google/chrome/chrome"
       : "/usr/local/bin/google-chrome");
 
-const SOURCE_DECK = path.join(
-  process.cwd(),
-  "decks",
-  "runecraft_sephie_test_subject.json",
-);
+const SOURCE_DECK = path.join(process.cwd(), "decks", "sephie_runecraft.json");
 
 function toPaste(format: "nx" | "n" | "xn"): string {
   const raw = JSON.parse(fs.readFileSync(SOURCE_DECK, "utf-8")) as {
@@ -62,9 +58,7 @@ async function main() {
   log(`# Browser verification — decklist import`);
   log(`- URL: ${BASE}`);
   log(`- Chromium: ${CHROME}`);
-  log(
-    `- Source list: decks/runecraft_sephie_test_subject.json → paste formats`,
-  );
+  log(`- Source list: decks/sephie_runecraft.json → paste formats`);
   log(`- Time: ${new Date().toISOString()}`);
 
   const browser = await chromium.launch({

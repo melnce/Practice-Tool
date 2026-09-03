@@ -1,0 +1,22 @@
+{
+  "class": "Runecraft",
+  "deckName": "Sephie Runecraft",
+  "size": 40,
+  "cards": [
+    { "name": "Foresight", "count": 3 },
+    { "name": "Miscalculated Experiment", "count": 3 },
+    { "name": "Stormy Blast", "count": 3 },
+    { "name": "Lyria, Skydestined", "count": 1 },
+    { "name": "Metamorphosis of the Dawnblossom", "count": 2 },
+    { "name": "Obsessed Test Subject", "count": 3 },
+    { "name": "Wills United", "count": 3 },
+    { "name": "Amethyst's Naptime", "count": 3 },
+    { "name": "Humane Love", "count": 3 },
+    { "name": "Enamored Researcher", "count": 3 },
+    { "name": "Ecstatic Scholar", "count": 3 },
+    { "name": "Fate of the World", "count": 2 },
+    { "name": "Obsidian Raven", "count": 3 },
+    { "name": "Tetra & Ladica, Forest BFFs", "count": 2 },
+    { "name": "Sephie, Maven Convict", "count": 3 }
+  ]
+}

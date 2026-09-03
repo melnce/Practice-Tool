@@ -1,0 +1,21 @@
+{
+  "class": "Dragoncraft",
+  "deckName": "Antemaria Dragoncraft",
+  "size": 40,
+  "cards": [
+    { "name": "Drake Whelp's Tantrum", "count": 3 },
+    { "name": "Ripper-Clawed Thief", "count": 3 },
+    { "name": "Artiglio", "count": 3 },
+    { "name": "High-Spirited Marauder", "count": 3 },
+    { "name": "Jellyfish Dancer", "count": 3 },
+    { "name": "Kimika, Cook of Happiness", "count": 3 },
+    { "name": "Sloth of the Crestpetal", "count": 3 },
+    { "name": "Vorlalai, Eld Blades", "count": 3 },
+    { "name": "Resolute Dragonewt", "count": 3 },
+    { "name": "Advent of the Eld Blades", "count": 3 },
+    { "name": "Carrier Wyvern", "count": 2 },
+    { "name": "Barren-Earth Tyrant", "count": 3 },
+    { "name": "Antemaria, Piercing Convict", "count": 3 },
+    { "name": "Sagatsumatsu, Fair Beheader", "count": 2 }
+  ]
+}

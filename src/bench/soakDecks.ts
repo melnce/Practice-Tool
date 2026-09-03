@@ -12,10 +12,23 @@ import { saveImportedDeck } from "../data/importedDeckStore.js";
 import { loadMainPoolIds } from "./soakCoverage.js";
 
 export const SHIPPED_DECK_IDS = [
-  "starter_deck",
-  "dragoncraft_meta",
-  "portalcraft_artifact_rotation",
-  "runecraft_sephie_test_subject",
+  "aggro_abysscraft",
+  "amulet_havencraft",
+  "antemaria_dragoncraft",
+  "artifact_portalcraft",
+  "barbaros_swordcraft",
+  "buff_forestcraft",
+  "cutthroat_portalcraft",
+  "evolution_forestcraft",
+  "evolution_havencraft",
+  "kukishiro_havencraft",
+  "lhynkal_runecraft",
+  "midrange_abysscraft",
+  "rally_swordcraft",
+  "ramp_dragoncraft",
+  "sephie_runecraft",
+  "spell_runecraft",
+  "thestae_forestcraft",
 ] as const;
 
 /**

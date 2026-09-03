@@ -1,0 +1,23 @@
+{
+  "class": "Swordcraft",
+  "deckName": "Rally Swordcraft",
+  "size": 40,
+  "cards": [
+    { "name": "Orchestrated Silence", "count": 3 },
+    { "name": "Sharp-Eared Operative", "count": 3 },
+    { "name": "Yidmetra, Eld Sword", "count": 3 },
+    { "name": "High-Strung Liaison", "count": 3 },
+    { "name": "Severed Ties", "count": 1 },
+    { "name": "Gildaria, Anathema of Attunement", "count": 3 },
+    { "name": "Shared Existence", "count": 2 },
+    { "name": "Zeta & Bea, Crimson and Blue", "count": 3 },
+    { "name": "Bunny & Baron, Fate's Bullet", "count": 3 },
+    { "name": "Knellclaw Lieutenant", "count": 3 },
+    { "name": "Metronomic Medic", "count": 3 },
+    { "name": "Cesar, Accordant Major", "count": 3 },
+    { "name": "Golden Knight, True King's Blade", "count": 2 },
+    { "name": "Naht & Vince, Force and Order", "count": 1 },
+    { "name": "Mars, Conflagrant Commander", "count": 2 },
+    { "name": "Beltezore, Valorous Revenant", "count": 2 }
+  ]
+}

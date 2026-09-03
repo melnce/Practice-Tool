@@ -1,4 +1,4 @@
-/** Card entry inside an object-format deck file (e.g. starter_deck.json). */
+/** Card entry inside an object-format deck file (e.g. rally_swordcraft.json). */
 export interface RawDeckCardEntry {
   name?: string;
   id?: string | number;

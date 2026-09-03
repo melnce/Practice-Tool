@@ -57,22 +57,22 @@ Harness extends via `__svwbTest` only (no new god UI buttons required for QA). `
 
 ## Scenario map
 
-| Id  | Focus                                                                    |
-| --- | ------------------------------------------------------------------------ |
-| S1  | Real mulligan (`starter_deck`), opening draw, play/attack/turns/lethal   |
-| S2  | Spell target, cancel invalid, Ralmia multi + 3-cap, leader target        |
-| S3  | Drag-then-click suppressor, loot/forest/generic/artifact fuse            |
-| S4  | EP/SEP evo drag, bonus PP early+late, Enhance below/at threshold         |
-| S5  | Engage, engage no-op same turn, countdown→0→Last Words                   |
-| S6  | 9-hand burn, full board, ward spell, aura spell, intimidate attack block |
-| S7  | Storm, rush, bane trade, drain attack/defend, barrier single-pop         |
-| S8  | Rapid input spam mid-resolution                                          |
+| Id  | Focus                                                                       |
+| --- | --------------------------------------------------------------------------- |
+| S1  | Real mulligan (`0_testing_vanilla`), opening draw, play/attack/turns/lethal |
+| S2  | Spell target, cancel invalid, Ralmia multi + 3-cap, leader target           |
+| S3  | Drag-then-click suppressor, loot/forest/generic/artifact fuse               |
+| S4  | EP/SEP evo drag, bonus PP early+late, Enhance below/at threshold            |
+| S5  | Engage, engage no-op same turn, countdown→0→Last Words                      |
+| S6  | 9-hand burn, full board, ward spell, aura spell, intimidate attack block    |
+| S7  | Storm, rush, bane trade, drain attack/defend, barrier single-pop            |
+| S8  | Rapid input spam mid-resolution                                             |
 
 ## Traceability (gap-closure)
 
 | Mechanic / scenario                     | Hook                                            | Status                      |
 | --------------------------------------- | ----------------------------------------------- | --------------------------- |
-| Real mulligan                           | S1 `startGameFull` + `starter_deck`             | ✅ gauntlet                 |
+| Real mulligan                           | S1 `startGameFull` + `0_testing_vanilla`        | ✅ gauntlet                 |
 | Opening draw                            | S1 `loadDecks(..., drawOpening: true)`          | ✅ gauntlet                 |
 | Play / attack / turns / lethal          | S1 fundamentals                                 | ✅ gauntlet                 |
 | Single-select spell                     | S2                                              | ✅ gauntlet                 |

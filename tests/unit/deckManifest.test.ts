@@ -20,15 +20,17 @@ describe("deckManifest", () => {
       "index.json",
       "all_cards.json",
       "manifest.json",
-      "starter_deck.json",
+      "rally_swordcraft.json",
+      "0_testing_vanilla.json",
       "0_testing_basic.json",
       "vanilla_deck.json",
     ]);
 
     expect(manifest.entries.map((e) => e.file)).toEqual([
-      "starter_deck.json",
+      "rally_swordcraft.json",
       "vanilla_deck.json",
       "0_testing_basic.json",
+      "0_testing_vanilla.json",
     ]);
     expect(DECK_FILE_EXCLUDE.has("index.json")).toBe(true);
     expect(manifest.entries[0]!.category).toBe("deck");

@@ -324,9 +324,9 @@ export async function refreshDeckSelectsWithImports(
   if (shipped.length === 0) {
     shipped = [
       {
-        file: "starter_deck.json",
-        id: "starter_deck",
-        label: "Starter",
+        file: "rally_swordcraft.json",
+        id: "rally_swordcraft",
+        label: "Rally Swordcraft",
         category: "deck",
       },
     ];

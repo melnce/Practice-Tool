@@ -617,10 +617,7 @@ async function main() {
       .evaluateAll((opts) =>
         opts.map((o) => ({ value: o.value, text: o.textContent?.trim() })),
       );
-    const expected = [
-      "runecraft_sephie_test_subject",
-      "portalcraft_artifact_rotation",
-    ];
+    const expected = ["sephie_runecraft", "artifact_portalcraft"];
     const values = blueOpts.map((o) => o.value);
     const missing = expected.filter((e) => !values.includes(e));
     const art = await checkImages(page);
@@ -659,8 +656,8 @@ async function main() {
     await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
     const seed = 20260815;
     await startGame(page, {
-      blue: "runecraft_sephie_test_subject",
-      red: "portalcraft_artifact_rotation",
+      blue: "sephie_runecraft",
+      red: "artifact_portalcraft",
       seed,
     });
     await shot(page, "02-mulligan");
@@ -713,8 +710,8 @@ async function main() {
       await page.goto(`${BASE}/?test=1`, { waitUntil: "networkidle" });
       await page.waitForFunction(() => !!window.__svwbTest);
       await startGame(page, {
-        blue: "starter_deck",
-        red: "starter_deck",
+        blue: "0_testing_vanilla",
+        red: "0_testing_vanilla",
         seed: 42,
       });
       await confirmMulligans(page);
@@ -793,8 +790,8 @@ async function main() {
   try {
     await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
     await startGame(page, {
-      blue: "runecraft_sephie_test_subject",
-      red: "portalcraft_artifact_rotation",
+      blue: "sephie_runecraft",
+      red: "artifact_portalcraft",
       seed: 20260816,
     });
     await confirmMulligans(page);
@@ -914,7 +911,7 @@ async function main() {
     if (portalOpt) {
       await startGame(page, {
         blue: portalOpt.value,
-        red: "starter_deck",
+        red: "0_testing_vanilla",
         seed: 777001,
       });
       await confirmMulligans(page);
@@ -1051,8 +1048,8 @@ async function main() {
     await page.goto(`${BASE}/?test=1`, { waitUntil: "networkidle" });
     await page.waitForFunction(() => !!window.__svwbTest);
     await startGame(page, {
-      blue: "runecraft_sephie_test_subject",
-      red: "portalcraft_artifact_rotation",
+      blue: "sephie_runecraft",
+      red: "artifact_portalcraft",
       seed: 555001,
     });
     await confirmMulligans(page);
@@ -1158,7 +1155,7 @@ async function main() {
 
     const seedNum = seedInputVal || seedShown || "555001";
     await page.goto(
-      `${BASE}/?seed=${seedNum}&a=runecraft_sephie_test_subject&b=portalcraft_artifact_rotation`,
+      `${BASE}/?seed=${seedNum}&a=sephie_runecraft&b=artifact_portalcraft`,
       {
         waitUntil: "networkidle",
       },
@@ -1243,8 +1240,8 @@ async function main() {
     await page.goto(`${BASE}/?test=1`, { waitUntil: "networkidle" });
     await page.waitForFunction(() => !!window.__svwbTest);
     await startGame(page, {
-      blue: "starter_deck",
-      red: "starter_deck",
+      blue: "0_testing_vanilla",
+      red: "0_testing_vanilla",
       seed: 9001,
     });
     await confirmMulligans(page);
@@ -1334,8 +1331,8 @@ async function main() {
   try {
     await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
     await startGame(page, {
-      blue: "starter_deck",
-      red: "starter_deck",
+      blue: "0_testing_vanilla",
+      red: "0_testing_vanilla",
       seed: 8001,
     });
     await confirmMulligans(page);
@@ -1457,8 +1454,8 @@ async function main() {
     let after = null;
     if (exists) {
       await startGame(page, {
-        blue: "starter_deck",
-        red: "starter_deck",
+        blue: "0_testing_vanilla",
+        red: "0_testing_vanilla",
         seed: 11,
       });
       await confirmMulligans(page);
