@@ -1,6 +1,6 @@
 {
   "class": "Neutral",
-  "deckName": "Starter",
+  "deckName": "Vanilla Test Deck",
   "size": 40,
   "cards": [
     { "name": "Marsh Wyrmling", "count": 3 },

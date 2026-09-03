@@ -63,8 +63,8 @@ function spawnEnemyFollower(name: string, atk: number, def: number) {
 
 async function playScriptedGame(seed: number) {
   await startGame({
-    deckAId: "starter_deck",
-    deckBId: "starter_deck",
+    deckAId: "0_testing_vanilla",
+    deckBId: "0_testing_vanilla",
     seed,
   });
 

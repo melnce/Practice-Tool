@@ -18,10 +18,25 @@ import {
 } from "../../src/data/deckValidation.js";
 import { isRawDeckObject, type RawDeck } from "../../src/data/rawDeck.js";
 
-/** One playable 40-card list per class — keep in sync with .gitignore exceptions. */
+/** In-game meta deck library — keep in sync with .gitignore exceptions. */
 export const COMMITTED_CLASS_DECKS = [
-  "portalcraft_artifact_rotation.json",
-  "runecraft_sephie_test_subject.json",
+  "aggro_abysscraft.json",
+  "amulet_havencraft.json",
+  "antemaria_dragoncraft.json",
+  "artifact_portalcraft.json",
+  "barbaros_swordcraft.json",
+  "buff_forestcraft.json",
+  "cutthroat_portalcraft.json",
+  "evolution_forestcraft.json",
+  "evolution_havencraft.json",
+  "kukishiro_havencraft.json",
+  "lhynkal_runecraft.json",
+  "midrange_abysscraft.json",
+  "rally_swordcraft.json",
+  "ramp_dragoncraft.json",
+  "sephie_runecraft.json",
+  "spell_runecraft.json",
+  "thestae_forestcraft.json",
 ] as const;
 
 const ROOT = path.resolve(
@@ -109,13 +124,24 @@ describe("committed class deck library", () => {
     },
   );
 
-  it("ships exactly one committed deck per craft class", () => {
+  it("covers all seven craft classes", () => {
     const classes = COMMITTED_CLASS_DECKS.map((file) => {
       const raw = readJson(path.join(DECKS_DIR, file)) as RawDeck;
       expect(isRawDeckObject(raw)).toBe(true);
       return isRawDeckObject(raw) ? raw.class : undefined;
     });
-    expect(new Set(classes).size).toBe(COMMITTED_CLASS_DECKS.length);
-    expect(classes.sort()).toEqual(["Portalcraft", "Runecraft"].sort());
+    const unique = new Set(classes);
+    expect(unique.size).toBe(7);
+    expect([...unique].sort()).toEqual(
+      [
+        "Abysscraft",
+        "Dragoncraft",
+        "Forestcraft",
+        "Havencraft",
+        "Portalcraft",
+        "Runecraft",
+        "Swordcraft",
+      ].sort(),
+    );
   });
 });

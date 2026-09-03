@@ -50,10 +50,7 @@ function loadCardIndex() {
 /** Build a valid 40-card Runecraft paste from the shipped house deck. */
 function houseDeckPaste(format: "nx" | "n" | "xn" | "plain"): string {
   const raw = JSON.parse(
-    fs.readFileSync(
-      path.join(ROOT, "decks/runecraft_sephie_test_subject.json"),
-      "utf-8",
-    ),
+    fs.readFileSync(path.join(ROOT, "decks/sephie_runecraft.json"), "utf-8"),
   ) as RawDeckObject;
   const lines: string[] = ["Main Deck", ""];
   for (const c of raw.cards ?? []) {

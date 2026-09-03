@@ -1,0 +1,22 @@
+{
+  "class": "Forestcraft",
+  "deckName": "Thestae Forestcraft",
+  "size": 40,
+  "cards": [
+    { "name": "Elven Trapper", "count": 3 },
+    { "name": "Sprouting Initiate", "count": 3 },
+    { "name": "World of Games", "count": 3 },
+    { "name": "Leafshadow Assassin", "count": 3 },
+    { "name": "Lyria, Skydestined", "count": 3 },
+    { "name": "Verdant Ring Kindred", "count": 3 },
+    { "name": "Virewind Fencer", "count": 2 },
+    { "name": "Virid Lieutenant", "count": 3 },
+    { "name": "Magachiyo, Aromatic Convict", "count": 3 },
+    { "name": "Miroku, Swarmpetal", "count": 3 },
+    { "name": "Crimson Incense", "count": 1 },
+    { "name": "Thestae, Anathema of Distortion", "count": 3 },
+    { "name": "Great Hart of the Glacial Realm", "count": 3 },
+    { "name": "Setus & Maisha, Bladerights", "count": 3 },
+    { "name": "Hien, Redolent Revenant", "count": 1 }
+  ]
+}

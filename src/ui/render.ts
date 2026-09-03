@@ -325,11 +325,11 @@ async function rematch(keepSeed: boolean) {
   const deckAId =
     blueSelect?.value ||
     state.players.first.deckFile?.replace(/\.json$/i, "") ||
-    "starter_deck";
+    "rally_swordcraft";
   const deckBId =
     redSelect?.value ||
     state.players.second.deckFile?.replace(/\.json$/i, "") ||
-    "starter_deck";
+    "rally_swordcraft";
 
   let seed: number | string;
   if (keepSeed) {

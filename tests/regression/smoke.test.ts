@@ -7,8 +7,8 @@ import { runEffects } from "../../src/logic/core/effects";
 import type { CardInstance } from "../../src/core/types";
 
 const START_OPTS = {
-  deckAId: "starter_deck",
-  deckBId: "starter_deck",
+  deckAId: "0_testing_vanilla",
+  deckBId: "0_testing_vanilla",
   seed: 1,
 };
 

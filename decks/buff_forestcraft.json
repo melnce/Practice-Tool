@@ -1,0 +1,24 @@
+{
+  "class": "Forestcraft",
+  "deckName": "Buff Forestcraft",
+  "size": 40,
+  "cards": [
+    { "name": "Flight of the Swarmpetal", "count": 2 },
+    { "name": "Lyria, Skydestined", "count": 3 },
+    { "name": "Prudent Tanuki", "count": 1 },
+    { "name": "Ruflet, Primeval Fairy", "count": 3 },
+    { "name": "Tia, Eternal Crystalian", "count": 3 },
+    { "name": "Citrus, Heretical Hermit", "count": 2 },
+    { "name": "Magachiyo, Aromatic Convict", "count": 2 },
+    { "name": "Miroku, Swarmpetal", "count": 3 },
+    { "name": "Cupitan, Iridescent Archer", "count": 3 },
+    { "name": "Lycoris, Barbs of Passion", "count": 1 },
+    { "name": "Curiosity Abounds", "count": 3 },
+    { "name": "Spirited Skipper", "count": 3 },
+    { "name": "Michelle, Kind Mindreader", "count": 3 },
+    { "name": "Sandalphon, Primarch Successor", "count": 1 },
+    { "name": "Setus & Maisha, Bladerights", "count": 3 },
+    { "name": "Althenia, Nurturing Bloom", "count": 3 },
+    { "name": "Zerael, Sundered Rebirth", "count": 1 }
+  ]
+}

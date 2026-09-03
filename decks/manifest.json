@@ -1,34 +1,112 @@
 {
   "entries": [
     {
-      "file": "dragoncraft_meta_v2.json",
-      "id": "dragoncraft_meta_v2",
-      "label": "Dragon Meta v2 (owner ladder list)",
+      "file": "aggro_abysscraft.json",
+      "id": "aggro_abysscraft",
+      "label": "Aggro Abysscraft",
       "category": "deck"
     },
     {
-      "file": "dragoncraft_meta.json",
-      "id": "dragoncraft_meta",
-      "label": "Dragon Meta (owner ladder list)",
+      "file": "amulet_havencraft.json",
+      "id": "amulet_havencraft",
+      "label": "Amulet Havencraft",
       "category": "deck"
     },
     {
-      "file": "portalcraft_artifact_rotation.json",
-      "id": "portalcraft_artifact_rotation",
-      "label": "Portal Artifact (rotation)",
+      "file": "antemaria_dragoncraft.json",
+      "id": "antemaria_dragoncraft",
+      "label": "Antemaria Dragoncraft",
       "category": "deck"
     },
     {
-      "file": "runecraft_sephie_test_subject.json",
-      "id": "runecraft_sephie_test_subject",
-      "label": "Rune Sephie Test Subject",
+      "file": "artifact_portalcraft.json",
+      "id": "artifact_portalcraft",
+      "label": "Artifact Portalcraft",
       "category": "deck"
     },
     {
-      "file": "starter_deck.json",
-      "id": "starter_deck",
-      "label": "Starter",
+      "file": "barbaros_swordcraft.json",
+      "id": "barbaros_swordcraft",
+      "label": "Barbaros Swordcraft",
       "category": "deck"
+    },
+    {
+      "file": "buff_forestcraft.json",
+      "id": "buff_forestcraft",
+      "label": "Buff Forestcraft",
+      "category": "deck"
+    },
+    {
+      "file": "cutthroat_portalcraft.json",
+      "id": "cutthroat_portalcraft",
+      "label": "Cutthroat Portalcraft",
+      "category": "deck"
+    },
+    {
+      "file": "evolution_forestcraft.json",
+      "id": "evolution_forestcraft",
+      "label": "Evolution Forestcraft",
+      "category": "deck"
+    },
+    {
+      "file": "evolution_havencraft.json",
+      "id": "evolution_havencraft",
+      "label": "Evolution Havencraft",
+      "category": "deck"
+    },
+    {
+      "file": "kukishiro_havencraft.json",
+      "id": "kukishiro_havencraft",
+      "label": "Kukishiro Havencraft",
+      "category": "deck"
+    },
+    {
+      "file": "lhynkal_runecraft.json",
+      "id": "lhynkal_runecraft",
+      "label": "Lhynkal Runecraft",
+      "category": "deck"
+    },
+    {
+      "file": "midrange_abysscraft.json",
+      "id": "midrange_abysscraft",
+      "label": "Midrange Abysscraft",
+      "category": "deck"
+    },
+    {
+      "file": "rally_swordcraft.json",
+      "id": "rally_swordcraft",
+      "label": "Rally Swordcraft",
+      "category": "deck"
+    },
+    {
+      "file": "ramp_dragoncraft.json",
+      "id": "ramp_dragoncraft",
+      "label": "Ramp Dragoncraft",
+      "category": "deck"
+    },
+    {
+      "file": "sephie_runecraft.json",
+      "id": "sephie_runecraft",
+      "label": "Sephie Runecraft",
+      "category": "deck"
+    },
+    {
+      "file": "spell_runecraft.json",
+      "id": "spell_runecraft",
+      "label": "Spell Runecraft",
+      "category": "deck"
+    },
+    {
+      "file": "thestae_forestcraft.json",
+      "id": "thestae_forestcraft",
+      "label": "Thestae Forestcraft",
+      "category": "deck"
+    },
+    {
+      "file": "0_testing_vanilla.json",
+      "id": "0_testing_vanilla",
+      "label": "Vanilla Test Deck",
+      "category": "test"
     }
   ]
 }

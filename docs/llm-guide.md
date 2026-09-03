@@ -18,13 +18,13 @@
 ### Engine API
 
 - `startNewGame(options: StartGameOptions)`: Resets game. Options:
-  - `deckAId` (string): Deck filename without path (e.g. `"starter_deck"`).
+  - `deckAId` (string): Deck filename without path (e.g. `"rally_swordcraft"`).
   - `deckBId` (string): Deck filename without path.
   - `seed` (number | string): **Required** for determinism. Browser entry (`boot.ts`) generates one when the seed field is empty.
   ```typescript
   await startNewGame({
-    deckAId: "starter_deck",
-    deckBId: "starter_deck",
+    deckAId: "rally_swordcraft",
+    deckBId: "rally_swordcraft",
     seed: 12345,
   });
   ```
@@ -105,7 +105,7 @@ Legacy export layouts (`card_sets/`, `card_details.json`, `classes/`, `seperate_
 
 | Path                     | Role                                                                                                                               |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `decks/*.json`           | Deck lists (most are gitignored locally; `starter_deck.json` is tracked).                                                          |
+| `decks/*.json`           | Deck lists (most are gitignored locally; meta decks and `0_testing_vanilla.json` are tracked).                                     |
 | `npm run decks:discover` | Scans `decks/*.json` and writes `decks/manifest.json` for the UI dropdown (runs automatically on `npm run dev` / `npm run build`). |
 | `npm run check:decks`    | Validates every discovered deck parses cleanly and every card resolves against `cards/all.json`.                                   |
 

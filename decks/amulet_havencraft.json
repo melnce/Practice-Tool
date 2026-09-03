@@ -1,0 +1,21 @@
+{
+  "class": "Havencraft",
+  "deckName": "Amulet Havencraft",
+  "size": 40,
+  "cards": [
+    { "name": "Earrings of Sunlight", "count": 3 },
+    { "name": "Winged Statue", "count": 3 },
+    { "name": "Academy Hijinks", "count": 3 },
+    { "name": "Roaring Basilica", "count": 3 },
+    { "name": "Scripture of Salvation", "count": 3 },
+    { "name": "Timepiece of Perfection", "count": 2 },
+    { "name": "Unholy Water", "count": 3 },
+    { "name": "Trident of Eroding Tides", "count": 3 },
+    { "name": "Kandima, Sublime Hatred", "count": 3 },
+    { "name": "Sublime Eld Tome", "count": 3 },
+    { "name": "Prostrating Coward", "count": 3 },
+    { "name": "Omerio, Winged Revenant", "count": 3 },
+    { "name": "Initia, Chief Ordination Officer", "count": 2 },
+    { "name": "Lyanthoth, Eld Tome", "count": 3 }
+  ]
+}

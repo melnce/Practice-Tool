@@ -1,0 +1,21 @@
+{
+  "class": "Havencraft",
+  "deckName": "Evolution Havencraft",
+  "size": 40,
+  "cards": [
+    { "name": "Academy Hijinks", "count": 3 },
+    { "name": "Lilium, Witch of the Tomes", "count": 3 },
+    { "name": "Lyria, Skydestined", "count": 3 },
+    { "name": "Trident of Eroding Tides", "count": 3 },
+    { "name": "Troue, Heroic Visionary", "count": 3 },
+    { "name": "Sofina, Inspiring Strength", "count": 3 },
+    { "name": "Zoe, Dazzling Hope", "count": 3 },
+    { "name": "Erralde, Signet Convict", "count": 3 },
+    { "name": "Juratio", "count": 3 },
+    { "name": "Sandalphon, Primarch Successor", "count": 2 },
+    { "name": "Viche, Abyssal Researcher", "count": 3 },
+    { "name": "Executor of the Vow", "count": 3 },
+    { "name": "Verdilia & Castelle, Sisters", "count": 3 },
+    { "name": "Olivia, Proud Dark Angel", "count": 2 }
+  ]
+}

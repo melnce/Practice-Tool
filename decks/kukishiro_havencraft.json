@@ -1,0 +1,22 @@
+{
+  "class": "Havencraft",
+  "deckName": "Kukishiro Havencraft",
+  "size": 40,
+  "cards": [
+    { "name": "Bouquet Believer", "count": 1 },
+    { "name": "Earrings of Sunlight", "count": 3 },
+    { "name": "Vow of Devotion", "count": 3 },
+    { "name": "World of Games", "count": 3 },
+    { "name": "Colette, Holy Exorcist", "count": 3 },
+    { "name": "De La Fille's Gleaming Gems", "count": 3 },
+    { "name": "Resolve of the Mistbloom", "count": 3 },
+    { "name": "Trident of Eroding Tides", "count": 3 },
+    { "name": "Troue, Heroic Visionary", "count": 3 },
+    { "name": "Desperate Shrinemouse", "count": 1 },
+    { "name": "Fate of the World", "count": 3 },
+    { "name": "Prostrating Coward", "count": 3 },
+    { "name": "Zoe, Dazzling Hope", "count": 3 },
+    { "name": "Blade Angel", "count": 2 },
+    { "name": "Kukishiro, Mistbloom", "count": 3 }
+  ]
+}

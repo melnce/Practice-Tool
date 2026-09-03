@@ -1,0 +1,23 @@
+{
+  "class": "Forestcraft",
+  "deckName": "Evolution Forestcraft",
+  "size": 40,
+  "cards": [
+    { "name": "Sathanid, Eld Lance", "count": 3 },
+    { "name": "Ewiyar, Wind Personified", "count": 3 },
+    { "name": "Flight of the Swarmpetal", "count": 2 },
+    { "name": "Kindly Executor", "count": 3 },
+    { "name": "Magachiyo, Aromatic Convict", "count": 2 },
+    { "name": "Miroku, Swarmpetal", "count": 3 },
+    { "name": "Nurturing Eld Lance", "count": 3 },
+    { "name": "Cupitan, Iridescent Archer", "count": 3 },
+    { "name": "Gran & Djeeta, Valiant Skyfarers", "count": 3 },
+    { "name": "Motherly Forestdweller", "count": 3 },
+    { "name": "Merciful Attendant", "count": 2 },
+    { "name": "Spirited Skipper", "count": 2 },
+    { "name": "Great Hart of the Glacial Realm", "count": 1 },
+    { "name": "Sandalphon, Primarch Successor", "count": 3 },
+    { "name": "Althenia, Nurturing Bloom", "count": 3 },
+    { "name": "Alabaster Bahamut", "count": 1 }
+  ]
+}

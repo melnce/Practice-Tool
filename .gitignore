@@ -5,12 +5,25 @@
 
 # Personal data / notes (do not track)
 decks/*
-!decks/starter_deck.json
 !decks/manifest.json
-!decks/dragoncraft_meta.json
-!decks/dragoncraft_meta_v2.json
-!decks/portalcraft_artifact_rotation.json
-!decks/runecraft_sephie_test_subject.json
+!decks/0_testing_vanilla.json
+!decks/aggro_abysscraft.json
+!decks/amulet_havencraft.json
+!decks/antemaria_dragoncraft.json
+!decks/artifact_portalcraft.json
+!decks/barbaros_swordcraft.json
+!decks/buff_forestcraft.json
+!decks/cutthroat_portalcraft.json
+!decks/evolution_forestcraft.json
+!decks/evolution_havencraft.json
+!decks/kukishiro_havencraft.json
+!decks/lhynkal_runecraft.json
+!decks/midrange_abysscraft.json
+!decks/rally_swordcraft.json
+!decks/ramp_dragoncraft.json
+!decks/sephie_runecraft.json
+!decks/spell_runecraft.json
+!decks/thestae_forestcraft.json
 game_rules/
 
 # Node dependencies

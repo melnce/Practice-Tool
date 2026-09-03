@@ -17,9 +17,9 @@ const OUT = path.join(ROOT, "reports", "deck-library-playtest.json");
 const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
 
 const DECKS = [
-  { id: "runecraft_sephie_test_subject", mechanic: "fuse_storm", seed: 424203 },
+  { id: "sephie_runecraft", mechanic: "fuse_storm", seed: 424203 },
   {
-    id: "portalcraft_artifact_rotation",
+    id: "artifact_portalcraft",
     mechanic: "artifact_gear",
     seed: 424207,
   },
@@ -308,7 +308,7 @@ async function playtestOne(
     });
 
     await page.selectOption("#blueDeckSelect", deck.id);
-    await page.selectOption("#redDeckSelect", "starter_deck");
+    await page.selectOption("#redDeckSelect", "0_testing_vanilla");
     await page.locator("#seedInput").fill(String(deck.seed));
     await page.locator("#startGameBtn").click();
 

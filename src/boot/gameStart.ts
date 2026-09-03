@@ -18,8 +18,8 @@ export function initGameStart(): void {
     const seedInput = document.getElementById("seedInput") as HTMLInputElement;
 
     // Default or read value
-    const deckAId = blueSelect?.value || "starter_deck";
-    const deckBId = redSelect?.value || "starter_deck";
+    const deckAId = blueSelect?.value || "rally_swordcraft";
+    const deckBId = redSelect?.value || "rally_swordcraft";
 
     // Empty seed → generate one so games stay reproducible once surfaced to the user
     let seed: number | string;
