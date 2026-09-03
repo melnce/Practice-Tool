@@ -7378,7 +7378,7 @@
       "status": "covered"
     },
     "10654120": {
-      "fingerprint": "4e1bc400",
+      "fingerprint": "768edc68",
       "gatesSatisfied": ["necromancy"],
       "name": "Bibatii, Eld Sight",
       "scenarios": [
@@ -7387,7 +7387,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "6bd106f0",
+          "fingerprint": "f61366e8",
           "scenario": "evolve"
         }
       ],
@@ -7516,17 +7516,17 @@
       "unmetGates": ["selected_matches"]
     },
     "10664120": {
-      "fingerprint": "3e6beb9f",
+      "fingerprint": "d4a36d48",
       "gatesSatisfied": [],
       "name": "Lyanthoth, Eld Tome",
       "scenarios": [
         {
-          "fingerprint": "5fbce5cc",
+          "fingerprint": "3301514c",
           "scenario": "play"
         },
         {
-          "fingerprint": "29727afc",
-          "scenario": "evolve"
+          "fingerprint": "9842039b",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
