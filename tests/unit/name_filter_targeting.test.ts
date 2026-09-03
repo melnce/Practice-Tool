@@ -283,5 +283,35 @@ describe("name filter on targeted selection pools", () => {
       );
       expect(drawnRunecraft).toEqual([]);
     });
+
+    it("draws the top 2 deck cards (not Runecraft-follower search)", () => {
+      // Deck bottom → top: Runecraft followers deeper, non-Runecraft on top.
+      // Old data (search) would add 10131110 + 10132110; Aug 28 patch draws
+      // 10111310 then 10102110 (top of deck).
+      const deckBottomToTop = [
+        FILLER,
+        "10131110", // Runeblade Conductor — Runecraft follower
+        "10132110", // Ms. Miranda — Runecraft follower
+        "10102110", // Apollo — Neutral follower (2nd from top)
+        "10111310", // Fairy Convocation — Forestcraft spell (top)
+      ];
+      setupTurn(5, {
+        hand: [REAVED_ORDER],
+        pp: 1,
+        deck: deckBottomToTop,
+      });
+      const spawn = putNamedOnBoard(CRYSTALSPAWN);
+
+      whenPlayCard("first", 0);
+      resolvePendingTarget(spawn.uid);
+
+      expect(findOnBoard("first", "Crystalspawn")).toBeFalsy();
+
+      const drawnIds = getHand(state, "first").map((c) => c.id);
+      expect(drawnIds).toContain("10111310");
+      expect(drawnIds).toContain("10102110");
+      expect(drawnIds).not.toContain("10131110");
+      expect(drawnIds).not.toContain("10132110");
+    });
   });
 });

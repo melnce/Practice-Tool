@@ -23276,7 +23276,7 @@
     "class": "Runecraft",
     "rarity": "Silver",
     "tribes": [],
-    "description": "Select an allied Crystalspawn on the field and destroy it. Draw 2 Runecraft followers.",
+    "description": "Select an allied Crystalspawn on the field and destroy it. Draw 2 cards.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10632310.webp",
     "evo_image": "",
     "set": "[10006] Apocalypse Pact",
@@ -23295,12 +23295,9 @@
         }
       },
       {
-        "op": "search",
-        "count": 2,
-        "filter": {
-          "type": "follower",
-          "class": "Runecraft"
-        }
+        "op": "draw",
+        "source": "deck",
+        "count": 2
       }
     ],
     "fanfare": []
