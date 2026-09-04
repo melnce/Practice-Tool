@@ -26,7 +26,7 @@ import { endTurnBlue, endTurnRed } from "../../src/logic/core/turns.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
-import { getHand, getHP } from "../../src/core/playerHelpers.js";
+import { getHand, getHP, getGraveyard } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
 // Deck cards
@@ -447,17 +447,19 @@ describe("L2 — Antemaria Dragoncraft", () => {
       expect(Number(bystander.defense)).toBe(1);
     });
 
-    it.fails(
-      "when discarded at cost 4: adds copy at cost 2 to hand — 10641310: printed text requires on_discard add at cost 4; gate uses wrong sourceCard so copy is not added",
-      () => {
-        setupTurn(R6, { hand: [SAGATSUMATSU, ADVENT], pp: 7 });
-        whenPlayCard("first", 0);
-        discardHandCard("first", ADVENT);
-        const added = thenHand("first").filter((c) => c.id === ADVENT);
-        expect(added.length).toBe(1);
-        expect(getEffectiveCost(added[0]!)).toBe(2);
-      },
-    );
+    it("when discarded at cost 4: adds exactly one copy at cost 2 to hand; original is in graveyard", () => {
+      setupTurn(R6, { hand: [SAGATSUMATSU, ADVENT], pp: 7 });
+      const advent = getHand(state, "first").find((c) => c.id === ADVENT)!;
+      whenPlayCard("first", 0);
+      discardHandCard("first", ADVENT);
+      const added = thenHand("first").filter((c) => c.id === ADVENT);
+      expect(added).toHaveLength(1);
+      expect(getEffectiveCost(added[0]!)).toBe(2);
+      expect(
+        getGraveyard(state, "first").some((c) => c.uid === advent.uid),
+      ).toBe(true);
+      expect(printed).toContain("if its cost is 4");
+    });
 
     it("when discarded at cost 2: does not add another copy", () => {
       setupTurn(R6, { hand: [SAGATSUMATSU], pp: 7 });
