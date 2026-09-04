@@ -22,7 +22,8 @@ import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
-import { attackFollower } from "../../src/logic/core/combat.js";
+import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
+import type { CardInstance } from "../../src/core/types/index.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
@@ -203,6 +204,38 @@ function crestNamed(name: string, player: "first" | "second" = "first") {
   return getCrests(state, player).find((c) => c.name === name);
 }
 
+function handUids(player: "first" | "second" = "first"): Set<string> {
+  return new Set(thenHand(player).map((c) => c.uid));
+}
+
+function newHandCards(
+  before: Set<string>,
+  player: "first" | "second" = "first",
+  id?: string,
+): CardInstance[] {
+  const fresh = thenHand(player).filter((c) => !before.has(c.uid));
+  return id ? fresh.filter((c) => String(c.id) === id) : fresh;
+}
+
+function enemyAmulet(name = "EnemySigil", extra: Record<string, unknown> = {}) {
+  const c = createCard(
+    { name, type: "Amulet", cost: 2, ...extra },
+    "board",
+    "second",
+  );
+  state.players.second.board.push(c);
+  return c;
+}
+
+function gainYubeCrest(): CardInstance {
+  setupTurn(R6, { hand: [YUBE, FILLER], pp: 3, evo: 2 });
+  whenPlayCard("first", 0);
+  const yube = findOnBoard("first", "Yube, Crestpetal")!;
+  onEvolve(yube, "first", "normal", { spendPoint: true });
+  discardHandCard("first", FILLER);
+  return thenBoard("first").find((c) => c.id === MEGALORCA)!;
+}
+
 describe("L2 — Rotation Dragoncraft", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -332,6 +365,20 @@ describe("L2 — Rotation Dragoncraft", () => {
       runEndOfTurnBoundary("second");
       expect(Number(ally.attack)).toBe(atkBefore);
     });
+
+    it("crest expires after four owner turn-starts; no EOT buff after expiry", () => {
+      setupTurn(R6, { hand: [CRESCENT_TUBE], pp: 2 });
+      whenPlayCard("first", 0);
+      for (let i = 0; i < 4; i++) {
+        whenEndTurn();
+        whenEndTurn();
+      }
+      expect(crestNamed("Crescent Tube Ride")).toBeFalsy();
+      const ally = allyFollower(2, 3, "Ally");
+      const atkBefore = Number(ally.attack);
+      runEndOfTurnBoundary("first");
+      expect(Number(ally.attack)).toBe(atkBefore);
+    });
   });
 
   describe("Draconic Part-Timer (10742120)", () => {
@@ -455,6 +502,22 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(Number(superGuy.defense)).toBe(beforeSuper.def + 1);
       expect(Number(plain.attack)).toBe(plainAtk);
       expect(printed).toContain("super-evolved");
+    });
+
+    it("opponent's EOT: does not give super-evolved ally +1/+1", () => {
+      givenGameState({ seed: 2, activePlayer: "first", roundCount: 7 }).build();
+      state.gameStarted = true;
+      const superGuy = createCard(DRACONIC_BERSERKER, "board", "first");
+      superGuy.peak_defense = superGuy.defense;
+      onEvolve(superGuy, "first", "super");
+      createCard(MARI, "board", "first");
+      const before = {
+        atk: Number(superGuy.attack),
+        def: Number(superGuy.defense),
+      };
+      runEndOfTurnBoundary("second");
+      expect(Number(superGuy.attack)).toBe(before.atk);
+      expect(Number(superGuy.defense)).toBe(before.def);
     });
   });
 
@@ -744,6 +807,66 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(Number(marine.attack)).toBe(atkBefore);
       expect(printed).toContain("+1/+0");
     });
+
+    it("crest: first Marine attack per turn adds exactly one Megalorca; second same turn adds none; next owner turn adds one again", () => {
+      const marine = gainYubeCrest();
+      marine.can_attack = true;
+      marine.attacks_left = 2;
+      marine.justPlayed = false;
+      marine.hasStorm = true;
+      const uidsBefore = handUids();
+      enemyFollower(0, 10, "W1");
+      enemyFollower(0, 10, "W2");
+      attackFollower(
+        state.players.first.board.indexOf(marine),
+        0,
+        "first",
+        "second",
+      );
+      expect(newHandCards(uidsBefore, "first", MEGALORCA)).toHaveLength(1);
+      const uidsMid = handUids();
+      attackFollower(
+        state.players.first.board.indexOf(marine),
+        0,
+        "first",
+        "second",
+      );
+      expect(newHandCards(uidsMid, "first", MEGALORCA)).toHaveLength(0);
+      whenEndTurn();
+      whenEndTurn();
+      const uidsNextTurn = handUids();
+      marine.can_attack = true;
+      marine.attacks_left = 1;
+      enemyFollower(0, 10, "W3");
+      attackFollower(
+        state.players.first.board.indexOf(marine),
+        0,
+        "first",
+        "second",
+      );
+      expect(newHandCards(uidsNextTurn, "first", MEGALORCA)).toHaveLength(1);
+      expect(printed).toContain("once on each of your turns");
+    });
+
+    it("crest: non-Marine attacker gets neither +1/+0 nor Megalorca", () => {
+      gainYubeCrest();
+      const plain = allyFollower(2, 2, "Plain");
+      plain.can_attack = true;
+      plain.justPlayed = false;
+      plain.attacks_left = 1;
+      plain.hasStorm = true;
+      const uidsBefore = handUids();
+      const atkBefore = Number(plain.attack);
+      enemyFollower(0, 10, "Wall");
+      attackFollower(
+        state.players.first.board.indexOf(plain),
+        0,
+        "first",
+        "second",
+      );
+      expect(Number(plain.attack)).toBe(atkBefore);
+      expect(newHandCards(uidsBefore, "first", MEGALORCA)).toHaveLength(0);
+    });
   });
 
   describe("Apathetic Gaze (10741310)", () => {
@@ -841,6 +964,42 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(crest).toBeTruthy();
       expect(Number(crest!.countdown)).toBe(2);
       expect(printed).toContain("Last Words");
+    });
+
+    const crestPrinted =
+      "Countdown (2)\nLast Words: Add a Drache & Aluzard, Burning Blood to your hand and set its cost to 2.";
+
+    it("crest Countdown (2): after two owner turn-starts LW adds Drache at cost 2 by uid; no copy before expiry; opponent turn-starts do not tick", () => {
+      setupTurn(R8, { hand: [DRACHE], pp: 4 });
+      whenPlayCard("first", 0);
+      const drache = findOnBoard("first", "Drache & Aluzard, Burning Blood")!;
+      drache.defense = 0;
+      cleanupDead();
+      const uidsAtGain = handUids();
+      expect(crestNamed("Drache & Aluzard, Burning Blood")).toBeTruthy();
+      expect(newHandCards(uidsAtGain, "first", DRACHE)).toHaveLength(0);
+
+      whenEndTurn();
+      expect(crestNamed("Drache & Aluzard, Burning Blood")).toBeTruthy();
+      expect(
+        Number(crestNamed("Drache & Aluzard, Burning Blood")!.countdown),
+      ).toBe(2);
+      expect(newHandCards(uidsAtGain, "first", DRACHE)).toHaveLength(0);
+
+      whenEndTurn();
+      expect(crestNamed("Drache & Aluzard, Burning Blood")).toBeTruthy();
+      expect(
+        Number(crestNamed("Drache & Aluzard, Burning Blood")!.countdown),
+      ).toBe(1);
+      expect(newHandCards(uidsAtGain, "first", DRACHE)).toHaveLength(0);
+
+      whenEndTurn();
+      whenEndTurn();
+      expect(crestNamed("Drache & Aluzard, Burning Blood")).toBeFalsy();
+      const added = newHandCards(uidsAtGain, "first", DRACHE);
+      expect(added).toHaveLength(1);
+      expect(getEffectiveCost(added[0]!)).toBe(2);
+      expect(crestPrinted).toContain("set its cost to 2");
     });
   });
 
@@ -1053,6 +1212,32 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(thenHand("first").some((c) => c.name === "LWVictim")).toBe(true);
       expect(printed).toContain("banish");
     });
+
+    it("banishes selected enemy amulet (Last Words do not fire) and adds copy to hand by name", () => {
+      setupTurn(R6, { hand: [PRIMAL_ABSORPTION], pp: 5 });
+      const amulet = enemyAmulet("SigilOfDoom", {
+        hasLastWords: true,
+        lastWordsEffects: [
+          { op: "summon", source: "named", name: "Fairy", count: 1 },
+        ],
+      });
+      state.players.second.shadows = 0;
+      whenPlayCard("first", 0);
+      resolvePendingByUid(amulet.uid);
+      expect(getBoard(state, "second")).toHaveLength(0);
+      expect(
+        getGraveyard(state, "second").some((c) => c.uid === amulet.uid),
+      ).toBe(false);
+      expect(getBanish(state, "second").some((c) => c.uid === amulet.uid)).toBe(
+        true,
+      );
+      expect(thenHand("first").some((c) => c.name === "SigilOfDoom")).toBe(
+        true,
+      );
+      expect(getBoard(state, "second").some((c) => c.name === "Fairy")).toBe(
+        false,
+      );
+    });
   });
 
   describe("Reef & Lolo, Serene Sirens (10842110)", () => {
@@ -1073,21 +1258,26 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(reef.hasRush || reef.keywordState?.hasRush).toBe(true);
     });
 
-    it("owner's EOT adds Majestic Megalorca to hand; opponent EOT does not", () => {
+    it("owner's EOT adds Majestic Megalorca to hand", () => {
       setupTurn(R6, { hand: [REEF_LOLO], pp: 5 });
       whenPlayCard("first", 0);
-      // Fanfare leaves 2 copies on board; each EOT adds one Megalorca
       const handBefore = handIds().filter((id) => id === MEGALORCA).length;
       runEndOfTurnBoundary("first");
       expect(handIds().filter((id) => id === MEGALORCA).length).toBe(
         handBefore + 2,
       );
+      expect(printed).toContain("Majestic Megalorca");
+    });
+
+    it("opponent's EOT does not add Majestic Megalorca", () => {
+      setupTurn(R6, { hand: [REEF_LOLO], pp: 5 });
+      whenPlayCard("first", 0);
+      runEndOfTurnBoundary("first");
       const afterOwner = handIds().filter((id) => id === MEGALORCA).length;
       runEndOfTurnBoundary("second");
       expect(handIds().filter((id) => id === MEGALORCA).length).toBe(
         afterOwner,
       );
-      expect(printed).toContain("Majestic Megalorca");
     });
   });
 
@@ -1132,7 +1322,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       );
     });
 
-    it("Strike vs follower: grants 2 attacks per turn until EOT (batch12 pin)", () => {
+    it("Strike vs follower: grants Barrier and 2 attacks per turn until owner EOT", () => {
       setupTurn(R6, { hand: [GIADA], pp: 6 });
       whenPlayCard("first", 0);
       const giada = findOnBoard("first", "Giada, Peerless Flame of War")!;
@@ -1141,13 +1331,27 @@ describe("L2 — Rotation Dragoncraft", () => {
       giada.attacks_left = 1;
       enemyFollower(1, 10, "Wall");
       attackFollower(0, 0, "first", "second");
+      applyKeywordsFromList(giada);
+      expect(giada.hasBarrier || giada.keywordState?.hasBarrier).toBe(true);
       expect(giada.attacks_per_turn).toBe(2);
       whenEndTurn();
-      const still = findOnBoard("first", "Giada, Peerless Flame of War");
-      if (still) {
-        expect((still as any).attacks_per_turn_pre_eot).toBeUndefined();
-      }
+      const after = findOnBoard("first", "Giada, Peerless Flame of War")!;
+      expect((after as any).attacks_per_turn_pre_eot).toBeUndefined();
       expect(printed).toContain("Can attack 2 times");
+    });
+
+    it("Strike vs leader: grants Barrier but not extra attack", () => {
+      setupTurn(R6, { hand: [GIADA], pp: 6 });
+      whenPlayCard("first", 0);
+      const giada = findOnBoard("first", "Giada, Peerless Flame of War")!;
+      giada.can_attack = true;
+      giada.justPlayed = false;
+      giada.attacks_left = 1;
+      attackLeader(0, "first", "second");
+      applyKeywordsFromList(giada);
+      expect(giada.hasBarrier || giada.keywordState?.hasBarrier).toBe(true);
+      expect(giada.attacks_per_turn).not.toBe(2);
+      expect((giada as any).attacks_per_turn_pre_eot).toBeUndefined();
     });
   });
 
@@ -1259,6 +1463,21 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(added).toHaveLength(1);
       expect(getEffectiveCost(added[0]!)).toBe(3);
     });
+
+    it("when played at effective cost 5: deals exactly 5 to all enemy followers", () => {
+      setupTurn(R6);
+      const reduced = createCard(BEHEADING_BLADES, "hand", "first");
+      reduced.cost = 5;
+      state.players.first.hand.push(reduced);
+      state.players.first.pp = 5;
+      state.players.first.maxPP = 10;
+      const a = enemyFollower(2, 8, "A");
+      const b = enemyFollower(2, 8, "B");
+      whenPlayCard("first", 0);
+      expect(Number(a.defense)).toBe(3);
+      expect(Number(b.defense)).toBe(3);
+      expect(printed).toContain("X is this card's cost");
+    });
   });
 
   describe("Blackflame Deluge (10743310)", () => {
@@ -1304,8 +1523,14 @@ describe("L2 — Rotation Dragoncraft", () => {
     const printed =
       "Super-Evolve: Banish all 1-, 3-, 5-, 7-, and 9-cost cards from your deck. Deal X damage split between all enemy followers. X is the number of cards you banished.";
 
-    it("Super-Evolve banishes odd-cost deck cards and splits damage", () => {
-      setupTurn(R7, { hand: [RUINBRINGER], pp: 7, evo: 2, superEvo: 1 });
+    it("Super-Evolve banishes 1- and 3-cost by uid (not graveyard); 2-cost stays in deck; splits exactly X=2 damage", () => {
+      setupTurn(R7, {
+        hand: [RUINBRINGER],
+        pp: 7,
+        evo: 2,
+        superEvo: 1,
+        seed: 1,
+      });
       const c1 = createCard(FILLER, "deck", "first");
       c1.cost = 1;
       const c3 = createCard(FILLER, "deck", "first");
@@ -1318,9 +1543,25 @@ describe("L2 — Rotation Dragoncraft", () => {
       whenPlayCard("first", 0);
       const ruin = findOnBoard("first", "Ruinbringer")!;
       onEvolve(ruin, "first", "super", { spendPoint: true });
+      expect(getBanish(state, "first").some((c) => c.uid === c1.uid)).toBe(
+        true,
+      );
+      expect(getBanish(state, "first").some((c) => c.uid === c3.uid)).toBe(
+        true,
+      );
+      expect(getGraveyard(state, "first").some((c) => c.uid === c1.uid)).toBe(
+        false,
+      );
+      expect(getGraveyard(state, "first").some((c) => c.uid === c3.uid)).toBe(
+        false,
+      );
+      expect(thenDeck("first").some((c) => c.uid === c2.uid)).toBe(true);
       expect(getBanish(state, "first").length).toBe(2);
-      expect(deckIds()).toHaveLength(1);
-      expect(Number(e1.defense) + Number(e2.defense)).toBe(8);
+      const dmg1 = 5 - Number(e1.defense);
+      const dmg2 = 5 - Number(e2.defense);
+      expect(dmg1 + dmg2).toBe(2);
+      expect(dmg1).toBeLessThanOrEqual(2);
+      expect(dmg2).toBeLessThanOrEqual(2);
       expect(printed).toContain("banished");
     });
   });
@@ -1545,6 +1786,58 @@ describe("L2 — Rotation Dragoncraft", () => {
       const before = boardCountById(VASTWING);
       runEndOfTurnBoundary("first");
       expect(boardCountById(VASTWING)).toBe(before + 1);
+    });
+
+    it("crest Countdown (2): summons Vastwing at owner EOT for two turns then expires", () => {
+      setupTurn(R10, { hand: [DRAGONS_VALE_ELDER], pp: 10 });
+      whenPlayCard("first", 0);
+      expect(boardCountById(VASTWING)).toBe(1);
+      whenEndTurn();
+      expect(boardCountById(VASTWING)).toBe(2);
+      whenEndTurn();
+      whenEndTurn();
+      expect(boardCountById(VASTWING)).toBe(3);
+      whenEndTurn();
+      expect(crestNamed("Dragon's Vale Elder")).toBeFalsy();
+      whenEndTurn();
+      expect(boardCountById(VASTWING)).toBe(3);
+    });
+
+    it("crest does not summon Vastwing on opponent's EOT", () => {
+      setupTurn(R10, { hand: [DRAGONS_VALE_ELDER], pp: 10 });
+      whenPlayCard("first", 0);
+      const before = boardCountById(VASTWING);
+      runEndOfTurnBoundary("second");
+      expect(boardCountById(VASTWING)).toBe(before);
+    });
+
+    it("Super-Evolve delay +2: crest outlasts baseline countdown (2) by two owner turn-starts", () => {
+      setupTurn(R10, {
+        hand: [DRAGONS_VALE_ELDER],
+        pp: 10,
+        evo: 2,
+        superEvo: 1,
+      });
+      whenPlayCard("first", 0);
+      const elder = findOnBoard("first", "Dragon's Vale Elder")!;
+      onEvolve(elder, "first", "super", { spendPoint: true });
+      expect(Number(crestNamed("Dragon's Vale Elder")!.countdown)).toBe(4);
+      whenEndTurn();
+      whenEndTurn();
+      expect(crestNamed("Dragon's Vale Elder")).toBeTruthy();
+      whenEndTurn();
+      whenEndTurn();
+      expect(crestNamed("Dragon's Vale Elder")).toBeTruthy();
+      whenEndTurn();
+      whenEndTurn();
+      expect(crestNamed("Dragon's Vale Elder")).toBeTruthy();
+      whenEndTurn();
+      whenEndTurn();
+      expect(crestNamed("Dragon's Vale Elder")).toBeFalsy();
+      const before = boardCountById(VASTWING);
+      whenEndTurn();
+      expect(boardCountById(VASTWING)).toBe(before);
+      expect(printed).toContain("Delay");
     });
   });
 });
