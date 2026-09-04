@@ -1551,12 +1551,12 @@
       "status": "covered"
     },
     "10134310": {
-      "fingerprint": "2be00238",
+      "fingerprint": "91907b67",
       "gatesSatisfied": [],
       "name": "Dimension Climb",
       "scenarios": [
         {
-          "fingerprint": "67fa795f",
+          "fingerprint": "83b62f64",
           "scenario": "play"
         }
       ],
