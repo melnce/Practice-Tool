@@ -103,17 +103,26 @@ export function dispatchTargetedOp(opCtx: TargetedOpContext): DispatchResult {
 
 TARGETED_OP_HANDLERS.set("damage", (ctx) => {
   const { eff, owner, sourceCard, targetUids } = ctx;
-  const targets = resolveUids(targetUids);
-  if (targets.length) {
-    state.__lastSelected = targets[0];
-  }
   const amt = resolveAmountWithOverflow(eff, owner, {
     sourceCard,
     selectedCard: state.__lastSelected,
   });
   const oppOwner = opponentOf(owner);
+  const canFallbackLeader = Boolean(
+    (eff as any).fallback_leader ?? (eff as any).can_target_leader,
+  );
+
+  if (targetUids.includes("leader")) {
+    if (amt) applyLeaderDamage(oppOwner, amt);
+    return { kind: "handled" };
+  }
+
+  const targets = resolveUids(targetUids);
+  if (targets.length) {
+    state.__lastSelected = targets[0];
+  }
   if (!targets.length) {
-    if ((eff as any).fallback_leader && amt) {
+    if (canFallbackLeader && amt) {
       applyLeaderDamage(oppOwner, amt);
     }
     return { kind: "handled" };
