@@ -31,6 +31,10 @@ import {
   runEndOfTurnBoundary,
 } from "../../src/logic/core/turnBoundary.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
+import { attackLeader } from "../../src/logic/core/combat.js";
+import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
+import { handleGainCrest } from "../../src/logic/effects/crest.js";
+import { getCardById } from "../../src/data/cardDatabase.js";
 import {
   getBoard,
   getHand,
@@ -41,6 +45,7 @@ import {
   getGraveyard,
   getDeck,
   getSuperEvoCharges,
+  getEvoCharges,
 } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -107,6 +112,7 @@ const SPELL_B = "10031310";
 const BIG_FOLLOWER = "10002120";
 const SMALL_FOLLOWER = "10001110";
 const FILLER = "10111310";
+const FAIRY = "90011110";
 
 const R4 = 4;
 const R5 = 5;
@@ -137,11 +143,20 @@ const DUPLICATE_DECK = [
   { name: "UniqueC", type: "Follower", cost: 3, attack: 2, defense: 2 },
 ];
 
+const HIGHLANDER_FILLER = [
+  { name: "SingletonA", type: "Follower", cost: 1, attack: 1, defense: 1 },
+  { name: "SingletonB", type: "Spell", cost: 2 },
+  { name: "SingletonC", type: "Follower", cost: 3, attack: 2, defense: 2 },
+];
+
+const PAD_DECK = Array.from({ length: 15 }, () => FILLER);
+
 function setupTurn(
   round: number,
   opts: {
     hand?: Array<string | Record<string, unknown>>;
     deck?: Array<string | Record<string, unknown>>;
+    secondDeck?: Array<string | Record<string, unknown>>;
     pp?: number;
     hp?: number;
     active?: "first" | "second";
@@ -157,11 +172,88 @@ function setupTurn(
   }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand as any);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck as any);
+  else b = b.withFirstDeck(PAD_DECK);
+  if (opts.secondDeck?.length) b = b.withSecondDeck(opts.secondDeck as any);
+  else b = b.withSecondDeck(PAD_DECK);
   if (opts.hp !== undefined) b = b.withFirstHP(opts.hp);
   if (opts.evo !== undefined) b = b.withFirstEvo(opts.evo);
   b.build();
   state.gameStarted = true;
   state.phase = "main";
+}
+
+function advanceToFirstNextTurn(): void {
+  whenEndTurn();
+  whenEndTurn();
+}
+
+function findCrestGain(card: Record<string, unknown>): unknown {
+  let found: unknown;
+  function walk(obj: unknown): void {
+    if (!obj || typeof obj !== "object") return;
+    const rec = obj as Record<string, unknown>;
+    if (rec.op === "crest" && rec.action === "gain") found = rec;
+    if (Array.isArray(obj)) obj.forEach(walk);
+    else Object.values(rec).forEach(walk);
+  }
+  walk(card);
+  return found;
+}
+
+function gainCardCrest(cardId: string, owner: "first" | "second"): void {
+  const card = getCardById(cardId);
+  expect(card).toBeDefined();
+  const gain = findCrestGain(card as Record<string, unknown>);
+  expect(gain).toBeDefined();
+  handleGainCrest(gain as Parameters<typeof handleGainCrest>[0], owner);
+}
+
+function gainCutthroatCrest(): void {
+  setupTurn(R6, {
+    hand: [CUTTHROAT],
+    pp: 2,
+    deck: [
+      { name: "Cutthroat, Fluxblade Convict", type: "Follower", cost: 2 },
+      { name: "Cutthroat, Fluxblade Convict", type: "Follower", cost: 2 },
+      ...HIGHLANDER_FILLER,
+    ],
+    evo: 2,
+  });
+  whenPlayCard("first", 0);
+  const cut = findOnBoard("first", "Cutthroat, Fluxblade Convict")!;
+  onEvolve(cut, "first", "normal", { spendPoint: true });
+  expect(
+    getCrests(state, "first").some(
+      (c) => c.name === "Cutthroat, Fluxblade Convict",
+    ),
+  ).toBe(true);
+}
+
+function readyStormAttacker(
+  owner: "first" | "second",
+  atk = 5,
+  name = "Storm Raider",
+) {
+  const c = createCard(
+    {
+      name,
+      type: "Follower",
+      cost: 2,
+      attack: atk,
+      defense: 2,
+      hasStorm: true,
+      justPlayed: false,
+      can_attack: true,
+      can_attack_followers: true,
+      attacks_left: 1,
+    },
+    "board",
+    owner,
+  );
+  applyKeywordsFromList(c);
+  c.peak_defense = 2;
+  getBoard(state, owner).push(c);
+  return c;
 }
 
 function resolvePendingByUid(uid: string): void {
@@ -520,7 +612,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       onEvolve(courier, "first", "normal", { spendPoint: true });
       expect(
         getHand(state, "first").filter((c) => c.id === ANCIENT).length,
-      ).toBeGreaterThanOrEqual(2);
+      ).toBe(2);
     });
   });
 
@@ -592,6 +684,50 @@ describe("L2 — Cutthroat Portalcraft", () => {
           (c) => c.name === "Cutthroat, Fluxblade Convict",
         ),
       ).toBe(false);
+    });
+
+    it("crest: first follower each turn evolves without spending an evolution point", () => {
+      gainCutthroatCrest();
+      state.players.first.hand = [
+        createCard(FAIRY, "hand", "first"),
+        createCard(FAIRY, "hand", "first"),
+      ];
+      state.players.first.pp = 10;
+      const evoBefore = getEvoCharges(state, "first");
+      whenPlayCard("first", 0);
+      const firstFairy = findOnBoard("first", "Fairy")!;
+      expect(firstFairy.hasEvolved).toBe(true);
+      expect(getEvoCharges(state, "first")).toBe(evoBefore);
+
+      whenPlayCard("first", 0);
+      const fairies = thenBoard("first").filter((c) => c.name === "Fairy");
+      expect(fairies.filter((c) => c.hasEvolved).length).toBe(1);
+      expect(fairies.filter((c) => !c.hasEvolved).length).toBe(1);
+    });
+
+    it("crest: opponent playing a follower does not evolve it", () => {
+      gainCutthroatCrest();
+      advanceToFirstNextTurn();
+      state.players.second.hand = [createCard(FAIRY, "hand", "second")];
+      state.players.second.pp = 10;
+      state.activePlayer = "second";
+      whenPlayCard("second", 0);
+      const foeFairy = findOnBoard("second", "Fairy")!;
+      expect(foeFairy.hasEvolved).toBeFalsy();
+    });
+
+    it("crest: on owner's next turn the first follower is evolved again", () => {
+      gainCutthroatCrest();
+      state.players.first.hand = [createCard(FAIRY, "hand", "first")];
+      state.players.first.pp = 10;
+      whenPlayCard("first", 0);
+      expect(findOnBoard("first", "Fairy")!.hasEvolved).toBe(true);
+
+      advanceToFirstNextTurn();
+      state.players.first.hand = [createCard(FAIRY, "hand", "first")];
+      state.players.first.pp = 10;
+      whenPlayCard("first", 0);
+      expect(findOnBoard("first", "Fairy")!.hasEvolved).toBe(true);
     });
   });
 
@@ -675,19 +811,23 @@ describe("L2 — Cutthroat Portalcraft", () => {
       ).toBe(false);
     });
 
-    it("Super-Evolve draws 2 differently named 1-cost spells", () => {
+    it("Super-Evolve draws exactly 2 differently named 1-cost spells", () => {
       setupTurn(R8, {
-        hand: [IMARI],
-        deck: [SPELL_A, SPELL_B, DRAW_TOP],
+        hand: [IMARI, DRAW_TOP],
+        deck: [SPELL_A, SPELL_B],
         pp: 3,
       });
       state.players.first.superEvoCharges = 2;
       whenPlayCard("first", 0);
+      resolvePendingByUid(
+        getHand(state, "first").find((c) => c.id === DRAW_TOP)!.uid,
+      );
       const imari = findOnBoard("first", "Imari, Dewdrop")!;
       onEvolve(imari, "first", "super", { spendPoint: true });
       const spells = getHand(state, "first").filter((c) => c.type === "Spell");
-      expect(spells.length).toBeGreaterThanOrEqual(2);
-      expect(new Set(spells.map((c) => c.name)).size).toBeGreaterThanOrEqual(2);
+      expect(spells).toHaveLength(2);
+      expect(spells.every((c) => Number(c.cost) === 1)).toBe(true);
+      expect(new Set(spells.map((c) => c.id)).size).toBe(2);
       expect(printed).toContain("differently named 1-cost spells");
     });
   });
@@ -731,7 +871,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       expect(thenHand("first").some((c) => c.name === "Big")).toBe(true);
       expect(getPP(state, "first")).toBe(7);
-      expect(findOnBoard("first", "Lyria, Skydestined")).toBeTruthy();
+      expect(findOnBoard("first", "Lyria, Skydestined")).toBeDefined();
     });
   });
 
@@ -758,15 +898,15 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(Number(theater.countdown)).toBe(2);
     });
 
-    it("owner's EOT adds another Puppet to hand", () => {
+    it("owner's EOT adds exactly one Puppet to hand", () => {
       setupTurn(R5, { hand: [PUPPET_THEATER], pp: 2 });
       whenPlayCard("first", 0);
       const puppetsAfterFanfare = handIds().filter(
         (id) => id === PUPPET,
       ).length;
       whenEndTurn();
-      expect(handIds().filter((id) => id === PUPPET).length).toBeGreaterThan(
-        puppetsAfterFanfare,
+      expect(handIds().filter((id) => id === PUPPET).length).toBe(
+        puppetsAfterFanfare + 1,
       );
     });
 
@@ -870,15 +1010,16 @@ describe("L2 — Cutthroat Portalcraft", () => {
       ).toBe(true);
     });
 
-    it("Enhance (5): summons Mystic Artifact in addition to Fanfare", () => {
+    it("Enhance (5): summons exactly 1 Mystic and 1 Analyzing Artifact", () => {
       setupTurn(R8, { hand: [BRAZEN], pp: 5 });
       whenPlayCard("first", 0);
       expect(
         thenBoard("first").filter((c) => c.name === "Mystic Artifact").length,
-      ).toBeGreaterThanOrEqual(1);
+      ).toBe(1);
       expect(
-        thenBoard("first").some((c) => c.name === "Analyzing Artifact"),
-      ).toBe(true);
+        thenBoard("first").filter((c) => c.name === "Analyzing Artifact")
+          .length,
+      ).toBe(1);
     });
 
     it("without 5 PP: only Analyzing Artifact from Fanfare", () => {
@@ -900,10 +1041,27 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const artifacts = thenBoard("first").filter(
         (c) => c.name === "Analyzing Artifact",
       );
-      expect(artifacts.length).toBeGreaterThanOrEqual(2);
+      expect(artifacts).toHaveLength(2);
       expect(artifacts.every((c) => c.hasRush || c.keywordState?.hasRush)).toBe(
         true,
       );
+    });
+
+    it("non-Artifact ally enter does not grant Rush", () => {
+      setupTurn(R10, { hand: [BRAZEN, PUPPET_LANCER], pp: 10 });
+      whenPlayCard("first", 0);
+      const lancerIdx = getHand(state, "first").findIndex(
+        (c) => c.id === PUPPET_LANCER,
+      );
+      expect(lancerIdx).toBeGreaterThanOrEqual(0);
+      const outcome = playCardNoRender(
+        getHand(state, "first"),
+        "first",
+        lancerIdx,
+      );
+      expect(outcome.kind).toBe("done");
+      const lancer = findOnBoard("first", "Puppet Lancer")!;
+      expect(lancer.hasRush || lancer.keywordState?.hasRush).toBeFalsy();
     });
   });
 
@@ -994,6 +1152,121 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(Number(ally.attack)).toBe(atkBefore + 2);
     });
 
+    it("own SOT: three consecutive turns each fire one unused ability; fourth does nothing", () => {
+      setupTurn(R6, { hand: [], pp: 3 });
+      const slaus = createCard(SLAUS, "board", "first");
+      state.players.first.board = [slaus];
+      const ally = allyFollower("ModeAlly", 1, 1);
+      const handCard = createCard(
+        { name: "HandCard", type: "Follower", cost: 5, attack: 1, defense: 1 },
+        "hand",
+        "first",
+      );
+      state.players.first.hand.push(handCard);
+      state.players.first.hp = 15;
+
+      const usedLengths: number[] = [];
+      for (let i = 0; i < 4; i++) {
+        const hpBefore = getHP(state, "first");
+        const costBefore = getEffectiveCost(handCard);
+        const atkBefore = Number(ally.attack);
+        runStartOfTurnBoundary("first");
+        const used =
+          (slaus as { usedModeIndices?: number[] }).usedModeIndices ?? [];
+        usedLengths.push(used.length);
+        if (i < 3) {
+          const changed =
+            getHP(state, "first") !== hpBefore ||
+            getEffectiveCost(handCard) !== costBefore ||
+            Number(ally.attack) !== atkBefore;
+          expect(changed).toBe(true);
+        } else {
+          expect(getHP(state, "first")).toBe(hpBefore);
+          expect(getEffectiveCost(handCard)).toBe(costBefore);
+          expect(Number(ally.attack)).toBe(atkBefore);
+        }
+      }
+      expect(usedLengths).toEqual([1, 2, 3, 3]);
+      expect(new Set(usedLengths.slice(0, 3)).size).toBe(3);
+    });
+
+    it("opponent crest: three SOT debuffs then crest removed", () => {
+      setupTurn(R6, { hand: [SLAUS], pp: 3 });
+      whenPlayCard("first", 0);
+      const slaus = findOnBoard("first", "Slaus, Revolving Wheel of Fortune")!;
+      state.players.first.evoCharges = 2;
+      onEvolve(slaus, "first", "normal", { spendPoint: true });
+
+      const oppHand = createCard(
+        { name: "OppHand", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "hand",
+        "second",
+      );
+      state.players.second.hand.push(oppHand);
+      const oppAlly = createCard(
+        { name: "OppAlly", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "board",
+        "second",
+      );
+      oppAlly.peak_defense = 2;
+      state.players.second.board.push(oppAlly);
+      state.players.second.hp = 20;
+
+      const debuffKinds = new Set<string>();
+      const noteDebuff = (
+        costBefore: number,
+        atkBefore: number,
+        defBefore: number,
+        hpBefore: number,
+      ) => {
+        if (getEffectiveCost(oppHand) === costBefore + 1) {
+          debuffKinds.add("cost");
+        }
+        if (
+          Number(oppAlly.attack) === atkBefore - 2 &&
+          Number(oppAlly.defense) === defBefore - 2
+        ) {
+          debuffKinds.add("stat");
+        }
+        if (getHP(state, "second") === hpBefore - 3) {
+          debuffKinds.add("damage");
+        }
+      };
+
+      let costBefore = getEffectiveCost(oppHand);
+      let atkBefore = Number(oppAlly.attack);
+      let defBefore = Number(oppAlly.defense);
+      let hpBefore = getHP(state, "second");
+
+      whenEndTurn();
+      noteDebuff(costBefore, atkBefore, defBefore, hpBefore);
+      costBefore = getEffectiveCost(oppHand);
+      atkBefore = Number(oppAlly.attack);
+      defBefore = Number(oppAlly.defense);
+      hpBefore = getHP(state, "second");
+
+      let crest = getCrests(state, "second").find((c) =>
+        c.name.includes("Slaus"),
+      );
+      expect(crest).toBeDefined();
+      // Crest gained at CD 3; opponent SOT during whenEndTurn already ticked it once → 2
+      expect(Number(crest!.countdown)).toBe(2);
+
+      for (let i = 0; i < 2; i++) {
+        whenEndTurn();
+        whenEndTurn();
+        noteDebuff(costBefore, atkBefore, defBefore, hpBefore);
+        costBefore = getEffectiveCost(oppHand);
+        atkBefore = Number(oppAlly.attack);
+        defBefore = Number(oppAlly.defense);
+        hpBefore = getHP(state, "second");
+      }
+
+      expect(debuffKinds.size).toBe(3);
+      crest = getCrests(state, "second").find((c) => c.name.includes("Slaus"));
+      expect(crest).toBeUndefined();
+    });
+
     it("opponent's SOT does not activate Slaus modes", () => {
       setupTurn(R6, { hand: [SLAUS], pp: 3, active: "second" });
       whenPlayCard("first", 0);
@@ -1033,6 +1306,14 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const hpBefore = getHP(state, "first");
       whenPlayCard("first", 0);
       expect(getHP(state, "first")).toBe(hpBefore + 1);
+    });
+
+    it("non-Artifact ally enter does not restore leader defense", () => {
+      setupTurn(R6, { hand: [BARKEEP, PUPPET_LANCER], pp: 6, hp: 15 });
+      whenPlayCard("first", 0);
+      const hpBefore = getHP(state, "first");
+      whenPlayCard("first", 0);
+      expect(getHP(state, "first")).toBe(hpBefore);
     });
 
     it("Evolve summons Mystic Artifact", () => {
@@ -1168,6 +1449,18 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(foe.hasWard || foe.keywordState?.hasWard).toBe(true);
     });
 
+    it("Enhance off-branch: below 9 PP → Fanfare Ward only, not evolved, no Storm", () => {
+      setupTurn(R8, { hand: [ASHER], pp: 6 });
+      const foe = enemyFollower(2, 4);
+      whenPlayCard("first", 0);
+      resolvePendingByUid(foe.uid);
+      const asher = findOnBoard("first", "Asher & Lydia, Paths Beyond")!;
+      expect(asher.hasEvolved).toBeFalsy();
+      expect(asher.hasStorm || asher.keywordState?.hasStorm).toBeFalsy();
+      expect(foe.hasWard || foe.keywordState?.hasWard).toBe(true);
+      expect(printed).toContain("Enhance (9)");
+    });
+
     it("Enhance (9): evolves with Storm and destroys Ward enemies", () => {
       setupTurn(R9, { hand: [ASHER], pp: 9 });
       const w1 = enemyFollower(2, 4, "Ward1", { keywords: ["Ward"] });
@@ -1181,6 +1474,31 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(asher.hasStorm || asher.keywordState?.hasStorm).toBe(true);
       cleanupDead();
       expect(getBoard(state, "second").length).toBe(0);
+    });
+
+    it("Evolve (normal): destroys exactly 2 of 3 Ward enemies; non-Ward survives", () => {
+      setupTurn(R8, { hand: [ASHER], pp: 6 });
+      const w1 = enemyFollower(2, 4, "W1", { keywords: ["Ward"] });
+      const w2 = enemyFollower(2, 4, "W2", { keywords: ["Ward"] });
+      const w3 = enemyFollower(2, 4, "W3", { keywords: ["Ward"] });
+      const plain = enemyFollower(2, 4, "Plain");
+      applyKeywordsFromList(w1);
+      applyKeywordsFromList(w2);
+      applyKeywordsFromList(w3);
+      whenPlayCard("first", 0);
+      const asher = findOnBoard("first", "Asher & Lydia, Paths Beyond")!;
+      state.players.first.evoCharges = 2;
+      onEvolve(asher, "first", "normal", { spendPoint: true });
+      cleanupDead();
+      expect(getBoard(state, "second").length).toBe(2);
+      expect(getBoard(state, "second").some((c) => c.uid === plain.uid)).toBe(
+        true,
+      );
+      expect(
+        getBoard(state, "second").filter(
+          (c) => c.hasWard || c.keywordState?.hasWard,
+        ).length,
+      ).toBe(1);
     });
   });
 
@@ -1197,6 +1515,18 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const defs = thenBoard("second").map((c) => Number(c.defense));
       expect(defs.every((d) => d === 3)).toBe(true);
+    });
+
+    it("Skybound off-branch: gauge < 10 → no damage", () => {
+      setupTurn(R5, { hand: [KATALINA], pp: 5 });
+      const kat = getHand(state, "first").find((c) => c.id === KATALINA)!;
+      kat.skyboundArtEvolvesWitnessed = 0;
+      const e1 = enemyFollower(2, 8, "E1");
+      const e2 = enemyFollower(2, 8, "E2");
+      whenPlayCard("first", 0);
+      expect(Number(e1.defense)).toBe(8);
+      expect(Number(e2.defense)).toBe(8);
+      expect(printed).toContain("Skybound Art");
     });
 
     it("has Ward on field", () => {
@@ -1231,20 +1561,44 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(defBefore - Number(foe.defense)).toBe(6);
     });
 
-    it("Fanfare buffs opponent hand followers +1/+0", () => {
-      setupTurn(R8, { hand: [LU_WOH], pp: 5 });
-      const handFoe = createCard(
-        { name: "HandFoe", type: "Follower", cost: 2, attack: 2, defense: 2 },
-        "hand",
-        "second",
-      );
-      state.players.second.hand.push(handFoe);
+    it.fails(
+      "Give all followers in your opponent's hand +1/+0 — 10474110: printed Fanfare buffs enemy hand; observed enemy:hand:follower resolves to board (hand follower stays 2/2, board follower buffed)",
+      () => {
+        setupTurn(R8, { hand: [LU_WOH], pp: 5 });
+        const handFoe = createCard(
+          {
+            name: "HandFoe",
+            type: "Follower",
+            cost: 2,
+            attack: 2,
+            defense: 2,
+          },
+          "hand",
+          "second",
+        );
+        state.players.second.hand.push(handFoe);
+        const boardBystander = enemyFollower(2, 20, "BoardBystander");
+        whenPlayCard("first", 0);
+        const buffed = getHand(state, "second").find(
+          (c) => c.uid === handFoe.uid,
+        )!;
+        expect(Number(buffed.attack)).toBe(3);
+        expect(Number(buffed.defense)).toBe(2);
+        expect(Number(boardBystander.attack)).toBe(2);
+        expect(printed).toContain("+1/+0");
+      },
+    );
+
+    it("Skybound off-branch: gauge < 10 → no crest", () => {
+      setupTurn(R5, { hand: [LU_WOH], pp: 5 });
+      const lu = getHand(state, "first").find((c) => c.id === LU_WOH)!;
+      lu.skyboundArtEvolvesWitnessed = 0;
       whenPlayCard("first", 0);
-      const buffed = getHand(state, "second").find(
-        (c) => c.uid === handFoe.uid,
-      )!;
-      expect(Number(buffed?.attack ?? 0)).toBeGreaterThanOrEqual(2);
-      expect(printed).toContain("+1/+0");
+      expect(
+        getCrests(state, "first").some(
+          (c) => c.name === "Lu Woh, Light Personified",
+        ),
+      ).toBe(false);
     });
 
     it("Skybound Art: gains Crest: Lu Woh, Light Personified", () => {
@@ -1257,6 +1611,43 @@ describe("L2 — Cutthroat Portalcraft", () => {
           (c) => c.name === "Lu Woh, Light Personified",
         ),
       ).toBe(true);
+    });
+
+    it("crest: countdown 2; Storm attacker gets -3 attack until end of turn; non-Storm unaffected", () => {
+      setupTurn(R10, { hand: [], pp: 10, active: "first" });
+      gainCardCrest(LU_WOH, "second");
+      const crest = getCrests(state, "second").find(
+        (c) => c.name === "Lu Woh, Light Personified",
+      );
+      expect(Number(crest?.countdown)).toBe(2);
+
+      const stormAttacker = readyStormAttacker("first", 5, "Storm Raider");
+      const hpBeforeStorm = getHP(state, "second");
+      attackLeader(0, "first", "second");
+      expect(Number(stormAttacker.attack)).toBe(2);
+      expect(getHP(state, "second")).toBe(hpBeforeStorm - 2);
+
+      const plainAttacker = createCard(
+        {
+          name: "Plain Raider",
+          type: "Follower",
+          cost: 2,
+          attack: 5,
+          defense: 2,
+          justPlayed: false,
+          can_attack: true,
+          can_attack_followers: true,
+          attacks_left: 1,
+        },
+        "board",
+        "first",
+      );
+      plainAttacker.peak_defense = 2;
+      getBoard(state, "first").push(plainAttacker);
+      const hpBeforePlain = getHP(state, "second");
+      attackLeader(1, "first", "second");
+      expect(Number(plainAttacker.attack)).toBe(5);
+      expect(getHP(state, "second")).toBe(hpBeforePlain - 5);
     });
   });
 
@@ -1328,24 +1719,26 @@ describe("L2 — Cutthroat Portalcraft", () => {
     it("summons Ludicrous, Shoddy, Substandard each with +0/+1", () => {
       setupTurn(R8, { hand: [MYRIAD], pp: 6 });
       whenPlayCard("first", 0);
-      const lud = thenBoard("first").find(
-        (c) => c.name === "Ludicrous Ordnance",
+      const board = thenBoard("first");
+      expect(board.filter((c) => c.name === "Ludicrous Ordnance").length).toBe(
+        1,
       );
-      const shod = thenBoard("first").find(
-        (c) => c.name === "Shoddy Plaything",
+      expect(board.filter((c) => c.name === "Shoddy Plaything").length).toBe(1);
+      expect(board.filter((c) => c.name === "Substandard Puppet").length).toBe(
+        1,
       );
-      const sub = thenBoard("first").find(
-        (c) => c.name === "Substandard Puppet",
-      );
-      expect(lud).toBeTruthy();
-      expect(shod).toBeTruthy();
-      expect(sub).toBeTruthy();
+      const lud = board.find((c) => c.name === "Ludicrous Ordnance")!;
+      const shod = board.find((c) => c.name === "Shoddy Plaything")!;
+      const sub = board.find((c) => c.name === "Substandard Puppet")!;
       const baseLud = createCard(LUDICROUS_ID, "hand", "first");
       const baseShod = createCard(SHODDY_ID, "hand", "first");
       const baseSub = createCard(SUBSTANDARD, "hand", "first");
-      expect(Number(lud!.defense)).toBe(Number(baseLud.defense) + 1);
-      expect(Number(shod!.defense)).toBe(Number(baseShod.defense) + 1);
-      expect(Number(sub!.defense)).toBe(Number(baseSub.defense) + 1);
+      expect(Number(lud.attack)).toBe(Number(baseLud.attack));
+      expect(Number(lud.defense)).toBe(Number(baseLud.defense) + 1);
+      expect(Number(shod.attack)).toBe(Number(baseShod.attack));
+      expect(Number(shod.defense)).toBe(Number(baseShod.defense) + 1);
+      expect(Number(sub.attack)).toBe(Number(baseSub.attack));
+      expect(Number(sub.defense)).toBe(Number(baseSub.defense) + 1);
       expect(printed).toContain("+0/+1");
     });
   });
@@ -1441,7 +1834,15 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(getBoard(state, "second").length).toBe(0);
     });
 
-    it("Super-Evolve replicates Fanfare (second Warden)", () => {
+    it("non-Artifact ally enter does not destroy enemy follower", () => {
+      setupTurn(R8, { hand: [AIZEDEN, PUPPET_LANCER], pp: 10 });
+      whenPlayCard("first", 0);
+      enemyFollower(3, 5, "Victim");
+      whenPlayCard("first", 0);
+      expect(getBoard(state, "second").length).toBe(1);
+    });
+
+    it("Super-Evolve replicates Fanfare (exactly 2 Wardens total)", () => {
       setupTurn(R8, { hand: [AIZEDEN], pp: 7 });
       state.players.first.superEvoCharges = 2;
       whenPlayCard("first", 0);
@@ -1450,7 +1851,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(
         thenBoard("first").filter((c) => c.name === "Warden of the Trigger")
           .length,
-      ).toBeGreaterThanOrEqual(2);
+      ).toBe(2);
     });
   });
 
@@ -1472,6 +1873,8 @@ describe("L2 — Cutthroat Portalcraft", () => {
     it("when 5+ base cost ally enters: evolves it (fanfare summons)", () => {
       setupTurn(R8, { hand: [CAMISCILLA], pp: 7 });
       whenPlayCard("first", 0);
+      const cam = findOnBoard("first", "Camiscilla, Unfeeling Heart")!;
+      expect(cam.hasEvolved).toBeFalsy();
       const toys = thenBoard("first").filter(
         (c) => c.name === "Shoddy Plaything" || c.name === "Substandard Puppet",
       );
@@ -1479,14 +1882,22 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(toys.every((c) => c.hasEvolved)).toBe(true);
     });
 
-    it("Super-Evolve deals X damage (allies with base cost 5+)", () => {
+    it("≤4-cost ally entering afterwards is not evolved", () => {
+      setupTurn(R8, { hand: [CAMISCILLA, BLUERUST], pp: 8 });
+      whenPlayCard("first", 0);
+      whenPlayCard("first", 0);
+      const underling = findOnBoard("first", "Bluerust Underling");
+      expect(underling?.hasEvolved).toBeFalsy();
+    });
+
+    it("Super-Evolve deals exactly 3 damage (Camiscilla + Shoddy + Substandard)", () => {
       setupTurn(R8, { hand: [CAMISCILLA], pp: 8 });
       state.players.first.superEvoCharges = 2;
       whenPlayCard("first", 0);
       const cam = findOnBoard("first", "Camiscilla, Unfeeling Heart")!;
       const hpBefore = getHP(state, "second");
       onEvolve(cam, "first", "super", { spendPoint: true });
-      expect(getHP(state, "second")).toBeLessThan(hpBefore);
+      expect(getHP(state, "second")).toBe(hpBefore - 3);
     });
   });
 
@@ -1557,6 +1968,15 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(Number(b.defense)).toBe(3);
     });
 
+    it("Fanfare: X = 0 when no Artifact has entered → no damage", () => {
+      setupTurn(R10, { hand: [SCARLET], pp: 8 });
+      const a = enemyFollower(2, 5, "A");
+      const b = enemyFollower(2, 5, "B");
+      whenPlayCard("first", 0);
+      expect(Number(a.defense)).toBe(5);
+      expect(Number(b.defense)).toBe(5);
+    });
+
     it("has Storm and Ward on field", () => {
       setupTurn(R10, { hand: [SCARLET], pp: 8 });
       whenPlayCard("first", 0);
@@ -1575,24 +1995,37 @@ describe("L2 — Cutthroat Portalcraft", () => {
       setupTurn(R10, { hand: [BEELZEBUB], pp: 9 });
       const a = enemyFollower(5, 9, "A");
       const b = enemyFollower(5, 9, "B");
+      applyKeywordsFromList(a);
+      applyKeywordsFromList(b);
+      a.hasWard = true;
+      a.hasStorm = true;
+      b.hasWard = true;
+      b.hasStorm = true;
       whenPlayCard("first", 0);
       resolvePendingByUid(a.uid);
       resolvePendingByUid(b.uid);
       expect(Number(a.defense)).toBe(0);
       expect(Number(b.defense)).toBe(0);
+      expect(a.hasWard || a.keywordState?.hasWard).toBeFalsy();
+      expect(a.hasStorm || a.keywordState?.hasStorm).toBeFalsy();
+      expect(b.hasWard || b.keywordState?.hasWard).toBeFalsy();
+      expect(b.hasStorm || b.keywordState?.hasStorm).toBeFalsy();
     });
 
-    it("gives enemy leader Takes 1 more damage debuff", () => {
-      setupTurn(R10, { hand: [BEELZEBUB], pp: 9 });
-      const a = enemyFollower(5, 9, "A");
-      const b = enemyFollower(5, 9, "B");
-      whenPlayCard("first", 0);
-      resolvePendingByUid(a.uid);
-      resolvePendingByUid(b.uid);
-      expect(
-        (state as { redLeaderDamagePlus?: number }).redLeaderDamagePlus,
-      ).toBe(1);
-      expect(printed).toContain("Takes 1 more damage");
-    });
+    it.fails(
+      'Give the enemy leader "Takes 1 more damage." — 10474120: printed Fanfare debuff; observed applyLeaderDamage("second", 1) drops HP by 1 not 2 (state.redLeaderDamagePlus written in unified.ts Vulnerable branch; applyLeaderDamage reads leaderDamageTakenBonus)',
+      () => {
+        setupTurn(R10, { hand: [BEELZEBUB], pp: 9 });
+        const a = enemyFollower(5, 9, "A");
+        const b = enemyFollower(5, 9, "B");
+        whenPlayCard("first", 0);
+        resolvePendingByUid(a.uid);
+        resolvePendingByUid(b.uid);
+        const hpBefore = getHP(state, "second");
+        applyLeaderDamage("second", 1);
+        expect(getHP(state, "second")).toBe(hpBefore - 2);
+        expect(printed).toContain("Takes 1 more damage");
+      },
+    );
   });
 });
