@@ -32072,7 +32072,7 @@
       },
       {
         "op": "evolve",
-        "target": "ally:last_summoned",
+        "target": "last_summoned",
         "mode": "super"
       }
     ],
@@ -32118,7 +32118,7 @@
           },
           {
             "op": "evolve",
-            "target": "ally:last_summoned"
+            "target": "last_summoned"
           }
         ]
       }

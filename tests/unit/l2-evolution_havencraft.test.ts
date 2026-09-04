@@ -57,6 +57,7 @@ const DRAW_TOP = "10111310"; // Fairy Convocation
 const DRAW_SECOND = "10021110"; // Flashstep Quickblader
 const BIG_FOLLOWER = "10002120"; // Caravan Mammoth (cost 7)
 const SMALL_FOLLOWER = "10001110"; // Indomitable Fighter (cost 2)
+const THREE_COST_FOLLOWER = "10002110"; // Arriet, Luxminstrel (cost 3)
 const ENGAGE_AMULET = "10161210"; // Serene Sanctuary (Engage 1)
 const FILLER = "10111310";
 
@@ -501,6 +502,27 @@ describe("L2 — Evolution Havencraft", () => {
         getCrests(state, "first").some((c) => c.name === "Zoe, Dazzling Hope"),
       ).toBe(true);
     });
+
+    it("crest Last Words at countdown 0 summons a Zoe, Dazzling Hope that is evolved", () => {
+      setupTurn(R6, { pp: 5 });
+      const zoe = createCard(ZOE, "board", "first");
+      state.players.first.board.push(zoe);
+      state.players.first.evoCharges = 2;
+      onEvolve(zoe, "first", "normal", { spendPoint: true });
+      expect(
+        getCrests(state, "first").some((c) => c.name === "Zoe, Dazzling Hope"),
+      ).toBe(true);
+      const boardBefore = thenBoard("first").length;
+      whenEndTurn();
+      whenEndTurn();
+      expect(thenBoard("first").length).toBe(boardBefore + 1);
+      const summoned = thenBoard("first").find((c) => c.uid !== zoe.uid);
+      expect(summoned).toBeTruthy();
+      expect(summoned!.name).toBe("Zoe, Dazzling Hope");
+      expect(summoned!.hasEvolved).toBe(true);
+      expect(Number(summoned!.attack)).toBe(4);
+      expect(Number(summoned!.defense)).toBe(6);
+    });
   });
 
   describe("Erralde, Signet Convict (10964110)", () => {
@@ -706,18 +728,39 @@ describe("L2 — Evolution Havencraft", () => {
       );
     });
 
-    it.fails(() => {
+    it("Fanfare summons a ≤2-cost follower from deck and super-evolves it (+3/+3, evoType super)", () => {
       setupTurn(R8, {
         hand: [VERDILIA],
         deck: [SMALL_FOLLOWER],
         pp: 7,
       });
+      // withFirstDeck pads with synthetic PadF* cards not in the DB; force one real candidate.
+      state.players.first.deck = [createCard("10001110", "deck", "first")];
       whenPlayCard("first", 0);
       expect(deckIds()).not.toContain(SMALL_FOLLOWER);
       const summoned = thenBoard("first").find((c) => c.id === SMALL_FOLLOWER);
       expect(summoned).toBeTruthy();
-      expect(summoned!.evoType).toBe("super");
       expect(summoned!.hasEvolved).toBe(true);
+      expect(summoned!.evoType).toBe("super");
+      expect(Number(summoned!.attack)).toBe(5);
+      expect(Number(summoned!.defense)).toBe(5);
+    });
+
+    it("Fanfare with only >2-cost follower in deck summons nothing", () => {
+      setupTurn(R8, {
+        hand: [VERDILIA],
+        deck: [THREE_COST_FOLLOWER],
+        pp: 7,
+      });
+      state.players.first.deck = [
+        createCard(THREE_COST_FOLLOWER, "deck", "first"),
+      ];
+      const deckBefore = deckIds();
+      whenPlayCard("first", 0);
+      expect(deckIds()).toEqual(deckBefore);
+      expect(thenBoard("first").some((c) => c.id === THREE_COST_FOLLOWER)).toBe(
+        false,
+      );
     });
 
     it("Super-Evolve gains Crest: Verdilia & Castelle, Sisters", () => {
