@@ -9736,12 +9736,12 @@
       "status": "covered"
     },
     "10903110": {
-      "fingerprint": "ac1b8abc",
+      "fingerprint": "824ecb15",
       "gatesSatisfied": [],
       "name": "Warden of Selflessness",
       "scenarios": [
         {
-          "fingerprint": "de3fc21c",
+          "fingerprint": "b57ea914",
           "scenario": "play"
         },
         {
