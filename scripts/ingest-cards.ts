@@ -216,11 +216,10 @@ async function main() {
 
   if (!opts.dryRun && !opts.noMergeUpdate && totalNew >= 0) {
     // Always rebuild index after writes so all.json stays in sync
-    const { mergeSetsFromDisk, ALL_FILE, INDEX_FILE } =
+    const { mergeSetsFromDisk, writeMergedCardsToDisk } =
       await import("./mergeSets.js");
     const { allCards, indexData } = mergeSetsFromDisk();
-    fs.writeFileSync(ALL_FILE, JSON.stringify(allCards, null, 2));
-    fs.writeFileSync(INDEX_FILE, JSON.stringify(indexData, null, 2));
+    await writeMergedCardsToDisk(allCards, indexData);
     console.log(
       `Rebuilt cards/all.json (${allCards.length} cards) and cards/index.json`,
     );

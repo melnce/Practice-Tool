@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { writeFormattedJson } from "./lib/formatJson.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,6 +53,17 @@ export function mergeSetsFromDisk(setsDir = SETS_DIR): MergedCards {
   return { allCards, indexData };
 }
 
+/** Write merged card outputs using repo Prettier rules. */
+export async function writeMergedCardsToDisk(
+  allCards: unknown[],
+  indexData: Record<string, string>,
+  allFile = ALL_FILE,
+  indexFile = INDEX_FILE,
+): Promise<void> {
+  await writeFormattedJson(allFile, allCards);
+  await writeFormattedJson(indexFile, indexData);
+}
+
 async function main() {
   console.log(`Reading sets from: ${SETS_DIR}`);
 
@@ -68,10 +80,8 @@ async function main() {
   }
 
   console.log(`Writing combined file: ${ALL_FILE} (${allCards.length} cards)`);
-  fs.writeFileSync(ALL_FILE, JSON.stringify(allCards, null, 2));
-
   console.log(`Writing index to ${INDEX_FILE}`);
-  fs.writeFileSync(INDEX_FILE, JSON.stringify(indexData, null, 2));
+  await writeMergedCardsToDisk(allCards, indexData);
 
   console.log("Done.");
 }
