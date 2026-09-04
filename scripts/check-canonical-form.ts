@@ -15,6 +15,7 @@
  *   npx tsx scripts/check-canonical-form.ts --gate=turn-scope --fail
  *   npx tsx scripts/check-canonical-form.ts --gate=select-count --fail
  *   npx tsx scripts/check-canonical-form.ts --gate=chosen-target --fail
+ *   npx tsx scripts/check-canonical-form.ts --gate=evolve-target --fail
  *
  * Optional `--fail` promotes the selected family's warnings to exit 1.
  */
@@ -40,7 +41,7 @@ type CardJson = {
   [key: string]: unknown;
 };
 
-type Family = "turn-scope" | "select-count" | "chosen-target";
+type Family = "turn-scope" | "select-count" | "chosen-target" | "evolve-target";
 
 type Warning = {
   family: Family;
@@ -237,6 +238,51 @@ function checkSelectCount(card: CardJson): Warning[] {
   return out;
 }
 
+const EVOLVE_TARGETS = new Set([
+  "self",
+  "played_card",
+  "selected",
+  "selected:follower",
+  "last_summoned",
+  "entering_follower",
+  "all_allies",
+  "ally:follower",
+]);
+
+function checkEvolveTarget(card: CardJson): Warning[] {
+  const out: Warning[] = [];
+  walk(card, (obj, path) => {
+    const w = checkEvolveTargetAt(card, path, obj);
+    if (w) out.push(w);
+  });
+  return out;
+}
+
+function checkEvolveTargetAt(
+  card: CardJson,
+  path: string,
+  obj: Record<string, unknown>,
+): Warning | null {
+  if (obj.op !== "evolve") return null;
+  const target = obj.target;
+  if (target == null) return null;
+  const targetStr = String(target);
+  if (EVOLVE_TARGETS.has(targetStr)) return null;
+  return {
+    family: "evolve-target",
+    id: card.id,
+    name: card.name,
+    found: compact({ path, target: targetStr }),
+    canonical: compact({
+      path,
+      target: targetStr.startsWith("ally:last_summoned")
+        ? "last_summoned"
+        : "(allowlisted evolve target)",
+    }),
+    note: `evolve target must be one of: ${[...EVOLVE_TARGETS].join(", ")}`,
+  };
+}
+
 function checkChosenTarget(card: CardJson): Warning[] {
   // Key Spirit: nested select → spellboost target:"selected". Flattening would
   // rewrite the child's target to the select's "ally:hand", but ally:hand means
@@ -351,6 +397,9 @@ function main(): void {
     if (gateFilter === "all" || gateFilter === "chosen-target") {
       warnings.push(...checkChosenTarget(card));
     }
+    if (gateFilter === "all" || gateFilter === "evolve-target") {
+      warnings.push(...checkEvolveTarget(card));
+    }
   }
 
   // Dedupe identical warnings (same card can be walked via overlapping paths).
@@ -365,7 +414,8 @@ function main(): void {
   const migrated =
     gateFilter === "turn-scope" ||
     gateFilter === "select-count" ||
-    gateFilter === "chosen-target";
+    gateFilter === "chosen-target" ||
+    gateFilter === "evolve-target";
   console.log(
     migrated
       ? `Canonical-form gate — ${gateFilter} (error mode when --fail)`
@@ -376,6 +426,7 @@ function main(): void {
   printFamily("turn-scope", unique);
   printFamily("select-count", unique);
   printFamily("chosen-target", unique);
+  printFamily("evolve-target", unique);
 
   console.log(
     `\nTotal warnings: ${unique.length}` +
