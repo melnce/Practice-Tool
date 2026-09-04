@@ -455,8 +455,8 @@ describe("L2 — Evolution Havencraft", () => {
       const b = enemyFollower(2, 5, "B");
       setScriptedModePickProvider(() => [0]);
       whenPlayCard("first", 0);
-      const zoe = findOnBoard("first", "Zoe, Dazzling Hope");
-      if (zoe) expect(Number(zoe.defense)).toBe(1);
+      const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
+      expect(Number(zoe.defense)).toBe(1);
       expect(Number(a.defense)).toBe(2);
       expect(Number(b.defense)).toBe(2);
     });
@@ -466,38 +466,41 @@ describe("L2 — Evolution Havencraft", () => {
       const hpEnemyBefore = getHP(state, "second");
       setScriptedModePickProvider(() => [1]);
       whenPlayCard("first", 0);
+      const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
+      expect(Number(zoe.defense)).toBe(1);
       expect(getHP(state, "second")).toBe(hpEnemyBefore - 3);
     });
 
-    it.fails(
-      "mode 3 restores leader then deals 3 to Zoe — 10864120: printed Fanfare deals 3 to self; observed restore without self damage",
-      () => {
-        setupTurn(R6, { hand: [ZOE], pp: 5, hp: 15 });
-        const hpBefore = getHP(state, "first");
-        setScriptedModePickProvider(() => [2]);
-        whenPlayCard("first", 0);
-        const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
-        expect(getHP(state, "first")).toBe(hpBefore + 3);
-        expect(Number(zoe.defense)).toBe(1);
-      },
-    );
+    it("mode 2: Zoe survives at 1 defense and is on the board", () => {
+      setupTurn(R6, { hand: [ZOE], pp: 5 });
+      setScriptedModePickProvider(() => [1]);
+      whenPlayCard("first", 0);
+      const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
+      expect(zoe).toBeTruthy();
+      expect(Number(zoe.defense)).toBe(1);
+    });
 
-    it.fails(
-      "Evolve gains Crest: Zoe, Dazzling Hope — 10864120: evolve crest not applied",
-      () => {
-        setupTurn(R6, { hand: [ZOE], pp: 5 });
-        setScriptedModePickProvider(() => [1]);
-        whenPlayCard("first", 0);
-        const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
-        state.players.first.evoCharges = 2;
-        onEvolve(zoe, "first", "normal", { spendPoint: true });
-        expect(
-          getCrests(state, "first").some(
-            (c) => c.name === "Zoe, Dazzling Hope",
-          ),
-        ).toBe(true);
-      },
-    );
+    it("mode 3 restores leader then deals 3 to Zoe — 10864120: printed Fanfare deals 3 to self; observed restore without self damage", () => {
+      setupTurn(R6, { hand: [ZOE], pp: 5, hp: 15 });
+      const hpBefore = getHP(state, "first");
+      setScriptedModePickProvider(() => [2]);
+      whenPlayCard("first", 0);
+      const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
+      expect(getHP(state, "first")).toBe(hpBefore + 3);
+      expect(Number(zoe.defense)).toBe(1);
+    });
+
+    it("Evolve gains Crest: Zoe, Dazzling Hope — 10864120: evolve crest not applied", () => {
+      setupTurn(R6, { hand: [ZOE], pp: 5 });
+      setScriptedModePickProvider(() => [1]);
+      whenPlayCard("first", 0);
+      const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
+      state.players.first.evoCharges = 2;
+      onEvolve(zoe, "first", "normal", { spendPoint: true });
+      expect(
+        getCrests(state, "first").some((c) => c.name === "Zoe, Dazzling Hope"),
+      ).toBe(true);
+    });
   });
 
   describe("Erralde, Signet Convict (10964110)", () => {
