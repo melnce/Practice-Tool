@@ -27,6 +27,25 @@ function collectZoneEffects(card: CardInstance, zone: string): Effect[] {
   return [];
 }
 
+function effectNeedsSelection(e: Effect): boolean {
+  return (
+    !!e &&
+    (e.select === true ||
+      (typeof e.select === "number" && e.select > 0) ||
+      e.op === "select" ||
+      e.op === "mode")
+  );
+}
+
+/** Whether a replicate target zone contains effects that pause for selection. */
+export function replicatedZoneNeedsSelection(
+  card: CardInstance,
+  zone: string,
+): boolean {
+  const effects = collectZoneEffects(card, zone);
+  return effects.some((e) => effectNeedsSelection(e));
+}
+
 /**
  * Replicate a card ability zone (default fanfare) at resolve time.
  * Uses template lookup so balance changes to fanfare[] propagate.

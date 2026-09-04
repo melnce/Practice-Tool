@@ -17,6 +17,7 @@ import {
   setPP,
   addShadows,
 } from "../../../core/playerHelpers.js";
+import { replicatedZoneNeedsSelection } from "./replicate.js";
 
 // --- Helpers ---
 function boardOf(owner: Player) {
@@ -30,17 +31,33 @@ function payEngageCost(owner: Player, cost: number) {
   const cur = getPP(state, owner);
   setPP(state, owner, Math.max(0, cur - (cost | 0)));
 }
-function effectsNeedSelection(effects: Effect[] = []) {
+function effectHasSelection(e: Effect): boolean {
   return (
-    Array.isArray(effects) &&
-    effects.some(
-      (e) =>
-        e &&
-        (e.select === true ||
-          (typeof e.select === "number" && e.select > 0) ||
-          e.op === "select"),
-    )
+    !!e &&
+    (e.select === true ||
+      (typeof e.select === "number" && e.select > 0) ||
+      e.op === "select" ||
+      e.op === "mode")
   );
+}
+
+/** True when engage effects (or a replicate target zone) require player selection. */
+export function effectsNeedSelection(
+  effects: Effect[] = [],
+  card?: CardInstance,
+): boolean {
+  if (!Array.isArray(effects)) return false;
+  return effects.some((e) => {
+    if (!e) return false;
+    if (effectHasSelection(e)) return true;
+    if (e.op === "replicate" && card) {
+      return replicatedZoneNeedsSelection(
+        card,
+        (e as { zone?: string }).zone ?? "fanfare",
+      );
+    }
+    return false;
+  });
 }
 
 function removeWithLastWords(card: CardInstance, owner: Player) {
@@ -120,7 +137,7 @@ export function engageAmulet(owner: Player, index: number) {
       const effects = (
         Array.isArray(engageEffects) ? engageEffects.slice() : []
       ) as Effect[];
-      const needsSelection = effectsNeedSelection(effects);
+      const needsSelection = effectsNeedSelection(effects, card);
       const sacrifice = !!(s?.engageSacrifice ?? card.engageSacrifice);
 
       // If effects require selection
