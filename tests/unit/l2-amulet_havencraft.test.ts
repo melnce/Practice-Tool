@@ -637,8 +637,10 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
   });
 
   describe("Prostrating Coward (10661110)", () => {
-    const printed =
-      "When this follower enters the field, restore 2 defense to your leader.\nBane\nWard\nCrystallize (2): Countdown (3)\nLast Words: Summon a Prostrating Coward.";
+    const followerPrinted =
+      "When this follower enters the field, restore 2 defense to your leader.\nBane\nWard";
+    const crystallizePrinted =
+      "Crystallize (2): Countdown (3)\nLast Words: Summon a Prostrating Coward.";
 
     it("entering at 5 cost: restores 2 leader HP and has Bane and Ward", () => {
       setupTurn(R6, { hand: [PROSTRATING], pp: 5, hp: 15 });
@@ -648,6 +650,21 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       expect(coward.hasBane).toBe(true);
       expect(coward.hasWard).toBe(true);
       expect(coward.type).toBe("Follower");
+      expect(followerPrinted).toContain("restore 2 defense");
+    });
+
+    it("follower form has no Last Words: destroying it does not summon Prostrating Coward", () => {
+      setupTurn(R6, { hand: [PROSTRATING], pp: 5, hp: 20 });
+      whenPlayCard("first", 0);
+      const coward = findOnBoard("first", "Prostrating Coward")!;
+      expect(coward.type).toBe("Follower");
+      expect(Boolean(coward.hasLastWords)).toBe(false);
+      destroyTarget(coward, "first");
+      cleanupDead();
+      expect(
+        thenBoard("first").filter((c) => c.name === "Prostrating Coward"),
+      ).toHaveLength(0);
+      expect(followerPrinted).not.toContain("Last Words");
     });
 
     it("Crystallize (2): becomes amulet with Countdown (3); enter heal does not run", () => {
@@ -661,39 +678,36 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       expect(getHP(state, "first")).toBe(15);
       expect(Boolean(amulet.hasWard)).toBe(false);
       expect(Boolean(amulet.hasBane)).toBe(false);
+      expect(crystallizePrinted).toContain("Countdown (3)");
     });
 
-    it.fails(
-      "Last Words on follower form: summons Prostrating Coward — 10661110: printed text gives follower Last Words; authored data only attaches Last Words to Crystallize amulet form",
-      () => {
-        setupTurn(R6, { hand: [PROSTRATING], pp: 5, hp: 20 });
-        whenPlayCard("first", 0);
-        const coward = findOnBoard("first", "Prostrating Coward")!;
-        destroyTarget(coward, "first");
-        cleanupDead();
-        const copies = thenBoard("first").filter(
-          (c) => c.name === "Prostrating Coward" && c.type === "Follower",
-        );
-        expect(copies.length).toBeGreaterThanOrEqual(1);
-        expect(printed).toContain("Summon a Prostrating Coward");
-      },
-    );
-
-    it("Crystallize amulet Last Words: summons Prostrating Coward", () => {
+    it("Crystallize amulet Last Words: destroying amulet summons Prostrating Coward", () => {
       setupTurn(R6, { hand: [PROSTRATING], pp: 2, hp: 20 });
       playCardNoRender(getHand(state, "first"), "first", 0);
       const amulet = findOnBoard("first", "Prostrating Coward")!;
       expect(amulet.type).toBe("Amulet");
-      const lw =
-        amulet.lastWordsEffects ?? amulet.keywordState?.lastWordsEffects ?? [];
-      expect(lw.length).toBeGreaterThan(0);
-      runEffects(lw, "first", amulet);
+      destroyTarget(amulet, "first");
       cleanupDead();
       expect(
         thenBoard("first").some(
           (c) => c.name === "Prostrating Coward" && c.type === "Follower",
         ),
       ).toBe(true);
+      expect(crystallizePrinted).toContain("Summon a Prostrating Coward");
+    });
+
+    it("Crystallize amulet Last Words: at countdown 0 summons Prostrating Coward", () => {
+      setupTurn(R6, { hand: [PROSTRATING], pp: 2, hp: 20 });
+      playCardNoRender(getHand(state, "first"), "first", 0);
+      const amulet = findOnBoard("first", "Prostrating Coward")!;
+      amulet.countdown = 0;
+      cleanupDead();
+      expect(
+        thenBoard("first").some(
+          (c) => c.name === "Prostrating Coward" && c.type === "Follower",
+        ),
+      ).toBe(true);
+      expect(crystallizePrinted).toContain("Countdown (3)");
     });
   });
 
