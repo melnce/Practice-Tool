@@ -1713,32 +1713,27 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(printed).toContain("Can't be destroyed by abilities");
     });
 
-    it.fails(
-      "Clash — 10654110: enemy survives at 10 defense; allied bystander destroyed instead of opposing follower",
-      () => {
-        // Observed on main: clash_opponent resolves to ally board — foe stays at 10 def,
-        // allied 1/5 bystander is sent to the graveyard instead.
-        setupTurn(R10, { hand: [ARMES], pp: 9 });
-        whenPlayCard("first", 0);
-        const armes = findOnBoard("first", "Armes, Depletive Demon")!;
-        applyKeywordsFromList(armes);
-        const bystander = allyFollower("Bystander", 1, 5);
-        armes.can_attack = true;
-        armes.can_attack_followers = true;
-        armes.attacks_left = 1;
-        armes.justPlayed = false;
-        const foe = enemyFollower(2, 20, "ClashFoe");
-        const bystanderUid = bystander.uid;
-        const foeUid = foe.uid;
-        attackFollower(0, 0, "first", "second");
-        cleanupDead();
-        expect(getBoard(state, "second").some((c) => c.uid === foeUid)).toBe(
-          false,
-        );
-        expect(isInEitherGraveyard(bystanderUid)).toBe(false);
-        expect(printed).toContain("Destroy the opposing follower");
-      },
-    );
+    it("Clash — 10654110: Destroy the opposing follower", () => {
+      setupTurn(R10, { hand: [ARMES], pp: 9 });
+      whenPlayCard("first", 0);
+      const armes = findOnBoard("first", "Armes, Depletive Demon")!;
+      applyKeywordsFromList(armes);
+      const bystander = allyFollower("Bystander", 1, 5);
+      armes.can_attack = true;
+      armes.can_attack_followers = true;
+      armes.attacks_left = 1;
+      armes.justPlayed = false;
+      const foe = enemyFollower(2, 20, "ClashFoe");
+      const bystanderUid = bystander.uid;
+      const foeUid = foe.uid;
+      attackFollower(0, 0, "first", "second");
+      cleanupDead();
+      expect(getBoard(state, "second").some((c) => c.uid === foeUid)).toBe(
+        false,
+      );
+      expect(isInEitherGraveyard(bystanderUid)).toBe(false);
+      expect(printed).toContain("Destroy the opposing follower");
+    });
 
     it("Super-Evolve grants 3 attacks per turn", () => {
       setupTurn(R10, { hand: [ARMES], pp: 9 });

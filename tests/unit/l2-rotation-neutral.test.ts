@@ -754,33 +754,27 @@ describe("L2 — Rotation Neutral", () => {
       expect(printed).toContain("Give this follower Barrier");
     });
 
-    it.fails(
-      "Follower Strike: opposing follower cannot attack — 10704110 grants cant_attack trigger to self instead of clash opponent",
-      () => {
-        const { foe } = setupIllamritaStrike();
-        applyKeywordsFromList(foe);
-        expect(
-          foe.hasCantAttack ||
-            foe.keywordState?.cantAttack ||
-            foe.triggers?.some((t) => t.event === "end_of_turn"),
-        ).toBe(true);
-      },
-    );
+    it("Follower Strike: opposing follower cannot attack — 10704110", () => {
+      const { foe } = setupIllamritaStrike();
+      applyKeywordsFromList(foe);
+      expect(
+        foe.hasCantAttack ||
+          foe.keywordState?.cantAttack ||
+          foe.triggers?.some((t) => t.event === "end_of_turn"),
+      ).toBe(true);
+    });
 
-    it.fails(
-      "Follower Strike: banishes opposing follower at end of its controller's turn — 10704110 attaches banish trigger to Illamrita instead",
-      () => {
-        const { illa, foe } = setupIllamritaStrike();
-        runEndOfTurnBoundary("first");
-        expect(getBoard(state, "first").some((c) => c.uid === illa.uid)).toBe(
-          true,
-        );
-        runEndOfTurnBoundary("second");
-        expect(getBanish(state, "second").some((c) => c.uid === foe.uid)).toBe(
-          true,
-        );
-      },
-    );
+    it("Follower Strike: banishes opposing follower at end of its controller's turn — 10704110", () => {
+      const { illa, foe } = setupIllamritaStrike();
+      runEndOfTurnBoundary("first");
+      expect(getBoard(state, "first").some((c) => c.uid === illa.uid)).toBe(
+        true,
+      );
+      runEndOfTurnBoundary("second");
+      expect(getBanish(state, "second").some((c) => c.uid === foe.uid)).toBe(
+        true,
+      );
+    });
 
     it("Last Words: gains Crest: Illamrita, Designated Target with Countdown (2)", () => {
       setupTurn(R8, { hand: [ILLAMRITA], pp: 6 });
