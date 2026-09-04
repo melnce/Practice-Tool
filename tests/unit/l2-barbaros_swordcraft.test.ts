@@ -705,23 +705,35 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       expect(printed).toContain("Advance the counts");
     });
 
-    it.fails(
-      "Fanfare advances all allied Dread Pirate's Flags on the field by 5 — 10924110: printed text advances every copy including the Fanfare summon; pre-existing Flag reaches 2 but the Flag summoned in the same Fanfare stays at 7",
-      () => {
-        setupTurn(R8, { hand: [BARBAROS], pp: 7 });
-        const preFlag = createCard(DREAD_PIRATE_FLAG, "board", "first");
-        preFlag.countdown = 7;
-        state.players.first.board.push(preFlag);
-        whenPlayCard("first", 0);
-        const flags = thenBoard("first").filter(
-          (c) => c.id === DREAD_PIRATE_FLAG,
-        );
-        expect(flags).toHaveLength(2);
-        expect(Number(preFlag.countdown)).toBe(2);
-        const summoned = flags.find((f) => f.uid !== preFlag.uid)!;
-        expect(Number(summoned.countdown)).toBe(2);
-      },
-    );
+    it("Fanfare advances all allied Dread Pirate's Flags on the field by 5", () => {
+      setupTurn(R8, { hand: [BARBAROS], pp: 7 });
+      const preFlag = createCard(DREAD_PIRATE_FLAG, "board", "first");
+      preFlag.countdown = 7;
+      state.players.first.board.push(preFlag);
+      const bystander = createCard(
+        {
+          name: "Other Amulet",
+          type: "Amulet",
+          cost: 1,
+          attack: 0,
+          defense: 0,
+        },
+        "board",
+        "first",
+      );
+      bystander.hasCountdown = true;
+      bystander.countdown = 5;
+      state.players.first.board.push(bystander);
+      whenPlayCard("first", 0);
+      const flags = thenBoard("first").filter(
+        (c) => c.id === DREAD_PIRATE_FLAG,
+      );
+      expect(flags).toHaveLength(2);
+      expect(Number(preFlag.countdown)).toBe(2);
+      const summoned = flags.find((f) => f.uid !== preFlag.uid)!;
+      expect(Number(summoned.countdown)).toBe(2);
+      expect(Number(bystander.countdown)).toBe(5);
+    });
 
     it("has Storm on field", () => {
       setupTurn(R8, { hand: [BARBAROS], pp: 7 });

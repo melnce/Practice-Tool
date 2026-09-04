@@ -142,16 +142,23 @@ function handleBoardAmuletCountdown(
   );
   if (!pool.length) return;
 
-  const need = Math.max(1, parseInt(String((eff as any).select ?? 1), 10) || 1);
+  const rawSelect = (eff as any).select;
+  const hasSelect =
+    rawSelect !== undefined && rawSelect !== null && rawSelect !== "";
   const picks: CardInstance[] = [];
-  if ((eff as any).select_mode === "random" || (eff as any).random) {
-    const copy = [...pool];
-    for (let i = 0; i < need && copy.length; i++) {
-      const idx = state.rng.nextInt(copy.length);
-      picks.push(copy.splice(idx, 1)[0]!);
-    }
+  if (!hasSelect) {
+    picks.push(...pool);
   } else {
-    picks.push(...pool.slice(0, need));
+    const need = Math.max(1, parseInt(String(rawSelect), 10) || 1);
+    if ((eff as any).select_mode === "random" || (eff as any).random) {
+      const copy = [...pool];
+      for (let i = 0; i < need && copy.length; i++) {
+        const idx = state.rng.nextInt(copy.length);
+        picks.push(copy.splice(idx, 1)[0]!);
+      }
+    } else {
+      picks.push(...pool.slice(0, need));
+    }
   }
   for (const card of picks) {
     handleAmuletCountdown(card, action, amount);
