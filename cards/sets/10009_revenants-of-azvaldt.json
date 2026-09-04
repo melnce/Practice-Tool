@@ -161,6 +161,13 @@
         "op": "add_to_hand",
         "name": "Jailor of Antiquity",
         "count": 1
+      },
+      {
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": "{hand_class_count:Neutral}",
+        "count": 2,
+        "distribution": "random_distinct"
       }
     ]
   },

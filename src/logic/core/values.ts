@@ -93,6 +93,17 @@ export function resolveDynamicValue(
       return hand.length | 0;
     }
   }
+  // Count of cards in the acting player's hand whose class matches the argument.
+  // Resolved at effect time (e.g. after an earlier add_to_hand in the same Fanfare).
+  if (s.startsWith("{hand_class_count:") && s.endsWith("}")) {
+    const owner = context.owner;
+    if (owner) {
+      const cls = s.slice("{hand_class_count:".length, -1).trim().toLowerCase();
+      const hand = getHand(state, owner) || [];
+      return hand.filter((c) => String(c.class ?? "").toLowerCase() === cls)
+        .length;
+    }
+  }
   if (s === "{earth_counter_sum}") {
     if (context.owner) {
       const board = getBoard(state, context.owner);
