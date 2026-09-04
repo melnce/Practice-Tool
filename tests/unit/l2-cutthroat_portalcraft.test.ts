@@ -316,7 +316,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
         pp: 1,
       });
       whenPlayCard("first", 0);
-      resolvePendingByUid(getHand(state, "first").find((c) => c.id === FILLER)!.uid);
+      resolvePendingByUid(
+        getHand(state, "first").find((c) => c.id === FILLER)!.uid,
+      );
       expect(handIds()).not.toContain(DISGRACEFUL);
       expect(handIds().length).toBe(1);
       expect(printed).toContain("Draw a card");
@@ -329,7 +331,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
         pp: 1,
       });
       whenPlayCard("first", 0);
-      resolvePendingByUid(getHand(state, "first").find((c) => c.id === FILLER)!.uid);
+      resolvePendingByUid(
+        getHand(state, "first").find((c) => c.id === FILLER)!.uid,
+      );
       expect(getHand(state, "first").length).toBe(3);
     });
   });
@@ -644,7 +648,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const imari = findOnBoard("first", "Imari, Dewdrop")!;
       state.players.first.evoCharges = 2;
       onEvolve(imari, "first", "normal", { spendPoint: true });
-      const spellIdx = getHand(state, "first").findIndex((c) => c.id === SPELL_A);
+      const spellIdx = getHand(state, "first").findIndex(
+        (c) => c.id === SPELL_A,
+      );
       whenPlayCard("first", spellIdx);
       expect(
         thenBoard("first").some((c) => c.name === "Imari's Little Buddies"),
@@ -660,7 +666,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const discard = getHand(state, "first").find((c) => c.id === DRAW_TOP)!;
       whenPlayCard("first", 0);
       resolvePendingByUid(discard.uid);
-      const spellIdx = getHand(state, "first").findIndex((c) => c.id === SPELL_A);
+      const spellIdx = getHand(state, "first").findIndex(
+        (c) => c.id === SPELL_A,
+      );
       whenPlayCard("first", spellIdx);
       expect(
         thenBoard("first").some((c) => c.name === "Imari's Little Buddies"),
@@ -753,7 +761,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
     it("owner's EOT adds another Puppet to hand", () => {
       setupTurn(R5, { hand: [PUPPET_THEATER], pp: 2 });
       whenPlayCard("first", 0);
-      const puppetsAfterFanfare = handIds().filter((id) => id === PUPPET).length;
+      const puppetsAfterFanfare = handIds().filter(
+        (id) => id === PUPPET,
+      ).length;
       whenEndTurn();
       expect(handIds().filter((id) => id === PUPPET).length).toBeGreaterThan(
         puppetsAfterFanfare,
@@ -813,16 +823,13 @@ describe("L2 — Cutthroat Portalcraft", () => {
   });
 
   describe("Altaro, Mayor of Babelon (10704120)", () => {
-    const printed =
-      "Ambush\nAt the end of your turn, draw a card.";
+    const printed = "Ambush\nAt the end of your turn, draw a card.";
 
     it("has Ambush on field", () => {
       setupTurn(R6, { hand: [ALTARO], pp: 3 });
       whenPlayCard("first", 0);
       const altaro = findOnBoard("first", "Altaro, Mayor of Babelon")!;
-      expect(
-        altaro.hasAmbush || altaro.keywordState?.hasAmbush,
-      ).toBe(true);
+      expect(altaro.hasAmbush || altaro.keywordState?.hasAmbush).toBe(true);
     });
 
     it("owner's EOT draws a card", () => {
@@ -838,7 +845,12 @@ describe("L2 — Cutthroat Portalcraft", () => {
     });
 
     it("opponent's EOT does not draw from allied Altaro", () => {
-      setupTurn(R6, { hand: [ALTARO], deck: [DRAW_TOP], pp: 3, active: "second" });
+      setupTurn(R6, {
+        hand: [ALTARO],
+        deck: [DRAW_TOP],
+        pp: 3,
+        active: "second",
+      });
       whenPlayCard("first", 0);
       const handBefore = handIds().length;
       runEndOfTurnBoundary("second");
@@ -876,7 +888,8 @@ describe("L2 — Cutthroat Portalcraft", () => {
         thenBoard("first").filter((c) => c.name === "Mystic Artifact").length,
       ).toBe(0);
       expect(
-        thenBoard("first").filter((c) => c.name === "Analyzing Artifact").length,
+        thenBoard("first").filter((c) => c.name === "Analyzing Artifact")
+          .length,
       ).toBe(1);
     });
 
@@ -888,9 +901,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
         (c) => c.name === "Analyzing Artifact",
       );
       expect(artifacts.length).toBeGreaterThanOrEqual(2);
-      expect(
-        artifacts.every((c) => c.hasRush || c.keywordState?.hasRush),
-      ).toBe(true);
+      expect(artifacts.every((c) => c.hasRush || c.keywordState?.hasRush)).toBe(
+        true,
+      );
     });
   });
 
@@ -940,9 +953,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       setupTurn(R6, { hand: [SLAUS], pp: 3 });
       whenPlayCard("first", 0);
       const slaus = findOnBoard("first", "Slaus, Revolving Wheel of Fortune")!;
-      expect(
-        slaus.hasAmbush || slaus.keywordState?.hasAmbush,
-      ).toBe(true);
+      expect(slaus.hasAmbush || slaus.keywordState?.hasAmbush).toBe(true);
     });
 
     it("evolved owner's EOT banishes Slaus and gives opponent crest", () => {
@@ -1030,9 +1041,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const barkeep = findOnBoard("first", "Brusque Barkeep")!;
       state.players.first.evoCharges = 2;
       onEvolve(barkeep, "first", "normal", { spendPoint: true });
-      expect(
-        thenBoard("first").some((c) => c.name === "Mystic Artifact"),
-      ).toBe(true);
+      expect(thenBoard("first").some((c) => c.name === "Mystic Artifact")).toBe(
+        true,
+      );
     });
   });
 
@@ -1229,7 +1240,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
       );
       state.players.second.hand.push(handFoe);
       whenPlayCard("first", 0);
-      const buffed = getHand(state, "second").find((c) => c.uid === handFoe.uid)!;
+      const buffed = getHand(state, "second").find(
+        (c) => c.uid === handFoe.uid,
+      )!;
       expect(Number(buffed?.attack ?? 0)).toBeGreaterThanOrEqual(2);
       expect(printed).toContain("+1/+0");
     });
@@ -1315,8 +1328,12 @@ describe("L2 — Cutthroat Portalcraft", () => {
     it("summons Ludicrous, Shoddy, Substandard each with +0/+1", () => {
       setupTurn(R8, { hand: [MYRIAD], pp: 6 });
       whenPlayCard("first", 0);
-      const lud = thenBoard("first").find((c) => c.name === "Ludicrous Ordnance");
-      const shod = thenBoard("first").find((c) => c.name === "Shoddy Plaything");
+      const lud = thenBoard("first").find(
+        (c) => c.name === "Ludicrous Ordnance",
+      );
+      const shod = thenBoard("first").find(
+        (c) => c.name === "Shoddy Plaything",
+      );
       const sub = thenBoard("first").find(
         (c) => c.name === "Substandard Puppet",
       );
@@ -1456,8 +1473,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       setupTurn(R8, { hand: [CAMISCILLA], pp: 7 });
       whenPlayCard("first", 0);
       const toys = thenBoard("first").filter(
-        (c) =>
-          c.name === "Shoddy Plaything" || c.name === "Substandard Puppet",
+        (c) => c.name === "Shoddy Plaything" || c.name === "Substandard Puppet",
       );
       expect(toys.length).toBe(2);
       expect(toys.every((c) => c.hasEvolved)).toBe(true);
@@ -1482,7 +1498,8 @@ describe("L2 — Cutthroat Portalcraft", () => {
       setupTurn(R10, { hand: [LUDICROUS], pp: 8 });
       whenPlayCard("first", 0);
       expect(
-        thenBoard("first").filter((c) => c.name === "Ludicrous Ordnance").length,
+        thenBoard("first").filter((c) => c.name === "Ludicrous Ordnance")
+          .length,
       ).toBe(3);
     });
 
@@ -1520,7 +1537,8 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const outcome = playCardNoRender(getHand(state, "first"), "first", 0);
       expect(outcome.kind).toBe("done");
       expect(
-        thenBoard("first").filter((c) => c.name === "Ludicrous Ordnance").length,
+        thenBoard("first").filter((c) => c.name === "Ludicrous Ordnance")
+          .length,
       ).toBe(1);
     });
   });
@@ -1571,7 +1589,9 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       resolvePendingByUid(a.uid);
       resolvePendingByUid(b.uid);
-      expect((state as { redLeaderDamagePlus?: number }).redLeaderDamagePlus).toBe(1);
+      expect(
+        (state as { redLeaderDamagePlus?: number }).redLeaderDamagePlus,
+      ).toBe(1);
       expect(printed).toContain("Takes 1 more damage");
     });
   });
