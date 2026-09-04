@@ -10,16 +10,46 @@ import type {
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 import { getHand, getDeck } from "../../../core/playerHelpers.js";
 
-function putBack(card: CardInstance, owner: Player) {
+type PutBackOpts = { deferShuffle?: boolean };
+
+function markDeferredShuffle(owner: Player) {
+  const bag = (state as any)._deferredDeckShuffle as Set<Player> | undefined;
+  if (bag) bag.add(owner);
+  else (state as any)._deferredDeckShuffle = new Set<Player>([owner]);
+}
+
+/** Flush any deck shuffles deferred during return-then-draw chains. */
+export function flushDeferredDeckShuffle(owner?: Player) {
+  const bag = (state as any)._deferredDeckShuffle as Set<Player> | undefined;
+  if (!bag?.size) return;
+  const players = owner ? [owner] : [...bag];
+  for (const p of players) {
+    if (!bag.has(p)) continue;
+    shuffleInPlace(getDeck(state, p));
+    bag.delete(p);
+  }
+  if (!bag.size) delete (state as any)._deferredDeckShuffle;
+}
+
+function putBack(card: CardInstance, owner: Player, opts: PutBackOpts = {}) {
   const hand = getHand(state, owner);
   const deck = getDeck(state, owner);
   const idx = hand.indexOf(card);
   if (idx < 0) return false;
   const [removed] = hand.splice(idx, 1);
   if (!removed) return false;
-  deck.push(removed);
-  shuffleInPlace(deck);
+  if (opts.deferShuffle) {
+    deck.unshift(removed);
+    markDeferredShuffle(owner);
+  } else {
+    deck.push(removed);
+    shuffleInPlace(deck);
+  }
   return true;
+}
+
+function hasFollowingEffects(effectsQueue: any[] = []) {
+  return Array.isArray(effectsQueue) && effectsQueue.length > 0;
 }
 
 /**
@@ -32,6 +62,7 @@ export function handleReturnHandToDeck(
   effectsQueue: any[] = [],
 ) {
   const hand = getHand(state, owner);
+  const deferShuffle = hasFollowingEffects(effectsQueue);
 
   // Support returning the entire hand (e.g., Dimension Climb)
   const wantAll =
@@ -43,21 +74,18 @@ export function handleReturnHandToDeck(
     const returnedCount = hand.length;
     // Return everything currently in hand
     while (hand.length) {
-      // putBack shuffles each time; that's fine, or replace with a single shuffle if you prefer
       const first = hand[0];
       if (!first) break;
-      putBack(first, owner);
+      putBack(first, owner, { deferShuffle });
     }
     (state as any).lastReturnedCount = returnedCount;
     logEvent("returnHandToDeckAll", { owner, count: returnedCount });
-    // Render removed - UI layer
     return "done";
   }
 
   // If empty hand:
   if (hand.length === 0) {
     if ((eff as any).optional) {
-      // optional bounce: do nothing and keep resolving
       return "done";
     }
     console.warn("[return_hand_to_deck] no card to return — blocking chain");
@@ -85,14 +113,13 @@ export function handleReturnHandToDeck(
       const card = bag.splice(index, 1)[0];
       if (card) chosen.push(card);
     }
-    for (const card of chosen) putBack(card, owner);
+    for (const card of chosen) putBack(card, owner, { deferShuffle });
     (state as any).lastReturnedCount = chosen.length;
     logEvent("returnHandToDeckRandom", { owner, count: chosen.length });
     return "done";
   }
 
   if ((eff as any).select) {
-    // Canonical `select` wins; `select_count` is legacy fallback only.
     const selectCount =
       parseInt(
         String((eff as any).select ?? (eff as any).select_count ?? 1),
@@ -110,23 +137,24 @@ export function handleReturnHandToDeck(
       owner,
       sourceCard: null,
       resumeEffects: resume,
-      pool: hand, // <-- Add this (the pool is the hand)
-      targets: [], // <-- Add this
+      pool: hand,
+      targets: [],
       selectCount,
     });
-    hand.forEach((c) => ((c as any).__uiSelectable = true)); // This is effectively highlightSelectable(pool)
-    // Render removed - UI layer
+    hand.forEach((c) => ((c as any).__uiSelectable = true));
     return "pending";
   }
 
-  // no-select fallback
   const first = hand[0];
-  if (first) putBack(first, owner);
-  // Render removed - UI layer
+  if (first) putBack(first, owner, { deferShuffle });
   return "done";
 }
 
-export function resolveReturnHandToDeck(target: CardInstance, owner: Player) {
+export function resolveReturnHandToDeck(
+  target: CardInstance,
+  owner: Player,
+  opts: PutBackOpts = {},
+) {
   logEvent("returnHandToDeck", { owner, card: target.name, uid: target.uid });
-  putBack(target, owner);
+  putBack(target, owner, opts);
 }
