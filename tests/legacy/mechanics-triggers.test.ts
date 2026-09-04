@@ -17,7 +17,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import "./setup.js";
+import "../fixtures/setup.ts";
 import {
     givenGameState,
     resetUidCounter,

@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import generatedSpecs from "./specs/generated_specs.json";
+import generatedSpecs from "../specs/generated_specs.json";
 import {
     givenGameState,
     resetUidCounter,
@@ -21,8 +21,8 @@ import {
     thenHand,
     thenHP,
     captureStateSnapshot,
-} from "./harness/builders.js";
-import { state } from "../src/core/gameState.js";
+} from "../harness/builders.js";
+import { state } from "../../src/core/gameState.js";
 import type { PlayerSlot, Effect } from "../src/core/types/index.js";
 
 // =============================================================================

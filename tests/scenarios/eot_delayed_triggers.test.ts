@@ -1,82 +1,77 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { state, resetGameState } from "../../src/core/gameState.js";
-import { endTurnBlue, endTurnRed } from "../../src/logic/core/turns.js";
-import { registerTrigger } from "../../src/logic/core/triggers.js";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import "../audit/setup.ts";
+import {
+  givenGameState,
+  createCard,
+  resetUidCounter,
+} from "../harness/builders.js";
+import { state } from "../../src/core/gameState.js";
+import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { checkStateIntegrity } from "../../src/logic/debug/stateIntegrity.js";
-import { CardInstance } from "../../src/core/types/index.js";
-
-function createCard(id: string, name: string): CardInstance {
-  return {
-    uid: id,
-    name: name,
-    type: "Follower",
-    cost: 1,
-    base_cost: 1,
-    attack: 1,
-    base_attack: 1,
-    defense: 1,
-    base_defense: 1,
-    keywordState: {},
-    zone: "board",
-  } as any;
-}
+import { getHP } from "../../src/core/playerHelpers.js";
+import "../../src/logic/core/effects/index.js";
 
 describe("Scenario: End of Turn Delayed Triggers", () => {
   beforeEach(() => {
-    resetGameState(1);
-    // Setup initial basic state
-    state.players.first.hp = 20;
-    state.players.second.hp = 20;
+    resetUidCounter();
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
+      .withFirstHP(20, 20)
+      .withSecondHP(20, 20)
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
   });
 
   afterEach(() => {
     checkStateIntegrity(state);
   });
 
-  it("should fire delayed effects at end of turn and clean up", () => {
-    const ally = createCard("ally_trigger", "TriggerUnit");
-    state.players.first.board.push(ally);
+  it("fires delayed effects at end of turn and cleans up", () => {
+    const ally = createCard(
+      {
+        name: "TriggerUnit",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [{ op: "damage", amount: 1, target: "enemy:leader" }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    state.players.first.board = [ally];
 
-    // 1. Manually register a delayed trigger
-    // This simulates a card effect saying "At the end of your turn, deal 1 damage to enemy leader"
-    const triggerDef = {
-      event: "end_of_turn",
-      effects: [{ op: "damage", amount: 1, target: "enemy:leader" }],
-    };
-
-    // This is typically done by `registerTrigger` or implicitly via card metadata
-    registerTrigger(ally, triggerDef);
-
-    // Verify initial state
-    expect(state.players.second.hp).toBe(20);
-
-    // 2. End Turn (Blue)
-    endTurnBlue();
-
-    // 3. Assertions
-    // Effect should have fired
-    expect(state.players.second.hp).toBe(19);
-
-    // Trigger maintenance check?
-    // Note: Permanent triggers (from card text) persist.
-    // Temporary ones might expire, but here we registered a standard trigger.
-    // We assert the system processed the event queue.
+    expect(getHP(state, "second")).toBe(20);
+    runEndOfTurnBoundary("first");
+    expect(getHP(state, "second")).toBe(19);
   });
 
-  it("should NOT fire opponents end of turn triggers", () => {
-    const enemy = createCard("enemy_trigger", "EnemyUnit");
-    state.players.second.board.push(enemy);
+  it("does NOT fire opponent end-of-turn triggers on owner's boundary", () => {
+    const enemy = createCard(
+      {
+        name: "EnemyUnit",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [{ op: "damage", amount: 5, target: "enemy:leader" }],
+          },
+        ],
+      },
+      "board",
+      "second",
+    );
+    state.players.second.board = [enemy];
 
-    // Enemy has a trigger "At the end of YOUR (Red's) turn..."
-    registerTrigger(enemy, {
-      event: "end_of_turn",
-      effects: [{ op: "damage", amount: 5, target: "enemy:leader" }], // 'enemy' relative to Red is Blue
-    });
-
-    // End BLUE's turn
-    endTurnBlue();
-
-    // Blue ended turn, so it's not Red's EOT. Red's trigger should not fire.
-    expect(state.players.first.hp).toBe(20);
+    runEndOfTurnBoundary("first");
+    expect(getHP(state, "first")).toBe(20);
   });
 });
