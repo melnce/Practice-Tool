@@ -16,11 +16,7 @@ import {
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import {
-  getBoard,
-  getDeck,
-  getHP,
-} from "../../src/core/playerHelpers.js";
+import { getBoard, getDeck, getHP } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
 const EPHEMERAL_FOXFIRE = "10843310";
