@@ -785,24 +785,21 @@ describe("L2 — Rotation Neutral", () => {
       expect(printed).toContain("Gain Crest");
     });
 
-    it.fails(
-      "crest Last Words: summons evolved Illamrita — 10704110 crest summon arrives unevolved (1/4, hasEvolved falsy)",
-      () => {
-        setupTurn(R8, { hand: [ILLAMRITA], pp: 6 });
-        whenPlayCard("first", 0);
-        const illa = findOnBoard("first", "Illamrita, Designated Target")!;
-        illa.defense = 0;
-        cleanupDead();
-        whenEndTurn();
-        whenEndTurn();
-        whenEndTurn();
-        whenEndTurn();
-        expect(crestNamed("Illamrita, Designated Target")).toBeFalsy();
-        const summoned = findOnBoard("first", "Illamrita, Designated Target")!;
-        expect(summoned.hasEvolved || summoned.isEvolved).toBe(true);
-        expect(crestPrinted).toContain("evolve it");
-      },
-    );
+    it("crest Last Words: summons evolved Illamrita — 10704110", () => {
+      setupTurn(R8, { hand: [ILLAMRITA], pp: 6 });
+      whenPlayCard("first", 0);
+      const illa = findOnBoard("first", "Illamrita, Designated Target")!;
+      illa.defense = 0;
+      cleanupDead();
+      whenEndTurn();
+      whenEndTurn();
+      whenEndTurn();
+      whenEndTurn();
+      expect(crestNamed("Illamrita, Designated Target")).toBeFalsy();
+      const summoned = findOnBoard("first", "Illamrita, Designated Target")!;
+      expect(summoned.hasEvolved || summoned.isEvolved).toBe(true);
+      expect(crestPrinted).toContain("evolve it");
+    });
   });
 
   describe("Alfied, Squire of Joy (10802110)", () => {

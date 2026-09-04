@@ -25685,8 +25685,11 @@
                 "op": "summon",
                 "source": "named",
                 "name": "Illamrita, Designated Target",
-                "count": 1,
-                "evolve_summons": true
+                "count": 1
+              },
+              {
+                "op": "evolve",
+                "target": "last_summoned"
               }
             ]
           }
