@@ -118,7 +118,10 @@ function queueTurnBoundaryTriggers(
   const turnToken = Number.isFinite(state.turnNumber)
     ? state.turnNumber
     : (state.roundCount || 0) * 2 + (state.activePlayer === "first" ? 0 : 1);
-  const context: TriggerContext = { _turnNumber: turnToken };
+  const context: TriggerContext = {
+    _turnNumber: turnToken,
+    _triggerEvent: event,
+  };
   const queued: QueuedTurnTrigger[] = [];
   let order = 0;
 

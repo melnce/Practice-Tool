@@ -43,7 +43,6 @@ export function handleBuffEvent(
   context: TriggerContext,
 ) {
   dispatchOrderedTriggers(event, activePlayer, context, {
-    skipCommonConditions: true,
     skipTracking: true,
     predicate: (trigger, cand) => {
       const t = context.target;
