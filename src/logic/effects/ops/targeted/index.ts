@@ -11,6 +11,7 @@ import { bounceToHand } from "../bounce.js";
 import {
   resolveReturnHandToDeck,
   flushDeferredDeckShuffle,
+  countPendingDraws,
 } from "../returnHandToDeck.js";
 // clearSelectableFlags is NOT imported because handlers must not use it.
 import { fireTrigger } from "../../../core/triggers.js";
@@ -380,12 +381,13 @@ TARGETED_OP_HANDLERS.set("return", (ctx) => {
     destination === "deck" &&
     Array.isArray(resumeEffects) &&
     resumeEffects.length > 0;
+  const pendingDraws = deferShuffle ? countPendingDraws(resumeEffects) : 0;
   for (const target of targets) {
     if (destination === "hand") {
       bounceToHand(target);
       logEvent("bounce", { owner, target: target.name });
     } else if (destination === "deck") {
-      resolveReturnHandToDeck(target, owner, { deferShuffle });
+      resolveReturnHandToDeck(target, owner, { deferShuffle, pendingDraws });
       logEvent("returnToDeck", { owner, target: target.name });
     }
   }
