@@ -759,28 +759,52 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
       expect(zerael.hasIntimidate).toBe(true);
     });
 
-    it.fails(
-      "EOT with full cost ladder invokes from deck to board — 10904110: printed text requires deck Invoke at end of turn; card data has no invoke block",
-      () => {
-        setupTurn(10, { hand: [], pp: 9 });
-        const zerael = createCard(ZERAEL, "deck", "first");
-        state.players.first.deck = [zerael, ...state.players.first.deck];
-        for (let c = 1; c <= 8; c++) recordPlayedBaseCost(state, "first", c);
-        whenEndTurn();
-        expect(findOnBoard("first", "Zerael, Sundered Rebirth")).toBeDefined();
-        expect(deckIds()).not.toContain(ZERAEL);
-        expect(printed).toContain("Invoke this card");
-      },
-    );
+    it("EOT with full cost ladder invokes from deck to board by uid", () => {
+      setupTurn(10, { hand: [], pp: 9 });
+      const zerael = createCard(ZERAEL, "deck", "first");
+      const zeraelUid = zerael.uid;
+      state.players.first.deck = [zerael, ...state.players.first.deck];
+      for (let c = 1; c <= 8; c++) recordPlayedBaseCost(state, "first", c);
+      whenEndTurn();
+      const onBoard = thenBoard("first").find((c) => c.uid === zeraelUid);
+      expect(onBoard).toBeDefined();
+      expect(thenDeck("first").some((c) => c.uid === zeraelUid)).toBe(false);
+      expect(printed).toContain("Invoke this card");
+    });
 
     it("EOT with incomplete ladder does not invoke from deck", () => {
       setupTurn(10, { hand: [], pp: 9 });
       const zerael = createCard(ZERAEL, "deck", "first");
+      const zeraelUid = zerael.uid;
       state.players.first.deck = [zerael, ...state.players.first.deck];
       for (let c = 1; c <= 7; c++) recordPlayedBaseCost(state, "first", c);
       whenEndTurn();
-      expect(findOnBoard("first", "Zerael, Sundered Rebirth")).toBeUndefined();
-      expect(deckIds()).toContain(ZERAEL);
+      expect(thenBoard("first").some((c) => c.uid === zeraelUid)).toBe(false);
+      expect(thenDeck("first").some((c) => c.uid === zeraelUid)).toBe(true);
+    });
+
+    it("full ladder at opponent EOT does not invoke from deck", () => {
+      setupTurn(10, { hand: [], pp: 9 });
+      state.activePlayer = "second";
+      const zerael = createCard(ZERAEL, "deck", "first");
+      const zeraelUid = zerael.uid;
+      state.players.first.deck = [zerael, ...state.players.first.deck];
+      for (let c = 1; c <= 8; c++) recordPlayedBaseCost(state, "first", c);
+      whenEndTurn();
+      expect(thenBoard("first").some((c) => c.uid === zeraelUid)).toBe(false);
+      expect(thenDeck("first").some((c) => c.uid === zeraelUid)).toBe(true);
+    });
+
+    it("Invoke does not trigger Fanfare damage", () => {
+      setupTurn(10, { hand: [], pp: 9 });
+      const zerael = createCard(ZERAEL, "deck", "first");
+      state.players.first.deck = [zerael, ...state.players.first.deck];
+      const target = enemyFollower(2, 12, "Target");
+      for (let c = 1; c <= 8; c++) recordPlayedBaseCost(state, "first", c);
+      whenEndTurn();
+      expect(findOnBoard("first", "Zerael, Sundered Rebirth")).toBeDefined();
+      expect(Number(target.defense)).toBe(12);
+      expect(state.pendingTargetEffect).toBeUndefined();
     });
   });
 });
