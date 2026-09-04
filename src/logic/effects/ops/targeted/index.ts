@@ -222,7 +222,7 @@ TARGETED_OP_HANDLERS.set("keyword", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
-  const { owner, targetUids, resumeEffects } = ctx;
+  const { owner, targetUids } = ctx;
   const hand = getHand(state, owner);
   const grave = getGraveyard(state, owner);
   const discarded: CardInstance[] = [];
@@ -244,21 +244,19 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
   if (discarded.length) {
     rememberDiscardedCards(discarded);
   }
-  if (resumeEffects) {
-    for (const dc of discarded) {
-      const fx = (dc as any).on_discard;
-      if (!Array.isArray(fx) || !fx.length) continue;
-      for (let i = fx.length - 1; i >= 0; i--) {
-        resumeEffects.unshift(fx[i]);
-      }
-    }
+  for (const dc of discarded) {
+    const fx = (dc as any).on_discard;
+    if (!Array.isArray(fx) || !fx.length) continue;
+    runWithBypass(() => {
+      runEffects([...fx], owner, dc);
+    });
   }
   return { kind: "handled" };
 });
 
 // Unified discard op - same logic as discard_select_hand
 TARGETED_OP_HANDLERS.set("discard", (ctx) => {
-  const { owner, targetUids, resumeEffects } = ctx;
+  const { owner, targetUids } = ctx;
   const hand = getHand(state, owner);
   const grave = getGraveyard(state, owner);
   const discarded: CardInstance[] = [];
@@ -280,14 +278,12 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
   if (discarded.length) {
     rememberDiscardedCards(discarded);
   }
-  if (resumeEffects) {
-    for (const dc of discarded) {
-      const fx = (dc as any).on_discard;
-      if (!Array.isArray(fx) || !fx.length) continue;
-      for (let i = fx.length - 1; i >= 0; i--) {
-        resumeEffects.unshift(fx[i]);
-      }
-    }
+  for (const dc of discarded) {
+    const fx = (dc as any).on_discard;
+    if (!Array.isArray(fx) || !fx.length) continue;
+    runWithBypass(() => {
+      runEffects([...fx], owner, dc);
+    });
   }
   return { kind: "handled" };
 });
