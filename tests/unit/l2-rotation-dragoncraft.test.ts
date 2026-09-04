@@ -267,18 +267,15 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(printed).toContain("Add an Ephemeral Foxfire");
     });
 
-    it.fails(
-      "can target enemy leader for 1 damage — printed: 'enemy follower or the enemy leader'; observed: resolvePendingTarget('leader') leaves enemy HP unchanged (10843310)",
-      () => {
-        setupTurn(R6, { hand: [EPHEMERAL_FOXFIRE], pp: 1 });
-        state.players.second.hp = 20;
-        const foe = enemyFollower(1, 3, "Bystander");
-        whenPlayCard("first", 0);
-        resolvePendingByUid("leader");
-        expect(getHP(state, "second")).toBe(19);
-        expect(Number(foe.defense)).toBe(3);
-      },
-    );
+    it("can target enemy leader for 1 damage — printed: 'enemy follower or the enemy leader' (10843310)", () => {
+      setupTurn(R6, { hand: [EPHEMERAL_FOXFIRE], pp: 1 });
+      state.players.second.hp = 20;
+      const foe = enemyFollower(1, 3, "Bystander");
+      whenPlayCard("first", 0);
+      resolvePendingByUid("leader");
+      expect(getHP(state, "second")).toBe(19);
+      expect(Number(foe.defense)).toBe(3);
+    });
 
     it("without Overflow: does not draw a card", () => {
       setupTurn(R6, {

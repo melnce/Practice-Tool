@@ -112,8 +112,17 @@ TARGETED_OP_HANDLERS.set("damage", (ctx) => {
     selectedCard: state.__lastSelected,
   });
   const oppOwner = opponentOf(owner);
+  const canFallbackLeader = Boolean(
+    (eff as any).fallback_leader ?? (eff as any).can_target_leader,
+  );
+
+  if (targetUids.includes("leader")) {
+    if (amt) applyLeaderDamage(oppOwner, amt);
+    return { kind: "handled" };
+  }
+
   if (!targets.length) {
-    if ((eff as any).fallback_leader && amt) {
+    if (canFallbackLeader && amt) {
       applyLeaderDamage(oppOwner, amt);
     }
     return { kind: "handled" };
