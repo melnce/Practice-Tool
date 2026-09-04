@@ -230,7 +230,7 @@ export function registerResourceEffects() {
   // mode: "except_named" = discard all except named cards
   // ========================================================================
   registerOp("discard", (eff, ctx) => {
-    if (handleDiscard(eff, ctx.owner, ctx.queue) === "pending")
+    if (handleDiscard(eff, ctx.owner, ctx.queue, ctx.sourceCard) === "pending")
       return "pending";
   });
 
