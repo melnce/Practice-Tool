@@ -20,7 +20,10 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { isCantAttackLocked } from "../../src/logic/core/keywords/has.js";
-import { tickCrests } from "../../src/logic/effects/crest.js";
+import {
+  tickCrests,
+  playerHasCrestPassive,
+} from "../../src/logic/effects/crest.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
@@ -1199,6 +1202,35 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(findCrest("first", "Milteo")).toBeTruthy();
       expect(crestPrinted).toContain("Whenever you play a follower");
     });
+
+    it("crest: allied Fanfare does not activate on played follower", () => {
+      setupTurn(R8, { hand: [MILTEO, NIGHT_FIEND], pp: 9 });
+      whenPlayCard("first", 0);
+      const milteo = findOnBoard("first", "Milteo & Luzen")!;
+      state.players.first.superEvoCharges = 1;
+      state.players.first.superEvoPoints = 1;
+      onEvolve(milteo, "first", "super");
+      state.players.first.hp = 20;
+      whenPlayCard("first", 0);
+      expect(getHP(state, "first")).toBe(20);
+      expect(playerHasCrestPassive("first", "suppress_fanfare_enhance")).toBe(
+        true,
+      );
+      expect(crestPrinted).toContain("Fanfare and Enhance abilities don't");
+    });
+
+    it("crest: playing a follower evolves it", () => {
+      setupTurn(R8, { hand: [MILTEO, GHOST_DODGER], pp: 9 });
+      whenPlayCard("first", 0);
+      const milteo = findOnBoard("first", "Milteo & Luzen")!;
+      state.players.first.superEvoCharges = 1;
+      state.players.first.superEvoPoints = 1;
+      onEvolve(milteo, "first", "super");
+      whenPlayCard("first", 0);
+      const dodger = findOnBoard("first", "Ghost Dodger")!;
+      expect(dodger.hasEvolved).toBe(true);
+      expect(crestPrinted).toContain("Whenever you play a follower");
+    });
   });
 
   describe("Mistress of the Fanged (10051110)", () => {
@@ -1405,6 +1437,20 @@ describe("L2 — Rotation Abysscraft", () => {
         cdBefore - 1,
       );
       expect(printed).toContain("Advance the count");
+    });
+
+    it("crest Last Words at countdown 0: deals 20 to enemy leader", () => {
+      setupTurn(R10, { hand: [BELIAL], pp: 7 });
+      state.players.second.hp = 25;
+      const card = getHand(state, "first").find((c) => c.id === BELIAL)!;
+      card.skyboundArtEvolvesWitnessed = 15;
+      whenPlayCard("first", 0);
+      const crest = findCrest("first", "Belial")!;
+      crest.countdown = 1;
+      runStartOfTurnBoundary("first", { tickCrests });
+      expect(getHP(state, "second")).toBe(5);
+      expect(findCrest("first", "Belial")).toBeUndefined();
+      expect(crestPrinted).toContain("Deal 20 damage to the enemy leader");
     });
   });
 
