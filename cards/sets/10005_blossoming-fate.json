@@ -763,7 +763,8 @@
             "action": "give",
             "target": "self",
             "attack": 1,
-            "defense": 1
+            "defense": 1,
+            "keywords": ["Ward"]
           }
         ]
       }

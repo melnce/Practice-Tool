@@ -773,18 +773,14 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       expect(Number(beauty.defense)).toBe(4);
     });
 
-    it.fails(
-      "with at least 2 spells: grants Ward per printed text (10521120 JSON omits Ward from fanfare stat effect)",
-      () => {
-        setupTurn(R6, { hand: [SMOKE_BEAUTY, SPELL_A, SPELL_B], pp: 3 });
-        whenPlayCard("first", 0);
-        const beauty = findOnBoard("first", "Smoke-Shrouded Beauty")!;
-        expect(Number(beauty.attack)).toBe(4);
-        expect(Number(beauty.defense)).toBe(4);
-        // Printed: "give this follower +1/+1 and Ward" — authored fanfare only applies +1/+1.
-        expect(beauty.hasWard || beauty.keywordState?.hasWard).toBe(true);
-      },
-    );
+    it("with at least 2 spells: grants Ward per printed text", () => {
+      setupTurn(R6, { hand: [SMOKE_BEAUTY, SPELL_A, SPELL_B], pp: 3 });
+      whenPlayCard("first", 0);
+      const beauty = findOnBoard("first", "Smoke-Shrouded Beauty")!;
+      expect(Number(beauty.attack)).toBe(4);
+      expect(Number(beauty.defense)).toBe(4);
+      expect(beauty.hasWard || beauty.keywordState?.hasWard).toBe(true);
+    });
 
     it("Evolve adds Glittering Gold (90021350)", () => {
       setupTurn(R6, { hand: [SMOKE_BEAUTY], pp: 3, evo: 2 });
