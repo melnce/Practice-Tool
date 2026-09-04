@@ -112,6 +112,10 @@ const SAME_COST_A = "10051120";
 const SAME_COST_B = "10051120";
 const SAME_COST_C = "10051120";
 const SAME_COST_D = "10051120";
+const MIXED_COST_1 = "10751310"; // Soul Tuning, cost 1
+const MIXED_COST_2 = "10051310"; // Chaos Cyclone, cost 2
+const MIXED_COST_3 = "10051120"; // Night Fiend, cost 3
+const MIXED_COST_6 = "10051110"; // Mistress of the Fanged, cost 6
 
 const R3 = 3;
 const R4 = 4;
@@ -229,6 +233,13 @@ function boardNames(player: "first" | "second" = "first"): string[] {
 
 function findCrest(owner: "first" | "second", fragment: string) {
   return getCrests(state, owner).find((c) => c.name.includes(fragment));
+}
+
+function isInEitherGraveyard(uid: string): boolean {
+  return (
+    getGraveyard(state, "first").some((c) => c.uid === uid) ||
+    getGraveyard(state, "second").some((c) => c.uid === uid)
+  );
 }
 
 describe("L2 — Rotation Abysscraft", () => {
@@ -964,9 +975,22 @@ describe("L2 — Rotation Abysscraft", () => {
     it("owner's EOT: crest deals 2 damage to your leader", () => {
       setupTurn(R6, { hand: [CORRUPTION], pp: 5 });
       state.players.first.hp = 20;
+      state.players.second.hp = 20;
       whenPlayCard("first", 0);
       runEndOfTurnBoundary("first");
       expect(getHP(state, "first")).toBe(18);
+      expect(getHP(state, "second")).toBe(20);
+      expect(crestPrinted).toContain("deal 2 damage to your leader");
+    });
+
+    it("second player's EOT: their crest deals 2 to second leader only", () => {
+      setupTurn(R6, { hand: [CORRUPTION], pp: 5 });
+      state.players.first.hp = 20;
+      state.players.second.hp = 20;
+      whenPlayCard("first", 0);
+      runEndOfTurnBoundary("second");
+      expect(getHP(state, "first")).toBe(20);
+      expect(getHP(state, "second")).toBe(18);
       expect(crestPrinted).toContain("deal 2 damage to your leader");
     });
 
@@ -976,6 +1000,37 @@ describe("L2 — Rotation Abysscraft", () => {
       whenPlayCard("first", 0);
       runEndOfTurnBoundary("second");
       expect(getHP(state, "first")).toBe(20);
+    });
+
+    it("each crest ticks countdown only on its owner's SOT", () => {
+      setupTurn(R6, { hand: [CORRUPTION], pp: 5 });
+      whenPlayCard("first", 0);
+      const firstCd = Number(findCrest("first", "Corruption")!.countdown);
+      const secondCd = Number(findCrest("second", "Corruption")!.countdown);
+      expect(firstCd).toBe(4);
+      expect(secondCd).toBe(4);
+      runStartOfTurnBoundary("second", { tickCrests });
+      expect(Number(findCrest("first", "Corruption")!.countdown)).toBe(4);
+      expect(Number(findCrest("second", "Corruption")!.countdown)).toBe(3);
+      runStartOfTurnBoundary("first", { tickCrests });
+      expect(Number(findCrest("first", "Corruption")!.countdown)).toBe(3);
+      expect(Number(findCrest("second", "Corruption")!.countdown)).toBe(3);
+      expect(crestPrinted).toContain("Countdown (4)");
+    });
+
+    it("each crest expires after four of its owner's SOT ticks", () => {
+      setupTurn(R6, { hand: [CORRUPTION], pp: 5 });
+      whenPlayCard("first", 0);
+      for (let i = 0; i < 4; i++) {
+        runStartOfTurnBoundary("first", { tickCrests });
+      }
+      expect(findCrest("first", "Corruption")).toBeUndefined();
+      expect(findCrest("second", "Corruption")).toBeTruthy();
+      expect(Number(findCrest("second", "Corruption")!.countdown)).toBe(4);
+      for (let i = 0; i < 4; i++) {
+        runStartOfTurnBoundary("second", { tickCrests });
+      }
+      expect(findCrest("second", "Corruption")).toBeUndefined();
     });
 
     it("Super Skybound Art: destroys your Crest: Corruption", () => {
@@ -1178,19 +1233,49 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(printed).toContain("Reanimate (4)");
     });
 
-    it.fails(
-      "Evolve destroys 6 other random followers — 10554110: printed 'destroy 6 other random followers' observed 6 followers remain after evolve",
-      () => {
-        setupTurn(R8, { hand: [MILTEO], pp: 6, evo: 2 });
-        for (let i = 0; i < 6; i++) allyFollower(`F${i}`, 1, 1);
-        whenPlayCard("first", 0);
-        const milteo = findOnBoard("first", "Milteo & Luzen")!;
-        onEvolve(milteo, "first", "normal", { spendPoint: true });
-        cleanupDead();
-        expect(thenBoard("first").length).toBe(1);
-        expect(printed).toContain("destroy 6 other random followers");
-      },
-    );
+    it("Evolve destroys exactly 6 other followers; Milteo survives (3 allies + 3 enemies)", () => {
+      setupTurn(R8, { hand: [MILTEO], pp: 6, evo: 2 });
+      const allies = [
+        allyFollower("Ally0", 1, 1),
+        allyFollower("Ally1", 1, 1),
+        allyFollower("Ally2", 1, 1),
+      ];
+      const enemies = [
+        enemyFollower(1, 1, "Enemy0"),
+        enemyFollower(1, 1, "Enemy1"),
+        enemyFollower(1, 1, "Enemy2"),
+      ];
+      const otherUids = [...allies, ...enemies].map((c) => c.uid);
+      whenPlayCard("first", 0);
+      const milteo = findOnBoard("first", "Milteo & Luzen")!;
+      const milteoUid = milteo.uid;
+      onEvolve(milteo, "first", "normal", { spendPoint: true });
+      cleanupDead();
+      expect(findOnBoard("first", "Milteo & Luzen")?.uid).toBe(milteoUid);
+      expect(thenBoard("first").length).toBe(1);
+      expect(thenBoard("second").length).toBe(0);
+      for (const uid of otherUids) {
+        expect(isInEitherGraveyard(uid)).toBe(true);
+      }
+      expect(printed).toContain("destroy 6 other random followers");
+    });
+
+    it("Evolve destroys all 3 other followers when only 3 are on the field", () => {
+      setupTurn(R8, { hand: [MILTEO], pp: 6, evo: 2 });
+      const allies = [allyFollower("Ally0", 1, 1), allyFollower("Ally1", 1, 1)];
+      const enemies = [enemyFollower(1, 1, "Enemy0")];
+      const otherUids = [...allies, ...enemies].map((c) => c.uid);
+      whenPlayCard("first", 0);
+      const milteo = findOnBoard("first", "Milteo & Luzen")!;
+      onEvolve(milteo, "first", "normal", { spendPoint: true });
+      cleanupDead();
+      expect(thenBoard("first").length).toBe(1);
+      expect(thenBoard("second").length).toBe(0);
+      for (const uid of otherUids) {
+        expect(isInEitherGraveyard(uid)).toBe(true);
+      }
+      expect(findOnBoard("first", "Milteo & Luzen")).toBeTruthy();
+    });
 
     it("Super-Evolve gains Crest: Milteo & Luzen", () => {
       setupTurn(R8, { hand: [MILTEO], pp: 6 });
@@ -1629,20 +1714,28 @@ describe("L2 — Rotation Abysscraft", () => {
     });
 
     it.fails(
-      "Clash destroys opposing follower — 10654110: printed 'Destroy the opposing follower' but foe remains on board after clash combat",
+      "Clash — 10654110: enemy survives at 10 defense; allied bystander destroyed instead of opposing follower",
       () => {
+        // Observed on main: clash_opponent resolves to ally board — foe stays at 10 def,
+        // allied 1/5 bystander is sent to the graveyard instead.
         setupTurn(R10, { hand: [ARMES], pp: 9 });
         whenPlayCard("first", 0);
         const armes = findOnBoard("first", "Armes, Depletive Demon")!;
         applyKeywordsFromList(armes);
+        const bystander = allyFollower("Bystander", 1, 5);
         armes.can_attack = true;
         armes.can_attack_followers = true;
         armes.attacks_left = 1;
         armes.justPlayed = false;
         const foe = enemyFollower(2, 20, "ClashFoe");
+        const bystanderUid = bystander.uid;
+        const foeUid = foe.uid;
         attackFollower(0, 0, "first", "second");
         cleanupDead();
-        expect(getBoard(state, "second").length).toBe(0);
+        expect(getBoard(state, "second").some((c) => c.uid === foeUid)).toBe(
+          false,
+        );
+        expect(isInEitherGraveyard(bystanderUid)).toBe(false);
         expect(printed).toContain("Destroy the opposing follower");
       },
     );
@@ -1717,6 +1810,49 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(getHP(state, "second")).toBe(12);
       expect(getBoard(state, "second").length).toBe(0);
       expect(printed).toContain("4 cards with the same cost");
+    });
+
+    it("Fanfare with fewer than 4 same-cost after redraw: return-and-draw twice, no 4 damage", () => {
+      setupTurn(R10, {
+        hand: [SHAKDOH, MIXED_COST_1, MIXED_COST_2, MIXED_COST_3],
+        pp: 10,
+      });
+      state.players.first.deck = [
+        createCard(MIXED_COST_6, "deck", "first"),
+        createCard(MIXED_COST_3, "deck", "first"),
+        createCard(MIXED_COST_2, "deck", "first"),
+        createCard(MIXED_COST_1, "deck", "first"),
+        createCard(FILLER, "deck", "first"),
+      ];
+      state.players.second.deck = [
+        createCard(FILLER, "deck", "second"),
+        createCard(FILLER, "deck", "second"),
+      ];
+      state.players.second.hp = 20;
+      const foe = enemyFollower(2, 6, "Foe");
+      const cardsBefore =
+        handIds().length +
+        deckIds().length +
+        thenBoard("first").length +
+        thenBoard("second").length;
+      whenPlayCard("first", 0);
+      const cardsAfter =
+        handIds().length +
+        deckIds().length +
+        thenBoard("first").length +
+        thenBoard("second").length;
+      expect(cardsAfter).toBe(cardsBefore);
+      expect(handIds().length).toBe(3);
+      const costCounts = new Map<number, number>();
+      for (const c of thenHand("first")) {
+        const cost = Number(c.cost);
+        costCounts.set(cost, (costCounts.get(cost) ?? 0) + 1);
+      }
+      expect(Math.max(...costCounts.values())).toBe(1);
+      expect(getHP(state, "second")).toBe(20);
+      expect(Number(foe.defense)).toBe(6);
+      expect(getBoard(state, "second").length).toBe(1);
+      expect(printed).toContain("Return your hand to deck");
     });
 
     it("Super-Evolve replicates Fanfare sequence", () => {
