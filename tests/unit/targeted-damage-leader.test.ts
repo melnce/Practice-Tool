@@ -4,7 +4,7 @@
  * Ephemeral Foxfire (10843310) uses can_target_leader only; Ravening Tentacles
  * (10123310) has both keys. Both must honour a leader click and empty-board fallback.
  */
-import { describe, it, expect, beforeEach, beforeAll } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import "../audit/setup.ts";
 import {
   givenGameState,
@@ -20,7 +20,6 @@ import {
   getBoard,
   getDeck,
   getHP,
-  getHand,
 } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -70,10 +69,6 @@ function playAndTargetFollower(followerUid: string, handIndex = 0): void {
 }
 
 describe("targeted damage — leader click and empty-board fallback", () => {
-  beforeAll(async () => {
-    // setup.ts loads card DB
-  });
-
   beforeEach(() => {
     resetUidCounter();
   });
