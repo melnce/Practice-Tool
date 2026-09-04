@@ -214,13 +214,17 @@ function findDropTargetAt(
 function endSession(cancelled: boolean) {
   if (!session) return;
   const s = session;
+  detachSessionWindowListeners();
+  s.source.removeEventListener("lostpointercapture", onLostPointerCapture);
   clearHighlights(null);
   if (s.preview) {
     s.preview.remove();
     s.preview = null;
   }
-  s.source.classList.remove("pointer-drag-source");
-  delete s.source.dataset.pointerDragId;
+  if (s.source.isConnected) {
+    s.source.classList.remove("pointer-drag-source");
+    delete s.source.dataset.pointerDragId;
+  }
   try {
     s.source.releasePointerCapture(s.pointerId);
   } catch {
@@ -228,17 +232,41 @@ function endSession(cancelled: boolean) {
   }
   if (s.dragging) s.options.onDragEnded?.();
 
-  if (s.suppressClick) {
+  if (s.suppressClick && s.source.isConnected) {
     // Survive past any sibling pointerup/click in this turn (handler order varies).
     suppressClickUntilMs = performance.now() + 100;
     s.source.dataset.pointerDragSuppressClick = "1";
     setTimeout(() => {
-      delete s.source.dataset.pointerDragSuppressClick;
+      if (s.source.isConnected)
+        delete s.source.dataset.pointerDragSuppressClick;
     }, 0);
   }
 
   session = null;
   void cancelled;
+}
+
+let sessionWindowListenersAttached = false;
+
+function attachSessionWindowListeners() {
+  if (sessionWindowListenersAttached) return;
+  window.addEventListener("pointermove", onPointerMove, true);
+  window.addEventListener("pointerup", onPointerUp, true);
+  window.addEventListener("pointercancel", onPointerCancel, true);
+  sessionWindowListenersAttached = true;
+}
+
+function detachSessionWindowListeners() {
+  if (!sessionWindowListenersAttached) return;
+  window.removeEventListener("pointermove", onPointerMove, true);
+  window.removeEventListener("pointerup", onPointerUp, true);
+  window.removeEventListener("pointercancel", onPointerCancel, true);
+  sessionWindowListenersAttached = false;
+}
+
+function onLostPointerCapture(ev: PointerEvent) {
+  if (!session || ev.pointerId !== session.pointerId) return;
+  if (!session.source.isConnected) endSession(true);
 }
 
 function onPointerMove(ev: PointerEvent) {
@@ -267,6 +295,10 @@ function onPointerMove(ev: PointerEvent) {
 
 function onPointerUp(ev: PointerEvent) {
   if (!session || ev.pointerId !== session.pointerId) return;
+  if (!session.source.isConnected) {
+    endSession(true);
+    return;
+  }
   const s = session;
   const { clientX, clientY } = ev;
 
@@ -309,6 +341,10 @@ function onPointerUp(ev: PointerEvent) {
 function onPointerCancel(ev: PointerEvent) {
   if (!session) return;
   if (ev.pointerId !== session.pointerId) return;
+  if (!session.source.isConnected) {
+    endSession(true);
+    return;
+  }
   // Cancel cleanly — no fuse, no drop.
   if (session.dragging) session.suppressClick = true;
   endSession(true);
@@ -325,6 +361,11 @@ export function forceCancelPointerDrag(): void {
   if (session.dragging) session.suppressClick = true;
   endSession(true);
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") forceCancelPointerDrag();
+});
+window.addEventListener("blur", () => forceCancelPointerDrag());
 
 export function attachPointerDragSource(
   el: HTMLElement,
@@ -347,7 +388,13 @@ export function attachPointerDragSource(
 
   const onDown = (ev: PointerEvent) => {
     if (ev.button !== 0) return;
-    if (session) return;
+    if (session) {
+      if (!session.source.isConnected || session.pointerId === ev.pointerId) {
+        endSession(true);
+      } else {
+        return;
+      }
+    }
     delete el.dataset.pointerDragSuppressClick;
     suppressClickUntilMs = 0;
     session = {
@@ -368,21 +415,17 @@ export function attachPointerDragSource(
     } catch {
       /* capture optional */
     }
+    el.addEventListener("lostpointercapture", onLostPointerCapture);
+    attachSessionWindowListeners();
   };
 
   el.addEventListener("pointerdown", onDown);
-  // Capture phase so we finish the gesture before click-guard pointerup/click.
-  el.addEventListener("pointermove", onPointerMove);
-  el.addEventListener("pointerup", onPointerUp, true);
-  el.addEventListener("pointercancel", onPointerCancel, true);
 
   (
     el as HTMLElement & { __pointerDragCleanup?: () => void }
   ).__pointerDragCleanup = () => {
     el.removeEventListener("pointerdown", onDown);
-    el.removeEventListener("pointermove", onPointerMove);
-    el.removeEventListener("pointerup", onPointerUp, true);
-    el.removeEventListener("pointercancel", onPointerCancel, true);
+    el.removeEventListener("lostpointercapture", onLostPointerCapture);
   };
 }
 
