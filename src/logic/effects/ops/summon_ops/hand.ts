@@ -14,7 +14,7 @@ import {
   bumpZoneVersion,
   stampBoardEntryTs,
 } from "../../../core/triggers/utils.js";
-import { getEffectiveCost, nextId } from "./utils.js";
+import { getEffectiveCost } from "./utils.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getHand, getBoard } from "../../../../core/playerHelpers.js";
 
@@ -153,7 +153,6 @@ export function summonExactCopyFromHand(
   // as summonExactCopy / chain). Reusing the hand card's uid leaves one
   // identity in two zones (hand + board).
   clone.uid = state.rng.makeUid();
-  clone.id = nextId();
   clone.zone = "board";
   clone.owner = owner;
   clone.selected = false;
