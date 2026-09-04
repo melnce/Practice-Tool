@@ -925,17 +925,17 @@ describe("L2 — Rotation Havencraft", () => {
       expect(getHP(state, "first")).toBe(hpAfterFanfare + 1);
     });
 
-    it.fails(
-      "Super-Evolve replicates Fanfare once (+1 heal) — printed: replicate Fanfare; observed: restores 2 defense (13→16 after Fanfare on play) (10563110)",
-      () => {
-        setupTurn(R8, { hand: [SAINT_REHAB], pp: 5, hp: 13, superEvo: 1 });
-        whenPlayCard("first", 0);
-        const saint = findOnBoard("first", "Saint of Rehabilitation")!;
-        expect(getHP(state, "first")).toBe(14);
-        onEvolve(saint, "first", "super", { spendPoint: true });
-        expect(getHP(state, "first")).toBe(15);
-      },
-    );
+    // Rulebook (docs/svwb_rulebook_formatted.md — Evolve ability): when a follower has
+    // both Evolve and Super-Evolve lines, a super-evolve fires both simultaneously unless
+    // the Super-Evolve line says "instead" (owner-confirmed with Arriet).
+    it("Super-Evolve replicates Fanfare twice (+2 heal): Evolve line and Super-Evolve line both fire", () => {
+      setupTurn(R8, { hand: [SAINT_REHAB], pp: 5, hp: 13, superEvo: 1 });
+      whenPlayCard("first", 0);
+      const saint = findOnBoard("first", "Saint of Rehabilitation")!;
+      expect(getHP(state, "first")).toBe(14);
+      onEvolve(saint, "first", "super", { spendPoint: true });
+      expect(getHP(state, "first")).toBe(16);
+    });
   });
 
   describe("Missionary of Recruitment (10761120)", () => {
