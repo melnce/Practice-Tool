@@ -700,25 +700,22 @@ describe("L2 — Rotation Neutral", () => {
       expect(Number(foe.defense)).toBe(5);
     });
 
-    it.fails(
-      "Engage (1): discard selected hand card and delay countdown by 1 — 10703210 countdown stays 1 after Engage (printed: Delay the count of this amulet by 1)",
-      () => {
-        setupTurn(R6, { hand: [CITY_BABELON, FILLER_FOREST], pp: 10 });
-        whenPlayCard("first", 0);
-        const babelon = findOnBoard("first", "City of Babelon")!;
-        expect(Number(babelon.countdown)).toBe(1);
-        const idx = getBoard(state, "first").findIndex(
-          (c) => c.uid === babelon.uid,
-        );
-        engageAmulet("first", idx);
-        const discard = getHand(state, "first").find(
-          (c) => c.id === FILLER_FOREST,
-        )!;
-        resolvePendingByUid(discard.uid);
-        expect(handIds()).not.toContain(FILLER_FOREST);
-        expect(Number(babelon.countdown)).toBe(2);
-      },
-    );
+    it("Engage (1): discard selected hand card and delay countdown by 1 — 10703210 (printed: Delay the count of this amulet by 1)", () => {
+      setupTurn(R6, { hand: [CITY_BABELON, FILLER_FOREST], pp: 10 });
+      whenPlayCard("first", 0);
+      const babelon = findOnBoard("first", "City of Babelon")!;
+      expect(Number(babelon.countdown)).toBe(1);
+      const idx = getBoard(state, "first").findIndex(
+        (c) => c.uid === babelon.uid,
+      );
+      engageAmulet("first", idx);
+      const discard = getHand(state, "first").find(
+        (c) => c.id === FILLER_FOREST,
+      )!;
+      resolvePendingByUid(discard.uid);
+      expect(handIds()).not.toContain(FILLER_FOREST);
+      expect(Number(babelon.countdown)).toBe(2);
+    });
   });
 
   describe("Illamrita, Designated Target (10704110)", () => {

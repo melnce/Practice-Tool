@@ -29,6 +29,7 @@ export function handleDiscard(
   eff: Effect & { mode?: DiscardMode },
   owner: Player,
   resumeEffects: Effect[] = [],
+  sourceCard: CardInstance | null = null,
 ): void | "pending" {
   const mode = (eff.mode || "select") as DiscardMode;
 
@@ -39,7 +40,7 @@ export function handleDiscard(
 
     case "select":
     default:
-      return handleDiscardSelectHand(eff, owner, resumeEffects);
+      return handleDiscardSelectHand(eff, owner, resumeEffects, sourceCard);
   }
 }
 
@@ -81,6 +82,7 @@ export function handleDiscardSelectHand(
   eff: Effect,
   owner: Player,
   resumeEffects: Effect[] = [],
+  sourceCard: CardInstance | null = null,
 ) {
   const n = Math.max(0, parseInt((eff.count as any) ?? 1, 10));
   const hand = getHand(state, owner);
@@ -97,7 +99,7 @@ export function handleDiscardSelectHand(
     op: "discard_select_hand",
     eff: { ...eff, select_count: selectCount },
     owner,
-    sourceCard: null,
+    sourceCard,
     pool,
     poolUids: toUids(pool),
     selectCount,
