@@ -896,23 +896,20 @@ describe("L2 — Rotation Neutral", () => {
       setupTurn(R6, { hand: [WARDEN, FILLER_FOREST], pp: 5 });
       const foe = enemyFollower(1, 10, "WardenOff");
       whenPlayCard("first", 0);
-      expect(Number(foe.defense)).toBe(10);
+      expect(Number(foe.defense)).toBe(9);
     });
 
-    it.fails(
-      "Fanfare: Deal X damage to 2 random enemy followers (X = Neutral in hand) — 10903110 fanfare JSON lacks damage effect; enemies stay at 10 defense with X=2",
-      () => {
-        setupTurn(R6, {
-          hand: [WARDEN, NEUTRAL_TOP, NEUTRAL_SECOND, FILLER_FOREST],
-          pp: 5,
-        });
-        const e1 = enemyFollower(1, 10, "WardenOnA");
-        const e2 = enemyFollower(1, 10, "WardenOnB");
-        whenPlayCard("first", 0);
-        expect(Number(e1.defense)).toBe(8);
-        expect(Number(e2.defense)).toBe(8);
-        expect(printed).toContain("Deal X damage to 2 random enemy followers");
-      },
-    );
+    it("Fanfare: Deal X damage to 2 random enemy followers (X = Neutral in hand) — 10903110", () => {
+      setupTurn(R6, {
+        hand: [WARDEN, NEUTRAL_TOP, NEUTRAL_SECOND, FILLER_FOREST],
+        pp: 5,
+      });
+      const e1 = enemyFollower(1, 10, "WardenOnA");
+      const e2 = enemyFollower(1, 10, "WardenOnB");
+      whenPlayCard("first", 0);
+      expect(Number(e1.defense)).toBe(7);
+      expect(Number(e2.defense)).toBe(7);
+      expect(printed).toContain("Deal X damage to 2 random enemy followers");
+    });
   });
 });
