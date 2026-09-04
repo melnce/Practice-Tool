@@ -4647,12 +4647,12 @@
       "status": "covered"
     },
     "10403110": {
-      "fingerprint": "37d8dc58",
+      "fingerprint": "5d29e280",
       "gatesSatisfied": ["skybound_art"],
       "name": "Gran & Djeeta, Valiant Skyfarers",
       "scenarios": [
         {
-          "fingerprint": "fac18f14",
+          "fingerprint": "3118ab38",
           "scenario": "play"
         }
       ],
@@ -8234,12 +8234,12 @@
       "status": "covered"
     },
     "10743110": {
-      "fingerprint": "8624b284",
+      "fingerprint": "0f9f01e8",
       "gatesSatisfied": [],
       "name": "Dragonewt Pathfinder",
       "scenarios": [
         {
-          "fingerprint": "c0b099bb",
+          "fingerprint": "ad565920",
           "scenario": "play"
         }
       ],
@@ -9551,12 +9551,12 @@
       "status": "covered"
     },
     "10864120": {
-      "fingerprint": "3e1a9fa0",
+      "fingerprint": "444b5154",
       "gatesSatisfied": [],
       "name": "Zoe, Dazzling Hope",
       "scenarios": [
         {
-          "fingerprint": "cd7bf188",
+          "fingerprint": "063af618",
           "scenario": "play"
         },
         {

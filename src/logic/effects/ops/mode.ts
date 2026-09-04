@@ -23,6 +23,7 @@ import type { UnifiedGateSpec } from "../gates/types.js";
 // But for now, safe property access is enough.
 
 import type { EffectCtx } from "../../core/effects/registry.js";
+import { enqueueManyFront } from "../../core/effects/queue.js";
 import {
   getScriptedModePicks,
   recordScriptedModePicks,
@@ -48,7 +49,7 @@ function runAutomaticModePicks(
   picked: any[],
   owner: Player,
   sourceCard: any,
-  effectsQueue: Effect[],
+  ctx: EffectCtx,
   reason: "random" | "activate_all",
 ): "done" {
   const combined: Effect[] = [];
@@ -68,8 +69,7 @@ function runAutomaticModePicks(
   });
   logEvent("chooseFinalize", { owner, picked: picked.length, [reason]: true });
   fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
-  if (combined.length) runEffects(combined, owner, sourceCard);
-  if (effectsQueue.length) runEffects(effectsQueue, owner, sourceCard);
+  if (combined.length) enqueueManyFront(ctx, combined);
   return "done";
 }
 
@@ -123,7 +123,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       available,
       owner,
       sourceCard,
-      effectsQueue ?? [],
+      ctx,
       "activate_all",
     );
   }
@@ -158,7 +158,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       [chosenEntry.opt],
       owner,
       sourceCard,
-      effectsQueue ?? [],
+      ctx,
       "random",
     );
   }
@@ -176,13 +176,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       picked.push(chosen);
       if (unique) bag.splice(index, 1);
     }
-    return runAutomaticModePicks(
-      picked,
-      owner,
-      sourceCard,
-      effectsQueue ?? [],
-      "random",
-    );
+    return runAutomaticModePicks(picked, owner, sourceCard, ctx, "random");
   }
 
   // ==== Scripted sparring line (explicit indices; never the heuristic AI) ====
@@ -230,10 +224,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       if (Array.isArray(opt.effects) && opt.effects.length)
         combined.push(...opt.effects);
     }
-    if (combined.length) runEffects(combined, owner, sourceCard);
-    if (effectsQueue && effectsQueue.length) {
-      runEffects(effectsQueue, owner, sourceCard);
-    }
+    if (combined.length) enqueueManyFront(ctx, combined);
     return "done";
   }
 
@@ -325,12 +316,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
       if (Array.isArray(opt.effects) && opt.effects.length)
         combined.push(...opt.effects);
     }
-    if (combined.length) {
-      runEffects(combined, owner, sourceCard);
-    }
-    if (effectsQueue && effectsQueue.length) {
-      runEffects(effectsQueue, owner, sourceCard);
-    }
+    if (combined.length) enqueueManyFront(ctx, combined);
     // Render removed - UI layer handles rendering
     // console.groupEnd();
     return "done";
