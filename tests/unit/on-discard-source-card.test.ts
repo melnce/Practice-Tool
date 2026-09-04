@@ -20,10 +20,7 @@ const BEHEADING = "10643310";
 const RESOLUTE = "10641110";
 const FILLER = "10111310";
 
-function setupTurn(
-  hand: string[],
-  extra: { pp?: number } = {},
-): void {
+function setupTurn(hand: string[], extra: { pp?: number } = {}): void {
   givenGameState({
     seed: 1,
     activePlayer: "first",
