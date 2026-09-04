@@ -327,6 +327,7 @@ export type MiscOps = Extract<
   | "repeat_effect"
   | "sequence"
   | "replicate"
+  | "with_source"
   | "boost_skybound_art_hand"
 >;
 export interface MiscEffect extends BaseEffect {
@@ -338,6 +339,8 @@ export interface MiscEffect extends BaseEffect {
   select_count?: number;
   unique?: boolean;
   zone?: string; // replicate op
+  source_uid?: string; // with_source op
+  effects?: Effect[]; // with_source op
 }
 
 /** Unified evolve op (+ legacy self-evolve shims) */

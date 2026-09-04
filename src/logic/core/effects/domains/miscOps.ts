@@ -14,6 +14,7 @@ export const MISC_OPS = [
   "repeat_effect",
   "sequence",
   "replicate",
+  "with_source",
   "set_deckout_victory",
   "boost_skybound_art_hand",
 ] as const;

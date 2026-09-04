@@ -248,9 +248,11 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
     for (const dc of discarded) {
       const fx = (dc as any).on_discard;
       if (!Array.isArray(fx) || !fx.length) continue;
-      for (let i = fx.length - 1; i >= 0; i--) {
-        resumeEffects.unshift(fx[i]);
-      }
+      resumeEffects.unshift({
+        op: "with_source",
+        source_uid: dc.uid,
+        effects: [...fx],
+      });
     }
   }
   return { kind: "handled" };
@@ -284,9 +286,11 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
     for (const dc of discarded) {
       const fx = (dc as any).on_discard;
       if (!Array.isArray(fx) || !fx.length) continue;
-      for (let i = fx.length - 1; i >= 0; i--) {
-        resumeEffects.unshift(fx[i]);
-      }
+      resumeEffects.unshift({
+        op: "with_source",
+        source_uid: dc.uid,
+        effects: [...fx],
+      });
     }
   }
   return { kind: "handled" };
