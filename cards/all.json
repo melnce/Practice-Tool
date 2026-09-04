@@ -28162,7 +28162,8 @@
         "event": "ally_follower_enter",
         "source": "board",
         "condition": {
-          "tribe": "Departed"
+          "tribe": "Departed",
+          "whose_turn": "owner"
         },
         "effects": [
           {
