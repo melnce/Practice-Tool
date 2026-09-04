@@ -665,9 +665,10 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       expect(handIds()).toContain(OMINOUS_BETA);
     });
 
-    // Finding: Super-Evolve hand-summon throws "Targeted op handler illegally invoked lifecycle function: runEffects" (10572110).
+    // Finding (10572110): copied Artifact's enter trigger runs runEffects inside the
+    // targeted Super-Evolve handler (contract violation). Artifacts without enter triggers summon fine.
     it.fails(
-      "Super-Evolve summons exact copy of selected hand Artifact ≤5 cost",
+      "Super-Evolve with Analyzing Artifact (on-enter draw trigger) throws runEffects inside targeted handler",
       () => {
         setupTurn(R8, {
           hand: [NEW_AGE_CARTOGRAPHER, ANALYZING_ARTIFACT],
@@ -686,6 +687,36 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
         ).toHaveLength(1);
       },
     );
+
+    it("Super-Evolve summons exact copy of hand Artifact without enter trigger; original stays in hand", () => {
+      setupTurn(R8, { hand: [NEW_AGE_CARTOGRAPHER], pp: 4, superEvo: 1 });
+      const plainArtifact = createCard(
+        {
+          name: "PlainArtifact",
+          type: "Follower",
+          tribes: ["Artifact"],
+          cost: 3,
+          attack: 2,
+          defense: 2,
+        },
+        "hand",
+        "first",
+      );
+      state.players.first.hand.push(plainArtifact);
+      whenPlayCard("first", 0);
+      const cart = findOnBoard("first", "New-Age Cartographer")!;
+      onEvolve(cart, "first", "super", { spendPoint: true });
+      resolvePendingByUid(plainArtifact.uid);
+      const summoned = findOnBoard("first", "PlainArtifact");
+      expect(summoned).toBeTruthy();
+      expect(summoned!.uid).not.toBe(plainArtifact.uid);
+      expect(
+        getHand(state, "first").some((c) => c.uid === plainArtifact.uid),
+      ).toBe(true);
+      expect(Number(summoned!.attack)).toBe(Number(plainArtifact.attack));
+      expect(Number(summoned!.defense)).toBe(Number(plainArtifact.defense));
+      expect(printed).toContain("summon an exact copy of it");
+    });
   });
 
   describe("Timid Pioneer (10672120)", () => {
