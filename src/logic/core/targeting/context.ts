@@ -41,6 +41,25 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
       console.warn("[Targeting] played_card target used without context");
       return [];
     }
+    if (q.specialContext === "clash_opponent") {
+      const source = env.sourceCard;
+      if (!source) return [];
+      const ctx = env.context as any;
+      const attacker = ctx.attackerUid
+        ? resolveUid(ctx.attackerUid)
+        : ctx.attacker;
+      const defender = ctx.defenderUid
+        ? resolveUid(ctx.defenderUid)
+        : ctx.defender;
+      if (!attacker || !defender) return [];
+      const opponent =
+        source.uid === attacker.uid
+          ? defender
+          : source.uid === defender.uid
+            ? attacker
+            : null;
+      return opponent ? [opponent] : [];
+    }
     return [];
   },
 
@@ -104,6 +123,8 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
       (c) => c != null && typeof c === "object",
     );
   },
+
+  unknown: () => [],
 };
 
 export function resolveBasePool(
