@@ -6,12 +6,7 @@
  */
 import { isDev } from "../../../core/env.js";
 
-const ALLOWED_BYPASS_OPS = new Set([
-  "nested_effects",
-  "safe_but_nested",
-  "discard",
-  "discard_select_hand",
-]);
+const ALLOWED_BYPASS_OPS = new Set(["nested_effects", "safe_but_nested"]);
 let _currentOp: string | null = null;
 let _isTargetedOpDispatchActive = false;
 

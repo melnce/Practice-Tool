@@ -11,6 +11,7 @@ import { handleEvolve } from "../../../effects/ops/evolve/unified.js";
 import { handleGate } from "../../../effects/gates/unified.js";
 import { handleReplicate } from "../../../effects/ops/replicate.js";
 import { handleSequence } from "../../../effects/ops/sequence.js";
+import { handleWithSource } from "../../../effects/ops/with_source.js";
 import { state } from "../../../../core/gameState.js";
 import { getHand } from "../../../../core/playerHelpers.js";
 import type { Effect as _Effect } from "../../../../core/types/index.js";
@@ -97,6 +98,11 @@ export function registerMiscEffects() {
 
   registerOp("replicate", (eff, ctx) => {
     const result = handleReplicate(eff as any, ctx);
+    if (result === "pending") return "pending";
+  });
+
+  registerOp("with_source", (eff, ctx) => {
+    const result = handleWithSource(eff as any, ctx);
     if (result === "pending") return "pending";
   });
 
