@@ -32,7 +32,6 @@ import {
   getBoard,
   getHand,
   getHP,
-  getPP,
   getCrests,
 } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
