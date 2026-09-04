@@ -25,6 +25,7 @@ import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
+import type { CardInstance } from "../../src/core/types/index.js";
 import {
   getBoard,
   getHand,
@@ -116,6 +117,15 @@ function playCombo3(targetHandIndex: number): void {
   whenPlayCard("first", targetHandIndex);
 }
 
+/** Play two fillers, snapshot hand uids, then play the combo target at index 0. */
+function playCombo3WithHandSnapshot(): Set<string> {
+  whenPlayCard("first", 0);
+  whenPlayCard("first", 0);
+  const uidsBeforeTarget = handUids();
+  whenPlayCard("first", 0);
+  return uidsBeforeTarget;
+}
+
 function enemyFollower(
   atk: number,
   def: number,
@@ -170,6 +180,20 @@ function boardIds(player: "first" | "second" = "first"): string[] {
   return thenBoard(player).map((c) => String(c.id));
 }
 
+function handUids(player: "first" | "second" = "first"): Set<string> {
+  return new Set(thenHand(player).map((c) => c.uid));
+}
+
+/** Cards that entered hand after `before` snapshot; optional id filter. */
+function newHandCards(
+  before: Set<string>,
+  player: "first" | "second" = "first",
+  id?: string,
+): CardInstance[] {
+  const fresh = thenHand(player).filter((c) => !before.has(c.uid));
+  return id ? fresh.filter((c) => String(c.id) === id) : fresh;
+}
+
 function playFillerFromFirst(): void {
   const hand = getHand(state, "first");
   const idx = hand.findIndex(
@@ -198,13 +222,15 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
         deck: [DRAW_TOP],
         pp: 1,
       });
+      const uidsBefore = handUids();
       whenPlayCard("first", 0);
       const returnCard = thenHand("first").find((c) => c.id === RETURN_CARD);
       expect(returnCard).toBeTruthy();
       resolvePendingByUid(returnCard!.uid);
       expect(handIds()).not.toContain(RETURN_CARD);
       expect(deckIds()).toContain(RETURN_CARD);
-      expect(handIds().filter((id) => id === FAIRY)).toHaveLength(2);
+      const newFairies = newHandCards(uidsBefore, "first", FAIRY);
+      expect(newFairies).toHaveLength(2);
       expect(printed).toContain("Fairy");
     });
   });
@@ -328,31 +354,36 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
 
     it("Fanfare adds Fairy by identity", () => {
       setupTurn(R6, { hand: [LEAFSHADOW_ASSASSIN], pp: 2 });
+      const uidsBefore = handUids();
       whenPlayCard("first", 0);
-      expect(handIds().filter((id) => id === FAIRY)).toHaveLength(1);
+      expect(newHandCards(uidsBefore, "first", FAIRY)).toHaveLength(1);
     });
 
-    it("without Combo(3): Fairy lacks Bane", () => {
+    it("without Combo(3): added Fairy lacks Bane", () => {
       setupTurn(R6, { hand: [LEAFSHADOW_ASSASSIN], pp: 2 });
+      const uidsBefore = handUids();
       whenPlayCard("first", 0);
-      const fairy = thenHand("first").find((c) => c.id === FAIRY)!;
+      const fairy = newHandCards(uidsBefore, "first", FAIRY)[0]!;
       expect(fairy.hasBane).toBeFalsy();
     });
 
-    // Printed: "Combo (3) - Give it Bane." Engine adds Fairy but does not grant Bane at Combo(3).
-    it.fails(
-      "Combo(3): gives the added Fairy Bane — 10912110 Leafshadow Assassin grants Fairy without Bane at Combo(3)",
-      () => {
-        setupTurn(R6, {
-          hand: [FILLER, FILLER, LEAFSHADOW_ASSASSIN],
-          pp: 6,
-        });
-        playCombo3(0);
-        const fairy = thenHand("first").find((c) => c.id === FAIRY)!;
-        expect(fairy.hasBane).toBe(true);
-        expect(printed).toContain("Give it Bane");
-      },
-    );
+    it("Combo(3): gives the newly added Fairy Bane; Convocation Fairies untouched", () => {
+      setupTurn(R6, {
+        hand: [FILLER, FILLER, LEAFSHADOW_ASSASSIN],
+        pp: 6,
+      });
+      const uidsBeforeAssassin = playCombo3WithHandSnapshot();
+      const convocationFairies = thenHand("first").filter(
+        (c) => c.id === FAIRY && uidsBeforeAssassin.has(c.uid),
+      );
+      expect(convocationFairies).toHaveLength(4);
+      for (const fairy of convocationFairies) {
+        expect(fairy.hasBane).toBeFalsy();
+      }
+      const addedFairy = newHandCards(uidsBeforeAssassin, "first", FAIRY)[0]!;
+      expect(addedFairy.hasBane).toBe(true);
+      expect(printed).toContain("Give it Bane");
+    });
   });
 
   describe("Lyria, Skydestined (10403120)", () => {
@@ -410,10 +441,11 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       setScriptedModePickProvider(() => [1]);
       setupTurn(R6, { hand: [VERDANT_RING], pp: 2 });
       enemyFollower(2, 6, "Target");
+      const uidsBefore = handUids();
       whenPlayCard("first", 0);
       setScriptedModePickProvider(null);
-      expect(handIds()).toContain(DEEPWOOD);
-      expect(handIds()).toContain(FAIRY);
+      expect(newHandCards(uidsBefore, "first", DEEPWOOD)).toHaveLength(1);
+      expect(newHandCards(uidsBefore, "first", FAIRY)).toHaveLength(1);
     });
 
     it("Combo(3): activates both modes — damage plus hand tokens", () => {
@@ -423,10 +455,10 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       });
       const foe = enemyFollower(2, 6, "Foe");
       const defBefore = Number(foe.defense);
-      playCombo3(0);
+      const uidsBeforeRing = playCombo3WithHandSnapshot();
       expect(defBefore - Number(foe.defense)).toBe(4);
-      expect(handIds()).toContain(DEEPWOOD);
-      expect(handIds()).toContain(FAIRY);
+      expect(newHandCards(uidsBeforeRing, "first", DEEPWOOD)).toHaveLength(1);
+      expect(newHandCards(uidsBeforeRing, "first", FAIRY)).toHaveLength(1);
       expect(printed).toContain("Activate all of them");
     });
   });
@@ -540,9 +572,10 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
     it("Mode 1: adds 2 Fairies to hand by identity", () => {
       setScriptedModePickProvider(() => [0]);
       setupTurn(R6, { hand: [MIROKU], pp: 3 });
+      const uidsBefore = handUids();
       whenPlayCard("first", 0);
       setScriptedModePickProvider(null);
-      expect(handIds().filter((id) => id === FAIRY)).toHaveLength(2);
+      expect(newHandCards(uidsBefore, "first", FAIRY)).toHaveLength(2);
     });
 
     it("Mode 2: recovers 2 play points", () => {
@@ -571,16 +604,17 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
     it("Evolve replicates Fanfare mode pick", () => {
       setScriptedModePickProvider(() => [0]);
       setupTurn(R6, { hand: [MIROKU], pp: 3, evo: 2 });
+      const uidsBeforeFanfare = handUids();
       whenPlayCard("first", 0);
       setScriptedModePickProvider(null);
-      const fairiesAfterFanfare = handIds().filter((id) => id === FAIRY).length;
+      expect(newHandCards(uidsBeforeFanfare, "first", FAIRY)).toHaveLength(2);
       const miroku = findOnBoard("first", "Miroku, Swarmpetal")!;
+      const uidsBeforeEvolve = handUids();
       setScriptedModePickProvider(() => [0]);
       onEvolve(miroku, "first", "normal", { spendPoint: true });
       setScriptedModePickProvider(null);
-      expect(handIds().filter((id) => id === FAIRY).length).toBe(
-        fairiesAfterFanfare + 2,
-      );
+      expect(newHandCards(uidsBeforeEvolve, "first", FAIRY)).toHaveLength(2);
+      expect(newHandCards(uidsBeforeFanfare, "first", FAIRY)).toHaveLength(4);
     });
   });
 
@@ -752,6 +786,98 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       expect(Number(deckF.attack)).toBe(2);
       expect(Number(deckF.defense)).toBe(2);
     });
+
+    it("crest owner's EOT Combo(3): deck buff persists on draw and on board (owner ruling 2026-08-13)", () => {
+      setupTurn(R7, {
+        hand: [THESTAE],
+        pp: 4,
+        evo: 2,
+        deck: [FILLER, FILLER, FILLER],
+      });
+      const deckF = createCard(
+        { name: "DeckFolo", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "deck",
+        "first",
+      );
+      state.players.first.deck = [FILLER, deckF];
+      enemyFollower(2, 8, "Target");
+      whenPlayCard("first", 0);
+      resolveFirstPending();
+      const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
+      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      state.players.first.playsThisTurn = 3;
+      whenEndTurn();
+      expect(Number(deckF.attack)).toBe(3);
+      expect(Number(deckF.defense)).toBe(3);
+      whenEndTurn();
+      const drawn = getHand(state, "first").find((c) => c.uid === deckF.uid)!;
+      expect(Number(drawn.attack)).toBe(3);
+      expect(Number(drawn.defense)).toBe(3);
+      const idx = getHand(state, "first").findIndex((c) => c.uid === deckF.uid);
+      const playResult = playCardNoRender(
+        getHand(state, "first"),
+        "first",
+        idx,
+      );
+      expect(playResult.kind).toBe("done");
+      const onBoard = thenBoard("first").find((c) => c.uid === deckF.uid)!;
+      expect(Number(onBoard.attack)).toBe(3);
+      expect(Number(onBoard.defense)).toBe(3);
+    });
+
+    it("crest does not buff deck followers on opponent's EOT", () => {
+      setupTurn(R7, {
+        hand: [THESTAE],
+        pp: 4,
+        evo: 2,
+        secondHand: [FILLER, FILLER, FILLER],
+        secondPP: 6,
+        deck: [FILLER, FILLER, FILLER],
+      });
+      const deckF = createCard(
+        { name: "DeckFolo", type: "Follower", cost: 2, attack: 2, defense: 2 },
+        "deck",
+        "first",
+      );
+      state.players.first.deck = [deckF];
+      enemyFollower(2, 8, "Target");
+      whenPlayCard("first", 0);
+      resolveFirstPending();
+      const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
+      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEndTurn();
+      expect(state.activePlayer).toBe("second");
+      playCardNoRender(getHand(state, "second"), "second", 0);
+      playCardNoRender(getHand(state, "second"), "second", 0);
+      playCardNoRender(getHand(state, "second"), "second", 0);
+      whenEndTurn();
+      expect(Number(deckF.attack)).toBe(2);
+      expect(Number(deckF.defense)).toBe(2);
+    });
+
+    it("crest expires after Countdown (3) owner turn-starts", () => {
+      setupTurn(R7, {
+        hand: [THESTAE],
+        pp: 4,
+        evo: 2,
+        deck: [FILLER, FILLER, FILLER],
+      });
+      enemyFollower(2, 8, "Target");
+      whenPlayCard("first", 0);
+      resolveFirstPending();
+      const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
+      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      expect(
+        getCrests(state, "first").some((c) => c.name.includes("Thestae")),
+      ).toBe(true);
+      for (let i = 0; i < 3; i++) {
+        whenEndTurn();
+        whenEndTurn();
+      }
+      expect(
+        getCrests(state, "first").some((c) => c.name.includes("Thestae")),
+      ).toBe(false);
+    });
   });
 
   describe("Great Hart of the Glacial Realm (10714120)", () => {
@@ -762,8 +888,9 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
 
     it("Fanfare adds 2 Deepwood Bounty to hand by identity", () => {
       setupTurn(R7, { hand: [GREAT_HART], pp: 6 });
+      const uidsBefore = handUids();
       whenPlayCard("first", 0);
-      expect(handIds().filter((id) => id === DEEPWOOD)).toHaveLength(2);
+      expect(newHandCards(uidsBefore, "first", DEEPWOOD)).toHaveLength(2);
     });
 
     it("owner's EOT: deals attack-value split damage to enemy followers", () => {
@@ -803,35 +930,86 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       expect(Number(crest!.countdown)).toBe(3);
     });
 
-    it("crest owner's EOT Combo(3): adds Deepwood Bounty to hand", () => {
+    it("crest owner's EOT Combo(3): adds a new Deepwood Bounty to hand", () => {
       setupTurn(R7, { hand: [GREAT_HART], pp: 6 });
+      const uidsBeforePlay = handUids();
       whenPlayCard("first", 0);
+      const fanfareBounties = newHandCards(uidsBeforePlay, "first", DEEPWOOD);
+      expect(fanfareBounties).toHaveLength(2);
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
       onEvolve(hart, "first", "super");
-      const bountyBefore = handIds().filter((id) => id === DEEPWOOD).length;
+      const uidsBeforeEot = handUids();
       state.players.first.playsThisTurn = 3;
       whenEndTurn();
-      expect(handIds().filter((id) => id === DEEPWOOD).length).toBe(
-        bountyBefore + 1,
-      );
+      expect(newHandCards(uidsBeforeEot, "first", DEEPWOOD)).toHaveLength(1);
       expect(crestPrinted).toContain("Deepwood Bounty");
     });
 
     it("crest owner's EOT below Combo(3): does not add Deepwood Bounty", () => {
       setupTurn(R7, { hand: [GREAT_HART], pp: 6 });
+      const uidsBeforePlay = handUids();
+      whenPlayCard("first", 0);
+      newHandCards(uidsBeforePlay, "first", DEEPWOOD);
+      const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
+      state.players.first.superEvoPoints = 1;
+      state.players.first.superEvoCharges = 1;
+      onEvolve(hart, "first", "super");
+      const uidsBeforeEot = handUids();
+      state.players.first.playsThisTurn = 2;
+      whenEndTurn();
+      expect(newHandCards(uidsBeforeEot, "first", DEEPWOOD)).toHaveLength(0);
+    });
+
+    it("crest does not add Deepwood Bounty on opponent's EOT", () => {
+      setupTurn(R7, {
+        hand: [GREAT_HART],
+        pp: 6,
+        secondHand: [FILLER, FILLER, FILLER],
+        secondPP: 6,
+        deck: [FILLER, FILLER, FILLER],
+      });
+      const uidsBeforePlay = handUids();
+      whenPlayCard("first", 0);
+      newHandCards(uidsBeforePlay, "first", DEEPWOOD);
+      const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
+      state.players.first.superEvoPoints = 1;
+      state.players.first.superEvoCharges = 1;
+      onEvolve(hart, "first", "super");
+      whenEndTurn();
+      expect(state.activePlayer).toBe("second");
+      const uidsBeforeOpponentEot = handUids();
+      playCardNoRender(getHand(state, "second"), "second", 0);
+      playCardNoRender(getHand(state, "second"), "second", 0);
+      playCardNoRender(getHand(state, "second"), "second", 0);
+      whenEndTurn();
+      expect(
+        newHandCards(uidsBeforeOpponentEot, "first", DEEPWOOD),
+      ).toHaveLength(0);
+    });
+
+    it("crest expires after Countdown (3) owner turn-starts", () => {
+      setupTurn(R7, {
+        hand: [GREAT_HART],
+        pp: 6,
+        deck: [FILLER, FILLER, FILLER],
+      });
       whenPlayCard("first", 0);
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
       onEvolve(hart, "first", "super");
-      const bountyBefore = handIds().filter((id) => id === DEEPWOOD).length;
-      state.players.first.playsThisTurn = 2;
-      whenEndTurn();
-      expect(handIds().filter((id) => id === DEEPWOOD).length).toBe(
-        bountyBefore,
-      );
+      expect(
+        getCrests(state, "first").some((c) => c.name.includes("Great Hart")),
+      ).toBe(true);
+      for (let i = 0; i < 3; i++) {
+        whenEndTurn();
+        whenEndTurn();
+      }
+      expect(
+        getCrests(state, "first").some((c) => c.name.includes("Great Hart")),
+      ).toBe(false);
     });
   });
 
