@@ -2466,6 +2466,12 @@
             "target": "selected:follower",
             "count": 1,
             "reveal": false
+          },
+          {
+            "op": "cost",
+            "target": "last_added_to_hand",
+            "mode": "reduce",
+            "amount": 3
           }
         ]
       }
