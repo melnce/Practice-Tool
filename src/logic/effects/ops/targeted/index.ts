@@ -145,8 +145,22 @@ TARGETED_OP_HANDLERS.set("transform", (ctx) => {
     if (!src) return { kind: "handled" };
     const firstHand = getHand(state, "first");
     const secondHand = getHand(state, "second");
-    const inHand = firstHand.includes(target) || secondHand.includes(target);
-    transformIntoExactInstance(target, src, inHand ? "hand" : "board");
+    const inFirstHand = firstHand.includes(target);
+    const inSecondHand = secondHand.includes(target);
+    const inHand = inFirstHand || inSecondHand;
+    const targetOwner = inFirstHand
+      ? "first"
+      : inSecondHand
+        ? "second"
+        : getBoard(state, "first").includes(target)
+          ? "first"
+          : "second";
+    transformIntoExactInstance(
+      target,
+      src,
+      inHand ? "hand" : "board",
+      targetOwner,
+    );
     logEvent("transform", {
       owner,
       target: target.name,
@@ -173,20 +187,21 @@ function transformIntoExactInstance(
   target: CardInstance,
   source: CardInstance,
   zone: "hand" | "board",
+  targetOwner: "first" | "second",
 ): void {
   const clone: CardInstance = structuredClone(source);
   clone.uid = target.uid;
-  if (target.owner) clone.owner = target.owner;
+  clone.owner = targetOwner;
   clone.zone = target.zone ?? zone;
   if (zone === "hand") {
     normalizeInstanceEnteringHandAsCopy(clone);
     normalizeCardStats(clone);
-    const hand = getHand(state, target.owner as any);
+    const hand = getHand(state, targetOwner);
     const idx = hand.indexOf(target);
     if (idx !== -1) hand[idx] = clone;
   } else {
     normalizeCardStats(clone);
-    const board = getBoard(state, target.owner as any);
+    const board = getBoard(state, targetOwner);
     const idx = board.indexOf(target);
     if (idx !== -1) board[idx] = clone;
   }

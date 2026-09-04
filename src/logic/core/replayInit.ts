@@ -102,6 +102,7 @@ const REPLAY_DECKS: Record<string, ReplayDeckDef> = {
 function buildDeckFromNames(
   cardNames: readonly string[],
   rng: any,
+  owner: "first" | "second",
   strict: boolean = false,
 ): CardInstance[] {
   const deck: CardInstance[] = [];
@@ -122,6 +123,7 @@ function buildDeckFromNames(
     const card: CardInstance = {
       ...template,
       uid: rng.makeUid(),
+      owner,
     } as CardInstance;
 
     deck.push(card);
@@ -203,8 +205,8 @@ export function initReplayState(
   const deckDef = REPLAY_DECKS[deckId] ?? REPLAY_DECK_STANDARD;
 
   // Build decks from card names
-  const firstDeck = buildDeckFromNames(deckDef.cards, s.rng, strict);
-  const secondDeck = buildDeckFromNames(deckDef.cards, s.rng, strict);
+  const firstDeck = buildDeckFromNames(deckDef.cards, s.rng, "first", strict);
+  const secondDeck = buildDeckFromNames(deckDef.cards, s.rng, "second", strict);
 
   // Shuffle using seeded RNG - FIX: Shuffle returns a copy, we must use it!
   const firstShuffled = s.rng.shuffle(firstDeck);
