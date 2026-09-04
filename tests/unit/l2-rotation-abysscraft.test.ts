@@ -267,8 +267,7 @@ describe("L2 — Rotation Abysscraft", () => {
   });
 
   describe("Almeida, Headstrong Miner (10451110)", () => {
-    const printed =
-      "Enhance(4): Evolve this follower and give it +1/+1.\nRush";
+    const printed = "Enhance(4): Evolve this follower and give it +1/+1.\nRush";
 
     it("enters with Rush without Enhance", () => {
       setupTurn(R5, { hand: [ALMEIDA], pp: 2 });
@@ -494,9 +493,9 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(getBoard(state, "first").some((c) => c.uid === target.uid)).toBe(
         false,
       );
-      expect(getBoard(state, "first").some((c) => c.uid === bystander.uid)).toBe(
-        true,
-      );
+      expect(
+        getBoard(state, "first").some((c) => c.uid === bystander.uid),
+      ).toBe(true);
       expect(handIds()).toContain(DRAW_TOP);
       expect(handIds()).toContain(DRAW_SECOND);
       expect(printed).toContain("Draw 2 cards");
@@ -538,8 +537,7 @@ describe("L2 — Rotation Abysscraft", () => {
   });
 
   describe("Valiant Edge (10451310)", () => {
-    const printed =
-      "Deal 2 damage to your leader. Gain Crest: Valiant Edge.";
+    const printed = "Deal 2 damage to your leader. Gain Crest: Valiant Edge.";
     const crestPrinted =
       "Countdown (2). At the end of your turn, deal 2 damage to a random enemy follower and restore 1 defense to your leader.";
 
@@ -795,9 +793,7 @@ describe("L2 — Rotation Abysscraft", () => {
       whenPlayCard("first", 0);
       const amorous = findOnBoard("first", "Amorous Necromancer")!;
       onEvolve(amorous, "first", "normal", { spendPoint: true });
-      expect(
-        thenBoard("first").filter((c) => c.id === GHOST).length,
-      ).toBe(2);
+      expect(thenBoard("first").filter((c) => c.id === GHOST).length).toBe(2);
       expect(printed).toContain("Summon 2 copies of Ghost");
     });
 
@@ -810,9 +806,9 @@ describe("L2 — Rotation Abysscraft", () => {
       onEvolve(amorous, "first", "super");
       const ghosts = thenBoard("first").filter((c) => c.id === GHOST);
       expect(ghosts.length).toBe(2);
-      expect(ghosts.every((g) => g.hasDrain || g.keywords?.includes("Drain"))).toBe(
-        true,
-      );
+      expect(
+        ghosts.every((g) => g.hasDrain || g.keywords?.includes("Drain")),
+      ).toBe(true);
       expect(printed).toContain("Give them Drain");
     });
   });
@@ -1032,7 +1028,7 @@ describe("L2 — Rotation Abysscraft", () => {
 
   describe("Friendly Blue Ogre (10552120)", () => {
     const printed =
-      'Fanfare: Select an enemy follower on the field and give it "Can\'t attack followers or leaders" until the end of your opponent\'s turn. Draw a card.\nEvolve: Replicate the effects of this card\'s Fanfare ability.';
+      "Fanfare: Select an enemy follower on the field and give it \"Can't attack followers or leaders\" until the end of your opponent's turn. Draw a card.\nEvolve: Replicate the effects of this card's Fanfare ability.";
 
     it("Fanfare silences enemy attacks and draws a card; bystander untouched", () => {
       setupTurn(R6, {
@@ -1115,7 +1111,9 @@ describe("L2 — Rotation Abysscraft", () => {
       fiole.peak_defense = fiole.defense;
       state.players.first.board = [fiole];
       whenPlayCard("first", 0);
-      const bat = thenBoard("first").find((c) => c.uid !== fiole.uid && c.id === BAT)!;
+      const bat = thenBoard("first").find(
+        (c) => c.uid !== fiole.uid && c.id === BAT,
+      )!;
       expect(bat.hasRush).toBe(true);
       expect(printed).toContain("give it Rush");
     });
@@ -1177,16 +1175,19 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(printed).toContain("Reanimate (4)");
     });
 
-    it.fails("Evolve destroys 6 other random followers — 10554110: printed 'destroy 6 other random followers' observed 6 followers remain after evolve", () => {
-      setupTurn(R8, { hand: [MILTEO], pp: 6, evo: 2 });
-      for (let i = 0; i < 6; i++) allyFollower(`F${i}`, 1, 1);
-      whenPlayCard("first", 0);
-      const milteo = findOnBoard("first", "Milteo & Luzen")!;
-      onEvolve(milteo, "first", "normal", { spendPoint: true });
-      cleanupDead();
-      expect(thenBoard("first").length).toBe(1);
-      expect(printed).toContain("destroy 6 other random followers");
-    });
+    it.fails(
+      "Evolve destroys 6 other random followers — 10554110: printed 'destroy 6 other random followers' observed 6 followers remain after evolve",
+      () => {
+        setupTurn(R8, { hand: [MILTEO], pp: 6, evo: 2 });
+        for (let i = 0; i < 6; i++) allyFollower(`F${i}`, 1, 1);
+        whenPlayCard("first", 0);
+        const milteo = findOnBoard("first", "Milteo & Luzen")!;
+        onEvolve(milteo, "first", "normal", { spendPoint: true });
+        cleanupDead();
+        expect(thenBoard("first").length).toBe(1);
+        expect(printed).toContain("destroy 6 other random followers");
+      },
+    );
 
     it("Super-Evolve gains Crest: Milteo & Luzen", () => {
       setupTurn(R8, { hand: [MILTEO], pp: 6 });
@@ -1244,8 +1245,7 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(nezha.hasRush).toBe(true);
       const totalBefore = Number(a.defense) + Number(b.defense);
       runEndOfTurnBoundary("first");
-      const totalAfter =
-        Number(a.defense) + Number(b.defense);
+      const totalAfter = Number(a.defense) + Number(b.defense);
       expect(totalBefore - totalAfter).toBe(6);
       expect(printed).toContain("deal 4 damage");
     });
@@ -1281,8 +1281,9 @@ describe("L2 — Rotation Abysscraft", () => {
       vas.defense = 0;
       cleanupDead();
       expect(
-        thenBoard("first").filter((c) => c.name === "Vaseraga, Unyielding Scythe")
-          .length,
+        thenBoard("first").filter(
+          (c) => c.name === "Vaseraga, Unyielding Scythe",
+        ).length,
       ).toBe(1);
       expect(getHP(state, "first")).toBe(18);
       expect(printed).toContain("Deal 2 damage to your leader");
@@ -1400,7 +1401,9 @@ describe("L2 — Rotation Abysscraft", () => {
       state.players.first.superEvoPoints = 1;
       const cdBefore = Number(findCrest("first", "Belial")!.countdown);
       onEvolve(belial, "first", "super");
-      expect(Number(findCrest("first", "Belial")!.countdown)).toBe(cdBefore - 1);
+      expect(Number(findCrest("first", "Belial")!.countdown)).toBe(
+        cdBefore - 1,
+      );
       expect(printed).toContain("Advance the count");
     });
   });
@@ -1416,7 +1419,8 @@ describe("L2 — Rotation Abysscraft", () => {
       state.players.first.shadows = 6;
       whenPlayCard("first", 0);
       const reanimated = thenBoard("first").filter(
-        (c) => c.uid !== findOnBoard("first", "Fediel, Darkness Personified")!.uid,
+        (c) =>
+          c.uid !== findOnBoard("first", "Fediel, Darkness Personified")!.uid,
       );
       expect(reanimated.length).toBe(2);
       expect(reanimated.every((c) => c.hasEvolved)).toBe(true);
@@ -1505,9 +1509,7 @@ describe("L2 — Rotation Abysscraft", () => {
       onEvolve(isty, "first", "super");
       const lwAlly = allyFollower("LWAlly", 1, 2);
       lwAlly.hasLastWords = true;
-      lwAlly.lastWordsEffects = [
-        { op: "draw", source: "deck", count: 1 },
-      ];
+      lwAlly.lastWordsEffects = [{ op: "draw", source: "deck", count: 1 }];
       const foe = enemyFollower(2, 5, "Foe");
       runEndOfTurnBoundary("first");
       cleanupDead();
@@ -1580,21 +1582,24 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(printed).toContain("Can't be destroyed by abilities");
     });
 
-    it.fails("Clash destroys opposing follower — 10654110: printed 'Destroy the opposing follower' but foe remains on board after clash combat", () => {
-      setupTurn(R10, { hand: [ARMES], pp: 9 });
-      whenPlayCard("first", 0);
-      const armes = findOnBoard("first", "Armes, Depletive Demon")!;
-      applyKeywordsFromList(armes);
-      armes.can_attack = true;
-      armes.can_attack_followers = true;
-      armes.attacks_left = 1;
-      armes.justPlayed = false;
-      const foe = enemyFollower(2, 20, "ClashFoe");
-      attackFollower(0, 0, "first", "second");
-      cleanupDead();
-      expect(getBoard(state, "second").length).toBe(0);
-      expect(printed).toContain("Destroy the opposing follower");
-    });
+    it.fails(
+      "Clash destroys opposing follower — 10654110: printed 'Destroy the opposing follower' but foe remains on board after clash combat",
+      () => {
+        setupTurn(R10, { hand: [ARMES], pp: 9 });
+        whenPlayCard("first", 0);
+        const armes = findOnBoard("first", "Armes, Depletive Demon")!;
+        applyKeywordsFromList(armes);
+        armes.can_attack = true;
+        armes.can_attack_followers = true;
+        armes.attacks_left = 1;
+        armes.justPlayed = false;
+        const foe = enemyFollower(2, 20, "ClashFoe");
+        attackFollower(0, 0, "first", "second");
+        cleanupDead();
+        expect(getBoard(state, "second").length).toBe(0);
+        expect(printed).toContain("Destroy the opposing follower");
+      },
+    );
 
     it("Super-Evolve grants 3 attacks per turn", () => {
       setupTurn(R10, { hand: [ARMES], pp: 9 });
@@ -1617,10 +1622,9 @@ describe("L2 — Rotation Abysscraft", () => {
       allyFollower("Ally", 3, 3);
       enemyFollower(3, 3, "Foe");
       whenPlayCard("first", 0);
-      const skels = [
-        ...thenBoard("first"),
-        ...thenBoard("second"),
-      ].filter((c) => c.id === SKELETON);
+      const skels = [...thenBoard("first"), ...thenBoard("second")].filter(
+        (c) => c.id === SKELETON,
+      );
       expect(skels.length).toBe(2);
       expect(printed).toContain("Transform all other followers");
     });
