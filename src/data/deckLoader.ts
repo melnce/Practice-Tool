@@ -37,7 +37,11 @@ function assertDeckCardsResolvable(raw: RawDeck, deckFile: string): void {
   );
 }
 
-function enrichDeck(rawDeck: RawDeck, deckFile?: string): CardInstance[] {
+function enrichDeck(
+  rawDeck: RawDeck,
+  deckFile: string | undefined,
+  owner: "first" | "second",
+): CardInstance[] {
   assertDeckCardsResolvable(rawDeck, deckFile ?? "unknown");
 
   const deck = normalizeDeck(rawDeck, deckFile);
@@ -47,7 +51,7 @@ function enrichDeck(rawDeck: RawDeck, deckFile?: string): CardInstance[] {
       (card.name != null && getCardDetails(card.name));
 
     const base = fullData ? { ...fullData, ...card } : { ...card };
-    return { ...base, uid: state.rng.makeUid() } as CardInstance;
+    return { ...base, uid: state.rng.makeUid(), owner } as CardInstance;
   });
 }
 
@@ -88,7 +92,7 @@ async function fetchDeck(deckId: string): Promise<FetchedDeck> {
 export async function loadBlueDeck(deckName: string) {
   const loaded = await fetchDeck(deckName);
   state.players.first.deckFile = loaded.__deckFile;
-  const enriched = enrichDeck(loaded, loaded.__deckFile);
+  const enriched = enrichDeck(loaded, loaded.__deckFile, "first");
 
   state.players.first.deck.length = 0;
   state.players.first.deck.push(...enriched);
@@ -114,7 +118,7 @@ export async function loadBlueDeck(deckName: string) {
 export async function loadRedDeck(deckName: string) {
   const loaded = await fetchDeck(deckName);
   state.players.second.deckFile = loaded.__deckFile;
-  const enriched = enrichDeck(loaded, loaded.__deckFile);
+  const enriched = enrichDeck(loaded, loaded.__deckFile, "second");
 
   state.players.second.deck.length = 0;
   state.players.second.deck.push(...enriched);
@@ -146,7 +150,7 @@ export function loadPlayerDeckFromRaw(
 ): void {
   const player = state.players[owner];
   player.deckFile = deckFile;
-  const enriched = enrichDeck(raw, deckFile);
+  const enriched = enrichDeck(raw, deckFile, owner);
 
   player.deck.length = 0;
   player.deck.push(...enriched);
