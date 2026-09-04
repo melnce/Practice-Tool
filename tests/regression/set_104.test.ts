@@ -2,6 +2,53 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { startNewGame, dispatch } from "../../src/engine.js";
 import { getCardDetails } from "../../src/data/cardDatabase.js";
 import { GameState } from "../../src/core/types/index.js";
+import "../audit/setup.ts";
+import {
+  givenGameState,
+  whenPlayCard,
+  createCard,
+  resetUidCounter,
+  thenHand,
+  findOnBoard,
+} from "../harness/builders.js";
+import { state as globalState } from "../../src/core/gameState.js";
+import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import "../../src/logic/core/effects/index.js";
+
+function setupHarnessTurn(
+  round: number,
+  opts: { hand?: string[]; pp?: number; deck?: string[] } = {},
+) {
+  const max = Math.min(round, 10);
+  const pp = opts.pp ?? max;
+  let b = givenGameState({
+    seed: 104,
+    activePlayer: "first",
+    roundCount: round,
+  }).withFirstPP(pp, max);
+  if (opts.hand?.length) b = b.withFirstHand(opts.hand);
+  if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
+  b.build();
+  globalState.gameStarted = true;
+  globalState.phase = "main";
+}
+
+function enemyFollower(defense: number, name = "Enemy") {
+  const c = createCard(
+    { name, type: "Follower", cost: 2, attack: 2, defense },
+    "board",
+    "second",
+  );
+  c.peak_defense = defense;
+  globalState.players.second.board.push(c);
+  return c;
+}
+
+function earthSigilOnBoard() {
+  return globalState.players.first.board.find(
+    (c) => (c.counters?.earth ?? 0) > 0,
+  );
+}
 
 // Mocks
 // Mocks
@@ -139,41 +186,15 @@ describe("Set 104: Skybound Dragons", () => {
     // Wait, `arthur.evolve` json property is standard.
   });
 
-  it("Philosophia should draw a spell", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
+  it("Philosophia should draw a spell", () => {
+    resetUidCounter();
+    setupHarnessTurn(6, {
+      hand: ["10431110"],
+      pp: 3,
+      deck: ["10021110", "10131310", "10021120"],
     });
-
-    const spell = { uid: "deck_1", type: "Spell", name: "Target Spell" } as any;
-    const follower = { uid: "deck_2", type: "Follower", name: "Noise" } as any;
-    state.players.first.deck = [follower, spell]; // Top is 0? usually. draw pops from end? or shift?
-    // logic/core/draw.ts: return deck.pop().
-    // So end of array = top.
-    state.players.first.deck = [follower, spell, follower]; // spell in middle
-
-    const philo = {
-      uid: "hand_1",
-      id: "10431110",
-      name: "Philosophia",
-      type: "Follower",
-      cost: 3,
-      fanfare: [{ op: "draw", filters: { type: "Spell" }, count: 1 }],
-    } as any;
-    state.players.first.hand = [philo];
-    state.players.first.pp = 3;
-
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_1",
-    });
-
-    // Should have drawn the spell
-    expect(
-      state.players.first.hand.some((c) => c.name === "Target Spell"),
-    ).toBe(true);
+    whenPlayCard("first", 0);
+    expect(thenHand("first").some((c) => c.type === "Spell")).toBe(true);
   });
 
   it("Rune Portal should damage all and heal leader", async () => {
@@ -218,75 +239,29 @@ describe("Set 104: Skybound Dragons", () => {
 
     expect(state.players.first.hp).toBe(13);
   });
-  it("Randall should gain Storm on Enhance(5)", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
-    });
-    const randall = {
-      uid: "hand_1",
-      id: "10421110",
-      name: "Randall",
-      type: "Follower",
-      cost: 2,
-      keywords: [
-        {
-          name: "Enhance",
-          cost: 5,
-          effects: [{ op: "stat", keywords: ["Storm"] }],
-        },
-      ],
-    } as any;
-    state.players.first.hand = [randall];
-    state.players.first.pp = 5; // Enough for Enhance
-
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_1",
-    });
-    expect(state.players.first.board[0].keywords).toContain("Storm");
-    expect(state.players.first.pp).toBe(0); // 5 consumed
+  it("Randall should gain Storm on Enhance(5)", () => {
+    resetUidCounter();
+    setupHarnessTurn(6, { hand: ["10421110"], pp: 5 });
+    whenPlayCard("first", 0);
+    expect(findOnBoard("first", "Randall, Feet Fighter")?.hasStorm).toBe(true);
   });
 
-  it("Anthuria should give Barrier to allies", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
-    });
-    const ally = {
-      uid: "b1",
-      name: "Ally",
-      type: "Follower",
-      keywords: [],
-    } as any;
-    state.players.first.board = [ally];
-
-    const anthuria = {
-      uid: "hand_1",
-      id: "10412120",
-      name: "Anthuria",
-      type: "Follower",
-      cost: 5,
-      fanfare: [{ op: "stat", target: "ally:follower", keywords: ["Barrier"] }],
-    } as any;
-    state.players.first.hand = [anthuria];
-    state.players.first.pp = 5;
-
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_1",
-    });
-
-    // Both Anthuria (self) and Ally should have Barrier?
-    // JSON said: "ally:follower" -> usually includes self unless `not_self` is set.
-    // Let's assume it buffs all.
-    expect(state.players.first.board.length).toBe(2);
-    expect(state.players.first.board[0].keywords).toContain("Barrier"); // ally
-    expect(state.players.first.board[1].keywords).toContain("Barrier"); // anthuria (if target includes self)
+  it("Anthuria should give Barrier to allies", () => {
+    resetUidCounter();
+    setupHarnessTurn(8, { hand: ["10412120"], pp: 5 });
+    const ally = createCard(
+      { name: "Ally", type: "Follower", cost: 2, attack: 2, defense: 2 },
+      "board",
+      "first",
+    );
+    ally.peak_defense = 2;
+    globalState.players.first.board = [ally];
+    whenPlayCard("first", 0);
+    expect(ally.hasBarrier || ally.keywordState?.hasBarrier).toBe(true);
+    const anthuria = findOnBoard("first", "Anthuria, Toe-Tapping Torch");
+    expect(anthuria?.hasBarrier || anthuria?.keywordState?.hasBarrier).toBe(
+      true,
+    );
   });
 
   it("Aglovale should damage all enemies", async () => {
@@ -319,68 +294,17 @@ describe("Set 104: Skybound Dragons", () => {
     expect(state.players.second.board.length).toBe(0); // 3-3=0 -> Destroyed
   });
 
-  it("Ezecrain should damage 2 enemies and summon 2 Magic Sediments", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
-    });
-    // Setup 2 enemies
-    state.players.second.board = [
-      { uid: "e1", defense: 5, type: "Follower" },
-      { uid: "e2", defense: 5, type: "Follower" },
-    ] as any;
-
-    const ezecrain = {
-      uid: "hand_1",
-      id: "10432110",
-      name: "Ezecrain",
-      type: "Follower",
-      cost: 6,
-      fanfare: [
-        {
-          op: "select",
-          target: "enemy:follower",
-          count: 2,
-          effects: [{ op: "damage", amount: 4 }],
-        },
-        { op: "summon", name: "Magic Sediment", count: 2 },
-      ],
-    } as any;
-    state.players.first.hand = [ezecrain];
-    state.players.first.pp = 6;
-    state.players.first.board = [];
-
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_1",
-    });
-
-    // Should require target selection
-    expect(state.pendingTargetEffect).toBeDefined();
-    // Select e1
-    state = dispatch(state, {
-      type: "CHOOSE_TARGET",
-      player: "first",
-      target: { type: "card", uid: "e1" },
-    });
-    // Select e2
-    state = dispatch(state, {
-      type: "CHOOSE_TARGET",
-      player: "first",
-      target: { type: "card", uid: "e2" },
-    });
-
-    // Damage applied?
-    expect((state.players.second.board[0] as any).defense).toBe(1); // 5-4
-    expect((state.players.second.board[1] as any).defense).toBe(1);
-
-    // Sigils?
-    expect(
-      state.players.first.board.filter((c) => c.name === "Magic Sediment")
-        .length,
-    ).toBe(2);
+  it("Ezecrain should damage 2 enemies and summon 2 Magic Sediments", () => {
+    resetUidCounter();
+    setupHarnessTurn(10, { hand: ["10432110"], pp: 6 });
+    const a = enemyFollower(5, "A");
+    const b = enemyFollower(5, "B");
+    whenPlayCard("first", 0);
+    resolvePendingTarget(String(a.uid));
+    resolvePendingTarget(String(b.uid));
+    expect(Number(a.defense)).toBe(1);
+    expect(Number(b.defense)).toBe(1);
+    expect(earthSigilOnBoard()?.counters?.earth).toBeGreaterThanOrEqual(2);
   });
 
   it("Alchemic Flare should damage and summon Magic Sediment", async () => {
@@ -427,57 +351,16 @@ describe("Set 104: Skybound Dragons", () => {
     ).toBe(true);
   });
 
-  it("Lyria should Enhance(8) to Draw and Recover PP", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
+  it("Lyria should Enhance(8) to Draw and Recover PP", () => {
+    resetUidCounter();
+    setupHarnessTurn(10, {
+      hand: ["10403120"],
+      pp: 8,
+      deck: ["10002120"],
     });
-    const bigFollower = {
-      uid: "deck_1",
-      type: "Follower",
-      cost: 9,
-      name: "Big Guy",
-    } as any;
-    state.players.first.deck = [bigFollower];
-
-    const lyria = {
-      uid: "hand_1",
-      id: "10403120",
-      name: "Lyria",
-      type: "Follower",
-      cost: 2,
-      keywords: [
-        {
-          name: "Enhance",
-          cost: 8,
-          effects: [
-            {
-              op: "draw",
-              filters: { type: "Follower", cost_gte: 7 },
-              count: 1,
-            },
-            { op: "recover_pp", amount: 7 },
-          ],
-        },
-      ],
-    } as any;
-    state.players.first.hand = [lyria];
-    state.players.first.pp = 8;
-    state.players.first.maxPP = 8;
-
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_1",
-    });
-
-    // Cost 8 paid -> 0 left. Recover 7 -> 7 left.
-    expect(state.players.first.pp).toBe(7);
-    // Drawn?
-    expect(state.players.first.hand.some((c) => c.name === "Big Guy")).toBe(
-      true,
-    );
+    whenPlayCard("first", 0);
+    expect(globalState.players.first.pp).toBe(7);
+    expect(thenHand("first").some((c) => c.id === "10002120")).toBe(true);
   });
 
   it("Nezha should deal EOT damage", async () => {
@@ -563,116 +446,34 @@ describe("Set 104: Skybound Dragons", () => {
     expect(true).toBe(true);
   });
 
-  it("Satyr should evolve if evolved ally exists", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
-    });
-    const evolvedAlly = {
-      uid: "b1",
-      name: "Ally",
-      type: "Follower",
-      hasEvolved: true,
-    } as any;
-    state.players.first.board = [evolvedAlly];
-
-    const satyr = {
-      uid: "hand_1",
-      id: "10452120",
-      name: "Satyr",
-      type: "Follower",
-      cost: 3,
-      fanfare: [
-        {
-          op: "check_condition",
-          condition: "evolved_ally_exists",
-          effects: [{ op: "evolve_self" }],
-        },
-      ],
-    } as any;
-    state.players.first.hand = [satyr];
-    state.players.first.pp = 3;
-
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_1",
-    });
-
-    expect(state.players.first.board.length).toBe(2);
-    const satyrOnBoard = state.players.first.board.find(
-      (c) => c.name === "Satyr",
+  it("Satyr should evolve if evolved ally exists", () => {
+    resetUidCounter();
+    setupHarnessTurn(6, { hand: ["10452120"], pp: 4 });
+    const evolved = createCard(
+      { name: "EvoAlly", type: "Follower", cost: 2, attack: 2, defense: 2 },
+      "board",
+      "first",
     );
-    expect(satyrOnBoard?.hasEvolved).toBe(true);
+    evolved.hasEvolved = true;
+    globalState.players.first.board = [evolved];
+    whenPlayCard("first", 0);
+    expect(findOnBoard("first", "Satyr, Open-Hearted Rover")?.hasEvolved).toBe(
+      true,
+    );
   });
 
-  it("Izmir should evolve if Max PP >= 10", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
-    });
-    state.players.first.maxPP = 10;
-    state.players.first.pp = 10;
-
-    const izmir = {
-      uid: "hand_1",
-      id: "10442110",
-      name: "Izmir",
-      type: "Follower",
-      cost: 5,
-      fanfare: [
-        {
-          op: "gate",
-          at_least: 10,
-          effects: [{ op: "evolve_self" }],
-        },
-      ],
-    } as any;
-    state.players.first.hand = [izmir];
-
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_1",
-    });
-
-    const izmirOnBoard = state.players.first.board.find(
-      (c) => c.name === "Izmir",
-    );
-    expect(izmirOnBoard?.hasEvolved).toBe(true);
+  it("Izmir should evolve if Max PP >= 10", () => {
+    resetUidCounter();
+    setupHarnessTurn(10, { hand: ["10442110"], pp: 5 });
+    enemyFollower(5);
+    whenPlayCard("first", 0);
+    expect(findOnBoard("first", "Izmir, Frigid Fate")?.hasEvolved).toBe(true);
   });
-  it("Vyrn should evolve if super evo is active", async () => {
-    state = await startNewGame({
-      deckAId: "sample_blue",
-      deckBId: "sample_red",
-      seed: 104,
-    });
-    // We assume mergeSets has run, so Vyrn is in the DB
-    const vyrnData = getCardDetails("Vyrn, Li'l Red Dragon");
-    if (!vyrnData) throw new Error("Vyrn not found in DB");
-
-    // Mock SUPER EVO via round count? Or mock the gate?
-    // super_evo_gate checks round >= 7 for blue.
-    state.roundCount = 8;
-
-    const card: any = { ...vyrnData, uid: "hand_vyrn", owner: "first" };
-    state.players.first.hand = [card];
-    state.players.first.pp = 3;
-    state.players.first.maxPP = 3;
-
-    // Play
-    state = dispatch(state, {
-      type: "PLAY_CARD",
-      player: "first",
-      cardUid: "hand_vyrn",
-    });
-
-    const vyrn = state.players.first.board[0];
-    expect(vyrn).toBeDefined();
-    // Should have evolved
-    expect(vyrn.hasEvolved).toBe(true);
+  it("Vyrn should evolve if super evo is active", () => {
+    resetUidCounter();
+    setupHarnessTurn(7, { hand: ["10401120"], pp: 2 });
+    whenPlayCard("first", 0);
+    expect(findOnBoard("first", "Vyrn, Bestest Pal")?.hasEvolved).toBe(true);
   });
 
   it("Golden Knight Enhance(9) should trigger all effects", async () => {

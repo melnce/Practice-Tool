@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import "./setup.js";
+import "../fixtures/setup.ts";
 import {
     givenGameState,
     whenRunEffects,
@@ -89,9 +89,10 @@ describe("Mechanic Contract: PP", () => {
 
     describe("pp action: gain_max", () => {
         it("increases max PP", () => {
-            givenGameState({ seed: 1 }).build();
-            // Set legacy permPP so gain_max can increment
-            (state as any).bluePermPP = 5;
+            givenGameState({ seed: 1, roundCount: 1 })
+                .withFirstPP(2, 2)
+                .build();
+            state.players.first.permPP = 2;
 
             const effect = {
                 op: "pp" as const,
@@ -100,13 +101,17 @@ describe("Mechanic Contract: PP", () => {
             };
             whenRunEffects([effect], "first");
 
-            // Engine modifies legacy bluePermPP
-            expect((state as any).bluePermPP).toBe(6);
+            expect(state.players.first.permPP).toBe(3);
+            expect(state.players.first.maxPP).toBe(
+                state.roundCount + state.players.first.permPP,
+            );
         });
 
         it("max PP caps at 10", () => {
-            givenGameState({ seed: 1 }).build();
-            (state as any).bluePermPP = 9;
+            givenGameState({ seed: 1, roundCount: 9 })
+                .withFirstPP(9, 9)
+                .build();
+            state.players.first.permPP = 9;
 
             const effect = {
                 op: "pp" as const,
@@ -115,7 +120,8 @@ describe("Mechanic Contract: PP", () => {
             };
             whenRunEffects([effect], "first");
 
-            expect((state as any).bluePermPP).toBeLessThanOrEqual(10);
+            expect(state.players.first.permPP).toBeLessThanOrEqual(10);
+            expect(state.players.first.maxPP).toBeLessThanOrEqual(10);
         });
     });
 

@@ -11,16 +11,16 @@
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import allCards from "../cards/all.json";
-import tokenCards from "../cards/token_details.json";
+import allCards from "../../cards/all.json";
+import tokenCards from "../../cards/token_details.json";
 import {
     givenGameState,
     resetUidCounter,
     whenPlayCard,
     thenBoard,
     thenHand,
-} from "./harness/builders.js";
-import { state } from "../src/core/gameState.js";
+} from "../harness/builders.js";
+import { state } from "../../src/core/gameState.js";
 
 // =============================================================================
 // TYPES
