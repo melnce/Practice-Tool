@@ -44,7 +44,11 @@ export function filterArtifactFollowersHand(owner: Player, maxCost: number) {
   );
 }
 
-export function summonFromHand(card: CardInstance, owner: Player): boolean {
+export function summonFromHand(
+  card: CardInstance,
+  owner: Player,
+  opts?: { deferEnter?: boolean },
+): boolean {
   if (!card) return false;
 
   const hand = getHand(state, owner);
@@ -111,7 +115,14 @@ export function summonFromHand(card: CardInstance, owner: Player): boolean {
     initAmulet(card);
   }
 
-  if (pushToBoard(board, owner, card)) {
+  if (
+    pushToBoard(
+      board,
+      owner,
+      card,
+      opts?.deferEnter ? { deferEnter: true } : undefined,
+    )
+  ) {
     logEvent("summonFromHand", { owner, card: card.name, uid: card.uid });
     if (state.lastSummoned) {
       state.lastSummoned.length = 0;
@@ -128,6 +139,7 @@ export function summonExactCopyFromHand(
   srcCard: CardInstance,
   owner: Player,
   position = "right",
+  opts?: { deferEnter?: boolean },
 ) {
   if (!srcCard) return null;
 
@@ -207,9 +219,11 @@ export function summonExactCopyFromHand(
     state.lastSummoned.push(clone);
   }
 
-  // Rally + enter triggers — same as pushToBoard / finishFollowerEnter
-  // (Owner ruling — Rally 2026-08-12: any successful follower entry counts).
-  finishFollowerEnter(clone, owner);
+  // Rally + enter triggers — deferred when invoked from targeted handlers
+  // (orchestrator calls finishFollowerEnter after handler returns).
+  if (!opts?.deferEnter) {
+    finishFollowerEnter(clone, owner);
+  }
 
   return clone;
 }

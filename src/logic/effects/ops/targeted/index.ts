@@ -23,6 +23,7 @@ import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
 import { doAction } from "../../../../core/history.js";
 import type { CardInstance } from "../../../../core/types/index.js";
+import type { Player } from "../../../../core/types/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 import {
   getHand,
@@ -634,21 +635,32 @@ TARGETED_OP_HANDLERS.set("cost", (ctx) => {
 TARGETED_OP_HANDLERS.set("select_hand_summon_follower", (ctx) => {
   const { owner, targetUids } = ctx;
   const targets = resolveUids(targetUids);
+  const deferredEnter: Array<{ card: CardInstance; owner: Player }> = [];
   for (const target of targets) {
-    summonFromHand(target, owner);
+    if (summonFromHand(target, owner, { deferEnter: true })) {
+      deferredEnter.push({ card: target, owner });
+    }
   }
-  return { kind: "handled" };
+  return deferredEnter.length
+    ? { kind: "handled", deferredEnter }
+    : { kind: "handled" };
 });
 
 // Handler for summoning copies of artifacts selected from hand
 TARGETED_OP_HANDLERS.set("select_hand_summon_artifact_copy", (ctx) => {
   const { owner, targetUids } = ctx;
   const targets = resolveUids(targetUids);
+  const deferredEnter: Array<{ card: CardInstance; owner: Player }> = [];
 
   for (const target of targets) {
-    summonExactCopyFromHand(target, owner, "right");
+    const copy = summonExactCopyFromHand(target, owner, "right", {
+      deferEnter: true,
+    });
+    if (copy) deferredEnter.push({ card: copy, owner });
   }
-  return { kind: "handled" };
+  return deferredEnter.length
+    ? { kind: "handled", deferredEnter }
+    : { kind: "handled" };
 });
 
 // Handler for summoning copies from hand with EOT destroy (Doomwright Resurgence)
@@ -657,9 +669,12 @@ TARGETED_OP_HANDLERS.set(
   (ctx) => {
     const { owner, targetUids } = ctx;
     const targets = resolveUids(targetUids);
+    const deferredEnter: Array<{ card: CardInstance; owner: Player }> = [];
 
     for (const target of targets) {
-      const copy = summonExactCopyFromHand(target, owner, "right");
+      const copy = summonExactCopyFromHand(target, owner, "right", {
+        deferEnter: true,
+      });
       if (copy) {
         // Grant "destroy at end of opponent's turn" trigger
         if (!Array.isArray(copy.triggers)) {
@@ -670,8 +685,11 @@ TARGETED_OP_HANDLERS.set(
           condition: { whose_turn: "opponent" },
           effects: [{ op: "destroy", target: "self" }],
         } as any);
+        deferredEnter.push({ card: copy, owner });
       }
     }
-    return { kind: "handled" };
+    return deferredEnter.length
+      ? { kind: "handled", deferredEnter }
+      : { kind: "handled" };
   },
 );

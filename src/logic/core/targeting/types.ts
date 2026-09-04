@@ -134,6 +134,9 @@ export type TargetingResult =
   | { kind: "execute"; opCtx: TargetedOpContext };
 
 export type DispatchResult =
-  | { kind: "handled" }
+  | {
+      kind: "handled";
+      deferredEnter?: Array<{ card: CardInstance; owner: Player }>;
+    }
   | { kind: "paused" }
   | { kind: "error"; reason: string };
