@@ -328,19 +328,16 @@ describe("L2 — Rotation Havencraft", () => {
       expect(printed).toContain("During your turn");
     });
 
-    it.fails(
-      "during opponent's turn leader restore does not evolve — printed: 'During your turn'; observed: evolves on opponent turn too (10961110)",
-      () => {
-        setupTurn(R5, { hand: [TENETS], pp: 2 });
-        whenPlayCard("first", 0);
-        const tenets = findOnBoard("first", "Follower of the Tenets")!;
-        whenEndTurn();
-        expect(state.activePlayer).toBe("second");
-        state.players.first.hp = 18;
-        restoreLeaderHP("first", 1);
-        expect(!!tenets.hasEvolved || !!tenets.isEvolved).toBe(false);
-      },
-    );
+    it("during opponent's turn leader restore does not evolve — printed: 'During your turn' (10961110)", () => {
+      setupTurn(R5, { hand: [TENETS], pp: 2 });
+      whenPlayCard("first", 0);
+      const tenets = findOnBoard("first", "Follower of the Tenets")!;
+      whenEndTurn();
+      expect(state.activePlayer).toBe("second");
+      state.players.first.hp = 18;
+      restoreLeaderHP("first", 1);
+      expect(!!tenets.hasEvolved || !!tenets.isEvolved).toBe(false);
+    });
   });
 
   describe("Lamretta, Sisterly Shepherd (10461120)", () => {
@@ -902,19 +899,16 @@ describe("L2 — Rotation Havencraft", () => {
       expect(boardCountById(FOX_PURITY)).toBe(foxesAfterFanfare + 1);
     });
 
-    it.fails(
-      "during opponent's turn leader restore does not summon Fox — printed: 'During your turn'; observed: extra Fox summoned on opponent turn (10563110)",
-      () => {
-        setupTurn(R6, { hand: [SAINT_REHAB], pp: 5, hp: 14 });
-        whenPlayCard("first", 0);
-        const foxesAfterFanfare = boardCountById(FOX_PURITY);
-        whenEndTurn();
-        expect(state.activePlayer).toBe("second");
-        state.players.first.hp = 14;
-        restoreLeaderHP("first", 1);
-        expect(boardCountById(FOX_PURITY)).toBe(foxesAfterFanfare);
-      },
-    );
+    it("during opponent's turn leader restore does not summon Fox — printed: 'During your turn' (10563110)", () => {
+      setupTurn(R6, { hand: [SAINT_REHAB], pp: 5, hp: 14 });
+      whenPlayCard("first", 0);
+      const foxesAfterFanfare = boardCountById(FOX_PURITY);
+      whenEndTurn();
+      expect(state.activePlayer).toBe("second");
+      state.players.first.hp = 14;
+      restoreLeaderHP("first", 1);
+      expect(boardCountById(FOX_PURITY)).toBe(foxesAfterFanfare);
+    });
 
     it("Evolve replicates Fanfare (+1 more heal)", () => {
       setupTurn(R6, { hand: [SAINT_REHAB], pp: 5, hp: 14, evo: 2 });
