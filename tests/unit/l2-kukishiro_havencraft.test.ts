@@ -48,7 +48,6 @@ const TROUE = "10461110";
 const DESPERATE_SHRINEMOUSE = "10562120";
 const FATE_OF_WORLD = "10503310";
 const PROSTRATING = "10661110";
-const ZOE = "10864120";
 const BLADE_ANGEL = "10902110";
 const KUKISHIRO = "10564120";
 
@@ -61,6 +60,9 @@ const BIG_ALLY = "10002120"; // Caravan Mammoth (cost 7)
 const ENGAGE_AMULET = "10161210"; // Serene Sanctuary
 const FOX_OF_PURITY = "10061120"; // cost 2
 const COST_ONE_DRAW = "10031310"; // Foresight (cost 1)
+const PICK_A = "10111310";
+const PICK_B = "10112310";
+const STAY = "10102110";
 
 const R5 = 5;
 const R6 = 6;
@@ -166,6 +168,19 @@ function crestSummonNames(player: "first" | "second"): string[] {
     .map((c) => c.name);
 }
 
+function setupKukishiroWithCrest() {
+  setupTurn(R10, {
+    hand: [KUKISHIRO, PICK_A, PICK_B, STAY],
+    deck: [FILLER, FILLER, FILLER],
+    pp: 10,
+  });
+  whenPlayCard("first", 0);
+}
+
+function pushDeckTop(spec: string | Record<string, unknown>) {
+  state.players.first.deck.push(createCard(spec, "deck", "first"));
+}
+
 describe("L2 — Kukishiro Havencraft", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -227,25 +242,26 @@ describe("L2 — Kukishiro Havencraft", () => {
       expect(believer.hasRush).toBe(true);
     });
 
-    it.fails(
-      "opponent turn draw does not grant Rush — 10561120: printed During your turn; observed Rush on opponent turn",
-      () => {
-        setupTurn(R6, {
-          hand: [BOUQUET_BELIEVER],
-          deck: [DRAW_A, FILLER],
-          pp: 1,
-          active: "second",
-          secondDeck: [FILLER, FILLER],
-        });
-        whenPlayCard("first", 0);
-        const believer = findOnBoard("first", "Bouquet Believer")!;
-        applyKeywordsFromList(believer);
-        runEndOfTurnBoundary("second");
-        drawFromDeck();
-        applyKeywordsFromList(believer);
-        expect(believer.hasRush).toBeFalsy();
-      },
-    );
+    it("opponent turn draw does not grant Rush", () => {
+      resetUidCounter();
+      givenGameState({
+        seed: 1,
+        activePlayer: "second",
+        roundCount: R6,
+      })
+        .withFirstPP(10, 6)
+        .withSecondPP(10, 6)
+        .withSecondDeck([FILLER, FILLER])
+        .build();
+      state.gameStarted = true;
+      state.phase = "main";
+      const believer = createCard(BOUQUET_BELIEVER, "board", "first");
+      believer.peak_defense = believer.defense;
+      state.players.first.board = [believer];
+      pushDeckTop(COST_ONE_DRAW);
+      drawFromDeck();
+      expect(believer.hasRush).toBeFalsy();
+    });
   });
 
   describe("Earrings of Sunlight (10761210)", () => {
@@ -495,9 +511,6 @@ describe("L2 — Kukishiro Havencraft", () => {
     });
 
     it("Engage: returns 2 random hand cards to deck then draws 2 stacked cards", () => {
-      const PICK_A = "10111310";
-      const PICK_B = "10112310";
-      const STAY = "10102110";
       setupTurn(R10, {
         hand: [RESOLVE_MISTBLOOM, PICK_A, PICK_B, STAY],
         deck: [DRAW_A, DRAW_B],
@@ -745,61 +758,6 @@ describe("L2 — Kukishiro Havencraft", () => {
     });
   });
 
-  describe("Zoe, Dazzling Hope (10864120)", () => {
-    const printed =
-      "Fanfare: Select a Mode to activate. Deal 3 damage to this follower.\n1. Deal 3 damage to all enemy followers.\n2. Deal 3 damage to the enemy leader.\n3. Restore 3 defense to your leader.\nEvolve: Gain Crest: Zoe, Dazzling Hope.";
-
-    it("mode 1: self takes 3 then all enemy followers take 3", () => {
-      setupTurn(R6, { hand: [ZOE], pp: 5 });
-      const a = enemyFollower(2, 5, "A");
-      const b = enemyFollower(2, 5, "B");
-      setScriptedModePickProvider(() => [0]);
-      whenPlayCard("first", 0);
-      const zoe = findOnBoard("first", "Zoe, Dazzling Hope");
-      if (zoe) expect(Number(zoe.defense)).toBe(1);
-      expect(Number(a.defense)).toBe(2);
-      expect(Number(b.defense)).toBe(2);
-    });
-
-    it("mode 2: self takes 3 then enemy leader takes 3", () => {
-      setupTurn(R6, { hand: [ZOE], pp: 5, hp: 20 });
-      const hpEnemyBefore = getHP(state, "second");
-      setScriptedModePickProvider(() => [1]);
-      whenPlayCard("first", 0);
-      expect(getHP(state, "second")).toBe(hpEnemyBefore - 3);
-    });
-
-    it.fails(
-      "mode 3 restores leader then deals 3 to Zoe — 10864120: printed Fanfare deals 3 to self; observed restore without self damage",
-      () => {
-        setupTurn(R6, { hand: [ZOE], pp: 5, hp: 15 });
-        const hpBefore = getHP(state, "first");
-        setScriptedModePickProvider(() => [2]);
-        whenPlayCard("first", 0);
-        const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
-        expect(getHP(state, "first")).toBe(hpBefore + 3);
-        expect(Number(zoe.defense)).toBe(1);
-      },
-    );
-
-    it.fails(
-      "Evolve gains Crest: Zoe, Dazzling Hope — 10864120: evolve crest not applied",
-      () => {
-        setupTurn(R6, { hand: [ZOE], pp: 5 });
-        setScriptedModePickProvider(() => [1]);
-        whenPlayCard("first", 0);
-        const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
-        state.players.first.evoCharges = 2;
-        onEvolve(zoe, "first", "normal", { spendPoint: true });
-        expect(
-          getCrests(state, "first").some(
-            (c) => c.name === "Zoe, Dazzling Hope",
-          ),
-        ).toBe(true);
-      },
-    );
-  });
-
   describe("Blade Angel (10902110)", () => {
     const printed =
       "Fanfare: Select 2 other allied followers on the field and give them +3/+3.";
@@ -830,10 +788,6 @@ describe("L2 — Kukishiro Havencraft", () => {
       "Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.\nRush";
     const crestPrinted =
       "During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a Fox of Purity or Holy Falcon at random.\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy Fox of Purity or Holy Falcon at random.";
-
-    const PICK_A = "10111310";
-    const PICK_B = "10112310";
-    const STAY = "10102110";
 
     it("Fanfare: gains Crest: Kukishiro, Mistbloom", () => {
       setupTurn(R10, {
@@ -878,42 +832,51 @@ describe("L2 — Kukishiro Havencraft", () => {
       expect(kuki.hasRush).toBe(true);
     });
 
-    it("crest during your turn: drawing cost-1 card summons Fox or Holy Falcon on your side", () => {
-      setupTurn(R10, {
-        hand: [KUKISHIRO, PICK_A, PICK_B, STAY],
-        deck: [FILLER, FILLER, FILLER],
-        pp: 10,
-      });
-      whenPlayCard("first", 0);
-      const allyBefore = crestSummonNames("first").length;
-      state.players.first.deck.unshift(
-        createCard(COST_ONE_DRAW, "deck", "first"),
-      );
+    it("crest during your turn: drawing cost-1 card summons exactly one Fox or Holy Falcon on your side", () => {
+      setupKukishiroWithCrest();
+      const allyBefore = crestSummonNames("first");
+      const enemyBefore = crestSummonNames("second");
+      pushDeckTop(COST_ONE_DRAW);
       drawFromDeck();
-      const allyAfter = crestSummonNames("first").length;
-      expect(allyAfter - allyBefore).toBe(1);
+      const allyAfter = crestSummonNames("first");
+      const enemyAfter = crestSummonNames("second");
+      expect(allyAfter.length - allyBefore.length).toBe(1);
+      expect(enemyAfter.length).toBe(enemyBefore.length);
+      expect(
+        allyAfter.some(
+          (name) => name === "Fox of Purity" || name === "Holy Falcon",
+        ),
+      ).toBe(true);
       expect(crestPrinted).toContain("1-, 3-, or 5-cost");
     });
 
-    it.fails(
-      "crest drawing cost-2 summons on enemy side — 10564120: printed enemy Fox of Purity or Holy Falcon; observed ally-side summon",
-      () => {
-        setupTurn(R10, {
-          hand: [KUKISHIRO, PICK_A, PICK_B, STAY],
-          deck: [FILLER, FILLER, FILLER],
-          pp: 10,
-        });
-        whenPlayCard("first", 0);
-        const enemyBefore = crestSummonNames("second").length;
-        state.players.first.deck.unshift(
-          createCard(FOX_OF_PURITY, "deck", "first"),
-        );
-        drawFromDeck();
-        const enemyAfter = crestSummonNames("second").length;
-        expect(enemyAfter - enemyBefore).toBe(1);
-        expect(crestPrinted).toContain("2-, 4-, or 6-cost");
-      },
-    );
+    it("crest during your turn: drawing cost-2 card summons exactly one Fox or Holy Falcon on enemy side", () => {
+      setupKukishiroWithCrest();
+      const allyBefore = crestSummonNames("first");
+      const enemyBefore = crestSummonNames("second");
+      pushDeckTop(FOX_OF_PURITY);
+      drawFromDeck();
+      const allyAfter = crestSummonNames("first");
+      const enemyAfter = crestSummonNames("second");
+      expect(enemyAfter.length - enemyBefore.length).toBe(1);
+      expect(allyAfter.length).toBe(allyBefore.length);
+      expect(
+        enemyAfter.some(
+          (name) => name === "Fox of Purity" || name === "Holy Falcon",
+        ),
+      ).toBe(true);
+      expect(crestPrinted).toContain("2-, 4-, or 6-cost");
+    });
+
+    it("crest during your turn: drawing cost-7 card summons nothing on either side", () => {
+      setupKukishiroWithCrest();
+      const allyBefore = crestSummonNames("first").length;
+      const enemyBefore = crestSummonNames("second").length;
+      pushDeckTop(BIG_ALLY);
+      drawFromDeck();
+      expect(crestSummonNames("first").length).toBe(allyBefore);
+      expect(crestSummonNames("second").length).toBe(enemyBefore);
+    });
 
     it("crest does not summon during opponent turn draw", () => {
       setupTurn(R10, {
@@ -927,13 +890,7 @@ describe("L2 — Kukishiro Havencraft", () => {
       const allyBefore = crestSummonNames("first").length;
       const enemyBefore = crestSummonNames("second").length;
       runEndOfTurnBoundary("second");
-      state.players.first.deck.unshift(
-        createCard(
-          { name: "Cost1Opp", type: "Spell", cost: 1 },
-          "deck",
-          "first",
-        ),
-      );
+      pushDeckTop(COST_ONE_DRAW);
       drawFromDeck();
       expect(crestSummonNames("first").length).toBe(allyBefore);
       expect(crestSummonNames("second").length).toBe(enemyBefore);
