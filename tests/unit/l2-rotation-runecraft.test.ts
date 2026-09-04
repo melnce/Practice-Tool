@@ -34,7 +34,10 @@ import {
   runEndOfTurnBoundary,
 } from "../../src/logic/core/turnBoundary.js";
 import { crestAddCounter } from "../../src/logic/effects/crest.js";
-import { faithCrestNameForCard, bootstrapFaithForPlayer } from "../../src/logic/faith/bootstrap.js";
+import {
+  faithCrestNameForCard,
+  bootstrapFaithForPlayer,
+} from "../../src/logic/faith/bootstrap.js";
 import {
   getBoard,
   getHand,
@@ -222,7 +225,10 @@ function earthSigilStack(player: "first" | "second" = "first"): number {
     .reduce((sum, c) => sum + (c.counters?.earth ?? 0), 0);
 }
 
-function placeEarthSigils(n: number, player: "first" | "second" = "first"): void {
+function placeEarthSigils(
+  n: number,
+  player: "first" | "second" = "first",
+): void {
   whenRunEffects(
     [
       {
@@ -352,20 +358,23 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       expect(printed).toContain("X is this follower's attack");
     });
 
-    it.fails("EOT with buffed attack (3): spellboosts hand 3 times — printed: X is this follower's attack; observed: EOT uses base attack 1 (card 10431120)", () => {
-      setupTurn(R6, { hand: [SUFRAMARE, BLAZE_DESTROYER], pp: 1 });
-      whenPlayCard("first", 0);
-      const suframare = findOnBoard("first", "Suframare, Wandering Tutor")!;
-      whenRunEffects(
-        [{ op: "stat", action: "give", target: "self", attack: 2 } as any],
-        "first",
-        suframare,
-      );
-      const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      const sb0 = sbCount(blaze);
-      whenEndTurn();
-      expect(sbCount(blaze) - sb0).toBe(3);
-    });
+    it.fails(
+      "EOT with buffed attack (3): spellboosts hand 3 times — printed: X is this follower's attack; observed: EOT uses base attack 1 (card 10431120)",
+      () => {
+        setupTurn(R6, { hand: [SUFRAMARE, BLAZE_DESTROYER], pp: 1 });
+        whenPlayCard("first", 0);
+        const suframare = findOnBoard("first", "Suframare, Wandering Tutor")!;
+        whenRunEffects(
+          [{ op: "stat", action: "give", target: "self", attack: 2 } as any],
+          "first",
+          suframare,
+        );
+        const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+        const sb0 = sbCount(blaze);
+        whenEndTurn();
+        expect(sbCount(blaze) - sb0).toBe(3);
+      },
+    );
 
     it("Evolve: gives Can't attack followers or leaders", () => {
       setupTurn(R6, { hand: [SUFRAMARE], pp: 1, evo: 2 });
@@ -537,7 +546,9 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
     it("adds exactly one Mysterian Missile (90031310) to hand", () => {
       setupTurn(R6, { hand: [POPPY], pp: 2 });
       whenPlayCard("first", 0);
-      const missiles = thenHand("first").filter((c) => c.id === MYSTERIAN_MISSILE);
+      const missiles = thenHand("first").filter(
+        (c) => c.id === MYSTERIAN_MISSILE,
+      );
       expect(missiles).toHaveLength(1);
       expect(printed).toContain("Mysterian Missile");
     });
@@ -893,9 +904,14 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       "Activates in hand. Whenever you perform Earth Rite, reduce the cost of this card by 1.\nSelect an enemy follower on the field and destroy it. Gain 2 earth sigils.";
 
     it("in hand: Earth Rite performed elsewhere reduces cost by 1", () => {
-      setupTurn(R6, { hand: [BOTTOMLESS_GLUTTONY, DAZZLING_RUNEKNIGHT], pp: 6 });
+      setupTurn(R6, {
+        hand: [BOTTOMLESS_GLUTTONY, DAZZLING_RUNEKNIGHT],
+        pp: 6,
+      });
       placeEarthSigils(1);
-      const gluttony = thenHand("first").find((c) => c.id === BOTTOMLESS_GLUTTONY)!;
+      const gluttony = thenHand("first").find(
+        (c) => c.id === BOTTOMLESS_GLUTTONY,
+      )!;
       const cost0 = getEffectiveCost(gluttony, "first");
       setScriptedModePickProvider(() => [1]);
       whenPlayCard("first", 1);
@@ -1052,14 +1068,20 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       expect(printed).toContain("Destroy your Crest");
     });
 
-    it.fails("crest countdown (2) Last Words: deals 3 to all followers — printed: Countdown (2) Last Words Deal 3 damage to all followers; observed: crest countdown does not advance via EOT in harness (card 10532110)", () => {
+    it("crest Countdown (2) Last Words: after two owner turn-starts deals 3 to all followers", () => {
       setupTurn(R7, { hand: [INSOMNIAC_WITCH], pp: 4 });
       const ally = allyFollower(2, 5, "Ally");
       const enemy = enemyFollower(2, 5, "Enemy");
       whenPlayCard("first", 0);
-      runEndOfTurnBoundary("first");
-      runEndOfTurnBoundary("second");
-      runEndOfTurnBoundary("first");
+      expect(Number(crestByName("Insomniac Witch")!.countdown)).toBe(2);
+      whenEndTurn();
+      whenEndTurn();
+      runStartOfTurnBoundary("first");
+      expect(Number(crestByName("Insomniac Witch")!.countdown)).toBe(1);
+      whenEndTurn();
+      whenEndTurn();
+      runStartOfTurnBoundary("first");
+      expect(crestByName("Insomniac Witch")).toBeUndefined();
       expect(Number(ally.defense)).toBe(2);
       expect(Number(enemy.defense)).toBe(2);
     });
@@ -1178,9 +1200,9 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R8, { hand: [EARTH_SHATTERING_BOLT], pp: 5 });
       enemyFollower(5, 10, "High");
       whenPlayCard("first", 0);
-      expect(handIds().filter((id) => id === EARTH_SHATTERING_BOLT)).toHaveLength(
-        0,
-      );
+      expect(
+        handIds().filter((id) => id === EARTH_SHATTERING_BOLT),
+      ).toHaveLength(0);
     });
 
     it("with Earth Rite (2): adds Earth-Shattering Bolt to hand", () => {
@@ -1188,9 +1210,9 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       placeEarthSigils(2);
       enemyFollower(5, 10, "High");
       whenPlayCard("first", 0);
-      expect(handIds().filter((id) => id === EARTH_SHATTERING_BOLT)).toHaveLength(
-        1,
-      );
+      expect(
+        handIds().filter((id) => id === EARTH_SHATTERING_BOLT),
+      ).toHaveLength(1);
       expect(earthSigilStack()).toBe(0);
     });
   });
@@ -1207,7 +1229,11 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
     });
 
     it("Crystalspawn enter: restores 1 defense to leader", () => {
-      setupTurn(R7, { hand: [ENRAPTURED_STUDENT, CRYSTALSPAWN], pp: 6, hp: 15 });
+      setupTurn(R7, {
+        hand: [ENRAPTURED_STUDENT, CRYSTALSPAWN],
+        pp: 6,
+        hp: 15,
+      });
       whenPlayCard("first", 0);
       const hpAfterFanfare = getHP(state, "first");
       whenPlayCard("first", 0);
@@ -1348,7 +1374,10 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       "Fanfare: Deal 3 damage to 3 random enemy followers. Spellboost your hand 3 times.";
 
     it("deals 3 damage split across 3 random enemies (seed 1) and spellboosts hand 3 times", () => {
-      setupTurn(R10, { hand: [WATERBENDING_CHARMWIELDER, BLAZE_DESTROYER], pp: 6 });
+      setupTurn(R10, {
+        hand: [WATERBENDING_CHARMWIELDER, BLAZE_DESTROYER],
+        pp: 6,
+      });
       enemyFollower(2, 5, "E1");
       enemyFollower(2, 5, "E2");
       enemyFollower(2, 5, "E3");
@@ -1383,14 +1412,24 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       expect(golem.hasEvolved).toBeFalsy();
     });
 
-    it.fails("Golem enter with Earth Rite (1): evolves the entering Golem — printed: Whenever an allied Golem follower enters the field, Earth Rite (1) - Evolve it; observed: fanfare Golems do not evolve despite sigils (card 10533110)", () => {
+    it("with Earth Rite (1): first Golem entering evolves; second does not without another sigil", () => {
       setupTurn(R10, { hand: [EMPEROR_OF_ELEMENTS], pp: 7 });
       placeEarthSigils(1);
       whenPlayCard("first", 0);
       const golems = thenBoard("first").filter((c) => c.id === GUARDIAN_GOLEM);
       expect(golems).toHaveLength(2);
-      expect(golems.every((g) => g.hasEvolved)).toBe(true);
+      const evolvedCount = golems.filter((g) => g.hasEvolved).length;
+      expect(evolvedCount).toBe(1);
       expect(printed).toContain("Earth Rite (1)");
+    });
+
+    it("with Earth Rite (2): both Fanfare Golems evolve", () => {
+      setupTurn(R10, { hand: [EMPEROR_OF_ELEMENTS], pp: 7 });
+      placeEarthSigils(2);
+      whenPlayCard("first", 0);
+      const golems = thenBoard("first").filter((c) => c.id === GUARDIAN_GOLEM);
+      expect(golems).toHaveLength(2);
+      expect(golems.filter((g) => g.hasEvolved)).toHaveLength(2);
     });
   });
 
@@ -1505,16 +1544,22 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       expect(Number(bystander.defense)).toBe(5);
     });
 
-    it.fails("crest on opponent EOT: summons and evolves Lilanthim on their board — printed: At the end of your opponent's turn, summon a Lilanthim and evolve it; observed: crest does not summon after first EOT (card 10734110)", () => {
+    it("crest at end of opponent's turn: summons and evolves Lilanthim on your board", () => {
       setupTurn(R10, { hand: [LILANTHIM], pp: 7 });
       placeEarthSigils(1);
       whenPlayCard("first", 0);
-      runEndOfTurnBoundary("first");
-      const onSecond = getBoard(state, "second").filter((c) =>
+      const boardBefore = countOnBoardByName(
+        "Lilanthim, Anathema of Predation",
+      );
+      expect(boardBefore).toBe(1);
+      whenEndTurn();
+      whenEndTurn();
+      const onFirst = getBoard(state, "first").filter((c) =>
         c.name?.includes("Lilanthim"),
       );
-      expect(onSecond.length).toBe(1);
-      expect(onSecond[0]!.hasEvolved).toBe(true);
+      expect(onFirst.length).toBe(2);
+      const summoned = onFirst.find((c) => c.hasEvolved);
+      expect(summoned).toBeDefined();
     });
   });
 
