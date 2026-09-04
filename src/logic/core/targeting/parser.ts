@@ -1,4 +1,5 @@
 import type { TargetQuery } from "./types.js";
+import { logEvent } from "../../../core/logger.js";
 
 /**
  * Parses a raw target string into a normalized Query object.
@@ -14,7 +15,7 @@ export function parseTargetQuery(
 
   // 1. Handle special string literals that map to specific contexts
   // LEGACY: Preserves "ally:last_summoned" syntax for replay compatibility
-  if (raw === "ally:last_summoned") {
+  if (raw === "ally:last_summoned" || raw === "last_summoned") {
     return {
       raw,
       side: "special",
@@ -39,6 +40,16 @@ export function parseTargetQuery(
       raw,
       side: "special",
       specialContext: "played_card",
+      condition,
+    };
+  }
+
+  // Clash / follower_strike: the opposing combatant relative to sourceCard
+  if (raw === "clash_opponent") {
+    return {
+      raw,
+      side: "special",
+      specialContext: "clash_opponent",
       condition,
     };
   }
@@ -114,8 +125,17 @@ export function parseTargetQuery(
     // "other:follower" = all followers on the field except the source (both sides)
     side = "any";
     excludeSelf = true;
-  } else {
-    side = "ally"; // default
+  } else if (sideRaw === "other_allies") {
+    side = "ally";
+    excludeSelf = true;
+  } else if (sideRaw !== "ally") {
+    logEvent("targeting_unknown_side", { side: sideRaw, raw });
+    console.warn(`[Targeting] Unknown target side "${sideRaw}" in "${raw}"`);
+    return {
+      raw,
+      side: "unknown",
+      condition,
+    };
   }
 
   // Map type filter if present in string

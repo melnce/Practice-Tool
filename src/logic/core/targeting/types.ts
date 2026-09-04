@@ -83,11 +83,13 @@ export interface TargetQuery {
     | "self"
     | "selected"
     | "special"
-    | "attacker";
+    | "attacker"
+    | "unknown";
   specialContext?:
     | "entering_follower"
     | "last_summoned"
     | "played_card"
+    | "clash_opponent"
     | undefined;
   typeFilter?: "follower" | "amulet" | "spell" | undefined;
   condition: any;
@@ -104,7 +106,8 @@ export type TargetContextKey =
   | "ally"
   | "enemy"
   | "any"
-  | "attacker";
+  | "attacker"
+  | "unknown";
 
 // Closed union for Filter Keys (for documentation/consts if needed)
 export type TargetFilterKey = "follower" | "amulet" | "spell";
