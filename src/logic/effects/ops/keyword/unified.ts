@@ -149,8 +149,6 @@ function handleGrant(
       const duration = typeof k === "object" ? k?.duration : undefined;
       const nameLower = name.toLowerCase();
 
-      const s = state as any;
-
       if (nameLower === "barrier") {
         grantLeaderBarrier(targetOwner);
       } else if (nameLower === "maxdamagecap") {
@@ -168,18 +166,12 @@ function handleGrant(
           duration,
         });
       } else if (nameLower === "vulnerable") {
-        // Increase damage taken (Beelzebub-style debuff)
-        // NOTE: still writes legacy root keys (unread by applyLeaderDamage);
-        // reset strips them. Do not migrate here — would change shipped Beelzebub.
-        const modKey =
-          targetOwner === "first"
-            ? "blueLeaderDamagePlus"
-            : "redLeaderDamagePlus";
-        s[modKey] = (s[modKey] || 0) + (value ?? 1);
+        const bonus = value ?? 1;
+        state.players[targetOwner].leaderDamageTakenBonus += bonus;
         logEvent("grantVulnerable", {
           owner: targetOwner,
-          value: value ?? 1,
-          total: s[modKey],
+          value: bonus,
+          total: state.players[targetOwner].leaderDamageTakenBonus,
         });
       }
     }
