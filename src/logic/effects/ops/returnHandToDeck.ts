@@ -39,7 +39,12 @@ function putBack(card: CardInstance, owner: Player, opts: PutBackOpts = {}) {
   const [removed] = hand.splice(idx, 1);
   if (!removed) return false;
   if (opts.deferShuffle) {
-    deck.unshift(removed);
+    // Owner ruling (deck op, shuffle:false): seeded random insertion. When a
+    // sibling draw follows, use indices [0, deck.length) so the drawable top
+    // (deck[length-1] before pop) is unchanged; full shuffle after the chain.
+    // Flagged as behavioural choice — owner may rule differently.
+    const index = deck.length > 0 ? state.rng.nextInt(deck.length) : 0;
+    deck.splice(index, 0, removed);
     markDeferredShuffle(owner);
   } else {
     deck.push(removed);
@@ -113,7 +118,7 @@ export function handleReturnHandToDeck(
       const card = bag.splice(index, 1)[0];
       if (card) chosen.push(card);
     }
-    for (const card of chosen) putBack(card, owner, { deferShuffle });
+    for (const card of chosen) putBack(card, owner);
     (state as any).lastReturnedCount = chosen.length;
     logEvent("returnHandToDeckRandom", { owner, count: chosen.length });
     return "done";
