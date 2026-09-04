@@ -2625,6 +2625,9 @@
       {
         "event": "ally_draw",
         "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
             "op": "keyword",
@@ -2728,6 +2731,9 @@
       {
         "event": "ally_draw",
         "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
             "op": "damage",

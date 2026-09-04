@@ -100,6 +100,8 @@ function isTurnTrigger(obj: Record<string, unknown>): boolean {
   );
 }
 
+const DURING_YOUR_TURN_WHENEVER = /During your turn,? whenever/i;
+
 function checkTurnScope(card: CardJson): Warning[] {
   const out: Warning[] = [];
   walk(card, (obj) => {
@@ -167,6 +169,45 @@ function checkTurnScope(card: CardJson): Warning[] {
       });
     }
   });
+
+  // "During your turn, whenever …" — every top-level trigger must scope to owner.
+  if (
+    card.description &&
+    DURING_YOUR_TURN_WHENEVER.test(card.description) &&
+    Array.isArray(card.triggers)
+  ) {
+    for (let i = 0; i < card.triggers.length; i++) {
+      const trig = card.triggers[i];
+      if (!trig || typeof trig !== "object") continue;
+      const t = trig as Record<string, unknown>;
+      const cond =
+        t.condition &&
+        typeof t.condition === "object" &&
+        !Array.isArray(t.condition)
+          ? (t.condition as Record<string, unknown>)
+          : {};
+      if (cond.whose_turn !== "owner") {
+        const nextCond = { ...cond, whose_turn: "owner" };
+        out.push({
+          family: "turn-scope",
+          id: card.id,
+          name: card.name,
+          found: compact({
+            trigger_index: i,
+            event: t.event ?? t.type ?? null,
+            condition: t.condition ?? null,
+          }),
+          canonical: compact({
+            trigger_index: i,
+            event: t.event ?? t.type ?? null,
+            condition: nextCond,
+          }),
+          note: 'printed "During your turn, whenever …" requires condition.whose_turn:"owner" on every trigger',
+        });
+      }
+    }
+  }
+
   return out;
 }
 

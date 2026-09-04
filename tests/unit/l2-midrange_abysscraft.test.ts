@@ -666,25 +666,22 @@ describe("L2 — Midrange Abysscraft", () => {
       expect(printed).toContain("Departed follower");
     });
 
-    it.fails(
-      "during opponent's turn: Departed enter does not buff or damage leader — 10754120: printed text requires during your turn; engine grants +1/+0, Rush, and Ward on opponent's turn too",
-      () => {
-        setupTurn(10, { active: "second" });
-        const mac = createCard(MACMILLAN, "board", "first");
-        mac.peak_defense = mac.defense;
-        state.players.first.board = [mac];
-        const ghost = createCard(GHOST, "board", "first");
-        ghost.peak_defense = ghost.defense;
-        const hpEnemyBefore = getHP(state, "second");
-        fireTrigger("ally_follower_enter", "first", {
-          enteringCard: ghost,
-          enteringOwner: "first",
-        });
-        expect(Number(ghost.attack)).toBe(1);
-        expect(ghost.hasRush).toBeFalsy();
-        expect(ghost.hasWard).toBeFalsy();
-        expect(getHP(state, "second")).toBe(hpEnemyBefore);
-      },
-    );
+    it("during opponent's turn: Departed enter does not buff or damage leader", () => {
+      setupTurn(10, { active: "second" });
+      const mac = createCard(MACMILLAN, "board", "first");
+      mac.peak_defense = mac.defense;
+      state.players.first.board = [mac];
+      const ghost = createCard(GHOST, "board", "first");
+      ghost.peak_defense = ghost.defense;
+      const hpEnemyBefore = getHP(state, "second");
+      fireTrigger("ally_follower_enter", "first", {
+        enteringCard: ghost,
+        enteringOwner: "first",
+      });
+      expect(Number(ghost.attack)).toBe(1);
+      expect(ghost.hasRush).toBeFalsy();
+      expect(ghost.hasWard).toBeFalsy();
+      expect(getHP(state, "second")).toBe(hpEnemyBefore);
+    });
   });
 });
