@@ -26,6 +26,7 @@ import {
 } from "./cleanup.js";
 import { flushDeferredDeckShuffle } from "../effects/ops/returnHandToDeck.js";
 import { flushDeferredOnFuse } from "../effects/ops/fuse/types.js";
+import { finishFollowerEnter } from "../effects/ops/summon_ops/core.js";
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
@@ -92,6 +93,11 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
 
     // Deaths from the targeted mutation resolve here — not inside handlers
     // (handlers must not call cleanupDead / runEffects; see targeting-contract).
+    if (result.deferredEnter?.length) {
+      for (const { card, owner } of result.deferredEnter) {
+        finishFollowerEnter(card, owner);
+      }
+    }
     cleanupDead();
 
     if (opCtx.resumeEffects?.length) {

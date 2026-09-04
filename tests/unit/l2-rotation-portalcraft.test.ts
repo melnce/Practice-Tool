@@ -665,28 +665,23 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       expect(handIds()).toContain(OMINOUS_BETA);
     });
 
-    // Finding (10572110): copied Artifact's enter trigger runs runEffects inside the
-    // targeted Super-Evolve handler (contract violation). Artifacts without enter triggers summon fine.
-    it.fails(
-      "Super-Evolve with Analyzing Artifact (on-enter draw trigger) throws runEffects inside targeted handler",
-      () => {
-        setupTurn(R8, {
-          hand: [NEW_AGE_CARTOGRAPHER, ANALYZING_ARTIFACT],
-          pp: 4,
-          superEvo: 1,
-        });
-        whenPlayCard("first", 0);
-        const cart = findOnBoard("first", "New-Age Cartographer")!;
-        const handArtifact = getHand(state, "first").find(
-          (c) => c.id === ANALYZING_ARTIFACT,
-        )!;
-        onEvolve(cart, "first", "super", { spendPoint: true });
-        resolvePendingByUid(handArtifact.uid);
-        expect(
-          boardIds().filter((id) => id === ANALYZING_ARTIFACT),
-        ).toHaveLength(1);
-      },
-    );
+    it("Super-Evolve with Analyzing Artifact summons exact copy (10572110) — printed: 'Select an Artifact follower in your hand that costs 5 or less and summon an exact copy of it.'", () => {
+      setupTurn(R8, {
+        hand: [NEW_AGE_CARTOGRAPHER, ANALYZING_ARTIFACT],
+        pp: 4,
+        superEvo: 1,
+      });
+      whenPlayCard("first", 0);
+      const cart = findOnBoard("first", "New-Age Cartographer")!;
+      const handArtifact = getHand(state, "first").find(
+        (c) => c.id === ANALYZING_ARTIFACT,
+      )!;
+      onEvolve(cart, "first", "super", { spendPoint: true });
+      resolvePendingByUid(handArtifact.uid);
+      expect(boardIds().filter((id) => id === ANALYZING_ARTIFACT)).toHaveLength(
+        1,
+      );
+    });
 
     it("Super-Evolve summons exact copy of hand Artifact without enter trigger; original stays in hand", () => {
       setupTurn(R8, { hand: [NEW_AGE_CARTOGRAPHER], pp: 4, superEvo: 1 });

@@ -14,7 +14,7 @@ import {
   bumpZoneVersion,
   stampBoardEntryTs,
 } from "../../../core/triggers/utils.js";
-import { getEffectiveCost, nextId } from "./utils.js";
+import { getEffectiveCost } from "./utils.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getHand, getBoard } from "../../../../core/playerHelpers.js";
 
@@ -44,7 +44,11 @@ export function filterArtifactFollowersHand(owner: Player, maxCost: number) {
   );
 }
 
-export function summonFromHand(card: CardInstance, owner: Player): boolean {
+export function summonFromHand(
+  card: CardInstance,
+  owner: Player,
+  opts?: { deferEnter?: boolean },
+): boolean {
   if (!card) return false;
 
   const hand = getHand(state, owner);
@@ -111,7 +115,14 @@ export function summonFromHand(card: CardInstance, owner: Player): boolean {
     initAmulet(card);
   }
 
-  if (pushToBoard(board, owner, card)) {
+  if (
+    pushToBoard(
+      board,
+      owner,
+      card,
+      opts?.deferEnter ? { deferEnter: true } : undefined,
+    )
+  ) {
     logEvent("summonFromHand", { owner, card: card.name, uid: card.uid });
     if (state.lastSummoned) {
       state.lastSummoned.length = 0;
@@ -128,6 +139,7 @@ export function summonExactCopyFromHand(
   srcCard: CardInstance,
   owner: Player,
   position = "right",
+  opts?: { deferEnter?: boolean },
 ) {
   if (!srcCard) return null;
 
@@ -139,9 +151,10 @@ export function summonExactCopyFromHand(
 
   // Normalize instance identity/placement — must mint a new uid (same discipline
   // as summonExactCopy / chain). Reusing the hand card's uid leaves one
-  // identity in two zones (hand + board).
+  // identity in two zones (hand + board). Keep template id from srcCard so
+  // copies remain identifiable (boardIds / "copies of X" counting); only uid
+  // is instance-scoped.
   clone.uid = state.rng.makeUid();
-  clone.id = nextId();
   clone.zone = "board";
   clone.owner = owner;
   clone.selected = false;
@@ -207,9 +220,11 @@ export function summonExactCopyFromHand(
     state.lastSummoned.push(clone);
   }
 
-  // Rally + enter triggers — same as pushToBoard / finishFollowerEnter
-  // (Owner ruling — Rally 2026-08-12: any successful follower entry counts).
-  finishFollowerEnter(clone, owner);
+  // Rally + enter triggers — deferred when invoked from targeted handlers
+  // (orchestrator calls finishFollowerEnter after handler returns).
+  if (!opts?.deferEnter) {
+    finishFollowerEnter(clone, owner);
+  }
 
   return clone;
 }
