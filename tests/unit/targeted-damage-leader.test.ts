@@ -9,11 +9,9 @@ import "../audit/setup.ts";
 import {
   givenGameState,
   whenPlayCard,
-  whenRunEffects,
   createCard,
   resetUidCounter,
 } from "../harness/builders.js";
-import { getCardById } from "../../src/data/cardDatabase.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getBoard, getDeck, getHP } from "../../src/core/playerHelpers.js";
@@ -101,13 +99,10 @@ describe("targeted damage — leader click and empty-board fallback", () => {
       expect(follower.defense).toBe(8);
     });
 
-    it("(c) no enemy followers → leader −1 via leader target", () => {
-      // Preflight blocks full spell play when the pool is empty (can_target_leader
-      // is not yet honoured there); exercise the damage op directly.
-      givenGameState({ seed: 1 }).withSecondHP(20).build();
-      const damageEff = getCardById(EPHEMERAL_FOXFIRE)!.spell![0];
+    it("(c) no enemy followers → leader −1 via leader-only prompt", () => {
+      setupTurn({ hand: [EPHEMERAL_FOXFIRE], pp: 1, deck: [FILLER] });
 
-      whenRunEffects([damageEff], "first");
+      whenPlayCard("first", 0);
       expect(state.pendingTargetEffect?.canTargetLeader).toBe(true);
       expect(state.pendingTargetEffect?.pool?.length ?? 0).toBe(0);
       resolvePendingTarget("leader");

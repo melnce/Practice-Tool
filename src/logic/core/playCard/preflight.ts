@@ -201,9 +201,11 @@ function checkEffectsHaveValidTargets(
 ): PreflightResult {
   const playingCardUid = sourceCard?.uid;
 
-  // Allow damage effects with fallback_leader (can always target leader)
+  // Allow damage effects that can target the leader when no followers are in pool
   const hasFollowerOrLeaderEffect = effects.some(
-    (eff: Effect) => eff?.op === "damage" && (eff as any)?.fallback_leader,
+    (eff: Effect) =>
+      eff?.op === "damage" &&
+      Boolean((eff as any).fallback_leader ?? (eff as any).can_target_leader),
   );
   if (hasFollowerOrLeaderEffect) return { ok: true };
 
