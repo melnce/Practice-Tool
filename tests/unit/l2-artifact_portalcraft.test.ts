@@ -32,6 +32,7 @@ import {
   getHP,
   getGraveyard,
   getCrests,
+  getEvoCharges,
 } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -197,6 +198,10 @@ function pushUniqueArtifactEnters(
   }
 }
 
+function sandalphonDeck(): string[] {
+  return [SANDALPHON, ...Array.from({ length: 25 }, () => FILLER)];
+}
+
 function summonArtifactOnBoard(
   id: string,
   owner: "first" | "second" = "first",
@@ -321,30 +326,31 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       expect(handIds()).toContain(ANALYZING_ARTIFACT);
     });
 
-    it.fails(
-      "Evolve: Select another unevolved allied follower — 10874120: onEvolve also evolves Eudie instead of only the selected ally",
-      () => {
-        setupTurn(R6, { hand: [EUDIE], pp: 2, evo: 2 });
-        const buddy = allyFollower(1, 1, "Buddy");
-        whenPlayCard("first", 0);
-        const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
-        onEvolve(eudie, "first", "normal", { spendPoint: true });
-        resolvePendingByUid(buddy.uid);
-        expect(buddy.hasEvolved).toBe(true);
-        expect(eudie.hasEvolved).toBe(false);
-      },
-    );
+    it("Evolve: Eudie and selected unevolved ally both evolve; costs 1 EP; already-evolved ally not in pool", () => {
+      setupTurn(R6, { hand: [EUDIE], pp: 2, evo: 2 });
+      whenPlayCard("first", 0);
+      const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
+      const buddy = allyFollower(1, 1, "Buddy");
+      const bystander = allyFollower(1, 1, "Bystander");
+      bystander.hasEvolved = true;
+      const evoBefore = getEvoCharges(state, "first");
+      onEvolve(eudie, "first", "normal", { spendPoint: true });
+      resolvePendingByUid(buddy.uid);
+      expect(eudie.hasEvolved).toBe(true);
+      expect(buddy.hasEvolved).toBe(true);
+      expect(bystander.hasEvolved).toBe(true);
+      expect(getEvoCharges(state, "first")).toBe(evoBefore - 1);
+      expect(printed).toContain("another unevolved allied follower");
+    });
 
-    it.fails(
-      "Evolve without another unevolved ally — 10874120: onEvolve evolves Eudie despite no valid selection target",
-      () => {
-        setupTurn(R6, { hand: [EUDIE], pp: 2, evo: 2 });
-        whenPlayCard("first", 0);
-        const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
-        onEvolve(eudie, "first", "normal", { spendPoint: true });
-        expect(eudie.hasEvolved).toBe(false);
-      },
-    );
+    it("Evolve with no other unevolved ally: Eudie evolves; no selection opened", () => {
+      setupTurn(R6, { hand: [EUDIE], pp: 2, evo: 2 });
+      whenPlayCard("first", 0);
+      const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
+      onEvolve(eudie, "first", "normal", { spendPoint: true });
+      expect(eudie.hasEvolved).toBe(true);
+      expect(state.pendingTargetEffect).toBeFalsy();
+    });
   });
 
   describe("Imari, Dewdrop (10574120)", () => {
@@ -619,7 +625,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       'Activates in deck. At the start of your turn, if allied followers have evolved at least 6 times this match, Invoke this card.\nWhen this card is Invoked, gain Crest: Sandalphon, Primarch Successor and return this card to hand\nFanfare: Super Skybound Art- Do this 5 times: "Deal 2 damage to a random enemy."';
 
     it("below 6 evolves at turn start: does not invoke (l2-buff_forestcraft parity)", () => {
-      setupTurn(R6, { hand: [], deck: [SANDALPHON, FILLER], pp: 6 });
+      setupTurn(R6, { hand: [], deck: sandalphonDeck(), pp: 6 });
       state.players.first.evoCount = 5;
       whenEndTurn();
       whenEndTurn();
@@ -628,7 +634,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
     });
 
     it("at 6+ evolves: invokes, gains crest, returns to hand", () => {
-      setupTurn(R6, { hand: [], deck: [SANDALPHON, FILLER], pp: 6 });
+      setupTurn(R6, { hand: [], deck: sandalphonDeck(), pp: 6 });
       state.players.first.evoCount = 6;
       whenEndTurn();
       whenEndTurn();
@@ -642,42 +648,49 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       expect(thenBoard("first").length).toBe(0);
     });
 
-    it("crest owner's EOT restores 1 defense to all allies", () => {
-      setupTurn(R6, { hand: [], deck: [SANDALPHON, FILLER], pp: 6, hp: 15 });
+    it("crest owner's EOT restores 1 defense to all allies; countdown still 2", () => {
+      setupTurn(R6, { hand: [], deck: sandalphonDeck(), pp: 6, hp: 15 });
       state.players.first.evoCount = 6;
       const ally = allyFollower(2, 2, "Ally");
       ally.defense = 1;
       whenEndTurn();
       whenEndTurn();
+      const crest = () =>
+        getCrests(state, "first").find(
+          (c) => c.name === "Sandalphon, Primarch Successor",
+        );
+      expect(Number(crest()!.countdown)).toBe(2);
       const hpBefore = getHP(state, "first");
       whenEndTurn();
       expect(getHP(state, "first")).toBe(hpBefore + 1);
       expect(Number(ally.defense)).toBe(2);
+      expect(Number(crest()!.countdown)).toBe(2);
     });
 
-    it.fails(
-      "crest Countdown (2) decrements at owner's EOT — 10404110: countdown remains 2 after first owner EOT",
-      () => {
-        setupTurn(R6, { hand: [], deck: [SANDALPHON, FILLER], pp: 6, hp: 15 });
-        state.players.first.evoCount = 6;
-        whenEndTurn();
-        whenEndTurn();
-        const crest0 = getCrests(state, "first").find(
+    it("crest Countdown (2): ticks at owner turn-start; gone after second turn-start", () => {
+      setupTurn(R6, { hand: [], deck: sandalphonDeck(), pp: 6, hp: 15 });
+      state.players.first.evoCount = 6;
+      whenEndTurn();
+      whenEndTurn();
+      const crest = () =>
+        getCrests(state, "first").find(
           (c) => c.name === "Sandalphon, Primarch Successor",
-        )!;
-        expect(Number(crest0.countdown)).toBe(2);
-        whenEndTurn();
-        const crest1 = getCrests(state, "first").find(
-          (c) => c.name === "Sandalphon, Primarch Successor",
-        )!;
-        expect(Number(crest1.countdown)).toBe(1);
-      },
-    );
+        );
+      expect(Number(crest()!.countdown)).toBe(2);
+      whenEndTurn();
+      expect(Number(crest()!.countdown)).toBe(2);
+      whenEndTurn();
+      whenEndTurn();
+      expect(Number(crest()!.countdown)).toBe(1);
+      whenEndTurn();
+      whenEndTurn();
+      expect(crest()).toBeFalsy();
+    });
 
     it("opponent's EOT does not heal from Sandalphon crest", () => {
       setupTurn(R6, {
         hand: [],
-        deck: [SANDALPHON, FILLER],
+        deck: sandalphonDeck(),
         pp: 6,
         hp: 15,
         active: "second",
