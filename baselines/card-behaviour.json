@@ -5583,12 +5583,12 @@
       "status": "covered"
     },
     "10474110": {
-      "fingerprint": "be95660d",
+      "fingerprint": "91712794",
       "gatesSatisfied": ["skybound_art"],
       "name": "Lu Woh, Light Personified",
       "scenarios": [
         {
-          "fingerprint": "27332164",
+          "fingerprint": "e89a4ef7",
           "scenario": "play"
         }
       ],

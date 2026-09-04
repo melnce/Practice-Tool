@@ -78,6 +78,11 @@ export const CONTEXT_RESOLVERS: Record<TargetContextKey, ResolverFn> = {
     return myHand || [];
   },
 
+  enemy_hand: (_q, env) => {
+    const oppHand = getHand(state, opponentOf(env.owner));
+    return oppHand || [];
+  },
+
   self: (q, env) => {
     return env.sourceCard ? [env.sourceCard] : [];
   },

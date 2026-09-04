@@ -1561,33 +1561,41 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(defBefore - Number(foe.defense)).toBe(6);
     });
 
-    it.fails(
-      "Give all followers in your opponent's hand +1/+0 — 10474110: printed Fanfare buffs enemy hand; observed enemy:hand:follower resolves to board (hand follower stays 2/2, board follower buffed)",
-      () => {
-        setupTurn(R8, { hand: [LU_WOH], pp: 5 });
-        const handFoe = createCard(
-          {
-            name: "HandFoe",
-            type: "Follower",
-            cost: 2,
-            attack: 2,
-            defense: 2,
-          },
-          "hand",
-          "second",
-        );
-        state.players.second.hand.push(handFoe);
-        const boardBystander = enemyFollower(2, 20, "BoardBystander");
-        whenPlayCard("first", 0);
-        const buffed = getHand(state, "second").find(
-          (c) => c.uid === handFoe.uid,
-        )!;
-        expect(Number(buffed.attack)).toBe(3);
-        expect(Number(buffed.defense)).toBe(2);
-        expect(Number(boardBystander.attack)).toBe(2);
-        expect(printed).toContain("+1/+0");
-      },
-    );
+    it("Give all followers in your opponent's hand +1/+0 — hand follower 3/2, board bystander attack unchanged, spell in enemy hand untouched", () => {
+      setupTurn(R8, { hand: [LU_WOH], pp: 5 });
+      const handFoe = createCard(
+        {
+          name: "HandFoe",
+          type: "Follower",
+          cost: 2,
+          attack: 2,
+          defense: 2,
+        },
+        "hand",
+        "second",
+      );
+      state.players.second.hand.push(handFoe);
+      const handSpell = createCard(
+        { name: "HandSpell", type: "Spell", cost: 1 },
+        "hand",
+        "second",
+      );
+      state.players.second.hand.push(handSpell);
+      const boardBystander = enemyFollower(2, 20, "BoardBystander");
+      const spellAtkBefore = Number(handSpell.attack ?? 0);
+      whenPlayCard("first", 0);
+      const buffed = getHand(state, "second").find(
+        (c) => c.uid === handFoe.uid,
+      )!;
+      const spell = getHand(state, "second").find(
+        (c) => c.uid === handSpell.uid,
+      )!;
+      expect(Number(buffed.attack)).toBe(3);
+      expect(Number(buffed.defense)).toBe(2);
+      expect(Number(boardBystander.attack)).toBe(2);
+      expect(Number(spell.attack ?? 0)).toBe(spellAtkBefore);
+      expect(printed).toContain("+1/+0");
+    });
 
     it("Skybound off-branch: gauge < 10 → no crest", () => {
       setupTurn(R5, { hand: [LU_WOH], pp: 5 });

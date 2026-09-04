@@ -56,17 +56,40 @@ export function parseTargetQuery(
     };
   }
 
-  // 3. Standard "side:type" parsing
+  // 3. Standard "side:type[:subtype]" parsing
   const parts = raw.split(":");
-  let sideRaw = (parts[0] || "ally").trim();
-  let typeRaw = (parts[1] || "").trim();
+  const sideRaw = (parts[0] || "ally").trim();
+  const typeRaw = (parts[1] || "").trim();
+  const subtypeRaw = (parts[2] || "").trim();
 
-  // Mapping aliases
-  // LEGACY: if side is "ally" and type is "hand", it means "hand"
-  // This handles old card definitions that used "ally:hand" before standardization
-  if (sideRaw === "ally" && (typeRaw === "hand" || typeRaw === "hand_card")) {
-    sideRaw = "hand";
-    typeRaw = ""; // "hand" usually implies type is handled elsewhere or implicitly
+  const parseTypeFilter = (
+    seg: string,
+  ): "follower" | "amulet" | "spell" | undefined => {
+    if (seg === "follower") return "follower";
+    if (seg === "amulet") return "amulet";
+    if (seg === "spell") return "spell";
+    return undefined;
+  };
+
+  const isEnemySide =
+    sideRaw.startsWith("enemy") || sideRaw === "opp" || sideRaw === "opponent";
+
+  // Hand zone: ally:hand[:type], ally:hand_card, enemy:hand[:type]
+  if (typeRaw === "hand" || typeRaw === "hand_card") {
+    if (isEnemySide) {
+      return {
+        raw,
+        side: "enemy_hand",
+        typeFilter: parseTypeFilter(subtypeRaw),
+        condition,
+      };
+    }
+    return {
+      raw,
+      side: "hand",
+      typeFilter: parseTypeFilter(subtypeRaw),
+      condition,
+    };
   }
 
   // Map side to enum
