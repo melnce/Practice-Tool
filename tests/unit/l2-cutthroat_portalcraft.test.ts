@@ -2012,20 +2012,42 @@ describe("L2 — Cutthroat Portalcraft", () => {
       expect(b.hasStorm || b.keywordState?.hasStorm).toBeFalsy();
     });
 
-    it.fails(
-      'Give the enemy leader "Takes 1 more damage." — 10474120: printed Fanfare debuff; observed applyLeaderDamage("second", 1) drops HP by 1 not 2 (state.redLeaderDamagePlus written in unified.ts Vulnerable branch; applyLeaderDamage reads leaderDamageTakenBonus)',
-      () => {
-        setupTurn(R10, { hand: [BEELZEBUB], pp: 9 });
-        const a = enemyFollower(5, 9, "A");
-        const b = enemyFollower(5, 9, "B");
-        whenPlayCard("first", 0);
-        resolvePendingByUid(a.uid);
-        resolvePendingByUid(b.uid);
-        const hpBefore = getHP(state, "second");
-        applyLeaderDamage("second", 1);
-        expect(getHP(state, "second")).toBe(hpBefore - 2);
-        expect(printed).toContain("Takes 1 more damage");
-      },
-    );
+    it('Give the enemy leader "Takes 1 more damage." — first 1-damage hit takes 2', () => {
+      setupTurn(R10, { hand: [BEELZEBUB], pp: 9 });
+      const a = enemyFollower(5, 9, "A");
+      const b = enemyFollower(5, 9, "B");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(a.uid);
+      resolvePendingByUid(b.uid);
+      const hpBefore = getHP(state, "second");
+      applyLeaderDamage("second", 1);
+      expect(getHP(state, "second")).toBe(hpBefore - 2);
+      expect(printed).toContain("Takes 1 more damage");
+    });
+
+    it("Vulnerable debuff is permanent: second 1-damage hit also takes 2", () => {
+      setupTurn(R10, { hand: [BEELZEBUB], pp: 9 });
+      const a = enemyFollower(5, 9, "A");
+      const b = enemyFollower(5, 9, "B");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(a.uid);
+      resolvePendingByUid(b.uid);
+      applyLeaderDamage("second", 1);
+      const hpMid = getHP(state, "second");
+      applyLeaderDamage("second", 1);
+      expect(getHP(state, "second")).toBe(hpMid - 2);
+    });
+
+    it("Vulnerable debuff does not affect the owner's own leader (bystander)", () => {
+      setupTurn(R10, { hand: [BEELZEBUB], pp: 9 });
+      const a = enemyFollower(5, 9, "A");
+      const b = enemyFollower(5, 9, "B");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(a.uid);
+      resolvePendingByUid(b.uid);
+      const allyHpBefore = getHP(state, "first");
+      applyLeaderDamage("first", 1);
+      expect(getHP(state, "first")).toBe(allyHpBefore - 1);
+    });
   });
 });
