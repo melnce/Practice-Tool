@@ -18,7 +18,7 @@ export interface UnifiedSpellboostSpec {
   op: "spellboost";
   target: SpellboostTarget;
   mode: SpellboostMode;
-  count: number;
+  count: number | string;
 }
 
 function normalizeSpellboostTarget(target: unknown): SpellboostTarget | null {
@@ -61,10 +61,19 @@ export function normalizeToSpellboostSpec(eff: Effect): UnifiedSpellboostSpec {
   const count =
     (eff as any).count ?? (eff as any).times ?? (eff as any).amount ?? 1;
 
+  let normalizedCount: number | string;
+  if (typeof count === "number") {
+    normalizedCount = count;
+  } else if (typeof count === "string" && count.includes("{")) {
+    normalizedCount = count;
+  } else {
+    normalizedCount = parseInt(String(count), 10) || 1;
+  }
+
   return {
     op: "spellboost",
     target,
     mode,
-    count: typeof count === "number" ? count : parseInt(String(count), 10) || 1,
+    count: normalizedCount,
   };
 }

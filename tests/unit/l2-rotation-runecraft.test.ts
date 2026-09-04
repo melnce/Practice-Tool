@@ -358,23 +358,20 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       expect(printed).toContain("X is this follower's attack");
     });
 
-    it.fails(
-      "EOT with buffed attack (3): spellboosts hand 3 times — printed: X is this follower's attack; observed: EOT uses base attack 1 (card 10431120)",
-      () => {
-        setupTurn(R6, { hand: [SUFRAMARE, BLAZE_DESTROYER], pp: 1 });
-        whenPlayCard("first", 0);
-        const suframare = findOnBoard("first", "Suframare, Wandering Tutor")!;
-        whenRunEffects(
-          [{ op: "stat", action: "give", target: "self", attack: 2 } as any],
-          "first",
-          suframare,
-        );
-        const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-        const sb0 = sbCount(blaze);
-        whenEndTurn();
-        expect(sbCount(blaze) - sb0).toBe(3);
-      },
-    );
+    it("EOT with buffed attack (3): spellboosts hand 3 times — printed: X is this follower's attack (card 10431120)", () => {
+      setupTurn(R6, { hand: [SUFRAMARE, BLAZE_DESTROYER], pp: 1 });
+      whenPlayCard("first", 0);
+      const suframare = findOnBoard("first", "Suframare, Wandering Tutor")!;
+      whenRunEffects(
+        [{ op: "stat", action: "give", target: "self", attack: 2 } as any],
+        "first",
+        suframare,
+      );
+      const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+      const sb0 = sbCount(blaze);
+      whenEndTurn();
+      expect(sbCount(blaze) - sb0).toBe(3);
+    });
 
     it("Evolve: gives Can't attack followers or leaders", () => {
       setupTurn(R6, { hand: [SUFRAMARE], pp: 1, evo: 2 });
