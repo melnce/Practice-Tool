@@ -14,6 +14,7 @@ import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
 import { whenPlayCard } from "../harness/builders.js";
 import type { RawDeck } from "../../src/data/rawDeck.js";
+import { initReplayState } from "../../src/logic/core/replayInit.js";
 import "../../src/logic/core/effects/index.js";
 
 const ENCROACHED = "10602210";
@@ -85,6 +86,15 @@ describe("deck instance owner", () => {
     expect(card.owner).toBe("first");
     deck.push(card);
     expect(deck[deck.length - 1]!.owner).toBe("first");
+  });
+
+  it("initReplayState assigns owner to every deck and opening-hand card", () => {
+    resetGameState(42);
+    initReplayState({ seed: 42, deckId: "standard", initialDraw: 4 });
+    assertAllOwned("deck", "first");
+    assertAllOwned("hand", "first");
+    assertAllOwned("deck", "second");
+    assertAllOwned("hand", "second");
   });
 });
 
