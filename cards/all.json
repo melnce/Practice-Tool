@@ -32784,6 +32784,12 @@
     "evolve": [],
     "superevolve": [],
     "keywords": ["Intimidate"],
+    "invoke": {
+      "timing": "end_of_turn",
+      "condition": {
+        "played_base_cost_ladder": true
+      }
+    },
     "triggers": [],
     "fanfare": [
       {
