@@ -26,11 +26,7 @@ import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js"
 import { fireTrigger } from "../../src/logic/core/triggers.js";
 import { startFuseFromHand } from "../../src/logic/index.js";
 import { forceCompleteOrFizzlePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import {
-  getHP,
-  getPP,
-  getCrests,
-} from "../../src/core/playerHelpers.js";
+import { getHP, getPP, getCrests } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 
