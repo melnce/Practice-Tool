@@ -151,7 +151,9 @@ export function summonExactCopyFromHand(
 
   // Normalize instance identity/placement — must mint a new uid (same discipline
   // as summonExactCopy / chain). Reusing the hand card's uid leaves one
-  // identity in two zones (hand + board).
+  // identity in two zones (hand + board). Keep template id from srcCard so
+  // copies remain identifiable (boardIds / "copies of X" counting); only uid
+  // is instance-scoped.
   clone.uid = state.rng.makeUid();
   clone.zone = "board";
   clone.owner = owner;
