@@ -341,17 +341,17 @@ describe("L2 Swordcraft tokens — real-card tests", () => {
       expect(printed).toContain("deal it 1 damage");
     });
 
-    it.fails(
-      "Enhance (1): deals 3 damage instead of 1 — token 90024320: Enhance tier does not fire at 1 PP (only base 1 damage dealt)",
-      () => {
-        setupTurn(R6, { hand: [DEPTHS_ELD_SWORD], pp: 1 });
-        const target = enemyFollower(2, 6, "Target");
-        whenPlayCard("first", 0);
-        resolveFirstPending();
-        expect(Number(target.defense)).toBe(3);
-        expect(printed).toContain("Deal 3 damage instead");
-      },
-    );
+    it("Enhance (1): deals 3 damage instead of 1", () => {
+      setupTurn(R6, { hand: [DEPTHS_ELD_SWORD], pp: 1 });
+      const target = enemyFollower(2, 6, "Target");
+      const bystander = enemyFollower(2, 4, "Bystander");
+      whenPlayCard("first", 0);
+      resolveFirstPending();
+      expect(Number(target.defense)).toBe(3);
+      expect(Number(bystander.defense)).toBe(4);
+      expect(state.pendingTargetEffect).toBeUndefined();
+      expect(printed).toContain("Deal 3 damage instead");
+    });
   });
 
   describe("Desperados' Shot (90024330)", () => {
