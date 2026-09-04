@@ -2439,12 +2439,12 @@
       "status": "covered"
     },
     "10172320": {
-      "fingerprint": "662d08d0",
+      "fingerprint": "39a87327",
       "gatesSatisfied": [],
       "name": "Doomwright Resurgence",
       "scenarios": [
         {
-          "fingerprint": "7024fba0",
+          "fingerprint": "0a566d1c",
           "scenario": "play"
         }
       ],
@@ -2563,12 +2563,12 @@
       "status": "covered"
     },
     "10174130": {
-      "fingerprint": "ffc1152b",
+      "fingerprint": "5b957f68",
       "gatesSatisfied": [],
       "name": "Ralmia, Sonic Boom",
       "scenarios": [
         {
-          "fingerprint": "77e881f8",
+          "fingerprint": "5dc5ab67",
           "scenario": "play"
         },
         {
@@ -3561,12 +3561,12 @@
       "status": "covered"
     },
     "10274120": {
-      "fingerprint": "161710f7",
+      "fingerprint": "994a0c61",
       "gatesSatisfied": [],
       "name": "Karula, Eternal Arts",
       "scenarios": [
         {
-          "fingerprint": "42ca985b",
+          "fingerprint": "129db79f",
           "scenario": "play"
         },
         {
