@@ -1727,7 +1727,8 @@
       {
         "event": "self_damaged",
         "condition": {
-          "still_alive": true
+          "still_alive": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -2131,7 +2132,8 @@
       {
         "event": "self_damaged",
         "condition": {
-          "still_alive": true
+          "still_alive": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {

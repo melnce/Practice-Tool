@@ -12633,7 +12633,8 @@
       {
         "event": "self_damaged",
         "condition": {
-          "still_alive": true
+          "still_alive": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -13037,7 +13038,8 @@
       {
         "event": "self_damaged",
         "condition": {
-          "still_alive": true
+          "still_alive": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -20964,6 +20966,9 @@
       {
         "event": "ally_draw",
         "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
             "op": "keyword",
@@ -21067,6 +21072,9 @@
       {
         "event": "ally_draw",
         "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
             "op": "damage",
@@ -26665,7 +26673,8 @@
         "event": "ally_follower_enter",
         "source": "board",
         "condition": {
-          "not_self": true
+          "not_self": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {

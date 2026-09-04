@@ -1246,7 +1246,8 @@
         "event": "ally_follower_enter",
         "source": "board",
         "condition": {
-          "not_self": true
+          "not_self": true,
+          "whose_turn": "owner"
         },
         "effects": [
           {
@@ -2734,7 +2735,8 @@
         "event": "ally_follower_enter",
         "source": "board",
         "condition": {
-          "tribe": "Departed"
+          "tribe": "Departed",
+          "whose_turn": "owner"
         },
         "effects": [
           {
