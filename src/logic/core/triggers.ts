@@ -85,6 +85,7 @@ export function fireTrigger(
     // Enhance context with turn info for internal modules
     // Using a non-enumerable or specific prop to pass this down
     context._turnNumber = _turnToken;
+    context._triggerEvent = eventName;
 
     // 1. Loot Fused Dedupe
     if (eventName === "loot_fused" && context?.initiator) {

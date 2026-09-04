@@ -37,9 +37,17 @@ export function evalCommonConditions(
   // TRIGGER-SPECIFIC CONDITIONS (not shareable with targeting)
   // =========================================================================
 
-  // 1. whose_turn
-  if (cond.whose_turn === "owner" && activePlayer !== owner) return false;
-  if (cond.whose_turn === "opponent" && activePlayer === owner) return false;
+  // 1. whose_turn — for ally_draw / ally_follower_enter the fireTrigger() routing
+  // argument is the drawing/entering owner's slot, not the active turn player.
+  // Use game turn (state.activePlayer) for those events only; turn-boundary and
+  // other paths keep the focal activePlayer argument.
+  const event = (context as { _triggerEvent?: string })._triggerEvent;
+  const turnPlayer =
+    event === "ally_draw" || event === "ally_follower_enter"
+      ? (state.activePlayer ?? activePlayer)
+      : activePlayer;
+  if (cond.whose_turn === "owner" && turnPlayer !== owner) return false;
+  if (cond.whose_turn === "opponent" && turnPlayer === owner) return false;
   if (trigger.your_turn_only && owner !== activePlayer) return false;
 
   // 2. is_ally — subject owner from enter/leave context, else card.owner (combat)
