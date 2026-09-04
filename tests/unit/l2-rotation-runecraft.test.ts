@@ -595,18 +595,25 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       expect(printed).toContain("Summon 2 copies");
     });
 
-    it("Last Words: spellboosts cards in hand", () => {
+    it("Last Words: spellboosts every On Spellboost card in hand exactly once; others untouched", () => {
+      const STORMY_BLAST = "10131320";
       setupTurn(R6, {
-        hand: [ADVENTUROUS_GRIMOIRE, BLAZE_DESTROYER],
+        hand: [ADVENTUROUS_GRIMOIRE, BLAZE_DESTROYER, STORMY_BLAST, FORESIGHT],
         pp: 3,
       });
       whenPlayCard("first", 0);
       const grimoire = findOnBoard("first", "Adventurous Grimoire")!;
       const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      const sb0 = sbCount(blaze);
+      const stormy = thenHand("first").find((c) => c.id === STORMY_BLAST)!;
+      const foresight = thenHand("first").find((c) => c.id === FORESIGHT)!;
+      const blazeSb0 = sbCount(blaze);
+      const stormySb0 = sbCount(stormy);
+      const foresightSb0 = sbCount(foresight);
       grimoire.defense = 0;
       cleanupDead();
-      expect(sbCount(blaze)).toBeGreaterThan(sb0);
+      expect(sbCount(blaze)).toBe(blazeSb0 + 1);
+      expect(sbCount(stormy)).toBe(stormySb0 + 1);
+      expect(sbCount(foresight)).toBe(foresightSb0);
       expect(printed).toContain("Spellboost your hand");
     });
   });
