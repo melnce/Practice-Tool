@@ -8,7 +8,11 @@ import { transformTarget, transformHandTarget } from "../transform.js";
 import { destroyTarget } from "../destroy/index.js";
 import { banishCard } from "../banish/index.js";
 import { bounceToHand } from "../bounce.js";
-import { resolveReturnHandToDeck } from "../returnHandToDeck.js";
+import {
+  resolveReturnHandToDeck,
+  flushDeferredDeckShuffle,
+  countPendingDraws,
+} from "../returnHandToDeck.js";
 // clearSelectableFlags is NOT imported because handlers must not use it.
 import { fireTrigger } from "../../../core/triggers.js";
 import { resolveAmountWithOverflow } from "../damage/index.js";
@@ -370,15 +374,20 @@ TARGETED_OP_HANDLERS.set("banish", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("return", (ctx) => {
-  const { owner, targetUids, eff } = ctx;
+  const { owner, targetUids, eff, resumeEffects } = ctx;
   const targets = resolveUids(targetUids);
   const destination = (eff as any).destination ?? "hand";
+  const deferShuffle =
+    destination === "deck" &&
+    Array.isArray(resumeEffects) &&
+    resumeEffects.length > 0;
+  const pendingDraws = deferShuffle ? countPendingDraws(resumeEffects) : 0;
   for (const target of targets) {
     if (destination === "hand") {
       bounceToHand(target);
       logEvent("bounce", { owner, target: target.name });
     } else if (destination === "deck") {
-      resolveReturnHandToDeck(target, owner);
+      resolveReturnHandToDeck(target, owner, { deferShuffle, pendingDraws });
       logEvent("returnToDeck", { owner, target: target.name });
     }
   }

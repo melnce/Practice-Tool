@@ -24,6 +24,7 @@ import {
   resumeDeferredDeathIfIdle,
   cleanupDead,
 } from "./cleanup.js";
+import { flushDeferredDeckShuffle } from "../effects/ops/returnHandToDeck.js";
 import { flushDeferredOnFuse } from "../effects/ops/fuse/types.js";
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
@@ -96,6 +97,7 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
     if (opCtx.resumeEffects?.length) {
       runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
     }
+    flushDeferredDeckShuffle(opCtx.owner);
 
     if (playFollowerResume) {
       runPlayFollowerPostFanfare(playFollowerResume);

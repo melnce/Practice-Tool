@@ -20,6 +20,7 @@ import {
   registerRunEffectsInCleanup,
   flushDeferredDeathBatch,
 } from "../cleanup.js";
+import { flushDeferredDeckShuffle } from "../../effects/ops/returnHandToDeck.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
 
 // Registry
@@ -235,6 +236,9 @@ export function runEffects(
     }
   } finally {
     (state as any)._runEffectsDepth = runDepth;
+    if (runDepth === 0 && !paused && !state.pendingTargetEffect) {
+      flushDeferredDeckShuffle();
+    }
     if (enableDeathDefer) {
       (state as any).deferDeathTriggers = false;
       // Interactive pause: defer flush until target/mode resolution completes.

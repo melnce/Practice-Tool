@@ -17,6 +17,7 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -35,6 +36,8 @@ import "../../src/logic/core/effects/index.js";
 const WAY_OF_MAID = "10021310";
 const MALICE = "10561310";
 const COGNITIVE_SHIFT = "10711310";
+const KUKISHIRO = "10564120";
+const RESOLVE_MISTBLOOM = "10563210";
 const EBB_AND_FLOW = "10853310";
 const REVEREND = "10761110";
 const SISTER = "10762110";
@@ -180,35 +183,32 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
     const DRAW_THIRD = "10021130";
 
     // Printed order: return from hand, then draw 3. Engine draws first and returns a drawn card.
-    it.fails(
-      "returns one random hand card to deck before drawing 3 stacked cards — 10561310: printed text requires return-then-draw; observed draw-then-random-return",
-      () => {
-        setupTurn(10, {
-          hand: [MALICE, RETURN_A, RETURN_B],
-          deck: [DRAW_TOP, DRAW_SECOND, DRAW_THIRD],
-          pp: 10,
-        });
+    it("returns one random hand card to deck before drawing 3 stacked cards — 10561310: printed text requires return-then-draw; observed draw-then-random-return", () => {
+      setupTurn(10, {
+        hand: [MALICE, RETURN_A, RETURN_B],
+        deck: [DRAW_TOP, DRAW_SECOND, DRAW_THIRD],
+        pp: 10,
+      });
 
-        const returnCandidateIds = [RETURN_A, RETURN_B];
-        whenPlayCard("first", 0);
+      const returnCandidateIds = [RETURN_A, RETURN_B];
+      whenPlayCard("first", 0);
 
-        const drawnIds = handIds();
-        // "Draw 3 cards" — identity from stacked deck top
-        expect(drawnIds).toContain(DRAW_TOP);
-        expect(drawnIds).toContain(DRAW_SECOND);
-        expect(drawnIds).toContain(DRAW_THIRD);
-        // "Return a random card from your hand to deck" — some candidate left hand for deck
-        expect(
-          returnCandidateIds.some(
-            (id) =>
-              deckIds().includes(id) &&
-              !drawnIds.includes(id) &&
-              !thenHand("first").some((c) => String(c.id) === id),
-          ),
-        ).toBe(true);
-        expect(printed).toContain("Draw 3 cards");
-      },
-    );
+      const drawnIds = handIds();
+      // "Draw 3 cards" — identity from stacked deck top
+      expect(drawnIds).toContain(DRAW_TOP);
+      expect(drawnIds).toContain(DRAW_SECOND);
+      expect(drawnIds).toContain(DRAW_THIRD);
+      // "Return a random card from your hand to deck" — some candidate left hand for deck
+      expect(
+        returnCandidateIds.some(
+          (id) =>
+            deckIds().includes(id) &&
+            !drawnIds.includes(id) &&
+            !thenHand("first").some((c) => String(c.id) === id),
+        ),
+      ).toBe(true);
+      expect(printed).toContain("Draw 3 cards");
+    });
   });
 
   describe("Cognitive Shift (10711310)", () => {
@@ -221,37 +221,103 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
     const DRAW_A = "10021110";
     const DRAW_B = "10021120";
 
-    it.fails(
-      "returns both selected cards to deck then draws 2 stacked cards — 10711310: multi-select return only puts the first selection into deck; second selection stays in hand",
-      () => {
-        setupTurn(10, {
-          hand: [COGNITIVE_SHIFT, PICK_A, PICK_B, STAY],
-          deck: [DRAW_A, DRAW_B],
-          pp: 10,
-        });
+    it("returns both selected cards to deck then draws 2 stacked cards — 10711310: multi-select return only puts the first selection into deck; second selection stays in hand", () => {
+      setupTurn(10, {
+        hand: [COGNITIVE_SHIFT, PICK_A, PICK_B, STAY],
+        deck: [DRAW_A, DRAW_B],
+        pp: 10,
+      });
 
-        const pickA = thenHand("first").find((c) => c.id === PICK_A)!;
-        const pickB = thenHand("first").find((c) => c.id === PICK_B)!;
+      const pickA = thenHand("first").find((c) => c.id === PICK_A)!;
+      const pickB = thenHand("first").find((c) => c.id === PICK_B)!;
 
-        whenPlayCard("first", 0);
-        expect(state.pendingTargetEffect?.selectCount).toBe(2);
-        resolvePendingByUid(pickA.uid);
-        expect(state.pendingTargetEffect?.targetUids).toEqual([pickA.uid]);
-        resolvePendingByUid(pickB.uid);
+      whenPlayCard("first", 0);
+      expect(state.pendingTargetEffect?.selectCount).toBe(2);
+      resolvePendingByUid(pickA.uid);
+      expect(state.pendingTargetEffect?.targetUids).toEqual([pickA.uid]);
+      resolvePendingByUid(pickB.uid);
 
-        const drawnIds = handIds();
-        // "return them to deck"
-        expect(deckIds()).toContain(PICK_A);
-        expect(deckIds()).toContain(PICK_B);
-        expect(drawnIds).not.toContain(PICK_A);
-        expect(drawnIds).not.toContain(PICK_B);
-        expect(drawnIds).toContain(STAY);
-        // "Draw 2 cards"
-        expect(drawnIds).toContain(DRAW_A);
-        expect(drawnIds).toContain(DRAW_B);
-        expect(printed).toContain("Select 2 cards");
-      },
-    );
+      const drawnIds = handIds();
+      // "return them to deck"
+      expect(deckIds()).toContain(PICK_A);
+      expect(deckIds()).toContain(PICK_B);
+      expect(drawnIds).not.toContain(PICK_A);
+      expect(drawnIds).not.toContain(PICK_B);
+      expect(drawnIds).toContain(STAY);
+      // "Draw 2 cards"
+      expect(drawnIds).toContain(DRAW_A);
+      expect(drawnIds).toContain(DRAW_B);
+      expect(printed).toContain("Select 2 cards");
+    });
+  });
+
+  describe("Kukishiro, Mistbloom (10564120)", () => {
+    const printed =
+      "Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.";
+
+    const PICK_A = "10111310";
+    const PICK_B = "10112310";
+    const STAY = "10102110";
+    const DRAW_A = "10021110";
+    const DRAW_B = "10021120";
+
+    it("returns 2 random hand cards to deck then draws 2 stacked cards — seed 1", () => {
+      setupTurn(10, {
+        hand: [KUKISHIRO, PICK_A, PICK_B, STAY],
+        deck: [DRAW_A, DRAW_B],
+        pp: 10,
+      });
+
+      whenPlayCard("first", 0);
+
+      const drawnIds = handIds();
+      // seed 1: PICK_A + STAY returned; PICK_B remains; stacked draws on top
+      expect(deckIds()).toContain(PICK_A);
+      expect(deckIds()).toContain(STAY);
+      expect(drawnIds).toContain(PICK_B);
+      expect(drawnIds).toContain(DRAW_A);
+      expect(drawnIds).toContain(DRAW_B);
+      expect(drawnIds).not.toContain(PICK_A);
+      expect(drawnIds).not.toContain(STAY);
+      expect(printed).toContain("Return 2 random cards");
+    });
+  });
+
+  describe("Resolve of the Mistbloom (10563210)", () => {
+    const printed =
+      "Engage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.";
+
+    const PICK_A = "10111310";
+    const PICK_B = "10112310";
+    const STAY = "10102110";
+    const DRAW_A = "10021110";
+    const DRAW_B = "10021120";
+
+    it("Engage returns 2 random hand cards to deck then draws 2 stacked cards — seed 1", () => {
+      setupTurn(10, {
+        hand: [RESOLVE_MISTBLOOM, PICK_A, PICK_B, STAY],
+        deck: [DRAW_A, DRAW_B],
+        pp: 10,
+      });
+      const enemy = enemyFollower(5, 5, "EngageTarget");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(enemy.uid);
+
+      const amuletIdx = getBoard(state, "first").findIndex(
+        (c) => c.id === RESOLVE_MISTBLOOM,
+      );
+      engageAmulet("first", amuletIdx);
+
+      const drawnIds = handIds();
+      expect(deckIds()).toContain(PICK_A);
+      expect(deckIds()).toContain(STAY);
+      expect(drawnIds).toContain(PICK_B);
+      expect(drawnIds).toContain(DRAW_A);
+      expect(drawnIds).toContain(DRAW_B);
+      expect(drawnIds).not.toContain(PICK_A);
+      expect(drawnIds).not.toContain(STAY);
+      expect(printed).toContain("Return 2 random cards");
+    });
   });
 
   describe("Ebb and Flow (10853310)", () => {
