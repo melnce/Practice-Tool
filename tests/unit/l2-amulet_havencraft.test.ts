@@ -240,34 +240,52 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       expect(printed).toContain("Destroy this card");
     });
 
-    it.fails(
-      "Engage replicates Fanfare (return selected hand card to deck and draw) — 10761210: printed Engage replicates Fanfare; observed destroy only with no hand/deck change",
-      () => {
-        setupTurn(R6, {
-          hand: [EARRINGS, RETURN_CARD, FILLER],
-          deck: [DRAW_TOP, "10021120"],
-          pp: 1,
-        });
-        const toReturn = thenHand("first").find((c) => c.id === RETURN_CARD)!;
-        whenPlayCard("first", 0);
-        resolvePendingByUid(toReturn.uid);
-        const engageReturn = thenHand("first").find((c) => c.id === FILLER)!;
-        const snapshot = {
-          hand: handIds().slice().sort(),
-          deck: deckIds().slice().sort(),
-        };
-        engageAmulet("first", amuletIndex("Earrings of Sunlight"));
-        if (state.pendingTargetEffect) {
-          resolveFirstPending();
-        }
-        expect(findOnBoard("first", "Earrings of Sunlight")).toBeUndefined();
-        expect(handIds()).not.toContain(engageReturn.id);
-        expect(
-          handIds().slice().sort().join() !== snapshot.hand.join() ||
-            deckIds().slice().sort().join() !== snapshot.deck.join(),
-        ).toBe(true);
-      },
-    );
+    it("Engage replicates Fanfare: returns selected hand card to deck and draws stacked top card", () => {
+      const ENGAGE_DRAW = "10021120";
+      setupTurn(R6, {
+        hand: [EARRINGS, RETURN_CARD, FILLER],
+        deck: [DRAW_TOP, ENGAGE_DRAW],
+        pp: 1,
+      });
+      const toReturn = thenHand("first").find((c) => c.id === RETURN_CARD)!;
+      whenPlayCard("first", 0);
+      resolvePendingByUid(toReturn.uid);
+
+      const engageReturn = thenHand("first").find((c) => c.id === FILLER)!;
+      const engageReturnUid = engageReturn.uid;
+
+      engageAmulet("first", amuletIndex("Earrings of Sunlight"));
+      expect(state.pendingTargetEffect?.eff?.op).toBe("return");
+      resolvePendingByUid(engageReturn.uid);
+
+      expect(findOnBoard("first", "Earrings of Sunlight")).toBeUndefined();
+      expect(thenHand("first").some((c) => c.uid === engageReturnUid)).toBe(
+        false,
+      );
+      expect(thenDeck("first").some((c) => c.uid === engageReturnUid)).toBe(
+        true,
+      );
+      expect(thenHand("first").some((c) => c.id === DRAW_TOP)).toBe(true);
+      expect(thenDeck("first").some((c) => c.id === DRAW_TOP)).toBe(false);
+      expect(printed).toContain("Replicate the effects");
+    });
+
+    it("Engage replicates Fanfare with empty hand: return fizzles, still draws stacked top card", () => {
+      setupTurn(R6, {
+        hand: [EARRINGS],
+        deck: [DRAW_TOP, "10021120"],
+        pp: 1,
+      });
+      whenPlayCard("first", 0);
+      state.players.first.hand = [];
+
+      engageAmulet("first", amuletIndex("Earrings of Sunlight"));
+      expect(state.pendingTargetEffect).toBeFalsy();
+      expect(findOnBoard("first", "Earrings of Sunlight")).toBeUndefined();
+      expect(thenHand("first").some((c) => c.id === DRAW_TOP)).toBe(true);
+      expect(thenDeck("first").some((c) => c.id === DRAW_TOP)).toBe(false);
+      expect(printed).toContain("Draw a card");
+    });
   });
 
   describe("Winged Statue (10062210)", () => {
