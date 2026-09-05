@@ -2,6 +2,7 @@
 import { state } from "../../core/gameState.js";
 import { moveToBanishZone } from "../effects/ops/banish/primitives.js";
 import { logEvent } from "../../core/logger.js";
+import { isGameOver, logEffectsHaltedGameOver } from "../../core/gameOver.js";
 import { fireTrigger } from "./triggers.js";
 import type { CardInstance, Player, Effect } from "../../core/types/index.js";
 import type { TriggerContext, TriggerEventName } from "./triggers/types.js";
@@ -170,12 +171,26 @@ export function flushDeferredDeathBatch() {
   const MAX_ROUNDS = 32;
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
+    if (isGameOver()) {
+      const q = getDeferredQueues();
+      logEffectsHaltedGameOver(q.leave.length + q.lw.length);
+      q.leave.length = 0;
+      q.lw.length = 0;
+      return;
+    }
+
     const q = getDeferredQueues();
     if (q.leave.length === 0 && q.lw.length === 0) break;
 
     if (q.leave.length > 0) {
       sortLeaveQueue(q.leave);
       while (q.leave.length > 0) {
+        if (isGameOver()) {
+          logEffectsHaltedGameOver(q.leave.length + q.lw.length);
+          q.leave.length = 0;
+          q.lw.length = 0;
+          return;
+        }
         const item = q.leave.shift()!;
         fireTrigger(item.event, item.activePlayer, item.context);
       }
@@ -185,6 +200,11 @@ export function flushDeferredDeathBatch() {
     if (lwBatch.length > 0) {
       sortLwQueue(lwBatch);
       for (let i = 0; i < lwBatch.length; i++) {
+        if (isGameOver()) {
+          logEffectsHaltedGameOver(lwBatch.length - i + q.lw.length);
+          q.lw.length = 0;
+          return;
+        }
         const { card: c, owner } = lwBatch[i]!;
         const paused = triggerLastWords(c, owner);
         if (paused === "pending" || state.pendingTargetEffect) {

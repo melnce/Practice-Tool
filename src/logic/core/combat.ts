@@ -377,6 +377,12 @@ function _attackFollowerCore(
   resolveDrain(attacker, attackerPlayer, dealtToDef);
   resolvePiercing(attacker, defender, defenderPlayer);
 
+  if (isGameOver()) {
+    spendAttack(attacker);
+    recomputeAttackFlags(attacker);
+    return;
+  }
+
   // Spend the swing, refresh flags, clean (render happens at UI layer)
   spendAttack(attacker);
   recomputeAttackFlags(attacker);
@@ -489,6 +495,12 @@ function _attackLeaderCore(
 
   const damage = effectiveAtk(attacker);
   applyLeaderDamage(defenderPlayer, damage);
+
+  if (isGameOver()) {
+    spendAttack(attacker);
+    recomputeAttackFlags(attacker);
+    return;
+  }
 
   if ((attacker as any).hasDrain && damage > 0 && !isGameOver()) {
     // Route through unified restore handler with proper spec format

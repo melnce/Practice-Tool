@@ -15,6 +15,46 @@ import { logEvent } from "./logger.js";
 
 export type GameOverReason = "lethal" | "deckout";
 
+/** Log dropped pending effect work once the match is terminal. */
+export function logEffectsHaltedGameOver(dropped: number): void {
+  if (dropped > 0) {
+    logEvent("effectsHaltedGameOver", { dropped });
+  }
+}
+
+/** Clear orchestrator-held effect queues; returns count dropped. */
+export function clearOrchestratorEffectQueues(): number {
+  let dropped = 0;
+  const pending = state.pendingTargetEffect;
+  if (pending?.resumeEffects?.length) {
+    dropped += pending.resumeEffects.length;
+    pending.resumeEffects.length = 0;
+  }
+  const deferred = (state as any)._deferredDeath as
+    | { lw?: unknown[]; leave?: unknown[] }
+    | undefined;
+  if (deferred) {
+    dropped += (deferred.leave?.length ?? 0) + (deferred.lw?.length ?? 0);
+    deferred.leave = [];
+    deferred.lw = [];
+  }
+  return dropped;
+}
+
+/**
+ * When the match is decided, drop pending effect work and log once.
+ * @param localQueue - optional in-flight runEffects queue (mutated in place)
+ * @returns true if game is over (caller should stop looping)
+ */
+export function haltEffectsIfGameOver(localQueue?: unknown[]): boolean {
+  if (!isGameOver()) return false;
+  let dropped = localQueue?.length ?? 0;
+  if (localQueue) localQueue.length = 0;
+  dropped += clearOrchestratorEffectQueues();
+  logEffectsHaltedGameOver(dropped);
+  return true;
+}
+
 export function isGameOver(s: GameState = state): boolean {
   return s.phase === "gameover";
 }

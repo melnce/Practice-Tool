@@ -19,6 +19,7 @@ import type {
   TriggerSpec,
 } from "./triggers/types.js";
 import { runEffects } from "./effects/index.js";
+import { isGameOver, logEffectsHaltedGameOver } from "../../core/gameOver.js";
 import { flushDeferredDeathBatch, cleanupDead } from "./cleanup.js";
 import { clearTemporaryBuffs } from "../effects/self.js";
 import { clearTemporaryAttacksPerTurn } from "../effects/attacks.js";
@@ -202,7 +203,13 @@ function resolveTurnBoundaryQueue(
   const context: TriggerContext = { _turnNumber: turnToken };
 
   try {
-    for (const item of queue) {
+    for (let i = 0; i < queue.length; i++) {
+      if (isGameOver()) {
+        logEffectsHaltedGameOver(queue.length - i);
+        break;
+      }
+
+      const item = queue[i]!;
       const { trigger, candidate } = item;
       const card = candidate.card as CardInstance;
       runEffects(trigger.effects || [], item.owner, card, {
@@ -210,10 +217,17 @@ function resolveTurnBoundaryQueue(
         deferDeathTriggers: false,
       });
       markFired(trigger, card, event, turnToken, context);
+
+      if (isGameOver()) {
+        logEffectsHaltedGameOver(queue.length - i - 1);
+        break;
+      }
     }
   } finally {
-    flushDeferredDeathBatch();
-    (state as any)._deferredDeath = { lw: [], leave: [] };
+    if (!isGameOver()) {
+      flushDeferredDeathBatch();
+      (state as any)._deferredDeath = { lw: [], leave: [] };
+    }
   }
 }
 

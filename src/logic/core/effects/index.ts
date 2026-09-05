@@ -22,6 +22,7 @@ import {
 } from "../cleanup.js";
 import { flushDeferredDeckShuffle } from "../../effects/ops/returnHandToDeck.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
+import { haltEffectsIfGameOver, isGameOver } from "../../../core/gameOver.js";
 
 // Registry
 import type { EffectCtx } from "./registry.js";
@@ -176,6 +177,8 @@ export function runEffects(
 
   try {
     while (queue.length > 0) {
+      if (haltEffectsIfGameOver(queue)) return;
+
       const eff = queue.shift()!;
 
       // P2-3 FIX: Increment game tick for deterministic ordering
@@ -227,6 +230,8 @@ export function runEffects(
         // Trace: effect_end
         if (trace) trace.emit({ kind: "effect_end", op: eff.op });
         processedCount++;
+
+        if (haltEffectsIfGameOver(queue)) return;
       } catch (e) {
         // Contextualize error
         const err = e instanceof Error ? e : new Error(String(e));
@@ -236,13 +241,18 @@ export function runEffects(
     }
   } finally {
     (state as any)._runEffectsDepth = runDepth;
-    if (runDepth === 0 && !paused && !state.pendingTargetEffect) {
+    if (
+      runDepth === 0 &&
+      !paused &&
+      !state.pendingTargetEffect &&
+      !isGameOver()
+    ) {
       flushDeferredDeckShuffle();
     }
     if (enableDeathDefer) {
       (state as any).deferDeathTriggers = false;
       // Interactive pause: defer flush until target/mode resolution completes.
-      if (!paused && !state.pendingTargetEffect) {
+      if (!paused && !state.pendingTargetEffect && !isGameOver()) {
         flushDeferredDeathBatch();
         (state as any)._deferredDeath = { lw: [], leave: [] };
       }

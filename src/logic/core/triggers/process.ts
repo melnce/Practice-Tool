@@ -4,6 +4,7 @@ import type {
   Player,
 } from "../../../core/types/index.js";
 import { logEvent } from "../../../core/logger.js";
+import { isGameOver } from "../../../core/gameOver.js";
 import type { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";
 import { evalCommonConditions } from "./conditions.js";
@@ -69,9 +70,12 @@ export function processCandidateTriggers(
   const currentTurn = context._turnNumber as number;
 
   for (const cand of candidates) {
+    if (isGameOver()) return;
+
     const { card, owner, source } = cand;
 
     for (const trigger of cand.triggers) {
+      if (isGameOver()) return;
       let checkEvent = trigger.event;
 
       // Shorthand: end_of_turn_own / start_of_turn_own
