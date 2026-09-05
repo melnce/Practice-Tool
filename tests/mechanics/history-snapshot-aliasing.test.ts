@@ -6,16 +6,14 @@ import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { initCardDatabaseNode } from "../../src/data/cardLoaderNode.js";
 import { dispatch } from "../../src/engine.js";
 import { state } from "../../src/core/gameState.js";
-import { captureSnapshot, setHistoryEnabled } from "../../src/core/history.js";
+import { setHistoryEnabled } from "../../src/core/history.js";
+import { hashGameState } from "../../src/core/stateHash.js";
 import { givenGameState } from "../harness/builders.js";
 import { injectAdapter } from "../../src/core/adapter.js";
 import "../audit/setup.ts";
 
-function canonSnap(): string {
-  return JSON.stringify(
-    captureSnapshot(),
-    Object.keys(captureSnapshot()).sort(),
-  );
+function postPlayHash(): string {
+  return hashGameState(state);
 }
 
 beforeAll(async () => {
@@ -63,7 +61,7 @@ describe("engine dispatch history snapshot aliasing", () => {
     const uidB = state.players.first.hand[1]!.uid;
 
     dispatch(state, { type: "PLAY_CARD", player, cardUid: uidA });
-    const postA = canonSnap();
+    const postA = postPlayHash();
 
     dispatch(state, { type: "UNDO" });
     dispatch(state, { type: "REDO" });
@@ -73,7 +71,7 @@ describe("engine dispatch history snapshot aliasing", () => {
     dispatch(state, { type: "UNDO" });
     dispatch(state, { type: "REDO" });
 
-    expect(canonSnap()).toBe(postA);
+    expect(postPlayHash()).toBe(postA);
   });
 
   it("__lastSelected is cleared on undo after nested_effects target resolution", () => {
