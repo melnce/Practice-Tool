@@ -113,6 +113,7 @@ function dispatchLeaveTriggers(
 }
 
 function triggerLastWords(card: CardInstance, owner: Player): "pending" | void {
+  if (isGameOver()) return;
   if ((card as any)._lwFired) return;
   if (!card?.hasLastWords) return;
   const kw = card.keywordState;
@@ -166,17 +167,40 @@ function sendToGrave(card: CardInstance, owner: Player) {
   addShadows(state, owner, 1);
 }
 
+/**
+ * Game-over halt: bury deferred corpses without firing leave/LW, then compact.
+ * Used when the match ends mid-flush so boards never retain null placeholders.
+ */
+function buryDeferredDeathBatchWithoutTriggers(
+  pendingLw: { card: CardInstance; owner: Player }[] = [],
+): void {
+  const q = getDeferredQueues();
+  const dropped = q.leave.length + q.lw.length + pendingLw.length;
+  logEffectsHaltedGameOver(dropped);
+
+  q.leave.length = 0;
+
+  const toBury = [...pendingLw, ...q.lw];
+  q.lw.length = 0;
+
+  for (const { card, owner } of toBury) {
+    (card as any)._lwFired = true;
+    sendToGrave(card, owner);
+  }
+
+  compactAllBoards();
+}
+
 /** Flush deferred leave triggers + Last Words after an atomic card effect (C4). */
 export function flushDeferredDeathBatch() {
   const MAX_ROUNDS = 32;
+  let halted = false;
+  let haltPendingLw: { card: CardInstance; owner: Player }[] = [];
 
   for (let round = 0; round < MAX_ROUNDS; round++) {
     if (isGameOver()) {
-      const q = getDeferredQueues();
-      logEffectsHaltedGameOver(q.leave.length + q.lw.length);
-      q.leave.length = 0;
-      q.lw.length = 0;
-      return;
+      halted = true;
+      break;
     }
 
     const q = getDeferredQueues();
@@ -186,29 +210,29 @@ export function flushDeferredDeathBatch() {
       sortLeaveQueue(q.leave);
       while (q.leave.length > 0) {
         if (isGameOver()) {
-          logEffectsHaltedGameOver(q.leave.length + q.lw.length);
-          q.leave.length = 0;
-          q.lw.length = 0;
-          return;
+          halted = true;
+          break;
         }
         const item = q.leave.shift()!;
         fireTrigger(item.event, item.activePlayer, item.context);
       }
     }
+    if (halted) break;
 
-    const lwBatch = q.lw.splice(0);
+    const qAfterLeave = getDeferredQueues();
+    const lwBatch = qAfterLeave.lw.splice(0);
     if (lwBatch.length > 0) {
       sortLwQueue(lwBatch);
       for (let i = 0; i < lwBatch.length; i++) {
         if (isGameOver()) {
-          logEffectsHaltedGameOver(lwBatch.length - i + q.lw.length);
-          q.lw.length = 0;
-          return;
+          haltPendingLw = lwBatch.slice(i);
+          halted = true;
+          break;
         }
         const { card: c, owner } = lwBatch[i]!;
         const paused = triggerLastWords(c, owner);
         if (paused === "pending" || state.pendingTargetEffect) {
-          q.lw.unshift(...lwBatch.slice(i));
+          qAfterLeave.lw.unshift(...lwBatch.slice(i));
           if (state.pendingTargetEffect) {
             state.pendingTargetEffect.deferredLwComplete = {
               cardUid: c.uid,
@@ -221,10 +245,17 @@ export function flushDeferredDeathBatch() {
         sendToGrave(c, owner);
       }
     }
+    if (halted) break;
 
     cleanupDead();
 
-    if (q.leave.length === 0 && q.lw.length === 0) break;
+    const qEnd = getDeferredQueues();
+    if (qEnd.leave.length === 0 && qEnd.lw.length === 0) break;
+  }
+
+  if (halted) {
+    buryDeferredDeathBatchWithoutTriggers(haltPendingLw);
+    return;
   }
 
   compactAllBoards();

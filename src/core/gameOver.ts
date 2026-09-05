@@ -30,14 +30,9 @@ export function clearOrchestratorEffectQueues(): number {
     dropped += pending.resumeEffects.length;
     pending.resumeEffects.length = 0;
   }
-  const deferred = (state as any)._deferredDeath as
-    | { lw?: unknown[]; leave?: unknown[] }
-    | undefined;
-  if (deferred) {
-    dropped += (deferred.leave?.length ?? 0) + (deferred.lw?.length ?? 0);
-    deferred.leave = [];
-    deferred.lw = [];
-  }
+  // Deferred leave/LW queues are buried by flushDeferredDeathBatch (runEffects
+  // finally / turn boundary), not dropped here — clearing without sendToGrave
+  // left null board slots after lethal mid-batch (#217 regression).
   return dropped;
 }
 
