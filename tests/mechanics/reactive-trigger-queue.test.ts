@@ -37,13 +37,25 @@ import {
 } from "../../src/core/history.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
 import { allocateInsertionTs } from "../../src/logic/core/triggers/utils.js";
+import { readFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+import { replaySoakTrace } from "../../src/bench/soakEnv.js";
 import "../../src/logic/core/effects/index.js";
+
+const SOAK_FIXTURE_DIR = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "../fixtures/soak",
+);
+
+function loadSoakFixture(name: string) {
+  return JSON.parse(
+    readFileSync(resolve(SOAK_FIXTURE_DIR, name), "utf8"),
+  ) as { seed: number; gameIndex: number; trace: unknown[] };
+}
 
 const NETHERWORLD_LT = "10951120";
 const KRULLE = "10314110";
-const REAPERS_DUE = "10953310";
-const SUPPLICANT_UNKILLING = "10312110";
-const ARIETT = "10002110";
 const OTS = "Obsessed Test Subject";
 const SEPHIE_ID = "10934110";
 
@@ -114,49 +126,17 @@ describe("Reactive trigger queue", () => {
   });
 
   it.fails(
-    "soak seed 20260913 game 124 — Reaper's Due exact-copy encoding loops until printed-copy PR",
-    () => {
-      givenGameState({ seed: 20260913, activePlayer: "first" })
-        .withFirstDeck([
-          { name: "Pad", type: "Follower", cost: 1, attack: 1, defense: 1 },
-        ])
-        .withSecondDeck([
-          { name: "Pad", type: "Follower", cost: 1, attack: 1, defense: 1 },
-        ])
-        .build();
-
-      const arriet = createCard(ARIETT, "board", "second");
-      applyKeywordsFromList(arriet);
-      arriet.attack = 5;
-      arriet.defense = 3;
-      arriet.base_attack = 3;
-      arriet.base_defense = 3;
-
-      const lwKw = (getCardById(REAPERS_DUE)!.spell as any[])[0].keywords[0];
-      arriet.keywords = [lwKw];
-      arriet.hasLastWords = true;
-      arriet.lastWordsEffects = lwKw.effects;
-      applyKeywordsFromList(arriet);
-
-      state.players.second.board = [arriet];
-
-      const supplicant = createCard(SUPPLICANT_UNKILLING, "board", "first");
-      applyKeywordsFromList(supplicant);
-      state.players.first.board = [supplicant];
-
-      whenRunEffects(
-        [
-          {
-            op: "stat",
-            action: "give",
-            target: "enemy:follower",
-            attack: 0,
-            defense: -3,
-          },
-        ],
-        "first",
-        supplicant,
+    "soak seed 20260913 game 123 — Reaper's Due exact-copy encoding loops until printed-copy PR",
+    async () => {
+      const fixture = loadSoakFixture(
+        "seed20260913_game123_reapers_due_loop.json",
       );
+      const result = await replaySoakTrace(
+        fixture.seed,
+        fixture.gameIndex,
+        fixture.trace as any,
+      );
+      expect(result.error).toBeUndefined();
     },
   );
 

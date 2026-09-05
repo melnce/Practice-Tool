@@ -375,9 +375,7 @@ export function resumeDeferredDeathIfIdle(): void {
 export function cleanupDead() {
   if (state.suppressCleanup) return;
 
-  const defer =
-    !!(state as any).deferDeathTriggers ||
-    !!(state as any)._drainingResolutionQueue;
+  const defer = !!(state as any).deferDeathTriggers;
 
   const toNum = (v: any): number =>
     typeof v === "number" ? v : v == null ? 0 : +v;

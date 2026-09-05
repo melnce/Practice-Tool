@@ -10099,16 +10099,16 @@
       "status": "covered"
     },
     "10932110": {
-      "fingerprint": "dd5797a0",
+      "fingerprint": "9857407f",
       "gatesSatisfied": [],
       "name": "Enamored Researcher",
       "scenarios": [
         {
-          "fingerprint": "f95fbf84",
+          "fingerprint": "4c28f700",
           "scenario": "play"
         },
         {
-          "fingerprint": "974981b7",
+          "fingerprint": "0afd45ce",
           "scenario": "play_base"
         },
         {
@@ -10131,24 +10131,24 @@
       "status": "covered"
     },
     "10932310": {
-      "fingerprint": "0bfef740",
+      "fingerprint": "f1e7d0c8",
       "gatesSatisfied": [],
       "name": "Humane Love",
       "scenarios": [
         {
-          "fingerprint": "f2a9696c",
+          "fingerprint": "c5ae85ab",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10933110": {
-      "fingerprint": "6633ebe1",
+      "fingerprint": "49a00aa8",
       "gatesSatisfied": ["has_fuse_materials"],
       "name": "Ecstatic Scholar",
       "scenarios": [
         {
-          "fingerprint": "8f3deb03",
+          "fingerprint": "d5532d23",
           "scenario": "play"
         },
         {
@@ -10159,24 +10159,24 @@
       "status": "covered"
     },
     "10933310": {
-      "fingerprint": "f943ae9c",
+      "fingerprint": "f6fbd5e8",
       "gatesSatisfied": [],
       "name": "Obsidian Raven",
       "scenarios": [
         {
-          "fingerprint": "4726e2a4",
+          "fingerprint": "85a8fbd8",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10934110": {
-      "fingerprint": "895efde8",
+      "fingerprint": "5b9c6170",
       "gatesSatisfied": ["pp_at_least"],
       "name": "Sephie, Maven Convict",
       "scenarios": [
         {
-          "fingerprint": "1ca6b1cb",
+          "fingerprint": "a6174510",
           "scenario": "play"
         },
         {
