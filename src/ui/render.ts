@@ -18,6 +18,7 @@ import { refreshActiveTooltips } from "./tooltips.js";
 import { getPuzzleSessionSnapshot } from "../core/puzzle/session.js";
 import { syncFloatingCombatTextFromLogs } from "./floatingCombatText.js";
 import { noteBlackboxRematch } from "./blackbox.js";
+import { syncMulliganOverlayFromState } from "../logic/mulligan.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -77,6 +78,7 @@ export function render() {
   setText("redShadows", state.players.second.shadows);
 
   syncBodyTurnClasses();
+  syncMulliganOverlayFromState();
   syncSeedDisplay();
 
   // zones - use activePlayer as source of truth for turn state

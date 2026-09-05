@@ -54,7 +54,7 @@ describe("history round-trip soak", () => {
     });
   }
 
-  it("mulligan picks are not undoable — canUndo() false and UNDO is a no-op", async () => {
+  it("mulligan picks are undoable — toggle, confirm, and undo/redo round-trip", async () => {
     setHistoryEnabled(true);
     await startNewGame({
       deckAId: "aggro_abysscraft",
@@ -64,25 +64,29 @@ describe("history round-trip soak", () => {
     expect(state.phase).toBe("mulligan");
 
     const hand = state.players.first.hand;
-    const cardUid = hand.find((c) => (c as any).__mulliganSelectable)?.uid;
-    expect(cardUid).toBeTruthy();
+    const uids = hand
+      .filter((c) => (c as any).__mulliganSelectable)
+      .map((c) => c.uid);
+    expect(uids.length).toBeGreaterThanOrEqual(2);
 
     dispatch(state, {
       type: "TOGGLE_MULLIGAN",
       player: "first",
-      cardUid: cardUid!,
+      cardUid: uids[0]!,
     });
-    expect(canUndo()).toBe(false);
+    expect(canUndo()).toBe(true);
     const afterToggle = canonicalJson(captureSnapshot());
     dispatch(state, { type: "UNDO" });
-    expect(canonicalJson(captureSnapshot())).toBe(afterToggle);
+    expect(canonicalJson(captureSnapshot())).not.toBe(afterToggle);
+    expect(canUndo()).toBe(false);
 
     dispatch(state, { type: "CONFIRM_MULLIGAN", player: "first" });
     dispatch(state, { type: "CONFIRM_MULLIGAN", player: "second" });
-    expect(canUndo()).toBe(false);
+    expect(canUndo()).toBe(true);
     const afterConfirm = canonicalJson(captureSnapshot());
     dispatch(state, { type: "UNDO" });
-    expect(canonicalJson(captureSnapshot())).toBe(afterConfirm);
+    expect(canonicalJson(captureSnapshot())).not.toBe(afterConfirm);
+    expect(state.phase).toBe("mulligan");
   });
 
   it("engine dispatch: PLAY_CARD with fanfare draw undoes cleanly", async () => {
@@ -119,40 +123,33 @@ describe("history round-trip soak", () => {
     expect(canonicalJson(getBoard(state, player))).toBe(boardBefore);
   });
 
-  it.fails(
-    `seed ${CHAIN_UNDO_FAIL_SEED} — engine CHOOSE_TARGET nested-commit chain-undo (no mask)`,
-    async () => {
-      const result = await runSoakGame({
-        seed: CHAIN_UNDO_FAIL_SEED,
-        gameIndex: 0,
-        historyCheck: true,
-        dispatch: ENGINE,
-        turnCap: 60,
-        actionCap: 800,
-      });
-      expect(
-        result.outcome,
-        result.error ??
-          `seed ${CHAIN_UNDO_FAIL_SEED} outcome ${result.outcome}`,
-      ).toBe("completed");
-    },
-  );
+  it(`seed ${CHAIN_UNDO_FAIL_SEED} — engine CHOOSE_TARGET nested-commit chain-undo (no mask)`, async () => {
+    const result = await runSoakGame({
+      seed: CHAIN_UNDO_FAIL_SEED,
+      gameIndex: 0,
+      historyCheck: true,
+      dispatch: ENGINE,
+      turnCap: 60,
+      actionCap: 800,
+    });
+    expect(
+      result.outcome,
+      result.error ?? `seed ${CHAIN_UNDO_FAIL_SEED} outcome ${result.outcome}`,
+    ).toBe("completed");
+  });
 
-  it.fails(
-    "engine chain-undo: CHOOSE_TARGET nested commit leaves pendingTargetEffect.targetUids (seed 20260909 game 22 action 19)",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260909,
-        gameIndex: 22,
-        historyCheck: true,
-        dispatch: ENGINE,
-      });
-      expect(
-        result.outcome,
-        result.error ?? `game 22 outcome ${result.outcome}`,
-      ).toBe("completed");
-    },
-  );
+  it("engine chain-undo: CHOOSE_TARGET nested commit leaves pendingTargetEffect.targetUids (seed 20260909 game 22 action 19)", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 22,
+      historyCheck: true,
+      dispatch: ENGINE,
+    });
+    expect(
+      result.outcome,
+      result.error ?? `game 22 outcome ${result.outcome}`,
+    ).toBe("completed");
+  });
 
   it("engine deep chain undo: null board slot (seed 20260909 game 14 action 56)", async () => {
     const result = await runSoakGame({

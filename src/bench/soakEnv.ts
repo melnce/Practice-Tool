@@ -498,10 +498,8 @@ function safeHash(): string {
 
 type SnapshotPair = { canon: string; snap: GameState };
 
-/** Mulligan picks, target-selection clicks, and stuck-pending recovery are not undoable by design. */
+/** Mulligan picks and target-selection clicks are not undoable by design. */
 export const EXPECTED_NON_UNDOABLE_ACTION_TYPES = new Set([
-  "TOGGLE_MULLIGAN",
-  "CONFIRM_MULLIGAN",
   "CHOOSE_TARGET",
   "FORCE_COMPLETE_PENDING",
 ]);

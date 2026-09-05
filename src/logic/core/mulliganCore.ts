@@ -5,7 +5,7 @@
 import { state } from "../../core/gameState.js";
 import { drawCard, shuffleInPlace } from "../../core/utils.js";
 import { logEvent } from "../../core/logger.js";
-import { doAction, resetHistory } from "../../core/history.js";
+import { doAction } from "../../core/history.js";
 import type { Player } from "../../core/types/index.js";
 import { getHand, getDeck, isFirstPlayer } from "../../core/playerHelpers.js";
 import { adapter } from "../../core/adapter.js";
@@ -72,15 +72,24 @@ export function toggleMulliganPickCore(owner: Player, uid: string): void {
     : state.mulliganSecondSelected;
   if (!bag) return;
 
-  if ((card as any).__mulliganSelected) {
-    (card as any).__mulliganSelected = false;
-    bag.delete(uid);
-  } else {
-    if (bag.size >= 4) return;
-    (card as any).__mulliganSelected = true;
-    bag.add(uid);
-  }
-  adapter.render();
+  const deselecting = !!(card as any).__mulliganSelected;
+  if (!deselecting && bag.size >= 4) return;
+
+  doAction(
+    "Toggle Mulligan",
+    () => {
+      if ((card as any).__mulliganSelected) {
+        (card as any).__mulliganSelected = false;
+        bag.delete(uid);
+      } else {
+        (card as any).__mulliganSelected = true;
+        bag.add(uid);
+      }
+      adapter.render();
+    },
+    { owner, uid, stage: "mulligan" },
+    { autoRender: true },
+  );
 }
 
 /**
@@ -140,9 +149,5 @@ export function confirmMulliganCore(
     { autoRender: true },
   );
 
-  if (state.phase === "main") {
-    resetHistory();
-    return true;
-  }
-  return false;
+  return state.phase === "main";
 }
