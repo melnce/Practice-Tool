@@ -6,6 +6,7 @@ import { initCardDatabaseNode } from "../../src/data/cardLoaderNode.js";
 import {
   runSoakGame,
   canonicalJson,
+  getLegalSoakActions,
   PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS,
 } from "../../src/bench/soakEnv.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
@@ -48,33 +49,47 @@ beforeAll(async () => {
   await initCardDatabaseNode();
 });
 
-const SAVE_LOAD_ENGINE_FINDING =
-  "position save-load re-apply mismatch: enhanceTiers [] vs undefined after loadPosition " +
-  "(applySnapshot does not normalize empty array fields on restored cards; " +
-  "src/core/history.ts applySnapshot / positionStore loadPosition)";
+const SAVE_LOAD_READ_PATH_FINDING =
+  "position save-load re-apply mismatch: read-path preflight mutates live state during " +
+  "getLegalSoakActions (pickEnhanceTiers enhanceTiers write-back in " +
+  "src/logic/core/playCard/cost.ts; e.g. __uiSelectable on deck cards) — " +
+  "flips when fix-enhance-tiers-read-write merges";
 
 describe("position round-trip soak", () => {
   vi.setConfig({ testTimeout: 120_000 });
 
-  for (const seed of [20260909, 20260908] as const) {
-    it.fails(
-      `seed ${seed} — engine dispatch position round-trip (game 0)`,
-      async () => {
-        const result = await runSoakGame({
-          seed,
-          gameIndex: 0,
-          positionCheck: true,
-          dispatch: ENGINE,
-          turnCap: 60,
-          actionCap: 800,
-        });
-        expect(
-          result.outcome,
-          result.error ?? `${SAVE_LOAD_ENGINE_FINDING}; got ${result.outcome}`,
-        ).toBe("completed");
-      },
-    );
-  }
+  it("seed 20260908 — engine dispatch position round-trip (game 0)", async () => {
+    const result = await runSoakGame({
+      seed: 20260908,
+      gameIndex: 0,
+      positionCheck: true,
+      dispatch: ENGINE,
+      turnCap: 60,
+      actionCap: 800,
+    });
+    expect(
+      result.outcome,
+      result.error ?? `seed 20260908 outcome ${result.outcome}`,
+    ).toBe("completed");
+  });
+
+  it.fails(
+    "seed 20260909 — engine dispatch position round-trip (game 0)",
+    async () => {
+      const result = await runSoakGame({
+        seed: 20260909,
+        gameIndex: 0,
+        positionCheck: true,
+        dispatch: ENGINE,
+        turnCap: 60,
+        actionCap: 800,
+      });
+      expect(
+        result.outcome,
+        result.error ?? `${SAVE_LOAD_READ_PATH_FINDING}; got ${result.outcome}`,
+      ).toBe("completed");
+    },
+  );
 
   it("seed 20260909 — history + positions together (game 0)", async () => {
     const result = await runSoakGame({
@@ -123,6 +138,41 @@ describe("position round-trip shapes (engineDispatch)", () => {
     state.phase = "main";
     state.activePlayer = "first";
   });
+
+  it.fails(
+    "pickEnhanceTiers write-back in cost.ts mutates hand on getLegalSoakActions read path",
+    () => {
+      givenGameState({ seed: 4242, activePlayer: "first", roundCount: 5 })
+        .withFirstHand([
+          {
+            name: "Enhance Test",
+            type: "Follower",
+            cost: 1,
+            attack: 1,
+            defense: 1,
+            enhanceTiers: [{ cost: 1, effects: [{ op: "draw", count: 1 }] }],
+          },
+        ])
+        .withFirstDeck([
+          {
+            name: "Filler",
+            type: "Follower",
+            cost: 1,
+            attack: 1,
+            defense: 1,
+          },
+        ])
+        .withFirstPP(5, 5)
+        .build();
+      resetHistory();
+
+      const card = state.players.first.hand[0]!;
+      expect(card.enhanceTiers).toBeUndefined();
+
+      getLegalSoakActions();
+      expect(card.enhanceTiers).toBeUndefined();
+    },
+  );
 
   it("save while target prompt open → load → prompt open with no picks", () => {
     givenGameState({ seed: 5, activePlayer: "first" }).build();

@@ -692,6 +692,28 @@ function formatLegalMismatch(
   return `history legal-${phase} mismatch at action ${actionIndex} (${JSON.stringify(action)}):\n${diffText}`;
 }
 
+function formatPositionLegalMismatch(
+  actionIndex: number,
+  action: SoakAction,
+  phase: string,
+  expected: string,
+  actual: string,
+): string {
+  const exp = JSON.parse(expected) as unknown;
+  const act = JSON.parse(actual) as unknown;
+  const diffs = diffJsonPaths(exp, act);
+  const diffText = diffs
+    .map(
+      (d) =>
+        `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+    )
+    .join("\n");
+  return (
+    `position save-load legal-${phase} mismatch at action ${actionIndex} ` +
+    `(${JSON.stringify(action)}):\n${diffText}`
+  );
+}
+
 function dispatchSoakPlayerAction(
   action: PlayerAction,
   dispatchPath: SoakDispatchPath,
@@ -1158,6 +1180,7 @@ export function runPositionSaveLoad(
 ): string | null {
   const { actionIndex, action, ignoreFields, policyRng, dispatchPath } = ctx;
 
+  const legalBeforeSave = captureLegalSnapshot();
   const savedCanon = captureFullSnapshot().canon;
   const saved = savePosition("soak");
 
@@ -1185,6 +1208,18 @@ export function runPositionSaveLoad(
       savedCanon,
       loadedCanon,
       ignoreFields,
+    );
+  }
+
+  const legalAfterLoad = canonicalJson(sortSoakActions(getLegalSoakActions()));
+  if (legalAfterLoad !== legalBeforeSave) {
+    deletePosition(saved.id);
+    return formatPositionLegalMismatch(
+      actionIndex,
+      action,
+      "after-load",
+      legalBeforeSave,
+      legalAfterLoad,
     );
   }
 
