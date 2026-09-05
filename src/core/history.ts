@@ -7,6 +7,8 @@ import { validateGameState } from "./stateValidation.js";
 import { isHistoryDisabled } from "./env.js";
 import type { ReplayStep } from "./stateHash.js";
 import { hashGameState } from "./stateHash.js";
+import type { CardInstance } from "./types/index.js";
+import { pruneCompletedPendingFromSnapshot } from "../logic/core/resolveTarget.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -93,6 +95,35 @@ export const INTERNAL_CACHE_KEYS = new Set([
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
+
+/** Snapshots never store in-progress target picks — undo reopens a clean prompt. */
+function sanitizePendingTargetInSnapshot(snap: GameState): void {
+  const pending = snap.pendingTargetEffect;
+  if (!pending) return;
+
+  pending.targetUids = [];
+  if (Array.isArray(pending.targets)) {
+    pending.targets = [];
+  }
+
+  const seen = new Set<CardInstance>();
+  const visit = (c: CardInstance | null | undefined) => {
+    if (!c || seen.has(c)) return;
+    seen.add(c);
+    if ((c as any).__uiSelectable) delete (c as any).__uiSelectable;
+  };
+
+  for (const p of ["first", "second"] as const) {
+    const pl = snap.players[p];
+    for (const c of pl.board) visit(c);
+    for (const c of pl.hand) visit(c);
+    for (const c of pl.graveyard ?? []) visit(c);
+  }
+  if (Array.isArray(pending.pool)) {
+    for (const c of pending.pool) visit(c);
+  }
+}
+
 function snapshot(): GameState {
   // Exclude RNG (has methods, must be handled separately) and internal caches
   const { rng, ...rest } = state as any;
@@ -112,6 +143,7 @@ function snapshot(): GameState {
     if (rng && typeof rng.snapshot === "function") {
       (snap as any).__rng = rng.snapshot();
     }
+    sanitizePendingTargetInSnapshot(snap);
     return snap;
   } catch (e) {
     // Fallback: manually clone, skipping non-cloneable properties
@@ -159,6 +191,7 @@ function manualSnapshot(rest: any, rng: any): GameState {
     snap.__rng = rng.snapshot();
   }
 
+  sanitizePendingTargetInSnapshot(snap as GameState);
   return snap as GameState;
 }
 
@@ -244,6 +277,7 @@ function cloneSnapshot(snap: GameState): GameState {
         uidCounter: rngMeta.uidCounter,
       };
     }
+    sanitizePendingTargetInSnapshot(clone);
     return clone;
   } catch (e) {
     console.warn(
@@ -258,6 +292,7 @@ function cloneSnapshot(snap: GameState): GameState {
         uidCounter: rngMeta.uidCounter,
       };
     }
+    sanitizePendingTargetInSnapshot(clone);
     return clone;
   }
 }
@@ -334,6 +369,7 @@ export function commitAction({ autoRender = true } = {}) {
   }
 
   const after = snapshot();
+  pruneCompletedPendingFromSnapshot(after, inAction.name);
   const entry: HistoryEntry = { ...inAction, after } as HistoryEntry;
   past.push(entry);
   trimRing();

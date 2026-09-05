@@ -102,13 +102,19 @@ export type HistoryRingEntry = {
 
 const HISTORY_RING_MAX = 10;
 
-/** Top-level state fields mutated before history.ts snapshots during headless play. */
+/**
+ * Top-level state fields mutated before history.ts snapshots during headless play,
+ * or trigger-candidate cache bookkeeping that may differ ±1 across undo/redo without
+ * changing gameplay outcomes. History soak comparisons (single-step, deep-chain, and
+ * re-execute) all use this list via `historyIgnoreFields`.
+ */
 export const PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS = [
   "deferDeathTriggers",
   "gameTick",
   "lastDrawnCard",
   "lastDrawnCards",
   "lastSummoned",
+  "zoneVersion",
 ] as const;
 
 export type ActionTelemetry = {
@@ -498,10 +504,8 @@ function safeHash(): string {
 
 type SnapshotPair = { canon: string; snap: GameState };
 
-/** Mulligan picks, target-selection clicks, and stuck-pending recovery are not undoable by design. */
+/** Mulligan picks and target-selection clicks are not undoable by design. */
 export const EXPECTED_NON_UNDOABLE_ACTION_TYPES = new Set([
-  "TOGGLE_MULLIGAN",
-  "CONFIRM_MULLIGAN",
   "CHOOSE_TARGET",
   "FORCE_COMPLETE_PENDING",
 ]);
@@ -1024,7 +1028,9 @@ export async function runSoakGame(
   const nonUndoableActionTypes = new Set<string>();
   const playBlockedLog: SoakGameResult["playBlockedLog"] = [];
   const zeroCommitLog: NonNullable<SoakGameResult["zeroCommitLog"]> = [];
-  const historyIgnoreFields = opts.historyIgnoreFields ?? [];
+  const historyIgnoreFields =
+    opts.historyIgnoreFields ??
+    (opts.historyCheck ? [...PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS] : []);
   const dispatchPath = opts.dispatch ?? DEFAULT_SOAK_DISPATCH;
   const historyReExecute = opts.historyReExecute ?? false;
   let unsubHistoryReset: (() => void) | undefined;

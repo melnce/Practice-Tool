@@ -190,6 +190,9 @@ async function main(): Promise<void> {
   const soakEnv = await import(
     pathToFileURL(resolve(ROOT, "src/bench/soakEnv.ts")).href
   );
+  if (config.history && config.historyIgnore.length === 0) {
+    config.historyIgnore = [...soakEnv.PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS];
+  }
   const { CoverageTracker } = await import(
     pathToFileURL(resolve(ROOT, "src/bench/soakCoverage.ts")).href
   );

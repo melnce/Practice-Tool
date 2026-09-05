@@ -94,6 +94,12 @@ export function beginMulligan(options?: { skipMulligan?: boolean }) {
   showMulliganUI();
 }
 
+export function syncMulliganOverlayFromState(): void {
+  if (typeof document === "undefined") return;
+  if (state.phase !== "mulligan") return;
+  showMulliganUI();
+}
+
 if (typeof window !== "undefined") {
   (window as any).confirmMulligan = confirmMulligan;
   (window as any).toggleMulliganPick = toggleMulliganPick;
