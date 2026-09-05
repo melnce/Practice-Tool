@@ -13,7 +13,14 @@ import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
 import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
-import { startNewGame, getState } from "../engine.js";
+import {
+  captureSnapshot,
+  applySnapshot,
+  setHistoryEnabled,
+} from "../core/history.js";
+import { setNodeEnv } from "../core/env.js";
+import type { GameState } from "../core/types/index.js";
+import { startNewGame } from "../engine.js";
 import { canPlayCard } from "../logic/core/playCard/preflight.js";
 import { getEffectiveCost } from "../logic/core/playCard/cost.js";
 import { canEvolve } from "../logic/evolveUtils.js";
@@ -50,7 +57,8 @@ export type SoakGameResult = {
     | "crash"
     | "hang"
     | "invariant"
-    | "determinism_mismatch";
+    | "determinism_mismatch"
+    | "history";
   turns: number;
   actions: number;
   finalHash: string;
@@ -434,6 +442,287 @@ function safeHash(): string {
   }
 }
 
+// ---------------------------------------------------------------------------
+// History round-trip helpers (canonical full-state comparison)
+// ---------------------------------------------------------------------------
+
+type SnapshotPair = { canon: string; snap: GameState };
+
+/** FORCE_COMPLETE_PENDING mutates state without a history.ts entry — see PR Findings. */
+const PSEUDO_WITHOUT_HISTORY = new Set<SoakAction["type"]>([
+  "FORCE_COMPLETE_PENDING",
+]);
+
+function canonicalize(value: unknown): unknown {
+  if (value === null || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map(canonicalize);
+  const sorted: Record<string, unknown> = {};
+  for (const key of Object.keys(value as object).sort()) {
+    sorted[key] = canonicalize((value as Record<string, unknown>)[key]);
+  }
+  return sorted;
+}
+
+export function canonicalJson(value: unknown): string {
+  return JSON.stringify(canonicalize(value));
+}
+
+function captureFullSnapshot(): SnapshotPair {
+  const snap = captureSnapshot();
+  return { canon: canonicalJson(snap), snap };
+}
+
+function captureLegalSnapshot(): string {
+  return canonicalJson(sortSoakActions(getLegalSoakActions()));
+}
+
+export type JsonPathDiff = { path: string; a: unknown; b: unknown };
+
+export function diffJsonPaths(
+  a: unknown,
+  b: unknown,
+  prefix = "",
+  out: JsonPathDiff[] = [],
+  max = 10,
+): JsonPathDiff[] {
+  if (out.length >= max) return out;
+  if (Object.is(a, b)) return out;
+
+  const isArrA = Array.isArray(a);
+  const isArrB = Array.isArray(b);
+  const typeA = isArrA ? "array" : typeof a;
+  const typeB = isArrB ? "array" : typeof b;
+
+  if (
+    typeA !== typeB ||
+    (typeA !== "object" && typeA !== "array") ||
+    a === null ||
+    b === null
+  ) {
+    out.push({ path: prefix || "(root)", a, b });
+    return out;
+  }
+
+  if (isArrA && isArrB) {
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len && out.length < max; i++) {
+      diffJsonPaths(a[i], b[i], `${prefix}[${i}]`, out, max);
+    }
+    return out;
+  }
+
+  const keys = new Set([
+    ...Object.keys(a as object),
+    ...Object.keys(b as object),
+  ]);
+  for (const key of [...keys].sort()) {
+    if (out.length >= max) break;
+    const pa = (a as Record<string, unknown>)[key];
+    const pb = (b as Record<string, unknown>)[key];
+    diffJsonPaths(pa, pb, prefix ? `${prefix}.${key}` : key, out, max);
+  }
+  return out;
+}
+
+function formatHistoryMismatch(
+  actionIndex: number,
+  action: SoakAction,
+  phase: string,
+  expected: string,
+  actual: string,
+): string {
+  const exp = JSON.parse(expected) as unknown;
+  const act = JSON.parse(actual) as unknown;
+  const diffs = diffJsonPaths(exp, act);
+  const diffText = diffs
+    .map(
+      (d) =>
+        `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+    )
+    .join("\n");
+  return `history ${phase} mismatch at action ${actionIndex} (${JSON.stringify(action)}):\n${diffText}`;
+}
+
+function formatLegalMismatch(
+  actionIndex: number,
+  action: SoakAction,
+  phase: string,
+  expected: string,
+  actual: string,
+): string {
+  const exp = JSON.parse(expected) as unknown;
+  const act = JSON.parse(actual) as unknown;
+  const diffs = diffJsonPaths(exp, act);
+  const diffText = diffs
+    .map(
+      (d) =>
+        `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+    )
+    .join("\n");
+  return `history legal-${phase} mismatch at action ${actionIndex} (${JSON.stringify(action)}):\n${diffText}`;
+}
+
+function usesEngineHistory(action: SoakAction): boolean {
+  return !PSEUDO_WITHOUT_HISTORY.has(action.type);
+}
+
+function performHistoryUndo(action: SoakAction, before: SnapshotPair): void {
+  if (usesEngineHistory(action)) {
+    dispatchAction(state, { type: "UNDO" }, { checkInvariants: false });
+  } else {
+    applySnapshot(before.snap, { autoRender: false, resetHistory: false });
+  }
+}
+
+function performHistoryRedo(action: SoakAction, after: SnapshotPair): void {
+  if (usesEngineHistory(action)) {
+    dispatchAction(state, { type: "REDO" }, { checkInvariants: false });
+  } else {
+    applySnapshot(after.snap, { autoRender: false, resetHistory: false });
+  }
+}
+
+type HistoryCheckContext = {
+  actionIndex: number;
+  action: SoakAction;
+  before: SnapshotPair;
+  after: SnapshotPair;
+  legalBefore: string;
+  legalAfter: string;
+  policyRng: RNG;
+};
+
+function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
+  const {
+    actionIndex,
+    action,
+    before,
+    after,
+    legalBefore,
+    legalAfter,
+    policyRng,
+  } = ctx;
+
+  performHistoryUndo(action, before);
+
+  let actual = captureFullSnapshot().canon;
+  if (actual !== before.canon) {
+    return formatHistoryMismatch(
+      actionIndex,
+      action,
+      "undo",
+      before.canon,
+      actual,
+    );
+  }
+  let legalActual = captureLegalSnapshot();
+  if (legalActual !== legalBefore) {
+    return formatLegalMismatch(
+      actionIndex,
+      action,
+      "undo",
+      legalBefore,
+      legalActual,
+    );
+  }
+
+  const useReExecute = policyRng.nextInt(4) === 0;
+  if (useReExecute) {
+    applySoakAction(action);
+    actual = captureFullSnapshot().canon;
+    if (actual !== after.canon) {
+      return formatHistoryMismatch(
+        actionIndex,
+        action,
+        "re-execute",
+        after.canon,
+        actual,
+      );
+    }
+    legalActual = captureLegalSnapshot();
+    if (legalActual !== legalAfter) {
+      return formatLegalMismatch(
+        actionIndex,
+        action,
+        "re-execute",
+        legalAfter,
+        legalActual,
+      );
+    }
+  } else {
+    performHistoryRedo(action, after);
+    actual = captureFullSnapshot().canon;
+    if (actual !== after.canon) {
+      return formatHistoryMismatch(
+        actionIndex,
+        action,
+        "redo",
+        after.canon,
+        actual,
+      );
+    }
+    legalActual = captureLegalSnapshot();
+    if (legalActual !== legalAfter) {
+      return formatLegalMismatch(
+        actionIndex,
+        action,
+        "redo",
+        legalAfter,
+        legalActual,
+      );
+    }
+  }
+
+  return null;
+}
+
+function runDeepHistoryChain(
+  actionIndex: number,
+  beforeRing: string[],
+  afterRing: string[],
+): string | null {
+  const k = Math.min(10, beforeRing.length);
+  if (k === 0) return null;
+
+  for (let j = 1; j <= k; j++) {
+    dispatchAction(state, { type: "UNDO" }, { checkInvariants: false });
+    const expected = beforeRing[beforeRing.length - j]!;
+    const actual = captureFullSnapshot().canon;
+    if (actual !== expected) {
+      const exp = JSON.parse(expected) as unknown;
+      const act = JSON.parse(actual) as unknown;
+      const diffs = diffJsonPaths(exp, act);
+      const diffText = diffs
+        .map(
+          (d) =>
+            `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+        )
+        .join("\n");
+      return `history chain-undo level ${j} mismatch at action ${actionIndex}:\n${diffText}`;
+    }
+  }
+
+  for (let j = 1; j <= k; j++) {
+    dispatchAction(state, { type: "REDO" }, { checkInvariants: false });
+    const expected = afterRing[afterRing.length - k + j - 1]!;
+    const actual = captureFullSnapshot().canon;
+    if (actual !== expected) {
+      const exp = JSON.parse(expected) as unknown;
+      const act = JSON.parse(actual) as unknown;
+      const diffs = diffJsonPaths(exp, act);
+      const diffText = diffs
+        .map(
+          (d) =>
+            `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+        )
+        .join("\n");
+      return `history chain-redo level ${j} mismatch at action ${actionIndex}:\n${diffText}`;
+    }
+  }
+
+  return null;
+}
+
 function applySoakAction(action: SoakAction): void {
   if (action.type === "CONFIRM_TARGETS") {
     if (confirmHook) {
@@ -458,6 +747,8 @@ export type RunSoakGameOptions = {
   coverage?: CoverageTracker;
   /** When true, skip invariant checks (used only for timing). */
   skipInvariants?: boolean;
+  /** When true, undo/redo round-trip after every action with full-state comparison. */
+  historyCheck?: boolean;
   /** Override deck pairing (skips deckSpecForSeed when both are set). */
   deckAId?: string;
   deckBId?: string;
@@ -471,6 +762,11 @@ export async function runSoakGame(
 ): Promise<SoakGameResult> {
   installSoakAdapter();
   confirmHook = null;
+
+  if (opts.historyCheck) {
+    setNodeEnv("DISABLE_HISTORY", undefined);
+    setHistoryEnabled(true);
+  }
 
   const turnCap = opts.turnCap ?? DEFAULT_TURN_CAP;
   const actionCap = opts.actionCap ?? DEFAULT_ACTION_CAP;
@@ -523,6 +819,8 @@ export async function runSoakGame(
   }
 
   let actions = 0;
+  const engineBeforeRing: string[] = [];
+  const engineAfterRing: string[] = [];
   try {
     while (true) {
       if (isGameOver(state)) break;
@@ -568,8 +866,63 @@ export async function runSoakGame(
       if (opts.coverage) noteActionCoverage(opts.coverage, action);
       trace.push(action);
 
+      const beforeSnap = opts.historyCheck ? captureFullSnapshot() : null;
+      const legalBefore = opts.historyCheck ? captureLegalSnapshot() : null;
+
       applySoakAction(action);
       actions++;
+
+      if (opts.historyCheck && beforeSnap && legalBefore) {
+        const afterSnap = captureFullSnapshot();
+        const legalAfter = captureLegalSnapshot();
+
+        const roundTripErr = runHistoryRoundTrip({
+          actionIndex: actions,
+          action,
+          before: beforeSnap,
+          after: afterSnap,
+          legalBefore,
+          legalAfter,
+          policyRng,
+        });
+        if (roundTripErr) {
+          return {
+            ...base,
+            outcome: "history",
+            turns: state.turnNumber | 0,
+            actions,
+            finalHash: safeHash(),
+            error: roundTripErr,
+            findings: [roundTripErr],
+          };
+        }
+
+        if (usesEngineHistory(action)) {
+          engineBeforeRing.push(beforeSnap.canon);
+          engineAfterRing.push(afterSnap.canon);
+          if (engineBeforeRing.length > 10) engineBeforeRing.shift();
+          if (engineAfterRing.length > 10) engineAfterRing.shift();
+        }
+
+        if (actions % 25 === 0 && engineBeforeRing.length > 0) {
+          const chainErr = runDeepHistoryChain(
+            actions,
+            engineBeforeRing,
+            engineAfterRing,
+          );
+          if (chainErr) {
+            return {
+              ...base,
+              outcome: "history",
+              turns: state.turnNumber | 0,
+              actions,
+              finalHash: safeHash(),
+              error: chainErr,
+              findings: [chainErr],
+            };
+          }
+        }
+      }
 
       if (opts.coverage) scanZonesForCoverage(opts.coverage);
 

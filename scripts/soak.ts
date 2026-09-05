@@ -1,11 +1,14 @@
 // scripts/soak.ts
 // Engine soak harness — hundreds of seeded random games across the full card pool.
-// Run: npm run soak -- [--games=N] [--seed=N] [--smoke] [--determinism=N]
+// Run: npm run soak -- [--games=N] [--seed=N] [--smoke] [--history] [--determinism=N]
 //
 // Reports land in reports/soak/
 
 (globalThis as any).HEADLESS = true;
-process.env.DISABLE_HISTORY = process.env.DISABLE_HISTORY ?? "1";
+// History is off by default for soak throughput; --history / --smoke enable round-trip checks.
+if (!process.argv.includes("--history") && !process.argv.includes("--smoke")) {
+  process.env.DISABLE_HISTORY = process.env.DISABLE_HISTORY ?? "1";
+}
 
 import { mkdirSync, writeFileSync, existsSync } from "fs";
 import { resolve, dirname, join } from "path";
@@ -110,6 +113,7 @@ type SoakCliConfig = {
   games: number;
   seed: number;
   smoke: boolean;
+  history: boolean;
   determinism: number;
   turnCap: number;
   actionCap: number;
@@ -121,6 +125,7 @@ function parseArgs(): SoakCliConfig {
     games: 400,
     seed: 20260815,
     smoke: false,
+    history: false,
     determinism: 20,
     turnCap: 60,
     actionCap: 800,
@@ -133,7 +138,9 @@ function parseArgs(): SoakCliConfig {
       config.smoke = true;
       config.games = 8;
       config.determinism = 2;
-    } else if (arg.startsWith("--determinism="))
+      config.history = true;
+    } else if (arg === "--history") config.history = true;
+    else if (arg.startsWith("--determinism="))
       config.determinism = parseInt(arg.slice(14), 10);
     else if (arg.startsWith("--turn-cap="))
       config.turnCap = parseInt(arg.slice(11), 10);
@@ -172,10 +179,30 @@ async function main(): Promise<void> {
   console.log("║              SHADOWVERSE ENGINE SOAK                     ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
-    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap}`,
+    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history}`,
   );
   console.log(`reports → ${REPORT_DIR}`);
   console.log("");
+
+  let smokeNoHistoryMs: number | undefined;
+
+  if (config.smoke && config.history) {
+    console.log("Timing 8 smoke games without history check…");
+    const tNoHistory = performance.now();
+    for (let i = 0; i < 8; i++) {
+      await soakEnv.runSoakGame({
+        seed: config.seed,
+        gameIndex: i,
+        turnCap: config.turnCap,
+        actionCap: config.actionCap,
+      });
+    }
+    smokeNoHistoryMs = performance.now() - tNoHistory;
+    console.log(
+      `  without history: ${(smokeNoHistoryMs / 1000).toFixed(2)}s (${(smokeNoHistoryMs / 8).toFixed(0)}ms/game)`,
+    );
+    console.log("");
+  }
 
   const summary = {
     seed: config.seed,
@@ -185,6 +212,8 @@ async function main(): Promise<void> {
     crashes: 0,
     hangs: 0,
     invariants: 0,
+    history: 0,
+    historyCheck: config.history,
     determinismChecks: 0,
     determinismFailures: 0,
     byRegime: { shipped: 0, random: 0 },
@@ -209,6 +238,7 @@ async function main(): Promise<void> {
       turnCap: config.turnCap,
       actionCap: config.actionCap,
       coverage,
+      historyCheck: config.history,
     });
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
@@ -217,6 +247,7 @@ async function main(): Promise<void> {
     else if (result.outcome === "crash") summary.crashes++;
     else if (result.outcome === "hang") summary.hangs++;
     else if (result.outcome === "invariant") summary.invariants++;
+    else if (result.outcome === "history") summary.history++;
 
     if (result.outcome !== "completed") {
       const reproFile = join(
@@ -335,6 +366,7 @@ async function main(): Promise<void> {
   console.log(`crashes:              ${summary.crashes}`);
   console.log(`hangs:                ${summary.hangs}`);
   console.log(`invariantViolations:  ${summary.invariants}`);
+  console.log(`historyViolations:  ${summary.history}`);
   console.log(
     `determinism:          ${summary.determinismChecks} checks, ${summary.determinismFailures} failures`,
   );
@@ -347,6 +379,12 @@ async function main(): Promise<void> {
   console.log(
     `duration:             ${(summary.durationMs / 1000).toFixed(1)}s`,
   );
+  if (config.smoke && config.history && smokeNoHistoryMs != null) {
+    const historyMs = summary.durationMs;
+    console.log(
+      `history timing:       without=${(smokeNoHistoryMs / 1000).toFixed(2)}s with=${(historyMs / 1000).toFixed(2)}s overhead=${((historyMs / smokeNoHistoryMs - 1) * 100).toFixed(0)}%`,
+    );
+  }
   console.log(`summary:              ${summaryPath}`);
   console.log(`coverage:             ${summary.coveragePath}`);
 
@@ -354,6 +392,7 @@ async function main(): Promise<void> {
     summary.crashes +
     summary.hangs +
     summary.invariants +
+    summary.history +
     summary.determinismFailures;
   if (failed > 0) {
     console.log(`\n${failed} finding(s) — see reports/soak/repro_*.json`);
