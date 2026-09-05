@@ -21,30 +21,12 @@
  * Optional `--fail` promotes the selected family's warnings to exit 1.
  */
 
-import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { SETS_DIR } from "./mergeSets.js";
+import { loadCardsForGates, type CardJson } from "./lib/loadCards.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
-
-const ALL_FILE = path.join(ROOT, "cards", "all.json");
-const TOKEN_FILE = path.join(ROOT, "cards", "token_details.json");
-
-type CardJson = {
-  id: string;
-  name: string;
-  description?: string;
-  type?: string;
-  fanfare?: unknown[];
-  spell?: unknown[];
-  evolve?: unknown[];
-  superevolve?: unknown[];
-  triggers?: unknown[];
-  enhance_replaces_base?: unknown;
-  [key: string]: unknown;
-};
 
 type Family =
   | "turn-scope"
@@ -57,6 +39,7 @@ type Warning = {
   family: Family;
   id: string;
   name: string;
+  sourceFile: string;
   found: string;
   canonical: string;
   note?: string;
@@ -375,40 +358,6 @@ function checkEnhanceInstead(card: CardJson): Warning[] {
   ];
 }
 
-function loadCardsFromAllAndTokens(): CardJson[] {
-  const cards: CardJson[] = [];
-  const allRaw = JSON.parse(fs.readFileSync(ALL_FILE, "utf-8"));
-  if (Array.isArray(allRaw)) {
-    for (const c of allRaw) {
-      if (c && typeof c === "object" && c.id) cards.push(c as CardJson);
-    }
-  }
-  const tokenRaw = JSON.parse(fs.readFileSync(TOKEN_FILE, "utf-8"));
-  if (Array.isArray(tokenRaw)) {
-    for (const c of tokenRaw) {
-      if (c && typeof c === "object" && c.id) cards.push(c as CardJson);
-    }
-  }
-  return cards;
-}
-
-function loadCardsFromSets(): CardJson[] {
-  const files = fs
-    .readdirSync(SETS_DIR)
-    .filter((f) => f.endsWith(".json"))
-    .sort();
-  const cards: CardJson[] = [];
-  for (const file of files) {
-    const raw = JSON.parse(fs.readFileSync(path.join(SETS_DIR, file), "utf-8"));
-    if (Array.isArray(raw)) {
-      for (const c of raw) {
-        if (c && typeof c === "object" && c.id) cards.push(c as CardJson);
-      }
-    }
-  }
-  return cards;
-}
-
 function printFamily(family: Family, warnings: Warning[]): void {
   const list = warnings.filter((w) => w.family === family);
   console.log(`\n======= ${family} (${list.length}) =======`);
@@ -417,7 +366,7 @@ function printFamily(family: Family, warnings: Warning[]): void {
     return;
   }
   for (const w of list) {
-    console.log(`\n${w.id}\t${w.name}`);
+    console.log(`\n${w.id}\t${w.name}\t(${w.sourceFile})`);
     console.log(`  found:      ${w.found}`);
     console.log(`  canonical:  ${w.canonical}`);
     if (w.note) console.log(`  note:       ${w.note}`);
@@ -432,27 +381,28 @@ function main(): void {
     ? (gateArg.slice("--gate=".length) as Family | "all")
     : "all";
 
-  const cards =
-    gateFilter === "enhance-instead"
-      ? loadCardsFromAllAndTokens()
-      : loadCardsFromSets();
+  const loaded = loadCardsForGates();
   const warnings: Warning[] = [];
 
-  for (const card of cards) {
+  for (const { card, sourceFile } of loaded) {
+    const tag = (w: Omit<Warning, "sourceFile">): Warning => ({
+      ...w,
+      sourceFile,
+    });
     if (gateFilter === "all" || gateFilter === "turn-scope") {
-      warnings.push(...checkTurnScope(card));
+      warnings.push(...checkTurnScope(card).map(tag));
     }
     if (gateFilter === "all" || gateFilter === "select-count") {
-      warnings.push(...checkSelectCount(card));
+      warnings.push(...checkSelectCount(card).map(tag));
     }
     if (gateFilter === "all" || gateFilter === "chosen-target") {
-      warnings.push(...checkChosenTarget(card));
+      warnings.push(...checkChosenTarget(card).map(tag));
     }
     if (gateFilter === "all" || gateFilter === "evolve-target") {
-      warnings.push(...checkEvolveTarget(card));
+      warnings.push(...checkEvolveTarget(card).map(tag));
     }
     if (gateFilter === "all" || gateFilter === "enhance-instead") {
-      warnings.push(...checkEnhanceInstead(card));
+      warnings.push(...checkEnhanceInstead(card).map(tag));
     }
   }
 
@@ -477,9 +427,7 @@ function main(): void {
       : "Canonical-form gate — WARN mode for unmigrated families",
   );
   console.log(
-    gateFilter === "enhance-instead"
-      ? `scanned ${cards.length} cards from cards/all.json + cards/token_details.json`
-      : `scanned ${cards.length} cards from cards/sets/`,
+    `scanned ${loaded.length} cards from cards/sets/ + cards/token_details.json`,
   );
 
   printFamily("turn-scope", unique);

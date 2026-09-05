@@ -11,6 +11,8 @@ type CardJson = {
   id: string;
   name: string;
   description?: string;
+  triggers?: unknown[];
+  [key: string]: unknown;
 };
 
 type Issue = {
@@ -150,6 +152,53 @@ export const ADD_TO_HAND_FILTER_KEYS = new Set([
 
 /** Rejected nested keys (no reader in evaluateCardCondition / filters.ts). */
 export const REJECTED_NESTED_KEYS = new Set(["card_type", "type_eq"]);
+
+/**
+ * Allowlist for triggers[].condition and crest.triggers[].condition keys.
+ * Union of keys handled in evalCommonConditions (src/logic/core/triggers/conditions.ts)
+ * and keys on CardCondition delegated to evaluateCardCondition
+ * (src/logic/core/conditions/evaluator.ts).
+ */
+export const TRIGGER_CONDITION_KEYS = new Set([
+  // evalCommonConditions — trigger routing / host gates
+  "whose_turn",
+  "is_ally",
+  "is_self",
+  "is_fuse_initiator",
+  "not_self",
+  "field_other_same_base_cost",
+  "own_turn",
+  "super_evolution_unlocked",
+  "played_base_cost_ladder",
+  "enemy_follower_count_gte",
+  // shared stat gates (host in triggers; subject via evaluator)
+  "attack_lte",
+  "attack_gte",
+  "attack_eq",
+  "defense_lte",
+  "defense_gte",
+  "defense_eq",
+  "still_alive",
+  // evaluateCardCondition / CardCondition
+  "type",
+  "class",
+  "tribe",
+  "exclude_tribe",
+  "has_keyword",
+  "keywords",
+  "exclude_keyword",
+  "base_cost_eq",
+  "base_cost_gte",
+  "base_cost_lte",
+  "base_cost_in",
+  "cost_in",
+  "cost_changed",
+  "unevolved",
+  "is_super_evolved",
+  "damaged",
+  "did_not_attack_this_turn",
+  "name",
+]);
 
 const STAT_NAME_VALUE_SOURCES = new Set(["named_enter_count"]);
 
@@ -729,7 +778,81 @@ export function collectOpsInTree(
   }
 }
 
-export function checkOpKeysForCard(card: CardJson): Issue[] {
+function collectCrestTriggerConditions(
+  node: unknown,
+  pathStr: string,
+  out: { path: string; cond: Record<string, unknown> }[],
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) =>
+      collectCrestTriggerConditions(n, `${pathStr}[${i}]`, out),
+    );
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.op === "crest") {
+    const triggerLists: unknown[][] = [];
+    if (Array.isArray(obj.triggers)) triggerLists.push(obj.triggers);
+    if (obj.trigger && typeof obj.trigger === "object") {
+      triggerLists.push([obj.trigger]);
+    }
+    for (const trigArr of triggerLists) {
+      trigArr.forEach((t, i) => {
+        if (!t || typeof t !== "object") return;
+        const cond = (t as Record<string, unknown>).condition;
+        if (cond && typeof cond === "object" && !Array.isArray(cond)) {
+          out.push({
+            path: `${pathStr}.triggers[${i}].condition`,
+            cond: cond as Record<string, unknown>,
+          });
+        }
+      });
+    }
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    collectCrestTriggerConditions(v, `${pathStr}.${k}`, out);
+  }
+}
+
+export function checkTriggerConditionKeysForCard(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const sites: { path: string; cond: Record<string, unknown> }[] = [];
+
+  if (Array.isArray(card.triggers)) {
+    card.triggers.forEach((t, i) => {
+      if (!t || typeof t !== "object") return;
+      const cond = (t as Record<string, unknown>).condition;
+      if (cond && typeof cond === "object" && !Array.isArray(cond)) {
+        sites.push({
+          path: `${card.id}.triggers[${i}].condition`,
+          cond: cond as Record<string, unknown>,
+        });
+      }
+    });
+  }
+
+  collectCrestTriggerConditions(card, card.id, sites);
+
+  for (const { path: condPath, cond } of sites) {
+    for (const key of Object.keys(cond)) {
+      if (!TRIGGER_CONDITION_KEYS.has(key)) {
+        const alt = nearestKey(key, TRIGGER_CONDITION_KEYS);
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "error",
+          message: `trigger condition at ${condPath} has unsupported key "${key}" (try "${alt}"?) — ${descSnippet(card.description)}`,
+        });
+      }
+    }
+  }
+
+  return issues;
+}
+
+function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
   const issues: Issue[] = [];
   const found: { path: string; eff: Record<string, unknown> }[] = [];
   collectOpsInTree(card, card.id, found);
@@ -813,4 +936,11 @@ export function checkOpKeysForCard(card: CardJson): Issue[] {
   }
 
   return issues;
+}
+
+export function checkOpKeysForCard(card: CardJson): Issue[] {
+  return [
+    ...checkOpTopLevelKeysForCard(card),
+    ...checkTriggerConditionKeysForCard(card),
+  ];
 }
