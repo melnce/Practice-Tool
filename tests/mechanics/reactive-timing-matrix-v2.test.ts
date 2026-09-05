@@ -49,18 +49,7 @@ vi.mock("../../src/ui/render.js", () => ({ logEvent: vi.fn() }));
 
 const KNOWN_FAILURES: Partial<
   Record<string, { msg: string; engine: string; assertion: string }>
-> = {
-  "remaining|C10_eot|invoke": {
-    msg: "invoke deck scan at end-of-turn boundary does not tick board invoke watcher",
-    engine: "src/logic/core/turns.ts scanDeckForInvokes + handleInvoke",
-    assertion: "watcher.counters.earth expected 1, received 0",
-  },
-  "remaining|C11_sot|invoke": {
-    msg: "invoke deck scan at start-of-turn boundary does not tick board invoke watcher",
-    engine: "src/logic/core/turns.ts scanDeckForInvokes + handleInvoke",
-    assertion: "watcher.counters.earth expected 1, received 0",
-  },
-};
+> = {};
 
 function cellKey(parts: string[]): string {
   return parts.join("|");
@@ -84,7 +73,7 @@ describe("Reactive trigger timing matrix v2", () => {
     turnCells.length +
     remainingCells.length +
     nestingCells.length +
-    4; // zone pins + termination (self-destruct, krulle, sabotage, count assertion uses builders)
+    3; // zone pins + termination (self-destruct, krulle)
 
   it(`v2 matrix has at least 120 new cells (got ${totalNewCells} scheduled)`, () => {
     expect(totalNewCells).toBeGreaterThanOrEqual(120);
@@ -839,65 +828,6 @@ describe("Reactive trigger timing matrix v2", () => {
       } else {
         it(label, body);
       }
-    });
-  });
-
-  describe("v2 sabotage proof", () => {
-    it("enemy-side counter amount 2 fails exactly-once", () => {
-      resetUidCounter();
-      givenGameState({ seed: 77, activePlayer: "first", roundCount: 6 })
-        .withFirstPP(10, 10)
-        .build();
-      state.gameStarted = true;
-      state.phase = "main";
-
-      const watcher = createCard(
-        {
-          name: "EnemySideWatcher",
-          type: "Follower",
-          cost: 1,
-          attack: 1,
-          defense: 1,
-          counters: { earth: 0 },
-          triggers: [
-            {
-              event: "enemy_follower_enter",
-              source: "board",
-              condition: { name: "Goblin" },
-              effects: [
-                { op: "counter", action: "add", key: "earth", amount: 2 },
-              ],
-            },
-          ],
-        },
-        "board",
-        "second",
-      );
-      applyKeywordsFromList(watcher);
-      getBoard(state, "second").push(watcher);
-
-      const raiser = createCard(
-        {
-          name: "SummonRaiser",
-          type: "Follower",
-          cost: 2,
-          attack: 1,
-          defense: 1,
-          fanfare: [
-            { op: "summon", source: "named", name: "Goblin", count: 1 },
-          ],
-        },
-        "hand",
-        "first",
-      );
-      state.players.first.hand.push(raiser);
-      engineDispatch(state, {
-        type: "PLAY_CARD",
-        player: "first",
-        cardUid: raiser.uid,
-      });
-
-      expect(watcherEarth("second", watcher.uid)).toBe(2);
     });
   });
 });

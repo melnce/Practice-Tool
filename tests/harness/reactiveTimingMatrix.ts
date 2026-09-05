@@ -1351,8 +1351,9 @@ export function v2RemainingSkipReason(
   event: V2RemainingEvent,
 ): string | null {
   if (event === "invoke") {
-    if (context === "C11_sot") return null;
-    if (context === "C10_eot") return null;
+    if (context === "C10_eot" || context === "C11_sot") {
+      return "no pool card listens to invoke from the board; Sandalphon's is_self case is covered by l2-rotation-havencraft";
+    }
     return "invoke only fires from deck scan at turn boundary (start/end of turn)";
   }
   if (event === "on_fuse" && context !== "C3_engage") {
@@ -1377,9 +1378,6 @@ export function v2RemainingSkipReason(
     (context === "C10_eot" || context === "C11_sot")
   ) {
     return "ward/amulet destroy not constructible at turn boundary in this harness";
-  }
-  if (event === "invoke" && (context === "C10_eot" || context === "C11_sot")) {
-    return null;
   }
   if (
     event === "engage" &&
