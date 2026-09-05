@@ -414,28 +414,20 @@ describe("L2 — Runecraft tokens", () => {
       expect(added[0]!.class).toBe("Runecraft");
     });
 
-    it.fails(
-      "on play: selected ally gains attacks_per_turn 2 — token 90034350: engine crash [dispatchTargetedOp] Unknown op: attacks_per_turn",
-      () => {
-        setupTurn(R6, { hand: [SEND_EM_PACKING], pp: 1 });
-        const target = allyFollower(2, 3, "Target");
-        const bystander = allyFollower(2, 3, "Bystander");
-        whenPlayCard("first", 0);
-        resolvePendingByUid(target.uid);
-        expect(
-          Number(
-            target.attacks_per_turn ?? target.keywordState?.attacks_per_turn,
-          ),
-        ).toBe(2);
-        expect(
-          Number(
-            bystander.attacks_per_turn ??
-              bystander.keywordState?.attacks_per_turn,
-          ),
-        ).toBe(1);
-        expect(printed).toContain("Can attack 2 times per turn");
-      },
-    );
+    it("on play: selected ally gains attacks_per_turn 2", () => {
+      setupTurn(R6, { hand: [SEND_EM_PACKING], pp: 1 });
+      const target = allyFollower(2, 3, "Target");
+      const bystander = allyFollower(2, 3, "Bystander");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(target.uid);
+      expect(
+        Number(
+          target.attacks_per_turn ?? target.keywordState?.attacks_per_turn,
+        ),
+      ).toBe(2);
+      expect(bystander.attacks_per_turn ?? 1).toBe(1);
+      expect(printed).toContain("Can attack 2 times per turn");
+    });
   });
 
   describe("Anne's Summoning (90034130)", () => {
