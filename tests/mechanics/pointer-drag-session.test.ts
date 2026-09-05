@@ -11,6 +11,8 @@ import {
   clearDropTarget,
   DRAG_THRESHOLD_PX,
   isPointerDragActive,
+  getActivePointerId,
+  forceCancelPointerDrag,
   shouldSuppressClickFromPointerDrag,
 } from "../../src/ui/pointerDragSession.js";
 
@@ -42,6 +44,7 @@ describe("pointerDragSession", () => {
   let hand: HTMLElement;
 
   beforeEach(() => {
+    forceCancelPointerDrag();
     document.body.innerHTML = "";
     hand = document.createElement("div");
     hand.id = "blueHand";
@@ -260,6 +263,213 @@ describe("pointerDragSession", () => {
     fire(source, "pointerdown", 50, 50);
     fire(source, "pointermove", 100, 100);
     expect(onBegan).not.toHaveBeenCalled();
+  });
+
+  it("re-render mid-gesture: pointerup on non-source ends session and next drag works", () => {
+    const onDrop = vi.fn();
+    setDropTarget(board, (p) => p.startsWith("hand,"), onDrop);
+    attachPointerDragSource(
+      source,
+      {
+        payload: "hand,blueHand,u1",
+        kind: "hand",
+        handContainerId: "blueHand",
+      },
+      true,
+    );
+
+    fire(source, "pointerdown", 50, 50, { pointerId: 1 });
+    fire(source, "pointermove", 50, 50 + DRAG_THRESHOLD_PX + 2, {
+      pointerId: 1,
+    });
+
+    const replacement = document.createElement("div");
+    replacement.className = "card";
+    hand.replaceChild(replacement, source);
+
+    // Release lands on board — no drag listeners on this element (repro path).
+    fire(board, "pointerup", 200, 400, { pointerId: 1 });
+    expect(isPointerDragActive()).toBe(false);
+    expect(document.querySelector(".pointer-drag-preview")).toBeNull();
+
+    attachPointerDragSource(
+      replacement,
+      {
+        payload: "hand,blueHand,u2",
+        kind: "hand",
+        handContainerId: "blueHand",
+      },
+      true,
+    );
+    fire(replacement, "pointerdown", 60, 60, { pointerId: 2 });
+    fire(replacement, "pointermove", 60, 60 + DRAG_THRESHOLD_PX + 2, {
+      pointerId: 2,
+    });
+    fire(replacement, "pointermove", 200, 400, { pointerId: 2 });
+    fire(replacement, "pointerup", 200, 400, { pointerId: 2 });
+    expect(onDrop).toHaveBeenCalledWith("hand,blueHand,u2", 200, 400);
+  });
+
+  it("re-render mid-gesture past threshold cancels without drop or fuse", () => {
+    const onDrop = vi.fn();
+    const onFuse = vi.fn();
+    const onEnded = vi.fn();
+    setDropTarget(board, () => true, onDrop);
+    attachPointerDragSource(
+      source,
+      {
+        payload: "hand,blueHand,u1",
+        kind: "hand",
+        handContainerId: "blueHand",
+        onFuseGesture: onFuse,
+        isInitiatorStillInHand: () => true,
+        onDragEnded: onEnded,
+      },
+      true,
+    );
+
+    fire(source, "pointerdown", 50, 50);
+    fire(source, "pointermove", 80, 80);
+    expect(document.querySelector(".pointer-drag-preview")).toBeTruthy();
+
+    const replacement = document.createElement("div");
+    replacement.className = "card";
+    hand.replaceChild(replacement, source);
+
+    fire(board, "pointerup", 200, 400);
+    expect(isPointerDragActive()).toBe(false);
+    expect(document.querySelector(".pointer-drag-preview")).toBeNull();
+    expect(onEnded).toHaveBeenCalledTimes(1);
+    expect(onDrop).not.toHaveBeenCalled();
+    expect(onFuse).not.toHaveBeenCalled();
+  });
+
+  it("lostpointercapture on detached source ends session; connected source is no-op", () => {
+    const onEnded = vi.fn();
+    attachPointerDragSource(
+      source,
+      {
+        payload: "hand,blueHand,u1",
+        kind: "hand",
+        handContainerId: "blueHand",
+        onDragEnded: onEnded,
+      },
+      true,
+    );
+
+    fire(source, "pointerdown", 50, 50);
+    fire(source, "pointermove", 80, 80);
+    expect(isPointerDragActive()).toBe(true);
+
+    const detached = source;
+    const replacement = document.createElement("div");
+    replacement.className = "card";
+    hand.replaceChild(replacement, detached);
+
+    detached.dispatchEvent(
+      new PointerEvent("lostpointercapture", {
+        bubbles: false,
+        cancelable: false,
+        pointerId: 1,
+      }),
+    );
+    expect(isPointerDragActive()).toBe(false);
+    expect(document.querySelector(".pointer-drag-preview")).toBeNull();
+    expect(onEnded).toHaveBeenCalledTimes(1);
+
+    // Normal post-up lostpointercapture on a still-connected source must not strand.
+    attachPointerDragSource(
+      replacement,
+      {
+        payload: "hand,blueHand,u2",
+        kind: "hand",
+        handContainerId: "blueHand",
+      },
+      true,
+    );
+    fire(replacement, "pointerdown", 50, 50, { pointerId: 2 });
+    fire(replacement, "pointermove", 80, 80, { pointerId: 2 });
+    fire(replacement, "pointerup", 80, 80, { pointerId: 2 });
+    expect(isPointerDragActive()).toBe(false);
+    replacement.dispatchEvent(
+      new PointerEvent("lostpointercapture", {
+        bubbles: false,
+        cancelable: false,
+        pointerId: 2,
+      }),
+    );
+    expect(isPointerDragActive()).toBe(false);
+  });
+
+  it("self-heal: stale session with disconnected source does not block new press", () => {
+    const onBegan = vi.fn();
+    attachPointerDragSource(
+      source,
+      {
+        payload: "hand,blueHand,u1",
+        kind: "hand",
+        handContainerId: "blueHand",
+        onDragBegan: onBegan,
+      },
+      true,
+    );
+
+    fire(source, "pointerdown", 50, 50);
+    const replacement = document.createElement("div");
+    replacement.className = "card";
+    hand.replaceChild(replacement, source);
+    expect(isPointerDragActive()).toBe(true);
+    expect(getActivePointerId()).toBe(1);
+
+    attachPointerDragSource(
+      replacement,
+      {
+        payload: "hand,blueHand,u2",
+        kind: "hand",
+        handContainerId: "blueHand",
+        onDragBegan: onBegan,
+      },
+      true,
+    );
+    fire(replacement, "pointerdown", 60, 60, { pointerId: 2 });
+    fire(replacement, "pointermove", 80, 80, { pointerId: 2 });
+    expect(onBegan).toHaveBeenCalledTimes(1);
+    expect(isPointerDragActive()).toBe(true);
+    expect(getActivePointerId()).toBe(2);
+  });
+
+  it("visibilitychange hidden cancels an active gesture", () => {
+    const onEnded = vi.fn();
+    attachPointerDragSource(
+      source,
+      {
+        payload: "hand,blueHand,u1",
+        kind: "hand",
+        handContainerId: "blueHand",
+        onDragEnded: onEnded,
+      },
+      true,
+    );
+
+    fire(source, "pointerdown", 50, 50);
+    fire(source, "pointermove", 80, 80);
+    expect(isPointerDragActive()).toBe(true);
+
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => "hidden",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      get: () => "visible",
+    });
+
+    expect(isPointerDragActive()).toBe(false);
+    expect(document.querySelector(".pointer-drag-preview")).toBeNull();
+    expect(onEnded).toHaveBeenCalledTimes(1);
+    forceCancelPointerDrag(); // idempotent
+    expect(isPointerDragActive()).toBe(false);
   });
 
   it("clearDropTarget removes registration", () => {

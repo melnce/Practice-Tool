@@ -370,6 +370,81 @@ for (const vp of TABLET_VIEWPORTS) {
       return { context, page };
     }
 
+    test("mid-gesture re-render does not strand pointer-drag session", async () => {
+      if (vp.width !== 1024 || vp.height !== 768) return;
+
+      const { context, page } = await touchPage();
+      await seedPlayable(page);
+      const before = await getState(page);
+      const card = page.locator("#blueHand .card").first();
+      const board = page.locator("#blueBoard");
+      const s = await card.boundingBox();
+      const t = await board.boundingBox();
+      expect(s && t).toBeTruthy();
+
+      const cdp = await context.newCDPSession(page);
+      const sx = s!.x + s!.width / 2;
+      const sy = s!.y + s!.height / 2;
+      const emptyBoardX = t!.x + t!.width * 0.15;
+      const emptyBoardY = t!.y + t!.height * 0.5;
+
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchStart",
+        touchPoints: [{ x: sx, y: sy }],
+      });
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x: sx + 40, y: sy - 10 }],
+      });
+
+      await page.evaluate(() => {
+        const st = window.__svwbTest!.getState();
+        st.players.first.pp -= 1;
+        window.__svwbTest!.render();
+      });
+
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchMove",
+        touchPoints: [{ x: emptyBoardX, y: emptyBoardY }],
+      });
+      await cdp.send("Input.dispatchTouchEvent", {
+        type: "touchEnd",
+        touchPoints: [],
+      });
+      await page.waitForTimeout(100);
+
+      const stranded = await page.evaluate(async () => {
+        const { isPointerDragActive, getActivePointerId } =
+          await import("/src/ui/pointerDragSession.ts");
+        return {
+          active: isPointerDragActive(),
+          pointerId: getActivePointerId(),
+          preview: !!document.querySelector(".pointer-drag-preview"),
+        };
+      });
+      expect(stranded.active).toBe(false);
+      expect(stranded.preview).toBe(false);
+
+      const playTarget = await page.locator("#blueBoard").boundingBox();
+      const card2 = page.locator("#blueHand .card").first();
+      const s2 = await card2.boundingBox();
+      expect(s2 && playTarget).toBeTruthy();
+      await cdpTouchDrag(
+        page,
+        s2!.x + s2!.width / 2,
+        s2!.y + s2!.height / 2,
+        playTarget!.x + playTarget!.width / 2,
+        playTarget!.y + playTarget!.height / 2,
+      );
+      await page.waitForTimeout(300);
+
+      const after = await getState(page);
+      expect(after.board).toBe(before.board + 1);
+      expect(after.hand).toBe(before.hand - 1);
+      expect(after.dragActive).toBe(false);
+      await context.close();
+    });
+
     test("finger-drag hand card to board plays it", async () => {
       const { context, page } = await touchPage();
       await seedPlayable(page);
