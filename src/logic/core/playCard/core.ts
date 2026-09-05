@@ -18,37 +18,9 @@ import {
   isFirstPlayer,
 } from "../../../core/playerHelpers.js";
 import { isGameOver } from "../../../core/gameOver.js";
-import type { AlternateForm } from "../../../helpers/alternateForm.js";
+import { applyCrystallizeTransform } from "../../../helpers/alternateForm.js";
 import { fireTrigger } from "../triggers.js";
 import { bumpZoneVersion } from "../triggers/utils.js";
-
-/**
- * Transform a follower into its Crystallize amulet form for this play.
- * Follower Fanfare / keywords do not apply; amuletKeywords take over.
- */
-function applyCrystallizeTransform(
-  card: CardInstance,
-  form: AlternateForm,
-): void {
-  (card as any).playedAs = "crystallize";
-  (card as any).originalPrintedType = card.type;
-  card.type = "Amulet";
-  card.attack = 0;
-  card.defense = 0;
-  card.fanfare = [];
-  card.evolve = [];
-  card.superevolve = [];
-  card.hasRush = false;
-  card.hasStorm = false;
-  card.hasBane = false;
-  card.hasWard = false;
-  card.hasAura = false;
-  card.hasAmbush = false;
-  card.hasIntimidate = false;
-  card.can_attack = false;
-  card.isRush = false;
-  card.keywords = [...form.amuletKeywords];
-}
 
 /**
  * Core play card logic. Returns a PlayOutcome without any rendering.
