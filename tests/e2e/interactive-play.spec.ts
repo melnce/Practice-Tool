@@ -6,6 +6,7 @@ import { test, expect, type Page } from "@playwright/test";
 import fs from "fs";
 import path from "path";
 import { setupHermeticPage } from "./helpers/console.js";
+import { SvwbPage } from "./qa/pageObject.js";
 
 const OUT = path.join("test-results", "interactive-play");
 const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
@@ -71,13 +72,11 @@ test.describe("Interactive play paths", () => {
     page,
   }) => {
     const errors = await setupHermeticPage(page);
+    const po = new SvwbPage(page);
     await page.goto(BASE);
     await page.waitForLoadState("networkidle");
 
-    await page.click("#settingsToggle");
-    await page.waitForFunction(() =>
-      document.getElementById("settingsDrawer")?.classList.contains("open"),
-    );
+    await po.openSettingsDrawer();
     await page.locator("#godModeToggle").check();
 
     const deckIds = await page
@@ -91,16 +90,8 @@ test.describe("Interactive play paths", () => {
     await page.selectOption("#blueDeckSelect", deckIds[0]);
     await page.selectOption("#redDeckSelect", deckIds[1]);
     await page.fill("#seedInput", "42");
-    await page.evaluate(() => {
-      (
-        document.getElementById("startGameBtn") as HTMLButtonElement | null
-      )?.click();
-    });
-    await page.click("#settingsScrim");
-    await page.waitForFunction(
-      () =>
-        !document.getElementById("settingsDrawer")?.classList.contains("open"),
-    );
+    await page.locator("#startGameBtn").click();
+    await po.closeSettingsDrawer();
     await page.waitForFunction(() => {
       const phase = (window as any).gameState?.phase;
       return phase === "mulligan" || phase === "main";
@@ -110,18 +101,8 @@ test.describe("Interactive play paths", () => {
       () => (window as any).gameState?.phase === "mulligan",
     );
     if (inMulligan) {
-      await page.evaluate(() => {
-        (
-          document.getElementById(
-            "blueMulliganConfirm",
-          ) as HTMLButtonElement | null
-        )?.click();
-        (
-          document.getElementById(
-            "redMulliganConfirm",
-          ) as HTMLButtonElement | null
-        )?.click();
-      });
+      await page.locator("#blueMulliganConfirm").click();
+      await page.locator("#redMulliganConfirm").click();
       await page.waitForFunction(
         () => (window as any).gameState?.phase === "main",
       );

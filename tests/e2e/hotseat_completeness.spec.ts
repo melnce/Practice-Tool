@@ -173,9 +173,9 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   await expect(page.locator("body")).toHaveClass(/gameover/);
   log("1 PASS: lethal → overlay First wins / Lethal + body.gameover");
 
-  await page.evaluate(() => {
-    (document.getElementById("undoBtn") as HTMLButtonElement | null)?.click();
-  });
+  await po.openSettingsDrawer();
+  await page.locator("#undoBtn").click();
+  await po.closeSettingsDrawer();
   await page.waitForFunction(
     () => (window as any).gameState?.phase !== "gameover",
   );
@@ -203,15 +203,10 @@ test("hot-seat completeness browser verification", async ({ page }) => {
     attackLeader(0, "first", "second");
   });
   await expect(page.locator("#gameOverOverlay")).toBeVisible();
-  await page.evaluate(() => {
-    const seed = document.getElementById(
-      "seedInput",
-    ) as HTMLInputElement | null;
-    if (seed) seed.value = "88001";
-    (
-      document.getElementById("rematchSameSeedBtn") as HTMLButtonElement | null
-    )?.click();
-  });
+  await po.openSettingsDrawer();
+  await page.locator("#seedInput").fill("88001");
+  await page.locator("#rematchSameSeedBtn").click();
+  await po.closeSettingsDrawer();
   await page.waitForFunction(
     () => (window as any).gameState?.phase === "mulligan",
   );
@@ -219,13 +214,9 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   log("1 PASS: Rematch same seed → mulligan, seed kept 88001");
 
   // --- 5: perspective flip ---
-  await page.evaluate(() => {
-    const toggle = document.getElementById(
-      "activeOnBottomToggle",
-    ) as HTMLInputElement | null;
-    if (toggle) toggle.checked = true;
-    toggle?.dispatchEvent(new Event("change", { bubbles: true }));
-  });
+  await po.openSettingsDrawer();
+  await page.locator("#activeOnBottomToggle").check();
+  await po.closeSettingsDrawer();
   await expect(page.locator("body")).toHaveClass(/active-on-bottom/);
   await page.evaluate(() => {
     (window as any).gameState.activePlayer = "second";
