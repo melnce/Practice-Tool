@@ -416,7 +416,7 @@ describe("Rulebook L72–73 — Field limit 5: excess summons skipped", () => {
       ),
     );
     summonNamed({ op: "summon", name: "Goblin", count: 2 } as any, "first");
-    expect(thenBoard("first").length).toBe(6);
+    expect(thenBoard("first").length).toBe(5);
     expect(thenBoard("first").filter((c) => c.name === "Goblin").length).toBe(
       1,
     );
