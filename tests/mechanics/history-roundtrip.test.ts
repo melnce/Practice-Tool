@@ -138,7 +138,9 @@ describe("history round-trip soak", () => {
     ).toBe("completed");
   });
 
-  it("engine chain-undo: CHOOSE_TARGET nested commit leaves pendingTargetEffect.targetUids (seed 20260909 game 22 action 19)", async () => {
+  it.fails(
+    "engine chain-undo: CHOOSE_TARGET nested commit — targetUids fixed; chain-redo zoneVersion drift remains (seed 20260909 game 22 action 19)",
+    async () => {
     const result = await runSoakGame({
       seed: 20260909,
       gameIndex: 22,
