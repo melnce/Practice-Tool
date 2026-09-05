@@ -1797,7 +1797,8 @@
       },
       {
         "op": "crest",
-        "action": "delay",
+        "action": "delay_countdown",
+        "target": "ally:crest",
         "amount": 1
       }
     ],

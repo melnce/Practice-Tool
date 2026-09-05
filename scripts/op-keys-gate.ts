@@ -5,6 +5,8 @@
  * src/logic/effects/ops type modules.
  */
 
+import { CREST_ACTION_VALUES } from "../src/logic/effects/ops/crest/types.js";
+
 type CardJson = {
   id: string;
   name: string;
@@ -428,6 +430,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "on_gain",
     "keywords",
     "passives",
+    "target",
   ]),
   fuse: new Set([
     "action",
@@ -768,6 +771,19 @@ export function checkOpKeysForCard(card: CardJson): Issue[] {
         kind: "error",
         message: `${op} op at ${opPath} has unsupported top-level key "${key}" (try "${alt}"?) — ${descSnippet(card.description)}`,
       });
+    }
+
+    if (op === "crest" && typeof eff.action === "string") {
+      const action = String(eff.action);
+      if (!CREST_ACTION_VALUES.has(action)) {
+        const alt = nearestKey(action, CREST_ACTION_VALUES);
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "error",
+          message: `crest op at ${opPath} has unsupported action "${action}" (try "${alt}"?) — ${descSnippet(card.description)}`,
+        });
+      }
     }
 
     for (const field of ["condition", "filter", "filters"] as const) {

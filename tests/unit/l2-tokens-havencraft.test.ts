@@ -639,38 +639,82 @@ describe("L2 — Havencraft tokens", () => {
       expect(printed).toContain("Banish a random enemy follower");
     });
 
-    it.fails(
-      "on play: delays all crest countdowns by 1 (90064310 — crest op action 'delay' unknown; observed countdown unchanged)",
-      () => {
-        setupTurn(R6, { hand: [TORRENT], pp: 2 });
-        handleGainCrest(
-          {
-            op: "crest",
-            action: "gain",
-            name: "Test Crest A",
-            countdown: 3,
-          } as any,
-          "first",
-        );
-        handleGainCrest(
-          {
-            op: "crest",
-            action: "gain",
-            name: "Test Crest B",
-            countdown: 5,
-          } as any,
-          "first",
-        );
-        whenPlayCard("first", 0);
-        const crests = getCrests(state, "first");
-        expect(
-          Number(crests.find((c) => c.name === "Test Crest A")!.countdown),
-        ).toBe(4);
-        expect(
-          Number(crests.find((c) => c.name === "Test Crest B")!.countdown),
-        ).toBe(6);
-        expect(printed).toContain("Delay the counts");
-      },
-    );
+    it("on play: delays all crest countdowns by 1", () => {
+      setupTurn(R6, { hand: [TORRENT], pp: 2 });
+      handleGainCrest(
+        {
+          op: "crest",
+          action: "gain",
+          name: "Test Crest A",
+          countdown: 3,
+        } as any,
+        "first",
+      );
+      handleGainCrest(
+        {
+          op: "crest",
+          action: "gain",
+          name: "Test Crest B",
+          countdown: 1,
+        } as any,
+        "first",
+      );
+      handleGainCrest(
+        {
+          op: "crest",
+          action: "gain",
+          name: "Passive Crest",
+        } as any,
+        "first",
+      );
+      handleGainCrest(
+        {
+          op: "crest",
+          action: "gain",
+          name: "Enemy Crest",
+          countdown: 2,
+        } as any,
+        "second",
+      );
+      whenPlayCard("first", 0);
+      const allyCrests = getCrests(state, "first");
+      expect(
+        Number(allyCrests.find((c) => c.name === "Test Crest A")!.countdown),
+      ).toBe(4);
+      expect(
+        Number(allyCrests.find((c) => c.name === "Test Crest B")!.countdown),
+      ).toBe(2);
+      expect(
+        allyCrests.find((c) => c.name === "Passive Crest")!.countdown,
+      ).toBeUndefined();
+      expect(
+        Number(
+          getCrests(state, "second").find((c) => c.name === "Enemy Crest")!
+            .countdown,
+        ),
+      ).toBe(2);
+      expect(printed).toContain("Delay the counts");
+    });
+
+    it("on play with empty enemy board: still delays all allied crest countdowns by 1", () => {
+      setupTurn(R6, { hand: [TORRENT], pp: 2 });
+      handleGainCrest(
+        {
+          op: "crest",
+          action: "gain",
+          name: "Test Crest A",
+          countdown: 3,
+        } as any,
+        "first",
+      );
+      whenPlayCard("first", 0);
+      expect(
+        Number(
+          getCrests(state, "first").find((c) => c.name === "Test Crest A")!
+            .countdown,
+        ),
+      ).toBe(4);
+      expect(getBanish(state, "second").length).toBe(0);
+    });
   });
 });
