@@ -98,6 +98,8 @@ describe("history __lastPlayedCard and null snapshot boards", () => {
     const enemyUid = state.players.second.board[0]!.uid;
 
     dispatch(state, { type: "PLAY_CARD", player, cardUid: playedUid });
+    expect((state as any).__lastPlayedCard?.uid).toBe(playedUid);
+
     dispatch(state, {
       type: "CHOOSE_TARGET",
       player,
