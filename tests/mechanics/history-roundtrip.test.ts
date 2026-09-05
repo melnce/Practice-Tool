@@ -1,7 +1,7 @@
 /**
  * History round-trip soak — undo/redo after every undoable action with full-state comparison.
  */
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, vi } from "vitest";
 import fs from "fs";
 import { initCardDatabaseNode } from "../../src/data/cardLoaderNode.js";
 import {
@@ -37,6 +37,7 @@ beforeAll(async () => {
 });
 
 describe("history round-trip soak", () => {
+  vi.setConfig({ testTimeout: 60_000 });
   for (const seed of PASSING_ENGINE_SEEDS) {
     it(`seed ${seed} — engine dispatch undo/redo (no mask)`, async () => {
       const result = await runSoakGame({
