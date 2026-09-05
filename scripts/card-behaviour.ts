@@ -48,7 +48,8 @@ export type PoolCard = CardJson & { sourceFile: string; token?: boolean };
 
 function readTokenPool(): PoolCard[] {
   const raw = JSON.parse(fs.readFileSync(TOKEN_FILE, "utf-8"));
-  if (!Array.isArray(raw)) throw new Error("token_details.json is not an array");
+  if (!Array.isArray(raw))
+    throw new Error("token_details.json is not an array");
   return raw
     .filter(
       (c): c is CardJson =>
@@ -357,8 +358,7 @@ function main(): void {
 }
 
 const isMain =
-  process.argv[1] &&
-  path.resolve(process.argv[1]) === path.resolve(__filename);
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
 
 if (isMain) {
   main();

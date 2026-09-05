@@ -1,6 +1,6 @@
 {
   "_generated": "DO NOT HAND-EDIT. Regenerate with: npm run cards:baseline",
-  "cardCount": 811,
+  "cardCount": 904,
   "cards": {
     "10001110": {
       "fingerprint": "b6bcca3c",
@@ -10743,18 +10743,1223 @@
         }
       ],
       "status": "covered"
+    },
+    "90001110": {
+      "fingerprint": "71304038",
+      "gatesSatisfied": [],
+      "name": "Goblin",
+      "scenarios": [
+        {
+          "fingerprint": "f0f16cf4",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90004110": {
+      "fingerprint": "bb0b7c1c",
+      "gatesSatisfied": [],
+      "name": "Silent Rider",
+      "scenarios": [
+        {
+          "fingerprint": "a2bc4edb",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90004120": {
+      "fingerprint": "04166c9d",
+      "gatesSatisfied": [],
+      "name": "Servant of Cocytus",
+      "scenarios": [
+        {
+          "fingerprint": "2f9b9734",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90004130": {
+      "fingerprint": "2a2a4990",
+      "gatesSatisfied": [],
+      "name": "Demon of Purgatory",
+      "scenarios": [
+        {
+          "fingerprint": "ef0704bc",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90004310": {
+      "fingerprint": "c2c15e40",
+      "gatesSatisfied": [],
+      "name": "Astaroth's Reckoning",
+      "scenarios": [
+        {
+          "fingerprint": "cb14e2f8",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90004320": {
+      "fingerprint": "1cf43617",
+      "gatesSatisfied": [],
+      "name": "Great Testimony",
+      "scenarios": [
+        {
+          "fingerprint": "f37cbc00",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90004330": {
+      "fingerprint": "afe19778",
+      "gatesSatisfied": [],
+      "name": "Sweetness of Voracity",
+      "scenarios": [
+        {
+          "fingerprint": "2b63f940",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90011110": {
+      "fingerprint": "6f366017",
+      "gatesSatisfied": [],
+      "name": "Fairy",
+      "scenarios": [
+        {
+          "fingerprint": "72be9688",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90011120": {
+      "fingerprint": "0904f380",
+      "gatesSatisfied": [],
+      "name": "Springbloom Fairy",
+      "scenarios": [
+        {
+          "fingerprint": "5bbcfb18",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90011310": {
+      "fingerprint": "151a9b88",
+      "gatesSatisfied": [],
+      "name": "Deepwood Bounty",
+      "scenarios": [
+        {
+          "fingerprint": "13d90b70",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90014110": {
+      "fingerprint": "d74c35ef",
+      "gatesSatisfied": [],
+      "name": "Eve, Blade of Crystalia",
+      "scenarios": [
+        {
+          "fingerprint": "b2708286",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90014310": {
+      "fingerprint": "262a7bd8",
+      "gatesSatisfied": [],
+      "name": "Bramble Burst",
+      "scenarios": [
+        {
+          "fingerprint": "81fcfd3c",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90014320": {
+      "fingerprint": "795a2ed0",
+      "gatesSatisfied": [],
+      "name": "Annihilating Onslaught",
+      "scenarios": [
+        {
+          "fingerprint": "9aca75ac",
+          "scenario": "play"
+        }
+      ],
+      "status": "partial",
+      "token": true,
+      "unmetGates": ["board_name"]
+    },
+    "90014330": {
+      "fingerprint": "7e05223c",
+      "gatesSatisfied": [],
+      "name": "Depths of the Eld Lance",
+      "scenarios": [
+        {
+          "fingerprint": "c849744c",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021110": {
+      "fingerprint": "b6267205",
+      "gatesSatisfied": [],
+      "name": "Knight",
+      "scenarios": [
+        {
+          "fingerprint": "054fff50",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021120": {
+      "fingerprint": "0bab00d0",
+      "gatesSatisfied": [],
+      "name": "Steelclad Knight",
+      "scenarios": [
+        {
+          "fingerprint": "ec228b60",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021130": {
+      "fingerprint": "f5b46e6c",
+      "gatesSatisfied": [],
+      "name": "Naht's Henchman",
+      "scenarios": [
+        {
+          "fingerprint": "f00ddbf0",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021210": {
+      "fingerprint": "01bddce0",
+      "gatesSatisfied": [],
+      "name": "Dread Pirate's Flag",
+      "scenarios": [
+        {
+          "fingerprint": "41daf0a8",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021310": {
+      "fingerprint": "9d4b3e08",
+      "gatesSatisfied": [],
+      "name": "Gilded Blade",
+      "scenarios": [
+        {
+          "fingerprint": "14b16868",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021320": {
+      "fingerprint": "2f571833",
+      "gatesSatisfied": [],
+      "name": "Gilded Goblet",
+      "scenarios": [
+        {
+          "fingerprint": "3425db47",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021330": {
+      "fingerprint": "bcbc0850",
+      "gatesSatisfied": [],
+      "name": "Gilded Boots",
+      "scenarios": [
+        {
+          "fingerprint": "4c0ec46c",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021340": {
+      "fingerprint": "609736a0",
+      "gatesSatisfied": [],
+      "name": "Gilded Necklace",
+      "scenarios": [
+        {
+          "fingerprint": "f9facb8c",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90021350": {
+      "fingerprint": "ea7fe478",
+      "gatesSatisfied": [],
+      "name": "Glittering Gold",
+      "scenarios": [
+        {
+          "fingerprint": "e39508e8",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90022110": {
+      "fingerprint": "0b634ec8",
+      "gatesSatisfied": [],
+      "name": "Wretch",
+      "scenarios": [
+        {
+          "fingerprint": "bcc826ac",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90023110": {
+      "fingerprint": "e73d83c8",
+      "gatesSatisfied": [],
+      "name": "Nonja, Silent Maid",
+      "scenarios": [
+        {
+          "fingerprint": "c8b9a478",
+          "scenario": "play"
+        }
+      ],
+      "status": "partial",
+      "token": true,
+      "unmetGates": ["board_name"]
+    },
+    "90024310": {
+      "fingerprint": "965a79a8",
+      "gatesSatisfied": [],
+      "name": "Remnant of Hollowness",
+      "scenarios": [
+        {
+          "fingerprint": "8c188487",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90024320": {
+      "fingerprint": "7934c9d0",
+      "gatesSatisfied": [],
+      "name": "Depths of the Eld Sword",
+      "scenarios": [
+        {
+          "fingerprint": "0ac76224",
+          "scenario": "play"
+        },
+        {
+          "fingerprint": "4ef3775b",
+          "scenario": "play_base"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90024330": {
+      "fingerprint": "5fa185c9",
+      "gatesSatisfied": [],
+      "name": "Desperados' Shot",
+      "scenarios": [
+        {
+          "fingerprint": "595a2954",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90031110": {
+      "fingerprint": "8502a218",
+      "gatesSatisfied": [],
+      "name": "Clay Golem",
+      "scenarios": [
+        {
+          "fingerprint": "a27eeb70",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90031120": {
+      "fingerprint": "26bf6a8c",
+      "gatesSatisfied": [],
+      "name": "Guardian Golem",
+      "scenarios": [
+        {
+          "fingerprint": "78571a1c",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90031130": {
+      "fingerprint": "802c4938",
+      "gatesSatisfied": [],
+      "name": "Paper Shikigami",
+      "scenarios": [
+        {
+          "fingerprint": "f7526122",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90031140": {
+      "fingerprint": "5fed8bb0",
+      "gatesSatisfied": [],
+      "name": "Demonic Shikigami",
+      "scenarios": [
+        {
+          "fingerprint": "b0c6c0fc",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90031210": {
+      "fingerprint": "eb9d6e3c",
+      "gatesSatisfied": [],
+      "name": "Magic Sediment",
+      "scenarios": [
+        {
+          "fingerprint": "c7ba04e4",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90031310": {
+      "fingerprint": "b2bb8288",
+      "gatesSatisfied": [],
+      "name": "Mysterian Missile",
+      "scenarios": [
+        {
+          "fingerprint": "dd7c63ec",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90032110": {
+      "fingerprint": "fd5c05c4",
+      "gatesSatisfied": [],
+      "name": "Onion Patch",
+      "scenarios": [
+        {
+          "fingerprint": "b4272420",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90033310": {
+      "fingerprint": "e32cbbd4",
+      "gatesSatisfied": [],
+      "name": "Looking Smart!",
+      "scenarios": [
+        {
+          "fingerprint": "a18ad202",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034110": {
+      "fingerprint": "7a855fdc",
+      "gatesSatisfied": [],
+      "name": "Celestial Shikigami",
+      "scenarios": [
+        {
+          "fingerprint": "2e4c83a2",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034120": {
+      "fingerprint": "eb4a2867",
+      "gatesSatisfied": [],
+      "name": "Noble Shikigami",
+      "scenarios": [
+        {
+          "fingerprint": "5117b290",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034130": {
+      "fingerprint": "e9a7aad9",
+      "gatesSatisfied": [],
+      "name": "Anne's Summoning",
+      "scenarios": [
+        {
+          "fingerprint": "c258b668",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034310": {
+      "fingerprint": "40001b28",
+      "gatesSatisfied": [],
+      "name": "Ersatz Elimination",
+      "scenarios": [
+        {
+          "fingerprint": "d2306ec0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034320": {
+      "fingerprint": "a89e98b8",
+      "gatesSatisfied": [],
+      "name": "Ars Magna",
+      "scenarios": [
+        {
+          "fingerprint": "2aeec1d4",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034330": {
+      "fingerprint": "fa5ec4f8",
+      "gatesSatisfied": [],
+      "name": "Depths of the Eld Crystals",
+      "scenarios": [
+        {
+          "fingerprint": "71883ee0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034340": {
+      "fingerprint": "ce67c918",
+      "gatesSatisfied": [],
+      "name": "Delta Cannon",
+      "scenarios": [
+        {
+          "fingerprint": "33a3dc68",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90034350": {
+      "fingerprint": "50cf6d60",
+      "gatesSatisfied": [],
+      "name": "Send 'Em Packing",
+      "scenarios": [
+        {
+          "fingerprint": "341867ae",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90041110": {
+      "fingerprint": "65fe7e1c",
+      "gatesSatisfied": [],
+      "name": "Fire Drake Whelp",
+      "scenarios": [
+        {
+          "fingerprint": "ff2998c2",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90041120": {
+      "fingerprint": "1f34ad17",
+      "gatesSatisfied": [],
+      "name": "Vastwing Dragon",
+      "scenarios": [
+        {
+          "fingerprint": "8edea050",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90041130": {
+      "fingerprint": "6f9baed7",
+      "gatesSatisfied": [],
+      "name": "Majestic Megalorca",
+      "scenarios": [
+        {
+          "fingerprint": "8b5c4810",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90043110": {
+      "fingerprint": "426c4b28",
+      "gatesSatisfied": [],
+      "name": "Otohime's Bodyguard",
+      "scenarios": [
+        {
+          "fingerprint": "2b671930",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90044110": {
+      "fingerprint": "c59bf344",
+      "gatesSatisfied": [],
+      "name": "Supreme Golden Dragon",
+      "scenarios": [
+        {
+          "fingerprint": "4f47c47c",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90044120": {
+      "fingerprint": "31487960",
+      "gatesSatisfied": [],
+      "name": "Supreme Silver Dragon",
+      "scenarios": [
+        {
+          "fingerprint": "315d9044",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90044310": {
+      "fingerprint": "63704fd0",
+      "gatesSatisfied": [],
+      "name": "Whitefrost Whisper",
+      "scenarios": [
+        {
+          "fingerprint": "a38fdad0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90044320": {
+      "fingerprint": "982607dc",
+      "gatesSatisfied": [],
+      "name": "Fangs of Ardent Destruction",
+      "scenarios": [
+        {
+          "fingerprint": "66375040",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90044330": {
+      "fingerprint": "cb24f020",
+      "gatesSatisfied": [],
+      "name": "Depths of the Eld Blades",
+      "scenarios": [
+        {
+          "fingerprint": "110e94e3",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90051110": {
+      "fingerprint": "dba2b9d7",
+      "gatesSatisfied": [],
+      "name": "Skeleton",
+      "scenarios": [
+        {
+          "fingerprint": "cc271492",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90051120": {
+      "fingerprint": "b5b44e4f",
+      "gatesSatisfied": [],
+      "name": "Bat",
+      "scenarios": [
+        {
+          "fingerprint": "9fe21144",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90051130": {
+      "fingerprint": "8162ba78",
+      "gatesSatisfied": [],
+      "name": "Ghost",
+      "scenarios": [
+        {
+          "fingerprint": "b02ce430",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90051140": {
+      "fingerprint": "c73e77b0",
+      "gatesSatisfied": [],
+      "name": "Rotting Zombie",
+      "scenarios": [
+        {
+          "fingerprint": "adfe9993",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90054110": {
+      "fingerprint": "48da56f8",
+      "gatesSatisfied": [],
+      "name": "Mimi, Right Paw Hellhound",
+      "scenarios": [
+        {
+          "fingerprint": "68fb99cc",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90054120": {
+      "fingerprint": "983a6218",
+      "gatesSatisfied": [],
+      "name": "Coco, Left Paw Hellhound",
+      "scenarios": [
+        {
+          "fingerprint": "18f8bb44",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90054130": {
+      "fingerprint": "b045bb84",
+      "gatesSatisfied": [],
+      "name": "One-Tailed Fox",
+      "scenarios": [
+        {
+          "fingerprint": "5daafff0",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90054310": {
+      "fingerprint": "369ddf08",
+      "gatesSatisfied": [],
+      "name": "Scream Diffusion",
+      "scenarios": [
+        {
+          "fingerprint": "1b5ed984",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90054320": {
+      "detail": "Spell requires a target but none are available.",
+      "name": "Wings of Desire",
+      "reason": "play_blocked",
+      "status": "skipped",
+      "token": true
+    },
+    "90054330": {
+      "fingerprint": "f8f8a5e4",
+      "gatesSatisfied": [],
+      "name": "Depths of the Eld Sight",
+      "scenarios": [
+        {
+          "fingerprint": "a1103ef0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90061110": {
+      "fingerprint": "01f92640",
+      "gatesSatisfied": [],
+      "name": "Holy Falcon",
+      "scenarios": [
+        {
+          "fingerprint": "f22b10c0",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90061120": {
+      "fingerprint": "b9c94b38",
+      "gatesSatisfied": [],
+      "name": "Holyflame Tiger",
+      "scenarios": [
+        {
+          "fingerprint": "44ec44c4",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90061130": {
+      "fingerprint": "ffe88db7",
+      "gatesSatisfied": [],
+      "name": "Regal Falcon",
+      "scenarios": [
+        {
+          "fingerprint": "42385c74",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90064110": {
+      "fingerprint": "23ce5d77",
+      "gatesSatisfied": [],
+      "name": "Holy Cavalier",
+      "scenarios": [
+        {
+          "fingerprint": "79c8097b",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90064210": {
+      "fingerprint": "152b8a0c",
+      "gatesSatisfied": ["amulet_count"],
+      "name": "Rings of Moonlight",
+      "scenarios": [
+        {
+          "fingerprint": "f7b1a478",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90064310": {
+      "fingerprint": "2b75faa0",
+      "gatesSatisfied": [],
+      "name": "Torrent of Despair",
+      "scenarios": [
+        {
+          "fingerprint": "1f3c6344",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90064320": {
+      "fingerprint": "59672a39",
+      "gatesSatisfied": [],
+      "name": "Depths of the Eld Tome",
+      "scenarios": [
+        {
+          "fingerprint": "47379800",
+          "scenario": "play"
+        }
+      ],
+      "status": "partial",
+      "token": true,
+      "unmetGates": ["selected_matches"]
+    },
+    "90071110": {
+      "fingerprint": "b1c3db38",
+      "gatesSatisfied": [],
+      "name": "Puppet",
+      "scenarios": [
+        {
+          "fingerprint": "1bd034c0",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90071120": {
+      "fingerprint": "e73525b4",
+      "gatesSatisfied": [],
+      "name": "Enhanced Puppet",
+      "scenarios": [
+        {
+          "fingerprint": "0c2b0823",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90071130": {
+      "fingerprint": "0358b2cd",
+      "gatesSatisfied": [],
+      "name": "Analyzing Artifact",
+      "scenarios": [
+        {
+          "fingerprint": "0b3cec44",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90071140": {
+      "fingerprint": "fcf8c7d9",
+      "gatesSatisfied": [],
+      "name": "Ancient Artifact",
+      "scenarios": [
+        {
+          "fingerprint": "9e111bf0",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90071150": {
+      "fingerprint": "b9d1079c",
+      "gatesSatisfied": [],
+      "name": "Mystic Artifact",
+      "scenarios": [
+        {
+          "fingerprint": "24797740",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90071160": {
+      "fingerprint": "f428cb74",
+      "gatesSatisfied": [],
+      "name": "Radiant Artifact",
+      "scenarios": [
+        {
+          "fingerprint": "8839a62b",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90071210": {
+      "fingerprint": "0397337c",
+      "gatesSatisfied": [],
+      "name": "Gear of Ambition",
+      "scenarios": [
+        {
+          "fingerprint": "294279d0",
+          "scenario": "summon"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90071220": {
+      "fingerprint": "7c3ff360",
+      "gatesSatisfied": [],
+      "name": "Gear of Remembrance",
+      "scenarios": [
+        {
+          "fingerprint": "01bb7df8",
+          "scenario": "summon"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90072110": {
+      "fingerprint": "af2c9050",
+      "gatesSatisfied": [],
+      "name": "Striker Artifact",
+      "scenarios": [
+        {
+          "fingerprint": "4d17d05c",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90072120": {
+      "fingerprint": "86ef0e9f",
+      "gatesSatisfied": [],
+      "name": "Fortifier Artifact",
+      "scenarios": [
+        {
+          "fingerprint": "1c919d94",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90072130": {
+      "fingerprint": "b55eda19",
+      "gatesSatisfied": [],
+      "name": "Doll Slayer",
+      "scenarios": [
+        {
+          "fingerprint": "854e55c4",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90073110": {
+      "fingerprint": "8891e90c",
+      "gatesSatisfied": [],
+      "name": "Ominous Artifact α",
+      "scenarios": [
+        {
+          "fingerprint": "a4a0fabb",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90073120": {
+      "fingerprint": "9facd338",
+      "gatesSatisfied": [],
+      "name": "Ominous Artifact β",
+      "scenarios": [
+        {
+          "fingerprint": "f13ce0e7",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90073130": {
+      "fingerprint": "555a55a8",
+      "gatesSatisfied": [],
+      "name": "Ominous Artifact γ",
+      "scenarios": [
+        {
+          "fingerprint": "a57b5bf8",
+          "scenario": "turn_boundary"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074110": {
+      "fingerprint": "95251a77",
+      "gatesSatisfied": [],
+      "name": "Masterwork Artifact Ω",
+      "scenarios": [
+        {
+          "fingerprint": "a54a5e28",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074120": {
+      "fingerprint": "abc0e204",
+      "gatesSatisfied": [],
+      "name": "Lloyd",
+      "scenarios": [
+        {
+          "fingerprint": "96e585d6",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074130": {
+      "fingerprint": "050af1b0",
+      "gatesSatisfied": [],
+      "name": "Victoria",
+      "scenarios": [
+        {
+          "fingerprint": "1441b6ae",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074140": {
+      "fingerprint": "68cc0138",
+      "gatesSatisfied": [],
+      "name": "Imari's Little Buddies",
+      "scenarios": [
+        {
+          "fingerprint": "143f0b38",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074150": {
+      "fingerprint": "6b14cc66",
+      "gatesSatisfied": [],
+      "name": "Warden of the Trigger",
+      "scenarios": [
+        {
+          "fingerprint": "2fa692b4",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074210": {
+      "fingerprint": "e00c9bf8",
+      "gatesSatisfied": [],
+      "name": "White Psalm, New Revelation",
+      "scenarios": [
+        {
+          "fingerprint": "6e17cd20",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074220": {
+      "fingerprint": "d4a46a69",
+      "gatesSatisfied": [],
+      "name": "Black Psalm, New Revelation",
+      "scenarios": [
+        {
+          "fingerprint": "a0c67e0e",
+          "scenario": "vanilla_place"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074310": {
+      "fingerprint": "d6e022d0",
+      "gatesSatisfied": [],
+      "name": "Melodious Monody",
+      "scenarios": [
+        {
+          "fingerprint": "5eca62e0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
+      "token": true
+    },
+    "90074320": {
+      "detail": "Spell requires a target but none are available.",
+      "name": "Depths of the Eld Axe",
+      "reason": "play_blocked",
+      "status": "skipped",
+      "token": true
     }
   },
-  "covered": 769,
-  "partial": 26,
+  "covered": 857,
+  "partial": 29,
   "seed": 42,
   "skipReasons": {
-    "play_blocked": 16
+    "play_blocked": 18
   },
-  "skipped": 16,
+  "skipped": 18,
+  "tokenCount": 93,
   "unmetGateCounts": {
     "ally_matches": 4,
-    "board_name": 1,
+    "board_name": 3,
     "field_matches": 1,
     "hand_matches": 2,
     "hand_same_cost_gte": 2,
@@ -10762,7 +11967,7 @@
     "last_discarded_type": 1,
     "named_enter_count": 2,
     "played_base_cost_ladder": 1,
-    "selected_matches": 2,
+    "selected_matches": 3,
     "self_cost": 4,
     "unique_tribe_enters": 5
   },

@@ -618,7 +618,11 @@ function hasEngageKeyword(card: CardInstance): boolean {
   const kws = (card as { keywords?: unknown[] }).keywords ?? [];
   for (const k of kws) {
     if (typeof k === "string" && k === "Engage") return true;
-    if (k && typeof k === "object" && (k as { name?: string }).name === "Engage") {
+    if (
+      k &&
+      typeof k === "object" &&
+      (k as { name?: string }).name === "Engage"
+    ) {
       return true;
     }
   }
@@ -886,7 +890,7 @@ export function toBaselineEntry(
   result: CardDriveResult,
   opts: ToBaselineEntryOptions = {},
 ): BaselineCardEntry {
-  const tokenFlag = opts.token ? ({ token: true as const }) : {};
+  const tokenFlag = opts.token ? { token: true as const } : {};
   if (result.status === "skipped") {
     return {
       status: "skipped",

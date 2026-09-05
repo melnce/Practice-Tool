@@ -49,9 +49,7 @@ describe("card behaviour harness tokens", () => {
   });
 
   it("collectible fingerprints match committed baseline for sample ids", () => {
-    const baseline = JSON.parse(
-      fs.readFileSync(BASELINE_PATH, "utf-8"),
-    ) as {
+    const baseline = JSON.parse(fs.readFileSync(BASELINE_PATH, "utf-8")) as {
       cards: Record<
         string,
         { fingerprint?: string; status: string; scenarios?: unknown[] }
