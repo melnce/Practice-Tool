@@ -2,8 +2,8 @@
  * Interaction sweep — every player action on mouse (1440×900) and CDP touch (1024×768).
  * Oracle: window.__svwbTest.getState(); pageerror count must stay 0.
  *
- * Touch long-press play: CDP cannot synthesise a reliable long-press here, so we
- * dispatch `contextmenu` on the card element (same handler as right-click play).
+ * Touch taps: Playwright `page.touchscreen.tap` (CDP touchEnd without points does not
+ * synthesise `click`). CDP is reserved for drag move streams only.
  */
 import {
   test,
@@ -22,6 +22,7 @@ const RAVENING_TENTACLES = "10123310";
 const GILDED_BLADE = "90021310";
 const MODE_SPELL = "10051310"; // Chaos Cyclone — mode modal (interactive-play proven)
 const MODE_SPELL_ALT = "10633310"; // Bewitching Eld Crystals (brief example)
+const CRYSTALSPAWN = "10631110";
 const SEPHIE = "10934110";
 const RUSH_FOLLOWER = "10071110";
 const WARD_FOLLOWER = "10001130";
@@ -148,16 +149,23 @@ async function cdpTouchDrag(
   });
 }
 
-async function cdpTap(page: Page, x: number, y: number) {
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send("Input.dispatchTouchEvent", {
-    type: "touchStart",
-    touchPoints: [{ x, y }],
-  });
-  await cdp.send("Input.dispatchTouchEvent", {
-    type: "touchEnd",
-    touchPoints: [],
-  });
+async function screenTap(page: Page, x: number, y: number) {
+  await page.touchscreen.tap(x, y);
+}
+
+async function tapLocator(
+  page: Page,
+  mode: InputMode,
+  loc: ReturnType<Page["locator"]>,
+) {
+  await expect(loc).toBeVisible();
+  if (mode === "touch") {
+    const box = await loc.boundingBox();
+    expect(box).toBeTruthy();
+    await screenTap(page, box!.x + box!.width / 2, box!.y + box!.height / 2);
+  } else {
+    await loc.click({ force: true });
+  }
 }
 
 async function dragLocator(
@@ -261,9 +269,7 @@ async function tapOrClick(
     return;
   }
 
-  const loc = page.locator(selector).nth(nth);
-  await expect(loc).toBeVisible();
-  await loc.click({ force: true });
+  await tapLocator(page, mode, page.locator(selector).nth(nth));
 }
 
 async function resolveSelectableTarget(
@@ -271,15 +277,80 @@ async function resolveSelectableTarget(
   mode: InputMode,
   selector: string,
 ) {
-  const loc = page.locator(selector).first();
-  await expect(loc).toBeVisible();
-  if (mode === "touch") {
-    const box = await loc.boundingBox();
-    expect(box).toBeTruthy();
-    await cdpTap(page, box!.x + box!.width / 2, box!.y + box!.height / 2);
-  } else {
-    await loc.click({ force: true });
-  }
+  await tapLocator(page, mode, page.locator(selector).first());
+}
+
+async function assertStrikeKilledEnemyFollower(
+  page: Page,
+  enemyUid = "enemy_0",
+) {
+  const result = await page.evaluate((uid) => {
+    const s = window.__svwbTest!.getState();
+    return {
+      pending: !!s.pendingTargetEffect,
+      boardEmpty: s.players.second.board.length === 0,
+      inGraveyard: s.players.second.graveyard.some((c) => c.uid === uid),
+    };
+  }, enemyUid);
+  expect(result.pending).toBe(false);
+  expect(result.boardEmpty).toBe(true);
+  expect(result.inGraveyard).toBe(true);
+}
+
+async function assertBewitchingEnhanceOutcome(page: Page) {
+  const result = await page.evaluate((crystalId) => {
+    const board = window.__svwbTest!.getState().players.first.board;
+    const crystals = board.filter((c) => c?.id === crystalId);
+    return {
+      count: crystals.length,
+      stormCount: crystals.filter((c) => !!c?.hasStorm).length,
+      attacks: crystals.map((c) => Number(c?.attack ?? 0)),
+      defenses: crystals.map((c) => Number(c?.defense ?? 0)),
+      pending: !!window.__svwbTest!.getState().pendingTargetEffect,
+    };
+  }, CRYSTALSPAWN);
+  expect(result.pending).toBe(false);
+  expect(result.count).toBe(3);
+  expect(result.stormCount).toBe(1);
+  expect(result.attacks.every((a) => a === 2)).toBe(true);
+  expect(result.defenses.every((d) => d === 1)).toBe(true);
+}
+
+async function assertBewitchingMode1Outcome(page: Page) {
+  const result = await page.evaluate((crystalId) => {
+    const board = window.__svwbTest!.getState().players.first.board;
+    const crystals = board.filter((c) => c?.id === crystalId);
+    const c = crystals[0];
+    return {
+      count: crystals.length,
+      storm: !!c?.hasStorm,
+      attack: Number(c?.attack ?? 0),
+      defense: Number(c?.defense ?? 0),
+      pending: !!window.__svwbTest!.getState().pendingTargetEffect,
+    };
+  }, CRYSTALSPAWN);
+  expect(result.pending).toBe(false);
+  expect(result.count).toBe(1);
+  expect(result.storm).toBe(true);
+  expect(result.attack).toBe(2);
+  expect(result.defense).toBe(1);
+}
+
+async function assertBewitchingMode2Outcome(page: Page) {
+  const result = await page.evaluate((crystalId) => {
+    const board = window.__svwbTest!.getState().players.first.board;
+    const crystals = board.filter((c) => c?.id === crystalId);
+    return {
+      count: crystals.length,
+      attacks: crystals.map((c) => Number(c?.attack ?? 0)),
+      defenses: crystals.map((c) => Number(c?.defense ?? 0)),
+      pending: !!window.__svwbTest!.getState().pendingTargetEffect,
+    };
+  }, CRYSTALSPAWN);
+  expect(result.pending).toBe(false);
+  expect(result.count).toBe(2);
+  expect(result.attacks.every((a) => a === 2)).toBe(true);
+  expect(result.defenses.every((d) => d === 1)).toBe(true);
 }
 
 async function endTurn(page: Page) {
@@ -770,19 +841,7 @@ test.describe("Interaction sweep — touch @ 1024×768", () => {
       await page.waitForTimeout(200);
       await resolveSelectableTarget(page, mode, "#redBoard .card.selectable");
       await page.waitForTimeout(300);
-      const after = await snap(page);
-      expect(after.pending).toBe(false);
-      const def = await page.evaluate(
-        () =>
-          window.__svwbTest!.getState().players.second.board[0]?.defense ?? 5,
-      );
-      if (mode === "touch" && def >= 5) {
-        test.fail(
-          true,
-          "Finding: CDP touch tap on selectable enemy clears Strike prompt but defense stays 5 (mouse path passes)",
-        );
-      }
-      expect(def).toBeLessThan(5);
+      await assertStrikeKilledEnemyFollower(page);
     },
   );
 
@@ -904,6 +963,64 @@ test.describe("Interaction sweep — touch @ 1024×768", () => {
     await page.waitForTimeout(300);
     expect((await snap(page)).pending).toBe(false);
   });
+
+  withTouch(
+    "mode spell Bewitching Eld Crystals Enhance at 10 PP auto-activates both",
+    async (page, mode) => {
+      await seedCustom(page, {
+        handIds: [MODE_SPELL_ALT],
+        pp: 10,
+        maxPP: 10,
+        statePatch: { roundCount: 6 },
+      });
+      await playHandCard(page, mode);
+      await page.waitForTimeout(400);
+      await expect(page.locator(".choice-modal .choice-option")).toHaveCount(0);
+      await assertBewitchingEnhanceOutcome(page);
+    },
+  );
+
+  withTouch(
+    "mode spell Bewitching Eld Crystals option 1 at 3 PP",
+    async (page, mode) => {
+      await seedCustom(page, {
+        handIds: [MODE_SPELL_ALT],
+        pp: 3,
+        maxPP: 10,
+        statePatch: { roundCount: 6 },
+      });
+      await playHandCard(page, mode);
+      await expect(
+        page.locator(".choice-modal .choice-option").first(),
+      ).toBeVisible({
+        timeout: 8000,
+      });
+      await tapOrClick(page, mode, ".choice-modal .choice-option", 0);
+      await page.waitForTimeout(300);
+      await assertBewitchingMode1Outcome(page);
+    },
+  );
+
+  withTouch(
+    "mode spell Bewitching Eld Crystals option 2 at 3 PP",
+    async (page, mode) => {
+      await seedCustom(page, {
+        handIds: [MODE_SPELL_ALT],
+        pp: 3,
+        maxPP: 10,
+        statePatch: { roundCount: 6 },
+      });
+      await playHandCard(page, mode);
+      await expect(
+        page.locator(".choice-modal .choice-option").first(),
+      ).toBeVisible({
+        timeout: 8000,
+      });
+      await tapOrClick(page, mode, ".choice-modal .choice-option", 1);
+      await page.waitForTimeout(300);
+      await assertBewitchingMode2Outcome(page);
+    },
+  );
 
   // --- 6. Fuse gestures ---
   withTouch("fuse tap opens picker", async (page, mode) => {
@@ -1471,7 +1588,7 @@ registerMouseCase("targeted spell legal click", async (page, mode) => {
   );
   await resolveSelectableTarget(page, mode, "#redBoard .card.selectable");
   await page.waitForTimeout(300);
-  expect((await snap(page)).pending).toBe(false);
+  await assertStrikeKilledEnemyFollower(page);
 });
 
 registerMouseCase("targeted spell illegal leader click", async (page, mode) => {
@@ -1526,23 +1643,60 @@ registerMouseCase("fuse multi-select confirm", async (page, mode) => {
 });
 
 registerMouseCase(
-  "mode spell Bewitching Eld Crystals option 1",
+  "mode spell Bewitching Eld Crystals Enhance at 10 PP auto-activates both",
   async (page, mode) => {
-    test.fail(
-      true,
-      "Finding: Bewitching Eld Crystals (10633310) choice modal not shown after drag-to-board play in e2e seed (Chaos Cyclone 10051310 works)",
-    );
     await seedCustom(page, {
       handIds: [MODE_SPELL_ALT],
       pp: 10,
+      maxPP: 10,
       statePatch: { roundCount: 6 },
     });
-    await dragLocator(page, mode, "#blueHand .card", "#blueBoard");
+    await playHandCard(page, mode);
+    await page.waitForTimeout(400);
+    await expect(page.locator(".choice-modal .choice-option")).toHaveCount(0);
+    await assertBewitchingEnhanceOutcome(page);
+  },
+);
+
+registerMouseCase(
+  "mode spell Bewitching Eld Crystals option 1 at 3 PP",
+  async (page, mode) => {
+    await seedCustom(page, {
+      handIds: [MODE_SPELL_ALT],
+      pp: 3,
+      maxPP: 10,
+      statePatch: { roundCount: 6 },
+    });
+    await playHandCard(page, mode);
     await expect(
       page.locator(".choice-modal .choice-option").first(),
     ).toBeVisible({
       timeout: 8000,
     });
+    await tapOrClick(page, mode, ".choice-modal .choice-option", 0);
+    await page.waitForTimeout(300);
+    await assertBewitchingMode1Outcome(page);
+  },
+);
+
+registerMouseCase(
+  "mode spell Bewitching Eld Crystals option 2 at 3 PP",
+  async (page, mode) => {
+    await seedCustom(page, {
+      handIds: [MODE_SPELL_ALT],
+      pp: 3,
+      maxPP: 10,
+      statePatch: { roundCount: 6 },
+    });
+    await playHandCard(page, mode);
+    await expect(
+      page.locator(".choice-modal .choice-option").first(),
+    ).toBeVisible({
+      timeout: 8000,
+    });
+    await tapOrClick(page, mode, ".choice-modal .choice-option", 1);
+    await page.waitForTimeout(300);
+    await assertBewitchingMode2Outcome(page);
   },
 );
 
