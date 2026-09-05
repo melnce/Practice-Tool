@@ -1,6 +1,6 @@
 /**
  * Harness for reactive-trigger timing matrix (context × event).
- * Each cell raises event E from raising context C and asserts drain invariants.
+ * Observable: watcher card `counters.earth` via counter op (nothing else touches it).
  */
 import { expect } from "vitest";
 import type {
@@ -12,16 +12,9 @@ import { state } from "../../src/core/gameState.js";
 import { dispatchAction } from "../../src/logic/core/dispatch.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
 import { getResolutionQueue } from "../../src/logic/core/triggers/queue.js";
-import {
-  getShadows,
-  getBoard,
-  getHand,
-  getDeck,
-  setHP,
-} from "../../src/core/playerHelpers.js";
+import { getBoard, setHP } from "../../src/core/playerHelpers.js";
 import {
   canUndo,
-  canRedo,
   captureSnapshot,
   resetHistory,
   setHistoryEnabled,
@@ -32,8 +25,14 @@ import {
 } from "../../src/bench/soakEnv.js";
 import { createCard, givenGameState, resetUidCounter } from "./builders.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { allocateInsertionTs } from "../../src/logic/core/triggers/utils.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
+
+const WATCHER_TICK: Effect = {
+  op: "counter",
+  action: "add",
+  key: "earth",
+  amount: 1,
+};
 
 // ---------------------------------------------------------------------------
 // Event / context catalog
@@ -106,18 +105,6 @@ export const ALL_CONTEXTS: RaisingContext[] = [
   "C15_nesting",
 ];
 
-export const DESTROY_BASED_EVENTS: ReactiveEvent[] = [
-  "ally_follower_leaves_field",
-  "enemy_follower_leaves_field",
-  "ally_ward_destroyed",
-  "ally_amulet_destroyed",
-];
-
-const ENEMY_SCOPED: ReactiveEvent[] = [
-  "enemy_follower_enter",
-  "enemy_follower_leaves_field",
-];
-
 const PLAY_FIRED_BEFORE_BODY: ReactiveEvent[] = [
   "ally_spell_played",
   "ally_card_played",
@@ -129,20 +116,22 @@ const PLAY_ONLY_EVENTS: ReactiveEvent[] = [
   ...PLAY_FIRED_BEFORE_BODY,
 ];
 
-const ENGAGE_FIRED_BEFORE_BODY = "engage" as const;
-
 // ---------------------------------------------------------------------------
 // Watcher / raiser helpers
 // ---------------------------------------------------------------------------
 
-export function watcherOwnerForEvent(event: ReactiveEvent): PlayerSlot {
-  if (ENEMY_SCOPED.includes(event)) return "second";
+/** Watcher board owner for matrix cells (context-aware for SOT / leader events). */
+export function watcherOwnerForEvent(
+  event: ReactiveEvent,
+  context?: RaisingContext,
+): PlayerSlot {
   if (event === "leader_damaged") return "second";
   if (event === "leader_restored") return "first";
+  if (context === "C11_sot" && event.startsWith("ally_")) return "second";
   return "first";
 }
 
-export function makeShadowWatcher(
+export function makeMatrixWatcher(
   event: ReactiveEvent,
   owner: PlayerSlot,
   opts: { leadingGate?: boolean; zone?: "board" | "hand" | "deck" } = {},
@@ -150,10 +139,16 @@ export function makeShadowWatcher(
   const trigger: Record<string, unknown> = {
     event,
     source: event === "when_drawn" ? "hand" : "board",
-    effects: [{ op: "add_shadows", amount: 1 }],
+    effects: [WATCHER_TICK],
   };
   if (event === "ally_follower_enter" || event === "enemy_follower_enter") {
     trigger.condition = { name: "Goblin" };
+  }
+  if (
+    event === "ally_follower_leaves_field" ||
+    event === "enemy_follower_leaves_field"
+  ) {
+    trigger.condition = { name: "LeaveVictim" };
   }
   if (opts.leadingGate) {
     trigger.effects = [
@@ -161,18 +156,19 @@ export function makeShadowWatcher(
         op: "gate",
         condition: "leader_defense_lte",
         count: 15,
-        effects: [{ op: "add_shadows", amount: 1 }],
+        effects: [WATCHER_TICK],
       },
     ];
   }
-  const zone = opts.zone ?? (event === "when_drawn" ? "hand" : "board");
+  const zone = opts.zone ?? (event === "when_drawn" ? "deck" : "board");
   const card = createCard(
     {
       name: `Watcher:${event}`,
-      type: "Follower",
+      type: event === "when_drawn" ? "Spell" : "Follower",
       cost: 1,
       attack: 1,
       defense: 1,
+      counters: { earth: 0 },
       triggers: [trigger],
     },
     zone,
@@ -180,6 +176,17 @@ export function makeShadowWatcher(
   );
   if (zone === "board") applyKeywordsFromList(card);
   return card;
+}
+
+export function watcherEarth(owner: PlayerSlot, watcherUid: string): number {
+  const zones = [
+    ...getBoard(state, owner),
+    ...state.players[owner].hand,
+    ...state.players[owner].deck,
+    ...state.players[owner].graveyard,
+  ];
+  const card = zones.find((c) => c?.uid === watcherUid);
+  return Number(card?.counters?.earth ?? 0);
 }
 
 export function raiseEffects(
@@ -233,6 +240,7 @@ export function raiseEffects(
         },
       ];
     case "ally_draw":
+      return [{ op: "draw", source: "deck", count: 1 }];
     case "when_drawn":
       return [{ op: "draw", source: "deck", count: 1 }];
     case "ally_amulet_destroyed":
@@ -252,8 +260,9 @@ export function raiseEffects(
         {
           op: "damage",
           target: "ally:follower",
-          filter: { uid: ctx.watcherUid },
+          condition: { name: `Watcher:self_damaged` },
           amount: 1,
+          distribution: "all",
         },
       ];
     case "self_buffed_up":
@@ -271,10 +280,6 @@ export function raiseEffects(
       return [];
   }
 }
-
-// ---------------------------------------------------------------------------
-// Constructibility
-// ---------------------------------------------------------------------------
 
 export function skipReason(
   context: RaisingContext,
@@ -306,7 +311,7 @@ export function skipReason(
       return "no play-from-hand op in effect bodies";
     }
   }
-  if (event === ENGAGE_FIRED_BEFORE_BODY && context === "C3_engage") {
+  if (event === "engage" && context === "C3_engage") {
     return "engage event fires before engage body";
   }
   if (
@@ -318,6 +323,9 @@ export function skipReason(
   }
   if (event === "when_drawn" && context === "C11_sot") {
     return "when_drawn requires draw during SOT body, not start_of_turn trigger";
+  }
+  if (event === "ally_draw" && context === "C11_sot") {
+    return "turn draw step also fires ally_draw after SOT body (step 8)";
   }
   if (
     ["self_damaged", "self_buffed_up"].includes(event) &&
@@ -332,7 +340,7 @@ export function skipReason(
 }
 
 // ---------------------------------------------------------------------------
-// Board support cards for destroy / evolve targets
+// Board support cards
 // ---------------------------------------------------------------------------
 
 function leaveVictim(owner: PlayerSlot, name = "LeaveVictim") {
@@ -343,6 +351,13 @@ function leaveVictim(owner: PlayerSlot, name = "LeaveVictim") {
   );
   applyKeywordsFromList(c);
   c.peak_defense = Number(c.defense);
+  return c;
+}
+
+function selectVictim(owner: PlayerSlot) {
+  const c = leaveVictim(owner, "SelectVictim");
+  c.defense = 3;
+  c.peak_defense = 3;
   return c;
 }
 
@@ -384,12 +399,15 @@ function evoVictim(owner: PlayerSlot) {
 }
 
 function amuletVictim(owner: PlayerSlot) {
-  const c = createCard(
+  return createCard(
     { name: "AmuletVictim", type: "Amulet", cost: 1, countdown: 2 },
     "board",
     owner,
   );
-  return c;
+}
+
+function deckFiller(owner: PlayerSlot, name = "DrawFiller") {
+  return createCard({ name, type: "Spell", cost: 1 }, "deck", owner);
 }
 
 export function installEventSupport(
@@ -400,12 +418,10 @@ export function installEventSupport(
   const board = getBoard(state, wOwner);
   switch (event) {
     case "ally_follower_leaves_field":
+      board.push(leaveVictim(wOwner));
+      break;
     case "ally_ward_destroyed":
-      if (event === "ally_ward_destroyed") {
-        board.push(wardVictim(wOwner));
-      } else {
-        board.push(leaveVictim(wOwner));
-      }
+      board.push(wardVictim(wOwner));
       break;
     case "enemy_follower_leaves_field":
       getBoard(state, "second").push(leaveVictim("second"));
@@ -418,14 +434,11 @@ export function installEventSupport(
       board.push(amuletVictim(wOwner));
       break;
     case "when_drawn":
-      state.players[wOwner].deck.unshift(
-        createCard({ name: "DrawTop", type: "Spell", cost: 1 }, "deck", wOwner),
-      );
+      state.players[wOwner].deck.push(deckFiller(wOwner, "PadBelowDraw"));
+      state.players[wOwner].deck.push(watcher);
       break;
     case "ally_draw":
-      state.players[wOwner].deck.unshift(
-        createCard({ name: "DrawTop", type: "Spell", cost: 1 }, "deck", wOwner),
-      );
+      state.players[wOwner].deck.unshift(deckFiller(wOwner, "DrawTop"));
       break;
     case "leader_damaged":
       setHP(state, "second", 20);
@@ -436,7 +449,8 @@ export function installEventSupport(
     case "self_damaged":
     case "self_buffed_up":
       if (!board.includes(watcher)) board.push(watcher);
-      watcher.peak_defense = Number(watcher.defense);
+      watcher.defense = 3;
+      watcher.peak_defense = 3;
       break;
     default:
       break;
@@ -501,8 +515,7 @@ function raiserEvoFollower(effects: Effect[], superEvo = false) {
       defense: 2,
       canEvolve: true,
       hasEvolved: false,
-      evolve: effects,
-      ...(superEvo ? { canSuperEvolve: true, superEvolve: effects } : {}),
+      ...(superEvo ? { superevolve: effects } : { evolve: effects }),
     },
     "board",
     "first",
@@ -537,7 +550,7 @@ function raiserSotFollower(effects: Effect[]) {
       cost: 2,
       attack: 1,
       defense: 1,
-      triggers: [{ event: "start_of_turn", effects }],
+      triggers: [{ type: "start_of_turn_own", effects }],
     },
     "board",
     "second",
@@ -553,7 +566,7 @@ function raiserStrikeFollower(effects: Effect[]) {
       type: "Follower",
       cost: 3,
       attack: 3,
-      defense: 1,
+      defense: 5,
       justPlayed: false,
       can_attack: true,
       can_attack_followers: true,
@@ -591,7 +604,7 @@ function lwVictimWithEffects(effects: Effect[]) {
 // ---------------------------------------------------------------------------
 
 export interface MatrixRunResult {
-  shadowsBefore: number;
+  watcherUid: string;
   watcherOwner: PlayerSlot;
   pendingPrompt: boolean;
 }
@@ -609,37 +622,57 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
   resetHistory();
   (globalThis as any).HEADLESS = true;
 
-  givenGameState({ seed: 77, activePlayer: "first", roundCount: 6 })
+  const roundCount = context === "C4_super_evolve" ? 8 : 6;
+  givenGameState({ seed: 77, activePlayer: "first", roundCount })
     .withFirstPP(10, 10)
     .withFirstEvo(2)
     .build();
   state.gameStarted = true;
   state.phase = "main";
 
-  const watcherOwner = watcherOwnerForEvent(event);
+  const watcherOwner = watcherOwnerForEvent(event, context);
+  let watcherUid = "";
 
-  if (context !== "C15_nesting") {
-    const watcher = makeShadowWatcher(event, watcherOwner, {
+  if (context === "C15_nesting") {
+    const w2 = makeMatrixWatcher("ally_draw", "first");
+    watcherUid = w2.uid;
+    getBoard(state, "first").push(w2);
+    installEventSupport("ally_draw", w2);
+    const w1 = createCard(
+      {
+        name: "W1",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            event: "ally_follower_enter",
+            source: "board",
+            condition: { name: "Goblin" },
+            effects: raiseEffects("ally_draw"),
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    applyKeywordsFromList(w1);
+    getBoard(state, "first").push(w1);
+  } else {
+    const zone = event === "when_drawn" ? "deck" : "board";
+    const watcher = makeMatrixWatcher(event, watcherOwner, {
       leadingGate,
-      zone: event === "when_drawn" ? "hand" : "board",
+      zone,
     });
-
+    watcherUid = watcher.uid;
     if (event === "when_drawn") {
-      state.players[watcherOwner].hand = [watcher];
+      installEventSupport(event, watcher);
     } else {
       getBoard(state, watcherOwner).push(watcher);
+      installEventSupport(event, watcher);
     }
-    installEventSupport(event, watcher);
   }
-
-  const watcherUid =
-    context === "C15_nesting"
-      ? undefined
-      : event === "when_drawn"
-        ? state.players[watcherOwner].hand[0]?.uid
-        : getBoard(state, watcherOwner).find((c) =>
-            c.name?.startsWith("Watcher:"),
-          )?.uid;
 
   if (leadingGate) {
     setHP(state, watcherOwner, 12);
@@ -647,7 +680,6 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
 
   const raise = raiseEffects(event, { watcherUid });
   let pendingPrompt = false;
-  const shadowsBefore = getShadows(state, watcherOwner);
 
   const dispatch = (action: Parameters<typeof engineDispatch>[1]) => {
     engineDispatch(state, action);
@@ -691,7 +723,7 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
       break;
     }
     case "C5_target_handler": {
-      const victim = leaveVictim("first", "SelectVictim");
+      const victim = selectVictim("first");
       state.players.first.board.push(victim);
       const raiser = raiserFollowerInHand([
         {
@@ -714,7 +746,7 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
       break;
     }
     case "C6_target_resume": {
-      const victim = leaveVictim("first", "SelectVictim");
+      const victim = selectVictim("first");
       state.players.first.board.push(victim);
       const raiser = raiserFollowerInHand([
         {
@@ -812,21 +844,24 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
       break;
     }
     case "C12_crest": {
-      const crestDef = {
-        op: "crest",
-        action: "gain",
-        name: "MatrixCrest",
-        triggers: [
-          {
-            event: "ally_draw",
-            effects: raise,
-          },
-        ],
-      };
-      handleGainCrest(crestDef as any, "first");
-      const drawSpell = raiserSpellInHand([
-        { op: "draw", source: "deck", count: 1 },
-      ]);
+      const crestTrigger =
+        event === "ally_draw"
+          ? { event: "ally_spell_played" as const, effects: raise }
+          : { event: "ally_draw" as const, effects: raise };
+      handleGainCrest(
+        {
+          op: "crest",
+          action: "gain",
+          name: "MatrixCrest",
+          triggers: [crestTrigger],
+        } as any,
+        "first",
+      );
+      const spellBody =
+        event === "ally_draw"
+          ? ([] as Effect[])
+          : [{ op: "draw", source: "deck", count: 1 } as Effect];
+      const drawSpell = raiserSpellInHand(spellBody);
       state.players.first.hand.push(drawSpell);
       dispatch({ type: "PLAY_CARD", player: "first", cardUid: drawSpell.uid });
       break;
@@ -862,30 +897,6 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
       break;
     }
     case "C15_nesting": {
-      const innerEvent: ReactiveEvent = "ally_draw";
-      const w2 = makeShadowWatcher(innerEvent, "first");
-      getBoard(state, "first").push(w2);
-      installEventSupport(innerEvent, w2);
-      const w1 = createCard(
-        {
-          name: "W1",
-          type: "Follower",
-          cost: 1,
-          attack: 1,
-          defense: 1,
-          triggers: [
-            {
-              event: "ally_follower_enter",
-              source: "board",
-              effects: raiseEffects(innerEvent),
-            },
-          ],
-        },
-        "board",
-        "first",
-      );
-      applyKeywordsFromList(w1);
-      getBoard(state, "first").push(w1);
       const raiser = raiserFollowerInHand([
         { op: "summon", source: "named", name: "Goblin", count: 1 },
       ]);
@@ -897,56 +908,30 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
       break;
   }
 
-  return {
-    shadowsBefore,
-    watcherOwner,
-    pendingPrompt,
-  };
-}
-
-export function expectedShadowDelta(
-  event: ReactiveEvent,
-  context: RaisingContext,
-): number {
-  let delta = 1; // watcher add_shadows
-  if (DESTROY_BASED_EVENTS.includes(event)) delta += 1;
-  if (context === "C2_spell" || context === "C12_crest") delta += 1; // spell → graveyard
-  if (context === "C7_deferred_lw") {
-    delta += 1; // LwVictim destroy shadow
-    if (DESTROY_BASED_EVENTS.includes(event)) delta += 1; // fanfare destroy
-  }
-  if (context === "C6_target_resume" || context === "C5_target_handler") {
-    // Played follower enters after fanfare/resume tail (Goblin-filtered watcher unaffected)
-    if (event === "ally_follower_enter") delta += 0;
-  }
-  if (context === "C9_strike") {
-    // Blocker may die in strike combat when leaves_field raised
-    if (DESTROY_BASED_EVENTS.includes(event)) delta += 1;
-  }
-  return delta;
+  return { watcherUid, watcherOwner, pendingPrompt };
 }
 
 export function assertReactiveInvariants(
+  watcherUid: string,
   watcherOwner: PlayerSlot,
-  shadowsBefore: number,
   opts: {
     pendingPrompt?: boolean;
     leadingGate?: boolean;
+    expectFired?: boolean;
     event?: ReactiveEvent;
     context?: RaisingContext;
   } = {},
 ): void {
-  const { pendingPrompt = false, leadingGate = false, event, context } = opts;
-  const delta =
-    event && context
-      ? expectedShadowDelta(event, context)
-      : leadingGate
-        ? 0
-        : 1;
-  const expected = leadingGate ? shadowsBefore : shadowsBefore + delta;
-  const actual = getShadows(state, watcherOwner);
-  if (!leadingGate) {
-    expect(actual).toBe(expected);
+  const {
+    pendingPrompt = false,
+    leadingGate = false,
+    expectFired = true,
+  } = opts;
+  const earth = watcherEarth(watcherOwner, watcherUid);
+  if (expectFired && !leadingGate) {
+    expect(earth).toBe(1);
+  } else if (leadingGate) {
+    expect(earth).toBe(1);
   }
   expect(getResolutionQueue().length).toBe(0);
   expect((state as any)._drainingResolutionQueue).toBeFalsy();
@@ -979,7 +964,6 @@ export function assertReactiveInvariants(
   expect(after).toBe(before);
 }
 
-/** Build matrix cell list: every row × core events + full C1 + full C7. */
 export function buildMatrixCells(): Array<{
   context: RaisingContext;
   event: ReactiveEvent;
@@ -1011,3 +995,6 @@ export function buildMatrixCells(): Array<{
 
   return cells;
 }
+
+/** @deprecated use makeMatrixWatcher */
+export const makeShadowWatcher = makeMatrixWatcher;
