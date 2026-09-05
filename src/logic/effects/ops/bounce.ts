@@ -3,6 +3,11 @@ import { state } from "../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { pushToHand } from "../../../core/utils.js";
 import { getCardDetails } from "../../../data/cardDatabase.js";
+import {
+  applyCrystallizeTransform,
+  getAlternateForms,
+} from "../../../helpers/alternateForm.js";
+import { initAmulet } from "./summon_ops/init.js";
 import { fireTrigger } from "../../core/triggers.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 
@@ -22,6 +27,30 @@ function freshBaseCopyByName(name: string) {
   const copy = structuredClone(base);
   copy.uid = state.rng.makeUid();
   return copy;
+}
+
+/** Board instance is a Crystallize amulet (printed follower, field amulet). */
+function isCrystallizeAmuletInstance(card: CardInstance): boolean {
+  if (card.type !== "Amulet") return false;
+  const base = getCardDetails(card.name);
+  if (!base) return false;
+  if (base.type === "Follower") return true;
+  if ((card as any).playedAs === "crystallize") return true;
+  if ((card as any).originalPrintedType === "Follower") return true;
+  return false;
+}
+
+function preserveAlternateFormOnHandCopy(
+  removed: CardInstance,
+  fresh: CardInstance,
+): void {
+  if (!isCrystallizeAmuletInstance(removed)) return;
+  const crystallize = getAlternateForms(fresh).find(
+    (f) => f.kind === "crystallize",
+  );
+  if (!crystallize) return;
+  applyCrystallizeTransform(fresh, crystallize);
+  initAmulet(fresh);
 }
 
 // Remove from board and push a *reset* copy to the correct hand.
@@ -61,6 +90,7 @@ export function bounceToHand(card: CardInstance) {
 
   // Try to get fresh base copy from database
   let fresh = freshBaseCopyByName(removed.name);
+  if (fresh) preserveAlternateFormOnHandCopy(removed, fresh);
 
   // Fallback: For synthetic/test cards not in database, create a reset copy
   // This enables AI training scenarios and testing with custom cards

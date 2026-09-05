@@ -824,34 +824,66 @@ describe("Rulebook L437 — Crystallize permanence", () => {
     setupMain(6, { pp: 2, maxPP: 6 });
   });
 
-  it.fails(
-    "Crystallize amulet returned to hand stays type Amulet (owner 2026-09-02)",
-    () => {
-      // Rulebook L437 / owner: "remain an amulet" after return to hand.
-      // Observed: return op restores printed Follower type.
-      state.players.first.hand = [createCard(PROSTRATING, "hand", "first")];
-      playCardNoRender(getHand(state, "first"), "first", 0);
-      const amulet = thenBoard("first")[0]!;
-      expect(amulet.type).toBe("Amulet");
+  it("Crystallize amulet returned to hand stays type Amulet (owner 2026-09-02)", () => {
+    // Rulebook L437 / owner: "remain an amulet" after return to hand.
+    state.players.first.hand = [createCard(PROSTRATING, "hand", "first")];
+    playCardNoRender(getHand(state, "first"), "first", 0);
+    const amulet = thenBoard("first")[0]!;
+    expect(amulet.type).toBe("Amulet");
 
-      whenRunEffects(
-        [
-          {
-            op: "return",
-            destination: "hand",
-            target: "ally:amulet",
-          } as Effect,
-        ],
-        "first",
-      );
+    whenRunEffects(
+      [
+        {
+          op: "return",
+          destination: "hand",
+          target: "ally:amulet",
+        } as Effect,
+      ],
+      "first",
+    );
 
-      const inHand = thenHand("first").find(
-        (c) => c.name === "Prostrating Coward",
-      )!;
-      expect(inHand.type).toBe("Amulet");
-      expect(inHand.hasCountdown).toBe(true);
-    },
-  );
+    const inHand = thenHand("first").find(
+      (c) => c.name === "Prostrating Coward",
+    )!;
+    expect(inHand.type).toBe("Amulet");
+    expect(inHand.hasCountdown).toBe(true);
+    expect(Number(inHand.countdown)).toBe(3);
+
+    state.players.first.pp = 6;
+    playCardNoRender(getHand(state, "first"), "first", 0);
+    const replayed = thenBoard("first")[0]!;
+    expect(replayed.type).toBe("Amulet");
+    expect(replayed.hasCountdown).toBe(true);
+  });
+
+  it("normal follower bounced to hand stays a follower with printed stats", () => {
+    state.players.first.pp = 6;
+    state.players.first.hand = [createCard(PROSTRATING, "hand", "first")];
+    playCardNoRender(getHand(state, "first"), "first", 0);
+    const follower = thenBoard("first")[0]!;
+    expect(follower.type).toBe("Follower");
+    expect(follower.attack).toBe(4);
+    expect(follower.defense).toBe(5);
+
+    whenRunEffects(
+      [
+        {
+          op: "return",
+          destination: "hand",
+          target: "ally:follower",
+        } as Effect,
+      ],
+      "first",
+    );
+
+    const inHand = thenHand("first").find(
+      (c) => c.name === "Prostrating Coward",
+    )!;
+    expect(inHand.type).toBe("Follower");
+    expect(inHand.attack).toBe(4);
+    expect(inHand.defense).toBe(5);
+    expect(inHand.hasCountdown).toBeFalsy();
+  });
 });
 
 // ---------------------------------------------------------------------------

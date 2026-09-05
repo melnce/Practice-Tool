@@ -100,3 +100,31 @@ export function alternateFormLabel(form: AlternateForm | null): string | null {
   if (!form) return null;
   return form.kind === "accelerate" ? "Accelerate" : "Crystallize";
 }
+
+/**
+ * Transform a follower into its Crystallize amulet form.
+ * Follower Fanfare / keywords do not apply; amuletKeywords take over.
+ */
+export function applyCrystallizeTransform(
+  card: CardInstance,
+  form: AlternateForm,
+): void {
+  (card as any).playedAs = "crystallize";
+  (card as any).originalPrintedType = card.type;
+  card.type = "Amulet";
+  card.attack = 0;
+  card.defense = 0;
+  card.fanfare = [];
+  card.evolve = [];
+  card.superevolve = [];
+  card.hasRush = false;
+  card.hasStorm = false;
+  card.hasBane = false;
+  card.hasWard = false;
+  card.hasAura = false;
+  card.hasAmbush = false;
+  card.hasIntimidate = false;
+  card.can_attack = false;
+  card.isRush = false;
+  card.keywords = [...form.amuletKeywords];
+}
