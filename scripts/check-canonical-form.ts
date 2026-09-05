@@ -16,6 +16,7 @@
  *   npx tsx scripts/check-canonical-form.ts --gate=select-count --fail
  *   npx tsx scripts/check-canonical-form.ts --gate=chosen-target --fail
  *   npx tsx scripts/check-canonical-form.ts --gate=evolve-target --fail
+ *   npx tsx scripts/check-canonical-form.ts --gate=enhance-instead --fail
  *
  * Optional `--fail` promotes the selected family's warnings to exit 1.
  */
@@ -28,6 +29,9 @@ import { SETS_DIR } from "./mergeSets.js";
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
 
+const ALL_FILE = path.join(ROOT, "cards", "all.json");
+const TOKEN_FILE = path.join(ROOT, "cards", "token_details.json");
+
 type CardJson = {
   id: string;
   name: string;
@@ -38,10 +42,16 @@ type CardJson = {
   evolve?: unknown[];
   superevolve?: unknown[];
   triggers?: unknown[];
+  enhance_replaces_base?: unknown;
   [key: string]: unknown;
 };
 
-type Family = "turn-scope" | "select-count" | "chosen-target" | "evolve-target";
+type Family =
+  | "turn-scope"
+  | "select-count"
+  | "chosen-target"
+  | "evolve-target"
+  | "enhance-instead";
 
 type Warning = {
   family: Family;
@@ -344,6 +354,44 @@ function checkChosenTarget(card: CardJson): Warning[] {
   return out;
 }
 
+function checkEnhanceInstead(card: CardJson): Warning[] {
+  const desc = String(card.description ?? "");
+  if (!/Enhance \(\d+\):[^\n]*\binstead\b/i.test(desc)) return [];
+  if (card.enhance_replaces_base === true) return [];
+  return [
+    {
+      family: "enhance-instead",
+      id: card.id,
+      name: card.name,
+      found: compact({
+        enhance_replaces_base: card.enhance_replaces_base ?? null,
+        description_line: desc
+          .split(/\r?\n/)
+          .find((line) => /Enhance \(\d+\):[^\n]*\binstead\b/i.test(line)),
+      }),
+      canonical: compact({ enhance_replaces_base: true }),
+      note: 'printed "Enhance (N): … instead" requires enhance_replaces_base:true',
+    },
+  ];
+}
+
+function loadCardsFromAllAndTokens(): CardJson[] {
+  const cards: CardJson[] = [];
+  const allRaw = JSON.parse(fs.readFileSync(ALL_FILE, "utf-8"));
+  if (Array.isArray(allRaw)) {
+    for (const c of allRaw) {
+      if (c && typeof c === "object" && c.id) cards.push(c as CardJson);
+    }
+  }
+  const tokenRaw = JSON.parse(fs.readFileSync(TOKEN_FILE, "utf-8"));
+  if (Array.isArray(tokenRaw)) {
+    for (const c of tokenRaw) {
+      if (c && typeof c === "object" && c.id) cards.push(c as CardJson);
+    }
+  }
+  return cards;
+}
+
 function loadCardsFromSets(): CardJson[] {
   const files = fs
     .readdirSync(SETS_DIR)
@@ -384,7 +432,10 @@ function main(): void {
     ? (gateArg.slice("--gate=".length) as Family | "all")
     : "all";
 
-  const cards = loadCardsFromSets();
+  const cards =
+    gateFilter === "enhance-instead"
+      ? loadCardsFromAllAndTokens()
+      : loadCardsFromSets();
   const warnings: Warning[] = [];
 
   for (const card of cards) {
@@ -399,6 +450,9 @@ function main(): void {
     }
     if (gateFilter === "all" || gateFilter === "evolve-target") {
       warnings.push(...checkEvolveTarget(card));
+    }
+    if (gateFilter === "all" || gateFilter === "enhance-instead") {
+      warnings.push(...checkEnhanceInstead(card));
     }
   }
 
@@ -415,18 +469,24 @@ function main(): void {
     gateFilter === "turn-scope" ||
     gateFilter === "select-count" ||
     gateFilter === "chosen-target" ||
-    gateFilter === "evolve-target";
+    gateFilter === "evolve-target" ||
+    gateFilter === "enhance-instead";
   console.log(
     migrated
       ? `Canonical-form gate — ${gateFilter} (error mode when --fail)`
       : "Canonical-form gate — WARN mode for unmigrated families",
   );
-  console.log(`scanned ${cards.length} cards from cards/sets/`);
+  console.log(
+    gateFilter === "enhance-instead"
+      ? `scanned ${cards.length} cards from cards/all.json + cards/token_details.json`
+      : `scanned ${cards.length} cards from cards/sets/`,
+  );
 
   printFamily("turn-scope", unique);
   printFamily("select-count", unique);
   printFamily("chosen-target", unique);
   printFamily("evolve-target", unique);
+  printFamily("enhance-instead", unique);
 
   console.log(
     `\nTotal warnings: ${unique.length}` +

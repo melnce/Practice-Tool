@@ -699,7 +699,8 @@
           }
         ]
       }
-    ]
+    ],
+    "enhance_replaces_base": true
   },
   {
     "id": "90031110",
