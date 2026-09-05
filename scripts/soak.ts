@@ -273,6 +273,13 @@ async function main(): Promise<void> {
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
 
+    if (i === 0 && result.commitSequence?.length) {
+      const seq = result.commitSequence
+        .map((e) => `${e.actionType}:${e.commits}`)
+        .join(", ");
+      console.log(`game 0 commit sequence: [${seq}]`);
+    }
+
     for (const t of result.nonUndoableActionTypes ?? []) {
       nonUndoableUnion.add(t);
     }
@@ -335,6 +342,8 @@ async function main(): Promise<void> {
             actions: result.actions,
             trace: result.trace,
             nonUndoableActionTypes: result.nonUndoableActionTypes ?? [],
+            commitSequence: result.commitSequence ?? [],
+            zeroCommitLog: result.zeroCommitLog ?? [],
           },
           null,
           2,

@@ -22,7 +22,8 @@ import { getBoard, getHand } from "../../src/core/playerHelpers.js";
 import { givenGameState } from "../harness/builders.js";
 import "../audit/setup.ts";
 
-const FIXED_SEEDS = [20260908, 20260909, 20260910] as const;
+const PASSING_ENGINE_SEEDS = [20260908, 20260910] as const;
+const CHAIN_UNDO_FAIL_SEED = 20260909;
 const MASK = [...PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS];
 const REPRO_GAME = 17;
 const REPRO_ACTION = 40;
@@ -36,25 +37,21 @@ beforeAll(async () => {
 });
 
 describe("history round-trip soak", () => {
-  for (const seed of FIXED_SEEDS) {
-    it.fails(
-      `seed ${seed} — engine dispatch main-phase undo/redo with drift mask`,
-      async () => {
-        const result = await runSoakGame({
-          seed,
-          gameIndex: 0,
-          historyCheck: true,
-          historyIgnoreFields: MASK,
-          dispatch: ENGINE,
-          turnCap: 60,
-          actionCap: 800,
-        });
-        expect(
-          result.outcome,
-          result.error ?? `seed ${seed} outcome ${result.outcome}`,
-        ).toBe("completed");
-      },
-    );
+  for (const seed of PASSING_ENGINE_SEEDS) {
+    it(`seed ${seed} — engine dispatch undo/redo (no mask)`, async () => {
+      const result = await runSoakGame({
+        seed,
+        gameIndex: 0,
+        historyCheck: true,
+        dispatch: ENGINE,
+        turnCap: 60,
+        actionCap: 800,
+      });
+      expect(
+        result.outcome,
+        result.error ?? `seed ${seed} outcome ${result.outcome}`,
+      ).toBe("completed");
+    });
   }
 
   it("mulligan picks are not undoable — canUndo() false and UNDO is a no-op", async () => {
@@ -121,6 +118,25 @@ describe("history round-trip soak", () => {
     expect(canonicalJson(getHand(state, player))).toBe(handBefore);
     expect(canonicalJson(getBoard(state, player))).toBe(boardBefore);
   });
+
+  it.fails(
+    `seed ${CHAIN_UNDO_FAIL_SEED} — engine chain-undo __lastPlayedCard drift (no mask)`,
+    async () => {
+      const result = await runSoakGame({
+        seed: CHAIN_UNDO_FAIL_SEED,
+        gameIndex: 0,
+        historyCheck: true,
+        dispatch: ENGINE,
+        turnCap: 60,
+        actionCap: 800,
+      });
+      expect(
+        result.outcome,
+        result.error ??
+          `seed ${CHAIN_UNDO_FAIL_SEED} outcome ${result.outcome}`,
+      ).toBe("completed");
+    },
+  );
 
   // Core dispatch (dispatch.ts) uses playCardNoRender — no beginAction before mutations.
   it.fails(

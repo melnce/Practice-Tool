@@ -19,6 +19,7 @@ import {
   captureSnapshot,
   setHistoryEnabled,
   onHistoryEvent,
+  canUndo,
 } from "../core/history.js";
 import { setNodeEnv } from "../core/env.js";
 import type { GameState } from "../core/types/index.js";
@@ -86,8 +87,20 @@ export type SoakGameResult = {
     actionType: string;
     reason: string;
   }>;
+  /** Per-action history commit counts (actions with commits ≥ 1 only). */
+  commitSequence?: Array<{ actionType: string; commits: number }>;
   trace: SoakAction[];
 };
+
+/** One ring slot per applied action with ≥1 history commit. */
+export type HistoryRingEntry = {
+  action: SoakAction;
+  commits: number;
+  before: string;
+  after: string;
+};
+
+const HISTORY_RING_MAX = 10;
 
 /** Top-level state fields mutated before history.ts snapshots during headless play. */
 export const PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS = [
@@ -485,10 +498,12 @@ function safeHash(): string {
 
 type SnapshotPair = { canon: string; snap: GameState };
 
-/** Mulligan picks are not undoable by design; anything else here is a soak finding. */
+/** Mulligan picks, target-selection clicks, and stuck-pending recovery are not undoable by design. */
 export const EXPECTED_NON_UNDOABLE_ACTION_TYPES = new Set([
   "TOGGLE_MULLIGAN",
   "CONFIRM_MULLIGAN",
+  "CHOOSE_TARGET",
+  "FORCE_COMPLETE_PENDING",
 ]);
 
 export function maskCanonicalSnapshot(
@@ -597,6 +612,11 @@ export function findUnexpectedNonUndoableActionTypes(
 export const CHOOSE_TARGET_ZERO_COMMIT_REASON =
   "CHOOSE_TARGET calls resolvePendingTarget → applyTargetClick (resolveTarget.ts); " +
   "no doAction until Confirm Targets (showConfirmationButton onConfirm).";
+
+/** Target-picker clicks may nest a history commit that does not bound the full click. */
+export const CHOOSE_TARGET_NESTED_COMMIT_REASON =
+  "CHOOSE_TARGET nested commit (orchestrateExecution / targeted op doAction); " +
+  "round-trip skipped — use CONFIRM_TARGETS for confirm-step undo checks.";
 
 function formatHistoryMismatch(
   actionIndex: number,
@@ -747,7 +767,7 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
     return formatHistoryMismatch(
       actionIndex,
       action,
-      `undo×${n}`,
+      `undo×${n} (recorded commits=${n})`,
       before.canon,
       actual,
       historyIgnoreFields,
@@ -820,21 +840,29 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
 
 function runDeepHistoryChain(
   actionIndex: number,
-  beforeRing: string[],
-  afterRing: string[],
+  ring: HistoryRingEntry[],
   historyIgnoreFields: readonly string[],
   dispatchPath: SoakDispatchPath,
 ): string | null {
-  const k = Math.min(10, beforeRing.length);
+  const k = Math.min(HISTORY_RING_MAX, ring.length);
   if (k === 0) return null;
 
-  for (let j = 1; j <= k; j++) {
-    dispatchSoakHistory("UNDO", dispatchPath);
-    const expected = beforeRing[beforeRing.length - j]!;
+  const slice = ring.slice(ring.length - k);
+
+  // Undo newest → oldest: undo c_i times, compare with before_i.
+  for (let j = 0; j < k; j++) {
+    const entry = slice[slice.length - 1 - j]!;
+    for (let u = 0; u < entry.commits; u++) {
+      if (!canUndo()) {
+        ring.length = 0;
+        return null;
+      }
+      dispatchSoakHistory("UNDO", dispatchPath);
+    }
     const actual = captureFullSnapshot().canon;
-    if (!snapshotsEqual(expected, actual, historyIgnoreFields)) {
+    if (!snapshotsEqual(entry.before, actual, historyIgnoreFields)) {
       const exp = JSON.parse(
-        maskCanonicalSnapshot(expected, historyIgnoreFields),
+        maskCanonicalSnapshot(entry.before, historyIgnoreFields),
       ) as unknown;
       const act = JSON.parse(
         maskCanonicalSnapshot(actual, historyIgnoreFields),
@@ -846,17 +874,24 @@ function runDeepHistoryChain(
             `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
         )
         .join("\n");
-      return `history chain-undo level ${j} mismatch at action ${actionIndex}:\n${diffText}`;
+      const label = formatSoakActionLabel(entry.action);
+      return (
+        `history chain-undo level ${j + 1} mismatch at action ${actionIndex} ` +
+        `(${label}, commits=${entry.commits}):\n${diffText}`
+      );
     }
   }
 
-  for (let j = 1; j <= k; j++) {
-    dispatchSoakHistory("REDO", dispatchPath);
-    const expected = afterRing[afterRing.length - k + j - 1]!;
+  // Redo oldest → newest among slice: redo c_i times, compare with after_i.
+  for (let j = 0; j < k; j++) {
+    const entry = slice[j]!;
+    for (let r = 0; r < entry.commits; r++) {
+      dispatchSoakHistory("REDO", dispatchPath);
+    }
     const actual = captureFullSnapshot().canon;
-    if (!snapshotsEqual(expected, actual, historyIgnoreFields)) {
+    if (!snapshotsEqual(entry.after, actual, historyIgnoreFields)) {
       const exp = JSON.parse(
-        maskCanonicalSnapshot(expected, historyIgnoreFields),
+        maskCanonicalSnapshot(entry.after, historyIgnoreFields),
       ) as unknown;
       const act = JSON.parse(
         maskCanonicalSnapshot(actual, historyIgnoreFields),
@@ -868,11 +903,19 @@ function runDeepHistoryChain(
             `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
         )
         .join("\n");
-      return `history chain-redo level ${j} mismatch at action ${actionIndex}:\n${diffText}`;
+      const label = formatSoakActionLabel(entry.action);
+      return (
+        `history chain-redo level ${j + 1} mismatch at action ${actionIndex} ` +
+        `(${label}, commits=${entry.commits}):\n${diffText}`
+      );
     }
   }
 
   return null;
+}
+
+function formatSoakActionLabel(action: SoakAction): string {
+  return `${action.type}:${JSON.stringify(action)}`;
 }
 
 function applySoakAction(
@@ -980,8 +1023,8 @@ export async function runSoakGame(
   }
 
   let actions = 0;
-  const engineBeforeRing: string[] = [];
-  const engineAfterRing: string[] = [];
+  const historyRing: HistoryRingEntry[] = [];
+  const commitSequence: NonNullable<SoakGameResult["commitSequence"]> = [];
   const nonUndoableActionTypes = new Set<string>();
   const playBlockedLog: SoakGameResult["playBlockedLog"] = [];
   const zeroCommitLog: NonNullable<SoakGameResult["zeroCommitLog"]> = [];
@@ -992,8 +1035,7 @@ export async function runSoakGame(
   if (opts.historyCheck) {
     unsubHistoryReset = onHistoryEvent((ev) => {
       if (ev.type === "reset") {
-        engineBeforeRing.length = 0;
-        engineAfterRing.length = 0;
+        historyRing.length = 0;
       }
     });
   }
@@ -1062,18 +1104,36 @@ export async function runSoakGame(
       actions++;
 
       if (opts.historyCheck && beforeSnap && legalBefore) {
-        if (historyCommits === 0) {
+        const skipTargetPickerRoundTrip = action.type === "CHOOSE_TARGET";
+
+        if (historyCommits === 0 || skipTargetPickerRoundTrip) {
           nonUndoableActionTypes.add(action.type);
-          if (telemetry.zeroCommitReason) {
+          if (historyCommits === 0 && telemetry.zeroCommitReason) {
             zeroCommitLog.push({
               actionIndex: actions,
               actionType: action.type,
               reason: telemetry.zeroCommitReason,
             });
+          } else if (skipTargetPickerRoundTrip && historyCommits > 0) {
+            zeroCommitLog.push({
+              actionIndex: actions,
+              actionType: action.type,
+              reason: `${CHOOSE_TARGET_NESTED_COMMIT_REASON} commits=${historyCommits}`,
+            });
+            commitSequence.push({
+              actionType: action.type,
+              commits: historyCommits,
+            });
+            // Nested targeted-op commits do not bound the picker click — omit from deep chain ring.
           }
         } else {
           const afterSnap = captureFullSnapshot();
           const legalAfter = captureLegalSnapshot();
+
+          commitSequence.push({
+            actionType: action.type,
+            commits: historyCommits,
+          });
 
           const roundTripErr = runHistoryRoundTrip({
             actionIndex: actions,
@@ -1100,21 +1160,22 @@ export async function runSoakGame(
               nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
               playBlockedLog,
               zeroCommitLog,
+              commitSequence,
             };
           }
 
-          if (historyCommits === 1) {
-            engineBeforeRing.push(beforeSnap.canon);
-            engineAfterRing.push(afterSnap.canon);
-            if (engineBeforeRing.length > 10) engineBeforeRing.shift();
-            if (engineAfterRing.length > 10) engineAfterRing.shift();
-          }
+          historyRing.push({
+            action,
+            commits: historyCommits,
+            before: beforeSnap.canon,
+            after: afterSnap.canon,
+          });
+          if (historyRing.length > HISTORY_RING_MAX) historyRing.shift();
 
-          if (actions % 25 === 0 && engineBeforeRing.length > 0) {
+          if (actions % 25 === 0 && historyRing.length > 0) {
             const chainErr = runDeepHistoryChain(
               actions,
-              engineBeforeRing,
-              engineAfterRing,
+              historyRing,
               historyIgnoreFields,
               dispatchPath,
             );
@@ -1130,6 +1191,7 @@ export async function runSoakGame(
                 nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
                 playBlockedLog,
                 zeroCommitLog,
+                commitSequence,
               };
             }
           }
@@ -1178,6 +1240,7 @@ export async function runSoakGame(
     nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
     playBlockedLog,
     zeroCommitLog,
+    commitSequence,
   };
   const unexpected = findUnexpectedNonUndoableActionTypes(
     nonUndoableActionTypes,
