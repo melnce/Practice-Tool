@@ -13,7 +13,17 @@ import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
 import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
-import { startNewGame, getState } from "../engine.js";
+import { playCard } from "../logic/core/playCard/index.js";
+import type { PlayOutcome } from "../logic/core/playCard/types.js";
+import {
+  captureSnapshot,
+  setHistoryEnabled,
+  onHistoryEvent,
+  canUndo,
+} from "../core/history.js";
+import { setNodeEnv } from "../core/env.js";
+import type { GameState } from "../core/types/index.js";
+import { startNewGame, dispatch as engineDispatch } from "../engine.js";
 import { canPlayCard } from "../logic/core/playCard/preflight.js";
 import { getEffectiveCost } from "../logic/core/playCard/cost.js";
 import { canEvolve } from "../logic/evolveUtils.js";
@@ -31,6 +41,11 @@ import { CoverageTracker } from "./soakCoverage.js";
 
 export const DEFAULT_TURN_CAP = 60;
 export const DEFAULT_ACTION_CAP = 800;
+
+/** Which dispatch entrypoint soak uses for PlayerActions (default: UI/engine path). */
+export type SoakDispatchPath = "engine" | "core";
+
+export const DEFAULT_SOAK_DISPATCH: SoakDispatchPath = "engine";
 
 export type SoakAction =
   | PlayerAction
@@ -50,14 +65,57 @@ export type SoakGameResult = {
     | "crash"
     | "hang"
     | "invariant"
-    | "determinism_mismatch";
+    | "determinism_mismatch"
+    | "history";
   turns: number;
   actions: number;
   finalHash: string;
   winner?: string;
   error?: string;
   findings?: string[];
+  /** Action types that created zero history commits during this game (not undoable). */
+  nonUndoableActionTypes?: string[];
+  /** Blocked play attempts (engine refused after soak listed them as legal). */
+  playBlockedLog?: Array<{
+    actionIndex: number;
+    cardUid: string;
+    reason: string;
+  }>;
+  /** Zero-commit actions with diagnostic reason (non-mulligan). */
+  zeroCommitLog?: Array<{
+    actionIndex: number;
+    actionType: string;
+    reason: string;
+  }>;
+  /** Per-action history commit counts (actions with commits ≥ 1 only). */
+  commitSequence?: Array<{ actionType: string; commits: number }>;
   trace: SoakAction[];
+};
+
+/** One ring slot per applied action with ≥1 history commit. */
+export type HistoryRingEntry = {
+  action: SoakAction;
+  commits: number;
+  before: string;
+  after: string;
+};
+
+const HISTORY_RING_MAX = 10;
+
+/** Top-level state fields mutated before history.ts snapshots during headless play. */
+export const PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS = [
+  "deferDeathTriggers",
+  "gameTick",
+  "lastDrawnCard",
+  "lastDrawnCards",
+  "lastSummoned",
+] as const;
+
+export type ActionTelemetry = {
+  historyCommits: number;
+  /** Why this action type recorded zero commits (diagnostics). */
+  zeroCommitReason?: string;
+  playBlocked?: { cardUid: string; reason: string };
 };
 
 type ConfirmHook = (() => void) | null;
@@ -434,7 +492,433 @@ function safeHash(): string {
   }
 }
 
-function applySoakAction(action: SoakAction): void {
+// ---------------------------------------------------------------------------
+// History round-trip helpers (canonical full-state comparison)
+// ---------------------------------------------------------------------------
+
+type SnapshotPair = { canon: string; snap: GameState };
+
+/** Mulligan picks, target-selection clicks, and stuck-pending recovery are not undoable by design. */
+export const EXPECTED_NON_UNDOABLE_ACTION_TYPES = new Set([
+  "TOGGLE_MULLIGAN",
+  "CONFIRM_MULLIGAN",
+  "CHOOSE_TARGET",
+  "FORCE_COMPLETE_PENDING",
+]);
+
+export function maskCanonicalSnapshot(
+  canon: string,
+  ignoreFields: readonly string[],
+): string {
+  if (ignoreFields.length === 0) return canon;
+  const obj = JSON.parse(canon) as Record<string, unknown>;
+  for (const key of ignoreFields) {
+    delete obj[key];
+  }
+  return canonicalJson(obj);
+}
+
+function snapshotsEqual(
+  expected: string,
+  actual: string,
+  ignoreFields: readonly string[],
+): boolean {
+  if (ignoreFields.length === 0) return expected === actual;
+  return (
+    maskCanonicalSnapshot(expected, ignoreFields) ===
+    maskCanonicalSnapshot(actual, ignoreFields)
+  );
+}
+
+function canonicalize(value: unknown): unknown {
+  if (value === null || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map(canonicalize);
+  const sorted: Record<string, unknown> = {};
+  for (const key of Object.keys(value as object).sort()) {
+    sorted[key] = canonicalize((value as Record<string, unknown>)[key]);
+  }
+  return sorted;
+}
+
+export function canonicalJson(value: unknown): string {
+  return JSON.stringify(canonicalize(value));
+}
+
+function captureFullSnapshot(): SnapshotPair {
+  const snap = captureSnapshot();
+  return { canon: canonicalJson(snap), snap };
+}
+
+function captureLegalSnapshot(): string {
+  return canonicalJson(sortSoakActions(getLegalSoakActions()));
+}
+
+export type JsonPathDiff = { path: string; a: unknown; b: unknown };
+
+export function diffJsonPaths(
+  a: unknown,
+  b: unknown,
+  prefix = "",
+  out: JsonPathDiff[] = [],
+  max = 10,
+): JsonPathDiff[] {
+  if (out.length >= max) return out;
+  if (Object.is(a, b)) return out;
+
+  const isArrA = Array.isArray(a);
+  const isArrB = Array.isArray(b);
+  const typeA = isArrA ? "array" : typeof a;
+  const typeB = isArrB ? "array" : typeof b;
+
+  if (
+    typeA !== typeB ||
+    (typeA !== "object" && typeA !== "array") ||
+    a === null ||
+    b === null
+  ) {
+    out.push({ path: prefix || "(root)", a, b });
+    return out;
+  }
+
+  if (isArrA && isArrB) {
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len && out.length < max; i++) {
+      diffJsonPaths(a[i], b[i], `${prefix}[${i}]`, out, max);
+    }
+    return out;
+  }
+
+  const keys = new Set([
+    ...Object.keys(a as object),
+    ...Object.keys(b as object),
+  ]);
+  for (const key of [...keys].sort()) {
+    if (out.length >= max) break;
+    const pa = (a as Record<string, unknown>)[key];
+    const pb = (b as Record<string, unknown>)[key];
+    diffJsonPaths(pa, pb, prefix ? `${prefix}.${key}` : key, out, max);
+  }
+  return out;
+}
+
+export function findUnexpectedNonUndoableActionTypes(
+  types: Iterable<string>,
+): string[] {
+  return [...types]
+    .filter((t) => !EXPECTED_NON_UNDOABLE_ACTION_TYPES.has(t))
+    .sort();
+}
+
+export const CHOOSE_TARGET_ZERO_COMMIT_REASON =
+  "CHOOSE_TARGET calls resolvePendingTarget → applyTargetClick (resolveTarget.ts); " +
+  "no doAction until Confirm Targets (showConfirmationButton onConfirm).";
+
+/** Target-picker clicks may nest a history commit that does not bound the full click. */
+export const CHOOSE_TARGET_NESTED_COMMIT_REASON =
+  "CHOOSE_TARGET nested commit (orchestrateExecution / targeted op doAction); " +
+  "round-trip skipped — use CONFIRM_TARGETS for confirm-step undo checks.";
+
+function formatHistoryMismatch(
+  actionIndex: number,
+  action: SoakAction,
+  phase: string,
+  expected: string,
+  actual: string,
+  ignoreFields: readonly string[] = [],
+): string {
+  const exp = JSON.parse(
+    maskCanonicalSnapshot(expected, ignoreFields),
+  ) as unknown;
+  const act = JSON.parse(
+    maskCanonicalSnapshot(actual, ignoreFields),
+  ) as unknown;
+  const diffs = diffJsonPaths(exp, act);
+  const diffText = diffs
+    .map(
+      (d) =>
+        `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+    )
+    .join("\n");
+  return `history ${phase} mismatch at action ${actionIndex} (${JSON.stringify(action)}):\n${diffText}`;
+}
+
+function formatLegalMismatch(
+  actionIndex: number,
+  action: SoakAction,
+  phase: string,
+  expected: string,
+  actual: string,
+): string {
+  const exp = JSON.parse(expected) as unknown;
+  const act = JSON.parse(actual) as unknown;
+  const diffs = diffJsonPaths(exp, act);
+  const diffText = diffs
+    .map(
+      (d) =>
+        `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+    )
+    .join("\n");
+  return `history legal-${phase} mismatch at action ${actionIndex} (${JSON.stringify(action)}):\n${diffText}`;
+}
+
+function dispatchSoakPlayerAction(
+  action: PlayerAction,
+  dispatchPath: SoakDispatchPath,
+): void {
+  if (dispatchPath === "engine") {
+    engineDispatch(state, action);
+  } else {
+    dispatchAction(state, action, { checkInvariants: false });
+  }
+}
+
+function dispatchSoakHistory(
+  type: "UNDO" | "REDO",
+  dispatchPath: SoakDispatchPath,
+): void {
+  dispatchSoakPlayerAction({ type }, dispatchPath);
+}
+
+function countHistoryCommitsDuring(
+  action: SoakAction,
+  dispatchPath: SoakDispatchPath,
+): ActionTelemetry {
+  let commits = 0;
+  const unsub = onHistoryEvent((ev) => {
+    if (ev.type === "commit") commits++;
+    if (ev.type === "reset") commits = 0;
+  });
+  const telemetry = applySoakActionWithOutcome(action, dispatchPath);
+  unsub();
+  telemetry.historyCommits = commits;
+  if (commits === 0) {
+    if (telemetry.playBlocked) {
+      telemetry.zeroCommitReason = `PLAY_CARD blocked: ${telemetry.playBlocked.reason}`;
+    } else if (action.type === "CHOOSE_TARGET") {
+      telemetry.zeroCommitReason = CHOOSE_TARGET_ZERO_COMMIT_REASON;
+    }
+  }
+  return telemetry;
+}
+
+export function applySoakActionWithOutcome(
+  action: SoakAction,
+  dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
+): ActionTelemetry {
+  const telemetry: ActionTelemetry = { historyCommits: 0 };
+  if (action.type === "PLAY_CARD") {
+    const hand = getHand(state, action.player);
+    const index = hand.findIndex((c) => c.uid === action.cardUid);
+    if (index === -1) {
+      dispatchSoakPlayerAction(action as PlayerAction, dispatchPath);
+      return telemetry;
+    }
+    const outcome: PlayOutcome = playCard(hand, action.player, index);
+    if (outcome.kind === "blocked") {
+      telemetry.playBlocked = {
+        cardUid: action.cardUid,
+        reason: outcome.reason ?? "blocked",
+      };
+    }
+    return telemetry;
+  }
+  applySoakAction(action, dispatchPath);
+  return telemetry;
+}
+
+type HistoryCheckContext = {
+  actionIndex: number;
+  action: SoakAction;
+  before: SnapshotPair;
+  after: SnapshotPair;
+  legalBefore: string;
+  legalAfter: string;
+  policyRng: RNG;
+  historyCommits: number;
+  historyIgnoreFields: readonly string[];
+  historyReExecute: boolean;
+  dispatchPath: SoakDispatchPath;
+};
+
+function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
+  const {
+    actionIndex,
+    action,
+    before,
+    after,
+    legalBefore,
+    legalAfter,
+    policyRng,
+    historyCommits: n,
+    historyIgnoreFields,
+    historyReExecute,
+    dispatchPath,
+  } = ctx;
+
+  for (let i = 0; i < n; i++) {
+    dispatchSoakHistory("UNDO", dispatchPath);
+  }
+
+  let actual = captureFullSnapshot().canon;
+  if (!snapshotsEqual(before.canon, actual, historyIgnoreFields)) {
+    return formatHistoryMismatch(
+      actionIndex,
+      action,
+      `undo×${n} (recorded commits=${n})`,
+      before.canon,
+      actual,
+      historyIgnoreFields,
+    );
+  }
+  let legalActual = captureLegalSnapshot();
+  if (legalActual !== legalBefore) {
+    return formatLegalMismatch(
+      actionIndex,
+      action,
+      `undo×${n}`,
+      legalBefore,
+      legalActual,
+    );
+  }
+
+  const useReExecute = historyReExecute && policyRng.nextInt(4) === 0;
+  if (useReExecute) {
+    applySoakActionWithOutcome(action, dispatchPath);
+    actual = captureFullSnapshot().canon;
+    if (!snapshotsEqual(after.canon, actual, historyIgnoreFields)) {
+      return formatHistoryMismatch(
+        actionIndex,
+        action,
+        "re-execute",
+        after.canon,
+        actual,
+        historyIgnoreFields,
+      );
+    }
+    legalActual = captureLegalSnapshot();
+    if (legalActual !== legalAfter) {
+      return formatLegalMismatch(
+        actionIndex,
+        action,
+        "re-execute",
+        legalAfter,
+        legalActual,
+      );
+    }
+  } else {
+    for (let i = 0; i < n; i++) {
+      dispatchSoakHistory("REDO", dispatchPath);
+    }
+    actual = captureFullSnapshot().canon;
+    if (!snapshotsEqual(after.canon, actual, historyIgnoreFields)) {
+      return formatHistoryMismatch(
+        actionIndex,
+        action,
+        `redo×${n}`,
+        after.canon,
+        actual,
+        historyIgnoreFields,
+      );
+    }
+    legalActual = captureLegalSnapshot();
+    if (legalActual !== legalAfter) {
+      return formatLegalMismatch(
+        actionIndex,
+        action,
+        `redo×${n}`,
+        legalAfter,
+        legalActual,
+      );
+    }
+  }
+
+  return null;
+}
+
+function runDeepHistoryChain(
+  actionIndex: number,
+  ring: HistoryRingEntry[],
+  historyIgnoreFields: readonly string[],
+  dispatchPath: SoakDispatchPath,
+): string | null {
+  const k = Math.min(HISTORY_RING_MAX, ring.length);
+  if (k === 0) return null;
+
+  const slice = ring.slice(ring.length - k);
+
+  // Undo newest → oldest: undo c_i times, compare with before_i.
+  for (let j = 0; j < k; j++) {
+    const entry = slice[slice.length - 1 - j]!;
+    for (let u = 0; u < entry.commits; u++) {
+      if (!canUndo()) {
+        ring.length = 0;
+        return null;
+      }
+      dispatchSoakHistory("UNDO", dispatchPath);
+    }
+    const actual = captureFullSnapshot().canon;
+    if (!snapshotsEqual(entry.before, actual, historyIgnoreFields)) {
+      const exp = JSON.parse(
+        maskCanonicalSnapshot(entry.before, historyIgnoreFields),
+      ) as unknown;
+      const act = JSON.parse(
+        maskCanonicalSnapshot(actual, historyIgnoreFields),
+      ) as unknown;
+      const diffs = diffJsonPaths(exp, act);
+      const diffText = diffs
+        .map(
+          (d) =>
+            `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+        )
+        .join("\n");
+      const label = formatSoakActionLabel(entry.action);
+      return (
+        `history chain-undo level ${j + 1} mismatch at action ${actionIndex} ` +
+        `(${label}, commits=${entry.commits}):\n${diffText}`
+      );
+    }
+  }
+
+  // Redo oldest → newest among slice: redo c_i times, compare with after_i.
+  for (let j = 0; j < k; j++) {
+    const entry = slice[j]!;
+    for (let r = 0; r < entry.commits; r++) {
+      dispatchSoakHistory("REDO", dispatchPath);
+    }
+    const actual = captureFullSnapshot().canon;
+    if (!snapshotsEqual(entry.after, actual, historyIgnoreFields)) {
+      const exp = JSON.parse(
+        maskCanonicalSnapshot(entry.after, historyIgnoreFields),
+      ) as unknown;
+      const act = JSON.parse(
+        maskCanonicalSnapshot(actual, historyIgnoreFields),
+      ) as unknown;
+      const diffs = diffJsonPaths(exp, act);
+      const diffText = diffs
+        .map(
+          (d) =>
+            `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+        )
+        .join("\n");
+      const label = formatSoakActionLabel(entry.action);
+      return (
+        `history chain-redo level ${j + 1} mismatch at action ${actionIndex} ` +
+        `(${label}, commits=${entry.commits}):\n${diffText}`
+      );
+    }
+  }
+
+  return null;
+}
+
+function formatSoakActionLabel(action: SoakAction): string {
+  return `${action.type}:${JSON.stringify(action)}`;
+}
+
+function applySoakAction(
+  action: SoakAction,
+  dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
+): void {
   if (action.type === "CONFIRM_TARGETS") {
     if (confirmHook) {
       const fn = confirmHook;
@@ -447,7 +931,7 @@ function applySoakAction(action: SoakAction): void {
     forceCompleteOrFizzlePendingTarget();
     return;
   }
-  dispatchAction(state, action as PlayerAction, { checkInvariants: false });
+  dispatchSoakPlayerAction(action as PlayerAction, dispatchPath);
 }
 
 export type RunSoakGameOptions = {
@@ -458,6 +942,14 @@ export type RunSoakGameOptions = {
   coverage?: CoverageTracker;
   /** When true, skip invariant checks (used only for timing). */
   skipInvariants?: boolean;
+  /** When true, undo/redo round-trip after every action with full-state comparison. */
+  historyCheck?: boolean;
+  /** Top-level snapshot fields to ignore when comparing undo/redo round-trips. */
+  historyIgnoreFields?: string[];
+  /** Dispatch entrypoint for PlayerActions (default engine / UI path). */
+  dispatch?: SoakDispatchPath;
+  /** When true, ~25% of round-trips re-apply the action after undo instead of redo. */
+  historyReExecute?: boolean;
   /** Override deck pairing (skips deckSpecForSeed when both are set). */
   deckAId?: string;
   deckBId?: string;
@@ -471,6 +963,11 @@ export async function runSoakGame(
 ): Promise<SoakGameResult> {
   installSoakAdapter();
   confirmHook = null;
+
+  if (opts.historyCheck) {
+    setNodeEnv("DISABLE_HISTORY", undefined);
+    setHistoryEnabled(true);
+  }
 
   const turnCap = opts.turnCap ?? DEFAULT_TURN_CAP;
   const actionCap = opts.actionCap ?? DEFAULT_ACTION_CAP;
@@ -523,6 +1020,22 @@ export async function runSoakGame(
   }
 
   let actions = 0;
+  const historyRing: HistoryRingEntry[] = [];
+  const commitSequence: NonNullable<SoakGameResult["commitSequence"]> = [];
+  const nonUndoableActionTypes = new Set<string>();
+  const playBlockedLog: SoakGameResult["playBlockedLog"] = [];
+  const zeroCommitLog: NonNullable<SoakGameResult["zeroCommitLog"]> = [];
+  const historyIgnoreFields = opts.historyIgnoreFields ?? [];
+  const dispatchPath = opts.dispatch ?? DEFAULT_SOAK_DISPATCH;
+  const historyReExecute = opts.historyReExecute ?? false;
+  let unsubHistoryReset: (() => void) | undefined;
+  if (opts.historyCheck) {
+    unsubHistoryReset = onHistoryEvent((ev) => {
+      if (ev.type === "reset") {
+        historyRing.length = 0;
+      }
+    });
+  }
   try {
     while (true) {
       if (isGameOver(state)) break;
@@ -568,8 +1081,121 @@ export async function runSoakGame(
       if (opts.coverage) noteActionCoverage(opts.coverage, action);
       trace.push(action);
 
-      applySoakAction(action);
+      const beforeSnap = opts.historyCheck ? captureFullSnapshot() : null;
+      const legalBefore = opts.historyCheck ? captureLegalSnapshot() : null;
+
+      const telemetry = opts.historyCheck
+        ? countHistoryCommitsDuring(action, dispatchPath)
+        : (applySoakActionWithOutcome(action, dispatchPath),
+          {
+            historyCommits: 0,
+          });
+      const historyCommits = telemetry.historyCommits;
+      if (telemetry.playBlocked) {
+        playBlockedLog.push({
+          actionIndex: actions + 1,
+          cardUid: telemetry.playBlocked.cardUid,
+          reason: telemetry.playBlocked.reason,
+        });
+      }
       actions++;
+
+      if (opts.historyCheck && beforeSnap && legalBefore) {
+        const skipTargetPickerRoundTrip = action.type === "CHOOSE_TARGET";
+
+        if (historyCommits === 0 || skipTargetPickerRoundTrip) {
+          nonUndoableActionTypes.add(action.type);
+          if (historyCommits === 0 && telemetry.zeroCommitReason) {
+            zeroCommitLog.push({
+              actionIndex: actions,
+              actionType: action.type,
+              reason: telemetry.zeroCommitReason,
+            });
+          } else if (skipTargetPickerRoundTrip && historyCommits > 0) {
+            zeroCommitLog.push({
+              actionIndex: actions,
+              actionType: action.type,
+              reason: `${CHOOSE_TARGET_NESTED_COMMIT_REASON} commits=${historyCommits}`,
+            });
+            commitSequence.push({
+              actionType: action.type,
+              commits: historyCommits,
+            });
+            // Nested targeted-op commits do not bound the picker click — omit from deep chain ring.
+          }
+        } else {
+          const afterSnap = captureFullSnapshot();
+          const legalAfter = captureLegalSnapshot();
+
+          commitSequence.push({
+            actionType: action.type,
+            commits: historyCommits,
+          });
+
+          const roundTripErr = runHistoryRoundTrip({
+            actionIndex: actions,
+            action,
+            before: beforeSnap,
+            after: afterSnap,
+            legalBefore,
+            legalAfter,
+            policyRng,
+            historyCommits,
+            historyIgnoreFields,
+            historyReExecute,
+            dispatchPath,
+          });
+          if (roundTripErr) {
+            return {
+              ...base,
+              outcome: "history",
+              turns: state.turnNumber | 0,
+              actions,
+              finalHash: safeHash(),
+              error: roundTripErr,
+              findings: [roundTripErr],
+              nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+              playBlockedLog,
+              zeroCommitLog,
+              commitSequence,
+            };
+          }
+
+          historyRing.push({
+            action,
+            commits: historyCommits,
+            before: beforeSnap.canon,
+            after: afterSnap.canon,
+          });
+          if (historyRing.length > HISTORY_RING_MAX) historyRing.shift();
+
+          if (actions % 25 === 0 && historyRing.length > 0) {
+            const chainErr = runDeepHistoryChain(
+              actions,
+              historyRing,
+              historyIgnoreFields,
+              dispatchPath,
+            );
+            if (chainErr) {
+              return {
+                ...base,
+                outcome: "history",
+                turns: state.turnNumber | 0,
+                actions,
+                finalHash: safeHash(),
+                error: chainErr,
+                findings: [chainErr],
+                nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+                playBlockedLog,
+                zeroCommitLog,
+                commitSequence,
+              };
+            }
+          }
+        }
+      } else if (!opts.historyCheck) {
+        void telemetry;
+      }
 
       if (opts.coverage) scanZonesForCoverage(opts.coverage);
 
@@ -598,6 +1224,8 @@ export async function runSoakGame(
       error: e instanceof Error ? e.stack || e.message : String(e),
       findings: [],
     };
+  } finally {
+    unsubHistoryReset?.();
   }
 
   const completed: SoakGameResult = {
@@ -606,7 +1234,24 @@ export async function runSoakGame(
     turns: state.turnNumber | 0,
     actions,
     finalHash: safeHash(),
+    nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+    playBlockedLog,
+    zeroCommitLog,
+    commitSequence,
   };
+  const unexpected = findUnexpectedNonUndoableActionTypes(
+    nonUndoableActionTypes,
+  );
+  if (unexpected.length > 0) {
+    return {
+      ...completed,
+      outcome: "history",
+      error: `unexpected non-undoable action types: ${unexpected.join(", ")}`,
+      findings: [
+        `unexpected non-undoable action types: ${unexpected.join(", ")}`,
+      ],
+    };
+  }
   if (state.winner) completed.winner = state.winner;
   return completed;
 }
@@ -618,9 +1263,11 @@ export async function replaySoakTrace(
   seed: number,
   gameIndex: number,
   trace: SoakAction[],
+  opts?: { dispatch?: SoakDispatchPath },
 ): Promise<{ hash: string; error?: string }> {
   installSoakAdapter();
   confirmHook = null;
+  const dispatchPath = opts?.dispatch ?? DEFAULT_SOAK_DISPATCH;
   const deckSpec = deckSpecForSeed(seed, gameIndex);
   try {
     await startNewGame({
@@ -629,7 +1276,7 @@ export async function replaySoakTrace(
       seed: seed + gameIndex * 1_000_003,
     });
     for (const action of trace) {
-      applySoakAction(action);
+      applySoakActionWithOutcome(action, dispatchPath);
     }
     return { hash: safeHash() };
   } catch (e) {

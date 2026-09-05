@@ -1,0 +1,581 @@
+{
+  "seed": 20260908,
+  "gameIndex": 17,
+  "gameSeed": 37260959,
+  "regime": "random",
+  "deckAId": "soak_rand_a_20260908_17",
+  "deckBId": "soak_rand_b_20260908_17",
+  "deckARaw": {
+    "class": "Portalcraft",
+    "deckName": "Soak Random A (Portalcraft) #17",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10002210",
+        "name": "Adventurers' Guild",
+        "count": 1
+      },
+      {
+        "id": "10974120",
+        "name": "Aizeden, Killshot Revenant",
+        "count": 1
+      },
+      {
+        "id": "10772120",
+        "name": "Audacious Artist",
+        "count": 1
+      },
+      {
+        "id": "10502120",
+        "name": "Behemoth General",
+        "count": 1
+      },
+      {
+        "id": "10671120",
+        "name": "Brilliant Inventor",
+        "count": 1
+      },
+      {
+        "id": "10674110",
+        "name": "Camiscilla, Unfeeling Heart",
+        "count": 1
+      },
+      {
+        "id": "10373310",
+        "name": "Devastating Soprano",
+        "count": 1
+      },
+      {
+        "id": "10172320",
+        "name": "Doomwright Resurgence",
+        "count": 2
+      },
+      {
+        "id": "10874120",
+        "name": "Eudie, Your Dependable Mentor",
+        "count": 1
+      },
+      {
+        "id": "10503310",
+        "name": "Fate of the World",
+        "count": 2
+      },
+      {
+        "id": "10372120",
+        "name": "Field Scientist",
+        "count": 1
+      },
+      {
+        "id": "10101310",
+        "name": "Goblin Foray",
+        "count": 1
+      },
+      {
+        "id": "10472120",
+        "name": "Ilsa, Brutal Drill Sergeant",
+        "count": 1
+      },
+      {
+        "id": "10001110",
+        "name": "Indomitable Fighter",
+        "count": 1
+      },
+      {
+        "id": "10901110",
+        "name": "Jailor of Antiquity",
+        "count": 1
+      },
+      {
+        "id": "10871110",
+        "name": "Kratos, Everyday Joy",
+        "count": 1
+      },
+      {
+        "id": "10872120",
+        "name": "Lazuli, Gateway Connector",
+        "count": 1
+      },
+      {
+        "id": "10802310",
+        "name": "Legacy of the Brave",
+        "count": 1
+      },
+      {
+        "id": "10571310",
+        "name": "Light of the Dewdrop",
+        "count": 1
+      },
+      {
+        "id": "10374120",
+        "name": "Lishenna, Melody Manifest",
+        "count": 2
+      },
+      {
+        "id": "10474110",
+        "name": "Lu Woh, Light Personified",
+        "count": 1
+      },
+      {
+        "id": "10873110",
+        "name": "Miriam, Reciprocator",
+        "count": 1
+      },
+      {
+        "id": "10601110",
+        "name": "Muddled Onlooker",
+        "count": 1
+      },
+      {
+        "id": "10672310",
+        "name": "Myriad Designs",
+        "count": 1
+      },
+      {
+        "id": "10572110",
+        "name": "New-Age Cartographer",
+        "count": 1
+      },
+      {
+        "id": "10204110",
+        "name": "Odin, Twilit Fate",
+        "count": 2
+      },
+      {
+        "id": "10104110",
+        "name": "Olivia, Heroic Dark Angel",
+        "count": 1
+      },
+      {
+        "id": "10001130",
+        "name": "Quake Goliath",
+        "count": 1
+      },
+      {
+        "id": "10471110",
+        "name": "Sho, Reborn Night King",
+        "count": 1
+      },
+      {
+        "id": "10973310",
+        "name": "Soulforge",
+        "count": 1
+      },
+      {
+        "id": "10973110",
+        "name": "Steelforged Right Hand",
+        "count": 1
+      },
+      {
+        "id": "10371120",
+        "name": "Supersonic Fighter",
+        "count": 1
+      },
+      {
+        "id": "10873310",
+        "name": "The Journey Ahead",
+        "count": 1
+      },
+      {
+        "id": "10673310",
+        "name": "Unfeeling Eld Axe",
+        "count": 1
+      },
+      {
+        "id": "10872310",
+        "name": "Unsullied Days",
+        "count": 1
+      },
+      {
+        "id": "10773310",
+        "name": "Warp Slash",
+        "count": 1
+      }
+    ]
+  },
+  "deckBRaw": {
+    "class": "Swordcraft",
+    "deckName": "Soak Random B (Swordcraft) #17",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10721110",
+        "name": "Bombastic Bombardier",
+        "count": 1
+      },
+      {
+        "id": "10723310",
+        "name": "Caesura al Fine",
+        "count": 1
+      },
+      {
+        "id": "10021130",
+        "name": "Centaur Centurion",
+        "count": 1
+      },
+      {
+        "id": "10321120",
+        "name": "Comrade of the Swordmaster",
+        "count": 1
+      },
+      {
+        "id": "10603210",
+        "name": "Dark Dimensions",
+        "count": 1
+      },
+      {
+        "id": "10201310",
+        "name": "Dark Side",
+        "count": 1
+      },
+      {
+        "id": "10602210",
+        "name": "Encroached World",
+        "count": 1
+      },
+      {
+        "id": "10621110",
+        "name": "Fearless Soldier",
+        "count": 1
+      },
+      {
+        "id": "10222110",
+        "name": "Gelt, Intrepid Vice-Captain",
+        "count": 1
+      },
+      {
+        "id": "10224110",
+        "name": "Gildaria, Anathema of Peace",
+        "count": 1
+      },
+      {
+        "id": "10621120",
+        "name": "Idle Maid",
+        "count": 1
+      },
+      {
+        "id": "10121150",
+        "name": "Ignominious Samurai",
+        "count": 1
+      },
+      {
+        "id": "10901110",
+        "name": "Jailor of Antiquity",
+        "count": 1
+      },
+      {
+        "id": "10822110",
+        "name": "Katze, Magical Thief",
+        "count": 2
+      },
+      {
+        "id": "10921120",
+        "name": "Kindred Cavalrywoman",
+        "count": 1
+      },
+      {
+        "id": "10423310",
+        "name": "Knightly Ardor",
+        "count": 1
+      },
+      {
+        "id": "10802310",
+        "name": "Legacy of the Brave",
+        "count": 2
+      },
+      {
+        "id": "10221310",
+        "name": "Lucrative Deal",
+        "count": 1
+      },
+      {
+        "id": "10122130",
+        "name": "Luminous Lancetrooper",
+        "count": 2
+      },
+      {
+        "id": "10324120",
+        "name": "Octrice, Hollowness Manifest",
+        "count": 1
+      },
+      {
+        "id": "10822120",
+        "name": "Oda Nobunaga",
+        "count": 1
+      },
+      {
+        "id": "10823110",
+        "name": "Okita Souji",
+        "count": 1
+      },
+      {
+        "id": "10104110",
+        "name": "Olivia, Heroic Dark Angel",
+        "count": 2
+      },
+      {
+        "id": "10804120",
+        "name": "Olivia, Proud Dark Angel",
+        "count": 1
+      },
+      {
+        "id": "10921310",
+        "name": "Phalanx",
+        "count": 1
+      },
+      {
+        "id": "10022110",
+        "name": "Royal Coachwoman",
+        "count": 2
+      },
+      {
+        "id": "10022120",
+        "name": "Rusty, Luxcard Trickster",
+        "count": 1
+      },
+      {
+        "id": "10404110",
+        "name": "Sandalphon, Primarch Successor",
+        "count": 1
+      },
+      {
+        "id": "10522310",
+        "name": "Serenity's Shield",
+        "count": 1
+      },
+      {
+        "id": "10221110",
+        "name": "Seria, Gunslinger Maid",
+        "count": 1
+      },
+      {
+        "id": "10701310",
+        "name": "Tears of Degradation",
+        "count": 1
+      },
+      {
+        "id": "10402110",
+        "name": "Yuni, Cosmic Legacy",
+        "count": 1
+      },
+      {
+        "id": "10824120",
+        "name": "Mars, Conflagrant Commander",
+        "count": 3
+      }
+    ]
+  },
+  "outcome": "history",
+  "error": "history undo×1 mismatch at action 40 ({\"type\":\"PLAY_CARD\",\"player\":\"second\",\"cardUid\":\"uid_2a\"}):\n  __lastPlayedCard.attack: expected=1 actual=0\n  __lastPlayedCard.base_attack: expected=1 actual=0\n  __lastPlayedCard.base_cost: expected=3 actual=0\n  __lastPlayedCard.base_defense: expected=4 actual=0\n  __lastPlayedCard.base_image: expected=\"https://static.dotgg.gg/shadowverse/cards/10822110.webp\" actual=\"https://static.dotgg.gg/shadowverse/cards/90021350.webp\"\n  __lastPlayedCard.can_attack: expected=false actual=undefined\n  __lastPlayedCard.cost: expected=3 actual=0\n  __lastPlayedCard.defense: expected=4 actual=0\n  __lastPlayedCard.description: expected=\"Once on each of your turns, when you play a spell, deal 2 damage to a random enemy follower.\\nEvolve: Add a Glittering Gold to your hand.\" actual=\"Select a Mode to activate.\\n1. Draw a card.\\n2. Deal 2 damage to a random enemy follower.\"\n  __lastPlayedCard.evo_image: expected=\"https://static.dotgg.gg/shadowverse/cards/10822110_evo.webp\" actual=\"\"",
+  "findings": [
+    "history undo×1 mismatch at action 40 ({\"type\":\"PLAY_CARD\",\"player\":\"second\",\"cardUid\":\"uid_2a\"}):\n  __lastPlayedCard.attack: expected=1 actual=0\n  __lastPlayedCard.base_attack: expected=1 actual=0\n  __lastPlayedCard.base_cost: expected=3 actual=0\n  __lastPlayedCard.base_defense: expected=4 actual=0\n  __lastPlayedCard.base_image: expected=\"https://static.dotgg.gg/shadowverse/cards/10822110.webp\" actual=\"https://static.dotgg.gg/shadowverse/cards/90021350.webp\"\n  __lastPlayedCard.can_attack: expected=false actual=undefined\n  __lastPlayedCard.cost: expected=3 actual=0\n  __lastPlayedCard.defense: expected=4 actual=0\n  __lastPlayedCard.description: expected=\"Once on each of your turns, when you play a spell, deal 2 damage to a random enemy follower.\\nEvolve: Add a Glittering Gold to your hand.\" actual=\"Select a Mode to activate.\\n1. Draw a card.\\n2. Deal 2 damage to a random enemy follower.\"\n  __lastPlayedCard.evo_image: expected=\"https://static.dotgg.gg/shadowverse/cards/10822110_evo.webp\" actual=\"\""
+  ],
+  "turns": 12,
+  "actions": 40,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_24"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_10"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_24",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_29"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_x"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_24"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_29",
+      "defender": {
+        "type": "card",
+        "uid": "uid_26"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_27"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_27",
+      "mode": "normal"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_12",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_12",
+      "defender": {
+        "type": "card",
+        "uid": "uid_27"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_20"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_27",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_y"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1z"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_22"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_1z",
+      "mode": "super"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_2a"
+    }
+  ],
+  "nonUndoableActionTypes": [
+    "CHOOSE_TARGET",
+    "CONFIRM_MULLIGAN",
+    "PLAY_CARD",
+    "TOGGLE_MULLIGAN"
+  ]
+}
