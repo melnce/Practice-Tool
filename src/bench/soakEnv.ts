@@ -13,7 +13,7 @@ import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
 import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
-import { playCard, playCardNoRender } from "../logic/core/playCard/index.js";
+import { playCard } from "../logic/core/playCard/index.js";
 import type { PlayOutcome } from "../logic/core/playCard/types.js";
 import {
   captureSnapshot,
@@ -713,10 +713,7 @@ export function applySoakActionWithOutcome(
       dispatchSoakPlayerAction(action as PlayerAction, dispatchPath);
       return telemetry;
     }
-    const outcome: PlayOutcome =
-      dispatchPath === "engine"
-        ? playCard(hand, action.player, index)
-        : playCardNoRender(hand, action.player, index);
+    const outcome: PlayOutcome = playCard(hand, action.player, index);
     if (outcome.kind === "blocked") {
       telemetry.playBlocked = {
         cardUid: action.cardUid,

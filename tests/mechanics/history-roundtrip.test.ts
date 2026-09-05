@@ -108,12 +108,12 @@ describe("history round-trip soak", () => {
     const handBefore = canonicalJson(getHand(state, player));
     const boardBefore = canonicalJson(getBoard(state, player));
     const tickBefore = state.gameTick;
-    const deferBefore = !!(state as any).deferDeathTriggers;
+    const deferBefore = (state as any).deferDeathTriggers ?? false;
 
     dispatch(state, { type: "PLAY_CARD", player, cardUid });
     dispatch(state, { type: "UNDO" });
 
-    expect((state as any).deferDeathTriggers).toBe(deferBefore);
+    expect((state as any).deferDeathTriggers ?? false).toBe(deferBefore);
     expect(state.gameTick).toBe(tickBefore);
     expect(canonicalJson(getHand(state, player))).toBe(handBefore);
     expect(canonicalJson(getBoard(state, player))).toBe(boardBefore);
@@ -155,77 +155,65 @@ describe("history round-trip soak", () => {
   );
 
   // Core dispatch (dispatch.ts) uses playCardNoRender — no beginAction before mutations.
-  it.fails(
-    "deferDeathTriggers restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)",
-    async () => {
-      const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
-      setHistoryEnabled(true);
-      await replaySoakTrace(
-        20260908,
-        REPRO_GAME,
-        repro.trace.slice(0, REPRO_ACTION - 1),
-        { dispatch: CORE },
-      );
-      const before = (state as any).deferDeathTriggers;
-      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
-      dispatch(state, { type: "UNDO" });
-      expect((state as any).deferDeathTriggers).toBe(before);
-    },
-  );
+  it("deferDeathTriggers restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)", async () => {
+    const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
+    setHistoryEnabled(true);
+    await replaySoakTrace(
+      20260908,
+      REPRO_GAME,
+      repro.trace.slice(0, REPRO_ACTION - 1),
+      { dispatch: CORE },
+    );
+    const before = (state as any).deferDeathTriggers ?? false;
+    applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
+    dispatch(state, { type: "UNDO" });
+    expect((state as any).deferDeathTriggers ?? false).toBe(before);
+  });
 
-  it.fails(
-    "gameTick restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)",
-    async () => {
-      const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
-      setHistoryEnabled(true);
-      await replaySoakTrace(
-        20260908,
-        REPRO_GAME,
-        repro.trace.slice(0, REPRO_ACTION - 1),
-        { dispatch: CORE },
-      );
-      const tickBefore = state.gameTick;
-      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
-      dispatch(state, { type: "UNDO" });
-      expect(state.gameTick).toBe(tickBefore);
-    },
-  );
+  it("gameTick restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)", async () => {
+    const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
+    setHistoryEnabled(true);
+    await replaySoakTrace(
+      20260908,
+      REPRO_GAME,
+      repro.trace.slice(0, REPRO_ACTION - 1),
+      { dispatch: CORE },
+    );
+    const tickBefore = state.gameTick;
+    applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
+    dispatch(state, { type: "UNDO" });
+    expect(state.gameTick).toBe(tickBefore);
+  });
 
-  it.fails(
-    "PLAY_CARD undo restores full board/hand state with drift mask (core dispatch path, seed 20260908 game 17 action 40)",
-    async () => {
-      const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
-      setHistoryEnabled(true);
-      await replaySoakTrace(
-        20260908,
-        REPRO_GAME,
-        repro.trace.slice(0, REPRO_ACTION - 1),
-        { dispatch: CORE },
-      );
-      const before = canonicalJson(captureSnapshot());
-      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
-      dispatch(state, { type: "UNDO" });
-      const afterUndo = canonicalJson(captureSnapshot());
-      const mask = (json: string) => {
-        const obj = JSON.parse(json) as Record<string, unknown>;
-        for (const key of MASK) delete obj[key];
-        return canonicalJson(obj);
-      };
-      expect(mask(afterUndo)).toBe(mask(before));
-    },
-  );
+  it("PLAY_CARD undo restores full board/hand state with drift mask (core dispatch path, seed 20260908 game 17 action 40)", async () => {
+    const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
+    setHistoryEnabled(true);
+    await replaySoakTrace(
+      20260908,
+      REPRO_GAME,
+      repro.trace.slice(0, REPRO_ACTION - 1),
+      { dispatch: CORE },
+    );
+    const before = canonicalJson(captureSnapshot());
+    applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
+    dispatch(state, { type: "UNDO" });
+    const afterUndo = canonicalJson(captureSnapshot());
+    const mask = (json: string) => {
+      const obj = JSON.parse(json) as Record<string, unknown>;
+      for (const key of MASK) delete obj[key];
+      return canonicalJson(obj);
+    };
+    expect(mask(afterUndo)).toBe(mask(before));
+  });
 
-  it.fails(
-    "END_TURN undo×1 round-trip with drift mask (core dispatch path, seed 20260908 game 0)",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260908,
-        gameIndex: 0,
-        historyCheck: true,
-        historyIgnoreFields: MASK,
-        dispatch: CORE,
-      });
-      expect(result.outcome).toBe("completed");
-    },
-  );
+  it("END_TURN undo×1 round-trip with drift mask (core dispatch path, seed 20260908 game 0)", async () => {
+    const result = await runSoakGame({
+      seed: 20260908,
+      gameIndex: 0,
+      historyCheck: true,
+      historyIgnoreFields: MASK,
+      dispatch: CORE,
+    });
+    expect(result.outcome).toBe("completed");
+  });
 });
