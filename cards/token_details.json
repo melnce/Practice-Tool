@@ -1116,7 +1116,43 @@
     "superevolve": [],
     "keywords": [],
     "triggers": [],
-    "spell": [],
+    "spell": [
+      {
+        "op": "random_split",
+        "total": {
+          "crest_counter": {
+            "crest": "Faith: Calge-Danthla, Eld Crystals",
+            "counter": "faith"
+          }
+        },
+        "parts": ["X", "Y", "Z"],
+        "effects": [
+          {
+            "op": "summon",
+            "source": "named",
+            "name": "Crystalspawn",
+            "count": 1
+          },
+          {
+            "op": "stat",
+            "action": "give",
+            "target": "ally:last_summoned",
+            "attack": "{X}",
+            "defense": "{X}"
+          },
+          {
+            "op": "restore",
+            "target": "leader",
+            "amount": "{Y}"
+          },
+          {
+            "op": "damage",
+            "target": "enemy:leader",
+            "amount": "{Z}"
+          }
+        ]
+      }
+    ],
     "specific_effects": [
       {
         "specific_effect_type": 4,

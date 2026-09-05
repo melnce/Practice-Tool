@@ -329,6 +329,7 @@ export type MiscOps = Extract<
   | "replicate"
   | "with_source"
   | "boost_skybound_art_hand"
+  | "random_split"
 >;
 export interface MiscEffect extends BaseEffect {
   op: MiscOps;
@@ -340,7 +341,12 @@ export interface MiscEffect extends BaseEffect {
   unique?: boolean;
   zone?: string; // replicate op
   source_uid?: string; // with_source op
-  effects?: Effect[]; // with_source op
+  effects?: Effect[]; // with_source / random_split op
+  total?:
+    | number
+    | string
+    | { crest_counter: { crest: string; counter: string } };
+  parts?: string[];
 }
 
 /** Unified evolve op (+ legacy self-evolve shims) */

@@ -523,6 +523,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
   ]),
   sequence: new Set(["key", "steps", "advance"]),
   replicate: new Set(["zone"]),
+  random_split: new Set(["total", "parts", "effects"]),
   with_source: new Set(["source_uid", "effects"]),
   set_deckout_victory: new Set([]),
   boost_skybound_art_hand: new Set(["amount"]),

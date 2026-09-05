@@ -12,6 +12,7 @@ import { handleGate } from "../../../effects/gates/unified.js";
 import { handleReplicate } from "../../../effects/ops/replicate.js";
 import { handleSequence } from "../../../effects/ops/sequence.js";
 import { handleWithSource } from "../../../effects/ops/with_source.js";
+import { handleRandomSplit } from "../../../effects/ops/random_split.js";
 import { state } from "../../../../core/gameState.js";
 import { getHand } from "../../../../core/playerHelpers.js";
 import type { Effect as _Effect } from "../../../../core/types/index.js";
@@ -121,4 +122,6 @@ export function registerMiscEffects() {
         (card.skyboundArtEvolvesWitnessed || 0) + amt;
     }
   });
+
+  registerOp("random_split", (eff, ctx) => handleRandomSplit(eff as any, ctx));
 }
