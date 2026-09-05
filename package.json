@@ -55,6 +55,7 @@
     "check:card-status": "npx tsx scripts/report-card-status.ts",
     "cards:baseline": "npx tsx scripts/card-behaviour.ts --record",
     "cards:verify": "npx tsx scripts/card-behaviour.ts --verify",
+    "sweep:play-modes": "NODE_ENV=test HEADLESS=1 npx tsx scripts/play-mode-sweep.ts",
     "audit:superevolve-dedup": "npx tsx scripts/audit-super-evolve-dedup.ts",
     "test:audit": "vitest run -c vitest.audit.config.ts",
     "decks:discover": "npx tsx scripts/generate-deck-manifest.ts",
