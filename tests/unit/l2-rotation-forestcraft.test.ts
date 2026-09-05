@@ -660,19 +660,16 @@ describe("L2 — rotation Forestcraft", () => {
       "Whenever an enemy follower enters the field, destroy it and this card.";
 
     it("enemy follower enter destroys it and the trap", () => {
-      setupTurn(R6, { hand: [TRAP], pp: 3 });
+      setupTurn(R6, {
+        hand: [TRAP],
+        pp: 3,
+        secondHand: [FAIRY],
+        secondPP: 1,
+      });
       whenPlayCard("first", 0);
-      const trap = findOnBoard("first", "Trap in the Woods")!;
-      const foe = enemyFollower(2, 5, "Intruder");
-      const enterTrig = trap.triggers![0]!;
-      runEffects(
-        (enterTrig as { effects: unknown[] })
-          .effects as import("../../src/core/types/index.js").Effect[],
-        "first",
-        trap,
-        { enteringCard: foe },
-      );
-      cleanupDead();
+      expect(findOnBoard("first", "Trap in the Woods")).toBeTruthy();
+      whenEndTurn();
+      whenPlayCard("second", 0);
       expect(getBoard(state, "second")).toHaveLength(0);
       expect(findOnBoard("first", "Trap in the Woods")).toBeFalsy();
       expect(printed).toContain("destroy it and this card");

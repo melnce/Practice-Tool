@@ -468,7 +468,7 @@ export function cleanupDead() {
       logEvent("banishOnDeath", { card: c.name, owner });
       bumpZoneVersion();
       fireTrigger("ally_follower_leaves_field", owner as any);
-      fireTrigger("enemy_follower_leaves_field", opponentOf(owner) as any);
+      fireTrigger("enemy_follower_leaves_field", owner as any);
       logEvent("banish", {
         card: c.name,
         uid: c.uid,

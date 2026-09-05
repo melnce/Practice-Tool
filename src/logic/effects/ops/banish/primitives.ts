@@ -35,7 +35,7 @@ export function banishCard(
     bumpZoneVersion(); // PERF: Invalidate cache before triggers
     // Fire ally trigger for first, enemy trigger for second
     fireTrigger("ally_follower_leaves_field", "first");
-    fireTrigger("enemy_follower_leaves_field", "second");
+    fireTrigger("enemy_follower_leaves_field", "first");
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
@@ -52,9 +52,9 @@ export function banishCard(
   if (ri !== -1) {
     secondBoard.splice(ri, 1);
     bumpZoneVersion(); // PERF: Invalidate cache before triggers
-    // Fire ally trigger for second, enemy trigger for first
+    // Fire ally trigger for second, enemy trigger for acting side (banished owner)
     fireTrigger("ally_follower_leaves_field", "second");
-    fireTrigger("enemy_follower_leaves_field", "first");
+    fireTrigger("enemy_follower_leaves_field", "second");
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
