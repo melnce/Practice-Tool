@@ -47,7 +47,12 @@ import {
   toggleSecondPlayerBonusPp,
   canToggleSecondPlayerBonusPp,
 } from "../../src/core/bonusPp.js";
-import { startFirstTurnCore } from "../../src/logic/core/mulliganCore.js";
+import {
+  confirmMulliganCore,
+  startFirstTurnCore,
+} from "../../src/logic/core/mulliganCore.js";
+import { loadDecksFromRaw } from "../../src/data/deckLoader.js";
+import type { RawDeck } from "../../src/data/rawDeck.js";
 import { isOverflow } from "../../src/helpers/overflow.js";
 import type { CardInstance, Player } from "../../src/core/types/index.js";
 import "../../src/logic/core/effects/index.js";
@@ -217,6 +222,30 @@ function readyBoard(owner: Player) {
   state.activePlayer = owner;
 }
 
+/** 40-card deck used by deckLoader QA tests (same shape as deck-instance-owner). */
+const VANILLA_DECK: RawDeck = {
+  cards: [
+    { name: "Marsh Wyrmling", count: 10 },
+    { name: "Scaled Lurker", count: 10 },
+    { name: "Dune Scorpion", count: 10 },
+    { name: "Mountain Behemoth", count: 10 },
+  ],
+};
+
+/** Deck loader → both mulligans → first main-phase turn (matches startGame minus fetch). */
+function runRealMatchStart(seed = 42) {
+  resetUidCounter();
+  resetGameState(seed);
+  loadDecksFromRaw(VANILLA_DECK, VANILLA_DECK);
+  state.phase = "mulligan";
+  state.mulliganStage = "first";
+  state.mulliganFirstSelected = new Set();
+  state.mulliganSecondSelected = new Set();
+  state.gameStarted = true;
+  confirmMulliganCore("first");
+  confirmMulliganCore("second");
+}
+
 // ---------------------------------------------------------------------------
 // §54–56 Match flow
 // ---------------------------------------------------------------------------
@@ -244,21 +273,38 @@ describe("Rulebook L54 — Match flow: leaders, decks, opening draw", () => {
     expect(state.activePlayer).toBe("first");
     expect(state.turnNumber).toBe(1);
   });
+});
 
-  // Rulebook L60/L148–150: at start of turn 1, max PP +1 and refill before draw.
-  it.fails(
-    "first player turn 1 start: max PP becomes 1 and PP refills to 1",
-    () => {
-      givenGameState({ seed: 1 })
-        .withFirstDeck(deckFill("D", 5))
-        .withSecondDeck(deckFill("S", 5))
-        .build();
-      state.phase = "mulligan";
-      startFirstTurnCore();
-      expect(getMaxPP(state, "first")).toBe(1);
-      expect(getPP(state, "first")).toBe(1);
-    },
-  );
+// Rulebook L148–150 / L60 / L184 — PP initialisation via deck loader + mulligan start path.
+describe("Rulebook L148–150 — Real start path: deck loader PP then mulligan", () => {
+  beforeEach(() => resetUidCounter());
+
+  it("loadDecksFromRaw + mulligan: turn 1 at 1/1 with 5 cards; second turn 1/1 with 5; round 2 first at 2/2; never 0/0 in main", () => {
+    runRealMatchStart(42);
+
+    expect(state.phase).toBe("main");
+    expect(state.activePlayer).toBe("first");
+    expect(state.turnNumber).toBe(1);
+    // deckLoader.ts sets pp/maxPP=1 before opening hand; startFirstTurnCore adds turn-1 draw only.
+    expect(getMaxPP(state, "first")).toBe(1);
+    expect(getPP(state, "first")).toBe(1);
+    expect(thenHand("first").length).toBe(5);
+    expect(getPP(state, "first")).not.toBe(0);
+    expect(getMaxPP(state, "first")).not.toBe(0);
+
+    whenEndTurn();
+    expect(state.activePlayer).toBe("second");
+    expect(getMaxPP(state, "second")).toBe(1);
+    expect(getPP(state, "second")).toBe(1);
+    expect(thenHand("second").length).toBe(5);
+    expect(getPP(state, "second")).not.toBe(0);
+    expect(getMaxPP(state, "second")).not.toBe(0);
+
+    whenEndTurn();
+    expect(state.activePlayer).toBe("first");
+    expect(getMaxPP(state, "first")).toBe(2);
+    expect(getPP(state, "first")).toBe(2);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -970,6 +1016,9 @@ describe("Rulebook L152 — Start-of-turn conditions snapshot at first tick", ()
   });
 
   // Rulebook L152: conditions checked when trigger is queued, not re-evaluated at resolution.
+  // Blast radius: Sandalphon, Primarch Successor (10404110) — "At the start of your turn, if allied
+  // followers have evolved at least 6 times this match, Invoke" could fire wrongly if another SOT
+  // effect increments evoCount during the same boundary before Sandalphon queues.
   it.fails(
     "SOT trigger with condition unmet at queue time does not fire if condition becomes true later in SOT",
     () => {
@@ -1016,6 +1065,9 @@ describe("Rulebook L252 — State-based condition checking at trigger creation",
   });
 
   // Rulebook L252: condition snapshot at trigger creation — 8th follower leaving in same EOT batch must not count.
+  // Blast radius: Crest: Eudie, Maiden Reborn (from Eudie, Maiden Reborn 10174110) — "At the end of
+  // your turn, if you have 5 cards or less in your hand, draw" vs restore could branch-wrong if another
+  // EOT effect changes hand size before that crest resolves in the same boundary.
   it.fails(
     "EOT condition counting followers destroyed does not include destruction from same EOT batch",
     () => {
