@@ -1832,6 +1832,24 @@
           {
             "op": "destroy",
             "target": "selected"
+          },
+          {
+            "op": "gate",
+            "condition": "selected_matches",
+            "type": "Amulet",
+            "is_ally": true,
+            "effects": [
+              {
+                "op": "damage",
+                "target": "enemy:leader",
+                "amount": 2
+              },
+              {
+                "op": "add_to_hand",
+                "name": "Depths of the Eld Tome",
+                "count": 1
+              }
+            ]
           }
         ]
       }
