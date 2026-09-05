@@ -259,10 +259,8 @@ function resolveTurnBoundaryQueue(
       }
     }
   } finally {
-    if (!isGameOver()) {
-      flushDeferredDeathBatch();
-      (state as any)._deferredDeath = { lw: [], leave: [] };
-    }
+    flushDeferredDeathBatch();
+    (state as any)._deferredDeath = { lw: [], leave: [] };
   }
 }
 

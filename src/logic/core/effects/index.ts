@@ -252,7 +252,7 @@ export function runEffects(
     if (enableDeathDefer) {
       (state as any).deferDeathTriggers = false;
       // Interactive pause: defer flush until target/mode resolution completes.
-      if (!paused && !state.pendingTargetEffect && !isGameOver()) {
+      if (!paused && !state.pendingTargetEffect) {
         flushDeferredDeathBatch();
         (state as any)._deferredDeath = { lw: [], leave: [] };
       }
