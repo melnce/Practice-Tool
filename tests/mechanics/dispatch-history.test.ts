@@ -131,7 +131,7 @@ describe("dispatchAction PLAY_CARD history", () => {
     expect(getPP(state, "first")).toBe(0);
   });
 
-  it("target prompt play + CHOOSE_TARGET is one undo step on both entrypoints", () => {
+  it("target prompt play + CHOOSE_TARGET is two undo steps on both entrypoints", () => {
     const setup = () => {
       resetUidCounter();
       givenGameState({ seed: 7, activePlayer: "first" })
@@ -150,16 +150,17 @@ describe("dispatchAction PLAY_CARD history", () => {
       return {
         cardUid: getHand(state, "first")[0]!.uid,
         targetUid: enemy.uid,
-        before: canonicalJson(captureSnapshot()),
+        beforePlay: canonicalJson(captureSnapshot()),
       };
     };
 
     const runHeadlessPath = (play: typeof playViaDispatchAction) => {
-      const { cardUid, targetUid, before } = setup();
+      const { cardUid, targetUid, beforePlay } = setup();
       play(cardUid);
       expect(state.pendingTargetEffect).toBeDefined();
       expect(canUndo()).toBe(true);
 
+      const beforeResolve = canonicalJson(captureSnapshot());
       dispatchAction(state, {
         type: "CHOOSE_TARGET",
         target: { type: "card", uid: targetUid },
@@ -168,9 +169,14 @@ describe("dispatchAction PLAY_CARD history", () => {
       expect(canUndo()).toBe(true);
 
       dispatchAction(state, { type: "UNDO" });
+      expect(state.pendingTargetEffect).toBeDefined();
+      expect(state.pendingTargetEffect!.targetUids ?? []).toEqual([]);
+      expect(canonicalJson(captureSnapshot())).toBe(beforeResolve);
+
+      dispatchAction(state, { type: "UNDO" });
       expect(canUndo()).toBe(false);
-      expect(canonicalJson(captureSnapshot())).toBe(before);
-      return before;
+      expect(canonicalJson(captureSnapshot())).toBe(beforePlay);
+      return beforePlay;
     };
 
     const headlessBefore = runHeadlessPath(playViaDispatchAction);

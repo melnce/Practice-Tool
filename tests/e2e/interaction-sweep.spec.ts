@@ -1209,9 +1209,13 @@ test.describe("Interaction sweep — touch @ 1024×768", () => {
     await tapOrClick(page, mode, "#redBoard .card.selectable");
     await page.waitForTimeout(300);
     await undoViaButton(page, mode);
-    const undone = await snap(page);
-    expect(undone.hand).toBe(before.hand);
-    expect(undone.enemyBoardUids).toEqual(before.enemyBoardUids);
+    const afterFirstUndo = await snap(page);
+    expect(afterFirstUndo.pending).toBe(true);
+    expect(afterFirstUndo.enemyBoardUids).toEqual(before.enemyBoardUids);
+    await undoViaButton(page, mode);
+    const afterSecondUndo = await snap(page);
+    expect(afterSecondUndo.hand).toBe(before.hand);
+    expect(afterSecondUndo.pending).toBe(false);
     await redoViaButton(page, mode);
     await assertDragStillWorks(page, mode);
   });
@@ -1879,6 +1883,10 @@ registerMouseCase("undo/redo after target resolve", async (page, mode) => {
   await playHandCard(page, mode);
   await tapOrClick(page, mode, "#redBoard .card.selectable");
   await page.waitForTimeout(300);
+  await undoViaButton(page, mode);
+  const afterFirstUndo = await snap(page);
+  expect(afterFirstUndo.pending).toBe(true);
+  expect(afterFirstUndo.enemyBoardUids).toEqual(before.enemyBoardUids);
   await undoViaButton(page, mode);
   expect((await snap(page)).hand).toBe(before.hand);
   await assertDragStillWorks(page, mode);
