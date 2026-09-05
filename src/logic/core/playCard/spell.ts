@@ -11,7 +11,7 @@ import { runEffects } from "../effects/index.js";
 import { spellboostHand } from "../../effects/ops/spellboost.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
 import { fireTrigger } from "../triggers.js";
-import { pushPlayedHistory } from "./history.js";
+import { pushPlayedHistory, rememberLastPlayedCard } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import {
   getGraveyard,
@@ -79,7 +79,7 @@ export function playSpell(
   fireTrigger("ally_spell_played", owner as any, {
     playedCard: spellCard,
   });
-  (state as any).__lastPlayedCard = spellCard;
+  rememberLastPlayedCard(spellCard);
   fireTrigger("ally_card_played", owner as any, {
     playedCard: spellCard,
   });
