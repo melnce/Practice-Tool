@@ -5,7 +5,11 @@ import { runEffects } from "./effects/index.js";
 import { clearSelectableFlags } from "./targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { doAction } from "../../core/history.js";
-import type { Player, CardInstance, GameState } from "../../core/types/index.js";
+import type {
+  Player,
+  CardInstance,
+  GameState,
+} from "../../core/types/index.js";
 import type { TargetedOpContext } from "./targeting/index.js";
 
 import { applyTargetClick } from "./targeting/index.js";
@@ -33,12 +37,8 @@ import { finishFollowerEnter } from "../effects/ops/summon_ops/core.js";
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
 
-<<<<<<< HEAD
-/** Targeted-op history steps should not leave an empty prompt shell on after snapshots.
-=======
 /**
  * Targeted-op history steps should not leave an empty prompt shell on after snapshots.
->>>>>>> d4c7bde (Bench: mask zoneVersion in history soak; flip game 22 chain-redo pin to passing)
  *
  * Live state is cleared by `orchestrateExecution` once the targeted handler returns;
  * players never see a completed prompt. The shell can still appear on the *after*
