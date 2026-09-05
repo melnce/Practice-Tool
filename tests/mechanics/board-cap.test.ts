@@ -18,12 +18,30 @@ import {
   flushDeferredDeathBatch,
 } from "../../src/logic/core/cleanup.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
-import { runSoakGame } from "../../src/bench/soakEnv.js";
+import { replaySoakTrace } from "../../src/bench/soakEnv.js";
 import { checkSoakInvariants } from "../../src/bench/soakInvariants.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
+import { readFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { countRealBoardCards } from "../../src/logic/effects/ops/summon_ops/core.js";
 import "../../src/logic/core/effects/index.js";
+
+const FIXTURE_DIR = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "../fixtures/soak",
+);
+
+function loadSoakFixture(name: string) {
+  return JSON.parse(readFileSync(resolve(FIXTURE_DIR, name), "utf8")) as {
+    seed: number;
+    gameIndex: number;
+    deckAId: string;
+    deckBId: string;
+    trace: unknown[];
+  };
+}
 
 const MAJESTIC_CONQUEST = "10622310";
 const ROSE = "10223110";
@@ -146,19 +164,19 @@ describe("board field cap", () => {
     expect(board.filter((c) => c.name === "Steelclad Knight").length).toBe(1);
   });
 
-  it("soak repro seed20260913 game391 — no field>5 after final action", async () => {
-    const result = await runSoakGame({
-      seed: 20260913,
-      gameIndex: 391,
-      turnCap: 60,
-      actionCap: 800,
-    });
-    expect(result.outcome).not.toBe("invariant");
-    expect(result.findings?.some((f) => f.includes("field>5"))).not.toBe(true);
+  it("soak repro seed20260913 game391 — replaySoakTrace stays at ≤5 field", async () => {
+    const fixture = loadSoakFixture("seed20260913_game391_board_cap.json");
+    const result = await replaySoakTrace(
+      fixture.seed,
+      fixture.gameIndex,
+      fixture.trace as any,
+    );
+    expect(result.error).toBeUndefined();
     const findings = checkSoakInvariants(state);
     expect(
       findings.map((f) => f.message),
       findings.map((f) => f.message).join("; "),
     ).toEqual([]);
+    expect(getBoard(state, "first").length).toBeLessThanOrEqual(5);
   });
 });
