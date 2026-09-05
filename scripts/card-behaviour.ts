@@ -33,19 +33,39 @@ import {
   type CardDriveResult,
   type BaselineCardEntry,
 } from "./lib/cardBehaviourDrive.js";
+import { TOKEN_FILE, type CardJson } from "./lib/loadCards.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
 const BASELINE_PATH = path.join(ROOT, "baselines", "card-behaviour.json");
 const ALL_CARDS_PATH = path.join(ROOT, "cards", "all.json");
+const TOKEN_SOURCE = "cards/token_details.json";
 
 const GENERATED_BANNER =
   "DO NOT HAND-EDIT. Regenerate with: npm run cards:baseline";
 
-function loadPool(): { id: string; name: string; [k: string]: unknown }[] {
+export type PoolCard = CardJson & { sourceFile: string; token?: boolean };
+
+function readTokenPool(): PoolCard[] {
+  const raw = JSON.parse(fs.readFileSync(TOKEN_FILE, "utf-8"));
+  if (!Array.isArray(raw))
+    throw new Error("token_details.json is not an array");
+  return raw
+    .filter(
+      (c): c is CardJson =>
+        c != null && typeof c === "object" && typeof c.id === "string",
+    )
+    .map((card) => ({ ...card, sourceFile: TOKEN_SOURCE, token: true }));
+}
+
+export function loadPool(): PoolCard[] {
   const raw = JSON.parse(fs.readFileSync(ALL_CARDS_PATH, "utf-8"));
   if (!Array.isArray(raw)) throw new Error("cards/all.json is not an array");
-  return raw;
+  const collectibles: PoolCard[] = raw.map((card: CardJson) => ({
+    ...card,
+    sourceFile: "cards/all.json",
+  }));
+  return [...collectibles, ...readTokenPool()];
 }
 
 function stableStringify(obj: unknown): string {
@@ -71,6 +91,7 @@ function runPool(): {
   baseline: BehaviourBaseline;
 } {
   const pool = loadPool();
+  const tokenCount = pool.filter((c) => c.token).length;
   const results: CardDriveResult[] = [];
   const cards: Record<string, BaselineCardEntry> = {};
   const skipReasons: Record<string, number> = {};
@@ -80,9 +101,9 @@ function runPool(): {
   let skipped = 0;
 
   for (const raw of pool) {
-    const result = driveCard(raw as any);
+    const result = driveCard(raw, { isToken: !!raw.token });
     results.push(result);
-    cards[result.id] = toBaselineEntry(result);
+    cards[result.id] = toBaselineEntry(result, { token: !!raw.token });
     if (result.status === "covered") {
       covered++;
     } else if (result.status === "partial") {
@@ -101,6 +122,7 @@ function runPool(): {
     version: HARNESS_VERSION,
     seed: HARNESS_SEED,
     cardCount: pool.length,
+    tokenCount,
     covered,
     partial,
     skipped,
@@ -116,7 +138,7 @@ function printSummary(baseline: BehaviourBaseline): void {
   console.log("\n=== Card behaviour harness summary ===");
   console.log(`seed=${baseline.seed}  version=${baseline.version}`);
   console.log(
-    `covered=${baseline.covered}  partial=${baseline.partial}  skipped=${baseline.skipped}  total=${baseline.cardCount}`,
+    `covered=${baseline.covered}  partial=${baseline.partial}  skipped=${baseline.skipped}  total=${baseline.cardCount}  tokens=${baseline.tokenCount}`,
   );
   if (baseline.skipped > 0) {
     console.log("skip reasons:");
@@ -281,7 +303,9 @@ function verify(): number {
   }
 
   if (diffs.length === 0) {
-    console.log("\nOK — all cards match baseline.");
+    console.log(
+      `\nOK — all cards match baseline (${actual.tokenCount} tokens).`,
+    );
     return 0;
   }
 
@@ -333,4 +357,9 @@ function main(): void {
   process.exit(verify());
 }
 
-main();
+const isMain =
+  process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
+
+if (isMain) {
+  main();
+}
