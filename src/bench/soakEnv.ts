@@ -102,13 +102,19 @@ export type HistoryRingEntry = {
 
 const HISTORY_RING_MAX = 10;
 
-/** Top-level state fields mutated before history.ts snapshots during headless play. */
+/**
+ * Top-level state fields mutated before history.ts snapshots during headless play,
+ * or trigger-candidate cache bookkeeping that may differ ±1 across undo/redo without
+ * changing gameplay outcomes. History soak comparisons (single-step, deep-chain, and
+ * re-execute) all use this list via `historyIgnoreFields`.
+ */
 export const PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS = [
   "deferDeathTriggers",
   "gameTick",
   "lastDrawnCard",
   "lastDrawnCards",
   "lastSummoned",
+  "zoneVersion",
 ] as const;
 
 export type ActionTelemetry = {
@@ -1022,7 +1028,9 @@ export async function runSoakGame(
   const nonUndoableActionTypes = new Set<string>();
   const playBlockedLog: SoakGameResult["playBlockedLog"] = [];
   const zeroCommitLog: NonNullable<SoakGameResult["zeroCommitLog"]> = [];
-  const historyIgnoreFields = opts.historyIgnoreFields ?? [];
+  const historyIgnoreFields =
+    opts.historyIgnoreFields ??
+    (opts.historyCheck ? [...PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS] : []);
   const dispatchPath = opts.dispatch ?? DEFAULT_SOAK_DISPATCH;
   const historyReExecute = opts.historyReExecute ?? false;
   let unsubHistoryReset: (() => void) | undefined;
