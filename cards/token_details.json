@@ -1520,7 +1520,7 @@
             "op": "keyword",
             "action": "remove",
             "target": "ally:last_summoned",
-            "keyword": "LastWords"
+            "keywords": ["LastWords"]
           }
         ]
       }
@@ -2516,8 +2516,7 @@
             "op": "add_to_hand",
             "source": "copy",
             "target": "selected:follower",
-            "count": 1,
-            "reveal": false
+            "count": 1
           },
           {
             "op": "cost",

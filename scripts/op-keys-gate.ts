@@ -210,7 +210,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
   keyword: new Set([
     "action",
     "keywords",
-    "keyword",
     "target",
     "player",
     "select",
