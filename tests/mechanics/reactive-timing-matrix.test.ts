@@ -35,38 +35,7 @@ vi.mock("../../src/ui/render.js", () => ({ logEvent: vi.fn() }));
  */
 const KNOWN_FAILURES: Partial<
   Record<string, { msg: string; engine: string; assertion: string }>
-> = {
-  "C6_target_resume|ally_follower_enter": {
-    msg: "undo/redo snapshot drift after target resume (enter)",
-    engine:
-      "captureSnapshot / history.ts — post-CHOOSE_TARGET resume tail does not round-trip",
-    assertion: "undo/redo canonical snapshot mismatch",
-  },
-  "C6_target_resume|ally_follower_leaves_field": {
-    msg: "undo/redo snapshot drift after target resume (leaves)",
-    engine:
-      "captureSnapshot / history.ts — post-CHOOSE_TARGET resume tail does not round-trip",
-    assertion: "undo/redo canonical snapshot mismatch",
-  },
-  "C6_target_resume|ally_draw": {
-    msg: "undo/redo snapshot drift after target resume (draw)",
-    engine:
-      "captureSnapshot / history.ts — post-CHOOSE_TARGET resume tail does not round-trip",
-    assertion: "undo/redo canonical snapshot mismatch",
-  },
-  "C6_target_resume|leader_damaged": {
-    msg: "undo/redo snapshot drift after target resume (leader_damaged counter)",
-    engine:
-      "captureSnapshot / history.ts — watcher counters.earth not restored on redo after CHOOSE_TARGET resume",
-    assertion: "undo/redo canonical snapshot mismatch (counters.earth 1 vs 0)",
-  },
-  "C6_target_resume|leading_gate": {
-    msg: "undo/redo drift with leading-gate watcher after resume",
-    engine:
-      "captureSnapshot / history.ts — gated watcher state does not round-trip after target resume",
-    assertion: "undo/redo canonical snapshot mismatch",
-  },
-};
+> = {};
 
 function cellKey(context: RaisingContext, event: ReactiveEvent): string {
   return `${context}|${event}`;
