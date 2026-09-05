@@ -5,7 +5,7 @@ import { runEffects } from "./effects/index.js";
 import { clearSelectableFlags } from "./targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { doAction } from "../../core/history.js";
-import type { Player } from "../../core/types/index.js";
+import type { Player, CardInstance } from "../../core/types/index.js";
 import type { TargetedOpContext } from "./targeting/index.js";
 
 import { applyTargetClick } from "./targeting/index.js";
@@ -23,7 +23,9 @@ import {
   completeDeferredLwAfterSelection,
   resumeDeferredDeathIfIdle,
   cleanupDead,
+  flushDeferredDeathBatch,
 } from "./cleanup.js";
+import { clearResolutionQueue } from "./triggers/queue.js";
 import { flushDeferredDeckShuffle } from "../effects/ops/returnHandToDeck.js";
 import { flushDeferredOnFuse } from "../effects/ops/fuse/types.js";
 import { finishFollowerEnter } from "../effects/ops/summon_ops/core.js";
@@ -75,46 +77,75 @@ export function resolvePendingTarget(uid: string | "leader") {
  * - See docs/targeting-contract.md
  */
 function orchestrateExecution(opCtx: TargetedOpContext) {
-  const result = dispatchTargetedOp(opCtx);
+  (state as any).deferDeathTriggers = true;
+  let result: ReturnType<typeof dispatchTargetedOp>;
+  try {
+    result = dispatchTargetedOp(opCtx);
+  } catch (e) {
+    (state as any).deferDeathTriggers = false;
+    throw e;
+  }
 
   if (result.kind === "handled") {
-    flushDeferredOnFuse();
-    const playFollowerResume = (state.pendingTargetEffect?.resumePlayFollower ??
-      (state as any).resumePlayFollower) as PlayFollowerResume | undefined;
-    const deferredLwComplete = state.pendingTargetEffect?.deferredLwComplete as
-      | { cardUid: string; owner: Player }
-      | undefined;
-
-    // Standard cleanup for ALL handled ops (Contract Step 3)
-    delete state.pendingTargetEffect;
-    delete (state as any).resumePlayFollower;
-    clearSelectableFlags();
-    adapter.hideTargetConfirmation();
-
-    // Deaths from the targeted mutation resolve here — not inside handlers
-    // (handlers must not call cleanupDead / runEffects; see targeting-contract).
-    if (result.deferredEnter?.length) {
-      for (const { card, owner } of result.deferredEnter) {
-        finishFollowerEnter(card, owner);
-      }
-    }
-    cleanupDead();
-
-    if (opCtx.resumeEffects?.length) {
-      runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
-    }
-    flushDeferredDeckShuffle(opCtx.owner);
-
-    if (playFollowerResume) {
-      runPlayFollowerPostFanfare(playFollowerResume);
-    }
-    completeDeferredLwAfterSelection(deferredLwComplete);
-    resumeDeferredDeathIfIdle();
-
-    // Render after targeted op completes for immediate visual feedback
-    adapter.render();
+    flushTargetedOpAfterHandler(opCtx, result);
+  } else {
+    (state as any).deferDeathTriggers = false;
   }
   // If paused, orchestrator relinquishes control (no cleanup).
+}
+
+/** Drain deferred deaths/reactive triggers raised during a targeted-op handler. */
+function flushTargetedOpAfterHandler(
+  opCtx: TargetedOpContext,
+  result: { kind: "handled"; deferredEnter?: { card: CardInstance; owner: Player }[] },
+) {
+  flushDeferredOnFuse();
+  const playFollowerResume = (state.pendingTargetEffect?.resumePlayFollower ??
+    (state as any).resumePlayFollower) as PlayFollowerResume | undefined;
+  const deferredLwComplete = state.pendingTargetEffect?.deferredLwComplete as
+    | { cardUid: string; owner: Player }
+    | undefined;
+
+  // Standard cleanup for ALL handled ops (Contract Step 3)
+  delete state.pendingTargetEffect;
+  delete (state as any).resumePlayFollower;
+  clearSelectableFlags();
+  adapter.hideTargetConfirmation();
+
+  if (result.deferredEnter?.length) {
+    for (const { card, owner } of result.deferredEnter) {
+      finishFollowerEnter(card, owner);
+    }
+  }
+
+  // Deaths from the targeted mutation batch while deferDeathTriggers was set.
+  cleanupDead();
+  (state as any).deferDeathTriggers = false;
+
+  if (opCtx.resumeEffects?.length) {
+    runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
+  }
+  flushDeferredDeckShuffle(opCtx.owner);
+
+  if (playFollowerResume) {
+    runPlayFollowerPostFanfare(playFollowerResume);
+  }
+  completeDeferredLwAfterSelection(deferredLwComplete);
+
+  // Reactive triggers / deaths raised inside the handler drain after it returns.
+  if (
+    !state.pendingTargetEffect &&
+    !(state as any)._drainingResolutionQueue
+  ) {
+    flushDeferredDeathBatch();
+    if (!state.pendingTargetEffect) {
+      clearResolutionQueue();
+    }
+  }
+  cleanupDead();
+  resumeDeferredDeathIfIdle();
+
+  adapter.render();
 }
 
 // UI Bridge

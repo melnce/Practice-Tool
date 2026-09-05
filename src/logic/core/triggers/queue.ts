@@ -9,7 +9,8 @@
  * - ally_follower_attacked, enemy_follower_attacked, leader_attacked — combat watchers
  * - self_damaged — when combatResolutionDepth > 0 (combat damage batch flush)
  *
- * REACTIVE when _runEffectsDepth > 0 (queued, conditions judged at enqueue):
+ * REACTIVE when _runEffectsDepth > 0 or a targeted-op handler is active (queued,
+ * conditions judged at enqueue):
  * - ally_follower_enter, enemy_follower_enter
  * - ally_follower_played
  * - ally_follower_leaves_field, enemy_follower_leaves_field
@@ -32,6 +33,7 @@ import type { CardInstance, Player } from "../../../core/types/index.js";
 import type { TriggerContext, TriggerEventName } from "./types.js";
 import type { QueuedTriggerEntry } from "./process.js";
 import { dispatchEvent } from "./dispatcher.js";
+import { isTargetedOpDispatchActive } from "../targeting/guards.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 
 export const MAX_RESOLUTION_QUEUE_LENGTH = 500;
@@ -100,7 +102,7 @@ export function getRunEffectsDepth(): number {
 export function shouldQueueReactiveTrigger(
   eventName: TriggerEventName,
 ): boolean {
-  if (getRunEffectsDepth() <= 0) return false;
+  if (getRunEffectsDepth() <= 0 && !isTargetedOpDispatchActive()) return false;
   if (TURN_BOUNDARY_EVENTS.has(eventName)) return false;
 
   const combatDepth = ((state as any).combatResolutionDepth ?? 0) as number;
