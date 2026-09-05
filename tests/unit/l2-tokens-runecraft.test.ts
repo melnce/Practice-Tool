@@ -32,11 +32,13 @@ import {
   faithCrestNameForCard,
   bootstrapFaithForPlayer,
 } from "../../src/logic/faith/bootstrap.js";
+import { getLogs, clearLogs } from "../../src/core/logger.js";
 import {
   getBoard,
   getHand,
   getHP,
   getPP,
+  getCrests,
 } from "../../src/core/playerHelpers.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import "../../src/logic/core/effects/index.js";
@@ -82,6 +84,7 @@ const BLAZE_DESTROYER = "10032120";
 const CRYSTALSPAWN = "10631110";
 
 const CALGE_FAITH = faithCrestNameForCard("Calge-Danthla, Eld Crystals");
+const DEPTHS_SEED = 42;
 
 const R6 = 6;
 const R7 = 7;
@@ -252,6 +255,26 @@ function setupCalgeFaith(amount: number): void {
     state.players.first.hand,
   );
   crestAddCounter("first", CALGE_FAITH, "faith", amount);
+}
+
+function readRandomSplit(): { total: number; parts: Record<string, number> } {
+  const entry = getLogs()
+    .slice()
+    .reverse()
+    .find((e) => e.type === "randomSplit");
+  expect(entry, "randomSplit event").toBeTruthy();
+  return entry!.details as { total: number; parts: Record<string, number> };
+}
+
+function setupDepthsFaith(amount: number, hp?: number): void {
+  setupTurn(R10, {
+    hand: [DEPTHS_ELD_CRYSTALS],
+    pp: 6,
+    deck: [CALGE_DANTHLA, ...Array(39).fill(FILLER)],
+    hp,
+    seed: DEPTHS_SEED,
+  });
+  setupCalgeFaith(amount);
 }
 
 describe("L2 — Runecraft tokens", () => {
@@ -883,38 +906,84 @@ describe("L2 — Runecraft tokens", () => {
       expect(added[0]!.tribes).toContain("Encroacher");
     });
 
-    it.fails(
-      "on play: summons a Crystalspawn — token 90034330 un-encoded (spell: []); faith 5 yields 0 Crystalspawn on board",
-      () => {
-        setupTurn(R10, { hand: [DEPTHS_ELD_CRYSTALS], pp: 6 });
-        setupCalgeFaith(5);
-        whenPlayCard("first", 0);
-        expect(
-          thenBoard("first").filter((c) => c.id === CRYSTALSPAWN),
-        ).toHaveLength(1);
-      },
-    );
+    it("on play: summons a Crystalspawn with +X/+X from faith split", () => {
+      (globalThis as any).HEADLESS = false;
+      clearLogs();
+      setupDepthsFaith(5);
+      const uidsBefore = boardUids();
+      whenPlayCard("first", 0);
+      const { parts } = readRandomSplit();
+      const X = parts.X ?? 0;
+      const Y = parts.Y ?? 0;
+      const Z = parts.Z ?? 0;
+      expect(X + Y + Z).toBe(5);
+      const summoned = newBoardCards(uidsBefore, "first", CRYSTALSPAWN);
+      expect(summoned).toHaveLength(1);
+      const spawn = summoned[0]!;
+      expect(Number(spawn.attack)).toBe(1 + X);
+      expect(Number(spawn.defense)).toBe(1 + X);
+      applyKeywordsFromList(spawn);
+      expect(hasKeyword(spawn, "Rush")).toBe(true);
+      expect(printed).toContain("Summon a Crystalspawn");
+    });
 
-    it.fails(
-      "on play: restores Y defense to your leader — token 90034330 un-encoded (spell: []); faith 5 at 15 HP stays 15",
-      () => {
-        setupTurn(R10, { hand: [DEPTHS_ELD_CRYSTALS], pp: 6, hp: 15 });
-        setupCalgeFaith(5);
-        whenPlayCard("first", 0);
-        expect(getHP(state, "first")).toBe(16);
-      },
-    );
+    it("on play: restores Y defense to your leader", () => {
+      (globalThis as any).HEADLESS = false;
+      clearLogs();
+      setupDepthsFaith(5, 15);
+      whenPlayCard("first", 0);
+      const Y = readRandomSplit().parts.Y ?? 0;
+      expect(getHP(state, "first")).toBe(15 + Y);
+      expect(printed).toContain("Restore Y defense");
+    });
 
-    it.fails(
-      "on play: deals Z damage to the enemy leader — token 90034330 un-encoded (spell: []); faith 5 leaves enemy leader at 15 not 20",
-      () => {
-        setupTurn(R10, { hand: [DEPTHS_ELD_CRYSTALS], pp: 6 });
-        setupCalgeFaith(5);
-        state.players.second.hp = 20;
+    it("on play: deals Z damage to the enemy leader", () => {
+      (globalThis as any).HEADLESS = false;
+      clearLogs();
+      setupDepthsFaith(5);
+      state.players.second.hp = 20;
+      whenPlayCard("first", 0);
+      const Z = readRandomSplit().parts.Z ?? 0;
+      expect(getHP(state, "second")).toBe(20 - Z);
+      expect(printed).toContain("Deal Z damage");
+    });
+
+    it("faith 0: plain 1/1 Crystalspawn, no heal or damage, faith not spent", () => {
+      (globalThis as any).HEADLESS = false;
+      clearLogs();
+      setupDepthsFaith(0);
+      state.players.first.hp = 15;
+      state.players.second.hp = 20;
+      const faithBefore =
+        getCrests(state, "first").find((c) => c.name === CALGE_FAITH)?.counters
+          ?.faith ?? 0;
+      whenPlayCard("first", 0);
+      const split = readRandomSplit();
+      expect(split.total).toBe(0);
+      expect(split.parts).toEqual({ X: 0, Y: 0, Z: 0 });
+      const spawn = thenBoard("first").find((c) => c.id === CRYSTALSPAWN)!;
+      expect(Number(spawn.attack)).toBe(1);
+      expect(Number(spawn.defense)).toBe(1);
+      expect(getHP(state, "first")).toBe(15);
+      expect(getHP(state, "second")).toBe(20);
+      expect(faithBefore).toBe(0);
+      const faithAfter =
+        getCrests(state, "first").find((c) => c.name === CALGE_FAITH)?.counters
+          ?.faith ?? 0;
+      expect(faithAfter).toBe(1);
+    });
+
+    it("draw is deterministic for the same seed", () => {
+      (globalThis as any).HEADLESS = false;
+      const drawOnce = () => {
+        resetUidCounter();
+        clearLogs();
+        setupDepthsFaith(5);
         whenPlayCard("first", 0);
-        expect(getHP(state, "second")).toBe(15);
-      },
-    );
+        return readRandomSplit().parts;
+      };
+      expect(drawOnce()).toEqual(drawOnce());
+    });
   });
 
   describe("Ersatz Elimination (90034310)", () => {

@@ -17,4 +17,5 @@ export const MISC_OPS = [
   "with_source",
   "set_deckout_victory",
   "boost_skybound_art_hand",
+  "random_split",
 ] as const;
