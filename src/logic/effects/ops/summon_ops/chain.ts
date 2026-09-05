@@ -4,11 +4,7 @@ import { logEvent } from "../../../../core/logger.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import { boardOf } from "./utils.js";
-import {
-  setRally,
-  getRally,
-  opponentOf,
-} from "../../../../core/playerHelpers.js";
+import { setRally, getRally } from "../../../../core/playerHelpers.js";
 import {
   bumpZoneVersion,
   stampBoardEntryTs,
@@ -155,15 +151,14 @@ export function handleFillBoardChainDecay(
     recordFollowerEnter(state, owner, clone);
 
     // Per-enter hooks & triggers (keep parity with pushToBoard)
-    // Fire ally trigger for owner, enemy trigger for opponent
-    const opponent = opponentOf(owner);
+    // Fire ally trigger for owner, enemy trigger for acting side (entering owner)
     const enterCtx = {
       enteringCard: clone,
       enteringOwner: owner,
       enteringKeywordSnapshot: snapshotEnteringKeywords(clone),
     };
     fireTrigger("ally_follower_enter", owner, enterCtx);
-    fireTrigger("enemy_follower_enter", opponent, enterCtx);
+    fireTrigger("enemy_follower_enter", owner, enterCtx);
 
     // Next link in the chain is the clone we just placed
     prev = clone;

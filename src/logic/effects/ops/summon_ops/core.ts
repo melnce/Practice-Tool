@@ -7,11 +7,7 @@ import type {
 } from "../../../../core/types/index.js";
 import { initAmulet, initFollower } from "./init.js";
 import { isFollower, isAmulet } from "./utils.js";
-import {
-  opponentOf,
-  setRally,
-  getRally,
-} from "../../../../core/playerHelpers.js";
+import { setRally, getRally } from "../../../../core/playerHelpers.js";
 import {
   bumpZoneVersion,
   stampBoardEntryTs,
@@ -75,13 +71,12 @@ export function finishFollowerEnter(card: CardInstance, owner: Player) {
   }
 
   if (isFollower(card)) {
-    const opponent = opponentOf(owner);
     const enterCtx = {
       enteringCard: card,
       enteringOwner: owner,
       enteringKeywordSnapshot: snapshotEnteringKeywords(card),
     };
     fireTrigger("ally_follower_enter", owner, enterCtx);
-    fireTrigger("enemy_follower_enter", opponent, enterCtx);
+    fireTrigger("enemy_follower_enter", owner, enterCtx);
   }
 }

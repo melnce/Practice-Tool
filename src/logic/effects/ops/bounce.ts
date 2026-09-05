@@ -18,7 +18,7 @@ import type {
   Player,
   EffectContext,
 } from "../../../core/types/index.js";
-import { getBoard, getHand, opponentOf } from "../../../core/playerHelpers.js";
+import { getBoard, getHand } from "../../../core/playerHelpers.js";
 
 // Create a fresh base copy (new uid)
 function freshBaseCopyByName(name: string) {
@@ -80,10 +80,8 @@ export function bounceToHand(card: CardInstance) {
     return; // Card not on a board; ignore.
   }
 
-  // Fire ally trigger for owner, enemy trigger for opponent
-  const opponent = opponentOf(owner);
   fireTrigger("ally_follower_leaves_field", owner);
-  fireTrigger("enemy_follower_leaves_field", opponent);
+  fireTrigger("enemy_follower_leaves_field", owner);
 
   const [removed] = fromArr.splice(fromArr.indexOf(card), 1);
   if (!removed) return;
