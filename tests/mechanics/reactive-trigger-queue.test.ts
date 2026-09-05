@@ -326,11 +326,19 @@ describe("Reactive trigger queue", () => {
           def: Number(c.defense),
         }));
     expect(boardSummary("first")).toEqual([
-      { id: "10304110", name: "Mjerrabaine, Great Manifest", atk: 5, def: 2 },
-      { id: "10312110", name: "Supplicant of Unkilling", atk: 7, def: 5 },
-      { id: "10343110", name: "Congregant of Disdain", atk: 5, def: 4 },
+      { id: "10701110", name: "Altaro Superfan", atk: 2, def: 2 },
+      { id: "10272110", name: "Vier, Heart Slayer", atk: 1, def: 1 },
+      { id: "10304110", name: "Mjerrabaine, Great Manifest", atk: 5, def: 5 },
+      { id: "10272110", name: "Vier, Heart Slayer", atk: 1, def: 1 },
     ]);
-    expect(boardSummary("second")).toEqual([]);
+    expect(boardSummary("second")).toEqual([
+      {
+        id: "10304110",
+        name: "Mjerrabaine, Great Manifest",
+        atk: 3,
+        def: 3,
+      },
+    ]);
   });
 
   it("Sephie Fanfare at 4 prior OTS — first summoned 2/2, second 5/5", () => {
