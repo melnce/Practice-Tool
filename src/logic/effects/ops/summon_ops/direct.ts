@@ -11,7 +11,7 @@ import {
   getCardDetails,
   isCardDatabaseInitialized,
 } from "../../../../data/cardIndex.js";
-import { makeCardFromDB, pushToBoard } from "./core.js";
+import { makeCardFromDB, pushToBoard, boardHasRoom } from "./core.js";
 import { boardOf, safeClone } from "./utils.js";
 import { isEarthSigil, tryMergeIntoExistingEarthSigil } from "./earth.js";
 
@@ -71,7 +71,7 @@ export function summonExactCopy(
   if (!sourceCard || sourceCard.type !== "Follower") return null;
 
   const board = boardOf(owner);
-  if ((board?.length || 0) >= 5) return null;
+  if (!boardHasRoom(board)) return null;
 
   // Deep clone current instance (no cycles)
   const clone =

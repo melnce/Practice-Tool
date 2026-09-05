@@ -2,14 +2,14 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 import type { Player } from "../../../../core/types/index.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
-import { makeCardFromDB, pushToBoard } from "./core.js";
+import { makeCardFromDB, pushToBoard, boardHasRoom } from "./core.js";
 import { boardOf } from "./utils.js";
 
 export function reanimateSummon(c: any, owner: Player) {
   if (!c || c.type !== "Follower") return;
 
   const board = boardOf(owner);
-  if (board.length >= 5) return;
+  if (!boardHasRoom(board)) return;
 
   const base = getCardDetails(c.id) || getCardDetails(c.name);
   if (!base) return;

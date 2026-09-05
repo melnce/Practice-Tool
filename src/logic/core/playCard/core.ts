@@ -70,7 +70,8 @@ export function playCardCore(
   setPlaysThisTurn(state, player, getPlaysThisTurn(state, player) + 1);
 
   // Enhanced-play watchers (Faith / crests) — fire once the Enhance cost is paid.
-  if (plan.mode === "enhance") {
+  // Followers/amulets fire after entering the field (see playFollower/playAmulet).
+  if (plan.mode === "enhance" && card.type === "Spell") {
     fireTrigger("enhanced_play", player, { playedCard: card });
   }
 
@@ -98,9 +99,13 @@ export function playCardCore(
   if (card.type === "Spell") {
     return playSpell(card, player, plan.cost, plan.enhanceTiers);
   } else if (card.type === "Follower") {
-    return playFollower(card, player, plan.enhanceTiers);
+    return playFollower(card, player, plan.enhanceTiers, {
+      enhancedPlay: plan.mode === "enhance",
+    });
   } else if (card.type === "Amulet") {
-    return playAmulet(card, player, plan.enhanceTiers);
+    return playAmulet(card, player, plan.enhanceTiers, {
+      enhancedPlay: plan.mode === "enhance",
+    });
   }
 
   return { kind: "done" };

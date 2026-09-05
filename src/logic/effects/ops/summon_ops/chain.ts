@@ -15,6 +15,7 @@ import {
 } from "../../../core/triggers/utils.js";
 import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 import { recordFollowerEnter } from "../../../core/followerEnterHistory.js";
+import { countRealBoardCards } from "./core.js";
 
 // =============== Generic Board Fill Chain ===============
 
@@ -132,14 +133,13 @@ export function handleFillBoardChainDecay(
 
   // Chain from the *latest* instance; stop if DEF would drop to 0 or board is full.
   let prev = enteringCard;
-  while (board.length < 5) {
+  while (countRealBoardCards(board) < 5) {
     const nextDef = (parseInt(String(prev.defense), 10) || 0) - 1;
     if (nextDef <= 0) break;
 
     const clone = makeChainDecayClone(prev, owner);
 
-    // Respect max board size
-    if (board.length >= 5) break;
+    if (countRealBoardCards(board) >= 5) break;
     stampBoardEntryTs(clone);
     board.push(clone);
     bumpZoneVersion();

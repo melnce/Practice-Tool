@@ -12,7 +12,9 @@ import { pushPlayedHistory } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
 import { getBoard } from "../../../core/playerHelpers.js";
-import { bumpZoneVersion, stampBoardEntryTs } from "../triggers/utils.js";
+import { stampBoardEntryTs } from "../triggers/utils.js";
+import { fireTrigger } from "../triggers.js";
+import { pushToBoard } from "../../effects/ops/summon_ops/core.js";
 import { snapshotEnteringKeywords } from "../enterKeywords.js";
 import {
   stashPlayFollowerResume,
@@ -29,6 +31,7 @@ export function playFollower(
   card: CardInstance,
   player: Player,
   chosenTiers: { effects: Effect[] }[] | null = [],
+  opts?: { enhancedPlay?: boolean },
 ): PlayOutcome {
   const tiers = chosenTiers ?? [];
   pushPlayedHistory(player, card);
@@ -63,9 +66,13 @@ export function playFollower(
 
   const toBoard = getBoard(state, player);
   stampBoardEntryTs(card, { advance: true });
-  toBoard.push(card);
-  // Invalidate trigger-candidate cache (mid-turn scans must see this follower).
-  bumpZoneVersion();
+  if (!pushToBoard(toBoard, player, card, { deferEnter: true })) {
+    return { kind: "blocked", reason: "Board is full." };
+  }
+
+  if (opts?.enhancedPlay) {
+    fireTrigger("enhanced_play", player, { playedCard: card });
+  }
 
   const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
 
