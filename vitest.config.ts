@@ -21,7 +21,6 @@ export default mergeConfig(
         "tests/golden/**/*.test.ts",
       ],
       exclude: [
-        "tests/legacy/**",
         "tests/_dev/**",
         "tests/audit/**",
         "tests/specs/**",

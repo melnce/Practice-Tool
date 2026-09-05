@@ -1,20 +1,21 @@
+/**
+ * Trigger module invariants — ordering, dedupe, condition bypass rules.
+ */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   fireTrigger,
   registerRunEffects,
 } from "../../src/logic/core/triggers.js";
 import { state, resetGameState } from "../../src/core/gameState.js";
-import { CardInstance } from "../../src/core/types/index.js";
+import type { CardInstance } from "../../src/core/types/index.js";
 
-// Mock minimal dependencies
 vi.mock("../../src/ui/render.js", () => ({ logEvent: vi.fn() }));
 vi.mock("../../src/logic/core/logger.js", () => ({ logEvent: vi.fn() }));
 
-describe("Trigger Module Invariants", () => {
-  let effectSpy: any;
+describe("Trigger module invariants", () => {
+  let effectSpy: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    // Reset state using nested player structure
     resetGameState(1);
     state.players.first.board = [];
     state.players.second.board = [];
@@ -24,7 +25,6 @@ describe("Trigger Module Invariants", () => {
     state.players.second.crests = [];
     (state as any).turnNumber = 1;
     state.activePlayer = "first";
-    state.activePlayer = "first"; // Source of truth for player turn
 
     effectSpy = vi.fn();
     registerRunEffects(effectSpy);
@@ -38,11 +38,11 @@ describe("Trigger Module Invariants", () => {
     id: number,
     owner: string,
     zone: string,
-    triggers: any[],
+    triggers: object[],
   ): CardInstance {
     return {
       uid: id,
-      id: id,
+      id,
       name: `Card ${id}`,
       triggers,
       keywordState: { triggers: [] },
@@ -54,33 +54,41 @@ describe("Trigger Module Invariants", () => {
     } as unknown as CardInstance;
   }
 
-  it("Invariant: Execution Order (C2 eight-tier priority)", () => {
+  it("execution order: hand → crest → active board → reactive board", () => {
     const event = "TEST_EVENT";
-    const crest = {
-      name: "Crest",
-      triggers: [{ event, effects: [{ type: "log", value: "CREST" }] }],
-    };
-    state.players.first.crests = [crest] as any;
-    const c1 = createCard(1, "first", "board", [
+    state.players.first.crests = [
       {
-        event,
-        effects: [{ type: "log", value: "BLUE_BOARD" }],
-        source: "board",
+        name: "Crest",
+        triggers: [{ event, effects: [{ type: "log", value: "CREST" }] }],
       },
-    ]);
-    state.players.first.board = [c1];
-    const c2 = createCard(2, "second", "board", [
-      {
-        event,
-        effects: [{ type: "log", value: "RED_BOARD" }],
-        source: "board",
-      },
-    ]);
-    state.players.second.board = [c2];
-    const c3 = createCard(3, "first", "hand", [
-      { event, effects: [{ type: "log", value: "BLUE_HAND" }], source: "hand" },
-    ]);
-    state.players.first.hand = [c3];
+    ] as any;
+    state.players.first.board = [
+      createCard(1, "first", "board", [
+        {
+          event,
+          effects: [{ type: "log", value: "BLUE_BOARD" }],
+          source: "board",
+        },
+      ]),
+    ];
+    state.players.second.board = [
+      createCard(2, "second", "board", [
+        {
+          event,
+          effects: [{ type: "log", value: "RED_BOARD" }],
+          source: "board",
+        },
+      ]),
+    ];
+    state.players.first.hand = [
+      createCard(3, "first", "hand", [
+        {
+          event,
+          effects: [{ type: "log", value: "BLUE_HAND" }],
+          source: "hand",
+        },
+      ]),
+    ];
 
     fireTrigger(event, "first", {});
 
@@ -89,50 +97,49 @@ describe("Trigger Module Invariants", () => {
     expect(calls).toEqual(["BLUE_HAND", "CREST", "BLUE_BOARD", "RED_BOARD"]);
   });
 
-  it("Invariant: Loot Fused Dedupe (Once per turn per initiator)", () => {
+  it("loot_fused: dedupes once per turn per initiator", () => {
     const initiator = createCard(99, "first", "hand", []);
-
     const recipient = createCard(10, "first", "board", [
       { event: "loot_fused", effects: [{ type: "ping" }], source: "board" },
     ]);
     state.players.first.board = [recipient];
 
-    // Fire 1
     fireTrigger("loot_fused", "first", { initiator });
     expect(effectSpy).toHaveBeenCalledTimes(1);
 
-    // Fire 2 (Same turn)
     fireTrigger("loot_fused", "first", { initiator });
     expect(effectSpy).toHaveBeenCalledTimes(1);
 
-    // Fire 3 (New turn)
     (state as any).turnNumber = 2;
     fireTrigger("loot_fused", "first", { initiator });
     expect(effectSpy).toHaveBeenCalledTimes(2);
   });
 
-  it("Invariant: Once Per Turn (Generic)", () => {
+  it("once_per_turn: generic trigger fires only once per turn", () => {
     const event = "OPT_TEST";
-    const c1 = createCard(100, "first", "board", [
-      { event, effects: [{ type: "e" }], once_per_turn: true, source: "board" },
-    ]);
-    state.players.first.board = [c1];
+    state.players.first.board = [
+      createCard(100, "first", "board", [
+        {
+          event,
+          effects: [{ type: "e" }],
+          once_per_turn: true,
+          source: "board",
+        },
+      ]),
+    ];
 
-    // Fire 1
     fireTrigger(event, "first", {});
     expect(effectSpy).toHaveBeenCalledTimes(1);
 
-    // Fire 2
     fireTrigger(event, "first", {});
     expect(effectSpy).toHaveBeenCalledTimes(1);
 
-    // Reset turn
     (state as any).turnNumber = 2;
     fireTrigger(event, "first", {});
     expect(effectSpy).toHaveBeenCalledTimes(2);
   });
 
-  it("Invariant: Legacy Bypass (Clash ignores standard conditions)", () => {
+  it("clash: ignores standard conditions (legacy bypass)", () => {
     const c1 = createCard(200, "first", "board", [
       {
         event: "clash",
@@ -143,15 +150,16 @@ describe("Trigger Module Invariants", () => {
     ]);
     c1.attack = 5;
     state.players.first.board = [c1];
-    const context = {
+
+    fireTrigger("clash", "first", {
       attacker: c1,
       defender: createCard(201, "second", "board", []),
-    };
-    fireTrigger("clash", "first", context);
+    });
+
     expect(effectSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("Invariant: Strict Play Logic (No bypass for ally_follower_played check)", () => {
+  it("ally_follower_played: respects name condition (no bypass)", () => {
     const c1 = createCard(300, "first", "board", [
       {
         event: "ally_follower_played",
@@ -162,13 +170,11 @@ describe("Trigger Module Invariants", () => {
     ]);
     state.players.first.board = [c1];
 
-    // Play Alice
     fireTrigger("ally_follower_played", "first", {
       playedCard: { ...c1, name: "Alice", type: "Follower" } as any,
     });
     expect(effectSpy).toHaveBeenCalledTimes(0);
 
-    // Play Bob
     fireTrigger("ally_follower_played", "first", {
       playedCard: { ...c1, name: "Bob", type: "Follower" } as any,
     });

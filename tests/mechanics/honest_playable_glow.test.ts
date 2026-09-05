@@ -26,6 +26,10 @@ import {
 } from "../../src/core/history.js";
 import { getHand, getPP } from "../../src/core/playerHelpers.js";
 import { previewHandStats } from "../../src/helpers/enhance.js";
+import {
+  handleGainCrest,
+  crestAddCounter,
+} from "../../src/logic/effects/crest.js";
 import "../../src/logic/core/effects/index.js";
 
 const SPILLING_RED_SPEC = {
@@ -262,5 +266,51 @@ describe("Glow preflight cache performance", () => {
     expect(cachedMs).toBeLessThan(50);
     const perPassMs = cachedMs / iterations / 2;
     expect(perPassMs).toBeLessThan(5);
+  });
+});
+
+describe("Sham-Nacha faith threshold glow", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    (globalThis as any).HEADLESS = true;
+  });
+
+  it("10354110: enhance-ready glow when Faith ≥ 10, playable-glow below", () => {
+    givenGameState({ seed: 1 }).withFirstPP(10, 10).build();
+    handleGainCrest(
+      { name: "Faith: Sham-Nacha, Heir to Entwining" } as any,
+      "first",
+    );
+
+    const card = {
+      id: "10354110",
+      name: "Sham-Nacha, Heir to Entwining",
+      type: "Follower",
+      cost: 2,
+      fanfare: [],
+    } as any;
+    const ctx = {
+      state,
+      owner: "first" as const,
+      isPlayersTurn: true,
+      availablePP: 10,
+      isSpell: false,
+    };
+
+    crestAddCounter(
+      "first",
+      "Faith: Sham-Nacha, Heir to Entwining",
+      "faith",
+      9,
+    );
+    expect(computeHandGlow(card, ctx).glowClass).toBe("playable-glow");
+
+    crestAddCounter(
+      "first",
+      "Faith: Sham-Nacha, Heir to Entwining",
+      "faith",
+      1,
+    );
+    expect(computeHandGlow(card, ctx).glowClass).toBe("enhance-ready");
   });
 });

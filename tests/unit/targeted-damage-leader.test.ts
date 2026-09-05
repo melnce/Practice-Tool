@@ -19,6 +19,7 @@ import "../../src/logic/core/effects/index.js";
 
 const EPHEMERAL_FOXFIRE = "10843310";
 const RAVENING_TENTACLES = "10123310";
+const RAGE_OF_SERPENTS = "10153310";
 const FILLER = "90001110";
 
 function setupTurn(opts: {
@@ -148,6 +149,47 @@ describe("targeted damage — leader click and empty-board fallback", () => {
       expect(state.pendingTargetEffect).toBeUndefined();
 
       expect(getHP(state, "second")).toBe(15);
+    });
+  });
+
+  describe("Rage of Serpents (10153310) — fallback_leader + ally leader damage", () => {
+    const printed =
+      "Select an enemy follower on the field and deal it 3 damage. Deal 2 damage to your leader.";
+
+    it("follower target → 3 damage to follower, 2 to self leader, pending cleared", () => {
+      setupTurn({ hand: [RAGE_OF_SERPENTS], pp: 3 });
+      const target = enemyFollower(2, 3, "Target");
+      state.players.first.hp = 20;
+
+      whenPlayCard("first", 0);
+      expect(state.pendingTargetEffect).toBeDefined();
+      expect((target as any).__uiSelectable).toBe(true);
+
+      resolvePendingTarget(target.uid);
+
+      expect(state.pendingTargetEffect).toBeUndefined();
+      expect((target as any).__uiSelectable).toBeUndefined();
+      expect(target.defense).toBe(0);
+      expect(getHP(state, "first")).toBe(18);
+      expect(printed).toContain("deal it 3 damage");
+    });
+
+    it("follower present, click leader → enemy leader −3, self leader −2, pending cleared", () => {
+      setupTurn({ hand: [RAGE_OF_SERPENTS], pp: 3, secondHP: 20 });
+      const bystander = enemyFollower(2, 5, "Bystander");
+      state.players.first.hp = 20;
+
+      whenPlayCard("first", 0);
+      expect(state.pendingTargetEffect).toBeDefined();
+      expect((bystander as any).__uiSelectable).toBe(true);
+
+      resolvePendingTarget("leader");
+
+      expect(state.pendingTargetEffect).toBeUndefined();
+      expect((bystander as any).__uiSelectable).toBeUndefined();
+      expect(getHP(state, "second")).toBe(17);
+      expect(getHP(state, "first")).toBe(18);
+      expect(printed).toContain("Deal 2 damage to your leader");
     });
   });
 });

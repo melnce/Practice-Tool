@@ -1,7 +1,9 @@
+/**
+ * Engine dispatch golden path — start, end turn, undo, redo.
+ */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { startNewGame, dispatch, getState } from "../../src/engine.js";
+import { startNewGame, dispatch } from "../../src/engine.js";
 
-// Mock UI rendering to avoid DOM dependency in engine tests
 vi.mock("../../src/ui/render.js", () => ({
   render: vi.fn(),
   updateCounts: vi.fn(),
@@ -12,18 +14,16 @@ vi.mock("../../src/ui/render.js", () => ({
   wireHistoryImagePreview: vi.fn(),
 }));
 
-// Mock sound/assets if needed
 vi.mock("../../src/ui/dom.js", () => ({
   byId: () => document.createElement("div"),
-  clear: () => { },
-  wireClick: () => { },
+  clear: () => {},
+  wireClick: () => {},
   getDragData: () => "",
-  setDragData: () => { },
+  setDragData: () => {},
 }));
 
-describe("Engine Golden Path", () => {
-  beforeEach(async () => {
-    // Reset DOM environment mock
+describe("Engine dispatch golden path", () => {
+  beforeEach(() => {
     document.body.innerHTML = `
       <select id="blueDeckSelect"><option value="sample_blue">Blue</option></select>
       <select id="redDeckSelect"><option value="sample_red">Red</option></select>
@@ -32,7 +32,6 @@ describe("Engine Golden Path", () => {
       <div id="blueBoard"></div><div id="redBoard"></div>
       <div id="blueLeader"></div><div id="redLeader"></div>
     `;
-    // Add other necessary DOM elements if startNewGame assumes them
     ["blueHP", "redHP", "bluePP", "redPP", "blueShadows", "redShadows"].forEach(
       (id) => {
         const d = document.createElement("div");
@@ -42,35 +41,27 @@ describe("Engine Golden Path", () => {
     );
   });
 
-  it("should drive game state via dispatch", async () => {
-    // 1. Start Game
+  it("drives game state via dispatch (END_TURN, UNDO, REDO)", async () => {
     const stateStart = await startNewGame({
       deckAId: "sample_blue",
       deckBId: "sample_red",
       seed: 12345,
     });
+
     expect(stateStart).toBeDefined();
     expect(stateStart.activePlayer).toBe("first");
     expect(stateStart.roundCount).toBe(1);
 
-    // Store snapshot of initial state basics (now using nested player state)
     const initialFirstHandSize = stateStart.players.first.hand.length;
 
-    // 2. Dispatch Action: End Turn (First -> Second)
-    // We pass stateStart as "currentState" context, though currently engine uses singleton.
     const stateAfterEndTurn = dispatch(stateStart, { type: "END_TURN" });
-
     expect(stateAfterEndTurn.activePlayer).toBe("second");
-    // Second player draws a card at start of their turn
     expect(stateAfterEndTurn.players.second.hand.length).toBeGreaterThan(0);
 
-    // 3. Dispatch Action: Undo
     const stateRestored = dispatch(stateAfterEndTurn, { type: "UNDO" });
-
     expect(stateRestored.activePlayer).toBe("first");
     expect(stateRestored.players.first.hand.length).toBe(initialFirstHandSize);
 
-    // 4. Dispatch Action: Redo
     const stateRedone = dispatch(stateRestored, { type: "REDO" });
     expect(stateRedone.activePlayer).toBe("second");
   });
