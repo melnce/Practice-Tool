@@ -17,6 +17,9 @@ import {
 // CREST TYPES
 // =============================================================================
 
+/** Maximum active crest / faith slots per player (owner ruling 2026-09-05). */
+export const MAX_CREST_SLOTS = 5;
+
 /**
  * Event trigger attached to a crest (e.g., "end_of_turn_own")
  */
@@ -109,6 +112,16 @@ export function handleGainCrest(eff: Effect, owner: Player) {
   const crestName = (eff as any).name?.trim();
   if (!crestName || crests.some((c) => c.name === crestName)) {
     console.warn(`[Crest] Crest "${crestName}" already active or invalid.`);
+    return;
+  }
+
+  if (crests.length >= MAX_CREST_SLOTS) {
+    logEvent("crestBounce", {
+      owner: targetOwner,
+      crest: crestName,
+      reason: "slot_cap",
+      cap: MAX_CREST_SLOTS,
+    });
     return;
   }
 
