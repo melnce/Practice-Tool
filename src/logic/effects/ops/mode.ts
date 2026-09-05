@@ -206,7 +206,6 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
         /* allow duplicate object refs only when unique=false */
       }
     }
-    resumeDeferredDeathIfIdle();
     appendStep("Script Choice", {
       owner,
       picks: picked.map((p) => p?.label || p?.name || "(opt)"),
