@@ -122,7 +122,7 @@ type ConfirmHook = (() => void) | null;
 
 let confirmHook: ConfirmHook = null;
 
-function installSoakAdapter(): void {
+export function installSoakAdapter(): void {
   injectAdapter({
     showTargetConfirmationButton: (vm: {
       onConfirm: () => void;
@@ -613,10 +613,9 @@ export const CHOOSE_TARGET_ZERO_COMMIT_REASON =
   "CHOOSE_TARGET calls resolvePendingTarget → applyTargetClick (resolveTarget.ts); " +
   "no doAction until Confirm Targets (showConfirmationButton onConfirm).";
 
-/** Target-picker clicks may nest a history commit that does not bound the full click. */
 export const CHOOSE_TARGET_NESTED_COMMIT_REASON =
   "CHOOSE_TARGET nested commit (orchestrateExecution / targeted op doAction); " +
-  "round-trip skipped — use CONFIRM_TARGETS for confirm-step undo checks.";
+  "single-step round-trip skipped — deep ring still counts commits.";
 
 function formatHistoryMismatch(
   actionIndex: number,
@@ -835,7 +834,7 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
   return null;
 }
 
-function runDeepHistoryChain(
+export function runDeepHistoryChain(
   actionIndex: number,
   ring: HistoryRingEntry[],
   historyIgnoreFields: readonly string[],
@@ -1101,27 +1100,14 @@ export async function runSoakGame(
       actions++;
 
       if (opts.historyCheck && beforeSnap && legalBefore) {
-        const skipTargetPickerRoundTrip = action.type === "CHOOSE_TARGET";
-
-        if (historyCommits === 0 || skipTargetPickerRoundTrip) {
+        if (historyCommits === 0) {
           nonUndoableActionTypes.add(action.type);
-          if (historyCommits === 0 && telemetry.zeroCommitReason) {
+          if (telemetry.zeroCommitReason) {
             zeroCommitLog.push({
               actionIndex: actions,
               actionType: action.type,
               reason: telemetry.zeroCommitReason,
             });
-          } else if (skipTargetPickerRoundTrip && historyCommits > 0) {
-            zeroCommitLog.push({
-              actionIndex: actions,
-              actionType: action.type,
-              reason: `${CHOOSE_TARGET_NESTED_COMMIT_REASON} commits=${historyCommits}`,
-            });
-            commitSequence.push({
-              actionType: action.type,
-              commits: historyCommits,
-            });
-            // Nested targeted-op commits do not bound the picker click — omit from deep chain ring.
           }
         } else {
           const afterSnap = captureFullSnapshot();
@@ -1132,33 +1118,44 @@ export async function runSoakGame(
             commits: historyCommits,
           });
 
-          const roundTripErr = runHistoryRoundTrip({
-            actionIndex: actions,
-            action,
-            before: beforeSnap,
-            after: afterSnap,
-            legalBefore,
-            legalAfter,
-            policyRng,
-            historyCommits,
-            historyIgnoreFields,
-            historyReExecute,
-            dispatchPath,
-          });
-          if (roundTripErr) {
-            return {
-              ...base,
-              outcome: "history",
-              turns: state.turnNumber | 0,
-              actions,
-              finalHash: safeHash(),
-              error: roundTripErr,
-              findings: [roundTripErr],
-              nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
-              playBlockedLog,
-              zeroCommitLog,
-              commitSequence,
-            };
+          // Nested targeted-op commits on picker clicks do not bound the full
+          // selection for single-step undo — still count them in the deep ring.
+          const skipSingleStepRoundTrip = action.type === "CHOOSE_TARGET";
+          if (skipSingleStepRoundTrip) {
+            zeroCommitLog.push({
+              actionIndex: actions,
+              actionType: action.type,
+              reason: `${CHOOSE_TARGET_NESTED_COMMIT_REASON} commits=${historyCommits}`,
+            });
+          } else {
+            const roundTripErr = runHistoryRoundTrip({
+              actionIndex: actions,
+              action,
+              before: beforeSnap,
+              after: afterSnap,
+              legalBefore,
+              legalAfter,
+              policyRng,
+              historyCommits,
+              historyIgnoreFields,
+              historyReExecute,
+              dispatchPath,
+            });
+            if (roundTripErr) {
+              return {
+                ...base,
+                outcome: "history",
+                turns: state.turnNumber | 0,
+                actions,
+                finalHash: safeHash(),
+                error: roundTripErr,
+                findings: [roundTripErr],
+                nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+                playBlockedLog,
+                zeroCommitLog,
+                commitSequence,
+              };
+            }
           }
 
           historyRing.push({
