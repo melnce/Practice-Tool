@@ -3,6 +3,7 @@
 // UNIFIED DECK OPERATIONS
 // ========================================================================
 
+import { isDev } from "../../core/env.js";
 import { state } from "../../core/gameState.js";
 import { getCardDetails } from "../../data/cardDatabase.js";
 import { getSetCards } from "../../data/cardSets.js";
@@ -15,15 +16,15 @@ import { pickDestroyedMatchHighestBaseCost } from "../core/destroyedHistory.js";
 import { getCardById } from "../../data/cardDatabase.js";
 import { normalizeCardStats } from "../../core/cardStats.js";
 
-// ========================================================================
-// UNIFIED DECK HANDLER - routes by action field
-// ========================================================================
+/** Allowed deck.action values — must match handleDeck switch in deck.ts */
+export const DECK_ACTION_VALUES = new Set(["replace", "add", "cost"]);
 export function handleDeck(
   eff: any,
   owner: Player,
   context: any = {},
 ): void | "pending" {
   const action = eff.action || "replace";
+  const cardName = context.sourceCard?.name ?? "unknown";
 
   switch (action) {
     case "replace":
@@ -58,8 +59,13 @@ export function handleDeck(
       }
       break;
 
-    default:
-      console.warn(`[deck] Unknown action: ${action}`);
+    default: {
+      const msg = `[deck] Unknown action "${action}" in card ${cardName}`;
+      if (isDev()) {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+    }
   }
 }
 

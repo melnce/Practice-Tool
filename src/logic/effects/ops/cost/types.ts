@@ -1,6 +1,7 @@
 // src/logic/effects/ops/cost/types.ts
 
 import type { Effect } from "../../../../core/types/index.js";
+import { isDev } from "../../../../core/env.js";
 
 export type CostTarget =
   | "self"
@@ -10,6 +11,14 @@ export type CostTarget =
   | "last_drawn"
   | "last_added_to_hand";
 export type CostMode = "reduce" | "set" | "modify" | "increase";
+
+/** Allowed cost.action values — aliased to mode in normalizeToCostSpec */
+export const COST_ACTION_VALUES = new Set([
+  "reduce",
+  "set",
+  "modify",
+  "increase",
+]);
 
 export interface UnifiedCostSpec {
   op: "cost";
@@ -38,13 +47,14 @@ export function normalizeToCostSpec(eff: Effect): UnifiedCostSpec {
     // Card JSON sometimes uses "action" where the unified op expects "mode"
     if ((eff as any).mode === undefined && (eff as any).action) {
       const act = String((eff as any).action).toLowerCase();
-      if (
-        act === "reduce" ||
-        act === "set" ||
-        act === "modify" ||
-        act === "increase"
-      ) {
+      if (COST_ACTION_VALUES.has(act)) {
         (eff as any).mode = act;
+      } else {
+        const msg = `[cost] Unknown action "${(eff as any).action}"`;
+        if (isDev()) {
+          throw new Error(msg);
+        }
+        console.warn(msg);
       }
     }
 

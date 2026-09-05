@@ -15,6 +15,15 @@ import {
 } from "../../../core/keywords/remove.js";
 import type { KeywordEffectResult } from "../../../core/keywords/types.js";
 import { grantLeaderBarrier } from "../../leader.js";
+import { isDev } from "../../../../core/env.js";
+
+/** Allowed keyword.action values — must match handleKeyword switch in keyword/unified.ts */
+export const KEYWORD_ACTION_VALUES = new Set([
+  "grant",
+  "remove",
+  "silence",
+  "grant_trigger",
+]);
 
 export interface KeywordHandlerContext {
   owner: Player;
@@ -82,10 +91,15 @@ export function handleKeyword(
       return handleSilence(eff, ctx);
     case "grant_trigger":
       return handleGrantTrigger(eff, ctx);
-    default:
-      throw new Error(
-        `[keyword] Invalid action: "${action}". Must be "grant", "remove", "silence", or "grant_trigger".`,
-      );
+    default: {
+      const cardName = ctx.sourceCard?.name ?? "unknown";
+      const msg = `[keyword] Unknown action "${action}" in card ${cardName}`;
+      if (isDev()) {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+      return { kind: "done" };
+    }
   }
 }
 

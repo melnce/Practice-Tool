@@ -14,6 +14,9 @@ import type {
  */
 export type FuseAction = "start" | "finalize";
 
+/** Allowed fuse.action values — must match handleFuse in fuse/unified.ts */
+export const FUSE_ACTION_VALUES = new Set(["start", "finalize"]);
+
 /**
  * Type field values for action: finalize
  * Determines which class-specific finalizer to use

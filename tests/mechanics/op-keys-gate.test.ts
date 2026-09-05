@@ -1,0 +1,63 @@
+import { describe, it, expect } from "vitest";
+import {
+  checkOpKeysForCard,
+  checkTriggerConditionKeysForCard,
+} from "../../scripts/op-keys-gate.js";
+
+describe("op-keys gate — action enums", () => {
+  it("flags bogus pp action naming the card", () => {
+    const issues = checkOpKeysForCard({
+      id: "BOGUS_PP",
+      name: "Bogus PP Card",
+      description: "test",
+      fanfare: [{ op: "pp", action: "bogus", amount: 1 }],
+    });
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues[0]?.message).toMatch(/pp op.*unsupported action "bogus"/i);
+    expect(issues[0]?.name).toBe("Bogus PP Card");
+  });
+
+  it("allows known crest action", () => {
+    const issues = checkOpKeysForCard({
+      id: "OK_CREST",
+      name: "Ok Crest",
+      fanfare: [{ op: "crest", action: "gain", name: "Faith" }],
+    });
+    const actionIssues = issues.filter((i) => i.message.includes("action"));
+    expect(actionIssues).toHaveLength(0);
+  });
+});
+
+describe("op-keys gate — trigger condition keys", () => {
+  it("flags unknown trigger.condition key", () => {
+    const issues = checkTriggerConditionKeysForCard({
+      id: "BAD_TRIG",
+      name: "Bad Trigger",
+      description: "test",
+      triggers: [
+        {
+          type: "fanfare",
+          condition: { shadows_at_least: 1 },
+          effects: [],
+        },
+      ],
+    });
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues[0]?.message).toMatch(/unsupported key "shadows_at_least"/);
+  });
+
+  it("allows known trigger.condition key", () => {
+    const issues = checkTriggerConditionKeysForCard({
+      id: "OK_TRIG",
+      name: "Ok Trigger",
+      triggers: [
+        {
+          type: "fanfare",
+          condition: { tribe: "Golem" },
+          effects: [],
+        },
+      ],
+    });
+    expect(issues).toHaveLength(0);
+  });
+});

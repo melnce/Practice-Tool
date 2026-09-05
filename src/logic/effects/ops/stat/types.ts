@@ -14,6 +14,9 @@ export interface StatContext {
 
 export type StatAction = "give" | "set";
 
+/** Allowed stat.action values — must match handleStatOrchestrator branches */
+export const STAT_ACTION_VALUES = new Set(["give", "set"]);
+
 export type StatOp = Effect & {
   // Action field - determines add (default) or set
   action?: StatAction;

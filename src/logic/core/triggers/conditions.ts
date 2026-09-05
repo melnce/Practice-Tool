@@ -2,6 +2,7 @@ import type { TriggerContext, TriggerSpec } from "./types.js";
 import { state } from "../../../core/gameState.js";
 import type { CardInstance, Player } from "../../../core/types/index.js";
 import type { CardCondition } from "../conditions/evaluator.js";
+import { isDev } from "../../../core/env.js";
 
 import { evaluateCardCondition } from "../conditions/evaluator.js";
 import { mergeEnteringKeywordSnapshot } from "../enterKeywords.js";
@@ -11,6 +12,112 @@ import {
   hasPlayedBaseCostLadder,
   DEFAULT_FULL_COST_LADDER,
 } from "../playedBaseCostHistory.js";
+/**
+ * Allowlist for triggers[].condition and crest.triggers[].condition keys.
+ * Union of keys handled in evalCommonConditions and keys on CardCondition
+ * delegated to evaluateCardCondition (src/logic/core/conditions/evaluator.ts).
+ */
+export const TRIGGER_CONDITION_KEYS = new Set([
+  // evalCommonConditions — trigger routing / host gates
+  "whose_turn",
+  "is_ally",
+  "is_self",
+  "is_fuse_initiator",
+  "not_self",
+  "field_other_same_base_cost",
+  "own_turn",
+  "super_evolution_unlocked",
+  "played_base_cost_ladder",
+  "enemy_follower_count_gte",
+  // shared stat gates (host in triggers; subject via evaluator)
+  "attack_lte",
+  "attack_gte",
+  "attack_eq",
+  "defense_lte",
+  "defense_gte",
+  "defense_eq",
+  "still_alive",
+  // evaluateCardCondition / CardCondition
+  "type",
+  "class",
+  "tribe",
+  "exclude_tribe",
+  "has_keyword",
+  "keywords",
+  "exclude_keyword",
+  "base_cost_eq",
+  "base_cost_gte",
+  "base_cost_lte",
+  "base_cost_in",
+  "cost_in",
+  "cost_changed",
+  "unevolved",
+  "is_super_evolved",
+  "damaged",
+  "did_not_attack_this_turn",
+  "name",
+]);
+
+const warnedTriggerConditionKeys = new Set<string>();
+
+function nearestTriggerConditionKey(
+  unknown: string,
+  allowed: Iterable<string>,
+): string {
+  const list = [...allowed];
+  if (!list.length) return "(none)";
+  let best = list[0]!;
+  let bestScore = Infinity;
+  for (const k of list) {
+    let score = 0;
+    const a = unknown.toLowerCase();
+    const b = k.toLowerCase();
+    const m = a.length;
+    const n = b.length;
+    const dp: number[][] = Array.from({ length: m + 1 }, () =>
+      Array(n + 1).fill(0),
+    );
+    for (let i = 0; i <= m; i++) dp[i]![0] = i;
+    for (let j = 0; j <= n; j++) dp[0]![j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[i]![j] = Math.min(
+          dp[i - 1]![j]! + 1,
+          dp[i]![j - 1]! + 1,
+          dp[i - 1]![j - 1]! + cost,
+        );
+      }
+    }
+    score = dp[m]![n]!;
+    if (score < bestScore) {
+      bestScore = score;
+      best = k;
+    }
+  }
+  return best;
+}
+
+function assertKnownTriggerConditionKeys(
+  cond: Record<string, unknown>,
+  cardName: string,
+  event?: string,
+): void {
+  for (const key of Object.keys(cond)) {
+    if (TRIGGER_CONDITION_KEYS.has(key)) continue;
+    const nearest = nearestTriggerConditionKey(key, TRIGGER_CONDITION_KEYS);
+    const eventPart = event ? ` event=${event}` : "";
+    const msg = `Unknown trigger condition key "${key}" on card ${cardName}${eventPart} (try "${nearest}")`;
+    if (isDev()) {
+      throw new Error(msg);
+    }
+    if (!warnedTriggerConditionKeys.has(key)) {
+      console.warn(msg);
+      warnedTriggerConditionKeys.add(key);
+    }
+  }
+}
+
 // Helper to normalize "subject" card (entering, played, leaving, etc.)
 export function getSubjectCard(context: TriggerContext): CardInstance | null {
   return (
@@ -30,7 +137,19 @@ export function evalCommonConditions(
   activePlayer: Player,
   context: TriggerContext,
 ): boolean {
-  const cond = trigger.condition || {};
+  const rawCond = trigger.condition;
+  const event = (context as { _triggerEvent?: string })._triggerEvent;
+  if (rawCond && typeof rawCond === "object" && !Array.isArray(rawCond)) {
+    assertKnownTriggerConditionKeys(
+      rawCond as Record<string, unknown>,
+      hostCard.name ?? "unknown",
+      event,
+    );
+  }
+  const cond: Record<string, any> =
+    rawCond && typeof rawCond === "object" && !Array.isArray(rawCond)
+      ? (rawCond as Record<string, any>)
+      : {};
   const subjectCard = getSubjectCard(context);
 
   // =========================================================================
@@ -41,7 +160,6 @@ export function evalCommonConditions(
   // owner slot (restored/drawn/entering player), not the active turn player.
   // Use state.activePlayer for game-turn scope. Turn-boundary events use the
   // focal routing player (always the turn player in real play; see turns.ts).
-  const event = (context as { _triggerEvent?: string })._triggerEvent;
   const turnPlayer =
     event === "start_of_turn" || event === "end_of_turn"
       ? activePlayer

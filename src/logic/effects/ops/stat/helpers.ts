@@ -5,6 +5,8 @@
 import { state } from "../../../../core/gameState.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { StatOp } from "./types.js";
+import { STAT_ACTION_VALUES } from "./types.js";
+import { isDev } from "../../../../core/env.js";
 import { logEvent } from "../../../../core/logger.js";
 import {
   getPlaysThisTurn,
@@ -24,6 +26,14 @@ export function validateStatOp(eff: StatOp): void {
   const hasMode = !!(eff as any).mode;
   const hasAction = !!eff.action;
   const hasTarget = eff.target !== undefined;
+
+  if (hasAction && !hasMode && !STAT_ACTION_VALUES.has(String(eff.action))) {
+    const msg = `[stat] Unknown action "${eff.action}"`;
+    if (isDev()) {
+      throw new Error(msg);
+    }
+    console.warn(msg);
+  }
 
   if (!hasMode && !hasAction) {
     throw new Error(
