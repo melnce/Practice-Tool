@@ -280,6 +280,28 @@ async function resolveSelectableTarget(
   await tapLocator(page, mode, page.locator(selector).first());
 }
 
+async function waitForPendingCleared(page: Page) {
+  await page.waitForFunction(
+    () => !window.__svwbTest!.getState().pendingTargetEffect,
+  );
+}
+
+async function resolveBoardTargetByUid(
+  page: Page,
+  mode: InputMode,
+  uid: string,
+  board = "#blueBoard",
+) {
+  const selector = `${board} .card[data-uid="${uid}"]`;
+  const loc = page.locator(selector);
+  await expect(loc).toHaveClass(/selectable/, { timeout: 5000 });
+  // Playwright's touch click is reliable after CDP drag streams; raw
+  // `touchscreen.tap` can miss `click` listeners on reconciled board cards.
+  if (mode === "touch") await loc.click({ timeout: 5000 });
+  else await tapOrClick(page, mode, selector);
+  await waitForPendingCleared(page);
+}
+
 async function assertStrikeKilledEnemyFollower(
   page: Page,
   enemyUid = "enemy_0",
@@ -805,10 +827,22 @@ test.describe("Interaction sweep — touch @ 1024×768", () => {
       s.players.first.evoUsedThisTurn = false;
       window.__svwbTest!.render();
     });
-    await dragLocator(page, mode, "#blueSuperEvo", "#blueBoard .card");
-    await page.waitForTimeout(300);
-    await tapOrClick(page, mode, "#blueBoard .card.selectable");
-    await page.waitForTimeout(300);
+    await dragLocator(
+      page,
+      mode,
+      "#blueSuperEvo",
+      '#blueBoard .card[data-uid="remi_uid"]',
+    );
+    await page.waitForFunction(() => {
+      const s = window.__svwbTest!.getState();
+      const remi = s.players.first.board.find((c) => c?.uid === "remi_uid");
+      return (
+        !!s.pendingTargetEffect &&
+        !!remi?.hasEvolved &&
+        remi.evoType === "super"
+      );
+    });
+    await resolveBoardTargetByUid(page, mode, "golem_uid");
     const result = await page.evaluate(() => {
       const s = window.__svwbTest!.getState();
       const golem = s.players.first.board.find((c) => c?.uid === "golem_uid");
@@ -1566,17 +1600,35 @@ registerMouseCase(
       s.players.first.superEvoCharges = 1;
       window.__svwbTest!.render();
     });
-    await dragLocator(page, mode, "#blueSuperEvo", "#blueBoard .card");
-    await page.waitForTimeout(300);
-    await tapOrClick(page, mode, "#blueBoard .card.selectable");
-    await page.waitForTimeout(300);
-    const remiEvolved = await page.evaluate(
-      () =>
-        !!window
-          .__svwbTest!.getState()
-          .players.first.board.find((c) => c?.uid === "remi_uid")?.hasEvolved,
+    await dragLocator(
+      page,
+      mode,
+      "#blueSuperEvo",
+      '#blueBoard .card[data-uid="remi_uid"]',
     );
-    expect(remiEvolved).toBe(true);
+    await page.waitForFunction(() => {
+      const s = window.__svwbTest!.getState();
+      const remi = s.players.first.board.find((c) => c?.uid === "remi_uid");
+      return (
+        !!s.pendingTargetEffect &&
+        !!remi?.hasEvolved &&
+        remi.evoType === "super"
+      );
+    });
+    await resolveBoardTargetByUid(page, mode, "golem_uid");
+    const result = await page.evaluate(() => {
+      const s = window.__svwbTest!.getState();
+      const golem = s.players.first.board.find((c) => c?.uid === "golem_uid");
+      const remi = s.players.first.board.find((c) => c?.uid === "remi_uid");
+      return {
+        pending: !!s.pendingTargetEffect,
+        golemEvolved: !!golem?.hasEvolved,
+        remiEvolved: !!remi?.hasEvolved,
+      };
+    });
+    expect(result.pending).toBe(false);
+    expect(result.remiEvolved).toBe(true);
+    expect(result.golemEvolved).toBe(true);
   },
 );
 
