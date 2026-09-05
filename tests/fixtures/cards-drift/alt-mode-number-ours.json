@@ -1,0 +1,17 @@
+[
+  {
+    "id": "90002002",
+    "name": "Alt Mode Number Card",
+    "cost": "3",
+    "attack": "3",
+    "defense": "3",
+    "type": "Follower",
+    "description": "Ward.",
+    "specific_effects": [
+      {
+        "name": "Crystallize",
+        "skill_text": "Crystallize (1): Countdown (3)"
+      }
+    ]
+  }
+]

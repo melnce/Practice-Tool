@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "id": "10442120",
+    "kind": "text_main_semantic",
+    "reason": "Client text omits the Super Skybound Art threshold; value confirmed 15"
+  }
+]

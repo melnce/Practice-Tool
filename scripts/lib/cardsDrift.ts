@@ -65,7 +65,12 @@ export type OurCard = {
   defense?: string;
   type: string;
   description?: string;
-  specific_effects?: Array<{ name?: string; skill_text?: string }>;
+  keywords?: unknown[];
+  specific_effects?: Array<{
+    name?: string;
+    skill_text?: string;
+    cost?: number;
+  }>;
 };
 
 export type DumpRecord = {
@@ -77,7 +82,11 @@ export type DumpRecord = {
   life: number | null;
   type: number;
   skill_texts?: Array<{ text_eng?: string | null }>;
-  alt_modes?: Array<{ type_key?: string; text_eng?: string | null }>;
+  alt_modes?: Array<{
+    type_key?: string;
+    text_eng?: string | null;
+    cost?: number | null;
+  }>;
   evolves_to?: unknown;
 };
 
@@ -170,6 +179,357 @@ export function extractKeywordSet(text: string): Set<string> {
   return found;
 }
 
+/** Map repo `keywords[]` entries onto drift keyword-word set entries. */
+export function extractOurKeywordDriftSet(
+  card: OurCard,
+  dumpTextKeywordSet: Set<string>,
+): Set<string> {
+  const descKw = extractKeywordSet(normalizeCardText(card.description ?? ""));
+  const found = new Set<string>();
+  for (const entry of card.keywords ?? []) {
+    let raw = "";
+    if (typeof entry === "string") raw = entry;
+    else if (entry && typeof entry === "object" && "name" in entry) {
+      raw = String((entry as { name: string }).name);
+    } else {
+      continue;
+    }
+
+    const variants = [
+      raw,
+      raw.replace(/([a-z])([A-Z])/g, "$1 $2"),
+      raw.replace(/([a-z])([A-Z])/g, "$1-$2"),
+    ];
+    for (const kw of DRIFT_KEYWORDS) {
+      const kl = kw.toLowerCase();
+      for (const variant of variants) {
+        if (variant.toLowerCase() !== kl) continue;
+        if (dumpTextKeywordSet.has(kl) || descKw.has(kl)) found.add(kl);
+      }
+    }
+  }
+  return found;
+}
+
+export function ourUnionTexts(card: OurCard): string[] {
+  const texts = [card.description ?? ""];
+  const descNorm = normalizeCardText(card.description ?? "");
+  for (const effect of card.specific_effects ?? []) {
+    if (!effect.skill_text) continue;
+    const skillNorm = normalizeCardText(effect.skill_text);
+    if (skillNorm && descNorm.includes(skillNorm)) continue;
+    texts.push(effect.skill_text);
+  }
+  return texts;
+}
+
+export function dumpUnionTexts(record: DumpRecord): string[] {
+  const texts: string[] = [];
+  for (const skill of record.skill_texts ?? []) {
+    if (skill.text_eng) texts.push(skill.text_eng);
+  }
+  for (const mode of record.alt_modes ?? []) {
+    if (mode.text_eng) texts.push(mode.text_eng);
+  }
+  return texts;
+}
+
+function altModeKeyword(typeKeyOrName: string): string | undefined {
+  const mapped = ALT_MODE_DUMP_TO_OUR[typeKeyOrName.toLowerCase()];
+  return mapped?.toLowerCase();
+}
+
+function altModeCostAlreadyInText(
+  text: string,
+  cost: number,
+  mode: AltModeName,
+): boolean {
+  const norm = normalizeCardText(text);
+  if (mode === "Crystallize") {
+    return new RegExp(`Crystallize \\(${cost}\\)`, "i").test(norm);
+  }
+  if (mode === "Accelerate") {
+    return new RegExp(`Accelerate \\(${cost}\\)`, "i").test(norm);
+  }
+  return false;
+}
+
+function stripInlineAltLinesForSemantic(
+  description: string,
+  oursModes: Partial<Record<AltModeName, string>>,
+  dumpModes: Partial<Record<AltModeName, string>>,
+): string {
+  const lines = description.split("\n");
+  const kept: string[] = [];
+  for (const line of lines) {
+    let trimmed = line.trim();
+    if (!trimmed) continue;
+    let drop = false;
+    if (
+      "Crest" in oursModes &&
+      "Crest" in dumpModes &&
+      /^Gain Crest:/i.test(trimmed)
+    ) {
+      drop = true;
+    } else if (
+      "Crest" in oursModes &&
+      "Crest" in dumpModes &&
+      /Gain Crest:/i.test(trimmed)
+    ) {
+      trimmed = trimmed.replace(/\(\s*[^)]+\s*\)\s*\.?\s*$/, "").trim();
+    }
+    if (
+      "Crystallize" in oursModes &&
+      "Crystallize" in dumpModes &&
+      /^Crystallize \(\d+\):/i.test(trimmed)
+    ) {
+      drop = true;
+    }
+    if (
+      "Accelerate" in oursModes &&
+      "Accelerate" in dumpModes &&
+      /^Accelerate \(\d+\):/i.test(trimmed)
+    ) {
+      drop = true;
+    }
+    if (
+      "Faith" in oursModes &&
+      "Faith" in dumpModes &&
+      /^Faith\b/i.test(trimmed)
+    ) {
+      drop = true;
+    }
+    if (!drop) {
+      for (const mode of ALT_MODES) {
+        if (!(mode in oursModes) || !(mode in dumpModes)) continue;
+        const skillLines = (oursModes[mode] ?? "")
+          .split("\n")
+          .map((part) => normalizeCardText(part))
+          .filter(Boolean);
+        if (skillLines.includes(normalizeCardText(trimmed))) {
+          drop = true;
+          break;
+        }
+      }
+    }
+    if (!drop && trimmed) kept.push(trimmed);
+  }
+  return kept.join("\n");
+}
+
+export function ourSemanticUnionTexts(
+  card: OurCard,
+  dumpModes: Partial<Record<AltModeName, string>>,
+): string[] {
+  const oursModes = ourAltModes(card);
+  const description = stripInlineAltLinesForSemantic(
+    card.description ?? "",
+    oursModes,
+    dumpModes,
+  );
+  const texts = [description];
+  const descNorm = normalizeCardText(description);
+  for (const mode of ALT_MODES) {
+    if (!(mode in oursModes) || !(mode in dumpModes)) continue;
+    const skill = oursModes[mode] ?? "";
+    const skillNorm = normalizeCardText(skill);
+    if (skillNorm && descNorm.includes(skillNorm)) continue;
+    if (skill) texts.push(skill);
+  }
+  return texts;
+}
+
+export function dumpSemanticUnionTexts(
+  record: DumpRecord,
+  oursModes: Partial<Record<AltModeName, string>>,
+): string[] {
+  const texts = [dumpMainText(record)];
+  const mainNorm = normalizeCardText(dumpMainText(record));
+  const dumpModes = dumpAltModes(record);
+  for (const mode of ALT_MODES) {
+    if (!(mode in dumpModes) || !(mode in oursModes)) continue;
+    const skill = dumpModes[mode] ?? "";
+    const skillNorm = normalizeCardText(skill);
+    if (skillNorm && mainNorm.includes(skillNorm)) continue;
+    if (skill) texts.push(skill);
+  }
+  return texts;
+}
+
+function buildSemanticIntegerMultiset(
+  card: OurCard,
+  record: DumpRecord,
+  side: "ours" | "dump",
+): number[] {
+  const oursModes = ourAltModes(card);
+  const dumpModes = dumpAltModes(record);
+  const ints: number[] = [];
+
+  if (side === "ours") {
+    const main = stripInlineAltLinesForSemantic(
+      card.description ?? "",
+      oursModes,
+      dumpModes,
+    );
+    ints.push(...extractIntegers(normalizeCardText(main)));
+    for (const mode of ALT_MODES) {
+      if (!(mode in oursModes) || !(mode in dumpModes)) continue;
+      ints.push(...extractIntegers(normalizeCardText(oursModes[mode] ?? "")));
+      const effect = (card.specific_effects ?? []).find((e) => e.name === mode);
+      if (effect?.cost == null) continue;
+      if (
+        altModeCostAlreadyInText(
+          effect.skill_text ?? "",
+          Number(effect.cost),
+          mode,
+        )
+      ) {
+        continue;
+      }
+      ints.push(Number(effect.cost));
+    }
+  } else {
+    ints.push(...extractIntegers(normalizeCardText(dumpMainText(record))));
+    for (const mode of ALT_MODES) {
+      if (!(mode in oursModes) || !(mode in dumpModes)) continue;
+      ints.push(...extractIntegers(normalizeCardText(dumpModes[mode] ?? "")));
+      const altEntry = (record.alt_modes ?? []).find(
+        (entry) =>
+          ALT_MODE_DUMP_TO_OUR[entry.type_key?.toLowerCase() ?? ""] === mode,
+      );
+      if (altEntry?.cost == null) continue;
+      if (
+        altModeCostAlreadyInText(
+          altEntry.text_eng ?? "",
+          Number(altEntry.cost),
+          mode,
+        )
+      ) {
+        continue;
+      }
+      ints.push(Number(altEntry.cost));
+    }
+  }
+
+  return ints.sort((a, b) => a - b);
+}
+
+function buildSemanticKeywordSet(
+  card: OurCard,
+  record: DumpRecord,
+): { ours: Set<string>; dump: Set<string> } {
+  const oursModes = ourAltModes(card);
+  const dumpModes = dumpAltModes(record);
+  const dumpKw = new Set<string>();
+  const oursKw = new Set<string>();
+
+  for (const kw of extractKeywordSet(normalizeCardText(dumpMainText(record)))) {
+    dumpKw.add(kw);
+  }
+  const mainOurs = stripInlineAltLinesForSemantic(
+    card.description ?? "",
+    oursModes,
+    dumpModes,
+  );
+  for (const kw of extractKeywordSet(normalizeCardText(mainOurs))) {
+    oursKw.add(kw);
+  }
+
+  for (const mode of ALT_MODES) {
+    if (!(mode in oursModes) || !(mode in dumpModes)) continue;
+    for (const kw of extractKeywordSet(
+      normalizeCardText(oursModes[mode] ?? ""),
+    )) {
+      oursKw.add(kw);
+    }
+    for (const kw of extractKeywordSet(
+      normalizeCardText(dumpModes[mode] ?? ""),
+    )) {
+      dumpKw.add(kw);
+    }
+    const modeKw = altModeKeyword(mode);
+    if (modeKw) {
+      oursKw.add(modeKw);
+      dumpKw.add(modeKw);
+    }
+  }
+
+  for (const kw of extractOurKeywordDriftSet(card, dumpKw)) oursKw.add(kw);
+
+  return { ours: oursKw, dump: dumpKw };
+}
+
+function hasCardSemanticDrift(card: OurCard, record: DumpRecord): boolean {
+  const oursInts = buildSemanticIntegerMultiset(card, record, "ours");
+  const dumpInts = buildSemanticIntegerMultiset(card, record, "dump");
+  if (
+    oursInts.length !== dumpInts.length ||
+    oursInts.some((value, index) => value !== dumpInts[index])
+  ) {
+    return true;
+  }
+
+  const { ours: oursKw, dump: dumpKw } = buildSemanticKeywordSet(card, record);
+  if (oursKw.size !== dumpKw.size) return true;
+  for (const kw of oursKw) {
+    if (!dumpKw.has(kw)) return true;
+  }
+  for (const kw of dumpKw) {
+    if (!oursKw.has(kw)) return true;
+  }
+  return false;
+}
+
+/** @deprecated Prefer hasCardSemanticDrift(card, record) for card-level checks. */
+export function hasSemanticDrift(
+  oursTexts: string[],
+  dumpTexts: string[],
+  oursKeywordExtras?: Set<string>,
+  dumpKeywordExtras?: Set<string>,
+  oursStructuredInts: number[] = [],
+  dumpStructuredInts: number[] = [],
+): boolean {
+  const oursCombined = oursTexts.map(normalizeCardText).join("\n");
+  const dumpCombined = dumpTexts.map(normalizeCardText).join("\n");
+
+  const oursInts = [
+    ...extractIntegers(oursCombined),
+    ...oursStructuredInts,
+  ].sort((a, b) => a - b);
+  const dumpInts = [
+    ...extractIntegers(dumpCombined),
+    ...dumpStructuredInts,
+  ].sort((a, b) => a - b);
+  if (
+    oursInts.length !== dumpInts.length ||
+    oursInts.some((value, index) => value !== dumpInts[index])
+  ) {
+    return true;
+  }
+
+  const oursKw = extractKeywordSet(oursCombined);
+  const dumpKw = extractKeywordSet(dumpCombined);
+  if (oursKeywordExtras) {
+    for (const kw of oursKeywordExtras) oursKw.add(kw);
+  }
+  if (dumpKeywordExtras) {
+    for (const kw of dumpKeywordExtras) dumpKw.add(kw);
+  }
+
+  if (oursKw.size !== dumpKw.size) return true;
+  for (const kw of oursKw) {
+    if (!dumpKw.has(kw)) return true;
+  }
+  for (const kw of dumpKw) {
+    if (!oursKw.has(kw)) return true;
+  }
+  return false;
+}
+
+export function sliceTextsDiffer(oursRaw: string, dumpRaw: string): boolean {
+  return normalizeCardText(oursRaw) !== normalizeCardText(dumpRaw);
+}
+
 export function classifyTextDrift(
   oursRaw: string,
   dumpRaw: string,
@@ -216,10 +576,16 @@ function dumpAltModes(
   record: DumpRecord,
 ): Partial<Record<AltModeName, string>> {
   const out: Partial<Record<AltModeName, string>> = {};
+  const seen = new Set<string>();
   for (const mode of record.alt_modes ?? []) {
     const key = mode.type_key?.toLowerCase() ?? "";
     const mapped = ALT_MODE_DUMP_TO_OUR[key];
-    if (mapped) out[mapped] = mode.text_eng ?? "";
+    if (!mapped) continue;
+    const norm = normalizeCardText(mode.text_eng ?? "");
+    const dedupeKey = `${mapped}:${norm}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    out[mapped] = mode.text_eng ?? "";
   }
   return out;
 }
@@ -366,21 +732,27 @@ export function compareCardsDrift(input: CompareCardsDriftInput): DriftReport {
       }
     }
 
-    const mainOurs = card.description ?? "";
-    const mainDump = dumpMainText(record);
-    const mainClass = classifyTextDrift(mainOurs, mainDump);
-    if (mainClass === "semantic") {
+    const oursModes = ourAltModes(card);
+    const dumpModes = dumpAltModes(record);
+    const cardSemantic = hasCardSemanticDrift(card, record);
+
+    if (cardSemantic) {
       if (!isAllowlisted(card.id, "text_main_semantic", allowlist)) {
         textSemantic.push({
           id: card.id,
           name: card.name,
           mode: "main",
           classification: "semantic",
-          ours: mainOurs,
-          dump: mainDump,
+          ours: ourUnionTexts(card).join("\n"),
+          dump: dumpUnionTexts(record).join("\n"),
         });
       }
-    } else if (mainClass === "wording") {
+    }
+
+    const mainOurs = card.description ?? "";
+    const mainDump = dumpMainText(record);
+
+    if (sliceTextsDiffer(mainOurs, mainDump)) {
       if (!isAllowlisted(card.id, "text_main_wording", allowlist)) {
         textWording.push({
           id: card.id,
@@ -392,9 +764,6 @@ export function compareCardsDrift(input: CompareCardsDriftInput): DriftReport {
         });
       }
     }
-
-    const oursModes = ourAltModes(card);
-    const dumpModes = dumpAltModes(record);
 
     for (const mode of ALT_MODES) {
       const hasOurs = mode in oursModes;
@@ -418,30 +787,17 @@ export function compareCardsDrift(input: CompareCardsDriftInput): DriftReport {
           });
         }
       } else if (hasOurs && hasDump) {
-        const altClass = classifyTextDrift(
-          oursModes[mode] ?? "",
-          dumpModes[mode] ?? "",
-        );
-        if (altClass === "semantic") {
-          if (!isAllowlisted(card.id, "alt_mode_semantic", allowlist)) {
-            altModeSemantic.push({
-              id: card.id,
-              name: card.name,
-              mode,
-              classification: "semantic",
-              ours: oursModes[mode] ?? "",
-              dump: dumpModes[mode] ?? "",
-            });
-          }
-        } else if (altClass === "wording") {
+        const oursText = oursModes[mode] ?? "";
+        const dumpText = dumpModes[mode] ?? "";
+        if (sliceTextsDiffer(oursText, dumpText)) {
           if (!isAllowlisted(card.id, "alt_mode_wording", allowlist)) {
             altModeWording.push({
               id: card.id,
               name: card.name,
               mode,
               classification: "wording",
-              ours: oursModes[mode] ?? "",
-              dump: dumpModes[mode] ?? "",
+              ours: oursText,
+              dump: dumpText,
             });
           }
         }

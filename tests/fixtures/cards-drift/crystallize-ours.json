@@ -1,0 +1,19 @@
+[
+  {
+    "id": "90002001",
+    "name": "Crystallize Union Card",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "keywords": ["Rush"],
+    "description": "Rush.\nCrystallize (1): Countdown (3)\nLast Words: Summon a Crystallize Union Card.",
+    "specific_effects": [
+      {
+        "name": "Crystallize",
+        "cost": 1,
+        "skill_text": "Countdown (3)\nLast Words: Summon a Crystallize Union Card."
+      }
+    ]
+  }
+]

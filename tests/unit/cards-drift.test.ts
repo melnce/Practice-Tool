@@ -124,4 +124,31 @@ describe("cards drift comparison", () => {
     expect(report.altModeMissing).toEqual([]);
     expect(report.exitCode).toBe(0);
   });
+
+  it("does not flag semantic drift when Crystallize text is inlined on ours but alt_mode on dump", () => {
+    const unionOurs = loadFixture<OurCard[]>("crystallize-ours.json");
+    const unionDump = loadFixture<DumpRecord[]>("crystallize-dump.json");
+    const report = compareCardsDrift({
+      oursCards: unionOurs,
+      dumpRecords: unionDump,
+    });
+    expect(report.textSemantic).toEqual([]);
+    expect(report.altModeSemantic).toEqual([]);
+    expect(report.exitCode).toBe(0);
+  });
+
+  it("flags semantic drift when an alt mode number changes", () => {
+    const unionOurs = loadFixture<OurCard[]>("alt-mode-number-ours.json");
+    const unionDump = loadFixture<DumpRecord[]>("alt-mode-number-dump.json");
+    const report = compareCardsDrift({
+      oursCards: unionOurs,
+      dumpRecords: unionDump,
+    });
+    expect(report.textSemantic).toHaveLength(1);
+    expect(report.textSemantic[0]).toMatchObject({
+      id: "90002002",
+      classification: "semantic",
+    });
+    expect(report.exitCode).toBe(1);
+  });
 });

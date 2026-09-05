@@ -1,0 +1,18 @@
+[
+  {
+    "card_id": 90002002,
+    "card_set_id": 90000,
+    "name_eng": "Alt Mode Number Card",
+    "cost": 3,
+    "atk": 3,
+    "life": 3,
+    "type": 1,
+    "skill_texts": [{ "text_eng": "<b><color=Keyword>Ward</color></b>." }],
+    "alt_modes": [
+      {
+        "type_key": "crystallize",
+        "text_eng": "<b><color=Keyword>Crystallize</color> (2)</b>: <b><color=Keyword>Countdown</color> (3)</b>"
+      }
+    ]
+  }
+]
