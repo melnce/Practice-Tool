@@ -24,7 +24,7 @@ import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
+import { destroyCardForLastWords } from "../harness/l2Dispatch.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
@@ -207,11 +207,7 @@ function amuletIndex(name: string): number {
 
 function triggerLastWords(cardId: string, cardName: string): void {
   const card = findOnBoard("first", cardName)!;
-  const lwKw = (getCardById(cardId)!.keywords as any[]).find(
-    (k) => k?.name === "LastWords",
-  );
-  runEffects(lwKw.effects, "first", card);
-  cleanupDead();
+  destroyCardForLastWords(card, "first");
 }
 
 function readyAttacker(

@@ -21,7 +21,11 @@ import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  summonFollowerByCardId,
+  playFollowerFromHandById,
+  PLAY_FILLER_FOLLOWER,
+} from "../harness/l2Dispatch.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
@@ -206,14 +210,7 @@ function summonArtifactOnBoard(
   id: string,
   owner: "first" | "second" = "first",
 ) {
-  const c = createCard(id, "board", owner);
-  c.peak_defense = c.defense;
-  state.players[owner].board.push(c);
-  fireTrigger("ally_follower_enter", owner, {
-    enteringCard: c,
-    enteringOwner: owner,
-  });
-  return c;
+  return summonFollowerByCardId(id, owner);
 }
 
 describe("L2 Artifact Portalcraft — real-card tests", () => {
@@ -505,11 +502,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
     it("non-Artifact ally enter does not grant Rush", () => {
       setupTurn(R6, { hand: [BRAZEN_BROADCASTER], pp: 3 });
       whenPlayCard("first", 0);
-      const plain = allyFollower(1, 1, "Plain");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: plain,
-        enteringOwner: "first",
-      });
+      const plain = summonFollowerByCardId(PLAY_FILLER_FOLLOWER, "first");
       applyKeywordsFromList(plain);
       expect(plain.hasRush).toBeFalsy();
     });
@@ -531,11 +524,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       setupTurn(R6, { hand: [MYUU], pp: 4 });
       const victim = enemyFollower(2, 5, "Safe");
       whenPlayCard("first", 0);
-      const plain = allyFollower(1, 1, "Plain");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: plain,
-        enteringOwner: "first",
-      });
+      summonFollowerByCardId(PLAY_FILLER_FOLLOWER, "first");
       expect(Number(victim.defense)).toBe(5);
     });
 
@@ -773,11 +762,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       setupTurn(R8, { hand: [AIZEDEN], pp: 7 });
       whenPlayCard("first", 0);
       enemyFollower(2, 5, "Safe");
-      const plain = allyFollower(1, 1, "Plain");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: plain,
-        enteringOwner: "first",
-      });
+      summonFollowerByCardId(PLAY_FILLER_FOLLOWER, "first");
       expect(getBoard(state, "second").length).toBe(1);
     });
 
@@ -804,22 +789,14 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
     it("when another ally base cost ≥5 enters, evolves that follower", () => {
       setupTurn(R8, { hand: [CAMISCILLA], pp: 7 });
       whenPlayCard("first", 0);
-      const big = allyBigFollower(6, "LateBig");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: big,
-        enteringOwner: "first",
-      });
+      const big = summonFollowerByCardId(SANDALPHON, "first");
       expect(big.hasEvolved).toBe(true);
     });
 
     it("ally base cost <5 entering does not evolve via trigger", () => {
       setupTurn(R8, { hand: [CAMISCILLA], pp: 7 });
       whenPlayCard("first", 0);
-      const small = allyFollower(2, 2, "Small");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: small,
-        enteringOwner: "first",
-      });
+      const small = summonFollowerByCardId(PLAY_FILLER_FOLLOWER, "first");
       expect(small.hasEvolved).not.toBe(true);
     });
 

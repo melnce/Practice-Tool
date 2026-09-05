@@ -21,7 +21,7 @@ import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
+import { giveStatBuffViaEngine } from "../harness/l2Dispatch.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
 import { recordPlayedBaseCost } from "../../src/logic/core/playedBaseCostHistory.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -169,19 +169,7 @@ function deckIds(player: "first" | "second" = "first"): string[] {
 }
 
 function buffSelf(card: ReturnType<typeof createCard>, atk = 1, def = 0): void {
-  runEffects(
-    [
-      {
-        op: "stat",
-        action: "give",
-        target: "self",
-        attack: atk,
-        defense: def,
-      },
-    ],
-    "first",
-    card,
-  );
+  giveStatBuffViaEngine(card, "first", atk, def);
 }
 
 describe("L2 Buff Forestcraft — real-card tests", () => {

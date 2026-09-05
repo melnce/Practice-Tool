@@ -24,11 +24,13 @@ import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import type { CardInstance } from "../../src/core/types/index.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  summonFollowerByCardId,
+  playFollowerFromHandById,
+  PLAY_FILLER_FOLLOWER,
+} from "../harness/l2Dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
-import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { isOverflow } from "../../src/helpers/overflow.js";
 import {
@@ -474,11 +476,19 @@ describe("L2 — Rotation Dragoncraft", () => {
     });
 
     it("owner's EOT: +1/+1 to super-evolved ally only (seed 2)", () => {
-      givenGameState({ seed: 2, activePlayer: "first", roundCount: 7 }).build();
+      const deckFiller = Array.from({ length: 5 }, () => "10001110");
+      givenGameState({
+        seed: 2,
+        activePlayer: "first",
+        roundCount: 7,
+      })
+        .withFirstDeck(deckFiller)
+        .withSecondDeck(deckFiller)
+        .build();
       state.gameStarted = true;
+      state.phase = "main";
       const superGuy = createCard(DRACONIC_BERSERKER, "board", "first");
       superGuy.peak_defense = superGuy.defense;
-      onEvolve(superGuy, "first", "super");
       const plain = createCard(
         { name: "Plain", type: "Follower", cost: 1, attack: 1, defense: 1 },
         "board",
@@ -486,15 +496,13 @@ describe("L2 — Rotation Dragoncraft", () => {
       );
       const mari = createCard(MARI, "board", "first");
       state.players.first.board = [superGuy, plain, mari];
+      onEvolve(superGuy, "first", "super");
       const beforeSuper = {
         atk: Number(superGuy.attack),
         def: Number(superGuy.defense),
       };
       const plainAtk = Number(plain.attack);
-      const eot = (mari.triggers as any[]).find(
-        (t) => t.event === "end_of_turn",
-      );
-      runEffects(eot.effects, "first", mari);
+      whenEndTurn();
       expect(Number(superGuy.attack)).toBe(beforeSuper.atk + 1);
       expect(Number(superGuy.defense)).toBe(beforeSuper.def + 1);
       expect(Number(plain.attack)).toBe(plainAtk);
@@ -572,21 +580,12 @@ describe("L2 — Rotation Dragoncraft", () => {
       whenPlayCard("first", 0);
       const spirit = findOnBoard("first", "Spirit of Wadatsumi")!;
       onEvolve(spirit, "first", "normal", { spendPoint: true });
-      summonNamed(
-        { op: "summon", source: "named", name: "Majestic Megalorca", count: 1 },
-        "first",
-      );
-      const marine = thenBoard("first").find((c) => c.id === MEGALORCA)!;
+      const marine = summonFollowerByCardId(MEGALORCA, "first");
       expect(Number(marine.attack)).toBe(3);
       expect(Number(marine.defense)).toBe(3);
 
-      const plain = allyFollower(2, 2, "Plain");
-      const plainAtk = Number(plain.attack);
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: plain,
-        enteringOwner: "first",
-      });
-      expect(Number(plain.attack)).toBe(plainAtk);
+      const filler = summonFollowerByCardId(PLAY_FILLER_FOLLOWER, "first");
+      expect(Number(filler.attack)).toBe(2);
       expect(printed).toContain("Marine");
     });
   });
@@ -716,21 +715,11 @@ describe("L2 — Rotation Dragoncraft", () => {
       setupTurn(R6, { hand: [MEG], pp: 3 });
       whenPlayCard("first", 0);
       const meg = findOnBoard("first", "Meg, Girl Next Door")!;
-      const cost2 = createCard(COST2_FOLLOWER, "board", "first");
-      cost2.peak_defense = cost2.defense;
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: cost2,
-        enteringOwner: "first",
-      });
+      summonFollowerByCardId(COST2_FOLLOWER, "first");
       expect(meg.hasWard || meg.keywordState?.hasWard).toBe(true);
 
-      const cost3 = createCard(MEG, "board", "first");
-      cost3.peak_defense = cost3.defense;
       const hadWard = meg.hasWard || meg.keywordState?.hasWard;
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: cost3,
-        enteringOwner: "first",
-      });
+      summonFollowerByCardId(PLAY_FILLER_FOLLOWER, "first");
       expect(meg.hasWard || meg.keywordState?.hasWard).toBe(hadWard);
       expect(printed).toContain("2-base-cost");
     });
@@ -1406,22 +1395,17 @@ describe("L2 — Rotation Dragoncraft", () => {
     });
 
     it("Marine ally enter restores 2 leader HP; non-Marine does not", () => {
-      setupTurn(R6, { hand: [STORMY_SHAMISEN], pp: 6, hp: 14 });
+      setupTurn(R6, {
+        hand: [STORMY_SHAMISEN, PLAY_FILLER_FOLLOWER],
+        pp: 8,
+        hp: 14,
+      });
       whenPlayCard("first", 0);
       // Fanfare summons a Marine, which triggers +2 heal once
       expect(getHP(state, "first")).toBe(16);
-      const plain = allyFollower(1, 1, "Plain");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: plain,
-        enteringOwner: "first",
-      });
+      playFollowerFromHandById("first", PLAY_FILLER_FOLLOWER);
       expect(getHP(state, "first")).toBe(16);
-      const marine = createCard(MEGALORCA, "board", "first");
-      marine.peak_defense = marine.defense;
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: marine,
-        enteringOwner: "first",
-      });
+      summonFollowerByCardId(MEGALORCA, "first");
       expect(getHP(state, "first")).toBe(18);
       expect(printed).toContain("Marine");
     });

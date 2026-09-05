@@ -24,7 +24,11 @@ import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import { endTurnBlue, endTurnRed } from "../../src/logic/core/turns.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  playFollowerFromHandById,
+  summonFollowerByCardId,
+  PLAY_FILLER_FOLLOWER,
+} from "../harness/l2Dispatch.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { getHand, getHP, getGraveyard } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
@@ -239,29 +243,19 @@ describe("L2 — Antemaria Dragoncraft", () => {
     });
 
     it("Marine ally enter grants Rush and Bane to Jellyfish Dancer", () => {
-      setupTurn(R6, { hand: [JELLYFISH], pp: 2 });
+      setupTurn(R6, { hand: [JELLYFISH], pp: 4 });
       whenPlayCard("first", 0);
       const jelly = findOnBoard("first", "Jellyfish Dancer")!;
-      const marine = createCard(MEGALORCA, "board", "first");
-      marine.peak_defense = marine.defense;
-      state.players.first.board.push(marine);
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: marine,
-        enteringOwner: "first",
-      });
+      playFollowerFromHandById("first", MEGALORCA);
       expect(jelly.hasRush || jelly.keywordState?.hasRush).toBe(true);
       expect(jelly.hasBane || jelly.keywordState?.hasBane).toBe(true);
     });
 
     it("non-Marine ally enter does not grant Rush or Bane", () => {
-      setupTurn(R6, { hand: [JELLYFISH], pp: 2 });
+      setupTurn(R6, { hand: [JELLYFISH, PLAY_FILLER_FOLLOWER], pp: 4 });
       whenPlayCard("first", 0);
       const jelly = findOnBoard("first", "Jellyfish Dancer")!;
-      const plain = allyFollower(1, 1, "Plain");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: plain,
-        enteringOwner: "first",
-      });
+      playFollowerFromHandById("first", PLAY_FILLER_FOLLOWER);
       expect(jelly.hasRush || jelly.keywordState?.hasRush).toBeFalsy();
       expect(jelly.hasBane || jelly.keywordState?.hasBane).toBeFalsy();
       expect(printed).toContain("Marine");

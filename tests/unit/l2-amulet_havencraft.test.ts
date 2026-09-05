@@ -26,8 +26,10 @@ import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { destroyTarget } from "../../src/logic/effects/ops/destroy/primitives.js";
 import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
-import { getCardById } from "../../src/data/cardDatabase.js";
+import {
+  destroyCardForLastWords,
+  expireCountdownForLastWords,
+} from "../harness/l2Dispatch.js";
 import {
   getBoard,
   getHand,
@@ -185,13 +187,9 @@ function amuletIndex(name: string): number {
   return state.players.first.board.findIndex((c) => c.name === name);
 }
 
-function triggerLastWords(amuletId: string, amuletName: string): void {
+function triggerLastWords(_amuletId: string, amuletName: string): void {
   const card = findOnBoard("first", amuletName)!;
-  const lwKw = (getCardById(amuletId)!.keywords as any[]).find(
-    (k) => k?.name === "LastWords",
-  );
-  runEffects(lwKw.effects, "first", card);
-  cleanupDead();
+  destroyCardForLastWords(card, "first");
 }
 
 describe("L2 Amulet Havencraft — real-card tests", () => {
@@ -646,9 +644,7 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       const ally = allyAmulet("Fodder", 1);
       resolvePendingByUid(ally.uid);
       const tome = findOnBoard("first", "Sublime Eld Tome")!;
-      tome.countdown = 0;
-      cleanupDead();
-      triggerLastWords(SUBLIME_ELD_TOME, "Sublime Eld Tome");
+      expireCountdownForLastWords(tome, "first");
       expect(boardNames()).toContain("Winged Statue");
       expect(printed).toContain("Summon a copy");
     });

@@ -23,7 +23,10 @@ import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  playFollowerFromHandById,
+  PLAY_FILLER_FOLLOWER,
+} from "../harness/l2Dispatch.js";
 import {
   getBoard,
   getHP,
@@ -642,29 +645,18 @@ describe("L2 Lhynkal Runecraft — real-card tests", () => {
     });
 
     it("when another ally enters: gives it Rush and spellboosts hand; Ginger self-enter does not", () => {
-      setupTurn(R8, { hand: [GINGER, SPELLBOOST_TARGET], pp: 7 });
+      setupTurn(R8, {
+        hand: [GINGER, SPELLBOOST_TARGET, PLAY_FILLER_FOLLOWER],
+        pp: 10,
+      });
       whenPlayCard("first", 0);
       const ginger = findOnBoard("first", "Ginger, Disastrous Word")!;
       const sbCard = thenHand("first").find((c) => c.id === SPELLBOOST_TARGET)!;
       const sb0 = sbCount(sbCard);
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: ginger,
-        enteringOwner: "first",
-      });
       expect(ginger.hasRush).toBeFalsy();
       expect(sbCount(sbCard)).toBe(sb0);
 
-      const newcomer = createCard(
-        { name: "NewAlly", type: "Follower", cost: 1, attack: 1, defense: 1 },
-        "board",
-        "first",
-      );
-      newcomer.peak_defense = 1;
-      state.players.first.board.push(newcomer);
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: newcomer,
-        enteringOwner: "first",
-      });
+      const newcomer = playFollowerFromHandById("first", PLAY_FILLER_FOLLOWER);
       expect(newcomer.hasRush).toBe(true);
       expect(sbCount(sbCard)).toBeGreaterThan(sb0);
     });

@@ -20,7 +20,7 @@ import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import { summonFollowerByCardId } from "../harness/l2Dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import {
@@ -373,9 +373,14 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
           ?.counters?.faith,
       ).toBe(0);
 
-      fireTrigger("enhanced_play", "first", {
-        playedCard: createCard(SPLENDOR_GOLDBLOOM, "hand", "first"),
-      });
+      state.players.first.pp = 5;
+      state.players.first.hand.push(
+        createCard(SPLENDOR_GOLDBLOOM, "hand", "first"),
+      );
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.id === SPLENDOR_GOLDBLOOM),
+      );
       expect(Number(ally.attack)).toBe(3);
       expect(Number(ally.defense)).toBe(3);
       expect(printed).toContain("Enhanced card");
@@ -393,9 +398,14 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
           ?.counters?.faith,
       ).toBe(4);
 
-      fireTrigger("enhanced_play", "first", {
-        playedCard: createCard(SPLENDOR_GOLDBLOOM, "hand", "first"),
-      });
+      state.players.first.pp = 3;
+      state.players.first.hand.push(
+        createCard(SPLENDOR_GOLDBLOOM, "hand", "first"),
+      );
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.id === SPLENDOR_GOLDBLOOM),
+      );
       expect(Number(ally.attack)).toBe(2);
       expect(Number(ally.defense)).toBe(2);
     });

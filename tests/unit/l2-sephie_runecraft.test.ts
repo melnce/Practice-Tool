@@ -23,7 +23,10 @@ import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  playFollowerFromHandById,
+  summonFollowerByCardId,
+} from "../harness/l2Dispatch.js";
 import { startFuseFromHand } from "../../src/logic/index.js";
 import { forceCompleteOrFizzlePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getHP, getPP, getCrests } from "../../src/core/playerHelpers.js";
@@ -843,17 +846,12 @@ describe("L2 Sephie Runecraft — real-card tests", () => {
       );
       const first = thenBoard("first").find((c) => c.id === TEST_SUBJECT)!;
       expect(hasKeyword(first, "Storm")).toBe(true);
-      const second = createCard(TEST_SUBJECT, "board", "first");
-      second.peak_defense = Number(second.defense) || 2;
-      state.players.first.board.push(second);
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: second,
-        enteringOwner: "first",
-      });
+      const second = summonFollowerByCardId(TEST_SUBJECT, "first");
       const subjects = thenBoard("first").filter((c) => c.id === TEST_SUBJECT);
       expect(subjects).toHaveLength(2);
       const stormCount = subjects.filter((c) => hasKeyword(c, "Storm")).length;
       expect(stormCount).toBe(1);
+      expect(hasKeyword(second, "Storm")).toBe(false);
       expect(crestPrinted).toContain("Once on each of your turns");
     });
 
@@ -896,12 +894,7 @@ describe("L2 Sephie Runecraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const sephie = findOnBoard("first", "Sephie, Maven Convict")!;
       onEvolve(sephie, "first", "super", { spendPoint: true });
-      const subject = createCard(TEST_SUBJECT, "board", "first");
-      subject.peak_defense = Number(subject.defense) || 2;
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: subject,
-        enteringOwner: "first",
-      });
+      const subject = summonFollowerByCardId(TEST_SUBJECT, "first");
       expect(hasKeyword(subject, "Storm")).toBe(false);
       expect(crestPrinted).toContain("your turns");
     });
