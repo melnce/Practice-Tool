@@ -1,7 +1,6 @@
 /**
- * Dev-mode guard findings from soak (NODE_ENV=test). Each it.fails pins a
- * targeted-op handler that still invokes runEffects (via triggers/LW) inside
- * the handler — separate PRs. Evolve selective resume is fixed in PR #230.
+ * Dev-mode guard soak findings — targeted-op handler scope queues reactive
+ * triggers and defers Last Words instead of invoking runEffects inside handlers.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
@@ -16,7 +15,7 @@ import { dispatch as engineDispatch } from "../../src/engine.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 
-describe("dev-guards soak findings (separate PRs)", () => {
+describe("dev-guards soak — targeted-op handler scope", () => {
   beforeEach(() => {
     resetUidCounter();
     givenGameState({ seed: 1, activePlayer: "first" })
@@ -26,7 +25,7 @@ describe("dev-guards soak findings (separate PRs)", () => {
     state.phase = "main";
   });
 
-  it.fails(
+  it(
     "destroy targeted handler: amulet destroy fires ally_amulet_destroyed → runEffects (Omerio)",
     () => {
       const omerio = structuredClone(getCardById("10964120")!);
@@ -61,7 +60,7 @@ describe("dev-guards soak findings (separate PRs)", () => {
     },
   );
 
-  it.fails(
+  it(
     "destroy targeted handler: amulet last words fire runEffects inside handler",
     () => {
       const amulet = createCard(
@@ -72,7 +71,7 @@ describe("dev-guards soak findings (separate PRs)", () => {
           countdown: 2,
           hasLastWords: true,
           keywordState: {
-            lastWordsEffects: [{ op: "draw", amount: 1 }],
+            lastWordsEffects: [{ op: "draw", count: 1 }],
           },
         },
         "board",
@@ -96,7 +95,7 @@ describe("dev-guards soak findings (separate PRs)", () => {
     },
   );
 
-  it.fails(
+  it(
     "damage targeted handler: dealDamage fires self_damaged trigger inside handler",
     () => {
       const damaged = createCard(
@@ -110,7 +109,7 @@ describe("dev-guards soak findings (separate PRs)", () => {
             {
               event: "self_damaged",
               source: "board",
-              effects: [{ op: "draw", amount: 1 }],
+              effects: [{ op: "draw", count: 1 }],
             },
           ],
         },

@@ -171,9 +171,7 @@ describe("Reactive trigger queue", () => {
     expect(graveLts.length).toBe(2);
   });
 
-  it.fails(
-    "soak seed 20260913 game 123 — Reaper's Due exact-copy encoding loops until printed-copy PR",
-    async () => {
+  it("soak seed 20260913 game 123 — Reaper's Due printed copy terminates; exact board after batch", async () => {
       const fixture = loadSoakFixture(
         "seed20260913_game123_reapers_due_loop.json",
       );
@@ -182,9 +180,23 @@ describe("Reactive trigger queue", () => {
         fixture.gameIndex,
         fixture.trace as any,
       );
-      expect(result.error).toBeUndefined();
-    },
-  );
+    expect(result.error).toBeUndefined();
+    const boardSummary = (player: "first" | "second") =>
+      getBoard(state, player)
+        .filter(Boolean)
+        .map((c) => ({
+          id: c.id,
+          name: c.name,
+          atk: Number(c.attack),
+          def: Number(c.defense),
+        }));
+    expect(boardSummary("first")).toEqual([
+      { id: "10304110", name: "Mjerrabaine, Great Manifest", atk: 5, def: 2 },
+      { id: "10312110", name: "Supplicant of Unkilling", atk: 7, def: 5 },
+      { id: "10343110", name: "Congregant of Disdain", atk: 5, def: 4 },
+    ]);
+    expect(boardSummary("second")).toEqual([]);
+  });
 
   it("Sephie Fanfare at 4 prior OTS — first summoned 2/2, second 5/5", () => {
     givenGameState({ seed: 48, activePlayer: "first", roundCount: 8 })
