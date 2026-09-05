@@ -1005,12 +1005,12 @@
       "status": "covered"
     },
     "10113210": {
-      "fingerprint": "a24e7650",
+      "fingerprint": "aa5f2c38",
       "gatesSatisfied": ["combo"],
       "name": "Godwood Staff",
       "scenarios": [
         {
-          "fingerprint": "1eb42918",
+          "fingerprint": "5b3b52f4",
           "scenario": "turn_boundary"
         }
       ],
@@ -1955,12 +1955,12 @@
       "status": "covered"
     },
     "10153110": {
-      "fingerprint": "6986fc40",
+      "fingerprint": "1ccab7f8",
       "gatesSatisfied": ["super_evolved_self"],
       "name": "Ceres, Blue Rose Maiden",
       "scenarios": [
         {
-          "fingerprint": "e5456cbf",
+          "fingerprint": "95610dd4",
           "scenario": "turn_boundary"
         }
       ],
@@ -2843,12 +2843,12 @@
       "status": "covered"
     },
     "10222110": {
-      "fingerprint": "576498c0",
+      "fingerprint": "170c69e9",
       "gatesSatisfied": ["super_evolved_allied"],
       "name": "Gelt, Intrepid Vice-Captain",
       "scenarios": [
         {
-          "fingerprint": "a15b5bc2",
+          "fingerprint": "6ef7e930",
           "scenario": "turn_boundary"
         }
       ],
@@ -5363,12 +5363,12 @@
       "status": "covered"
     },
     "10461120": {
-      "fingerprint": "d0b0cf60",
+      "fingerprint": "a00e0b80",
       "gatesSatisfied": ["evolved_self"],
       "name": "Lamretta, Sisterly Shepherd",
       "scenarios": [
         {
-          "fingerprint": "662d06d0",
+          "fingerprint": "e9559358",
           "scenario": "turn_boundary"
         },
         {
@@ -5879,12 +5879,12 @@
       "status": "covered"
     },
     "10522120": {
-      "fingerprint": "a1844438",
+      "fingerprint": "50f22bc8",
       "gatesSatisfied": [],
       "name": "Amphibian Goldmuncher",
       "scenarios": [
         {
-          "fingerprint": "68c2f058",
+          "fingerprint": "61e8fe5c",
           "scenario": "turn_boundary"
         },
         {
@@ -5944,12 +5944,12 @@
       "status": "covered"
     },
     "10524110": {
-      "fingerprint": "53b20de0",
+      "fingerprint": "2d5aa208",
       "gatesSatisfied": ["evolved_self"],
       "name": "Oluon, Raging Chariot",
       "scenarios": [
         {
-          "fingerprint": "1cf5f80c",
+          "fingerprint": "c4269b64",
           "scenario": "turn_boundary"
         }
       ],
@@ -6204,12 +6204,12 @@
       "status": "covered"
     },
     "10544110": {
-      "fingerprint": "ad87bc9f",
+      "fingerprint": "400247d8",
       "gatesSatisfied": ["evolved_self"],
       "name": "Erntz, Governing Justice",
       "scenarios": [
         {
-          "fingerprint": "d7142a63",
+          "fingerprint": "43888ddc",
           "scenario": "turn_boundary"
         },
         {
@@ -6484,7 +6484,7 @@
       "status": "covered"
     },
     "10564110": {
-      "fingerprint": "c5781d17",
+      "fingerprint": "f11adfb1",
       "gatesSatisfied": ["evolved_self"],
       "name": "Sofina, Inspiring Strength",
       "scenarios": [
@@ -6493,7 +6493,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "96f9caa0",
+          "fingerprint": "2f921790",
           "scenario": "turn_boundary"
         }
       ],
@@ -6616,12 +6616,12 @@
       "status": "covered"
     },
     "10574110": {
-      "fingerprint": "ac513498",
+      "fingerprint": "da138ae9",
       "gatesSatisfied": ["evolved_self"],
       "name": "Slaus, Revolving Wheel of Fortune",
       "scenarios": [
         {
-          "fingerprint": "70057c78",
+          "fingerprint": "fd7262cc",
           "scenario": "turn_boundary"
         }
       ],
@@ -7814,7 +7814,7 @@
       "status": "covered"
     },
     "10713110": {
-      "fingerprint": "5f3f70b0",
+      "fingerprint": "5eb9e36c",
       "gatesSatisfied": ["combo"],
       "name": "Frostbow Sniper",
       "scenarios": [
@@ -7823,7 +7823,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "0e6f90c0",
+          "fingerprint": "c92d089f",
           "scenario": "turn_boundary"
         }
       ],
@@ -8202,7 +8202,7 @@
       "status": "covered"
     },
     "10742120": {
-      "fingerprint": "d7e93280",
+      "fingerprint": "e7885fdf",
       "gatesSatisfied": ["evolved_self", "max_pp"],
       "name": "Draconic Part-Timer",
       "scenarios": [
@@ -8215,7 +8215,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "c9efb7e8",
+          "fingerprint": "2e9ea7e4",
           "scenario": "turn_boundary"
         }
       ],
@@ -9752,12 +9752,12 @@
       "status": "covered"
     },
     "10903210": {
-      "fingerprint": "e0808a48",
+      "fingerprint": "2ad9cb88",
       "gatesSatisfied": [],
       "name": "Azvaldt, Penitentiary of Chaos",
       "scenarios": [
         {
-          "fingerprint": "47520230",
+          "fingerprint": "f5688010",
           "scenario": "turn_boundary"
         }
       ],
