@@ -257,6 +257,56 @@ describe("game-over halt compacts deferred death batch", () => {
     expect(checkSoakInvariants(state).map((f) => f.message)).toEqual([]);
   });
 
+  it("lethal inside Last Words batch: second corpse buried, its LW suppressed", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: R6 })
+      .withFirstHand(["10473310"])
+      .withFirstPP(6, 6)
+      .withSecondDeck([
+        {
+          name: "DeckFodder",
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+        },
+      ])
+      .build();
+
+    const lethalLw = createCard("10601110", "board", "second");
+    lethalLw.peak_defense = Number(lethalLw.defense);
+    applyKeywordsFromList(lethalLw);
+    lethalLw.uid = "lw_leader_ping";
+    (lethalLw as any).insertionTs = 1;
+
+    const drawLw = createCard("10001120", "board", "second");
+    drawLw.peak_defense = Number(drawLw.defense);
+    applyKeywordsFromList(drawLw);
+    drawLw.uid = "lw_draw";
+    (drawLw as any).insertionTs = 2;
+
+    state.players.second.board = [lethalLw, drawLw];
+    state.players.second.hp = 10;
+    state.players.first.hp = 1;
+
+    const handBefore = thenHand("second").length;
+
+    whenPlayCard("first", 0);
+
+    expect(state.phase).toBe("gameover");
+    expect(getWinner(state)).toBe("second");
+    assertNoNullBoardSlots();
+    expect(
+      getGraveyard(state, "second").some((c) => c.uid === lethalLw.uid),
+    ).toBe(true);
+    expect(
+      getGraveyard(state, "second").some((c) => c.uid === drawLw.uid),
+    ).toBe(true);
+    assertSingleZone(lethalLw);
+    assertSingleZone(drawLw);
+    expect(thenHand("second").length).toBe(handBefore);
+    expect(checkSoakInvariants(state).map((f) => f.message)).toEqual([]);
+  });
+
   it("damage batch depth does not leak into the next game after a halted lethal", () => {
     givenGameState({ seed: 3, activePlayer: "first", roundCount: 8 })
       .withFirstPP(10, 10)
