@@ -21,6 +21,7 @@ import {
   getGraveyard,
   getHand,
   getHP,
+  getDeck,
   setHP,
 } from "../../src/core/playerHelpers.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
@@ -136,8 +137,8 @@ describe("Reactive trigger queue", () => {
     state.turnNumber = 5;
   });
 
-  it("Krulle crest enter debuff resolves after Lieutenant Last Words (+1/+0, LW removed) — no loop", () => {
-    // Krulle SE gives crest to opponent; LT on crest owner's board so ally_follower_enter fires.
+  it("Krulle crest enter debuff resolves after Lieutenant Last Words (+1/+0, LW removed) — regression", () => {
+    // Regression: LT LW summon+buff must finish before Krulle crest enter debuff (-1/-0).
     givenGameState({ seed: 42, activePlayer: "first" })
       .withFirstDeck([
         { name: "Filler", type: "Follower", cost: 1, attack: 1, defense: 1 },
@@ -169,6 +170,130 @@ describe("Reactive trigger queue", () => {
       (c) => c.name === "Netherworld Lieutenant",
     );
     expect(graveLts.length).toBe(2);
+  });
+
+  describe("Queue-after-current-effect ordering (sabotage-sensitive)", () => {
+    function makeDrawOnEnterObserver() {
+      const observer = createCard(
+        {
+          name: "Draw On Enter",
+          type: "Follower",
+          cost: 2,
+          attack: 1,
+          defense: 1,
+          triggers: [
+            {
+              event: "ally_follower_enter",
+              source: "board",
+              effects: [{ op: "draw", count: 1 }],
+            },
+          ],
+        },
+        "board",
+        "first",
+      );
+      applyKeywordsFromList(observer);
+      return observer;
+    }
+
+    it("enter draw vs summon-then-discard-rightmost — hand order differs by dispatch timing", () => {
+      givenGameState({ seed: 61, activePlayer: "first" })
+        .withFirstHand([
+          { name: "HandLeft", type: "Spell", cost: 1 },
+          { name: "HandRight", type: "Spell", cost: 2 },
+        ])
+        .withFirstDeck([
+          {
+            name: "DeckFiller",
+            type: "Follower",
+            cost: 1,
+            attack: 1,
+            defense: 1,
+          },
+          { name: "DrawnTop", type: "Spell", cost: 3 },
+        ])
+        .build();
+      state.players.first.board = [makeDrawOnEnterObserver()];
+      const deckBefore = getDeck(state, "first").length;
+
+      whenRunEffects(
+        [
+          { op: "summon", source: "named", name: "Goblin", count: 1 },
+          { op: "discard", mode: "rightmost", count: 1 },
+        ],
+        "first",
+      );
+
+      // Queue: discard HandRight, then enter draw → [HandLeft, DrawnTop]
+      expect(getHand(state, "first").map((c) => c.name)).toEqual([
+        "HandLeft",
+        "DrawnTop",
+      ]);
+      expect(getDeck(state, "first").length).toBe(deckBefore - 1);
+      expect(
+        getGraveyard(state, "first").some((c) => c.name === "HandRight"),
+      ).toBe(true);
+      expect(
+        getGraveyard(state, "first").some((c) => c.name === "DrawnTop"),
+      ).toBe(false);
+    });
+
+    it("enter damage-by-attack vs summon-then-set-attack — leader HP differs by dispatch timing", () => {
+      givenGameState({ seed: 62, activePlayer: "first" }).build();
+      setHP(state, "second", 20);
+      const observer = createCard(
+        {
+          name: "Strike On Enter",
+          type: "Follower",
+          cost: 2,
+          attack: 1,
+          defense: 1,
+          triggers: [
+            {
+              event: "ally_follower_enter",
+              source: "board",
+              effects: [
+                {
+                  op: "damage",
+                  target: "enemy:leader",
+                  amount: "{entering.attack}",
+                },
+              ],
+            },
+          ],
+        },
+        "board",
+        "first",
+      );
+      applyKeywordsFromList(observer);
+      state.players.first.board = [observer];
+
+      whenRunEffects(
+        [
+          {
+            op: "summon",
+            source: "named",
+            name: "Goblin",
+            count: 1,
+          },
+          {
+            op: "stat",
+            action: "set",
+            target: "ally:follower",
+            filter: { name: "Goblin" },
+            attack: 5,
+            defense: 1,
+          },
+        ],
+        "first",
+      );
+
+      // Queue: set Goblin to 5/1, then enter strike for 5 → leader 15
+      expect(getHP(state, "second")).toBe(15);
+      const goblin = getBoard(state, "first").find((c) => c?.name === "Goblin");
+      expect(goblin).toBeTruthy();
+      expect(Number(goblin!.attack)).toBe(5);
+    });
   });
 
   it("soak seed 20260913 game 123 — Reaper's Due printed copy terminates; exact board after batch", async () => {

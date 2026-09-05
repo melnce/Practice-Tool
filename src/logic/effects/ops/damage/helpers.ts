@@ -115,10 +115,7 @@ export function resolveAmount(
       return resolveAmountWithOverflow(
         { amount: spec.amount, add_amount: spec.add_amount } as any,
         ctx.owner,
-        {
-          sourceCard: ctx.sourceCard,
-          selectedCard: ctx.selectedCard,
-        },
+        ctx,
       );
   }
 }

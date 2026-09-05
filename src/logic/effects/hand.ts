@@ -13,7 +13,7 @@ import { toUids } from "../../core/uidResolver.js";
 // UNIFIED DISCARD HANDLER - routes by mode field
 // ========================================================================
 
-export type DiscardMode = "select" | "except_named";
+export type DiscardMode = "select" | "except_named" | "rightmost";
 
 function rememberDiscardedCards(discarded: CardInstance[]): void {
   if (!discarded.length) return;
@@ -36,6 +36,10 @@ export function handleDiscard(
   switch (mode) {
     case "except_named":
       handleDiscardAllExceptNamed(eff, owner);
+      return;
+
+    case "rightmost":
+      handleDiscardRightmost(eff, owner);
       return;
 
     case "select":
@@ -70,6 +74,28 @@ export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
   if (discarded.length > 0) {
     rememberDiscardedCards(discarded);
     logEvent("discard", { owner, count: discarded.length });
+    addShadows(state, owner, discarded.length);
+  }
+}
+
+/** Discard the rightmost card(s) in hand without opening selection UI. */
+export function handleDiscardRightmost(eff: Effect, owner: Player): void {
+  const n = Math.max(1, parseInt(String((eff as any).count ?? 1), 10));
+  const hand = getHand(state, owner);
+  const grave = getGraveyard(state, owner);
+  const discarded: CardInstance[] = [];
+
+  for (let i = 0; i < n && hand.length > 0; i++) {
+    const removed = hand.pop();
+    if (!removed) continue;
+    removed.cost_mod = 0;
+    grave.push(removed);
+    discarded.push(removed);
+  }
+
+  if (discarded.length > 0) {
+    rememberDiscardedCards(discarded);
+    logEvent("discard", { owner, count: discarded.length, mode: "rightmost" });
     addShadows(state, owner, discarded.length);
   }
 }
