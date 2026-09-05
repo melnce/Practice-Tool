@@ -8,7 +8,7 @@ import type {
   Effect,
 } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
-import { pushPlayedHistory } from "./history.js";
+import { pushPlayedHistory, rememberLastPlayedCard } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
 import { getBoard } from "../../../core/playerHelpers.js";
@@ -115,10 +115,12 @@ export function playFollower(
         enteringKeywordSnapshot,
       };
       stashPlayFollowerResume(resume);
+      rememberLastPlayedCard(card);
       return { kind: "paused" };
     }
   }
 
+  rememberLastPlayedCard(card);
   runPlayFollowerPostFanfare({
     player,
     cardUid: card.uid,

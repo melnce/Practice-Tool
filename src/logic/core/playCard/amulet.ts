@@ -8,7 +8,7 @@ import type {
   Effect,
 } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
-import { pushPlayedHistory } from "./history.js";
+import { pushPlayedHistory, rememberLastPlayedCard } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 
 import { mergeEarthSigilOnPlay } from "../../effects/ops/summon_ops/earth.js";
@@ -68,7 +68,7 @@ export function playAmulet(
     }
   }
 
-  (state as any).__lastPlayedCard = card;
+  rememberLastPlayedCard(card);
   fireTrigger("ally_card_played", player as any, {
     playedCard: card,
   });
