@@ -178,6 +178,14 @@ function allyAmulet(id: string, countdown?: number) {
   return c;
 }
 
+function enemyAmulet(id: string, countdown?: number) {
+  const c = createCard(id, "board", "second");
+  applyKeywordsFromList(c);
+  if (countdown != null) c.countdown = countdown;
+  state.players.second.board.push(c);
+  return c;
+}
+
 function enemyLastWordsFollower(name = "LWTarget") {
   const lw = createCard(
     { name, type: "Follower", cost: 2, attack: 2, defense: 3 },
@@ -404,6 +412,36 @@ describe("L2 — Havencraft tokens", () => {
       expect(depthsInHand()).toBe(0);
     });
 
+    it("on play selecting allied follower: destroys follower without leader damage or add", () => {
+      setupTurn(R6, { hand: [DEPTHS_TOME], pp: 1 });
+      const target = allyFollower(2, 4, "Target");
+      const bystander = allyFollower(2, 4, "Bystander");
+      state.players.second.hp = 20;
+      whenPlayCard("first", 0);
+      resolvePendingByUid(target.uid);
+      expect(findOnBoard("first", "Target")).toBeFalsy();
+      expect(findOnBoard("first", "Bystander")).toBeTruthy();
+      expect(getHP(state, "second")).toBe(20);
+      expect(depthsInHand()).toBe(0);
+    });
+
+    it("on play selecting enemy amulet: destroys amulet without leader damage or add", () => {
+      setupTurn(R6, { hand: [DEPTHS_TOME], pp: 1 });
+      const target = enemyAmulet(SERENE_SANCTUARY);
+      const bystander = enemyAmulet(SERENE_SANCTUARY);
+      state.players.second.hp = 20;
+      whenPlayCard("first", 0);
+      resolvePendingByUid(target.uid);
+      expect(getBoard(state, "second").some((c) => c?.uid === target.uid)).toBe(
+        false,
+      );
+      expect(
+        getBoard(state, "second").some((c) => c?.uid === bystander.uid),
+      ).toBe(true);
+      expect(getHP(state, "second")).toBe(20);
+      expect(depthsInHand()).toBe(0);
+    });
+
     it("on play selecting allied amulet: destroys amulet", () => {
       setupTurn(R6, { hand: [DEPTHS_TOME], pp: 1 });
       const amulet = allyAmulet(SERENE_SANCTUARY);
@@ -412,31 +450,24 @@ describe("L2 — Havencraft tokens", () => {
       expect(findOnBoard("first", "Serene Sanctuary")).toBeFalsy();
     });
 
-    it.fails(
-      "allied amulet branch: deal 2 damage to enemy leader (90064320 — conditional clause un-encoded in spell JSON)",
-      () => {
-        setupTurn(R6, { hand: [DEPTHS_TOME], pp: 1 });
-        const amulet = allyAmulet(SERENE_SANCTUARY);
-        state.players.second.hp = 20;
-        whenPlayCard("first", 0);
-        resolvePendingByUid(amulet.uid);
-        // Printed: "deal 2 damage to the enemy leader". Observed: HP stays 20.
-        expect(getHP(state, "second")).toBe(18);
-      },
-    );
+    it("allied amulet branch: deal 2 damage to enemy leader", () => {
+      setupTurn(R6, { hand: [DEPTHS_TOME], pp: 1 });
+      const amulet = allyAmulet(SERENE_SANCTUARY);
+      state.players.second.hp = 20;
+      whenPlayCard("first", 0);
+      resolvePendingByUid(amulet.uid);
+      expect(getHP(state, "second")).toBe(18);
+    });
 
-    it.fails(
-      "allied amulet branch: add Depths of the Eld Tome to hand (90064320 — conditional clause un-encoded in spell JSON)",
-      () => {
-        setupTurn(R6, { hand: [DEPTHS_TOME], pp: 1 });
-        const amulet = allyAmulet(SERENE_SANCTUARY);
-        const handBefore = depthsInHand();
-        whenPlayCard("first", 0);
-        resolvePendingByUid(amulet.uid);
-        // Printed: "add a Depths of the Eld Tome to your hand". Observed: hand count unchanged.
-        expect(depthsInHand()).toBe(handBefore + 1);
-      },
-    );
+    it("allied amulet branch: add Depths of the Eld Tome to hand", () => {
+      setupTurn(R6, { hand: [DEPTHS_TOME], pp: 1 });
+      const amulet = allyAmulet(SERENE_SANCTUARY);
+      const uidsBefore = handUids();
+      whenPlayCard("first", 0);
+      resolvePendingByUid(amulet.uid);
+      const added = newHandCards(uidsBefore, "first", DEPTHS_TOME);
+      expect(added).toHaveLength(1);
+    });
   });
 
   describe("Holy Cavalier (90064110)", () => {
