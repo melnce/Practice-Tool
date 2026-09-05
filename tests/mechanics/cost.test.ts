@@ -23,6 +23,16 @@ import {
   thenHand,
   resetUidCounter,
 } from "../harness/builders.js";
+import { state } from "../../src/core/gameState.js";
+import { hashGameState } from "../../src/core/stateHash.js";
+import { getHand } from "../../src/core/playerHelpers.js";
+import {
+  pickEnhanceTiers,
+  getEffectiveCost,
+  resolvePlayCost,
+} from "../../src/logic/core/playCard/cost.js";
+import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
+import type { CardInstance } from "../../src/core/types/index.js";
 
 describe("Mechanic Contract: cost", () => {
   beforeEach(() => {
@@ -169,6 +179,80 @@ describe("Mechanic Contract: cost", () => {
       whenRunEffects([effect], "first");
 
       expect(thenHand("first")[0].cost).toBe(0);
+    });
+  });
+
+  // ===========================================================================
+  // PURE READ PATHS (pickEnhanceTiers must not write enhanceTiers onto cards)
+  // ===========================================================================
+
+  describe("pickEnhanceTiers is pure on read paths", () => {
+    beforeEach(() => {
+      state.gameStarted = true;
+      state.phase = "main";
+      state.activePlayer = "first";
+    });
+
+    function snapshotCard(card: CardInstance): string {
+      return JSON.stringify(card);
+    }
+
+    it("does not add enhanceTiers when inspecting a card without Enhance", () => {
+      givenGameState({ seed: 1, activePlayer: "first" })
+        .withFirstPP(5, 5)
+        .withFirstHand([
+          {
+            name: "PlainFollower",
+            type: "Follower",
+            cost: 3,
+            attack: 2,
+            defense: 2,
+            keywords: [{ name: "Rush" }],
+          },
+        ])
+        .build();
+
+      const card = getHand(state, "first")[0]!;
+      const hashBefore = hashGameState(state);
+      const cardBefore = snapshotCard(card);
+
+      pickEnhanceTiers(card, 5);
+      getEffectiveCost(card);
+      resolvePlayCost(card, 5);
+      canPlayCard(card, "first");
+
+      expect("enhanceTiers" in card).toBe(false);
+      expect(snapshotCard(card)).toBe(cardBefore);
+      expect(hashGameState(state)).toBe(hashBefore);
+    });
+
+    it("returns tiers from Enhance keyword without mutating the card", () => {
+      const raise = [
+        { op: "stat" as const, target: "self", attack: 2, defense: 0 },
+      ];
+      givenGameState({ seed: 1, activePlayer: "first" })
+        .withFirstPP(7, 7)
+        .withFirstHand([
+          {
+            name: "EnhanceFollower",
+            type: "Follower",
+            cost: 3,
+            attack: 2,
+            defense: 2,
+            keywords: [{ name: "Enhance", cost: 5, effects: raise }],
+          },
+        ])
+        .build();
+
+      const card = getHand(state, "first")[0]!;
+      const cardBefore = snapshotCard(card);
+
+      const tiers = pickEnhanceTiers(card, 7);
+      canPlayCard(card, "first");
+
+      expect(tiers).toEqual([{ cost: 5, effects: raise }]);
+      expect("enhanceTiers" in card).toBe(false);
+      expect(snapshotCard(card)).toBe(cardBefore);
     });
   });
 

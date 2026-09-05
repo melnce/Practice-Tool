@@ -23,23 +23,29 @@ export function pickEnhanceTiers(
   card: CardInstance,
   availablePP: number,
 ): { cost: number; effects: Effect[] }[] {
-  const tiers = Array.isArray(card.enhanceTiers) ? card.enhanceTiers : [];
+  let tiers: { cost: number; effects: Effect[] }[] = Array.isArray(
+    card.enhanceTiers,
+  )
+    ? card.enhanceTiers.map((t) => ({
+        cost: t.cost,
+        effects: t.effects || [],
+      }))
+    : [];
   if (!tiers.length && Array.isArray(card.keywords)) {
-    const tmp = [];
+    tiers = [];
     for (const k of card.keywords) {
       const name = (typeof k === "string" ? k : k?.name) || "";
       if (name.toLowerCase() === "enhance") {
         const cost = Number(typeof k === "object" ? k.cost : 0);
         const effects =
           typeof k === "object" && Array.isArray(k.effects) ? k.effects : [];
-        if (cost > 0) tmp.push({ cost, effects });
+        if (cost > 0) tiers.push({ cost, effects });
       }
     }
-    tmp.sort((a: any, b: any) => b.cost - a.cost);
-    (card as any).enhanceTiers = tmp;
+    tiers.sort((a, b) => b.cost - a.cost);
   }
   const affordable: { cost: number; effects: Effect[] }[] = [];
-  for (const t of card.enhanceTiers || []) {
+  for (const t of tiers) {
     if (availablePP >= t.cost) {
       affordable.push({ cost: t.cost, effects: t.effects || [] });
     }
