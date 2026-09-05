@@ -32,7 +32,6 @@ import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getSkyboundArtGauge } from "../../src/logic/effects/skybound.js";
 import {
   getBoard,
@@ -725,10 +724,7 @@ describe("L2 — rotation Forestcraft", () => {
       manamel.justPlayed = false;
       state.players.first.board = [manamel];
       const foe = enemyFollower(2, 3, "Foe");
-      const eot = (manamel.triggers ?? []).find(
-        (t: { event?: string }) => t.event === "end_of_turn",
-      );
-      runEffects((eot as { effects: unknown[] }).effects, "first", manamel);
+      whenEndTurn();
       expect(manamel.hasEvolved).toBe(true);
       expect(Number(foe.defense)).toBe(2);
     });
@@ -996,13 +992,16 @@ describe("L2 — rotation Forestcraft", () => {
       setupTurn(R8, { hand: [KOU_YOU], pp: 7, hp: 15 });
       const ally = allyFollower(3, 1, "Ally");
       ally.peak_defense = 10;
+      const enemy = enemyFollower(0, 5, "Dummy");
       whenPlayCard("first", 0);
       const kou = findOnBoard("first", "Kou & You, Love and Hatred")!;
       kou.justPlayed = false;
-      const strike = (kou.triggers ?? []).find(
-        (t: { event?: string }) => t.event === "strike",
-      );
-      runEffects((strike as { effects: unknown[] }).effects, "first", kou);
+      kou.can_attack = true;
+      kou.can_attack_followers = true;
+      kou.attacks_left = 2;
+      applyKeywordsFromList(kou);
+      const atkIdx = getBoard(state, "first").indexOf(kou);
+      attackFollower(atkIdx, 0, "first", "second");
       expect(getHP(state, "first")).toBe(18);
       expect(Number(ally.defense)).toBe(4);
       expect(printed).toContain("Restore 3 defense to all allies");

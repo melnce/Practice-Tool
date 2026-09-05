@@ -19,7 +19,10 @@ import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  playFollowerFromHandById,
+  summonFollowerByCardId,
+} from "../harness/l2Dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import {
@@ -273,9 +276,12 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
 
       const atkBefore = Number(ally.attack);
       const defBefore = Number(ally.defense);
-      fireTrigger("enhanced_play", "first", {
-        playedCard: createCard(ZETA_BEA, "hand", "first"),
-      });
+      state.players.first.pp = 6;
+      state.players.first.hand.push(createCard(ZETA_BEA, "hand", "first"));
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.id === ZETA_BEA),
+      );
       expect(Number(ally.attack)).toBe(atkBefore + 1);
       expect(Number(ally.defense)).toBe(defBefore + 1);
       expect(printed).toContain("Enhanced card");
@@ -294,9 +300,12 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       ).toBe(4);
 
       const atkBefore = Number(ally.attack);
-      fireTrigger("enhanced_play", "first", {
-        playedCard: createCard(ZETA_BEA, "hand", "first"),
-      });
+      state.players.first.pp = 4;
+      state.players.first.hand.push(createCard(ZETA_BEA, "hand", "first"));
+      whenPlayCard(
+        "first",
+        thenHand("first").findIndex((c) => c.id === ZETA_BEA),
+      );
       expect(Number(ally.attack)).toBe(atkBefore);
       expect(printed).toContain("Reduce your faith's value by 5");
     });

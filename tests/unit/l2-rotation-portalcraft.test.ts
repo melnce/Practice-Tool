@@ -21,7 +21,6 @@ import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";

@@ -29,7 +29,7 @@ import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import { summonFollowerByCardId } from "../harness/l2Dispatch.js";
 import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import {
@@ -1285,18 +1285,14 @@ describe("L2 — Rotation Abysscraft", () => {
       expect(printed).toContain("give it Rush");
     });
 
-    it("during opponent's turn: Bat enter does not gain Rush", () => {
+    it("allied Bat entering gains Rush during opponent's turn too", () => {
       setupTurn(R6, { active: "second" });
       const fiole = createCard(FIOLE, "board", "first");
       fiole.peak_defense = fiole.defense;
       state.players.first.board = [fiole];
-      const bat = createCard(BAT, "board", "first");
-      bat.peak_defense = bat.defense;
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: bat,
-        enteringOwner: "first",
-      });
-      expect(bat.hasRush).toBeFalsy();
+      const bat = summonFollowerByCardId(BAT, "first");
+      expect(bat.hasRush).toBe(true);
+      expect(printed).toContain("give it Rush");
     });
   });
 

@@ -23,7 +23,10 @@ import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  summonFollowerByCardId,
+  playFollowerFromHandById,
+} from "../harness/l2Dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { getBoard, getHand, getHP } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
@@ -437,14 +440,9 @@ describe("L2 — Midrange Abysscraft", () => {
     });
 
     it("self-enter does not grant Rush to Adahime", () => {
-      setupTurn(8);
-      const adahime = createCard(ADAHIME, "board", "first");
-      adahime.peak_defense = adahime.defense;
-      state.players.first.board = [adahime];
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: adahime,
-        enteringOwner: "first",
-      });
+      setupTurn(8, { hand: [ADAHIME], pp: 6 });
+      whenPlayCard("first", 0);
+      const adahime = findOnBoard("first", "Adahime, Anathema of Death")!;
       expect(adahime.hasRush).toBeFalsy();
     });
 
@@ -671,13 +669,8 @@ describe("L2 — Midrange Abysscraft", () => {
       const mac = createCard(MACMILLAN, "board", "first");
       mac.peak_defense = mac.defense;
       state.players.first.board = [mac];
-      const ghost = createCard(GHOST, "board", "first");
-      ghost.peak_defense = ghost.defense;
       const hpEnemyBefore = getHP(state, "second");
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: ghost,
-        enteringOwner: "first",
-      });
+      const ghost = summonFollowerByCardId(GHOST, "first");
       expect(Number(ghost.attack)).toBe(1);
       expect(ghost.hasRush).toBeFalsy();
       expect(ghost.hasWard).toBeFalsy();

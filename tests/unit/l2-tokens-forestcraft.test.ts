@@ -22,7 +22,7 @@ import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
+import { giveStatBuffViaEngine } from "../harness/l2Dispatch.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import {
@@ -173,19 +173,7 @@ function allyFollower(
 }
 
 function buffSelf(card: ReturnType<typeof createCard>, atk = 1, def = 0): void {
-  runEffects(
-    [
-      {
-        op: "stat",
-        action: "give",
-        target: "self",
-        attack: atk,
-        defense: def,
-      },
-    ],
-    "first",
-    card,
-  );
+  giveStatBuffViaEngine(card, "first", atk, def);
 }
 
 function setupFaith(owner: "first" | "second", amount: number): void {

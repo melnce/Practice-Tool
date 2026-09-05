@@ -19,13 +19,15 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { onEvolve } from "../../src/logic/evolveUtils.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import {
+  playFollowerFromHandById,
+  PLAY_FILLER_FOLLOWER,
+} from "../harness/l2Dispatch.js";
 import {
   getBoard,
   getHand,
@@ -55,6 +57,7 @@ const MYSTERIAN_MISSILE = "90031310";
 const DELTA_CANNON = "90034340";
 const SEND_EM_PACKING = "90034350";
 const GUARDIAN_GOLEM = "90031120";
+const FILLER = "10111310";
 const REGAL_FALCON = "90061130";
 
 const R6 = 6;
@@ -576,29 +579,18 @@ describe("L2 Spell Runecraft — real-card tests", () => {
     });
 
     it("when another ally enters: gives it Rush and spellboosts hand; Ginger self-enter does not", () => {
-      setupTurn(R8, { hand: [GINGER, SPELLBOOST_TARGET], pp: 7 });
+      setupTurn(R8, {
+        hand: [GINGER, SPELLBOOST_TARGET, PLAY_FILLER_FOLLOWER],
+        pp: 10,
+      });
       whenPlayCard("first", 0);
       const ginger = findOnBoard("first", "Ginger, Disastrous Word")!;
       const sbCard = thenHand("first").find((c) => c.id === SPELLBOOST_TARGET)!;
       const sb0 = sbCount(sbCard);
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: ginger,
-        enteringOwner: "first",
-      });
       expect(ginger.hasRush).toBeFalsy();
       expect(sbCount(sbCard)).toBe(sb0);
 
-      const newcomer = createCard(
-        { name: "NewAlly", type: "Follower", cost: 1, attack: 1, defense: 1 },
-        "board",
-        "first",
-      );
-      newcomer.peak_defense = 1;
-      state.players.first.board.push(newcomer);
-      fireTrigger("ally_follower_enter", "first", {
-        enteringCard: newcomer,
-        enteringOwner: "first",
-      });
+      const newcomer = playFollowerFromHandById("first", PLAY_FILLER_FOLLOWER);
       expect(newcomer.hasRush).toBe(true);
       expect(sbCount(sbCard)).toBeGreaterThan(sb0);
     });
@@ -657,14 +649,11 @@ describe("L2 Spell Runecraft — real-card tests", () => {
 
   describe("Phylene, Cleansing Revenant (10934120)", () => {
     it("On Spellboost: reduces this card's cost by 1", () => {
-      setupTurn(R10, { hand: [PHYLENE], pp: 10 });
-      const card = getHand(state, "first")[0]!;
-      runEffects(
-        [{ op: "spellboost", target: "ally:hand", count: 1 }],
-        "first",
-        card,
-      );
-      expect(Number(card.cost)).toBeLessThan(10);
+      setupTurn(R10, { hand: [FORESIGHT, PHYLENE], pp: 2 });
+      const card = thenHand("first").find((c) => c.id === PHYLENE)!;
+      const cost0 = Number(card.cost);
+      whenPlayCard("first", 0);
+      expect(getEffectiveCost(card)).toBeLessThan(cost0);
     });
 
     it("has Bane, Ward, and Aura on field", () => {

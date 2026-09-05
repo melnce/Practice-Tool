@@ -28,7 +28,7 @@ import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
-import { fireTrigger } from "../../src/logic/core/triggers.js";
+import { attackFollower } from "../../src/logic/core/combat.js";
 import {
   runStartOfTurnBoundary,
   runEndOfTurnBoundary,
@@ -834,10 +834,14 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       );
       const cs = thenBoard("first").find((c) => c.id === CRYSTALSPAWN)!;
       const atk0 = Number(cs.attack);
-      fireTrigger("ally_follower_attacked", "first", {
-        attacker: cs,
-        defender: cs,
-      });
+      cs.justPlayed = false;
+      cs.can_attack = true;
+      cs.can_attack_followers = true;
+      cs.attacks_left = 1;
+      applyKeywordsFromList(cs);
+      const defender = enemyFollower(0, 5, "Blocker");
+      const atkIdx = getBoard(state, "first").indexOf(cs);
+      attackFollower(atkIdx, 0, "first", "second");
       expect(Number(cs.attack)).toBe(atk0 + 1);
     });
   });

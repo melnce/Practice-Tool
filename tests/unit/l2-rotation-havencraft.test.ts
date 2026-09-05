@@ -29,7 +29,10 @@ import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { runEffects } from "../../src/logic/core/effects/index.js";
+import {
+  destroyCardForLastWords,
+  expireCountdownForLastWords,
+} from "../harness/l2Dispatch.js";
 import {
   getBoard,
   getHand,
@@ -227,13 +230,9 @@ function amuletIndex(
   return state.players[player].board.findIndex((c) => c.name === name);
 }
 
-function triggerLastWords(amuletId: string, amuletName: string): void {
+function triggerLastWords(_amuletId: string, amuletName: string): void {
   const card = findOnBoard("first", amuletName)!;
-  const lwKw = (getCardById(amuletId)!.keywords as any[]).find(
-    (k) => k?.name === "LastWords",
-  );
-  runEffects(lwKw.effects, "first", card);
-  cleanupDead();
+  destroyCardForLastWords(card, "first");
 }
 
 describe("L2 — Rotation Havencraft", () => {
@@ -658,7 +657,9 @@ describe("L2 — Rotation Havencraft", () => {
     it("Last Words summons Regal Falcon", () => {
       setupTurn(R6, { hand: [AVIAN_STATUE], pp: 4 });
       whenPlayCard("first", 0);
-      triggerLastWords(AVIAN_STATUE, "Avian Statue");
+      const statue = findOnBoard("first", "Avian Statue")!;
+      engageAmulet("first", amuletIndex("Avian Statue"));
+      expireCountdownForLastWords(statue, "first");
       expect(boardCountById(REGAL_FALCON)).toBe(1);
       expect(printed).toContain("Regal Falcon");
     });
