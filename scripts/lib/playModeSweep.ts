@@ -19,6 +19,11 @@ import { isCardDatabaseInitialized } from "../../src/data/cardIndex.js";
 import { hashGameState } from "../../src/core/stateHash.js";
 import { state } from "../../src/core/gameState.js";
 import {
+  getLogs,
+  clearLogs,
+  setConsoleMirroring,
+} from "../../src/core/logger.js";
+import {
   getPP,
   getBoard,
   getHand,
@@ -89,6 +94,23 @@ export type InvariantCheck = {
   detail: string;
 };
 
+export type PlayLogEvent = {
+  type: string;
+  details: Record<string, unknown>;
+};
+
+export type PlayEventSummary = {
+  recoveredPP: number;
+  extraSpendPP: number;
+  drawn: number;
+  addedToHand: number;
+  bounced: number;
+  discarded: number;
+  returnedToDeck: number;
+  removedNames: string[];
+  removedUids: string[];
+};
+
 export type SweepCaseRecord = {
   cardId: string;
   name: string;
@@ -116,6 +138,15 @@ export type SweepCaseRecord = {
   crestBefore: number;
   crestAfter: number;
   extraSummons: number;
+  playEvents: PlayLogEvent[];
+  recoveredPP: number;
+  extraSpendPP: number;
+  drawn: number;
+  addedToHand: number;
+  bounced: number;
+  discarded: number;
+  returnedToDeck: number;
+  playedCardRemovedByLog: boolean;
   playedCardOnOwnBoard: boolean;
   cardInGraveyard: boolean;
   cardInBanish: boolean;
@@ -344,9 +375,178 @@ function check(
   };
 }
 
-/** I1: accepted ⇒ ppAfter === ppBefore − plan.cost */
+function eventPlayer(details: Record<string, unknown>): string | undefined {
+  if (typeof details.owner === "string") return details.owner;
+  if (typeof details.player === "string") return details.player;
+  if (typeof details.from === "string") return details.from;
+  return undefined;
+}
+
+function isPlayerEvent(
+  details: Record<string, unknown>,
+  player: string,
+): boolean {
+  const who = eventPlayer(details);
+  return who == null || who === player;
+}
+
+function pushUnique(list: string[], value: unknown): void {
+  if (typeof value !== "string" || !value) return;
+  if (!list.includes(value)) list.push(value);
+}
+
+/**
+ * Fold play-path `logEvent` rows into the I1'/I6' correction terms.
+ * Per-card `draw` events (uid/card) win over a preceding `{ count }` so
+ * unified draw + drawCard are not double-counted.
+ */
+export function summarizePlayEvents(
+  events: PlayLogEvent[],
+  player: string = "first",
+): PlayEventSummary {
+  let recoveredPP = 0;
+  let extraSpendPP = 0;
+  let addedToHand = 0;
+  let bounced = 0;
+  let discarded = 0;
+  let returnedToDeck = 0;
+  const removedNames: string[] = [];
+  const removedUids: string[] = [];
+  const perCardDraws: PlayLogEvent[] = [];
+  const countOnlyDraws: PlayLogEvent[] = [];
+
+  for (const ev of events) {
+    const d = ev.details ?? {};
+    switch (ev.type) {
+      case "recoverPP":
+        if (isPlayerEvent(d, player)) {
+          recoveredPP += Number(d.amount) || 0;
+        }
+        break;
+      case "spendPP":
+        if (isPlayerEvent(d, player)) {
+          extraSpendPP += Number(d.amount) || 0;
+        }
+        break;
+      case "draw":
+        if (!isPlayerEvent(d, player)) break;
+        if (d.uid != null || d.card != null) perCardDraws.push(ev);
+        else if (typeof d.count === "number") countOnlyDraws.push(ev);
+        break;
+      case "add_to_hand":
+        if (isPlayerEvent(d, player)) addedToHand += 1;
+        break;
+      case "bounceToHand":
+        if (isPlayerEvent(d, player)) {
+          bounced += 1;
+          pushUnique(removedNames, d.name);
+          pushUnique(removedUids, d.oldUid);
+        }
+        break;
+      case "bounce":
+        pushUnique(removedNames, d.target);
+        break;
+      case "discard":
+        if (isPlayerEvent(d, player)) discarded += Number(d.count) || 0;
+        break;
+      case "returnHandToDeck":
+        if (isPlayerEvent(d, player)) {
+          returnedToDeck += 1;
+          pushUnique(removedNames, d.card);
+          pushUnique(removedUids, d.uid);
+        }
+        break;
+      case "returnHandToDeckAll":
+      case "returnHandToDeckRandom":
+        if (isPlayerEvent(d, player)) returnedToDeck += Number(d.count) || 0;
+        break;
+      case "destroy":
+      case "destroyQueued":
+        pushUnique(removedNames, d.target ?? d.card);
+        pushUnique(removedUids, d.uid);
+        break;
+      case "death":
+      case "banish":
+        pushUnique(removedNames, d.card ?? d.target);
+        pushUnique(removedUids, d.uid);
+        break;
+      default:
+        break;
+    }
+  }
+
+  const drawn =
+    perCardDraws.length > 0
+      ? perCardDraws.length
+      : countOnlyDraws.reduce(
+          (sum, ev) => sum + (Number(ev.details.count) || 0),
+          0,
+        );
+
+  return {
+    recoveredPP,
+    extraSpendPP,
+    drawn,
+    addedToHand,
+    bounced,
+    discarded,
+    returnedToDeck,
+    removedNames,
+    removedUids,
+  };
+}
+
+export function playedCardNamedInRemovalLog(
+  summary: PlayEventSummary,
+  played: { name: string; uid: string },
+): boolean {
+  return (
+    summary.removedUids.includes(played.uid) ||
+    summary.removedNames.includes(played.name)
+  );
+}
+
+/** Capture `logEvent` rows emitted during `fn` even under HEADLESS. */
+export function capturePlayEvents(fn: () => void): PlayLogEvent[] {
+  const g = globalThis as { HEADLESS?: boolean };
+  const prevHeadless = g.HEADLESS;
+  g.HEADLESS = false;
+  setConsoleMirroring(false);
+  clearLogs();
+  try {
+    fn();
+    return getLogs().map((entry) => ({
+      type: String(entry.type ?? ""),
+      details: (entry.details ?? {}) as Record<string, unknown>,
+    }));
+  } finally {
+    g.HEADLESS = prevHeadless;
+    setConsoleMirroring(false);
+    clearLogs();
+  }
+}
+
+function applyEventSummary(
+  rec: SweepCaseRecord,
+  played?: { name: string; uid: string },
+): void {
+  const summary = summarizePlayEvents(rec.playEvents);
+  rec.recoveredPP = summary.recoveredPP;
+  rec.extraSpendPP = summary.extraSpendPP;
+  rec.drawn = summary.drawn;
+  rec.addedToHand = summary.addedToHand;
+  rec.bounced = summary.bounced;
+  rec.discarded = summary.discarded;
+  rec.returnedToDeck = summary.returnedToDeck;
+  rec.playedCardRemovedByLog = played
+    ? playedCardNamedInRemovalLog(summary, played)
+    : rec.playedCardRemovedByLog;
+}
+
+/** I1': accepted ⇒ ppAfter === ppBefore − plan.cost + Σ recoverPP − Σ spendPP */
 export function checkI1(rec: SweepCaseRecord): InvariantCheck {
-  const expected = rec.ppBefore - rec.plan.cost;
+  const expected =
+    rec.ppBefore - rec.plan.cost + rec.recoveredPP - rec.extraSpendPP;
   if (!rec.accepted) {
     return check(
       "I1",
@@ -363,7 +563,7 @@ export function checkI1(rec: SweepCaseRecord): InvariantCheck {
     rec.ppAfter === expected,
     expected,
     rec.ppAfter,
-    `accepted ⇒ ppAfter === ppBefore − plan.cost (${rec.ppBefore} − ${rec.plan.cost})`,
+    `accepted ⇒ ppAfter === ppBefore − plan.cost + recoveredPP − extraSpendPP (${rec.ppBefore} − ${rec.plan.cost} + ${rec.recoveredPP} − ${rec.extraSpendPP})`,
   );
 }
 
@@ -536,9 +736,10 @@ export function checkI5(rec: SweepCaseRecord): InvariantCheck {
 }
 
 /**
- * I6: accepted follower/amulet ⇒ hand −1 and the played card is on the
- * own board (extra summons are recorded, not asserted). Accepted
- * spell / Accelerate ⇒ hand −1 and the card is in the graveyard or banished.
+ * I6': accepted ⇒ handAfter === handBefore − 1 + draws + add_to_hand +
+ * bounceToHand − discards − returnHandToDeck. Follower/amulet: the played
+ * card is on the own board unless a logged bounce/return/destroy names it.
+ * Spell/Accelerate: the card is in the graveyard or banished.
  */
 export function checkI6(rec: SweepCaseRecord): InvariantCheck {
   if (!rec.accepted) {
@@ -552,7 +753,14 @@ export function checkI6(rec: SweepCaseRecord): InvariantCheck {
     );
   }
 
-  const expectedHand = rec.handBefore - 1;
+  const expectedHand =
+    rec.handBefore -
+    1 +
+    rec.drawn +
+    rec.addedToHand +
+    rec.bounced -
+    rec.discarded -
+    rec.returnedToDeck;
   const handOk = rec.handAfter === expectedHand;
   const isSpellPlay =
     rec.plan.mode === "accelerate" || rec.printedType === "Spell";
@@ -571,26 +779,34 @@ export function checkI6(rec: SweepCaseRecord): InvariantCheck {
         handAfter: rec.handAfter,
         cardInGraveyard: rec.cardInGraveyard,
         cardInBanish: rec.cardInBanish,
+        drawn: rec.drawn,
+        addedToHand: rec.addedToHand,
+        bounced: rec.bounced,
       },
-      "accepted spell/Accelerate ⇒ hand shrinks by 1 and the card is in the graveyard or banished",
+      "accepted spell/Accelerate ⇒ hand delta matches logged draw/add/bounce/discard/return and the card is in the graveyard or banished",
     );
   }
 
+  const boardOk = rec.playedCardOnOwnBoard || rec.playedCardRemovedByLog;
   return check(
     "I6",
     true,
-    handOk && rec.playedCardOnOwnBoard,
+    handOk && boardOk,
     {
       handAfter: expectedHand,
-      playedCardOnOwnBoard: true,
+      playedCardOnOwnBoard: !rec.playedCardRemovedByLog,
     },
     {
       handAfter: rec.handAfter,
       playedCardOnOwnBoard: rec.playedCardOnOwnBoard,
+      playedCardRemovedByLog: rec.playedCardRemovedByLog,
       boardAfter: rec.boardAfter,
       extraSummons: rec.extraSummons,
+      drawn: rec.drawn,
+      addedToHand: rec.addedToHand,
+      bounced: rec.bounced,
     },
-    "accepted follower/amulet ⇒ hand shrinks by 1 and the played card is on the own board (extra summons recorded, not asserted)",
+    "accepted follower/amulet ⇒ hand delta matches logged draw/add/bounce/discard/return; played card on board unless a logged bounce/return/destroy names it",
   );
 }
 
@@ -647,6 +863,15 @@ export function syntheticSweepCase(
     crestBefore: 0,
     crestAfter: 0,
     extraSummons: 0,
+    playEvents: [],
+    recoveredPP: 0,
+    extraSpendPP: 0,
+    drawn: 0,
+    addedToHand: 0,
+    bounced: 0,
+    discarded: 0,
+    returnedToDeck: 0,
+    playedCardRemovedByLog: false,
     playedCardOnOwnBoard: true,
     cardInGraveyard: false,
     cardInBanish: false,
@@ -659,6 +884,29 @@ export function syntheticSweepCase(
   const merged = { ...base, ...overrides };
   if (overrides.plan) {
     merged.plan = { ...base.plan, ...overrides.plan };
+  }
+  if (overrides.playEvents) {
+    applyEventSummary(merged, { name: merged.name, uid: "synth" });
+    if (overrides.recoveredPP !== undefined) {
+      merged.recoveredPP = overrides.recoveredPP;
+    }
+    if (overrides.extraSpendPP !== undefined) {
+      merged.extraSpendPP = overrides.extraSpendPP;
+    }
+    if (overrides.drawn !== undefined) merged.drawn = overrides.drawn;
+    if (overrides.addedToHand !== undefined) {
+      merged.addedToHand = overrides.addedToHand;
+    }
+    if (overrides.bounced !== undefined) merged.bounced = overrides.bounced;
+    if (overrides.discarded !== undefined) {
+      merged.discarded = overrides.discarded;
+    }
+    if (overrides.returnedToDeck !== undefined) {
+      merged.returnedToDeck = overrides.returnedToDeck;
+    }
+    if (overrides.playedCardRemovedByLog !== undefined) {
+      merged.playedCardRemovedByLog = overrides.playedCardRemovedByLog;
+    }
   }
   merged.expectedRoute = expectedRouteFromSpec(
     {
@@ -780,12 +1028,15 @@ export function runSweepCase(
   let outcomeKind: SweepCaseRecord["outcomeKind"] = "threw";
   let outcomeReason: string | null = null;
 
+  let playEvents: PlayLogEvent[] = [];
   if (exception === null) {
     try {
-      const outcome: PlayOutcome = whenPlayCard("first", 0);
-      outcomeKind = outcome.kind;
-      outcomeReason =
-        outcome.kind === "blocked" ? (outcome.reason ?? null) : null;
+      playEvents = capturePlayEvents(() => {
+        const outcome: PlayOutcome = whenPlayCard("first", 0);
+        outcomeKind = outcome.kind;
+        outcomeReason =
+          outcome.kind === "blocked" ? (outcome.reason ?? null) : null;
+      });
     } catch (err) {
       exception = summarizeException(err);
       outcomeKind = "threw";
@@ -834,6 +1085,15 @@ export function runSweepCase(
     crestBefore,
     crestAfter,
     extraSummons,
+    playEvents,
+    recoveredPP: 0,
+    extraSpendPP: 0,
+    drawn: 0,
+    addedToHand: 0,
+    bounced: 0,
+    discarded: 0,
+    returnedToDeck: 0,
+    playedCardRemovedByLog: false,
     playedCardOnOwnBoard,
     cardInGraveyard,
     cardInBanish,
@@ -843,6 +1103,7 @@ export function runSweepCase(
     hashFn: STATE_HASH_FN,
     checks: {} as Record<InvariantId, InvariantCheck>,
   };
+  applyEventSummary(rec, { name: card.name, uid });
   rec.checks = evaluateInvariants(rec);
   return rec;
 }
@@ -982,16 +1243,14 @@ export function formatSweepMarkdown(report: SweepReport): string {
     }
   }
   lines.push("");
-  lines.push("## How to read I1 / I6 failures");
+  lines.push("## I1 / I6 reconciliation");
   lines.push("");
   lines.push(
-    "I1 is `ppAfter === ppBefore − plan.cost` after the full play, so a card whose " +
-      "own text recovers play points (Lyria, Heartless Strategist) fails I1 even when " +
-      "the deduction itself was correct. I6 is `hand shrinks by exactly 1` plus " +
-      '"played card on board / in graveyard", so a card whose own text draws or ' +
-      "adds to hand fails I6 even when the played card left the hand cleanly. Extra " +
-      "summons are recorded (`extraSummons`) and are not an I6 failure. These rows " +
-      "are findings for a fix PR to classify — this sweep does not change `src/`.",
+    "I1' is `ppAfter === ppBefore − plan.cost + Σ recoverPP − Σ spendPP` from " +
+      "`logEvent` rows emitted during `whenPlayCard`. I6' is " +
+      "`handAfter === handBefore − 1 + draws + add_to_hand + bounceToHand − discards − returnHandToDeck`, " +
+      "and a follower/amulet must stay on the board unless a logged bounce/return/destroy names it. " +
+      "Explained deltas are recorded in `recoveredPP`, `drawn`, `addedToHand`, `bounced`.",
   );
   lines.push("");
   lines.push("## Failures by invariant");
@@ -1017,11 +1276,15 @@ export function formatSweepMarkdown(report: SweepReport): string {
   }
   lines.push("## Every case");
   lines.push("");
-  lines.push("| id | name | pp | board | mode | cost | accepted | checks |");
-  lines.push("| --- | --- | --- | --- | --- | --- | --- | --- |");
+  lines.push(
+    "| id | name | pp | board | mode | cost | accepted | recoveredPP | drawn | addedToHand | bounced | checks |",
+  );
+  lines.push(
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+  );
   for (const rec of report.cases) {
     lines.push(
-      `| ${rec.cardId} | ${rec.name} | ${rec.pp} | ${rec.boardFull ? "full" : "empty"} | ${rec.plan.mode} | ${rec.plan.cost} | ${yesNo(rec.accepted)} | ${checksCell(rec)} |`,
+      `| ${rec.cardId} | ${rec.name} | ${rec.pp} | ${rec.boardFull ? "full" : "empty"} | ${rec.plan.mode} | ${rec.plan.cost} | ${yesNo(rec.accepted)} | ${rec.recoveredPP} | ${rec.drawn} | ${rec.addedToHand} | ${rec.bounced} | ${checksCell(rec)} |`,
     );
   }
   lines.push("");
@@ -1087,6 +1350,11 @@ export function writeSweepReports(
       handBefore: rec.handBefore,
       handAfter: rec.handAfter,
       extraSummons: rec.extraSummons,
+      recoveredPP: rec.recoveredPP,
+      drawn: rec.drawn,
+      addedToHand: rec.addedToHand,
+      bounced: rec.bounced,
+      extraSpendPP: rec.extraSpendPP,
       exception: rec.exception,
       hashBefore: rec.hashBefore,
       hashAfter: rec.hashAfter,
