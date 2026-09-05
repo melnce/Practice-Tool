@@ -2,9 +2,13 @@
 // Engine soak harness — hundreds of seeded random games across the full card pool.
 // Run: npm run soak -- [--games=N] [--seed=N] [--smoke] [--history] [--determinism=N]
 //
+// NODE_ENV defaults to "test" so dev-mode engine guards (targeted-op lifecycle,
+// unknown op actions, etc.) throw instead of warn — soak must not run blind.
+//
 // Reports land in reports/soak/
 
 (globalThis as any).HEADLESS = true;
+process.env.NODE_ENV ??= "test";
 // History is off by default for soak throughput; --history / --smoke enable round-trip checks.
 if (!process.argv.includes("--history") && !process.argv.includes("--smoke")) {
   process.env.DISABLE_HISTORY = process.env.DISABLE_HISTORY ?? "1";

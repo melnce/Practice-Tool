@@ -17,7 +17,7 @@ import {
 import { fireTrigger } from "../../../core/triggers.js";
 import { resolveAmountWithOverflow } from "../damage/index.js";
 import { handleFuse } from "../fuse/unified.js";
-import { handleEvolveSelf } from "../evolve.js";
+import { evolveFollowerDeferred, handleEvolveSelf } from "../evolve.js";
 import { summonExactCopyFromHand, summonFromHand } from "../summon_ops/hand.js";
 import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
@@ -507,28 +507,36 @@ TARGETED_OP_HANDLERS.set("destroy_then", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("super_evolve_ally", (ctx) => {
-  const { owner, sourceCard, targetUids } = ctx;
+  const { owner, sourceCard, targetUids, resumeEffects } = ctx;
   const targets = resolveUids(targetUids);
   const target = targets?.[0];
   if (!target) return { kind: "handled" };
   if (sourceCard && target.uid === sourceCard.uid) return { kind: "handled" };
   if (target.hasEvolved) return { kind: "handled" };
-  handleEvolveSelf(target, owner, { mode: "super", spendPoint: false });
+  if (resumeEffects) {
+    evolveFollowerDeferred(target, owner, "super", resumeEffects, false);
+  } else {
+    handleEvolveSelf(target, owner, { mode: "super", spendPoint: false });
+  }
   logEvent("evolve", { owner, target: target.name, mode: "super" });
   return { kind: "handled" };
 });
 
 TARGETED_OP_HANDLERS.set("super_evolve_self", (ctx) => {
-  const { owner, sourceCard } = ctx;
+  const { owner, sourceCard, resumeEffects } = ctx;
   if (!sourceCard) return { kind: "handled" };
-  handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false });
+  if (resumeEffects) {
+    evolveFollowerDeferred(sourceCard, owner, "super", resumeEffects, false);
+  } else {
+    handleEvolveSelf(sourceCard, owner, { mode: "super", spendPoint: false });
+  }
   logEvent("evolve", { owner, target: sourceCard.name, mode: "super" });
   return { kind: "handled" };
 });
 
 // Unified evolve handler for targeted selection resumption
 TARGETED_OP_HANDLERS.set("evolve", (ctx) => {
-  const { eff, owner, sourceCard, targetUids } = ctx;
+  const { eff, owner, sourceCard, targetUids, resumeEffects } = ctx;
   const targets = resolveUids(targetUids);
   const mode = (eff as any).mode || "normal";
 
@@ -541,7 +549,11 @@ TARGETED_OP_HANDLERS.set("evolve", (ctx) => {
     )
       continue;
 
-    handleEvolveSelf(target, owner, { mode, spendPoint: false });
+    if (resumeEffects) {
+      evolveFollowerDeferred(target, owner, mode, resumeEffects, false);
+    } else {
+      handleEvolveSelf(target, owner, { mode, spendPoint: false });
+    }
     logEvent("evolve", { owner, target: target.name, mode });
   }
 
