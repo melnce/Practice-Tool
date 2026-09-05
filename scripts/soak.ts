@@ -214,6 +214,8 @@ async function main(): Promise<void> {
     invariants: 0,
     history: 0,
     historyCheck: config.history,
+    nonUndoableActionTypes: [] as string[],
+    totalActionsCompleted: 0,
     determinismChecks: 0,
     determinismFailures: 0,
     byRegime: { shipped: 0, random: 0 },
@@ -230,6 +232,7 @@ async function main(): Promise<void> {
   };
 
   const t0 = performance.now();
+  const nonUndoableUnion = new Set<string>();
 
   for (let i = 0; i < config.games; i++) {
     const result = await soakEnv.runSoakGame({
@@ -243,8 +246,13 @@ async function main(): Promise<void> {
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
 
-    if (result.outcome === "completed") summary.completed++;
-    else if (result.outcome === "crash") summary.crashes++;
+    for (const t of result.nonUndoableActionTypes ?? []) {
+      nonUndoableUnion.add(t);
+    }
+    if (result.outcome === "completed") {
+      summary.completed++;
+      summary.totalActionsCompleted += result.actions;
+    } else if (result.outcome === "crash") summary.crashes++;
     else if (result.outcome === "hang") summary.hangs++;
     else if (result.outcome === "invariant") summary.invariants++;
     else if (result.outcome === "history") summary.history++;
@@ -272,6 +280,7 @@ async function main(): Promise<void> {
             turns: result.turns,
             actions: result.actions,
             trace: result.trace,
+            nonUndoableActionTypes: result.nonUndoableActionTypes ?? [],
           },
           null,
           2,
@@ -354,6 +363,7 @@ async function main(): Promise<void> {
 
   summary.finishedAt = new Date().toISOString();
   summary.durationMs = performance.now() - t0;
+  summary.nonUndoableActionTypes = [...nonUndoableUnion].sort();
 
   const summaryPath = join(REPORT_DIR, "summary.json");
   writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
@@ -367,6 +377,14 @@ async function main(): Promise<void> {
   console.log(`hangs:                ${summary.hangs}`);
   console.log(`invariantViolations:  ${summary.invariants}`);
   console.log(`historyViolations:  ${summary.history}`);
+  console.log(
+    `nonUndoableTypes:   ${summary.nonUndoableActionTypes.join(", ") || "(none)"}`,
+  );
+  if (summary.completed > 0) {
+    console.log(
+      `avgActions/game:    ${(summary.totalActionsCompleted / summary.completed).toFixed(1)}`,
+    );
+  }
   console.log(
     `determinism:          ${summary.determinismChecks} checks, ${summary.determinismFailures} failures`,
   );
