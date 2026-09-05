@@ -120,7 +120,7 @@ describe("history round-trip soak", () => {
   });
 
   it.fails(
-    `seed ${CHAIN_UNDO_FAIL_SEED} — engine chain-undo __lastPlayedCard drift (no mask)`,
+    `seed ${CHAIN_UNDO_FAIL_SEED} — engine CHOOSE_TARGET nested-commit chain-undo (no mask)`,
     async () => {
       const result = await runSoakGame({
         seed: CHAIN_UNDO_FAIL_SEED,
@@ -139,7 +139,23 @@ describe("history round-trip soak", () => {
   );
 
   it.fails(
-    "engine dispatch: UNDO leaves null board slot (seed 20260909 game 14)",
+    "engine chain-undo: CHOOSE_TARGET nested commit leaves pendingTargetEffect.targetUids (seed 20260909 game 22 action 19)",
+    async () => {
+      const result = await runSoakGame({
+        seed: 20260909,
+        gameIndex: 22,
+        historyCheck: true,
+        dispatch: ENGINE,
+      });
+      expect(
+        result.outcome,
+        result.error ?? `game 22 outcome ${result.outcome}`,
+      ).toBe("completed");
+    },
+  );
+
+  it.fails(
+    "engine deep chain undo: null board slot (seed 20260909 game 14 action 56)",
     async () => {
       const result = await runSoakGame({
         seed: 20260909,
