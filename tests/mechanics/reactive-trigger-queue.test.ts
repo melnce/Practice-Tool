@@ -306,7 +306,13 @@ describe("Reactive trigger queue", () => {
     expect(result.error).toBeUndefined();
   });
 
-  it("soak seed 20260913 game 123 — Reaper's Due printed copy terminates; exact board after batch", async () => {
+  // The trace was recorded before the mulligan-order change; the second player's
+  // swap now draws different cards, so the original Reaper's Due loop is not
+  // reproduced here — that ruling is covered directly by
+  // tests/unit/l2-rotation-abysscraft.test.ts ("granted Last Words on
+  // buffed/debuffed follower summons printed copy — no LW, printed stats"); the
+  // board pins below are a determinism pin of the diverged game, nothing more.
+  it("soak seed 20260913 game 123 replays without error after the mulligan-order fix (diverged trace; determinism pin)", async () => {
     const fixture = loadSoakFixture(
       "seed20260913_game123_reapers_due_loop.json",
     );
