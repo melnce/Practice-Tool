@@ -81,7 +81,8 @@ describe("Snapshot Omission", () => {
     // Special keys that are allowed (not internal caches):
     // - __debugId: Debug identity for the state instance
     // __rng must NOT leak onto the live state root after restore (H4)
-    const ALLOWED_UNDERSCORE_KEYS = new Set(["__debugId"]);
+    // _resolutionQueue: unified reactive-trigger + death batch (included in snapshots)
+    const ALLOWED_UNDERSCORE_KEYS = new Set(["__debugId", "_resolutionQueue"]);
 
     const unexpectedUnderscoreKeys = stateKeys.filter(
       (k) =>

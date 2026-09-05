@@ -1,0 +1,209 @@
+/**
+ * Reactive trigger queue + unified resolution sequence (rulebook L194/L209).
+ *
+ * TriggerEventName classification (owner ruling 2026-09-05):
+ *
+ * NON-REACTIVE (fire synchronously via fireTriggerImmediate / dispatchEvent):
+ * - start_of_turn, end_of_turn — turn-boundary two-phase queue (turnBoundary.ts)
+ * - strike, follower_strike, leader_strike, clash — combat sequence (combat.ts)
+ * - ally_follower_attacked, enemy_follower_attacked, leader_attacked — combat watchers
+ * - self_damaged — when combatResolutionDepth > 0 (combat damage batch flush)
+ *
+ * REACTIVE when _runEffectsDepth > 0 (queued, conditions judged at enqueue):
+ * - ally_follower_enter, enemy_follower_enter
+ * - ally_follower_played
+ * - ally_follower_leaves_field, enemy_follower_leaves_field
+ * - ally_ward_destroyed
+ * - enemy_follower_defense_down
+ * - ally_evolve, ally_super_evolve, enemy_super_evolve
+ * - enhanced_play, ally_spell_played, ally_card_played, ally_draw, when_drawn
+ * - ally_amulet_destroyed
+ * - engage, on_fuse, loot_fused, loot_played, ally_earth_rite, invoke, select_mode
+ * - leader_damaged, leader_restored
+ * - self_damaged — when raised outside combat sequence (_runEffectsDepth > 0)
+ * - self_buffed_up
+ *
+ * NOT fireTrigger (effect lists, not triggers): Fanfare / Evolve / Super-Evolve /
+ * Engage / Accelerate / Crystallize / Last Words bodies — runEffects, not queued here.
+ */
+import { state } from "../../../core/gameState.js";
+import { isGameOver } from "../../../core/gameOver.js";
+import type { CardInstance, Player } from "../../../core/types/index.js";
+import type { TriggerContext, TriggerEventName } from "./types.js";
+import type { QueuedTriggerEntry } from "./process.js";
+import { dispatchEvent } from "./dispatcher.js";
+
+export const MAX_RESOLUTION_QUEUE_LENGTH = 500;
+
+/** Combat-sequence events keep synchronous timing when combatResolutionDepth > 0. */
+export const COMBAT_SEQUENCE_EVENTS = new Set<TriggerEventName>([
+  "strike",
+  "follower_strike",
+  "leader_strike",
+  "clash",
+  "ally_follower_attacked",
+  "enemy_follower_attacked",
+  "leader_attacked",
+  "self_damaged",
+]);
+
+export const TURN_BOUNDARY_EVENTS = new Set<TriggerEventName>([
+  "start_of_turn",
+  "end_of_turn",
+]);
+
+export type DeathLeaveItem = {
+  event: TriggerEventName;
+  activePlayer: Player;
+  context: TriggerContext;
+};
+
+export type DeathLwItem = {
+  card: CardInstance;
+  owner: Player;
+};
+
+export type ReactiveQueueItem = {
+  kind: "reactive";
+  event: TriggerEventName;
+  activePlayer: Player;
+  entries: QueuedTriggerEntry[];
+  /** Resume index when an interactive op pauses mid-group. */
+  resumeAt?: number;
+};
+
+export type DeathLeaveQueueItem = {
+  kind: "death_leave";
+  items: DeathLeaveItem[];
+};
+
+export type DeathLwQueueItem = {
+  kind: "death_lw";
+  items: DeathLwItem[];
+};
+
+export type ResolutionQueueItem =
+  | ReactiveQueueItem
+  | DeathLeaveQueueItem
+  | DeathLwQueueItem;
+
+export function getRunEffectsDepth(): number {
+  return ((state as any)._runEffectsDepth ?? 0) as number;
+}
+
+export function shouldQueueReactiveTrigger(
+  eventName: TriggerEventName,
+): boolean {
+  if (getRunEffectsDepth() <= 0) return false;
+  if (TURN_BOUNDARY_EVENTS.has(eventName)) return false;
+
+  const combatDepth = ((state as any).combatResolutionDepth ?? 0) as number;
+  if (combatDepth > 0 && COMBAT_SEQUENCE_EVENTS.has(eventName)) return false;
+
+  return true;
+}
+
+export function getResolutionQueue(): ResolutionQueueItem[] {
+  if (!(state as any)._resolutionQueue) {
+    (state as any)._resolutionQueue = [];
+  }
+  return (state as any)._resolutionQueue as ResolutionQueueItem[];
+}
+
+export function clearResolutionQueue(): void {
+  (state as any)._resolutionQueue = [];
+}
+
+function recentCardNamesForGuard(limit = 3): string[] {
+  const names: string[] = [];
+  const q = getResolutionQueue();
+  for (let i = q.length - 1; i >= 0 && names.length < limit; i--) {
+    const item = q[i]!;
+    if (item.kind === "reactive") {
+      for (
+        let j = item.entries.length - 1;
+        j >= 0 && names.length < limit;
+        j--
+      ) {
+        const n = item.entries[j]?.card?.name;
+        if (n) names.push(n);
+      }
+    } else if (item.kind === "death_lw") {
+      for (let j = item.items.length - 1; j >= 0 && names.length < limit; j--) {
+        const n = item.items[j]?.card?.name;
+        if (n) names.push(n);
+      }
+    } else if (item.kind === "death_leave") {
+      for (let j = item.items.length - 1; j >= 0 && names.length < limit; j--) {
+        const n = item.items[j]?.context?.leavingCard?.name;
+        if (n) names.push(n);
+      }
+    }
+  }
+  return names;
+}
+
+function assertQueueLengthGuard(eventName?: TriggerEventName): void {
+  const q = getResolutionQueue();
+  if (q.length < MAX_RESOLUTION_QUEUE_LENGTH) return;
+  const cards = recentCardNamesForGuard().join(", ");
+  const msg =
+    `[Triggers] Resolution queue exceeded ${MAX_RESOLUTION_QUEUE_LENGTH}. ` +
+    `Event: ${eventName ?? "unknown"}. Last cards: ${cards || "n/a"}. ` +
+    `This indicates an infinite loop in trigger effects.`;
+  console.error(msg);
+  throw new Error(msg);
+}
+
+export function enqueueReactiveTriggerGroup(
+  event: TriggerEventName,
+  activePlayer: Player,
+  entries: QueuedTriggerEntry[],
+): void {
+  if (entries.length === 0) return;
+  assertQueueLengthGuard(event);
+  getResolutionQueue().push({
+    kind: "reactive",
+    event,
+    activePlayer,
+    entries,
+  });
+}
+
+export function enqueueDeathLeaveGroup(items: DeathLeaveItem[]): void {
+  if (items.length === 0) return;
+  assertQueueLengthGuard();
+  getResolutionQueue().push({ kind: "death_leave", items });
+}
+
+export function enqueueDeathLwGroup(items: DeathLwItem[]): void {
+  if (items.length === 0) return;
+  assertQueueLengthGuard();
+  getResolutionQueue().push({ kind: "death_lw", items });
+}
+
+/** Collect reactive triggers for an event (conditions judged at collection). */
+export function collectReactiveTriggers(
+  eventName: TriggerEventName,
+  activePlayer: Player,
+  context: TriggerContext,
+): QueuedTriggerEntry[] {
+  const entries: QueuedTriggerEntry[] = [];
+  (state as any)._reactiveCollector = entries;
+  try {
+    dispatchEvent(eventName, activePlayer, context);
+  } finally {
+    delete (state as any)._reactiveCollector;
+  }
+  return entries;
+}
+
+/** Synchronous trigger dispatch — used at drain time and for non-reactive events. */
+export function fireTriggerImmediate(
+  eventName: TriggerEventName,
+  activePlayer: Player,
+  context: TriggerContext = {},
+): void {
+  if (isGameOver()) return;
+  dispatchEvent(eventName, activePlayer, context);
+}

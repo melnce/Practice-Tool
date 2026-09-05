@@ -87,9 +87,10 @@ export function onHistoryEvent(cb: HistoryEventListener): () => void {
 // EXPORTED for testing - tests can verify no unexpected underscore keys appear.
 export const INTERNAL_CACHE_KEYS = new Set([
   "_triggerCache", // Trigger candidate cache (auto-reinitializes on access)
-  "_deferredDeath", // Deferred LW / leave-play batch during death deferral
   "_runEffectsDepth", // Nested runEffects depth counter for deferred flush
   "deferDeathTriggers", // Transient runEffects flag — must not survive undo/redo
+  "_reactiveCollector", // Ephemeral during reactive trigger collection
+  "_drainingResolutionQueue", // Re-entrancy guard during unified queue drain
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.

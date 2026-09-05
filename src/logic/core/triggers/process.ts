@@ -5,6 +5,7 @@ import type {
 } from "../../../core/types/index.js";
 import { logEvent } from "../../../core/logger.js";
 import { isGameOver } from "../../../core/gameOver.js";
+import { state } from "../../../core/gameState.js";
 import type { TriggerContext, TriggerEventName, TriggerSpec } from "./types.js";
 import { shouldFire, markFired } from "./tracking.js";
 import { evalCommonConditions } from "./conditions.js";
@@ -36,6 +37,16 @@ export interface ProcessingCandidate {
   triggers: TriggerSpec[];
 }
 
+/** Pre-evaluated trigger ready for deferred execution (conditions judged at enqueue). */
+export interface QueuedTriggerEntry {
+  trigger: TriggerSpec;
+  card: any;
+  owner: Player;
+  source: string;
+  context: TriggerContext;
+  event: TriggerEventName;
+}
+
 export interface ProcessOptions {
   event: TriggerEventName;
   activePlayer: Player;
@@ -43,6 +54,8 @@ export interface ProcessOptions {
   predicate?: (trigger: TriggerSpec, candidate: ProcessingCandidate) => boolean;
   skipCommonConditions?: boolean;
   skipTracking?: boolean;
+  /** When set, matching triggers are collected instead of executed immediately. */
+  collector?: QueuedTriggerEntry[];
 }
 
 // P0-4 FIX: Maximum trigger chain depth to prevent infinite loops
@@ -181,7 +194,7 @@ export function processCandidateTriggers(
         }
       }
 
-      // 5. Execute
+      // 5. Execute or collect for reactive queue
       DEBUG_TRIGGERS.log({
         event,
         card: card.name,
@@ -194,8 +207,22 @@ export function processCandidateTriggers(
         cardUid: card?.uid,
       });
 
-      // PERF: Pass effects array directly without spread (runEffects doesn't mutate it)
-      runEffects(trigger.effects || [], owner, card, context);
+      const collector =
+        options.collector ??
+        ((state as any)._reactiveCollector as QueuedTriggerEntry[] | undefined);
+      if (collector) {
+        collector.push({
+          trigger,
+          card,
+          owner,
+          source,
+          context,
+          event,
+        });
+      } else {
+        // PERF: Pass effects array directly without spread (runEffects doesn't mutate it)
+        runEffects(trigger.effects || [], owner, card, context);
+      }
 
       // 6. Mark Fired
       if (enforceTracking || !options.skipTracking) {

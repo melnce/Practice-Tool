@@ -21,6 +21,7 @@ import type {
 import { runEffects } from "./effects/index.js";
 import { isGameOver, logEffectsHaltedGameOver } from "../../core/gameOver.js";
 import { flushDeferredDeathBatch, cleanupDead } from "./cleanup.js";
+import { clearResolutionQueue } from "./triggers/queue.js";
 import { clearTemporaryBuffs } from "../effects/self.js";
 import { clearTemporaryAttacksPerTurn } from "../effects/attacks.js";
 import { normalizeToGateSpec } from "../effects/gates/types.js";
@@ -260,7 +261,7 @@ function resolveTurnBoundaryQueue(
     }
   } finally {
     flushDeferredDeathBatch();
-    (state as any)._deferredDeath = { lw: [], leave: [] };
+    clearResolutionQueue();
   }
 }
 

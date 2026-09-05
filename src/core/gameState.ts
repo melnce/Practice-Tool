@@ -53,7 +53,7 @@ const KNOWN_ROOT_KEYS = new Set<string>([
   "zoneVersion",
   "_triggerCache",
   "deferDeathTriggers",
-  "_deferredDeath",
+  "_resolutionQueue",
   "_runEffectsDepth",
   "combatResolutionDepth",
   "resumePlayFollower",
@@ -138,7 +138,7 @@ export function resetStateInstance(
 
   // G) Death-defer / combat / resume ephemeral (not in DEFAULTS — must clear explicitly)
   (target as any).deferDeathTriggers = false;
-  (target as any)._deferredDeath = { lw: [], leave: [] };
+  (target as any)._resolutionQueue = [];
   (target as any).suppressCleanup = false;
   (target as any)._runEffectsDepth = 0;
   (target as any).combatResolutionDepth = 0;
