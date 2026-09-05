@@ -366,6 +366,14 @@ Uniformly at random among the destroyed allied followers that share the highest 
 
 Engine already matched (`pickDestroyedMatchHighestBaseCost` keeps every record at `maxBase`, then `top[state.rng.nextInt(top.length)]`). Behaviour pinned; do not change without a new ruling.
 
+## Depths of the Eld Crystals — how X, Y and Z are drawn — 2026-09-05
+
+Owner-supplied FAQ text (his caveat: "Dont know if this is official but since I personally never seen it hit 0 I think this makes sense"): "To determine the values of X, Y, and Z, the ability first chooses X, Y, or Z at random, with each having an equal 1/3 chance of being chosen. This process is repeated a number of times equal to your faith's value … The number of times each letter is chosen then becomes its final value." So the split is one independent uniform draw per faith point; zeros are legal outcomes (1/27 for X=3,Y=0,Z=0 at faith 3). `random_split` (`src/logic/effects/ops/random_split.ts`) implements exactly this; the faith counter is read, not spent.
+
+## Artifact fuse chain — 2026-09-05
+
+Owner's recollection (caveat: "Its been a while so I'm not 100% sure anymore"): gears fuse only with gears and the gear fused _into_ decides the body (Ambition → Striker 5/1 Rush, Remembrance → Fortifier 1/5 Ward); Striker/Fortifier host any Artifact cards and transform by the partners' total cost (1 → Ominous α, 2 → β, 3+ → γ — which is where γ's many recipes come from); Ominous α needs β **and** γ for Masterwork Ω (only one → consumed, no transform); β, γ, Ω cannot fuse. The engine (`src/logic/effects/ops/fuse/fuse.artifact.ts`) matches all of it and the printed token texts. Open, low priority: the owner "believes" α can fuse with anything except gears — α's printed text says β and γ only, and text wins until the client shows otherwise; and both Gears' printed description in `cards/token_details.json` reads "Fuse: Artifact amulets", which matches neither the owner nor the engine (stale text, not a behaviour bug — do not edit the description in this PR).
+
 ---
 
 ## Still open — Chris will test in game

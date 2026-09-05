@@ -79,16 +79,10 @@
     "url": "https://shadowverse.gg/cards/90004130-demon-of-purgatory",
     "fanfare": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
         "select": 2,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected:follower",
-            "amount": 6
-          }
-        ]
+        "amount": 6
       },
       {
         "op": "damage",
@@ -231,7 +225,11 @@
     "keywords": ["Ward"],
     "triggers": [
       {
-        "type": "end_of_turn_own",
+        "event": "end_of_turn",
+        "source": "board",
+        "condition": {
+          "whose_turn": "owner"
+        },
         "effects": [
           {
             "op": "evolve",
@@ -378,18 +376,12 @@
     "triggers": [],
     "spell": [
       {
-        "op": "select",
+        "op": "evolve",
         "target": "ally:follower",
         "select": 1,
         "condition": {
           "unevolved": true
-        },
-        "effects": [
-          {
-            "op": "evolve",
-            "target": "selected:follower"
-          }
-        ]
+        }
       }
     ]
   },
@@ -671,16 +663,10 @@
         "cost": 1,
         "effects": [
           {
-            "op": "select",
+            "op": "damage",
             "target": "enemy:follower",
             "select": 1,
-            "effects": [
-              {
-                "op": "damage",
-                "target": "selected:follower",
-                "amount": 3
-              }
-            ]
+            "amount": 3
           }
         ]
       }
@@ -688,16 +674,10 @@
     "triggers": [],
     "spell": [
       {
-        "op": "select",
+        "op": "damage",
         "target": "enemy:follower",
         "select": 1,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected:follower",
-            "amount": 1
-          }
-        ]
+        "amount": 1
       }
     ],
     "enhance_replaces_base": true

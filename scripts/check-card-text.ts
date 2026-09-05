@@ -21,12 +21,12 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { SETS_DIR } from "./mergeSets.js";
 import { checkOpKeysForCard } from "./op-keys-gate.js";
 import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceSemanticsForCard } from "./enhance-semantics-gate.js";
 import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
+import { loadCardsForGates, type CardJson } from "./lib/loadCards.js";
 import {
   getImplementationStatus,
   type ImplementationStatus,
@@ -35,20 +35,6 @@ import { spellAmuletMarkerIssues } from "./lib/typeAudit.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
-const TOKEN_FILE = path.join(ROOT, "cards", "token_details.json");
-
-type CardJson = {
-  id: string;
-  name: string;
-  description?: string;
-  type?: string;
-  fanfare?: unknown[];
-  evolve?: unknown[];
-  superevolve?: unknown[];
-  spell?: unknown[];
-  keywords?: unknown[];
-  triggers?: unknown[];
-};
 
 type Issue = {
   id: string;
@@ -56,6 +42,7 @@ type Issue = {
   kind: "error" | "warn";
   message: string;
   status?: ImplementationStatus;
+  sourceFile?: string;
 };
 
 type ClauseHint = {
@@ -128,20 +115,9 @@ const ADD_TO_HAND_ALLOWED = new Set([
   "condition",
 ]);
 
-function listSetFiles(setFilter?: string): string[] {
-  const files = fs
-    .readdirSync(SETS_DIR)
-    .filter((f) => f.endsWith(".json"))
-    .sort();
-  if (!setFilter) return files.map((f) => path.join(SETS_DIR, f));
-  const needle = setFilter.replace(/\.json$/, "");
-  const match = files.filter(
-    (f) => f === `${needle}.json` || f.includes(needle),
-  );
-  if (!match.length) {
-    throw new Error(`No set file matching "${setFilter}" in ${SETS_DIR}`);
-  }
-  return match.map((f) => path.join(SETS_DIR, f));
+function isCantPlaySpellExempt(card: CardJson): boolean {
+  if (card.type !== "Spell" || !card.cant_play) return false;
+  return /can't be played/i.test(card.description ?? "");
 }
 
 function keywordNames(keywords: unknown[] | undefined): string[] {
@@ -1410,13 +1386,15 @@ function checkCard(card: CardJson): Issue[] {
     !(card.spell?.length ?? 0) &&
     !(card.fanfare?.length ?? 0)
   ) {
-    issues.push({
-      id: card.id,
-      name: card.name,
-      kind: effectCompletenessKind,
-      status,
-      message: "Spell has description but spell[] is empty",
-    });
+    if (!isCantPlaySpellExempt(card)) {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: effectCompletenessKind,
+        status,
+        message: "Spell has description but spell[] is empty",
+      });
+    }
   }
 
   if (
@@ -1491,7 +1469,7 @@ function main() {
     gateEnhanceSemantics ||
     gateAllAlliedIncludeSelf;
 
-  const files = listSetFiles(setArg);
+  const files = loadCardsForGates(setArg);
   const allIssues: Issue[] = [];
   const allHints: ClauseHint[] = [];
   const allNumericDriftHints: NumericDriftHint[] = [];
@@ -1500,6 +1478,7 @@ function main() {
     NumericDriftScanStat
   >();
   let cardCount = 0;
+  let cantPlayExemptCount = 0;
 
   console.log(
     gateAddToHand
@@ -1521,38 +1500,36 @@ function main() {
                     : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
-  for (const file of files) {
-    const cards = JSON.parse(fs.readFileSync(file, "utf-8")) as CardJson[];
-    cardCount += cards.length;
-    for (const card of cards) {
-      if (gateMode) {
-        if (gateAddToHand) allIssues.push(...checkAddToHand(card));
-        if (gateStatOp) allIssues.push(...checkStatOpFilters(card));
-        if (gateDestroyOp) allIssues.push(...checkDestroyOpFilters(card));
-        if (gateOpKeys) allIssues.push(...checkOpKeysForCard(card));
-        if (gateDurationOp) allIssues.push(...checkDurationOpKeysForCard(card));
-        if (gateSelectTarget) allIssues.push(...checkSelectTargetForCard(card));
-        if (gateEnhanceSemantics)
-          allIssues.push(...checkEnhanceSemanticsForCard(card));
-        if (gateAllAlliedIncludeSelf)
-          allIssues.push(...checkAllAlliedIncludeSelfForCard(card));
-      } else {
-        allIssues.push(...checkCard(card));
-        allHints.push(...clauseHintsForCard(card));
-        const drift = checkNumericDrift(card, numericDriftStats);
-        allNumericDriftHints.push(...drift.hints);
-        allIssues.push(...drift.errors);
-      }
-    }
-  }
+  for (const { card, sourceFile } of files) {
+    cardCount += 1;
+    const tagIssue = (issue: Issue): Issue => ({ ...issue, sourceFile });
 
-  if (gateOpKeys && fs.existsSync(TOKEN_FILE)) {
-    const tokens = JSON.parse(
-      fs.readFileSync(TOKEN_FILE, "utf-8"),
-    ) as CardJson[];
-    cardCount += tokens.length;
-    for (const card of tokens) {
-      allIssues.push(...checkOpKeysForCard(card));
+    if (gateMode) {
+      if (gateAddToHand) allIssues.push(...checkAddToHand(card).map(tagIssue));
+      if (gateStatOp) allIssues.push(...checkStatOpFilters(card).map(tagIssue));
+      if (gateDestroyOp)
+        allIssues.push(...checkDestroyOpFilters(card).map(tagIssue));
+      if (gateOpKeys) allIssues.push(...checkOpKeysForCard(card).map(tagIssue));
+      if (gateDurationOp)
+        allIssues.push(...checkDurationOpKeysForCard(card).map(tagIssue));
+      if (gateSelectTarget)
+        allIssues.push(...checkSelectTargetForCard(card).map(tagIssue));
+      if (gateEnhanceSemantics)
+        allIssues.push(...checkEnhanceSemanticsForCard(card).map(tagIssue));
+      if (gateAllAlliedIncludeSelf)
+        allIssues.push(...checkAllAlliedIncludeSelfForCard(card).map(tagIssue));
+    } else {
+      if (isCantPlaySpellExempt(card)) {
+        cantPlayExemptCount += 1;
+        console.log(
+          `  ℹ️  [${card.id}] ${card.name} (${sourceFile}): cant_play spell — empty spell[] exempt`,
+        );
+      }
+      allIssues.push(...checkCard(card).map(tagIssue));
+      allHints.push(...clauseHintsForCard(card));
+      const drift = checkNumericDrift(card, numericDriftStats);
+      allNumericDriftHints.push(...drift.hints);
+      allIssues.push(...drift.errors.map(tagIssue));
     }
   }
 
@@ -1562,7 +1539,8 @@ function main() {
   if (errors.length) {
     console.log(`❌ ${errors.length} error(s):\n`);
     for (const i of errors) {
-      console.log(`  [${i.id}] ${i.name}: ${i.message}`);
+      const where = i.sourceFile ? ` (${i.sourceFile})` : "";
+      console.log(`  [${i.id}] ${i.name}${where}: ${i.message}`);
     }
     console.log("");
   }
@@ -1570,9 +1548,16 @@ function main() {
   if (warns.length) {
     console.log(`⚠️  ${warns.length} warning(s):\n`);
     for (const i of warns) {
-      console.log(`  [${i.id}] ${i.name}: ${i.message}`);
+      const where = i.sourceFile ? ` (${i.sourceFile})` : "";
+      console.log(`  [${i.id}] ${i.name}${where}: ${i.message}`);
     }
     console.log("");
+  }
+
+  if (!gateMode && cantPlayExemptCount) {
+    console.log(
+      `ℹ️  cant_play spell exemptions: ${cantPlayExemptCount} card(s) with empty spell[] allowed`,
+    );
   }
 
   if (!gateMode) {
@@ -1637,8 +1622,13 @@ function main() {
                       : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
+    const setFiles = new Set(
+      files
+        .filter((f) => !f.sourceFile.includes("token_details"))
+        .map((f) => f.sourceFile),
+    );
     console.log(
-      `   Scanned ${cardCount} cards in ${files.length} set file(s).`,
+      `   Scanned ${cardCount} cards in ${setFiles.size} set file(s) + token_details.json.`,
     );
     console.log("   Errors fail CI; warnings are informational.\n");
   }
