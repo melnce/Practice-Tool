@@ -114,6 +114,7 @@ type SoakCliConfig = {
   seed: number;
   smoke: boolean;
   history: boolean;
+  historyIgnore: string[];
   determinism: number;
   turnCap: number;
   actionCap: number;
@@ -126,6 +127,7 @@ function parseArgs(): SoakCliConfig {
     seed: 20260815,
     smoke: false,
     history: false,
+    historyIgnore: [],
     determinism: 20,
     turnCap: 60,
     actionCap: 800,
@@ -140,7 +142,13 @@ function parseArgs(): SoakCliConfig {
       config.determinism = 2;
       config.history = true;
     } else if (arg === "--history") config.history = true;
-    else if (arg.startsWith("--determinism="))
+    else if (arg.startsWith("--history-ignore=")) {
+      config.historyIgnore = arg
+        .slice(17)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    } else if (arg.startsWith("--determinism="))
       config.determinism = parseInt(arg.slice(14), 10);
     else if (arg.startsWith("--turn-cap="))
       config.turnCap = parseInt(arg.slice(11), 10);
@@ -179,7 +187,7 @@ async function main(): Promise<void> {
   console.log("║              SHADOWVERSE ENGINE SOAK                     ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
-    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history}`,
+    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} historyIgnore=${config.historyIgnore.join("|") || "(none)"}`,
   );
   console.log(`reports → ${REPORT_DIR}`);
   console.log("");
@@ -214,7 +222,12 @@ async function main(): Promise<void> {
     invariants: 0,
     history: 0,
     historyCheck: config.history,
+    historyIgnoreFields: config.historyIgnore,
     nonUndoableActionTypes: [] as string[],
+    playBlockedCount: 0,
+    playBlockedReasons: {} as Record<string, number>,
+    zeroCommitReasons: {} as Record<string, number>,
+    historyViolationKinds: {} as Record<string, number>,
     totalActionsCompleted: 0,
     determinismChecks: 0,
     determinismFailures: 0,
@@ -242,6 +255,7 @@ async function main(): Promise<void> {
       actionCap: config.actionCap,
       coverage,
       historyCheck: config.history,
+      historyIgnoreFields: config.historyIgnore,
     });
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
@@ -249,13 +263,40 @@ async function main(): Promise<void> {
     for (const t of result.nonUndoableActionTypes ?? []) {
       nonUndoableUnion.add(t);
     }
+    for (const entry of result.playBlockedLog ?? []) {
+      summary.playBlockedCount++;
+      summary.playBlockedReasons[entry.reason] =
+        (summary.playBlockedReasons[entry.reason] ?? 0) + 1;
+    }
+    for (const entry of result.zeroCommitLog ?? []) {
+      summary.zeroCommitReasons[entry.reason] =
+        (summary.zeroCommitReasons[entry.reason] ?? 0) + 1;
+    }
     if (result.outcome === "completed") {
       summary.completed++;
       summary.totalActionsCompleted += result.actions;
     } else if (result.outcome === "crash") summary.crashes++;
     else if (result.outcome === "hang") summary.hangs++;
     else if (result.outcome === "invariant") summary.invariants++;
-    else if (result.outcome === "history") summary.history++;
+    else if (result.outcome === "history") {
+      summary.history++;
+      const err = result.error ?? "";
+      const kind = err.startsWith("history chain-undo")
+        ? "chain-undo"
+        : err.startsWith("history chain-redo")
+          ? "chain-redo"
+          : err.includes("re-execute")
+            ? "re-execute"
+            : err.includes("redo×")
+              ? "redo"
+              : err.includes("undo×")
+                ? "undo"
+                : err.includes("legal-")
+                  ? "legal"
+                  : "other";
+      summary.historyViolationKinds[kind] =
+        (summary.historyViolationKinds[kind] ?? 0) + 1;
+    }
 
     if (result.outcome !== "completed") {
       const reproFile = join(
@@ -380,6 +421,34 @@ async function main(): Promise<void> {
   console.log(
     `nonUndoableTypes:   ${summary.nonUndoableActionTypes.join(", ") || "(none)"}`,
   );
+  if (summary.playBlockedCount > 0) {
+    const topBlocked = Object.entries(summary.playBlockedReasons)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([reason, n]) => `${reason}×${n}`)
+      .join(", ");
+    console.log(
+      `playBlocked:        ${summary.playBlockedCount} (${topBlocked})`,
+    );
+  }
+  const zeroCommitEntries = Object.entries(summary.zeroCommitReasons);
+  if (zeroCommitEntries.length > 0) {
+    const topZero = zeroCommitEntries
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([reason, n]) => `${reason.slice(0, 60)}×${n}`)
+      .join("; ");
+    console.log(`zeroCommitReasons:  ${topZero}`);
+  }
+  const histKinds = Object.entries(summary.historyViolationKinds);
+  if (histKinds.length > 0) {
+    console.log(
+      `historyKinds:       ${histKinds
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, n]) => `${k}×${n}`)
+        .join(", ")}`,
+    );
+  }
   if (summary.completed > 0) {
     console.log(
       `avgActions/game:    ${(summary.totalActionsCompleted / summary.completed).toFixed(1)}`,

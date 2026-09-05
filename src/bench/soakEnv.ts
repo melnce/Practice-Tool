@@ -13,6 +13,8 @@ import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
 import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
+import { playCardNoRender } from "../logic/core/playCard/index.js";
+import type { PlayOutcome } from "../logic/core/playCard/types.js";
 import {
   captureSnapshot,
   setHistoryEnabled,
@@ -67,7 +69,35 @@ export type SoakGameResult = {
   findings?: string[];
   /** Action types that created zero history commits during this game (not undoable). */
   nonUndoableActionTypes?: string[];
+  /** Blocked play attempts (engine refused after soak listed them as legal). */
+  playBlockedLog?: Array<{
+    actionIndex: number;
+    cardUid: string;
+    reason: string;
+  }>;
+  /** Zero-commit actions with diagnostic reason (non-mulligan). */
+  zeroCommitLog?: Array<{
+    actionIndex: number;
+    actionType: string;
+    reason: string;
+  }>;
   trace: SoakAction[];
+};
+
+/** Top-level state fields mutated before history.ts snapshots during headless play. */
+export const PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS = [
+  "deferDeathTriggers",
+  "gameTick",
+  "lastDrawnCard",
+  "lastDrawnCards",
+  "lastSummoned",
+] as const;
+
+export type ActionTelemetry = {
+  historyCommits: number;
+  /** Why this action type recorded zero commits (diagnostics). */
+  zeroCommitReason?: string;
+  playBlocked?: { cardUid: string; reason: string };
 };
 
 type ConfirmHook = (() => void) | null;
@@ -456,12 +486,28 @@ export const EXPECTED_NON_UNDOABLE_ACTION_TYPES = new Set([
   "CONFIRM_MULLIGAN",
 ]);
 
-export function findUnexpectedNonUndoableActionTypes(
-  types: Iterable<string>,
-): string[] {
-  return [...types]
-    .filter((t) => !EXPECTED_NON_UNDOABLE_ACTION_TYPES.has(t))
-    .sort();
+export function maskCanonicalSnapshot(
+  canon: string,
+  ignoreFields: readonly string[],
+): string {
+  if (ignoreFields.length === 0) return canon;
+  const obj = JSON.parse(canon) as Record<string, unknown>;
+  for (const key of ignoreFields) {
+    delete obj[key];
+  }
+  return canonicalJson(obj);
+}
+
+function snapshotsEqual(
+  expected: string,
+  actual: string,
+  ignoreFields: readonly string[],
+): boolean {
+  if (ignoreFields.length === 0) return expected === actual;
+  return (
+    maskCanonicalSnapshot(expected, ignoreFields) ===
+    maskCanonicalSnapshot(actual, ignoreFields)
+  );
 }
 
 function canonicalize(value: unknown): unknown {
@@ -535,15 +581,32 @@ export function diffJsonPaths(
   return out;
 }
 
+export function findUnexpectedNonUndoableActionTypes(
+  types: Iterable<string>,
+): string[] {
+  return [...types]
+    .filter((t) => !EXPECTED_NON_UNDOABLE_ACTION_TYPES.has(t))
+    .sort();
+}
+
+export const CHOOSE_TARGET_ZERO_COMMIT_REASON =
+  "CHOOSE_TARGET calls resolvePendingTarget → applyTargetClick (resolveTarget.ts); " +
+  "no doAction until Confirm Targets (showConfirmationButton onConfirm).";
+
 function formatHistoryMismatch(
   actionIndex: number,
   action: SoakAction,
   phase: string,
   expected: string,
   actual: string,
+  ignoreFields: readonly string[] = [],
 ): string {
-  const exp = JSON.parse(expected) as unknown;
-  const act = JSON.parse(actual) as unknown;
+  const exp = JSON.parse(
+    maskCanonicalSnapshot(expected, ignoreFields),
+  ) as unknown;
+  const act = JSON.parse(
+    maskCanonicalSnapshot(actual, ignoreFields),
+  ) as unknown;
   const diffs = diffJsonPaths(exp, act);
   const diffText = diffs
     .map(
@@ -573,16 +636,47 @@ function formatLegalMismatch(
   return `history legal-${phase} mismatch at action ${actionIndex} (${JSON.stringify(action)}):\n${diffText}`;
 }
 
-function countHistoryCommitsDuring(action: SoakAction): number {
+function countHistoryCommitsDuring(action: SoakAction): ActionTelemetry {
   let commits = 0;
   const unsub = onHistoryEvent((ev) => {
     if (ev.type === "commit") commits++;
-    // resetHistory (e.g. after second-player mulligan confirm) clears the undo stack.
     if (ev.type === "reset") commits = 0;
   });
-  applySoakAction(action);
+  const telemetry = applySoakActionWithOutcome(action);
   unsub();
-  return commits;
+  telemetry.historyCommits = commits;
+  if (commits === 0) {
+    if (telemetry.playBlocked) {
+      telemetry.zeroCommitReason = `PLAY_CARD blocked: ${telemetry.playBlocked.reason}`;
+    } else if (action.type === "CHOOSE_TARGET") {
+      telemetry.zeroCommitReason = CHOOSE_TARGET_ZERO_COMMIT_REASON;
+    }
+  }
+  return telemetry;
+}
+
+export function applySoakActionWithOutcome(
+  action: SoakAction,
+): ActionTelemetry {
+  const telemetry: ActionTelemetry = { historyCommits: 0 };
+  if (action.type === "PLAY_CARD") {
+    const hand = getHand(state, action.player);
+    const index = hand.findIndex((c) => c.uid === action.cardUid);
+    if (index === -1) {
+      dispatchAction(state, action as PlayerAction, { checkInvariants: false });
+      return telemetry;
+    }
+    const outcome: PlayOutcome = playCardNoRender(hand, action.player, index);
+    if (outcome.kind === "blocked") {
+      telemetry.playBlocked = {
+        cardUid: action.cardUid,
+        reason: outcome.reason ?? "blocked",
+      };
+    }
+    return telemetry;
+  }
+  applySoakAction(action);
+  return telemetry;
 }
 
 type HistoryCheckContext = {
@@ -594,6 +688,7 @@ type HistoryCheckContext = {
   legalAfter: string;
   policyRng: RNG;
   historyCommits: number;
+  historyIgnoreFields: readonly string[];
 };
 
 function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
@@ -604,8 +699,8 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
     after,
     legalBefore,
     legalAfter,
-    policyRng,
     historyCommits: n,
+    historyIgnoreFields,
   } = ctx;
 
   for (let i = 0; i < n; i++) {
@@ -613,13 +708,14 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
   }
 
   let actual = captureFullSnapshot().canon;
-  if (actual !== before.canon) {
+  if (!snapshotsEqual(before.canon, actual, historyIgnoreFields)) {
     return formatHistoryMismatch(
       actionIndex,
       action,
       `undo×${n}`,
       before.canon,
       actual,
+      historyIgnoreFields,
     );
   }
   let legalActual = captureLegalSnapshot();
@@ -633,17 +729,20 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
     );
   }
 
-  const useReExecute = policyRng.nextInt(4) === 0;
+  // Always redo (not re-execute): re-running the action consumes game RNG and breaks
+  // trace replay for repro files and it.fails fixtures.
+  const useReExecute = false;
   if (useReExecute) {
-    applySoakAction(action);
+    applySoakActionWithOutcome(action);
     actual = captureFullSnapshot().canon;
-    if (actual !== after.canon) {
+    if (!snapshotsEqual(after.canon, actual, historyIgnoreFields)) {
       return formatHistoryMismatch(
         actionIndex,
         action,
         "re-execute",
         after.canon,
         actual,
+        historyIgnoreFields,
       );
     }
     legalActual = captureLegalSnapshot();
@@ -661,13 +760,14 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
       dispatchAction(state, { type: "REDO" }, { checkInvariants: false });
     }
     actual = captureFullSnapshot().canon;
-    if (actual !== after.canon) {
+    if (!snapshotsEqual(after.canon, actual, historyIgnoreFields)) {
       return formatHistoryMismatch(
         actionIndex,
         action,
         `redo×${n}`,
         after.canon,
         actual,
+        historyIgnoreFields,
       );
     }
     legalActual = captureLegalSnapshot();
@@ -689,6 +789,7 @@ function runDeepHistoryChain(
   actionIndex: number,
   beforeRing: string[],
   afterRing: string[],
+  historyIgnoreFields: readonly string[],
 ): string | null {
   const k = Math.min(10, beforeRing.length);
   if (k === 0) return null;
@@ -697,9 +798,13 @@ function runDeepHistoryChain(
     dispatchAction(state, { type: "UNDO" }, { checkInvariants: false });
     const expected = beforeRing[beforeRing.length - j]!;
     const actual = captureFullSnapshot().canon;
-    if (actual !== expected) {
-      const exp = JSON.parse(expected) as unknown;
-      const act = JSON.parse(actual) as unknown;
+    if (!snapshotsEqual(expected, actual, historyIgnoreFields)) {
+      const exp = JSON.parse(
+        maskCanonicalSnapshot(expected, historyIgnoreFields),
+      ) as unknown;
+      const act = JSON.parse(
+        maskCanonicalSnapshot(actual, historyIgnoreFields),
+      ) as unknown;
       const diffs = diffJsonPaths(exp, act);
       const diffText = diffs
         .map(
@@ -715,9 +820,13 @@ function runDeepHistoryChain(
     dispatchAction(state, { type: "REDO" }, { checkInvariants: false });
     const expected = afterRing[afterRing.length - k + j - 1]!;
     const actual = captureFullSnapshot().canon;
-    if (actual !== expected) {
-      const exp = JSON.parse(expected) as unknown;
-      const act = JSON.parse(actual) as unknown;
+    if (!snapshotsEqual(expected, actual, historyIgnoreFields)) {
+      const exp = JSON.parse(
+        maskCanonicalSnapshot(expected, historyIgnoreFields),
+      ) as unknown;
+      const act = JSON.parse(
+        maskCanonicalSnapshot(actual, historyIgnoreFields),
+      ) as unknown;
       const diffs = diffJsonPaths(exp, act);
       const diffText = diffs
         .map(
@@ -758,6 +867,8 @@ export type RunSoakGameOptions = {
   skipInvariants?: boolean;
   /** When true, undo/redo round-trip after every action with full-state comparison. */
   historyCheck?: boolean;
+  /** Top-level snapshot fields to ignore when comparing undo/redo round-trips. */
+  historyIgnoreFields?: string[];
   /** Override deck pairing (skips deckSpecForSeed when both are set). */
   deckAId?: string;
   deckBId?: string;
@@ -831,6 +942,18 @@ export async function runSoakGame(
   const engineBeforeRing: string[] = [];
   const engineAfterRing: string[] = [];
   const nonUndoableActionTypes = new Set<string>();
+  const playBlockedLog: SoakGameResult["playBlockedLog"] = [];
+  const zeroCommitLog: NonNullable<SoakGameResult["zeroCommitLog"]> = [];
+  const historyIgnoreFields = opts.historyIgnoreFields ?? [];
+  let unsubHistoryReset: (() => void) | undefined;
+  if (opts.historyCheck) {
+    unsubHistoryReset = onHistoryEvent((ev) => {
+      if (ev.type === "reset") {
+        engineBeforeRing.length = 0;
+        engineAfterRing.length = 0;
+      }
+    });
+  }
   try {
     while (true) {
       if (isGameOver(state)) break;
@@ -879,14 +1002,29 @@ export async function runSoakGame(
       const beforeSnap = opts.historyCheck ? captureFullSnapshot() : null;
       const legalBefore = opts.historyCheck ? captureLegalSnapshot() : null;
 
-      const historyCommits = opts.historyCheck
+      const telemetry = opts.historyCheck
         ? countHistoryCommitsDuring(action)
-        : (applySoakAction(action), 0);
+        : (applySoakActionWithOutcome(action), { historyCommits: 0 });
+      const historyCommits = telemetry.historyCommits;
+      if (telemetry.playBlocked) {
+        playBlockedLog.push({
+          actionIndex: actions + 1,
+          cardUid: telemetry.playBlocked.cardUid,
+          reason: telemetry.playBlocked.reason,
+        });
+      }
       actions++;
 
       if (opts.historyCheck && beforeSnap && legalBefore) {
         if (historyCommits === 0) {
           nonUndoableActionTypes.add(action.type);
+          if (telemetry.zeroCommitReason) {
+            zeroCommitLog.push({
+              actionIndex: actions,
+              actionType: action.type,
+              reason: telemetry.zeroCommitReason,
+            });
+          }
         } else {
           const afterSnap = captureFullSnapshot();
           const legalAfter = captureLegalSnapshot();
@@ -900,6 +1038,7 @@ export async function runSoakGame(
             legalAfter,
             policyRng,
             historyCommits,
+            historyIgnoreFields,
           });
           if (roundTripErr) {
             return {
@@ -911,6 +1050,8 @@ export async function runSoakGame(
               error: roundTripErr,
               findings: [roundTripErr],
               nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+              playBlockedLog,
+              zeroCommitLog,
             };
           }
 
@@ -926,6 +1067,7 @@ export async function runSoakGame(
               actions,
               engineBeforeRing,
               engineAfterRing,
+              historyIgnoreFields,
             );
             if (chainErr) {
               return {
@@ -937,10 +1079,14 @@ export async function runSoakGame(
                 error: chainErr,
                 findings: [chainErr],
                 nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+                playBlockedLog,
+                zeroCommitLog,
               };
             }
           }
         }
+      } else if (!opts.historyCheck) {
+        void telemetry;
       }
 
       if (opts.coverage) scanZonesForCoverage(opts.coverage);
@@ -970,6 +1116,8 @@ export async function runSoakGame(
       error: e instanceof Error ? e.stack || e.message : String(e),
       findings: [],
     };
+  } finally {
+    unsubHistoryReset?.();
   }
 
   const completed: SoakGameResult = {
@@ -979,6 +1127,8 @@ export async function runSoakGame(
     actions,
     finalHash: safeHash(),
     nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+    playBlockedLog,
+    zeroCommitLog,
   };
   const unexpected = findUnexpectedNonUndoableActionTypes(
     nonUndoableActionTypes,
@@ -1015,7 +1165,7 @@ export async function replaySoakTrace(
       seed: seed + gameIndex * 1_000_003,
     });
     for (const action of trace) {
-      applySoakAction(action);
+      applySoakActionWithOutcome(action);
     }
     return { hash: safeHash() };
   } catch (e) {
