@@ -177,7 +177,7 @@ export function runEffects(
 
   try {
     while (queue.length > 0) {
-      if (haltEffectsIfGameOver(queue)) return;
+      if (processedCount > 0 && haltEffectsIfGameOver(queue)) return;
 
       const eff = queue.shift()!;
 

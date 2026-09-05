@@ -204,11 +204,6 @@ function resolveTurnBoundaryQueue(
 
   try {
     for (let i = 0; i < queue.length; i++) {
-      if (isGameOver()) {
-        logEffectsHaltedGameOver(queue.length - i);
-        break;
-      }
-
       const item = queue[i]!;
       const { trigger, candidate } = item;
       const card = candidate.card as CardInstance;
