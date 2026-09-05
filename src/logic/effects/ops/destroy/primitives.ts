@@ -6,6 +6,7 @@ import { logEvent } from "../../../../core/logger.js";
 import type { Player, CardInstance } from "../../../../core/types/index.js";
 import { runEffects } from "../../../core/effects/index.js";
 import { fireTrigger } from "../../../core/triggers.js";
+import { enqueueDeathLwGroup } from "../../../core/triggers/queue.js";
 import {
   getBoard as getBoardHelper,
   getGraveyard as getGraveyardHelper,
@@ -145,6 +146,10 @@ export function fireLastWords(card: CardInstance, owner: Player): void {
   const lw =
     card.keywordState?.lastWordsEffects || (card as any).lastWordsEffects;
   if (card.hasLastWords && Array.isArray(lw) && lw.length > 0) {
+    if ((state as any).deferDeathTriggers) {
+      enqueueDeathLwGroup([{ cardUid: card.uid, owner, card }]);
+      return;
+    }
     runEffects([...lw], owner, card);
   }
 }

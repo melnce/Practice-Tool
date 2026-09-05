@@ -154,21 +154,18 @@ describe("history round-trip soak", () => {
     },
   );
 
-  it.fails(
-    "engine deep chain undo: null board slot (seed 20260909 game 14 action 56)",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260909,
-        gameIndex: 14,
-        historyCheck: true,
-        dispatch: ENGINE,
-      });
-      expect(
-        result.outcome,
-        result.error ?? `game 14 outcome ${result.outcome}`,
-      ).toBe("completed");
-    },
-  );
+  it("engine deep chain undo: null board slot (seed 20260909 game 14 action 56)", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 14,
+      historyCheck: true,
+      dispatch: ENGINE,
+    });
+    expect(
+      result.outcome,
+      result.error ?? `game 14 outcome ${result.outcome}`,
+    ).toBe("completed");
+  });
 
   // Core dispatch (dispatch.ts) uses playCardNoRender — no beginAction before mutations.
   it("deferDeathTriggers restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)", async () => {

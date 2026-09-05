@@ -6,6 +6,7 @@ import {
   getPlaysThisTurn,
 } from "../../core/playerHelpers.js";
 import { resolveDamageAmountExtended } from "../effects/ops/damage/primitives.js";
+import { resolveUid } from "../../core/uidResolver.js";
 
 interface ResolveContext {
   sourceCard?: CardInstance | null;
@@ -71,6 +72,14 @@ export function resolveDynamicValue(
   if (s === "{selected.attack}") {
     const sel = context.selectedCard || state.__lastSelected;
     return parseInt((sel as any)?.attack || 0, 10) || 0;
+  }
+
+  if (s === "{entering.attack}") {
+    const entering = (context as any).enteringCard;
+    const uid = (context as any).enteringCardUid ?? entering?.uid;
+    const live = uid ? resolveUid(String(uid)) : null;
+    const card = live ?? entering;
+    return parseInt(String(card?.attack ?? 0), 10) || 0;
   }
 
   // 4. Game state / Globals

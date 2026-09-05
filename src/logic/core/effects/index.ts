@@ -20,6 +20,7 @@ import {
   registerRunEffectsInCleanup,
   flushDeferredDeathBatch,
 } from "../cleanup.js";
+import { clearResolutionQueue } from "../triggers/queue.js";
 import { flushDeferredDeckShuffle } from "../../effects/ops/returnHandToDeck.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
 import { haltEffectsIfGameOver, isGameOver } from "../../../core/gameOver.js";
@@ -252,9 +253,14 @@ export function runEffects(
     if (enableDeathDefer) {
       (state as any).deferDeathTriggers = false;
       // Interactive pause: defer flush until target/mode resolution completes.
-      if (!paused && !state.pendingTargetEffect) {
+      // Skip re-entrant flush while the unified resolution queue is draining.
+      if (
+        !paused &&
+        !state.pendingTargetEffect &&
+        !(state as any)._drainingResolutionQueue
+      ) {
         flushDeferredDeathBatch();
-        (state as any)._deferredDeath = { lw: [], leave: [] };
+        clearResolutionQueue();
       }
     } else if (batchTurnBoundary) {
       (state as any).deferDeathTriggers = false;

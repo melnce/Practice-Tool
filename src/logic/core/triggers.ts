@@ -8,6 +8,11 @@ import { handleLootFusedDedupe } from "./triggers/tracking.js";
 import { enrichContextWithUids } from "./triggers/resolve.js";
 import { getBoard, getCrests } from "../../core/playerHelpers.js";
 import { isGameOver } from "../../core/gameOver.js";
+import {
+  shouldQueueReactiveTrigger,
+  collectReactiveTriggers,
+  enqueueReactiveTriggerGroup,
+} from "./triggers/queue.js";
 
 // Re-export for external consumers if needed
 export type { TriggerContext } from "./triggers/types.js";
@@ -52,6 +57,8 @@ export function resetTriggerChainDepth(): void {
 export function registerRunEffects(fn: any) {
   registerRunEffectsInProcess(fn);
 }
+
+export { fireTriggerImmediate } from "./triggers/queue.js";
 
 // --- Main Entry Point ---
 
@@ -112,8 +119,13 @@ export function fireTrigger(
       }
     }
 
-    // 3. Dispatch
-    dispatchEvent(eventName, activePlayer, context);
+    // 3. Dispatch (queue reactive triggers raised during effect resolution)
+    if (shouldQueueReactiveTrigger(eventName)) {
+      const entries = collectReactiveTriggers(eventName, activePlayer, context);
+      enqueueReactiveTriggerGroup(eventName, activePlayer, entries);
+    } else {
+      dispatchEvent(eventName, activePlayer, context);
+    }
   } finally {
     _triggerChainDepth--;
   }

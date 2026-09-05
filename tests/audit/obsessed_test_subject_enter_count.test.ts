@@ -1,14 +1,20 @@
 /**
  * Obsessed Test Subject (10931110) — named_enter_count on enter-trigger route.
  * Drache & Aluzard (10844110) — named_enter_count on Fanfare route (regression pin).
+ *
+ * Enter triggers are reactive (queued behind the resolving effect). Leading gate
+ * ops are pre-judged at enqueue per rulebook L252 (same as turn-boundary triggers
+ * in PR #219): each copy's "if at least 5 other copies have entered" is evaluated
+ * when that copy's trigger is created, not when the queue drains.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
 import {
   givenGameState,
   resetUidCounter,
-  whenPlayCard,
+  whenRunEffects,
   createCard,
+  whenPlayCard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { getBoard, getHand } from "../../src/core/playerHelpers.js";
@@ -112,6 +118,30 @@ describe("Obsessed Test Subject — named_enter_count enter-trigger route", () =
     expect(summoned.length).toBe(2);
     expect(isBuffed(summoned[0]!)).toBe(false);
     expect(isBuffed(summoned[1]!)).toBe(true);
+  });
+
+  it("summon count:3 — 4th and 5th unbuffed, 6th buffed (per-copy gate at each enter)", () => {
+    for (let i = 0; i < 3; i++) {
+      summonOTS();
+      state.players.first.board = [];
+    }
+    expect(countNamedEnters(state, "first", OTS)).toBe(3);
+
+    whenRunEffects(
+      [{ op: "summon", source: "named", name: OTS, count: 3 }],
+      "first",
+    );
+
+    const copies = getBoard(state, "first").filter((c) => c?.name === OTS);
+    expect(copies.length).toBe(3);
+    expect(isBuffed(copies[0]!)).toBe(false);
+    expect(isBuffed(copies[1]!)).toBe(false);
+    expect(isBuffed(copies[2]!)).toBe(true);
+    expect(countNamedEnters(state, "first", OTS)).toBe(6);
+    const history = state.players.first.followerEnterHistory.filter(
+      (r) => r.name === OTS,
+    );
+    expect(history.slice(-3).map((r) => r.name)).toEqual([OTS, OTS, OTS]);
   });
 });
 

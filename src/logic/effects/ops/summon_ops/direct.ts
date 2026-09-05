@@ -39,6 +39,9 @@ export function summonNamed(eff: Effect, owner: Player) {
   const board = boardOf(owner);
   const isEarthSigilSummon = isEarthSigil(data);
 
+  // Owner ruling (2026-09-05): count > 1 resolves one copy at a time — each
+  // pushToBoard/finishFollowerEnter records the enter and raises its own
+  // ally_follower_enter reactive group (gate judged at that moment, not after all copies).
   for (let i = 0; i < count; i++) {
     if (isEarthSigilSummon && tryMergeIntoExistingEarthSigil(board)) {
       continue;

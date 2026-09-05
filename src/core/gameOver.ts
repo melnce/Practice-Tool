@@ -32,7 +32,7 @@ export function clearOrchestratorEffectQueues(): number {
   }
   // Deferred leave/LW queues are buried by flushDeferredDeathBatch (runEffects
   // finally / turn boundary), not dropped here — clearing without sendToGrave
-  // left null board slots after lethal mid-batch (#217 regression).
+  // would leave corpses on the board after lethal mid-batch (#217 regression).
   return dropped;
 }
 
