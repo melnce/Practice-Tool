@@ -191,61 +191,61 @@ describe("Reactive trigger timing matrix — batch ordering (documentation)", ()
     expect(getResolutionQueue().length).toBe(0);
   });
 
-  it.fails(
-    "C8 combat LW: enter watcher drains after death-trigger batch before main phase resumes — ally_follower_enter not raised mid-combat LW batch",
-    () => {
-      const watcher = makeMatrixWatcher("ally_follower_enter", "first");
-      getBoard(state, "first").push(watcher);
+  it("C8 combat LW: enter watcher drains after death-trigger batch before main phase resumes — ally_follower_enter not raised mid-combat LW batch", () => {
+    const watcher = makeMatrixWatcher("ally_follower_enter", "first");
+    getBoard(state, "first").push(watcher);
 
-      const defender = createCard(
-        { name: "Blocker", type: "Follower", cost: 2, attack: 3, defense: 3 },
-        "board",
-        "second",
-      );
-      defender.peak_defense = 3;
-      applyKeywordsFromList(defender);
+    const defender = createCard(
+      { name: "Blocker", type: "Follower", cost: 2, attack: 3, defense: 3 },
+      "board",
+      "second",
+    );
+    defender.peak_defense = 3;
+    applyKeywordsFromList(defender);
 
-      const attacker = createCard(
-        {
-          name: "LwAttacker",
-          type: "Follower",
-          cost: 3,
-          attack: 3,
-          defense: 1,
-          justPlayed: false,
-          can_attack: true,
-          can_attack_followers: true,
-          attacks_left: 1,
-          keywords: [
-            {
-              name: "LastWords",
-              effects: [
-                { op: "summon", source: "named", name: "LwToken", count: 1 },
-              ],
-            },
-          ],
-        },
-        "board",
-        "first",
-      );
-      applyKeywordsFromList(attacker);
-      attacker.peak_defense = 1;
-      state.players.first.board.push(attacker);
-      state.players.second.board.push(defender);
+    const attacker = createCard(
+      {
+        name: "LwAttacker",
+        type: "Follower",
+        cost: 3,
+        attack: 3,
+        defense: 1,
+        justPlayed: false,
+        can_attack: true,
+        can_attack_followers: true,
+        attacks_left: 1,
+        keywords: [
+          {
+            name: "LastWords",
+            effects: [
+              { op: "summon", source: "named", name: "Goblin", count: 1 },
+            ],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    applyKeywordsFromList(attacker);
+    attacker.peak_defense = 1;
+    state.players.first.board.push(attacker);
+    state.players.second.board.push(defender);
 
-      engineDispatch(state, {
-        type: "ATTACK",
-        player: "first",
-        attackerUid: attacker.uid,
-        defender: { type: "card", uid: defender.uid },
-      });
+    engineDispatch(state, {
+      type: "ATTACK",
+      player: "first",
+      attackerUid: attacker.uid,
+      defender: { type: "card", uid: defender.uid },
+    });
 
-      expect(watcherEarth("first", watcher.uid)).toBe(1);
-      expect(getResolutionQueue().length).toBe(0);
-      expect((state as any)._drainingResolutionQueue).toBeFalsy();
-      expect(state.pendingTargetEffect).toBeUndefined();
-    },
-  );
+    expect(getBoard(state, "first").some((c) => c?.name === "Goblin")).toBe(
+      true,
+    );
+    expect(watcherEarth("first", watcher.uid)).toBe(1);
+    expect(getResolutionQueue().length).toBe(0);
+    expect((state as any)._drainingResolutionQueue).toBeFalsy();
+    expect(state.pendingTargetEffect).toBeUndefined();
+  });
 });
 
 describe("Reactive trigger timing matrix — C15 nesting", () => {
