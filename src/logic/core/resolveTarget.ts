@@ -97,7 +97,10 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
 /** Drain deferred deaths/reactive triggers raised during a targeted-op handler. */
 function flushTargetedOpAfterHandler(
   opCtx: TargetedOpContext,
-  result: { kind: "handled"; deferredEnter?: { card: CardInstance; owner: Player }[] },
+  result: {
+    kind: "handled";
+    deferredEnter?: { card: CardInstance; owner: Player }[];
+  },
 ) {
   flushDeferredOnFuse();
   const playFollowerResume = (state.pendingTargetEffect?.resumePlayFollower ??
@@ -133,10 +136,7 @@ function flushTargetedOpAfterHandler(
   completeDeferredLwAfterSelection(deferredLwComplete);
 
   // Reactive triggers / deaths raised inside the handler drain after it returns.
-  if (
-    !state.pendingTargetEffect &&
-    !(state as any)._drainingResolutionQueue
-  ) {
+  if (!state.pendingTargetEffect && !(state as any)._drainingResolutionQueue) {
     flushDeferredDeathBatch();
     if (!state.pendingTargetEffect) {
       clearResolutionQueue();

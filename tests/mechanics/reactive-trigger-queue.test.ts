@@ -172,14 +172,14 @@ describe("Reactive trigger queue", () => {
   });
 
   it("soak seed 20260913 game 123 — Reaper's Due printed copy terminates; exact board after batch", async () => {
-      const fixture = loadSoakFixture(
-        "seed20260913_game123_reapers_due_loop.json",
-      );
-      const result = await replaySoakTrace(
-        fixture.seed,
-        fixture.gameIndex,
-        fixture.trace as any,
-      );
+    const fixture = loadSoakFixture(
+      "seed20260913_game123_reapers_due_loop.json",
+    );
+    const result = await replaySoakTrace(
+      fixture.seed,
+      fixture.gameIndex,
+      fixture.trace as any,
+    );
     expect(result.error).toBeUndefined();
     const boardSummary = (player: "first" | "second") =>
       getBoard(state, player)
