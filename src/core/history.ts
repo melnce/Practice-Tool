@@ -368,7 +368,7 @@ export function abortAction({ autoRender = true } = {}) {
 
   // Revert state if we have a real snapshot (history was enabled)
   if (before !== null) {
-    replaceState(before);
+    replaceState(cloneSnapshot(before));
     // Respect autoRender and HEADLESS/AI_SUPPRESS_RENDER
     const suppress =
       (globalThis as any).HEADLESS === true ||
@@ -469,7 +469,7 @@ export function undo({ autoRender = true } = {}) {
   const entry = past.pop();
   if (entry) {
     future.push(entry);
-    replaceState(entry.before);
+    replaceState(cloneSnapshot(entry.before));
     logEvent("history_undo", { name: entry.name, meta: entry.meta || {} });
     emitHistoryEvent({
       type: "undo",
@@ -490,7 +490,7 @@ export function redo({ autoRender = true } = {}) {
   const entry = future.pop();
   if (entry) {
     past.push(entry);
-    if (entry.after) replaceState(entry.after);
+    if (entry.after) replaceState(cloneSnapshot(entry.after));
     logEvent("history_redo", { name: entry.name, meta: entry.meta || {} });
     emitHistoryEvent({
       type: "redo",
