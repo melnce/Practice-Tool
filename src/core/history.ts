@@ -8,7 +8,13 @@ import { isHistoryDisabled } from "./env.js";
 import type { ReplayStep } from "./stateHash.js";
 import { hashGameState } from "./stateHash.js";
 import type { CardInstance } from "./types/index.js";
-import { pruneCompletedPendingFromSnapshot } from "../logic/core/resolveTarget.js";
+import { isDev, readEnv } from "./env.js";
+import {
+  flushDeferredDeathBatch,
+  cleanupDead,
+  resumeDeferredDeathIfIdle,
+} from "../logic/core/cleanup.js";
+import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -124,6 +130,11 @@ function sanitizePendingTargetInSnapshot(snap: GameState): void {
   }
 }
 
+/** History snapshots never carry an in-flight resolution queue. */
+function sanitizeResolutionQueueInSnapshot(snap: GameState): void {
+  (snap as any)._resolutionQueue = [];
+}
+
 function snapshot(): GameState {
   // Exclude RNG (has methods, must be handled separately) and internal caches
   const { rng, ...rest } = state as any;
@@ -144,6 +155,7 @@ function snapshot(): GameState {
       (snap as any).__rng = rng.snapshot();
     }
     sanitizePendingTargetInSnapshot(snap);
+    sanitizeResolutionQueueInSnapshot(snap);
     return snap;
   } catch (e) {
     // Fallback: manually clone, skipping non-cloneable properties
@@ -192,6 +204,7 @@ function manualSnapshot(rest: any, rng: any): GameState {
   }
 
   sanitizePendingTargetInSnapshot(snap as GameState);
+  sanitizeResolutionQueueInSnapshot(snap as GameState);
   return snap as GameState;
 }
 
@@ -278,6 +291,7 @@ function cloneSnapshot(snap: GameState): GameState {
       };
     }
     sanitizePendingTargetInSnapshot(clone);
+    sanitizeResolutionQueueInSnapshot(clone);
     return clone;
   } catch (e) {
     console.warn(
@@ -293,6 +307,7 @@ function cloneSnapshot(snap: GameState): GameState {
       };
     }
     sanitizePendingTargetInSnapshot(clone);
+    sanitizeResolutionQueueInSnapshot(clone);
     return clone;
   }
 }
@@ -356,6 +371,44 @@ export function beginAction(name: string, meta: any = {}) {
   inAction = { name, before: snapshot(), meta };
 }
 
+function settleResolutionQueueBeforeHistoryCommit(): void {
+  if ((state as any)._drainingResolutionQueue) return;
+  if (state.pendingTargetEffect) return;
+
+  for (let round = 0; round < 32; round++) {
+    cleanupDead();
+    resumeDeferredDeathIfIdle();
+    if (getResolutionQueue().length === 0) return;
+    if ((state as any)._drainingResolutionQueue) return;
+    if (state.pendingTargetEffect) return;
+
+    const lenBefore = getResolutionQueue().length;
+    flushDeferredDeathBatch();
+    resumeDeferredDeathIfIdle();
+    if (state.pendingTargetEffect) return;
+    if (getResolutionQueue().length === 0) return;
+    if (getResolutionQueue().length >= lenBefore) break;
+  }
+}
+
+function assertResolutionQueueClearForCommit(actionName: string): void {
+  const queueLen = getResolutionQueue().length;
+  const draining = !!(state as any)._drainingResolutionQueue;
+  if (draining) return;
+  if (queueLen === 0) return;
+  if (state.pendingTargetEffect) return;
+
+  const msg =
+    `[History] commitAction("${actionName}") with in-flight resolution queue ` +
+    `(length=${queueLen}, draining=${draining})`;
+  const vitest = readEnv("VITEST");
+  const inTest = vitest === "true" || vitest === "1";
+  if (isDev() || inTest) {
+    throw new Error(msg);
+  }
+  console.warn(msg);
+}
+
 /** Commit the current action (captures after-snapshot; clears redo). */
 export function commitAction({ autoRender = true } = {}) {
   if (!inAction) return; // no-op if nothing open
@@ -368,8 +421,10 @@ export function commitAction({ autoRender = true } = {}) {
     return;
   }
 
+  settleResolutionQueueBeforeHistoryCommit();
+  assertResolutionQueueClearForCommit(inAction.name);
+
   const after = snapshot();
-  pruneCompletedPendingFromSnapshot(after, inAction.name);
   const entry: HistoryEntry = { ...inAction, after } as HistoryEntry;
   past.push(entry);
   trimRing();

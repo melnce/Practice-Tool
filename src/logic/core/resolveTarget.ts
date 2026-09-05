@@ -5,11 +5,7 @@ import { runEffects } from "./effects/index.js";
 import { clearSelectableFlags } from "./targeting.js";
 import { logEvent } from "../../core/logger.js";
 import { doAction } from "../../core/history.js";
-import type {
-  Player,
-  CardInstance,
-  GameState,
-} from "../../core/types/index.js";
+import type { Player, CardInstance } from "../../core/types/index.js";
 import type { TargetedOpContext } from "./targeting/index.js";
 
 import { applyTargetClick } from "./targeting/index.js";
@@ -29,40 +25,13 @@ import {
   cleanupDead,
   flushDeferredDeathBatch,
 } from "./cleanup.js";
-import { clearResolutionQueue } from "./triggers/queue.js";
+import { clearResolutionQueue, getResolutionQueue } from "./triggers/queue.js";
 import { flushDeferredDeckShuffle } from "../effects/ops/returnHandToDeck.js";
 import { flushDeferredOnFuse } from "../effects/ops/fuse/types.js";
 import { finishFollowerEnter } from "../effects/ops/summon_ops/core.js";
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
-
-/**
- * Targeted-op history steps should not leave an empty prompt shell on after snapshots.
- *
- * Live state is cleared by `orchestrateExecution` once the targeted handler returns;
- * players never see a completed prompt. The shell can still appear on the *after*
- * snapshot for inner `doAction("Resolve Targets")` / `doAction("Confirm Targets")`
- * commits because `commitAction` runs inside the handler before `orchestrateExecution`
- * deletes `pendingTargetEffect` (notably `nested_effects`). Strip it from snapshot
- * copies only — not from live state mid-dispatch.
- */
-const PRUNE_EMPTY_PENDING_AFTER_ACTIONS = new Set([
-  "Resolve Targets",
-  "Confirm Targets",
-]);
-
-export function pruneCompletedPendingFromSnapshot(
-  snap: GameState,
-  actionName: string,
-): void {
-  if (!PRUNE_EMPTY_PENDING_AFTER_ACTIONS.has(actionName)) return;
-  const pending = snap.pendingTargetEffect;
-  if (!pending) return;
-  if ((pending.targetUids?.length ?? 0) > 0) return;
-  if ((pending.targets?.length ?? 0) > 0) return;
-  delete snap.pendingTargetEffect;
-}
 
 /**
  * Handles a click on a target (card or leader) when a targeting effect is pending.
@@ -93,7 +62,22 @@ export function resolvePendingTarget(uid: string | "leader") {
   }
 
   if (result.kind === "execute") {
-    orchestrateExecution(result.opCtx);
+    const op = (pending.eff as { op?: string } | undefined)?.op;
+    const run = () => orchestrateExecution(result.opCtx);
+    if (op === "nested_effects") {
+      doAction(
+        "Resolve Targets",
+        run,
+        {
+          op,
+          owner: pending.owner,
+          source: pending.sourceCard?.name,
+        },
+        { autoRender: true },
+      );
+    } else {
+      run();
+    }
   }
 }
 
@@ -123,6 +107,26 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
     (state as any).deferDeathTriggers = false;
   }
   // If paused, orchestrator relinquishes control (no cleanup).
+}
+
+/** Drain reactive/death queue raised during a targeted-op handler before history commit. */
+function settleTargetedOpResolutionQueue(): void {
+  for (let round = 0; round < 32; round++) {
+    if (state.pendingTargetEffect) return;
+    if ((state as any)._drainingResolutionQueue) return;
+
+    cleanupDead();
+    if (getResolutionQueue().length === 0) return;
+
+    const lenBefore = getResolutionQueue().length;
+    flushDeferredDeathBatch();
+    if (state.pendingTargetEffect) return;
+    if (getResolutionQueue().length === 0) {
+      clearResolutionQueue();
+      return;
+    }
+    if (getResolutionQueue().length >= lenBefore) return;
+  }
 }
 
 /** Drain deferred deaths/reactive triggers raised during a targeted-op handler. */
@@ -166,15 +170,9 @@ function flushTargetedOpAfterHandler(
   }
   completeDeferredLwAfterSelection(deferredLwComplete);
 
-  // Reactive triggers / deaths raised inside the handler drain after it returns.
-  if (!state.pendingTargetEffect && !(state as any)._drainingResolutionQueue) {
-    flushDeferredDeathBatch();
-    if (!state.pendingTargetEffect) {
-      clearResolutionQueue();
-    }
-  }
-  cleanupDead();
+  settleTargetedOpResolutionQueue();
   resumeDeferredDeathIfIdle();
+  settleTargetedOpResolutionQueue();
 
   adapter.render();
 }

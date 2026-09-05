@@ -14,7 +14,13 @@ import { dispatchAction } from "../../src/logic/core/dispatch.js";
 import { setPendingTarget } from "../../src/logic/core/pendingTarget/index.js";
 import { highlightSelectable } from "../../src/logic/core/targeting.js";
 import { injectAdapter } from "../../src/core/adapter.js";
-import { captureSnapshot, setHistoryEnabled } from "../../src/core/history.js";
+import {
+  captureSnapshot,
+  onHistoryEvent,
+  setHistoryEnabled,
+} from "../../src/core/history.js";
+import { getResolutionQueue } from "../../src/logic/core/triggers/queue.js";
+import { getShadows } from "../../src/core/playerHelpers.js";
 
 type DispatchFn = typeof engineDispatch;
 
@@ -171,5 +177,89 @@ describe.each([
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(Number(a.defense)).toBe(defA);
     expect(Number(b.defense)).toBe(defB);
+  });
+
+  it("confirm with summon enter reaction — queue empty at every commit; undo/redo matches", () => {
+    const watcher = createCard(
+      {
+        name: "Enter Watcher",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 2,
+        triggers: [
+          {
+            type: "ally_follower_enter",
+            effects: [{ op: "add_shadows", amount: 1 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    const enemy = createCard(
+      { name: "Enemy", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      "board",
+      "second",
+    );
+    enemy.peak_defense = 1;
+    state.players.first.board = [watcher];
+    state.players.second.board = [enemy];
+
+    setPendingTarget({
+      eff: {
+        op: "nested_effects",
+        effects: [
+          {
+            op: "summon",
+            name: "Summoned Token",
+            count: 1,
+            source: "named",
+            type: "Follower",
+            attack: 1,
+            defense: 1,
+          },
+        ],
+      } as any,
+      owner: "first",
+      sourceCard: watcher,
+      pool: [enemy],
+      poolUids: [enemy.uid],
+      targets: [],
+      targetUids: [],
+      selectCount: 1,
+      requiresConfirmation: true,
+    });
+    highlightSelectable([enemy]);
+
+    const queueAtCommits: number[] = [];
+    const unsub = onHistoryEvent((ev) => {
+      if (ev.type === "commit") {
+        queueAtCommits.push(getResolutionQueue().length);
+      }
+    });
+
+    chooseTarget(dispatch, enemy.uid);
+    confirmOnClick!();
+    unsub();
+
+    expect(queueAtCommits.length).toBeGreaterThan(0);
+    for (const len of queueAtCommits) {
+      expect(len).toBe(0);
+    }
+    expect(getResolutionQueue()).toHaveLength(0);
+
+    const shadowsAfter = getShadows(state, "first");
+    const boardLenAfter = state.players.first.board.length;
+    const snapAfter = captureSnapshot();
+
+    undo(dispatch);
+    expect(getResolutionQueue()).toHaveLength(0);
+
+    redo(dispatch);
+    expect(getResolutionQueue()).toHaveLength(0);
+    expect(getShadows(state, "first")).toBe(shadowsAfter);
+    expect(state.players.first.board.length).toBe(boardLenAfter);
+    expect(captureSnapshot()).toEqual(snapAfter);
   });
 });
