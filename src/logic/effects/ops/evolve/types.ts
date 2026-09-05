@@ -54,6 +54,9 @@ export interface UnifiedEvolveSpec {
 
   /** When set with select, pick targets randomly instead of opening selection UI */
   select_mode?: "random";
+
+  /** Internal: targeted-op resume runs bookkeeping after deferred evolve script */
+  resume_bookkeeping_only?: boolean;
 }
 
 /**
@@ -95,6 +98,7 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
       effAny.select ??
       (effAny.count != null ? Number(effAny.count) : undefined),
     select_mode: effAny.select_mode,
+    resume_bookkeeping_only: effAny.resume_bookkeeping_only,
     // Honour object `condition` as filter (same merge pattern as stat op)
     filter: {
       ...(effAny.condition && typeof effAny.condition === "object"

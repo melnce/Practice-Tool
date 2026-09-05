@@ -10,7 +10,7 @@ import type {
 import type { UnifiedEvolveSpec } from "./types.js";
 
 import { normalizeToEvolveSpec } from "./types.js";
-import { onEvolve } from "../../../evolveUtils.js";
+import { onEvolve, completeEvolveBookkeeping } from "../../../evolveUtils.js";
 import {
   getBoard,
   isFirstPlayer,
@@ -34,6 +34,19 @@ export function handleEvolve(
   context: any = {},
 ): "done" | "pending" {
   const spec = normalizeToEvolveSpec(eff);
+
+  if (spec.resume_bookkeeping_only) {
+    if (sourceCard) {
+      completeEvolveBookkeeping(
+        sourceCard,
+        owner,
+        spec.mode || "normal",
+        spec.spend_point ?? false,
+        "deferredResume",
+      );
+    }
+    return "done";
+  }
 
   // If we're resuming after selection, use selected targets
   if (context?.targetUids?.length) {

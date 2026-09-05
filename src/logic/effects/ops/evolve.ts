@@ -1,8 +1,15 @@
 // src/logic/effects/ops/evolve.ts
-import { onEvolve } from "../../evolveUtils.js";
+import {
+  onEvolve,
+  enqueueDeferredEvolveCompletion,
+} from "../../evolveUtils.js";
 import { logEvent } from "../../../core/logger.js";
 import { state } from "../../../core/gameState.js";
-import type { CardInstance, Player } from "../../../core/types/index.js";
+import type {
+  CardInstance,
+  Player,
+  Effect,
+} from "../../../core/types/index.js";
 import {
   isFirstPlayer,
   getEvoUsedThisTurn,
@@ -25,14 +32,11 @@ function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
   }
 }
 
-export function handleEvolveSelf(
+export function applyEvolveStatBuffs(
   sourceCard: CardInstance,
   owner: Player,
-  opts: any = {},
+  mode: "normal" | "super" = "normal",
 ) {
-  const { spendPoint = true, mode = "normal", runEvoEffects = true } = opts; // <-- allow mode
-  if (spendPoint && !canEvolve(owner, sourceCard, mode)) return; // engine gate
-
   const attackBonus = mode === "super" ? 3 : 2;
   const defenseBonus = mode === "super" ? 3 : 2;
 
@@ -75,6 +79,37 @@ export function handleEvolveSelf(
     sourceCard.isRush = true;
     sourceCard.can_attack = true;
   }
+}
+
+/** Targeted-op resume path: stats + flags in handler; script via orchestrator queue. */
+export function evolveFollowerDeferred(
+  sourceCard: CardInstance,
+  owner: Player,
+  mode: "normal" | "super",
+  resumeEffects: Effect[],
+  spendPoint = false,
+) {
+  applyEvolveStatBuffs(sourceCard, owner, mode);
+  sourceCard.hasEvolved = true;
+  sourceCard.evoType = mode === "super" ? "super" : "normal";
+  enqueueDeferredEvolveCompletion(
+    sourceCard,
+    owner,
+    mode,
+    spendPoint,
+    resumeEffects,
+  );
+}
+
+export function handleEvolveSelf(
+  sourceCard: CardInstance,
+  owner: Player,
+  opts: any = {},
+) {
+  const { spendPoint = true, mode = "normal", runEvoEffects = true } = opts; // <-- allow mode
+  if (spendPoint && !canEvolve(owner, sourceCard, mode)) return; // engine gate
+
+  applyEvolveStatBuffs(sourceCard, owner, mode);
 
   // Spend counters, set evo flags, and (optionally) run the card’s evolve/superevolve script.
   onEvolve(sourceCard, owner, mode, {

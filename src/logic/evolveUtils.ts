@@ -111,6 +111,77 @@ export function canEvolve(
   }
 }
 
+function spendEvolveCounters(owner: Player, mode: "normal" | "super") {
+  if (mode === "super") {
+    setSuperEvoCharges(
+      state,
+      owner,
+      Math.max(0, getSuperEvoCharges(state, owner) - 1),
+    );
+    setEvoUsedThisTurn(state, owner, true);
+  } else {
+    setEvoCharges(state, owner, Math.max(0, getEvoCharges(state, owner) - 1));
+    setEvoUsedThisTurn(state, owner, true);
+  }
+}
+
+function fireEvolveTriggers(
+  card: CardInstance,
+  owner: Player,
+  mode: "normal" | "super",
+) {
+  fireTrigger("ally_evolve", owner, { enteringCard: card });
+  if (mode === "super") {
+    fireTrigger("ally_super_evolve", owner, { enteringCard: card });
+    fireTrigger("enemy_super_evolve", owner, { enteringCard: card });
+  }
+}
+
+/** Post-script bookkeeping shared by onEvolve and deferred targeted-op resume. */
+export function completeEvolveBookkeeping(
+  card: CardInstance,
+  owner: Player,
+  mode: "normal" | "super",
+  spendPoint: boolean,
+  via = "withEffects",
+) {
+  recordAlliedEvolve(owner);
+  if (spendPoint) spendEvolveCounters(owner, mode);
+  fireEvolveTriggers(card, owner, mode);
+  logEvent("evolve", {
+    owner,
+    card: card.name,
+    uid: card.uid,
+    mode,
+    via,
+  });
+}
+
+/** Queue evolve script + bookkeeping for orchestrator resume (targeted-op handlers). */
+export function enqueueDeferredEvolveCompletion(
+  card: CardInstance,
+  owner: Player,
+  mode: "normal" | "super",
+  spendPoint: boolean,
+  resumeEffects: Effect[],
+) {
+  const script = resolveEvolveScriptToRun(card, mode, spendPoint);
+  resumeEffects.unshift({
+    op: "with_source",
+    source_uid: card.uid,
+    effects: [
+      ...script,
+      {
+        op: "evolve",
+        target: "self",
+        spend_point: spendPoint,
+        resume_bookkeeping_only: true,
+        mode,
+      } as Effect,
+    ],
+  });
+}
+
 export function onEvolve(
   card: CardInstance,
   owner: Player,
@@ -123,77 +194,18 @@ export function onEvolve(
   card.hasEvolved = true;
   card.evoType = mode === "super" ? "super" : "normal";
 
-  const spendCounters = () => {
-    if (!spendPoint) return;
-    if (mode === "super") {
-      // Only decrement super evolution charges for super evolves
-      setSuperEvoCharges(
-        state,
-        owner,
-        Math.max(0, getSuperEvoCharges(state, owner) - 1),
-      );
-      setEvoUsedThisTurn(state, owner, true);
-    } else {
-      // Only decrement normal evolution charges for normal evolves
-      setEvoCharges(state, owner, Math.max(0, getEvoCharges(state, owner) - 1));
-      setEvoUsedThisTurn(state, owner, true);
-    }
-  };
-
-  const fireEvoTriggers = () => {
-    // Ally evolve fires for both normal and super (EP-spent or effect-granted).
-    fireTrigger("ally_evolve", owner, { enteringCard: card });
-    if (mode === "super") {
-      // Ally listeners: cards on the super-evolver's side.
-      fireTrigger("ally_super_evolve", owner, { enteringCard: card });
-      // Enemy listeners: cards on the opponent's side (hand/board/deck).
-      // activePlayer must be the super-evolver so process/zones route to owner !== evolver.
-      fireTrigger("enemy_super_evolve", owner, { enteringCard: card });
-    }
-  };
-
   if (skipEffects) {
-    // Just spend counters & trigger, no card effects
-    recordAlliedEvolve(owner);
-    spendCounters();
-    fireEvoTriggers();
-    logEvent("evolve", {
-      owner,
-      card: card.name,
-      uid: card.uid,
-      mode,
-      via: "skipEffects",
-    });
+    completeEvolveBookkeeping(card, owner, mode, spendPoint, "skipEffects");
     return;
   }
 
   const effectsToRun = resolveEvolveScriptToRun(card, mode, spendPoint);
 
-  // Even with no evolve effects defined, we still spend counters & fire triggers once.
   if (effectsToRun.length === 0) {
-    recordAlliedEvolve(owner);
-    spendCounters();
-    fireEvoTriggers();
-    logEvent("evolve", {
-      owner,
-      card: card.name,
-      uid: card.uid,
-      mode,
-      via: "noEffects",
-    });
+    completeEvolveBookkeeping(card, owner, mode, spendPoint, "noEffects");
     return;
   }
 
   runEffects(effectsToRun, owner, card);
-
-  recordAlliedEvolve(owner);
-  spendCounters();
-  fireEvoTriggers();
-  logEvent("evolve", {
-    owner,
-    card: card.name,
-    uid: card.uid,
-    mode,
-    via: "withEffects",
-  });
+  completeEvolveBookkeeping(card, owner, mode, spendPoint, "withEffects");
 }
