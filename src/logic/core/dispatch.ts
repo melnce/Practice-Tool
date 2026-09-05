@@ -12,7 +12,7 @@ import type {
   ActionByType,
 } from "../../core/types/index.js";
 import { endTurnBlue, endTurnRed } from "./turns.js";
-import { playCardNoRender } from "./playCard/index.js";
+import { playCard } from "./playCard/index.js";
 import { attackFollower, attackLeader } from "./combat.js";
 import { resolvePendingTarget } from "./resolveTarget.js";
 import { undo, redo, resetHistory, doAction } from "../../core/history.js";
@@ -77,7 +77,7 @@ function dispatchInternal(
       const index = hand.findIndex((c) => c.uid === action.cardUid);
 
       if (index !== -1) {
-        playCardNoRender(hand, action.player, index);
+        playCard(hand, action.player, index);
       } else {
         throw new Error(
           `[DISPATCH_UID_FAIL] Card not found in hand for UID: ${action.cardUid}`,

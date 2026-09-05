@@ -88,6 +88,7 @@ export const INTERNAL_CACHE_KEYS = new Set([
   "_triggerCache", // Trigger candidate cache (auto-reinitializes on access)
   "_deferredDeath", // Deferred LW / leave-play batch during death deferral
   "_runEffectsDepth", // Nested runEffects depth counter for deferred flush
+  "deferDeathTriggers", // Transient runEffects flag — must not survive undo/redo
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
