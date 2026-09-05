@@ -1,7 +1,7 @@
 /**
  * Reactive trigger queue — rulebook L194/L209 (Stage A/B).
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import "../audit/setup.js";
 import {
   givenGameState,
@@ -37,6 +37,8 @@ import {
 } from "../../src/core/history.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
 import { allocateInsertionTs } from "../../src/logic/core/triggers/utils.js";
+import { countNamedEnters } from "../../src/logic/core/followerEnterHistory.js";
+import * as triggerQueue from "../../src/logic/core/triggers/queue.js";
 import { readFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -60,6 +62,48 @@ const NETHERWORLD_LT = "10951120";
 const KRULLE = "10314110";
 const OTS = "Obsessed Test Subject";
 const SEPHIE_ID = "10934110";
+const ARIA_ID = "10114110";
+
+function isBuffedOTS(card: { attack: unknown; defense: unknown }) {
+  return Number(card.attack) === 5 && Number(card.defense) === 5;
+}
+
+function addAriaPixieStormCrest(player: "first" | "second") {
+  const card = getCardById(ARIA_ID);
+  const crestOp = card?.fanfare?.find(
+    (e: any) => e.op === "crest" && e.action === "gain",
+  ) as any;
+  expect(crestOp).toBeTruthy();
+  getCrests(state, player).push({
+    name: crestOp.name,
+    owner: player,
+    countdown: crestOp.countdown ?? 99,
+    triggers: crestOp.triggers,
+    insertionTs: allocateInsertionTs(),
+  } as any);
+}
+
+function makeEnterCounterObserver() {
+  return createCard(
+    {
+      name: "Enter Counter",
+      type: "Follower",
+      cost: 1,
+      attack: 1,
+      defense: 1,
+      triggers: [
+        {
+          event: "ally_follower_enter",
+          source: "board",
+          condition: { name: "Goblin" },
+          effects: [{ op: "stat", action: "give", target: "self", attack: 1 }],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+}
 
 function addKrulleEnterCrest(player: "first" | "second") {
   const card = getCardById(KRULLE);
@@ -165,6 +209,158 @@ describe("Reactive trigger queue", () => {
     expect(summoned.length).toBe(2);
     expect(isBuffed(summoned[0]!)).toBe(false);
     expect(isBuffed(summoned[1]!)).toBe(true);
+  });
+
+  describe("Sequential multi-summon (one enter per copy)", () => {
+    it("handleSummon count:2 enqueues one ally_follower_enter reactive group per copy", () => {
+      givenGameState({ seed: 51, activePlayer: "first" }).build();
+      const spy = vi.spyOn(triggerQueue, "enqueueReactiveTriggerGroup");
+
+      whenRunEffects(
+        [{ op: "summon", source: "named", name: "Goblin", count: 2 }],
+        "first",
+      );
+
+      const allyEnterGroups = spy.mock.calls.filter(
+        (call) => call[0] === "ally_follower_enter",
+      );
+      expect(allyEnterGroups.length).toBe(2);
+      spy.mockRestore();
+    });
+
+    it("handleSummon count:3 — enter history and per-enter reactive triggers fire in order", () => {
+      givenGameState({ seed: 52, activePlayer: "first" }).build();
+      const observer = makeEnterCounterObserver();
+      state.players.first.board = [observer];
+
+      whenRunEffects(
+        [{ op: "summon", source: "named", name: "Goblin", count: 3 }],
+        "first",
+      );
+
+      expect(Number(observer.attack)).toBe(4);
+      const goblins = getBoard(state, "first").filter(
+        (c) => c?.name === "Goblin",
+      );
+      expect(goblins.length).toBe(3);
+      const history = state.players.first.followerEnterHistory.filter(
+        (r) => r.name === "Goblin",
+      );
+      expect(history.slice(-3).map((r) => r.name)).toEqual([
+        "Goblin",
+        "Goblin",
+        "Goblin",
+      ]);
+    });
+
+    it("OTS summon count:3 — 4th/5th unbuffed, 6th buffed (per-copy named_enter_count gate)", () => {
+      givenGameState({ seed: 53, activePlayer: "first", roundCount: 8 })
+        .withFirstPP(20, 20)
+        .build();
+
+      for (let i = 0; i < 3; i++) {
+        summonNamed(
+          { op: "summon", source: "named", name: OTS, count: 1 },
+          "first",
+        );
+        state.players.first.board = [];
+      }
+      expect(countNamedEnters(state, "first", OTS)).toBe(3);
+
+      whenRunEffects(
+        [{ op: "summon", source: "named", name: OTS, count: 3 }],
+        "first",
+      );
+
+      const copies = getBoard(state, "first").filter((c) => c?.name === OTS);
+      expect(copies.length).toBe(3);
+      expect(isBuffedOTS(copies[0]!)).toBe(false);
+      expect(isBuffedOTS(copies[1]!)).toBe(false);
+      expect(isBuffedOTS(copies[2]!)).toBe(true);
+    });
+
+    it("Aria crest — summon count:3 Fairy grants Storm to each copy in enter order", () => {
+      givenGameState({ seed: 54, activePlayer: "first" }).build();
+      addAriaPixieStormCrest("first");
+
+      whenRunEffects(
+        [{ op: "summon", source: "named", name: "Fairy", count: 3 }],
+        "first",
+      );
+
+      const fairies = getBoard(state, "first").filter(
+        (c) => c?.name === "Fairy",
+      );
+      expect(fairies.length).toBe(3);
+      for (const fairy of fairies) {
+        expect(fairy.hasStorm).toBe(true);
+      }
+      const history = state.players.first.followerEnterHistory.filter(
+        (r) => r.name === "Fairy",
+      );
+      expect(history.slice(-3).map((r) => r.name)).toEqual([
+        "Fairy",
+        "Fairy",
+        "Fairy",
+      ]);
+    });
+
+    it("deferred LW batch — each Last Words summon is a separate sequential enter", () => {
+      givenGameState({ seed: 55, activePlayer: "first" }).build();
+      const observer = makeEnterCounterObserver();
+
+      const makeLwVictim = (name: string) => {
+        const victim = createCard(
+          {
+            name,
+            type: "Follower",
+            cost: 1,
+            attack: 1,
+            defense: 1,
+            keywords: [
+              {
+                name: "LastWords",
+                effects: [
+                  { op: "summon", source: "named", name: "Goblin", count: 1 },
+                ],
+              },
+            ],
+          },
+          "board",
+          "first",
+        );
+        applyKeywordsFromList(victim);
+        return victim;
+      };
+
+      state.players.first.board = [
+        observer,
+        makeLwVictim("LW A"),
+        makeLwVictim("LW B"),
+      ];
+
+      whenRunEffects(
+        [
+          {
+            op: "destroy",
+            target: "ally:follower",
+            filter: { name: "LW A" },
+          },
+          {
+            op: "destroy",
+            target: "ally:follower",
+            filter: { name: "LW B" },
+          },
+        ],
+        "first",
+      );
+
+      expect(Number(observer.attack)).toBe(3);
+      const goblins = getBoard(state, "first").filter(
+        (c) => c?.name === "Goblin",
+      );
+      expect(goblins.length).toBe(2);
+    });
   });
 
   it("leading gate true at enqueue, false at drain — reactive trigger still fires", () => {
