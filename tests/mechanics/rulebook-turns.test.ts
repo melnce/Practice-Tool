@@ -1008,23 +1008,293 @@ describe("Owner ruling L244 — Turn-boundary triggers are owner-scoped", () => 
   });
 });
 
-describe("Rulebook L152 — Start-of-turn conditions snapshot at first tick", () => {
+/** Congregant of Disdain (10343110) pattern: trigger.condition.defense_lte on host. */
+function congregantStyleHost(defense: number, insertionTs: number) {
+  const card = createCard(
+    {
+      name: "CongregantStyle",
+      type: "Follower",
+      class: "Dragoncraft",
+      cost: 6,
+      attack: 5,
+      defense,
+      triggers: [
+        {
+          event: "end_of_turn",
+          condition: { defense_lte: 3, whose_turn: "owner" },
+          effects: [{ op: "draw", source: "deck", count: 1, tag: "cong-eot" }],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+  card.insertionTs = insertionTs;
+  return card;
+}
+
+function olderEotAllyFollowerDamage(amount: number, insertionTs: number) {
+  const card = createCard(
+    {
+      name: "OlderDamager",
+      type: "Follower",
+      cost: 1,
+      attack: 1,
+      defense: 1,
+      triggers: [
+        {
+          type: "end_of_turn_own",
+          effects: [
+            {
+              op: "damage",
+              target: "ally:follower",
+              amount,
+              distribution: "all",
+            },
+          ],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+  card.insertionTs = insertionTs;
+  return card;
+}
+
+function olderEotAllyFollowerBuff(defense: number, insertionTs: number) {
+  const card = createCard(
+    {
+      name: "OlderBuffer",
+      type: "Follower",
+      cost: 1,
+      attack: 1,
+      defense: 1,
+      triggers: [
+        {
+          type: "end_of_turn_own",
+          effects: [
+            {
+              op: "stat",
+              action: "give",
+              target: "ally:follower",
+              defense,
+              attack: 0,
+            },
+          ],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+  card.insertionTs = insertionTs;
+  return card;
+}
+
+/** SOT analogue of Congregant — no printed SOT card uses defense_lte; same key as evalCommonConditions. */
+function sotDefenseLteHost(defense: number, insertionTs: number) {
+  const card = createCard(
+    {
+      name: "SotConditional",
+      type: "Follower",
+      cost: 1,
+      attack: 1,
+      defense,
+      triggers: [
+        {
+          type: "start_of_turn_own",
+          condition: { defense_lte: 3 },
+          effects: [{ op: "draw", source: "deck", count: 1, tag: "sot-def" }],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+  card.insertionTs = insertionTs;
+  return card;
+}
+
+function olderSotAllyFollowerDamage(amount: number, insertionTs: number) {
+  const card = createCard(
+    {
+      name: "OlderSotDamager",
+      type: "Follower",
+      cost: 1,
+      attack: 1,
+      defense: 1,
+      triggers: [
+        {
+          type: "start_of_turn_own",
+          effects: [
+            {
+              op: "damage",
+              target: "ally:follower",
+              amount,
+              distribution: "all",
+            },
+          ],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+  card.insertionTs = insertionTs;
+  return card;
+}
+
+describe("Rulebook L252 — EOT trigger.condition snapshots at queue time (Congregant 10343110)", () => {
   beforeEach(() => {
     resetUidCounter();
-    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 }).build();
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
+      .withFirstDeck(deckFill("D", 5))
+      .build();
     state.gameStarted = true;
   });
 
-  // Rulebook L152: conditions checked when trigger is queued, not re-evaluated at resolution.
-  // Blast radius: Sandalphon, Primarch Successor (10404110) — "At the start of your turn, if allied
-  // followers have evolved at least 6 times this match, Invoke" could fire wrongly if another SOT
-  // effect increments evoCount during the same boundary before Sandalphon queues.
+  // Printed: "At the end of your turn, if this follower's defense is 3 or less…" — JSON uses defense_lte: 3.
+  // queueTurnBoundaryTriggers calls evalCommonConditions before any resolution.
+  it("defense_lte unmet at queue (host 7): older ally damage to 2 same batch does not draw", () => {
+    const older = olderEotAllyFollowerDamage(5, 1);
+    const host = congregantStyleHost(7, 2);
+    state.players.first.board = [older, host];
+    const handBefore = thenHand("first").length;
+
+    runEndOfTurnBoundary("first");
+
+    expect(thenHand("first").length).toBe(handBefore);
+  });
+
+  it("defense_lte met at queue (host 2): older ally buff before resolve still draws", () => {
+    const older = olderEotAllyFollowerBuff(5, 1);
+    const host = congregantStyleHost(2, 2);
+    state.players.first.board = [older, host];
+    const handBefore = thenHand("first").length;
+
+    runEndOfTurnBoundary("first");
+
+    expect(thenHand("first").length).toBe(handBefore + 1);
+  });
+});
+
+describe("Rulebook L152 — SOT trigger.condition snapshots at queue time", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 })
+      .withFirstDeck(deckFill("D", 5))
+      .build();
+    state.gameStarted = true;
+  });
+
+  // Only Congregant (EOT) and Galleon (super_evolution_unlocked EOT) use non-scoping keys on turn boundaries;
+  // SOT uses the same evalCommonConditions path with defense_lte as the analogue.
+  it("defense_lte unmet at queue (host 7): older ally damage to 2 same batch does not draw", () => {
+    const older = olderSotAllyFollowerDamage(5, 1);
+    const host = sotDefenseLteHost(7, 2);
+    state.players.first.board = [older, host];
+    const handBefore = thenHand("first").length;
+
+    runStartOfTurnBoundary("first");
+
+    expect(thenHand("first").length).toBe(handBefore);
+  });
+
+  it("defense_lte met at queue (host 2): older ally buff before resolve still draws", () => {
+    const older = olderEotAllyFollowerBuff(5, 1);
+    const host = sotDefenseLteHost(2, 2);
+    state.players.first.board = [older, host];
+    const handBefore = thenHand("first").length;
+
+    runStartOfTurnBoundary("first");
+
+    expect(thenHand("first").length).toBe(handBefore + 1);
+  });
+});
+
+describe("Authored pattern — gate op inside trigger effects evaluates at resolution", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
+      .withFirstDeck(deckFill("D", 5))
+      .build();
+    state.gameStarted = true;
+  });
+
+  // Most "at the end of your turn, if …" cards use a gate op in effects (e.g. Godwood Staff 10113210 combo gate),
+  // not trigger.condition — the gate runs when the trigger resolves, not at queue time.
+  it("leader_defense_lte gate: leader damaged below threshold before gate resolves → no draw", () => {
+    const older = createCard(
+      {
+        name: "OlderLeaderHit",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [{ op: "damage", target: "ally:leader", amount: 8 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    older.insertionTs = 1;
+    const host = createCard(
+      {
+        name: "GateHost",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [
+              {
+                op: "gate",
+                condition: "leader_defense_lte",
+                count: 10,
+                effects: [{ op: "draw", source: "deck", count: 1 }],
+              },
+            ],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    host.insertionTs = 2;
+    state.players.first.board = [older, host];
+    expect(getHP(state, "first")).toBe(20);
+    const handBefore = thenHand("first").length;
+
+    runEndOfTurnBoundary("first");
+
+    expect(getHP(state, "first")).toBe(12);
+    expect(thenHand("first").length).toBe(handBefore);
+  });
+});
+
+describe("Guard — unknown trigger.condition keys", () => {
+  beforeEach(() => {
+    resetUidCounter();
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 })
+      .withSecondHP(20)
+      .build();
+    state.gameStarted = true;
+  });
+
+  // evalCommonConditions ignores unrecognized keys (returns true); PR #210 used shadows_at_least — not in src/.
   it.fails(
-    "SOT trigger with condition unmet at queue time does not fire if condition becomes true later in SOT",
+    "unknown trigger.condition key must not silently pass evalCommonConditions",
     () => {
       const follower = createCard(
         {
-          name: "Conditional",
+          name: "BadCondition",
           type: "Follower",
           cost: 1,
           attack: 1,
@@ -1032,7 +1302,7 @@ describe("Rulebook L152 — Start-of-turn conditions snapshot at first tick", ()
           triggers: [
             {
               type: "start_of_turn_own",
-              condition: { shadows_at_least: 3 },
+              condition: { shadows_at_least: 999 },
               effects: [{ op: "damage", target: "enemy:leader", amount: 5 }],
             },
           ],
@@ -1044,85 +1314,9 @@ describe("Rulebook L152 — Start-of-turn conditions snapshot at first tick", ()
       state.players.first.shadows = 0;
       const hpBefore = getHP(state, "second");
 
-      runStartOfTurnBoundary("first", {
-        tickCrests: () => {
-          state.players.first.shadows = 5;
-        },
-      });
+      runStartOfTurnBoundary("first");
 
       expect(getHP(state, "second")).toBe(hpBefore);
-    },
-  );
-});
-
-describe("Rulebook L252 — State-based condition checking at trigger creation", () => {
-  beforeEach(() => {
-    resetUidCounter();
-    givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
-      .withSecondHP(20)
-      .build();
-    state.gameStarted = true;
-  });
-
-  // Rulebook L252: condition snapshot at trigger creation — 8th follower leaving in same EOT batch must not count.
-  // Blast radius: Crest: Eudie, Maiden Reborn (from Eudie, Maiden Reborn 10174110) — "At the end of
-  // your turn, if you have 5 cards or less in your hand, draw" vs restore could branch-wrong if another
-  // EOT effect changes hand size before that crest resolves in the same boundary.
-  it.fails(
-    "EOT condition counting followers destroyed does not include destruction from same EOT batch",
-    () => {
-      const counter = createCard(
-        {
-          name: "Counter",
-          type: "Follower",
-          cost: 1,
-          attack: 1,
-          defense: 1,
-          triggers: [
-            {
-              type: "end_of_turn_own",
-              condition: { followers_destroyed_this_turn: 1 },
-              effects: [{ op: "draw", source: "deck", count: 1 }],
-            },
-          ],
-        },
-        "board",
-        "first",
-      );
-      const victim = createCard(
-        { name: "Victim", type: "Follower", cost: 1, attack: 1, defense: 1 },
-        "board",
-        "first",
-      );
-      const destroyer = createCard(
-        {
-          name: "Destroyer",
-          type: "Follower",
-          cost: 1,
-          attack: 1,
-          defense: 1,
-          triggers: [
-            {
-              type: "end_of_turn_own",
-              effects: [
-                { op: "destroy", target: "ally:follower", distribution: "all" },
-              ],
-            },
-          ],
-        },
-        "board",
-        "first",
-      );
-      destroyer.insertionTs = 1;
-      counter.insertionTs = 2;
-      victim.insertionTs = 3;
-      state.players.first.board = [destroyer, counter, victim];
-      state.players.first.deck = deckFill("D", 3);
-      const handBefore = thenHand("first").length;
-
-      runEndOfTurnBoundary("first");
-
-      expect(thenHand("first").length).toBe(handBefore);
     },
   );
 });
