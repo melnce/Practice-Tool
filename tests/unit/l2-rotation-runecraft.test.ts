@@ -42,10 +42,10 @@ import {
   getBoard,
   getHand,
   getHP,
-  getPP,
   getCrests,
 } from "../../src/core/playerHelpers.js";
 import type { CardInstance } from "../../src/core/types/index.js";
+import { getCardById } from "../../src/data/cardDatabase.js";
 import "../../src/logic/core/effects/index.js";
 
 // Deck cards
@@ -1587,8 +1587,18 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
     const printed =
       "Fanfare: Deal 6 damage to all enemy followers.\nWard\nLast Words: Earth Rite (2) - Deal 3 damage to the enemy leader.\nSuper-Evolve: Summon a Beloved Masterpiece.";
 
+    it("printed stats 4/8 on board; cost 8", () => {
+      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 8 });
+      whenPlayCard("first", 0);
+      const bmp = findOnBoard("first", "Beloved Masterpiece")!;
+      expect(Number(bmp.attack)).toBe(4);
+      expect(Number(bmp.defense)).toBe(8);
+      expect(bmp.hasEvolved).toBeFalsy();
+      expect(String(getCardById(BELOVED_MASTERPIECE)!.cost)).toBe("8");
+    });
+
     it("Fanfare: deals 6 to all enemy followers", () => {
-      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 9 });
+      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 8 });
       const e1 = enemyFollower(2, 6, "E1");
       const e2 = enemyFollower(2, 6, "E2");
       whenPlayCard("first", 0);
@@ -1598,14 +1608,14 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
     });
 
     it("has Ward on field", () => {
-      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 9 });
+      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 8 });
       whenPlayCard("first", 0);
       const bmp = findOnBoard("first", "Beloved Masterpiece")!;
       expect(hasKeyword(bmp, "Ward")).toBe(true);
     });
 
     it("Last Words without Earth Rite (2): does not deal 3 to enemy leader", () => {
-      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 9 });
+      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 8 });
       whenPlayCard("first", 0);
       const bmp = findOnBoard("first", "Beloved Masterpiece")!;
       state.players.second.hp = 20;
@@ -1616,7 +1626,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
     });
 
     it("Last Words with Earth Rite (2): deals 3 to enemy leader", () => {
-      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 9 });
+      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 8 });
       placeEarthSigils(2);
       whenPlayCard("first", 0);
       const bmp = findOnBoard("first", "Beloved Masterpiece")!;
@@ -1626,12 +1636,18 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       expect(getHP(state, "second")).toBe(17);
     });
 
-    it("Super-Evolve: summons a Beloved Masterpiece copy", () => {
-      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 9, superEvo: 1 });
+    it("Super-Evolve: summons a Beloved Masterpiece copy as 4/8 unevolved", () => {
+      setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 8, superEvo: 1 });
       whenPlayCard("first", 0);
       const bmp = findOnBoard("first", "Beloved Masterpiece")!;
       onEvolve(bmp, "first", "super", { spendPoint: true });
       expect(countOnBoardByName("Beloved Masterpiece")).toBe(2);
+      const copy = thenBoard("first").find(
+        (c) => c.name === "Beloved Masterpiece" && c.uid !== bmp.uid,
+      )!;
+      expect(Number(copy.attack)).toBe(4);
+      expect(Number(copy.defense)).toBe(8);
+      expect(copy.hasEvolved).toBeFalsy();
       expect(printed).toContain("Summon a Beloved Masterpiece");
     });
   });

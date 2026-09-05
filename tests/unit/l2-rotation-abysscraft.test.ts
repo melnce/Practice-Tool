@@ -1219,8 +1219,20 @@ describe("L2 — Rotation Abysscraft", () => {
     const crestPrinted =
       "Allied followers' Fanfare and Enhance abilities don't activate.\nWhenever you play a follower, evolve it.";
 
-    it("Fanfare Reanimate (4) and Reanimate (2) from graveyard", () => {
+    it("cannot be played at 6 PP; playable at 7 PP", () => {
       setupTurn(R8, { hand: [MILTEO], pp: 6 });
+      const blocked = playCardNoRender(getHand(state, "first"), "first", 0);
+      expect(blocked.kind).toBe("blocked");
+      expect(findOnBoard("first", "Milteo & Luzen")).toBeFalsy();
+
+      resetUidCounter();
+      setupTurn(R8, { hand: [MILTEO], pp: 7 });
+      whenPlayCard("first", 0);
+      expect(findOnBoard("first", "Milteo & Luzen")).toBeTruthy();
+    });
+
+    it("Fanfare Reanimate (4) and Reanimate (2) from graveyard", () => {
+      setupTurn(R8, { hand: [MILTEO], pp: 7 });
       putCorpseInGraveyard(REANIMATE_CORPSE_4);
       putCorpseInGraveyard(REANIMATE_CORPSE);
       whenPlayCard("first", 0);
@@ -1234,7 +1246,7 @@ describe("L2 — Rotation Abysscraft", () => {
     });
 
     it("Evolve destroys exactly 6 other followers; Milteo survives (3 allies + 3 enemies)", () => {
-      setupTurn(R8, { hand: [MILTEO], pp: 6, evo: 2 });
+      setupTurn(R8, { hand: [MILTEO], pp: 7, evo: 2 });
       const allies = [
         allyFollower("Ally0", 1, 1),
         allyFollower("Ally1", 1, 1),
@@ -1261,7 +1273,7 @@ describe("L2 — Rotation Abysscraft", () => {
     });
 
     it("Evolve destroys all 3 other followers when only 3 are on the field", () => {
-      setupTurn(R8, { hand: [MILTEO], pp: 6, evo: 2 });
+      setupTurn(R8, { hand: [MILTEO], pp: 7, evo: 2 });
       const allies = [allyFollower("Ally0", 1, 1), allyFollower("Ally1", 1, 1)];
       const enemies = [enemyFollower(1, 1, "Enemy0")];
       const otherUids = [...allies, ...enemies].map((c) => c.uid);
@@ -1278,7 +1290,7 @@ describe("L2 — Rotation Abysscraft", () => {
     });
 
     it("Super-Evolve gains Crest: Milteo & Luzen", () => {
-      setupTurn(R8, { hand: [MILTEO], pp: 6 });
+      setupTurn(R8, { hand: [MILTEO], pp: 7 });
       whenPlayCard("first", 0);
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
       state.players.first.superEvoCharges = 1;
@@ -1289,7 +1301,7 @@ describe("L2 — Rotation Abysscraft", () => {
     });
 
     it("crest: allied Fanfare does not activate on played follower", () => {
-      setupTurn(R8, { hand: [MILTEO, NIGHT_FIEND], pp: 9 });
+      setupTurn(R8, { hand: [MILTEO, NIGHT_FIEND], pp: 10 });
       whenPlayCard("first", 0);
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
       state.players.first.superEvoCharges = 1;
@@ -1305,7 +1317,7 @@ describe("L2 — Rotation Abysscraft", () => {
     });
 
     it("crest: playing a follower evolves it", () => {
-      setupTurn(R8, { hand: [MILTEO, GHOST_DODGER], pp: 9 });
+      setupTurn(R8, { hand: [MILTEO, GHOST_DODGER], pp: 10 });
       whenPlayCard("first", 0);
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
       state.players.first.superEvoCharges = 1;

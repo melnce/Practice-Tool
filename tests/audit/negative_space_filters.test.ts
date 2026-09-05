@@ -205,7 +205,7 @@ describe("negative-space filters — Artifact hand (≤5 cost)", () => {
   });
 
   it("10274120 Karula — Fanfare never summons Artifact followers above 5 cost", () => {
-    setupTurn(R6, { hand: ["10274120", "90072110", "90074110"], pp: 6 });
+    setupTurn(R6, { hand: ["10274120", "90072110", "90074110"], pp: 5 });
     const costly = thenHand("first").find((c) => c.id === "90074110")!;
     whenPlayCard("first", 0);
     if (state.pendingTargetEffect) {

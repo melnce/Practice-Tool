@@ -277,16 +277,40 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     expect(thenHand("first").some((c) => c.name === "Ally")).toBe(true);
   });
 
-  it("Aria — Fanfare crest; Super-Evolve 3 Fairies", () => {
+  it("Aria — Fanfare crest; Evolve summons 3 new Fairies; Super-Evolve also summons 3 Fairies", () => {
     setupTurn(R7, { hand: ["10114110"], pp: 6 });
     whenPlayCard("first", 0);
     expect(
       getCrests(state, "first").some((c) => c.name?.includes("Aria")),
     ).toBe(true);
     const aria = findOnBoard("first", "Aria, Lady of the Woods")!;
+    state.players.first.evoCharges = 2;
+    const fairyUidsBeforeEvolve = new Set(
+      thenBoard("first")
+        .filter((c) => c.name === "Fairy")
+        .map((c) => c.uid),
+    );
+    onEvolve(aria, "first", "normal", { spendPoint: true });
+    const newFairiesFromEvolve = thenBoard("first").filter(
+      (c) => c.name === "Fairy" && !fairyUidsBeforeEvolve.has(c.uid),
+    );
+    expect(newFairiesFromEvolve).toHaveLength(3);
+
+    resetUidCounter();
+    setupTurn(R7, { hand: ["10114110"], pp: 6 });
+    whenPlayCard("first", 0);
+    const ariaSe = findOnBoard("first", "Aria, Lady of the Woods")!;
     state.players.first.superEvoPoints = 1;
-    onEvolve(aria, "first", "super");
-    expect(thenBoard("first").filter((c) => c.name === "Fairy").length).toBe(3);
+    const fairyUidsBeforeSe = new Set(
+      thenBoard("first")
+        .filter((c) => c.name === "Fairy")
+        .map((c) => c.uid),
+    );
+    onEvolve(ariaSe, "first", "super");
+    const newFairiesFromSe = thenBoard("first").filter(
+      (c) => c.name === "Fairy" && !fairyUidsBeforeSe.has(c.uid),
+    );
+    expect(newFairiesFromSe).toHaveLength(3);
   });
 });
 

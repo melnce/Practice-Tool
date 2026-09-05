@@ -27,7 +27,9 @@ function loadPortalCards() {
   const cards: Array<{
     id: string;
     name: string;
+    cost?: string;
     description?: string;
+    fanfare?: unknown[];
     evolve_trigger_always?: boolean;
     class?: string;
   }> = [];
@@ -58,5 +60,22 @@ describe("Portal inventory watch — data scan", () => {
     const portal = loadPortalCards();
     const flagged = portal.filter((c) => c.evolve_trigger_always);
     expect(flagged.map((c) => c.id)).toEqual([]);
+  });
+
+  it("10271210 Artifact Catapult — cost 1; Fanfare adds Gear of Ambition and Gear of Remembrance", () => {
+    const catapult = loadPortalCards().find((c) => c.id === "10271210")!;
+    expect(catapult.cost).toBe("1");
+    expect(catapult.description).toContain(
+      "Fanfare: Add a Gear of Ambition and a Gear of Remembrance to your hand.",
+    );
+    expect(catapult.fanfare).toEqual([
+      { op: "add_to_hand", name: "Gear of Ambition", count: 1 },
+      { op: "add_to_hand", name: "Gear of Remembrance", count: 1 },
+    ]);
+  });
+
+  it("10274120 Karula, Eternal Arts — cost 5", () => {
+    const karula = loadPortalCards().find((c) => c.id === "10274120")!;
+    expect(karula.cost).toBe("5");
   });
 });
