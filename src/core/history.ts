@@ -544,8 +544,7 @@ export function isInAction() {
  */
 export function appendStep(name: string, meta: any = {}) {
   if (!inAction) {
-    // No action open → record a zero-mutation action so the step is still visible in history.
-    doAction(name, () => {}, { step: true, ...meta }, { autoRender: false });
+    logEvent("history_step", { parent: null, step: name, meta });
     return;
   }
   if (!inAction.meta) inAction.meta = {};

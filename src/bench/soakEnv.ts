@@ -554,7 +554,23 @@ function captureFullSnapshot(): SnapshotPair {
 }
 
 function captureLegalSnapshot(): string {
-  return canonicalJson(sortSoakActions(getLegalSoakActions()));
+  // History snapshots strip in-progress target picks (sanitizePendingTargetInSnapshot);
+  // legal actions after undo must match that sanitized prompt, not live partial picks.
+  const pending = state.pendingTargetEffect;
+  const savedUids = pending?.targetUids;
+  const savedTargets = pending?.targets;
+  if (pending) {
+    pending.targetUids = [];
+    if (Array.isArray(pending.targets)) pending.targets = [];
+  }
+  try {
+    return canonicalJson(sortSoakActions(getLegalSoakActions()));
+  } finally {
+    if (pending && savedUids !== undefined) {
+      pending.targetUids = savedUids;
+      if (savedTargets !== undefined) pending.targets = savedTargets;
+    }
+  }
 }
 
 export type JsonPathDiff = { path: string; a: unknown; b: unknown };
@@ -614,12 +630,8 @@ export function findUnexpectedNonUndoableActionTypes(
 }
 
 export const CHOOSE_TARGET_ZERO_COMMIT_REASON =
-  "CHOOSE_TARGET calls resolvePendingTarget → applyTargetClick (resolveTarget.ts); " +
-  "no doAction until Confirm Targets (showConfirmationButton onConfirm).";
-
-export const CHOOSE_TARGET_NESTED_COMMIT_REASON =
-  "CHOOSE_TARGET nested commit (orchestrateExecution / targeted op doAction); " +
-  "single-step round-trip skipped — deep ring still counts commits.";
+  "CHOOSE_TARGET pick-only click (applyTargetClick → continue); " +
+  "no doAction until selection completes (Resolve Targets or Confirm Targets).";
 
 function formatHistoryMismatch(
   actionIndex: number,
@@ -1124,44 +1136,33 @@ export async function runSoakGame(
             commits: historyCommits,
           });
 
-          // Nested targeted-op commits on picker clicks do not bound the full
-          // selection for single-step undo — still count them in the deep ring.
-          const skipSingleStepRoundTrip = action.type === "CHOOSE_TARGET";
-          if (skipSingleStepRoundTrip) {
-            zeroCommitLog.push({
-              actionIndex: actions,
-              actionType: action.type,
-              reason: `${CHOOSE_TARGET_NESTED_COMMIT_REASON} commits=${historyCommits}`,
-            });
-          } else {
-            const roundTripErr = runHistoryRoundTrip({
-              actionIndex: actions,
-              action,
-              before: beforeSnap,
-              after: afterSnap,
-              legalBefore,
-              legalAfter,
-              policyRng,
-              historyCommits,
-              historyIgnoreFields,
-              historyReExecute,
-              dispatchPath,
-            });
-            if (roundTripErr) {
-              return {
-                ...base,
-                outcome: "history",
-                turns: state.turnNumber | 0,
-                actions,
-                finalHash: safeHash(),
-                error: roundTripErr,
-                findings: [roundTripErr],
-                nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
-                playBlockedLog,
-                zeroCommitLog,
-                commitSequence,
-              };
-            }
+          const roundTripErr = runHistoryRoundTrip({
+            actionIndex: actions,
+            action,
+            before: beforeSnap,
+            after: afterSnap,
+            legalBefore,
+            legalAfter,
+            policyRng,
+            historyCommits,
+            historyIgnoreFields,
+            historyReExecute,
+            dispatchPath,
+          });
+          if (roundTripErr) {
+            return {
+              ...base,
+              outcome: "history",
+              turns: state.turnNumber | 0,
+              actions,
+              finalHash: safeHash(),
+              error: roundTripErr,
+              findings: [roundTripErr],
+              nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+              playBlockedLog,
+              zeroCommitLog,
+              commitSequence,
+            };
           }
 
           historyRing.push({

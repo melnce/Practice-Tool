@@ -63,21 +63,16 @@ export function resolvePendingTarget(uid: string | "leader") {
 
   if (result.kind === "execute") {
     const op = (pending.eff as { op?: string } | undefined)?.op;
-    const run = () => orchestrateExecution(result.opCtx);
-    if (op === "nested_effects") {
-      doAction(
-        "Resolve Targets",
-        run,
-        {
-          op,
-          owner: pending.owner,
-          source: pending.sourceCard?.name,
-        },
-        { autoRender: true },
-      );
-    } else {
-      run();
-    }
+    doAction(
+      "Resolve Targets",
+      () => orchestrateExecution(result.opCtx),
+      {
+        op,
+        owner: pending.owner,
+        source: pending.sourceCard?.name,
+      },
+      { autoRender: true },
+    );
   }
 }
 
@@ -200,7 +195,17 @@ export function forceCompleteOrFizzlePendingTarget(): void {
       targetUids: [...targetUids],
       resumeEffects: pending.resumeEffects,
     };
-    orchestrateExecution(opCtx);
+    const op = (pending.eff as { op?: string } | undefined)?.op;
+    doAction(
+      "Resolve Targets",
+      () => orchestrateExecution(opCtx),
+      {
+        op,
+        owner: pending.owner,
+        source: pending.sourceCard?.name,
+      },
+      { autoRender: true },
+    );
     return;
   }
 

@@ -194,29 +194,20 @@ describe("selective evolve targeted-op resume (PR #230)", () => {
     expect(edel.hasEvolved).toBe(true);
 
     engineDispatch(state, { type: "UNDO" });
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(
+      getBoard(state, "first").find((c) => c.uid === edel.uid)?.hasEvolved,
+    ).toBeFalsy();
+
+    engineDispatch(state, { type: "UNDO" });
     expect(JSON.stringify(captureSnapshot())).toBe(before);
     const restored = getBoard(state, "first").find((c) => c.uid === edel.uid);
     expect(restored?.hasEvolved).toBeFalsy();
 
-    doAction(
-      "Select evolve ally",
-      () => {
-        runEffects(
-          [
-            {
-              op: "evolve",
-              target: "ally:follower",
-              select: 1,
-              spend_point: false,
-            },
-          ],
-          "first",
-          null,
-        );
-      },
-      { op: "evolve" },
-      { autoRender: false },
-    );
+    engineDispatch(state, { type: "REDO" });
+    expect(state.pendingTargetEffect).toBeDefined();
+
+    engineDispatch(state, { type: "REDO" });
     engineDispatch(state, {
       type: "CHOOSE_TARGET",
       target: { type: "card", uid: edel.uid },

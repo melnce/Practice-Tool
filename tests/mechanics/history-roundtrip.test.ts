@@ -55,6 +55,23 @@ describe("history round-trip soak", () => {
     });
   }
 
+  for (const gameIndex of [8, 86] as const) {
+    it(`seed 20260908 game ${gameIndex} — engine chain-undo (Earrings + Kukishiro crest)`, async () => {
+      const result = await runSoakGame({
+        seed: 20260908,
+        gameIndex,
+        historyCheck: true,
+        dispatch: ENGINE,
+        turnCap: 60,
+        actionCap: 800,
+      });
+      expect(
+        result.outcome,
+        result.error ?? `game ${gameIndex} outcome ${result.outcome}`,
+      ).toBe("completed");
+    });
+  }
+
   it("mulligan picks are undoable — toggle, confirm, and undo/redo round-trip", async () => {
     setHistoryEnabled(true);
     await startNewGame({

@@ -109,8 +109,13 @@ describe("history __lastPlayedCard and null snapshot boards", () => {
     expect((state as any).__lastPlayedCard?.uid).toBe(playedUid);
 
     dispatch(state, { type: "UNDO" });
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect((state as any).__lastPlayedCard?.uid).toBe(playedUid);
+
+    dispatch(state, { type: "UNDO" });
     expect((state as any).__lastPlayedCard).toBeUndefined();
 
+    dispatch(state, { type: "REDO" });
     dispatch(state, { type: "REDO" });
     dispatch(state, {
       type: "CHOOSE_TARGET",
