@@ -1,8 +1,13 @@
 // src/logic/effects/ops/crest/unified.ts
 // Unified crest handler - handles crest operations
 
-import type { Effect, Player } from "../../../../core/types/index.js";
-import type { completeCrest, Crest } from "../../crest.js";
+import type {
+  Effect,
+  CardInstance,
+  Player,
+} from "../../../../core/types/index.js";
+import type { Crest } from "../../crest.js";
+import { isDev } from "../../../../core/env.js";
 
 import {
   handleGainCrest,
@@ -18,6 +23,7 @@ import { handleCountdown } from "../countdown/unified.js";
 export interface CrestHandlerContext {
   owner: Player;
   source?: Crest | null; // Optional: the crest object when in a crest trigger context
+  sourceCard?: CardInstance | null;
 }
 
 /**
@@ -88,7 +94,13 @@ export function handleCrest(eff: Effect, ctx: CrestHandlerContext): void {
       }
       break;
     }
-    default:
-      console.warn(`[crest] Unknown action: ${action}`);
+    default: {
+      const cardName = ctx.sourceCard?.name ?? "unknown";
+      const msg = `[crest] Unknown action "${action}" in card ${cardName}`;
+      if (isDev()) {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+    }
   }
 }

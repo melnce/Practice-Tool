@@ -12,7 +12,11 @@ import type { Crest } from "../../crest.js";
 import { resolveEffectAmount } from "../../../core/values.js";
 
 import { completeCrest } from "../../crest.js";
-import { getCrests, getBoard } from "../../../../core/playerHelpers.js";
+import {
+  getCrests,
+  getBoard,
+  opponentOf,
+} from "../../../../core/playerHelpers.js";
 
 export type CountdownAction = "advance" | "delay";
 
@@ -70,6 +74,14 @@ export function handleCountdown(
       targetSpec !== "self")
   ) {
     handleBoardAmuletCountdown(ctx.owner, eff, action, amount);
+    return;
+  }
+
+  // All crests for a player (e.g. Torrent of Despair delays every allied crest)
+  if (targetSpec === "ally:crest" || targetSpec === "enemy:crest") {
+    const crestOwner =
+      targetSpec === "enemy:crest" ? opponentOf(ctx.owner) : ctx.owner;
+    handleAllCrestsCountdown(crestOwner, action, amount);
     return;
   }
 
@@ -196,6 +208,17 @@ function handleAmuletCountdown(
 // =============================================================================
 // CREST COUNTDOWN
 // =============================================================================
+
+function handleAllCrestsCountdown(
+  owner: Player,
+  action: CountdownAction,
+  amount: number,
+): void {
+  const crests = [...(getCrests(state, owner) || [])];
+  for (const crest of crests) {
+    handleCrestCountdown(crest, action, amount, owner);
+  }
+}
 
 function handleCrestCountdown(
   crest: Crest,

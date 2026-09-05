@@ -1,12 +1,27 @@
 // src/logic/effects/ops/crest/types.ts
 // Unified crest operation types
 
+/** Allowed crest.action values — must match handleCrest switch in crest/unified.ts */
+export const CREST_ACTION_VALUES = new Set([
+  "gain",
+  "add_counter",
+  "pay_counter",
+  "append_triggers",
+  "advance",
+  "advance_countdown",
+  "delay_countdown",
+  "destroy",
+  "banish_all",
+]);
+
 export type CrestAction =
   | "gain"
   | "add_counter"
   | "pay_counter"
   | "append_triggers"
+  | "advance"
   | "advance_countdown"
+  | "delay_countdown"
   | "destroy"
   | "banish_all";
 
@@ -28,6 +43,7 @@ export interface UnifiedCrestSpec {
   // For counter actions
   counter?: string; // Counter key (e.g., "faith")
   amount?: number;
+  target?: string; // e.g. "ally:crest", "enemy:crest" for countdown ops
 
   // For "pay_counter" action
   on_success_effects?: any[];
