@@ -5519,12 +5519,12 @@
       "status": "covered"
     },
     "10472110": {
-      "fingerprint": "1f303990",
+      "fingerprint": "5e4b49b8",
       "gatesSatisfied": ["skybound_art"],
       "name": "Eustace, Howl of Thunder",
       "scenarios": [
         {
-          "fingerprint": "2b1ca630",
+          "fingerprint": "413a5ee8",
           "scenario": "play"
         }
       ],
@@ -9684,7 +9684,7 @@
       "status": "covered"
     },
     "10874120": {
-      "fingerprint": "bab65710",
+      "fingerprint": "6f7a52cd",
       "gatesSatisfied": [],
       "name": "Eudie, Your Dependable Mentor",
       "scenarios": [
@@ -9693,7 +9693,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "6ef11390",
+          "fingerprint": "420ae9cc",
           "scenario": "evolve"
         }
       ],
