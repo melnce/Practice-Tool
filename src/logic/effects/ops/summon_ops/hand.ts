@@ -9,11 +9,8 @@ import type {
 } from "../../../../core/types/index.js";
 import { highlightSelectable } from "../../../core/targeting.js"; // Targeting is external
 import { initAmulet } from "./init.js";
-import { finishFollowerEnter, pushToBoard } from "./core.js";
-import {
-  bumpZoneVersion,
-  stampBoardEntryTs,
-} from "../../../core/triggers/utils.js";
+import { finishFollowerEnter, pushToBoard, boardHasRoom } from "./core.js";
+import { stampBoardEntryTs } from "../../../core/triggers/utils.js";
 import { getEffectiveCost } from "./utils.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getHand, getBoard } from "../../../../core/playerHelpers.js";
@@ -61,8 +58,8 @@ export function summonFromHand(
     return false;
   }
 
-  // Verify board space
-  if (board.length >= 5) {
+  // Verify board space (real cards, not null death placeholders)
+  if (!boardHasRoom(board)) {
     console.warn("summonFromHand: Board is full");
     return false;
   }
@@ -204,14 +201,14 @@ export function summonExactCopyFromHand(
     }
   }
 
-  // Place on board (respect space)
+  // Place on board (respect space; fills null holes from deferred deaths)
   const board = getBoard(state, owner);
-  if (!Array.isArray(board) || board.length >= 5) return null;
+  if (!boardHasRoom(board)) return null;
 
   stampBoardEntryTs(clone);
-  if (position === "left") board.unshift(clone);
-  else board.push(clone);
-  bumpZoneVersion();
+  if (!pushToBoard(board, owner, clone, { deferEnter: true })) {
+    return null;
+  }
 
   logEvent("summonExactCopy", { owner, from: srcCard.name, uid: clone.uid });
   // Track last summoned

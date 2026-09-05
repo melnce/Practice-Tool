@@ -19,6 +19,23 @@ import {
 import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 import { recordFollowerEnter } from "../../../core/followerEnterHistory.js";
 
+const BOARD_CAP = 5;
+
+/** Count real cards on the field (null death placeholders are not cards). */
+export function countRealBoardCards(board: CardInstance[]): number {
+  let n = 0;
+  for (let i = 0; i < board.length; i++) {
+    const slot = board[i];
+    if (slot && typeof slot === "object") n++;
+  }
+  return n;
+}
+
+/** True when another follower/amulet can enter (fills null holes first). */
+export function boardHasRoom(board: CardInstance[]): boolean {
+  return countRealBoardCards(board) < BOARD_CAP;
+}
+
 // =============== Core Summon Routines ===============
 
 export function makeCardFromDB(
@@ -56,8 +73,8 @@ export function pushToBoard(
     }
   }
 
-  // Respect max board size 5 occupied slots
-  if (board.length >= 5) return false;
+  // Respect max board size: 5 real cards (null holes are freed slots)
+  if (countRealBoardCards(board) >= BOARD_CAP) return false;
 
   board.push(card);
   bumpZoneVersion();
