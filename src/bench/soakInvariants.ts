@@ -21,23 +21,8 @@ export type SoakInvariantFinding = {
 export function checkSoakInvariants(state: GameState): SoakInvariantFinding[] {
   const findings: SoakInvariantFinding[] = [];
 
-  const resolutionQueue = (state as any)._resolutionQueue as
-    | unknown[]
-    | undefined;
-  const deferredDeathPause =
-    !!state.pendingTargetEffect ||
-    !!(resolutionQueue && resolutionQueue.length > 0);
-
   const base = validateGameState(state);
   for (const fail of base.fails) {
-    // cleanup.ts intentionally leaves null board slots while Last Words /
-    // leave triggers are deferred across a pending target selection.
-    if (
-      deferredDeathPause &&
-      /Null entry in players\.(first|second)\.board/.test(fail)
-    ) {
-      continue;
-    }
     findings.push({ kind: "invariant", message: fail });
   }
 

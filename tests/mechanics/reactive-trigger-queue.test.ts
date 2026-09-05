@@ -296,6 +296,16 @@ describe("Reactive trigger queue", () => {
     });
   });
 
+  it("soak seed 20260915 game 95 — gate evolved_allied does not see null board slots", async () => {
+    const fixture = loadSoakFixture("seed20260915_game95_gate_null.json");
+    const result = await replaySoakTrace(
+      fixture.seed,
+      fixture.gameIndex,
+      fixture.trace as any,
+    );
+    expect(result.error).toBeUndefined();
+  });
+
   it("soak seed 20260913 game 123 — Reaper's Due printed copy terminates; exact board after batch", async () => {
     const fixture = loadSoakFixture(
       "seed20260913_game123_reapers_due_loop.json",

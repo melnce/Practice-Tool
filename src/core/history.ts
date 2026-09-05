@@ -7,7 +7,6 @@ import { validateGameState } from "./stateValidation.js";
 import { isHistoryDisabled } from "./env.js";
 import type { ReplayStep } from "./stateHash.js";
 import { hashGameState } from "./stateHash.js";
-import type { CardInstance } from "./types/index.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -94,22 +93,6 @@ export const INTERNAL_CACHE_KEYS = new Set([
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
-/** Compact null death placeholders in a snapshot copy (never mutates live state). */
-function compactBoardsInSnapshot(snap: GameState): void {
-  const compactBoard = (board: CardInstance[]) => {
-    let w = 0;
-    for (let r = 0; r < board.length; r++) {
-      const x = board[r];
-      if (x && typeof x === "object") {
-        board[w++] = x;
-      }
-    }
-    if (w < board.length) board.length = w;
-  };
-  compactBoard(snap.players.first.board);
-  compactBoard(snap.players.second.board);
-}
-
 function snapshot(): GameState {
   // Exclude RNG (has methods, must be handled separately) and internal caches
   const { rng, ...rest } = state as any;
@@ -129,7 +112,6 @@ function snapshot(): GameState {
     if (rng && typeof rng.snapshot === "function") {
       (snap as any).__rng = rng.snapshot();
     }
-    compactBoardsInSnapshot(snap);
     return snap;
   } catch (e) {
     // Fallback: manually clone, skipping non-cloneable properties
@@ -177,7 +159,6 @@ function manualSnapshot(rest: any, rng: any): GameState {
     snap.__rng = rng.snapshot();
   }
 
-  compactBoardsInSnapshot(snap as GameState);
   return snap as GameState;
 }
 
@@ -263,7 +244,6 @@ function cloneSnapshot(snap: GameState): GameState {
         uidCounter: rngMeta.uidCounter,
       };
     }
-    compactBoardsInSnapshot(clone);
     return clone;
   } catch (e) {
     console.warn(
@@ -278,7 +258,6 @@ function cloneSnapshot(snap: GameState): GameState {
         uidCounter: rngMeta.uidCounter,
       };
     }
-    compactBoardsInSnapshot(clone);
     return clone;
   }
 }

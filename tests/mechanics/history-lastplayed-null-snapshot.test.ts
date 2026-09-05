@@ -174,8 +174,6 @@ describe("history __lastPlayedCard and null snapshot boards", () => {
 
     expect(state.pendingTargetEffect).toBeDefined();
 
-    state.players.first.board = [buffTarget, null as any, null as any];
-
     const snap = captureSnapshot();
     expect(getBoard(snap, "first").every((c) => c != null)).toBe(true);
     expect(getBoard(snap, "second").every((c) => c != null)).toBe(true);

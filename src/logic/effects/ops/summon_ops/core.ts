@@ -21,34 +21,14 @@ import { recordFollowerEnter } from "../../../core/followerEnterHistory.js";
 
 const BOARD_CAP = 5;
 
-/** Count real cards on the field (null death placeholders are not cards). */
+/** Count cards on the field. */
 export function countRealBoardCards(board: CardInstance[]): number {
-  let n = 0;
-  for (let i = 0; i < board.length; i++) {
-    const slot = board[i];
-    if (slot && typeof slot === "object") n++;
-  }
-  return n;
+  return board.length;
 }
 
-/** True when another follower/amulet can enter (real cards only). */
+/** True when another follower/amulet can enter. */
 export function boardHasRoom(board: CardInstance[]): boolean {
-  return countRealBoardCards(board) < BOARD_CAP;
-}
-
-/** Remove null death placeholders; preserve left-to-right order of real cards. */
-function compactBoardInPlace(board: CardInstance[]): void {
-  let w = 0;
-  for (let r = 0; r < board.length; r++) {
-    const slot = board[r];
-    if (slot && typeof slot === "object") {
-      board[w++] = slot;
-    }
-  }
-  if (w < board.length) {
-    board.length = w;
-    bumpZoneVersion();
-  }
+  return board.length < BOARD_CAP;
 }
 
 // =============== Core Summon Routines ===============
@@ -77,10 +57,7 @@ export function pushToBoard(
   card.zone = "board";
   stampBoardEntryTs(card);
 
-  // Owner ruling: summons append right; compact null holes from deferred deaths first.
-  compactBoardInPlace(board);
-
-  if (countRealBoardCards(board) >= BOARD_CAP) return false;
+  if (board.length >= BOARD_CAP) return false;
 
   board.push(card);
   bumpZoneVersion();

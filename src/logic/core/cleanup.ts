@@ -125,22 +125,22 @@ function triggerLastWords(card: CardInstance, owner: Player): "pending" | void {
 }
 
 /**
- * Detach a card from a board array by object identity.
+ * Remove a card from a board array by object identity.
  * Must not use a previously collected index — destroy triggers / nested
- * cleanup can compact or reorder the board before we write the hole.
- * Null placeholders keep slot positions for LW summons (pushToBoard).
+ * cleanup can reorder the board before we splice.
  */
-function detachFromBoardAsNull(
+function removeFromBoardByIdentity(
   board: CardInstance[],
   card: CardInstance,
 ): boolean {
   let found = false;
-  for (let i = 0; i < board.length; i++) {
+  for (let i = board.length - 1; i >= 0; i--) {
     if (board[i] === card) {
-      (board as any)[i] = null;
+      board.splice(i, 1);
       found = true;
     }
   }
+  if (found) bumpZoneVersion();
   return found;
 }
 
@@ -149,7 +149,7 @@ function detachFromBoardAsNull(
  * instance is still listed on the owner's board (stale slot), detach it.
  */
 function sendToGrave(card: CardInstance, owner: Player) {
-  detachFromBoardAsNull(getBoard(state, owner), card);
+  removeFromBoardByIdentity(getBoard(state, owner), card);
   const grave = getGraveyard(state, owner);
   if (grave.includes(card)) {
     card.zone = "graveyard";
@@ -162,8 +162,8 @@ function sendToGrave(card: CardInstance, owner: Player) {
 }
 
 /**
- * Game-over halt: bury deferred corpses without firing leave/LW, then compact.
- * Used when the match ends mid-flush so boards never retain null placeholders.
+ * Game-over halt: bury deferred corpses without firing leave/LW.
+ * Used when the match ends mid-flush.
  */
 function buryResolutionQueueWithoutTriggers(
   pendingLw: DeathLwItem[] = [],
@@ -189,8 +189,6 @@ function buryResolutionQueueWithoutTriggers(
     (card as any)._lwFired = true;
     sendToGrave(card, lwItem.owner);
   }
-
-  compactAllBoards();
 }
 
 function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
@@ -304,7 +302,6 @@ export function flushDeferredDeathBatch() {
                   owner,
                 };
               }
-              compactAllBoards();
               return;
             }
             sendToGrave(card, owner);
@@ -312,7 +309,6 @@ export function flushDeferredDeathBatch() {
         } else {
           const status = executeReactiveGroup(item);
           if (status === "paused") {
-            compactAllBoards();
             return;
           }
           q.shift();
@@ -330,8 +326,6 @@ export function flushDeferredDeathBatch() {
       buryResolutionQueueWithoutTriggers(haltPendingLw);
       return;
     }
-
-    compactAllBoards();
   } finally {
     (state as any)._drainingResolutionQueue = false;
   }
@@ -459,11 +453,11 @@ export function cleanupDead() {
 
     // Zone transfer FIRST (by identity, not collected index). Destroy/leave
     // triggers and nested cleanup may reorder the board; a stale index would
-    // null the wrong slot (or extend the array) and leave the instance in
-    // two zones when sendToGrave runs. Matches destroyTarget / bounce:
-    // remove from the source zone, then fire observers.
+    // remove the wrong slot and leave the instance in two zones when
+    // sendToGrave runs. Matches destroyTarget / bounce: remove from the
+    // source zone, then fire observers.
     const isBanishedOnDeath = kw?.banishOnDeath || (c as any).banishOnDeath;
-    detachFromBoardAsNull(board, c);
+    removeFromBoardByIdentity(board, c);
 
     delete (c as any).buffs;
     delete (c as any).potential_attack;
@@ -542,8 +536,8 @@ export function cleanupDead() {
       }
     }
 
-    // Re-detach after triggers: nested effects must not re-seat the corpse.
-    detachFromBoardAsNull(board, c);
+    // Re-remove after triggers: nested effects must not re-seat the corpse.
+    removeFromBoardByIdentity(board, c);
 
     const lw = kw?.lastWordsEffects || c.lastWordsEffects;
     const lwCount = Array.isArray(lw) ? lw.length : 0;
@@ -584,25 +578,6 @@ export function cleanupDead() {
       sendToGrave(card, owner);
     }
   }
-  compactAllBoards();
-}
-
-function compactAllBoards() {
-  const compactBoard = (board: CardInstance[]) => {
-    let w = 0;
-    for (let r = 0; r < board.length; r++) {
-      const x = board[r];
-      if (x && typeof x === "object") {
-        board[w++] = x;
-      }
-    }
-    if (w < board.length) {
-      board.length = w;
-      bumpZoneVersion();
-    }
-  };
-  compactBoard(getBoard(state, "first"));
-  compactBoard(getBoard(state, "second"));
 }
 
 export function resetDeferredDeathState() {

@@ -1,6 +1,6 @@
 /**
- * Board order: Last Words summons append on the right after compaction,
- * never in the dead follower's slot when followers sit to the right.
+ * Board order: Last Words summons append on the right;
+ * destroyed followers leave the field immediately (no placeholder slots).
  */
 /**
  * @vitest-environment jsdom
