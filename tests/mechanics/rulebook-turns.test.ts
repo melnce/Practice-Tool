@@ -31,6 +31,7 @@ import {
   setEvoUsedThisTurn,
   setMaxPP,
   setPP,
+  setHP,
 } from "../../src/core/playerHelpers.js";
 import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
@@ -1213,18 +1214,19 @@ describe("Rulebook L152 — SOT trigger.condition snapshots at queue time", () =
   });
 });
 
-describe("Authored pattern — gate op inside trigger effects evaluates at resolution", () => {
+describe("Authored pattern — leading gate op in trigger effects is judged at queue time", () => {
   beforeEach(() => {
     resetUidCounter();
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
       .withFirstDeck(deckFill("D", 5))
+      .withSecondHP(20)
       .build();
     state.gameStarted = true;
   });
 
   // Most "at the end of your turn, if …" cards use a gate op in effects (e.g. Godwood Staff 10113210 combo gate),
-  // not trigger.condition — the gate runs when the trigger resolves, not at queue time.
-  it("leader_defense_lte gate: leader damaged below threshold before gate resolves → no draw", () => {
+  // not trigger.condition — the leading gate is judged when the trigger queues, not when it resolves.
+  it("leader_defense_lte gate false at queue: older ally damage before resolve does not draw", () => {
     const older = createCard(
       {
         name: "OlderLeaderHit",
@@ -1236,6 +1238,62 @@ describe("Authored pattern — gate op inside trigger effects evaluates at resol
           {
             type: "end_of_turn_own",
             effects: [{ op: "damage", target: "ally:leader", amount: 8 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    older.insertionTs = 1;
+    const host = createCard(
+      {
+        name: "GateHost",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [
+              {
+                op: "gate",
+                condition: "leader_defense_lte",
+                count: 15,
+                effects: [{ op: "draw", source: "deck", count: 1 }],
+              },
+            ],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    host.insertionTs = 2;
+    state.players.first.board = [older, host];
+    expect(getHP(state, "first")).toBe(20);
+    const handBefore = thenHand("first").length;
+
+    runEndOfTurnBoundary("first");
+
+    expect(getHP(state, "first")).toBe(12);
+    expect(thenHand("first").length).toBe(handBefore);
+  });
+
+  it("leader_defense_lte gate true at queue: older ally heal before resolve still draws", () => {
+    setHP(state, "first", 5);
+    expect(getHP(state, "first")).toBe(5);
+    const older = createCard(
+      {
+        name: "OlderLeaderHeal",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [{ op: "restore", target: "ally:leader", amount: 20 }],
           },
         ],
       },
@@ -1269,13 +1327,91 @@ describe("Authored pattern — gate op inside trigger effects evaluates at resol
     );
     host.insertionTs = 2;
     state.players.first.board = [older, host];
-    expect(getHP(state, "first")).toBe(20);
     const handBefore = thenHand("first").length;
 
     runEndOfTurnBoundary("first");
 
-    expect(getHP(state, "first")).toBe(12);
-    expect(thenHand("first").length).toBe(handBefore);
+    expect(getHP(state, "first")).toBe(20);
+    expect(thenHand("first").length).toBe(handBefore + 1);
+  });
+
+  function simpleAmulet(name: string, insertionTs: number) {
+    const card = createCard(
+      { name, type: "Amulet", cost: 1, attack: 0, defense: 0 },
+      "board",
+      "first",
+    );
+    card.insertionTs = insertionTs;
+    return card;
+  }
+
+  // Rings of Moonlight (90064210): "At the end of your turn, if there are at least 3 allied amulets…"
+  it("Rings of Moonlight (90064210): 3 amulets at queue, older destroy → damage still happens", () => {
+    const older = createCard(
+      {
+        name: "OlderAmuletDestroy",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [{ op: "destroy", target: "ally:amulet", count: 1 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    older.insertionTs = 1;
+    const amuletA = simpleAmulet("AmuletA", 2);
+    const amuletB = simpleAmulet("AmuletB", 3);
+    const rings = createCard("90064210", "board", "first");
+    rings.insertionTs = 4;
+    state.players.first.board = [older, amuletA, amuletB, rings];
+    expect(getHP(state, "second")).toBe(20);
+
+    runEndOfTurnBoundary("first");
+
+    expect(getHP(state, "second")).toBe(17);
+  });
+
+  it("Rings of Moonlight (90064210): 2 amulets at queue, older summon → no damage", () => {
+    const older = createCard(
+      {
+        name: "OlderAmuletSummon",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "end_of_turn_own",
+            effects: [
+              {
+                op: "summon",
+                source: "named",
+                name: "Serene Sanctuary",
+                count: 1,
+              },
+            ],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    older.insertionTs = 1;
+    const amuletA = simpleAmulet("AmuletA", 2);
+    const rings = createCard("90064210", "board", "first");
+    rings.insertionTs = 3;
+    state.players.first.board = [older, amuletA, rings];
+    expect(getHP(state, "second")).toBe(20);
+
+    runEndOfTurnBoundary("first");
+
+    expect(getHP(state, "second")).toBe(20);
   });
 });
 

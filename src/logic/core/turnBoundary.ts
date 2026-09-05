@@ -22,6 +22,9 @@ import { runEffects } from "./effects/index.js";
 import { flushDeferredDeathBatch, cleanupDead } from "./cleanup.js";
 import { clearTemporaryBuffs } from "../effects/self.js";
 import { clearTemporaryAttacksPerTurn } from "../effects/attacks.js";
+import { normalizeToGateSpec } from "../effects/gates/types.js";
+import { evaluateCondition } from "../effects/gates/conditions.js";
+import { logEvent } from "../../core/logger.js";
 
 export type TurnBoundaryEvent = "end_of_turn" | "start_of_turn";
 
@@ -108,6 +111,36 @@ function sourceOrder(source: string, sources: string[]): number {
   return idx >= 0 ? idx : sources.length;
 }
 
+/** Leading "if …" gate in trigger.effects — judged at queue time per rulebook L252. */
+function preJudgeLeadingGate(
+  trigger: TriggerSpec,
+  owner: Player,
+  card: CardInstance,
+): TriggerSpec | null {
+  const effects = trigger.effects;
+  if (!effects?.length || effects[0]?.op !== "gate") return trigger;
+
+  const spec = normalizeToGateSpec(effects[0]);
+  const passed = evaluateCondition(spec, owner, card);
+  const rest = effects.slice(1);
+
+  if (!passed) {
+    const elseBranch = spec.else_effects || [];
+    if (elseBranch.length === 0) {
+      logEvent("turnBoundaryGateSkipped", {
+        card: card.name,
+        condition: spec.condition,
+        owner,
+      });
+      return null;
+    }
+    return { ...trigger, effects: [...elseBranch, ...rest] };
+  }
+
+  const ungated = [...(spec.effects || []), ...rest];
+  return { ...trigger, effects: ungated };
+}
+
 function queueTurnBoundaryTriggers(
   event: TurnBoundaryEvent,
   focalPlayer: Player,
@@ -158,11 +191,18 @@ function queueTurnBoundaryTriggers(
         if (!shouldFire(trigger, cand.card, event, turnToken, context))
           continue;
 
+        const judged = preJudgeLeadingGate(
+          trigger,
+          cand.owner,
+          cand.card as CardInstance,
+        );
+        if (!judged) continue;
+
         queued.push({
           step: stepDef.step,
           order: order++,
           candidate: cand,
-          trigger,
+          trigger: judged,
           owner: cand.owner,
         });
       }
