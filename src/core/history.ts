@@ -9,11 +9,6 @@ import type { ReplayStep } from "./stateHash.js";
 import { hashGameState } from "./stateHash.js";
 import type { CardInstance } from "./types/index.js";
 import { isDev, readEnv } from "./env.js";
-import {
-  flushDeferredDeathBatch,
-  cleanupDead,
-  resumeDeferredDeathIfIdle,
-} from "../logic/core/cleanup.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
@@ -371,26 +366,6 @@ export function beginAction(name: string, meta: any = {}) {
   inAction = { name, before: snapshot(), meta };
 }
 
-function settleResolutionQueueBeforeHistoryCommit(): void {
-  if ((state as any)._drainingResolutionQueue) return;
-  if (state.pendingTargetEffect) return;
-
-  for (let round = 0; round < 32; round++) {
-    cleanupDead();
-    resumeDeferredDeathIfIdle();
-    if (getResolutionQueue().length === 0) return;
-    if ((state as any)._drainingResolutionQueue) return;
-    if (state.pendingTargetEffect) return;
-
-    const lenBefore = getResolutionQueue().length;
-    flushDeferredDeathBatch();
-    resumeDeferredDeathIfIdle();
-    if (state.pendingTargetEffect) return;
-    if (getResolutionQueue().length === 0) return;
-    if (getResolutionQueue().length >= lenBefore) break;
-  }
-}
-
 function assertResolutionQueueClearForCommit(actionName: string): void {
   const queueLen = getResolutionQueue().length;
   const draining = !!(state as any)._drainingResolutionQueue;
@@ -421,7 +396,6 @@ export function commitAction({ autoRender = true } = {}) {
     return;
   }
 
-  settleResolutionQueueBeforeHistoryCommit();
   assertResolutionQueueClearForCommit(inAction.name);
 
   const after = snapshot();

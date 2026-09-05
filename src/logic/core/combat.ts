@@ -20,7 +20,7 @@ import { isGameOver } from "../../core/gameOver.js";
 // Imported from JS still
 import { applyLeaderDamage } from "../effects/leader.js";
 import { destroyTarget } from "../effects/ops/destroy/index.js";
-import { cleanupDead } from "./cleanup.js";
+import { cleanupDead, resumeDeferredDeathIfIdle } from "./cleanup.js";
 import { dealDamage, enterDamageBatch, exitDamageBatch } from "./barrier.js";
 import { doAction } from "../../core/history.js";
 import { handleRestore } from "../effects/ops/restore/index.js";
@@ -135,6 +135,23 @@ function recomputeAttackFlags(card: CardInstance) {
   (card as any).can_attack = eligible && swingsLeft && !forbidden;
   card.isRush = !!(card.justPlayed && card.hasRush && !card.hasStorm);
 }
+function drainCombatResolutionQueue() {
+  if (state.pendingTargetEffect) return;
+  if ((state as any)._drainingResolutionQueue) return;
+  resumeDeferredDeathIfIdle();
+}
+
+function finishCombatCleanup() {
+  cleanupDead();
+  drainCombatResolutionQueue();
+}
+
+function endCombatOnGameOver(attacker: CardInstance) {
+  finishCombatCleanup();
+  spendAttack(attacker);
+  recomputeAttackFlags(attacker);
+}
+
 function stripAmbushOnSelfAttack(attacker: CardInstance) {
   if (attacker.hasAmbush) attacker.hasAmbush = false;
 }
@@ -286,8 +303,7 @@ function _attackFollowerCore(
 
   // Strike / Clash may have dealt lethal — stop combat (bible §342).
   if (isGameOver()) {
-    spendAttack(attacker);
-    recomputeAttackFlags(attacker);
+    endCombatOnGameOver(attacker);
     return;
   }
 
@@ -322,13 +338,13 @@ function _attackFollowerCore(
       if (hasPiercingOne(attacker)) {
         applyLeaderDamage(defenderPlayer, 1);
       }
-      cleanupDead();
+      finishCombatCleanup();
       spendAttack(attacker);
       recomputeAttackFlags(attacker);
       return;
     }
 
-    cleanupDead();
+    finishCombatCleanup();
 
     if (isGameOver()) {
       spendAttack(attacker);
@@ -386,6 +402,7 @@ function _attackFollowerCore(
   }
 
   if (isGameOver()) {
+    finishCombatCleanup();
     spendAttack(attacker);
     recomputeAttackFlags(attacker);
     return;
@@ -394,7 +411,7 @@ function _attackFollowerCore(
   // Spend the swing, refresh flags, clean (render happens at UI layer)
   spendAttack(attacker);
   recomputeAttackFlags(attacker);
-  cleanupDead();
+  finishCombatCleanup();
 }
 
 export function attackFollower(
@@ -483,8 +500,7 @@ function _attackLeaderCore(
   fireTrigger("leader_strike", attackerPlayer, { attacker });
 
   if (isGameOver()) {
-    spendAttack(attacker);
-    recomputeAttackFlags(attacker);
+    endCombatOnGameOver(attacker);
     return;
   }
 
@@ -496,8 +512,7 @@ function _attackLeaderCore(
   fireTrigger("leader_attacked", defenderPlayer, { attacker });
 
   if (isGameOver()) {
-    spendAttack(attacker);
-    recomputeAttackFlags(attacker);
+    endCombatOnGameOver(attacker);
     return;
   }
 
@@ -505,8 +520,7 @@ function _attackLeaderCore(
   applyLeaderDamage(defenderPlayer, damage);
 
   if (isGameOver()) {
-    spendAttack(attacker);
-    recomputeAttackFlags(attacker);
+    endCombatOnGameOver(attacker);
     return;
   }
 
@@ -530,7 +544,7 @@ function _attackLeaderCore(
 
   spendAttack(attacker);
   recomputeAttackFlags(attacker);
-  // Render removed - happens at UI layer
+  finishCombatCleanup();
 }
 
 export function attackLeader(
@@ -544,7 +558,16 @@ export function attackLeader(
   const meta = { attackerIdx, attackerPlayer, defenderPlayer };
   doAction(
     "Attack Leader",
-    () => _attackLeaderCore(attackerIdx, attackerPlayer, defenderPlayer),
+    () => {
+      (state as any).combatResolutionDepth =
+        ((state as any).combatResolutionDepth ?? 0) + 1;
+      try {
+        return _attackLeaderCore(attackerIdx, attackerPlayer, defenderPlayer);
+      } finally {
+        (state as any).combatResolutionDepth =
+          ((state as any).combatResolutionDepth ?? 1) - 1;
+      }
+    },
     meta,
     { autoRender: true },
   );
