@@ -186,13 +186,15 @@ describe("Set 10009 — Abysscraft", () => {
 
   it("Reaper's Due — grants Last Words summon copy to selected ally", () => {
     setupTurn(R6, { hand: ["10953310"], pp: 4 });
-    const ally = alliedFollower("TargetAlly");
+    const ally = createCard("10002110", "board", "first");
+    ally.peak_defense = Number(ally.defense);
+    state.players.first.board.push(ally);
     whenPlayCard("first", 0);
     resolveFirstPendingIfNeeded();
     ally.defense = 0;
     cleanupDead();
     expect(
-      thenBoard("first").filter((c) => c.name === ally.name).length,
+      thenBoard("first").filter((c) => c.id === "10002110").length,
     ).toBeGreaterThanOrEqual(1);
   });
 

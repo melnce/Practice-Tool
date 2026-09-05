@@ -455,6 +455,69 @@ function collectMaxPerTurn(
   }
 }
 
+function collectSummonCopyOps(
+  node: unknown,
+  pathStr: string,
+  out: { path: string; eff: Record<string, unknown> }[],
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((n, i) => collectSummonCopyOps(n, `${pathStr}[${i}]`, out));
+    return;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.op === "summon") {
+    const source = String(obj.source || "").toLowerCase();
+    const mode = String(obj.mode || "").toLowerCase();
+    const isCopySummon =
+      source === "copy" ||
+      source === "self" ||
+      mode === "copy" ||
+      String(obj.op).toLowerCase() === "summon_exact_copy";
+    if (isCopySummon && source !== "hand") {
+      out.push({ path: pathStr, eff: obj });
+    }
+  }
+  for (const [k, v] of Object.entries(obj)) {
+    if (k === "op") continue;
+    collectSummonCopyOps(v, `${pathStr}.${k}`, out);
+  }
+}
+
+function checkSummonCopyMode(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const desc = card.description ?? "";
+  const found: { path: string; eff: Record<string, unknown> }[] = [];
+  collectSummonCopyOps(card, card.id, found);
+
+  const wantsPrinted =
+    /summon a copy of this card/i.test(desc) ||
+    /copies of this card/i.test(desc);
+  const wantsExact = /exact copy/i.test(desc);
+
+  for (const { path: opPath, eff } of found) {
+    const copyMode = String(eff.copy_mode || "exact").toLowerCase();
+    if (wantsExact && copyMode === "printed") {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `summon copy at ${opPath} has copy_mode:"printed" but card text says "exact copy"`,
+      });
+    }
+    if (wantsPrinted && !wantsExact && copyMode !== "printed") {
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `summon copy at ${opPath} must have copy_mode:"printed" (card text: plain "copy of this card")`,
+      });
+    }
+  }
+
+  return issues;
+}
+
 function checkAddToHand(card: CardJson): Issue[] {
   const issues: Issue[] = [];
   const found: { path: string; eff: Record<string, unknown> }[] = [];
@@ -1412,6 +1475,7 @@ function checkCard(card: CardJson): Issue[] {
 
   // Gate: add_to_hand field contracts (includes crest-nested ops)
   issues.push(...checkAddToHand(card));
+  issues.push(...checkSummonCopyMode(card));
   issues.push(...checkStatOpFilters(card));
   issues.push(...checkRandomDamageDistribution(card));
   issues.push(...checkAlternateFormClauses(card));

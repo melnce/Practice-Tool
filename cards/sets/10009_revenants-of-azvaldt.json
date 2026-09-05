@@ -2398,6 +2398,7 @@
                 "op": "summon",
                 "source": "self",
                 "mode": "copy",
+                "copy_mode": "printed",
                 "count": 1
               }
             ]

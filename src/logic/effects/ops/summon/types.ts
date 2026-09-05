@@ -69,6 +69,9 @@ export interface UnifiedSummonSpec {
   /** Scope for copy source. Default: "self" */
   copy_scope: CopyScope;
 
+  /** Copy fidelity: "exact" clones the instance; "printed" summons from DB. Default: "exact" */
+  copy_mode: "exact" | "printed";
+
   /** Filter criteria (for deck / destroyed_match summon). */
   filter: SummonFilter | null;
 
@@ -144,6 +147,7 @@ export function normalizeToUnifiedSpec(
     count: 1,
     owner: "self",
     copy_scope: "self",
+    copy_mode: "exact",
     filter: null,
     cost: null,
     distinct_by: null,
@@ -169,6 +173,10 @@ export function normalizeToUnifiedSpec(
   // Parse owner
   if (eff.owner === "enemy" || op === "summon_named_enemy") {
     spec.owner = "enemy";
+  }
+
+  if (eff.copy_mode === "printed" || eff.copy_mode === "exact") {
+    spec.copy_mode = eff.copy_mode;
   }
 
   // Derive source from legacy op names (only if not already set)

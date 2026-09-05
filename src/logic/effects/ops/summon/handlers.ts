@@ -17,6 +17,7 @@ import { resolveUids } from "../../../../core/uidResolver.js";
 import {
   summonNamed,
   summonExactCopy,
+  summonPrintedCopy,
   summonRandomFromDeck,
   handleReanimate,
 } from "./primitives.js";
@@ -79,11 +80,13 @@ export function handleSummonCopy(
   }
 
   const thenSteps = Array.isArray(eff.then) ? eff.then : [];
+  const summonCopy =
+    spec.copy_mode === "printed" ? summonPrintedCopy : summonExactCopy;
 
   for (const target of targets) {
     if (!target) continue;
     for (let i = 0; i < spec.count; i++) {
-      const clone = summonExactCopy(target, owner, {
+      const clone = summonCopy(target, owner, {
         deferEnter: !!thenSteps.length,
       });
       if (!clone) continue;

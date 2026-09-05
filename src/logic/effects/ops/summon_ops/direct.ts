@@ -10,6 +10,7 @@ import type {
 import {
   getCardDetails,
   isCardDatabaseInitialized,
+  getCardById,
 } from "../../../../data/cardIndex.js";
 import { makeCardFromDB, pushToBoard, boardHasRoom } from "./core.js";
 import { boardOf, safeClone } from "./utils.js";
@@ -137,4 +138,39 @@ export function summonExactCopy(
   }
   // Render removed - UI orchestrator handles rendering
   return clone;
+}
+
+export function summonPrintedCopy(
+  sourceCard: CardInstance,
+  owner: Player,
+  opts?: { deferEnter?: boolean },
+) {
+  if (!sourceCard || sourceCard.type !== "Follower") return null;
+
+  const board = boardOf(owner);
+  if (!boardHasRoom(board)) return null;
+
+  const data = getCardById(sourceCard.id) ?? getCardDetails(sourceCard.name);
+  if (!data) {
+    console.error(
+      `summonPrintedCopy: Card "${sourceCard.name}" (${sourceCard.id}) not found in DB`,
+    );
+    return null;
+  }
+
+  const card = makeCardFromDB(data, owner);
+
+  if (!pushToBoard(board, owner, card, opts)) return null;
+
+  logEvent("summonPrintedCopy", {
+    owner,
+    from: sourceCard.name,
+    uid: card.uid,
+  });
+
+  if (state.lastSummoned) {
+    state.lastSummoned.length = 0;
+    state.lastSummoned.push(card);
+  }
+  return card;
 }
