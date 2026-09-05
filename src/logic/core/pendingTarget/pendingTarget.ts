@@ -4,7 +4,9 @@
 
 import { state } from "../../../core/gameState.js";
 import type { PendingTargetRequest } from "./types.js";
+import { hasTargetedOpHandler, isTargetedOpRegistryReady } from "./types.js";
 import { toUids, toUid } from "../../../core/uidResolver.js";
+import { isDev } from "../../../core/env.js";
 
 /**
  * Sets the pending target selection state.
@@ -39,6 +41,17 @@ export function setPendingTarget(
   // Populate sourceCardUid if sourceCard is provided
   if (normalized.sourceCard && !normalized.sourceCardUid) {
     normalized.sourceCardUid = toUid(normalized.sourceCard);
+  }
+
+  const op = String(normalized.eff?.op ?? "");
+  if (op && isTargetedOpRegistryReady() && !hasTargetedOpHandler(op)) {
+    const sourceName =
+      normalized.sourceCard?.name ?? normalized.sourceCardUid ?? "unknown";
+    const msg = `[setPendingTarget] No targeted handler for op "${op}" (source: ${sourceName})`;
+    if (isDev()) {
+      throw new Error(msg);
+    }
+    console.warn(msg);
   }
 
   state.pendingTargetEffect = normalized;

@@ -36,6 +36,10 @@ import {
 import { normalizeCardStats } from "../../../../core/cardStats.js";
 import { normalizeInstanceEnteringHandAsCopy } from "../add_to_hand/normalizeHandCopy.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
+import {
+  applyAttacksPerTurnToCard,
+  parseAttacksPerTurnParams,
+} from "../../attacks.js";
 import type {
   TargetedOpContext,
   DispatchResult,
@@ -45,6 +49,10 @@ import {
   endDispatch,
   runWithBypass,
 } from "../../../core/targeting/guards.js";
+import {
+  registerTargetedOpForGuard,
+  sealTargetedOpRegistry,
+} from "../../../core/pendingTarget/types.js";
 type TargetedOpHandler = (ctx: TargetedOpContext) => DispatchResult;
 const TARGETED_OP_HANDLERS: Map<string, TargetedOpHandler> = new Map();
 
@@ -101,6 +109,18 @@ export function dispatchTargetedOp(opCtx: TargetedOpContext): DispatchResult {
 // Contract: Handlers mutate state only. No cleanup, no resumeEffects, no render.
 // All handlers use resolveUids() to get CardInstance[] from targetUids.
 // =============================================================================
+
+TARGETED_OP_HANDLERS.set("attacks_per_turn", (ctx) => {
+  const { eff, targetUids } = ctx;
+  const targets = resolveUids(targetUids).filter(
+    (c): c is CardInstance => !!c && c.type === "Follower",
+  );
+  const { n, untilEot } = parseAttacksPerTurnParams(eff);
+  for (const target of targets) {
+    applyAttacksPerTurnToCard(target, n, untilEot);
+  }
+  return { kind: "handled" };
+});
 
 TARGETED_OP_HANDLERS.set("damage", (ctx) => {
   const { eff, owner, sourceCard, targetUids } = ctx;
@@ -702,3 +722,8 @@ TARGETED_OP_HANDLERS.set(
       : { kind: "handled" };
   },
 );
+
+for (const op of TARGETED_OP_HANDLERS.keys()) {
+  registerTargetedOpForGuard(op);
+}
+sealTargetedOpRegistry();

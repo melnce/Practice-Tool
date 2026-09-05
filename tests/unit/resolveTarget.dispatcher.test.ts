@@ -3,6 +3,7 @@ import { __getRegisteredTargetedOps } from "../../src/logic/core/resolveTarget.j
 import "../../src/logic/core/effects/index.js";
 
 const EXPECTED_TARGETED_OPS = [
+  "attacks_per_turn",
   "banish",
   "cost",
   "damage",

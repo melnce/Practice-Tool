@@ -6,6 +6,21 @@ import { setPendingTarget } from "../core/pendingTarget/index.js";
 import { resolveUids } from "../../core/uidResolver.js";
 import type { Effect, CardInstance, Player } from "../../core/types/index.js";
 
+/** Shared field parsing for direct and targeted attacks_per_turn paths. */
+export function parseAttacksPerTurnParams(
+  eff: Effect | Record<string, unknown>,
+): {
+  n: number;
+  untilEot: boolean;
+} {
+  const raw = eff as Record<string, unknown>;
+  const n =
+    parseInt(String(raw.value ?? raw.count ?? raw.amount ?? raw.n ?? 1), 10) ||
+    1;
+  const untilEot = !!raw.until_end_of_turn || !!raw.until_eot;
+  return { n, untilEot };
+}
+
 /**
  * Apply attacks_per_turn to one follower, optionally until end of turn.
  */
@@ -74,11 +89,7 @@ export function applyAttacksPerTurn(
   sourceCard: CardInstance | null,
 ) {
   if (!sourceCard) return;
-  const n =
-    parseInt(
-      (eff.value ?? eff.count ?? eff.amount ?? eff.n ?? eff[0] ?? eff) as any,
-    ) || 1;
-  const untilEot = !!(eff as any).until_end_of_turn || !!(eff as any).until_eot;
+  const { n, untilEot } = parseAttacksPerTurnParams(eff);
   applyAttacksPerTurnToCard(sourceCard, n, untilEot);
 }
 
@@ -91,18 +102,7 @@ export function handleAttacksPerTurn(
   sourceCard: CardInstance | null,
   context: any = {},
 ): "done" | "pending" {
-  const n =
-    parseInt(
-      String(
-        (eff as any).value ??
-          (eff as any).count ??
-          (eff as any).amount ??
-          (eff as any).n ??
-          1,
-      ),
-      10,
-    ) || 1;
-  const untilEot = !!(eff as any).until_end_of_turn || !!(eff as any).until_eot;
+  const { n, untilEot } = parseAttacksPerTurnParams(eff);
 
   let targets: CardInstance[] = [];
 
