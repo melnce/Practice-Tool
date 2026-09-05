@@ -66,7 +66,7 @@ describe("Portal inventory watch — data scan", () => {
     const catapult = loadPortalCards().find((c) => c.id === "10271210")!;
     expect(catapult.cost).toBe("1");
     expect(catapult.description).toContain(
-      "Fanfare: Add a Gear of Ambition and a Gear of Remembrance to your hand.",
+      "Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.",
     );
     expect(catapult.fanfare).toEqual([
       { op: "add_to_hand", name: "Gear of Ambition", count: 1 },
