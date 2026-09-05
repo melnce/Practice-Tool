@@ -29,10 +29,10 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   await po.seedRng(88001);
   await po.loadDecks(blueFund as any, redFund as any);
 
+  await po.enableGodMode();
+
   await page.evaluate(() => {
     const s = (window as any).gameState;
-    s.players.first.deckFile = "0_testing.json";
-    s.players.second.deckFile = "0_testing.json";
     s.phase = "main";
     s.gameStarted = true;
     (window as any).__svwbTest.render();
@@ -173,7 +173,9 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   await expect(page.locator("body")).toHaveClass(/gameover/);
   log("1 PASS: lethal → overlay First wins / Lethal + body.gameover");
 
+  await po.openSettingsDrawer();
   await page.locator("#undoBtn").click();
+  await po.closeSettingsDrawer();
   await page.waitForFunction(
     () => (window as any).gameState?.phase !== "gameover",
   );
@@ -201,8 +203,10 @@ test("hot-seat completeness browser verification", async ({ page }) => {
     attackLeader(0, "first", "second");
   });
   await expect(page.locator("#gameOverOverlay")).toBeVisible();
+  await po.openSettingsDrawer();
   await page.locator("#seedInput").fill("88001");
   await page.locator("#rematchSameSeedBtn").click();
+  await po.closeSettingsDrawer();
   await page.waitForFunction(
     () => (window as any).gameState?.phase === "mulligan",
   );
@@ -210,7 +214,9 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   log("1 PASS: Rematch same seed → mulligan, seed kept 88001");
 
   // --- 5: perspective flip ---
+  await po.openSettingsDrawer();
   await page.locator("#activeOnBottomToggle").check();
+  await po.closeSettingsDrawer();
   await expect(page.locator("body")).toHaveClass(/active-on-bottom/);
   await page.evaluate(() => {
     (window as any).gameState.activePlayer = "second";

@@ -4,18 +4,10 @@
 import { test, expect, type Page } from "@playwright/test";
 import fs from "fs";
 import path from "path";
+import { setupHermeticPage } from "./helpers/console.js";
 
 const OUT = path.join("reports", "ui", "floating-text");
 const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
-
-function trackConsole(page: Page) {
-  const errors: string[] = [];
-  page.on("console", (msg) => {
-    if (msg.type() === "error") errors.push(msg.text());
-  });
-  page.on("pageerror", (err) => errors.push(String(err)));
-  return errors;
-}
 
 async function shot(page: Page, name: string) {
   fs.mkdirSync(OUT, { recursive: true });
@@ -62,7 +54,7 @@ test.describe("floating combat text", () => {
   test("leader damage, heal, and simultaneous heal+damage", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(`${BASE}/?test=1`);
     await page.waitForLoadState("networkidle");
     await setupLeaderScenario(page);

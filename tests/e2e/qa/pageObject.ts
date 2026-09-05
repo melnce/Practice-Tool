@@ -50,6 +50,44 @@ export class SvwbPage {
     await this.page.waitForFunction(() => !!(window as any).__svwbTest);
   }
 
+  async openSettingsDrawer(): Promise<void> {
+    const drawer = this.page.locator("#settingsDrawer");
+    const isOpen = await drawer.evaluate((el) => el.classList.contains("open"));
+    if (!isOpen) {
+      await this.page.click("#settingsToggle");
+      await this.page.waitForFunction(() =>
+        document.getElementById("settingsDrawer")?.classList.contains("open"),
+      );
+    }
+  }
+
+  async enableGodMode(): Promise<void> {
+    await this.page.evaluate(async () => {
+      const { setGodModeEnabled } = await import("/src/ui/render.ts");
+      setGodModeEnabled(true);
+      const toggle = document.getElementById(
+        "godModeToggle",
+      ) as HTMLInputElement | null;
+      if (toggle) toggle.checked = true;
+      (window as any).__svwbTest?.render();
+    });
+  }
+
+  async closeSettingsDrawer(): Promise<void> {
+    const isOpen = await this.page
+      .locator("#settingsDrawer")
+      .evaluate((el) => el.classList.contains("open"));
+    if (isOpen) {
+      await this.page.click("#settingsScrim");
+      await this.page.waitForFunction(
+        () =>
+          !document
+            .getElementById("settingsDrawer")
+            ?.classList.contains("open"),
+      );
+    }
+  }
+
   async loadDb(): Promise<void> {
     await this.page.evaluate(async () => {
       const { loadCardDatabase } = await import("/src/data/cardDatabase.ts");
