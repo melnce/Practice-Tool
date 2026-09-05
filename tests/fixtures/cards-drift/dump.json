@@ -1,0 +1,32 @@
+[
+  {
+    "card_id": 90001001,
+    "card_set_id": 90000,
+    "name_eng": "Cost Test Card",
+    "cost": 3,
+    "atk": 2,
+    "life": 2,
+    "type": 1,
+    "skill_texts": [{ "text_eng": "Deal 3 damage to an enemy follower." }]
+  },
+  {
+    "card_id": 90001002,
+    "card_set_id": 90000,
+    "name_eng": "Attack Test Card",
+    "cost": 1,
+    "atk": 3,
+    "life": 2,
+    "type": 1,
+    "skill_texts": [{ "text_eng": "Rush." }]
+  },
+  {
+    "card_id": 90001004,
+    "card_set_id": 90000,
+    "name_eng": "Wording Test Card",
+    "cost": 1,
+    "atk": null,
+    "life": null,
+    "type": 3,
+    "skill_texts": [{ "text_eng": "Gain 2 shadows." }]
+  }
+]

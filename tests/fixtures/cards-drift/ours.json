@@ -1,0 +1,36 @@
+[
+  {
+    "id": "90001001",
+    "name": "Cost Test Card",
+    "cost": "2",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "description": "Deal 3 damage to an enemy follower."
+  },
+  {
+    "id": "90001002",
+    "name": "Attack Test Card",
+    "cost": "1",
+    "attack": "2",
+    "defense": "2",
+    "type": "Follower",
+    "description": "Rush."
+  },
+  {
+    "id": "90001003",
+    "name": "Missing Test Card",
+    "cost": "1",
+    "attack": "1",
+    "defense": "1",
+    "type": "Follower",
+    "description": "Ward."
+  },
+  {
+    "id": "90001004",
+    "name": "Wording Test Card",
+    "cost": "1",
+    "type": "Spell",
+    "description": "Gain 2 shadows."
+  }
+]
