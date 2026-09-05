@@ -18,40 +18,34 @@ import {
   captureSnapshot,
   setHistoryEnabled,
 } from "../../src/core/history.js";
+import { getBoard, getHand } from "../../src/core/playerHelpers.js";
+import { givenGameState } from "../harness/builders.js";
+import "../audit/setup.ts";
 
 const FIXED_SEEDS = [20260908, 20260909, 20260910] as const;
 const MASK = [...PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS];
 const REPRO_GAME = 17;
 const REPRO_ACTION = 40;
 const REPRO_PATH = "tests/fixtures/repro_seed20260908_game17_history.json";
+const CORE = "core" as const;
+const ENGINE = "engine" as const;
 
 beforeAll(async () => {
   (globalThis as any).HEADLESS = true;
   await initCardDatabaseNode();
 });
 
-async function replayPlayCardUndoAtAction40(): Promise<void> {
-  const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
-  setHistoryEnabled(true);
-  await replaySoakTrace(
-    20260908,
-    REPRO_GAME,
-    repro.trace.slice(0, REPRO_ACTION - 1),
-  );
-  applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1]);
-  dispatch(state, { type: "UNDO" });
-}
-
 describe("history round-trip soak", () => {
   for (const seed of FIXED_SEEDS) {
     it.fails(
-      `seed ${seed} — main-phase undo/redo with drift mask`,
+      `seed ${seed} — engine dispatch main-phase undo/redo with drift mask`,
       async () => {
         const result = await runSoakGame({
           seed,
           gameIndex: 0,
           historyCheck: true,
           historyIgnoreFields: MASK,
+          dispatch: ENGINE,
           turnCap: 60,
           actionCap: 800,
         });
@@ -94,10 +88,43 @@ describe("history round-trip soak", () => {
     expect(canonicalJson(captureSnapshot())).toBe(afterConfirm);
   });
 
-  // dispatch PLAY_CARD uses playCardNoRender (no beginAction); nested appendStep/doAction
-  // snapshots state after playCardCore mutations (effects/index.ts deferDeathTriggers, gameTick).
+  it("engine dispatch: PLAY_CARD with fanfare draw undoes cleanly", async () => {
+    setHistoryEnabled(true);
+    const FILLER = "10111310";
+    givenGameState({ seed: 424242, activePlayer: "first", roundCount: 5 })
+      .withFirstHand([
+        {
+          name: "Fanfare Draw Test",
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+          fanfare: [{ op: "draw", source: "deck", count: 1 }],
+        },
+      ])
+      .withFirstDeck([FILLER, FILLER, FILLER, FILLER, FILLER])
+      .withFirstPP(5, 5)
+      .build();
+
+    const player = "first" as const;
+    const cardUid = state.players.first.hand[0]!.uid;
+    const handBefore = canonicalJson(getHand(state, player));
+    const boardBefore = canonicalJson(getBoard(state, player));
+    const tickBefore = state.gameTick;
+    const deferBefore = !!(state as any).deferDeathTriggers;
+
+    dispatch(state, { type: "PLAY_CARD", player, cardUid });
+    dispatch(state, { type: "UNDO" });
+
+    expect((state as any).deferDeathTriggers).toBe(deferBefore);
+    expect(state.gameTick).toBe(tickBefore);
+    expect(canonicalJson(getHand(state, player))).toBe(handBefore);
+    expect(canonicalJson(getBoard(state, player))).toBe(boardBefore);
+  });
+
+  // Core dispatch (dispatch.ts) uses playCardNoRender — no beginAction before mutations.
   it.fails(
-    "deferDeathTriggers restored after PLAY_CARD undo (seed 20260908 game 17 action 40)",
+    "deferDeathTriggers restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)",
     async () => {
       const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
       setHistoryEnabled(true);
@@ -105,16 +132,17 @@ describe("history round-trip soak", () => {
         20260908,
         REPRO_GAME,
         repro.trace.slice(0, REPRO_ACTION - 1),
+        { dispatch: CORE },
       );
       const before = (state as any).deferDeathTriggers;
-      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1]);
+      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
       dispatch(state, { type: "UNDO" });
       expect((state as any).deferDeathTriggers).toBe(before);
     },
   );
 
   it.fails(
-    "gameTick restored after PLAY_CARD undo (seed 20260908 game 17 action 40)",
+    "gameTick restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)",
     async () => {
       const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
       setHistoryEnabled(true);
@@ -122,16 +150,17 @@ describe("history round-trip soak", () => {
         20260908,
         REPRO_GAME,
         repro.trace.slice(0, REPRO_ACTION - 1),
+        { dispatch: CORE },
       );
       const tickBefore = state.gameTick;
-      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1]);
+      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
       dispatch(state, { type: "UNDO" });
       expect(state.gameTick).toBe(tickBefore);
     },
   );
 
   it.fails(
-    "PLAY_CARD undo restores full board/hand state with drift mask (seed 20260908 game 17 action 40)",
+    "PLAY_CARD undo restores full board/hand state with drift mask (core dispatch path, seed 20260908 game 17 action 40)",
     async () => {
       const repro = JSON.parse(fs.readFileSync(REPRO_PATH, "utf8"));
       setHistoryEnabled(true);
@@ -139,9 +168,10 @@ describe("history round-trip soak", () => {
         20260908,
         REPRO_GAME,
         repro.trace.slice(0, REPRO_ACTION - 1),
+        { dispatch: CORE },
       );
       const before = canonicalJson(captureSnapshot());
-      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1]);
+      applySoakActionWithOutcome(repro.trace[REPRO_ACTION - 1], CORE);
       dispatch(state, { type: "UNDO" });
       const afterUndo = canonicalJson(captureSnapshot());
       const mask = (json: string) => {
@@ -154,13 +184,14 @@ describe("history round-trip soak", () => {
   );
 
   it.fails(
-    "END_TURN undo×1 round-trip with drift mask (seed 20260908 game 0)",
+    "END_TURN undo×1 round-trip with drift mask (core dispatch path, seed 20260908 game 0)",
     async () => {
       const result = await runSoakGame({
         seed: 20260908,
         gameIndex: 0,
         historyCheck: true,
         historyIgnoreFields: MASK,
+        dispatch: CORE,
       });
       expect(result.outcome).toBe("completed");
     },

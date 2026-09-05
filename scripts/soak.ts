@@ -115,6 +115,8 @@ type SoakCliConfig = {
   smoke: boolean;
   history: boolean;
   historyIgnore: string[];
+  historyReExecute: boolean;
+  dispatch: "engine" | "core";
   determinism: number;
   turnCap: number;
   actionCap: number;
@@ -128,6 +130,8 @@ function parseArgs(): SoakCliConfig {
     smoke: false,
     history: false,
     historyIgnore: [],
+    historyReExecute: false,
+    dispatch: "engine",
     determinism: 20,
     turnCap: 60,
     actionCap: 800,
@@ -148,6 +152,11 @@ function parseArgs(): SoakCliConfig {
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
+    } else if (arg === "--history-reexecute") config.historyReExecute = true;
+    else if (arg.startsWith("--dispatch=")) {
+      const v = arg.slice(11);
+      if (v === "engine" || v === "core") config.dispatch = v;
+      else throw new Error(`--dispatch must be engine|core, got ${v}`);
     } else if (arg.startsWith("--determinism="))
       config.determinism = parseInt(arg.slice(14), 10);
     else if (arg.startsWith("--turn-cap="))
@@ -187,7 +196,7 @@ async function main(): Promise<void> {
   console.log("║              SHADOWVERSE ENGINE SOAK                     ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
-    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} historyIgnore=${config.historyIgnore.join("|") || "(none)"}`,
+    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"}`,
   );
   console.log(`reports → ${REPORT_DIR}`);
   console.log("");
@@ -223,6 +232,8 @@ async function main(): Promise<void> {
     history: 0,
     historyCheck: config.history,
     historyIgnoreFields: config.historyIgnore,
+    dispatch: config.dispatch,
+    historyReExecute: config.historyReExecute,
     nonUndoableActionTypes: [] as string[],
     playBlockedCount: 0,
     playBlockedReasons: {} as Record<string, number>,
@@ -256,6 +267,8 @@ async function main(): Promise<void> {
       coverage,
       historyCheck: config.history,
       historyIgnoreFields: config.historyIgnore,
+      dispatch: config.dispatch,
+      historyReExecute: config.historyReExecute,
     });
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
