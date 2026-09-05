@@ -21,6 +21,19 @@ import {
   onHistoryEvent,
   canUndo,
 } from "../core/history.js";
+import {
+  savePosition,
+  loadPosition,
+  deletePosition,
+  exportPositionToJson,
+  importPositionFromJson,
+  setCheckpoint,
+  restoreCheckpoint,
+  rerollFromCheckpoint,
+  getCheckpointInfo,
+  deriveRerollSeed,
+  _resetPositionStoreForTests,
+} from "../core/positionStore.js";
 import { setNodeEnv } from "../core/env.js";
 import type { GameState } from "../core/types/index.js";
 import { startNewGame, dispatch as engineDispatch } from "../engine.js";
@@ -66,13 +79,16 @@ export type SoakGameResult = {
     | "hang"
     | "invariant"
     | "determinism_mismatch"
-    | "history";
+    | "history"
+    | "position";
   turns: number;
   actions: number;
   finalHash: string;
   winner?: string;
   error?: string;
   findings?: string[];
+  /** Position save/load, export/import, checkpoint, reroll checks performed. */
+  positionChecks?: number;
   /** Action types that created zero history commits during this game (not undoable). */
   nonUndoableActionTypes?: string[];
   /** Blocked play attempts (engine refused after soak listed them as legal). */
@@ -926,6 +942,371 @@ export function runDeepHistoryChain(
   return null;
 }
 
+// ---------------------------------------------------------------------------
+// Position save/load, export/import, checkpoint + reroll round-trip helpers
+// ---------------------------------------------------------------------------
+
+export type PositionViolationKind =
+  | "save-load"
+  | "export-import"
+  | "checkpoint"
+  | "reroll";
+
+type PositionCheckContext = {
+  actionIndex: number;
+  action: SoakAction;
+  ignoreFields: readonly string[];
+  policyRng: RNG;
+  dispatchPath: SoakDispatchPath;
+};
+
+function formatPositionMismatch(
+  kind: PositionViolationKind,
+  phase: string,
+  actionIndex: number,
+  action: SoakAction,
+  expected: string,
+  actual: string,
+  ignoreFields: readonly string[],
+): string {
+  const exp = JSON.parse(
+    maskCanonicalSnapshot(expected, ignoreFields),
+  ) as unknown;
+  const act = JSON.parse(
+    maskCanonicalSnapshot(actual, ignoreFields),
+  ) as unknown;
+  const diffs = diffJsonPaths(exp, act);
+  const diffText = diffs
+    .map(
+      (d) =>
+        `  ${d.path}: expected=${JSON.stringify(d.a)} actual=${JSON.stringify(d.b)}`,
+    )
+    .join("\n");
+  return (
+    `position ${kind} ${phase} mismatch at action ${actionIndex} ` +
+    `(${JSON.stringify(action)}):\n${diffText}`
+  );
+}
+
+function formatPositionError(
+  kind: PositionViolationKind,
+  phase: string,
+  actionIndex: number,
+  action: SoakAction,
+  message: string,
+): string {
+  return (
+    `position ${kind} ${phase} at action ${actionIndex} ` +
+    `(${JSON.stringify(action)}): ${message}`
+  );
+}
+
+function deckIdMultiset(deck: CardInstance[]): string[] {
+  return deck.map((c) => String(c.id)).sort();
+}
+
+function captureDeckRemainders(): { first: string[]; second: string[] } {
+  return {
+    first: deckIdMultiset(state.players.first.deck),
+    second: deckIdMultiset(state.players.second.deck),
+  };
+}
+
+function captureDeckUidOrders(): { first: string[]; second: string[] } {
+  return {
+    first: state.players.first.deck.map((c) => c.uid),
+    second: state.players.second.deck.map((c) => c.uid),
+  };
+}
+
+function captureKnownZonesCanon(): string {
+  const snap = captureSnapshot();
+  const known = {
+    firstHand: snap.players.first.hand.map((c) => ({
+      uid: c.uid,
+      id: c.id,
+    })),
+    secondHand: snap.players.second.hand.map((c) => ({
+      uid: c.uid,
+      id: c.id,
+    })),
+    firstBoard: snap.players.first.board.map((c) =>
+      c ? { uid: c.uid, id: c.id } : null,
+    ),
+    secondBoard: snap.players.second.board.map((c) =>
+      c ? { uid: c.uid, id: c.id } : null,
+    ),
+    firstGraveyard: snap.players.first.graveyard.map((c) => ({
+      uid: c.uid,
+      id: c.id,
+    })),
+    secondGraveyard: snap.players.second.graveyard.map((c) => ({
+      uid: c.uid,
+      id: c.id,
+    })),
+    firstBanish: (snap.players.first.banish ?? []).map((c) => ({
+      uid: c.uid,
+      id: c.id,
+    })),
+    secondBanish: (snap.players.second.banish ?? []).map((c) => ({
+      uid: c.uid,
+      id: c.id,
+    })),
+  };
+  return canonicalJson(known);
+}
+
+function verifyRerollFromCheckpoint(
+  ctx: PositionCheckContext,
+  checkpointKnownZones: string,
+  checkpointDeckRemainders: { first: string[]; second: string[] },
+  checkpointDeckUidOrders: { first: string[]; second: string[] },
+): string | null {
+  const { actionIndex, action } = ctx;
+
+  if (canUndo()) {
+    return formatPositionError(
+      "reroll",
+      "canUndo",
+      actionIndex,
+      action,
+      "canUndo() must be false right after reroll (new history floor)",
+    );
+  }
+
+  const knownAfter = captureKnownZonesCanon();
+  if (knownAfter !== checkpointKnownZones) {
+    return formatPositionMismatch(
+      "reroll",
+      "known-zones",
+      actionIndex,
+      action,
+      checkpointKnownZones,
+      knownAfter,
+      [],
+    );
+  }
+
+  const deckAfter = captureDeckRemainders();
+  if (
+    deckAfter.first.join(",") !== checkpointDeckRemainders.first.join(",") ||
+    deckAfter.second.join(",") !== checkpointDeckRemainders.second.join(",")
+  ) {
+    return formatPositionError(
+      "reroll",
+      "deck-multiset",
+      actionIndex,
+      action,
+      "undrawn deck remainder multiset must match checkpoint",
+    );
+  }
+
+  const firstSorted = [...state.players.first.deck.map((c) => c.uid)].sort();
+  const cpFirstSorted = [...checkpointDeckUidOrders.first].sort();
+  const secondSorted = [...state.players.second.deck.map((c) => c.uid)].sort();
+  const cpSecondSorted = [...checkpointDeckUidOrders.second].sort();
+  if (
+    firstSorted.join(",") !== cpFirstSorted.join(",") ||
+    secondSorted.join(",") !== cpSecondSorted.join(",")
+  ) {
+    return formatPositionError(
+      "reroll",
+      "deck-permutation",
+      actionIndex,
+      action,
+      "undrawn deck remainder must be a permutation of checkpoint deck",
+    );
+  }
+
+  const info = getCheckpointInfo();
+  if (
+    info.originalSeed == null ||
+    info.checkpointCursor == null ||
+    info.rerollCount !== 1
+  ) {
+    return formatPositionError(
+      "reroll",
+      "checkpoint-info",
+      actionIndex,
+      action,
+      `expected rerollCount=1 with RNG metadata, got ${JSON.stringify(info)}`,
+    );
+  }
+
+  const expectedSeed = deriveRerollSeed(
+    info.originalSeed,
+    info.checkpointCursor,
+    1,
+  );
+  const rngSnap = state.rng.snapshot();
+  if (rngSnap.seed !== expectedSeed) {
+    return formatPositionError(
+      "reroll",
+      "rng",
+      actionIndex,
+      action,
+      `expected RNG on derived sub-seed ${expectedSeed}, got seed=${rngSnap.seed} cursor=${rngSnap.cursor}`,
+    );
+  }
+
+  return null;
+}
+
+export function runPositionSaveLoad(
+  ctx: PositionCheckContext,
+  opts?: { sabotageSkipLoad?: boolean },
+): string | null {
+  const { actionIndex, action, ignoreFields, policyRng, dispatchPath } = ctx;
+
+  const savedCanon = captureFullSnapshot().canon;
+  const saved = savePosition("soak");
+
+  const legal = getLegalSoakActions();
+  if (legal.length === 0) {
+    deletePosition(saved.id);
+    return null;
+  }
+
+  const nextAction = pickSoakAction(legal, policyRng);
+  applySoakActionWithOutcome(nextAction, dispatchPath);
+  const afterFirstCanon = captureFullSnapshot().canon;
+
+  if (!opts?.sabotageSkipLoad) {
+    loadPosition(saved.id, { autoRender: false });
+  }
+  const loadedCanon = captureFullSnapshot().canon;
+  if (!snapshotsEqual(savedCanon, loadedCanon, ignoreFields)) {
+    deletePosition(saved.id);
+    return formatPositionMismatch(
+      "save-load",
+      "load",
+      actionIndex,
+      action,
+      savedCanon,
+      loadedCanon,
+      ignoreFields,
+    );
+  }
+
+  applySoakActionWithOutcome(nextAction, dispatchPath);
+  const afterSecondCanon = captureFullSnapshot().canon;
+  if (!snapshotsEqual(afterFirstCanon, afterSecondCanon, ignoreFields)) {
+    deletePosition(saved.id);
+    return formatPositionMismatch(
+      "save-load",
+      "re-apply",
+      actionIndex,
+      action,
+      afterFirstCanon,
+      afterSecondCanon,
+      ignoreFields,
+    );
+  }
+
+  loadPosition(saved.id, { autoRender: false });
+  deletePosition(saved.id);
+  return null;
+}
+
+export function runPositionExportImport(
+  ctx: PositionCheckContext,
+): string | null {
+  const { actionIndex, action, ignoreFields } = ctx;
+
+  const savedCanon = captureFullSnapshot().canon;
+  const saved = savePosition("soak-export");
+  const json = exportPositionToJson(saved.id);
+
+  let imported;
+  try {
+    imported = importPositionFromJson(json, { load: false });
+  } catch (e) {
+    deletePosition(saved.id);
+    return formatPositionError(
+      "export-import",
+      "import",
+      actionIndex,
+      action,
+      e instanceof Error ? e.message : String(e),
+    );
+  }
+
+  loadPosition(imported.id, { autoRender: false });
+  const loadedCanon = captureFullSnapshot().canon;
+
+  deletePosition(saved.id);
+  deletePosition(imported.id);
+
+  if (!snapshotsEqual(savedCanon, loadedCanon, ignoreFields)) {
+    return formatPositionMismatch(
+      "export-import",
+      "load",
+      actionIndex,
+      action,
+      savedCanon,
+      loadedCanon,
+      ignoreFields,
+    );
+  }
+
+  return null;
+}
+
+export function runPositionCheckpoint(
+  ctx: PositionCheckContext,
+): string | null {
+  const { actionIndex, action, ignoreFields, policyRng, dispatchPath } = ctx;
+
+  setCheckpoint();
+  const checkpointCanon = captureFullSnapshot().canon;
+  const checkpointKnownZones = captureKnownZonesCanon();
+  const checkpointDeckRemainders = captureDeckRemainders();
+  const checkpointDeckUidOrders = captureDeckUidOrders();
+
+  for (let i = 0; i < 5; i++) {
+    if (isGameOver(state)) break;
+    const legal = getLegalSoakActions();
+    if (legal.length === 0) break;
+    const probe = pickSoakAction(legal, policyRng);
+    applySoakActionWithOutcome(probe, dispatchPath);
+  }
+
+  if (!restoreCheckpoint({ autoRender: false })) {
+    return formatPositionError(
+      "checkpoint",
+      "restore",
+      actionIndex,
+      action,
+      "restoreCheckpoint returned false",
+    );
+  }
+
+  const restoredCanon = captureFullSnapshot().canon;
+  if (!snapshotsEqual(checkpointCanon, restoredCanon, ignoreFields)) {
+    return formatPositionMismatch(
+      "checkpoint",
+      "restore",
+      actionIndex,
+      action,
+      checkpointCanon,
+      restoredCanon,
+      ignoreFields,
+    );
+  }
+
+  rerollFromCheckpoint({ autoRender: false });
+
+  const rerollErr = verifyRerollFromCheckpoint(
+    ctx,
+    checkpointKnownZones,
+    checkpointDeckRemainders,
+    checkpointDeckUidOrders,
+  );
+  if (rerollErr) return rerollErr;
+
+  return null;
+}
+
 function formatSoakActionLabel(action: SoakAction): string {
   return `${action.type}:${JSON.stringify(action)}`;
 }
@@ -965,6 +1346,10 @@ export type RunSoakGameOptions = {
   dispatch?: SoakDispatchPath;
   /** When true, ~25% of round-trips re-apply the action after undo instead of redo. */
   historyReExecute?: boolean;
+  /** When true, position save/load, export/import, checkpoint, reroll round-trips. */
+  positionCheck?: boolean;
+  /** Test hook: skip loadPosition during save/load round-trip (must fail). */
+  sabotageSkipLoad?: boolean;
   /** Override deck pairing (skips deckSpecForSeed when both are set). */
   deckAId?: string;
   deckBId?: string;
@@ -979,7 +1364,7 @@ export async function runSoakGame(
   installSoakAdapter();
   confirmHook = null;
 
-  if (opts.historyCheck) {
+  if (opts.historyCheck || opts.positionCheck) {
     setNodeEnv("DISABLE_HISTORY", undefined);
     setHistoryEnabled(true);
   }
@@ -1040,13 +1425,21 @@ export async function runSoakGame(
   const nonUndoableActionTypes = new Set<string>();
   const playBlockedLog: SoakGameResult["playBlockedLog"] = [];
   const zeroCommitLog: NonNullable<SoakGameResult["zeroCommitLog"]> = [];
-  const historyIgnoreFields =
-    opts.historyIgnoreFields ??
-    (opts.historyCheck ? [...PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS] : []);
   const dispatchPath = opts.dispatch ?? DEFAULT_SOAK_DISPATCH;
   const historyReExecute = opts.historyReExecute ?? false;
+  const positionCheck = opts.positionCheck ?? false;
+  const sabotageSkipLoad = opts.sabotageSkipLoad ?? false;
+  const historyIgnoreFields =
+    opts.historyIgnoreFields ??
+    (opts.historyCheck || positionCheck
+      ? [...PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS]
+      : []);
+  let positionChecks = 0;
+  if (positionCheck) {
+    _resetPositionStoreForTests();
+  }
   let unsubHistoryReset: (() => void) | undefined;
-  if (opts.historyCheck) {
+  if (opts.historyCheck || positionCheck) {
     unsubHistoryReset = onHistoryEvent((ev) => {
       if (ev.type === "reset") {
         historyRing.length = 0;
@@ -1098,10 +1491,11 @@ export async function runSoakGame(
       if (opts.coverage) noteActionCoverage(opts.coverage, action);
       trace.push(action);
 
-      const beforeSnap = opts.historyCheck ? captureFullSnapshot() : null;
+      const needsCommitTelemetry = opts.historyCheck || positionCheck;
+      const beforeSnap = needsCommitTelemetry ? captureFullSnapshot() : null;
       const legalBefore = opts.historyCheck ? captureLegalSnapshot() : null;
 
-      const telemetry = opts.historyCheck
+      const telemetry = needsCommitTelemetry
         ? countHistoryCommitsDuring(action, dispatchPath)
         : (applySoakActionWithOutcome(action, dispatchPath),
           {
@@ -1117,87 +1511,166 @@ export async function runSoakGame(
       }
       actions++;
 
-      if (opts.historyCheck && beforeSnap && legalBefore) {
+      if (needsCommitTelemetry && beforeSnap) {
         if (historyCommits === 0) {
-          nonUndoableActionTypes.add(action.type);
-          if (telemetry.zeroCommitReason) {
-            zeroCommitLog.push({
-              actionIndex: actions,
-              actionType: action.type,
-              reason: telemetry.zeroCommitReason,
-            });
+          if (opts.historyCheck) {
+            nonUndoableActionTypes.add(action.type);
+            if (telemetry.zeroCommitReason) {
+              zeroCommitLog.push({
+                actionIndex: actions,
+                actionType: action.type,
+                reason: telemetry.zeroCommitReason,
+              });
+            }
           }
         } else {
-          const afterSnap = captureFullSnapshot();
-          const legalAfter = captureLegalSnapshot();
+          if (opts.historyCheck && legalBefore) {
+            const afterSnap = captureFullSnapshot();
+            const legalAfter = captureLegalSnapshot();
 
-          commitSequence.push({
-            actionType: action.type,
-            commits: historyCommits,
-          });
+            commitSequence.push({
+              actionType: action.type,
+              commits: historyCommits,
+            });
 
-          const roundTripErr = runHistoryRoundTrip({
-            actionIndex: actions,
-            action,
-            before: beforeSnap,
-            after: afterSnap,
-            legalBefore,
-            legalAfter,
-            policyRng,
-            historyCommits,
-            historyIgnoreFields,
-            historyReExecute,
-            dispatchPath,
-          });
-          if (roundTripErr) {
-            return {
-              ...base,
-              outcome: "history",
-              turns: state.turnNumber | 0,
-              actions,
-              finalHash: safeHash(),
-              error: roundTripErr,
-              findings: [roundTripErr],
-              nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
-              playBlockedLog,
-              zeroCommitLog,
-              commitSequence,
-            };
-          }
-
-          historyRing.push({
-            action,
-            commits: historyCommits,
-            before: beforeSnap.canon,
-            after: afterSnap.canon,
-          });
-          if (historyRing.length > HISTORY_RING_MAX) historyRing.shift();
-
-          if (actions % 25 === 0 && historyRing.length > 0) {
-            const chainErr = runDeepHistoryChain(
-              actions,
-              historyRing,
+            const roundTripErr = runHistoryRoundTrip({
+              actionIndex: actions,
+              action,
+              before: beforeSnap,
+              after: afterSnap,
+              legalBefore,
+              legalAfter,
+              policyRng,
+              historyCommits,
               historyIgnoreFields,
+              historyReExecute,
               dispatchPath,
-            );
-            if (chainErr) {
+            });
+            if (roundTripErr) {
               return {
                 ...base,
                 outcome: "history",
                 turns: state.turnNumber | 0,
                 actions,
                 finalHash: safeHash(),
-                error: chainErr,
-                findings: [chainErr],
+                error: roundTripErr,
+                findings: [roundTripErr],
                 nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
                 playBlockedLog,
                 zeroCommitLog,
                 commitSequence,
+                positionChecks,
               };
+            }
+
+            historyRing.push({
+              action,
+              commits: historyCommits,
+              before: beforeSnap.canon,
+              after: afterSnap.canon,
+            });
+            if (historyRing.length > HISTORY_RING_MAX) historyRing.shift();
+
+            if (actions % 25 === 0 && historyRing.length > 0) {
+              const chainErr = runDeepHistoryChain(
+                actions,
+                historyRing,
+                historyIgnoreFields,
+                dispatchPath,
+              );
+              if (chainErr) {
+                return {
+                  ...base,
+                  outcome: "history",
+                  turns: state.turnNumber | 0,
+                  actions,
+                  finalHash: safeHash(),
+                  error: chainErr,
+                  findings: [chainErr],
+                  nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+                  playBlockedLog,
+                  zeroCommitLog,
+                  commitSequence,
+                  positionChecks,
+                };
+              }
+            }
+          }
+
+          if (positionCheck) {
+            const posCtx: PositionCheckContext = {
+              actionIndex: actions,
+              action,
+              ignoreFields: historyIgnoreFields,
+              policyRng,
+              dispatchPath,
+            };
+
+            positionChecks++;
+            const saveLoadErr = runPositionSaveLoad(posCtx, {
+              sabotageSkipLoad,
+            });
+            if (saveLoadErr) {
+              return {
+                ...base,
+                outcome: "position",
+                turns: state.turnNumber | 0,
+                actions,
+                finalHash: safeHash(),
+                error: saveLoadErr,
+                findings: [saveLoadErr],
+                nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+                playBlockedLog,
+                zeroCommitLog,
+                commitSequence,
+                positionChecks,
+              };
+            }
+
+            if (actions % 10 === 0) {
+              positionChecks++;
+              const exportErr = runPositionExportImport(posCtx);
+              if (exportErr) {
+                return {
+                  ...base,
+                  outcome: "position",
+                  turns: state.turnNumber | 0,
+                  actions,
+                  finalHash: safeHash(),
+                  error: exportErr,
+                  findings: [exportErr],
+                  nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+                  playBlockedLog,
+                  zeroCommitLog,
+                  commitSequence,
+                  positionChecks,
+                };
+              }
+            }
+
+            if (actions % 25 === 0) {
+              positionChecks++;
+              const checkpointErr = runPositionCheckpoint(posCtx);
+              if (checkpointErr) {
+                return {
+                  ...base,
+                  outcome: "position",
+                  turns: state.turnNumber | 0,
+                  actions,
+                  finalHash: safeHash(),
+                  error: checkpointErr,
+                  findings: [checkpointErr],
+                  nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+                  playBlockedLog,
+                  zeroCommitLog,
+                  commitSequence,
+                  positionChecks,
+                };
+              }
             }
           }
         }
-      } else if (!opts.historyCheck) {
+      } else if (!needsCommitTelemetry) {
         void telemetry;
       }
 
@@ -1242,6 +1715,7 @@ export async function runSoakGame(
     playBlockedLog,
     zeroCommitLog,
     commitSequence,
+    ...(positionCheck ? { positionChecks } : {}),
   };
   const unexpected = findUnexpectedNonUndoableActionTypes(
     nonUndoableActionTypes,
