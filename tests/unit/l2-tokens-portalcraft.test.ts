@@ -626,22 +626,60 @@ describe("L2 Portalcraft tokens — real-card tests", () => {
       );
     });
 
-    it.fails(
-      "copy effective cost reduced by 3 (90074320) — printed: reduce the cost of the copy by 3; observed: copy keeps full base cost",
-      () => {
-        setupTurn(R6, { hand: [DEPTHS_ELD_AXE], pp: 0 });
-        const big = allyBigFollower(5, "BigAlly");
-        const handBefore = uidSet("first", "hand");
-        whenPlayCard("first", 0);
-        resolvePendingByUid(big.uid);
-        const copy = thenHand("first").find(
-          (c) => c.name === "BigAlly" && !handBefore.has(c.uid),
-        )!;
-        expect(getEffectiveCost(big)).toBe(5);
-        expect(getEffectiveCost(copy)).toBe(2);
-        expect(printed).toContain("reduce the cost of the copy by 3");
-      },
-    );
+    it("copy effective cost reduced by 3 (90074320) — printed: reduce the cost of the copy by 3", () => {
+      setupTurn(R6, { hand: [DEPTHS_ELD_AXE], pp: 0 });
+      const big = allyBigFollower(5, "BigAlly");
+      const handBefore = uidSet("first", "hand");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(big.uid);
+      const copy = thenHand("first").find(
+        (c) => c.name === "BigAlly" && !handBefore.has(c.uid),
+      )!;
+      expect(getEffectiveCost(big)).toBe(5);
+      expect(getEffectiveCost(copy)).toBe(2);
+      expect(printed).toContain("reduce the cost of the copy by 3");
+    });
+
+    it("7-cost ally copy costs 4 after reduction", () => {
+      setupTurn(R6, { hand: [DEPTHS_ELD_AXE], pp: 0 });
+      const big = allyBigFollower(7, "SevenCost");
+      const handBefore = uidSet("first", "hand");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(big.uid);
+      const copy = thenHand("first").find(
+        (c) => c.name === "SevenCost" && !handBefore.has(c.uid),
+      )!;
+      expect(getEffectiveCost(big)).toBe(7);
+      expect(getEffectiveCost(copy)).toBe(4);
+    });
+
+    it("pre-existing hand copy keeps full cost; reduction applies to new copy only", () => {
+      setupTurn(R6, { hand: [DEPTHS_ELD_AXE], pp: 0 });
+      const existing = createCard(
+        {
+          name: "BigAlly",
+          type: "Follower",
+          cost: 5,
+          base_cost: 5,
+          attack: 5,
+          defense: 5,
+        },
+        "hand",
+        "first",
+      );
+      state.players.first.hand.push(existing);
+      const big = allyBigFollower(5, "BigAlly");
+      const handBefore = uidSet("first", "hand");
+      whenPlayCard("first", 0);
+      resolvePendingByUid(big.uid);
+      const newCopy = thenHand("first").find(
+        (c) => c.name === "BigAlly" && !handBefore.has(c.uid),
+      )!;
+      expect(getEffectiveCost(big)).toBe(5);
+      expect(getEffectiveCost(existing)).toBe(5);
+      expect(getEffectiveCost(newCopy)).toBe(2);
+      expect(existing.uid).not.toBe(newCopy.uid);
+    });
   });
 
   describe("Doll Slayer (90072130)", () => {
