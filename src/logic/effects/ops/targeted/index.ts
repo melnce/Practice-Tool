@@ -22,7 +22,6 @@ import { summonExactCopyFromHand, summonFromHand } from "../summon_ops/hand.js";
 import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
 import { isDev } from "../../../../core/env.js";
-import { doAction } from "../../../../core/history.js";
 import type { CardInstance } from "../../../../core/types/index.js";
 import type { Player } from "../../../../core/types/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
@@ -597,46 +596,39 @@ TARGETED_OP_HANDLERS.set("fuse", (ctx) => {
 });
 
 TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
-  const { eff, owner, sourceCard, targetUids } = ctx;
+  const { eff, owner, targetUids } = ctx;
   const targets = resolveUids(targetUids);
-  doAction(
-    "Resolve Targets",
-    () => {
-      if (targets[0]) {
-        state.__lastSelected = targets[0];
-      }
-      for (const target of targets) {
-        for (const nestedEff of (eff as any).effects || []) {
-          if (nestedEff.op === "set_stats") {
-            if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
+  if (targets[0]) {
+    state.__lastSelected = targets[0];
+  }
+  for (const target of targets) {
+    for (const nestedEff of (eff as any).effects || []) {
+      if (nestedEff.op === "set_stats") {
+        if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
 
-            if (nestedEff.attack !== undefined) {
-              target.attack = parseInt(nestedEff.attack);
-              target.potential_attack = target.attack as number;
-              target.base_attack = target.attack as number;
-              target.buffs.attack = 0;
-            }
-            if (nestedEff.defense !== undefined) {
-              target.defense = parseInt(nestedEff.defense);
-              target.potential_defense = target.defense as number;
-              target.base_defense = target.defense as number;
-              target.peak_defense = target.defense as number;
-              target.buffs.defense = 0;
-            }
-          } else {
-            runWithBypass(() => {
-              runEffects([nestedEff], owner, target, {
-                targetUids: [target.uid],
-                selectedCard: target,
-              });
-            });
-          }
+        if (nestedEff.attack !== undefined) {
+          target.attack = parseInt(nestedEff.attack);
+          target.potential_attack = target.attack as number;
+          target.base_attack = target.attack as number;
+          target.buffs.attack = 0;
         }
+        if (nestedEff.defense !== undefined) {
+          target.defense = parseInt(nestedEff.defense);
+          target.potential_defense = target.defense as number;
+          target.base_defense = target.defense as number;
+          target.peak_defense = target.defense as number;
+          target.buffs.defense = 0;
+        }
+      } else {
+        runWithBypass(() => {
+          runEffects([nestedEff], owner, target, {
+            targetUids: [target.uid],
+            selectedCard: target,
+          });
+        });
       }
-    },
-    { op: eff?.op, owner, source: sourceCard?.name },
-    { autoRender: true },
-  );
+    }
+  }
   return { kind: "handled" };
 });
 
