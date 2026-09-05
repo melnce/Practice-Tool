@@ -21,7 +21,7 @@ import { isGameOver } from "../../core/gameOver.js";
 import { applyLeaderDamage } from "../effects/leader.js";
 import { destroyTarget } from "../effects/ops/destroy/index.js";
 import { cleanupDead } from "./cleanup.js";
-import { dealDamage } from "./barrier.js";
+import { dealDamage, enterDamageBatch, exitDamageBatch } from "./barrier.js";
 import { doAction } from "../../core/history.js";
 import { handleRestore } from "../effects/ops/restore/index.js";
 import { isCantAttackLocked } from "./keywords/has.js";
@@ -312,20 +312,23 @@ function _attackFollowerCore(
   // Follower Strike may have fired in card-text order above; if it removed the
   // defender before damage exchange, award piercing and end combat early.
   if (hasCardTrigger(attacker, "follower_strike", "board")) {
-    cleanupDead();
-
-    // If the defender was removed or died due to follower_strike, award piercing now.
-    // Use identity, not defenderIdx: cleanupDead() may have spliced a bystander and
-    // shifted indices while the combat target is still alive on the board.
+    // Rulebook L267: knockback before the destroyed follower's Last Words.
+    // Use identity, not defenderIdx: cleanupDead() may splice bystanders and shift
+    // indices while the combat target is still alive on the board.
     const stillThere = defenderBoard.includes(defender);
-    if (!stillThere || (defender.defense as any) <= 0) {
+    const defenderDead =
+      !stillThere || (parseInt(defender.defense as any, 10) || 0) <= 0;
+    if (defenderDead) {
       if (hasPiercingOne(attacker)) {
         applyLeaderDamage(defenderPlayer, 1);
       }
+      cleanupDead();
       spendAttack(attacker);
       recomputeAttackFlags(attacker);
       return;
     }
+
+    cleanupDead();
 
     if (isGameOver()) {
       spendAttack(attacker);
@@ -357,25 +360,30 @@ function _attackFollowerCore(
   });
 
   // --- Simultaneous damage exchange ---
+  // Batch self_damaged from the 0-damage counter-hit so cleanupDead (Last Words)
+  // does not run until after Drain and super-evo knockback (rulebook L267).
   let dealtToDef = 0;
+  enterDamageBatch();
+  try {
+    const dmgResultDef = dealDamage(defender, atkDmg, attacker);
+    dealtToDef = dmgResultDef.damage;
 
-  // Attacker deals damage to defender
-  const dmgResultDef = dealDamage(defender, atkDmg, attacker);
-  dealtToDef = dmgResultDef.damage;
+    // Resolve Bane for attacker (0 damage still counts — see resolveBane)
+    resolveBane(attacker, defender, defenderPlayer);
 
-  // Resolve Bane for attacker (0 damage still counts — see resolveBane)
-  resolveBane(attacker, defender, defenderPlayer);
+    // Defender deals back. Always route through dealDamage so zeroed hits (super-evolve
+    // protection, barrier) still emit self_damaged; prevention is handled inside.
+    dealDamage(attacker, defDmg, defender);
 
-  // Defender deals back. Always route through dealDamage so zeroed hits (super-evolve
-  // protection, barrier) still emit self_damaged; prevention is handled inside.
-  dealDamage(attacker, defDmg, defender);
+    // Resolve Bane for defender (0 counter-damage still counts)
+    resolveBane(defender, attacker, attackerPlayer);
 
-  // Resolve Bane for defender (0 counter-damage still counts)
-  resolveBane(defender, attacker, attackerPlayer);
-
-  // Resolve Drain and Piercing
-  resolveDrain(attacker, attackerPlayer, dealtToDef);
-  resolvePiercing(attacker, defender, defenderPlayer);
+    // Resolve Drain and Piercing before flushing deferred deaths / self_damaged
+    resolveDrain(attacker, attackerPlayer, dealtToDef);
+    resolvePiercing(attacker, defender, defenderPlayer);
+  } finally {
+    exitDamageBatch();
+  }
 
   // Spend the swing, refresh flags, clean (render happens at UI layer)
   spendAttack(attacker);

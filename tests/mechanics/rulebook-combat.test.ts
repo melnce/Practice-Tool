@@ -25,6 +25,7 @@ import { dealDamage, grantBarrier } from "../../src/logic/core/barrier.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { isDamaged } from "../../src/logic/core/combat/damageState.js";
+import { getLogs, clearLogs } from "../../src/core/logger.js";
 import {
   applyStatBuff,
   setStatsBuff,
@@ -421,41 +422,157 @@ describe("Rulebook L254–273 — Combat timing specifics", () => {
     expect(thenHand("first").length).toBe(handBefore + 2);
   });
 
-  it.fails(
-    "L267: super-evolution knockback hits leader before destroyed follower's Last Words",
-    () => {
-      // Rulebook L267: knockback −1 before defender LW restore +5 → leader ends at 20.
-      // Observed: 19 — Last Words restore appears to resolve before knockback (or restore skipped).
-      state.players.second.hp = 20;
-      const attacker = combatAttacker("first", {
-        attack: 5,
-        defense: 5,
-        evoType: "super",
-        hasEvolved: true,
-      });
-      const defender = readyFollower("Fodder", "second", {
-        attack: 0,
-        defense: 2,
-        hasLastWords: true,
-        lastWordsEffects: [
-          {
-            op: "restore",
-            target: "leader",
-            player: "self",
-            amount: 5,
-          } as Effect,
-        ],
-      });
+  it("L267: super-evolution knockback hits leader before destroyed follower's Last Words", () => {
+    // Rulebook L267: knockback −1 before defender LW restore +5 → leader ends at 20.
+    state.players.second.hp = 20;
+    const attacker = combatAttacker("first", {
+      attack: 5,
+      defense: 5,
+      evoType: "super",
+      hasEvolved: true,
+    });
+    const defender = readyFollower("Fodder", "second", {
+      attack: 0,
+      defense: 2,
+      hasLastWords: true,
+      lastWordsEffects: [
+        {
+          op: "restore",
+          target: "leader",
+          player: "self",
+          amount: 5,
+        } as Effect,
+      ],
+    });
 
-      state.players.first.board = [attacker];
-      state.players.second.board = [defender];
+    state.players.first.board = [attacker];
+    state.players.second.board = [defender];
 
-      attackFollower(0, 0, "first", "second");
+    attackFollower(0, 0, "first", "second");
 
-      expect(state.players.second.hp).toBe(20);
-      expect(getBoard(state, "second").length).toBe(0);
-    },
-  );
+    expect(state.players.second.hp).toBe(20);
+    expect(getBoard(state, "second").length).toBe(0);
+  });
+
+  it("L267: knockback resolves before Last Words that damage the enemy leader", () => {
+    const prevHeadless = (globalThis as any).HEADLESS;
+    (globalThis as any).HEADLESS = false;
+    clearLogs();
+    state.players.second.hp = 20;
+    const attacker = combatAttacker("first", {
+      attack: 5,
+      defense: 5,
+      evoType: "super",
+      hasEvolved: true,
+    });
+    const defender = readyFollower("Fodder", "second", {
+      attack: 0,
+      defense: 2,
+      hasLastWords: true,
+      lastWordsEffects: [
+        {
+          op: "damage",
+          target: "enemy:leader",
+          amount: 1,
+        } as Effect,
+      ],
+    });
+
+    state.players.first.board = [attacker];
+    state.players.second.board = [defender];
+
+    attackFollower(0, 0, "first", "second");
+    (globalThis as any).HEADLESS = prevHeadless;
+
+    const logs = getLogs();
+    const piercingIdx = logs.findIndex((e) => e.type === "piercingPing");
+    const lwDamageIdx = logs.findIndex(
+      (e, i) =>
+        i > piercingIdx &&
+        e.type === "leaderDamage" &&
+        e.details?.owner === "first",
+    );
+    expect(piercingIdx).toBeGreaterThanOrEqual(0);
+    expect(lwDamageIdx).toBeGreaterThan(piercingIdx);
+    expect(state.players.first.hp).toBe(19);
+    expect(state.players.second.hp).toBe(19);
+  });
+
+  it("L267 negative: non-super-evolved attacker deals no knockback on kill", () => {
+    const prevHeadless = (globalThis as any).HEADLESS;
+    (globalThis as any).HEADLESS = false;
+    clearLogs();
+    state.players.second.hp = 20;
+    const attacker = combatAttacker("first", {
+      attack: 5,
+      defense: 5,
+    });
+    const defender = readyFollower("Fodder", "second", {
+      attack: 0,
+      defense: 2,
+      hasLastWords: true,
+      lastWordsEffects: [
+        {
+          op: "restore",
+          target: "leader",
+          player: "self",
+          amount: 5,
+        } as Effect,
+      ],
+    });
+
+    state.players.first.board = [attacker];
+    state.players.second.board = [defender];
+
+    attackFollower(0, 0, "first", "second");
+    (globalThis as any).HEADLESS = prevHeadless;
+
+    expect(state.players.second.hp).toBe(20);
+    expect(getLogs().some((e) => e.type === "piercingPing")).toBe(false);
+  });
+
+  it("L267: follower-strike kill applies knockback before destroyed follower's Last Words", () => {
+    state.players.second.hp = 20;
+    const attacker = combatAttacker("first", {
+      attack: 1,
+      defense: 5,
+      evoType: "super",
+      hasEvolved: true,
+      triggers: [
+        {
+          event: "follower_strike",
+          source: "board",
+          effects: [
+            {
+              op: "destroy",
+              target: "enemy:follower",
+            } as Effect,
+          ],
+        },
+      ],
+    });
+    const defender = readyFollower("Fodder", "second", {
+      attack: 0,
+      defense: 2,
+      hasLastWords: true,
+      lastWordsEffects: [
+        {
+          op: "restore",
+          target: "leader",
+          player: "self",
+          amount: 5,
+        } as Effect,
+      ],
+    });
+
+    state.players.first.board = [attacker];
+    state.players.second.board = [defender];
+
+    attackFollower(0, 0, "first", "second");
+
+    expect(state.players.second.hp).toBe(20);
+    expect(getBoard(state, "second").length).toBe(0);
+  });
 
   it("L268–269: cross-side Last Words — active player's batch resolves first", () => {
     state.players.first.board = [lwFollower("first", "ActiveLW", 1, "Bat")];
