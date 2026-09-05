@@ -196,7 +196,7 @@ describe("B/C — Tablet deck_duplicates banish (10303210)", () => {
   it("Fanfare banishes deck duplicates and keeps singletons; Engage draws", () => {
     setupTurn(R6, {
       hand: ["10303210"],
-      pp: 3,
+      pp: 4,
       deck: [
         { name: "Dup", type: "Follower", attack: 1, defense: 1 },
         { name: "Dup", type: "Follower", attack: 1, defense: 1 },
@@ -220,6 +220,45 @@ describe("B/C — Tablet deck_duplicates banish (10303210)", () => {
     engageAmulet("first", tabletIdx);
     expect(thenHand("first").length).toBe(hand0 + 1);
     expect(thenDeck("first").length).toBe(deckBeforeEngage - 1);
+  });
+
+  it("Engage with 0 PP is refused — deck size unchanged, no draw", () => {
+    setupTurn(R6, {
+      hand: ["10303210"],
+      pp: 3,
+      deck: [{ name: "Unique", type: "Follower", attack: 1, defense: 1 }],
+    });
+    whenPlayCard("first", 0);
+    const tabletIdx = thenBoard("first").findIndex(
+      (c) => c.name === "Tablet of Tribulations",
+    );
+    const deckBefore = thenDeck("first").length;
+    const handBefore = thenHand("first").length;
+    engageAmulet("first", tabletIdx);
+    expect(thenDeck("first").length).toBe(deckBefore);
+    expect(thenHand("first").length).toBe(handBefore);
+    expect(getPP(state, "first")).toBe(0);
+  });
+
+  it("Engage (1) with 1 PP draws 1 and PP drops to 0", () => {
+    setupTurn(R6, {
+      hand: ["10303210"],
+      pp: 4,
+      deck: [
+        { name: "Unique", type: "Follower", attack: 1, defense: 1 },
+        { name: "DrawMe", type: "Follower", attack: 1, defense: 1 },
+      ],
+    });
+    whenPlayCard("first", 0);
+    const tabletIdx = thenBoard("first").findIndex(
+      (c) => c.name === "Tablet of Tribulations",
+    );
+    const deckBefore = thenDeck("first").length;
+    const handBefore = thenHand("first").length;
+    engageAmulet("first", tabletIdx);
+    expect(thenHand("first").length).toBe(handBefore + 1);
+    expect(thenDeck("first").length).toBe(deckBefore - 1);
+    expect(getPP(state, "first")).toBe(0);
   });
 });
 

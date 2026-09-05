@@ -2942,14 +2942,14 @@
   {
     "id": "10271210",
     "name": "Artifact Catapult",
-    "cost": "2",
+    "cost": "1",
     "attack": "0",
     "defense": "0",
     "type": "Amulet",
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Add a Gear of Ambition to your hand.\nEngage (3): Destroy this card. Select an Artifact follower in your hand that costs 5 or less, summon an exact copy of it, and give the exact copy \"At the end of your opponent's turn, destroy this card.\"",
+    "description": "Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.\nEngage (3): Destroy this card. Select an Artifact follower in your hand that costs 5 or less, summon an exact copy of it, and give the exact copy \"At the end of your opponent's turn, destroy this card.\"",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10271210.webp",
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
@@ -2961,6 +2961,11 @@
       {
         "op": "add_to_hand",
         "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
         "count": 1
       }
     ],
@@ -3234,7 +3239,7 @@
   {
     "id": "10274120",
     "name": "Karula, Eternal Arts",
-    "cost": "6",
+    "cost": "5",
     "attack": "5",
     "defense": "4",
     "type": "Follower",

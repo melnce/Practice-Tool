@@ -1783,9 +1783,9 @@
   {
     "id": "10734120",
     "name": "Beloved Masterpiece",
-    "cost": "9",
-    "attack": "6",
-    "defense": "10",
+    "cost": "8",
+    "attack": "4",
+    "defense": "8",
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",

@@ -1017,7 +1017,7 @@
       "status": "covered"
     },
     "10114110": {
-      "fingerprint": "394d1a2c",
+      "fingerprint": "d7dc7344",
       "gatesSatisfied": [],
       "name": "Aria, Lady of the Woods",
       "scenarios": [
@@ -1026,7 +1026,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "a9a434ef",
+          "fingerprint": "6dbb8fe8",
           "scenario": "evolve"
         }
       ],
@@ -3475,12 +3475,12 @@
       "status": "covered"
     },
     "10271210": {
-      "fingerprint": "349b68e4",
+      "fingerprint": "934a82c8",
       "gatesSatisfied": [],
       "name": "Artifact Catapult",
       "scenarios": [
         {
-          "fingerprint": "01422c10",
+          "fingerprint": "68594180",
           "scenario": "play"
         }
       ],
@@ -3561,7 +3561,7 @@
       "status": "covered"
     },
     "10274120": {
-      "fingerprint": "994a0c61",
+      "fingerprint": "531824e4",
       "gatesSatisfied": [],
       "name": "Karula, Eternal Arts",
       "scenarios": [
@@ -3570,7 +3570,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "a653cc14",
+          "fingerprint": "92c6ee6e",
           "scenario": "evolve"
         }
       ],
@@ -6349,7 +6349,7 @@
       "unmetGates": ["hand_same_cost_gte"]
     },
     "10554110": {
-      "fingerprint": "b0868000",
+      "fingerprint": "5f4d4fb9",
       "gatesSatisfied": [],
       "name": "Milteo & Luzen",
       "scenarios": [
@@ -6358,7 +6358,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "8323bad4",
+          "fingerprint": "001370fb",
           "scenario": "evolve"
         }
       ],
@@ -8134,16 +8134,16 @@
       "status": "covered"
     },
     "10734120": {
-      "fingerprint": "2bcc3f39",
+      "fingerprint": "97fb6924",
       "gatesSatisfied": [],
       "name": "Beloved Masterpiece",
       "scenarios": [
         {
-          "fingerprint": "8f0be3f0",
+          "fingerprint": "01d79588",
           "scenario": "play"
         },
         {
-          "fingerprint": "809438c7",
+          "fingerprint": "250cbf28",
           "scenario": "evolve"
         }
       ],

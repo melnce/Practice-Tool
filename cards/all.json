@@ -2846,13 +2846,12 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Gain Crest: Aria, Lady of the Woods. (Whenever an allied Pixie follower enters the field, give it Storm.)\nSuper-Evolve: Summon 3 copies of Fairy.",
+    "description": "Fanfare: Gain Crest: Aria, Lady of the Woods. (Whenever an allied Pixie follower enters the field, give it Storm.)\nEvolve: Summon 3 copies of Fairy.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10114110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10114110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10114110-aria-lady-of-the-woods",
-    "evolve": [],
-    "superevolve": [
+    "evolve": [
       {
         "op": "summon",
         "source": "named",
@@ -2860,6 +2859,7 @@
         "count": 3
       }
     ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "crest",
@@ -10579,14 +10579,14 @@
   {
     "id": "10271210",
     "name": "Artifact Catapult",
-    "cost": "2",
+    "cost": "1",
     "attack": "0",
     "defense": "0",
     "type": "Amulet",
     "class": "Portalcraft",
     "rarity": "Bronze",
     "tribes": [],
-    "description": "Fanfare: Add a Gear of Ambition to your hand.\nEngage (3): Destroy this card. Select an Artifact follower in your hand that costs 5 or less, summon an exact copy of it, and give the exact copy \"At the end of your opponent's turn, destroy this card.\"",
+    "description": "Fanfare: Add a Gear of Ambition and Gear of Remembrance to your hand.\nEngage (3): Destroy this card. Select an Artifact follower in your hand that costs 5 or less, summon an exact copy of it, and give the exact copy \"At the end of your opponent's turn, destroy this card.\"",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10271210.webp",
     "evo_image": "",
     "set": "[10002] Infinity Evolved",
@@ -10598,6 +10598,11 @@
       {
         "op": "add_to_hand",
         "name": "Gear of Ambition",
+        "count": 1
+      },
+      {
+        "op": "add_to_hand",
+        "name": "Gear of Remembrance",
         "count": 1
       }
     ],
@@ -10871,7 +10876,7 @@
   {
     "id": "10274120",
     "name": "Karula, Eternal Arts",
-    "cost": "6",
+    "cost": "5",
     "attack": "5",
     "defense": "4",
     "type": "Follower",
@@ -11054,7 +11059,7 @@
     "class": "Neutral",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Banish all duplicates from your deck.\nEngage: Draw a card.",
+    "description": "Fanfare: Banish all duplicates from your deck.\nEngage (1): Draw a card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10303210.webp",
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
@@ -11071,7 +11076,7 @@
     "keywords": [
       {
         "name": "Engage",
-        "cost": 0,
+        "cost": 1,
         "effects": [
           {
             "op": "draw",
@@ -20769,7 +20774,7 @@
   {
     "id": "10554110",
     "name": "Milteo & Luzen",
-    "cost": "6",
+    "cost": "7",
     "attack": "3",
     "defense": "3",
     "type": "Follower",
@@ -27211,9 +27216,9 @@
   {
     "id": "10734120",
     "name": "Beloved Masterpiece",
-    "cost": "9",
-    "attack": "6",
-    "defense": "10",
+    "cost": "8",
+    "attack": "4",
+    "defense": "8",
     "type": "Follower",
     "class": "Runecraft",
     "rarity": "Legendary",

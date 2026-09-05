@@ -212,7 +212,7 @@ describe("B/C — Liam / Alouette / Karula artifact hand (10173130, 10173140, 10
   });
 
   it("Karula Fanfare summons one copy of selected Artifact", () => {
-    setupTurn(R6, { hand: ["10274120", "90072110"], pp: 6 });
+    setupTurn(R6, { hand: ["10274120", "90072110"], pp: 5 });
     whenPlayCard("first", 0);
     expect(
       thenBoard("first").filter((c) => c.name === "Striker Artifact").length,
@@ -291,6 +291,18 @@ describe("B/C — Artifact Catapult sacrifice Engage (10271210)", () => {
     state.activePlayer = "first";
   });
 
+  it("Fanfare at 1 PP adds exactly one Gear of Ambition and one Gear of Remembrance", () => {
+    setupTurn(R6, { hand: ["10271210"], pp: 1 });
+    whenPlayCard("first", 0);
+    const hand = thenHand("first");
+    const ambitions = hand.filter((c) => c.name === "Gear of Ambition");
+    const remembrances = hand.filter((c) => c.name === "Gear of Remembrance");
+    expect(ambitions).toHaveLength(1);
+    expect(remembrances).toHaveLength(1);
+    expect(ambitions[0]!.uid).not.toBe(remembrances[0]!.uid);
+    expect(hand.length).toBe(2);
+  });
+
   it("Engage (3): destroys amulet, summons Artifact copy from hand", () => {
     setupTurn(R6, { hand: ["10271210", "90072110"], pp: 6 });
     whenPlayCard("first", 0);
@@ -308,7 +320,7 @@ describe("B/C — Artifact Catapult sacrifice Engage (10271210)", () => {
     expect(thenBoard("first").some((c) => c.name === "Striker Artifact")).toBe(
       true,
     );
-    expect(getPP(state, "first")).toBe(1);
+    expect(getPP(state, "first")).toBe(2);
   });
 });
 

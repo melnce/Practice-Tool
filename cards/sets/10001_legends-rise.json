@@ -933,13 +933,12 @@
     "class": "Forestcraft",
     "rarity": "Legendary",
     "tribes": [],
-    "description": "Fanfare: Gain Crest: Aria, Lady of the Woods. (Whenever an allied Pixie follower enters the field, give it Storm.)\nSuper-Evolve: Summon 3 copies of Fairy.",
+    "description": "Fanfare: Gain Crest: Aria, Lady of the Woods. (Whenever an allied Pixie follower enters the field, give it Storm.)\nEvolve: Summon 3 copies of Fairy.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10114110.webp",
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10114110_evo.webp",
     "set": "[10001] Legends Rise",
     "url": "https://shadowverse.gg/cards/10114110-aria-lady-of-the-woods",
-    "evolve": [],
-    "superevolve": [
+    "evolve": [
       {
         "op": "summon",
         "source": "named",
@@ -947,6 +946,7 @@
         "count": 3
       }
     ],
+    "superevolve": [],
     "fanfare": [
       {
         "op": "crest",

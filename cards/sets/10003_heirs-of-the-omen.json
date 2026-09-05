@@ -148,7 +148,7 @@
     "class": "Neutral",
     "rarity": "Gold",
     "tribes": [],
-    "description": "Fanfare: Banish all duplicates from your deck.\nEngage: Draw a card.",
+    "description": "Fanfare: Banish all duplicates from your deck.\nEngage (1): Draw a card.",
     "base_image": "https://static.dotgg.gg/shadowverse/cards/10303210.webp",
     "evo_image": "",
     "set": "[10003] Heirs of the Omen",
@@ -165,7 +165,7 @@
     "keywords": [
       {
         "name": "Engage",
-        "cost": 0,
+        "cost": 1,
         "effects": [
           {
             "op": "draw",
