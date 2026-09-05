@@ -379,25 +379,28 @@ describe("L2 — Abysscraft tokens", () => {
       expect(printed).toContain("Summon a Rotting Zombie");
     });
 
-    // Finding: Rotting Zombie (90051140) — "remove Last Words from it"
-    // Observed: summoned copy still has Last Words and chains on destroy.
-    it.fails(
-      "Last Words: summoned copy has Last Words removed and does not chain",
-      () => {
-        setupTurn(R6, { hand: [ROTTING_ZOMBIE], pp: 3 });
-        whenPlayCard("first", 0);
-        const original = findOnBoard("first", "Rotting Zombie")!;
-        original.defense = 0;
-        cleanupDead();
-        const copy = thenBoard("first").find((c) => c.uid !== original.uid)!;
-        expect(hasLastWords(copy)).toBe(false);
-        const countBefore = thenBoard("first").length;
-        copy.defense = 0;
-        cleanupDead();
-        expect(thenBoard("first").length).toBe(countBefore - 1);
-        expect(printed).toContain("remove Last Words");
-      },
-    );
+    it("Last Words: summoned copy has Last Words removed and does not chain", () => {
+      setupTurn(R6, { hand: [ROTTING_ZOMBIE], pp: 3 });
+      whenPlayCard("first", 0);
+      const original = findOnBoard("first", "Rotting Zombie")!;
+      const boardBeforeLw = thenBoard("first").length;
+      original.defense = 0;
+      cleanupDead();
+      expect(thenBoard("first").length).toBe(boardBeforeLw);
+      expect(
+        thenBoard("first").filter((c) => c.id === ROTTING_ZOMBIE),
+      ).toHaveLength(1);
+      const copy = thenBoard("first").find((c) => c.uid !== original.uid)!;
+      expect(hasLastWords(copy)).toBe(false);
+      expect(copy.keywordState?.lastWordsEffects ?? []).toHaveLength(0);
+      const countBefore = thenBoard("first").length;
+      const copyUid = copy.uid;
+      copy.defense = 0;
+      cleanupDead();
+      expect(thenBoard("first").length).toBe(countBefore - 1);
+      expect(thenBoard("first").some((c) => c.uid === copyUid)).toBe(false);
+      expect(printed).toContain("remove Last Words");
+    });
   });
 
   describe("Skeleton (90051110)", () => {
