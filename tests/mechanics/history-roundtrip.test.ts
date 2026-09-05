@@ -141,17 +141,18 @@ describe("history round-trip soak", () => {
   it.fails(
     "engine chain-undo: CHOOSE_TARGET nested commit — targetUids fixed; chain-redo zoneVersion drift remains (seed 20260909 game 22 action 19)",
     async () => {
-    const result = await runSoakGame({
-      seed: 20260909,
-      gameIndex: 22,
-      historyCheck: true,
-      dispatch: ENGINE,
-    });
-    expect(
-      result.outcome,
-      result.error ?? `game 22 outcome ${result.outcome}`,
-    ).toBe("completed");
-  });
+      const result = await runSoakGame({
+        seed: 20260909,
+        gameIndex: 22,
+        historyCheck: true,
+        dispatch: ENGINE,
+      });
+      expect(
+        result.outcome,
+        result.error ?? `game 22 outcome ${result.outcome}`,
+      ).toBe("completed");
+    },
+  );
 
   it("engine deep chain undo: null board slot (seed 20260909 game 14 action 56)", async () => {
     const result = await runSoakGame({
