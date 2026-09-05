@@ -12,6 +12,7 @@ import { evalCommonConditions } from "./conditions.js";
 import { DEBUG_TRIGGERS } from "./debug.js";
 import { shouldCrestTriggerFire } from "./crestScope.js";
 import { triggerMatchesCandidateZone } from "./utils.js";
+import { preJudgeLeadingGate } from "./preJudgeLeadingGate.js";
 
 // Cycle breaker for runEffects
 let runEffects: (
@@ -212,8 +213,16 @@ export function processCandidateTriggers(
         options.collector ??
         ((state as any)._reactiveCollector as QueuedTriggerEntry[] | undefined);
       if (collector) {
-        collector.push({
+        const judged = preJudgeLeadingGate(
           trigger,
+          owner,
+          card as CardInstance,
+          "reactive",
+        );
+        if (!judged) continue;
+
+        collector.push({
+          trigger: judged,
           card,
           cardUid: card?.uid,
           owner,
