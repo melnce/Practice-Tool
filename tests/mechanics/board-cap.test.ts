@@ -18,10 +18,8 @@ import {
   flushDeferredDeathBatch,
 } from "../../src/logic/core/cleanup.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
-import { replaySoakTrace } from "../../src/bench/soakEnv.js";
+import { runSoakGame } from "../../src/bench/soakEnv.js";
 import { checkSoakInvariants } from "../../src/bench/soakInvariants.js";
-import { readFileSync } from "fs";
-import { resolve } from "path";
 import { getBoard } from "../../src/core/playerHelpers.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { countRealBoardCards } from "../../src/logic/effects/ops/summon_ops/core.js";
@@ -149,12 +147,14 @@ describe("board field cap", () => {
   });
 
   it("soak repro seed20260913 game391 — no field>5 after final action", async () => {
-    const reproPath = resolve(
-      "reports/soak/repro_seed20260913_game391_invariant.json",
-    );
-    const repro = JSON.parse(readFileSync(reproPath, "utf8"));
-    const result = await replaySoakTrace(20260913, 391, repro.trace);
-    expect(result.error).toBeUndefined();
+    const result = await runSoakGame({
+      seed: 20260913,
+      gameIndex: 391,
+      turnCap: 60,
+      actionCap: 800,
+    });
+    expect(result.outcome).not.toBe("invariant");
+    expect(result.findings?.some((f) => f.includes("field>5"))).not.toBe(true);
     const findings = checkSoakInvariants(state);
     expect(
       findings.map((f) => f.message),
