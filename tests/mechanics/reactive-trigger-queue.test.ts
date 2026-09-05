@@ -49,9 +49,11 @@ const SOAK_FIXTURE_DIR = resolve(
 );
 
 function loadSoakFixture(name: string) {
-  return JSON.parse(
-    readFileSync(resolve(SOAK_FIXTURE_DIR, name), "utf8"),
-  ) as { seed: number; gameIndex: number; trace: unknown[] };
+  return JSON.parse(readFileSync(resolve(SOAK_FIXTURE_DIR, name), "utf8")) as {
+    seed: number;
+    gameIndex: number;
+    trace: unknown[];
+  };
 }
 
 const NETHERWORLD_LT = "10951120";
