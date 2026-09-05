@@ -587,12 +587,12 @@ TARGETED_OP_HANDLERS.set("fuse", (ctx) => {
 TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
   const { eff, owner, sourceCard, targetUids } = ctx;
   const targets = resolveUids(targetUids);
-  if (targets[0]) {
-    state.__lastSelected = targets[0];
-  }
   doAction(
     "Resolve Targets",
     () => {
+      if (targets[0]) {
+        state.__lastSelected = targets[0];
+      }
       for (const target of targets) {
         for (const nestedEff of (eff as any).effects || []) {
           if (nestedEff.op === "set_stats") {
