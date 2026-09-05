@@ -1,6 +1,6 @@
 // src/logic/core/cleanup.ts
 import { state } from "../../core/gameState.js";
-import { banishCard } from "../effects/ops/banish/index.js";
+import { moveToBanishZone } from "../effects/ops/banish/primitives.js";
 import { logEvent } from "../../core/logger.js";
 import { fireTrigger } from "./triggers.js";
 import type { CardInstance, Player, Effect } from "../../core/types/index.js";
@@ -332,7 +332,16 @@ export function cleanupDead() {
 
     if (isBanishedOnDeath) {
       logEvent("banishOnDeath", { card: c.name, owner });
-      banishCard(c);
+      bumpZoneVersion();
+      fireTrigger("ally_follower_leaves_field", owner as any);
+      fireTrigger("enemy_follower_leaves_field", opponentOf(owner) as any);
+      logEvent("banish", {
+        card: c.name,
+        uid: c.uid,
+        owner,
+        reason: "death",
+      });
+      moveToBanishZone(c, owner);
       continue;
     }
 

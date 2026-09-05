@@ -281,28 +281,30 @@ describe("L2 — Abysscraft tokens", () => {
       expect(printed).toContain("Storm");
     });
 
-    // Finding: Ghost (90051130) — "When this card leaves the field, banish it."
-    // Observed: destroyed Ghost goes to graveyard, not banish zone.
-    it.fails(
-      "When this card leaves the field: banishes on destroy (not graveyard)",
-      () => {
-        setupTurn(R6, { hand: [GHOST], pp: 1 });
-        whenPlayCard("first", 0);
-        const ghost = findOnBoard("first", "Ghost")!;
-        const ghostUid = ghost.uid;
-        state.players.first.shadows = 0;
-        ghost.defense = 0;
-        cleanupDead();
-        expect(getBoard(state, "first").some((c) => c.uid === ghostUid)).toBe(
-          false,
-        );
-        expect(getGraveyard(state, "first")).toHaveLength(0);
-        expect(getBanish(state, "first").some((c) => c.uid === ghostUid)).toBe(
-          true,
-        );
-        expect(printed).toContain("banish it");
-      },
-    );
+    it("When this card leaves the field: banishes on destroy (not graveyard)", () => {
+      setupTurn(R6, { hand: [GHOST, SKELETON], pp: 2 });
+      whenPlayCard("first", 0);
+      whenPlayCard("first", 0);
+      const ghost = findOnBoard("first", "Ghost")!;
+      const skeleton = findOnBoard("first", "Skeleton")!;
+      const ghostUid = ghost.uid;
+      const skeletonUid = skeleton.uid;
+      state.players.first.shadows = 0;
+      ghost.defense = 0;
+      skeleton.defense = 0;
+      cleanupDead();
+      expect(getBoard(state, "first").some((c) => c.uid === ghostUid)).toBe(
+        false,
+      );
+      expect(getGraveyard(state, "first")).toHaveLength(1);
+      expect(getGraveyard(state, "first")[0]!.uid).toBe(skeletonUid);
+      expect(getBanish(state, "first").some((c) => c.uid === ghostUid)).toBe(
+        true,
+      );
+      expect(ghost.zone).toBe("banished");
+      expect(state.players.first.shadows).toBe(1);
+      expect(printed).toContain("banish it");
+    });
 
     it("owner's EOT: banishes Ghost from the field", () => {
       setupTurn(R6, {
