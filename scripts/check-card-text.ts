@@ -35,6 +35,7 @@ import { spellAmuletMarkerIssues } from "./lib/typeAudit.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
+const TOKEN_FILE = path.join(ROOT, "cards", "token_details.json");
 
 type CardJson = {
   id: string;
@@ -1542,6 +1543,16 @@ function main() {
         allNumericDriftHints.push(...drift.hints);
         allIssues.push(...drift.errors);
       }
+    }
+  }
+
+  if (gateOpKeys && fs.existsSync(TOKEN_FILE)) {
+    const tokens = JSON.parse(
+      fs.readFileSync(TOKEN_FILE, "utf-8"),
+    ) as CardJson[];
+    cardCount += tokens.length;
+    for (const card of tokens) {
+      allIssues.push(...checkOpKeysForCard(card));
     }
   }
 
