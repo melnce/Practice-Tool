@@ -94,6 +94,48 @@ describe("Mechanic Contract: all actions", () => {
 
       expect(state.players.first.pp).toBe(5);
     });
+
+    it("pp action:recover cannot exceed max PP", () => {
+      givenGameState({ seed: 1 }).build();
+      state.players.first.pp = 8;
+      state.players.first.maxPP = 10;
+
+      whenRunEffects(
+        [{ op: "pp" as const, action: "recover", amount: 5, player: "self" }],
+        "first",
+      );
+
+      expect(state.players.first.pp).toBe(10);
+    });
+
+    it("pp action:recover targets correct player only", () => {
+      givenGameState({ seed: 1 }).build();
+      state.players.first.pp = 3;
+      state.players.first.maxPP = 10;
+      state.players.second.pp = 2;
+      state.players.second.maxPP = 10;
+
+      whenRunEffects(
+        [{ op: "pp" as const, action: "recover", amount: 2, player: "self" }],
+        "first",
+      );
+
+      expect(state.players.first.pp).toBe(5);
+      expect(state.players.second.pp).toBe(2);
+    });
+
+    it("pp action:recover amount 0 is a no-op", () => {
+      givenGameState({ seed: 1 }).build();
+      state.players.first.pp = 5;
+      state.players.first.maxPP = 10;
+
+      whenRunEffects(
+        [{ op: "pp" as const, action: "recover", amount: 0 }],
+        "first",
+      );
+
+      expect(state.players.first.pp).toBe(5);
+    });
   });
 
   // ===========================================================================

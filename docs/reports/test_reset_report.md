@@ -77,4 +77,4 @@ _Executed on 2025-12-19T01:10:00+01:00_
 - `npm test`: **PASSED** (83/83 suites).
 - `replay:check`: **PASSED** (Deterministic).
 - `check:arch`: **PASSED** (Clean).
-- **Legacy Status**: Documented in `tests/legacy/README.md`.
+- **Legacy Status**: Retired in PR `test: retire tests/legacy` — see commit table for per-test verdicts.
