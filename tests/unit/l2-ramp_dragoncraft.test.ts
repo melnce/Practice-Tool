@@ -214,7 +214,7 @@ describe("L2 — Ramp Dragoncraft", () => {
     it("Evolve replicates Fanfare: second discard, draw, and heal", () => {
       setupTurn(R6, {
         hand: [KIMIKA, FODDER, DRAW_SECOND],
-        deck: [DRAW_TOP],
+        deck: [DRAW_TOP, SMALL_FOLLOWER],
         pp: 2,
         hp: 17,
         evo: 2,
@@ -501,7 +501,7 @@ describe("L2 — Ramp Dragoncraft", () => {
     it("Evolve replicates Fanfare mode", () => {
       setupTurn(R7, {
         hand: [NORMAGDALA],
-        deck: [DRAW_TOP],
+        deck: [DRAW_TOP, SMALL_FOLLOWER],
         pp: 7,
         hp: 14,
         evo: 2,

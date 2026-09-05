@@ -28,6 +28,7 @@ import {
   getPP,
 } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
+import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 
 const R6 = 6;
 const R7 = 7;
@@ -548,8 +549,9 @@ describe("B/C — Unleashed mode (10432310)", () => {
   it("Mode 1 draws and deals 4 to a random enemy follower", () => {
     setupTurn(R6, { hand: ["10432310"], pp: 4, deck: ["10131310"] });
     enemyFollower(5);
+    setScriptedModePickProvider(() => [0]);
     whenPlayCard("first", 0);
-    if (state.pendingModeChoice) state.pendingModeChoice.selectedIndex = 0;
+    setScriptedModePickProvider(null);
     expect(thenHand("first").length).toBeGreaterThan(0);
     const foe = state.players.second.board[0];
     expect(foe == null || Number(foe.defense) < 5).toBe(true);

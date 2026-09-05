@@ -23,6 +23,7 @@ import {
   thenPP,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
+import { undo, resetHistory } from "../../src/core/history.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getPool } from "../../src/logic/core/targeting.js";
 import {
@@ -30,6 +31,7 @@ import {
   canAttackFollowerTarget,
 } from "../../src/logic/core/combat.js";
 import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
+import { playCard } from "../../src/logic/core/playCard/index.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { changeFollowerControl } from "../../src/logic/effects/ops/changeControl.js";
 import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
@@ -291,33 +293,167 @@ describe("Rulebook L313–317 — atomic resolution and text order", () => {
     expect(getShadows(state, "first")).toBe(shadowsBefore + 1);
   });
 
-  it.fails(
-    "draw 2 then opponent draw 1: self deck-out should lose before opponent draw (L317) — engine still draws for opponent after deck-out",
-    () => {
-      setupMain(R6, {
-        hand: ["10221310"],
-        pp: 2,
-        deck: [
-          { name: "Only", type: "Follower", cost: 1, attack: 1, defense: 1 },
-        ],
-        secondDeck: [
+  it("draw 2 then opponent draw 1: self deck-out should lose before opponent draw (L317)", () => {
+    setupMain(R6, {
+      hand: ["10221310"],
+      pp: 2,
+      deck: [
+        { name: "Only", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ],
+      secondDeck: [
+        {
+          name: "OppCard",
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+        },
+      ],
+    });
+    const secondHandBefore = thenHand("second").length;
+    whenPlayCard("first", 0);
+
+    expect(thenHand("first").length).toBe(1);
+    expect(getWinner(state)).toBe("second");
+    expect(state.phase).toBe("gameover");
+    expect(thenHand("second").length).toBe(secondHandBefore);
+  });
+
+  it("lethal mid-effect halts remaining draws in the same spell", () => {
+    givenGameState({ seed: 1, activePlayer: "first" })
+      .withFirstDeck([
+        { name: "D1", type: "Follower", cost: 1, attack: 1, defense: 1 },
+        { name: "D2", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ])
+      .build();
+    state.gameStarted = true;
+    state.players.second.hp = 3;
+    const deckBefore = thenDeck("first").length;
+
+    whenRunEffects(
+      [
+        { op: "damage", target: "enemy:leader", amount: 3 },
+        { op: "draw", source: "deck", count: 2 },
+      ] as any,
+      "first",
+    );
+
+    expect(state.phase).toBe("gameover");
+    expect(getWinner(state)).toBe("first");
+    expect(thenDeck("first").length).toBe(deckBefore);
+  });
+
+  it("deal 3 then draw 2 still draws when enemy leader survives", () => {
+    givenGameState({ seed: 1, activePlayer: "first" })
+      .withFirstDeck([
+        { name: "D1", type: "Follower", cost: 1, attack: 1, defense: 1 },
+        { name: "D2", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ])
+      .build();
+    state.gameStarted = true;
+    state.players.second.hp = 4;
+    const deckBefore = thenDeck("first").length;
+
+    whenRunEffects(
+      [
+        { op: "damage", target: "enemy:leader", amount: 3 },
+        { op: "draw", source: "deck", count: 2 },
+      ] as any,
+      "first",
+    );
+
+    expect(state.phase).not.toBe("gameover");
+    expect(thenHP("second")).toBe(1);
+    expect(thenDeck("first").length).toBe(deckBefore - 2);
+  });
+
+  it("turn-boundary lethal trigger stops later queued triggers in the same boundary", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
+      .withFirstDeck([
+        { name: "DeckCard", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ])
+      .build();
+    state.gameStarted = true;
+    state.players.second.hp = 3;
+
+    const killer = createCard(
+      {
+        name: "Killer",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        can_attack: false,
+        triggers: [
           {
-            name: "OppCard",
-            type: "Follower",
-            cost: 1,
-            attack: 1,
-            defense: 1,
+            event: "end_of_turn",
+            effects: [{ op: "damage", target: "enemy:leader", amount: 3 }],
           },
         ],
-      });
-      const secondHandBefore = thenHand("second").length;
-      whenPlayCard("first", 0);
+      },
+      "board",
+      "first",
+    );
+    const drawer = createCard(
+      {
+        name: "Drawer",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        can_attack: false,
+        triggers: [
+          {
+            event: "end_of_turn",
+            effects: [{ op: "draw", source: "deck", count: 1 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    state.players.first.board = [killer, drawer];
+    const deckBefore = thenDeck("first").length;
 
-      expect(thenHand("first").length).toBe(1);
-      expect(getWinner(state)).toBe("second");
-      expect(thenHand("second").length).toBe(secondHandBefore);
-    },
-  );
+    runEndOfTurnBoundary("first");
+
+    expect(state.phase).toBe("gameover");
+    expect(getWinner(state)).toBe("first");
+    expect(thenDeck("first").length).toBe(deckBefore);
+  });
+
+  it("undo after deck-out loss restores main phase without stale halt state", () => {
+    resetHistory();
+    setupMain(R6, {
+      hand: ["10221310"],
+      pp: 2,
+      deck: [
+        { name: "Only", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ],
+      secondDeck: [
+        {
+          name: "OppCard",
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+        },
+      ],
+    });
+    const secondHandBefore = thenHand("second").length;
+
+    playCard(getHand(state, "first"), "first", 0);
+    expect(state.phase).toBe("gameover");
+    expect(getWinner(state)).toBe("second");
+    expect(thenHand("second").length).toBe(secondHandBefore);
+
+    undo({ autoRender: false });
+
+    expect(state.phase).toBe("main");
+    expect(getWinner(state)).toBeNull();
+    expect(state.players.first.defeated).toBe(false);
+    expect(thenHand("second").length).toBe(secondHandBefore);
+  });
 
   it("destroy enemy follower then draw still draws (kill-then-draw, 10913310)", () => {
     setupMain(R6, {

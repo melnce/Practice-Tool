@@ -7,6 +7,7 @@ import { registerRunEffectsInProcess } from "./triggers/process.js";
 import { handleLootFusedDedupe } from "./triggers/tracking.js";
 import { enrichContextWithUids } from "./triggers/resolve.js";
 import { getBoard, getCrests } from "../../core/playerHelpers.js";
+import { isGameOver } from "../../core/gameOver.js";
 
 // Re-export for external consumers if needed
 export type { TriggerContext } from "./triggers/types.js";
@@ -59,6 +60,8 @@ export function fireTrigger(
   activePlayer: Player,
   context: TriggerContext = {},
 ) {
+  if (isGameOver()) return;
+
   // P0-1 FIX: Chain depth protection
   if (_triggerChainDepth >= MAX_TRIGGER_CHAIN_DEPTH) {
     const msg =
