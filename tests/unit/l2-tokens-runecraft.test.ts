@@ -852,17 +852,27 @@ describe("L2 — Runecraft tokens", () => {
       expect(printed).toContain("Restore 1 defense");
     });
 
-    it.fails(
-      "on play: selecting enemy leader deals 2 damage and restores 1 leader defense — token 90034320: leader takes 0 damage and leader HP stays 18",
-      () => {
-        setupTurn(R6, { hand: [ARS_MAGNA], pp: 1, hp: 18 });
-        state.players.second.hp = 20;
-        whenPlayCard("first", 0);
-        resolvePendingByUid("leader");
-        expect(getHP(state, "second")).toBe(18);
-        expect(getHP(state, "first")).toBe(19);
-      },
-    );
+    it("on play: selecting enemy leader deals 2 damage and restores 1 leader defense", () => {
+      setupTurn(R6, { hand: [ARS_MAGNA], pp: 1, hp: 18 });
+      state.players.second.hp = 20;
+      whenPlayCard("first", 0);
+      resolvePendingByUid("leader");
+      expect(getHP(state, "second")).toBe(18);
+      expect(getHP(state, "first")).toBe(19);
+      expect(printed).toContain("deal it 2 damage");
+      expect(printed).toContain("Restore 1 defense");
+    });
+
+    it("on play: empty enemy board hits leader via fallback_leader and restores 1 leader defense once", () => {
+      setupTurn(R6, { hand: [ARS_MAGNA], pp: 1, hp: 18 });
+      state.players.second.hp = 20;
+      whenPlayCard("first", 0);
+      expect(state.pendingTargetEffect?.canTargetLeader).toBe(true);
+      resolvePendingByUid("leader");
+      expect(state.pendingTargetEffect).toBeUndefined();
+      expect(getHP(state, "second")).toBe(18);
+      expect(getHP(state, "first")).toBe(19);
+    });
   });
 
   describe("Depths of the Eld Crystals (90034330)", () => {

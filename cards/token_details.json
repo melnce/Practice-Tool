@@ -1078,21 +1078,17 @@
     "url": "https://shadowverse.gg/cards/90034320-ars-magna",
     "spell": [
       {
-        "op": "select",
-        "target": "enemy:any",
-        "count": 1,
-        "effects": [
-          {
-            "op": "damage",
-            "target": "selected",
-            "amount": 2
-          },
-          {
-            "op": "restore",
-            "target": "leader",
-            "amount": 1
-          }
-        ]
+        "op": "damage",
+        "target": "enemy:follower",
+        "amount": 2,
+        "select": 1,
+        "can_target_leader": true,
+        "fallback_leader": true
+      },
+      {
+        "op": "restore",
+        "target": "leader",
+        "amount": 1
       }
     ],
     "evolve": [],
