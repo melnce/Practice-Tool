@@ -21,6 +21,14 @@ import { getCardById } from "../../src/data/cardDatabase.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { dispatchAction } from "../../src/logic/core/dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
+import { attackLeader } from "../../src/logic/core/combat.js";
+import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
+import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
+import {
+  makeCardFromDB,
+  pushToBoard,
+} from "../../src/logic/effects/ops/summon_ops/core.js";
+import { getBoard } from "../../src/core/playerHelpers.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import {
   fingerprintGameState,
@@ -51,7 +59,8 @@ export type ScenarioName =
   | "play_else"
   | "turn_boundary"
   | "evolve"
-  | "vanilla_place";
+  | "vanilla_place"
+  | "summon";
 
 export type ScenarioResult = {
   scenario: ScenarioName;
@@ -98,6 +107,11 @@ type RawCard = {
   superevolve?: unknown[];
   triggers?: unknown[];
   keywords?: unknown[];
+  cant_play?: boolean;
+};
+
+export type DriveCardOptions = {
+  isToken?: boolean;
 };
 
 function walkEffects(
@@ -600,10 +614,112 @@ function isSkip(
   return "skip" in r;
 }
 
+function hasEngageKeyword(card: CardInstance): boolean {
+  const kws = (card as { keywords?: unknown[] }).keywords ?? [];
+  for (const k of kws) {
+    if (typeof k === "string" && k === "Engage") return true;
+    if (k && typeof k === "object" && (k as { name?: string }).name === "Engage") {
+      return true;
+    }
+  }
+  return false;
+}
+
+function readyAttacker(card: CardInstance): void {
+  card.justPlayed = false;
+  card.can_attack = true;
+  card.can_attack_followers = true;
+  card.attacks_left = 1;
+  applyKeywordsFromList(card);
+}
+
+function runSummonScenario(
+  cardId: string,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  buildArena({ roundCount: 8, activePlayer: "first" });
+  const card = makeCardFromDB(template, "first");
+  pushToBoard(state.players.first.board, "first", card);
+
+  whenEndTurn();
+  if (state.pendingTargetEffect) {
+    const resolved = autoResolvePending();
+    if (!resolved.ok) {
+      return {
+        skip: "unresolvable_pending",
+        detail: `after_first_eot:${resolved.reason}`,
+      };
+    }
+  }
+  whenEndTurn();
+  if (state.pendingTargetEffect) {
+    const resolved = autoResolvePending();
+    if (!resolved.ok) {
+      return {
+        skip: "unresolvable_pending",
+        detail: `after_second_eot:${resolved.reason}`,
+      };
+    }
+  }
+
+  const type = String(template.type).toLowerCase();
+  if (type === "follower") {
+    readyAttacker(card);
+    const idx = getBoard(state, "first").indexOf(card);
+    if (idx >= 0) {
+      try {
+        attackLeader(idx, "first", "second");
+      } catch (err) {
+        return {
+          skip: "drive_threw",
+          detail: err instanceof Error ? err.message : String(err),
+        };
+      }
+    }
+  } else if (type === "amulet") {
+    if (hasEngageKeyword(card)) {
+      const idx = getBoard(state, "first").indexOf(card);
+      if (idx >= 0) {
+        try {
+          engageAmulet("first", idx);
+        } catch (err) {
+          return {
+            skip: "drive_threw",
+            detail: err instanceof Error ? err.message : String(err),
+          };
+        }
+        if (state.pendingTargetEffect) {
+          const resolved = autoResolvePending();
+          if (!resolved.ok) {
+            return {
+              skip: "unresolvable_pending",
+              detail: resolved.reason ?? "pending_after_engage",
+            };
+          }
+        }
+      }
+    }
+  }
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "summon",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: [],
+    gatesUnmet: [],
+  };
+}
+
 /**
  * Drive one card through classified scenarios with gate preparation.
  */
-export function driveCard(raw: RawCard): CardDriveResult {
+export function driveCard(
+  raw: RawCard,
+  opts: DriveCardOptions = {},
+): CardDriveResult {
   const id = String(raw.id);
   const name = raw.name ?? id;
   const template = getCardById(id);
@@ -616,7 +732,10 @@ export function driveCard(raw: RawCard): CardDriveResult {
 
   installModePicks();
   try {
-    const paths = classifyPaths(raw);
+    const paths =
+      opts.isToken && raw.cant_play
+        ? (["summon"] as ScenarioName[])
+        : classifyPaths(raw);
     const scenarios: ScenarioResult[] = [];
     const failures: { skip: SkipReason; detail: string }[] = [];
     const satisfiedAll = new Set<string>();
@@ -650,6 +769,7 @@ export function driveCard(raw: RawCard): CardDriveResult {
         } else if (path === "turn_boundary")
           result = runTurnBoundaryScenario(id, gates);
         else if (path === "evolve") result = runEvolveScenario(id, gates);
+        else if (path === "summon") result = runSummonScenario(id);
         else result = runVanillaPlaceScenario(id);
       } catch (err) {
         result = {
@@ -724,6 +844,7 @@ export type BaselineCardEntry =
       fingerprint: string;
       scenarios: { scenario: ScenarioName; fingerprint: string }[];
       gatesSatisfied?: string[];
+      token?: true;
     }
   | {
       status: "partial";
@@ -732,12 +853,14 @@ export type BaselineCardEntry =
       scenarios: { scenario: ScenarioName; fingerprint: string }[];
       gatesSatisfied?: string[];
       unmetGates: string[];
+      token?: true;
     }
   | {
       status: "skipped";
       name: string;
       reason: SkipReason;
       detail?: string;
+      token?: true;
     };
 
 export type BehaviourBaseline = {
@@ -746,6 +869,7 @@ export type BehaviourBaseline = {
   version: number;
   seed: number;
   cardCount: number;
+  tokenCount: number;
   covered: number;
   partial: number;
   skipped: number;
@@ -754,13 +878,22 @@ export type BehaviourBaseline = {
   cards: Record<string, BaselineCardEntry>;
 };
 
-export function toBaselineEntry(result: CardDriveResult): BaselineCardEntry {
+export type ToBaselineEntryOptions = {
+  token?: boolean;
+};
+
+export function toBaselineEntry(
+  result: CardDriveResult,
+  opts: ToBaselineEntryOptions = {},
+): BaselineCardEntry {
+  const tokenFlag = opts.token ? ({ token: true as const }) : {};
   if (result.status === "skipped") {
     return {
       status: "skipped",
       name: result.name,
       reason: result.reason,
       ...(result.detail ? { detail: result.detail } : {}),
+      ...tokenFlag,
     };
   }
   if (result.status === "partial") {
@@ -774,6 +907,7 @@ export function toBaselineEntry(result: CardDriveResult): BaselineCardEntry {
       })),
       gatesSatisfied: result.gatesSatisfied,
       unmetGates: result.unmetGates,
+      ...tokenFlag,
     };
   }
   return {
@@ -785,5 +919,6 @@ export function toBaselineEntry(result: CardDriveResult): BaselineCardEntry {
       fingerprint: s.fingerprint,
     })),
     gatesSatisfied: result.gatesSatisfied,
+    ...tokenFlag,
   };
 }
