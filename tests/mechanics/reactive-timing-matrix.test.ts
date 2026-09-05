@@ -66,18 +66,6 @@ const KNOWN_FAILURES: Partial<
       "captureSnapshot / history.ts — gated watcher state does not round-trip after target resume",
     assertion: "undo/redo canonical snapshot mismatch",
   },
-  "C1_fanfare|enemy_follower_enter": {
-    msg: "enemy enter watcher on first board never fires",
-    engine:
-      "finishFollowerEnter (summon_ops/core.ts) routes enemy_follower_enter with opponent as activePlayer, but process.ts owner filter skips owner===activePlayer — conflicts with zones.ts predicate requiring cand.owner!==enteringOwner",
-    assertion: "expected counters.earth 1, received 0",
-  },
-  "C7_deferred_lw|enemy_follower_enter": {
-    msg: "enemy enter from LW body not observed (same routing bug)",
-    engine:
-      "finishFollowerEnter (summon_ops/core.ts) — same enemy_follower_enter activePlayer/owner-filter mismatch as C1",
-    assertion: "expected counters.earth 1, received 0",
-  },
 };
 
 function cellKey(context: RaisingContext, event: ReactiveEvent): string {
