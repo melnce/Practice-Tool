@@ -36,6 +36,9 @@ const WATCHER_TICK: Effect = {
   amount: 1,
 };
 
+/** Real card name in cards/all.json — used by matrix summon raisers. */
+export const MATRIX_SUMMON_NAME = "Goblin";
+
 // ---------------------------------------------------------------------------
 // Event / context catalog
 // ---------------------------------------------------------------------------
@@ -189,6 +192,46 @@ export function watcherEarth(owner: PlayerSlot, watcherUid: string): number {
   ];
   const card = zones.find((c) => c?.uid === watcherUid);
   return Number(card?.counters?.earth ?? 0);
+}
+
+export interface MatrixNamedSummonExpectation {
+  boardOwner: PlayerSlot;
+  name: string;
+}
+
+/** Where a matrix raiser's named summon should land (null = no named enter summon). */
+export function matrixNamedSummonExpectation(input: {
+  event?: ReactiveEvent | string;
+  context?: string;
+  axis?: string;
+  actionPlayer?: PlayerSlot;
+  onOwnerTurn?: boolean;
+}): MatrixNamedSummonExpectation | null {
+  const { event, axis, actionPlayer = "first", onOwnerTurn = true } = input;
+  if (event !== "ally_follower_enter" && event !== "enemy_follower_enter") {
+    return null;
+  }
+  if (axis === "turn" && event === "ally_follower_enter" && !onOwnerTurn) {
+    return {
+      boardOwner: enemyWatcherOwner(actionPlayer),
+      name: MATRIX_SUMMON_NAME,
+    };
+  }
+  if (event === "enemy_follower_enter") {
+    return {
+      boardOwner: enemyWatcherOwner(actionPlayer),
+      name: MATRIX_SUMMON_NAME,
+    };
+  }
+  return { boardOwner: actionPlayer, name: MATRIX_SUMMON_NAME };
+}
+
+export function assertMatrixNamedSummonPresent(
+  exp: MatrixNamedSummonExpectation,
+): void {
+  expect(
+    getBoard(state, exp.boardOwner).some((c) => c?.name === exp.name),
+  ).toBe(true);
 }
 
 export function raiseEffects(
@@ -609,6 +652,7 @@ export interface MatrixRunResult {
   watcherUid: string;
   watcherOwner: PlayerSlot;
   pendingPrompt: boolean;
+  summonExpectation?: MatrixNamedSummonExpectation | null;
 }
 
 export interface MatrixCellOptions {
@@ -910,7 +954,13 @@ export function runMatrixCell(opts: MatrixCellOptions): MatrixRunResult {
       break;
   }
 
-  return { watcherUid, watcherOwner, pendingPrompt };
+  const summonExpectation = matrixNamedSummonExpectation({
+    event,
+    context,
+    actionPlayer: "first",
+  });
+
+  return { watcherUid, watcherOwner, pendingPrompt, summonExpectation };
 }
 
 export function assertReactiveInvariants(
@@ -928,7 +978,20 @@ export function assertReactiveInvariants(
     pendingPrompt = false,
     leadingGate = false,
     expectFired = true,
+    event,
+    context,
   } = opts;
+  const summonExp =
+    expectFired && event
+      ? matrixNamedSummonExpectation({
+          event,
+          context,
+          actionPlayer: watcherOwner,
+        })
+      : null;
+  if (summonExp) {
+    assertMatrixNamedSummonPresent(summonExp);
+  }
   const earth = watcherEarth(watcherOwner, watcherUid);
   if (expectFired && !leadingGate) {
     expect(earth).toBe(1);
@@ -1940,6 +2003,18 @@ export function runV2MatrixCell(opts: V2MatrixCellOptions): V2MatrixRunResult {
     watcherOwner,
     pendingPrompt,
     expectFired,
+    summonExpectation: expectFired
+      ? matrixNamedSummonExpectation({
+          event:
+            axis === "enemy_enter"
+              ? "ally_follower_enter"
+              : (event as ReactiveEvent),
+          context,
+          axis,
+          actionPlayer,
+          onOwnerTurn,
+        })
+      : null,
     skipUndoRoundTrip:
       context === "C10_eot" ||
       context === "C11_sot" ||
@@ -2255,6 +2330,10 @@ export function runV2NestingCell(opts: {
     watcherOwner: opts.depth === 3 ? "second" : "first",
     pendingPrompt,
     expectFired: true,
+    summonExpectation: {
+      boardOwner: "first",
+      name: MATRIX_SUMMON_NAME,
+    },
   };
 }
 
@@ -2262,6 +2341,9 @@ export function assertV2ReactiveInvariants(
   run: V2MatrixRunResult,
   opts: { event?: ReactiveEvent | V2RemainingEvent; context?: string } = {},
 ): void {
+  if (run.expectFired && run.summonExpectation) {
+    assertMatrixNamedSummonPresent(run.summonExpectation);
+  }
   const earth = watcherEarth(run.watcherOwner, run.watcherUid);
   if (run.expectFired) {
     expect(earth).toBe(1);

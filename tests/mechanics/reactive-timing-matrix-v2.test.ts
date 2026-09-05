@@ -323,7 +323,7 @@ describe("Reactive trigger timing matrix v2", () => {
               {
                 event: "ally_follower_enter",
                 source: "board",
-                condition: { name: "LoopToken" },
+                condition: { name: "Goblin" },
                 effects: [
                   {
                     op: "stat",
@@ -352,7 +352,7 @@ describe("Reactive trigger timing matrix v2", () => {
             {
               op: "summon",
               source: "named",
-              name: "LoopToken",
+              name: "Goblin",
               count: 1,
             },
           ],
@@ -363,7 +363,7 @@ describe("Reactive trigger timing matrix v2", () => {
                 {
                   op: "summon",
                   source: "named",
-                  name: "LoopToken",
+                  name: "Goblin",
                   count: 1,
                 },
               ],
