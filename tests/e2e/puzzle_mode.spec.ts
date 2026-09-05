@@ -5,10 +5,13 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
 import fs from "fs";
+import { SvwbPage } from "./qa/pageObject.js";
 
 test.describe("Puzzle mode UI", () => {
   test("control chrome present", async ({ page }) => {
+    const po = new SvwbPage(page);
     await page.goto("/");
+    await po.openSettingsDrawer();
     await expect(page.locator("#savePuzzleBtn")).toBeVisible();
     await expect(page.locator("#loadPuzzleBtn")).toBeVisible();
     await expect(page.locator("#retryPuzzleBtn")).toBeVisible();
@@ -16,7 +19,9 @@ test.describe("Puzzle mode UI", () => {
   });
 
   test("author → fail → retry → solve (deterministic)", async ({ page }) => {
+    const po = new SvwbPage(page);
     await page.goto("/");
+    await po.openSettingsDrawer();
     await page.locator("#seedInput").fill("31337");
     await page.locator("#startGameBtn").click();
     await expect(page.locator("#blueHand, #blueBoard").first()).toBeVisible({

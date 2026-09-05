@@ -5,12 +5,15 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
 import fs from "fs";
+import { SvwbPage } from "./qa/pageObject.js";
 
 test.describe("Positions + Checkpoint UI", () => {
   test("save/load buttons, checkpoint/reroll hotkeys and status", async ({
     page,
   }) => {
+    const po = new SvwbPage(page);
     await page.goto("/");
+    await po.openSettingsDrawer();
 
     // Control chrome present
     await expect(page.locator("#savePositionBtn")).toBeVisible();

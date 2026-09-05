@@ -3,6 +3,7 @@
  */
 import { test, expect } from "@playwright/test";
 import path from "path";
+import { setupHermeticPage } from "./helpers/console.js";
 
 const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
 
@@ -10,13 +11,7 @@ test.describe("Interactive target selection", () => {
   test("targeted spell: picker appears and click resolves damage", async ({
     page,
   }) => {
-    const consoleErrors: string[] = [];
-    page.on("console", (msg) => {
-      if (msg.type() === "error") consoleErrors.push(msg.text());
-    });
-    page.on("pageerror", (err) => {
-      consoleErrors.push(String(err));
-    });
+    const consoleErrors = await setupHermeticPage(page);
 
     await page.goto(BASE);
     await page.waitForLoadState("networkidle");

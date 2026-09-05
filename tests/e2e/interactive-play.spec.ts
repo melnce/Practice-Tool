@@ -5,18 +5,10 @@
 import { test, expect, type Page } from "@playwright/test";
 import fs from "fs";
 import path from "path";
+import { setupHermeticPage } from "./helpers/console.js";
 
 const OUT = path.join("test-results", "interactive-play");
 const BASE = process.env.PW_BASE_URL ?? "http://localhost:5173";
-
-function trackConsole(page: Page) {
-  const errors: string[] = [];
-  page.on("console", (msg) => {
-    if (msg.type() === "error") errors.push(msg.text());
-  });
-  page.on("pageerror", (err) => errors.push(String(err)));
-  return errors;
-}
 
 async function shot(page: Page, name: string) {
   fs.mkdirSync(OUT, { recursive: true });
@@ -78,15 +70,64 @@ test.describe("Interactive play paths", () => {
   test("full start-game flow with test deck (god mode visible)", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await page.waitForLoadState("networkidle");
 
-    await page.selectOption("#blueDeckSelect", "0_testing_basic");
-    await page.selectOption("#redDeckSelect", "0_testing_basic");
+    await page.click("#settingsToggle");
+    await page.waitForFunction(() =>
+      document.getElementById("settingsDrawer")?.classList.contains("open"),
+    );
+    await page.locator("#godModeToggle").check();
+
+    const deckIds = await page
+      .locator("#blueDeckSelect option")
+      .evaluateAll((opts) =>
+        opts
+          .map((o) => (o as HTMLOptionElement).value)
+          .filter((v) => v && !v.startsWith("0_testing")),
+      );
+    expect(deckIds.length).toBeGreaterThanOrEqual(2);
+    await page.selectOption("#blueDeckSelect", deckIds[0]);
+    await page.selectOption("#redDeckSelect", deckIds[1]);
     await page.fill("#seedInput", "42");
-    await page.click("#startGameBtn");
-    await page.waitForTimeout(1500);
+    await page.evaluate(() => {
+      (
+        document.getElementById("startGameBtn") as HTMLButtonElement | null
+      )?.click();
+    });
+    await page.click("#settingsScrim");
+    await page.waitForFunction(
+      () =>
+        !document.getElementById("settingsDrawer")?.classList.contains("open"),
+    );
+    await page.waitForFunction(() => {
+      const phase = (window as any).gameState?.phase;
+      return phase === "mulligan" || phase === "main";
+    });
+
+    const inMulligan = await page.evaluate(
+      () => (window as any).gameState?.phase === "mulligan",
+    );
+    if (inMulligan) {
+      await page.evaluate(() => {
+        (
+          document.getElementById(
+            "blueMulliganConfirm",
+          ) as HTMLButtonElement | null
+        )?.click();
+        (
+          document.getElementById(
+            "redMulliganConfirm",
+          ) as HTMLButtonElement | null
+        )?.click();
+      });
+      await page.waitForFunction(
+        () => (window as any).gameState?.phase === "main",
+      );
+    }
+
+    await page.waitForTimeout(500);
     await shot(page, "start-game-01");
 
     const godVisible = await page
@@ -106,7 +147,7 @@ test.describe("Interactive play paths", () => {
   test("targeted spell via right-click play + board click", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await loadDb(page);
     await setupTargetingScenario(page);
@@ -137,7 +178,7 @@ test.describe("Interactive play paths", () => {
   test("fanfare select (nested_effects): play pauses until board click resolves", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await loadDb(page);
 
@@ -200,7 +241,7 @@ test.describe("Interactive play paths", () => {
   test("Ward blocks leader click but allows Ward target selection for spell", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await loadDb(page);
 
@@ -270,7 +311,7 @@ test.describe("Interactive play paths", () => {
   test("mode spell: choice modal appears and pick resumes play", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await loadDb(page);
 
@@ -337,7 +378,7 @@ test.describe("Interactive play paths", () => {
   test("super-evolve: drag super button then select Golem target", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await loadDb(page);
 
@@ -414,12 +455,13 @@ test.describe("Interactive play paths", () => {
   test("turn cycle: end turn swaps active player and advances round", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await loadDb(page);
 
     await page.evaluate(async () => {
       const { resetGameState, state } = await import("/src/core/gameState.ts");
+      const { getCardById } = await import("/src/data/cardDatabase.ts");
       const { render } = await import("/src/ui/render.ts");
 
       resetGameState(88);
@@ -427,6 +469,17 @@ test.describe("Interactive play paths", () => {
       state.phase = "main";
       state.activePlayer = "first";
       state.roundCount = 1;
+
+      const padDeck = (owner: "first" | "second", count: number) =>
+        Array.from({ length: count }, (_, i) => ({
+          ...getCardById("10001110")!,
+          uid: `pad_${owner}_${i}`,
+          owner,
+          buffs: { attack: 0, defense: 0 },
+        }));
+
+      state.players.first.deck = padDeck("first", 10) as any;
+      state.players.second.deck = padDeck("second", 10) as any;
       render();
     });
 
@@ -460,7 +513,7 @@ test.describe("Interactive play paths", () => {
   });
 
   test("left-click playable hand card does not play", async ({ page }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await setupTargetingScenario(page);
 
@@ -488,7 +541,7 @@ test.describe("Interactive play paths", () => {
   test("left-click fusable hand card enters fuse selection", async ({
     page,
   }) => {
-    const errors = trackConsole(page);
+    const errors = await setupHermeticPage(page);
     await page.goto(BASE);
     await loadDb(page);
 

@@ -5,6 +5,7 @@ import { test, expect } from "@playwright/test";
 import fs from "fs";
 import path from "path";
 import { SvwbPage } from "./qa/pageObject.js";
+import { setupHermeticPage } from "./helpers/console.js";
 import blueFund from "./qa/decks/fundamentals-blue.json" with { type: "json" };
 import redFund from "./qa/decks/fundamentals-red.json" with { type: "json" };
 
@@ -25,10 +26,7 @@ async function hoverHandCard(page: import("@playwright/test").Page) {
 test("tooltip counters, crest fallback, and keyword formatting", async ({
   page,
 }) => {
-  const errors: string[] = [];
-  page.on("console", (msg) => {
-    if (msg.type() === "error") errors.push(msg.text());
-  });
+  const errors = await setupHermeticPage(page);
 
   const po = new SvwbPage(page);
   await page.goto("http://localhost:5173/?test=1");
@@ -102,12 +100,27 @@ test("tooltip counters, crest fallback, and keyword formatting", async ({
   const crestImg = page.locator("#blueCrests .crest-image").first();
   await expect(crestImg).toBeVisible();
   const crestSrc = await crestImg.getAttribute("src");
-  expect(crestSrc).toContain("10844110.webp");
-  expect(crestSrc).not.toContain("_token");
+  expect(crestSrc).toContain("10844110_token.webp");
   await page.screenshot({
-    path: path.join(SHOT_DIR, "crest_fallback_art.png"),
+    path: path.join(SHOT_DIR, "crest_token_art.png"),
     fullPage: false,
   });
+
+  const tooltipFallback = await page.evaluate(async () => {
+    const { formatCrestPanels } = await import("/src/ui/tooltipFormat.ts");
+    return formatCrestPanels(
+      [
+        {
+          name: "Drache & Aluzard, Burning Blood",
+          description:
+            "Countdown (2)\nLast Words: Add a Drache & Aluzard, Burning Blood to your hand and set its cost to 2.",
+        },
+      ],
+      "10844110",
+    );
+  });
+  expect(tooltipFallback).toContain("10844110.webp");
+  expect(tooltipFallback).not.toContain("_token");
 
   await page.evaluate(() => {
     const t = (window as any).__svwbTest;

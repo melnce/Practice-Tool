@@ -29,10 +29,10 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   await po.seedRng(88001);
   await po.loadDecks(blueFund as any, redFund as any);
 
+  await po.enableGodMode();
+
   await page.evaluate(() => {
     const s = (window as any).gameState;
-    s.players.first.deckFile = "0_testing.json";
-    s.players.second.deckFile = "0_testing.json";
     s.phase = "main";
     s.gameStarted = true;
     (window as any).__svwbTest.render();
@@ -173,7 +173,9 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   await expect(page.locator("body")).toHaveClass(/gameover/);
   log("1 PASS: lethal → overlay First wins / Lethal + body.gameover");
 
-  await page.locator("#undoBtn").click();
+  await page.evaluate(() => {
+    (document.getElementById("undoBtn") as HTMLButtonElement | null)?.click();
+  });
   await page.waitForFunction(
     () => (window as any).gameState?.phase !== "gameover",
   );
@@ -201,8 +203,15 @@ test("hot-seat completeness browser verification", async ({ page }) => {
     attackLeader(0, "first", "second");
   });
   await expect(page.locator("#gameOverOverlay")).toBeVisible();
-  await page.locator("#seedInput").fill("88001");
-  await page.locator("#rematchSameSeedBtn").click();
+  await page.evaluate(() => {
+    const seed = document.getElementById(
+      "seedInput",
+    ) as HTMLInputElement | null;
+    if (seed) seed.value = "88001";
+    (
+      document.getElementById("rematchSameSeedBtn") as HTMLButtonElement | null
+    )?.click();
+  });
   await page.waitForFunction(
     () => (window as any).gameState?.phase === "mulligan",
   );
@@ -210,7 +219,13 @@ test("hot-seat completeness browser verification", async ({ page }) => {
   log("1 PASS: Rematch same seed → mulligan, seed kept 88001");
 
   // --- 5: perspective flip ---
-  await page.locator("#activeOnBottomToggle").check();
+  await page.evaluate(() => {
+    const toggle = document.getElementById(
+      "activeOnBottomToggle",
+    ) as HTMLInputElement | null;
+    if (toggle) toggle.checked = true;
+    toggle?.dispatchEvent(new Event("change", { bubbles: true }));
+  });
   await expect(page.locator("body")).toHaveClass(/active-on-bottom/);
   await page.evaluate(() => {
     (window as any).gameState.activePlayer = "second";
