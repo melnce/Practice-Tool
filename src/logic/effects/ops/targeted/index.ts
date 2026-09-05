@@ -22,7 +22,7 @@ import { summonExactCopyFromHand, summonFromHand } from "../summon_ops/hand.js";
 import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
 import { isDev } from "../../../../core/env.js";
-import { doAction, isInAction } from "../../../../core/history.js";
+import { doAction } from "../../../../core/history.js";
 import type { CardInstance } from "../../../../core/types/index.js";
 import type { Player } from "../../../../core/types/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
@@ -126,7 +126,7 @@ TARGETED_OP_HANDLERS.set("attacks_per_turn", (ctx) => {
 TARGETED_OP_HANDLERS.set("damage", (ctx) => {
   const { eff, owner, sourceCard, targetUids } = ctx;
   const targets = resolveUids(targetUids);
-  if (targets.length && isInAction()) {
+  if (targets.length) {
     state.__lastSelected = targets[0];
   }
   const amt = resolveAmountWithOverflow(eff, owner, {
@@ -532,22 +532,17 @@ TARGETED_OP_HANDLERS.set("evolve", (ctx) => {
   const targets = resolveUids(targetUids);
   const mode = (eff as any).mode || "normal";
 
-  endDispatch();
-  try {
-    for (const target of targets) {
-      if (!target || target.type !== "Follower" || target.hasEvolved) continue;
-      if (
-        sourceCard &&
-        (eff as any).filter?.not_self &&
-        target.uid === sourceCard.uid
-      )
-        continue;
+  for (const target of targets) {
+    if (!target || target.type !== "Follower" || target.hasEvolved) continue;
+    if (
+      sourceCard &&
+      (eff as any).filter?.not_self &&
+      target.uid === sourceCard.uid
+    )
+      continue;
 
-      handleEvolveSelf(target, owner, { mode, spendPoint: false });
-      logEvent("evolve", { owner, target: target.name, mode });
-    }
-  } finally {
-    startDispatch("evolve");
+    handleEvolveSelf(target, owner, { mode, spendPoint: false });
+    logEvent("evolve", { owner, target: target.name, mode });
   }
 
   return { kind: "handled" };
