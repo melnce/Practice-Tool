@@ -294,6 +294,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "distribution",
     "target",
     "copy_scope",
+    "copy_mode",
     "mode",
     "select",
     "select_count",

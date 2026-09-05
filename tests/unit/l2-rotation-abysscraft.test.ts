@@ -55,6 +55,9 @@ const CHAINS = "10952310";
 const CHAOS_CYCLONE = "10051310";
 const LULUMI = "10751110";
 const REAPERS_DUE = "10953310";
+const ARRIET = "10002110";
+const SUPPLICANT_OF_UNKILLING = "10312110";
+const CONGREGANT_OF_UNKILLING = "10313110";
 const RIGOR = "10553310";
 const SOUL_PREDATION = "10052310";
 const SUPPORT_WOLF = "10551110";
@@ -190,6 +193,20 @@ function allyFollower(
   c.peak_defense = def;
   state.players.first.board.push(c);
   return c;
+}
+
+function hasLastWords(card: ReturnType<typeof createCard>): boolean {
+  if (card.hasLastWords) return true;
+  if (Array.isArray(card.keywords)) {
+    return card.keywords.some(
+      (k) =>
+        k === "LastWords" ||
+        (typeof k === "object" &&
+          k !== null &&
+          (k as { name?: string }).name === "LastWords"),
+    );
+  }
+  return false;
 }
 
 function enemyLastWordsFollower(name = "LWEnemy") {
@@ -400,7 +417,9 @@ describe("L2 — Rotation Abysscraft", () => {
 
     it("grants Last Words summon copy to selected ally; bystander untouched", () => {
       setupTurn(R6, { hand: [REAPERS_DUE], pp: 4 });
-      const target = allyFollower("LWTarget", 2, 3);
+      const target = createCard(ARRIET, "board", "first");
+      target.peak_defense = Number(target.defense);
+      state.players.first.board.push(target);
       const bystander = allyFollower("Bystander", 2, 2);
       whenPlayCard("first", 0);
       resolvePendingByUid(target.uid);
@@ -408,9 +427,99 @@ describe("L2 — Rotation Abysscraft", () => {
       target.defense = 0;
       cleanupDead();
       expect(thenBoard("first").length).toBe(boardBefore);
-      expect(thenBoard("first").some((c) => c.name === "LWTarget")).toBe(true);
+      expect(thenBoard("first").some((c) => c.id === ARRIET)).toBe(true);
       expect(Number(bystander.defense)).toBe(2);
       expect(printed).toContain("Summon a copy");
+    });
+
+    it("granted Last Words on buffed/debuffed follower summons printed copy — no LW, printed stats", () => {
+      setupTurn(R6, { hand: [REAPERS_DUE], pp: 4 });
+      const arriet = createCard(ARRIET, "board", "first");
+      arriet.peak_defense = Number(arriet.defense);
+      state.players.first.board.push(arriet);
+      whenPlayCard("first", 0);
+      resolvePendingByUid(arriet.uid);
+      expect(hasLastWords(arriet)).toBe(true);
+      arriet.attack = Number(arriet.attack) + 1;
+      arriet.defense = Number(arriet.defense) + 1;
+      arriet.defense = Number(arriet.defense) - 3;
+      const originalUid = arriet.uid;
+      arriet.defense = 0;
+      cleanupDead();
+      const copies = thenBoard("first").filter((c) => c.id === ARRIET);
+      expect(copies).toHaveLength(1);
+      const copy = copies[0]!;
+      expect(copy.uid).not.toBe(originalUid);
+      expect(Number(copy.attack)).toBe(3);
+      expect(Number(copy.defense)).toBe(3);
+      expect(Number(copy.cost)).toBe(3);
+      expect(hasLastWords(copy)).toBe(false);
+      expect(copy.buffs ?? {}).toEqual({});
+      const countBefore = thenBoard("first").length;
+      copy.defense = 0;
+      cleanupDead();
+      expect(thenBoard("first").length).toBe(countBefore - 1);
+      expect(thenBoard("first").some((c) => c.id === ARRIET)).toBe(false);
+      expect(printed).toContain("Summon a copy of this card");
+    });
+
+    it("Arriet + Supplicant soak shape — one printed Arriet remains, game continues", () => {
+      setupTurn(R10, {
+        hand: [REAPERS_DUE, SUPPLICANT_OF_UNKILLING],
+        pp: 10,
+      });
+      const arriet = createCard(ARRIET, "board", "first");
+      arriet.peak_defense = Number(arriet.defense);
+      state.players.first.board.push(arriet);
+      whenPlayCard("first", 0);
+      resolvePendingByUid(arriet.uid);
+      whenPlayCard("first", 0);
+      arriet.attack = Number(arriet.attack);
+      arriet.defense = Math.max(0, Number(arriet.defense) - 3);
+      const originalUid = arriet.uid;
+      arriet.defense = 0;
+      cleanupDead();
+      const arriets = thenBoard("first").filter((c) => c.id === ARRIET);
+      expect(arriets).toHaveLength(1);
+      const copy = arriets[0]!;
+      expect(copy.uid).not.toBe(originalUid);
+      expect(Number(copy.attack)).toBe(3);
+      expect(Number(copy.defense)).toBe(3);
+      expect(hasLastWords(copy)).toBe(false);
+      copy.defense = 0;
+      cleanupDead();
+      expect(thenBoard("first").filter((c) => c.id === ARRIET)).toHaveLength(0);
+      expect(state.gameOver).toBeFalsy();
+    });
+  });
+
+  describe("Congregant of Unkilling (10313110)", () => {
+    const printed =
+      "When this card enters the field, summon an exact copy of it and give the exact copy -0/-1.";
+
+    it("exact copy keeps -0/-1 and source current stats (buffed source)", () => {
+      setupTurn(R10, { hand: [CONGREGANT_OF_UNKILLING], pp: 9 });
+      for (let i = 0; i < 3; i++) {
+        allyFollower(`Ally${i}`, 1, 1);
+      }
+      const inHand = getHand(state, "first").find(
+        (c) => c.id === CONGREGANT_OF_UNKILLING,
+      )!;
+      inHand.attack = 5;
+      inHand.defense = 7;
+      whenPlayCard("first", 0);
+      const copies = thenBoard("first")
+        .filter((c) => c.id === CONGREGANT_OF_UNKILLING)
+        .map((c) => ({
+          atk: Number(c.attack),
+          def: Number(c.defense),
+        }))
+        .sort((a, b) => b.def - a.def);
+      expect(copies).toEqual([
+        { atk: 5, def: 7 },
+        { atk: 5, def: 6 },
+      ]);
+      expect(printed).toContain("exact copy");
     });
   });
 
