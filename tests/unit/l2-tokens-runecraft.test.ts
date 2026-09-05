@@ -85,6 +85,19 @@ const CRYSTALSPAWN = "10631110";
 
 const CALGE_FAITH = faithCrestNameForCard("Calge-Danthla, Eld Crystals");
 const DEPTHS_SEED = 42;
+/** Pinned under setupDepthsFaith(5) + DEPTHS_SEED (seed 42). */
+const DEPTHS_FAITH5_SPLIT = { X: 1, Y: 2, Z: 2 } as const;
+
+function expectFaith5RandomSplit(split: {
+  total: number;
+  parts: Record<string, number>;
+}): void {
+  expect(split.total).toBe(5);
+  expect(split.parts).toEqual(DEPTHS_FAITH5_SPLIT);
+  expect(
+    (split.parts.X ?? 0) + (split.parts.Y ?? 0) + (split.parts.Z ?? 0),
+  ).toBe(5);
+}
 
 const R6 = 6;
 const R7 = 7;
@@ -912,11 +925,9 @@ describe("L2 — Runecraft tokens", () => {
       setupDepthsFaith(5);
       const uidsBefore = boardUids();
       whenPlayCard("first", 0);
-      const { parts } = readRandomSplit();
-      const X = parts.X ?? 0;
-      const Y = parts.Y ?? 0;
-      const Z = parts.Z ?? 0;
-      expect(X + Y + Z).toBe(5);
+      const split = readRandomSplit();
+      expectFaith5RandomSplit(split);
+      const { X } = DEPTHS_FAITH5_SPLIT;
       const summoned = newBoardCards(uidsBefore, "first", CRYSTALSPAWN);
       expect(summoned).toHaveLength(1);
       const spawn = summoned[0]!;
@@ -932,8 +943,9 @@ describe("L2 — Runecraft tokens", () => {
       clearLogs();
       setupDepthsFaith(5, 15);
       whenPlayCard("first", 0);
-      const Y = readRandomSplit().parts.Y ?? 0;
-      expect(getHP(state, "first")).toBe(15 + Y);
+      const split = readRandomSplit();
+      expectFaith5RandomSplit(split);
+      expect(getHP(state, "first")).toBe(15 + DEPTHS_FAITH5_SPLIT.Y);
       expect(printed).toContain("Restore Y defense");
     });
 
@@ -943,8 +955,9 @@ describe("L2 — Runecraft tokens", () => {
       setupDepthsFaith(5);
       state.players.second.hp = 20;
       whenPlayCard("first", 0);
-      const Z = readRandomSplit().parts.Z ?? 0;
-      expect(getHP(state, "second")).toBe(20 - Z);
+      const split = readRandomSplit();
+      expectFaith5RandomSplit(split);
+      expect(getHP(state, "second")).toBe(20 - DEPTHS_FAITH5_SPLIT.Z);
       expect(printed).toContain("Deal Z damage");
     });
 
