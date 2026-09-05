@@ -14,6 +14,9 @@ import {
   enqueueDeathLwGroup,
   getResolutionQueue,
   clearResolutionQueue,
+  resolveDeathLwCard,
+  resolveDeathLeaveContext,
+  resolveQueuedTriggerCard,
 } from "./triggers/queue.js";
 import {
   opponentOf,
@@ -51,8 +54,10 @@ function sortLwItems(queue: DeathLwItem[]) {
     const aActive = a.owner === activePlayer ? 0 : 1;
     const bActive = b.owner === activePlayer ? 0 : 1;
     if (aActive !== bActive) return aActive - bActive;
+    const aCard = resolveDeathLwCard(a);
+    const bCard = resolveDeathLwCard(b);
     return (
-      ((a.card as any).insertionTs ?? 0) - ((b.card as any).insertionTs ?? 0)
+      ((aCard as any)?.insertionTs ?? 0) - ((bCard as any)?.insertionTs ?? 0)
     );
   });
 }
@@ -61,8 +66,8 @@ function sortLwItems(queue: DeathLwItem[]) {
 function sortLeaveItems(queue: DeathLeaveItem[]) {
   const activePlayer = state.activePlayer;
   queue.sort((a, b) => {
-    const leavingA = a.context.leavingOwner;
-    const leavingB = b.context.leavingOwner;
+    const leavingA = a.leavingOwner;
+    const leavingB = b.leavingOwner;
     const aActive = leavingA !== activePlayer ? 0 : 1;
     const bActive = leavingB !== activePlayer ? 0 : 1;
     if (aActive !== bActive) return aActive - bActive;
@@ -83,11 +88,15 @@ function dispatchLeaveTriggers(
     leaveBatch.push({
       event: "ally_follower_leaves_field",
       activePlayer: owner,
+      leavingCardUid: card.uid,
+      leavingOwner: owner,
       context: allyCtx,
     });
     leaveBatch.push({
       event: "enemy_follower_leaves_field",
       activePlayer: owner,
+      leavingCardUid: card.uid,
+      leavingOwner: owner,
       context: enemyCtx,
     });
     return;
@@ -174,9 +183,11 @@ function buryResolutionQueueWithoutTriggers(
   }
   clearResolutionQueue();
 
-  for (const { card, owner } of toBury) {
+  for (const lwItem of toBury) {
+    const card = resolveDeathLwCard(lwItem);
+    if (!card) continue;
     (card as any)._lwFired = true;
-    sendToGrave(card, owner);
+    sendToGrave(card, lwItem.owner);
   }
 
   compactAllBoards();
@@ -187,10 +198,11 @@ function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
   for (let i = start; i < item.entries.length; i++) {
     if (isGameOver()) return "done";
     const entry = item.entries[i]!;
+    const sourceCard = resolveQueuedTriggerCard(entry);
     const result = runEffects(
       entry.trigger.effects || [],
       entry.owner,
-      entry.card,
+      sourceCard,
       entry.context,
     );
     if (result === "pending" || state.pendingTargetEffect) {
@@ -210,6 +222,8 @@ function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
 /** Flush unified resolution queue: reactive triggers + deferred death batches (C4). */
 export function flushDeferredDeathBatch() {
   const MAX_ROUNDS = 32;
+  const MAX_DRAIN_STEPS = 5000;
+  let drainSteps = 0;
   let halted = false;
   let haltPendingLw: DeathLwItem[] = [];
 
@@ -230,6 +244,26 @@ export function flushDeferredDeathBatch() {
           break;
         }
 
+        drainSteps++;
+        if (drainSteps > MAX_DRAIN_STEPS) {
+          const q = getResolutionQueue();
+          const head = q[0];
+          const kind = head?.kind ?? "unknown";
+          const event =
+            head?.kind === "reactive"
+              ? head.event
+              : head?.kind === "death_leave"
+                ? head.items[0]?.event
+                : head?.kind === "death_lw"
+                  ? resolveDeathLwCard(head.items[0]!)?.name
+                  : "unknown";
+          throw new Error(
+            `[Triggers] Resolution drain exceeded ${MAX_DRAIN_STEPS} steps. ` +
+              `Queue length: ${q.length}. Head: ${kind}/${event}. ` +
+              `This indicates an infinite loop in trigger effects.`,
+          );
+        }
+
         const item = q[0]!;
 
         if (item.kind === "death_leave") {
@@ -244,7 +278,7 @@ export function flushDeferredDeathBatch() {
             fireTriggerImmediate(
               leave.event,
               leave.activePlayer,
-              leave.context,
+              resolveDeathLeaveContext(leave),
             );
           }
         } else if (item.kind === "death_lw") {
@@ -257,20 +291,23 @@ export function flushDeferredDeathBatch() {
               halted = true;
               break;
             }
-            const { card: c, owner } = lwBatch[i]!;
-            const paused = triggerLastWords(c, owner);
+            const lwItem = lwBatch[i]!;
+            const card = resolveDeathLwCard(lwItem);
+            if (!card) continue;
+            const owner = lwItem.owner;
+            const paused = triggerLastWords(card, owner);
             if (paused === "pending" || state.pendingTargetEffect) {
               enqueueDeathLwGroup(lwBatch.slice(i));
               if (state.pendingTargetEffect) {
                 state.pendingTargetEffect.deferredLwComplete = {
-                  cardUid: c.uid,
+                  cardUid: card.uid,
                   owner,
                 };
               }
               compactAllBoards();
               return;
             }
-            sendToGrave(c, owner);
+            sendToGrave(card, owner);
           }
         } else {
           const status = executeReactiveGroup(item);
@@ -309,11 +346,17 @@ export function completeDeferredLwAfterSelection(request?: {
   const q = getResolutionQueue();
   for (const item of q) {
     if (item.kind !== "death_lw") continue;
-    const idx = item.items.findIndex((x) => x.card.uid === request.cardUid);
+    const idx = item.items.findIndex((x) => x.cardUid === request.cardUid);
     if (idx < 0) continue;
-    const { card, owner } = item.items.splice(idx, 1)[0]!;
-    (card as any)._lwFired = true;
-    sendToGrave(card, owner);
+    const resolved = resolveDeathLwCard(item.items[idx]!);
+    if (!resolved) {
+      item.items.splice(idx, 1);
+      continue;
+    }
+    const owner = item.items[idx]!.owner;
+    item.items.splice(idx, 1);
+    (resolved as any)._lwFired = true;
+    sendToGrave(resolved, owner);
     if (item.items.length === 0) {
       const qi = q.indexOf(item);
       if (qi >= 0) q.splice(qi, 1);
@@ -332,7 +375,9 @@ export function resumeDeferredDeathIfIdle(): void {
 export function cleanupDead() {
   if (state.suppressCleanup) return;
 
-  const defer = !!(state as any).deferDeathTriggers;
+  const defer =
+    !!(state as any).deferDeathTriggers ||
+    !!(state as any)._drainingResolutionQueue;
 
   const toNum = (v: any): number =>
     typeof v === "number" ? v : v == null ? 0 : +v;
@@ -467,6 +512,8 @@ export function cleanupDead() {
           leaveBatch.push({
             event: "ally_ward_destroyed",
             activePlayer: owner,
+            leavingCardUid: c.uid,
+            leavingOwner: owner,
             context: { destroyedCard: c },
           });
         } else {
@@ -480,6 +527,8 @@ export function cleanupDead() {
         leaveBatch.push({
           event: "ally_amulet_destroyed",
           activePlayer: owner,
+          leavingCardUid: c.uid,
+          leavingOwner: owner,
           context: {
             destroyedCard: c,
             leavingCard: c,
@@ -508,9 +557,9 @@ export function cleanupDead() {
         uid: c.uid,
       });
       if (defer) {
-        lwDefer.push({ card: c, owner });
+        lwDefer.push({ cardUid: c.uid, owner, card: c });
       } else {
-        lwSync.push({ card: c, owner });
+        lwSync.push({ cardUid: c.uid, owner, card: c });
       }
     } else {
       sendToGrave(c, owner);
@@ -526,13 +575,15 @@ export function cleanupDead() {
   if (lwSync.length > 0) {
     sortLwItems(lwSync);
     for (let i = 0; i < lwSync.length; i++) {
-      const { card: c, owner } = lwSync[i]!;
-      const paused = triggerLastWords(c, owner);
+      const { owner } = lwSync[i]!;
+      const card = resolveDeathLwCard(lwSync[i]!);
+      if (!card) continue;
+      const paused = triggerLastWords(card, owner);
       if (paused === "pending" || state.pendingTargetEffect) {
         enqueueDeathLwGroup(lwSync.slice(i));
         return;
       }
-      sendToGrave(c, owner);
+      sendToGrave(card, owner);
     }
   }
   compactAllBoards();

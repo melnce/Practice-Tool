@@ -32,6 +32,7 @@ import type { CardInstance, Player } from "../../../core/types/index.js";
 import type { TriggerContext, TriggerEventName } from "./types.js";
 import type { QueuedTriggerEntry } from "./process.js";
 import { dispatchEvent } from "./dispatcher.js";
+import { resolveUid } from "../../../core/uidResolver.js";
 
 export const MAX_RESOLUTION_QUEUE_LENGTH = 500;
 
@@ -55,12 +56,17 @@ export const TURN_BOUNDARY_EVENTS = new Set<TriggerEventName>([
 export type DeathLeaveItem = {
   event: TriggerEventName;
   activePlayer: Player;
-  context: TriggerContext;
+  leavingCardUid: string;
+  leavingOwner: Player;
+  /** @deprecated Stale clone fallback — prefer leavingCardUid at drain. */
+  context?: TriggerContext;
 };
 
 export type DeathLwItem = {
-  card: CardInstance;
+  cardUid: string;
   owner: Player;
+  /** @deprecated Stale clone fallback — prefer cardUid at drain. */
+  card?: CardInstance;
 };
 
 export type ReactiveQueueItem = {
@@ -130,12 +136,14 @@ function recentCardNamesForGuard(limit = 3): string[] {
       }
     } else if (item.kind === "death_lw") {
       for (let j = item.items.length - 1; j >= 0 && names.length < limit; j--) {
-        const n = item.items[j]?.card?.name;
+        const n = resolveDeathLwCard(item.items[j]!)?.name;
         if (n) names.push(n);
       }
     } else if (item.kind === "death_leave") {
       for (let j = item.items.length - 1; j >= 0 && names.length < limit; j--) {
-        const n = item.items[j]?.context?.leavingCard?.name;
+        const uid = item.items[j]?.leavingCardUid;
+        if (!uid) continue;
+        const n = resolveUid(uid)?.name;
         if (n) names.push(n);
       }
     }
@@ -196,6 +204,48 @@ export function collectReactiveTriggers(
     delete (state as any)._reactiveCollector;
   }
   return entries;
+}
+
+export function resolveDeathLwCard(item: DeathLwItem): CardInstance | null {
+  const live = resolveUid(item.cardUid);
+  if (live) return live;
+  const stale = item.card;
+  if (stale?.uid === item.cardUid) return stale;
+  return null;
+}
+
+export function resolveDeathLeaveContext(item: DeathLeaveItem): TriggerContext {
+  const card = resolveUid(item.leavingCardUid);
+  if (card) {
+    return {
+      leavingCard: card,
+      leavingOwner: item.leavingOwner,
+      leavingCardUid: item.leavingCardUid,
+    };
+  }
+  const stale = item.context?.leavingCard;
+  if (stale?.uid === item.leavingCardUid) {
+    return {
+      ...item.context,
+      leavingCard: stale,
+      leavingOwner: item.leavingOwner,
+    };
+  }
+  return {
+    leavingOwner: item.leavingOwner,
+    leavingCardUid: item.leavingCardUid,
+  };
+}
+
+export function resolveQueuedTriggerCard(entry: {
+  cardUid?: string;
+  card?: any;
+}): any {
+  if (entry.cardUid) {
+    const live = resolveUid(entry.cardUid);
+    if (live) return live;
+  }
+  return entry.card ?? null;
 }
 
 /** Synchronous trigger dispatch — used at drain time and for non-reactive events. */

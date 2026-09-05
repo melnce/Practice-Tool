@@ -1,6 +1,12 @@
 /**
  * Obsessed Test Subject (10931110) — named_enter_count on enter-trigger route.
  * Drache & Aluzard (10844110) — named_enter_count on Fanfare route (regression pin).
+ *
+ * Enter triggers are reactive (queued behind the resolving effect). All enters
+ * from one effect complete — and are recorded in followerEnterHistory — before
+ * any of their enter triggers drain. The printed gate counts "other allied copies
+ * that have entered this match"; copies summoned earlier in the same effect count
+ * as "other" when a later copy's trigger fires.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
@@ -68,7 +74,7 @@ describe("Obsessed Test Subject — named_enter_count enter-trigger route", () =
     setupBase();
   });
 
-  it("copies 1–5 are unbuffed; copy 6 is 5/5", () => {
+  it("isolated summons: copies 1–5 unbuffed; copy 6 is 5/5", () => {
     for (let i = 1; i <= 5; i++) {
       const copy = summonOTS();
       expect(isBuffed(copy)).toBe(false);
@@ -100,7 +106,7 @@ describe("Obsessed Test Subject — named_enter_count enter-trigger route", () =
     expect(isBuffed(sixth)).toBe(true);
   });
 
-  it("Sephie Fanfare summons — 5th unbuffed, 6th buffed", () => {
+  it("Sephie Fanfare — batched summons share enter history before triggers drain", () => {
     for (let i = 0; i < 4; i++) summonOTS();
     clearBoardKeepHistory();
     expect(countNamedEnters(state, "first", OTS)).toBe(4);
@@ -110,7 +116,9 @@ describe("Obsessed Test Subject — named_enter_count enter-trigger route", () =
 
     const summoned = getBoard(state, "first").filter((c) => c?.name === OTS);
     expect(summoned.length).toBe(2);
-    expect(isBuffed(summoned[0]!)).toBe(false);
+    // Both Fanfare summons recorded before either enter trigger: 4 prior + the
+    // sibling from the same effect = 5 "other" copies for each gate check.
+    expect(isBuffed(summoned[0]!)).toBe(true);
     expect(isBuffed(summoned[1]!)).toBe(true);
   });
 });

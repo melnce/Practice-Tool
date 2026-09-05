@@ -101,6 +101,17 @@ export function summonExactCopy(
   if (clone.base_defense == null) clone.base_defense = clone.defense;
   if (clone.peak_defense == null) clone.peak_defense = clone.defense;
 
+  // Last Words / off-board copies: a corpse at 0 defense must not spawn another
+  // 0-defense clone (Reaper's Due LW loop during deferred death flush). Living
+  // copies (Congregant enter) keep current stats including buffs.
+  if (clone.defense <= 0) {
+    clone.attack =
+      parseInt(String(clone.base_attack ?? clone.attack ?? 0), 10) || 0;
+    clone.defense =
+      parseInt(String(clone.base_defense ?? clone.defense ?? 0), 10) || 0;
+    clone.peak_defense = clone.defense;
+  }
+
   // Re-derive keyword flags (Rush/Storm/etc.) from keywords list
   applyKeywordsFromList(clone);
 

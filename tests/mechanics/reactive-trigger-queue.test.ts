@@ -1,5 +1,5 @@
 /**
- * Reactive trigger queue — rulebook L194/L209 (Stage A).
+ * Reactive trigger queue — rulebook L194/L209 (Stage A/B).
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "../audit/setup.js";
@@ -11,18 +11,23 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { dealDamage } from "../../src/logic/core/barrier.js";
 import {
   cleanupDead,
   flushDeferredDeathBatch,
 } from "../../src/logic/core/cleanup.js";
-import { getBoard, getCrests } from "../../src/core/playerHelpers.js";
+import {
+  getBoard,
+  getCrests,
+  getGraveyard,
+} from "../../src/core/playerHelpers.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import {
   doAction,
   undo,
+  redo,
   canUndo,
+  canRedo,
   isHistoryEnabled,
   setHistoryEnabled,
 } from "../../src/core/history.js";
@@ -31,6 +36,9 @@ import "../../src/logic/core/effects/index.js";
 
 const NETHERWORLD_LT = "10951120";
 const KRULLE = "10314110";
+const REAPERS_DUE = "10953310";
+const SUPPLICANT_UNKILLING = "10312110";
+const ARIETT = "10002110";
 
 function addKrulleEnterCrest(player: "first" | "second") {
   const card = getCardById(KRULLE);
@@ -64,31 +72,98 @@ describe("Reactive trigger queue", () => {
   });
 
   it("Krulle crest enter debuff resolves after Lieutenant Last Words (+1/+0, LW removed) — no loop", () => {
-    givenGameState({ seed: 42, activePlayer: "first" }).build();
-    addKrulleEnterCrest("first");
+    // Krulle SE gives crest to opponent; LT on crest owner's board so ally_follower_enter fires.
+    givenGameState({ seed: 42, activePlayer: "first" })
+      .withFirstDeck([
+        { name: "Filler", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ])
+      .withSecondDeck([
+        { name: "Filler", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ])
+      .build();
+    addKrulleEnterCrest("second");
 
-    const lt = createCard(NETHERWORLD_LT, "board", "first");
+    const lt = createCard(NETHERWORLD_LT, "board", "second");
     applyKeywordsFromList(lt);
     lt.uid = "lt_original";
-    state.players.first.board = [lt];
+    state.players.second.board = [lt];
 
-    (state as any).deferDeathTriggers = true;
-    lt.defense = 0;
-    cleanupDead();
-    (state as any).deferDeathTriggers = false;
-    flushDeferredDeathBatch();
+    whenRunEffects(
+      [
+        {
+          op: "destroy",
+          target: "enemy:follower",
+          filter: { name: "Netherworld Lieutenant" },
+        },
+      ],
+      "first",
+    );
 
-    // Summoned copy reaches 1/0 after +1/+0 then -1/-1; both corpses leave the board.
-    expect(countLieutenantsOn("first")).toBe(0);
-    const graveLts = state.players.first.graveyard.filter(
+    expect(countLieutenantsOn("second")).toBe(0);
+    const graveLts = getGraveyard(state, "second").filter(
       (c) => c.name === "Netherworld Lieutenant",
     );
     expect(graveLts.length).toBe(2);
   });
 
+  it("soak seed 20260913 game 123 — Reaper's Due LW copy at 0 def does not loop during drain", () => {
+    givenGameState({ seed: 20260913, activePlayer: "first" })
+      .withFirstDeck([
+        { name: "Pad", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ])
+      .withSecondDeck([
+        { name: "Pad", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ])
+      .build();
+
+    const arriet = createCard(ARIETT, "board", "second");
+    applyKeywordsFromList(arriet);
+    arriet.attack = 5;
+    arriet.defense = 3;
+    arriet.base_attack = 3;
+    arriet.base_defense = 3;
+
+    const lwKw = (getCardById(REAPERS_DUE)!.spell as any[])[0].keywords[0];
+    arriet.keywords = [lwKw];
+    arriet.hasLastWords = true;
+    arriet.lastWordsEffects = lwKw.effects;
+    applyKeywordsFromList(arriet);
+
+    state.players.second.board = [arriet];
+
+    const supplicant = createCard(SUPPLICANT_UNKILLING, "board", "first");
+    applyKeywordsFromList(supplicant);
+    state.players.first.board = [supplicant];
+
+    whenRunEffects(
+      [
+        {
+          op: "stat",
+          action: "give",
+          target: "enemy:follower",
+          attack: 0,
+          defense: -3,
+        },
+      ],
+      "first",
+      supplicant,
+    );
+
+    const secondBoard = getBoard(state, "second").filter(Boolean);
+    expect(secondBoard.some((c) => c?.name === "Arriet, Luxminstrel")).toBe(
+      true,
+    );
+    expect(secondBoard.every((c) => Number(c?.defense) > 0)).toBe(true);
+    expect(
+      getGraveyard(state, "second").filter(
+        (c) => c.name === "Arriet, Luxminstrel",
+      ).length,
+    ).toBe(1);
+  });
+
   it("summon +1/+0 before enter -1/-1: 1/1 Goblin survives at 1/1", () => {
     givenGameState({ seed: 43, activePlayer: "first" }).build();
-    addKrulleEnterCrest("first");
+    addKrulleEnterCrest("second");
 
     whenRunEffects(
       [
@@ -101,10 +176,10 @@ describe("Reactive trigger queue", () => {
           defense: 0,
         },
       ],
-      "first",
+      "second",
     );
 
-    const goblin = getBoard(state, "first").find((c) => c?.name === "Goblin")!;
+    const goblin = getBoard(state, "second").find((c) => c?.name === "Goblin")!;
     expect(goblin).toBeTruthy();
     expect(Number(goblin.attack)).toBe(1);
     expect(Number(goblin.defense)).toBe(1);
@@ -124,34 +199,13 @@ describe("Reactive trigger queue", () => {
           {
             event: "ally_follower_enter",
             source: "board",
-            effects: [
-              {
-                op: "stat",
-                action: "set",
-                target: "self",
-                attack: 9,
-              },
-            ],
+            effects: [{ op: "stat", action: "set", target: "self", attack: 9 }],
           },
         ],
       },
       "board",
       "first",
     );
-    observer.triggers![0]!.effects[0] = {
-      op: "stat",
-      action: "set",
-      target: "self",
-      attack: 9,
-    };
-    // Patch run via flag on observer
-    observer.triggers = [
-      {
-        event: "ally_follower_enter",
-        source: "board",
-        effects: [{ op: "stat", action: "set", target: "self", attack: 9 }],
-      },
-    ];
 
     const victim = createCard(
       {
@@ -197,12 +251,10 @@ describe("Reactive trigger queue", () => {
       "first",
     );
 
+    expect(Number(observer.attack)).toBe(9);
     const goblins = getBoard(state, "first").filter(
       (c) => c?.name === "Goblin",
     );
-    // LW summoned one Goblin, then summon op added another → 2 if enter fired between;
-    // destroy-then-summon: LW goblin first (observer still 1 atk), then summon goblin triggers enter
-    expect(Number(observer.attack)).toBe(9);
     expect(goblins.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -272,7 +324,6 @@ describe("Reactive trigger queue", () => {
       "first",
     );
 
-    // Enter from summon op fires before LW from destroy
     expect(Number(observer.attack)).toBe(9);
   });
 
@@ -328,7 +379,7 @@ describe("Reactive trigger queue", () => {
     expect(Number(buffTarget.attack)).toBeGreaterThan(atkBefore);
   });
 
-  it("undo across queued-trigger pause does not resurrect or lose queue state", () => {
+  it("undo across queued-trigger pause resolves against live board instances after redo", () => {
     const prevHistory = isHistoryEnabled();
     setHistoryEnabled(true);
     try {
@@ -367,6 +418,8 @@ describe("Reactive trigger queue", () => {
       );
       applyKeywordsFromList(lwVictim);
       const buffTarget = createCard("10001110", "board", "first");
+      buffTarget.uid = "buff_tgt";
+      const victimUid = lwVictim.uid;
       state.players.first.board = [buffTarget, lwVictim];
 
       doAction(
@@ -386,11 +439,30 @@ describe("Reactive trigger queue", () => {
       expect(canUndo()).toBe(true);
 
       undo({ autoRender: false });
-
       expect(state.pendingTargetEffect).toBeUndefined();
-      expect(
-        getBoard(state, "first").some((c) => c?.uid === lwVictim.uid),
-      ).toBe(true);
+      const liveVictim = getBoard(state, "first").find(
+        (c) => c?.uid === victimUid,
+      );
+      expect(liveVictim).toBeTruthy();
+      expect(getBoard(state, "first").includes(liveVictim!)).toBe(true);
+
+      redo({ autoRender: false });
+      expect(state.pendingTargetEffect).toBeDefined();
+
+      const liveBuff = getBoard(state, "first").find(
+        (c) => c?.uid === buffTarget.uid,
+      );
+      expect(liveBuff).toBeTruthy();
+      expect(getBoard(state, "first").includes(liveBuff!)).toBe(true);
+
+      const atkBefore = Number(liveBuff!.attack);
+      resolvePendingTarget(liveBuff!.uid);
+      expect(state.pendingTargetEffect).toBeUndefined();
+      expect(Number(liveBuff!.attack)).toBeGreaterThan(atkBefore);
+      expect(getBoard(state, "first").some((c) => c?.uid === victimUid)).toBe(
+        false,
+      );
+      expect(canRedo()).toBe(false);
     } finally {
       setHistoryEnabled(prevHistory);
     }

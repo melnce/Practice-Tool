@@ -41,6 +41,7 @@ export interface ProcessingCandidate {
 export interface QueuedTriggerEntry {
   trigger: TriggerSpec;
   card: any;
+  cardUid?: string;
   owner: Player;
   source: string;
   context: TriggerContext;
@@ -214,6 +215,7 @@ export function processCandidateTriggers(
         collector.push({
           trigger,
           card,
+          cardUid: card?.uid,
           owner,
           source,
           context,
