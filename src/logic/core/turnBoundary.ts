@@ -122,16 +122,21 @@ function preJudgeLeadingGate(
 
   const spec = normalizeToGateSpec(effects[0]);
   const passed = evaluateCondition(spec, owner, card);
+  const rest = effects.slice(1);
+
   if (!passed) {
-    logEvent("turnBoundaryGateSkipped", {
-      card: card.name,
-      condition: spec.condition,
-      owner,
-    });
-    return null;
+    const elseBranch = spec.else_effects || [];
+    if (elseBranch.length === 0) {
+      logEvent("turnBoundaryGateSkipped", {
+        card: card.name,
+        condition: spec.condition,
+        owner,
+      });
+      return null;
+    }
+    return { ...trigger, effects: [...elseBranch, ...rest] };
   }
 
-  const rest = effects.slice(1);
   const ungated = [...(spec.effects || []), ...rest];
   return { ...trigger, effects: ungated };
 }
