@@ -5,7 +5,7 @@ import { logEvent } from "../../core/logger.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
 import type { TriggerContext } from "./triggers/types.js";
 import { getBoard, toSlot } from "../../core/playerHelpers.js";
-import { cleanupDead } from "./cleanup.js";
+import { cleanupDead, resumeDeferredDeathIfIdle } from "./cleanup.js";
 
 // Helper interface for card with barrier properties
 interface BarrierCard extends CardInstance {
@@ -82,6 +82,9 @@ export function flushPendingSelfDamagedTriggers(): void {
     const item = queue.shift()!;
     fireTrigger("self_damaged", item.owner, item.context);
     cleanupDead();
+  }
+  if (!(state as any).deferDeathTriggers) {
+    resumeDeferredDeathIfIdle();
   }
 }
 

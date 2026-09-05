@@ -250,20 +250,20 @@ export function runEffects(
     ) {
       flushDeferredDeckShuffle();
     }
-    if (enableDeathDefer) {
+    if (enableDeathDefer || batchTurnBoundary) {
       (state as any).deferDeathTriggers = false;
-      // Interactive pause: defer flush until target/mode resolution completes.
-      // Skip re-entrant flush while the unified resolution queue is draining.
-      if (
-        !paused &&
-        !state.pendingTargetEffect &&
-        !(state as any)._drainingResolutionQueue
-      ) {
-        flushDeferredDeathBatch();
-        clearResolutionQueue();
-      }
-    } else if (batchTurnBoundary) {
-      (state as any).deferDeathTriggers = false;
+    }
+    // Drain reactive queue at end of top-level runEffects even during combat
+    // (death deferral stays gated by enableDeathDefer above).
+    if (
+      runDepth === 0 &&
+      !paused &&
+      !state.pendingTargetEffect &&
+      !(state as any)._drainingResolutionQueue &&
+      !batchTurnBoundary
+    ) {
+      flushDeferredDeathBatch();
+      clearResolutionQueue();
     }
   }
 
