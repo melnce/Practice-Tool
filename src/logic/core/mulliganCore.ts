@@ -120,11 +120,11 @@ export function confirmMulliganCore(
             toPutBack.push(hand.splice(i, 1)[0]!);
           }
         }
-        deck.push(...toPutBack);
-        shuffleInPlace(deck);
         while (hand.length < 4 && deck.length > 0) {
           drawCard(hand, deck, owner);
         }
+        deck.push(...toPutBack);
+        shuffleInPlace(deck);
       }
 
       logEvent("mulligan", { owner, kept: [...hand.map((c) => c.name)] });
