@@ -138,6 +138,22 @@ describe("history round-trip soak", () => {
     },
   );
 
+  it.fails(
+    "engine dispatch: UNDO leaves null board slot (seed 20260909 game 14)",
+    async () => {
+      const result = await runSoakGame({
+        seed: 20260909,
+        gameIndex: 14,
+        historyCheck: true,
+        dispatch: ENGINE,
+      });
+      expect(
+        result.outcome,
+        result.error ?? `game 14 outcome ${result.outcome}`,
+      ).toBe("completed");
+    },
+  );
+
   // Core dispatch (dispatch.ts) uses playCardNoRender — no beginAction before mutations.
   it.fails(
     "deferDeathTriggers restored after PLAY_CARD undo (core dispatch path, seed 20260908 game 17 action 40)",
