@@ -1424,37 +1424,33 @@ describe("Guard — unknown trigger.condition keys", () => {
     state.gameStarted = true;
   });
 
-  // evalCommonConditions ignores unrecognized keys (returns true); PR #210 used shadows_at_least — not in src/.
-  it.fails(
-    "unknown trigger.condition key must not silently pass evalCommonConditions",
-    () => {
-      const follower = createCard(
-        {
-          name: "BadCondition",
-          type: "Follower",
-          cost: 1,
-          attack: 1,
-          defense: 1,
-          triggers: [
-            {
-              type: "start_of_turn_own",
-              condition: { shadows_at_least: 999 },
-              effects: [{ op: "damage", target: "enemy:leader", amount: 5 }],
-            },
-          ],
-        },
-        "board",
-        "first",
-      );
-      state.players.first.board = [follower];
-      state.players.first.shadows = 0;
-      const hpBefore = getHP(state, "second");
+  // evalCommonConditions rejects unrecognized keys in dev/test.
+  it("unknown trigger.condition key must not silently pass evalCommonConditions", () => {
+    const follower = createCard(
+      {
+        name: "BadCondition",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        triggers: [
+          {
+            type: "start_of_turn_own",
+            condition: { shadows_at_least: 999 },
+            effects: [{ op: "damage", target: "enemy:leader", amount: 5 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    state.players.first.board = [follower];
+    state.players.first.shadows = 0;
 
-      runStartOfTurnBoundary("first");
-
-      expect(getHP(state, "second")).toBe(hpBefore);
-    },
-  );
+    expect(() => runStartOfTurnBoundary("first")).toThrow(
+      /shadows_at_least.*BadCondition/,
+    );
+  });
 });
 
 // ---------------------------------------------------------------------------

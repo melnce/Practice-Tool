@@ -6,6 +6,19 @@
  */
 
 import { CREST_ACTION_VALUES } from "../src/logic/effects/ops/crest/types.js";
+import { DECK_ACTION_VALUES } from "../src/logic/effects/deck.js";
+import { COUNTER_ACTION_VALUES } from "../src/logic/effects/ops/counter/types.js";
+import { COUNTDOWN_ACTION_VALUES } from "../src/logic/effects/ops/countdown/unified.js";
+import { COST_ACTION_VALUES } from "../src/logic/effects/ops/cost/types.js";
+import { FUSE_ACTION_VALUES } from "../src/logic/effects/ops/fuse/types.js";
+import { KEYWORD_ACTION_VALUES } from "../src/logic/effects/ops/keyword/unified.js";
+import { STAT_ACTION_VALUES } from "../src/logic/effects/ops/stat/types.js";
+import {
+  PP_ACTION_VALUES,
+  EP_ACTION_VALUES,
+  COMBO_ACTION_VALUES,
+} from "../src/logic/core/effects/domains/resources.js";
+import { TRIGGER_CONDITION_KEYS } from "../src/logic/core/triggers/conditions.js";
 
 type CardJson = {
   id: string;
@@ -20,6 +33,21 @@ type Issue = {
   name: string;
   kind: "error" | "warn";
   message: string;
+};
+
+/** Ops with an action field validated against exported *_ACTION_VALUES sets. */
+const OP_ACTION_VALUES: Record<string, ReadonlySet<string>> = {
+  crest: CREST_ACTION_VALUES,
+  deck: DECK_ACTION_VALUES,
+  counter: COUNTER_ACTION_VALUES,
+  countdown: COUNTDOWN_ACTION_VALUES,
+  cost: COST_ACTION_VALUES,
+  fuse: FUSE_ACTION_VALUES,
+  keyword: KEYWORD_ACTION_VALUES,
+  stat: STAT_ACTION_VALUES,
+  pp: PP_ACTION_VALUES,
+  ep: EP_ACTION_VALUES,
+  combo: COMBO_ACTION_VALUES,
 };
 
 // ---------------------------------------------------------------------------
@@ -152,53 +180,6 @@ export const ADD_TO_HAND_FILTER_KEYS = new Set([
 
 /** Rejected nested keys (no reader in evaluateCardCondition / filters.ts). */
 export const REJECTED_NESTED_KEYS = new Set(["card_type", "type_eq"]);
-
-/**
- * Allowlist for triggers[].condition and crest.triggers[].condition keys.
- * Union of keys handled in evalCommonConditions (src/logic/core/triggers/conditions.ts)
- * and keys on CardCondition delegated to evaluateCardCondition
- * (src/logic/core/conditions/evaluator.ts).
- */
-export const TRIGGER_CONDITION_KEYS = new Set([
-  // evalCommonConditions — trigger routing / host gates
-  "whose_turn",
-  "is_ally",
-  "is_self",
-  "is_fuse_initiator",
-  "not_self",
-  "field_other_same_base_cost",
-  "own_turn",
-  "super_evolution_unlocked",
-  "played_base_cost_ladder",
-  "enemy_follower_count_gte",
-  // shared stat gates (host in triggers; subject via evaluator)
-  "attack_lte",
-  "attack_gte",
-  "attack_eq",
-  "defense_lte",
-  "defense_gte",
-  "defense_eq",
-  "still_alive",
-  // evaluateCardCondition / CardCondition
-  "type",
-  "class",
-  "tribe",
-  "exclude_tribe",
-  "has_keyword",
-  "keywords",
-  "exclude_keyword",
-  "base_cost_eq",
-  "base_cost_gte",
-  "base_cost_lte",
-  "base_cost_in",
-  "cost_in",
-  "cost_changed",
-  "unevolved",
-  "is_super_evolved",
-  "damaged",
-  "did_not_attack_this_turn",
-  "name",
-]);
 
 const STAT_NAME_VALUE_SOURCES = new Set(["named_enter_count"]);
 
@@ -896,15 +877,16 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
       });
     }
 
-    if (op === "crest" && typeof eff.action === "string") {
+    const actionValues = OP_ACTION_VALUES[op];
+    if (actionValues && typeof eff.action === "string") {
       const action = String(eff.action);
-      if (!CREST_ACTION_VALUES.has(action)) {
-        const alt = nearestKey(action, CREST_ACTION_VALUES);
+      if (!actionValues.has(action)) {
+        const alt = nearestKey(action, actionValues);
         issues.push({
           id: card.id,
           name: card.name,
           kind: "error",
-          message: `crest op at ${opPath} has unsupported action "${action}" (try "${alt}"?) — ${descSnippet(card.description)}`,
+          message: `${op} op at ${opPath} has unsupported action "${action}" (try "${alt}"?) — ${descSnippet(card.description)}`,
         });
       }
     }

@@ -10,6 +10,8 @@ import type {
 } from "../../../../core/types/index.js";
 import { addCounter, spendCounter, setCounter } from "../../counters.js";
 import { logEvent } from "../../../../core/logger.js";
+import { isDev } from "../../../../core/env.js";
+import { COUNTER_ACTION_VALUES } from "./types.js";
 import {
   getPlaysThisTurn,
   setPlaysThisTurn,
@@ -30,6 +32,7 @@ export function handleCounter(eff: Effect, ctx: CounterHandlerContext): void {
   const action = (eff as any).action;
   const key = (eff as any).key;
   const amount = Number((eff as any).amount ?? 1);
+  const cardName = ctx.source?.name ?? "unknown";
 
   if (!key) {
     console.warn(`[counter] Missing key for action: ${action}`);
@@ -65,8 +68,13 @@ export function handleCounter(eff: Effect, ctx: CounterHandlerContext): void {
       setCounter(ctx.source, key, amount);
       break;
     }
-    default:
-      console.warn(`[counter] Unknown action: ${action}`);
+    default: {
+      const msg = `[counter] Unknown action "${action}" in card ${cardName}`;
+      if (isDev()) {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+    }
   }
 }
 
@@ -87,6 +95,10 @@ function handleComboCounter(
       plays: newPlays,
     });
   } else {
-    console.warn(`[counter] Unsupported action for combo: ${action}`);
+    const msg = `[counter] Unknown action "${action}" in card unknown`;
+    if (isDev()) {
+      throw new Error(msg);
+    }
+    console.warn(msg);
   }
 }

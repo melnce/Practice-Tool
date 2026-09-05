@@ -25,6 +25,8 @@ import { fuse_finalize_gardens_allure } from "./fuse.forest.js";
 import { fuse_finalize_loot } from "./fuse.loot.js";
 
 import { fuse_finalize_cards } from "./fuse.cards.js";
+import { isDev } from "../../../../core/env.js";
+import { FUSE_ACTION_VALUES } from "./types.js";
 
 /**
  * Unified fuse handler
@@ -118,6 +120,13 @@ export function handleFuse(
     return "done";
   }
 
-  console.warn(`[fuse] Unknown action: "${action}"`);
+  {
+    const cardName = sourceCard?.name ?? "unknown";
+    const msg = `[fuse] Unknown action "${action}" in card ${cardName}`;
+    if (isDev()) {
+      throw new Error(msg);
+    }
+    console.warn(msg);
+  }
   return "done";
 }

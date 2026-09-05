@@ -8,6 +8,7 @@ import type {
 } from "../../../../core/types/index.js";
 import { logEvent } from "../../../../core/logger.js";
 import { state } from "../../../../core/gameState.js";
+import { isDev } from "../../../../core/env.js";
 import type { Crest } from "../../crest.js";
 import { resolveEffectAmount } from "../../../core/values.js";
 
@@ -19,6 +20,14 @@ import {
 } from "../../../../core/playerHelpers.js";
 
 export type CountdownAction = "advance" | "delay";
+
+/** Allowed countdown.action values — must match normalizeAction in countdown/unified.ts */
+export const COUNTDOWN_ACTION_VALUES = new Set([
+  "advance",
+  "advance_countdown",
+  "delay",
+  "delay_countdown",
+]);
 
 export interface CountdownHandlerContext {
   owner: Player;
@@ -44,9 +53,22 @@ export function handleCountdown(
   eff: Effect,
   ctx: CountdownHandlerContext,
 ): void {
-  const action = normalizeAction((eff as any).action);
+  const rawAction = (eff as any).action;
   const sourceCard =
     ctx.source && !isCrest(ctx.source) ? (ctx.source as CardInstance) : null;
+  const cardName = sourceCard?.name ?? "unknown";
+  if (
+    rawAction != null &&
+    rawAction !== "" &&
+    !COUNTDOWN_ACTION_VALUES.has(String(rawAction))
+  ) {
+    const msg = `[countdown] Unknown action "${rawAction}" in card ${cardName}`;
+    if (isDev()) {
+      throw new Error(msg);
+    }
+    console.warn(msg);
+  }
+  const action = normalizeAction(rawAction);
   const amount = resolveEffectAmount(
     eff as any,
     {

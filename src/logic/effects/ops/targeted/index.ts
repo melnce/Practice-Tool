@@ -21,6 +21,7 @@ import { handleEvolveSelf } from "../evolve.js";
 import { summonExactCopyFromHand, summonFromHand } from "../summon_ops/hand.js";
 import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
+import { isDev } from "../../../../core/env.js";
 import { doAction } from "../../../../core/history.js";
 import type { CardInstance } from "../../../../core/types/index.js";
 import type { Player } from "../../../../core/types/index.js";
@@ -655,6 +656,14 @@ TARGETED_OP_HANDLERS.set("cost", (ctx) => {
       case "increase":
         target.cost = currentCost + amount;
         break;
+      default: {
+        const cardName = ctx.sourceCard?.name ?? "unknown";
+        const msg = `[cost/targeted] Unknown mode "${mode}" in card ${cardName}`;
+        if (isDev()) {
+          throw new Error(msg);
+        }
+        console.warn(msg);
+      }
     }
   }
 

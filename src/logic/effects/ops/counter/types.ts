@@ -2,6 +2,9 @@
 // Unified counter operation types
 // NOTE: Countdown operations (reduce_countdown, delay_countdown) are handled by countdown/unified.ts, NOT counter
 
+/** Allowed counter.action values — must match handleCounter switch in counter/unified.ts */
+export const COUNTER_ACTION_VALUES = new Set(["add", "spend", "set"]);
+
 export type CounterAction = "add" | "spend" | "set";
 
 export interface UnifiedCounterSpec {

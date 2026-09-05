@@ -35,6 +35,16 @@ import {
   setSuperEvoCharges,
 } from "../../../../core/playerHelpers.js";
 import { resolveEffectAmount } from "../../values.js";
+import { isDev } from "../../../../core/env.js";
+
+/** Allowed pp.action values — must match handlePP switch */
+export const PP_ACTION_VALUES = new Set(["gain_max", "recover", "spend"]);
+
+/** Allowed ep.action values — must match handleEP switch */
+export const EP_ACTION_VALUES = new Set(["recover", "recover_super"]);
+
+/** Allowed combo.action values — must match combo registerOp handler */
+export const COMBO_ACTION_VALUES = new Set(["increase", "add"]);
 
 const doLog = (event: string, payload: any) => logEvent(event, payload);
 
@@ -110,8 +120,14 @@ function handlePP(
       logEvent("spendPP", { owner: targetPlayer, amount: amt });
       break;
     }
-    default:
-      console.warn(`pp op: unknown action ${action}`);
+    default: {
+      const cardName = sourceCard?.name ?? "unknown";
+      const msg = `[pp] Unknown action "${action}" in card ${cardName}`;
+      if (isDev()) {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+    }
   }
 }
 
@@ -142,8 +158,13 @@ function handleEP(eff: Effect & { action?: EPAction }, owner: Player) {
       logEvent("recoverSEP", { owner: targetPlayer, amount: amt });
       break;
     }
-    default:
-      console.warn(`ep op: unknown action ${action}`);
+    default: {
+      const msg = `[ep] Unknown action "${action}"`;
+      if (isDev()) {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+    }
   }
 }
 
@@ -185,6 +206,15 @@ export function registerResourceEffects() {
       0,
       parseInt(String((eff as any).amount ?? 1), 10) || 0,
     );
+    if (!COMBO_ACTION_VALUES.has(action)) {
+      const cardName = ctx.sourceCard?.name ?? "unknown";
+      const msg = `[combo] Unknown action "${action}" in card ${cardName}`;
+      if (isDev()) {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+      return;
+    }
     if (action === "increase" || action === "add") {
       for (let i = 0; i < amt; i++) {
         state.players[ctx.owner].playsThisTurn++;
@@ -244,7 +274,10 @@ export function registerResourceEffects() {
   // NOTE: Synchronous import ensures deterministic effect execution order
   // ========================================================================
   registerOp("deck", (eff, ctx) => {
-    handleDeck(eff, ctx.owner, { adapter: getAdapter(ctx) });
+    handleDeck(eff, ctx.owner, {
+      adapter: getAdapter(ctx),
+      sourceCard: ctx.sourceCard,
+    });
   });
 
   // ========================================================================
