@@ -9,6 +9,7 @@ import type { Player, CardInstance } from "../../core/types/index.js";
 import type { TargetedOpContext } from "./targeting/index.js";
 
 import { applyTargetClick } from "./targeting/index.js";
+import { highlightSelectable } from "./targeting.js";
 import { resolveUids } from "../../core/uidResolver.js";
 import {
   dispatchTargetedOp,
@@ -52,6 +53,9 @@ export function resolvePendingTarget(uid: string | "leader") {
   }
 
   if (result.kind === "continue") {
+    if (pending.pool?.length) {
+      highlightSelectable(pending.pool);
+    }
     adapter.render();
     return;
   }
