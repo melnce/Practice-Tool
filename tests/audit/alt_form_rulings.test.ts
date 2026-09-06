@@ -189,13 +189,14 @@ describe("Owner rulings 2026-09-02 — Accelerate / Crystallize alternate forms"
       recordDestroyed(state, "first", amorousCorpse);
       enemyFollower(2, 5, "AccelPing");
 
-      // Accelerate Jailor → GY as Spell (cost still 6, higher than Amorous).
+      // Accelerate Jailor → GY as Spell (base cost 1 per ruling 2026-09-06).
       expect(whenPlayCard("first", handIndexById(JAILOR)).kind).toBe("done");
       const jailorInGy = getGraveyard(state, "first").find(
         (c) => c.id === JAILOR,
       )!;
       expect(jailorInGy.type).toBe("Spell");
-      expect(Number(jailorInGy.cost)).toBe(6);
+      expect(Number(jailorInGy.cost)).toBe(1);
+      expect(Number(jailorInGy.base_cost)).toBe(1);
 
       // Enhance (8): Reanimate (9) — must pick the Follower corpse, skip Jailor.
       setPP(state, "first", 8);

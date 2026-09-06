@@ -17,6 +17,7 @@ import {
   resolveDeathLwCard,
   resolveDeathLeaveContext,
   resolveQueuedTriggerCard,
+  isQueuedTriggerSourceInPlay,
 } from "./triggers/queue.js";
 import {
   opponentOf,
@@ -219,6 +220,16 @@ function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
   for (let i = start; i < item.entries.length; i++) {
     if (isGameOver()) return "done";
     const entry = item.entries[i]!;
+    if (!isQueuedTriggerSourceInPlay(entry)) {
+      const stale = resolveQueuedTriggerCard(entry);
+      logEvent("triggerFizzled", {
+        owner: entry.owner,
+        sourceName: stale?.name ?? entry.card?.name,
+        uid: entry.cardUid ?? entry.card?.uid,
+        event: entry.event,
+      });
+      continue;
+    }
     const sourceCard = resolveQueuedTriggerCard(entry);
     const result = runEffects(
       entry.trigger.effects || [],
