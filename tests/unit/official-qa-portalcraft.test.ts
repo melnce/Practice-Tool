@@ -433,31 +433,27 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     expect(thenHand("first").some((c) => c.id === GEAR_REMEMBRANCE)).toBe(true);
   }, 60_000);
 
-  it.fails(
-    "10172320 Doomwright Resurgence — cannot play without 2 Artifact followers ≤5 in hand (official Q&A)",
-    () => {
-      setupTurn(R8, { hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT], pp: 5 });
-      const spell = getHand(state, "first").find(
-        (c) => c.id === DOOMWRIGHT_RESURGENCE,
-      )!;
-      const ppBefore = thenPP("first");
-      expect(canPlayCard(spell, "first").ok).toBe(false);
-      expect(
-        whenPlayCard("first", getHand(state, "first").indexOf(spell)).kind,
-      ).toBe("blocked");
-      expect(thenPP("first")).toBe(ppBefore);
+  it("10172320 Doomwright Resurgence — cannot play without 2 Artifact followers ≤5 in hand (official Q&A)", () => {
+    setupTurn(R8, { hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT], pp: 5 });
+    const spell = getHand(state, "first").find(
+      (c) => c.id === DOOMWRIGHT_RESURGENCE,
+    )!;
+    const ppBefore = thenPP("first");
+    expect(canPlayCard(spell, "first").ok).toBe(false);
+    expect(
+      whenPlayCard("first", getHand(state, "first").indexOf(spell)).kind,
+    ).toBe("blocked");
+    expect(thenPP("first")).toBe(ppBefore);
 
-      setupTurn(R8, {
-        hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT, FORTIFIER_ARTIFACT],
-        pp: 5,
-      });
-      const okSpell = getHand(state, "first").find(
-        (c) => c.id === DOOMWRIGHT_RESURGENCE,
-      )!;
-      expect(canPlayCard(okSpell, "first").ok).toBe(true);
-    },
-    60_000,
-  );
+    setupTurn(R8, {
+      hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT, FORTIFIER_ARTIFACT],
+      pp: 5,
+    });
+    const okSpell = getHand(state, "first").find(
+      (c) => c.id === DOOMWRIGHT_RESURGENCE,
+    )!;
+    expect(canPlayCard(okSpell, "first").ok).toBe(true);
+  }, 60_000);
 
   it("10174110 Eudie — cannot gain a second Crest: Eudie, Maiden Reborn (official Q&A)", () => {
     setupTurn(R6, { hand: [EUDIE], pp: 3, evo: 1 });
