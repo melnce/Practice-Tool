@@ -14,7 +14,7 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { destroyTarget } from "../../src/logic/effects/ops/destroy/primitives.js";
@@ -234,7 +234,10 @@ describe("Official Q&A — Havencraft batch 5", () => {
     setupTurn(R8, { hand: [LAMRETTA], pp: 2, evo: 2 });
     whenPlayCard("first", 0);
     const lamEvolved = findOnBoard("first", "Lamretta, Sisterly Shepherd")!;
-    onEvolve(lamEvolved, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(lamEvolved, "first", {
+      mode: "normal",
+      spendPoint: true,
+    });
     const ally2 = allyFollower(1, 5, "AllyHit");
     const foe2 = enemyFollower(3, 5, "EnemyHit");
 
@@ -252,7 +255,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
     const foe = enemyFollower(2, 4, "FoeA");
     const handBefore = getHand(state, "first").length;
 
-    onEvolve(mouse, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(mouse, "first", { mode: "normal", spendPoint: true });
 
     expect(getHand(state, "first").length).toBe(handBefore);
     expect(Number(foe.defense)).toBe(4);
@@ -268,7 +271,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
     whenPlayCard("first", 0);
     const mouse2 = findOnBoard("first", "Desperate Shrinemouse")!;
     const foe2 = enemyFollower(2, 4, "FoeB");
-    onEvolve(mouse2, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(mouse2, "first", { mode: "normal", spendPoint: true });
     expect(Number(foe2.defense)).toBe(3);
   }, 60_000);
 
@@ -294,7 +297,10 @@ describe("Official Q&A — Havencraft batch 5", () => {
     state.players.first.evoCharges = 2;
     const summonsBefore = crestSummonCount();
 
-    onEvolve(shrinemouse, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(shrinemouse, "first", {
+      mode: "normal",
+      spendPoint: true,
+    });
 
     expect(crestSummonCount()).toBe(summonsBefore);
 
@@ -311,7 +317,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
     mouse2.peak_defense = mouse2.defense;
     state.players.first.board.push(mouse2);
     const before2 = crestSummonCount();
-    onEvolve(mouse2, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(mouse2, "first", { mode: "normal", spendPoint: true });
     expect(crestSummonCount() - before2).toBeGreaterThanOrEqual(0);
     expect(getHand(state, "first").some((c) => c.id === DRAW_A)).toBe(true);
   }, 60_000);
@@ -326,7 +332,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
       const armes = findOnBoard("first", "Armes, Depletive Demon")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(armes, "first", "super", { spendPoint: true });
+      handleEvolveSelf(armes, "first", { mode: "super", spendPoint: true });
       expect(Number(armes.attacks_per_turn ?? armes.attacksPerTurn)).toBe(3);
 
       const foe = enemyFollower(1, 10, "PunchingBag");
@@ -379,7 +385,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
     expect(maid.hasBarrier || maid.keywordState?.hasBarrier).toBe(true);
     state.players.first.superEvoCharges = 1;
     state.players.first.superEvoPoints = 1;
-    onEvolve(maid, "first", "super", { spendPoint: true });
+    handleEvolveSelf(maid, "first", { mode: "super", spendPoint: true });
 
     const foe = enemyFollower(1, 5, "Blocker");
     prepareAttacker(maid);
@@ -396,11 +402,11 @@ describe("Official Q&A — Havencraft batch 5", () => {
     setupTurn(R6, { hand: [SARISSA], pp: 2, evo: 2 });
     whenPlayCard("first", 0);
     const sarissa = findOnBoard("first", "Sarissa, Luxspear Al-mi'raj")!;
-    onEvolve(sarissa, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(sarissa, "first", { mode: "normal", spendPoint: true });
     expect(sarissa.hasBarrier || sarissa.keywordState?.hasBarrier).toBe(true);
     state.players.first.superEvoCharges = 1;
     state.players.first.superEvoPoints = 1;
-    onEvolve(sarissa, "first", "super", { spendPoint: true });
+    handleEvolveSelf(sarissa, "first", { mode: "super", spendPoint: true });
 
     const foe = enemyFollower(1, 5, "Blocker");
     prepareAttacker(sarissa);
@@ -481,7 +487,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
 
       whenPlayCard("first", 0);
       const cleric = findOnBoard("first", "Cleric of Crushing")!;
-      onEvolve(cleric, "first", "normal", { spendPoint: true });
+      handleEvolveSelf(cleric, "first", { mode: "normal", spendPoint: true });
       const pending = state.pendingTargetEffect!;
       const orchis = getBoard(state, "second").find((c) => c.id === ORCHIS)!;
       expect(validateTargetSelection(state, pending, orchis.uid).ok).toBe(true);
@@ -500,7 +506,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
 
     whenPlayCard("first", 0);
     const cleric = findOnBoard("first", "Cleric of Crushing")!;
-    onEvolve(cleric, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(cleric, "first", { mode: "normal", spendPoint: true });
     const pending = state.pendingTargetEffect!;
     const orchis = getBoard(state, "second").find((c) => c.id === ORCHIS)!;
     const lloyd = getBoard(state, "second").find((c) => c.id === LLOYD)!;
@@ -522,7 +528,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
 
     state.players.first.superEvoCharges = 1;
     state.players.first.superEvoPoints = 1;
-    onEvolve(goliath, "first", "super", { spendPoint: true });
+    handleEvolveSelf(goliath, "first", { mode: "super", spendPoint: true });
     runEndOfTurnBoundary("first");
     expect(getBoard(state, "first").some((c) => c.uid === goliath.uid)).toBe(
       true,
@@ -556,7 +562,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
     const agnes = findOnBoard("first", "Agnes, the Swiftblade")!;
     state.players.first.superEvoCharges = 1;
     state.players.first.superEvoPoints = 1;
-    onEvolve(agnes, "first", "super", { spendPoint: true });
+    handleEvolveSelf(agnes, "first", { mode: "super", spendPoint: true });
     const leaderHp = getHP(state, "second");
     prepareAttacker(agnes);
     attackFollower(
@@ -583,7 +589,7 @@ describe("Official Q&A — Havencraft batch 5", () => {
     const himeka = findOnBoard("second", "Himeka, Heir to Repose")!;
     state.players.second.superEvoCharges = 1;
     state.players.second.superEvoPoints = 1;
-    onEvolve(himeka, "second", "super", { spendPoint: true });
+    handleEvolveSelf(himeka, "second", { mode: "super", spendPoint: true });
     state.activePlayer = "first";
     expect(Number(knight.attack)).toBe(4);
     expect(getHP(state, "first")).toBe(18);
@@ -592,68 +598,49 @@ describe("Official Q&A — Havencraft batch 5", () => {
     expect(getHP(state, "first")).toBe(19);
   }, 60_000);
 
-  it.fails(
-    "10362210 Temple of Repose — faiths do not count as crests for Engage (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [TEMPLE_OF_REPOSE], pp: 3 });
-      grantShamNachaFaith();
-      gainCrest("first", "Test Crest A");
-      gainCrest("first", "Test Crest B");
-      whenPlayCard("first", 0);
-      const temple = engageFirstAmulet("Temple of Repose");
-      expect(temple.countdown).toBe(2);
-    },
-    60_000,
-  );
+  it("10362210 Temple of Repose — faiths do not count as crests for Engage (official Q&A)", () => {
+    setupTurn(R6, { hand: [TEMPLE_OF_REPOSE], pp: 3 });
+    grantShamNachaFaith();
+    gainCrest("first", "Test Crest A");
+    gainCrest("first", "Test Crest B");
+    whenPlayCard("first", 0);
+    const temple = engageFirstAmulet("Temple of Repose");
+    expect(temple.countdown).toBe(2);
+  }, 60_000);
 
-  it.fails(
-    "10363210 Shining Disenchantment — faiths do not count as crests for Engage (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [SHINING_DISENCHANTMENT], pp: 4 });
-      grantShamNachaFaith();
-      gainCrest("first", "Test Crest A");
-      gainCrest("first", "Test Crest B");
-      whenPlayCard("first", 0);
-      const disc = engageFirstAmulet("Shining Disenchantment");
-      expect(disc.countdown).toBe(2);
-    },
-    60_000,
-  );
+  it("10363210 Shining Disenchantment — faiths do not count as crests for Engage (official Q&A)", () => {
+    setupTurn(R6, { hand: [SHINING_DISENCHANTMENT], pp: 4 });
+    grantShamNachaFaith();
+    gainCrest("first", "Test Crest A");
+    gainCrest("first", "Test Crest B");
+    whenPlayCard("first", 0);
+    const disc = engageFirstAmulet("Shining Disenchantment");
+    expect(disc.countdown).toBe(2);
+  }, 60_000);
 
-  it.fails(
-    "10364110 Himeka — faiths do not count as crests for crest locks (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [HIMEKA], pp: 6 });
-      grantShamNachaFaith();
-      gainCrest("first", "Filler Crest");
-      for (let i = 0; i < 3; i++) {
-        const foe = enemyFollower(3, 5, `LockTarget${i}`);
-        foe.justPlayed = false;
-      }
-      whenPlayCard("first", 0);
-      endTurnBlue();
-      const locked = getBoard(state, "second").filter(
-        (c) => getKS(c).cantAttack,
-      );
-      expect(locked.length).toBe(2);
-    },
-    60_000,
-  );
+  it("10364110 Himeka — faiths do not count as crests for crest locks (official Q&A)", () => {
+    setupTurn(R6, { hand: [HIMEKA], pp: 6 });
+    grantShamNachaFaith();
+    gainCrest("first", "Filler Crest");
+    for (let i = 0; i < 3; i++) {
+      const foe = enemyFollower(3, 5, `LockTarget${i}`);
+      foe.justPlayed = false;
+    }
+    whenPlayCard("first", 0);
+    endTurnBlue();
+    const locked = getBoard(state, "second").filter((c) => getKS(c).cantAttack);
+    expect(locked.length).toBe(2);
+  }, 60_000);
 
-  it.fails(
-    "10364120 Marwynn — faiths do not count as crests for split damage (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [MARWYNN], pp: 5 });
-      grantShamNachaFaith();
-      gainCrest("first", "Filler Crest");
-      enemyFollower(2, 10, "SplitFoe");
-      state.players.second.hp = 20;
-      whenPlayCard("first", 0);
-      const mar = findOnBoard("first", "Marwynn, Despair Manifest")!;
-      onEvolve(mar, "first", "normal");
-      endTurnBlue();
-      expect(getHP(state, "second")).toBe(18);
-    },
-    60_000,
-  );
+  it("10364120 Marwynn — faiths do not count as crests for split damage (official Q&A)", () => {
+    setupTurn(R6, { hand: [MARWYNN], pp: 5, evo: 2 });
+    grantShamNachaFaith();
+    gainCrest("first", "Filler Crest");
+    state.players.second.hp = 20;
+    whenPlayCard("first", 0);
+    const mar = findOnBoard("first", "Marwynn, Despair Manifest")!;
+    handleEvolveSelf(mar, "first", { mode: "normal", spendPoint: true });
+    endTurnBlue();
+    expect(getHP(state, "second")).toBe(18);
+  }, 60_000);
 });
