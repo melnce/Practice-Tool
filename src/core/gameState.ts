@@ -54,6 +54,7 @@ const KNOWN_ROOT_KEYS = new Set<string>([
   "zoneVersion",
   "_triggerCache",
   "deferDeathTriggers",
+  "turnBoundaryInvokePhase",
   "_resolutionQueue",
   "_runEffectsDepth",
   "combatResolutionDepth",

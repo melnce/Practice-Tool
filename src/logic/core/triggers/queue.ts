@@ -103,6 +103,10 @@ export function getRunEffectsDepth(): number {
 export function shouldQueueReactiveTrigger(
   eventName: TriggerEventName,
 ): boolean {
+  if ((state as any).turnBoundaryInvokePhase && eventName === "invoke") {
+    return true;
+  }
+
   if (getRunEffectsDepth() <= 0 && !isTargetedOpDispatchActive()) return false;
   if (TURN_BOUNDARY_EVENTS.has(eventName)) return false;
 

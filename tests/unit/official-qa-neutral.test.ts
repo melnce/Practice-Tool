@@ -286,7 +286,7 @@ describe("official Q&A — Neutral batch 7", () => {
       expect(thenHand("first").length).toBe(handBefore + 3);
     }, 60_000);
 
-    it("10404110 Sandalphon — Serene Sanctuary LW draw before invoke return at SOT (official Q&A)", () => {
+    it("10404110 Sandalphon — Serene Sanctuary invoke then LW draw then return at SOT (official Q&A)", () => {
       setupTurn(R6, { hand: [], deck: [SANDALPHON, FAIRY, FAIRY], pp: 6 });
       const sanctuary = createCard(SERENE_SANCTUARY, "board", "first");
       sanctuary.countdown = 1;
@@ -300,37 +300,31 @@ describe("official Q&A — Neutral batch 7", () => {
       expect(thenHand("first").length).toBe(handBefore + 3);
     }, 60_000);
 
-    it.fails(
-      "10404110 Sandalphon — Pact LW cannot summon Holyflame Tiger when field is full (official Q&A)",
-      () => {
-        setupTurn(R6, {
-          hand: [PACT],
-          deck: [SANDALPHON, FAIRY],
-          pp: 6,
-        });
-        whenPlayCard("first", 0);
-        const pactIdx = getBoard(state, "first").findIndex(
-          (c) => c.id === PACT,
+    it("10404110 Sandalphon — Pact LW cannot summon Holyflame Tiger when field is full (official Q&A)", () => {
+      setupTurn(R6, {
+        hand: [PACT],
+        deck: [SANDALPHON, FAIRY],
+        pp: 6,
+      });
+      whenPlayCard("first", 0);
+      const pactIdx = getBoard(state, "first").findIndex((c) => c.id === PACT);
+      engageAmulet("first", pactIdx);
+      for (let i = 0; i < 4; i++) {
+        state.players.first.board.push(
+          createCard(HOLY_FALCON, "board", "first"),
         );
-        engageAmulet("first", pactIdx);
-        for (let i = 0; i < 4; i++) {
-          state.players.first.board.push(
-            createCard(HOLY_FALCON, "board", "first"),
-          );
-        }
-        state.players.first.evoCount = 6;
-        state.activePlayer = "second";
-        whenEndTurn();
-        expect(findOnBoard("first", "Pact of the Beast Princess")).toBeFalsy();
-        expect(
-          thenBoard("first").filter((c) => c.name === "Holy Falcon"),
-        ).toHaveLength(4);
-        expect(findOnBoard("first", "Holyflame Tiger")).toBeFalsy();
-        expect(handNames()).toContain("Sandalphon, Primarch Successor");
-        expect(thenBoard("first").length).toBe(4);
-      },
-      60_000,
-    );
+      }
+      state.players.first.evoCount = 6;
+      state.activePlayer = "second";
+      whenEndTurn();
+      expect(findOnBoard("first", "Pact of the Beast Princess")).toBeFalsy();
+      expect(
+        thenBoard("first").filter((c) => c.name === "Holy Falcon"),
+      ).toHaveLength(4);
+      expect(findOnBoard("first", "Holyflame Tiger")).toBeFalsy();
+      expect(handNames()).toContain("Sandalphon, Primarch Successor");
+      expect(thenBoard("first").length).toBe(4);
+    }, 60_000);
   });
 
   describe("10503210 World of Games", () => {
