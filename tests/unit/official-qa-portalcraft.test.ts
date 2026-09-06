@@ -608,40 +608,30 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     expect(Number(foe.defense)).toBe(3);
   }, 60_000);
 
-  it.fails(
-    "90073110 Ominous Artifact α — β then γ across turns transforms into Masterwork Ω (official Q&A)",
-    () => {
-      setupTurn(R6, {
-        hand: [OMINOUS_ALPHA, OMINOUS_BETA, OMINOUS_GAMMA],
-        pp: 0,
-      });
-      const alpha = getHand(state, "first").find(
-        (c) => c.id === OMINOUS_ALPHA,
-      )!;
-      const beta = getHand(state, "first").find((c) => c.id === OMINOUS_BETA)!;
-      fuseAlphaPartners(alpha.uid, [beta.uid]);
-      expect(getHand(state, "first").some((c) => c.id === OMINOUS_ALPHA)).toBe(
-        true,
-      );
-      expect(
-        getHand(state, "first").some((c) => c.id === MASTERWORK_OMEGA),
-      ).toBe(false);
+  it("90073110 Ominous Artifact α — β then γ across turns transforms into Masterwork Ω (official Q&A)", () => {
+    setupTurn(R6, {
+      hand: [OMINOUS_ALPHA, OMINOUS_BETA, OMINOUS_GAMMA],
+      pp: 0,
+    });
+    const alpha = getHand(state, "first").find((c) => c.id === OMINOUS_ALPHA)!;
+    const beta = getHand(state, "first").find((c) => c.id === OMINOUS_BETA)!;
+    fuseAlphaPartners(alpha.uid, [beta.uid]);
+    expect(getHand(state, "first").some((c) => c.id === OMINOUS_ALPHA)).toBe(
+      true,
+    );
+    expect(getHand(state, "first").some((c) => c.id === MASTERWORK_OMEGA)).toBe(
+      false,
+    );
 
-      whenEndTurn();
-      whenEndTurn();
-      const alphaTurn2 = getHand(state, "first").find(
-        (c) => c.id === OMINOUS_ALPHA,
-      )!;
-      const gamma = getHand(state, "first").find(
-        (c) => c.id === OMINOUS_GAMMA,
-      )!;
-      fuseAlphaPartners(alphaTurn2.uid, [gamma.uid]);
-      expect(thenHand("first").some((c) => c.id === MASTERWORK_OMEGA)).toBe(
-        true,
-      );
-    },
-    60_000,
-  );
+    whenEndTurn();
+    whenEndTurn();
+    const alphaTurn2 = getHand(state, "first").find(
+      (c) => c.id === OMINOUS_ALPHA,
+    )!;
+    const gamma = getHand(state, "first").find((c) => c.id === OMINOUS_GAMMA)!;
+    fuseAlphaPartners(alphaTurn2.uid, [gamma.uid]);
+    expect(thenHand("first").some((c) => c.id === MASTERWORK_OMEGA)).toBe(true);
+  }, 60_000);
 
   it("90074120 Lloyd + 10173120 Sylvia — Super-Evolve selects Lloyd then Orchis and destroys both (official Q&A)", () => {
     setupTurn(R8, { hand: [SYLVIA], pp: 6, superEvo: 1, evo: 1 });
