@@ -24,11 +24,23 @@ Note the separate, pre-existing timing rule still stands: a "Fanfare: if Rally (
 
 > "In the game there was a puzzle with Accelerate that said the units keep their original cost. Evolution Portalcraft with Shoddy Plaything and Yog-Zentha, Eld Axe abuses this specifically."
 
-Playing a card via Accelerate does **not** replace its original/base cost with the Accelerate value. The base cost stays as printed.
+~~Playing a card via Accelerate does **not** replace its original/base cost with the Accelerate value. The base cost stays as printed.~~ **Superseded 2026-09-06** — see **Accelerate / Crystallize — the played card takes the alternate form's base cost (2026-09-06)** below. The observation here still stands: the summoned Shoddy Plaything is base cost **6**, and the Eld Axe package turns on off that body.
 
-**This overrides a contradicting official source**, deliberately: a Cygames tweet from 18 Sep 2018 states 「アクセラレート能力でカードをプレイした際、元のコストはアクセラレートの値となります」 — "when played via Accelerate, the original cost becomes the Accelerate value." That tweet is about the **original Shadowverse**, whose service ended June 2026. Worlds Beyond is a separate implementation and never restated the rule, so in-game observation of _this_ game wins. The contradicted source is named in the rulebook so nobody "corrects" it back later.
+**This overrides a contradicting official source**, deliberately: a Cygames tweet from 18 Sep 2018 states 「アクセラレート能力でカードをプレイした際、元のコストはアクセラレートの値となります」 — "when played via Accelerate, the original cost becomes the Accelerate value." That tweet is about the **original Shadowverse**, whose service ended June 2026. The **2026-09-06 ruling** restores that tweet's reading for Worlds Beyond too (see official Q&A on Zerael, Sundered Rebirth `10904110`).
 
 The abuse case is also the regression test: Shoddy Plaything is base cost 6 with "Accelerate 2: Summon a Shoddy Plaything", so 2 PP buys a **base-cost-6 body**, switching on Portalcraft's whole "base cost 5 or more" package — Yog-Zentha adds Depths of the Eld Axe, Advent of the Eld Axe draws, Unfeeling Eld Axe drops 1 in hand.
+
+## Accelerate / Crystallize — the played card takes the alternate form's base cost (2026-09-06)
+
+> "yes if you play it in that form it stays that value. That was my mistake. The shoddy plaything accelerate spell has the EFFECT of summoning a shoddy plaything. So obviously it will summon a freshly printed one and go to grave as 2 cost spell."
+
+Official per-card Q&A (Zerael, Sundered Rebirth `10904110`): _"If I play an accelerated Jailor of Antiquity, what will its base cost be?"_ → _"Its base cost will be 1."_
+
+From the moment a card is played via **Accelerate (N)**, it is a **spell with base cost N** (and cost N). It records N — not the printed follower cost — on the Zerael / Azvaldt "played cards with base costs of 1…8" ladder and on every other "played a card with base cost X" check, and it goes to the graveyard as a cost-N spell. The **2026-09-02 permanence ruling** stands: it stays a spell corpse (not reanimatable).
+
+A card played via **Crystallize (N)** is likewise an **amulet with base cost N** from that play on (and stays an amulet if bounced to hand — the hand copy keeps cost N).
+
+Whatever the alternate form's _effect_ summons is a **freshly printed** card: Shoddy Plaything's _"Accelerate (2): Summon a Shoddy Plaything"_ puts a base-cost-**6** follower on the field. Normal plays and Enhance plays are unchanged: printed base cost.
 
 ## Hidden information — always visible — 2026-08-13
 
