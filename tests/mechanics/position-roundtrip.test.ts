@@ -49,12 +49,6 @@ beforeAll(async () => {
   await initCardDatabaseNode();
 });
 
-const SAVE_LOAD_READ_PATH_FINDING =
-  "position save-load re-apply mismatch: read-path preflight mutates live state during " +
-  "getLegalSoakActions (pickEnhanceTiers enhanceTiers write-back in " +
-  "src/logic/core/playCard/cost.ts; e.g. __uiSelectable on deck cards) — " +
-  "flips when fix-enhance-tiers-read-write merges";
-
 describe("position round-trip soak", () => {
   vi.setConfig({ testTimeout: 120_000 });
 
@@ -74,7 +68,7 @@ describe("position round-trip soak", () => {
   });
 
   it.fails(
-    "seed 20260909 — engine dispatch position round-trip (game 0)",
+    "seed 20260909 game 0 — __uiSelectable write during legal enumeration (targeting.ts)",
     async () => {
       const result = await runSoakGame({
         seed: 20260909,
@@ -86,7 +80,9 @@ describe("position round-trip soak", () => {
       });
       expect(
         result.outcome,
-        result.error ?? `${SAVE_LOAD_READ_PATH_FINDING}; got ${result.outcome}`,
+        result.error ??
+          "position save-load re-apply: highlightSelectable in src/logic/core/targeting.ts " +
+            "mutates __uiSelectable on deck/banish during getLegalSoakActions read path",
       ).toBe("completed");
     },
   );
@@ -139,40 +135,43 @@ describe("position round-trip shapes (engineDispatch)", () => {
     state.activePlayer = "first";
   });
 
-  it.fails(
-    "pickEnhanceTiers write-back in cost.ts mutates hand on getLegalSoakActions read path",
-    () => {
-      givenGameState({ seed: 4242, activePlayer: "first", roundCount: 5 })
-        .withFirstHand([
-          {
-            name: "Enhance Test",
-            type: "Follower",
-            cost: 1,
-            attack: 1,
-            defense: 1,
-            enhanceTiers: [{ cost: 1, effects: [{ op: "draw", count: 1 }] }],
-          },
-        ])
-        .withFirstDeck([
-          {
-            name: "Filler",
-            type: "Follower",
-            cost: 1,
-            attack: 1,
-            defense: 1,
-          },
-        ])
-        .withFirstPP(5, 5)
-        .build();
-      resetHistory();
+  it("pickEnhanceTiers does not write back on getLegalSoakActions read path", () => {
+    givenGameState({ seed: 4242, activePlayer: "first", roundCount: 5 })
+      .withFirstHand([
+        {
+          name: "Enhance Test",
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+          keywords: [
+            {
+              name: "Enhance",
+              cost: 1,
+              effects: [{ op: "draw", count: 1 }],
+            },
+          ],
+        },
+      ])
+      .withFirstDeck([
+        {
+          name: "Filler",
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+        },
+      ])
+      .withFirstPP(5, 5)
+      .build();
+    resetHistory();
 
-      const card = state.players.first.hand[0]!;
-      expect(card.enhanceTiers).toBeUndefined();
+    const card = state.players.first.hand[0]!;
+    expect(card.enhanceTiers).toBeUndefined();
 
-      getLegalSoakActions();
-      expect(card.enhanceTiers).toBeUndefined();
-    },
-  );
+    getLegalSoakActions();
+    expect(card.enhanceTiers).toBeUndefined();
+  });
 
   it("save while target prompt open → load → prompt open with no picks", () => {
     givenGameState({ seed: 5, activePlayer: "first" }).build();
