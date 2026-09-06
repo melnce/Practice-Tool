@@ -32,6 +32,7 @@ export type KeywordName =
 export const KEYWORD_ALIASES: Record<string, KeywordName> = {
   banishondeath: "banish_on_death",
   lastwords: "last_words",
+  "last words": "last_words",
   "skybound art": "skybound_art",
   pixieenter: "pixie_enter",
   allyenter: "ally_enter",

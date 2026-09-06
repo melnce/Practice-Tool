@@ -6,9 +6,14 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { TRIGGER_EVENT_NAMES } from "../src/logic/core/triggers/types.js";
+import { loadCardsForGates } from "./lib/loadCards.js";
 
 const BASE = "src/logic/core/triggers";
-const POOL_PATH = path.resolve("cards/all.json");
+const HANDLERS_DIR = path.join(BASE, "handlers");
+
+/** type shorthands on crest triggers — not TriggerEventName literals */
+const CREST_TYPE_ALIASES = new Set(["end_of_turn_own", "start_of_turn_own"]);
 
 // Define rules
 const RULES = [
@@ -23,10 +28,6 @@ const RULES = [
     msg: "process.ts must not import from handlers (use predicates)",
   },
 ];
-
-// For handlers, we want to ensure they don't import EACH OTHER (siblings).
-// They can import common stuff, but cross-handler dependencies are smelly.
-const HANDLERS_DIR = path.join(BASE, "handlers");
 
 function checkFile(
   filePath: string,
@@ -57,56 +58,124 @@ function checkFile(
 
 function collectCrestTriggerEvents(): Set<string> {
   const events = new Set<string>();
-  if (!fs.existsSync(POOL_PATH)) return events;
-
-  const data = JSON.parse(fs.readFileSync(POOL_PATH, "utf8")) as unknown[];
-
-  function walk(obj: unknown): void {
-    if (!obj || typeof obj !== "object") return;
-    const rec = obj as Record<string, unknown>;
-    if (
-      rec.op === "crest" &&
-      rec.action === "gain" &&
-      Array.isArray(rec.triggers)
-    ) {
-      for (const t of rec.triggers as Record<string, unknown>[]) {
-        const ev = (t.event ?? t.type) as string | undefined;
-        if (ev) events.add(ev);
-      }
-    }
-    if (Array.isArray(obj)) obj.forEach(walk);
-    else Object.values(rec).forEach(walk);
+  for (const { card } of loadCardsForGates()) {
+    walkCardForCrestEvents(card, events);
   }
-
-  for (const card of data) walk(card);
   events.add("select_mode");
   events.add("invoke");
   return events;
 }
 
+function walkCardForCrestEvents(obj: unknown, events: Set<string>): void {
+  if (!obj || typeof obj !== "object") return;
+  const rec = obj as Record<string, unknown>;
+  if (
+    rec.op === "crest" &&
+    rec.action === "gain" &&
+    Array.isArray(rec.triggers)
+  ) {
+    for (const t of rec.triggers as Record<string, unknown>[]) {
+      const ev = (t.event ?? t.type) as string | undefined;
+      if (ev) events.add(ev);
+    }
+  }
+  if (Array.isArray(obj))
+    obj.forEach((entry) => walkCardForCrestEvents(entry, events));
+  else
+    Object.values(rec).forEach((entry) =>
+      walkCardForCrestEvents(entry, events),
+    );
+}
+
+function collectAllTriggerEvents(): Array<{
+  cardId: string;
+  cardName: string;
+  jsonPath: string;
+  event: string;
+}> {
+  const found: Array<{
+    cardId: string;
+    cardName: string;
+    jsonPath: string;
+    event: string;
+  }> = [];
+
+  for (const { card } of loadCardsForGates()) {
+    walkTriggers(card, card, found, "");
+  }
+
+  return found;
+}
+
+function walkTriggers(
+  node: unknown,
+  card: { id: string; name: string },
+  found: Array<{
+    cardId: string;
+    cardName: string;
+    jsonPath: string;
+    event: string;
+  }>,
+  pathPrefix: string,
+): void {
+  if (!node || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    node.forEach((child, index) => {
+      walkTriggers(child, card, found, `${pathPrefix}[${index}]`);
+    });
+    return;
+  }
+
+  const record = node as Record<string, unknown>;
+  if (Array.isArray(record.triggers)) {
+    record.triggers.forEach((trigger, index) => {
+      if (!trigger || typeof trigger !== "object") return;
+      const trig = trigger as Record<string, unknown>;
+      const event = String(trig.event ?? trig.type ?? "").trim();
+      if (!event) return;
+      const jsonPath = pathPrefix
+        ? `${pathPrefix}.triggers[${index}]`
+        : `triggers[${index}]`;
+      found.push({
+        cardId: card.id,
+        cardName: card.name,
+        event,
+        jsonPath,
+      });
+    });
+  }
+
+  for (const [key, value] of Object.entries(record)) {
+    const childPath = pathPrefix ? `${pathPrefix}.${key}` : key;
+    walkTriggers(value, card, found, childPath);
+  }
+}
+
 function checkCrestTriggerEvents(): string[] {
   const errors: string[] = [];
-  const typesPath = path.join(BASE, "types.ts");
-  const content = fs.readFileSync(typesPath, "utf-8");
-  const start = content.indexOf("export type TriggerEventName");
-  if (start < 0) {
-    errors.push("Could not find TriggerEventName in types.ts");
-    return errors;
-  }
-  const end = content.indexOf("// =====", start + 1);
-  const block = content.slice(start, end > start ? end : undefined);
-
-  const known = new Set<string>();
-  for (const m of block.matchAll(/\|\s*"([^"]+)"/g)) known.add(m[1]);
-
-  /** type shorthands on crest triggers — not TriggerEventName literals */
-  const CREST_TYPE_ALIASES = new Set(["end_of_turn_own", "start_of_turn_own"]);
+  const known = TRIGGER_EVENT_NAMES;
 
   for (const ev of collectCrestTriggerEvents()) {
     if (CREST_TYPE_ALIASES.has(ev)) continue;
-    if (!known.has(ev)) {
+    if (!known.has(ev as any)) {
       errors.push(
-        `Unknown crest trigger event "${ev}" in cards/all.json — add to TriggerEventName and crest owner-scoping tests`,
+        `Unknown crest trigger event "${ev}" in card data — add to TriggerEventName and crest owner-scoping tests`,
+      );
+    }
+  }
+
+  return errors;
+}
+
+function checkAllTriggerEvents(): string[] {
+  const errors: string[] = [];
+  const known = TRIGGER_EVENT_NAMES;
+
+  for (const entry of collectAllTriggerEvents()) {
+    if (CREST_TYPE_ALIASES.has(entry.event)) continue;
+    if (!known.has(entry.event as any)) {
+      errors.push(
+        `[${entry.cardId}] ${entry.cardName} — unknown trigger event "${entry.event}" at ${entry.jsonPath}`,
       );
     }
   }
@@ -177,6 +246,15 @@ function main() {
     failure = true;
     console.error("❌ Unknown crest trigger events:");
     crestEventErrors.forEach((e) => console.error(`   ${e}`));
+  }
+
+  const triggerEventErrors = checkAllTriggerEvents();
+  if (triggerEventErrors.length > 0) {
+    failure = true;
+    console.error("❌ Unknown trigger events in card data:");
+    triggerEventErrors.forEach((e) => console.error(`   ${e}`));
+  } else {
+    console.log("✅ All card trigger event names are recognized.");
   }
 
   if (failure) {
