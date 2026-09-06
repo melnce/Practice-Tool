@@ -597,12 +597,12 @@
       "status": "covered"
     },
     "10071110": {
-      "fingerprint": "05423314",
+      "fingerprint": "178838ac",
       "gatesSatisfied": [],
       "name": "Kitty Cannoneer",
       "scenarios": [
         {
-          "fingerprint": "506d4330",
+          "fingerprint": "f22b1c3c",
           "scenario": "play"
         }
       ],
@@ -633,24 +633,24 @@
       "status": "covered"
     },
     "10071310": {
-      "fingerprint": "275827c8",
+      "fingerprint": "5eaad109",
       "gatesSatisfied": [],
       "name": "Bullet from Beyond",
       "scenarios": [
         {
-          "fingerprint": "75ddf4bc",
+          "fingerprint": "0f4a07d8",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10072110": {
-      "fingerprint": "31359f10",
+      "fingerprint": "25f3aa10",
       "gatesSatisfied": [],
       "name": "Electric Whip Lass",
       "scenarios": [
         {
-          "fingerprint": "076eea7c",
+          "fingerprint": "4c2d7503",
           "scenario": "play"
         }
       ],
@@ -2331,12 +2331,12 @@
       "status": "covered"
     },
     "10171130": {
-      "fingerprint": "a795d2af",
+      "fingerprint": "94e7b020",
       "gatesSatisfied": [],
       "name": "Ironheart Hunter",
       "scenarios": [
         {
-          "fingerprint": "c4ea47a0",
+          "fingerprint": "940a78de",
           "scenario": "play"
         },
         {
@@ -2371,24 +2371,24 @@
       "status": "covered"
     },
     "10171320": {
-      "fingerprint": "28aa4d1c",
+      "fingerprint": "91145188",
       "gatesSatisfied": [],
       "name": "Artifact Recharge",
       "scenarios": [
         {
-          "fingerprint": "b75b5668",
+          "fingerprint": "5f347fe8",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10172110": {
-      "fingerprint": "ae989f8f",
+      "fingerprint": "f343714c",
       "gatesSatisfied": [],
       "name": "Rukina, Resistance Leader",
       "scenarios": [
         {
-          "fingerprint": "9b75477c",
+          "fingerprint": "61d0a910",
           "scenario": "play"
         },
         {
@@ -2427,12 +2427,12 @@
       "status": "covered"
     },
     "10172310": {
-      "fingerprint": "47187710",
+      "fingerprint": "5ed6fb00",
       "gatesSatisfied": [],
       "name": "Stream of Life",
       "scenarios": [
         {
-          "fingerprint": "2b96c404",
+          "fingerprint": "00143023",
           "scenario": "play"
         }
       ],
@@ -2451,16 +2451,16 @@
       "status": "covered"
     },
     "10173110": {
-      "fingerprint": "4f656f6c",
+      "fingerprint": "aebe86cd",
       "gatesSatisfied": [],
       "name": "Miriam, the Resolute",
       "scenarios": [
         {
-          "fingerprint": "bd798c03",
+          "fingerprint": "adef7758",
           "scenario": "play"
         },
         {
-          "fingerprint": "260e1baa",
+          "fingerprint": "7f569580",
           "scenario": "evolve"
         }
       ],
@@ -2499,12 +2499,12 @@
       "status": "covered"
     },
     "10173140": {
-      "fingerprint": "1b22f0e1",
+      "fingerprint": "417c790c",
       "gatesSatisfied": [],
       "name": "Alouette, Doomwright Ward",
       "scenarios": [
         {
-          "fingerprint": "f669be43",
+          "fingerprint": "279261b4",
           "scenario": "play"
         },
         {
@@ -2515,12 +2515,12 @@
       "status": "covered"
     },
     "10173210": {
-      "fingerprint": "12176190",
+      "fingerprint": "c524a7b4",
       "gatesSatisfied": [],
       "name": "Ancient Cannon",
       "scenarios": [
         {
-          "fingerprint": "f987427b",
+          "fingerprint": "8c1e0a00",
           "scenario": "play"
         }
       ],
@@ -3447,16 +3447,16 @@
       "status": "covered"
     },
     "10271110": {
-      "fingerprint": "10e51501",
+      "fingerprint": "f4f672d8",
       "gatesSatisfied": [],
       "name": "Engineblade Maven",
       "scenarios": [
         {
-          "fingerprint": "b988b0d7",
+          "fingerprint": "781cbaf0",
           "scenario": "play"
         },
         {
-          "fingerprint": "a68e3963",
+          "fingerprint": "323f5a24",
           "scenario": "evolve"
         }
       ],
@@ -3475,12 +3475,12 @@
       "status": "covered"
     },
     "10271210": {
-      "fingerprint": "934a82c8",
+      "fingerprint": "26543294",
       "gatesSatisfied": [],
       "name": "Artifact Catapult",
       "scenarios": [
         {
-          "fingerprint": "68594180",
+          "fingerprint": "f9931c93",
           "scenario": "play"
         }
       ],
@@ -3517,12 +3517,12 @@
       "status": "skipped"
     },
     "10273110": {
-      "fingerprint": "c0966600",
+      "fingerprint": "3df7cba4",
       "gatesSatisfied": [],
       "name": "Carnelia, Ember of Darkness",
       "scenarios": [
         {
-          "fingerprint": "3b1406a8",
+          "fingerprint": "cc5750c0",
           "scenario": "play"
         },
         {
@@ -11734,12 +11734,12 @@
       "token": true
     },
     "90071210": {
-      "fingerprint": "0397337c",
+      "fingerprint": "58fbe028",
       "gatesSatisfied": [],
       "name": "Gear of Ambition",
       "scenarios": [
         {
-          "fingerprint": "294279d0",
+          "fingerprint": "2253ef98",
           "scenario": "summon"
         }
       ],
@@ -11747,12 +11747,12 @@
       "token": true
     },
     "90071220": {
-      "fingerprint": "7c3ff360",
+      "fingerprint": "40be959c",
       "gatesSatisfied": [],
       "name": "Gear of Remembrance",
       "scenarios": [
         {
-          "fingerprint": "01bb7df8",
+          "fingerprint": "e27c5688",
           "scenario": "summon"
         }
       ],
