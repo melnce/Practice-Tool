@@ -8,6 +8,7 @@
 import { state } from "../../src/core/gameState.js";
 import { createCard } from "../../tests/harness/builders.js";
 import type { CardInstance } from "../../src/core/types/index.js";
+import { DEFAULT_FULL_COST_LADDER } from "../../src/logic/core/playedBaseCostHistory.js";
 
 export type GateSpec = {
   condition: string;
@@ -16,6 +17,16 @@ export type GateSpec = {
   requirement?: number;
   at_least?: number;
   hasElse: boolean;
+  /** Named gate fields used by board/ally/hand matchers */
+  name?: string;
+  type?: string;
+  tribe?: string;
+  base_cost_eq?: number;
+  base_cost_gte?: number;
+  base_cost_lte?: number;
+  has_keyword?: string;
+  exclude_self?: boolean;
+  is_ally?: boolean;
   /** Path hint for debugging only */
   where: string;
 };
@@ -54,7 +65,46 @@ const PREPARABLE = new Set([
   "leader_defense_gt_enemy",
   "has_fuse_materials",
   "fused_this_turn",
+  "self_cost",
+  "board_name",
+  "ally_matches",
+  "field_matches",
+  "selected_matches",
+  "unique_tribe_enters",
+  "named_enter_count",
+  "hand_matches",
+  "last_discarded_type",
+  "hand_same_cost_gte",
+  "hand_top_base_costs_gt_enemy",
+  "played_base_cost_ladder",
 ]);
+
+/** Max followers/amulets per side — harness must never exceed this after prep. */
+export const HARNESS_BOARD_CAP = 5;
+
+/** Leave one slot when the driven card will occupy the allied board. */
+export const HARNESS_BOARD_RESERVE = 1;
+
+export function trimBoardToCap(board: CardInstance[], maxLen: number): void {
+  while (board.length > maxLen) {
+    const idx = board.findIndex(
+      (c) => c.type === "Follower" && String(c.name).startsWith("ArenaAlly"),
+    );
+    if (idx >= 0) board.splice(idx, 1);
+    else board.pop();
+  }
+}
+
+export function assertHarnessBoardCap(context: string): void {
+  for (const side of ["first", "second"] as const) {
+    const len = state.players[side].board.length;
+    if (len > HARNESS_BOARD_CAP) {
+      throw new Error(
+        `Harness board cap exceeded for ${side}: ${len} > ${HARNESS_BOARD_CAP} (${context})`,
+      );
+    }
+  }
+}
 
 export function isPreparableCondition(name: string): boolean {
   return PREPARABLE.has(name);
@@ -106,6 +156,19 @@ export function collectNamedGates(card: {
           typeof obj.requirement === "number" ? obj.requirement : undefined,
         at_least: typeof obj.at_least === "number" ? obj.at_least : undefined,
         hasElse: Array.isArray(obj.else_effects) && obj.else_effects.length > 0,
+        name: typeof obj.name === "string" ? obj.name : undefined,
+        type: typeof obj.type === "string" ? obj.type : undefined,
+        tribe: typeof obj.tribe === "string" ? obj.tribe : undefined,
+        base_cost_eq:
+          typeof obj.base_cost_eq === "number" ? obj.base_cost_eq : undefined,
+        base_cost_gte:
+          typeof obj.base_cost_gte === "number" ? obj.base_cost_gte : undefined,
+        base_cost_lte:
+          typeof obj.base_cost_lte === "number" ? obj.base_cost_lte : undefined,
+        has_keyword:
+          typeof obj.has_keyword === "string" ? obj.has_keyword : undefined,
+        exclude_self: obj.exclude_self === true,
+        is_ally: typeof obj.is_ally === "boolean" ? obj.is_ally : undefined,
         where: `${label}${where.slice(1)}`,
       });
     });
@@ -216,21 +279,14 @@ export function applyGatePreparations(
       }
       case "amulet_count": {
         const need = Math.max(1, maxCount || 1);
+        const maxBeforePlay = HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE;
         if (wantPass) {
           while (first.board.filter((c) => c.type === "Amulet").length < need) {
-            while (first.board.length >= 5) {
-              const idx = first.board.findIndex(
-                (c) =>
-                  c.type === "Follower" &&
-                  String(c.name).startsWith("ArenaAlly"),
-              );
-              if (idx >= 0) first.board.splice(idx, 1);
-              else first.board.pop();
-            }
+            trimBoardToCap(first.board, maxBeforePlay - 1);
             first.board.push(
               createCard(
                 {
-                  name: `HarnessAmulet${first.board.length}`,
+                  name: `HarnessAmulet${first.board.filter((c) => c.type === "Amulet").length + 1}`,
                   type: "Amulet",
                   cost: 1,
                 },
@@ -239,6 +295,7 @@ export function applyGatePreparations(
               ),
             );
           }
+          trimBoardToCap(first.board, maxBeforePlay);
           satisfied.push(cond);
         } else {
           first.board = first.board.filter((c) => c.type !== "Amulet");
@@ -485,6 +542,350 @@ export function applyGatePreparations(
             unmet.push(cond);
           }
         } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "self_cost": {
+        const targetCost = Math.max(0, maxCost || 0);
+        if (opts.sourceCard) {
+          if (wantPass) {
+            (opts.sourceCard as any).cost = targetCost;
+            (opts.sourceCard as any).effectiveCost = targetCost;
+            (opts.sourceCard as any).base_cost = targetCost;
+            satisfied.push(cond);
+          } else {
+            (opts.sourceCard as any).cost = 0;
+            (opts.sourceCard as any).effectiveCost = 0;
+            unmet.push(cond);
+          }
+        } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "board_name": {
+        const want = String(specs.find((s) => s.name)?.name ?? "").trim();
+        if (!want) {
+          unmet.push(cond);
+          break;
+        }
+        if (wantPass) {
+          trimBoardToCap(
+            first.board,
+            HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+          );
+          if (!first.board.some((c) => String(c.name) === want)) {
+            first.board.push(
+              createCard(
+                {
+                  name: want,
+                  type: "Follower",
+                  cost: 2,
+                  attack: 1,
+                  defense: 1,
+                },
+                "board",
+                "first",
+              ),
+            );
+          }
+          satisfied.push(cond);
+        } else {
+          first.board = first.board.filter((c) => String(c.name) !== want);
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "ally_matches": {
+        const spec = specs[0];
+        const need = Math.max(1, maxCount || 1);
+        const countMatches = () =>
+          first.board.filter((c) => {
+            if (spec?.type && spec.type !== "Card") {
+              if (
+                String(c.type).toLowerCase() !== String(spec.type).toLowerCase()
+              )
+                return false;
+            }
+            if (spec?.base_cost_gte != null) {
+              const bc =
+                (c as any).base_cost !== undefined
+                  ? Number((c as any).base_cost)
+                  : Number(c.cost) || 0;
+              if (bc < spec.base_cost_gte) return false;
+            }
+            if (spec?.has_keyword) {
+              const kws = (c as any).keywords ?? [];
+              const hasKw = kws.some(
+                (k: unknown) =>
+                  k === spec.has_keyword ||
+                  (k &&
+                    typeof k === "object" &&
+                    (k as { name?: string }).name === spec.has_keyword),
+              );
+              if (!hasKw && !(c as any)[`has${spec.has_keyword}`]) return false;
+            }
+            return true;
+          }).length;
+        if (wantPass) {
+          while (countMatches() < need) {
+            trimBoardToCap(
+              first.board,
+              HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+            );
+            const cardSpec: Record<string, unknown> = {
+              name: `HarnessAllyMatch${countMatches() + 1}`,
+              type: spec?.type && spec.type !== "Card" ? spec.type : "Follower",
+              cost: spec?.base_cost_gte ?? spec?.base_cost_eq ?? 2,
+              attack: 1,
+              defense: 1,
+            };
+            if (spec?.base_cost_gte != null) {
+              cardSpec.cost = spec.base_cost_gte;
+              cardSpec.base_cost = spec.base_cost_gte;
+            }
+            if (spec?.base_cost_eq != null) {
+              cardSpec.cost = spec.base_cost_eq;
+              cardSpec.base_cost = spec.base_cost_eq;
+            }
+            if (spec?.name) cardSpec.name = spec.name;
+            if (spec?.tribe) cardSpec.tribes = [spec.tribe];
+            const ally = createCard(cardSpec as any, "board", "first");
+            if (spec?.has_keyword) {
+              (ally as any).keywords = [spec.has_keyword];
+              if (spec.has_keyword === "LastWords") ally.hasLastWords = true;
+            }
+            first.board.push(ally);
+          }
+          satisfied.push(cond);
+        } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "field_matches": {
+        const spec = specs[0];
+        const need = Math.max(1, maxCount || 1);
+        if (wantPass) {
+          const field = [...first.board, ...second.board];
+          let matches = field.filter((c) => {
+            if (
+              spec?.exclude_self &&
+              opts.sourceCard &&
+              c.uid === opts.sourceCard.uid
+            )
+              return false;
+            if (spec?.base_cost_eq != null) {
+              const bc =
+                (c as any).base_cost !== undefined
+                  ? Number((c as any).base_cost)
+                  : Number(c.cost) || 0;
+              return bc === spec.base_cost_eq;
+            }
+            return true;
+          }).length;
+          while (matches < need) {
+            trimBoardToCap(second.board, HARNESS_BOARD_CAP);
+            const cardSpec: Record<string, unknown> = {
+              name: `HarnessFieldMatch${matches + 1}`,
+              type: spec?.type && spec.type !== "Card" ? spec.type : "Follower",
+              cost: spec?.base_cost_eq ?? 1,
+              attack: 1,
+              defense: 1,
+            };
+            if (spec?.base_cost_eq != null) {
+              cardSpec.base_cost = spec.base_cost_eq;
+            }
+            second.board.push(createCard(cardSpec as any, "board", "second"));
+            matches++;
+          }
+          satisfied.push(cond);
+        } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "selected_matches": {
+        if (wantPass) {
+          trimBoardToCap(
+            first.board,
+            HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+          );
+          const spec = specs[0];
+          const ally = createCard(
+            {
+              name: "HarnessSelectAmulet",
+              type: spec?.type === "Amulet" ? "Amulet" : "Follower",
+              cost: 1,
+            },
+            "board",
+            "first",
+          );
+          first.board.unshift(ally);
+          satisfied.push(cond);
+        } else {
+          first.board = first.board.filter(
+            (c) => String(c.name) !== "HarnessSelectAmulet",
+          );
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "unique_tribe_enters": {
+        const tribe = String(specs[0]?.tribe || "Artifact");
+        const need = Math.max(1, maxCount || 1);
+        if (wantPass) {
+          if (!first.followerEnterHistory) first.followerEnterHistory = [];
+          const names = [
+            "HarnessTribeA",
+            "HarnessTribeB",
+            "HarnessTribeC",
+            "HarnessTribeD",
+          ];
+          for (let i = 0; i < need; i++) {
+            first.followerEnterHistory.push({
+              name: names[i] ?? `HarnessTribe${i}`,
+              tribes: [tribe],
+              cardId: `harness_tribe_${i}`,
+            });
+          }
+          satisfied.push(cond);
+        } else {
+          first.followerEnterHistory = [];
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "named_enter_count": {
+        const name = String(specs[0]?.name ?? opts.sourceCard?.name ?? "");
+        const need = Math.max(1, maxCount || 1);
+        const excludeSelf = specs.some((s) => s.exclude_self);
+        if (wantPass && name) {
+          if (!first.followerEnterHistory) first.followerEnterHistory = [];
+          const entries = excludeSelf ? need : need;
+          for (let i = 0; i < entries; i++) {
+            first.followerEnterHistory.push({
+              name,
+              tribes: [],
+              cardId: `harness_named_${i}`,
+            });
+          }
+          satisfied.push(cond);
+        } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "hand_matches": {
+        const spec = specs[0];
+        const need = Math.max(1, maxCount || 1);
+        if (wantPass) {
+          const filterType = spec?.type ?? "Follower";
+          let have = first.hand.filter(
+            (c) =>
+              String(c.type).toLowerCase() === String(filterType).toLowerCase(),
+          ).length;
+          while (have < need) {
+            first.hand.push(
+              createCard(
+                {
+                  name: `HarnessHandMatch${have + 1}`,
+                  type: filterType,
+                  cost: 1,
+                },
+                "hand",
+                "first",
+              ),
+            );
+            have++;
+          }
+          satisfied.push(cond);
+        } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "last_discarded_type": {
+        const wantType = String(specs[0]?.type ?? "Spell");
+        if (wantPass) {
+          (state as any).lastDiscardedType = wantType;
+          satisfied.push(cond);
+        } else {
+          (state as any).lastDiscardedType =
+            wantType === "Spell" ? "Follower" : "Spell";
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "hand_same_cost_gte": {
+        const need = Math.max(1, maxCount || 4);
+        if (wantPass) {
+          const sharedCost = 2;
+          let have = first.hand.filter(
+            (c) => Number(c.cost) === sharedCost,
+          ).length;
+          while (have < need) {
+            first.hand.push(
+              createCard(
+                {
+                  name: `HarnessSameCost${have + 1}`,
+                  type: "Follower",
+                  cost: sharedCost,
+                },
+                "hand",
+                "first",
+              ),
+            );
+            have++;
+          }
+          satisfied.push(cond);
+        } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "hand_top_base_costs_gt_enemy": {
+        const n = Math.max(1, maxCount || 3);
+        if (wantPass) {
+          first.hand = [];
+          for (let i = 0; i < n; i++) {
+            const c = createCard(
+              {
+                name: `HarnessHighTop${i + 1}`,
+                type: "Follower",
+                cost: 8 - i,
+              },
+              "hand",
+              "first",
+            );
+            (c as any).base_cost = 8 - i;
+            first.hand.push(c);
+          }
+          second.hand = [
+            createCard(
+              { name: "HarnessLowEnemy", type: "Follower", cost: 1 },
+              "hand",
+              "second",
+            ),
+          ];
+          satisfied.push(cond);
+        } else {
+          unmet.push(cond);
+        }
+        break;
+      }
+      case "played_base_cost_ladder": {
+        if (wantPass) {
+          for (const cost of DEFAULT_FULL_COST_LADDER) {
+            if (!first.playedBaseCostsThisMatch.includes(cost)) {
+              first.playedBaseCostsThisMatch.push(cost);
+            }
+          }
+          first.playedBaseCostsThisMatch.sort((a, b) => a - b);
+          satisfied.push(cond);
+        } else {
+          first.playedBaseCostsThisMatch = [];
           unmet.push(cond);
         }
         break;
