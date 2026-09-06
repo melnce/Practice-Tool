@@ -595,22 +595,18 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     expect(getBoard(state, "second")).toHaveLength(0);
   }, 60_000);
 
-  it.fails(
-    "10372110 Supplicant — random 2 damage still fires when Lishenna can't be destroyed (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [SUPPLICANT], pp: 2 });
-      const lishenna = createCard(LISHENNA, "board", "first");
-      lishenna.peak_defense = lishenna.defense;
-      applyKeywordsFromList(lishenna);
-      state.players.first.board = [lishenna];
-      const foe = enemyFollower(2, 5, "Foe");
-      whenPlayCard("first", 0);
-      resolvePendingByUid(lishenna.uid);
-      expect(findOnBoard("first", "Lishenna, Melody Manifest")).toBeTruthy();
-      expect(Number(foe.defense)).toBe(3);
-    },
-    60_000,
-  );
+  it("10372110 Supplicant — random 2 damage still fires when Lishenna can't be destroyed (official Q&A)", () => {
+    setupTurn(R6, { hand: [SUPPLICANT], pp: 2 });
+    const lishenna = createCard(LISHENNA, "board", "first");
+    lishenna.peak_defense = lishenna.defense;
+    applyKeywordsFromList(lishenna);
+    state.players.first.board = [lishenna];
+    const foe = enemyFollower(2, 5, "Foe");
+    whenPlayCard("first", 0);
+    resolvePendingByUid(lishenna.uid);
+    expect(findOnBoard("first", "Lishenna, Melody Manifest")).toBeTruthy();
+    expect(Number(foe.defense)).toBe(3);
+  }, 60_000);
 
   it.fails(
     "90073110 Ominous Artifact α — β then γ across turns transforms into Masterwork Ω (official Q&A)",
