@@ -90,6 +90,8 @@ A "Select …" clause is mandatory: while a legal target exists, the selection c
 
 A **spell** with a mandatory "Select …" clause requires at least one legal target to be playable at all — no target, no play (no Hearthstone-style burning mana on nothing). **Followers and amulets** with the same kind of clause stay playable; the selection clause simply fizzles. Accelerate plays are gated like spells (they resolve as spells). Radiant Rainbow (`10131310`) is the canonical dead-card case when no Spellboost card is in hand.
 
+**Hand selections (official Q&A, 2026-09-06):** The same rule applies when a spell must **select from your hand** — every mandatory hand-selection step needs enough legal candidates (the card being played is never a candidate for its own hand selection, and `select: N` needs N candidates). Spilling Red (`10642310`) cannot be played unless you can both discard a different hand card and destroy an enemy follower; Doomwright Resurgence (`10172320`) cannot be played without two Artifact followers in hand that cost 5 or less. See `docs/official-qa.md` for the published answers.
+
 Once an ability is activated with chosen targets, those targets are locked in; there is no interrupt or response window between selection and resolution. If a target becomes invalid mid-resolution (e.g. destroyed by an earlier part of a multi-step effect), the action on that target simply does nothing while the rest of the effect resolves on its other targets. Spells never "fizzle" entirely — each instruction does as much as it can. For example, "destroy an enemy follower, then draw a card": if the follower is already gone when the spell resolves, the destroy does nothing but the player still draws.
 
 ## Randomness

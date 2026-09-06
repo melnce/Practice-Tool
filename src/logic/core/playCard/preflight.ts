@@ -9,6 +9,7 @@ import type {
   Effect,
 } from "../../../core/types/index.js";
 import { getPool, selectPoolCondition } from "../targeting.js";
+import { parseSelectConfig } from "../targeting/selectHelpers.js";
 import { isOverflow } from "../../../helpers/overflow.js";
 import {
   peekCondition,
@@ -102,18 +103,15 @@ export function canPlayCard(
     const targetCheck = checkEffectsHaveValidTargets(effectList, player, card);
     if (!targetCheck.ok) return targetCheck;
 
-    const handReturnCheck = checkHandReturnRequirement(effectList, hand, card);
-    if (!handReturnCheck.ok) return handReturnCheck;
+    const handSelectCheck = checkMandatoryHandSelections(
+      effectList,
+      player,
+      card,
+    );
+    if (!handSelectCheck.ok) return handSelectCheck;
 
     const allyOnBoardCheck = checkAllyOnBoardRequirement(effectList, myBoard);
     if (!allyOnBoardCheck.ok) return allyOnBoardCheck;
-
-    const artifactPairCheck = checkArtifactPairRequirement(
-      effectList,
-      hand,
-      card,
-    );
-    if (!artifactPairCheck.ok) return artifactPairCheck;
   }
 
   // 3) Board space for permanents (Accelerate is a spell — no slot needed)
@@ -283,26 +281,203 @@ function checkEffectsHaveValidTargets(
   return checkArr(effects);
 }
 
+function describeEmptyHandSelectionPool(eff: Effect): string {
+  const condition = selectPoolCondition(eff);
+  const op = String(eff?.op || "").toLowerCase();
+
+  if (
+    op === "summon" &&
+    (eff as any).source === "hand" &&
+    (eff as any).filter?.type === "Artifact"
+  ) {
+    const maxCost = (eff as any).max_cost ?? 5;
+    return `Spell requires at least ${requiredHandSelectCount(eff)} Artifact followers (cost ≤ ${maxCost}) in hand.`;
+  }
+
+  if (condition.has_keyword) {
+    const keywords = Array.isArray(condition.has_keyword)
+      ? condition.has_keyword
+      : [condition.has_keyword];
+    const kwLabel = keywords.map((k: string | number) => String(k)).join(", ");
+    return `Spell requires a card in hand with ${kwLabel}.`;
+  }
+
+  if (condition.tribe || condition.type === "Artifact") {
+    const label = condition.tribe || condition.type;
+    return `Spell requires a ${label} card in hand but none are available.`;
+  }
+
+  if (condition.type) {
+    return `Spell requires a ${condition.type} card in hand but none are available.`;
+  }
+
+  if (op === "discard") {
+    return "Spell needs a different hand card to discard.";
+  }
+
+  if (
+    op === "return" &&
+    String((eff as any).destination || "").toLowerCase() === "deck"
+  ) {
+    return "Spell needs a different hand card to return.";
+  }
+
+  return "Spell requires a hand selection but none are available.";
+}
+
+function requiredHandSelectCount(eff: Effect): number {
+  const op = String(eff?.op || "").toLowerCase();
+  if (op === "discard" && String((eff as any).mode || "select") === "select") {
+    const count = Math.max(0, parseInt(String((eff as any).count ?? 1), 10));
+    return count > 0 ? count : 1;
+  }
+
+  const raw = (eff as any).select ?? (eff as any).select_count;
+  if (raw === "all") return 1;
+
+  return parseSelectConfig(eff).count;
+}
+
+function isMandatoryHandSelectionOp(eff: Effect): boolean {
+  if (!eff || (eff as any).optional) return false;
+  if (eff.op === "mode") return false;
+
+  const op = String(eff.op || "").toLowerCase();
+  const target = String(eff.target || "");
+  const hasHandTarget = target.includes("hand");
+
+  if (op === "discard" && String((eff as any).mode || "select") === "select") {
+    return requiredHandSelectCount(eff) > 0;
+  }
+
+  if (
+    op === "summon" &&
+    (eff as any).source === "hand" &&
+    ((eff as any).select || (eff as any).select_count)
+  ) {
+    return true;
+  }
+
+  if (
+    op === "return" &&
+    String((eff as any).destination || "").toLowerCase() === "deck" &&
+    (eff as any).select
+  ) {
+    return true;
+  }
+
+  if (op === "cost" && (eff as any).select && hasHandTarget) {
+    return true;
+  }
+
+  if ((eff.select || eff.select_count || op === "select") && hasHandTarget) {
+    return true;
+  }
+
+  return false;
+}
+
+function getHandSelectionPool(
+  eff: Effect,
+  player: Player,
+  sourceCard: CardInstance | null,
+): CardInstance[] {
+  const playingCardUid = sourceCard?.uid;
+  const poolContext = {
+    isTargetedEffect: true,
+    ...(playingCardUid ? { playingCardUid } : {}),
+  };
+
+  const op = String(eff?.op || "").toLowerCase();
+
+  if (op === "discard" && String((eff as any).mode || "select") === "select") {
+    return getPool(
+      "ally:hand",
+      player,
+      sourceCard,
+      selectPoolCondition(eff),
+      poolContext,
+    );
+  }
+
+  if (
+    op === "summon" &&
+    (eff as any).source === "hand" &&
+    (eff as any).filter?.type === "Artifact"
+  ) {
+    const maxCost = Number((eff as any).max_cost ?? 5);
+    return getHand(state, player).filter((c) => {
+      if (!c || c.uid === playingCardUid || c.type !== "Follower") return false;
+      const tribes = Array.isArray(c.tribes)
+        ? c.tribes.map((t) => String(t).toLowerCase())
+        : [];
+      if (!tribes.includes("artifact")) return false;
+      return getEffectiveCost(c) <= maxCost;
+    });
+  }
+
+  if (
+    op === "summon" &&
+    (eff as any).source === "hand" &&
+    ((eff as any).filter?.type === "Follower" ||
+      String(eff.target || "").includes("hand:follower"))
+  ) {
+    return getPool(
+      "ally:hand:follower",
+      player,
+      sourceCard,
+      selectPoolCondition(eff),
+      poolContext,
+    );
+  }
+
+  const target = String(eff.target || "");
+  if (target.includes("hand")) {
+    return getPool(
+      target,
+      player,
+      sourceCard,
+      selectPoolCondition(eff),
+      poolContext,
+    );
+  }
+
+  if (
+    op === "return" &&
+    String((eff as any).destination || "").toLowerCase() === "deck"
+  ) {
+    return getPool(
+      "ally:hand",
+      player,
+      sourceCard,
+      selectPoolCondition(eff),
+      poolContext,
+    );
+  }
+
+  return [];
+}
+
 /**
- * Check if effects require returning a hand card (need at least 2 cards in hand).
+ * Top-level spell effects with mandatory hand selection need enough legal
+ * candidates (playing card excluded). Followers/amulets fizzle instead.
  */
-function checkHandReturnRequirement(
+function checkMandatoryHandSelections(
   effects: Effect[],
-  hand: CardInstance[],
-  playingCard: CardInstance,
+  player: Player,
+  sourceCard: CardInstance,
 ): PreflightResult {
-  const needsHandReturn = effects.some(
-    (e: Effect) =>
-      String(e.op).toLowerCase() === "return" &&
-      (e as any).destination === "deck" &&
-      e.select,
-  );
-  const otherHandCards = hand.filter((c) => c?.uid !== playingCard.uid);
-  if (needsHandReturn && otherHandCards.length < 1) {
-    return {
-      ok: false,
-      reason: "Spell needs a different hand card to return.",
-    };
+  for (const eff of effects || []) {
+    if (!isMandatoryHandSelectionOp(eff)) continue;
+
+    const required = requiredHandSelectCount(eff);
+    const pool = getHandSelectionPool(eff, player, sourceCard);
+    if (!pool || pool.length < required) {
+      return {
+        ok: false,
+        reason: describeEmptyHandSelectionPool(eff),
+      };
+    }
   }
   return { ok: true };
 }
@@ -326,38 +501,6 @@ function checkAllyOnBoardRequirement(
   );
   if (needsAlly && myBoard.length === 0) {
     return { ok: false, reason: "Spell requires an ally on board." };
-  }
-  return { ok: true };
-}
-
-/**
- * Check artifact pair requirement (need at least 2 artifact followers in hand).
- */
-function checkArtifactPairRequirement(
-  effects: Effect[],
-  hand: CardInstance[],
-  playingCard: CardInstance,
-): PreflightResult {
-  const usesArtifactCopyOp = effects.some(
-    (e: any) => e && e.op === "select_hand_summon_artifact_copies_eot_destroy",
-  );
-  if (usesArtifactCopyOp) {
-    let artifactCount = 0;
-    for (const c of hand) {
-      if (!c || c.uid === playingCard.uid || c.type !== "Follower") continue;
-      const tribes = Array.isArray(c.tribes)
-        ? c.tribes.map((t) => String(t).toLowerCase())
-        : [];
-      if (!tribes.includes("artifact")) continue;
-      if (getEffectiveCost(c) <= 5) artifactCount++;
-    }
-    if (artifactCount < 2) {
-      return {
-        ok: false,
-        reason:
-          "Spell requires at least 2 Artifact followers (cost ≤ 5) in hand.",
-      };
-    }
   }
   return { ok: true };
 }
