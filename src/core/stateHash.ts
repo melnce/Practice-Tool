@@ -20,6 +20,11 @@ export function hashGameState(state: GameState): string {
   return simpleHash(JSON.stringify(canonical));
 }
 
+/** Debug / soak comparison — full canonical snapshot (game-relevant fields only). */
+export function exportCanonicalState(state: GameState): object {
+  return canonicalizeState(state);
+}
+
 /**
  * Create a canonical, deterministic representation of state.
  * Strips non-deterministic fields (timestamps, UI flags).
@@ -37,8 +42,10 @@ function canonicalizeState(state: GameState): object {
     // Resources
     blueHP: state.players.first.hp,
     redHP: state.players.second.hp,
-    bluePP: state.players.first.pp,
-    redPP: state.players.second.pp,
+    bluePP: state.players.first.pp + state.players.first.bonusPpOrb,
+    redPP: state.players.second.pp + state.players.second.bonusPpOrb,
+    blueBonusPpOrb: state.players.first.bonusPpOrb,
+    redBonusPpOrb: state.players.second.bonusPpOrb,
     blueMaxPP: state.players.first.maxPP,
     redMaxPP: state.players.second.maxPP,
     blueShadows: state.players.first.shadows,

@@ -317,7 +317,11 @@ export function runStartOfTurnBoundary(
     }
   } finally {
     if (deferDrain) {
-      (state as any).sotBoundaryDeferDrain = prevBoundaryDefer;
+      if (prevBoundaryDefer) {
+        (state as any).sotBoundaryDeferDrain = true;
+      } else {
+        delete (state as any).sotBoundaryDeferDrain;
+      }
       (state as any).deferDeathTriggers = prevDefer;
     }
   }
