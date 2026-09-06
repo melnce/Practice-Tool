@@ -247,22 +247,17 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     ).toBe("blocked");
   }, 60_000);
 
-  it.fails(
-    "10642310 Spilling Red — blocked with enemy but no other hand card to discard (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [SPILLING_RED], pp: 6 });
-      enemyFollower(2, 3);
-      const spillingOnly = getHand(state, "first").find(
-        (c) => c.id === SPILLING_RED,
-      )!;
-      expect(canPlayCard(spillingOnly, "first").ok).toBe(false);
-      expect(
-        whenPlayCard("first", getHand(state, "first").indexOf(spillingOnly))
-          .kind,
-      ).toBe("blocked");
-    },
-    60_000,
-  );
+  it("10642310 Spilling Red — blocked with enemy but no other hand card to discard (official Q&A)", () => {
+    setupTurn(R6, { hand: [SPILLING_RED], pp: 6 });
+    enemyFollower(2, 3);
+    const spillingOnly = getHand(state, "first").find(
+      (c) => c.id === SPILLING_RED,
+    )!;
+    expect(canPlayCard(spillingOnly, "first").ok).toBe(false);
+    expect(
+      whenPlayCard("first", getHand(state, "first").indexOf(spillingOnly)).kind,
+    ).toBe("blocked");
+  }, 60_000);
 
   it("10143210 Fan of Otohime — Engage with empty hand summons Bodyguard without discard (official Q&A)", () => {
     setupTurn(R6, { hand: [], pp: 4 });

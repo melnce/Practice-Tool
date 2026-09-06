@@ -5855,16 +5855,10 @@
       "unmetGates": ["hand_matches"]
     },
     "10521310": {
-      "fingerprint": "01c65b25",
-      "gatesSatisfied": [],
+      "detail": "Spell requires a Spell card in hand but none are available.",
       "name": "Extravagance of the Goldbloom",
-      "scenarios": [
-        {
-          "fingerprint": "c3ae115c",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10522110": {
       "fingerprint": "7b1acc28",
@@ -6000,16 +5994,10 @@
       "status": "covered"
     },
     "10531310": {
-      "fingerprint": "ce73d4b4",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Metamorphosis of the Dawnblossom",
-      "scenarios": [
-        {
-          "fingerprint": "61c7e8ce",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10532110": {
       "fingerprint": "80d41ad1",
@@ -6580,16 +6568,10 @@
       "status": "covered"
     },
     "10572310": {
-      "fingerprint": "5373c0f7",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Resurrection Tuner",
-      "scenarios": [
-        {
-          "fingerprint": "cbcbfd23",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10573110": {
       "fingerprint": "25ea04cf",
@@ -7198,16 +7180,10 @@
       "status": "covered"
     },
     "10642310": {
-      "fingerprint": "06673a20",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Spilling Red",
-      "scenarios": [
-        {
-          "fingerprint": "0c5428f3",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10643110": {
       "fingerprint": "61f88498",
@@ -10267,16 +10243,10 @@
       "status": "covered"
     },
     "10942310": {
-      "fingerprint": "0329a7ec",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Parting Jaws",
-      "scenarios": [
-        {
-          "fingerprint": "c9d4a5d0",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10943110": {
       "fingerprint": "bb1f2428",
@@ -10673,20 +10643,10 @@
       "status": "covered"
     },
     "10972310": {
-      "fingerprint": "2ad0583f",
-      "gatesSatisfied": ["highlander"],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Disgraceful Banishment",
-      "scenarios": [
-        {
-          "fingerprint": "740ba364",
-          "scenario": "play_else"
-        },
-        {
-          "fingerprint": "0e3be254",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10973110": {
       "fingerprint": "247f5d38",
@@ -11949,13 +11909,13 @@
       "token": true
     }
   },
-  "covered": 857,
+  "covered": 851,
   "partial": 29,
   "seed": 42,
   "skipReasons": {
-    "play_blocked": 18
+    "play_blocked": 24
   },
-  "skipped": 18,
+  "skipped": 24,
   "tokenCount": 93,
   "unmetGateCounts": {
     "ally_matches": 4,
