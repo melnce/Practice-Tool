@@ -4,7 +4,7 @@
 import { state } from "../../../../core/gameState.js";
 import { getPool } from "../../../core/targeting.js";
 import { cleanupDead } from "../../../core/cleanup.js";
-import { applyLeaderDamage } from "../../leader.js";
+import { applyLeaderDamage, applyAllLeadersDamage } from "../../leader.js";
 import { dealDamage } from "../../../core/barrier.js";
 import type {
   Effect,
@@ -138,6 +138,12 @@ export function handleDamage(
   // by_stat must run before generic leader routing (e.g. Raging Lightning Overflow)
   if (spec.distribution === "by_stat") {
     handleByStatDamage(spec, amount, owner);
+    return "done";
+  }
+
+  // Both leaders in one instruction — damage both before game-over check
+  if (targetStr === "all:leader") {
+    applyAllLeadersDamage(owner, amount);
     return "done";
   }
 

@@ -63,6 +63,12 @@ At the start of each turn the active player increases their maximum Play Points 
 
 The primary win condition is reducing the opponent's leader defense to 0, through combat damage or card effects; that player wins immediately. The secondary loss condition is deck depletion: nothing happens the moment a deck empties, but the next time a player must _draw_ from an empty deck, they lose immediately. Surrendering also causes an immediate loss. There are no alternate "instant win" conditions in the base rules (no Exodia-style cards).
 
+**Simultaneous leader lethal (official Q&A).** When a single instruction deals damage to both leaders (e.g. "deal X damage to both leaders"), both leaders take that damage before the outcome is judged. If both leaders are at 0 or less after that judgement, the **active player loses** (their opponent wins). Separate instructions are still judged one after another — if the enemy leader reaches 0 from an earlier clause, the match ends before later clauses can damage your leader.
+
+- _Balto, Dusk Bounty Hunter (`10153140`):_ Crest at end of your turn with both leaders at 1 — your opponent wins.
+- _Aragavy, Eternal Hunter (`10154130`):_ Evolve with both leaders at 3 — your opponent wins.
+- _Rage of Serpents (`10153310`):_ Both leaders at 2, enemy leader selected — you win (enemy reaches 0 first; the self-damage clause does not run).
+
 ## Zones and Card States
 
 Cards move through distinct zones during play:
@@ -569,7 +575,7 @@ Combat is straightforward but interacts subtly with abilities. This section cove
 
 - **Bane:** a Bane follower that deals any combat damage (even 0) to a follower destroys it after damage resolves. The sequence is: exchange damage, then check Bane — a combatant that fought a Bane follower is destroyed (if both had Bane, both die). _Example:_ a 1/1 Bane into a 10/10 — the 1/1 dies to the counter-damage, but its Bane still destroys the 10/10, so both die. A Bane kill is destruction by an ability (not by damage) tied to combat: it fires the victim's Last Words, Barrier does not stop it, and the Bane follower need not survive. A follower that "can't be destroyed by abilities" survives Bane as long as it still has more than 0 defense.
 - **Drain:** in combat, after damage, an attacker with Drain restores its leader by the damage it dealt. A _defending_ Drain follower's counter-damage restores nothing, and effect (non-combat) damage from a Drain follower restores nothing.
-- **Splash / AoE:** simultaneous damage to several targets is applied to all, then destruction is checked for all at once; the resulting triggers resolve by the queue ordering (active side's Last Words first). If an AoE would bring both leaders to 0, the active player loses, since their side resolves first.
+- **Splash / AoE:** simultaneous damage to several targets is applied to all, then destruction is checked for all at once; the resulting triggers resolve by the queue ordering (active side's Last Words first). A single "deal damage to both leaders" instruction damages both leaders before game-over is judged; if both are at 0 or less, the active player loses.
 - **Self-damage:** damaging your own followers or leader works the same way; your leader at 0 loses you the game, and your own units dying are normal deaths (producing your shadows).
 
 ## Destruction vs. Other Removal

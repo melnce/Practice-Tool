@@ -391,34 +391,27 @@ describe("official Q&A — Abysscraft batch 4", () => {
     expect(bonemancer.hasBane).toBeFalsy();
   }, 60_000);
 
-  it.fails(
-    "10153140 Balto, Dusk Bounty Hunter — both leaders at 1: opponent wins at end of your turn (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [BALTO], pp: 4, hp: 1, secondHp: 1 });
-      whenPlayCard("first", 0);
-      whenEndTurn();
-      expect(getHP(state, "first")).toBe(0);
-      expect(getHP(state, "second")).toBe(0);
-      expect(getWinner(state)).toBe("second");
-      expect(state.phase).toBe("gameover");
-    },
-    60_000,
-  );
+  it("10153140 Balto, Dusk Bounty Hunter — both leaders at 1: opponent wins at end of your turn (official Q&A)", () => {
+    setupTurn(R6, { hand: [BALTO], pp: 4, hp: 1, secondHp: 1 });
+    whenPlayCard("first", 0);
+    whenEndTurn();
+    expect(getHP(state, "first")).toBe(0);
+    expect(getHP(state, "second")).toBe(0);
+    expect(getWinner(state)).toBe("second");
+    expect(state.phase).toBe("gameover");
+  }, 60_000);
 
-  it.fails(
-    "10153310 Rage of Serpents — both leaders at 2, enemy leader selected: you win (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [RAGE_OF_SERPENTS], pp: 3, hp: 2, secondHp: 2 });
-      enemyFollower(1, 5, "Bystander");
-      whenPlayCard("first", 0);
-      resolvePendingByUid("leader");
-      expect(getHP(state, "second")).toBe(0);
-      expect(getHP(state, "first")).toBe(0);
-      expect(getWinner(state)).toBe("first");
-      expect(state.phase).toBe("gameover");
-    },
-    60_000,
-  );
+  it("10153310 Rage of Serpents — both leaders at 2, enemy leader selected: you win (official Q&A)", () => {
+    setupTurn(R6, { hand: [RAGE_OF_SERPENTS], pp: 3, hp: 2, secondHp: 2 });
+    enemyFollower(1, 5, "Bystander");
+    whenPlayCard("first", 0);
+    resolvePendingByUid("leader");
+    expect(getHP(state, "second")).toBe(0);
+    // Game ends when enemy leader hits 0; self-damage clause never runs.
+    expect(getHP(state, "first")).toBe(2);
+    expect(getWinner(state)).toBe("first");
+    expect(state.phase).toBe("gameover");
+  }, 60_000);
 
   it("10154120 Medusa, Venomfang Royalty — super-evolve destroy ping fires after Follower Strike kill (official Q&A)", () => {
     setupTurn(R8, { hand: [MEDUSA], pp: 8, secondHp: 20 });
@@ -456,20 +449,16 @@ describe("official Q&A — Abysscraft batch 4", () => {
     expect(getBoard(state, "second")).toHaveLength(1);
   }, 60_000);
 
-  it.fails(
-    "10154130 Aragavy, Eternal Hunter — Evolve at 3/3 leaders: opponent wins (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [ARAGAVY], pp: 6, hp: 3, secondHp: 3 });
-      whenPlayCard("first", 0);
-      const arag = findOnBoard("first", "Aragavy, Eternal Hunter")!;
-      whenEvolveSelf(arag, "first", "normal");
-      expect(getHP(state, "first")).toBe(0);
-      expect(getHP(state, "second")).toBe(0);
-      expect(getWinner(state)).toBe("second");
-      expect(state.phase).toBe("gameover");
-    },
-    60_000,
-  );
+  it("10154130 Aragavy, Eternal Hunter — Evolve at 3/3 leaders: opponent wins (official Q&A)", () => {
+    setupTurn(R6, { hand: [ARAGAVY], pp: 6, hp: 3, secondHp: 3 });
+    whenPlayCard("first", 0);
+    const arag = findOnBoard("first", "Aragavy, Eternal Hunter")!;
+    whenEvolveSelf(arag, "first", "normal");
+    expect(getHP(state, "first")).toBe(0);
+    expect(getHP(state, "second")).toBe(0);
+    expect(getWinner(state)).toBe("second");
+    expect(state.phase).toBe("gameover");
+  }, 60_000);
 
   it("10252110 Vuella, the Blastwing — Olivia super-evolves Arriet: Vuella 6, Olivia 9, Arriet 8 attack (official Q&A)", () => {
     setupTurn(R10, { hand: [OLIVIA], pp: 10 });

@@ -26,6 +26,7 @@ import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceSemanticsForCard } from "./enhance-semantics-gate.js";
 import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
+import { checkBothLeadersForCard } from "./both-leaders-gate.js";
 import { loadCardsForGates, type CardJson } from "./lib/loadCards.js";
 import {
   getImplementationStatus,
@@ -1586,6 +1587,9 @@ function main() {
   const gateAllAlliedIncludeSelf =
     process.argv.includes("--gate=all-allied-include-self") ||
     process.argv.includes("--gate=all_allied_include_self");
+  const gateBothLeaders =
+    process.argv.includes("--gate=both-leaders") ||
+    process.argv.includes("--gate=both_leaders");
   const gateRandomEnemyIncludeLeader =
     process.argv.includes("--gate=random-enemy-include-leader") ||
     process.argv.includes("--gate=random_enemy_include_leader");
@@ -1598,6 +1602,7 @@ function main() {
     gateSelectTarget ||
     gateEnhanceSemantics ||
     gateAllAlliedIncludeSelf ||
+    gateBothLeaders ||
     gateRandomEnemyIncludeLeader;
 
   const files = loadCardsForGates(setArg);
@@ -1628,9 +1633,11 @@ function main() {
                   ? "🔍 Checking Enhance semantics contracts...\n"
                   : gateAllAlliedIncludeSelf
                     ? "🔍 Checking all-allied-followers include_self contracts...\n"
-                    : gateRandomEnemyIncludeLeader
-                      ? "🔍 Checking random-enemy include_leader contracts...\n"
-                      : "🔍 Checking card description ↔ JSON structure...\n",
+                    : gateBothLeaders
+                      ? "🔍 Checking both-leaders ↔ all:leader contracts...\n"
+                      : gateRandomEnemyIncludeLeader
+                        ? "🔍 Checking random-enemy include_leader contracts...\n"
+                        : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const { card, sourceFile } of files) {
@@ -1651,6 +1658,8 @@ function main() {
         allIssues.push(...checkEnhanceSemanticsForCard(card).map(tagIssue));
       if (gateAllAlliedIncludeSelf)
         allIssues.push(...checkAllAlliedIncludeSelfForCard(card).map(tagIssue));
+      if (gateBothLeaders)
+        allIssues.push(...checkBothLeadersForCard(card).map(tagIssue));
       if (gateRandomEnemyIncludeLeader)
         allIssues.push(...checkRandomEnemyIncludeLeader(card).map(tagIssue));
     } else {
