@@ -15,7 +15,11 @@ import {
   thenHand,
   resetUidCounter,
 } from "../harness/builders.js";
-import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";

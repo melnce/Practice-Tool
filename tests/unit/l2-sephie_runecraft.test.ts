@@ -17,7 +17,11 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
-import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 
@@ -889,15 +893,18 @@ describe("L2 Sephie Runecraft — real-card tests", () => {
       expect(hasKeyword(nextTurnSubject, "Storm")).toBe(true);
     });
 
-    it.fails("Sephie crest grants Storm on opponent turn when Obsessed Test Subject enters — crest turn scope?", () => {
-      setupTurn(R8, { pp: 7, superEvo: 1, active: "second" });
-      const sephie = createCard(SEPHIE, "board", "first");
-      sephie.peak_defense = Number(sephie.defense) || 1;
-      state.players.first.board = [sephie];
-      whenSuperEvolve(sephie, "first");
-      const subject = summonFollowerByCardId(TEST_SUBJECT, "first");
-      expect(hasKeyword(subject, "Storm")).toBe(false);
-      expect(crestPrinted).toContain("your turns");
-    });
+    it.fails(
+      "Sephie crest grants Storm on opponent turn when Obsessed Test Subject enters — crest turn scope?",
+      () => {
+        setupTurn(R8, { pp: 7, superEvo: 1, active: "second" });
+        const sephie = createCard(SEPHIE, "board", "first");
+        sephie.peak_defense = Number(sephie.defense) || 1;
+        state.players.first.board = [sephie];
+        whenSuperEvolve(sephie, "first");
+        const subject = summonFollowerByCardId(TEST_SUBJECT, "first");
+        expect(hasKeyword(subject, "Storm")).toBe(false);
+        expect(crestPrinted).toContain("your turns");
+      },
+    );
   });
 });

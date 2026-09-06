@@ -20,8 +20,7 @@ type EvolveMode = "normal" | "super";
 
 function ensureEvolveWindow(owner: PlayerSlot, mode: EvolveMode): void {
   const first = isFirstPlayer(owner);
-  const minRound =
-    mode === "super" ? (first ? 7 : 6) : first ? 5 : 4;
+  const minRound = mode === "super" ? (first ? 7 : 6) : first ? 5 : 4;
   if (state.roundCount < minRound) {
     state.roundCount = minRound;
   }

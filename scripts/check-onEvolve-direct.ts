@@ -63,7 +63,9 @@ function main(): void {
   const violations = files.flatMap(checkFile);
 
   if (violations.length === 0) {
-    console.log("check:onEvolve-direct — OK (no direct onEvolve imports in tests/)");
+    console.log(
+      "check:onEvolve-direct — OK (no direct onEvolve imports in tests/)",
+    );
     process.exit(0);
   }
 

@@ -11,7 +11,11 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
-import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 
 import { evolveFollowerByEffect } from "../../src/logic/effects/ops/evolve.js";
