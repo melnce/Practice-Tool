@@ -2,6 +2,7 @@ import type { GameState, PlayerSlot } from "./types/index.js";
 import { createPlayerState } from "./playerState.js";
 import { createRng, normalizeSeed } from "./rng.js";
 import type { SeedLiteral } from "./seed.js";
+import { INTERNAL_CACHE_KEYS } from "./snapshotEphemeralKeys.js";
 // NOTE: Trigger caches stored on state._triggerCache (auto-reset when state is reset)
 
 // -- 1. Canonical Defaults (Single Source of Truth) --
@@ -52,19 +53,20 @@ const KNOWN_ROOT_KEYS = new Set<string>([
   "__debugId",
   "actionSeq",
   "zoneVersion",
-  "_triggerCache",
-  "deferDeathTriggers",
-  "sotBoundaryDeferDrain",
-  "turnBoundaryInvokePhase",
+  // Snapshot-ephemeral caches (single source: snapshotEphemeralKeys.ts)
+  ...INTERNAL_CACHE_KEYS,
   "_resolutionQueue",
-  "_runEffectsDepth",
   "combatResolutionDepth",
   "resumePlayFollower",
-  "pendingModeChoice",
   // Mid-match ephemerals that must clear on reset (listed so we delete values below)
   "lastAddedToHand",
   "lastSearchedCards",
 ]);
+
+/** @internal Test-only: verify INTERNAL_CACHE_KEYS cannot drift from reset allow-list. */
+export function getKnownRootKeysForTest(): ReadonlySet<string> {
+  return KNOWN_ROOT_KEYS;
+}
 
 // -- 2. Factory --
 // IMPORTANT: seed is REQUIRED for determinism. No Date.now() fallback.
@@ -146,6 +148,11 @@ export function resetStateInstance(
   (target as any).suppressCleanup = false;
   (target as any)._runEffectsDepth = 0;
   (target as any).combatResolutionDepth = 0;
+  (target as any)._drainingResolutionQueue = false;
+  (target as any).__resolutionDrainDepth = 0;
+  delete (target as any).sotBoundaryDeferDrain;
+  delete (target as any).turnBoundaryInvokePhase;
+  delete (target as any)._reactiveCollector;
   delete (target as any).resumePlayFollower;
   delete (target as any).pendingModeChoice;
 

@@ -12,8 +12,12 @@ import type { CardInstance } from "./types/index.js";
 import { isDev, readEnv } from "./env.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
-import { resetTriggerChainDepth } from "../logic/core/triggers.js";
-import { endDispatch } from "../logic/core/targeting/guards.js";
+import { resetTriggerChainDepth, getTriggerChainDepth } from "../logic/core/triggers.js";
+import {
+  endDispatch,
+  isTargetedOpDispatchActive,
+} from "../logic/core/targeting/guards.js";
+import { INTERNAL_CACHE_KEYS } from "./snapshotEphemeralKeys.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -91,16 +95,118 @@ export function onHistoryEvent(cb: HistoryEventListener): () => void {
 // These are implementation details that should not pollute history.
 // Add new cache keys here if needed.
 // EXPORTED for testing - tests can verify no unexpected underscore keys appear.
-export const INTERNAL_CACHE_KEYS = new Set([
-  "_triggerCache", // Trigger candidate cache (auto-reinitializes on access)
-  "_runEffectsDepth", // Nested runEffects depth counter for deferred flush
-  "deferDeathTriggers", // Transient runEffects flag — must not survive undo/redo
-  "sotBoundaryDeferDrain", // SOT steps 2–6 hold step-7 drain open
-  "turnBoundaryInvokePhase", // Step-6 invoke scan — queue when-invoked until drain
-  "_reactiveCollector", // Ephemeral during reactive trigger collection
-  "_drainingResolutionQueue", // Re-entrancy guard during unified queue drain
-  "__resolutionDrainDepth", // Dev/test nested drain depth counter
-]);
+export { INTERNAL_CACHE_KEYS } from "./snapshotEphemeralKeys.js";
+
+/**
+ * Keys excluded from snapshots that are provably safe at commit time.
+ * Adding to INTERNAL_CACHE_KEYS requires a row here with a one-line structural proof.
+ */
+export const SNAPSHOT_EPHEMERAL_ALLOWLIST: Readonly<
+  Record<string, string>
+> = {
+  _triggerCache:
+    "Derived trigger-candidate cache; nulled on restore and rebuilt from zones on next access.",
+  _runEffectsDepth:
+    "runEffects finally restores parent depth before returning; top-level pause commits see 0.",
+  deferDeathTriggers:
+    "Combat/resolve doAction restores prevDefer in finally before commit; prevDefer may be true from outer runEffects.",
+  sotBoundaryDeferDrain:
+    "Set/cleared inside runStartOfTurnBoundary try/finally only; no commit path in that synchronous window.",
+  turnBoundaryInvokePhase:
+    "Set/cleared in try/finally during end-turn step-6 invoke scan only.",
+  _reactiveCollector:
+    "Lives only inside collectReactiveTriggers synchronous collect+enqueue try/finally.",
+  _drainingResolutionQueue:
+    "Re-entrancy guard during drain; assertResolutionQueueClearForCommit skips queue check while true.",
+  __resolutionDrainDepth:
+    "Dev/test nested-drain counter; 0 outside active drain try/finally.",
+  __uiSelectable:
+    "UI highlight on cards; stripped from snapshots and re-applied by highlightSelectable on render.",
+};
+
+const MODULE_EPHEMERAL_DEFAULTS = {
+  triggerChainDepth: 0,
+  targetedOpDispatchActive: false,
+} as const;
+
+function cardHasUiSelectable(c: CardInstance | null | undefined): boolean {
+  return !!(c && (c as any).__uiSelectable);
+}
+
+function liveStateHasUiSelectable(): boolean {
+  const seen = new Set<CardInstance>();
+  const visit = (c: CardInstance | null | undefined): boolean => {
+    if (!c || seen.has(c)) return false;
+    seen.add(c);
+    return cardHasUiSelectable(c);
+  };
+  for (const p of ["first", "second"] as const) {
+    const pl = state.players[p];
+    for (const c of pl.board) if (visit(c)) return true;
+    for (const c of pl.hand) if (visit(c)) return true;
+    for (const c of pl.graveyard ?? []) if (visit(c)) return true;
+  }
+  const pending = state.pendingTargetEffect;
+  if (pending && Array.isArray(pending.pool)) {
+    for (const c of pending.pool) if (visit(c)) return true;
+  }
+  return false;
+}
+
+/** Collect non-default snapshot-dropped state at commit time (dev/test gate). */
+export function collectSnapshotEphemeralViolations(): string[] {
+  const violations: string[] = [];
+  const s = state as any;
+
+  for (const key of INTERNAL_CACHE_KEYS) {
+    if (SNAPSHOT_EPHEMERAL_ALLOWLIST[key]) continue;
+    const value = s[key];
+    if (value === undefined || value === null || value === false || value === 0)
+      continue;
+    violations.push(key);
+  }
+
+  if (
+    getTriggerChainDepth() !== MODULE_EPHEMERAL_DEFAULTS.triggerChainDepth &&
+    !SNAPSHOT_EPHEMERAL_ALLOWLIST.triggerChainDepth
+  ) {
+    violations.push("triggerChainDepth");
+  }
+  if (
+    isTargetedOpDispatchActive() &&
+    !SNAPSHOT_EPHEMERAL_ALLOWLIST.targetedOpDispatchActive
+  ) {
+    violations.push("targetedOpDispatchActive");
+  }
+
+  if (
+    liveStateHasUiSelectable() &&
+    !SNAPSHOT_EPHEMERAL_ALLOWLIST.__uiSelectable
+  ) {
+    violations.push("__uiSelectable");
+  }
+
+  return violations;
+}
+
+function assertNoDroppedSnapshotStateAtCommit(actionName: string): void {
+  const violations = collectSnapshotEphemeralViolations();
+  if (violations.length === 0) return;
+
+  const msg =
+    `[History] commitAction("${actionName}") with snapshot-dropped ephemeral state: ` +
+    violations.join(", ");
+  const vitest = readEnv("VITEST");
+  const inTest = vitest === "true" || vitest === "1";
+  if (isDev() || inTest) {
+    throw new Error(msg);
+  }
+  console.warn(msg);
+}
+
+// --- Internal Cache Keys (excluded from snapshots) ---
+// These are implementation details that should not pollute history.
+// Add new cache keys in snapshotEphemeralKeys.ts and SNAPSHOT_EPHEMERAL_ALLOWLIST.
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
 
@@ -156,6 +262,64 @@ export function getEngineEphemeralFootprint() {
   };
 }
 
+function assertSnapshotPreservesCommittedPromptFields(snap: GameState): void {
+  const issues: string[] = [];
+  const livePending = state.pendingTargetEffect;
+  const snapPending = snap.pendingTargetEffect;
+  if (livePending && snapPending) {
+    const committed = livePending.picksAreCommitted === true;
+    const liveUids = livePending.targetUids ?? [];
+    const snapUids = snapPending.targetUids ?? [];
+    if (committed) {
+      if (JSON.stringify(liveUids) !== JSON.stringify(snapUids)) {
+        issues.push("pendingTargetEffect.targetUids");
+      }
+      const liveTargets = livePending.targets ?? [];
+      const snapTargets = snapPending.targets ?? [];
+      if (
+        liveTargets.length > 0 &&
+        JSON.stringify(liveTargets.map((t) => t?.uid)) !==
+          JSON.stringify(snapTargets.map((t) => t?.uid))
+      ) {
+        issues.push("pendingTargetEffect.targets");
+      }
+    } else {
+      if (snapUids.length > 0) {
+        issues.push("pendingTargetEffect.targetUids (uncommitted must clear)");
+      }
+      const snapTargets = snapPending.targets ?? [];
+      if (snapTargets.length > 0) {
+        issues.push("pendingTargetEffect.targets (uncommitted must clear)");
+      }
+    }
+  }
+  const liveMode = state.pendingModeChoice;
+  const snapMode = snap.pendingModeChoice;
+  if (liveMode && snapMode) {
+    const committed = liveMode.picksAreCommitted === true;
+    const livePartial = liveMode.partialPickedIndices ?? [];
+    const snapPartial = snapMode.partialPickedIndices ?? [];
+    if (committed) {
+      if (JSON.stringify(livePartial) !== JSON.stringify(snapPartial)) {
+        issues.push("pendingModeChoice.partialPickedIndices");
+      }
+    } else if (snapPartial.length > 0) {
+      issues.push(
+        "pendingModeChoice.partialPickedIndices (uncommitted must clear)",
+      );
+    }
+  }
+  if (issues.length === 0) return;
+
+  const msg = `[History] snapshot prompt pick mismatch: ${issues.join(", ")}`;
+  const vitest = readEnv("VITEST");
+  const inTest = vitest === "true" || vitest === "1";
+  if (isDev() || inTest) {
+    throw new Error(msg);
+  }
+  console.warn(msg);
+}
+
 function assertSnapshotPreservesResolutionQueue(
   liveLen: number,
   snapLen: number,
@@ -168,6 +332,15 @@ function assertSnapshotPreservesResolutionQueue(
   throw new Error(
     `[History] snapshot dropped resolution queue entries (live=${liveLen}, snap=${snapLen}); ` +
       `limbo death_lw corpses will orphan on restore`,
+  );
+}
+
+function finalizeLiveSnapshot(snap: GameState): void {
+  sanitizePendingTargetInSnapshot(snap);
+  assertSnapshotPreservesCommittedPromptFields(snap);
+  assertSnapshotPreservesResolutionQueue(
+    getResolutionQueue().length,
+    ((snap as any)._resolutionQueue ?? []).length,
   );
 }
 
@@ -190,20 +363,20 @@ function snapshot(): GameState {
     if (rng && typeof rng.snapshot === "function") {
       (snap as any).__rng = rng.snapshot();
     }
-    sanitizePendingTargetInSnapshot(snap);
-    assertSnapshotPreservesResolutionQueue(
-      getResolutionQueue().length,
-      ((snap as any)._resolutionQueue ?? []).length,
-    );
+    finalizeLiveSnapshot(snap);
     return snap;
   } catch (e) {
     // Fallback: manually clone, skipping non-cloneable properties
     console.warn("[History] structuredClone failed, using fallback. Error:", e);
-    return manualSnapshot(cleaned, rng);
+    return manualSnapshot(cleaned, rng, true);
   }
 }
 
-function manualSnapshot(rest: any, rng: any): GameState {
+function manualSnapshot(
+  rest: any,
+  rng: any,
+  fromLiveState = false,
+): GameState {
   const snap: any = {};
 
   for (const key of Object.keys(rest)) {
@@ -242,11 +415,11 @@ function manualSnapshot(rest: any, rng: any): GameState {
     snap.__rng = rng.snapshot();
   }
 
-  sanitizePendingTargetInSnapshot(snap as GameState);
-  assertSnapshotPreservesResolutionQueue(
-    getResolutionQueue().length,
-    ((snap as any)._resolutionQueue ?? []).length,
-  );
+  if (fromLiveState) {
+    finalizeLiveSnapshot(snap as GameState);
+  } else {
+    sanitizePendingTargetInSnapshot(snap as GameState);
+  }
   return snap as GameState;
 }
 
@@ -456,6 +629,7 @@ export function commitAction({ autoRender = true } = {}) {
   }
 
   assertResolutionQueueClearForCommit(inAction.name);
+  assertNoDroppedSnapshotStateAtCommit(inAction.name);
 
   bumpActionSeq();
   const after = snapshot();
