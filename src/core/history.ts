@@ -144,6 +144,135 @@ export const SNAPSHOT_EPHEMERAL_ALLOWLIST: Readonly<Record<string, string>> = {
   ...SNAPSHOT_EPHEMERAL_MAY_BE_SET,
 };
 
+export type SnapshotDroppedProofClass = "a" | "b";
+
+export interface SnapshotDroppedAuditRow {
+  category: string;
+  mechanism: string;
+  proofClass: SnapshotDroppedProofClass;
+  proof: string;
+}
+
+/**
+ * Audit table: why each snapshot-dropped state class is safe (or tracked) at commit.
+ * INTERNAL_CACHE_KEYS rows are enumerated in SNAPSHOT_EPHEMERAL_* allowlists above.
+ */
+export const SNAPSHOT_DROPPED_STATE_AUDIT: readonly SnapshotDroppedAuditRow[] =
+  [
+    {
+      category: "Named internal caches",
+      mechanism: "INTERNAL_CACHE_KEYS exclusion",
+      proofClass: "a",
+      proof:
+        "Each key is classified must_be_default or may_be_set with a structural proof; gate asserts at commit.",
+    },
+    {
+      category: "Module ephemerals",
+      mechanism: "triggerChainDepth / targetedOpDispatchActive readers",
+      proofClass: "a",
+      proof:
+        "Not on state root; read via getters and covered by must_be_default gate rows.",
+    },
+    {
+      category: "Functions / non-cloneable objects",
+      mechanism: "manualSnapshot fallback",
+      proofClass: "b",
+      proof:
+        "pendingTargetEffect.confirmHook is gameplay state (fuse/target confirm continuation); unsnapshotable by construction; fix on fix-fuse-confirm-handler-registry via confirm-handler registry (TARGETED_OP_REGISTRY shape).",
+    },
+  ];
+
+/**
+ * Function paths on live state that snapshots drop by construction — allowlisted until
+ * fix-fuse-confirm-handler-registry lands (remove entry when that branch merges).
+ */
+export const SNAPSHOT_DROPPED_FUNCTION_ALLOWLIST: Readonly<
+  Record<string, string>
+> = {
+  "pendingTargetEffect.confirmHook":
+    "Fuse/target confirm continuation; reconstructible from serializable data on fix-fuse-confirm-handler-registry.",
+};
+
+const SNAPSHOT_WALK_MAX_NODES = 4096;
+const SNAPSHOT_WALK_MAX_DEPTH = 14;
+
+function collectFunctionPaths(
+  roots: Array<{ label: string; value: unknown }>,
+  maxNodes = SNAPSHOT_WALK_MAX_NODES,
+  maxDepth = SNAPSHOT_WALK_MAX_DEPTH,
+): Set<string> {
+  const paths = new Set<string>();
+  const seen = new Set<unknown>();
+  let nodes = 0;
+
+  const walk = (value: unknown, path: string, depth: number): void => {
+    if (nodes >= maxNodes || depth > maxDepth) return;
+    if (value === null || value === undefined) return;
+    const t = typeof value;
+    if (t === "function") {
+      paths.add(path);
+      return;
+    }
+    if (t !== "object") return;
+    if (seen.has(value)) return;
+    seen.add(value);
+    nodes += 1;
+
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        walk(value[i], `${path}[${i}]`, depth + 1);
+      }
+      return;
+    }
+
+    for (const key of Object.keys(value as object)) {
+      walk((value as any)[key], `${path}.${key}`, depth + 1);
+    }
+  };
+
+  for (const { label, value } of roots) {
+    if (value !== undefined && value !== null) {
+      walk(value, label, 0);
+    }
+  }
+  return paths;
+}
+
+function snapshotFunctionWalkRoots(s: GameState): Array<{
+  label: string;
+  value: unknown;
+}> {
+  const roots: Array<{ label: string; value: unknown }> = [
+    { label: "pendingTargetEffect", value: s.pendingTargetEffect },
+    { label: "pendingModeChoice", value: s.pendingModeChoice },
+    { label: "_resolutionQueue", value: (s as any)._resolutionQueue },
+  ];
+  for (const side of ["first", "second"] as const) {
+    const pl = s.players?.[side];
+    if (!pl) continue;
+    for (const zone of ["board", "hand", "graveyard", "deck"] as const) {
+      roots.push({ label: `players.${side}.${zone}`, value: pl[zone] });
+    }
+  }
+  return roots;
+}
+
+/** Functions reachable from live snapshot roots that the snapshot layer drops. */
+export function collectSnapshotDroppedFunctionViolations(
+  live: GameState,
+  snap: GameState,
+): string[] {
+  const liveFns = collectFunctionPaths(snapshotFunctionWalkRoots(live));
+  const snapFns = collectFunctionPaths(snapshotFunctionWalkRoots(snap));
+  const violations: string[] = [];
+  for (const path of liveFns) {
+    if (snapFns.has(path)) continue;
+    if (SNAPSHOT_DROPPED_FUNCTION_ALLOWLIST[path]) continue;
+    violations.push(path);
+  }
+  return violations;
+}
+
 function isSnapshotEphemeralDefault(value: unknown): boolean {
   return (
     value === undefined || value === null || value === false || value === 0
@@ -331,6 +460,22 @@ function assertSnapshotPreservesResolutionQueue(
   );
 }
 
+function assertSnapshotDroppedFunctions(
+  live: GameState,
+  snap: GameState,
+): void {
+  const violations = collectSnapshotDroppedFunctionViolations(live, snap);
+  if (violations.length === 0) return;
+
+  const msg = `[History] snapshot dropped gameplay function(s): ${violations.join(", ")}`;
+  const vitest = readEnv("VITEST");
+  const inTest = vitest === "true" || vitest === "1";
+  if (isDev() || inTest) {
+    throw new Error(msg);
+  }
+  console.warn(msg);
+}
+
 function finalizeLiveSnapshot(snap: GameState): void {
   sanitizePendingTargetInSnapshot(snap);
   assertSnapshotPreservesCommittedPromptFields(snap);
@@ -338,6 +483,7 @@ function finalizeLiveSnapshot(snap: GameState): void {
     getResolutionQueue().length,
     ((snap as any)._resolutionQueue ?? []).length,
   );
+  assertSnapshotDroppedFunctions(state, snap);
 }
 
 function snapshot(): GameState {
@@ -392,8 +538,10 @@ function manualSnapshot(rest: any, rng: any, fromLiveState = false): GameState {
       try {
         snap[key] = structuredClone(val);
       } catch {
-        console.warn(`[History] Skipping non-cloneable object at key: ${key}`);
-        snap[key] = {}; // fallback to empty
+        console.warn(
+          `[History] structuredClone failed for key ${key}, cloning manually`,
+        );
+        snap[key] = cloneItem(val, key);
       }
     }
     // Primitives: copy directly

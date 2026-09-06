@@ -442,6 +442,9 @@ function showConfirmationButton(pending: any) {
     );
   };
 
+  // Gameplay continuation for fuse / multi-select confirm; not snapshotable (see gate).
+  pending.confirmHook = onConfirm;
+
   const vm = {
     pending,
     onConfirm,
