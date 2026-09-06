@@ -653,58 +653,52 @@ describe("official Q&A — Runecraft batch 2", () => {
     expect(Number(institute.countdown)).toBe(cd0 - 1);
   }, 60_000);
 
-  it.fails(
-    "10332210 Institute of Truth — Blaze Destroyer back at printed cost 10 after Whitefrost does not trigger (official Q&A)",
-    () => {
-      setupTurn(R6, {
-        hand: [INSTITUTE_OF_TRUTH, BLAZE_DESTROYER],
-        deck: [DRAW_TOP],
-        pp: 10,
-        secondHand: [WHITEFROST_WHISPER],
-        secondPP: 3,
-      });
-      whenPlayCard("first", 0);
-      const institute = findOnBoard("first", "Institute of Truth")!;
-      const deck0 = thenDeck("first").length;
-      const cd0 = Number(institute.countdown);
+  it("10332210 Institute of Truth — Blaze Destroyer back at printed cost 10 after Whitefrost does not trigger (official Q&A)", () => {
+    setupTurn(R10, {
+      hand: [INSTITUTE_OF_TRUTH, BLAZE_DESTROYER],
+      deck: [DRAW_TOP, DRAW_TOP, DRAW_TOP],
+      pp: 10,
+      secondHand: [WHITEFROST_WHISPER],
+      secondPP: 3,
+    });
+    whenPlayCard("first", 0);
+    const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+    spellboostHand("first", 1, blaze);
+    expect(getEffectiveCost(blaze)).toBe(9);
 
-      const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      spellboostHand("first", 1, blaze);
-      expect(getEffectiveCost(blaze)).toBe(9);
+    whenEndTurn();
+    playWhitefrostHandCostMode();
+    whenEndTurn();
 
-      whenEndTurn();
-      playWhitefrostHandCostMode();
-      whenEndTurn();
-      expect(getEffectiveCost(blaze)).toBe(10);
+    const blazeAfter = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+    expect(getEffectiveCost(blazeAfter)).toBe(10);
 
-      const blazeIdx = thenHand("first").findIndex(
-        (c) => c.id === BLAZE_DESTROYER,
-      );
-      whenPlayCard("first", blazeIdx);
-      expect(thenDeck("first").length).toBe(deck0);
-      expect(Number(institute.countdown)).toBe(cd0);
+    const institute = findOnBoard("first", "Institute of Truth")!;
+    const deck0 = thenDeck("first").length;
+    const cd0 = Number(institute.countdown);
+    const blazeIdx = thenHand("first").findIndex(
+      (c) => c.id === BLAZE_DESTROYER,
+    );
+    whenPlayCard("first", blazeIdx);
+    expect(thenDeck("first").length).toBe(deck0);
+    expect(Number(institute.countdown)).toBe(cd0);
 
-      resetUidCounter();
-      setupTurn(R6, {
-        hand: [INSTITUTE_OF_TRUTH, BLAZE_DESTROYER],
-        deck: [DRAW_TOP],
-        pp: 9,
-      });
-      whenPlayCard("first", 0);
-      const institute2 = findOnBoard("first", "Institute of Truth")!;
-      const blaze2 = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      spellboostHand("first", 1, blaze2);
-      const deck1 = thenDeck("first").length;
-      const cd1 = Number(institute2.countdown);
-      const blaze2Idx = thenHand("first").findIndex(
-        (c) => c.id === BLAZE_DESTROYER,
-      );
-      whenPlayCard("first", blaze2Idx);
-      expect(thenDeck("first").length).toBe(deck1 - 1);
-      expect(Number(institute2.countdown)).toBe(cd1 - 1);
-    },
-    60_000,
-  );
+    resetUidCounter();
+    setupTurn(R10, {
+      hand: [BLAZE_DESTROYER],
+      deck: [DRAW_TOP, DRAW_TOP, DRAW_TOP],
+      pp: 10,
+    });
+    const institute2 = createCard(INSTITUTE_OF_TRUTH, "board", "first");
+    state.players.first.board.push(institute2);
+    const blaze2 = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+    spellboostHand("first", 1, blaze2);
+    const deck1 = thenDeck("first").length;
+    const cd1 = Number(institute2.countdown);
+    whenPlayCard("first", 0);
+    expect(thenDeck("first").length).toBe(deck1 - 1);
+    expect(Number(institute2.countdown)).toBe(cd1 - 1);
+  }, 60_000);
 
   it("90034330 Depths of the Eld Crystals — faith 3 splits X+Y+Z=3 via three random letter picks (official Q&A)", () => {
     (globalThis as any).HEADLESS = false;

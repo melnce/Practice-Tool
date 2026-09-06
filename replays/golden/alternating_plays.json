@@ -18,11 +18,11 @@
     }
   ],
   "final": {
-    "stateHash": "ecee80d8"
+    "stateHash": "7308d02c"
   },
   "id": "alternating_plays",
   "initial": {
-    "stateHash": "2c636d0b"
+    "stateHash": "630b92ac"
   },
   "seed": 100004,
   "trace": [],

@@ -127,16 +127,106 @@ export function setMaxHP(
   state.players[player].maxHP = value;
 }
 
-export function getPP(state: GameState, player: PlayerSlot): number {
+/** Regular play-point orbs only (capped at maxPP). */
+export function getRegularPP(state: GameState, player: PlayerSlot): number {
   return state.players[player].pp;
 }
 
-export function setPP(
+/** Bonus PP orb (0 or 1) — spent after regular orbs. */
+export function getBonusPpOrb(state: GameState, player: PlayerSlot): number {
+  return state.players[player].bonusPpOrb;
+}
+
+/** Usable PP for the turn (regular + bonus orb). */
+export function getPP(state: GameState, player: PlayerSlot): number {
+  return getRegularPP(state, player) + getBonusPpOrb(state, player);
+}
+
+/** Recovery / refill cap: maxPP plus bonus orb if still present. */
+export function getPPRecoverCap(state: GameState, player: PlayerSlot): number {
+  return getMaxPP(state, player) + getBonusPpOrb(state, player);
+}
+
+export function setRegularPP(
   state: GameState,
   player: PlayerSlot,
   value: number,
 ): void {
-  state.players[player].pp = value;
+  state.players[player].pp = Math.max(0, value);
+}
+
+export function setBonusPpOrb(
+  state: GameState,
+  player: PlayerSlot,
+  value: 0 | 1,
+): void {
+  state.players[player].bonusPpOrb = value;
+}
+
+/**
+ * Set total usable PP (test/setup). Splits into regular pool + bonus orb.
+ * When total <= maxPP the bonus orb is cleared (consumed or absent).
+ */
+export function setPP(
+  state: GameState,
+  player: PlayerSlot,
+  total: number,
+): void {
+  const max = getMaxPP(state, player);
+  if (total > max) {
+    setRegularPP(state, player, max);
+    setBonusPpOrb(state, player, 1);
+  } else {
+    setRegularPP(state, player, total);
+    setBonusPpOrb(state, player, 0);
+  }
+}
+
+/** Pay PP: regular orbs first, bonus orb last. */
+export function spendPP(
+  state: GameState,
+  player: PlayerSlot,
+  amount: number,
+): void {
+  let remaining = amount;
+  const regular = getRegularPP(state, player);
+  const fromRegular = Math.min(regular, remaining);
+  if (fromRegular > 0) {
+    setRegularPP(state, player, regular - fromRegular);
+    remaining -= fromRegular;
+  }
+  if (remaining > 0 && getBonusPpOrb(state, player) > 0) {
+    setBonusPpOrb(state, player, 0);
+    remaining -= 1;
+  }
+}
+
+/** Recover PP up to maxPP (+ bonus orb if still present). Returns amount gained. */
+export function recoverPP(
+  state: GameState,
+  player: PlayerSlot,
+  amount: number,
+): number {
+  const cap = getPPRecoverCap(state, player);
+  const cur = getPP(state, player);
+  const gain = Math.min(amount, Math.max(0, cap - cur));
+  if (gain <= 0) return 0;
+  const max = getMaxPP(state, player);
+  setRegularPP(
+    state,
+    player,
+    Math.min(max, getRegularPP(state, player) + gain),
+  );
+  return gain;
+}
+
+/** Turn-start refill: regular orbs to max, bonus orb cleared. */
+export function refillPPAtTurnStart(
+  state: GameState,
+  player: PlayerSlot,
+): void {
+  setRegularPP(state, player, getMaxPP(state, player));
+  setBonusPpOrb(state, player, 0);
 }
 
 export function getMaxPP(state: GameState, player: PlayerSlot): number {
@@ -498,10 +588,17 @@ export function isPlayerDefeated(
 
 /** Returns the defeated player slot, or null if the game is ongoing. */
 export function getDefeatedPlayer(state: GameState): PlayerSlot | null {
-  if (state.players.first.defeated || state.players.first.hp <= 0)
-    return "first";
-  if (state.players.second.defeated || state.players.second.hp <= 0)
-    return "second";
+  if (state.phase === "gameover") {
+    if (state.players.first.defeated) return "first";
+    if (state.players.second.defeated) return "second";
+  }
+
+  const firstDown = state.players.first.defeated || state.players.first.hp <= 0;
+  const secondDown =
+    state.players.second.defeated || state.players.second.hp <= 0;
+  if (firstDown && secondDown) return state.activePlayer;
+  if (firstDown) return "first";
+  if (secondDown) return "second";
   return null;
 }
 

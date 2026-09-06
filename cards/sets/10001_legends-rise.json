@@ -4009,12 +4009,7 @@
             "effects": [
               {
                 "op": "damage",
-                "target": "ally:leader",
-                "amount": 1
-              },
-              {
-                "op": "damage",
-                "target": "enemy:leader",
+                "target": "all:leader",
                 "amount": 1
               }
             ],
@@ -4188,12 +4183,7 @@
     "evolve": [
       {
         "op": "damage",
-        "target": "ally:leader",
-        "amount": 3
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
+        "target": "all:leader",
         "amount": 3
       }
     ],

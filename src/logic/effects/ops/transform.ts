@@ -19,7 +19,10 @@ import {
 } from "../../../core/playerHelpers.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
-import { setPendingTarget } from "../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../core/pendingTarget/index.js";
 import { recomputeAttackFlags } from "../../core/combat.js";
 import { bumpZoneVersion } from "../../core/triggers/utils.js";
 
@@ -157,18 +160,31 @@ export function handleTransform(
     // Flat transform+select must open a hand prompt (mirror returnHandToDeck).
     // Empty pool: do not open an empty prompt — no-op like today's slice.
     if (selectN > 0) {
-      if (!pool.length) return;
+      if (!pool.length) {
+        reportSelectFizzled({
+          eff,
+          owner,
+          sourceCard: ctx.sourceCard ?? null,
+          target: eff.target,
+        });
+        return;
+      }
       const resume = ctx.effectsQueue ? Array.from(ctx.effectsQueue) : [];
       if (ctx.effectsQueue) ctx.effectsQueue.length = 0;
-      setPendingTarget({
-        eff,
-        owner,
-        sourceCard: ctx.sourceCard ?? null,
-        resumeEffects: resume,
-        pool,
-        targets: [],
-        selectCount: selectN,
-      });
+      if (
+        trySetPendingTarget({
+          eff,
+          owner,
+          sourceCard: ctx.sourceCard ?? null,
+          resumeEffects: resume,
+          pool,
+          targets: [],
+          selectCount: selectN,
+        }) === "fizzled"
+      ) {
+        if (ctx.effectsQueue) ctx.effectsQueue.push(...resume);
+        return;
+      }
       highlightSelectable(pool);
       return "pending";
     }
@@ -527,18 +543,30 @@ function transformInHandByFilter(
       return;
     }
 
-    if (!pool.length) return;
+    if (!pool.length) {
+      reportSelectFizzled({
+        eff,
+        owner,
+        sourceCard: ctx.sourceCard ?? null,
+        target: eff.target,
+      });
+      return;
+    }
 
     const selectCount = Math.min(selectN, pool.length);
-    setPendingTarget({
-      eff: { ...eff, op: "transform", into: targetCardName },
-      owner,
-      sourceCard: ctx.sourceCard ?? null,
-      resumeEffects: ctx.effectsQueue ?? [],
-      pool,
-      targets: [],
-      selectCount,
-    });
+    if (
+      trySetPendingTarget({
+        eff: { ...eff, op: "transform", into: targetCardName },
+        owner,
+        sourceCard: ctx.sourceCard ?? null,
+        resumeEffects: ctx.effectsQueue ?? [],
+        pool,
+        targets: [],
+        selectCount,
+      }) === "fizzled"
+    ) {
+      return;
+    }
     highlightSelectable(pool);
     return "pending";
   }
@@ -638,7 +666,7 @@ function locateZone(target: CardInstance) {
 /**
  * Transform a card into another card by name.
  * Accepts board or hand targets. Keeps owner & uid. No enter/leave triggers.
- * For board followers, preserves attack/turn state (no free attack refresh).
+ * For board followers, resets turn/action state (transform is a new card).
  */
 export function transformTarget(target: CardInstance, intoName: string) {
   if (!target || !intoName) {
@@ -692,22 +720,22 @@ export function transformTarget(target: CardInstance, intoName: string) {
     // Keywords set flags like hasRush/hasStorm/etc.
     applyKeywordsFromList(c);
 
-    // Preserve turn/action state (no free swing refresh)
+    // Fresh turn state — transform is a new card (no inherited attack/act flags).
     const perTurnNew = Number.isFinite(c.attacks_per_turn)
       ? c.attacks_per_turn!
       : 1;
-    const leftOld = Number.isFinite(target.attacks_left)
-      ? target.attacks_left!
-      : perTurnNew;
 
-    c.justPlayed = target.justPlayed === true;
-    c.hasAttacked = target.hasAttacked === true;
+    c.justPlayed = true;
+    c.hasAttacked = false;
     c.attacks_per_turn = perTurnNew;
-    c.attacks_left = Math.max(0, Math.min(perTurnNew, leftOld));
+    c.attacks_left = perTurnNew;
+    c.attacks_used_this_turn = 0;
     recomputeAttackFlags(c);
   } else if (c.type === "Amulet") {
     applyKeywordsFromList(c);
     if (c.hasCountdown) c.countdown = Number(c.countdown || 0);
+    if (!c.keywordState) c.keywordState = {};
+    c.keywordState.engagedThisTurn = false;
   }
 
   // Replace in place; do not fire enter/leave triggers

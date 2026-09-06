@@ -409,19 +409,15 @@ describe("Official Q&A — Havencraft batch 5", () => {
     expect(sarissa.hasBarrier || sarissa.keywordState?.hasBarrier).toBeFalsy();
   }, 60_000);
 
-  it.fails(
-    "10162210 Darkhaven Grace — Engage with no allies still restores 1 leader defense (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [DARKHAVEN_GRACE], pp: 2, hp: 18 });
-      whenPlayCard("first", 0);
-      engageFirstAmulet("Darkhaven Grace");
-      expect(getHP(state, "first")).toBe(19);
-      expect(thenBoard("first").some((c) => c.name === "Darkhaven Grace")).toBe(
-        true,
-      );
-    },
-    60_000,
-  );
+  it("10162210 Darkhaven Grace — Engage with no allies still restores 1 leader defense (official Q&A)", () => {
+    setupTurn(R6, { hand: [DARKHAVEN_GRACE], pp: 3, hp: 18 });
+    whenPlayCard("first", 0);
+    engageFirstAmulet("Darkhaven Grace");
+    expect(getHP(state, "first")).toBe(19);
+    expect(thenBoard("first").some((c) => c.name === "Darkhaven Grace")).toBe(
+      true,
+    );
+  }, 60_000);
 
   it("10162220 Dose of Holiness — Engage with no enemies destroys self and restores 1 leader defense (official Q&A)", () => {
     setupTurn(R6, { hand: [DOSE_OF_HOLINESS], pp: 3, hp: 17 });
@@ -463,31 +459,25 @@ describe("Official Q&A — Havencraft batch 5", () => {
     expect(names.size).toBe(3);
   }, 60_000);
 
-  it.fails(
-    "10261110 Cleric of Crushing — can select super-evolved Orchis when Lloyd is unevolved (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [CLERIC], pp: 3, evo: 2 });
-      superEvolvedOnBoard(ORCHIS, "second");
-      const lloyd = createCard(LLOYD, "board", "second");
-      applyKeywordsFromList(lloyd);
-      lloyd.peak_defense = lloyd.defense;
-      lloyd.hasEvolved = false;
-      lloyd.isEvolved = false;
-      state.players.second.board.push(lloyd);
+  it("10261110 Cleric of Crushing — can select super-evolved Orchis when Lloyd is unevolved (official Q&A)", () => {
+    setupTurn(R6, { hand: [CLERIC], pp: 3, evo: 2 });
+    superEvolvedOnBoard(ORCHIS, "second");
+    const lloyd = createCard(LLOYD, "board", "second");
+    applyKeywordsFromList(lloyd);
+    lloyd.peak_defense = lloyd.defense;
+    lloyd.hasEvolved = false;
+    lloyd.isEvolved = false;
+    state.players.second.board.push(lloyd);
 
-      whenPlayCard("first", 0);
-      const cleric = findOnBoard("first", "Cleric of Crushing")!;
-      handleEvolveSelf(cleric, "first", { mode: "normal", spendPoint: true });
-      const pending = state.pendingTargetEffect!;
-      const orchis = getBoard(state, "second").find((c) => c.id === ORCHIS)!;
-      expect(validateTargetSelection(state, pending, orchis.uid).ok).toBe(true);
-      resolvePendingByUid(orchis.uid);
-      expect(getBoard(state, "second").some((c) => c.id === ORCHIS)).toBe(
-        false,
-      );
-    },
-    60_000,
-  );
+    whenPlayCard("first", 0);
+    const cleric = findOnBoard("first", "Cleric of Crushing")!;
+    handleEvolveSelf(cleric, "first", { mode: "normal", spendPoint: true });
+    const pending = state.pendingTargetEffect!;
+    const orchis = getBoard(state, "second").find((c) => c.id === ORCHIS)!;
+    expect(validateTargetSelection(state, pending, orchis.uid).ok).toBe(true);
+    resolvePendingByUid(orchis.uid);
+    expect(getBoard(state, "second").some((c) => c.id === ORCHIS)).toBe(false);
+  }, 60_000);
 
   it("10261110 Cleric of Crushing — cannot select Orchis when Lloyd is super-evolved (official Q&A)", () => {
     setupTurn(R6, { hand: [CLERIC], pp: 3, evo: 2 });

@@ -14,7 +14,7 @@ import {
   getBoard,
   getGraveyard,
   getPP,
-  setPP,
+  spendPP,
   addShadows,
 } from "../../../core/playerHelpers.js";
 import { clearSelectableFlags } from "../../core/targeting.js";
@@ -29,9 +29,7 @@ function boardOf(owner: Player) {
 //     return getGraveyard(state, owner);
 // }
 function payEngageCost(owner: Player, cost: number) {
-  // Assume PP system; no-op if you already checked affordability elsewhere.
-  const cur = getPP(state, owner);
-  setPP(state, owner, Math.max(0, cur - (cost | 0)));
+  spendPP(state, owner, cost | 0);
 }
 function effectsNeedSelection(effects: Effect[] = []) {
   return (

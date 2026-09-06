@@ -20,11 +20,11 @@
     }
   ],
   "final": {
-    "stateHash": "31bf7597"
+    "stateHash": "b0f42d20"
   },
   "id": "history_reset",
   "initial": {
-    "stateHash": "42f293f4"
+    "stateHash": "44c767d4"
   },
   "seed": 42,
   "trace": [],

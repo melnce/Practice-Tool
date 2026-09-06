@@ -2,7 +2,10 @@
 import { state } from "../../core/gameState.js";
 // Legacy getCardDetails import removed - discard handlers don't need card lookup
 import { highlightSelectable } from "../core/targeting.js";
-import { setPendingTarget } from "../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../core/pendingTarget/index.js";
 
 import { logEvent } from "../../core/logger.js";
 import type { Player, Effect, CardInstance } from "../../core/types/index.js";
@@ -115,27 +118,42 @@ export function handleDiscardSelectHand(
 ) {
   const n = Math.max(0, parseInt((eff.count as any) ?? 1, 10));
   const hand = getHand(state, owner);
-  if (n <= 0 || hand.length === 0) return;
+  if (n <= 0 || hand.length === 0) {
+    reportSelectFizzled({
+      eff,
+      owner,
+      sourceCard,
+      target: "ally:hand",
+    });
+    return;
+  }
 
   const filterType = String((eff as any).filter?.type || "").toLowerCase();
   const pool = filterType
     ? hand.filter((card) => String(card.type).toLowerCase() === filterType)
     : [...hand];
-  if (pool.length === 0) return;
+  if (pool.length === 0) {
+    reportSelectFizzled({ eff, owner, sourceCard, target: "ally:hand" });
+    return;
+  }
   const selectCount = Math.min(n, pool.length);
 
-  setPendingTarget({
-    op: "discard_select_hand",
-    eff: { ...eff, select_count: selectCount },
-    owner,
-    sourceCard,
-    pool,
-    poolUids: toUids(pool),
-    selectCount,
-    targets: [],
-    targetUids: [],
-    resumeEffects,
-  } as any);
+  if (
+    trySetPendingTarget({
+      op: "discard_select_hand",
+      eff: { ...eff, select_count: selectCount },
+      owner,
+      sourceCard,
+      pool,
+      poolUids: toUids(pool),
+      selectCount,
+      targets: [],
+      targetUids: [],
+      resumeEffects,
+    } as any) === "fizzled"
+  ) {
+    return;
+  }
 
   // mark with the correct flag and render
   highlightSelectable(pool); // sets __uiSelectable + render()

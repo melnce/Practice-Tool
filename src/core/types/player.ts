@@ -47,6 +47,8 @@ export interface PlayerState {
   pp: number;
   maxPP: number;
   permPP: number; // Permanent PP bonus (e.g., from Zooey)
+  /** Second-player Bonus PP orb (0 or 1). Regular `pp` is capped at maxPP; orb stacks on top. */
+  bonusPpOrb: 0 | 1;
 
   // === Zones ===
   hand: CardInstance[];
