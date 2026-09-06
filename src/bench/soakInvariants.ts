@@ -106,6 +106,38 @@ export function checkSoakInvariants(state: GameState): SoakInvariantFinding[] {
     }
   }
 
+  // No card may remain on board in a dead-by-state condition after an action
+  for (const player of ["first", "second"] as const) {
+    const board = state.players[player].board;
+    for (const card of board) {
+      if (!card || typeof card !== "object") continue;
+      if ((card as any).pendingDestruction) {
+        findings.push({
+          kind: "invariant",
+          message: `dead-on-board: ${card.name} (${card.uid}) pendingDestruction on ${player}.board`,
+        });
+        continue;
+      }
+      if (card.type === "Follower" && Number(card.defense) <= 0) {
+        findings.push({
+          kind: "invariant",
+          message: `dead-on-board: ${card.name} (${card.uid}) defense<=${card.defense} on ${player}.board`,
+        });
+        continue;
+      }
+      if (
+        card.type === "Amulet" &&
+        card.hasCountdown &&
+        Number(card.countdown) <= 0
+      ) {
+        findings.push({
+          kind: "invariant",
+          message: `dead-on-board: ${card.name} (${card.uid}) countdown<=${card.countdown} on ${player}.board`,
+        });
+      }
+    }
+  }
+
   // Stuck pending with empty pool
   const pending = state.pendingTargetEffect;
   if (pending) {

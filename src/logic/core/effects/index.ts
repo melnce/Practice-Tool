@@ -18,6 +18,7 @@ import type {
 import { guardLifecycle } from "../targeting/guards.js";
 import {
   registerRunEffectsInCleanup,
+  cleanupCountdownZeroAmulets,
   flushDeferredDeathBatch,
 } from "../cleanup.js";
 import { clearResolutionQueue } from "../triggers/queue.js";
@@ -265,6 +266,7 @@ export function runEffects(
       !(state as any)._drainingResolutionQueue &&
       !batchTurnBoundary
     ) {
+      cleanupCountdownZeroAmulets();
       flushDeferredDeathBatch();
       clearResolutionQueue();
     }
