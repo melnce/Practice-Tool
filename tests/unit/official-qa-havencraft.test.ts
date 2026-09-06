@@ -322,60 +322,50 @@ describe("Official Q&A — Havencraft batch 5", () => {
     expect(getHand(state, "first").some((c) => c.id === DRAW_A)).toBe(true);
   }, 60_000);
 
-  it.fails(
-    "10864110 Verdilia crest — super-evolved Armes attacks 3 times per turn (official Q&A)",
-    () => {
-      setupTurn(R10, { hand: [ARMES], pp: 10 });
-      const crestDef = getCardById(VERDILIA)!.superevolve![0] as any;
-      handleGainCrest(crestDef, "first");
-      whenPlayCard("first", 0);
-      const armes = findOnBoard("first", "Armes, Depletive Demon")!;
-      state.players.first.superEvoCharges = 1;
-      state.players.first.superEvoPoints = 1;
-      handleEvolveSelf(armes, "first", { mode: "super", spendPoint: true });
-      expect(Number(armes.attacks_per_turn ?? armes.attacksPerTurn)).toBe(3);
+  it("10864110 Verdilia crest — super-evolved Armes attacks 3 times per turn (official Q&A)", () => {
+    setupTurn(R10, { hand: [ARMES], pp: 10 });
+    const crestDef = getCardById(VERDILIA)!.superevolve![0] as any;
+    handleGainCrest(crestDef, "first");
+    whenPlayCard("first", 0);
+    const armes = findOnBoard("first", "Armes, Depletive Demon")!;
+    state.players.first.superEvoCharges = 1;
+    state.players.first.superEvoPoints = 1;
+    handleEvolveSelf(armes, "first", { mode: "super", spendPoint: true });
+    expect(Number(armes.attacks_per_turn ?? armes.attacksPerTurn)).toBe(3);
 
-      const foe = enemyFollower(1, 10, "PunchingBag");
-      prepareAttacker(armes);
-      const idx = state.players.first.board.indexOf(armes);
-      attackFollower(idx, 0, "first", "second");
-      expect(Number(armes.attacks_left)).toBe(2);
-    },
-    60_000,
-  );
+    const foe = enemyFollower(1, 10, "PunchingBag");
+    prepareAttacker(armes);
+    const idx = state.players.first.board.indexOf(armes);
+    attackFollower(idx, 0, "first", "second");
+    expect(Number(armes.attacks_left)).toBe(2);
+  }, 60_000);
 
-  it.fails(
-    "10964120 Omerio — after third ability, next amulet destroy fires first ability again (official Q&A)",
-    () => {
-      setupTurn(R8, { hand: [OMERIO], pp: 6 });
-      whenPlayCard("first", 0);
-      const foes = [
-        enemyFollower(2, 6, "F1"),
-        enemyFollower(2, 6, "F2"),
-        enemyFollower(2, 6, "F3"),
-      ];
-      const amulets = ["T1", "T2", "T3", "T4"].map((n) =>
-        allyAmulet(AMULET_A, n),
-      );
+  it("10964120 Omerio — after third ability, next amulet destroy fires first ability again (official Q&A)", () => {
+    setupTurn(R8, { hand: [OMERIO], pp: 6 });
+    whenPlayCard("first", 0);
+    const foes = [
+      enemyFollower(2, 6, "F1"),
+      enemyFollower(2, 6, "F2"),
+      enemyFollower(2, 6, "F3"),
+    ];
+    const amulets = ["T1", "T2", "T3", "T4"].map((n) =>
+      allyAmulet(AMULET_A, n),
+    );
 
-      destroyTarget(amulets[0]!, "first");
-      cleanupDead();
-      destroyTarget(amulets[1]!, "first");
-      cleanupDead();
-      destroyTarget(amulets[2]!, "first");
-      cleanupDead();
-      expect(thenBoard("first").some((c) => c.name === "Holy Falcon")).toBe(
-        true,
-      );
+    destroyTarget(amulets[0]!, "first");
+    cleanupDead();
+    destroyTarget(amulets[1]!, "first");
+    cleanupDead();
+    destroyTarget(amulets[2]!, "first");
+    cleanupDead();
+    expect(thenBoard("first").some((c) => c.name === "Holy Falcon")).toBe(true);
 
-      const defBefore = foes.reduce((s, f) => s + Number(f.defense), 0);
-      destroyTarget(amulets[3]!, "first");
-      cleanupDead();
-      const defAfter = foes.reduce((s, f) => s + Number(f.defense), 0);
-      expect(defBefore - defAfter).toBeGreaterThan(0);
-    },
-    60_000,
-  );
+    const defBefore = foes.reduce((s, f) => s + Number(f.defense), 0);
+    destroyTarget(amulets[3]!, "first");
+    cleanupDead();
+    const defAfter = foes.reduce((s, f) => s + Number(f.defense), 0);
+    expect(defBefore - defAfter).toBeGreaterThan(0);
+  }, 60_000);
 
   it("10161120 Holy Shieldmaiden — super-evolve attack loses Barrier (official Q&A)", () => {
     setupTurn(R8, { hand: [HOLY_SHIELDMAIDEN], pp: 3 });

@@ -403,31 +403,36 @@ describe("official Q&A — Neutral batch 7", () => {
   });
 
   describe("10804110 Alabaster Bahamut", () => {
-    it.fails(
-      "10804110 Alabaster Bahamut — Mode 3 banishes crests but not faith (official Q&A)",
-      () => {
-        setupTurn(R10, { hand: [ALABASTER], pp: 10 });
-        state.players.first.crests = [
-          { name: "Probe Crest", owner: "first", counters: {} } as any,
-        ];
-        const faithName = faithCrestNameForCard("Sathanid, Eld Lance");
-        crestAddCounter("first", faithName, "faith", 3);
-        setScriptedModePickProvider(() => [2]);
-        whenPlayCard("first", 0);
-        setScriptedModePickProvider(null);
-        expect(
-          getCrests(state, "first").some((c) => c.name === "Probe Crest"),
-        ).toBe(false);
-        expect(
-          getCrests(state, "first").some((c) => c.name === faithName),
-        ).toBe(true);
-        expect(
-          getCrests(state, "first").find((c) => c.name === faithName)?.counters
-            ?.faith,
-        ).toBe(3);
-      },
-      60_000,
-    );
+    it("10804110 Alabaster Bahamut — Mode 3 banishes crests but not faith (official Q&A)", () => {
+      setupTurn(R10, { hand: [ALABASTER], pp: 10 });
+      state.players.first.crests = [
+        { name: "Probe Crest", owner: "first", counters: {} } as any,
+      ];
+      const faithName = faithCrestNameForCard("Sathanid, Eld Lance");
+      handleGainCrest(
+        {
+          op: "crest",
+          action: "gain",
+          name: faithName,
+          is_faith: true,
+        } as any,
+        "first",
+      );
+      crestAddCounter("first", faithName, "faith", 3);
+      setScriptedModePickProvider(() => [2]);
+      whenPlayCard("first", 0);
+      setScriptedModePickProvider(null);
+      expect(
+        getCrests(state, "first").some((c) => c.name === "Probe Crest"),
+      ).toBe(false);
+      expect(getCrests(state, "first").some((c) => c.name === faithName)).toBe(
+        true,
+      );
+      expect(
+        getCrests(state, "first").find((c) => c.name === faithName)?.counters
+          ?.faith,
+      ).toBe(3);
+    }, 60_000);
   });
 
   describe("10901110 Jailor of Antiquity", () => {
