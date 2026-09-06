@@ -7,7 +7,7 @@ import type { PendingTargetRequest } from "./types.js";
 import {
   hasTargetedOpHandler,
   isTargetedOpRegistryReady,
-  pendingTargetCommitsEachPick,
+  inferPicksAreCommitted,
 } from "./types.js";
 import { toUids, toUid } from "../../../core/uidResolver.js";
 import { isDev, readEnv } from "../../../core/env.js";
@@ -55,7 +55,7 @@ export function setPendingTarget(
     normalized.sourceCardUid = toUid(normalized.sourceCard);
   }
 
-  if (pendingTargetCommitsEachPick(normalized)) {
+  if (inferPicksAreCommitted(normalized)) {
     normalized.picksAreCommitted = true;
   }
 

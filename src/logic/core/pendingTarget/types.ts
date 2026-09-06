@@ -41,14 +41,13 @@ export type PendingTargetResult =
   | { status: "pending" }
   | { status: "resolved"; targetUids: string[] };
 
-/** Same predicate as resolveTarget multi-pick discard routing (PR #308). */
-export function pendingTargetCommitsEachPick(
+/** Whether this prompt commits each target pick as its own history action (set once at creation). */
+export function inferPicksAreCommitted(
   request: Partial<PendingTargetRequest> & {
     eff: Effect;
     selectCount: number;
   },
 ): boolean {
-  if (request.picksAreCommitted === true) return true;
   const selectCount = request.selectCount ?? 1;
   if (selectCount <= 1) return false;
   const topOp = String((request as { op?: string }).op ?? "");
