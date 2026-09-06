@@ -4,7 +4,7 @@ import { logEvent } from "../../core/logger.js";
 import type { Effect, Player, CardInstance } from "../../core/types/index.js";
 import {
   getHand,
-  getCrests,
+  countCrests,
   getPlaysThisTurn,
 } from "../../core/playerHelpers.js";
 
@@ -42,7 +42,7 @@ export function handleRepeatEffect(
         break;
 
       case "crest_count":
-        count = (getCrests(state, owner) || []).length | 0;
+        count = countCrests(state, owner) | 0;
         break;
 
       case "combo":
