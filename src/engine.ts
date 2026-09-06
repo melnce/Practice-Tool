@@ -1,4 +1,5 @@
 // src/engine.ts
+// ci-path-gate probe (reverted before merge)
 import { state } from "./core/gameState.js";
 import type {
   GameState,
