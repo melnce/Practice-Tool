@@ -7,8 +7,9 @@ import {
   setHP,
   setMaxHP,
   getPP,
-  setPP,
   getMaxPP,
+  recoverPP,
+  getPPRecoverCap,
   opponentOf,
   getEvoCharges,
   setEvoCharges,
@@ -49,7 +50,7 @@ export function handleRecoverPP(owner: Player, eff: Effect) {
     (eff.player || "self") === "self" ? owner : opponentOf(owner);
 
   const cur = getPP(state, targetPlayer);
-  const max = getMaxPP(state, targetPlayer);
+  const cap = getPPRecoverCap(state, targetPlayer);
 
   // Allow symbolic "full" refills (your card uses "currentMaxPP")
   let amt;
@@ -57,13 +58,12 @@ export function handleRecoverPP(owner: Player, eff: Effect) {
     typeof eff.amount === "string" &&
     eff.amount.toLowerCase() === "currentmaxpp"
   ) {
-    amt = Math.max(0, max - cur);
+    amt = Math.max(0, cap - cur);
   } else {
     amt = parseInt(eff.amount) || 0;
   }
 
-  const next = Math.min(max, cur + amt);
-  setPP(state, targetPlayer, next);
+  recoverPP(state, targetPlayer, amt);
 }
 
 /* ---------- NEW: leader barrier state ops ---------- */

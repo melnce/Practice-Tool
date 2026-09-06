@@ -12,7 +12,7 @@ import { playAmulet } from "./amulet.js";
 import type { PlayOutcome } from "./types.js";
 import {
   getPP,
-  setPP,
+  spendPP,
   getPlaysThisTurn,
   setPlaysThisTurn,
   isFirstPlayer,
@@ -65,7 +65,7 @@ export function playCardCore(
   }
 
   // 4) Pay PP exactly once
-  setPP(state, player, currentPP - plan.cost);
+  spendPP(state, player, plan.cost);
 
   // 5) Remove from hand and count play
   fromHand.splice(index, 1);
