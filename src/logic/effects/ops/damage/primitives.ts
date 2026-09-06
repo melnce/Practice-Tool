@@ -19,7 +19,7 @@ import type { DamageContext } from "./types.js";
 import {
   getHand,
   getBoard,
-  getCrests,
+  countCrests,
   opponentOf,
 } from "../../../../core/playerHelpers.js";
 
@@ -123,10 +123,8 @@ export function resolveDamageAmountExtended(
       ).length;
     }
 
-    case "crest_count": {
-      const list = getCrests(state, owner);
-      return Array.isArray(list) ? list.length : 0;
-    }
+    case "crest_count":
+      return countCrests(state, owner);
 
     case "fixed":
     default:
