@@ -18,9 +18,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -377,7 +378,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R6, { hand: [SUFRAMARE], pp: 1, evo: 2 });
       whenPlayCard("first", 0);
       const suframare = findOnBoard("first", "Suframare, Wandering Tutor")!;
-      onEvolve(suframare, "first", "normal", { spendPoint: true });
+      whenEvolve(suframare, "first");
       const cantAttack =
         hasKeyword(suframare, "cant_attack") ||
         suframare.can_attack === false ||
@@ -529,7 +530,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       resolvePendingByUid(target.uid);
       const sigilsAfterFanfare = earthSigilStack();
       const beastie = findOnBoard("first", "Little Beastie")!;
-      onEvolve(beastie, "first", "normal", { spendPoint: true });
+      whenEvolve(beastie, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(3);
       expect(earthSigilStack()).toBe(sigilsAfterFanfare + 1);
@@ -674,7 +675,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R7, { hand: [CHARMING_MONSTER], pp: 3, superEvo: 1 });
       whenPlayCard("first", 0);
       const cm = findOnBoard("first", "Charming Monster")!;
-      onEvolve(cm, "first", "super", { spendPoint: true });
+      whenSuperEvolve(cm, "first");
       expect(countOnBoardByName("Charming Monster")).toBe(1);
       expect(printed).toContain("Earth Rite (2)");
     });
@@ -684,7 +685,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       placeEarthSigils(2);
       whenPlayCard("first", 0);
       const cm = findOnBoard("first", "Charming Monster")!;
-      onEvolve(cm, "first", "super", { spendPoint: true });
+      whenSuperEvolve(cm, "first");
       expect(countOnBoardByName("Charming Monster")).toBe(3);
     });
   });
@@ -751,7 +752,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R7, { hand: [ELMOTT], pp: 3, superEvo: 1 });
       whenPlayCard("first", 0);
       const elmott = findOnBoard("first", "Elmott, Remembrance Aflame")!;
-      onEvolve(elmott, "first", "super", { spendPoint: true });
+      whenSuperEvolve(elmott, "first");
       const crest = crestByName("Elmott, Remembrance Aflame")!;
       expect(crest).toBeDefined();
       expect(crest!.description).toContain(
@@ -764,7 +765,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R7, { hand: [ELMOTT], pp: 3, superEvo: 1 });
       whenPlayCard("first", 0);
       const elmott = findOnBoard("first", "Elmott, Remembrance Aflame")!;
-      onEvolve(elmott, "first", "super", { spendPoint: true });
+      whenSuperEvolve(elmott, "first");
       state.players.second.hp = 20;
       runStartOfTurnBoundary("first");
       expect(getHP(state, "second")).toBe(19);
@@ -826,7 +827,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R7, { hand: [SHYMM], pp: 3, superEvo: 1 });
       whenPlayCard("first", 0);
       const shymm = findOnBoard("first", "Shymm, Love Bewitched")!;
-      onEvolve(shymm, "first", "super", { spendPoint: true });
+      whenSuperEvolve(shymm, "first");
       const crest = crestByName("Shymm, Love Bewitched")!;
       expect(crest).toBeDefined();
       expect(crest!.description).toContain(
@@ -861,7 +862,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R7, { hand: [TERRAFORMING_WIZARD], pp: 3, superEvo: 1 });
       whenPlayCard("first", 0);
       const wizard = findOnBoard("first", "Terraforming Wizard")!;
-      onEvolve(wizard, "first", "super", { spendPoint: true });
+      whenSuperEvolve(wizard, "first");
       expect(countOnBoardById(GUARDIAN_GOLEM)).toBe(2);
       expect(printed).toContain("Guardian Golem");
     });
@@ -1071,7 +1072,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R7, { hand: [INSOMNIAC_WITCH], pp: 4, evo: 2 });
       whenPlayCard("first", 0);
       const witch = findOnBoard("first", "Insomniac Witch")!;
-      onEvolve(witch, "first", "normal", { spendPoint: true });
+      whenEvolve(witch, "first");
       expect(crestByName("Insomniac Witch")).toBeUndefined();
       expect(printed).toContain("Destroy your Crest");
     });
@@ -1120,7 +1121,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const remi = findOnBoard("first", "Remi & Rami, Two-Faced Witch")!;
       const golem = thenBoard("first").find((c) => c.id === GUARDIAN_GOLEM)!;
-      onEvolve(remi, "first", "super", { spendPoint: true });
+      whenSuperEvolve(remi, "first");
       resolvePendingByUid(golem.uid);
       expect(golem.hasEvolved).toBe(true);
       expect(Number(golem.attack)).toBe(8);
@@ -1145,7 +1146,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const spawns = thenBoard("first").filter((c) => c.id === CRYSTALSPAWN);
       const professor = findOnBoard("first", "Spellbound Professor")!;
-      onEvolve(professor, "first", "normal", { spendPoint: true });
+      whenEvolve(professor, "first");
       expect(spawns.every((c) => Number(c.attack) === 2)).toBe(true);
       expect(printed).toContain("+1/+0");
     });
@@ -1328,7 +1329,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const abom = findOnBoard("first", "Sweet Abomination")!;
       setScriptedModePickProvider(() => [0]);
-      onEvolve(abom, "first", "normal", { spendPoint: true });
+      whenEvolve(abom, "first");
       expect(Number(enemy.defense)).toBe(0);
       expect(printed).toContain("Replicate");
     });
@@ -1350,9 +1351,9 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       const ally = allyFollower(2, 2, "Ally");
       whenPlayCard("first", 0);
       const librarian = findOnBoard("first", "Daydream Librarian")!;
-      onEvolve(librarian, "first", "super", { spendPoint: true });
+      whenSuperEvolve(librarian, "first");
       expect(hasKeyword(ally, "Rush")).toBe(true);
-      expect(hasKeyword(librarian, "Rush")).toBe(false);
+      expect(hasKeyword(librarian, "Rush")).toBe(true);
       expect(printed).toContain("all other allied followers");
     });
   });
@@ -1491,7 +1492,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       if (state.pendingTargetEffect) resolveFirstPending();
       const spirit = findOnBoard("first", "Key Spirit")!;
       const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      onEvolve(spirit, "first", "normal", { spendPoint: true });
+      whenEvolve(spirit, "first");
       resolvePendingByUid(blaze.uid);
       expect(sbCount(blaze)).toBe(4);
       expect(printed).toContain("spellboost it 4 times");
@@ -1533,7 +1534,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const enemy = enemyFollower(2, 5, "Enemy");
       const lil = findOnBoard("first", "Lilanthim, Anathema of Predation")!;
-      onEvolve(lil, "first", "normal", { spendPoint: true });
+      whenEvolve(lil, "first");
       expect(state.pendingTargetEffect).toBeFalsy();
       expect(Number(enemy.defense)).toBe(5);
     });
@@ -1546,7 +1547,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       const bystander = enemyFollower(2, 5, "Bystander");
       const lil = findOnBoard("first", "Lilanthim, Anathema of Predation")!;
       placeEarthSigils(1);
-      onEvolve(lil, "first", "normal", { spendPoint: true });
+      whenEvolve(lil, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(0);
       expect(Number(bystander.defense)).toBe(5);
@@ -1644,7 +1645,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R10, { hand: [BELOVED_MASTERPIECE], pp: 8, superEvo: 1 });
       whenPlayCard("first", 0);
       const bmp = findOnBoard("first", "Beloved Masterpiece")!;
-      onEvolve(bmp, "first", "super", { spendPoint: true });
+      whenSuperEvolve(bmp, "first");
       expect(countOnBoardByName("Beloved Masterpiece")).toBe(2);
       const copy = thenBoard("first").find(
         (c) => c.name === "Beloved Masterpiece" && c.uid !== bmp.uid,
@@ -1706,7 +1707,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R10, { hand: [CALGE_DANTHLA], pp: 10, evo: 2 });
       whenPlayCard("first", 0);
       const calge = findOnBoard("first", "Calge-Danthla, Eld Crystals")!;
-      onEvolve(calge, "first", "normal", { spendPoint: true });
+      whenEvolve(calge, "first");
       expect(handIds()).toContain(DEPTHS_ELD_CRYSTALS);
       expect(printed).toContain("Depths of the Eld Crystals");
     });

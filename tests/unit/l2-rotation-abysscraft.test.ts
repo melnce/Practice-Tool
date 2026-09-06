@@ -17,6 +17,7 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { isCantAttackLocked } from "../../src/logic/core/keywords/has.js";
@@ -24,7 +25,7 @@ import {
   tickCrests,
   playerHasCrestPassive,
 } from "../../src/logic/effects/crest.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
@@ -915,7 +916,7 @@ describe("L2 — Rotation Abysscraft", () => {
       setupTurn(R6, { hand: [AMOROUS], pp: 4, evo: 2 });
       whenPlayCard("first", 0);
       const amorous = findOnBoard("first", "Amorous Necromancer")!;
-      onEvolve(amorous, "first", "normal", { spendPoint: true });
+      whenEvolve(amorous, "first");
       expect(thenBoard("first").filter((c) => c.id === GHOST).length).toBe(2);
       expect(printed).toContain("Summon 2 copies of Ghost");
     });
@@ -926,7 +927,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const amorous = findOnBoard("first", "Amorous Necromancer")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(amorous, "first", "super");
+      whenSuperEvolve(amorous, "first");
       const ghosts = thenBoard("first").filter((c) => c.id === GHOST);
       expect(ghosts.length).toBe(2);
       expect(
@@ -956,7 +957,7 @@ describe("L2 — Rotation Abysscraft", () => {
       whenPlayCard("first", 0);
       const soul = findOnBoard("first", "Crimson Soulmancer")!;
       const boardBefore = thenBoard("first").length;
-      onEvolve(soul, "first", "normal", { spendPoint: true });
+      whenEvolve(soul, "first");
       expect(thenBoard("first").length).toBe(boardBefore + 1);
       expect(printed).toContain("Replicate");
     });
@@ -987,7 +988,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const bystander = enemyFollower(2, 6, "Bystander");
       whenPlayCard("first", 0);
       const hb = findOnBoard("first", "Devilish Heartbreaker")!;
-      onEvolve(hb, "first", "normal", { spendPoint: true });
+      whenEvolve(hb, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(2);
       expect(Number(bystander.defense)).toBe(6);
@@ -1224,7 +1225,7 @@ describe("L2 — Rotation Abysscraft", () => {
       whenPlayCard("first", 0);
       resolvePendingByUid(target.uid);
       const ogre = findOnBoard("first", "Friendly Blue Ogre")!;
-      onEvolve(ogre, "first", "normal", { spendPoint: true });
+      whenEvolve(ogre, "first");
       resolvePendingByUid(target.uid);
       expect(isCantAttackLocked(target)).toBe(true);
       expect(printed).toContain("Replicate");
@@ -1255,7 +1256,7 @@ describe("L2 — Rotation Abysscraft", () => {
       enemyFollower(2, 3, "A");
       whenPlayCard("first", 0);
       const marsha = findOnBoard("first", "Marsha, Dark Knight")!;
-      onEvolve(marsha, "first", "normal", { spendPoint: true });
+      whenEvolve(marsha, "first");
       expect(getHP(state, "second")).toBe(18);
       expect(printed).toContain("Replicate");
     });
@@ -1366,7 +1367,7 @@ describe("L2 — Rotation Abysscraft", () => {
       whenPlayCard("first", 0);
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
       const milteoUid = milteo.uid;
-      onEvolve(milteo, "first", "normal", { spendPoint: true });
+      whenEvolve(milteo, "first");
       cleanupDead();
       expect(findOnBoard("first", "Milteo & Luzen")?.uid).toBe(milteoUid);
       expect(thenBoard("first").length).toBe(1);
@@ -1384,7 +1385,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const otherUids = [...allies, ...enemies].map((c) => c.uid);
       whenPlayCard("first", 0);
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
-      onEvolve(milteo, "first", "normal", { spendPoint: true });
+      whenEvolve(milteo, "first");
       cleanupDead();
       expect(thenBoard("first").length).toBe(1);
       expect(thenBoard("second").length).toBe(0);
@@ -1400,7 +1401,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(milteo, "first", "super");
+      whenSuperEvolve(milteo, "first");
       expect(findCrest("first", "Milteo")).toBeTruthy();
       expect(crestPrinted).toContain("Whenever you play a follower");
     });
@@ -1411,7 +1412,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(milteo, "first", "super");
+      whenSuperEvolve(milteo, "first");
       state.players.first.hp = 20;
       whenPlayCard("first", 0);
       expect(getHP(state, "first")).toBe(20);
@@ -1427,7 +1428,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const milteo = findOnBoard("first", "Milteo & Luzen")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(milteo, "first", "super");
+      whenSuperEvolve(milteo, "first");
       whenPlayCard("first", 0);
       const dodger = findOnBoard("first", "Ghost Dodger")!;
       expect(dodger.hasEvolved).toBe(true);
@@ -1581,7 +1582,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const bones = findOnBoard("first", "Beastmaster Bones")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(bones, "first", "super");
+      whenSuperEvolve(bones, "first");
       resolvePendingByUid(ally.uid);
       cleanupDead();
       expect(findOnBoard("first", "Sacrifice")).toBeFalsy();
@@ -1634,7 +1635,7 @@ describe("L2 — Rotation Abysscraft", () => {
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
       const cdBefore = Number(findCrest("first", "Belial")!.countdown);
-      onEvolve(belial, "first", "super");
+      whenSuperEvolve(belial, "first");
       expect(Number(findCrest("first", "Belial")!.countdown)).toBe(
         cdBefore - 1,
       );
@@ -1743,7 +1744,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const isty = findOnBoard("first", "Istyndet vs. Mitilykket")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(isty, "first", "super");
+      whenSuperEvolve(isty, "first");
       expect(findCrest("first", "Istyndet")).toBeTruthy();
       expect(printed).toContain("Gain Crest");
     });
@@ -1754,7 +1755,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const isty = findOnBoard("first", "Istyndet vs. Mitilykket")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(isty, "first", "super");
+      whenSuperEvolve(isty, "first");
       const lwAlly = allyFollower("LWAlly", 1, 2);
       lwAlly.hasLastWords = true;
       lwAlly.lastWordsEffects = [{ op: "draw", source: "deck", count: 1 }];
@@ -1772,7 +1773,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const isty = findOnBoard("first", "Istyndet vs. Mitilykket")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(isty, "first", "super");
+      whenSuperEvolve(isty, "first");
       allyFollower("NoLW", 2, 2);
       const foe = enemyFollower(2, 5, "Foe");
       runEndOfTurnBoundary("first");
@@ -1781,12 +1782,13 @@ describe("L2 — Rotation Abysscraft", () => {
     });
 
     it("opponent's EOT: crest does not destroy", () => {
-      setupTurn(R8, { hand: [ISTYNDET], pp: 7, active: "second" });
-      whenPlayCard("first", 0);
-      const isty = findOnBoard("first", "Istyndet vs. Mitilykket")!;
+      setupTurn(R8, { pp: 7, active: "second" });
+      const isty = createCard(ISTYNDET, "board", "first");
+      isty.peak_defense = Number(isty.defense) || 1;
+      state.players.first.board = [isty];
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(isty, "first", "super");
+      whenSuperEvolve(isty, "first");
       const lwAlly = allyFollower("LWAlly", 1, 2);
       lwAlly.hasLastWords = true;
       const foe = enemyFollower(2, 5, "Foe");
@@ -1858,7 +1860,7 @@ describe("L2 — Rotation Abysscraft", () => {
       const armes = findOnBoard("first", "Armes, Depletive Demon")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
-      onEvolve(armes, "first", "super");
+      whenSuperEvolve(armes, "first");
       expect(Number(armes.attacks_per_turn ?? armes.attacksPerTurn)).toBe(3);
       expect(printed).toContain("Can attack 3 times per turn");
     });
@@ -1898,10 +1900,10 @@ describe("L2 — Rotation Abysscraft", () => {
       whenPlayCard("first", 0);
       const ls = findOnBoard("first", "Lifestealer")!;
       const skel = thenBoard("first").find((c) => c.id === SKELETON)!;
-      onEvolve(ls, "first", "normal", { spendPoint: true });
+      whenEvolve(ls, "first");
       expect(Number(skel.defense)).toBe(0);
       cleanupDead();
-      expect(Number(ls.defense)).toBe(7);
+      expect(Number(ls.defense)).toBe(9);
       expect(printed).toContain("Deal 1 damage to all other followers");
     });
   });
@@ -1979,7 +1981,7 @@ describe("L2 — Rotation Abysscraft", () => {
       state.players.first.superEvoCharges = 1;
       state.players.first.superEvoPoints = 1;
       expect(getHP(state, "second")).toBe(12);
-      onEvolve(shak, "first", "super");
+      whenSuperEvolve(shak, "first");
       expect(getHP(state, "second")).toBe(4);
       expect(printed).toContain("Replicate");
     });

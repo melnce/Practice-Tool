@@ -17,9 +17,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
@@ -654,7 +655,7 @@ describe("L2 — Kukishiro Havencraft", () => {
       whenPlayCard("first", 0);
       expect(handIds()).toContain(DRAW_A);
       const mouse = findOnBoard("first", "Desperate Shrinemouse")!;
-      onEvolve(mouse, "first", "normal", { spendPoint: true });
+      whenEvolve(mouse, "first");
       expect(handIds()).toContain(DRAW_B);
       expect(printed).toContain("Replicate the effects");
     });

@@ -17,9 +17,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
@@ -286,7 +287,7 @@ describe("L2 — Evolution Havencraft", () => {
       bystander.hasWard = true;
       whenPlayCard("first", 0);
       const lilium = findOnBoard("first", "Lilium, Witch of the Tomes")!;
-      onEvolve(lilium, "first", "normal", { spendPoint: true });
+      whenEvolve(lilium, "first");
       resolvePendingByUid(target.uid);
       expect(target.hasWard).toBeFalsy();
       expect(Number(target.defense)).toBe(3);
@@ -497,7 +498,7 @@ describe("L2 — Evolution Havencraft", () => {
       whenPlayCard("first", 0);
       const zoe = findOnBoard("first", "Zoe, Dazzling Hope")!;
       state.players.first.evoCharges = 2;
-      onEvolve(zoe, "first", "normal", { spendPoint: true });
+      whenEvolve(zoe, "first");
       expect(
         getCrests(state, "first").some((c) => c.name === "Zoe, Dazzling Hope"),
       ).toBe(true);
@@ -508,7 +509,7 @@ describe("L2 — Evolution Havencraft", () => {
       const zoe = createCard(ZOE, "board", "first");
       state.players.first.board.push(zoe);
       state.players.first.evoCharges = 2;
-      onEvolve(zoe, "first", "normal", { spendPoint: true });
+      whenEvolve(zoe, "first");
       expect(
         getCrests(state, "first").some((c) => c.name === "Zoe, Dazzling Hope"),
       ).toBe(true);
@@ -553,7 +554,7 @@ describe("L2 — Evolution Havencraft", () => {
       resolvePendingByUid(getBoard(state, "second")[0]!.uid);
       const erralde = findOnBoard("first", "Erralde, Signet Convict")!;
       state.players.first.evoCharges = 2;
-      onEvolve(erralde, "first", "normal", { spendPoint: true });
+      whenEvolve(erralde, "first");
       expect(
         getCrests(state, "first").some(
           (c) => c.name === "Erralde, Signet Convict",
@@ -656,7 +657,7 @@ describe("L2 — Evolution Havencraft", () => {
       expect(getEffectiveCost(viche())).toBe(6);
       const ally = allyFollower();
       state.players.first.superEvoCharges = 1;
-      onEvolve(ally, "first", "super", { spendPoint: true });
+      whenSuperEvolve(ally, "first");
       expect(getEffectiveCost(viche())).toBe(3);
     });
 
@@ -666,7 +667,7 @@ describe("L2 — Evolution Havencraft", () => {
       expect(getEffectiveCost(viche())).toBe(6);
       const ally = allyFollower();
       state.players.first.evoCharges = 2;
-      onEvolve(ally, "first", "normal", { spendPoint: true });
+      whenEvolve(ally, "first");
       expect(getEffectiveCost(viche())).toBe(6);
     });
   });
@@ -710,7 +711,7 @@ describe("L2 — Evolution Havencraft", () => {
       const exec = findOnBoard("first", "Executor of the Vow")!;
       const hpAfterFanfare = getHP(state, "first");
       state.players.first.superEvoCharges = 1;
-      onEvolve(exec, "first", "super", { spendPoint: true });
+      whenSuperEvolve(exec, "first");
       expect(getHP(state, "first")).toBe(hpAfterFanfare + 2);
     });
   });
@@ -772,7 +773,7 @@ describe("L2 — Evolution Havencraft", () => {
       whenPlayCard("first", 0);
       const verdilia = findOnBoard("first", "Verdilia & Castelle, Sisters")!;
       state.players.first.superEvoCharges = 1;
-      onEvolve(verdilia, "first", "super", { spendPoint: true });
+      whenSuperEvolve(verdilia, "first");
       expect(
         getCrests(state, "first").some(
           (c) => c.name === "Verdilia & Castelle, Sisters",

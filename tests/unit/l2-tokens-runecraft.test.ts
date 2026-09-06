@@ -17,9 +17,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -912,7 +913,7 @@ describe("L2 — Runecraft tokens", () => {
       const uidsBefore = handUids();
       whenPlayCard("first", 0);
       const calge = findOnBoard("first", "Calge-Danthla, Eld Crystals")!;
-      onEvolve(calge, "first", "normal", { spendPoint: true });
+      whenEvolve(calge, "first");
       const added = newHandCards(uidsBefore, "first", DEPTHS_ELD_CRYSTALS);
       expect(added).toHaveLength(1);
       expect(Number(added[0]!.cost)).toBe(6);

@@ -16,9 +16,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
@@ -229,7 +230,7 @@ describe("L2 — Midrange Abysscraft", () => {
       const bystander = enemyFollower(2, 5, "Bystander");
       whenPlayCard("first", 0);
       const raz = findOnBoard("first", "Raz, Demon on the Drums")!;
-      onEvolve(raz, "first", "normal");
+      whenEvolve(raz, "first");
       resolvePendingByUid(target.uid);
 
       expect(Number(target.defense)).toBe(2);
@@ -293,7 +294,7 @@ describe("L2 — Midrange Abysscraft", () => {
       state.players.first.shadows = 0;
       whenPlayCard("first", 0);
       const bibatii = findOnBoard("first", "Bibatii, Eld Sight")!;
-      onEvolve(bibatii, "first", "normal");
+      whenEvolve(bibatii, "first");
       expect(handIds()).toContain(DEPTHS_SIGHT);
       expect(printed).toContain("Depths of the Eld Sight");
     });
@@ -320,7 +321,7 @@ describe("L2 — Midrange Abysscraft", () => {
       state.players.first.evoCharges = 2;
       whenPlayCard("first", 0);
       const necro = findOnBoard("first", "Fickle Necromancer")!;
-      onEvolve(necro, "first", "normal");
+      whenEvolve(necro, "first");
       expect(boardNames()).toContain("Rotting Zombie");
       expect(thenBoard("first").some((c) => c.id === ROTTING_ZOMBIE)).toBe(
         true,
@@ -392,7 +393,7 @@ describe("L2 — Midrange Abysscraft", () => {
         (c) => c.name === "Skeleton",
       ).length;
 
-      onEvolve(feline, "first", "normal");
+      whenEvolve(feline, "first");
       resolvePendingByUid(target.uid);
 
       expect(Number(target.defense)).toBeLessThan(2);
@@ -454,10 +455,10 @@ describe("L2 — Midrange Abysscraft", () => {
       const adahime = findOnBoard("first", "Adahime, Anathema of Death")!;
       const adahimeAtk = Number(adahime.attack);
       const allyAtkBefore = Number(ally.attack);
-      onEvolve(adahime, "first", "super");
+      whenSuperEvolve(adahime, "first");
       expect(Number(ally.attack)).toBe(allyAtkBefore + 2);
       expect(Number(ally.defense)).toBe(5);
-      expect(Number(adahime.attack)).toBe(adahimeAtk);
+      expect(Number(adahime.attack)).toBe(adahimeAtk + 3);
       expect(printed).toContain("all other allied Abysscraft");
     });
   });
@@ -605,7 +606,7 @@ describe("L2 — Midrange Abysscraft", () => {
       const brothers = findOnBoard("first", "Itsurugi & Taketsumi, Brothers")!;
       const handBefore = handIds();
       setScriptedModePickProvider(() => [0]);
-      onEvolve(brothers, "first", "normal");
+      whenEvolve(brothers, "first");
       expect(handIds()).toContain("10021110");
       expect(handIds()).toContain("10021120");
       expect(handIds().length).toBeGreaterThan(handBefore.length);
@@ -620,7 +621,7 @@ describe("L2 — Midrange Abysscraft", () => {
       const brothers = findOnBoard("first", "Itsurugi & Taketsumi, Brothers")!;
       state.players.first.pp = 0;
       setScriptedModePickProvider(() => [1]);
-      onEvolve(brothers, "first", "normal");
+      whenEvolve(brothers, "first");
       expect(state.players.first.pp).toBe(2);
       expect(printed).toContain("Recover 2 play points");
     });

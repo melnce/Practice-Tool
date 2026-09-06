@@ -21,9 +21,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
@@ -215,7 +216,7 @@ describe("L2 — Evolution Forestcraft", () => {
       ).toBe(0);
       const ally = allyFollower();
       state.players.second.hp = 20;
-      onEvolve(ally, "first", "normal", { spendPoint: false });
+      whenEffectEvolve(ally, "first", "normal");
       expect(getHP(state, "second")).toBe(19);
       expect(printed).toContain("Depths of the Eld Lance");
     });
@@ -231,7 +232,7 @@ describe("L2 — Evolution Forestcraft", () => {
       ).toBe(5);
       const ally = allyFollower();
       state.players.second.hp = 20;
-      onEvolve(ally, "first", "normal", { spendPoint: false });
+      whenEffectEvolve(ally, "first", "normal");
       expect(getHP(state, "second")).toBe(20);
     });
 
@@ -368,7 +369,7 @@ describe("L2 — Evolution Forestcraft", () => {
       setupTurn(R6, { hand: [MOTHERLY], pp: 4, evo: 2 });
       whenPlayCard("first", 0);
       const mom = findOnBoard("first", "Motherly Forestdweller")!;
-      onEvolve(mom, "first", "normal", { spendPoint: true });
+      whenEvolve(mom, "first");
       expect(boardIds().filter((id) => id === SPRINGBLOOM)).toHaveLength(1);
       expect(printed).toContain("Summon a Springbloom Fairy");
     });
@@ -389,7 +390,7 @@ describe("L2 — Evolution Forestcraft", () => {
       setupTurn(R7, { hand: [MERCIFUL], pp: 5, hp: 15 });
       whenPlayCard("first", 0);
       const fairy = findOnBoard("first", "Springbloom Fairy")!;
-      onEvolve(fairy, "first", "normal", { spendPoint: false });
+      whenEffectEvolve(fairy, "first", "normal");
       expect(getHP(state, "first")).toBe(16);
       expect(printed).toContain("restore 1 defense");
     });
@@ -441,7 +442,7 @@ describe("L2 — Evolution Forestcraft", () => {
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(hart, "first", "super");
+      whenSuperEvolve(hart, "first");
       expect(
         getCrests(state, "first").some(
           (c) => c.name === "Great Hart of the Glacial Realm",

@@ -17,10 +17,11 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
@@ -332,7 +333,7 @@ describe("L2 Dragoncraft tokens — real-card tests", () => {
       whenPlayCard("first", 0);
       const vor = findOnBoard("first", "Vorlalai, Eld Blades")!;
       const handBefore = handUids();
-      onEvolve(vor, "first", "normal", { spendPoint: true });
+      whenEvolve(vor, "first");
       const added = newHandCards(handBefore, "first", DEPTHS_BLADES);
       expect(added).toHaveLength(1);
     });

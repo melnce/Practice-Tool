@@ -17,9 +17,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
@@ -459,7 +460,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       const bystander = enemyFollower(2, 5, "Bystander");
       whenPlayCard("first", 0);
       const shaili = findOnBoard("first", "Shaili, Prowling Assassin")!;
-      onEvolve(shaili, "first", "normal", { spendPoint: true });
+      whenEvolve(shaili, "first");
       resolvePendingByUid(target.uid);
       expect(isCantAttackLocked(target)).toBe(true);
       expect(isCantAttackLocked(bystander)).toBe(false);
@@ -480,7 +481,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       setupTurn(R6, { hand: [ARTHUR], pp: 3, evo: 2 });
       whenPlayCard("first", 0);
       const arthur = findOnBoard("first", "Arthur, Staunch Dragon")!;
-      onEvolve(arthur, "first", "normal", { spendPoint: true });
+      whenEvolve(arthur, "first");
       expect(boardCountById(MORDRED)).toBe(1);
       expect(printed).toContain("Mordred");
     });
@@ -512,7 +513,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       const ally = allyFollower(3, 3, "Hero");
       applyKeywordsFromList(ally);
       state.players.first.superEvoCharges = 1;
-      onEvolve(ally, "first", "super");
+      whenSuperEvolve(ally, "first");
       expect(getEffectiveCost(bombardier)).toBe(1);
       expect(printed).toContain("set the cost of this card to 1");
     });
@@ -607,7 +608,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       setupTurn(R6, { hand: [KATZE], pp: 3, evo: 2 });
       whenPlayCard("first", 0);
       const katze = findOnBoard("first", "Katze, Magical Thief")!;
-      onEvolve(katze, "first", "normal", { spendPoint: true });
+      whenEvolve(katze, "first");
       expect(handIds()).toContain(GLITTERING_GOLD);
     });
   });
@@ -640,7 +641,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       const bystander = enemyFollower(2, 6, "Bystander");
       whenPlayCard("first", 0);
       const guard = findOnBoard("first", "Loyal Guard")!;
-      onEvolve(guard, "first", "normal", { spendPoint: true });
+      whenEvolve(guard, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(3);
       expect(Number(bystander.defense)).toBe(6);
@@ -661,7 +662,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       setupTurn(R6, { hand: [MORDRED], pp: 3, evo: 2 });
       whenPlayCard("first", 0);
       const mordred = findOnBoard("first", "Mordred, Illusory Lion")!;
-      onEvolve(mordred, "first", "normal", { spendPoint: true });
+      whenEvolve(mordred, "first");
       expect(boardCountById(ARTHUR)).toBe(1);
     });
   });
@@ -736,7 +737,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       const handUidsBefore = new Set(
         state.players.first.hand.map((c) => c.uid),
       );
-      onEvolve(onBoard, "first", "super");
+      whenSuperEvolve(onBoard, "first");
       const rustyInHand = thenHand("first").filter(
         (c) => c.name === "Rusty, Luxcard Trickster",
       );
@@ -786,7 +787,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       setupTurn(R6, { hand: [SMOKE_BEAUTY], pp: 3, evo: 2 });
       whenPlayCard("first", 0);
       const beauty = findOnBoard("first", "Smoke-Shrouded Beauty")!;
-      onEvolve(beauty, "first", "normal", { spendPoint: true });
+      whenEvolve(beauty, "first");
       expect(handIds()).toContain(GLITTERING_GOLD);
     });
   });
@@ -913,7 +914,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       setupTurn(R6, { hand: [SASHA], pp: 4, evo: 2 });
       whenPlayCard("first", 0);
       const sasha = findOnBoard("first", "Sasha, Knight Everlasting")!;
-      onEvolve(sasha, "first", "normal", { spendPoint: true });
+      whenEvolve(sasha, "first");
       const knights = thenBoard("first").filter(
         (c) => c.id === STEELCLAD_KNIGHT,
       );
@@ -989,11 +990,11 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       const bystander = allyFollower(2, 2, "Bystander");
       whenPlayCard("first", 0);
       const tact = findOnBoard("first", "Unmoving Tactician")!;
-      onEvolve(tact, "first", "super", { spendPoint: true });
+      whenSuperEvolve(tact, "first");
       expect(Number(bystander.attack)).toBe(5);
       expect(Number(bystander.defense)).toBe(5);
-      expect(Number(tact.attack)).toBe(5);
-      expect(Number(tact.defense)).toBe(6);
+      expect(Number(tact.attack)).toBe(8);
+      expect(Number(tact.defense)).toBe(9);
     });
   });
 
@@ -1202,10 +1203,10 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       const bystander = allyFollower(2, 2, "Bystander");
       whenPlayCard("first", 0);
       const noel = findOnBoard("first", "Noel IV, Ruthless Warlord")!;
-      onEvolve(noel, "first", "super", { spendPoint: true });
+      whenSuperEvolve(noel, "first");
       expect(Number(bystander.attack)).toBe(3);
       expect(Number(bystander.defense)).toBe(3);
-      expect(Number(noel.attack)).toBe(4);
+      expect(Number(noel.attack)).toBe(7);
     });
   });
 
@@ -1272,7 +1273,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       setupTurn(R7, { hand: [AMPHIBIAN], pp: 7, evo: 2 });
       whenPlayCard("first", 0);
       const amp = findOnBoard("first", "Amphibian Goldmuncher")!;
-      onEvolve(amp, "first", "normal", { spendPoint: true });
+      whenEvolve(amp, "first");
       expect(
         thenHand("first").filter((c) => c.id === GLITTERING_GOLD),
       ).toHaveLength(2);
@@ -1313,7 +1314,7 @@ describe("L2 rotation Swordcraft — real-card tests", () => {
       setupTurn(R9, { hand: [OLUON], pp: 9, evo: 2, seed: 3 });
       whenPlayCard("first", 0);
       const oluon = findOnBoard("first", "Oluon, Raging Chariot")!;
-      onEvolve(oluon, "first", "normal", { spendPoint: true });
+      whenEvolve(oluon, "first");
       state.players.second.board = [];
       state.players.second.hp = 20;
       state.players.first.hp = 20;

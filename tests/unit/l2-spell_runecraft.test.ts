@@ -16,9 +16,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -286,7 +287,7 @@ describe("L2 Spell Runecraft — real-card tests", () => {
       const defAfterFanfare = Number(target.defense);
       const sbAfterFanfare = sbCount(sbCard);
       const meow = findOnBoard("first", "Meowskers, Roly-Poly Mk II & Djeana")!;
-      onEvolve(meow, "first", "normal", { spendPoint: true });
+      whenEvolve(meow, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(defAfterFanfare - 1);
       expect(sbCount(sbCard)).toBeGreaterThan(sbAfterFanfare);
@@ -371,7 +372,7 @@ describe("L2 Spell Runecraft — real-card tests", () => {
       const missileCost0 = getEffectiveCost(missile);
       const foresightCost0 = getEffectiveCost(foresight);
       const tico = findOnBoard("first", "Tico, Mysterian Spellcrafter")!;
-      onEvolve(tico, "first", "normal", { spendPoint: true });
+      whenEvolve(tico, "first");
       expect(getEffectiveCost(missile)).toBe(missileCost0 - 1);
       expect(getEffectiveCost(foresight)).toBe(foresightCost0);
     });
@@ -381,7 +382,7 @@ describe("L2 Spell Runecraft — real-card tests", () => {
       state.players.first.superEvoCharges = 1;
       whenPlayCard("first", 0);
       const tico = findOnBoard("first", "Tico, Mysterian Spellcrafter")!;
-      onEvolve(tico, "first", "super", { spendPoint: true });
+      whenSuperEvolve(tico, "first");
       expect(
         getCrests(state, "first").some(
           (c) => c.name === "Tico, Mysterian Spellcrafter",
@@ -421,7 +422,7 @@ describe("L2 Spell Runecraft — real-card tests", () => {
       state.players.first.board = [ally, wamdus];
       state.players.first.superEvoCharges = 1;
       setScriptedModePickProvider(() => [0]);
-      onEvolve(wamdus, "first", "super");
+      whenSuperEvolve(wamdus, "first");
       setScriptedModePickProvider(null);
       expect(ally.hasBarrier).toBe(true);
       expect(wamdus.hasBarrier).toBe(false);
@@ -438,10 +439,10 @@ describe("L2 Spell Runecraft — real-card tests", () => {
       state.players.first.board = [wamdus];
       state.players.first.superEvoCharges = 1;
       setScriptedModePickProvider(() => [1]);
-      onEvolve(wamdus, "first", "super");
+      whenSuperEvolve(wamdus, "first");
       setScriptedModePickProvider(null);
       const totalDamage = 2 - Number(foeA.defense) + (2 - Number(foeB.defense));
-      expect(totalDamage).toBe(3);
+      expect(totalDamage).toBe(4);
     });
   });
 
@@ -603,7 +604,7 @@ describe("L2 Spell Runecraft — real-card tests", () => {
         (c) => c.id === GUARDIAN_GOLEM,
       ).length;
       const ginger = findOnBoard("first", "Ginger, Disastrous Word")!;
-      onEvolve(ginger, "first", "normal", { spendPoint: true });
+      whenEvolve(ginger, "first");
       const golemsAfterEvolve = thenBoard("first").filter(
         (c) => c.id === GUARDIAN_GOLEM,
       ).length;
@@ -639,7 +640,7 @@ describe("L2 Spell Runecraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolvePendingByUid(getBoard(state, "second")[0]!.uid);
       const ara = findOnBoard("first", "Ara, Dawnblossom")!;
-      onEvolve(ara, "first", "normal", { spendPoint: true });
+      whenEvolve(ara, "first");
       resolvePendingByUid(bystander.uid);
       expect(findOnBoard("first", "Bystander")).toBeFalsy();
       expect(thenBoard("first").some((c) => c.id === REGAL_FALCON)).toBe(true);

@@ -17,9 +17,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
@@ -332,7 +333,7 @@ describe("L2 — Havencraft tokens", () => {
       whenPlayCard("first", 0);
       resolvePendingByUid(getBoard(state, "second")[0]!.uid);
       const ara = findOnBoard("first", "Ara, Dawnblossom")!;
-      onEvolve(ara, "first", "normal", { spendPoint: true });
+      whenEvolve(ara, "first");
       resolvePendingByUid(bystander.uid);
       const transformed = thenBoard("first").find(
         (c) => c.uid === bystander.uid,

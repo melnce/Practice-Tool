@@ -17,10 +17,11 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -590,7 +591,7 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       const kandima = findOnBoard("first", "Kandima, Sublime Hatred")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(kandima, "first", "super");
+      whenSuperEvolve(kandima, "first");
       resolvePendingByUid(foeAmulet.uid);
       expect(Number(foe.defense)).toBe(6);
     });
@@ -603,7 +604,7 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       const kandima = findOnBoard("first", "Kandima, Sublime Hatred")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(kandima, "first", "super");
+      whenSuperEvolve(kandima, "first");
       resolvePendingByUid(ally.uid);
       expect(Number(foe.defense)).toBe(3);
       expect(printed).toContain("deal 3 damage to all enemy followers");
@@ -771,7 +772,7 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       allyAmulet("Stay2");
       const omerio = findOnBoard("first", "Omerio, Winged Revenant")!;
       state.players.first.evoCharges = 2;
-      onEvolve(omerio, "first", "normal");
+      whenEvolve(omerio, "first");
       expect(getBoard(state, "first").every((c) => c.type !== "Amulet")).toBe(
         true,
       );
@@ -803,7 +804,7 @@ describe("L2 Amulet Havencraft — real-card tests", () => {
       state.players.first.superEvoCharges = 1;
       const foe2 = enemyLastWordsFollower("BanishMe2");
       state.players.second.shadows = 0;
-      onEvolve(initia, "first", "super");
+      whenSuperEvolve(initia, "first");
       resolvePendingByUid(foe2.uid);
 
       expect(getBoard(state, "second").some((c) => c.uid === foe2.uid)).toBe(

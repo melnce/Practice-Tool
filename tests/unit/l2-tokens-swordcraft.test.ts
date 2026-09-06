@@ -17,11 +17,12 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -363,7 +364,7 @@ describe("L2 Swordcraft tokens — real-card tests", () => {
       whenPlayCard("first", 0);
       const bunny = findOnBoard("first", "Bunny & Baron, Fate's Bullet")!;
       const handBefore = handUids();
-      onEvolve(bunny, "first", "normal", { spendPoint: true });
+      whenEvolve(bunny, "first");
       const added = newHandCards(handBefore, "first", DESPERADOS_SHOT);
       expect(added).toHaveLength(1);
     });
@@ -452,7 +453,7 @@ describe("L2 Swordcraft tokens — real-card tests", () => {
       whenPlayCard("first", 0);
       const oct = findOnBoard("first", "Octrice, Hollowness Manifest")!;
       const handBefore = handUids();
-      onEvolve(oct, "first", "normal", { spendPoint: true });
+      whenEvolve(oct, "first");
       const added = newHandCards(handBefore, "first", GILDED_BLADE);
       expect(added).toHaveLength(1);
     });
@@ -488,7 +489,7 @@ describe("L2 Swordcraft tokens — real-card tests", () => {
       whenPlayCard("first", 0);
       const scout = findOnBoard("first", "Open-Sea Scout")!;
       const handBefore = handUids();
-      onEvolve(scout, "first", "normal", { spendPoint: true });
+      whenEvolve(scout, "first");
       const added = newHandCards(handBefore, "first", GILDED_BOOTS);
       expect(added).toHaveLength(1);
     });
@@ -537,7 +538,7 @@ describe("L2 Swordcraft tokens — real-card tests", () => {
       whenPlayCard("first", 0);
       const oct = findOnBoard("first", "Octrice, Hollowness Manifest")!;
       const handBefore = handUids();
-      onEvolve(oct, "first", "normal", { spendPoint: true });
+      whenEvolve(oct, "first");
       const added = newHandCards(handBefore, "first", GILDED_NECKLACE);
       expect(added).toHaveLength(1);
     });

@@ -17,10 +17,11 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -355,7 +356,7 @@ describe("L2 — Abysscraft tokens", () => {
       whenPlayCard("first", 0);
       const necro = findOnBoard("first", "Fickle Necromancer")!;
       const uidsBefore = boardUids();
-      onEvolve(necro, "first", "normal");
+      whenEvolve(necro, "first");
       const summoned = newBoardCards(uidsBefore, "first", ROTTING_ZOMBIE);
       expect(summoned).toHaveLength(1);
       expect(Number(summoned[0]!.cost)).toBe(3);
@@ -433,7 +434,7 @@ describe("L2 — Abysscraft tokens", () => {
       whenPlayCard("first", 0);
       const bibatii = findOnBoard("first", "Bibatii, Eld Sight")!;
       const uidsBefore = handUids();
-      onEvolve(bibatii, "first", "normal");
+      whenEvolve(bibatii, "first");
       const added = newHandCards(uidsBefore, "first", DEPTHS_SIGHT);
       expect(added).toHaveLength(1);
       expect(Number(added[0]!.cost)).toBe(1);

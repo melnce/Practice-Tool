@@ -17,9 +17,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -223,7 +224,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       discardHandCard("first", FODDER);
       const hpAfterFanfare = getHP(state, "first");
       const kimika = findOnBoard("first", "Kimika, Cook of Happiness")!;
-      onEvolve(kimika, "first", "normal", { spendPoint: true });
+      whenEvolve(kimika, "first");
       discardHandCard("first", DRAW_SECOND);
       expect(handIds()).toContain(DRAW_TOP);
       expect(handIds()).not.toContain(DRAW_SECOND);
@@ -315,7 +316,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       setupTurn(R6, { hand: [VORLALAI], pp: 2, evo: 2 });
       whenPlayCard("first", 0);
       const vor = findOnBoard("first", "Vorlalai, Eld Blades")!;
-      onEvolve(vor, "first", "normal", { spendPoint: true });
+      whenEvolve(vor, "first");
       expect(handIds().filter((id) => id === DEPTHS)).toHaveLength(1);
       expect(printed).toContain("Add a Depths");
     });
@@ -324,7 +325,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       setupTurn(R7, { hand: [VORLALAI], pp: 2, superEvo: 1 });
       whenPlayCard("first", 0);
       const vor = findOnBoard("first", "Vorlalai, Eld Blades")!;
-      onEvolve(vor, "first", "super", { spendPoint: true });
+      whenSuperEvolve(vor, "first");
       expect(handIds().filter((id) => id === DEPTHS)).toHaveLength(3);
       expect(printed).toContain("3 copies");
     });
@@ -512,7 +513,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       const hpAfterFanfare = getHP(state, "first");
       const norm = findOnBoard("first", "Normagdala, Ravening Revenant")!;
       setScriptedModePickProvider(() => [0]);
-      onEvolve(norm, "first", "normal", { spendPoint: true });
+      whenEvolve(norm, "first");
       setScriptedModePickProvider(null);
       expect(getHP(state, "first")).toBe(hpAfterFanfare + 3);
       expect(printed).toContain("Replicate");
@@ -572,7 +573,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       discardHandCard("first", FODDER);
       discardHandCard("first", DRAW_SECOND);
       const lumiore = findOnBoard("first", "Lumiore & Argente, Shining Wings")!;
-      onEvolve(lumiore, "first", "super", { spendPoint: true });
+      whenSuperEvolve(lumiore, "first");
       expect(handIds()).toContain(DRAW_TOP);
       expect(handIds()).toContain("10031320");
       expect(handIds()).toContain(FODDER);
@@ -685,7 +686,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       setupTurn(R7, { hand: [BURNITE], pp: 9, superEvo: 1 });
       whenPlayCard("first", 0);
       const burnite = findOnBoard("first", "Burnite, Anathema of Ash")!;
-      onEvolve(burnite, "first", "super", { spendPoint: true });
+      whenSuperEvolve(burnite, "first");
       expect(
         getCrests(state, "second").some((c) =>
           c.name?.includes("Burnite, Anathema of Ash"),
@@ -720,7 +721,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       whenPlayCard("first", 0);
       const erntz = findOnBoard("first", "Erntz, Governing Justice")!;
       const foe = enemyFollower(2, 10, "Foe");
-      onEvolve(erntz, "first", "normal", { spendPoint: true });
+      whenEvolve(erntz, "first");
       const hpEnemyBefore = getHP(state, "second");
       whenEndTurn();
       expect(getHP(state, "second")).toBe(hpEnemyBefore - 8);
@@ -743,7 +744,7 @@ describe("L2 — Ramp Dragoncraft", () => {
       setupTurn(R10, { hand: [ERNTZ], pp: 10, evo: 2 });
       whenPlayCard("first", 0);
       const erntz = findOnBoard("first", "Erntz, Governing Justice")!;
-      onEvolve(erntz, "first", "normal", { spendPoint: true });
+      whenEvolve(erntz, "first");
       expect(erntz.hasWard || erntz.keywordState?.hasWard).toBeFalsy();
       expect(
         erntz.hasIntimidate || erntz.keywordState?.hasIntimidate,

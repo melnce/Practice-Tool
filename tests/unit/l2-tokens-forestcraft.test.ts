@@ -17,9 +17,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { giveStatBuffViaEngine } from "../harness/l2Dispatch.js";
@@ -454,7 +455,7 @@ describe("L2 — Forestcraft tokens", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const iz = findOnBoard("first", "Izudia, Annihilation Manifest")!;
-      onEvolve(iz, "first", "normal", { spendPoint: true });
+      whenEvolve(iz, "first");
       const added = newHandCards(uidsBefore, "first", ANNIHILATING);
       expect(added).toHaveLength(1);
       expect(Number(added[0]!.cost)).toBe(6);

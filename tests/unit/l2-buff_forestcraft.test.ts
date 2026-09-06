@@ -17,9 +17,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { giveStatBuffViaEngine } from "../harness/l2Dispatch.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
@@ -260,7 +261,7 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
       });
       whenPlayCard("first", 0);
       const tanuki = findOnBoard("first", "Prudent Tanuki")!;
-      onEvolve(tanuki, "first", "normal", { spendPoint: true });
+      whenEvolve(tanuki, "first");
       expect(handIds()).toContain(DRAW_TOP);
       expect(deckIds()).not.toContain(DRAW_TOP);
       expect(printed).toContain("Draw a card");
@@ -352,7 +353,7 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
       setupTurn(5, { hand: [CITRUS], pp: 3, evo: 2 });
       whenPlayCard("first", 0);
       const citrus = findOnBoard("first", "Citrus, Heretical Hermit")!;
-      onEvolve(citrus, "first", "normal", { spendPoint: true });
+      whenEvolve(citrus, "first");
       expect(boardIds().filter((id) => id === FAIRY)).toHaveLength(4);
       expect(printed).toContain("Replicate");
     });
@@ -390,7 +391,7 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
       const maga = findOnBoard("first", "Magachiyo, Aromatic Convict")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(maga, "first", "super");
+      whenSuperEvolve(maga, "first");
       expect(maga.hasStorm).toBe(true);
       expect(printed).toContain("Storm");
     });
@@ -439,7 +440,7 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
       const fairiesAfterFanfare = handIds().filter((id) => id === FAIRY).length;
       const miroku = findOnBoard("first", "Miroku, Swarmpetal")!;
       setScriptedModePickProvider(() => [0]);
-      onEvolve(miroku, "first", "normal", { spendPoint: true });
+      whenEvolve(miroku, "first");
       setScriptedModePickProvider(null);
       expect(handIds().filter((id) => id === FAIRY).length).toBe(
         fairiesAfterFanfare + 2,
@@ -565,7 +566,7 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
         });
       cleanupDead();
       expect(boardIds().filter((id) => id === FAIRY)).toHaveLength(1);
-      onEvolve(skipper, "first", "normal", { spendPoint: true });
+      whenEvolve(skipper, "first");
       expect(boardIds().filter((id) => id === FAIRY)).toHaveLength(4);
     });
 
@@ -577,7 +578,7 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
       const fairy = thenBoard("first").find((c) => c.id === FAIRY)!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(skipper, "first", "super");
+      whenSuperEvolve(skipper, "first");
       expect(fairy.hasBane).toBe(true);
       expect(nonPixie.hasBane).toBeFalsy();
       expect(skipper.hasBane).toBeFalsy();
@@ -715,7 +716,7 @@ describe("L2 Buff Forestcraft — real-card tests", () => {
       const victim = enemyLastWordsFollower("Victim");
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(althenia, "first", "super");
+      whenSuperEvolve(althenia, "first");
       resolvePendingByUid(victim.uid);
       expect(getBoard(state, "second").some((c) => c.uid === victim.uid)).toBe(
         false,
