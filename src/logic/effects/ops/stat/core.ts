@@ -6,6 +6,10 @@ import type { CardInstance, Player } from "../../../../core/types/index.js";
 import type { StatOp } from "./types.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getBoard } from "../../../../core/playerHelpers.js";
+import {
+  recomputeAttackFlags,
+  syncHasAttackedFromSwings,
+} from "../../../core/combat.js";
 
 /**
  * Applies stat changes to a card (additive).
@@ -144,8 +148,9 @@ export function applyAttacksPerTurnBuff(
     // Give them the attacks immediately if they can attack
     if (target.hasStorm || target.hasRush || !target.justPlayed) {
       target.attacks_left = n;
-      target.can_attack = true;
+      syncHasAttackedFromSwings(target);
     }
+    recomputeAttackFlags(target);
     logEvent("attacksPerTurn", {
       owner,
       target: target.name,

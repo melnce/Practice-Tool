@@ -12,6 +12,7 @@ import {
 import { snapshotEnteringKeywords } from "../../../core/enterKeywords.js";
 import { recordFollowerEnter } from "../../../core/followerEnterHistory.js";
 import { countRealBoardCards } from "./core.js";
+import { recomputeAttackFlags } from "../../../core/combat.js";
 
 // =============== Generic Board Fill Chain ===============
 
@@ -86,19 +87,12 @@ export function makeChainDecayClone(
   clone.attacks_left = clone.attacks_per_turn;
 
   // Rush/Storm handling
-  if (clone.hasStorm) {
-    clone.can_attack = true;
+  if (clone.hasStorm || clone.hasRush) {
     clone.can_attack_followers = true;
-    clone.isRush = false;
-  } else if (clone.hasRush) {
-    clone.can_attack = true; // followers only this turn
-    clone.can_attack_followers = true;
-    clone.isRush = true;
   } else {
-    clone.can_attack = false;
     clone.can_attack_followers = false;
-    clone.isRush = false;
   }
+  recomputeAttackFlags(clone);
 
   // Prevent re-entrant cascade from chain-spawned copies
   // Renamed from _spawnedByCongregant to generic _spawnedByChain

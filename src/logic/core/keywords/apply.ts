@@ -2,6 +2,7 @@ import type { CardInstance } from "../../../core/types/index.js";
 import { normalizeKeywordName } from "./registry.js";
 import { getKS } from "./internal.js";
 import { grantBarrier } from "../barrier.js";
+import { recomputeAttackFlags } from "../combat.js";
 
 interface KeywordOptions {
   [key: string]: any;
@@ -25,15 +26,13 @@ export const KEYWORD_MAP: {
         : 1;
       c.attacks_left = per;
     }
-    c.can_attack = true;
     getKS(c).can_attack_followers = true;
-    c.isRush = !c.hasStorm && !!c.justPlayed;
+    recomputeAttackFlags(c);
   },
   storm: (c) => {
     c.hasStorm = true;
-    c.can_attack = true;
     getKS(c).can_attack_followers = true;
-    c.isRush = false;
+    recomputeAttackFlags(c);
   },
   ward: (c) => {
     c.hasWard = true;
@@ -231,6 +230,8 @@ export const KEYWORD_MAP: {
       // Use the caster if provided, otherwise fallback to card owner (for self-buffs)
       ks.cantAttackOwner = opts.request_owner || c.owner || null;
     }
+
+    if (c.type === "Follower") recomputeAttackFlags(c);
   },
 };
 

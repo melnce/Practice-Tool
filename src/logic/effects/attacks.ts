@@ -5,6 +5,10 @@ import { getPool, highlightSelectable } from "../core/targeting.js";
 import { setPendingTarget } from "../core/pendingTarget/index.js";
 import { resolveUids } from "../../core/uidResolver.js";
 import type { Effect, CardInstance, Player } from "../../core/types/index.js";
+import {
+  recomputeAttackFlags,
+  syncHasAttackedFromSwings,
+} from "../core/combat.js";
 
 /** Shared field parsing for direct and targeted attacks_per_turn paths. */
 export function parseAttacksPerTurnParams(
@@ -56,10 +60,8 @@ export function applyAttacksPerTurnToCard(
 
   target.attacks_per_turn = n;
   target.attacks_left = Math.max(0, n - used);
-
-  if (target.hasStorm || target.hasRush || !target.justPlayed) {
-    target.can_attack = (target.attacks_left ?? 0) > 0;
-  }
+  syncHasAttackedFromSwings(target);
+  recomputeAttackFlags(target);
 }
 
 /** Clear until-EOT attacks_per_turn grants (both boards at EOT boundary). */
@@ -70,9 +72,8 @@ export function clearTemporaryAttacksPerTurn(card: CardInstance): void {
   const used = Math.max(0, card.attacks_used_this_turn ?? 0);
   card.attacks_per_turn = restore;
   card.attacks_left = Math.max(0, restore - used);
-  if (card.hasStorm || card.hasRush || !card.justPlayed) {
-    card.can_attack = (card.attacks_left ?? 0) > 0;
-  }
+  syncHasAttackedFromSwings(card);
+  recomputeAttackFlags(card);
 }
 
 /**

@@ -133,6 +133,7 @@ type SoakCliConfig = {
   fuse: boolean;
   interactiveModes: boolean;
   parity: boolean;
+  traces?: string;
 };
 
 function parseArgs(): SoakCliConfig {
@@ -187,6 +188,8 @@ function parseArgs(): SoakCliConfig {
     else if (arg === "--all-paths") {
       config.fuse = true;
       config.interactiveModes = true;
+    } else if (arg.startsWith("--traces=")) {
+      config.traces = arg.slice(9);
     }
   }
   return config;
@@ -202,6 +205,9 @@ async function main(): Promise<void> {
 
   const config = parseArgs();
   mkdirSync(REPORT_DIR, { recursive: true });
+  if (config.traces) {
+    mkdirSync(resolve(ROOT, config.traces), { recursive: true });
+  }
 
   const { initCardDatabaseNode } = await import(
     pathToFileURL(resolve(ROOT, "src/data/cardLoaderNode.ts")).href
@@ -230,7 +236,7 @@ async function main(): Promise<void> {
   console.log("║              SHADOWVERSE ENGINE SOAK                     ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
-    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} positions=${config.positions} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"} fuse=${config.fuse} interactiveModes=${config.interactiveModes} parity=${config.parity}`,
+    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} positions=${config.positions} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"} fuse=${config.fuse} interactiveModes=${config.interactiveModes} parity=${config.parity}${config.traces ? ` traces=${config.traces}` : ""}`,
   );
   console.log(`reports → ${REPORT_DIR}`);
   console.log("");
@@ -265,6 +271,7 @@ async function main(): Promise<void> {
     crashes: 0,
     hangs: 0,
     invariants: 0,
+    attackFlags: 0,
     history: 0,
     historyCheck: config.history,
     historyIgnoreFields: config.historyIgnore,
@@ -297,6 +304,12 @@ async function main(): Promise<void> {
       error?: string;
       reproFile?: string;
     }>,
+    perGame: [] as Array<{
+      gameIndex: number;
+      outcome: string;
+      actions: number;
+      finalHash: string;
+    }>,
     startedAt: new Date().toISOString(),
     finishedAt: "",
     durationMs: 0,
@@ -327,6 +340,35 @@ async function main(): Promise<void> {
       : await soakEnv.runSoakGame(runOpts);
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
+    summary.perGame.push({
+      gameIndex: i,
+      outcome: result.outcome,
+      actions: result.actions,
+      finalHash: result.finalHash,
+    });
+
+    if (config.traces) {
+      const tracePath = join(
+        resolve(ROOT, config.traces!),
+        `seed${config.seed}_game${i}.json`,
+      );
+      writeFileSync(
+        tracePath,
+        JSON.stringify(
+          {
+            seed: config.seed,
+            gameIndex: i,
+            gameSeed: config.seed + i * 1_000_003,
+            outcome: result.outcome,
+            actions: result.actions,
+            finalHash: result.finalHash,
+            trace: result.trace,
+          },
+          null,
+          2,
+        ),
+      );
+    }
 
     for (const [type, count] of Object.entries(result.actionTypeCounts ?? {})) {
       summary.actionTypeCounts[type] =
@@ -360,6 +402,7 @@ async function main(): Promise<void> {
     } else if (result.outcome === "crash") summary.crashes++;
     else if (result.outcome === "hang") summary.hangs++;
     else if (result.outcome === "invariant") summary.invariants++;
+    else if (result.outcome === "attack-flags") summary.attackFlags++;
     else if (result.outcome === "history") {
       summary.history++;
       const err = result.error ?? "";
@@ -543,6 +586,7 @@ async function main(): Promise<void> {
   console.log(`crashes:              ${summary.crashes}`);
   console.log(`hangs:                ${summary.hangs}`);
   console.log(`invariantViolations:  ${summary.invariants}`);
+  console.log(`attackFlagsViolations: ${summary.attackFlags}`);
   console.log(`historyViolations:  ${summary.history}`);
   console.log(`positionChecks:     ${summary.positionChecks}`);
   console.log(`positionViolations: ${summary.positionViolations}`);
@@ -646,6 +690,7 @@ async function main(): Promise<void> {
     summary.crashes +
     summary.hangs +
     summary.invariants +
+    summary.attackFlags +
     summary.history +
     summary.positionViolations +
     summary.parityViolations +

@@ -51,6 +51,7 @@ import {
   opponentOf,
 } from "../core/playerHelpers.js";
 import { checkSoakInvariants } from "./soakInvariants.js";
+import { assertAttackFlagsConsistent } from "./attackFlagsInvariant.js";
 import { deckSpecForSeed, type SoakDeckSpec } from "./soakDecks.js";
 import { CoverageTracker } from "./soakCoverage.js";
 import type { PendingModeChoice } from "../logic/core/resolutionPause.js";
@@ -81,6 +82,7 @@ export type SoakGameResult = {
     | "crash"
     | "hang"
     | "invariant"
+    | "attack-flags"
     | "determinism_mismatch"
     | "history"
     | "position"
@@ -1903,6 +1905,30 @@ export async function runSoakGame(
       if (opts.coverage) scanZonesForCoverage(opts.coverage);
 
       if (!opts.skipInvariants) {
+        const attackCtx = {
+          seed: opts.seed,
+          gameIndex: opts.gameIndex,
+          actionIndex: actions,
+          actionType: action.type,
+        };
+        const attackFindings = assertAttackFlagsConsistent(state, attackCtx);
+        if (attackFindings.length) {
+          return {
+            ...base,
+            outcome: "attack-flags",
+            turns: state.turnNumber | 0,
+            actions,
+            finalHash: safeHash(),
+            error: attackFindings.map((f) => f.message).join("; "),
+            findings: attackFindings.map((f) => f.message),
+            nonUndoableActionTypes: [...nonUndoableActionTypes].sort(),
+            playBlockedLog,
+            zeroCommitLog,
+            commitSequence,
+            positionChecks,
+          };
+        }
+
         const findings = checkSoakInvariants(state);
         if (findings.length) {
           return {

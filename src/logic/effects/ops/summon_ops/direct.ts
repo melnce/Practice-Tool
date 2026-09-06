@@ -15,6 +15,7 @@ import {
 import { makeCardFromDB, pushToBoard, boardHasRoom } from "./core.js";
 import { boardOf, safeClone } from "./utils.js";
 import { isEarthSigil, tryMergeIntoExistingEarthSigil } from "./earth.js";
+import { recomputeAttackFlags } from "../../../core/combat.js";
 
 // =============== Public API ===============
 
@@ -116,19 +117,12 @@ export function summonExactCopy(
   clone.attacks_left = clone.attacks_per_turn;
 
   // Combat flags
-  if (clone.hasStorm) {
-    clone.can_attack = true;
+  if (clone.hasStorm || clone.hasRush) {
     clone.can_attack_followers = true;
-    clone.isRush = false;
-  } else if (clone.hasRush) {
-    clone.can_attack = true; // followers this turn
-    clone.can_attack_followers = true;
-    clone.isRush = true;
   } else {
-    clone.can_attack = false;
     clone.can_attack_followers = false;
-    clone.isRush = false;
   }
+  recomputeAttackFlags(clone);
 
   if (!pushToBoard(board, owner, clone, opts)) return null;
 

@@ -12,6 +12,7 @@ import { getBoard, incrementRally } from "../../../core/playerHelpers.js";
 import type { EnteringKeywordSnapshot } from "../enterKeywords.js";
 import { resumeDeferredDeathIfIdle } from "../cleanup.js";
 import { recordFollowerEnter } from "../followerEnterHistory.js";
+import { recomputeAttackFlags } from "../combat.js";
 
 export interface PlayFollowerResume {
   player: Player;
@@ -77,8 +78,7 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
   }
 
   applyKeywordsFromList(card);
-  card.can_attack = !!card.hasStorm || !!card.hasRush;
-  card.isRush = !!card.hasRush && !card.hasStorm;
+  recomputeAttackFlags(card);
 
   const myBoard = getBoard(state, player);
   for (const perm of myBoard) {

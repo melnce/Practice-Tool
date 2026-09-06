@@ -2,6 +2,7 @@ import { state } from "../../../../core/gameState.js";
 import { logEvent } from "../../../../core/logger.js";
 
 import { applyKeywordsFromList } from "../../../core/keywords.js";
+import { recomputeAttackFlags } from "../../../core/combat.js";
 import type {
   CardInstance,
   Effect,
@@ -95,19 +96,12 @@ export function summonFromHand(
     card.attacks_left = card.attacks_per_turn;
 
     // Combat flags
-    if (card.hasStorm) {
-      card.can_attack = true;
+    if (card.hasStorm || card.hasRush) {
       card.can_attack_followers = true;
-      card.isRush = false;
-    } else if (card.hasRush) {
-      card.can_attack = true;
-      card.can_attack_followers = true;
-      card.isRush = true;
     } else {
-      card.can_attack = false;
-      card.isRush = false;
       card.can_attack_followers = false;
     }
+    recomputeAttackFlags(card);
   } else if (card.type === "Amulet") {
     initAmulet(card);
   }
@@ -186,19 +180,12 @@ export function summonExactCopyFromHand(
     clone.attacks_left = clone.attacks_per_turn;
 
     // Combat flags
-    if (clone.hasStorm) {
-      clone.can_attack = true; // leaders & followers
-      clone.isRush = false;
-      clone.can_attack_followers = true;
-    } else if (clone.hasRush) {
-      clone.can_attack = true; // followers this turn
-      clone.isRush = true;
+    if (clone.hasStorm || clone.hasRush) {
       clone.can_attack_followers = true;
     } else {
-      clone.can_attack = false;
-      clone.isRush = false;
       clone.can_attack_followers = false;
     }
+    recomputeAttackFlags(clone);
   }
 
   // Place on board (respect space; fills null holes from deferred deaths)
