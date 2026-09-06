@@ -55,6 +55,7 @@ export type SkipReason =
   | "play_blocked"
   | "unresolvable_pending"
   | "evolve_unavailable"
+  | "super_evolve_unavailable"
   | "drive_threw";
 
 export type ScenarioName =
@@ -63,6 +64,7 @@ export type ScenarioName =
   | "play_else"
   | "turn_boundary"
   | "evolve"
+  | "super_evolve"
   | "vanilla_place"
   | "summon";
 
@@ -459,6 +461,9 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   if (hasNonEmptyEffects(card.evolve) || hasNonEmptyEffects(card.superevolve)) {
     paths.push("evolve");
   }
+  if (hasNonEmptyEffects(card.superevolve)) {
+    paths.push("super_evolve");
+  }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
     paths.length === 0 &&
@@ -822,15 +827,19 @@ function runTurnBoundaryScenario(
   };
 }
 
-function runEvolveScenario(
+function runEvolveLikeScenario(
   cardId: string,
   gates: GateSpec[],
+  mode: "normal" | "super",
+  scenarioName: "evolve" | "super_evolve",
   arenaNeeds?: HarnessArenaNeeds,
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
   if (String(template.type).toLowerCase() !== "follower") {
-    return { skip: "evolve_unavailable", detail: "not_a_follower" };
+    const skipReason: SkipReason =
+      mode === "super" ? "super_evolve_unavailable" : "evolve_unavailable";
+    return { skip: skipReason, detail: "not_a_follower" };
   }
 
   buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
@@ -842,7 +851,7 @@ function runEvolveScenario(
     mode: "satisfy",
     sourceCard: host,
   });
-  assertHarnessBoardCap("runEvolveScenario:afterGatePrep");
+  assertHarnessBoardCap(`run${scenarioName}Scenario:afterGatePrep`);
   trimBoardToCap(
     state.players.first.board,
     HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
@@ -850,17 +859,20 @@ function runEvolveScenario(
   state.players.first.board = [host, ...state.players.first.board];
   state.players.first.evoCharges = 3;
   state.players.first.superEvoCharges = 3;
+  state.players.first.evoUsedThisTurn = false;
 
   try {
     dispatchAction(state, {
       type: "EVOLVE",
       player: "first",
       cardUid: host.uid,
-      mode: "normal",
+      mode,
     });
   } catch (err) {
+    const skipReason: SkipReason =
+      mode === "super" ? "super_evolve_unavailable" : "evolve_unavailable";
     return {
-      skip: "evolve_unavailable",
+      skip: skipReason,
       detail: err instanceof Error ? err.message : String(err),
     };
   }
@@ -877,12 +889,34 @@ function runEvolveScenario(
 
   const detail = fingerprintGameState(state);
   return {
-    scenario: "evolve",
+    scenario: scenarioName,
     fingerprint: hashFingerprint(detail),
     detail,
     gatesSatisfied: prep.satisfied,
     gatesUnmet: prep.unmet,
   };
+}
+
+function runEvolveScenario(
+  cardId: string,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  return runEvolveLikeScenario(cardId, gates, "normal", "evolve", arenaNeeds);
+}
+
+function runSuperEvolveScenario(
+  cardId: string,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  return runEvolveLikeScenario(
+    cardId,
+    gates,
+    "super",
+    "super_evolve",
+    arenaNeeds,
+  );
 }
 
 function runVanillaPlaceScenario(
@@ -1105,6 +1139,8 @@ export function driveCard(
           result = runTurnBoundaryScenario(id, gates, arenaNeeds);
         else if (path === "evolve")
           result = runEvolveScenario(id, gates, arenaNeeds);
+        else if (path === "super_evolve")
+          result = runSuperEvolveScenario(id, gates, arenaNeeds);
         else if (path === "summon") result = runSummonScenario(id, arenaNeeds);
         else result = runVanillaPlaceScenario(id, arenaNeeds);
       } catch (err) {
