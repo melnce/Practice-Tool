@@ -230,6 +230,10 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
 
   // ==== AI / Headless path (no modal) ====
   const isAIMode = () => {
+    // Soak exercises the modal path; real bots keep HEADLESS heuristic resolution.
+    if (globalThis && (globalThis as any).__SVWB_INTERACTIVE_MODES__) {
+      return false;
+    }
     // Your spectator sets these during AI searches/turns (see AlphaVanillaSpectator)
     // If you later run bots without the spectator, you can flip HEADLESS yourself before resolving effects.
     return !!(

@@ -18,34 +18,25 @@ export { resolvePendingTarget } from "./core/resolveTarget.js";
 export { summonNamed } from "./effects/ops/summon.js";
 export { getCardDetails } from "../data/cardDatabase.js";
 
-// Expose to window
-
 import { startGame as _startGame } from "./startGame.js";
 import "../data/cardDatabase.js";
 import { summonNamed as _summonNamed } from "./effects/ops/summon.js";
 import { getCardDetails as _getCardDetails } from "../data/cardDatabase.js";
 import { state } from "../core/gameState.js";
 import type { Player } from "../core/types/index.js";
+import { startFuseFromHand as _startFuseFromHandImpl } from "./core/fuseStart.js";
 
 export function startFuseFromHand(owner: Player, initiatorUid: string) {
-  runEffects(
-    [
-      {
-        op: "fuse",
-        action: "start",
-        initiator_uid: initiatorUid,
-      } as any,
-    ],
-    owner,
-    null,
-  ); // sourceCard null?
+  _startFuseFromHandImpl(owner, initiatorUid);
 }
 
-(window as any).startGame = _startGame;
-// End-turn / Bonus PP window hooks are owned by boot.ts (routed through
-// PlayerAction dispatch for sparring-line recording). Do not overwrite here.
-(window as any).summonNamed = _summonNamed;
-(window as any).getCardDetails = _getCardDetails;
-(window as any)._gameState = state;
-(window as any).getGameState = () => state;
-(window as any).startFuseFromHand = startFuseFromHand;
+if (typeof window !== "undefined") {
+  (window as any).startGame = _startGame;
+  // End-turn / Bonus PP window hooks are owned by boot.ts (routed through
+  // PlayerAction dispatch for sparring-line recording). Do not overwrite here.
+  (window as any).summonNamed = _summonNamed;
+  (window as any).getCardDetails = _getCardDetails;
+  (window as any)._gameState = state;
+  (window as any).getGameState = () => state;
+  (window as any).startFuseFromHand = startFuseFromHand;
+}

@@ -64,6 +64,12 @@ export type ConfirmMulliganAction = {
   player: Player;
 };
 
+export type FuseAction = {
+  type: "FUSE";
+  player: Player;
+  cardUid: string;
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ACTION TYPE MAPPING - Closed-world union with type-level assertions
 // ─────────────────────────────────────────────────────────────────────────────
@@ -82,7 +88,8 @@ export type ActionType =
   | "BONUS_PP"
   | "CHOOSE_MODE"
   | "TOGGLE_MULLIGAN"
-  | "CONFIRM_MULLIGAN";
+  | "CONFIRM_MULLIGAN"
+  | "FUSE";
 
 // Step 2: Define the canonical type mapping (ActionType -> Action interface)
 export interface ActionByType {
@@ -99,6 +106,7 @@ export interface ActionByType {
   CHOOSE_MODE: ChooseModeAction;
   TOGGLE_MULLIGAN: ToggleMulliganAction;
   CONFIRM_MULLIGAN: ConfirmMulliganAction;
+  FUSE: FuseAction;
 }
 
 // Step 3: Type assertions to enforce totality and exactness

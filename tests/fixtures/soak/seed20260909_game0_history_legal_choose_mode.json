@@ -1,0 +1,69 @@
+{
+  "seed": 20260909,
+  "gameIndex": 0,
+  "deckAId": "artifact_portalcraft",
+  "deckBId": "thestae_forestcraft",
+  "outcome": "history",
+  "error": "history legal-undo×1 mismatch at action 12 ({\"type\":\"PLAY_CARD\",\"player\":\"first\",\"cardUid\":\"uid_10\"}):\n  [0].indices: expected=undefined actual=[0]\n  [0].player: expected=undefined actual=\"first\"\n  [0].type: expected=\"END_TURN\" actual=\"CHOOSE_MODE\"\n  [1].cardUid: expected=\"uid_10\" actual=undefined\n  [1].indices: expected=undefined actual=[1]\n  [1].type: expected=\"PLAY_CARD\" actual=\"CHOOSE_MODE\"\n  [2]: expected={\"cardUid\":\"uid_k\",\"player\":\"first\",\"type\":\"PLAY_CARD\"} actual=undefined",
+  "actions": 12,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_28"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_10"
+    }
+  ]
+}
