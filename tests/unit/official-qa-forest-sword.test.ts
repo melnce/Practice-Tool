@@ -349,28 +349,23 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(findOnBoard("first", "Marlone, Scales of the Past")).toBeTruthy();
   }, 60_000);
 
-  // Flip to it when tests/mechanics/queued-ability-source-check.test.ts is on main (open PR #270).
-  it.fails(
-    "10911210 Trap in the Woods — only first of multi-summon destroyed (official Q&A)",
-    () => {
-      setupTurn(R6, {
-        hand: [TRAP],
-        pp: 3,
-        secondHand: [ADVENT_ELD_SWORD],
-        secondPP: 5,
-        active: "first",
-      });
-      whenPlayCard("first", 0);
-      whenEndTurn();
-      whenPlayCard("second", 0);
-      const soldiers = thenBoard("second").filter(
-        (c) => c.name === "Fearless Soldier",
-      );
-      expect(soldiers.length).toBe(2);
-      expect(findOnBoard("first", "Trap in the Woods")).toBeFalsy();
-    },
-    60_000,
-  );
+  it("10911210 Trap in the Woods — only first of multi-summon destroyed (official Q&A)", () => {
+    setupTurn(R6, {
+      hand: [TRAP],
+      pp: 3,
+      secondHand: [ADVENT_ELD_SWORD],
+      secondPP: 5,
+      active: "first",
+    });
+    whenPlayCard("first", 0);
+    whenEndTurn();
+    whenPlayCard("second", 0);
+    const soldiers = thenBoard("second").filter(
+      (c) => c.name === "Fearless Soldier",
+    );
+    expect(soldiers.length).toBe(2);
+    expect(findOnBoard("first", "Trap in the Woods")).toBeFalsy();
+  }, 60_000);
 
   it("10111130 Deepwood Fairy Beast — restores defense equal to hand size (official Q&A)", () => {
     setupTurn(R10, {
