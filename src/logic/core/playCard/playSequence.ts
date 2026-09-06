@@ -14,7 +14,6 @@ import {
 import {
   cleanupCountdownZeroAmulets,
   flushDeferredDeathBatch,
-  flushReactiveQueueOnly,
 } from "../cleanup.js";
 import { clearResolutionQueue } from "../triggers/queue.js";
 import { isEffectResolutionPaused } from "../resolutionPause.js";
@@ -63,11 +62,6 @@ function stageReactiveGroup(
 /** Begin a card-play sequence; suppresses end-of-runEffects drain until ended. */
 export function beginPlaySequence(): void {
   const depth = getPlaySequenceDepth();
-  if (depth === 0) {
-    (state as any)._playSequenceSavedDefer = !!(state as any)
-      .deferDeathTriggers;
-    (state as any).deferDeathTriggers = true;
-  }
   (state as any).playSequenceDepth = depth + 1;
 }
 
@@ -81,23 +75,12 @@ function mergeStagedPlayEnterGroups(): void {
   (state as any)._stagedPlayEnterGroups = [];
 }
 
-/** Merge staged play/enter reactions and resolve them before Fanfare runs. */
-export function drainStagedPlayEnterBeforeFanfare(): void {
-  mergeStagedPlayEnterGroups();
-  flushReactiveQueueOnly();
-}
-
 /** Drain the play sequence queue once after Fanfare, Enhance, and post-Fanfare tail. */
 export function endPlaySequenceDrain(): void {
   const depth = getPlaySequenceDepth();
   if (depth <= 0) return;
   (state as any).playSequenceDepth = depth - 1;
   if (getPlaySequenceDepth() > 0) return;
-
-  if ((state as any)._playSequenceSavedDefer !== undefined) {
-    (state as any).deferDeathTriggers = (state as any)._playSequenceSavedDefer;
-    delete (state as any)._playSequenceSavedDefer;
-  }
 
   if (
     isEffectResolutionPaused() ||
@@ -125,9 +108,6 @@ export function stageFollowerPlayEnterReactions(
     playedCard: card,
     costChanged: costChangedOnPlay,
   });
-  stageReactiveGroup("ally_card_played", player, {
-    playedCard: card,
-  });
 
   const enterCtx = {
     enteringCard: card,
@@ -138,14 +118,12 @@ export function stageFollowerPlayEnterReactions(
   stageReactiveGroup("enemy_follower_enter", player, enterCtx);
 }
 
-/** Stage amulet ally_card_played (FIFO ahead of Fanfare-raised items). */
+/** Stage amulet play — ally_card_played fires after Fanfare (board watchers, #299). */
 export function stageAmuletCardPlayedReaction(
-  card: CardInstance,
-  player: Player,
+  _card: CardInstance,
+  _player: Player,
 ): void {
-  stageReactiveGroup("ally_card_played", player, {
-    playedCard: card,
-  });
+  // ally_card_played is raised after Fanfare in playAmulet (parity with main).
 }
 
 /** End play sequence when no interactive pause remains. */

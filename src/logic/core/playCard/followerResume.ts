@@ -7,13 +7,18 @@ import type {
 } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
 import { applyKeywordsFromList } from "../keywords.js";
-import { getBoard, incrementRally } from "../../../core/playerHelpers.js";
+import {
+  getBoard,
+  getGraveyard,
+  incrementRally,
+} from "../../../core/playerHelpers.js";
 import type { EnteringKeywordSnapshot } from "../enterKeywords.js";
 import { resumeDeferredDeathIfIdle } from "../cleanup.js";
 import { recordFollowerEnter } from "../followerEnterHistory.js";
 import { recomputeAttackFlags } from "../combat.js";
 import { endPlaySequenceDrain } from "./playSequence.js";
 import { isEffectResolutionPaused } from "../resolutionPause.js";
+import { fireTrigger } from "../triggers.js";
 
 export interface PlayFollowerResume {
   player: Player;
@@ -39,6 +44,7 @@ export function stashPlayFollowerResume(ctx: PlayFollowerResume): void {
 
 /** Run play/enter-reactive triggers and Enhance after fanfare fully resolves. */
 export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
+  const player = resume.player;
   // §372 / Owner ruling — Rally (2026-08-12): Fanfare Rally(N) sees the count
   // from just before this card entered (timing). Increment after Fanfare
   // (before enter/play triggers) so rally-conditioned Fanfare gates exclude
@@ -46,42 +52,47 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
   // increment even if the follower left play during Fanfare.
   incrementRally(state, resume.player);
 
-  const card = findFollowerOnBoard(resume.cardUid, resume.player);
-  if (!card) return;
+  const card =
+    findFollowerOnBoard(resume.cardUid, resume.player) ??
+    getGraveyard(state, resume.player).find((c) => c?.uid === resume.cardUid) ??
+    null;
+  if (card) {
+    recordFollowerEnter(state, player, card);
+  }
 
-  const player = resume.player;
+  const live = findFollowerOnBoard(resume.cardUid, resume.player);
+  if (!live) return;
 
-  // Match Rally timing: record after Fanfare so X-from-prior-enters excludes self.
-  recordFollowerEnter(state, player, card);
+  fireTrigger("ally_card_played", player, { playedCard: live });
 
   if (resume.chosenTierEffectGroups?.length) {
     for (const effects of resume.chosenTierEffectGroups) {
       if (effects.length) {
-        runEffects([...effects], player, card);
+        runEffects([...effects], player, live);
       }
     }
   }
 
-  applyKeywordsFromList(card);
-  recomputeAttackFlags(card);
+  applyKeywordsFromList(live);
+  recomputeAttackFlags(live);
 
   const myBoard = getBoard(state, player);
   for (const perm of myBoard) {
-    if (!perm || perm === card || perm.type !== "Amulet") continue;
+    if (!perm || perm === live || perm.type !== "Amulet") continue;
     const ks = perm.keywordState;
     if (ks?.hasAllyEnter && Array.isArray(ks.allyEnterEffects)) {
       for (const eff of ks.allyEnterEffects) {
         if (eff.op === "stat" && eff.target === "trigger") {
-          card.attack =
-            (Number(card.attack) || 0) + (Number((eff as any).attack) || 0);
-          card.defense =
-            (Number(card.defense) || 0) + (Number((eff as any).defense) || 0);
+          live.attack =
+            (Number(live.attack) || 0) + (Number((eff as any).attack) || 0);
+          live.defense =
+            (Number(live.defense) || 0) + (Number((eff as any).defense) || 0);
         }
       }
     }
   }
 
-  if (Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
+  if (card && Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
     for (const perm of myBoard) {
       if (!perm) continue;
       const ks = perm.keywordState || {};

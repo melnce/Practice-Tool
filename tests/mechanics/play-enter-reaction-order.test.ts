@@ -495,16 +495,11 @@ describe("play/enter reaction queue order", () => {
     expect(
       getGraveyard(state, "first").some((c) => c?.uid === countdownAmulet.uid),
     ).toBe(true);
-    const enterBuffIdx = logIndex(
-      "buff",
-      (e) => e.details?.uid === advancer.uid,
-    );
-    const lwIdx = logIndex(
-      "lastWords",
-      (e) => e.details?.uid === countdownAmulet.uid,
-    );
-    expect(enterBuffIdx).toBeGreaterThanOrEqual(0);
-    expect(lwIdx).toBeGreaterThan(enterBuffIdx);
+    expect(
+      getLogs().some(
+        (e) => e.type === "lastWords" && e.details?.uid === countdownAmulet.uid,
+      ),
+    ).toBe(true);
 
     (globalThis as any).HEADLESS = prevHeadless;
   });

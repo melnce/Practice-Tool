@@ -23,7 +23,6 @@ import { pushToBoard } from "../../effects/ops/summon_ops/core.js";
 import { enhanceReplacesBase } from "./enhancePlan.js";
 import {
   beginPlaySequence,
-  drainStagedPlayEnterBeforeFanfare,
   endPlaySequenceDrain,
   stageAmuletCardPlayedReaction,
 } from "./playSequence.js";
@@ -50,7 +49,6 @@ export function playAmulet(
 
   beginPlaySequence();
   stageAmuletCardPlayedReaction(card, player);
-  drainStagedPlayEnterBeforeFanfare();
 
   if (opts?.enhancedPlay) {
     fireTrigger("enhanced_play", player, { playedCard: card });
@@ -80,6 +78,9 @@ export function playAmulet(
   }
 
   rememberLastPlayedCard(card);
+  fireTrigger("ally_card_played", player as any, {
+    playedCard: card,
+  });
 
   if (!isEffectResolutionPaused()) {
     endPlaySequenceDrain();

@@ -162,7 +162,6 @@ export function runEffects(
   const enableDeathDefer =
     runDepth === 0 &&
     combatDepth === 0 &&
-    playDepth === 0 &&
     context?.deferDeathTriggers !== false &&
     !batchTurnBoundary;
 
