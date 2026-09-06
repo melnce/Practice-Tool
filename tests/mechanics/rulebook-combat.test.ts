@@ -37,6 +37,7 @@ import {
   getBanish,
   getGraveyard,
   setLeaderDamageTakenBonus,
+  getWinner,
 } from "../../src/core/playerHelpers.js";
 import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
 import { handleRestore } from "../../src/logic/effects/ops/restore/index.js";
@@ -1251,7 +1252,7 @@ describe("Rulebook L560–565 — Bane, Drain, and special combat damage", () =>
     expect(state.players.second.hp).toBe(hpAfterFirst);
   });
 
-  it("L564: simultaneous leader damage — active player's side resolves first (both at 0 → active loses)", () => {
+  it("L564: simultaneous leader damage — both leaders hit before judgement (both at 0 → active loses)", () => {
     state.players.first.hp = 1;
     state.players.second.hp = 1;
     state.players.first.board = [
@@ -1275,6 +1276,9 @@ describe("Rulebook L560–565 — Bane, Drain, and special combat damage", () =>
       "first",
     );
     expect(state.players.first.hp).toBe(0);
+    expect(state.players.second.hp).toBe(0);
+    expect(state.phase).toBe("gameover");
+    expect(getWinner(state)).toBe("second");
   });
 
   it("L565: self-damage to own leader at 0 loses the game", () => {

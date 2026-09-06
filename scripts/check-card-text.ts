@@ -26,6 +26,7 @@ import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceSemanticsForCard } from "./enhance-semantics-gate.js";
 import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
+import { checkBothLeadersForCard } from "./both-leaders-gate.js";
 import { loadCardsForGates, type CardJson } from "./lib/loadCards.js";
 import {
   getImplementationStatus,
@@ -413,6 +414,68 @@ function checkRandomDamageDistribution(card: CardJson): Issue[] {
             ? `damage op at ${opPath}: count=${eff.count} uses "${eff.distribution}" but card text implies distinct random targets — use distribution="random_distinct"`
             : `damage op at ${opPath}: count=${eff.count} uses "${eff.distribution}" but card text implies "do this N times" repeats — use distribution="random_hits"`,
       });
+    }
+  }
+  return issues;
+}
+
+function isRandomDamageDistribution(eff: Record<string, unknown>): boolean {
+  const dist = String(eff.distribution ?? "random_hits").toLowerCase();
+  return (
+    dist === "random_hits" || dist === "random" || dist === "random_distinct"
+  );
+}
+
+/** Printed "random enemy" / "random enemies" not immediately followed by "follower". */
+function cardTextSaysRandomEnemyWithoutFollower(text: string): boolean {
+  return /random\s+enem(?:y|ies)(?!\s+follower)/i.test(text);
+}
+
+/** Printed "random enemy follower(s)". */
+function cardTextSaysRandomEnemyFollower(text: string): boolean {
+  return /random\s+enemy\s+followers?/i.test(text);
+}
+
+function damageOpHasIncludeLeader(eff: Record<string, unknown>): boolean {
+  const v = eff.include_leader;
+  return v !== undefined && v !== false && v !== null;
+}
+
+function checkRandomEnemyIncludeLeader(card: CardJson): Issue[] {
+  const issues: Issue[] = [];
+  const found: {
+    path: string;
+    eff: Record<string, unknown>;
+    contextText: string;
+  }[] = [];
+  for (const root of allEffectRoots(card)) {
+    collectDamageOps(root, "effects", found);
+  }
+
+  for (const { path: opPath, eff, contextText } of found) {
+    if (!isRandomDamageDistribution(eff)) continue;
+    const text = [card.description ?? "", contextText]
+      .filter(Boolean)
+      .join("\n");
+
+    if (cardTextSaysRandomEnemyFollower(text)) {
+      if (damageOpHasIncludeLeader(eff)) {
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "error",
+          message: `damage op at ${opPath} has include_leader but card text says "random enemy follower" — remove include_leader`,
+        });
+      }
+    } else if (cardTextSaysRandomEnemyWithoutFollower(text)) {
+      if (!damageOpHasIncludeLeader(eff)) {
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "error",
+          message: `damage op at ${opPath}: card text says "random enemy" without "follower" — add include_leader: "enemy"`,
+        });
+      }
     }
   }
   return issues;
@@ -1478,6 +1541,7 @@ function checkCard(card: CardJson): Issue[] {
   issues.push(...checkSummonCopyMode(card));
   issues.push(...checkStatOpFilters(card));
   issues.push(...checkRandomDamageDistribution(card));
+  issues.push(...checkRandomEnemyIncludeLeader(card));
   issues.push(...checkAlternateFormClauses(card));
 
   for (const msg of spellAmuletMarkerIssues(card)) {
@@ -1523,6 +1587,12 @@ function main() {
   const gateAllAlliedIncludeSelf =
     process.argv.includes("--gate=all-allied-include-self") ||
     process.argv.includes("--gate=all_allied_include_self");
+  const gateBothLeaders =
+    process.argv.includes("--gate=both-leaders") ||
+    process.argv.includes("--gate=both_leaders");
+  const gateRandomEnemyIncludeLeader =
+    process.argv.includes("--gate=random-enemy-include-leader") ||
+    process.argv.includes("--gate=random_enemy_include_leader");
   const gateMode =
     gateAddToHand ||
     gateStatOp ||
@@ -1531,7 +1601,9 @@ function main() {
     gateDurationOp ||
     gateSelectTarget ||
     gateEnhanceSemantics ||
-    gateAllAlliedIncludeSelf;
+    gateAllAlliedIncludeSelf ||
+    gateBothLeaders ||
+    gateRandomEnemyIncludeLeader;
 
   const files = loadCardsForGates(setArg);
   const allIssues: Issue[] = [];
@@ -1561,7 +1633,11 @@ function main() {
                   ? "🔍 Checking Enhance semantics contracts...\n"
                   : gateAllAlliedIncludeSelf
                     ? "🔍 Checking all-allied-followers include_self contracts...\n"
-                    : "🔍 Checking card description ↔ JSON structure...\n",
+                    : gateBothLeaders
+                      ? "🔍 Checking both-leaders ↔ all:leader contracts...\n"
+                      : gateRandomEnemyIncludeLeader
+                        ? "🔍 Checking random-enemy include_leader contracts...\n"
+                        : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const { card, sourceFile } of files) {
@@ -1582,6 +1658,10 @@ function main() {
         allIssues.push(...checkEnhanceSemanticsForCard(card).map(tagIssue));
       if (gateAllAlliedIncludeSelf)
         allIssues.push(...checkAllAlliedIncludeSelfForCard(card).map(tagIssue));
+      if (gateBothLeaders)
+        allIssues.push(...checkBothLeadersForCard(card).map(tagIssue));
+      if (gateRandomEnemyIncludeLeader)
+        allIssues.push(...checkRandomEnemyIncludeLeader(card).map(tagIssue));
     } else {
       if (isCantPlaySpellExempt(card)) {
         cantPlayExemptCount += 1;
