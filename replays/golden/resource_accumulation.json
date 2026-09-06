@@ -26,11 +26,11 @@
     }
   ],
   "final": {
-    "stateHash": "dd138ad4"
+    "stateHash": "84b05644"
   },
   "id": "resource_accumulation",
   "initial": {
-    "stateHash": "67f92e70"
+    "stateHash": "7e47a970"
   },
   "seed": 54321,
   "trace": [],
