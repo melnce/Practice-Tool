@@ -18,7 +18,10 @@ import {
   isFirstPlayer,
 } from "../../../core/playerHelpers.js";
 import { isGameOver } from "../../../core/gameOver.js";
-import { applyCrystallizeTransform } from "../../../helpers/alternateForm.js";
+import {
+  applyAlternateFormBaseCost,
+  applyCrystallizeTransform,
+} from "../../../helpers/alternateForm.js";
 import { fireTrigger } from "../triggers.js";
 import { bumpZoneVersion } from "../triggers/utils.js";
 
@@ -79,6 +82,7 @@ export function playCardCore(
   if (plan.mode === "accelerate" && plan.alternate) {
     (card as any).playedAs = "accelerate";
     (card as any).originalPrintedType = card.type;
+    applyAlternateFormBaseCost(card, plan.alternate.cost);
     card.type = "Spell";
     // Accelerate reuses the tiers slot for alternate-form effects; pass
     // replaceBase so only those effects run (not the printed follower text).
