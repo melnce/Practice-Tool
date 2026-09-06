@@ -14,10 +14,14 @@ export type PendingModeChoice = {
   }>;
   sourceCardUid?: string;
   resumeEffects?: Effect[];
-  /** Picks accumulated across multi-select rounds (history-safe). */
-  partialPickedIndices?: number[];
-  /** When true (default), each option index may be picked at most once. */
+  /** Full initial option pool (stable indices for commit / history). */
+  allOptions?: PendingModeChoice["options"];
+  /** Maps each entry in `options` (current round pool) to an `allOptions` index. */
+  optionOriginalIndices?: number[];
+  /** When false, the same option may be picked more than once (default true). */
   unique?: boolean;
+  /** Picks accumulated across multi-select rounds (history-safe; indices into allOptions). */
+  partialPickedIndices?: number[];
 };
 
 /** True while an interactive target or mode prompt is waiting for player input. */

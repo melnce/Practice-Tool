@@ -16,33 +16,79 @@ import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
 import {
   clearPendingModeChoice,
   setPendingModeChoice,
+  type PendingModeChoice,
 } from "../../core/resolutionPause.js";
 import { evaluateCondition } from "../gates/conditions.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 import type { UnifiedGateSpec } from "../gates/types.js";
 
+/** Rebuild `options` / `optionCount` to the current-round pool (remaining picks when unique). */
+function rebuildPendingModeRoundPool(pending: PendingModeChoice): void {
+  const all = pending.allOptions ?? pending.options;
+  pending.allOptions = all;
+  const unique = pending.unique !== false;
+  if (!unique) {
+    pending.options = all;
+    pending.optionOriginalIndices = all.map((_, i) => i);
+    pending.optionCount = all.length;
+    return;
+  }
+  const picked = new Set(pending.partialPickedIndices ?? []);
+  const options: PendingModeChoice["options"] = [];
+  const optionOriginalIndices: number[] = [];
+  for (let i = 0; i < all.length; i++) {
+    if (picked.has(i)) continue;
+    const opt = all[i];
+    if (!opt) continue;
+    options.push(opt);
+    optionOriginalIndices.push(i);
+  }
+  pending.options = options;
+  pending.optionOriginalIndices = optionOriginalIndices;
+  pending.optionCount = options.length;
+}
+
+function resolveModePickIndex(
+  pending: PendingModeChoice,
+  roundIndex: number,
+): number {
+  const mapped = pending.optionOriginalIndices?.[roundIndex];
+  return mapped ?? roundIndex;
+}
+
 function commitConfirmedModePicks(
   owner: Player,
   sourceCard: any,
-  picked: any[],
-  paidByOpt: Map<any, boolean>,
+  pickedIndices: number[],
   resumeEffects: Effect[],
-  scriptIndices: number[],
 ): void {
-  recordScriptedModePicks(owner, scriptIndices);
+  const pending = state.pendingModeChoice;
+  const allOptions = pending?.allOptions ?? pending?.options ?? [];
+  const pickedLabels = pickedIndices.map(
+    (i) => allOptions[i]?.label || allOptions[i]?.name || "(opt)",
+  );
+  recordScriptedModePicks(owner, pickedIndices);
 
   doAction(
     "Confirm Choice",
     () => {
       clearPendingModeChoice();
-      logEvent("chooseFinalize", { owner, picked: picked.length });
+      logEvent("chooseFinalize", { owner, picked: pickedIndices.length });
       fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
 
       const combined: Effect[] = [];
-      for (const opt of picked) {
-        const fizzled =
-          opt?.requires?.earth_rite && paidByOpt.get(opt) === false;
-        if (fizzled) continue;
+      for (const idx of pickedIndices) {
+        const opt = allOptions[idx];
+        if (!opt) continue;
+        let paid = true;
+        if (opt.requires?.earth_rite) {
+          const need = parseInt(String(opt.requires.earth_rite), 10) || 1;
+          paid = consumeEarthSigils(owner, need);
+          if (!paid) {
+            logEvent("earthRiteFizzle", { owner, option: opt.label });
+          }
+        }
+        if (opt.requires?.earth_rite && !paid) continue;
         if (Array.isArray(opt.effects) && opt.effects.length)
           combined.push(...opt.effects);
       }
@@ -58,9 +104,23 @@ function commitConfirmedModePicks(
       consumePlayFollowerResume();
       resumeDeferredDeathIfIdle();
     },
-    { owner, picks: picked.map((p) => p?.label || p?.name || "(opt)") },
+    { owner, picks: pickedLabels },
     { autoRender: true },
   );
+}
+
+/** Re-open the mode modal from state (undo/redo, render). */
+export function showPendingModePickerModal(onAfterPick?: () => void): void {
+  const pending = state.pendingModeChoice;
+  if (!pending?.options?.length) return;
+
+  adapter.showChoiceModal(pending.options, (selectedIndex: number) => {
+    applyPendingModePickIndex(selectedIndex);
+    onAfterPick?.();
+    if (state.pendingModeChoice) {
+      showPendingModePickerModal(onAfterPick);
+    }
+  });
 }
 
 /** History-safe mode pick (redo / engine CHOOSE_MODE without modal callback). */
@@ -68,37 +128,40 @@ export function applyPendingModePickIndex(index: number): void {
   const pending = state.pendingModeChoice;
   if (!pending?.options?.length) return;
 
-  const partial = [...(pending.partialPickedIndices ?? []), index];
-  if (partial.length < pending.selectCount) {
-    pending.partialPickedIndices = partial;
-    return;
-  }
+  const selected = pending.options[index];
+  logEvent("choosePick", {
+    owner: pending.owner,
+    index,
+    requiresER: !!selected?.requires?.earth_rite,
+  });
 
   const owner = pending.owner;
   const sourceCard = pending.sourceCardUid
     ? resolveUid(pending.sourceCardUid)
     : null;
-  const picked: any[] = [];
-  const paidByOpt = new Map<any, boolean>();
-  for (const idx of partial) {
-    const selected = pending.options[idx];
-    if (!selected) continue;
-    let paid = true;
-    if (selected.requires?.earth_rite) {
-      const need = parseInt(String(selected.requires.earth_rite), 10) || 1;
-      paid = consumeEarthSigils(owner, need);
-    }
-    picked.push(selected);
-    paidByOpt.set(selected, paid);
+  const partial = [
+    ...(pending.partialPickedIndices ?? []),
+    resolveModePickIndex(pending, index),
+  ];
+
+  if (partial.length < pending.selectCount) {
+    doAction(
+      "Pick Mode",
+      () => {
+        pending.partialPickedIndices = partial;
+        rebuildPendingModeRoundPool(pending);
+      },
+      { owner, index, pick: partial.length },
+      { autoRender: true },
+    );
+    return;
   }
 
   commitConfirmedModePicks(
     owner,
     sourceCard,
-    picked,
-    paidByOpt,
+    partial,
     pending.resumeEffects ?? [],
-    [...partial],
   );
 }
 
@@ -413,78 +476,23 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   }
   // ==== /AI path ====
 
-  // Keep direct references to chosen options for identity comparison
-  const picked: any[] = [];
-  // Track resource-payment outcome per option (e.g., Earth Rite)
-  const paidByOpt = new Map();
-
-  const finalize = () => {
-    commitConfirmedModePicks(
-      owner,
-      sourceCard,
-      picked,
-      paidByOpt,
-      effectsQueue ? [...effectsQueue] : [],
-      picked.map((p) => available.indexOf(p)),
-    );
+  const openModePicker = () => {
+    showPendingModePickerModal();
   };
 
-  const pickOnce = (pool: any[]) => {
-    // Build the pool for this round (remove duplicates if unique)
-    const roundPool = unique
-      ? pool.filter((opt) => !picked.includes(opt))
-      : pool.slice();
-
-    if (roundPool.length === 0) {
-      // console.warn("No options left to pick.");
-      finalize();
-      return;
-    }
-
-    adapter.showChoiceModal(roundPool, (selectedIndex: number) => {
-      const selected = roundPool[selectedIndex];
-      logEvent("choosePick", {
-        owner,
-        index: selectedIndex,
-        requiresER: !!selected?.requires?.earth_rite,
-      });
-      if (!selected) {
-        finalize();
-        return;
-      }
-
-      // Try to pay Earth Rite; if it fails, we still proceed and fizzle later.
-      let paid = true;
-      if (selected.requires?.earth_rite) {
-        paid = consumeEarthSigils(owner, selected.requires.earth_rite);
-        if (!paid) {
-          // console.warn("Earth Rite cost not paid – effect fizzles");
-          logEvent("earthRiteFizzle", { owner, option: selected.label });
-        }
-      }
-
-      // Record selection and payment result
-      picked.push(selected);
-      paidByOpt.set(selected, paid);
-
-      if (picked.length < selectCount) {
-        pickOnce(pool);
-      } else {
-        finalize();
-      }
-    });
-  };
-
-  // Start first round
+  const initialOptions = structuredClone(available);
   setPendingModeChoice({
     owner,
     optionCount: available.length,
     selectCount,
-    options: structuredClone(available),
+    options: initialOptions,
+    allOptions: initialOptions,
+    optionOriginalIndices: available.map((_: unknown, i: number) => i),
     unique,
     ...(sourceCard?.uid ? { sourceCardUid: sourceCard.uid } : {}),
     resumeEffects: effectsQueue ? [...effectsQueue] : [],
   });
-  pickOnce(available);
+  rebuildPendingModeRoundPool(state.pendingModeChoice!);
+  openModePicker();
   return "pending"; // Return pending to pause effect chain while modal is shown
 }

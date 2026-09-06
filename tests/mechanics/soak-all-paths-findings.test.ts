@@ -93,22 +93,31 @@ describe("soak --all-paths findings", () => {
     expect(result.outcome).toBe("completed");
   }, 60_000);
 
-  it.fails(
-    "history legal-undo: [0].attackerUid missing ATTACK after undo",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260909,
-        gameIndex: 15,
-        turnCap: 60,
-        actionCap: 800,
-        historyCheck: true,
-        dispatch: "engine",
-        ...ALL_PATHS,
-      });
-      expect(result.outcome).toBe("completed");
-    },
-    60_000,
-  );
+  it("history legal-undo: [0].attackerUid missing ATTACK after undo", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 15,
+      turnCap: 60,
+      actionCap: 800,
+      historyCheck: true,
+      dispatch: "engine",
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  }, 60_000);
+
+  it("history undo: CHOOSE_MODE earth sigil mismatch after undo (game 161)", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 161,
+      turnCap: 60,
+      actionCap: 800,
+      historyCheck: true,
+      dispatch: "engine",
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  }, 60_000);
 
   it("crash: commitAction Play Card with in-flight resolution queue", async () => {
     const result = await runSoakGame({
