@@ -26,23 +26,33 @@ import {
   getHand,
 } from "../../src/core/playerHelpers.js";
 import { getResolutionQueue } from "../../src/logic/core/triggers/queue.js";
-import { getEngineEphemeralFootprint } from "../../src/core/history.js";
 
 const WORLD_OF_GAMES = "10503210";
+const RESOLVE_MISTBLOOM = "10563210";
 const ENGINE = "engine" as const;
 
-function canonGraveAndHand(player: "first" | "second") {
-  const grave = getGraveyard(state, player).map((c) => ({
-    uid: c.uid,
-    name: c.name,
-    lw: (c as any)._lwFired,
-  }));
-  const hand = getHand(state, player).map((c) => c.uid);
-  return JSON.stringify({
-    grave,
-    hand,
+function wogOutcome(player: "first" | "second") {
+  const wog = getGraveyard(state, player).find((c) => c.id === WORLD_OF_GAMES);
+  return {
+    wogInGrave: !!wog,
+    lwFired: !!(wog as any)?._lwFired,
     shadows: state.players[player].shadows,
+    handLen: getHand(state, player).length,
+  };
+}
+
+function resolvePendingFanfareTarget(
+  player: "first" | "second",
+  targetUid: string,
+): void {
+  engineDispatch(state, {
+    type: "CHOOSE_TARGET",
+    player,
+    target: { type: "card", uid: targetUid },
   });
+  if (state.pendingTargetEffect?.requiresConfirmation) {
+    engineDispatch(state, { type: "CONFIRM_TARGETS" });
+  }
 }
 
 beforeAll(async () => {
@@ -67,23 +77,6 @@ describe("position re-apply countdown (soak pins)", () => {
       result.error ?? `game 18 outcome ${result.outcome}`,
     ).toBe("completed");
   }, 60_000);
-
-  it("seed 20260925 game 98 — position save-load re-apply (World of Games uid_13)", async () => {
-    const result = await runSoakGame({
-      seed: 20260925,
-      gameIndex: 98,
-      positionCheck: true,
-      dispatch: ENGINE,
-      fuse: true,
-      interactiveModes: true,
-      turnCap: 60,
-      actionCap: 800,
-    });
-    expect(
-      result.outcome,
-      result.error ?? `game 98 outcome ${result.outcome}`,
-    ).toBe("completed");
-  }, 60_000);
 });
 
 describe("position re-apply countdown (World of Games unit)", () => {
@@ -95,7 +88,7 @@ describe("position re-apply countdown (World of Games unit)", () => {
     state.activePlayer = "first";
   });
 
-  it("save → play → load → re-play leaves World of Games in graveyard with 2 draws", () => {
+  it("save mid fanfare prompt with pending death_lw → load → same graveyard, shadow, and draws", () => {
     givenGameState({ seed: 42, activePlayer: "first", roundCount: 5 })
       .withFirstPP(10, 10)
       .withFirstDeck([
@@ -112,40 +105,55 @@ describe("position re-apply countdown (World of Games unit)", () => {
     wog.countdown = 1;
     getBoard(state, "first").push(wog);
 
-    const sameCostOnField = createCard("10001110", "board", "first");
-    sameCostOnField.cost = 1;
-    (sameCostOnField as { base_cost?: number }).base_cost = 1;
-    getBoard(state, "first").push(sameCostOnField);
+    // Same base cost (3) on field so playing Mistbloom advances WOG to 0.
+    const costMate = createCard(RESOLVE_MISTBLOOM, "board", "first");
+    applyKeywordsFromList(costMate);
+    getBoard(state, "first").push(costMate);
 
-    const toPlay = createCard("10001120", "hand", "first");
-    toPlay.cost = 1;
-    (toPlay as { base_cost?: number }).base_cost = 1;
+    const enemy = createCard("10001110", "board", "second");
+    enemy.peak_defense = Number(enemy.defense);
+    getBoard(state, "second").push(enemy);
+
+    const toPlay = createCard(RESOLVE_MISTBLOOM, "hand", "first");
+    applyKeywordsFromList(toPlay);
     state.players.first.hand.push(toPlay);
-    const playUid = toPlay.uid;
 
-    const saved = savePosition("wog-reapply");
-    const playAction = {
-      type: "PLAY_CARD" as const,
-      player: "first" as const,
-      cardUid: playUid,
-    };
+    engineDispatch(state, {
+      type: "PLAY_CARD",
+      player: "first",
+      cardUid: toPlay.uid,
+    });
 
-    engineDispatch(state, playAction);
-    const afterFirst = canonGraveAndHand("first");
-    expect(getGraveyard(state, "first").some((c) => c.uid === wog.uid)).toBe(
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(getResolutionQueue().some((item) => item.kind === "death_lw")).toBe(
       true,
     );
-    expect(getHand(state, "first").length).toBeGreaterThanOrEqual(2);
+    expect(getBoard(state, "first").some((c) => c.uid === wog.uid)).toBe(
+      false,
+    );
+    expect(getGraveyard(state, "first").some((c) => c.uid === wog.uid)).toBe(
+      false,
+    );
+
+    const saved = savePosition("wog-mid-prompt");
+    expect((saved.state as any)._resolutionQueue?.length).toBeGreaterThan(0);
+
+    resolvePendingFanfareTarget("first", enemy.uid);
+    const afterFirst = wogOutcome("first");
+    expect(afterFirst.wogInGrave).toBe(true);
+    expect(afterFirst.lwFired).toBe(true);
+    expect(afterFirst.shadows).toBe(1);
+    expect(afterFirst.handLen).toBe(2);
 
     loadPosition(saved.id, { autoRender: false });
-    expect(getResolutionQueue().length).toBe(0);
-
-    engineDispatch(state, playAction);
-    const afterSecond = canonGraveAndHand("first");
-    expect(afterSecond).toBe(afterFirst);
-    expect(getGraveyard(state, "first").some((c) => c.uid === wog.uid)).toBe(
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(getResolutionQueue().some((item) => item.kind === "death_lw")).toBe(
       true,
     );
+
+    resolvePendingFanfareTarget("first", enemy.uid);
+    const afterSecond = wogOutcome("first");
+    expect(afterSecond).toEqual(afterFirst);
 
     deletePosition(saved.id);
   });
@@ -168,9 +176,8 @@ describe("position re-apply countdown (World of Games unit)", () => {
     });
     getBoard(state, "first").splice(getBoard(state, "first").indexOf(wog), 1);
 
-    const footprint = getEngineEphemeralFootprint();
-    expect(footprint.resolutionQueueLen).toBe(1);
-    expect(footprint.resolutionQueueKinds[0]).toMatch(/^death_lw/);
+    expect(getResolutionQueue().length).toBe(1);
+    expect(getResolutionQueue()[0]?.kind).toBe("death_lw");
 
     const saved = savePosition("wog-limbo");
     expect((saved.state as any)._resolutionQueue?.length).toBe(1);
