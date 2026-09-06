@@ -12,6 +12,8 @@ import type { CardInstance } from "./types/index.js";
 import { isDev, readEnv } from "./env.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
+import { resetTriggerChainDepth } from "../logic/core/triggers.js";
+import { endDispatch } from "../logic/core/targeting/guards.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -133,9 +135,38 @@ function sanitizePendingTargetInSnapshot(snap: GameState): void {
   }
 }
 
-/** History snapshots never carry an in-flight resolution queue. */
-function sanitizeResolutionQueueInSnapshot(snap: GameState): void {
-  (snap as any)._resolutionQueue = [];
+/** Dev/test footprint of engine state excluded from snapshots or reset on restore. */
+export function getEngineEphemeralFootprint() {
+  const q = getResolutionQueue();
+  return {
+    resolutionQueueLen: q.length,
+    resolutionQueueKinds: q.map((item) =>
+      item.kind === "reactive"
+        ? `reactive:${item.event}(${item.entries.length})`
+        : `${item.kind}(${item.items.length})`,
+    ),
+    deferDeathTriggers: !!(state as any).deferDeathTriggers,
+    runEffectsDepth: (state as any)._runEffectsDepth ?? 0,
+    drainingResolutionQueue: !!(state as any)._drainingResolutionQueue,
+    resolutionDrainDepth: (state as any).__resolutionDrainDepth ?? 0,
+    hasReactiveCollector: !!(state as any)._reactiveCollector,
+    hasTriggerCache: !!(state as any)._triggerCache,
+  };
+}
+
+function assertSnapshotPreservesResolutionQueue(
+  liveLen: number,
+  snapLen: number,
+): void {
+  if (liveLen === 0) return;
+  const vitest = readEnv("VITEST");
+  const inTest = vitest === "true" || vitest === "1";
+  if (!isDev() && !inTest) return;
+  if (snapLen >= liveLen) return;
+  throw new Error(
+    `[History] snapshot dropped resolution queue entries (live=${liveLen}, snap=${snapLen}); ` +
+      `limbo death_lw corpses will orphan on restore`,
+  );
 }
 
 function snapshot(): GameState {
@@ -158,7 +189,10 @@ function snapshot(): GameState {
       (snap as any).__rng = rng.snapshot();
     }
     sanitizePendingTargetInSnapshot(snap);
-    sanitizeResolutionQueueInSnapshot(snap);
+    assertSnapshotPreservesResolutionQueue(
+      getResolutionQueue().length,
+      ((snap as any)._resolutionQueue ?? []).length,
+    );
     return snap;
   } catch (e) {
     // Fallback: manually clone, skipping non-cloneable properties
@@ -207,7 +241,10 @@ function manualSnapshot(rest: any, rng: any): GameState {
   }
 
   sanitizePendingTargetInSnapshot(snap as GameState);
-  sanitizeResolutionQueueInSnapshot(snap as GameState);
+  assertSnapshotPreservesResolutionQueue(
+    getResolutionQueue().length,
+    ((snap as any)._resolutionQueue ?? []).length,
+  );
   return snap as GameState;
 }
 
@@ -260,6 +297,20 @@ function replaceState(next: GameState) {
   }
   // __rng is snapshot-only metadata — never leave it on the live state root
   delete (state as any).__rng;
+
+  resetEphemeralStateAfterRestore();
+}
+
+/** Clear transient engine state excluded from snapshots — must not survive restore. */
+function resetEphemeralStateAfterRestore(): void {
+  (state as any).deferDeathTriggers = false;
+  (state as any)._runEffectsDepth = 0;
+  (state as any)._drainingResolutionQueue = false;
+  (state as any).__resolutionDrainDepth = 0;
+  (state as any)._triggerCache = null;
+  delete (state as any)._reactiveCollector;
+  resetTriggerChainDepth();
+  endDispatch();
 }
 
 /**
@@ -294,7 +345,6 @@ function cloneSnapshot(snap: GameState): GameState {
       };
     }
     sanitizePendingTargetInSnapshot(clone);
-    sanitizeResolutionQueueInSnapshot(clone);
     return clone;
   } catch (e) {
     console.warn(
@@ -310,7 +360,6 @@ function cloneSnapshot(snap: GameState): GameState {
       };
     }
     sanitizePendingTargetInSnapshot(clone);
-    sanitizeResolutionQueueInSnapshot(clone);
     return clone;
   }
 }

@@ -18,6 +18,7 @@ import {
   resolveDeathLeaveContext,
   resolveQueuedTriggerCard,
   isQueuedTriggerSourceInPlay,
+  assertLiveResolutionQueueCardIdentity,
 } from "./triggers/queue.js";
 import {
   opponentOf,
@@ -270,6 +271,7 @@ export function flushReactiveQueueOnly(): void {
 /** Flush unified resolution queue: reactive triggers + deferred death batches (C4). */
 export function flushDeferredDeathBatch() {
   noteResolutionDrainDepthEntry();
+  assertLiveResolutionQueueCardIdentity();
   if ((state as any)._drainingResolutionQueue) {
     const vitest = readEnv("VITEST");
     const inTest = vitest === "true" || vitest === "1";
