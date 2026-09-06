@@ -9,7 +9,10 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
-import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../../core/pendingTarget/index.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 
 import type { UnifiedBanishSpec, BanishContext } from "./types.js";
@@ -161,21 +164,35 @@ function handleBanishDirect(
   effectsQueue: Effect[],
   ctx: BanishContext,
 ): "pending" | number {
-  if (!pool.length) return 0;
+  if (!pool.length) {
+    if (spec.select > 0) {
+      reportSelectFizzled({
+        eff: { op: "banish", target: spec.target } as Effect,
+        owner,
+        sourceCard: ctx.sourceCard || null,
+        target: spec.target,
+      });
+    }
+    return 0;
+  }
 
   // If selection required
   if (spec.select > 0) {
     const selectCount = Math.min(spec.select, pool.length);
 
-    setPendingTarget({
-      eff: { op: "banish", target: spec.target } as Effect,
-      owner,
-      sourceCard: ctx.sourceCard || null,
-      resumeEffects: effectsQueue,
-      pool,
-      targets: [],
-      selectCount,
-    });
+    if (
+      trySetPendingTarget({
+        eff: { op: "banish", target: spec.target } as Effect,
+        owner,
+        sourceCard: ctx.sourceCard || null,
+        resumeEffects: effectsQueue,
+        pool,
+        targets: [],
+        selectCount,
+      }) === "fizzled"
+    ) {
+      return 0;
+    }
 
     logEvent("banish_select", {
       owner,

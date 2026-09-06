@@ -19,7 +19,10 @@ import {
 } from "../../../core/playerHelpers.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
-import { setPendingTarget } from "../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../core/pendingTarget/index.js";
 import { recomputeAttackFlags } from "../../core/combat.js";
 import { bumpZoneVersion } from "../../core/triggers/utils.js";
 
@@ -157,18 +160,31 @@ export function handleTransform(
     // Flat transform+select must open a hand prompt (mirror returnHandToDeck).
     // Empty pool: do not open an empty prompt — no-op like today's slice.
     if (selectN > 0) {
-      if (!pool.length) return;
+      if (!pool.length) {
+        reportSelectFizzled({
+          eff,
+          owner,
+          sourceCard: ctx.sourceCard ?? null,
+          target: eff.target,
+        });
+        return;
+      }
       const resume = ctx.effectsQueue ? Array.from(ctx.effectsQueue) : [];
       if (ctx.effectsQueue) ctx.effectsQueue.length = 0;
-      setPendingTarget({
-        eff,
-        owner,
-        sourceCard: ctx.sourceCard ?? null,
-        resumeEffects: resume,
-        pool,
-        targets: [],
-        selectCount: selectN,
-      });
+      if (
+        trySetPendingTarget({
+          eff,
+          owner,
+          sourceCard: ctx.sourceCard ?? null,
+          resumeEffects: resume,
+          pool,
+          targets: [],
+          selectCount: selectN,
+        }) === "fizzled"
+      ) {
+        if (ctx.effectsQueue) ctx.effectsQueue.push(...resume);
+        return;
+      }
       highlightSelectable(pool);
       return "pending";
     }
@@ -527,18 +543,30 @@ function transformInHandByFilter(
       return;
     }
 
-    if (!pool.length) return;
+    if (!pool.length) {
+      reportSelectFizzled({
+        eff,
+        owner,
+        sourceCard: ctx.sourceCard ?? null,
+        target: eff.target,
+      });
+      return;
+    }
 
     const selectCount = Math.min(selectN, pool.length);
-    setPendingTarget({
-      eff: { ...eff, op: "transform", into: targetCardName },
-      owner,
-      sourceCard: ctx.sourceCard ?? null,
-      resumeEffects: ctx.effectsQueue ?? [],
-      pool,
-      targets: [],
-      selectCount,
-    });
+    if (
+      trySetPendingTarget({
+        eff: { ...eff, op: "transform", into: targetCardName },
+        owner,
+        sourceCard: ctx.sourceCard ?? null,
+        resumeEffects: ctx.effectsQueue ?? [],
+        pool,
+        targets: [],
+        selectCount,
+      }) === "fizzled"
+    ) {
+      return;
+    }
     highlightSelectable(pool);
     return "pending";
   }

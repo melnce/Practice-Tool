@@ -23,7 +23,10 @@ import {
   checkPostBuffTriggers,
 } from "./core.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
-import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../../core/pendingTarget/index.js";
 import {
   handleStatSelf,
   handleDynamicStatSelf,
@@ -249,7 +252,17 @@ function handlePoolBasedBuff(
   );
   let pool = filterBuffCandidates(rawPool, eff, sourceCard);
 
-  if (!pool.length) return "done";
+  if (!pool.length) {
+    if ((eff as any).select) {
+      reportSelectFizzled({
+        eff,
+        owner,
+        sourceCard,
+        target: String(eff.target || ""),
+      });
+    }
+    return "done";
+  }
 
   // 2. Restrict highest-stat effects before resolving tied targets.
   const distribution = (eff as any).distribution;
@@ -292,7 +305,7 @@ function handlePoolBasedBuff(
 
   // 5. Handle user selection (only when no random distribution)
   if ((eff as any).select) {
-    setPendingTarget({
+    const result = trySetPendingTarget({
       eff,
       owner,
       sourceCard,
@@ -304,6 +317,7 @@ function handlePoolBasedBuff(
       ),
       context,
     } as any);
+    if (result === "fizzled") return "done";
     highlightSelectable(pool);
     return "pending";
   }
