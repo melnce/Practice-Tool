@@ -14,6 +14,7 @@ import { resolveDynamicValue } from "../../../core/values.js";
 import type { UnifiedCostSpec } from "./types.js";
 
 import { normalizeToCostSpec } from "./types.js";
+import { applyCostChangeToCard } from "./model.js";
 import { opponentOf, getHand } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 
@@ -190,62 +191,11 @@ function resolveTargets(
   }
 }
 
-/**
- * Apply cost change to a single card.
- */
-function applyCostChange(
+/** Apply cost change to a single card (shared by unified + targeted handlers). */
+export function applyCostChange(
   card: CardInstance,
   spec: UnifiedCostSpec,
   amount: number,
 ): void {
-  if (!card) return;
-
-  // Always track base cost
-  if (card.base_cost === undefined) {
-    card.base_cost = parseInt(String(card.cost)) || 0;
-  }
-
-  const currentCost = parseInt(String(card.cost)) || 0;
-  const minCost = spec.min_cost ?? 0;
-
-  switch (spec.mode) {
-    case "reduce": {
-      const newCost = Math.max(minCost, currentCost - amount);
-      card.cost = newCost;
-      if (spec.until_eot) {
-        (card as any).temp_cost_reduce_until_eot = true;
-      }
-      break;
-    }
-
-    case "set": {
-      card.cost = Math.max(0, amount);
-      // Honour until_eot generally: stamp so clearTempHandCostMods can restore
-      // from base_cost (already recorded above). Used by Mari (10441120) et al.
-      if (spec.until_eot) {
-        (card as any).temp_cost_set_until_eot = true;
-      }
-      break;
-    }
-
-    case "modify": {
-      // Use cost_mod for additive modifier (can be positive or negative)
-      card.cost_mod = (parseInt(String(card.cost_mod)) || 0) + amount;
-      if (spec.until_eot) {
-        card.temp_cost_mod_until_eot =
-          (parseInt(String(card.temp_cost_mod_until_eot)) || 0) + amount;
-      }
-      break;
-    }
-
-    case "increase": {
-      // Increase uses cost_mod for opponent hand increases
-      card.cost_mod = (parseInt(String(card.cost_mod)) || 0) + amount;
-      if (spec.until_eot) {
-        card.temp_cost_mod_until_eot =
-          (parseInt(String(card.temp_cost_mod_until_eot)) || 0) + amount;
-      }
-      break;
-    }
-  }
+  applyCostChangeToCard(card, spec, amount);
 }
