@@ -2,7 +2,13 @@ import { state } from "../../core/gameState.js";
 // import { logEvent } from "../../core/logger.js";
 import type { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { guardLifecycle } from "./targeting/guards.js";
-import { getBoard, getHand, getGraveyard } from "../../core/playerHelpers.js";
+import {
+  getBoard,
+  getHand,
+  getGraveyard,
+  getDeck,
+  getBanish,
+} from "../../core/playerHelpers.js";
 import { toUids, toUid } from "../../core/uidResolver.js";
 
 // Refactored Imports
@@ -56,15 +62,16 @@ export function highlightSelectable(cards: CardInstance[]) {
 
 export function clearSelectableFlags() {
   guardLifecycle("clearSelectableFlags");
-  // Use playerHelpers for player-agnostic zone access
-  const allCards = [
-    ...getBoard(state, "first"),
-    ...getBoard(state, "second"),
-    ...getHand(state, "first"),
-    ...getHand(state, "second"),
-    ...getGraveyard(state, "first"),
-    ...getGraveyard(state, "second"),
-  ];
+  const allCards: CardInstance[] = [];
+  for (const player of ["first", "second"] as const) {
+    allCards.push(
+      ...getBoard(state, player),
+      ...getHand(state, player),
+      ...getGraveyard(state, player),
+      ...getDeck(state, player),
+      ...getBanish(state, player),
+    );
+  }
   allCards.forEach((c) => {
     if (c) delete c.__uiSelectable;
   });
