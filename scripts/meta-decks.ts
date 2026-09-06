@@ -18,6 +18,7 @@ import {
   buildArchetypeMap,
   diffMetaAgainstLibrary,
   formatMetaDiffTable,
+  listDroppedMetaDeckFiles,
   parseArchetypesFeed,
   parseDecksFeed,
   processMetaDeck,
@@ -167,6 +168,10 @@ async function main(): Promise<void> {
   }
 
   const archetypes = buildArchetypeMap(parseArchetypesFeed(archetypesBody));
+  const indexPath = path.join(outDir, "index.json");
+  const oldIndex = fs.existsSync(indexPath)
+    ? readJson<MetaDeckIndexEntry[]>(indexPath)
+    : [];
   const skipped: { id: string; name: string; reasons: string[] }[] = [];
   const written: { id: string; file: string }[] = [];
   const processedForDiff: { id: string; deck: DeckFileObject }[] = [];
@@ -201,7 +206,16 @@ async function main(): Promise<void> {
     console.log(`Wrote ${path.relative(ROOT, outPath)}`);
   }
 
-  await writeFormattedJson(path.join(outDir, "index.json"), indexEntries);
+  await writeFormattedJson(indexPath, indexEntries);
+
+  const droppedFiles = listDroppedMetaDeckFiles(oldIndex, indexEntries);
+  for (const file of droppedFiles) {
+    const filePath = path.join(outDir, file);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`Removed (dropped from feed): ${file}`);
+    }
+  }
 
   console.log(
     `\nSummary: fetched ${feedDecks.length}, valid ${written.length}, skipped ${skipped.length}`,

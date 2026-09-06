@@ -1,11 +1,242 @@
 {
   "archetypes": [
     {
-      "id": "local:3",
-      "class_id": 5,
+      "id": 39,
+      "class_id": 1,
+      "name_chs": "快妖",
+      "name_cht": "",
       "name_eng": "",
-      "name_jpn": "中速冥界",
-      "name_chs": "中速冥界"
+      "name_jpn": "",
+      "name_kor": "",
+      "badge_card_id": 0,
+      "badge_focus_x": 50,
+      "badge_focus_y": 50,
+      "badge_zoom": 100,
+      "enabled": true,
+      "sort_order": 0,
+      "source_keys": ["アグロE"],
+      "mappings": [
+        {
+          "source": "svlabo",
+          "key": "アグロE"
+        }
+      ],
+      "resolved_name_chs": "快妖",
+      "resolved_name_cht": "",
+      "resolved_name_eng": "",
+      "resolved_name_jpn": "アグロE",
+      "resolved_name_kor": "",
+      "parent_archetype_id": 0,
+      "promoted": true,
+      "tier_enabled": true
+    },
+    {
+      "id": 13,
+      "class_id": 2,
+      "name_chs": "财宝皇",
+      "name_cht": "",
+      "name_eng": "",
+      "name_jpn": "",
+      "name_kor": "",
+      "badge_card_id": 10324110,
+      "badge_focus_x": 50,
+      "badge_focus_y": 18,
+      "badge_zoom": 100,
+      "enabled": true,
+      "sort_order": 0,
+      "source_keys": ["財宝R", "財宝R"],
+      "mappings": [
+        {
+          "source": "svlabo",
+          "key": "財宝R"
+        },
+        {
+          "source": "svwbmeta",
+          "key": "財宝R"
+        }
+      ],
+      "resolved_name_chs": "财宝皇",
+      "resolved_name_cht": "財寶皇",
+      "resolved_name_eng": "Loot Sword",
+      "resolved_name_jpn": "財宝R",
+      "resolved_name_kor": "Loot Sword",
+      "parent_archetype_id": 0,
+      "promoted": true,
+      "tier_enabled": true
+    },
+    {
+      "id": 7,
+      "class_id": 3,
+      "name_chs": "实验法",
+      "name_cht": "",
+      "name_eng": "",
+      "name_jpn": "",
+      "name_kor": "",
+      "badge_card_id": 10934110,
+      "badge_focus_x": 50,
+      "badge_focus_y": 19,
+      "badge_zoom": 100,
+      "enabled": true,
+      "sort_order": 0,
+      "source_keys": ["実験体W", "実験体W"],
+      "mappings": [
+        {
+          "source": "svlabo",
+          "key": "実験体W"
+        },
+        {
+          "source": "svwbmeta",
+          "key": "実験体W"
+        }
+      ],
+      "resolved_name_chs": "实验法",
+      "resolved_name_cht": "實驗法",
+      "resolved_name_eng": "Test subject Rune",
+      "resolved_name_jpn": "実験体W",
+      "resolved_name_kor": "Test subject Rune",
+      "parent_archetype_id": 0,
+      "promoted": true,
+      "tier_enabled": true
+    },
+    {
+      "id": 6,
+      "class_id": 4,
+      "name_chs": "跳费龙",
+      "name_cht": "",
+      "name_eng": "",
+      "name_jpn": "",
+      "name_kor": "",
+      "badge_card_id": 10944120,
+      "badge_focus_x": 50,
+      "badge_focus_y": 10,
+      "badge_zoom": 100,
+      "enabled": true,
+      "sort_order": 0,
+      "source_keys": ["ランプD", "ランプD"],
+      "mappings": [
+        {
+          "source": "svlabo",
+          "key": "ランプD"
+        },
+        {
+          "source": "svwbmeta",
+          "key": "ランプD"
+        }
+      ],
+      "resolved_name_chs": "跳费龙",
+      "resolved_name_cht": "跳費龍",
+      "resolved_name_eng": "Ramp Dragon",
+      "resolved_name_jpn": "ランプD",
+      "resolved_name_kor": "Ramp Dragon",
+      "parent_archetype_id": 0,
+      "promoted": true,
+      "tier_enabled": true
+    },
+    {
+      "id": 3,
+      "class_id": 5,
+      "name_chs": "中速梦",
+      "name_cht": "",
+      "name_eng": "",
+      "name_jpn": "",
+      "name_kor": "",
+      "badge_card_id": 10954120,
+      "badge_focus_x": 50,
+      "badge_focus_y": 15,
+      "badge_zoom": 100,
+      "enabled": true,
+      "sort_order": 0,
+      "source_keys": ["ミッドレンジNi", "ミッドレンジNi"],
+      "mappings": [
+        {
+          "source": "svlabo",
+          "key": "ミッドレンジNi"
+        },
+        {
+          "source": "svwbmeta",
+          "key": "ミッドレンジNi"
+        }
+      ],
+      "resolved_name_chs": "中速梦",
+      "resolved_name_cht": "中速夜",
+      "resolved_name_eng": "Midrange Abyss",
+      "resolved_name_jpn": "ミッドレンジNi",
+      "resolved_name_kor": "Midrange Abyss",
+      "parent_archetype_id": 0,
+      "promoted": true,
+      "tier_enabled": true
+    },
+    {
+      "id": 12,
+      "class_id": 6,
+      "name_chs": "护符教",
+      "name_cht": "",
+      "name_eng": "",
+      "name_jpn": "",
+      "name_kor": "",
+      "badge_card_id": 10964120,
+      "badge_focus_x": 50,
+      "badge_focus_y": 14,
+      "badge_zoom": 100,
+      "enabled": true,
+      "sort_order": 0,
+      "source_keys": ["アミュレットB", "アミュレットB"],
+      "mappings": [
+        {
+          "source": "svlabo",
+          "key": "アミュレットB"
+        },
+        {
+          "source": "svwbmeta",
+          "key": "アミュレットB"
+        }
+      ],
+      "resolved_name_chs": "护符教",
+      "resolved_name_cht": "護符教",
+      "resolved_name_eng": "Amulet Haven",
+      "resolved_name_jpn": "アミュレットB",
+      "resolved_name_kor": "Amulet Haven",
+      "parent_archetype_id": 0,
+      "promoted": true,
+      "tier_enabled": true
+    },
+    {
+      "id": 1,
+      "class_id": 7,
+      "name_chs": "造物超",
+      "name_cht": "",
+      "name_eng": "",
+      "name_jpn": "",
+      "name_kor": "",
+      "badge_card_id": 10974120,
+      "badge_focus_x": 50,
+      "badge_focus_y": 11,
+      "badge_zoom": 100,
+      "enabled": true,
+      "sort_order": 0,
+      "source_keys": ["AFNm", "AFNm", "造物仇"],
+      "mappings": [
+        {
+          "source": "svlabo",
+          "key": "AFNm"
+        },
+        {
+          "source": "svwbmeta",
+          "key": "AFNm"
+        },
+        {
+          "source": "svwbmeta",
+          "key": "造物仇"
+        }
+      ],
+      "resolved_name_chs": "造物超",
+      "resolved_name_cht": "造物仇",
+      "resolved_name_eng": "AF Portal",
+      "resolved_name_jpn": "AFNm",
+      "resolved_name_kor": "AF Portal",
+      "parent_archetype_id": 0,
+      "promoted": true,
+      "tier_enabled": true
     }
   ]
 }

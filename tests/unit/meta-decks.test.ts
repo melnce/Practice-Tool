@@ -1,4 +1,5 @@
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { fileURLToPath } from "url";
 import { describe, it, expect, beforeAll } from "vitest";
@@ -17,9 +18,11 @@ import {
   cardCountsFromDeck,
   countAwareJaccard,
   diffMetaAgainstLibrary,
+  listDroppedMetaDeckFiles,
   metaDeckFilename,
   processMetaDeck,
   resolveArchetypeName,
+  type MetaDeckIndexEntry,
   type WbArtsDeck,
 } from "../../scripts/lib/metaDecks.js";
 import {
@@ -45,10 +48,7 @@ describe("meta decks", () => {
   let cards: DeckCodeCard[] = [];
   let index = buildCardIndex({ mainCards: [], tokenCards: [] });
   let feedDecks: WbArtsDeck[] = [];
-  let archetypes = new Map<
-    string,
-    { id: string; class_id: number; name_jpn?: string }
-  >();
+  let archetypes = buildArchetypeMap([]);
 
   beforeAll(() => {
     cards = JSON.parse(
@@ -63,14 +63,16 @@ describe("meta decks", () => {
     const feed = loadJson<{ decks: WbArtsDeck[] }>("feed.json");
     feedDecks = feed.decks;
     archetypes = buildArchetypeMap(
-      loadJson<{
-        archetypes: { id: string; class_id: number; name_jpn?: string }[];
-      }>("archetypes.json").archetypes,
+      loadJson<{ archetypes: unknown[] }>("archetypes.json").archetypes,
     );
   });
 
-  it("resolves archetype name from jpn when eng is empty", () => {
-    expect(resolveArchetypeName("local:3", archetypes)).toBe("中速冥界");
+  it("resolves archetype name from resolved_name_eng", () => {
+    expect(resolveArchetypeName("local:3", archetypes)).toBe("Midrange Abyss");
+  });
+
+  it("falls back to resolved_name_jpn when English is empty", () => {
+    expect(resolveArchetypeName("local:39", archetypes)).toBe("アグロE");
   });
 
   it("writes valid feed deck with expected filename and hash", () => {
@@ -86,7 +88,7 @@ describe("meta decks", () => {
     );
     expect(result.result.indexEntry.archetype).toEqual({
       id: "local:3",
-      name: "中速冥界",
+      name: "Midrange Abyss",
     });
     expect(result.result.indexEntry.hash).toBe(
       encodeDeckHash({
@@ -172,8 +174,11 @@ describe("meta decks", () => {
     expect(midrangeOrphan?.noCounterpart).toBe(false);
   });
 
-  it("import-code fixture parses into a 40-card deck", () => {
-    const body = loadJson<unknown>("get-deck-midrange.json");
+  // Success shape is synthetic: no live 4-character code was obtained (only
+  // result_code 5400 for bad codes). mana_curve length 11 indexed by cost 0–10
+  // is inferred and unverified against a live success response.
+  it("import-code synthetic fixture parses into a 40-card deck", () => {
+    const body = loadJson<unknown>("get-deck-midrange.synthetic.json");
     const data = parseGetDeckResponse(body);
     const deck = deckFileFromGetDeck(data, catalog, "Imported Midrange");
     expect(deck.size).toBe(40);
@@ -194,10 +199,94 @@ describe("meta decks", () => {
     expect(mismatch).toContain("cost 1");
   });
 
-  it("metaDeckFilename matches class_slug_id pattern", () => {
-    expect(metaDeckFilename(feedDecks[0])).toBe(
+  it("metaDeckFilename uses English archetype slug and author", () => {
+    expect(metaDeckFilename(feedDecks[0], archetypes)).toBe(
       "abysscraft_midrange_abyss_by_ukyo0120_wb-meta-001.json",
     );
+    expect(
+      metaDeckFilename(
+        {
+          ...feedDecks[0],
+          id: "22130",
+          name: "ミッドレンジNi by @m_applere",
+        },
+        archetypes,
+      ),
+    ).toBe("abysscraft_midrange_abyss_by_m_applere_22130.json");
+    expect(
+      metaDeckFilename(
+        {
+          ...feedDecks[0],
+          id: "150502",
+          name: "17 Wins Nightmare by @hystarfay53",
+        },
+        archetypes,
+      ),
+    ).toBe("abysscraft_midrange_abyss_by_hystarfay53_150502.json");
+  });
+
+  it("removes only files listed in the old index that are absent from the new index", () => {
+    const oldIndex: MetaDeckIndexEntry[] = [
+      {
+        id: "old-1",
+        canonical_id: "c1",
+        class: "Abysscraft",
+        archetype: { id: "local:3", name: "Midrange Abyss" },
+        source: "svwbmeta",
+        source_url: "",
+        rating: 0,
+        win_count: 0,
+        posted_at: "",
+        recommendation_score: 0,
+        fetched_at: "",
+        file: "abysscraft_midrange_abyss_by_old_1.json",
+        hash: "h1",
+      },
+      {
+        id: "old-2",
+        canonical_id: "c2",
+        class: "Abysscraft",
+        archetype: { id: "local:3", name: "Midrange Abyss" },
+        source: "svwbmeta",
+        source_url: "",
+        rating: 0,
+        win_count: 0,
+        posted_at: "",
+        recommendation_score: 0,
+        fetched_at: "",
+        file: "abysscraft_midrange_abyss_by_old_2.json",
+        hash: "h2",
+      },
+    ];
+    const newIndex: MetaDeckIndexEntry[] = [
+      {
+        ...oldIndex[0],
+        id: "new-1",
+        file: "abysscraft_midrange_abyss_by_new_1.json",
+      },
+    ];
+
+    expect(listDroppedMetaDeckFiles(oldIndex, newIndex)).toEqual([
+      "abysscraft_midrange_abyss_by_old_1.json",
+      "abysscraft_midrange_abyss_by_old_2.json",
+    ]);
+
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "meta-decks-cleanup-"));
+    const dropped = listDroppedMetaDeckFiles(oldIndex, newIndex);
+    const stray = "stray_not_in_old_index.json";
+    for (const file of [...dropped, newIndex[0].file, stray, "index.json"]) {
+      fs.writeFileSync(path.join(tmp, file), "{}\n");
+    }
+
+    for (const file of dropped) {
+      fs.unlinkSync(path.join(tmp, file));
+    }
+
+    expect(fs.existsSync(path.join(tmp, stray))).toBe(true);
+    expect(fs.existsSync(path.join(tmp, newIndex[0].file))).toBe(true);
+    expect(fs.existsSync(path.join(tmp, dropped[0]))).toBe(false);
+
+    fs.rmSync(tmp, { recursive: true, force: true });
   });
 
   it("count-aware Jaccard is symmetric", () => {

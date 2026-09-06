@@ -66,8 +66,8 @@
       "10954120": 3
     },
     "mana_curve": [0, 5, 6, 9, 2, 3, 6, 2, 5, 3, 0],
-    "num_follower": 28,
-    "num_spell": 8,
-    "num_amulet": 4
+    "num_follower": 37,
+    "num_spell": 3,
+    "num_amulet": 0
   }
 }

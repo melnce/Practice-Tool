@@ -41,11 +41,18 @@ export interface WbArtsDeck {
 }
 
 export interface WbArtsArchetype {
-  id: string;
+  id: number | string;
   class_id: number;
   name_eng?: string;
   name_jpn?: string;
   name_chs?: string;
+  name_cht?: string;
+  name_kor?: string;
+  resolved_name_eng?: string;
+  resolved_name_jpn?: string;
+  resolved_name_chs?: string;
+  resolved_name_cht?: string;
+  resolved_name_kor?: string;
   source_keys?: string[];
 }
 
@@ -113,19 +120,65 @@ export function classNameFromId(classId: number): string {
   return name;
 }
 
+export function archetypeLookupKey(id: number | string): string {
+  return String(id);
+}
+
+/** Parse `local:<n>` or a bare numeric archetype id from the deck feed. */
+export function parseArchetypeNumericId(archetypeId: string): string | null {
+  const trimmed = archetypeId.trim();
+  const localMatch = /^local:(\d+)$/i.exec(trimmed);
+  if (localMatch) return localMatch[1];
+  if (/^\d+$/.test(trimmed)) return trimmed;
+  return null;
+}
+
+export function lookupArchetype(
+  archetypeId: string,
+  archetypes: ReadonlyMap<string, WbArtsArchetype>,
+): WbArtsArchetype | undefined {
+  const numeric = parseArchetypeNumericId(archetypeId);
+  if (numeric) {
+    const row = archetypes.get(numeric);
+    if (row) return row;
+  }
+  return archetypes.get(archetypeId);
+}
+
+function pickNonEmpty(...values: (string | undefined)[]): string | undefined {
+  for (const value of values) {
+    const trimmed = value?.trim();
+    if (trimmed) return trimmed;
+  }
+  return undefined;
+}
+
 export function resolveArchetypeName(
   archetypeId: string,
   archetypes: ReadonlyMap<string, WbArtsArchetype>,
 ): string {
-  const row = archetypes.get(archetypeId);
+  const row = lookupArchetype(archetypeId, archetypes);
   if (!row) return archetypeId;
-  const eng = row.name_eng?.trim();
-  if (eng) return eng;
-  const jpn = row.name_jpn?.trim();
-  if (jpn) return jpn;
-  const chs = row.name_chs?.trim();
-  if (chs) return chs;
-  return archetypeId;
+  return (
+    pickNonEmpty(
+      row.resolved_name_eng,
+      row.name_eng,
+      row.resolved_name_jpn,
+      row.name_jpn,
+      row.resolved_name_chs,
+      row.name_chs,
+    ) ?? archetypeId
+  );
+}
+
+/** English archetype label when the API provides one; otherwise null. */
+export function resolveArchetypeEnglishName(
+  archetypeId: string,
+  archetypes: ReadonlyMap<string, WbArtsArchetype>,
+): string | null {
+  const row = lookupArchetype(archetypeId, archetypes);
+  if (!row) return null;
+  return pickNonEmpty(row.resolved_name_eng, row.name_eng) ?? null;
 }
 
 export function buildArchetypeMap(
@@ -133,9 +186,18 @@ export function buildArchetypeMap(
 ): Map<string, WbArtsArchetype> {
   const map = new Map<string, WbArtsArchetype>();
   for (const row of archetypes) {
-    map.set(row.id, row);
+    map.set(archetypeLookupKey(row.id), row);
   }
   return map;
+}
+
+/** Author segment after the last " by " in a feed deck name (@ stripped). */
+export function parseFeedDeckAuthor(feedName: string): string | null {
+  const idx = feedName.lastIndexOf(" by ");
+  if (idx < 0) return null;
+  const author = feedName.slice(idx + 4).trim();
+  if (!author) return null;
+  return author.replace(/^@+/, "");
 }
 
 export function cardsRecordToDeckFile(
@@ -220,10 +282,36 @@ function promoteValidationIssues(
   return deduped;
 }
 
-export function metaDeckFilename(feedDeck: WbArtsDeck): string {
+export function metaDeckFilename(
+  feedDeck: WbArtsDeck,
+  archetypes: ReadonlyMap<string, WbArtsArchetype>,
+): string {
   const classSlug = classNameFromId(feedDeck.class_id).toLowerCase();
+  const englishArchetype = resolveArchetypeEnglishName(
+    feedDeck.archetype,
+    archetypes,
+  );
+
+  if (englishArchetype) {
+    const archetypeSlug = slugifyDeckSlug(englishArchetype);
+    const author = parseFeedDeckAuthor(feedDeck.name);
+    const authorPart = author ? `_by_${slugifyDeckSlug(author)}` : "";
+    return `${classSlug}_${archetypeSlug}${authorPart}_${feedDeck.id}.json`;
+  }
+
   const nameSlug = slugifyDeckSlug(feedDeck.name);
   return `${classSlug}_${nameSlug}_${feedDeck.id}.json`;
+}
+
+/** Files listed in the previous index but absent from the new index. */
+export function listDroppedMetaDeckFiles(
+  oldIndex: readonly MetaDeckIndexEntry[],
+  newIndex: readonly MetaDeckIndexEntry[],
+): string[] {
+  const newFiles = new Set(newIndex.map((entry) => entry.file));
+  return oldIndex
+    .map((entry) => entry.file)
+    .filter((file) => !newFiles.has(file));
 }
 
 export function processMetaDeck(
@@ -248,7 +336,7 @@ export function processMetaDeck(
   }
 
   const { deck, cardIds } = converted;
-  const filename = metaDeckFilename(feedDeck);
+  const filename = metaDeckFilename(feedDeck, archetypes);
   const reasons = promoteValidationIssues(deck, filename, index);
 
   if (reasons.length > 0) {
