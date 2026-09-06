@@ -108,8 +108,6 @@ export { INTERNAL_CACHE_KEYS } from "./snapshotEphemeralKeys.js";
 export const SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT: Readonly<
   Record<string, string>
 > = {
-  _runEffectsDepth:
-    "runEffects finally restores parent depth before returning; top-level pause commits see 0.",
   sotBoundaryDeferDrain:
     "Set/cleared inside runStartOfTurnBoundary try/finally only; non-default at commit means a prompt or pause leaked past the boundary window.",
   turnBoundaryInvokePhase:
@@ -128,6 +126,8 @@ export const SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT: Readonly<
  * Snapshot-dropped keys allowed to be non-default at commit, with reason.
  */
 export const SNAPSHOT_EPHEMERAL_MAY_BE_SET: Readonly<Record<string, string>> = {
+  _runEffectsDepth:
+    "A paused commit can occur inside nested runEffects (mode-picker confirm). The counter describes a call stack that does not survive restore; resumption re-enters from a fresh top-level dispatch through resumeEffects, so restoring at 0 is correct.",
   deferDeathTriggers:
     "Combat/resolve doAction restores prevDefer in finally before commit; prevDefer may be true from outer runEffects.",
   _drainingResolutionQueue:

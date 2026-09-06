@@ -56,7 +56,6 @@ describe("snapshot ephemeral gate must_be_default at commit", () => {
   });
 
   const scalarDefaults: Record<string, unknown> = {
-    _runEffectsDepth: 0,
     sotBoundaryDeferDrain: false,
     turnBoundaryInvokePhase: false,
     __resolutionDrainDepth: 0,
@@ -114,9 +113,16 @@ describe("snapshot ephemeral gate enforcement", () => {
     );
   });
 
-  it("may_be_set keys do not trip the gate when legitimately non-default", () => {
+  it("may_be_set: deferDeathTriggers does not trip the gate when legitimately true", () => {
     beginAction("defer");
     (state as any).deferDeathTriggers = true;
+    expect(collectSnapshotEphemeralViolations()).toEqual([]);
+    commitAction({ autoRender: false });
+  });
+
+  it("may_be_set: _runEffectsDepth does not trip the gate when nested mode confirm commits", () => {
+    beginAction("nested");
+    (state as any)._runEffectsDepth = 2;
     expect(collectSnapshotEphemeralViolations()).toEqual([]);
     commitAction({ autoRender: false });
   });
