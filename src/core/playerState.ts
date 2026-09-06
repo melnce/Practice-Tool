@@ -18,6 +18,7 @@ export function createPlayerState(isSecond: boolean = false): PlayerState {
     pp: 0,
     maxPP: 0,
     permPP: 0,
+    bonusPpOrb: 0,
 
     // Zones
     hand: [],

@@ -9,7 +9,7 @@ import { releaseImageLoads } from "./releaseImageLoads.js";
 
 import { state } from "../core/gameState.js";
 import type { GameState, Player, CardInstance } from "../core/types/index.js";
-import { getWinner } from "../core/playerHelpers.js";
+import { getWinner, getPP } from "../core/playerHelpers.js";
 import { getGlobalCardIndex } from "../data/cardIndex.js";
 import { collectSetIds, formatSetBadge } from "../data/formats.js";
 import { maybeAdvanceScriptFromUi } from "./playerDispatch.js";
@@ -74,8 +74,8 @@ export function render() {
   };
   setText("blueHP", state.players.first.hp);
   setText("redHP", state.players.second.hp);
-  setText("bluePP", `${state.players.first.pp}/${state.players.first.maxPP}`);
-  setText("redPP", `${state.players.second.pp}/${state.players.second.maxPP}`);
+  setText("bluePP", `${getPP(state, "first")}/${state.players.first.maxPP}`);
+  setText("redPP", `${getPP(state, "second")}/${state.players.second.maxPP}`);
   setText("blueShadows", state.players.first.shadows);
   setText("redShadows", state.players.second.shadows);
 

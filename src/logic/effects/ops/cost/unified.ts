@@ -6,7 +6,10 @@ import type {
   Effect,
 } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
-import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../../core/pendingTarget/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
 import type { UnifiedCostSpec } from "./types.js";
 
@@ -78,18 +81,32 @@ export function handleCost(
   }
 
   // Handle selection if required
-  if (spec.select && spec.select > 0 && targets.length > 0) {
+  if (spec.select && spec.select > 0) {
+    if (targets.length === 0) {
+      reportSelectFizzled({
+        eff: eff as Effect,
+        owner,
+        sourceCard,
+        target: spec.target,
+      });
+      return "done";
+    }
+
     const selectCount = Math.min(spec.select, targets.length);
 
-    setPendingTarget({
-      eff: eff as any,
-      owner,
-      sourceCard,
-      resumeEffects: context?.queue || [],
-      pool: targets,
-      targets: [],
-      selectCount,
-    });
+    if (
+      trySetPendingTarget({
+        eff: eff as any,
+        owner,
+        sourceCard,
+        resumeEffects: context?.queue || [],
+        pool: targets,
+        targets: [],
+        selectCount,
+      }) === "fizzled"
+    ) {
+      return "done";
+    }
 
     highlightSelectable(targets);
     logEvent("cost_select", {

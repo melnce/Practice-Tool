@@ -99,6 +99,7 @@ export type DamageAmountSource =
 export interface UnifiedDamageSpec {
   // Target specification
   target?: string;
+  /** `all:leader` — one instruction damages both leaders before game-over is judged. */
 
   // Distribution mode
   distribution: DamageDistribution;
