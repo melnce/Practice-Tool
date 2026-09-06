@@ -1,0 +1,212 @@
+{
+  "seed": 20260925,
+  "gameIndex": 98,
+  "gameSeed": 118261219,
+  "regime": "shipped",
+  "deckAId": "kukishiro_havencraft",
+  "deckBId": "sephie_runecraft",
+  "deckARaw": null,
+  "deckBRaw": null,
+  "outcome": "position",
+  "error": "position save-load re-apply mismatch at action 39 ({\"type\":\"PLAY_CARD\",\"player\":\"first\",\"cardUid\":\"uid_i\"}):\n  players.first.deck[29]: expected=undefined actual={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10463210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Engage: Destroy this card. Select a Mode to activate.\\n1. Destroy a random enemy follower.\\n2. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10463210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"distribution\":\"random\",\"op\":\"destroy\",\"select\":1,\"target\":\"enemy:follower\"}],\"label\":\"Destroy a random enemy follower\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"label\":\"Draw 2 cards\"}]}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"De La Fille's Gleaming Gems\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10004] Skybound Dragons\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_x\",\"url\":\"https://shadowverse.gg/cards/10463210-de-la-filles-gleaming-gems\"}\n  players.first.deck[30]: expected=undefined actual={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_g\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\"}\n  players.first.graveyard[1]: expected={\"_lwFired\":true,\"attack\":0,\"base_attack\":0,\"base_cost\":1,\"base_defense\":0,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10503210.webp\",\"class\":\"Neutral\",\"cost\":1,\"cost_mod\":0,\"countdown\":0,\"counters\":{},\"defense\":0,\"description\":\"Countdown (5)\\nWhenever you play another card, if there's a card on the field other than it with the same base cost, advance this amulet's count by 1.\\nLast Words: Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":true,\"hasIntimidate\":false,\"hasLastWords\":true,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10503210\",\"implementationStatus\":\"ops_present\",\"insertionTs\":4,\"keywordState\":{\"engagedThisTurn\":false,\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}]},\"keywords\":[{\"count\":5,\"name\":\"countdown\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"LastWords\"}],\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"World of Games\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[{\"condition\":{\"field_other_same_base_cost\":true,\"not_self\":true},\"effects\":[{\"action\":\"advance\",\"amount\":1,\"op\":\"countdown\",\"target\":\"self\"}],\"event\":\"ally_card_played\",\"source\":\"board\"}],\"type\":\"Amulet\",\"uid\":\"uid_13\",\"url\":\"https://shadowverse.gg/cards/10503210-world-of-games\",\"zone\":\"graveyard\"} actual=undefined\n  players.first.hand[5]: expected={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_g\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\",\"zone\":\"hand\"} actual=undefined\n  players.first.hand[6]: expected={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10463210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Engage: Destroy this card. Select a Mode to activate.\\n1. Destroy a random enemy follower.\\n2. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10463210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"distribution\":\"random\",\"op\":\"destroy\",\"select\":1,\"target\":\"enemy:follower\"}],\"label\":\"Destroy a random enemy follower\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"label\":\"Draw 2 cards\"}]}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"De La Fille's Gleaming Gems\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10004] Skybound Dragons\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_x\",\"url\":\"https://shadowverse.gg/cards/10463210-de-la-filles-gleaming-gems\",\"zone\":\"hand\"} actual=undefined\n  players.first.shadows: expected=2 actual=1",
+  "findings": [
+    "position save-load re-apply mismatch at action 39 ({\"type\":\"PLAY_CARD\",\"player\":\"first\",\"cardUid\":\"uid_i\"}):\n  players.first.deck[29]: expected=undefined actual={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10463210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Engage: Destroy this card. Select a Mode to activate.\\n1. Destroy a random enemy follower.\\n2. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10463210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"distribution\":\"random\",\"op\":\"destroy\",\"select\":1,\"target\":\"enemy:follower\"}],\"label\":\"Destroy a random enemy follower\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"label\":\"Draw 2 cards\"}]}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"De La Fille's Gleaming Gems\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10004] Skybound Dragons\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_x\",\"url\":\"https://shadowverse.gg/cards/10463210-de-la-filles-gleaming-gems\"}\n  players.first.deck[30]: expected=undefined actual={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_g\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\"}\n  players.first.graveyard[1]: expected={\"_lwFired\":true,\"attack\":0,\"base_attack\":0,\"base_cost\":1,\"base_defense\":0,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10503210.webp\",\"class\":\"Neutral\",\"cost\":1,\"cost_mod\":0,\"countdown\":0,\"counters\":{},\"defense\":0,\"description\":\"Countdown (5)\\nWhenever you play another card, if there's a card on the field other than it with the same base cost, advance this amulet's count by 1.\\nLast Words: Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":true,\"hasIntimidate\":false,\"hasLastWords\":true,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10503210\",\"implementationStatus\":\"ops_present\",\"insertionTs\":4,\"keywordState\":{\"engagedThisTurn\":false,\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}]},\"keywords\":[{\"count\":5,\"name\":\"countdown\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"LastWords\"}],\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"World of Games\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[{\"condition\":{\"field_other_same_base_cost\":true,\"not_self\":true},\"effects\":[{\"action\":\"advance\",\"amount\":1,\"op\":\"countdown\",\"target\":\"self\"}],\"event\":\"ally_card_played\",\"source\":\"board\"}],\"type\":\"Amulet\",\"uid\":\"uid_13\",\"url\":\"https://shadowverse.gg/cards/10503210-world-of-games\",\"zone\":\"graveyard\"} actual=undefined\n  players.first.hand[5]: expected={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_g\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\",\"zone\":\"hand\"} actual=undefined\n  players.first.hand[6]: expected={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10463210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Engage: Destroy this card. Select a Mode to activate.\\n1. Destroy a random enemy follower.\\n2. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10463210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"distribution\":\"random\",\"op\":\"destroy\",\"select\":1,\"target\":\"enemy:follower\"}],\"label\":\"Destroy a random enemy follower\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"label\":\"Draw 2 cards\"}]}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"De La Fille's Gleaming Gems\",\"owner\":\"first\",\"rarity\":\"Gold\",\"set\":\"[10004] Skybound Dragons\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_x\",\"url\":\"https://shadowverse.gg/cards/10463210-de-la-filles-gleaming-gems\",\"zone\":\"hand\"} actual=undefined\n  players.first.shadows: expected=2 actual=1"
+  ],
+  "turns": 9,
+  "actions": 39,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_28"
+    },
+    {
+      "type": "FUSE",
+      "player": "second",
+      "cardUid": "uid_1m"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_24"
+      }
+    },
+    {
+      "type": "CONFIRM_TARGETS"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "FUSE",
+      "player": "second",
+      "cardUid": "uid_1k"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_25"
+      }
+    },
+    {
+      "type": "CONFIRM_TARGETS"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_27"
+    },
+    {
+      "type": "FUSE",
+      "player": "second",
+      "cardUid": "uid_1m"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_1n"
+      }
+    },
+    {
+      "type": "CONFIRM_TARGETS"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "FUSE",
+      "player": "second",
+      "cardUid": "uid_1m"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_22"
+      }
+    },
+    {
+      "type": "CONFIRM_TARGETS"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_27",
+      "defender": {
+        "type": "card",
+        "uid": "uid_14"
+      }
+    },
+    {
+      "type": "FUSE",
+      "player": "second",
+      "cardUid": "uid_1k"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_1m"
+      }
+    },
+    {
+      "type": "CONFIRM_TARGETS"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_29",
+      "defender": {
+        "type": "card",
+        "uid": "uid_14"
+      }
+    },
+    {
+      "type": "FUSE",
+      "player": "second",
+      "cardUid": "uid_1k"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_20"
+      }
+    },
+    {
+      "type": "CONFIRM_TARGETS"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_i"
+    }
+  ],
+  "nonUndoableActionTypes": [],
+  "commitSequence": [],
+  "zeroCommitLog": []
+}
