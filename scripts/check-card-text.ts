@@ -26,6 +26,7 @@ import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceSemanticsForCard } from "./enhance-semantics-gate.js";
 import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
+import { checkBothLeadersForCard } from "./both-leaders-gate.js";
 import { loadCardsForGates, type CardJson } from "./lib/loadCards.js";
 import {
   getImplementationStatus,
@@ -1523,6 +1524,9 @@ function main() {
   const gateAllAlliedIncludeSelf =
     process.argv.includes("--gate=all-allied-include-self") ||
     process.argv.includes("--gate=all_allied_include_self");
+  const gateBothLeaders =
+    process.argv.includes("--gate=both-leaders") ||
+    process.argv.includes("--gate=both_leaders");
   const gateMode =
     gateAddToHand ||
     gateStatOp ||
@@ -1531,7 +1535,8 @@ function main() {
     gateDurationOp ||
     gateSelectTarget ||
     gateEnhanceSemantics ||
-    gateAllAlliedIncludeSelf;
+    gateAllAlliedIncludeSelf ||
+    gateBothLeaders;
 
   const files = loadCardsForGates(setArg);
   const allIssues: Issue[] = [];
@@ -1561,7 +1566,9 @@ function main() {
                   ? "🔍 Checking Enhance semantics contracts...\n"
                   : gateAllAlliedIncludeSelf
                     ? "🔍 Checking all-allied-followers include_self contracts...\n"
-                    : "🔍 Checking card description ↔ JSON structure...\n",
+                    : gateBothLeaders
+                      ? "🔍 Checking both-leaders ↔ all:leader contracts...\n"
+                      : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const { card, sourceFile } of files) {
@@ -1582,6 +1589,8 @@ function main() {
         allIssues.push(...checkEnhanceSemanticsForCard(card).map(tagIssue));
       if (gateAllAlliedIncludeSelf)
         allIssues.push(...checkAllAlliedIncludeSelfForCard(card).map(tagIssue));
+      if (gateBothLeaders)
+        allIssues.push(...checkBothLeadersForCard(card).map(tagIssue));
     } else {
       if (isCantPlaySpellExempt(card)) {
         cantPlayExemptCount += 1;
