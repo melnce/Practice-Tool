@@ -188,6 +188,34 @@ function describeEmptyTargetPool(eff: Effect): string {
   return "Spell requires a target but none are available.";
 }
 
+function describeInsufficientSelectPool(eff: Effect, required: number): string {
+  const condition = selectPoolCondition(eff);
+  const target = String(eff.target || "").toLowerCase();
+
+  if (target.includes("hand")) {
+    return `Spell needs ${required} selectable hand cards.`;
+  }
+
+  if (condition.type === "Follower" || target.includes("follower")) {
+    const side = target.includes("enemy") ? "enemy" : "allied";
+    return `Spell needs ${required} selectable ${side} followers.`;
+  }
+
+  if (condition.has_keyword) {
+    const keywords = Array.isArray(condition.has_keyword)
+      ? condition.has_keyword
+      : [condition.has_keyword];
+    const kwLabel = keywords.map((k: string | number) => String(k)).join(", ");
+    return `Spell needs ${required} selectable targets with ${kwLabel}.`;
+  }
+
+  if (condition.tribe) {
+    return `Spell needs ${required} selectable targets with tribe ${String(condition.tribe)}.`;
+  }
+
+  return `Spell needs ${required} selectable targets.`;
+}
+
 /**
  * Recursively check if any effect requires a target (select/choose) that has an empty pool.
  * The card being played is excluded from every pool — it is in no zone during evaluation.
@@ -261,10 +289,17 @@ function checkEffectsHaveValidTargets(
             ...(playingCardUid ? { playingCardUid } : {}),
           },
         );
+        const requiredCount = parseSelectConfig(eff).count;
         if (!pool || pool.length === 0) {
           return {
             ok: false,
             reason: describeEmptyTargetPool(eff),
+          };
+        }
+        if (pool.length < requiredCount) {
+          return {
+            ok: false,
+            reason: describeInsufficientSelectPool(eff, requiredCount),
           };
         }
       }
