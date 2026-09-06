@@ -34,6 +34,7 @@ export interface DeckCodeCard {
   id: string;
   name: string;
   class: string;
+  cost?: string | number;
 }
 
 export interface DeckCodeCatalog {
@@ -444,4 +445,134 @@ export const DECK_SHARE_BASE_URL =
 
 export function deckShareUrl(hash: string): string {
   return `${DECK_SHARE_BASE_URL}${hash}`;
+}
+
+/** Official 4-character deck-code API response (POST …/DeckCode/getDeck). */
+export interface GetDeckApiResponse {
+  responseCode?: number;
+  data_headers?: { result_code?: number; csrf_token?: string };
+  data?: GetDeckData;
+}
+
+/** Fields read from getDeck `data` — see import-deck-code.ts. */
+export interface GetDeckData {
+  class_id: number;
+  sort_card_id_list: readonly (number | string)[];
+  deck_card_num?: Readonly<Record<string, number>>;
+  mana_curve?: readonly number[];
+  num_follower?: number;
+  num_spell?: number;
+  num_amulet?: number;
+}
+
+const GET_DECK_NOT_FOUND = 5400;
+
+export function parseGetDeckResponse(body: unknown): GetDeckData {
+  if (body == null || typeof body !== "object") {
+    throw new DeckCodeError("Invalid getDeck response");
+  }
+
+  const resp = body as GetDeckApiResponse;
+  const resultCode = resp.data_headers?.result_code;
+
+  if (!resp.data || resultCode !== 1) {
+    if (resultCode === GET_DECK_NOT_FOUND) {
+      throw new DeckCodeError(
+        "Deck code not found or expired (official API returned 5400)",
+      );
+    }
+    throw new DeckCodeError(
+      `getDeck failed (result_code ${resultCode ?? "missing"})`,
+    );
+  }
+
+  const data = resp.data;
+  const list = data.sort_card_id_list;
+  if (!Array.isArray(list) || list.length !== DECK_SIZE) {
+    throw new DeckCodeError(
+      `getDeck returned ${list?.length ?? 0} cards (expected ${DECK_SIZE})`,
+    );
+  }
+
+  if (!DECK_CLASS_IDS[data.class_id]) {
+    throw new DeckCodeError(`Unknown class_id ${data.class_id} from getDeck`);
+  }
+
+  return data;
+}
+
+export function deckFileFromGetDeck(
+  data: GetDeckData,
+  catalog: DeckCodeCatalog,
+  deckName: string,
+): DeckFileObject {
+  const className = DECK_CLASS_IDS[data.class_id];
+  const cardIds = data.sort_card_id_list.map(String);
+  validateDecodedDeck(cardIds, data.class_id, className, catalog);
+
+  const cards: DeckFileCardEntry[] = [];
+  const seen = new Set<string>();
+
+  for (const id of cardIds) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const card = catalog.byId.get(id);
+    if (!card) {
+      throw new DeckCodeError(
+        `Unknown card id "${id}" (not in cards/all.json)`,
+      );
+    }
+    const count = cardIds.filter((x) => x === id).length;
+    cards.push({ name: card.name, count });
+  }
+
+  return {
+    class: className,
+    deckName,
+    size: DECK_SIZE,
+    cards,
+  };
+}
+
+export function buildCostById(
+  cards: readonly DeckCodeCard[],
+): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const card of cards) {
+    const cost = Number(card.cost ?? 0);
+    map.set(card.id, Number.isFinite(cost) ? cost : 0);
+  }
+  return map;
+}
+
+/** Mana curve indexed by playable cost (0–10); length 11. */
+export function computeManaCurveFromIds(
+  cardIds: readonly string[],
+  costById: ReadonlyMap<string, number>,
+): number[] {
+  const curve = new Array(11).fill(0);
+  for (const id of cardIds) {
+    const raw = costById.get(id) ?? 0;
+    const cost = Math.min(10, Math.max(0, raw));
+    curve[cost]++;
+  }
+  return curve;
+}
+
+export function formatManaCurveMismatch(
+  expected: readonly number[],
+  actual: readonly number[],
+): string | null {
+  if (expected.length !== actual.length) {
+    return `mana_curve length ${actual.length} (expected ${expected.length})`;
+  }
+  const parts: string[] = [];
+  for (let cost = 0; cost < expected.length; cost++) {
+    if (expected[cost] !== actual[cost]) {
+      parts.push(
+        `cost ${cost}: computed ${expected[cost]}, API ${actual[cost]}`,
+      );
+    }
+  }
+  return parts.length > 0 ? parts.join("; ") : null;
 }
