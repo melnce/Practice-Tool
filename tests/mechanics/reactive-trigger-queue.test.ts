@@ -306,7 +306,13 @@ describe("Reactive trigger queue", () => {
     expect(result.error).toBeUndefined();
   });
 
-  it("soak seed 20260913 game 123 — Reaper's Due printed copy terminates; exact board after batch", async () => {
+  // The trace was recorded before the mulligan-order change; the second player's
+  // swap now draws different cards, so the original Reaper's Due loop is not
+  // reproduced here — that ruling is covered directly by
+  // tests/unit/l2-rotation-abysscraft.test.ts ("granted Last Words on
+  // buffed/debuffed follower summons printed copy — no LW, printed stats"); the
+  // board pins below are a determinism pin of the diverged game, nothing more.
+  it("soak seed 20260913 game 123 replays without error after the mulligan-order fix (diverged trace; determinism pin)", async () => {
     const fixture = loadSoakFixture(
       "seed20260913_game123_reapers_due_loop.json",
     );
@@ -326,11 +332,19 @@ describe("Reactive trigger queue", () => {
           def: Number(c.defense),
         }));
     expect(boardSummary("first")).toEqual([
-      { id: "10304110", name: "Mjerrabaine, Great Manifest", atk: 5, def: 2 },
-      { id: "10312110", name: "Supplicant of Unkilling", atk: 7, def: 5 },
-      { id: "10343110", name: "Congregant of Disdain", atk: 5, def: 4 },
+      { id: "10701110", name: "Altaro Superfan", atk: 2, def: 2 },
+      { id: "10272110", name: "Vier, Heart Slayer", atk: 1, def: 1 },
+      { id: "10304110", name: "Mjerrabaine, Great Manifest", atk: 5, def: 5 },
+      { id: "10272110", name: "Vier, Heart Slayer", atk: 1, def: 1 },
     ]);
-    expect(boardSummary("second")).toEqual([]);
+    expect(boardSummary("second")).toEqual([
+      {
+        id: "10304110",
+        name: "Mjerrabaine, Great Manifest",
+        atk: 3,
+        def: 3,
+      },
+    ]);
   });
 
   it("Sephie Fanfare at 4 prior OTS — first summoned 2/2, second 5/5", () => {
