@@ -14,6 +14,7 @@ import {
   whenPlayCard,
   whenRunEffects,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import {
   getBoard,
@@ -30,7 +31,7 @@ import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import { applyKeyword } from "../../src/logic/core/keywords/apply.js";
 import { grantBarrier } from "../../src/logic/core/barrier.js";
 import { grantLeaderBarrier } from "../../src/logic/effects/leader.js";
-import { canEvolve, onEvolve } from "../../src/logic/evolveUtils.js";
+import { canEvolve } from "../../src/logic/evolveUtils.js";
 import { getPool } from "../../src/logic/core/targeting.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
@@ -201,7 +202,7 @@ describe("Rulebook §164 — SEP cannot upgrade already-evolved; auto-evolve ski
     state.players.first.board = [card];
     setEvoCharges(state, "first", 2);
 
-    onEvolve(card, "first", "normal", { spendPoint: false, skipEffects: true });
+    whenEffectEvolve(card, "first", "normal");
 
     expect(card.hasEvolved).toBe(true);
     expect(state.players.first.evoCharges).toBe(2);

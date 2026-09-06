@@ -11,8 +11,9 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { evolveFollowerByEffect } from "../../src/logic/effects/ops/evolve.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
@@ -71,7 +72,7 @@ describe("Foundations — Manamel & Cupitan evolve_trigger_always", () => {
     state.players.second.board = [enemy];
     state.players.first.board = [manamel];
 
-    onEvolve(manamel, "first", "normal", { spendPoint: true });
+    whenEvolve(manamel, "first");
     expect(enemy.defense).toBe(2);
   });
 

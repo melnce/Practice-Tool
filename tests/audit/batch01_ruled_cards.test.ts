@@ -14,9 +14,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { bounceToHand } from "../../src/logic/effects/ops/bounce.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
@@ -108,7 +109,7 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
       const handBefore = getHand(state, "first").length;
       const handUidsBefore = new Set(getHand(state, "first").map((c) => c.uid));
 
-      onEvolve(onBoard, "first", "super");
+      whenSuperEvolve(onBoard, "first");
 
       const rustyInHand = getHand(state, "first").filter(
         (c) => c.name === "Rusty, Luxcard Trickster",
@@ -314,7 +315,7 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
       b.uid = "enemy_b";
       state.players.second.board = [a, b];
 
-      onEvolve(selwyn, "first", "super");
+      whenSuperEvolve(selwyn, "first");
       expect(state.pendingTargetEffect).toBeDefined();
       resolvePendingTarget("enemy_a");
 
@@ -412,7 +413,7 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
 
       state.players.second.board = [legal, illegal];
 
-      onEvolve(priest, "first", "normal");
+      whenEvolve(priest, "first");
       expect(state.pendingTargetEffect).toBeDefined();
       resolvePendingTarget("legal");
 
@@ -527,7 +528,7 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
       golem.peak_defense = 3;
       state.players.first.board.push(golem);
 
-      onEvolve(remi, "first", "super");
+      whenSuperEvolve(remi, "first");
       resolvePendingTarget("golem");
 
       expect(state.players.first.evoCharges).toBe(2);
@@ -587,7 +588,7 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
       mecha.peak_defense = mecha.defense;
       state.players.first.board = [mecha];
 
-      onEvolve(mecha, "first", "super");
+      whenSuperEvolve(mecha, "first");
 
       const tokens = thenBoard("first").filter(
         (c) => c.name === "Mecha Cavalier",

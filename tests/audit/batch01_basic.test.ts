@@ -15,12 +15,12 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import "../../src/logic/core/effects/index.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
 
 /** Card text: "Draw a card." */
 const FORESIGHT = "10031310";
@@ -166,7 +166,7 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
       state.players.first.board = [leah];
 
       const handBefore = thenHand("first").length;
-      onEvolve(leah, "first", "normal");
+      whenEvolve(leah, "first");
 
       expect(thenHand("first").length).toBe(handBefore + 1);
       expect(thenHand("first").length).not.toBe(handBefore);
@@ -189,7 +189,7 @@ describe("Audit Batch 01 — [10000] Basic (card-text derived)", () => {
       state.players.first.board = [leah];
 
       const handBefore = thenHand("first").length;
-      onEvolve(leah, "first", "super");
+      whenSuperEvolve(leah, "first");
 
       expect(thenHand("first").length).toBe(handBefore + 1);
       expect(thenHand("first").length).not.toBe(handBefore);

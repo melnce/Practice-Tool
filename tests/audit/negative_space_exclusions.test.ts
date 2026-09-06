@@ -17,9 +17,10 @@ import {
   thenHand,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
@@ -179,7 +180,7 @@ describe("Negative-space — select-another pools exclude source", () => {
     const zell = createCard("10142130", "board", "first");
     zell.peak_defense = zell.defense;
     state.players.first.board = [bystander, zell];
-    onEvolve(zell, "first", "super");
+    whenSuperEvolve(zell, "first");
     expect(poolUids()).not.toContain(String(zell.uid));
     expect(zell.hasStorm).toBeFalsy();
     resolvePendingTarget(String(bystander.uid));
@@ -208,7 +209,7 @@ describe("Negative-space — select-another pools exclude source", () => {
     resolveFirstPending();
     expect(bystander.hasBane).toBe(true);
     state.players.first.superEvoPoints = 1;
-    onEvolve(laura, "first", "super");
+    whenSuperEvolve(laura, "first");
     expect(poolUids()).not.toContain(String(laura.uid));
     expect(laura.hasStorm).toBeFalsy();
     resolvePendingTarget(String(bystander.uid));
@@ -243,7 +244,7 @@ describe("Negative-space — select-another pools exclude source", () => {
     const bystander = allyFollower(2, "Bystander", 2);
     whenPlayCard("first", 0);
     const scout = findOnBoard("first", "Peppy Scout")!;
-    onEvolve(scout, "first", "normal");
+    whenEvolve(scout, "first");
     expect(poolUids()).not.toContain(String(scout.uid));
     resolvePendingTarget(String(bystander.uid));
     expect(Number(bystander.attack)).toBe(4);
@@ -267,7 +268,7 @@ describe("Negative-space — select-another pools exclude source", () => {
     whenPlayCard("first", 0);
     resolvePendingIfAny();
     const ara = findOnBoard("first", "Ara, Dawnblossom")!;
-    onEvolve(ara, "first", "normal");
+    whenEvolve(ara, "first");
     expect(poolUids()).not.toContain(String(ara.uid));
     resolvePendingTarget(String(bystander.uid));
     expect(ara.name).toBe("Ara, Dawnblossom");
@@ -291,7 +292,7 @@ describe("Negative-space — select-another pools exclude source", () => {
     const bystander = allyAmulet("Bystander Amulet");
     const kandima = findOnBoard("first", "Kandima, Sublime Hatred")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(kandima, "first", "super");
+    whenSuperEvolve(kandima, "first");
     expect(poolUids()).not.toContain(String(kandima.uid));
     resolveFirstPending();
     expect(findOnBoard("first", "Kandima, Sublime Hatred")).toBeTruthy();
@@ -317,7 +318,7 @@ describe("Negative-space — select-another pools exclude source", () => {
     leona.peak_defense = leona.defense;
     state.players.first.board = [bystander, leona];
     state.players.first.superEvoPoints = 1;
-    onEvolve(leona, "first", "super");
+    whenSuperEvolve(leona, "first");
     expect(poolUids()).not.toContain(String(leona.uid));
     expect(leona.hasAmbush).toBeFalsy();
     resolvePendingTarget(String(bystander.uid));
@@ -329,7 +330,7 @@ describe("Negative-space — select-another pools exclude source", () => {
     whenPlayCard("first", 0);
     const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
     const bystander = allyFollower(2, "Bystander", 2);
-    onEvolve(eudie, "first", "normal");
+    whenEvolve(eudie, "first");
     expect(poolUids()).not.toContain(String(eudie.uid));
     resolvePendingTarget(String(bystander.uid));
     expect(bystander.hasEvolved).toBe(true);
@@ -375,8 +376,11 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     zir.peak_defense = zir.defense;
     const zirBefore = statSnapshot(zir);
     state.players.first.board = [bystander, zir];
-    onEvolve(zir, "first", "normal");
-    expect(statSnapshot(zir)).toEqual(zirBefore);
+    whenEvolve(zir, "first");
+    expect(statSnapshot(zir)).toEqual({
+      atk: zirBefore.atk + 2,
+      def: zirBefore.def + 2,
+    });
     expect(Number(bystander.attack)).toBe(3);
   });
 
@@ -388,7 +392,7 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     whenPlayCard("first", 0);
     const amelia = findOnBoard("first", "Amelia, Silver Captain")!;
     state.players.first.superEvoPoints = 1;
-    onEvolve(amelia, "first", "super");
+    whenSuperEvolve(amelia, "first");
     expect(amelia.hasBarrier).toBeFalsy();
     expect(bystander.hasBarrier).toBe(true);
   });
@@ -425,8 +429,11 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     const primBefore = statSnapshot(prim);
     state.players.first.board = [bystander, prim];
     state.players.first.superEvoPoints = 1;
-    onEvolve(prim, "first", "super");
-    expect(statSnapshot(prim)).toEqual(primBefore);
+    whenSuperEvolve(prim, "first");
+    expect(statSnapshot(prim)).toEqual({
+      atk: primBefore.atk + 3,
+      def: primBefore.def + 3,
+    });
     expect(Number(bystander.attack)).toBe(3);
   });
 
@@ -437,7 +444,7 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     aether.peak_defense = aether.defense;
     state.players.first.board = [bystander, aether];
     state.players.first.superEvoPoints = 1;
-    onEvolve(aether, "first", "super");
+    whenSuperEvolve(aether, "first");
     expect(aether.hasAura).toBeFalsy();
     expect(bystander.hasAura).toBe(true);
   });
@@ -450,8 +457,11 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     const tactBefore = statSnapshot(tact);
     state.players.first.board = [bystander, tact];
     state.players.first.superEvoPoints = 1;
-    onEvolve(tact, "first", "super");
-    expect(statSnapshot(tact)).toEqual(tactBefore);
+    whenSuperEvolve(tact, "first");
+    expect(statSnapshot(tact)).toEqual({
+      atk: tactBefore.atk + 3,
+      def: tactBefore.def + 3,
+    });
     expect(Number(bystander.attack)).toBe(5);
     expect(Number(bystander.defense)).toBe(5);
   });
@@ -463,8 +473,11 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     const noel = findOnBoard("first", "Noel IV, Ruthless Warlord")!;
     const noelBefore = statSnapshot(noel);
     state.players.first.superEvoPoints = 1;
-    onEvolve(noel, "first", "super");
-    expect(statSnapshot(noel)).toEqual(noelBefore);
+    whenSuperEvolve(noel, "first");
+    expect(statSnapshot(noel)).toEqual({
+      atk: noelBefore.atk + 3,
+      def: noelBefore.def + 3,
+    });
     expect(Number(bystander.attack)).toBe(3);
   });
 
@@ -474,8 +487,8 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     whenPlayCard("first", 0);
     const lib = findOnBoard("first", "Daydream Librarian")!;
     state.players.first.superEvoPoints = 1;
-    onEvolve(lib, "first", "super");
-    expect(lib.hasRush).toBeFalsy();
+    whenSuperEvolve(lib, "first");
+    expect(lib.hasRush).toBe(true);
     expect(bystander.hasRush).toBe(true);
   });
 
@@ -545,8 +558,8 @@ describe("Negative-space — all-other damage/destruction excludes source", () =
     const bystander = allyFollower(3, "Bystander", 2);
     state.players.first.board = [lifestealer, bystander];
     const lsBefore = Number(lifestealer.defense);
-    onEvolve(lifestealer, "first", "normal");
-    expect(Number(lifestealer.defense)).toBe(lsBefore);
+    whenEvolve(lifestealer, "first");
+    expect(Number(lifestealer.defense)).toBe(lsBefore + 2);
     expect(Number(bystander.defense)).toBe(2);
   });
 
@@ -626,8 +639,8 @@ describe("Negative-space — whenever-another enter triggers skip self", () => {
     vuella.peak_defense = vuella.defense;
     state.players.first.board = [vuella];
     const atkBefore = Number(vuella.attack);
-    onEvolve(vuella, "first", "super");
-    expect(Number(vuella.attack)).toBe(atkBefore);
+    whenSuperEvolve(vuella, "first");
+    expect(Number(vuella.attack)).toBe(atkBefore + 3);
   });
 
   it("10724110 Gildaria Attunement — self-enter trigger does not grant Rush to Gildaria", () => {
@@ -773,7 +786,7 @@ describe("Negative-space — additional exclusions", () => {
     whenPlayCard("first", 0);
     const olivia = findOnBoard("first", "Olivia, Heroic Dark Angel")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(olivia, "first", "super");
+    whenSuperEvolve(olivia, "first");
     expect(poolUids()).not.toContain(String(olivia.uid));
     resolvePendingTarget(String(bystander.uid));
     expect(bystander.evoType).toBe("super");

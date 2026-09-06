@@ -13,6 +13,7 @@ import {
   thenHand,
   whenRunEffects,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
 import { bounceToHand } from "../../src/logic/effects/ops/bounce.js";
@@ -32,7 +33,7 @@ import {
   setStatsBuff,
   applyStatBuff,
 } from "../../src/logic/effects/ops/stat/core.js";
-import { onEvolve, resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
+import { resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { isOverflow } from "../../src/helpers/overflow.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
@@ -643,7 +644,7 @@ describe("Rulebook §747 + owner — Super-Evolve effect lines", () => {
     state.players.first.board = [leah];
 
     const handBefore = thenHand("first").length;
-    onEvolve(leah, "first", "super");
+    whenSuperEvolve(leah, "first");
 
     expect(thenHand("first").length).toBe(handBefore + 1);
   });
@@ -666,7 +667,7 @@ describe("Rulebook §747 + owner — Super-Evolve effect lines", () => {
     state.players.first.board = [card];
 
     const handBefore = thenHand("first").length;
-    onEvolve(card, "first", "super");
+    whenSuperEvolve(card, "first");
 
     expect(thenHand("first").length).toBe(handBefore + 1);
     expect(getBoard(state, "first").some((c) => c.name === "Ghost")).toBe(true);
@@ -682,7 +683,7 @@ describe("Rulebook §747 + owner — Super-Evolve effect lines", () => {
     state.players.first.hp = 10;
 
     expect(resolveEvolveEffects(arriet, "super")).toHaveLength(1);
-    onEvolve(arriet, "first", "super");
+    whenSuperEvolve(arriet, "first");
 
     expect(state.players.first.hp).toBe(14);
   });

@@ -26,9 +26,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
@@ -124,7 +125,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     const demon = createCard("10151120", "board", "first");
     demon.peak_defense = demon.defense;
     state.players.first.board = [demon];
-    onEvolve(demon, "first", "normal");
+    whenEvolve(demon, "first");
     expect(thenBoard("first").filter((c) => c.name === "Bat").length).toBe(2);
   });
 
@@ -165,7 +166,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(getHP(state, "first")).toBe(18);
 
     const demon = findOnBoard("first", "Darkseal Demon")!;
-    onEvolve(demon, "first", "normal");
+    whenEvolve(demon, "first");
     resolveFirstPending();
     expect(e.defense).toBe(2);
   });
@@ -204,7 +205,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(getHP(state, "first")).toBe(17);
 
     const beryl = findOnBoard("first", "Beryl, Nightmare Incarnate")!;
-    onEvolve(beryl, "first", "normal");
+    whenEvolve(beryl, "first");
     expect(getHP(state, "first")).toBe(20);
   });
 
@@ -268,7 +269,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(getShadows(state, "first")).toBe(6);
     const orth = findOnBoard("first", "Orthrus, Hellhound Blader")!;
     enemyFollower(5);
-    onEvolve(orth, "first", "normal");
+    whenEvolve(orth, "first");
     expect(getShadows(state, "first")).toBe(2);
     expect(state.players.second.board[0]!.defense).toBe(1);
   });
@@ -352,7 +353,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(a.defense + b.defense).toBeLessThan(8);
 
     const arag = findOnBoard("first", "Aragavy, Eternal Hunter")!;
-    onEvolve(arag, "first", "normal");
+    whenEvolve(arag, "first");
     expect(getHP(state, "first")).toBe(17);
     expect(getHP(state, "second")).toBe(17);
   });
@@ -377,7 +378,7 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
     enemyFollower(4, "B");
     state.players.first.hp = 20;
     state.players.first.board = [rayvn];
-    onEvolve(rayvn, "first", "normal");
+    whenEvolve(rayvn, "first");
     const enemies = state.players.second.board;
     resolvePendingTarget(String(enemies[0]!.uid));
     resolvePendingTarget(String(enemies[1]!.uid));
@@ -413,8 +414,8 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
     );
     ally.peak_defense = ally.defense;
     state.players.first.board = [vuella, ally];
-    onEvolve(ally, "first", "super");
-    expect(ally.attack).toBe(4);
+    whenSuperEvolve(ally, "first");
+    expect(ally.attack).toBe(7);
     expect(vuella.attack).toBe(4);
   });
 
@@ -529,7 +530,7 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
     const e = enemyFollower(4);
     whenPlayCard("first", 0);
     const sup = findOnBoard("first", "Supplicant of Entwining")!;
-    onEvolve(sup, "first", "normal");
+    whenEvolve(sup, "first");
     expect(e.defense).toBeLessThan(3);
   });
 

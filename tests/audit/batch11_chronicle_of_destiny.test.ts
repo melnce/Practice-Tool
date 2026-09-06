@@ -13,10 +13,11 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { isCantAttackLocked } from "../../src/logic/core/keywords/index.js";
 import {
@@ -117,10 +118,9 @@ describe("Set 10008 — Chronicle of Destiny", () => {
     const hamsa = findOnBoard("first", "Hamsa, Sculpted Divinity")!;
     const atk0 = hamsa.attack!;
     const def0 = hamsa.defense!;
-    onEvolve(hamsa, "first", "normal", { spendPoint: true });
-    // onEvolve runs Evolve: script (+5/+5); evo stat line is applied by UI evolve path
-    expect(hamsa.attack).toBe(atk0 + 5);
-    expect(hamsa.defense).toBe(def0 + 5);
+    whenEvolve(hamsa, "first");
+    expect(hamsa.attack).toBe(atk0 + 7);
+    expect(hamsa.defense).toBe(def0 + 7);
   });
 
   it("Alfied — Fanfare deals 4 to selected enemy", () => {
@@ -144,7 +144,7 @@ describe("Set 10008 — Chronicle of Destiny", () => {
       getBoard(state, "first").filter((c) => c.name === "Fairy"),
     ).toHaveLength(2);
     const citrus = findOnBoard("first", "Citrus, Heretical Hermit")!;
-    onEvolve(citrus, "first", "normal", { spendPoint: true });
+    whenEvolve(citrus, "first");
     expect(
       getBoard(state, "first").filter((c) => c.name === "Fairy"),
     ).toHaveLength(4);
@@ -187,7 +187,7 @@ describe("Set 10008 — Chronicle of Destiny", () => {
     whenPlayCard("first", 0);
     const shaili = findOnBoard("first", "Shaili, Prowling Assassin")!;
     expect(shaili.hasAmbush).toBe(true);
-    onEvolve(shaili, "first", "normal", { spendPoint: true });
+    whenEvolve(shaili, "first");
     resolveFirstPending();
     expect(isCantAttackLocked(foe)).toBe(true);
   });
@@ -235,7 +235,7 @@ describe("Set 10008 — Chronicle of Destiny", () => {
       getHand(state, "first").some((c) => c.name === "Majestic Megalorca"),
     ).toBe(true);
     const spirit = findOnBoard("first", "Spirit of Wadatsumi")!;
-    onEvolve(spirit, "first", "normal", { spendPoint: true });
+    whenEvolve(spirit, "first");
     expect(
       (getCrests(state, "first") || []).some(
         (c) => c.name === "Spirit of Wadatsumi",

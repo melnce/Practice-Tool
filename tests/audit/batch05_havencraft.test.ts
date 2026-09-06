@@ -23,9 +23,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
@@ -106,7 +107,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     expect(amuletInHand).toBeTruthy();
     const priestess = findOnBoard("first", "Angelic Prism Priestess")!;
     const costBefore = Number(amuletInHand!.cost);
-    onEvolve(priestess, "first", "normal");
+    whenEvolve(priestess, "first");
     resolveFirstPending();
     expect(Number(amuletInHand!.cost)).toBe(Math.max(0, costBefore - 1));
   });
@@ -169,7 +170,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     wardAlly.defense = 0;
     cleanupDead();
     expect(sarissa.attack).toBe(3);
-    onEvolve(sarissa, "first", "normal");
+    whenEvolve(sarissa, "first");
     expect(sarissa.hasBarrier || sarissa.keywordState?.hasBarrier).toBe(true);
   });
 
@@ -190,7 +191,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     reno2.peak_defense = reno2.defense;
     state.players.first.board = [reno2];
     state.players.first.superEvoPoints = 1;
-    onEvolve(reno2, "first", "super");
+    whenSuperEvolve(reno2, "first");
     expect(reno2.attacks_per_turn).toBe(2);
   });
 
@@ -202,7 +203,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     const e = enemyFollower(4);
     state.players.first.board = [ron];
     expect(ron.hasAmbush).toBe(true);
-    onEvolve(ron, "first", "normal");
+    whenEvolve(ron, "first");
     resolveFirstPending();
     expect(getBoard(state, "second")).toHaveLength(0);
   });
@@ -274,7 +275,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     whenPlayCard("first", 0);
     expect(getHP(state, "first")).toBe(17);
     const salefa = findOnBoard("first", "Salefa, Guardian of Water")!;
-    onEvolve(salefa, "first", "normal");
+    whenEvolve(salefa, "first");
     expect(state.players.second.board[0]!.defense).toBe(2);
   });
 });
@@ -499,7 +500,7 @@ describe("Batch 5 — Havencraft [10003] Heirs of the Omen", () => {
     resolveFirstPending();
     expect(getBoard(state, "second")).toHaveLength(0);
     const cong = findOnBoard("first", "Congregant of Repose")!;
-    onEvolve(cong, "first", "normal");
+    whenEvolve(cong, "first");
     expect(
       getCrests(state, "first").some((c) => c.name === "Congregant of Repose"),
     ).toBe(true);
@@ -551,7 +552,7 @@ describe("Batch 5 — Havencraft [10004] Skybound Dragons", () => {
     setupTurn(R6, { hand: ["10461120"], pp: 2 });
     whenPlayCard("first", 0);
     const lam2 = findOnBoard("first", "Lamretta, Sisterly Shepherd")!;
-    onEvolve(lam2, "first", "normal");
+    whenEvolve(lam2, "first");
     expect(
       lam2.cantAttack ||
         lam2.keywordState?.cantAttack ||
@@ -597,7 +598,7 @@ describe("Batch 5 — Havencraft [10004] Skybound Dragons", () => {
     const sara2 = createCard("10462110", "board", "first");
     sara2.peak_defense = sara2.defense;
     state.players.first.board = [sara2];
-    onEvolve(sara2, "first", "normal");
+    whenEvolve(sara2, "first");
     resolveFirstPending();
     expect(getBoard(state, "second")).toHaveLength(0);
   });
@@ -615,7 +616,7 @@ describe("Batch 5 — Havencraft [10004] Skybound Dragons", () => {
     const sara = createCard("10462110", "board", "first");
     sara.peak_defense = sara.defense;
     state.players.first.board = [sara];
-    onEvolve(sara, "first", "normal");
+    whenEvolve(sara, "first");
     const pending = state.pendingTargetEffect;
     const poolUids =
       pending?.poolUids ?? pending?.pool?.map((c) => String(c.uid)) ?? [];
@@ -647,7 +648,7 @@ describe("Batch 5 — Havencraft [10004] Skybound Dragons", () => {
     soph2.peak_defense = soph2.defense;
     state.players.first.board = [ally, soph2];
     state.players.first.superEvoPoints = 1;
-    onEvolve(soph2, "first", "super");
+    whenSuperEvolve(soph2, "first");
     expect(ally.hasBarrier || ally.keywordState?.hasBarrier).toBe(true);
   });
 
@@ -663,7 +664,7 @@ describe("Batch 5 — Havencraft [10004] Skybound Dragons", () => {
     engageAmulet("first", amuletIdx);
     expect(getHP(state, "first")).toBe(19);
     enemyFollower(5);
-    onEvolve(tikoh, "first", "normal");
+    whenEvolve(tikoh, "first");
     resolveFirstPending();
     expect(state.players.second.board[0]!.defense).toBe(2);
   });

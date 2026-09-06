@@ -14,6 +14,7 @@ import {
   whenEndTurn,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
@@ -27,7 +28,7 @@ import {
 } from "../../src/core/playerHelpers.js";
 import { getImplementationStatus } from "../../src/data/cardImplementationStatus.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import "../../src/logic/core/effects/index.js";
@@ -157,7 +158,7 @@ describe("Set 10007 — Anathema's Gambit", () => {
     expect(enemy.defense).toBe(4);
 
     const tactician = findOnBoard("first", "Hawkeyed Tactician")!;
-    onEvolve(tactician, "first");
+    whenEvolve(tactician, "first");
     resolveFirstPending();
     expect(enemy.defense).toBe(0);
   });
@@ -175,7 +176,7 @@ describe("Set 10007 — Anathema's Gambit", () => {
     applyKeywordsFromList(ally);
     state.players.first.board.push(ally);
     state.players.first.superEvoCharges = 1;
-    onEvolve(ally, "first", "super");
+    whenSuperEvolve(ally, "first");
     expect(Number(bombardier.cost)).toBe(1);
   });
 
@@ -260,7 +261,7 @@ describe("Set 10007 — Anathema's Gambit", () => {
     enemyFollower(3, 3, "Victim");
     const bones = findOnBoard("first", "Beastmaster Bones")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(bones, "first", "super");
+    whenSuperEvolve(bones, "first");
     const pending = state.pendingTargetEffect;
     expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(
       0,

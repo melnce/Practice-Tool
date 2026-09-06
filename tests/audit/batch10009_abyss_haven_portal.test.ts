@@ -14,9 +14,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getBoard, getHand, getHP } from "../../src/core/playerHelpers.js";
@@ -340,7 +341,7 @@ describe("Set 10009 — Havencraft", () => {
 
     const erralde = findOnBoard("first", "Erralde, Signet Convict")!;
     state.players.first.evoCharges = 2;
-    onEvolve(erralde, "first", "normal");
+    whenEvolve(erralde, "first");
     alliedFollower("Big", 6, 6, 6);
     state.players.first.hp = 19;
     const hpEnemy = getHP(state, "second");
@@ -376,7 +377,7 @@ describe("Set 10009 — Havencraft", () => {
     whenPlayCard("first", 0);
     const omerio2 = findOnBoard("first", "Omerio, Winged Revenant")!;
     state.players.first.evoCharges = 2;
-    onEvolve(omerio2, "first", "normal");
+    whenEvolve(omerio2, "first");
     expect(getBoard(state, "first").every((c) => c.type !== "Amulet")).toBe(
       true,
     );
@@ -410,7 +411,7 @@ describe("Set 10009 — Portalcraft", () => {
     ).toBe(1);
     const eng = findOnBoard("first", "Twindrone Engineer")!;
     state.players.first.evoCharges = 2;
-    onEvolve(eng, "first", "normal");
+    whenEvolve(eng, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Analyzing Artifact").length,
     ).toBe(2);

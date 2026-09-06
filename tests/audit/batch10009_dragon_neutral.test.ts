@@ -14,9 +14,10 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import {
   getBoard,
@@ -128,7 +129,7 @@ describe("Set 10009 — Neutral", () => {
     const warden = findOnBoard("first", "Warden of Selflessness")!;
     const ppBefore = getPP(state, "first");
     state.players.first.evoCharges = 2;
-    onEvolve(warden, "first", "normal");
+    whenEvolve(warden, "first");
     expect(getPP(state, "first")).toBe(ppBefore + 1);
   });
 
@@ -193,7 +194,7 @@ describe("Set 10009 — Dragoncraft", () => {
 
     const butler = findOnBoard("first", "Dragonfolk Butler")!;
     state.players.first.evoCharges = 2;
-    onEvolve(butler, "first", "normal");
+    whenEvolve(butler, "first");
     resolveFirstPending();
     expect(ally.attack).toBe(5);
     expect(ally.defense).toBe(5);
@@ -246,7 +247,7 @@ describe("Set 10009 — Dragoncraft", () => {
     const norm = findOnBoard("first", "Normagdala, Ravening Revenant")!;
     const handBefore = getHand(state, "first").length;
     state.players.first.evoCharges = 2;
-    onEvolve(norm, "first", "normal");
+    whenEvolve(norm, "first");
     expect(getHand(state, "first").length).toBeGreaterThanOrEqual(handBefore);
   });
 });

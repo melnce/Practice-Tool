@@ -18,8 +18,9 @@ import {
   findOnBoard,
   whenEndTurn,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getCrests, getPP, getHP } from "../../src/core/playerHelpers.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -124,7 +125,7 @@ describe("Batch 9 — Neutral [10001] Legends Rise", () => {
     whenPlayCard("first", 0);
     const apollo = findOnBoard("first", "Apollo, Heaven's Envoy")!;
     state.players.first.evoCharges = 2;
-    onEvolve(apollo, "first", "normal");
+    whenEvolve(apollo, "first");
     expect(state.players.second.board[0]!.defense).toBe(2);
   });
 
@@ -148,7 +149,7 @@ describe("Batch 9 — Neutral [10001] Legends Rise", () => {
     whenPlayCard("first", 0);
     const ph = findOnBoard("first", "Phildau, Lionheart Ward")!;
     state.players.first.evoCharges = 2;
-    onEvolve(ph, "first", "normal");
+    whenEvolve(ph, "first");
     resolveFirstPending();
     expect(thenBoard("second").includes(foe)).toBe(false);
   });
@@ -237,7 +238,7 @@ describe("Batch 9 — Neutral [10002] Infinity Evolved", () => {
     whenPlayCard("first", 0);
     const reina = findOnBoard("first", "Reina, Angelic Partner")!;
     state.players.first.evoCharges = 2;
-    onEvolve(reina, "first", "normal");
+    whenEvolve(reina, "first");
     expect(a.hasEvolved).toBe(true);
     expect(b.hasEvolved).toBe(true);
   });

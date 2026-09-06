@@ -11,6 +11,7 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import {
@@ -25,7 +26,7 @@ import {
 } from "../../src/core/playerHelpers.js";
 import { getImplementationStatus } from "../../src/data/cardImplementationStatus.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { endTurnBlue } from "../../src/logic/core/turns.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
 import { countUniqueTribeEnters } from "../../src/logic/core/followerEnterHistory.js";
@@ -130,7 +131,7 @@ describe("Unblock round 2 — tokens / enter-history / spell-played", () => {
       getHand(state, "first").some((c) => c.name === "Ancient Artifact"),
     ).toBe(true);
     const courier = findOnBoard("first", "Cool Courier")!;
-    onEvolve(courier, "first", "normal", { spendPoint: true });
+    whenEvolve(courier, "first");
     expect(
       getHand(state, "first").filter((c) => c.name === "Ancient Artifact")
         .length,

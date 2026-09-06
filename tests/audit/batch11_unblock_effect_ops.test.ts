@@ -10,6 +10,7 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import {
@@ -20,7 +21,7 @@ import {
 } from "../../src/core/playerHelpers.js";
 import { getImplementationStatus } from "../../src/data/cardImplementationStatus.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import {
   bootstrapFaithForPlayer,
@@ -107,7 +108,7 @@ describe("Unblock effect ops — tokens / Faith / base_cost_gte", () => {
 
     const mom = findOnBoard("first", "Motherly Forestdweller")!;
     // "Evolve:" lines require EP-spent evolve (spendPoint: true)
-    onEvolve(mom, "first", "normal", { spendPoint: true });
+    whenEvolve(mom, "first");
     expect(findOnBoard("first", "Springbloom Fairy")).toBeTruthy();
   });
 
@@ -116,7 +117,7 @@ describe("Unblock effect ops — tokens / Faith / base_cost_gte", () => {
     state.players.first.hp = 15;
     whenPlayCard("first", 0);
     const fairy = findOnBoard("first", "Springbloom Fairy")!;
-    onEvolve(fairy, "first", "normal", { spendPoint: false });
+    whenEffectEvolve(fairy, "first", "normal");
     expect(getHP(state, "first")).toBe(16);
   });
 
@@ -190,7 +191,7 @@ describe("Unblock effect ops — tokens / Faith / base_cost_gte", () => {
     const cam = findOnBoard("first", "Camiscilla, Unfeeling Heart")!;
     const hpBefore = getHP(state, "second");
     // "Super-Evolve:" line requires EP-spent super evolve
-    onEvolve(cam, "first", "super", { spendPoint: true });
+    whenSuperEvolve(cam, "first");
     // X = allies with base cost ≥5 (Camiscilla 5 + 2 toys = 3)
     expect(getHP(state, "second")).toBe(hpBefore - 3);
   });
@@ -298,7 +299,7 @@ describe("Faith bootstrap + append_triggers", () => {
       "first",
     );
     state.players.first.board.push(ally);
-    onEvolve(ally, "first", "normal", { spendPoint: false });
+    whenEffectEvolve(ally, "first", "normal");
     expect(crest!.counters?.faith).toBe(1);
   });
 
@@ -360,7 +361,7 @@ describe("Faith bootstrap + append_triggers", () => {
       "first",
     );
     state.players.first.board.push(ally);
-    onEvolve(ally, "first", "normal", { spendPoint: false });
+    whenEffectEvolve(ally, "first", "normal");
     expect(getHP(state, "second")).toBe(hpBefore - 1);
   });
 

@@ -16,9 +16,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { attackLeader } from "../../src/logic/core/combat.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { recordPlayedBaseCost } from "../../src/logic/core/playedBaseCostHistory.js";
 import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
@@ -343,7 +344,7 @@ describe("10943110 Barren-Earth Tyrant", () => {
     whenPlayCard("first", 0);
     const tyrant = findOnBoard("first", "Barren-Earth Tyrant")!;
     state.players.first.evoCharges = 2;
-    onEvolve(tyrant, "first", "normal");
+    whenEvolve(tyrant, "first");
     const marauder = findOnBoard("first", "High-Spirited Marauder");
     expect(marauder).toBeTruthy();
     expect(marauder!.attack).toBe(1);

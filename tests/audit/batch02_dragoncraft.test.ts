@@ -26,9 +26,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
@@ -137,7 +138,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     ).toHaveLength(1);
 
     const nanny = findOnBoard("first", "Little Dragon Nanny")!;
-    onEvolve(nanny, "first", "normal");
+    whenEvolve(nanny, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Fire Drake Whelp"),
     ).toHaveLength(2);
@@ -214,7 +215,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     const zell = createCard("10142130", "board", "first");
     zell.peak_defense = zell.defense;
     state.players.first.board = [ally, zell];
-    onEvolve(zell, "first", "super");
+    whenSuperEvolve(zell, "first");
     resolvePendingTarget(String(ally.uid));
     expect(ally.hasStorm).toBe(true);
   });
@@ -315,7 +316,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     twi.peak_defense = twi.defense;
     state.players.first.board = [twi];
     const before = thenHand("first").length;
-    onEvolve(twi, "first", "super");
+    whenSuperEvolve(twi, "first");
     expect(thenHand("first").length).toBe(before + 3);
   });
 
@@ -359,7 +360,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
       (c) => c.name === "Wise Guardian Dragon",
     )!;
     const baseCost = wise.cost;
-    onEvolve(berserker, "first", "super");
+    whenSuperEvolve(berserker, "first");
     expect(wise.cost).toBe(baseCost - 3);
   });
 
@@ -419,7 +420,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     const ally = createCard("10042110", "board", "first");
     ally.peak_defense = ally.defense;
     state.players.first.board = [ally];
-    onEvolve(ally, "first", "super");
+    whenSuperEvolve(ally, "first");
     expect(ally.evoType).toBe("super");
     const before = thenHand("first").length;
     whenPlayCard("first", 0);
@@ -433,7 +434,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
       thenBoard("first").filter((c) => c.name === "Majestic Megalorca"),
     ).toHaveLength(2);
     const merman = findOnBoard("first", "Seasoned Merman")!;
-    onEvolve(merman, "first", "normal");
+    whenEvolve(merman, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Majestic Megalorca"),
     ).toHaveLength(3);
@@ -471,7 +472,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     const nep = createCard("10243110", "board", "first");
     nep.peak_defense = nep.defense;
     state.players.first.board = [nep];
-    onEvolve(nep, "first", "super");
+    whenSuperEvolve(nep, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Majestic Megalorca"),
     ).toHaveLength(2);
@@ -502,7 +503,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     filene.peak_defense = filene.defense;
     const e = enemyFollower(3);
     state.players.first.board = [filene];
-    onEvolve(filene, "first", "normal");
+    whenEvolve(filene, "first");
     expect(e.defense).toBe(2);
   });
 
@@ -756,7 +757,7 @@ describe("Batch 2 — Dragoncraft [10004] Skybound Dragons", () => {
     mugen.peak_defense = mugen.defense;
     state.players.second.board = [enemyFollower(3, "A"), enemyFollower(3, "B")];
     state.players.first.board = [mugen];
-    onEvolve(mugen, "first", "super");
+    whenSuperEvolve(mugen, "first");
     resolvePendingTarget(String(state.players.second.board[0].uid));
     resolvePendingTarget(
       String(
@@ -806,7 +807,7 @@ describe("Batch 2 — Dragoncraft [10004] Skybound Dragons", () => {
     w.peak_defense = w.defense;
     const e2 = enemyFollower(10);
     state.players.first.board = [w];
-    onEvolve(w, "first", "normal");
+    whenEvolve(w, "first");
     resolvePendingTarget(String(e2.uid));
     expect(e2.defense).toBe(2);
   });

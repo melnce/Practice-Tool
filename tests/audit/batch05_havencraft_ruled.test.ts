@@ -12,11 +12,12 @@ import {
   thenHand,
   thenBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
@@ -151,7 +152,7 @@ describe("B/C — Rodeo discard + amulet summon / super (10164110)", () => {
     high.attack = 8;
     state.players.first.board = [rodeo];
     state.players.first.superEvoPoints = 1;
-    onEvolve(rodeo, "first", "super");
+    whenSuperEvolve(rodeo, "first");
     expect(getBoard(state, "second").some((c) => c.name === "High")).toBe(
       false,
     );
@@ -177,7 +178,7 @@ describe("B/C — Aether deck summon + super Aura (10264110)", () => {
     const aether = findOnBoard("first", "Aether, Empyrean Guardian")!;
     const ally = thenBoard("first").find((c) => c.uid !== aether.uid)!;
     state.players.first.superEvoPoints = 1;
-    onEvolve(aether, "first", "super");
+    whenSuperEvolve(aether, "first");
     expect(ally.defense).toBeGreaterThanOrEqual(ally.peak_defense ?? 0);
     expect(ally.hasAura).toBe(true);
   });
@@ -209,7 +210,7 @@ describe("B/C — Wilbert crest + Holy Cavalier LW (10264120)", () => {
     const wil2 = createCard("10264120", "board", "first");
     wil2.peak_defense = wil2.defense;
     state.players.first.board = [wil2];
-    onEvolve(wil2, "first", "normal");
+    whenEvolve(wil2, "first");
     const crest = getCrests(state, "first").find(
       (c) => c.name === "Wilbert, Desolate Paladin",
     )!;
@@ -359,7 +360,7 @@ describe("B/C — Himeka crest + super set attack 4 (10364110)", () => {
     const foe = enemyFollower(5);
     foe.attack = 7;
     state.players.first.superEvoPoints = 1;
-    onEvolve(himeka, "first", "super");
+    whenSuperEvolve(himeka, "first");
     expect(foe.attack).toBe(4);
   });
 });
@@ -378,7 +379,7 @@ describe("B/C — Marwynn Torrent + crest (10364120)", () => {
       true,
     );
     const mar = findOnBoard("first", "Marwynn, Despair Manifest")!;
-    onEvolve(mar, "first", "normal");
+    whenEvolve(mar, "first");
     expect(
       getCrests(state, "first").some(
         (c) => c.name === "Marwynn, Despair Manifest",
