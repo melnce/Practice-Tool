@@ -263,14 +263,17 @@ export function runEffects(
     if (
       runDepth === 0 &&
       combatDepth === 0 &&
-      !paused &&
-      !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
       !batchTurnBoundary &&
       !(state as any).sotBoundaryDeferDrain
     ) {
       cleanupCountdownZeroAmulets();
-      if (playDepth === 0) {
+      if (
+        playDepth === 0 &&
+        !paused &&
+        !isEffectResolutionPaused() &&
+        !(state as any)._drainingResolutionQueue
+      ) {
         flushDeferredDeathBatch();
         clearResolutionQueue();
       }

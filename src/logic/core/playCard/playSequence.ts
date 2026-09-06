@@ -14,6 +14,7 @@ import {
 import {
   cleanupCountdownZeroAmulets,
   flushDeferredDeathBatch,
+  flushReactiveQueueOnly,
 } from "../cleanup.js";
 import { clearResolutionQueue } from "../triggers/queue.js";
 import { isEffectResolutionPaused } from "../resolutionPause.js";
@@ -78,6 +79,12 @@ function mergeStagedPlayEnterGroups(): void {
     q.unshift(staged[i]!);
   }
   (state as any)._stagedPlayEnterGroups = [];
+}
+
+/** Merge staged play/enter reactions and resolve them before Fanfare runs. */
+export function drainStagedPlayEnterBeforeFanfare(): void {
+  mergeStagedPlayEnterGroups();
+  flushReactiveQueueOnly();
 }
 
 /** Drain the play sequence queue once after Fanfare, Enhance, and post-Fanfare tail. */

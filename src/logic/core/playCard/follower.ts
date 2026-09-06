@@ -29,6 +29,7 @@ import { recomputeAttackFlags } from "../combat.js";
 import { isPlayCostChangedFromPrinted } from "../../../helpers/alternateForm.js";
 import {
   beginPlaySequence,
+  drainStagedPlayEnterBeforeFanfare,
   endPlaySequenceDrain,
   stageFollowerPlayEnterReactions,
 } from "./playSequence.js";
@@ -80,6 +81,7 @@ export function playFollower(
     costChangedOnPlay,
     enteringKeywordSnapshot,
   );
+  drainStagedPlayEnterBeforeFanfare();
 
   if (opts?.enhancedPlay) {
     fireTrigger("enhanced_play", player, { playedCard: card });

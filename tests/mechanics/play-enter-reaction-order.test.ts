@@ -17,6 +17,7 @@ import {
   getBoard,
   getHP,
   getRally,
+  getGraveyard,
   setRally,
 } from "../../src/core/playerHelpers.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
@@ -402,5 +403,109 @@ describe("play/enter reaction queue order", () => {
     expect(
       countNamedEnters(state, "first", "Drache & Aluzard, Burning Blood"),
     ).toBe(1);
+  });
+
+  it("(g) countdown amulet: leaves board with LW queued during paused Fanfare", () => {
+    const prevHeadless = (globalThis as any).HEADLESS;
+    (globalThis as any).HEADLESS = false;
+    clearLogs();
+
+    const enterWatcher = makeEnterUidLogWatcher("PauseEnterWatcher");
+    state.players.first.board = [enterWatcher];
+
+    const countdownAmulet = createCard(
+      {
+        name: "CountdownToken",
+        type: "Amulet",
+        cost: 1,
+        attack: 0,
+        defense: 0,
+        keywords: [
+          { name: "countdown", count: 1 },
+          {
+            name: "LastWords",
+            effects: [{ op: "add_shadows", amount: 1 }],
+          },
+        ],
+      },
+      "board",
+      "first",
+    );
+    applyKeywordsFromList(countdownAmulet);
+    countdownAmulet.countdown = 1;
+    getBoard(state, "first").push(countdownAmulet);
+
+    const enemy = createCard("10001110", "board", "second");
+    enemy.peak_defense = Number(enemy.defense);
+    getBoard(state, "second").push(enemy);
+
+    const advancer = createCard(
+      {
+        name: "CountdownAdvancer",
+        type: "Follower",
+        cost: 3,
+        attack: 2,
+        defense: 2,
+        fanfare: [
+          {
+            op: "countdown",
+            action: "advance",
+            target: "ally:amulet",
+            amount: 1,
+          },
+          {
+            op: "damage",
+            target: "enemy:follower",
+            select: 1,
+            amount: 1,
+          },
+        ],
+      },
+      "hand",
+      "first",
+    );
+    applyKeywordsFromList(advancer);
+    state.players.first.hand = [advancer];
+    state.players.first.pp = 3;
+
+    engineDispatch(state, {
+      type: "PLAY_CARD",
+      player: "first",
+      cardUid: advancer.uid,
+    });
+
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(
+      getBoard(state, "first").some((c) => c?.uid === countdownAmulet.uid),
+    ).toBe(false);
+    expect(
+      getGraveyard(state, "first").some((c) => c?.uid === countdownAmulet.uid),
+    ).toBe(false);
+    expect(getResolutionQueue().some((item) => item.kind === "death_lw")).toBe(
+      true,
+    );
+
+    engineDispatch(state, {
+      type: "CHOOSE_TARGET",
+      player: "first",
+      target: { type: "card", uid: enemy.uid },
+    });
+
+    expect(state.pendingTargetEffect).toBeUndefined();
+    expect(
+      getGraveyard(state, "first").some((c) => c?.uid === countdownAmulet.uid),
+    ).toBe(true);
+    const enterBuffIdx = logIndex(
+      "buff",
+      (e) => e.details?.uid === advancer.uid,
+    );
+    const lwIdx = logIndex(
+      "lastWords",
+      (e) => e.details?.uid === countdownAmulet.uid,
+    );
+    expect(enterBuffIdx).toBeGreaterThanOrEqual(0);
+    expect(lwIdx).toBeGreaterThan(enterBuffIdx);
+
+    (globalThis as any).HEADLESS = prevHeadless;
   });
 });
