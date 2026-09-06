@@ -85,7 +85,7 @@ export function handleRestore(
 // ============================================================================
 
 function handleRestoreLeader(player: Player, amount: number): number {
-  if (amount <= 0) return 0;
+  if (amount < 0) return 0;
   return restoreLeaderHP(player, amount);
 }
 

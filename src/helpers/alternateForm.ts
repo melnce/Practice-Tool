@@ -8,6 +8,7 @@ import type {
   Effect,
   KeywordEntry,
 } from "../core/types/index.js";
+import { getEffectiveCostValue } from "../logic/effects/ops/cost/model.js";
 
 export type AlternateKind = "accelerate" | "crystallize";
 
@@ -71,12 +72,7 @@ export function getAlternateForms(card: CardInstance): AlternateForm[] {
  * Enhance / Accelerate / Crystallize alternate costs are separate.
  */
 export function getEffectivePlayCost(card: CardInstance): number {
-  if (typeof card.effectiveCost === "number") {
-    return Math.max(0, card.effectiveCost);
-  }
-  const base = parseInt(String(card.cost), 10) || 0;
-  const handMod = parseInt(String(card.cost_mod), 10) || 0;
-  return Math.max(0, base + handMod);
+  return getEffectiveCostValue(card);
 }
 
 /** Printed base cost before play-time modifiers (Spellboost sets base_cost). */
@@ -133,8 +129,11 @@ export function applyAlternateFormBaseCost(
       : printedCost;
   (card as any).originalPrintedCost = printedCost;
   (card as any).originalPrintedBaseCost = printedBase;
-  card.cost = alternateCost;
   card.base_cost = alternateCost;
+  // Alternate form cost is fixed — not modified by Spellboost / hand cost_mod.
+  card.cost_acc = 0;
+  card.cost_mod = 0;
+  card.cost = alternateCost;
 }
 
 /**

@@ -19,23 +19,24 @@ import {
 
 /**
  * Restore leader HP by fixed amount, respecting max HP.
- * Fires `leader_restored` trigger if HP actually increases.
+ * Fires `leader_restored` whenever a restore effect resolves on the leader,
+ * including 0 net heal (already at max defense or restore amount 0).
  * @returns actual amount healed
  */
 export function restoreLeaderHP(player: Player, amount: number): number {
-  if (amount <= 0) return 0;
+  if (amount < 0) return 0;
 
   const before = getHP(state, player);
   const maxHP = getMaxHP(state, player);
-  const newHP = Math.max(0, Math.min(maxHP, before + amount));
-  setHP(state, player, newHP);
+  const newHP =
+    amount === 0 ? before : Math.max(0, Math.min(maxHP, before + amount));
+  if (amount > 0) {
+    setHP(state, player, newHP);
+  }
   const healed = newHP - before;
 
-  if (healed > 0) {
-    logEvent("restoreLeader", { player, amount: healed });
-    // Fire trigger so cards/crests can react to leader heal
-    fireTrigger("leader_restored", player, { amount: healed });
-  }
+  logEvent("restoreLeader", { player, amount: healed });
+  fireTrigger("leader_restored", player, { amount: healed });
 
   return healed;
 }

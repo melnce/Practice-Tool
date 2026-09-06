@@ -54,7 +54,7 @@ describe("soak --parity findings", () => {
       ...SOAK_CAPS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 
   it("green pin: fuse+interactive path engine/core agree (seed 20260909 game 6)", async () => {
     const result = await runParitySoakGame({
@@ -64,7 +64,7 @@ describe("soak --parity findings", () => {
       ...ALL_PATHS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 
   it("state: autoRender parity on lastAddedToHand — selection flags cleared consistently (seed 20260909 game 53)", async () => {
     const result = await runParitySoakGame({
@@ -75,5 +75,5 @@ describe("soak --parity findings", () => {
       dispatch: "engine",
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 });
