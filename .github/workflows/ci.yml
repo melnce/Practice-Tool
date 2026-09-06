@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, master]
     types: [opened, synchronize, reopened, ready_for_review]
+  schedule:
+    # Best-effort off-peak UTC; GitHub may delay execution.
+    - cron: "0 4 * * *"
+  workflow_dispatch:
 
 # PR runs share a group per PR number so superseded pushes cancel in-flight work.
 # Push-to-main uses github.run_id so each merge commit keeps its own run (no cross-cancel).
@@ -14,9 +18,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-test-check:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+  changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      engine: ${{ steps.filter.outputs.engine }}
+    steps:
+      - name: Checkout (PR diff only)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect engine-impacting paths
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "engine=true" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            echo "engine=false" >> "$GITHUB_OUTPUT"
+          else
+            git fetch origin "${{ github.base_ref }}"
+            PATTERN='^(src/|cards/|decks/|scripts/|package(-lock)?\.json|\.github/workflows/)'
+            if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -qE "$PATTERN"; then
+              echo "engine=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "engine=false" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+  build-test-check:
+    if: >-
+      (github.event_name != 'schedule' || github.repository == 'melnce/Practice-Tool') &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VITEST_MAX_WORKERS: "2"
 
     steps:
       - name: Checkout code
@@ -28,6 +66,14 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      - name: Cache lint and format
+        uses: actions/cache@v4
+        with:
+          path: .cache/
+          key: lint-format-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            lint-format-${{ hashFiles('package-lock.json') }}-
+
       - name: Install dependencies
         run: npm ci
 
@@ -38,7 +84,13 @@ jobs:
         run: npm run check
 
   soak:
+    needs: changes
+    if: >-
+      (github.event_name != 'schedule' || github.repository == 'melnce/Practice-Tool') &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.changes.outputs.engine == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -71,8 +123,13 @@ jobs:
           retention-days: 14
 
   e2e:
-    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    needs: changes
+    if: >-
+      (github.event_name != 'schedule' || github.repository == 'melnce/Practice-Tool') &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || needs.changes.outputs.engine == 'true')
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout code

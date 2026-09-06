@@ -11,8 +11,8 @@
   "scripts": {
     "clean": "rimraf dist .tsbuildinfo coverage .cache || exit 0",
     "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "lint": "eslint . --cache --cache-location .cache/eslint",
+    "format:check": "prettier . --check --cache --cache-location .cache/prettier",
+    "lint": "eslint . --cache --cache-location .cache/eslint --cache-strategy content",
     "lint:fix": "eslint . --fix --cache --cache-location .cache/eslint",
     "typecheck": "tsc --noEmit",
     "build": "vite build",
