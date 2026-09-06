@@ -152,8 +152,7 @@ export function setRegularPP(
   player: PlayerSlot,
   value: number,
 ): void {
-  const max = getMaxPP(state, player);
-  state.players[player].pp = Math.max(0, Math.min(max, value));
+  state.players[player].pp = Math.max(0, value);
 }
 
 export function setBonusPpOrb(
@@ -212,7 +211,12 @@ export function recoverPP(
   const cur = getPP(state, player);
   const gain = Math.min(amount, Math.max(0, cap - cur));
   if (gain <= 0) return 0;
-  setRegularPP(state, player, getRegularPP(state, player) + gain);
+  const max = getMaxPP(state, player);
+  setRegularPP(
+    state,
+    player,
+    Math.min(max, getRegularPP(state, player) + gain),
+  );
   return gain;
 }
 
