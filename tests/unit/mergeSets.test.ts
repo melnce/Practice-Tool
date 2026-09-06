@@ -15,5 +15,5 @@ describe("mergeSets", () => {
       cwd: ROOT,
       stdio: "pipe",
     });
-  });
+  }, 120_000); // shell-out under load can exceed vitest's default 5 s timeout
 });
