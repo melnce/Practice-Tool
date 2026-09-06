@@ -101,90 +101,84 @@ export function onHistoryEvent(cb: HistoryEventListener): () => void {
 export { INTERNAL_CACHE_KEYS } from "./snapshotEphemeralKeys.js";
 
 /**
- * Keys excluded from snapshots that are provably safe at commit time.
- * Adding to INTERNAL_CACHE_KEYS requires a row here with a one-line structural proof.
+ * Snapshot-dropped keys that must be at default at every commit.
+ * Proof class: set and cleared inside a synchronous try/finally; non-default at
+ * commit means an existing proof stopped being true (gate fires by name).
  */
-export const SNAPSHOT_EPHEMERAL_ALLOWLIST: Readonly<Record<string, string>> = {
-  _triggerCache:
-    "Derived trigger-candidate cache; nulled on restore and rebuilt from zones on next access.",
+export const SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT: Readonly<
+  Record<string, string>
+> = {
   _runEffectsDepth:
     "runEffects finally restores parent depth before returning; top-level pause commits see 0.",
-  deferDeathTriggers:
-    "Combat/resolve doAction restores prevDefer in finally before commit; prevDefer may be true from outer runEffects.",
   sotBoundaryDeferDrain:
-    "Set/cleared inside runStartOfTurnBoundary try/finally only; no commit path in that synchronous window.",
+    "Set/cleared inside runStartOfTurnBoundary try/finally only; non-default at commit means a prompt or pause leaked past the boundary window.",
   turnBoundaryInvokePhase:
-    "Set/cleared in try/finally during end-turn step-6 invoke scan only.",
+    "Set/cleared in try/finally during invoke scan only (step 6, after sotBoundaryDeferDrain cleared).",
   _reactiveCollector:
     "Lives only inside collectReactiveTriggers synchronous collect+enqueue try/finally.",
-  _drainingResolutionQueue:
-    "Re-entrancy guard during drain; assertResolutionQueueClearForCommit skips queue check while true.",
   __resolutionDrainDepth:
     "Dev/test nested-drain counter; 0 outside active drain try/finally.",
-  __uiSelectable:
-    "UI highlight on cards; stripped from snapshots and re-applied by highlightSelectable on render.",
+  triggerChainDepth:
+    "Incremented/decremented synchronously inside fireTrigger; 0 at commit boundary.",
+  targetedOpDispatchActive:
+    "Set/cleared by targeted-op dispatcher try/finally; false at commit.",
 };
 
-const MODULE_EPHEMERAL_DEFAULTS = {
-  triggerChainDepth: 0,
-  targetedOpDispatchActive: false,
-} as const;
+/**
+ * Snapshot-dropped keys allowed to be non-default at commit, with reason.
+ */
+export const SNAPSHOT_EPHEMERAL_MAY_BE_SET: Readonly<Record<string, string>> = {
+  deferDeathTriggers:
+    "Combat/resolve doAction restores prevDefer in finally before commit; prevDefer may be true from outer runEffects.",
+  _drainingResolutionQueue:
+    "Re-entrancy guard during drain; assertResolutionQueueClearForCommit skips queue check while true.",
+  _triggerCache:
+    "Derived trigger-candidate cache; a populated cache is normal between commits.",
+  __uiSelectable:
+    "UI highlight on cards when a prompt is open; stripped from snapshots and re-applied on render.",
+};
 
-function cardHasUiSelectable(c: CardInstance | null | undefined): boolean {
-  return !!(c && (c as any).__uiSelectable);
+/** Combined proof rows (documentation + tests). */
+export const SNAPSHOT_EPHEMERAL_ALLOWLIST: Readonly<Record<string, string>> = {
+  ...SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT,
+  ...SNAPSHOT_EPHEMERAL_MAY_BE_SET,
+};
+
+function isSnapshotEphemeralDefault(value: unknown): boolean {
+  return (
+    value === undefined || value === null || value === false || value === 0
+  );
 }
 
-function liveStateHasUiSelectable(): boolean {
-  const seen = new Set<CardInstance>();
-  const visit = (c: CardInstance | null | undefined): boolean => {
-    if (!c || seen.has(c)) return false;
-    seen.add(c);
-    return cardHasUiSelectable(c);
-  };
-  for (const p of ["first", "second"] as const) {
-    const pl = state.players[p];
-    for (const c of pl.board) if (visit(c)) return true;
-    for (const c of pl.hand) if (visit(c)) return true;
-    for (const c of pl.graveyard ?? []) if (visit(c)) return true;
-  }
-  const pending = state.pendingTargetEffect;
-  if (pending && Array.isArray(pending.pool)) {
-    for (const c of pending.pool) if (visit(c)) return true;
-  }
-  return false;
+function readSnapshotEphemeralValue(key: string): unknown {
+  if (key === "triggerChainDepth") return getTriggerChainDepth();
+  if (key === "targetedOpDispatchActive") return isTargetedOpDispatchActive();
+  return (state as any)[key];
 }
 
-/** Collect non-default snapshot-dropped state at commit time (dev/test gate). */
+/** Collect snapshot-dropped state violations at commit time (dev/test gate). */
 export function collectSnapshotEphemeralViolations(): string[] {
   const violations: string[] = [];
   const s = state as any;
 
+  for (const key of Object.keys(SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT)) {
+    const value = readSnapshotEphemeralValue(key);
+    if (!isSnapshotEphemeralDefault(value)) {
+      violations.push(`${key} (must_be_default)`);
+    }
+  }
+
   for (const key of INTERNAL_CACHE_KEYS) {
-    if (SNAPSHOT_EPHEMERAL_ALLOWLIST[key]) continue;
-    const value = s[key];
-    if (value === undefined || value === null || value === false || value === 0)
+    if (
+      SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT[key] ||
+      SNAPSHOT_EPHEMERAL_MAY_BE_SET[key]
+    ) {
       continue;
-    violations.push(key);
-  }
-
-  if (
-    getTriggerChainDepth() !== MODULE_EPHEMERAL_DEFAULTS.triggerChainDepth &&
-    !SNAPSHOT_EPHEMERAL_ALLOWLIST.triggerChainDepth
-  ) {
-    violations.push("triggerChainDepth");
-  }
-  if (
-    isTargetedOpDispatchActive() &&
-    !SNAPSHOT_EPHEMERAL_ALLOWLIST.targetedOpDispatchActive
-  ) {
-    violations.push("targetedOpDispatchActive");
-  }
-
-  if (
-    liveStateHasUiSelectable() &&
-    !SNAPSHOT_EPHEMERAL_ALLOWLIST.__uiSelectable
-  ) {
-    violations.push("__uiSelectable");
+    }
+    const value = s[key];
+    if (!isSnapshotEphemeralDefault(value)) {
+      violations.push(`${key} (unclassified)`);
+    }
   }
 
   return violations;
@@ -207,7 +201,8 @@ function assertNoDroppedSnapshotStateAtCommit(actionName: string): void {
 
 // --- Internal Cache Keys (excluded from snapshots) ---
 // These are implementation details that should not pollute history.
-// Add new cache keys in snapshotEphemeralKeys.ts and SNAPSHOT_EPHEMERAL_ALLOWLIST.
+// Add new cache keys in snapshotEphemeralKeys.ts and classify in
+// SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT or SNAPSHOT_EPHEMERAL_MAY_BE_SET.
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
 

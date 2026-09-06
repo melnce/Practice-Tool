@@ -15,6 +15,8 @@ import {
   setHistoryEnabled,
   resetHistory,
   SNAPSHOT_EPHEMERAL_ALLOWLIST,
+  SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT,
+  SNAPSHOT_EPHEMERAL_MAY_BE_SET,
   INTERNAL_CACHE_KEYS,
   collectSnapshotEphemeralViolations,
   captureSnapshot,
@@ -36,14 +38,17 @@ describe("INTERNAL_CACHE_KEYS vs KNOWN_ROOT_KEYS", () => {
     }
   });
 
-  it("every INTERNAL_CACHE_KEYS entry has an allow-list proof row", () => {
+  it("every INTERNAL_CACHE_KEYS entry is must_be_default or may_be_set", () => {
     for (const key of INTERNAL_CACHE_KEYS) {
-      expect(SNAPSHOT_EPHEMERAL_ALLOWLIST[key]?.length).toBeGreaterThan(0);
+      const row =
+        SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT[key] ||
+        SNAPSHOT_EPHEMERAL_MAY_BE_SET[key];
+      expect(row?.length).toBeGreaterThan(0);
     }
   });
 });
 
-describe("snapshot ephemeral gate allow-list defaults at commit", () => {
+describe("snapshot ephemeral gate must_be_default at commit", () => {
   beforeEach(() => {
     resetGameState(42);
     setHistoryEnabled(true);
@@ -52,36 +57,31 @@ describe("snapshot ephemeral gate allow-list defaults at commit", () => {
 
   const scalarDefaults: Record<string, unknown> = {
     _runEffectsDepth: 0,
-    deferDeathTriggers: false,
     sotBoundaryDeferDrain: false,
     turnBoundaryInvokePhase: false,
-    _drainingResolutionQueue: false,
     __resolutionDrainDepth: 0,
     triggerChainDepth: 0,
     targetedOpDispatchActive: false,
   };
 
-  for (const key of Object.keys(SNAPSHOT_EPHEMERAL_ALLOWLIST)) {
-    it(`allow-list covers ${key}`, () => {
-      expect(SNAPSHOT_EPHEMERAL_ALLOWLIST[key]?.length).toBeGreaterThan(0);
-      if (key in scalarDefaults) {
-        doAction(
-          "baseline",
-          () => {
-            state.players.first.hp -= 1;
-          },
-          {},
-          { autoRender: false },
+  for (const key of Object.keys(SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT)) {
+    it(`must_be_default: ${key} is default after a normal commit`, () => {
+      doAction(
+        "baseline",
+        () => {
+          state.players.first.hp -= 1;
+        },
+        {},
+        { autoRender: false },
+      );
+      if (key === "triggerChainDepth") {
+        expect(getTriggerChainDepth()).toBe(scalarDefaults[key]);
+      } else if (key === "targetedOpDispatchActive") {
+        expect(isTargetedOpDispatchActive()).toBe(scalarDefaults[key]);
+      } else if (INTERNAL_CACHE_KEYS.has(key)) {
+        expect((state as any)[key] ?? scalarDefaults[key]).toBe(
+          scalarDefaults[key],
         );
-        if (key === "triggerChainDepth") {
-          expect(getTriggerChainDepth()).toBe(scalarDefaults[key]);
-        } else if (key === "targetedOpDispatchActive") {
-          expect(isTargetedOpDispatchActive()).toBe(scalarDefaults[key]);
-        } else if (INTERNAL_CACHE_KEYS.has(key)) {
-          expect((state as any)[key] ?? scalarDefaults[key]).toBe(
-            scalarDefaults[key],
-          );
-        }
       }
     });
   }
@@ -106,21 +106,19 @@ describe("snapshot ephemeral gate enforcement", () => {
     resetHistory();
   });
 
-  it("throws when sotBoundaryDeferDrain is poisoned across commit (sabotage)", () => {
-    const saved = SNAPSHOT_EPHEMERAL_ALLOWLIST.sotBoundaryDeferDrain;
-    delete (SNAPSHOT_EPHEMERAL_ALLOWLIST as Record<string, string>)
-      .sotBoundaryDeferDrain;
-    try {
-      beginAction("poison");
-      (state as any).sotBoundaryDeferDrain = true;
-      expect(() => commitAction({ autoRender: false })).toThrow(
-        /snapshot-dropped ephemeral state: sotBoundaryDeferDrain/,
-      );
-    } finally {
-      (
-        SNAPSHOT_EPHEMERAL_ALLOWLIST as Record<string, string>
-      ).sotBoundaryDeferDrain = saved;
-    }
+  it("throws when sotBoundaryDeferDrain is non-default at commit (must_be_default)", () => {
+    beginAction("poison");
+    (state as any).sotBoundaryDeferDrain = true;
+    expect(() => commitAction({ autoRender: false })).toThrow(
+      /sotBoundaryDeferDrain \(must_be_default\)/,
+    );
+  });
+
+  it("may_be_set keys do not trip the gate when legitimately non-default", () => {
+    beginAction("defer");
+    (state as any).deferDeathTriggers = true;
+    expect(collectSnapshotEphemeralViolations()).toEqual([]);
+    commitAction({ autoRender: false });
   });
 
   it("paused mid-prompt commit with empty picks passes the gate", () => {
