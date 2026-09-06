@@ -8,6 +8,7 @@ import type {
   Effect,
 } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
+import { isEffectResolutionPaused } from "../resolutionPause.js";
 import { pushPlayedHistory, rememberLastPlayedCard } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 
@@ -73,7 +74,7 @@ export function playAmulet(
     playedCard: card,
   });
 
-  if (state.pendingTargetEffect) {
+  if (isEffectResolutionPaused()) {
     return { kind: "paused" };
   }
 

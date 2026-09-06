@@ -57,21 +57,18 @@ describe("soak --all-paths findings", () => {
     expect(result.outcome).toBe("completed");
   });
 
-  it.fails(
-    "history legal-undo: [0].indices CHOOSE_MODE vs END_TURN after mode spell undo",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260909,
-        gameIndex: 0,
-        turnCap: 60,
-        actionCap: 800,
-        historyCheck: true,
-        dispatch: "engine",
-        ...ALL_PATHS,
-      });
-      expect(result.outcome).toBe("completed");
-    },
-  );
+  it("history legal-undo: [0].indices CHOOSE_MODE vs END_TURN after mode spell undo", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 0,
+      turnCap: 60,
+      actionCap: 800,
+      historyCheck: true,
+      dispatch: "engine",
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  });
 
   it.fails(
     "history legal-undo: [0].attackerUid missing ATTACK after undo",
@@ -89,19 +86,27 @@ describe("soak --all-paths findings", () => {
     },
   );
 
-  it.fails(
-    "crash: commitAction Play Card with in-flight resolution queue",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260909,
-        gameIndex: 20,
-        turnCap: 60,
-        actionCap: 800,
-        historyCheck: true,
-        dispatch: "engine",
-        ...ALL_PATHS,
-      });
-      expect(result.outcome).toBe("completed");
-    },
-  );
+  it("crash: commitAction Play Card with in-flight resolution queue", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 20,
+      turnCap: 60,
+      actionCap: 800,
+      historyCheck: true,
+      dispatch: "engine",
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  });
+
+  it("crash: deferred-death/damage batch stack overflow (flushDeferredDeathBatch cycle)", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 54,
+      turnCap: 60,
+      actionCap: 800,
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  });
 });

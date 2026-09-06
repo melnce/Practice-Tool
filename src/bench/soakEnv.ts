@@ -42,6 +42,7 @@ import { getEffectiveCost } from "../logic/core/playCard/cost.js";
 import { canEvolve } from "../logic/evolveUtils.js";
 import { canToggleSecondPlayerBonusPp } from "../core/bonusPp.js";
 import { canFuse } from "../logic/core/fuseFromHand.js";
+import { applyPendingModePickIndex } from "../logic/effects/ops/mode.js";
 import {
   getBoard,
   getHand,
@@ -306,8 +307,16 @@ export function getLegalSoakActions(): SoakAction[] {
   }
 
   // Mode choice modal: only CHOOSE_MODE until resolved
-  if (pendingModeChoice) {
-    const { owner, optionCount } = pendingModeChoice;
+  const modePending =
+    pendingModeChoice ??
+    (s.pendingModeChoice
+      ? {
+          owner: s.pendingModeChoice.owner,
+          optionCount: s.pendingModeChoice.optionCount,
+        }
+      : null);
+  if (modePending) {
+    const { owner, optionCount } = modePending;
     for (let i = 0; i < optionCount; i++) {
       actions.push({ type: "CHOOSE_MODE", player: owner, indices: [i] });
     }
@@ -790,6 +799,8 @@ function dispatchSoakHistory(
   type: "UNDO" | "REDO",
   dispatchPath: SoakDispatchPath,
 ): void {
+  // Modal callbacks are not in history snapshots; re-sync from state after undo/redo.
+  pendingModeChoice = null;
   dispatchSoakPlayerAction({ type }, dispatchPath);
 }
 
@@ -1423,13 +1434,21 @@ function applySoakAction(
     forceCompleteOrFizzlePendingTarget();
     return;
   }
-  if (action.type === "CHOOSE_MODE" && pendingModeChoice) {
-    const pick = pendingModeChoice;
-    pendingModeChoice = null;
-    for (const idx of action.indices) {
-      pick.pickCallback(idx);
+  if (action.type === "CHOOSE_MODE") {
+    if (pendingModeChoice) {
+      const pick = pendingModeChoice;
+      pendingModeChoice = null;
+      for (const idx of action.indices) {
+        pick.pickCallback(idx);
+      }
+      return;
     }
-    return;
+    if (state.pendingModeChoice) {
+      for (const idx of action.indices) {
+        applyPendingModePickIndex(idx);
+      }
+      return;
+    }
   }
   dispatchSoakPlayerAction(action as PlayerAction, dispatchPath);
 }

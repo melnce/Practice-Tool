@@ -24,6 +24,7 @@ import { clearResolutionQueue } from "../triggers/queue.js";
 import { flushDeferredDeckShuffle } from "../../effects/ops/returnHandToDeck.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
 import { haltEffectsIfGameOver, isGameOver } from "../../../core/gameOver.js";
+import { isEffectResolutionPaused } from "../resolutionPause.js";
 
 // Registry
 import type { EffectCtx } from "./registry.js";
@@ -245,7 +246,7 @@ export function runEffects(
     if (
       runDepth === 0 &&
       !paused &&
-      !state.pendingTargetEffect &&
+      !isEffectResolutionPaused() &&
       !isGameOver()
     ) {
       flushDeferredDeckShuffle();
@@ -258,7 +259,7 @@ export function runEffects(
     if (
       runDepth === 0 &&
       !paused &&
-      !state.pendingTargetEffect &&
+      !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
       !batchTurnBoundary
     ) {

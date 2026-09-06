@@ -10,6 +10,7 @@ import { hashGameState } from "./stateHash.js";
 import type { CardInstance } from "./types/index.js";
 import { isDev, readEnv } from "./env.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
+import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -93,6 +94,7 @@ export const INTERNAL_CACHE_KEYS = new Set([
   "deferDeathTriggers", // Transient runEffects flag — must not survive undo/redo
   "_reactiveCollector", // Ephemeral during reactive trigger collection
   "_drainingResolutionQueue", // Re-entrancy guard during unified queue drain
+  "__resolutionDrainDepth", // Dev/test nested drain depth counter
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
@@ -105,6 +107,11 @@ function sanitizePendingTargetInSnapshot(snap: GameState): void {
   pending.targetUids = [];
   if (Array.isArray(pending.targets)) {
     pending.targets = [];
+  }
+
+  const modePending = snap.pendingModeChoice;
+  if (modePending) {
+    modePending.partialPickedIndices = [];
   }
 
   const seen = new Set<CardInstance>();
@@ -371,7 +378,7 @@ function assertResolutionQueueClearForCommit(actionName: string): void {
   const draining = !!(state as any)._drainingResolutionQueue;
   if (draining) return;
   if (queueLen === 0) return;
-  if (state.pendingTargetEffect) return;
+  if (isEffectResolutionPaused()) return;
 
   const msg =
     `[History] commitAction("${actionName}") with in-flight resolution queue ` +

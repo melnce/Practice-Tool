@@ -13,8 +13,94 @@ import type { Effect, Player } from "../../../core/types/index.js";
 import { getModeBonus } from "../../../core/playerHelpers.js";
 import { consumePlayFollowerResume } from "../../core/playCard/followerResume.js";
 import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
+import {
+  clearPendingModeChoice,
+  setPendingModeChoice,
+} from "../../core/resolutionPause.js";
 import { evaluateCondition } from "../gates/conditions.js";
+import { resolveUid } from "../../../core/uidResolver.js";
 import type { UnifiedGateSpec } from "../gates/types.js";
+
+function commitConfirmedModePicks(
+  owner: Player,
+  sourceCard: any,
+  picked: any[],
+  paidByOpt: Map<any, boolean>,
+  resumeEffects: Effect[],
+  scriptIndices: number[],
+): void {
+  recordScriptedModePicks(owner, scriptIndices);
+
+  doAction(
+    "Confirm Choice",
+    () => {
+      clearPendingModeChoice();
+      logEvent("chooseFinalize", { owner, picked: picked.length });
+      fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
+
+      const combined: Effect[] = [];
+      for (const opt of picked) {
+        const fizzled =
+          opt?.requires?.earth_rite && paidByOpt.get(opt) === false;
+        if (fizzled) continue;
+        if (Array.isArray(opt.effects) && opt.effects.length)
+          combined.push(...opt.effects);
+      }
+
+      if (combined.length) {
+        runEffects([...combined], owner, sourceCard);
+      }
+
+      if (resumeEffects.length) {
+        runEffects([...resumeEffects], owner, sourceCard);
+      }
+
+      consumePlayFollowerResume();
+      resumeDeferredDeathIfIdle();
+    },
+    { owner, picks: picked.map((p) => p?.label || p?.name || "(opt)") },
+    { autoRender: true },
+  );
+}
+
+/** History-safe mode pick (redo / engine CHOOSE_MODE without modal callback). */
+export function applyPendingModePickIndex(index: number): void {
+  const pending = state.pendingModeChoice;
+  if (!pending?.options?.length) return;
+
+  const partial = [...(pending.partialPickedIndices ?? []), index];
+  if (partial.length < pending.selectCount) {
+    pending.partialPickedIndices = partial;
+    return;
+  }
+
+  const owner = pending.owner;
+  const sourceCard = pending.sourceCardUid
+    ? resolveUid(pending.sourceCardUid)
+    : null;
+  const picked: any[] = [];
+  const paidByOpt = new Map<any, boolean>();
+  for (const idx of partial) {
+    const selected = pending.options[idx];
+    if (!selected) continue;
+    let paid = true;
+    if (selected.requires?.earth_rite) {
+      const need = parseInt(String(selected.requires.earth_rite), 10) || 1;
+      paid = consumeEarthSigils(owner, need);
+    }
+    picked.push(selected);
+    paidByOpt.set(selected, paid);
+  }
+
+  commitConfirmedModePicks(
+    owner,
+    sourceCard,
+    picked,
+    paidByOpt,
+    pending.resumeEffects ?? [],
+    [...partial],
+  );
+}
 
 // Import types if needed, or define locally if specific to mode
 // ChooseEffect?
@@ -333,40 +419,13 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   const paidByOpt = new Map();
 
   const finalize = () => {
-    // Record indices relative to the original available pool for scripts.
-    const indices = picked.map((p) => available.indexOf(p));
-    recordScriptedModePicks(owner, indices);
-
-    // One undo step for the whole choice confirmation
-    doAction(
-      "Confirm Choice",
-      () => {
-        logEvent("chooseFinalize", { owner, picked: picked.length });
-        fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
-
-        // Flatten effects of all picked options in pick order
-        const combined: Effect[] = [];
-        for (const opt of picked) {
-          const fizzled =
-            opt?.requires?.earth_rite && paidByOpt.get(opt) === false;
-          if (fizzled) continue; // nothing happens
-          if (Array.isArray(opt.effects) && opt.effects.length)
-            combined.push(...opt.effects);
-        }
-
-        if (combined.length) {
-          runEffects([...combined], owner, sourceCard);
-        }
-
-        if (effectsQueue && effectsQueue.length) {
-          runEffects([...effectsQueue], owner, sourceCard);
-        }
-
-        consumePlayFollowerResume();
-        resumeDeferredDeathIfIdle();
-      },
-      { owner, picks: picked.map((p) => p?.label || p?.name || "(opt)") },
-      { autoRender: true },
+    commitConfirmedModePicks(
+      owner,
+      sourceCard,
+      picked,
+      paidByOpt,
+      effectsQueue ? [...effectsQueue] : [],
+      picked.map((p) => available.indexOf(p)),
     );
   };
 
@@ -417,6 +476,14 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
   };
 
   // Start first round
+  setPendingModeChoice({
+    owner,
+    optionCount: available.length,
+    selectCount,
+    options: structuredClone(available),
+    ...(sourceCard?.uid ? { sourceCardUid: sourceCard.uid } : {}),
+    resumeEffects: effectsQueue ? [...effectsQueue] : [],
+  });
   pickOnce(available);
   return "pending"; // Return pending to pause effect chain while modal is shown
 }

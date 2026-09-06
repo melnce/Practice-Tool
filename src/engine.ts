@@ -116,6 +116,7 @@ import {
 } from "./logic/core/mulliganCore.js";
 import { fuseFromHand } from "./logic/core/fuseFromHand.js";
 import { setScriptedModePickProvider } from "./logic/script/modeHook.js";
+import { applyPendingModePickIndex } from "./logic/effects/ops/mode.js";
 
 /**
  * Dispatch a centralized action to mutate state.
@@ -255,6 +256,12 @@ function _dispatchInternal(
     }
     case "CHOOSE_MODE": {
       const indices = action.indices.slice();
+      if (currentState.pendingModeChoice) {
+        for (const idx of indices) {
+          applyPendingModePickIndex(idx);
+        }
+        break;
+      }
       let consumed = false;
       setScriptedModePickProvider((req) => {
         if (req.owner !== action.player) return null;

@@ -35,6 +35,7 @@ import {
   getScriptedModePicks,
   setScriptedModePickProvider,
 } from "../script/modeHook.js";
+import { applyPendingModePickIndex } from "../effects/ops/mode.js";
 
 /**
  * Dependencies that can be injected for testing/replay.
@@ -158,14 +159,13 @@ function dispatchInternal(
       break;
     }
     case "CHOOSE_MODE": {
-      // Mode effects pause for a modal. Scripted playback pre-loads indices via
-      // the modeHook provider; dispatching CHOOSE_MODE installs those picks so
-      // the *next* mode effect (or an already-queued one) consumes them.
-      // For headless scripts that emit CHOOSE_MODE as a standalone step before
-      // the play that needs it, we stash indices for the provider.
-      const prev = getScriptedModePicks;
-      void prev;
       const indices = action.indices.slice();
+      if (currentState.pendingModeChoice) {
+        for (const idx of indices) {
+          applyPendingModePickIndex(idx);
+        }
+        break;
+      }
       let consumed = false;
       setScriptedModePickProvider((req) => {
         if (req.owner !== action.player) return null;

@@ -25,6 +25,7 @@ import {
   cleanupDead,
   flushDeferredDeathBatch,
 } from "./cleanup.js";
+import { isEffectResolutionPaused } from "./resolutionPause.js";
 import { clearResolutionQueue, getResolutionQueue } from "./triggers/queue.js";
 import { flushDeferredDeckShuffle } from "../effects/ops/returnHandToDeck.js";
 import { flushDeferredOnFuse } from "../effects/ops/fuse/types.js";
@@ -107,7 +108,7 @@ function orchestrateExecution(opCtx: TargetedOpContext) {
 /** Drain reactive/death queue raised during a targeted-op handler before history commit. */
 function settleTargetedOpResolutionQueue(): void {
   for (let round = 0; round < 32; round++) {
-    if (state.pendingTargetEffect) return;
+    if (isEffectResolutionPaused()) return;
     if ((state as any)._drainingResolutionQueue) return;
 
     cleanupDead();
@@ -115,7 +116,7 @@ function settleTargetedOpResolutionQueue(): void {
 
     const lenBefore = getResolutionQueue().length;
     flushDeferredDeathBatch();
-    if (state.pendingTargetEffect) return;
+    if (isEffectResolutionPaused()) return;
     if (getResolutionQueue().length === 0) {
       clearResolutionQueue();
       return;
