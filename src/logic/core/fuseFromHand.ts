@@ -74,10 +74,13 @@ function hasRecipePartners(owner: Player, initiator: CardInstance): boolean {
     );
   }
   if (initiator.name === "Ominous Artifact α") {
+    const needsBeta = !initiator.fusedArtifacts?.beta;
+    const needsGamma = !initiator.fusedArtifacts?.gamma;
     return handOf(owner).some(
       (c) =>
         c.uid !== initiator.uid &&
-        (c.name === "Ominous Artifact β" || c.name === "Ominous Artifact γ"),
+        ((c.name === "Ominous Artifact β" && needsBeta) ||
+          (c.name === "Ominous Artifact γ" && needsGamma)),
     );
   }
   const recipes = initiator.fuse_recipes;

@@ -193,9 +193,17 @@ describe("Combat reaction ordering", () => {
     });
 
     const knight = getBoard(state, "first").find((c) => c?.name === "Knight");
-    // Rule: defender LW kills the 1/1 before the enter reaction can buff it.
+    // Defender LW kills the 1/1; watcher also dies to the same AoE before enter drains.
     expect(knight).toBeUndefined();
-    expect(watcher.counters?.earth ?? 0).toBe(1);
+    expect(watcher.counters?.earth ?? 0).toBe(0);
+    expect(
+      getLogs().some(
+        (e) =>
+          e.type === "triggerFizzled" &&
+          e.details?.sourceName === "EnterWatcher" &&
+          e.details?.event === "ally_follower_enter",
+      ),
+    ).toBe(true);
 
     const summonIdx = firstIndex("summon");
     const postSummonDamageIdx = getLogs().findIndex(
@@ -205,13 +213,14 @@ describe("Combat reaction ordering", () => {
       (e, i) =>
         i > summonIdx && e.type === "death" && e.details?.card === "Knight",
     );
-    const earthIdx = getLogs().findIndex(
-      (e) => e.type === "counterChange" && e.details?.key === "earth",
+    const fizzledIdx = getLogs().findIndex(
+      (e) =>
+        e.type === "triggerFizzled" && e.details?.sourceName === "EnterWatcher",
     );
     expect(summonIdx).toBeGreaterThanOrEqual(0);
     expect(postSummonDamageIdx).toBeGreaterThan(summonIdx);
     expect(knightDeathIdx).toBeGreaterThan(postSummonDamageIdx);
-    expect(earthIdx).toBeGreaterThan(knightDeathIdx);
+    expect(fizzledIdx).toBeGreaterThan(knightDeathIdx);
     expect(getResolutionQueue()).toHaveLength(0);
     (globalThis as any).HEADLESS = prevHeadless;
   });

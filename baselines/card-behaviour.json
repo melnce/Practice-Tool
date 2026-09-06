@@ -2051,7 +2051,7 @@
       "status": "covered"
     },
     "10154130": {
-      "fingerprint": "1266dbd7",
+      "fingerprint": "6c890923",
       "gatesSatisfied": [],
       "name": "Aragavy, Eternal Hunter",
       "scenarios": [
@@ -2060,7 +2060,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "80b19e78",
+          "fingerprint": "0f1fe343",
           "scenario": "evolve"
         }
       ],
@@ -4671,12 +4671,12 @@
       "status": "covered"
     },
     "10404110": {
-      "fingerprint": "5b3e034f",
+      "fingerprint": "44ed41b4",
       "gatesSatisfied": ["skybound_art"],
       "name": "Sandalphon, Primarch Successor",
       "scenarios": [
         {
-          "fingerprint": "705428ac",
+          "fingerprint": "410ea98e",
           "scenario": "play"
         },
         {
@@ -5855,16 +5855,10 @@
       "unmetGates": ["hand_matches"]
     },
     "10521310": {
-      "fingerprint": "01c65b25",
-      "gatesSatisfied": [],
+      "detail": "Spell requires a Spell card in hand but none are available.",
       "name": "Extravagance of the Goldbloom",
-      "scenarios": [
-        {
-          "fingerprint": "c3ae115c",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10522110": {
       "fingerprint": "7b1acc28",
@@ -6000,16 +5994,10 @@
       "status": "covered"
     },
     "10531310": {
-      "fingerprint": "ce73d4b4",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Metamorphosis of the Dawnblossom",
-      "scenarios": [
-        {
-          "fingerprint": "61c7e8ce",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10532110": {
       "fingerprint": "80d41ad1",
@@ -6580,16 +6568,10 @@
       "status": "covered"
     },
     "10572310": {
-      "fingerprint": "5373c0f7",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Resurrection Tuner",
-      "scenarios": [
-        {
-          "fingerprint": "cbcbfd23",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10573110": {
       "fingerprint": "25ea04cf",
@@ -7198,16 +7180,10 @@
       "status": "covered"
     },
     "10642310": {
-      "fingerprint": "06673a20",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Spilling Red",
-      "scenarios": [
-        {
-          "fingerprint": "0c5428f3",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10643110": {
       "fingerprint": "61f88498",
@@ -9345,16 +9321,16 @@
       "status": "covered"
     },
     "10852120": {
-      "fingerprint": "773f9781",
+      "fingerprint": "302929a8",
       "gatesSatisfied": [],
       "name": "Marsha, Dark Knight",
       "scenarios": [
         {
-          "fingerprint": "3541bf98",
+          "fingerprint": "d959fedc",
           "scenario": "play"
         },
         {
-          "fingerprint": "0e5aa02c",
+          "fingerprint": "2f443614",
           "scenario": "evolve"
         }
       ],
@@ -10267,16 +10243,10 @@
       "status": "covered"
     },
     "10942310": {
-      "fingerprint": "0329a7ec",
-      "gatesSatisfied": [],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Parting Jaws",
-      "scenarios": [
-        {
-          "fingerprint": "c9d4a5d0",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10943110": {
       "fingerprint": "bb1f2428",
@@ -10343,12 +10313,12 @@
       "status": "covered"
     },
     "10951110": {
-      "fingerprint": "c484ca38",
+      "fingerprint": "2cbc7ed7",
       "gatesSatisfied": [],
       "name": "Ruthless Blitzer",
       "scenarios": [
         {
-          "fingerprint": "625c938c",
+          "fingerprint": "4011c504",
           "scenario": "play"
         }
       ],
@@ -10403,28 +10373,28 @@
       "status": "covered"
     },
     "10952310": {
-      "fingerprint": "c93727b0",
+      "fingerprint": "b81d7690",
       "gatesSatisfied": [],
       "name": "Chains of the Past",
       "scenarios": [
         {
-          "fingerprint": "4f751433",
+          "fingerprint": "5021e99b",
           "scenario": "play"
         },
         {
-          "fingerprint": "d35616f0",
+          "fingerprint": "dc5206d0",
           "scenario": "play_base"
         }
       ],
       "status": "covered"
     },
     "10953110": {
-      "fingerprint": "f5a22014",
+      "fingerprint": "b2418680",
       "gatesSatisfied": [],
       "name": "Rampaging Commander",
       "scenarios": [
         {
-          "fingerprint": "5b4db638",
+          "fingerprint": "fe4ccd10",
           "scenario": "play"
         },
         {
@@ -10673,20 +10643,10 @@
       "status": "covered"
     },
     "10972310": {
-      "fingerprint": "2ad0583f",
-      "gatesSatisfied": ["highlander"],
+      "detail": "Spell needs a different hand card to discard.",
       "name": "Disgraceful Banishment",
-      "scenarios": [
-        {
-          "fingerprint": "740ba364",
-          "scenario": "play_else"
-        },
-        {
-          "fingerprint": "0e3be254",
-          "scenario": "play"
-        }
-      ],
-      "status": "covered"
+      "reason": "play_blocked",
+      "status": "skipped"
     },
     "10973110": {
       "fingerprint": "247f5d38",
@@ -11949,13 +11909,13 @@
       "token": true
     }
   },
-  "covered": 857,
+  "covered": 851,
   "partial": 29,
   "seed": 42,
   "skipReasons": {
-    "play_blocked": 18
+    "play_blocked": 24
   },
-  "skipped": 18,
+  "skipped": 24,
   "tokenCount": 93,
   "unmetGateCounts": {
     "ally_matches": 4,

@@ -33,18 +33,19 @@ export function validateTargetSelection(
     const me = pending.owner as Player;
     const opp = opponentOf(me);
     const oppBoard = getBoard(state, opp) || [];
-    const lloyds = oppBoard.filter((c) => c?.name === "Lloyd");
+    const pool = pending.pool || [];
+    // Lloyd forces targeting only when Lloyd itself is a legal target of this
+    // ability (official Q&A: Cleric of Crushing vs unevolved vs super-evolved Lloyd).
+    const lloyds = pool.filter((c: any) => c?.name === "Lloyd");
 
     if (lloyds.length > 0) {
-      // Only care if the current pool includes opponent-side targets
-      // We verify opponent-side status by board membership
       const myBoard = getBoard(state, me) || [];
-      const poolHasOpponent = (pending.pool || []).some(
+      const poolHasOpponent = pool.some(
         (c: any) => !myBoard.includes(c) && oppBoard.includes(c),
       );
 
       if (poolHasOpponent) {
-        const lloydUids = new Set(lloyds.map((l) => l.uid));
+        const lloydUids = new Set(lloyds.map((l: { uid: string }) => l.uid));
         const firstPick =
           !pending.targetUids || pending.targetUids.length === 0;
 

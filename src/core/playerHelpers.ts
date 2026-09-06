@@ -588,10 +588,17 @@ export function isPlayerDefeated(
 
 /** Returns the defeated player slot, or null if the game is ongoing. */
 export function getDefeatedPlayer(state: GameState): PlayerSlot | null {
-  if (state.players.first.defeated || state.players.first.hp <= 0)
-    return "first";
-  if (state.players.second.defeated || state.players.second.hp <= 0)
-    return "second";
+  if (state.phase === "gameover") {
+    if (state.players.first.defeated) return "first";
+    if (state.players.second.defeated) return "second";
+  }
+
+  const firstDown = state.players.first.defeated || state.players.first.hp <= 0;
+  const secondDown =
+    state.players.second.defeated || state.players.second.hp <= 0;
+  if (firstDown && secondDown) return state.activePlayer;
+  if (firstDown) return "first";
+  if (secondDown) return "second";
   return null;
 }
 
