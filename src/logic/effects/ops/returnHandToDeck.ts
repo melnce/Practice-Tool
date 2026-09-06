@@ -7,7 +7,10 @@ import type {
   Player,
   CardInstance,
 } from "../../../core/types/index.js";
-import { setPendingTarget } from "../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../core/pendingTarget/index.js";
 import { highlightSelectable } from "../../core/targeting.js";
 import { getHand, getDeck } from "../../../core/playerHelpers.js";
 import { bumpZoneVersion } from "../../core/triggers/utils.js";
@@ -121,6 +124,14 @@ export function handleReturnHandToDeck(
   // If empty hand:
   if (hand.length === 0) {
     if ((eff as any).optional) {
+      if ((eff as any).select) {
+        reportSelectFizzled({
+          eff,
+          owner,
+          sourceCard: null,
+          target: String((eff as any).target || "ally:hand"),
+        });
+      }
       return "done";
     }
     console.warn("[return_hand_to_deck] no card to return — blocking chain");
@@ -167,7 +178,7 @@ export function handleReturnHandToDeck(
     });
     const resume = effectsQueue ? Array.from(effectsQueue) : [];
     if (effectsQueue) effectsQueue.length = 0;
-    setPendingTarget({
+    const selection = trySetPendingTarget({
       eff,
       owner,
       sourceCard: null,
@@ -176,6 +187,10 @@ export function handleReturnHandToDeck(
       targets: [],
       selectCount,
     });
+    if (selection === "fizzled") {
+      if (effectsQueue) effectsQueue.push(...resume);
+      return "done";
+    }
     highlightSelectable(hand);
     return "pending";
   }

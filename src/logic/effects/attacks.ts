@@ -2,7 +2,10 @@
 import { logEvent } from "../../core/logger.js";
 import { state } from "../../core/gameState.js";
 import { getPool, highlightSelectable } from "../core/targeting.js";
-import { setPendingTarget } from "../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../core/pendingTarget/index.js";
 import { resolveUids } from "../../core/uidResolver.js";
 import type { Effect, CardInstance, Player } from "../../core/types/index.js";
 import {
@@ -137,16 +140,29 @@ export function handleAttacksPerTurn(
         targets.push(copy.splice(idx, 1)[0]!);
       }
     } else if (need > 0) {
-      setPendingTarget({
-        eff,
-        owner,
-        sourceCard,
-        pool,
-        poolUids: pool.map((c) => String(c.uid)),
-        selectCount: need,
-        targets: [],
-        targetUids: [],
-      } as any);
+      if (!pool.length) {
+        reportSelectFizzled({
+          eff,
+          owner,
+          sourceCard,
+          target: String((eff as any).target || ""),
+        });
+        return "done";
+      }
+      if (
+        trySetPendingTarget({
+          eff,
+          owner,
+          sourceCard,
+          pool,
+          poolUids: pool.map((c) => String(c.uid)),
+          selectCount: need,
+          targets: [],
+          targetUids: [],
+        } as any) === "fizzled"
+      ) {
+        return "done";
+      }
       highlightSelectable(pool);
       return "pending";
     } else {

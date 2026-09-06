@@ -1,6 +1,7 @@
 import { state } from "../../core/gameState.js";
 // import { logEvent } from "../../core/logger.js";
 import type { CardInstance, Effect, Player } from "../../core/types/index.js";
+import { reportSelectFizzled } from "./pendingTarget/index.js";
 import { guardLifecycle } from "./targeting/guards.js";
 import {
   getBoard,
@@ -144,8 +145,16 @@ export function handleSelect(
   );
   pool = applyPositionFilter(pool, positionFilterFromEffect(eff));
 
-  // 4. Early exit if no valid targets
-  if (!pool.length) return;
+  // 4. Early exit if no valid targets — fizzle clause; outer queue continues.
+  if (!pool.length) {
+    reportSelectFizzled({
+      eff,
+      owner,
+      sourceCard,
+      target: eff.target,
+    });
+    return;
+  }
 
   // 5. Cap count to available targets
   const effectiveCount = Math.min(requestedCount, pool.length);
