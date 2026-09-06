@@ -387,34 +387,30 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(getHP(state, "first")).toBe(19);
   }, 60_000);
 
-  it.fails(
-    "10112130 Baby Carbuncle — Super-Evolve recovers 3 PP after bonus PP spend (official Q&A)",
-    () => {
-      givenGameState({
-        seed: 42,
-        activePlayer: "second",
-        roundCount: 9,
-      })
-        .withSecondPP(9, 9)
-        .withSecondHand([SERAPHIC_TIDINGS])
-        .withSecondBoard([BABY_CARBUNCLE])
-        .build();
-      state.gameStarted = true;
-      state.phase = "main";
-      state.players.second.superEvoPoints = 1;
-      state.players.second.superEvoCharges = 1;
-      const carb = findOnBoard("second", "Baby Carbuncle")!;
-      carb.peak_defense = carb.defense;
-      applyKeywordsFromList(carb);
-      toggleSecondPlayerBonusPp();
-      expect(getPP(state, "second")).toBe(10);
-      whenPlayCard("second", 0);
-      expect(getPP(state, "second")).toBe(7);
-      evolveFollower(carb, "second", "super");
-      expect(getPP(state, "second")).toBe(10);
-    },
-    60_000,
-  );
+  it("10112130 Baby Carbuncle — Super-Evolve recovers 3 PP after bonus PP spend (official Q&A)", () => {
+    givenGameState({
+      seed: 42,
+      activePlayer: "second",
+      roundCount: 9,
+    })
+      .withSecondPP(9, 9)
+      .withSecondHand([SERAPHIC_TIDINGS])
+      .withSecondBoard([BABY_CARBUNCLE])
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+    state.players.second.superEvoPoints = 1;
+    state.players.second.superEvoCharges = 1;
+    const carb = findOnBoard("second", "Baby Carbuncle")!;
+    carb.peak_defense = carb.defense;
+    applyKeywordsFromList(carb);
+    toggleSecondPlayerBonusPp();
+    expect(getPP(state, "second")).toBe(10);
+    whenPlayCard("second", 0);
+    expect(getPP(state, "second")).toBe(7);
+    evolveFollower(carb, "second", "super");
+    expect(getPP(state, "second")).toBe(10);
+  }, 60_000);
 
   it("10112210 Lambent Cairn — Engage with no allies destroys only the amulet (official Q&A)", () => {
     setupTurn(R6, { hand: [LAMBENT_CAIRN], pp: 2 });

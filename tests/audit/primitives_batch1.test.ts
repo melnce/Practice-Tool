@@ -28,6 +28,7 @@ import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
 import { isOverflow } from "../../src/helpers/overflow.js";
 import { useSecondPlayerPPBoost } from "../../src/logic/boosts.js";
+import { getPP } from "../../src/core/playerHelpers.js";
 import { getBoard, getHP, getHand } from "../../src/core/playerHelpers.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
@@ -380,7 +381,9 @@ describe("Rulebook §769 — Overflow (bonus PP does not count)", () => {
     expect(isOverflow("second")).toBe(false);
 
     useSecondPlayerPPBoost();
-    expect(state.players.second.pp).toBe(7);
+    expect(getPP(state, "second")).toBe(7);
+    expect(state.players.second.pp).toBe(6);
+    expect(state.players.second.bonusPpOrb).toBe(1);
     expect(state.players.second.maxPP).toBe(6);
     expect(isOverflow("second")).toBe(false);
   });
