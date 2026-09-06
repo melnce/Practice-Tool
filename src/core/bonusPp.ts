@@ -10,7 +10,12 @@
 import { state } from "./gameState.js";
 import { logEvent } from "./logger.js";
 import { doAction } from "./history.js";
-import { getPP, setPP, getMaxPP } from "./playerHelpers.js";
+import {
+  getPP,
+  getBonusPpOrb,
+  setBonusPpOrb,
+  getMaxPP,
+} from "./playerHelpers.js";
 
 /**
  * True when the second player may activate Bonus PP, or cancel an unspent one.
@@ -27,7 +32,7 @@ export function canToggleSecondPlayerBonusPp(): boolean {
   if (!state.secondPlayerPPBoostPending) return true;
 
   // Cancel only while the bonus orb remains unspent.
-  return getPP(state, "second") > getMaxPP(state, "second");
+  return getBonusPpOrb(state, "second") > 0;
 }
 
 /**
@@ -48,7 +53,7 @@ export function toggleSecondPlayerBonusPp(): boolean {
       if (alreadyUsed) return;
 
       if (!state.secondPlayerPPBoostPending) {
-        setPP(state, "second", getPP(state, "second") + 1);
+        setBonusPpOrb(state, "second", 1);
         state.secondPlayerPPBoostPending = true;
         logEvent("boost", { owner: "second", action: "activate" });
         mutated = true;
@@ -56,20 +61,18 @@ export function toggleSecondPlayerBonusPp(): boolean {
       }
 
       // Cancel: refund only if the temporary orb is still unspent.
-      const cur = getPP(state, "second");
-      const max = getMaxPP(state, "second");
-      if (cur <= max) {
-        // Spent — cannot undo without driving PP negative / reclaiming spent PP.
+      if (getBonusPpOrb(state, "second") <= 0) {
+        // Spent — cannot undo without reclaiming spent PP.
         logEvent("boost", {
           owner: "second",
           action: "cancel_blocked_spent",
-          pp: cur,
-          maxPP: max,
+          pp: getPP(state, "second"),
+          maxPP: getMaxPP(state, "second"),
         });
         return;
       }
 
-      setPP(state, "second", cur - 1);
+      setBonusPpOrb(state, "second", 0);
       state.secondPlayerPPBoostPending = false;
       logEvent("boost", { owner: "second", action: "cancel" });
       mutated = true;

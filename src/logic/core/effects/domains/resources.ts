@@ -23,16 +23,16 @@ import type {
   EffectContext,
 } from "../../../../core/types/index.js";
 import {
-  isFirstPlayer,
   getPP,
-  setPP,
-  getMaxPP,
   opponentOf,
   addShadows,
   getEvoCharges,
   setEvoCharges,
   getSuperEvoCharges,
   setSuperEvoCharges,
+  spendPP,
+  recoverPP,
+  getPPRecoverCap,
 } from "../../../../core/playerHelpers.js";
 import { resolveEffectAmount } from "../../values.js";
 import { isDev } from "../../../../core/env.js";
@@ -80,7 +80,6 @@ function handlePP(
     }
     case "recover": {
       const cur = getPP(state, targetPlayer);
-      const max = getMaxPP(state, targetPlayer);
 
       let amt: number;
       if ((eff as any).amount_source) {
@@ -92,16 +91,15 @@ function handlePP(
         typeof eff.amount === "string" &&
         eff.amount.toLowerCase() === "currentmaxpp"
       ) {
-        amt = Math.max(0, max - cur);
+        amt = Math.max(0, getPPRecoverCap(state, targetPlayer) - cur);
       } else {
         amt = parseInt(String(eff.amount)) || 0;
       }
 
-      const next = Math.min(max, cur + amt);
-      setPP(state, targetPlayer, next);
+      const gained = recoverPP(state, targetPlayer, amt);
       logEvent("recoverPP", {
         owner: targetPlayer,
-        amount: amt,
+        amount: gained,
       });
       break;
     }
@@ -116,7 +114,7 @@ function handlePP(
         });
         break;
       }
-      setPP(state, targetPlayer, cur - amt);
+      spendPP(state, targetPlayer, amt);
       logEvent("spendPP", { owner: targetPlayer, amount: amt });
       break;
     }

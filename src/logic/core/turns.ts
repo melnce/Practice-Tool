@@ -24,10 +24,11 @@ import {
   getDeck,
   getEvoCount,
   getPP,
-  setPP,
   getMaxPP,
   setMaxPP,
   getPermPP,
+  setBonusPpOrb,
+  refillPPAtTurnStart,
   setPlaysThisTurn,
   setEvoUsedThisTurn,
   setAnyAllyAttackedThisTurn,
@@ -258,6 +259,8 @@ function _endTurnCore(endingPlayer: Player) {
         if (state.roundCount <= 5) state.secondPlayerPPBoostUsedEarly = true;
         else state.secondPlayerPPBoostUsedLate = true;
         state.secondPlayerPPBoostPending = false;
+        // Unused bonus orb is lost at end of second player's turn.
+        setBonusPpOrb(state, "second", 0);
       }
       state.roundCount++;
     }
@@ -268,7 +271,7 @@ function _endTurnCore(endingPlayer: Player) {
       nextPlayer,
       Math.min(state.roundCount + getPermPP(state, nextPlayer), 10),
     );
-    setPP(state, nextPlayer, getMaxPP(state, nextPlayer));
+    refillPPAtTurnStart(state, nextPlayer);
 
     // Reset evolution usage flag for ending player
     setEvoUsedThisTurn(state, endingPlayer, false);

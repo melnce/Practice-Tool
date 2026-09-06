@@ -7,8 +7,9 @@ import {
   setHP,
   setMaxHP,
   getPP,
-  setPP,
   getMaxPP,
+  recoverPP,
+  getPPRecoverCap,
   opponentOf,
   getEvoCharges,
   setEvoCharges,
@@ -49,7 +50,7 @@ export function handleRecoverPP(owner: Player, eff: Effect) {
     (eff.player || "self") === "self" ? owner : opponentOf(owner);
 
   const cur = getPP(state, targetPlayer);
-  const max = getMaxPP(state, targetPlayer);
+  const cap = getPPRecoverCap(state, targetPlayer);
 
   // Allow symbolic "full" refills (your card uses "currentMaxPP")
   let amt;
@@ -57,13 +58,12 @@ export function handleRecoverPP(owner: Player, eff: Effect) {
     typeof eff.amount === "string" &&
     eff.amount.toLowerCase() === "currentmaxpp"
   ) {
-    amt = Math.max(0, max - cur);
+    amt = Math.max(0, cap - cur);
   } else {
     amt = parseInt(eff.amount) || 0;
   }
 
-  const next = Math.min(max, cur + amt);
-  setPP(state, targetPlayer, next);
+  recoverPP(state, targetPlayer, amt);
 }
 
 /* ---------- NEW: leader barrier state ops ---------- */
@@ -93,7 +93,11 @@ function getLeaderMaxDamageCap(owner: Player): number | null {
 }
 
 /** Centralized leader damage that respects barrier and max HP */
-export function applyLeaderDamage(owner: Player, amount: number) {
+export function applyLeaderDamage(
+  owner: Player,
+  amount: number,
+  opts?: { deferGameOver?: boolean },
+): number {
   amount = amount | 0;
   if (amount < 0) return 0;
   // Match already over — no further leader damage (bible continuous lethal).
@@ -132,7 +136,7 @@ export function applyLeaderDamage(owner: Player, amount: number) {
   const actualDamage = cur - next;
 
   // Continuous lethal check (bible §219): first time a leader reaches 0, match ends.
-  if (next <= 0) {
+  if (next <= 0 && !opts?.deferGameOver) {
     applyGameOverIfNeeded("lethal");
   }
 
@@ -146,6 +150,19 @@ export function applyLeaderDamage(owner: Player, amount: number) {
   }
 
   return actualDamage;
+}
+
+/**
+ * Deal the same damage packet to both leaders before a single game-over check.
+ * Order: enemy leader, then own leader (irrelevant when both reach 0 — active
+ * player loses per official Q&A).
+ */
+export function applyAllLeadersDamage(actingPlayer: Player, amount: number) {
+  if (isGameOver()) return;
+  const enemy = opponentOf(actingPlayer);
+  applyLeaderDamage(enemy, amount, { deferGameOver: true });
+  applyLeaderDamage(actingPlayer, amount, { deferGameOver: true });
+  applyGameOverIfNeeded("lethal");
 }
 
 /* ---------- NEW: effect op for cards ---------- */

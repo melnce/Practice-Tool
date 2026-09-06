@@ -410,12 +410,20 @@ export function removeCrest(owner: Player, crestName: string) {
  * 1. Crest has "Last Words" in its keywords array, OR
  * 2. Crest description contains "Last Words:"
  */
+function isFaithCrest(crest: Crest): boolean {
+  return !!crest.isFaith || String(crest.name).startsWith("Faith: ");
+}
+
 /** Banish every crest on a player (no Last Words — banish, not destroy). */
 export function banishAllCrests(owner: Player) {
   const list = getCrests(owner);
   if (!Array.isArray(list) || list.length === 0) return;
-  logEvent("crestBanishAll", { owner, count: list.length });
+  const kept = list.filter(isFaithCrest);
+  const removed = list.length - kept.length;
+  if (removed === 0) return;
+  logEvent("crestBanishAll", { owner, count: removed });
   list.length = 0;
+  list.push(...kept);
   bumpZoneVersion();
 }
 

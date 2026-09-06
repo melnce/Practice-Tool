@@ -129,6 +129,8 @@ export interface CardInstance extends CardTemplate {
   __lootFuseTurn?: number;
   __lootFuseCount?: number;
   lastFuseRound?: number;
+  /** Ominous Artifact α — which fuse partners have been consumed (persists on instance). */
+  fusedArtifacts?: { beta: boolean; gamma: boolean };
   isFused?: boolean;
 
   // Phase 3: Unified once-per-turn tracking store

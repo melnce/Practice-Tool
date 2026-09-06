@@ -132,14 +132,16 @@ describe("negative-space filters — Artifact hand (≤5 cost)", () => {
 
   it("10172320 Doomwright Resurgence — pool is Artifact followers ≤5 only", () => {
     setupTurn(R6, {
-      hand: ["10172320", "90072110", "90074110", "90071210"],
+      hand: ["10172320", "90072110", "90072110", "90074110", "90071210"],
       pp: 5,
     });
-    const legal = thenHand("first").find((c) => c.id === "90072110")!;
+    const legals = thenHand("first").filter((c) => c.id === "90072110");
     const costly = thenHand("first").find((c) => c.id === "90074110")!;
     const spell = thenHand("first").find((c) => c.id === "90071210")!;
     whenPlayCard("first", 0);
-    expect(poolUids()).toContain(String(legal.uid));
+    for (const legal of legals) {
+      expect(poolUids()).toContain(String(legal.uid));
+    }
     expect(poolUids()).not.toContain(String(costly.uid));
     expect(poolUids()).not.toContain(String(spell.uid));
   });

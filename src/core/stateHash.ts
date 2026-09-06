@@ -37,8 +37,10 @@ function canonicalizeState(state: GameState): object {
     // Resources
     blueHP: state.players.first.hp,
     redHP: state.players.second.hp,
-    bluePP: state.players.first.pp,
-    redPP: state.players.second.pp,
+    bluePP: state.players.first.pp + state.players.first.bonusPpOrb,
+    redPP: state.players.second.pp + state.players.second.bonusPpOrb,
+    blueBonusPpOrb: state.players.first.bonusPpOrb,
+    redBonusPpOrb: state.players.second.bonusPpOrb,
     blueMaxPP: state.players.first.maxPP,
     redMaxPP: state.players.second.maxPP,
     blueShadows: state.players.first.shadows,

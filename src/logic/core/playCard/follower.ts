@@ -25,6 +25,7 @@ import {
 import { playerHasCrestPassive } from "../../effects/crest.js";
 import { enhanceReplacesBase } from "./enhancePlan.js";
 import { recomputeAttackFlags } from "../combat.js";
+import { isPlayCostChangedFromPrinted } from "../../../helpers/alternateForm.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -38,14 +39,8 @@ export function playFollower(
   const tiers = chosenTiers ?? [];
   pushPlayedHistory(player, card);
 
-  // Snapshot cost for triggers
-  const printed = Number.isFinite(card.base_cost)
-    ? Number(card.base_cost)
-    : parseInt(String(card.cost), 10) || 0;
-  const current = parseInt(String(card.cost), 10) || 0;
-  const handMod = parseInt(String(card.cost_mod), 10) || 0;
-  const costChangedOnPlay =
-    handMod !== 0 || (Number.isFinite(card.base_cost) && current !== printed);
+  // Snapshot cost for triggers — net effective vs printed base (Institute of Truth Q&A).
+  const costChangedOnPlay = isPlayCostChangedFromPrinted(card);
 
   card.attack = parseInt(String(card.attack), 10) || 0;
   card.defense = parseInt(String(card.defense), 10) || 0;

@@ -5,8 +5,8 @@
 //
 // Index is stored on sourceCard.counters[key] (0-based). Each call runs the
 // current step's effects, then increments when advance !== false. After the
-// last step the index clamps at steps.length (no wrap) so subsequent calls
-// are no-ops unless the card is destroyed by the final step.
+// last step the index wraps to 0 by default (`wrap: false` clamps at
+// steps.length so subsequent calls are no-ops).
 
 import { runEffects } from "../../core/effects/index.js";
 import { logEvent } from "../../../core/logger.js";
@@ -26,17 +26,22 @@ export function handleSequence(
 
   const key = String(eff.key || "sequence").trim() || "sequence";
   sourceCard.counters = sourceCard.counters || {};
+  const wrap = eff.wrap !== false;
   const raw = Number(sourceCard.counters[key] ?? 0);
-  const index = Number.isFinite(raw) ? Math.max(0, Math.floor(raw)) : 0;
+  let index = Number.isFinite(raw) ? Math.max(0, Math.floor(raw)) : 0;
 
   if (index >= steps.length) {
-    logEvent("sequence_exhausted", {
-      owner,
-      key,
-      card: sourceCard.name,
-      index,
-    });
-    return;
+    if (!wrap) {
+      logEvent("sequence_exhausted", {
+        owner,
+        key,
+        card: sourceCard.name,
+        index,
+      });
+      return;
+    }
+    index = 0;
+    sourceCard.counters[key] = 0;
   }
 
   const step = steps[index];
@@ -59,6 +64,7 @@ export function handleSequence(
   }
 
   if (eff.advance !== false) {
-    sourceCard.counters[key] = index + 1;
+    const next = index + 1;
+    sourceCard.counters[key] = wrap && next >= steps.length ? 0 : next;
   }
 }
