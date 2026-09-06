@@ -128,9 +128,7 @@ describe("position re-apply countdown (World of Games unit)", () => {
     expect(getResolutionQueue().some((item) => item.kind === "death_lw")).toBe(
       true,
     );
-    expect(getBoard(state, "first").some((c) => c.uid === wog.uid)).toBe(
-      false,
-    );
+    expect(getBoard(state, "first").some((c) => c.uid === wog.uid)).toBe(false);
     expect(getGraveyard(state, "first").some((c) => c.uid === wog.uid)).toBe(
       false,
     );
