@@ -1,6 +1,7 @@
 /**
  * Board field cap (5 real cards). Null death placeholders hold a slot until
  * filled or compacted; Last Words summons fill freed slots.
+ * Full-game soak fixture replays need >5s under load; per-test timeout avoids vitest's default 5000ms.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
@@ -178,5 +179,5 @@ describe("board field cap", () => {
       findings.map((f) => f.message).join("; "),
     ).toEqual([]);
     expect(getBoard(state, "first").length).toBeLessThanOrEqual(5);
-  });
+  }, 60_000);
 });

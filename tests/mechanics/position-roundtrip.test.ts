@@ -1,5 +1,6 @@
 /**
  * Position save/load, export/import, checkpoint, and reroll round-trip soak.
+ * Full-game soak replays need >5s under load; describe-level testTimeout avoids vitest's default 5000ms.
  */
 import { describe, it, expect, beforeAll, beforeEach, vi } from "vitest";
 import { initCardDatabaseNode } from "../../src/data/cardLoaderNode.js";

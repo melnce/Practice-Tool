@@ -1,5 +1,6 @@
 /**
  * Reactive trigger queue — rulebook L194/L209 (Stage A/B).
+ * Full-game soak fixture replays need >5s under load; per-test timeout avoids vitest's default 5000ms.
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import "../audit/setup.js";
@@ -304,7 +305,7 @@ describe("Reactive trigger queue", () => {
       fixture.trace as any,
     );
     expect(result.error).toBeUndefined();
-  });
+  }, 60_000);
 
   // The trace was recorded before the mulligan-order change; the second player's
   // swap now draws different cards, so the original Reaper's Due loop is not
@@ -345,7 +346,7 @@ describe("Reactive trigger queue", () => {
         def: 3,
       },
     ]);
-  });
+  }, 60_000);
 
   it("Sephie Fanfare at 4 prior OTS — first summoned 2/2, second 5/5", () => {
     givenGameState({ seed: 48, activePlayer: "first", roundCount: 8 })

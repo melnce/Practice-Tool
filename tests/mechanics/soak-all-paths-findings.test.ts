@@ -1,6 +1,7 @@
 /**
  * Pinned soak findings from --all-paths runs (fuse + interactiveModes opt-in).
  * Each it.fails reproduces one distinct failure signature via runSoakGame.
+ * Full-game soak replays need >5s under load; per-test timeout avoids vitest's default 5000ms.
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { resolve } from "path";
@@ -55,7 +56,7 @@ describe("soak --all-paths findings", () => {
       ...ALL_PATHS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 
   it("fuse_finalize_gear_multi lifecycle guard fixed by PR #257 — seed 20260910 game 113", async () => {
     const result = await runSoakGame({
@@ -66,7 +67,7 @@ describe("soak --all-paths findings", () => {
       ...ALL_PATHS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 
   it("fuse_finalize_fortifier lifecycle guard fixed by PR #257 — seed 20260910 game 147", async () => {
     const result = await runSoakGame({
@@ -77,7 +78,7 @@ describe("soak --all-paths findings", () => {
       ...ALL_PATHS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 
   it("history legal-undo: [0].indices CHOOSE_MODE vs END_TURN after mode spell undo", async () => {
     const result = await runSoakGame({
@@ -90,7 +91,7 @@ describe("soak --all-paths findings", () => {
       ...ALL_PATHS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 
   it.fails(
     "history legal-undo: [0].attackerUid missing ATTACK after undo",
@@ -106,6 +107,7 @@ describe("soak --all-paths findings", () => {
       });
       expect(result.outcome).toBe("completed");
     },
+    60_000,
   );
 
   it("crash: commitAction Play Card with in-flight resolution queue", async () => {
@@ -119,7 +121,7 @@ describe("soak --all-paths findings", () => {
       ...ALL_PATHS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 
   it("crash: deferred-death/damage batch stack overflow (flushDeferredDeathBatch cycle)", async () => {
     const result = await runSoakGame({
@@ -130,5 +132,5 @@ describe("soak --all-paths findings", () => {
       ...ALL_PATHS,
     });
     expect(result.outcome).toBe("completed");
-  });
+  }, 60_000);
 });
