@@ -87,7 +87,7 @@ export function makeChainDecayClone(
   clone.attacks_left = clone.attacks_per_turn;
 
   // Rush/Storm handling
-  if (clone.hasStorm || clone.hasRush) {
+  if (clone.hasStorm || clone.hasRush || clone.hasEvolved) {
     clone.can_attack_followers = true;
   } else {
     clone.can_attack_followers = false;

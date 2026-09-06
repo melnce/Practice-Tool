@@ -117,7 +117,7 @@ export function summonExactCopy(
   clone.attacks_left = clone.attacks_per_turn;
 
   // Combat flags
-  if (clone.hasStorm || clone.hasRush) {
+  if (clone.hasStorm || clone.hasRush || clone.hasEvolved) {
     clone.can_attack_followers = true;
   } else {
     clone.can_attack_followers = false;
