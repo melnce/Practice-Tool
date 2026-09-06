@@ -240,6 +240,22 @@ function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
   return "done";
 }
 
+/** Flush queued reactive triggers only — leaves death_leave/death_lw batches for later. */
+export function flushReactiveQueueOnly(): void {
+  if (isEffectResolutionPaused()) return;
+  if ((state as any)._drainingResolutionQueue) return;
+
+  const q = getResolutionQueue();
+  while (q.length > 0 && q[0]!.kind === "reactive") {
+    if (isGameOver()) return;
+    const item = q[0]!;
+    const status = executeReactiveGroup(item);
+    if (status === "paused") return;
+    q.shift();
+    cleanupDead();
+  }
+}
+
 /** Flush unified resolution queue: reactive triggers + deferred death batches (C4). */
 export function flushDeferredDeathBatch() {
   noteResolutionDrainDepthEntry();

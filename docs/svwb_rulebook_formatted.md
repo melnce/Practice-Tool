@@ -191,7 +191,7 @@ On End Turn, every "at the end of your turn" / "at the end of this turn" effect 
 
 Certain events cause triggered abilities to activate. To stay deterministic, SVWB defines a strict order for resolving simultaneous triggers.
 
-**No stack, but an event queue.** When an event occurs (a follower attacks, a follower is destroyed, the turn ends, etc.), every ability that triggers in response goes into a queue, and the game resolves them one at a time. New events created during resolution (e.g. a Last Words that summons a follower, which itself has an enter-play trigger) add their triggers to the queue after the current item, at the appropriate timing.
+**No stack, but an event queue.** When an event occurs (a follower attacks, a follower is destroyed, the turn ends, etc.), every ability that triggers in response goes into a queue, and the game resolves them one at a time. New triggers raised while another ability is resolving are appended to the **end** of the queue and do not interrupt the ability currently resolving (Japanese effect-processing spec, おんJシャドビヨ部 「シャドバWBの仕様」, confirmed 2026-09-06; see also owner-rulings.md).
 
 **Trigger resolution order by source.** When multiple effects share the same trigger timing, they resolve in this fixed order (active side before reactive side; within a side, hand effects before leader before board):
 

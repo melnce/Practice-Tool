@@ -257,10 +257,11 @@ export function runEffects(
     if (enableDeathDefer || batchTurnBoundary) {
       (state as any).deferDeathTriggers = false;
     }
-    // Drain reactive queue at end of top-level runEffects even during combat
-    // (death deferral stays gated by enableDeathDefer above).
+    // Drain reactive queue at end of top-level runEffects only outside combat.
+    // During combat, attack cores drain at step boundaries instead.
     if (
       runDepth === 0 &&
+      combatDepth === 0 &&
       !paused &&
       !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
