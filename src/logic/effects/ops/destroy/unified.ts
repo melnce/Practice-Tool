@@ -9,6 +9,7 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
+import type { TargetContext } from "../../../core/targeting/index.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 
@@ -123,12 +124,19 @@ export function handleDestroy(
   // isTargetedEffect should only be true when player selects targets (spec.select > 0)
   // AoE/random effects should bypass Ambush protection
   const isSelectBased = spec.select != null && spec.select > 0;
+  const poolContext: TargetContext = {
+    ...ctx,
+    isTargetedEffect: isSelectBased,
+  };
+  if (isSelectBased) {
+    poolContext.selectCount = spec.select ?? 1;
+  }
   const pool = getPool(
     spec.target || "",
     owner,
     ctx.sourceCard,
     poolCondition,
-    { ...ctx, isTargetedEffect: isSelectBased },
+    poolContext,
   ).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
 
   // Apply excludes

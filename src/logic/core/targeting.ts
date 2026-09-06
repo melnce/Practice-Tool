@@ -25,6 +25,10 @@ import {
   pickRandomTargets,
   shouldAutoSelect,
 } from "./targeting/selectHelpers.js";
+import {
+  getForcedFirstPicks,
+  isFirstTargetPick,
+} from "./targeting/forcedPicks.js";
 // Re-export Context for consumers
 export type { TargetContext };
 
@@ -56,8 +60,45 @@ export function getPool(
 }
 
 export function highlightSelectable(cards: CardInstance[]) {
+  const pending = state.pendingTargetEffect;
+  if (pending) {
+    const pickCtx: {
+      pool: CardInstance[];
+      targetUids?: string[];
+      owner?: Player;
+    } = {
+      pool: cards,
+    };
+    if (pending.targetUids) pickCtx.targetUids = pending.targetUids;
+    if (pending.owner) pickCtx.owner = pending.owner as Player;
+    highlightSelectableForPending(pickCtx);
+    return;
+  }
   cards.forEach((c) => (c.__uiSelectable = true));
   // Render removed - UI layer
+}
+
+/** Highlight legal picks for the current pending prompt (Lloyd first-pick aware). */
+export function highlightSelectableForPending(pending: {
+  pool?: CardInstance[];
+  targetUids?: string[];
+  owner?: Player;
+}) {
+  clearSelectableFlags();
+  const pool = pending.pool ?? [];
+  const selected = new Set(pending.targetUids ?? []);
+  const available = pool.filter((c) => c && !selected.has(c.uid));
+  let toHighlight = available;
+  if (isFirstTargetPick(pending)) {
+    const forced = getForcedFirstPicks(pending);
+    if (forced.length > 0) {
+      const forcedSet = new Set(forced);
+      toHighlight = available.filter((c) => forcedSet.has(c.uid));
+    }
+  }
+  toHighlight.forEach((c) => {
+    c.__uiSelectable = true;
+  });
 }
 
 export function clearSelectableFlags() {
@@ -152,7 +193,13 @@ export function handleSelect(
 
   // 6. Auto-selection path (bot or random mode)
   if (shouldAutoSelect(eff.mode)) {
-    const picks = pickRandomTargets(pool, effectiveCount, state.rng);
+    const forcedFirst = getForcedFirstPicks({ pool, owner });
+    const picks = pickRandomTargets(
+      pool,
+      effectiveCount,
+      state.rng,
+      forcedFirst,
+    );
 
     clearSelectableFlags();
     // Populate both object refs (deprecated) and UIDs (preferred)
