@@ -481,6 +481,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
     optionCount: available.length,
     selectCount,
     options: structuredClone(available),
+    unique,
     ...(sourceCard?.uid ? { sourceCardUid: sourceCard.uid } : {}),
     resumeEffects: effectsQueue ? [...effectsQueue] : [],
   });

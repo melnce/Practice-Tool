@@ -53,6 +53,7 @@ import {
 import { checkSoakInvariants } from "./soakInvariants.js";
 import { deckSpecForSeed, type SoakDeckSpec } from "./soakDecks.js";
 import { CoverageTracker } from "./soakCoverage.js";
+import type { PendingModeChoice } from "../logic/core/resolutionPause.js";
 
 export const DEFAULT_TURN_CAP = 60;
 export const DEFAULT_ACTION_CAP = 800;
@@ -82,7 +83,8 @@ export type SoakGameResult = {
     | "invariant"
     | "determinism_mismatch"
     | "history"
-    | "position";
+    | "position"
+    | "parity";
   turns: number;
   actions: number;
   finalHash: string;
@@ -152,9 +154,49 @@ export type PendingSoakModeChoice = {
   owner: Player;
   optionCount: number;
   pickCallback: (index: number) => void;
+  /** Identity of state.pendingModeChoice when the modal callback was registered. */
+  promptIdentity: string;
 };
 
 let pendingModeChoice: PendingSoakModeChoice | null = null;
+
+function modePromptIdentity(pending: PendingModeChoice): string {
+  return JSON.stringify({
+    owner: pending.owner,
+    selectCount: pending.selectCount,
+    optionCount: pending.optionCount,
+    sourceCardUid: pending.sourceCardUid ?? null,
+    partial: pending.partialPickedIndices ?? [],
+  });
+}
+
+/** Drop modal accelerator when state no longer matches (undo/load/replay/partial pick). */
+export function invalidateStaleModeCallback(): void {
+  const sPending = state.pendingModeChoice;
+  if (!sPending) {
+    pendingModeChoice = null;
+    return;
+  }
+  if (
+    pendingModeChoice &&
+    pendingModeChoice.promptIdentity !== modePromptIdentity(sPending)
+  ) {
+    pendingModeChoice = null;
+  }
+}
+
+/** Legal CHOOSE_MODE option indices from state.pendingModeChoice (mode.ts pickOnce semantics). */
+export function legalModeChoiceIndices(pending: PendingModeChoice): number[] {
+  const partial = pending.partialPickedIndices ?? [];
+  if (partial.length >= pending.selectCount) return [];
+  const unique = pending.unique !== false;
+  const indices: number[] = [];
+  for (let i = 0; i < pending.options.length; i++) {
+    if (unique && partial.includes(i)) continue;
+    indices.push(i);
+  }
+  return indices;
+}
 
 /** Per-run soak options (set by runSoakGame; default off matches main soak). */
 let activeSoakRunOptions: { fuse: boolean; interactiveModes: boolean } = {
@@ -170,6 +212,21 @@ export function clearPendingSoakModeChoice(): void {
   pendingModeChoice = null;
 }
 
+/** Mirror runSoakGame / replaySoakTrace setup before a parity core replay. */
+export function prepareSoakReplay(opts: {
+  fuse: boolean;
+  interactiveModes: boolean;
+}): void {
+  activeSoakRunOptions = {
+    fuse: opts.fuse,
+    interactiveModes: opts.interactiveModes,
+  };
+  (globalThis as any).__SVWB_INTERACTIVE_MODES__ = opts.interactiveModes;
+  installSoakAdapter({ interactiveModes: opts.interactiveModes });
+  confirmHook = null;
+  pendingModeChoice = null;
+}
+
 export function installSoakAdapter(opts?: {
   interactiveModes?: boolean;
 }): void {
@@ -178,10 +235,13 @@ export function installSoakAdapter(opts?: {
     ...(interactiveModes
       ? {
           showChoiceModal: (roundPool, cb) => {
+            const sPending = state.pendingModeChoice;
+            if (!sPending) return;
             pendingModeChoice = {
-              owner: state.activePlayer,
+              owner: sPending.owner,
               optionCount: roundPool.length,
               pickCallback: cb,
+              promptIdentity: modePromptIdentity(sPending),
             };
           },
         }
@@ -306,18 +366,12 @@ export function getLegalSoakActions(): SoakAction[] {
     return actions;
   }
 
-  // Mode choice modal: only CHOOSE_MODE until resolved
-  const modePending =
-    pendingModeChoice ??
-    (s.pendingModeChoice
-      ? {
-          owner: s.pendingModeChoice.owner,
-          optionCount: s.pendingModeChoice.optionCount,
-        }
-      : null);
+  // Mode choice modal: only CHOOSE_MODE until resolved (state is sole legality source).
+  invalidateStaleModeCallback();
+  const modePending = s.pendingModeChoice;
   if (modePending) {
-    const { owner, optionCount } = modePending;
-    for (let i = 0; i < optionCount; i++) {
+    const { owner } = modePending;
+    for (const i of legalModeChoiceIndices(modePending)) {
       actions.push({ type: "CHOOSE_MODE", player: owner, indices: [i] });
     }
     return actions;
@@ -634,12 +688,12 @@ export function canonicalJson(value: unknown): string {
   return JSON.stringify(canonicalize(value));
 }
 
-function captureFullSnapshot(): SnapshotPair {
+export function captureFullSnapshot(): SnapshotPair {
   const snap = captureSnapshot();
   return { canon: canonicalJson(snap), snap };
 }
 
-function captureLegalSnapshot(): string {
+export function captureLegalSnapshot(): string {
   // History snapshots strip in-progress target picks (sanitizePendingTargetInSnapshot);
   // legal actions after undo must match that sanitized prompt, not live partial picks.
   const pending = state.pendingTargetEffect;
@@ -1268,6 +1322,7 @@ export function runPositionSaveLoad(
 
   if (!opts?.sabotageSkipLoad) {
     loadPosition(saved.id, { autoRender: false });
+    pendingModeChoice = null;
   }
   const loadedCanon = captureFullSnapshot().canon;
   if (!snapshotsEqual(savedCanon, loadedCanon, ignoreFields)) {
@@ -1311,6 +1366,7 @@ export function runPositionSaveLoad(
   }
 
   loadPosition(saved.id, { autoRender: false });
+  pendingModeChoice = null;
   deletePosition(saved.id);
   return null;
 }
@@ -1339,6 +1395,7 @@ export function runPositionExportImport(
   }
 
   loadPosition(imported.id, { autoRender: false });
+  pendingModeChoice = null;
   const loadedCanon = captureFullSnapshot().canon;
 
   deletePosition(saved.id);
@@ -1435,17 +1492,19 @@ function applySoakAction(
     return;
   }
   if (action.type === "CHOOSE_MODE") {
+    invalidateStaleModeCallback();
+    if (state.pendingModeChoice) {
+      for (const idx of action.indices) {
+        applyPendingModePickIndex(idx);
+      }
+      pendingModeChoice = null;
+      return;
+    }
     if (pendingModeChoice) {
       const pick = pendingModeChoice;
       pendingModeChoice = null;
       for (const idx of action.indices) {
         pick.pickCallback(idx);
-      }
-      return;
-    }
-    if (state.pendingModeChoice) {
-      for (const idx of action.indices) {
-        applyPendingModePickIndex(idx);
       }
       return;
     }
@@ -1480,6 +1539,15 @@ export type RunSoakGameOptions = {
   fuse?: boolean;
   /** When true, resolve mode prompts via modal/CHOOSE_MODE (default false). */
   interactiveModes?: boolean;
+  /** Parity soak: capture legal + state fingerprint after each applied action. */
+  onAfterAction?: (ctx: {
+    actionIndex: number;
+    action: SoakAction;
+    legal: string;
+    stateFp: string;
+  }) => void;
+  /** Top-level fields to ignore in parity state fingerprint (internal). */
+  parityIgnoreFields?: readonly string[];
 };
 
 /**
@@ -1577,6 +1645,9 @@ export async function runSoakGame(
       if (ev.type === "reset") {
         historyRing.length = 0;
       }
+      if (ev.type === "undo" || ev.type === "redo" || ev.type === "reset") {
+        pendingModeChoice = null;
+      }
     });
   }
   try {
@@ -1644,6 +1715,27 @@ export async function runSoakGame(
       }
       actions++;
       actionTypeCounts[action.type] = (actionTypeCounts[action.type] ?? 0) + 1;
+
+      if (opts.onAfterAction) {
+        const parityIgnore =
+          opts.parityIgnoreFields ??
+          (opts.historyCheck || positionCheck
+            ? [...PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS]
+            : []);
+        let stateFp: string;
+        if (parityIgnore.length === 0) {
+          stateFp = safeHash();
+        } else {
+          const afterCanon = captureFullSnapshot().canon;
+          stateFp = maskCanonicalSnapshot(afterCanon, parityIgnore);
+        }
+        opts.onAfterAction({
+          actionIndex: actions,
+          action,
+          legal: captureLegalSnapshot(),
+          stateFp,
+        });
+      }
 
       if (needsCommitTelemetry && beforeSnap) {
         if (historyCommits === 0) {
@@ -1886,11 +1978,7 @@ export async function replaySoakTrace(
 ): Promise<{ hash: string; error?: string }> {
   const fuse = opts?.fuse ?? false;
   const interactiveModes = opts?.interactiveModes ?? false;
-  activeSoakRunOptions = { fuse, interactiveModes };
-  (globalThis as any).__SVWB_INTERACTIVE_MODES__ = interactiveModes;
-  installSoakAdapter({ interactiveModes });
-  confirmHook = null;
-  pendingModeChoice = null;
+  prepareSoakReplay({ fuse, interactiveModes });
   const dispatchPath = opts?.dispatch ?? DEFAULT_SOAK_DISPATCH;
   const deckSpec = deckSpecForSeed(seed, gameIndex);
   try {

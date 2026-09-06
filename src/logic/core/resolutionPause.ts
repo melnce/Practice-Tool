@@ -16,6 +16,8 @@ export type PendingModeChoice = {
   resumeEffects?: Effect[];
   /** Picks accumulated across multi-select rounds (history-safe). */
   partialPickedIndices?: number[];
+  /** When true (default), each option index may be picked at most once. */
+  unique?: boolean;
 };
 
 /** True while an interactive target or mode prompt is waiting for player input. */
