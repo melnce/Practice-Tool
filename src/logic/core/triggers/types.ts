@@ -69,6 +69,46 @@ export type TriggerEventName =
   | "invoke"
   | "select_mode"; // Mode selection (used by Faith crest)
 
+/** Known trigger event names — keep in sync with TriggerEventName. */
+export const TRIGGER_EVENT_NAMES: ReadonlySet<TriggerEventName> = new Set([
+  "start_of_turn",
+  "end_of_turn",
+  "strike",
+  "follower_strike",
+  "leader_strike",
+  "clash",
+  "ally_follower_attacked",
+  "enemy_follower_attacked",
+  "leader_attacked",
+  "leader_damaged",
+  "leader_restored",
+  "ally_follower_enter",
+  "enemy_follower_enter",
+  "ally_follower_played",
+  "ally_follower_leaves_field",
+  "enemy_follower_leaves_field",
+  "ally_ward_destroyed",
+  "enemy_follower_defense_down",
+  "self_damaged",
+  "self_buffed_up",
+  "ally_evolve",
+  "ally_super_evolve",
+  "enemy_super_evolve",
+  "enhanced_play",
+  "ally_spell_played",
+  "ally_card_played",
+  "ally_draw",
+  "when_drawn",
+  "ally_amulet_destroyed",
+  "engage",
+  "on_fuse",
+  "loot_fused",
+  "loot_played",
+  "ally_earth_rite",
+  "invoke",
+  "select_mode",
+]);
+
 // =============================================================================
 // TRIGGER CONTEXT
 // =============================================================================
