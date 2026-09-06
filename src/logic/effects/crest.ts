@@ -77,6 +77,9 @@ export interface Crest {
 
   /** Indices of mode options already activated (Slaus unused pool). */
   usedModeIndices?: number[];
+
+  /** True for Faith leader counters (owner ruling 2026-09-06: not counted as crests). */
+  isFaith?: boolean;
 }
 
 function getCrests(owner: Player) {
@@ -157,6 +160,7 @@ export function handleGainCrest(eff: Effect, owner: Player) {
       : [],
     __onceByTurn: {}, // Initialize tracking store
     insertionTs: allocateInsertionTs(),
+    isFaith: !!(eff as any).is_faith,
   } as Crest;
 
   crests.push(newCrest);

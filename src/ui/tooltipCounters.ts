@@ -2,7 +2,7 @@ import { state } from "../core/gameState.js";
 import type { CardInstance, Player } from "../core/types/index.js";
 import {
   getBoard,
-  getCrests,
+  countCrests,
   getHand,
   getPlaysThisTurn,
   getRally,
@@ -336,7 +336,7 @@ export function resolveCounterValue(
     case "crest_count":
       return {
         kind: "single",
-        value: (getCrests(state, owner) || []).length,
+        value: countCrests(state, owner),
       };
     case "unique_tribe_enters":
       return {
