@@ -478,7 +478,9 @@ TARGETED_OP_HANDLERS.set("destroy", (ctx) => {
     }
   }
   const thenEffects = Array.isArray((eff as any).then) ? (eff as any).then : [];
-  if (destroyed > 0 && thenEffects.length && resumeEffects) {
+  // "If you selected one, destroy it and …" — the then-branch runs on selection,
+  // not on whether the destroy succeeded (official Q&A: Supplicant of Destruction).
+  if (targetUids.length > 0 && thenEffects.length && resumeEffects) {
     for (let i = thenEffects.length - 1; i >= 0; i--) {
       resumeEffects.unshift(thenEffects[i]!);
     }
