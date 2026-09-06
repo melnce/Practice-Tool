@@ -10,7 +10,9 @@ import type { TargetedOpContext } from "./targeting/index.js";
 
 import { applyTargetClick } from "./targeting/index.js";
 import { highlightSelectable } from "./targeting.js";
+import { validateTargetSelection } from "./targeting/validation.js";
 import { resolveUids } from "../../core/uidResolver.js";
+import { discardHandCardFromTargetPick } from "../effects/hand.js";
 import {
   dispatchTargetedOp,
   __getRegisteredTargetedOps,
@@ -35,6 +37,144 @@ import { finishFollowerEnter } from "../effects/ops/summon_ops/core.js";
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
 
+function getRequiredSelectCount(pending: any): number {
+  return typeof pending.selectCount === "number" &&
+    Number.isFinite(pending.selectCount) &&
+    pending.selectCount > 0
+    ? pending.selectCount
+    : 1;
+}
+
+function isMultiPickHandDiscard(pending: any): boolean {
+  if (getRequiredSelectCount(pending) <= 1) return false;
+  const topOp = String((pending as { op?: string }).op ?? "");
+  const effOp = String((pending.eff as { op?: string })?.op ?? "");
+  return (
+    topOp === "discard_select_hand" ||
+    effOp === "discard" ||
+    effOp === "discard_select_hand"
+  );
+}
+
+function applyMultiPickDiscardPick(pending: any, uid: string): void {
+  if (!pending.targetUids) pending.targetUids = [];
+  pending.targetUids.push(uid);
+  const pickNumber = pending.targetUids.length;
+  discardHandCardFromTargetPick(pending.owner, uid, {
+    resetBatch: pickNumber === 1,
+    sourceCard: pending.sourceCard ?? null,
+  });
+}
+
+function completeMultiPickDiscardPending(pending: any): void {
+  const opCtx: TargetedOpContext = {
+    eff: pending.eff,
+    owner: pending.owner,
+    sourceCard: pending.sourceCard,
+    targetUids: [...(pending.targetUids ?? [])],
+    resumeEffects: pending.resumeEffects,
+  };
+
+  flushDeferredOnFuse();
+  const playFollowerResume = (pending.resumePlayFollower ??
+    (state as any).resumePlayFollower) as PlayFollowerResume | undefined;
+  const deferredLwComplete = pending.deferredLwComplete as
+    | { cardUid: string; owner: Player }
+    | undefined;
+
+  delete state.pendingTargetEffect;
+  delete (state as any).resumePlayFollower;
+  clearSelectableFlags();
+  adapter.hideTargetConfirmation();
+
+  cleanupDead();
+  (state as any).deferDeathTriggers = false;
+
+  if (opCtx.resumeEffects?.length) {
+    runEffects(opCtx.resumeEffects, opCtx.owner, opCtx.sourceCard);
+  }
+  flushDeferredDeckShuffle(opCtx.owner);
+
+  if (playFollowerResume) {
+    runPlayFollowerPostFanfare(playFollowerResume);
+  }
+  completeDeferredLwAfterSelection(deferredLwComplete);
+
+  settleTargetedOpResolutionQueue();
+  resumeDeferredDeathIfIdle();
+  settleTargetedOpResolutionQueue();
+
+  adapter.render();
+}
+
+function resolveMultiPickHandDiscardTarget(
+  pending: any,
+  uid: string | "leader",
+) {
+  if (uid === "leader") {
+    console.warn("Cannot discard leader via hand discard prompt.");
+    return;
+  }
+
+  const validation = validateTargetSelection(state, pending, uid);
+  if (!validation.ok) {
+    if (validation.reason) console.warn(validation.reason);
+    return;
+  }
+
+  const requiredCount = getRequiredSelectCount(pending);
+  const currentUids = pending.targetUids ?? [];
+  if (currentUids.includes(uid)) return;
+
+  const pickNumber = currentUids.length + 1;
+  const isComplete = pickNumber >= requiredCount;
+  const op = (pending.eff as { op?: string })?.op;
+
+  if (!isComplete) {
+    doAction(
+      "Pick Target",
+      () => {
+        applyMultiPickDiscardPick(pending, uid);
+        if (pending.pool?.length) {
+          highlightSelectable(pending.pool);
+        } else {
+          clearSelectableFlags();
+        }
+      },
+      {
+        op,
+        owner: pending.owner,
+        source: pending.sourceCard?.name,
+        pick: pickNumber,
+        uid,
+      },
+      { autoRender: true },
+    );
+    return;
+  }
+
+  doAction(
+    "Resolve Targets",
+    () => {
+      (state as any).deferDeathTriggers = true;
+      try {
+        applyMultiPickDiscardPick(pending, uid);
+        completeMultiPickDiscardPending(pending);
+      } finally {
+        (state as any).deferDeathTriggers = false;
+      }
+    },
+    {
+      op,
+      owner: pending.owner,
+      source: pending.sourceCard?.name,
+      pick: pickNumber,
+      uid,
+    },
+    { autoRender: true },
+  );
+}
+
 /**
  * Handles a click on a target (card or leader) when a targeting effect is pending.
  * Orchestrates the Flow: Engine (Logic) -> Dispatcher (Effect) -> Cleanup.
@@ -42,6 +182,11 @@ export { __getRegisteredTargetedOps };
 export function resolvePendingTarget(uid: string | "leader") {
   const pending = state.pendingTargetEffect;
   if (!pending) return;
+
+  if (isMultiPickHandDiscard(pending)) {
+    resolveMultiPickHandDiscardTarget(pending, uid);
+    return;
+  }
 
   // 1. Delegate Logic to Pure Engine
   const result = applyTargetClick(state, pending, uid);
