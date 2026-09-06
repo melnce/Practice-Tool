@@ -698,8 +698,11 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       const sand = getHand(state, "first").find((c) => c.id === SANDALPHON)!;
       sand.skyboundArtEvolvesWitnessed = 15;
       const foe = enemyFollower(2, 10, "Foe");
+      state.players.second.hp = 20;
       whenPlayCard("first", 0);
-      expect(10 - Number(foe.defense)).toBe(10);
+      const followerDmg = 10 - Number(foe.defense);
+      const leaderDmg = 20 - getHP(state, "second");
+      expect(followerDmg + leaderDmg).toBe(10);
     });
   });
 

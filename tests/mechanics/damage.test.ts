@@ -312,6 +312,49 @@ describe("Mechanic Contract: damage", () => {
       // Either both alive (12 - 10 = 2) or one dead (10 - remaining hits)
       expect(totalRemaining).toBeLessThanOrEqual(2);
     });
+
+    it("random_hits with include_leader: dead follower leaves pool before next hit", () => {
+      givenGameState({ seed: 99 })
+        .withSecondBoard([
+          { name: "Fodder", type: "Follower", defense: 1, attack: 1 },
+        ])
+        .withSecondHP(20)
+        .build();
+
+      const effect = {
+        op: "damage" as const,
+        target: "enemy",
+        amount: 2,
+        distribution: "random_hits" as const,
+        count: 5,
+        include_leader: "enemy" as const,
+      };
+      whenRunEffects([effect], "first");
+
+      expect(thenBoard("second").length).toBe(0);
+      expect(thenHP("second")).toBe(12);
+    });
+
+    it("random_hits without include_leader: after lone follower dies, leader untouched", () => {
+      givenGameState({ seed: 1 })
+        .withSecondBoard([
+          { name: "Fodder", type: "Follower", defense: 1, attack: 1 },
+        ])
+        .withSecondHP(20)
+        .build();
+
+      const effect = {
+        op: "damage" as const,
+        target: "enemy",
+        amount: 2,
+        distribution: "random_hits" as const,
+        count: 5,
+      };
+      whenRunEffects([effect], "first");
+
+      expect(thenBoard("second").length).toBe(0);
+      expect(thenHP("second")).toBe(20);
+    });
   });
 
   // ===========================================================================
