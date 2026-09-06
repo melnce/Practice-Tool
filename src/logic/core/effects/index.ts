@@ -255,7 +255,11 @@ export function runEffects(
       flushDeferredDeckShuffle();
     }
     if (enableDeathDefer || batchTurnBoundary) {
-      (state as any).deferDeathTriggers = false;
+      if ((state as any).sotBoundaryDeferDrain) {
+        (state as any).deferDeathTriggers = true;
+      } else {
+        (state as any).deferDeathTriggers = false;
+      }
     }
     // Drain reactive queue at end of top-level runEffects only outside combat.
     // During combat, attack cores drain at step boundaries instead.
@@ -265,7 +269,8 @@ export function runEffects(
       !paused &&
       !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
-      !batchTurnBoundary
+      !batchTurnBoundary &&
+      !(state as any).sotBoundaryDeferDrain
     ) {
       cleanupCountdownZeroAmulets();
       flushDeferredDeathBatch();

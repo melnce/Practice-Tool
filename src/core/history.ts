@@ -93,6 +93,7 @@ export const INTERNAL_CACHE_KEYS = new Set([
   "_triggerCache", // Trigger candidate cache (auto-reinitializes on access)
   "_runEffectsDepth", // Nested runEffects depth counter for deferred flush
   "deferDeathTriggers", // Transient runEffects flag — must not survive undo/redo
+  "sotBoundaryDeferDrain", // SOT steps 2–6 hold step-7 drain open
   "turnBoundaryInvokePhase", // Step-6 invoke scan — queue when-invoked until drain
   "_reactiveCollector", // Ephemeral during reactive trigger collection
   "_drainingResolutionQueue", // Re-entrancy guard during unified queue drain

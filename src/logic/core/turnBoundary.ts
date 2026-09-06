@@ -274,11 +274,6 @@ export function runEndOfTurnBoundary(
   }
 }
 
-function queueCountdownDeathsAfterTick() {
-  (state as any).deferDeathTriggers = true;
-  cleanupDead();
-}
-
 /** Start-of-turn: queue steps 2–5, resolve per step; crest/amulet ticks after steps 2/3. */
 export function runStartOfTurnBoundary(
   startingPlayer: Player,
@@ -296,17 +291,34 @@ export function runStartOfTurnBoundary(
   );
   const steps = [2, 3, 4, 5];
 
-  for (const step of steps) {
-    const batch = queue.filter((q) => q.step === step);
-    if (batch.length > 0) {
-      resolveTurnBoundaryQueue(batch, "start_of_turn", startingPlayer, {
-        deferDrain,
-      });
+  const prevDefer = !!(state as any).deferDeathTriggers;
+  const prevBoundaryDefer = !!(state as any).sotBoundaryDeferDrain;
+  if (deferDrain) {
+    (state as any).deferDeathTriggers = true;
+    (state as any).sotBoundaryDeferDrain = true;
+  }
+
+  try {
+    for (const step of steps) {
+      const batch = queue.filter((q) => q.step === step);
+      if (batch.length > 0) {
+        resolveTurnBoundaryQueue(batch, "start_of_turn", startingPlayer, {
+          deferDrain,
+        });
+      }
+      if (step === 2) {
+        hooks?.tickCrests?.(startingPlayer);
+        if (deferDrain) cleanupDead();
+      }
+      if (step === 3) {
+        hooks?.tickAmulets?.(startingPlayer);
+        if (deferDrain) cleanupDead();
+      }
     }
-    if (step === 2) hooks?.tickCrests?.(startingPlayer);
-    if (step === 3) {
-      hooks?.tickAmulets?.(startingPlayer);
-      if (deferDrain) queueCountdownDeathsAfterTick();
+  } finally {
+    if (deferDrain) {
+      (state as any).sotBoundaryDeferDrain = prevBoundaryDefer;
+      (state as any).deferDeathTriggers = prevDefer;
     }
   }
 }

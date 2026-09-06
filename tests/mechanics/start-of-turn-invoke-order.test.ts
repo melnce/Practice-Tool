@@ -30,6 +30,7 @@ import {
   drainTurnBoundaryQueue,
   runStartOfTurnBoundary,
 } from "../../src/logic/core/turnBoundary.js";
+import { tickCrests } from "../../src/logic/effects/crest.js";
 import type { Player } from "../../src/core/types/index.js";
 
 const SANDALPHON = "10404110";
@@ -422,5 +423,88 @@ describe("start-of-turn Invoke order (engineDispatch)", () => {
 
     expect(thenHand("first").length).toBe(handBefore + 1);
     expect(getLogs().some((e) => e.type === "lastWords")).toBe(true);
+  });
+
+  /**
+   * Rulebook §231 — step-2 crest kill LW must not resolve before step-3 board SOT.
+   * Countdown crest tick after step 2 used to flush the queue early (destroyCrest → runEffects).
+   * Red on main and on pre-fix head; green once deferral is set at boundary start.
+   */
+  it("(g) step-2 crest kill LW waits for step-3 board SOT (countdown tick between steps)", () => {
+    givenGameState({
+      seed: 42,
+      activePlayer: "first",
+      roundCount: 5,
+    })
+      .withFirstDeck(deckFill("D", 10))
+      .withSecondDeck(deckFill("S", 10))
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+
+    const lwVictim = createCard(
+      {
+        name: "LWVictim",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        hasLastWords: true,
+        lastWordsEffects: [
+          { op: "draw", source: "deck", count: 1, tag: "LWDraw" },
+        ],
+      },
+      "board",
+      "first",
+    );
+    lwVictim.insertionTs = 1;
+    state.players.first.board = [lwVictim];
+    grantSotCrest(
+      "first",
+      "CrestKill",
+      [{ op: "destroy", target: "ally:follower", tag: "CrestKill" }],
+      1,
+    );
+    // Countdown-1 crest with Last Words: tickCrests after step 2 destroys it and
+    // (without boundary defer) runEffects flush used to drain step-2 follower LW early.
+    state.players.first.crests.push({
+      name: "CountdownCrest",
+      owner: "first",
+      insertionTs: 0,
+      countdown: 1,
+      keywords: ["LastWords"],
+      effects: [
+        { op: "damage", target: "enemy:leader", amount: 0, tag: "CrestTick" },
+      ],
+    } as any);
+    state.players.first.board.push(
+      sotBoardMarker("BoardSOT", "first", 2, "start_of_turn_own"),
+    );
+
+    const handBefore = thenHand("first").length;
+    clearLogs();
+
+    let handAfterStep2Tick = handBefore;
+    const queueSeq = recordEffectTags(() =>
+      runStartOfTurnBoundary(
+        "first",
+        {
+          tickCrests: (owner) => {
+            tickCrests(owner);
+            handAfterStep2Tick = thenHand("first").length;
+          },
+        },
+        { deferDrain: true },
+      ),
+    );
+
+    expect(handAfterStep2Tick).toBe(handBefore);
+    expect(queueSeq).toEqual(["CrestKill", "CrestTick", "BoardSOT"]);
+    expect(thenHand("first").length).toBe(handBefore);
+    expect(findOnBoard("first", "LWVictim")).toBeFalsy();
+
+    recordEffectTags(() => drainTurnBoundaryQueue());
+
+    expect(thenHand("first").length).toBe(handBefore + 1);
   });
 });
