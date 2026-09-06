@@ -135,11 +135,6 @@ function sanitizePendingTargetInSnapshot(snap: GameState): void {
   }
 }
 
-/** Snapshots carry the unified resolution queue (death_lw may hold limbo card refs). */
-function sanitizeResolutionQueueInSnapshot(snap: GameState): void {
-  // Queue is cloned by structuredClone; limbo corpses rely on death_lw.card refs.
-}
-
 /** Dev/test footprint of engine state excluded from snapshots or reset on restore. */
 export function getEngineEphemeralFootprint() {
   const q = getResolutionQueue();
@@ -194,7 +189,6 @@ function snapshot(): GameState {
       (snap as any).__rng = rng.snapshot();
     }
     sanitizePendingTargetInSnapshot(snap);
-    sanitizeResolutionQueueInSnapshot(snap);
     assertSnapshotPreservesResolutionQueue(
       getResolutionQueue().length,
       ((snap as any)._resolutionQueue ?? []).length,
@@ -247,7 +241,6 @@ function manualSnapshot(rest: any, rng: any): GameState {
   }
 
   sanitizePendingTargetInSnapshot(snap as GameState);
-  sanitizeResolutionQueueInSnapshot(snap as GameState);
   assertSnapshotPreservesResolutionQueue(
     getResolutionQueue().length,
     ((snap as any)._resolutionQueue ?? []).length,
@@ -352,7 +345,6 @@ function cloneSnapshot(snap: GameState): GameState {
       };
     }
     sanitizePendingTargetInSnapshot(clone);
-    sanitizeResolutionQueueInSnapshot(clone);
     return clone;
   } catch (e) {
     console.warn(
@@ -368,7 +360,6 @@ function cloneSnapshot(snap: GameState): GameState {
       };
     }
     sanitizePendingTargetInSnapshot(clone);
-    sanitizeResolutionQueueInSnapshot(clone);
     return clone;
   }
 }
