@@ -3,7 +3,7 @@
  * Sequence: countdown tick/destruction → Invoke summon → queued Last Words →
  * when-invoked → turn draw (docs/official-qa.md; rulebook §223–232).
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import "./setup.js";
 import {
   givenGameState,
@@ -25,6 +25,12 @@ import {
   setHistoryEnabled,
 } from "../../src/core/history.js";
 import { getLogs, clearLogs } from "../../src/core/logger.js";
+import * as effectsIndex from "../../src/logic/core/effects/index.js";
+import {
+  drainTurnBoundaryQueue,
+  runStartOfTurnBoundary,
+} from "../../src/logic/core/turnBoundary.js";
+import type { Player } from "../../src/core/types/index.js";
 
 const SANDALPHON = "10404110";
 const SERENE_SANCTUARY = "10161210";
@@ -61,6 +67,73 @@ function drawCountLogIndex(player: "first" | "second", count: number): number {
       e.details?.player === player &&
       e.details?.count === count,
   );
+}
+
+function taggedEffect(tag: string, op = "damage", amount = 0) {
+  return { op, target: "enemy:leader", amount, tag };
+}
+
+function grantSotCrest(
+  owner: Player,
+  name: string,
+  effects: Record<string, unknown>[],
+  insertionTs: number,
+) {
+  state.players[owner].crests.push({
+    name,
+    owner,
+    insertionTs,
+    triggers: [{ type: "start_of_turn_own", effects }],
+  } as any);
+}
+
+function sotBoardMarker(
+  name: string,
+  owner: Player,
+  insertionTs: number,
+  event: "start_of_turn" | "start_of_turn_own" = "start_of_turn_own",
+) {
+  const card = createCard(
+    {
+      name,
+      type: "Follower",
+      cost: 1,
+      attack: 1,
+      defense: 1,
+      triggers: [
+        event === "start_of_turn_own"
+          ? { type: "start_of_turn_own", effects: [taggedEffect(name)] }
+          : {
+              event: "start_of_turn",
+              condition: { whose_turn: "opponent" },
+              effects: [taggedEffect(name)],
+            },
+      ],
+    },
+    "board",
+    owner,
+  );
+  card.insertionTs = insertionTs;
+  return card;
+}
+
+function recordEffectTags(fn: () => void): string[] {
+  const seq: string[] = [];
+  const realRunEffects = effectsIndex.runEffects.bind(effectsIndex);
+  const spy = vi
+    .spyOn(effectsIndex, "runEffects")
+    .mockImplementation((effects, owner, sourceCard, context) => {
+      for (const eff of effects as any[]) {
+        if (eff.tag) seq.push(eff.tag);
+      }
+      return realRunEffects(effects, owner, sourceCard, context);
+    });
+  try {
+    fn();
+  } finally {
+    spy.mockRestore();
+  }
+  return seq;
 }
 
 describe("start-of-turn Invoke order (engineDispatch)", () => {
@@ -285,5 +358,69 @@ describe("start-of-turn Invoke order (engineDispatch)", () => {
         (c) => c.name === "Sandalphon, Primarch Successor",
       ),
     ).toBe(true);
+  });
+
+  /**
+   * Rulebook §231 (JP): 各項で誘発し処理待ちとなる能力については一連の処理が終了した後、
+   * 処理待ちとなった項番順に処理する — deferred Last Words after full SOT queue.
+   * Red on main: LW draw fires after crest kill (step 2) before board SOT (step 3).
+   */
+  it("(f) deferDrain SOT: crest kill → board SOT → opponent SOT → then Last Words (no Invoke)", () => {
+    givenGameState({
+      seed: 42,
+      activePlayer: "first",
+      roundCount: 5,
+    })
+      .withFirstDeck(deckFill("D", 10))
+      .withSecondDeck(deckFill("S", 10))
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+
+    const lwVictim = createCard(
+      {
+        name: "LWVictim",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+        hasLastWords: true,
+        lastWordsEffects: [
+          { op: "draw", source: "deck", count: 1, tag: "LWDraw" },
+        ],
+      },
+      "board",
+      "first",
+    );
+    lwVictim.insertionTs = 1;
+    state.players.first.board = [lwVictim];
+    grantSotCrest(
+      "first",
+      "CrestKill",
+      [{ op: "destroy", target: "ally:follower", tag: "CrestKill" }],
+      1,
+    );
+    state.players.first.board.push(
+      sotBoardMarker("BoardSOT", "first", 2, "start_of_turn_own"),
+    );
+    state.players.second.board = [
+      sotBoardMarker("OppSOT", "second", 1, "start_of_turn"),
+    ];
+
+    const handBefore = thenHand("first").length;
+    clearLogs();
+
+    const queueSeq = recordEffectTags(() =>
+      runStartOfTurnBoundary("first", undefined, { deferDrain: true }),
+    );
+
+    expect(queueSeq).toEqual(["CrestKill", "BoardSOT", "OppSOT"]);
+    expect(thenHand("first").length).toBe(handBefore);
+    expect(findOnBoard("first", "LWVictim")).toBeFalsy();
+
+    recordEffectTags(() => drainTurnBoundaryQueue());
+
+    expect(thenHand("first").length).toBe(handBefore + 1);
+    expect(getLogs().some((e) => e.type === "lastWords")).toBe(true);
   });
 });
