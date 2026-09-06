@@ -26,6 +26,7 @@ import { state } from "../../src/core/gameState.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
+import { getCostAcc } from "../../src/logic/effects/ops/cost/model.js";
 import { evaluateCardCondition } from "../../src/logic/core/conditions/evaluator.js";
 import { getBoard, getHand, getPP } from "../../src/core/playerHelpers.js";
 import { getImplementationStatus } from "../../src/data/cardImplementationStatus.js";
@@ -178,7 +179,7 @@ describe("Owner ruling — Accelerate original cost (2026-08-12)", () => {
       "done",
     );
     expect(getEffectiveCost(unfeeling())).toBe(2);
-    expect(Number(unfeeling().cost_mod) || 0).toBe(-1);
+    expect(getCostAcc(unfeeling())).toBe(-1);
   });
 
   it("negative control: no base-cost-≥5 ally → Yog / Advent / Unfeeling do not fire", () => {

@@ -3719,13 +3719,13 @@
       "status": "covered"
     },
     "10311120": {
-      "fingerprint": "94b48ed9",
+      "fingerprint": "94515b7d",
       "gatesSatisfied": [],
       "name": "Bearer of the Fairy Blade",
       "scenarios": [
         {
-          "fingerprint": "d48381a4",
-          "scenario": "vanilla_place"
+          "fingerprint": "8cae33f6",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -3783,13 +3783,13 @@
       "status": "covered"
     },
     "10313110": {
-      "fingerprint": "da032824",
+      "fingerprint": "0da9f049",
       "gatesSatisfied": [],
       "name": "Congregant of Unkilling",
       "scenarios": [
         {
-          "fingerprint": "bd4a2c28",
-          "scenario": "vanilla_place"
+          "fingerprint": "8099f10b",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -4079,12 +4079,12 @@
       "status": "covered"
     },
     "10333310": {
-      "fingerprint": "99a96de8",
+      "fingerprint": "417859a8",
       "gatesSatisfied": [],
       "name": "Illusory Conjuration",
       "scenarios": [
         {
-          "fingerprint": "971ad012",
+          "fingerprint": "a9878c24",
           "scenario": "play"
         }
       ],
@@ -7451,13 +7451,13 @@
       "status": "covered"
     },
     "10661110": {
-      "fingerprint": "3817a500",
+      "fingerprint": "1d95d3d4",
       "gatesSatisfied": [],
       "name": "Prostrating Coward",
       "scenarios": [
         {
-          "fingerprint": "a288df06",
-          "scenario": "vanilla_place"
+          "fingerprint": "6dbfcea2",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -10167,13 +10167,13 @@
       "status": "covered"
     },
     "10931110": {
-      "fingerprint": "899f9318",
-      "gatesSatisfied": [],
+      "fingerprint": "de2708a0",
+      "gatesSatisfied": ["named_enter_count"],
       "name": "Obsessed Test Subject",
       "scenarios": [
         {
-          "fingerprint": "401c45fb",
-          "scenario": "vanilla_place"
+          "fingerprint": "c9a3b4c0",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -11336,13 +11336,13 @@
       "token": true
     },
     "90034120": {
-      "fingerprint": "eb4a2867",
+      "fingerprint": "3497eeb0",
       "gatesSatisfied": [],
       "name": "Noble Shikigami",
       "scenarios": [
         {
-          "fingerprint": "5117b290",
-          "scenario": "vanilla_place"
+          "fingerprint": "146c48e8",
+          "scenario": "play"
         }
       ],
       "status": "covered",
@@ -11791,13 +11791,13 @@
       "token": true
     },
     "90071130": {
-      "fingerprint": "0358b2cd",
+      "fingerprint": "05e61a83",
       "gatesSatisfied": [],
       "name": "Analyzing Artifact",
       "scenarios": [
         {
-          "fingerprint": "0b3cec44",
-          "scenario": "vanilla_place"
+          "fingerprint": "30ebd16a",
+          "scenario": "play"
         }
       ],
       "status": "covered",

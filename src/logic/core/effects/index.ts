@@ -84,15 +84,10 @@ export function onFanfare(card: CardInstance, owner: Player) {
   }
 }
 
+import { getEffectiveCostValue } from "../../effects/ops/cost/model.js";
+
 export function getEffectiveCost(card: CardInstance) {
-  if (
-    typeof card.effectiveCost === "number" &&
-    Number.isFinite(card.effectiveCost)
-  )
-    return card.effectiveCost;
-  const base = parseInt(card?.cost as string, 10) || 0;
-  const mod = parseInt((card as any)?.cost_mod, 10) || 0;
-  return base + mod;
+  return getEffectiveCostValue(card);
 }
 
 // Notify (event-only) that a Loot spell was played.
@@ -255,7 +250,11 @@ export function runEffects(
       flushDeferredDeckShuffle();
     }
     if (enableDeathDefer || batchTurnBoundary) {
-      (state as any).deferDeathTriggers = false;
+      if ((state as any).sotBoundaryDeferDrain) {
+        (state as any).deferDeathTriggers = true;
+      } else {
+        (state as any).deferDeathTriggers = false;
+      }
     }
     // Drain reactive queue at end of top-level runEffects only outside combat.
     // During combat, attack cores drain at step boundaries instead.
@@ -265,7 +264,8 @@ export function runEffects(
       !paused &&
       !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
-      !batchTurnBoundary
+      !batchTurnBoundary &&
+      !(state as any).sotBoundaryDeferDrain
     ) {
       cleanupCountdownZeroAmulets();
       flushDeferredDeathBatch();

@@ -82,7 +82,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
+  "private": true,
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@playwright/test": "^1.60.0",

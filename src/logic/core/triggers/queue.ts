@@ -36,6 +36,7 @@ import { dispatchEvent } from "./dispatcher.js";
 import { isTargetedOpDispatchActive } from "../targeting/guards.js";
 import { resolveUid, resolveUidOnBoard } from "../../../core/uidResolver.js";
 import { getCrests, getHand } from "../../../core/playerHelpers.js";
+import { isDev, readEnv } from "../../../core/env.js";
 
 export const MAX_RESOLUTION_QUEUE_LENGTH = 500;
 
@@ -103,6 +104,10 @@ export function getRunEffectsDepth(): number {
 export function shouldQueueReactiveTrigger(
   eventName: TriggerEventName,
 ): boolean {
+  if ((state as any).turnBoundaryInvokePhase && eventName === "invoke") {
+    return true;
+  }
+
   if (getRunEffectsDepth() <= 0 && !isTargetedOpDispatchActive()) return false;
   if (TURN_BOUNDARY_EVENTS.has(eventName)) return false;
 
@@ -121,6 +126,47 @@ export function getResolutionQueue(): ResolutionQueueItem[] {
 
 export function clearResolutionQueue(): void {
   (state as any)._resolutionQueue = [];
+}
+
+/** Dev/test: queued card refs must match the live zone instance when one exists. */
+export function assertResolutionQueueCardIdentity(
+  queue: ResolutionQueueItem[],
+  opts?: { throwOnStale?: boolean },
+): void {
+  const throwOnStale =
+    opts?.throwOnStale ??
+    (isDev() || readEnv("VITEST") === "true" || readEnv("VITEST") === "1");
+  if (!throwOnStale) return;
+
+  for (const item of queue) {
+    if (item.kind === "death_lw") {
+      for (const lw of item.items) {
+        const uid = lw.cardUid;
+        if (!uid || !lw.card) continue;
+        const live = resolveUid(uid);
+        if (live && lw.card !== live) {
+          throw new Error(
+            `[Triggers] stale death_lw card identity for uid ${uid}`,
+          );
+        }
+      }
+    } else if (item.kind === "reactive") {
+      for (const entry of item.entries) {
+        const uid = entry.cardUid ?? entry.card?.uid;
+        if (!uid || !entry.card) continue;
+        const live = resolveUid(uid);
+        if (live && entry.card !== live) {
+          throw new Error(
+            `[Triggers] stale reactive queue card identity for uid ${uid} (${entry.event})`,
+          );
+        }
+      }
+    }
+  }
+}
+
+export function assertLiveResolutionQueueCardIdentity(): void {
+  assertResolutionQueueCardIdentity(getResolutionQueue());
 }
 
 function recentCardNamesForGuard(limit = 3): string[] {

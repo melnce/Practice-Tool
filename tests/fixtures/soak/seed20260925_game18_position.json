@@ -1,0 +1,255 @@
+{
+  "seed": 20260925,
+  "gameIndex": 18,
+  "gameSeed": 38260979,
+  "regime": "shipped",
+  "deckAId": "thestae_forestcraft",
+  "deckBId": "kukishiro_havencraft",
+  "deckARaw": null,
+  "deckBRaw": null,
+  "outcome": "position",
+  "error": "position save-load re-apply mismatch at action 47 ({\"type\":\"PLAY_CARD\",\"player\":\"second\",\"cardUid\":\"uid_1s\"}):\n  players.second.deck[31]: expected=undefined actual={\"attack\":5,\"base_cost\":7,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120.webp\",\"class\":\"Havencraft\",\"cost\":7,\"defense\":5,\"description\":\"Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.\\nRush\",\"evo_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_evo.webp\",\"evolve\":[],\"fanfare\":[{\"action\":\"gain\",\"description\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a Fox of Purity or Holy Falcon at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy Fox of Purity or Holy Falcon at random.\",\"image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_token.webp\",\"name\":\"Kukishiro, Mistbloom\",\"op\":\"crest\",\"triggers\":[{\"condition\":{\"cost_in\":[1,3,5],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"},{\"condition\":{\"cost_in\":[2,4,6],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"}]},{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":true,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10564120\",\"implementationStatus\":\"ops_present\",\"keywords\":[\"Rush\"],\"name\":\"Kukishiro, Mistbloom\",\"owner\":\"second\",\"rarity\":\"Legendary\",\"set\":\"[10005] Blossoming Fate\",\"specific_effects\":[{\"cost\":0,\"name\":\"Crest\",\"skill_text\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\",\"specific_effect_type\":1}],\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Follower\",\"uid\":\"uid_1b\",\"url\":\"https://shadowverse.gg/cards/10564120-kukishiro-mistbloom\"}\n  players.second.deck[32]: expected=undefined actual={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"second\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_19\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\"}\n  players.second.graveyard[1]: expected={\"_lwFired\":true,\"attack\":0,\"base_attack\":0,\"base_cost\":1,\"base_defense\":0,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10503210.webp\",\"class\":\"Neutral\",\"cost\":1,\"cost_mod\":0,\"countdown\":0,\"counters\":{},\"defense\":0,\"description\":\"Countdown (5)\\nWhenever you play another card, if there's a card on the field other than it with the same base cost, advance this amulet's count by 1.\\nLast Words: Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":true,\"hasIntimidate\":false,\"hasLastWords\":true,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10503210\",\"implementationStatus\":\"ops_present\",\"insertionTs\":5,\"keywordState\":{\"engagedThisTurn\":false,\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}]},\"keywords\":[{\"count\":5,\"name\":\"countdown\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"LastWords\"}],\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"World of Games\",\"owner\":\"second\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[{\"condition\":{\"field_other_same_base_cost\":true,\"not_self\":true},\"effects\":[{\"action\":\"advance\",\"amount\":1,\"op\":\"countdown\",\"target\":\"self\"}],\"event\":\"ally_card_played\",\"source\":\"board\"}],\"type\":\"Amulet\",\"uid\":\"uid_28\",\"url\":\"https://shadowverse.gg/cards/10503210-world-of-games\",\"zone\":\"graveyard\"} actual=undefined\n  players.second.hand[2]: expected={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"second\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_19\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\",\"zone\":\"hand\"} actual=undefined\n  players.second.hand[3]: expected={\"attack\":5,\"base_cost\":7,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120.webp\",\"class\":\"Havencraft\",\"cost\":7,\"defense\":5,\"description\":\"Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.\\nRush\",\"evo_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_evo.webp\",\"evolve\":[],\"fanfare\":[{\"action\":\"gain\",\"description\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a Fox of Purity or Holy Falcon at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy Fox of Purity or Holy Falcon at random.\",\"image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_token.webp\",\"name\":\"Kukishiro, Mistbloom\",\"op\":\"crest\",\"triggers\":[{\"condition\":{\"cost_in\":[1,3,5],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"},{\"condition\":{\"cost_in\":[2,4,6],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"}]},{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":true,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10564120\",\"implementationStatus\":\"ops_present\",\"keywords\":[\"Rush\"],\"name\":\"Kukishiro, Mistbloom\",\"owner\":\"second\",\"rarity\":\"Legendary\",\"set\":\"[10005] Blossoming Fate\",\"specific_effects\":[{\"cost\":0,\"name\":\"Crest\",\"skill_text\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\",\"specific_effect_type\":1}],\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Follower\",\"uid\":\"uid_1b\",\"url\":\"https://shadowverse.gg/cards/10564120-kukishiro-mistbloom\",\"zone\":\"hand\"} actual=undefined\n  players.second.shadows: expected=2 actual=1",
+  "findings": [
+    "position save-load re-apply mismatch at action 47 ({\"type\":\"PLAY_CARD\",\"player\":\"second\",\"cardUid\":\"uid_1s\"}):\n  players.second.deck[31]: expected=undefined actual={\"attack\":5,\"base_cost\":7,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120.webp\",\"class\":\"Havencraft\",\"cost\":7,\"defense\":5,\"description\":\"Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.\\nRush\",\"evo_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_evo.webp\",\"evolve\":[],\"fanfare\":[{\"action\":\"gain\",\"description\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a Fox of Purity or Holy Falcon at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy Fox of Purity or Holy Falcon at random.\",\"image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_token.webp\",\"name\":\"Kukishiro, Mistbloom\",\"op\":\"crest\",\"triggers\":[{\"condition\":{\"cost_in\":[1,3,5],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"},{\"condition\":{\"cost_in\":[2,4,6],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"}]},{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":true,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10564120\",\"implementationStatus\":\"ops_present\",\"keywords\":[\"Rush\"],\"name\":\"Kukishiro, Mistbloom\",\"owner\":\"second\",\"rarity\":\"Legendary\",\"set\":\"[10005] Blossoming Fate\",\"specific_effects\":[{\"cost\":0,\"name\":\"Crest\",\"skill_text\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\",\"specific_effect_type\":1}],\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Follower\",\"uid\":\"uid_1b\",\"url\":\"https://shadowverse.gg/cards/10564120-kukishiro-mistbloom\"}\n  players.second.deck[32]: expected=undefined actual={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"second\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_19\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\"}\n  players.second.graveyard[1]: expected={\"_lwFired\":true,\"attack\":0,\"base_attack\":0,\"base_cost\":1,\"base_defense\":0,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10503210.webp\",\"class\":\"Neutral\",\"cost\":1,\"cost_mod\":0,\"countdown\":0,\"counters\":{},\"defense\":0,\"description\":\"Countdown (5)\\nWhenever you play another card, if there's a card on the field other than it with the same base cost, advance this amulet's count by 1.\\nLast Words: Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":true,\"hasIntimidate\":false,\"hasLastWords\":true,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10503210\",\"implementationStatus\":\"ops_present\",\"insertionTs\":5,\"keywordState\":{\"engagedThisTurn\":false,\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}]},\"keywords\":[{\"count\":5,\"name\":\"countdown\"},{\"effects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"LastWords\"}],\"lastWordsEffects\":[{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"World of Games\",\"owner\":\"second\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[{\"condition\":{\"field_other_same_base_cost\":true,\"not_self\":true},\"effects\":[{\"action\":\"advance\",\"amount\":1,\"op\":\"countdown\",\"target\":\"self\"}],\"event\":\"ally_card_played\",\"source\":\"board\"}],\"type\":\"Amulet\",\"uid\":\"uid_28\",\"url\":\"https://shadowverse.gg/cards/10503210-world-of-games\",\"zone\":\"graveyard\"} actual=undefined\n  players.second.hand[2]: expected={\"attack\":0,\"base_cost\":3,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10563210.webp\",\"class\":\"Havencraft\",\"cost\":3,\"defense\":0,\"description\":\"Fanfare: Select an enemy follower on the field and deal it 5 damage.\\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.\",\"evo_image\":\"\",\"evolve\":[],\"fanfare\":[{\"amount\":5,\"op\":\"damage\",\"select\":1,\"target\":\"enemy:follower\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":false,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10563210\",\"implementationStatus\":\"ops_present\",\"keywords\":[{\"effects\":[{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"name\":\"Engage\",\"sacrifice\":true}],\"name\":\"Resolve of the Mistbloom\",\"owner\":\"second\",\"rarity\":\"Gold\",\"set\":\"[10005] Blossoming Fate\",\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Amulet\",\"uid\":\"uid_19\",\"url\":\"https://shadowverse.gg/cards/10563210-resolve-of-the-mistbloom\",\"zone\":\"hand\"} actual=undefined\n  players.second.hand[3]: expected={\"attack\":5,\"base_cost\":7,\"base_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120.webp\",\"class\":\"Havencraft\",\"cost\":7,\"defense\":5,\"description\":\"Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.\\nRush\",\"evo_image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_evo.webp\",\"evolve\":[],\"fanfare\":[{\"action\":\"gain\",\"description\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a Fox of Purity or Holy Falcon at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy Fox of Purity or Holy Falcon at random.\",\"image\":\"https://static.dotgg.gg/shadowverse/cards/10564120_token.webp\",\"name\":\"Kukishiro, Mistbloom\",\"op\":\"crest\",\"triggers\":[{\"condition\":{\"cost_in\":[1,3,5],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"source\":\"named\"}],\"label\":\"Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"},{\"condition\":{\"cost_in\":[2,4,6],\"whose_turn\":\"owner\"},\"effects\":[{\"op\":\"mode\",\"options\":[{\"effects\":[{\"count\":1,\"name\":\"Fox of Purity\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Fox of Purity\"},{\"effects\":[{\"count\":1,\"name\":\"Holy Falcon\",\"op\":\"summon\",\"owner\":\"enemy\",\"source\":\"named\"}],\"label\":\"Enemy Holy Falcon\"}],\"pick\":\"random\",\"select\":1}],\"event\":\"ally_draw\"}]},{\"destination\":\"deck\",\"op\":\"return\",\"select\":2,\"select_mode\":\"random\",\"target\":\"ally:hand\"},{\"count\":2,\"op\":\"draw\",\"source\":\"deck\"}],\"hasBane\":false,\"hasBanishOnDeath\":false,\"hasBarrier\":false,\"hasCountdown\":false,\"hasIntimidate\":false,\"hasLastWords\":false,\"hasRush\":true,\"hasStorm\":false,\"hasWard\":false,\"id\":\"10564120\",\"implementationStatus\":\"ops_present\",\"keywords\":[\"Rush\"],\"name\":\"Kukishiro, Mistbloom\",\"owner\":\"second\",\"rarity\":\"Legendary\",\"set\":\"[10005] Blossoming Fate\",\"specific_effects\":[{\"cost\":0,\"name\":\"Crest\",\"skill_text\":\"During your turn, whenever you draw a 1-, 3-, or 5-cost card, summon a <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\\nDuring your turn, whenever you draw a 2-, 4-, or 6-cost card, summon an enemy <b><i><color=Keyword>Fox of Purity</color></i></b> or <b><i><color=Keyword>Holy Falcon</color></i></b> at random.\",\"specific_effect_type\":1}],\"spell\":[],\"superevolve\":[],\"tribes\":[],\"triggers\":[],\"type\":\"Follower\",\"uid\":\"uid_1b\",\"url\":\"https://shadowverse.gg/cards/10564120-kukishiro-mistbloom\",\"zone\":\"hand\"} actual=undefined\n  players.second.shadows: expected=2 actual=1"
+  ],
+  "turns": 6,
+  "actions": 47,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_25"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_10"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_27"
+    },
+    {
+      "type": "CHOOSE_MODE",
+      "player": "second",
+      "indices": [0]
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_28"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_29"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2a"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1k"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1e"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_9"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_29",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2a",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1s"
+    }
+  ],
+  "nonUndoableActionTypes": [],
+  "commitSequence": [],
+  "zeroCommitLog": []
+}

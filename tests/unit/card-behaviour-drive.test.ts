@@ -98,4 +98,19 @@ describe("card behaviour drive prep", () => {
   it("uses the harness seed constant for deterministic drives", () => {
     expect(HARNESS_SEED).toBe(42);
   });
+
+  it("enter-only followers use play scenario (Obsessed Test Subject)", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string }[];
+    const ots = all.find((c) => c.id === "10931110")!;
+    const result = driveCard(ots);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      expect(result.scenarios.map((s) => s.scenario)).toContain("play");
+      expect(result.scenarios.map((s) => s.scenario)).not.toContain(
+        "vanilla_place",
+      );
+    }
+  });
 });

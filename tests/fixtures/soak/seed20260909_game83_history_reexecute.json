@@ -1,0 +1,8 @@
+{
+  "seed": 20260909,
+  "gameIndex": 83,
+  "deckAId": "soak_rand_a_20260909_83",
+  "deckBId": "soak_rand_b_20260909_83",
+  "regime": "random",
+  "note": "history re-execute pin — multi-discard CHOOSE_TARGET"
+}

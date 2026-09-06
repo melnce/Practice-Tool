@@ -178,6 +178,11 @@ export function analyzeHarnessArenaNeeds(
     if (obj.optional === true) return;
     const target = String(obj.target ?? "");
     const op = String(obj.op ?? "");
+    // Named follower required for keyword grants (e.g. Wings of Desire → Rulenye).
+    if (op === "keyword" && obj.condition) {
+      const c = obj.condition as Record<string, unknown>;
+      if (String(c.name ?? "").trim()) namedBoardAllies.add(String(c.name));
+    }
     // Discard-from-hand (implicit pool — no target string on the op).
     if (op === "discard" && String(obj.mode ?? "select") === "select") {
       handKit = true;
@@ -423,6 +428,15 @@ function hasBoardTurnTrigger(card: RawCard): boolean {
   return found;
 }
 
+/** Follower enters the field via play/summon (not vanilla board placement). */
+function hasAllyEnterTrigger(card: RawCard): boolean {
+  let found = false;
+  walkEffects(card.triggers ?? [], (obj) => {
+    if (String(obj.event ?? "") === "ally_follower_enter") found = true;
+  });
+  return found;
+}
+
 function classifyPaths(card: RawCard): ScenarioName[] {
   const paths: ScenarioName[] = [];
   const isSpell = String(card.type).toLowerCase() === "spell";
@@ -444,6 +458,15 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   }
   if (hasNonEmptyEffects(card.evolve) || hasNonEmptyEffects(card.superevolve)) {
     paths.push("evolve");
+  }
+  const isFollower = String(card.type).toLowerCase() === "follower";
+  if (
+    paths.length === 0 &&
+    isFollower &&
+    hasAllyEnterTrigger(card) &&
+    hasNonEmptyEffects(card.triggers)
+  ) {
+    paths.push("play");
   }
   if (paths.length === 0) {
     paths.push("vanilla_place");
