@@ -5922,12 +5922,7 @@
             "effects": [
               {
                 "op": "damage",
-                "target": "ally:leader",
-                "amount": 1
-              },
-              {
-                "op": "damage",
-                "target": "enemy:leader",
+                "target": "all:leader",
                 "amount": 1
               }
             ],
@@ -6101,12 +6096,7 @@
     "evolve": [
       {
         "op": "damage",
-        "target": "ally:leader",
-        "amount": 3
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
+        "target": "all:leader",
         "amount": 3
       }
     ],
@@ -31204,12 +31194,7 @@
         "effects": [
           {
             "op": "damage",
-            "target": "ally:leader",
-            "amount": 1
-          },
-          {
-            "op": "damage",
-            "target": "enemy:leader",
+            "target": "all:leader",
             "amount": 1
           }
         ]
@@ -31333,12 +31318,7 @@
       },
       {
         "op": "damage",
-        "target": "ally:leader",
-        "amount": 1
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
+        "target": "all:leader",
         "amount": 1
       }
     ]
@@ -34603,12 +34583,7 @@
     "fanfare": [
       {
         "op": "damage",
-        "target": "ally:leader",
-        "amount": 2
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
+        "target": "all:leader",
         "amount": 2
       }
     ]
@@ -34829,12 +34804,7 @@
               },
               {
                 "op": "damage",
-                "target": "ally:leader",
-                "amount": 1
-              },
-              {
-                "op": "damage",
-                "target": "enemy:leader",
+                "target": "all:leader",
                 "amount": 1
               }
             ]
@@ -34857,12 +34827,7 @@
           },
           {
             "op": "damage",
-            "target": "ally:leader",
-            "amount": 1
-          },
-          {
-            "op": "damage",
-            "target": "enemy:leader",
+            "target": "all:leader",
             "amount": 1
           }
         ]
@@ -34894,12 +34859,7 @@
       },
       {
         "op": "damage",
-        "target": "ally:leader",
-        "amount": 1
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
+        "target": "all:leader",
         "amount": 1
       }
     ],
@@ -34913,12 +34873,7 @@
       },
       {
         "op": "damage",
-        "target": "ally:leader",
-        "amount": 3
-      },
-      {
-        "op": "damage",
-        "target": "enemy:leader",
+        "target": "all:leader",
         "amount": 3
       }
     ]
