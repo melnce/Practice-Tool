@@ -64,7 +64,7 @@ function serveRootStaticDirs(dirs: readonly string[]): Plugin {
 export default defineConfig({
   root: ".",
   // Do NOT set publicDir to "." — that serves src/*.ts as raw static files (breaks the browser).
-  publicDir: false,
+  publicDir: "public",
   server: {
     port: 5173,
     open: true,
