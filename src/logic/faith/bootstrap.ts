@@ -170,6 +170,7 @@ export function buildFaithGainEffect(pkg: FaithPackage): Effect {
     name: pkg.crestName,
     image: FAITH_IMAGE,
     description: pkg.description,
+    is_faith: true,
     triggers: [incrementTrigger(pkg)],
   } as Effect;
 }
