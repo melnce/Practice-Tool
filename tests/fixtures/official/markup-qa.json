@@ -1,0 +1,25 @@
+{
+  "data": {
+    "count": 1,
+    "sort_card_id_list": [10012110],
+    "cards": {},
+    "card_details": {
+      "10012110": {
+        "common": {
+          "card_id": 10012110,
+          "name": "<b>May, Journey Elf</b>",
+          "card_set_id": 10000,
+          "questions": [
+            {
+              "question": "Does <b><color=Keyword>Combo</color></b> count the card being played?",
+              "answer": "<b>Yes.</b> The card being played also counts toward your <color=Keyword>Combo</color>."
+            }
+          ],
+          "is_token": false,
+          "is_include_rotation": true,
+          "deck_enabled_num": 3
+        }
+      }
+    }
+  }
+}
