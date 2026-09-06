@@ -1,0 +1,19 @@
+[
+  {
+    "card_id": 90002001,
+    "card_set_id": 90000,
+    "name_eng": "Crystallize Union Card",
+    "cost": 2,
+    "atk": 2,
+    "life": 2,
+    "type": 1,
+    "skill_texts": [{ "text_eng": "<b><color=Keyword>Rush</color></b>." }],
+    "alt_modes": [
+      {
+        "type_key": "crystallize",
+        "cost": 1,
+        "text_eng": "<b><color=Keyword>Countdown</color> (3)</b>\n<b><color=Keyword>Last Words</color></b>: Summon a <b><i><color=Keyword>Crystallize Union Card</color></i></b>."
+      }
+    ]
+  }
+]
