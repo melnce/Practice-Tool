@@ -4,6 +4,8 @@
  * Faith still occupies one of the five crest/faith slots (MAX_CREST_SLOTS).
  * "Number of crests you have" counts exclude Faith entries.
  *
+ * Game-playing tests use it(name, fn, 60_000) per repo lesson §11 (2-core CI).
+ *
  * Sabotage: if countCrests counted Faith (full list length), the Shining Disenchantment
  * cases below would expect countdown 1 / 3 instead of 2 / 4 and would fail.
  */
