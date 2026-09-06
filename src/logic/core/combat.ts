@@ -21,7 +21,11 @@ import { isGameOver } from "../../core/gameOver.js";
 // Imported from JS still
 import { applyLeaderDamage } from "../effects/leader.js";
 import { destroyTarget } from "../effects/ops/destroy/index.js";
-import { cleanupDead, resumeDeferredDeathIfIdle } from "./cleanup.js";
+import {
+  cleanupDead,
+  resumeDeferredDeathIfIdle,
+  flushReactiveQueueOnly,
+} from "./cleanup.js";
 import { isEffectResolutionPaused } from "./resolutionPause.js";
 import { dealDamage, enterDamageBatch, exitDamageBatch } from "./barrier.js";
 import { doAction } from "../../core/history.js";
@@ -169,9 +173,20 @@ function drainCombatResolutionQueue() {
   resumeDeferredDeathIfIdle();
 }
 
-function finishCombatCleanup() {
+/** Collect deferred deaths and flush the reactive queue at a combat step boundary. */
+function drainAfterCombatStep() {
   cleanupDead();
   drainCombatResolutionQueue();
+}
+
+/** After Strike/Clash: settle non-LW deaths, drain enter reactions — not strike-kill LW batches. */
+function drainStrikeClashReactions() {
+  cleanupDead();
+  flushReactiveQueueOnly();
+}
+
+function finishCombatCleanup() {
+  drainAfterCombatStep();
 }
 
 function endCombatOnGameOver(attacker: CardInstance) {
@@ -336,6 +351,15 @@ function _attackFollowerCore(
     return;
   }
 
+  // Rulebook attack sequence steps 5–6: reactions from Strike/Clash resolve after
+  // both sides' abilities and before combat damage (LW from strike kills waits for knockback).
+  drainStrikeClashReactions();
+
+  if (isGameOver()) {
+    endCombatOnGameOver(attacker);
+    return;
+  }
+
   // Ensure swing counter exists
   if ((attacker as any).attacks_left == null) {
     (attacker as any).attacks_left = Number.isFinite(
@@ -456,8 +480,10 @@ export function attackFollower(
   doAction(
     "Attack Follower",
     () => {
+      const prevDefer = !!(state as any).deferDeathTriggers;
       (state as any).combatResolutionDepth =
         ((state as any).combatResolutionDepth ?? 0) + 1;
+      (state as any).deferDeathTriggers = true;
       try {
         return _attackFollowerCore(
           attackerIdx,
@@ -466,6 +492,7 @@ export function attackFollower(
           defenderPlayer,
         );
       } finally {
+        (state as any).deferDeathTriggers = prevDefer;
         (state as any).combatResolutionDepth =
           ((state as any).combatResolutionDepth ?? 1) - 1;
       }
@@ -545,6 +572,13 @@ function _attackLeaderCore(
     return;
   }
 
+  drainStrikeClashReactions();
+
+  if (isGameOver()) {
+    endCombatOnGameOver(attacker);
+    return;
+  }
+
   const damage = effectiveAtk(attacker);
   applyLeaderDamage(defenderPlayer, damage);
 
@@ -588,11 +622,14 @@ export function attackLeader(
   doAction(
     "Attack Leader",
     () => {
+      const prevDefer = !!(state as any).deferDeathTriggers;
       (state as any).combatResolutionDepth =
         ((state as any).combatResolutionDepth ?? 0) + 1;
+      (state as any).deferDeathTriggers = true;
       try {
         return _attackLeaderCore(attackerIdx, attackerPlayer, defenderPlayer);
       } finally {
+        (state as any).deferDeathTriggers = prevDefer;
         (state as any).combatResolutionDepth =
           ((state as any).combatResolutionDepth ?? 1) - 1;
       }
