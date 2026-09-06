@@ -33,14 +33,18 @@ export function fnv1aHex(str: string): string {
 function fingerprintCard(card: CardInstance | null | undefined): object {
   if (!card) return { id: null, uid: null, name: null };
   const kw = card.keywordState ?? {};
-  return {
+  const rawCost = card.cost ?? null;
+  const costMod = (card as { cost_mod?: number }).cost_mod;
+  const costAcc = (card as { cost_acc?: number }).cost_acc;
+  const effectiveCost = (card as { effectiveCost?: number }).effectiveCost;
+  const fp: Record<string, unknown> = {
     id: card.id ?? null,
     uid: card.uid ?? null,
     name: card.name ?? null,
     type: card.type ?? null,
     attack: card.attack ?? null,
     defense: card.defense ?? null,
-    cost: card.cost ?? null,
+    cost: rawCost,
     countdown: card.countdown ?? null,
     counters: card.counters ?? {},
     hasWard: !!card.hasWard,
@@ -60,6 +64,16 @@ function fingerprintCard(card: CardInstance | null | undefined): object {
     can_attack: !!(card as any).can_attack,
     hasAttacked: !!card.hasAttacked,
   };
+  if (costMod != null && Number(costMod) !== 0) fp.cost_mod = costMod;
+  if (costAcc != null && Number(costAcc) !== 0) fp.cost_acc = costAcc;
+  if (
+    typeof effectiveCost === "number" &&
+    Number.isFinite(effectiveCost) &&
+    effectiveCost !== rawCost
+  ) {
+    fp.effectiveCost = effectiveCost;
+  }
+  return fp;
 }
 
 function fingerprintCrest(crest: {
