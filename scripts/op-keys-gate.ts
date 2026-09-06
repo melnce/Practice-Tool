@@ -551,7 +551,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "count_source",
     "filter",
   ]),
-  sequence: new Set(["key", "steps", "advance"]),
+  sequence: new Set(["key", "steps", "advance", "wrap"]),
   replicate: new Set(["zone"]),
   random_split: new Set(["total", "parts", "effects"]),
   with_source: new Set(["source_uid", "effects"]),
