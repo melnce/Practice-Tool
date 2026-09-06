@@ -433,31 +433,27 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     expect(thenHand("first").some((c) => c.id === GEAR_REMEMBRANCE)).toBe(true);
   }, 60_000);
 
-  it.fails(
-    "10172320 Doomwright Resurgence — cannot play without 2 Artifact followers ≤5 in hand (official Q&A)",
-    () => {
-      setupTurn(R8, { hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT], pp: 5 });
-      const spell = getHand(state, "first").find(
-        (c) => c.id === DOOMWRIGHT_RESURGENCE,
-      )!;
-      const ppBefore = thenPP("first");
-      expect(canPlayCard(spell, "first").ok).toBe(false);
-      expect(
-        whenPlayCard("first", getHand(state, "first").indexOf(spell)).kind,
-      ).toBe("blocked");
-      expect(thenPP("first")).toBe(ppBefore);
+  it("10172320 Doomwright Resurgence — cannot play without 2 Artifact followers ≤5 in hand (official Q&A)", () => {
+    setupTurn(R8, { hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT], pp: 5 });
+    const spell = getHand(state, "first").find(
+      (c) => c.id === DOOMWRIGHT_RESURGENCE,
+    )!;
+    const ppBefore = thenPP("first");
+    expect(canPlayCard(spell, "first").ok).toBe(false);
+    expect(
+      whenPlayCard("first", getHand(state, "first").indexOf(spell)).kind,
+    ).toBe("blocked");
+    expect(thenPP("first")).toBe(ppBefore);
 
-      setupTurn(R8, {
-        hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT, FORTIFIER_ARTIFACT],
-        pp: 5,
-      });
-      const okSpell = getHand(state, "first").find(
-        (c) => c.id === DOOMWRIGHT_RESURGENCE,
-      )!;
-      expect(canPlayCard(okSpell, "first").ok).toBe(true);
-    },
-    60_000,
-  );
+    setupTurn(R8, {
+      hand: [DOOMWRIGHT_RESURGENCE, STRIKER_ARTIFACT, FORTIFIER_ARTIFACT],
+      pp: 5,
+    });
+    const okSpell = getHand(state, "first").find(
+      (c) => c.id === DOOMWRIGHT_RESURGENCE,
+    )!;
+    expect(canPlayCard(okSpell, "first").ok).toBe(true);
+  }, 60_000);
 
   it("10174110 Eudie — cannot gain a second Crest: Eudie, Maiden Reborn (official Q&A)", () => {
     setupTurn(R6, { hand: [EUDIE], pp: 3, evo: 1 });
@@ -595,57 +591,43 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     expect(getBoard(state, "second")).toHaveLength(0);
   }, 60_000);
 
-  it.fails(
-    "10372110 Supplicant — random 2 damage still fires when Lishenna can't be destroyed (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [SUPPLICANT], pp: 2 });
-      const lishenna = createCard(LISHENNA, "board", "first");
-      lishenna.peak_defense = lishenna.defense;
-      applyKeywordsFromList(lishenna);
-      state.players.first.board = [lishenna];
-      const foe = enemyFollower(2, 5, "Foe");
-      whenPlayCard("first", 0);
-      resolvePendingByUid(lishenna.uid);
-      expect(findOnBoard("first", "Lishenna, Melody Manifest")).toBeTruthy();
-      expect(Number(foe.defense)).toBe(3);
-    },
-    60_000,
-  );
+  it("10372110 Supplicant — random 2 damage still fires when Lishenna can't be destroyed (official Q&A)", () => {
+    setupTurn(R6, { hand: [SUPPLICANT], pp: 2 });
+    const lishenna = createCard(LISHENNA, "board", "first");
+    lishenna.peak_defense = lishenna.defense;
+    applyKeywordsFromList(lishenna);
+    state.players.first.board = [lishenna];
+    const foe = enemyFollower(2, 5, "Foe");
+    whenPlayCard("first", 0);
+    resolvePendingByUid(lishenna.uid);
+    expect(findOnBoard("first", "Lishenna, Melody Manifest")).toBeTruthy();
+    expect(Number(foe.defense)).toBe(3);
+  }, 60_000);
 
-  it.fails(
-    "90073110 Ominous Artifact α — β then γ across turns transforms into Masterwork Ω (official Q&A)",
-    () => {
-      setupTurn(R6, {
-        hand: [OMINOUS_ALPHA, OMINOUS_BETA, OMINOUS_GAMMA],
-        pp: 0,
-      });
-      const alpha = getHand(state, "first").find(
-        (c) => c.id === OMINOUS_ALPHA,
-      )!;
-      const beta = getHand(state, "first").find((c) => c.id === OMINOUS_BETA)!;
-      fuseAlphaPartners(alpha.uid, [beta.uid]);
-      expect(getHand(state, "first").some((c) => c.id === OMINOUS_ALPHA)).toBe(
-        true,
-      );
-      expect(
-        getHand(state, "first").some((c) => c.id === MASTERWORK_OMEGA),
-      ).toBe(false);
+  it("90073110 Ominous Artifact α — β then γ across turns transforms into Masterwork Ω (official Q&A)", () => {
+    setupTurn(R6, {
+      hand: [OMINOUS_ALPHA, OMINOUS_BETA, OMINOUS_GAMMA],
+      pp: 0,
+    });
+    const alpha = getHand(state, "first").find((c) => c.id === OMINOUS_ALPHA)!;
+    const beta = getHand(state, "first").find((c) => c.id === OMINOUS_BETA)!;
+    fuseAlphaPartners(alpha.uid, [beta.uid]);
+    expect(getHand(state, "first").some((c) => c.id === OMINOUS_ALPHA)).toBe(
+      true,
+    );
+    expect(getHand(state, "first").some((c) => c.id === MASTERWORK_OMEGA)).toBe(
+      false,
+    );
 
-      whenEndTurn();
-      whenEndTurn();
-      const alphaTurn2 = getHand(state, "first").find(
-        (c) => c.id === OMINOUS_ALPHA,
-      )!;
-      const gamma = getHand(state, "first").find(
-        (c) => c.id === OMINOUS_GAMMA,
-      )!;
-      fuseAlphaPartners(alphaTurn2.uid, [gamma.uid]);
-      expect(thenHand("first").some((c) => c.id === MASTERWORK_OMEGA)).toBe(
-        true,
-      );
-    },
-    60_000,
-  );
+    whenEndTurn();
+    whenEndTurn();
+    const alphaTurn2 = getHand(state, "first").find(
+      (c) => c.id === OMINOUS_ALPHA,
+    )!;
+    const gamma = getHand(state, "first").find((c) => c.id === OMINOUS_GAMMA)!;
+    fuseAlphaPartners(alphaTurn2.uid, [gamma.uid]);
+    expect(thenHand("first").some((c) => c.id === MASTERWORK_OMEGA)).toBe(true);
+  }, 60_000);
 
   it("90074120 Lloyd + 10173120 Sylvia — Super-Evolve selects Lloyd then Orchis and destroys both (official Q&A)", () => {
     setupTurn(R8, { hand: [SYLVIA], pp: 6, superEvo: 1, evo: 1 });

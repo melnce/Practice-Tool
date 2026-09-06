@@ -77,7 +77,8 @@ function commitConfirmedModePicks(
       fireTrigger("select_mode", owner, { sourceCard: sourceCard || null });
 
       const combined: Effect[] = [];
-      for (const idx of pickedIndices) {
+      const resolutionOrder = [...pickedIndices].sort((a, b) => a - b);
+      for (const idx of resolutionOrder) {
         const opt = allOptions[idx];
         if (!opt) continue;
         let paid = true;

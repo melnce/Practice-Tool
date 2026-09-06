@@ -247,33 +247,29 @@ describe("official Q&A — Neutral batch 7", () => {
       expect(Number(sandInHand.cost)).toBe(6);
     }, 60_000);
 
-    it.fails(
-      "10404110 Sandalphon — SSA random pool includes leader when enemy followers are present (official Q&A)",
-      () => {
-        setupTurn(R10, { hand: [SANDALPHON], pp: 6, seed: 42 });
-        state.players.second.hp = 20;
-        enemyFollower(1, 1, "Fairy");
-        const sand = getHand(state, "first").find((c) => c.id === SANDALPHON)!;
-        sand.skyboundArtEvolvesWitnessed = 15;
-        whenPlayCard("first", 0);
-        expect(findOnBoard("second", "Fairy")).toBeFalsy();
-        expect(20 - getHP(state, "second")).toBe(8);
+    it("10404110 Sandalphon — SSA random pool includes leader when enemy followers are present (official Q&A)", () => {
+      setupTurn(R10, { hand: [SANDALPHON], pp: 6, seed: 42 });
+      state.players.second.hp = 20;
+      enemyFollower(1, 1, "Fairy");
+      const sand = getHand(state, "first").find((c) => c.id === SANDALPHON)!;
+      sand.skyboundArtEvolvesWitnessed = 15;
+      whenPlayCard("first", 0);
+      expect(findOnBoard("second", "Fairy")).toBeFalsy();
+      expect(20 - getHP(state, "second")).toBe(8);
 
-        resetUidCounter();
-        setupTurn(R10, { hand: [SANDALPHON], pp: 6, seed: 42 });
-        state.players.second.hp = 20;
-        const wall = enemyFollower(2, 20, "Wall");
-        const sandSolo = getHand(state, "first").find(
-          (c) => c.id === SANDALPHON,
-        )!;
-        sandSolo.skyboundArtEvolvesWitnessed = 15;
-        whenPlayCard("first", 0);
-        const wallDamage = 20 - Number(wall.defense);
-        const leaderDamage = 20 - getHP(state, "second");
-        expect(wallDamage + leaderDamage).toBe(10);
-      },
-      60_000,
-    );
+      resetUidCounter();
+      setupTurn(R10, { hand: [SANDALPHON], pp: 6, seed: 42 });
+      state.players.second.hp = 20;
+      const wall = enemyFollower(2, 20, "Wall");
+      const sandSolo = getHand(state, "first").find(
+        (c) => c.id === SANDALPHON,
+      )!;
+      sandSolo.skyboundArtEvolvesWitnessed = 15;
+      whenPlayCard("first", 0);
+      const wallDamage = 20 - Number(wall.defense);
+      const leaderDamage = 20 - getHP(state, "second");
+      expect(wallDamage + leaderDamage).toBe(10);
+    }, 60_000);
 
     it("10404110 Sandalphon — Titania Fairy then invoke then return then draw at SOT (official Q&A)", () => {
       setupTurn(R6, { hand: [], deck: [SANDALPHON, FAIRY], pp: 6 });

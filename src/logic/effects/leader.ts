@@ -93,7 +93,11 @@ function getLeaderMaxDamageCap(owner: Player): number | null {
 }
 
 /** Centralized leader damage that respects barrier and max HP */
-export function applyLeaderDamage(owner: Player, amount: number) {
+export function applyLeaderDamage(
+  owner: Player,
+  amount: number,
+  opts?: { deferGameOver?: boolean },
+): number {
   amount = amount | 0;
   if (amount < 0) return 0;
   // Match already over — no further leader damage (bible continuous lethal).
@@ -132,7 +136,7 @@ export function applyLeaderDamage(owner: Player, amount: number) {
   const actualDamage = cur - next;
 
   // Continuous lethal check (bible §219): first time a leader reaches 0, match ends.
-  if (next <= 0) {
+  if (next <= 0 && !opts?.deferGameOver) {
     applyGameOverIfNeeded("lethal");
   }
 
@@ -146,6 +150,19 @@ export function applyLeaderDamage(owner: Player, amount: number) {
   }
 
   return actualDamage;
+}
+
+/**
+ * Deal the same damage packet to both leaders before a single game-over check.
+ * Order: enemy leader, then own leader (irrelevant when both reach 0 — active
+ * player loses per official Q&A).
+ */
+export function applyAllLeadersDamage(actingPlayer: Player, amount: number) {
+  if (isGameOver()) return;
+  const enemy = opponentOf(actingPlayer);
+  applyLeaderDamage(enemy, amount, { deferGameOver: true });
+  applyLeaderDamage(actingPlayer, amount, { deferGameOver: true });
+  applyGameOverIfNeeded("lethal");
 }
 
 /* ---------- NEW: effect op for cards ---------- */

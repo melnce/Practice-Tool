@@ -13,7 +13,7 @@ import type { GameState, PlayerSlot } from "./types/index.js";
 import { getDefeatedPlayer, getWinner } from "./playerHelpers.js";
 import { logEvent } from "./logger.js";
 
-export type GameOverReason = "lethal" | "deckout";
+export type GameOverReason = "lethal" | "deckout" | "simultaneous";
 
 /** Log dropped pending effect work once the match is terminal. */
 export function logEffectsHaltedGameOver(dropped: number): void {
@@ -61,6 +61,11 @@ export function isGameOver(s: GameState = state): boolean {
 export function applyGameOverIfNeeded(reasonHint?: GameOverReason): boolean {
   if (state.phase === "gameover") return true;
 
+  const firstDown = state.players.first.defeated || state.players.first.hp <= 0;
+  const secondDown =
+    state.players.second.defeated || state.players.second.hp <= 0;
+  const simultaneous = firstDown && secondDown;
+
   const loser = getDefeatedPlayer(state);
   if (!loser) return false;
 
@@ -69,7 +74,9 @@ export function applyGameOverIfNeeded(reasonHint?: GameOverReason): boolean {
 
   const winner = getWinner(state) as PlayerSlot;
   let reason: GameOverReason = reasonHint ?? "lethal";
-  if (!reasonHint) {
+  if (simultaneous) {
+    reason = "simultaneous";
+  } else if (!reasonHint) {
     // Deck-out sets defeated without necessarily dropping HP to 0.
     if (state.players[loser].hp > 0) reason = "deckout";
   }
