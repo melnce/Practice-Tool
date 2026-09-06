@@ -54,17 +54,18 @@ describe("enemy_* event activePlayer convention", () => {
       expect(findOnBoard("first", "Trap in the Woods")).toBeFalsy();
     });
 
-    it("fanfare summon path: Trap destroys summoned enemy follower and itself", () => {
+    it("fanfare summon path: played-card enter reaction runs before fanfare-raised enters", () => {
       givenGameState({ seed: 42, activePlayer: "first", roundCount: 8 })
         .withFirstPP(7, 8)
         .withFirstHand([AIZEDEN])
         .withSecondBoard([TRAP])
         .build();
       whenPlayCard("first", 0);
+      // Trap reacts to Aizeden's entry (staged before fanfare-raised Warden enter).
+      expect(findOnBoard("second", "Trap in the Woods")).toBeFalsy();
       expect(
         thenBoard("first").some((c) => c.name === "Warden of the Trigger"),
-      ).toBe(false);
-      expect(findOnBoard("second", "Trap in the Woods")).toBeFalsy();
+      ).toBe(true);
     });
 
     it("chain summon path: Trap destroys first chain-spawned enemy follower and itself", () => {

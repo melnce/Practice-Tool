@@ -6,13 +6,14 @@ import type {
   Effect,
 } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
-import { fireTrigger } from "../triggers.js";
 import { applyKeywordsFromList } from "../keywords.js";
 import { getBoard, incrementRally } from "../../../core/playerHelpers.js";
 import type { EnteringKeywordSnapshot } from "../enterKeywords.js";
 import { resumeDeferredDeathIfIdle } from "../cleanup.js";
 import { recordFollowerEnter } from "../followerEnterHistory.js";
 import { recomputeAttackFlags } from "../combat.js";
+import { endPlaySequenceDrain } from "./playSequence.js";
+import { isEffectResolutionPaused } from "../resolutionPause.js";
 
 export interface PlayFollowerResume {
   player: Player;
@@ -52,22 +53,6 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
 
   // Match Rally timing: record after Fanfare so X-from-prior-enters excludes self.
   recordFollowerEnter(state, player, card);
-
-  fireTrigger("ally_follower_played", player as any, {
-    playedCard: card,
-    costChanged: resume.costChangedOnPlay,
-  });
-  fireTrigger("ally_card_played", player as any, {
-    playedCard: card,
-  });
-
-  const enterCtx = {
-    enteringCard: card,
-    enteringOwner: player,
-    enteringKeywordSnapshot: resume.enteringKeywordSnapshot,
-  };
-  fireTrigger("ally_follower_enter", player as any, enterCtx);
-  fireTrigger("enemy_follower_enter", player as any, enterCtx);
 
   if (resume.chosenTierEffectGroups?.length) {
     for (const effects of resume.chosenTierEffectGroups) {
@@ -128,5 +113,8 @@ export function consumePlayFollowerResume(): void {
   }
 
   runPlayFollowerPostFanfare(resume);
+  if (!isEffectResolutionPaused()) {
+    endPlaySequenceDrain();
+  }
   resumeDeferredDeathIfIdle();
 }

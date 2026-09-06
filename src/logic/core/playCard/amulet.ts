@@ -21,6 +21,11 @@ import { stampBoardEntryTs } from "../triggers/utils.js";
 import { fireTrigger } from "../triggers.js";
 import { pushToBoard } from "../../effects/ops/summon_ops/core.js";
 import { enhanceReplacesBase } from "./enhancePlan.js";
+import {
+  beginPlaySequence,
+  endPlaySequenceDrain,
+  stageAmuletCardPlayedReaction,
+} from "./playSequence.js";
 
 /**
  * Play an amulet card. Returns PlayOutcome without rendering.
@@ -41,6 +46,9 @@ export function playAmulet(
   if (!pushToBoard(toBoard, player, card, { deferEnter: true })) {
     return { kind: "blocked", reason: "Board is full." };
   }
+
+  beginPlaySequence();
+  stageAmuletCardPlayedReaction(card, player);
 
   if (opts?.enhancedPlay) {
     fireTrigger("enhanced_play", player, { playedCard: card });
@@ -70,9 +78,10 @@ export function playAmulet(
   }
 
   rememberLastPlayedCard(card);
-  fireTrigger("ally_card_played", player as any, {
-    playedCard: card,
-  });
+
+  if (!isEffectResolutionPaused()) {
+    endPlaySequenceDrain();
+  }
 
   if (isEffectResolutionPaused()) {
     return { kind: "paused" };

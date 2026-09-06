@@ -157,10 +157,12 @@ export function runEffects(
   const wasTopLevelRunEffects = runDepth === 0;
   (state as any)._runEffectsDepth = runDepth + 1;
   const combatDepth = ((state as any).combatResolutionDepth ?? 0) as number;
+  const playDepth = ((state as any).playSequenceDepth ?? 0) as number;
   const batchTurnBoundary = !!(context?.batchTurnBoundary && runDepth === 0);
   const enableDeathDefer =
     runDepth === 0 &&
     combatDepth === 0 &&
+    playDepth === 0 &&
     context?.deferDeathTriggers !== false &&
     !batchTurnBoundary;
 
@@ -261,6 +263,7 @@ export function runEffects(
     if (
       runDepth === 0 &&
       combatDepth === 0 &&
+      playDepth === 0 &&
       !paused &&
       !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
