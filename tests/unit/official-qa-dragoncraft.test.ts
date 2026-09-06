@@ -18,13 +18,13 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
-import { restoreLeaderHP } from "../../src/logic/effects/ops/restore/primitives.js";
+import { drawCard } from "../../src/core/utils.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import {
@@ -57,6 +57,7 @@ const RUBY = "10101110";
 const KRULLE = "10314110";
 const BALTO = "10153140";
 const SERVANT_COCYTUS = "90004120";
+const DARKHAVEN_GRACE = "10162210";
 const FILLER = "10001130";
 
 const R6 = 6;
@@ -296,14 +297,32 @@ describe("official Q&A — Dragoncraft batch 3", () => {
   it.fails(
     "10144110 Burnite, Anathema of Flame — crest leader_restored fires on 0 restore (official Q&A)",
     () => {
-      givenGameState({ seed: 42, activePlayer: "first", roundCount: R6 })
-        .withSecondHP(15, 20)
-        .build();
-      state.gameStarted = true;
+      setupTurn(R6, { active: "second", secondPp: 2 });
+      state.players.second.hp = 20;
+      state.players.second.maxHP = 20;
       gainCardCrest(BURNITE, "first");
 
-      restoreLeaderHP("second", 0);
-      expect(getHP(state, "second")).toBe(14);
+      const grace = createCard(DARKHAVEN_GRACE, "board", "second");
+      applyKeywordsFromList(grace);
+      const ally = createCard(
+        {
+          name: "EngageAlly",
+          type: "Follower",
+          cost: 1,
+          attack: 1,
+          defense: 1,
+        },
+        "board",
+        "second",
+      );
+      ally.peak_defense = 1;
+      state.players.second.board = [grace, ally];
+      state.activePlayer = "second";
+
+      engageAmulet("second", 0);
+      resolvePendingByUid(ally.uid);
+
+      expect(getHP(state, "second")).toBe(19);
     },
     60_000,
   );
@@ -317,7 +336,8 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     burnite.peak_defense = burnite.defense;
     state.players.first.board = [burnite];
     state.players.first.superEvoCharges = 1;
-    onEvolve(burnite, "first", "super");
+    state.players.first.superEvoPoints = 1;
+    handleEvolveSelf(burnite, "first", { mode: "super", spendPoint: true });
 
     expect(crestCount("second", "Burnite, Anathema of Flame")).toBe(1);
   }, 60_000);
@@ -342,36 +362,36 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     const olivia = findOnBoard("first", "Olivia, Heroic Dark Angel")!;
     const arriet = findOnBoard("first", "Arriet, Luxminstrel")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(olivia, "first", "super");
+    state.players.first.superEvoPoints = 1;
+    handleEvolveSelf(olivia, "first", { mode: "super", spendPoint: true });
     expect(Number(wise.cost)).toBe(7);
     resolvePendingByUid(arriet.uid);
     expect(Number(wise.cost)).toBe(4);
   }, 60_000);
 
-  it.fails(
-    "10243310 Draconic Strike — Fennie-halved Quake Goliath becomes cost 0 (official Q&A)",
-    () => {
-      setupTurn(R6, {
-        hand: [DRACONIC_STRIKE, FENNIE],
-        pp: 14,
-        deck: [QUAKE_GOLIATH],
-      });
-      whenPlayCard(
-        "first",
-        getHand(state, "first").findIndex((c) => c.id === FENNIE),
-      );
-      const goliath = thenDeck("first").find((c) => c.id === QUAKE_GOLIATH)!;
-      expect(getEffectiveCost(goliath)).toBe(2);
+  it("10243310 Draconic Strike — Fennie-halved Quake Goliath becomes cost 0 (official Q&A)", () => {
+    setupTurn(R6, {
+      hand: [DRACONIC_STRIKE, FENNIE],
+      pp: 14,
+      deck: [QUAKE_GOLIATH],
+    });
+    whenPlayCard(
+      "first",
+      getHand(state, "first").findIndex((c) => c.id === FENNIE),
+    );
+    drawCard(state.players.first.hand, state.players.first.deck, "first");
+    const goliath = getHand(state, "first").find(
+      (c) => c.id === QUAKE_GOLIATH,
+    )!;
+    expect(getEffectiveCost(goliath)).toBe(2);
 
-      whenPlayCard(
-        "first",
-        getHand(state, "first").findIndex((c) => c.id === DRACONIC_STRIKE),
-      );
-      resolvePendingByUid(goliath.uid);
-      expect(getEffectiveCost(goliath)).toBe(0);
-    },
-    60_000,
-  );
+    whenPlayCard(
+      "first",
+      getHand(state, "first").findIndex((c) => c.id === DRACONIC_STRIKE),
+    );
+    resolvePendingByUid(goliath.uid);
+    expect(getEffectiveCost(goliath)).toBe(0);
+  }, 60_000);
 
   it("10244120 Fennie, Prismatic Phoenix — odd cost halving rounds up (official Q&A)", () => {
     setupTurn(R6, {
@@ -440,7 +460,8 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     devotee.peak_defense = devotee.defense;
     state.players.first.board = [devotee];
     state.players.first.superEvoCharges = 1;
-    onEvolve(devotee, "first", "super");
+    state.players.first.superEvoPoints = 1;
+    handleEvolveSelf(devotee, "first", { mode: "super", spendPoint: true });
     const goliath = createCard(QUAKE_GOLIATH, "board", "second");
     applyKeywordsFromList(goliath);
     goliath.peak_defense = goliath.defense;
@@ -502,11 +523,11 @@ describe("official Q&A — Dragoncraft batch 3", () => {
   }, 60_000);
 
   it.fails(
-    "10344110 Azurifrit, Heir to Disdain — Krulle crest destroys before on-damage ping (official Q&A)",
+    "10344110 Azurifrit, Heir to Disdain — Krulle crest destroys before on-damage ping (official Q&A; needs PR #270 queued-source guard)",
     () => {
       setupTurn(R6, { hand: [AZURIFRIT], pp: 9 });
       state.players.second.hp = 20;
-      gainCardCrest(KRULLE, "first");
+      gainCardCrest(KRULLE, "second");
       whenPlayCard("first", 0);
 
       expect(
@@ -553,7 +574,8 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     galmieux.peak_defense = galmieux.defense;
     state.players.first.board = [galmieux];
     state.players.first.superEvoCharges = 1;
-    onEvolve(galmieux, "first", "super");
+    state.players.first.superEvoPoints = 1;
+    handleEvolveSelf(galmieux, "first", { mode: "super", spendPoint: true });
     const goliath = createCard(QUAKE_GOLIATH, "board", "second");
     applyKeywordsFromList(goliath);
     goliath.peak_defense = goliath.defense;
@@ -585,40 +607,37 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     ).toBe(true);
   }, 60_000);
 
-  it.fails(
-    "90044310 Whitefrost Whisper — returned boosted Quake Goliath redraws at 5 same turn (official Q&A)",
-    () => {
-      setupTurn(R7, {
-        hand: [WHITEFROST],
-        pp: 3,
-        secondHand: [RUBY, QUAKE_GOLIATH],
-        secondDeck: [QUAKE_GOLIATH],
-        secondPp: 7,
-      });
-      applyWhitefrostHandTaxToSecond();
-      const boosted = getHand(state, "second").find(
-        (c) => c.id === QUAKE_GOLIATH,
-      )!;
-      expect(getEffectiveCost(boosted)).toBe(5);
+  it("90044310 Whitefrost Whisper — returned boosted Quake Goliath redraws at 5 same turn (official Q&A)", () => {
+    setupTurn(R7, {
+      hand: [WHITEFROST],
+      pp: 3,
+      secondHand: [RUBY, QUAKE_GOLIATH],
+      secondDeck: [],
+    });
+    applyWhitefrostHandTaxToSecond();
+    const boosted = getHand(state, "second").find(
+      (c) => c.id === QUAKE_GOLIATH,
+    )!;
+    const goliathUid = boosted.uid;
+    expect(getEffectiveCost(boosted)).toBe(5);
 
-      whenEndTurn();
-      expect(state.activePlayer).toBe("second");
+    whenEndTurn();
+    expect(state.activePlayer).toBe("second");
 
-      const goliath = getHand(state, "second").find(
-        (c) => c.id === QUAKE_GOLIATH,
-      )!;
-      expect(getEffectiveCost(goliath)).toBe(5);
+    const goliath = getHand(state, "second").find((c) => c.uid === goliathUid)!;
+    expect(getEffectiveCost(goliath)).toBe(5);
 
-      const rubyIdx = getHand(state, "second").findIndex((c) => c.id === RUBY);
-      whenPlayCard("second", rubyIdx);
-      resolvePendingByUid(goliath.uid);
-      const redrawn = thenHand("second").find((c) => c.id === QUAKE_GOLIATH)!;
-      expect(getEffectiveCost(redrawn)).toBe(5);
-    },
-    60_000,
-  );
+    const rubyIdx = getHand(state, "second").findIndex((c) => c.id === RUBY);
+    whenPlayCard("second", rubyIdx);
+    resolvePendingByUid(goliathUid);
+    const redrawn =
+      thenHand("second").find((c) => c.uid === goliathUid) ??
+      thenDeck("second").find((c) => c.uid === goliathUid);
+    expect(redrawn).toBeDefined();
+    expect(getEffectiveCost(redrawn!)).toBe(5);
+  }, 60_000);
 
-  it("90044310 Whitefrost Whisper — boosted cost reverts to 4 after effect expires (official Q&A)", () => {
+  it("90044310 Whitefrost Whisper — hand Goliath cost reverts to 4 after tax expires (official Q&A)", () => {
     setupTurn(R7, {
       hand: [WHITEFROST],
       pp: 3,
@@ -636,4 +655,41 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     whenEndTurn();
     expect(getEffectiveCost(goliath)).toBe(4);
   }, 60_000);
+
+  it.fails(
+    "90044310 Whitefrost Whisper — deck Goliath redraws at 4 after tax expires (official Q&A)",
+    () => {
+      setupTurn(R7, {
+        hand: [WHITEFROST],
+        pp: 3,
+        secondHand: [RUBY, QUAKE_GOLIATH],
+        secondDeck: [],
+        secondPp: 7,
+      });
+      applyWhitefrostHandTaxToSecond();
+      whenEndTurn();
+
+      const goliath = getHand(state, "second").find(
+        (c) => c.id === QUAKE_GOLIATH,
+      )!;
+      const goliathUid = goliath.uid;
+      const rubyIdx = getHand(state, "second").findIndex((c) => c.id === RUBY);
+      whenPlayCard("second", rubyIdx);
+      resolvePendingByUid(goliathUid);
+
+      const inDeck = thenDeck("second").find((c) => c.uid === goliathUid)!;
+      expect(inDeck).toBeDefined();
+      expect(getEffectiveCost(inDeck)).toBe(5);
+
+      whenEndTurn();
+      expect(getEffectiveCost(inDeck)).toBe(4);
+
+      whenEndTurn();
+      whenEndTurn();
+      drawCard(state.players.second.hand, state.players.second.deck, "second");
+      const redrawn = thenHand("second").find((c) => c.uid === goliathUid)!;
+      expect(getEffectiveCost(redrawn)).toBe(4);
+    },
+    60_000,
+  );
 });
