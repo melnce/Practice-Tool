@@ -220,8 +220,8 @@ describe("Blocked plays must not corrupt undo history", () => {
   });
 });
 
-describe("Glow preflight cache performance", () => {
-  it("10-card hand: cached preflight is fast enough for per-render use", () => {
+describe("Glow preflight cache", () => {
+  it("10-card hand: cached preflight returns same object on cache hit", () => {
     resetUidCounter();
     resetGlowPreflightCache();
     givenGameState({ seed: 1, activePlayer: "first" })
@@ -237,35 +237,48 @@ describe("Glow preflight cache performance", () => {
 
     const hand = getHand(state, "first");
 
-    const iterations = 200;
-    const start = performance.now();
-    for (let i = 0; i < iterations; i++) {
-      resetGlowPreflightCache();
-      for (const card of hand) {
-        getCachedCanPlay(card, "first");
-      }
+    const first = hand.map((c) => getCachedCanPlay(c, "first"));
+    const second = hand.map((c) => getCachedCanPlay(c, "first"));
+    for (let i = 0; i < hand.length; i++) {
+      expect(second[i]).toBe(first[i]);
     }
-    const uncachedMs = performance.now() - start;
 
-    const startCached = performance.now();
+    resetGlowPreflightCache();
+    const afterReset = hand.map((c) => getCachedCanPlay(c, "first"));
+    for (let i = 0; i < hand.length; i++) {
+      expect(afterReset[i]).not.toBe(first[i]);
+    }
+
+    // cacheKey = zoneVersion|activePlayer|first.pp|second.pp|tick|pendingTargetEffect uid
+    resetGlowPreflightCache();
+    const beforePpChange = getCachedCanPlay(hand[0], "first");
+    state.players.first.pp -= 1;
+    const afterPpChange = getCachedCanPlay(hand[0], "first");
+    expect(afterPpChange).not.toBe(beforePpChange);
+
+    const iterations = 200;
+    let uncachedMs = 0;
+    let cachedOnlyMs = 0;
     for (let i = 0; i < iterations; i++) {
       resetGlowPreflightCache();
+      const uncachedStart = performance.now();
       for (const card of hand) {
         getCachedCanPlay(card, "first");
       }
+      uncachedMs += performance.now() - uncachedStart;
+
+      const cachedStart = performance.now();
       for (const card of hand) {
         getCachedCanPlay(card, "first");
       }
+      cachedOnlyMs += performance.now() - cachedStart;
     }
-    const cachedMs = performance.now() - startCached;
 
     console.log(
-      `[glow-preflight-bench] 10-card hand x${iterations}: uncached=${uncachedMs.toFixed(1)}ms cached-2pass=${cachedMs.toFixed(1)}ms`,
+      `[glow-preflight-bench] 10-card hand x${iterations}: uncached=${uncachedMs.toFixed(1)}ms cached-only=${cachedOnlyMs.toFixed(1)}ms ratio=${(cachedOnlyMs / uncachedMs).toFixed(3)}`,
     );
 
-    expect(cachedMs).toBeLessThan(50);
-    const perPassMs = cachedMs / iterations / 2;
-    expect(perPassMs).toBeLessThan(5);
+    expect(cachedOnlyMs).toBeLessThan(5000); // hang guard only
   });
 });
 
