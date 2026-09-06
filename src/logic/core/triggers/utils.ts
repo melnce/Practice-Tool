@@ -13,6 +13,7 @@ import {
   getDeck,
   opponentOf,
 } from "../../../core/playerHelpers.js";
+import { isDev, readEnv } from "../../../core/env.js";
 
 // PERF: Helper to get/initialize trigger cache on state
 
@@ -216,6 +217,55 @@ function mapDeckCandidates(owner: Player): ProcessingCandidate[] {
   return out;
 }
 
+function buildOrderedTriggerCandidates(
+  activePlayer: Player,
+  exclude: Set<string>,
+): ProcessingCandidate[] {
+  const reactivePlayer = opponentOf(activePlayer);
+  const tiers: ProcessingCandidate[][] = [];
+
+  if (!exclude.has("hand")) {
+    tiers.push(mapHandCandidates(activePlayer));
+    tiers.push(mapHandCandidates(reactivePlayer));
+  }
+
+  if (!exclude.has("crest")) {
+    tiers.push(mapCrestCandidates(activePlayer));
+  }
+
+  if (!exclude.has("board")) {
+    tiers.push(mapBoardCandidates(activePlayer));
+  }
+
+  if (!exclude.has("crest")) {
+    tiers.push(mapCrestCandidates(reactivePlayer));
+  }
+
+  if (!exclude.has("board")) {
+    tiers.push(mapBoardCandidates(reactivePlayer));
+  }
+
+  if (!exclude.has("deck")) {
+    tiers.push(mapDeckCandidates(activePlayer));
+    tiers.push(mapDeckCandidates(reactivePlayer));
+  }
+
+  return tiers.flat();
+}
+
+function candidateUidZoneFingerprint(
+  candidates: ProcessingCandidate[],
+): string {
+  return candidates
+    .map((c) => `${c.owner}:${c.source}:${c.card?.uid ?? "?"}`)
+    .join("|");
+}
+
+function shouldSelfCheckTriggerCache(): boolean {
+  const vitest = readEnv("VITEST");
+  return isDev() || vitest === "true" || vitest === "1";
+}
+
 export type OrderedTriggerOptions = {
   /** Skip tiers whose ProcessingCandidate.source matches (e.g. crest for turn events). */
 
@@ -245,8 +295,6 @@ export function getOrderedTriggerCandidates(
 
   options?: OrderedTriggerOptions,
 ): ProcessingCandidate[] {
-  const reactivePlayer = opponentOf(activePlayer);
-
   const exclude = new Set(options?.excludeSources ?? []);
 
   const excludeKey = [...exclude].sort().join(",");
@@ -264,40 +312,48 @@ export function getOrderedTriggerCandidates(
     cache.activePlayer === activePlayer &&
     cache.excludeKey === excludeKey
   ) {
+    if (shouldSelfCheckTriggerCache()) {
+      const fresh = buildOrderedTriggerCandidates(activePlayer, exclude);
+      const cachedFp = candidateUidZoneFingerprint(cache.candidates);
+      const freshFp = candidateUidZoneFingerprint(fresh);
+      if (cachedFp !== freshFp) {
+        const onlyCached = cache.candidates!.filter(
+          (c) =>
+            !fresh.some(
+              (f) =>
+                f.owner === c.owner &&
+                f.source === c.source &&
+                f.card?.uid === c.card?.uid,
+            ),
+        );
+        const onlyFresh = fresh.filter(
+          (f) =>
+            !cache.candidates!.some(
+              (c) =>
+                c.owner === f.owner &&
+                c.source === f.source &&
+                c.card?.uid === f.card?.uid,
+            ),
+        );
+        const detail = [
+          onlyCached.length
+            ? `stale=${onlyCached.map((c) => `${c.owner}:${c.source}:${c.card?.uid}`).join(",")}`
+            : "",
+          onlyFresh.length
+            ? `missing=${onlyFresh.map((c) => `${c.owner}:${c.source}:${c.card?.uid}`).join(",")}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("; ");
+        throw new Error(
+          `[Triggers] stale trigger candidate cache (zoneVersion=${zoneVersion}, actionSeq=${actionSeq}${detail ? `; ${detail}` : ""})`,
+        );
+      }
+    }
     return cache.candidates;
   }
 
-  const tiers: ProcessingCandidate[][] = [];
-
-  if (!exclude.has("hand")) {
-    tiers.push(mapHandCandidates(activePlayer));
-
-    tiers.push(mapHandCandidates(reactivePlayer));
-  }
-
-  if (!exclude.has("crest")) {
-    tiers.push(mapCrestCandidates(activePlayer));
-  }
-
-  if (!exclude.has("board")) {
-    tiers.push(mapBoardCandidates(activePlayer));
-  }
-
-  if (!exclude.has("crest")) {
-    tiers.push(mapCrestCandidates(reactivePlayer));
-  }
-
-  if (!exclude.has("board")) {
-    tiers.push(mapBoardCandidates(reactivePlayer));
-  }
-
-  if (!exclude.has("deck")) {
-    tiers.push(mapDeckCandidates(activePlayer));
-
-    tiers.push(mapDeckCandidates(reactivePlayer));
-  }
-
-  const result = tiers.flat();
+  const result = buildOrderedTriggerCandidates(activePlayer, exclude);
 
   cache.candidates = result;
 

@@ -21,6 +21,7 @@ import {
   flushDeferredDeathBatch,
 } from "../cleanup.js";
 import { clearResolutionQueue } from "../triggers/queue.js";
+import { invalidateZoneCandidatesCache } from "../triggers/utils.js";
 import { flushDeferredDeckShuffle } from "../../effects/ops/returnHandToDeck.js";
 import { recordEvent } from "../../../core/debugTimeline.js";
 import { haltEffectsIfGameOver, isGameOver } from "../../../core/gameOver.js";
@@ -157,6 +158,7 @@ export function runEffects(
   const queue = [...effects]; // Shallow copy to process
 
   const runDepth = ((state as any)._runEffectsDepth ?? 0) as number;
+  const wasTopLevelRunEffects = runDepth === 0;
   (state as any)._runEffectsDepth = runDepth + 1;
   const combatDepth = ((state as any).combatResolutionDepth ?? 0) as number;
   const batchTurnBoundary = !!(context?.batchTurnBoundary && runDepth === 0);
@@ -265,6 +267,9 @@ export function runEffects(
     ) {
       flushDeferredDeathBatch();
       clearResolutionQueue();
+    }
+    if (wasTopLevelRunEffects) {
+      invalidateZoneCandidatesCache();
     }
   }
 

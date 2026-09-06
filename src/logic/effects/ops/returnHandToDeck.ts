@@ -8,7 +8,9 @@ import type {
   CardInstance,
 } from "../../../core/types/index.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
+import { highlightSelectable } from "../../core/targeting.js";
 import { getHand, getDeck } from "../../../core/playerHelpers.js";
+import { bumpZoneVersion } from "../../core/triggers/utils.js";
 
 type PutBackOpts = { deferShuffle?: boolean; pendingDraws?: number };
 
@@ -75,6 +77,7 @@ function putBack(card: CardInstance, owner: Player, opts: PutBackOpts = {}) {
     deck.push(removed);
     shuffleInPlace(deck);
   }
+  bumpZoneVersion();
   return true;
 }
 
@@ -173,7 +176,7 @@ export function handleReturnHandToDeck(
       targets: [],
       selectCount,
     });
-    hand.forEach((c) => ((c as any).__uiSelectable = true));
+    highlightSelectable(hand);
     return "pending";
   }
 

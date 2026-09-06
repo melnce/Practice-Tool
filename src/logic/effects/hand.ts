@@ -7,6 +7,7 @@ import { setPendingTarget } from "../core/pendingTarget/index.js";
 import { logEvent } from "../../core/logger.js";
 import type { Player, Effect, CardInstance } from "../../core/types/index.js";
 import { getHand, getGraveyard, addShadows } from "../../core/playerHelpers.js";
+import { bumpZoneVersion } from "../core/triggers/utils.js";
 import { toUids } from "../../core/uidResolver.js";
 
 // ========================================================================
@@ -72,6 +73,7 @@ export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
   }
 
   if (discarded.length > 0) {
+    bumpZoneVersion();
     rememberDiscardedCards(discarded);
     logEvent("discard", { owner, count: discarded.length });
     addShadows(state, owner, discarded.length);
@@ -94,6 +96,7 @@ export function handleDiscardRightmost(eff: Effect, owner: Player): void {
   }
 
   if (discarded.length > 0) {
+    bumpZoneVersion();
     rememberDiscardedCards(discarded);
     logEvent("discard", { owner, count: discarded.length, mode: "rightmost" });
     addShadows(state, owner, discarded.length);

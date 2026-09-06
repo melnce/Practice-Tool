@@ -529,6 +529,11 @@ async function main(): Promise<void> {
         skipInvariants: true,
         fuse: config.fuse,
         interactiveModes: config.interactiveModes,
+        positionCheck: config.positions,
+        historyCheck: config.history,
+        historyReExecute: config.historyReExecute,
+        historyIgnoreFields: config.historyIgnore,
+        dispatch: config.dispatch,
       });
       if (
         again.outcome !== "completed" ||

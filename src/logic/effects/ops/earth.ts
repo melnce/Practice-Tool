@@ -8,6 +8,7 @@ import {
   addShadows,
 } from "../../../core/playerHelpers.js";
 import { fireTrigger } from "../../core/triggers.js";
+import { bumpZoneVersion } from "../../core/triggers/utils.js";
 
 function board(owner: Player) {
   return getBoard(state, owner);
@@ -35,6 +36,7 @@ export function consumeEarthSigils(owner: Player, amount = 1) {
         const removed = b.splice(i, 1)[0];
         if (removed) {
           grave.push(removed);
+          bumpZoneVersion();
 
           logEvent("earthSigilDestroyed", { owner, card: c.name, uid: c.uid });
 

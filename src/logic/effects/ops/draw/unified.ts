@@ -20,6 +20,7 @@ import {
 import type { UnifiedDrawSpec, DrawCount } from "./types.js";
 
 import { normalizeToUnifiedSpec } from "./types.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 // ============================================================================
 // INTERNAL HELPERS
 // ============================================================================
@@ -75,6 +76,7 @@ function drawFiltered(
     if (deckIdx !== deck.length - 1) {
       deck.splice(deckIdx, 1);
       deck.push(card);
+      bumpZoneVersion();
     }
     if (drawCard(hand, deck, drawingPlayer)) drawn++;
   }

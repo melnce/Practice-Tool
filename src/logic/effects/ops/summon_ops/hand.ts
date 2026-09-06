@@ -11,7 +11,10 @@ import type {
 import { highlightSelectable } from "../../../core/targeting.js"; // Targeting is external
 import { initAmulet } from "./init.js";
 import { finishFollowerEnter, pushToBoard, boardHasRoom } from "./core.js";
-import { stampBoardEntryTs } from "../../../core/triggers/utils.js";
+import {
+  stampBoardEntryTs,
+  bumpZoneVersion,
+} from "../../../core/triggers/utils.js";
 import { getEffectiveCost } from "./utils.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { getHand, getBoard } from "../../../../core/playerHelpers.js";
@@ -67,6 +70,7 @@ export function summonFromHand(
 
   // Remove from hand
   hand.splice(idx, 1);
+  bumpZoneVersion();
 
   // Update state to be 'board'
   card.zone = "board";

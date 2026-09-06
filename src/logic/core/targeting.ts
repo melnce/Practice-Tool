@@ -75,6 +75,11 @@ export function clearSelectableFlags() {
   allCards.forEach((c) => {
     if (c) delete c.__uiSelectable;
   });
+  // Ephemeral selection refs may outlive zone membership (graveyard, lastAddedToHand).
+  const last = (state as any).__lastSelected as CardInstance | null | undefined;
+  if (last) delete last.__uiSelectable;
+  const lah = (state as any).lastAddedToHand as CardInstance | null | undefined;
+  if (lah) delete lah.__uiSelectable;
 }
 
 // -----------------------------------------------------------------------------
@@ -163,7 +168,14 @@ export function handleSelect(
         context.runner ||
         ((..._args: any[]) =>
           console.warn("Missing runner for handleSelect auto"));
-      runner([...eff.effects], owner, sourceCard, selectedCtx);
+      try {
+        runner([...eff.effects], owner, sourceCard, selectedCtx);
+      } finally {
+        // Nested sync ops may highlight pools; orchestrator cleanup does not run on this path.
+        if (!state.pendingTargetEffect) {
+          clearSelectableFlags();
+        }
+      }
     }
 
     state.__lastSelected = picks[0] || null;

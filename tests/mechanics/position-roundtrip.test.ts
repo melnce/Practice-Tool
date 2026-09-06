@@ -116,6 +116,53 @@ describe("position round-trip soak", () => {
   });
 });
 
+describe("position round-trip soak pins", () => {
+  const PINS = [
+    {
+      seed: 20260909,
+      gameIndex: 13,
+      note: "PLAY_CARD — stale __lastSelected on graveyard card",
+    },
+    {
+      seed: 20260909,
+      gameIndex: 61,
+      note: "PLAY_CARD — stale __uiSelectable on graveyard card",
+    },
+    {
+      seed: 20260908,
+      gameIndex: 35,
+      note: "EVOLVE super — stale __uiSelectable on graveyard card",
+    },
+    {
+      seed: 20260908,
+      gameIndex: 105,
+      note: "ENGAGE — stale lastAddedToHand.__uiSelectable",
+    },
+    {
+      seed: 20260909,
+      gameIndex: 81,
+      note: "CHOOSE_TARGET after Bug Alert bounce — evoCount drift from stale trigger cache",
+    },
+  ] as const;
+
+  for (const pin of PINS) {
+    it(`seed ${pin.seed} game ${pin.gameIndex} — ${pin.note}`, async () => {
+      const result = await runSoakGame({
+        seed: pin.seed,
+        gameIndex: pin.gameIndex,
+        positionCheck: true,
+        dispatch: ENGINE,
+        turnCap: 60,
+        actionCap: 800,
+      });
+      expect(
+        result.outcome,
+        result.error ?? `seed ${pin.seed} game ${pin.gameIndex}`,
+      ).toBe("completed");
+    });
+  }
+});
+
 describe("position round-trip shapes (engineDispatch)", () => {
   beforeEach(() => {
     resetUidCounter();

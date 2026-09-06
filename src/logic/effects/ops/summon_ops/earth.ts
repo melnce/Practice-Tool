@@ -11,6 +11,7 @@ import {
 } from "../../../../core/playerHelpers.js";
 import { getGlobalCardIndex } from "../../../../data/cardIndex.js";
 import { isAmulet } from "./utils.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 
 const EARTH_SIGIL_TRIBE = "Earth Sigil";
 
@@ -151,6 +152,7 @@ function removeEarthSigilsFromBoard(
       addShadows(state, owner, 1);
     }
   }
+  if (indices.length > 0) bumpZoneVersion();
 }
 
 function mergeEarthSigilsOntoSurvivor(

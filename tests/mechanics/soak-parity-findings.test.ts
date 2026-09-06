@@ -66,17 +66,14 @@ describe("soak --parity findings", () => {
     expect(result.outcome).toBe("completed");
   });
 
-  it.fails(
-    "state: autoRender:true leaves __uiSelectable on lastAddedToHand — engine EVOLVE/FUSE doAction autoRender:true clears via render; core autoRender:false does not (dispatch.ts:139,191)",
-    async () => {
-      const result = await runParitySoakGame({
-        seed: 20260909,
-        gameIndex: 53,
-        ...SOAK_CAPS,
-        historyCheck: true,
-        dispatch: "engine",
-      });
-      expect(result.outcome).toBe("completed");
-    },
-  );
+  it("state: autoRender parity on lastAddedToHand — selection flags cleared consistently (seed 20260909 game 53)", async () => {
+    const result = await runParitySoakGame({
+      seed: 20260909,
+      gameIndex: 53,
+      ...SOAK_CAPS,
+      historyCheck: true,
+      dispatch: "engine",
+    });
+    expect(result.outcome).toBe("completed");
+  });
 });

@@ -376,6 +376,7 @@ export function completeCrest(crest: Crest, owner: Player, context: any = {}) {
   // Remove the crest so start-of-turn doesn’t fire it again
   const idx = list.indexOf(crest);
   if (idx !== -1) list.splice(idx, 1);
+  bumpZoneVersion();
   // Render removed - UI layer
 }
 
@@ -390,6 +391,7 @@ export function removeCrest(owner: Player, crestName: string) {
   const idx = list.findIndex((c) => c.name === crestName);
   if (idx !== -1) {
     list.splice(idx, 1);
+    bumpZoneVersion();
     // Render removed - UI layer
   }
 }
@@ -410,6 +412,7 @@ export function banishAllCrests(owner: Player) {
   if (!Array.isArray(list) || list.length === 0) return;
   logEvent("crestBanishAll", { owner, count: list.length });
   list.length = 0;
+  bumpZoneVersion();
 }
 
 export function destroyCrest(owner: Player, crestName: string) {
@@ -448,6 +451,7 @@ export function destroyCrest(owner: Player, crestName: string) {
   // Remove crest from list
   const idx = list.indexOf(crest);
   if (idx !== -1) list.splice(idx, 1);
+  bumpZoneVersion();
   // Render removed - UI layer
 }
 

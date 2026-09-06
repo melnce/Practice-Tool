@@ -19,6 +19,7 @@ import type {
   EffectContext,
 } from "../../../core/types/index.js";
 import { getBoard, getHand } from "../../../core/playerHelpers.js";
+import { bumpZoneVersion } from "../../core/triggers/utils.js";
 
 // Create a fresh base copy (new uid)
 function freshBaseCopyByName(name: string) {
@@ -85,6 +86,8 @@ export function bounceToHand(card: CardInstance) {
 
   const [removed] = fromArr.splice(fromArr.indexOf(card), 1);
   if (!removed) return;
+
+  bumpZoneVersion();
 
   // Try to get fresh base copy from database
   let fresh = freshBaseCopyByName(removed.name);

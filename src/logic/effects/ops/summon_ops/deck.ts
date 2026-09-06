@@ -8,6 +8,7 @@ import type {
 } from "../../../../core/types/index.js";
 import { getCardDetails } from "../../../../data/cardDatabase.js";
 import { makeCardFromDB, pushToBoard } from "./core.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import { boardOf, deckOf } from "./utils.js";
 
 export function summonRandomFromDeck(eff: Effect, owner: Player) {
@@ -89,7 +90,10 @@ export function summonRandomFromDeck(eff: Effect, owner: Player) {
 
     // remove the specific deck entry (by uid) so duplicates remain intact in deck
     const idx = deck.indexOf(deckEntry);
-    if (idx !== -1) deck.splice(idx, 1);
+    if (idx !== -1) {
+      deck.splice(idx, 1);
+      bumpZoneVersion();
+    }
 
     state.lastSummoned.push(card);
   }

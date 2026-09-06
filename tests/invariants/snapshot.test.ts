@@ -209,12 +209,11 @@ describe("Undo/Redo Determinism", () => {
 
     // Perform actions that increment counters
     beginAction("action1");
-    (state as any).actionSeq = (initialActionSeq || 0) + 1;
     (state as any).zoneVersion = (initialZoneVersion || 0) + 1;
     state.players.first.hp -= 1;
     commitAction({ autoRender: false });
 
-    // Counters should be incremented
+    // actionSeq bumps on commit; zoneVersion only when zones change
     expect((state as any).actionSeq).toBe((initialActionSeq || 0) + 1);
     expect((state as any).zoneVersion).toBe((initialZoneVersion || 0) + 1);
 
