@@ -1,5 +1,5 @@
 {
-  "name": "Shadowverse Practice Tool",
+  "name": "Practice Tool",
   "install": "npm ci",
   "terminals": [
     {
