@@ -481,6 +481,29 @@ function playGrantsCrestTurnBoundary(card: RawCard): boolean {
   return found;
 }
 
+/** True when a classified scenario fingerprints the subject card entering the field. */
+function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
+  switch (scenario) {
+    case "in_hand":
+      return false;
+    case "play":
+    case "play_base":
+    case "play_else":
+    case "evolve":
+    case "super_evolve":
+    case "vanilla_place":
+    case "summon":
+    case "turn_boundary":
+      return true;
+    default:
+      return false;
+  }
+}
+
+function hasScenarioPlacingOnBoard(paths: ScenarioName[]): boolean {
+  return paths.some(scenarioPlacesSubjectOnBoard);
+}
+
 function classifyPaths(card: RawCard): ScenarioName[] {
   const paths: ScenarioName[] = [];
   const isSpell = String(card.type).toLowerCase() === "spell";
@@ -508,14 +531,14 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
-    paths.length === 0 &&
+    !hasScenarioPlacingOnBoard(paths) &&
     isFollower &&
     hasAllyEnterTrigger(card) &&
     hasNonEmptyEffects(card.triggers)
   ) {
     paths.push("play");
   }
-  if (paths.length === 0) {
+  if (!hasScenarioPlacingOnBoard(paths)) {
     paths.push("vanilla_place");
   }
   return paths;
