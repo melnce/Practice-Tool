@@ -60,6 +60,7 @@
     "audit:superevolve-dedup": "npx tsx scripts/audit-super-evolve-dedup.ts",
     "test:audit": "vitest run -c vitest.audit.config.ts",
     "deck:code": "npx tsx scripts/import-deck-code.ts",
+    "decks:meta": "npx tsx scripts/meta-decks.ts",
     "decks:discover": "npx tsx scripts/generate-deck-manifest.ts",
     "check:decks": "npm run decks:discover && npx tsx scripts/check-decks.ts",
     "predev": "npm run decks:discover",

@@ -1,0 +1,75 @@
+{
+  "class": "Portalcraft",
+  "deckName": "16 Wins Nemesis by @chappy_106",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Aizeden, Killshot Revenant",
+      "count": 3
+    },
+    {
+      "name": "Asher & Lydia, Paths Beyond",
+      "count": 3
+    },
+    {
+      "name": "Brazen Broadcaster",
+      "count": 3
+    },
+    {
+      "name": "Brusque Barkeep",
+      "count": 1
+    },
+    {
+      "name": "Camiscilla, Unfeeling Heart",
+      "count": 2
+    },
+    {
+      "name": "Cool Courier",
+      "count": 1
+    },
+    {
+      "name": "Eudie, Your Dependable Mentor",
+      "count": 3
+    },
+    {
+      "name": "Freerunning",
+      "count": 3
+    },
+    {
+      "name": "Imari, Dewdrop",
+      "count": 3
+    },
+    {
+      "name": "Isaac, Congenial Engineer",
+      "count": 1
+    },
+    {
+      "name": "Ludicrous Ordnance",
+      "count": 3
+    },
+    {
+      "name": "Myuu, Hot on His Heels",
+      "count": 2
+    },
+    {
+      "name": "Sandalphon, Primarch Successor",
+      "count": 1
+    },
+    {
+      "name": "Scarlet, Anathema of Dislocation",
+      "count": 3
+    },
+    {
+      "name": "Shoddy Plaything",
+      "count": 2
+    },
+    {
+      "name": "Sincerity of the Dewdrop",
+      "count": 3
+    },
+    {
+      "name": "Yog-Zentha, Eld Axe",
+      "count": 3
+    }
+  ]
+}

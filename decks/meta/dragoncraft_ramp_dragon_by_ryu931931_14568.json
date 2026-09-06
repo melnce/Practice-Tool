@@ -1,0 +1,63 @@
+{
+  "class": "Dragoncraft",
+  "deckName": "Ramp Dragon by ryu931931",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Alabaster Bahamut",
+      "count": 2
+    },
+    {
+      "name": "Burnite, Anathema of Ash",
+      "count": 3
+    },
+    {
+      "name": "Dark Dimensions",
+      "count": 3
+    },
+    {
+      "name": "Dragonewt Promoter",
+      "count": 3
+    },
+    {
+      "name": "Dragonsign",
+      "count": 3
+    },
+    {
+      "name": "Erntz, Governing Justice",
+      "count": 3
+    },
+    {
+      "name": "Kimika, Cook of Happiness",
+      "count": 2
+    },
+    {
+      "name": "Lumiore & Argente, Shining Wings",
+      "count": 3
+    },
+    {
+      "name": "Lyria, Skydestined",
+      "count": 3
+    },
+    {
+      "name": "Normagdala, Ravening Revenant",
+      "count": 3
+    },
+    {
+      "name": "Sagatsumatsu, Fair Beheader",
+      "count": 3
+    },
+    {
+      "name": "Sloth of the Crestpetal",
+      "count": 3
+    },
+    {
+      "name": "Vorlalai, Eld Blades",
+      "count": 3
+    },
+    {
+      "name": "Zooey, Ally of the World",
+      "count": 3
+    }
+  ]
+}

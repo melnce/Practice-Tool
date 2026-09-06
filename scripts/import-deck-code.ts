@@ -4,6 +4,7 @@
  *
  * Usage:
  *   npm run deck:code -- import "<url or hash>" --name "<Deck Name>" [--out decks/<file>.json] [--force]
+ *   npm run deck:code -- import-code <XXXX> --name "<Deck Name>" [--out decks/<file>.json] [--force]
  *   npm run deck:code -- diff "<url or hash>" decks/<file>.json
  *   npm run deck:code -- export decks/<file>.json
  */
@@ -12,13 +13,18 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import {
+  buildCostById,
   buildDeckCodeCatalog,
+  computeManaCurveFromIds,
+  deckFileFromGetDeck,
   deckFileFromHash,
   deckShareUrl,
   DeckCodeError,
   diffDeckFile,
   encodeDeckFile,
   extractDeckHash,
+  formatManaCurveMismatch,
+  parseGetDeckResponse,
   type DeckCodeCard,
   type DeckFileObject,
 } from "./lib/deckCode.js";
@@ -26,6 +32,7 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
 const CARDS_FILE = path.join(ROOT, "cards", "all.json");
+const GET_DECK_URL = "https://shadowverse-wb.com/web/DeckCode/getDeck";
 
 function readJson<T>(file: string): T {
   return JSON.parse(fs.readFileSync(file, "utf-8")) as T;
@@ -38,12 +45,13 @@ function loadCatalog() {
     );
   }
   const cards = readJson<DeckCodeCard[]>(CARDS_FILE);
-  return buildDeckCodeCatalog(cards);
+  return { catalog: buildDeckCodeCatalog(cards), cards };
 }
 
 function usage(): never {
   console.error(`Usage:
   npm run deck:code -- import "<url or hash>" --name "<Deck Name>" [--out decks/<file>.json] [--force]
+  npm run deck:code -- import-code <XXXX> --name "<Deck Name>" [--out decks/<file>.json] [--force]
   npm run deck:code -- diff "<url or hash>" decks/<file>.json
   npm run deck:code -- export decks/<file>.json`);
   process.exit(1);
@@ -83,9 +91,17 @@ function cmdImport(argv: string[]): void {
     parseFlag(argv, "--out") ??
     path.join("decks", `${slugifyDeckName(name)}.json`);
   const force = argv.includes("--force");
-  const catalog = loadCatalog();
+  const { catalog } = loadCatalog();
   const hash = extractDeckHash(input);
   const deck = deckFileFromHash(hash, catalog, name);
+  writeDeckFile(deck, out, force);
+}
+
+function writeDeckFile(
+  deck: DeckFileObject,
+  out: string,
+  force: boolean,
+): void {
   const outPath = path.isAbsolute(out) ? out : path.join(ROOT, out);
 
   if (fs.existsSync(outPath) && !force) {
@@ -98,6 +114,76 @@ function cmdImport(argv: string[]): void {
   fs.writeFileSync(outPath, `${JSON.stringify(deck, null, 2)}\n`);
   console.log(`Wrote ${path.relative(ROOT, outPath)}`);
   printCardTable(deck);
+}
+
+async function fetchGetDeck(code: string): Promise<unknown> {
+  const response = await fetch(GET_DECK_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Lang: "en",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({ deck_code: code }),
+  });
+
+  if (!response.ok) {
+    throw new DeckCodeError(
+      `getDeck HTTP ${response.status} for deck code "${code}"`,
+    );
+  }
+
+  return (await response.json()) as unknown;
+}
+
+function cmdImportCode(argv: string[]): void {
+  const positional = argv.filter((a) => !a.startsWith("--"));
+  const code = positional[0]?.trim();
+  if (!code || !/^[0-9A-Za-z]{4}$/.test(code)) {
+    throw new DeckCodeError(
+      'import-code requires a 4-character deck code (e.g. "Ab12")',
+    );
+  }
+
+  const name = parseFlag(argv, "--name");
+  if (!name) {
+    throw new DeckCodeError('import-code requires --name "<Deck Name>"');
+  }
+
+  const out =
+    parseFlag(argv, "--out") ??
+    path.join("decks", `${slugifyDeckName(name)}.json`);
+  const force = argv.includes("--force");
+
+  void (async () => {
+    const { catalog, cards } = loadCatalog();
+    const body = await fetchGetDeck(code);
+    const data = parseGetDeckResponse(body);
+    const deck = deckFileFromGetDeck(data, catalog, name);
+
+    if (data.mana_curve) {
+      const costById = buildCostById(cards);
+      const computed = computeManaCurveFromIds(
+        data.sort_card_id_list.map(String),
+        costById,
+      );
+      const mismatch = formatManaCurveMismatch(computed, data.mana_curve);
+      if (mismatch) {
+        console.warn(`Mana curve mismatch: ${mismatch}`);
+      }
+    }
+
+    writeDeckFile(deck, out, force);
+  })().catch((error) => {
+    const message =
+      error instanceof DeckCodeError
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : String(error);
+    console.error(`Error: ${message}`);
+    process.exit(1);
+  });
 }
 
 function slugifyDeckName(name: string): string {
@@ -159,7 +245,7 @@ function cmdDiff(argv: string[]): void {
   const deckFileArg = positional[1];
   if (!input || !deckFileArg) usage();
 
-  const catalog = loadCatalog();
+  const { catalog } = loadCatalog();
   const hash = extractDeckHash(input);
   const deckFile = loadDeckFile(deckFileArg);
   const diff = diffDeckFile(hash, deckFile, catalog);
@@ -172,7 +258,7 @@ function cmdExport(argv: string[]): void {
   const deckFileArg = positional[0];
   if (!deckFileArg) usage();
 
-  const catalog = loadCatalog();
+  const { catalog } = loadCatalog();
   const deckFile = loadDeckFile(deckFileArg);
   const hash = encodeDeckFile(deckFile, catalog);
   const url = deckShareUrl(hash);
@@ -196,6 +282,9 @@ function main(): void {
       case "import":
         cmdImport(subargv.slice(1));
         break;
+      case "import-code":
+        cmdImportCode(subargv.slice(1));
+        return;
       case "diff":
         cmdDiff(subargv.slice(1));
         break;

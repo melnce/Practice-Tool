@@ -1,0 +1,21 @@
+{
+  "class": "Abysscraft",
+  "deckName": "Aggro Abysscraft",
+  "size": 40,
+  "cards": [
+    { "name": "Lilith, Devilish Cutie", "count": 3 },
+    { "name": "Lilith, Enchanting Succubus", "count": 3 },
+    { "name": "Monster Litterateur", "count": 3 },
+    { "name": "Devious Lesser Mummy", "count": 2 },
+    { "name": "Limil, Devilish Bunny", "count": 3 },
+    { "name": "Reverent Demon", "count": 3 },
+    { "name": "Ruthless Blitzer", "count": 3 },
+    { "name": "Tyrannical Fists", "count": 3 },
+    { "name": "Baal, Elemental Resonance", "count": 3 },
+    { "name": "Hark to the Night Song", "count": 3 },
+    { "name": "Anisage, Clear Resolve", "count": 2 },
+    { "name": "Suzy, Sincere Hexcaster", "count": 3 },
+    { "name": "Rampaging Commander", "count": 3 },
+    { "name": "Garodeth vs. Zeth", "count": 3 }
+  ]
+}

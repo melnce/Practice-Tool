@@ -24,6 +24,8 @@ decks/*
 !decks/sephie_runecraft.json
 !decks/spell_runecraft.json
 !decks/thestae_forestcraft.json
+!decks/meta/
+!decks/meta/**
 game_rules/
 
 # Node dependencies

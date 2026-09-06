@@ -1,0 +1,63 @@
+{
+  "class": "Abysscraft",
+  "deckName": "17 Wins Nightmare by @hystarfay53",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Adahime, Anathema of Death",
+      "count": 3
+    },
+    {
+      "name": "Baal, Elemental Resonance",
+      "count": 3
+    },
+    {
+      "name": "Bibatii, Eld Sight",
+      "count": 3
+    },
+    {
+      "name": "Fickle Necromancer",
+      "count": 2
+    },
+    {
+      "name": "Garodeth vs. Zeth",
+      "count": 3
+    },
+    {
+      "name": "Hark to the Night Song",
+      "count": 3
+    },
+    {
+      "name": "Highwire Feline",
+      "count": 3
+    },
+    {
+      "name": "Istyndet vs. Mitilykket",
+      "count": 3
+    },
+    {
+      "name": "Itsurugi & Taketsumi, Brothers",
+      "count": 2
+    },
+    {
+      "name": "Lilith, Devilish Cutie",
+      "count": 3
+    },
+    {
+      "name": "Macmillan, Reaper of Ceremonies",
+      "count": 3
+    },
+    {
+      "name": "Netherworld Lieutenant",
+      "count": 3
+    },
+    {
+      "name": "Raz, Demon on the Drums",
+      "count": 3
+    },
+    {
+      "name": "Void Colonel",
+      "count": 3
+    }
+  ]
+}
