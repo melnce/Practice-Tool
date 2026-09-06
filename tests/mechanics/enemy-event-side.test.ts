@@ -67,7 +67,7 @@ describe("enemy_* event activePlayer convention", () => {
       expect(findOnBoard("second", "Trap in the Woods")).toBeFalsy();
     });
 
-    it("chain summon path: Trap destroys chain-spawned enemy follower and itself", () => {
+    it("chain summon path: Trap destroys first chain-spawned enemy follower and itself", () => {
       givenGameState({ seed: 42, activePlayer: "first", roundCount: 10 })
         .withFirstBoard([
           { name: "Seed", type: "Follower", attack: 3, defense: 3 },
@@ -80,7 +80,9 @@ describe("enemy_* event activePlayer convention", () => {
         "first",
         seed,
       );
-      expect(thenBoard("first").length).toBe(1);
+      // Trap handles only the first enemy_follower_enter; later chain enters fizzle
+      // once Trap left the field (JP resolution-start source check).
+      expect(thenBoard("first").length).toBe(2);
       expect(findOnBoard("second", "Trap in the Woods")).toBeFalsy();
     });
 
@@ -275,6 +277,7 @@ describe("enemy_* event activePlayer convention", () => {
             op: "stat",
             action: "give",
             target: "enemy:follower",
+            filter: { name: "Target" },
             defense: -1,
           },
         ],
