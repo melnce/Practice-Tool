@@ -15,6 +15,7 @@ import {
 import { playCardCore } from "./core.js";
 import { logEvent } from "../../../core/logger.js";
 import type { PlayOutcome } from "./types.js";
+import { endPlaySequenceDrainIfIdle } from "./playSequence.js";
 
 /**
  * Play a card from hand. This is the main entry point.
@@ -54,6 +55,10 @@ export function playCard(
     if (outcome.kind === "blocked") {
       abortAction({ autoRender: true });
       return outcome;
+    }
+
+    if (outcome.kind === "done") {
+      endPlaySequenceDrainIfIdle();
     }
 
     commitAction({ autoRender: true });

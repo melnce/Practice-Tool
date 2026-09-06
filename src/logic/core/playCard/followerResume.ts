@@ -55,7 +55,9 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
 
     const card =
       findFollowerOnBoard(resume.cardUid, resume.player) ??
-      getGraveyard(state, resume.player).find((c) => c?.uid === resume.cardUid) ??
+      getGraveyard(state, resume.player).find(
+        (c) => c?.uid === resume.cardUid,
+      ) ??
       null;
     if (card) {
       recordFollowerEnter(state, player, card);
