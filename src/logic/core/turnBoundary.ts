@@ -201,9 +201,12 @@ function resolveTurnBoundaryQueue(
   queue: QueuedTurnTrigger[],
   event: TurnBoundaryEvent,
   focalPlayer: Player,
+  options?: { deferDrain?: boolean },
 ) {
+  const deferDrain = !!options?.deferDrain;
+
   if (queue.length === 0) {
-    flushDeferredDeathBatch();
+    if (!deferDrain) flushDeferredDeathBatch();
     return;
   }
 
@@ -229,19 +232,39 @@ function resolveTurnBoundaryQueue(
       }
     }
   } finally {
-    flushDeferredDeathBatch();
-    clearResolutionQueue();
+    if (!deferDrain) {
+      flushDeferredDeathBatch();
+      clearResolutionQueue();
+    }
   }
 }
 
+/** Step 7 — drain everything queued during steps 2–6 (rulebook §231). */
+export function drainTurnBoundaryQueue() {
+  flushDeferredDeathBatch();
+  clearResolutionQueue();
+  (state as any).deferDeathTriggers = false;
+}
+
+export type TurnBoundaryOptions = {
+  /** Hold step-7 drain open until after direct summon (Invoke) scan. */
+  deferDrain?: boolean;
+};
+
 /** End-of-turn: queue steps 1–4, resolve under deferral, then clear temp buffs on both boards. */
-export function runEndOfTurnBoundary(endingPlayer: Player) {
+export function runEndOfTurnBoundary(
+  endingPlayer: Player,
+  options?: TurnBoundaryOptions,
+) {
+  const deferDrain = !!options?.deferDrain;
   const queue = queueTurnBoundaryTriggers(
     "end_of_turn",
     endingPlayer,
     EOT_STEPS,
   );
-  resolveTurnBoundaryQueue(queue, "end_of_turn", endingPlayer);
+  resolveTurnBoundaryQueue(queue, "end_of_turn", endingPlayer, {
+    deferDrain,
+  });
 
   for (const side of ["first", "second"] as Player[]) {
     getBoard(state, side).forEach((card) => {
@@ -258,7 +281,9 @@ export function runStartOfTurnBoundary(
     tickCrests?: (player: Player) => void;
     tickAmulets?: (player: Player) => void;
   },
+  options?: TurnBoundaryOptions,
 ) {
+  const deferDrain = !!options?.deferDrain;
   const queue = queueTurnBoundaryTriggers(
     "start_of_turn",
     startingPlayer,
@@ -266,12 +291,38 @@ export function runStartOfTurnBoundary(
   );
   const steps = [2, 3, 4, 5];
 
-  for (const step of steps) {
-    const batch = queue.filter((q) => q.step === step);
-    if (batch.length > 0) {
-      resolveTurnBoundaryQueue(batch, "start_of_turn", startingPlayer);
+  const prevDefer = !!(state as any).deferDeathTriggers;
+  const prevBoundaryDefer = !!(state as any).sotBoundaryDeferDrain;
+  if (deferDrain) {
+    (state as any).deferDeathTriggers = true;
+    (state as any).sotBoundaryDeferDrain = true;
+  }
+
+  try {
+    for (const step of steps) {
+      const batch = queue.filter((q) => q.step === step);
+      if (batch.length > 0) {
+        resolveTurnBoundaryQueue(batch, "start_of_turn", startingPlayer, {
+          deferDrain,
+        });
+      }
+      if (step === 2) {
+        hooks?.tickCrests?.(startingPlayer);
+        if (deferDrain) cleanupDead();
+      }
+      if (step === 3) {
+        hooks?.tickAmulets?.(startingPlayer);
+        if (deferDrain) cleanupDead();
+      }
     }
-    if (step === 2) hooks?.tickCrests?.(startingPlayer);
-    if (step === 3) hooks?.tickAmulets?.(startingPlayer);
+  } finally {
+    if (deferDrain) {
+      if (prevBoundaryDefer) {
+        (state as any).sotBoundaryDeferDrain = true;
+      } else {
+        delete (state as any).sotBoundaryDeferDrain;
+      }
+      (state as any).deferDeathTriggers = prevDefer;
+    }
   }
 }

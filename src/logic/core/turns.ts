@@ -7,6 +7,7 @@ import { tickCrests, resetCrestOncePerTurn } from "../effects/crest.js";
 import {
   runEndOfTurnBoundary,
   runStartOfTurnBoundary,
+  drainTurnBoundaryQueue,
 } from "./turnBoundary.js";
 import { clearExpiredCantAttackAtEOT } from "./keywords/eot.js";
 import { recomputeAttackFlags } from "./combat.js";
@@ -194,7 +195,12 @@ function scanDeckForInvokes(
 
       // Execute invoke logic via centralized handler
       // This ensures stats are initialized, triggers fire, and Rally increments.
-      handleInvoke(owner, card);
+      (state as any).turnBoundaryInvokePhase = true;
+      try {
+        handleInvoke(owner, card);
+      } finally {
+        (state as any).turnBoundaryInvokePhase = false;
+      }
 
       // "Only 1 copy of an Invoke card will activated each turn"
 
@@ -276,27 +282,37 @@ function _endTurnCore(endingPlayer: Player) {
     refreshBoardForNewTurn(getBoard(state, nextPlayer));
 
     try {
-      runStartOfTurnBoundary(nextPlayer, {
-        tickCrests,
-        tickAmulets: tickAmuletCountdowns,
-      });
+      runStartOfTurnBoundary(
+        nextPlayer,
+        {
+          tickCrests,
+          tickAmulets: tickAmuletCountdowns,
+        },
+        { deferDrain: true },
+      );
     } catch (e) {
       console.error(`Error in start-of-turn boundary (${nextPlayer}):`, e);
     }
-
-    // Draw step 8 ? after SOT queue resolves
-    drawCard(
-      getHand(state, nextPlayer),
-      getDeck(state, nextPlayer),
-      nextPlayer,
-    );
-    logEvent("draw", { player: nextPlayer, count: 1 });
 
     try {
       scanDeckForInvokes(nextPlayer, "start_of_turn");
     } catch (e) {
       console.error(`Error in ${nextPlayer} Start Invoke:`, e);
     }
+
+    try {
+      drainTurnBoundaryQueue();
+    } catch (e) {
+      console.error(`Error draining SOT boundary (${nextPlayer}):`, e);
+    }
+
+    // Draw step 8 — after SOT queue + invoke drain resolve
+    drawCard(
+      getHand(state, nextPlayer),
+      getDeck(state, nextPlayer),
+      nextPlayer,
+    );
+    logEvent("draw", { player: nextPlayer, count: 1 });
 
     cleanupDead();
 
