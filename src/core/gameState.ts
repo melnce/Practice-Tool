@@ -22,6 +22,7 @@ const DEFAULTS = {
 
   // Ephemeral
   pendingTargetEffect: undefined,
+  pendingModeChoice: undefined,
   lastFuse: undefined,
 } as const;
 
@@ -57,6 +58,7 @@ const KNOWN_ROOT_KEYS = new Set<string>([
   "_runEffectsDepth",
   "combatResolutionDepth",
   "resumePlayFollower",
+  "pendingModeChoice",
   // Mid-match ephemerals that must clear on reset (listed so we delete values below)
   "lastAddedToHand",
   "lastSearchedCards",
@@ -143,6 +145,7 @@ export function resetStateInstance(
   (target as any)._runEffectsDepth = 0;
   (target as any).combatResolutionDepth = 0;
   delete (target as any).resumePlayFollower;
+  delete (target as any).pendingModeChoice;
 
   // H) Clear optional / mid-match root ephemerals
   delete (target as any).phase;

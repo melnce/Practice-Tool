@@ -10,6 +10,7 @@ import { hashGameState } from "./stateHash.js";
 import type { CardInstance } from "./types/index.js";
 import { isDev, readEnv } from "./env.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
+import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -105,6 +106,11 @@ function sanitizePendingTargetInSnapshot(snap: GameState): void {
   pending.targetUids = [];
   if (Array.isArray(pending.targets)) {
     pending.targets = [];
+  }
+
+  const modePending = snap.pendingModeChoice;
+  if (modePending) {
+    modePending.partialPickedIndices = [];
   }
 
   const seen = new Set<CardInstance>();
@@ -371,7 +377,7 @@ function assertResolutionQueueClearForCommit(actionName: string): void {
   const draining = !!(state as any)._drainingResolutionQueue;
   if (draining) return;
   if (queueLen === 0) return;
-  if (state.pendingTargetEffect) return;
+  if (isEffectResolutionPaused()) return;
 
   const msg =
     `[History] commitAction("${actionName}") with in-flight resolution queue ` +

@@ -26,6 +26,8 @@ import {
 } from "../../core/playerHelpers.js";
 import { bumpZoneVersion } from "./triggers/utils.js";
 import { recordDestroyed } from "./destroyedHistory.js";
+import { isDev, readEnv } from "../../core/env.js";
+import { isEffectResolutionPaused } from "./resolutionPause.js";
 
 let runEffects: (
   effects: Effect[],
@@ -118,7 +120,7 @@ function triggerLastWords(card: CardInstance, owner: Player): "pending" | void {
     return;
   }
   const result = runEffects(lw, owner, card);
-  if (result === "pending" || state.pendingTargetEffect) {
+  if (result === "pending" || isEffectResolutionPaused()) {
     return "pending";
   }
   (card as any)._lwFired = true;
@@ -203,7 +205,7 @@ function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
       sourceCard,
       entry.context,
     );
-    if (result === "pending" || state.pendingTargetEffect) {
+    if (result === "pending" || isEffectResolutionPaused()) {
       item.resumeAt = i;
       if (state.pendingTargetEffect) {
         (state.pendingTargetEffect as any).deferredReactiveResume = {
@@ -219,6 +221,15 @@ function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
 
 /** Flush unified resolution queue: reactive triggers + deferred death batches (C4). */
 export function flushDeferredDeathBatch() {
+  if ((state as any)._drainingResolutionQueue) {
+    const vitest = readEnv("VITEST");
+    const inTest = vitest === "true" || vitest === "1";
+    if (isDev() || inTest) {
+      throw new Error("[Triggers] Resolution drain re-entered");
+    }
+    return;
+  }
+
   const MAX_ROUNDS = 32;
   const MAX_DRAIN_STEPS = 5000;
   let drainSteps = 0;
@@ -294,7 +305,7 @@ export function flushDeferredDeathBatch() {
             if (!card) continue;
             const owner = lwItem.owner;
             const paused = triggerLastWords(card, owner);
-            if (paused === "pending" || state.pendingTargetEffect) {
+            if (paused === "pending" || isEffectResolutionPaused()) {
               enqueueDeathLwGroup(lwBatch.slice(i));
               if (state.pendingTargetEffect) {
                 state.pendingTargetEffect.deferredLwComplete = {
@@ -359,9 +370,10 @@ export function completeDeferredLwAfterSelection(request?: {
   }
 }
 
-/** Resume unified resolution flush after interactive target/LW resolution completes. */
+/** Resume unified resolution flush after interactive target/mode resolution completes. */
 export function resumeDeferredDeathIfIdle(): void {
-  if (state.pendingTargetEffect) return;
+  if ((state as any)._drainingResolutionQueue) return;
+  if (isEffectResolutionPaused()) return;
   if (getResolutionQueue().length === 0) return;
   flushDeferredDeathBatch();
 }
@@ -571,7 +583,7 @@ export function cleanupDead() {
       const card = resolveDeathLwCard(lwSync[i]!);
       if (!card) continue;
       const paused = triggerLastWords(card, owner);
-      if (paused === "pending" || state.pendingTargetEffect) {
+      if (paused === "pending" || isEffectResolutionPaused()) {
         enqueueDeathLwGroup(lwSync.slice(i));
         return;
       }

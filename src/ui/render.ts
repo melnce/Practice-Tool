@@ -19,6 +19,8 @@ import { getPuzzleSessionSnapshot } from "../core/puzzle/session.js";
 import { syncFloatingCombatTextFromLogs } from "./floatingCombatText.js";
 import { noteBlackboxRematch } from "./blackbox.js";
 import { syncMulliganOverlayFromState } from "../logic/mulligan.js";
+import { showChoiceModal } from "./choiceModal.js";
+import { applyPendingModePickIndex } from "../logic/effects/ops/mode.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -166,6 +168,18 @@ export function render() {
     document.body.classList.add("select-mode");
   } else {
     document.body.classList.remove("select-mode");
+  }
+
+  // Re-open mode modal after undo/redo when pendingModeChoice survives on state.
+  if (
+    state.phase !== "mulligan" &&
+    state.pendingModeChoice?.options?.length &&
+    !document.querySelector(".choice-modal")
+  ) {
+    showChoiceModal(state.pendingModeChoice.options, (index) => {
+      applyPendingModePickIndex(index);
+      render();
+    });
   }
 
   updateEvoButtonsUI(state);

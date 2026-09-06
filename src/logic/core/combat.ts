@@ -21,6 +21,7 @@ import { isGameOver } from "../../core/gameOver.js";
 import { applyLeaderDamage } from "../effects/leader.js";
 import { destroyTarget } from "../effects/ops/destroy/index.js";
 import { cleanupDead, resumeDeferredDeathIfIdle } from "./cleanup.js";
+import { isEffectResolutionPaused } from "./resolutionPause.js";
 import { dealDamage, enterDamageBatch, exitDamageBatch } from "./barrier.js";
 import { doAction } from "../../core/history.js";
 import { handleRestore } from "../effects/ops/restore/index.js";
@@ -136,7 +137,7 @@ function recomputeAttackFlags(card: CardInstance) {
   card.isRush = !!(card.justPlayed && card.hasRush && !card.hasStorm);
 }
 function drainCombatResolutionQueue() {
-  if (state.pendingTargetEffect) return;
+  if (isEffectResolutionPaused()) return;
   if ((state as any)._drainingResolutionQueue) return;
   resumeDeferredDeathIfIdle();
 }

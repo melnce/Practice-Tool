@@ -78,12 +78,13 @@ export function exitDamageBatch(): void {
 export function flushPendingSelfDamagedTriggers(): void {
   cleanupDead();
   const queue = getPendingSelfDamagedQueue();
+  const draining = !!(state as any)._drainingResolutionQueue;
   while (queue.length > 0) {
     const item = queue.shift()!;
     fireTrigger("self_damaged", item.owner, item.context);
     cleanupDead();
   }
-  if (!(state as any).deferDeathTriggers) {
+  if (!draining && !(state as any).deferDeathTriggers) {
     resumeDeferredDeathIfIdle();
   }
 }

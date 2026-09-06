@@ -57,6 +57,10 @@ export interface GameState {
   mulliganSecondSelected?: Set<string>;
 
   // === EPHEMERAL STATE ===
+  /** Open mode-choice modal (interactive path); gates commits and queue drains. */
+  pendingModeChoice?:
+    | import("../../logic/core/resolutionPause.js").PendingModeChoice
+    | undefined;
   pendingTargetEffect?:
     | {
         eff: Effect;

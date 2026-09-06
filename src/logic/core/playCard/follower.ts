@@ -8,6 +8,7 @@ import type {
   Effect,
 } from "../../../core/types/index.js";
 import { runEffects } from "../effects/index.js";
+import { isEffectResolutionPaused } from "../resolutionPause.js";
 import { pushPlayedHistory, rememberLastPlayedCard } from "./history.js";
 import type { PlayOutcome } from "./types.js";
 import { applyKeywordsFromList } from "../keywords.js";
@@ -106,7 +107,7 @@ export function playFollower(
       runEffects([...card.fanfare], player, card, { enteringCard: card }) ===
       "pending";
 
-    if (fanfarePaused || state.pendingTargetEffect) {
+    if (fanfarePaused || isEffectResolutionPaused()) {
       const resume: PlayFollowerResume = {
         player,
         cardUid: card.uid,
@@ -130,7 +131,7 @@ export function playFollower(
     enteringKeywordSnapshot,
   });
 
-  if (state.pendingTargetEffect) {
+  if (isEffectResolutionPaused()) {
     return { kind: "paused" };
   }
 
