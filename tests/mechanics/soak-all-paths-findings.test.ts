@@ -46,10 +46,32 @@ beforeAll(async () => {
 });
 
 describe("soak --all-paths findings", () => {
-  it("crash: clearSelectableFlags lifecycle guard — fuse_finalize_gear_multi (guardLifecycle)", async () => {
+  it("fuse_finalize_gardens_allure lifecycle guard fixed — seed 20260910 game 95", async () => {
+    const result = await runSoakGame({
+      seed: 20260910,
+      gameIndex: 95,
+      turnCap: 60,
+      actionCap: 800,
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  });
+
+  it("fuse_finalize_gear_multi lifecycle guard fixed by PR #257 — seed 20260910 game 113", async () => {
     const result = await runSoakGame({
       seed: 20260910,
       gameIndex: 113,
+      turnCap: 60,
+      actionCap: 800,
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  });
+
+  it("fuse_finalize_fortifier lifecycle guard fixed by PR #257 — seed 20260910 game 147", async () => {
+    const result = await runSoakGame({
+      seed: 20260910,
+      gameIndex: 147,
       turnCap: 60,
       actionCap: 800,
       ...ALL_PATHS,

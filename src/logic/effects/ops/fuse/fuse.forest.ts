@@ -1,5 +1,4 @@
 // src/logic/effects/ops/fuse/fuse.forest.ts
-import { clearSelectableFlags } from "../../../core/targeting.js";
 import { logEvent } from "../../../../core/logger.js";
 import type {
   Player,
@@ -21,7 +20,6 @@ export function fuse_finalize_gardens_allure(
 
   const initiator = hand.find((c) => c?.uid === initiator_uid);
   if (!initiator) {
-    clearSelectableFlags();
     // Render removed - UI layer
     return;
   }
@@ -33,7 +31,6 @@ export function fuse_finalize_gardens_allure(
       reason: "already_fused_this_turn",
       initiator: initiator?.name,
     });
-    clearSelectableFlags();
     // Render removed - UI layer
     return "done";
   }
@@ -68,6 +65,5 @@ export function fuse_finalize_gardens_allure(
     result: "gardens_allure_mutate",
   });
 
-  clearSelectableFlags();
   // Render removed - UI layer
 }

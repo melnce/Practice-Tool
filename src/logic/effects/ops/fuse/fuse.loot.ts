@@ -1,6 +1,5 @@
 // src/logic/effects/ops/fuse/fuse.loot.ts
 import { state } from "../../../../core/gameState.js";
-import { clearSelectableFlags } from "../../../core/targeting.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { logEvent } from "../../../../core/logger.js";
 import type { Player, CardInstance } from "../../../../core/types/index.js";
@@ -18,7 +17,6 @@ export function fuse_finalize_loot(
 
   const initiator = hand.find((c) => c?.uid === initiator_uid);
   if (!initiator) {
-    clearSelectableFlags();
     // Render removed - UI layer
     return;
   }
@@ -30,7 +28,6 @@ export function fuse_finalize_loot(
       reason: "already_fused_this_turn",
       initiator: initiator?.name,
     });
-    clearSelectableFlags();
     // Render removed - UI layer
     return "done";
   }
@@ -144,6 +141,5 @@ export function fuse_finalize_loot(
     /* no-op */
   }
 
-  clearSelectableFlags();
   // Render removed - UI layer
 }
