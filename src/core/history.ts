@@ -94,6 +94,7 @@ export const INTERNAL_CACHE_KEYS = new Set([
   "deferDeathTriggers", // Transient runEffects flag — must not survive undo/redo
   "_reactiveCollector", // Ephemeral during reactive trigger collection
   "_drainingResolutionQueue", // Re-entrancy guard during unified queue drain
+  "__resolutionDrainDepth", // Dev/test nested drain depth counter
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.

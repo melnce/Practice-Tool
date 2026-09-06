@@ -39,6 +39,26 @@ export function registerRunEffectsInCleanup(fn: any) {
   runEffects = fn;
 }
 
+/** Dev/test-only: peak nested flushDeferredDeathBatch depth (re-entry attempts). */
+let maxResolutionDrainDepthForTests = 0;
+
+export function resetResolutionDrainDepthForTests(): void {
+  maxResolutionDrainDepthForTests = 0;
+  (state as any).__resolutionDrainDepth = 0;
+}
+
+export function getResolutionDrainDepthForTests(): { max: number } {
+  return { max: maxResolutionDrainDepthForTests };
+}
+
+function noteResolutionDrainDepthEntry(): void {
+  const next = ((state as any).__resolutionDrainDepth ?? 0) + 1;
+  (state as any).__resolutionDrainDepth = next;
+  if (next > maxResolutionDrainDepthForTests) {
+    maxResolutionDrainDepthForTests = next;
+  }
+}
+
 type PendingDeath = {
   card: CardInstance;
   owner: Player;
@@ -221,6 +241,7 @@ function executeReactiveGroup(item: ReactiveQueueItem): "done" | "paused" {
 
 /** Flush unified resolution queue: reactive triggers + deferred death batches (C4). */
 export function flushDeferredDeathBatch() {
+  noteResolutionDrainDepthEntry();
   if ((state as any)._drainingResolutionQueue) {
     const vitest = readEnv("VITEST");
     const inTest = vitest === "true" || vitest === "1";
@@ -339,6 +360,7 @@ export function flushDeferredDeathBatch() {
     }
   } finally {
     (state as any)._drainingResolutionQueue = false;
+    (state as any).__resolutionDrainDepth = 0;
   }
 }
 

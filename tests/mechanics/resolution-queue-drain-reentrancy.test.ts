@@ -10,9 +10,19 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
-import { flushDeferredDeathBatch } from "../../src/logic/core/cleanup.js";
+import {
+  getResolutionDrainDepthForTests,
+  resetResolutionDrainDepthForTests,
+} from "../../src/logic/core/cleanup.js";
 import { getResolutionQueue } from "../../src/logic/core/triggers/queue.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
+
+/**
+ * High defense so nested resume→flush cycles would overflow the stack on main
+ * (game-54 path: deferDeathTriggers off during reactive drain lets
+ * flushPendingSelfDamagedTriggers call resumeDeferredDeathIfIdle mid-drain).
+ */
+const PING_PONG_DEFENSE = 8000;
 
 const PING_PONG_TRIGGER = {
   event: "self_damaged",
@@ -22,7 +32,6 @@ const PING_PONG_TRIGGER = {
       op: "damage",
       target: "enemy:follower",
       amount: 1,
-      select: 1,
     },
   ],
 };
@@ -38,14 +47,14 @@ function makePingPongFollower(
       type: "Follower",
       cost: 2,
       attack: 2,
-      defense: 20,
+      defense: PING_PONG_DEFENSE,
       triggers: [PING_PONG_TRIGGER],
     },
     "board",
     owner,
   );
   card.uid = uid;
-  card.peak_defense = 20;
+  card.peak_defense = PING_PONG_DEFENSE;
   applyKeywordsFromList(card);
   return card;
 }
@@ -58,9 +67,10 @@ describe("resolution queue drain re-entrancy", () => {
       .build();
     state.gameStarted = true;
     state.phase = "main";
+    resetResolutionDrainDepthForTests();
   });
 
-  it("self-damage ping-pong inside deferred drain never throws RangeError", () => {
+  it("self-damage chain during reactive drain never re-enters flushDeferredDeathBatch", () => {
     const ally = makePingPongFollower("Ally Ping", "first", "ally_ping");
     const enemy = makePingPongFollower("Enemy Ping", "second", "enemy_ping");
     state.players.first.board = [ally];
@@ -84,11 +94,14 @@ describe("resolution queue drain re-entrancy", () => {
 
     expect(() => {
       runEffects([...fanfareSource.fanfare!], "first", fanfareSource, {
-        deferDeathTriggers: true,
+        // Must not defer: nested reactive runEffects during drain runs at depth 0,
+        // and resumeDeferredDeathIfIdle must be reachable from exitDamageBatch
+        // (matches soak game-54 overflow path on main).
+        deferDeathTriggers: false,
       });
-      flushDeferredDeathBatch();
     }).not.toThrow(RangeError);
 
+    expect(getResolutionDrainDepthForTests().max).toBeLessThanOrEqual(1);
     expect(getResolutionQueue()).toHaveLength(0);
     for (const p of ["first", "second"] as const) {
       for (const c of state.players[p].board) {
