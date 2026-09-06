@@ -16,7 +16,7 @@ import type { EnteringKeywordSnapshot } from "../enterKeywords.js";
 import { resumeDeferredDeathIfIdle } from "../cleanup.js";
 import { recordFollowerEnter } from "../followerEnterHistory.js";
 import { recomputeAttackFlags } from "../combat.js";
-import { endPlaySequenceDrain } from "./playSequence.js";
+import { endPlaySequenceDrainIfIdle } from "./playSequence.js";
 import { isEffectResolutionPaused } from "../resolutionPause.js";
 import { fireTrigger } from "../triggers.js";
 
@@ -44,70 +44,79 @@ export function stashPlayFollowerResume(ctx: PlayFollowerResume): void {
 
 /** Run play/enter-reactive triggers and Enhance after fanfare fully resolves. */
 export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
-  const player = resume.player;
-  // §372 / Owner ruling — Rally (2026-08-12): Fanfare Rally(N) sees the count
-  // from just before this card entered (timing). Increment after Fanfare
-  // (before enter/play triggers) so rally-conditioned Fanfare gates exclude
-  // self; tokens/summons during Fanfare still count via summon_ops. Always
-  // increment even if the follower left play during Fanfare.
-  incrementRally(state, resume.player);
+  try {
+    const player = resume.player;
+    // §372 / Owner ruling — Rally (2026-08-12): Fanfare Rally(N) sees the count
+    // from just before this card entered (timing). Increment after Fanfare
+    // (before enter/play triggers) so rally-conditioned Fanfare gates exclude
+    // self; tokens/summons during Fanfare still count via summon_ops. Always
+    // increment even if the follower left play during Fanfare.
+    incrementRally(state, resume.player);
 
-  const card =
-    findFollowerOnBoard(resume.cardUid, resume.player) ??
-    getGraveyard(state, resume.player).find((c) => c?.uid === resume.cardUid) ??
-    null;
-  if (card) {
-    recordFollowerEnter(state, player, card);
-  }
-
-  const live = findFollowerOnBoard(resume.cardUid, resume.player);
-  if (!live) return;
-
-  fireTrigger("ally_card_played", player, { playedCard: live });
-  fireTrigger("ally_follower_played", player, {
-    playedCard: live,
-    costChanged: resume.costChangedOnPlay,
-  });
-
-  if (resume.chosenTierEffectGroups?.length) {
-    for (const effects of resume.chosenTierEffectGroups) {
-      if (effects.length) {
-        runEffects([...effects], player, live);
-      }
+    const card =
+      findFollowerOnBoard(resume.cardUid, resume.player) ??
+      getGraveyard(state, resume.player).find((c) => c?.uid === resume.cardUid) ??
+      null;
+    if (card) {
+      recordFollowerEnter(state, player, card);
     }
-  }
 
-  applyKeywordsFromList(live);
-  recomputeAttackFlags(live);
+    const live = findFollowerOnBoard(resume.cardUid, resume.player);
+    if (!live) return;
 
-  const myBoard = getBoard(state, player);
-  for (const perm of myBoard) {
-    if (!perm || perm === live || perm.type !== "Amulet") continue;
-    const ks = perm.keywordState;
-    if (ks?.hasAllyEnter && Array.isArray(ks.allyEnterEffects)) {
-      for (const eff of ks.allyEnterEffects) {
-        if (eff.op === "stat" && eff.target === "trigger") {
-          live.attack =
-            (Number(live.attack) || 0) + (Number((eff as any).attack) || 0);
-          live.defense =
-            (Number(live.defense) || 0) + (Number((eff as any).defense) || 0);
+    fireTrigger("ally_card_played", player, { playedCard: live });
+    fireTrigger("ally_follower_played", player, {
+      playedCard: live,
+      costChanged: resume.costChangedOnPlay,
+    });
+
+    if (resume.chosenTierEffectGroups?.length) {
+      for (const effects of resume.chosenTierEffectGroups) {
+        if (effects.length) {
+          runEffects([...effects], player, live);
         }
       }
     }
-  }
 
-  if (card && Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
+    applyKeywordsFromList(live);
+    recomputeAttackFlags(live);
+
+    const myBoard = getBoard(state, player);
     for (const perm of myBoard) {
-      if (!perm) continue;
-      const ks = perm.keywordState || {};
-      if (
-        perm.type === "Amulet" &&
-        ks.hasPixieEnter &&
-        Array.isArray(ks.pixieEnterEffects)
-      ) {
-        runEffects([...ks.pixieEnterEffects], player, perm);
+      if (!perm || perm === live || perm.type !== "Amulet") continue;
+      const ks = perm.keywordState;
+      if (ks?.hasAllyEnter && Array.isArray(ks.allyEnterEffects)) {
+        for (const eff of ks.allyEnterEffects) {
+          if (eff.op === "stat" && eff.target === "trigger") {
+            live.attack =
+              (Number(live.attack) || 0) + (Number((eff as any).attack) || 0);
+            live.defense =
+              (Number(live.defense) || 0) + (Number((eff as any).defense) || 0);
+          }
+        }
       }
     }
+
+    if (card && Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
+      for (const perm of myBoard) {
+        if (!perm) continue;
+        const ks = perm.keywordState || {};
+        if (
+          perm.type === "Amulet" &&
+          ks.hasPixieEnter &&
+          Array.isArray(ks.pixieEnterEffects)
+        ) {
+          runEffects([...ks.pixieEnterEffects], player, perm);
+        }
+      }
+    }
+  } finally {
+    // Every completion path (orchestrateExecution, multi-pick discard, etc.)
+    // must end the play sequence; idempotent for explicit follower.ts drain.
+    if (!isEffectResolutionPaused()) {
+      endPlaySequenceDrainIfIdle();
+    }
+    resumeDeferredDeathIfIdle();
   }
 }
 
@@ -128,8 +137,4 @@ export function consumePlayFollowerResume(): void {
   }
 
   runPlayFollowerPostFanfare(resume);
-  if (!isEffectResolutionPaused()) {
-    endPlaySequenceDrain();
-  }
-  resumeDeferredDeathIfIdle();
 }

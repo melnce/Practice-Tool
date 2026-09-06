@@ -12,6 +12,7 @@ import type { CardInstance } from "./types/index.js";
 import { isDev, readEnv } from "./env.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
+import { getPlaySequenceDepth } from "../logic/core/playCard/playSequence.js";
 import { resetTriggerChainDepth } from "../logic/core/triggers.js";
 import { endDispatch } from "../logic/core/targeting/guards.js";
 // --- Config ---
@@ -443,6 +444,22 @@ function assertResolutionQueueClearForCommit(actionName: string): void {
   console.warn(msg);
 }
 
+function assertPlaySequenceClearForCommit(actionName: string): void {
+  const depth = getPlaySequenceDepth();
+  if (depth === 0) return;
+  if (isEffectResolutionPaused()) return;
+
+  const msg =
+    `[History] commitAction("${actionName}") with open play sequence ` +
+    `(playSequenceDepth=${depth})`;
+  const vitest = readEnv("VITEST");
+  const inTest = vitest === "true" || vitest === "1";
+  if (isDev() || inTest) {
+    throw new Error(msg);
+  }
+  console.warn(msg);
+}
+
 /** Commit the current action (captures after-snapshot; clears redo). */
 export function commitAction({ autoRender = true } = {}) {
   if (!inAction) return; // no-op if nothing open
@@ -456,6 +473,7 @@ export function commitAction({ autoRender = true } = {}) {
   }
 
   assertResolutionQueueClearForCommit(inAction.name);
+  assertPlaySequenceClearForCommit(inAction.name);
 
   bumpActionSeq();
   const after = snapshot();

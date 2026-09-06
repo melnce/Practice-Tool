@@ -29,7 +29,6 @@ import { recomputeAttackFlags } from "../combat.js";
 import { isPlayCostChangedFromPrinted } from "../../../helpers/alternateForm.js";
 import {
   beginPlaySequence,
-  endPlaySequenceDrain,
   stageFollowerEnterReactions,
 } from "./playSequence.js";
 
@@ -133,11 +132,6 @@ export function playFollower(
     costChangedOnPlay,
     enteringKeywordSnapshot,
   });
-
-  if (!isEffectResolutionPaused()) {
-    endPlaySequenceDrain();
-  }
-  resumeDeferredDeathIfIdle();
 
   if (isEffectResolutionPaused()) {
     return { kind: "paused" };

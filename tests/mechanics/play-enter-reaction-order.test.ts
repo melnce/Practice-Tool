@@ -19,20 +19,25 @@ import {
   getRally,
   getGraveyard,
   setRally,
+  getHand,
 } from "../../src/core/playerHelpers.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
 import { getResolutionQueue } from "../../src/logic/core/triggers/queue.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
 import { clearLogs, getLogs } from "../../src/core/logger.js";
-import { setHistoryEnabled } from "../../src/core/history.js";
+import { setHistoryEnabled, onHistoryEvent } from "../../src/core/history.js";
 import { countNamedEnters } from "../../src/logic/core/followerEnterHistory.js";
+import { getPlaySequenceDepth } from "../../src/logic/core/playCard/playSequence.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import "../../src/logic/core/effects/index.js";
 
 const AZURIFRIT = "10344110";
 const KRULLE = "10314110";
 const GILDARIA = "10224110";
+const LUMIORE = "10844120";
+const DEPTHS = "90044330";
+const FILLER = "10102110";
 
 function makeEnterLogWatcher(name = "EnterLogWatcher"): CardInstance {
   const card = createCard(
@@ -502,5 +507,65 @@ describe("play/enter reaction queue order", () => {
     ).toBe(true);
 
     (globalThis as any).HEADLESS = prevHeadless;
+  });
+
+  it("(h) Lumiore multi-pick discard: staged enter drains after both picks; queue empty at commit", () => {
+    setHistoryEnabled(true);
+    const enterWatcher = makeEnterLogWatcher("LumioreEnterWatcher");
+    state.players.first.board = [enterWatcher];
+    state.players.first.hand = [
+      createCard(LUMIORE, "hand", "first"),
+      createCard(DEPTHS, "hand", "first"),
+      createCard(FILLER, "hand", "first"),
+    ];
+    state.players.first.pp = 10;
+    state.turnNumber = 10;
+
+    const queueAtCommits: number[] = [];
+    const commitNames: string[] = [];
+    const unsub = onHistoryEvent((ev) => {
+      if (ev.type === "commit") {
+        queueAtCommits.push(getResolutionQueue().length);
+        commitNames.push(ev.name);
+      }
+    });
+
+    whenPlayCard("first", 0);
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(enterWatcher.counters?.earth).toBeUndefined();
+    expect(getPlaySequenceDepth()).toBeGreaterThan(0);
+
+    const hand = getHand(state, "first");
+    const pickA = hand.find((c) => String(c.id) === DEPTHS)!;
+    const pickB = hand.find((c) => String(c.id) === FILLER)!;
+
+    engineDispatch(state, {
+      type: "CHOOSE_TARGET",
+      player: "first",
+      target: { type: "card", uid: pickA.uid },
+    });
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(enterWatcher.counters?.earth).toBeUndefined();
+    expect(getPlaySequenceDepth()).toBeGreaterThan(0);
+    for (const len of queueAtCommits) {
+      expect(len).toBe(0);
+    }
+
+    engineDispatch(state, {
+      type: "CHOOSE_TARGET",
+      player: "first",
+      target: { type: "card", uid: pickB.uid },
+    });
+
+    unsub();
+
+    expect(state.pendingTargetEffect).toBeUndefined();
+    expect(getPlaySequenceDepth()).toBe(0);
+    expect(enterWatcher.counters?.earth).toBe(1);
+    expect(getResolutionQueue()).toHaveLength(0);
+    expect(commitNames).toContain("Resolve Targets");
+    for (const len of queueAtCommits) {
+      expect(len).toBe(0);
+    }
   });
 });
