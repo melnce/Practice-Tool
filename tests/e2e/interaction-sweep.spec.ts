@@ -277,7 +277,17 @@ async function resolveSelectableTarget(
   mode: InputMode,
   selector: string,
 ) {
-  await tapLocator(page, mode, page.locator(selector).first());
+  const loc = page.locator(selector).first();
+  await expect(loc).toBeVisible();
+  if (mode === "touch") {
+    await expect(loc).toHaveClass(/selectable/, { timeout: 5000 });
+    // Playwright's touch click is reliable after CDP drag streams; raw
+    // `touchscreen.tap` can miss `click` listeners on reconciled board cards.
+    await loc.click({ timeout: 5000 });
+  } else {
+    await tapLocator(page, mode, loc);
+  }
+  await waitForPendingCleared(page);
 }
 
 async function waitForPendingCleared(page: Page) {
