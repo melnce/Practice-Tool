@@ -1,6 +1,6 @@
 // scripts/soak.ts
 // Engine soak harness — hundreds of seeded random games across the full card pool.
-// Run: npm run soak -- [--games=N] [--seed=N] [--smoke] [--history] [--determinism=N]
+// Run: npm run soak -- [--games=N] [--seed=N] [--smoke] [--history] [--positions] [--determinism=N]
 //
 // NODE_ENV defaults to "test" so dev-mode engine guards (targeted-op lifecycle,
 // unknown op actions, etc.) throw instead of warn — soak must not run blind.
@@ -9,8 +9,12 @@
 
 (globalThis as any).HEADLESS = true;
 process.env.NODE_ENV ??= "test";
-// History is off by default for soak throughput; --history / --smoke enable round-trip checks.
-if (!process.argv.includes("--history") && !process.argv.includes("--smoke")) {
+// History is off by default for soak throughput; --history / --smoke / --positions enable round-trip checks.
+if (
+  !process.argv.includes("--history") &&
+  !process.argv.includes("--smoke") &&
+  !process.argv.includes("--positions")
+) {
   process.env.DISABLE_HISTORY = process.env.DISABLE_HISTORY ?? "1";
 }
 
@@ -120,6 +124,7 @@ type SoakCliConfig = {
   history: boolean;
   historyIgnore: string[];
   historyReExecute: boolean;
+  positions: boolean;
   dispatch: "engine" | "core";
   determinism: number;
   turnCap: number;
@@ -135,6 +140,7 @@ function parseArgs(): SoakCliConfig {
     history: false,
     historyIgnore: [],
     historyReExecute: false,
+    positions: false,
     dispatch: "engine",
     determinism: 20,
     turnCap: 60,
@@ -157,6 +163,7 @@ function parseArgs(): SoakCliConfig {
         .map((s) => s.trim())
         .filter(Boolean);
     } else if (arg === "--history-reexecute") config.historyReExecute = true;
+    else if (arg === "--positions") config.positions = true;
     else if (arg.startsWith("--dispatch=")) {
       const v = arg.slice(11);
       if (v === "engine" || v === "core") config.dispatch = v;
@@ -190,7 +197,10 @@ async function main(): Promise<void> {
   const soakEnv = await import(
     pathToFileURL(resolve(ROOT, "src/bench/soakEnv.ts")).href
   );
-  if (config.history && config.historyIgnore.length === 0) {
+  if (
+    (config.history || config.positions) &&
+    config.historyIgnore.length === 0
+  ) {
     config.historyIgnore = [...soakEnv.PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS];
   }
   const { CoverageTracker } = await import(
@@ -203,7 +213,7 @@ async function main(): Promise<void> {
   console.log("║              SHADOWVERSE ENGINE SOAK                     ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
-    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"}`,
+    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} positions=${config.positions} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"}`,
   );
   console.log(`reports → ${REPORT_DIR}`);
   console.log("");
@@ -246,6 +256,10 @@ async function main(): Promise<void> {
     playBlockedReasons: {} as Record<string, number>,
     zeroCommitReasons: {} as Record<string, number>,
     historyViolationKinds: {} as Record<string, number>,
+    positionCheck: config.positions,
+    positionViolations: 0,
+    positionChecks: 0,
+    positionViolationKinds: {} as Record<string, number>,
     totalActionsCompleted: 0,
     determinismChecks: 0,
     determinismFailures: 0,
@@ -276,6 +290,7 @@ async function main(): Promise<void> {
       historyIgnoreFields: config.historyIgnore,
       dispatch: config.dispatch,
       historyReExecute: config.historyReExecute,
+      positionCheck: config.positions,
     });
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
@@ -299,6 +314,7 @@ async function main(): Promise<void> {
       summary.zeroCommitReasons[entry.reason] =
         (summary.zeroCommitReasons[entry.reason] ?? 0) + 1;
     }
+    summary.positionChecks += result.positionChecks ?? 0;
     if (result.outcome === "completed") {
       summary.completed++;
       summary.totalActionsCompleted += result.actions;
@@ -323,6 +339,20 @@ async function main(): Promise<void> {
                   : "other";
       summary.historyViolationKinds[kind] =
         (summary.historyViolationKinds[kind] ?? 0) + 1;
+    } else if (result.outcome === "position") {
+      summary.positionViolations++;
+      const err = result.error ?? "";
+      const kind = err.startsWith("position save-load")
+        ? "save-load"
+        : err.startsWith("position export-import")
+          ? "export-import"
+          : err.startsWith("position checkpoint")
+            ? "checkpoint"
+            : err.startsWith("position reroll")
+              ? "reroll"
+              : "other";
+      summary.positionViolationKinds[kind] =
+        (summary.positionViolationKinds[kind] ?? 0) + 1;
     }
 
     if (result.outcome !== "completed") {
@@ -447,6 +477,8 @@ async function main(): Promise<void> {
   console.log(`hangs:                ${summary.hangs}`);
   console.log(`invariantViolations:  ${summary.invariants}`);
   console.log(`historyViolations:  ${summary.history}`);
+  console.log(`positionChecks:     ${summary.positionChecks}`);
+  console.log(`positionViolations: ${summary.positionViolations}`);
   console.log(
     `nonUndoableTypes:   ${summary.nonUndoableActionTypes.join(", ") || "(none)"}`,
   );
@@ -473,6 +505,15 @@ async function main(): Promise<void> {
   if (histKinds.length > 0) {
     console.log(
       `historyKinds:       ${histKinds
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, n]) => `${k}×${n}`)
+        .join(", ")}`,
+    );
+  }
+  const posKinds = Object.entries(summary.positionViolationKinds);
+  if (posKinds.length > 0) {
+    console.log(
+      `positionKinds:      ${posKinds
         .sort((a, b) => b[1] - a[1])
         .map(([k, n]) => `${k}×${n}`)
         .join(", ")}`,
@@ -509,6 +550,7 @@ async function main(): Promise<void> {
     summary.hangs +
     summary.invariants +
     summary.history +
+    summary.positionViolations +
     summary.determinismFailures;
   if (failed > 0) {
     console.log(`\n${failed} finding(s) — see reports/soak/repro_*.json`);
