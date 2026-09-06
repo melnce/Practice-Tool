@@ -39,7 +39,7 @@ jobs:
             echo "engine=false" >> "$GITHUB_OUTPUT"
           else
             git fetch origin "${{ github.base_ref }}"
-            PATTERN='^(src/|cards/|decks/|scripts/)'
+            PATTERN='^(src/|cards/|decks/|scripts/|package-lock\.json)'
             if git diff --name-only "origin/${{ github.base_ref }}...HEAD" | grep -qE "$PATTERN"; then
               echo "engine=true" >> "$GITHUB_OUTPUT"
             else
