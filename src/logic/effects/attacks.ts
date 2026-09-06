@@ -51,6 +51,8 @@ export function applyAttacksPerTurnToCard(
   const inferredUsed = Math.max(0, prevPer - prevLeft);
   const used = Math.max(0, target.attacks_used_this_turn ?? inferredUsed);
 
+  const nextPer = Math.max(prevPer, n);
+
   if (untilEndOfTurn) {
     // Stash only once so stacked EOT grants restore to the pre-temp baseline.
     if ((target as any).attacks_per_turn_pre_eot === undefined) {
@@ -58,8 +60,8 @@ export function applyAttacksPerTurnToCard(
     }
   }
 
-  target.attacks_per_turn = n;
-  target.attacks_left = Math.max(0, n - used);
+  target.attacks_per_turn = nextPer;
+  target.attacks_left = Math.max(0, nextPer - used);
   syncHasAttackedFromSwings(target);
   recomputeAttackFlags(target);
 }
