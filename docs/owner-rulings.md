@@ -366,6 +366,18 @@ Uniformly at random among the destroyed allied followers that share the highest 
 
 Engine already matched (`pickDestroyedMatchHighestBaseCost` keeps every record at `maxBase`, then `top[state.rng.nextInt(top.length)]`). Behaviour pinned; do not change without a new ruling.
 
+## Faith is not a crest for counting (2026-09-06)
+
+Owner:
+
+> "yes I guess for certain cards number of crests is important so faiths shouldn't count despite sharing a 'board'."
+
+Official per-card Q&A (Shining Disenchantment `10363210`, Temple of Repose `10362210`, Himeka `10364110`, Marwynn `10364120` — _"Do faiths count as crests?"_): **"No, they don't."**
+
+**Counting:** any effect whose amount is _"the number of crests you have"_ (`crest_count` / `amount_source: "crest_count"`) excludes Faith entries. Faith is still stored as a crest named `Faith: <card name>` with `isFaith: true`.
+
+**Slot cap unchanged:** Faith still occupies one of the five crest/faith slots (`MAX_CREST_SLOTS`, owner ruling 2026-09-05). Four ordinary crests plus one Faith means a sixth distinct crest bounces.
+
 ## Depths of the Eld Crystals — how X, Y and Z are drawn — 2026-09-05
 
 Owner-supplied FAQ text (his caveat: "Dont know if this is official but since I personally never seen it hit 0 I think this makes sense"): "To determine the values of X, Y, and Z, the ability first chooses X, Y, or Z at random, with each having an equal 1/3 chance of being chosen. This process is repeated a number of times equal to your faith's value … The number of times each letter is chosen then becomes its final value." So the split is one independent uniform draw per faith point; zeros are legal outcomes (1/27 for X=3,Y=0,Z=0 at faith 3). `random_split` (`src/logic/effects/ops/random_split.ts`) implements exactly this; the faith counter is read, not spent.
