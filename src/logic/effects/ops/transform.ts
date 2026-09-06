@@ -638,7 +638,7 @@ function locateZone(target: CardInstance) {
 /**
  * Transform a card into another card by name.
  * Accepts board or hand targets. Keeps owner & uid. No enter/leave triggers.
- * For board followers, preserves attack/turn state (no free attack refresh).
+ * For board followers, resets turn/action state (transform is a new card).
  */
 export function transformTarget(target: CardInstance, intoName: string) {
   if (!target || !intoName) {
@@ -692,22 +692,22 @@ export function transformTarget(target: CardInstance, intoName: string) {
     // Keywords set flags like hasRush/hasStorm/etc.
     applyKeywordsFromList(c);
 
-    // Preserve turn/action state (no free swing refresh)
+    // Fresh turn state — transform is a new card (no inherited attack/act flags).
     const perTurnNew = Number.isFinite(c.attacks_per_turn)
       ? c.attacks_per_turn!
       : 1;
-    const leftOld = Number.isFinite(target.attacks_left)
-      ? target.attacks_left!
-      : perTurnNew;
 
-    c.justPlayed = target.justPlayed === true;
-    c.hasAttacked = target.hasAttacked === true;
+    c.justPlayed = true;
+    c.hasAttacked = false;
     c.attacks_per_turn = perTurnNew;
-    c.attacks_left = Math.max(0, Math.min(perTurnNew, leftOld));
+    c.attacks_left = perTurnNew;
+    c.attacks_used_this_turn = 0;
     recomputeAttackFlags(c);
   } else if (c.type === "Amulet") {
     applyKeywordsFromList(c);
     if (c.hasCountdown) c.countdown = Number(c.countdown || 0);
+    if (!c.keywordState) c.keywordState = {};
+    c.keywordState.engagedThisTurn = false;
   }
 
   // Replace in place; do not fire enter/leave triggers
