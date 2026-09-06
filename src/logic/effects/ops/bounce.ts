@@ -9,7 +9,10 @@ import {
 } from "../../../helpers/alternateForm.js";
 import { initAmulet } from "./summon_ops/init.js";
 import { fireTrigger } from "../../core/triggers.js";
-import { setPendingTarget } from "../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../core/pendingTarget/index.js";
 
 import { logEvent } from "../../../core/logger.js";
 import type {
@@ -145,7 +148,17 @@ export function handleReturnToHand(
     pool = pool.filter((c) => c.uid !== sourceCard.uid);
   }
 
-  if (!pool.length) return;
+  if (!pool.length) {
+    if ((eff as any).select) {
+      reportSelectFizzled({
+        eff,
+        owner,
+        sourceCard,
+        target: String(eff.target || ""),
+      });
+    }
+    return;
+  }
 
   // Handle select: "all" - bounce all matching cards immediately
   if ((eff as any).select === "all") {
@@ -161,15 +174,19 @@ export function handleReturnToHand(
         String((eff as any).select ?? (eff as any).select_count ?? 1),
         10,
       ) || 1;
-    setPendingTarget({
-      eff,
-      owner,
-      sourceCard,
-      resumeEffects: effectsQueue,
-      pool,
-      targets: [],
-      selectCount,
-    });
+    if (
+      trySetPendingTarget({
+        eff,
+        owner,
+        sourceCard,
+        resumeEffects: effectsQueue,
+        pool,
+        targets: [],
+        selectCount,
+      }) === "fizzled"
+    ) {
+      return;
+    }
     logEvent("returnToHand_select", {
       owner,
       pool: pool.length,
