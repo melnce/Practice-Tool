@@ -15021,7 +15021,8 @@
             "target": "enemy",
             "amount": 2,
             "count": 5,
-            "distribution": "random_hits"
+            "distribution": "random_hits",
+            "include_leader": "enemy"
           }
         ]
       }
