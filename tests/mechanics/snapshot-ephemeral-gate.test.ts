@@ -17,11 +17,16 @@ import {
   SNAPSHOT_EPHEMERAL_ALLOWLIST,
   SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT,
   SNAPSHOT_EPHEMERAL_MAY_BE_SET,
+  SNAPSHOT_DROPPED_STATE_AUDIT,
+  SNAPSHOT_DROPPED_FUNCTION_ALLOWLIST,
   INTERNAL_CACHE_KEYS,
   collectSnapshotEphemeralViolations,
+  collectSnapshotDroppedFunctionViolations,
   captureSnapshot,
 } from "../../src/core/history.js";
 import { setPendingTarget } from "../../src/logic/core/pendingTarget/index.js";
+import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import { injectAdapter } from "../../src/core/adapter.js";
 import { getTriggerChainDepth } from "../../src/logic/core/triggers.js";
 import { isTargetedOpDispatchActive } from "../../src/logic/core/targeting/guards.js";
 import { givenGameState } from "../harness/builders.js";
@@ -45,6 +50,89 @@ describe("INTERNAL_CACHE_KEYS vs KNOWN_ROOT_KEYS", () => {
         SNAPSHOT_EPHEMERAL_MAY_BE_SET[key];
       expect(row?.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("SNAPSHOT_DROPPED_STATE_AUDIT", () => {
+  it("functions row is (b): pendingTargetEffect.confirmHook is unsnapshotable gameplay state", () => {
+    const row = SNAPSHOT_DROPPED_STATE_AUDIT.find((r) =>
+      r.category.startsWith("Functions / non-cloneable"),
+    );
+    expect(row?.proofClass).toBe("b");
+    expect(row?.proof).toContain("pendingTargetEffect.confirmHook");
+    expect(row?.proof).toContain("fix-fuse-confirm-handler-registry");
+  });
+});
+
+describe("snapshot dropped function gate", () => {
+  beforeEach(() => {
+    resetGameState(11);
+    setHistoryEnabled(true);
+    resetHistory();
+    injectAdapter({
+      render: () => {},
+      showChoiceModal: () => {},
+      showTargetConfirmationButton: () => {},
+      hideTargetConfirmation: () => {},
+    });
+  });
+
+  it("allowlists pendingTargetEffect.confirmHook on fuse confirm_needed snapshot", () => {
+    givenGameState({ seed: 3, activePlayer: "first" }).build();
+    setPendingTarget({
+      eff: { op: "fuse", action: "recipe" },
+      owner: "first",
+      selectCount: 1,
+      targetUids: ["partner_uid"],
+      requiresConfirmation: true,
+      pool: [],
+    } as any);
+    state.pendingTargetEffect!.confirmHook = () => {};
+
+    const snap = captureSnapshot();
+    expect(collectSnapshotDroppedFunctionViolations(state, snap)).toEqual([]);
+    expect(SNAPSHOT_DROPPED_FUNCTION_ALLOWLIST).toHaveProperty(
+      "pendingTargetEffect.confirmHook",
+    );
+  });
+
+  it("throws when an unallowlisted function is reachable from pendingTargetEffect", () => {
+    givenGameState({ seed: 3, activePlayer: "first" }).build();
+    setPendingTarget({
+      eff: { op: "damage", amount: 1 },
+      owner: "first",
+      selectCount: 1,
+      targetUids: [],
+    } as any);
+    (state.pendingTargetEffect as any).mysteryHook = () => {};
+
+    expect(() => captureSnapshot()).toThrow(
+      /snapshot dropped gameplay function.*pendingTargetEffect\.mysteryHook/,
+    );
+  });
+
+  it("sets confirmHook on pending when fuse selection needs confirm", () => {
+    givenGameState({ seed: 42, activePlayer: "first", roundCount: 6 })
+      .withFirstPP(6, 6)
+      .withFirstHand(["10934110", "10111310", "10111310"])
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+
+    const filler = state.players.first.hand.find((c) => c.id === "10111310")!;
+    setPendingTarget({
+      eff: { op: "fuse", action: "recipe" },
+      owner: "first",
+      sourceCard: state.players.first.hand.find((c) => c.id === "10934110")!,
+      selectCount: 1,
+      targetUids: [],
+      requiresConfirmation: true,
+      pool: state.players.first.hand,
+    } as any);
+
+    resolvePendingTarget(filler.uid);
+    expect(typeof state.pendingTargetEffect?.confirmHook).toBe("function");
+    expect(() => captureSnapshot()).not.toThrow();
   });
 });
 
