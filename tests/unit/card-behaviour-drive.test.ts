@@ -113,4 +113,49 @@ describe("card behaviour drive prep", () => {
       );
     }
   });
+
+  it("super-evolve-only cards get both evolve and super_evolve scenarios", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as {
+      id: string;
+      evolve?: unknown[];
+      superevolve?: unknown[];
+    }[];
+    const selwyn = all.find((c) => c.id === "10012120")!;
+    expect(selwyn.superevolve?.length).toBeGreaterThan(0);
+    expect(selwyn.evolve ?? []).toHaveLength(0);
+    const result = driveCard(selwyn);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      const names = result.scenarios.map((s) => s.scenario);
+      expect(names).toContain("evolve");
+      expect(names).toContain("super_evolve");
+    }
+  });
+
+  it("cards with both evolve and superevolve get both scenarios", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as {
+      id: string;
+      evolve?: unknown[];
+      superevolve?: unknown[];
+    }[];
+    const dual = all.find(
+      (c) =>
+        Array.isArray(c.evolve) &&
+        c.evolve.length > 0 &&
+        Array.isArray(c.superevolve) &&
+        c.superevolve.length > 0,
+    );
+    expect(dual).toBeDefined();
+    const result = driveCard(dual!);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      const names = result.scenarios.map((s) => s.scenario);
+      expect(names).toContain("evolve");
+      expect(names).toContain("super_evolve");
+    }
+  });
 });
