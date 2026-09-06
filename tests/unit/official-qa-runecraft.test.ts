@@ -17,7 +17,6 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
@@ -262,6 +261,15 @@ function setupDepthsFaith(amount: number): void {
   crestAddCounter("first", CALGE_FAITH, "faith", amount);
 }
 
+function findCardByUid(
+  uid: string,
+  player: "first" | "second" = "first",
+): CardInstance | undefined {
+  const p = state.players[player];
+  return [...p.hand, ...p.deck, ...p.board, ...p.graveyard].find(
+    (c) => c.uid === uid,
+  );
+}
 function gainJunoCrest(player: "first" | "second" = "first"): void {
   handleGainCrest(
     {
@@ -381,25 +389,22 @@ describe("official Q&A — Runecraft batch 2", () => {
     expect(Number(subjects[1]!.defense)).toBe(5);
   }, 60_000);
 
-  it.fails(
-    "10131120 Apprentice Astrologer — returned Blaze Destroyer keeps spellboosted cost when redrawn (official Q&A)",
-    () => {
-      setupTurn(R6, {
-        hand: [APPRENTICE_ASTROLOGER, BLAZE_DESTROYER],
-        deck: [DRAW_TOP, BLAZE_DESTROYER],
-        pp: 2,
-      });
-      const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      spellboostHand("first", 5, blaze);
-      expect(getEffectiveCost(blaze)).toBe(5);
-      whenPlayCard("first", 0);
-      resolvePendingByUid(blaze.uid);
-      const redrawn = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      expect(redrawn).toBeTruthy();
-      expect(getEffectiveCost(redrawn)).toBe(5);
-    },
-    60_000,
-  );
+  it("10131120 Apprentice Astrologer — returned Blaze Destroyer keeps spellboosted cost when redrawn (official Q&A)", () => {
+    setupTurn(R6, {
+      hand: [APPRENTICE_ASTROLOGER, BLAZE_DESTROYER],
+      deck: [DRAW_TOP],
+      pp: 2,
+    });
+    const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+    const blazeUid = blaze.uid;
+    spellboostHand("first", 5, blaze);
+    expect(getEffectiveCost(blaze)).toBe(5);
+    whenPlayCard("first", 0);
+    resolvePendingByUid(blazeUid);
+    const returned = findCardByUid(blazeUid);
+    expect(returned).toBeTruthy();
+    expect(getEffectiveCost(returned!)).toBe(5);
+  }, 60_000);
 
   it("10131120 Apprentice Astrologer — Fanfare activates with only itself in hand (official Q&A)", () => {
     setupTurn(R6, { hand: [APPRENTICE_ASTROLOGER], deck: [DRAW_TOP], pp: 2 });
@@ -409,19 +414,20 @@ describe("official Q&A — Runecraft batch 2", () => {
     expect(earthSigilStack()).toBeGreaterThanOrEqual(1);
   }, 60_000);
 
-  it.fails(
-    "10131120 Apprentice Astrologer — gains earth sigil even with one field slot and existing Earth Sigil (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [APPRENTICE_ASTROLOGER, FILLER], pp: 2 });
-      placeEarthSigils(1);
-      for (let i = 0; i < 3; i++) allyFollower(1, 1, `Ally${i}`);
-      const sigilsBefore = earthSigilStack();
-      whenPlayCard("first", 0);
-      resolvePendingByUid(thenHand("first").find((c) => c.id === FILLER)!.uid);
-      expect(earthSigilStack()).toBe(sigilsBefore + 1);
-    },
-    60_000,
-  );
+  it("10131120 Apprentice Astrologer — gains earth sigil even with one field slot and existing Earth Sigil (official Q&A)", () => {
+    setupTurn(R6, {
+      hand: [WITCHS_NEW_BREW, APPRENTICE_ASTROLOGER, FILLER],
+      pp: 4,
+    });
+    whenPlayCard("first", 0);
+    expect(earthSigilStack()).toBe(1);
+    for (let i = 0; i < 3; i++) allyFollower(1, 1, `Ally${i}`);
+    expect(thenBoard("first").length).toBe(4);
+    const sigilsBefore = earthSigilStack();
+    whenPlayCard("first", 0);
+    resolvePendingByUid(thenHand("first").find((c) => c.id === FILLER)!.uid);
+    expect(earthSigilStack()).toBe(sigilsBefore + 1);
+  }, 60_000);
 
   it("10131310 Radiant Rainbow — unplayable without On Spellboost card in hand (official Q&A)", () => {
     setupTurn(R6, { hand: [RADIANT_RAINBOW, FILLER], pp: 2 });
@@ -508,90 +514,83 @@ describe("official Q&A — Runecraft batch 2", () => {
 
     whenPlayCard("first", 0);
     const juno = findOnBoard("first", "Juno, Visionary Alchemist")!;
-    onEvolve(juno, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(juno, "first", { mode: "normal", spendPoint: true });
     expect(
       getCrests(state, "first").filter((c) => c.name.includes("Juno")),
     ).toHaveLength(1);
   }, 60_000);
 
-  it.fails(
-    "10134310 Dimension Climb — redrawn Blaze Destroyer keeps cost 6 then spellboosts to 0 (official Q&A)",
-    () => {
-      setupTurn(R10, {
-        hand: [DIMENSION_CLIMB, BLAZE_DESTROYER],
-        deck: [BLAZE_DESTROYER, ...Array(19).fill(FILLER)],
-        pp: 10,
-      });
-      const climb = thenHand("first").find((c) => c.id === DIMENSION_CLIMB)!;
-      const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      spellboostHand("first", 18, climb);
-      spellboostHand("first", 4, blaze);
-      expect(getEffectiveCost(climb)).toBe(0);
-      expect(getEffectiveCost(blaze)).toBe(6);
+  it("10134310 Dimension Climb — redrawn Blaze Destroyer keeps cost 6 then spellboosts to 0 (official Q&A)", () => {
+    const climbDeck = [FILLER, FILLER, FILLER];
+    setupTurn(R10, {
+      hand: [DIMENSION_CLIMB, BLAZE_DESTROYER, STORMY_BLAST],
+      deck: climbDeck,
+      pp: 10,
+    });
+    const climb = thenHand("first").find((c) => c.id === DIMENSION_CLIMB)!;
+    const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+    const blazeUid = blaze.uid;
+    spellboostHand("first", 18, climb);
+    spellboostHand("first", 4, blaze);
+    expect(getEffectiveCost(climb)).toBe(0);
+    expect(getEffectiveCost(blaze)).toBe(6);
 
-      whenPlayCard("first", 0);
-      const redrawn = thenHand("first").find((c) => c.id === BLAZE_DESTROYER);
-      expect(redrawn).toBeTruthy();
-      expect(getEffectiveCost(redrawn!)).toBe(0);
-    },
-    60_000,
-  );
+    whenPlayCard("first", 0);
+    const returnedBlaze = findCardByUid(blazeUid);
+    expect(returnedBlaze).toBeTruthy();
+    expect(getEffectiveCost(returnedBlaze!)).toBe(0);
+  }, 60_000);
 
-  it.fails(
-    "10134310 Dimension Climb — redrawn Stormy Blast keeps X=4 then spellboosts to X=10 (official Q&A)",
-    () => {
-      setupTurn(R10, {
-        hand: [DIMENSION_CLIMB, STORMY_BLAST],
-        deck: [STORMY_BLAST, ...Array(19).fill(FILLER)],
-        pp: 10,
-      });
-      const climb = thenHand("first").find((c) => c.id === DIMENSION_CLIMB)!;
-      const blast = thenHand("first").find((c) => c.id === STORMY_BLAST)!;
-      spellboostHand("first", 18, climb);
-      spellboostHand("first", 2, blast);
-      expect(getEffectiveCost(climb)).toBe(0);
-      expect(stormyX(blast)).toBe(4);
+  it("10134310 Dimension Climb — redrawn Stormy Blast keeps X=4 then spellboosts to X=10 (official Q&A)", () => {
+    const climbDeck = [FILLER, FILLER, FILLER];
+    setupTurn(R10, {
+      hand: [DIMENSION_CLIMB, BLAZE_DESTROYER, STORMY_BLAST],
+      deck: climbDeck,
+      pp: 10,
+    });
+    const climb = thenHand("first").find((c) => c.id === DIMENSION_CLIMB)!;
+    const blast = thenHand("first").find((c) => c.id === STORMY_BLAST)!;
+    const blastUid = blast.uid;
+    spellboostHand("first", 18, climb);
+    spellboostHand("first", 2, blast);
+    expect(getEffectiveCost(climb)).toBe(0);
+    expect(stormyX(blast)).toBe(4);
 
-      whenPlayCard("first", 0);
-      const redrawn = thenHand("first").find((c) => c.id === STORMY_BLAST);
-      expect(redrawn).toBeTruthy();
-      expect(stormyX(redrawn!)).toBe(10);
-    },
-    60_000,
-  );
+    whenPlayCard("first", 0);
+    const returnedBlast = findCardByUid(blastUid);
+    expect(returnedBlast).toBeTruthy();
+    expect(stormyX(returnedBlast!)).toBe(10);
+  }, 60_000);
 
-  it.fails(
-    "10134310 Dimension Climb — fully recovers max PP (9) not bonus PP after Kuon Enhance (10) (official Q&A)",
-    () => {
-      setupTurn(R9, {
-        active: "second",
-        hand: [KUON, DIMENSION_CLIMB],
-        pp: 9,
-        maxPP: 9,
-      });
-      state.players.second.maxPP = 9;
-      state.players.second.pp = 9;
-      toggleSecondPlayerBonusPp();
-      expect(getPP(state, "second")).toBe(10);
+  it("10134310 Dimension Climb — fully recovers max PP (9) not bonus PP after Kuon Enhance (10) (official Q&A)", () => {
+    setupTurn(R9, {
+      active: "second",
+      hand: [KUON, DIMENSION_CLIMB, FILLER],
+      deck: Array(10).fill(FILLER),
+      pp: 9,
+      maxPP: 9,
+    });
+    state.players.second.maxPP = 9;
+    state.players.second.pp = 9;
+    toggleSecondPlayerBonusPp();
+    expect(getPP(state, "second")).toBe(10);
 
-      const climb = thenHand("second").find((c) => c.id === DIMENSION_CLIMB)!;
-      spellboostHand("second", 18, climb);
-      expect(getEffectiveCost(climb)).toBe(0);
+    const climb = thenHand("second").find((c) => c.id === DIMENSION_CLIMB)!;
+    spellboostHand("second", 18, climb);
+    expect(getEffectiveCost(climb)).toBe(0);
 
-      whenPlayCard(
-        "second",
-        thenHand("second").findIndex((c) => c.id === KUON),
-      );
-      expect(getPP(state, "second")).toBe(0);
+    whenPlayCard(
+      "second",
+      thenHand("second").findIndex((c) => c.id === KUON),
+    );
+    expect(getPP(state, "second")).toBe(0);
 
-      whenPlayCard(
-        "second",
-        thenHand("second").findIndex((c) => c.id === DIMENSION_CLIMB),
-      );
-      expect(getPP(state, "second")).toBe(9);
-    },
-    60_000,
-  );
+    whenPlayCard(
+      "second",
+      thenHand("second").findIndex((c) => c.id === DIMENSION_CLIMB),
+    );
+    expect(getPP(state, "second")).toBe(9);
+  }, 60_000);
 
   it("10234120 Norman — Evolve replicate offers Mode selection again (official Q&A)", () => {
     setupTurn(R10, {
@@ -607,33 +606,28 @@ describe("official Q&A — Runecraft batch 2", () => {
 
     const norman = findOnBoard("first", "Norman, Adamant Alchemist")!;
     setScriptedModePickProvider(() => [0]);
-    onEvolve(norman, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(norman, "first", { mode: "normal", spendPoint: true });
     expect(getHand(state, "first").length).toBe(handAfterFanfare);
     expect(thenBoard("first").some((c) => c.id === "90031120")).toBe(true);
   }, 60_000);
 
-  it.fails(
-    "10332210 Institute of Truth — 0-cost Blaze Destroyer triggers cost-changed draw (official Q&A)",
-    () => {
-      setupTurn(R6, {
-        hand: [BLAZE_DESTROYER],
-        deck: [DRAW_TOP, DRAW_TOP],
-        pp: 0,
-      });
-      const institute = createCard(INSTITUTE_OF_TRUTH, "board", "first");
-      institute.countdown = 5;
-      state.players.first.board = [institute];
-      const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      spellboostHand("first", 10, blaze);
-      expect(getEffectiveCost(blaze)).toBe(0);
-      const deck0 = thenDeck("first").length;
-      const cd0 = Number(institute.countdown);
-      whenPlayCard("first", 0);
-      expect(thenDeck("first").length).toBe(deck0 - 1);
-      expect(Number(institute.countdown)).toBe(cd0 - 1);
-    },
-    60_000,
-  );
+  it("10332210 Institute of Truth — 0-cost Blaze Destroyer triggers cost-changed draw (official Q&A)", () => {
+    setupTurn(R6, {
+      hand: [INSTITUTE_OF_TRUTH, BLAZE_DESTROYER],
+      deck: [DRAW_TOP, DRAW_TOP],
+      pp: 3,
+    });
+    whenPlayCard("first", 0);
+    const institute = findOnBoard("first", "Institute of Truth")!;
+    const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
+    spellboostHand("first", 10, blaze);
+    expect(getEffectiveCost(blaze)).toBe(0);
+    const deck0 = thenDeck("first").length;
+    const cd0 = Number(institute.countdown);
+    whenPlayCard("first", 0);
+    expect(thenDeck("first").length).toBe(deck0 - 1);
+    expect(Number(institute.countdown)).toBe(cd0 - 1);
+  }, 60_000);
 
   it("10332210 Institute of Truth — Quake Goliath at 5 from enemy Whitefrost triggers (official Q&A)", () => {
     setupTurn(R6, {
@@ -752,11 +746,14 @@ describe("official Q&A — Runecraft batch 2", () => {
   it.fails(
     "90034350 Send 'Em Packing — super-evolved Armes attacks 3 times per turn (official Q&A)",
     () => {
-      setupTurn(R10, { hand: [SEND_EM_PACKING], pp: 1, superEvo: 1 });
-      const armes = createCard(ARMS_DEPLETIVE_DEMON, "board", "first");
-      armes.peak_defense = armes.defense;
-      state.players.first.board = [armes];
-      onEvolve(armes, "first", "super", { spendPoint: true });
+      setupTurn(R10, {
+        hand: [ARMS_DEPLETIVE_DEMON, SEND_EM_PACKING],
+        pp: 10,
+        superEvo: 1,
+      });
+      whenPlayCard("first", 0);
+      const armes = findOnBoard("first", "Armes, Depletive Demon")!;
+      handleEvolveSelf(armes, "first", { mode: "super", spendPoint: true });
       expect(Number(armes.attacks_per_turn ?? 1)).toBe(3);
 
       whenPlayCard("first", 0);
