@@ -118,8 +118,16 @@ export function applyFilters(
       return isEnemy && (c as any).hasTaunt;
     });
 
-    if (tauntCards.length > 0) {
-      // Filter to only Taunt cards + any ally cards (Taunt only restricts enemy targeting)
+    const selectCount =
+      typeof env.context.selectCount === "number" &&
+      Number.isFinite(env.context.selectCount) &&
+      env.context.selectCount > 0
+        ? env.context.selectCount
+        : 1;
+
+    // Single-select: pool matches Taunt-only enemy targeting. Multi-select keeps
+    // the full filtered pool; forced-first-pick handles Lloyd on pick 1 only.
+    if (tauntCards.length > 0 && selectCount <= 1) {
       filtered = filtered.filter((c) => {
         const cardSide = getCardSide(c);
         const isEnemy = cardSide && cardSide !== env.owner;

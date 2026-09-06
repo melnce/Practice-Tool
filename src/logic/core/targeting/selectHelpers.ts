@@ -63,9 +63,21 @@ export function pickRandomTargets(
   pool: CardInstance[],
   count: number,
   rng: RNG,
+  forcedFirstUids: string[] = [],
 ): CardInstance[] {
   const picks: CardInstance[] = [];
   const remaining = [...pool];
+
+  if (forcedFirstUids.length > 0 && count > 0 && picks.length === 0) {
+    const forced = remaining.filter((c) => forcedFirstUids.includes(c.uid));
+    if (forced.length > 0) {
+      const idx = rng.nextInt(forced.length);
+      const picked = forced[idx]!;
+      picks.push(picked);
+      const pickIdx = remaining.findIndex((c) => c.uid === picked.uid);
+      if (pickIdx !== -1) remaining.splice(pickIdx, 1);
+    }
+  }
 
   while (picks.length < count && remaining.length) {
     const idx = rng.nextInt(remaining.length);
