@@ -6,6 +6,7 @@ import type {
 } from "../types.js";
 import type { ProcessingCandidate } from "../process.js";
 import { dispatchOrderedTriggers } from "./common.js";
+import { isPlayCostChangedFromPrinted } from "../../../../helpers/alternateForm.js";
 
 function checkPlayConditions(
   trigger: TriggerSpec,
@@ -16,17 +17,7 @@ function checkPlayConditions(
   if (!played) return false;
 
   if (cond.cost_changed) {
-    let changed = !!context.costChanged;
-    if (!changed) {
-      const printed = Number.isFinite((played as any).base_cost)
-        ? Number((played as any).base_cost)
-        : parseInt(played.cost as string, 10) || 0;
-      const current = parseInt(played.cost as string, 10) || 0;
-      const handMod = parseInt((played as any).cost_mod, 10) || 0;
-      changed =
-        handMod !== 0 ||
-        (Number.isFinite((played as any).base_cost) && current !== printed);
-    }
+    const changed = context.costChanged ?? isPlayCostChangedFromPrinted(played);
     if (!changed) return false;
   }
 

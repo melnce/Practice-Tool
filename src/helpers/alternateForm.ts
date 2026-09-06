@@ -79,6 +79,23 @@ export function getEffectivePlayCost(card: CardInstance): number {
   return Math.max(0, base + handMod);
 }
 
+/** Printed base cost before play-time modifiers (Spellboost sets base_cost). */
+export function getPrintedBaseCost(card: CardInstance): number {
+  if (Number.isFinite(card.base_cost)) {
+    return Number(card.base_cost);
+  }
+  return parseInt(String(card.cost), 10) || 0;
+}
+
+/**
+ * True when the card's effective play cost differs from its printed base cost.
+ * Alternate-form plays rewrite cost/base_cost to the form's N, so they compare
+ * equal and do not count as "cost has been changed".
+ */
+export function isPlayCostChangedFromPrinted(card: CardInstance): boolean {
+  return getEffectivePlayCost(card) !== getPrintedBaseCost(card);
+}
+
 /**
  * Highest-payable Crystallize/Accelerate when PP is below the normal
  * effective cost. Returns null when normal play is affordable or no
