@@ -20,6 +20,7 @@ import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
+import { getCostAcc } from "../../src/logic/effects/ops/cost/model.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { handleSuperEvoGate } from "../../src/logic/effects/gates/gates.js";
 import {
@@ -633,7 +634,7 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
       );
 
       expect(getEffectiveCost(unfeeling())).toBe(2);
-      expect(Number(unfeeling().cost_mod) || 0).toBe(-1);
+      expect(getCostAcc(unfeeling())).toBe(-1);
       expect(printed).toContain("base cost of 5 or more");
     });
 

@@ -41,6 +41,8 @@ import {
   applyAttacksPerTurnToCard,
   parseAttacksPerTurnParams,
 } from "../../attacks.js";
+import { applyCostChange } from "../cost/unified.js";
+import { normalizeToCostSpec } from "../cost/types.js";
 import type {
   TargetedOpContext,
   DispatchResult,
@@ -645,41 +647,16 @@ TARGETED_OP_HANDLERS.set("nested_effects", (ctx) => {
 
 // Handler for cost modification on selected cards
 TARGETED_OP_HANDLERS.set("cost", (ctx) => {
-  const { eff, targetUids } = ctx;
-  const targets = resolveUids(targetUids);
-  const mode = (eff as any).mode || "reduce";
-  const amount = parseInt((eff as any).amount) || 1;
-  const minCost = (eff as any).minCost ?? (eff as any).min_cost ?? 0;
+  const spec = normalizeToCostSpec(ctx.eff);
+  const amount = resolveDynamicValue(spec.amount, {
+    owner: ctx.owner,
+    sourceCard: ctx.sourceCard,
+  });
+  const targets = resolveUids(ctx.targetUids);
 
   for (const target of targets) {
     if (!target) continue;
-
-    // Track base cost if not already set
-    if (target.base_cost === undefined) {
-      target.base_cost = parseInt(String(target.cost)) || 0;
-    }
-
-    const currentCost = parseInt(String(target.cost)) || 0;
-
-    switch (mode) {
-      case "reduce":
-        target.cost = Math.max(minCost, currentCost - amount);
-        break;
-      case "set":
-        target.cost = Math.max(0, amount);
-        break;
-      case "increase":
-        target.cost = currentCost + amount;
-        break;
-      default: {
-        const cardName = ctx.sourceCard?.name ?? "unknown";
-        const msg = `[cost/targeted] Unknown mode "${mode}" in card ${cardName}`;
-        if (isDev()) {
-          throw new Error(msg);
-        }
-        console.warn(msg);
-      }
-    }
+    applyCostChange(target, spec, amount);
   }
 
   return { kind: "handled" };

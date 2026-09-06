@@ -84,15 +84,10 @@ export function onFanfare(card: CardInstance, owner: Player) {
   }
 }
 
+import { getEffectiveCostValue } from "../../effects/ops/cost/model.js";
+
 export function getEffectiveCost(card: CardInstance) {
-  if (
-    typeof card.effectiveCost === "number" &&
-    Number.isFinite(card.effectiveCost)
-  )
-    return card.effectiveCost;
-  const base = parseInt(card?.cost as string, 10) || 0;
-  const mod = parseInt((card as any)?.cost_mod, 10) || 0;
-  return base + mod;
+  return getEffectiveCostValue(card);
 }
 
 // Notify (event-only) that a Loot spell was played.

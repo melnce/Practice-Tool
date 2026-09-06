@@ -5,6 +5,15 @@ import { logEvent } from "../../core/logger.js";
 import type { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { getHand, getDeck, opponentOf } from "../../core/playerHelpers.js";
 import { resolveUids } from "../../core/uidResolver.js";
+import {
+  applyHalveCurrentCost,
+  ensureBaseCost,
+  getEffectiveCostValue,
+  setCostAcc,
+  getCostAcc,
+  saveTempCostSnapshot,
+  syncDisplayedCost,
+} from "./ops/cost/model.js";
 
 /**
  * Reduces the cost of the card that owns the effect.
@@ -18,17 +27,11 @@ export function handleReduceCostSelf(
   if (!sourceCard) return;
 
   const amount = parseInt((eff.amount as any) ?? 1);
+  ensureBaseCost(sourceCard);
+  const oldCost = getEffectiveCostValue(sourceCard);
+  setCostAcc(sourceCard, getCostAcc(sourceCard) - amount);
 
-  // If this is the first time cost is reduced, save the original cost
-  if (sourceCard.base_cost === undefined) {
-    sourceCard.base_cost = parseInt(sourceCard.cost as any);
-  }
-
-  // Reduce the current cost, ensuring it doesn't go below 0
-  const oldCost = parseInt(sourceCard.cost as any);
-  sourceCard.cost = Math.max(0, oldCost - amount);
-
-  if (oldCost !== sourceCard.cost) {
+  if (oldCost !== getEffectiveCostValue(sourceCard)) {
     logEvent("costChange", {
       card: sourceCard.name,
       uid: sourceCard.uid,
@@ -41,18 +44,11 @@ export function handleReduceCost(targetCard: CardInstance, eff: Effect) {
   if (!targetCard) return;
 
   const amount = parseInt((eff.amount as any) ?? 1);
-  const minCost = Number.isFinite(parseInt(eff.minCost as any))
-    ? parseInt(eff.minCost as any)
-    : 0;
+  ensureBaseCost(targetCard);
+  const oldCost = getEffectiveCostValue(targetCard);
+  setCostAcc(targetCard, getCostAcc(targetCard) - amount);
 
-  if (targetCard.base_cost === undefined) {
-    targetCard.base_cost = parseInt(targetCard.cost as any);
-  }
-
-  const oldCost = parseInt(targetCard.cost as any);
-  targetCard.cost = Math.max(minCost, oldCost - amount);
-
-  if (oldCost !== targetCard.cost) {
+  if (oldCost !== getEffectiveCostValue(targetCard)) {
     logEvent("costChange", {
       card: targetCard.name,
       uid: targetCard.uid,
@@ -68,11 +64,12 @@ export function handleSetCostSelf(
   if (!sourceCard) return;
   const newCost = parseInt(eff.amount as any);
   if (Number.isFinite(newCost)) {
-    if (sourceCard.base_cost === undefined) {
-      sourceCard.base_cost = parseInt(sourceCard.cost as any);
-    }
+    ensureBaseCost(sourceCard);
     const oldCost = sourceCard.cost;
-    sourceCard.cost = Math.max(0, newCost);
+    const base = ensureBaseCost(sourceCard);
+    sourceCard.cost_acc = newCost - base;
+    sourceCard.cost_mod = 0;
+    syncDisplayedCost(sourceCard);
     if (oldCost !== sourceCard.cost) {
       logEvent("costChange", {
         card: sourceCard.name,
@@ -88,14 +85,11 @@ export function applyTempOpponentHandCostMod(owner: Player, amount: number) {
   const hand = getHand(state, opponent);
 
   for (const card of hand) {
-    // track base cost for safety
-    if (card.base_cost === undefined) {
-      card.base_cost = parseInt(card.cost as any);
-    }
-    // apply a reversible modifier
+    ensureBaseCost(card);
     card.cost_mod = (parseInt(card.cost_mod as any) || 0) + amount;
     card.temp_cost_mod_until_eot =
       (parseInt(card.temp_cost_mod_until_eot as any) || 0) + amount;
+    syncDisplayedCost(card);
   }
   if (hand.length > 0) {
     logEvent("costChangeBulk", {
@@ -112,20 +106,9 @@ export function handleHalveDeckCost(owner: Player) {
 
   for (const card of deck) {
     if (!card) continue;
-
-    const current = parseInt(card.cost as any, 10) || 0;
-
-    // Do not change 0 or 1 cost cards
+    const current = getEffectiveCostValue(card);
     if (current <= 1) continue;
-
-    // Keep original printed cost once
-    if (card.base_cost === undefined) {
-      card.base_cost = current;
-    }
-
-    // Halve and round up (ceil)
-    const halvedUp = Math.ceil(current / 2);
-    card.cost = Math.max(0, halvedUp);
+    applyHalveCurrentCost(card);
     changed = true;
   }
   if (changed) {
@@ -171,16 +154,14 @@ export function handleModifyCost(
   if (!targets || !targets.length) return;
 
   for (const t of targets) {
-    // Ensure base_cost is recorded once
-    if (t.base_cost === undefined) {
-      t.base_cost = parseInt(String(t.cost), 10) || 0;
-    }
-    // Only adjust modifier; don't touch t.cost directly
+    ensureBaseCost(t);
+    if (eff.until_eot) saveTempCostSnapshot(t);
     t.cost_mod = (parseInt(String(t.cost_mod ?? 0), 10) || 0) + amount;
+    syncDisplayedCost(t);
     logEvent("costChange", {
       card: t.name,
       uid: t.uid,
-      newCost: (parseInt(String(t.cost), 10) || 0) + t.cost_mod,
+      newCost: getEffectiveCostValue(t),
       type: "mod",
     });
 
@@ -210,13 +191,14 @@ export function handleModifyCostPool(
   if (!pool.length) return;
   for (const t of pool) {
     if (!t) continue;
-    if (t.base_cost === undefined)
-      t.base_cost = parseInt(t.cost as any, 10) || 0;
+    ensureBaseCost(t);
+    if (eff.until_eot) saveTempCostSnapshot(t);
     t.cost_mod = (parseInt(t.cost_mod as any, 10) || 0) + amount;
+    syncDisplayedCost(t);
     logEvent("costChange", {
       card: t.name,
       uid: t.uid,
-      newCost: (parseInt(t.cost as any, 10) || 0) + t.cost_mod!,
+      newCost: getEffectiveCostValue(t),
       type: "mod",
     });
 
@@ -234,15 +216,10 @@ export function reduceDeckFollowersCost(owner: Player, amount = 1) {
 
   for (const card of deck) {
     if (!card || card.type !== "Follower") continue;
-
-    // Track original cost once
-    if (card.base_cost === undefined) {
-      card.base_cost = parseInt(card.cost as any) || 0;
-    }
-
-    const current = parseInt(card.cost as any) || 0;
+    ensureBaseCost(card);
+    const current = getEffectiveCostValue(card);
     if (current > 0) {
-      card.cost = Math.max(0, current - amount);
+      setCostAcc(card, getCostAcc(card) - amount);
       changed = true;
     }
   }

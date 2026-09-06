@@ -4079,12 +4079,12 @@
       "status": "covered"
     },
     "10333310": {
-      "fingerprint": "99a96de8",
+      "fingerprint": "417859a8",
       "gatesSatisfied": [],
       "name": "Illusory Conjuration",
       "scenarios": [
         {
-          "fingerprint": "971ad012",
+          "fingerprint": "a9878c24",
           "scenario": "play"
         }
       ],
