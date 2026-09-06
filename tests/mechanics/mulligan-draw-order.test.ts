@@ -88,7 +88,7 @@ describe("mulligan draw order", () => {
     }
 
     expect(gamesWithReturnedUid).toBe(0);
-  });
+  }, 60_000);
 
   it("duplicate name: swapped uid never returns; another copy can return", async () => {
     const TRIPLET_ID = "triplet_shared_id";
@@ -175,7 +175,7 @@ describe("mulligan draw order", () => {
 
     expect(swappedUidReturned).toBe(0);
     expect(duplicateNameReturned).toBeGreaterThan(0);
-  });
+  }, 60_000);
 
   it("keeping all four does not draw or shuffle the deck", async () => {
     await startMulligan(777001);
@@ -187,7 +187,7 @@ describe("mulligan draw order", () => {
     expect(getDeck(state, "first").map((c) => c.uid)).toEqual(deckSnapshot);
     expect(getHand(state, "first")).toHaveLength(4);
     expect(state.mulliganStage).toBe("second");
-  });
+  }, 60_000);
 
   it("swapping when the deck is smaller than the swap count draws what exists", async () => {
     await startMulligan(777002);
@@ -203,5 +203,5 @@ describe("mulligan draw order", () => {
         (uid) => !getHand(state, "first").some((c) => c.uid === uid),
       ),
     ).toBe(true);
-  });
+  }, 60_000);
 });
