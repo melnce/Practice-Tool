@@ -12,7 +12,10 @@ import type { CardInstance } from "./types/index.js";
 import { isDev, readEnv } from "./env.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
-import { resetTriggerChainDepth, getTriggerChainDepth } from "../logic/core/triggers.js";
+import {
+  resetTriggerChainDepth,
+  getTriggerChainDepth,
+} from "../logic/core/triggers.js";
 import {
   endDispatch,
   isTargetedOpDispatchActive,
@@ -101,9 +104,7 @@ export { INTERNAL_CACHE_KEYS } from "./snapshotEphemeralKeys.js";
  * Keys excluded from snapshots that are provably safe at commit time.
  * Adding to INTERNAL_CACHE_KEYS requires a row here with a one-line structural proof.
  */
-export const SNAPSHOT_EPHEMERAL_ALLOWLIST: Readonly<
-  Record<string, string>
-> = {
+export const SNAPSHOT_EPHEMERAL_ALLOWLIST: Readonly<Record<string, string>> = {
   _triggerCache:
     "Derived trigger-candidate cache; nulled on restore and rebuilt from zones on next access.",
   _runEffectsDepth:
@@ -372,11 +373,7 @@ function snapshot(): GameState {
   }
 }
 
-function manualSnapshot(
-  rest: any,
-  rng: any,
-  fromLiveState = false,
-): GameState {
+function manualSnapshot(rest: any, rng: any, fromLiveState = false): GameState {
   const snap: any = {};
 
   for (const key of Object.keys(rest)) {

@@ -3,7 +3,11 @@
  */
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import "./setup.js";
-import { state, resetGameState, getKnownRootKeysForTest } from "../../src/core/gameState.js";
+import {
+  state,
+  resetGameState,
+  getKnownRootKeysForTest,
+} from "../../src/core/gameState.js";
 import {
   beginAction,
   commitAction,
