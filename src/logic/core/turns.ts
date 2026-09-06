@@ -25,10 +25,11 @@ import {
   getDeck,
   getEvoCount,
   getPP,
-  setPP,
   getMaxPP,
   setMaxPP,
   getPermPP,
+  setBonusPpOrb,
+  refillPPAtTurnStart,
   setPlaysThisTurn,
   setEvoUsedThisTurn,
   setAnyAllyAttackedThisTurn,
@@ -94,27 +95,34 @@ function clearExpiredLeaderEffects(endedPlayer: Player) {
   }
 }
 
+function clearTempCostModsOnCard(card: CardInstance) {
+  // Temporary cost *set* (e.g. Mari until-EOT → 0): restore from base_cost.
+  if ((card as any).temp_cost_set_until_eot) {
+    if (card.base_cost !== undefined) {
+      card.cost = card.base_cost;
+    }
+    delete (card as any).temp_cost_set_until_eot;
+  }
+  if ((card as any).temp_cost_reduce_until_eot) {
+    if (card.base_cost !== undefined) {
+      card.cost = card.base_cost;
+    }
+    delete (card as any).temp_cost_reduce_until_eot;
+  }
+  const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
+  if (delta !== 0) {
+    (card as any).cost_mod = (parseInt((card as any).cost_mod) || 0) - delta;
+    delete (card as any).temp_cost_mod_until_eot;
+  }
+}
+
 function clearTempHandCostMods(endedPlayer: Player) {
-  const hand = getHand(state, endedPlayer);
-  for (const card of hand) {
-    // Temporary cost *set* (e.g. Mari until-EOT → 0): restore from base_cost.
-    if ((card as any).temp_cost_set_until_eot) {
-      if (card.base_cost !== undefined) {
-        card.cost = card.base_cost;
-      }
-      delete (card as any).temp_cost_set_until_eot;
-    }
-    if ((card as any).temp_cost_reduce_until_eot) {
-      if (card.base_cost !== undefined) {
-        card.cost = card.base_cost;
-      }
-      delete (card as any).temp_cost_reduce_until_eot;
-    }
-    const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
-    if (delta !== 0) {
-      (card as any).cost_mod = (parseInt((card as any).cost_mod) || 0) - delta;
-      delete (card as any).temp_cost_mod_until_eot;
-    }
+  // Until-EOT hand taxes also expire on cards returned to deck (graveyard irrelevant).
+  for (const card of getHand(state, endedPlayer)) {
+    clearTempCostModsOnCard(card);
+  }
+  for (const card of getDeck(state, endedPlayer)) {
+    clearTempCostModsOnCard(card);
   }
 }
 
@@ -264,6 +272,8 @@ function _endTurnCore(endingPlayer: Player) {
         if (state.roundCount <= 5) state.secondPlayerPPBoostUsedEarly = true;
         else state.secondPlayerPPBoostUsedLate = true;
         state.secondPlayerPPBoostPending = false;
+        // Unused bonus orb is lost at end of second player's turn.
+        setBonusPpOrb(state, "second", 0);
       }
       state.roundCount++;
     }
@@ -274,7 +284,7 @@ function _endTurnCore(endingPlayer: Player) {
       nextPlayer,
       Math.min(state.roundCount + getPermPP(state, nextPlayer), 10),
     );
-    setPP(state, nextPlayer, getMaxPP(state, nextPlayer));
+    refillPPAtTurnStart(state, nextPlayer);
 
     // Reset evolution usage flag for ending player
     setEvoUsedThisTurn(state, endingPlayer, false);

@@ -20,7 +20,10 @@ import {
 } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
-import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../../core/pendingTarget/index.js";
 import { evaluateCardCondition } from "../../../core/conditions/evaluator.js";
 import { recomputeAttackFlags } from "../../../core/combat.js";
 
@@ -72,7 +75,12 @@ export function handleEvolve(
     const pool = buildSelectionPool(spec, owner, sourceCard);
 
     if (pool.length === 0) {
-      // No valid targets, skip silently
+      reportSelectFizzled({
+        eff: eff as Effect,
+        owner,
+        sourceCard,
+        target: String(spec.target ?? ""),
+      });
       return "done";
     }
 
@@ -98,15 +106,19 @@ export function handleEvolve(
       return "done";
     }
 
-    setPendingTarget({
-      eff: eff as any,
-      owner,
-      sourceCard,
-      resumeEffects: context?.queue || [],
-      pool,
-      targets: [],
-      selectCount,
-    });
+    if (
+      trySetPendingTarget({
+        eff: eff as any,
+        owner,
+        sourceCard,
+        resumeEffects: context?.queue || [],
+        pool,
+        targets: [],
+        selectCount,
+      }) === "fizzled"
+    ) {
+      return "done";
+    }
 
     highlightSelectable(pool);
     logEvent("evolve_select", {

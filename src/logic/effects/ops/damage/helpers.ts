@@ -12,7 +12,10 @@ import type {
   CardInstance,
   Player,
 } from "../../../../core/types/index.js";
-import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../../core/pendingTarget/index.js";
 import { getBoard, getHP, getHand } from "../../../../core/playerHelpers.js";
 import { evaluateCardCondition } from "../../../core/conditions/evaluator.js";
 import {
@@ -139,6 +142,12 @@ export function handleSelection(
   const selectCount = Math.min(spec.select || 1, pool.length);
 
   if (selectCount === 0 && !spec.fallback_leader) {
+    reportSelectFizzled({
+      eff,
+      owner,
+      sourceCard,
+      target: String(spec.target ?? ""),
+    });
     return "done";
   }
 
@@ -147,16 +156,20 @@ export function handleSelection(
   const { add_amount: _addAmount, ...effWithoutAdd } = eff as Effect & {
     add_amount?: unknown;
   };
-  setPendingTarget({
-    eff: { ...effWithoutAdd, amount } as any,
-    owner,
-    sourceCard,
-    targets: [],
-    selectCount: selectCount || 1,
-    pool,
-    resumeEffects: effectsQueue,
-    canTargetLeader: spec.fallback_leader ?? false,
-  });
+  if (
+    trySetPendingTarget({
+      eff: { ...effWithoutAdd, amount } as any,
+      owner,
+      sourceCard,
+      targets: [],
+      selectCount: selectCount || 1,
+      pool,
+      resumeEffects: effectsQueue,
+      canTargetLeader: spec.fallback_leader ?? false,
+    }) === "fizzled"
+  ) {
+    return "done";
+  }
 
   logEvent("damage_select", {
     owner,

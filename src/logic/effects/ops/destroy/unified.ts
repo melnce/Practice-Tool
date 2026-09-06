@@ -9,7 +9,11 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
-import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import type { TargetContext } from "../../../core/targeting/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../../core/pendingTarget/index.js";
 import { cleanupDead } from "../../../core/cleanup.js";
 
 import type { UnifiedDestroySpec, DestroyContext } from "./types.js";
@@ -123,12 +127,19 @@ export function handleDestroy(
   // isTargetedEffect should only be true when player selects targets (spec.select > 0)
   // AoE/random effects should bypass Ambush protection
   const isSelectBased = spec.select != null && spec.select > 0;
+  const poolContext: TargetContext = {
+    ...ctx,
+    isTargetedEffect: isSelectBased,
+  };
+  if (isSelectBased) {
+    poolContext.selectCount = spec.select ?? 1;
+  }
   const pool = getPool(
     spec.target || "",
     owner,
     ctx.sourceCard,
     poolCondition,
-    { ...ctx, isTargetedEffect: isSelectBased },
+    poolContext,
   ).filter((c) => c && (c.type === "Follower" || c.type === "Amulet"));
 
   // Apply excludes
@@ -179,26 +190,44 @@ function handleDestroyDirect(
   effectsQueue: Effect[],
   ctx: DestroyContext,
 ): "pending" | number {
-  if (!pool.length) return 0;
+  if (!pool.length) {
+    if (spec.select > 0) {
+      reportSelectFizzled({
+        eff: {
+          op: "destroy",
+          target: spec.target,
+          select: spec.select,
+        } as Effect,
+        owner,
+        sourceCard: ctx.sourceCard,
+        target: spec.target,
+      });
+    }
+    return 0;
+  }
 
   // If selection required
   if (spec.select > 0) {
     const selectCount = Math.min(spec.select, pool.length);
 
-    setPendingTarget({
-      eff: {
-        op: "destroy",
-        target: spec.target,
-        select: selectCount,
-        then: spec.then_effects.length ? spec.then_effects : undefined,
-      } as any,
-      owner,
-      sourceCard: ctx.sourceCard,
-      resumeEffects: effectsQueue,
-      pool,
-      targets: [],
-      selectCount,
-    });
+    if (
+      trySetPendingTarget({
+        eff: {
+          op: "destroy",
+          target: spec.target,
+          select: selectCount,
+          then: spec.then_effects.length ? spec.then_effects : undefined,
+        } as any,
+        owner,
+        sourceCard: ctx.sourceCard,
+        resumeEffects: effectsQueue,
+        pool,
+        targets: [],
+        selectCount,
+      }) === "fizzled"
+    ) {
+      return 0;
+    }
 
     highlightSelectable(pool);
     logEvent("destroy_select", {

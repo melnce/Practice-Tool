@@ -207,10 +207,16 @@
       "status": "covered"
     },
     "10021310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "0ea29408",
+      "gatesSatisfied": [],
       "name": "Way of the Maid",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "66b80bcc",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10022110": {
       "fingerprint": "1eb956b8",
@@ -1357,10 +1363,16 @@
       "status": "covered"
     },
     "10131310": {
-      "detail": "Spell requires a card in hand with Spellboost.",
+      "fingerprint": "a4b75f78",
+      "gatesSatisfied": [],
       "name": "Radiant Rainbow",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "a1b11db3",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10131320": {
       "fingerprint": "244b76b1",
@@ -2051,7 +2063,7 @@
       "status": "covered"
     },
     "10154130": {
-      "fingerprint": "1266dbd7",
+      "fingerprint": "6c890923",
       "gatesSatisfied": [],
       "name": "Aragavy, Eternal Hunter",
       "scenarios": [
@@ -2060,7 +2072,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "80b19e78",
+          "fingerprint": "0f1fe343",
           "scenario": "evolve"
         }
       ],
@@ -3167,10 +3179,16 @@
       "status": "covered"
     },
     "10243310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "5c53b270",
+      "gatesSatisfied": [],
       "name": "Draconic Strike",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "b2c9e078",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10244110": {
       "fingerprint": "711c55b8",
@@ -3365,10 +3383,20 @@
       "status": "covered"
     },
     "10262110": {
-      "detail": "Board is full.",
+      "fingerprint": "ddd72210",
+      "gatesSatisfied": ["amulet_count"],
       "name": "Colette, Barrage Exorcist",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "dad3c1dc",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "3ccd9fc0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10262120": {
       "fingerprint": "77118e98",
@@ -3511,10 +3539,16 @@
       "status": "covered"
     },
     "10272310": {
-      "detail": "Spell requires a Artifact follower target but none are available.",
+      "fingerprint": "f9a5923d",
+      "gatesSatisfied": [],
       "name": "Flight of Icarus",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "dd29308c",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10273110": {
       "fingerprint": "3df7cba4",
@@ -3941,17 +3975,20 @@
       "status": "covered"
     },
     "10331110": {
-      "fingerprint": "d3443a1c",
-      "gatesSatisfied": [],
+      "fingerprint": "b8326435",
+      "gatesSatisfied": ["self_cost"],
       "name": "Devotee of Truth",
       "scenarios": [
         {
           "fingerprint": "99eac1f7",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "c5efcbaa",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["self_cost"]
+      "status": "covered"
     },
     "10331120": {
       "fingerprint": "003a2cc7",
@@ -3982,17 +4019,20 @@
       "status": "covered"
     },
     "10332110": {
-      "fingerprint": "500953c8",
-      "gatesSatisfied": [],
+      "fingerprint": "5110bed0",
+      "gatesSatisfied": ["self_cost"],
       "name": "Supplicant of Truth",
       "scenarios": [
         {
           "fingerprint": "7ace6780",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "99258754",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["self_cost"]
+      "status": "covered"
     },
     "10332210": {
       "fingerprint": "5f374d20",
@@ -4019,12 +4059,16 @@
       "status": "covered"
     },
     "10333110": {
-      "fingerprint": "cb6301f8",
-      "gatesSatisfied": [],
+      "fingerprint": "5a99a680",
+      "gatesSatisfied": ["self_cost"],
       "name": "Congregant of Truth",
       "scenarios": [
         {
           "fingerprint": "261429f4",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "157042e8",
           "scenario": "play"
         },
         {
@@ -4032,14 +4076,19 @@
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["self_cost"]
+      "status": "covered"
     },
     "10333310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "99a96de8",
+      "gatesSatisfied": [],
       "name": "Illusory Conjuration",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "971ad012",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10334110": {
       "fingerprint": "812b8450",
@@ -4446,21 +4495,20 @@
       "status": "covered"
     },
     "10364110": {
-      "fingerprint": "23fe30b8",
-      "gatesSatisfied": [],
+      "fingerprint": "f16df7d7",
+      "gatesSatisfied": ["board_name"],
       "name": "Himeka, Heir to Repose",
       "scenarios": [
         {
-          "fingerprint": "854be3ee",
+          "fingerprint": "2e2effe0",
           "scenario": "play"
         },
         {
-          "fingerprint": "ae9ed914",
+          "fingerprint": "65aa40ca",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["board_name"]
+      "status": "covered"
     },
     "10364120": {
       "fingerprint": "032574cf",
@@ -4671,12 +4719,12 @@
       "status": "covered"
     },
     "10404110": {
-      "fingerprint": "5b3e034f",
+      "fingerprint": "44ed41b4",
       "gatesSatisfied": ["skybound_art"],
       "name": "Sandalphon, Primarch Successor",
       "scenarios": [
         {
-          "fingerprint": "705428ac",
+          "fingerprint": "410ea98e",
           "scenario": "play"
         },
         {
@@ -5607,17 +5655,16 @@
       "status": "covered"
     },
     "10501110": {
-      "fingerprint": "24d3e770",
-      "gatesSatisfied": [],
+      "fingerprint": "d2161b74",
+      "gatesSatisfied": ["field_matches"],
       "name": "Monster Litterateur",
       "scenarios": [
         {
-          "fingerprint": "af76b8e4",
+          "fingerprint": "a6aa551c",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["field_matches"]
+      "status": "covered"
     },
     "10502110": {
       "fingerprint": "7352f3a7",
@@ -5632,17 +5679,16 @@
       "status": "covered"
     },
     "10502120": {
-      "fingerprint": "88511460",
-      "gatesSatisfied": [],
+      "fingerprint": "4012fb78",
+      "gatesSatisfied": ["hand_top_base_costs_gt_enemy"],
       "name": "Behemoth General",
       "scenarios": [
         {
-          "fingerprint": "4e061bd4",
+          "fingerprint": "5a02ffb4",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["hand_top_base_costs_gt_enemy"]
+      "status": "covered"
     },
     "10503210": {
       "fingerprint": "fe05f769",
@@ -5825,40 +5871,48 @@
       "status": "covered"
     },
     "10521110": {
-      "fingerprint": "b0239dd8",
-      "gatesSatisfied": [],
+      "fingerprint": "413fca40",
+      "gatesSatisfied": ["last_discarded_type"],
       "name": "Altruistic Aristocrat",
       "scenarios": [
+        {
+          "fingerprint": "ea5d512b",
+          "scenario": "play_else"
+        },
         {
           "fingerprint": "ea5d512b",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["last_discarded_type"]
+      "status": "covered"
     },
     "10521120": {
-      "fingerprint": "0c2f1458",
-      "gatesSatisfied": [],
+      "fingerprint": "7d7e8ed1",
+      "gatesSatisfied": ["hand_matches"],
       "name": "Smoke-Shrouded Beauty",
       "scenarios": [
         {
-          "fingerprint": "807b2758",
+          "fingerprint": "f35b78e8",
           "scenario": "play"
         },
         {
-          "fingerprint": "3cbe4408",
+          "fingerprint": "4ba24c24",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["hand_matches"]
+      "status": "covered"
     },
     "10521310": {
-      "detail": "Spell requires a Spell card in hand but none are available.",
+      "fingerprint": "8c2a7b98",
+      "gatesSatisfied": [],
       "name": "Extravagance of the Goldbloom",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "b7a8d6af",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10522110": {
       "fingerprint": "7b1acc28",
@@ -5873,21 +5927,20 @@
       "status": "covered"
     },
     "10522120": {
-      "fingerprint": "50f22bc8",
-      "gatesSatisfied": [],
+      "fingerprint": "70fc2ec8",
+      "gatesSatisfied": ["hand_matches"],
       "name": "Amphibian Goldmuncher",
       "scenarios": [
         {
-          "fingerprint": "61e8fe5c",
+          "fingerprint": "151981b0",
           "scenario": "turn_boundary"
         },
         {
-          "fingerprint": "2e8b8b80",
+          "fingerprint": "beb4527b",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["hand_matches"]
+      "status": "covered"
     },
     "10522310": {
       "fingerprint": "85dc10e9",
@@ -5994,10 +6047,16 @@
       "status": "covered"
     },
     "10531310": {
-      "detail": "Spell needs a different hand card to discard.",
+      "fingerprint": "f10b679f",
+      "gatesSatisfied": [],
       "name": "Metamorphosis of the Dawnblossom",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "300d29fc",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10532110": {
       "fingerprint": "80d41ad1",
@@ -6324,17 +6383,16 @@
       "status": "covered"
     },
     "10553310": {
-      "fingerprint": "4d569ed0",
-      "gatesSatisfied": [],
+      "fingerprint": "0941ccd0",
+      "gatesSatisfied": ["hand_same_cost_gte"],
       "name": "Rigor of the Nightblossom",
       "scenarios": [
         {
-          "fingerprint": "d9f97253",
+          "fingerprint": "b4cb3fa2",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["hand_same_cost_gte"]
+      "status": "covered"
     },
     "10554110": {
       "fingerprint": "5f4d4fb9",
@@ -6353,21 +6411,20 @@
       "status": "covered"
     },
     "10554120": {
-      "fingerprint": "6827fa21",
-      "gatesSatisfied": [],
+      "fingerprint": "f81bb819",
+      "gatesSatisfied": ["hand_same_cost_gte"],
       "name": "Shakdoh, Nightblossom",
       "scenarios": [
         {
-          "fingerprint": "7eb8ac00",
+          "fingerprint": "76f2ae34",
           "scenario": "play"
         },
         {
-          "fingerprint": "a246ca58",
+          "fingerprint": "0e419e24",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["hand_same_cost_gte"]
+      "status": "covered"
     },
     "10561110": {
       "fingerprint": "5ae32d87",
@@ -6398,10 +6455,16 @@
       "status": "covered"
     },
     "10561310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "112da7c7",
+      "gatesSatisfied": [],
       "name": "Malice of the Mistbloom",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "0e24db60",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10562110": {
       "fingerprint": "53575ab0",
@@ -6444,16 +6507,16 @@
       "status": "covered"
     },
     "10563110": {
-      "fingerprint": "9def1ac0",
+      "fingerprint": "71a47740",
       "gatesSatisfied": [],
       "name": "Saint of Rehabilitation",
       "scenarios": [
         {
-          "fingerprint": "f38cc264",
+          "fingerprint": "27a23990",
           "scenario": "play"
         },
         {
-          "fingerprint": "cce769e7",
+          "fingerprint": "a083ecc8",
           "scenario": "evolve"
         }
       ],
@@ -6568,10 +6631,16 @@
       "status": "covered"
     },
     "10572310": {
-      "detail": "Spell needs a different hand card to discard.",
+      "fingerprint": "0d6f1400",
+      "gatesSatisfied": [],
       "name": "Resurrection Tuner",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "48086a33",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10573110": {
       "fingerprint": "25ea04cf",
@@ -7046,10 +7115,16 @@
       "status": "covered"
     },
     "10632310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "5cafb658",
+      "gatesSatisfied": [],
       "name": "Reaved Order",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "ad8a6f34",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10633110": {
       "fingerprint": "31f103d4",
@@ -7180,10 +7255,16 @@
       "status": "covered"
     },
     "10642310": {
-      "detail": "Spell needs a different hand card to discard.",
+      "fingerprint": "fa6aa0e8",
+      "gatesSatisfied": [],
       "name": "Spilling Red",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "42365faf",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10643110": {
       "fingerprint": "61f88498",
@@ -7462,34 +7543,32 @@
       "status": "covered"
     },
     "10663210": {
-      "fingerprint": "476f4218",
-      "gatesSatisfied": [],
+      "fingerprint": "d3b27fc4",
+      "gatesSatisfied": ["selected_matches"],
       "name": "Sublime Eld Tome",
       "scenarios": [
         {
-          "fingerprint": "381a18c8",
+          "fingerprint": "b5947124",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["selected_matches"]
+      "status": "covered"
     },
     "10664110": {
-      "fingerprint": "76c70538",
-      "gatesSatisfied": [],
+      "fingerprint": "adf13f27",
+      "gatesSatisfied": ["selected_matches"],
       "name": "Kandima, Sublime Hatred",
       "scenarios": [
         {
-          "fingerprint": "cc199774",
+          "fingerprint": "64dbe06c",
           "scenario": "play"
         },
         {
-          "fingerprint": "2517be6b",
+          "fingerprint": "3efe389f",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["selected_matches"]
+      "status": "covered"
     },
     "10664120": {
       "fingerprint": "d4a36d48",
@@ -7532,17 +7611,16 @@
       "status": "covered"
     },
     "10671310": {
-      "fingerprint": "bc8a70d8",
-      "gatesSatisfied": [],
+      "fingerprint": "ad865288",
+      "gatesSatisfied": ["ally_matches"],
       "name": "Advent of the Eld Axe",
       "scenarios": [
         {
-          "fingerprint": "3357513b",
+          "fingerprint": "ce37fe07",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["ally_matches"]
+      "status": "covered"
     },
     "10672110": {
       "fingerprint": "a33961dc",
@@ -7601,10 +7679,16 @@
       "status": "covered"
     },
     "10673310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "e074e530",
+      "gatesSatisfied": [],
       "name": "Unfeeling Eld Axe",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "f0979bf4",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10674110": {
       "fingerprint": "18e3c568",
@@ -7623,17 +7707,16 @@
       "status": "covered"
     },
     "10674120": {
-      "fingerprint": "ddad6a3c",
-      "gatesSatisfied": [],
+      "fingerprint": "4d21d900",
+      "gatesSatisfied": ["ally_matches"],
       "name": "Yog-Zentha, Eld Axe",
       "scenarios": [
         {
-          "fingerprint": "933e017b",
+          "fingerprint": "8b1ca930",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["ally_matches"]
+      "status": "covered"
     },
     "10701110": {
       "fingerprint": "bd3223d8",
@@ -7744,10 +7827,16 @@
       "status": "covered"
     },
     "10711310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "a55ccd00",
+      "gatesSatisfied": [],
       "name": "Cognitive Shift",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "25314368",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10712110": {
       "fingerprint": "f4a3813c",
@@ -8398,10 +8487,16 @@
       "status": "covered"
     },
     "10761110": {
-      "detail": "Board is full.",
+      "fingerprint": "b0152b80",
+      "gatesSatisfied": ["amulet_count"],
       "name": "Reverend of Finance",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "17f3c234",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10761120": {
       "fingerprint": "1cbd6f28",
@@ -8432,16 +8527,28 @@
       "status": "covered"
     },
     "10762110": {
-      "detail": "Board is full.",
+      "fingerprint": "6ec66d78",
+      "gatesSatisfied": ["amulet_count"],
       "name": "Sister of Strategic Development",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "f323132b",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10762120": {
-      "detail": "Board is full.",
+      "fingerprint": "94374618",
+      "gatesSatisfied": ["amulet_count"],
       "name": "Holy Hawk of Communications",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "f277caf8",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10762210": {
       "fingerprint": "f154cedf",
@@ -8456,10 +8563,16 @@
       "status": "covered"
     },
     "10763110": {
-      "detail": "Board is full.",
+      "fingerprint": "f8bbf61f",
+      "gatesSatisfied": ["amulet_count"],
       "name": "Deacon of Security",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "4a8490fc",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10763210": {
       "fingerprint": "dfa4d280",
@@ -8490,10 +8603,20 @@
       "status": "covered"
     },
     "10764120": {
-      "detail": "Board is full.",
+      "fingerprint": "44ae89e8",
+      "gatesSatisfied": ["amulet_count"],
       "name": "Initia, Chief Ordination Officer",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "5c794e5c",
+          "scenario": "play"
+        },
+        {
+          "fingerprint": "8b1f26e8",
+          "scenario": "evolve"
+        }
+      ],
+      "status": "covered"
     },
     "10771110": {
       "fingerprint": "4cfbdb08",
@@ -8508,30 +8631,36 @@
       "status": "covered"
     },
     "10771120": {
-      "fingerprint": "bad98aac",
-      "gatesSatisfied": [],
+      "fingerprint": "04da3547",
+      "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Beat Breaker",
       "scenarios": [
         {
           "fingerprint": "edc64fc8",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "36936cfc",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["unique_tribe_enters"]
+      "status": "covered"
     },
     "10771310": {
-      "fingerprint": "35364568",
-      "gatesSatisfied": [],
+      "fingerprint": "30240400",
+      "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Freerunning",
       "scenarios": [
         {
           "fingerprint": "d692891b",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "a3652c44",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["unique_tribe_enters"]
+      "status": "covered"
     },
     "10772110": {
       "fingerprint": "f75504f4",
@@ -8550,17 +8679,16 @@
       "status": "covered"
     },
     "10772120": {
-      "fingerprint": "aa689f08",
-      "gatesSatisfied": [],
+      "fingerprint": "cab21724",
+      "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Audacious Artist",
       "scenarios": [
         {
-          "fingerprint": "2631bb50",
+          "fingerprint": "41596764",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["unique_tribe_enters"]
+      "status": "covered"
     },
     "10772310": {
       "fingerprint": "2ba52958",
@@ -8616,7 +8744,7 @@
     },
     "10774120": {
       "fingerprint": "e2903ab0",
-      "gatesSatisfied": [],
+      "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Myuu, Hot on His Heels",
       "scenarios": [
         {
@@ -8624,8 +8752,7 @@
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["unique_tribe_enters"]
+      "status": "covered"
     },
     "10801110": {
       "fingerprint": "6048dd50",
@@ -9240,17 +9367,16 @@
       "status": "covered"
     },
     "10844110": {
-      "fingerprint": "c8bc5394",
-      "gatesSatisfied": [],
+      "fingerprint": "bdeb0762",
+      "gatesSatisfied": ["named_enter_count"],
       "name": "Drache & Aluzard, Burning Blood",
       "scenarios": [
         {
-          "fingerprint": "5cf36318",
+          "fingerprint": "78d90ebc",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["named_enter_count"]
+      "status": "covered"
     },
     "10844120": {
       "fingerprint": "8f231348",
@@ -9321,16 +9447,16 @@
       "status": "covered"
     },
     "10852120": {
-      "fingerprint": "773f9781",
+      "fingerprint": "302929a8",
       "gatesSatisfied": [],
       "name": "Marsha, Dark Knight",
       "scenarios": [
         {
-          "fingerprint": "3541bf98",
+          "fingerprint": "d959fedc",
           "scenario": "play"
         },
         {
-          "fingerprint": "0e5aa02c",
+          "fingerprint": "2f443614",
           "scenario": "evolve"
         }
       ],
@@ -9365,10 +9491,20 @@
       "status": "covered"
     },
     "10853310": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "0fe7a867",
+      "gatesSatisfied": ["super_evo_unlocked"],
       "name": "Ebb and Flow",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "b49dd7c7",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "e373cac0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10854110": {
       "fingerprint": "3981cd38",
@@ -9627,17 +9763,16 @@
       "status": "covered"
     },
     "10873310": {
-      "fingerprint": "cfd2fd08",
-      "gatesSatisfied": [],
+      "fingerprint": "c18c4bb0",
+      "gatesSatisfied": ["unique_tribe_enters"],
       "name": "The Journey Ahead",
       "scenarios": [
         {
-          "fingerprint": "495ea60b",
+          "fingerprint": "a42f7cff",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["unique_tribe_enters"]
+      "status": "covered"
     },
     "10874110": {
       "fingerprint": "57b290a1",
@@ -9728,17 +9863,16 @@
       "status": "covered"
     },
     "10903210": {
-      "fingerprint": "2ad9cb88",
-      "gatesSatisfied": [],
+      "fingerprint": "f8fa8728",
+      "gatesSatisfied": ["played_base_cost_ladder"],
       "name": "Azvaldt, Penitentiary of Chaos",
       "scenarios": [
         {
-          "fingerprint": "f5688010",
+          "fingerprint": "d835a19c",
           "scenario": "turn_boundary"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["played_base_cost_ladder"]
+      "status": "covered"
     },
     "10904110": {
       "fingerprint": "f820227c",
@@ -9965,17 +10099,16 @@
       "status": "covered"
     },
     "10922310": {
-      "fingerprint": "78166e23",
-      "gatesSatisfied": [],
+      "fingerprint": "a5abff48",
+      "gatesSatisfied": ["self_cost"],
       "name": "Severed Ties",
       "scenarios": [
         {
-          "fingerprint": "e4acc81b",
+          "fingerprint": "e492778b",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["self_cost"]
+      "status": "covered"
     },
     "10923110": {
       "fingerprint": "68168af8",
@@ -10043,8 +10176,7 @@
           "scenario": "vanilla_place"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["named_enter_count"]
+      "status": "covered"
     },
     "10931120": {
       "fingerprint": "f2162fa0",
@@ -10243,10 +10375,16 @@
       "status": "covered"
     },
     "10942310": {
-      "detail": "Spell needs a different hand card to discard.",
+      "fingerprint": "b70a8994",
+      "gatesSatisfied": [],
       "name": "Parting Jaws",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "780362f4",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10943110": {
       "fingerprint": "bb1f2428",
@@ -10313,12 +10451,12 @@
       "status": "covered"
     },
     "10951110": {
-      "fingerprint": "c484ca38",
+      "fingerprint": "2cbc7ed7",
       "gatesSatisfied": [],
       "name": "Ruthless Blitzer",
       "scenarios": [
         {
-          "fingerprint": "625c938c",
+          "fingerprint": "4011c504",
           "scenario": "play"
         }
       ],
@@ -10373,28 +10511,28 @@
       "status": "covered"
     },
     "10952310": {
-      "fingerprint": "c93727b0",
+      "fingerprint": "b81d7690",
       "gatesSatisfied": [],
       "name": "Chains of the Past",
       "scenarios": [
         {
-          "fingerprint": "4f751433",
+          "fingerprint": "5021e99b",
           "scenario": "play"
         },
         {
-          "fingerprint": "d35616f0",
+          "fingerprint": "dc5206d0",
           "scenario": "play_base"
         }
       ],
       "status": "covered"
     },
     "10953110": {
-      "fingerprint": "f5a22014",
+      "fingerprint": "b2418680",
       "gatesSatisfied": [],
       "name": "Rampaging Commander",
       "scenarios": [
         {
-          "fingerprint": "5b4db638",
+          "fingerprint": "fe4ccd10",
           "scenario": "play"
         },
         {
@@ -10417,21 +10555,20 @@
       "status": "covered"
     },
     "10954110": {
-      "fingerprint": "cddbe8c4",
-      "gatesSatisfied": [],
+      "fingerprint": "07325fe7",
+      "gatesSatisfied": ["ally_matches"],
       "name": "Istyndet vs. Mitilykket",
       "scenarios": [
         {
-          "fingerprint": "df8057b8",
+          "fingerprint": "139abc66",
           "scenario": "play"
         },
         {
-          "fingerprint": "3d73dffc",
+          "fingerprint": "a39fee48",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["ally_matches"]
+      "status": "covered"
     },
     "10954120": {
       "fingerprint": "3c1b786f",
@@ -10522,12 +10659,12 @@
       "status": "covered"
     },
     "10963110": {
-      "fingerprint": "ec1aadd0",
+      "fingerprint": "de24dc64",
       "gatesSatisfied": [],
       "name": "Executor of the Vow",
       "scenarios": [
         {
-          "fingerprint": "77bf7930",
+          "fingerprint": "9cd44aac",
           "scenario": "play"
         },
         {
@@ -10550,21 +10687,16 @@
       "status": "covered"
     },
     "10964110": {
-      "fingerprint": "43c8e078",
-      "gatesSatisfied": [],
+      "fingerprint": "062dcf77",
+      "gatesSatisfied": ["ally_matches"],
       "name": "Erralde, Signet Convict",
       "scenarios": [
         {
-          "fingerprint": "2af50ce8",
-          "scenario": "play"
-        },
-        {
-          "fingerprint": "62e0dd40",
+          "fingerprint": "21b36cb4",
           "scenario": "evolve"
         }
       ],
-      "status": "partial",
-      "unmetGates": ["ally_matches"]
+      "status": "covered"
     },
     "10964120": {
       "fingerprint": "44c92144",
@@ -10643,10 +10775,20 @@
       "status": "covered"
     },
     "10972310": {
-      "detail": "Spell needs a different hand card to discard.",
+      "fingerprint": "efbd74cd",
+      "gatesSatisfied": ["highlander"],
       "name": "Disgraceful Banishment",
-      "reason": "play_blocked",
-      "status": "skipped"
+      "scenarios": [
+        {
+          "fingerprint": "53629e0c",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "f19ae97c",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered"
     },
     "10973110": {
       "fingerprint": "247f5d38",
@@ -10861,18 +11003,21 @@
       "token": true
     },
     "90014320": {
-      "fingerprint": "795a2ed0",
-      "gatesSatisfied": [],
+      "fingerprint": "23d860bc",
+      "gatesSatisfied": ["board_name"],
       "name": "Annihilating Onslaught",
       "scenarios": [
         {
-          "fingerprint": "9aca75ac",
+          "fingerprint": "2fcae85f",
+          "scenario": "play_else"
+        },
+        {
+          "fingerprint": "2d7acc66",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "token": true,
-      "unmetGates": ["board_name"]
+      "status": "covered",
+      "token": true
     },
     "90014330": {
       "fingerprint": "7e05223c",
@@ -11018,18 +11163,17 @@
       "token": true
     },
     "90023110": {
-      "fingerprint": "e73d83c8",
-      "gatesSatisfied": [],
+      "fingerprint": "040a98eb",
+      "gatesSatisfied": ["board_name"],
       "name": "Nonja, Silent Maid",
       "scenarios": [
         {
-          "fingerprint": "c8b9a478",
+          "fingerprint": "097aa6f8",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "token": true,
-      "unmetGates": ["board_name"]
+      "status": "covered",
+      "token": true
     },
     "90024310": {
       "fingerprint": "965a79a8",
@@ -11504,10 +11648,16 @@
       "token": true
     },
     "90054320": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "b91e0390",
+      "gatesSatisfied": [],
       "name": "Wings of Desire",
-      "reason": "play_blocked",
-      "status": "skipped",
+      "scenarios": [
+        {
+          "fingerprint": "4f7c18c0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
       "token": true
     },
     "90054330": {
@@ -11576,12 +11726,12 @@
       "token": true
     },
     "90064210": {
-      "fingerprint": "152b8a0c",
+      "fingerprint": "3e2100c7",
       "gatesSatisfied": ["amulet_count"],
       "name": "Rings of Moonlight",
       "scenarios": [
         {
-          "fingerprint": "f7b1a478",
+          "fingerprint": "3dfb5aa7",
           "scenario": "turn_boundary"
         }
       ],
@@ -11602,18 +11752,17 @@
       "token": true
     },
     "90064320": {
-      "fingerprint": "59672a39",
-      "gatesSatisfied": [],
+      "fingerprint": "883bf588",
+      "gatesSatisfied": ["selected_matches"],
       "name": "Depths of the Eld Tome",
       "scenarios": [
         {
-          "fingerprint": "47379800",
+          "fingerprint": "0843130c",
           "scenario": "play"
         }
       ],
-      "status": "partial",
-      "token": true,
-      "unmetGates": ["selected_matches"]
+      "status": "covered",
+      "token": true
     },
     "90071110": {
       "fingerprint": "b1c3db38",
@@ -11902,34 +12051,25 @@
       "token": true
     },
     "90074320": {
-      "detail": "Spell requires a target but none are available.",
+      "fingerprint": "d5692160",
+      "gatesSatisfied": [],
       "name": "Depths of the Eld Axe",
-      "reason": "play_blocked",
-      "status": "skipped",
+      "scenarios": [
+        {
+          "fingerprint": "ce9b96e0",
+          "scenario": "play"
+        }
+      ],
+      "status": "covered",
       "token": true
     }
   },
-  "covered": 851,
-  "partial": 29,
+  "covered": 904,
+  "partial": 0,
   "seed": 42,
-  "skipReasons": {
-    "play_blocked": 24
-  },
-  "skipped": 24,
+  "skipReasons": {},
+  "skipped": 0,
   "tokenCount": 93,
-  "unmetGateCounts": {
-    "ally_matches": 4,
-    "board_name": 3,
-    "field_matches": 1,
-    "hand_matches": 2,
-    "hand_same_cost_gte": 2,
-    "hand_top_base_costs_gt_enemy": 1,
-    "last_discarded_type": 1,
-    "named_enter_count": 2,
-    "played_base_cost_ladder": 1,
-    "selected_matches": 3,
-    "self_cost": 4,
-    "unique_tribe_enters": 5
-  },
+  "unmetGateCounts": {},
   "version": 2
 }

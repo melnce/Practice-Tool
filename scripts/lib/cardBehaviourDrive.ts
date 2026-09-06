@@ -38,6 +38,10 @@ import {
   applyGatePreparations,
   collectNamedGates,
   summarizeGateConditions,
+  assertHarnessBoardCap,
+  trimBoardToCap,
+  HARNESS_BOARD_CAP,
+  HARNESS_BOARD_RESERVE,
   type GateSpec,
 } from "./cardBehaviourGates.js";
 
@@ -114,6 +118,12 @@ export type DriveCardOptions = {
   isToken?: boolean;
 };
 
+function targetsHandSelectPool(target: string): boolean {
+  const t = target.toLowerCase();
+  if (t === "ally:hand" || t.startsWith("hand:")) return true;
+  if (t.includes("hand_card")) return false;
+  return t.includes(":hand");
+}
 function walkEffects(
   node: unknown,
   visit: (obj: Record<string, unknown>) => void,
@@ -126,6 +136,254 @@ function walkEffects(
   const obj = node as Record<string, unknown>;
   visit(obj);
   for (const value of Object.values(obj)) walkEffects(value, visit);
+}
+
+export type HarnessArenaNeeds = {
+  handKit: boolean;
+  amuletKit: number;
+  crystalspawnAlly: boolean;
+  highCostAlly: boolean;
+  namedBoardAllies: string[];
+  reservesBoardSlot: boolean;
+};
+
+/** Data-derived arena prep selected per card (never a hard-coded id list). */
+export function analyzeHarnessArenaNeeds(
+  card: RawCard,
+  gates: GateSpec[],
+): HarnessArenaNeeds {
+  let handKit = false;
+  let crystalspawnAlly = false;
+  let highCostAlly = false;
+  const namedBoardAllies = new Set<string>();
+  let amuletKit = 0;
+
+  for (const g of gates) {
+    if (g.condition === "amulet_count") {
+      amuletKit = Math.max(amuletKit, g.count ?? 1);
+    }
+  }
+  // Full amulet-board kit only when ≥3 amulets are required (Havencraft line).
+  if (amuletKit < 3) amuletKit = 0;
+
+  const playRoots: unknown[] = [...(card.fanfare ?? []), ...(card.spell ?? [])];
+  const allRoots: unknown[] = [
+    ...playRoots,
+    ...(card.evolve ?? []),
+    ...(card.superevolve ?? []),
+    ...(card.triggers ?? []),
+  ];
+
+  walkEffects(playRoots, (obj) => {
+    if (obj.optional === true) return;
+    const target = String(obj.target ?? "");
+    const op = String(obj.op ?? "");
+    // Discard-from-hand (implicit pool — no target string on the op).
+    if (op === "discard" && String(obj.mode ?? "select") === "select") {
+      handKit = true;
+      return;
+    }
+    if (!targetsHandSelectPool(target)) return;
+    if (op === "spellboost" || op === "stat" || op === "draw") return;
+    if (obj.select === "all") return;
+    if (op === "transform" && obj.mode === "random") return;
+    const sel = obj.select ?? obj.select_count;
+    if (op === "return" && obj.destination === "deck") {
+      handKit = true;
+      return;
+    }
+    if (op === "select" || sel != null) handKit = true;
+  });
+
+  walkEffects(playRoots, (obj) => {
+    const target = String(obj.target ?? "").toLowerCase();
+    const filter = obj.filter as Record<string, unknown> | undefined;
+    if (
+      (obj.op === "evolve" || obj.op === "select") &&
+      target.includes("ally:follower") &&
+      filter?.base_cost_gte != null &&
+      Number(filter.base_cost_gte) >= 5
+    ) {
+      highCostAlly = true;
+    }
+  });
+
+  walkEffects(allRoots, (obj) => {
+    const target = String(obj.target ?? "").toLowerCase();
+
+    const cond = obj.condition;
+    if (
+      (obj.op === "destroy" || obj.op === "select") &&
+      target.includes("ally:follower") &&
+      obj.condition
+    ) {
+      const c = obj.condition as Record<string, unknown>;
+      if (String(c.name ?? "") === "Crystalspawn") crystalspawnAlly = true;
+      if (String(c.name ?? "").trim()) namedBoardAllies.add(String(c.name));
+      if (c.base_cost_gte != null && Number(c.base_cost_gte) >= 5) {
+        highCostAlly = true;
+      }
+    }
+
+    if (
+      obj.op === "keyword" &&
+      target.includes("ally:follower") &&
+      obj.condition
+    ) {
+      const c = obj.condition as Record<string, unknown>;
+      if (String(c.name ?? "").trim()) namedBoardAllies.add(String(c.name));
+      if (c.base_cost_gte != null && Number(c.base_cost_gte) >= 5) {
+        highCostAlly = true;
+      }
+    }
+
+    if (obj.op === "gate" && obj.condition === "ally_matches") {
+      if (obj.base_cost_gte != null && Number(obj.base_cost_gte) >= 5) {
+        highCostAlly = true;
+      }
+    }
+  });
+
+  for (const g of gates) {
+    if (g.condition === "board_name" && g.name) namedBoardAllies.add(g.name);
+    if (g.condition === "ally_matches" && (g.base_cost_gte ?? 0) >= 5) {
+      highCostAlly = true;
+    }
+  }
+
+  const isSpell = String(card.type).toLowerCase() === "spell";
+  // Hand kit only for spells (cluster-A skips). Follower/amulet fanfare hand
+  // selects were already fingerprinted without extra hand cards.
+  if (!isSpell) handKit = false;
+
+  return {
+    handKit,
+    amuletKit,
+    crystalspawnAlly,
+    highCostAlly,
+    namedBoardAllies: [...namedBoardAllies],
+    reservesBoardSlot: !isSpell,
+  };
+}
+
+function spellboostHandCard(): CardInstance {
+  const sb = createCard(
+    { name: "HarnessSpellboostable", type: "Spell", cost: 1 },
+    "hand",
+    "first",
+  );
+  (sb as any).keywords = [{ name: "Spellboost", effects: [] }];
+  (sb as any).spellboostCount = 0;
+  return sb;
+}
+
+function buildHandKit(): CardInstance[] {
+  const high = createCard(
+    {
+      name: "HarnessHandHighCost",
+      type: "Follower",
+      cost: 5,
+      attack: 3,
+      defense: 3,
+    },
+    "hand",
+    "first",
+  );
+  (high as any).base_cost = 5;
+  return [
+    createCard(
+      {
+        name: "HarnessHandFollower",
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 1,
+      },
+      "hand",
+      "first",
+    ),
+    high,
+    artifactFollower("HarnessHandArt", "first"),
+    spellboostHandCard(),
+    createCard(
+      { name: "HarnessHandSpell", type: "Spell", cost: 1 },
+      "hand",
+      "first",
+    ),
+  ];
+}
+
+function applyArenaBoardPrep(needs: HarnessArenaNeeds): void {
+  const maxAllied =
+    HARNESS_BOARD_CAP - (needs.reservesBoardSlot ? HARNESS_BOARD_RESERVE : 0);
+
+  if (needs.amuletKit > 0) {
+    state.players.first.board = [];
+    for (let i = 0; i < needs.amuletKit; i++) {
+      state.players.first.board.push(
+        createCard(
+          {
+            name: `HarnessAmulet${i + 1}`,
+            type: "Amulet",
+            cost: 1,
+          },
+          "board",
+          "first",
+        ),
+      );
+    }
+  }
+
+  const pushAlly = (spec: Record<string, unknown>) => {
+    trimBoardToCap(state.players.first.board, maxAllied);
+    state.players.first.board.push(createCard(spec as any, "board", "first"));
+  };
+
+  if (needs.crystalspawnAlly) {
+    if (!state.players.first.board.some((c) => c.name === "Crystalspawn")) {
+      pushAlly({
+        name: "Crystalspawn",
+        type: "Follower",
+        cost: 2,
+        attack: 2,
+        defense: 2,
+      });
+    }
+  }
+
+  if (needs.highCostAlly) {
+    const hasHigh = state.players.first.board.some((c) => {
+      const bc =
+        (c as any).base_cost !== undefined
+          ? Number((c as any).base_cost)
+          : Number(c.cost) || 0;
+      return bc >= 5 && c.type === "Follower";
+    });
+    if (!hasHigh) {
+      pushAlly({
+        name: "HarnessBoardHighCost",
+        type: "Follower",
+        cost: 5,
+        attack: 3,
+        defense: 3,
+        base_cost: 5,
+      });
+    }
+  }
+
+  for (const name of needs.namedBoardAllies) {
+    if (!state.players.first.board.some((c) => c.name === name)) {
+      pushAlly({
+        name,
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 1,
+      });
+    }
+  }
+
+  assertHarnessBoardCap("applyArenaBoardPrep");
 }
 
 function hasNonEmptyEffects(arr: unknown[] | undefined): boolean {
@@ -237,6 +495,7 @@ function buildArena(opts: {
   extraHand?: CardInstance[];
   /** Override first-player PP (and maxPP). Default 10 — affords every Enhance tier. */
   firstPP?: number;
+  arenaNeeds?: HarnessArenaNeeds;
 }): void {
   resetUidCounter();
   state.gameStarted = true;
@@ -260,52 +519,69 @@ function buildArena(opts: {
   state.players.first.superEvoCharges = 3;
   state.players.second.superEvoCharges = 3;
 
-  const allyA = fillerFollower("ArenaAllyA", "first", 2, 6);
-  const enemyA = fillerFollower("ArenaEnemyA", "second", 2, 6);
-  const enemyB = fillerFollower("ArenaEnemyB", "second", 3, 4);
-  const allyWard = fillerFollower("ArenaAllyWard", "first", 1, 5);
-  allyWard.hasWard = true;
-  (allyWard as any).keywords = ["Ward"];
-  const enemyWard = fillerFollower("ArenaEnemyWard", "second", 1, 5);
-  enemyWard.hasWard = true;
-  (enemyWard as any).keywords = ["Ward"];
-  const enemyArt = createCard(
-    {
-      name: "ArenaEnemyArt",
-      type: "Follower",
-      cost: 2,
-      attack: 1,
-      defense: 4,
-      tribes: ["Artifact"],
-    },
-    "board",
-    "second",
-  );
-  const allyArt = createCard(
-    {
-      name: "ArenaAllyArt",
-      type: "Follower",
-      cost: 2,
-      attack: 1,
-      defense: 4,
-      tribes: ["Artifact"],
-    },
-    "board",
-    "first",
-  );
+  const needs = opts.arenaNeeds;
+  const useAmuletKit = (needs?.amuletKit ?? 0) > 0;
 
-  // Keep first board lean (≤2) so gate prep can add evolved/amulet hosts
-  // without hitting the 5-slot board cap before play.
-  state.players.first.board = [allyA, allyWard];
-  state.players.second.board = [enemyA, enemyB, enemyWard, enemyArt];
-  // allyArt stays available as a hand Artifact when needed via buildExtraHand;
-  // keep one allied Artifact on board for Artifact-target spells.
-  state.players.first.board.push(allyArt);
-  // Cap at 3 so amulet_count / evolved_allied still have room.
+  if (!useAmuletKit) {
+    const allyA = fillerFollower("ArenaAllyA", "first", 2, 6);
+    const enemyA = fillerFollower("ArenaEnemyA", "second", 2, 6);
+    const enemyB = fillerFollower("ArenaEnemyB", "second", 3, 4);
+    const allyWard = fillerFollower("ArenaAllyWard", "first", 1, 5);
+    allyWard.hasWard = true;
+    (allyWard as any).keywords = ["Ward"];
+    const enemyWard = fillerFollower("ArenaEnemyWard", "second", 1, 5);
+    enemyWard.hasWard = true;
+    (enemyWard as any).keywords = ["Ward"];
+    const enemyArt = createCard(
+      {
+        name: "ArenaEnemyArt",
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 4,
+        tribes: ["Artifact"],
+      },
+      "board",
+      "second",
+    );
+    const allyArt = createCard(
+      {
+        name: "ArenaAllyArt",
+        type: "Follower",
+        cost: 2,
+        attack: 1,
+        defense: 4,
+        tribes: ["Artifact"],
+      },
+      "board",
+      "first",
+    );
 
-  if (opts.extraHand?.length) {
-    state.players.first.hand.push(...opts.extraHand);
+    // Keep first board lean (≤2) so gate prep can add evolved/amulet hosts
+    // without hitting the 5-slot board cap before play.
+    state.players.first.board = [allyA, allyWard];
+    state.players.second.board = [enemyA, enemyB, enemyWard, enemyArt];
+    // allyArt stays available as a hand Artifact when needed via buildExtraHand;
+    // keep one allied Artifact on board for Artifact-target spells.
+    state.players.first.board.push(allyArt);
+    // Cap at 3 so amulet_count / evolved_allied still have room.
+  } else {
+    state.players.second.board = [
+      fillerFollower("ArenaEnemyA", "second", 2, 6),
+      fillerFollower("ArenaEnemyB", "second", 3, 4),
+    ];
   }
+
+  if (needs) applyArenaBoardPrep(needs);
+
+  const handExtras = [...(opts.extraHand ?? [])];
+  if (needs?.handKit) handExtras.push(...buildHandKit());
+
+  if (handExtras.length) {
+    state.players.first.hand.push(...handExtras);
+  }
+
+  assertHarnessBoardCap("buildArena");
 }
 
 function autoResolvePending(maxSteps = 12): {
@@ -379,6 +655,14 @@ function buildExtraHand(template: {
       ) {
         needsSpellboost = true;
       }
+      const cond = obj.condition;
+      if (
+        cond &&
+        typeof cond === "object" &&
+        (cond as { has_keyword?: string }).has_keyword === "Spellboost"
+      ) {
+        needsSpellboost = true;
+      }
     },
   );
   if (needsArtifact) {
@@ -410,7 +694,7 @@ function runPlayScenario(
   gates: GateSpec[],
   mode: "satisfy" | "deny",
   scenarioName: "play" | "play_else" | "play_base",
-  opts: { firstPP?: number } = {},
+  opts: { firstPP?: number; arenaNeeds?: HarnessArenaNeeds } = {},
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
@@ -420,6 +704,7 @@ function runPlayScenario(
     extraHand: extras,
     roundCount: 8,
     firstPP: opts.firstPP,
+    arenaNeeds: opts.arenaNeeds,
   });
 
   const playCard = createCard(cardId, "hand", "first");
@@ -430,6 +715,7 @@ function runPlayScenario(
     mode,
     sourceCard: playCard,
   });
+  assertHarnessBoardCap(`runPlayScenario:${scenarioName}:afterGatePrep`);
 
   state.players.first.hand = [playCard, ...state.players.first.hand];
 
@@ -463,11 +749,12 @@ function runPlayScenario(
 function runTurnBoundaryScenario(
   cardId: string,
   gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
 
-  buildArena({ roundCount: 8, activePlayer: "first" });
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
 
   const host = createCard(cardId, "board", "first");
   if (host.type === "Follower") {
@@ -478,6 +765,7 @@ function runTurnBoundaryScenario(
     mode: "satisfy",
     sourceCard: host,
   });
+  assertHarnessBoardCap("runTurnBoundaryScenario:afterGatePrep");
   state.players.first.board = [host, ...state.players.first.board];
 
   whenEndTurn();
@@ -514,6 +802,7 @@ function runTurnBoundaryScenario(
 function runEvolveScenario(
   cardId: string,
   gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
@@ -521,7 +810,7 @@ function runEvolveScenario(
     return { skip: "evolve_unavailable", detail: "not_a_follower" };
   }
 
-  buildArena({ roundCount: 8, activePlayer: "first" });
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
   const host = createCard(cardId, "board", "first");
   host.defense = Math.max(Number(host.defense) || 1, 8);
   host.justPlayed = false;
@@ -530,6 +819,11 @@ function runEvolveScenario(
     mode: "satisfy",
     sourceCard: host,
   });
+  assertHarnessBoardCap("runEvolveScenario:afterGatePrep");
+  trimBoardToCap(
+    state.players.first.board,
+    HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+  );
   state.players.first.board = [host, ...state.players.first.board];
   state.players.first.evoCharges = 3;
   state.players.first.superEvoCharges = 3;
@@ -570,16 +864,17 @@ function runEvolveScenario(
 
 function runVanillaPlaceScenario(
   cardId: string,
+  arenaNeeds?: HarnessArenaNeeds,
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
 
-  buildArena({ roundCount: 3 });
+  buildArena({ roundCount: 3, arenaNeeds });
   const isSpell = String(template.type).toLowerCase() === "spell";
   if (isSpell) {
     const card = createCard(cardId, "hand", "first");
     (card as any).cost = 0;
-    state.players.first.hand = [card];
+    state.players.first.hand = [card, ...state.players.first.hand];
     const outcome = whenPlayCard("first", 0);
     if (outcome.kind === "blocked") {
       return { skip: "play_blocked", detail: outcome.reason ?? "blocked" };
@@ -594,9 +889,15 @@ function runVanillaPlaceScenario(
       }
     }
   } else {
+    trimBoardToCap(
+      state.players.first.board,
+      HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+    );
     const host = createCard(cardId, "board", "first");
     state.players.first.board = [host, ...state.players.first.board];
   }
+
+  assertHarnessBoardCap("runVanillaPlaceScenario");
 
   const detail = fingerprintGameState(state);
   return {
@@ -639,11 +940,12 @@ function readyAttacker(card: CardInstance): void {
 
 function runSummonScenario(
   cardId: string,
+  arenaNeeds?: HarnessArenaNeeds,
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
 
-  buildArena({ roundCount: 8, activePlayer: "first" });
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
   const card = makeCardFromDB(template, "first");
   pushToBoard(state.players.first.board, "first", card);
 
@@ -733,6 +1035,7 @@ export function driveCard(
 
   const gates = collectNamedGates(raw);
   const gateSummary = summarizeGateConditions(gates);
+  const arenaNeeds = analyzeHarnessArenaNeeds(raw, gates);
 
   installModePicks();
   try {
@@ -749,13 +1052,17 @@ export function driveCard(
       let result: ScenarioResult | { skip: SkipReason; detail: string };
       try {
         if (path === "play") {
-          result = runPlayScenario(id, gates, "satisfy", "play");
+          result = runPlayScenario(id, gates, "satisfy", "play", {
+            arenaNeeds,
+          });
           // Also drive else_effects branches for preparable gates that have them.
           if (
             !isSkip(result) &&
             gateSummary.withElse.some((c) => gateSummary.preparable.includes(c))
           ) {
-            const elseResult = runPlayScenario(id, gates, "deny", "play_else");
+            const elseResult = runPlayScenario(id, gates, "deny", "play_else", {
+              arenaNeeds,
+            });
             if (!isSkip(elseResult)) {
               scenarios.push(elseResult);
               for (const c of elseResult.gatesSatisfied ?? [])
@@ -769,12 +1076,14 @@ export function driveCard(
           const firstPP = lowest != null && lowest > 1 ? lowest - 1 : 0;
           result = runPlayScenario(id, gates, "satisfy", "play_base", {
             firstPP,
+            arenaNeeds,
           });
         } else if (path === "turn_boundary")
-          result = runTurnBoundaryScenario(id, gates);
-        else if (path === "evolve") result = runEvolveScenario(id, gates);
-        else if (path === "summon") result = runSummonScenario(id);
-        else result = runVanillaPlaceScenario(id);
+          result = runTurnBoundaryScenario(id, gates, arenaNeeds);
+        else if (path === "evolve")
+          result = runEvolveScenario(id, gates, arenaNeeds);
+        else if (path === "summon") result = runSummonScenario(id, arenaNeeds);
+        else result = runVanillaPlaceScenario(id, arenaNeeds);
       } catch (err) {
         result = {
           skip: "drive_threw",

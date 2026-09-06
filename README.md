@@ -1,4 +1,10 @@
-# Shadowverse Practice Tool
+A local practice/simulation tool for a collectible card game. Personal project.
+
+## Quick Start
+
+- `npm install`
+- `npm run cards:watch`
+- `npm start`
 
 ## Developer Documentation
 
@@ -7,9 +13,3 @@
 - **[PlayCard Contract](docs/playcard-contract.md)**: Card play system ownership and invariants.
 - [Architecture](docs/architecture.md): System overview.
 - [LLM Guide](docs/llm-guide.md): Tips for AI agents working on this repo.
-
-## Quick Start
-
-- `npm install`
-- `npm run cards:watch`
-- `npm start`

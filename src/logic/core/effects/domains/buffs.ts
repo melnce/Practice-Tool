@@ -1,7 +1,7 @@
 import { registerOp } from "../registry.js";
 import { state } from "../../../../core/gameState.js";
 import { getPool, highlightSelectable } from "../../targeting.js";
-import { setPendingTarget } from "../../pendingTarget/index.js";
+import { trySetPendingTarget } from "../../pendingTarget/index.js";
 import { handleStat } from "../../../effects/ops/stat.js";
 import { handleKeyword } from "../../../effects/ops/keyword/unified.js";
 import { handleCost } from "../../../effects/ops/cost/unified.js";
@@ -121,11 +121,15 @@ export function registerBuffEffects() {
     });
 
     if (res.kind === "request_target") {
-      setPendingTarget({
-        ...res.request,
-        targets: [],
-        targetUids: [],
-      });
+      if (
+        trySetPendingTarget({
+          ...res.request,
+          targets: [],
+          targetUids: [],
+        }) === "fizzled"
+      ) {
+        return;
+      }
       highlightSelectable(res.request.pool);
       return "pending";
     }
