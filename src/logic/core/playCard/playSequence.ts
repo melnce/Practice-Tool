@@ -1,6 +1,7 @@
 // Play-sequence depth gate (mirrors combatResolutionDepth in PR #269).
-// Stages play/enter reactions at board entry; merges ahead of fanfare-raised
-// queue items at the single end-of-play drain.
+// Stages enter reactions at board entry; merges ahead of fanfare-raised queue
+// items at the single end-of-play drain. Play reactions (ally_card_played,
+// ally_follower_played) stay post-Fanfare — see PR #300 out-of-scope note.
 import { state } from "../../../core/gameState.js";
 import type { CardInstance, Player } from "../../../core/types/index.js";
 import type { EnteringKeywordSnapshot } from "../enterKeywords.js";
@@ -97,18 +98,12 @@ export function endPlaySequenceDrain(): void {
   clearResolutionQueue();
 }
 
-/** Stage follower play + enter reactions (FIFO ahead of Fanfare-raised items). */
-export function stageFollowerPlayEnterReactions(
+/** Stage follower enter reactions (FIFO ahead of Fanfare-raised items). */
+export function stageFollowerEnterReactions(
   card: CardInstance,
   player: Player,
-  costChangedOnPlay: boolean,
   enteringKeywordSnapshot: EnteringKeywordSnapshot,
 ): void {
-  stageReactiveGroup("ally_follower_played", player, {
-    playedCard: card,
-    costChanged: costChangedOnPlay,
-  });
-
   const enterCtx = {
     enteringCard: card,
     enteringOwner: player,

@@ -64,6 +64,10 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
   if (!live) return;
 
   fireTrigger("ally_card_played", player, { playedCard: live });
+  fireTrigger("ally_follower_played", player, {
+    playedCard: live,
+    costChanged: resume.costChangedOnPlay,
+  });
 
   if (resume.chosenTierEffectGroups?.length) {
     for (const effects of resume.chosenTierEffectGroups) {

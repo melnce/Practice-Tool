@@ -30,7 +30,7 @@ import { isPlayCostChangedFromPrinted } from "../../../helpers/alternateForm.js"
 import {
   beginPlaySequence,
   endPlaySequenceDrain,
-  stageFollowerPlayEnterReactions,
+  stageFollowerEnterReactions,
 } from "./playSequence.js";
 
 /**
@@ -74,12 +74,7 @@ export function playFollower(
 
   beginPlaySequence();
   const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
-  stageFollowerPlayEnterReactions(
-    card,
-    player,
-    costChangedOnPlay,
-    enteringKeywordSnapshot,
-  );
+  stageFollowerEnterReactions(card, player, enteringKeywordSnapshot);
 
   if (opts?.enhancedPlay) {
     fireTrigger("enhanced_play", player, { playedCard: card });
