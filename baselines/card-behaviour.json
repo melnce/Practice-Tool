@@ -6331,11 +6331,7 @@
       "status": "covered"
     },
     "10534110": {
-<<<<<<< HEAD
       "fingerprint": "73643c70",
-=======
-      "fingerprint": "94e022c4",
->>>>>>> c7b6a4c (Re-baseline card behaviour fingerprints for play/enter reaction order)
       "gatesSatisfied": [],
       "name": "Lhynkal, Wandering Fool",
       "scenarios": [

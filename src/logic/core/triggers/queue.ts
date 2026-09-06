@@ -128,6 +128,29 @@ export function clearResolutionQueue(): void {
   (state as any)._resolutionQueue = [];
 }
 
+/** Re-bind queued card refs to live zone instances (staged enter groups after Fanfare). */
+export function refreshResolutionQueueCardRefs(
+  queue: ResolutionQueueItem[],
+): void {
+  for (const item of queue) {
+    if (item.kind === "reactive") {
+      for (const entry of item.entries) {
+        const uid = entry.cardUid ?? entry.card?.uid;
+        if (!uid) continue;
+        const live = resolveUid(uid);
+        if (live) entry.card = live;
+      }
+    } else if (item.kind === "death_lw") {
+      for (const lw of item.items) {
+        const uid = lw.cardUid;
+        if (!uid) continue;
+        const live = resolveUid(uid);
+        if (live) lw.card = live;
+      }
+    }
+  }
+}
+
 /** Dev/test: queued card refs must match the live zone instance when one exists. */
 export function assertResolutionQueueCardIdentity(
   queue: ResolutionQueueItem[],
