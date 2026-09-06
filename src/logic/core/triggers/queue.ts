@@ -34,7 +34,8 @@ import type { TriggerContext, TriggerEventName } from "./types.js";
 import type { QueuedTriggerEntry } from "./process.js";
 import { dispatchEvent } from "./dispatcher.js";
 import { isTargetedOpDispatchActive } from "../targeting/guards.js";
-import { resolveUid } from "../../../core/uidResolver.js";
+import { resolveUid, resolveUidOnBoard } from "../../../core/uidResolver.js";
+import { getCrests, getHand } from "../../../core/playerHelpers.js";
 
 export const MAX_RESOLUTION_QUEUE_LENGTH = 500;
 
@@ -248,6 +249,45 @@ export function resolveQueuedTriggerCard(entry: {
     if (live) return live;
   }
   return entry.card ?? null;
+}
+
+/**
+ * Resolution-start check (JP spec 2026-09-06): non-Last-Words queued abilities
+ * require the source crest / board card to still be in the leader area or field.
+ */
+export function isQueuedTriggerSourceInPlay(entry: {
+  source: string;
+  owner: Player;
+  cardUid?: string;
+  card?: any;
+}): boolean {
+  const { source, owner, cardUid, card } = entry;
+
+  if (source === "crest") {
+    const crests = getCrests(state, owner) || [];
+    if (card && crests.includes(card)) return true;
+    const name = card?.name;
+    if (name) {
+      return crests.some(
+        (c) => String(c.name).toLowerCase() === String(name).toLowerCase(),
+      );
+    }
+    return false;
+  }
+
+  if (source === "board") {
+    const uid = cardUid ?? card?.uid;
+    return uid ? resolveUidOnBoard(uid) !== null : false;
+  }
+
+  if (source === "hand") {
+    const uid = cardUid ?? card?.uid;
+    if (!uid) return false;
+    return getHand(state, owner).some((c) => c?.uid === uid);
+  }
+
+  const uid = cardUid ?? card?.uid;
+  return uid ? resolveUidOnBoard(uid) !== null : false;
 }
 
 /** Synchronous trigger dispatch — used at drain time and for non-reactive events. */
