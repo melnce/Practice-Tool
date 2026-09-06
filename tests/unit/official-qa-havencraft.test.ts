@@ -409,19 +409,15 @@ describe("Official Q&A — Havencraft batch 5", () => {
     expect(sarissa.hasBarrier || sarissa.keywordState?.hasBarrier).toBeFalsy();
   }, 60_000);
 
-  it(
-    "10162210 Darkhaven Grace — Engage with no allies still restores 1 leader defense (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [DARKHAVEN_GRACE], pp: 3, hp: 18 });
-      whenPlayCard("first", 0);
-      engageFirstAmulet("Darkhaven Grace");
-      expect(getHP(state, "first")).toBe(19);
-      expect(thenBoard("first").some((c) => c.name === "Darkhaven Grace")).toBe(
-        true,
-      );
-    },
-    60_000,
-  );
+  it("10162210 Darkhaven Grace — Engage with no allies still restores 1 leader defense (official Q&A)", () => {
+    setupTurn(R6, { hand: [DARKHAVEN_GRACE], pp: 3, hp: 18 });
+    whenPlayCard("first", 0);
+    engageFirstAmulet("Darkhaven Grace");
+    expect(getHP(state, "first")).toBe(19);
+    expect(thenBoard("first").some((c) => c.name === "Darkhaven Grace")).toBe(
+      true,
+    );
+  }, 60_000);
 
   it("10162220 Dose of Holiness — Engage with no enemies destroys self and restores 1 leader defense (official Q&A)", () => {
     setupTurn(R6, { hand: [DOSE_OF_HOLINESS], pp: 3, hp: 17 });
