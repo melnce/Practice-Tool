@@ -4,6 +4,7 @@ import { completeCrest } from "./crest.js";
 import { logEvent } from "../../core/logger.js";
 import type { CardInstance, Effect, Player } from "../../core/types/index.js";
 import { getBoard, getCrests } from "../../core/playerHelpers.js";
+import { bumpZoneVersion } from "../core/triggers/utils.js";
 
 // --- helpers
 function boardOf(owner: Player) {
@@ -14,7 +15,10 @@ function removeFromBoard(card: CardInstance) {
   if (!owner) return;
   const board = boardOf(owner);
   const i = board.findIndex((c) => c.uid === card.uid);
-  if (i !== -1) board.splice(i, 1);
+  if (i !== -1) {
+    board.splice(i, 1);
+    bumpZoneVersion();
+  }
 }
 
 // Return the Counter keyword config for a given key on this card

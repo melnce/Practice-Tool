@@ -11,6 +11,7 @@ import { shuffleInPlace } from "../../core/utils.js";
 import { logEvent } from "../../core/logger.js";
 import type { Effect as _Effect, Player } from "../../core/types/index.js";
 import { getDeck } from "../../core/playerHelpers.js";
+import { bumpZoneVersion } from "../core/triggers/utils.js";
 import { handleHalveDeckCost, reduceDeckFollowersCost } from "./cost.js";
 import { pickDestroyedMatchHighestBaseCost } from "../core/destroyedHistory.js";
 import { getCardById } from "../../data/cardDatabase.js";
@@ -107,6 +108,7 @@ function replaceDeckFromSet(
   }
 
   shuffleInPlace(deck);
+  bumpZoneVersion();
   logEvent("deckReplaceFromSet", {
     owner,
     set: setId,
@@ -141,6 +143,7 @@ function handleReplaceDeckFromList(
   }
 
   shuffleInPlace(deck);
+  bumpZoneVersion();
   logEvent("deckReplace", { owner, count: deck.length });
 }
 
@@ -187,6 +190,7 @@ function handleAddToDeck(owner: Player, eff: any): void {
   if (shuffleDeck) {
     shuffleInPlace(deck);
   }
+  bumpZoneVersion();
   logEvent("deckAdd", { owner, name, count });
 }
 
@@ -242,4 +246,5 @@ function handleAddDestroyedMatchToDeck(owner: Player, eff: any): void {
   if (eff.shuffle !== false) {
     shuffleInPlace(deck);
   }
+  bumpZoneVersion();
 }

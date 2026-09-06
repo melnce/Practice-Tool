@@ -1,0 +1,588 @@
+{
+  "seed": 20260908,
+  "gameIndex": 105,
+  "gameSeed": 125261223,
+  "regime": "random",
+  "deckAId": "soak_rand_a_20260908_105",
+  "deckBId": "soak_rand_b_20260908_105",
+  "deckARaw": {
+    "class": "Dragoncraft",
+    "deckName": "Soak Random A (Dragoncraft) #105",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10902110",
+        "name": "Blade Angel",
+        "count": 1
+      },
+      {
+        "id": "10141310",
+        "name": "Calamity Breath",
+        "count": 2
+      },
+      {
+        "id": "10201310",
+        "name": "Dark Side",
+        "count": 1
+      },
+      {
+        "id": "10341110",
+        "name": "Devotee of Disdain",
+        "count": 1
+      },
+      {
+        "id": "10601120",
+        "name": "Disrupted Commoner",
+        "count": 1
+      },
+      {
+        "id": "10844110",
+        "name": "Drache & Aluzard, Burning Blood",
+        "count": 1
+      },
+      {
+        "id": "10042310",
+        "name": "Dragonsign",
+        "count": 1
+      },
+      {
+        "id": "10941310",
+        "name": "Drake Whelp's Tantrum",
+        "count": 1
+      },
+      {
+        "id": "10602210",
+        "name": "Encroached World",
+        "count": 1
+      },
+      {
+        "id": "10344120",
+        "name": "Galmieux, Ardor Manifest",
+        "count": 1
+      },
+      {
+        "id": "10504110",
+        "name": "Getenou, Eightfold Glory",
+        "count": 1
+      },
+      {
+        "id": "10801110",
+        "name": "Hamsa, Sculpted Divinity",
+        "count": 1
+      },
+      {
+        "id": "10542120",
+        "name": "Jellyfish Dancer",
+        "count": 1
+      },
+      {
+        "id": "10142110",
+        "name": "Kit, Luxfang Champion",
+        "count": 2
+      },
+      {
+        "id": "10442310",
+        "name": "Maximum Love Bomb",
+        "count": 3
+      },
+      {
+        "id": "10501110",
+        "name": "Monster Litterateur",
+        "count": 1
+      },
+      {
+        "id": "10342210",
+        "name": "Nation of Disdain",
+        "count": 1
+      },
+      {
+        "id": "10342120",
+        "name": "Ocean Rider",
+        "count": 1
+      },
+      {
+        "id": "10204110",
+        "name": "Odin, Twilit Fate",
+        "count": 1
+      },
+      {
+        "id": "10341310",
+        "name": "Raging Lightning",
+        "count": 1
+      },
+      {
+        "id": "10842110",
+        "name": "Reef & Lolo, Serene Sirens",
+        "count": 1
+      },
+      {
+        "id": "10542310",
+        "name": "Roar of Prominence",
+        "count": 2
+      },
+      {
+        "id": "10404110",
+        "name": "Sandalphon, Primarch Successor",
+        "count": 1
+      },
+      {
+        "id": "10541110",
+        "name": "Springwell Steward",
+        "count": 1
+      },
+      {
+        "id": "10041310",
+        "name": "Strike of the Dragonewt",
+        "count": 2
+      },
+      {
+        "id": "10101120",
+        "name": "Vigilant Detective",
+        "count": 1
+      },
+      {
+        "id": "10503210",
+        "name": "World of Games",
+        "count": 1
+      },
+      {
+        "id": "10142130",
+        "name": "Zell, Windreader",
+        "count": 1
+      },
+      {
+        "id": "10904110",
+        "name": "Zerael, Sundered Rebirth",
+        "count": 2
+      },
+      {
+        "id": "10444120",
+        "name": "Zooey, Ally of the World",
+        "count": 1
+      },
+      {
+        "id": "10142140",
+        "name": "Marion, Ravishing Dragonewt",
+        "count": 3
+      }
+    ]
+  },
+  "deckBRaw": {
+    "class": "Havencraft",
+    "deckName": "Soak Random B (Havencraft) #105",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10863210",
+        "name": "Academy Hijinks",
+        "count": 2
+      },
+      {
+        "id": "10263110",
+        "name": "Agnes, the Swiftblade",
+        "count": 1
+      },
+      {
+        "id": "10704120",
+        "name": "Altaro, Mayor of Babelon",
+        "count": 1
+      },
+      {
+        "id": "10301110",
+        "name": "Apostle of Voracity",
+        "count": 2
+      },
+      {
+        "id": "10061210",
+        "name": "Avian Statue",
+        "count": 1
+      },
+      {
+        "id": "10863110",
+        "name": "Colette, Holy Exorcist",
+        "count": 1
+      },
+      {
+        "id": "10201310",
+        "name": "Dark Side",
+        "count": 1
+      },
+      {
+        "id": "10463210",
+        "name": "De La Fille's Gleaming Gems",
+        "count": 1
+      },
+      {
+        "id": "10763110",
+        "name": "Deacon of Security",
+        "count": 2
+      },
+      {
+        "id": "10361110",
+        "name": "Devotee of Repose",
+        "count": 1
+      },
+      {
+        "id": "10262310",
+        "name": "Divine Guard",
+        "count": 1
+      },
+      {
+        "id": "10304120",
+        "name": "Gilnelise, Voracity Manifest",
+        "count": 1
+      },
+      {
+        "id": "10301310",
+        "name": "Greatness Ascended",
+        "count": 1
+      },
+      {
+        "id": "10801110",
+        "name": "Hamsa, Sculpted Divinity",
+        "count": 1
+      },
+      {
+        "id": "10364110",
+        "name": "Himeka, Heir to Repose",
+        "count": 1
+      },
+      {
+        "id": "10302110",
+        "name": "Inspirational One",
+        "count": 1
+      },
+      {
+        "id": "10401110",
+        "name": "Katalina, Sky's Protector",
+        "count": 1
+      },
+      {
+        "id": "10001120",
+        "name": "Leah, Bellringer Angel",
+        "count": 2
+      },
+      {
+        "id": "10802310",
+        "name": "Legacy of the Brave",
+        "count": 1
+      },
+      {
+        "id": "10962120",
+        "name": "Miraculous Al-mi'raj",
+        "count": 1
+      },
+      {
+        "id": "10304110",
+        "name": "Mjerrabaine, Great Manifest",
+        "count": 1
+      },
+      {
+        "id": "10601110",
+        "name": "Muddled Onlooker",
+        "count": 1
+      },
+      {
+        "id": "10204110",
+        "name": "Odin, Twilit Fate",
+        "count": 1
+      },
+      {
+        "id": "10104110",
+        "name": "Olivia, Heroic Dark Angel",
+        "count": 1
+      },
+      {
+        "id": "10562210",
+        "name": "Protective Shell",
+        "count": 3
+      },
+      {
+        "id": "10104120",
+        "name": "Ruler of Cocytus",
+        "count": 1
+      },
+      {
+        "id": "10563110",
+        "name": "Saint of Rehabilitation",
+        "count": 1
+      },
+      {
+        "id": "10663210",
+        "name": "Sublime Eld Tome",
+        "count": 1
+      },
+      {
+        "id": "10362210",
+        "name": "Temple of Repose",
+        "count": 1
+      },
+      {
+        "id": "10763210",
+        "name": "Trident of Eroding Tides",
+        "count": 1
+      },
+      {
+        "id": "10163220",
+        "name": "Unholy Vessel",
+        "count": 1
+      },
+      {
+        "id": "10264120",
+        "name": "Wilbert, Desolate Paladin",
+        "count": 1
+      },
+      {
+        "id": "10663110",
+        "name": "Worshipful Crusader",
+        "count": 2
+      }
+    ]
+  },
+  "outcome": "position",
+  "error": "position save-load re-apply mismatch at action 45 ({\"type\":\"ENGAGE\",\"player\":\"first\",\"cardUid\":\"uid_z\"}):\n  lastAddedToHand.__uiSelectable: expected=true actual=undefined",
+  "findings": [
+    "position save-load re-apply mismatch at action 45 ({\"type\":\"ENGAGE\",\"player\":\"first\",\"cardUid\":\"uid_z\"}):\n  lastAddedToHand.__uiSelectable: expected=true actual=undefined"
+  ],
+  "turns": 13,
+  "actions": 45,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_j"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_13",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_22"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_26",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_u"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_28"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_28",
+      "mode": "normal"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_3o"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_2z"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_28",
+      "defender": {
+        "type": "card",
+        "uid": "uid_14"
+      }
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_2z",
+      "mode": "normal"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_z"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_41"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2z",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_38"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_3o",
+      "mode": "super"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_28",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "ENGAGE",
+      "player": "second",
+      "cardUid": "uid_41"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_3o",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_2z"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_10"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_10",
+      "mode": "super"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_10",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2z"
+      }
+    },
+    {
+      "type": "ENGAGE",
+      "player": "first",
+      "cardUid": "uid_z"
+    }
+  ],
+  "nonUndoableActionTypes": [],
+  "commitSequence": [],
+  "zeroCommitLog": []
+}

@@ -1,0 +1,516 @@
+{
+  "seed": 20260909,
+  "gameIndex": 61,
+  "gameSeed": 81261092,
+  "regime": "random",
+  "deckAId": "soak_rand_a_20260909_61",
+  "deckBId": "soak_rand_b_20260909_61",
+  "deckARaw": {
+    "class": "Runecraft",
+    "deckName": "Soak Random A (Runecraft) #61",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10632120",
+        "name": "Adventurous Grimoire",
+        "count": 1
+      },
+      {
+        "id": "10032310",
+        "name": "Arcane Eruption",
+        "count": 1
+      },
+      {
+        "id": "10232110",
+        "name": "Bergent, Rejected Artes",
+        "count": 1
+      },
+      {
+        "id": "10032120",
+        "name": "Blaze Destroyer",
+        "count": 1
+      },
+      {
+        "id": "10634120",
+        "name": "Calge-Danthla, Eld Crystals",
+        "count": 1
+      },
+      {
+        "id": "10333110",
+        "name": "Congregant of Truth",
+        "count": 1
+      },
+      {
+        "id": "10031110",
+        "name": "Dazzling Runeknight",
+        "count": 1
+      },
+      {
+        "id": "10134310",
+        "name": "Dimension Climb",
+        "count": 1
+      },
+      {
+        "id": "10103310",
+        "name": "Divine Thunder",
+        "count": 1
+      },
+      {
+        "id": "10832320",
+        "name": "Earth-Shattering Bolt",
+        "count": 1
+      },
+      {
+        "id": "10933110",
+        "name": "Ecstatic Scholar",
+        "count": 1
+      },
+      {
+        "id": "10132120",
+        "name": "Emmylou, Witch of Wonder",
+        "count": 1
+      },
+      {
+        "id": "10232120",
+        "name": "Enchanting Perfumer",
+        "count": 1
+      },
+      {
+        "id": "10432110",
+        "name": "Ezecrain, Portent of Vengeance",
+        "count": 1
+      },
+      {
+        "id": "10834120",
+        "name": "Ginger, Disastrous Word",
+        "count": 1
+      },
+      {
+        "id": "10231310",
+        "name": "Glacial Crash",
+        "count": 1
+      },
+      {
+        "id": "10204120",
+        "name": "Grimnir, Heavenly Gale",
+        "count": 1
+      },
+      {
+        "id": "10703110",
+        "name": "Hedonistic Socialite",
+        "count": 1
+      },
+      {
+        "id": "10333310",
+        "name": "Illusory Conjuration",
+        "count": 1
+      },
+      {
+        "id": "10001110",
+        "name": "Indomitable Fighter",
+        "count": 1
+      },
+      {
+        "id": "10532110",
+        "name": "Insomniac Witch",
+        "count": 1
+      },
+      {
+        "id": "10302110",
+        "name": "Inspirational One",
+        "count": 1
+      },
+      {
+        "id": "10901110",
+        "name": "Jailor of Antiquity",
+        "count": 1
+      },
+      {
+        "id": "10931120",
+        "name": "Key Spirit",
+        "count": 1
+      },
+      {
+        "id": "10534110",
+        "name": "Lhynkal, Wandering Fool",
+        "count": 1
+      },
+      {
+        "id": "10731120",
+        "name": "Little Beastie",
+        "count": 1
+      },
+      {
+        "id": "10403120",
+        "name": "Lyria, Skydestined",
+        "count": 1
+      },
+      {
+        "id": "10531310",
+        "name": "Metamorphosis of the Dawnblossom",
+        "count": 1
+      },
+      {
+        "id": "10432120",
+        "name": "Mireille & Risette, Penitent Duo",
+        "count": 1
+      },
+      {
+        "id": "10601110",
+        "name": "Muddled Onlooker",
+        "count": 1
+      },
+      {
+        "id": "10932120",
+        "name": "Noble Philosopher",
+        "count": 1
+      },
+      {
+        "id": "10931110",
+        "name": "Obsessed Test Subject",
+        "count": 1
+      },
+      {
+        "id": "10103110",
+        "name": "Phildau, Lionheart Ward",
+        "count": 1
+      },
+      {
+        "id": "10334120",
+        "name": "Raio, Elimination Manifest",
+        "count": 1
+      },
+      {
+        "id": "10632310",
+        "name": "Reaved Order",
+        "count": 2
+      },
+      {
+        "id": "10332310",
+        "name": "Risky Amalgamation",
+        "count": 1
+      },
+      {
+        "id": "10101110",
+        "name": "Ruby, Greedy Cherub",
+        "count": 1
+      },
+      {
+        "id": "10833110",
+        "name": "Tico, Mysterian Spellcrafter",
+        "count": 1
+      },
+      {
+        "id": "10532120",
+        "name": "Woodsong Haikumaster",
+        "count": 1
+      }
+    ]
+  },
+  "deckBRaw": {
+    "class": "Dragoncraft",
+    "deckName": "Soak Random B (Dragoncraft) #61",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10803110",
+        "name": "Aika, Elegy of Loss",
+        "count": 2
+      },
+      {
+        "id": "10102110",
+        "name": "Apollo, Heaven's Envoy",
+        "count": 1
+      },
+      {
+        "id": "10842310",
+        "name": "Art of Decay",
+        "count": 1
+      },
+      {
+        "id": "10603110",
+        "name": "Beast Lost to the Dark",
+        "count": 1
+      },
+      {
+        "id": "10741120",
+        "name": "Carrier Wyvern",
+        "count": 2
+      },
+      {
+        "id": "10441310",
+        "name": "Crescent Tube Ride",
+        "count": 1
+      },
+      {
+        "id": "10603210",
+        "name": "Dark Dimensions",
+        "count": 1
+      },
+      {
+        "id": "10201310",
+        "name": "Dark Side",
+        "count": 1
+      },
+      {
+        "id": "10642110",
+        "name": "Decisive Swordmaster",
+        "count": 2
+      },
+      {
+        "id": "10544110",
+        "name": "Erntz, Governing Justice",
+        "count": 1
+      },
+      {
+        "id": "10503310",
+        "name": "Fate of the World",
+        "count": 1
+      },
+      {
+        "id": "10143110",
+        "name": "Genesis Dragon Reborn",
+        "count": 1
+      },
+      {
+        "id": "10841110",
+        "name": "Gido, Leader of the Pack",
+        "count": 1
+      },
+      {
+        "id": "10403110",
+        "name": "Gran & Djeeta, Valiant Skyfarers",
+        "count": 1
+      },
+      {
+        "id": "10801110",
+        "name": "Hamsa, Sculpted Divinity",
+        "count": 1
+      },
+      {
+        "id": "10704110",
+        "name": "Illamrita, Designated Target",
+        "count": 1
+      },
+      {
+        "id": "10001110",
+        "name": "Indomitable Fighter",
+        "count": 1
+      },
+      {
+        "id": "10302110",
+        "name": "Inspirational One",
+        "count": 1
+      },
+      {
+        "id": "10542120",
+        "name": "Jellyfish Dancer",
+        "count": 1
+      },
+      {
+        "id": "10441110",
+        "name": "Joel, Wave Chaser",
+        "count": 1
+      },
+      {
+        "id": "10844120",
+        "name": "Lumiore & Argente, Shining Wings",
+        "count": 1
+      },
+      {
+        "id": "10442310",
+        "name": "Maximum Love Bomb",
+        "count": 1
+      },
+      {
+        "id": "10103110",
+        "name": "Phildau, Lionheart Ward",
+        "count": 1
+      },
+      {
+        "id": "10001130",
+        "name": "Quake Goliath",
+        "count": 1
+      },
+      {
+        "id": "10641110",
+        "name": "Resolute Dragonewt",
+        "count": 1
+      },
+      {
+        "id": "10941110",
+        "name": "Ripper-Clawed Thief",
+        "count": 1
+      },
+      {
+        "id": "10102310",
+        "name": "Seraphic Tidings",
+        "count": 1
+      },
+      {
+        "id": "10543310",
+        "name": "Sloth of the Crestpetal",
+        "count": 1
+      },
+      {
+        "id": "10341120",
+        "name": "Snowstorm Dragonewt",
+        "count": 1
+      },
+      {
+        "id": "10642120",
+        "name": "Spiked Dragon",
+        "count": 1
+      },
+      {
+        "id": "10841130",
+        "name": "Spirit of Wadatsumi",
+        "count": 1
+      },
+      {
+        "id": "10541110",
+        "name": "Springwell Steward",
+        "count": 1
+      },
+      {
+        "id": "10041310",
+        "name": "Strike of the Dragonewt",
+        "count": 2
+      },
+      {
+        "id": "10141120",
+        "name": "Swordsnout Trencher",
+        "count": 1
+      },
+      {
+        "id": "10303210",
+        "name": "Tablet of Tribulations",
+        "count": 1
+      },
+      {
+        "id": "10803310",
+        "name": "Wills United",
+        "count": 1
+      }
+    ]
+  },
+  "outcome": "position",
+  "error": "position save-load re-apply mismatch at action 23 ({\"type\":\"PLAY_CARD\",\"player\":\"second\",\"cardUid\":\"uid_21\"}):\n  __lastSelected.__uiSelectable: expected=true actual=undefined\n  players.first.graveyard[2].__uiSelectable: expected=true actual=undefined",
+  "findings": [
+    "position save-load re-apply mismatch at action 23 ({\"type\":\"PLAY_CARD\",\"player\":\"second\",\"cardUid\":\"uid_21\"}):\n  __lastSelected.__uiSelectable: expected=true actual=undefined\n  players.first.graveyard[2].__uiSelectable: expected=true actual=undefined"
+  ],
+  "turns": 8,
+  "actions": 23,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_24"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_z"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_11"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_25"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_28"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_f"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_28",
+      "defender": {
+        "type": "card",
+        "uid": "uid_f"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_29"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_21"
+    }
+  ],
+  "nonUndoableActionTypes": [],
+  "commitSequence": [],
+  "zeroCommitLog": []
+}

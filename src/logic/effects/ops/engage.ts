@@ -17,6 +17,9 @@ import {
   setPP,
   addShadows,
 } from "../../../core/playerHelpers.js";
+import { clearSelectableFlags } from "../../core/targeting.js";
+import { isPendingTarget } from "../../core/pendingTarget/index.js";
+import { bumpZoneVersion } from "../../core/triggers/utils.js";
 
 // --- Helpers ---
 function boardOf(owner: Player) {
@@ -53,6 +56,7 @@ function removeWithLastWords(card: CardInstance, owner: Player) {
   }
   const removed = board.splice(idx, 1)[0];
   if (!removed) return;
+  bumpZoneVersion();
 
   if (removed?.hasLastWords && Array.isArray(removed.lastWordsEffects)) {
     runEffects([...removed.lastWordsEffects], owner, removed);
@@ -145,6 +149,9 @@ export function engageAmulet(owner: Player, index: number) {
 
         // Render removed - UI layer
         cleanupDead();
+        if (!isPendingTarget()) {
+          clearSelectableFlags();
+        }
         return;
       }
 

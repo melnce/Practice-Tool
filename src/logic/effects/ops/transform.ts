@@ -21,6 +21,7 @@ import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
 import { recomputeAttackFlags } from "../../core/combat.js";
+import { bumpZoneVersion } from "../../core/triggers/utils.js";
 
 // ========================================================================
 // UNIFIED TRANSFORM HANDLER - target field REQUIRED
@@ -711,6 +712,7 @@ export function transformTarget(target: CardInstance, intoName: string) {
 
   // Replace in place; do not fire enter/leave triggers
   board.splice(idx, 1, c);
+  bumpZoneVersion();
   logEvent("transformTarget", {
     owner,
     from: target.name,
@@ -772,6 +774,7 @@ export function transformHandTarget(target: CardInstance, intoName: string) {
   c.defense = parseInt(String(c.defense)) || 0;
 
   hand.splice(idx, 1, c);
+  bumpZoneVersion();
   logEvent("transformHandTarget", {
     owner,
     from: target.name,

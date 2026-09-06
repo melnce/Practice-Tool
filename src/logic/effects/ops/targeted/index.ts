@@ -22,6 +22,7 @@ import { summonExactCopyFromHand, summonFromHand } from "../summon_ops/hand.js";
 import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
 import { logEvent } from "../../../../core/logger.js";
 import { isDev } from "../../../../core/env.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import type { CardInstance } from "../../../../core/types/index.js";
 import type { Player } from "../../../../core/types/index.js";
 import { resolveDynamicValue } from "../../../core/values.js";
@@ -228,12 +229,18 @@ function transformIntoExactInstance(
     normalizeCardStats(clone);
     const hand = getHand(state, targetOwner);
     const idx = hand.indexOf(target);
-    if (idx !== -1) hand[idx] = clone;
+    if (idx !== -1) {
+      hand[idx] = clone;
+      bumpZoneVersion();
+    }
   } else {
     normalizeCardStats(clone);
     const board = getBoard(state, targetOwner);
     const idx = board.indexOf(target);
-    if (idx !== -1) board[idx] = clone;
+    if (idx !== -1) {
+      board[idx] = clone;
+      bumpZoneVersion();
+    }
   }
 }
 
@@ -287,6 +294,7 @@ TARGETED_OP_HANDLERS.set("discard_select_hand", (ctx) => {
     addShadows(state, owner, targetUids.length);
   }
   if (discarded.length) {
+    bumpZoneVersion();
     rememberDiscardedCards(discarded);
   }
   if (resumeEffects) {
@@ -325,6 +333,7 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
     addShadows(state, owner, targetUids.length);
   }
   if (discarded.length) {
+    bumpZoneVersion();
     rememberDiscardedCards(discarded);
   }
   if (resumeEffects) {

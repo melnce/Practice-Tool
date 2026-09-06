@@ -112,6 +112,7 @@ export function burnHandOverflow(
     card.owner = owner;
     getGraveyard(state, owner).push(card);
     addShadows(state, owner, 1);
+    bumpZoneVersion();
     logEvent("burn_to_grave", {
       owner,
       card: card.name,
@@ -170,6 +171,7 @@ export function pushToHand(
   }
   card.zone = "hand";
   hand.push(card);
+  bumpZoneVersion();
   return true;
 }
 
@@ -227,7 +229,6 @@ export function drawCard(
     state.lastDrawnCards.unshift(top);
     if (state.lastDrawnCards.length > 5) state.lastDrawnCards.length = 5;
     (state as any).lastDrawnCard = top;
-    bumpZoneVersion();
     fireTrigger("ally_draw", owner, { drawnCard: top, enteringCard: top });
     fireTrigger("when_drawn", owner, {
       sourceCard: top,

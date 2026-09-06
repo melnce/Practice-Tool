@@ -1,0 +1,592 @@
+{
+  "seed": 20260909,
+  "gameIndex": 81,
+  "gameSeed": 101261152,
+  "regime": "random",
+  "deckAId": "soak_rand_a_20260909_81",
+  "deckBId": "soak_rand_b_20260909_81",
+  "deckARaw": {
+    "class": "Abysscraft",
+    "deckName": "Soak Random A (Abysscraft) #81",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10802110",
+        "name": "Alfied, Squire of Joy",
+        "count": 1
+      },
+      {
+        "id": "10701110",
+        "name": "Altaro Superfan",
+        "count": 1
+      },
+      {
+        "id": "10151110",
+        "name": "Aryll, Moonstruck Vampire",
+        "count": 1
+      },
+      {
+        "id": "10603110",
+        "name": "Beast Lost to the Dark",
+        "count": 2
+      },
+      {
+        "id": "10753110",
+        "name": "Beastmaster Bones",
+        "count": 1
+      },
+      {
+        "id": "10952310",
+        "name": "Chains of the Past",
+        "count": 1
+      },
+      {
+        "id": "10051310",
+        "name": "Chaos Cyclone",
+        "count": 1
+      },
+      {
+        "id": "10703210",
+        "name": "City of Babelon",
+        "count": 2
+      },
+      {
+        "id": "10551120",
+        "name": "Crimson Soulmancer",
+        "count": 1
+      },
+      {
+        "id": "10603210",
+        "name": "Dark Dimensions",
+        "count": 2
+      },
+      {
+        "id": "10001210",
+        "name": "Detective's Lens",
+        "count": 1
+      },
+      {
+        "id": "10454110",
+        "name": "Fediel, Darkness Personified",
+        "count": 1
+      },
+      {
+        "id": "10403110",
+        "name": "Gran & Djeeta, Valiant Skyfarers",
+        "count": 1
+      },
+      {
+        "id": "10203120",
+        "name": "Hnikar & Jafnhar, Firestorm Duo",
+        "count": 2
+      },
+      {
+        "id": "10302110",
+        "name": "Inspirational One",
+        "count": 2
+      },
+      {
+        "id": "10854110",
+        "name": "Itsurugi & Taketsumi, Brothers",
+        "count": 1
+      },
+      {
+        "id": "10851130",
+        "name": "Limil, Devilish Bunny",
+        "count": 1
+      },
+      {
+        "id": "10403120",
+        "name": "Lyria, Skydestined",
+        "count": 2
+      },
+      {
+        "id": "10852120",
+        "name": "Marsha, Dark Knight",
+        "count": 1
+      },
+      {
+        "id": "10152110",
+        "name": "Mino, Shrewd Reaper",
+        "count": 1
+      },
+      {
+        "id": "10601110",
+        "name": "Muddled Onlooker",
+        "count": 1
+      },
+      {
+        "id": "10951120",
+        "name": "Netherworld Lieutenant",
+        "count": 1
+      },
+      {
+        "id": "10104110",
+        "name": "Olivia, Heroic Dark Angel",
+        "count": 1
+      },
+      {
+        "id": "10804120",
+        "name": "Olivia, Proud Dark Angel",
+        "count": 2
+      },
+      {
+        "id": "10153310",
+        "name": "Rage of Serpents",
+        "count": 1
+      },
+      {
+        "id": "10801120",
+        "name": "Reina, Timeless Wanderer",
+        "count": 1
+      },
+      {
+        "id": "10101120",
+        "name": "Vigilant Detective",
+        "count": 2
+      },
+      {
+        "id": "10401120",
+        "name": "Vyrn, Bestest Pal",
+        "count": 1
+      },
+      {
+        "id": "10803310",
+        "name": "Wills United",
+        "count": 1
+      },
+      {
+        "id": "10503210",
+        "name": "World of Games",
+        "count": 1
+      },
+      {
+        "id": "10402110",
+        "name": "Yuni, Cosmic Legacy",
+        "count": 2
+      }
+    ]
+  },
+  "deckBRaw": {
+    "class": "Forestcraft",
+    "deckName": "Soak Random B (Forestcraft) #81",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10704120",
+        "name": "Altaro, Mayor of Babelon",
+        "count": 1
+      },
+      {
+        "id": "10114130",
+        "name": "Amataz, Origin Blader",
+        "count": 2
+      },
+      {
+        "id": "10002110",
+        "name": "Arriet, Luxminstrel",
+        "count": 1
+      },
+      {
+        "id": "10511120",
+        "name": "Battledore Woodsmaiden",
+        "count": 2
+      },
+      {
+        "id": "10603110",
+        "name": "Beast Lost to the Dark",
+        "count": 1
+      },
+      {
+        "id": "10902110",
+        "name": "Blade Angel",
+        "count": 1
+      },
+      {
+        "id": "10012310",
+        "name": "Bug Alert",
+        "count": 1
+      },
+      {
+        "id": "10413110",
+        "name": "Cupitan, Iridescent Archer",
+        "count": 1
+      },
+      {
+        "id": "10813310",
+        "name": "Curiosity Abounds",
+        "count": 1
+      },
+      {
+        "id": "10111130",
+        "name": "Deepwood Fairy Beast",
+        "count": 1
+      },
+      {
+        "id": "10001210",
+        "name": "Detective's Lens",
+        "count": 3
+      },
+      {
+        "id": "10303110",
+        "name": "Dogged One",
+        "count": 1
+      },
+      {
+        "id": "10313310",
+        "name": "Eradicating Arrow",
+        "count": 1
+      },
+      {
+        "id": "10713110",
+        "name": "Frostbow Sniper",
+        "count": 2
+      },
+      {
+        "id": "10011130",
+        "name": "Gentle Treant",
+        "count": 1
+      },
+      {
+        "id": "10113120",
+        "name": "Glade, Fragrantwood Ward",
+        "count": 1
+      },
+      {
+        "id": "10101310",
+        "name": "Goblin Foray",
+        "count": 1
+      },
+      {
+        "id": "10502110",
+        "name": "Goddess of Starlight",
+        "count": 1
+      },
+      {
+        "id": "10203120",
+        "name": "Hnikar & Jafnhar, Firestorm Duo",
+        "count": 1
+      },
+      {
+        "id": "10302110",
+        "name": "Inspirational One",
+        "count": 1
+      },
+      {
+        "id": "10912110",
+        "name": "Leafshadow Assassin",
+        "count": 1
+      },
+      {
+        "id": "10411120",
+        "name": "Manamel, Super Cutest",
+        "count": 1
+      },
+      {
+        "id": "10613110",
+        "name": "Merciful Attendant",
+        "count": 1
+      },
+      {
+        "id": "10712310",
+        "name": "Minimized Anxiety",
+        "count": 1
+      },
+      {
+        "id": "10514120",
+        "name": "Miroku, Swarmpetal",
+        "count": 1
+      },
+      {
+        "id": "10611110",
+        "name": "Motherly Forestdweller",
+        "count": 1
+      },
+      {
+        "id": "10613310",
+        "name": "Nurturing Eld Lance",
+        "count": 1
+      },
+      {
+        "id": "10104110",
+        "name": "Olivia, Heroic Dark Angel",
+        "count": 1
+      },
+      {
+        "id": "10604110",
+        "name": "Omegotep, the Dreaded One",
+        "count": 1
+      },
+      {
+        "id": "10114120",
+        "name": "Opulent Rose Queen",
+        "count": 1
+      },
+      {
+        "id": "10912120",
+        "name": "Primate Plotters",
+        "count": 1
+      },
+      {
+        "id": "10203110",
+        "name": "Reina, Angelic Partner",
+        "count": 1
+      },
+      {
+        "id": "10714110",
+        "name": "Thestae, Anathema of Distortion",
+        "count": 2
+      },
+      {
+        "id": "10803310",
+        "name": "Wills United",
+        "count": 1
+      }
+    ]
+  },
+  "outcome": "position",
+  "error": "position save-load re-apply mismatch at action 51 ({\"type\":\"CHOOSE_TARGET\",\"player\":\"second\",\"target\":{\"type\":\"card\",\"uid\":\"uid_1n\"}}):\n  players.second.evoCount: expected=2 actual=1",
+  "findings": [
+    "position save-load re-apply mismatch at action 51 ({\"type\":\"CHOOSE_TARGET\",\"player\":\"second\",\"target\":{\"type\":\"card\",\"uid\":\"uid_1n\"}}):\n  players.second.evoCount: expected=2 actual=1"
+  ],
+  "turns": 11,
+  "actions": 51,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_y"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "ENGAGE",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_z"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "ENGAGE",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_10"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_24"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_24",
+      "mode": "normal"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_f"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_f",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_f",
+      "defender": {
+        "type": "card",
+        "uid": "uid_24"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1n"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_23"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_1n"
+      }
+    }
+  ],
+  "nonUndoableActionTypes": [],
+  "commitSequence": [],
+  "zeroCommitLog": []
+}

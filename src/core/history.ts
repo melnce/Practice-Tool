@@ -1,5 +1,6 @@
 // /gamelogic/history.ts
 import { state } from "./gameState.js";
+import { bumpActionSeq } from "./actionSeq.js";
 import { adapter } from "./adapter.js";
 import { logEvent } from "./logger.js";
 import type { GameState } from "./types/index.js";
@@ -405,6 +406,7 @@ export function commitAction({ autoRender = true } = {}) {
 
   assertResolutionQueueClearForCommit(inAction.name);
 
+  bumpActionSeq();
   const after = snapshot();
   const entry: HistoryEntry = { ...inAction, after } as HistoryEntry;
   past.push(entry);

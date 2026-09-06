@@ -13,6 +13,7 @@ import {
   addShadows,
 } from "../../../../core/playerHelpers.js";
 import { recordDestroyed } from "../../../core/destroyedHistory.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 
 // ============================================================================
 // PROTECTION CHECKS
@@ -120,6 +121,7 @@ export function destroyTarget(
     removed.zone = "graveyard";
     removed.cost_mod = 0; // Reset cost when entering graveyard
     grave.push(removed);
+    bumpZoneVersion();
 
     // Add shadow
     addShadows(state, cardOwner, 1);

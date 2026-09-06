@@ -22,6 +22,7 @@ import {
 } from "../../../core/cardFilter/index.js";
 import { applyKeyword } from "../../../core/keywords.js";
 import { MAX_HAND, pushToHand } from "../../../../core/utils.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import {
   getDeck,
   getHand,
@@ -113,6 +114,7 @@ export function handleSearch(
 
     // Remove from deck
     deck.splice(idx, 1);
+    bumpZoneVersion();
 
     // Apply keywords if specified
     if (spec.keywords.length > 0) {
@@ -136,6 +138,7 @@ export function handleSearch(
       // Hand full - card goes to graveyard (overdraw/search overflow)
       card.zone = "graveyard";
       grave.push(card);
+      bumpZoneVersion();
       discarded.push(card);
     }
   }
@@ -158,6 +161,7 @@ export function handleSearch(
     const j = state.rng.nextInt(i + 1);
     [deck[i], deck[j]] = [deck[j]!, deck[i]!];
   }
+  if (selectedIndices.length > 0) bumpZoneVersion();
 }
 
 // ============================================================================

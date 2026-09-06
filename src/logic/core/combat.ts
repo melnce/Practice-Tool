@@ -8,6 +8,7 @@ import {
   fireAttackerCombatTriggers,
   fireDefenderClashTriggers,
 } from "./triggers/handlers/combat.js";
+import { invalidateZoneCandidatesCache } from "./triggers/utils.js";
 import { recordEvent } from "../../core/debugTimeline.js";
 import {
   getBoard,
@@ -321,6 +322,7 @@ function _attackFollowerCore(
   state.suppressCleanup = true;
   fireAttackerCombatTriggers(attacker, attackerPlayer, { attacker, defender });
   fireDefenderClashTriggers(defender, defenderPlayer, { attacker, defender });
+  invalidateZoneCandidatesCache();
   fireTrigger("ally_follower_attacked", attackerPlayer, { attacker, defender });
   fireTrigger("enemy_follower_attacked", attackerPlayer, {
     attacker,

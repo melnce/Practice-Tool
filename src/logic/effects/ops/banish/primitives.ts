@@ -87,6 +87,7 @@ export function moveToBanishZone(card: CardInstance, owner: Player): void {
   const bzone = getBanish(state, owner);
   if (Array.isArray(bzone)) {
     bzone.push(card);
+    bumpZoneVersion();
   }
 }
 
@@ -131,6 +132,7 @@ export function banishDeckDuplicates(owner: Player): number {
   // Overwrite deck in place
   deck.length = 0;
   deck.push(...kept);
+  bumpZoneVersion();
   logEvent("banishDuplicatesFromDeck", {
     owner,
     kept: kept.length,
@@ -189,6 +191,7 @@ export function banishFilteredFromDeck(
 
   deck.length = 0;
   deck.push(...kept);
+  bumpZoneVersion();
 
   if (bzone && removed.length) {
     for (const card of removed) {

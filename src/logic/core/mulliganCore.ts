@@ -9,6 +9,7 @@ import { doAction } from "../../core/history.js";
 import type { Player } from "../../core/types/index.js";
 import { getHand, getDeck, isFirstPlayer } from "../../core/playerHelpers.js";
 import { adapter } from "../../core/adapter.js";
+import { bumpZoneVersion } from "./triggers/utils.js";
 
 type MulliganUiHooks = {
   onAdvanceToSecond?: () => void;
@@ -125,6 +126,7 @@ export function confirmMulliganCore(
         }
         deck.push(...toPutBack);
         shuffleInPlace(deck);
+        bumpZoneVersion();
       }
 
       logEvent("mulligan", { owner, kept: [...hand.map((c) => c.name)] });

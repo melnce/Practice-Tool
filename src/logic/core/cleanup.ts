@@ -181,6 +181,7 @@ function sendToGrave(card: CardInstance, owner: Player) {
   card.cost_mod = 0;
   grave.push(card);
   addShadows(state, owner, 1);
+  bumpZoneVersion();
 }
 
 /**

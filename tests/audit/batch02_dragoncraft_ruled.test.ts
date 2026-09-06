@@ -21,6 +21,7 @@ import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
 import { attackLeader } from "../../src/logic/core/combat.js";
 import { handleRestore } from "../../src/logic/effects/ops/restore/index.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
+import { bumpZoneVersion } from "../../src/logic/core/triggers/utils.js";
 import {
   getHP,
   getMaxHP,
@@ -28,7 +29,7 @@ import {
   getBoard,
 } from "../../src/core/playerHelpers.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
-import "../../src/logic/core/effects/index.js";
+import { bumpZoneVersion } from "../../src/logic/core/triggers/utils.js";
 
 function setupTurn(round: number, opts: { hand?: string[]; pp?: number } = {}) {
   const max = Math.min(round, 10);
@@ -237,6 +238,7 @@ describe("Owner ruling — Mari (10441120)", () => {
     );
     const mari = createCard("10441120", "board", "first");
     state.players.first.board = [superGuy, plainA, plainB, plainC, mari];
+    bumpZoneVersion();
 
     const before = {
       superAtk: Number(superGuy.attack),
@@ -272,6 +274,7 @@ describe("Owner ruling — Mari (10441120)", () => {
     );
     const mari = createCard("10441120", "board", "first");
     state.players.first.board = [oldSuper, plain, mari];
+    bumpZoneVersion();
 
     const atkBefore = parseInt(String(oldSuper.attack), 10);
     const defBefore = parseInt(String(oldSuper.defense), 10);

@@ -5,6 +5,7 @@ import { fireTrigger } from "../../../core/triggers.js";
 import type { CardInstance, Player } from "../../../../core/types/index.js";
 import { initAmulet, initFollower } from "./init.js";
 import { pushToBoard } from "./core.js";
+import { bumpZoneVersion } from "../../../core/triggers/utils.js";
 import { deckOf, boardOf } from "./utils.js";
 
 /**
@@ -26,12 +27,14 @@ export function handleInvoke(owner: Player, card: CardInstance): boolean {
     return false;
   }
   deck.splice(index, 1);
+  bumpZoneVersion();
 
   // 2. Add to board (or return to deck if full)
   if (board.length >= 5) {
     console.log("Invoke failed: Board full. Returning to deck.");
     // "If your area is full, Invoked cards remain in your deck."
     deck.push(card);
+    bumpZoneVersion();
     return false;
   }
 
@@ -59,6 +62,7 @@ export function handleInvoke(owner: Player, card: CardInstance): boolean {
     // Fallback if push failed (unlikely given length check detailed above, but for safety)
     console.warn("Invoke pushToBoard failed unexpectedly. Returning to deck.");
     deck.push(card);
+    bumpZoneVersion();
     return false;
   }
 }

@@ -138,6 +138,7 @@ export const PRE_SNAPSHOT_HISTORY_DRIFT_FIELDS = [
   "lastDrawnCard",
   "lastDrawnCards",
   "lastSummoned",
+  "actionSeq",
   "zoneVersion",
 ] as const;
 
