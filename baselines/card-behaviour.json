@@ -4671,12 +4671,12 @@
       "status": "covered"
     },
     "10404110": {
-      "fingerprint": "5b3e034f",
+      "fingerprint": "44ed41b4",
       "gatesSatisfied": ["skybound_art"],
       "name": "Sandalphon, Primarch Successor",
       "scenarios": [
         {
-          "fingerprint": "705428ac",
+          "fingerprint": "410ea98e",
           "scenario": "play"
         },
         {
