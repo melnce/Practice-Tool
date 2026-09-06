@@ -26,6 +26,7 @@ const ALLOWED_FILES = new Set([
   "core/turnBoundary.ts",
   "core/combat.ts",
   "core/effects/domains/combat.ts",
+  "effects/ops/countdown/unified.ts",
   "effects/ops/damage.ts",
   "effects/ops/damage/unified.ts",
   "effects/ops/damage/helpers.ts",

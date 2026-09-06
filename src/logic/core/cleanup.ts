@@ -401,6 +401,32 @@ export function resumeDeferredDeathIfIdle(): void {
   flushDeferredDeathBatch();
 }
 
+/** Safety net: countdown-zero amulets and pendingDestruction between effect ops. */
+export function cleanupCountdownZeroAmulets(): void {
+  const toNum = (v: any): number =>
+    typeof v === "number" ? v : v == null ? 0 : +v;
+
+  const needsCountdownCleanup = (board: CardInstance[]) => {
+    for (const c of board) {
+      if (!c || typeof c !== "object") continue;
+      if ((c as any).pendingDestruction) return true;
+      if (c.type === "Amulet" && c.hasCountdown && toNum(c.countdown) <= 0)
+        return true;
+    }
+    return false;
+  };
+
+  const firstBoard = getBoard(state, "first");
+  const secondBoard = getBoard(state, "second");
+  if (
+    !needsCountdownCleanup(firstBoard) &&
+    !needsCountdownCleanup(secondBoard)
+  ) {
+    return;
+  }
+  cleanupDead();
+}
+
 export function cleanupDead() {
   if (state.suppressCleanup) return;
 

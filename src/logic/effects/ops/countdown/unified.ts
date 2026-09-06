@@ -13,6 +13,7 @@ import type { Crest } from "../../crest.js";
 import { resolveEffectAmount } from "../../../core/values.js";
 
 import { completeCrest } from "../../crest.js";
+import { cleanupDead } from "../../../core/cleanup.js";
 import {
   getCrests,
   getBoard,
@@ -112,8 +113,10 @@ export function handleCountdown(
     // Instance-based: amulet or crest passed as source
     if (isCrest(ctx.source)) {
       handleCrestCountdown(ctx.source, action, amount, ctx.owner);
-    } else {
-      handleAmuletCountdown(ctx.source as CardInstance, action, amount);
+    } else if (
+      handleAmuletCountdown(ctx.source as CardInstance, action, amount)
+    ) {
+      cleanupDead();
     }
   } else if (crestName) {
     // Name-based: find crest by name
@@ -123,7 +126,9 @@ export function handleCountdown(
     }
   } else if (ctx.source && !isCrest(ctx.source)) {
     // Default: assume amulet source
-    handleAmuletCountdown(ctx.source as CardInstance, action, amount);
+    if (handleAmuletCountdown(ctx.source as CardInstance, action, amount)) {
+      cleanupDead();
+    }
   }
 }
 
@@ -194,8 +199,14 @@ function handleBoardAmuletCountdown(
       picks.push(...pool.slice(0, need));
     }
   }
+  let anyReachedZero = false;
   for (const card of picks) {
-    handleAmuletCountdown(card, action, amount);
+    if (handleAmuletCountdown(card, action, amount)) {
+      anyReachedZero = true;
+    }
+  }
+  if (anyReachedZero) {
+    cleanupDead();
   }
 }
 
@@ -207,8 +218,8 @@ function handleAmuletCountdown(
   card: CardInstance,
   action: CountdownAction,
   amount: number,
-): void {
-  if (card.type !== "Amulet" || !card.hasCountdown) return;
+): boolean {
+  if (card.type !== "Amulet" || !card.hasCountdown) return false;
 
   if (action === "advance") {
     card.countdown = Math.max(0, (Number(card.countdown) || 0) - amount);
@@ -223,8 +234,7 @@ function handleAmuletCountdown(
     uid: card.uid,
   });
 
-  // Render removed - UI layer
-  // Note: cleanupDead() handles amulet death when countdown=0
+  return action === "advance" && (Number(card.countdown) || 0) <= 0;
 }
 
 // =============================================================================
