@@ -272,16 +272,12 @@ export function fuse_finalize_generic(
   const iIdx = hand.findIndex((c) => c?.uid === initiatorUid);
   const pIdx = hand.findIndex((c) => c?.uid === partnerCard?.uid);
   if (iIdx === -1 || pIdx === -1) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
   const iCard = hand[iIdx];
   const pCard = hand[pIdx];
   if (!iCard || !pCard) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -300,21 +296,15 @@ export function fuse_finalize_generic(
       partner_name: pCard?.name,
       result_name: "wasted",
     };
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
   if (!resultSpec || resultSpec.type !== "transform") {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
   const tmpl = getCardDetails(resultSpec.result_card_name);
   if (!tmpl) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -382,6 +372,4 @@ export function fuse_finalize_generic(
       resultSpec?.result_card_name || state?.lastFuse?.result_name || "wasted",
     targets,
   });
-  clearSelectableFlags();
-  // Render removed - UI layer
 }

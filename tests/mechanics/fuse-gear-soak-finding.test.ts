@@ -32,35 +32,32 @@ describe("gear fuse soak finding", () => {
     });
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
       .withFirstPP(6, 6)
-      .withFirstHand(["10471120", "10471130"])
+      .withFirstHand(["90071210", "90071220"])
       .build();
     state.gameStarted = true;
     state.phase = "main";
   });
 
-  it.fails(
-    "FUSE gear_multi Confirm Targets: clearSelectableFlags lifecycle guard (engine path)",
-    () => {
-      const ambition = state.players.first.hand.find(
-        (c) => c.name === "Gear of Ambition",
-      )!;
-      const remembrance = state.players.first.hand.find(
-        (c) => c.name === "Gear of Remembrance",
-      )!;
+  it("FUSE gear_multi Confirm Targets: clearSelectableFlags lifecycle guard (engine path)", () => {
+    const ambition = state.players.first.hand.find(
+      (c) => c.name === "Gear of Ambition",
+    )!;
+    const remembrance = state.players.first.hand.find(
+      (c) => c.name === "Gear of Remembrance",
+    )!;
 
-      engineDispatch(state, {
-        type: "FUSE",
-        player: "first",
-        cardUid: ambition.uid,
-      });
-      engineDispatch(state, {
-        type: "CHOOSE_TARGET",
-        player: "first",
-        target: { type: "card", uid: remembrance.uid },
-      });
-      expect(confirmOnClick).toBeTypeOf("function");
-      confirmOnClick!();
-      expect(state.pendingTargetEffect).toBeUndefined();
-    },
-  );
+    engineDispatch(state, {
+      type: "FUSE",
+      player: "first",
+      cardUid: ambition.uid,
+    });
+    engineDispatch(state, {
+      type: "CHOOSE_TARGET",
+      player: "first",
+      target: { type: "card", uid: remembrance.uid },
+    });
+    expect(confirmOnClick).toBeTypeOf("function");
+    confirmOnClick!();
+    expect(state.pendingTargetEffect).toBeUndefined();
+  });
 });
