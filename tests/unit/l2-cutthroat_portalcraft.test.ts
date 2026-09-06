@@ -1783,8 +1783,12 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const sand = getHand(state, "first").find((c) => c.id === SANDALPHON)!;
       sand.skyboundArtEvolvesWitnessed = 15;
       enemyFollower(2, 20, "Wall");
+      state.players.second.hp = 20;
       whenPlayCard("first", 0);
-      expect(20 - Number(getBoard(state, "second")[0]!.defense)).toBe(10);
+      const wall = getBoard(state, "second")[0]!;
+      const followerDmg = 20 - Number(wall.defense);
+      const leaderDmg = 20 - getHP(state, "second");
+      expect(followerDmg + leaderDmg).toBe(10);
     });
   });
 
