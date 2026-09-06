@@ -17,7 +17,8 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
+import type { CardInstance } from "../../src/core/types/index.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
@@ -213,6 +214,23 @@ function secondSideHpPool(): number {
   );
 }
 
+/** Real EVOLVE / SUPER_EVOLVE path (+2/+2 or +3/+3 and evolve script). */
+function evolveFollower(
+  card: CardInstance,
+  owner: "first" | "second",
+  mode: "normal" | "super" = "normal",
+): void {
+  const ps = state.players[owner];
+  ps.evoUsedThisTurn = false;
+  if (mode === "super") {
+    ps.superEvoPoints = Math.max(1, ps.superEvoPoints ?? 0);
+    ps.superEvoCharges = Math.max(1, ps.superEvoCharges ?? 0);
+  } else {
+    ps.evoCharges = Math.max(1, ps.evoCharges ?? 0);
+  }
+  handleEvolveSelf(card, owner, { mode, spendPoint: true });
+}
+
 describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -242,28 +260,24 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(Number(lone.defense)).toBe(5);
   }, 60_000);
 
-  it.fails(
-    "10021310 Way of the Maid — returned Rusty keeps Storm when redrawn (official Q&A)",
-    () => {
-      setupTurn(R10, {
-        hand: [WAY_OF_MAID, RUSTY],
-        deck: [RUSTY, RUSTY, "10021110", "10021120"],
-        pp: 10,
-      });
-      const rusty = thenHand("first").find((c) => c.id === RUSTY)!;
-      applyKeywordsFromList(rusty);
-      rusty.hasStorm = true;
-      const rustyUid = rusty.uid;
-      whenPlayCard("first", 0);
-      resolvePendingByUid(rustyUid);
-      const redrawn = [...thenHand("first"), ...thenDeck("first")].find(
-        (c) => c.id === RUSTY && c.uid !== rustyUid,
-      );
-      expect(redrawn).toBeTruthy();
-      expect(redrawn!.hasStorm).toBe(true);
-    },
-    60_000,
-  );
+  it("10021310 Way of the Maid — returned Rusty keeps Storm when redrawn (official Q&A)", () => {
+    setupTurn(R10, {
+      hand: [WAY_OF_MAID, RUSTY],
+      deck: ["10021110", "10021120"],
+      pp: 10,
+    });
+    const rusty = thenHand("first").find((c) => c.id === RUSTY)!;
+    applyKeywordsFromList(rusty);
+    rusty.hasStorm = true;
+    const rustyUid = rusty.uid;
+    whenPlayCard("first", 0);
+    resolvePendingByUid(rustyUid);
+    const returned = [...thenHand("first"), ...thenDeck("first")].find(
+      (c) => c.uid === rustyUid,
+    );
+    expect(returned).toBeTruthy();
+    expect(returned!.hasStorm).toBe(true);
+  }, 60_000);
 
   it("10412110 Chloe, What a Gal — full field: Quake not summoned, Chloe returns to hand (official Q&A)", () => {
     setupTurn(R10, { hand: [CHLOE, QUAKE], pp: 8 });
@@ -300,7 +314,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     setupTurn(R9, { hand: [OLUON], pp: 9, evo: 2, seed: 11 });
     whenPlayCard("first", 0);
     const oluon = findOnBoard("first", "Oluon, Raging Chariot")!;
-    onEvolve(oluon, "first", "normal", { spendPoint: true });
+    evolveFollower(oluon, "first", "normal");
     for (let i = 0; i < 3; i++) {
       const f = createCard(FAIRY, "board", "second");
       f.peak_defense = f.defense;
@@ -318,7 +332,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     setupTurn(R9, { hand: [OLUON], pp: 9, evo: 2, seed: 3 });
     whenPlayCard("first", 0);
     const oluonSolo = findOnBoard("first", "Oluon, Raging Chariot")!;
-    onEvolve(oluonSolo, "first", "normal", { spendPoint: true });
+    evolveFollower(oluonSolo, "first", "normal");
     state.players.second.board = [];
     state.players.second.hp = 20;
     whenEndTurn();
@@ -335,6 +349,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(findOnBoard("first", "Marlone, Scales of the Past")).toBeTruthy();
   }, 60_000);
 
+  // Flip to it when tests/mechanics/queued-ability-source-check.test.ts is on main (open PR #270).
   it.fails(
     "10911210 Trap in the Woods — only first of multi-summon destroyed (official Q&A)",
     () => {
@@ -400,7 +415,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
       expect(getPP(state, "second")).toBe(10);
       whenPlayCard("second", 0);
       expect(getPP(state, "second")).toBe(7);
-      onEvolve(carb, "second", "super");
+      evolveFollower(carb, "second", "super");
       expect(getPP(state, "second")).toBe(10);
     },
     60_000,
@@ -417,45 +432,37 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     expect(getBoard(state, "first").length).toBe(0);
   }, 60_000);
 
-  it.fails(
-    "10113110 Lily, Crystalian Innocence — evolved Quake Goliath at 4/1 becomes 6/3 (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [FILLER, FILLER, LILY], pp: 4 });
-      const quake = enemyFollower(4, 5, "Quake");
-      quake.id = QUAKE;
-      quake.name = "Quake Goliath";
-      playCombo3(0);
-      resolveFirstPending();
-      expect(Number(quake.defense)).toBe(1);
-      whenEndTurn();
-      state.activePlayer = "second";
-      state.players.second.evoCharges = 2;
-      onEvolve(quake, "second", "normal", { spendPoint: true });
-      expect(Number(quake.attack)).toBe(6);
-      expect(Number(quake.defense)).toBe(3);
-    },
-    60_000,
-  );
+  it("10113110 Lily, Crystalian Innocence — evolved Quake Goliath at 4/1 becomes 6/3 (official Q&A)", () => {
+    setupTurn(R6, { hand: [FILLER, FILLER, LILY], pp: 4 });
+    const quake = createCard(QUAKE, "board", "second");
+    quake.peak_defense = quake.defense;
+    applyKeywordsFromList(quake);
+    state.players.second.board = [quake];
+    playCombo3(0);
+    resolvePendingByUid(quake.uid);
+    expect(Number(quake.attack)).toBe(4);
+    expect(Number(quake.defense)).toBe(1);
+    whenEndTurn();
+    state.activePlayer = "second";
+    evolveFollower(quake, "second", "normal");
+    expect(Number(quake.attack)).toBe(6);
+    expect(Number(quake.defense)).toBe(3);
+  }, 60_000);
 
-  it.fails(
-    "10113110 Lily, Crystalian Innocence — super-evolved Quake Goliath at 4/1 becomes 7/4 (official Q&A)",
-    () => {
-      setupTurn(R7, { hand: [FILLER, FILLER, LILY], pp: 4 });
-      const quake = enemyFollower(4, 5, "Quake");
-      quake.id = QUAKE;
-      quake.name = "Quake Goliath";
-      playCombo3(0);
-      resolveFirstPending();
-      whenEndTurn();
-      state.activePlayer = "second";
-      state.players.second.superEvoPoints = 1;
-      state.players.second.superEvoCharges = 1;
-      onEvolve(quake, "second", "super");
-      expect(Number(quake.attack)).toBe(7);
-      expect(Number(quake.defense)).toBe(4);
-    },
-    60_000,
-  );
+  it("10113110 Lily, Crystalian Innocence — super-evolved Quake Goliath at 4/1 becomes 7/4 (official Q&A)", () => {
+    setupTurn(R7, { hand: [FILLER, FILLER, LILY], pp: 4 });
+    const quake = createCard(QUAKE, "board", "second");
+    quake.peak_defense = quake.defense;
+    applyKeywordsFromList(quake);
+    state.players.second.board = [quake];
+    playCombo3(0);
+    resolvePendingByUid(quake.uid);
+    whenEndTurn();
+    state.activePlayer = "second";
+    evolveFollower(quake, "second", "super");
+    expect(Number(quake.attack)).toBe(7);
+    expect(Number(quake.defense)).toBe(4);
+  }, 60_000);
 
   it("10113120 Glade, Fragrantwood Ward — split damage oldest-first 3/3/2 with X=7 (official Q&A)", () => {
     setupTurn(R8, {
@@ -468,8 +475,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     state.players.second.board = [oldest, middle, newest];
     whenPlayCard("first", 0);
     const glade = findOnBoard("first", "Glade, Fragrantwood Ward")!;
-    onEvolve(glade, "first", "normal", { spendPoint: true });
-    state.players.first.evoCharges = 2;
+    evolveFollower(glade, "first", "normal");
     expect(Number(oldest.defense)).toBe(0);
     expect(Number(middle.defense)).toBe(0);
     expect(Number(newest.defense)).toBe(1);
@@ -598,8 +604,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     enemyFollower(1, 5, "Blocker");
     whenPlayCard("first", 0);
     const jeno = findOnBoard("first", "Jeno, Levin Axeraider")!;
-    state.players.first.superEvoPoints = 1;
-    onEvolve(jeno, "first", "super");
+    evolveFollower(jeno, "first", "super");
     jeno.can_attack = true;
     jeno.justPlayed = false;
     const idx = getBoard(state, "first").indexOf(jeno);
@@ -617,11 +622,10 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     state.players.first.board = [knight];
     whenPlayCard("first", 0);
     const amelia = findOnBoard("first", "Amelia, Silver Captain")!;
-    state.players.first.superEvoPoints = 1;
-    onEvolve(amelia, "first", "super");
+    evolveFollower(amelia, "first", "super");
     const barrierKnight = thenBoard("first").find((c) => c.id === KNIGHT)!;
     expect(barrierKnight.hasBarrier).toBe(true);
-    onEvolve(barrierKnight, "first", "super");
+    evolveFollower(barrierKnight, "first", "super");
     barrierKnight.can_attack = true;
     barrierKnight.justPlayed = false;
     enemyFollower(1, 5, "Foe");
@@ -655,8 +659,7 @@ describe("official Q&A — Forestcraft + Swordcraft batch 1", () => {
     const victim = enemyFollower(2, 5, "Victim");
     whenPlayCard("first", 0);
     const lym = findOnBoard("first", "Lymaga, Untamed Wild")!;
-    state.players.first.superEvoPoints = 1;
-    onEvolve(lym, "first", "super");
+    evolveFollower(lym, "first", "super");
     resolveFirstPending();
     const pending = state.pendingTargetEffect;
     if (pending?.poolUids?.[1]) {
