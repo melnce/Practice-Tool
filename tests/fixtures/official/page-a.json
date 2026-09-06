@@ -1,0 +1,41 @@
+{
+  "data": {
+    "count": 3,
+    "sort_card_id_list": [10012110, 10011110],
+    "cards": {
+      "10011110": {
+        "related_card_ids": [90011110],
+        "specific_effect_card_ids": []
+      }
+    },
+    "card_details": {
+      "10012110": {
+        "common": {
+          "card_id": 10012110,
+          "name": "May, Journey Elf",
+          "card_set_id": 10000,
+          "questions": [
+            {
+              "question": "Combo question",
+              "answer": "Yes."
+            }
+          ],
+          "is_token": false,
+          "is_include_rotation": true,
+          "deck_enabled_num": 3
+        }
+      },
+      "10011110": {
+        "common": {
+          "card_id": 10011110,
+          "name": "Fairy Tamer",
+          "card_set_id": 10000,
+          "questions": [],
+          "is_token": false,
+          "is_include_rotation": true,
+          "deck_enabled_num": 3
+        }
+      }
+    }
+  }
+}

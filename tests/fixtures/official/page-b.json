@@ -1,0 +1,20 @@
+{
+  "data": {
+    "count": 3,
+    "sort_card_id_list": [10263310],
+    "cards": {},
+    "card_details": {
+      "10263310": {
+        "common": {
+          "card_id": 10263310,
+          "name": "Maddening Benison",
+          "card_set_id": 10002,
+          "questions": [],
+          "is_token": false,
+          "is_include_rotation": false,
+          "deck_enabled_num": 3
+        }
+      }
+    }
+  }
+}

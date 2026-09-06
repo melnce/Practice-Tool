@@ -1,0 +1,64 @@
+{
+  "data_headers": { "result_code": 1 },
+  "data": {
+    "count": 3,
+    "sort_card_id_list": [10012110, 10011110, 10263310],
+    "cards": {
+      "10011110": {
+        "related_card_ids": [90011110],
+        "specific_effect_card_ids": []
+      },
+      "10263310": {
+        "related_card_ids": [],
+        "specific_effect_card_ids": [10263312]
+      }
+    },
+    "card_details": {
+      "10012110": {
+        "common": {
+          "card_id": 10012110,
+          "name": "May, Journey Elf",
+          "card_set_id": 10000,
+          "questions": [
+            {
+              "question": "If I play May, Journey Elf after playing 2 other cards this turn, will its Combo (3) ability activate?",
+              "answer": "Yes. The card being played also counts toward your Combo."
+            }
+          ],
+          "is_token": false,
+          "is_include_rotation": true,
+          "deck_enabled_num": 3
+        }
+      },
+      "10011110": {
+        "common": {
+          "card_id": 10011110,
+          "name": "Fairy Tamer",
+          "card_set_id": 10000,
+          "questions": [],
+          "is_token": false,
+          "is_include_rotation": true,
+          "deck_enabled_num": 3
+        }
+      },
+      "10263310": {
+        "common": {
+          "card_id": 10263310,
+          "name": "Maddening Benison",
+          "card_set_id": 10002,
+          "questions": [],
+          "is_token": false,
+          "is_include_rotation": false,
+          "deck_enabled_num": 3
+        }
+      }
+    },
+    "specific_effect_card_info": {
+      "10263312": {
+        "specific_effect_type": 4,
+        "cost": 0,
+        "skill_text": "Crest text."
+      }
+    }
+  }
+}
