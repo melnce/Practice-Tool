@@ -91,7 +91,10 @@ npm run replay:check    # Replay determinism
    ```ts
    registerOp("my_op", (eff, ctx) => { ... });
    ```
-4. Run `npm run check:arch` to verify.
+4. Add allowed top-level keys to `OP_TOP_LEVEL_KEYS` in `scripts/op-keys-gate.ts` (Layer 1–3 op-keys gate).
+5. Run `npm run check:arch` to verify.
+
+`tests/unit/op-registry-sync.test.ts` fails if `ALL_OPS` and `OP_TOP_LEVEL_KEYS` diverge — the gate list is no longer optional documentation.
 
 ### Add a New Trigger Event
 
