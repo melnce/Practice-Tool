@@ -183,6 +183,11 @@ async function main() {
 
   // ─────────────────────────────────────────────────────────────────────────────
 
+  const namedScenarioIds = new Set(
+    REPLAY_SCENARIOS.map((s: { id: string }) => s.id),
+  );
+  let scenarioRunCount = 0;
+
   for (const scenario of REPLAY_SCENARIOS) {
     if (targetId && scenario.id !== targetId) continue;
 
@@ -350,7 +355,88 @@ async function main() {
     }
 
     console.log(`  Done.`);
+    scenarioRunCount++;
   }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Directory golden files not covered by REPLAY_SCENARIOS (e.g. soak:promote)
+  // ─────────────────────────────────────────────────────────────────────────────
+  const { isSoakGoldenId, replaySoakGolden } = await import("./soakRepro.js");
+  const { installHeadlessNode } = await import("./headlessNode.js");
+  let headlessNodeReady = false;
+  async function ensureHeadlessNode(): Promise<void> {
+    if (!headlessNodeReady) {
+      await installHeadlessNode();
+      headlessNodeReady = true;
+    }
+  }
+
+  const goldenFiles = fs
+    .readdirSync(GOLDEN_DIR)
+    .filter((f) => f.endsWith(".json"))
+    .sort();
+
+  let directoryRunCount = 0;
+  for (const file of goldenFiles) {
+    const id = file.replace(/\.json$/, "");
+    if (namedScenarioIds.has(id)) continue;
+    if (targetId && targetId !== id) continue;
+
+    const goldenPath = path.join(GOLDEN_DIR, file);
+    const goldenCapsule = JSON.parse(fs.readFileSync(goldenPath, "utf-8"));
+    console.log(`Running golden file: ${id} ...`);
+
+    if (isSoakGoldenId(id)) {
+      if (updateMode) {
+        console.log(`  Skip update for soak golden ${id} (use soak:promote).`);
+        continue;
+      }
+      try {
+        await ensureHeadlessNode();
+        const replay = await replaySoakGolden({
+          id,
+          seed: goldenCapsule.seed,
+          actions: goldenCapsule.actions,
+        });
+        if (replay.threw) {
+          const msg = `  FAIL: Soak golden ${id} threw during replay: ${replay.error}`;
+          console.error(msg);
+          fs.appendFileSync(logFile, msg + "\n");
+          failureCount++;
+        } else if (replay.initialHash !== goldenCapsule.initial?.stateHash) {
+          const msg =
+            `  FAIL: Soak golden ${id} initial hash mismatch ` +
+            `(expected ${goldenCapsule.initial?.stateHash}, got ${replay.initialHash})`;
+          console.error(msg);
+          fs.appendFileSync(logFile, msg + "\n");
+          failureCount++;
+        } else if (replay.finalHash !== goldenCapsule.final?.stateHash) {
+          const msg =
+            `  FAIL: Soak golden ${id} final hash mismatch ` +
+            `(expected ${goldenCapsule.final?.stateHash}, got ${replay.finalHash})`;
+          console.error(msg);
+          fs.appendFileSync(logFile, msg + "\n");
+          failureCount++;
+        }
+      } catch (e: any) {
+        const msg = `  FAIL: Soak golden ${id} error: ${e?.message ?? e}`;
+        console.error(msg);
+        fs.appendFileSync(logFile, msg + "\n");
+        failureCount++;
+      }
+    } else {
+      const msg = `  FAIL: Unknown golden file ${id} (not in REPLAY_SCENARIOS)`;
+      console.error(msg);
+      fs.appendFileSync(logFile, msg + "\n");
+      failureCount++;
+    }
+    console.log(`  Done.`);
+    directoryRunCount++;
+  }
+
+  console.log(
+    `\nReplay counts: ${scenarioRunCount} named scenario(s), ${directoryRunCount} directory golden(s).`,
+  );
 
   if (failureCount > 0) {
     console.error(`\n${failureCount} failure(s).`);

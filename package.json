@@ -27,6 +27,7 @@
     "replay:check": "npx tsx scripts/replay.ts",
     "replay:update": "npx tsx scripts/replay.ts --update",
     "soak": "npx tsx scripts/soak.ts",
+    "soak:promote": "npx tsx scripts/soak-promote.ts",
     "soak:smoke": "npx tsx scripts/soak.ts --smoke",
     "cards:update": "npx tsx scripts/mergeSets.ts",
     "cards:drift": "npx tsx scripts/cards-drift.ts",
