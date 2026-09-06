@@ -1,5 +1,6 @@
 /**
  * History round-trip soak — undo/redo after every undoable action with full-state comparison.
+ * Full-game soak replays need >5s under load; describe-level testTimeout avoids vitest's default 5000ms.
  */
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import fs from "fs";
