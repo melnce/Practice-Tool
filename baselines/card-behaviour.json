@@ -3791,25 +3791,33 @@
       "status": "covered"
     },
     "10302110": {
-      "fingerprint": "a033a275",
+      "fingerprint": "632b0220",
       "gatesSatisfied": [],
       "name": "Inspirational One",
       "scenarios": [
         {
           "fingerprint": "70f9095c",
           "scenario": "in_hand"
+        },
+        {
+          "fingerprint": "a6c6d340",
+          "scenario": "vanilla_place"
         }
       ],
       "status": "covered"
     },
     "10303110": {
-      "fingerprint": "41c74940",
+      "fingerprint": "f72919f5",
       "gatesSatisfied": [],
       "name": "Dogged One",
       "scenarios": [
         {
           "fingerprint": "a5e8407b",
           "scenario": "in_hand"
+        },
+        {
+          "fingerprint": "4dec4263",
+          "scenario": "vanilla_place"
         }
       ],
       "status": "covered"
@@ -4283,12 +4291,12 @@
       "status": "covered"
     },
     "10334120": {
-      "fingerprint": "62848b80",
+      "fingerprint": "19e58438",
       "gatesSatisfied": [],
       "name": "Raio, Elimination Manifest",
       "scenarios": [
         {
-          "fingerprint": "28d7b2c4",
+          "fingerprint": "51232856",
           "scenario": "play"
         }
       ],
@@ -5723,13 +5731,17 @@
       "status": "covered"
     },
     "10462210": {
-      "fingerprint": "5b2fac88",
+      "fingerprint": "08222c18",
       "gatesSatisfied": [],
       "name": "Skyfaring Vessel",
       "scenarios": [
         {
           "fingerprint": "7c3445e4",
           "scenario": "in_hand"
+        },
+        {
+          "fingerprint": "bc257a60",
+          "scenario": "vanilla_place"
         }
       ],
       "status": "covered"
@@ -10031,13 +10043,17 @@
       "status": "covered"
     },
     "10862120": {
-      "fingerprint": "90b9e73f",
+      "fingerprint": "077c2de8",
       "gatesSatisfied": [],
       "name": "Viche, Abyssal Researcher",
       "scenarios": [
         {
           "fingerprint": "9829ad30",
           "scenario": "in_hand"
+        },
+        {
+          "fingerprint": "97132600",
+          "scenario": "vanilla_place"
         }
       ],
       "status": "covered"
