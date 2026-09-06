@@ -1,7 +1,7 @@
 // scripts/soak.ts
 // Engine soak harness — hundreds of seeded random games across the full card pool.
 // Run: npm run soak -- [--games=N] [--seed=N] [--smoke] [--history] [--positions] [--determinism=N]
-// Opt-in paths (off by default): --fuse --interactive-modes --all-paths (both)
+// Opt-in paths (off by default): --fuse --interactive-modes --all-paths (both) --parity
 //
 // NODE_ENV defaults to "test" so dev-mode engine guards (targeted-op lifecycle,
 // unknown op actions, etc.) throw instead of warn — soak must not run blind.
@@ -132,6 +132,7 @@ type SoakCliConfig = {
   actionCap: number;
   fuse: boolean;
   interactiveModes: boolean;
+  parity: boolean;
 };
 
 function parseArgs(): SoakCliConfig {
@@ -150,6 +151,7 @@ function parseArgs(): SoakCliConfig {
     actionCap: 800,
     fuse: false,
     interactiveModes: false,
+    parity: false,
   };
   for (const arg of args) {
     if (arg.startsWith("--games=")) config.games = parseInt(arg.slice(8), 10);
@@ -181,6 +183,7 @@ function parseArgs(): SoakCliConfig {
       config.actionCap = parseInt(arg.slice(13), 10);
     else if (arg === "--fuse") config.fuse = true;
     else if (arg === "--interactive-modes") config.interactiveModes = true;
+    else if (arg === "--parity") config.parity = true;
     else if (arg === "--all-paths") {
       config.fuse = true;
       config.interactiveModes = true;
@@ -208,6 +211,9 @@ async function main(): Promise<void> {
   const soakEnv = await import(
     pathToFileURL(resolve(ROOT, "src/bench/soakEnv.ts")).href
   );
+  const parityBench = config.parity
+    ? await import(pathToFileURL(resolve(ROOT, "src/bench/parity.ts")).href)
+    : null;
   if (
     (config.history || config.positions) &&
     config.historyIgnore.length === 0
@@ -224,7 +230,7 @@ async function main(): Promise<void> {
   console.log("║              SHADOWVERSE ENGINE SOAK                     ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
-    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} positions=${config.positions} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"} fuse=${config.fuse} interactiveModes=${config.interactiveModes}`,
+    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} positions=${config.positions} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"} fuse=${config.fuse} interactiveModes=${config.interactiveModes} parity=${config.parity}`,
   );
   console.log(`reports → ${REPORT_DIR}`);
   console.log("");
@@ -273,6 +279,13 @@ async function main(): Promise<void> {
     positionViolations: 0,
     positionChecks: 0,
     positionViolationKinds: {} as Record<string, number>,
+    parityCheck: config.parity,
+    parityViolations: 0,
+    parityKinds: {} as Record<string, number>,
+    paritySignatures: {} as Record<
+      string,
+      { count: number; exampleGameIndex: number }
+    >,
     actionTypeCounts: {} as Record<string, number>,
     totalActionsCompleted: 0,
     determinismChecks: 0,
@@ -295,7 +308,7 @@ async function main(): Promise<void> {
   const actionTypeTotals: Record<string, number> = {};
 
   for (let i = 0; i < config.games; i++) {
-    const result = await soakEnv.runSoakGame({
+    const runOpts = {
       seed: config.seed,
       gameIndex: i,
       turnCap: config.turnCap,
@@ -308,7 +321,10 @@ async function main(): Promise<void> {
       positionCheck: config.positions,
       fuse: config.fuse,
       interactiveModes: config.interactiveModes,
-    });
+    };
+    const result = config.parity
+      ? await parityBench!.runParitySoakGame(runOpts)
+      : await soakEnv.runSoakGame(runOpts);
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
 
@@ -376,6 +392,29 @@ async function main(): Promise<void> {
               : "other";
       summary.positionViolationKinds[kind] =
         (summary.positionViolationKinds[kind] ?? 0) + 1;
+    } else if (result.outcome === "parity") {
+      summary.parityViolations++;
+      const div = (
+        result as {
+          parityDivergence?: {
+            action: { type: string };
+            signaturePath: string;
+            kind: string;
+          };
+        }
+      ).parityDivergence;
+      const actionType =
+        div?.action?.type ??
+        (result.error?.includes("legal") ? "legal" : "state");
+      const sigPath = div?.signaturePath ?? "(unknown)";
+      const sigKey = div
+        ? parityBench!.parityViolationSignature(div as any)
+        : `other:${actionType}:${sigPath}`;
+      summary.parityKinds[actionType] =
+        (summary.parityKinds[actionType] ?? 0) + 1;
+      const existing = summary.paritySignatures[sigKey];
+      if (existing) existing.count++;
+      else summary.paritySignatures[sigKey] = { count: 1, exampleGameIndex: i };
     }
 
     if (result.outcome !== "completed") {
@@ -404,6 +443,9 @@ async function main(): Promise<void> {
             nonUndoableActionTypes: result.nonUndoableActionTypes ?? [],
             commitSequence: result.commitSequence ?? [],
             zeroCommitLog: result.zeroCommitLog ?? [],
+            ...(result.outcome === "parity" && (result as any).parityDivergence
+              ? { parityDivergence: (result as any).parityDivergence }
+              : {}),
           },
           null,
           2,
@@ -544,6 +586,29 @@ async function main(): Promise<void> {
         .join(", ")}`,
     );
   }
+  if (config.parity) {
+    console.log(
+      `parity:             ${summary.gamesPlayed} games, ${summary.parityViolations} violations`,
+    );
+    const parityKindEntries = Object.entries(summary.parityKinds);
+    if (parityKindEntries.length > 0) {
+      console.log(
+        `parityKinds:        ${parityKindEntries
+          .sort((a, b) => b[1] - a[1])
+          .map(([k, n]) => `${k}×${n}`)
+          .join(", ")}`,
+      );
+    }
+    const sigEntries = Object.entries(summary.paritySignatures).sort(
+      (a, b) => b[1].count - a[1].count,
+    );
+    if (sigEntries.length > 0) {
+      console.log("paritySignatures:");
+      for (const [sig, { count, exampleGameIndex }] of sigEntries) {
+        console.log(`  ${sig} ×${count} (e.g. game ${exampleGameIndex})`);
+      }
+    }
+  }
   if (summary.completed > 0) {
     console.log(
       `avgActions/game:    ${(summary.totalActionsCompleted / summary.completed).toFixed(1)}`,
@@ -583,6 +648,7 @@ async function main(): Promise<void> {
     summary.invariants +
     summary.history +
     summary.positionViolations +
+    summary.parityViolations +
     summary.determinismFailures;
   if (failed > 0) {
     console.log(`\n${failed} finding(s) — see reports/soak/repro_*.json`);
