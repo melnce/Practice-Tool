@@ -20,6 +20,7 @@ import {
   thenPP,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import {
   attackFollower,
@@ -30,7 +31,7 @@ import {
 import { applyKeyword } from "../../src/logic/core/keywords/apply.js";
 import { grantBarrier, dealDamage } from "../../src/logic/core/barrier.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
-import { onEvolve, resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
+import { resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
 import { getPool } from "../../src/logic/core/targeting.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
 import { handleReanimate } from "../../src/logic/effects/ops/reanimate.js";
@@ -651,7 +652,7 @@ describe("Rulebook L405–407 — Evolve abilities", () => {
     expect(normalFx[0]).toMatchObject({ op: "draw" });
 
     const handBefore = thenHand("first").length;
-    onEvolve(card, "first", "normal");
+    whenEvolve(card, "first");
     expect(thenHand("first").length).toBe(handBefore + 1);
     expect(thenBoard("first").some((c) => c.name === "Ghost")).toBe(false);
   });

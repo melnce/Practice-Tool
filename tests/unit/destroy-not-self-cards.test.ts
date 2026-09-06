@@ -11,9 +11,10 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { getBoard, getHand } from "../../src/core/playerHelpers.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import "../../src/logic/core/effects/index.js";
@@ -81,7 +82,7 @@ describe("destroy not_self — select-another cards", () => {
     const source = findOnBoard("first", "Supplicant of Destruction")!;
     resolvePendingTarget(ally.uid);
     cleanupDead();
-    onEvolve(source, "first", "normal");
+    whenEvolve(source, "first");
     expect(poolUids()).not.toContain(source.uid);
   });
 
@@ -129,7 +130,7 @@ describe("destroy not_self — select-another cards", () => {
     whenPlayCard("first", 0);
     const bones = findOnBoard("first", "Beastmaster Bones")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(bones, "first", "super");
+    whenSuperEvolve(bones, "first");
     expect(poolUids()).not.toContain(bones.uid);
     expect(poolUids()).toContain(sacrifice.uid);
     resolvePendingTarget(sacrifice.uid);

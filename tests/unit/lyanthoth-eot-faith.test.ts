@@ -11,8 +11,9 @@ import {
   resetUidCounter,
   thenHand,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import {
   bootstrapFaithForPlayer,
@@ -59,7 +60,7 @@ describe("Lyanthoth EOT faith payoff (10664120)", () => {
     state.players.first.board = [lyanthoth];
 
     const handBefore = depthsInHand("first");
-    onEvolve(lyanthoth, "first", "normal");
+    whenEvolve(lyanthoth, "first");
     expect(depthsInHand("first")).toBe(handBefore);
   });
 

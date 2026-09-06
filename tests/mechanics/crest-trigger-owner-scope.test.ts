@@ -12,6 +12,7 @@ import {
   resetUidCounter,
   thenHand,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
@@ -22,7 +23,7 @@ import {
   runStartOfTurnBoundary,
 } from "../../src/logic/core/turnBoundary.js";
 import { restoreLeaderHP } from "../../src/logic/effects/ops/restore/primitives.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { getCardById } from "../../src/data/cardDatabase.js";
 import {
   getCrests,
@@ -306,7 +307,7 @@ describe("Crest trigger owner scoping — real cards", () => {
         state.players.first.board = [burnite];
         state.players.first.superEvoCharges = 1;
 
-        onEvolve(burnite, "first", "super");
+        whenSuperEvolve(burnite, "first");
 
         expect(hasNamedCrest("first", BURNITE_ASH_CREST)).toBe(false);
         expect(hasNamedCrest("second", BURNITE_ASH_CREST)).toBe(true);

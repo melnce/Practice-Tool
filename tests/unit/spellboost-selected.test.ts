@@ -13,9 +13,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { handleSpellboost } from "../../src/logic/effects/ops/spellboost/unified.js";
 import { getHand } from "../../src/core/playerHelpers.js";
@@ -138,7 +139,7 @@ describe("Key Spirit 10931120 — Evolve spellboosts selected 4 times", () => {
     const filler0 = sbCount(filler);
 
     state.players.first.evoCharges = 2;
-    onEvolve(spirit, "first", "normal");
+    whenEvolve(spirit, "first");
     expect(state.pendingTargetEffect).toBeTruthy();
     resolvePendingTarget(blast.uid);
 

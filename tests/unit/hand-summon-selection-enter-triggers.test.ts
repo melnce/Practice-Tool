@@ -14,9 +14,10 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { getRally } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -67,7 +68,7 @@ describe("hand-copy summon selection — deferred enter triggers", () => {
     const deckBefore = thenDeck("first").length;
     const cart = findOnBoard("first", "New-Age Cartographer")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(cart, "first", "super");
+    whenSuperEvolve(cart, "first");
 
     const analyzing = thenHand("first").find(
       (c) => c.id === ANALYZING_ARTIFACT,
@@ -100,7 +101,7 @@ describe("hand-copy summon selection — deferred enter triggers", () => {
     whenPlayCard("first", 0);
     const cart = findOnBoard("first", "New-Age Cartographer")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(cart, "first", "super");
+    whenSuperEvolve(cart, "first");
 
     const striker = thenHand("first").find((c) => c.id === STRIKER_ARTIFACT)!;
     expect(() => resolvePendingTarget(striker.uid)).not.toThrow();

@@ -10,8 +10,9 @@ import {
   createCard,
   resetUidCounter,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import {
   bootstrapFaithForPlayer,
   faithCrestNameForCard,
@@ -63,7 +64,7 @@ describe("Sathanid faith evolve trigger (10614120)", () => {
     const followerDefBefore = Number(enemyFollower.defense);
 
     whenPlayCard("first", 0);
-    onEvolve(ally, "first", "normal", { spendPoint: false });
+    whenEffectEvolve(ally, "first", "normal");
 
     expect(getHP(state, "second")).toBe(leaderHpBefore - 1);
     const enemyOnBoard = getBoard(state, "second").find(

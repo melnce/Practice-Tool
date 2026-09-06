@@ -11,6 +11,7 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
 import { resetHistory, setHistoryEnabled } from "../../src/core/history.js";
@@ -25,7 +26,7 @@ import {
   recomputeAttackFlags,
 } from "../../src/logic/core/combat.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { injectAdapter } from "../../src/core/adapter.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import "../../src/logic/core/effects/index.js";
@@ -191,7 +192,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
     whenPlayCard("first", 0);
     resolvePendingTarget(getBoard(state, "second")[0]!.uid);
     const ara = findOnBoard("first", "Ara, Dawnblossom")!;
-    onEvolve(ara, "first", "normal", { spendPoint: true });
+    whenEvolve(ara, "first");
     resolvePendingTarget(ally.uid);
 
     const falcon = getBoard(state, "first").find((c) => c.uid === ally.uid)!;
@@ -244,7 +245,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
     const foe = enemyFollower("Foe", 2, 5);
     whenPlayCard("first", 0);
     const titania = findOnBoard("first", "Titania, Queen of Fairies")!;
-    onEvolve(titania, "first", "normal", { spendPoint: true });
+    whenEvolve(titania, "first");
     resolvePendingTarget(foe.uid);
 
     const fairy = getBoard(state, "second").find((c) => c.uid === foe.uid)!;

@@ -12,10 +12,11 @@ import {
   whenEndTurn,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import {
   getBoard,
@@ -202,7 +203,7 @@ describe("BUG 3 — Gilnelise evolve can target self; fanfare still excludes sel
 
     state.pendingTargetEffect = undefined;
     state.players.first.evo = 1;
-    onEvolve(gil, "first", "normal");
+    whenEvolve(gil, "first");
 
     expect(poolUids()).toContain(String(gil.uid));
   });
@@ -221,7 +222,7 @@ describe("BUG 4 — Burnite Ash crest damage schedule", () => {
     state.players.first.superEvoCharges = 1;
     whenPlayCard("first", 0);
     const burnite = findOnBoard("first", "Burnite, Anathema of Ash")!;
-    onEvolve(burnite, "first", "super");
+    whenSuperEvolve(burnite, "first");
     expect(
       getCrests(state, "second").some((c) =>
         c.name?.includes("Burnite, Anathema of Ash"),

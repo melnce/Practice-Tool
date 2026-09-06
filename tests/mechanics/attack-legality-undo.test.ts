@@ -10,6 +10,7 @@ import {
   whenRunEffects,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
 import {
@@ -26,7 +27,6 @@ import {
 } from "../../src/bench/soakEnv.js";
 import { deriveCanAttack } from "../../src/logic/core/combat.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
 
 const IMARI = "10574120";
 const IMARI_BUDDIES = "90074140";
@@ -227,7 +227,7 @@ describe("attack eligibility follows current keywords", () => {
       getHand(state, "first").find((c) => c.id === FILLER)!.uid,
     );
     const imari = findOnBoard("first", "Imari, Dewdrop")!;
-    onEvolve(imari, "first", "normal", { spendPoint: true });
+    whenEvolve(imari, "first");
     const spellIdx = getHand(state, "first").findIndex(
       (c) => c.id === SPELL_1A,
     );
@@ -271,7 +271,7 @@ describe("attack eligibility follows current keywords", () => {
     const target = getBoard(state, "first").find(
       (c) => c.name === "TransformTarget",
     )!;
-    onEvolve(ara, "first", "normal", { spendPoint: true });
+    whenEvolve(ara, "first");
     resolvePendingTarget(target.uid);
 
     const falcon = getBoard(state, "first").find((c) => c.uid === target.uid)!;

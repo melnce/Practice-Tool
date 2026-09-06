@@ -15,8 +15,9 @@ import {
   thenHand,
   resetUidCounter,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { hasKeyword } from "../../src/logic/core/keywords/has.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
@@ -241,7 +242,7 @@ describe("enemy_* event activePlayer convention", () => {
       );
       applyKeywordsFromList(foe);
       state.players.second.board = [foe];
-      onEvolve(foe, "second", "super");
+      whenSuperEvolve(foe, "second");
       const insp = thenHand("first").find(
         (c) => c.name === "Inspirational One",
       )!;

@@ -15,8 +15,9 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { resolveDynamicValue } from "../../src/logic/core/values.js";
 import { getPP } from "../../src/core/playerHelpers.js";
 import "../../src/logic/core/effects/index.js";
@@ -125,7 +126,7 @@ describe("Warden of Selflessness (10903110)", () => {
     whenPlayCard("first", 0);
     const ppAfterPlay = getPP(state, "first");
     const warden = findOnBoard("first", "Warden of Selflessness")!;
-    onEvolve(warden, "first", "normal");
+    whenEvolve(warden, "first");
     expect(getPP(state, "first")).toBe(ppAfterPlay + 1);
   });
 });

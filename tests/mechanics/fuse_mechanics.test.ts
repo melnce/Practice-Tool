@@ -21,6 +21,7 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve, whenEffectEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { startFuseFromHand } from "../../src/logic/index.js";
 import {
@@ -28,7 +29,7 @@ import {
   forceCompleteOrFizzlePendingTarget,
 } from "../../src/logic/core/resolveTarget.js";
 import { fuse_finalize_cards } from "../../src/logic/effects/ops/fuse/fuse.cards.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { getPP } from "../../src/core/playerHelpers.js";
 import {
   undo,
@@ -97,7 +98,7 @@ function scholarDrainPayoff(scholarOnBoard: ReturnType<typeof findOnBoard>) {
   state.players.first.board.push(subject);
   scholarOnBoard!.peak_defense = scholarOnBoard!.defense;
   state.players.first.superEvoPoints = 1;
-  onEvolve(scholarOnBoard!, "first", "super");
+  whenSuperEvolve(scholarOnBoard!, "first");
 
   const pending = state.pendingTargetEffect;
   expect(pending).toBeDefined();
@@ -282,7 +283,7 @@ describe("Mechanic Contract: Fuse: Cards", () => {
       const scholarOnBoard = findOnBoard("first", "Ecstatic Scholar")!;
       scholarOnBoard.peak_defense = scholarOnBoard.defense;
       state.players.first.superEvoPoints = 1;
-      onEvolve(scholarOnBoard, "first", "super");
+      whenSuperEvolve(scholarOnBoard, "first");
 
       const pending = state.pendingTargetEffect;
       expect(pending).toBeDefined();
@@ -332,7 +333,7 @@ describe("Mechanic Contract: Fuse: Cards", () => {
       const scholarOnBoard = findOnBoard("first", "Ecstatic Scholar")!;
       scholarOnBoard.peak_defense = scholarOnBoard.defense;
       state.players.first.superEvoPoints = 1;
-      onEvolve(scholarOnBoard, "first", "super");
+      whenSuperEvolve(scholarOnBoard, "first");
 
       expect(state.pendingTargetEffect).toBeUndefined();
       const updated = state.players.first.board.find(
