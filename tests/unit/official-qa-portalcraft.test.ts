@@ -18,7 +18,7 @@ import {
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { forceCompleteOrFizzlePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { canPlayCard } from "../../src/logic/core/playCard/preflight.js";
 import {
@@ -395,11 +395,11 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     const leona = findOnBoard("first", "Leona, Overbearing Guardian")!;
     whenPlayCard("first", 0);
     const myuu = findOnBoard("first", "Myuu, Hot on His Heels")!;
-    onEvolve(leona, "first", "super", { spendPoint: true });
+    handleEvolveSelf(leona, "first", { mode: "super", spendPoint: true });
     resolvePendingByUid(myuu.uid);
     expect(hasKeyword(myuu, "Ambush")).toBe(true);
 
-    onEvolve(myuu, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(myuu, "first", { mode: "normal", spendPoint: true });
     expect(hasKeyword(myuu, "Ambush")).toBe(true);
     expect(getBoard(state, "second")).toHaveLength(0);
   }, 60_000);
@@ -472,7 +472,7 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     ).toHaveLength(1);
     whenPlayCard("first", 0);
     const eudie = findOnBoard("first", "Eudie, Maiden Reborn")!;
-    onEvolve(eudie, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(eudie, "first", { mode: "normal", spendPoint: true });
     expect(
       getCrests(state, "first").filter(
         (c) => c.name === "Eudie, Maiden Reborn",
@@ -510,46 +510,59 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     expect(thenBoard("first").length).toBeGreaterThanOrEqual(4);
   }, 60_000);
 
-  it.fails(
-    "10272120 Achim — exact copy of evolved enemy Goblin can attack same turn (official Q&A)",
-    () => {
-      setupTurn(R6, { hand: [ACHIM], pp: 5, evo: 1 });
-      const goblin = createCard(GOBLIN, "board", "second");
-      goblin.peak_defense = goblin.defense;
-      onEvolve(goblin, "second", "normal", { spendPoint: false });
-      state.players.second.board = [goblin];
-      whenPlayCard("first", 0);
-      const achim = findOnBoard("first", "Achim, Lord of Despair")!;
-      onEvolve(achim, "first", "normal", { spendPoint: true });
-      resolvePendingByUid(goblin.uid);
-      const copy = thenBoard("first").find(
-        (c) => c.name === "Goblin" && c.uid !== achim.uid,
-      )!;
-      expect(copy.hasEvolved).toBe(true);
-      expect(copy.can_attack).toBe(true);
-    },
-    60_000,
-  );
+  it("10272120 Achim — exact copy of evolved enemy Goblin can attack same turn (official Q&A)", () => {
+    setupTurn(R6, { hand: [ACHIM], pp: 5, evo: 1 });
+    const goblin = createCard(GOBLIN, "board", "second");
+    goblin.peak_defense = goblin.defense;
+    handleEvolveSelf(goblin, "second", { mode: "normal", spendPoint: false });
+    expect(Number(goblin.attack)).toBe(3);
+    expect(Number(goblin.defense)).toBe(4);
+    expect(goblin.hasEvolved).toBe(true);
+    state.players.second.board = [goblin];
+    const fodder = enemyFollower(1, 2, "Fodder");
+    whenPlayCard("first", 0);
+    const achim = findOnBoard("first", "Achim, Lord of Despair")!;
+    handleEvolveSelf(achim, "first", { mode: "normal", spendPoint: true });
+    resolvePendingByUid(goblin.uid);
+    const copy = thenBoard("first").find(
+      (c) => c.name === "Goblin" && c.uid !== achim.uid,
+    )!;
+    expect(Number(copy.attack)).toBe(3);
+    expect(Number(copy.defense)).toBe(4);
+    expect(copy.hasEvolved).toBe(true);
+    expect(copy.can_attack).toBe(true);
+    const defBefore = Number(fodder.defense);
+    attackFollower(
+      getBoard(state, "first").indexOf(copy),
+      getBoard(state, "second").indexOf(fodder),
+      "first",
+      "second",
+    );
+    expect(Number(fodder.defense)).toBeLessThan(defBefore);
+  }, 60_000);
 
   it("10272120 Achim — exact copy of super-evolved enemy Goblin has SEP abilities (official Q&A)", () => {
     setupTurn(R7, { hand: [ACHIM], pp: 5, evo: 1 });
     const goblin = createCard(GOBLIN, "board", "second");
     goblin.peak_defense = goblin.defense;
-    onEvolve(goblin, "second", "super", { spendPoint: false });
+    handleEvolveSelf(goblin, "second", { mode: "super", spendPoint: false });
+    expect(Number(goblin.attack)).toBe(4);
+    expect(Number(goblin.defense)).toBe(5);
+    expect(goblin.evoType).toBe("super");
     state.players.second.board = [goblin];
     const fodder = enemyFollower(1, 1, "Fodder");
     whenPlayCard("first", 0);
     const achim = findOnBoard("first", "Achim, Lord of Despair")!;
-    onEvolve(achim, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(achim, "first", { mode: "normal", spendPoint: true });
     resolvePendingByUid(goblin.uid);
     const copy = thenBoard("first").find(
       (c) => c.name === "Goblin" && c.uid !== achim.uid,
     )!;
     expect(copy.evoType).toBe("super");
     expect(copy.hasEvolved).toBe(true);
-    copy.can_attack = true;
-    copy.attacks_left = 1;
-    copy.justPlayed = false;
+    expect(Number(copy.attack)).toBe(4);
+    expect(Number(copy.defense)).toBe(5);
+    expect(copy.can_attack).toBe(true);
     const hpBefore = getHP(state, "second");
     attackFollower(
       getBoard(state, "first").indexOf(copy),
@@ -564,7 +577,7 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     setupTurn(R10, { hand: [CARNELIA, STRIKER_ARTIFACT], pp: 5, evo: 1 });
     whenPlayCard("first", 0);
     const carn = findOnBoard("first", "Carnelia, Ember of Darkness")!;
-    onEvolve(carn, "first", "normal", { spendPoint: true });
+    handleEvolveSelf(carn, "first", { mode: "normal", spendPoint: true });
     const strikerHand = getHand(state, "first").find(
       (c) => c.id === STRIKER_ARTIFACT,
     )!;
@@ -644,7 +657,7 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     orchis.peak_defense = orchis.defense;
     state.players.second.board = [orchis, lloyd];
 
-    onEvolve(sylvia, "first", "super", { spendPoint: true });
+    handleEvolveSelf(sylvia, "first", { mode: "super", spendPoint: true });
     const pending = state.pendingTargetEffect!;
     expect(validateTargetSelection(state, pending, orchis.uid).ok).toBe(false);
     expect(validateTargetSelection(state, pending, lloyd.uid).ok).toBe(true);
