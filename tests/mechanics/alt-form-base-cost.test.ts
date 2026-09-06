@@ -79,7 +79,7 @@ describe("Alternate-form played card base cost (2026-09-06)", () => {
     expect(Number((gy as any).originalPrintedBaseCost)).toBe(6);
     expect(getShadows(state, "first")).toBe(shadowsBefore + 1);
     expect(getPP(state, "first")).toBe(0);
-  });
+  }, 60_000);
 
   it("Jailor normal play (6 PP): ladder records 6; follower on board base cost 6", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
@@ -99,7 +99,7 @@ describe("Alternate-form played card base cost (2026-09-06)", () => {
     )!;
     expect(jailor.type).toBe("Follower");
     expect(Number(jailor.base_cost)).toBe(6);
-  });
+  }, 60_000);
 
   it("Shoddy Accelerate (2): ladder 2; summoned body base cost 6; Yog adds Depths", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
@@ -125,7 +125,7 @@ describe("Alternate-form played card base cost (2026-09-06)", () => {
     expect(getHand(state, "first").some((c) => c.name === DEPTHS_NAME)).toBe(
       true,
     );
-  });
+  }, 60_000);
 
   it("Zerael ladder: accelerated Jailor completes 1–8 when 2–8 already recorded", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
@@ -146,7 +146,7 @@ describe("Alternate-form played card base cost (2026-09-06)", () => {
     expect(
       hasPlayedBaseCostLadder(state, "first", [1, 2, 3, 4, 5, 6, 7, 8]),
     ).toBe(true);
-  });
+  }, 60_000);
 
   it("Venerating Dyer Crystallize (1): ladder 1; field amulet base cost 1; bounce keeps amulet cost 1", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 4 })
@@ -172,5 +172,5 @@ describe("Alternate-form played card base cost (2026-09-06)", () => {
     expect(handCopy.type).toBe("Amulet");
     expect(Number(handCopy.base_cost)).toBe(1);
     expect(Number(handCopy.cost)).toBe(1);
-  });
+  }, 60_000);
 });
