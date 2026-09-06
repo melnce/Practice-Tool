@@ -10,6 +10,10 @@
  */
 
 import type { CardInstance } from "../../../core/types/index.js";
+import {
+  getEffectivePlayCost,
+  isPlayCostChangedFromPrinted,
+} from "../../../helpers/alternateForm.js";
 import { hasKeyword, hasAllKeywords } from "../keywords/has.js";
 
 // -----------------------------------------------------------------------------
@@ -228,17 +232,9 @@ export function evaluateCardCondition(
     if (!allowed.includes(cost)) return false;
   }
 
-  // Cost changed
+  // Cost changed — net effective play cost vs printed base (Institute of Truth Q&A).
   if (cond.cost_changed) {
-    const printed = Number.isFinite((card as any).base_cost)
-      ? Number((card as any).base_cost)
-      : Number(card.cost) || 0;
-    const current = Number(card.cost) || 0;
-    const handMod = Number((card as any).cost_mod) || 0;
-    const changed =
-      handMod !== 0 ||
-      (Number.isFinite((card as any).base_cost) && current !== printed);
-    if (!changed) return false;
+    if (!isPlayCostChangedFromPrinted(card)) return false;
   }
 
   // Evolution state
