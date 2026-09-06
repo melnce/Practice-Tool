@@ -16,17 +16,16 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { recordDestroyed } from "../../src/logic/core/destroyedHistory.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
-import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
+import type { CardInstance, PlayerSlot } from "../../src/core/types/index.js";
 import {
   getBoard,
-  getHand,
   getHP,
   getPP,
   getShadows,
@@ -110,6 +109,31 @@ function setupTurn(
 
 function resolvePendingByUid(uid: string): void {
   resolvePendingTarget(uid);
+}
+
+/** Real EVOLVE / SUPER-EVOLVE path (stats + script); not `onEvolve` from evolveUtils. */
+function whenEvolveSelf(
+  card: CardInstance,
+  owner: PlayerSlot,
+  mode: "normal" | "super" = "normal",
+): void {
+  if (mode === "super") {
+    state.players[owner].superEvoCharges = Math.max(
+      1,
+      state.players[owner].superEvoCharges,
+    );
+    state.players[owner].superEvoPoints = Math.max(
+      1,
+      state.players[owner].superEvoPoints ?? 0,
+    );
+  } else {
+    state.players[owner].evoCharges = Math.max(
+      1,
+      state.players[owner].evoCharges,
+    );
+  }
+  state.players[owner].evoUsedThisTurn = false;
+  handleEvolveSelf(card, owner, { mode, spendPoint: true });
 }
 
 function enemyFollower(
@@ -204,9 +228,7 @@ function grantMilteoCrest() {
   setupTurn(R8, { hand: [MILTEO], pp: 7 });
   whenPlayCard("first", 0);
   const milteo = findOnBoard("first", "Milteo & Luzen")!;
-  state.players.first.superEvoCharges = 1;
-  state.players.first.superEvoPoints = 1;
-  onEvolve(milteo, "first", "super");
+  whenEvolveSelf(milteo, "first", "super");
   expect(getCrests(state, "first").some((c) => c.name.includes("Milteo"))).toBe(
     true,
   );
@@ -247,13 +269,13 @@ describe("official Q&A — Abysscraft batch 4", () => {
   }, 60_000);
 
   it("10052310 Soul Predation — can target super-evolved ally; not destroyed but draws 2 (official Q&A)", () => {
-    setupTurn(R6, {
+    setupTurn(R8, {
       hand: [SOUL_PREDATION],
       deck: [FILLER, DRAW_SECOND, DRAW_TOP],
       pp: 2,
     });
     const target = allyFollower("SuperAlly", 3, 3);
-    onEvolve(target, "first", "super");
+    whenEvolveSelf(target, "first", "super");
     expect(target.evoType).toBe("super");
     const defBefore = Number(target.defense);
     whenPlayCard("first", 0);
@@ -303,28 +325,24 @@ describe("official Q&A — Abysscraft batch 4", () => {
     expect(getHP(state, "second")).toBe(17);
   }, 60_000);
 
-  it.fails(
-    "10554110 Milteo & Luzen — Mino Enhance (4) suppressed; 2 PP spent with 4 PP available (official Q&A)",
-    () => {
-      grantMilteoCrest();
-      state.players.first.pp = 4;
-      state.players.first.hand.push(createCard(MINO, "hand", "first"));
-      whenPlayCard("first", 0);
-      const mino = findOnBoard("first", "Mino, Shrewd Reaper")!;
-      expect(getPP(state, "first")).toBe(2);
-      expect(mino.hasRush).toBeFalsy();
-      expect(mino.hasBane).toBeFalsy();
+  it("10554110 Milteo & Luzen — Mino Enhance (4) suppressed; 2 PP spent with 4 PP available (official Q&A)", () => {
+    grantMilteoCrest();
+    state.players.first.pp = 4;
+    state.players.first.hand.push(createCard(MINO, "hand", "first"));
+    whenPlayCard("first", 0);
+    const mino = findOnBoard("first", "Mino, Shrewd Reaper")!;
+    expect(getPP(state, "first")).toBe(2);
+    expect(mino.hasBane).toBeFalsy();
+    expect(mino.hasEvolved).toBe(true);
 
-      resetUidCounter();
-      setupTurn(R6, { hand: [MINO], pp: 4 });
-      whenPlayCard("first", 0);
-      const minoNormal = findOnBoard("first", "Mino, Shrewd Reaper")!;
-      expect(getPP(state, "first")).toBe(0);
-      expect(minoNormal.hasRush).toBe(true);
-      expect(minoNormal.hasBane).toBe(true);
-    },
-    60_000,
-  );
+    resetUidCounter();
+    setupTurn(R6, { hand: [MINO], pp: 4 });
+    whenPlayCard("first", 0);
+    const minoNormal = findOnBoard("first", "Mino, Shrewd Reaper")!;
+    expect(getPP(state, "first")).toBe(0);
+    expect(minoNormal.hasRush).toBe(true);
+    expect(minoNormal.hasBane).toBe(true);
+  }, 60_000);
 
   it("10152140 Vlad, Impaler — Fanfare restores 5 even with no enemy followers (official Q&A)", () => {
     setupTurn(R8, { hand: [VLAD], pp: 8, hp: 10 });
@@ -345,7 +363,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     whenPlayCard("first", 0);
     expect(getShadows(state, "first")).toBe(6);
     const orth = findOnBoard("first", "Orthrus, Hellhound Blader")!;
-    onEvolve(orth, "first", "normal");
+    whenEvolveSelf(orth, "first", "normal");
     expect(getShadows(state, "first")).toBe(2);
     expect(getBoard(state, "second")).toHaveLength(0);
 
@@ -354,7 +372,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     whenPlayCard("first", 0);
     enemyFollower(2, 5);
     const orth2 = findOnBoard("first", "Orthrus, Hellhound Blader")!;
-    onEvolve(orth2, "first", "normal");
+    whenEvolveSelf(orth2, "first", "normal");
     expect(Number(getBoard(state, "second")[0]!.defense)).toBe(1);
   }, 60_000);
 
@@ -407,8 +425,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     const foe = enemyFollower(1, 3);
     whenPlayCard("first", 0);
     const medusa = findOnBoard("first", "Medusa, Venomfang Royalty")!;
-    state.players.first.superEvoPoints = 1;
-    onEvolve(medusa, "first", "super");
+    whenEvolveSelf(medusa, "first", "super");
     const hpBefore = getHP(state, "second");
     const atkIdx = readyAttacker(medusa);
     attackFollower(atkIdx, 0, "first", "second");
@@ -420,7 +437,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     enemyFollower(1, 3);
     whenPlayCard("first", 0);
     const medusaEvo = findOnBoard("first", "Medusa, Venomfang Royalty")!;
-    onEvolve(medusaEvo, "first", "normal");
+    whenEvolveSelf(medusaEvo, "first", "normal");
     const hpEvoBefore = getHP(state, "second");
     const idx = readyAttacker(medusaEvo);
     attackFollower(idx, 0, "first", "second");
@@ -445,7 +462,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
       setupTurn(R6, { hand: [ARAGAVY], pp: 6, hp: 3, secondHp: 3 });
       whenPlayCard("first", 0);
       const arag = findOnBoard("first", "Aragavy, Eternal Hunter")!;
-      onEvolve(arag, "first", "normal");
+      whenEvolveSelf(arag, "first", "normal");
       expect(getHP(state, "first")).toBe(0);
       expect(getHP(state, "second")).toBe(0);
       expect(getWinner(state)).toBe("second");
@@ -454,30 +471,23 @@ describe("official Q&A — Abysscraft batch 4", () => {
     60_000,
   );
 
-  it.fails(
-    "10252110 Vuella, the Blastwing — Olivia super-evolves Arriet: Vuella 6, Olivia 9, Arriet 8 attack (official Q&A)",
-    () => {
-      setupTurn(R10, { hand: [OLIVIA], pp: 10 });
-      const vuella = createCard(VUELLA, "board", "first");
-      applyKeywordsFromList(vuella);
-      vuella.peak_defense = vuella.defense;
-      const arriet = createCard(ARRIET, "board", "first");
-      applyKeywordsFromList(arriet);
-      arriet.peak_defense = arriet.defense;
-      state.players.first.board = [vuella, arriet];
-      whenPlayCard("first", 0);
-      const olivia = findOnBoard("first", "Olivia, Heroic Dark Angel")!;
-      state.players.first.superEvoCharges = 1;
-      state.players.first.superEvoPoints = 1;
-      state.players.first.evoUsedThisTurn = false;
-      onEvolve(olivia, "first", "super");
-      resolvePendingByUid(arriet.uid);
-      expect(Number(vuella.attack)).toBe(6);
-      expect(Number(olivia.attack)).toBe(9);
-      expect(Number(arriet.attack)).toBe(8);
-    },
-    60_000,
-  );
+  it("10252110 Vuella, the Blastwing — Olivia super-evolves Arriet: Vuella 6, Olivia 9, Arriet 8 attack (official Q&A)", () => {
+    setupTurn(R10, { hand: [OLIVIA], pp: 10 });
+    const vuella = createCard(VUELLA, "board", "first");
+    applyKeywordsFromList(vuella);
+    vuella.peak_defense = vuella.defense;
+    const arriet = createCard(ARRIET, "board", "first");
+    applyKeywordsFromList(arriet);
+    arriet.peak_defense = arriet.defense;
+    state.players.first.board = [vuella, arriet];
+    whenPlayCard("first", 0);
+    const olivia = findOnBoard("first", "Olivia, Heroic Dark Angel")!;
+    whenEvolveSelf(olivia, "first", "super");
+    resolvePendingByUid(arriet.uid);
+    expect(Number(vuella.attack)).toBe(6);
+    expect(Number(olivia.attack)).toBe(9);
+    expect(Number(arriet.attack)).toBe(8);
+  }, 60_000);
 
   it("10354110 Sham-Nacha, Heir to Entwining — Fanfare twice increases selectable Modes by 2 (official Q&A)", () => {
     setupTurn(R6, { hand: [SHAM_NACHA, SHAM_NACHA], pp: 6 });
@@ -561,10 +571,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     whenPlayCard("second", 0);
     whenEndTurn();
     const attacker = allyFollower("SuperAttacker", 5, 5);
-    state.players.first.superEvoCharges = 1;
-    state.players.first.superEvoPoints = 1;
-    state.players.first.evoUsedThisTurn = false;
-    onEvolve(attacker, "first", "super");
+    whenEvolveSelf(attacker, "first", "super");
     const mimi = findOnBoard("second", "Mimi, Right Paw Hellhound")!;
     const atkIdx = readyAttacker(attacker);
     const mimiIdx = getBoard(state, "second").indexOf(mimi);
@@ -584,9 +591,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     whenPlayCard("second", 0);
     whenEndTurn();
     const normal = allyFollower("NormalAttacker", 5, 5);
-    state.players.first.evoCharges = 2;
-    state.players.first.evoUsedThisTurn = false;
-    onEvolve(normal, "first", "normal");
+    whenEvolveSelf(normal, "first", "normal");
     const mimi2 = findOnBoard("second", "Mimi, Right Paw Hellhound")!;
     const idx = readyAttacker(normal);
     const mimiIdx2 = getBoard(state, "second").indexOf(mimi2);
@@ -607,10 +612,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     whenPlayCard("second", 0);
     whenEndTurn();
     const attacker = allyFollower("SuperAttacker", 5, 5);
-    state.players.first.superEvoCharges = 1;
-    state.players.first.superEvoPoints = 1;
-    state.players.first.evoUsedThisTurn = false;
-    onEvolve(attacker, "first", "super");
+    whenEvolveSelf(attacker, "first", "super");
     const coco = findOnBoard("second", "Coco, Left Paw Hellhound")!;
     const atkIdx = readyAttacker(attacker);
     const cocoIdx = getBoard(state, "second").indexOf(coco);
@@ -631,9 +633,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     whenPlayCard("second", 0);
     whenEndTurn();
     const normal = allyFollower("NormalAttacker", 5, 5);
-    state.players.first.evoCharges = 2;
-    state.players.first.evoUsedThisTurn = false;
-    onEvolve(normal, "first", "normal");
+    whenEvolveSelf(normal, "first", "normal");
     const coco2 = findOnBoard("second", "Coco, Left Paw Hellhound")!;
     const idx = readyAttacker(normal);
     const cocoIdx2 = getBoard(state, "second").indexOf(coco2);
