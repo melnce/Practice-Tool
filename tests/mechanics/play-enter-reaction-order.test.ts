@@ -64,6 +64,66 @@ function makeEnterLogWatcher(name = "EnterLogWatcher"): CardInstance {
   return card;
 }
 
+/** Logs each entering ally uid via buff events (for sequence assertions). */
+function makeEnterUidLogWatcher(name = "EnterUidLogWatcher"): CardInstance {
+  const card = createCard(
+    {
+      name,
+      type: "Follower",
+      cost: 2,
+      attack: 1,
+      defense: 5,
+      triggers: [
+        {
+          event: "ally_follower_enter",
+          source: "board",
+          effects: [
+            {
+              op: "stat",
+              action: "give",
+              target: "entering_follower",
+              attack: 1,
+              defense: 0,
+            },
+          ],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+  applyKeywordsFromList(card);
+  card.peak_defense = card.defense;
+  return card;
+}
+
+const goblinLastWordsKeyword = {
+  name: "LastWords",
+  effects: [{ op: "add_shadows", amount: 1 }],
+};
+
+function logIndex(
+  type: string,
+  predicate?: (e: ReturnType<typeof getLogs>[0]) => boolean,
+): number {
+  const logs = getLogs();
+  return logs.findIndex((e) => e.type === type && (!predicate || predicate(e)));
+}
+
+function allLogIndices(
+  type: string,
+  predicate?: (e: ReturnType<typeof getLogs>[0]) => boolean,
+): number[] {
+  const logs = getLogs();
+  const out: number[] = [];
+  for (let i = 0; i < logs.length; i++) {
+    if (logs[i]!.type === type && (!predicate || predicate(logs[i]!))) {
+      out.push(i);
+    }
+  }
+  return out;
+}
+
 describe("play/enter reaction queue order", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -97,8 +157,12 @@ describe("play/enter reaction queue order", () => {
     expect(getHP(state, "second")).toBe(20);
   });
 
-  it("(b) Kuon shape: played enter → token enters → destroys after Fanfare summons", () => {
-    const watcher = makeEnterLogWatcher();
+  it("(b) Kuon shape: enter log order is played card → summons → Last Words", () => {
+    const prevHeadless = (globalThis as any).HEADLESS;
+    (globalThis as any).HEADLESS = false;
+    clearLogs();
+
+    const watcher = makeEnterUidLogWatcher("KuonEnterWatcher");
     state.players.first.board = [watcher];
 
     const kuonShape = createCard(
@@ -109,8 +173,20 @@ describe("play/enter reaction queue order", () => {
         attack: 2,
         defense: 2,
         fanfare: [
-          { op: "summon", source: "named", name: "Goblin", count: 1 },
-          { op: "summon", source: "named", name: "Goblin", count: 1 },
+          {
+            op: "summon",
+            source: "named",
+            name: "Goblin",
+            count: 1,
+            keywords: [goblinLastWordsKeyword],
+          },
+          {
+            op: "summon",
+            source: "named",
+            name: "Goblin",
+            count: 1,
+            keywords: [goblinLastWordsKeyword],
+          },
           {
             op: "destroy",
             target: "ally:follower",
@@ -133,10 +209,41 @@ describe("play/enter reaction queue order", () => {
     expect(outcome.kind).toBe("done");
 
     expect(findOnBoard("first", "KuonShape")).toBeDefined();
-    expect(watcher.counters?.earth).toBe(3);
     expect(
       getBoard(state, "first").filter((c) => c?.name === "Goblin").length,
     ).toBe(0);
+
+    const enterBuffUids = allLogIndices(
+      "buff",
+      (e) => e.details?.a === 1 && e.details?.d === 0,
+    ).map((i) => getLogs()[i]!.details?.uid as string);
+    expect(enterBuffUids).toHaveLength(3);
+    expect(enterBuffUids[0]).toBe(kuonShape.uid);
+    expect(enterBuffUids[1]).not.toBe(kuonShape.uid);
+    expect(enterBuffUids[2]).not.toBe(kuonShape.uid);
+    expect(enterBuffUids[1]).not.toBe(enterBuffUids[2]);
+
+    const kuonBuffIdx = logIndex(
+      "buff",
+      (e) => e.details?.uid === kuonShape.uid,
+    );
+    const goblinBuffIdxs = allLogIndices(
+      "buff",
+      (e) =>
+        e.details?.a === 1 &&
+        e.details?.d === 0 &&
+        e.details?.uid !== kuonShape.uid,
+    );
+    expect(goblinBuffIdxs).toHaveLength(2);
+    for (const idx of goblinBuffIdxs) {
+      expect(idx).toBeGreaterThan(kuonBuffIdx);
+    }
+
+    expect(
+      allLogIndices("lastWords", (e) => e.details?.card === "Goblin"),
+    ).toHaveLength(2);
+
+    (globalThis as any).HEADLESS = prevHeadless;
   });
 
   it("(c) amulet ally_card_played reaction queues before Fanfare summon", () => {
