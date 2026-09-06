@@ -6331,12 +6331,16 @@
       "status": "covered"
     },
     "10534110": {
+<<<<<<< HEAD
       "fingerprint": "73643c70",
+=======
+      "fingerprint": "94e022c4",
+>>>>>>> c7b6a4c (Re-baseline card behaviour fingerprints for play/enter reaction order)
       "gatesSatisfied": [],
       "name": "Lhynkal, Wandering Fool",
       "scenarios": [
         {
-          "fingerprint": "9d333f54",
+          "fingerprint": "0f60663c",
           "scenario": "play"
         },
         {
@@ -8331,12 +8335,12 @@
       "status": "covered"
     },
     "10724110": {
-      "fingerprint": "6a4ca02f",
+      "fingerprint": "fb2a9448",
       "gatesSatisfied": ["rally"],
       "name": "Gildaria, Anathema of Attunement",
       "scenarios": [
         {
-          "fingerprint": "87411170",
+          "fingerprint": "720a4a00",
           "scenario": "play"
         },
         {
