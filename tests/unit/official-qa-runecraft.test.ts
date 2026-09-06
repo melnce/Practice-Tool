@@ -743,23 +743,19 @@ describe("official Q&A — Runecraft batch 2", () => {
     expect(splitB.X! + splitB.Y! + splitB.Z!).toBe(3);
   }, 60_000);
 
-  it.fails(
-    "90034350 Send 'Em Packing — super-evolved Armes attacks 3 times per turn (official Q&A)",
-    () => {
-      setupTurn(R10, {
-        hand: [ARMS_DEPLETIVE_DEMON, SEND_EM_PACKING],
-        pp: 10,
-        superEvo: 1,
-      });
-      whenPlayCard("first", 0);
-      const armes = findOnBoard("first", "Armes, Depletive Demon")!;
-      handleEvolveSelf(armes, "first", { mode: "super", spendPoint: true });
-      expect(Number(armes.attacks_per_turn ?? 1)).toBe(3);
+  it("90034350 Send 'Em Packing — super-evolved Armes attacks 3 times per turn (official Q&A)", () => {
+    setupTurn(R10, {
+      hand: [ARMS_DEPLETIVE_DEMON, SEND_EM_PACKING],
+      pp: 10,
+      superEvo: 1,
+    });
+    whenPlayCard("first", 0);
+    const armes = findOnBoard("first", "Armes, Depletive Demon")!;
+    handleEvolveSelf(armes, "first", { mode: "super", spendPoint: true });
+    expect(Number(armes.attacks_per_turn ?? 1)).toBe(3);
 
-      whenPlayCard("first", 0);
-      resolvePendingByUid(armes.uid);
-      expect(Number(armes.attacks_per_turn ?? 1)).toBe(3);
-    },
-    60_000,
-  );
+    whenPlayCard("first", 0);
+    resolvePendingByUid(armes.uid);
+    expect(Number(armes.attacks_per_turn ?? 1)).toBe(3);
+  }, 60_000);
 });

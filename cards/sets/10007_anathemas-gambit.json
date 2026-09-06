@@ -176,6 +176,7 @@
             "op": "sequence",
             "key": "babelon",
             "advance": true,
+            "wrap": false,
             "steps": [
               {
                 "effects": [
