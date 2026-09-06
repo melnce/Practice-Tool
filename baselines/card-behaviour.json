@@ -6507,16 +6507,16 @@
       "status": "covered"
     },
     "10563110": {
-      "fingerprint": "9def1ac0",
+      "fingerprint": "71a47740",
       "gatesSatisfied": [],
       "name": "Saint of Rehabilitation",
       "scenarios": [
         {
-          "fingerprint": "f38cc264",
+          "fingerprint": "27a23990",
           "scenario": "play"
         },
         {
-          "fingerprint": "cce769e7",
+          "fingerprint": "a083ecc8",
           "scenario": "evolve"
         }
       ],
@@ -10659,12 +10659,12 @@
       "status": "covered"
     },
     "10963110": {
-      "fingerprint": "ec1aadd0",
+      "fingerprint": "de24dc64",
       "gatesSatisfied": [],
       "name": "Executor of the Vow",
       "scenarios": [
         {
-          "fingerprint": "77bf7930",
+          "fingerprint": "9cd44aac",
           "scenario": "play"
         },
         {

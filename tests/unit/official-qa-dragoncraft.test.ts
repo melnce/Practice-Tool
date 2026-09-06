@@ -86,9 +86,9 @@ function setupTurn(
     roundCount: round,
   }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand);
-  if (opts.deck?.length) b = b.withFirstDeck(opts.deck);
+  if (opts.deck !== undefined) b = b.withFirstDeck(opts.deck);
   if (opts.secondHand?.length) b = b.withSecondHand(opts.secondHand);
-  if (opts.secondDeck?.length) b = b.withSecondDeck(opts.secondDeck);
+  if (opts.secondDeck !== undefined) b = b.withSecondDeck(opts.secondDeck);
   if (opts.hp !== undefined) b = b.withFirstHP(opts.hp);
   if (opts.secondHp !== undefined) b = b.withSecondHP(opts.secondHp);
   if (opts.secondPp !== undefined) b = b.withSecondPP(opts.secondPp, max);
@@ -289,38 +289,34 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     expect(Number(foe2.defense)).toBeLessThan(6);
   }, 60_000);
 
-  it.fails(
-    "10144110 Burnite, Anathema of Flame — crest leader_restored fires on 0 restore (official Q&A)",
-    () => {
-      setupTurn(R6, { active: "second", secondPp: 2 });
-      state.players.second.hp = 20;
-      state.players.second.maxHP = 20;
-      gainCardCrest(BURNITE, "first");
+  it("10144110 Burnite, Anathema of Flame — crest leader_restored fires on 0 restore (official Q&A)", () => {
+    setupTurn(R6, { active: "second", secondPp: 2 });
+    state.players.second.hp = 20;
+    state.players.second.maxHP = 20;
+    gainCardCrest(BURNITE, "first");
 
-      const grace = createCard(DARKHAVEN_GRACE, "board", "second");
-      applyKeywordsFromList(grace);
-      const ally = createCard(
-        {
-          name: "EngageAlly",
-          type: "Follower",
-          cost: 1,
-          attack: 1,
-          defense: 1,
-        },
-        "board",
-        "second",
-      );
-      ally.peak_defense = 1;
-      state.players.second.board = [grace, ally];
-      state.activePlayer = "second";
+    const grace = createCard(DARKHAVEN_GRACE, "board", "second");
+    applyKeywordsFromList(grace);
+    const ally = createCard(
+      {
+        name: "EngageAlly",
+        type: "Follower",
+        cost: 1,
+        attack: 1,
+        defense: 1,
+      },
+      "board",
+      "second",
+    );
+    ally.peak_defense = 1;
+    state.players.second.board = [grace, ally];
+    state.activePlayer = "second";
 
-      engageAmulet("second", 0);
-      resolvePendingByUid(ally.uid);
+    engageAmulet("second", 0);
+    resolvePendingByUid(ally.uid);
 
-      expect(getHP(state, "second")).toBe(19);
-    },
-    60_000,
-  );
+    expect(getHP(state, "second")).toBe(19);
+  }, 60_000);
 
   it("10144110 Burnite, Anathema of Flame — cannot gain duplicate Flame crest (official Q&A)", () => {
     setupTurn(R7);
@@ -651,40 +647,39 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     expect(getEffectiveCost(goliath)).toBe(4);
   }, 60_000);
 
-  it.fails(
-    "90044310 Whitefrost Whisper — deck Goliath redraws at 4 after tax expires (official Q&A)",
-    () => {
-      setupTurn(R7, {
-        hand: [WHITEFROST],
-        pp: 3,
-        secondHand: [RUBY, QUAKE_GOLIATH],
-        secondDeck: [],
-        secondPp: 7,
-      });
-      applyWhitefrostHandTaxToSecond();
-      whenEndTurn();
+  it("90044310 Whitefrost Whisper — deck Goliath redraws at 4 after tax expires (official Q&A)", () => {
+    setupTurn(R7, {
+      hand: [WHITEFROST],
+      pp: 3,
+      secondHand: [RUBY, QUAKE_GOLIATH],
+      secondDeck: [
+        { name: "PadA", type: "Follower", cost: 1, attack: 1, defense: 1 },
+        { name: "PadB", type: "Follower", cost: 1, attack: 1, defense: 1 },
+      ],
+      secondPp: 7,
+    });
+    applyWhitefrostHandTaxToSecond();
+    whenEndTurn();
 
-      const goliath = getHand(state, "second").find(
-        (c) => c.id === QUAKE_GOLIATH,
-      )!;
-      const goliathUid = goliath.uid;
-      const rubyIdx = getHand(state, "second").findIndex((c) => c.id === RUBY);
-      whenPlayCard("second", rubyIdx);
-      resolvePendingByUid(goliathUid);
+    const goliath = getHand(state, "second").find(
+      (c) => c.id === QUAKE_GOLIATH,
+    )!;
+    const goliathUid = goliath.uid;
+    const rubyIdx = getHand(state, "second").findIndex((c) => c.id === RUBY);
+    whenPlayCard("second", rubyIdx);
+    resolvePendingByUid(goliathUid);
 
-      const inDeck = thenDeck("second").find((c) => c.uid === goliathUid)!;
-      expect(inDeck).toBeDefined();
-      expect(getEffectiveCost(inDeck)).toBe(5);
+    const inDeck = thenDeck("second").find((c) => c.uid === goliathUid)!;
+    expect(inDeck).toBeDefined();
+    expect(getEffectiveCost(inDeck)).toBe(5);
 
-      whenEndTurn();
-      expect(getEffectiveCost(inDeck)).toBe(4);
+    whenEndTurn();
+    expect(getEffectiveCost(inDeck)).toBe(4);
 
-      whenEndTurn();
-      whenEndTurn();
-      drawCard(state.players.second.hand, state.players.second.deck, "second");
-      const redrawn = thenHand("second").find((c) => c.uid === goliathUid)!;
-      expect(getEffectiveCost(redrawn)).toBe(4);
-    },
-    60_000,
-  );
+    whenEndTurn();
+    whenEndTurn();
+    drawCard(state.players.second.hand, state.players.second.deck, "second");
+    const redrawn = thenHand("second").find((c) => c.uid === goliathUid)!;
+    expect(getEffectiveCost(redrawn)).toBe(4);
+  }, 60_000);
 });

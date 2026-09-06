@@ -16,7 +16,10 @@ import {
   bumpZoneVersion,
 } from "../../../core/triggers/utils.js";
 import { getEffectiveCost } from "./utils.js";
-import { setPendingTarget } from "../../../core/pendingTarget/index.js";
+import {
+  trySetPendingTarget,
+  reportSelectFizzled,
+} from "../../../core/pendingTarget/index.js";
 import { getHand, getBoard } from "../../../../core/playerHelpers.js";
 
 // =============== Hand Operations ===============
@@ -225,7 +228,15 @@ export function handleSelectHandSummonFollower(
 ): string | void {
   const hand = getHand(state, owner);
   const pool = (hand || []).filter((c) => c?.type === "Follower");
-  if (!pool.length) return;
+  if (!pool.length) {
+    reportSelectFizzled({
+      eff,
+      owner,
+      sourceCard,
+      target: "ally:hand",
+    });
+    return;
+  }
 
   const selectCount = Math.max(
     1,
@@ -242,18 +253,22 @@ export function handleSelectHandSummonFollower(
     return;
   }
 
-  setPendingTarget({
-    eff: { ...eff, op: "select_hand_summon_follower" } as any,
-    owner,
-    sourceCard,
-    resumeEffects: effectsQueue,
-    pool,
-    targets: [],
-    selectCount,
-    requiresConfirmation: false,
-    enforceMinSelectCount: selectCount > 1,
-    enforceMaxSelectCount: true,
-  });
+  if (
+    trySetPendingTarget({
+      eff: { ...eff, op: "select_hand_summon_follower" } as any,
+      owner,
+      sourceCard,
+      resumeEffects: effectsQueue,
+      pool,
+      targets: [],
+      selectCount,
+      requiresConfirmation: false,
+      enforceMinSelectCount: selectCount > 1,
+      enforceMaxSelectCount: true,
+    }) === "fizzled"
+  ) {
+    return;
+  }
 
   highlightSelectable(pool);
   return "pending";
@@ -281,7 +296,15 @@ export function handleSelectHandSummonArtifactCopy(
     return effCost <= maxCost;
   });
 
-  if (!pool.length) return;
+  if (!pool.length) {
+    reportSelectFizzled({
+      eff,
+      owner,
+      sourceCard: null,
+      target: "ally:hand",
+    });
+    return;
+  }
 
   const maxRequired = parseHandArtifactSelectCount(eff, 3);
   const selectCount = pool.length <= maxRequired ? pool.length : maxRequired;
@@ -291,18 +314,22 @@ export function handleSelectHandSummonArtifactCopy(
     return;
   }
 
-  setPendingTarget({
-    eff: { ...eff, op: "select_hand_summon_artifact_copy" } as any, // resolved in resolveTarget.js
-    owner,
-    sourceCard: null,
-    resumeEffects: effectsQueue,
-    pool,
-    targets: [],
-    selectCount,
-    requiresConfirmation: false,
-    enforceMinSelectCount: selectCount > 1,
-    enforceMaxSelectCount: true,
-  });
+  if (
+    trySetPendingTarget({
+      eff: { ...eff, op: "select_hand_summon_artifact_copy" } as any, // resolved in resolveTarget.js
+      owner,
+      sourceCard: null,
+      resumeEffects: effectsQueue,
+      pool,
+      targets: [],
+      selectCount,
+      requiresConfirmation: false,
+      enforceMinSelectCount: selectCount > 1,
+      enforceMaxSelectCount: true,
+    }) === "fizzled"
+  ) {
+    return;
+  }
 
   highlightSelectable(pool);
   return "pending";
@@ -325,23 +352,35 @@ export function handleSelectHandSummonArtifactCopiesEOT(
     return getEffectiveCost(c) <= maxCost;
   });
 
-  if (!pool.length) return;
+  if (!pool.length) {
+    reportSelectFizzled({
+      eff,
+      owner,
+      sourceCard: null,
+      target: "ally:hand",
+    });
+    return;
+  }
 
-  setPendingTarget({
-    eff: {
-      ...eff,
-      op: "select_hand_summon_artifact_copies_eot_destroy",
-    } as any,
-    owner,
-    sourceCard: null,
-    resumeEffects: effectsQueue,
-    pool,
-    targets: [],
-    selectCount: Math.max(
-      1,
-      parseInt((eff.select ?? (eff as any).select_count ?? 2) as any, 10),
-    ),
-  });
+  if (
+    trySetPendingTarget({
+      eff: {
+        ...eff,
+        op: "select_hand_summon_artifact_copies_eot_destroy",
+      } as any,
+      owner,
+      sourceCard: null,
+      resumeEffects: effectsQueue,
+      pool,
+      targets: [],
+      selectCount: Math.max(
+        1,
+        parseInt((eff.select ?? (eff as any).select_count ?? 2) as any, 10),
+      ),
+    }) === "fizzled"
+  ) {
+    return;
+  }
   highlightSelectable(pool);
   return "pending";
 }
