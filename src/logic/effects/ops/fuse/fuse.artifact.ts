@@ -15,6 +15,39 @@ import type { FuseOp } from "./types.js";
 
 import { alreadyFusedThisTurn, handOf } from "./types.js";
 import { moveToBanishZone } from "../banish/primitives.js";
+
+const OMINOUS_BETA = "Ominous Artifact β";
+const OMINOUS_GAMMA = "Ominous Artifact γ";
+
+function ensureFusedArtifacts(initiator: CardInstance) {
+  if (!initiator.fusedArtifacts) {
+    initiator.fusedArtifacts = { beta: false, gamma: false };
+  }
+  return initiator.fusedArtifacts;
+}
+
+function alphaNeedsBeta(initiator: CardInstance): boolean {
+  return !ensureFusedArtifacts(initiator).beta;
+}
+
+function alphaNeedsGamma(initiator: CardInstance): boolean {
+  return !ensureFusedArtifacts(initiator).gamma;
+}
+
+function alphaPartnerPool(
+  hand: CardInstance[],
+  initiator: CardInstance,
+): CardInstance[] {
+  const needsBeta = alphaNeedsBeta(initiator);
+  const needsGamma = alphaNeedsGamma(initiator);
+  return hand.filter(
+    (c) =>
+      c.uid !== initiator.uid &&
+      ((c.name === OMINOUS_BETA && needsBeta) ||
+        (c.name === OMINOUS_GAMMA && needsGamma)),
+  );
+}
+
 // ---------- starters ----------
 export function startGearMultiSelect(owner: Player, initiator: CardInstance) {
   const hand = handOf(owner);
@@ -109,11 +142,7 @@ export function startFortifierFuse(owner: Player, initiator: CardInstance) {
 
 export function startAlphaSelect(owner: Player, initiator: CardInstance) {
   const hand = handOf(owner);
-  const pool = hand.filter(
-    (c) =>
-      c.uid !== initiator.uid &&
-      (c.name === "Ominous Artifact β" || c.name === "Ominous Artifact γ"),
-  );
+  const pool = alphaPartnerPool(hand, initiator);
   if (!pool.length) return;
 
   logEvent("fuseOpen", {
@@ -320,89 +349,65 @@ export function fuse_finalize_alpha(
     return;
   }
 
-  const names = (partners || []).map((p) => p?.name);
-  const hasBeta = names.includes("Ominous Artifact β");
-  const hasGamma = names.includes("Ominous Artifact γ");
-
   const idxOf = (uid: string) => hand.findIndex((c) => c?.uid === uid);
+  const fused = ensureFusedArtifacts(initiator);
 
-  if (hasBeta && hasGamma) {
+  for (const p of partners || []) {
+    if (p?.name === OMINOUS_BETA) fused.beta = true;
+    if (p?.name === OMINOUS_GAMMA) fused.gamma = true;
+  }
+
+  const partnerIdxsDesc = (partners || [])
+    .map((p) => idxOf(p?.uid))
+    .filter((ix) => ix !== -1 && ix !== iIdx)
+    .sort((a, b) => b - a);
+
+  for (const ix of partnerIdxsDesc) {
+    const [used] = hand.splice(ix, 1);
+    if (used) moveToBanishZone(used, owner);
+  }
+
+  const bothFused = fused.beta && fused.gamma;
+  const resultName = bothFused ? "Masterwork Artifact Ω" : "wasted";
+
+  if (bothFused) {
     const tmpl = getCardDetails("Masterwork Artifact Ω");
     if (!tmpl) {
       return;
     }
     const omega = structuredClone(tmpl);
     omega.uid = state.rng.makeUid();
-
     hand[iIdx] = omega;
-
-    const partnerIdxsDesc = (partners || [])
-      .map((p) => idxOf(p?.uid))
-      .filter((ix) => ix !== -1 && ix !== iIdx)
-      .sort((a, b) => b - a);
-
-    for (const ix of partnerIdxsDesc) {
-      const [used] = hand.splice(ix, 1);
-      if (used) moveToBanishZone(used, owner);
-    }
-
-    state.lastFuse = {
-      owner,
-      initiator_name: "Ominous Artifact α",
-      partners_count: partners.length,
-      result_name: "Masterwork Artifact Ω",
-      targets: "merge",
-    };
-  } else if ((partners || []).length === 1) {
-    const partner0 = partners[0];
-    if (!partner0) {
-      return;
-    }
-    const pIdx = idxOf(partner0.uid);
-    if (pIdx !== -1) {
-      const [used] = hand.splice(pIdx, 1);
-      if (used) moveToBanishZone(used, owner);
-    }
-    state.lastFuse = {
-      owner,
-      initiator_name: "Ominous Artifact α",
-      partner_name: partners[0]?.name,
-      result_name: "wasted",
-    };
-
-    logEvent("fuseFinalize", {
-      owner,
-      kind: "artifact_alpha",
-      initiator: "Ominous Artifact α",
-      initiatorUid: initiator?.uid,
-      partners: (partners || []).map((p) => p.name),
-      partnerUids: (partners || []).map((p) => p.uid),
-      result: "wasted",
-    });
   }
+
+  state.lastFuse = {
+    owner,
+    initiator_name: "Ominous Artifact α",
+    partners_count: (partners || []).length,
+    partner_name: partners?.length === 1 ? partners[0]?.name : undefined,
+    result_name: resultName,
+    ...(bothFused ? { targets: "merge" as const } : {}),
+  };
 
   fireTrigger("on_fuse", owner, {
     initiator,
     partners,
-    result: {
-      result_card_name:
-        hasBeta && hasGamma ? "Masterwork Artifact Ω" : "wasted",
-    },
+    result: { result_card_name: resultName },
   });
 
-  if (hand[iIdx]?.name === "Ominous Artifact α") {
-    hand[iIdx].lastFuseRound = state.roundCount;
+  const host = hand[iIdx];
+  if (host?.name === "Ominous Artifact α") {
+    host.lastFuseRound = state.roundCount;
+    host.fusedArtifacts = fused;
   }
 
-  if (hasBeta && hasGamma) {
-    logEvent("fuseFinalize", {
-      owner,
-      kind: "artifact_alpha",
-      initiator: "Ominous Artifact α",
-      initiatorUid: initiator?.uid,
-      partners: (partners || []).map((p) => p.name),
-      partnerUids: (partners || []).map((p) => p.uid),
-      result: "Masterwork Artifact Ω",
-    });
-  }
+  logEvent("fuseFinalize", {
+    owner,
+    kind: "artifact_alpha",
+    initiator: "Ominous Artifact α",
+    initiatorUid: initiator?.uid,
+    partners: (partners || []).map((p) => p.name),
+    partnerUids: (partners || []).map((p) => p.uid),
+    result: resultName,
+  });
 }
