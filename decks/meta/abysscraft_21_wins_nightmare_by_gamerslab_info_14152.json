@@ -1,0 +1,67 @@
+{
+  "class": "Abysscraft",
+  "deckName": "21 Wins Nightmare by @GAMERSLAB_info",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Adahime, Anathema of Death",
+      "count": 3
+    },
+    {
+      "name": "Azvaldt, Penitentiary of Chaos",
+      "count": 2
+    },
+    {
+      "name": "Bibatii, Eld Sight",
+      "count": 2
+    },
+    {
+      "name": "Garodeth vs. Zeth",
+      "count": 3
+    },
+    {
+      "name": "Hark to the Night Song",
+      "count": 3
+    },
+    {
+      "name": "Highwire Feline",
+      "count": 3
+    },
+    {
+      "name": "Istyndet vs. Mitilykket",
+      "count": 3
+    },
+    {
+      "name": "Lilith, Enchanting Succubus",
+      "count": 3
+    },
+    {
+      "name": "Macmillan, Reaper of Ceremonies",
+      "count": 3
+    },
+    {
+      "name": "Netherworld Lieutenant",
+      "count": 3
+    },
+    {
+      "name": "Raz, Demon on the Drums",
+      "count": 3
+    },
+    {
+      "name": "Reaper's Due",
+      "count": 2
+    },
+    {
+      "name": "Suzy, Sincere Hexcaster",
+      "count": 1
+    },
+    {
+      "name": "Void Colonel",
+      "count": 3
+    },
+    {
+      "name": "World of Games",
+      "count": 3
+    }
+  ]
+}

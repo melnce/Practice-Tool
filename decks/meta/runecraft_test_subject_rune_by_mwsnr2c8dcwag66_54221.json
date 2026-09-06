@@ -1,0 +1,63 @@
+{
+  "class": "Runecraft",
+  "deckName": "Test subject Rune by MWSnr2C8DcwAg66",
+  "size": 40,
+  "cards": [
+    {
+      "name": "Alchemic Flare",
+      "count": 3
+    },
+    {
+      "name": "Beloved Masterpiece",
+      "count": 2
+    },
+    {
+      "name": "Ecstatic Scholar",
+      "count": 3
+    },
+    {
+      "name": "Enamored Researcher",
+      "count": 3
+    },
+    {
+      "name": "Humane Love",
+      "count": 3
+    },
+    {
+      "name": "Obsessed Test Subject",
+      "count": 3
+    },
+    {
+      "name": "Obsidian Raven",
+      "count": 3
+    },
+    {
+      "name": "Sephie, Maven Convict",
+      "count": 3
+    },
+    {
+      "name": "Sweet Abomination",
+      "count": 2
+    },
+    {
+      "name": "Tetra & Ladica, Forest BFFs",
+      "count": 3
+    },
+    {
+      "name": "Tico, Mysterian Spellcrafter",
+      "count": 3
+    },
+    {
+      "name": "Wills United",
+      "count": 3
+    },
+    {
+      "name": "Witch's New Brew",
+      "count": 3
+    },
+    {
+      "name": "World of Games",
+      "count": 3
+    }
+  ]
+}
