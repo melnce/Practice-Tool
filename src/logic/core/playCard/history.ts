@@ -27,6 +27,7 @@ export function pushPlayedHistory(owner: Player, card: CardInstance) {
     card.base_cost !== undefined
       ? Number(card.base_cost)
       : parseInt(String(card.cost), 10) || 0;
+  const printedBase = (card as any).originalPrintedBaseCost;
   const entry: PlayedHistoryEntry = {
     id: card?.id,
     uid: card?.uid,
@@ -34,6 +35,9 @@ export function pushPlayedHistory(owner: Player, card: CardInstance) {
     type: card?.type,
     cost: Number(card?.cost) || 0,
     base_cost: baseCost,
+    ...(Number.isFinite(printedBase)
+      ? { printed_base_cost: Number(printedBase) }
+      : {}),
     base_image: card?.base_image || null,
     ts: gameTick,
   };
