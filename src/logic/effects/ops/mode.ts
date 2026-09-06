@@ -490,6 +490,7 @@ export function handleMode(eff: Effect, ctx: EffectCtx) {
     allOptions: initialOptions,
     optionOriginalIndices: available.map((_: unknown, i: number) => i),
     unique,
+    picksAreCommitted: selectCount > 1,
     ...(sourceCard?.uid ? { sourceCardUid: sourceCard.uid } : {}),
     resumeEffects: effectsQueue ? [...effectsQueue] : [],
   });

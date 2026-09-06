@@ -77,6 +77,8 @@ export interface GameState {
         sourceCardUid?: string;
         poolUids?: string[];
         targetUids?: string[];
+        /** Each pick is its own committed action — snapshots preserve targetUids. */
+        picksAreCommitted?: boolean;
         /** Stashed when fanfare pauses mid-play for interactive targeting. */
         resumePlayFollower?: {
           player: Player;

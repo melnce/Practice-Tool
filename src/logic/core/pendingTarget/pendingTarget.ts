@@ -4,7 +4,11 @@
 
 import { state } from "../../../core/gameState.js";
 import type { PendingTargetRequest } from "./types.js";
-import { hasTargetedOpHandler, isTargetedOpRegistryReady } from "./types.js";
+import {
+  hasTargetedOpHandler,
+  isTargetedOpRegistryReady,
+  pendingTargetCommitsEachPick,
+} from "./types.js";
 import { toUids, toUid } from "../../../core/uidResolver.js";
 import { isDev, readEnv } from "../../../core/env.js";
 import { logEvent } from "../../../core/logger.js";
@@ -49,6 +53,10 @@ export function setPendingTarget(
   // Populate sourceCardUid if sourceCard is provided
   if (normalized.sourceCard && !normalized.sourceCardUid) {
     normalized.sourceCardUid = toUid(normalized.sourceCard);
+  }
+
+  if (pendingTargetCommitsEachPick(normalized)) {
+    normalized.picksAreCommitted = true;
   }
 
   const op = String(normalized.eff?.op ?? "");
