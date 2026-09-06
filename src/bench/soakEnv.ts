@@ -187,14 +187,12 @@ export function invalidateStaleModeCallback(): void {
   }
 }
 
-/** Legal CHOOSE_MODE option indices from state.pendingModeChoice (mode.ts pickOnce semantics). */
+/** Legal CHOOSE_MODE indices: 0..optionCount-1 into the current pending.options round pool. */
 export function legalModeChoiceIndices(pending: PendingModeChoice): number[] {
   const partial = pending.partialPickedIndices ?? [];
   if (partial.length >= pending.selectCount) return [];
-  const unique = pending.unique !== false;
   const indices: number[] = [];
-  for (let i = 0; i < pending.options.length; i++) {
-    if (unique && partial.includes(i)) continue;
+  for (let i = 0; i < pending.optionCount; i++) {
     indices.push(i);
   }
   return indices;
