@@ -1,6 +1,7 @@
 /**
  * Pinned dispatch-parity findings from --parity soak runs.
  * Engine (src/engine.ts dispatch) is the UI reference path; core (dispatchAction) must match.
+ * Full-game parity replays need >5s under CI load; per-test timeout avoids vitest's default 5000ms.
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { resolve } from "path";
