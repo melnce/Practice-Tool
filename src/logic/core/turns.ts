@@ -16,6 +16,7 @@ import { dealDamage } from "./barrier.js";
 import { applyLeaderDamage } from "../effects/leader.js";
 import { logEvent } from "../../core/logger.js";
 import { beginAction, commitAction, abortAction } from "../../core/history.js";
+import { restoreTempCostMods } from "../effects/ops/cost/model.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
 import {
   isFirstPlayer,
@@ -93,27 +94,17 @@ function clearExpiredLeaderEffects(endedPlayer: Player) {
   }
 }
 
+function clearTempCostModsOnCard(card: CardInstance) {
+  restoreTempCostMods([card]);
+}
+
 function clearTempHandCostMods(endedPlayer: Player) {
-  const hand = getHand(state, endedPlayer);
-  for (const card of hand) {
-    // Temporary cost *set* (e.g. Mari until-EOT → 0): restore from base_cost.
-    if ((card as any).temp_cost_set_until_eot) {
-      if (card.base_cost !== undefined) {
-        card.cost = card.base_cost;
-      }
-      delete (card as any).temp_cost_set_until_eot;
-    }
-    if ((card as any).temp_cost_reduce_until_eot) {
-      if (card.base_cost !== undefined) {
-        card.cost = card.base_cost;
-      }
-      delete (card as any).temp_cost_reduce_until_eot;
-    }
-    const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
-    if (delta !== 0) {
-      (card as any).cost_mod = (parseInt((card as any).cost_mod) || 0) - delta;
-      delete (card as any).temp_cost_mod_until_eot;
-    }
+  // Until-EOT cost changes expire in hand and deck (graveyard out of scope).
+  for (const card of getHand(state, endedPlayer)) {
+    clearTempCostModsOnCard(card);
+  }
+  for (const card of getDeck(state, endedPlayer)) {
+    clearTempCostModsOnCard(card);
   }
 }
 
