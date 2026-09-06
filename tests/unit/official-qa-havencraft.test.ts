@@ -409,10 +409,10 @@ describe("Official Q&A — Havencraft batch 5", () => {
     expect(sarissa.hasBarrier || sarissa.keywordState?.hasBarrier).toBeFalsy();
   }, 60_000);
 
-  it.fails(
+  it(
     "10162210 Darkhaven Grace — Engage with no allies still restores 1 leader defense (official Q&A)",
     () => {
-      setupTurn(R6, { hand: [DARKHAVEN_GRACE], pp: 2, hp: 18 });
+      setupTurn(R6, { hand: [DARKHAVEN_GRACE], pp: 3, hp: 18 });
       whenPlayCard("first", 0);
       engageFirstAmulet("Darkhaven Grace");
       expect(getHP(state, "first")).toBe(19);
