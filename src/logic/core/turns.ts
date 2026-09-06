@@ -94,27 +94,34 @@ function clearExpiredLeaderEffects(endedPlayer: Player) {
   }
 }
 
+function clearTempCostModsOnCard(card: CardInstance) {
+  // Temporary cost *set* (e.g. Mari until-EOT → 0): restore from base_cost.
+  if ((card as any).temp_cost_set_until_eot) {
+    if (card.base_cost !== undefined) {
+      card.cost = card.base_cost;
+    }
+    delete (card as any).temp_cost_set_until_eot;
+  }
+  if ((card as any).temp_cost_reduce_until_eot) {
+    if (card.base_cost !== undefined) {
+      card.cost = card.base_cost;
+    }
+    delete (card as any).temp_cost_reduce_until_eot;
+  }
+  const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
+  if (delta !== 0) {
+    (card as any).cost_mod = (parseInt((card as any).cost_mod) || 0) - delta;
+    delete (card as any).temp_cost_mod_until_eot;
+  }
+}
+
 function clearTempHandCostMods(endedPlayer: Player) {
-  const hand = getHand(state, endedPlayer);
-  for (const card of hand) {
-    // Temporary cost *set* (e.g. Mari until-EOT → 0): restore from base_cost.
-    if ((card as any).temp_cost_set_until_eot) {
-      if (card.base_cost !== undefined) {
-        card.cost = card.base_cost;
-      }
-      delete (card as any).temp_cost_set_until_eot;
-    }
-    if ((card as any).temp_cost_reduce_until_eot) {
-      if (card.base_cost !== undefined) {
-        card.cost = card.base_cost;
-      }
-      delete (card as any).temp_cost_reduce_until_eot;
-    }
-    const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
-    if (delta !== 0) {
-      (card as any).cost_mod = (parseInt((card as any).cost_mod) || 0) - delta;
-      delete (card as any).temp_cost_mod_until_eot;
-    }
+  // Until-EOT hand taxes also expire on cards returned to deck (graveyard irrelevant).
+  for (const card of getHand(state, endedPlayer)) {
+    clearTempCostModsOnCard(card);
+  }
+  for (const card of getDeck(state, endedPlayer)) {
+    clearTempCostModsOnCard(card);
   }
 }
 
