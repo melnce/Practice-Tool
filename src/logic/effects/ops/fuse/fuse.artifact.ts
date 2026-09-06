@@ -156,15 +156,11 @@ export function fuse_finalize_gear_multi(
   const hand = handOf(owner);
   const iIdx = hand.findIndex((c) => c?.uid === initiatorUid);
   if (iIdx === -1) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
   const initiator = hand[iIdx];
   if (!initiator) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -174,15 +170,11 @@ export function fuse_finalize_gear_multi(
       reason: "already_fused_this_turn",
       initiator: initiator?.name,
     });
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
   const tmpl = getCardDetails(resultName);
   if (!tmpl) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -222,9 +214,6 @@ export function fuse_finalize_gear_multi(
     partnerUids: (partners || []).map((p) => p.uid),
     result: resultName,
   });
-
-  clearSelectableFlags();
-  // Render removed - UI layer
 }
 
 export function fuse_finalize_fortifier(
@@ -235,15 +224,11 @@ export function fuse_finalize_fortifier(
   const hand = handOf(owner);
   const iIdx = hand.findIndex((c) => c?.uid === initiatorUid);
   if (iIdx === -1) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
   const initiator = hand[iIdx];
   if (!initiator) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -253,8 +238,6 @@ export function fuse_finalize_fortifier(
       reason: "already_fused_this_turn",
       initiator: initiator?.name,
     });
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -274,8 +257,6 @@ export function fuse_finalize_fortifier(
 
   const tmpl = getCardDetails(resultName);
   if (!tmpl) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -312,9 +293,6 @@ export function fuse_finalize_fortifier(
     partnerUids: (partners || []).map((p) => p.uid),
     result: resultName,
   });
-
-  clearSelectableFlags();
-  // Render removed - UI layer
 }
 
 export function fuse_finalize_alpha(
@@ -325,15 +303,11 @@ export function fuse_finalize_alpha(
   const hand = handOf(owner);
   const iIdx = hand.findIndex((c) => c?.uid === initiatorUid);
   if (iIdx === -1) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
   const initiator = hand[iIdx];
   if (!initiator) {
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -343,8 +317,6 @@ export function fuse_finalize_alpha(
       reason: "already_fused_this_turn",
       initiator: initiator?.name,
     });
-    clearSelectableFlags();
-    // Render removed - UI layer
     return;
   }
 
@@ -357,8 +329,6 @@ export function fuse_finalize_alpha(
   if (hasBeta && hasGamma) {
     const tmpl = getCardDetails("Masterwork Artifact Ω");
     if (!tmpl) {
-      clearSelectableFlags();
-      // Render removed - UI layer
       return;
     }
     const omega = structuredClone(tmpl);
@@ -386,8 +356,6 @@ export function fuse_finalize_alpha(
   } else if ((partners || []).length === 1) {
     const partner0 = partners[0];
     if (!partner0) {
-      clearSelectableFlags();
-      // Render removed - UI layer
       return;
     }
     const pIdx = idxOf(partner0.uid);
@@ -437,7 +405,4 @@ export function fuse_finalize_alpha(
       result: "Masterwork Artifact Ω",
     });
   }
-
-  clearSelectableFlags();
-  // Render removed - UI layer
 }

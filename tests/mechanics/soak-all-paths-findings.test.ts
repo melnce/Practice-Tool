@@ -46,19 +46,16 @@ beforeAll(async () => {
 });
 
 describe("soak --all-paths findings", () => {
-  it.fails(
-    "crash: clearSelectableFlags lifecycle guard — fuse_finalize_gear_multi (guardLifecycle)",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260910,
-        gameIndex: 113,
-        turnCap: 60,
-        actionCap: 800,
-        ...ALL_PATHS,
-      });
-      expect(result.outcome).toBe("completed");
-    },
-  );
+  it("crash: clearSelectableFlags lifecycle guard — fuse_finalize_gear_multi (guardLifecycle)", async () => {
+    const result = await runSoakGame({
+      seed: 20260910,
+      gameIndex: 113,
+      turnCap: 60,
+      actionCap: 800,
+      ...ALL_PATHS,
+    });
+    expect(result.outcome).toBe("completed");
+  });
 
   it.fails(
     "history legal-undo: [0].indices CHOOSE_MODE vs END_TURN after mode spell undo",
