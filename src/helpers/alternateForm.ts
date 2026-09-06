@@ -102,6 +102,25 @@ export function alternateFormLabel(form: AlternateForm | null): string | null {
 }
 
 /**
+ * Rewrite instance cost/base_cost to the alternate form's fixed N.
+ * Preserves printed values on originalPrintedCost / originalPrintedBaseCost.
+ */
+export function applyAlternateFormBaseCost(
+  card: CardInstance,
+  alternateCost: number,
+): void {
+  const printedCost = parseInt(String(card.cost), 10) || 0;
+  const printedBase =
+    card.base_cost !== undefined
+      ? parseInt(String(card.base_cost), 10) || printedCost
+      : printedCost;
+  (card as any).originalPrintedCost = printedCost;
+  (card as any).originalPrintedBaseCost = printedBase;
+  card.cost = alternateCost;
+  card.base_cost = alternateCost;
+}
+
+/**
  * Transform a follower into its Crystallize amulet form.
  * Follower Fanfare / keywords do not apply; amuletKeywords take over.
  */
@@ -111,6 +130,7 @@ export function applyCrystallizeTransform(
 ): void {
   (card as any).playedAs = "crystallize";
   (card as any).originalPrintedType = card.type;
+  applyAlternateFormBaseCost(card, form.cost);
   card.type = "Amulet";
   card.attack = 0;
   card.defense = 0;
