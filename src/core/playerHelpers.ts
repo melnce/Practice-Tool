@@ -307,6 +307,20 @@ export function getCrests(
   return state.players[player].crests;
 }
 
+/** Number of crests excluding Faith (owner ruling 2026-09-06). Slot cap still uses full list length. */
+export function countCrests(state: GameState, player: PlayerSlot): number {
+  const crests = getCrests(state, player) || [];
+  return crests.filter((c) => !isFaithCrest(c)).length;
+}
+
+function isFaithCrest(
+  crest: import("../logic/effects/crest.js").Crest,
+): boolean {
+  if (crest.isFaith) return true;
+  // Defensive fallback for older saved states without isFaith.
+  return String(crest.name).startsWith("Faith: ");
+}
+
 export function setCrests(
   state: GameState,
   player: PlayerSlot,

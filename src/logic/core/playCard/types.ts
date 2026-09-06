@@ -10,6 +10,8 @@ export interface PlayedHistoryEntry {
   type: string;
   cost: number;
   base_cost?: number;
+  /** Debug only — printed base cost before alternate-form rewrite; not for rules. */
+  printed_base_cost?: number;
   base_image?: string | null;
   ts: number;
 }
