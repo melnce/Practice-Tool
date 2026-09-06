@@ -1,5 +1,6 @@
 /**
  * Mode pick history: each CHOOSE_MODE commits; Earth Rite payment inside Confirm Choice.
+ * Full-game soak replays need >5s under load; per-test timeout avoids vitest's default 5000ms.
  */
 import { describe, it, expect, beforeEach, beforeAll } from "vitest";
 import { readFileSync } from "fs";
@@ -353,6 +354,6 @@ describe("soak history_allpaths fixture pins", () => {
         interactiveModes: true,
       });
       expect(result.outcome).toBe("completed");
-    });
+    }, 60_000);
   }
 });
