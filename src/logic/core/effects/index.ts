@@ -258,12 +258,11 @@ export function runEffects(
         (state as any).deferDeathTriggers = false;
       }
     }
-    // Drain reactive queue at end of top-level runEffects only outside combat.
-    // During combat, attack cores drain at step boundaries instead.
+    // Countdown-zero / dead cards leave the board during play sequences; only
+    // queue drain is deferred (mirrors combat: cleanupDead at steps, drain at boundaries).
     if (
       runDepth === 0 &&
       combatDepth === 0 &&
-      playDepth === 0 &&
       !paused &&
       !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
@@ -271,8 +270,10 @@ export function runEffects(
       !(state as any).sotBoundaryDeferDrain
     ) {
       cleanupCountdownZeroAmulets();
-      flushDeferredDeathBatch();
-      clearResolutionQueue();
+      if (playDepth === 0) {
+        flushDeferredDeathBatch();
+        clearResolutionQueue();
+      }
     }
     if (wasTopLevelRunEffects) {
       invalidateZoneCandidatesCache();
