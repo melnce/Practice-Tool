@@ -114,6 +114,7 @@ import {
   toggleMulliganPickCore,
   confirmMulliganCore,
 } from "./logic/core/mulliganCore.js";
+import { fuseFromHand } from "./logic/core/fuseFromHand.js";
 import { setScriptedModePickProvider } from "./logic/script/modeHook.js";
 
 /**
@@ -270,6 +271,14 @@ function _dispatchInternal(
     case "CONFIRM_MULLIGAN":
       confirmMulliganCore(action.player);
       break;
+    case "FUSE": {
+      if (action.player !== currentState.activePlayer) {
+        console.warn("[Engine] FUSE: not active player's turn");
+        break;
+      }
+      fuseFromHand(action.player, action.cardUid, { autoRender: true });
+      break;
+    }
     default:
       // Comprehensive check for unknown actions (or union members not handled)
       console.warn("Unknown action dispatched:", action as any);

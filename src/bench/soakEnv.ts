@@ -41,6 +41,7 @@ import { canPlayCard } from "../logic/core/playCard/preflight.js";
 import { getEffectiveCost } from "../logic/core/playCard/cost.js";
 import { canEvolve } from "../logic/evolveUtils.js";
 import { canToggleSecondPlayerBonusPp } from "../core/bonusPp.js";
+import { canFuse } from "../logic/core/fuseFromHand.js";
 import {
   getBoard,
   getHand,
@@ -105,6 +106,8 @@ export type SoakGameResult = {
   }>;
   /** Per-action history commit counts (actions with commits ≥ 1 only). */
   commitSequence?: Array<{ actionType: string; commits: number }>;
+  /** Count of each soak action type applied this game. */
+  actionTypeCounts?: Record<string, number>;
   trace: SoakAction[];
 };
 
@@ -144,8 +147,44 @@ type ConfirmHook = (() => void) | null;
 
 let confirmHook: ConfirmHook = null;
 
-export function installSoakAdapter(): void {
+export type PendingSoakModeChoice = {
+  owner: Player;
+  optionCount: number;
+  pickCallback: (index: number) => void;
+};
+
+let pendingModeChoice: PendingSoakModeChoice | null = null;
+
+/** Per-run soak options (set by runSoakGame; default off matches main soak). */
+let activeSoakRunOptions: { fuse: boolean; interactiveModes: boolean } = {
+  fuse: false,
+  interactiveModes: false,
+};
+
+export function getPendingSoakModeChoice(): PendingSoakModeChoice | null {
+  return pendingModeChoice;
+}
+
+export function clearPendingSoakModeChoice(): void {
+  pendingModeChoice = null;
+}
+
+export function installSoakAdapter(opts?: {
+  interactiveModes?: boolean;
+}): void {
+  const interactiveModes = opts?.interactiveModes ?? false;
   injectAdapter({
+    ...(interactiveModes
+      ? {
+          showChoiceModal: (roundPool, cb) => {
+            pendingModeChoice = {
+              owner: state.activePlayer,
+              optionCount: roundPool.length,
+              pickCallback: cb,
+            };
+          },
+        }
+      : {}),
     showTargetConfirmationButton: (vm: {
       onConfirm: () => void;
       count?: number;
@@ -262,6 +301,15 @@ export function getLegalSoakActions(): SoakAction[] {
         }
       }
       actions.push({ type: "CONFIRM_MULLIGAN", player });
+    }
+    return actions;
+  }
+
+  // Mode choice modal: only CHOOSE_MODE until resolved
+  if (pendingModeChoice) {
+    const { owner, optionCount } = pendingModeChoice;
+    for (let i = 0; i < optionCount; i++) {
+      actions.push({ type: "CHOOSE_MODE", player: owner, indices: [i] });
     }
     return actions;
   }
@@ -413,6 +461,15 @@ export function getLegalSoakActions(): SoakAction[] {
     actions.push({ type: "BONUS_PP", player: "second" });
   }
 
+  // Fuse (opt-in soak path)
+  if (activeSoakRunOptions.fuse) {
+    for (const card of hand) {
+      if (card && canFuse(player, card.uid)) {
+        actions.push({ type: "FUSE", player, cardUid: card.uid });
+      }
+    }
+  }
+
   // End turn always legal in main phase
   actions.push({ type: "END_TURN" });
 
@@ -441,6 +498,10 @@ function stableKey(action: SoakAction): string {
       return `MULL_T_${action.cardUid}`;
     case "CONFIRM_MULLIGAN":
       return `MULL_C_${action.player}`;
+    case "CHOOSE_MODE":
+      return `MODE_${action.indices.join("_")}`;
+    case "FUSE":
+      return `FUSE_${action.cardUid}`;
     case "END_TURN":
       return `END`;
     default:
@@ -1362,6 +1423,14 @@ function applySoakAction(
     forceCompleteOrFizzlePendingTarget();
     return;
   }
+  if (action.type === "CHOOSE_MODE" && pendingModeChoice) {
+    const pick = pendingModeChoice;
+    pendingModeChoice = null;
+    for (const idx of action.indices) {
+      pick.pickCallback(idx);
+    }
+    return;
+  }
   dispatchSoakPlayerAction(action as PlayerAction, dispatchPath);
 }
 
@@ -1388,6 +1457,10 @@ export type RunSoakGameOptions = {
   /** Override deck pairing (skips deckSpecForSeed when both are set). */
   deckAId?: string;
   deckBId?: string;
+  /** When true, list/dispatch FUSE actions (default false — matches main soak). */
+  fuse?: boolean;
+  /** When true, resolve mode prompts via modal/CHOOSE_MODE (default false). */
+  interactiveModes?: boolean;
 };
 
 /**
@@ -1396,8 +1469,13 @@ export type RunSoakGameOptions = {
 export async function runSoakGame(
   opts: RunSoakGameOptions,
 ): Promise<SoakGameResult> {
-  installSoakAdapter();
+  const fuse = opts.fuse ?? false;
+  const interactiveModes = opts.interactiveModes ?? false;
+  activeSoakRunOptions = { fuse, interactiveModes };
+  (globalThis as any).__SVWB_INTERACTIVE_MODES__ = interactiveModes;
+  installSoakAdapter({ interactiveModes });
   confirmHook = null;
+  pendingModeChoice = null;
 
   if (opts.historyCheck || opts.positionCheck) {
     setNodeEnv("DISABLE_HISTORY", undefined);
@@ -1460,6 +1538,7 @@ export async function runSoakGame(
   const nonUndoableActionTypes = new Set<string>();
   const playBlockedLog: SoakGameResult["playBlockedLog"] = [];
   const zeroCommitLog: NonNullable<SoakGameResult["zeroCommitLog"]> = [];
+  const actionTypeCounts: Record<string, number> = {};
   const dispatchPath = opts.dispatch ?? DEFAULT_SOAK_DISPATCH;
   const historyReExecute = opts.historyReExecute ?? false;
   const positionCheck = opts.positionCheck ?? false;
@@ -1545,6 +1624,7 @@ export async function runSoakGame(
         });
       }
       actions++;
+      actionTypeCounts[action.type] = (actionTypeCounts[action.type] ?? 0) + 1;
 
       if (needsCommitTelemetry && beforeSnap) {
         if (historyCommits === 0) {
@@ -1738,6 +1818,8 @@ export async function runSoakGame(
     };
   } finally {
     unsubHistoryReset?.();
+    activeSoakRunOptions = { fuse: false, interactiveModes: false };
+    (globalThis as any).__SVWB_INTERACTIVE_MODES__ = false;
   }
 
   const completed: SoakGameResult = {
@@ -1750,6 +1832,7 @@ export async function runSoakGame(
     playBlockedLog,
     zeroCommitLog,
     commitSequence,
+    actionTypeCounts,
     ...(positionCheck ? { positionChecks } : {}),
   };
   const unexpected = findUnexpectedNonUndoableActionTypes(
@@ -1776,10 +1859,19 @@ export async function replaySoakTrace(
   seed: number,
   gameIndex: number,
   trace: SoakAction[],
-  opts?: { dispatch?: SoakDispatchPath },
+  opts?: {
+    dispatch?: SoakDispatchPath;
+    fuse?: boolean;
+    interactiveModes?: boolean;
+  },
 ): Promise<{ hash: string; error?: string }> {
-  installSoakAdapter();
+  const fuse = opts?.fuse ?? false;
+  const interactiveModes = opts?.interactiveModes ?? false;
+  activeSoakRunOptions = { fuse, interactiveModes };
+  (globalThis as any).__SVWB_INTERACTIVE_MODES__ = interactiveModes;
+  installSoakAdapter({ interactiveModes });
   confirmHook = null;
+  pendingModeChoice = null;
   const dispatchPath = opts?.dispatch ?? DEFAULT_SOAK_DISPATCH;
   const deckSpec = deckSpecForSeed(seed, gameIndex);
   try {
@@ -1797,6 +1889,9 @@ export async function replaySoakTrace(
       hash: "",
       error: e instanceof Error ? e.message : String(e),
     };
+  } finally {
+    activeSoakRunOptions = { fuse: false, interactiveModes: false };
+    (globalThis as any).__SVWB_INTERACTIVE_MODES__ = false;
   }
 }
 

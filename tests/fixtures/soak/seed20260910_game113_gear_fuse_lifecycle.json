@@ -1,0 +1,832 @@
+{
+  "seed": 20260910,
+  "gameIndex": 113,
+  "deckAId": "soak_rand_a_20260910_113",
+  "deckBId": "soak_rand_b_20260910_113",
+  "deckARaw": {
+    "class": "Portalcraft",
+    "deckName": "Soak Random A (Portalcraft) #113",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10671310",
+        "name": "Advent of the Eld Axe",
+        "count": 1
+      },
+      {
+        "id": "10803110",
+        "name": "Aika, Elegy of Loss",
+        "count": 1
+      },
+      {
+        "id": "10271210",
+        "name": "Artifact Catapult",
+        "count": 1
+      },
+      {
+        "id": "10874110",
+        "name": "Asher & Lydia, Paths Beyond",
+        "count": 1
+      },
+      {
+        "id": "10772120",
+        "name": "Audacious Artist",
+        "count": 1
+      },
+      {
+        "id": "10373110",
+        "name": "Congregant of Destruction",
+        "count": 1
+      },
+      {
+        "id": "10201310",
+        "name": "Dark Side",
+        "count": 1
+      },
+      {
+        "id": "10072110",
+        "name": "Electric Whip Lass",
+        "count": 1
+      },
+      {
+        "id": "10472110",
+        "name": "Eustace, Howl of Thunder",
+        "count": 1
+      },
+      {
+        "id": "10771310",
+        "name": "Freerunning",
+        "count": 2
+      },
+      {
+        "id": "10101310",
+        "name": "Goblin Foray",
+        "count": 1
+      },
+      {
+        "id": "10403110",
+        "name": "Gran & Djeeta, Valiant Skyfarers",
+        "count": 2
+      },
+      {
+        "id": "10972110",
+        "name": "Ironwork Bodyguard",
+        "count": 1
+      },
+      {
+        "id": "10173130",
+        "name": "Liam, Crazed Creator",
+        "count": 1
+      },
+      {
+        "id": "10474110",
+        "name": "Lu Woh, Light Personified",
+        "count": 1
+      },
+      {
+        "id": "10673110",
+        "name": "Ludicrous Ordnance",
+        "count": 1
+      },
+      {
+        "id": "10774120",
+        "name": "Myuu, Hot on His Heels",
+        "count": 1
+      },
+      {
+        "id": "10573110",
+        "name": "Neuron Disrupter",
+        "count": 2
+      },
+      {
+        "id": "10172130",
+        "name": "Noah, Thread of Death",
+        "count": 1
+      },
+      {
+        "id": "10103110",
+        "name": "Phildau, Lionheart Ward",
+        "count": 1
+      },
+      {
+        "id": "10271120",
+        "name": "Puppet Cat",
+        "count": 1
+      },
+      {
+        "id": "10174130",
+        "name": "Ralmia, Sonic Boom",
+        "count": 1
+      },
+      {
+        "id": "10203110",
+        "name": "Reina, Angelic Partner",
+        "count": 1
+      },
+      {
+        "id": "10172110",
+        "name": "Rukina, Resistance Leader",
+        "count": 1
+      },
+      {
+        "id": "10104120",
+        "name": "Ruler of Cocytus",
+        "count": 1
+      },
+      {
+        "id": "10404110",
+        "name": "Sandalphon, Primarch Successor",
+        "count": 1
+      },
+      {
+        "id": "10774110",
+        "name": "Scarlet, Anathema of Dislocation",
+        "count": 1
+      },
+      {
+        "id": "10471110",
+        "name": "Sho, Reborn Night King",
+        "count": 1
+      },
+      {
+        "id": "10574110",
+        "name": "Slaus, Revolving Wheel of Fortune",
+        "count": 1
+      },
+      {
+        "id": "10973310",
+        "name": "Soulforge",
+        "count": 1
+      },
+      {
+        "id": "10372110",
+        "name": "Supplicant of Destruction",
+        "count": 1
+      },
+      {
+        "id": "10672120",
+        "name": "Timid Pioneer",
+        "count": 1
+      },
+      {
+        "id": "10773310",
+        "name": "Warp Slash",
+        "count": 1
+      },
+      {
+        "id": "10803310",
+        "name": "Wills United",
+        "count": 2
+      },
+      {
+        "id": "10904110",
+        "name": "Zerael, Sundered Rebirth",
+        "count": 1
+      },
+      {
+        "id": "10871130",
+        "name": "Zerk, Artifact Manipulator",
+        "count": 1
+      }
+    ]
+  },
+  "deckBRaw": {
+    "class": "Portalcraft",
+    "deckName": "Soak Random B (Portalcraft) #113",
+    "size": 40,
+    "ordered": false,
+    "cards": [
+      {
+        "id": "10272120",
+        "name": "Achim, Lord of Despair",
+        "count": 1
+      },
+      {
+        "id": "10671310",
+        "name": "Advent of the Eld Axe",
+        "count": 1
+      },
+      {
+        "id": "10803110",
+        "name": "Aika, Elegy of Loss",
+        "count": 1
+      },
+      {
+        "id": "10804110",
+        "name": "Alabaster Bahamut",
+        "count": 1
+      },
+      {
+        "id": "10802110",
+        "name": "Alfied, Squire of Joy",
+        "count": 1
+      },
+      {
+        "id": "10701110",
+        "name": "Altaro Superfan",
+        "count": 1
+      },
+      {
+        "id": "10173210",
+        "name": "Ancient Cannon",
+        "count": 1
+      },
+      {
+        "id": "10301110",
+        "name": "Apostle of Voracity",
+        "count": 1
+      },
+      {
+        "id": "10271210",
+        "name": "Artifact Catapult",
+        "count": 1
+      },
+      {
+        "id": "10374110",
+        "name": "Axia, Heir to Destruction",
+        "count": 1
+      },
+      {
+        "id": "10902110",
+        "name": "Blade Angel",
+        "count": 2
+      },
+      {
+        "id": "10972120",
+        "name": "Blade Puppeteer",
+        "count": 1
+      },
+      {
+        "id": "10071310",
+        "name": "Bullet from Beyond",
+        "count": 1
+      },
+      {
+        "id": "10473310",
+        "name": "Chaos Legion",
+        "count": 2
+      },
+      {
+        "id": "10373110",
+        "name": "Congregant of Destruction",
+        "count": 1
+      },
+      {
+        "id": "10974110",
+        "name": "Cutthroat, Fluxblade Convict",
+        "count": 1
+      },
+      {
+        "id": "10373310",
+        "name": "Devastating Soprano",
+        "count": 1
+      },
+      {
+        "id": "10371110",
+        "name": "Devotee of Destruction",
+        "count": 1
+      },
+      {
+        "id": "10972310",
+        "name": "Disgraceful Banishment",
+        "count": 1
+      },
+      {
+        "id": "10174110",
+        "name": "Eudie, Maiden Reborn",
+        "count": 2
+      },
+      {
+        "id": "10403110",
+        "name": "Gran & Djeeta, Valiant Skyfarers",
+        "count": 1
+      },
+      {
+        "id": "10204120",
+        "name": "Grimnir, Heavenly Gale",
+        "count": 2
+      },
+      {
+        "id": "10901310",
+        "name": "Initiation of Rebirth",
+        "count": 1
+      },
+      {
+        "id": "10171130",
+        "name": "Ironheart Hunter",
+        "count": 1
+      },
+      {
+        "id": "10901110",
+        "name": "Jailor of Antiquity",
+        "count": 2
+      },
+      {
+        "id": "10871120",
+        "name": "Leona, Overbearing Guardian",
+        "count": 1
+      },
+      {
+        "id": "10672310",
+        "name": "Myriad Designs",
+        "count": 1
+      },
+      {
+        "id": "10174120",
+        "name": "Orchis, Newfound Heart",
+        "count": 1
+      },
+      {
+        "id": "10071120",
+        "name": "Puppet Lancer",
+        "count": 1
+      },
+      {
+        "id": "10072210",
+        "name": "Puppet Theater",
+        "count": 1
+      },
+      {
+        "id": "10574110",
+        "name": "Slaus, Revolving Wheel of Fortune",
+        "count": 1
+      },
+      {
+        "id": "10872310",
+        "name": "Unsullied Days",
+        "count": 1
+      },
+      {
+        "id": "10674120",
+        "name": "Yog-Zentha, Eld Axe",
+        "count": 1
+      },
+      {
+        "id": "10904110",
+        "name": "Zerael, Sundered Rebirth",
+        "count": 1
+      },
+      {
+        "id": "10871130",
+        "name": "Zerk, Artifact Manipulator",
+        "count": 1
+      }
+    ]
+  },
+  "outcome": "crash",
+  "error": "Error: Targeted op handler illegally invoked lifecycle function: clearSelectableFlags\n    at guardLifecycle (/workspace/src/logic/core/targeting/guards.ts:68:11)\n    at clearSelectableFlags (/workspace/src/logic/core/targeting.ts:58:3)\n    at fuse_finalize_gear_multi (/workspace/src/logic/effects/ops/fuse/fuse.artifact.ts:226:3)\n    at handleFuse (/workspace/src/logic/effects/ops/fuse/unified.ts:96:9)\n    at <anonymous> (/workspace/src/logic/effects/ops/targeted/index.ts:594:3)\n    at dispatchTargetedOp (/workspace/src/logic/effects/ops/targeted/index.ts:101:12)\n    at orchestrateExecution (/workspace/src/logic/core/resolveTarget.ts:93:14)\n    at doAction.op (/workspace/src/logic/core/resolveTarget.ts:287:9)\n    at doAction (/workspace/src/core/history.ts:484:5)\n    at Object.onConfirm (/workspace/src/logic/core/resolveTarget.ts:260:5)",
+  "actions": 84,
+  "trace": [
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_12"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "first",
+      "cardUid": "uid_11"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_25"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_26"
+      }
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_r"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_13"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_13",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_24"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_g"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_24"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_13",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_27"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_27",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_27",
+      "defender": {
+        "type": "card",
+        "uid": "uid_13"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_h"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_27"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_28"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_28",
+      "mode": "normal"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1n"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_b"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_b",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_b",
+      "defender": {
+        "type": "card",
+        "uid": "uid_1n"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_x"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_x",
+      "defender": {
+        "type": "card",
+        "uid": "uid_28"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_23"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_18"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_28"
+      }
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_23",
+      "mode": "super"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_23",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_9"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_6"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_9",
+      "mode": "normal"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_23"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_22"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "second",
+      "target": {
+        "type": "card",
+        "uid": "uid_6"
+      }
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_22",
+      "mode": "super"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_9",
+      "defender": {
+        "type": "card",
+        "uid": "uid_22"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_p"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_p",
+      "mode": "super"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_u"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_22"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1y"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_17"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_e"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_p",
+      "defender": {
+        "type": "card",
+        "uid": "uid_17"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_s"
+    },
+    {
+      "type": "CHOOSE_MODE",
+      "player": "first",
+      "indices": [0]
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_e",
+      "mode": "super"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1z"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1d"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_k"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1f"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1s"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2c"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2d"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_y"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2d",
+      "defender": {
+        "type": "card",
+        "uid": "uid_1s"
+      }
+    },
+    {
+      "type": "FUSE",
+      "player": "first",
+      "cardUid": "uid_2l"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_2k"
+      }
+    },
+    {
+      "type": "CONFIRM_TARGETS"
+    }
+  ]
+}

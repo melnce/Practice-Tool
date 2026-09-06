@@ -30,6 +30,7 @@ import { handleEvolveSelf } from "../effects/ops/evolve.js";
 import { engageAmulet } from "../effects/ops/engage.js";
 import { toggleSecondPlayerBonusPp } from "../../core/bonusPp.js";
 import { toggleMulliganPickCore, confirmMulliganCore } from "./mulliganCore.js";
+import { fuseFromHand } from "./fuseFromHand.js";
 import {
   getScriptedModePicks,
   setScriptedModePickProvider,
@@ -181,6 +182,13 @@ function dispatchInternal(
     }
     case "CONFIRM_MULLIGAN": {
       confirmMulliganCore(action.player);
+      break;
+    }
+    case "FUSE": {
+      if (action.player !== currentState.activePlayer) {
+        throw new Error("[DISPATCH] FUSE: not active player's turn");
+      }
+      fuseFromHand(action.player, action.cardUid, { autoRender: false });
       break;
     }
     // No default - TypeScript will error if a case is missing (exhaustiveness check)

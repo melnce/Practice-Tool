@@ -5,12 +5,10 @@ import {
   playCardAtIndex,
   chooseTargetAction,
   engageAction,
+  dispatchPlayerAction,
 } from "../playerDispatch.js";
 import { state } from "../../core/gameState.js";
 import { getBoard } from "../../core/playerHelpers.js";
-
-// Lazy imports for logic still needed for fuse
-const logic = () => import(/* webpackIgnore: true */ "../../logic/index.js");
 
 export function handleMulliganToggle(owner: Player, uid: string): void {
   // Mulligan stays on the browser mulligan module (records into the script runtime).
@@ -24,21 +22,16 @@ export function handleMulliganToggle(owner: Player, uid: string): void {
 export function handleFuse(
   owner: Player,
   uid: string,
-  hasFuseRecipes: boolean,
-  card: CardInstance,
+  _hasFuseRecipes: boolean,
+  _card: CardInstance,
 ): void {
-  // Fuse is deliberately not routed through PlayerAction yet (left alone).
-  void logic()
-    .then(({ startFuseFromHand, runEffects }) => {
-      if (hasFuseRecipes) startFuseFromHand(owner, uid);
-      else
-        runEffects(
-          [{ op: "fuse", type: "fortifier", initiator_uid: uid }],
-          owner,
-          card,
-        );
-    })
-    .catch(reportError);
+  void _hasFuseRecipes;
+  void _card;
+  try {
+    dispatchPlayerAction({ type: "FUSE", player: owner, cardUid: uid });
+  } catch (e) {
+    reportError(e);
+  }
 }
 
 export function handleResolveTarget(uid: string): void {

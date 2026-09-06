@@ -1,0 +1,510 @@
+{
+  "seed": 20260909,
+  "gameIndex": 20,
+  "deckAId": "rally_swordcraft",
+  "deckBId": "buff_forestcraft",
+  "outcome": "crash",
+  "error": "Error: [History] commitAction(\"Play Card\") with in-flight resolution queue (length=2, draining=false)\n    at assertResolutionQueueClearForCommit (/workspace/src/core/history.ts:382:11)\n    at commitAction (/workspace/src/core/history.ts:399:3)\n    at playCard (/workspace/src/logic/core/playCard/index.ts:59:5)\n    at applySoakActionWithOutcome (/workspace/src/bench/soakEnv.ts:792:34)\n    at countHistoryCommitsDuring (/workspace/src/bench/soakEnv.ts:767:21)\n    at Module.runSoakGame (/workspace/src/bench/soakEnv.ts:1184:11)\n    at async main (/workspace/scripts/soak.ts:284:20)",
+  "actions": 81,
+  "trace": [
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "first"
+    },
+    {
+      "type": "TOGGLE_MULLIGAN",
+      "player": "second",
+      "cardUid": "uid_26"
+    },
+    {
+      "type": "CONFIRM_MULLIGAN",
+      "player": "second"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_25"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_29"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_10"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_29",
+      "defender": {
+        "type": "leader",
+        "player": "first"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2b"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_y"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2c"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_29"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2a",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1n"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2e",
+      "defender": {
+        "type": "card",
+        "uid": "uid_10"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2d",
+      "defender": {
+        "type": "card",
+        "uid": "uid_y"
+      }
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_1n",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2f",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2b"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_1n",
+      "defender": {
+        "type": "card",
+        "uid": "uid_10"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_x"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_2h",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2a",
+      "defender": {
+        "type": "card",
+        "uid": "uid_1n"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_y",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2g"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_16"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_16",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_16",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2b"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_13"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_16"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_w"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2l"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2h",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_x",
+      "mode": "normal"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_x",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_2k"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1v"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2o",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2l"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2m",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2h"
+      }
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_1v",
+      "mode": "super"
+    },
+    {
+      "type": "BONUS_PP",
+      "player": "second"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2n",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2l"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2q",
+      "defender": {
+        "type": "card",
+        "uid": "uid_x"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_2j"
+    },
+    {
+      "type": "CHOOSE_TARGET",
+      "player": "first",
+      "target": {
+        "type": "card",
+        "uid": "uid_2k"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_u"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_u",
+      "mode": "super"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_s"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_s",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2p"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2t",
+      "defender": {
+        "type": "card",
+        "uid": "uid_1v"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2h",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_u",
+      "defender": {
+        "type": "card",
+        "uid": "uid_1v"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_1y"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2v",
+      "defender": {
+        "type": "card",
+        "uid": "uid_u"
+      }
+    },
+    {
+      "type": "EVOLVE",
+      "player": "second",
+      "cardUid": "uid_2v",
+      "mode": "super"
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2s",
+      "defender": {
+        "type": "card",
+        "uid": "uid_1y"
+      }
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_t"
+    },
+    {
+      "type": "EVOLVE",
+      "player": "first",
+      "cardUid": "uid_2u",
+      "mode": "super"
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2h",
+      "defender": {
+        "type": "card",
+        "uid": "uid_1y"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2w",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2v"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_2u",
+      "defender": {
+        "type": "leader",
+        "player": "second"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "first",
+      "attackerUid": "uid_t",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2v"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_28"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "second",
+      "cardUid": "uid_22"
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_28",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2u"
+      }
+    },
+    {
+      "type": "ATTACK",
+      "player": "second",
+      "attackerUid": "uid_2y",
+      "defender": {
+        "type": "card",
+        "uid": "uid_2h"
+      }
+    },
+    {
+      "type": "END_TURN"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_14"
+    },
+    {
+      "type": "PLAY_CARD",
+      "player": "first",
+      "cardUid": "uid_12"
+    }
+  ]
+}

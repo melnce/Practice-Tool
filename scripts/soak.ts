@@ -1,6 +1,7 @@
 // scripts/soak.ts
 // Engine soak harness — hundreds of seeded random games across the full card pool.
 // Run: npm run soak -- [--games=N] [--seed=N] [--smoke] [--history] [--positions] [--determinism=N]
+// Opt-in paths (off by default): --fuse --interactive-modes --all-paths (both)
 //
 // NODE_ENV defaults to "test" so dev-mode engine guards (targeted-op lifecycle,
 // unknown op actions, etc.) throw instead of warn — soak must not run blind.
@@ -129,6 +130,8 @@ type SoakCliConfig = {
   determinism: number;
   turnCap: number;
   actionCap: number;
+  fuse: boolean;
+  interactiveModes: boolean;
 };
 
 function parseArgs(): SoakCliConfig {
@@ -145,6 +148,8 @@ function parseArgs(): SoakCliConfig {
     determinism: 20,
     turnCap: 60,
     actionCap: 800,
+    fuse: false,
+    interactiveModes: false,
   };
   for (const arg of args) {
     if (arg.startsWith("--games=")) config.games = parseInt(arg.slice(8), 10);
@@ -174,6 +179,12 @@ function parseArgs(): SoakCliConfig {
       config.turnCap = parseInt(arg.slice(11), 10);
     else if (arg.startsWith("--action-cap="))
       config.actionCap = parseInt(arg.slice(13), 10);
+    else if (arg === "--fuse") config.fuse = true;
+    else if (arg === "--interactive-modes") config.interactiveModes = true;
+    else if (arg === "--all-paths") {
+      config.fuse = true;
+      config.interactiveModes = true;
+    }
   }
   return config;
 }
@@ -213,7 +224,7 @@ async function main(): Promise<void> {
   console.log("║              SHADOWVERSE ENGINE SOAK                     ║");
   console.log("╚══════════════════════════════════════════════════════════╝");
   console.log(
-    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} positions=${config.positions} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"}`,
+    `games=${config.games} seed=${config.seed} determinism=${config.determinism} turnCap=${config.turnCap} history=${config.history} positions=${config.positions} dispatch=${config.dispatch} historyReExecute=${config.historyReExecute} historyIgnore=${config.historyIgnore.join("|") || "(none)"} fuse=${config.fuse} interactiveModes=${config.interactiveModes}`,
   );
   console.log(`reports → ${REPORT_DIR}`);
   console.log("");
@@ -229,6 +240,8 @@ async function main(): Promise<void> {
         gameIndex: i,
         turnCap: config.turnCap,
         actionCap: config.actionCap,
+        fuse: config.fuse,
+        interactiveModes: config.interactiveModes,
       });
     }
     smokeNoHistoryMs = performance.now() - tNoHistory;
@@ -260,6 +273,7 @@ async function main(): Promise<void> {
     positionViolations: 0,
     positionChecks: 0,
     positionViolationKinds: {} as Record<string, number>,
+    actionTypeCounts: {} as Record<string, number>,
     totalActionsCompleted: 0,
     determinismChecks: 0,
     determinismFailures: 0,
@@ -278,6 +292,7 @@ async function main(): Promise<void> {
 
   const t0 = performance.now();
   const nonUndoableUnion = new Set<string>();
+  const actionTypeTotals: Record<string, number> = {};
 
   for (let i = 0; i < config.games; i++) {
     const result = await soakEnv.runSoakGame({
@@ -291,9 +306,17 @@ async function main(): Promise<void> {
       dispatch: config.dispatch,
       historyReExecute: config.historyReExecute,
       positionCheck: config.positions,
+      fuse: config.fuse,
+      interactiveModes: config.interactiveModes,
     });
     summary.gamesPlayed++;
     summary.byRegime[result.regime]++;
+
+    for (const [type, count] of Object.entries(result.actionTypeCounts ?? {})) {
+      summary.actionTypeCounts[type] =
+        (summary.actionTypeCounts[type] ?? 0) + count;
+      actionTypeTotals[type] = (actionTypeTotals[type] ?? 0) + count;
+    }
 
     if (i === 0 && result.commitSequence?.length) {
       const seq = result.commitSequence
@@ -419,6 +442,8 @@ async function main(): Promise<void> {
         turnCap: config.turnCap,
         actionCap: config.actionCap,
         skipInvariants: true,
+        fuse: config.fuse,
+        interactiveModes: config.interactiveModes,
       });
       if (
         again.outcome !== "completed" ||
@@ -522,6 +547,13 @@ async function main(): Promise<void> {
   if (summary.completed > 0) {
     console.log(
       `avgActions/game:    ${(summary.totalActionsCompleted / summary.completed).toFixed(1)}`,
+    );
+  }
+  if (config.fuse || config.interactiveModes) {
+    const modeCount = summary.actionTypeCounts.CHOOSE_MODE ?? 0;
+    const fuseCount = summary.actionTypeCounts.FUSE ?? 0;
+    console.log(
+      `actionTypeCounts:   CHOOSE_MODE=${modeCount} FUSE=${fuseCount}`,
     );
   }
   console.log(
