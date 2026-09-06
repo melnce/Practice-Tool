@@ -1,5 +1,6 @@
 import type { CardInstance } from "../../../../core/types/index.js";
 import { applyKeywordsFromList } from "../../../core/keywords.js";
+import { recomputeAttackFlags } from "../../../core/combat.js";
 import { isEarthSigil } from "./earth.js";
 import { normalizeCardStats } from "../../../../core/cardStats.js";
 
@@ -42,8 +43,7 @@ export function initFollower(card: CardInstance) {
     ? card.attacks_per_turn!
     : 1;
   card.attacks_left = card.attacks_per_turn;
-  card.can_attack = !!(card.hasStorm || card.hasRush);
-  card.isRush = !!(card.hasRush && !card.hasStorm);
+  recomputeAttackFlags(card);
 }
 
 export function initAmulet(card: CardInstance) {

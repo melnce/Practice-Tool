@@ -1,4 +1,5 @@
 import type { CardInstance } from "../../../core/types/index.js";
+import { recomputeAttackFlags } from "../combat.js";
 import { normalizeKeywordName } from "./registry.js";
 // import { getKS } from "./internal.js";
 // import { state } from "../../../core/gameState.js";
@@ -21,6 +22,8 @@ export function clearCantAttack(card: CardInstance) {
   delete (card as any).cantAttack;
   delete (card as any).cantAttackFollowers;
   delete (card as any).cantAttackLeaders;
+
+  if (card.type === "Follower") recomputeAttackFlags(card);
 }
 
 export function removeKeywordFromSingleCard(
@@ -60,6 +63,8 @@ export function removeKeywordFromSingleCard(
       return normalizeKeywordName(kwName) !== keywordToRemove;
     });
   }
+
+  if (target.type === "Follower") recomputeAttackFlags(target);
 }
 
 export function removeAllAbilitiesFromCard(card: CardInstance) {
@@ -94,4 +99,6 @@ export function removeAllAbilitiesFromCard(card: CardInstance) {
     // Clear Cant Attack
     clearCantAttack(card);
   }
+
+  if (card.type === "Follower") recomputeAttackFlags(card);
 }

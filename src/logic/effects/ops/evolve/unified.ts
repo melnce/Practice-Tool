@@ -22,6 +22,7 @@ import { resolveUids } from "../../../../core/uidResolver.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import { setPendingTarget } from "../../../core/pendingTarget/index.js";
 import { evaluateCardCondition } from "../../../core/conditions/evaluator.js";
+import { recomputeAttackFlags } from "../../../core/combat.js";
 
 /**
  * Unified evolve handler - handles all evolve variants.
@@ -326,14 +327,10 @@ function applyEvolution(
   if (card.evo_image) card.base_image = card.evo_image;
 
   // Grant rush (or keep storm active)
-  if (card.hasStorm) {
-    card.isRush = false;
-    card.can_attack = true;
-  } else {
+  if (!card.hasStorm) {
     card.hasRush = true;
-    card.isRush = true;
-    card.can_attack = true;
   }
+  recomputeAttackFlags(card);
 
   logEvent("evolve", {
     owner,

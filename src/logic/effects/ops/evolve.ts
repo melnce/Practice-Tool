@@ -16,6 +16,7 @@ import {
   getEvoCharges,
   getSuperEvoCharges,
 } from "../../../core/playerHelpers.js";
+import { recomputeAttackFlags } from "../../core/combat.js";
 
 function canEvolve(owner: Player, card: CardInstance, mode = "normal") {
   if (!card || card.type !== "Follower" || card.hasEvolved) return false;
@@ -71,14 +72,10 @@ export function applyEvolveStatBuffs(
   });
   if (sourceCard.evo_image) sourceCard.base_image = sourceCard.evo_image;
 
-  if (sourceCard.hasStorm) {
-    sourceCard.isRush = false;
-    sourceCard.can_attack = true;
-  } else {
+  if (!sourceCard.hasStorm) {
     sourceCard.hasRush = true;
-    sourceCard.isRush = true;
-    sourceCard.can_attack = true;
   }
+  recomputeAttackFlags(sourceCard);
 }
 
 /** Targeted-op resume path: stats + flags in handler; script via orchestrator queue. */

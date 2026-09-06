@@ -20,6 +20,7 @@ import {
 import { getPool, highlightSelectable } from "../../core/targeting.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 import { setPendingTarget } from "../../core/pendingTarget/index.js";
+import { recomputeAttackFlags } from "../../core/combat.js";
 
 // ========================================================================
 // UNIFIED TRANSFORM HANDLER - target field REQUIRED
@@ -702,10 +703,7 @@ export function transformTarget(target: CardInstance, intoName: string) {
     c.hasAttacked = target.hasAttacked === true;
     c.attacks_per_turn = perTurnNew;
     c.attacks_left = Math.max(0, Math.min(perTurnNew, leftOld));
-    c.can_attack = !!(
-      target.can_attack &&
-      (c.hasStorm || c.hasRush || !target.justPlayed)
-    );
+    recomputeAttackFlags(c);
   } else if (c.type === "Amulet") {
     applyKeywordsFromList(c);
     if (c.hasCountdown) c.countdown = Number(c.countdown || 0);

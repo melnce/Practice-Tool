@@ -128,12 +128,38 @@ function isAttackForbidden(card: CardInstance) {
   return isCantAttackLocked(card);
 }
 
-function recomputeAttackFlags(card: CardInstance) {
+function swingsRemaining(card: CardInstance): boolean {
+  const left = (card as any).attacks_left;
+  if (left != null) return left > 0;
+  const per = Number.isFinite((card as any).attacks_per_turn)
+    ? ((card as any).attacks_per_turn as number)
+    : 1;
+  return per > 0;
+}
+
+/** Keep UI flag honest whenever attacks_left is written. */
+export function syncHasAttackedFromSwings(card: CardInstance): void {
+  const left = (card as any).attacks_left;
+  card.hasAttacked = left != null ? left <= 0 : false;
+}
+
+/** Pure derivation of whether a follower may attack (no mutation). */
+export function deriveCanAttack(card: CardInstance): boolean {
   const eligible = !!(card.hasStorm || !card.justPlayed || card.hasRush);
-  const swingsLeft = ((card as any).attacks_left ?? 0) > 0;
-  // Fix: Check isAttackForbidden
-  const forbidden = isAttackForbidden(card);
-  (card as any).can_attack = eligible && swingsLeft && !forbidden;
+  return eligible && swingsRemaining(card) && !isAttackForbidden(card);
+}
+
+/** Effective attack gate used by combat dispatch (must match deriveCanAttack). */
+export function effectiveAttackEligibility(card: CardInstance): boolean {
+  return (
+    !!(card as any).can_attack &&
+    ((card as any).attacks_left ?? 1) > 0 &&
+    !isAttackForbidden(card)
+  );
+}
+
+export function recomputeAttackFlags(card: CardInstance) {
+  (card as any).can_attack = deriveCanAttack(card);
   card.isRush = !!(card.justPlayed && card.hasRush && !card.hasStorm);
 }
 function drainCombatResolutionQueue() {

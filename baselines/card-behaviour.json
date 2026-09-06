@@ -2775,7 +2775,7 @@
       "status": "covered"
     },
     "10214110": {
-      "fingerprint": "4b670a80",
+      "fingerprint": "9097c0c0",
       "gatesSatisfied": [],
       "name": "Titania, Queen of Fairies",
       "scenarios": [
@@ -2784,7 +2784,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "d0650444",
+          "fingerprint": "d588ce40",
           "scenario": "evolve"
         }
       ],
@@ -4967,7 +4967,7 @@
       "status": "covered"
     },
     "10431120": {
-      "fingerprint": "bc9b4548",
+      "fingerprint": "7931ef40",
       "gatesSatisfied": [],
       "name": "Suframare, Wandering Tutor",
       "scenarios": [
@@ -4976,7 +4976,7 @@
           "scenario": "turn_boundary"
         },
         {
-          "fingerprint": "b5322540",
+          "fingerprint": "282875c7",
           "scenario": "evolve"
         }
       ],
@@ -6092,7 +6092,7 @@
       "status": "covered"
     },
     "10534120": {
-      "fingerprint": "5c3f3610",
+      "fingerprint": "060832e4",
       "gatesSatisfied": [],
       "name": "Ara, Dawnblossom",
       "scenarios": [
@@ -6101,7 +6101,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "6a9b7bd0",
+          "fingerprint": "568a9690",
           "scenario": "evolve"
         }
       ],
@@ -6604,12 +6604,12 @@
       "status": "covered"
     },
     "10573310": {
-      "fingerprint": "a56828c8",
+      "fingerprint": "8f714f9d",
       "gatesSatisfied": [],
       "name": "Sincerity of the Dewdrop",
       "scenarios": [
         {
-          "fingerprint": "f3f5d0e8",
+          "fingerprint": "ce0947d4",
           "scenario": "play"
         }
       ],

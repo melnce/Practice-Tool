@@ -24,6 +24,7 @@ import {
 } from "./followerResume.js";
 import { playerHasCrestPassive } from "../../effects/crest.js";
 import { enhanceReplacesBase } from "./enhancePlan.js";
+import { recomputeAttackFlags } from "../combat.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -60,10 +61,9 @@ export function playFollower(
 
   applyKeywordsFromList(card);
 
-  card.can_attack = !!card.hasStorm || !!card.hasRush;
-  card.isRush = !!card.hasRush && !card.hasStorm;
   card.justPlayed = true;
   card.hasAttacked = false;
+  recomputeAttackFlags(card);
 
   const toBoard = getBoard(state, player);
   stampBoardEntryTs(card, { advance: true });
