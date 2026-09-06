@@ -67,25 +67,22 @@ describe("position round-trip soak", () => {
     ).toBe("completed");
   });
 
-  it.fails(
-    "seed 20260909 game 0 — __uiSelectable write during legal enumeration (targeting.ts)",
-    async () => {
-      const result = await runSoakGame({
-        seed: 20260909,
-        gameIndex: 0,
-        positionCheck: true,
-        dispatch: ENGINE,
-        turnCap: 60,
-        actionCap: 800,
-      });
-      expect(
-        result.outcome,
-        result.error ??
-          "position save-load re-apply: highlightSelectable in src/logic/core/targeting.ts " +
-            "mutates __uiSelectable on deck/banish during getLegalSoakActions read path",
-      ).toBe("completed");
-    },
-  );
+  it("seed 20260909 game 0 — position round-trip (returnHandToDeck select + clearSelectableFlags deck leak fixed)", async () => {
+    const result = await runSoakGame({
+      seed: 20260909,
+      gameIndex: 0,
+      positionCheck: true,
+      dispatch: ENGINE,
+      turnCap: 60,
+      actionCap: 800,
+    });
+    expect(
+      result.outcome,
+      result.error ??
+        "position save-load: returnHandToDeck flags hand cards __uiSelectable; " +
+          "clearSelectableFlags must clear deck/banish too",
+    ).toBe("completed");
+  });
 
   it("seed 20260909 — history + positions together (game 0)", async () => {
     const result = await runSoakGame({

@@ -62,6 +62,7 @@ function putBack(card: CardInstance, owner: Player, opts: PutBackOpts = {}) {
   if (idx < 0) return false;
   const [removed] = hand.splice(idx, 1);
   if (!removed) return false;
+  delete (removed as any).__uiSelectable;
   if (opts.deferShuffle) {
     // Owner ruling (deck op, shuffle:false): seeded random insertion below the
     // drawable top. When sibling draws follow, restrict to indices that keep the
