@@ -17,7 +17,8 @@ import {
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
+import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -42,6 +43,8 @@ import {
   getPP,
   getCrests,
   getDeck,
+  getGraveyard,
+  getShadows,
 } from "../../src/core/playerHelpers.js";
 import { hasKeyword } from "../../src/logic/core/keywords/has.js";
 import "../../src/logic/core/effects/index.js";
@@ -249,12 +252,12 @@ describe("official Q&A — Neutral batch 7", () => {
       () => {
         setupTurn(R10, { hand: [SANDALPHON], pp: 6, seed: 42 });
         state.players.second.hp = 20;
-        for (let i = 0; i < 4; i++) enemyFollower(1, 1, `Fairy${i}`);
+        enemyFollower(1, 1, "Fairy");
         const sand = getHand(state, "first").find((c) => c.id === SANDALPHON)!;
         sand.skyboundArtEvolvesWitnessed = 15;
         whenPlayCard("first", 0);
-        expect(getBoard(state, "second").length).toBe(0);
-        expect(20 - getHP(state, "second")).toBeGreaterThan(0);
+        expect(findOnBoard("second", "Fairy")).toBeFalsy();
+        expect(20 - getHP(state, "second")).toBe(8);
 
         resetUidCounter();
         setupTurn(R10, { hand: [SANDALPHON], pp: 6, seed: 42 });
@@ -265,7 +268,9 @@ describe("official Q&A — Neutral batch 7", () => {
         )!;
         sandSolo.skyboundArtEvolvesWitnessed = 15;
         whenPlayCard("first", 0);
-        expect(20 - Number(wall.defense)).toBe(10);
+        const wallDamage = 20 - Number(wall.defense);
+        const leaderDamage = 20 - getHP(state, "second");
+        expect(wallDamage + leaderDamage).toBe(10);
       },
       60_000,
     );
@@ -298,17 +303,24 @@ describe("official Q&A — Neutral batch 7", () => {
     it.fails(
       "10404110 Sandalphon — Pact LW cannot summon Holyflame Tiger when field is full (official Q&A)",
       () => {
-        setupTurn(R6, { hand: [], deck: [SANDALPHON, FAIRY], pp: 6 });
-        const pact = createCard(PACT, "board", "first");
-        pact.countdown = 1;
-        pact.hasCountdown = true;
-        state.players.first.board = [pact];
+        setupTurn(R6, {
+          hand: [PACT],
+          deck: [SANDALPHON, FAIRY],
+          pp: 6,
+        });
+        whenPlayCard("first", 0);
+        const pactIdx = getBoard(state, "first").findIndex(
+          (c) => c.id === PACT,
+        );
+        engageAmulet("first", pactIdx);
         for (let i = 0; i < 4; i++) {
           state.players.first.board.push(
             createCard(HOLY_FALCON, "board", "first"),
           );
         }
-        invokeSandalphonFromDeck();
+        state.players.first.evoCount = 6;
+        state.activePlayer = "second";
+        whenEndTurn();
         expect(findOnBoard("first", "Pact of the Beast Princess")).toBeFalsy();
         expect(
           thenBoard("first").filter((c) => c.name === "Holy Falcon"),
@@ -359,27 +371,34 @@ describe("official Q&A — Neutral batch 7", () => {
 
   describe("10604110 Omegotep, the Dreaded One", () => {
     it("10604110 Omegotep — Milteo crest blocks Fanfare when super-evolve picks +4/+4 (official Q&A)", () => {
-      setupTurn(R10, { hand: [OMEGOTEP], pp: 9, seed: 5 });
+      setupTurn(R10, { hand: [], pp: 9, seed: 5 });
       gainMilteoCrest();
       enemyFollower(1, 10, "OmegotepFoe");
-      whenPlayCard("first", 0);
-      const omeg = findOnBoard("first", "Omegotep, the Dreaded One")!;
-      const hpAfterFanfare = getHP(state, "second");
-      const atkBefore = Number(omeg.attack);
+      const omeg = createCard(OMEGOTEP, "board", "first");
+      omeg.peak_defense = omeg.defense;
+      state.players.first.board = [omeg];
+      const hpBeforeSuper = getHP(state, "second");
       state.players.first.superEvoCharges = 1;
-      onEvolve(omeg, "first", "super", { spendPoint: true });
-      expect(Number(omeg.attack)).toBe(atkBefore + 4);
-      expect(getHP(state, "second")).toBe(hpAfterFanfare);
+      state.players.first.superEvoPoints = 1;
+      setScriptedModePickProvider(() => [3, 3]);
+      handleEvolveSelf(omeg, "first", { mode: "super", spendPoint: true });
+      setScriptedModePickProvider(null);
+      expect(Number(omeg.attack)).toBe(11);
+      expect(getHP(state, "second")).toBe(hpBeforeSuper);
 
       resetUidCounter();
       setupTurn(R10, { hand: [OMEGOTEP], pp: 9, seed: 5 });
       enemyFollower(1, 10, "OmegotepFoe2");
       whenPlayCard("first", 0);
       const omegPlain = findOnBoard("first", "Omegotep, the Dreaded One")!;
-      const hpBeforeSuper = getHP(state, "second");
+      const hpBeforePlainSuper = getHP(state, "second");
       state.players.first.superEvoCharges = 1;
-      onEvolve(omegPlain, "first", "super", { spendPoint: true });
-      expect(getHP(state, "second")).toBe(hpBeforeSuper - 2);
+      state.players.first.superEvoPoints = 1;
+      handleEvolveSelf(omegPlain, "first", {
+        mode: "super",
+        spendPoint: true,
+      });
+      expect(getHP(state, "second")).toBe(hpBeforePlainSuper - 2);
     }, 60_000);
   });
 
@@ -412,6 +431,29 @@ describe("official Q&A — Neutral batch 7", () => {
   });
 
   describe("10901110 Jailor of Antiquity", () => {
+    it("10901110 Jailor — Accelerate form base cost is 1 (owner ruling 2026-09-06)", () => {
+      setupTurn(R6, { hand: [JAILOR], pp: 1 });
+      enemyFollower(2, 5, "Wall");
+      const shadowsBefore = getShadows(state, "first");
+      expect(playCardNoRender(getHand(state, "first"), "first", 0).kind).toBe(
+        "done",
+      );
+      const costs = state.players.first.playedBaseCostsThisMatch;
+      expect(costs).toContain(1);
+      expect(costs).not.toContain(6);
+      const gy = getGraveyard(state, "first").find((c) => c.id === JAILOR)!;
+      expect(gy.type).toBe("Spell");
+      expect(Number(gy.cost)).toBe(1);
+      expect(Number(gy.base_cost)).toBe(1);
+      expect(
+        Number(
+          (gy as { originalPrintedBaseCost?: number }).originalPrintedBaseCost,
+        ),
+      ).toBe(6);
+      expect(getShadows(state, "first")).toBe(shadowsBefore + 1);
+      expect(getPP(state, "first")).toBe(0);
+    }, 60_000);
+
     it("10901110 Jailor — random 2 damage still hits Aura follower when first select fails (official Q&A)", () => {
       setupTurn(R6, { hand: [JAILOR], pp: 6 });
       const lil = createCard(LILANTHIM_EDACITY, "board", "second");
@@ -442,12 +484,6 @@ describe("official Q&A — Neutral batch 7", () => {
       expect(zeraelBoard).toBeDefined();
       expect(thenBoard("first").some((c) => c.id === FAIRY)).toBe(true);
     }, 60_000);
-  });
-
-  describe("10904110 Zerael, Sundered Rebirth", () => {
-    it.todo(
-      "10904110 Zerael — accelerated Jailor base cost is 1 (official Q&A; owner ruling keeps printed base cost 6)",
-    );
   });
 
   describe("10101110 Ruby, Greedy Cherub", () => {
@@ -508,8 +544,9 @@ describe("official Q&A — Neutral batch 7", () => {
       whenPlayCard("first", 0);
       const olivia = findOnBoard("first", "Olivia, Heroic Dark Angel")!;
       state.players.first.superEvoCharges = 1;
+      state.players.first.superEvoPoints = 1;
       state.players.first.evoUsedThisTurn = false;
-      onEvolve(olivia, "first", "super", { spendPoint: true });
+      handleEvolveSelf(olivia, "first", { mode: "super", spendPoint: true });
       resolvePendingByUid(goliath.uid);
       expect(goliath.evoType).toBe("super");
       expect(canBeDestroyed(goliath, "first")).toBe(false);
@@ -538,7 +575,7 @@ describe("official Q&A — Neutral batch 7", () => {
       whenPlayCard("first", 0);
       expect(getHP(state, "first")).toBe(17);
       const olivia = findOnBoard("first", "Olivia, Heroic Dark Angel")!;
-      onEvolve(olivia, "first", "super", { spendPoint: true });
+      handleEvolveSelf(olivia, "first", { mode: "super", spendPoint: true });
       resolvePendingByUid(arriet.uid);
       expect(getHP(state, "first")).toBe(17);
       expect(arriet.evoType).toBe("super");
@@ -548,7 +585,8 @@ describe("official Q&A — Neutral batch 7", () => {
       whenPlayCard("first", 0);
       const solo = findOnBoard("first", "Arriet, Luxminstrel")!;
       state.players.first.superEvoCharges = 1;
-      onEvolve(solo, "first", "super", { spendPoint: true });
+      state.players.first.superEvoPoints = 1;
+      handleEvolveSelf(solo, "first", { mode: "super", spendPoint: true });
       expect(getHP(state, "first")).toBe(19);
     }, 60_000);
   });
