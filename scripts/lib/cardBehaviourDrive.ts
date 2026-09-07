@@ -17,7 +17,7 @@ import {
   whenRunEffects,
   resetUidCounter,
 } from "../../tests/harness/builders.js";
-import { state } from "../../src/core/gameState.js";
+import { state, resetGameState } from "../../src/core/gameState.js";
 import { drawCard } from "../../src/core/utils.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import {
@@ -52,6 +52,9 @@ import {
   fingerprintGameState,
   hashFingerprint,
 } from "./cardBehaviourFingerprint.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import {
   applyGatePreparations,
   collectNamedGates,
@@ -62,6 +65,13 @@ import {
   HARNESS_BOARD_RESERVE,
   type GateSpec,
 } from "./cardBehaviourGates.js";
+
+const HARNESS_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "..",
+);
+const DAMAGED_LEADER_HP = 17;
 
 export const HARNESS_SEED = 42;
 /** v2: gate-aware coverage (covered / partial / skipped). */
@@ -90,6 +100,7 @@ export type ScenarioName =
   | "destroy"
   | "engage"
   | "combat"
+  | "watch"
   | "accelerate"
   | "crystallize"
   | "crystallize_engage"
@@ -174,6 +185,8 @@ export type HarnessArenaNeeds = {
   highCostAlly: boolean;
   namedBoardAllies: string[];
   reservesBoardSlot: boolean;
+  /** First player's leader starts below max HP so restore-to-leader effects are visible. */
+  damagedFirstLeader: boolean;
 };
 
 /** Data-derived arena prep selected per card (never a hard-coded id list). */
@@ -290,6 +303,16 @@ export function analyzeHarnessArenaNeeds(
   // selects were already fingerprinted without extra hand cards.
   if (!isSpell) handKit = false;
 
+  let damagedFirstLeader = false;
+  walkEffects(allRoots, (obj) => {
+    if (damagedFirstLeader) return;
+    if (String(obj.op ?? "") !== "restore") return;
+    const target = String(obj.target ?? "").toLowerCase();
+    if (target !== "leader" && target !== "ally:leader") return;
+    const player = obj.player;
+    if (player === undefined || player === "self") damagedFirstLeader = true;
+  });
+
   return {
     handKit,
     amuletKit,
@@ -297,6 +320,7 @@ export function analyzeHarnessArenaNeeds(
     highCostAlly,
     namedBoardAllies: [...namedBoardAllies],
     reservesBoardSlot: !isSpell,
+    damagedFirstLeader,
   };
 }
 
@@ -616,6 +640,341 @@ export function hasCombatTriggerEffects(card: RawCard): boolean {
   return hasCombatTriggerEntryEffects(card);
 }
 
+type BoardWatcherTrigger = {
+  event?: string;
+  source?: string;
+  condition?: Record<string, unknown>;
+  effects?: unknown[];
+};
+
+/** ally_follower_enter on board (not hand) whose condition is not is_self. */
+export function getBoardWatcherEnterTrigger(
+  card: RawCard,
+): BoardWatcherTrigger | null {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as BoardWatcherTrigger;
+    if (String(trig.event ?? "") !== "ally_follower_enter") continue;
+    if (trig.source === "hand") continue;
+    const cond = trig.condition ?? {};
+    if (cond.is_self === true) continue;
+    if (!hasNonEmptyEffects(trig.effects)) continue;
+    return trig;
+  }
+  return null;
+}
+
+/** Data-derived: board watcher for ally_follower_enter (non-self condition). */
+export function hasBoardWatcherEnterTrigger(card: RawCard): boolean {
+  return getBoardWatcherEnterTrigger(card) != null;
+}
+
+/** Self-enter ally_follower_enter (is_self) — exercised via play scenario. */
+function hasSelfAllyEnterTrigger(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as BoardWatcherTrigger;
+    if (String(trig.event ?? "") !== "ally_follower_enter") continue;
+    const cond = trig.condition ?? {};
+    if (cond.is_self !== true) continue;
+    if (!hasNonEmptyEffects(trig.effects)) continue;
+    return true;
+  }
+  return false;
+}
+
+type ProbeFollowerTemplate = {
+  id: string;
+  name: string;
+  type?: string;
+  cost?: string | number;
+  base_cost?: number;
+  class?: string;
+  tribes?: string[];
+};
+
+let probeFollowerPool: ProbeFollowerTemplate[] | null = null;
+
+function loadProbeFollowerPool(): ProbeFollowerTemplate[] {
+  if (probeFollowerPool) return probeFollowerPool;
+  const allPath = path.join(HARNESS_ROOT, "cards/all.json");
+  const tokenPath = path.join(HARNESS_ROOT, "cards/token_details.json");
+  const all = JSON.parse(
+    fs.readFileSync(allPath, "utf-8"),
+  ) as ProbeFollowerTemplate[];
+  const tokens = JSON.parse(
+    fs.readFileSync(tokenPath, "utf-8"),
+  ) as ProbeFollowerTemplate[];
+  probeFollowerPool = [...all, ...tokens].filter(
+    (c) => String(c.type ?? "").toLowerCase() === "follower",
+  );
+  return probeFollowerPool;
+}
+
+function watchConditionShape(cond: Record<string, unknown>): string {
+  const keys = Object.keys(cond).sort();
+  return keys.length ? keys.join("+") : "empty";
+}
+
+function probeBaseCost(card: ProbeFollowerTemplate): number {
+  if (card.base_cost !== undefined) return Number(card.base_cost);
+  const n = Number(card.cost);
+  return Number.isFinite(n) ? n : parseInt(String(card.cost ?? ""), 10) || 0;
+}
+
+function probeSatisfiesCondition(
+  card: ProbeFollowerTemplate,
+  condition: Record<string, unknown>,
+  hostName: string,
+): boolean {
+  if (condition.is_self === true) return false;
+  if (condition.not_self && card.name === hostName) return false;
+
+  if (condition.tribe) {
+    const want = String(condition.tribe).toLowerCase();
+    const tribes = (card.tribes ?? []).map((t) => String(t).toLowerCase());
+    if (!tribes.includes(want)) return false;
+  }
+
+  if (condition.name) {
+    if (card.name !== String(condition.name)) return false;
+  }
+
+  if (condition.class) {
+    if (String(card.class ?? "") !== String(condition.class)) return false;
+  }
+
+  const base = probeBaseCost(card);
+  if (condition.base_cost_eq != null) {
+    if (base !== Number(condition.base_cost_eq)) return false;
+  }
+  if (condition.base_cost_gte != null) {
+    if (base < Number(condition.base_cost_gte)) return false;
+  }
+  if (condition.base_cost_lte != null) {
+    if (base > Number(condition.base_cost_lte)) return false;
+  }
+
+  return true;
+}
+
+function pickProbeFollower(
+  condition: Record<string, unknown>,
+  hostName: string,
+  qualify: boolean,
+): { template: ProbeFollowerTemplate } | { unsatisfiable: string } {
+  const pool = loadProbeFollowerPool();
+  const matches = pool.filter((c) =>
+    qualify
+      ? probeSatisfiesCondition(c, condition, hostName)
+      : !probeSatisfiesCondition(c, condition, hostName),
+  );
+  if (!matches.length) {
+    return {
+      unsatisfiable: qualify
+        ? watchConditionShape(condition)
+        : `no_non_qualifying:${watchConditionShape(condition)}`,
+    };
+  }
+  return { template: matches[0]! };
+}
+
+function watchNeedsEarthSigil(trigger: BoardWatcherTrigger): boolean {
+  let need = false;
+  walkEffects(trigger.effects ?? [], (obj) => {
+    if (String(obj.op ?? "") === "earth_rite") need = true;
+  });
+  return need;
+}
+
+type WatchSnapshot = {
+  leaderHp: number;
+  hostAtk: number;
+  hostDef: number;
+  hostCost: number;
+  hostHasWard: boolean;
+  hostHasRush: boolean;
+  enteringHasWard: boolean;
+  enteringHasBane: boolean;
+  enteringHasRush: boolean;
+  enteringEvolved: boolean;
+  enteringAtk: number;
+  enteringDef: number;
+  enemyFollowerDefSum: number;
+};
+
+function enemyFollowerDefenseSum(): number {
+  return getBoard(state, "second")
+    .filter((c) => c.type === "Follower")
+    .reduce((sum, c) => sum + (parseInt(String(c.defense), 10) || 0), 0);
+}
+
+function snapshotWatchState(
+  host: CardInstance,
+  entering?: CardInstance,
+): WatchSnapshot {
+  const hostCost =
+    (host as { effectiveCost?: number }).effectiveCost ??
+    Number(host.cost) ??
+    0;
+  return {
+    leaderHp: state.players.first.hp,
+    hostAtk: parseInt(String(host.attack), 10) || 0,
+    hostDef: parseInt(String(host.defense), 10) || 0,
+    hostCost: Number.isFinite(hostCost) ? hostCost : 0,
+    hostHasWard: !!host.hasWard,
+    hostHasRush: !!host.hasRush,
+    enteringHasWard: !!entering?.hasWard,
+    enteringHasBane: !!entering?.hasBane,
+    enteringHasRush: !!entering?.hasRush,
+    enteringEvolved: !!(
+      (entering as { hasEvolved?: boolean; isEvolved?: boolean })?.hasEvolved ??
+      (entering as { isEvolved?: boolean })?.isEvolved
+    ),
+    enteringAtk: parseInt(String(entering?.attack ?? 0), 10) || 0,
+    enteringDef: parseInt(String(entering?.defense ?? 0), 10) || 0,
+    enemyFollowerDefSum: enemyFollowerDefenseSum(),
+  };
+}
+
+function watchEffectObserved(
+  trigger: BoardWatcherTrigger,
+  host: CardInstance,
+  entering: CardInstance,
+  before: WatchSnapshot,
+  after: WatchSnapshot,
+): boolean {
+  let anyCheck = false;
+  let allPass = true;
+
+  const checkRestore = () => {
+    anyCheck = true;
+    if (after.leaderHp <= before.leaderHp) allPass = false;
+  };
+
+  const checkEnteringKeyword = (keywords: unknown) => {
+    anyCheck = true;
+    const list = Array.isArray(keywords) ? keywords : [];
+    for (const kw of list) {
+      const name =
+        typeof kw === "string"
+          ? kw
+          : String((kw as { name?: string })?.name ?? "");
+      const n = name.toLowerCase();
+      if (n === "ward" && !after.enteringHasWard) allPass = false;
+      if (n === "bane" && !after.enteringHasBane) allPass = false;
+      if (n === "rush" && !after.enteringHasRush) allPass = false;
+    }
+  };
+
+  const checkSelfStat = (atkDelta: number, defDelta: number) => {
+    anyCheck = true;
+    const atkUp = after.hostAtk > before.hostAtk;
+    const defUp = after.hostDef > before.hostDef;
+    if (atkDelta > 0 && !atkUp && defDelta <= 0) allPass = false;
+    if (defDelta > 0 && !defUp && atkDelta <= 0) allPass = false;
+    if (atkDelta > 0 && defDelta > 0 && !atkUp && !defUp) allPass = false;
+  };
+
+  const checkSelfKeyword = (keywords: unknown) => {
+    anyCheck = true;
+    const list = Array.isArray(keywords) ? keywords : [];
+    for (const kw of list) {
+      const name =
+        typeof kw === "string"
+          ? kw
+          : String((kw as { name?: string })?.name ?? "");
+      const n = name.toLowerCase();
+      if (n === "ward" && !after.hostHasWard) allPass = false;
+      if (n === "rush" && !after.hostHasRush) allPass = false;
+    }
+  };
+
+  const checkEvolve = () => {
+    anyCheck = true;
+    if (!after.enteringEvolved) allPass = false;
+  };
+
+  const checkSelfCostDown = () => {
+    anyCheck = true;
+    if (after.hostCost >= before.hostCost) allPass = false;
+  };
+
+  const checkEnemyFollowerDamage = (amount: number) => {
+    anyCheck = true;
+    const dealt = before.enemyFollowerDefSum - after.enemyFollowerDefSum;
+    if (amount > 0 && dealt <= 0) allPass = false;
+  };
+
+  walkEffects(trigger.effects ?? [], (obj) => {
+    const op = String(obj.op ?? "");
+    const target = String(obj.target ?? "").toLowerCase();
+
+    if (op === "damage") {
+      if (target.includes("enemy") && target.includes("follower")) {
+        checkEnemyFollowerDamage(Number(obj.amount ?? 0));
+      }
+    }
+
+    if (op === "restore") {
+      if (
+        target === "leader" ||
+        target === "ally:leader" ||
+        target.includes("leader")
+      ) {
+        checkRestore();
+      }
+    }
+
+    if (op === "keyword") {
+      if (target === "entering_follower" || target.includes("entering")) {
+        checkEnteringKeyword(obj.keywords);
+      }
+      if (target === "self") {
+        checkSelfKeyword(obj.keywords);
+      }
+    }
+
+    if (op === "stat") {
+      if (target === "self") {
+        if (obj.keywords) checkSelfKeyword(obj.keywords);
+        const atk = Number(obj.attack ?? 0);
+        const def = Number(obj.defense ?? 0);
+        if (atk !== 0 || def !== 0) checkSelfStat(atk, def);
+      }
+      if (target === "entering_follower" || target.includes("entering")) {
+        anyCheck = true;
+        const atk = Number(obj.attack ?? 0);
+        const def = Number(obj.defense ?? 0);
+        if (atk > 0 && after.enteringAtk <= before.enteringAtk) allPass = false;
+        if (def > 0 && after.enteringDef <= before.enteringDef) allPass = false;
+      }
+    }
+
+    if (op === "evolve") {
+      if (target === "entering_follower" || target.includes("entering")) {
+        checkEvolve();
+      }
+    }
+
+    if (op === "earth_rite") {
+      walkEffects(obj.effects ?? [], (inner) => {
+        if (String(inner.op ?? "") === "evolve") checkEvolve();
+      });
+    }
+
+    if (
+      op === "cost" &&
+      String(obj.mode ?? "") === "reduce" &&
+      target === "self"
+    ) {
+      checkSelfCostDown();
+    }
+  });
+
+  return anyCheck && allPass;
+}
+
 function isAccelerateKeywordName(name: string): boolean {
   return name.toLowerCase() === "accelerate";
 }
@@ -762,6 +1121,7 @@ function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
     case "destroy":
     case "engage":
     case "combat":
+    case "watch":
     case "accelerate":
     case "crystallize":
     case "crystallize_engage":
@@ -810,6 +1170,9 @@ export function classifyPaths(card: RawCard): ScenarioName[] {
   if (hasCombatTriggerEffects(card)) {
     paths.push("combat");
   }
+  if (hasBoardWatcherEnterTrigger(card)) {
+    paths.push("watch");
+  }
   if (hasAccelerateForm(card)) {
     paths.push("accelerate");
   }
@@ -825,7 +1188,7 @@ export function classifyPaths(card: RawCard): ScenarioName[] {
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
     isFollower &&
-    hasAllyEnterTrigger(card) &&
+    hasSelfAllyEnterTrigger(card) &&
     hasNonEmptyEffects(card.triggers) &&
     !paths.includes("play")
   ) {
@@ -959,6 +1322,13 @@ function buildArena(opts: {
   }
 
   if (needs) applyArenaBoardPrep(needs);
+
+  if (needs?.damagedFirstLeader) {
+    state.players.first.hp = Math.min(
+      state.players.first.hp,
+      DAMAGED_LEADER_HP,
+    );
+  }
 
   const handExtras = [...(opts.extraHand ?? [])];
   if (needs?.handKit) handExtras.push(...buildHandKit());
@@ -1897,6 +2267,140 @@ function runCombatScenario(
   };
 }
 
+function runWatchScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const boardTrigger = getBoardWatcherEnterTrigger(raw);
+  if (!boardTrigger) {
+    return { skip: "drive_threw", detail: "no_board_watcher_trigger" };
+  }
+
+  const condition = boardTrigger.condition ?? {};
+  const hostName = raw.name ?? cardId;
+  const picked = pickProbeFollower(condition, hostName, true);
+  if ("unsatisfiable" in picked) {
+    return {
+      skip: "drive_threw",
+      detail: `watch_condition_unsatisfiable:${picked.unsatisfiable}`,
+    };
+  }
+
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
+
+  if (condition.whose_turn === "owner" && state.activePlayer !== "first") {
+    return {
+      skip: "drive_threw",
+      detail: "watch_whose_turn_not_first",
+    };
+  }
+  if (condition.whose_turn === "opponent") {
+    return {
+      skip: "drive_threw",
+      detail: "watch_whose_turn_opponent_unsupported",
+    };
+  }
+  if (state.activePlayer !== "first") {
+    return { skip: "drive_threw", detail: "watch_active_player_not_first" };
+  }
+
+  const needsEarth = watchNeedsEarthSigil(boardTrigger);
+  const boardReserve = needsEarth ? 3 : 2;
+  trimBoardToCap(state.players.first.board, HARNESS_BOARD_CAP - boardReserve);
+
+  const host = makeCardFromDB(template, "first");
+  if (host.type === "Follower") {
+    host.justPlayed = false;
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  if (needsEarth) {
+    state.players.first.board.push(earthSigilOnBoard());
+  }
+
+  assertHarnessBoardCap("runWatchScenario:beforeSummon");
+
+  const hostOnBoard = getBoard(state, "first").find((c) => c.uid === host.uid);
+  if (!hostOnBoard) {
+    return { skip: "drive_threw", detail: "host_missing_after_place" };
+  }
+
+  const probeTemplate = picked.template;
+  const probeData = getCardById(probeTemplate.id);
+  const probeCard = probeData
+    ? makeCardFromDB(probeData, "first")
+    : createCard(
+        {
+          name: probeTemplate.name,
+          type: "Follower",
+          cost: probeBaseCost(probeTemplate),
+          attack: 1,
+          defense: 1,
+          tribes: probeTemplate.tribes ?? [],
+          class: probeTemplate.class,
+          base_cost: probeBaseCost(probeTemplate),
+        },
+        "hand",
+        "first",
+      );
+  if (probeTemplate.tribes?.length) {
+    (probeCard as { tribes?: string[] }).tribes = [...probeTemplate.tribes];
+  }
+  if (probeTemplate.class) {
+    (probeCard as { class?: string }).class = probeTemplate.class;
+  }
+  (probeCard as { base_cost?: number }).base_cost =
+    probeBaseCost(probeTemplate);
+  probeCard.cost = 0;
+  (probeCard as { effectiveCost?: number }).effectiveCost = 0;
+
+  const before = snapshotWatchState(hostOnBoard);
+  state.players.first.hand.push(probeCard);
+  const handIdx = state.players.first.hand.indexOf(probeCard);
+  const outcome = whenPlayCard("first", handIdx);
+  if (outcome.kind === "blocked") {
+    return {
+      skip: "play_blocked",
+      detail: outcome.reason ?? "watch_probe_play_blocked",
+    };
+  }
+
+  const pending = resolvePendingOrFail("watch_after");
+  if (!("ok" in pending)) return pending;
+
+  const entering =
+    getBoard(state, "first").find((c) => c.uid === probeCard.uid) ?? probeCard;
+  const after = snapshotWatchState(hostOnBoard, entering);
+
+  if (
+    !watchEffectObserved(boardTrigger, hostOnBoard, entering, before, after)
+  ) {
+    return { skip: "drive_threw", detail: "watch_did_not_fire" };
+  }
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "watch",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
 function runEngageScenario(
   cardId: string,
   raw: RawCard,
@@ -2399,6 +2903,17 @@ function runSummonScenario(
 }
 
 /**
+ * Isolate each card drive from residue left by prior cards in the pool loop.
+ * Per-scenario buildArena resets are not always sufficient (e.g. watch probe
+ * summons on the immediately preceding card can shift UID/RNG for the next).
+ */
+function resetHarnessBetweenCards(): void {
+  resetGameState(HARNESS_SEED);
+  resetUidCounter();
+  state.gameStarted = false;
+}
+
+/**
  * Drive one card through classified scenarios with gate preparation.
  */
 export function driveCard(
@@ -2412,6 +2927,8 @@ export function driveCard(
     return { status: "skipped", id, name, reason: "card_not_in_registry" };
   }
 
+  resetHarnessBetweenCards();
+
   const gates = collectNamedGates(raw);
   const gateSummary = summarizeGateConditions(gates);
   const arenaNeeds = analyzeHarnessArenaNeeds(raw, gates);
@@ -2423,7 +2940,11 @@ export function driveCard(
         ? (["summon"] as ScenarioName[])
         : classifyPaths(raw);
     const scenarios: ScenarioResult[] = [];
-    const failures: { skip: SkipReason; detail: string }[] = [];
+    const failures: {
+      path: ScenarioName;
+      skip: SkipReason;
+      detail: string;
+    }[] = [];
     const satisfiedAll = new Set<string>();
     const unmetAll = new Set<string>(gateSummary.unpreparable);
 
@@ -2471,6 +2992,8 @@ export function driveCard(
           result = runEngageScenario(id, raw, gates, arenaNeeds);
         else if (path === "combat")
           result = runCombatScenario(id, gates, arenaNeeds);
+        else if (path === "watch")
+          result = runWatchScenario(id, raw, gates, arenaNeeds);
         else if (path === "accelerate")
           result = runAccelerateScenario(id, raw, gates, arenaNeeds);
         else if (path === "crystallize")
@@ -2489,7 +3012,7 @@ export function driveCard(
       }
 
       if (isSkip(result)) {
-        failures.push(result);
+        failures.push({ path, skip: result.skip, detail: result.detail ?? "" });
       } else {
         scenarios.push(result);
         for (const c of result.gatesSatisfied ?? []) satisfiedAll.add(c);
