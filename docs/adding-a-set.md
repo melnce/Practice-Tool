@@ -23,6 +23,7 @@ Supporting gates (also in `npm run check` where noted):
 - `npm run check:card-status` — fails on `unimplemented` / `unknown_ops` collectibles (**in `check`**, with `--check`)
 - `npm run check:card-text-full` — text-vs-JSON mechanical checks (warns for stubs)
 - `npm run check:keyword-names` — card-data keywords must map to `KEYWORD_MAP`
+- `npm run check:rotation-meta` — official `is_include_rotation` must match the set-window heuristic (allowlisted mismatches only)
 
 `npm run cards:verify` is **not** wired into `npm run check` (see `scripts/card-behaviour.ts` header comment).
 
@@ -151,9 +152,11 @@ Cards with only `"keywords": ["Ward"]` and `"fanfare": []` remain **`unimplement
 
 > **Warning:** Run **`npm run ingest:cards`** and **`npm run ingest:tokens`** _before_ **`npm run cards:official`**.
 
-`npm run cards:official` refreshes `cards/official-meta.json` from the live official site. `tests/unit/official-qa.test.ts:225–230` asserts every catalog id in that file exists in `cards/all.json` or `cards/token_details.json`.
+`npm run cards:official` refreshes `cards/official-meta.json` from the live official site. That file carries per-card `is_include_rotation` flags (plus Q&A and deck limits). `tests/unit/official-qa.test.ts:225–230` asserts every catalog id in that file exists in `cards/all.json` or `cards/token_details.json`.
 
 Refreshing official metadata **before** ingesting the new set leaves ~100 catalog ids with no local card row → ~100 test failures. Ingest first so local ids exist, then pull official metadata.
+
+**Rotation window:** UI badges and `check:rotation-meta` read rotation legality from `official-meta.json` after it exists. Until `cards:official` runs, newly ingested ids fall back to the Basic + newest-six-sets heuristic in `src/data/formats.ts`. The snapshot timestamp is `_meta.fetched_at` — rotation moves when you refresh official metadata, not when a set file lands in git. That is more accurate than the old commit-driven window, but still reflects Cygames’ published flags at fetch time, not a scheduled rotation date.
 
 ---
 
@@ -214,7 +217,7 @@ Runs `scripts/cards-drift.ts` against the upstream DotGG dump. Exit code from `c
 
 ## 9. Rotation window vs shipped decks
 
-**Rotation set window** (which expansion sets are “legal”) is **dynamic** — see `src/data/formats.ts`. Basic (`10000`) plus the six newest expansion set ids are computed from the card catalog; no hardcoded set-id list.
+**Rotation legality** (which cards show as “in rotation” in tooltips / deck history) comes from `cards/official-meta.json` (`is_include_rotation` per card id), refreshed by `npm run cards:official`. Cards missing from that snapshot temporarily use the heuristic in `src/data/formats.ts`: Basic (`10000`) plus the six newest expansion set ids derived from the catalog. `npm run check:rotation-meta` fails if the official flags and heuristic disagree except for entries in `cards/rotation-gate-allowlist.json`.
 
 **Shipped deck ids** (the 17 reference decks in `src/bench/soakDecks.ts` `SHIPPED_DECK_IDS`) are **hardcoded** across the repo. Removing or replacing a rotated-out reference deck is a separate, enumerable job.
 

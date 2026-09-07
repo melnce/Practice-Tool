@@ -1116,7 +1116,7 @@ function hasScenarioPlacingOnBoard(paths: ScenarioName[]): boolean {
   return paths.some(scenarioPlacesSubjectOnBoard);
 }
 
-function classifyPaths(card: RawCard): ScenarioName[] {
+export function classifyPaths(card: RawCard): ScenarioName[] {
   const paths: ScenarioName[] = [];
   const isSpell = String(card.type).toLowerCase() === "spell";
   const playableEffects = isSpell
