@@ -1798,7 +1798,8 @@ export function runV2MatrixCell(opts: V2MatrixCellOptions): V2MatrixRunResult {
     getHand(state, watcherOwner).push(watcher);
     raise = [];
   } else if (axis === "enemy_defense") {
-    watcherOwner = enemyWatcherOwner(actor);
+    // Routing activePlayer is the debuffed follower's owner; listener sits on debuffer's side.
+    watcherOwner = actor;
     const watcher = makeV2Watcher("enemy_follower_defense_down", watcherOwner);
     watcherUid = watcher.uid;
     getBoard(state, watcherOwner).push(watcher);

@@ -413,7 +413,7 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
           ? "second"
           : null;
       if (targetOwner)
-        fireTrigger("enemy_follower_defense_down", owner as any, { target });
+        fireTrigger("enemy_follower_defense_down", targetOwner, { target });
     }
     applyKeywordBuff(target, eff as any, owner);
   }

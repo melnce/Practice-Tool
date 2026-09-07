@@ -36,7 +36,7 @@ import {
   runEndOfTurnBoundary,
 } from "../../src/logic/core/turnBoundary.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
-import { attackLeader } from "../../src/logic/core/combat.js";
+import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
@@ -93,6 +93,7 @@ const CAMISCILLA = "10674110";
 const LUDICROUS = "10673110";
 const SCARLET = "10774110";
 const BEELZEBUB = "10474120";
+const BERYL = "10152120";
 
 // Tokens
 const PUPPET = "90071110";
@@ -160,6 +161,7 @@ function setupTurn(
   round: number,
   opts: {
     hand?: Array<string | Record<string, unknown>>;
+    secondHand?: Array<string | Record<string, unknown>>;
     deck?: Array<string | Record<string, unknown>>;
     secondDeck?: Array<string | Record<string, unknown>>;
     pp?: number;
@@ -176,6 +178,7 @@ function setupTurn(
     roundCount: round,
   }).withFirstPP(pp, max);
   if (opts.hand?.length) b = b.withFirstHand(opts.hand as any);
+  if (opts.secondHand?.length) b = b.withSecondHand(opts.secondHand as any);
   if (opts.deck?.length) b = b.withFirstDeck(opts.deck as any);
   else b = b.withFirstDeck(PAD_DECK);
   if (opts.secondDeck?.length) b = b.withSecondDeck(opts.secondDeck as any);
@@ -183,6 +186,10 @@ function setupTurn(
   if (opts.hp !== undefined) b = b.withFirstHP(opts.hp);
   if (opts.evo !== undefined) b = b.withFirstEvo(opts.evo);
   b.build();
+  if (opts.active === "second") {
+    state.players.second.pp = pp;
+    state.players.second.maxPP = max;
+  }
   state.gameStarted = true;
   state.phase = "main";
 }
@@ -291,6 +298,33 @@ function enemyFollower(
   c.peak_defense = def;
   state.players.second.board.push(c);
   return c;
+}
+
+function boardFollower(
+  owner: "first" | "second",
+  atk: number,
+  def: number,
+  name = "Board",
+) {
+  const c = createCard(
+    { name, type: "Follower", cost: 2, attack: atk, defense: def },
+    "board",
+    owner,
+  );
+  c.peak_defense = def;
+  state.players[owner].board.push(c);
+  return c;
+}
+
+function playBeelzebubFanfare(
+  player: "first" | "second",
+  targetA: { uid: string },
+  targetB: { uid: string },
+) {
+  const idx = getHand(state, player).findIndex((c) => c.id === BEELZEBUB);
+  whenPlayCard(player, idx);
+  resolvePendingByUid(targetA.uid);
+  resolvePendingByUid(targetB.uid);
 }
 
 function allyFollower(
@@ -2066,5 +2100,78 @@ describe("L2 — Cutthroat Portalcraft", () => {
       applyLeaderDamage("first", 1);
       expect(getHP(state, "first")).toBe(allyHpBefore - 1);
     });
+
+    it("Beelzebub ×2 (10474120) — official Q&A #1: 3-damage effect deals 5 (20 → 15)", () => {
+      setupTurn(R10, { hand: [BEELZEBUB, BEELZEBUB], pp: 9 });
+      state.players.second.hp = 20;
+      const a = enemyFollower(5, 9, "A");
+      const b = enemyFollower(5, 9, "B");
+      playBeelzebubFanfare("first", a, b);
+      expect(state.players.second.leaderDamageTakenBonus).toBe(1);
+      advanceToFirstNextTurn();
+      const c = enemyFollower(5, 9, "C");
+      const d = enemyFollower(5, 9, "D");
+      playBeelzebubFanfare("first", c, d);
+      expect(state.players.second.leaderDamageTakenBonus).toBe(2);
+      expect(getHP(state, "second")).toBe(20);
+      applyLeaderDamage("second", 3);
+      expect(getHP(state, "second")).toBe(15);
+    }, 60_000);
+
+    it("Beryl (10152120) — official Q&A #2: Fanfare deals 4 to your leader under Takes 1 more damage", () => {
+      setupTurn(R10, {
+        hand: [BERYL],
+        secondHand: [BEELZEBUB],
+        pp: 9,
+        hp: 20,
+        active: "second",
+      });
+      const a = boardFollower("first", 5, 9, "A");
+      const b = boardFollower("first", 5, 9, "B");
+      playBeelzebubFanfare("second", a, b);
+      expect(state.players.first.leaderDamageTakenBonus).toBe(1);
+      state.activePlayer = "first";
+      state.players.first.hp = 20;
+      const hpBefore = getHP(state, "first");
+      whenPlayCard("first", 0);
+      expect(getHP(state, "first")).toBe(hpBefore - 4);
+    }, 60_000);
+
+    it("Super-evolve destroy — official Q&A #3: enemy super-evolved follower ping deals 2 to your leader", () => {
+      setupTurn(R10, { secondHand: [BEELZEBUB], pp: 9, active: "second" });
+      const a = boardFollower("first", 5, 9, "A");
+      const b = boardFollower("first", 5, 9, "B");
+      playBeelzebubFanfare("second", a, b);
+      expect(state.players.first.leaderDamageTakenBonus).toBe(1);
+
+      const attacker = createCard(
+        {
+          name: "Super Striker",
+          type: "Follower",
+          cost: 3,
+          attack: 5,
+          defense: 5,
+        },
+        "board",
+        "second",
+      );
+      attacker.peak_defense = 5;
+      attacker.evoType = "super";
+      attacker.hasEvolved = true;
+      attacker.can_attack = true;
+      attacker.attacks_left = 1;
+      attacker.justPlayed = false;
+      applyKeywordsFromList(attacker);
+
+      const fodder = allyFollower("Fodder", 1, 1);
+      state.players.second.board = [attacker];
+      state.players.first.board = [fodder];
+      state.activePlayer = "second";
+      state.players.first.hp = 20;
+
+      const hpBefore = getHP(state, "first");
+      attackFollower(0, 0, "second", "first");
+      expect(getHP(state, "first")).toBe(hpBefore - 2);
+    }, 60_000);
   });
 });
