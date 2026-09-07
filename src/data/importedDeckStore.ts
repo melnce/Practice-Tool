@@ -5,9 +5,9 @@
  * export/import (same pattern as positionStore). localStorage is unreliable in
  * this environment and is intentionally not used.
  *
- * On-disk `decks/*` is gitignored except the shipped house decks — that is
- * deliberate so private lists never become commit noise. Imported decks live
- * here in memory (and in user-downloaded JSON), not as tracked repo files.
+ * On-disk `decks/*.local.json` is gitignored so scratch lists never become commit
+ * noise. Imported decks live here in memory (and in user-downloaded JSON), not as
+ * tracked repo files.
  */
 
 import type { DeckManifestEntry } from "./deckManifest.js";
