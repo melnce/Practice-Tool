@@ -12,4 +12,5 @@ export const INTERNAL_CACHE_KEYS = new Set([
   "_reactiveCollector",
   "_drainingResolutionQueue",
   "__resolutionDrainDepth",
+  "playSequenceDepth",
 ]);

@@ -6407,12 +6407,12 @@
       "status": "covered"
     },
     "10534110": {
-      "fingerprint": "73643c70",
+      "fingerprint": "065acff4",
       "gatesSatisfied": [],
       "name": "Lhynkal, Wandering Fool",
       "scenarios": [
         {
-          "fingerprint": "9d333f54",
+          "fingerprint": "0f60663c",
           "scenario": "play"
         },
         {
@@ -8427,12 +8427,12 @@
       "status": "covered"
     },
     "10724110": {
-      "fingerprint": "6a4ca02f",
+      "fingerprint": "fb2a9448",
       "gatesSatisfied": ["rally"],
       "name": "Gildaria, Anathema of Attunement",
       "scenarios": [
         {
-          "fingerprint": "87411170",
+          "fingerprint": "720a4a00",
           "scenario": "play"
         },
         {
@@ -10647,12 +10647,12 @@
       "status": "covered"
     },
     "10931110": {
-      "fingerprint": "de2708a0",
+      "fingerprint": "c55291f0",
       "gatesSatisfied": ["named_enter_count"],
       "name": "Obsessed Test Subject",
       "scenarios": [
         {
-          "fingerprint": "c9a3b4c0",
+          "fingerprint": "f78a8aa3",
           "scenario": "play"
         }
       ],

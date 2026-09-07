@@ -149,6 +149,7 @@ describe("snapshot ephemeral gate must_be_default at commit", () => {
     __resolutionDrainDepth: 0,
     triggerChainDepth: 0,
     targetedOpDispatchActive: false,
+    playSequenceDepth: 0,
   };
 
   for (const key of Object.keys(SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT)) {

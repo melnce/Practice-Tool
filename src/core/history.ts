@@ -120,6 +120,8 @@ export const SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT: Readonly<
     "Incremented/decremented synchronously inside fireTrigger; 0 at commit boundary.",
   targetedOpDispatchActive:
     "Set/cleared by targeted-op dispatcher try/finally; false at commit.",
+  playSequenceDepth:
+    "Must be 0 at commit unless isEffectResolutionPaused() (fanfare/mode/target pause mid-Play Card). Non-zero without a pause means a completion path returned without endPlaySequenceDrain.",
 };
 
 /**
@@ -172,6 +174,13 @@ export const SNAPSHOT_DROPPED_STATE_AUDIT: readonly SnapshotDroppedAuditRow[] =
       proofClass: "a",
       proof:
         "Not on state root; read via getters and covered by must_be_default gate rows.",
+    },
+    {
+      category: "Play sequence depth",
+      mechanism: "INTERNAL_CACHE_KEYS exclusion",
+      proofClass: "a",
+      proof:
+        "playSequenceDepth may be >0 at commit only when isEffectResolutionPaused() (paused Play Card); otherwise must be 0 or a drain path leaked.",
     },
     {
       category: "Functions / non-cloneable objects",
@@ -291,6 +300,7 @@ export function collectSnapshotEphemeralViolations(): string[] {
   const s = state as any;
 
   for (const key of Object.keys(SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT)) {
+    if (key === "playSequenceDepth" && isEffectResolutionPaused()) continue;
     const value = readSnapshotEphemeralValue(key);
     if (!isSnapshotEphemeralDefault(value)) {
       violations.push(`${key} (must_be_default)`);
@@ -623,6 +633,7 @@ function resetEphemeralStateAfterRestore(): void {
   (state as any)._drainingResolutionQueue = false;
   (state as any).__resolutionDrainDepth = 0;
   (state as any)._triggerCache = null;
+  (state as any).playSequenceDepth = 0;
   delete (state as any)._reactiveCollector;
   resetTriggerChainDepth();
   endDispatch();
@@ -738,6 +749,22 @@ export function beginAction(name: string, meta: any = {}) {
   inAction = { name, before: snapshot(), meta };
 }
 
+function assertPlaySequenceDepthClearForCommit(actionName: string): void {
+  const depth = ((state as any).playSequenceDepth ?? 0) as number;
+  if (depth === 0) return;
+  if (isEffectResolutionPaused()) return;
+
+  const msg =
+    `[History] commitAction("${actionName}") with playSequenceDepth=${depth} ` +
+    `while effect resolution is not paused`;
+  const vitest = readEnv("VITEST");
+  const inTest = vitest === "true" || vitest === "1";
+  if (isDev() || inTest) {
+    throw new Error(msg);
+  }
+  console.warn(msg);
+}
+
 function assertResolutionQueueClearForCommit(actionName: string): void {
   const queueLen = getResolutionQueue().length;
   const draining = !!(state as any)._drainingResolutionQueue;
@@ -769,6 +796,7 @@ export function commitAction({ autoRender = true } = {}) {
   }
 
   assertResolutionQueueClearForCommit(inAction.name);
+  assertPlaySequenceDepthClearForCommit(inAction.name);
   assertNoDroppedSnapshotStateAtCommit(inAction.name);
 
   bumpActionSeq();

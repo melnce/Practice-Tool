@@ -57,6 +57,7 @@ const KNOWN_ROOT_KEYS = new Set<string>([
   ...INTERNAL_CACHE_KEYS,
   "_resolutionQueue",
   "combatResolutionDepth",
+  "playSequenceDepth",
   "resumePlayFollower",
   // Mid-match ephemerals that must clear on reset (listed so we delete values below)
   "lastAddedToHand",
@@ -148,11 +149,14 @@ export function resetStateInstance(
   (target as any).suppressCleanup = false;
   (target as any)._runEffectsDepth = 0;
   (target as any).combatResolutionDepth = 0;
+  (target as any).playSequenceDepth = 0;
   (target as any)._drainingResolutionQueue = false;
   (target as any).__resolutionDrainDepth = 0;
   delete (target as any).sotBoundaryDeferDrain;
   delete (target as any).turnBoundaryInvokePhase;
   delete (target as any)._reactiveCollector;
+  delete (target as any)._stagedPlayEnterGroups;
+  delete (target as any)._playSequenceSavedDefer;
   delete (target as any).resumePlayFollower;
   delete (target as any).pendingModeChoice;
 
