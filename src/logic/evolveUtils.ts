@@ -16,6 +16,7 @@ import {
   getEvoCount,
   incrementEvoCount,
 } from "../core/playerHelpers.js";
+import { recomputeAttackFlags } from "./core/combat.js";
 
 /**
  * Bookkeeping for every completed allied evolve (EP-spent or effect-granted,
@@ -193,6 +194,7 @@ export function onEvolve(
   // Update evolution state FIRST (before running effects)
   card.hasEvolved = true;
   card.evoType = mode === "super" ? "super" : "normal";
+  recomputeAttackFlags(card);
 
   if (skipEffects) {
     completeEvolveBookkeeping(card, owner, mode, spendPoint, "skipEffects");

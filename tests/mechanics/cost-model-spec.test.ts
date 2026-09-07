@@ -14,10 +14,10 @@ import {
   thenHand,
   thenDeck,
 } from "../harness/builders.js";
+import { whenEvolve, whenSuperEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import { getHand } from "../../src/core/playerHelpers.js";
 import {
@@ -218,7 +218,7 @@ describe("Cost model spec (Japanese rules 2026-09-06)", () => {
       const liu = createCard(LIU, "board", "first");
       liu.peak_defense = liu.defense;
       state.players.first.board.push(liu);
-      onEvolve(liu, "first", "super");
+      whenSuperEvolve(liu, "first");
       expect(getEffectiveCost(mariInDeck)).toBe(0);
 
       whenEndTurn();
@@ -332,7 +332,7 @@ describe("Cost model spec (Japanese rules 2026-09-06)", () => {
       liu.peak_defense = liu.defense;
       state.players.first.board.push(liu);
       beginAction("super-evolve");
-      onEvolve(liu, "first", "super");
+      whenSuperEvolve(liu, "first");
       commitAction({ autoRender: false });
       expect(getEffectiveCost(mari)).toBe(0);
       whenEndTurn();

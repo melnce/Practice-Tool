@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 import type { RawCardData, BuildCardIndexInput } from "./cardIndex.js";
 import { initCardDatabase } from "./cardIndex.js";
 import { initCardSets } from "./cardSets.js";
+import { initOfficialRotationFromJson } from "./officialRotation.js";
 // Get directory path for relative imports
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,4 +78,14 @@ export async function initCardDatabaseNode(): Promise<void> {
   const cards = loadCardsNode();
   initCardDatabase(cards);
   initCardSets(loadCardSetsNode());
+
+  const officialMetaPath = path.join(cardsDirPath(), "official-meta.json");
+  if (fs.existsSync(officialMetaPath)) {
+    initOfficialRotationFromJson(
+      JSON.parse(fs.readFileSync(officialMetaPath, "utf-8")) as Record<
+        string,
+        unknown
+      >,
+    );
+  }
 }

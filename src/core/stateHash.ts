@@ -6,6 +6,39 @@
  */
 
 import type { GameState, CardInstance } from "./types/index.js";
+import type { KeywordState } from "../logic/core/keywords/types.js";
+
+// ============================================================================
+// STATIC EFFECT ARRAY EXCLUSIONS (deliberate — card data, not runtime state)
+// ============================================================================
+
+/**
+ * Effect arrays excluded from canonicalizeCard — static card definition data.
+ * Hashing them adds size/churn without determinism signal for replay/undo/soak.
+ */
+export const STATE_HASH_STATIC_EFFECT_EXCLUSIONS: Record<string, string> = {
+  lastWordsEffects:
+    "static Last Words script from card data; hasLastWords marker is hashed",
+  strikeEffects:
+    "static Strike script from card data; hasStrike marker is hashed",
+  engageEffects:
+    "static Engage script from card data; engage runtime flags are hashed",
+  rallyEffects:
+    "static Rally script from card data; hasRally/rallyRequirement are hashed",
+  triggers:
+    "static trigger definitions from card data; not mutable runtime state",
+  pixieEnterEffects:
+    "static Pixie-enter script from card data; hasPixieEnter marker is hashed",
+  allyEnterEffects:
+    "static ally-enter script from card data; hasAllyEnter marker is hashed",
+  fanfare: "static Fanfare script on card.fanfare; hasFanfare marker is hashed",
+  enhanceTiers:
+    "static Enhance tiers from card data; PP tier selection is play-time logic",
+  accelerateTiers:
+    "static Accelerate tiers from card data; alternate form is play-time logic",
+  crystallizeTiers:
+    "static Crystallize tiers from card data; alternate form is play-time logic",
+};
 
 // ============================================================================
 // CANONICAL STATE HASH
@@ -112,13 +145,127 @@ function canonicalizeCrest(crest: {
   };
 }
 
+function canonicalizeCounterMap(
+  counters: Record<string, number> | undefined,
+): Record<string, number> | undefined {
+  if (!counters) return undefined;
+  const keys = Object.keys(counters).sort();
+  if (keys.length === 0) return undefined;
+  const out: Record<string, number> = {};
+  for (const key of keys) {
+    out[key] = counters[key]!;
+  }
+  return out;
+}
+
+function canonicalizeSpellboostCost(
+  spellboost: KeywordState["spellboost"],
+): { reduceCostBy: number; minCost: number } | undefined {
+  if (!spellboost) return undefined;
+  return {
+    reduceCostBy: spellboost.reduceCostBy,
+    minCost: spellboost.minCost,
+  };
+}
+
+function canonicalizeBleed(
+  bleed: KeywordState["bleed"],
+): { toLeader: number; toSelf: number } | undefined {
+  if (!bleed) return undefined;
+  return {
+    toLeader: bleed.toLeader,
+    toSelf: bleed.toSelf,
+  };
+}
+
+/**
+ * Mutable keywordState fields included in the hash (sorted keys, undefined omitted).
+ * Static effect arrays are excluded — see STATE_HASH_STATIC_EFFECT_EXCLUSIONS.
+ */
+function canonicalizeKeywordRuntime(
+  ks: KeywordState | undefined,
+): Record<string, unknown> | undefined {
+  if (!ks) return undefined;
+
+  const raw: Record<string, unknown> = {};
+
+  if (ks.maxDamageCap != null) raw.maxDamageCap = ks.maxDamageCap;
+  if (ks.cannotBeDestroyed) raw.cannotBeDestroyed = true;
+  if (ks.can_attack_followers) raw.can_attack_followers = true;
+  if (ks.isInvincibleOnAttack) raw.isInvincibleOnAttack = true;
+  if (ks.hasPiercing) raw.hasPiercing = true;
+  if (ks.banishOnDeath) raw.banishOnDeath = true;
+  if (ks.hasRally) raw.hasRally = true;
+  if (ks.rallyRequirement != null) raw.rallyRequirement = ks.rallyRequirement;
+  if (ks.hasFanfare) raw.hasFanfare = true;
+  if (ks.hasStrike) raw.hasStrike = true;
+  if (ks.hasEngage) raw.hasEngage = true;
+  if (ks.engageCost != null) raw.engageCost = ks.engageCost;
+  if (ks.engageOncePerTurn === false) raw.engageOncePerTurn = false;
+  if (ks.engageSacrifice) raw.engageSacrifice = true;
+  if (ks.engagedThisTurn) raw.engagedThisTurn = true;
+  if (ks.hasSpellboost) raw.hasSpellboost = true;
+  if (ks.spellboostCount != null && ks.spellboostCount !== 0) {
+    raw.spellboostCount = ks.spellboostCount;
+  }
+  const spellboostCost = canonicalizeSpellboostCost(ks.spellboost);
+  if (spellboostCost) raw.spellboost = spellboostCost;
+  const ksCounters = canonicalizeCounterMap(ks.counters);
+  if (ksCounters) raw.counters = ksCounters;
+  if (ks.hasPixieEnter) raw.hasPixieEnter = true;
+  if (ks.hasAllyEnter) raw.hasAllyEnter = true;
+  if (ks.hasBleed) raw.hasBleed = true;
+  const bleed = canonicalizeBleed(ks.bleed);
+  if (bleed) raw.bleed = bleed;
+  if (ks.hasCantAttack) raw.hasCantAttack = true;
+  if (ks.cantAttack) raw.cantAttack = true;
+  if (ks.cantAttackFollowers) raw.cantAttackFollowers = true;
+  if (ks.cantAttackLeaders) raw.cantAttackLeaders = true;
+  if (ks.cantAttackExpiresOnTurn != null) {
+    raw.cantAttackExpiresOnTurn = ks.cantAttackExpiresOnTurn;
+  }
+  if (ks.cantAttackIsTemporary) raw.cantAttackIsTemporary = true;
+  if (ks.cantAttackUntilOpponentEOT) raw.cantAttackUntilOpponentEOT = true;
+  if (ks.cantAttackOwner != null) raw.cantAttackOwner = ks.cantAttackOwner;
+
+  const keys = Object.keys(raw).sort();
+  if (keys.length === 0) return undefined;
+
+  const out: Record<string, unknown> = {};
+  for (const key of keys) {
+    out[key] = raw[key];
+  }
+  return out;
+}
+
+function canonicalizeCountdown(card: CardInstance): number | undefined {
+  if (!card.hasCountdown && card.countdown == null) return undefined;
+  const value = Number(card.countdown);
+  if (!Number.isFinite(value)) return undefined;
+  return value;
+}
+
+function canonicalizeSpellboostCount(card: CardInstance): number | undefined {
+  const fromCard = card.spellboostCount;
+  const fromKs = card.keywordState?.spellboostCount;
+  const value =
+    fromCard != null ? fromCard : fromKs != null ? fromKs : undefined;
+  if (value == null || value === 0) return undefined;
+  return value;
+}
+
 /**
  * Canonicalize a card for hashing.
  * Only include game-relevant properties.
  */
 function canonicalizeCard(card: CardInstance | null | undefined): object {
   if (!card) return { id: null, uid: null, name: null };
-  return {
+
+  const keywordRuntime = canonicalizeKeywordRuntime(card.keywordState);
+  const spellboostCount = canonicalizeSpellboostCount(card);
+  const countdown = canonicalizeCountdown(card);
+
+  const base: Record<string, unknown> = {
     id: card.id,
     uid: card.uid,
     name: card.name,
@@ -133,10 +280,28 @@ function canonicalizeCard(card: CardInstance | null | undefined): object {
     hasStorm: !!card.hasStorm,
     hasRush: !!card.hasRush,
     hasBarrier: !!card.hasBarrier,
+    hasAmbush: !!card.hasAmbush,
+    hasAura: !!card.hasAura,
+    hasIntimidate: !!card.hasIntimidate,
+    hasCountdown: !!card.hasCountdown,
+    hasLastWords: !!card.hasLastWords,
+    hasTaunt: !!card.hasTaunt,
+    hasEngage: !!card.hasEngage,
     isEvolved: !!card.isEvolved,
     evoType: card.evoType,
     counters: card.counters || {},
   };
+
+  if (countdown != null) base.countdown = countdown;
+  if (spellboostCount != null) base.spellboostCount = spellboostCount;
+  if (keywordRuntime) base.keywordRuntime = keywordRuntime;
+
+  const keys = Object.keys(base).sort();
+  const out: Record<string, unknown> = {};
+  for (const key of keys) {
+    out[key] = base[key];
+  }
+  return out;
 }
 
 /**

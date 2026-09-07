@@ -17,9 +17,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
@@ -221,7 +226,7 @@ function gainCutthroatCrest(): void {
   });
   whenPlayCard("first", 0);
   const cut = findOnBoard("first", "Cutthroat, Fluxblade Convict")!;
-  onEvolve(cut, "first", "normal", { spendPoint: true });
+  whenEvolve(cut, "first");
   expect(
     getCrests(state, "first").some(
       (c) => c.name === "Cutthroat, Fluxblade Convict",
@@ -609,7 +614,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const courier = findOnBoard("first", "Cool Courier")!;
       state.players.first.evoCharges = 2;
-      onEvolve(courier, "first", "normal", { spendPoint: true });
+      whenEvolve(courier, "first");
       expect(
         getHand(state, "first").filter((c) => c.id === ANCIENT).length,
       ).toBe(2);
@@ -641,7 +646,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const cut = findOnBoard("first", "Cutthroat, Fluxblade Convict")!;
       state.players.first.evoCharges = 2;
-      onEvolve(cut, "first", "normal", { spendPoint: true });
+      whenEvolve(cut, "first");
       expect(
         getDeck(state, "first").filter(
           (c) => c.name === "Cutthroat, Fluxblade Convict",
@@ -678,7 +683,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const cut = findOnBoard("first", "Cutthroat, Fluxblade Convict")!;
       state.players.first.evoCharges = 2;
-      onEvolve(cut, "first", "normal", { spendPoint: true });
+      whenEvolve(cut, "first");
       expect(
         getCrests(state, "first").some(
           (c) => c.name === "Cutthroat, Fluxblade Convict",
@@ -747,7 +752,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
       const ally = allyFollower("PickMe");
       state.players.first.evoCharges = 2;
-      onEvolve(eudie, "first", "normal", { spendPoint: true });
+      whenEvolve(eudie, "first");
       resolvePendingByUid(ally.uid);
       expect(ally.hasEvolved).toBe(true);
       expect(eudie.hasEvolved).toBe(true);
@@ -783,7 +788,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       );
       const imari = findOnBoard("first", "Imari, Dewdrop")!;
       state.players.first.evoCharges = 2;
-      onEvolve(imari, "first", "normal", { spendPoint: true });
+      whenEvolve(imari, "first");
       const spellIdx = getHand(state, "first").findIndex(
         (c) => c.id === SPELL_A,
       );
@@ -823,7 +828,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
         getHand(state, "first").find((c) => c.id === DRAW_TOP)!.uid,
       );
       const imari = findOnBoard("first", "Imari, Dewdrop")!;
-      onEvolve(imari, "first", "super", { spendPoint: true });
+      whenSuperEvolve(imari, "first");
       const spells = getHand(state, "first").filter((c) => c.type === "Spell");
       expect(spells).toHaveLength(2);
       expect(spells.every((c) => Number(c.cost) === 1)).toBe(true);
@@ -1119,7 +1124,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const slaus = findOnBoard("first", "Slaus, Revolving Wheel of Fortune")!;
       state.players.first.evoCharges = 2;
-      onEvolve(slaus, "first", "normal", { spendPoint: true });
+      whenEvolve(slaus, "first");
       whenEndTurn();
       expect(
         getBoard(state, "first").some((c) => c.name.includes("Slaus")),
@@ -1195,7 +1200,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const slaus = findOnBoard("first", "Slaus, Revolving Wheel of Fortune")!;
       state.players.first.evoCharges = 2;
-      onEvolve(slaus, "first", "normal", { spendPoint: true });
+      whenEvolve(slaus, "first");
 
       const oppHand = createCard(
         { name: "OppHand", type: "Follower", cost: 2, attack: 2, defense: 2 },
@@ -1321,7 +1326,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const barkeep = findOnBoard("first", "Brusque Barkeep")!;
       state.players.first.evoCharges = 2;
-      onEvolve(barkeep, "first", "normal", { spendPoint: true });
+      whenEvolve(barkeep, "first");
       expect(thenBoard("first").some((c) => c.name === "Mystic Artifact")).toBe(
         true,
       );
@@ -1488,7 +1493,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const asher = findOnBoard("first", "Asher & Lydia, Paths Beyond")!;
       state.players.first.evoCharges = 2;
-      onEvolve(asher, "first", "normal", { spendPoint: true });
+      whenEvolve(asher, "first");
       cleanupDead();
       expect(getBoard(state, "second").length).toBe(2);
       expect(getBoard(state, "second").some((c) => c.uid === plain.uid)).toBe(
@@ -1859,7 +1864,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       state.players.first.superEvoCharges = 2;
       whenPlayCard("first", 0);
       const aizeden = findOnBoard("first", "Aizeden, Killshot Revenant")!;
-      onEvolve(aizeden, "first", "super", { spendPoint: true });
+      whenSuperEvolve(aizeden, "first");
       expect(
         thenBoard("first").filter((c) => c.name === "Warden of the Trigger")
           .length,
@@ -1908,7 +1913,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       whenPlayCard("first", 0);
       const cam = findOnBoard("first", "Camiscilla, Unfeeling Heart")!;
       const hpBefore = getHP(state, "second");
-      onEvolve(cam, "first", "super", { spendPoint: true });
+      whenSuperEvolve(cam, "first");
       expect(getHP(state, "second")).toBe(hpBefore - 3);
     });
   });
@@ -1951,7 +1956,7 @@ describe("L2 — Cutthroat Portalcraft", () => {
       const lud = findOnBoard("first", "Ludicrous Ordnance")!;
       state.players.first.evoCharges = 2;
       const defBefore = Number(foe.defense);
-      onEvolve(lud, "first", "normal", { spendPoint: true });
+      whenEvolve(lud, "first");
       expect(defBefore - Number(foe.defense)).toBe(3);
     });
 

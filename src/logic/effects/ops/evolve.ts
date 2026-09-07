@@ -72,9 +72,6 @@ export function applyEvolveStatBuffs(
   });
   if (sourceCard.evo_image) sourceCard.base_image = sourceCard.evo_image;
 
-  if (!sourceCard.hasStorm) {
-    sourceCard.hasRush = true;
-  }
   recomputeAttackFlags(sourceCard);
 }
 
@@ -89,6 +86,7 @@ export function evolveFollowerDeferred(
   applyEvolveStatBuffs(sourceCard, owner, mode);
   sourceCard.hasEvolved = true;
   sourceCard.evoType = mode === "super" ? "super" : "normal";
+  recomputeAttackFlags(sourceCard);
   enqueueDeferredEvolveCompletion(
     sourceCard,
     owner,

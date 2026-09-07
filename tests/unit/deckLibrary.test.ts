@@ -17,27 +17,10 @@ import {
   validateDeckRaw,
 } from "../../src/data/deckValidation.js";
 import { isRawDeckObject, type RawDeck } from "../../src/data/rawDeck.js";
-
-/** In-game meta deck library — keep in sync with .gitignore exceptions. */
-export const COMMITTED_CLASS_DECKS = [
-  "aggro_abysscraft.json",
-  "amulet_havencraft.json",
-  "antemaria_dragoncraft.json",
-  "artifact_portalcraft.json",
-  "barbaros_swordcraft.json",
-  "buff_forestcraft.json",
-  "cutthroat_portalcraft.json",
-  "evolution_forestcraft.json",
-  "evolution_havencraft.json",
-  "kukishiro_havencraft.json",
-  "lhynkal_runecraft.json",
-  "midrange_abysscraft.json",
-  "rally_swordcraft.json",
-  "ramp_dragoncraft.json",
-  "sephie_runecraft.json",
-  "spell_runecraft.json",
-  "thestae_forestcraft.json",
-] as const;
+import {
+  shippedDeckFiles,
+  type DeckManifest,
+} from "../../src/data/deckManifest.js";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -45,6 +28,12 @@ const ROOT = path.resolve(
 );
 const DECKS_DIR = path.join(ROOT, "decks");
 const CARDS_DIR = path.join(ROOT, "cards");
+const MANIFEST_FILE = path.join(DECKS_DIR, "manifest.json");
+
+function loadCommittedClassDecks(): string[] {
+  const manifest = readJson(MANIFEST_FILE) as DeckManifest;
+  return shippedDeckFiles(manifest);
+}
 
 function readJson(file: string): unknown {
   return JSON.parse(fs.readFileSync(file, "utf-8"));
@@ -69,8 +58,18 @@ function loadCardIndex() {
 
 describe("committed class deck library", () => {
   const index = loadCardIndex();
+  const COMMITTED_CLASS_DECKS = loadCommittedClassDecks();
 
-  it.each([...COMMITTED_CLASS_DECKS])(
+  it("manifest lists every shipped deck file on disk", () => {
+    expect(COMMITTED_CLASS_DECKS.length).toBeGreaterThanOrEqual(7);
+    for (const file of COMMITTED_CLASS_DECKS) {
+      expect(fs.existsSync(path.join(DECKS_DIR, file)), `missing ${file}`).toBe(
+        true,
+      );
+    }
+  });
+
+  it.each(COMMITTED_CLASS_DECKS)(
     "%s is valid (40 cards, copy limit, names resolve)",
     (file) => {
       const raw = readJson(path.join(DECKS_DIR, file));
@@ -83,7 +82,7 @@ describe("committed class deck library", () => {
     },
   );
 
-  it.each([...COMMITTED_CLASS_DECKS])(
+  it.each(COMMITTED_CLASS_DECKS)(
     "%s only uses its class + Neutral cards",
     (file) => {
       const raw = readJson(path.join(DECKS_DIR, file)) as RawDeck;

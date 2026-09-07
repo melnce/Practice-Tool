@@ -13,11 +13,16 @@ import {
   thenBoard,
   whenEndTurn,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
 import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
@@ -279,7 +284,7 @@ describe("B/C — Enchanting Perfumer replicate (10232120)", () => {
     resolveFirstPending();
     const perf = findOnBoard("first", "Enchanting Perfumer")!;
     const sigilsBefore = earthSigilOnBoard()?.counters?.earth ?? 0;
-    onEvolve(perf, "first", "normal");
+    whenEvolve(perf, "first");
     resolveFirstPending();
     expect(Number(e.defense)).toBeLessThan(def0);
     expect(earthSigilOnBoard()?.counters?.earth).toBeGreaterThan(sigilsBefore);
@@ -308,7 +313,7 @@ describe("B/C — Norman mode + replicate (10234120)", () => {
       (c) => c.name === "Guardian Golem",
     ).length;
     const norman = findOnBoard("first", "Norman, Adamant Alchemist")!;
-    onEvolve(norman, "first", "normal");
+    whenEvolve(norman, "first");
     if (state.pendingModeChoice) state.pendingModeChoice.selectedIndex = 0;
     expect(
       thenBoard("first").filter((c) => c.name === "Guardian Golem").length,
@@ -446,7 +451,7 @@ describe("B/C — Ascetic replicate shikigami (10331120)", () => {
     const countBefore = thenBoard("first").filter(
       (c) => c.name === "Paper Shikigami",
     ).length;
-    onEvolve(asc, "first", "normal");
+    whenEvolve(asc, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Paper Shikigami").length,
     ).toBeGreaterThan(countBefore);

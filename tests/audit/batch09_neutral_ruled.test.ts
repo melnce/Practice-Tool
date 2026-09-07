@@ -15,8 +15,13 @@ import {
   thenDeck,
   whenEndTurn,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { drawCard } from "../../src/core/utils.js";
@@ -115,7 +120,7 @@ describe("B/C — Olivia super-evolve ally (10104110)", () => {
     expect(olivia.hasEvolved).toBeFalsy();
     state.players.first.superEvoCharges = 1;
     state.players.first.evoUsedThisTurn = false;
-    onEvolve(olivia, "first", "super");
+    whenSuperEvolve(olivia, "first");
     resolveFirstPending();
     expect(ally.hasEvolved).toBe(true);
     expect(ally.evoType).toBe("super");
@@ -163,7 +168,7 @@ describe("B/C — enemy_super_evolve hand triggers (10302110, 10303110)", () => 
     );
     applyKeywordsFromList(foe);
     state.players.second.board = [foe];
-    onEvolve(foe, "second", "super");
+    whenSuperEvolve(foe, "second");
     const insp = thenHand("first").find((c) => c.name === "Inspirational One")!;
     expect(hasKeyword(insp, "Bane")).toBe(true);
   });
@@ -180,7 +185,7 @@ describe("B/C — enemy_super_evolve hand triggers (10302110, 10303110)", () => 
     );
     applyKeywordsFromList(foe);
     state.players.second.board = [foe];
-    onEvolve(foe, "second", "super");
+    whenSuperEvolve(foe, "second");
     const dog = thenHand("first").find((c) => c.name === "Dogged One")!;
     expect(hasKeyword(dog, "Storm")).toBe(true);
   });
@@ -281,7 +286,7 @@ describe("B/C — Mjerrabaine alt-win chain (10304110)", () => {
       true,
     );
     const mj = findOnBoard("first", "Mjerrabaine, Great Manifest")!;
-    onEvolve(mj, "first", "normal");
+    whenEvolve(mj, "first");
     expect(
       getCrests(state, "first").some(
         (c) => c.name === "Mjerrabaine, Great Manifest",

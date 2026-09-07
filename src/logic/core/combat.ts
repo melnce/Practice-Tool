@@ -150,7 +150,12 @@ export function syncHasAttackedFromSwings(card: CardInstance): void {
 
 /** Pure derivation of whether a follower may attack (no mutation). */
 export function deriveCanAttack(card: CardInstance): boolean {
-  const eligible = !!(card.hasStorm || !card.justPlayed || card.hasRush);
+  const eligible = !!(
+    card.hasStorm ||
+    !card.justPlayed ||
+    card.hasRush ||
+    card.hasEvolved
+  );
   return eligible && swingsRemaining(card) && !isAttackForbidden(card);
 }
 
@@ -165,7 +170,11 @@ export function effectiveAttackEligibility(card: CardInstance): boolean {
 
 export function recomputeAttackFlags(card: CardInstance) {
   (card as any).can_attack = deriveCanAttack(card);
-  card.isRush = !!(card.justPlayed && card.hasRush && !card.hasStorm);
+  card.isRush = !!(
+    card.justPlayed &&
+    (card.hasRush || card.hasEvolved) &&
+    !card.hasStorm
+  );
 }
 function drainCombatResolutionQueue() {
   if (isEffectResolutionPaused()) return;
@@ -523,8 +532,13 @@ function _attackLeaderCore(
 
   if (!attacker || attacker.type !== "Follower") return;
 
-  // Rush can't hit leader on play turn
-  if (attacker.hasRush && attacker.justPlayed && !attacker.hasStorm) return;
+  // Rush / evolve attack permission can't hit leader on play turn
+  if (
+    attacker.justPlayed &&
+    (attacker.hasRush || attacker.hasEvolved) &&
+    !attacker.hasStorm
+  )
+    return;
 
   if (
     !(attacker as any).can_attack ||

@@ -103,7 +103,7 @@ export function summonFromHand(
     card.attacks_left = card.attacks_per_turn;
 
     // Combat flags
-    if (card.hasStorm || card.hasRush) {
+    if (card.hasStorm || card.hasRush || card.hasEvolved) {
       card.can_attack_followers = true;
     } else {
       card.can_attack_followers = false;
@@ -187,7 +187,7 @@ export function summonExactCopyFromHand(
     clone.attacks_left = clone.attacks_per_turn;
 
     // Combat flags
-    if (clone.hasStorm || clone.hasRush) {
+    if (clone.hasStorm || clone.hasRush || clone.hasEvolved) {
       clone.can_attack_followers = true;
     } else {
       clone.can_attack_followers = false;

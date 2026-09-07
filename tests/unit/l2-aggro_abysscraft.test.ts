@@ -16,9 +16,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
@@ -265,7 +270,7 @@ describe("L2 — Aggro Abysscraft", () => {
       whenPlayCard("first", 0);
       const limil = findOnBoard("first", "Limil, Devilish Bunny")!;
       const batsBefore = thenBoard("first").filter((c) => c.id === BAT).length;
-      onEvolve(limil, "first", "normal");
+      whenEvolve(limil, "first");
       expect(thenBoard("first").filter((c) => c.id === BAT).length).toBe(
         batsBefore + 2,
       );
@@ -453,7 +458,7 @@ describe("L2 — Aggro Abysscraft", () => {
         );
       }
       const suzy = findOnBoard("first", "Suzy, Sincere Hexcaster")!;
-      onEvolve(suzy, "first", "normal");
+      whenEvolve(suzy, "first");
       if (state.pendingTargetEffect) {
         resolvePendingByUid(String(follower.uid));
       }
@@ -500,7 +505,7 @@ describe("L2 — Aggro Abysscraft", () => {
       whenPlayCard("first", 0);
       const commander = findOnBoard("first", "Rampaging Commander")!;
       const handBefore = handIds();
-      onEvolve(commander, "first", "super");
+      whenSuperEvolve(commander, "first");
       expect(handIds()).toContain(deckTop);
       expect(handIds()).toContain(DRAW_TOP);
       expect(handIds()).not.toContain(DRAW_DEEP);
@@ -516,7 +521,7 @@ describe("L2 — Aggro Abysscraft", () => {
       state.players.second.hp = 20;
       whenPlayCard("first", 0);
       const commander = findOnBoard("first", "Rampaging Commander")!;
-      onEvolve(commander, "first", "super");
+      whenSuperEvolve(commander, "first");
       expect(getHP(state, "first")).toBe(16);
       expect(getHP(state, "second")).toBe(16);
       expect(printed).toContain("Deal 1 damage to both leaders");

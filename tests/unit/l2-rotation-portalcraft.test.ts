@@ -17,9 +17,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -394,7 +399,7 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const leona = findOnBoard("first", "Leona, Overbearing Guardian")!;
       const bystander = allyFollower(2, 2, "Bystander");
-      onEvolve(leona, "first", "super", { spendPoint: true });
+      whenSuperEvolve(leona, "first");
       resolvePendingByUid(bystander.uid);
       expect(hasKeyword(bystander, "Ambush")).toBe(true);
       expect(hasKeyword(leona, "Ambush")).toBe(false);
@@ -675,7 +680,7 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       const handArtifact = getHand(state, "first").find(
         (c) => c.id === ANALYZING_ARTIFACT,
       )!;
-      onEvolve(cart, "first", "super", { spendPoint: true });
+      whenSuperEvolve(cart, "first");
       resolvePendingByUid(handArtifact.uid);
       expect(boardIds().filter((id) => id === ANALYZING_ARTIFACT)).toHaveLength(
         1,
@@ -699,7 +704,7 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       state.players.first.hand.push(plainArtifact);
       whenPlayCard("first", 0);
       const cart = findOnBoard("first", "New-Age Cartographer")!;
-      onEvolve(cart, "first", "super", { spendPoint: true });
+      whenSuperEvolve(cart, "first");
       resolvePendingByUid(plainArtifact.uid);
       const summoned = findOnBoard("first", "PlainArtifact");
       expect(summoned).toBeTruthy();
@@ -752,7 +757,7 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       setupTurn(R6, { hand: [TWINDRONE], pp: 4, evo: 2 });
       whenPlayCard("first", 0);
       const eng = findOnBoard("first", "Twindrone Engineer")!;
-      onEvolve(eng, "first", "normal", { spendPoint: true });
+      whenEvolve(eng, "first");
       expect(boardIds().filter((id) => id === ANALYZING_ARTIFACT)).toHaveLength(
         2,
       );
@@ -885,7 +890,7 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       setupTurn(R7, { hand: [MECHA_CAVALIER], pp: 5, evo: 2 });
       whenPlayCard("first", 0);
       const mecha = findOnBoard("first", "Mecha Cavalier")!;
-      onEvolve(mecha, "first", "normal", { spendPoint: true });
+      whenEvolve(mecha, "first");
       expect(boardIds().filter((id) => id === MECHA_CAVALIER)).toHaveLength(2);
     });
 
@@ -893,7 +898,7 @@ describe("L2 rotation Portalcraft — real-card tests", () => {
       setupTurn(R8, { hand: [MECHA_CAVALIER], pp: 5, superEvo: 1 });
       whenPlayCard("first", 0);
       const mecha = findOnBoard("first", "Mecha Cavalier")!;
-      onEvolve(mecha, "first", "super", { spendPoint: true });
+      whenSuperEvolve(mecha, "first");
       expect(boardIds().filter((id) => id === MECHA_CAVALIER)).toHaveLength(3);
     });
   });

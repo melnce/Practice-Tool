@@ -13,11 +13,16 @@ import {
   thenHand,
   thenBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
@@ -85,7 +90,7 @@ describe("B/C — Ernesta replicate fanfare (10121120)", () => {
     whenPlayCard("first", 0);
     expect(ally.attack).toBe(3);
     const ern = findOnBoard("first", "Ernesta, Peace Hawker")!;
-    onEvolve(ern, "first", "normal");
+    whenEvolve(ern, "first");
     expect(ally.attack).toBe(4);
   });
 });
@@ -352,7 +357,7 @@ describe("B/C — Octrice crest (10324120)", () => {
     ).toBe(true);
 
     const oct = findOnBoard("first", "Octrice, Hollowness Manifest")!;
-    onEvolve(oct, "first", "normal");
+    whenEvolve(oct, "first");
     const names = thenHand("first").map((c) => c.name);
     expect(names).toContain("Gilded Blade");
     expect(names).toContain("Gilded Necklace");

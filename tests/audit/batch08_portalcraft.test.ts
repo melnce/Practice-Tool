@@ -19,8 +19,13 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getCrests } from "../../src/core/playerHelpers.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -162,7 +167,7 @@ describe("Batch 8 — Portalcraft [10001] Legends Rise", () => {
     whenPlayCard("first", 0);
     expect(thenHand("first").length).toBeGreaterThan(0);
     const eudie = findOnBoard("first", "Eudie, Maiden Reborn")!;
-    onEvolve(eudie, "first", "normal");
+    whenEvolve(eudie, "first");
     expect(
       getCrests(state, "first").some((c) => c.name?.includes("Eudie")),
     ).toBe(true);

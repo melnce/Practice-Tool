@@ -16,10 +16,15 @@ import {
   givenGameState,
   resetUidCounter,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { changeFollowerControl } from "../../src/logic/effects/ops/changeControl.js";
 import { transformTarget } from "../../src/logic/effects/ops/transform.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import {
   buildV2EnemyEnterCells,
   buildV2EnemyLeaveCells,
@@ -587,7 +592,7 @@ describe("Reactive trigger timing matrix v2", () => {
       evoTarget.peak_defense = 2;
       getBoard(state, "first").push(evoTarget);
 
-      onEvolve(evoTarget, "first", "normal");
+      whenEvolve(evoTarget, "first");
 
       expect(watcherEarth("first", evoWatcher.uid)).toBe(1);
       expect(watcherEarth("first", enterWatcher.uid)).toBe(0);

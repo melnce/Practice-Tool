@@ -17,7 +17,7 @@ import {
   whenRunEffects,
   resetUidCounter,
 } from "../../tests/harness/builders.js";
-import { state } from "../../src/core/gameState.js";
+import { state, resetGameState } from "../../src/core/gameState.js";
 import { drawCard } from "../../src/core/utils.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import {
@@ -26,7 +26,12 @@ import {
 } from "../../src/logic/core/resolveTarget.js";
 import { dispatchAction } from "../../src/logic/core/dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
-import { attackLeader } from "../../src/logic/core/combat.js";
+import {
+  attackFollower,
+  attackLeader,
+  effectiveAttackEligibility,
+  recomputeAttackFlags,
+} from "../../src/logic/core/combat.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { consumeEarthSigils } from "../../src/logic/effects/ops/earth.js";
@@ -35,12 +40,21 @@ import {
   makeCardFromDB,
   pushToBoard,
 } from "../../src/logic/effects/ops/summon_ops/core.js";
+import {
+  cleanupDead,
+  flushDeferredDeathBatch,
+} from "../../src/logic/core/cleanup.js";
+import { destroyTarget } from "../../src/logic/effects/ops/destroy/primitives.js";
+import { resolvePlayCost } from "../../src/logic/core/playCard/cost.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import {
   fingerprintGameState,
   hashFingerprint,
 } from "./cardBehaviourFingerprint.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import {
   applyGatePreparations,
   collectNamedGates,
@@ -51,6 +65,13 @@ import {
   HARNESS_BOARD_RESERVE,
   type GateSpec,
 } from "./cardBehaviourGates.js";
+
+const HARNESS_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "..",
+);
+const DAMAGED_LEADER_HP = 17;
 
 export const HARNESS_SEED = 42;
 /** v2: gate-aware coverage (covered / partial / skipped). */
@@ -75,7 +96,15 @@ export type ScenarioName =
   | "super_evolve"
   | "vanilla_place"
   | "summon"
-  | "in_hand";
+  | "in_hand"
+  | "destroy"
+  | "engage"
+  | "combat"
+  | "watch"
+  | "accelerate"
+  | "crystallize"
+  | "crystallize_engage"
+  | "crystallize_death";
 
 export type ScenarioResult = {
   scenario: ScenarioName;
@@ -156,6 +185,8 @@ export type HarnessArenaNeeds = {
   highCostAlly: boolean;
   namedBoardAllies: string[];
   reservesBoardSlot: boolean;
+  /** First player's leader starts below max HP so restore-to-leader effects are visible. */
+  damagedFirstLeader: boolean;
 };
 
 /** Data-derived arena prep selected per card (never a hard-coded id list). */
@@ -272,6 +303,16 @@ export function analyzeHarnessArenaNeeds(
   // selects were already fingerprinted without extra hand cards.
   if (!isSpell) handKit = false;
 
+  let damagedFirstLeader = false;
+  walkEffects(allRoots, (obj) => {
+    if (damagedFirstLeader) return;
+    if (String(obj.op ?? "") !== "restore") return;
+    const target = String(obj.target ?? "").toLowerCase();
+    if (target !== "leader" && target !== "ally:leader") return;
+    const player = obj.player;
+    if (player === undefined || player === "self") damagedFirstLeader = true;
+  });
+
   return {
     handKit,
     amuletKit,
@@ -279,6 +320,7 @@ export function analyzeHarnessArenaNeeds(
     highCostAlly,
     namedBoardAllies: [...namedBoardAllies],
     reservesBoardSlot: !isSpell,
+    damagedFirstLeader,
   };
 }
 
@@ -468,6 +510,588 @@ function hasHandSourceTrigger(card: RawCard): boolean {
   return getHandTrigger(card) != null;
 }
 
+function isLastWordsKeywordName(name: string): boolean {
+  const n = name.toLowerCase().replace(/\s+/g, "");
+  return n === "lastwords" || n === "last_words";
+}
+
+/** Last Words / last_words keyword on this card's board form (not nested Crystallize amulet text). */
+function keywordEntryHasDeathEffects(k: unknown): boolean {
+  if (typeof k === "string") return isLastWordsKeywordName(k);
+  if (!k || typeof k !== "object") return false;
+  const kw = k as { name?: unknown; effects?: unknown[] };
+  if (!isLastWordsKeywordName(String(kw.name ?? ""))) return false;
+  return Array.isArray(kw.effects) && kw.effects.length > 0;
+}
+
+function hasLastWordsKeywordEffects(card: RawCard): boolean {
+  for (const k of card.keywords ?? []) {
+    if (keywordEntryHasDeathEffects(k)) return true;
+  }
+  return false;
+}
+
+function hasLastWordsTriggerEffects(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as { event?: string; type?: string; effects?: unknown[] };
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (ev !== "last_words") continue;
+    if (hasNonEmptyEffects(trig.effects)) return true;
+  }
+  return false;
+}
+
+/** Top-level last_words script (compiler output) on this card form. */
+function hasLastWordsScript(card: RawCard): boolean {
+  const lw = (card as { last_words?: unknown[] }).last_words;
+  return hasNonEmptyEffects(lw);
+}
+
+/**
+ * Board triggers that fire when this card leaves the field (death-adjacent).
+ * Excludes watchers on other cards leaving (e.g. Lifestealer, Bayle in hand).
+ */
+function hasLeavesFieldDeathTrigger(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as {
+      event?: string;
+      type?: string;
+      source?: string;
+      effects?: unknown[];
+    };
+    if (trig.source !== "board") continue;
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (!ev.includes("leaves_field") && !ev.includes("leave_field")) continue;
+    if (!hasNonEmptyEffects(trig.effects)) continue;
+    // Self-leave only: effect targets self or has no off-board condition naming others.
+    let targetsSelf = false;
+    walkEffects(trig.effects, (obj) => {
+      const target = String(obj.target ?? "").toLowerCase();
+      if (target === "self" || target.includes("this")) targetsSelf = true;
+    });
+    if (targetsSelf) return true;
+  }
+  return false;
+}
+
+/** Data-derived: card should be destroyed in harness to exercise on-death effects. */
+export function hasDestroyOnDeathEffects(card: RawCard): boolean {
+  return (
+    hasLastWordsKeywordEffects(card) ||
+    hasLastWordsTriggerEffects(card) ||
+    hasLastWordsScript(card) ||
+    hasLeavesFieldDeathTrigger(card)
+  );
+}
+
+function isEngageKeywordName(name: string): boolean {
+  return name.toLowerCase() === "engage";
+}
+
+/** Engage keyword on this card's board form with a non-empty effect list. */
+function keywordEntryHasEngageEffects(k: unknown): boolean {
+  if (typeof k === "string") return isEngageKeywordName(k);
+  if (!k || typeof k !== "object") return false;
+  const kw = k as { name?: unknown; effects?: unknown[] };
+  if (!isEngageKeywordName(String(kw.name ?? ""))) return false;
+  return Array.isArray(kw.effects) && kw.effects.length > 0;
+}
+
+export function hasEngageKeywordEffects(card: RawCard): boolean {
+  for (const k of card.keywords ?? []) {
+    if (keywordEntryHasEngageEffects(k)) return true;
+  }
+  return false;
+}
+
+function hasEngageTriggerEffects(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as { event?: string; type?: string; effects?: unknown[] };
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (ev !== "engage") continue;
+    if (hasNonEmptyEffects(trig.effects)) return true;
+  }
+  return false;
+}
+
+/** Data-derived: card carries Engage keyword effects or an engage trigger. */
+export function hasEngageAbility(card: RawCard): boolean {
+  return hasEngageKeywordEffects(card) || hasEngageTriggerEffects(card);
+}
+
+const COMBAT_TRIGGER_EVENTS = new Set(["strike", "follower_strike", "clash"]);
+
+function hasCombatTriggerEntryEffects(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as { event?: string; type?: string; effects?: unknown[] };
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (!COMBAT_TRIGGER_EVENTS.has(ev)) continue;
+    if (hasNonEmptyEffects(trig.effects)) return true;
+  }
+  return false;
+}
+
+/** Data-derived: card carries strike / follower_strike / clash trigger effects. */
+export function hasCombatTriggerEffects(card: RawCard): boolean {
+  return hasCombatTriggerEntryEffects(card);
+}
+
+type BoardWatcherTrigger = {
+  event?: string;
+  source?: string;
+  condition?: Record<string, unknown>;
+  effects?: unknown[];
+};
+
+/** ally_follower_enter on board (not hand) whose condition is not is_self. */
+export function getBoardWatcherEnterTrigger(
+  card: RawCard,
+): BoardWatcherTrigger | null {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as BoardWatcherTrigger;
+    if (String(trig.event ?? "") !== "ally_follower_enter") continue;
+    if (trig.source === "hand") continue;
+    const cond = trig.condition ?? {};
+    if (cond.is_self === true) continue;
+    if (!hasNonEmptyEffects(trig.effects)) continue;
+    return trig;
+  }
+  return null;
+}
+
+/** Data-derived: board watcher for ally_follower_enter (non-self condition). */
+export function hasBoardWatcherEnterTrigger(card: RawCard): boolean {
+  return getBoardWatcherEnterTrigger(card) != null;
+}
+
+/** Self-enter ally_follower_enter (is_self) — exercised via play scenario. */
+function hasSelfAllyEnterTrigger(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as BoardWatcherTrigger;
+    if (String(trig.event ?? "") !== "ally_follower_enter") continue;
+    const cond = trig.condition ?? {};
+    if (cond.is_self !== true) continue;
+    if (!hasNonEmptyEffects(trig.effects)) continue;
+    return true;
+  }
+  return false;
+}
+
+type ProbeFollowerTemplate = {
+  id: string;
+  name: string;
+  type?: string;
+  cost?: string | number;
+  base_cost?: number;
+  class?: string;
+  tribes?: string[];
+};
+
+let probeFollowerPool: ProbeFollowerTemplate[] | null = null;
+
+function loadProbeFollowerPool(): ProbeFollowerTemplate[] {
+  if (probeFollowerPool) return probeFollowerPool;
+  const allPath = path.join(HARNESS_ROOT, "cards/all.json");
+  const tokenPath = path.join(HARNESS_ROOT, "cards/token_details.json");
+  const all = JSON.parse(
+    fs.readFileSync(allPath, "utf-8"),
+  ) as ProbeFollowerTemplate[];
+  const tokens = JSON.parse(
+    fs.readFileSync(tokenPath, "utf-8"),
+  ) as ProbeFollowerTemplate[];
+  probeFollowerPool = [...all, ...tokens].filter(
+    (c) => String(c.type ?? "").toLowerCase() === "follower",
+  );
+  return probeFollowerPool;
+}
+
+function watchConditionShape(cond: Record<string, unknown>): string {
+  const keys = Object.keys(cond).sort();
+  return keys.length ? keys.join("+") : "empty";
+}
+
+function probeBaseCost(card: ProbeFollowerTemplate): number {
+  if (card.base_cost !== undefined) return Number(card.base_cost);
+  const n = Number(card.cost);
+  return Number.isFinite(n) ? n : parseInt(String(card.cost ?? ""), 10) || 0;
+}
+
+function probeSatisfiesCondition(
+  card: ProbeFollowerTemplate,
+  condition: Record<string, unknown>,
+  hostName: string,
+): boolean {
+  if (condition.is_self === true) return false;
+  if (condition.not_self && card.name === hostName) return false;
+
+  if (condition.tribe) {
+    const want = String(condition.tribe).toLowerCase();
+    const tribes = (card.tribes ?? []).map((t) => String(t).toLowerCase());
+    if (!tribes.includes(want)) return false;
+  }
+
+  if (condition.name) {
+    if (card.name !== String(condition.name)) return false;
+  }
+
+  if (condition.class) {
+    if (String(card.class ?? "") !== String(condition.class)) return false;
+  }
+
+  const base = probeBaseCost(card);
+  if (condition.base_cost_eq != null) {
+    if (base !== Number(condition.base_cost_eq)) return false;
+  }
+  if (condition.base_cost_gte != null) {
+    if (base < Number(condition.base_cost_gte)) return false;
+  }
+  if (condition.base_cost_lte != null) {
+    if (base > Number(condition.base_cost_lte)) return false;
+  }
+
+  return true;
+}
+
+function pickProbeFollower(
+  condition: Record<string, unknown>,
+  hostName: string,
+  qualify: boolean,
+): { template: ProbeFollowerTemplate } | { unsatisfiable: string } {
+  const pool = loadProbeFollowerPool();
+  const matches = pool.filter((c) =>
+    qualify
+      ? probeSatisfiesCondition(c, condition, hostName)
+      : !probeSatisfiesCondition(c, condition, hostName),
+  );
+  if (!matches.length) {
+    return {
+      unsatisfiable: qualify
+        ? watchConditionShape(condition)
+        : `no_non_qualifying:${watchConditionShape(condition)}`,
+    };
+  }
+  return { template: matches[0]! };
+}
+
+function watchNeedsEarthSigil(trigger: BoardWatcherTrigger): boolean {
+  let need = false;
+  walkEffects(trigger.effects ?? [], (obj) => {
+    if (String(obj.op ?? "") === "earth_rite") need = true;
+  });
+  return need;
+}
+
+type WatchSnapshot = {
+  leaderHp: number;
+  hostAtk: number;
+  hostDef: number;
+  hostCost: number;
+  hostHasWard: boolean;
+  hostHasRush: boolean;
+  enteringHasWard: boolean;
+  enteringHasBane: boolean;
+  enteringHasRush: boolean;
+  enteringEvolved: boolean;
+  enteringAtk: number;
+  enteringDef: number;
+  enemyFollowerDefSum: number;
+};
+
+function enemyFollowerDefenseSum(): number {
+  return getBoard(state, "second")
+    .filter((c) => c.type === "Follower")
+    .reduce((sum, c) => sum + (parseInt(String(c.defense), 10) || 0), 0);
+}
+
+function snapshotWatchState(
+  host: CardInstance,
+  entering?: CardInstance,
+): WatchSnapshot {
+  const hostCost =
+    (host as { effectiveCost?: number }).effectiveCost ??
+    Number(host.cost) ??
+    0;
+  return {
+    leaderHp: state.players.first.hp,
+    hostAtk: parseInt(String(host.attack), 10) || 0,
+    hostDef: parseInt(String(host.defense), 10) || 0,
+    hostCost: Number.isFinite(hostCost) ? hostCost : 0,
+    hostHasWard: !!host.hasWard,
+    hostHasRush: !!host.hasRush,
+    enteringHasWard: !!entering?.hasWard,
+    enteringHasBane: !!entering?.hasBane,
+    enteringHasRush: !!entering?.hasRush,
+    enteringEvolved: !!(
+      (entering as { hasEvolved?: boolean; isEvolved?: boolean })?.hasEvolved ??
+      (entering as { isEvolved?: boolean })?.isEvolved
+    ),
+    enteringAtk: parseInt(String(entering?.attack ?? 0), 10) || 0,
+    enteringDef: parseInt(String(entering?.defense ?? 0), 10) || 0,
+    enemyFollowerDefSum: enemyFollowerDefenseSum(),
+  };
+}
+
+function watchEffectObserved(
+  trigger: BoardWatcherTrigger,
+  host: CardInstance,
+  entering: CardInstance,
+  before: WatchSnapshot,
+  after: WatchSnapshot,
+): boolean {
+  let anyCheck = false;
+  let allPass = true;
+
+  const checkRestore = () => {
+    anyCheck = true;
+    if (after.leaderHp <= before.leaderHp) allPass = false;
+  };
+
+  const checkEnteringKeyword = (keywords: unknown) => {
+    anyCheck = true;
+    const list = Array.isArray(keywords) ? keywords : [];
+    for (const kw of list) {
+      const name =
+        typeof kw === "string"
+          ? kw
+          : String((kw as { name?: string })?.name ?? "");
+      const n = name.toLowerCase();
+      if (n === "ward" && !after.enteringHasWard) allPass = false;
+      if (n === "bane" && !after.enteringHasBane) allPass = false;
+      if (n === "rush" && !after.enteringHasRush) allPass = false;
+    }
+  };
+
+  const checkSelfStat = (atkDelta: number, defDelta: number) => {
+    anyCheck = true;
+    const atkUp = after.hostAtk > before.hostAtk;
+    const defUp = after.hostDef > before.hostDef;
+    if (atkDelta > 0 && !atkUp && defDelta <= 0) allPass = false;
+    if (defDelta > 0 && !defUp && atkDelta <= 0) allPass = false;
+    if (atkDelta > 0 && defDelta > 0 && !atkUp && !defUp) allPass = false;
+  };
+
+  const checkSelfKeyword = (keywords: unknown) => {
+    anyCheck = true;
+    const list = Array.isArray(keywords) ? keywords : [];
+    for (const kw of list) {
+      const name =
+        typeof kw === "string"
+          ? kw
+          : String((kw as { name?: string })?.name ?? "");
+      const n = name.toLowerCase();
+      if (n === "ward" && !after.hostHasWard) allPass = false;
+      if (n === "rush" && !after.hostHasRush) allPass = false;
+    }
+  };
+
+  const checkEvolve = () => {
+    anyCheck = true;
+    if (!after.enteringEvolved) allPass = false;
+  };
+
+  const checkSelfCostDown = () => {
+    anyCheck = true;
+    if (after.hostCost >= before.hostCost) allPass = false;
+  };
+
+  const checkEnemyFollowerDamage = (amount: number) => {
+    anyCheck = true;
+    const dealt = before.enemyFollowerDefSum - after.enemyFollowerDefSum;
+    if (amount > 0 && dealt <= 0) allPass = false;
+  };
+
+  walkEffects(trigger.effects ?? [], (obj) => {
+    const op = String(obj.op ?? "");
+    const target = String(obj.target ?? "").toLowerCase();
+
+    if (op === "damage") {
+      if (target.includes("enemy") && target.includes("follower")) {
+        checkEnemyFollowerDamage(Number(obj.amount ?? 0));
+      }
+    }
+
+    if (op === "restore") {
+      if (
+        target === "leader" ||
+        target === "ally:leader" ||
+        target.includes("leader")
+      ) {
+        checkRestore();
+      }
+    }
+
+    if (op === "keyword") {
+      if (target === "entering_follower" || target.includes("entering")) {
+        checkEnteringKeyword(obj.keywords);
+      }
+      if (target === "self") {
+        checkSelfKeyword(obj.keywords);
+      }
+    }
+
+    if (op === "stat") {
+      if (target === "self") {
+        if (obj.keywords) checkSelfKeyword(obj.keywords);
+        const atk = Number(obj.attack ?? 0);
+        const def = Number(obj.defense ?? 0);
+        if (atk !== 0 || def !== 0) checkSelfStat(atk, def);
+      }
+      if (target === "entering_follower" || target.includes("entering")) {
+        anyCheck = true;
+        const atk = Number(obj.attack ?? 0);
+        const def = Number(obj.defense ?? 0);
+        if (atk > 0 && after.enteringAtk <= before.enteringAtk) allPass = false;
+        if (def > 0 && after.enteringDef <= before.enteringDef) allPass = false;
+      }
+    }
+
+    if (op === "evolve") {
+      if (target === "entering_follower" || target.includes("entering")) {
+        checkEvolve();
+      }
+    }
+
+    if (op === "earth_rite") {
+      walkEffects(obj.effects ?? [], (inner) => {
+        if (String(inner.op ?? "") === "evolve") checkEvolve();
+      });
+    }
+
+    if (
+      op === "cost" &&
+      String(obj.mode ?? "") === "reduce" &&
+      target === "self"
+    ) {
+      checkSelfCostDown();
+    }
+  });
+
+  return anyCheck && allPass;
+}
+
+function isAccelerateKeywordName(name: string): boolean {
+  return name.toLowerCase() === "accelerate";
+}
+
+function isCrystallizeKeywordName(name: string): boolean {
+  return name.toLowerCase() === "crystallize";
+}
+
+type AccelerateFormSpec = { cost: number; effects: unknown[] };
+type CrystallizeFormSpec = { cost: number; amuletKeywords: unknown[] };
+
+function getAccelerateForm(card: RawCard): AccelerateFormSpec | null {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as { name?: unknown; cost?: unknown; effects?: unknown[] };
+    if (!isAccelerateKeywordName(String(kw.name ?? ""))) continue;
+    if (!Array.isArray(kw.effects) || kw.effects.length === 0) continue;
+    const cost = Number(kw.cost);
+    if (!Number.isFinite(cost) || cost < 0) continue;
+    return { cost, effects: kw.effects };
+  }
+  return null;
+}
+
+function getCrystallizeForm(card: RawCard): CrystallizeFormSpec | null {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as {
+      name?: unknown;
+      cost?: unknown;
+      amuletKeywords?: unknown[];
+    };
+    if (!isCrystallizeKeywordName(String(kw.name ?? ""))) continue;
+    if (!Array.isArray(kw.amuletKeywords) || kw.amuletKeywords.length === 0) {
+      continue;
+    }
+    const cost = Number(kw.cost);
+    if (!Number.isFinite(cost) || cost < 0) continue;
+    return { cost, amuletKeywords: kw.amuletKeywords };
+  }
+  return null;
+}
+
+/** Data-derived: Accelerate keyword with a non-empty effects array. */
+export function hasAccelerateForm(card: RawCard): boolean {
+  return getAccelerateForm(card) != null;
+}
+
+/** Data-derived: Crystallize keyword with a non-empty amuletKeywords array. */
+export function hasCrystallizeForm(card: RawCard): boolean {
+  return getCrystallizeForm(card) != null;
+}
+
+function hasCrystallizeAmuletEngage(card: RawCard): boolean {
+  const form = getCrystallizeForm(card);
+  if (!form) return false;
+  for (const k of form.amuletKeywords) {
+    if (keywordEntryHasEngageEffects(k)) return true;
+  }
+  return false;
+}
+
+function hasCrystallizeAmuletLastWords(card: RawCard): boolean {
+  const form = getCrystallizeForm(card);
+  if (!form) return false;
+  for (const k of form.amuletKeywords) {
+    if (keywordEntryHasDeathEffects(k)) return true;
+  }
+  return false;
+}
+
+function crystallizeAmuletEngageCost(card: RawCard): number {
+  const form = getCrystallizeForm(card);
+  if (!form) return 0;
+  for (const k of form.amuletKeywords) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as { name?: unknown; cost?: unknown };
+    if (!isEngageKeywordName(String(kw.name ?? ""))) continue;
+    return Number(kw.cost ?? 0);
+  }
+  return 0;
+}
+
+function printedBaseCost(card: RawCard): number {
+  const n = Number(card.cost);
+  if (Number.isFinite(n)) return n;
+  return parseInt(String(card.cost ?? ""), 10) || 0;
+}
+
+function alternateFormFirstPP(
+  alternateCost: number,
+  printedCost: number,
+  extraPP = 0,
+): number | { skip: SkipReason; detail: string } {
+  const firstPP = alternateCost + extraPP;
+  if (alternateCost >= printedCost) {
+    return { skip: "drive_threw", detail: "alternate_cost_not_below_printed" };
+  }
+  if (firstPP >= printedCost) {
+    return {
+      skip: "drive_threw",
+      detail: "alternate_pp_setup_not_below_printed",
+    };
+  }
+  return firstPP;
+}
+
+function engageCostFromRaw(card: RawCard): number {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as { name?: unknown; cost?: unknown };
+    if (!isEngageKeywordName(String(kw.name ?? ""))) continue;
+    return Number(kw.cost ?? 0);
+  }
+  return 0;
+}
+
 function playGrantsCrestTurnBoundary(card: RawCard): boolean {
   const playRoots: unknown[] = [...(card.fanfare ?? []), ...(card.spell ?? [])];
   let found = false;
@@ -494,6 +1118,14 @@ function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
     case "vanilla_place":
     case "summon":
     case "turn_boundary":
+    case "destroy":
+    case "engage":
+    case "combat":
+    case "watch":
+    case "accelerate":
+    case "crystallize":
+    case "crystallize_engage":
+    case "crystallize_death":
       return true;
     default:
       return false;
@@ -504,7 +1136,7 @@ function hasScenarioPlacingOnBoard(paths: ScenarioName[]): boolean {
   return paths.some(scenarioPlacesSubjectOnBoard);
 }
 
-function classifyPaths(card: RawCard): ScenarioName[] {
+export function classifyPaths(card: RawCard): ScenarioName[] {
   const paths: ScenarioName[] = [];
   const isSpell = String(card.type).toLowerCase() === "spell";
   const playableEffects = isSpell
@@ -529,12 +1161,36 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   if (hasHandSourceTrigger(card)) {
     paths.push("in_hand");
   }
+  if (hasDestroyOnDeathEffects(card)) {
+    paths.push("destroy");
+  }
+  if (hasEngageAbility(card)) {
+    paths.push("engage");
+  }
+  if (hasCombatTriggerEffects(card)) {
+    paths.push("combat");
+  }
+  if (hasBoardWatcherEnterTrigger(card)) {
+    paths.push("watch");
+  }
+  if (hasAccelerateForm(card)) {
+    paths.push("accelerate");
+  }
+  if (hasCrystallizeForm(card)) {
+    paths.push("crystallize");
+    if (hasCrystallizeAmuletEngage(card)) {
+      paths.push("crystallize_engage");
+    }
+    if (hasCrystallizeAmuletLastWords(card)) {
+      paths.push("crystallize_death");
+    }
+  }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
-    !hasScenarioPlacingOnBoard(paths) &&
     isFollower &&
-    hasAllyEnterTrigger(card) &&
-    hasNonEmptyEffects(card.triggers)
+    hasSelfAllyEnterTrigger(card) &&
+    hasNonEmptyEffects(card.triggers) &&
+    !paths.includes("play")
   ) {
     paths.push("play");
   }
@@ -666,6 +1322,13 @@ function buildArena(opts: {
   }
 
   if (needs) applyArenaBoardPrep(needs);
+
+  if (needs?.damagedFirstLeader) {
+    state.players.first.hp = Math.min(
+      state.players.first.hp,
+      DAMAGED_LEADER_HP,
+    );
+  }
 
   const handExtras = [...(opts.extraHand ?? [])];
   if (needs?.handKit) handExtras.push(...buildHandKit());
@@ -1059,8 +1722,9 @@ function runSuperEvolveScenario(
   );
 }
 
+/** Zero-cost sacrifice Engage helper — keywords applied so engageAmulet sees hasEngage. */
 function engageAmuletOnBoard(): CardInstance {
-  return createCard(
+  const card = createCard(
     {
       name: "HarnessEngageAmulet",
       type: "Amulet",
@@ -1068,6 +1732,7 @@ function engageAmuletOnBoard(): CardInstance {
       keywords: [
         {
           name: "Engage",
+          cost: 0,
           sacrifice: true,
           effects: [{ op: "draw", source: "deck", count: 1 }],
         },
@@ -1076,6 +1741,8 @@ function engageAmuletOnBoard(): CardInstance {
     "board",
     "first",
   );
+  applyKeywordsFromList(card);
+  return card;
 }
 
 function earthSigilOnBoard(): CardInstance {
@@ -1396,6 +2063,688 @@ function runInHandScenario(
   };
 }
 
+function runDestroyScenario(
+  cardId: string,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
+
+  trimBoardToCap(
+    state.players.first.board,
+    HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+  );
+
+  const host = makeCardFromDB(template, "first");
+  if (host.type === "Follower") {
+    host.justPlayed = false;
+    host.defense = Math.max(Number(host.defense) || 1, 3);
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  assertHarnessBoardCap("runDestroyScenario:beforeDestroy");
+
+  const hostOnBoard = getBoard(state, "first").find((c) => c.uid === host.uid);
+  if (!hostOnBoard) {
+    return { skip: "drive_threw", detail: "host_missing_after_place" };
+  }
+
+  if (!destroyTarget(hostOnBoard, "first", "harness_destroy")) {
+    return { skip: "drive_threw", detail: "destroy_target_failed" };
+  }
+  cleanupDead();
+  flushDeferredDeathBatch();
+
+  const pending = resolvePendingOrFail("destroy_after_death");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "destroy",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
+/** Prefer the plain arena follower over Ward/other targets for stable trades. */
+function arenaEnemyADefenderIndex(): number {
+  const board = getBoard(state, "second");
+  const idx = board.findIndex((c) => c.name === "ArenaEnemyA");
+  return idx >= 0 ? idx : 0;
+}
+
+/** Ward blocks non-Ward targets — strip it so ArenaEnemyA is attackable. */
+function clearEnemyWardBlockers(): void {
+  for (const card of getBoard(state, "second")) {
+    if (card.type !== "Follower") continue;
+    if (!card.hasWard) continue;
+    card.hasWard = false;
+    if (Array.isArray((card as any).keywords)) {
+      (card as any).keywords = (card as any).keywords.filter(
+        (k: unknown) =>
+          !(
+            k === "Ward" ||
+            (k &&
+              typeof k === "object" &&
+              (k as { name?: string }).name === "Ward")
+          ),
+      );
+    }
+  }
+}
+
+function prepareCombatAttacker(card: CardInstance): void {
+  card.justPlayed = false;
+  card.hasAttacked = false;
+  const per = Number.isFinite(card.attacks_per_turn)
+    ? (card.attacks_per_turn as number)
+    : 1;
+  card.attacks_left = per;
+  card.attacks_used_this_turn = 0;
+  applyKeywordsFromList(card);
+  recomputeAttackFlags(card);
+}
+
+function combatAttackObserved(
+  attacker: CardInstance,
+  defender: CardInstance,
+  before: {
+    defenderDef: number;
+    attacksUsed: number;
+    attacksLeft: number;
+  },
+): boolean {
+  const defAfter = parseInt(defender.defense as any, 10) || 0;
+  const attacksUsedAfter = attacker.attacks_used_this_turn ?? 0;
+  const attacksLeftAfter =
+    attacker.attacks_left ??
+    (Number.isFinite(attacker.attacks_per_turn)
+      ? (attacker.attacks_per_turn as number)
+      : 1);
+  return (
+    attacksUsedAfter > before.attacksUsed ||
+    defAfter < before.defenderDef ||
+    attacksLeftAfter < before.attacksLeft ||
+    !!attacker.hasAttacked
+  );
+}
+
+function runCombatScenario(
+  cardId: string,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  buildArena({ roundCount: 8, activePlayer: "first", firstPP: 10, arenaNeeds });
+
+  trimBoardToCap(
+    state.players.first.board,
+    HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+  );
+
+  const host = makeCardFromDB(template, "first");
+  prepareCombatAttacker(host);
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  assertHarnessBoardCap("runCombatScenario:beforeAttack");
+
+  const hostOnBoard = getBoard(state, "first").find((c) => c.uid === host.uid);
+  if (!hostOnBoard) {
+    return { skip: "drive_threw", detail: "host_missing_after_place" };
+  }
+
+  prepareCombatAttacker(hostOnBoard);
+  if (!effectiveAttackEligibility(hostOnBoard)) {
+    return { skip: "drive_threw", detail: "attacker_cannot_attack" };
+  }
+
+  clearEnemyWardBlockers();
+
+  const attackerIdx = getBoard(state, "first").indexOf(hostOnBoard);
+  const defenderIdx = arenaEnemyADefenderIndex();
+  const defenderBoard = getBoard(state, "second");
+  const defender = defenderBoard[defenderIdx];
+  if (!defender || defender.type !== "Follower") {
+    return { skip: "drive_threw", detail: "defender_missing" };
+  }
+
+  const before = {
+    defenderDef: parseInt(defender.defense as any, 10) || 0,
+    attacksUsed: hostOnBoard.attacks_used_this_turn ?? 0,
+    attacksLeft:
+      hostOnBoard.attacks_left ??
+      (Number.isFinite(hostOnBoard.attacks_per_turn)
+        ? (hostOnBoard.attacks_per_turn as number)
+        : 1),
+  };
+
+  const outcome = attackFollower(attackerIdx, defenderIdx, "first", "second");
+  if (outcome.kind === "blocked") {
+    return {
+      skip: "drive_threw",
+      detail: `attack_blocked:${outcome.reason}`,
+    };
+  }
+
+  const defenderAfter = defenderBoard[defenderIdx] ?? defender;
+  if (!combatAttackObserved(hostOnBoard, defenderAfter, before)) {
+    return { skip: "drive_threw", detail: "attack_did_not_resolve" };
+  }
+
+  const pending = resolvePendingOrFail("combat_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "combat",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
+function runWatchScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const boardTrigger = getBoardWatcherEnterTrigger(raw);
+  if (!boardTrigger) {
+    return { skip: "drive_threw", detail: "no_board_watcher_trigger" };
+  }
+
+  const condition = boardTrigger.condition ?? {};
+  const hostName = raw.name ?? cardId;
+  const picked = pickProbeFollower(condition, hostName, true);
+  if ("unsatisfiable" in picked) {
+    return {
+      skip: "drive_threw",
+      detail: `watch_condition_unsatisfiable:${picked.unsatisfiable}`,
+    };
+  }
+
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
+
+  if (condition.whose_turn === "owner" && state.activePlayer !== "first") {
+    return {
+      skip: "drive_threw",
+      detail: "watch_whose_turn_not_first",
+    };
+  }
+  if (condition.whose_turn === "opponent") {
+    return {
+      skip: "drive_threw",
+      detail: "watch_whose_turn_opponent_unsupported",
+    };
+  }
+  if (state.activePlayer !== "first") {
+    return { skip: "drive_threw", detail: "watch_active_player_not_first" };
+  }
+
+  const needsEarth = watchNeedsEarthSigil(boardTrigger);
+  const boardReserve = needsEarth ? 3 : 2;
+  trimBoardToCap(state.players.first.board, HARNESS_BOARD_CAP - boardReserve);
+
+  const host = makeCardFromDB(template, "first");
+  if (host.type === "Follower") {
+    host.justPlayed = false;
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  if (needsEarth) {
+    state.players.first.board.push(earthSigilOnBoard());
+  }
+
+  assertHarnessBoardCap("runWatchScenario:beforeSummon");
+
+  const hostOnBoard = getBoard(state, "first").find((c) => c.uid === host.uid);
+  if (!hostOnBoard) {
+    return { skip: "drive_threw", detail: "host_missing_after_place" };
+  }
+
+  const probeTemplate = picked.template;
+  const probeData = getCardById(probeTemplate.id);
+  const probeCard = probeData
+    ? makeCardFromDB(probeData, "first")
+    : createCard(
+        {
+          name: probeTemplate.name,
+          type: "Follower",
+          cost: probeBaseCost(probeTemplate),
+          attack: 1,
+          defense: 1,
+          tribes: probeTemplate.tribes ?? [],
+          class: probeTemplate.class,
+          base_cost: probeBaseCost(probeTemplate),
+        },
+        "hand",
+        "first",
+      );
+  if (probeTemplate.tribes?.length) {
+    (probeCard as { tribes?: string[] }).tribes = [...probeTemplate.tribes];
+  }
+  if (probeTemplate.class) {
+    (probeCard as { class?: string }).class = probeTemplate.class;
+  }
+  (probeCard as { base_cost?: number }).base_cost =
+    probeBaseCost(probeTemplate);
+  probeCard.cost = 0;
+  (probeCard as { effectiveCost?: number }).effectiveCost = 0;
+
+  const before = snapshotWatchState(hostOnBoard);
+  state.players.first.hand.push(probeCard);
+  const handIdx = state.players.first.hand.indexOf(probeCard);
+  const outcome = whenPlayCard("first", handIdx);
+  if (outcome.kind === "blocked") {
+    return {
+      skip: "play_blocked",
+      detail: outcome.reason ?? "watch_probe_play_blocked",
+    };
+  }
+
+  const pending = resolvePendingOrFail("watch_after");
+  if (!("ok" in pending)) return pending;
+
+  const entering =
+    getBoard(state, "first").find((c) => c.uid === probeCard.uid) ?? probeCard;
+  const after = snapshotWatchState(hostOnBoard, entering);
+
+  if (
+    !watchEffectObserved(boardTrigger, hostOnBoard, entering, before, after)
+  ) {
+    return { skip: "drive_threw", detail: "watch_did_not_fire" };
+  }
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "watch",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
+function runEngageScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const ownEngage = hasEngageKeywordEffects(raw);
+  const engageCost = ownEngage ? engageCostFromRaw(raw) : 0;
+  const firstPP = Math.max(10, engageCost + 2);
+
+  buildArena({ roundCount: 8, activePlayer: "first", firstPP, arenaNeeds });
+
+  trimBoardToCap(
+    state.players.first.board,
+    HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+  );
+
+  const host = makeCardFromDB(template, "first");
+  if (host.type === "Follower") {
+    host.justPlayed = false;
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  assertHarnessBoardCap("runEngageScenario:beforeEngage");
+
+  let engageIndex = -1;
+  if (ownEngage) {
+    const hostOnBoard = getBoard(state, "first").find(
+      (c) => c.uid === host.uid,
+    );
+    if (!hostOnBoard) {
+      return { skip: "drive_threw", detail: "host_missing_after_place" };
+    }
+    engageIndex = getBoard(state, "first").indexOf(hostOnBoard);
+  } else {
+    const helper = engageAmuletOnBoard();
+    state.players.first.board.push(helper);
+    engageIndex = getBoard(state, "first").indexOf(helper);
+  }
+
+  if (engageIndex < 0) {
+    return { skip: "drive_threw", detail: "engage_target_missing" };
+  }
+
+  const ppBefore = state.players.first.pp;
+  try {
+    engageAmulet("first", engageIndex);
+  } catch (err) {
+    return {
+      skip: "drive_threw",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+
+  if (engageCost > 0 && state.players.first.pp >= ppBefore) {
+    return { skip: "drive_threw", detail: "engage_cost_not_paid" };
+  }
+
+  const pending = resolvePendingOrFail("engage_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "engage",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
+function findPlayedCard(uid: string): CardInstance | undefined {
+  const zones = [
+    ...state.players.first.hand,
+    ...state.players.first.board,
+    ...state.players.first.graveyard,
+    ...state.players.first.banish,
+    ...state.players.second.hand,
+    ...state.players.second.board,
+    ...state.players.second.graveyard,
+    ...state.players.second.banish,
+  ];
+  return zones.find((c) => c.uid === uid);
+}
+
+function findCrystallizeAmuletOnBoard(
+  cardId: string,
+  name: string,
+): CardInstance | undefined {
+  return getBoard(state, "first").find(
+    (c) => c.id === cardId || c.name === name,
+  );
+}
+
+function setupAlternateFormPlay(
+  cardId: string,
+  expectedMode: "accelerate" | "crystallize",
+  firstPP: number,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+):
+  | {
+      playCard: CardInstance;
+      prep: { satisfied: string[]; unmet: string[] };
+    }
+  | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const extras = buildExtraHand(template);
+  buildArena({
+    extraHand: extras,
+    roundCount: 8,
+    firstPP,
+    arenaNeeds,
+  });
+
+  const playCard = createCard(cardId, "hand", "first");
+  const plan = resolvePlayCost(playCard, state.players.first.pp);
+  if (plan.mode !== expectedMode) {
+    return { skip: "drive_threw", detail: "alternate_form_not_selected" };
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: playCard,
+  });
+  const maxAllied = HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE;
+  if (state.players.first.board.length > maxAllied) {
+    trimBoardToCap(state.players.first.board, maxAllied);
+  }
+  assertHarnessBoardCap(`runAlternateForm:${expectedMode}:afterGatePrep`);
+
+  state.players.first.hand = [playCard, ...state.players.first.hand];
+
+  const outcome = whenPlayCard("first", 0);
+  if (outcome.kind === "blocked") {
+    return {
+      skip: "play_blocked",
+      detail: outcome.reason ?? "blocked",
+    };
+  }
+  if (outcome.kind === "paused" || state.pendingTargetEffect) {
+    const resolved = autoResolvePending();
+    if (!resolved.ok) {
+      return {
+        skip: "unresolvable_pending",
+        detail: resolved.reason ?? "pending",
+      };
+    }
+  }
+
+  const played = findPlayedCard(playCard.uid);
+  const playedAs = (played as { playedAs?: string } | undefined)?.playedAs;
+  if (playedAs !== expectedMode) {
+    return { skip: "drive_threw", detail: "alternate_form_not_selected" };
+  }
+
+  return { playCard, prep };
+}
+
+function runAccelerateScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getAccelerateForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_accelerate_form" };
+  const printedCost = printedBaseCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "accelerate",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const pending = resolvePendingOrFail("accelerate_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "accelerate",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
+function runCrystallizeScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getCrystallizeForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_crystallize_form" };
+  const printedCost = printedBaseCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "crystallize",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const pending = resolvePendingOrFail("crystallize_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "crystallize",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
+function runCrystallizeEngageScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getCrystallizeForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_crystallize_form" };
+  const printedCost = printedBaseCost(raw);
+  const engageCost = crystallizeAmuletEngageCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost, engageCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "crystallize",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const amulet = findCrystallizeAmuletOnBoard(cardId, raw.name ?? cardId);
+  if (!amulet || amulet.type !== "Amulet") {
+    return { skip: "drive_threw", detail: "crystallize_amulet_missing" };
+  }
+
+  const engageIndex = getBoard(state, "first").indexOf(amulet);
+  if (engageIndex < 0) {
+    return { skip: "drive_threw", detail: "engage_target_missing" };
+  }
+
+  const ppBefore = state.players.first.pp;
+  try {
+    engageAmulet("first", engageIndex);
+  } catch (err) {
+    return {
+      skip: "drive_threw",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+
+  if (engageCost > 0 && state.players.first.pp >= ppBefore) {
+    return { skip: "drive_threw", detail: "engage_cost_not_paid" };
+  }
+
+  const pending = resolvePendingOrFail("crystallize_engage_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "crystallize_engage",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
+function runCrystallizeDeathScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getCrystallizeForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_crystallize_form" };
+  const printedCost = printedBaseCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "crystallize",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const amulet = findCrystallizeAmuletOnBoard(cardId, raw.name ?? cardId);
+  if (!amulet || amulet.type !== "Amulet") {
+    return { skip: "drive_threw", detail: "crystallize_amulet_missing" };
+  }
+
+  if (!destroyTarget(amulet, "first", "harness_crystallize_death")) {
+    return { skip: "drive_threw", detail: "destroy_target_failed" };
+  }
+  cleanupDead();
+  flushDeferredDeathBatch();
+
+  const pending = resolvePendingOrFail("crystallize_death_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "crystallize_death",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
 function runVanillaPlaceScenario(
   cardId: string,
   arenaNeeds?: HarnessArenaNeeds,
@@ -1554,6 +2903,17 @@ function runSummonScenario(
 }
 
 /**
+ * Isolate each card drive from residue left by prior cards in the pool loop.
+ * Per-scenario buildArena resets are not always sufficient (e.g. watch probe
+ * summons on the immediately preceding card can shift UID/RNG for the next).
+ */
+function resetHarnessBetweenCards(): void {
+  resetGameState(HARNESS_SEED);
+  resetUidCounter();
+  state.gameStarted = false;
+}
+
+/**
  * Drive one card through classified scenarios with gate preparation.
  */
 export function driveCard(
@@ -1567,6 +2927,8 @@ export function driveCard(
     return { status: "skipped", id, name, reason: "card_not_in_registry" };
   }
 
+  resetHarnessBetweenCards();
+
   const gates = collectNamedGates(raw);
   const gateSummary = summarizeGateConditions(gates);
   const arenaNeeds = analyzeHarnessArenaNeeds(raw, gates);
@@ -1578,7 +2940,11 @@ export function driveCard(
         ? (["summon"] as ScenarioName[])
         : classifyPaths(raw);
     const scenarios: ScenarioResult[] = [];
-    const failures: { skip: SkipReason; detail: string }[] = [];
+    const failures: {
+      path: ScenarioName;
+      skip: SkipReason;
+      detail: string;
+    }[] = [];
     const satisfiedAll = new Set<string>();
     const unmetAll = new Set<string>(gateSummary.unpreparable);
 
@@ -1620,6 +2986,22 @@ export function driveCard(
           result = runSuperEvolveScenario(id, gates, arenaNeeds);
         else if (path === "in_hand")
           result = runInHandScenario(id, gates, arenaNeeds);
+        else if (path === "destroy")
+          result = runDestroyScenario(id, gates, arenaNeeds);
+        else if (path === "engage")
+          result = runEngageScenario(id, raw, gates, arenaNeeds);
+        else if (path === "combat")
+          result = runCombatScenario(id, gates, arenaNeeds);
+        else if (path === "watch")
+          result = runWatchScenario(id, raw, gates, arenaNeeds);
+        else if (path === "accelerate")
+          result = runAccelerateScenario(id, raw, gates, arenaNeeds);
+        else if (path === "crystallize")
+          result = runCrystallizeScenario(id, raw, gates, arenaNeeds);
+        else if (path === "crystallize_engage")
+          result = runCrystallizeEngageScenario(id, raw, gates, arenaNeeds);
+        else if (path === "crystallize_death")
+          result = runCrystallizeDeathScenario(id, raw, gates, arenaNeeds);
         else if (path === "summon") result = runSummonScenario(id, arenaNeeds);
         else result = runVanillaPlaceScenario(id, arenaNeeds);
       } catch (err) {
@@ -1630,7 +3012,7 @@ export function driveCard(
       }
 
       if (isSkip(result)) {
-        failures.push(result);
+        failures.push({ path, skip: result.skip, detail: result.detail ?? "" });
       } else {
         scenarios.push(result);
         for (const c of result.gatesSatisfied ?? []) satisfiedAll.add(c);

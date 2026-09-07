@@ -463,10 +463,12 @@ function renderListIfPresent(id: string, arr: any[]) {
       count: 0,
       base_image: it?.base_image || null,
       set: it?.set,
+      id: it?.id ?? it?.cardId ?? null,
     };
     g.count += 1;
     if (!g.base_image && it?.base_image) g.base_image = it.base_image;
     if (!g.set && it?.set) g.set = it.set;
+    if (!g.id && (it?.id ?? it?.cardId)) g.id = it?.id ?? it?.cardId;
     groups.set(key, g);
   }
 
@@ -489,7 +491,7 @@ function renderListIfPresent(id: string, arr: any[]) {
     label.className = "hist-label";
     label.textContent = `${g.name} ×${g.count}`;
 
-    const setBadge = formatSetBadge({ set: g.set }, allSetIds);
+    const setBadge = formatSetBadge({ id: g.id, set: g.set }, allSetIds);
     if (setBadge) {
       const setEl = document.createElement("span");
       setEl.className = "hist-set";

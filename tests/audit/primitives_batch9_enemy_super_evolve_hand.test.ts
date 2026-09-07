@@ -9,8 +9,13 @@ import {
   resetUidCounter,
   thenHand,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { hasKeyword } from "../../src/logic/core/keywords/has.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import "../../src/logic/core/effects/index.js";
@@ -34,7 +39,7 @@ describe("enemy_super_evolve hand trigger primitive", () => {
     );
     applyKeywordsFromList(foe);
     state.players.second.board = [foe];
-    onEvolve(foe, "second", "super");
+    whenSuperEvolve(foe, "second");
     const insp = thenHand("first").find((c) => c.name === "Inspirational One")!;
     expect(hasKeyword(insp, "Bane")).toBe(true);
   });

@@ -21,7 +21,7 @@ export function reanimateSummon(c: any, owner: Player) {
   // - Rush:  can attack followers only
   copy.hasAttacked = false;
   copy.attacks_left = copy.attacks_per_turn ?? 1;
-  if (copy.hasStorm || copy.hasRush) {
+  if (copy.hasStorm || copy.hasRush || copy.hasEvolved) {
     copy.can_attack_followers = true;
   }
   recomputeAttackFlags(copy);

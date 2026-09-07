@@ -16,8 +16,13 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { injectAdapter } from "../../src/core/adapter.js";
@@ -198,7 +203,7 @@ describe("Set 10005 — Blossoming Fate", () => {
       getCrests(state, "first").some((c) => c.name === "Insomniac Witch"),
     ).toBe(true);
     const witch = findOnBoard("first", "Insomniac Witch")!;
-    onEvolve(witch, "first", "normal");
+    whenEvolve(witch, "first");
     expect(
       getCrests(state, "first").some((c) => c.name === "Insomniac Witch"),
     ).toBe(false);
@@ -219,7 +224,7 @@ describe("Set 10005 — Blossoming Fate", () => {
     whenPlayCard("first", 0);
     const e1 = enemyFollower(1, 6, "E1");
     const steward = findOnBoard("first", "Springwell Steward")!;
-    onEvolve(steward, "first", "normal");
+    whenEvolve(steward, "first");
     resolveFirstPending();
     expect(Number(e1.defense)).toBe(1);
   });
@@ -266,7 +271,7 @@ describe("Set 10005 — Blossoming Fate", () => {
     whenPlayCard("first", 0);
     const erntz = findOnBoard("first", "Erntz, Governing Justice")!;
     expect(erntz.hasWard || erntz.keywordState?.hasWard).toBeTruthy();
-    onEvolve(erntz, "first", "normal");
+    whenEvolve(erntz, "first");
     expect(erntz.hasWard || erntz.keywordState?.hasWard).toBeFalsy();
     expect(
       erntz.hasIntimidate || erntz.keywordState?.hasIntimidate,
@@ -285,7 +290,7 @@ describe("Set 10005 — Blossoming Fate", () => {
     const skeletonB = createCard("90051110", "graveyard", "first");
     state.players.first.graveyard.push(skeletonB);
     recordDestroyed(state, "first", skeletonB);
-    onEvolve(necro, "first", "normal");
+    whenEvolve(necro, "first");
     expect(thenBoard("first").length).toBeGreaterThan(before);
   });
 
@@ -305,7 +310,7 @@ describe("Set 10005 — Blossoming Fate", () => {
     expect(Number(e.defense)).toBe(2);
     const priest = findOnBoard("first", "Prescient Priestess")!;
     const e2 = enemyFollower(1, 4, "E2");
-    onEvolve(priest, "first", "normal");
+    whenEvolve(priest, "first");
     resolveFirstPending();
     expect(Number(e2.defense) === 2 || Number(e.defense) === 0).toBe(true);
   });

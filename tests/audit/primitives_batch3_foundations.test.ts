@@ -13,9 +13,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import {
   evolveFollowerByEffect,
   handleEvolveSelf,
@@ -159,7 +164,7 @@ describe("Foundations — Skybound Art gauge (turn# + in-hand evolves)", () => {
     ally.peak_defense = ally.defense;
     state.players.first.board = [ally];
 
-    onEvolve(ally, "first", "normal", { spendPoint: false });
+    whenEffectEvolve(ally, "first", "normal");
 
     const belial = createCard("10454120", "hand", "first");
     state.players.first.hand.push(belial);
@@ -184,7 +189,7 @@ describe("Foundations — Skybound Art gauge (turn# + in-hand evolves)", () => {
     state.players.first.hand.push(belial);
     expect(hasSkyboundArt(belial)).toBe(true);
 
-    onEvolve(ally, "first", "normal", { spendPoint: false });
+    whenEffectEvolve(ally, "first", "normal");
     // Sync: witness visible before onEvolve returns (static import, not microtask).
     expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(1);
     expect(getSkyboundArtGauge(belial, 8)).toBe(9);
@@ -228,7 +233,7 @@ describe("Foundations — Skybound Art gauge (turn# + in-hand evolves)", () => {
     expect(Array.isArray(fighter.evolve) ? fighter.evolve.length : 0).toBe(0);
     expect(getEvoCount(state, "first")).toBe(0);
 
-    onEvolve(fighter, "first", "normal", { spendPoint: true });
+    whenEvolve(fighter, "first");
     expect(belial.skyboundArtEvolvesWitnessed ?? 0).toBe(1);
     expect(getEvoCount(state, "first")).toBe(1);
   });
@@ -320,7 +325,7 @@ describe("Foundations — Faith counter + variable Modes selection", () => {
     whenPlayCard("first", 0);
     expect(faithCount()).toBe(1);
     const devotee = findOnBoard("first", "Devotee of Entwining")!;
-    onEvolve(devotee, "first", "normal");
+    whenEvolve(devotee, "first");
     expect(faithCount()).toBe(2);
   });
 
@@ -435,7 +440,7 @@ describe("Foundations — Effect-granted evolve vs Evolve: line", () => {
     const byPlayer = createCard("10151120", "board", "first");
     byPlayer.peak_defense = byPlayer.defense;
     state.players.first.board = [byPlayer];
-    onEvolve(byPlayer, "first", "normal", { spendPoint: true });
+    whenEvolve(byPlayer, "first");
     expect(thenBoard("first").filter((c) => c.name === "Bat").length).toBe(2);
   });
 });

@@ -9,6 +9,7 @@ import {
   createCard,
   resetUidCounter,
 } from "../harness/builders.js";
+import { whenEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
 import {
@@ -19,7 +20,6 @@ import {
 import { getHand, getGraveyard } from "../../src/core/playerHelpers.js";
 import { installSoakAdapter, runSoakGame } from "../../src/bench/soakEnv.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
 import { setPendingTarget } from "../../src/logic/core/pendingTarget/index.js";
 import { highlightSelectable } from "../../src/logic/core/targeting.js";
 
@@ -100,7 +100,7 @@ const DISCARD_SCENARIOS: DiscardScenario[] = [
       state.players.first.evoPoints = 3;
       const goddess = state.players.first.board[0]!;
       applyKeywordsFromList(goddess);
-      onEvolve(goddess, "first", "normal", { spendPoint: true });
+      whenEvolve(goddess, "first");
       const picks = getHand(state, "first").slice(-3);
       return { pickUids: picks.map((c) => c.uid) };
     },

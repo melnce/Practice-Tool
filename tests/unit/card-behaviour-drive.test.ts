@@ -9,6 +9,9 @@ import "../../src/logic/core/effects/index.js";
 import {
   driveCard,
   analyzeHarnessArenaNeeds,
+  classifyPaths,
+  hasDestroyOnDeathEffects,
+  hasEngageAbility,
   HARNESS_SEED,
 } from "../../scripts/lib/cardBehaviourDrive.js";
 import {
@@ -156,6 +159,78 @@ describe("card behaviour drive prep", () => {
       const names = result.scenarios.map((s) => s.scenario);
       expect(names).toContain("evolve");
       expect(names).toContain("super_evolve");
+    }
+  });
+
+  it("cards with Last Words get destroy scenario and drop vanilla_place", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string; keywords?: unknown[] }[];
+    const peddler = all.find((c) => c.id === "10021120")!;
+    expect(hasDestroyOnDeathEffects(peddler)).toBe(true);
+    const result = driveCard(peddler);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      const names = result.scenarios.map((s) => s.scenario);
+      expect(names).toContain("destroy");
+      expect(names).not.toContain("vanilla_place");
+    }
+  });
+
+  it("cards with Engage get engage scenario and drop vanilla_place", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string; keywords?: unknown[] }[];
+    const serene = all.find((c) => c.id === "10161210")!;
+    expect(hasEngageAbility(serene)).toBe(true);
+    const result = driveCard(serene);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      const names = result.scenarios.map((s) => s.scenario);
+      expect(names).toContain("engage");
+      expect(names).not.toContain("vanilla_place");
+    }
+  });
+
+  it("enter-trigger followers keep play alongside crystallize (Prostrating Coward)", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string }[];
+    const coward = all.find((c) => c.id === "10661110")!;
+    const paths = classifyPaths(coward);
+    expect(paths).toContain("play");
+    expect(paths).toContain("crystallize");
+  });
+
+  it("driveCard includes play for enter-trigger crystallize follower (10661110)", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string }[];
+    const coward = all.find((c) => c.id === "10661110")!;
+    const result = driveCard(coward);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      expect(result.scenarios.map((s) => s.scenario)).toContain("play");
+    }
+  });
+
+  it("destroy scenario still suppresses vanilla_place when play is absent", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string; keywords?: unknown[] }[];
+    const peddler = all.find((c) => c.id === "10021120")!;
+    expect(hasDestroyOnDeathEffects(peddler)).toBe(true);
+    const paths = classifyPaths(peddler);
+    expect(paths).toContain("destroy");
+    expect(paths).not.toContain("play");
+    expect(paths).not.toContain("vanilla_place");
+    const result = driveCard(peddler);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      const names = result.scenarios.map((s) => s.scenario);
+      expect(names).toContain("destroy");
+      expect(names).not.toContain("vanilla_place");
+      expect(names).not.toContain("play");
     }
   });
 });
