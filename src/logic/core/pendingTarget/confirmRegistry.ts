@@ -21,7 +21,9 @@ export type PendingConfirmInput = {
 };
 
 /** Registry key derived from serializable pending fields (survives snapshots). */
-export function getPendingConfirmKey(pending: PendingConfirmInput): string | null {
+export function getPendingConfirmKey(
+  pending: PendingConfirmInput,
+): string | null {
   if (!pending.requiresConfirmation) return null;
   const eff = pending.eff ?? {};
   const op = String(eff.op ?? "");

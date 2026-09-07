@@ -13,7 +13,10 @@ import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
 import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
-import { canConfirmPendingTarget, type PendingConfirmInput } from "../logic/core/pendingTarget/confirmRegistry.js";
+import {
+  canConfirmPendingTarget,
+  type PendingConfirmInput,
+} from "../logic/core/pendingTarget/confirmRegistry.js";
 import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
 import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { playCard } from "../logic/core/playCard/index.js";
