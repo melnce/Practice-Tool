@@ -58,6 +58,17 @@
  *   arrays; triggers with no effects (timing-only stubs). These are not effect
  *   clauses a human test would name separately.
  *
+ * Fewer subject blocks than clauses
+ * - Compares subjectBlockCount to clauseCount per card.
+ * - Counts asserting *blocks*, not clauses asserted within a block. A single
+ *   `it()` that asserts two fanfare/superevolve clauses still counts as one
+ *   block, so it appears as a gap even when nothing is missing.
+ * - Measured 2026-09-07: 23 of 54 flagged cards were false positives after
+ *   body review (D4 / D4b clause-gap work).
+ * - Treat as a heuristic for where to look, not a defect count. Never drive
+ *   this number to zero without reading each existing block's body — duplicate
+ *   tests would move the counter without closing real gaps.
+ *
  * vanilla_place-only / dark
  * - Uses classifyPaths() from cardBehaviourDrive (no harness mutation).
  * - vanilla_place-only ⇔ paths are exactly ["vanilla_place"].
@@ -122,6 +133,10 @@ export type AssertingBlock = {
   describeTitles: string[];
 };
 
+/** One-line caveat for report table footnote and reports/subjecthood.json. */
+export const FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT =
+  "Heuristic only (not a defect count): counts asserting blocks, not clauses — one block may assert multiple clauses; 23/54 flagged cards were false positives on 2026-09-07. Do not drive to zero without reading each block body.";
+
 export type CardSubjecthood = {
   cardId: string;
   cardName: string;
@@ -151,6 +166,8 @@ export type SubjecthoodReport = {
     mentionedOnlyAsFiller: number;
     neverMentioned: number;
     fewerSubjectBlocksThanClauses: number;
+    /** Same text as FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT; echoed for JSON consumers. */
+    fewerSubjectBlocksThanClausesCaveat?: string;
     dark: number;
     matchedByNameOnly: number;
   };
@@ -452,6 +469,8 @@ export function analyzeSubjecthood(
     fewerSubjectBlocksThanClauses: perCard.filter(
       (c) => c.fewerSubjectBlocksThanClauses,
     ).length,
+    fewerSubjectBlocksThanClausesCaveat:
+      FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT,
     dark: darkCardIds.length,
     matchedByNameOnly: perCard.filter((c) => c.matchedByNameOnly).length,
   };
