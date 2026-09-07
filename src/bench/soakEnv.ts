@@ -12,15 +12,15 @@ import { hashGameState } from "../core/stateHash.js";
 import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
-import {
-  forceCompleteOrFizzlePendingTarget,
-  executeConfirmedPendingTargets,
-} from "../logic/core/resolveTarget.js";
+import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
+import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
+import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { playCard } from "../logic/core/playCard/index.js";
 import type { PlayOutcome } from "../logic/core/playCard/types.js";
 import {
   captureSnapshot,
   setHistoryEnabled,
+  setHistorySuppressRecording,
   onHistoryEvent,
   canUndo,
 } from "../core/history.js";
@@ -399,6 +399,12 @@ export function getLegalSoakActions(): SoakAction[] {
     const selectedCount = selected.size;
     const forcedFirst = selectedCount === 0 ? getForcedFirstPicks(pending) : [];
 
+    // Once a confirm hook is armed, finish the selection — never toggle forever.
+    if (confirmHook && selectedCount > 0) {
+      return [{ type: "CONFIRM_TARGETS" }];
+    }
+
+    // Only offer unselected, still-present targets (avoid toggle loops).
     const stillPresent = new Set<string>();
     for (const p of ["first", "second"] as const) {
       for (const zone of ["hand", "board"] as const) {
@@ -408,24 +414,6 @@ export function getLegalSoakActions(): SoakAction[] {
       }
     }
 
-    const hasMoreToPick = poolUids.some(
-      (uid) =>
-        !!uid &&
-        !selected.has(uid) &&
-        stillPresent.has(uid) &&
-        (forcedFirst.length === 0 || forcedFirst.includes(uid)),
-    );
-
-    // Non-confirm prompts: once hook is armed, finish — never toggle forever.
-    if (confirmHook && selectedCount > 0 && !pending.requiresConfirmation) {
-      return [{ type: "CONFIRM_TARGETS" }];
-    }
-
-    if (pending.requiresConfirmation && selectedCount > 0 && !hasMoreToPick) {
-      return [{ type: "CONFIRM_TARGETS" }];
-    }
-
-    // Only offer unselected, still-present targets (avoid toggle loops).
     for (const uid of poolUids) {
       if (!uid || selected.has(uid)) continue;
       if (!stillPresent.has(uid)) continue;
@@ -452,9 +440,6 @@ export function getLegalSoakActions(): SoakAction[] {
 
     // Stuck: no remaining selectable targets — force-complete or fizzle.
     if (actions.length === 0 && !confirmHook) {
-      if (pending.requiresConfirmation && selectedCount > 0) {
-        return [{ type: "CONFIRM_TARGETS" }];
-      }
       actions.push({ type: "FORCE_COMPLETE_PENDING" });
     }
 
@@ -984,7 +969,13 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
 
   const useReExecute = historyReExecute && policyRng.nextInt(4) === 0;
   if (useReExecute) {
-    applySoakActionWithOutcome(action, dispatchPath);
+    // Re-apply mutations without recording history (undo left entries in future).
+    setHistorySuppressRecording(true);
+    try {
+      applySoakActionWithOutcome(action, dispatchPath);
+    } finally {
+      setHistorySuppressRecording(false);
+    }
     actual = captureFullSnapshot().canon;
     if (!snapshotsEqual(after.canon, actual, historyIgnoreFields)) {
       return formatHistoryMismatch(
@@ -1005,6 +996,10 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
         legalAfter,
         legalActual,
       );
+    }
+    // Restore past/future to match `after` without double-applying effects.
+    for (let i = 0; i < n; i++) {
+      dispatchSoakHistory("REDO", dispatchPath);
     }
   } else {
     for (let i = 0; i < n; i++) {
@@ -1031,6 +1026,13 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
         legalActual,
       );
     }
+  }
+
+  if (!isEffectResolutionPaused() && getResolutionQueue().length > 0) {
+    return (
+      `history round-trip left resolution queue (len=${getResolutionQueue().length}) ` +
+      `at action ${actionIndex} (${JSON.stringify(action)})`
+    );
   }
 
   return null;
@@ -1502,13 +1504,8 @@ function applySoakAction(
   dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
 ): void {
   if (action.type === "CONFIRM_TARGETS") {
-    if (confirmHook) {
-      const fn = confirmHook;
-      confirmHook = null;
-      fn();
-    } else {
-      executeConfirmedPendingTargets();
-    }
+    confirmHook = null;
+    dispatchSoakPlayerAction({ type: "CONFIRM_TARGETS" }, dispatchPath);
     return;
   }
   if (action.type === "FORCE_COMPLETE_PENDING") {

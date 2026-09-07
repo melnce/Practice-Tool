@@ -99,8 +99,7 @@ describe.each([
     });
 
     chooseTarget(dispatch, "first", remembrance.uid);
-    expect(confirmOnClick).toBeTypeOf("function");
-    confirmOnClick!();
+    dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(handHasSelectableFlag()).toBe(false);
@@ -124,7 +123,7 @@ describe.each([
 
     fuseCard(dispatch, "first", ambition.uid);
     chooseTarget(dispatch, "first", remembrance.uid);
-    confirmOnClick!();
+    dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(commits.filter((n) => n === "Pick Target")).toHaveLength(1);
     expect(commits.filter((n) => n === "Confirm Targets")).toHaveLength(1);

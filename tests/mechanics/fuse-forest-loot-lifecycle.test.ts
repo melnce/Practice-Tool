@@ -118,8 +118,7 @@ describe.each([
       player: "first",
       target: { type: "card", uid: partner.uid },
     });
-    expect(confirmOnClick).toBeTypeOf("function");
-    confirmOnClick!();
+    dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(allure.isFused).toBe(true);
     expect(allure.spell).toEqual([{ op: "draw", source: "deck", count: 2 }]);
@@ -166,8 +165,7 @@ describe.each([
       player: "first",
       target: { type: "card", uid: boots.uid },
     });
-    expect(confirmOnClick).toBeTypeOf("function");
-    confirmOnClick!();
+    dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(slash.isFused).toBe(true);
     expect(

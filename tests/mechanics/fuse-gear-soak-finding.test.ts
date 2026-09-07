@@ -56,8 +56,7 @@ describe("gear fuse soak finding", () => {
       player: "first",
       target: { type: "card", uid: remembrance.uid },
     });
-    expect(confirmOnClick).toBeTypeOf("function");
-    confirmOnClick!();
+    engineDispatch(state, { type: "CONFIRM_TARGETS" });
     expect(state.pendingTargetEffect).toBeUndefined();
   });
 });

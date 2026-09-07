@@ -14,7 +14,10 @@ import type {
 import { endTurnBlue, endTurnRed } from "./turns.js";
 import { playCard } from "./playCard/index.js";
 import { attackFollower, attackLeader } from "./combat.js";
-import { resolvePendingTarget } from "./resolveTarget.js";
+import {
+  resolvePendingTarget,
+  confirmPendingTargetFromState,
+} from "./resolveTarget.js";
 import { undo, redo, resetHistory, doAction } from "../../core/history.js";
 import { assertValidGameState } from "../../core/stateValidation.js";
 import type { ReplayStep } from "../../core/stateHash.js";
@@ -182,6 +185,12 @@ function dispatchInternal(
     }
     case "CONFIRM_MULLIGAN": {
       confirmMulliganCore(action.player);
+      break;
+    }
+    case "CONFIRM_TARGETS": {
+      if (!confirmPendingTargetFromState()) {
+        throw new Error("[DISPATCH] CONFIRM_TARGETS: nothing to confirm");
+      }
       break;
     }
     case "FUSE": {

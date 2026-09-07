@@ -14,6 +14,7 @@ import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
 import { resetTriggerChainDepth } from "../logic/core/triggers.js";
 import { endDispatch } from "../logic/core/targeting/guards.js";
+import { resyncPendingTargetConfirmation } from "../logic/core/resolveTarget.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -21,6 +22,8 @@ const MAX_HISTORY = 200; // ring limit
 // When disabled, history skips expensive structuredClone for performance.
 // Use DISABLE_HISTORY=1 env var or call setHistoryEnabled(false).
 let _historyEnabled = true;
+/** When true, actions run through history commit guards but do not push to past/future. */
+let _historySuppressRecording = false;
 
 /** Explicitly enable or disable history snapshots. */
 export function setHistoryEnabled(enabled: boolean): void {
@@ -30,6 +33,15 @@ export function setHistoryEnabled(enabled: boolean): void {
 /** Check if history is currently enabled. */
 export function isHistoryEnabled(): boolean {
   return _historyEnabled;
+}
+
+/** Suppress recording commits while still running commit-time guards (soak re-execute). */
+export function setHistorySuppressRecording(suppress: boolean): void {
+  _historySuppressRecording = suppress;
+}
+
+export function isHistorySuppressRecording(): boolean {
+  return _historySuppressRecording;
 }
 
 // Check env var at module load (for benchmarks)
@@ -389,6 +401,7 @@ export function applySnapshot(
   if (shouldResetHistory) {
     resetHistory();
   }
+  resyncPendingTargetConfirmation();
   const suppress =
     (globalThis as any).HEADLESS === true ||
     (globalThis as any).AI_SUPPRESS_RENDER === true;
@@ -456,6 +469,12 @@ export function commitAction({ autoRender = true } = {}) {
   }
 
   assertResolutionQueueClearForCommit(inAction.name);
+
+  if (_historySuppressRecording) {
+    inAction = null;
+    notify();
+    return;
+  }
 
   bumpActionSeq();
   const after = snapshot();
@@ -602,6 +621,7 @@ export function undo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
+    resyncPendingTargetConfirmation();
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -623,6 +643,7 @@ export function redo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
+    resyncPendingTargetConfirmation();
     if (autoRender) adapter.render();
     notify();
     return true;
