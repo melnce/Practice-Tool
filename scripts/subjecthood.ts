@@ -14,6 +14,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { loadPool, type PoolCard } from "./card-behaviour.js";
 import {
+  FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT,
   runSubjecthoodAnalysis,
   runSubjecthoodDarkGate,
   type SubjecthoodReport,
@@ -68,6 +69,9 @@ function printTable(report: SubjecthoodReport): void {
     );
   }
   console.log("─".repeat(72));
+  console.log(
+    `  † ${summary.fewerSubjectBlocksThanClausesCaveat ?? FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT}`,
+  );
   console.log(`${"pool size".padEnd(46)} ${String(poolSize).padStart(6)}`);
   console.log(
     `\nNested describe inheritance: ${report.options.inheritDescribeTitles}`,
