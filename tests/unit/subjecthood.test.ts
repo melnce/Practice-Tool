@@ -151,6 +151,7 @@ describe("subjecthood dark gate", () => {
         inheritDescribeTitles: true,
         testRoots: ["tests"],
         testGlobs: ["**/*.test.ts"],
+        excludedTestRelPaths: [],
       },
       poolSize: 1,
       summary: {

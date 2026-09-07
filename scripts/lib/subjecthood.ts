@@ -65,6 +65,13 @@
  *
  * Scanned files
  * - Vitest (*.test.ts) and Playwright (*.spec.ts) files under tests/.
+ * - NOT scanned: tests/specs/generated_specs.json (lists all 904 cards by
+ *   construction — including it would mark every card "mentioned" and destroy
+ *   the signal).
+ * - Excluded: tests/unit/subjecthood.test.ts (and any path in
+ *   excludedTestRelPaths). A test *about* subjecthood must not change
+ *   subjecthood counts — e.g. an it() title naming a dark card would drop it
+ *   from the dark set and fail the gate's stale-entry arm.
  */
 
 import fs from "fs";
@@ -91,16 +98,21 @@ export type SubjecthoodDarkAllowEntry = {
   reason: string;
 };
 
+export const SUBJECTHOOD_SCAN_EXCLUSIONS = ["tests/unit/subjecthood.test.ts"];
+
 export type SubjecthoodOptions = {
   inheritDescribeTitles: boolean;
   testRoots: string[];
   testGlobs: string[];
+  /** Repo-relative paths omitted from the scan (see header). */
+  excludedTestRelPaths: string[];
 };
 
 export const DEFAULT_SUBJECTHOOD_OPTIONS: SubjecthoodOptions = {
   inheritDescribeTitles: true,
   testRoots: ["tests"],
   testGlobs: ["**/*.test.ts", "**/*.spec.ts"],
+  excludedTestRelPaths: SUBJECTHOOD_SCAN_EXCLUSIONS,
 };
 
 export type AssertingBlock = {
@@ -281,9 +293,13 @@ function collectTitlesFromFile(sourceFile: SourceFile): {
 
 export function listTestFiles(
   rootDir: string,
-  options: Pick<SubjecthoodOptions, "testRoots" | "testGlobs">,
+  options: Pick<
+    SubjecthoodOptions,
+    "testRoots" | "testGlobs" | "excludedTestRelPaths"
+  >,
 ): string[] {
   const files: string[] = [];
+  const excluded = new Set(options.excludedTestRelPaths);
 
   function walk(dir: string): void {
     if (!fs.existsSync(dir)) return;
@@ -295,6 +311,7 @@ export function listTestFiles(
       }
       if (!entry.isFile()) continue;
       const rel = path.relative(rootDir, full).replace(/\\/g, "/");
+      if (excluded.has(rel)) continue;
       if (
         options.testGlobs.some((glob) => {
           const pattern = glob.replace(/\*\*/g, "<<<globstar>>>");
