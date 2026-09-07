@@ -776,7 +776,7 @@ function hasScenarioPlacingOnBoard(paths: ScenarioName[]): boolean {
   return paths.some(scenarioPlacesSubjectOnBoard);
 }
 
-function classifyPaths(card: RawCard): ScenarioName[] {
+export function classifyPaths(card: RawCard): ScenarioName[] {
   const paths: ScenarioName[] = [];
   const isSpell = String(card.type).toLowerCase() === "spell";
   const playableEffects = isSpell
@@ -824,10 +824,10 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
-    !hasScenarioPlacingOnBoard(paths) &&
     isFollower &&
     hasAllyEnterTrigger(card) &&
-    hasNonEmptyEffects(card.triggers)
+    hasNonEmptyEffects(card.triggers) &&
+    !paths.includes("play")
   ) {
     paths.push("play");
   }
