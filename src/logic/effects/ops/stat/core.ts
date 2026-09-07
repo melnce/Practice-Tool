@@ -170,6 +170,9 @@ export function checkPostBuffTriggers(
     (a > 0 || d > 0) &&
     (blueBoard.includes(target) || redBoard.includes(target))
   ) {
+    // Routing argument is the executor, not the target owner; harmless here
+    // because self_buffed_up has no ally_/enemy_ prefix and handleBuffEvent
+    // restricts candidates to context.target.uid.
     fireTrigger("self_buffed_up", owner, { target });
   }
 
@@ -181,6 +184,9 @@ export function checkPostBuffTriggers(
         ? "second"
         : null;
     if (targetOwner) {
+      // ally_/enemy_* routing: activePlayer = affected card's owner (conditions.ts:157-160).
+      // Only ally_/enemy_ events use this for eligibility (process.ts:130); other events use it for ordering only.
+      // Passing the actor inverts the enemy_* ownership rule.
       fireTrigger("enemy_follower_defense_down", targetOwner, { target });
     }
   }

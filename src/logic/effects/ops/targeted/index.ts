@@ -412,8 +412,12 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
         : secondBoard.includes(target)
           ? "second"
           : null;
-      if (targetOwner)
+      if (targetOwner) {
+        // ally_/enemy_* routing: activePlayer = affected card's owner (conditions.ts:157-160).
+        // Only ally_/enemy_ events use this for eligibility (process.ts:130); other events use it for ordering only.
+        // Passing the actor inverts the enemy_* ownership rule.
         fireTrigger("enemy_follower_defense_down", targetOwner, { target });
+      }
     }
     applyKeywordBuff(target, eff as any, owner);
   }
