@@ -15,6 +15,7 @@ import {
   captureSnapshot,
   setHistoryEnabled,
   resetHistory,
+  undo as historyUndo,
 } from "../../src/core/history.js";
 import {
   canConfirmPendingTarget,
@@ -132,6 +133,51 @@ describe.each([
       type: "gear_multi",
     });
     confirmTargets(dispatch);
+    expect(captureSnapshot()).toEqual(snapDone);
+  });
+
+  it("undo with autoRender:false re-arms adapter confirm without render (history.ts path)", () => {
+    let confirmVm: { onConfirm: () => void } | null = null;
+    let renderCalls = 0;
+    injectAdapter({
+      render: () => {
+        renderCalls++;
+      },
+      showChoiceModal: () => {},
+      showTargetConfirmationButton: (vm) => {
+        confirmVm = vm;
+      },
+      hideTargetConfirmation: () => {},
+      triggerConfirmButtonClick: () => {},
+    });
+
+    givenGameState({ seed: 10, activePlayer: "first", roundCount: 6 })
+      .withFirstPP(6, 6)
+      .withFirstHand([GEAR_AMBITION, GEAR_REMEMBRANCE])
+      .build();
+    state.gameStarted = true;
+    state.phase = "main";
+
+    const ambition = getHand(state, "first").find(
+      (c) => c.id === GEAR_AMBITION,
+    )!;
+    const remembrance = getHand(state, "first").find(
+      (c) => c.id === GEAR_REMEMBRANCE,
+    )!;
+
+    dispatch(state, { type: "FUSE", player: "first", cardUid: ambition.uid });
+    chooseTarget(dispatch, remembrance.uid);
+    confirmTargets(dispatch);
+    const snapDone = captureSnapshot();
+
+    renderCalls = 0;
+    confirmVm = null;
+    historyUndo({ autoRender: false });
+
+    expect(renderCalls).toBe(0);
+    expect(confirmVm).not.toBeNull();
+    expect(canConfirmPendingTarget(state.pendingTargetEffect)).toBe(true);
+    confirmVm!.onConfirm();
     expect(captureSnapshot()).toEqual(snapDone);
   });
 
