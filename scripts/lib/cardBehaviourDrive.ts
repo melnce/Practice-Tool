@@ -14,16 +14,23 @@ import {
   createCard,
   whenPlayCard,
   whenEndTurn,
+  whenRunEffects,
   resetUidCounter,
 } from "../../tests/harness/builders.js";
 import { state } from "../../src/core/gameState.js";
+import { drawCard } from "../../src/core/utils.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import {
+  forceCompleteOrFizzlePendingTarget,
+  resolvePendingTarget,
+} from "../../src/logic/core/resolveTarget.js";
 import { dispatchAction } from "../../src/logic/core/dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
 import { attackLeader } from "../../src/logic/core/combat.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
+import { consumeEarthSigils } from "../../src/logic/effects/ops/earth.js";
+import { startFuseFromHand } from "../../src/logic/index.js";
 import {
   makeCardFromDB,
   pushToBoard,
@@ -56,7 +63,8 @@ export type SkipReason =
   | "unresolvable_pending"
   | "evolve_unavailable"
   | "super_evolve_unavailable"
-  | "drive_threw";
+  | "drive_threw"
+  | "in_hand_event_undrivable";
 
 export type ScenarioName =
   | "play"
@@ -66,7 +74,8 @@ export type ScenarioName =
   | "evolve"
   | "super_evolve"
   | "vanilla_place"
-  | "summon";
+  | "summon"
+  | "in_hand";
 
 export type ScenarioResult = {
   scenario: ScenarioName;
@@ -439,6 +448,62 @@ function hasAllyEnterTrigger(card: RawCard): boolean {
   return found;
 }
 
+type HandTriggerSpec = {
+  event?: string;
+  source?: string;
+  condition?: Record<string, unknown>;
+  effects?: unknown[];
+};
+
+function getHandTrigger(card: RawCard): HandTriggerSpec | null {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as HandTriggerSpec;
+    if (trig.source === "hand") return trig;
+  }
+  return null;
+}
+
+function hasHandSourceTrigger(card: RawCard): boolean {
+  return getHandTrigger(card) != null;
+}
+
+function playGrantsCrestTurnBoundary(card: RawCard): boolean {
+  const playRoots: unknown[] = [...(card.fanfare ?? []), ...(card.spell ?? [])];
+  let found = false;
+  walkEffects(playRoots, (obj) => {
+    if (obj.op !== "crest" || obj.action !== "gain") return;
+    walkEffects(obj.triggers ?? [], (t) => {
+      const ev = String(t.event ?? "");
+      if (ev === "end_of_turn" || ev === "start_of_turn") found = true;
+    });
+  });
+  return found;
+}
+
+/** True when a classified scenario fingerprints the subject card entering the field. */
+function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
+  switch (scenario) {
+    case "in_hand":
+      return false;
+    case "play":
+    case "play_base":
+    case "play_else":
+    case "evolve":
+    case "super_evolve":
+    case "vanilla_place":
+    case "summon":
+    case "turn_boundary":
+      return true;
+    default:
+      return false;
+  }
+}
+
+function hasScenarioPlacingOnBoard(paths: ScenarioName[]): boolean {
+  return paths.some(scenarioPlacesSubjectOnBoard);
+}
+
 function classifyPaths(card: RawCard): ScenarioName[] {
   const paths: ScenarioName[] = [];
   const isSpell = String(card.type).toLowerCase() === "spell";
@@ -449,13 +514,10 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   if (playableEffects || isSpell) {
     paths.push("play");
   }
-  // Base-cost branch for Enhance cards — PP held below the lowest tier so
-  // resolvePlayCost cannot prefer Enhance (the existing `play` scenario
-  // always affords every pool tier).
   if (lowestEnhanceTierCost(card) != null) {
     paths.push("play_base");
   }
-  if (hasBoardTurnTrigger(card)) {
+  if (hasBoardTurnTrigger(card) || playGrantsCrestTurnBoundary(card)) {
     paths.push("turn_boundary");
   }
   if (hasNonEmptyEffects(card.evolve) || hasNonEmptyEffects(card.superevolve)) {
@@ -464,16 +526,19 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   if (hasNonEmptyEffects(card.superevolve)) {
     paths.push("super_evolve");
   }
+  if (hasHandSourceTrigger(card)) {
+    paths.push("in_hand");
+  }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
-    paths.length === 0 &&
+    !hasScenarioPlacingOnBoard(paths) &&
     isFollower &&
     hasAllyEnterTrigger(card) &&
     hasNonEmptyEffects(card.triggers)
   ) {
     paths.push("play");
   }
-  if (paths.length === 0) {
+  if (!hasScenarioPlacingOnBoard(paths)) {
     paths.push("vanilla_place");
   }
   return paths;
@@ -743,6 +808,10 @@ function runPlayScenario(
     mode,
     sourceCard: playCard,
   });
+  const maxAllied = HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE;
+  if (state.players.first.board.length > maxAllied) {
+    trimBoardToCap(state.players.first.board, maxAllied);
+  }
   assertHarnessBoardCap(`runPlayScenario:${scenarioName}:afterGatePrep`);
 
   state.players.first.hand = [playCard, ...state.players.first.hand];
@@ -781,6 +850,77 @@ function runTurnBoundaryScenario(
 ): ScenarioResult | { skip: SkipReason; detail: string } {
   const template = getCardById(cardId);
   if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const raw = template as unknown as RawCard;
+  const crestFromPlay =
+    playGrantsCrestTurnBoundary(raw) && !hasBoardTurnTrigger(raw);
+
+  if (crestFromPlay) {
+    const extras = buildExtraHand(template);
+    buildArena({
+      extraHand: extras,
+      roundCount: 8,
+      activePlayer: "first",
+      arenaNeeds,
+    });
+    const playCard = createCard(cardId, "hand", "first");
+    (playCard as any).cost = 0;
+    (playCard as any).effectiveCost = 0;
+    const maxAllied = HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE;
+    if (state.players.first.board.length > maxAllied) {
+      trimBoardToCap(state.players.first.board, maxAllied);
+    }
+    const prep = applyGatePreparations(gates, {
+      mode: "satisfy",
+      sourceCard: playCard,
+    });
+    assertHarnessBoardCap("runTurnBoundaryScenario:crestPlay:afterGatePrep");
+    state.players.first.hand = [playCard, ...state.players.first.hand];
+    const outcome = whenPlayCard("first", 0);
+    if (outcome.kind === "blocked") {
+      return {
+        skip: "play_blocked",
+        detail: outcome.reason ?? "blocked",
+      };
+    }
+    if (state.pendingTargetEffect) {
+      const resolved = autoResolvePending();
+      if (!resolved.ok) {
+        return {
+          skip: "unresolvable_pending",
+          detail: resolved.reason ?? "pending_after_play",
+        };
+      }
+    }
+    whenEndTurn();
+    if (state.pendingTargetEffect) {
+      const resolved = autoResolvePending();
+      if (!resolved.ok) {
+        return {
+          skip: "unresolvable_pending",
+          detail: `after_first_eot:${resolved.reason}`,
+        };
+      }
+    }
+    whenEndTurn();
+    if (state.pendingTargetEffect) {
+      const resolved = autoResolvePending();
+      if (!resolved.ok) {
+        return {
+          skip: "unresolvable_pending",
+          detail: `after_second_eot:${resolved.reason}`,
+        };
+      }
+    }
+    const detail = fingerprintGameState(state);
+    return {
+      scenario: "turn_boundary",
+      fingerprint: hashFingerprint(detail),
+      detail,
+      gatesSatisfied: prep.satisfied,
+      gatesUnmet: prep.unmet,
+    };
+  }
 
   buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
 
@@ -917,6 +1057,343 @@ function runSuperEvolveScenario(
     "super_evolve",
     arenaNeeds,
   );
+}
+
+function engageAmuletOnBoard(): CardInstance {
+  return createCard(
+    {
+      name: "HarnessEngageAmulet",
+      type: "Amulet",
+      cost: 1,
+      keywords: [
+        {
+          name: "Engage",
+          sacrifice: true,
+          effects: [{ op: "draw", source: "deck", count: 1 }],
+        },
+      ],
+    },
+    "board",
+    "first",
+  );
+}
+
+function earthSigilOnBoard(): CardInstance {
+  const sigil = createCard(
+    {
+      name: "Earth Sigil",
+      type: "Amulet",
+      cost: 2,
+      counters: { earth: 2 },
+    },
+    "board",
+    "first",
+  );
+  (sigil as any).counters = { earth: 2 };
+  return sigil;
+}
+
+function resolvePendingOrFail(
+  context: string,
+): { ok: true } | { skip: SkipReason; detail: string } {
+  if (!state.pendingTargetEffect) return { ok: true };
+  const resolved = autoResolvePending();
+  if (!resolved.ok) {
+    return {
+      skip: "unresolvable_pending",
+      detail: `${context}:${resolved.reason ?? "pending"}`,
+    };
+  }
+  return { ok: true };
+}
+
+function fireInHandTriggerEvent(
+  event: string,
+  handCard: CardInstance,
+  handTrigger: HandTriggerSpec,
+): { ok: true } | { skip: SkipReason; detail: string } {
+  switch (event) {
+    case "ally_super_evolve": {
+      trimBoardToCap(
+        state.players.first.board,
+        HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+      );
+      const host = fillerFollower("HarnessInHandSuperEvo", "first", 2, 8);
+      host.justPlayed = false;
+      state.players.first.board.push(host);
+      state.players.first.evoCharges = 3;
+      state.players.first.superEvoCharges = 3;
+      state.players.first.evoUsedThisTurn = false;
+      try {
+        dispatchAction(state, {
+          type: "EVOLVE",
+          player: "first",
+          cardUid: host.uid,
+          mode: "super",
+        });
+      } catch (err) {
+        return {
+          skip: "super_evolve_unavailable",
+          detail: err instanceof Error ? err.message : String(err),
+        };
+      }
+      return resolvePendingOrFail("ally_super_evolve");
+    }
+    case "enemy_super_evolve": {
+      whenEndTurn();
+      let pending = resolvePendingOrFail("enemy_super_eot_pass");
+      if (!("ok" in pending)) return pending;
+      trimBoardToCap(
+        state.players.second.board,
+        HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+      );
+      const host = fillerFollower("HarnessEnemySuperEvo", "second", 2, 8);
+      host.justPlayed = false;
+      state.players.second.board.push(host);
+      state.players.second.evoCharges = 3;
+      state.players.second.superEvoCharges = 3;
+      state.players.second.evoUsedThisTurn = false;
+      try {
+        dispatchAction(state, {
+          type: "EVOLVE",
+          player: "second",
+          cardUid: host.uid,
+          mode: "super",
+        });
+      } catch (err) {
+        return {
+          skip: "super_evolve_unavailable",
+          detail: err instanceof Error ? err.message : String(err),
+        };
+      }
+      return resolvePendingOrFail("enemy_super_evolve");
+    }
+    case "ally_evolve": {
+      trimBoardToCap(
+        state.players.first.board,
+        HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+      );
+      const host = fillerFollower("HarnessInHandEvo", "first", 2, 8);
+      host.justPlayed = false;
+      state.players.first.board.push(host);
+      state.players.first.evoCharges = 3;
+      state.players.first.superEvoCharges = 3;
+      state.players.first.evoUsedThisTurn = false;
+      try {
+        dispatchAction(state, {
+          type: "EVOLVE",
+          player: "first",
+          cardUid: host.uid,
+          mode: "normal",
+        });
+      } catch (err) {
+        return {
+          skip: "evolve_unavailable",
+          detail: err instanceof Error ? err.message : String(err),
+        };
+      }
+      return resolvePendingOrFail("ally_evolve");
+    }
+    case "ally_follower_enter": {
+      const minCost = Number(handTrigger.condition?.base_cost_gte ?? 5);
+      const enter = createCard(
+        {
+          name: "HarnessInHandEnter",
+          type: "Follower",
+          cost: minCost,
+          attack: 3,
+          defense: 3,
+          base_cost: minCost,
+        },
+        "hand",
+        "first",
+      );
+      (enter as any).base_cost = minCost;
+      (enter as any).cost = 0;
+      (enter as any).effectiveCost = 0;
+      state.players.first.hand.push(enter);
+      trimBoardToCap(
+        state.players.first.board,
+        HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+      );
+      const idx = state.players.first.hand.indexOf(enter);
+      const outcome = whenPlayCard("first", idx);
+      if (outcome.kind === "blocked") {
+        return {
+          skip: "play_blocked",
+          detail: outcome.reason ?? "enter_play_blocked",
+        };
+      }
+      return resolvePendingOrFail("ally_follower_enter");
+    }
+    case "ally_card_played": {
+      const filler = createCard(
+        { name: "HarnessInHandPlayFiller", type: "Spell", cost: 0 },
+        "hand",
+        "first",
+      );
+      (filler as any).cost = 0;
+      (filler as any).effectiveCost = 0;
+      state.players.first.hand.push(filler);
+      const idx = state.players.first.hand.findIndex(
+        (c) => c.uid === filler.uid,
+      );
+      const outcome = whenPlayCard("first", idx);
+      if (outcome.kind === "blocked") {
+        return {
+          skip: "play_blocked",
+          detail: outcome.reason ?? "ally_card_played_blocked",
+        };
+      }
+      return resolvePendingOrFail("ally_card_played");
+    }
+    case "end_of_turn": {
+      whenEndTurn();
+      return resolvePendingOrFail("in_hand_first_eot");
+    }
+    case "when_drawn": {
+      drawCard(state.players.first.hand, state.players.first.deck, "first");
+      return { ok: true };
+    }
+    case "engage": {
+      trimBoardToCap(
+        state.players.first.board,
+        HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+      );
+      const amulet = engageAmuletOnBoard();
+      state.players.first.board.push(amulet);
+      const idx = getBoard(state, "first").indexOf(amulet);
+      if (idx < 0) {
+        return {
+          skip: "in_hand_event_undrivable",
+          detail: "engage_amulet_missing",
+        };
+      }
+      try {
+        engageAmulet("first", idx);
+      } catch (err) {
+        return {
+          skip: "drive_threw",
+          detail: err instanceof Error ? err.message : String(err),
+        };
+      }
+      return resolvePendingOrFail("engage");
+    }
+    case "ally_earth_rite": {
+      trimBoardToCap(
+        state.players.first.board,
+        HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+      );
+      state.players.first.board.push(earthSigilOnBoard());
+      if (!consumeEarthSigils("first")) {
+        return {
+          skip: "in_hand_event_undrivable",
+          detail: "earth_sigil_consume_failed",
+        };
+      }
+      return { ok: true };
+    }
+    case "on_fuse": {
+      const filler = createCard(
+        { name: "HarnessFuseMaterial", type: "Follower", cost: 1 },
+        "hand",
+        "first",
+      );
+      state.players.first.hand.push(filler);
+      try {
+        startFuseFromHand("first", handCard.uid);
+      } catch (err) {
+        return {
+          skip: "in_hand_event_undrivable",
+          detail: err instanceof Error ? err.message : String(err),
+        };
+      }
+      if (state.pendingTargetEffect) {
+        resolvePendingTarget(filler.uid);
+        if (state.pendingTargetEffect) {
+          forceCompleteOrFizzlePendingTarget();
+        }
+      }
+      return resolvePendingOrFail("on_fuse");
+    }
+    case "ally_follower_leaves_field": {
+      trimBoardToCap(
+        state.players.first.board,
+        HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+      );
+      const victim = fillerFollower("HarnessLeaveVictim", "first", 1, 1);
+      state.players.first.board.push(victim);
+      whenRunEffects(
+        [
+          {
+            op: "destroy",
+            target: "ally:follower",
+            filter: { uid: victim.uid },
+          },
+        ],
+        "first",
+        null,
+      );
+      return resolvePendingOrFail("ally_follower_leaves_field");
+    }
+    default:
+      return {
+        skip: "in_hand_event_undrivable",
+        detail: `unsupported_event:${event}`,
+      };
+  }
+}
+
+function runInHandScenario(
+  cardId: string,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+  const raw = template as unknown as RawCard;
+  const handTrigger = getHandTrigger(raw);
+  if (!handTrigger) {
+    return { skip: "in_hand_event_undrivable", detail: "no_hand_trigger" };
+  }
+  const event = String(handTrigger.event ?? "");
+  if (!event) {
+    return { skip: "in_hand_event_undrivable", detail: "missing_event" };
+  }
+
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
+  const handCard = createCard(cardId, "hand", "first");
+  if (event !== "on_fuse" && event !== "when_drawn") {
+    (handCard as any).cost = handCard.cost ?? (Number(template.cost) || 0);
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: handCard,
+  });
+  const maxAllied = HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE;
+  if (state.players.first.board.length > maxAllied) {
+    trimBoardToCap(state.players.first.board, maxAllied);
+  }
+  assertHarnessBoardCap("runInHandScenario:afterGatePrep");
+
+  if (event === "when_drawn") {
+    state.players.first.deck.push(handCard);
+  } else {
+    state.players.first.hand = [handCard, ...state.players.first.hand];
+  }
+
+  const fired = fireInHandTriggerEvent(event, handCard, handTrigger);
+  if (!("ok" in fired)) return fired;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "in_hand",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
 }
 
 function runVanillaPlaceScenario(
@@ -1141,6 +1618,8 @@ export function driveCard(
           result = runEvolveScenario(id, gates, arenaNeeds);
         else if (path === "super_evolve")
           result = runSuperEvolveScenario(id, gates, arenaNeeds);
+        else if (path === "in_hand")
+          result = runInHandScenario(id, gates, arenaNeeds);
         else if (path === "summon") result = runSummonScenario(id, arenaNeeds);
         else result = runVanillaPlaceScenario(id, arenaNeeds);
       } catch (err) {

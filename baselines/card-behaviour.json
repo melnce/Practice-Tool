@@ -1027,13 +1027,17 @@
       "status": "covered"
     },
     "10113130": {
-      "fingerprint": "f7cdf0f8",
+      "fingerprint": "de2f523c",
       "gatesSatisfied": [],
       "name": "Bayle, Luxglaive Warrior",
       "scenarios": [
         {
           "fingerprint": "7c855424",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "7bd480d8",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -2083,13 +2087,17 @@
       "status": "covered"
     },
     "10153140": {
-      "fingerprint": "55d41fc7",
+      "fingerprint": "231ed8b8",
       "gatesSatisfied": [],
       "name": "Balto, Dusk Bounty Hunter",
       "scenarios": [
         {
           "fingerprint": "6030bb9c",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "10648b70",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -2759,13 +2767,17 @@
       "status": "covered"
     },
     "10204120": {
-      "fingerprint": "4f8bf460",
+      "fingerprint": "08f8b557",
       "gatesSatisfied": ["super_evolved_allied"],
       "name": "Grimnir, Heavenly Gale",
       "scenarios": [
         {
           "fingerprint": "a0db56f0",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "201a29bc",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -2823,13 +2835,17 @@
       "status": "covered"
     },
     "10212120": {
-      "fingerprint": "93438148",
+      "fingerprint": "decb0e0d",
       "gatesSatisfied": [],
       "name": "Fairy Fencer",
       "scenarios": [
         {
           "fingerprint": "d7c4296c",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "f82f3293",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -2883,13 +2899,17 @@
       "status": "covered"
     },
     "10214110": {
-      "fingerprint": "9097c0c0",
+      "fingerprint": "44964010",
       "gatesSatisfied": [],
       "name": "Titania, Queen of Fairies",
       "scenarios": [
         {
           "fingerprint": "6d857b08",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "0f7bc75c",
+          "scenario": "turn_boundary"
         },
         {
           "fingerprint": "d588ce40",
@@ -3151,13 +3171,17 @@
       "status": "covered"
     },
     "10233310": {
-      "fingerprint": "2f5d7e20",
+      "fingerprint": "91c3d2d8",
       "gatesSatisfied": [],
       "name": "Pascale's Dance",
       "scenarios": [
         {
           "fingerprint": "f44e1363",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "5d06c4b3",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -3195,13 +3219,17 @@
       "status": "covered"
     },
     "10241110": {
-      "fingerprint": "d55dabc0",
+      "fingerprint": "960b5f68",
       "gatesSatisfied": [],
       "name": "Wise Guardian Dragon",
       "scenarios": [
         {
           "fingerprint": "5ef51954",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "cb266b18",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -3291,12 +3319,12 @@
       "status": "covered"
     },
     "10243310": {
-      "fingerprint": "5c53b270",
+      "fingerprint": "233ec7d1",
       "gatesSatisfied": [],
       "name": "Draconic Strike",
       "scenarios": [
         {
-          "fingerprint": "b2c9e078",
+          "fingerprint": "33be2d40",
           "scenario": "play"
         }
       ],
@@ -3763,10 +3791,14 @@
       "status": "covered"
     },
     "10302110": {
-      "fingerprint": "e03c6940",
+      "fingerprint": "632b0220",
       "gatesSatisfied": [],
       "name": "Inspirational One",
       "scenarios": [
+        {
+          "fingerprint": "70f9095c",
+          "scenario": "in_hand"
+        },
         {
           "fingerprint": "a6c6d340",
           "scenario": "vanilla_place"
@@ -3775,10 +3807,14 @@
       "status": "covered"
     },
     "10303110": {
-      "fingerprint": "a64d40bc",
+      "fingerprint": "f72919f5",
       "gatesSatisfied": [],
       "name": "Dogged One",
       "scenarios": [
+        {
+          "fingerprint": "a5e8407b",
+          "scenario": "in_hand"
+        },
         {
           "fingerprint": "4dec4263",
           "scenario": "vanilla_place"
@@ -4223,12 +4259,12 @@
       "status": "covered"
     },
     "10333310": {
-      "fingerprint": "417859a8",
+      "fingerprint": "f9f90c78",
       "gatesSatisfied": [],
       "name": "Illusory Conjuration",
       "scenarios": [
         {
-          "fingerprint": "a9878c24",
+          "fingerprint": "50e0efbc",
           "scenario": "play"
         }
       ],
@@ -4551,13 +4587,17 @@
       "status": "covered"
     },
     "10361110": {
-      "fingerprint": "fdd538e0",
+      "fingerprint": "3f55c191",
       "gatesSatisfied": ["no_ally_attacked"],
       "name": "Devotee of Repose",
       "scenarios": [
         {
           "fingerprint": "6c0619fc",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "8ebb2c4c",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -4591,13 +4631,17 @@
       "status": "covered"
     },
     "10362110": {
-      "fingerprint": "5d800c54",
+      "fingerprint": "cab7c478",
       "gatesSatisfied": ["no_ally_attacked"],
       "name": "Supplicant of Repose",
       "scenarios": [
         {
           "fingerprint": "65fef780",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "03846d50",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -4655,13 +4699,17 @@
       "status": "covered"
     },
     "10364110": {
-      "fingerprint": "969d7008",
+      "fingerprint": "9dcf02e8",
       "gatesSatisfied": ["board_name"],
       "name": "Himeka, Heir to Repose",
       "scenarios": [
         {
           "fingerprint": "2e2effe0",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "7eee1628",
+          "scenario": "turn_boundary"
         },
         {
           "fingerprint": "65aa40ca",
@@ -5303,13 +5351,17 @@
       "status": "covered"
     },
     "10434120": {
-      "fingerprint": "bd62170f",
+      "fingerprint": "5d4b8580",
       "gatesSatisfied": ["skybound_art"],
       "name": "Cagliostro, Genius Alchemist",
       "scenarios": [
         {
           "fingerprint": "1fbc3e9c",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "12202cd8",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -5327,25 +5379,33 @@
       "status": "covered"
     },
     "10441120": {
-      "fingerprint": "b1886c20",
+      "fingerprint": "16cb7c48",
       "gatesSatisfied": [],
       "name": "Mari, Meg's Bestie",
       "scenarios": [
         {
           "fingerprint": "a0e4bc23",
           "scenario": "turn_boundary"
+        },
+        {
+          "fingerprint": "042151b7",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
     },
     "10441310": {
-      "fingerprint": "025c4331",
+      "fingerprint": "6809c079",
       "gatesSatisfied": [],
       "name": "Crescent Tube Ride",
       "scenarios": [
         {
           "fingerprint": "ea4e58d0",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "9f9db0f0",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -5479,13 +5539,17 @@
       "status": "covered"
     },
     "10451310": {
-      "fingerprint": "5e4cd101",
+      "fingerprint": "9a1f97a4",
       "gatesSatisfied": [],
       "name": "Valiant Edge",
       "scenarios": [
         {
           "fingerprint": "6c700af6",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "2727dc40",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -5539,13 +5603,17 @@
       "status": "covered"
     },
     "10453310": {
-      "fingerprint": "0a2eb338",
+      "fingerprint": "6065cea7",
       "gatesSatisfied": ["skybound_art"],
       "name": "Corruption",
       "scenarios": [
         {
           "fingerprint": "3bb76f53",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "a4a9e2c4",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -5663,10 +5731,14 @@
       "status": "covered"
     },
     "10462210": {
-      "fingerprint": "ec983fb0",
+      "fingerprint": "08222c18",
       "gatesSatisfied": [],
       "name": "Skyfaring Vessel",
       "scenarios": [
+        {
+          "fingerprint": "7c3445e4",
+          "scenario": "in_hand"
+        },
         {
           "fingerprint": "bc257a60",
           "scenario": "vanilla_place"
@@ -6111,13 +6183,17 @@
       "status": "covered"
     },
     "10522110": {
-      "fingerprint": "7b1acc28",
+      "fingerprint": "d7d62150",
       "gatesSatisfied": [],
       "name": "Swift Staffmaster",
       "scenarios": [
         {
           "fingerprint": "f355b72c",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "952c6094",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -6603,13 +6679,17 @@
       "status": "covered"
     },
     "10553310": {
-      "fingerprint": "0941ccd0",
+      "fingerprint": "63a06d4f",
       "gatesSatisfied": ["hand_same_cost_gte"],
       "name": "Rigor of the Nightblossom",
       "scenarios": [
         {
           "fingerprint": "b4cb3fa2",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "f7172414",
+          "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
@@ -7079,13 +7159,17 @@
       "status": "covered"
     },
     "10612310": {
-      "fingerprint": "0bb812d0",
+      "fingerprint": "63245df0",
       "gatesSatisfied": [],
       "name": "Floral Offering",
       "scenarios": [
         {
           "fingerprint": "9436db23",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "1b95ae94",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -7435,7 +7519,7 @@
       "status": "covered"
     },
     "10634120": {
-      "fingerprint": "07ef8048",
+      "fingerprint": "6d499ed0",
       "gatesSatisfied": [],
       "name": "Calge-Danthla, Eld Crystals",
       "scenarios": [
@@ -7446,6 +7530,10 @@
         {
           "fingerprint": "1a32f36b",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "ee725754",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -7951,13 +8039,17 @@
       "status": "covered"
     },
     "10673310": {
-      "fingerprint": "e074e530",
+      "fingerprint": "4aebb157",
       "gatesSatisfied": [],
       "name": "Unfeeling Eld Axe",
       "scenarios": [
         {
           "fingerprint": "f0979bf4",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "522f3500",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -8227,13 +8319,17 @@
       "status": "covered"
     },
     "10721110": {
-      "fingerprint": "0c50e7f0",
+      "fingerprint": "1b042738",
       "gatesSatisfied": [],
       "name": "Bombastic Bombardier",
       "scenarios": [
         {
           "fingerprint": "b8377478",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "ef150e48",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -8395,13 +8491,17 @@
       "status": "covered"
     },
     "10731310": {
-      "fingerprint": "c61eb4cc",
+      "fingerprint": "f8775f58",
       "gatesSatisfied": [],
       "name": "Heel, My Dearie",
       "scenarios": [
         {
           "fingerprint": "1e19447c",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "04e68b30",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -8463,25 +8563,33 @@
       "status": "covered"
     },
     "10733310": {
-      "fingerprint": "014b0c47",
+      "fingerprint": "dea17bf0",
       "gatesSatisfied": [],
       "name": "Bottomless Gluttony",
       "scenarios": [
         {
           "fingerprint": "74db8818",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "dd6733b2",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
     },
     "10734110": {
-      "fingerprint": "1ab3fe9f",
+      "fingerprint": "1e11d880",
       "gatesSatisfied": [],
       "name": "Lilanthim, Anathema of Predation",
       "scenarios": [
         {
           "fingerprint": "56502dec",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "518ab728",
+          "scenario": "turn_boundary"
         },
         {
           "fingerprint": "73c3c7ee",
@@ -8639,13 +8747,17 @@
       "status": "covered"
     },
     "10744120": {
-      "fingerprint": "faeae430",
+      "fingerprint": "7ca011e8",
       "gatesSatisfied": [],
       "name": "Dragon's Vale Elder",
       "scenarios": [
         {
           "fingerprint": "a526913b",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "4b0d7b98",
+          "scenario": "turn_boundary"
         },
         {
           "fingerprint": "3d4b6ec0",
@@ -9827,7 +9939,7 @@
       "status": "covered"
     },
     "10853310": {
-      "fingerprint": "0fe7a867",
+      "fingerprint": "37acf190",
       "gatesSatisfied": ["super_evo_unlocked"],
       "name": "Ebb and Flow",
       "scenarios": [
@@ -9836,7 +9948,7 @@
           "scenario": "play_else"
         },
         {
-          "fingerprint": "e373cac0",
+          "fingerprint": "214bbbc0",
           "scenario": "play"
         }
       ],
@@ -9931,10 +10043,14 @@
       "status": "covered"
     },
     "10862120": {
-      "fingerprint": "1b89d548",
+      "fingerprint": "077c2de8",
       "gatesSatisfied": [],
       "name": "Viche, Abyssal Researcher",
       "scenarios": [
+        {
+          "fingerprint": "9829ad30",
+          "scenario": "in_hand"
+        },
         {
           "fingerprint": "97132600",
           "scenario": "vanilla_place"
@@ -10331,13 +10447,17 @@
       "status": "covered"
     },
     "10913310": {
-      "fingerprint": "a25aa090",
+      "fingerprint": "f88f71d5",
       "gatesSatisfied": ["combo"],
       "name": "Crimson Incense",
       "scenarios": [
         {
           "fingerprint": "498dc5bc",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "8b52c4eb",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -10367,13 +10487,17 @@
       "status": "covered"
     },
     "10914120": {
-      "fingerprint": "7fece11f",
+      "fingerprint": "c6ce9ebd",
       "gatesSatisfied": [],
       "name": "Hien, Redolent Revenant",
       "scenarios": [
         {
           "fingerprint": "05e3b0d8",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "07b84358",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -10451,19 +10575,19 @@
       "status": "covered"
     },
     "10922310": {
-      "fingerprint": "a5abff48",
+      "fingerprint": "09ab18c8",
       "gatesSatisfied": ["self_cost"],
       "name": "Severed Ties",
       "scenarios": [
         {
-          "fingerprint": "e492778b",
+          "fingerprint": "9a0a1284",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10923110": {
-      "fingerprint": "1d485ed0",
+      "fingerprint": "72fe6d00",
       "gatesSatisfied": [],
       "name": "Roughwater First Mate",
       "scenarios": [
@@ -10476,7 +10600,7 @@
           "scenario": "evolve"
         },
         {
-          "fingerprint": "67246e08",
+          "fingerprint": "bce8e6d0",
           "scenario": "super_evolve"
         }
       ],
@@ -10639,7 +10763,7 @@
       "status": "covered"
     },
     "10934110": {
-      "fingerprint": "870f16e4",
+      "fingerprint": "1ebde6b8",
       "gatesSatisfied": ["pp_at_least"],
       "name": "Sephie, Maven Convict",
       "scenarios": [
@@ -10654,6 +10778,10 @@
         {
           "fingerprint": "5b6e924c",
           "scenario": "super_evolve"
+        },
+        {
+          "fingerprint": "51853378",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -10943,13 +11071,17 @@
       "status": "covered"
     },
     "10954120": {
-      "fingerprint": "3c1b786f",
+      "fingerprint": "f9c777c8",
       "gatesSatisfied": ["leader_defense_lte"],
       "name": "Garodeth vs. Zeth",
       "scenarios": [
         {
           "fingerprint": "125275b8",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "2101ac84",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered"
@@ -11063,10 +11195,14 @@
       "status": "covered"
     },
     "10964110": {
-      "fingerprint": "062dcf77",
+      "fingerprint": "d739651c",
       "gatesSatisfied": ["ally_matches"],
       "name": "Erralde, Signet Convict",
       "scenarios": [
+        {
+          "fingerprint": "093420a3",
+          "scenario": "play"
+        },
         {
           "fingerprint": "21b36cb4",
           "scenario": "evolve"
@@ -11383,7 +11519,7 @@
       "token": true
     },
     "90014320": {
-      "fingerprint": "23d860bc",
+      "fingerprint": "9857cdec",
       "gatesSatisfied": ["board_name"],
       "name": "Annihilating Onslaught",
       "scenarios": [
@@ -11394,6 +11530,10 @@
         {
           "fingerprint": "2d7acc66",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "aa7b701c",
+          "scenario": "in_hand"
         }
       ],
       "status": "covered",
@@ -12431,12 +12571,12 @@
       "token": true
     },
     "90074320": {
-      "fingerprint": "d5692160",
+      "fingerprint": "175f6fa4",
       "gatesSatisfied": [],
       "name": "Depths of the Eld Axe",
       "scenarios": [
         {
-          "fingerprint": "ce9b96e0",
+          "fingerprint": "ada5dfec",
           "scenario": "play"
         }
       ],
