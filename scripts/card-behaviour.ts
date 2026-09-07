@@ -86,11 +86,78 @@ function stableStringify(obj: unknown): string {
   );
 }
 
-function runPool(): {
+function parseOnlyFilter(args: string[]): Set<string> | null {
+  const onlyArg = args.find((a) => a.startsWith("--only="));
+  if (!onlyArg) return null;
+  const raw = onlyArg.slice("--only=".length).trim();
+  if (!raw) return null;
+  return new Set(
+    raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
+  );
+}
+
+function explainCard(result: CardDriveResult): void {
+  console.log(`\n=== ${result.id}  ${result.name} ===`);
+  if (result.status === "skipped") {
+    console.log(`status: skipped (${result.reason})`);
+    if (result.detail) console.log(`detail: ${result.detail}`);
+    return;
+  }
+  console.log(`status: ${result.status}`);
+  if (result.status === "partial") {
+    console.log(`unmetGates: ${result.unmetGates.join(", ") || "(none)"}`);
+  }
+  console.log(
+    `gatesSatisfied: ${result.gatesSatisfied.join(", ") || "(none)"}`,
+  );
+  console.log(`fingerprint: ${result.fingerprint}`);
+  for (const s of result.scenarios) {
+    console.log(`\n  scenario: ${s.scenario}`);
+    console.log(`  fingerprint: ${s.fingerprint}`);
+    if (s.gatesSatisfied?.length) {
+      console.log(`  gatesSatisfied: ${s.gatesSatisfied.join(", ")}`);
+    }
+    if (s.gatesUnmet?.length) {
+      console.log(`  gatesUnmet: ${s.gatesUnmet.join(", ")}`);
+    }
+    const d = s.detail as Record<string, unknown>;
+    const players = d.players as
+      | Record<string, Record<string, unknown>>
+      | undefined;
+    if (players) {
+      for (const side of ["first", "second"] as const) {
+        const p = players[side];
+        if (!p) continue;
+        console.log(
+          `  ${side}: hp=${p.hp} pp=${p.pp}/${p.maxPP} shadows=${p.shadows}`,
+        );
+        const board = (p.board as object[]) ?? [];
+        const hand = (p.hand as object[]) ?? [];
+        const grave = (p.graveyard as object[]) ?? [];
+        const crests = (p.crests as object[]) ?? [];
+        if (board.length) console.log(`    board: ${JSON.stringify(board)}`);
+        if (hand.length) console.log(`    hand: ${JSON.stringify(hand)}`);
+        if (grave.length)
+          console.log(`    graveyard: ${JSON.stringify(grave)}`);
+        if (crests.length) console.log(`    crests: ${JSON.stringify(crests)}`);
+      }
+    }
+    if (d.pending) console.log(`  pending: ${JSON.stringify(d.pending)}`);
+  }
+}
+
+function runPool(opts: { onlyIds?: Set<string> | null } = {}): {
   results: CardDriveResult[];
   baseline: BehaviourBaseline;
 } {
   const pool = loadPool();
+  const filtered =
+    opts.onlyIds && opts.onlyIds.size > 0
+      ? pool.filter((c) => opts.onlyIds!.has(String(c.id)))
+      : pool;
   const tokenCount = pool.filter((c) => c.token).length;
   const results: CardDriveResult[] = [];
   const cards: Record<string, BaselineCardEntry> = {};
@@ -100,7 +167,7 @@ function runPool(): {
   let partial = 0;
   let skipped = 0;
 
-  for (const raw of pool) {
+  for (const raw of filtered) {
     const result = driveCard(raw, { isToken: !!raw.token });
     results.push(result);
     cards[result.id] = toBaselineEntry(result, { token: !!raw.token });
@@ -323,10 +390,15 @@ function main(): void {
     ? "verify"
     : args.includes("--record")
       ? "record"
-      : null;
+      : args.includes("--explain")
+        ? "explain"
+        : null;
+  const onlyIds = parseOnlyFilter(args);
 
   if (!mode) {
-    console.error("Usage: card-behaviour.ts --record | --verify");
+    console.error(
+      "Usage: card-behaviour.ts --record | --verify | --explain [--only=<id>[,<id>...]]",
+    );
     process.exit(2);
   }
 
@@ -351,6 +423,16 @@ function main(): void {
 
   if (mode === "record") {
     record();
+    process.exit(0);
+  }
+
+  if (mode === "explain") {
+    const { results } = runPool({ onlyIds });
+    if (onlyIds && results.length === 0) {
+      console.error(`No cards matched --only=${[...onlyIds].join(",")}`);
+      process.exit(2);
+    }
+    for (const r of results) explainCard(r);
     process.exit(0);
   }
 

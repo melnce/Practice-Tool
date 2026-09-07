@@ -7,6 +7,7 @@ import { tickCrests, resetCrestOncePerTurn } from "../effects/crest.js";
 import {
   runEndOfTurnBoundary,
   runStartOfTurnBoundary,
+  drainTurnBoundaryQueue,
 } from "./turnBoundary.js";
 import { clearExpiredCantAttackAtEOT } from "./keywords/eot.js";
 import { recomputeAttackFlags } from "./combat.js";
@@ -16,6 +17,7 @@ import { dealDamage } from "./barrier.js";
 import { applyLeaderDamage } from "../effects/leader.js";
 import { logEvent } from "../../core/logger.js";
 import { beginAction, commitAction, abortAction } from "../../core/history.js";
+import { restoreTempCostMods } from "../effects/ops/cost/model.js";
 import type { CardInstance, Player } from "../../core/types/index.js";
 import {
   isFirstPlayer,
@@ -95,24 +97,7 @@ function clearExpiredLeaderEffects(endedPlayer: Player) {
 }
 
 function clearTempCostModsOnCard(card: CardInstance) {
-  // Temporary cost *set* (e.g. Mari until-EOT → 0): restore from base_cost.
-  if ((card as any).temp_cost_set_until_eot) {
-    if (card.base_cost !== undefined) {
-      card.cost = card.base_cost;
-    }
-    delete (card as any).temp_cost_set_until_eot;
-  }
-  if ((card as any).temp_cost_reduce_until_eot) {
-    if (card.base_cost !== undefined) {
-      card.cost = card.base_cost;
-    }
-    delete (card as any).temp_cost_reduce_until_eot;
-  }
-  const delta = parseInt((card as any).temp_cost_mod_until_eot) || 0;
-  if (delta !== 0) {
-    (card as any).cost_mod = (parseInt((card as any).cost_mod) || 0) - delta;
-    delete (card as any).temp_cost_mod_until_eot;
-  }
+  restoreTempCostMods([card]);
 }
 
 function clearTempHandCostMods(endedPlayer: Player) {
@@ -210,7 +195,12 @@ function scanDeckForInvokes(
 
       // Execute invoke logic via centralized handler
       // This ensures stats are initialized, triggers fire, and Rally increments.
-      handleInvoke(owner, card);
+      (state as any).turnBoundaryInvokePhase = true;
+      try {
+        handleInvoke(owner, card);
+      } finally {
+        (state as any).turnBoundaryInvokePhase = false;
+      }
 
       // "Only 1 copy of an Invoke card will activated each turn"
 
@@ -292,27 +282,37 @@ function _endTurnCore(endingPlayer: Player) {
     refreshBoardForNewTurn(getBoard(state, nextPlayer));
 
     try {
-      runStartOfTurnBoundary(nextPlayer, {
-        tickCrests,
-        tickAmulets: tickAmuletCountdowns,
-      });
+      runStartOfTurnBoundary(
+        nextPlayer,
+        {
+          tickCrests,
+          tickAmulets: tickAmuletCountdowns,
+        },
+        { deferDrain: true },
+      );
     } catch (e) {
       console.error(`Error in start-of-turn boundary (${nextPlayer}):`, e);
     }
-
-    // Draw step 8 ? after SOT queue resolves
-    drawCard(
-      getHand(state, nextPlayer),
-      getDeck(state, nextPlayer),
-      nextPlayer,
-    );
-    logEvent("draw", { player: nextPlayer, count: 1 });
 
     try {
       scanDeckForInvokes(nextPlayer, "start_of_turn");
     } catch (e) {
       console.error(`Error in ${nextPlayer} Start Invoke:`, e);
     }
+
+    try {
+      drainTurnBoundaryQueue();
+    } catch (e) {
+      console.error(`Error draining SOT boundary (${nextPlayer}):`, e);
+    }
+
+    // Draw step 8 — after SOT queue + invoke drain resolve
+    drawCard(
+      getHand(state, nextPlayer),
+      getDeck(state, nextPlayer),
+      nextPlayer,
+    );
+    logEvent("draw", { player: nextPlayer, count: 1 });
 
     cleanupDead();
 

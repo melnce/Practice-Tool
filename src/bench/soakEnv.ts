@@ -55,6 +55,7 @@ import { assertAttackFlagsConsistent } from "./attackFlagsInvariant.js";
 import { deckSpecForSeed, type SoakDeckSpec } from "./soakDecks.js";
 import { CoverageTracker } from "./soakCoverage.js";
 import type { PendingModeChoice } from "../logic/core/resolutionPause.js";
+import { getForcedFirstPicks } from "../logic/core/targeting/forcedPicks.js";
 
 export const DEFAULT_TURN_CAP = 60;
 export const DEFAULT_ACTION_CAP = 800;
@@ -393,6 +394,7 @@ export function getLegalSoakActions(): SoakAction[] {
         ? pending.selectCount
         : 1;
     const selectedCount = selected.size;
+    const forcedFirst = selectedCount === 0 ? getForcedFirstPicks(pending) : [];
 
     // Once a confirm hook is armed, finish the selection — never toggle forever.
     if (confirmHook && selectedCount > 0) {
@@ -412,6 +414,7 @@ export function getLegalSoakActions(): SoakAction[] {
     for (const uid of poolUids) {
       if (!uid || selected.has(uid)) continue;
       if (!stillPresent.has(uid)) continue;
+      if (forcedFirst.length > 0 && !forcedFirst.includes(uid)) continue;
       actions.push({
         type: "CHOOSE_TARGET",
         player: owner,
@@ -700,7 +703,7 @@ export function captureLegalSnapshot(): string {
   const pending = state.pendingTargetEffect;
   const savedUids = pending?.targetUids;
   const savedTargets = pending?.targets;
-  if (pending) {
+  if (pending && !pending.picksAreCommitted) {
     pending.targetUids = [];
     if (Array.isArray(pending.targets)) pending.targets = [];
   }

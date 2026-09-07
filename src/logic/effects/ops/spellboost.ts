@@ -12,6 +12,7 @@ import { getHand } from "../../../core/playerHelpers.js";
 import { runEffects } from "../../core/effects/index.js";
 import { handleStat } from "./stat.js";
 import { handleCost } from "./cost/unified.js";
+import { applySpellboostCostReduction } from "./cost/model.js";
 
 /* ------------------------ helpers ------------------------ */
 
@@ -145,23 +146,12 @@ export function spellboostHand(
 
         // optional cost reduction (only if keyword specifies)
         if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
-          const reduceBy = Number.isFinite(kw.reduceCostBy)
-            ? kw.reduceCostBy
+          const reduceBy: number = Number.isFinite(kw.reduceCostBy)
+            ? Number(kw.reduceCostBy)
             : 0;
-          const minCost = Number.isFinite(kw.minCost) ? kw.minCost : 0;
-
-          targetCard.base_cost =
-            targetCard.base_cost ??
-            (parseInt(String(targetCard.cost), 10) || 0);
-          const prev = targetCard.spellboostCostCount || 0;
-          const next = prev + reduceBy;
-          targetCard.spellboostCostCount = next;
-
-          const newCost = Math.max(
-            minCost ?? 0,
-            Number(targetCard.base_cost ?? 0) - next,
-          );
-          if (Number.isFinite(newCost)) targetCard.cost = newCost;
+          if (reduceBy > 0) {
+            applySpellboostCostReduction(targetCard, reduceBy);
+          }
         }
         logEvent("spellboost", {
           owner,
@@ -185,21 +175,12 @@ export function spellboostHand(
 
         // optional cost reduction (opt-in per keyword)
         if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
-          const reduceBy = Number.isFinite(kw.reduceCostBy)
-            ? kw.reduceCostBy
+          const reduceBy: number = Number.isFinite(kw.reduceCostBy)
+            ? Number(kw.reduceCostBy)
             : 0;
-          const minCost = Number.isFinite(kw.minCost) ? kw.minCost : 0;
-
-          c.base_cost = c.base_cost ?? (parseInt(String(c.cost), 10) || 0);
-          const prev = c.spellboostCostCount || 0;
-          const next = prev + reduceBy;
-          c.spellboostCostCount = next;
-
-          const newCost = Math.max(
-            minCost ?? 0,
-            Number(c.base_cost ?? 0) - next,
-          );
-          if (Number.isFinite(newCost)) c.cost = newCost;
+          if (reduceBy > 0) {
+            applySpellboostCostReduction(c, reduceBy);
+          }
         }
         logEvent("spellboost", {
           owner,

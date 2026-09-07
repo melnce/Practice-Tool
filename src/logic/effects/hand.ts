@@ -12,6 +12,7 @@ import type { Player, Effect, CardInstance } from "../../core/types/index.js";
 import { getHand, getGraveyard, addShadows } from "../../core/playerHelpers.js";
 import { bumpZoneVersion } from "../core/triggers/utils.js";
 import { toUids } from "../../core/uidResolver.js";
+import { runEffects } from "../core/effects/index.js";
 
 // ========================================================================
 // UNIFIED DISCARD HANDLER - routes by mode field
@@ -27,6 +28,63 @@ function rememberDiscardedCards(discarded: CardInstance[]): void {
   state.lastDiscardedCost = state.lastDiscardedCosts[0] || 0;
   state.lastDiscardedTypes = discarded.map((card) => String(card.type || ""));
   state.lastDiscardedType = state.lastDiscardedTypes[0] || "";
+}
+
+/** Append one card to lastDiscarded* during multi-pick discard (reset on first pick). */
+export function rememberDiscardedCardInBatch(
+  card: CardInstance,
+  resetBatch: boolean,
+): void {
+  if (resetBatch) {
+    state.lastDiscardedCosts = [];
+    state.lastDiscardedTypes = [];
+  } else {
+    if (!state.lastDiscardedCosts) state.lastDiscardedCosts = [];
+    if (!state.lastDiscardedTypes) state.lastDiscardedTypes = [];
+  }
+  state.lastDiscardedCosts.push(parseInt(String(card.cost), 10) || 0);
+  state.lastDiscardedTypes.push(String(card.type || ""));
+  state.lastDiscardedCost = state.lastDiscardedCosts[0] || 0;
+  state.lastDiscardedType = state.lastDiscardedTypes[0] || "";
+}
+
+/**
+ * Discard one hand card during a multi-pick target prompt.
+ * History-safe: call only inside doAction for each pick.
+ */
+export function discardHandCardFromTargetPick(
+  owner: Player,
+  uid: string,
+  opts: { resetBatch: boolean; sourceCard: CardInstance | null },
+): CardInstance | null {
+  const hand = getHand(state, owner);
+  const grave = getGraveyard(state, owner);
+  const idx = hand.findIndex((c) => c.uid === uid);
+  if (idx === -1) return null;
+  const [d] = hand.splice(idx, 1);
+  if (!d) return null;
+  d.cost_mod = 0;
+  grave.push(d);
+  bumpZoneVersion();
+  rememberDiscardedCardInBatch(d, opts.resetBatch);
+  addShadows(state, owner, 1);
+  logEvent("discard", { owner, count: 1, uid: d.uid, multiPick: true });
+
+  const fx = (d as any).on_discard;
+  if (Array.isArray(fx) && fx.length) {
+    runEffects(
+      [
+        {
+          op: "with_source",
+          source_uid: d.uid,
+          effects: [...fx],
+        } as Effect,
+      ],
+      owner,
+      opts.sourceCard,
+    );
+  }
+  return d;
 }
 
 export function handleDiscard(

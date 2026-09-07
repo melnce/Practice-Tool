@@ -4,19 +4,12 @@ import {
   pickAlternateForm,
   type AlternateForm,
 } from "../../../helpers/alternateForm.js";
+import { getEffectiveCostValue } from "../../effects/ops/cost/model.js";
 import { playerHasCrestPassive } from "../../effects/crest.js";
 import { state } from "../../../core/gameState.js";
 
 export function getEffectiveCost(card: CardInstance): number {
-  if (typeof card.effectiveCost === "number") return card.effectiveCost;
-  if (card.cost_mod != null)
-    return (
-      (parseInt(String(card.cost), 10) || 0) +
-      (parseInt(String(card.cost_mod), 10) || 0)
-    );
-  if ((card as any).costModified != null)
-    return parseInt((card as any).costModified, 10) || 0;
-  return parseInt(String(card.cost), 10) || 0;
+  return getEffectiveCostValue(card);
 }
 
 export function pickEnhanceTiers(

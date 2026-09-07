@@ -14,6 +14,7 @@ import {
   opponentOf,
 } from "../../../core/playerHelpers.js";
 import { isDev, readEnv } from "../../../core/env.js";
+import { resolveUid } from "../../../core/uidResolver.js";
 
 // PERF: Helper to get/initialize trigger cache on state
 
@@ -348,6 +349,16 @@ export function getOrderedTriggerCandidates(
         throw new Error(
           `[Triggers] stale trigger candidate cache (zoneVersion=${zoneVersion}, actionSeq=${actionSeq}${detail ? `; ${detail}` : ""})`,
         );
+      }
+      for (const c of cache.candidates ?? []) {
+        const uid = c.card?.uid;
+        if (!uid) continue;
+        const live = resolveUid(uid);
+        if (live && c.card !== live) {
+          throw new Error(
+            `[Triggers] stale trigger candidate card identity for uid ${uid} (${c.owner}:${c.source})`,
+          );
+        }
       }
     }
     return cache.candidates;

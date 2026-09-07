@@ -22,6 +22,8 @@ export type PendingModeChoice = {
   unique?: boolean;
   /** Picks accumulated across multi-select rounds (history-safe; indices into allOptions). */
   partialPickedIndices?: number[];
+  /** Each CHOOSE_MODE pick is its own committed action (PR #264). */
+  picksAreCommitted?: boolean;
 };
 
 /** True while an interactive target or mode prompt is waiting for player input. */

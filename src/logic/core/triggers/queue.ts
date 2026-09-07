@@ -36,6 +36,7 @@ import { dispatchEvent } from "./dispatcher.js";
 import { isTargetedOpDispatchActive } from "../targeting/guards.js";
 import { resolveUid, resolveUidOnBoard } from "../../../core/uidResolver.js";
 import { getCrests, getHand } from "../../../core/playerHelpers.js";
+import { isDev, readEnv } from "../../../core/env.js";
 
 export const MAX_RESOLUTION_QUEUE_LENGTH = 500;
 
@@ -103,6 +104,10 @@ export function getRunEffectsDepth(): number {
 export function shouldQueueReactiveTrigger(
   eventName: TriggerEventName,
 ): boolean {
+  if ((state as any).turnBoundaryInvokePhase && eventName === "invoke") {
+    return true;
+  }
+
   if (getRunEffectsDepth() <= 0 && !isTargetedOpDispatchActive()) return false;
   if (TURN_BOUNDARY_EVENTS.has(eventName)) return false;
 
@@ -123,44 +128,159 @@ export function clearResolutionQueue(): void {
   (state as any)._resolutionQueue = [];
 }
 
-function recentCardNamesForGuard(limit = 3): string[] {
-  const names: string[] = [];
+/** Re-bind queued card refs to live zone instances (staged enter groups after Fanfare). */
+export function refreshResolutionQueueCardRefs(
+  queue: ResolutionQueueItem[],
+): void {
+  for (const item of queue) {
+    if (item.kind === "reactive") {
+      for (const entry of item.entries) {
+        const uid = entry.cardUid ?? entry.card?.uid;
+        if (!uid) continue;
+        const live = resolveUid(uid);
+        if (live) entry.card = live;
+      }
+    } else if (item.kind === "death_lw") {
+      for (const lw of item.items) {
+        const uid = lw.cardUid;
+        if (!uid) continue;
+        const live = resolveUid(uid);
+        if (live) lw.card = live;
+      }
+    }
+  }
+}
+
+/** Dev/test: queued card refs must match the live zone instance when one exists. */
+export function assertResolutionQueueCardIdentity(
+  queue: ResolutionQueueItem[],
+  opts?: { throwOnStale?: boolean },
+): void {
+  const throwOnStale =
+    opts?.throwOnStale ??
+    (isDev() || readEnv("VITEST") === "true" || readEnv("VITEST") === "1");
+  if (!throwOnStale) return;
+
+  for (const item of queue) {
+    if (item.kind === "death_lw") {
+      for (const lw of item.items) {
+        const uid = lw.cardUid;
+        if (!uid || !lw.card) continue;
+        const live = resolveUid(uid);
+        if (live && lw.card !== live) {
+          throw new Error(
+            `[Triggers] stale death_lw card identity for uid ${uid}`,
+          );
+        }
+      }
+    } else if (item.kind === "reactive") {
+      for (const entry of item.entries) {
+        const uid = entry.cardUid ?? entry.card?.uid;
+        if (!uid || !entry.card) continue;
+        const live = resolveUid(uid);
+        if (live && entry.card !== live) {
+          throw new Error(
+            `[Triggers] stale reactive queue card identity for uid ${uid} (${entry.event})`,
+          );
+        }
+      }
+    }
+  }
+}
+
+export function assertLiveResolutionQueueCardIdentity(): void {
+  assertResolutionQueueCardIdentity(getResolutionQueue());
+}
+
+export type ResolutionHistoryEntry = {
+  cardName: string;
+  event: string;
+  owner: string;
+};
+
+const GUARD_HISTORY_LIMIT = 20;
+
+/** Recent resolution queue entries for guard diagnostics (newest first). */
+export function recentResolutionHistoryForGuard(
+  limit = GUARD_HISTORY_LIMIT,
+): ResolutionHistoryEntry[] {
+  const history: ResolutionHistoryEntry[] = [];
   const q = getResolutionQueue();
-  for (let i = q.length - 1; i >= 0 && names.length < limit; i--) {
+  for (let i = q.length - 1; i >= 0 && history.length < limit; i--) {
     const item = q[i]!;
     if (item.kind === "reactive") {
       for (
         let j = item.entries.length - 1;
-        j >= 0 && names.length < limit;
+        j >= 0 && history.length < limit;
         j--
       ) {
-        const n = item.entries[j]?.card?.name;
-        if (n) names.push(n);
+        const entry = item.entries[j];
+        const n = entry?.card?.name;
+        if (!n) continue;
+        history.push({
+          cardName: n,
+          event: entry.event ?? item.event,
+          owner: entry.owner,
+        });
       }
     } else if (item.kind === "death_lw") {
-      for (let j = item.items.length - 1; j >= 0 && names.length < limit; j--) {
-        const n = resolveDeathLwCard(item.items[j]!)?.name;
-        if (n) names.push(n);
+      for (
+        let j = item.items.length - 1;
+        j >= 0 && history.length < limit;
+        j--
+      ) {
+        const lw = item.items[j]!;
+        const n = resolveDeathLwCard(lw)?.name;
+        if (!n) continue;
+        history.push({
+          cardName: n,
+          event: "death_lw",
+          owner: lw.owner,
+        });
       }
     } else if (item.kind === "death_leave") {
-      for (let j = item.items.length - 1; j >= 0 && names.length < limit; j--) {
-        const uid = item.items[j]?.leavingCardUid;
+      for (
+        let j = item.items.length - 1;
+        j >= 0 && history.length < limit;
+        j--
+      ) {
+        const leave = item.items[j]!;
+        const uid = leave.leavingCardUid;
         if (!uid) continue;
         const n = resolveUid(uid)?.name;
-        if (n) names.push(n);
+        if (!n) continue;
+        history.push({
+          cardName: n,
+          event: leave.event,
+          owner: leave.leavingOwner,
+        });
       }
     }
   }
-  return names;
+  return history;
+}
+
+/** @deprecated Use recentResolutionHistoryForGuard — card names only, for callers that need it. */
+export function recentCardNamesForGuard(limit = GUARD_HISTORY_LIMIT): string[] {
+  return recentResolutionHistoryForGuard(limit).map((e) => e.cardName);
+}
+
+export function formatResolutionHistoryForGuard(
+  history: ResolutionHistoryEntry[],
+): string {
+  if (history.length === 0) return "n/a";
+  return history
+    .map((e) => `${e.cardName} (${e.event}, ${e.owner})`)
+    .join("; ");
 }
 
 function assertQueueLengthGuard(eventName?: TriggerEventName): void {
   const q = getResolutionQueue();
   if (q.length < MAX_RESOLUTION_QUEUE_LENGTH) return;
-  const cards = recentCardNamesForGuard().join(", ");
+  const history = recentResolutionHistoryForGuard();
   const msg =
     `[Triggers] Resolution queue exceeded ${MAX_RESOLUTION_QUEUE_LENGTH}. ` +
-    `Event: ${eventName ?? "unknown"}. Last cards: ${cards || "n/a"}. ` +
+    `Event: ${eventName ?? "unknown"}. Recent history: ${formatResolutionHistoryForGuard(history)}. ` +
     `This indicates an infinite loop in trigger effects.`;
   console.error(msg);
   throw new Error(msg);

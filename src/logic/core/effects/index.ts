@@ -84,15 +84,10 @@ export function onFanfare(card: CardInstance, owner: Player) {
   }
 }
 
+import { getEffectiveCostValue } from "../../effects/ops/cost/model.js";
+
 export function getEffectiveCost(card: CardInstance) {
-  if (
-    typeof card.effectiveCost === "number" &&
-    Number.isFinite(card.effectiveCost)
-  )
-    return card.effectiveCost;
-  const base = parseInt(card?.cost as string, 10) || 0;
-  const mod = parseInt((card as any)?.cost_mod, 10) || 0;
-  return base + mod;
+  return getEffectiveCostValue(card);
 }
 
 // Notify (event-only) that a Loot spell was played.
@@ -162,6 +157,7 @@ export function runEffects(
   const wasTopLevelRunEffects = runDepth === 0;
   (state as any)._runEffectsDepth = runDepth + 1;
   const combatDepth = ((state as any).combatResolutionDepth ?? 0) as number;
+  const playDepth = ((state as any).playSequenceDepth ?? 0) as number;
   const batchTurnBoundary = !!(context?.batchTurnBoundary && runDepth === 0);
   const enableDeathDefer =
     runDepth === 0 &&
@@ -255,21 +251,31 @@ export function runEffects(
       flushDeferredDeckShuffle();
     }
     if (enableDeathDefer || batchTurnBoundary) {
-      (state as any).deferDeathTriggers = false;
+      if ((state as any).sotBoundaryDeferDrain) {
+        (state as any).deferDeathTriggers = true;
+      } else {
+        (state as any).deferDeathTriggers = false;
+      }
     }
-    // Drain reactive queue at end of top-level runEffects only outside combat.
-    // During combat, attack cores drain at step boundaries instead.
+    // Countdown-zero / dead cards leave the board during play sequences; only
+    // queue drain is deferred (mirrors combat: cleanupDead at steps, drain at boundaries).
     if (
       runDepth === 0 &&
       combatDepth === 0 &&
-      !paused &&
-      !isEffectResolutionPaused() &&
       !(state as any)._drainingResolutionQueue &&
-      !batchTurnBoundary
+      !batchTurnBoundary &&
+      !(state as any).sotBoundaryDeferDrain
     ) {
       cleanupCountdownZeroAmulets();
-      flushDeferredDeathBatch();
-      clearResolutionQueue();
+      if (
+        playDepth === 0 &&
+        !paused &&
+        !isEffectResolutionPaused() &&
+        !(state as any)._drainingResolutionQueue
+      ) {
+        flushDeferredDeathBatch();
+        clearResolutionQueue();
+      }
     }
     if (wasTopLevelRunEffects) {
       invalidateZoneCandidatesCache();
