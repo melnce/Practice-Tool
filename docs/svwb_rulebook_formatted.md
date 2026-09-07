@@ -284,13 +284,14 @@ _Combat test case._ The active player attacks with a follower that has "Strike: 
 
 When a card is played and/or a follower/amulet enters play, the resulting triggers resolve in this order:
 
-1. The played card's own **Fanfare**, and the entering card's own "when this enters play" abilities.
-2. Crests that react to **the play** ("when you play a card…", e.g. Mil & Lus).
-3. Board abilities that react to the play.
-4. Crests that react to **a card entering** ("when a follower enters play…", e.g. Krull).
-5. Board abilities that react to a card entering (e.g. Orchis).
+1. **Play/enter reactions for the played card itself** — queued the moment the card enters the field (`ally_follower_played`, `ally_card_played`, `ally_follower_enter`, `enemy_follower_enter` for that card). These resolve **before** anything its Fanfare raises.
+2. The played card's own **Fanfare**, and any effects it raises (summons, damage, etc.) in FIFO order with their own triggered abilities.
+3. Crests that react to **the play** ("when you play a card…", e.g. Mil & Lus) — for cards other than the played card's own staged reactions above.
+4. Board abilities that react to the play.
+5. Crests that react to **a card entering** ("when a follower enters play…", e.g. Krull) — for entries raised during Fanfare, after the played card's own enter reaction.
+6. Board abilities that react to a card entering (e.g. Orchis).
 
-Same-timing abilities resolve self → opponent; same-timing crests resolve in the order they were granted.
+Same-timing abilities resolve self → opponent; same-timing crests resolve in the order they were granted. Nothing raised mid-sequence interrupts the play sequence; the reactive queue drains once at the end of the play.
 
 Two enter-play rulings:
 
@@ -493,11 +494,11 @@ This section enumerates the keyword abilities and major mechanics of SVWB. Each 
 
 **Faith and Modes.** Faith is a leader counter on the crest _Faith: Sham-Nacha, Heir to Entwining_ (active while Sham-Nacha is in your deck), starting at 0. It increases by 1 per Modes-selection event (one completed mode-choice resolution), not per individual mode picked — Screaming and Loathing (pick 2 modes at once) adds 1, while a card that selects Modes on both Fanfare and Evolve adds 2. The selectable-mode count = the card's base (usually 1, Screaming 2) + the leader's `modeBonus`. Sham-Nacha's Fanfare spends 10 Faith (`pay_counter` must be ≥ 10 or the pay fizzles; on success `mode_bonus` +1, stacking), and a second successful spend gives +2 total (so Screaming caps at 2 + 2 = 4 picks). Effects that **banish all crests** remove ordinary crests but **not** Faith icons (official Q&A: Alabaster Bahamut mode 3; owner ruling 2026-09-06).
 
-**Effect-granted evolve (when Evolve abilities run).** Effect-granted evolves apply stats and flags only. The `evolve[]` script splits by wording:
+**Effect-granted evolve (when Evolve abilities run).** Effect-granted evolves apply stats and flags only. The `evolve[]` script splits by wording (official Q&A Olivia `10104110`: Evolve abilities activate only when evolved with EP or SEP):
 
 - **"Evolve:"** — the default (82 cards); runs only when the player spends EP.
-- **"When this follower evolves"** — marked `evolve_trigger_always: true` (7 cards in current data, where the whole `evolve[]` is that trigger); also runs on effect-granted evolves (Overflow/Skybound auto-evolve, Necromancy evolve, `evolve_summons`, etc.).
-- **Future:** `on_any_evolve: true` would mark a card mixing both lines in one `evolve[]` (none today).
+- **"When this follower evolves"** — not an Evolve ability; runs on **any** evolve, including effect-granted ones (Overflow/Skybound auto-evolve, Necromancy evolve, crest auto-evolve, Olivia Super-Evolve, etc.). Mark the card `evolve_trigger_always: true` when the whole matching `evolve[]` / `superevolve[]` is that trigger (14 Rotation cards in current data), or flag individual effects `on_any_evolve: true` when mixing both wordings in one list (none today).
+- **Future:** `on_any_evolve: true` per-effect when a single `evolve[]` mixes an EP-only `Evolve:` line with a When-this-evolves line.
 
 A player's EP evolve always runs the full `evolve[]` / `superevolve[]` script for that mode.
 

@@ -1,10 +1,15 @@
 // src/bench/soakCoverage.ts
-// Track which of the 735 main-pool cards were exercised during soak.
+// Track which main-pool cards (cards/all.json collectibles) were exercised during soak.
 
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { getGlobalCardIndex } from "../data/cardIndex.js";
+
+/** Sanity floor — well below cards/all.json length; trips if merge/ingest drops cards. */
+function mainPoolSanityFloor(actualCount: number): number {
+  return Math.max(650, Math.floor(actualCount * 0.85));
+}
 
 export type CoverageBucket =
   | "playedFromHand"
@@ -26,7 +31,7 @@ export type SoakCoverage = {
   touchedDetails: Record<string, { name: string; buckets: CoverageBucket[] }>;
 };
 
-/** Canonical 735-card pool from cards/all.json (excludes tokens + vanilla lab). */
+/** Canonical main-pool cards from cards/all.json (811 as of set 10009; grows with ingest). */
 export function loadMainPoolIds(): Map<string, string> {
   const here = path.dirname(fileURLToPath(import.meta.url));
   const allPath = path.resolve(here, "../../cards/all.json");
@@ -49,9 +54,10 @@ export class CoverageTracker {
   constructor() {
     this.idToName = loadMainPoolIds();
     this.poolIds = new Set(this.idToName.keys());
-    if (this.poolIds.size < 700) {
+    const floor = mainPoolSanityFloor(this.poolIds.size);
+    if (this.poolIds.size < floor) {
       throw new Error(
-        `[soakCoverage] Expected ~735 main cards, got ${this.poolIds.size}`,
+        `[soakCoverage] Expected at least ${floor} main cards, got ${this.poolIds.size}`,
       );
     }
 

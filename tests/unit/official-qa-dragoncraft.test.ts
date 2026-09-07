@@ -513,35 +513,29 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     expect(getHP(state, "second")).toBe(19);
   }, 60_000);
 
-  it.fails(
-    "10344110 Azurifrit, Heir to Disdain — Krulle crest destroys before on-damage ping (official Q&A; needs PR #270 queued-source guard)",
-    () => {
-      setupTurn(R6, { hand: [AZURIFRIT], pp: 9 });
-      state.players.second.hp = 20;
-      gainCardCrest(KRULLE, "second");
-      whenPlayCard("first", 0);
+  it("10344110 Azurifrit, Heir to Disdain — Krulle crest destroys before on-damage ping (official Q&A)", () => {
+    setupTurn(R6, { hand: [AZURIFRIT], pp: 9 });
+    state.players.second.hp = 20;
+    gainCardCrest(KRULLE, "second");
+    whenPlayCard("first", 0);
 
-      expect(
-        findOnBoard("first", "Azurifrit, Heir to Disdain"),
-      ).toBeUndefined();
-      expect(getHP(state, "second")).toBe(20);
+    expect(findOnBoard("first", "Azurifrit, Heir to Disdain")).toBeUndefined();
+    expect(getHP(state, "second")).toBe(20);
 
-      resetUidCounter();
-      setupTurn(R6);
-      state.players.second.hp = 20;
-      const az = createCard(AZURIFRIT, "board", "first");
-      az.peak_defense = az.defense;
-      state.players.first.board = [az];
-      const leah = createCard(LEAH, "board", "second");
-      applyKeywordsFromList(leah);
-      leah.peak_defense = leah.defense;
-      state.players.second.board = [leah];
-      readyAttacker(az);
-      attackFollower(0, 0, "first", "second");
-      expect(getHP(state, "second")).toBe(19);
-    },
-    60_000,
-  );
+    resetUidCounter();
+    setupTurn(R6);
+    state.players.second.hp = 20;
+    const az = createCard(AZURIFRIT, "board", "first");
+    az.peak_defense = az.defense;
+    state.players.first.board = [az];
+    const leah = createCard(LEAH, "board", "second");
+    applyKeywordsFromList(leah);
+    leah.peak_defense = leah.defense;
+    state.players.second.board = [leah];
+    readyAttacker(az);
+    attackFollower(0, 0, "first", "second");
+    expect(getHP(state, "second")).toBe(19);
+  }, 60_000);
 
   it("10344120 Galmieux, Ardor Manifest — attacking Leah fires passive (official Q&A)", () => {
     setupTurn(R6);

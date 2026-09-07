@@ -30,17 +30,21 @@ export function fnv1aHex(str: string): string {
   return hash.toString(16).padStart(8, "0");
 }
 
-function fingerprintCard(card: CardInstance | null | undefined): object {
+function fingerprintCard(
+  card: CardInstance | null | undefined,
+  zone?: "hand" | "board" | "graveyard" | "banish",
+): object {
   if (!card) return { id: null, uid: null, name: null };
   const kw = card.keywordState ?? {};
-  return {
+  const rawCost = card.cost ?? null;
+  const fp: Record<string, unknown> = {
     id: card.id ?? null,
     uid: card.uid ?? null,
     name: card.name ?? null,
     type: card.type ?? null,
     attack: card.attack ?? null,
     defense: card.defense ?? null,
-    cost: card.cost ?? null,
+    cost: rawCost,
     countdown: card.countdown ?? null,
     counters: card.counters ?? {},
     hasWard: !!card.hasWard,
@@ -60,6 +64,21 @@ function fingerprintCard(card: CardInstance | null | undefined): object {
     can_attack: !!(card as any).can_attack,
     hasAttacked: !!card.hasAttacked,
   };
+  if (zone === "hand") {
+    const costMod = (card as { cost_mod?: number }).cost_mod;
+    const costAcc = (card as { cost_acc?: number }).cost_acc;
+    const effectiveCost = (card as { effectiveCost?: number }).effectiveCost;
+    if (costMod != null && Number(costMod) !== 0) fp.cost_mod = costMod;
+    if (costAcc != null && Number(costAcc) !== 0) fp.cost_acc = costAcc;
+    if (
+      typeof effectiveCost === "number" &&
+      Number.isFinite(effectiveCost) &&
+      effectiveCost !== rawCost
+    ) {
+      fp.effectiveCost = effectiveCost;
+    }
+  }
+  return fp;
 }
 
 function fingerprintCrest(crest: {
@@ -121,15 +140,21 @@ export function fingerprintGameState(state: GameState): object {
         evoCount: state.players.first.evoCount,
         leaderBarrier: state.players.first.leaderBarrier,
         crests: state.players.first.crests.map(fingerprintCrest),
-        hand: state.players.first.hand.map(fingerprintCard),
-        board: state.players.first.board.map(fingerprintCard),
+        hand: state.players.first.hand.map((c) => fingerprintCard(c, "hand")),
+        board: state.players.first.board.map((c) =>
+          fingerprintCard(c, "board"),
+        ),
         deck: state.players.first.deck.map((c) => ({
           id: c.id,
           uid: c.uid,
           name: c.name,
         })),
-        graveyard: state.players.first.graveyard.map(fingerprintCard),
-        banish: state.players.first.banish.map(fingerprintCard),
+        graveyard: state.players.first.graveyard.map((c) =>
+          fingerprintCard(c, "graveyard"),
+        ),
+        banish: state.players.first.banish.map((c) =>
+          fingerprintCard(c, "banish"),
+        ),
       },
       second: {
         hp: state.players.second.hp,
@@ -143,15 +168,21 @@ export function fingerprintGameState(state: GameState): object {
         evoCount: state.players.second.evoCount,
         leaderBarrier: state.players.second.leaderBarrier,
         crests: state.players.second.crests.map(fingerprintCrest),
-        hand: state.players.second.hand.map(fingerprintCard),
-        board: state.players.second.board.map(fingerprintCard),
+        hand: state.players.second.hand.map((c) => fingerprintCard(c, "hand")),
+        board: state.players.second.board.map((c) =>
+          fingerprintCard(c, "board"),
+        ),
         deck: state.players.second.deck.map((c) => ({
           id: c.id,
           uid: c.uid,
           name: c.name,
         })),
-        graveyard: state.players.second.graveyard.map(fingerprintCard),
-        banish: state.players.second.banish.map(fingerprintCard),
+        graveyard: state.players.second.graveyard.map((c) =>
+          fingerprintCard(c, "graveyard"),
+        ),
+        banish: state.players.second.banish.map((c) =>
+          fingerprintCard(c, "banish"),
+        ),
       },
     },
   };

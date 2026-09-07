@@ -703,7 +703,7 @@ export function captureLegalSnapshot(): string {
   const pending = state.pendingTargetEffect;
   const savedUids = pending?.targetUids;
   const savedTargets = pending?.targets;
-  if (pending) {
+  if (pending && !pending.picksAreCommitted) {
     pending.targetUids = [];
     if (Array.isArray(pending.targets)) pending.targets = [];
   }

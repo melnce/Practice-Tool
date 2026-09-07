@@ -20,6 +20,11 @@ export function hashGameState(state: GameState): string {
   return simpleHash(JSON.stringify(canonical));
 }
 
+/** Debug / soak comparison — full canonical snapshot (game-relevant fields only). */
+export function exportCanonicalState(state: GameState): object {
+  return canonicalizeState(state);
+}
+
 /**
  * Create a canonical, deterministic representation of state.
  * Strips non-deterministic fields (timestamps, UI flags).

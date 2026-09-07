@@ -1,0 +1,7 @@
+[
+  {
+    "cardId": "10474120",
+    "keyword": "Vulnerable",
+    "reason": "The \"takes N more damage\" mechanic (Vulnerable) is unimplemented — applyKeyword warns and the Fanfare clause is currently a no-op."
+  }
+]

@@ -94,6 +94,7 @@ export interface PlayerState {
     name: string;
     tribes: string[];
     cardId: string;
+    uid?: string;
   }>;
   /** Distinct printed base costs of cards played this match (cost-ladder conditions). */
   playedBaseCostsThisMatch: number[];

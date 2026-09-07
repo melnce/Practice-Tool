@@ -30,6 +30,8 @@ import {
   recordPlayedBaseCost,
 } from "../../src/logic/core/playedBaseCostHistory.js";
 import { bounceToHand } from "../../src/logic/effects/ops/bounce.js";
+import { setCostAcc } from "../../src/logic/effects/ops/cost/model.js";
+import { getEffectiveCost } from "../../src/logic/core/playCard/cost.js";
 import "../../src/logic/core/effects/index.js";
 
 const JAILOR = "10901110";
@@ -99,6 +101,29 @@ describe("Alternate-form played card base cost (2026-09-06)", () => {
     )!;
     expect(jailor.type).toBe("Follower");
     expect(Number(jailor.base_cost)).toBe(6);
+  }, 60_000);
+
+  it("Shoddy Accelerate after Spellboost reductions: played cost is 2 not boosted printed", () => {
+    givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
+      .withFirstHand([SHODDY])
+      .withFirstPP(2, 6)
+      .build();
+
+    const shoddy = getHand(state, "first")[0]!;
+    setCostAcc(shoddy, -3);
+    expect(getEffectiveCost(shoddy)).toBe(3);
+
+    expect(playCardNoRender(getHand(state, "first"), "first", 0).kind).toBe(
+      "done",
+    );
+
+    const body = getBoard(state, "first").find(
+      (c) => c.name === "Shoddy Plaything",
+    )!;
+    expect(Number(body.base_cost)).toBe(6);
+    expect(getEffectiveCost(body)).toBe(6);
+    expect(state.players.first.playedBaseCostsThisMatch).toContain(2);
+    expect(state.players.first.playedBaseCostsThisMatch).not.toContain(6);
   }, 60_000);
 
   it("Shoddy Accelerate (2): ladder 2; summoned body base cost 6; Yog adds Depths", () => {
