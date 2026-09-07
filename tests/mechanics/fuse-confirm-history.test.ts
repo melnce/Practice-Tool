@@ -261,7 +261,8 @@ describe("fuse confirm history soak pins (seed 20260909)", () => {
       label: "Ecstatic Scholar game 152",
       interactiveModes: true,
     },
-    // Game 161 hits earth-sigil mode prompts; interactive mode re-execute is a separate finding.
+    // Game 161: fuse gear_multi pin. interactiveModes + historyReExecute crashes
+    // (resolution queue) — separate brief; see soak-all-paths-findings game 161.
     { gameIndex: 161, label: "gear_multi game 161", interactiveModes: false },
   ];
 

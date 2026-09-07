@@ -15,6 +15,7 @@ import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
 import { resetTriggerChainDepth } from "../logic/core/triggers.js";
 import { endDispatch } from "../logic/core/targeting/guards.js";
 import { resyncPendingTargetConfirmation } from "../logic/core/resolveTarget.js";
+import { showPendingModePickerModal } from "../logic/effects/ops/mode.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -115,6 +116,13 @@ export const INTERNAL_CACHE_KEYS = new Set([
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
+
+export function resyncInteractivePromptsAfterHistoryRestore(): void {
+  resyncPendingTargetConfirmation();
+  if (state.pendingModeChoice) {
+    showPendingModePickerModal();
+  }
+}
 
 /** Snapshots strip uncommitted in-progress picks; committed per-pick prompts keep them. */
 function sanitizePendingTargetInSnapshot(snap: GameState): void {
@@ -401,7 +409,7 @@ export function applySnapshot(
   if (shouldResetHistory) {
     resetHistory();
   }
-  resyncPendingTargetConfirmation();
+  resyncInteractivePromptsAfterHistoryRestore();
   const suppress =
     (globalThis as any).HEADLESS === true ||
     (globalThis as any).AI_SUPPRESS_RENDER === true;
@@ -621,7 +629,7 @@ export function undo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
-    resyncPendingTargetConfirmation();
+    resyncInteractivePromptsAfterHistoryRestore();
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -643,7 +651,7 @@ export function redo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
-    resyncPendingTargetConfirmation();
+    resyncInteractivePromptsAfterHistoryRestore();
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -656,6 +664,19 @@ export function canUndo() {
 }
 export function canRedo() {
   return future.length > 0;
+}
+
+/**
+ * Move undone commits from future → past without restoring snapshots.
+ * Used when live state was already brought to `after` by re-executing actions.
+ */
+export function acceptUndoneCommits(commits: number): void {
+  for (let i = 0; i < commits; i++) {
+    const entry = future.pop();
+    if (!entry) break;
+    past.push(entry);
+  }
+  notify();
 }
 
 /** Optional: set a listener to enable/disable UI buttons. */
