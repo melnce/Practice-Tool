@@ -3,6 +3,7 @@ import os from "os";
 import path from "path";
 import { describe, it, expect } from "vitest";
 import {
+  FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT,
   MIN_NAME_MATCH_LENGTH,
   analyzeSubjecthood,
   cardMatchesTitle,
@@ -140,6 +141,19 @@ describe("subjecthood clause counting", () => {
       ],
     };
     expect(countClauses(card)).toBe(4);
+  });
+});
+
+describe("fewer subject blocks than clauses caveat", () => {
+  it("pins summary.fewerSubjectBlocksThanClausesCaveat to the exported constant", () => {
+    const report = analyzeSubjecthood([], [], new Map());
+    expect(report.summary.fewerSubjectBlocksThanClausesCaveat).toBe(
+      FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT,
+    );
+    expect(FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT).toContain("blocks");
+    expect(FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT).toContain(
+      "not a defect count",
+    );
   });
 });
 

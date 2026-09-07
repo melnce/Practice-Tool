@@ -21,6 +21,8 @@ import {
   isTargetedOpDispatchActive,
 } from "../logic/core/targeting/guards.js";
 import { INTERNAL_CACHE_KEYS } from "./snapshotEphemeralKeys.js";
+import { resyncPendingTargetConfirmation } from "../logic/core/resolveTarget.js";
+import { showPendingModePickerModal } from "../logic/effects/ops/mode.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -28,6 +30,8 @@ const MAX_HISTORY = 200; // ring limit
 // When disabled, history skips expensive structuredClone for performance.
 // Use DISABLE_HISTORY=1 env var or call setHistoryEnabled(false).
 let _historyEnabled = true;
+/** When true, actions run through history commit guards but do not push to past/future. */
+let _historySuppressRecording = false;
 
 /** Explicitly enable or disable history snapshots. */
 export function setHistoryEnabled(enabled: boolean): void {
@@ -37,6 +41,15 @@ export function setHistoryEnabled(enabled: boolean): void {
 /** Check if history is currently enabled. */
 export function isHistoryEnabled(): boolean {
   return _historyEnabled;
+}
+
+/** Suppress recording commits while still running commit-time guards (soak re-execute). */
+export function setHistorySuppressRecording(suppress: boolean): void {
+  _historySuppressRecording = suppress;
+}
+
+export function isHistorySuppressRecording(): boolean {
+  return _historySuppressRecording;
 }
 
 // Check env var at module load (for benchmarks)
@@ -186,23 +199,17 @@ export const SNAPSHOT_DROPPED_STATE_AUDIT: readonly SnapshotDroppedAuditRow[] =
     },
     {
       category: "Functions / non-cloneable objects",
-      mechanism: "manualSnapshot fallback",
+      mechanism: "dropped-function gate (absolute after #315)",
       proofClass: "b",
       proof:
-        "pendingTargetEffect.confirmHook is gameplay state (fuse/target confirm continuation); unsnapshotable by construction; fix on fix-fuse-confirm-handler-registry via confirm-handler registry (TARGETED_OP_REGISTRY shape).",
+        "Fuse confirm was gameplay state stored as pendingTargetEffect.confirmHook; structuredClone drops functions, so undo/redo/save-load silently lost confirm while targetUids survived (Confirm did nothing). #315 (confirmRegistry) replaced the closure with serializable keys (e.g. fuse:finalize:cards). No function may be reachable from pendingTargetEffect at commit.",
     },
   ];
 
-/**
- * Function paths on live state that snapshots drop by construction — allowlisted until
- * fix-fuse-confirm-handler-registry lands (remove entry when that branch merges).
- */
+/** Function paths snapshots drop — empty after #315; any entry must be a live finding. */
 export const SNAPSHOT_DROPPED_FUNCTION_ALLOWLIST: Readonly<
   Record<string, string>
-> = {
-  "pendingTargetEffect.confirmHook":
-    "Fuse/target confirm continuation; reconstructible from serializable data on fix-fuse-confirm-handler-registry.",
-};
+> = {};
 
 const SNAPSHOT_WALK_MAX_NODES = 4096;
 const SNAPSHOT_WALK_MAX_DEPTH = 14;
@@ -346,6 +353,13 @@ function assertNoDroppedSnapshotStateAtCommit(actionName: string): void {
 // SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT or SNAPSHOT_EPHEMERAL_MAY_BE_SET.
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
+
+export function resyncInteractivePromptsAfterHistoryRestore(): void {
+  resyncPendingTargetConfirmation();
+  if (state.pendingModeChoice) {
+    showPendingModePickerModal();
+  }
+}
 
 /** Snapshots strip uncommitted in-progress picks; committed per-pick prompts keep them. */
 function sanitizePendingTargetInSnapshot(snap: GameState): void {
@@ -716,6 +730,7 @@ export function applySnapshot(
   if (shouldResetHistory) {
     resetHistory();
   }
+  resyncInteractivePromptsAfterHistoryRestore();
   const suppress =
     (globalThis as any).HEADLESS === true ||
     (globalThis as any).AI_SUPPRESS_RENDER === true;
@@ -801,6 +816,12 @@ export function commitAction({ autoRender = true } = {}) {
   assertResolutionQueueClearForCommit(inAction.name);
   assertPlaySequenceDepthClearForCommit(inAction.name);
   assertNoDroppedSnapshotStateAtCommit(inAction.name);
+
+  if (_historySuppressRecording) {
+    inAction = null;
+    notify();
+    return;
+  }
 
   bumpActionSeq();
   const after = snapshot();
@@ -947,6 +968,7 @@ export function undo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
+    resyncInteractivePromptsAfterHistoryRestore();
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -968,6 +990,7 @@ export function redo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
+    resyncInteractivePromptsAfterHistoryRestore();
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -980,6 +1003,19 @@ export function canUndo() {
 }
 export function canRedo() {
   return future.length > 0;
+}
+
+/**
+ * Move undone commits from future → past without restoring snapshots.
+ * Used when live state was already brought to `after` by re-executing actions.
+ */
+export function acceptUndoneCommits(commits: number): void {
+  for (let i = 0; i < commits; i++) {
+    const entry = future.pop();
+    if (!entry) break;
+    past.push(entry);
+  }
+  notify();
 }
 
 /** Optional: set a listener to enable/disable UI buttons. */

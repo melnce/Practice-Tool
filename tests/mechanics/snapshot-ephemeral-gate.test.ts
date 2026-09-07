@@ -14,7 +14,6 @@ import {
   doAction,
   setHistoryEnabled,
   resetHistory,
-  SNAPSHOT_EPHEMERAL_ALLOWLIST,
   SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT,
   SNAPSHOT_EPHEMERAL_MAY_BE_SET,
   SNAPSHOT_DROPPED_STATE_AUDIT,
@@ -26,6 +25,10 @@ import {
 } from "../../src/core/history.js";
 import { setPendingTarget } from "../../src/logic/core/pendingTarget/index.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import {
+  canConfirmPendingTarget,
+  getPendingConfirmKey,
+} from "../../src/logic/core/pendingTarget/confirmRegistry.js";
 import { injectAdapter } from "../../src/core/adapter.js";
 import { getTriggerChainDepth } from "../../src/logic/core/triggers.js";
 import { isTargetedOpDispatchActive } from "../../src/logic/core/targeting/guards.js";
@@ -54,13 +57,14 @@ describe("INTERNAL_CACHE_KEYS vs KNOWN_ROOT_KEYS", () => {
 });
 
 describe("SNAPSHOT_DROPPED_STATE_AUDIT", () => {
-  it("functions row is (b): pendingTargetEffect.confirmHook is unsnapshotable gameplay state", () => {
+  it("functions row documents #315 confirmHook removal and absolute gate", () => {
     const row = SNAPSHOT_DROPPED_STATE_AUDIT.find((r) =>
       r.category.startsWith("Functions / non-cloneable"),
     );
     expect(row?.proofClass).toBe("b");
-    expect(row?.proof).toContain("pendingTargetEffect.confirmHook");
-    expect(row?.proof).toContain("fix-fuse-confirm-handler-registry");
+    expect(row?.proof).toContain("confirmHook");
+    expect(row?.proof).toContain("#315");
+    expect(row?.proof).toContain("confirmRegistry");
   });
 });
 
@@ -77,26 +81,11 @@ describe("snapshot dropped function gate", () => {
     });
   });
 
-  it("allowlists pendingTargetEffect.confirmHook on fuse confirm_needed snapshot", () => {
-    givenGameState({ seed: 3, activePlayer: "first" }).build();
-    setPendingTarget({
-      eff: { op: "fuse", action: "recipe" },
-      owner: "first",
-      selectCount: 1,
-      targetUids: ["partner_uid"],
-      requiresConfirmation: true,
-      pool: [],
-    } as any);
-    state.pendingTargetEffect!.confirmHook = () => {};
-
-    const snap = captureSnapshot();
-    expect(collectSnapshotDroppedFunctionViolations(state, snap)).toEqual([]);
-    expect(SNAPSHOT_DROPPED_FUNCTION_ALLOWLIST).toHaveProperty(
-      "pendingTargetEffect.confirmHook",
-    );
+  it("allowlist is empty after #315 — gate is absolute, not allowlisted", () => {
+    expect(Object.keys(SNAPSHOT_DROPPED_FUNCTION_ALLOWLIST)).toEqual([]);
   });
 
-  it("throws when an unallowlisted function is reachable from pendingTargetEffect", () => {
+  it("throws when any function is reachable from pendingTargetEffect", () => {
     givenGameState({ seed: 3, activePlayer: "first" }).build();
     setPendingTarget({
       eff: { op: "damage", amount: 1 },
@@ -111,7 +100,7 @@ describe("snapshot dropped function gate", () => {
     );
   });
 
-  it("sets confirmHook on pending when fuse selection needs confirm", () => {
+  it("fuse confirm_needed pending carries confirmKey, not a function (#315)", () => {
     givenGameState({ seed: 42, activePlayer: "first", roundCount: 6 })
       .withFirstPP(6, 6)
       .withFirstHand(["10934110", "10111310", "10111310"])
@@ -131,7 +120,11 @@ describe("snapshot dropped function gate", () => {
     } as any);
 
     resolvePendingTarget(filler.uid);
-    expect(typeof state.pendingTargetEffect?.confirmHook).toBe("function");
+    expect(getPendingConfirmKey(state.pendingTargetEffect!)).toBe("targeted:fuse");
+    expect(canConfirmPendingTarget(state.pendingTargetEffect)).toBe(true);
+    expect(collectSnapshotDroppedFunctionViolations(state, captureSnapshot())).toEqual(
+      [],
+    );
     expect(() => captureSnapshot()).not.toThrow();
   });
 });

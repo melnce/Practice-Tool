@@ -118,8 +118,7 @@ describe.each([
       player: "first",
       target: { type: "card", uid: partner.uid },
     });
-    expect(confirmOnClick).toBeTypeOf("function");
-    confirmOnClick!();
+    dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(allure.isFused).toBe(true);
     expect(allure.spell).toEqual([{ op: "draw", source: "deck", count: 2 }]);
@@ -134,8 +133,10 @@ describe.each([
 
     undo(dispatch);
     expect(state.pendingTargetEffect).toBeDefined();
-    expect(state.pendingTargetEffect?.targetUids).toEqual([]);
+    expect(state.pendingTargetEffect?.picksAreCommitted).toBe(true);
+    expect(state.pendingTargetEffect?.targetUids).toEqual([partner.uid]);
 
+    undo(dispatch);
     undo(dispatch);
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(getHand(state, "first").some((c) => c.uid === allure.uid)).toBe(
@@ -164,8 +165,7 @@ describe.each([
       player: "first",
       target: { type: "card", uid: boots.uid },
     });
-    expect(confirmOnClick).toBeTypeOf("function");
-    confirmOnClick!();
+    dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(slash.isFused).toBe(true);
     expect(
@@ -181,8 +181,10 @@ describe.each([
 
     undo(dispatch);
     expect(state.pendingTargetEffect).toBeDefined();
-    expect(state.pendingTargetEffect?.targetUids).toEqual([]);
+    expect(state.pendingTargetEffect?.picksAreCommitted).toBe(true);
+    expect(state.pendingTargetEffect?.targetUids).toEqual([boots.uid]);
 
+    undo(dispatch);
     undo(dispatch);
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(getHand(state, "first").some((c) => c.uid === slash.uid)).toBe(true);
