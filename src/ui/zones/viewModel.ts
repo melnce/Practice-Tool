@@ -180,7 +180,7 @@ export function createCardViewModel(
     );
     if (!hasCantAttack) {
       canAttack = true;
-      if (card.isRush && card.justPlayed) isRush = true;
+      if (card.hasRush && card.justPlayed && !card.hasStorm) isRush = true;
     }
   }
 
