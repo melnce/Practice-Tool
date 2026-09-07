@@ -124,6 +124,9 @@ function explainCard(result: CardDriveResult): void {
       console.log(`  gatesUnmet: ${s.gatesUnmet.join(", ")}`);
     }
     const d = s.detail as Record<string, unknown>;
+    if (d.gameTick != null) console.log(`  gameTick: ${d.gameTick}`);
+    if (d.rng != null) console.log(`  rng: ${JSON.stringify(d.rng)}`);
+    if (d.phase != null) console.log(`  phase: ${d.phase}`);
     const players = d.players as
       | Record<string, Record<string, unknown>>
       | undefined;

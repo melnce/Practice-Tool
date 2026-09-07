@@ -40,6 +40,7 @@ import {
   flushDeferredDeathBatch,
 } from "../../src/logic/core/cleanup.js";
 import { destroyTarget } from "../../src/logic/effects/ops/destroy/primitives.js";
+import { resolvePlayCost } from "../../src/logic/core/playCard/cost.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import {
@@ -82,7 +83,11 @@ export type ScenarioName =
   | "summon"
   | "in_hand"
   | "destroy"
-  | "engage";
+  | "engage"
+  | "accelerate"
+  | "crystallize"
+  | "crystallize_engage"
+  | "crystallize_death";
 
 export type ScenarioResult = {
   scenario: ScenarioName;
@@ -587,6 +592,113 @@ export function hasEngageAbility(card: RawCard): boolean {
   return hasEngageKeywordEffects(card) || hasEngageTriggerEffects(card);
 }
 
+function isAccelerateKeywordName(name: string): boolean {
+  return name.toLowerCase() === "accelerate";
+}
+
+function isCrystallizeKeywordName(name: string): boolean {
+  return name.toLowerCase() === "crystallize";
+}
+
+type AccelerateFormSpec = { cost: number; effects: unknown[] };
+type CrystallizeFormSpec = { cost: number; amuletKeywords: unknown[] };
+
+function getAccelerateForm(card: RawCard): AccelerateFormSpec | null {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as { name?: unknown; cost?: unknown; effects?: unknown[] };
+    if (!isAccelerateKeywordName(String(kw.name ?? ""))) continue;
+    if (!Array.isArray(kw.effects) || kw.effects.length === 0) continue;
+    const cost = Number(kw.cost);
+    if (!Number.isFinite(cost) || cost < 0) continue;
+    return { cost, effects: kw.effects };
+  }
+  return null;
+}
+
+function getCrystallizeForm(card: RawCard): CrystallizeFormSpec | null {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as {
+      name?: unknown;
+      cost?: unknown;
+      amuletKeywords?: unknown[];
+    };
+    if (!isCrystallizeKeywordName(String(kw.name ?? ""))) continue;
+    if (!Array.isArray(kw.amuletKeywords) || kw.amuletKeywords.length === 0) {
+      continue;
+    }
+    const cost = Number(kw.cost);
+    if (!Number.isFinite(cost) || cost < 0) continue;
+    return { cost, amuletKeywords: kw.amuletKeywords };
+  }
+  return null;
+}
+
+/** Data-derived: Accelerate keyword with a non-empty effects array. */
+export function hasAccelerateForm(card: RawCard): boolean {
+  return getAccelerateForm(card) != null;
+}
+
+/** Data-derived: Crystallize keyword with a non-empty amuletKeywords array. */
+export function hasCrystallizeForm(card: RawCard): boolean {
+  return getCrystallizeForm(card) != null;
+}
+
+function hasCrystallizeAmuletEngage(card: RawCard): boolean {
+  const form = getCrystallizeForm(card);
+  if (!form) return false;
+  for (const k of form.amuletKeywords) {
+    if (keywordEntryHasEngageEffects(k)) return true;
+  }
+  return false;
+}
+
+function hasCrystallizeAmuletLastWords(card: RawCard): boolean {
+  const form = getCrystallizeForm(card);
+  if (!form) return false;
+  for (const k of form.amuletKeywords) {
+    if (keywordEntryHasDeathEffects(k)) return true;
+  }
+  return false;
+}
+
+function crystallizeAmuletEngageCost(card: RawCard): number {
+  const form = getCrystallizeForm(card);
+  if (!form) return 0;
+  for (const k of form.amuletKeywords) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as { name?: unknown; cost?: unknown };
+    if (!isEngageKeywordName(String(kw.name ?? ""))) continue;
+    return Number(kw.cost ?? 0);
+  }
+  return 0;
+}
+
+function printedBaseCost(card: RawCard): number {
+  const n = Number(card.cost);
+  if (Number.isFinite(n)) return n;
+  return parseInt(String(card.cost ?? ""), 10) || 0;
+}
+
+function alternateFormFirstPP(
+  alternateCost: number,
+  printedCost: number,
+  extraPP = 0,
+): number | { skip: SkipReason; detail: string } {
+  const firstPP = alternateCost + extraPP;
+  if (alternateCost >= printedCost) {
+    return { skip: "drive_threw", detail: "alternate_cost_not_below_printed" };
+  }
+  if (firstPP >= printedCost) {
+    return {
+      skip: "drive_threw",
+      detail: "alternate_pp_setup_not_below_printed",
+    };
+  }
+  return firstPP;
+}
+
 function engageCostFromRaw(card: RawCard): number {
   for (const k of card.keywords ?? []) {
     if (!k || typeof k !== "object") continue;
@@ -625,6 +737,10 @@ function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
     case "turn_boundary":
     case "destroy":
     case "engage":
+    case "accelerate":
+    case "crystallize":
+    case "crystallize_engage":
+    case "crystallize_death":
       return true;
     default:
       return false;
@@ -665,6 +781,18 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   }
   if (hasEngageAbility(card)) {
     paths.push("engage");
+  }
+  if (hasAccelerateForm(card)) {
+    paths.push("accelerate");
+  }
+  if (hasCrystallizeForm(card)) {
+    paths.push("crystallize");
+    if (hasCrystallizeAmuletEngage(card)) {
+      paths.push("crystallize_engage");
+    }
+    if (hasCrystallizeAmuletLastWords(card)) {
+      paths.push("crystallize_death");
+    }
   }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
@@ -1675,6 +1803,268 @@ function runEngageScenario(
   };
 }
 
+function findPlayedCard(uid: string): CardInstance | undefined {
+  const zones = [
+    ...state.players.first.hand,
+    ...state.players.first.board,
+    ...state.players.first.graveyard,
+    ...state.players.first.banish,
+    ...state.players.second.hand,
+    ...state.players.second.board,
+    ...state.players.second.graveyard,
+    ...state.players.second.banish,
+  ];
+  return zones.find((c) => c.uid === uid);
+}
+
+function findCrystallizeAmuletOnBoard(
+  cardId: string,
+  name: string,
+): CardInstance | undefined {
+  return getBoard(state, "first").find(
+    (c) => c.id === cardId || c.name === name,
+  );
+}
+
+function setupAlternateFormPlay(
+  cardId: string,
+  expectedMode: "accelerate" | "crystallize",
+  firstPP: number,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+):
+  | {
+      playCard: CardInstance;
+      prep: { satisfied: string[]; unmet: string[] };
+    }
+  | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const extras = buildExtraHand(template);
+  buildArena({
+    extraHand: extras,
+    roundCount: 8,
+    firstPP,
+    arenaNeeds,
+  });
+
+  const playCard = createCard(cardId, "hand", "first");
+  const plan = resolvePlayCost(playCard, state.players.first.pp);
+  if (plan.mode !== expectedMode) {
+    return { skip: "drive_threw", detail: "alternate_form_not_selected" };
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: playCard,
+  });
+  const maxAllied = HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE;
+  if (state.players.first.board.length > maxAllied) {
+    trimBoardToCap(state.players.first.board, maxAllied);
+  }
+  assertHarnessBoardCap(`runAlternateForm:${expectedMode}:afterGatePrep`);
+
+  state.players.first.hand = [playCard, ...state.players.first.hand];
+
+  const outcome = whenPlayCard("first", 0);
+  if (outcome.kind === "blocked") {
+    return {
+      skip: "play_blocked",
+      detail: outcome.reason ?? "blocked",
+    };
+  }
+  if (outcome.kind === "paused" || state.pendingTargetEffect) {
+    const resolved = autoResolvePending();
+    if (!resolved.ok) {
+      return {
+        skip: "unresolvable_pending",
+        detail: resolved.reason ?? "pending",
+      };
+    }
+  }
+
+  const played = findPlayedCard(playCard.uid);
+  const playedAs = (played as { playedAs?: string } | undefined)?.playedAs;
+  if (playedAs !== expectedMode) {
+    return { skip: "drive_threw", detail: "alternate_form_not_selected" };
+  }
+
+  return { playCard, prep };
+}
+
+function runAccelerateScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getAccelerateForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_accelerate_form" };
+  const printedCost = printedBaseCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "accelerate",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const pending = resolvePendingOrFail("accelerate_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "accelerate",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
+function runCrystallizeScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getCrystallizeForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_crystallize_form" };
+  const printedCost = printedBaseCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "crystallize",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const pending = resolvePendingOrFail("crystallize_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "crystallize",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
+function runCrystallizeEngageScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getCrystallizeForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_crystallize_form" };
+  const printedCost = printedBaseCost(raw);
+  const engageCost = crystallizeAmuletEngageCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost, engageCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "crystallize",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const amulet = findCrystallizeAmuletOnBoard(cardId, raw.name ?? cardId);
+  if (!amulet || amulet.type !== "Amulet") {
+    return { skip: "drive_threw", detail: "crystallize_amulet_missing" };
+  }
+
+  const engageIndex = getBoard(state, "first").indexOf(amulet);
+  if (engageIndex < 0) {
+    return { skip: "drive_threw", detail: "engage_target_missing" };
+  }
+
+  const ppBefore = state.players.first.pp;
+  try {
+    engageAmulet("first", engageIndex);
+  } catch (err) {
+    return {
+      skip: "drive_threw",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+
+  if (engageCost > 0 && state.players.first.pp >= ppBefore) {
+    return { skip: "drive_threw", detail: "engage_cost_not_paid" };
+  }
+
+  const pending = resolvePendingOrFail("crystallize_engage_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "crystallize_engage",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
+function runCrystallizeDeathScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const form = getCrystallizeForm(raw);
+  if (!form) return { skip: "drive_threw", detail: "no_crystallize_form" };
+  const printedCost = printedBaseCost(raw);
+  const ppSetup = alternateFormFirstPP(form.cost, printedCost);
+  if (typeof ppSetup !== "number") return ppSetup;
+
+  const played = setupAlternateFormPlay(
+    cardId,
+    "crystallize",
+    ppSetup,
+    gates,
+    arenaNeeds,
+  );
+  if (!("playCard" in played)) return played;
+
+  const amulet = findCrystallizeAmuletOnBoard(cardId, raw.name ?? cardId);
+  if (!amulet || amulet.type !== "Amulet") {
+    return { skip: "drive_threw", detail: "crystallize_amulet_missing" };
+  }
+
+  if (!destroyTarget(amulet, "first", "harness_crystallize_death")) {
+    return { skip: "drive_threw", detail: "destroy_target_failed" };
+  }
+  cleanupDead();
+  flushDeferredDeathBatch();
+
+  const pending = resolvePendingOrFail("crystallize_death_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "crystallize_death",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: played.prep.satisfied,
+    gatesUnmet: played.prep.unmet,
+  };
+}
+
 function runVanillaPlaceScenario(
   cardId: string,
   arenaNeeds?: HarnessArenaNeeds,
@@ -1903,6 +2293,14 @@ export function driveCard(
           result = runDestroyScenario(id, gates, arenaNeeds);
         else if (path === "engage")
           result = runEngageScenario(id, raw, gates, arenaNeeds);
+        else if (path === "accelerate")
+          result = runAccelerateScenario(id, raw, gates, arenaNeeds);
+        else if (path === "crystallize")
+          result = runCrystallizeScenario(id, raw, gates, arenaNeeds);
+        else if (path === "crystallize_engage")
+          result = runCrystallizeEngageScenario(id, raw, gates, arenaNeeds);
+        else if (path === "crystallize_death")
+          result = runCrystallizeDeathScenario(id, raw, gates, arenaNeeds);
         else if (path === "summon") result = runSummonScenario(id, arenaNeeds);
         else result = runVanillaPlaceScenario(id, arenaNeeds);
       } catch (err) {
