@@ -44,9 +44,15 @@ function setupIlsaTurn() {
 
 /** engineDispatch PLAY_CARD — leaves pendingModeChoice open after play commits. */
 function openIlsaModePromptViaEngine(): GameState {
+  let modalInvocation = 0;
   injectAdapter({
     showChoiceModal: (_opts, _cb) => {
-      expect((state as any)._runEffectsDepth).toBeGreaterThan(0);
+      modalInvocation++;
+      // First modal per open is fanfare pause (nested runEffects). Resync after
+      // undo/snapshot restore calls showChoiceModal again at depth 0 (#315).
+      if (modalInvocation === 1) {
+        expect((state as any)._runEffectsDepth).toBeGreaterThan(0);
+      }
     },
   });
 
