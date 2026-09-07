@@ -18,6 +18,13 @@ import {
   type OfficialMetaFile,
   type OfficialQuestion,
 } from "./officialCards.js";
+import {
+  cardMatchesTitle,
+  DEFAULT_SUBJECTHOOD_OPTIONS,
+  listTestFiles,
+  parseTestFiles,
+  type AssertingBlock,
+} from "./subjecthood.js";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -67,9 +74,15 @@ export type QaCoverageRow = {
   name: string;
   question: string;
   answer: string;
+  /** Block-scoped pin with QA_PIN_BLOCK_KEYWORD_MIN (honest default). */
   pinned: boolean;
+  /** Legacy file-scoped pin: card id + ≥1 keyword anywhere in the file. */
+  pinnedFileScoped: boolean;
+  /** Block-scoped pin requiring ≥ceil(keywords/2) keyword hits in a subject block. */
+  pinnedBlockScopedHalf: boolean;
   matchedKeywords: string[];
   matchedFile: string | null;
+  matchedBlock: string | null;
 };
 
 export type QaRulingNote = {
@@ -463,10 +476,181 @@ export function compareTokenLinks(
 }
 
 /**
- * Pin rule (crude, documented): a Q&A is pinned if any file under tests/
- * (except this generated backlog file and tests/specs/generated_specs.json)
- * contains the card id AND at least one keyword from the answer. A keyword
- * is a 4+ letter token that is not in QA_COVERAGE_STOPWORDS.
+ * Block-scoped pin threshold (chosen rule): require at least this many answer
+ * keywords inside the body of a subject asserting block. Single-keyword matches
+ * are too loose — median pinned verdict on main rested on one generic token.
+ * Also report pinnedBlockScopedHalf (≥ceil(n/2) keywords) for comparison.
+ */
+export const QA_PIN_BLOCK_KEYWORD_MIN = 2;
+
+export type QaPinThreshold = "min2" | "half";
+
+export type QaPinResult = {
+  pinnedFileScoped: boolean;
+  pinnedBlockScopedMin2: boolean;
+  pinnedBlockScopedHalf: boolean;
+  matchedKeywords: string[];
+  matchedFile: string | null;
+  matchedBlock: string | null;
+  fileScopedMatchedKeywords: string[];
+  fileScopedMatchedFile: string | null;
+};
+
+export type QaPinBlockIndex = {
+  subjectBlocks: AssertingBlock[];
+};
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export function matchAnswerKeywordsInText(
+  keywords: string[],
+  text: string,
+): string[] {
+  return keywords.filter((kw) =>
+    new RegExp(`\\b${escapeRegExp(kw)}\\b`, "i").test(text),
+  );
+}
+
+export function qaPinThresholdMet(
+  availableKeywordCount: number,
+  matchedKeywordCount: number,
+  threshold: QaPinThreshold,
+): boolean {
+  if (availableKeywordCount === 0 || matchedKeywordCount === 0) return false;
+  if (threshold === "min2") {
+    return matchedKeywordCount >= QA_PIN_BLOCK_KEYWORD_MIN;
+  }
+  return matchedKeywordCount >= Math.ceil(availableKeywordCount / 2);
+}
+
+/**
+ * Legacy pin rule (file-scoped): a Q&A is pinned if any file under tests/
+ * contains the card id AND at least one keyword from the answer.
+ */
+export function isQaPinnedFileScoped(
+  id: string,
+  answer: string,
+  corpus: Array<{ file: string; text: string }>,
+): Pick<QaPinResult, "pinnedFileScoped" | "matchedKeywords" | "matchedFile"> & {
+  pinned: boolean;
+} {
+  const keywords = extractAnswerKeywords(answer);
+  if (!keywords.length) {
+    return {
+      pinned: false,
+      pinnedFileScoped: false,
+      matchedKeywords: [],
+      matchedFile: null,
+    };
+  }
+  for (const { file, text } of corpus) {
+    if (!text.includes(id)) continue;
+    const hit = matchAnswerKeywordsInText(keywords, text);
+    if (hit.length) {
+      return {
+        pinned: true,
+        pinnedFileScoped: true,
+        matchedKeywords: hit,
+        matchedFile: file,
+      };
+    }
+  }
+  return {
+    pinned: false,
+    pinnedFileScoped: false,
+    matchedKeywords: [],
+    matchedFile: null,
+  };
+}
+
+/** @deprecated Use evaluateQaPin — kept for callers that only need file-scoped. */
+export function isQaPinned(
+  id: string,
+  answer: string,
+  corpus: Array<{ file: string; text: string }>,
+): { pinned: boolean; matchedKeywords: string[]; matchedFile: string | null } {
+  const result = isQaPinnedFileScoped(id, answer, corpus);
+  return {
+    pinned: result.pinned,
+    matchedKeywords: result.matchedKeywords,
+    matchedFile: result.matchedFile,
+  };
+}
+
+export function buildQaPinBlockIndex(root = ROOT): QaPinBlockIndex {
+  const testFiles = listTestFiles(root, DEFAULT_SUBJECTHOOD_OPTIONS);
+  const { assertingBlocks } = parseTestFiles(
+    testFiles,
+    DEFAULT_SUBJECTHOOD_OPTIONS,
+  );
+  return {
+    subjectBlocks: assertingBlocks.map((block) => ({
+      ...block,
+      file: path.relative(root, block.file).replace(/\\/g, "/"),
+    })),
+  };
+}
+
+export function evaluateQaPin(
+  cardId: string,
+  cardName: string,
+  answer: string,
+  corpus: Array<{ file: string; text: string }>,
+  blockIndex: QaPinBlockIndex,
+): QaPinResult {
+  const keywords = extractAnswerKeywords(answer);
+  const fileScoped = isQaPinnedFileScoped(cardId, answer, corpus);
+  const card = { id: cardId, name: cardName };
+
+  let best: {
+    hits: string[];
+    file: string;
+    composedTitle: string;
+  } | null = null;
+
+  for (const block of blockIndex.subjectBlocks) {
+    const titleMatch = cardMatchesTitle(card, block.composedTitle);
+    if (!titleMatch.byId && !titleMatch.byName) continue;
+    const hits = matchAnswerKeywordsInText(keywords, block.bodyText);
+    if (!best || hits.length > best.hits.length) {
+      best = {
+        hits,
+        file: block.file,
+        composedTitle: block.composedTitle,
+      };
+    }
+  }
+
+  const matchedKeywords = best?.hits ?? [];
+  const matchedFile = best?.file ?? null;
+  const matchedBlock = best?.composedTitle ?? null;
+  const pinnedBlockScopedMin2 = qaPinThresholdMet(
+    keywords.length,
+    matchedKeywords.length,
+    "min2",
+  );
+  const pinnedBlockScopedHalf = qaPinThresholdMet(
+    keywords.length,
+    matchedKeywords.length,
+    "half",
+  );
+
+  return {
+    pinnedFileScoped: fileScoped.pinnedFileScoped,
+    pinnedBlockScopedMin2,
+    pinnedBlockScopedHalf,
+    matchedKeywords,
+    matchedFile,
+    matchedBlock,
+    fileScopedMatchedKeywords: fileScoped.matchedKeywords,
+    fileScopedMatchedFile: fileScoped.matchedFile,
+  };
+}
+
+/**
+ * Answer keywords for Q&A pin checks: 4+ letter tokens not in QA_COVERAGE_STOPWORDS.
  */
 export function extractAnswerKeywords(answer: string): string[] {
   const words = answer
@@ -503,45 +687,31 @@ export function loadTestCorpus(
   return out;
 }
 
-export function isQaPinned(
-  id: string,
-  answer: string,
-  corpus: Array<{ file: string; text: string }>,
-): { pinned: boolean; matchedKeywords: string[]; matchedFile: string | null } {
-  const keywords = extractAnswerKeywords(answer);
-  if (!keywords.length) {
-    return { pinned: false, matchedKeywords: [], matchedFile: null };
-  }
-  for (const { file, text } of corpus) {
-    if (!text.includes(id)) continue;
-    const hit = keywords.filter((kw) =>
-      new RegExp(`\\b${kw}\\b`, "i").test(text),
-    );
-    if (hit.length) {
-      return { pinned: true, matchedKeywords: hit, matchedFile: file };
-    }
-  }
-  return { pinned: false, matchedKeywords: [], matchedFile: null };
-}
-
 export function coverOfficialQa(
   meta: OfficialMetaFile,
   corpus: Array<{ file: string; text: string }>,
+  blockIndex: QaPinBlockIndex = buildQaPinBlockIndex(),
 ): QaCoverageRow[] {
   const rows: QaCoverageRow[] = [];
   for (const id of officialMetaCardIds(meta)) {
     const rec = getOfficialCard(meta, id);
     if (!rec) continue;
     for (const qa of rec.questions) {
-      const pin = isQaPinned(id, qa.answer, corpus);
+      const pin = evaluateQaPin(id, rec.name, qa.answer, corpus, blockIndex);
+      const blockPinned = pin.pinnedBlockScopedMin2;
       rows.push({
         id,
         name: rec.name,
         question: qa.question,
         answer: qa.answer,
-        pinned: pin.pinned,
-        matchedKeywords: pin.matchedKeywords,
-        matchedFile: pin.matchedFile,
+        pinned: blockPinned,
+        pinnedFileScoped: pin.pinnedFileScoped,
+        pinnedBlockScopedHalf: pin.pinnedBlockScopedHalf,
+        matchedKeywords: blockPinned
+          ? pin.matchedKeywords
+          : pin.fileScopedMatchedKeywords,
+        matchedFile: blockPinned ? pin.matchedFile : pin.fileScopedMatchedFile,
+        matchedBlock: blockPinned ? pin.matchedBlock : null,
       });
     }
   }
@@ -753,9 +923,35 @@ export type OfficialReport = {
   unresolvedTokens: UnresolvedTokenName[];
   qaCoverage: QaCoverageRow[];
   qaRulings: QaRulingNote[];
+  /** Block-scoped, ≥2 keywords in a subject block (honest default). */
   pinnedCount: number;
   unpinnedCount: number;
+  pinnedFileScopedCount: number;
+  unpinnedFileScopedCount: number;
+  pinnedBlockScopedHalfCount: number;
+  unpinnedBlockScopedHalfCount: number;
 };
+
+export function summarizeQaCoverage(rows: QaCoverageRow[]): {
+  total: number;
+  pinnedFileScoped: number;
+  unpinnedFileScoped: number;
+  pinnedBlockScopedMin2: number;
+  unpinnedBlockScopedMin2: number;
+  pinnedBlockScopedHalf: number;
+  unpinnedBlockScopedHalf: number;
+} {
+  return {
+    total: rows.length,
+    pinnedFileScoped: rows.filter((r) => r.pinnedFileScoped).length,
+    unpinnedFileScoped: rows.filter((r) => !r.pinnedFileScoped).length,
+    pinnedBlockScopedMin2: rows.filter((r) => r.pinned).length,
+    unpinnedBlockScopedMin2: rows.filter((r) => !r.pinned).length,
+    pinnedBlockScopedHalf: rows.filter((r) => r.pinnedBlockScopedHalf).length,
+    unpinnedBlockScopedHalf: rows.filter((r) => !r.pinnedBlockScopedHalf)
+      .length,
+  };
+}
 
 export function buildOfficialReport(
   meta: OfficialMetaFile,
@@ -765,7 +961,9 @@ export function buildOfficialReport(
   const rotation = compareRotation(meta, allCards, byId);
   const tokens = compareTokenLinks(meta, byId, tokenNameToIds);
   const corpus = loadTestCorpus(path.join(root, "tests"));
-  const qaCoverage = coverOfficialQa(meta, corpus);
+  const blockIndex = buildQaPinBlockIndex(root);
+  const qaCoverage = coverOfficialQa(meta, corpus, blockIndex);
+  const qaSummary = summarizeQaCoverage(qaCoverage);
   const ownerRulings = fs.readFileSync(
     path.join(root, "docs/owner-rulings.md"),
     "utf-8",
@@ -782,8 +980,12 @@ export function buildOfficialReport(
     unresolvedTokens: tokens.unresolved,
     qaCoverage,
     qaRulings,
-    pinnedCount: qaCoverage.filter((r) => r.pinned).length,
-    unpinnedCount: qaCoverage.filter((r) => !r.pinned).length,
+    pinnedCount: qaSummary.pinnedBlockScopedMin2,
+    unpinnedCount: qaSummary.unpinnedBlockScopedMin2,
+    pinnedFileScopedCount: qaSummary.pinnedFileScoped,
+    unpinnedFileScopedCount: qaSummary.unpinnedFileScoped,
+    pinnedBlockScopedHalfCount: qaSummary.pinnedBlockScopedHalf,
+    unpinnedBlockScopedHalfCount: qaSummary.unpinnedBlockScopedHalf,
   };
 }
 
@@ -869,18 +1071,49 @@ export function renderOfficialReportMarkdown(
     ),
     "## Q&A coverage",
     "",
-    `Pin rule: a Q&A is **pinned** if any file under \`tests/\` other than \`tests/unit/official-qa.test.ts\` and \`tests/specs/generated_specs.json\` contains the card id **and** at least one 4+ letter keyword from the answer after dropping ${QA_COVERAGE_STOPWORDS.size} stopwords (including generic game vocabulary such as destroy / cost / opponent). Otherwise **unpinned**.`,
-    "",
-    `Pinned: **${report.pinnedCount}**. Unpinned: **${report.unpinnedCount}**. Total: **${report.qaCoverage.length}**.`,
+    "Pin predicates (measurement only — not a CI gate). Keywords: 4+ letter tokens from the answer after dropping stopwords.",
     "",
     table(
-      ["id", "name", "status", "keywords / file", "Q / A"],
+      ["scope", "threshold", "pinned", "unpinned", "total"],
+      [
+        [
+          "file",
+          "≥1 keyword anywhere in file with card id",
+          String(report.pinnedFileScopedCount),
+          String(report.unpinnedFileScopedCount),
+          String(report.qaCoverage.length),
+        ],
+        [
+          "block (subject `it`/`test`)",
+          `≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in block body`,
+          String(report.pinnedCount),
+          String(report.unpinnedCount),
+          String(report.qaCoverage.length),
+        ],
+        [
+          "block (subject `it`/`test`)",
+          "≥ceil(n/2) keywords in block body",
+          String(report.pinnedBlockScopedHalfCount),
+          String(report.unpinnedBlockScopedHalfCount),
+          String(report.qaCoverage.length),
+        ],
+      ],
+    ),
+    "",
+    `Default \`pinned\` field: block-scoped, ≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords (subject block from \`subjecthood.ts\` title matcher). Legacy file-scoped verdict kept as \`pinnedFileScoped\`.`,
+    "",
+    table(
+      ["id", "name", "status", "keywords / block", "Q / A"],
       report.qaCoverage.map((r) => [
         r.id,
         r.name,
-        r.pinned ? "pinned" : "unpinned",
         r.pinned
-          ? `${r.matchedKeywords.join(", ")} @ ${r.matchedFile ?? "?"}`
+          ? "pinned"
+          : r.pinnedFileScoped
+            ? "unpinned (was file-scoped)"
+            : "unpinned",
+        r.pinned || r.pinnedFileScoped
+          ? `${r.matchedKeywords.join(", ")} @ ${r.matchedFile ?? "?"}${r.matchedBlock ? ` — ${r.matchedBlock}` : ""}`
           : "—",
         `Q: ${r.question} / A: ${r.answer}`,
       ]),
