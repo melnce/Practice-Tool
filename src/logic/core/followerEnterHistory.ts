@@ -16,6 +16,8 @@ export type FollowerEnterRecord = {
   name: string;
   tribes: string[];
   cardId: string;
+  /** Instance uid when recorded via recordFollowerEnter (play tail / summon). */
+  uid?: string;
 };
 
 export function recordFollowerEnter(
@@ -31,6 +33,7 @@ export function recordFollowerEnter(
     name: String(card.name ?? ""),
     tribes: Array.isArray(card.tribes) ? card.tribes.map((t) => String(t)) : [],
     cardId: String(card.id ?? ""),
+    uid: String(card.uid ?? ""),
   });
 }
 

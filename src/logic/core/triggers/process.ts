@@ -13,6 +13,11 @@ import { DEBUG_TRIGGERS } from "./debug.js";
 import { shouldCrestTriggerFire } from "./crestScope.js";
 import { triggerMatchesCandidateZone } from "./utils.js";
 import { preJudgeLeadingGate } from "./preJudgeLeadingGate.js";
+import {
+  formatResolutionHistoryForGuard,
+  recentResolutionHistoryForGuard,
+} from "./queue.js";
+import { readEnv } from "../../../core/env.js";
 
 // Cycle breaker for runEffects
 let runEffects: (
@@ -72,10 +77,15 @@ export function processCandidateTriggers(
   // P0-4 FIX: Chain depth guard to prevent infinite trigger recursion
   const currentDepth = ((context as any)._chainDepth ?? 0) as number;
   if (currentDepth > MAX_CHAIN_DEPTH) {
-    console.error(
-      `[Triggers] Chain depth exceeded ${MAX_CHAIN_DEPTH} for event "${event}". ` +
-        `Possible infinite loop. Aborting trigger processing.`,
-    );
+    const history = recentResolutionHistoryForGuard();
+    const msg =
+      `[Triggers] Chain depth exceeded ${MAX_CHAIN_DEPTH} for event "${event}" ` +
+      `(depth=${currentDepth}). Recent history: ${formatResolutionHistoryForGuard(history)}. ` +
+      `Possible infinite loop. Aborting trigger processing.`;
+    if (readEnv("NODE_ENV") === "test") {
+      throw new Error(msg);
+    }
+    console.error(msg);
     return;
   }
   // Increment depth for nested trigger calls

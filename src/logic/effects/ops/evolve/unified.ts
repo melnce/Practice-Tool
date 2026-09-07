@@ -19,6 +19,7 @@ import {
   getSuperEvoCharges,
 } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
+import { findCardByUid } from "../../../core/triggers/resolve.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
 import {
   trySetPendingTarget,
@@ -222,7 +223,10 @@ function resolveTargets(
       return sourceCard ? [sourceCard] : [];
 
     case "played_card": {
-      const played = context?.playedCard as CardInstance | undefined;
+      let played = context?.playedCard as CardInstance | undefined;
+      if ((!played || played.type !== "Follower") && context?.playedCardUid) {
+        played = findCardByUid(String(context.playedCardUid), owner) ?? played;
+      }
       if (played?.type === "Follower") return [played];
       return sourceCard?.type === "Follower" ? [sourceCard] : [];
     }
@@ -338,10 +342,6 @@ function applyEvolution(
   // Swap to evolved image
   if (card.evo_image) card.base_image = card.evo_image;
 
-  // Grant rush (or keep storm active)
-  if (!card.hasStorm) {
-    card.hasRush = true;
-  }
   recomputeAttackFlags(card);
 
   logEvent("evolve", {

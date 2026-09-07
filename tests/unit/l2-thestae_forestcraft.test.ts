@@ -529,7 +529,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       expect(ally.hasRush).toBe(true);
       expect(Number(lt.attack)).toBe(3);
       expect(Number(lt.defense)).toBe(5);
-      expect(lt.hasRush).toBe(true);
+      expect(lt.hasRush).toBe(false);
       expect(printed).toContain("another allied follower");
     });
   });

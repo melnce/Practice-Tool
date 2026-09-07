@@ -192,7 +192,7 @@ describe("Rulebook §176–269 / owner — Storm & Rush", () => {
     expect(unit.hasRush).toBe(true);
   });
 
-  it("evolving a non-Storm follower grants Rush only — may strike followers, not the leader", () => {
+  it("evolving a non-Storm follower grants follower attack permission only — not the Rush keyword", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 }).build();
 
     const fighter = createCard("10001110", "board", "first");
@@ -213,8 +213,10 @@ describe("Rulebook §176–269 / owner — Storm & Rush", () => {
 
     handleEvolveSelf(fighter, "first", { spendPoint: false });
 
-    expect(fighter.hasRush).toBe(true);
+    expect(fighter.hasEvolved).toBe(true);
+    expect(fighter.hasRush).toBeFalsy();
     expect(fighter.hasStorm).toBeFalsy();
+    expect(fighter.can_attack).toBe(true);
 
     attackFollower(0, 0, "first", "second");
     expect(enemy.defense).toBeLessThan(5);

@@ -78,12 +78,10 @@ See the following READMEs for architecture contracts:
 
 ## CI Pipeline
 
-The CI pipeline (`.github/workflows/ci.yml`) runs:
+The CI workflow (`.github/workflows/ci.yml`) runs three jobs on pull requests (non-draft) and pushes to `main`:
 
-1. `npm ci` - Install dependencies
-2. `npm run build` - TypeScript compilation
-3. `npm test` - Unit tests + boundary checks
-4. `npm run replay:check` - Replay determinism
-5. `npm run check:arch` - Architecture guardrails
+1. **build-test-check** — `npm ci`, `npm run build`, `npm run check` (format, lint, typecheck, card gates, architecture, full test suite, replay determinism, and related gates — see `package.json` `check` script)
+2. **soak** — long-running soak simulations (`scripts/soak.ts` with fixed seeds) plus `npm run soak:smoke`
+3. **e2e** — Playwright interaction sweep (`tests/e2e/interaction-sweep.spec.ts`)
 
-All checks must pass for PRs to be merged.
+All jobs must pass for PRs to be merged.

@@ -1357,7 +1357,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       const librarian = findOnBoard("first", "Daydream Librarian")!;
       whenSuperEvolve(librarian, "first");
       expect(hasKeyword(ally, "Rush")).toBe(true);
-      expect(hasKeyword(librarian, "Rush")).toBe(true);
+      expect(hasKeyword(librarian, "Rush")).toBe(false);
       expect(printed).toContain("all other allied followers");
     });
   });

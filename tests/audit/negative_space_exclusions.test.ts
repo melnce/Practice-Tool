@@ -492,7 +492,7 @@ describe("Negative-space — all-other buffs/damage exclude source", () => {
     const lib = findOnBoard("first", "Daydream Librarian")!;
     state.players.first.superEvoPoints = 1;
     whenSuperEvolve(lib, "first");
-    expect(lib.hasRush).toBe(true);
+    expect(lib.hasRush).toBe(false);
     expect(bystander.hasRush).toBe(true);
   });
 

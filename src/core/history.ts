@@ -104,18 +104,18 @@ export const INTERNAL_CACHE_KEYS = new Set([
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
 
-/** Snapshots never store in-progress target picks — undo reopens a clean prompt. */
+/** Snapshots strip uncommitted in-progress picks; committed per-pick prompts keep them. */
 function sanitizePendingTargetInSnapshot(snap: GameState): void {
   const pending = snap.pendingTargetEffect;
-  if (!pending) return;
-
-  pending.targetUids = [];
-  if (Array.isArray(pending.targets)) {
-    pending.targets = [];
+  if (pending && !pending.picksAreCommitted) {
+    pending.targetUids = [];
+    if (Array.isArray(pending.targets)) {
+      pending.targets = [];
+    }
   }
 
   const modePending = snap.pendingModeChoice;
-  if (modePending) {
+  if (modePending && !modePending.picksAreCommitted) {
     modePending.partialPickedIndices = [];
   }
 
@@ -132,7 +132,7 @@ function sanitizePendingTargetInSnapshot(snap: GameState): void {
     for (const c of pl.hand) visit(c);
     for (const c of pl.graveyard ?? []) visit(c);
   }
-  if (Array.isArray(pending.pool)) {
+  if (pending && Array.isArray(pending.pool)) {
     for (const c of pending.pool) visit(c);
   }
 }

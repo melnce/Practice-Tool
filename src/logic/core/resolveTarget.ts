@@ -22,6 +22,7 @@ import {
   runPlayFollowerPostFanfare,
   type PlayFollowerResume,
 } from "./playCard/followerResume.js";
+import { endPlaySequenceDrainIfIdle } from "./playCard/playSequence.js";
 import {
   completeDeferredLwAfterSelection,
   resumeDeferredDeathIfIdle,
@@ -45,15 +46,10 @@ function getRequiredSelectCount(pending: any): number {
     : 1;
 }
 
-function isMultiPickHandDiscard(pending: any): boolean {
-  if (getRequiredSelectCount(pending) <= 1) return false;
-  const topOp = String((pending as { op?: string }).op ?? "");
-  const effOp = String((pending.eff as { op?: string })?.op ?? "");
-  return (
-    topOp === "discard_select_hand" ||
-    effOp === "discard" ||
-    effOp === "discard_select_hand"
-  );
+function isMultiPickHandDiscard(pending: {
+  picksAreCommitted?: boolean;
+}): boolean {
+  return pending.picksAreCommitted === true;
 }
 
 function applyMultiPickDiscardPick(pending: any, uid: string): void {
@@ -156,12 +152,14 @@ function resolveMultiPickHandDiscardTarget(
   doAction(
     "Resolve Targets",
     () => {
+      const prevDefer = !!(state as any).deferDeathTriggers;
       (state as any).deferDeathTriggers = true;
       try {
         applyMultiPickDiscardPick(pending, uid);
         completeMultiPickDiscardPending(pending);
       } finally {
-        (state as any).deferDeathTriggers = false;
+        // Restore outer deferral (play sequence, SOT boundary, etc.) — do not hard-clear.
+        (state as any).deferDeathTriggers = prevDefer;
       }
     },
     {
@@ -316,6 +314,7 @@ function flushTargetedOpAfterHandler(
   completeDeferredLwAfterSelection(deferredLwComplete);
 
   settleTargetedOpResolutionQueue();
+  endPlaySequenceDrainIfIdle();
   resumeDeferredDeathIfIdle();
   settleTargetedOpResolutionQueue();
 

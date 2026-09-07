@@ -332,12 +332,12 @@ registerCondition("named_enter_count", (spec, owner, sourceCard) => {
   const need = spec.count ?? spec.at_least ?? 1;
   let count = countNamedEnters(state, owner, name);
   if (spec.exclude_self && sourceCard?.name === name && count > 0) {
-    // Enter-trigger route records the entering card before the gate runs; Fanfare
-    // records after, so exclude_self only subtracts when the latest history entry
-    // is this source card (avoids double-subtract on Fanfare path).
     const history = state.players[owner].followerEnterHistory ?? [];
     const last = history[history.length - 1];
-    if (last?.name === name && last?.cardId === String(sourceCard.id ?? "")) {
+    // Only subtract when recordFollowerEnter logged this exact instance (uid).
+    // Enter triggers staged at play entry run before that record; prior history
+    // rows with the same name/cardId must not count as self.
+    if (last?.uid && sourceCard?.uid && last.uid === sourceCard.uid) {
       count -= 1;
     }
   }

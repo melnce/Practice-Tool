@@ -84,11 +84,11 @@ describe("Warden of Selflessness (10903110)", () => {
       ).toBe(1);
     });
 
-    it("unknown dynamic template resolves to 0", () => {
+    it("unknown dynamic template throws in test mode", () => {
       setupTurn(R6, { hand: [NEUTRAL_A], pp: 6 });
-      expect(
+      expect(() =>
         resolveDynamicValue("{bogus_unknown_template}", { owner: "first" }),
-      ).toBe(0);
+      ).toThrow(/Unknown dynamic template/i);
     });
   });
 

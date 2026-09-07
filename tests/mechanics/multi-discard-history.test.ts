@@ -119,7 +119,7 @@ describe.each([
 
     undo(dispatch);
     expect(state.pendingTargetEffect).toBeDefined();
-    expect(state.pendingTargetEffect!.targetUids ?? []).toEqual([]);
+    expect(state.pendingTargetEffect!.targetUids ?? []).toEqual([pickA.uid]);
     expect(getGraveyard(state, "first").some((c) => c.uid === pickB.uid)).toBe(
       false,
     );
