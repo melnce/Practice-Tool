@@ -105,7 +105,7 @@ Legacy export layouts (`card_sets/`, `card_details.json`, `classes/`, `seperate_
 
 | Path                     | Role                                                                                                                               |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `decks/*.json`           | Deck lists (most are gitignored locally; meta decks and `0_testing_vanilla.json` are tracked).                                     |
+| `decks/*.json`           | Shipped deck lists; `decks/*.local.json` is gitignored for scratch imports.                                                        |
 | `npm run decks:discover` | Scans `decks/*.json` and writes `decks/manifest.json` for the UI dropdown (runs automatically on `npm run dev` / `npm run build`). |
 | `npm run check:decks`    | Validates every discovered deck parses cleanly and every card resolves against `cards/all.json`.                                   |
 

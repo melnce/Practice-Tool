@@ -24,9 +24,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
@@ -195,7 +200,7 @@ describe("Batch 7 — Runecraft [10001] Legends Rise", () => {
     const e = enemyFollower(5);
     whenPlayCard("first", 0);
     const emmylou = findOnBoard("first", "Emmylou, Witch of Wonder")!;
-    onEvolve(emmylou, "first", "normal");
+    whenEvolve(emmylou, "first");
     expect(thenBoard("first").some((c) => c.name === "Clay Golem")).toBe(true);
     expect(e.defense).toBeLessThan(5);
   });
@@ -444,7 +449,7 @@ describe("Batch 7 — Runecraft [10004] Skybound Dragons", () => {
     state.players.first.superEvoCharges = 1;
 
     setScriptedModePickProvider(() => [0]);
-    onEvolve(wamdus, "first", "super");
+    whenSuperEvolve(wamdus, "first");
     setScriptedModePickProvider(null);
 
     expect(ally.hasBarrier).toBe(true);

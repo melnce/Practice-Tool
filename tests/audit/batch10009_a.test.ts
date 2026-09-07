@@ -16,9 +16,14 @@ import {
   thenHand,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
@@ -329,7 +334,7 @@ describe("Set 10009 batch A — C7 Cutthroat, Fluxblade Convict", () => {
     whenPlayCard("first", 0);
     const cut = findOnBoard("first", "Cutthroat, Fluxblade Convict")!;
     state.players.first.evoCharges = 2;
-    onEvolve(cut, "first", "normal");
+    whenEvolve(cut, "first");
     expect(
       getDeck(state, "first").filter(
         (c) => c.name === "Cutthroat, Fluxblade Convict",
@@ -356,7 +361,7 @@ describe("Set 10009 batch A — C7 Cutthroat, Fluxblade Convict", () => {
     whenPlayCard("first", 0);
     const cut = findOnBoard("first", "Cutthroat, Fluxblade Convict")!;
     state.players.first.evoCharges = 2;
-    onEvolve(cut, "first", "normal");
+    whenEvolve(cut, "first");
     expect(
       getCrests(state, "first").some(
         (c) => c.name === "Cutthroat, Fluxblade Convict",
@@ -373,7 +378,7 @@ describe("Set 10009 batch A — C7 Cutthroat, Fluxblade Convict", () => {
     state.players.first.evoCharges = 2;
     whenPlayCard("first", 0);
     const cut = findOnBoard("first", "Cutthroat, Fluxblade Convict")!;
-    onEvolve(cut, "first", "normal");
+    whenEvolve(cut, "first");
 
     whenPlayCard("first", 0);
     const firstFairy = findOnBoard("first", "Fairy")!;
@@ -426,7 +431,7 @@ describe("Set 10009 batch A — C8 Istyndet vs. Mitilykket", () => {
     state.players.first.superEvoCharges = 1;
     whenPlayCard("first", 0);
     const isty = findOnBoard("first", "Istyndet vs. Mitilykket")!;
-    onEvolve(isty, "first", "super");
+    whenSuperEvolve(isty, "first");
 
     const lwAlly = createCard(
       {
@@ -456,7 +461,7 @@ describe("Set 10009 batch A — C8 Istyndet vs. Mitilykket", () => {
     state.players.first.superEvoCharges = 1;
     whenPlayCard("first", 0);
     const isty = findOnBoard("first", "Istyndet vs. Mitilykket")!;
-    onEvolve(isty, "first", "super");
+    whenSuperEvolve(isty, "first");
 
     const plain = createCard(
       { name: "Plain", type: "Follower", cost: 2, attack: 2, defense: 3 },

@@ -34,6 +34,22 @@ export function deckLabelFromFilename(file: string): string {
 }
 
 /** Build a manifest from bare filenames (no filesystem access — safe for tests). */
+/** Shipped playable deck ids from a manifest (category === "deck"), sorted by id. */
+export function shippedDeckIds(manifest: DeckManifest): string[] {
+  return manifest.entries
+    .filter((e) => e.category === "deck")
+    .map((e) => e.id)
+    .sort((a, b) => a.localeCompare(b));
+}
+
+/** Shipped deck filenames from a manifest (category === "deck"), sorted by file. */
+export function shippedDeckFiles(manifest: DeckManifest): string[] {
+  return manifest.entries
+    .filter((e) => e.category === "deck")
+    .map((e) => e.file)
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+}
+
 export function buildManifestFromFilenames(
   files: readonly string[],
 ): DeckManifest {

@@ -9,6 +9,10 @@ import {
   resetCardIndex,
 } from "./cardIndex.js";
 import { initCardSets, resetCardSets } from "./cardSets.js";
+import {
+  initOfficialRotationFromJson,
+  resetOfficialRotationForTests,
+} from "./officialRotation.js";
 // Re-export types if needed
 export { getCardDetails, getCardById } from "./cardIndex.js";
 
@@ -40,11 +44,12 @@ export async function loadCardsBrowser(): Promise<BuildCardIndexInput> {
   const root = browserRoot();
   const ts = Date.now();
 
-  // Parallel fetch for main cards and tokens
-  const [fullRes, tokenRes, vanillaRes] = await Promise.all([
+  // Parallel fetch for main cards, tokens, and official rotation snapshot
+  const [fullRes, tokenRes, vanillaRes, officialMetaRes] = await Promise.all([
     fetch(`${root}cards/all.json?v=${ts}`),
     fetch(`${root}cards/token_details.json?v=${ts}`),
     fetch(`${root}cards/vanilla_lab_set.json`).catch(() => null), // Optional
+    fetch(`${root}cards/official-meta.json?v=${ts}`).catch(() => null),
   ]);
 
   if (!fullRes.ok) throw new Error(`Main cards failed: ${fullRes.status}`);
@@ -60,6 +65,18 @@ export async function loadCardsBrowser(): Promise<BuildCardIndexInput> {
     } catch (e) {
       console.warn("Vanilla lab set failed to parse", e);
     }
+  }
+
+  if (officialMetaRes && officialMetaRes.ok) {
+    try {
+      initOfficialRotationFromJson(await officialMetaRes.json());
+    } catch (e) {
+      console.warn("Official rotation metadata failed to parse", e);
+    }
+  } else {
+    console.warn(
+      "Official rotation metadata missing — UI falls back to set-window heuristic",
+    );
   }
 
   return {
@@ -125,6 +142,7 @@ export function injectCardForTest(card: CardTemplate) {
 export function resetCardDatabaseForTests() {
   resetCardIndex();
   resetCardSets();
+  resetOfficialRotationForTests();
 }
 
 // Expose globals for debugging/console access

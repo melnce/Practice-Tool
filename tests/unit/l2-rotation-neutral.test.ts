@@ -17,9 +17,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -377,7 +382,7 @@ describe("L2 — Rotation Neutral", () => {
       const foe = enemyFollower(2, 4, "BehemothVictim");
       const behemoth = createCard(BEHEMOTH, "board", "first");
       state.players.first.board = [behemoth];
-      onEvolve(behemoth, "first", "normal", { spendPoint: true });
+      whenEvolve(behemoth, "first");
       expect(getBoard(state, "second").length).toBe(0);
       expect(Number(foe.defense)).toBe(0);
     });
@@ -463,7 +468,7 @@ describe("L2 — Rotation Neutral", () => {
       const foe = enemyFollower(2, 4, "BehemothBystander");
       const behemoth = createCard(BEHEMOTH, "board", "first");
       state.players.first.board = [behemoth];
-      onEvolve(behemoth, "first", "normal", { spendPoint: true });
+      whenEvolve(behemoth, "first");
       expect(getBoard(state, "second").length).toBe(1);
       expect(Number(foe.defense)).toBe(4);
       expect(printed).toContain("destroy all enemy followers");
@@ -562,7 +567,7 @@ describe("L2 — Rotation Neutral", () => {
       foe.defense = 5;
       state.players.second.board = [foe];
       const omeg = findOnBoard("first", "Omegotep, the Dreaded One")!;
-      onEvolve(omeg, "first", "super", { spendPoint: true });
+      whenSuperEvolve(omeg, "first");
       expect(getBoard(state, "second").length).toBe(0);
       expect(Number(foe.defense)).toBe(0);
       expect(getPP(state, "first")).toBe(ppAfterFanfare + 4);
@@ -582,7 +587,7 @@ describe("L2 — Rotation Neutral", () => {
       });
       whenPlayCard("first", 0);
       const altaro = findOnBoard("first", "Altaro Superfan")!;
-      onEvolve(altaro, "first", "normal", { spendPoint: true });
+      whenEvolve(altaro, "first");
       expect(handIds()).toContain(NEUTRAL_TOP);
       expect(handIds()).not.toContain(FILLER_FOREST);
       expect(printed).toContain("Neutral card");
@@ -611,7 +616,7 @@ describe("L2 — Rotation Neutral", () => {
       setupTurn(R7, { hand: [INTREPID], pp: 3, evo: 2, superEvo: 1 });
       whenPlayCard("first", 0);
       const hound = findOnBoard("first", "Intrepid Newshound")!;
-      onEvolve(hound, "first", "super", { spendPoint: true });
+      whenSuperEvolve(hound, "first");
       expect(boardCountByName("Intrepid Newshound", "first")).toBe(3);
       expect(printed).toContain("Summon 2 copies");
     });
@@ -812,7 +817,7 @@ describe("L2 — Rotation Neutral", () => {
       whenPlayCard("first", 0);
       resolvePendingByUid(getBoard(state, "second")[0]!.uid);
       const alfied = findOnBoard("first", "Alfied, Squire of Joy")!;
-      onEvolve(alfied, "first", "normal", { spendPoint: true });
+      whenEvolve(alfied, "first");
       applyKeywordsFromList(alfied);
       expect(alfied.hasStorm || alfied.keywordState?.hasStorm).toBe(true);
       expect(printed).toContain("Storm");
@@ -843,7 +848,7 @@ describe("L2 — Rotation Neutral", () => {
       whenPlayCard("first", 0);
       const aika = findOnBoard("first", "Aika, Elegy of Loss")!;
       const uidsBefore = new Set(thenHand("first").map((c) => c.uid));
-      onEvolve(aika, "first", "normal", { spendPoint: true });
+      whenEvolve(aika, "first");
       const added = thenHand("first").filter((c) => !uidsBefore.has(c.uid));
       expect(added.length).toBe(1);
       expect(["Quake Goliath", "Detective's Lens"]).toContain(added[0]!.name);

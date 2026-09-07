@@ -17,9 +17,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
@@ -233,7 +238,7 @@ function gainYubeCrest(): CardInstance {
   setupTurn(R6, { hand: [YUBE, FILLER], pp: 3, evo: 2 });
   whenPlayCard("first", 0);
   const yube = findOnBoard("first", "Yube, Crestpetal")!;
-  onEvolve(yube, "first", "normal", { spendPoint: true });
+  whenEvolve(yube, "first");
   discardHandCard("first", FILLER);
   return thenBoard("first").find((c) => c.id === MEGALORCA)!;
 }
@@ -461,7 +466,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       state.players.first.board = [liu];
       const mari = getHand(state, "first").find((c) => c.id === MARI)!;
       expect(getEffectiveCost(mari)).toBe(2);
-      onEvolve(liu, "first", "super");
+      whenSuperEvolve(liu, "first");
       expect(getEffectiveCost(mari)).toBe(0);
     });
 
@@ -471,7 +476,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       berserker.peak_defense = berserker.defense;
       state.players.first.board = [berserker];
       const mari = getHand(state, "first").find((c) => c.id === MARI)!;
-      onEvolve(berserker, "first", "super");
+      whenSuperEvolve(berserker, "first");
       expect(getEffectiveCost(mari)).toBe(2);
     });
 
@@ -496,7 +501,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       );
       const mari = createCard(MARI, "board", "first");
       state.players.first.board = [superGuy, plain, mari];
-      onEvolve(superGuy, "first", "super");
+      whenSuperEvolve(superGuy, "first");
       const beforeSuper = {
         atk: Number(superGuy.attack),
         def: Number(superGuy.defense),
@@ -514,7 +519,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       state.gameStarted = true;
       const superGuy = createCard(DRACONIC_BERSERKER, "board", "first");
       superGuy.peak_defense = superGuy.defense;
-      onEvolve(superGuy, "first", "super");
+      whenSuperEvolve(superGuy, "first");
       createCard(MARI, "board", "first");
       const before = {
         atk: Number(superGuy.attack),
@@ -571,7 +576,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       setupTurn(R6, { hand: [SPIRIT_WADATSUMI], pp: 2, evo: 2 });
       whenPlayCard("first", 0);
       const spirit = findOnBoard("first", "Spirit of Wadatsumi")!;
-      onEvolve(spirit, "first", "normal", { spendPoint: true });
+      whenEvolve(spirit, "first");
       expect(crestNamed("Spirit of Wadatsumi")).toBeTruthy();
     });
 
@@ -579,7 +584,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       setupTurn(R6, { hand: [SPIRIT_WADATSUMI], pp: 2, evo: 2 });
       whenPlayCard("first", 0);
       const spirit = findOnBoard("first", "Spirit of Wadatsumi")!;
-      onEvolve(spirit, "first", "normal", { spendPoint: true });
+      whenEvolve(spirit, "first");
       const marine = summonFollowerByCardId(MEGALORCA, "first");
       expect(Number(marine.attack)).toBe(3);
       expect(Number(marine.defense)).toBe(3);
@@ -600,7 +605,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const e2 = enemyFollower(1, 6, "E2");
       whenPlayCard("first", 0);
       const steward = findOnBoard("first", "Springwell Steward")!;
-      onEvolve(steward, "first", "normal", { spendPoint: true });
+      whenEvolve(steward, "first");
       resolvePendingByUid(e1.uid);
       expect(Number(e1.defense)).toBe(1);
       expect(Number(e2.defense)).toBe(6);
@@ -617,7 +622,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const e2 = enemyFollower(1, 6, "E2");
       whenPlayCard("first", 0);
       const steward = findOnBoard("first", "Springwell Steward")!;
-      onEvolve(steward, "first", "super", { spendPoint: true });
+      whenSuperEvolve(steward, "first");
       resolvePendingByUid(e1.uid);
       resolvePendingByUid(e2.uid);
       expect(Number(e1.defense)).toBe(1);
@@ -760,7 +765,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       setupTurn(R6, { hand: [YUBE, FILLER], pp: 3, evo: 2 });
       whenPlayCard("first", 0);
       const yube = findOnBoard("first", "Yube, Crestpetal")!;
-      onEvolve(yube, "first", "normal", { spendPoint: true });
+      whenEvolve(yube, "first");
       discardHandCard("first", FILLER);
       expect(handIds()).not.toContain(FILLER);
       expect(crestNamed("Yube, Crestpetal")).toBeTruthy();
@@ -770,7 +775,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       setupTurn(R6, { hand: [YUBE, FILLER], pp: 3, evo: 2 });
       whenPlayCard("first", 0);
       const yube = findOnBoard("first", "Yube, Crestpetal")!;
-      onEvolve(yube, "first", "normal", { spendPoint: true });
+      whenEvolve(yube, "first");
       discardHandCard("first", FILLER);
       const marine = createCard(MEGALORCA, "board", "first");
       marine.tribes = ["Marine"];
@@ -1000,7 +1005,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const e1 = enemyFollower(2, 6, "E1");
       const e2 = enemyFollower(2, 6, "E2");
       state.players.first.board = [berserker];
-      onEvolve(berserker, "first", "normal", { spendPoint: true });
+      whenEvolve(berserker, "first");
       resolvePendingByUid(e1.uid);
       expect(Number(e1.defense)).toBe(2);
       expect(Number(e2.defense)).toBe(6);
@@ -1013,7 +1018,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const e1 = enemyFollower(2, 6, "E1");
       const e2 = enemyFollower(2, 6, "E2");
       state.players.first.board = [berserker];
-      onEvolve(berserker, "first", "super", { spendPoint: true });
+      whenSuperEvolve(berserker, "first");
       expect(Number(e1.defense)).toBe(2);
       expect(Number(e2.defense)).toBe(2);
       expect(printed).toContain("all enemy followers");
@@ -1168,7 +1173,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const foe = enemyFollower(2, 5, "Foe");
       whenPlayCard("first", 0);
       const iz = findOnBoard("first", "Izmir, Frigid Fate")!;
-      onEvolve(iz, "first", "normal", { spendPoint: true });
+      whenEvolve(iz, "first");
       expect(Number(foe.defense)).toBe(2);
       expect(printed).toContain("deal 3 damage");
     });
@@ -1376,7 +1381,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(Number(foe1.defense)).toBe(2);
       const foe2 = enemyFollower(2, 8, "Foe2");
       const pug = findOnBoard("first", "Impeding Pugilist")!;
-      onEvolve(pug, "first", "normal", { spendPoint: true });
+      whenEvolve(pug, "first");
       discardHandCard("first", DRAW_TOP);
       expect(handIds()).not.toContain(DRAW_TOP);
       expect(Number(foe2.defense)).toBe(2);
@@ -1523,7 +1528,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const e2 = enemyFollower(2, 5, "E2");
       whenPlayCard("first", 0);
       const ruin = findOnBoard("first", "Ruinbringer")!;
-      onEvolve(ruin, "first", "super", { spendPoint: true });
+      whenSuperEvolve(ruin, "first");
       expect(getBanish(state, "first").some((c) => c.uid === c1.uid)).toBe(
         true,
       );
@@ -1608,7 +1613,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       expect(Number(foe.defense)).toBe(2);
       const wilnas = findOnBoard("first", "Wilnas, Flame Personified")!;
       const foe2 = enemyFollower(2, 10, "Foe2");
-      onEvolve(wilnas, "first", "normal", { spendPoint: true });
+      whenEvolve(wilnas, "first");
       resolvePendingByUid(foe2.uid);
       expect(Number(foe2.defense)).toBe(2);
       expect(printed).toContain("Replicate");
@@ -1631,7 +1636,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const ally = allyFollower(2, 2, "Ally");
       whenPlayCard("first", 0);
       const butler = findOnBoard("first", "Dragonfolk Butler")!;
-      onEvolve(butler, "first", "normal", { spendPoint: true });
+      whenEvolve(butler, "first");
       resolvePendingByUid(ally.uid);
       expect(Number(ally.attack)).toBe(5);
       expect(Number(ally.defense)).toBe(5);
@@ -1678,7 +1683,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       const b = enemyFollower(2, 4, "B");
       whenPlayCard("first", 0);
       const mugen = findOnBoard("first", "Mugen, Steel-Bodied Honesty")!;
-      onEvolve(mugen, "first", "super", { spendPoint: true });
+      whenSuperEvolve(mugen, "first");
       resolvePendingByUid(a.uid);
       resolvePendingByUid(b.uid);
       expect(getBoard(state, "second")).toHaveLength(0);
@@ -1755,7 +1760,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       });
       whenPlayCard("first", 0);
       const elder = findOnBoard("first", "Dragon's Vale Elder")!;
-      onEvolve(elder, "first", "super", { spendPoint: true });
+      whenSuperEvolve(elder, "first");
       const crest = crestNamed("Dragon's Vale Elder");
       expect(Number(crest!.countdown)).toBe(4);
       expect(printed).toContain("Delay");
@@ -1801,7 +1806,7 @@ describe("L2 — Rotation Dragoncraft", () => {
       });
       whenPlayCard("first", 0);
       const elder = findOnBoard("first", "Dragon's Vale Elder")!;
-      onEvolve(elder, "first", "super", { spendPoint: true });
+      whenSuperEvolve(elder, "first");
       expect(Number(crestNamed("Dragon's Vale Elder")!.countdown)).toBe(4);
       whenEndTurn();
       whenEndTurn();

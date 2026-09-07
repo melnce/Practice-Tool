@@ -11,12 +11,17 @@ import {
   whenEndTurn,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { handleCrest } from "../../src/logic/effects/ops/crest/unified.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { handleGainCrest, tickCrests } from "../../src/logic/effects/crest.js";
 import { incrementSkyboundArt } from "../../src/logic/effects/skybound.js";
@@ -308,7 +313,7 @@ describe("B/C — Sham-Nacha faith + super-evolve (10354110)", () => {
     state.players.first.board = [sham];
     state.players.first.evoPoints = 2;
     state.players.first.superEvoPoints = 1;
-    onEvolve(sham, "first", "super");
+    whenSuperEvolve(sham, "first");
     resolvePendingTarget(String(prey.uid));
     expect(getBoard(state, "second")).toHaveLength(0);
     expect(getHand(state, "first").some((c) => c.name === "Prey")).toBe(true);
@@ -330,7 +335,7 @@ describe("B/C — Sham-Nacha faith + super-evolve (10354110)", () => {
     state.players.first.board = [sham];
     state.players.first.evoPoints = 2;
     state.players.first.superEvoPoints = 1;
-    onEvolve(sham, "first", "super");
+    whenSuperEvolve(sham, "first");
     resolvePendingTarget(String(prey.uid));
     const copy = getHand(state, "first").find((c) => c.name === "Prey");
     expect(copy).toBeTruthy();
@@ -365,7 +370,7 @@ describe("B/C — Belial SSA crest (10454120)", () => {
 
     const onBoard = findOnBoard("first", "Belial, Archangel of Cunning")!;
     state.players.first.superEvoPoints = 1;
-    onEvolve(onBoard, "first", "super");
+    whenSuperEvolve(onBoard, "first");
     const crest = getCrests(state, "first").find((c) =>
       c.name?.includes("Belial, Archangel"),
     )!;

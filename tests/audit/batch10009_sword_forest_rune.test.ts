@@ -15,9 +15,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getBoard, getHand, getHP } from "../../src/core/playerHelpers.js";
@@ -118,7 +123,7 @@ describe("Set 10009 — Forestcraft", () => {
     const plotter = findOnBoard("first", "Primate Plotters")!;
     state.players.first.evoCharges = 2;
     const handBefore = getHand(state, "first").length;
-    onEvolve(plotter, "first", "normal");
+    whenEvolve(plotter, "first");
     expect(getHand(state, "first").length).toBeGreaterThan(handBefore);
   });
 
@@ -147,7 +152,7 @@ describe("Set 10009 — Forestcraft", () => {
     state.players.first.board.push(ally);
     const lt = findOnBoard("first", "Virid Lieutenant")!;
     state.players.first.evoCharges = 2;
-    onEvolve(lt, "first", "normal");
+    whenEvolve(lt, "first");
     resolveFirstPending();
     expect(ally.hasRush).toBe(true);
   });
@@ -198,7 +203,7 @@ describe("Set 10009 — Swordcraft", () => {
     whenPlayCard("first", 0);
     const scout = findOnBoard("first", "Open-Sea Scout")!;
     state.players.first.evoCharges = 2;
-    onEvolve(scout, "first", "normal");
+    whenEvolve(scout, "first");
     expect(thenHand("first").some((c) => c.name === "Gilded Boots")).toBe(true);
   });
 
@@ -255,7 +260,7 @@ describe("Set 10009 — Swordcraft", () => {
     const mate = findOnBoard("first", "Roughwater First Mate")!;
     state.players.first.superEvoCharges = 1;
     state.players.first.evoCharges = 2;
-    onEvolve(mate, "first", "super");
+    whenSuperEvolve(mate, "first");
     if (state.pendingTargetEffect) resolveFirstPending();
     const blade = thenHand("first").find((c) => c.name === "Gilded Blade");
     const necklace = thenHand("first").find(
@@ -342,7 +347,7 @@ describe("Set 10009 — Runecraft", () => {
     )!;
     const researcher = findOnBoard("first", "Enamored Researcher")!;
     state.players.first.evoCharges = 2;
-    onEvolve(researcher, "first", "normal");
+    whenEvolve(researcher, "first");
     resolveFirstPending();
     expect(subj.hasBane).toBe(true);
   });

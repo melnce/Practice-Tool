@@ -12,11 +12,16 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { handleRallyGate } from "../../src/logic/effects/gates/gates.js";
 import { getRally, setRally } from "../../src/core/playerHelpers.js";
 import { evolveFollowerByEffect } from "../../src/logic/effects/ops/evolve.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import "../../src/logic/core/effects/index.js";
 
 const R6 = 6;
@@ -134,7 +139,7 @@ describe("Foundations — Gildaria evolve_trigger_always (10224110)", () => {
     const byEp = createCard("10224110", "board", "first");
     byEp.peak_defense = byEp.defense;
     state.players.first.board = [byEp];
-    onEvolve(byEp, "first", "normal", { spendPoint: true });
+    whenEvolve(byEp, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Steelclad Knight").length,
     ).toBe(2);

@@ -15,9 +15,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import {
   playFollowerFromHandById,
@@ -243,7 +248,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       const bystander = enemyFollower(2, 5, "Bystander");
       whenPlayCard("first", 0);
       const op = findOnBoard("first", "Sharp-Eared Operative")!;
-      onEvolve(op, "first", "normal", { spendPoint: true });
+      whenEvolve(op, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(2);
       expect(Number(bystander.defense)).toBe(5);
@@ -268,7 +273,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       const ally = allyFollower(2, 2, "Ally");
       whenPlayCard("first", 0);
       const yid = findOnBoard("first", "Yidmetra, Eld Sword")!;
-      onEvolve(yid, "first", "normal", { spendPoint: true });
+      whenEvolve(yid, "first");
       expect(
         getCrests(state, "first").find((c) => c.name === YIDMETRA_FAITH)
           ?.counters?.faith,
@@ -293,7 +298,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       const ally = allyFollower(2, 2, "Ally");
       whenPlayCard("first", 0);
       const yid = findOnBoard("first", "Yidmetra, Eld Sword")!;
-      onEvolve(yid, "first", "normal", { spendPoint: true });
+      whenEvolve(yid, "first");
       expect(
         getCrests(state, "first").find((c) => c.name === YIDMETRA_FAITH)
           ?.counters?.faith,
@@ -527,7 +532,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       setupTurn(R8, { hand: [BUNNY_BARON], pp: 5, evo: 2 });
       whenPlayCard("first", 0);
       const bunny = findOnBoard("first", "Bunny & Baron, Fate's Bullet")!;
-      onEvolve(bunny, "first", "normal", { spendPoint: true });
+      whenEvolve(bunny, "first");
       expect(handIds()).toContain(DESPERADOS_SHOT);
       expect(printed).toContain("Desperados' Shot");
     });
@@ -597,7 +602,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       const bystander = enemyFollower(2, 5, "Bystander");
       whenPlayCard("first", 0);
       const medic = findOnBoard("first", "Metronomic Medic")!;
-      onEvolve(medic, "first", "normal", { spendPoint: true });
+      whenEvolve(medic, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(2);
       expect(Number(bystander.defense)).toBe(5);
@@ -631,7 +636,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       const cesar = findOnBoard("first", "Cesar, Accordant Major")!;
       const victim = enemyLastWordsFollower("Victim");
       const bystander = enemyFollower(2, 5, "Bystander");
-      onEvolve(cesar, "first", "super", { spendPoint: true });
+      whenSuperEvolve(cesar, "first");
       resolvePendingByUid(victim.uid);
       expect(getBoard(state, "second").some((c) => c.uid === victim.uid)).toBe(
         false,
@@ -721,7 +726,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
         (id) => id === NAHT_HENCHMAN,
       ).length;
       const defBefore = Number(getBoard(state, "second")[0]!.defense);
-      onEvolve(naht, "first", "super", { spendPoint: true });
+      whenSuperEvolve(naht, "first");
       expect(boardIds().filter((id) => id === NAHT_HENCHMAN).length).toBe(
         henchBefore + 1,
       );
@@ -771,7 +776,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       const knights = thenBoard("first").filter((c) => c.id === KNIGHT);
       knights[0]!.defense = 0;
       cleanupDead();
-      onEvolve(mars, "first", "super", { spendPoint: true });
+      whenSuperEvolve(mars, "first");
       expect(boardIds().filter((id) => id === KNIGHT).length).toBe(
         knightsBefore,
       );

@@ -16,8 +16,13 @@ import {
   thenBoard,
   thenHand,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import {
   resolvePendingTarget,
   forceCompleteOrFizzlePendingTarget,
@@ -124,7 +129,7 @@ describe("name filter on targeted selection pools", () => {
 
       const researcher = findOnBoard("first", "Enamored Researcher")!;
       state.players.first.evoCharges = 2;
-      onEvolve(researcher, "first", "normal");
+      whenEvolve(researcher, "first");
 
       const names = poolNames();
       expect(names.length).toBeGreaterThan(0);
@@ -147,7 +152,7 @@ describe("name filter on targeted selection pools", () => {
       ).toBe(false);
 
       state.players.first.evoCharges = 2;
-      onEvolve(researcher, "first", "normal");
+      whenEvolve(researcher, "first");
 
       expect(state.pendingTargetEffect).toBeFalsy();
       expect(hasKeyword(unrelated, "Bane")).toBe(false);
@@ -181,7 +186,7 @@ describe("name filter on targeted selection pools", () => {
       const onBoard = findOnBoard("first", "Ecstatic Scholar")!;
       onBoard.peak_defense = Number(onBoard.defense);
       state.players.first.superEvoPoints = 1;
-      onEvolve(onBoard, "first", "super");
+      whenSuperEvolve(onBoard, "first");
 
       const names = poolNames();
       expect(names.length).toBeGreaterThan(0);
@@ -216,7 +221,7 @@ describe("name filter on targeted selection pools", () => {
       const onBoard = findOnBoard("first", "Ecstatic Scholar")!;
       onBoard.peak_defense = Number(onBoard.defense);
       state.players.first.superEvoPoints = 1;
-      onEvolve(onBoard, "first", "super");
+      whenSuperEvolve(onBoard, "first");
 
       expect(state.pendingTargetEffect).toBeFalsy();
       expect(hasKeyword(unrelated, "Drain")).toBe(false);

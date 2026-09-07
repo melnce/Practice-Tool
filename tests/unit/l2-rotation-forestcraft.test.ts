@@ -21,9 +21,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -779,7 +784,7 @@ describe("L2 — rotation Forestcraft", () => {
       whenPlayCard("first", 0);
       const maiden = findOnBoard("first", "Battledore Woodsmaiden")!;
       expect(boardIds().filter((id) => id === FAIRY)).toHaveLength(1);
-      onEvolve(maiden, "first", "normal", { spendPoint: true });
+      whenEvolve(maiden, "first");
       expect(boardIds().filter((id) => id === FAIRY)).toHaveLength(2);
       expect(printed).toContain("Replicate");
     });
@@ -813,7 +818,7 @@ describe("L2 — rotation Forestcraft", () => {
       const floral = getHand(state, "first").find((c) => c.id === FLORAL)!;
       expect(getEffectiveCost(floral)).toBe(5);
       const ally = allyFollower(2, 2, "EvoTarget");
-      onEvolve(ally, "first", "normal", { spendPoint: true });
+      whenEvolve(ally, "first");
       expect(getEffectiveCost(floral)).toBe(4);
     });
 
@@ -861,7 +866,7 @@ describe("L2 — rotation Forestcraft", () => {
       whenPlayCard("first", 0);
       resolvePendingByUid(target.uid);
       const tactician = findOnBoard("first", "Hawkeyed Tactician")!;
-      onEvolve(tactician, "first", "normal", { spendPoint: true });
+      whenEvolve(tactician, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(0);
     });
@@ -888,7 +893,7 @@ describe("L2 — rotation Forestcraft", () => {
       const yuel = findOnBoard("first", "Yuel & Societte, Dancing Duo")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(yuel, "first", "super");
+      whenSuperEvolve(yuel, "first");
       const crest = getCrests(state, "first").find((c) =>
         c.name.includes("Yuel"),
       );
@@ -902,7 +907,7 @@ describe("L2 — rotation Forestcraft", () => {
       const yuel = findOnBoard("first", "Yuel & Societte, Dancing Duo")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(yuel, "first", "super");
+      whenSuperEvolve(yuel, "first");
       state.players.first.hand = [
         createCard(FAIRY, "hand", "first"),
         createCard(FAIRY, "hand", "first"),
@@ -926,7 +931,7 @@ describe("L2 — rotation Forestcraft", () => {
       const yuel = findOnBoard("first", "Yuel & Societte, Dancing Duo")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(yuel, "first", "super");
+      whenSuperEvolve(yuel, "first");
       whenEndTurn();
       state.players.second.hand = [createCard(FAIRY, "hand", "second")];
       state.players.second.pp = 10;
@@ -1061,7 +1066,7 @@ describe("L2 — rotation Forestcraft", () => {
       );
       b.uid = "enemy_b";
       state.players.second.board = [a, b];
-      onEvolve(selwyn, "first", "super");
+      whenSuperEvolve(selwyn, "first");
       expect(state.pendingTargetEffect).toBeDefined();
       resolvePendingTarget("enemy_a");
       expect(getBoard(state, "second")).toHaveLength(1);

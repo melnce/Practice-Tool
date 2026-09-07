@@ -64,6 +64,20 @@ function fingerprintCard(
     can_attack: !!(card as any).can_attack,
     hasAttacked: !!card.hasAttacked,
   };
+  const ks = card.keywordState ?? {};
+  if (card.hasEngage || (ks as { hasEngage?: boolean }).hasEngage) {
+    const engageCost = (ks as { engageCost?: number }).engageCost;
+    if (engageCost != null) fp.engageCost = engageCost;
+    if ((ks as { engageOncePerTurn?: boolean }).engageOncePerTurn === false) {
+      fp.engageOncePerTurn = false;
+    }
+    if ((ks as { engageSacrifice?: boolean }).engageSacrifice) {
+      fp.engageSacrifice = true;
+    }
+    if ((ks as { engagedThisTurn?: boolean }).engagedThisTurn) {
+      fp.engagedThisTurn = true;
+    }
+  }
   if (zone === "hand") {
     const costMod = (card as { cost_mod?: number }).cost_mod;
     const costAcc = (card as { cost_acc?: number }).cost_acc;
