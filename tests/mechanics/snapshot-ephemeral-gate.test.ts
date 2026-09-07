@@ -120,11 +120,13 @@ describe("snapshot dropped function gate", () => {
     } as any);
 
     resolvePendingTarget(filler.uid);
-    expect(getPendingConfirmKey(state.pendingTargetEffect!)).toBe("targeted:fuse");
-    expect(canConfirmPendingTarget(state.pendingTargetEffect)).toBe(true);
-    expect(collectSnapshotDroppedFunctionViolations(state, captureSnapshot())).toEqual(
-      [],
+    expect(getPendingConfirmKey(state.pendingTargetEffect!)).toBe(
+      "targeted:fuse",
     );
+    expect(canConfirmPendingTarget(state.pendingTargetEffect)).toBe(true);
+    expect(
+      collectSnapshotDroppedFunctionViolations(state, captureSnapshot()),
+    ).toEqual([]);
     expect(() => captureSnapshot()).not.toThrow();
   });
 });
