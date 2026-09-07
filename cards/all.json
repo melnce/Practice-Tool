@@ -20777,6 +20777,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10554110_evo.webp",
     "set": "[10005] Blossoming Fate",
     "url": "https://shadowverse.gg/cards/10554110-milteo-luzen",
+    "evolve_trigger_always": true,
     "evolve": [
       {
         "op": "destroy",

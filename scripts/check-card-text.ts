@@ -27,6 +27,7 @@ import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceSemanticsForCard } from "./enhance-semantics-gate.js";
 import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
 import { checkBothLeadersForCard } from "./both-leaders-gate.js";
+import { checkWhenThisEvolvesForCard } from "./when-this-evolves-gate.js";
 import { loadCardsForGates, type CardJson } from "./lib/loadCards.js";
 import {
   getImplementationStatus,
@@ -1593,6 +1594,9 @@ function main() {
   const gateRandomEnemyIncludeLeader =
     process.argv.includes("--gate=random-enemy-include-leader") ||
     process.argv.includes("--gate=random_enemy_include_leader");
+  const gateWhenThisEvolves =
+    process.argv.includes("--gate=when-this-evolves") ||
+    process.argv.includes("--gate=when_this_evolves");
   const gateMode =
     gateAddToHand ||
     gateStatOp ||
@@ -1603,7 +1607,8 @@ function main() {
     gateEnhanceSemantics ||
     gateAllAlliedIncludeSelf ||
     gateBothLeaders ||
-    gateRandomEnemyIncludeLeader;
+    gateRandomEnemyIncludeLeader ||
+    gateWhenThisEvolves;
 
   const files = loadCardsForGates(setArg);
   const allIssues: Issue[] = [];
@@ -1637,7 +1642,9 @@ function main() {
                       ? "🔍 Checking both-leaders ↔ all:leader contracts...\n"
                       : gateRandomEnemyIncludeLeader
                         ? "🔍 Checking random-enemy include_leader contracts...\n"
-                        : "🔍 Checking card description ↔ JSON structure...\n",
+                        : gateWhenThisEvolves
+                          ? "🔍 Checking when-this-follower-evolves contracts...\n"
+                          : "🔍 Checking card description ↔ JSON structure...\n",
   );
 
   for (const { card, sourceFile } of files) {
@@ -1662,6 +1669,8 @@ function main() {
         allIssues.push(...checkBothLeadersForCard(card).map(tagIssue));
       if (gateRandomEnemyIncludeLeader)
         allIssues.push(...checkRandomEnemyIncludeLeader(card).map(tagIssue));
+      if (gateWhenThisEvolves)
+        allIssues.push(...checkWhenThisEvolvesForCard(card).map(tagIssue));
     } else {
       if (isCantPlaySpellExempt(card)) {
         cantPlayExemptCount += 1;
@@ -1763,7 +1772,9 @@ function main() {
                     ? `✅ ${cardCount} cards — Enhance semantics contracts hold.\n`
                     : gateAllAlliedIncludeSelf
                       ? `✅ ${cardCount} cards — all-allied-followers stat ops include self.\n`
-                      : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
+                      : gateWhenThisEvolves
+                        ? `✅ ${cardCount} cards — when-this-evolves contracts hold.\n`
+                        : `✅ ${cardCount} cards — no description/JSON mismatches found.\n`,
     );
   } else {
     const setFiles = new Set(
