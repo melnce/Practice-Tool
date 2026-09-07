@@ -1,0 +1,18 @@
+[
+  {
+    "cardId": "10221120",
+    "reason": "Nightshadow Ninja Master — appears nowhere in tests (no id, no name match)."
+  },
+  {
+    "cardId": "10143110",
+    "reason": "Genesis Dragon Reborn — referenced by name in audit commentary only; zero asserting-block subjects."
+  },
+  {
+    "cardId": "10144120",
+    "reason": "Forte, Blackwing Dragoon — id appears in e2e filler setup only; name too short for title match; zero subjects."
+  },
+  {
+    "cardId": "10021130",
+    "reason": "Centaur Centurion — id in many deck/filler tests; never named in an asserting-block title."
+  }
+]
