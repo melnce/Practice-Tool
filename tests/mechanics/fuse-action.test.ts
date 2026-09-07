@@ -102,6 +102,11 @@ describe.each([
 
     undo(dispatch);
     expect(state.pendingTargetEffect).toBeDefined();
+    expect(state.pendingTargetEffect?.picksAreCommitted).toBe(true);
+    expect(state.pendingTargetEffect?.targetUids).toEqual([filler.uid]);
+
+    undo(dispatch);
+    expect(state.pendingTargetEffect).toBeDefined();
     expect(state.pendingTargetEffect?.targetUids).toEqual([]);
 
     undo(dispatch);

@@ -12,7 +12,10 @@ import { hashGameState } from "../core/stateHash.js";
 import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
-import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
+import {
+  forceCompleteOrFizzlePendingTarget,
+  executeConfirmedPendingTargets,
+} from "../logic/core/resolveTarget.js";
 import { playCard } from "../logic/core/playCard/index.js";
 import type { PlayOutcome } from "../logic/core/playCard/types.js";
 import {
@@ -396,12 +399,6 @@ export function getLegalSoakActions(): SoakAction[] {
     const selectedCount = selected.size;
     const forcedFirst = selectedCount === 0 ? getForcedFirstPicks(pending) : [];
 
-    // Once a confirm hook is armed, finish the selection — never toggle forever.
-    if (confirmHook && selectedCount > 0) {
-      return [{ type: "CONFIRM_TARGETS" }];
-    }
-
-    // Only offer unselected, still-present targets (avoid toggle loops).
     const stillPresent = new Set<string>();
     for (const p of ["first", "second"] as const) {
       for (const zone of ["hand", "board"] as const) {
@@ -411,6 +408,24 @@ export function getLegalSoakActions(): SoakAction[] {
       }
     }
 
+    const hasMoreToPick = poolUids.some(
+      (uid) =>
+        !!uid &&
+        !selected.has(uid) &&
+        stillPresent.has(uid) &&
+        (forcedFirst.length === 0 || forcedFirst.includes(uid)),
+    );
+
+    // Non-confirm prompts: once hook is armed, finish — never toggle forever.
+    if (confirmHook && selectedCount > 0 && !pending.requiresConfirmation) {
+      return [{ type: "CONFIRM_TARGETS" }];
+    }
+
+    if (pending.requiresConfirmation && selectedCount > 0 && !hasMoreToPick) {
+      return [{ type: "CONFIRM_TARGETS" }];
+    }
+
+    // Only offer unselected, still-present targets (avoid toggle loops).
     for (const uid of poolUids) {
       if (!uid || selected.has(uid)) continue;
       if (!stillPresent.has(uid)) continue;
@@ -437,6 +452,9 @@ export function getLegalSoakActions(): SoakAction[] {
 
     // Stuck: no remaining selectable targets — force-complete or fizzle.
     if (actions.length === 0 && !confirmHook) {
+      if (pending.requiresConfirmation && selectedCount > 0) {
+        return [{ type: "CONFIRM_TARGETS" }];
+      }
       actions.push({ type: "FORCE_COMPLETE_PENDING" });
     }
 
@@ -1488,6 +1506,8 @@ function applySoakAction(
       const fn = confirmHook;
       confirmHook = null;
       fn();
+    } else {
+      executeConfirmedPendingTargets();
     }
     return;
   }

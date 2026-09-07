@@ -46,10 +46,21 @@ function getRequiredSelectCount(pending: any): number {
     : 1;
 }
 
-function isMultiPickHandDiscard(pending: {
-  picksAreCommitted?: boolean;
-}): boolean {
+function hasCommittedPicks(pending: { picksAreCommitted?: boolean }): boolean {
   return pending.picksAreCommitted === true;
+}
+
+function isMultiPickHandDiscardOp(pending: {
+  eff?: { op?: string };
+  op?: string;
+}): boolean {
+  const topOp = String((pending as { op?: string }).op ?? "");
+  const effOp = String(pending.eff?.op ?? "");
+  return (
+    topOp === "discard_select_hand" ||
+    effOp === "discard" ||
+    effOp === "discard_select_hand"
+  );
 }
 
 function applyMultiPickDiscardPick(pending: any, uid: string): void {
@@ -101,6 +112,47 @@ function completeMultiPickDiscardPending(pending: any): void {
   settleTargetedOpResolutionQueue();
 
   adapter.render();
+}
+
+function resolveCommittedConfirmTarget(pending: any, uid: string | "leader") {
+  const previewPending = {
+    ...pending,
+    targetUids: [...(pending.targetUids ?? [])],
+  };
+  const preview = applyTargetClick(state, previewPending, uid);
+  if (preview.kind === "invalid") {
+    if (preview.reason) console.warn(preview.reason);
+    return;
+  }
+
+  const op = (pending.eff as { op?: string })?.op;
+  const actionName =
+    preview.kind === "execute" ? "Resolve Targets" : "Pick Target";
+
+  doAction(
+    actionName,
+    () => {
+      const result = applyTargetClick(state, pending, uid);
+      if (result.kind === "execute") {
+        orchestrateExecution(result.opCtx);
+      } else if (result.kind === "confirm_needed") {
+        showConfirmationButton(pending);
+      } else if (result.kind === "continue") {
+        if (pending.pool?.length) {
+          highlightSelectable(pending.pool);
+        } else {
+          clearSelectableFlags();
+        }
+      }
+    },
+    {
+      op,
+      owner: pending.owner,
+      source: pending.sourceCard?.name,
+      uid,
+    },
+    { autoRender: true },
+  );
 }
 
 function resolveMultiPickHandDiscardTarget(
@@ -181,8 +233,12 @@ export function resolvePendingTarget(uid: string | "leader") {
   const pending = state.pendingTargetEffect;
   if (!pending) return;
 
-  if (isMultiPickHandDiscard(pending)) {
-    resolveMultiPickHandDiscardTarget(pending, uid);
+  if (hasCommittedPicks(pending)) {
+    if (isMultiPickHandDiscardOp(pending)) {
+      resolveMultiPickHandDiscardTarget(pending, uid);
+    } else {
+      resolveCommittedConfirmTarget(pending, uid);
+    }
     return;
   }
 
@@ -384,69 +440,78 @@ export function forceCompleteOrFizzlePendingTarget(): void {
 }
 
 // Internal UI helper
-function showConfirmationButton(pending: any) {
-  const onConfirm = () => {
-    const targetUids = pending.targetUids || [];
+export function executeConfirmedPendingTargets(): void {
+  const pending = state.pendingTargetEffect;
+  if (!pending) return;
 
-    // Guard: only enforce minimum selectCount if explicitly flagged (e.g., Ralmia)
-    // Most selections (fuse, etc.) use selectCount as a soft max, not a required min
-    if (pending.enforceMinSelectCount) {
-      const requiredCount =
-        typeof pending.selectCount === "number" &&
-        Number.isFinite(pending.selectCount) &&
-        pending.selectCount > 0
-          ? pending.selectCount
-          : 1;
+  const targetUids = pending.targetUids || [];
 
-      if (targetUids.length < requiredCount) {
-        console.warn(
-          `[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`,
-        );
-        return; // Don't execute, keep selecting
-      }
+  if ((pending as { enforceMinSelectCount?: boolean }).enforceMinSelectCount) {
+    const requiredCount =
+      typeof pending.selectCount === "number" &&
+      Number.isFinite(pending.selectCount) &&
+      pending.selectCount > 0
+        ? pending.selectCount
+        : 1;
+
+    if (targetUids.length < requiredCount) {
+      console.warn(
+        `[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`,
+      );
+      return;
     }
+  }
 
-    doAction(
-      "Confirm Targets",
-      () => {
-        // Build UID-only opCtx
-        const opCtx: TargetedOpContext = {
-          eff: pending.eff,
-          owner: pending.owner,
-          sourceCard: pending.sourceCard,
-          targetUids,
-          resumeEffects: pending.resumeEffects,
-        };
+  doAction(
+    "Confirm Targets",
+    () => {
+      const opCtx: TargetedOpContext = {
+        eff: pending.eff,
+        owner: pending.owner,
+        sourceCard: pending.sourceCard,
+        targetUids,
+        resumeEffects: pending.resumeEffects,
+      };
 
-        // Log with resolved targets for debugging
-        const resolvedTargets = resolveUids(targetUids);
-        logEvent("targetsConfirmed", {
-          op: opCtx.eff.op,
-          owner: opCtx.owner,
-          source: opCtx.sourceCard?.name,
-          sourceUid: opCtx.sourceCard?.uid,
-          targetUids,
-          targets: resolvedTargets.map((t) => ({
-            name: t?.name,
-            uid: t?.uid,
-            type: t?.type,
-          })),
-        });
+      const resolvedTargets = resolveUids(targetUids);
+      logEvent("targetsConfirmed", {
+        op: opCtx.eff.op,
+        owner: opCtx.owner,
+        source: opCtx.sourceCard?.name,
+        sourceUid: opCtx.sourceCard?.uid,
+        targetUids,
+        targets: resolvedTargets.map((t) => ({
+          name: t?.name,
+          uid: t?.uid,
+          type: t?.type,
+        })),
+      });
 
-        orchestrateExecution(opCtx);
-      },
-      {
-        op: pending?.eff?.op,
-        owner: pending?.owner,
-        source: pending?.sourceCard?.name,
-      },
-      { autoRender: true },
-    );
-  };
+      orchestrateExecution(opCtx);
+    },
+    {
+      op: pending?.eff?.op,
+      owner: pending?.owner,
+      source: pending?.sourceCard?.name,
+    },
+    { autoRender: true },
+  );
+}
 
+/** Re-show confirm UI after undo/redo when committed picks survive on pending. */
+export function resyncPendingTargetConfirmation(): void {
+  const pending = state.pendingTargetEffect;
+  if (!pending?.requiresConfirmation) return;
+  if (!Array.isArray(pending.targetUids) || pending.targetUids.length === 0) {
+    return;
+  }
+  showConfirmationButton(pending);
+}
+
+function showConfirmationButton(pending: any) {
   const vm = {
     pending,
-    onConfirm,
+    onConfirm: executeConfirmedPendingTargets,
     text: pending.confirmationText || "Confirm Selection",
     count: Array.isArray(pending.targetUids) ? pending.targetUids.length : 0,
   };

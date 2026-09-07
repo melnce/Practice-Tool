@@ -109,7 +109,7 @@ describe.each([
     expect(state.players.first.hand[0]?.id).toBe(STRIKER_ARTIFACT);
   });
 
-  it("one Confirm Targets undo step per prompt; undo reopens with no picks", () => {
+  it("one Confirm Targets undo step per prompt; undo reopens with committed pick", () => {
     const commits: string[] = [];
     const unsub = onHistoryEvent((ev) => {
       if (ev.type === "commit") commits.push(ev.name);
@@ -126,6 +126,7 @@ describe.each([
     chooseTarget(dispatch, "first", remembrance.uid);
     confirmOnClick!();
 
+    expect(commits.filter((n) => n === "Pick Target")).toHaveLength(1);
     expect(commits.filter((n) => n === "Confirm Targets")).toHaveLength(1);
     expect(state.pendingTargetEffect).toBeUndefined();
 
@@ -133,7 +134,8 @@ describe.each([
     unsub();
 
     expect(state.pendingTargetEffect).toBeDefined();
-    expect(state.pendingTargetEffect?.targetUids).toEqual([]);
+    expect(state.pendingTargetEffect?.picksAreCommitted).toBe(true);
+    expect(state.pendingTargetEffect?.targetUids).toEqual([remembrance.uid]);
     expect(state.pendingTargetEffect?.eff).toMatchObject({
       op: "fuse",
       type: "gear_multi",
