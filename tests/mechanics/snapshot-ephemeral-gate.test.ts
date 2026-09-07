@@ -202,6 +202,28 @@ describe("snapshot ephemeral gate enforcement", () => {
     );
   });
 
+  it("throws when playSequenceDepth > 0 at commit without pause", () => {
+    beginAction("leak");
+    (state as any).playSequenceDepth = 2;
+    expect(() => commitAction({ autoRender: false })).toThrow(
+      /playSequenceDepth=2/,
+    );
+  });
+
+  it("playSequenceDepth > 0 is allowed at commit when isEffectResolutionPaused()", () => {
+    beginAction("paused play");
+    (state as any).playSequenceDepth = 1;
+    state.pendingModeChoice = {
+      owner: "first",
+      optionCount: 2,
+      selectCount: 1,
+      options: [{ label: "a" }, { label: "b" }],
+      partialPickedIndices: [],
+    };
+    expect(collectSnapshotEphemeralViolations()).toEqual([]);
+    commitAction({ autoRender: false });
+  });
+
   it("may_be_set: deferDeathTriggers does not trip the gate when legitimately true", () => {
     beginAction("defer");
     (state as any).deferDeathTriggers = true;

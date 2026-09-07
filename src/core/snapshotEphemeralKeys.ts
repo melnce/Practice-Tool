@@ -13,4 +13,5 @@ export const INTERNAL_CACHE_KEYS = new Set([
   "_drainingResolutionQueue",
   "__resolutionDrainDepth",
   "playSequenceDepth",
+  "_stagedPlayEnterGroups",
 ]);

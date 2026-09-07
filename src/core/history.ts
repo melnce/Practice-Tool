@@ -128,6 +128,8 @@ export const SNAPSHOT_EPHEMERAL_MUST_BE_DEFAULT: Readonly<
  * Snapshot-dropped keys allowed to be non-default at commit, with reason.
  */
 export const SNAPSHOT_EPHEMERAL_MAY_BE_SET: Readonly<Record<string, string>> = {
+  _stagedPlayEnterGroups:
+    "Populated during an active play sequence before endPlaySequenceDrain; excluded from snapshots and cleared on restore.",
   _runEffectsDepth:
     "A paused commit can occur inside nested runEffects (mode-picker confirm). The counter describes a call stack that does not survive restore; resumption re-enters from a fresh top-level dispatch through resumeEffects, so restoring at 0 is correct.",
   deferDeathTriggers:
@@ -634,6 +636,7 @@ function resetEphemeralStateAfterRestore(): void {
   (state as any).__resolutionDrainDepth = 0;
   (state as any)._triggerCache = null;
   (state as any).playSequenceDepth = 0;
+  delete (state as any)._stagedPlayEnterGroups;
   delete (state as any)._reactiveCollector;
   resetTriggerChainDepth();
   endDispatch();
