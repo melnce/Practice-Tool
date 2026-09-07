@@ -20,7 +20,11 @@ import { loadPool, type PoolCard } from "../card-behaviour.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "../..");
-export const BASELINE_PATH = path.join(ROOT, "baselines", "card-behaviour.json");
+export const BASELINE_PATH = path.join(
+  ROOT,
+  "baselines",
+  "card-behaviour.json",
+);
 
 /** Cards whose play fingerprints were wrong before per-card harness reset (#324). */
 export const SENSITIVE_CORE_IDS = [
@@ -108,7 +112,8 @@ function compareScenarioFingerprints(
 ): IsolationMismatch[] {
   const mismatches: IsolationMismatch[] = [];
   if (actual.status === "skipped") {
-    if ("status" in expected && expected.status === "skipped") return mismatches;
+    if ("status" in expected && expected.status === "skipped")
+      return mismatches;
     mismatches.push({
       cardId,
       cardName,
@@ -126,9 +131,7 @@ function compareScenarioFingerprints(
       ? expected
       : expected.status === "skipped"
         ? null
-        : new Map(
-            expected.scenarios.map((s) => [s.scenario, s.fingerprint]),
-          );
+        : new Map(expected.scenarios.map((s) => [s.scenario, s.fingerprint]));
 
   if (!expectedMap) {
     mismatches.push({
@@ -155,8 +158,9 @@ function compareScenarioFingerprints(
   }
 
   for (const [scenario, expFp] of expectedMap) {
-    const actFp = actual.scenarios.find((s) => s.scenario === scenario)
-      ?.fingerprint;
+    const actFp = actual.scenarios.find(
+      (s) => s.scenario === scenario,
+    )?.fingerprint;
     if (actFp !== expFp) {
       mismatches.push({
         cardId,
@@ -190,7 +194,9 @@ export function driveCardAlone(raw: PoolCard): CardDriveResult {
 }
 
 /** Drive the full pool in catalog order (same as cards:verify). */
-export function drivePoolOrdered(pool: PoolCard[]): Map<string, CardDriveResult> {
+export function drivePoolOrdered(
+  pool: PoolCard[],
+): Map<string, CardDriveResult> {
   const results = new Map<string, CardDriveResult>();
   for (const raw of pool) {
     results.set(String(raw.id), driveCard(raw, { isToken: !!raw.token }));
@@ -204,7 +210,9 @@ export function loadCommittedBaseline(): BehaviourBaseline {
       `No baseline at ${BASELINE_PATH}. Run: npm run cards:baseline`,
     );
   }
-  return JSON.parse(fs.readFileSync(BASELINE_PATH, "utf-8")) as BehaviourBaseline;
+  return JSON.parse(
+    fs.readFileSync(BASELINE_PATH, "utf-8"),
+  ) as BehaviourBaseline;
 }
 
 export function checkCardIsolation(
@@ -262,8 +270,7 @@ export function runBaselineIsolationCheck(
   const pool = opts.pool ?? loadPool();
   const baseline = opts.baseline ?? loadCommittedBaseline();
   const sampleIds =
-    opts.sampleIds ??
-    selectIsolationSampleIds(pool.map((c) => String(c.id)));
+    opts.sampleIds ?? selectIsolationSampleIds(pool.map((c) => String(c.id)));
   const byId = new Map(pool.map((c) => [String(c.id), c]));
 
   const started = performance.now();
@@ -298,7 +305,7 @@ export function runBaselineIsolationCheck(
 export function formatIsolationMismatch(m: IsolationMismatch): string {
   const prefix =
     m.kind === "baseline"
-      ? "isolated run differs from committed baseline"
+      ? "isolated run differs from committed baseline (harness state may be leaking between cards, or the baseline is stale or hand-edited)"
       : "pool-order run differs from isolated run (harness state is leaking between cards)";
   return `${m.cardId} ${m.cardName} scenario=${m.scenario}: expected ${m.expected}, got ${m.actual} — ${prefix}`;
 }

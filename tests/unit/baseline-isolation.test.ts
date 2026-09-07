@@ -16,7 +16,7 @@ import { initCardDatabaseNode } from "../../src/data/cardLoaderNode.js";
 
 beforeAll(() => {
   (globalThis as any).HEADLESS = true;
-  initCardDatabaseNode();
+  void initCardDatabaseNode();
 });
 
 describe("baseline isolation sample", () => {
@@ -33,9 +33,7 @@ describe("baseline isolation sample", () => {
   });
 
   it("is deterministic for a fixed seed", () => {
-    const poolIds = Array.from({ length: 200 }, (_, i) =>
-      String(10000000 + i),
-    );
+    const poolIds = Array.from({ length: 200 }, (_, i) => String(10000000 + i));
     const a = selectIsolationSampleIds(poolIds, { seed: 42, targetSize: 25 });
     const b = selectIsolationSampleIds(poolIds, { seed: 42, targetSize: 25 });
     expect(a).toEqual(b);
@@ -122,5 +120,7 @@ describe("baseline isolation gate failure path", () => {
     const msg = formatIsolationMismatch(mismatch);
     expect(msg).toContain("10274120");
     expect(msg).toMatch(/committed baseline/i);
+    expect(msg).toMatch(/stale or hand-edited/i);
+    expect(msg).toMatch(/leaking between cards/i);
   });
 });

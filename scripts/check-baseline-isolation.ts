@@ -15,7 +15,9 @@ import {
 } from "./lib/baselineIsolation.js";
 
 function main(): void {
-  console.log("Checking baseline isolation (order-independent fingerprints)...\n");
+  console.log(
+    "Checking baseline isolation (order-independent fingerprints)...\n",
+  );
   initCardDatabaseNode();
 
   const report = runBaselineIsolationCheck();
@@ -29,9 +31,7 @@ function main(): void {
     process.exit(0);
   }
 
-  console.error(
-    `\n❌ ${report.mismatches.length} isolation mismatch(es) — harness state may be leaking between cards:\n`,
-  );
+  console.error(`\n❌ ${report.mismatches.length} isolation mismatch(es):\n`);
   for (const m of report.mismatches) {
     console.error(`  ${formatIsolationMismatch(m)}`);
   }
