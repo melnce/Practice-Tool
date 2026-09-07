@@ -92,13 +92,17 @@ describe.each([
       player: "first",
       target: { type: "card", uid: filler.uid },
     });
-    expect(confirmOnClick).toBeTypeOf("function");
-    confirmOnClick!();
+    dispatch(state, { type: "CONFIRM_TARGETS" });
 
     expect(sephie.isFused).toBe(true);
     expect(getHand(state, "first").some((c) => c.uid === filler.uid)).toBe(
       false,
     );
+
+    undo(dispatch);
+    expect(state.pendingTargetEffect).toBeDefined();
+    expect(state.pendingTargetEffect?.picksAreCommitted).toBe(true);
+    expect(state.pendingTargetEffect?.targetUids).toEqual([filler.uid]);
 
     undo(dispatch);
     expect(state.pendingTargetEffect).toBeDefined();
