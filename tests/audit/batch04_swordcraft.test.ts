@@ -23,9 +23,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
@@ -146,7 +151,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
       cmd,
     );
     expect(cmd.attack).toBe(2);
-    onEvolve(cmd, "first", "normal");
+    whenEvolve(cmd, "first");
     expect(thenBoard("first").some((c) => c.name === "Knight")).toBe(true);
   });
 
@@ -190,7 +195,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     sq.peak_defense = sq.defense;
     state.players.first.board = [sq];
     expect(sq.hasAmbush).toBe(true);
-    onEvolve(sq, "first", "normal");
+    whenEvolve(sq, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Shinobi Squirrel").length,
     ).toBe(2);
@@ -233,7 +238,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     const zir = createCard("10123130", "board", "first");
     zir.peak_defense = zir.defense;
     state.players.first.board = [ally, zir];
-    onEvolve(zir, "first", "normal");
+    whenEvolve(zir, "first");
     expect(thenBoard("first").filter((c) => c.name === "Knight").length).toBe(
       2,
     );
@@ -346,7 +351,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     kag2.peak_defense = kag2.defense;
     state.players.first.board = [kag2];
     state.players.first.superEvoPoints = 1;
-    onEvolve(kag2, "first", "super");
+    whenSuperEvolve(kag2, "first");
     expect(kag2.hasStorm).toBe(true);
   });
 });
@@ -398,7 +403,7 @@ describe("Batch 4 — Swordcraft [10002] Infinity Evolved", () => {
     expect(thenHand("first").some((c) => c.type === "Spell")).toBe(true);
     const rack = findOnBoard("first", "Rackhir, Ordinary Knight")!;
     const ppBefore = state.players.first.pp;
-    onEvolve(rack, "first", "normal");
+    whenEvolve(rack, "first");
     expect(state.players.first.pp).toBe(ppBefore + 2);
   });
 
@@ -454,7 +459,7 @@ describe("Batch 4 — Swordcraft [10002] Infinity Evolved", () => {
     prim.peak_defense = prim.defense;
     state.players.first.board = [ally, prim];
     state.players.first.superEvoPoints = 1;
-    onEvolve(prim, "first", "super");
+    whenSuperEvolve(prim, "first");
     expect(ally.attack).toBe(3);
   });
 
@@ -563,7 +568,7 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
       "first",
     );
     state.players.first.board.push(ally);
-    onEvolve(scout, "first", "normal");
+    whenEvolve(scout, "first");
     resolvePendingTarget(ally.uid);
     expect(ally.attack).toBe(4);
     expect(ally.defense).toBe(4);
@@ -625,7 +630,7 @@ describe("Batch 4 — Swordcraft [10004] Skybound Dragons", () => {
     arthur.peak_defense = arthur.defense;
     state.players.first.board = [arthur];
     expect(arthur.hasWard).toBe(true);
-    onEvolve(arthur, "first", "normal");
+    whenEvolve(arthur, "first");
     expect(
       thenBoard("first").some((c) => c.name === "Mordred, Illusory Lion"),
     ).toBe(true);
@@ -638,7 +643,7 @@ describe("Batch 4 — Swordcraft [10004] Skybound Dragons", () => {
     mord.peak_defense = mord.defense;
     state.players.first.board = [mord];
     expect(mord.hasStorm).toBe(true);
-    onEvolve(mord, "first", "normal");
+    whenEvolve(mord, "first");
     expect(
       thenBoard("first").some((c) => c.name === "Arthur, Staunch Dragon"),
     ).toBe(true);

@@ -17,9 +17,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { attackFollower, attackLeader } from "../../src/logic/core/combat.js";
 import { endTurnBlue, endTurnRed } from "../../src/logic/core/turns.js";
@@ -295,7 +300,7 @@ describe("L2 — Antemaria Dragoncraft", () => {
       discardHandCard("first", FILLER);
       const kimika = findOnBoard("first", "Kimika, Cook of Happiness")!;
       const hpAfterFanfare = getHP(state, "first");
-      onEvolve(kimika, "first", "normal");
+      whenEvolve(kimika, "first");
       discardHandCard("first", DRAW_TOP);
       expect(getHP(state, "first")).toBe(hpAfterFanfare + 1);
       expect(handIds()).toContain(DRAW_THIRD);
@@ -362,7 +367,7 @@ describe("L2 — Antemaria Dragoncraft", () => {
       state.players.first.evoCharges = 2;
       whenPlayCard("first", 0);
       const vor = findOnBoard("first", "Vorlalai, Eld Blades")!;
-      onEvolve(vor, "first", "normal");
+      whenEvolve(vor, "first");
       expect(handIds()).toContain(DEPTHS_BLADES);
       expect(
         thenHand("first").filter((c) => c.id === DEPTHS_BLADES),
@@ -375,7 +380,7 @@ describe("L2 — Antemaria Dragoncraft", () => {
       state.players.first.superEvoPoints = 1;
       whenPlayCard("first", 0);
       const vor = findOnBoard("first", "Vorlalai, Eld Blades")!;
-      onEvolve(vor, "first", "super");
+      whenSuperEvolve(vor, "first");
       expect(
         thenHand("first").filter((c) => c.id === DEPTHS_BLADES),
       ).toHaveLength(3);
@@ -510,7 +515,7 @@ describe("L2 — Antemaria Dragoncraft", () => {
       const spellDef = Number(spell.defense ?? 0);
       whenPlayCard("first", 0);
       const wyvern = findOnBoard("first", "Carrier Wyvern")!;
-      onEvolve(wyvern, "first", "normal");
+      whenEvolve(wyvern, "first");
       resolvePendingByUid(follower.uid);
       expect(Number(follower.attack)).toBe(4);
       expect(Number(follower.defense)).toBe(3);

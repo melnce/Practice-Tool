@@ -17,9 +17,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -517,14 +522,14 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const ally = allyFollower(1, 1, "Bystander");
       whenPlayCard("first", 0);
       const lt = findOnBoard("first", "Virid Lieutenant")!;
-      onEvolve(lt, "first", "normal", { spendPoint: true });
+      whenEvolve(lt, "first");
       resolveFirstPending();
       expect(Number(ally.attack)).toBe(2);
       expect(Number(ally.defense)).toBe(2);
       expect(ally.hasRush).toBe(true);
-      expect(Number(lt.attack)).toBe(1);
-      expect(Number(lt.defense)).toBe(3);
-      expect(lt.hasRush).toBeFalsy();
+      expect(Number(lt.attack)).toBe(3);
+      expect(Number(lt.defense)).toBe(5);
+      expect(lt.hasRush).toBe(false);
       expect(printed).toContain("another allied follower");
     });
   });
@@ -559,7 +564,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const maga = findOnBoard("first", "Magachiyo, Aromatic Convict")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(maga, "first", "super");
+      whenSuperEvolve(maga, "first");
       expect(maga.hasStorm).toBe(true);
       expect(printed).toContain("Storm");
     });
@@ -611,7 +616,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const miroku = findOnBoard("first", "Miroku, Swarmpetal")!;
       const uidsBeforeEvolve = handUids();
       setScriptedModePickProvider(() => [0]);
-      onEvolve(miroku, "first", "normal", { spendPoint: true });
+      whenEvolve(miroku, "first");
       setScriptedModePickProvider(null);
       expect(newHandCards(uidsBeforeEvolve, "first", FAIRY)).toHaveLength(2);
       expect(newHandCards(uidsBeforeFanfare, "first", FAIRY)).toHaveLength(4);
@@ -733,7 +738,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
-      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEvolve(thestae, "first");
       const crest = getCrests(state, "first").find((c) =>
         c.name.includes("Thestae"),
       );
@@ -759,7 +764,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
-      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEvolve(thestae, "first");
       state.players.first.playsThisTurn = 3;
       whenEndTurn();
       expect(Number(deckF.attack)).toBe(3);
@@ -780,7 +785,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
-      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEvolve(thestae, "first");
       state.players.first.playsThisTurn = 2;
       whenEndTurn();
       expect(Number(deckF.attack)).toBe(2);
@@ -804,7 +809,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
-      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEvolve(thestae, "first");
       state.players.first.playsThisTurn = 3;
       whenEndTurn();
       expect(Number(deckF.attack)).toBe(3);
@@ -844,7 +849,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
-      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEvolve(thestae, "first");
       whenEndTurn();
       expect(state.activePlayer).toBe("second");
       playCardNoRender(getHand(state, "second"), "second", 0);
@@ -866,7 +871,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
-      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEvolve(thestae, "first");
       expect(
         getCrests(state, "first").some((c) => c.name.includes("Thestae")),
       ).toBe(true);
@@ -922,7 +927,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(hart, "first", "super");
+      whenSuperEvolve(hart, "first");
       const crest = getCrests(state, "first").find((c) =>
         c.name.includes("Great Hart"),
       );
@@ -939,7 +944,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(hart, "first", "super");
+      whenSuperEvolve(hart, "first");
       const uidsBeforeEot = handUids();
       state.players.first.playsThisTurn = 3;
       whenEndTurn();
@@ -955,7 +960,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(hart, "first", "super");
+      whenSuperEvolve(hart, "first");
       const uidsBeforeEot = handUids();
       state.players.first.playsThisTurn = 2;
       whenEndTurn();
@@ -976,7 +981,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(hart, "first", "super");
+      whenSuperEvolve(hart, "first");
       whenEndTurn();
       expect(state.activePlayer).toBe("second");
       const uidsBeforeOpponentEot = handUids();
@@ -999,7 +1004,7 @@ describe("L2 Thestae Forestcraft — real-card tests", () => {
       const hart = findOnBoard("first", "Great Hart of the Glacial Realm")!;
       state.players.first.superEvoPoints = 1;
       state.players.first.superEvoCharges = 1;
-      onEvolve(hart, "first", "super");
+      whenSuperEvolve(hart, "first");
       expect(
         getCrests(state, "first").some((c) => c.name.includes("Great Hart")),
       ).toBe(true);

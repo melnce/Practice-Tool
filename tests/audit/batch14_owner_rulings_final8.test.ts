@@ -13,6 +13,11 @@ import {
   findOnBoard,
   whenEndTurn,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import {
@@ -25,7 +30,7 @@ import {
 } from "../../src/core/playerHelpers.js";
 import { getImplementationStatus } from "../../src/data/cardImplementationStatus.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { runStartOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { tickCrests } from "../../src/logic/effects/crest.js";
@@ -154,7 +159,7 @@ describe("Owner rulings — final 8", () => {
       const goddess = createCard("10502110", "board", "first");
       state.players.first.board = [goddess];
 
-      onEvolve(goddess, "first", "normal", { spendPoint: true });
+      whenEvolve(goddess, "first");
       // Discard Drop1/2/3 (indices 5,6,7 at start — after pending pool is full hand)
       // Pending pool is current hand; pick last three by resolving their uids.
       const hand = getHand(state, "first");
@@ -232,7 +237,7 @@ describe("Owner rulings — final 8", () => {
       const atkAfterFanfare = Number(wolf.attack);
       expect(atkAfterFanfare).toBeGreaterThanOrEqual(2);
 
-      onEvolve(wolf, "first", "normal", { spendPoint: true });
+      whenEvolve(wolf, "first");
       const hand = getHand(state, "first");
       expect(hand.length).toBe(5);
       const names = new Set(hand.map((c) => c.name));
@@ -366,7 +371,7 @@ describe("Owner rulings — final 8", () => {
       state.players.second.board = [foe];
       const behemoth = createCard("10502120", "board", "first");
       state.players.first.board = [behemoth];
-      onEvolve(behemoth, "first", "normal", { spendPoint: true });
+      whenEvolve(behemoth, "first");
       expect(getBoard(state, "second").length).toBe(0);
     });
   });
@@ -517,7 +522,7 @@ describe("Owner rulings — final 8", () => {
       expect(getPlaysThisTurn(state, "first")).toBeGreaterThanOrEqual(1);
       // Combo counter bumped — playsThisTurn is separate; check crest path via evolve
       const thestae = findOnBoard("first", "Thestae, Anathema of Distortion")!;
-      onEvolve(thestae, "first", "normal", { spendPoint: true });
+      whenEvolve(thestae, "first");
       expect(
         getCrests(state, "first").some((c) => c.name.includes("Thestae")),
       ).toBe(true);

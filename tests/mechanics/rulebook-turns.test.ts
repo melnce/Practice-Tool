@@ -15,6 +15,11 @@ import {
   thenBoard,
   thenDeck,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state, resetGameState } from "../../src/core/gameState.js";
 import * as effectsIndex from "../../src/logic/core/effects/index.js";
 import { drawCard } from "../../src/core/utils.js";
@@ -35,7 +40,9 @@ import {
 } from "../../src/core/playerHelpers.js";
 import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
 import { summonNamed } from "../../src/logic/effects/ops/summon_ops/direct.js";
-import { canEvolve, onEvolve } from "../../src/logic/evolveUtils.js";
+import { canEvolve } from "../../src/logic/evolveUtils.js";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- onEvolve-direct: skipEffects bookkeeping tests isolate EP spend without stat buffs
+import { onEvolve } from "../../src/logic/evolveUtils.js";
 import {
   runEndOfTurnBoundary,
   runStartOfTurnBoundary,
@@ -689,7 +696,7 @@ describe("Rulebook L165–168 / L186–187 — Evolution points", () => {
     const card = readyFollower("first");
     state.players.first.board = [card];
     setEvoCharges(state, "first", 2);
-    onEvolve(card, "first", "normal", { spendPoint: false, skipEffects: true });
+    whenEffectEvolve(card, "first", "normal");
     expect(card.hasEvolved).toBe(true);
     expect(state.players.first.evoCharges).toBe(2);
     expect(canEvolve("first", card, "normal")).toBe(false);

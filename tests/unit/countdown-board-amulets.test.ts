@@ -12,9 +12,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { resetGameState, state } from "../../src/core/gameState.js";
 import { handleCountdown } from "../../src/logic/effects/ops/countdown/unified.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import "../../src/logic/core/effects/index.js";
 
 const DREAD_PIRATE_FLAG = "90021210";
@@ -165,7 +170,7 @@ describe("board-amulet countdown op", () => {
     const ringB = ringsAmulet(1);
     whenPlayCard("first", 0);
     const rodeo = findOnBoard("first", "Rodeo, Anathema of Adjudication")!;
-    onEvolve(rodeo, "first", "normal", { spendPoint: true });
+    whenEvolve(rodeo, "first");
 
     const rings = thenBoard("first").filter((c) => c.id === RINGS_OF_MOONLIGHT);
     expect(rings).toHaveLength(3);

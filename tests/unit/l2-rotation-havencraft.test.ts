@@ -17,9 +17,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
@@ -297,7 +302,7 @@ describe("L2 — Rotation Havencraft", () => {
       const target = enemyFollower(2, 5, "Target");
       const bystander = enemyFollower(2, 5, "Bystander");
       const tikoh = findOnBoard("first", "Tikoh, Asclepian Surgeon")!;
-      onEvolve(tikoh, "first", "normal", { spendPoint: true });
+      whenEvolve(tikoh, "first");
       resolvePendingByUid(target.uid);
       expect(Number(target.defense)).toBe(2);
       expect(Number(bystander.defense)).toBe(5);
@@ -372,7 +377,7 @@ describe("L2 — Rotation Havencraft", () => {
       setupTurn(R6, { hand: [LAMRETTA], pp: 2, evo: 2 });
       whenPlayCard("first", 0);
       const lam = findOnBoard("first", "Lamretta, Sisterly Shepherd")!;
-      onEvolve(lam, "first", "normal", { spendPoint: true });
+      whenEvolve(lam, "first");
       expect(
         lam.cantAttack ||
           lam.keywordState?.cantAttack ||
@@ -629,7 +634,7 @@ describe("L2 — Rotation Havencraft", () => {
       resolvePendingByUid(first.uid);
       const priest = findOnBoard("first", "Prescient Priestess")!;
       const second = enemyFollower(1, 4, "Second");
-      onEvolve(priest, "first", "normal", { spendPoint: true });
+      whenEvolve(priest, "first");
       resolvePendingByUid(second.uid);
       expect(Number(second.defense)).toBe(2);
     });
@@ -676,7 +681,7 @@ describe("L2 — Rotation Havencraft", () => {
       const legal = enemyLastWordsFollower("Legal");
       const tank = enemyFollower(4, 4, "Tank");
       state.players.first.board = [priest];
-      onEvolve(priest, "first", "normal", { spendPoint: true });
+      whenEvolve(priest, "first");
       resolvePendingByUid(legal.uid);
       expect(getBanish(state, "second").some((c) => c.uid === legal.uid)).toBe(
         true,
@@ -693,7 +698,7 @@ describe("L2 — Rotation Havencraft", () => {
       enemyFollower(2, 3, "B");
       const tank = enemyFollower(4, 4, "Tank");
       state.players.first.board = [priest];
-      onEvolve(priest, "first", "super", { spendPoint: true });
+      whenSuperEvolve(priest, "first");
       expect(getBoard(state, "second").map((c) => c.uid)).toEqual([tank.uid]);
       expect(printed).toContain("Super-Evolve");
     });
@@ -726,7 +731,7 @@ describe("L2 — Rotation Havencraft", () => {
       const damaged = enemyFollower(2, 1, "Damaged");
       damaged.peak_defense = 3;
       const healthy = enemyFollower(3, 3, "Healthy");
-      onEvolve(sara, "first", "normal", { spendPoint: true });
+      whenEvolve(sara, "first");
       resolvePendingByUid(damaged.uid);
       cleanupDead();
       expect(findOnBoard("second", "Damaged")).toBeFalsy();
@@ -785,7 +790,7 @@ describe("L2 — Rotation Havencraft", () => {
       const sophia = createCard(SOPHIA, "board", "first");
       const ally = allyFollower(1, 1, "BarrierAlly");
       state.players.first.board = [sophia, ally];
-      onEvolve(sophia, "first", "super", { spendPoint: true });
+      whenSuperEvolve(sophia, "first");
       expect(ally.hasBarrier || ally.keywordState?.hasBarrier).toBe(true);
       expect(sophia.hasBarrier || sophia.keywordState?.hasBarrier).toBeFalsy();
     });
@@ -841,7 +846,7 @@ describe("L2 — Rotation Havencraft", () => {
       resolvePendingByUid(first.uid);
       const winged = findOnBoard("first", "Winged Warrior")!;
       const second = allyFollower(2, 2, "SecondAlly");
-      onEvolve(winged, "first", "normal", { spendPoint: true });
+      whenEvolve(winged, "first");
       resolvePendingByUid(second.uid);
       expect(Number(second.attack)).toBe(3);
       expect(Number(second.defense)).toBe(3);
@@ -871,7 +876,7 @@ describe("L2 — Rotation Havencraft", () => {
       cleanupDead();
       const grant = findOnBoard("first", "Grant, Hunter of Undeath")!;
       const second = enemyFollower(2, 4, "Second");
-      onEvolve(grant, "first", "normal", { spendPoint: true });
+      whenEvolve(grant, "first");
       resolvePendingByUid(second.uid);
       cleanupDead();
       expect(findOnBoard("second", "Second")).toBeFalsy();
@@ -916,7 +921,7 @@ describe("L2 — Rotation Havencraft", () => {
       whenPlayCard("first", 0);
       const saint = findOnBoard("first", "Saint of Rehabilitation")!;
       const hpAfterFanfare = getHP(state, "first");
-      onEvolve(saint, "first", "normal", { spendPoint: true });
+      whenEvolve(saint, "first");
       expect(getHP(state, "first")).toBe(hpAfterFanfare + 1);
     });
 
@@ -928,7 +933,7 @@ describe("L2 — Rotation Havencraft", () => {
       whenPlayCard("first", 0);
       const saint = findOnBoard("first", "Saint of Rehabilitation")!;
       expect(getHP(state, "first")).toBe(14);
-      onEvolve(saint, "first", "super", { spendPoint: true });
+      whenSuperEvolve(saint, "first");
       expect(getHP(state, "first")).toBe(16);
     });
   });
@@ -962,7 +967,7 @@ describe("L2 — Rotation Havencraft", () => {
       enemyFollower(2, 5, "B");
       whenPlayCard("first", 0);
       const missionary = findOnBoard("first", "Missionary of Recruitment")!;
-      onEvolve(missionary, "first", "normal", { spendPoint: true });
+      whenEvolve(missionary, "first");
       expect(
         getBoard(state, "second").every((c) => Number(c.defense) === 3),
       ).toBe(true);
@@ -984,7 +989,7 @@ describe("L2 — Rotation Havencraft", () => {
       setupTurn(R8, { hand: [PEGASUS_RIDER], pp: 6, evo: 2 });
       whenPlayCard("first", 0);
       const rider = findOnBoard("first", "Pegasus Rider")!;
-      onEvolve(rider, "first", "normal", { spendPoint: true });
+      whenEvolve(rider, "first");
       expect(boardCountById(HOLY_FALCON)).toBe(2);
     });
   });
@@ -1034,7 +1039,7 @@ describe("L2 — Rotation Havencraft", () => {
       const bystander = enemyFollower(2, 4, "Bystander");
       whenPlayCard("first", 0);
       const crusader = findOnBoard("first", "Worshipful Crusader")!;
-      onEvolve(crusader, "first", "normal", { spendPoint: true });
+      whenEvolve(crusader, "first");
       resolvePendingByUid(target.uid);
       cleanupDead();
       expect(findOnBoard("second", "Target")).toBeFalsy();
@@ -1098,7 +1103,7 @@ describe("L2 — Rotation Havencraft", () => {
       const target = enemyFollower(2, 4, "Target");
       whenPlayCard("first", 0);
       const edeth = findOnBoard("first", "Edeth, Voice of Heaven")!;
-      onEvolve(edeth, "first", "super", { spendPoint: true });
+      whenSuperEvolve(edeth, "first");
       resolvePendingByUid(target.uid);
       cleanupDead();
       expect(findOnBoard("second", "Target")).toBeFalsy();
@@ -1137,7 +1142,7 @@ describe("L2 — Rotation Havencraft", () => {
       state.players.first.board.push(ringA, ringB);
       whenPlayCard("first", 0);
       const rodeo = findOnBoard("first", "Rodeo, Anathema of Adjudication")!;
-      onEvolve(rodeo, "first", "normal", { spendPoint: true });
+      whenEvolve(rodeo, "first");
       const rings = thenBoard("first").filter((c) => c.id === RINGS_MOONLIGHT);
       const delayed = rings.filter((c) => Number(c.countdown) === 2);
       const untouched = rings.filter((c) => Number(c.countdown) === 1);

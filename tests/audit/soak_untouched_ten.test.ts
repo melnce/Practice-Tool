@@ -15,8 +15,13 @@ import {
   thenHand,
   thenBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
@@ -152,7 +157,7 @@ describe("Soak-untouched ten — proof of work", () => {
     );
     expect(puppets.length).toBe(3);
     const liam = findOnBoard("first", "Liam, Crazed Creator")!;
-    onEvolve(liam, "first", "normal");
+    whenEvolve(liam, "first");
     for (const p of puppets) {
       expect(p.hasWard || p.keywordState?.hasWard).toBe(true);
       expect(p.hasLastWords || p.keywordState?.hasLastWords).toBe(true);
@@ -189,7 +194,7 @@ describe("Soak-untouched ten — proof of work", () => {
 
     state.players.first.superEvoPoints = 1;
     state.players.first.superEvoCharges = 1;
-    onEvolve(bm, "first", "super");
+    whenSuperEvolve(bm, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Beloved Masterpiece").length,
     ).toBe(2);
@@ -236,7 +241,7 @@ describe("Soak-untouched ten — proof of work", () => {
     expect(crest!.countdown).toBe(2);
     state.players.first.superEvoPoints = 1;
     state.players.first.superEvoCharges = 1;
-    onEvolve(elder, "first", "super");
+    whenSuperEvolve(elder, "first");
     const crestAfter = (getCrests(state, "first") || []).find(
       (c) => c.name === "Dragon's Vale Elder",
     );
@@ -265,7 +270,7 @@ describe("Soak-untouched ten — proof of work", () => {
     );
     // Prefer: fire via ally_spell_played by playing a 1-cost spell if available
     // Fallback assertion via evolve
-    onEvolve(katze, "first", "normal");
+    whenEvolve(katze, "first");
     expect(thenHand("first").some((c) => c.name === "Glittering Gold")).toBe(
       true,
     );
@@ -291,7 +296,7 @@ describe("Soak-untouched ten — proof of work", () => {
     cleanupDead();
     state.players.first.superEvoPoints = 1;
     state.players.first.superEvoCharges = 1;
-    onEvolve(mars, "first", "super");
+    whenSuperEvolve(mars, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Knight").length,
     ).toBeGreaterThanOrEqual(3);

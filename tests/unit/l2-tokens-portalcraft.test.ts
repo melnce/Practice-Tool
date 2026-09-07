@@ -16,9 +16,14 @@ import {
   thenHand,
   thenBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -399,7 +404,7 @@ describe("L2 Portalcraft tokens — real-card tests", () => {
       const imari = thenBoard("first").find(
         (c) => c.name === "Imari, Dewdrop",
       )!;
-      onEvolve(imari, "first", "normal", { spendPoint: true });
+      whenEvolve(imari, "first");
       const before = uidSet("first", "board");
       const spellIdx = getHand(state, "first").findIndex(
         (c) => c.id === SPELL_1A,

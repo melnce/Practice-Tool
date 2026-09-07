@@ -24,9 +24,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { fireTrigger } from "../../src/logic/core/triggers.js";
@@ -172,7 +177,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     const carb = findOnBoard("first", "Baby Carbuncle")!;
     const ppBefore = state.players.first.pp;
     state.players.first.superEvoPoints = 1;
-    onEvolve(carb, "first", "super");
+    whenSuperEvolve(carb, "first");
     expect(state.players.first.pp).toBeGreaterThan(ppBefore);
   });
 
@@ -221,7 +226,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     resolveFirstPending();
     expect(e.defense).toBe(1);
     const lily = findOnBoard("first", "Lily, Crystalian Innocence")!;
-    onEvolve(lily, "first", "normal");
+    whenEvolve(lily, "first");
     if (state.pendingTargetEffect) resolveFirstPending();
     expect(thenHand("first").length).toBeGreaterThan(0);
   });
@@ -236,7 +241,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     expect(thenHand("first").length).toBeGreaterThan(2);
     const glade = findOnBoard("first", "Glade, Fragrantwood Ward")!;
     enemyFollower(5);
-    onEvolve(glade, "first", "normal");
+    whenEvolve(glade, "first");
     expect(state.players.second.board[0]!.defense).toBeLessThan(5);
   });
 
@@ -290,7 +295,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
         .filter((c) => c.name === "Fairy")
         .map((c) => c.uid),
     );
-    onEvolve(aria, "first", "normal", { spendPoint: true });
+    whenEvolve(aria, "first");
     const newFairiesFromEvolve = thenBoard("first").filter(
       (c) => c.name === "Fairy" && !fairyUidsBeforeEvolve.has(c.uid),
     );
@@ -306,7 +311,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
         .filter((c) => c.name === "Fairy")
         .map((c) => c.uid),
     );
-    onEvolve(ariaSe, "first", "super");
+    whenSuperEvolve(ariaSe, "first");
     const newFairiesFromSe = thenBoard("first").filter(
       (c) => c.name === "Fairy" && !fairyUidsBeforeSe.has(c.uid),
     );
@@ -369,7 +374,7 @@ describe("Batch 6 — Forestcraft [10002] Infinity Evolved", () => {
     const cynthia = findOnBoard("first", "Cynthia, Chivalrous Elf")!;
     const fairy = thenBoard("first").find((c) => c.name === "Fairy")!;
     if (fairy) fairy.tribes = ["Pixie"];
-    onEvolve(cynthia, "first", "normal");
+    whenEvolve(cynthia, "first");
     expect(fairy!.attack).toBeGreaterThan(1);
   });
 
@@ -381,7 +386,7 @@ describe("Batch 6 — Forestcraft [10002] Infinity Evolved", () => {
       getCrests(state, "first").some((c) => c.name?.includes("Titania")),
     ).toBe(true);
     const titania = findOnBoard("first", "Titania, Queen of Fairies")!;
-    onEvolve(titania, "first", "normal");
+    whenEvolve(titania, "first");
     if (state.pendingTargetEffect) resolveFirstPending();
     expect(state.players.second.board.some((c) => c.name === "Fairy")).toBe(
       true,
@@ -462,7 +467,7 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     resolveFirstPending();
     expect(e.defense).toBe(2);
     const iz = findOnBoard("first", "Izudia, Annihilation Manifest")!;
-    onEvolve(iz, "first", "normal");
+    whenEvolve(iz, "first");
     expect(
       thenHand("first").some((c) => c.name === "Annihilating Onslaught"),
     ).toBe(true);
@@ -575,7 +580,7 @@ describe("Batch 6 — Forestcraft [10004] Skybound Dragons", () => {
     yuel.peak_defense = yuel.defense;
     state.players.first.board = [yuel];
     state.players.first.superEvoPoints = 1;
-    onEvolve(yuel, "first", "super");
+    whenSuperEvolve(yuel, "first");
     expect(
       getCrests(state, "first").some((c) => c.name?.includes("Yuel")),
     ).toBe(true);

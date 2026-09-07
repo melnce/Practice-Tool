@@ -1,7 +1,11 @@
 // src/bench/soakDecks.ts
 // Deck regimes for engine soak: shipped pairings + seeded random legal decks.
 
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { createRng, type RNG } from "../core/rng.js";
+import { shippedDeckIds, type DeckManifest } from "../data/deckManifest.js";
 import {
   REFERENCE_COPY_LIMIT,
   REFERENCE_DECK_SIZE,
@@ -11,25 +15,24 @@ import { getGlobalCardIndex } from "../data/cardIndex.js";
 import { saveImportedDeck } from "../data/importedDeckStore.js";
 import { loadMainPoolIds } from "./soakCoverage.js";
 
-export const SHIPPED_DECK_IDS = [
-  "aggro_abysscraft",
-  "amulet_havencraft",
-  "antemaria_dragoncraft",
-  "artifact_portalcraft",
-  "barbaros_swordcraft",
-  "buff_forestcraft",
-  "cutthroat_portalcraft",
-  "evolution_forestcraft",
-  "evolution_havencraft",
-  "kukishiro_havencraft",
-  "lhynkal_runecraft",
-  "midrange_abysscraft",
-  "rally_swordcraft",
-  "ramp_dragoncraft",
-  "sephie_runecraft",
-  "spell_runecraft",
-  "thestae_forestcraft",
-] as const;
+function loadShippedDeckIds(): readonly string[] {
+  const root = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "../..",
+  );
+  const manifestPath = path.join(root, "decks/manifest.json");
+  const manifest = JSON.parse(
+    fs.readFileSync(manifestPath, "utf-8"),
+  ) as DeckManifest;
+  const ids = shippedDeckIds(manifest);
+  if (ids.length === 0) {
+    throw new Error("[soakDecks] No shipped decks in decks/manifest.json");
+  }
+  return ids;
+}
+
+/** Shipped deck ids for soak pairings — derived from decks/manifest.json (category deck). */
+export const SHIPPED_DECK_IDS: readonly string[] = loadShippedDeckIds();
 
 /**
  * Cards the uniform random soak historically never touched (high cost and/or

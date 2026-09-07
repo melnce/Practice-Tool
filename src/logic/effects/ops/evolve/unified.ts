@@ -342,10 +342,6 @@ function applyEvolution(
   // Swap to evolved image
   if (card.evo_image) card.base_image = card.evo_image;
 
-  // Grant rush (or keep storm active)
-  if (!card.hasStorm) {
-    card.hasRush = true;
-  }
   recomputeAttackFlags(card);
 
   logEvent("evolve", {

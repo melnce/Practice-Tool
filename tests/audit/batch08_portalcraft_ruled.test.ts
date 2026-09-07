@@ -14,8 +14,13 @@ import {
   thenBoard,
   whenEndTurn,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
@@ -104,7 +109,7 @@ describe("B/C — replicate fanfare (10172120, 10173110, 10271110)", () => {
       (c) => c.name === "Puppet",
     ).length;
     const card = findOnBoard("first", "Lovestruck Puppeteer")!;
-    onEvolve(card, "first", "normal");
+    whenEvolve(card, "first");
     expect(
       thenHand("first").filter((c) => c.name === "Puppet").length,
     ).toBeGreaterThan(puppets0);
@@ -117,7 +122,7 @@ describe("B/C — replicate fanfare (10172120, 10173110, 10271110)", () => {
       /Gear of/.test(c.name ?? ""),
     ).length;
     const miriam = findOnBoard("first", "Miriam, the Resolute")!;
-    onEvolve(miriam, "first", "normal");
+    whenEvolve(miriam, "first");
     expect(
       thenHand("first").filter((c) => /Gear of/.test(c.name ?? "")).length,
     ).toBeGreaterThan(gears0);
@@ -130,7 +135,7 @@ describe("B/C — replicate fanfare (10172120, 10173110, 10271110)", () => {
       (c) => c.name === "Striker Artifact",
     ).length;
     const maven = findOnBoard("first", "Engineblade Maven")!;
-    onEvolve(maven, "first", "normal");
+    whenEvolve(maven, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Striker Artifact").length,
     ).toBeGreaterThan(strikers0);
@@ -205,7 +210,7 @@ describe("B/C — Liam / Alouette / Karula artifact hand (10173130, 10173140, 10
     setupTurn(R6, { hand: ["10173140", "90072110"], pp: 5 });
     whenPlayCard("first", 0);
     const alouette = findOnBoard("first", "Alouette, Doomwright Ward")!;
-    onEvolve(alouette, "first", "normal");
+    whenEvolve(alouette, "first");
     expect(
       thenBoard("first").filter((c) => c.name === "Striker Artifact").length,
     ).toBe(1);
@@ -352,7 +357,7 @@ describe("B/C — Achim banish copy (10272120)", () => {
     const foe = enemyFollower(3, 3);
     whenPlayCard("first", 0);
     const achim = findOnBoard("first", "Achim, Lord of Despair")!;
-    onEvolve(achim, "first", "normal");
+    whenEvolve(achim, "first");
     resolvePendingTarget(foe.uid);
     expect(getBoard(state, "second")).toHaveLength(0);
     expect(thenBoard("first").some((c) => c.name === "Enemy")).toBe(true);
@@ -370,7 +375,7 @@ describe("B/C — Carnelia hand buff (10273110)", () => {
     setupTurn(R6, { hand: ["10273110", "90072110"], pp: 5 });
     whenPlayCard("first", 0);
     const carn = findOnBoard("first", "Carnelia, Ember of Darkness")!;
-    onEvolve(carn, "first", "normal");
+    whenEvolve(carn, "first");
     const striker = thenHand("first").find(
       (c) => c.name === "Striker Artifact",
     )!;
@@ -499,7 +504,7 @@ describe("B/C — Destruction line (10371110, 10372110, 10372210, 10373110, 1037
     const hp0 = getHP(state, "second");
     whenPlayCard("first", 0);
     const axia = findOnBoard("first", "Axia, Heir to Destruction")!;
-    onEvolve(axia, "first", "super");
+    whenSuperEvolve(axia, "first");
     expect(getHP(state, "second")).toBe(hp0 - 1);
     expect(thenBoard("first").length).toBe(1);
     expect(thenBoard("first").some((c) => c.name === "Ally")).toBe(false);
@@ -512,7 +517,7 @@ describe("B/C — Destruction line (10371110, 10372110, 10372210, 10373110, 1037
       true,
     );
     const lish = findOnBoard("first", "Lishenna, Melody Manifest")!;
-    onEvolve(lish, "first", "normal");
+    whenEvolve(lish, "first");
     expect(
       thenBoard("first").some((c) => c.name === "White Psalm, New Revelation"),
     ).toBe(true);

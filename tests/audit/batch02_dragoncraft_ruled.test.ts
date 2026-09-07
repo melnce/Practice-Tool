@@ -12,9 +12,14 @@ import {
   whenEndTurn,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { dealDamage } from "../../src/logic/core/barrier.js";
 import { applyLeaderDamage } from "../../src/logic/effects/leader.js";
@@ -178,14 +183,14 @@ describe("Owner ruling — Mari (10441120)", () => {
     )!;
     const base = mari.cost;
 
-    onEvolve(liu, "first", "super");
+    whenSuperEvolve(liu, "first");
     expect(getEffectiveCost(mari)).toBe(0);
 
     const liu2 = createCard("10143120", "board", "first");
     liu2.uid = "liu2";
     liu2.peak_defense = liu2.defense;
     state.players.first.board.push(liu2);
-    onEvolve(liu2, "first", "super");
+    whenSuperEvolve(liu2, "first");
     expect(getEffectiveCost(mari)).toBe(0);
     expect(base).toBeGreaterThan(0);
   });
@@ -202,7 +207,7 @@ describe("Owner ruling — Mari (10441120)", () => {
     )!;
     expect(getEffectiveCost(mari)).toBe(2);
 
-    onEvolve(liu, "first", "super");
+    whenSuperEvolve(liu, "first");
     expect(getEffectiveCost(mari)).toBe(0);
 
     whenEndTurn();
@@ -218,7 +223,7 @@ describe("Owner ruling — Mari (10441120)", () => {
 
     const superGuy = createCard("10042110", "board", "first");
     superGuy.peak_defense = superGuy.defense;
-    onEvolve(superGuy, "first", "super");
+    whenSuperEvolve(superGuy, "first");
     expect(superGuy.evoType).toBe("super");
 
     const plainA = createCard(
@@ -264,7 +269,7 @@ describe("Owner ruling — Mari (10441120)", () => {
     setupTurn(7);
     const oldSuper = createCard("10042110", "board", "first");
     oldSuper.peak_defense = oldSuper.defense;
-    onEvolve(oldSuper, "first", "super");
+    whenSuperEvolve(oldSuper, "first");
     expect(oldSuper.evoType).toBe("super");
 
     const plain = createCard(

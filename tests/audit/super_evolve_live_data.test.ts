@@ -10,8 +10,13 @@ import {
   resetUidCounter,
   thenHand,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { onEvolve, resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
+import { resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { getBoard, getHand } from "../../src/core/playerHelpers.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
@@ -50,7 +55,7 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
     expect(leah.evolve?.length).toBeGreaterThan(0);
 
     const handBefore = thenHand("first").length;
-    onEvolve(leah, "first", "super");
+    whenSuperEvolve(leah, "first");
     expect(thenHand("first").length).toBe(handBefore + 1);
   });
 
@@ -65,7 +70,7 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
     amorous.peak_defense = amorous.defense;
     state.players.first.board = [amorous];
 
-    onEvolve(amorous, "first", "normal");
+    whenEvolve(amorous, "first");
     const normalGhosts = getBoard(state, "first").filter(
       (c) => c.name === "Ghost",
     );
@@ -77,7 +82,7 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
     amorous2.peak_defense = amorous2.defense;
     state.players.first.board = [amorous2];
 
-    onEvolve(amorous2, "first", "super");
+    whenSuperEvolve(amorous2, "first");
     const superGhosts = getBoard(state, "first").filter(
       (c) => c.name === "Ghost",
     );
@@ -100,7 +105,7 @@ describe("§747 live data — super-evolve after dedup (all.json)", () => {
 
     expect(resolveEvolveEffects(velharia, "super")).toHaveLength(2);
 
-    onEvolve(velharia, "first", "super");
+    whenSuperEvolve(velharia, "first");
     expect(state.pendingTargetEffect).toBeDefined();
     resolveFirstPendingPoolTarget();
 
@@ -140,7 +145,7 @@ describe("Replicate op — live fanfare re-execution", () => {
     expect(Number(ally1.attack)).toBe(3);
     expect(Number(ally2.attack)).toBe(2);
 
-    onEvolve(winged, "first", "normal");
+    whenEvolve(winged, "first");
     expect(state.pendingTargetEffect).toBeDefined();
     resolvePendingTarget(String(ally2.uid));
     expect(Number(ally2.attack)).toBe(3);
@@ -169,7 +174,7 @@ describe("Replicate op — live fanfare re-execution", () => {
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(Number(enemy.defense)).toBe(2);
 
-    onEvolve(apollo, "first", "normal");
+    whenEvolve(apollo, "first");
     expect(state.pendingTargetEffect).toBeUndefined();
     expect(Number(enemy.defense)).toBe(1);
   });

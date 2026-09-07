@@ -12,11 +12,16 @@ import {
   thenHand,
   thenBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { runEffects } from "../../src/logic/core/effects/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve, resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
+import { resolveEvolveEffects } from "../../src/logic/evolveUtils.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { getSkyboundArtGauge } from "../../src/logic/effects/skybound.js";
 import { fuse_finalize_gardens_allure } from "../../src/logic/effects/ops/fuse/fuse.forest.js";
@@ -81,7 +86,7 @@ describe("B/C — Capricious Sprite replicate fanfare on Evolve (10111120)", () 
     const sprite = findOnBoard("first", "Capricious Sprite")!;
     const handBefore = thenHand("first").length;
     const boardBefore = thenBoard("first").length;
-    onEvolve(sprite, "first", "normal");
+    whenEvolve(sprite, "first");
     expect(thenBoard("first").length).toBeGreaterThan(boardBefore);
     expect(thenHand("first").length).toBeGreaterThan(handBefore);
   });
@@ -160,7 +165,7 @@ describe("B/C — Amataz Pixie hand scaling (10114130)", () => {
     state.players.second.board = [enemy];
     state.players.first.superEvoPoints = 1;
     const defBefore = Number(enemy.defense);
-    onEvolve(amataz, "first", "super");
+    whenSuperEvolve(amataz, "first");
     // 2 Pixies in hand → 2 damage total (not 4 if evolve+superevolve both fired)
     expect(defBefore - Number(enemy.defense)).toBe(2);
     expect(resolveEvolveEffects(amataz, "super").length).toBe(1);
@@ -183,7 +188,7 @@ describe("B/C — Fairy Fencer hand activation (10212120)", () => {
     state.players.first.hand = [fencer];
     state.players.first.board = [ally];
     state.players.first.superEvoPoints = 1;
-    onEvolve(ally, "first", "super");
+    whenSuperEvolve(ally, "first");
     expect(Number(fencer.cost)).toBe(1);
   });
 });
@@ -239,7 +244,7 @@ describe("B/C — Lymaga debuff + Super-Evolve (10214120)", () => {
     const e = enemyFollower(5);
     state.players.first.board = [lym];
     state.players.first.superEvoPoints = 1;
-    onEvolve(lym, "first", "super");
+    whenSuperEvolve(lym, "first");
     resolveFirstPending();
     const pendingSuper = state.pendingTargetEffect;
     const bleedUid =
@@ -264,7 +269,7 @@ describe("B/C — Devotee / Supplicant replicate (10311110, 10312110)", () => {
     whenPlayCard("first", 0);
     resolveFirstPending();
     const dev = findOnBoard("first", "Devotee of Unkilling")!;
-    onEvolve(dev, "first", "normal");
+    whenEvolve(dev, "first");
     resolveFirstPending();
     expect(e.defense).toBeLessThan(3);
   });
@@ -276,7 +281,7 @@ describe("B/C — Devotee / Supplicant replicate (10311110, 10312110)", () => {
     expect(e.defense).toBe(3);
     const sup = findOnBoard("first", "Supplicant of Unkilling")!;
     state.players.first.superEvoPoints = 1;
-    onEvolve(sup, "first", "super");
+    whenSuperEvolve(sup, "first");
     expect(e.defense).toBe(0);
   });
 });
@@ -340,7 +345,7 @@ describe("B/C — Krulle Ambush + crest on Super (10314110)", () => {
     applyKeywordsFromList(kr);
     state.players.first.board = [kr];
     state.players.first.superEvoPoints = 1;
-    onEvolve(kr, "first", "super");
+    whenSuperEvolve(kr, "first");
     expect(
       getCrests(state, "second").some((c) => c.name?.includes("Krulle")),
     ).toBe(true);

@@ -12,11 +12,16 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
 import { dispatch } from "../../src/engine.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { handleCountdown } from "../../src/logic/effects/ops/countdown/unified.js";
 import {
   getPP,
@@ -188,7 +193,7 @@ describe("gate is_ally on selected_matches", () => {
     const kandima = findOnBoard("first", "Kandima, Sublime Hatred")!;
     state.players.first.superEvoPoints = 1;
     state.players.first.superEvoCharges = 1;
-    onEvolve(kandima, "first", "super");
+    whenSuperEvolve(kandima, "first");
     chooseTarget(foeAmulet.uid);
     expect(foe.defense).toBe(6);
   });
@@ -201,7 +206,7 @@ describe("gate is_ally on selected_matches", () => {
     const kandima = findOnBoard("first", "Kandima, Sublime Hatred")!;
     state.players.first.superEvoPoints = 1;
     state.players.first.superEvoCharges = 1;
-    onEvolve(kandima, "first", "super");
+    whenSuperEvolve(kandima, "first");
     chooseTarget(ally.uid);
     expect(state.__lastSelected?.uid).toBe(ally.uid);
     expect(foe.defense).toBe(3);

@@ -20,7 +20,9 @@ const ROOT = path.resolve(
 
 const KEYWORD_MAP_KEYS = Object.keys(KEYWORD_MAP).sort();
 
-/** Keywords whose runtime state is hashed via canonicalizeCard boolean flags. */
+import { STATE_HASH_STATIC_EFFECT_EXCLUSIONS } from "../../src/core/stateHash.js";
+
+/** Keywords whose mutable runtime state is hashed via canonicalizeCard. */
 const STATE_HASH_CANONICAL: Record<string, string> = {
   rush: "hasRush",
   storm: "hasStorm",
@@ -29,39 +31,42 @@ const STATE_HASH_CANONICAL: Record<string, string> = {
   bane: "hasBane",
   drain: "hasDrain",
   barrier: "hasBarrier",
+  max_damage_cap: "maxDamageCap",
+  intimidate: "hasIntimidate",
+  ambush: "hasAmbush",
+  banish_on_death: "banishOnDeath",
+  countdown: "hasCountdown",
+  aura: "hasAura",
+  taunt: "hasTaunt",
+  last_words: "hasLastWords",
+  cant_be_destroyed: "cannotBeDestroyed",
+  rally: "hasRally",
+  fanfare: "hasFanfare",
+  strike: "hasStrike",
+  engage: "engagedThisTurn",
+  spellboost: "hasSpellboost",
+  counter: "keywordRuntime",
+  pixie_enter: "hasPixieEnter",
+  bleed: "hasBleed",
+  ally_enter: "hasAllyEnter",
+  cant_attack: "cantAttack",
 };
 
 /**
- * Keywords that write to keywordState and/or non-hashed CardInstance fields.
- * canonicalizeCard ignores keywordState entirely — replay/undo/soak can diverge.
- * Fix tracked separately; do not add entries here to silence a new keyword permanently.
+ * Keywords whose runtime state is not hashed — static card data or intentional no-ops.
+ * Mutable markers for these keywords are in STATE_HASH_CANONICAL; effect arrays are in
+ * STATE_HASH_STATIC_EFFECT_EXCLUSIONS.
  */
 export const STATE_HASH_EXEMPTIONS: Record<string, string> = {
-  max_damage_cap: "keywordState.maxDamageCap not in canonicalizeCard",
-  intimidate: "hasIntimidate / keywordState.hasIntimidate not hashed",
-  ambush:
-    "hasAmbush not in canonicalizeCard (memoization tracks it for UI only)",
-  banish_on_death: "keywordState.banishOnDeath not hashed",
-  countdown: "card.countdown / hasCountdown not hashed",
-  aura: "hasAura not hashed",
-  taunt: "hasTaunt not hashed",
-  last_words: "hasLastWords / lastWordsEffects not hashed",
-  cant_be_destroyed: "keywordState.cannotBeDestroyed not hashed",
-  trigger: "keywordState.triggers / card.triggers not hashed",
-  rally: "keywordState rally fields not hashed",
-  fanfare: "marker keyword; fanfare[] ops hashed separately via card state",
-  strike: "keywordState.strikeEffects not hashed",
-  engage: "keywordState engage fields / hasEngage not hashed",
-  enhance: "enhanceTiers on card not hashed",
-  accelerate: "accelerateTiers on card not hashed",
-  crystallize: "crystallizeTiers on card not hashed",
-  spellboost: "keywordState.spellboost* not hashed",
-  counter: "card.counters hashed but keywordState.counters may diverge",
-  skybound_art: "intentional no-op handler",
-  pixie_enter: "keywordState.pixieEnterEffects not hashed",
-  bleed: "keywordState.bleed not hashed",
-  ally_enter: "keywordState.allyEnterEffects not hashed",
-  cant_attack: "keywordState cant-attack lock fields not hashed",
+  trigger:
+    "static trigger definitions only; triggers[] excluded by design (see STATE_HASH_STATIC_EFFECT_EXCLUSIONS)",
+  enhance:
+    "enhanceTiers are static card data; tier selection is play-time, not hashed",
+  accelerate:
+    "accelerateTiers are static card data; alternate form is play-time, not hashed",
+  crystallize:
+    "crystallizeTiers are static card data; alternate form is play-time, not hashed",
+  skybound_art: "intentional no-op handler; no runtime state to hash",
 };
 
 /** Evergreen keywords that only strip from keywords[] in remove.ts (no flag branch). */
@@ -319,6 +324,14 @@ describe("keyword registration checklist", () => {
   });
 
   it("documents exemption count for PR audits", () => {
-    expect(Object.keys(STATE_HASH_EXEMPTIONS).length).toBe(24);
+    expect(Object.keys(STATE_HASH_EXEMPTIONS).length).toBe(5);
+  });
+
+  it("STATE_HASH_STATIC_EFFECT_EXCLUSIONS documents every excluded effect array", () => {
+    expect(STATE_HASH_STATIC_EFFECT_EXCLUSIONS.triggers).toBeDefined();
+    expect(STATE_HASH_STATIC_EFFECT_EXCLUSIONS.enhanceTiers).toBeDefined();
+    expect(STATE_HASH_STATIC_EFFECT_EXCLUSIONS.accelerateTiers).toBeDefined();
+    expect(STATE_HASH_STATIC_EFFECT_EXCLUSIONS.crystallizeTiers).toBeDefined();
+    expect(STATE_HASH_STATIC_EFFECT_EXCLUSIONS.lastWordsEffects).toBeDefined();
   });
 });

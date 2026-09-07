@@ -14,9 +14,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import "../../src/logic/core/effects/index.js";
@@ -99,7 +104,7 @@ describe("negative-space filters — defense bound (≤3)", () => {
     const priest = createCard("10062110", "board", "first");
     priest.peak_defense = priest.defense;
     state.players.first.board = [priest];
-    onEvolve(priest, "first", "normal");
+    whenEvolve(priest, "first");
     expect(poolUids()).toContain(String(fragile.uid));
     expect(poolUids()).not.toContain(String(tank.uid));
   });
@@ -152,7 +157,7 @@ describe("negative-space filters — Artifact hand (≤5 cost)", () => {
     const alouette = createCard("10173140", "board", "first");
     alouette.peak_defense = alouette.defense;
     state.players.first.board = [alouette];
-    onEvolve(alouette, "first", "normal");
+    whenEvolve(alouette, "first");
     if (state.pendingTargetEffect) {
       const pool = poolUids();
       expect(pool).not.toContain(String(costly.uid));
@@ -229,7 +234,7 @@ describe("negative-space filters — Artifact hand (≤5 cost)", () => {
     whenPlayCard("first", 0);
     const cart = findOnBoard("first", "New-Age Cartographer")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(cart, "first", "super");
+    whenSuperEvolve(cart, "first");
     const legal = thenHand("first").find((c) => c.id === "90072110")!;
     const costly = thenHand("first").find((c) => c.id === "90074110")!;
     expect(poolUids()).toContain(String(legal.uid));
@@ -250,7 +255,7 @@ describe("negative-space filters — tribe / type hand selection", () => {
     const artifact = allyFollower("StrikerOnBoard", { tribes: ["Artifact"] });
     const plain = allyFollower("PlainAlly");
     const fighter = findOnBoard("first", "Supersonic Fighter")!;
-    onEvolve(fighter, "first", "normal");
+    whenEvolve(fighter, "first");
     expect(poolUids()).toContain(String(artifact.uid));
     expect(poolUids()).not.toContain(String(plain.uid));
   });
@@ -274,7 +279,7 @@ describe("negative-space filters — tribe / type hand selection", () => {
     const spellUid = thenHand("first").find((c) => c.id === "10131310")!.uid;
     whenPlayCard("first", 0);
     const wyvern = findOnBoard("first", "Carrier Wyvern")!;
-    onEvolve(wyvern, "first", "normal");
+    whenEvolve(wyvern, "first");
     expect(poolUids()).toContain(String(followerUid));
     expect(poolUids()).not.toContain(String(spellUid));
   });
@@ -290,7 +295,7 @@ describe("negative-space filters — tribe / type hand selection", () => {
       resolvePendingTarget(poolUids()[0]!);
     }
     const suzy = findOnBoard("first", "Suzy, Sincere Hexcaster")!;
-    onEvolve(suzy, "first", "normal");
+    whenEvolve(suzy, "first");
     if (state.pendingTargetEffect) {
       resolvePendingTarget(String(follower.uid));
     }
@@ -304,7 +309,7 @@ describe("negative-space filters — tribe / type hand selection", () => {
     const follower = thenHand("first").find((c) => c.type === "Follower")!;
     whenPlayCard("first", 0);
     const priestess = findOnBoard("first", "Angelic Prism Priestess")!;
-    onEvolve(priestess, "first", "normal");
+    whenEvolve(priestess, "first");
     expect(poolUids()).toContain(String(amulet.uid));
     expect(poolUids()).not.toContain(String(follower.uid));
   });
@@ -363,7 +368,7 @@ describe("negative-space filters — unevolved selection", () => {
     whenPlayCard("first", 0);
     const olivia = findOnBoard("first", "Olivia, Heroic Dark Angel")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(olivia, "first", "super");
+    whenSuperEvolve(olivia, "first");
     expect(poolUids()).toContain(String(raw.uid));
     expect(poolUids()).not.toContain(String(evolved.uid));
     expect(poolUids()).not.toContain(String(olivia.uid));
@@ -386,7 +391,7 @@ describe("negative-space filters — unevolved selection", () => {
     const evolved = allyFollower("EvoAlly");
     evolved.hasEvolved = true;
     const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
-    onEvolve(eudie, "first", "normal");
+    whenEvolve(eudie, "first");
     expect(poolUids()).toContain(String(raw.uid));
     expect(poolUids()).not.toContain(String(evolved.uid));
     expect(poolUids()).not.toContain(String(eudie.uid));
@@ -407,7 +412,7 @@ describe("negative-space filters — Golem tribe selection", () => {
     const plain = allyFollower("PlainAlly");
     const remi = findOnBoard("first", "Remi & Rami, Two-Faced Witch")!;
     state.players.first.superEvoCharges = 1;
-    onEvolve(remi, "first", "super");
+    whenSuperEvolve(remi, "first");
     expect(poolUids()).toContain(String(golem.uid));
     expect(poolUids()).not.toContain(String(plain.uid));
   });

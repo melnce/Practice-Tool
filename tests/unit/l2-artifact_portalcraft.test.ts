@@ -17,9 +17,14 @@ import {
   thenDeck,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import {
   summonFollowerByCardId,
@@ -306,7 +311,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       setupTurn(R6, { hand: [COOL_COURIER], pp: 2, evo: 2 });
       whenPlayCard("first", 0);
       const courier = findOnBoard("first", "Cool Courier")!;
-      onEvolve(courier, "first", "normal", { spendPoint: true });
+      whenEvolve(courier, "first");
       expect(
         thenHand("first").filter((c) => c.id === ANCIENT_ARTIFACT),
       ).toHaveLength(2);
@@ -331,7 +336,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       const bystander = allyFollower(1, 1, "Bystander");
       bystander.hasEvolved = true;
       const evoBefore = getEvoCharges(state, "first");
-      onEvolve(eudie, "first", "normal", { spendPoint: true });
+      whenEvolve(eudie, "first");
       resolvePendingByUid(buddy.uid);
       expect(eudie.hasEvolved).toBe(true);
       expect(buddy.hasEvolved).toBe(true);
@@ -344,7 +349,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       setupTurn(R6, { hand: [EUDIE], pp: 2, evo: 2 });
       whenPlayCard("first", 0);
       const eudie = findOnBoard("first", "Eudie, Your Dependable Mentor")!;
-      onEvolve(eudie, "first", "normal", { spendPoint: true });
+      whenEvolve(eudie, "first");
       expect(eudie.hasEvolved).toBe(true);
       expect(state.pendingTargetEffect).toBeFalsy();
     });
@@ -381,7 +386,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
         getHand(state, "first").find((c) => c.id === FILLER)!.uid,
       );
       const imari = findOnBoard("first", "Imari, Dewdrop")!;
-      onEvolve(imari, "first", "normal", { spendPoint: true });
+      whenEvolve(imari, "first");
       const spellIdx = getHand(state, "first").findIndex(
         (c) => c.id === SPELL_1A,
       );
@@ -419,7 +424,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       );
       expect(handIds()).toContain(SPELL_2);
       const imari = findOnBoard("first", "Imari, Dewdrop")!;
-      onEvolve(imari, "first", "super", { spendPoint: true });
+      whenSuperEvolve(imari, "first");
       expect(handIds()).toContain(SPELL_1A);
       expect(handIds()).toContain(SPELL_1B);
       expect(
@@ -532,7 +537,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       setupTurn(R6, { hand: [MYUU], pp: 4, evo: 2 });
       whenPlayCard("first", 0);
       const myuu = findOnBoard("first", "Myuu, Hot on His Heels")!;
-      onEvolve(myuu, "first", "normal", { spendPoint: true });
+      whenEvolve(myuu, "first");
       expect(boardIds().filter((id) => id === ANCIENT_ARTIFACT)).toHaveLength(
         1,
       );
@@ -547,7 +552,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       ]);
       whenPlayCard("first", 0);
       const myuu = findOnBoard("first", "Myuu, Hot on His Heels")!;
-      onEvolve(myuu, "first", "super", { spendPoint: true });
+      whenSuperEvolve(myuu, "first");
       applyKeywordsFromList(myuu);
       expect(myuu.hasStorm).toBe(true);
     });
@@ -560,7 +565,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       ]);
       whenPlayCard("first", 0);
       const myuu = findOnBoard("first", "Myuu, Hot on His Heels")!;
-      onEvolve(myuu, "first", "super", { spendPoint: true });
+      whenSuperEvolve(myuu, "first");
       applyKeywordsFromList(myuu);
       expect(myuu.hasStorm).toBe(false);
     });
@@ -602,7 +607,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const asher = findOnBoard("first", "Asher & Lydia, Paths Beyond")!;
-      onEvolve(asher, "first", "normal", { spendPoint: true });
+      whenEvolve(asher, "first");
       cleanupDead();
       expect(getBoard(state, "second").length).toBe(1);
       expect(findOnBoard("second", "NoWard")).toBeTruthy();
@@ -773,7 +778,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       setupTurn(R8, { hand: [AIZEDEN], pp: 7, superEvo: 1 });
       whenPlayCard("first", 0);
       const aizeden = findOnBoard("first", "Aizeden, Killshot Revenant")!;
-      onEvolve(aizeden, "first", "super", { spendPoint: true });
+      whenSuperEvolve(aizeden, "first");
       expect(boardIds().filter((id) => id === WARDEN_TRIGGER)).toHaveLength(2);
     });
   });
@@ -808,7 +813,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const cam = findOnBoard("first", "Camiscilla, Unfeeling Heart")!;
       const hpBefore = getHP(state, "second");
-      onEvolve(cam, "first", "super", { spendPoint: true });
+      whenSuperEvolve(cam, "first");
       // Camiscilla (7) + Shoddy (6) + Substandard (5) = 3 qualifying allies
       expect(hpBefore - getHP(state, "second")).toBe(3);
     });
@@ -858,7 +863,7 @@ describe("L2 Artifact Portalcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       const ord = thenBoard("first").find((c) => c.id === LUDICROUS_ORDNANCE)!;
       const defBefore = Number(foe.defense);
-      onEvolve(ord, "first", "normal", { spendPoint: true });
+      whenEvolve(ord, "first");
       expect(defBefore - Number(foe.defense)).toBe(3);
     });
 

@@ -4,28 +4,8 @@
 !.env.example
 
 # Personal data / notes (do not track)
-decks/*
-!decks/manifest.json
-!decks/0_testing_vanilla.json
-!decks/aggro_abysscraft.json
-!decks/amulet_havencraft.json
-!decks/antemaria_dragoncraft.json
-!decks/artifact_portalcraft.json
-!decks/barbaros_swordcraft.json
-!decks/buff_forestcraft.json
-!decks/cutthroat_portalcraft.json
-!decks/evolution_forestcraft.json
-!decks/evolution_havencraft.json
-!decks/kukishiro_havencraft.json
-!decks/lhynkal_runecraft.json
-!decks/midrange_abysscraft.json
-!decks/rally_swordcraft.json
-!decks/ramp_dragoncraft.json
-!decks/sephie_runecraft.json
-!decks/spell_runecraft.json
-!decks/thestae_forestcraft.json
-!decks/meta/
-!decks/meta/**
+# Shipped decks and decks/manifest.json are tracked directly. Ignore only scratch imports.
+decks/*.local.json
 game_rules/
 
 # Node dependencies

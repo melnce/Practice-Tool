@@ -19,12 +19,17 @@ import {
   resetUidCounter,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
 import { bootstrapFaithForPlayer } from "../../src/logic/faith/bootstrap.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { endTurnBlue } from "../../src/logic/core/turns.js";
 import {
   countCrests,
@@ -142,7 +147,7 @@ describe("Mechanic Contract: Faith is not a crest for counting", () => {
 
       whenPlayCard("first", 0);
       const mar = findOnBoard("first", "Marwynn, Despair Manifest")!;
-      onEvolve(mar, "first", "normal");
+      whenEvolve(mar, "first");
       expect(countCrests(state, "first")).toBe(2);
 
       endTurnBlue();

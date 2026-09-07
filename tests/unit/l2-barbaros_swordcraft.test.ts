@@ -16,9 +16,14 @@ import {
   thenBoard,
   findOnBoard,
 } from "../harness/builders.js";
+import {
+  whenEvolve,
+  whenSuperEvolve,
+  whenEffectEvolve,
+} from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
+
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
 import { summonFollowerByCardId } from "../harness/l2Dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
@@ -306,7 +311,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       setupTurn(R6, { hand: [OPEN_SEA_SCOUT], pp: 2, evo: 2 });
       whenPlayCard("first", 0);
       const scout = findOnBoard("first", "Open-Sea Scout")!;
-      onEvolve(scout, "first", "normal", { spendPoint: true });
+      whenEvolve(scout, "first");
       expect(handIds()).toContain(GILDED_BOOTS);
       expect(printed).toContain("Gilded Boots");
     });
@@ -367,7 +372,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       const ally = allyFollower(2, 2, "Ally");
       whenPlayCard("first", 0);
       const yid = findOnBoard("first", "Yidmetra, Eld Sword")!;
-      onEvolve(yid, "first", "normal", { spendPoint: true });
+      whenEvolve(yid, "first");
       expect(
         getCrests(state, "first").find((c) => c.name === YIDMETRA_FAITH)
           ?.counters?.faith,
@@ -392,7 +397,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       const ally = allyFollower(2, 2, "Ally");
       whenPlayCard("first", 0);
       const yid = findOnBoard("first", "Yidmetra, Eld Sword")!;
-      onEvolve(yid, "first", "normal", { spendPoint: true });
+      whenEvolve(yid, "first");
       expect(
         getCrests(state, "first").find((c) => c.name === YIDMETRA_FAITH)
           ?.counters?.faith,
@@ -581,7 +586,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       resolveFirstPending();
       expect(Number(target.defense)).toBe(5);
       const mate = findOnBoard("first", "Roughwater First Mate")!;
-      onEvolve(mate, "first", "normal", { spendPoint: true });
+      whenEvolve(mate, "first");
       resolveFirstPending();
       expect(Number(target.defense)).toBe(2);
       expect(boardIds().filter((id) => id === DREAD_PIRATE_FLAG)).toHaveLength(
@@ -598,7 +603,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       const mate = findOnBoard("first", "Roughwater First Mate")!;
       state.players.first.superEvoCharges = 1;
       state.players.first.evoCharges = 2;
-      onEvolve(mate, "first", "super");
+      whenSuperEvolve(mate, "first");
       if (state.pendingTargetEffect) resolveFirstPending();
       const blade = thenHand("first").find((c) => c.id === GILDED_BLADE);
       const necklace = thenHand("first").find((c) => c.id === GILDED_NECKLACE);
@@ -638,7 +643,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const unkei = findOnBoard("first", "Unkei, Goldbloom")!;
-      onEvolve(unkei, "first", "super", { spendPoint: true });
+      whenSuperEvolve(unkei, "first");
       const crest = getCrests(state, "first").find(
         (c) => c.name === "Unkei, Goldbloom",
       );
@@ -654,7 +659,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const unkei = findOnBoard("first", "Unkei, Goldbloom")!;
-      onEvolve(unkei, "first", "super", { spendPoint: true });
+      whenSuperEvolve(unkei, "first");
       const goldBefore = thenHand("first").filter(
         (c) => c.id === GLITTERING_GOLD,
       ).length;
@@ -671,7 +676,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const unkei = findOnBoard("first", "Unkei, Goldbloom")!;
-      onEvolve(unkei, "first", "super", { spendPoint: true });
+      whenSuperEvolve(unkei, "first");
       whenEndTurn(); // owner EOT — may add gold
       const goldAfterOwner = thenHand("first").filter(
         (c) => c.id === GLITTERING_GOLD,
@@ -688,7 +693,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
       whenPlayCard("first", 0);
       resolveFirstPending();
       const unkei = findOnBoard("first", "Unkei, Goldbloom")!;
-      onEvolve(unkei, "first", "super", { spendPoint: true });
+      whenSuperEvolve(unkei, "first");
       for (let i = 0; i < 4; i++) {
         whenEndTurn();
         whenEndTurn();
@@ -796,12 +801,12 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
           k.defense = 0;
         });
       cleanupDead();
-      onEvolve(mars, "first", "super", { spendPoint: true });
+      whenSuperEvolve(mars, "first");
       const knights = thenBoard("first").filter((c) => c.id === KNIGHT);
       const latestKnight = knights[knights.length - 1]!;
       expect(Number(latestKnight.attack)).toBe(3);
       expect(latestKnight.hasRush).toBe(true);
-      expect(Number(mars.attack)).toBe(5);
+      expect(Number(mars.attack)).toBe(8);
 
       const nonOfficer = allyFollower(2, 2, "Civilian");
       expect(Number(nonOfficer.attack)).toBe(2);
@@ -820,7 +825,7 @@ describe("L2 Barbaros Swordcraft — real-card tests", () => {
           k.defense = 0;
         });
       cleanupDead();
-      onEvolve(mars, "first", "super", { spendPoint: true });
+      whenSuperEvolve(mars, "first");
       expect(boardIds().filter((id) => id === KNIGHT).length).toBe(
         knightsBefore,
       );

@@ -6,7 +6,10 @@ import { fileURLToPath } from "node:url";
 import {
   buildManifestFromFilenames,
   DECK_FILE_EXCLUDE,
+  shippedDeckIds,
+  shippedDeckFiles,
 } from "../../src/data/deckManifest.js";
+import { SHIPPED_DECK_IDS } from "../../src/bench/soakDecks.js";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -46,5 +49,13 @@ describe("deckManifest", () => {
     const raw = fs.readFileSync(MANIFEST_FILE, "utf-8");
     expect(raw.endsWith("\n")).toBe(true);
     expect(raw).toMatch(/\}\n$/);
+  });
+
+  it("soak shipped pool matches manifest category deck", () => {
+    const manifest = JSON.parse(fs.readFileSync(MANIFEST_FILE, "utf-8"));
+    const ids = shippedDeckIds(manifest);
+    expect(ids.length).toBeGreaterThanOrEqual(7);
+    expect([...SHIPPED_DECK_IDS].sort()).toEqual(ids);
+    expect(shippedDeckFiles(manifest).length).toBe(ids.length);
   });
 });

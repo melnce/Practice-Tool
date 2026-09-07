@@ -11,6 +11,7 @@ import {
   whenPlayCard,
   resetUidCounter,
 } from "../harness/builders.js";
+import { whenEvolve } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
 import { dispatch as engineDispatch } from "../../src/engine.js";
 import { dispatchAction } from "../../src/logic/core/dispatch.js";
@@ -27,7 +28,6 @@ import {
 } from "../../src/bench/soakEnv.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { createCard } from "../harness/builders.js";
-import { onEvolve } from "../../src/logic/evolveUtils.js";
 
 const LUMIORE = "10844120";
 const PARTING_JAWS = "10942310";
@@ -178,7 +178,7 @@ describe("Goddess of Starlight evolve select-3 discard history", () => {
 
     const goddess = state.players.first.board[0]!;
     applyKeywordsFromList(goddess);
-    onEvolve(goddess, "first", "normal", { spendPoint: true });
+    whenEvolve(goddess, "first");
     expect(state.pendingTargetEffect).toBeDefined();
     expect(state.pendingTargetEffect!.selectCount).toBe(3);
 
