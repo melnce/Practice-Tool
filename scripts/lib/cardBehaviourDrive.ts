@@ -17,7 +17,7 @@ import {
   whenRunEffects,
   resetUidCounter,
 } from "../../tests/harness/builders.js";
-import { state } from "../../src/core/gameState.js";
+import { state, resetGameState } from "../../src/core/gameState.js";
 import { drawCard } from "../../src/core/utils.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import {
@@ -800,7 +800,14 @@ type WatchSnapshot = {
   enteringEvolved: boolean;
   enteringAtk: number;
   enteringDef: number;
+  enemyFollowerDefSum: number;
 };
+
+function enemyFollowerDefenseSum(): number {
+  return getBoard(state, "second")
+    .filter((c) => c.type === "Follower")
+    .reduce((sum, c) => sum + (parseInt(String(c.defense), 10) || 0), 0);
+}
 
 function snapshotWatchState(
   host: CardInstance,
@@ -826,6 +833,7 @@ function snapshotWatchState(
     ),
     enteringAtk: parseInt(String(entering?.attack ?? 0), 10) || 0,
     enteringDef: parseInt(String(entering?.defense ?? 0), 10) || 0,
+    enemyFollowerDefSum: enemyFollowerDefenseSum(),
   };
 }
 
@@ -892,9 +900,21 @@ function watchEffectObserved(
     if (after.hostCost >= before.hostCost) allPass = false;
   };
 
+  const checkEnemyFollowerDamage = (amount: number) => {
+    anyCheck = true;
+    const dealt = before.enemyFollowerDefSum - after.enemyFollowerDefSum;
+    if (amount > 0 && dealt <= 0) allPass = false;
+  };
+
   walkEffects(trigger.effects ?? [], (obj) => {
     const op = String(obj.op ?? "");
     const target = String(obj.target ?? "").toLowerCase();
+
+    if (op === "damage") {
+      if (target.includes("enemy") && target.includes("follower")) {
+        checkEnemyFollowerDamage(Number(obj.amount ?? 0));
+      }
+    }
 
     if (op === "restore") {
       if (
@@ -2883,6 +2903,17 @@ function runSummonScenario(
 }
 
 /**
+ * Isolate each card drive from residue left by prior cards in the pool loop.
+ * Per-scenario buildArena resets are not always sufficient (e.g. watch probe
+ * summons on the immediately preceding card can shift UID/RNG for the next).
+ */
+function resetHarnessBetweenCards(): void {
+  resetGameState(HARNESS_SEED);
+  resetUidCounter();
+  state.gameStarted = false;
+}
+
+/**
  * Drive one card through classified scenarios with gate preparation.
  */
 export function driveCard(
@@ -2896,6 +2927,8 @@ export function driveCard(
     return { status: "skipped", id, name, reason: "card_not_in_registry" };
   }
 
+  resetHarnessBetweenCards();
+
   const gates = collectNamedGates(raw);
   const gateSummary = summarizeGateConditions(gates);
   const arenaNeeds = analyzeHarnessArenaNeeds(raw, gates);
@@ -2907,7 +2940,11 @@ export function driveCard(
         ? (["summon"] as ScenarioName[])
         : classifyPaths(raw);
     const scenarios: ScenarioResult[] = [];
-    const failures: { skip: SkipReason; detail: string }[] = [];
+    const failures: {
+      path: ScenarioName;
+      skip: SkipReason;
+      detail: string;
+    }[] = [];
     const satisfiedAll = new Set<string>();
     const unmetAll = new Set<string>(gateSummary.unpreparable);
 
@@ -2975,7 +3012,7 @@ export function driveCard(
       }
 
       if (isSkip(result)) {
-        failures.push(result);
+        failures.push({ path, skip: result.skip, detail: result.detail ?? "" });
       } else {
         scenarios.push(result);
         for (const c of result.gatesSatisfied ?? []) satisfiedAll.add(c);

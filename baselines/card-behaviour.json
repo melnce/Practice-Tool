@@ -279,12 +279,12 @@
       "status": "covered"
     },
     "10031110": {
-      "fingerprint": "fa819aa8",
+      "fingerprint": "39c3b230",
       "gatesSatisfied": [],
       "name": "Dazzling Runeknight",
       "scenarios": [
         {
-          "fingerprint": "991335a0",
+          "fingerprint": "dc3bdd08",
           "scenario": "play"
         }
       ],
@@ -1471,12 +1471,12 @@
       "status": "covered"
     },
     "10131310": {
-      "fingerprint": "a4b75f78",
+      "fingerprint": "dc4d92d0",
       "gatesSatisfied": [],
       "name": "Radiant Rainbow",
       "scenarios": [
         {
-          "fingerprint": "a1b11db3",
+          "fingerprint": "b4e8a3bc",
           "scenario": "play"
         }
       ],
@@ -1495,12 +1495,12 @@
       "status": "covered"
     },
     "10132110": {
-      "fingerprint": "833356ed",
+      "fingerprint": "1b52264f",
       "gatesSatisfied": [],
       "name": "Ms. Miranda, Adored Academic",
       "scenarios": [
         {
-          "fingerprint": "5e1719b8",
+          "fingerprint": "6e99fb6c",
           "scenario": "play"
         },
         {
@@ -1663,12 +1663,12 @@
       "status": "covered"
     },
     "10134120": {
-      "fingerprint": "bbd1e240",
+      "fingerprint": "616c8c04",
       "gatesSatisfied": [],
       "name": "Anne & Grea, Mysterian Duo",
       "scenarios": [
         {
-          "fingerprint": "e7a4aecc",
+          "fingerprint": "7df5f4aa",
           "scenario": "play"
         },
         {
@@ -1679,12 +1679,12 @@
       "status": "covered"
     },
     "10134310": {
-      "fingerprint": "3a27bbc0",
+      "fingerprint": "dcefb0dc",
       "gatesSatisfied": [],
       "name": "Dimension Climb",
       "scenarios": [
         {
-          "fingerprint": "795b9604",
+          "fingerprint": "daa12f3f",
           "scenario": "play"
         }
       ],
@@ -2631,12 +2631,12 @@
       "status": "covered"
     },
     "10172320": {
-      "fingerprint": "39a87327",
+      "fingerprint": "cf7fab70",
       "gatesSatisfied": [],
       "name": "Doomwright Resurgence",
       "scenarios": [
         {
-          "fingerprint": "0a566d1c",
+          "fingerprint": "a277c4a4",
           "scenario": "play"
         }
       ],
@@ -2767,12 +2767,12 @@
       "status": "covered"
     },
     "10174130": {
-      "fingerprint": "084eac24",
+      "fingerprint": "61122a25",
       "gatesSatisfied": [],
       "name": "Ralmia, Sonic Boom",
       "scenarios": [
         {
-          "fingerprint": "2c36ae24",
+          "fingerprint": "eac675a2",
           "scenario": "play"
         },
         {
@@ -3151,7 +3151,7 @@
       "status": "covered"
     },
     "10224110": {
-      "fingerprint": "661eddc0",
+      "fingerprint": "7f081af8",
       "gatesSatisfied": ["rally"],
       "name": "Gildaria, Anathema of Peace",
       "scenarios": [
@@ -3162,6 +3162,10 @@
         {
           "fingerprint": "b6cda6fc",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "cf2a51b0",
+          "scenario": "watch"
         }
       ],
       "status": "covered"
@@ -3871,12 +3875,12 @@
       "status": "covered"
     },
     "10274120": {
-      "fingerprint": "992d5190",
+      "fingerprint": "c3c40ef0",
       "gatesSatisfied": [],
       "name": "Karula, Eternal Arts",
       "scenarios": [
         {
-          "fingerprint": "75c237cb",
+          "fingerprint": "5cea6d78",
           "scenario": "play"
         },
         {
@@ -5495,12 +5499,12 @@
       "status": "covered"
     },
     "10434110": {
-      "fingerprint": "69ecbf75",
+      "fingerprint": "2a5d4e99",
       "gatesSatisfied": [],
       "name": "Wamdus, Water Personified",
       "scenarios": [
         {
-          "fingerprint": "5368b03b",
+          "fingerprint": "940bfc70",
           "scenario": "play"
         },
         {
@@ -6499,12 +6503,12 @@
       "status": "covered"
     },
     "10531120": {
-      "fingerprint": "5f67a550",
+      "fingerprint": "f2e62a20",
       "gatesSatisfied": [],
       "name": "Waterbending Charmwielder",
       "scenarios": [
         {
-          "fingerprint": "1d815b14",
+          "fingerprint": "fa8a3ddc",
           "scenario": "play"
         }
       ],
@@ -9515,7 +9519,7 @@
       "status": "covered"
     },
     "10774120": {
-      "fingerprint": "562c87d4",
+      "fingerprint": "8eac9354",
       "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Myuu, Hot on His Heels",
       "scenarios": [
@@ -9526,6 +9530,10 @@
         {
           "fingerprint": "3cf08fca",
           "scenario": "super_evolve"
+        },
+        {
+          "fingerprint": "fae55a44",
+          "scenario": "watch"
         }
       ],
       "status": "covered"
@@ -9919,12 +9927,12 @@
       "status": "covered"
     },
     "10831110": {
-      "fingerprint": "1efecd18",
+      "fingerprint": "24a77988",
       "gatesSatisfied": [],
       "name": "Meowskers, Roly-Poly Mk II & Djeana",
       "scenarios": [
         {
-          "fingerprint": "3a42e474",
+          "fingerprint": "0b578694",
           "scenario": "play"
         },
         {
@@ -9971,12 +9979,12 @@
       "status": "covered"
     },
     "10832310": {
-      "fingerprint": "eb73b5f8",
+      "fingerprint": "0940cbcb",
       "gatesSatisfied": [],
       "name": "Harmonious Meal",
       "scenarios": [
         {
-          "fingerprint": "0c2b1ee4",
+          "fingerprint": "c7d1b160",
           "scenario": "play"
         }
       ],
@@ -10015,24 +10023,24 @@
       "status": "covered"
     },
     "10833310": {
-      "fingerprint": "8570f970",
+      "fingerprint": "9a5a310c",
       "gatesSatisfied": ["spellboost_count"],
       "name": "Amethyst's Naptime",
       "scenarios": [
         {
-          "fingerprint": "3e2ad4b0",
+          "fingerprint": "f2072420",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10834110": {
-      "fingerprint": "4f3ca837",
+      "fingerprint": "d2b5c6ec",
       "gatesSatisfied": ["spellboost_count"],
       "name": "Tetra & Ladica, Forest BFFs",
       "scenarios": [
         {
-          "fingerprint": "3c96f3d3",
+          "fingerprint": "ceb8d9ff",
           "scenario": "play"
         }
       ],

@@ -27,6 +27,7 @@ const ROOT = path.resolve(import.meta.dirname, "../..");
 const LYRALA = "10121130";
 const CHARON = "10254120";
 const PROSTRATING_COWARD = "10661110";
+const MYUU = "10774120";
 const VANILLA_FOLLOWER = "10001110";
 
 function loadPoolCard(id: string) {
@@ -138,6 +139,16 @@ describe("watch scenario", () => {
     const entering = state.players.first.board.find((c) => c.uid === probe.uid);
     expect(entering, "probe should enter the board").toBeDefined();
     expect(Boolean(entering?.hasWard)).toBe(false);
+  }, 60_000);
+
+  it("driveCard includes watch for Myuu (enemy follower damage watcher)", () => {
+    const raw = loadPoolCard(MYUU);
+    const result = driveCard(raw);
+    expect(result.status).toBe("covered");
+    if (result.status !== "covered") return;
+    const names = result.scenarios.map((s) => s.scenario);
+    expect(names).toContain("watch");
+    expect(names).not.toContain("play");
   }, 60_000);
 
   it("driveCard includes watch alongside play for Charon", () => {
