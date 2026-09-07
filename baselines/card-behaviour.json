@@ -123,13 +123,17 @@
       "status": "covered"
     },
     "10011130": {
-      "fingerprint": "f22c16a8",
+      "fingerprint": "c8566234",
       "gatesSatisfied": ["combo"],
       "name": "Gentle Treant",
       "scenarios": [
         {
           "fingerprint": "8b3a5a64",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "f3eddda0",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -1275,13 +1279,13 @@
       "status": "covered"
     },
     "10123110": {
-      "fingerprint": "6be27498",
+      "fingerprint": "54f6e72c",
       "gatesSatisfied": [],
       "name": "Jeno, Levin Axeraider",
       "scenarios": [
         {
-          "fingerprint": "9266dfeb",
-          "scenario": "vanilla_place"
+          "fingerprint": "0d312f5c",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -2175,13 +2179,13 @@
       "status": "covered"
     },
     "10154120": {
-      "fingerprint": "595443e9",
+      "fingerprint": "2a94c870",
       "gatesSatisfied": [],
       "name": "Medusa, Venomfang Royalty",
       "scenarios": [
         {
-          "fingerprint": "8017c8e0",
-          "scenario": "vanilla_place"
+          "fingerprint": "c0ded5fc",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -2295,7 +2299,7 @@
       "status": "covered"
     },
     "10162120": {
-      "fingerprint": "430e6318",
+      "fingerprint": "b7fc8130",
       "gatesSatisfied": [],
       "name": "Reno, Luxwing Featherfolk",
       "scenarios": [
@@ -2306,6 +2310,10 @@
         {
           "fingerprint": "cd54b7e3",
           "scenario": "super_evolve"
+        },
+        {
+          "fingerprint": "b88137e7",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -3071,13 +3079,17 @@
       "status": "covered"
     },
     "10223110": {
-      "fingerprint": "e5b0ab70",
+      "fingerprint": "efcc89bf",
       "gatesSatisfied": [],
       "name": "Rosé, Princess Knight",
       "scenarios": [
         {
           "fingerprint": "bcdb604c",
           "scenario": "play_base"
+        },
+        {
+          "fingerprint": "e8621c64",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -3211,13 +3223,17 @@
       "status": "covered"
     },
     "10233110": {
-      "fingerprint": "84d1b2cf",
+      "fingerprint": "ea2e4f0c",
       "gatesSatisfied": [],
       "name": "Owen, Mysterian Swordsman",
       "scenarios": [
         {
           "fingerprint": "d345fdcc",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "b6c094a7",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -3627,13 +3643,13 @@
       "status": "covered"
     },
     "10263110": {
-      "fingerprint": "8ecf5ee0",
-      "gatesSatisfied": [],
+      "fingerprint": "1f1d3db8",
+      "gatesSatisfied": ["amulet_count"],
       "name": "Agnes, the Swiftblade",
       "scenarios": [
         {
-          "fingerprint": "6135db64",
-          "scenario": "vanilla_place"
+          "fingerprint": "8c0a5ce7",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -5051,13 +5067,13 @@
       "status": "covered"
     },
     "10411110": {
-      "fingerprint": "375952d0",
+      "fingerprint": "19a43420",
       "gatesSatisfied": [],
       "name": "Kou & You, Love and Hatred",
       "scenarios": [
         {
-          "fingerprint": "bc6b0fac",
-          "scenario": "vanilla_place"
+          "fingerprint": "e285575c",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -5935,13 +5951,17 @@
       "status": "covered"
     },
     "10472110": {
-      "fingerprint": "93769a80",
+      "fingerprint": "3c7b65ef",
       "gatesSatisfied": ["skybound_art"],
       "name": "Eustace, Howl of Thunder",
       "scenarios": [
         {
           "fingerprint": "e8943d63",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "76408027",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -7907,7 +7927,7 @@
       "status": "covered"
     },
     "10654110": {
-      "fingerprint": "23a2c310",
+      "fingerprint": "6867029c",
       "gatesSatisfied": [],
       "name": "Armes, Depletive Demon",
       "scenarios": [
@@ -7918,6 +7938,10 @@
         {
           "fingerprint": "596a993b",
           "scenario": "super_evolve"
+        },
+        {
+          "fingerprint": "306c88ac",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -8299,7 +8323,7 @@
       "status": "covered"
     },
     "10704110": {
-      "fingerprint": "0fcd3b78",
+      "fingerprint": "807099e4",
       "gatesSatisfied": [],
       "name": "Illamrita, Designated Target",
       "scenarios": [
@@ -8310,6 +8334,10 @@
         {
           "fingerprint": "aa0ca5e6",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "f7057678",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -9691,7 +9719,7 @@
       "status": "covered"
     },
     "10823110": {
-      "fingerprint": "65e9c2db",
+      "fingerprint": "ec711c68",
       "gatesSatisfied": ["evolved_self", "super_evo_unlocked"],
       "name": "Okita Souji",
       "scenarios": [
@@ -9702,6 +9730,10 @@
         {
           "fingerprint": "fbe10fa4",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "530563fc",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -9975,13 +10007,13 @@
       "status": "covered"
     },
     "10843110": {
-      "fingerprint": "8178a080",
+      "fingerprint": "faf3fe37",
       "gatesSatisfied": [],
       "name": "Giada, Peerless Flame of War",
       "scenarios": [
         {
-          "fingerprint": "def01390",
-          "scenario": "vanilla_place"
+          "fingerprint": "a698739b",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -10047,13 +10079,17 @@
       "status": "covered"
     },
     "10851120": {
-      "fingerprint": "90a06df1",
+      "fingerprint": "6f0835b4",
       "gatesSatisfied": [],
       "name": "Lilith, Devilish Cutie",
       "scenarios": [
         {
           "fingerprint": "ee58a354",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "2b2b954c",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -10163,7 +10199,7 @@
       "status": "covered"
     },
     "10854120": {
-      "fingerprint": "409d3b8c",
+      "fingerprint": "cf94f8f7",
       "gatesSatisfied": ["necromancy"],
       "name": "Ceres, Liminal Rose",
       "scenarios": [
@@ -10174,6 +10210,10 @@
         {
           "fingerprint": "486c8488",
           "scenario": "turn_boundary"
+        },
+        {
+          "fingerprint": "fa8e1b1e",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -11051,13 +11091,13 @@
       "status": "covered"
     },
     "10942110": {
-      "fingerprint": "cf2e2788",
-      "gatesSatisfied": [],
+      "fingerprint": "8b51d84c",
+      "gatesSatisfied": ["ally_attacked_leader_last_turn"],
       "name": "High-Spirited Marauder",
       "scenarios": [
         {
-          "fingerprint": "b18790e4",
-          "scenario": "vanilla_place"
+          "fingerprint": "132eab4b",
+          "scenario": "combat"
         }
       ],
       "status": "covered"
@@ -12037,13 +12077,13 @@
       "token": true
     },
     "90032110": {
-      "fingerprint": "fd5c05c4",
+      "fingerprint": "46d38ab0",
       "gatesSatisfied": [],
       "name": "Onion Patch",
       "scenarios": [
         {
-          "fingerprint": "b4272420",
-          "scenario": "vanilla_place"
+          "fingerprint": "4db73f47",
+          "scenario": "combat"
         }
       ],
       "status": "covered",
@@ -12713,13 +12753,13 @@
       "token": true
     },
     "90074130": {
-      "fingerprint": "050af1b0",
+      "fingerprint": "b1b8d9f8",
       "gatesSatisfied": [],
       "name": "Victoria",
       "scenarios": [
         {
-          "fingerprint": "1441b6ae",
-          "scenario": "vanilla_place"
+          "fingerprint": "8d47407c",
+          "scenario": "combat"
         }
       ],
       "status": "covered",
