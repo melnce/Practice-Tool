@@ -35,6 +35,11 @@ import {
   makeCardFromDB,
   pushToBoard,
 } from "../../src/logic/effects/ops/summon_ops/core.js";
+import {
+  cleanupDead,
+  flushDeferredDeathBatch,
+} from "../../src/logic/core/cleanup.js";
+import { destroyTarget } from "../../src/logic/effects/ops/destroy/primitives.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import {
@@ -75,7 +80,8 @@ export type ScenarioName =
   | "super_evolve"
   | "vanilla_place"
   | "summon"
-  | "in_hand";
+  | "in_hand"
+  | "destroy";
 
 export type ScenarioResult = {
   scenario: ScenarioName;
@@ -468,6 +474,82 @@ function hasHandSourceTrigger(card: RawCard): boolean {
   return getHandTrigger(card) != null;
 }
 
+function isLastWordsKeywordName(name: string): boolean {
+  const n = name.toLowerCase().replace(/\s+/g, "");
+  return n === "lastwords" || n === "last_words";
+}
+
+/** Last Words / last_words keyword on this card's board form (not nested Crystallize amulet text). */
+function keywordEntryHasDeathEffects(k: unknown): boolean {
+  if (typeof k === "string") return isLastWordsKeywordName(k);
+  if (!k || typeof k !== "object") return false;
+  const kw = k as { name?: unknown; effects?: unknown[] };
+  if (!isLastWordsKeywordName(String(kw.name ?? ""))) return false;
+  return Array.isArray(kw.effects) && kw.effects.length > 0;
+}
+
+function hasLastWordsKeywordEffects(card: RawCard): boolean {
+  for (const k of card.keywords ?? []) {
+    if (keywordEntryHasDeathEffects(k)) return true;
+  }
+  return false;
+}
+
+function hasLastWordsTriggerEffects(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as { event?: string; type?: string; effects?: unknown[] };
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (ev !== "last_words") continue;
+    if (hasNonEmptyEffects(trig.effects)) return true;
+  }
+  return false;
+}
+
+/** Top-level last_words script (compiler output) on this card form. */
+function hasLastWordsScript(card: RawCard): boolean {
+  const lw = (card as { last_words?: unknown[] }).last_words;
+  return hasNonEmptyEffects(lw);
+}
+
+/**
+ * Board triggers that fire when this card leaves the field (death-adjacent).
+ * Excludes watchers on other cards leaving (e.g. Lifestealer, Bayle in hand).
+ */
+function hasLeavesFieldDeathTrigger(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as {
+      event?: string;
+      type?: string;
+      source?: string;
+      effects?: unknown[];
+    };
+    if (trig.source !== "board") continue;
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (!ev.includes("leaves_field") && !ev.includes("leave_field")) continue;
+    if (!hasNonEmptyEffects(trig.effects)) continue;
+    // Self-leave only: effect targets self or has no off-board condition naming others.
+    let targetsSelf = false;
+    walkEffects(trig.effects, (obj) => {
+      const target = String(obj.target ?? "").toLowerCase();
+      if (target === "self" || target.includes("this")) targetsSelf = true;
+    });
+    if (targetsSelf) return true;
+  }
+  return false;
+}
+
+/** Data-derived: card should be destroyed in harness to exercise on-death effects. */
+export function hasDestroyOnDeathEffects(card: RawCard): boolean {
+  return (
+    hasLastWordsKeywordEffects(card) ||
+    hasLastWordsTriggerEffects(card) ||
+    hasLastWordsScript(card) ||
+    hasLeavesFieldDeathTrigger(card)
+  );
+}
+
 function playGrantsCrestTurnBoundary(card: RawCard): boolean {
   const playRoots: unknown[] = [...(card.fanfare ?? []), ...(card.spell ?? [])];
   let found = false;
@@ -494,6 +576,7 @@ function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
     case "vanilla_place":
     case "summon":
     case "turn_boundary":
+    case "destroy":
       return true;
     default:
       return false;
@@ -528,6 +611,9 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   }
   if (hasHandSourceTrigger(card)) {
     paths.push("in_hand");
+  }
+  if (hasDestroyOnDeathEffects(card)) {
+    paths.push("destroy");
   }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
@@ -1396,6 +1482,62 @@ function runInHandScenario(
   };
 }
 
+function runDestroyScenario(
+  cardId: string,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  buildArena({ roundCount: 8, activePlayer: "first", arenaNeeds });
+
+  trimBoardToCap(
+    state.players.first.board,
+    HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+  );
+
+  const host = makeCardFromDB(template, "first");
+  if (host.type === "Follower") {
+    host.justPlayed = false;
+    host.defense = Math.max(Number(host.defense) || 1, 3);
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  assertHarnessBoardCap("runDestroyScenario:beforeDestroy");
+
+  const hostOnBoard = getBoard(state, "first").find((c) => c.uid === host.uid);
+  if (!hostOnBoard) {
+    return { skip: "drive_threw", detail: "host_missing_after_place" };
+  }
+
+  if (!destroyTarget(hostOnBoard, "first", "harness_destroy")) {
+    return { skip: "drive_threw", detail: "destroy_target_failed" };
+  }
+  cleanupDead();
+  flushDeferredDeathBatch();
+
+  const pending = resolvePendingOrFail("destroy_after_death");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "destroy",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
 function runVanillaPlaceScenario(
   cardId: string,
   arenaNeeds?: HarnessArenaNeeds,
@@ -1620,6 +1762,8 @@ export function driveCard(
           result = runSuperEvolveScenario(id, gates, arenaNeeds);
         else if (path === "in_hand")
           result = runInHandScenario(id, gates, arenaNeeds);
+        else if (path === "destroy")
+          result = runDestroyScenario(id, gates, arenaNeeds);
         else if (path === "summon") result = runSummonScenario(id, arenaNeeds);
         else result = runVanillaPlaceScenario(id, arenaNeeds);
       } catch (err) {

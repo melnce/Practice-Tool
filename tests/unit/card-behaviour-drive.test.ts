@@ -9,6 +9,7 @@ import "../../src/logic/core/effects/index.js";
 import {
   driveCard,
   analyzeHarnessArenaNeeds,
+  hasDestroyOnDeathEffects,
   HARNESS_SEED,
 } from "../../scripts/lib/cardBehaviourDrive.js";
 import {
@@ -156,6 +157,21 @@ describe("card behaviour drive prep", () => {
       const names = result.scenarios.map((s) => s.scenario);
       expect(names).toContain("evolve");
       expect(names).toContain("super_evolve");
+    }
+  });
+
+  it("cards with Last Words get destroy scenario and drop vanilla_place", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string; keywords?: unknown[] }[];
+    const peddler = all.find((c) => c.id === "10021120")!;
+    expect(hasDestroyOnDeathEffects(peddler)).toBe(true);
+    const result = driveCard(peddler);
+    expect(result.status).toBe("covered");
+    if (result.status === "covered") {
+      const names = result.scenarios.map((s) => s.scenario);
+      expect(names).toContain("destroy");
+      expect(names).not.toContain("vanilla_place");
     }
   });
 });
