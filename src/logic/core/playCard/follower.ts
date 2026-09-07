@@ -22,10 +22,15 @@ import {
   runPlayFollowerPostFanfare,
   type PlayFollowerResume,
 } from "./followerResume.js";
+import { resumeDeferredDeathIfIdle } from "../cleanup.js";
 import { playerHasCrestPassive } from "../../effects/crest.js";
 import { enhanceReplacesBase } from "./enhancePlan.js";
 import { recomputeAttackFlags } from "../combat.js";
 import { isPlayCostChangedFromPrinted } from "../../../helpers/alternateForm.js";
+import {
+  beginPlaySequence,
+  stageFollowerEnterReactions,
+} from "./playSequence.js";
 
 /**
  * Play a follower card. Returns PlayOutcome without rendering.
@@ -66,11 +71,13 @@ export function playFollower(
     return { kind: "blocked", reason: "Board is full." };
   }
 
+  beginPlaySequence();
+  const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
+  stageFollowerEnterReactions(card, player, enteringKeywordSnapshot);
+
   if (opts?.enhancedPlay) {
     fireTrigger("enhanced_play", player, { playedCard: card });
   }
-
-  const enteringKeywordSnapshot = snapshotEnteringKeywords(card);
 
   // Crest passive: suppress Fanfare (and Enhance is gated in resolvePlayCost).
   const suppressFanfareEnhance = playerHasCrestPassive(
@@ -84,8 +91,8 @@ export function playFollower(
         .map((tier) => (Array.isArray(tier.effects) ? [...tier.effects] : []))
         .filter((effects) => effects.length);
 
-  // Rulebook §242–256: Fanfare (step 1) before play/enter-reactive triggers (steps 2–5).
-  // Shared decision: additive unless enhance_replaces_base (ordering unchanged).
+  // Rulebook §242–256: play/enter reactions are staged at entry (before Fanfare);
+  // Fanfare runs next; Rally / enter-count counters stay in runPlayFollowerPostFanfare.
   const skipFanfareForEnhance =
     !!chosenTierEffectGroups?.length && enhanceReplacesBase(card, tiers);
   if (

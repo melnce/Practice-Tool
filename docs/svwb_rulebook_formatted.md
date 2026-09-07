@@ -284,13 +284,14 @@ _Combat test case._ The active player attacks with a follower that has "Strike: 
 
 When a card is played and/or a follower/amulet enters play, the resulting triggers resolve in this order:
 
-1. The played card's own **Fanfare**, and the entering card's own "when this enters play" abilities.
-2. Crests that react to **the play** ("when you play a card…", e.g. Mil & Lus).
-3. Board abilities that react to the play.
-4. Crests that react to **a card entering** ("when a follower enters play…", e.g. Krull).
-5. Board abilities that react to a card entering (e.g. Orchis).
+1. **Play/enter reactions for the played card itself** — queued the moment the card enters the field (`ally_follower_played`, `ally_card_played`, `ally_follower_enter`, `enemy_follower_enter` for that card). These resolve **before** anything its Fanfare raises.
+2. The played card's own **Fanfare**, and any effects it raises (summons, damage, etc.) in FIFO order with their own triggered abilities.
+3. Crests that react to **the play** ("when you play a card…", e.g. Mil & Lus) — for cards other than the played card's own staged reactions above.
+4. Board abilities that react to the play.
+5. Crests that react to **a card entering** ("when a follower enters play…", e.g. Krull) — for entries raised during Fanfare, after the played card's own enter reaction.
+6. Board abilities that react to a card entering (e.g. Orchis).
 
-Same-timing abilities resolve self → opponent; same-timing crests resolve in the order they were granted.
+Same-timing abilities resolve self → opponent; same-timing crests resolve in the order they were granted. Nothing raised mid-sequence interrupts the play sequence; the reactive queue drains once at the end of the play.
 
 Two enter-play rulings:
 

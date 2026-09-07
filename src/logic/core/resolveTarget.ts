@@ -22,6 +22,7 @@ import {
   runPlayFollowerPostFanfare,
   type PlayFollowerResume,
 } from "./playCard/followerResume.js";
+import { endPlaySequenceDrainIfIdle } from "./playCard/playSequence.js";
 import {
   completeDeferredLwAfterSelection,
   resumeDeferredDeathIfIdle,
@@ -313,6 +314,7 @@ function flushTargetedOpAfterHandler(
   completeDeferredLwAfterSelection(deferredLwComplete);
 
   settleTargetedOpResolutionQueue();
+  endPlaySequenceDrainIfIdle();
   resumeDeferredDeathIfIdle();
   settleTargetedOpResolutionQueue();
 
