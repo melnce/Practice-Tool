@@ -80,6 +80,8 @@ export type QaCoverageRow = {
   pinnedFileScoped: boolean;
   /** Block-scoped pin requiring ≥ceil(keywords/2) keyword hits in a subject block. */
   pinnedBlockScopedHalf: boolean;
+  /** Block-scoped pin with ≥1 keyword in a subject block (sensitivity row). */
+  pinnedBlockScopedMin1: boolean;
   matchedKeywords: string[];
   matchedFile: string | null;
   matchedBlock: string | null;
@@ -483,10 +485,11 @@ export function compareTokenLinks(
  */
 export const QA_PIN_BLOCK_KEYWORD_MIN = 2;
 
-export type QaPinThreshold = "min2" | "half";
+export type QaPinThreshold = "min1" | "min2" | "half";
 
 export type QaPinResult = {
   pinnedFileScoped: boolean;
+  pinnedBlockScopedMin1: boolean;
   pinnedBlockScopedMin2: boolean;
   pinnedBlockScopedHalf: boolean;
   matchedKeywords: string[];
@@ -519,6 +522,9 @@ export function qaPinThresholdMet(
   threshold: QaPinThreshold,
 ): boolean {
   if (availableKeywordCount === 0 || matchedKeywordCount === 0) return false;
+  if (threshold === "min1") {
+    return matchedKeywordCount >= 1;
+  }
   if (threshold === "min2") {
     return matchedKeywordCount >= QA_PIN_BLOCK_KEYWORD_MIN;
   }
@@ -626,6 +632,11 @@ export function evaluateQaPin(
   const matchedKeywords = best?.hits ?? [];
   const matchedFile = best?.file ?? null;
   const matchedBlock = best?.composedTitle ?? null;
+  const pinnedBlockScopedMin1 = qaPinThresholdMet(
+    keywords.length,
+    matchedKeywords.length,
+    "min1",
+  );
   const pinnedBlockScopedMin2 = qaPinThresholdMet(
     keywords.length,
     matchedKeywords.length,
@@ -639,6 +650,7 @@ export function evaluateQaPin(
 
   return {
     pinnedFileScoped: fileScoped.pinnedFileScoped,
+    pinnedBlockScopedMin1,
     pinnedBlockScopedMin2,
     pinnedBlockScopedHalf,
     matchedKeywords,
@@ -706,6 +718,7 @@ export function coverOfficialQa(
         answer: qa.answer,
         pinned: blockPinned,
         pinnedFileScoped: pin.pinnedFileScoped,
+        pinnedBlockScopedMin1: pin.pinnedBlockScopedMin1,
         pinnedBlockScopedHalf: pin.pinnedBlockScopedHalf,
         matchedKeywords: blockPinned
           ? pin.matchedKeywords
@@ -930,6 +943,8 @@ export type OfficialReport = {
   unpinnedFileScopedCount: number;
   pinnedBlockScopedHalfCount: number;
   unpinnedBlockScopedHalfCount: number;
+  pinnedBlockScopedMin1Count: number;
+  unpinnedBlockScopedMin1Count: number;
 };
 
 export function summarizeQaCoverage(rows: QaCoverageRow[]): {
@@ -940,6 +955,8 @@ export function summarizeQaCoverage(rows: QaCoverageRow[]): {
   unpinnedBlockScopedMin2: number;
   pinnedBlockScopedHalf: number;
   unpinnedBlockScopedHalf: number;
+  pinnedBlockScopedMin1: number;
+  unpinnedBlockScopedMin1: number;
 } {
   return {
     total: rows.length,
@@ -949,6 +966,9 @@ export function summarizeQaCoverage(rows: QaCoverageRow[]): {
     unpinnedBlockScopedMin2: rows.filter((r) => !r.pinned).length,
     pinnedBlockScopedHalf: rows.filter((r) => r.pinnedBlockScopedHalf).length,
     unpinnedBlockScopedHalf: rows.filter((r) => !r.pinnedBlockScopedHalf)
+      .length,
+    pinnedBlockScopedMin1: rows.filter((r) => r.pinnedBlockScopedMin1).length,
+    unpinnedBlockScopedMin1: rows.filter((r) => !r.pinnedBlockScopedMin1)
       .length,
   };
 }
@@ -986,6 +1006,8 @@ export function buildOfficialReport(
     unpinnedFileScopedCount: qaSummary.unpinnedFileScoped,
     pinnedBlockScopedHalfCount: qaSummary.pinnedBlockScopedHalf,
     unpinnedBlockScopedHalfCount: qaSummary.unpinnedBlockScopedHalf,
+    pinnedBlockScopedMin1Count: qaSummary.pinnedBlockScopedMin1,
+    unpinnedBlockScopedMin1Count: qaSummary.unpinnedBlockScopedMin1,
   };
 }
 
@@ -1081,6 +1103,13 @@ export function renderOfficialReportMarkdown(
           "≥1 keyword anywhere in file with card id",
           String(report.pinnedFileScopedCount),
           String(report.unpinnedFileScopedCount),
+          String(report.qaCoverage.length),
+        ],
+        [
+          "block (subject `it`/`test`)",
+          "≥1 keyword in block body",
+          String(report.pinnedBlockScopedMin1Count),
+          String(report.unpinnedBlockScopedMin1Count),
           String(report.qaCoverage.length),
         ],
         [
