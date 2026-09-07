@@ -130,6 +130,33 @@ function allLogIndices(
   return out;
 }
 
+/** Fanfare direct-damage log lines (applyDirectDamage), not dealDamage detail rows. */
+function azurifritFanfareDamageIndices(azUid: string): number[] {
+  return allLogIndices(
+    "damage",
+    (e) =>
+      e.details?.uid === azUid &&
+      e.details?.amount === 2 &&
+      e.details?.targetUid === undefined,
+  );
+}
+
+function gainKrulleCrestForOpponent(superEvolver: "first" | "second") {
+  const card = getCardById(KRULLE)!;
+  const gain = card.superevolve?.find(
+    (e: any) => e.op === "crest" && e.action === "gain",
+  );
+  handleGainCrest(gain as any, superEvolver);
+}
+
+function setupAzurifritPlay(crest: boolean) {
+  state.players.first.hand = [createCard(AZURIFRIT, "hand", "first")];
+  state.players.first.pp = 9;
+  state.players.first.maxPP = 9;
+  state.players.second.hp = 20;
+  if (crest) gainKrulleCrestForOpponent("second");
+}
+
 describe("play/enter reaction queue order", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -147,20 +174,60 @@ describe("play/enter reaction queue order", () => {
   });
 
   it("(a) Azurifrit + Krulle crest: enter debuff first, 0 leader damage, self_damaged fizzles", () => {
-    state.players.first.hand = [createCard(AZURIFRIT, "hand", "first")];
-    state.players.first.pp = 9;
-    state.players.first.maxPP = 9;
-    state.players.second.hp = 20;
-    const card = getCardById(KRULLE)!;
-    const gain = card.superevolve?.find(
-      (e: any) => e.op === "crest" && e.action === "gain",
-    );
-    handleGainCrest(gain as any, "second");
+    const prevHeadless = (globalThis as any).HEADLESS;
+    (globalThis as any).HEADLESS = false;
+    clearLogs();
 
+    setupAzurifritPlay(true);
     whenPlayCard("first", 0);
 
     expect(findOnBoard("first", "Azurifrit, Heir to Disdain")).toBeUndefined();
     expect(getHP(state, "second")).toBe(20);
+
+    const azInGrave = getGraveyard(state, "first").find(
+      (c) => c.name === "Azurifrit, Heir to Disdain",
+    )!;
+    const azUid = azInGrave.uid;
+
+    const fanfareDamageIdxs = azurifritFanfareDamageIndices(azUid);
+    expect(fanfareDamageIdxs).toHaveLength(3);
+
+    const crestDebuffIdx = logIndex(
+      "buff",
+      (e) =>
+        e.details?.uid === azUid && e.details?.a === -1 && e.details?.d === -1,
+    );
+    expect(crestDebuffIdx).toBeGreaterThanOrEqual(0);
+    for (const idx of fanfareDamageIdxs) {
+      expect(idx).toBeLessThan(crestDebuffIdx);
+    }
+
+    const deathIdx = logIndex("death", (e) => e.details?.uid === azUid);
+    expect(deathIdx).toBeGreaterThan(crestDebuffIdx);
+
+    const selfDamagedIdxs = allLogIndices(
+      "trigger",
+      (e) =>
+        e.details?.event === "self_damaged" && e.details?.cardUid === azUid,
+    );
+    expect(selfDamagedIdxs).toHaveLength(3);
+    for (const idx of selfDamagedIdxs) {
+      expect(idx).toBeLessThan(crestDebuffIdx);
+    }
+    // Three still-alive self_damaged triggers after 7 DEF and three 2-damage hits ⇒ 1 DEF at crest.
+    expect(7 - fanfareDamageIdxs.length * 2).toBe(1);
+
+    (globalThis as any).HEADLESS = prevHeadless;
+  });
+
+  it("(a-control) Azurifrit without crest: survives 5/1, enemy leader takes 3", () => {
+    setupAzurifritPlay(false);
+    whenPlayCard("first", 0);
+
+    const az = findOnBoard("first", "Azurifrit, Heir to Disdain")!;
+    expect(Number(az.attack)).toBe(5);
+    expect(Number(az.defense)).toBe(1);
+    expect(getHP(state, "second")).toBe(17);
   });
 
   it("(b) Kuon shape: enter log order is played card → summons → Last Words", () => {
