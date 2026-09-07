@@ -279,12 +279,11 @@ describe("Phase D4a — clause-gap cards (batch 1 of 2)", () => {
     expect(thenBoard("first").some((c) => c.name === "Ghost")).toBe(true);
   }, 60_000);
 
-  // FINDING (10314110): enemy_follower_defense_down fires (stat/core.ts) but Krulle's
-  // board trigger never restores leader HP. Self-Fanfare on play may also be a rules
-  // question (is Krulle a board candidate while its Fanfare resolves?). Discriminator:
-  // with Krulle already on board, a separate ally applies -0/-2 — restore still absent.
+  // CONFIRMED ENGINE BUG (10314110) — owner ruling (Chris): "Krulle when he comes onto
+  // the field and gives enemy followers -0/-2 he heals the leader 1 if he is successful."
+  // Own Fanfare debuff must satisfy the board trigger; engine does not restore leader HP.
   it.fails(
-    "Krulle, Heir to Unkilling (10314110) — own Fanfare -0/-2 does not restore leader on play (18 stays 18)",
+    "Krulle, Heir to Unkilling (10314110) — own Fanfare -0/-2 must restore leader 1 HP (18 → 19)",
     () => {
       setupTurn(6, { hand: [KRULLE], pp: 4, hp: 18 });
       const foe = enemyFollower(4, 4, "Victim");
@@ -296,8 +295,10 @@ describe("Phase D4a — clause-gap cards (batch 1 of 2)", () => {
     60_000,
   );
 
+  // Discriminator: separate -0/-2 with Krulle already on board. Still no restore → trigger
+  // broken generally (not only self-Fanfare ordering / board-candidate timing).
   it.fails(
-    "Krulle, Heir to Unkilling (10314110) — external -0/-2 with Krulle on board does not restore leader (18 stays 18)",
+    "Krulle, Heir to Unkilling (10314110) — external -0/-2 with Krulle on board must restore leader (18 → 19)",
     () => {
       setupTurn(6, { hand: [KRULLE], pp: 4, hp: 18 });
       whenPlayCard("first", 0);
@@ -322,9 +323,12 @@ describe("Phase D4a — clause-gap cards (batch 1 of 2)", () => {
     60_000,
   );
 
-  it("Krulle, Heir to Unkilling (10314110) — control: no enemy defense loss keeps leader at 18 HP", () => {
+  // Owner qualifier "if he is successful": no enemy followers → Fanfare debuff does nothing → no heal.
+  it("Krulle, Heir to Unkilling (10314110) — Fanfare with no enemy followers does not restore leader (18 stays 18)", () => {
     setupTurn(6, { hand: [KRULLE], pp: 4, hp: 18 });
+    expect(thenBoard("second").length).toBe(0);
     whenPlayCard("first", 0);
+    flushReactiveQueueOnly();
     expect(getHP(state, "first")).toBe(18);
   }, 60_000);
 
