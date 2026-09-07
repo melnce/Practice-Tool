@@ -1219,13 +1219,17 @@
       "status": "covered"
     },
     "10122110": {
-      "fingerprint": "b6f05850",
+      "fingerprint": "2fd226e8",
       "gatesSatisfied": [],
       "name": "Luminous Commander",
       "scenarios": [
         {
           "fingerprint": "f9071ab3",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "0dd5d1a0",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -7963,7 +7967,7 @@
       "status": "covered"
     },
     "10661110": {
-      "fingerprint": "ef5c17a8",
+      "fingerprint": "75d40cd4",
       "gatesSatisfied": [],
       "name": "Prostrating Coward",
       "scenarios": [
@@ -7974,6 +7978,10 @@
         {
           "fingerprint": "e63391d0",
           "scenario": "crystallize_death"
+        },
+        {
+          "fingerprint": "6dbfcea2",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -9291,13 +9299,17 @@
       "status": "covered"
     },
     "10771110": {
-      "fingerprint": "31335f48",
+      "fingerprint": "8af3ca05",
       "gatesSatisfied": [],
       "name": "Brusque Barkeep",
       "scenarios": [
         {
           "fingerprint": "977ae62c",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "c44139a3",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -9415,7 +9427,7 @@
       "status": "covered"
     },
     "10774120": {
-      "fingerprint": "562c87d4",
+      "fingerprint": "917ddf40",
       "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Myuu, Hot on His Heels",
       "scenarios": [
@@ -9426,6 +9438,10 @@
         {
           "fingerprint": "3cf08fca",
           "scenario": "super_evolve"
+        },
+        {
+          "fingerprint": "11af653c",
+          "scenario": "play"
         }
       ],
       "status": "covered"
