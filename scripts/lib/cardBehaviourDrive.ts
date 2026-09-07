@@ -81,7 +81,8 @@ export type ScenarioName =
   | "vanilla_place"
   | "summon"
   | "in_hand"
-  | "destroy";
+  | "destroy"
+  | "engage";
 
 export type ScenarioResult = {
   scenario: ScenarioName;
@@ -550,6 +551,52 @@ export function hasDestroyOnDeathEffects(card: RawCard): boolean {
   );
 }
 
+function isEngageKeywordName(name: string): boolean {
+  return name.toLowerCase() === "engage";
+}
+
+/** Engage keyword on this card's board form with a non-empty effect list. */
+function keywordEntryHasEngageEffects(k: unknown): boolean {
+  if (typeof k === "string") return isEngageKeywordName(k);
+  if (!k || typeof k !== "object") return false;
+  const kw = k as { name?: unknown; effects?: unknown[] };
+  if (!isEngageKeywordName(String(kw.name ?? ""))) return false;
+  return Array.isArray(kw.effects) && kw.effects.length > 0;
+}
+
+export function hasEngageKeywordEffects(card: RawCard): boolean {
+  for (const k of card.keywords ?? []) {
+    if (keywordEntryHasEngageEffects(k)) return true;
+  }
+  return false;
+}
+
+function hasEngageTriggerEffects(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as { event?: string; type?: string; effects?: unknown[] };
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (ev !== "engage") continue;
+    if (hasNonEmptyEffects(trig.effects)) return true;
+  }
+  return false;
+}
+
+/** Data-derived: card carries Engage keyword effects or an engage trigger. */
+export function hasEngageAbility(card: RawCard): boolean {
+  return hasEngageKeywordEffects(card) || hasEngageTriggerEffects(card);
+}
+
+function engageCostFromRaw(card: RawCard): number {
+  for (const k of card.keywords ?? []) {
+    if (!k || typeof k !== "object") continue;
+    const kw = k as { name?: unknown; cost?: unknown };
+    if (!isEngageKeywordName(String(kw.name ?? ""))) continue;
+    return Number(kw.cost ?? 0);
+  }
+  return 0;
+}
+
 function playGrantsCrestTurnBoundary(card: RawCard): boolean {
   const playRoots: unknown[] = [...(card.fanfare ?? []), ...(card.spell ?? [])];
   let found = false;
@@ -577,6 +624,7 @@ function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
     case "summon":
     case "turn_boundary":
     case "destroy":
+    case "engage":
       return true;
     default:
       return false;
@@ -614,6 +662,9 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   }
   if (hasDestroyOnDeathEffects(card)) {
     paths.push("destroy");
+  }
+  if (hasEngageAbility(card)) {
+    paths.push("engage");
   }
   const isFollower = String(card.type).toLowerCase() === "follower";
   if (
@@ -1145,8 +1196,9 @@ function runSuperEvolveScenario(
   );
 }
 
+/** Zero-cost sacrifice Engage helper — keywords applied so engageAmulet sees hasEngage. */
 function engageAmuletOnBoard(): CardInstance {
-  return createCard(
+  const card = createCard(
     {
       name: "HarnessEngageAmulet",
       type: "Amulet",
@@ -1154,6 +1206,7 @@ function engageAmuletOnBoard(): CardInstance {
       keywords: [
         {
           name: "Engage",
+          cost: 0,
           sacrifice: true,
           effects: [{ op: "draw", source: "deck", count: 1 }],
         },
@@ -1162,6 +1215,8 @@ function engageAmuletOnBoard(): CardInstance {
     "board",
     "first",
   );
+  applyKeywordsFromList(card);
+  return card;
 }
 
 function earthSigilOnBoard(): CardInstance {
@@ -1538,6 +1593,88 @@ function runDestroyScenario(
   };
 }
 
+function runEngageScenario(
+  cardId: string,
+  raw: RawCard,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  const ownEngage = hasEngageKeywordEffects(raw);
+  const engageCost = ownEngage ? engageCostFromRaw(raw) : 0;
+  const firstPP = Math.max(10, engageCost + 2);
+
+  buildArena({ roundCount: 8, activePlayer: "first", firstPP, arenaNeeds });
+
+  trimBoardToCap(
+    state.players.first.board,
+    HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+  );
+
+  const host = makeCardFromDB(template, "first");
+  if (host.type === "Follower") {
+    host.justPlayed = false;
+  }
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  assertHarnessBoardCap("runEngageScenario:beforeEngage");
+
+  let engageIndex = -1;
+  if (ownEngage) {
+    const hostOnBoard = getBoard(state, "first").find(
+      (c) => c.uid === host.uid,
+    );
+    if (!hostOnBoard) {
+      return { skip: "drive_threw", detail: "host_missing_after_place" };
+    }
+    engageIndex = getBoard(state, "first").indexOf(hostOnBoard);
+  } else {
+    const helper = engageAmuletOnBoard();
+    state.players.first.board.push(helper);
+    engageIndex = getBoard(state, "first").indexOf(helper);
+  }
+
+  if (engageIndex < 0) {
+    return { skip: "drive_threw", detail: "engage_target_missing" };
+  }
+
+  const ppBefore = state.players.first.pp;
+  try {
+    engageAmulet("first", engageIndex);
+  } catch (err) {
+    return {
+      skip: "drive_threw",
+      detail: err instanceof Error ? err.message : String(err),
+    };
+  }
+
+  if (engageCost > 0 && state.players.first.pp >= ppBefore) {
+    return { skip: "drive_threw", detail: "engage_cost_not_paid" };
+  }
+
+  const pending = resolvePendingOrFail("engage_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "engage",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
 function runVanillaPlaceScenario(
   cardId: string,
   arenaNeeds?: HarnessArenaNeeds,
@@ -1764,6 +1901,8 @@ export function driveCard(
           result = runInHandScenario(id, gates, arenaNeeds);
         else if (path === "destroy")
           result = runDestroyScenario(id, gates, arenaNeeds);
+        else if (path === "engage")
+          result = runEngageScenario(id, raw, gates, arenaNeeds);
         else if (path === "summon") result = runSummonScenario(id, arenaNeeds);
         else result = runVanillaPlaceScenario(id, arenaNeeds);
       } catch (err) {

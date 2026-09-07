@@ -43,13 +43,13 @@
       "status": "covered"
     },
     "10001210": {
-      "fingerprint": "3d7b12b0",
+      "fingerprint": "39116f0f",
       "gatesSatisfied": [],
       "name": "Detective's Lens",
       "scenarios": [
         {
-          "fingerprint": "5ad0dd70",
-          "scenario": "vanilla_place"
+          "fingerprint": "5de258a0",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -83,13 +83,17 @@
       "status": "covered"
     },
     "10002210": {
-      "fingerprint": "995581d1",
+      "fingerprint": "5526dc90",
       "gatesSatisfied": [],
       "name": "Adventurers' Guild",
       "scenarios": [
         {
-          "fingerprint": "a51bc1fe",
+          "fingerprint": "ce016f98",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "8af051b4",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -283,13 +287,17 @@
       "status": "covered"
     },
     "10031210": {
-      "fingerprint": "47637b9f",
+      "fingerprint": "9038e0e8",
       "gatesSatisfied": [],
       "name": "Witch's New Brew",
       "scenarios": [
         {
-          "fingerprint": "8438b1dc",
+          "fingerprint": "26972cf8",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "cf580153",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -583,13 +591,17 @@
       "status": "covered"
     },
     "10061210": {
-      "fingerprint": "7b564e24",
+      "fingerprint": "dc142805",
       "gatesSatisfied": [],
       "name": "Avian Statue",
       "scenarios": [
         {
-          "fingerprint": "455b80d6",
+          "fingerprint": "ba8139ef",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "12c08978",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -611,25 +623,29 @@
       "status": "covered"
     },
     "10062120": {
-      "fingerprint": "5b6669dc",
+      "fingerprint": "7036f4a4",
       "gatesSatisfied": [],
       "name": "Sacred Griffon",
       "scenarios": [
         {
-          "fingerprint": "b91eafc4",
-          "scenario": "vanilla_place"
+          "fingerprint": "ee32eb48",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10062210": {
-      "fingerprint": "5de6b7b0",
+      "fingerprint": "5a2566f0",
       "gatesSatisfied": [],
       "name": "Winged Statue",
       "scenarios": [
         {
-          "fingerprint": "c7c5a35c",
+          "fingerprint": "c429f1e8",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "9f7989b4",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -971,17 +987,21 @@
       "status": "covered"
     },
     "10112210": {
-      "fingerprint": "75f93f80",
+      "fingerprint": "536b7a30",
       "gatesSatisfied": ["combo"],
       "name": "Lambent Cairn",
       "scenarios": [
         {
-          "fingerprint": "92624a30",
+          "fingerprint": "88b363fa",
           "scenario": "play_else"
         },
         {
-          "fingerprint": "646a3834",
+          "fingerprint": "40f33e64",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "6b1abc94",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -1059,13 +1079,17 @@
       "status": "covered"
     },
     "10113210": {
-      "fingerprint": "aa5f2c38",
+      "fingerprint": "3f7ac060",
       "gatesSatisfied": ["combo"],
       "name": "Godwood Staff",
       "scenarios": [
         {
           "fingerprint": "5b3b52f4",
           "scenario": "turn_boundary"
+        },
+        {
+          "fingerprint": "bdeae6c0",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -1379,24 +1403,24 @@
       "status": "covered"
     },
     "10131120": {
-      "fingerprint": "9a7c7fac",
+      "fingerprint": "3bd8f1e8",
       "gatesSatisfied": [],
       "name": "Apprentice Astrologer",
       "scenarios": [
         {
-          "fingerprint": "e1be50c8",
+          "fingerprint": "87502b84",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10131130": {
-      "fingerprint": "28a43dc7",
+      "fingerprint": "60d31f28",
       "gatesSatisfied": [],
       "name": "Owl Summoner",
       "scenarios": [
         {
-          "fingerprint": "ab53f8f3",
+          "fingerprint": "256a0758",
           "scenario": "play"
         },
         {
@@ -1491,12 +1515,12 @@
       "status": "covered"
     },
     "10132310": {
-      "fingerprint": "dd65691c",
+      "fingerprint": "47017b30",
       "gatesSatisfied": [],
       "name": "Sagelight Teachings",
       "scenarios": [
         {
-          "fingerprint": "4a426ffc",
+          "fingerprint": "09766260",
           "scenario": "play"
         }
       ],
@@ -1531,12 +1555,12 @@
       "status": "covered"
     },
     "10133120": {
-      "fingerprint": "7da1d8c8",
+      "fingerprint": "51036030",
       "gatesSatisfied": [],
       "name": "Penelope, Potions Prodigy",
       "scenarios": [
         {
-          "fingerprint": "8dfba3bc",
+          "fingerprint": "5ef6d323",
           "scenario": "play"
         },
         {
@@ -1544,7 +1568,7 @@
           "scenario": "evolve"
         },
         {
-          "fingerprint": "14ace5c4",
+          "fingerprint": "b6f7eefc",
           "scenario": "super_evolve"
         }
       ],
@@ -1847,13 +1871,13 @@
       "status": "covered"
     },
     "10143210": {
-      "fingerprint": "584b1594",
+      "fingerprint": "55fb77bc",
       "gatesSatisfied": [],
       "name": "Fan of Otohime",
       "scenarios": [
         {
-          "fingerprint": "566cc5a0",
-          "scenario": "vanilla_place"
+          "fingerprint": "3f486660",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -2043,13 +2067,17 @@
       "status": "covered"
     },
     "10152210": {
-      "fingerprint": "827d2b58",
+      "fingerprint": "c8a429e0",
       "gatesSatisfied": [],
       "name": "Shadowcrypt Memorial",
       "scenarios": [
         {
-          "fingerprint": "6f320010",
+          "fingerprint": "89e58ae0",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "a1c8ae64",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -2215,25 +2243,29 @@
       "status": "covered"
     },
     "10161140": {
-      "fingerprint": "ffee1da8",
+      "fingerprint": "a6c48f60",
       "gatesSatisfied": [],
       "name": "Mainyu, Darkdweller",
       "scenarios": [
         {
-          "fingerprint": "80d57467",
-          "scenario": "vanilla_place"
+          "fingerprint": "25470930",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10161210": {
-      "fingerprint": "fb0c5af0",
+      "fingerprint": "70f71480",
       "gatesSatisfied": [],
       "name": "Serene Sanctuary",
       "scenarios": [
         {
-          "fingerprint": "6ec2ac62",
+          "fingerprint": "c96fb20c",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "ece8e498",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -2291,25 +2323,25 @@
       "status": "covered"
     },
     "10162210": {
-      "fingerprint": "61ed5680",
+      "fingerprint": "80855cdf",
       "gatesSatisfied": [],
       "name": "Darkhaven Grace",
       "scenarios": [
         {
-          "fingerprint": "2cc395f8",
-          "scenario": "vanilla_place"
+          "fingerprint": "d4f775d8",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10162220": {
-      "fingerprint": "8b70dbf0",
+      "fingerprint": "d5cff607",
       "gatesSatisfied": [],
       "name": "Dose of Holiness",
       "scenarios": [
         {
-          "fingerprint": "5088038c",
-          "scenario": "vanilla_place"
+          "fingerprint": "88695c94",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -2351,25 +2383,29 @@
       "status": "covered"
     },
     "10163210": {
-      "fingerprint": "b7ee4aa8",
+      "fingerprint": "d7317f3c",
       "gatesSatisfied": [],
       "name": "Pact of the Beast Princess",
       "scenarios": [
         {
-          "fingerprint": "7f5ad900",
+          "fingerprint": "c8dc458f",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "4beba45c",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10163220": {
-      "fingerprint": "0a73b77c",
+      "fingerprint": "a75a4b1d",
       "gatesSatisfied": [],
       "name": "Unholy Vessel",
       "scenarios": [
         {
-          "fingerprint": "a20336c4",
-          "scenario": "vanilla_place"
+          "fingerprint": "e699d810",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -3147,16 +3183,16 @@
       "status": "covered"
     },
     "10232120": {
-      "fingerprint": "432ca631",
+      "fingerprint": "44c0c1f1",
       "gatesSatisfied": [],
       "name": "Enchanting Perfumer",
       "scenarios": [
         {
-          "fingerprint": "ac569c37",
+          "fingerprint": "ab018890",
           "scenario": "play"
         },
         {
-          "fingerprint": "98d41c24",
+          "fingerprint": "eb44a487",
           "scenario": "evolve"
         }
       ],
@@ -3187,16 +3223,16 @@
       "status": "covered"
     },
     "10233310": {
-      "fingerprint": "91c3d2d8",
+      "fingerprint": "c0453198",
       "gatesSatisfied": [],
       "name": "Pascale's Dance",
       "scenarios": [
         {
-          "fingerprint": "f44e1363",
+          "fingerprint": "ec952202",
           "scenario": "play"
         },
         {
-          "fingerprint": "5d06c4b3",
+          "fingerprint": "cd6086c0",
           "scenario": "turn_boundary"
         }
       ],
@@ -3307,13 +3343,13 @@
       "status": "covered"
     },
     "10242210": {
-      "fingerprint": "00e75c14",
+      "fingerprint": "ab458068",
       "gatesSatisfied": [],
       "name": "Pyrewyrm Blade",
       "scenarios": [
         {
-          "fingerprint": "b624bc7c",
-          "scenario": "vanilla_place"
+          "fingerprint": "a77bd937",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -3539,13 +3575,13 @@
       "status": "covered"
     },
     "10261210": {
-      "fingerprint": "076c1260",
+      "fingerprint": "fc7dd9a9",
       "gatesSatisfied": [],
       "name": "Luminous Censer",
       "scenarios": [
         {
-          "fingerprint": "36209df8",
-          "scenario": "vanilla_place"
+          "fingerprint": "d3efdd8c",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -3679,13 +3715,17 @@
       "status": "covered"
     },
     "10271210": {
-      "fingerprint": "26543294",
+      "fingerprint": "531e1a25",
       "gatesSatisfied": [],
       "name": "Artifact Catapult",
       "scenarios": [
         {
-          "fingerprint": "f9931c93",
+          "fingerprint": "4323ad04",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "686429c4",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -3847,13 +3887,17 @@
       "status": "covered"
     },
     "10303210": {
-      "fingerprint": "7bbefa70",
+      "fingerprint": "0d12cfbc",
       "gatesSatisfied": [],
       "name": "Tablet of Tribulations",
       "scenarios": [
         {
-          "fingerprint": "ec1c8fb4",
+          "fingerprint": "a247df47",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "d40cbf17",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -3963,13 +4007,17 @@
       "status": "covered"
     },
     "10312210": {
-      "fingerprint": "6c423621",
+      "fingerprint": "9e5d2878",
       "gatesSatisfied": [],
       "name": "Hamlet of Unkilling",
       "scenarios": [
         {
-          "fingerprint": "39e6db3f",
+          "fingerprint": "b52041b0",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "098fd463",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -4107,13 +4155,13 @@
       "status": "covered"
     },
     "10322210": {
-      "fingerprint": "e536a758",
+      "fingerprint": "252174e8",
       "gatesSatisfied": [],
       "name": "Lair of Usurpation",
       "scenarios": [
         {
-          "fingerprint": "15e237dc",
-          "scenario": "vanilla_place"
+          "fingerprint": "1f8337de",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -4243,13 +4291,13 @@
       "status": "covered"
     },
     "10332210": {
-      "fingerprint": "5f374d20",
+      "fingerprint": "d88dec64",
       "gatesSatisfied": [],
       "name": "Institute of Truth",
       "scenarios": [
         {
-          "fingerprint": "4764d544",
-          "scenario": "vanilla_place"
+          "fingerprint": "34d69be0",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -4399,13 +4447,13 @@
       "status": "covered"
     },
     "10342210": {
-      "fingerprint": "1b38acf7",
+      "fingerprint": "6cba6420",
       "gatesSatisfied": [],
       "name": "Nation of Disdain",
       "scenarios": [
         {
-          "fingerprint": "bf075638",
-          "scenario": "vanilla_place"
+          "fingerprint": "4eeefc1c",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -4543,13 +4591,17 @@
       "status": "covered"
     },
     "10352210": {
-      "fingerprint": "f5d10044",
+      "fingerprint": "708ebfaf",
       "gatesSatisfied": [],
       "name": "Castle of Entwining",
       "scenarios": [
         {
-          "fingerprint": "a88104d3",
+          "fingerprint": "45dd000c",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "ec2e6c3c",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -4679,25 +4731,33 @@
       "status": "covered"
     },
     "10362210": {
-      "fingerprint": "629b17f9",
+      "fingerprint": "17929c90",
       "gatesSatisfied": [],
       "name": "Temple of Repose",
       "scenarios": [
         {
-          "fingerprint": "b1e1988e",
+          "fingerprint": "58b3da0c",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "a36b3bbc",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10362220": {
-      "fingerprint": "9ac86168",
+      "fingerprint": "add663c8",
       "gatesSatisfied": [],
       "name": "Winged Lion Statue",
       "scenarios": [
         {
-          "fingerprint": "82f3f093",
+          "fingerprint": "67fd6d20",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "b6a64488",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -4719,13 +4779,17 @@
       "status": "covered"
     },
     "10363210": {
-      "fingerprint": "c5dddf45",
+      "fingerprint": "d5fcba5c",
       "gatesSatisfied": [],
       "name": "Shining Disenchantment",
       "scenarios": [
         {
-          "fingerprint": "2a93ef23",
+          "fingerprint": "9099e6ac",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "e336d5e4",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -5299,12 +5363,12 @@
       "status": "covered"
     },
     "10432110": {
-      "fingerprint": "ffb3fd08",
+      "fingerprint": "1a9daa18",
       "gatesSatisfied": [],
       "name": "Ezecrain, Portent of Vengeance",
       "scenarios": [
         {
-          "fingerprint": "31cf1c2f",
+          "fingerprint": "b5556234",
           "scenario": "play"
         }
       ],
@@ -5355,12 +5419,12 @@
       "status": "covered"
     },
     "10433310": {
-      "fingerprint": "6d214b15",
+      "fingerprint": "20474430",
       "gatesSatisfied": ["skybound_art"],
       "name": "Alchemic Flare",
       "scenarios": [
         {
-          "fingerprint": "d278923c",
+          "fingerprint": "c107a67c",
           "scenario": "play"
         }
       ],
@@ -5387,16 +5451,16 @@
       "status": "covered"
     },
     "10434120": {
-      "fingerprint": "9b12cc0d",
+      "fingerprint": "b9d478a7",
       "gatesSatisfied": ["skybound_art"],
       "name": "Cagliostro, Genius Alchemist",
       "scenarios": [
         {
-          "fingerprint": "f0b60483",
+          "fingerprint": "bba1af44",
           "scenario": "play"
         },
         {
-          "fingerprint": "7edd55c0",
+          "fingerprint": "f5badc78",
           "scenario": "turn_boundary"
         }
       ],
@@ -5691,13 +5755,13 @@
       "status": "covered"
     },
     "10461110": {
-      "fingerprint": "75a0ea38",
+      "fingerprint": "4a5d7bf9",
       "gatesSatisfied": [],
       "name": "Troue, Heroic Visionary",
       "scenarios": [
         {
-          "fingerprint": "46f6d542",
-          "scenario": "vanilla_place"
+          "fingerprint": "1b051080",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -5719,13 +5783,13 @@
       "status": "covered"
     },
     "10461210": {
-      "fingerprint": "fcc4bf9c",
+      "fingerprint": "2b3f39cc",
       "gatesSatisfied": [],
       "name": "Awed and Inspired",
       "scenarios": [
         {
-          "fingerprint": "6968b1ac",
-          "scenario": "vanilla_place"
+          "fingerprint": "6cb51a54",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -5767,41 +5831,45 @@
       "status": "covered"
     },
     "10462210": {
-      "fingerprint": "08222c18",
+      "fingerprint": "03de9f30",
       "gatesSatisfied": [],
       "name": "Skyfaring Vessel",
       "scenarios": [
         {
-          "fingerprint": "7c3445e4",
+          "fingerprint": "e417f2f8",
           "scenario": "in_hand"
         },
         {
-          "fingerprint": "bc257a60",
-          "scenario": "vanilla_place"
+          "fingerprint": "12b888d6",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10463110": {
-      "fingerprint": "36a2038f",
+      "fingerprint": "5e7bae21",
       "gatesSatisfied": [],
       "name": "Tikoh, Asclepian Surgeon",
       "scenarios": [
         {
           "fingerprint": "022d9698",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "2de5feeb",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10463210": {
-      "fingerprint": "d2054bfc",
+      "fingerprint": "7992f660",
       "gatesSatisfied": [],
       "name": "De La Fille's Gleaming Gems",
       "scenarios": [
         {
-          "fingerprint": "86e2a66c",
-          "scenario": "vanilla_place"
+          "fingerprint": "ff726738",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -6339,12 +6407,12 @@
       "status": "covered"
     },
     "10531110": {
-      "fingerprint": "8412ec54",
+      "fingerprint": "042968b1",
       "gatesSatisfied": [],
       "name": "Terraforming Wizard",
       "scenarios": [
         {
-          "fingerprint": "f0a0776f",
+          "fingerprint": "ffc84a58",
           "scenario": "play"
         },
         {
@@ -6847,13 +6915,13 @@
       "status": "covered"
     },
     "10562210": {
-      "fingerprint": "b76cf4c0",
+      "fingerprint": "72a8eb7c",
       "gatesSatisfied": [],
       "name": "Protective Shell",
       "scenarios": [
         {
-          "fingerprint": "50ae92be",
-          "scenario": "vanilla_place"
+          "fingerprint": "9de4ebcf",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -6879,13 +6947,17 @@
       "status": "covered"
     },
     "10563210": {
-      "fingerprint": "aecb2df7",
+      "fingerprint": "afd4d498",
       "gatesSatisfied": [],
       "name": "Resolve of the Mistbloom",
       "scenarios": [
         {
-          "fingerprint": "0b058f10",
+          "fingerprint": "19a6a78c",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "2ab3f708",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -7087,13 +7159,13 @@
       "status": "covered"
     },
     "10602210": {
-      "fingerprint": "a7d40f50",
+      "fingerprint": "9cb4aaf8",
       "gatesSatisfied": [],
       "name": "Encroached World",
       "scenarios": [
         {
-          "fingerprint": "1dd4366c",
-          "scenario": "vanilla_place"
+          "fingerprint": "c12f4e40",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -7879,13 +7951,17 @@
       "status": "covered"
     },
     "10661210": {
-      "fingerprint": "78414ffc",
+      "fingerprint": "86ebbaff",
       "gatesSatisfied": [],
       "name": "Unholy Water",
       "scenarios": [
         {
-          "fingerprint": "8ded8658",
+          "fingerprint": "dc6bb418",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "c766dd10",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -8207,13 +8283,17 @@
       "status": "covered"
     },
     "10703210": {
-      "fingerprint": "09983570",
+      "fingerprint": "f5b051bf",
       "gatesSatisfied": [],
       "name": "City of Babelon",
       "scenarios": [
         {
           "fingerprint": "51e57944",
           "scenario": "turn_boundary"
+        },
+        {
+          "fingerprint": "de417d9c",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -8551,28 +8631,28 @@
       "status": "covered"
     },
     "10731120": {
-      "fingerprint": "5496cde9",
+      "fingerprint": "00ba891c",
       "gatesSatisfied": [],
       "name": "Little Beastie",
       "scenarios": [
         {
-          "fingerprint": "06ecc5c8",
+          "fingerprint": "8b0a386c",
           "scenario": "play"
         },
         {
-          "fingerprint": "5bb0e130",
+          "fingerprint": "044e2e67",
           "scenario": "evolve"
         }
       ],
       "status": "covered"
     },
     "10731310": {
-      "fingerprint": "f8775f58",
+      "fingerprint": "a1e39af0",
       "gatesSatisfied": [],
       "name": "Heel, My Dearie",
       "scenarios": [
         {
-          "fingerprint": "1e19447c",
+          "fingerprint": "0e41994b",
           "scenario": "play"
         },
         {
@@ -8583,7 +8663,7 @@
       "status": "covered"
     },
     "10732110": {
-      "fingerprint": "d0e2dcc8",
+      "fingerprint": "cc90d200",
       "gatesSatisfied": [],
       "name": "Charming Monster",
       "scenarios": [
@@ -8596,31 +8676,31 @@
           "scenario": "super_evolve"
         },
         {
-          "fingerprint": "a4e496e6",
+          "fingerprint": "1361f3d0",
           "scenario": "destroy"
         }
       ],
       "status": "covered"
     },
     "10732120": {
-      "fingerprint": "20677d40",
+      "fingerprint": "2afbfee7",
       "gatesSatisfied": [],
       "name": "Pretty Predator",
       "scenarios": [
         {
-          "fingerprint": "4606c608",
+          "fingerprint": "042661f0",
           "scenario": "play"
         }
       ],
       "status": "covered"
     },
     "10732310": {
-      "fingerprint": "e32c6b98",
+      "fingerprint": "9d1a0f6c",
       "gatesSatisfied": [],
       "name": "Haphazard Snacking",
       "scenarios": [
         {
-          "fingerprint": "eda0e37c",
+          "fingerprint": "10f34cb0",
           "scenario": "play"
         }
       ],
@@ -8643,12 +8723,12 @@
       "status": "covered"
     },
     "10733310": {
-      "fingerprint": "dea17bf0",
+      "fingerprint": "336331df",
       "gatesSatisfied": [],
       "name": "Bottomless Gluttony",
       "scenarios": [
         {
-          "fingerprint": "74db8818",
+          "fingerprint": "a0fe2418",
           "scenario": "play"
         },
         {
@@ -9031,13 +9111,17 @@
       "status": "covered"
     },
     "10761210": {
-      "fingerprint": "5749a7e9",
+      "fingerprint": "3b2d8bb0",
       "gatesSatisfied": [],
       "name": "Earrings of Sunlight",
       "scenarios": [
         {
-          "fingerprint": "8d99dd08",
+          "fingerprint": "3c7daff8",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "ca51e7a2",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -9067,13 +9151,17 @@
       "status": "covered"
     },
     "10762210": {
-      "fingerprint": "f154cedf",
+      "fingerprint": "ba4324f8",
       "gatesSatisfied": [],
       "name": "Timepiece of Perfection",
       "scenarios": [
         {
-          "fingerprint": "facde4e8",
+          "fingerprint": "b2fd6c50",
           "scenario": "play_base"
+        },
+        {
+          "fingerprint": "76f12af4",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -9095,13 +9183,17 @@
       "status": "covered"
     },
     "10763210": {
-      "fingerprint": "dfa4d280",
+      "fingerprint": "f74e78d8",
       "gatesSatisfied": [],
       "name": "Trident of Eroding Tides",
       "scenarios": [
         {
-          "fingerprint": "166ce5a2",
+          "fingerprint": "32577a98",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "d00514b8",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -11231,13 +11323,17 @@
       "status": "covered"
     },
     "10961210": {
-      "fingerprint": "bf3a38f0",
+      "fingerprint": "1b5a98b0",
       "gatesSatisfied": [],
       "name": "Roaring Basilica",
       "scenarios": [
         {
-          "fingerprint": "8a54aeec",
+          "fingerprint": "a798fc10",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "4be2c748",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -11303,13 +11399,17 @@
       "status": "covered"
     },
     "10963210": {
-      "fingerprint": "dac278c8",
+      "fingerprint": "e5da029c",
       "gatesSatisfied": [],
       "name": "Juratio",
       "scenarios": [
         {
-          "fingerprint": "09139780",
+          "fingerprint": "840d2144",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "6ef3b297",
+          "scenario": "engage"
         }
       ],
       "status": "covered"
@@ -11911,13 +12011,13 @@
       "token": true
     },
     "90031210": {
-      "fingerprint": "eb9d6e3c",
+      "fingerprint": "a54548d8",
       "gatesSatisfied": [],
       "name": "Magic Sediment",
       "scenarios": [
         {
-          "fingerprint": "c7ba04e4",
-          "scenario": "vanilla_place"
+          "fingerprint": "b8d29064",
+          "scenario": "engage"
         }
       ],
       "status": "covered",
