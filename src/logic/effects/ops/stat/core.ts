@@ -180,9 +180,8 @@ export function checkPostBuffTriggers(
       : redBoard.includes(target)
         ? "second"
         : null;
-    const debufferOwner = owner; // the player executing this buff/debuff op
-    if (targetOwner && debufferOwner) {
-      fireTrigger("enemy_follower_defense_down", debufferOwner, { target });
+    if (targetOwner) {
+      fireTrigger("enemy_follower_defense_down", targetOwner, { target });
     }
   }
 }
