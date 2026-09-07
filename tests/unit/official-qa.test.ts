@@ -274,6 +274,8 @@ describe("official Q&A backlog (it.todo per unpinned ruling)", () => {
     expect(pinned.length + unpinned.length).toBe(coverage.length);
   });
 
+  // One it.todo per unpinned row below — Vitest todo count === unpinned.length
+  // by construction (not a separate counter that could drift).
   for (const row of unpinned) {
     it.todo(`${row.id} ${row.name} — Q: ${row.question} / A: ${row.answer}`);
   }
