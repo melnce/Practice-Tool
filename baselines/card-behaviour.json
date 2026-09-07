@@ -4111,12 +4111,12 @@
       "status": "covered"
     },
     "10314110": {
-      "fingerprint": "d27e82af",
+      "fingerprint": "d716bd90",
       "gatesSatisfied": [],
       "name": "Krulle, Heir to Unkilling",
       "scenarios": [
         {
-          "fingerprint": "d8ef3944",
+          "fingerprint": "46eec9a3",
           "scenario": "play"
         },
         {

@@ -14,6 +14,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { loadPool, type PoolCard } from "./card-behaviour.js";
 import {
+  FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT,
   runSubjecthoodAnalysis,
   runSubjecthoodDarkGate,
   type SubjecthoodReport,
@@ -40,7 +41,7 @@ function printTable(report: SubjecthoodReport): void {
     ["— mentioned only as filler", summary.mentionedOnlyAsFiller, ""],
     ["— never mentioned anywhere", summary.neverMentioned, ""],
     [
-      "fewer subject blocks than clauses",
+      "fewer subject blocks than clauses †",
       summary.fewerSubjectBlocksThanClauses,
       "",
     ],
@@ -69,6 +70,10 @@ function printTable(report: SubjecthoodReport): void {
   }
   console.log("─".repeat(72));
   console.log(`${"pool size".padEnd(46)} ${String(poolSize).padStart(6)}`);
+  console.log("");
+  console.log(
+    `  † ${summary.fewerSubjectBlocksThanClausesCaveat ?? FEWER_SUBJECT_BLOCKS_THAN_CLAUSES_CAVEAT}`,
+  );
   console.log(
     `\nNested describe inheritance: ${report.options.inheritDescribeTitles}`,
   );
