@@ -26,7 +26,12 @@ import {
 } from "../../src/logic/core/resolveTarget.js";
 import { dispatchAction } from "../../src/logic/core/dispatch.js";
 import { setScriptedModePickProvider } from "../../src/logic/script/modeHook.js";
-import { attackLeader } from "../../src/logic/core/combat.js";
+import {
+  attackFollower,
+  attackLeader,
+  effectiveAttackEligibility,
+  recomputeAttackFlags,
+} from "../../src/logic/core/combat.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { consumeEarthSigils } from "../../src/logic/effects/ops/earth.js";
@@ -84,6 +89,7 @@ export type ScenarioName =
   | "in_hand"
   | "destroy"
   | "engage"
+  | "combat"
   | "accelerate"
   | "crystallize"
   | "crystallize_engage"
@@ -592,6 +598,24 @@ export function hasEngageAbility(card: RawCard): boolean {
   return hasEngageKeywordEffects(card) || hasEngageTriggerEffects(card);
 }
 
+const COMBAT_TRIGGER_EVENTS = new Set(["strike", "follower_strike", "clash"]);
+
+function hasCombatTriggerEntryEffects(card: RawCard): boolean {
+  for (const t of card.triggers ?? []) {
+    if (!t || typeof t !== "object") continue;
+    const trig = t as { event?: string; type?: string; effects?: unknown[] };
+    const ev = String(trig.event ?? trig.type ?? "").toLowerCase();
+    if (!COMBAT_TRIGGER_EVENTS.has(ev)) continue;
+    if (hasNonEmptyEffects(trig.effects)) return true;
+  }
+  return false;
+}
+
+/** Data-derived: card carries strike / follower_strike / clash trigger effects. */
+export function hasCombatTriggerEffects(card: RawCard): boolean {
+  return hasCombatTriggerEntryEffects(card);
+}
+
 function isAccelerateKeywordName(name: string): boolean {
   return name.toLowerCase() === "accelerate";
 }
@@ -737,6 +761,7 @@ function scenarioPlacesSubjectOnBoard(scenario: ScenarioName): boolean {
     case "turn_boundary":
     case "destroy":
     case "engage":
+    case "combat":
     case "accelerate":
     case "crystallize":
     case "crystallize_engage":
@@ -781,6 +806,9 @@ function classifyPaths(card: RawCard): ScenarioName[] {
   }
   if (hasEngageAbility(card)) {
     paths.push("engage");
+  }
+  if (hasCombatTriggerEffects(card)) {
+    paths.push("combat");
   }
   if (hasAccelerateForm(card)) {
     paths.push("accelerate");
@@ -1721,6 +1749,154 @@ function runDestroyScenario(
   };
 }
 
+/** Prefer the plain arena follower over Ward/other targets for stable trades. */
+function arenaEnemyADefenderIndex(): number {
+  const board = getBoard(state, "second");
+  const idx = board.findIndex((c) => c.name === "ArenaEnemyA");
+  return idx >= 0 ? idx : 0;
+}
+
+/** Ward blocks non-Ward targets — strip it so ArenaEnemyA is attackable. */
+function clearEnemyWardBlockers(): void {
+  for (const card of getBoard(state, "second")) {
+    if (card.type !== "Follower") continue;
+    if (!card.hasWard) continue;
+    card.hasWard = false;
+    if (Array.isArray((card as any).keywords)) {
+      (card as any).keywords = (card as any).keywords.filter(
+        (k: unknown) =>
+          !(
+            k === "Ward" ||
+            (k &&
+              typeof k === "object" &&
+              (k as { name?: string }).name === "Ward")
+          ),
+      );
+    }
+  }
+}
+
+function prepareCombatAttacker(card: CardInstance): void {
+  card.justPlayed = false;
+  card.hasAttacked = false;
+  const per = Number.isFinite(card.attacks_per_turn)
+    ? (card.attacks_per_turn as number)
+    : 1;
+  card.attacks_left = per;
+  card.attacks_used_this_turn = 0;
+  applyKeywordsFromList(card);
+  recomputeAttackFlags(card);
+}
+
+function combatAttackObserved(
+  attacker: CardInstance,
+  defender: CardInstance,
+  before: {
+    defenderDef: number;
+    attacksUsed: number;
+    attacksLeft: number;
+  },
+): boolean {
+  const defAfter = parseInt(defender.defense as any, 10) || 0;
+  const attacksUsedAfter = attacker.attacks_used_this_turn ?? 0;
+  const attacksLeftAfter =
+    attacker.attacks_left ??
+    (Number.isFinite(attacker.attacks_per_turn)
+      ? (attacker.attacks_per_turn as number)
+      : 1);
+  return (
+    attacksUsedAfter > before.attacksUsed ||
+    defAfter < before.defenderDef ||
+    attacksLeftAfter < before.attacksLeft ||
+    !!attacker.hasAttacked
+  );
+}
+
+function runCombatScenario(
+  cardId: string,
+  gates: GateSpec[],
+  arenaNeeds?: HarnessArenaNeeds,
+): ScenarioResult | { skip: SkipReason; detail: string } {
+  const template = getCardById(cardId);
+  if (!template) return { skip: "card_not_in_registry", detail: cardId };
+
+  buildArena({ roundCount: 8, activePlayer: "first", firstPP: 10, arenaNeeds });
+
+  trimBoardToCap(
+    state.players.first.board,
+    HARNESS_BOARD_CAP - HARNESS_BOARD_RESERVE,
+  );
+
+  const host = makeCardFromDB(template, "first");
+  prepareCombatAttacker(host);
+
+  const prep = applyGatePreparations(gates, {
+    mode: "satisfy",
+    sourceCard: host,
+  });
+
+  if (!pushToBoard(state.players.first.board, "first", host)) {
+    return { skip: "play_blocked", detail: "board_full" };
+  }
+
+  assertHarnessBoardCap("runCombatScenario:beforeAttack");
+
+  const hostOnBoard = getBoard(state, "first").find((c) => c.uid === host.uid);
+  if (!hostOnBoard) {
+    return { skip: "drive_threw", detail: "host_missing_after_place" };
+  }
+
+  prepareCombatAttacker(hostOnBoard);
+  if (!effectiveAttackEligibility(hostOnBoard)) {
+    return { skip: "drive_threw", detail: "attacker_cannot_attack" };
+  }
+
+  clearEnemyWardBlockers();
+
+  const attackerIdx = getBoard(state, "first").indexOf(hostOnBoard);
+  const defenderIdx = arenaEnemyADefenderIndex();
+  const defenderBoard = getBoard(state, "second");
+  const defender = defenderBoard[defenderIdx];
+  if (!defender || defender.type !== "Follower") {
+    return { skip: "drive_threw", detail: "defender_missing" };
+  }
+
+  const before = {
+    defenderDef: parseInt(defender.defense as any, 10) || 0,
+    attacksUsed: hostOnBoard.attacks_used_this_turn ?? 0,
+    attacksLeft:
+      hostOnBoard.attacks_left ??
+      (Number.isFinite(hostOnBoard.attacks_per_turn)
+        ? (hostOnBoard.attacks_per_turn as number)
+        : 1),
+  };
+
+  const outcome = attackFollower(attackerIdx, defenderIdx, "first", "second");
+  if (outcome.kind === "blocked") {
+    return {
+      skip: "drive_threw",
+      detail: `attack_blocked:${outcome.reason}`,
+    };
+  }
+
+  const defenderAfter = defenderBoard[defenderIdx] ?? defender;
+  if (!combatAttackObserved(hostOnBoard, defenderAfter, before)) {
+    return { skip: "drive_threw", detail: "attack_did_not_resolve" };
+  }
+
+  const pending = resolvePendingOrFail("combat_after");
+  if (!("ok" in pending)) return pending;
+
+  const detail = fingerprintGameState(state);
+  return {
+    scenario: "combat",
+    fingerprint: hashFingerprint(detail),
+    detail,
+    gatesSatisfied: prep.satisfied,
+    gatesUnmet: prep.unmet,
+  };
+}
+
 function runEngageScenario(
   cardId: string,
   raw: RawCard,
@@ -2293,6 +2469,8 @@ export function driveCard(
           result = runDestroyScenario(id, gates, arenaNeeds);
         else if (path === "engage")
           result = runEngageScenario(id, raw, gates, arenaNeeds);
+        else if (path === "combat")
+          result = runCombatScenario(id, gates, arenaNeeds);
         else if (path === "accelerate")
           result = runAccelerateScenario(id, raw, gates, arenaNeeds);
         else if (path === "crystallize")
