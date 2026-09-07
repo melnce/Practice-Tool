@@ -1219,13 +1219,17 @@
       "status": "covered"
     },
     "10122110": {
-      "fingerprint": "b6f05850",
+      "fingerprint": "2fd226e8",
       "gatesSatisfied": [],
       "name": "Luminous Commander",
       "scenarios": [
         {
           "fingerprint": "f9071ab3",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "0dd5d1a0",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -7963,10 +7967,18 @@
       "status": "covered"
     },
     "10661110": {
-      "fingerprint": "1d95d3d4",
+      "fingerprint": "75d40cd4",
       "gatesSatisfied": [],
       "name": "Prostrating Coward",
       "scenarios": [
+        {
+          "fingerprint": "7c3f9d08",
+          "scenario": "crystallize"
+        },
+        {
+          "fingerprint": "e63391d0",
+          "scenario": "crystallize_death"
+        },
         {
           "fingerprint": "6dbfcea2",
           "scenario": "play"
@@ -8003,13 +8015,17 @@
       "status": "covered"
     },
     "10662110": {
-      "fingerprint": "032804e5",
+      "fingerprint": "22e3e93b",
       "gatesSatisfied": [],
       "name": "Venerating Dyer",
       "scenarios": [
         {
-          "fingerprint": "a4c92a2c",
-          "scenario": "vanilla_place"
+          "fingerprint": "18f68f1c",
+          "scenario": "crystallize"
+        },
+        {
+          "fingerprint": "a75ba18b",
+          "scenario": "crystallize_death"
         }
       ],
       "status": "covered"
@@ -8043,7 +8059,7 @@
       "status": "covered"
     },
     "10663110": {
-      "fingerprint": "4177dcc8",
+      "fingerprint": "65be54af",
       "gatesSatisfied": [],
       "name": "Worshipful Crusader",
       "scenarios": [
@@ -8054,6 +8070,14 @@
         {
           "fingerprint": "602ee6f8",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "71af9fc4",
+          "scenario": "crystallize"
+        },
+        {
+          "fingerprint": "3052de14",
+          "scenario": "crystallize_death"
         }
       ],
       "status": "covered"
@@ -8111,13 +8135,17 @@
       "status": "covered"
     },
     "10671110": {
-      "fingerprint": "8f097fb0",
+      "fingerprint": "ee830b20",
       "gatesSatisfied": [],
       "name": "Shoddy Plaything",
       "scenarios": [
         {
           "fingerprint": "ab415fc8",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "534f7462",
+          "scenario": "accelerate"
         }
       ],
       "status": "covered"
@@ -8147,13 +8175,17 @@
       "status": "covered"
     },
     "10672110": {
-      "fingerprint": "711e79e0",
+      "fingerprint": "7938a580",
       "gatesSatisfied": [],
       "name": "Substandard Puppet",
       "scenarios": [
         {
           "fingerprint": "8dd7a1c7",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "4c53e5d4",
+          "scenario": "accelerate"
         }
       ],
       "status": "covered"
@@ -8183,7 +8215,7 @@
       "status": "covered"
     },
     "10673110": {
-      "fingerprint": "72cd08c9",
+      "fingerprint": "3e8c9988",
       "gatesSatisfied": [],
       "name": "Ludicrous Ordnance",
       "scenarios": [
@@ -8198,6 +8230,10 @@
         {
           "fingerprint": "9ccf1e2e",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "c61f7a50",
+          "scenario": "accelerate"
         }
       ],
       "status": "covered"
@@ -9263,13 +9299,17 @@
       "status": "covered"
     },
     "10771110": {
-      "fingerprint": "31335f48",
+      "fingerprint": "8af3ca05",
       "gatesSatisfied": [],
       "name": "Brusque Barkeep",
       "scenarios": [
         {
           "fingerprint": "977ae62c",
           "scenario": "evolve"
+        },
+        {
+          "fingerprint": "c44139a3",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -9387,7 +9427,7 @@
       "status": "covered"
     },
     "10774120": {
-      "fingerprint": "562c87d4",
+      "fingerprint": "917ddf40",
       "gatesSatisfied": ["unique_tribe_enters"],
       "name": "Myuu, Hot on His Heels",
       "scenarios": [
@@ -9398,6 +9438,10 @@
         {
           "fingerprint": "3cf08fca",
           "scenario": "super_evolve"
+        },
+        {
+          "fingerprint": "11af653c",
+          "scenario": "play"
         }
       ],
       "status": "covered"
@@ -10047,7 +10091,7 @@
       "status": "covered"
     },
     "10844120": {
-      "fingerprint": "0328ed6d",
+      "fingerprint": "9f38fb18",
       "gatesSatisfied": [],
       "name": "Lumiore & Argente, Shining Wings",
       "scenarios": [
@@ -10062,6 +10106,10 @@
         {
           "fingerprint": "145cb9b4",
           "scenario": "super_evolve"
+        },
+        {
+          "fingerprint": "fbcb666b",
+          "scenario": "accelerate"
         }
       ],
       "status": "covered"
@@ -10515,13 +10563,17 @@
       "status": "covered"
     },
     "10901110": {
-      "fingerprint": "238164f0",
+      "fingerprint": "036639ac",
       "gatesSatisfied": [],
       "name": "Jailor of Antiquity",
       "scenarios": [
         {
           "fingerprint": "aa8da8e4",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "2212446c",
+          "scenario": "accelerate"
         }
       ],
       "status": "covered"
@@ -11231,13 +11283,21 @@
       "status": "covered"
     },
     "10952110": {
-      "fingerprint": "b1433568",
+      "fingerprint": "56a08d18",
       "gatesSatisfied": [],
       "name": "Void Colonel",
       "scenarios": [
         {
           "fingerprint": "2c26bffc",
           "scenario": "destroy"
+        },
+        {
+          "fingerprint": "200bc31b",
+          "scenario": "crystallize"
+        },
+        {
+          "fingerprint": "9da11fb8",
+          "scenario": "crystallize_death"
         }
       ],
       "status": "covered"
@@ -11395,13 +11455,21 @@
       "status": "covered"
     },
     "10962120": {
-      "fingerprint": "efc26650",
+      "fingerprint": "d0a56e3d",
       "gatesSatisfied": [],
       "name": "Miraculous Al-mi'raj",
       "scenarios": [
         {
-          "fingerprint": "8b075984",
-          "scenario": "vanilla_place"
+          "fingerprint": "ecad0684",
+          "scenario": "crystallize"
+        },
+        {
+          "fingerprint": "b49fad0e",
+          "scenario": "crystallize_engage"
+        },
+        {
+          "fingerprint": "f6908784",
+          "scenario": "crystallize_death"
         }
       ],
       "status": "covered"
