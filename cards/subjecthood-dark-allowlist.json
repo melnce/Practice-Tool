@@ -1,0 +1,18 @@
+[
+  {
+    "cardId": "10221120",
+    "reason": "Nightshadow Ninja Master — id and name appear in no scanned test file (*.test.ts / *.spec.ts)."
+  },
+  {
+    "cardId": "10143110",
+    "reason": "Genesis Dragon Reborn — name appears only in a block comment in tests/audit/batch02_dragoncraft.test.ts; id never appears in scanned test files; zero asserting-block subjects."
+  },
+  {
+    "cardId": "10144120",
+    "reason": "Forte, Blackwing Dragoon — within scanned test files, id appears only in tests/e2e/qa/gauntlet.spec.ts (filler setup) and name appears in no test file; neither id nor name in any asserting-block title."
+  },
+  {
+    "cardId": "10021130",
+    "reason": "Centaur Centurion — id in many deck/filler tests; never named in an asserting-block title."
+  }
+]
