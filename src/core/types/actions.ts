@@ -64,6 +64,10 @@ export type ConfirmMulliganAction = {
   player: Player;
 };
 
+export type ConfirmTargetsAction = {
+  type: "CONFIRM_TARGETS";
+};
+
 export type FuseAction = {
   type: "FUSE";
   player: Player;
@@ -89,6 +93,7 @@ export type ActionType =
   | "CHOOSE_MODE"
   | "TOGGLE_MULLIGAN"
   | "CONFIRM_MULLIGAN"
+  | "CONFIRM_TARGETS"
   | "FUSE";
 
 // Step 2: Define the canonical type mapping (ActionType -> Action interface)
@@ -106,6 +111,7 @@ export interface ActionByType {
   CHOOSE_MODE: ChooseModeAction;
   TOGGLE_MULLIGAN: ToggleMulliganAction;
   CONFIRM_MULLIGAN: ConfirmMulliganAction;
+  CONFIRM_TARGETS: ConfirmTargetsAction;
   FUSE: FuseAction;
 }
 

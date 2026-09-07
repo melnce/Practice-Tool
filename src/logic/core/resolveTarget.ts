@@ -34,6 +34,13 @@ import { clearResolutionQueue, getResolutionQueue } from "./triggers/queue.js";
 import { flushDeferredDeckShuffle } from "../effects/ops/returnHandToDeck.js";
 import { flushDeferredOnFuse } from "../effects/ops/fuse/types.js";
 import { finishFollowerEnter } from "../effects/ops/summon_ops/core.js";
+import {
+  canConfirmPendingTarget,
+  getPendingConfirmKey,
+  registerPendingConfirmHandler,
+  runPendingConfirmHandler,
+  type PendingConfirmInput,
+} from "./pendingTarget/confirmRegistry.js";
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
@@ -46,10 +53,21 @@ function getRequiredSelectCount(pending: any): number {
     : 1;
 }
 
-function isMultiPickHandDiscard(pending: {
-  picksAreCommitted?: boolean;
-}): boolean {
+function hasCommittedPicks(pending: { picksAreCommitted?: boolean }): boolean {
   return pending.picksAreCommitted === true;
+}
+
+function isMultiPickHandDiscardOp(pending: {
+  eff?: { op?: string };
+  op?: string;
+}): boolean {
+  const topOp = String((pending as { op?: string }).op ?? "");
+  const effOp = String(pending.eff?.op ?? "");
+  return (
+    topOp === "discard_select_hand" ||
+    effOp === "discard" ||
+    effOp === "discard_select_hand"
+  );
 }
 
 function applyMultiPickDiscardPick(pending: any, uid: string): void {
@@ -101,6 +119,47 @@ function completeMultiPickDiscardPending(pending: any): void {
   settleTargetedOpResolutionQueue();
 
   adapter.render();
+}
+
+function resolveCommittedConfirmTarget(pending: any, uid: string | "leader") {
+  const previewPending = {
+    ...pending,
+    targetUids: [...(pending.targetUids ?? [])],
+  };
+  const preview = applyTargetClick(state, previewPending, uid);
+  if (preview.kind === "invalid") {
+    if (preview.reason) console.warn(preview.reason);
+    return;
+  }
+
+  const op = (pending.eff as { op?: string })?.op;
+  const actionName =
+    preview.kind === "execute" ? "Resolve Targets" : "Pick Target";
+
+  doAction(
+    actionName,
+    () => {
+      const result = applyTargetClick(state, pending, uid);
+      if (result.kind === "execute") {
+        orchestrateExecution(result.opCtx);
+      } else if (result.kind === "confirm_needed") {
+        showConfirmationButton(pending);
+      } else if (result.kind === "continue") {
+        if (pending.pool?.length) {
+          highlightSelectable(pending.pool);
+        } else {
+          clearSelectableFlags();
+        }
+      }
+    },
+    {
+      op,
+      owner: pending.owner,
+      source: pending.sourceCard?.name,
+      uid,
+    },
+    { autoRender: true },
+  );
 }
 
 function resolveMultiPickHandDiscardTarget(
@@ -181,8 +240,12 @@ export function resolvePendingTarget(uid: string | "leader") {
   const pending = state.pendingTargetEffect;
   if (!pending) return;
 
-  if (isMultiPickHandDiscard(pending)) {
-    resolveMultiPickHandDiscardTarget(pending, uid);
+  if (hasCommittedPicks(pending)) {
+    if (isMultiPickHandDiscardOp(pending)) {
+      resolveMultiPickHandDiscardTarget(pending, uid);
+    } else {
+      resolveCommittedConfirmTarget(pending, uid);
+    }
     return;
   }
 
@@ -326,6 +389,76 @@ export function confirmTargetsIfNeeded() {
   adapter.triggerConfirmButtonClick();
 }
 
+function confirmPendingTargetImpl(): void {
+  const pending = state.pendingTargetEffect as PendingConfirmInput | undefined;
+  if (!pending || !canConfirmPendingTarget(pending)) return;
+
+  const fullPending = state.pendingTargetEffect!;
+  const targetUids = fullPending.targetUids || [];
+  const opCtx: TargetedOpContext = {
+    eff: fullPending.eff,
+    owner: fullPending.owner,
+    sourceCard: fullPending.sourceCard,
+    targetUids: [...targetUids],
+    resumeEffects: fullPending.resumeEffects,
+  };
+
+  doAction(
+    "Confirm Targets",
+    () => {
+      const resolvedTargets = resolveUids(targetUids);
+      logEvent("targetsConfirmed", {
+        op: opCtx.eff.op,
+        owner: opCtx.owner,
+        source: opCtx.sourceCard?.name,
+        sourceUid: opCtx.sourceCard?.uid,
+        targetUids,
+        targets: resolvedTargets.map((t) => ({
+          name: t?.name,
+          uid: t?.uid,
+          type: t?.type,
+        })),
+      });
+      orchestrateExecution(opCtx);
+    },
+    {
+      op: fullPending?.eff?.op,
+      owner: fullPending?.owner,
+      source: fullPending?.sourceCard?.name,
+      confirmKey: getPendingConfirmKey(pending),
+    },
+    { autoRender: true },
+  );
+}
+
+const FUSE_FINALIZE_CONFIRM_TYPES = [
+  "cards",
+  "gear_multi",
+  "fortifier",
+  "alpha",
+  "loot",
+  "generic",
+  "gardens_allure",
+] as const;
+
+for (const fuseType of FUSE_FINALIZE_CONFIRM_TYPES) {
+  registerPendingConfirmHandler(
+    `fuse:finalize:${fuseType}`,
+    confirmPendingTargetImpl,
+  );
+}
+registerPendingConfirmHandler("targeted:default", confirmPendingTargetImpl);
+
+/** Confirm pending selection from serializable prompt data (undo/save/load/re-execute). */
+export function confirmPendingTargetFromState(): boolean {
+  const pending = state.pendingTargetEffect as PendingConfirmInput | undefined;
+  if (!canConfirmPendingTarget(pending)) return false;
+  const key = getPendingConfirmKey(pending!)!;
+  return runPendingConfirmHandler(key);
+}
+
+export { canConfirmPendingTarget, getPendingConfirmKey };
+
 /**
  * Force-complete a stuck pending selection (pool emptied mid-pick).
  * Executes with whatever targets are already selected; if none, fizzles
@@ -383,70 +516,17 @@ export function forceCompleteOrFizzlePendingTarget(): void {
   adapter.render();
 }
 
-// Internal UI helper
+// Internal UI helper — reconstructs adapter callback from serializable pending data.
+export function resyncPendingTargetConfirmation(): void {
+  const pending = state.pendingTargetEffect as PendingConfirmInput | undefined;
+  if (!canConfirmPendingTarget(pending)) return;
+  showConfirmationButton(state.pendingTargetEffect);
+}
+
 function showConfirmationButton(pending: any) {
-  const onConfirm = () => {
-    const targetUids = pending.targetUids || [];
-
-    // Guard: only enforce minimum selectCount if explicitly flagged (e.g., Ralmia)
-    // Most selections (fuse, etc.) use selectCount as a soft max, not a required min
-    if (pending.enforceMinSelectCount) {
-      const requiredCount =
-        typeof pending.selectCount === "number" &&
-        Number.isFinite(pending.selectCount) &&
-        pending.selectCount > 0
-          ? pending.selectCount
-          : 1;
-
-      if (targetUids.length < requiredCount) {
-        console.warn(
-          `[Confirm] Not enough selections: ${targetUids.length}/${requiredCount}`,
-        );
-        return; // Don't execute, keep selecting
-      }
-    }
-
-    doAction(
-      "Confirm Targets",
-      () => {
-        // Build UID-only opCtx
-        const opCtx: TargetedOpContext = {
-          eff: pending.eff,
-          owner: pending.owner,
-          sourceCard: pending.sourceCard,
-          targetUids,
-          resumeEffects: pending.resumeEffects,
-        };
-
-        // Log with resolved targets for debugging
-        const resolvedTargets = resolveUids(targetUids);
-        logEvent("targetsConfirmed", {
-          op: opCtx.eff.op,
-          owner: opCtx.owner,
-          source: opCtx.sourceCard?.name,
-          sourceUid: opCtx.sourceCard?.uid,
-          targetUids,
-          targets: resolvedTargets.map((t) => ({
-            name: t?.name,
-            uid: t?.uid,
-            type: t?.type,
-          })),
-        });
-
-        orchestrateExecution(opCtx);
-      },
-      {
-        op: pending?.eff?.op,
-        owner: pending?.owner,
-        source: pending?.sourceCard?.name,
-      },
-      { autoRender: true },
-    );
-  };
-
   const vm = {
     pending,
-    onConfirm,
+    onConfirm: () => confirmPendingTargetFromState(),
     text: pending.confirmationText || "Confirm Selection",
     count: Array.isArray(pending.targetUids) ? pending.targetUids.length : 0,
   };

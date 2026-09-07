@@ -21,6 +21,7 @@ import { noteBlackboxRematch } from "./blackbox.js";
 import { syncMulliganOverlayFromState } from "../logic/mulligan.js";
 import { showChoiceModal } from "./choiceModal.js";
 import { applyPendingModePickIndex } from "../logic/effects/ops/mode.js";
+import { resyncPendingTargetConfirmation } from "../logic/core/resolveTarget.js";
 
 // Map player slot to visual DOM prefix (first -> blue, second -> red)
 function domPrefix(player: Player): "blue" | "red" {
@@ -180,6 +181,15 @@ export function render() {
       applyPendingModePickIndex(index);
       render();
     });
+  }
+
+  // Re-open fuse / confirmable target prompt after undo/redo.
+  if (
+    state.phase !== "mulligan" &&
+    state.pendingTargetEffect &&
+    !document.querySelector(".confirm-targets-btn")
+  ) {
+    resyncPendingTargetConfirmation();
   }
 
   updateEvoButtonsUI(state);

@@ -13,11 +13,19 @@ import { isGameOver } from "../core/gameOver.js";
 import { injectAdapter } from "../core/adapter.js";
 import { dispatchAction } from "../logic/core/dispatch.js";
 import { forceCompleteOrFizzlePendingTarget } from "../logic/core/resolveTarget.js";
+import {
+  canConfirmPendingTarget,
+  type PendingConfirmInput,
+} from "../logic/core/pendingTarget/confirmRegistry.js";
+import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
+import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { playCard } from "../logic/core/playCard/index.js";
 import type { PlayOutcome } from "../logic/core/playCard/types.js";
 import {
   captureSnapshot,
   setHistoryEnabled,
+  setHistorySuppressRecording,
+  acceptUndoneCommits,
   onHistoryEvent,
   canUndo,
 } from "../core/history.js";
@@ -389,15 +397,14 @@ export function getLegalSoakActions(): SoakAction[] {
         ? pending.pool.filter(Boolean).map((c: CardInstance) => c.uid)
         : []);
     const selected = new Set(pending.targetUids ?? []);
-    const required =
-      typeof pending.selectCount === "number" && pending.selectCount > 0
-        ? pending.selectCount
-        : 1;
     const selectedCount = selected.size;
     const forcedFirst = selectedCount === 0 ? getForcedFirstPicks(pending) : [];
+    const confirmReady = canConfirmPendingTarget(
+      pending as unknown as PendingConfirmInput,
+    );
 
-    // Once a confirm hook is armed, finish the selection — never toggle forever.
-    if (confirmHook && selectedCount > 0) {
+    // Serializable pending data says confirm is legal — finish, never toggle forever.
+    if (confirmReady) {
       return [{ type: "CONFIRM_TARGETS" }];
     }
 
@@ -430,13 +437,8 @@ export function getLegalSoakActions(): SoakAction[] {
       });
     }
 
-    // Soft-max confirm path (hook not yet armed but we already have picks)
-    if (confirmHook && selectedCount >= required) {
-      actions.push({ type: "CONFIRM_TARGETS" });
-    }
-
     // Stuck: no remaining selectable targets — force-complete or fizzle.
-    if (actions.length === 0 && !confirmHook) {
+    if (actions.length === 0 && !confirmReady) {
       actions.push({ type: "FORCE_COMPLETE_PENDING" });
     }
 
@@ -966,7 +968,13 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
 
   const useReExecute = historyReExecute && policyRng.nextInt(4) === 0;
   if (useReExecute) {
-    applySoakActionWithOutcome(action, dispatchPath);
+    // Re-apply mutations without recording history (undo left entries in future).
+    setHistorySuppressRecording(true);
+    try {
+      applySoakActionWithOutcome(action, dispatchPath);
+    } finally {
+      setHistorySuppressRecording(false);
+    }
     actual = captureFullSnapshot().canon;
     if (!snapshotsEqual(after.canon, actual, historyIgnoreFields)) {
       return formatHistoryMismatch(
@@ -988,6 +996,8 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
         legalActual,
       );
     }
+    // Live state is already at `after` from re-execute; sync stack only.
+    acceptUndoneCommits(n);
   } else {
     for (let i = 0; i < n; i++) {
       dispatchSoakHistory("REDO", dispatchPath);
@@ -1013,6 +1023,13 @@ function runHistoryRoundTrip(ctx: HistoryCheckContext): string | null {
         legalActual,
       );
     }
+  }
+
+  if (!isEffectResolutionPaused() && getResolutionQueue().length > 0) {
+    return (
+      `history round-trip left resolution queue (len=${getResolutionQueue().length}) ` +
+      `at action ${actionIndex} (${JSON.stringify(action)})`
+    );
   }
 
   return null;
@@ -1484,11 +1501,8 @@ function applySoakAction(
   dispatchPath: SoakDispatchPath = DEFAULT_SOAK_DISPATCH,
 ): void {
   if (action.type === "CONFIRM_TARGETS") {
-    if (confirmHook) {
-      const fn = confirmHook;
-      confirmHook = null;
-      fn();
-    }
+    confirmHook = null;
+    dispatchSoakPlayerAction({ type: "CONFIRM_TARGETS" }, dispatchPath);
     return;
   }
   if (action.type === "FORCE_COMPLETE_PENDING") {

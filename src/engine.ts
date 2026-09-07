@@ -106,7 +106,10 @@ export function getState(): GameState {
 import { playCard } from "./logic/core/playCard/index.js";
 import { reportBlockedOutcome } from "./ui/outcomes.js";
 import { attackFollower, attackLeader } from "./logic/core/combat.js";
-import { resolvePendingTarget } from "./logic/core/resolveTarget.js";
+import {
+  resolvePendingTarget,
+  confirmPendingTargetFromState,
+} from "./logic/core/resolveTarget.js";
 import { handleEvolveSelf } from "./logic/effects/ops/evolve.js";
 import { engageAmulet } from "./logic/effects/ops/engage.js";
 import { toggleSecondPlayerBonusPp } from "./core/bonusPp.js";
@@ -277,6 +280,11 @@ function _dispatchInternal(
       break;
     case "CONFIRM_MULLIGAN":
       confirmMulliganCore(action.player);
+      break;
+    case "CONFIRM_TARGETS":
+      if (!confirmPendingTargetFromState()) {
+        console.warn("[Engine] CONFIRM_TARGETS: nothing to confirm");
+      }
       break;
     case "FUSE": {
       if (action.player !== currentState.activePlayer) {

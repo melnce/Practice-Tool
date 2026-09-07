@@ -48,10 +48,14 @@ export function inferPicksAreCommitted(
     selectCount: number;
   },
 ): boolean {
+  const effOp = String(request.eff?.op ?? "");
+  if (effOp === "fuse" && request.requiresConfirmation) {
+    return true;
+  }
+
   const selectCount = request.selectCount ?? 1;
   if (selectCount <= 1) return false;
   const topOp = String((request as { op?: string }).op ?? "");
-  const effOp = String(request.eff?.op ?? "");
   return (
     topOp === "discard_select_hand" ||
     effOp === "discard" ||

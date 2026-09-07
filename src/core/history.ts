@@ -14,6 +14,8 @@ import { getResolutionQueue } from "../logic/core/triggers/queue.js";
 import { isEffectResolutionPaused } from "../logic/core/resolutionPause.js";
 import { resetTriggerChainDepth } from "../logic/core/triggers.js";
 import { endDispatch } from "../logic/core/targeting/guards.js";
+import { resyncPendingTargetConfirmation } from "../logic/core/resolveTarget.js";
+import { showPendingModePickerModal } from "../logic/effects/ops/mode.js";
 // --- Config ---
 const MAX_HISTORY = 200; // ring limit
 
@@ -21,6 +23,8 @@ const MAX_HISTORY = 200; // ring limit
 // When disabled, history skips expensive structuredClone for performance.
 // Use DISABLE_HISTORY=1 env var or call setHistoryEnabled(false).
 let _historyEnabled = true;
+/** When true, actions run through history commit guards but do not push to past/future. */
+let _historySuppressRecording = false;
 
 /** Explicitly enable or disable history snapshots. */
 export function setHistoryEnabled(enabled: boolean): void {
@@ -30,6 +34,15 @@ export function setHistoryEnabled(enabled: boolean): void {
 /** Check if history is currently enabled. */
 export function isHistoryEnabled(): boolean {
   return _historyEnabled;
+}
+
+/** Suppress recording commits while still running commit-time guards (soak re-execute). */
+export function setHistorySuppressRecording(suppress: boolean): void {
+  _historySuppressRecording = suppress;
+}
+
+export function isHistorySuppressRecording(): boolean {
+  return _historySuppressRecording;
 }
 
 // Check env var at module load (for benchmarks)
@@ -103,6 +116,13 @@ export const INTERNAL_CACHE_KEYS = new Set([
 ]);
 
 // Shallow hash already exists in your logger; if you have a fast state hash, reuse it.
+
+export function resyncInteractivePromptsAfterHistoryRestore(): void {
+  resyncPendingTargetConfirmation();
+  if (state.pendingModeChoice) {
+    showPendingModePickerModal();
+  }
+}
 
 /** Snapshots strip uncommitted in-progress picks; committed per-pick prompts keep them. */
 function sanitizePendingTargetInSnapshot(snap: GameState): void {
@@ -389,6 +409,7 @@ export function applySnapshot(
   if (shouldResetHistory) {
     resetHistory();
   }
+  resyncInteractivePromptsAfterHistoryRestore();
   const suppress =
     (globalThis as any).HEADLESS === true ||
     (globalThis as any).AI_SUPPRESS_RENDER === true;
@@ -456,6 +477,12 @@ export function commitAction({ autoRender = true } = {}) {
   }
 
   assertResolutionQueueClearForCommit(inAction.name);
+
+  if (_historySuppressRecording) {
+    inAction = null;
+    notify();
+    return;
+  }
 
   bumpActionSeq();
   const after = snapshot();
@@ -602,6 +629,7 @@ export function undo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
+    resyncInteractivePromptsAfterHistoryRestore();
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -623,6 +651,7 @@ export function redo({ autoRender = true } = {}) {
       name: entry.name,
       meta: entry.meta || {},
     });
+    resyncInteractivePromptsAfterHistoryRestore();
     if (autoRender) adapter.render();
     notify();
     return true;
@@ -635,6 +664,19 @@ export function canUndo() {
 }
 export function canRedo() {
   return future.length > 0;
+}
+
+/**
+ * Move undone commits from future → past without restoring snapshots.
+ * Used when live state was already brought to `after` by re-executing actions.
+ */
+export function acceptUndoneCommits(commits: number): void {
+  for (let i = 0; i < commits; i++) {
+    const entry = future.pop();
+    if (!entry) break;
+    past.push(entry);
+  }
+  notify();
 }
 
 /** Optional: set a listener to enable/disable UI buttons. */
