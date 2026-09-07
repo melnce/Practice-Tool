@@ -255,10 +255,10 @@ describe("enemy_* event activePlayer convention", () => {
     });
   });
 
-  describe("enemy_follower_defense_down (already correct — regression pin)", () => {
-    it("listener on opponent-of-debuffer side draws when enemy follower defense is reduced", () => {
+  describe("enemy_follower_defense_down (routing: activePlayer = debuffed follower's owner)", () => {
+    it("listener on debuffer's side draws when enemy follower defense is reduced", () => {
       givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
-        .withSecondBoard([
+        .withFirstBoard([
           {
             name: "DefenseWatcher",
             type: "Follower",
@@ -272,11 +272,13 @@ describe("enemy_* event activePlayer convention", () => {
               },
             ],
           },
+        ])
+        .withFirstDeck([{ name: "Drawn", type: "Follower", cost: 1 }])
+        .withSecondBoard([
           { name: "Target", type: "Follower", attack: 3, defense: 5 },
         ])
-        .withSecondDeck([{ name: "Drawn", type: "Follower", cost: 1 }])
         .build();
-      const handBefore = thenHand("second").length;
+      const handBefore = thenHand("first").length;
       whenRunEffects(
         [
           {
@@ -289,7 +291,7 @@ describe("enemy_* event activePlayer convention", () => {
         ],
         "first",
       );
-      expect(thenHand("second").length).toBe(handBefore + 1);
+      expect(thenHand("first").length).toBe(handBefore + 1);
     });
   });
 });
