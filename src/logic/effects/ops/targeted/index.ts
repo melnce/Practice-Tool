@@ -14,12 +14,12 @@ import {
   countPendingDraws,
 } from "../returnHandToDeck.js";
 // clearSelectableFlags is NOT imported because handlers must not use it.
-import { fireTrigger } from "../../../core/triggers.js";
 import { resolveAmountWithOverflow } from "../damage/index.js";
 import { handleFuse } from "../fuse/unified.js";
 import { evolveFollowerDeferred, handleEvolveSelf } from "../evolve.js";
 import { summonExactCopyFromHand, summonFromHand } from "../summon_ops/hand.js";
-import { setStatsBuff, applyKeywordBuff } from "../stat/core.js";
+import { applyBuffsToTargets } from "../stat/orchestrator.js";
+import type { StatOp } from "../stat/types.js";
 import { logEvent } from "../../../../core/logger.js";
 import { isDev } from "../../../../core/env.js";
 import { bumpZoneVersion } from "../../../core/triggers/utils.js";
@@ -355,9 +355,6 @@ TARGETED_OP_HANDLERS.set("discard", (ctx) => {
 TARGETED_OP_HANDLERS.set("stat", (ctx) => {
   const { eff, owner, targetUids, sourceCard } = ctx;
   const targets = resolveUids(targetUids);
-  const action = (eff as any).action || "give";
-  const a = resolveDynamicValue((eff as any).attack, { owner, sourceCard });
-  const d = resolveDynamicValue((eff as any).defense, { owner, sourceCard });
   const rawTribes = (eff as any).tribes
     ? Array.isArray((eff as any).tribes)
       ? (eff as any).tribes
@@ -373,54 +370,12 @@ TARGETED_OP_HANDLERS.set("stat", (ctx) => {
       card.tribes.some((tr) => want.includes(String(tr).toLowerCase()))
     );
   };
-  for (const target of targets.filter(tribeOk)) {
-    // Handle action: "set" - sets stats to fixed values
-    if (action === "set") {
-      const setA = (eff as any).attack !== undefined ? a : null;
-      const setD = (eff as any).defense !== undefined ? d : null;
-      setStatsBuff(target, setA, setD, owner);
-      continue;
-    }
-
-    // Default: action "give" - adds to stats
-    if (!target.buffs) target.buffs = { attack: 0, defense: 0 };
-    target.buffs.attack = (target.buffs.attack ?? 0) + a;
-    target.buffs.defense = (target.buffs.defense ?? 0) + d;
-    target.attack = Math.max(0, (parseInt(target.attack as any) || 0) + a);
-    target.defense = (parseInt(target.defense as any) || 0) + d;
-    if (d < 0) {
-      // Rulebook: "-N defense" lowers max defense; follower sits at full new max.
-      target.peak_defense = Number(target.defense);
-      target.potential_defense = Number(target.defense);
-    } else {
-      target.peak_defense = Math.max(
-        target.peak_defense ?? (target.defense as number),
-        target.defense as number,
-      );
-    }
-    if (!target.potential_attack)
-      target.potential_attack = Number(target.base_attack || target.attack);
-    if (!target.potential_defense)
-      target.potential_defense = Number(target.base_defense || target.defense);
-    target.potential_attack += a;
-    if (d >= 0) target.potential_defense += d;
-    if (d < 0 && target.type === "Follower") {
-      const firstBoard = getBoard(state, "first");
-      const secondBoard = getBoard(state, "second");
-      const targetOwner = firstBoard.includes(target)
-        ? "first"
-        : secondBoard.includes(target)
-          ? "second"
-          : null;
-      if (targetOwner) {
-        // ally_/enemy_* routing: activePlayer = affected card's owner (conditions.ts:157-160).
-        // Only ally_/enemy_ events use this for eligibility (process.ts:130); other events use it for ordering only.
-        // Passing the actor inverts the enemy_* ownership rule.
-        fireTrigger("enemy_follower_defense_down", targetOwner, { target });
-      }
-    }
-    applyKeywordBuff(target, eff as any, owner);
-  }
+  applyBuffsToTargets(
+    targets.filter(tribeOk),
+    eff as StatOp,
+    owner,
+    sourceCard,
+  );
   return { kind: "handled" };
 });
 

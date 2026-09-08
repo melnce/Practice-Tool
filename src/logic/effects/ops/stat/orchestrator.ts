@@ -334,7 +334,7 @@ function handlePoolBasedBuff(
 // Buff Application
 // -----------------------------------------------------------------------------
 
-function applyBuffsToTargets(
+export function applyBuffsToTargets(
   targets: CardInstance[],
   eff: StatOp,
   owner: Player,
