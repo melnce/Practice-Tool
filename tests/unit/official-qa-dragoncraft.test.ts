@@ -482,21 +482,23 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     expect(Number(fighter.defense)).toBe(2);
   }, 60_000);
 
-  it("10344110 Azurifrit, Heir to Disdain — attacking Leah pings leader (official Q&A)", () => {
-    setupTurn(R6);
-    state.players.second.hp = 20;
-    const az = createCard(AZURIFRIT, "board", "first");
-    az.peak_defense = az.defense;
-    state.players.first.board = [az];
-    const leah = createCard(LEAH, "board", "second");
-    applyKeywordsFromList(leah);
-    leah.peak_defense = leah.defense;
-    state.players.second.board = [leah];
-    readyAttacker(az);
+  describe("10344110 Azurifrit — unevolved Leah Bellringer Angel whenever", () => {
+    it("10344110 Azurifrit — attacking unevolved Leah Bellringer Angel pings leader whenever damaged (official Q&A)", () => {
+      setupTurn(R6);
+      state.players.second.hp = 20;
+      const az = createCard(AZURIFRIT, "board", "first");
+      az.peak_defense = az.defense;
+      state.players.first.board = [az];
+      const leah = createCard(LEAH, "board", "second");
+      applyKeywordsFromList(leah);
+      leah.peak_defense = leah.defense;
+      state.players.second.board = [leah];
+      readyAttacker(az);
 
-    attackFollower(0, 0, "first", "second");
-    expect(getHP(state, "second")).toBe(19);
-  }, 60_000);
+      attackFollower(0, 0, "first", "second");
+      expect(getHP(state, "second")).toBe(19);
+    }, 60_000);
+  });
 
   it("10344110 Azurifrit, Heir to Disdain — super-evolved vs Servant of Cocytus pings leader (official Q&A)", () => {
     setupTurn(R7);
@@ -541,21 +543,23 @@ describe("official Q&A — Dragoncraft batch 3", () => {
     expect(getHP(state, "second")).toBe(19);
   }, 60_000);
 
-  it("10344120 Galmieux, Ardor Manifest — attacking Leah fires passive (official Q&A)", () => {
-    setupTurn(R6);
-    const galmieux = createCard(GALMIEX, "board", "first");
-    galmieux.peak_defense = galmieux.defense;
-    state.players.first.board = [galmieux];
-    const leah = createCard(LEAH, "board", "second");
-    applyKeywordsFromList(leah);
-    leah.peak_defense = leah.defense;
-    const bystander = enemyFollower(2, 5, "Bystander");
-    state.players.second.board = [leah, bystander];
-    readyAttacker(galmieux);
+  describe("10344120 Galmieux — unevolved Leah Bellringer Angel", () => {
+    it("10344120 Galmieux — attacking unevolved Leah Bellringer Angel fires passive (official Q&A)", () => {
+      setupTurn(R6);
+      const galmieux = createCard(GALMIEX, "board", "first");
+      galmieux.peak_defense = galmieux.defense;
+      state.players.first.board = [galmieux];
+      const leah = createCard(LEAH, "board", "second");
+      applyKeywordsFromList(leah);
+      leah.peak_defense = leah.defense;
+      const bystander = enemyFollower(2, 5, "Bystander");
+      state.players.second.board = [leah, bystander];
+      readyAttacker(galmieux);
 
-    attackFollower(0, 0, "first", "second");
-    expect(Number(bystander.defense)).toBeLessThan(5);
-  }, 60_000);
+      attackFollower(0, 0, "first", "second");
+      expect(Number(bystander.defense)).toBeLessThan(5);
+    }, 60_000);
+  });
 
   it("10344120 Galmieux, Ardor Manifest — super-evolved vs Quake Goliath fires passive (official Q&A)", () => {
     setupTurn(R7);

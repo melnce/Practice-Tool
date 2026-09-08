@@ -478,18 +478,20 @@ describe("official Q&A — Abysscraft batch 4", () => {
     expect(Number(arriet.attack)).toBe(8);
   }, 60_000);
 
-  it("10354110 Sham-Nacha, Heir to Entwining — Fanfare twice increases selectable Modes by 2 (official Q&A)", () => {
-    setupTurn(R6, { hand: [SHAM_NACHA, SHAM_NACHA], pp: 6 });
-    bootstrapFaithCrest();
-    getCrests(state, "first")[0]!.counters = { faith: 10 };
-    whenPlayCard("first", 0);
-    expect(faithCount()).toBe(0);
-    expect(getModeBonus(state, "first")).toBe(1);
-    getCrests(state, "first")[0]!.counters = { faith: 10 };
-    whenPlayCard("first", 0);
-    expect(faithCount()).toBe(0);
-    expect(getModeBonus(state, "first")).toBe(2);
-  }, 60_000);
+  describe("10354110 Sham-Nacha — Fanfare twice Modes increased", () => {
+    it("10354110 Sham-Nacha — Fanfare twice increased selectable Modes by 2 (official Q&A)", () => {
+      setupTurn(R6, { hand: [SHAM_NACHA, SHAM_NACHA], pp: 6 });
+      bootstrapFaithCrest();
+      getCrests(state, "first")[0]!.counters = { faith: 10 };
+      whenPlayCard("first", 0);
+      expect(faithCount()).toBe(0);
+      expect(getModeBonus(state, "first")).toBe(1);
+      getCrests(state, "first")[0]!.counters = { faith: 10 };
+      whenPlayCard("first", 0);
+      expect(faithCount()).toBe(0);
+      expect(getModeBonus(state, "first")).toBe(2);
+    }, 60_000);
+  });
 
   it("10354110 Sham-Nacha, Heir to Entwining — Screaming and Loathing 2 Modes adds only 1 faith (official Q&A)", () => {
     setupTurn(R6, { hand: [SCREAMING_LOATHING], pp: 3 });

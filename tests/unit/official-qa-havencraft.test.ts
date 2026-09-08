@@ -248,34 +248,36 @@ describe("Official Q&A — Havencraft batch 5", () => {
     }, 60_000);
   });
 
-  it("10562120 Desperate Shrinemouse — evolve at full hand: draw trigger does not fire (official Q&A)", () => {
-    setupTurn(R8, { deck: [DRAW_A, FILLER], evo: 2, pp: 5 });
-    const mouse = createCard(DESPERATE_SHRINEMOUSE, "board", "first");
-    mouse.peak_defense = mouse.defense;
-    state.players.first.board.push(mouse);
-    fillHand(9);
-    const foe = enemyFollower(2, 4, "FoeA");
-    const handBefore = getHand(state, "first").length;
+  describe("10562120 Desperate Shrinemouse — full hand whenever draw", () => {
+    it("10562120 Desperate Shrinemouse — evolve at full hand: whenever draw trigger does not fire (official Q&A)", () => {
+      setupTurn(R8, { deck: [DRAW_A, FILLER], evo: 2, pp: 5 });
+      const mouse = createCard(DESPERATE_SHRINEMOUSE, "board", "first");
+      mouse.peak_defense = mouse.defense;
+      state.players.first.board.push(mouse);
+      fillHand(9);
+      const foe = enemyFollower(2, 4, "FoeA");
+      const handBefore = getHand(state, "first").length;
 
-    handleEvolveSelf(mouse, "first", { mode: "normal", spendPoint: true });
+      handleEvolveSelf(mouse, "first", { mode: "normal", spendPoint: true });
 
-    expect(getHand(state, "first").length).toBe(handBefore);
-    expect(Number(foe.defense)).toBe(4);
+      expect(getHand(state, "first").length).toBe(handBefore);
+      expect(Number(foe.defense)).toBe(4);
 
-    cleanupDead();
-    resetUidCounter();
-    setupTurn(R8, {
-      hand: [DESPERATE_SHRINEMOUSE],
-      deck: [DRAW_A, FILLER],
-      evo: 2,
-      pp: 5,
-    });
-    whenPlayCard("first", 0);
-    const mouse2 = findOnBoard("first", "Desperate Shrinemouse")!;
-    const foe2 = enemyFollower(2, 4, "FoeB");
-    handleEvolveSelf(mouse2, "first", { mode: "normal", spendPoint: true });
-    expect(Number(foe2.defense)).toBe(3);
-  }, 60_000);
+      cleanupDead();
+      resetUidCounter();
+      setupTurn(R8, {
+        hand: [DESPERATE_SHRINEMOUSE],
+        deck: [DRAW_A, FILLER],
+        evo: 2,
+        pp: 5,
+      });
+      whenPlayCard("first", 0);
+      const mouse2 = findOnBoard("first", "Desperate Shrinemouse")!;
+      const foe2 = enemyFollower(2, 4, "FoeB");
+      handleEvolveSelf(mouse2, "first", { mode: "normal", spendPoint: true });
+      expect(Number(foe2.defense)).toBe(3);
+    }, 60_000);
+  });
 
   it("10564120 Kukishiro crest — evolve Shrinemouse at full hand: crest draw abilities do not fire (official Q&A)", () => {
     setupTurn(R10, {
