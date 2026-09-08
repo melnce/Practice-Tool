@@ -537,6 +537,7 @@ describe("Owner / cemetery — shadow fuel (Necromancy & Reanimate)", () => {
       "first",
       { sourceCard: null },
     );
+    resolvePendingTarget(transformTarget.uid);
     expect(getShadows(state, "second")).toBe(0);
     expect(getBoard(state, "second")).toHaveLength(1);
   });

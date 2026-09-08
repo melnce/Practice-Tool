@@ -159,6 +159,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
       (c) => c.id === SINCERITY,
     );
     whenPlayCard("first", spellIdx);
+    resolvePendingTarget(ally.uid);
 
     const buddies = getBoard(state, "first").find((c) => c.uid === ally.uid)!;
     expect(buddies.name).toBe("Imari's Little Buddies");
@@ -196,6 +197,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
     resolvePendingTarget(getBoard(state, "second")[0]!.uid);
     const ara = findOnBoard("first", "Ara, Dawnblossom")!;
     whenEvolve(ara, "first");
+    resolvePendingTarget(ally.uid);
 
     const falcon = getBoard(state, "first").find((c) => c.uid === ally.uid)!;
     expect(falcon.name).toBe("Regal Falcon");
@@ -248,6 +250,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
     whenPlayCard("first", 0);
     const titania = findOnBoard("first", "Titania, Queen of Fairies")!;
     whenEvolve(titania, "first");
+    resolvePendingTarget(foe.uid);
 
     const fairy = getBoard(state, "second").find((c) => c.uid === foe.uid)!;
     expect(fairy.name).toBe("Fairy");
@@ -275,6 +278,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
     const ally2 = allyFollower("SecondTarget", 2, 2);
     whenPlayCard("first", 0);
     engageAmulet("first", amuletIndex("Awed and Inspired"));
+    resolvePendingTarget(ally1.uid);
 
     const resultIdx = amuletIndex("Awed and Inspired");
     expect(resultIdx).toBeGreaterThanOrEqual(0);
@@ -283,6 +287,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
     expect(result.keywordState?.engagedThisTurn).toBeFalsy();
 
     engageAmulet("first", resultIdx);
+    resolvePendingTarget(ally2.uid);
     expect(
       state.players.first.board.some(
         (c) => c.name === "Awed and Inspired" && c.uid === ally2.uid,
@@ -361,6 +366,7 @@ describe("transform new card — fresh turn state (owner ruling 2026-09-06)", ()
       (c) => c.id === SINCERITY,
     );
     whenPlayCard("first", spellIdx);
+    resolvePendingTarget(ally.uid);
 
     const buddies = getBoard(state, "first").find((c) => c.uid === ally.uid)!;
     expect(buddies.can_attack).toBe(deriveCanAttack(buddies));
