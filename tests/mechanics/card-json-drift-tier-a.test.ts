@@ -19,6 +19,8 @@ import { getHand, getCrests } from "../../src/core/playerHelpers.js";
 import { getLogs, clearLogs } from "../../src/core/logger.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
+import { processCard } from "../../src/data/cardIndex.js";
+import { hasInherentLastWords } from "../../src/data/keywords.js";
 import "../../src/logic/core/effects/index.js";
 
 const MARAUDER = "10942110";
@@ -181,6 +183,22 @@ describe("A3 — LastWords template flag", () => {
     const template = getCardById(LAPIS)!;
     expect(template.hasLastWords).toBe(true);
   });
+
+  it("processCard sets hasLastWords and lastWordsEffects for last_words keyword object", () => {
+    const lastWordsEffects = [{ op: "draw", count: 1 }];
+    const template = processCard({
+      name: "Test Last Words Object",
+      id: "test-lw-object",
+      type: "Follower",
+      keywords: [{ name: "last_words", effects: lastWordsEffects }],
+    });
+    expect(template?.hasLastWords).toBe(true);
+    expect(template?.lastWordsEffects).toEqual(lastWordsEffects);
+  });
+
+  it("hasInherentLastWords accepts bare lastwords string spelling", () => {
+    expect(hasInherentLastWords(["lastwords"])).toBe(true);
+  });
 });
 
 describe("A4 — Countdown template value", () => {
@@ -188,6 +206,28 @@ describe("A4 — Countdown template value", () => {
     const template = getCardById(INSTITUTE_OF_TRUTH)!;
     expect(template.hasCountdown).toBe(true);
     expect(template.countdown).toBe(5);
+  });
+
+  it("processCard sets hasCountdown and countdown for countdown keyword with count", () => {
+    const template = processCard({
+      name: "Test Countdown Count",
+      id: "test-cd-count",
+      type: "Amulet",
+      keywords: [{ name: "countdown", count: 5 }],
+    });
+    expect(template?.hasCountdown).toBe(true);
+    expect(template?.countdown).toBe(5);
+  });
+
+  it("processCard reads count when Countdown keyword omits turns", () => {
+    const template = processCard({
+      name: "Test Countdown Canonical",
+      id: "test-cd-canonical",
+      type: "Amulet",
+      keywords: [{ name: "Countdown", count: 5 }],
+    });
+    expect(template?.hasCountdown).toBe(true);
+    expect(template?.countdown).toBe(5);
   });
 });
 
