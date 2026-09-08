@@ -9,6 +9,7 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
+import { mergePoolCondition } from "../../../core/targeting/poolCondition.js";
 import type { TargetContext } from "../../../core/targeting/index.js";
 import {
   trySetPendingTarget,
@@ -55,12 +56,10 @@ function destroyPoolCondition(
   eff: Effect & Record<string, any>,
   spec: UnifiedDestroySpec,
 ): any {
+  const merged = mergePoolCondition(spec.condition, eff.filter);
+  if (Object.keys(merged).length > 0) return merged;
   const base =
     spec.condition && typeof spec.condition === "object" ? spec.condition : {};
-  const filter = eff.filter;
-  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
-    return { ...base, ...filter };
-  }
   return Object.keys(base).length ? base : spec.condition;
 }
 

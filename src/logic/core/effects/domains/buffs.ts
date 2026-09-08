@@ -11,6 +11,11 @@ import { handleCountdown } from "../../../effects/ops/countdown/unified.js";
 import { handleAttacksPerTurn } from "../../../effects/attacks.js";
 import { getTargetingContext } from "../context.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
+import { readPoolNarrowFilter } from "../../targeting/poolCondition.js";
+import {
+  evaluateCardCondition,
+  type CardCondition,
+} from "../../conditions/evaluator.js";
 import type { CardInstance } from "../../../../core/types/index.js";
 
 // import { BuffEffect } from "../../../../core/types/index.js";
@@ -88,23 +93,11 @@ export function registerBuffEffects() {
       }
     }
 
-    // Apply filters if specified
-    if ((eff as any).filters) {
-      const filters = (eff as any).filters;
-      targets = targets.filter((c: any) => {
-        if (filters.class && c.class !== filters.class) return false;
-        if (
-          filters.type &&
-          c.type?.toLowerCase() !== String(filters.type).toLowerCase()
-        )
-          return false;
-        if (
-          filters.tribe &&
-          (!Array.isArray(c.tribes) || !c.tribes.includes(filters.tribe))
-        )
-          return false;
-        return true;
-      });
+    const narrowFilter = readPoolNarrowFilter(eff as Record<string, unknown>);
+    if (narrowFilter && Object.keys(narrowFilter).length > 0) {
+      targets = targets.filter((c) =>
+        evaluateCardCondition(c, narrowFilter as CardCondition),
+      );
     }
 
     // Apply exclude_self if specified

@@ -1590,7 +1590,7 @@
         "op": "banish",
         "select": 1,
         "target": "enemy:follower",
-        "filters": {
+        "filter": {
           "defense_lte": 3
         }
       }
@@ -1600,7 +1600,7 @@
         "op": "banish",
         "select": false,
         "target": "enemy:follower",
-        "filters": {
+        "filter": {
           "defense_lte": 3
         }
       }
@@ -3695,7 +3695,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "filters": {
+        "filter": {
           "class": "Swordcraft"
         },
         "exclude_self": true,
@@ -12625,7 +12625,7 @@
             "count": 1,
             "filter": {
               "type": "follower",
-              "class": "dragoncraft"
+              "class": "Dragoncraft"
             }
           }
         ]
@@ -12934,7 +12934,7 @@
             "count": 1,
             "filter": {
               "type": "follower",
-              "class": "dragoncraft"
+              "class": "Dragoncraft"
             }
           }
         ]
@@ -14098,7 +14098,7 @@
                     "op": "draw",
                     "source": "deck",
                     "count": 1,
-                    "filters": {
+                    "filter": {
                       "type": "follower",
                       "defense_eq": 4
                     }
@@ -20194,7 +20194,7 @@
         "op": "banish",
         "target": "ally:deck",
         "distribution": "all",
-        "filters": {
+        "filter": {
           "cost_in": [1, 3, 5, 7, 9]
         },
         "store_count_as": "banish_count"
@@ -21532,7 +21532,7 @@
         "op": "draw",
         "source": "deck",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Spell"
         }
       }
@@ -21926,7 +21926,7 @@
         "op": "draw",
         "source": "deck",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "Spell",
           "cost_eq": 1
         },
@@ -21964,7 +21964,7 @@
         "op": "draw",
         "source": "deck",
         "count": 1,
-        "filters": {
+        "filter": {
           "type": "Spell"
         }
       }
@@ -28254,7 +28254,7 @@
         "op": "draw",
         "source": "deck",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "Amulet"
         }
       }
@@ -31847,7 +31847,7 @@
             "op": "banish",
             "select": false,
             "target": "enemy:follower",
-            "filters": {
+            "filter": {
               "defense_lte": 3
             }
           }
@@ -31860,7 +31860,7 @@
         "op": "banish",
         "select": 1,
         "target": "enemy:follower",
-        "filters": {
+        "filter": {
           "defense_lte": 3
         }
       }
@@ -35921,7 +35921,7 @@
       {
         "op": "banish",
         "target": "ally:deck",
-        "filters": {
+        "filter": {
           "name": "Cutthroat, Fluxblade Convict"
         }
       },

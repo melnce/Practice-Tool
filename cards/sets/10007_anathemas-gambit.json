@@ -2832,7 +2832,7 @@
         "op": "draw",
         "source": "deck",
         "count": 2,
-        "filters": {
+        "filter": {
           "type": "Amulet"
         }
       }

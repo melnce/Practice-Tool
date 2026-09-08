@@ -1774,7 +1774,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:follower",
-        "filters": {
+        "filter": {
           "class": "Swordcraft"
         },
         "exclude_self": true,

@@ -66,6 +66,7 @@ import {
   HARNESS_BOARD_RESERVE,
   type GateSpec,
 } from "./cardBehaviourGates.js";
+import { readPoolNarrowFilter } from "../../src/logic/core/targeting/poolCondition.js";
 
 const HARNESS_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -179,6 +180,18 @@ function walkEffects(
   for (const value of Object.values(obj)) walkEffects(value, visit);
 }
 
+export type HarnessEnemyFilterBounds = {
+  defenseLte?: number;
+  defenseLt?: number;
+  defenseGte?: number;
+  attackLte?: number;
+  attackGte?: number;
+  costLte?: number;
+  costGte?: number;
+  baseCostLte?: number;
+  baseCostGte?: number;
+};
+
 export type HarnessArenaNeeds = {
   handKit: boolean;
   amuletKit: number;
@@ -188,9 +201,152 @@ export type HarnessArenaNeeds = {
   reservesBoardSlot: boolean;
   /** First player's leader starts below max HP so restore-to-leader effects are visible. */
   damagedFirstLeader: boolean;
+  /** Enemy follower must satisfy play-root pool filter bounds (data-derived). */
+  enemyFilterBounds: HarnessEnemyFilterBounds | null;
 };
 
 /** Data-derived arena prep selected per card (never a hard-coded id list). */
+const ENEMY_BOUND_FILTER_KEYS = [
+  "defense_lte",
+  "defense_lt",
+  "defense_gte",
+  "attack_lte",
+  "attack_gte",
+  "cost_lte",
+  "cost_gte",
+  "base_cost_lte",
+  "base_cost_gte",
+] as const;
+
+function toHarnessNum(v: unknown): number | null {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function filterHasEnemyNumericBounds(filter: Record<string, unknown>): boolean {
+  return ENEMY_BOUND_FILTER_KEYS.some((k) => filter[k] != null);
+}
+
+function mergeEnemyFilterBounds(
+  acc: HarnessEnemyFilterBounds,
+  filter: Record<string, unknown>,
+): void {
+  const minKey = (field: keyof HarnessEnemyFilterBounds, raw: string): void => {
+    const v = toHarnessNum(filter[raw]);
+    if (v == null) return;
+    const cur = acc[field];
+    acc[field] = cur == null ? v : Math.min(cur, v);
+  };
+  const maxKey = (field: keyof HarnessEnemyFilterBounds, raw: string): void => {
+    const v = toHarnessNum(filter[raw]);
+    if (v == null) return;
+    const cur = acc[field];
+    acc[field] = cur == null ? v : Math.max(cur, v);
+  };
+  minKey("defenseLte", "defense_lte");
+  minKey("defenseLt", "defense_lt");
+  maxKey("defenseGte", "defense_gte");
+  minKey("attackLte", "attack_lte");
+  maxKey("attackGte", "attack_gte");
+  minKey("costLte", "cost_lte");
+  maxKey("costGte", "cost_gte");
+  minKey("baseCostLte", "base_cost_lte");
+  maxKey("baseCostGte", "base_cost_gte");
+}
+
+function hasEnemyFilterBounds(
+  bounds: HarnessEnemyFilterBounds | null,
+): boolean {
+  if (!bounds) return false;
+  return Object.values(bounds).some((v) => v != null);
+}
+
+function enemyFollowerMatchesBounds(
+  card: CardInstance,
+  bounds: HarnessEnemyFilterBounds,
+): boolean {
+  if (card.type !== "Follower") return false;
+  const def = parseInt(String(card.defense), 10) || 0;
+  const atk = parseInt(String(card.attack), 10) || 0;
+  const cost = parseInt(String(card.cost), 10) || 0;
+  const baseCost =
+    (card as { base_cost?: number }).base_cost !== undefined
+      ? Number((card as { base_cost?: number }).base_cost)
+      : cost;
+  if (bounds.defenseLte != null && def > bounds.defenseLte) return false;
+  if (bounds.defenseLt != null && def >= bounds.defenseLt) return false;
+  if (bounds.defenseGte != null && def < bounds.defenseGte) return false;
+  if (bounds.attackLte != null && atk > bounds.attackLte) return false;
+  if (bounds.attackGte != null && atk < bounds.attackGte) return false;
+  if (bounds.costLte != null && cost > bounds.costLte) return false;
+  if (bounds.costGte != null && cost < bounds.costGte) return false;
+  if (bounds.baseCostLte != null && baseCost > bounds.baseCostLte) return false;
+  if (bounds.baseCostGte != null && baseCost < bounds.baseCostGte) return false;
+  return true;
+}
+
+function harnessEnemyForBounds(
+  bounds: HarnessEnemyFilterBounds,
+): Record<string, unknown> {
+  let defense = 3;
+  if (bounds.defenseLte != null) defense = Math.min(defense, bounds.defenseLte);
+  if (bounds.defenseLt != null)
+    defense = Math.min(defense, bounds.defenseLt - 1);
+  if (bounds.defenseGte != null) defense = Math.max(defense, bounds.defenseGte);
+
+  let attack = 2;
+  if (bounds.attackLte != null) attack = Math.min(attack, bounds.attackLte);
+  if (bounds.attackGte != null) attack = Math.max(attack, bounds.attackGte);
+
+  let cost = 2;
+  if (bounds.costLte != null) cost = Math.min(cost, bounds.costLte);
+  if (bounds.costGte != null) cost = Math.max(cost, bounds.costGte);
+
+  let baseCost = cost;
+  if (bounds.baseCostLte != null)
+    baseCost = Math.min(baseCost, bounds.baseCostLte);
+  if (bounds.baseCostGte != null)
+    baseCost = Math.max(baseCost, bounds.baseCostGte);
+
+  return {
+    name: "HarnessBoardEnemyFilter",
+    type: "Follower",
+    cost,
+    attack,
+    defense,
+    base_cost: baseCost,
+  };
+}
+
+function isEnemyPoolSelectOp(obj: Record<string, unknown>): boolean {
+  const target = String(obj.target ?? "").toLowerCase();
+  if (!target.includes("enemy:")) return false;
+  const sel = obj.select ?? obj.select_count;
+  if (sel === true) return true;
+  if (typeof sel === "number" && sel > 0) return true;
+  if (typeof sel === "string" && sel !== "all" && sel !== "false") {
+    const n = parseInt(sel, 10);
+    if (Number.isFinite(n) && n > 0) return true;
+  }
+  const op = String(obj.op ?? "").toLowerCase();
+  if (["banish", "destroy", "damage", "stat", "select"].includes(op)) {
+    const filter = readPoolNarrowFilter(obj);
+    return filter != null && filterHasEnemyNumericBounds(filter);
+  }
+  return false;
+}
+
+function keywordEffectRoots(card: RawCard): unknown[] {
+  const out: unknown[] = [];
+  if (!Array.isArray(card.keywords)) return out;
+  for (const kw of card.keywords) {
+    if (!kw || typeof kw !== "object") continue;
+    const effects = (kw as { effects?: unknown }).effects;
+    if (Array.isArray(effects)) out.push(...effects);
+  }
+  return out;
+}
+
 export function analyzeHarnessArenaNeeds(
   card: RawCard,
   gates: GateSpec[],
@@ -200,6 +356,7 @@ export function analyzeHarnessArenaNeeds(
   let highCostAlly = false;
   const namedBoardAllies = new Set<string>();
   let amuletKit = 0;
+  const enemyFilterBounds: HarnessEnemyFilterBounds = {};
 
   for (const g of gates) {
     if (g.condition === "amulet_count") {
@@ -241,6 +398,14 @@ export function analyzeHarnessArenaNeeds(
       return;
     }
     if (op === "select" || sel != null) handKit = true;
+  });
+
+  const enemyBoundRoots = [...playRoots, ...keywordEffectRoots(card)];
+  walkEffects(enemyBoundRoots, (obj) => {
+    if (!isEnemyPoolSelectOp(obj)) return;
+    const filter = readPoolNarrowFilter(obj);
+    if (!filter || !filterHasEnemyNumericBounds(filter)) return;
+    mergeEnemyFilterBounds(enemyFilterBounds, filter);
   });
 
   walkEffects(playRoots, (obj) => {
@@ -322,6 +487,9 @@ export function analyzeHarnessArenaNeeds(
     namedBoardAllies: [...namedBoardAllies],
     reservesBoardSlot: !isSpell,
     damagedFirstLeader,
+    enemyFilterBounds: hasEnemyFilterBounds(enemyFilterBounds)
+      ? enemyFilterBounds
+      : null,
   };
 }
 
@@ -439,6 +607,24 @@ function applyArenaBoardPrep(needs: HarnessArenaNeeds): void {
         attack: 1,
         defense: 1,
       });
+    }
+  }
+
+  const pushEnemy = (spec: Record<string, unknown>) => {
+    trimBoardToCap(state.players.second.board, HARNESS_BOARD_CAP);
+    state.players.second.board.push(createCard(spec as any, "board", "second"));
+  };
+
+  if (
+    needs.enemyFilterBounds &&
+    hasEnemyFilterBounds(needs.enemyFilterBounds)
+  ) {
+    const bounds = needs.enemyFilterBounds;
+    const hasMatch = state.players.second.board.some((c) =>
+      enemyFollowerMatchesBounds(c, bounds),
+    );
+    if (!hasMatch) {
+      pushEnemy(harnessEnemyForBounds(bounds));
     }
   }
 

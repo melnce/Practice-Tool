@@ -18,6 +18,7 @@ import {
   opponentOf,
 } from "../../../core/playerHelpers.js";
 import { getPool, highlightSelectable } from "../../core/targeting.js";
+import { mergeEffectPoolCondition } from "../../core/targeting/poolCondition.js";
 import { resolveUid } from "../../../core/uidResolver.js";
 import {
   trySetPendingTarget,
@@ -229,7 +230,7 @@ export function handleTransform(
         eff.target || "ally:follower",
         owner,
         ctx.sourceCard ?? null,
-        transformPoolCondition(eff),
+        mergeEffectPoolCondition(eff),
         {
           ...(ctx.context ?? {}),
           isTargetedEffect: selectN > 0 && !wantAll,
@@ -397,22 +398,6 @@ function transformBoardFromSource(
 }
 
 /**
- * Merge object-valued `filter` into the condition passed to getPool.
- * Card JSON uses `filter:{tribe:"Puppetry"}` on hand transforms; previously
- * only `eff.condition` reached getPool and object filters were ignored on the
- * select path (Vier).
- */
-function transformPoolCondition(eff: Effect & TransformSpec): any {
-  const base =
-    eff.condition && typeof eff.condition === "object" ? eff.condition : {};
-  const filter = eff.filter;
-  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
-    return { ...base, ...filter };
-  }
-  return base;
-}
-
-/**
  * Check if a card matches the filter criteria.
  */
 function matchesFilter(card: CardInstance, filter: any): boolean {
@@ -432,9 +417,11 @@ function matchesFilter(card: CardInstance, filter: any): boolean {
     if (!tribes.includes(want)) return false;
   }
 
-  // Check class filter
-  if (filter.class && (card as any).class !== filter.class) {
-    return false;
+  // Check class filter (case-insensitive via shared evaluator semantics)
+  if (filter.class) {
+    const want = String(filter.class).toLowerCase();
+    const have = String((card as any).class || "").toLowerCase();
+    if (have !== want) return false;
   }
 
   // Check exact name filter
@@ -526,7 +513,7 @@ function transformInHandByFilter(
       eff.target || "ally:hand",
       owner,
       ctx.sourceCard ?? null,
-      transformPoolCondition(eff),
+      mergeEffectPoolCondition(eff),
       {
         ...(ctx.context ?? {}),
         isTargetedEffect: true,

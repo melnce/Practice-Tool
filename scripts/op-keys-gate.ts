@@ -19,6 +19,7 @@ import {
   COMBO_ACTION_VALUES,
 } from "../src/logic/core/effects/domains/resources.js";
 import { TRIGGER_CONDITION_KEYS } from "../src/logic/core/triggers/conditions.js";
+import { CARD_CONDITION_KEYS } from "../src/logic/core/conditions/evaluator.js";
 
 type CardJson = {
   id: string;
@@ -56,31 +57,7 @@ const OP_ACTION_VALUES: Record<string, ReadonlySet<string>> = {
 
 /** Keys forwarded to evaluateCardCondition / applyFilters pool path. */
 export const POOL_CONDITION_KEYS = new Set([
-  "type",
-  "class",
-  "tribe",
-  "exclude_tribe",
-  "has_keyword",
-  "keywords",
-  "exclude_keyword",
-  "attack_lte",
-  "attack_gte",
-  "attack_eq",
-  "defense_lte",
-  "defense_gte",
-  "defense_eq",
-  "base_cost_eq",
-  "base_cost_gte",
-  "base_cost_lte",
-  "base_cost_in",
-  "cost_in",
-  "cost_changed",
-  "unevolved",
-  "is_super_evolved",
-  "damaged",
-  "did_not_attack_this_turn",
-  "still_alive",
-  "name",
+  ...CARD_CONDITION_KEYS,
   "not_self",
   "include_self",
 ]);
@@ -248,7 +225,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "pick",
     "distribution",
     "condition",
-    "filters",
+    "filter",
     "exclude_self",
     "until_end_of_turn",
     "name_filter",
@@ -288,7 +265,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "owner",
     "cost",
     "filter",
-    "filters",
     "condition",
     "distinct_by",
     "distribution",
@@ -379,7 +355,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "scope",
     "condition",
     "filter",
-    "filters",
     "store_count_as",
   ]),
   restore: new Set([
@@ -395,14 +370,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
   add_shadows: new Set(["amount"]),
   earth_rite: new Set(["cost", "amount", "effects"]),
   combo: new Set(["action", "amount"]),
-  draw: new Set([
-    "source",
-    "count",
-    "player",
-    "filters",
-    "filter",
-    "distinct_by",
-  ]),
+  draw: new Set(["source", "count", "player", "filter", "distinct_by"]),
   add_to_hand: new Set([
     "source",
     "name",
@@ -417,7 +385,7 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "select",
     "condition",
   ]),
-  search: new Set(["filter", "filters", "count", "keywords", "player"]),
+  search: new Set(["filter", "count", "keywords", "player"]),
   discard: new Set([
     "mode",
     "count",

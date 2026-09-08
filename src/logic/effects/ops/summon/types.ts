@@ -6,6 +6,7 @@ import type {
   Player,
   CardInstance,
 } from "../../../../core/types/index.js";
+import { mergePoolCondition } from "../../../core/targeting/poolCondition.js";
 
 // ============================================================================
 // SOURCE & SCOPE TYPES
@@ -161,14 +162,9 @@ export function normalizeToUnifiedSpec(
   if (eff.cost !== undefined) spec.cost = parseInt(String(eff.cost), 10);
 
   // Merge object-valued `filter` into condition (filter wins on key collision).
-  // Matches selectPoolCondition, transformPoolCondition, destroyPoolCondition.
-  const base =
-    eff.condition && typeof eff.condition === "object" ? eff.condition : {};
-  const filter = eff.filter;
-  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
-    spec.filter = { ...base, ...filter } as SummonFilter;
-  } else if (Object.keys(base).length) {
-    spec.filter = base as SummonFilter;
+  const merged = mergePoolCondition(eff.condition, eff.filter);
+  if (Object.keys(merged).length) {
+    spec.filter = merged as SummonFilter;
   }
   if (typeof eff.distinct_by === "string") {
     spec.distinct_by = eff.distinct_by.trim() || null;
