@@ -20,6 +20,7 @@ import {
 } from "../src/logic/core/effects/domains/resources.js";
 import { TRIGGER_CONDITION_KEYS } from "../src/logic/core/triggers/conditions.js";
 import { CARD_CONDITION_KEYS } from "../src/logic/core/conditions/evaluator.js";
+import { TRIGGER_EVENTS_WITH_DAMAGE_VICTIM } from "../src/logic/core/triggers/dispatcher.js";
 
 type CardJson = {
   id: string;
@@ -733,7 +734,7 @@ export function collectOpsInTree(
 function collectCrestTriggerConditions(
   node: unknown,
   pathStr: string,
-  out: { path: string; cond: Record<string, unknown> }[],
+  out: { path: string; event?: string; cond: Record<string, unknown> }[],
 ): void {
   if (!node || typeof node !== "object") return;
   if (Array.isArray(node)) {
@@ -752,10 +753,12 @@ function collectCrestTriggerConditions(
     for (const trigArr of triggerLists) {
       trigArr.forEach((t, i) => {
         if (!t || typeof t !== "object") return;
-        const cond = (t as Record<string, unknown>).condition;
+        const trig = t as Record<string, unknown>;
+        const cond = trig.condition;
         if (cond && typeof cond === "object" && !Array.isArray(cond)) {
           out.push({
             path: `${pathStr}.triggers[${i}].condition`,
+            event: typeof trig.event === "string" ? trig.event : undefined,
             cond: cond as Record<string, unknown>,
           });
         }
@@ -770,15 +773,21 @@ function collectCrestTriggerConditions(
 
 export function checkTriggerConditionKeysForCard(card: CardJson): Issue[] {
   const issues: Issue[] = [];
-  const sites: { path: string; cond: Record<string, unknown> }[] = [];
+  const sites: {
+    path: string;
+    event?: string;
+    cond: Record<string, unknown>;
+  }[] = [];
 
   if (Array.isArray(card.triggers)) {
     card.triggers.forEach((t, i) => {
       if (!t || typeof t !== "object") return;
-      const cond = (t as Record<string, unknown>).condition;
+      const trig = t as Record<string, unknown>;
+      const cond = trig.condition;
       if (cond && typeof cond === "object" && !Array.isArray(cond)) {
         sites.push({
           path: `${card.id}.triggers[${i}].condition`,
+          event: typeof trig.event === "string" ? trig.event : undefined,
           cond: cond as Record<string, unknown>,
         });
       }
@@ -787,7 +796,11 @@ export function checkTriggerConditionKeysForCard(card: CardJson): Issue[] {
 
   collectCrestTriggerConditions(card, card.id, sites);
 
-  for (const { path: condPath, cond } of sites) {
+  const damageVictimEvents = [...TRIGGER_EVENTS_WITH_DAMAGE_VICTIM]
+    .sort()
+    .join(", ");
+
+  for (const { path: condPath, event, cond } of sites) {
     for (const key of Object.keys(cond)) {
       if (!TRIGGER_CONDITION_KEYS.has(key)) {
         const alt = nearestKey(key, TRIGGER_CONDITION_KEYS);
@@ -796,6 +809,19 @@ export function checkTriggerConditionKeysForCard(card: CardJson): Issue[] {
           name: card.name,
           kind: "error",
           message: `trigger condition at ${condPath} has unsupported key "${key}" (try "${alt}"?) — ${descSnippet(card.description)}`,
+        });
+        continue;
+      }
+      if (
+        key === "still_alive" &&
+        (!event || !TRIGGER_EVENTS_WITH_DAMAGE_VICTIM.has(event))
+      ) {
+        const eventLabel = event ?? "(missing event)";
+        issues.push({
+          id: card.id,
+          name: card.name,
+          kind: "error",
+          message: `trigger condition at ${condPath} uses "still_alive" but event "${eventLabel}" is not a damage-victim event (allowed: ${damageVictimEvents}) — ${descSnippet(card.description)}`,
         });
       }
     }

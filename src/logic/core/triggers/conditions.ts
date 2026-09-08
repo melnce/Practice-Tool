@@ -36,6 +36,7 @@ export const TRIGGER_CONDITION_KEYS = new Set([
   "defense_lte",
   "defense_gte",
   "defense_eq",
+  // still_alive — trigger-only; subject is the damage victim (handlers/self.ts for self_damaged)
   "still_alive",
   // evaluateCardCondition / CardCondition
   "type",
@@ -253,7 +254,16 @@ export function evalCommonConditions(
     return false;
   if (typeof cond.defense_gte === "number" && def < cond.defense_gte)
     return false;
-  if (cond.still_alive === true && def <= 0) return false;
+
+  if (cond.still_alive === true) {
+    const victim = context.damagedCard;
+    if (!victim) {
+      const msg = `still_alive on trigger for event=${event ?? "unknown"} but no damagedCard in context — only valid where a damage victim is in scope (self_damaged is handled in handlers/self.ts)`;
+      if (isDev()) throw new Error(msg);
+      return false;
+    }
+    if ((parseInt(String(victim.defense), 10) || 0) <= 0) return false;
+  }
 
   if (typeof (cond as any).enemy_follower_count_gte === "number") {
     const need = (cond as any).enemy_follower_count_gte as number;
