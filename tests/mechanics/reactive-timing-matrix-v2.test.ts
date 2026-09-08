@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from "vitest";
 import "../audit/setup.js";
 import { state } from "../../src/core/gameState.js";
-import { getBoard } from "../../src/core/playerHelpers.js";
+import { getBoard, getHand, getShadows } from "../../src/core/playerHelpers.js";
 import {
   getResolutionQueue,
   MAX_RESOLUTION_QUEUE_LENGTH,
@@ -41,6 +41,7 @@ import {
   v2EnemyEnterSkipReason,
   v2EnemyLeaveSkipReason,
   v2RemainingSkipReason,
+  skipReasonText,
   HAND_EVENTS_WITH_CARD_POOL_SOURCE,
   watcherEarth,
   enemyWatcherOwner,
@@ -100,7 +101,7 @@ describe("Reactive trigger timing matrix v2", () => {
         });
       };
       if (skip) {
-        it.skip(`${label} — ${skip}`, body);
+        it.skip(`${label} — ${skipReasonText(skip)}`, body);
       } else if (fail) {
         it.fails(`${label}: ${fail.msg}`, body);
       } else {
@@ -129,7 +130,7 @@ describe("Reactive trigger timing matrix v2", () => {
           });
         };
         if (skip) {
-          it.skip(`${label} — ${skip}`, body);
+          it.skip(`${label} — ${skipReasonText(skip)}`, body);
         } else if (fail) {
           it.fails(`${label}: ${fail.msg}`, body);
         } else {
@@ -183,7 +184,7 @@ describe("Reactive trigger timing matrix v2", () => {
         assertV2ReactiveInvariants(run, { event, context });
       };
       if (skip) {
-        it.skip(`${label} — ${skip}`, body);
+        it.skip(`${label} — ${skipReasonText(skip)}`, body);
       } else if (fail) {
         it.fails(
           `${label}: ${fail.msg} (${HAND_EVENTS_WITH_CARD_POOL_SOURCE[event]?.join(", ") ?? "pool"})`,
@@ -386,10 +387,11 @@ describe("Reactive trigger timing matrix v2", () => {
   });
 
   describe("Axis E — zone-change pins", () => {
-    it("transform: board follower does not raise ally_follower_enter or leaves_field (rulebook: no enter/leave on transform)", () => {
+    function setupTransformPin() {
       resetUidCounter();
       givenGameState({ seed: 80, activePlayer: "first", roundCount: 6 })
         .withFirstPP(10, 10)
+        .withFirstDeck([{ name: "LWDrawPad", type: "Follower", cost: 1 }])
         .build();
       state.gameStarted = true;
       state.phase = "main";
@@ -448,6 +450,8 @@ describe("Reactive trigger timing matrix v2", () => {
           cost: 2,
           attack: 2,
           defense: 2,
+          hasLastWords: true,
+          lastWordsEffects: [{ op: "draw", source: "deck", count: 1 } as const],
         },
         "board",
         "first",
@@ -456,13 +460,34 @@ describe("Reactive trigger timing matrix v2", () => {
       victim.peak_defense = 2;
       getBoard(state, "first").push(victim);
 
+      return { enterWatcher, leaveWatcher, victim };
+    }
+
+    it.fails(
+      "transform must raise leaves_field for the transformed follower (rulebook line 591)",
+      () => {
+        const { leaveWatcher, victim } = setupTransformPin();
+        transformTarget(victim, "Goblin");
+        expect(watcherEarth("first", leaveWatcher.uid)).toBe(1);
+      },
+    );
+
+    it("transform: no Last Words, no shadow; uid preserved in place (rulebook line 588)", () => {
+      const { enterWatcher, victim } = setupTransformPin();
+      const uid = victim.uid;
+      const shadowsBefore = getShadows(state, "first");
+      const handBefore = getHand(state, "first").length;
+
       transformTarget(victim, "Goblin");
 
+      expect(getShadows(state, "first")).toBe(shadowsBefore);
+      expect(getHand(state, "first").length).toBe(handBefore);
+      const goblin = getBoard(state, "first").find((c) => c?.name === "Goblin");
+      expect(goblin).toBeTruthy();
+      expect(goblin!.uid).toBe(uid);
+      // Enter on transform is undecided: rulebook line 588 is "as if banished + summoned"
+      // but the owner has not settled whether enter triggers fire; transform.ts disables both.
       expect(watcherEarth("first", enterWatcher.uid)).toBe(0);
-      expect(watcherEarth("first", leaveWatcher.uid)).toBe(0);
-      expect(getBoard(state, "first").some((c) => c?.name === "Goblin")).toBe(
-        true,
-      );
     });
 
     it("changeFollowerControl: stolen follower does not enter/leave (changeControl.ts provisional)", () => {
@@ -827,7 +852,7 @@ describe("Reactive trigger timing matrix v2", () => {
         assertV2ReactiveInvariants(run, { event, context });
       };
       if (skip) {
-        it.skip(`${label} — ${skip}`, body);
+        it.skip(`${label} — ${skipReasonText(skip)}`, body);
       } else if (fail) {
         it.fails(`${label}: ${fail.msg}`, body);
       } else {
