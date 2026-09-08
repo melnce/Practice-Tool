@@ -81,25 +81,23 @@ describe("reactive timing matrix v2 skip gate", () => {
     }).toThrow(/must be 0/);
   });
 
-  it("classifies 19 unique skip reasons: 1 engine gap, 14 harness limits, 4 no-consumer", () => {
+  it("classifies 18 unique skip reasons: 0 engine gaps, 14 harness limits, 4 no-consumer", () => {
     const skips = collectV2MatrixSkipReasons();
     const summary = summarizeV2SkipReasons(skips);
     expect(summary).toEqual({
-      total: 19,
-      engine_gap: 1,
+      total: 18,
+      engine_gap: 0,
       harness_limit: 14,
       no_consumer: 4,
     });
     expect(summary.engine_gap).toBe(V2_SKIP_ENGINE_GAP_TOTAL);
   });
 
-  it("sole engine gap names transform leaves_field and Bayle (10113130)", () => {
+  it("has no engine_gap skips (transform leave/enter settled — owner ruling 2026-09-08)", () => {
     const gaps = collectV2MatrixSkipReasons().filter(
       (s) => s.kind === "engine_gap",
     );
-    expect(gaps).toHaveLength(1);
-    expect(gaps[0]!.reason).toMatch(/transform does not raise leaves_field/);
-    expect(gaps[0]!.cardIds).toEqual(["10113130", "10553110"]);
+    expect(gaps).toHaveLength(0);
   });
 });
 
