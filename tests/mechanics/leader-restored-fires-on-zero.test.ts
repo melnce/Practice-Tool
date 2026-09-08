@@ -132,8 +132,9 @@ describe("Mechanic Contract: leader_restored on 0 restore", () => {
   }, 60_000);
 
   it("positive control: no crest means full-HP restore does not damage leader", () => {
-    setupSecondAtFullWithGrace(false);
+    const ally = setupSecondAtFullWithGrace(false);
     engageAmulet("second", 0);
+    resolvePendingTarget(ally.uid);
     expect(getHP(state, "second")).toBe(20);
   }, 60_000);
 });
