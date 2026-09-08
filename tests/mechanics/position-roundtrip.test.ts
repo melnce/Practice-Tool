@@ -159,7 +159,7 @@ describe("position round-trip soak pins", () => {
         result.outcome,
         result.error ?? `seed ${pin.seed} game ${pin.gameIndex}`,
       ).toBe("completed");
-    }, 60_000);
+    });
   }
 });
 
