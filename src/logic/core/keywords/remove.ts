@@ -26,6 +26,25 @@ export function clearCantAttack(card: CardInstance) {
   if (card.type === "Follower") recomputeAttackFlags(card);
 }
 
+/** Clears Ambush and its temporary expiry metadata (keywordState is SoT for expiry). */
+export function clearAmbush(card: CardInstance) {
+  if (!card) return;
+  card.hasAmbush = false;
+  if (card.keywordState) {
+    const ks = card.keywordState;
+    delete ks.ambushUntilOpponentEOT;
+    delete ks.ambushExpiresOnTurn;
+    delete ks.ambushIsTemporary;
+    delete ks.ambushOwner;
+  }
+  if (Array.isArray(card.keywords)) {
+    card.keywords = card.keywords.filter((k) => {
+      const kwName = (typeof k === "string" ? k : (k as any)?.name) || "";
+      return normalizeKeywordName(kwName) !== "ambush";
+    });
+  }
+}
+
 export function removeKeywordFromSingleCard(
   target: CardInstance,
   rawKeyword: string,
@@ -48,7 +67,7 @@ export function removeKeywordFromSingleCard(
     if (target.keywordState) {
       target.keywordState.lastWordsEffects = [];
     }
-  } else if (keywordToRemove === "ambush") target.hasAmbush = false;
+  } else if (keywordToRemove === "ambush") clearAmbush(target);
 
   // Step 2: Remove from KeywordState if applicable
   // (Logic to clear specific keyword state bits could be expanded here)

@@ -7,7 +7,10 @@ import type { StatOp } from "./types.js";
 import { fireTrigger } from "../../../core/triggers.js";
 import { getBoard } from "../../../../core/playerHelpers.js";
 import { applyAttacksPerTurnToCard } from "../../attacks.js";
-import { resolveStatDuration } from "./duration.js";
+import {
+  resolveStatDuration,
+  rejectStatKeywordWithoutExpirySupport,
+} from "./duration.js";
 
 /**
  * Applies stat changes to a card (additive).
@@ -106,6 +109,7 @@ export function applyKeywordBuff(
   // STRICT: Only accept keywords array, not singular keyword
   const grantListRaw = eff.keywords || null;
   if (grantListRaw) {
+    rejectStatKeywordWithoutExpirySupport(eff, "keyword-grant");
     const grantList = Array.isArray(grantListRaw)
       ? grantListRaw
       : [grantListRaw];

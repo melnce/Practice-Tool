@@ -8,6 +8,15 @@ interface KeywordOptions {
   [key: string]: any;
 }
 
+/**
+ * Keywords whose KEYWORD_MAP handlers consume expires_on_turn / until_opponent_eot
+ * from stat-op duration resolution. Update alongside handler changes.
+ */
+export const KEYWORDS_SUPPORTING_STAT_DURATION = new Set<string>([
+  "cant_attack",
+  "ambush",
+]);
+
 export const KEYWORD_MAP: {
   [key: string]: (c: CardInstance, opts?: KeywordOptions) => void;
 } = {
@@ -50,8 +59,19 @@ export const KEYWORD_MAP: {
   intimidate: (c) => {
     c.hasIntimidate = true;
   },
-  ambush: (c) => {
+  ambush: (c, opts) => {
+    // hasAmbush stays on card root; expiry metadata lives in keywordState only.
     c.hasAmbush = true;
+    const ks = getKS(c);
+    if (opts?.expires_on_turn != null) {
+      ks.ambushExpiresOnTurn = Number(opts.expires_on_turn);
+      ks.ambushIsTemporary = true;
+    }
+    if (opts?.until_opponent_eot) {
+      ks.ambushUntilOpponentEOT = true;
+      ks.ambushIsTemporary = true;
+      ks.ambushOwner = opts.request_owner || c.owner || null;
+    }
   },
   barrier: (c) => {
     grantBarrier(c);
@@ -248,8 +268,11 @@ export function applyKeyword(
     const isTempCantAttack =
       key === "cant_attack" &&
       (options?.until_opponent_eot || options?.expires_on_turn);
+    const isTempAmbush =
+      key === "ambush" &&
+      (options?.until_opponent_eot || options?.expires_on_turn);
 
-    if (!__initializingKeywords && !isTempCantAttack) {
+    if (!__initializingKeywords && !isTempCantAttack && !isTempAmbush) {
       if (Array.isArray(card.keywords)) {
         card.keywords = card.keywords.map((k) =>
           typeof k === "string" ? k : { ...k },
