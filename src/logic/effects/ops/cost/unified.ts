@@ -17,6 +17,10 @@ import { normalizeToCostSpec } from "./types.js";
 import { applyCostChangeToCard } from "./model.js";
 import { opponentOf, getHand } from "../../../../core/playerHelpers.js";
 import { resolveUids } from "../../../../core/uidResolver.js";
+import {
+  evaluateCardCondition,
+  type CardCondition,
+} from "../../../core/conditions/evaluator.js";
 
 /**
  * Unified cost handler - handles all cost modification variants.
@@ -58,26 +62,9 @@ export function handleCost(
 
   // Apply filter if specified
   if (spec.filter && targets.length > 0) {
-    targets = targets.filter((c) => {
-      if (
-        spec.filter?.type &&
-        c.type?.toLowerCase() !== spec.filter.type.toLowerCase()
-      )
-        return false;
-      if (spec.filter?.class && c.class !== spec.filter.class) return false;
-      if (
-        spec.filter?.tribe &&
-        (!Array.isArray(c.tribes) || !c.tribes.includes(spec.filter.tribe))
-      )
-        return false;
-      if (
-        spec.filter?.name &&
-        String(c.name ?? "").toLowerCase() !==
-          String(spec.filter.name).toLowerCase()
-      )
-        return false;
-      return true;
-    });
+    targets = targets.filter((c) =>
+      evaluateCardCondition(c, spec.filter as CardCondition),
+    );
   }
 
   // Handle selection if required

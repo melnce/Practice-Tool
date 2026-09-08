@@ -154,7 +154,7 @@ describe("targeted damage — leader click and empty-board fallback", () => {
 
   describe("Rage of Serpents (10153310) — fallback_leader + ally leader damage", () => {
     const printed =
-      "Select an enemy follower on the field and deal it 3 damage. Deal 2 damage to your leader.";
+      "Select an enemy follower on the field or the enemy leader and deal it 3 damage. Deal 2 damage to your leader.";
 
     it("follower target → 3 damage to follower, 2 to self leader, pending cleared", () => {
       setupTurn({ hand: [RAGE_OF_SERPENTS], pp: 3 });

@@ -2,6 +2,7 @@
 // Type definitions for search operation
 
 import type { Effect } from "../../../../core/types/index.js";
+import { readPoolNarrowFilter } from "../../../core/targeting/poolCondition.js";
 
 export interface SearchSpec {
   /** Filters to match cards in deck */
@@ -53,7 +54,7 @@ export function normalizeSearchSpec(
   }
 
   return {
-    filters: eff.filter || eff.filters || {},
+    filters: readPoolNarrowFilter(eff as Record<string, unknown>) ?? {},
     count,
     keywords: Array.isArray(eff.keywords) ? eff.keywords : [],
     player: eff.player === "opponent" ? "opponent" : "self",

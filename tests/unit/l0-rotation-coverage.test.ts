@@ -254,7 +254,7 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
 
   describe("Kukishiro, Mistbloom (10564120)", () => {
     const printed =
-      "Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.";
+      "Fanfare: Gain Crest: Kukishiro, Mistbloom. Return 2 random cards from your hand to deck. Draw 2 cards.\nRush";
 
     const PICK_A = "10111310";
     const PICK_B = "10112310";
@@ -286,7 +286,7 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
 
   describe("Resolve of the Mistbloom (10563210)", () => {
     const printed =
-      "Engage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.";
+      "Fanfare: Select an enemy follower on the field and deal it 5 damage.\nEngage: Destroy this card. Return 2 random cards from your hand to deck. Draw 2 cards.";
 
     const PICK_A = "10111310";
     const PICK_B = "10112310";
@@ -607,7 +607,7 @@ describe("L0 rotation coverage — real-card L2 tests", () => {
 
   describe("Unfeeling Eld Axe (10673310)", () => {
     const printed =
-      "Activates in hand. Whenever an allied follower with a base cost of 5 or more enters the field, reduce the cost of this card by 1 until the end of the turn.";
+      "Activates in hand. Whenever an allied follower with a base cost of 5 or more enters the field, reduce the cost of this card by 1 until the end of the turn.\nEvolve a random unevolved allied follower on the field with a base cost of 5 or more. Deal 6 damage to a random enemy follower.";
 
     it("when a base-cost-5+ ally enters: reduces in-hand cost by 1 until EOT", () => {
       setupTurn(6, { hand: [UNFEELING], pp: 6 });

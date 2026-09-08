@@ -98,6 +98,40 @@ describe("card behaviour drive prep", () => {
     }
   });
 
+  it("Lingering Threat derives enemy defense_lte arena need from play roots", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string }[];
+    const lt = all.find((c) => c.id === "10862310")!;
+    const needs = analyzeHarnessArenaNeeds(lt, collectNamedGates(lt));
+    expect(needs.enemyFilterBounds).toEqual({ defenseLte: 3 });
+  });
+
+  it("enemy-filter arena prep lets Lingering Threat banish in play scenarios", () => {
+    const all = JSON.parse(
+      fs.readFileSync(path.join(ROOT, "cards/all.json"), "utf-8"),
+    ) as { id: string }[];
+    const lt = all.find((c) => c.id === "10862310")!;
+    const result = driveCard(lt);
+    expect(result.status).toBe("covered");
+    if (result.status !== "covered") return;
+    const names = result.scenarios.map((s) => s.scenario);
+    expect(names).toContain("play");
+    expect(names).toContain("play_base");
+    for (const s of result.scenarios) {
+      const banish =
+        (
+          s.detail as {
+            players: { second: { banish?: { defense: number }[] } };
+          }
+        ).players.second.banish ?? [];
+      expect(
+        banish.some((c) => Number(c.defense) <= 3),
+        `${s.scenario} should banish a ≤3-defense enemy`,
+      ).toBe(true);
+    }
+  });
+
   it("uses the harness seed constant for deterministic drives", () => {
     expect(HARNESS_SEED).toBe(42);
   });

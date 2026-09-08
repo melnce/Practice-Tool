@@ -1732,7 +1732,7 @@
             "count": 1,
             "filter": {
               "type": "follower",
-              "class": "dragoncraft"
+              "class": "Dragoncraft"
             }
           }
         ]
@@ -2041,7 +2041,7 @@
             "count": 1,
             "filter": {
               "type": "follower",
-              "class": "dragoncraft"
+              "class": "Dragoncraft"
             }
           }
         ]
@@ -3205,7 +3205,7 @@
                     "op": "draw",
                     "source": "deck",
                     "count": 1,
-                    "filters": {
+                    "filter": {
                       "type": "follower",
                       "defense_eq": 4
                     }

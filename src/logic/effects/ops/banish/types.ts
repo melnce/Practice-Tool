@@ -6,6 +6,7 @@ import type {
   Player,
   CardInstance,
 } from "../../../../core/types/index.js";
+import { readPoolNarrowFilter } from "../../../core/targeting/poolCondition.js";
 
 // ============================================================================
 // DISTRIBUTION & SCOPE TYPES
@@ -128,7 +129,7 @@ export function normalizeToUnifiedSpec(
     select: 0,
     scope: null,
     condition: eff.condition || null,
-    filters: eff.filters || eff.filter || null,
+    filters: readPoolNarrowFilter(eff as Record<string, unknown>),
     store_count_as:
       typeof eff.store_count_as === "string" ? eff.store_count_as : null,
   };

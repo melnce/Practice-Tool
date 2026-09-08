@@ -37,6 +37,33 @@ type Family =
   | "enhance-instead"
   | "op-key-shape";
 
+/** Class names as spelled on card records (case-sensitive canonical form). */
+const CANONICAL_CLASS_NAMES = new Set([
+  "Abysscraft",
+  "Dragoncraft",
+  "Forestcraft",
+  "Havencraft",
+  "Neutral",
+  "Portalcraft",
+  "Runecraft",
+  "Swordcraft",
+]);
+
+const POOL_NARROW_OPS_FORBID_FILTERS = new Set([
+  "summon",
+  "draw",
+  "search",
+  "banish",
+  "keyword",
+]);
+
+function suggestCanonicalClass(val: string): string | null {
+  for (const name of CANONICAL_CLASS_NAMES) {
+    if (name.toLowerCase() === val.toLowerCase()) return name;
+  }
+  return null;
+}
+
 type Warning = {
   family: Family;
   id: string;
@@ -514,6 +541,43 @@ function checkOpKeyShape(card: CardJson): Warning[] {
         canonical: compact({ path, op, filter: (obj as any).filters }),
         note: 'op:"summon" must use filter, not filters',
       });
+    }
+
+    if (
+      POOL_NARROW_OPS_FORBID_FILTERS.has(op) &&
+      op !== "summon" &&
+      (obj as any).filters
+    ) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, filters: (obj as any).filters }),
+        canonical: compact({ path, op, filter: (obj as any).filters }),
+        note: `op:"${op}" must use filter, not filters`,
+      });
+    }
+
+    for (const field of ["condition", "filter", "filters"] as const) {
+      const nested = (obj as any)[field];
+      if (!nested || typeof nested !== "object" || Array.isArray(nested))
+        continue;
+      const classVal = (nested as Record<string, unknown>).class;
+      if (typeof classVal !== "string") continue;
+      if (!CANONICAL_CLASS_NAMES.has(classVal)) {
+        const fixed = suggestCanonicalClass(classVal);
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({ path: `${path}.${field}`, class: classVal }),
+          canonical: compact({
+            path: `${path}.${field}`,
+            class: fixed ?? classVal,
+          }),
+          note: "filter/condition class must use canonical craft spelling from card records",
+        });
+      }
     }
 
     if (op === "stat") {

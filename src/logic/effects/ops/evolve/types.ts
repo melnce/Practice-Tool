@@ -1,6 +1,7 @@
 // src/logic/effects/ops/evolve/types.ts
 
 import type { Effect } from "../../../../core/types/index.js";
+import { mergePoolCondition } from "../../../core/targeting/poolCondition.js";
 
 /**
  * Target for an evolve operation.
@@ -99,19 +100,11 @@ export function normalizeToEvolveSpec(eff: Effect): UnifiedEvolveSpec {
       (effAny.count != null ? Number(effAny.count) : undefined),
     select_mode: effAny.select_mode,
     resume_bookkeeping_only: effAny.resume_bookkeeping_only,
-    // Honour object `condition` as filter (same merge pattern as stat op)
-    filter: {
-      ...(effAny.condition && typeof effAny.condition === "object"
-        ? effAny.condition
-        : {}),
-      ...(effAny.filter && typeof effAny.filter === "object"
-        ? effAny.filter
-        : {}),
-    },
   };
 
-  if (spec.filter && Object.keys(spec.filter).length === 0) {
-    delete spec.filter;
+  const mergedFilter = mergePoolCondition(effAny.condition, effAny.filter);
+  if (Object.keys(mergedFilter).length > 0) {
+    spec.filter = mergedFilter as NonNullable<UnifiedEvolveSpec["filter"]>;
   }
 
   return spec;

@@ -4,6 +4,7 @@
 // For card duplication, use "copy" op
 
 import type { Effect } from "../../../../core/types/index.js";
+import { readPoolNarrowFilter } from "../../../core/targeting/poolCondition.js";
 
 // ============================================================================
 // CANONICAL UNIFIED TYPES
@@ -119,12 +120,8 @@ export function normalizeToUnifiedSpec(
     .trim();
   const player: DrawPlayer = playerRaw === "opponent" ? "opponent" : "self";
 
-  const filters =
-    eff.filters && typeof eff.filters === "object"
-      ? (eff.filters as Record<string, any>)
-      : eff.filter && typeof eff.filter === "object"
-        ? (eff.filter as Record<string, any>)
-        : null;
+  const narrowFilter = readPoolNarrowFilter(eff as Record<string, unknown>);
+  const filters = narrowFilter as Record<string, any> | null;
 
   const distinct_by =
     typeof eff.distinct_by === "string" && eff.distinct_by.trim()

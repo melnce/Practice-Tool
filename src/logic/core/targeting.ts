@@ -14,6 +14,7 @@ import { toUids, toUid } from "../../core/uidResolver.js";
 
 // Refactored Imports
 import type { TargetContext } from "./targeting/index.js";
+import { mergeEffectPoolCondition } from "./targeting/poolCondition.js";
 
 import {
   parseTargetQuery,
@@ -134,13 +135,9 @@ export function clearSelectableFlags() {
  * string filters like "leftmost"/"rightmost" stay in applyPositionFilter.
  */
 export function selectPoolCondition(eff: Effect): any {
-  const base =
-    eff.condition && typeof eff.condition === "object" ? eff.condition : {};
-  const filter = eff.filter;
-  if (filter && typeof filter === "object" && !Array.isArray(filter)) {
-    return { ...base, ...filter };
-  }
-  return base;
+  return mergeEffectPoolCondition(
+    eff as { condition?: unknown; filter?: unknown },
+  );
 }
 
 function positionFilterFromEffect(eff: Effect): string | undefined {
