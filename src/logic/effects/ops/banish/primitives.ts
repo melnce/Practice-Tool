@@ -34,12 +34,14 @@ export function banishCard(
   if (bi !== -1) {
     firstBoard.splice(bi, 1);
     bumpZoneVersion(); // PERF: Invalidate cache before triggers
-    const leaveCtx: TriggerContext = {
-      leavingOwner: "first",
-      leavingCard: card,
-    };
-    fireTrigger("ally_follower_leaves_field", "first", leaveCtx);
-    fireTrigger("enemy_follower_leaves_field", "first", leaveCtx);
+    if (card.type === "Follower") {
+      const leaveCtx: TriggerContext = {
+        leavingOwner: "first",
+        leavingCard: card,
+      };
+      fireTrigger("ally_follower_leaves_field", "first", leaveCtx);
+      fireTrigger("enemy_follower_leaves_field", "first", leaveCtx);
+    }
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
@@ -56,12 +58,14 @@ export function banishCard(
   if (ri !== -1) {
     secondBoard.splice(ri, 1);
     bumpZoneVersion(); // PERF: Invalidate cache before triggers
-    const leaveCtx: TriggerContext = {
-      leavingOwner: "second",
-      leavingCard: card,
-    };
-    fireTrigger("ally_follower_leaves_field", "second", leaveCtx);
-    fireTrigger("enemy_follower_leaves_field", "second", leaveCtx);
+    if (card.type === "Follower") {
+      const leaveCtx: TriggerContext = {
+        leavingOwner: "second",
+        leavingCard: card,
+      };
+      fireTrigger("ally_follower_leaves_field", "second", leaveCtx);
+      fireTrigger("enemy_follower_leaves_field", "second", leaveCtx);
+    }
     logEvent("banish", {
       card: card.name,
       uid: card.uid,
