@@ -19,15 +19,13 @@ import {
   thenBoard,
 } from "../harness/builders.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import { attackFollower } from "../../src/logic/core/combat.js";
 import { state } from "../../src/core/gameState.js";
 import { getLogs, clearLogs } from "../../src/core/logger.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { runEndOfTurnBoundary } from "../../src/logic/core/turnBoundary.js";
 import { getBoard } from "../../src/core/playerHelpers.js";
-import {
-  flushDeferredDeathBatch,
-  flushReactiveQueueOnly,
-} from "../../src/logic/core/cleanup.js";
+import { flushDeferredDeathBatch } from "../../src/logic/core/cleanup.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -267,41 +265,23 @@ describe("stat targeted resume — shared applier contract", () => {
     }, 60_000);
   });
 
-  describe("attack floor clamp", () => {
-    function zeroAttackFollower(player: "first" | "second", name = "Zero") {
-      const c = createCard(
-        { name, type: "Follower", cost: 1, attack: 0, defense: 2 },
-        "board",
-        player,
-      );
-      c.peak_defense = 2;
-      state.players[player].board.push(c);
-      return c;
-    }
-
-    it("pooled route: 0-attack follower debuffed by -1 stays at 0 attack", () => {
+  describe("internal attack may go negative (rulebook L611)", () => {
+    it("targeted-resume debuff stores negative attack; combat deals 0; +3 buff yields 1", () => {
       setupTurn(R6);
-      const ally = zeroAttackFollower("first");
-
-      whenRunEffects(
-        [
-          {
-            op: "stat",
-            action: "give",
-            target: "ally:follower",
-            attack: -1,
-          },
-        ],
+      const card = createCard(
+        { name: "Debuff", type: "Follower", cost: 2, attack: 5, defense: 5 },
+        "board",
         "first",
       );
-      flushReactiveQueueOnly();
-
-      expect(Number(ally.attack)).toBe(0);
-    }, 60_000);
-
-    it("targeted resume route: 0-attack follower debuffed by -1 stays at 0 attack", () => {
-      setupTurn(R6);
-      const ally = zeroAttackFollower("first");
+      card.peak_defense = 5;
+      const foe = createCard(
+        { name: "Foe", type: "Follower", cost: 2, attack: 2, defense: 10 },
+        "board",
+        "second",
+      );
+      foe.peak_defense = 10;
+      state.players.first.board = [card];
+      state.players.second.board = [foe];
 
       whenRunEffects(
         [
@@ -310,14 +290,32 @@ describe("stat targeted resume — shared applier contract", () => {
             action: "give",
             target: "ally:follower",
             select: 1,
-            attack: -1,
+            attack: -7,
           },
         ],
         "first",
       );
-      resolvePendingTarget(String(ally.uid));
+      resolvePendingTarget(String(card.uid));
+      expect(Number(card.attack)).toBe(-2);
 
-      expect(Number(ally.attack)).toBe(0);
+      card.can_attack = true;
+      attackFollower(0, 0, "first", "second");
+      expect(Number(foe.defense)).toBe(10);
+
+      whenRunEffects(
+        [
+          {
+            op: "stat",
+            action: "give",
+            target: "ally:follower",
+            select: 1,
+            attack: 3,
+          },
+        ],
+        "first",
+      );
+      resolvePendingTarget(String(card.uid));
+      expect(Number(card.attack)).toBe(1);
     }, 60_000);
   });
 });

@@ -428,7 +428,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       const bruiser = enemyFollower(7, 5, "Bruiser");
       const weak = enemyFollower(2, 5, "Weak");
       whenPlayCard("first", 0);
-      expect(Number(bruiser.attack)).toBe(0);
+      expect(Number(bruiser.attack)).toBeLessThanOrEqual(-3);
       expect(Number(bruiser.defense)).toBeLessThanOrEqual(-5);
       expect(Number(weak.attack)).toBe(2);
       expect(Number(weak.defense)).toBe(5);
@@ -440,7 +440,7 @@ describe("L2 Rally Swordcraft — real-card tests", () => {
       setupTurn(R6, { hand: [SHARED_EXISTENCE], pp: 6 });
       const bruiser = enemyFollower(5, 3, "Bruiser");
       whenPlayCard("first", 0);
-      expect(Number(bruiser.attack)).toBe(0);
+      expect(Number(bruiser.attack)).toBeLessThanOrEqual(-5);
       cleanupDead();
       expect(thenBoard("first").filter((c) => c.id === WRETCH)).toHaveLength(3);
       expect(printed).toContain("Summon 3 copies of Wretch");
