@@ -128,14 +128,22 @@ import { afterEach } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import { state } from "../../src/core/gameState.js";
 import {
+  assertAllCommandsUsedAfterTest,
   assertStrictChooseAfterTest,
   normalizeTestFile,
 } from "../harness/strictChooseGate.js";
+import {
+  getNoPromptExits,
+  resetResolveTargetProbe,
+} from "../../src/logic/core/resolveTargetProbe.js";
 
 afterEach((ctx) => {
   const test = getCurrentTest();
   const testName = ctx.task.fullTestName ?? test?.name ?? ctx.task.name;
   const rawFile = test?.file?.filepath ?? ctx.task.file?.filepath ?? "";
   const file = normalizeTestFile(rawFile);
+  const noPromptExits = [...getNoPromptExits()];
+  resetResolveTargetProbe();
   assertStrictChooseAfterTest(file, testName, state.pendingTargetEffect);
+  assertAllCommandsUsedAfterTest(file, testName, noPromptExits);
 });

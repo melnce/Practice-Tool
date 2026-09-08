@@ -1,6 +1,10 @@
 /**
- * Measure tests ending with pendingTargetEffect still set.
- * Usage: npx tsx scripts/measure-dangling-pending.ts [vitest.config.ts]
+ * Measure resolvePendingTarget no-prompt exits during the test suite.
+ *
+ * Usage:
+ *   npx tsx scripts/measure-unconsumed-commands.ts [vitest.config.ts]
+ *
+ * Output: JSON array of { file, testName, uid } rows (one per no-prompt exit).
  */
 import { spawnSync } from "node:child_process";
 import { writeFileSync, readFileSync, unlinkSync, existsSync } from "node:fs";
@@ -8,11 +12,12 @@ import { join } from "node:path";
 
 const config = process.argv[2] ?? "vitest.config.ts";
 const setupPath = join(process.cwd(), "tests/fixtures/setup.ts");
+const pristineSetup = readFileSync(setupPath, "utf8");
 const outPath = join(
   process.cwd(),
-  "scripts/.dangling-pending-measurement.json",
+  "scripts/.unconsumed-commands-measurement.json",
 );
-let original = readFileSync(setupPath, "utf8");
+let original = pristineSetup;
 const gateMarker = '\nimport { afterEach } from "vitest";';
 const gateIdx = original.lastIndexOf(gateMarker);
 if (gateIdx >= 0) {
@@ -27,11 +32,11 @@ import { afterEach } from "vitest";
 import { getCurrentTest } from "vitest/suite";
 import { writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { state } from "../../src/core/gameState.js";
+import { getNoPromptExits, resetResolveTargetProbe } from "../../src/logic/core/resolveTargetProbe.js";
 
-const __outPath = join(process.cwd(), "scripts/.dangling-pending-measurement.json");
+const __outPath = join(process.cwd(), "scripts/.unconsumed-commands-measurement.json");
 
-function __loadRows(): Array<{ file: string; testName: string }> {
+function __loadRows(): Array<{ file: string; testName: string; uid: string }> {
   if (!existsSync(__outPath)) return [];
   try {
     return JSON.parse(readFileSync(__outPath, "utf8"));
@@ -40,21 +45,32 @@ function __loadRows(): Array<{ file: string; testName: string }> {
   }
 }
 
-function __saveRow(file: string, testName: string) {
-  const rows = __loadRows();
-  rows.push({ file, testName });
+function __saveRows(
+  rows: Array<{ file: string; testName: string; uid: string }>,
+) {
   writeFileSync(__outPath, JSON.stringify(rows, null, 2));
 }
 
+function __normalizeFile(filePath: string): string {
+  const cwd = process.cwd();
+  if (filePath.startsWith(cwd + "/")) return filePath.slice(cwd.length + 1);
+  return filePath.replace(/^\\.\\//, "");
+}
+
 afterEach((ctx) => {
-  if (!state.pendingTargetEffect) return;
+  const snapshotted = [...getNoPromptExits()];
+  resetResolveTargetProbe();
+  if (snapshotted.length === 0) return;
   const test = getCurrentTest();
   const name =
     ctx.task.fullTestName ?? test?.name ?? ctx.task.name;
   let file = test?.file?.filepath ?? ctx.task.file?.filepath ?? "";
-  const cwd = process.cwd();
-  if (file.startsWith(cwd + "/")) file = file.slice(cwd.length + 1);
-  __saveRow(file, name);
+  file = __normalizeFile(file);
+  const rows = __loadRows();
+  for (const { uid, callerTestFile } of snapshotted) {
+    rows.push({ file, testName: name, uid, callerTestFile: callerTestFile ?? "engine" });
+  }
+  __saveRows(rows);
 });
 `;
 
@@ -71,11 +87,11 @@ const result = spawnSync(
   },
 );
 
-writeFileSync(setupPath, original);
+writeFileSync(setupPath, pristineSetup);
 
 if (result.status !== 0) {
-  console.error(result.stdout?.slice(-4000));
-  console.error(result.stderr?.slice(-4000));
+  console.error(result.stdout?.slice(-8000));
+  console.error(result.stderr?.slice(-8000));
   process.exit(result.status ?? 1);
 }
 
@@ -86,5 +102,13 @@ if (!existsSync(outPath)) {
 
 const rows = JSON.parse(readFileSync(outPath, "utf8"));
 console.log(JSON.stringify(rows, null, 2));
-console.error(`\n${rows.length} dangling tests (${config})`);
+
+const byTest = new Map<string, number>();
+for (const row of rows) {
+  const key = `${row.file}::${row.testName}`;
+  byTest.set(key, (byTest.get(key) ?? 0) + 1);
+}
+console.error(
+  `\n${rows.length} no-prompt exits across ${byTest.size} tests (${config})`,
+);
 unlinkSync(outPath);
