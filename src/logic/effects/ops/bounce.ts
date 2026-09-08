@@ -9,6 +9,7 @@ import {
 } from "../../../helpers/alternateForm.js";
 import { initAmulet } from "./summon_ops/init.js";
 import { fireTrigger } from "../../core/triggers.js";
+import type { TriggerContext } from "../../core/triggers/types.js";
 import {
   trySetPendingTarget,
   reportSelectFizzled,
@@ -84,8 +85,9 @@ export function bounceToHand(card: CardInstance) {
     return; // Card not on a board; ignore.
   }
 
-  fireTrigger("ally_follower_leaves_field", owner);
-  fireTrigger("enemy_follower_leaves_field", owner);
+  const leaveCtx: TriggerContext = { leavingOwner: owner, leavingCard: card };
+  fireTrigger("ally_follower_leaves_field", owner, leaveCtx);
+  fireTrigger("enemy_follower_leaves_field", owner, leaveCtx);
 
   const [removed] = fromArr.splice(fromArr.indexOf(card), 1);
   if (!removed) return;

@@ -559,8 +559,9 @@ export function cleanupDead() {
     if (isBanishedOnDeath) {
       logEvent("banishOnDeath", { card: c.name, owner });
       bumpZoneVersion();
-      fireTrigger("ally_follower_leaves_field", owner as any);
-      fireTrigger("enemy_follower_leaves_field", owner as any);
+      const leaveCtx: TriggerContext = { leavingOwner: owner, leavingCard: c };
+      fireTrigger("ally_follower_leaves_field", owner as any, leaveCtx);
+      fireTrigger("enemy_follower_leaves_field", owner as any, leaveCtx);
       logEvent("banish", {
         card: c.name,
         uid: c.uid,
