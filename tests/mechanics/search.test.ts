@@ -226,7 +226,7 @@ describe("Mechanic Contract: search op", () => {
         [
           {
             op: "search" as const,
-            filter: { cost: 8 },
+            filter: { cost_eq: 8 },
             count: 1,
           },
         ],
@@ -604,7 +604,7 @@ describe("Mechanic Contract: search op", () => {
         [
           {
             op: "search" as const,
-            filter: { type: "Follower", attack: 2 },
+            filter: { type: "Follower", attack_eq: 2 },
             count: 1,
             keywords: ["Rush"],
           },

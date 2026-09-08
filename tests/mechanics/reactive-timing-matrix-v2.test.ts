@@ -684,7 +684,7 @@ describe("Reactive trigger timing matrix v2", () => {
               op: "return",
               destination: "deck",
               target: "ally:follower",
-              filter: { name: "ReturnVictim" },
+              condition: { name: "ReturnVictim" },
             },
           ],
         },
