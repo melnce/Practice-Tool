@@ -1,7 +1,7 @@
 /**
  * Sabotage proofs for assertAllCommandsUsed + invalid-target throw.
  */
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import "./setup.js";
 import { createCard } from "../harness/builders.js";
 import { state, resetGameState } from "../../src/core/gameState.js";
@@ -11,12 +11,20 @@ import {
   resolvePendingTarget,
 } from "../../src/logic/core/resolveTarget.js";
 import { validateTargetSelection } from "../../src/logic/core/targeting/validation.js";
+import { dispatch as engineDispatch } from "../../src/engine.js";
+import { setNodeEnv, readEnv } from "../../src/core/env.js";
 
 describe("strict-choose unconsumed commands sabotage proofs", () => {
+  const priorNodeEnv = readEnv("NODE_ENV");
+
   beforeEach(() => {
     resetGameState(99);
     state.phase = "main";
     state.activePlayer = "first";
+  });
+
+  afterEach(() => {
+    setNodeEnv("NODE_ENV", priorNodeEnv);
   });
 
   it("PRE: invalid uid on open prompt throws invalidTargetStrictChooseFailed with pool diagnostics", () => {
@@ -69,6 +77,40 @@ describe("strict-choose unconsumed commands sabotage proofs", () => {
     );
     expect(formatted).toContain("uid clicked: bogus");
     expect(formatted).toContain("legal targets: only_one");
+  });
+
+  it("PRE: production dispatch path warns on invalid CHOOSE_TARGET and keeps prompt open", () => {
+    setNodeEnv("NODE_ENV", "production");
+    const enemy = createCard("10001110", "board", "second");
+    enemy.uid = "enemy_only";
+    const ally = createCard("10001110", "board", "first");
+    ally.uid = "own_follower";
+    state.players.second.board = [enemy];
+    state.players.first.board = [ally];
+    state.pendingTargetEffect = {
+      eff: { op: "destroy" } as any,
+      owner: "first",
+      sourceCard: null,
+      resumeEffects: [],
+      pool: [enemy],
+      targets: [],
+      targetUids: [],
+      poolUids: [enemy.uid],
+      selectCount: 1,
+    };
+    const pendingBefore = state.pendingTargetEffect;
+
+    expect(() =>
+      engineDispatch(state, {
+        type: "CHOOSE_TARGET",
+        player: "first",
+        target: { type: "card", uid: ally.uid },
+      }),
+    ).not.toThrow();
+
+    expect(state.pendingTargetEffect).toBe(pendingBefore);
+    state.pendingTargetEffect = undefined;
+    setNodeEnv("NODE_ENV", "test");
   });
 
   it("SABOTAGE PRE: unconsumed no-prompt exit triggers gate diagnostic", () => {

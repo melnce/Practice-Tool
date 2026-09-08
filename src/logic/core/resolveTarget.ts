@@ -41,6 +41,7 @@ import {
   runPendingConfirmHandler,
   type PendingConfirmInput,
 } from "./pendingTarget/confirmRegistry.js";
+import { readEnv } from "../../core/env.js";
 import { recordNoPromptExit } from "./resolveTargetProbe.js";
 
 export type PendingTargetEffect = NonNullable<typeof state.pendingTargetEffect>;
@@ -284,9 +285,13 @@ export function resolvePendingTarget(uid: string | "leader") {
 
   // 2. Handle Logic Result
   if (result.kind === "invalid") {
-    throw new Error(
-      formatInvalidTargetStrictChooseFailed(uid, pending, result.reason),
-    );
+    if (readEnv("NODE_ENV") === "test") {
+      throw new Error(
+        formatInvalidTargetStrictChooseFailed(uid, pending, result.reason),
+      );
+    }
+    if (result.reason) console.warn(result.reason);
+    return;
   }
 
   if (result.kind === "continue") {
