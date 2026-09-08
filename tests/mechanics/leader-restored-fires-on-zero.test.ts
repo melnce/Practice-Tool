@@ -106,7 +106,6 @@ describe("Mechanic Contract: leader_restored on 0 restore — 10144110 Burnite, 
     expect(getHP(state, "second")).toBe(19);
 
     engageAmulet("second", 1);
-    resolvePendingTarget(enemy.uid);
     expect(getHP(state, "second")).toBe(19);
   }, 60_000);
 
@@ -192,7 +191,6 @@ describe("Mechanic Contract: leader_restored on 0 restore — 10744110 Burnite, 
     expect(getHP(state, "second")).toBe(19);
 
     engageAmulet("second", 1);
-    resolvePendingTarget(enemy.uid);
     expect(getHP(state, "second")).toBe(19);
   }, 60_000);
 

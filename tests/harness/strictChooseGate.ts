@@ -1,5 +1,10 @@
 import type { GameState } from "../../src/core/types/game.js";
 import { DANGLING_PENDING_AUDIT } from "./danglingPendingAudit.js";
+import { UNCONSUMED_COMMANDS_AUDIT } from "./unconsumedCommandsAudit.js";
+import {
+  getNoPromptExits,
+  type NoPromptExitRecord,
+} from "../../src/logic/core/resolveTargetProbe.js";
 
 export type PendingTargetEffect = NonNullable<GameState["pendingTargetEffect"]>;
 
@@ -16,8 +21,25 @@ export const STRICT_CHOOSE_ALLOWLIST: ReadonlyArray<{
   }),
 );
 
+/** Allowlisted tests with test-originated resolvePendingTarget no-prompt exits. */
+export const UNCONSUMED_COMMANDS_ALLOWLIST: ReadonlyArray<{
+  file: string;
+  testName: string;
+  reason: string;
+}> = UNCONSUMED_COMMANDS_AUDIT.filter((e) => e.classification === "A").map(
+  (e) => ({
+    file: e.file,
+    testName: e.testName,
+    reason: e.reason,
+  }),
+);
+
 const ALLOWLIST_KEYS = new Set(
   STRICT_CHOOSE_ALLOWLIST.map((e) => `${e.file}::${e.testName}`),
+);
+
+const UNCONSUMED_ALLOWLIST_KEYS = new Set(
+  UNCONSUMED_COMMANDS_ALLOWLIST.map((e) => `${e.file}::${e.testName}`),
 );
 
 export function normalizeTestFile(filePath: string): string {
@@ -49,6 +71,56 @@ export function formatChooseStrictModeFailed(
     `  requiresConfirmation: ${requiresConfirmation}`,
     "  The engine is still waiting for target selection. Call resolvePendingTarget(...) before the test ends, or add a (A) entry to tests/harness/danglingPendingAudit.ts if the open prompt is the subject.",
   ].join("\n");
+}
+
+export function formatUnconsumedCommandFailed(
+  file: string,
+  testName: string,
+  exits: readonly NoPromptExitRecord[],
+): string {
+  const lines = exits.map(
+    (e) => `  - uid: ${e.uid} (caller: ${e.callerTestFile ?? "engine"})`,
+  );
+  return [
+    `unconsumedCommandFailed: ${file}`,
+    `  test: "${testName}"`,
+    `  no-prompt resolvePendingTarget calls: ${exits.length}`,
+    ...lines,
+    "  The test called resolvePendingTarget but no target prompt was open. Remove the stray call, or add a (A) entry to tests/harness/unconsumedCommandsAudit.ts if the no-op is intentional.",
+  ].join("\n");
+}
+
+/**
+ * Bidirectional strict-choose gate for unconsumed resolvePendingTarget calls.
+ * - No-prompt exit not in (A) → fail.
+ * - (A) entry that no longer no-op's → fail so stale allowlist rows get deleted.
+ */
+export function assertAllCommandsUsedAfterTest(
+  file: string,
+  testName: string,
+  exits: readonly NoPromptExitRecord[] = getNoPromptExits(),
+): void {
+  const key = `${file}::${testName}`;
+  const allowlisted = UNCONSUMED_ALLOWLIST_KEYS.has(key);
+  const hasExits = exits.length > 0;
+
+  if (hasExits && !allowlisted) {
+    throw new Error(formatUnconsumedCommandFailed(file, testName, exits));
+  }
+
+  if (!hasExits && allowlisted) {
+    const entry = UNCONSUMED_COMMANDS_ALLOWLIST.find(
+      (e) => e.file === file && e.testName === testName,
+    );
+    throw new Error(
+      [
+        `unconsumed-command allowlist entry no longer reproduces: ${file}`,
+        `  test: "${testName}"`,
+        `  reason: ${entry?.reason ?? "(unknown)"}`,
+        "  This test no longer issues no-prompt resolvePendingTarget calls — remove the row from tests/harness/unconsumedCommandsAudit.ts.",
+      ].join("\n"),
+    );
+  }
 }
 
 /**

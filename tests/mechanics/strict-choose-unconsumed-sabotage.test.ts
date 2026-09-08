@@ -1,0 +1,130 @@
+/**
+ * Sabotage proofs for assertAllCommandsUsed + invalid-target throw.
+ */
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import "./setup.js";
+import { createCard } from "../harness/builders.js";
+import { state, resetGameState } from "../../src/core/gameState.js";
+import { assertAllCommandsUsedAfterTest } from "../harness/strictChooseGate.js";
+import {
+  formatInvalidTargetStrictChooseFailed,
+  resolvePendingTarget,
+} from "../../src/logic/core/resolveTarget.js";
+import { validateTargetSelection } from "../../src/logic/core/targeting/validation.js";
+import { dispatch as engineDispatch } from "../../src/engine.js";
+import { setNodeEnv, readEnv } from "../../src/core/env.js";
+
+describe("strict-choose unconsumed commands sabotage proofs", () => {
+  const priorNodeEnv = readEnv("NODE_ENV");
+
+  beforeEach(() => {
+    resetGameState(99);
+    state.phase = "main";
+    state.activePlayer = "first";
+  });
+
+  afterEach(() => {
+    setNodeEnv("NODE_ENV", priorNodeEnv);
+  });
+
+  it("PRE: invalid uid on open prompt throws invalidTargetStrictChooseFailed with pool diagnostics", () => {
+    const legal = createCard("10001110", "board", "second");
+    legal.uid = "legal_target";
+    state.players.second.board = [legal];
+    state.pendingTargetEffect = {
+      eff: { op: "destroy" } as any,
+      owner: "first",
+      sourceCard: null,
+      resumeEffects: [],
+      pool: [legal],
+      targets: [],
+      targetUids: [],
+      poolUids: [legal.uid],
+      selectCount: 1,
+    };
+    const pending = state.pendingTargetEffect!;
+
+    let message = "";
+    try {
+      resolvePendingTarget("illegal_uid");
+    } catch (error) {
+      message = (error as Error).message;
+    } finally {
+      state.pendingTargetEffect = undefined;
+    }
+
+    expect(message).toContain("invalidTargetStrictChooseFailed:");
+    expect(message).toContain("uid clicked: illegal_uid");
+    expect(message).toContain("op: destroy");
+    expect(message).toContain("pool size: 1");
+    expect(message).toContain("legal targets: legal_target");
+    expect(validateTargetSelection(state, pending, "illegal_uid").ok).toBe(
+      false,
+    );
+  });
+
+  it("PRE: formatInvalidTargetStrictChooseFailed matches thrown shape", () => {
+    const pending = {
+      eff: { op: "select" },
+      owner: "first",
+      pool: [{ uid: "only_one" } as any],
+      selectCount: 1,
+    };
+    const formatted = formatInvalidTargetStrictChooseFailed(
+      "bogus",
+      pending as any,
+      "Clicked card is not in the valid target pool.",
+    );
+    expect(formatted).toContain("uid clicked: bogus");
+    expect(formatted).toContain("legal targets: only_one");
+  });
+
+  it("PRE: production dispatch path warns on invalid CHOOSE_TARGET and keeps prompt open", () => {
+    setNodeEnv("NODE_ENV", "production");
+    const enemy = createCard("10001110", "board", "second");
+    enemy.uid = "enemy_only";
+    const ally = createCard("10001110", "board", "first");
+    ally.uid = "own_follower";
+    state.players.second.board = [enemy];
+    state.players.first.board = [ally];
+    state.pendingTargetEffect = {
+      eff: { op: "destroy" } as any,
+      owner: "first",
+      sourceCard: null,
+      resumeEffects: [],
+      pool: [enemy],
+      targets: [],
+      targetUids: [],
+      poolUids: [enemy.uid],
+      selectCount: 1,
+    };
+    const pendingBefore = state.pendingTargetEffect;
+
+    expect(() =>
+      engineDispatch(state, {
+        type: "CHOOSE_TARGET",
+        player: "first",
+        target: { type: "card", uid: ally.uid },
+      }),
+    ).not.toThrow();
+
+    expect(state.pendingTargetEffect).toBe(pendingBefore);
+    state.pendingTargetEffect = undefined;
+    setNodeEnv("NODE_ENV", "test");
+  });
+
+  it("SABOTAGE PRE: unconsumed no-prompt exit triggers gate diagnostic", () => {
+    expect(() =>
+      assertAllCommandsUsedAfterTest(
+        "tests/mechanics/example.test.ts",
+        "example > stray resolvePendingTarget",
+        [
+          {
+            uid: "orphan_uid",
+            callerTestFile: "tests/mechanics/example.test.ts",
+          },
+        ],
+      ),
+    ).toThrow(/unconsumedCommandFailed:/);
+  });
+});
