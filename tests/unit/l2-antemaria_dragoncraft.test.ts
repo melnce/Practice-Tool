@@ -23,7 +23,6 @@ import {
   whenEffectEvolve,
 } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -140,7 +139,7 @@ function resolveFirstPending(): void {
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolveOpenPendingTarget(uid);
+  resolvePendingTarget(uid);
 }
 
 function discardHandCard(player: "first" | "second", cardId: string): void {

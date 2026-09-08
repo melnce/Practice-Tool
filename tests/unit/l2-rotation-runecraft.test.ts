@@ -24,7 +24,6 @@ import {
   whenEffectEvolve,
 } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 
 import { spellboostHand } from "../../src/logic/effects/ops/spellboost.js";
@@ -182,7 +181,7 @@ function resolveFirstPending(): void {
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolveOpenPendingTarget(uid);
+  resolvePendingTarget(uid);
 }
 
 function handIds(player: "first" | "second" = "first"): string[] {

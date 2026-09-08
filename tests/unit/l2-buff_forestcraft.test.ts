@@ -23,7 +23,6 @@ import {
   whenEffectEvolve,
 } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -72,7 +71,7 @@ const BIG_FOLLOWER = "10614110"; // cost 8 — for Lyria search negative control
 const LYRIA_BIG = "10814110"; // Setus cost 7 — for Lyria search positive
 
 function resolvePendingByUid(uid: string): void {
-  resolveOpenPendingTarget(uid);
+  resolvePendingTarget(uid);
 }
 
 function resolveFirstPending(): void {

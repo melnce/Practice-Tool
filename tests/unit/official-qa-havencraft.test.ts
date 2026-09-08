@@ -13,7 +13,7 @@ import {
   findOnBoard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
-import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
+import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { cleanupDead } from "../../src/logic/core/cleanup.js";
@@ -102,7 +102,7 @@ function setupTurn(
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolveOpenPendingTarget(uid);
+  resolvePendingTarget(uid);
 }
 
 function enemyFollower(

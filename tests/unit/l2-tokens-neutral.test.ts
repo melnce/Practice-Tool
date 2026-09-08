@@ -19,7 +19,6 @@ import {
   findOnBoard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
-import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
@@ -90,7 +89,7 @@ function setupTurn(
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolveOpenPendingTarget(uid);
+  resolvePendingTarget(uid);
 }
 
 function handUids(player: "first" | "second" = "first"): Set<string> {

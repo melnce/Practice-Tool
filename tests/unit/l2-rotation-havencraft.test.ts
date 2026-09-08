@@ -23,7 +23,6 @@ import {
   whenEffectEvolve,
 } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
-import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
@@ -135,13 +134,13 @@ function setupTurn(
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolveOpenPendingTarget(uid);
+  resolvePendingTarget(uid);
 }
 
 function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   const uid = pending?.poolUids?.[0] ?? String(pending?.pool?.[0]?.uid ?? "");
-  resolveOpenPendingTarget(uid);
+  resolvePendingTarget(uid);
 }
 
 function handIds(player: "first" | "second" = "first"): string[] {

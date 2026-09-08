@@ -12,13 +12,6 @@ import {
 } from "../../src/logic/core/cleanup.js";
 import { destroyTarget } from "../../src/logic/effects/ops/destroy/primitives.js";
 import { whenPlayCard, whenRunEffects } from "./builders.js";
-import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
-
-/** Resolve a target click only when the engine has an open prompt. */
-export function resolveOpenPendingTarget(uid: string | "leader"): void {
-  if (!state.pendingTargetEffect) return;
-  resolvePendingTarget(uid);
-}
 
 /** Cheap neutral follower for real ally_follower_enter via play path. */
 export const PLAY_FILLER_FOLLOWER = "10001110";
