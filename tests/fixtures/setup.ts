@@ -123,3 +123,19 @@ if (typeof window === "undefined") {
 // reset if needed.
 
 export {};
+
+import { afterEach } from "vitest";
+import { getCurrentTest } from "vitest/suite";
+import { state } from "../../src/core/gameState.js";
+import {
+  assertStrictChooseAfterTest,
+  normalizeTestFile,
+} from "../harness/strictChooseGate.js";
+
+afterEach((ctx) => {
+  const test = getCurrentTest();
+  const testName = ctx.task.fullTestName ?? test?.name ?? ctx.task.name;
+  const rawFile = test?.file?.filepath ?? ctx.task.file?.filepath ?? "";
+  const file = normalizeTestFile(rawFile);
+  assertStrictChooseAfterTest(file, testName, state.pendingTargetEffect);
+});
