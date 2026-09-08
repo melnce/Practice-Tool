@@ -336,6 +336,17 @@ function isEnemyPoolSelectOp(obj: Record<string, unknown>): boolean {
   return false;
 }
 
+function keywordEffectRoots(card: RawCard): unknown[] {
+  const out: unknown[] = [];
+  if (!Array.isArray(card.keywords)) return out;
+  for (const kw of card.keywords) {
+    if (!kw || typeof kw !== "object") continue;
+    const effects = (kw as { effects?: unknown }).effects;
+    if (Array.isArray(effects)) out.push(...effects);
+  }
+  return out;
+}
+
 export function analyzeHarnessArenaNeeds(
   card: RawCard,
   gates: GateSpec[],
@@ -356,13 +367,6 @@ export function analyzeHarnessArenaNeeds(
   if (amuletKit < 3) amuletKit = 0;
 
   const playRoots: unknown[] = [...(card.fanfare ?? []), ...(card.spell ?? [])];
-  if (Array.isArray(card.keywords)) {
-    for (const kw of card.keywords) {
-      if (!kw || typeof kw !== "object") continue;
-      const effects = (kw as { effects?: unknown }).effects;
-      if (Array.isArray(effects)) playRoots.push(...effects);
-    }
-  }
   const allRoots: unknown[] = [
     ...playRoots,
     ...(card.evolve ?? []),
@@ -396,7 +400,8 @@ export function analyzeHarnessArenaNeeds(
     if (op === "select" || sel != null) handKit = true;
   });
 
-  walkEffects(playRoots, (obj) => {
+  const enemyBoundRoots = [...playRoots, ...keywordEffectRoots(card)];
+  walkEffects(enemyBoundRoots, (obj) => {
     if (!isEnemyPoolSelectOp(obj)) return;
     const filter = readPoolNarrowFilter(obj);
     if (!filter || !filterHasEnemyNumericBounds(filter)) return;

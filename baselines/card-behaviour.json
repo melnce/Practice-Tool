@@ -2363,24 +2363,24 @@
       "status": "covered"
     },
     "10162210": {
-      "fingerprint": "9e11e680",
+      "fingerprint": "80855cdf",
       "gatesSatisfied": [],
       "name": "Darkhaven Grace",
       "scenarios": [
         {
-          "fingerprint": "1daebee8",
+          "fingerprint": "d4f775d8",
           "scenario": "engage"
         }
       ],
       "status": "covered"
     },
     "10162220": {
-      "fingerprint": "a26de858",
+      "fingerprint": "d5cff607",
       "gatesSatisfied": [],
       "name": "Dose of Holiness",
       "scenarios": [
         {
-          "fingerprint": "d81984f8",
+          "fingerprint": "88695c94",
           "scenario": "engage"
         }
       ],
@@ -4771,7 +4771,7 @@
       "status": "covered"
     },
     "10361310": {
-      "fingerprint": "cfe6d514",
+      "fingerprint": "f78bbbf8",
       "gatesSatisfied": [],
       "name": "Blinding Faith",
       "scenarios": [
@@ -4780,7 +4780,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "78627918",
+          "fingerprint": "37b00e20",
           "scenario": "play_base"
         }
       ],
@@ -4803,16 +4803,16 @@
       "status": "covered"
     },
     "10362210": {
-      "fingerprint": "a3544cff",
+      "fingerprint": "17929c90",
       "gatesSatisfied": [],
       "name": "Temple of Repose",
       "scenarios": [
         {
-          "fingerprint": "e6db2610",
+          "fingerprint": "58b3da0c",
           "scenario": "destroy"
         },
         {
-          "fingerprint": "750504cf",
+          "fingerprint": "a36b3bbc",
           "scenario": "engage"
         }
       ],
@@ -4851,7 +4851,7 @@
       "status": "covered"
     },
     "10363210": {
-      "fingerprint": "2190f180",
+      "fingerprint": "d5fcba5c",
       "gatesSatisfied": [],
       "name": "Shining Disenchantment",
       "scenarios": [
@@ -4860,7 +4860,7 @@
           "scenario": "destroy"
         },
         {
-          "fingerprint": "1923b224",
+          "fingerprint": "e336d5e4",
           "scenario": "engage"
         }
       ],
@@ -7775,16 +7775,16 @@
       "status": "covered"
     },
     "10641120": {
-      "fingerprint": "63c990f0",
+      "fingerprint": "59b055a0",
       "gatesSatisfied": [],
       "name": "Fruitfish",
       "scenarios": [
         {
-          "fingerprint": "e31ef888",
+          "fingerprint": "6e9d291e",
           "scenario": "play_base"
         },
         {
-          "fingerprint": "4a93a440",
+          "fingerprint": "1e109514",
           "scenario": "destroy"
         }
       ],
@@ -8119,12 +8119,12 @@
       "status": "covered"
     },
     "10662210": {
-      "fingerprint": "aa61488c",
+      "fingerprint": "fd76c910",
       "gatesSatisfied": [],
       "name": "Scripture of Salvation",
       "scenarios": [
         {
-          "fingerprint": "3be9ef84",
+          "fingerprint": "b5c6757c",
           "scenario": "destroy"
         }
       ],
@@ -9323,12 +9323,12 @@
       "status": "covered"
     },
     "10763110": {
-      "fingerprint": "51758ec0",
+      "fingerprint": "951a65b0",
       "gatesSatisfied": ["amulet_count"],
       "name": "Deacon of Security",
       "scenarios": [
         {
-          "fingerprint": "37d9968c",
+          "fingerprint": "91c99536",
           "scenario": "play"
         },
         {
@@ -11391,20 +11391,20 @@
       "status": "covered"
     },
     "10952110": {
-      "fingerprint": "5957d340",
+      "fingerprint": "56a08d18",
       "gatesSatisfied": [],
       "name": "Void Colonel",
       "scenarios": [
         {
-          "fingerprint": "6d955398",
+          "fingerprint": "2c26bffc",
           "scenario": "destroy"
         },
         {
-          "fingerprint": "26e23137",
+          "fingerprint": "200bc31b",
           "scenario": "crystallize"
         },
         {
-          "fingerprint": "869165f0",
+          "fingerprint": "9da11fb8",
           "scenario": "crystallize_death"
         }
       ],
@@ -11615,16 +11615,16 @@
       "status": "covered"
     },
     "10963210": {
-      "fingerprint": "3fb98d98",
+      "fingerprint": "e5da029c",
       "gatesSatisfied": [],
       "name": "Juratio",
       "scenarios": [
         {
-          "fingerprint": "aedf65fc",
+          "fingerprint": "840d2144",
           "scenario": "play"
         },
         {
-          "fingerprint": "2df171fc",
+          "fingerprint": "6ef3b297",
           "scenario": "engage"
         }
       ],
@@ -12565,12 +12565,12 @@
       "token": true
     },
     "90054120": {
-      "fingerprint": "6dd8eafc",
+      "fingerprint": "6fdc594c",
       "gatesSatisfied": [],
       "name": "Coco, Left Paw Hellhound",
       "scenarios": [
         {
-          "fingerprint": "1713f833",
+          "fingerprint": "14685e88",
           "scenario": "destroy"
         }
       ],
@@ -12955,12 +12955,12 @@
       "token": true
     },
     "90074150": {
-      "fingerprint": "6454c270",
+      "fingerprint": "d9c8f2d4",
       "gatesSatisfied": [],
       "name": "Warden of the Trigger",
       "scenarios": [
         {
-          "fingerprint": "1b47d990",
+          "fingerprint": "83a9aecc",
           "scenario": "destroy"
         }
       ],
@@ -12968,12 +12968,12 @@
       "token": true
     },
     "90074210": {
-      "fingerprint": "4ade1330",
+      "fingerprint": "bb95cd7f",
       "gatesSatisfied": [],
       "name": "White Psalm, New Revelation",
       "scenarios": [
         {
-          "fingerprint": "ecf8586c",
+          "fingerprint": "8e1502c8",
           "scenario": "destroy"
         }
       ],
