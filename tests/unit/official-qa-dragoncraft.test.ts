@@ -16,7 +16,7 @@ import {
   findOnBoard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
-import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
+import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { handleEvolveSelf } from "../../src/logic/effects/ops/evolve.js";
 import { attackFollower } from "../../src/logic/core/combat.js";
@@ -101,11 +101,11 @@ function resolveFirstPending(): void {
   const pending = state.pendingTargetEffect;
   expect(pending?.poolUids?.length ?? pending?.pool?.length).toBeGreaterThan(0);
   const uid = pending!.poolUids?.[0] ?? String(pending!.pool?.[0]?.uid ?? "");
-  resolvePendingTarget(uid);
+  resolveOpenPendingTarget(uid);
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolvePendingTarget(uid);
+  resolveOpenPendingTarget(uid);
 }
 
 function enemyFollower(

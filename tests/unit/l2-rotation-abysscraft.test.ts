@@ -23,6 +23,7 @@ import {
   whenEffectEvolve,
 } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
+import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { isCantAttackLocked } from "../../src/logic/core/keywords/has.js";
 import {
@@ -165,7 +166,7 @@ function setupTurn(
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolvePendingTarget(uid);
+  resolveOpenPendingTarget(uid);
 }
 
 function enemyFollower(

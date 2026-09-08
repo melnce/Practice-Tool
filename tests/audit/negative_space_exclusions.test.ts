@@ -274,7 +274,6 @@ describe("Negative-space — select-another pools exclude source", () => {
     const ara = findOnBoard("first", "Ara, Dawnblossom")!;
     whenEvolve(ara, "first");
     expect(poolUids()).not.toContain(String(ara.uid));
-    resolvePendingTarget(String(bystander.uid));
     expect(ara.name).toBe("Ara, Dawnblossom");
     expect(findOnBoard("first", "Bystander")).toBeFalsy();
   });

@@ -41,6 +41,33 @@ import {
   runPendingConfirmHandler,
   type PendingConfirmInput,
 } from "./pendingTarget/confirmRegistry.js";
+import { recordNoPromptExit } from "./resolveTargetProbe.js";
+
+export type PendingTargetEffect = NonNullable<typeof state.pendingTargetEffect>;
+
+export function formatInvalidTargetStrictChooseFailed(
+  uid: string | "leader",
+  pending: PendingTargetEffect,
+  reason: string,
+): string {
+  const op =
+    pending.eff && typeof pending.eff === "object" && "op" in pending.eff
+      ? String((pending.eff as { op?: unknown }).op ?? "(unknown)")
+      : "(unknown)";
+  const pool = pending.pool ?? [];
+  const legalTargets = pool.map((c) => c.uid).join(", ") || "(empty)";
+  const canTargetLeader = pending.canTargetLeader === true;
+  const leaderNote = canTargetLeader ? " (+ leader)" : "";
+  return [
+    "invalidTargetStrictChooseFailed:",
+    `  uid clicked: ${uid}`,
+    `  op: ${op}`,
+    `  pool size: ${pool.length}`,
+    `  reason: ${reason}`,
+    `  legal targets: ${legalTargets}${leaderNote}`,
+    "  The test named a target the engine rejected. Use a uid from the legal targets list, or fix the board setup so the target is in the pool.",
+  ].join("\n");
+}
 
 // Re-export specific legacy accessors if needed by tests, or simple stubs
 export { __getRegisteredTargetedOps };
@@ -238,7 +265,10 @@ function resolveMultiPickHandDiscardTarget(
  */
 export function resolvePendingTarget(uid: string | "leader") {
   const pending = state.pendingTargetEffect;
-  if (!pending) return;
+  if (!pending) {
+    recordNoPromptExit(uid);
+    return;
+  }
 
   if (hasCommittedPicks(pending)) {
     if (isMultiPickHandDiscardOp(pending)) {
@@ -254,8 +284,9 @@ export function resolvePendingTarget(uid: string | "leader") {
 
   // 2. Handle Logic Result
   if (result.kind === "invalid") {
-    if (result.reason) console.warn(result.reason);
-    return;
+    throw new Error(
+      formatInvalidTargetStrictChooseFailed(uid, pending, result.reason),
+    );
   }
 
   if (result.kind === "continue") {

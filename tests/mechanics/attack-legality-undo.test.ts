@@ -276,7 +276,6 @@ describe("attack eligibility follows current keywords", () => {
       (c) => c.name === "TransformTarget",
     )!;
     whenEvolve(ara, "first");
-    resolvePendingTarget(target.uid);
 
     const falcon = getBoard(state, "first").find((c) => c.uid === target.uid)!;
     expect(falcon.hasStorm).toBe(true);

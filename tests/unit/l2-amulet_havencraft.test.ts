@@ -23,6 +23,7 @@ import {
   whenEffectEvolve,
 } from "../harness/whenEvolve.js";
 import { state } from "../../src/core/gameState.js";
+import { resolveOpenPendingTarget } from "../harness/l2Dispatch.js";
 import { resolvePendingTarget } from "../../src/logic/core/resolveTarget.js";
 import { playCardNoRender } from "../../src/logic/core/playCard/index.js";
 
@@ -96,7 +97,7 @@ function setupTurn(
 }
 
 function resolvePendingByUid(uid: string): void {
-  resolvePendingTarget(uid);
+  resolveOpenPendingTarget(uid);
 }
 
 function resolveFirstPending(): void {
