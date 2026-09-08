@@ -41,6 +41,7 @@ import {
   v2EnemyEnterSkipReason,
   v2EnemyLeaveSkipReason,
   v2RemainingSkipReason,
+  skipReasonText,
   HAND_EVENTS_WITH_CARD_POOL_SOURCE,
   watcherEarth,
   enemyWatcherOwner,
@@ -100,7 +101,7 @@ describe("Reactive trigger timing matrix v2", () => {
         });
       };
       if (skip) {
-        it.skip(`${label} — ${skip}`, body);
+        it.skip(`${label} — ${skipReasonText(skip)}`, body);
       } else if (fail) {
         it.fails(`${label}: ${fail.msg}`, body);
       } else {
@@ -129,7 +130,7 @@ describe("Reactive trigger timing matrix v2", () => {
           });
         };
         if (skip) {
-          it.skip(`${label} — ${skip}`, body);
+          it.skip(`${label} — ${skipReasonText(skip)}`, body);
         } else if (fail) {
           it.fails(`${label}: ${fail.msg}`, body);
         } else {
@@ -183,7 +184,7 @@ describe("Reactive trigger timing matrix v2", () => {
         assertV2ReactiveInvariants(run, { event, context });
       };
       if (skip) {
-        it.skip(`${label} — ${skip}`, body);
+        it.skip(`${label} — ${skipReasonText(skip)}`, body);
       } else if (fail) {
         it.fails(
           `${label}: ${fail.msg} (${HAND_EVENTS_WITH_CARD_POOL_SOURCE[event]?.join(", ") ?? "pool"})`,
@@ -386,7 +387,7 @@ describe("Reactive trigger timing matrix v2", () => {
   });
 
   describe("Axis E — zone-change pins", () => {
-    it("transform: board follower does not raise ally_follower_enter or leaves_field (rulebook: no enter/leave on transform)", () => {
+    it("transform: board follower does not raise ally_follower_enter or leaves_field (engine gap — rulebook §591: transform counts as leaving play)", () => {
       resetUidCounter();
       givenGameState({ seed: 80, activePlayer: "first", roundCount: 6 })
         .withFirstPP(10, 10)
@@ -827,7 +828,7 @@ describe("Reactive trigger timing matrix v2", () => {
         assertV2ReactiveInvariants(run, { event, context });
       };
       if (skip) {
-        it.skip(`${label} — ${skip}`, body);
+        it.skip(`${label} — ${skipReasonText(skip)}`, body);
       } else if (fail) {
         it.fails(`${label}: ${fail.msg}`, body);
       } else {

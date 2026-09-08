@@ -28,6 +28,98 @@ import {
 import { createCard, givenGameState, resetUidCounter } from "./builders.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
 import { handleGainCrest } from "../../src/logic/effects/crest.js";
+import {
+  countPoolTriggerConsumers,
+  type TriggerConsumerSource,
+} from "./poolTriggerConsumers.js";
+
+export type V2SkipKind = "engine_gap" | "harness_limit" | "no_consumer";
+
+export interface V2SkipResult {
+  kind: V2SkipKind;
+  reason: string;
+  cardIds?: string[];
+  /** For no_consumer: pinned count that makes the skip moot. */
+  consumerCount?: number;
+  consumerEvent?: string;
+  consumerSource?: TriggerConsumerSource;
+}
+
+export function skipReasonText(skip: V2SkipResult | null): string | null {
+  return skip?.reason ?? null;
+}
+
+function noConsumerSkip(
+  event: string,
+  source: TriggerConsumerSource,
+  reason: string,
+): V2SkipResult {
+  const tallies = countPoolTriggerConsumers(event);
+  const bucket = tallies[source];
+  return {
+    kind: "no_consumer",
+    reason,
+    consumerEvent: event,
+    consumerSource: source,
+    consumerCount: bucket.count,
+    cardIds: bucket.cardIds,
+  };
+}
+
+function harnessSkip(reason: string): V2SkipResult {
+  return { kind: "harness_limit", reason };
+}
+
+function engineGapSkip(reason: string, cardIds: string[]): V2SkipResult {
+  return { kind: "engine_gap", reason, cardIds };
+}
+
+/**
+ * Classified skip reasons in the v2 reactive-timing matrix (2026-09-08 audit).
+ * Engine gaps: 1 (transform leaves_field). Former "seven engine gaps" doc claim was wrong.
+ */
+export const V2_SKIP_ENGINE_GAP_TOTAL = 1;
+
+export function collectV2MatrixSkipReasons(): V2SkipResult[] {
+  const seen = new Set<string>();
+  const out: V2SkipResult[] = [];
+
+  const add = (skip: V2SkipResult | null) => {
+    if (!skip) return;
+    const key = `${skip.kind}|${skip.reason}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(skip);
+  };
+
+  for (const { context, event } of buildV2HandCells()) {
+    add(v2HandSkipReason(event, context));
+  }
+  for (const { context } of buildV2EnemyEnterCells()) {
+    add(v2EnemyEnterSkipReason(context));
+  }
+  for (const { leaveMode } of buildV2EnemyLeaveCells()) {
+    add(v2EnemyLeaveSkipReason(leaveMode));
+  }
+  for (const { context, event } of buildV2RemainingCells()) {
+    add(v2RemainingSkipReason(context, event));
+  }
+  return out;
+}
+
+export function summarizeV2SkipReasons(skips: V2SkipResult[]): {
+  total: number;
+  engine_gap: number;
+  harness_limit: number;
+  no_consumer: number;
+} {
+  return {
+    total: skips.length,
+    engine_gap: skips.filter((s) => s.kind === "engine_gap").length,
+    harness_limit: skips.filter((s) => s.kind === "harness_limit").length,
+    no_consumer: skips.filter((s) => s.kind === "no_consumer").length,
+  };
+}
 
 const WATCHER_TICK: Effect = {
   op: "counter",
@@ -1295,53 +1387,85 @@ export function raiseRemainingEventEffects(
 export function v2HandSkipReason(
   event: V2HandEvent,
   context?: V2Context,
-): string | null {
+): V2SkipResult | null {
   if (event === "ally_draw") {
-    return "engine does not dispatch ally_draw to hand (no cards/all.json hand source)";
+    return noConsumerSkip(
+      "ally_draw",
+      "hand",
+      "no hand-source ally_draw consumers in 904-card pool (board-only event)",
+    );
   }
   if (event === "ally_spell_played") {
-    return "engine does not dispatch ally_spell_played to hand (no cards/all.json hand source)";
+    return noConsumerSkip(
+      "ally_spell_played",
+      "hand",
+      "no hand-source ally_spell_played consumers in 904-card pool (board-only event)",
+    );
   }
   if (event === "leader_damaged") {
-    return "engine does not dispatch leader_damaged to hand (no cards/all.json hand source)";
+    return noConsumerSkip(
+      "leader_damaged",
+      "hand",
+      "leader_damaged has zero pool consumers on any source (dead event in current pool)",
+    );
   }
   if (event === "ally_super_evolve" && context !== "C_play_enter") {
-    return "ally_super_evolve hand listener requires super-evolve in same action";
-  }
-  if (event === "ally_earth_rite" && context === "C10_eot") {
-    return "earth rite consume not raised from EOT body for hand listener";
+    return harnessSkip(
+      "setupBaseState uses roundCount 6; first-player super-evolve needs round 7+ so hand listeners cannot fire in these contexts",
+    );
   }
   if (context === "C_play_enter" && event === "ally_follower_leaves_field") {
-    return "play-enter path does not leave";
+    return harnessSkip(
+      "C_play_enter only plays a follower; no leave op in that path",
+    );
   }
   if (context === "C_play_enter" && event === "ally_evolve") {
-    return "play-enter path does not evolve";
+    return harnessSkip(
+      "C_play_enter only plays a follower; no evolve op in that path",
+    );
   }
   if (context === "C_play_enter" && event === "ally_super_evolve") {
-    return "play-enter path does not super-evolve";
+    return harnessSkip(
+      "C_play_enter only plays a follower; no super-evolve op in that path",
+    );
   }
   if (context === "C_play_enter" && event === "ally_earth_rite") {
-    return "play-enter path does not consume earth sigils";
+    return harnessSkip(
+      "C_play_enter only plays a follower; no earth_rite consume in that path",
+    );
   }
   return null;
 }
 
-export function v2EnemyEnterSkipReason(context: V2Context): string | null {
+export function v2EnemyEnterSkipReason(
+  context: V2Context,
+): V2SkipResult | null {
   if (context === "C_chain_summon") {
-    return "chain_fill fires enemy_follower_enter once per decay clone (not exactly-once)";
+    return harnessSkip(
+      "chain_fill fires enemy_follower_enter once per decay clone (measured: watcher earth>1); matrix asserts exactly-once",
+    );
   }
   if (context === "C11_sot") {
-    return "SOT-on-second summon does not reach first-side enemy_enter watcher in harness";
+    return harnessSkip(
+      "SOT raiser sits on second board; first-side enemy_enter watcher is not reachable in this harness shape",
+    );
   }
   return null;
 }
 
-export function v2EnemyLeaveSkipReason(leaveMode: LeaveMode): string | null {
+export function v2EnemyLeaveSkipReason(
+  leaveMode: LeaveMode,
+): V2SkipResult | null {
   if (leaveMode === "transform") {
-    return "transform does not raise leaves_field (transform.ts — no enter/leave triggers)";
+    return engineGapSkip(
+      "transform does not raise leaves_field (transform.ts — intentional no enter/leave); rulebook §Destruction vs Other Removal: transform counts as leaving play for leaves-play triggers",
+      ["10113130", "10553110"],
+    );
   }
   if (leaveMode === "return") {
-    return "return destination deck is hand→deck only; board leave not constructible";
+    return harnessSkip(
+      "return-to-deck op only supports hand→deck in engine; board follower return not constructible",
+    );
   }
   return null;
 }
@@ -1349,51 +1473,54 @@ export function v2EnemyLeaveSkipReason(leaveMode: LeaveMode): string | null {
 export function v2RemainingSkipReason(
   context: RaisingContext,
   event: V2RemainingEvent,
-): string | null {
+): V2SkipResult | null {
   if (event === "invoke") {
     if (context === "C10_eot" || context === "C11_sot") {
-      return "no pool card listens to invoke from the board; Sandalphon's is_self case is covered by l2-rotation-havencraft";
+      return noConsumerSkip(
+        "invoke",
+        "board",
+        "no pool card has a board trigger on invoke (invoke is a card property; Sandalphon covered elsewhere)",
+      );
     }
-    return "invoke only fires from deck scan at turn boundary (start/end of turn)";
-  }
-  if (event === "on_fuse" && context !== "C3_engage") {
-    return "on_fuse not raised by loot fuse_finalize in this harness";
-  }
-  if (event === "on_fuse" && context === "C3_engage") {
-    return "on_fuse/loot_fused not raised from engage action in harness";
-  }
-  if (event === "loot_fused" && context === "C3_engage") {
-    return "on_fuse/loot_fused not raised from engage action in harness";
-  }
-  if (event === "loot_fused") {
-    return null;
+    return harnessSkip(
+      "invoke only fires from deck scan at turn boundary (start/end of turn), not mid-action contexts",
+    );
   }
   if (event === "loot_played") {
     if (context !== "C2_spell") {
-      return "loot_played fires on spell play path only";
+      return harnessSkip(
+        "loot_played only exercised via spell play path (C2_spell) in this harness",
+      );
     }
   }
   if (
     (event === "ally_ward_destroyed" || event === "ally_amulet_destroyed") &&
     (context === "C10_eot" || context === "C11_sot")
   ) {
-    return "ward/amulet destroy not constructible at turn boundary in this harness";
+    return harnessSkip(
+      "ward/amulet destroy not constructible at turn boundary in this harness",
+    );
   }
   if (
     event === "engage" &&
     context !== "C3_engage" &&
     context !== "C12_crest"
   ) {
-    return skipReason(context, "engage");
+    const legacy = skipReason(context, "engage");
+    return legacy ? harnessSkip(legacy) : null;
   }
   if (event === "ally_earth_rite" && context === "C11_sot") {
-    return "earth rite via consume not wired to SOT body in this harness";
+    return harnessSkip(
+      "earth_rite via consume not wired to SOT body in this harness (EOT path works)",
+    );
   }
   if (
     (event === "on_fuse" || event === "loot_fused") &&
     (context === "C10_eot" || context === "C11_sot")
   ) {
-    return "fuse finalize not constructible at turn boundary in this harness";
+    return harnessSkip(
+      "fuse finalize not constructible at turn boundary in this harness",
+    );
   }
   return null;
 }
