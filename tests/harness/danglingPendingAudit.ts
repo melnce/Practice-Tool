@@ -1,59 +1,44 @@
 /**
  * Audit of tests that end with `state.pendingTargetEffect` still set.
  *
- * Measured on origin/main (2026-09-08) via temporary afterEach in
- * tests/fixtures/setup.ts + full `npx vitest run -c vitest.config.ts`:
- *   56 dangling / 4227 passing / 326 files — suite GREEN.
+ * Measured on origin/main (2026-09-08) via afterEach probe in
+ * tests/fixtures/setup.ts + vitest run (keys use task.fullTestName when present):
+ *   vitest.config.ts: 53 allowlisted test ends
+ *   vitest.audit.config.ts: 19 additional test ends
+ *   Combined allowlist keys: 72
  *
- * Classifications (this file is the authority — headline counts must match it):
- *   A (53) — Prompt-is-the-subject: pending state, pool, snapshot/undo, or lifecycle.
- *       Correct as written. Proposed **allowlist** for the strict-choose gate: each (A)
- *       entry is allowlisted with its `reason`; an entry that stops reproducing must fail.
- *   B (3)  — Silently unresolved: plays a card, asserts an outcome, leaves a prompt open
- *       so a card clause never ran and existing assertions did not cover it.
- *       **Never allowlisted** — must be fixed (resolve the prompt or rewrite the test).
+ * Both configs share setupFiles: ["./tests/fixtures/setup.ts"], so the strict-choose
+ * afterEach gate covers both suites.
  *
- * Imported by nothing yet — inert data until the gate PR wires it in. Do not resolve
- * prompts or change assertions based on this file alone.
+ * Classifications:
+ *   A — Prompt-is-the-subject: pending state, pool, snapshot/undo, or lifecycle.
+ *   B — Silently unresolved (three fixed in I2; no longer in this table).
+ *
+ * Allowlist keys use file + fullTestName (suite path + it title). Renaming an
+ * allowlisted test makes the gate fail rather than silently skipping coverage.
  */
 
 export type DanglingPendingClassification = "A" | "B";
 
 export interface DanglingPendingAuditEntry {
-  /** 1-based row id matching measurement order. */
   id: number;
   file: string;
   testName: string;
   classification: DanglingPendingClassification;
-  /** One-line reason for the classification. */
   reason: string;
-  /**
-   * For (B) only: the card clause that never executed because the prompt was
-   * left open. Null for (A).
-   */
   unresolvedClause: string | null;
-  /**
-   * For (B) only: whether existing assertions would still pass if the dangling
-   * clause had run to completion. Null for (A).
-   */
   assertionsWouldStillPass: boolean | null;
-  /**
-   * For (B) only: notable under-coverage finding when assertionsWouldStillPass
-   * is false or the gap is especially misleading. Null for (A).
-   */
   finding: string | null;
 }
 
-/** Full table of 56 tests ending with pendingTargetEffect set (measurement 2026-09-08). */
 export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
   {
     id: 1,
     file: "tests/mechanics/multi-discard-position.test.ts",
     testName:
-      "save after first pick → restore → remaining picks match uninterrupted run",
+      "multi-discard position save/load (engineDispatch) > (a) 'Goddess of Starlight evolve' > save after first pick → restore → remaining picks match uninterrupted run",
     classification: "A",
-    reason:
-      "Snapshot round-trip for multi-discard prompts; Goddess branch deliberately stops after two of three picks to compare mid-prompt restore.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -62,10 +47,9 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
     id: 2,
     file: "tests/mechanics/multi-discard-position.test.ts",
     testName:
-      "(b) restored mid-prompt snapshot reports first pick in targetUids",
+      "multi-discard position save/load (engineDispatch) > (b) restored mid-prompt snapshot reports first pick in targetUids",
     classification: "A",
-    reason:
-      "Asserts picksAreCommitted and targetUids after applySnapshot without completing remaining picks.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -74,73 +58,64 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
     id: 3,
     file: "tests/mechanics/multi-discard-position.test.ts",
     testName:
-      "(d) uncommitted multi-pick prompt restores with no picks (f9a55e6)",
+      "multi-discard position save/load (engineDispatch) > (d) uncommitted multi-pick prompt restores with no picks (f9a55e6)",
     classification: "A",
-    reason:
-      "Tests uncommitted-pick snapshot sanitization: in-flight pick cleared on restore when picksAreCommitted is false.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 4,
-    file: "tests/mechanics/position-roundtrip.test.ts",
+    file: "tests/mechanics/board-cap.test.ts",
     testName:
-      "save while target prompt open → load → prompt open with no picks",
+      "board field cap > soak repro seed20260913 game391 — replaySoakTrace stays at ≤5 field",
     classification: "A",
-    reason:
-      "Position save/load of an open multi-select damage prompt with sanitized targetUids.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 5,
-    file: "tests/mechanics/board-cap.test.ts",
+    file: "tests/unit/official-qa-havencraft.test.ts",
     testName:
-      "soak repro seed20260913 game391 — replaySoakTrace stays at ≤5 field",
+      "Official Q&A — Havencraft batch 5 > 10261110 Cleric of Crushing — cannot select Orchis when Lloyd is super-evolved (official Q&A)",
     classification: "A",
-    reason:
-      "Soak trace replay pinned at fixture endpoint; open discard prompt is inherited trace state, not an effect the test asserts.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 6,
-    file: "tests/unit/l2-cutthroat_portalcraft.test.ts",
+    file: "tests/mechanics/lloyd-forced-selection.test.ts",
     testName:
-      "Evolve (normal): destroys exactly 2 of 3 Ward enemies; non-Ward survives",
-    classification: "B",
-    reason:
-      "Plays Asher, never resolves Fanfare Ward-selection, then evolves and asserts destroy outcomes on pre-keyworded Ward followers.",
-    unresolvedClause:
-      "Fanfare: Select an enemy follower on the field and give it Ward.",
-    assertionsWouldStillPass: true,
-    finding:
-      "Ward targets were seeded via applyKeywordsFromList, so evolve destroy-2-Ward assertions pass without Fanfare running; if Fanfare ran and gave Ward to the non-Ward follower, board count assertions could fail.",
+      "Lloyd forced first pick (pool-derived) > (c) either-side choose: enemy Lloyd blocks allied followers (Dark Side)",
+    classification: "A",
+    reason: "A",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
   },
   {
     id: 7,
-    file: "tests/unit/l2-amulet_havencraft.test.ts",
-    testName: "Engage: destroys this card on the field",
-    classification: "B",
-    reason:
-      "Resolves initial Fanfare, engages Earrings (destroy runs), but never resolves Engage-replicated Fanfare hand-return prompt; only asserts amulet left the board.",
-    unresolvedClause:
-      "Engage: Destroy this card. Replicate Fanfare — select a card in your hand, return it to deck, and draw a card.",
-    assertionsWouldStillPass: true,
-    finding:
-      "Destroy-on-engage runs before replicate opens the return prompt; assertions only check board absence, not return/draw.",
+    file: "tests/mechanics/lloyd-forced-selection.test.ts",
+    testName:
+      "Lloyd forced first pick (pool-derived) > (e) two Lloyds: either may be the first pick",
+    classification: "A",
+    reason: "A",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
   },
   {
     id: 8,
-    file: "tests/unit/official-qa-havencraft.test.ts",
+    file: "tests/mechanics/lloyd-forced-selection.test.ts",
     testName:
-      "10261110 Cleric of Crushing — cannot select Orchis when Lloyd is super-evolved (official Q&A)",
+      "Lloyd forced first pick (pool-derived) > (f) auto-select path picks Lloyd first when in pool",
     classification: "A",
-    reason:
-      "Tests Lloyd pool-eligibility and validateTargetSelection on the open evolve-destroy prompt; resolution intentionally omitted.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -149,10 +124,9 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
     id: 9,
     file: "tests/mechanics/lloyd-forced-selection.test.ts",
     testName:
-      "(c) either-side choose: enemy Lloyd blocks allied followers (Dark Side)",
+      "Lloyd forced first pick (pool-derived) > (i) own Lloyd on board: any:follower select does not force own Lloyd or allies",
     classification: "A",
-    reason:
-      "Tests Lloyd forced-target validation on an open Dark Side prompt without completing selection.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -160,10 +134,10 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
   {
     id: 10,
     file: "tests/mechanics/lloyd-forced-selection.test.ts",
-    testName: "(e) two Lloyds: either may be the first pick",
+    testName:
+      "Lloyd forced first pick (pool-derived) > (ii) own Lloyd on board: ally:follower select (Soul Tuning) does not force",
     classification: "A",
-    reason:
-      "Tests getForcedFirstPicks pool contents and validation on an open Advent Eld Axe prompt.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -171,94 +145,87 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
   {
     id: 11,
     file: "tests/mechanics/lloyd-forced-selection.test.ts",
-    testName: "(f) auto-select path picks Lloyd first when in pool",
+    testName:
+      "Lloyd forced first pick (pool-derived) > (iii) both sides Lloyd: any:follower select forces enemy Lloyd only",
     classification: "A",
-    reason:
-      "Unit-tests pickRandomTargets forced-first behavior; dangling pending is incidental leakage from prior test (e) in the same file (no reset between tests).",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 12,
-    file: "tests/mechanics/lloyd-forced-selection.test.ts",
+    file: "tests/mechanics/history-lastplayed-null-snapshot.test.ts",
     testName:
-      "(i) own Lloyd on board: any:follower select does not force own Lloyd or allies",
+      "history __lastPlayedCard and null snapshot boards > captureSnapshot() during paused deferred Last Words prompt has no null board slots",
     classification: "A",
-    reason:
-      "Tests that own-side Lloyd does not force targeting on any:follower select; asserts pool/selectability/validation only.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 13,
-    file: "tests/mechanics/lloyd-forced-selection.test.ts",
+    file: "tests/unit/soak_history_ring.test.ts",
     testName:
-      "(ii) own Lloyd on board: ally:follower select (Soul Tuning) does not force",
+      "soak deep history ring accounting > play → choose (0 commits) → confirm with nested commit: ring counts and deep chain lands on before",
     classification: "A",
-    reason:
-      "Tests Soul Tuning ally:follower pool with own Lloyd present; asserts no forced picks and free ally selection.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 14,
-    file: "tests/mechanics/lloyd-forced-selection.test.ts",
+    file: "tests/mechanics/history-snapshot-aliasing.test.ts",
     testName:
-      "(iii) both sides Lloyd: any:follower select forces enemy Lloyd only",
+      "engine dispatch history snapshot aliasing > __lastSelected is cleared on undo after nested_effects target resolution",
     classification: "A",
-    reason:
-      "Tests enemy-Lloyd-only forcing when both sides have Lloyd; asserts forced picks and validation on open prompt.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 15,
-    file: "tests/mechanics/history-lastplayed-null-snapshot.test.ts",
+    file: "tests/mechanics/dragon_meta_bugs.test.ts",
     testName:
-      "captureSnapshot() during paused deferred Last Words prompt has no null board slots",
+      "BUG 3 — Gilnelise evolve can target self; fanfare still excludes self > evolve selection pool includes Gilnelise; fanfare pool excludes her",
     classification: "A",
-    reason:
-      "Tests snapshot integrity during a paused deferred Last Words nested_effects prompt.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 16,
-    file: "tests/mechanics/history-snapshot-aliasing.test.ts",
+    file: "tests/mechanics/target-prompt-undo.test.ts",
     testName:
-      "__lastSelected is cleared on undo after nested_effects target resolution",
+      "target prompt snapshot sanitization > captureSnapshot clears pending targetUids and __uiSelectable flags",
     classification: "A",
-    reason:
-      "Tests history/undo behavior around nested_effects target resolution; pending restored by undo is the subject.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 17,
-    file: "tests/unit/soak_history_ring.test.ts",
+    file: "tests/mechanics/target-prompt-undo.test.ts",
     testName:
-      "play → choose (0 commits) → confirm with nested commit: ring counts and deep chain lands on before",
+      "target prompt undo via engineDispatch > click one target of two, undo confirm step → prompt open with empty targetUids",
     classification: "A",
-    reason:
-      "Tests history ring commit accounting for choose-then-confirm nested_effects flow; ends after undo with prompt reopened.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 18,
-    file: "tests/mechanics/dragon_meta_bugs.test.ts",
+    file: "tests/mechanics/target-prompt-undo.test.ts",
     testName:
-      "evolve selection pool includes Gilnelise; fanfare pool excludes her",
+      "target prompt undo via dispatchAction > click one target of two, undo confirm step → prompt open with empty targetUids",
     classification: "A",
-    reason:
-      "Tests fanfare vs evolve selection pool membership via poolUids(); ends on open evolve prompt after clearing fanfare pending.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -267,10 +234,9 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
     id: 19,
     file: "tests/unit/name_filter_targeting.test.ts",
     testName:
-      "selection pool is only Obsessed Test Subject (not unrelated allies)",
+      "name filter on targeted selection pools > 10932110 Enamored Researcher — Evolve give Bane > selection pool is only Obsessed Test Subject (not unrelated allies)",
     classification: "A",
-    reason:
-      "Tests Enamored Researcher evolve selection pool name filter; asserts poolNames only, no resolution.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -278,120 +244,109 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
   {
     id: 20,
     file: "tests/unit/name_filter_targeting.test.ts",
-    testName: "selection pool is only Obsessed Test Subject after fuse",
+    testName:
+      "name filter on targeted selection pools > 10933110 Ecstatic Scholar — Super-Evolve give Drain > selection pool is only Obsessed Test Subject after fuse",
     classification: "A",
-    reason:
-      "Tests Ecstatic Scholar super-evolve selection pool name filter after fuse; asserts pool composition only.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 21,
-    file: "tests/mechanics/target-prompt-undo.test.ts",
+    file: "tests/unit/damage_add_amount_once.test.ts",
     testName:
-      "captureSnapshot clears pending targetUids and __uiSelectable flags",
+      "pending damage bake invariant — add_amount must not ride along > after selectable damage opens, stored eff has baked amount and no re-addable add_amount",
     classification: "A",
-    reason:
-      "Tests snapshot sanitization of pending targetUids and UI flags on a synthetic open prompt.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 22,
-    file: "tests/mechanics/target-prompt-undo.test.ts",
+    file: "tests/unit/damage_add_amount_once.test.ts",
     testName:
-      "click one target of two, undo confirm step → prompt open with empty targetUids",
+      "pending damage bake invariant — add_amount must not ride along > Stormy Blast N=2: pending eff amount is 4 and add_amount is stripped",
     classification: "A",
-    reason:
-      "Tests undo sanitization of targetUids on a two-pick confirm prompt (engineDispatch path).",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 23,
-    file: "tests/mechanics/target-prompt-undo.test.ts",
+    file: "tests/mechanics/fuse-gear-lifecycle.test.ts",
     testName:
-      "click one target of two, undo confirm step → prompt open with empty targetUids",
+      "gear multi-fuse lifecycle via engineDispatch > one Confirm Targets undo step per prompt; undo reopens with committed pick",
     classification: "A",
-    reason:
-      "Same undo-sanitization contract via dispatchAction path (duplicate describe block).",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 24,
-    file: "tests/mechanics/leader-restored-fires-on-zero.test.ts",
+    file: "tests/mechanics/fuse-gear-lifecycle.test.ts",
     testName:
-      "positive control: no crest means full-HP restore does not damage leader",
-    classification: "B",
-    reason:
-      "Engages Darkhaven Grace without resolving allied-follower selection; asserts leader HP unchanged as positive control for Burnite crest absence.",
-    unresolvedClause:
-      "Engage (1): Select an allied follower on the field and give it +1/+1. Restore 1 defense to your leader.",
-    assertionsWouldStillPass: true,
-    finding:
-      "Vacuous as a control: Engage never completes (no resolvePendingTarget), so restore never fires and HP stays 20 because nothing happened — passes identically whether or not the effect runs (verified: adding resolvePendingTarget(ally.uid) still yields hp=20). A positive control that passes because the controlled-for thing never happened is worse than no control. Sibling test ~20 lines above (Burnite crest at full HP) uses the same setup with resolvePendingTarget before asserting — that is the correct pattern; fix here is one line. First item for the follow-up PR.",
+      "gear multi-fuse lifecycle via dispatchAction > one Confirm Targets undo step per prompt; undo reopens with committed pick",
+    classification: "A",
+    reason: "A",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
   },
   {
     id: 25,
-    file: "tests/unit/damage_add_amount_once.test.ts",
+    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
     testName:
-      "after selectable damage opens, stored eff has baked amount and no re-addable add_amount",
+      "snapshot dropped function gate > throws when any function is reachable from pendingTargetEffect",
     classification: "A",
-    reason:
-      "Tests pending eff shape (baked amount, stripped add_amount) before target resolution.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 26,
-    file: "tests/unit/damage_add_amount_once.test.ts",
+    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
     testName:
-      "Stormy Blast N=2: pending eff amount is 4 and add_amount is stripped",
+      "snapshot dropped function gate > fuse confirm_needed pending carries confirmKey, not a function (#315)",
     classification: "A",
-    reason:
-      "Tests Stormy Blast pending eff bake invariant at N=2 before any target is chosen.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 27,
-    file: "tests/mechanics/fuse-gear-lifecycle.test.ts",
+    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
     testName:
-      "one Confirm Targets undo step per prompt; undo reopens with committed pick",
+      "snapshot ephemeral gate enforcement > paused mid-prompt commit with empty picks passes the gate",
     classification: "A",
-    reason:
-      "Tests gear_multi fuse undo reopening with picksAreCommitted and committed targetUids (engineDispatch path).",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 28,
-    file: "tests/mechanics/fuse-gear-lifecycle.test.ts",
+    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
     testName:
-      "one Confirm Targets undo step per prompt; undo reopens with committed pick",
+      "snapshot ephemeral gate enforcement > snapshot preserves targetUids when picksAreCommitted",
     classification: "A",
-    reason:
-      "Same fuse undo/reopen contract via dispatchAction path (duplicate describe block).",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 29,
-    file: "tests/mechanics/lloyd-only-when-eligible.test.ts",
+    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
     testName:
-      "super-evolved Lloyd + super-evolved Orchis: Orchis refused, Lloyd selectable",
+      "snapshot ephemeral gate enforcement > snapshot clears targetUids when picksAreCommitted is false",
     classification: "A",
-    reason:
-      "Tests Cleric evolve destroy pool eligibility when super Lloyd blocks Orchis; asserts validation only.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -400,10 +355,9 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
     id: 30,
     file: "tests/mechanics/lloyd-only-when-eligible.test.ts",
     testName:
-      "positive control: generic enemy-follower select with unevolved Lloyd — only Lloyd",
+      "Lloyd restriction — only when Lloyd is pool-eligible > super-evolved Lloyd + super-evolved Orchis: Orchis refused, Lloyd selectable",
     classification: "A",
-    reason:
-      "Positive control for generic enemy-follower targeting with unevolved Lloyd; tests forced Lloyd validation on open prompt.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -412,112 +366,108 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
     id: 31,
     file: "tests/mechanics/lloyd-only-when-eligible.test.ts",
     testName:
-      "would allow Orchis if Lloyd were enforced from the whole board, not the pool",
+      "Lloyd restriction — only when Lloyd is pool-eligible > positive control: generic enemy-follower select with unevolved Lloyd — only Lloyd",
     classification: "A",
-    reason:
-      "Sabotage-proof pool-derivation test: asserts Orchis is selectable when Lloyd fails evolve filter despite being on board.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 32,
-    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
-    testName: "throws when any function is reachable from pendingTargetEffect",
+    file: "tests/mechanics/lloyd-only-when-eligible.test.ts",
+    testName:
+      "Lloyd restriction — sabotage proof > would allow Orchis if Lloyd were enforced from the whole board, not the pool",
     classification: "A",
-    reason:
-      "Tests snapshot dropped-function gate throws on pendingTargetEffect.mysteryHook.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 33,
-    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
+    file: "tests/unit/hand-select-effects.test.ts",
     testName:
-      "fuse confirm_needed pending carries confirmKey, not a function (#315)",
+      "Cassius 10473110 — select pool honors object filter > offers only Artifact followers in hand, not spells or non-Artifact cards",
     classification: "A",
-    reason:
-      "Tests fuse confirmKey registry and snapshot safety after partial fuse pick.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 34,
-    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
-    testName: "paused mid-prompt commit with empty picks passes the gate",
+    file: "tests/unit/hand-select-effects.test.ts",
+    testName:
+      "select op — object filter merge (regression) > still applies leftmost string filter after object filters are merged",
     classification: "A",
-    reason:
-      "Tests ephemeral gate allows commit while paused mid-prompt with empty targetUids.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 35,
-    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
-    testName: "snapshot preserves targetUids when picksAreCommitted",
+    file: "tests/unit/transform-into-source-select.test.ts",
+    testName:
+      "flat transform into_source enemy:deck + select > Engage opens pending selection over hand; nothing transforms until pick",
     classification: "A",
-    reason: "Tests snapshot preserves committed targetUids on pending prompts.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 36,
-    file: "tests/mechanics/snapshot-ephemeral-gate.test.ts",
-    testName: "snapshot clears targetUids when picksAreCommitted is false",
+    file: "tests/mechanics/alt-form-base-cost.test.ts",
+    testName:
+      "Alternate-form played card base cost (2026-09-06) > Jailor normal play (6 PP): ladder records 6; follower on board base cost 6",
     classification: "A",
-    reason: "Tests snapshot clears uncommitted targetUids on pending prompts.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 37,
-    file: "tests/unit/hand-select-effects.test.ts",
+    file: "tests/mechanics/multi-select-ui.test.ts",
     testName:
-      "offers only Artifact followers in hand, not spells or non-Artifact cards",
+      "Multi-select UI feedback > first partial pick should trigger render (continue path)",
     classification: "A",
-    reason:
-      "Tests Cassius hand-selection pool object filter; asserts pool names only.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 38,
-    file: "tests/unit/hand-select-effects.test.ts",
+    file: "tests/mechanics/multi-select-ui.test.ts",
     testName:
-      "still applies leftmost string filter after object filters are merged",
+      "Multi-select UI feedback > memoization invalidates when targetUids gains a pick (isSelected)",
     classification: "A",
-    reason:
-      "Regression on select op pool filtering via handleSelect; asserts returned pool after pending open.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 39,
-    file: "tests/mechanics/alt-form-base-cost.test.ts",
+    file: "tests/unit/lyanthoth-pool-equivalence.test.ts",
     testName:
-      "Jailor normal play (6 PP): ladder records 6; follower on board base cost 6",
+      "Lyanthoth pool equivalence — nested select vs flat destroy > direct handlers: flat pool matches nested pool and excludes self",
     classification: "A",
-    reason:
-      "Subject is playedBaseCosts ladder and on-board base_cost on normal play; explicitly expects outcome.kind paused before Fanfare resolves.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 40,
-    file: "tests/unit/transform-into-source-select.test.ts",
+    file: "tests/unit/lyanthoth-pool-equivalence.test.ts",
     testName:
-      "Engage opens pending selection over hand; nothing transforms until pick",
+      "Lyanthoth pool equivalence — nested select vs flat destroy > play path (flat form): pending pool excludes Lyanthoth",
     classification: "A",
-    reason:
-      "Tests Encroached World Engage opens hand transform prompt and that no cards transform before pick.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -525,79 +475,76 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
   {
     id: 41,
     file: "tests/scenarios/selection_resolution.test.ts",
-    testName: "pauses with pendingTargetEffect when no targets are provided",
+    testName:
+      "Scenario: Selection Resolution > pauses with pendingTargetEffect when no targets are provided",
     classification: "A",
-    reason:
-      "Golden scenario asserting runEffects returns pending and sets pendingTargetEffect.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 42,
-    file: "tests/mechanics/multi-select-ui.test.ts",
-    testName: "first partial pick should trigger render (continue path)",
+    file: "tests/mechanics/honest_playable_glow.test.ts",
+    testName:
+      "Honest playable glow — Spilling Red vs Aura > non-Aura enemy present: green glow and play proceeds",
     classification: "A",
-    reason:
-      "Tests UI render firing after first partial pick on a two-select damage prompt.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 43,
-    file: "tests/mechanics/multi-select-ui.test.ts",
+    file: "tests/unit/destroy-filter-merge.test.ts",
     testName:
-      "memoization invalidates when targetUids gains a pick (isSelected)",
+      "destroy filter merge > filter.not_self overrides condition.not_self:false in destroy pool",
     classification: "A",
-    reason:
-      "Tests memoized view-model isSelected updates when targetUids gains a pick.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 44,
-    file: "tests/mechanics/honest_playable_glow.test.ts",
-    testName: "non-Aura enemy present: green glow and play proceeds",
+    file: "tests/mechanics/ralmia-selection.test.ts",
+    testName:
+      "Ralmia Artifact Selection > should require selecting ALL artifacts when 2 in hand",
     classification: "A",
-    reason:
-      "Subject is honest playable glow and that play proceeds (paused outcome); discard/destroy clauses are out of scope.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 45,
-    file: "tests/unit/lyanthoth-pool-equivalence.test.ts",
+    file: "tests/mechanics/ralmia-selection.test.ts",
     testName:
-      "direct handlers: flat pool matches nested pool and excludes self",
+      "Ralmia Artifact Selection > should require selecting ALL artifacts when 3 in hand",
     classification: "A",
-    reason:
-      "Proof that flat destroy and nested select produce identical pools excluding self.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 46,
-    file: "tests/unit/lyanthoth-pool-equivalence.test.ts",
-    testName: "play path (flat form): pending pool excludes Lyanthoth",
+    file: "tests/mechanics/ralmia-selection.test.ts",
+    testName:
+      "Ralmia Artifact Selection > should allow choosing 3 when 4 or more artifacts in hand",
     classification: "A",
-    reason:
-      "Tests Lyanthoth fanfare play-path pool excludes self via flat destroy form.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 47,
-    file: "tests/unit/destroy-filter-merge.test.ts",
+    file: "tests/mechanics/ralmia-selection.test.ts",
     testName:
-      "filter.not_self overrides condition.not_self:false in destroy pool",
+      "Ralmia Artifact Selection > should allow choosing 3 when 5 artifacts in hand",
     classification: "A",
-    reason:
-      "Tests destroy pool filter merge precedence via handleDestroy pending pool.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
@@ -605,103 +552,298 @@ export const DANGLING_PENDING_AUDIT: readonly DanglingPendingAuditEntry[] = [
   {
     id: 48,
     file: "tests/mechanics/ralmia-selection.test.ts",
-    testName: "should require selecting ALL artifacts when 2 in hand",
+    testName:
+      "Ralmia Artifact Selection > should not require confirmation for artifact copy selection",
     classification: "A",
-    reason: "Tests Ralmia selectCount UX when fewer artifacts than cap.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 49,
-    file: "tests/mechanics/ralmia-selection.test.ts",
-    testName: "should require selecting ALL artifacts when 3 in hand",
+    file: "tests/unit/return_select_canonical.test.ts",
+    testName:
+      "op:return destination:deck honours the canonical `select` spelling > Cognitive Shift 10711310: text says 'Select 2 cards' → selectCount must be 2",
     classification: "A",
-    reason:
-      "Tests Ralmia selectCount equals hand size when exactly 3 artifacts.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 50,
-    file: "tests/mechanics/ralmia-selection.test.ts",
-    testName: "should allow choosing 3 when 4 or more artifacts in hand",
+    file: "tests/unit/return_select_canonical.test.ts",
+    testName:
+      "op:return destination:hand honours the canonical `select` spelling > select:2 yields selectCount 2 (bounce / return-to-hand path)",
     classification: "A",
-    reason: "Tests Ralmia selectCount capped at 3 when 4+ artifacts available.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 51,
-    file: "tests/mechanics/ralmia-selection.test.ts",
-    testName: "should allow choosing 3 when 5 artifacts in hand",
+    file: "tests/golden/pendingTarget.lifecycle.test.ts",
+    testName:
+      "Golden: PendingTarget Lifecycle > setPendingTarget creates pending state",
     classification: "A",
-    reason: "Same selectCount=3 cap contract with 5 artifacts in hand.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 52,
-    file: "tests/mechanics/ralmia-selection.test.ts",
-    testName: "should not require confirmation for artifact copy selection",
+    file: "tests/golden/pendingTarget.lifecycle.test.ts",
+    testName:
+      "Golden: PendingTarget Lifecycle > targets can be accumulated before resolution",
     classification: "A",
-    reason:
-      "Tests requiresConfirmation:false on Ralmia hand-artifact copy prompt.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 53,
-    file: "tests/golden/pendingTarget.lifecycle.test.ts",
-    testName: "setPendingTarget creates pending state",
+    file: "tests/mechanics/position-roundtrip.test.ts",
+    testName:
+      "position round-trip shapes (engineDispatch) > save while target prompt open → load → prompt open with no picks",
     classification: "A",
-    reason:
-      "Golden lifecycle test for setPendingTarget / isPendingTarget / getPendingTarget.",
+    reason: "A",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 54,
-    file: "tests/golden/pendingTarget.lifecycle.test.ts",
-    testName: "targets can be accumulated before resolution",
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — defense bound (≤3) > 10062110 Ironfist Priest — Evolve pool excludes enemies above 3 defense",
     classification: "A",
     reason:
-      "Golden test that pending.targets accumulates picks before resolution.",
+      "Asserts evolve selection pool excludes out-of-filter enemies; pending pool is the subject.",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 55,
-    file: "tests/unit/return_select_canonical.test.ts",
+    file: "tests/audit/negative_space_filters.test.ts",
     testName:
-      "Cognitive Shift 10711310: text says 'Select 2 cards' → selectCount must be 2",
+      "negative-space filters — defense bound (≤3) > 10672120 Timid Pioneer — Fanfare pool excludes enemies above 3 defense",
     classification: "A",
     reason:
-      "Tests return-to-deck handler honors canonical select:2 spelling via selectCount.",
+      "Asserts fanfare pool excludes enemies above 3 defense; resolution intentionally omitted.",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
   {
     id: 56,
-    file: "tests/unit/return_select_canonical.test.ts",
-    testName: "select:2 yields selectCount 2 (bounce / return-to-hand path)",
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — defense bound (≤3) > 10862310 Lingering Threat — pool excludes enemies above 3 defense",
     classification: "A",
     reason:
-      "Tests return-to-hand handler honors canonical select:2 via selectCount.",
+      "Asserts spell pool excludes high-defense enemies; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 57,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — Artifact hand (≤5 cost) > 10172320 Doomwright Resurgence — pool is Artifact followers ≤5 only",
+    classification: "A",
+    reason:
+      "Asserts hand selection pool is Artifact followers costing ≤5; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 58,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — Artifact hand (≤5 cost) > 10271210 Artifact Catapult — Engage pool is Artifact followers ≤5 only",
+    classification: "A",
+    reason:
+      "Asserts Engage hand pool is Artifact followers ≤5; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 59,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — Artifact hand (≤5 cost) > 10572110 New-Age Cartographer — Super-Evolve pool is Artifact followers ≤5 only",
+    classification: "A",
+    reason:
+      "Asserts Super-Evolve hand pool is Artifact followers ≤5; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 60,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — tribe / type hand selection > 10371120 Supersonic Fighter — Evolve pool is allied Artifact followers only",
+    classification: "A",
+    reason:
+      "Asserts evolve pool is allied Artifact followers only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 61,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — tribe / type hand selection > 10332210 Institute of Truth — Engage pool is hand followers only",
+    classification: "A",
+    reason:
+      "Asserts Engage hand pool is followers only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 62,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — tribe / type hand selection > 10741120 Carrier Wyvern — Evolve pool is hand followers only",
+    classification: "A",
+    reason:
+      "Asserts evolve hand pool is followers only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 63,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — tribe / type hand selection > 10161110 Angelic Prism Priestess — Evolve pool is hand amulets only",
+    classification: "A",
+    reason:
+      "Asserts evolve hand pool is amulets only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 64,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — tribe / type hand selection > 10131310 Radiant Rainbow — pool is On Spellboost cards only",
+    classification: "A",
+    reason:
+      "Asserts hand pool is On Spellboost cards only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 65,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — tribe / type hand selection > 10521310 Extravagance — pool is hand spells only",
+    classification: "A",
+    reason: "Asserts hand pool is spells only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 66,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — Ward keyword pool > 10262310 Divine Guard — pool is allied followers with Ward only",
+    classification: "A",
+    reason:
+      "Asserts pool is allied Ward followers only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 67,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — unevolved selection > 10104110 Olivia — Super-Evolve pool is unevolved allies only (excludes evolved)",
+    classification: "A",
+    reason:
+      "Asserts Super-Evolve pool excludes evolved allies; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 68,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — unevolved selection > 10472110 Eustace — Skybound Art pool is unevolved allies only",
+    classification: "A",
+    reason:
+      "Asserts Skybound Art pool is unevolved allies only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 69,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — unevolved selection > 10874120 Eudie — Evolve pool is unevolved allies only (excludes self)",
+    classification: "A",
+    reason:
+      "Asserts evolve pool is unevolved allies excluding self; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 70,
+    file: "tests/audit/negative_space_filters.test.ts",
+    testName:
+      "negative-space filters — Golem tribe selection > 10032110 Remi & Rami — Super-Evolve pool is allied Golem followers only",
+    classification: "A",
+    reason:
+      "Asserts Super-Evolve pool is allied Golem followers only; pending pool is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 71,
+    file: "tests/audit/alchemic_flare.test.ts",
+    testName:
+      "Alchemic Flare (10433310) — real card data > playing opens pending pool with exactly the two enemy followers",
+    classification: "A",
+    reason:
+      "Asserts pending pool membership for Alchemic Flare; pool composition is the subject.",
+    unresolvedClause: null,
+    assertionsWouldStillPass: null,
+    finding: null,
+  },
+  {
+    id: 72,
+    file: "tests/audit/sofina_random_select_mode.test.ts",
+    testName:
+      "Sofina mode-2 random ward evolve (10564110) > pre-fix select_mode leaves pending user selection (fails on main card JSON)",
+    classification: "A",
+    reason:
+      "Regression guard: legacy select_mode must leave pending user selection (pre-fix JSON shape).",
     unresolvedClause: null,
     assertionsWouldStillPass: null,
     finding: null,
   },
 ];
 
-/** Summary counts derived from DANGLING_PENDING_AUDIT. */
 export const DANGLING_PENDING_SUMMARY = {
   measuredTotal: DANGLING_PENDING_AUDIT.length,
   classificationA: DANGLING_PENDING_AUDIT.filter(
@@ -712,7 +854,6 @@ export const DANGLING_PENDING_SUMMARY = {
   ).length,
 } as const;
 
-/** (B) entries only — must be fixed, never allowlisted. Gate flags anything not in (A). */
 export const SILENTLY_UNRESOLVED = DANGLING_PENDING_AUDIT.filter(
   (e) => e.classification === "B",
 );
