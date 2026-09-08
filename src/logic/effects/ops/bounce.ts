@@ -85,9 +85,11 @@ export function bounceToHand(card: CardInstance) {
     return; // Card not on a board; ignore.
   }
 
-  const leaveCtx: TriggerContext = { leavingOwner: owner, leavingCard: card };
-  fireTrigger("ally_follower_leaves_field", owner, leaveCtx);
-  fireTrigger("enemy_follower_leaves_field", owner, leaveCtx);
+  if (card.type === "Follower") {
+    const leaveCtx: TriggerContext = { leavingOwner: owner, leavingCard: card };
+    fireTrigger("ally_follower_leaves_field", owner, leaveCtx);
+    fireTrigger("enemy_follower_leaves_field", owner, leaveCtx);
+  }
 
   const [removed] = fromArr.splice(fromArr.indexOf(card), 1);
   if (!removed) return;

@@ -231,32 +231,4 @@ describe("leave-field trigger context — conditioned observers", () => {
       );
     });
   });
-
-  describe("probe — amulet banish raises follower leave event (site C, no type guard)", () => {
-    it("documents current behaviour: banishing an amulet satisfies a name-matched leave watcher", () => {
-      const watcher = nameConditionWatcher("HolyAmulet");
-      const amulet = createCard(
-        { name: "HolyAmulet", type: "Amulet", cost: 2 },
-        "board",
-        "second",
-      );
-      state.players.first.board = [watcher];
-      state.players.second.board = [amulet];
-
-      const handBefore = thenHand("first").length;
-      whenRunEffects(
-        [
-          {
-            op: "banish",
-            target: "enemy:amulet",
-            filter: { name: "HolyAmulet" },
-          },
-        ],
-        "first",
-        null,
-      );
-      // Site A (destroy) is gated by isFollower; sites B/C/D are not.
-      expect(thenHand("first").length).toBe(handBefore + 1);
-    });
-  });
 });
