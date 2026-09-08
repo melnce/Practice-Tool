@@ -208,43 +208,45 @@ describe("Official Q&A — Havencraft batch 5", () => {
     state.phase = "main";
   });
 
-  it("10461120 Lamretta, Sisterly Shepherd — Galleon EOT evolve: no 2 damage to all followers (official Q&A)", () => {
-    setupTurn(R8);
-    const lam = createCard(LAMRETTA, "board", "first");
-    lam.peak_defense = lam.defense;
-    lam.hasEvolved = false;
-    lam.isEvolved = false;
-    lam.hasAttacked = false;
-    lam.justPlayed = false;
-    const galleon = createCard(GALLEON, "board", "first");
-    applyKeywordsFromList(galleon);
-    galleon.peak_defense = galleon.defense;
-    const ally = allyFollower(1, 5, "AllyVictim");
-    const foe = enemyFollower(3, 5, "EnemyVictim");
-    state.players.first.board = [galleon, lam];
+  describe("10461120 Lamretta — Galleon Earth Personified end of turn", () => {
+    it("10461120 Lamretta — Galleon Earth Personified EOT evolve: no 2 damage to all followers (official Q&A)", () => {
+      setupTurn(R8);
+      const lam = createCard(LAMRETTA, "board", "first");
+      lam.peak_defense = lam.defense;
+      lam.hasEvolved = false;
+      lam.isEvolved = false;
+      lam.hasAttacked = false;
+      lam.justPlayed = false;
+      const galleon = createCard(GALLEON, "board", "first");
+      applyKeywordsFromList(galleon);
+      galleon.peak_defense = galleon.defense;
+      const ally = allyFollower(1, 5, "AllyVictim");
+      const foe = enemyFollower(3, 5, "EnemyVictim");
+      state.players.first.board = [galleon, lam];
 
-    runEndOfTurnBoundary("first");
+      runEndOfTurnBoundary("first");
 
-    expect(lam.hasEvolved).toBe(true);
-    expect(Number(ally.defense)).toBe(5);
-    expect(Number(foe.defense)).toBe(5);
+      expect(lam.hasEvolved).toBe(true);
+      expect(Number(ally.defense)).toBe(5);
+      expect(Number(foe.defense)).toBe(5);
 
-    cleanupDead();
-    resetUidCounter();
-    setupTurn(R8, { hand: [LAMRETTA], pp: 2, evo: 2 });
-    whenPlayCard("first", 0);
-    const lamEvolved = findOnBoard("first", "Lamretta, Sisterly Shepherd")!;
-    handleEvolveSelf(lamEvolved, "first", {
-      mode: "normal",
-      spendPoint: true,
-    });
-    const ally2 = allyFollower(1, 5, "AllyHit");
-    const foe2 = enemyFollower(3, 5, "EnemyHit");
+      cleanupDead();
+      resetUidCounter();
+      setupTurn(R8, { hand: [LAMRETTA], pp: 2, evo: 2 });
+      whenPlayCard("first", 0);
+      const lamEvolved = findOnBoard("first", "Lamretta, Sisterly Shepherd")!;
+      handleEvolveSelf(lamEvolved, "first", {
+        mode: "normal",
+        spendPoint: true,
+      });
+      const ally2 = allyFollower(1, 5, "AllyHit");
+      const foe2 = enemyFollower(3, 5, "EnemyHit");
 
-    runEndOfTurnBoundary("first");
-    expect(Number(ally2.defense)).toBe(3);
-    expect(Number(foe2.defense)).toBe(3);
-  }, 60_000);
+      runEndOfTurnBoundary("first");
+      expect(Number(ally2.defense)).toBe(3);
+      expect(Number(foe2.defense)).toBe(3);
+    }, 60_000);
+  });
 
   it("10562120 Desperate Shrinemouse — evolve at full hand: draw trigger does not fire (official Q&A)", () => {
     setupTurn(R8, { deck: [DRAW_A, FILLER], evo: 2, pp: 5 });

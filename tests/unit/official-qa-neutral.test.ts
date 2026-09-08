@@ -392,8 +392,8 @@ describe("official Q&A — Neutral batch 7", () => {
     }, 60_000);
   });
 
-  describe("10804110 Alabaster Bahamut", () => {
-    it("10804110 Alabaster Bahamut — Mode 3 banishes crests but not faith (official Q&A)", () => {
+  describe("10804110 Alabaster Bahamut — option 3 banish faiths", () => {
+    it("10804110 Alabaster Bahamut — option 3 banish faiths doesn't banish faith (official Q&A)", () => {
       setupTurn(R10, { hand: [ALABASTER], pp: 10 });
       state.players.first.crests = [
         { name: "Probe Crest", owner: "first", counters: {} } as any,
