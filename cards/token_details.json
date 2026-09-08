@@ -1069,7 +1069,8 @@
       {
         "op": "restore",
         "target": "leader",
-        "amount": 1
+        "amount": 1,
+        "player": "self"
       }
     ],
     "evolve": [],
@@ -1123,7 +1124,8 @@
           {
             "op": "restore",
             "target": "leader",
-            "amount": "{Y}"
+            "amount": "{Y}",
+            "player": "self"
           },
           {
             "op": "damage",
@@ -1602,11 +1604,11 @@
             "op": "stat",
             "action": "give",
             "target": "ally:follower",
-            "random": true,
-            "count": 1,
             "attack": 1,
             "defense": 0,
-            "name_filter": "Ginsetsu & Yuzuki, Twin Calamities"
+            "name_filter": "Ginsetsu & Yuzuki, Twin Calamities",
+            "select_mode": "random",
+            "select": 1
           }
         ]
       }
@@ -2097,7 +2099,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Vier, Heart Slayer"
+            "name": "Vier, Heart Slayer",
+            "count": 1
           }
         ]
       }
@@ -2377,12 +2380,14 @@
           {
             "op": "restore",
             "target": "leader",
-            "amount": 1
+            "amount": 1,
+            "player": "self"
           },
           {
             "op": "summon",
             "source": "named",
-            "name": "Black Psalm, New Revelation"
+            "name": "Black Psalm, New Revelation",
+            "count": 1
           }
         ]
       }
@@ -2423,7 +2428,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "White Psalm, New Revelation"
+            "name": "White Psalm, New Revelation",
+            "count": 1
           }
         ]
       }

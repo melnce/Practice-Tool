@@ -53,7 +53,6 @@
       {
         "op": "draw",
         "source": "deck",
-        "player": "self",
         "count": 1
       }
     ],
@@ -67,7 +66,6 @@
           {
             "op": "draw",
             "source": "deck",
-            "player": "self",
             "count": 1
           }
         ]
@@ -364,9 +362,15 @@
       {
         "name": "Countdown",
         "turns": 2
-      },
+      }
+    ],
+    "triggers": [
       {
-        "name": "PixieEnter",
+        "event": "ally_follower_enter",
+        "source": "board",
+        "condition": {
+          "tribe": "Pixie"
+        },
         "effects": [
           {
             "op": "damage",
@@ -377,8 +381,7 @@
           }
         ]
       }
-    ],
-    "triggers": []
+    ]
   },
   {
     "id": "10012110",
@@ -675,21 +678,23 @@
       {
         "name": "Countdown",
         "turns": 4
-      },
+      }
+    ],
+    "triggers": [
       {
-        "name": "AllyEnter",
+        "event": "ally_follower_enter",
+        "source": "board",
         "effects": [
           {
             "op": "stat",
             "action": "give",
-            "target": "trigger",
+            "target": "entering_follower",
             "attack": 1,
             "defense": 1
           }
         ]
       }
-    ],
-    "triggers": []
+    ]
   },
   {
     "id": "10031110",
@@ -843,7 +848,8 @@
       {
         "op": "summon",
         "source": "named",
-        "name": "Clay Golem"
+        "name": "Clay Golem",
+        "count": 1
       }
     ],
     "keywords": [],
@@ -1542,7 +1548,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Regal Falcon"
+            "name": "Regal Falcon",
+            "count": 1
           }
         ]
       },
@@ -1671,7 +1678,8 @@
           {
             "op": "summon",
             "source": "named",
-            "name": "Holy Falcon"
+            "name": "Holy Falcon",
+            "count": 1
           }
         ]
       },
