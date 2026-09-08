@@ -15,7 +15,7 @@ import {
   isPlayCostChangedFromPrinted,
 } from "../../../helpers/alternateForm.js";
 import { hasKeyword, hasAllKeywords } from "../keywords/has.js";
-import { isDev } from "../../../core/env.js";
+import { readEnv } from "../../../core/env.js";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -184,7 +184,8 @@ function nearestCardConditionKey(
 }
 
 /**
- * Fail loudly on unknown condition keys (dev throw, prod warn-once).
+ * Fail loudly on unknown condition keys (test throw, otherwise warn-once).
+ * Pool evaluation runs on live game state in the owner's browser — never throw there.
  */
 export function assertKnownCardConditionKeys(
   cond: Record<string, unknown>,
@@ -194,7 +195,7 @@ export function assertKnownCardConditionKeys(
     if (CARD_CONDITION_KEYS.has(key)) continue;
     const nearest = nearestCardConditionKey(key, CARD_CONDITION_KEYS);
     const msg = `Unknown card condition key "${key}" in ${context} (try "${nearest}")`;
-    if (isDev()) {
+    if (readEnv("NODE_ENV") === "test") {
       throw new Error(msg);
     }
     if (!warnedCardConditionKeys.has(key)) {
