@@ -7,11 +7,12 @@ import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
 import {
   givenGameState,
-  whenRunEffects,
   createCard,
   resetUidCounter,
   thenHP,
   thenHand,
+  thenBoard,
+  findOnBoard,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
 import {
@@ -19,6 +20,8 @@ import {
   flushDeferredDeathBatch,
   flushReactiveQueueOnly,
 } from "../../src/logic/core/cleanup.js";
+import { bounceToHand } from "../../src/logic/effects/ops/bounce.js";
+import { banishCard } from "../../src/logic/effects/ops/banish/primitives.js";
 import type { CardInstance } from "../../src/core/types/index.js";
 import "../../src/logic/core/effects/index.js";
 
@@ -148,6 +151,7 @@ describe("Lifestealer (10553110) destruction-only healing", () => {
     lifestealerOnBoard();
     skeletonOnBoard("second");
     destroyFollower(state.players.second.board.find((c) => c.id === SKELETON)!);
+    expect(findOnBoard("first", "Lifestealer")).toBeTruthy();
     expect(thenHP("first")).toBe(19);
   });
 
@@ -156,21 +160,13 @@ describe("Lifestealer (10553110) destruction-only healing", () => {
       .withFirstHP(18)
       .build();
     lifestealerOnBoard();
-    skeletonOnBoard("first");
-    whenRunEffects(
-      [
-        {
-          op: "return",
-          destination: "hand",
-          target: "ally:follower",
-          filter: { name: "Skeleton" },
-        },
-      ],
-      "first",
-    );
+    const skel = skeletonOnBoard("second");
+    bounceToHand(skel);
     flushReactiveQueueOnly();
     flushDeferredDeathBatch();
-    expect(thenHand("first").some((c) => c.name === "Skeleton")).toBe(true);
+    expect(findOnBoard("first", "Lifestealer")).toBeTruthy();
+    expect(thenBoard("second").length).toBe(0);
+    expect(thenHand("second").some((c) => c.name === "Skeleton")).toBe(true);
     expect(thenHP("first")).toBe(18);
   });
 
@@ -179,8 +175,12 @@ describe("Lifestealer (10553110) destruction-only healing", () => {
       .withFirstHP(18)
       .build();
     lifestealerOnBoard();
-    skeletonOnBoard("first");
-    whenRunEffects([{ op: "banish", target: "ally:follower" }], "first");
+    const skel = skeletonOnBoard("second");
+    banishCard(skel);
+    flushReactiveQueueOnly();
+    flushDeferredDeathBatch();
+    expect(findOnBoard("first", "Lifestealer")).toBeTruthy();
+    expect(thenBoard("second").length).toBe(0);
     expect(thenHP("first")).toBe(18);
   });
 
@@ -198,10 +198,11 @@ describe("Lifestealer (10553110) destruction-only healing", () => {
         defense: 2,
       },
       "board",
-      "first",
+      "second",
     );
-    state.players.first.board.push(other);
+    state.players.second.board.push(other);
     destroyFollower(other);
+    expect(findOnBoard("first", "Lifestealer")).toBeTruthy();
     expect(thenHP("first")).toBe(18);
   });
 });
