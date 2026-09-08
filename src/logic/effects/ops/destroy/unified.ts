@@ -9,7 +9,10 @@ import type {
   CardInstance,
 } from "../../../../core/types/index.js";
 import { getPool, highlightSelectable } from "../../../core/targeting.js";
-import { mergePoolCondition } from "../../../core/targeting/poolCondition.js";
+import {
+  mergePoolCondition,
+  rejectUnsupportedPoolNarrowKeys,
+} from "../../../core/targeting/poolCondition.js";
 import type { TargetContext } from "../../../core/targeting/index.js";
 import {
   trySetPendingTarget,
@@ -105,6 +108,10 @@ export function handleDestroy(
 
   // Handle special scopes first
   if (spec.scope) {
+    rejectUnsupportedPoolNarrowKeys(
+      eff as Record<string, unknown>,
+      `scope:"${spec.scope}"`,
+    );
     return handleSpecialScope(spec, owner, ctx, effectsQueue);
   }
 

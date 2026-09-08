@@ -188,9 +188,15 @@ function handleDoubleStats(
   owner: Player,
   sourceCard: CardInstance | null,
 ): "done" {
-  const pool = getPool(eff.target || "ally:follower", owner, sourceCard);
+  const pool = getPool(
+    eff.target || "ally:follower",
+    owner,
+    sourceCard,
+    mergeEffectPoolCondition(eff),
+  );
+  const targets = filterBuffCandidates(pool, eff, sourceCard);
 
-  for (const card of pool) {
+  for (const card of targets) {
     const curA = parseInt(String(card.attack)) || 0;
     const curD = parseInt(String(card.defense)) || 0;
     applyStatBuff(card, curA, curD, owner);

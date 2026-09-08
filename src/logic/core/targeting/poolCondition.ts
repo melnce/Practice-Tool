@@ -2,6 +2,8 @@
  * Shared helpers for pool-narrowing `filter` / `condition` objects on effect ops.
  */
 
+import { readEnv } from "../../../core/env.js";
+
 /**
  * Read a pool-narrowing filter from an effect, accepting both spellings.
  * Precedence: `filter` wins over `filters` (canonical spelling).
@@ -61,4 +63,40 @@ export function mergeEffectPoolCondition(eff: {
   filter?: unknown;
 }): Record<string, unknown> {
   return mergePoolCondition(eff.condition, eff.filter);
+}
+
+const warnedUnsupportedRouteFilters = new Set<string>();
+
+function hasPoolNarrowKeys(eff: Record<string, unknown>): boolean {
+  const narrow = readPoolNarrowFilter(eff);
+  if (narrow && Object.keys(narrow).length > 0) return true;
+  const cond = eff.condition;
+  return (
+    cond != null &&
+    typeof cond === "object" &&
+    !Array.isArray(cond) &&
+    Object.keys(cond as object).length > 0
+  );
+}
+
+/**
+ * Reject filter/condition keys on routes where they are meaningless.
+ * Throws in NODE_ENV=test; warn-once in production (never isDev — Vite DEV breaks live play).
+ */
+export function rejectUnsupportedPoolNarrowKeys(
+  eff: Record<string, unknown>,
+  routeLabel: string,
+): void {
+  if (!hasPoolNarrowKeys(eff)) return;
+  const warnKey = `${String(eff.op ?? "?")}:${routeLabel}`;
+  const msg =
+    `[${eff.op}] filter/condition is not supported on route ${routeLabel}. ` +
+    `Effect: ${JSON.stringify(eff)}`;
+  if (readEnv("NODE_ENV") === "test") {
+    throw new Error(msg);
+  }
+  if (!warnedUnsupportedRouteFilters.has(warnKey)) {
+    console.warn(msg);
+    warnedUnsupportedRouteFilters.add(warnKey);
+  }
 }

@@ -9,6 +9,7 @@ import type {
 } from "../../../../core/types/index.js";
 import { logEvent } from "../../../../core/logger.js";
 import { getPool } from "../../../core/targeting.js";
+import { rejectUnsupportedPoolNarrowKeys } from "../../../core/targeting/poolCondition.js";
 import { runEffects } from "../../../core/effects/index.js";
 import { finishFollowerEnter } from "../summon_ops/core.js";
 
@@ -41,6 +42,10 @@ export function handleSummonNamed(
   spec: UnifiedSummonSpec,
   owner: Player,
 ): void {
+  rejectUnsupportedPoolNarrowKeys(
+    eff as Record<string, unknown>,
+    'source:"named"',
+  );
   const effWithCount = {
     ...eff,
     name: spec.name,

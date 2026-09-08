@@ -275,9 +275,11 @@ describe("Negative-space — select-another pools exclude source", () => {
     whenEvolve(ara, "first");
     expect(poolUids().length).toBeGreaterThan(0);
     expect(poolUids()).not.toContain(String(ara.uid));
-    resolvePendingTarget(String(bystander.uid));
     expect(ara.name).toBe("Ara, Dawnblossom");
+    expect(findOnBoard("first", "Bystander")).toBeTruthy();
+    resolvePendingTarget(String(bystander.uid));
     expect(findOnBoard("first", "Bystander")).toBeFalsy();
+    expect(findOnBoard("first", "Regal Falcon")).toBeTruthy();
   });
 
   it("10663210 Sublime Eld Tome — Fanfare destroy pool excludes self", () => {

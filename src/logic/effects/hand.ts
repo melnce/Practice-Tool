@@ -9,6 +9,7 @@ import {
 
 import { logEvent } from "../../core/logger.js";
 import type { Player, Effect, CardInstance } from "../../core/types/index.js";
+import { rejectUnsupportedPoolNarrowKeys } from "../core/targeting/poolCondition.js";
 import { getHand, getGraveyard, addShadows } from "../../core/playerHelpers.js";
 import { bumpZoneVersion } from "../core/triggers/utils.js";
 import { toUids } from "../../core/uidResolver.js";
@@ -115,6 +116,10 @@ export function handleDiscard(
 // ========================================================================
 
 export function handleDiscardAllExceptNamed(eff: Effect, owner: Player) {
+  rejectUnsupportedPoolNarrowKeys(
+    eff as Record<string, unknown>,
+    'mode:"except_named"',
+  );
   const names = ((eff as any).names || (eff as any).name || []).map(String);
   const keepSet = new Set(names);
   const hand = getHand(state, owner);
