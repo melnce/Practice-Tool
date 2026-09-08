@@ -582,6 +582,39 @@ function checkOpKeyShape(card: CardJson): Warning[] {
     }
 
     if (op === "stat") {
+      if ((obj as { until_eot?: boolean }).until_eot === true) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({ path, op, until_eot: true }),
+          canonical: compact({ path, op, until_end_of_turn: true }),
+          note: 'op:"stat" must use until_end_of_turn, not until_eot',
+        });
+      }
+
+      const hasDuration =
+        obj.until_end_of_turn === true ||
+        (obj as { until_eot?: boolean }).until_eot === true ||
+        obj.duration !== undefined;
+      if (obj.action === "set" && hasDuration) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({
+            path,
+            op,
+            action: "set",
+            until_end_of_turn: obj.until_end_of_turn ?? null,
+            until_eot: (obj as { until_eot?: boolean }).until_eot ?? null,
+            duration: obj.duration ?? null,
+          }),
+          canonical: compact({ path, op, action: "set" }),
+          note: 'op:"stat" action:"set" must not carry duration keys',
+        });
+      }
+
       const badRandom =
         obj.random === true ||
         String((obj as any).pick || "").toLowerCase() === "random" ||

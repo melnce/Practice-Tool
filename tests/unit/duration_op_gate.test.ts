@@ -19,10 +19,10 @@ describe("duration-op gate", () => {
     expect(issues[0]?.message).toMatch(/until_eot.*ignored/i);
   });
 
-  it("allows until_eot on stat op", () => {
+  it("flags until_eot on stat op (use until_end_of_turn)", () => {
     const issues = checkDurationOpKeysForCard({
-      id: "OK",
-      name: "Ok Stat",
+      id: "BAD",
+      name: "Bad Stat",
       fanfare: [
         {
           op: "stat",
@@ -33,6 +33,7 @@ describe("duration-op gate", () => {
         },
       ],
     });
-    expect(issues).toHaveLength(0);
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues[0]?.message).toMatch(/until_eot.*ignored/i);
   });
 });
