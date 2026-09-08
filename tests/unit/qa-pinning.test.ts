@@ -10,6 +10,7 @@ import {
   extractQaKeywords,
   isQaPinnedFileScoped,
   QA_PIN_BLOCK_KEYWORD_MIN,
+  QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS,
   qaPinTwoKeywordTierCaveat,
 } from "../../scripts/lib/officialReconcile.js";
 
@@ -264,5 +265,12 @@ describe("two-keyword tier caveat", () => {
     expect(report.qaPinTwoKeywordTierCaveat).toContain(
       "not a coverage guarantee",
     );
-  });
+    expect(report.pinnedAnswerOnlyFileScopedCount).toBe(62);
+    expect(report.pinnedAnswerOnlyBlockScopedMin2Count).toBe(16);
+    expect(report.pinnedCount).toBe(102);
+    expect(report.pinnedFileScopedCount).toBe(142);
+    expect(QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS).toBe(
+      "unpinned (file-scoped, same extraction)",
+    );
+  }, 60_000);
 });

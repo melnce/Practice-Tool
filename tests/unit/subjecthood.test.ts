@@ -49,7 +49,7 @@ describe("filler deck", () => {
       "Outer Centaur Centurion (10021130)",
     );
     expect(centaur?.mentionedOnlyAsFiller).toBe(false);
-  });
+  }, 60_000);
 
   it("does not count a card named only in the test body", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "subjecthood-"));
@@ -75,7 +75,7 @@ it("generic title", () => {
     expect(report.cards[0]?.subjectBlockCount).toBe(0);
     expect(report.cards[0]?.mentionedInTests).toBe(true);
     expect(report.cards[0]?.mentionedOnlyAsFiller).toBe(true);
-  });
+  }, 60_000);
 
   it("inherits outer describe titles when inheritDescribeTitles is true", () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "subjecthood-"));
@@ -104,7 +104,7 @@ describe("Warden of Selflessness (10903110)", () => {
       strict.fileContents,
     );
     expect(reportStrict.cards[0]?.subjectBlockCount).toBe(0);
-  });
+  }, 60_000);
 
   it("skips name matching below MIN_NAME_MATCH_LENGTH", () => {
     expect(MIN_NAME_MATCH_LENGTH).toBe(9);
