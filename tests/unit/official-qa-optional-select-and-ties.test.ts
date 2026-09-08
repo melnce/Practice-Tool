@@ -17,6 +17,7 @@ import {
   resetUidCounter,
   thenHand,
   thenBoard,
+  thenDeck,
   thenPP,
   findOnBoard,
 } from "../harness/builders.js";
@@ -55,6 +56,7 @@ const FILLER = "10111310";
 
 const R5 = 5;
 const R6 = 6;
+const R8 = 8;
 
 function setupTurn(
   round: number,
@@ -188,6 +190,7 @@ describe("official Q&A — optional select empty pool and simultaneous ties", ()
         deck: [AMULET_A, AMULET_B, AMULET_C, AMULET_D, FILLER],
         pp: 7,
       });
+      expect(thenDeck("first").length).toBe(5);
       const ppBefore = thenPP("first");
       assertPlayLegalAtBoundary(RODEO, ppBefore, 7);
       const amulets = thenBoard("first").filter((c) => c.type === "Amulet");
@@ -195,6 +198,7 @@ describe("official Q&A — optional select empty pool and simultaneous ties", ()
       const names = new Set(amulets.map((c) => c.name));
       expect(names.size).toBe(3);
       expect(amulets.every((c) => Number(c.cost) <= 3)).toBe(true);
+      expect(thenDeck("first").length).toBe(2);
       expect(state.pendingTargetEffect).toBeFalsy();
     }, 60_000);
 
