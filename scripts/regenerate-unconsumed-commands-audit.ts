@@ -7,7 +7,10 @@
  *   npx tsx scripts/regenerate-unconsumed-commands-audit.ts /tmp/main-unconsumed.json /tmp/audit-unconsumed.json
  */
 import { readFileSync, writeFileSync } from "node:fs";
-import { UNCONSUMED_COMMANDS_AUDIT } from "../tests/harness/unconsumedCommandsAudit.ts";
+import {
+  UNCONSUMED_COMMANDS_AUDIT,
+  UNCONSUMED_COMMANDS_SUMMARY,
+} from "../tests/harness/unconsumedCommandsAudit.ts";
 import type { UnconsumedCommandAuditEntry } from "../tests/harness/unconsumedCommandsAudit.ts";
 import {
   auditEntryKey,
@@ -49,7 +52,8 @@ const main = JSON.parse(readFileSync(mainPath, "utf8")) as MeasuredRow[];
 const auditMeasure = JSON.parse(
   readFileSync(auditMeasurePath, "utf8"),
 ) as MeasuredRow[];
-const measured = aggregate([...main, ...auditMeasure]);
+const allMeasuredRows = [...main, ...auditMeasure];
+const measured = aggregate(allMeasuredRows);
 
 const unmatched: string[] = [];
 const classifiedB: string[] = [];
@@ -98,14 +102,20 @@ if (unmatched.length > 0 || classifiedB.length > 0) {
 const out = `/**
  * Audit of resolvePendingTarget calls with no prompt open (exit 1).
  *
- * Measured via scripts/measure-unconsumed-commands.ts (keys use task.fullTestName):
- *   vitest.config.ts: ${main.length} call rows
- *   vitest.audit.config.ts: ${auditMeasure.length} additional rows
- *   Combined allowlist keys (classification A only): ${output.length}
+ * Measured on origin/main (2026-09-08) via resolveTargetProbe + afterEach in
+ * tests/fixtures/setup.ts (keys use task.fullTestName when present):
+ *   Before gate: 31 no-prompt calls across 25 tests in 17 files
+ *     (vitest.config.ts + vitest.audit.config.ts — audit config shares setup.ts,
+ *      so the afterEach gate runs there too; npm run check runs test:audit before test)
+ *   After gate + mechanics (B) fixes: ${allMeasuredRows.length} calls covered by ${output.length} (A) rows below;
+ *     ${UNCONSUMED_COMMANDS_SUMMARY.classificationB} (B) sites fixed by removing the dead resolvePendingTarget call
  *
  * Classifications:
- *   A — Legitimate no-op or replay artifact. Allowlisted by assertAllCommandsUsedAfterTest.
- *   B — Silently unresolved. Never allowlisted — fix the test, then remove the row.
+ *   A — No-op is legitimate or is itself the subject (soak replay, L2 harness idempotency, etc.)
+ *   B — Test meant to resolve a prompt that never opened (fixed in mechanics files; not listed)
+ *
+ * Maintenance: scripts/regenerate-unconsumed-commands-audit.ts reconciles with a new
+ * measurement but refuses to invent classifications.
  */
 
 export type UnconsumedCommandClassification = "A" | "B";
@@ -124,13 +134,10 @@ ${output.map((e, i) => formatEntry(e, i + 1)).join(",\n")},
 ];
 
 export const UNCONSUMED_COMMANDS_SUMMARY = {
-  measuredTotal: UNCONSUMED_COMMANDS_AUDIT.length,
-  classificationA: UNCONSUMED_COMMANDS_AUDIT.filter(
-    (e) => e.classification === "A",
-  ).length,
-  classificationB: UNCONSUMED_COMMANDS_AUDIT.filter(
-    (e) => e.classification === "B",
-  ).length,
+  measuredTotal: ${allMeasuredRows.length},
+  measuredTests: ${measured.size},
+  classificationA: UNCONSUMED_COMMANDS_AUDIT.length,
+  classificationB: ${UNCONSUMED_COMMANDS_SUMMARY.classificationB},
 } as const;
 `;
 

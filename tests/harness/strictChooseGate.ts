@@ -73,18 +73,6 @@ export function formatChooseStrictModeFailed(
   ].join("\n");
 }
 
-export function testOriginatedNoPromptExits(
-  exits: readonly NoPromptExitRecord[],
-): NoPromptExitRecord[] {
-  return exits.filter((e) => e.callerTestFile != null);
-}
-
-export function allNoPromptExits(
-  exits: readonly NoPromptExitRecord[],
-): NoPromptExitRecord[] {
-  return [...exits];
-}
-
 export function formatUnconsumedCommandFailed(
   file: string,
   testName: string,
@@ -103,8 +91,8 @@ export function formatUnconsumedCommandFailed(
 }
 
 /**
- * Bidirectional strict-choose gate for unconsumed test-originated commands.
- * - Test-originated no-prompt exit not in (A) → fail.
+ * Bidirectional strict-choose gate for unconsumed resolvePendingTarget calls.
+ * - No-prompt exit not in (A) → fail.
  * - (A) entry that no longer no-op's → fail so stale allowlist rows get deleted.
  */
 export function assertAllCommandsUsedAfterTest(
@@ -129,7 +117,7 @@ export function assertAllCommandsUsedAfterTest(
         `unconsumed-command allowlist entry no longer reproduces: ${file}`,
         `  test: "${testName}"`,
         `  reason: ${entry?.reason ?? "(unknown)"}`,
-        "  This test no longer issues test-originated no-prompt resolvePendingTarget calls — remove the row from tests/harness/unconsumedCommandsAudit.ts.",
+        "  This test no longer issues no-prompt resolvePendingTarget calls — remove the row from tests/harness/unconsumedCommandsAudit.ts.",
       ].join("\n"),
     );
   }

@@ -1,9 +1,13 @@
 /**
  * Audit of resolvePendingTarget calls with no prompt open (exit 1).
  *
- * Measured on origin/main (2026-09-08) via resolveTargetProbe + afterEach:
- *   Before gate: 30 calls across 24 tests in 16 files (hand instrumented)
- *   After gate + mechanics (B) fixes: 21 calls across 16 tests — all (A) below
+ * Measured on origin/main (2026-09-08) via resolveTargetProbe + afterEach in
+ * tests/fixtures/setup.ts (keys use task.fullTestName when present):
+ *   Before gate: 31 no-prompt calls across 25 tests in 17 files
+ *     (vitest.config.ts + vitest.audit.config.ts — audit config shares setup.ts,
+ *      so the afterEach gate runs there too; npm run check runs test:audit before test)
+ *   After gate + mechanics (B) fixes: 21 calls covered by 16 (A) rows below;
+ *     10 (B) sites fixed by removing the dead resolvePendingTarget call
  *
  * Classifications:
  *   A — No-op is legitimate or is itself the subject (soak replay, L2 harness idempotency, etc.)
@@ -123,7 +127,7 @@ export const UNCONSUMED_COMMANDS_AUDIT: readonly UnconsumedCommandAuditEntry[] =
         "L2 Lhynkal Runecraft — real-card tests > Ara, Dawnblossom (10534120) > Evolve: transforms another follower into Regal Falcon (90061130)",
       classification: "A",
       reason:
-        "resolvePendingByUid after whenEvolve is idempotent — evolve transform auto-completed with no open prompt when the bystander was the sole valid ally.",
+        "resolvePendingByUid after whenEvolve is a no-op because evolve op transform does not honour select on the evolve path — no prompt opens and the leftmost valid ally is silently transformed (engine bug; separate PR). This row should go stale once transform prompts correctly.",
       uid: null,
     },
     {
@@ -143,7 +147,7 @@ export const UNCONSUMED_COMMANDS_AUDIT: readonly UnconsumedCommandAuditEntry[] =
         "L2 Spell Runecraft — real-card tests > Ara, Dawnblossom (10534120) > Evolve: transforms another follower into Regal Falcon (90061130)",
       classification: "A",
       reason:
-        "Same Ara evolve idempotency as l2-lhynkal: post-evolve resolvePendingByUid is a no-op when transform already committed.",
+        "Same Ara evolve path as l2-lhynkal: op transform skips target selection on evolve, so resolvePendingByUid is a no-op with no open prompt (engine bug; separate PR). Row expected to fail bidirectional check once transform prompts.",
       uid: null,
     },
     {
@@ -153,7 +157,7 @@ export const UNCONSUMED_COMMANDS_AUDIT: readonly UnconsumedCommandAuditEntry[] =
         "L2 — Havencraft tokens > Regal Falcon (90061130) > real path via Ara Evolve: transforms ally into Regal Falcon by uid with 6/4/4 stats",
       classification: "A",
       reason:
-        "resolvePendingByUid after Ara evolve is idempotent on the single-ally transform path; prompt already closed before the harness call.",
+        "Ara evolve token path: op transform does not open a select prompt on evolve (measured with multiple allies on board); resolvePendingByUid is a no-op until the transform/select engine bug is fixed (separate PR).",
       uid: null,
     },
     {

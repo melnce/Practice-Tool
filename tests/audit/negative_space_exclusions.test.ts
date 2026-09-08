@@ -273,6 +273,10 @@ describe("Negative-space — select-another pools exclude source", () => {
     resolvePendingIfAny();
     const ara = findOnBoard("first", "Ara, Dawnblossom")!;
     whenEvolve(ara, "first");
+    // Vacuous today: evolve op transform does not honour select, so no prompt opens
+    // (poolUids() is [] and pendingTargetEffect is undefined). Contrast damage/destroy
+    // evolve ops which do prompt. Engine bug tracked separately; assertion kept so it
+    // becomes meaningful once transform prompts on evolve.
     expect(poolUids()).not.toContain(String(ara.uid));
     expect(ara.name).toBe("Ara, Dawnblossom");
     expect(findOnBoard("first", "Bystander")).toBeFalsy();
