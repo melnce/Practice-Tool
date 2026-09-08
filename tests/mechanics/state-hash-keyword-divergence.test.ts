@@ -118,8 +118,6 @@ describe("state hash keyword divergence", () => {
     const dummyEffect: Effect = { op: "noop" } as Effect;
     const base = withBoardCard((c) => {
       c.keywordState = {
-        hasStrike: true,
-        strikeEffects: [],
         hasEngage: true,
         engageEffects: [],
         hasRally: true,
@@ -134,8 +132,6 @@ describe("state hash keyword divergence", () => {
     const baseHash = hashGameState(base);
     const mutated = withBoardCard((c) => {
       c.keywordState = {
-        hasStrike: true,
-        strikeEffects: [dummyEffect],
         hasEngage: true,
         engageEffects: [dummyEffect],
         hasRally: true,

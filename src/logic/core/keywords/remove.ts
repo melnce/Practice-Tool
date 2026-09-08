@@ -91,7 +91,7 @@ export function removeAllAbilitiesFromCard(card: CardInstance) {
     card.fanfare = []; // Clear root fanfare
 
     ks.lastWordsEffects = [];
-    ks.strikeEffects = [];
+
     ks.engageEffects = [];
 
     card.enhanceTiers = [];

@@ -121,11 +121,6 @@ export const KEYWORD_MAP: {
     getKS(c).hasFanfare = true;
     c.fanfare = Array.isArray(opts?.effects) ? opts.effects : [];
   },
-  strike: (c, opts) => {
-    const ks = getKS(c);
-    ks.hasStrike = true;
-    ks.strikeEffects = Array.isArray(opts?.effects) ? opts.effects : [];
-  },
   engage: (c, opts) => {
     if (!opts) return;
     c.hasEngage = true;
@@ -178,10 +173,17 @@ export const KEYWORD_MAP: {
     ks.hasSpellboost = true;
     ks.spellboostCount = ks.spellboostCount ?? 0;
 
-    ks.spellboost = {
-      reduceCostBy: Number(opts.reduce_cost_by ?? 1),
-      minCost: Number(opts.min_cost ?? 0),
-    };
+    const hasCostSpec =
+      opts.reduceCostBy != null ||
+      opts.reduce_cost_by != null ||
+      opts.minCost != null ||
+      opts.min_cost != null;
+    if (hasCostSpec) {
+      ks.spellboost = {
+        reduceCostBy: Number(opts.reduceCostBy ?? opts.reduce_cost_by ?? 1),
+        minCost: Number(opts.minCost ?? opts.min_cost ?? 0),
+      };
+    }
   },
   counter: (c, opts) => {
     if (!opts?.key) return;

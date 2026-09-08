@@ -28,15 +28,29 @@ function incSB(card: CardInstance) {
   card.spellboostCount = val; // Legacy sync for UI/Values
 }
 
-function getSpellboostKeyword(card: CardInstance) {
-  if (!Array.isArray(card?.keywords)) return null;
+function hasSpellboostKeyword(card: CardInstance): boolean {
+  if (!Array.isArray(card?.keywords)) return false;
   for (const k of card.keywords) {
-    if (typeof k === "string" && k.toLowerCase() === "spellboost")
-      return { name: "Spellboost" };
+    if (typeof k === "string" && k.toLowerCase() === "spellboost") return true;
     if (typeof k === "object" && k?.name?.toLowerCase() === "spellboost")
-      return k;
+      return true;
   }
-  return null;
+  return false;
+}
+
+function getSpellboostCostReduction(card: CardInstance): {
+  reduceBy: number;
+  minCost: number;
+} | null {
+  const spec = card.keywordState?.spellboost;
+  if (!spec) return null;
+  const reduceBy = Number(spec.reduceCostBy);
+  if (!Number.isFinite(reduceBy) || reduceBy <= 0) return null;
+  const minCost = Number(spec.minCost);
+  return {
+    reduceBy,
+    minCost: Number.isFinite(minCost) ? minCost : 0,
+  };
 }
 
 function normTimes(x: any) {
@@ -139,18 +153,19 @@ export function spellboostHand(
   for (let i = 0; i < t; i++) {
     // --- Single-card spellboost path ---
     if (targetCard) {
-      const kw = getSpellboostKeyword(targetCard);
-      if (kw) {
+      if (hasSpellboostKeyword(targetCard)) {
         // increment counter first
         incSB(targetCard);
 
-        // optional cost reduction (only if keyword specifies)
-        if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
-          const reduceBy: number = Number.isFinite(kw.reduceCostBy)
-            ? Number(kw.reduceCostBy)
-            : 0;
-          if (reduceBy > 0) {
-            applySpellboostCostReduction(targetCard, reduceBy);
+        const costReduction = getSpellboostCostReduction(targetCard);
+        if (costReduction) {
+          applySpellboostCostReduction(targetCard, costReduction.reduceBy);
+          if (costReduction.minCost > 0) {
+            const floor = costReduction.minCost;
+            const current = parseInt(String(targetCard.cost), 10) || 0;
+            if (current < floor) {
+              targetCard.cost = floor;
+            }
           }
         }
         logEvent("spellboost", {
@@ -167,19 +182,20 @@ export function spellboostHand(
     } else {
       // --- Whole-hand spellboost path ---
       for (const c of hand) {
-        const kw = getSpellboostKeyword(c);
-        if (!kw) continue;
+        if (!hasSpellboostKeyword(c)) continue;
 
         // increment counter first
         incSB(c);
 
-        // optional cost reduction (opt-in per keyword)
-        if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
-          const reduceBy: number = Number.isFinite(kw.reduceCostBy)
-            ? Number(kw.reduceCostBy)
-            : 0;
-          if (reduceBy > 0) {
-            applySpellboostCostReduction(c, reduceBy);
+        const costReduction = getSpellboostCostReduction(c);
+        if (costReduction) {
+          applySpellboostCostReduction(c, costReduction.reduceBy);
+          if (costReduction.minCost > 0) {
+            const floor = costReduction.minCost;
+            const current = parseInt(String(c.cost), 10) || 0;
+            if (current < floor) {
+              c.cost = floor;
+            }
           }
         }
         logEvent("spellboost", {

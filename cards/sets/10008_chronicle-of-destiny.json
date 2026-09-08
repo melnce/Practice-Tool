@@ -1250,14 +1250,8 @@
     "keywords": [
       {
         "name": "Spellboost",
-        "effects": [
-          {
-            "op": "cost",
-            "target": "self",
-            "mode": "reduce",
-            "amount": 1
-          }
-        ]
+        "reduceCostBy": 1,
+        "minCost": 0
       }
     ],
     "triggers": [],

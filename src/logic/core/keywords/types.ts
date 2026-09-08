@@ -46,9 +46,6 @@ export interface KeywordState {
 
   hasFanfare?: boolean; // Marker
 
-  hasStrike?: boolean;
-  strikeEffects?: Effect[];
-
   hasEngage?: boolean;
   engageEffects?: Effect[];
   engageCost?: number;

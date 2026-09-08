@@ -25,6 +25,11 @@ import type {
 } from "../../src/core/types/index.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import {
+  initAmulet,
+  initFollower,
+} from "../../src/logic/effects/ops/summon_ops/init.js";
+import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
+import {
   playCardNoRender,
   PlayOutcome,
 } from "../../src/logic/core/playCard/index.js";
@@ -164,6 +169,12 @@ export function createCard(
     zone,
     owner,
   } as CardInstance;
+
+  if (typeof spec === "string" && (zone === "hand" || zone === "deck")) {
+    if (card.type === "Follower") initFollower(card);
+    else if (card.type === "Amulet") initAmulet(card);
+    else applyKeywordsFromList(card);
+  }
 
   return card;
 }

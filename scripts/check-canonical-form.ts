@@ -339,8 +339,52 @@ function checkChosenTarget(card: CardJson): Warning[] {
   return out;
 }
 
-function checkOpKeyShape(card: CardJson): Warning[] {
+function checkSpellboostCostKeywordShape(card: CardJson): Warning[] {
   const out: Warning[] = [];
+  for (let i = 0; i < (card.keywords ?? []).length; i++) {
+    const k = card.keywords![i];
+    if (!k || typeof k !== "object") continue;
+    const kw = k as {
+      name?: string;
+      effects?: unknown[];
+      reduceCostBy?: number;
+      minCost?: number;
+    };
+    if (String(kw.name ?? "").toLowerCase() !== "spellboost") continue;
+    const effects = Array.isArray(kw.effects) ? kw.effects : [];
+    for (let j = 0; j < effects.length; j++) {
+      const eff = effects[j];
+      if (!eff || typeof eff !== "object") continue;
+      const e = eff as Record<string, unknown>;
+      if (
+        e.op === "cost" &&
+        String(e.target ?? "").toLowerCase() === "self" &&
+        e.mode === "reduce"
+      ) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({
+            path: `$.keywords[${i}].effects[${j}]`,
+            keyword: kw,
+          }),
+          canonical: compact({
+            path: `$.keywords[${i}]`,
+            name: "Spellboost",
+            reduceCostBy: e.amount ?? 1,
+            minCost: 0,
+          }),
+          note: 'Spellboost cost reduction must use reduceCostBy/minCost on the keyword, not op:"cost" in effects',
+        });
+      }
+    }
+  }
+  return out;
+}
+
+function checkOpKeyShape(card: CardJson): Warning[] {
+  const out: Warning[] = checkSpellboostCostKeywordShape(card);
   walk(card, (obj, path) => {
     const op = String(obj.op ?? "");
 

@@ -1299,12 +1299,12 @@
       "status": "covered"
     },
     "10123110": {
-      "fingerprint": "54f6e72c",
+      "fingerprint": "b8976754",
       "gatesSatisfied": [],
       "name": "Jeno, Levin Axeraider",
       "scenarios": [
         {
-          "fingerprint": "0d312f5c",
+          "fingerprint": "1ac23a20",
           "scenario": "combat"
         }
       ],
@@ -5907,12 +5907,12 @@
       "status": "covered"
     },
     "10462210": {
-      "fingerprint": "03de9f30",
+      "fingerprint": "c1ffda98",
       "gatesSatisfied": [],
       "name": "Skyfaring Vessel",
       "scenarios": [
         {
-          "fingerprint": "e417f2f8",
+          "fingerprint": "508406dc",
           "scenario": "in_hand"
         },
         {
@@ -6371,7 +6371,7 @@
       "status": "covered"
     },
     "10522110": {
-      "fingerprint": "f0b78ea8",
+      "fingerprint": "c293d031",
       "gatesSatisfied": [],
       "name": "Swift Staffmaster",
       "scenarios": [
@@ -6380,7 +6380,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "391c3234",
+          "fingerprint": "0fff21a8",
           "scenario": "in_hand"
         }
       ],
@@ -10439,12 +10439,12 @@
       "status": "covered"
     },
     "10862120": {
-      "fingerprint": "4ad1bc40",
+      "fingerprint": "ecea1910",
       "gatesSatisfied": [],
       "name": "Viche, Abyssal Researcher",
       "scenarios": [
         {
-          "fingerprint": "a4ca1d7b",
+          "fingerprint": "c6a8033f",
           "scenario": "in_hand"
         },
         {
