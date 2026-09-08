@@ -167,7 +167,7 @@ export function checkKeywordNamesForCard(
         cardId: card.id,
         cardName: card.name,
         jsonPath,
-        kind: "warn",
+        kind: "error",
         message: `non-canonical keyword spelling "${raw}" at ${jsonPath} — canonical is "${canonical}"`,
         rawKeyword: raw,
         normalizedKeyword: normalized,
@@ -273,7 +273,11 @@ export function runKeywordNamesGate(
   ).length;
 
   const exitCode =
-    unallowlistedErrors.length > 0 || unmatchedAllowlist.length > 0 ? 1 : 0;
+    unallowlistedErrors.length > 0 ||
+    unmatchedAllowlist.length > 0 ||
+    warnings.length > 0
+      ? 1
+      : 0;
 
   return {
     issues,

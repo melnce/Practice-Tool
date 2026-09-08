@@ -18,6 +18,7 @@ import {
   hasInherentCountdown,
 } from "./keywords.js";
 import { getImplementationStatus } from "./cardImplementationStatus.js";
+import { normalizeKeywordName } from "../logic/core/keywords/registry.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -76,20 +77,29 @@ export function processCard(raw: RawCardData): CardTemplate | null {
         (k): k is { name: string; effects?: unknown[] } =>
           typeof k === "object" &&
           k !== null &&
-          (k as { name?: string }).name === "LastWords",
+          normalizeKeywordName((k as { name?: string }).name ?? "") ===
+            "last_words",
       );
       card.lastWordsEffects = lastWordsKeyword?.effects ?? [];
     }
 
     if (card.hasCountdown && keywords.length > 0) {
       const countdownKeyword = keywords.find(
-        (k): k is { name: string; turns?: string | number } =>
+        (
+          k,
+        ): k is {
+          name: string;
+          turns?: string | number;
+          count?: string | number;
+        } =>
           typeof k === "object" &&
           k !== null &&
-          (k as { name?: string }).name === "Countdown",
+          normalizeKeywordName((k as { name?: string }).name ?? "") ===
+            "countdown",
       );
       if (countdownKeyword) {
-        card.countdown = parseInt(String(countdownKeyword.turns)) || 0;
+        const turns = countdownKeyword.turns ?? countdownKeyword.count;
+        card.countdown = parseInt(String(turns)) || 0;
       }
     }
   }

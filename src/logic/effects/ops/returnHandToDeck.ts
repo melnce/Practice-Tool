@@ -123,19 +123,15 @@ export function handleReturnHandToDeck(
 
   // If empty hand:
   if (hand.length === 0) {
-    if ((eff as any).optional) {
-      if ((eff as any).select) {
-        reportSelectFizzled({
-          eff,
-          owner,
-          sourceCard: null,
-          target: String((eff as any).target || "ally:hand"),
-        });
-      }
-      return "done";
+    if ((eff as any).select) {
+      reportSelectFizzled({
+        eff,
+        owner,
+        sourceCard: null,
+        target: String((eff as any).target || "ally:hand"),
+      });
     }
-    console.warn("[return_hand_to_deck] no card to return — blocking chain");
-    return "blocked";
+    return "done";
   }
 
   const randomSelection =

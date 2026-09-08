@@ -1,5 +1,6 @@
 // src/data/keywords.ts
 
+import { normalizeKeywordName } from "../logic/core/keywords/registry.js";
 export function hasInherentStorm(
   description: string,
   keywords: any[],
@@ -111,13 +112,15 @@ export function hasInherentBanishOnDeath(keywords: any[]): boolean {
 export function hasInherentLastWords(keywords: any[]): boolean {
   return (
     Array.isArray(keywords) &&
-    keywords.some(
-      (k) =>
-        (typeof k === "string" && k.toLowerCase() === "lastwords") ||
-        (typeof k === "object" &&
-          k !== null &&
-          (k as any).name === "LastWords"),
-    )
+    keywords.some((k) => {
+      if (typeof k === "string") {
+        return normalizeKeywordName(k) === "last_words";
+      }
+      if (typeof k === "object" && k !== null) {
+        return normalizeKeywordName((k as any).name ?? "") === "last_words";
+      }
+      return false;
+    })
   );
 }
 
@@ -125,7 +128,10 @@ export function hasInherentCountdown(keywords: any[]): boolean {
   return (
     Array.isArray(keywords) &&
     keywords.some(
-      (k) => typeof k === "object" && (k as any).name === "Countdown",
+      (k) =>
+        typeof k === "object" &&
+        k !== null &&
+        normalizeKeywordName((k as any).name ?? "") === "countdown",
     )
   );
 }
