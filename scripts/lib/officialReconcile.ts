@@ -76,7 +76,7 @@ export type QaCoverageRow = {
   answer: string;
   /** Block-scoped pin with QA_PIN_BLOCK_KEYWORD_MIN (honest default). */
   pinned: boolean;
-  /** Legacy file-scoped pin: card id + ≥1 keyword anywhere in the file. */
+  /** File-scoped pin (Q+A extraction, name stripped): card id + ≥1 keyword anywhere in the file. */
   pinnedFileScoped: boolean;
   /** Block-scoped pin requiring ≥ceil(keywords/2) keyword hits in a subject block. */
   pinnedBlockScopedHalf: boolean;
@@ -506,6 +506,10 @@ export function countQaPinsAtExactlyTwoKeywords(rows: QaCoverageRow[]): number {
   return rows.filter((r) => r.pinned && r.matchedKeywords.length === 2).length;
 }
 
+/** Status label when block-scoped default is unpinned but file-scoped (same extraction) matched. */
+export const QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS =
+  "unpinned (file-scoped, same extraction)";
+
 export type QaPinThreshold = "min1" | "min2" | "half";
 
 export type QaPinResult = {
@@ -553,8 +557,8 @@ export function qaPinThresholdMet(
 }
 
 /**
- * Legacy pin rule (file-scoped): a Q&A is pinned if any file under tests/
- * contains the card id AND at least one keyword from the answer.
+ * File-scoped pin (diagnostic): any file under tests/ that contains the card id
+ * and at least one keyword mined from question + answer (subject card name stripped).
  */
 export function isQaPinnedFileScoped(
   id: string,
@@ -1024,6 +1028,12 @@ export type OfficialReport = {
   unpinnedCount: number;
   pinnedFileScopedCount: number;
   unpinnedFileScopedCount: number;
+  /** Answer-only extraction, file-scoped ≥1 (pre-#341 historical arc). */
+  pinnedAnswerOnlyFileScopedCount: number;
+  unpinnedAnswerOnlyFileScopedCount: number;
+  /** Answer-only extraction, block body ≥2 (#337 default before #341). */
+  pinnedAnswerOnlyBlockScopedMin2Count: number;
+  unpinnedAnswerOnlyBlockScopedMin2Count: number;
   pinnedBlockScopedHalfCount: number;
   unpinnedBlockScopedHalfCount: number;
   pinnedBlockScopedMin1Count: number;
@@ -1059,6 +1069,62 @@ export function summarizeQaCoverage(rows: QaCoverageRow[]): {
   };
 }
 
+/** Historical answer-only pin counts for the reconciliation arc (report only). */
+export function summarizeQaPinHistorical(
+  meta: OfficialMetaFile,
+  corpus: Array<{ file: string; text: string }>,
+  blockIndex: QaPinBlockIndex,
+): {
+  pinnedAnswerOnlyFileScoped: number;
+  unpinnedAnswerOnlyFileScoped: number;
+  pinnedAnswerOnlyBlockScopedMin2: number;
+  unpinnedAnswerOnlyBlockScopedMin2: number;
+} {
+  let pinnedAnswerOnlyFileScoped = 0;
+  let pinnedAnswerOnlyBlockScopedMin2 = 0;
+  for (const id of officialMetaCardIds(meta)) {
+    const rec = getOfficialCard(meta, id);
+    if (!rec) continue;
+    for (const qa of rec.questions) {
+      const keywords = extractAnswerKeywords(qa.answer);
+      let filePinned = false;
+      if (keywords.length) {
+        for (const { text } of corpus) {
+          if (!text.includes(id)) continue;
+          if (matchAnswerKeywordsInText(keywords, text).length) {
+            filePinned = true;
+            break;
+          }
+        }
+      }
+      if (filePinned) pinnedAnswerOnlyFileScoped++;
+
+      const card = { id, name: rec.name };
+      let bestHits: string[] = [];
+      for (const block of blockIndex.subjectBlocks) {
+        const titleMatch = cardMatchesTitle(card, block.composedTitle);
+        if (!titleMatch.byId && !titleMatch.byName) continue;
+        const hits = matchAnswerKeywordsInText(keywords, block.bodyText);
+        if (hits.length > bestHits.length) bestHits = hits;
+      }
+      if (qaPinThresholdMet(keywords.length, bestHits.length, "min2")) {
+        pinnedAnswerOnlyBlockScopedMin2++;
+      }
+    }
+  }
+  const rulingCount = officialMetaCardIds(meta).reduce(
+    (n, id) => n + (getOfficialCard(meta, id)?.questions.length ?? 0),
+    0,
+  );
+  return {
+    pinnedAnswerOnlyFileScoped,
+    unpinnedAnswerOnlyFileScoped: rulingCount - pinnedAnswerOnlyFileScoped,
+    pinnedAnswerOnlyBlockScopedMin2,
+    unpinnedAnswerOnlyBlockScopedMin2:
+      rulingCount - pinnedAnswerOnlyBlockScopedMin2,
+  };
+}
+
 export function buildOfficialReport(
   meta: OfficialMetaFile,
   root = ROOT,
@@ -1070,6 +1136,7 @@ export function buildOfficialReport(
   const blockIndex = buildQaPinBlockIndex(root);
   const qaCoverage = coverOfficialQa(meta, corpus, blockIndex);
   const qaSummary = summarizeQaCoverage(qaCoverage);
+  const qaHistorical = summarizeQaPinHistorical(meta, corpus, blockIndex);
   const ownerRulings = fs.readFileSync(
     path.join(root, "docs/owner-rulings.md"),
     "utf-8",
@@ -1091,6 +1158,13 @@ export function buildOfficialReport(
     unpinnedCount: qaSummary.unpinnedBlockScopedMin2,
     pinnedFileScopedCount: qaSummary.pinnedFileScoped,
     unpinnedFileScopedCount: qaSummary.unpinnedFileScoped,
+    pinnedAnswerOnlyFileScopedCount: qaHistorical.pinnedAnswerOnlyFileScoped,
+    unpinnedAnswerOnlyFileScopedCount:
+      qaHistorical.unpinnedAnswerOnlyFileScoped,
+    pinnedAnswerOnlyBlockScopedMin2Count:
+      qaHistorical.pinnedAnswerOnlyBlockScopedMin2,
+    unpinnedAnswerOnlyBlockScopedMin2Count:
+      qaHistorical.unpinnedAnswerOnlyBlockScopedMin2,
     pinnedBlockScopedHalfCount: qaSummary.pinnedBlockScopedHalf,
     unpinnedBlockScopedHalfCount: qaSummary.unpinnedBlockScopedHalf,
     pinnedBlockScopedMin1Count: qaSummary.pinnedBlockScopedMin1,
@@ -1185,10 +1259,34 @@ export function renderOfficialReportMarkdown(
     "Pin predicates (measurement only — not a CI gate). Keywords: 4+ letter tokens from question + answer after dropping stopwords and the subject card name. Asserting-block scope deliberately matches the `it`/`test` title plus callback body (not body alone): official Q&A tests encode ruling phrases in titles; subject-card name stripping keeps that honest.",
     "",
     table(
-      ["scope", "threshold", "pinned", "unpinned", "total"],
+      [
+        "scope",
+        "keyword extraction",
+        "threshold",
+        "pinned",
+        "unpinned",
+        "total",
+      ],
       [
         [
           "file",
+          "answer only",
+          "≥1 keyword anywhere in file with card id",
+          String(report.pinnedAnswerOnlyFileScopedCount),
+          String(report.unpinnedAnswerOnlyFileScopedCount),
+          String(report.qaCoverage.length),
+        ],
+        [
+          "block (subject `it`/`test`)",
+          "answer only",
+          `≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in block body (#337 default)`,
+          String(report.pinnedAnswerOnlyBlockScopedMin2Count),
+          String(report.unpinnedAnswerOnlyBlockScopedMin2Count),
+          String(report.qaCoverage.length),
+        ],
+        [
+          "file",
+          "question + answer (name stripped)",
           "≥1 keyword anywhere in file with card id",
           String(report.pinnedFileScopedCount),
           String(report.unpinnedFileScopedCount),
@@ -1196,6 +1294,7 @@ export function renderOfficialReportMarkdown(
         ],
         [
           "block (subject `it`/`test`)",
+          "question + answer (name stripped)",
           "≥1 keyword in asserting block",
           String(report.pinnedBlockScopedMin1Count),
           String(report.unpinnedBlockScopedMin1Count),
@@ -1203,6 +1302,7 @@ export function renderOfficialReportMarkdown(
         ],
         [
           "block (subject `it`/`test`)",
+          "question + answer (name stripped)",
           `≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in asserting block${QA_PIN_TWO_KEYWORD_TIER_FOOTNOTE}`,
           String(report.pinnedCount),
           String(report.unpinnedCount),
@@ -1210,6 +1310,7 @@ export function renderOfficialReportMarkdown(
         ],
         [
           "block (subject `it`/`test`)",
+          "question + answer (name stripped)",
           "≥ceil(n/2) keywords in asserting block",
           String(report.pinnedBlockScopedHalfCount),
           String(report.unpinnedBlockScopedHalfCount),
@@ -1220,7 +1321,9 @@ export function renderOfficialReportMarkdown(
     "",
     `${QA_PIN_TWO_KEYWORD_TIER_FOOTNOTE} ${report.qaPinTwoKeywordTierCaveat}`,
     "",
-    `Default \`pinned\` field: block-scoped, ≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in the asserting block title + body (subject block from \`subjecthood.ts\` title matcher). Legacy file-scoped verdict kept as \`pinnedFileScoped\`.`,
+    `Measurement arc (pinned at each era's default): **${report.pinnedAnswerOnlyFileScopedCount}** (file-scoped, answer-only) → **${report.pinnedAnswerOnlyBlockScopedMin2Count}** (block-scoped, answer-only, #337) → **${report.pinnedCount}** (block-scoped, question+answer, #341). File-scoped with current extraction: **${report.pinnedFileScopedCount}** (isolates scoping from extraction: ${report.pinnedFileScopedCount} → ${report.pinnedCount}).`,
+    "",
+    `Default \`pinned\` field: block-scoped, ≥${QA_PIN_BLOCK_KEYWORD_MIN} keywords in the asserting block title + body (question + answer extraction, subject card name stripped). File-scoped same-extraction diagnostic kept as \`pinnedFileScoped\`.`,
     "",
     table(
       ["id", "name", "status", "keywords / block", "Q / A"],
@@ -1230,7 +1333,7 @@ export function renderOfficialReportMarkdown(
         r.pinned
           ? "pinned"
           : r.pinnedFileScoped
-            ? "unpinned (was file-scoped)"
+            ? QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS
             : "unpinned",
         r.pinned || r.pinnedFileScoped
           ? `${r.matchedKeywords.join(", ")} @ ${r.matchedFile ?? "?"}${r.matchedBlock ? ` — ${r.matchedBlock}` : ""}`
