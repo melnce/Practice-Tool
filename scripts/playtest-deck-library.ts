@@ -159,49 +159,13 @@ function assess(
   let mechanicTriggered = false;
   const p = snap.first;
 
-  if (mechanic === "combo") {
-    if (p.playsThisTurn >= 2 || p.cardsPlayed >= 3) {
-      mechanicTriggered = true;
-      notes.push(
-        `Combo density: playsThisTurn=${p.playsThisTurn}, totalCardsPlayed=${p.cardsPlayed}`,
-      );
-    }
-    const fairies = [...p.hand, ...p.board.map((b) => b.name)].filter((n) =>
-      /Fairy|Pixie/.test(n),
+  if (mechanic === "fuse_storm") {
+    const fuseSignals = [...p.hand, ...p.board.map((b) => b.name)].filter((n) =>
+      /Storm|Fuse|Sephi/i.test(n),
     );
-    if (fairies.length) {
+    if (fuseSignals.length) {
       mechanicTriggered = true;
-      notes.push(`Fairy/Pixie seen: ${[...new Set(fairies)].join(", ")}`);
-    }
-  } else if (mechanic === "rally") {
-    if (p.rally > 0) {
-      mechanicTriggered = true;
-      notes.push(`Rally counter = ${p.rally}`);
-    }
-  } else if (mechanic === "spellboost") {
-    if (p.spellboostMax > 0) {
-      mechanicTriggered = true;
-      notes.push(`Spellboost max on hand = ${p.spellboostMax}`);
-    }
-  } else if (mechanic === "overflow") {
-    if (p.maxPP >= 7) {
-      mechanicTriggered = true;
-      notes.push(`Overflow on (maxPP=${p.maxPP})`);
-    } else if (p.maxPP > snap.round) {
-      notes.push(`Ramp: maxPP=${p.maxPP} at round ${snap.round}`);
-    }
-  } else if (mechanic === "shadows") {
-    if (p.shadows > 0) {
-      mechanicTriggered = true;
-      notes.push(`Shadows = ${p.shadows}`);
-    }
-  } else if (mechanic === "countdown_amulet") {
-    const amulets = p.board.filter((b) => b.type === "Amulet");
-    if (amulets.length) {
-      mechanicTriggered = true;
-      notes.push(
-        `Amulets: ${amulets.map((a) => `${a.name}(cd=${a.countdown})`).join(", ")}`,
-      );
+      notes.push(`Fuse/storm signals: ${[...new Set(fuseSignals)].join(", ")}`);
     }
   } else if (mechanic === "artifact_gear") {
     const gear = p.hand.filter(
@@ -331,7 +295,7 @@ async function playtestOne(
       { timeout: 15_000 },
     );
 
-    const turnBudget = deck.mechanic === "overflow" ? 16 : 12;
+    const turnBudget = 12;
     for (let t = 0; t < turnBudget; t++) {
       await dismissOverlays(page);
       await playCheapCards(page);
@@ -340,9 +304,6 @@ async function playtestOne(
       const mid = await snapshot(page);
       const assessed = assess(mid, deck.mechanic, consoleErrors);
       if (assessed.mechanicTriggered) {
-        if (deck.mechanic === "overflow" && mid.first.maxPP < 7 && t < 12) {
-          continue;
-        }
         if (t >= 3) break;
       }
     }

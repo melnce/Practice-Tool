@@ -218,7 +218,7 @@ export class GameStateBuilder {
     return this;
   }
 
-  withFirstHP(hp: number): this {
+  withFirstHP(hp: number, _maxHP?: number): this {
     this.firstPlayer.hp = hp;
     return this;
   }
@@ -256,7 +256,7 @@ export class GameStateBuilder {
     return this;
   }
 
-  withSecondHP(hp: number): this {
+  withSecondHP(hp: number, _maxHP?: number): this {
     this.secondPlayer.hp = hp;
     return this;
   }

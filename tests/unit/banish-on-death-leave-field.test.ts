@@ -49,7 +49,7 @@ describe("BanishOnDeath — leave-field triggers", () => {
     );
     const ghost = createCard(GHOST, "board", "first");
     if (Array.isArray(ghost.keywords)) {
-      applyKeywordsFromList(ghost, ghost.keywords);
+      applyKeywordsFromList(ghost);
     }
     ghost.defense = 0;
     state.players.first.board = [observer, ghost];

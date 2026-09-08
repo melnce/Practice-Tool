@@ -261,7 +261,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     });
     playCombo3(0);
     const handBefore = thenHand("first").length;
-    whenEndTurn("first");
+    whenEndTurn();
     expect(thenHand("first").length).toBeGreaterThan(handBefore);
 
     resetUidCounter();

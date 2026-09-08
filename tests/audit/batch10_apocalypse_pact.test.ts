@@ -186,7 +186,7 @@ describe("Set 10006 — Apocalypse Pact", () => {
     enemyFollower(2, 5, "Wall");
     state.players.second.hp = 20;
     whenPlayCard("first", 0);
-    whenEndTurn("first");
+    whenEndTurn();
     const spiked = findOnBoard("first", "Spiked Dragon");
     expect(spiked?.hasEvolved).toBe(true);
     expect(getBoard(state, "second")[0]?.defense).toBe(2);

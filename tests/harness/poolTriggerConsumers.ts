@@ -35,7 +35,7 @@ function cardId(card: { id?: string; card_id?: string }): string {
 /** Count pool cards whose printed trigger listens to `event` from `source`. */
 export function countPoolTriggerConsumers(
   event: string,
-  source: TriggerConsumerSource,
+  _source?: TriggerConsumerSource,
   cards = loadPoolCards(),
 ): TriggerConsumerCounts {
   const result: TriggerConsumerCounts = {

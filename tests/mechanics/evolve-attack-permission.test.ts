@@ -135,8 +135,8 @@ describe("Mechanic Contract: evolve attack permission (not Rush keyword)", () =>
     enemyFollower();
     evolveWithPoint(follower);
 
-    whenEndTurn("first");
-    whenEndTurn("second");
+    whenEndTurn();
+    whenEndTurn();
 
     expect(follower.justPlayed).toBe(false);
     expect(deriveCanAttack(follower)).toBe(true);

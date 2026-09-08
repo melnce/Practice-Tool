@@ -374,7 +374,7 @@ describe("Batch 7 — Runecraft [10004] Skybound Dragons", () => {
       emmylou.keywordState?.spellboostCount ??
       (emmylou as { spellboostCount?: number }).spellboostCount ??
       0;
-    whenEndTurn("first");
+    whenEndTurn();
     const count1 =
       emmylou.keywordState?.spellboostCount ??
       (emmylou as { spellboostCount?: number }).spellboostCount ??
