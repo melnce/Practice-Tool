@@ -1460,8 +1460,8 @@
     ],
     "keywords": [
       {
-        "name": "countdown",
-        "count": 5
+        "name": "Countdown",
+        "turns": 5
       },
       {
         "name": "Engage",
@@ -1937,7 +1937,7 @@
     "fanfare": [],
     "keywords": [
       {
-        "name": "countdown",
+        "name": "Countdown",
         "turns": 4
       },
       {
@@ -2493,7 +2493,7 @@
     ],
     "keywords": [
       {
-        "name": "engage",
+        "name": "Engage",
         "cost": 1,
         "sacrifice": true,
         "effects": [

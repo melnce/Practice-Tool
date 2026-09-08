@@ -2407,12 +2407,12 @@
       "status": "covered"
     },
     "10163130": {
-      "fingerprint": "29e7bac0",
+      "fingerprint": "ce25229c",
       "gatesSatisfied": [],
       "name": "Lapis, Shining Seraph",
       "scenarios": [
         {
-          "fingerprint": "0f09d204",
+          "fingerprint": "44f759cf",
           "scenario": "destroy"
         }
       ],
@@ -3115,16 +3115,16 @@
       "status": "covered"
     },
     "10223110": {
-      "fingerprint": "efcc89bf",
+      "fingerprint": "41a332ec",
       "gatesSatisfied": [],
       "name": "Rosé, Princess Knight",
       "scenarios": [
         {
-          "fingerprint": "bcdb604c",
+          "fingerprint": "e55f9687",
           "scenario": "play_base"
         },
         {
-          "fingerprint": "e8621c64",
+          "fingerprint": "43ad824a",
           "scenario": "combat"
         }
       ],
@@ -4355,12 +4355,12 @@
       "status": "covered"
     },
     "10332210": {
-      "fingerprint": "d88dec64",
+      "fingerprint": "057e1780",
       "gatesSatisfied": [],
       "name": "Institute of Truth",
       "scenarios": [
         {
-          "fingerprint": "34d69be0",
+          "fingerprint": "1b580623",
           "scenario": "engage"
         }
       ],
@@ -4515,12 +4515,12 @@
       "status": "covered"
     },
     "10342210": {
-      "fingerprint": "6cba6420",
+      "fingerprint": "58b015ac",
       "gatesSatisfied": [],
       "name": "Nation of Disdain",
       "scenarios": [
         {
-          "fingerprint": "4eeefc1c",
+          "fingerprint": "e46aac0c",
           "scenario": "engage"
         }
       ],
@@ -4659,16 +4659,16 @@
       "status": "covered"
     },
     "10352210": {
-      "fingerprint": "708ebfaf",
+      "fingerprint": "dfd25480",
       "gatesSatisfied": [],
       "name": "Castle of Entwining",
       "scenarios": [
         {
-          "fingerprint": "45dd000c",
+          "fingerprint": "b8739e3b",
           "scenario": "play"
         },
         {
-          "fingerprint": "ec2e6c3c",
+          "fingerprint": "9c9cbb4f",
           "scenario": "engage"
         }
       ],
@@ -5947,24 +5947,24 @@
       "status": "covered"
     },
     "10464110": {
-      "fingerprint": "2f5ac880",
+      "fingerprint": "e9a0d76d",
       "gatesSatisfied": [],
       "name": "Galleon, Earth Personified",
       "scenarios": [
         {
-          "fingerprint": "4be6bd08",
+          "fingerprint": "d2ab45e8",
           "scenario": "turn_boundary"
         }
       ],
       "status": "covered"
     },
     "10464120": {
-      "fingerprint": "d88a9d98",
+      "fingerprint": "cc63eac9",
       "gatesSatisfied": ["skybound_art"],
       "name": "Vira, Luminous Primal Knight",
       "scenarios": [
         {
-          "fingerprint": "f9ccc3b8",
+          "fingerprint": "d203396c",
           "scenario": "play"
         }
       ],
@@ -5995,12 +5995,12 @@
       "status": "covered"
     },
     "10471130": {
-      "fingerprint": "2a9b0937",
+      "fingerprint": "bd19c06c",
       "gatesSatisfied": [],
       "name": "Isaac, Congenial Engineer",
       "scenarios": [
         {
-          "fingerprint": "1815857f",
+          "fingerprint": "dc95de30",
           "scenario": "destroy"
         }
       ],
@@ -6047,16 +6047,16 @@
       "status": "covered"
     },
     "10473110": {
-      "fingerprint": "55666c20",
+      "fingerprint": "27bb6528",
       "gatesSatisfied": [],
       "name": "Cassius, Sky-Yearning Arrival",
       "scenarios": [
         {
-          "fingerprint": "93d1d158",
+          "fingerprint": "74511c10",
           "scenario": "play"
         },
         {
-          "fingerprint": "a8f809f8",
+          "fingerprint": "8ee07546",
           "scenario": "destroy"
         }
       ],
@@ -6139,12 +6139,12 @@
       "status": "covered"
     },
     "10503210": {
-      "fingerprint": "01a34280",
+      "fingerprint": "124d2e00",
       "gatesSatisfied": [],
       "name": "World of Games",
       "scenarios": [
         {
-          "fingerprint": "b719cf2c",
+          "fingerprint": "340a4020",
           "scenario": "destroy"
         }
       ],
@@ -6415,20 +6415,20 @@
       "status": "covered"
     },
     "10523110": {
-      "fingerprint": "f455364f",
+      "fingerprint": "94dec028",
       "gatesSatisfied": [],
       "name": "Unmoving Tactician",
       "scenarios": [
         {
-          "fingerprint": "9df10d64",
+          "fingerprint": "2bc86438",
           "scenario": "turn_boundary"
         },
         {
-          "fingerprint": "5b44954b",
+          "fingerprint": "33df1b88",
           "scenario": "evolve"
         },
         {
-          "fingerprint": "94a79530",
+          "fingerprint": "8a58ed54",
           "scenario": "super_evolve"
         }
       ],
@@ -8151,16 +8151,16 @@
       "status": "covered"
     },
     "10663210": {
-      "fingerprint": "8a610a6c",
+      "fingerprint": "f86b1697",
       "gatesSatisfied": ["selected_matches"],
       "name": "Sublime Eld Tome",
       "scenarios": [
         {
-          "fingerprint": "b5947124",
+          "fingerprint": "cc9e4fab",
           "scenario": "play"
         },
         {
-          "fingerprint": "322c2d04",
+          "fingerprint": "0a400cc4",
           "scenario": "destroy"
         }
       ],
@@ -8415,16 +8415,16 @@
       "status": "covered"
     },
     "10703210": {
-      "fingerprint": "cd10729d",
+      "fingerprint": "832ad8ac",
       "gatesSatisfied": [],
       "name": "City of Babelon",
       "scenarios": [
         {
-          "fingerprint": "5af69d38",
+          "fingerprint": "72559844",
           "scenario": "turn_boundary"
         },
         {
-          "fingerprint": "d0668fb0",
+          "fingerprint": "6da3934f",
           "scenario": "engage"
         }
       ],
@@ -11247,12 +11247,12 @@
       "status": "covered"
     },
     "10942110": {
-      "fingerprint": "8b51d84c",
+      "fingerprint": "723fe360",
       "gatesSatisfied": ["ally_attacked_leader_last_turn"],
       "name": "High-Spirited Marauder",
       "scenarios": [
         {
-          "fingerprint": "132eab4b",
+          "fingerprint": "a0dc4e88",
           "scenario": "combat"
         }
       ],

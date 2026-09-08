@@ -1392,7 +1392,7 @@
         "op": "keyword",
         "action": "grant",
         "target": "ally:last_summoned",
-        "keywords": ["drain"]
+        "keywords": ["Drain"]
       }
     ],
     "fanfare": [],

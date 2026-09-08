@@ -902,7 +902,7 @@
     "keywords": [
       "Rush",
       {
-        "name": "enhance",
+        "name": "Enhance",
         "cost": 5,
         "effects": [
           {
@@ -1075,7 +1075,7 @@
             "target": "entering_follower",
             "keywords": [
               {
-                "name": "cant_attack",
+                "name": "Can't Attack",
                 "until_opponent_eot": true
               }
             ]
@@ -3092,9 +3092,9 @@
         },
         "select": 1,
         "keywords": [
-          "rush",
+          "Rush",
           {
-            "name": "lastwords",
+            "name": "LastWords",
             "effects": [
               {
                 "op": "draw",

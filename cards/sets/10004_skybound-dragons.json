@@ -88,7 +88,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10402110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10402110-yuni-cosmic-legacy",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "triggers": [
       {
         "effects": [
@@ -1262,7 +1262,7 @@
     "evo_image": "",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10431120-suframare-wandering-tutor",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "triggers": [
       {
         "effects": [
@@ -1283,7 +1283,7 @@
         "op": "stat",
         "action": "give",
         "target": "self",
-        "keywords": ["cant_attack"]
+        "keywords": ["Can't Attack"]
       }
     ],
     "superevolve": [],
@@ -1775,7 +1775,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10441120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10441120-mari-megs-bestie",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "keywords": [],
@@ -2014,7 +2014,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10443110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10443110-meg-girl-next-door",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "fanfare": [
@@ -2338,7 +2338,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10452110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10452110-nezha-soaring-war-god",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "keywords": ["Rush"],
@@ -2606,7 +2606,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10454110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10454110-fediel-darkness-personified",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "fanfare": [
       {
         "op": "gate",
@@ -2729,7 +2729,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10461110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461110-troue-heroic-visionary",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "keywords": ["Storm"],
     "triggers": [
       {
@@ -2764,7 +2764,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10461120_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10461120-lamretta-sisterly-shepherd",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "triggers": [
       {
         "event": "end_of_turn",
@@ -2989,7 +2989,7 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10463110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10463110-tikoh-asclepian-surgeon",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "evolve": [
       {
         "op": "damage",
@@ -3084,13 +3084,13 @@
     "evo_image": "https://static.dotgg.gg/shadowverse/cards/10464110_evo.webp",
     "set": "[10004] Skybound Dragons",
     "url": "https://shadowverse.gg/cards/10464110-galleon-earth-personified",
-    "has_ongoing": true,
+    "hasOngoing": true,
     "evolve": [],
     "superevolve": [],
     "keywords": [
       "Ward",
       {
-        "name": "cant_attack"
+        "name": "Can't Attack"
       }
     ],
     "triggers": [
@@ -3136,7 +3136,7 @@
     "keywords": [
       "Ward",
       {
-        "name": "max_damage_cap",
+        "name": "MaxDamageCap",
         "amount": 3
       }
     ],
@@ -3240,7 +3240,7 @@
     "superevolve": [],
     "keywords": [
       {
-        "name": "last_words",
+        "name": "LastWords",
         "effects": [
           {
             "op": "add_to_hand",
@@ -3421,7 +3421,7 @@
     ],
     "keywords": [
       {
-        "name": "last_words",
+        "name": "LastWords",
         "effects": [
           {
             "op": "add_to_hand",

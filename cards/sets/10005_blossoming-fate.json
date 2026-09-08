@@ -126,8 +126,8 @@
     "superevolve": [],
     "keywords": [
       {
-        "name": "countdown",
-        "count": 5
+        "name": "Countdown",
+        "turns": 5
       },
       {
         "name": "LastWords",
@@ -986,7 +986,7 @@
     ],
     "keywords": [
       {
-        "name": "cant_attack"
+        "name": "Can't Attack"
       }
     ],
     "triggers": [

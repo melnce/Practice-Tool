@@ -2778,8 +2778,8 @@
     "superevolve": [],
     "keywords": [
       {
-        "name": "countdown",
-        "count": 2
+        "name": "Countdown",
+        "turns": 2
       },
       {
         "name": "LastWords",
