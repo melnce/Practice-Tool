@@ -2029,7 +2029,7 @@
       {
         "op": "select",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "has_keyword": "Spellboost"
         },
         "effects": [
@@ -5229,7 +5229,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:hand",
-        "tribe": "Puppetry",
+        "filter": {
+          "tribe": "Puppetry"
+        },
         "attack": 1,
         "defense": 0
       }

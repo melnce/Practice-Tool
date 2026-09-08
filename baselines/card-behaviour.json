@@ -8263,12 +8263,12 @@
       "status": "covered"
     },
     "10672120": {
-      "fingerprint": "3d018ee0",
+      "fingerprint": "1da3af51",
       "gatesSatisfied": [],
       "name": "Timid Pioneer",
       "scenarios": [
         {
-          "fingerprint": "d6ffdbf0",
+          "fingerprint": "c88df8e8",
           "scenario": "play"
         }
       ],

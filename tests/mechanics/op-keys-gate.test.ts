@@ -126,6 +126,66 @@ describe("op-keys gate — crest is_faith", () => {
   });
 });
 
+describe("op-keys gate — pool narrowing in filter", () => {
+  it("flags CARD_CONDITION key in banish.condition naming the card", () => {
+    const issues = checkOpKeysForCard({
+      id: "10672120",
+      name: "Timid Pioneer",
+      description: "banish",
+      fanfare: [
+        {
+          op: "banish",
+          target: "enemy:follower",
+          select: 1,
+          condition: { defense_lte: 3 },
+        },
+      ],
+    });
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues[0]?.message).toMatch(/defense_lte/i);
+    expect(issues[0]?.message).toMatch(/use filter/i);
+    expect(issues[0]?.name).toBe("Timid Pioneer");
+  });
+
+  it("allows pool-only not_self in banish.condition", () => {
+    const issues = checkOpKeysForCard({
+      id: "10804110",
+      name: "Alabaster Bahamut",
+      fanfare: [
+        {
+          op: "banish",
+          target: "enemy:follower",
+          select: 1,
+          condition: { not_self: true },
+        },
+      ],
+    });
+    const narrowIssues = issues.filter((i) =>
+      i.message.includes("card-narrowing"),
+    );
+    expect(narrowIssues).toHaveLength(0);
+  });
+
+  it("flags cost action key removed from allowlist", () => {
+    const issues = checkOpKeysForCard({
+      id: "10223110",
+      name: "Rosé, Princess Knight",
+      fanfare: [
+        {
+          op: "cost",
+          target: "last_drawn",
+          action: "set",
+          amount: 0,
+          mode: "set",
+        },
+      ],
+    });
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues[0]?.message).toMatch(/unsupported top-level key "action"/i);
+    expect(issues[0]?.name).toBe("Rosé, Princess Knight");
+  });
+});
+
 describe("op-keys gate — damage class", () => {
   it("allows top-level class on damage op with hand_class_count", () => {
     const issues = checkOpKeysForCard({

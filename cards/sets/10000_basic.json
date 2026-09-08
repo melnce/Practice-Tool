@@ -892,7 +892,7 @@
         "op": "select",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "tribe": "Golem"
         },
         "effects": [

@@ -63,6 +63,16 @@ export const POOL_CONDITION_KEYS = new Set([
   "include_self",
 ]);
 
+/** Pool-only keys — belong in condition, not filter. */
+export const POOL_ONLY_CONDITION_KEYS = new Set(["not_self", "include_self"]);
+
+/**
+ * Ops where CARD_CONDITION_KEYS must live in filter (not condition).
+ * Banish splits condition→getPool vs filter→applyFilters; select merges both
+ * but filter is the canonical spelling (targeting.ts selectPoolCondition).
+ */
+const OPS_CARD_NARROWING_IN_FILTER = new Set(["banish", "select"]);
+
 /** cardFilter family (draw, search). */
 export const CARD_FILTER_KEYS = new Set([
   "name",
@@ -180,8 +190,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
     "keyword",
     "duration",
     "tribes",
-    "tribe",
-    "class",
     "name_filter",
     "name_in",
     "has_keyword",
@@ -235,7 +243,6 @@ export const OP_TOP_LEVEL_KEYS: Record<string, ReadonlySet<string>> = {
   cost: new Set([
     "target",
     "mode",
-    "action",
     "amount",
     "pool",
     "condition",
@@ -888,6 +895,20 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
       }
     }
 
+    if (
+      op === "stat" &&
+      (eff.tribe !== undefined || eff.class !== undefined) &&
+      String(eff.target ?? "").includes(":hand")
+    ) {
+      const bad = eff.tribe !== undefined ? "tribe" : "class";
+      issues.push({
+        id: card.id,
+        name: card.name,
+        kind: "error",
+        message: `stat op at ${opPath} carries top-level "${bad}" on hand route — use filter.${bad} — ${descSnippet(card.description)}`,
+      });
+    }
+
     for (const field of ["condition", "filter", "filters"] as const) {
       const val = eff[field];
       if (val == null) continue;
@@ -908,6 +929,23 @@ function checkOpTopLevelKeysForCard(card: CardJson): Issue[] {
             name: card.name,
             kind: "error",
             message: `${op} op at ${opPath}.${field} has ${hint} key "${nk}" — ${descSnippet(card.description)}`,
+          });
+        }
+      }
+
+      if (
+        field === "condition" &&
+        OPS_CARD_NARROWING_IN_FILTER.has(op) &&
+        typeof val === "object" &&
+        !Array.isArray(val)
+      ) {
+        for (const nk of Object.keys(val as Record<string, unknown>)) {
+          if (!CARD_CONDITION_KEYS.has(nk)) continue;
+          issues.push({
+            id: card.id,
+            name: card.name,
+            kind: "error",
+            message: `${op} op at ${opPath}.condition carries card-narrowing key "${nk}" — use filter.{${nk}} (condition is for pool-only keys ${[...POOL_ONLY_CONDITION_KEYS].join("/")}) — ${descSnippet(card.description)}`,
           });
         }
       }

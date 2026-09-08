@@ -1180,7 +1180,7 @@
       {
         "op": "select",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "has_keyword": "Spellboost"
         },
         "effects": [

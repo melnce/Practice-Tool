@@ -2494,7 +2494,7 @@
         "op": "select",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "base_cost_gte": 5
         },
         "effects": [

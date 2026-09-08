@@ -2958,7 +2958,7 @@
                 "target": "ally:follower",
                 "select": 1,
                 "mode": "random",
-                "condition": {
+                "filter": {
                   "unevolved": true,
                   "has_keyword": "ward"
                 },
