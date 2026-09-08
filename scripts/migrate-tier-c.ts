@@ -66,18 +66,15 @@ const C2_IDS = new Set([
   "10761110",
 ]);
 
+// Bare target:"leader" only — ally:leader sites (10111130, 10174110, 10342110, 10451310) are left unchanged.
 const C3_LEADER_PLAYER = new Set([
-  "10111130",
-  "10174110",
   "10314110",
   "10331110",
   "10362110",
   "10362210",
   "10423310",
   "10431310",
-  "10451310",
 ]);
-const C3_ALLY_LEADER = new Set(["10342110"]);
 
 const C4_IDS = new Set([
   "10144110",
@@ -235,16 +232,6 @@ function migrateCard(card: Card): boolean {
       obj.player = "self";
       changed = true;
     }
-    if (
-      C3_ALLY_LEADER.has(id) &&
-      obj.op === "restore" &&
-      obj.target === "ally:leader"
-    ) {
-      obj.target = "leader";
-      obj.player = "self";
-      changed = true;
-    }
-
     // C4 — drop distribution:all on pool damage
     if (
       C4_IDS.has(id) &&

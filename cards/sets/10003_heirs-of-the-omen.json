@@ -1842,9 +1842,8 @@
           },
           {
             "op": "restore",
-            "target": "leader",
-            "amount_source": "context.restore_amount",
-            "player": "self"
+            "target": "ally:leader",
+            "amount_source": "context.restore_amount"
           }
         ],
         "event": "end_of_turn",

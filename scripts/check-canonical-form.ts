@@ -17,6 +17,7 @@
  *   npx tsx scripts/check-canonical-form.ts --gate=chosen-target --fail
  *   npx tsx scripts/check-canonical-form.ts --gate=evolve-target --fail
  *   npx tsx scripts/check-canonical-form.ts --gate=enhance-instead --fail
+ *   npx tsx scripts/check-canonical-form.ts --gate=op-key-shape --fail
  *
  * Optional `--fail` promotes the selected family's warnings to exit 1.
  */
@@ -33,7 +34,8 @@ type Family =
   | "select-count"
   | "chosen-target"
   | "evolve-target"
-  | "enhance-instead";
+  | "enhance-instead"
+  | "op-key-shape";
 
 type Warning = {
   family: Family;
@@ -337,6 +339,180 @@ function checkChosenTarget(card: CardJson): Warning[] {
   return out;
 }
 
+function checkOpKeyShape(card: CardJson): Warning[] {
+  const out: Warning[] = [];
+  walk(card, (obj, path) => {
+    const op = String(obj.op ?? "");
+
+    if (op === "summon" && obj.source === "named" && obj.count === undefined) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, source: "named", count: null }),
+        canonical: compact({ path, op, source: "named", count: 1 }),
+        note: 'op:"summon" with source:"named" must carry count',
+      });
+    }
+
+    if (op === "draw" && obj.player === "self") {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, player: "self" }),
+        canonical: compact({ path, op }),
+        note: 'op:"draw" must not carry player:"self"',
+      });
+    }
+
+    if (
+      op === "restore" &&
+      obj.target === "leader" &&
+      obj.player === undefined
+    ) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, target: "leader", player: null }),
+        canonical: compact({ path, op, target: "leader", player: "self" }),
+        note: 'op:"restore" with target:"leader" must carry player:"self"',
+      });
+    }
+
+    if (op === "damage" && obj.distribution === "all") {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({
+          path,
+          op,
+          distribution: "all",
+          target: obj.target ?? null,
+        }),
+        canonical: compact({ path, op, target: obj.target ?? null }),
+        note: 'op:"damage" must not carry distribution:"all"',
+      });
+    }
+
+    if (op === "cost") {
+      if ((obj as any).action && !(obj as any).mode) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({ path, op, action: (obj as any).action }),
+          canonical: compact({ path, op, mode: (obj as any).action }),
+          note: 'op:"cost" must use mode, not action',
+        });
+      }
+      if ((obj as any).minCost !== undefined) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({ path, op, minCost: (obj as any).minCost }),
+          canonical: compact({ path, op, min_cost: (obj as any).minCost }),
+          note: 'op:"cost" must use min_cost, not minCost',
+        });
+      }
+    }
+
+    if (
+      op === "attacks_per_turn" &&
+      (obj as any).amount !== undefined &&
+      obj.value === undefined
+    ) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, amount: (obj as any).amount }),
+        canonical: compact({ path, op, value: (obj as any).amount }),
+        note: 'op:"attacks_per_turn" must use value, not amount',
+      });
+    }
+
+    if (
+      op === "repeat_effect" &&
+      (obj as any).effect &&
+      !(obj as any).effects
+    ) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, effect: "(object)" }),
+        canonical: compact({ path, op, effects: ["(array)"] }),
+        note: 'op:"repeat_effect" must use effects, not effect',
+      });
+    }
+
+    if (op === "summon" && (obj as any).filters) {
+      out.push({
+        family: "op-key-shape",
+        id: card.id,
+        name: card.name,
+        found: compact({ path, op, filters: (obj as any).filters }),
+        canonical: compact({ path, op, filter: (obj as any).filters }),
+        note: 'op:"summon" must use filter, not filters',
+      });
+    }
+
+    if (op === "stat") {
+      const badRandom =
+        obj.random === true ||
+        String((obj as any).pick || "").toLowerCase() === "random" ||
+        obj.distribution === "random";
+      if (badRandom) {
+        out.push({
+          family: "op-key-shape",
+          id: card.id,
+          name: card.name,
+          found: compact({
+            path,
+            op,
+            random: obj.random ?? null,
+            pick: (obj as any).pick ?? null,
+            distribution: obj.distribution ?? null,
+          }),
+          canonical: compact({
+            path,
+            op,
+            select_mode: "random",
+            select: obj.select ?? 1,
+          }),
+          note: 'random selection on op:"stat" must use select_mode:"random"',
+        });
+      }
+    }
+
+    if (op === "mode" && Array.isArray(obj.options)) {
+      for (let i = 0; i < obj.options.length; i++) {
+        const opt = obj.options[i];
+        if (!opt || typeof opt !== "object") continue;
+        const o = opt as Record<string, unknown>;
+        if (o.name && !o.label) {
+          out.push({
+            family: "op-key-shape",
+            id: card.id,
+            name: card.name,
+            found: compact({ path: `${path}.options[${i}]`, name: o.name }),
+            canonical: compact({
+              path: `${path}.options[${i}]`,
+              label: o.name,
+            }),
+            note: 'op:"mode" options must use label, not name',
+          });
+        }
+      }
+    }
+  });
+  return out;
+}
+
 function checkEnhanceInstead(card: CardJson): Warning[] {
   const desc = String(card.description ?? "");
   if (!/Enhance \(\d+\):[^\n]*\binstead\b/i.test(desc)) return [];
@@ -404,6 +580,9 @@ function main(): void {
     if (gateFilter === "all" || gateFilter === "enhance-instead") {
       warnings.push(...checkEnhanceInstead(card).map(tag));
     }
+    if (gateFilter === "all" || gateFilter === "op-key-shape") {
+      warnings.push(...checkOpKeyShape(card).map(tag));
+    }
   }
 
   // Dedupe identical warnings (same card can be walked via overlapping paths).
@@ -420,7 +599,8 @@ function main(): void {
     gateFilter === "select-count" ||
     gateFilter === "chosen-target" ||
     gateFilter === "evolve-target" ||
-    gateFilter === "enhance-instead";
+    gateFilter === "enhance-instead" ||
+    gateFilter === "op-key-shape";
   console.log(
     migrated
       ? `Canonical-form gate — ${gateFilter} (error mode when --fail)`
@@ -435,6 +615,7 @@ function main(): void {
   printFamily("chosen-target", unique);
   printFamily("evolve-target", unique);
   printFamily("enhance-instead", unique);
+  printFamily("op-key-shape", unique);
 
   console.log(
     `\nTotal warnings: ${unique.length}` +
