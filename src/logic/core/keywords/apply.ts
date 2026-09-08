@@ -192,11 +192,6 @@ export const KEYWORD_MAP: {
     ks.counters[key] = (ks.counters[key] || 0) + add;
   },
   skybound_art: () => {},
-  pixie_enter: (c, opts) => {
-    const ks = getKS(c);
-    ks.hasPixieEnter = true;
-    ks.pixieEnterEffects = Array.isArray(opts?.effects) ? opts.effects : [];
-  },
   bleed: (c, opts) => {
     const toLeader = Number(opts?.to_leader ?? 1);
     const toSelf = Number(opts?.to_self ?? 2);
@@ -206,11 +201,6 @@ export const KEYWORD_MAP: {
     ks.bleed = { toLeader, toSelf };
     (c as any).hasBleed = true;
     (c as any).bleed = { toLeader, toSelf };
-  },
-  ally_enter: (c, opts) => {
-    const ks = getKS(c);
-    ks.hasAllyEnter = true;
-    ks.allyEnterEffects = Array.isArray(opts?.effects) ? opts.effects : [];
   },
   cant_attack: (c, opts) => {
     // Single source of truth: keywordState only (keywords-contract §3).

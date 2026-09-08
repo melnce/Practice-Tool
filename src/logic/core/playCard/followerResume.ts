@@ -82,36 +82,6 @@ export function runPlayFollowerPostFanfare(resume: PlayFollowerResume): void {
 
     applyKeywordsFromList(live);
     recomputeAttackFlags(live);
-
-    const myBoard = getBoard(state, player);
-    for (const perm of myBoard) {
-      if (!perm || perm === live || perm.type !== "Amulet") continue;
-      const ks = perm.keywordState;
-      if (ks?.hasAllyEnter && Array.isArray(ks.allyEnterEffects)) {
-        for (const eff of ks.allyEnterEffects) {
-          if (eff.op === "stat" && eff.target === "trigger") {
-            live.attack =
-              (Number(live.attack) || 0) + (Number((eff as any).attack) || 0);
-            live.defense =
-              (Number(live.defense) || 0) + (Number((eff as any).defense) || 0);
-          }
-        }
-      }
-    }
-
-    if (card && Array.isArray(card.tribes) && card.tribes.includes("Pixie")) {
-      for (const perm of myBoard) {
-        if (!perm) continue;
-        const ks = perm.keywordState || {};
-        if (
-          perm.type === "Amulet" &&
-          ks.hasPixieEnter &&
-          Array.isArray(ks.pixieEnterEffects)
-        ) {
-          runEffects([...ks.pixieEnterEffects], player, perm);
-        }
-      }
-    }
   } finally {
     // Every completion path (orchestrateExecution, multi-pick discard, etc.)
     // must end the play sequence; idempotent for explicit follower.ts drain.

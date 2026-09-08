@@ -68,12 +68,6 @@ export interface KeywordState {
   counters?: { [key: string]: number };
 
   // Class Specific
-  hasPixieEnter?: boolean;
-  pixieEnterEffects?: Effect[];
-
-  hasAllyEnter?: boolean;
-  allyEnterEffects?: Effect[];
-
   hasBleed?: boolean;
   bleed?: {
     toLeader: number;

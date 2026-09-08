@@ -27,10 +27,6 @@ export const STATE_HASH_STATIC_EFFECT_EXCLUSIONS: Record<string, string> = {
     "static Rally script from card data; hasRally/rallyRequirement are hashed",
   triggers:
     "static trigger definitions from card data; not mutable runtime state",
-  pixieEnterEffects:
-    "static Pixie-enter script from card data; hasPixieEnter marker is hashed",
-  allyEnterEffects:
-    "static ally-enter script from card data; hasAllyEnter marker is hashed",
   fanfare: "static Fanfare script on card.fanfare; hasFanfare marker is hashed",
   enhanceTiers:
     "static Enhance tiers from card data; PP tier selection is play-time logic",
@@ -212,8 +208,6 @@ function canonicalizeKeywordRuntime(
   if (spellboostCost) raw.spellboost = spellboostCost;
   const ksCounters = canonicalizeCounterMap(ks.counters);
   if (ksCounters) raw.counters = ksCounters;
-  if (ks.hasPixieEnter) raw.hasPixieEnter = true;
-  if (ks.hasAllyEnter) raw.hasAllyEnter = true;
   if (ks.hasBleed) raw.hasBleed = true;
   const bleed = canonicalizeBleed(ks.bleed);
   if (bleed) raw.bleed = bleed;

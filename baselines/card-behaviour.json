@@ -139,13 +139,17 @@
       "status": "covered"
     },
     "10011210": {
-      "fingerprint": "5ec073f8",
+      "fingerprint": "687ed6df",
       "gatesSatisfied": [],
       "name": "Wild Profusion",
       "scenarios": [
         {
-          "fingerprint": "8fad581c",
+          "fingerprint": "a5e4ac2b",
           "scenario": "play"
+        },
+        {
+          "fingerprint": "4194eba4",
+          "scenario": "watch"
         }
       ],
       "status": "covered"
@@ -267,13 +271,13 @@
       "status": "covered"
     },
     "10022210": {
-      "fingerprint": "fb097f30",
+      "fingerprint": "00ae344a",
       "gatesSatisfied": [],
       "name": "Ancestral Crown",
       "scenarios": [
         {
-          "fingerprint": "160fa8a8",
-          "scenario": "vanilla_place"
+          "fingerprint": "3557b67f",
+          "scenario": "watch"
         }
       ],
       "status": "covered"
