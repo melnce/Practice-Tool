@@ -1059,7 +1059,7 @@
       "status": "covered"
     },
     "10113130": {
-      "fingerprint": "de2f523c",
+      "fingerprint": "3576c6b0",
       "gatesSatisfied": [],
       "name": "Bayle, Luxglaive Warrior",
       "scenarios": [
@@ -1068,7 +1068,7 @@
           "scenario": "play"
         },
         {
-          "fingerprint": "7bd480d8",
+          "fingerprint": "a93d0d98",
           "scenario": "in_hand"
         }
       ],
@@ -10455,17 +10455,13 @@
       "status": "covered"
     },
     "10862310": {
-      "fingerprint": "ed63273c",
+      "fingerprint": "01883f1f",
       "gatesSatisfied": [],
       "name": "Lingering Threat",
       "scenarios": [
         {
           "fingerprint": "76d4eb8c",
           "scenario": "play"
-        },
-        {
-          "fingerprint": "693920f0",
-          "scenario": "play_base"
         }
       ],
       "status": "covered"
