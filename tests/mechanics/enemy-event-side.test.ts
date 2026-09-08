@@ -1,6 +1,8 @@
 /**
- * enemy_* trigger events: activePlayer must be the acting side (entering/leaving
- * follower's owner), not the listener side. See process.ts ally_/enemy_ filters.
+ * enemy_* trigger events: fireTrigger() activePlayer must be the affected card's
+ * owner (the entering / leaving / banished / debuffed follower's owner), not the
+ * acting player and not the listener. Canonical statement: conditions.ts:157-160.
+ * See process.ts ally_/enemy_ filters.
  */
 import { describe, it, expect, beforeEach } from "vitest";
 import "./setup.js";
@@ -233,7 +235,7 @@ describe("enemy_* event activePlayer convention", () => {
     });
   });
 
-  describe("enemy_super_evolve (already correct — regression pin)", () => {
+  describe("enemy_super_evolve (routing: super-evolving follower's owner)", () => {
     it("hand follower gains keyword when opponent super-evolves", () => {
       givenGameState({ seed: 1, activePlayer: "second", roundCount: 7 })
         .withFirstHand(["10302110"])
