@@ -19,8 +19,6 @@ import type { KeywordState } from "../logic/core/keywords/types.js";
 export const STATE_HASH_STATIC_EFFECT_EXCLUSIONS: Record<string, string> = {
   lastWordsEffects:
     "static Last Words script from card data; hasLastWords marker is hashed",
-  strikeEffects:
-    "static Strike script from card data; hasStrike marker is hashed",
   engageEffects:
     "static Engage script from card data; engage runtime flags are hashed",
   rallyEffects:
@@ -194,7 +192,6 @@ function canonicalizeKeywordRuntime(
   if (ks.hasRally) raw.hasRally = true;
   if (ks.rallyRequirement != null) raw.rallyRequirement = ks.rallyRequirement;
   if (ks.hasFanfare) raw.hasFanfare = true;
-  if (ks.hasStrike) raw.hasStrike = true;
   if (ks.hasEngage) raw.hasEngage = true;
   if (ks.engageCost != null) raw.engageCost = ks.engageCost;
   if (ks.engageOncePerTurn === false) raw.engageOncePerTurn = false;

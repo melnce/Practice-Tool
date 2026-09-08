@@ -33,6 +33,7 @@ import {
   recomputeAttackFlags,
 } from "../../src/logic/core/combat.js";
 import { applyKeywordsFromList } from "../../src/logic/core/keywords.js";
+import { normalizeKeywordName } from "../../src/logic/core/keywords/registry.js";
 import { engageAmulet } from "../../src/logic/effects/ops/engage.js";
 import { consumeEarthSigils } from "../../src/logic/effects/ops/earth.js";
 import { startFuseFromHand } from "../../src/logic/index.js";
@@ -2801,14 +2802,9 @@ function isSkip(
 function hasEngageKeyword(card: CardInstance): boolean {
   const kws = (card as { keywords?: unknown[] }).keywords ?? [];
   for (const k of kws) {
-    if (typeof k === "string" && k === "Engage") return true;
-    if (
-      k &&
-      typeof k === "object" &&
-      (k as { name?: string }).name === "Engage"
-    ) {
-      return true;
-    }
+    const raw =
+      typeof k === "string" ? k : ((k as { name?: string }).name ?? "");
+    if (normalizeKeywordName(String(raw)) === "engage") return true;
   }
   return false;
 }

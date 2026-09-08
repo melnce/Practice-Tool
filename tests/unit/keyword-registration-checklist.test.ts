@@ -42,7 +42,6 @@ const STATE_HASH_CANONICAL: Record<string, string> = {
   cant_be_destroyed: "cannotBeDestroyed",
   rally: "hasRally",
   fanfare: "hasFanfare",
-  strike: "hasStrike",
   engage: "engagedThisTurn",
   spellboost: "hasSpellboost",
   counter: "keywordRuntime",

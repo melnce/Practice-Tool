@@ -25,6 +25,7 @@ import { checkOpKeysForCard } from "./op-keys-gate.js";
 import { checkDurationOpKeysForCard } from "./duration-op-gate.js";
 import { checkSelectTargetForCard } from "./select-target-gate.js";
 import { checkEnhanceSemanticsForCard } from "./enhance-semantics-gate.js";
+import { normalizeKeywordName } from "../src/logic/core/keywords/registry.js";
 import { checkAllAlliedIncludeSelfForCard } from "./all-allied-include-self-gate.js";
 import { checkBothLeadersForCard } from "./both-leaders-gate.js";
 import { checkWhenThisEvolvesForCard } from "./when-this-evolves-gate.js";
@@ -176,7 +177,7 @@ function asArray<T>(v: T[] | T | undefined | null): T[] {
   return Array.isArray(v) ? v : [v as T];
 }
 
-function allEffectRoots(card: CardJson): unknown[] {
+export function allEffectRoots(card: CardJson): unknown[] {
   const roots: unknown[] = [];
   roots.push(...asArray(card.spell));
   roots.push(...asArray(card.fanfare));
@@ -187,9 +188,10 @@ function allEffectRoots(card: CardJson): unknown[] {
   for (const k of card.keywords ?? []) {
     if (k && typeof k === "object") {
       const kw = k as { name?: string; effects?: unknown[] };
-      if (kw.name === "Engage" && kw.effects) roots.push(...kw.effects);
-      if (kw.name === "Enhance" && kw.effects) roots.push(...kw.effects);
-      if (kw.name === "Countdown" && kw.effects) roots.push(...kw.effects);
+      const kwName = normalizeKeywordName(String(kw.name ?? ""));
+      if (kwName === "engage" && kw.effects) roots.push(...kw.effects);
+      if (kwName === "enhance" && kw.effects) roots.push(...kw.effects);
+      if (kwName === "countdown" && kw.effects) roots.push(...kw.effects);
     }
   }
   return roots;

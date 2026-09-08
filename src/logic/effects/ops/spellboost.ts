@@ -39,6 +39,27 @@ function getSpellboostKeyword(card: CardInstance) {
   return null;
 }
 
+function getSpellboostCostReductionFromKeyword(kw: Record<string, unknown>): {
+  reduceBy: number;
+  minCost: number;
+} | null {
+  const hasCostSpec =
+    kw.reduceCostBy != null ||
+    kw.reduce_cost_by != null ||
+    kw.minCost != null ||
+    kw.min_cost != null;
+  if (!hasCostSpec) return null;
+
+  const reduceBy = Number(kw.reduceCostBy ?? kw.reduce_cost_by ?? 1);
+  if (!Number.isFinite(reduceBy) || reduceBy <= 0) return null;
+
+  const minCost = Number(kw.minCost ?? kw.min_cost ?? 0);
+  return {
+    reduceBy,
+    minCost: Number.isFinite(minCost) ? minCost : 0,
+  };
+}
+
 function normTimes(x: any) {
   if (typeof x === "number" && Number.isFinite(x) && x > 0) return x;
   if (x && typeof x === "object") {
@@ -101,6 +122,23 @@ export function handleSetSpellboostCount(eff: any, sourceCard: CardInstance) {
   // Re-rendering happens periodically
 }
 
+function applySpellboostCostFromKeyword(
+  card: CardInstance,
+  kw: Record<string, unknown>,
+) {
+  const costReduction = getSpellboostCostReductionFromKeyword(kw);
+  if (!costReduction) return;
+
+  applySpellboostCostReduction(card, costReduction.reduceBy);
+  if (costReduction.minCost > 0) {
+    const floor = costReduction.minCost;
+    const current = parseInt(String(card.cost), 10) || 0;
+    if (current < floor) {
+      card.cost = floor;
+    }
+  }
+}
+
 /* ------------------------ main ------------------------ */
 
 /**
@@ -144,15 +182,10 @@ export function spellboostHand(
         // increment counter first
         incSB(targetCard);
 
-        // optional cost reduction (only if keyword specifies)
-        if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
-          const reduceBy: number = Number.isFinite(kw.reduceCostBy)
-            ? Number(kw.reduceCostBy)
-            : 0;
-          if (reduceBy > 0) {
-            applySpellboostCostReduction(targetCard, reduceBy);
-          }
-        }
+        applySpellboostCostFromKeyword(
+          targetCard,
+          kw as Record<string, unknown>,
+        );
         logEvent("spellboost", {
           owner,
           card: targetCard.name,
@@ -173,15 +206,7 @@ export function spellboostHand(
         // increment counter first
         incSB(c);
 
-        // optional cost reduction (opt-in per keyword)
-        if (Object.prototype.hasOwnProperty.call(kw, "reduceCostBy")) {
-          const reduceBy: number = Number.isFinite(kw.reduceCostBy)
-            ? Number(kw.reduceCostBy)
-            : 0;
-          if (reduceBy > 0) {
-            applySpellboostCostReduction(c, reduceBy);
-          }
-        }
+        applySpellboostCostFromKeyword(c, kw as Record<string, unknown>);
         logEvent("spellboost", {
           owner,
           card: c.name,

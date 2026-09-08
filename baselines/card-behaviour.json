@@ -1299,12 +1299,12 @@
       "status": "covered"
     },
     "10123110": {
-      "fingerprint": "54f6e72c",
+      "fingerprint": "b8976754",
       "gatesSatisfied": [],
       "name": "Jeno, Levin Axeraider",
       "scenarios": [
         {
-          "fingerprint": "0d312f5c",
+          "fingerprint": "1ac23a20",
           "scenario": "combat"
         }
       ],

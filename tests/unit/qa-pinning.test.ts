@@ -266,7 +266,7 @@ describe("two-keyword tier caveat", () => {
       "not a coverage guarantee",
     );
     expect(report.pinnedAnswerOnlyFileScopedCount).toBe(71);
-    expect(report.pinnedAnswerOnlyBlockScopedMin2Count).toBe(16);
+    expect(report.pinnedAnswerOnlyBlockScopedMin2Count).toBe(18);
     expect(report.pinnedCount).toBe(141);
     expect(report.pinnedFileScopedCount).toBe(149);
     expect(QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS).toBe(
