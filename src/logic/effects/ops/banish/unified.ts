@@ -264,6 +264,18 @@ function applyFilters(
 
   let result = pool;
 
+  const wantName = filters.name ? String(filters.name).trim() : null;
+  if (wantName) {
+    result = result.filter((c) => String(c.name) === wantName);
+  }
+
+  const wantType = filters.type ? String(filters.type).toLowerCase() : null;
+  if (wantType) {
+    result = result.filter(
+      (c) => String(c.type || "").toLowerCase() === wantType,
+    );
+  }
+
   if (filters.defense_lte !== undefined) {
     const cap = parseInt(String(filters.defense_lte), 10);
     if (Number.isFinite(cap)) {
