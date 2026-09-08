@@ -1025,7 +1025,7 @@ export function runSweepCase(
   const crestBefore = getCrests(state, "first").length;
   const hashBefore = hashGameState(state);
 
-  let outcomeKind: SweepCaseRecord["outcomeKind"] = "threw";
+  let outcomeKind: SweepCaseRecord["outcomeKind"];
   let outcomeReason: string | null = null;
 
   let playEvents: PlayLogEvent[] = [];
@@ -1041,6 +1041,8 @@ export function runSweepCase(
       exception = summarizeException(err);
       outcomeKind = "threw";
     }
+  } else {
+    outcomeKind = "threw";
   }
 
   const ppAfter = getPP(state, "first");

@@ -241,7 +241,7 @@ describe("Set 10007 — Anathema's Gambit", () => {
     state.players.first.hp = 15;
     whenPlayCard("first", 0);
     expect(findOnBoard("first", "Draconic Part-Timer")?.hasEvolved).toBe(true);
-    whenEndTurn("first");
+    whenEndTurn();
     expect(getHP(state, "first")).toBe(17);
   });
 
@@ -327,7 +327,7 @@ describe("Set 10007 — Anathema's Gambit", () => {
       true,
     );
     const handBefore = getHand(state, "first").length;
-    whenEndTurn("first");
+    whenEndTurn();
     expect(getHand(state, "first").length).toBe(handBefore + 1);
   });
 

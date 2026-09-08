@@ -36,7 +36,12 @@ async function main() {
   win.cardDatabase = mockDB;
 
   console.log("Starting test...");
-  const { state } = await startNewGame();
+  const { state } = await startNewGame({
+    deckAId: "default",
+    deckBId: "default",
+    seed: 42,
+    skipMulligan: true,
+  });
 
   state.roundCount = 8;
   state.bluePP = 10;

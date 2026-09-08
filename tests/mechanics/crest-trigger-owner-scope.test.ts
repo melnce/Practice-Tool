@@ -77,7 +77,7 @@ function counter(owner: "first" | "second", crestName: string): number {
 }
 
 function grantProbeCrest(
-  event: TriggerEventName,
+  event: TriggerEventName | "end_of_turn_own" | "start_of_turn_own",
   triggerExtra: Record<string, unknown> = {},
 ): string {
   const crestName = `Probe:${event}`;

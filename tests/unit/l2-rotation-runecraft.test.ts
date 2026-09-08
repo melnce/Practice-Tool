@@ -925,12 +925,11 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       const gluttony = thenHand("first").find(
         (c) => c.id === BOTTOMLESS_GLUTTONY,
       )!;
-      const cost0 = getEffectiveCost(gluttony, "first");
+      const cost0 = getEffectiveCost(gluttony);
       setScriptedModePickProvider(() => [1]);
       whenPlayCard("first", 1);
       const cost1 = getEffectiveCost(
         thenHand("first").find((c) => c.id === BOTTOMLESS_GLUTTONY)!,
-        "first",
       );
       expect(cost1).toBe(cost0 - 1);
       expect(printed).toContain("reduce the cost");
@@ -1034,12 +1033,11 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R6, { hand: [HEEL_MY_DEARIE, DAZZLING_RUNEKNIGHT], pp: 6 });
       placeEarthSigils(1);
       const dearie = thenHand("first").find((c) => c.id === HEEL_MY_DEARIE)!;
-      const cost0 = getEffectiveCost(dearie, "first");
+      const cost0 = getEffectiveCost(dearie);
       setScriptedModePickProvider(() => [1]);
       whenPlayCard("first", 1);
       const cost1 = getEffectiveCost(
         thenHand("first").find((c) => c.id === HEEL_MY_DEARIE)!,
-        "first",
       );
       expect(cost1).toBe(cost0 - 1);
     });
@@ -1667,7 +1665,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
     it("without spellboost: cost remains 10", () => {
       setupTurn(R10, { hand: [BLAZE_DESTROYER], pp: 10 });
       const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
-      expect(getEffectiveCost(blaze, "first")).toBe(10);
+      expect(getEffectiveCost(blaze)).toBe(10);
     });
 
     it("after 2 spellboosts: cost reduced by 2", () => {
@@ -1675,7 +1673,7 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       playForesights(2);
       const blaze = thenHand("first").find((c) => c.id === BLAZE_DESTROYER)!;
       expect(sbCount(blaze)).toBe(2);
-      expect(getEffectiveCost(blaze, "first")).toBe(8);
+      expect(getEffectiveCost(blaze)).toBe(8);
       expect(printed).toContain("Reduce the cost");
     });
   });
@@ -1688,11 +1686,10 @@ describe("L2 Rotation Runecraft — real-card tests", () => {
       setupTurn(R10, { hand: [CALGE_DANTHLA, CRYSTALSPAWN], pp: 10 });
       crestAddCounter("first", CALGE_FAITH, "faith", 0);
       const calge = thenHand("first").find((c) => c.id === CALGE_DANTHLA)!;
-      const cost0 = getEffectiveCost(calge, "first");
+      const cost0 = getEffectiveCost(calge);
       whenPlayCard("first", 1);
       const cost1 = getEffectiveCost(
         thenHand("first").find((c) => c.id === CALGE_DANTHLA)!,
-        "first",
       );
       expect(cost1).toBe(cost0 - 1);
       expect(printed).toContain("reduce the cost");

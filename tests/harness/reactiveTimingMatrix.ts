@@ -54,7 +54,7 @@ function noConsumerSkip(
   source: TriggerConsumerSource,
   reason: string,
 ): V2SkipResult {
-  const tallies = countPoolTriggerConsumers(event);
+  const tallies = countPoolTriggerConsumers(event, source);
   const bucket = tallies[source];
   return {
     kind: "no_consumer",
@@ -1261,7 +1261,11 @@ export function enemyWatcherOwner(actor: PlayerSlot): PlayerSlot {
 }
 
 export function makeV2Watcher(
-  event: ReactiveEvent | V2RemainingEvent,
+  event:
+    | ReactiveEvent
+    | V2RemainingEvent
+    | V2HandEvent
+    | "enemy_follower_defense_down",
   owner: PlayerSlot,
   opts: V2WatcherOptions = {},
 ): CardInstance {
@@ -1532,9 +1536,6 @@ function installLeaveVictim(owner: PlayerSlot, mode: LeaveMode): CardInstance {
     c.keywordState = { ...(c.keywordState ?? {}), banishOnDeath: true };
     return c;
   }
-  if (mode === "ally_ward_destroyed") {
-    return wardVictim(owner);
-  }
   return leaveVictim(owner);
 }
 
@@ -1674,7 +1675,7 @@ export interface V2MatrixRunResult extends MatrixRunResult {
 
 export interface V2MatrixCellOptions {
   context: V2Context;
-  event: ReactiveEvent | V2RemainingEvent;
+  event: ReactiveEvent | V2RemainingEvent | V2HandEvent;
   axis:
     | "enemy_enter"
     | "enemy_leave"
