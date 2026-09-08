@@ -40,6 +40,7 @@ import {
   v2HandSkipReason,
   v2EnemyEnterSkipReason,
   v2EnemyLeaveSkipReason,
+  v2EnemyLeaveExpectFired,
   v2RemainingSkipReason,
   skipReasonText,
   HAND_EVENTS_WITH_CARD_POOL_SOURCE,
@@ -123,6 +124,7 @@ describe("Reactive trigger timing matrix v2", () => {
             event: "enemy_follower_leaves_field",
             axis: "enemy_leave",
             leaveMode,
+            expectFired: v2EnemyLeaveExpectFired(leaveMode),
           });
           assertV2ReactiveInvariants(run, {
             event: "enemy_follower_leaves_field",
@@ -463,14 +465,11 @@ describe("Reactive trigger timing matrix v2", () => {
       return { enterWatcher, leaveWatcher, victim };
     }
 
-    it.fails(
-      "transform must raise leaves_field for the transformed follower (rulebook line 591)",
-      () => {
-        const { leaveWatcher, victim } = setupTransformPin();
-        transformTarget(victim, "Goblin");
-        expect(watcherEarth("first", leaveWatcher.uid)).toBe(1);
-      },
-    );
+    it("transform does not raise leaves_field (owner ruling 2026-09-08; 効果処理 wiki)", () => {
+      const { leaveWatcher, victim } = setupTransformPin();
+      transformTarget(victim, "Goblin");
+      expect(watcherEarth("first", leaveWatcher.uid)).toBe(0);
+    });
 
     it("transform: no Last Words, no shadow; uid preserved in place (rulebook line 588)", () => {
       const { enterWatcher, victim } = setupTransformPin();
@@ -485,8 +484,7 @@ describe("Reactive trigger timing matrix v2", () => {
       const goblin = getBoard(state, "first").find((c) => c?.name === "Goblin");
       expect(goblin).toBeTruthy();
       expect(goblin!.uid).toBe(uid);
-      // Enter on transform is undecided: rulebook line 588 is "as if banished + summoned"
-      // but the owner has not settled whether enter triggers fire; transform.ts disables both.
+      // Owner ruling 2026-09-08 + 効果処理 wiki: transform is not an enter either.
       expect(watcherEarth("first", enterWatcher.uid)).toBe(0);
     });
 
