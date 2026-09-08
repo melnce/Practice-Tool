@@ -55,8 +55,38 @@ export const fx = {
       "target",
     ]);
     expect(
-      violations.every((v) => v.message.includes("returnHandToDeck")),
+      violations
+        .filter((v) => v.key === "filter" || v.key === "condition")
+        .every((v) => v.message.includes("returnHandToDeck")),
     ).toBe(true);
+    const targetViolation = violations.find((v) => v.key === "target");
+    expect(targetViolation?.message.includes("delete the key")).toBe(false);
+    expect(
+      violations
+        .filter((v) => v.key === "filter" || v.key === "condition")
+        .every((v) => v.message.includes("delete the key")),
+    ).toBe(true);
+  });
+
+  it("deck return target violation does not tell reader to delete target", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "dangerous-keys-"));
+    const file = path.join(dir, "deck-target-msg.test.ts");
+    fs.writeFileSync(
+      file,
+      `
+export const fx = {
+  op: "return",
+  destination: "deck",
+  target: "ally:follower",
+  filter: { name: "Skeleton" },
+};
+`,
+    );
+    const violations = scanEffectLiteralFiles([file], dir);
+    const targetViolation = violations.find((v) => v.key === "target");
+    expect(targetViolation).toBeDefined();
+    expect(targetViolation!.message).not.toMatch(/delete the key/i);
+    expect(targetViolation!.message).toMatch(/return\/unified\.ts:37-40/);
   });
 
   it("flags condition on return op with destination deck", () => {

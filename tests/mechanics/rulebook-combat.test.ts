@@ -1444,6 +1444,7 @@ describe("Rulebook L567–577 — Destruction vs other removal", () => {
         {
           op: "return",
           destination: "deck",
+          target: "ally:hand",
         },
       ] as Effect[],
       "first",

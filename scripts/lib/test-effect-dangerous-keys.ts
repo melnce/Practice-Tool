@@ -46,9 +46,11 @@ const HANDLER_REF = {
   returnHandFilter:
     'handleReturnToHand (src/logic/effects/ops/bounce.ts:135,144) reads eff.condition and eff.filters?.type, not eff.filter — use "condition" instead',
   returnHandUnknownDestinationFilter:
-    '"filter" on op "return" is silently ignored — handleReturnToHand reads eff.condition and eff.filters?.type, not eff.filter (when destination is absent or not a string literal, flag conservatively)',
+    "handleReturnToHand reads eff.condition and eff.filters?.type, not eff.filter (when destination is absent or not a string literal, flag conservatively)",
   returnDeckInertKey:
-    "handleReturnHandToDeck (src/logic/effects/ops/returnHandToDeck.ts:95-201) never calls getPool and reads none of filter, condition, or target — delete the key",
+    "handleReturnHandToDeck (src/logic/effects/ops/returnHandToDeck.ts:95-201) never calls getPool and reads none of filter or condition — delete the key",
+  returnDeckTargetKey:
+    "handleReturnHandToDeck ignores target for selection, but handleReturn (src/logic/effects/ops/return/unified.ts:37-40) requires target — delete filter/condition instead; this violation clears once they are removed",
   keywordFilter:
     "keyword routing (src/logic/core/effects/domains/buffs.ts:92) reads eff.filters, not eff.filter",
   cardFilterBareStat:
@@ -195,7 +197,7 @@ function checkReturnOpKeys(
             : obj.getStartLineNumber(),
         op: "return",
         key: "target",
-        message: `"target" on op "return" with destination:"deck" is silently ignored — ${HANDLER_REF.returnDeckInertKey}`,
+        message: `"target" on op "return" with destination:"deck" is silently ignored for selection — ${HANDLER_REF.returnDeckTargetKey}`,
       });
     }
 

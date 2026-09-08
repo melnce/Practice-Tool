@@ -45,6 +45,7 @@ describe("op:return destination:deck honours the canonical `select` spelling", (
       op: "return",
       destination: "deck",
       select: 2,
+      target: "ally:hand",
     };
     expect(handleReturnHandToDeck(eff, "first" as any, [])).toBe("pending");
     expect((getPendingTarget() as any).selectCount).toBe(2);
@@ -55,6 +56,7 @@ describe("op:return destination:deck honours the canonical `select` spelling", (
       op: "return",
       destination: "deck",
       select: "all",
+      target: "ally:hand",
     };
     expect(handleReturnHandToDeck(eff, "first" as any, [])).toBe("done");
     expect(getHand(state as any, "first").length).toBe(0);
@@ -67,6 +69,7 @@ describe("op:return destination:deck honours the canonical `select` spelling", (
       destination: "deck",
       select: 2,
       select_mode: "random",
+      target: "ally:hand",
     };
     expect(handleReturnHandToDeck(eff, "first" as any, [])).toBe("done");
     expect(getDeck(state as any, "first").length).toBe(2);
