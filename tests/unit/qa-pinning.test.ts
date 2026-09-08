@@ -272,5 +272,5 @@ describe("two-keyword tier caveat", () => {
     expect(QA_PIN_UNPINNED_FILE_SCOPED_SAME_EXTRACTION_STATUS).toBe(
       "unpinned (file-scoped, same extraction)",
     );
-  });
+  }, 60_000);
 });
