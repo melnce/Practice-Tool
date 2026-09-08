@@ -3,11 +3,14 @@
  *
  * Measured on origin/main (2026-09-08) via resolveTargetProbe + afterEach in
  * tests/fixtures/setup.ts (keys use task.fullTestName when present):
- *   Before gate: 31 no-prompt calls across 25 tests in 17 files
+ *   Before gate (historical, measured on origin/main at gate introduction): 31 no-prompt
+ *     calls across 25 tests in 17 files
  *     (vitest.config.ts + vitest.audit.config.ts — audit config shares setup.ts,
  *      so the afterEach gate runs there too; npm run check runs test:audit before test)
- *   After gate + mechanics (B) fixes: 21 calls covered by 16 (A) rows below;
+ *   After gate + mechanics (B) fixes: 15 calls covered by 10 (A) rows below;
  *     10 (B) sites fixed by removing the dead resolvePendingTarget call
+ *   Board-route transform fix (PR #368): rows 7, 9, 10, 11, 12, 13 deleted — those
+ *     resolvePendingTarget calls now consume a real prompt instead of no-op'ing
  *
  * Classifications:
  *   A — No-op is legitimate or is itself the subject (soak replay, L2 harness idempotency, etc.)
