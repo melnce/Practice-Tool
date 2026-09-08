@@ -459,7 +459,7 @@ describe("negative-space filters — highest-attack random picks", () => {
     const bruiser = enemyFollower(7, 5, "Bruiser");
     const weak = enemyFollower(2, 5, "Weak");
     whenPlayCard("first", 0);
-    expect(bruiser.attack).toBeLessThanOrEqual(-3);
+    expect(bruiser.attack).toBe(0);
     expect(weak.attack).toBe(2);
   });
 

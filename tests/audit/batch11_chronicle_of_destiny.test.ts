@@ -346,7 +346,7 @@ describe("Set 10008 — Chronicle of Destiny", () => {
     setupTurn(6, { hand: ["10822310"], pp: 4 });
     const baseFoe = enemyFollower(5, 3, "Bruiser");
     whenPlayCard("first", 0);
-    expect(baseFoe.attack).toBeLessThanOrEqual(-5);
+    expect(baseFoe.attack).toBe(0);
     expect(baseFoe.defense).toBeLessThanOrEqual(-7);
     cleanupDead();
     expect(findOnBoard("second", "Bruiser")).toBeFalsy();
@@ -355,7 +355,7 @@ describe("Set 10008 — Chronicle of Destiny", () => {
     setupTurn(6, { hand: ["10822310"], pp: 6 });
     const enhanceFoe = enemyFollower(5, 3, "Bruiser");
     whenPlayCard("first", 0);
-    expect(enhanceFoe.attack).toBeLessThanOrEqual(-5);
+    expect(enhanceFoe.attack).toBe(0);
     expect(enhanceFoe.defense).toBeLessThanOrEqual(-7);
     cleanupDead();
     expect(findOnBoard("second", "Bruiser")).toBeFalsy();

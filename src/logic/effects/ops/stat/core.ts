@@ -22,7 +22,10 @@ export function applyStatBuff(
   target.buffs.attack = (target.buffs.attack ?? 0) + a;
   target.buffs.defense = (target.buffs.defense ?? 0) + d;
 
-  (target as any).attack = (parseInt(String(target.attack)) || 0) + a;
+  (target as any).attack = Math.max(
+    0,
+    (parseInt(String(target.attack)) || 0) + a,
+  );
   (target as any).defense = (parseInt(String(target.defense)) || 0) + d;
   if (!target.potential_attack)
     target.potential_attack = (target.base_attack ||

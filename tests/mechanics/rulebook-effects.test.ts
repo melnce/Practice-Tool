@@ -1022,20 +1022,20 @@ describe("Rulebook L585–598 — stat modification hierarchy", () => {
     expect(Number(card.defense)).toBe(5);
   });
 
-  it("attack debuff floors dealt damage at 0; internal attack may go negative then buff", () => {
+  it("attack debuff floors at 0; subsequent buff adds from floored value", () => {
     const card = readyFollower("Debuff", "first", { attack: 5, defense: 5 });
     const foe = readyFollower("Foe", "second", { defense: 10 });
     state.players.first.board = [card];
     state.players.second.board = [foe];
     applyStatBuff(card, -7, 0, "first");
-    expect(Number(card.attack)).toBe(-2);
+    expect(Number(card.attack)).toBe(0);
 
     card.can_attack = true;
     attackFollower(0, 0, "first", "second");
     expect(Number(foe.defense)).toBe(10);
 
     applyStatBuff(card, 3, 0, "first");
-    expect(Number(card.attack)).toBe(1);
+    expect(Number(card.attack)).toBe(3);
   });
 
   it("0-attack follower with Bane still destroys combat target", () => {
