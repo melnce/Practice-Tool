@@ -76,7 +76,9 @@ function engineGapSkip(reason: string, cardIds: string[]): V2SkipResult {
 
 /**
  * Classified skip reasons in the v2 reactive-timing matrix (2026-09-08 audit).
- * Engine gaps: 1 (transform leaves_field). Former "seven engine gaps" doc claim was wrong.
+ * Replaces "seven engine gaps" in claude/phase-b-harness-scenarios-2026-09-07.md
+ * (wrong in both directions: 6× overstated engine gaps, 12× understated total skips).
+ * Measured: 19 unique skips — 1 engine gap (transform leaves_field), 14 harness, 4 no-consumer.
  */
 export const V2_SKIP_ENGINE_GAP_TOTAL = 1;
 
@@ -1458,7 +1460,7 @@ export function v2EnemyLeaveSkipReason(
 ): V2SkipResult | null {
   if (leaveMode === "transform") {
     return engineGapSkip(
-      "transform does not raise leaves_field (transform.ts — intentional no enter/leave); rulebook §Destruction vs Other Removal: transform counts as leaving play for leaves-play triggers",
+      "transform does not raise leaves_field (transform.ts:668,741 — deliberate no enter/leave); rulebook line 591 (Leaves-play triggers): transform counts as leaving play; banish fires leaves_field in engine (banish/primitives.ts) and transform is rulebook line 588 'as if banished + summoned'",
       ["10113130", "10553110"],
     );
   }
