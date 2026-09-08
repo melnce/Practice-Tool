@@ -500,7 +500,7 @@ describe("L2 — Rotation Abysscraft", () => {
 
   describe("Congregant of Unkilling (10313110)", () => {
     const printed =
-      "When this card enters the field, summon an exact copy of it and give the exact copy -0/-1.";
+      "When this card enters the field, summon an exact copy of it and give the exact copy -0/-1.\nRush\nWard";
 
     it("exact copy keeps -0/-1 and source current stats (buffed source)", () => {
       setupTurn(R10, { hand: [CONGREGANT_OF_UNKILLING], pp: 9 });
