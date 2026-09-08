@@ -12,6 +12,7 @@ import {
   allocateInsertionTs,
   bumpZoneVersion,
 } from "../core/triggers/utils.js";
+import { normalizeKeywordName } from "../core/keywords/registry.js";
 
 // =============================================================================
 // CREST TYPES
@@ -340,13 +341,15 @@ export function processCrestEvent(owner: Player, event: string) {
 
 /** True if crest destruction should fire its effects payload (Last Words only). */
 function crestHasLastWords(crest: Crest): boolean {
-  // Accepts: string "LastWords"/"lastwords" OR object {name: "LastWords"}
+  // Accepts: string "LastWords"/"lastwords"/"Last Words" OR object {name: "LastWords"}
   return (
     (Array.isArray(crest.keywords) &&
       crest.keywords.some(
         (k: any) =>
-          (typeof k === "string" && k.toLowerCase() === "lastwords") ||
-          (typeof k === "object" && k !== null && k.name === "LastWords"),
+          (typeof k === "string" && normalizeKeywordName(k) === "last_words") ||
+          (typeof k === "object" &&
+            k !== null &&
+            normalizeKeywordName(k.name ?? "") === "last_words"),
       )) ||
     (!!crest.description &&
       crest.description.toLowerCase().includes("last words"))

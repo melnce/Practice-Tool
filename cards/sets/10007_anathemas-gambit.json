@@ -147,8 +147,8 @@
     "superevolve": [],
     "keywords": [
       {
-        "name": "countdown",
-        "count": 1
+        "name": "Countdown",
+        "turns": 1
       },
       {
         "name": "Engage",
@@ -252,7 +252,7 @@
             "image": "images/crests/illamrita_designated_target.png",
             "description": "Countdown (2)\nLast Words: Summon an Illamrita, Designated Target and evolve it.",
             "countdown": 2,
-            "keywords": ["Last Words"],
+            "keywords": ["LastWords"],
             "effects": [
               {
                 "op": "summon",
@@ -284,7 +284,7 @@
             "op": "keyword",
             "action": "grant",
             "target": "clash_opponent",
-            "keywords": ["cant_attack"]
+            "keywords": ["Can't Attack"]
           },
           {
             "op": "keyword",

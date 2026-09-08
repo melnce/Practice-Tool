@@ -167,7 +167,7 @@ export function checkKeywordNamesForCard(
         cardId: card.id,
         cardName: card.name,
         jsonPath,
-        kind: "warn",
+        kind: "error",
         message: `non-canonical keyword spelling "${raw}" at ${jsonPath} — canonical is "${canonical}"`,
         rawKeyword: raw,
         normalizedKeyword: normalized,

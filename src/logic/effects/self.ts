@@ -49,7 +49,7 @@ export function handleStatSelf(sourceCard: CardInstance, eff: Effect) {
   }
 
   // Track temporary buffs if specified
-  if (eff.until_end_of_turn) {
+  if (eff.until_end_of_turn || (eff as any).until_eot) {
     if (!sourceCard.temporaryBuffs) sourceCard.temporaryBuffs = [];
     sourceCard.temporaryBuffs.push({
       attack: a,
@@ -232,7 +232,7 @@ export function handleDynamicStatSelf(
   );
 
   // Track temporary buffs if specified
-  if (eff.until_end_of_turn) {
+  if (eff.until_end_of_turn || (eff as any).until_eot) {
     if (!sourceCard.temporaryBuffs) sourceCard.temporaryBuffs = [];
     sourceCard.temporaryBuffs.push({
       attack: a,

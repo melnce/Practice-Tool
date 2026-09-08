@@ -1744,7 +1744,7 @@
                 "target": "self",
                 "attack": 1,
                 "defense": 0,
-                "until_eot": true
+                "until_end_of_turn": true
               }
             ]
           }
