@@ -29,6 +29,12 @@ function allyFollower(name: string, atk = 2, def = 2) {
   return c;
 }
 
+function allyAmulet(name: string) {
+  const c = createCard({ name, type: "Amulet", cost: 2 }, "board", "first");
+  state.players.first.board.push(c);
+  return c;
+}
+
 describe("board-route object filters", () => {
   beforeEach(() => {
     resetUidCounter();
@@ -84,6 +90,30 @@ describe("board-route object filters", () => {
       expect(thenBoard("first").length).toBe(1);
       expect(bystander.uid).toBe(findOnBoard("first", "Bystander")!.uid);
       expect(getBanish(state, "first").some((c) => c.uid === victim.uid)).toBe(
+        true,
+      );
+    });
+
+    it("banishes only cards matching filter.type when follower and amulet share the pool", () => {
+      const follower = allyFollower("BoardFollower");
+      const amulet = allyAmulet("BoardAmulet");
+
+      whenRunEffects(
+        [
+          {
+            op: "banish",
+            target: "ally:any",
+            filter: { type: "Amulet" },
+          },
+        ],
+        "first",
+      );
+
+      expect(findOnBoard("first", "BoardFollower")).toBeTruthy();
+      expect(findOnBoard("first", "BoardAmulet")).toBeFalsy();
+      expect(thenBoard("first").length).toBe(1);
+      expect(follower.uid).toBe(findOnBoard("first", "BoardFollower")!.uid);
+      expect(getBanish(state, "first").some((c) => c.uid === amulet.uid)).toBe(
         true,
       );
     });
