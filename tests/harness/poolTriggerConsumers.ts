@@ -76,8 +76,10 @@ export const PINNED_POOL_TRIGGER_CONSUMER_COUNTS: Record<
   loot_played: { hand: 0, board: 1, deck: 0 },
   ally_ward_destroyed: { hand: 0, board: 1, deck: 0 },
   ally_amulet_destroyed: { hand: 0, board: 1, deck: 0 },
-  ally_follower_leaves_field: { hand: 1, board: 1, deck: 0 },
+  ally_follower_leaves_field: { hand: 1, board: 0, deck: 0 },
   enemy_follower_leaves_field: { hand: 0, board: 0, deck: 0 },
+  ally_follower_destroyed: { hand: 0, board: 1, deck: 0 },
+  enemy_follower_destroyed: { hand: 0, board: 1, deck: 0 },
   invoke: { hand: 0, board: 0, deck: 0 },
   engage: { hand: 1, board: 3, deck: 0 },
 };

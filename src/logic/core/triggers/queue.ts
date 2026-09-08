@@ -14,6 +14,7 @@
  * - ally_follower_enter, enemy_follower_enter
  * - ally_follower_played
  * - ally_follower_leaves_field, enemy_follower_leaves_field
+ * - ally_follower_destroyed, enemy_follower_destroyed
  * - ally_ward_destroyed
  * - enemy_follower_defense_down
  * - ally_evolve, ally_super_evolve, enemy_super_evolve

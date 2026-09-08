@@ -43,6 +43,8 @@ export type TriggerEventName =
   | "ally_follower_played"
   | "ally_follower_leaves_field" // When YOUR follower leaves the field
   | "enemy_follower_leaves_field" // When ENEMY follower leaves the field
+  | "ally_follower_destroyed" // When YOUR follower is destroyed (not bounce/banish)
+  | "enemy_follower_destroyed" // When ENEMY follower is destroyed (not bounce/banish)
   | "ally_ward_destroyed"
   | "enemy_follower_defense_down"
   // Self state changes
@@ -87,6 +89,8 @@ export const TRIGGER_EVENT_NAMES: ReadonlySet<TriggerEventName> = new Set([
   "ally_follower_played",
   "ally_follower_leaves_field",
   "enemy_follower_leaves_field",
+  "ally_follower_destroyed",
+  "enemy_follower_destroyed",
   "ally_ward_destroyed",
   "enemy_follower_defense_down",
   "self_damaged",
