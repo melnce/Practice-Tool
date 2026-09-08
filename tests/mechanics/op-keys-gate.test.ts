@@ -60,6 +60,40 @@ describe("op-keys gate — trigger condition keys", () => {
     });
     expect(issues).toHaveLength(0);
   });
+
+  it("rejects still_alive on a non-damage-victim trigger event", () => {
+    const issues = checkTriggerConditionKeysForCard({
+      id: "BAD_STILL_ALIVE",
+      name: "Bad Still Alive",
+      description: "test",
+      triggers: [
+        {
+          event: "end_of_turn",
+          condition: { whose_turn: "owner", still_alive: true },
+          effects: [],
+        },
+      ],
+    });
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues[0]?.message).toMatch(
+      /still_alive.*not a damage-victim event/i,
+    );
+  });
+
+  it("allows still_alive on self_damaged trigger", () => {
+    const issues = checkTriggerConditionKeysForCard({
+      id: "OK_STILL_ALIVE",
+      name: "Ok Still Alive",
+      triggers: [
+        {
+          event: "self_damaged",
+          condition: { still_alive: true },
+          effects: [],
+        },
+      ],
+    });
+    expect(issues).toHaveLength(0);
+  });
 });
 
 describe("op-keys gate — crest is_faith", () => {

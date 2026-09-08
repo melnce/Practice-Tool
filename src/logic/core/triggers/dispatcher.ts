@@ -74,6 +74,13 @@ const EVENT_HANDLERS: Record<string, EventHandler> = {
   enhanced_play: handleGenericEvent,
 };
 
+/** Events whose handler supplies context.damagedCard (still_alive subject). */
+export const TRIGGER_EVENTS_WITH_DAMAGE_VICTIM: ReadonlySet<string> = new Set(
+  Object.entries(EVENT_HANDLERS)
+    .filter(([, handler]) => handler === handleDamageEvent)
+    .map(([event]) => event),
+);
+
 export function dispatchEvent(
   event: TriggerEventName,
   activePlayer: Player, // legacy calls it activePlayer, but context.owner might differ
