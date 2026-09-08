@@ -12,6 +12,7 @@ import { doAction, appendStep } from "../../../core/history.js";
 import type { Effect, Player } from "../../../core/types/index.js";
 import { getModeBonus } from "../../../core/playerHelpers.js";
 import { consumePlayFollowerResume } from "../../core/playCard/followerResume.js";
+import { endPlaySequenceDrainIfIdle } from "../../core/playCard/playSequence.js";
 import { resumeDeferredDeathIfIdle } from "../../core/cleanup.js";
 import {
   clearPendingModeChoice,
@@ -104,6 +105,7 @@ function commitConfirmedModePicks(
 
       consumePlayFollowerResume();
       resumeDeferredDeathIfIdle();
+      endPlaySequenceDrainIfIdle();
     },
     { owner, picks: pickedLabels },
     { autoRender: true },

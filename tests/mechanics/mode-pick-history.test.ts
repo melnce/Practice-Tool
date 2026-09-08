@@ -353,7 +353,7 @@ describe("soak history_allpaths fixture pins", () => {
         fuse: true,
         interactiveModes: true,
       });
-      expect(result.outcome).toBe("completed");
+      expect(result.outcome, result.error ?? "").toBe("completed");
     }, 60_000);
   }
 });
