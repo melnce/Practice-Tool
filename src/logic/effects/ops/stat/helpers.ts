@@ -168,16 +168,14 @@ function matchesHandFilter(card: CardInstance, eff: StatOp): boolean {
     // Explicit non-follower filter → no match (deck/hand buffs are follower-only today)
     if (String(typeFilter).toLowerCase() !== "card") return false;
   }
-  if ((eff as any).class && card.class !== (eff as any).class) return false;
+  const classFilter =
+    filter?.class ?? (eff as any).class ?? eff.condition?.class;
+  if (classFilter && card.class !== classFilter) return false;
+  const tribeFilter =
+    filter?.tribe ?? (eff as any).tribe ?? eff.condition?.tribe;
   if (
-    (eff as any).tribe &&
-    (!Array.isArray(card.tribes) || !card.tribes.includes((eff as any).tribe))
-  )
-    return false;
-  if (eff.condition?.class && card.class !== eff.condition.class) return false;
-  if (
-    eff.condition?.tribe &&
-    (!Array.isArray(card.tribes) || !card.tribes.includes(eff.condition.tribe))
+    tribeFilter &&
+    (!Array.isArray(card.tribes) || !card.tribes.includes(tribeFilter))
   )
     return false;
   return true;

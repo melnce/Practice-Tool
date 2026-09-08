@@ -1467,7 +1467,7 @@
             "op": "select",
             "target": "ally:hand",
             "select": 1,
-            "condition": {
+            "filter": {
               "type": "Follower"
             },
             "effects": [
@@ -1587,7 +1587,7 @@
         "op": "select",
         "target": "ally:hand",
         "select": 1,
-        "condition": {
+        "filter": {
           "type": "Follower"
         },
         "effects": [
@@ -1992,7 +1992,9 @@
             "op": "stat",
             "action": "give",
             "target": "ally:hand",
-            "class": "Dragoncraft",
+            "filter": {
+              "class": "Dragoncraft"
+            },
             "attack": 1,
             "defense": 1
           }
@@ -3343,7 +3345,7 @@
                         "op": "select",
                         "mode": "random",
                         "target": "enemy:follower",
-                        "condition": {
+                        "filter": {
                           "attack_lte": 4,
                           "exclude_keyword": "cant_attack"
                         },

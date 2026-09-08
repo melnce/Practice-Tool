@@ -11,15 +11,18 @@ import {
   whenRunEffects,
 } from "../harness/builders.js";
 import { state } from "../../src/core/gameState.js";
-import { getPool } from "../../src/logic/core/targeting.js";
+import {
+  getPool,
+  selectPoolCondition,
+} from "../../src/logic/core/targeting.js";
 import { getCardById } from "../../src/data/cardDatabase.js";
 import "../../src/logic/core/effects/index.js";
 
 function selectionPool(
   target: string,
-  condition: Record<string, unknown> | undefined,
+  eff: { condition?: unknown; filter?: unknown },
 ) {
-  return getPool(target, "first", null, condition ?? {}, {
+  return getPool(target, "first", null, selectPoolCondition(eff as any), {
     isTargetedEffect: true,
   });
 }
@@ -89,10 +92,7 @@ describe("pool filter forwarding — ignored keys", () => {
     const selectEff = getCardById("10333310")!.spell!.find(
       (e) => e.op === "select",
     )!;
-    const pool = selectionPool(
-      String(selectEff.target),
-      selectEff.condition as Record<string, unknown>,
-    );
+    const pool = selectionPool(String(selectEff.target), selectEff);
 
     expect(pool.some((c) => c.type === "Follower")).toBe(true);
     expect(pool.some((c) => c.type === "Spell")).toBe(false);
@@ -104,10 +104,7 @@ describe("pool filter forwarding — ignored keys", () => {
       .build();
 
     const kwEff = getCardById("10272310")!.fanfare![0]!;
-    const pool = selectionPool(
-      String(kwEff.target),
-      kwEff.condition as Record<string, unknown>,
-    );
+    const pool = selectionPool(String(kwEff.target), kwEff);
 
     expect(pool.map((c) => c.name)).toContain("Striker Artifact");
     expect(pool.map((c) => c.name)).not.toContain("Gear of Ambition");
@@ -119,10 +116,7 @@ describe("pool filter forwarding — ignored keys", () => {
       .build();
 
     const kwEff = getCardById("10273110")!.evolve![0]!;
-    const pool = selectionPool(
-      String(kwEff.target),
-      kwEff.condition as Record<string, unknown>,
-    );
+    const pool = selectionPool(String(kwEff.target), kwEff);
 
     expect(pool.map((c) => c.name)).toContain("Striker Artifact");
     expect(pool.map((c) => c.name)).not.toContain("Gear of Ambition");
@@ -141,12 +135,13 @@ describe("pool filter forwarding — tribe regression", () => {
       .withFirstHand(["90071210", "90072110"])
       .build();
 
-    const artifactOnly = selectionPool("ally:hand", { tribe: "Artifact" });
+    const artifactOnly = selectionPool("ally:hand", {
+      filter: { tribe: "Artifact" },
+    });
     expect(artifactOnly).toHaveLength(2);
 
     const artifactFollowers = selectionPool("ally:hand", {
-      tribe: "Artifact",
-      type: "Follower",
+      filter: { tribe: "Artifact", type: "Follower" },
     });
     expect(artifactFollowers).toHaveLength(1);
     expect(artifactFollowers[0]!.name).toBe("Striker Artifact");

@@ -3162,7 +3162,7 @@
         "op": "banish",
         "target": "enemy:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "defense_lte": 3
         }
       }

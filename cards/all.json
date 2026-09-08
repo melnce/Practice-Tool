@@ -892,7 +892,7 @@
         "op": "select",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "tribe": "Golem"
         },
         "effects": [
@@ -3950,7 +3950,7 @@
       {
         "op": "select",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "has_keyword": "Spellboost"
         },
         "effects": [
@@ -7150,7 +7150,9 @@
         "op": "stat",
         "action": "give",
         "target": "ally:hand",
-        "tribe": "Puppetry",
+        "filter": {
+          "tribe": "Puppetry"
+        },
         "attack": 1,
         "defense": 0
       }
@@ -8550,7 +8552,6 @@
           {
             "op": "cost",
             "target": "last_drawn",
-            "action": "set",
             "amount": 0,
             "mode": "set"
           }
@@ -10247,7 +10248,7 @@
         "op": "select",
         "target": "ally:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "has_keyword": "ward"
         },
         "effects": [
@@ -10661,7 +10662,7 @@
       {
         "op": "select",
         "target": "enemy:follower",
-        "condition": {
+        "filter": {
           "attack_lte": 4
         },
         "effects": [
@@ -12360,7 +12361,7 @@
             "op": "select",
             "target": "ally:hand",
             "select": 1,
-            "condition": {
+            "filter": {
               "type": "Follower"
             },
             "effects": [
@@ -12480,7 +12481,7 @@
         "op": "select",
         "target": "ally:hand",
         "select": 1,
-        "condition": {
+        "filter": {
           "type": "Follower"
         },
         "effects": [
@@ -12885,7 +12886,9 @@
             "op": "stat",
             "action": "give",
             "target": "ally:hand",
-            "class": "Dragoncraft",
+            "filter": {
+              "class": "Dragoncraft"
+            },
             "attack": 1,
             "defense": 1
           }
@@ -14236,7 +14239,7 @@
                         "op": "select",
                         "mode": "random",
                         "target": "enemy:follower",
-                        "condition": {
+                        "filter": {
                           "attack_lte": 4,
                           "exclude_keyword": "cant_attack"
                         },
@@ -21292,7 +21295,7 @@
                 "target": "ally:follower",
                 "select": 1,
                 "mode": "random",
-                "condition": {
+                "filter": {
                   "unevolved": true,
                   "has_keyword": "ward"
                 },
@@ -25134,7 +25137,7 @@
         "op": "banish",
         "target": "enemy:follower",
         "select": 1,
-        "condition": {
+        "filter": {
           "defense_lte": 3
         }
       }
@@ -33687,7 +33690,7 @@
       {
         "op": "select",
         "target": "ally:hand",
-        "condition": {
+        "filter": {
           "has_keyword": "Spellboost"
         },
         "effects": [
