@@ -229,7 +229,7 @@ export function handleTransform(
         eff.target || "ally:follower",
         owner,
         ctx.sourceCard ?? null,
-        (eff as any).condition,
+        transformPoolCondition(eff),
         {
           ...(ctx.context ?? {}),
           isTargetedEffect: selectN > 0 && !wantAll,
