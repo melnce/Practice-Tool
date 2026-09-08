@@ -404,7 +404,7 @@ describe("Official Q&A — Portalcraft batch 6", () => {
     expect(getBoard(state, "second")).toHaveLength(0);
   }, 60_000);
 
-  it("10171140 Medical-Grade Assassin — only first Enhanced Puppet from Puppet Shield gets Bane (official Q&A)", () => {
+  it("10171140 Medical-Grade Assassin — only first Enhanced Puppet from Puppet Shield (10171310) gets Bane (official Q&A)", () => {
     setupTurn(R6, { hand: [MEDICAL_GRADE_ASSASSIN, PUPPET_SHIELD], pp: 6 });
     whenPlayCard("first", 0);
     const shieldIdx = getHand(state, "first").findIndex(

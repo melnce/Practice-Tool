@@ -896,7 +896,7 @@ describe("L2 — Rotation Havencraft", () => {
       expect(saint.hasWard).toBe(true);
     });
 
-    it("during your turn leader restore summons Fox of Purity", () => {
+    it("during your turn leader restore summons Fox of Purity (10061120)", () => {
       setupTurn(R6, { hand: [SAINT_REHAB], pp: 5, hp: 14 });
       whenPlayCard("first", 0);
       const foxesAfterFanfare = boardCountById(FOX_PURITY);

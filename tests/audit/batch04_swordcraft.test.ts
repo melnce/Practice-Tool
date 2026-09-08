@@ -120,7 +120,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     expect(getHP(state, "first")).toBe(20);
   });
 
-  it("Hound of War — Enhance (6) summons 2 copies; has Rush", () => {
+  it("Hound of War (10121140) — Enhance (6) summons 2 copies; has Rush", () => {
     setupTurn(R6, { hand: ["10121140"], pp: 6 });
     whenPlayCard("first", 0);
     expect(
@@ -155,7 +155,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     expect(thenBoard("first").some((c) => c.name === "Knight")).toBe(true);
   });
 
-  it("Luminous Magus — Fanfare 3 Steelclad Knights; Officer enter gains Ward", () => {
+  it("Luminous Magus (10122120) — Fanfare 3 Steelclad Knights; Officer enter gains Ward", () => {
     setupTurn(R6, { hand: ["10122120"], pp: 5 });
     whenPlayCard("first", 0);
     expect(
@@ -174,7 +174,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     expect(summoned?.hasWard).toBe(true);
   });
 
-  it("Luminous Lancetrooper — Fanfare Knight; Officer enter gains Rush", () => {
+  it("Luminous Lancetrooper (10122130) — Fanfare Knight; Officer enter gains Rush", () => {
     setupTurn(R6, { hand: ["10122130"], pp: 2 });
     whenPlayCard("first", 0);
     expect(thenBoard("first").some((c) => c.name === "Knight")).toBe(true);
@@ -188,7 +188,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     expect(knight?.hasRush).toBe(true);
   });
 
-  it("Shinobi Squirrel — Ambush; Evolve summons copy", () => {
+  it("Shinobi Squirrel (10122140) — Ambush; Evolve summons copy", () => {
     setupTurn(R6);
     const sq = createCard("10122140", "board", "first");
     applyKeywordsFromList(sq);
@@ -267,7 +267,7 @@ describe("Batch 4 — Swordcraft [10001] Legends Rise", () => {
     ).toBe(4);
   });
 
-  it("Ravening Tentacles — 5 damage to enemy follower or leader; restore 5", () => {
+  it("Ravening Tentacles (10123310) — 5 damage to enemy follower or leader; restore 5", () => {
     setupTurn(R8, { hand: ["10123310"], pp: 7 });
     const e = enemyFollower(4);
     state.players.first.hp = 12;
@@ -377,7 +377,7 @@ describe("Batch 4 — Swordcraft [10002] Infinity Evolved", () => {
     expect(defBefore - defAfter).toBe(2);
   });
 
-  it("Lucrative Deal — draw 2; opponent draws 1", () => {
+  it("Lucrative Deal (10221310) — draw 2; opponent draws 1", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: R6 })
       .withFirstHand(["10221310"])
       .withFirstPP(2, 6)
@@ -498,7 +498,7 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
     state.activePlayer = "first";
   });
 
-  it("Devotee of Usurpation — Fanfare Boots; Last Words Goblet", () => {
+  it("Devotee of Usurpation (10321110) — Fanfare Boots; Last Words Goblet", () => {
     setupTurn(R6, { hand: ["10321110"], pp: 2 });
     whenPlayCard("first", 0);
     expect(thenHand("first").some((c) => c.name === "Gilded Boots")).toBe(true);
@@ -510,7 +510,7 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
     );
   });
 
-  it("Comrade of the Swordmaster — Last Words summons copy without Last Words", () => {
+  it("Comrade of the Swordmaster (10321120) — Last Words summons copy without Last Words", () => {
     setupTurn(R6);
     const com = createCard("10321120", "board", "first");
     applyKeywordsFromList(com);
@@ -524,7 +524,7 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
     expect(copies[0]!.hasLastWords).toBeFalsy();
   });
 
-  it("Shield Bash — Ward on selected ally; 4 random enemy damage", () => {
+  it("Shield Bash (10321310) — Ward on selected ally; 4 random enemy damage", () => {
     setupTurn(R6, { hand: ["10321310"], pp: 2 });
     const ally = createCard(
       { name: "Ally", type: "Follower", cost: 2, attack: 2, defense: 2 },
@@ -539,7 +539,7 @@ describe("Batch 4 — Swordcraft [10003] Heirs of the Omen", () => {
     expect(state.players.second.board[0]!.defense).toBe(1);
   });
 
-  it("Supplicant of Usurpation — Fanfare Necklace; Last Words Blade", () => {
+  it("Supplicant of Usurpation (10322110) — Fanfare Necklace; Last Words Blade", () => {
     setupTurn(R6, { hand: ["10322110"], pp: 2 });
     whenPlayCard("first", 0);
     expect(thenHand("first").some((c) => c.name === "Gilded Necklace")).toBe(

@@ -185,7 +185,7 @@ describe("selectable flags (__uiSelectable)", () => {
     expect((state as any).lastAddedToHand?.__uiSelectable).toBeUndefined();
   });
 
-  it("Bug Alert return-to-hand: __lastSelected is not flagged after resolve", () => {
+  it("Bug Alert (10012310) return-to-hand: __lastSelected is not flagged after resolve", () => {
     givenGameState({ seed: 3, activePlayer: "first" })
       .withFirstHand([BUG_ALERT])
       .withFirstPP(10, 10)

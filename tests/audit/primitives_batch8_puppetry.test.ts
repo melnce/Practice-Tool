@@ -62,7 +62,7 @@ describe("Puppetry — real play", () => {
     state.activePlayer = "first";
   });
 
-  it("Puppet Shield summons 2 Enhanced Puppet", () => {
+  it("Puppet Shield (10171310) summons 2 Enhanced Puppet", () => {
     setupTurn(R6, { hand: ["10171310"], pp: 3 });
     whenPlayCard("first", 0);
     expect(

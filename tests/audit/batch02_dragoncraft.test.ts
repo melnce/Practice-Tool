@@ -102,7 +102,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     state.activePlayer = "first";
   });
 
-  it("Silvercloud Dragonrider — Last Words summons Vastwing Dragon", () => {
+  it("Silvercloud Dragonrider (10141110) — Last Words summons Vastwing Dragon", () => {
     setupTurn(R6, { pp: 8 });
     const rider = createCard("10141110", "board", "first");
     applyKeywordsFromList(rider);
@@ -114,7 +114,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     );
   });
 
-  it("Swordsnout Trencher — Fanfare grants Storm only in Overflow", () => {
+  it("Swordsnout Trencher (10141120) — Fanfare grants Storm only in Overflow", () => {
     setupTurn(R6, { hand: ["10141120"], pp: 5 });
     whenPlayCard("first", 0);
     expect(findOnBoard("first", "Swordsnout Trencher")?.hasStorm).toBeFalsy();
@@ -126,7 +126,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     expect(findOnBoard("first", "Swordsnout Trencher")?.hasStorm).toBe(true);
   });
 
-  it("Fledgling Dragonslayer — Fanfare destroys selected enemy follower", () => {
+  it("Fledgling Dragonslayer (10141130) — Fanfare destroys selected enemy follower", () => {
     setupTurn(R6, { hand: ["10141130"], pp: 4 });
     const enemy = enemyFollower(4);
     whenPlayCard("first", 0);
@@ -134,7 +134,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     expect(getBoard(state, "second")).toHaveLength(0);
   });
 
-  it("Little Dragon Nanny — Fanfare summons Fire Drake Whelp; Evolve replicates Fanfare", () => {
+  it("Little Dragon Nanny (10141140) — Fanfare summons Fire Drake Whelp; Evolve replicates Fanfare", () => {
     setupTurn(R6, { hand: ["10141140"], pp: 4 });
     whenPlayCard("first", 0);
     expect(
@@ -148,14 +148,14 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     ).toHaveLength(2);
   });
 
-  it("Whitescale Herald — Fanfare restores 4 leader defense in Overflow", () => {
+  it("Whitescale Herald (10141150) — Fanfare restores 4 leader defense in Overflow", () => {
     setupTurn(R7, { hand: ["10141150"], pp: 4 });
     state.players.first.hp = 12;
     whenPlayCard("first", 0);
     expect(getHP(state, "first")).toBe(16);
   });
 
-  it("Calamity Breath — deals 5 damage to all followers", () => {
+  it("Calamity Breath (10141310) — deals 5 damage to all followers", () => {
     setupTurn(R6, { hand: ["10141310"], pp: 6 });
     const ally = enemyFollower(5, "Ally");
     ally.owner = "first";
@@ -183,7 +183,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     expect(thenHand("first").length).toBe(handBefore - 1);
   });
 
-  it("Kit, Luxfang Champion — when discarded, random ally follower gains +1/+0", () => {
+  it("Kit, Luxfang Champion (10142110) — when discarded, random ally follower gains +1/+0", () => {
     setupTurn(R6);
     const ally = createCard(
       { name: "Ally", type: "Follower", cost: 2, attack: 2, defense: 2 },
@@ -201,7 +201,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     expect(ally.defense).toBe(2);
   });
 
-  it("Eyfa, Windrider — Overflow Fanfare grants Intimidate (has Storm)", () => {
+  it("Eyfa, Windrider (10142120) — Overflow Fanfare grants Intimidate (has Storm)", () => {
     setupTurn(R7, { hand: ["10142120"], pp: 3 });
     whenPlayCard("first", 0);
     const eyfa = findOnBoard("first", "Eyfa, Windrider")!;
@@ -251,7 +251,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     expect(ally2.defense).toBe(4);
   });
 
-  it("Goldennote Melody — draws 2; Overflow restores 2 leader defense", () => {
+  it("Goldennote Melody (10142310) — draws 2; Overflow restores 2 leader defense", () => {
     setupTurn(R6, {
       hand: ["10142310"],
       pp: 3,
@@ -291,7 +291,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     expect(getMaxPP(state, "first")).toBe(8);
   });
 
-  it("Zahar, Stormwave Dragoon — Fanfare summons Vastwing Dragon", () => {
+  it("Zahar, Stormwave Dragoon (10143130) — Fanfare summons Vastwing Dragon", () => {
     setupTurn(R6, { hand: ["10143130"], pp: 6 });
     whenPlayCard("first", 0);
     expect(thenBoard("first").some((c) => c.name === "Vastwing Dragon")).toBe(
@@ -299,7 +299,7 @@ describe("Batch 2 — Dragoncraft [10001] Legends Rise", () => {
     );
   });
 
-  it("Twilight Dragon — Fanfare -0/-9 all enemies; Super-Evolve draws 3", () => {
+  it("Twilight Dragon (10143140) — Fanfare -0/-9 all enemies; Super-Evolve draws 3", () => {
     setupTurn(R6, { hand: ["10143140"], pp: 9 });
     const e = enemyFollower(10);
     whenPlayCard("first", 0);
@@ -368,7 +368,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     expect(wise.cost).toBe(baseCost - 3);
   });
 
-  it("Soaring Ivory Dragon — Overflow Fanfare draws 1", () => {
+  it("Soaring Ivory Dragon (10241120) — Overflow Fanfare draws 1", () => {
     setupTurn(R7, {
       hand: ["10241120"],
       pp: 1,
@@ -380,7 +380,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     expect(thenHand("first").some((c) => c.name === "Drawn")).toBe(true);
   });
 
-  it("Call of the Megalorca — summons Megalorca; Overflow adds spell copy to hand", () => {
+  it("Call of the Megalorca (10241310) — summons Megalorca; Overflow adds spell copy to hand", () => {
     setupTurn(R6, { hand: ["10241310"], pp: 2 });
     whenPlayCard("first", 0);
     expect(
@@ -410,7 +410,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     ).toBe(true);
   });
 
-  it("Intent Dragonewt Princess — Fanfare draws 2 if super-evolved ally exists", () => {
+  it("Intent Dragonewt Princess (10242110) — Fanfare draws 2 if super-evolved ally exists", () => {
     setupTurn(R7, {
       hand: ["10242110"],
       pp: 2,
@@ -431,7 +431,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     expect(thenHand("first").length).toBe(before + 1);
   });
 
-  it("Seasoned Merman — Fanfare 2 Megalorca; Evolve summons 1 more", () => {
+  it("Seasoned Merman (10242120) — Fanfare 2 Megalorca; Evolve summons 1 more", () => {
     setupTurn(R6, { hand: ["10242120"], pp: 5 });
     whenPlayCard("first", 0);
     expect(
@@ -444,7 +444,7 @@ describe("Batch 2 — Dragoncraft [10002] Infinity Evolved", () => {
     ).toHaveLength(3);
   });
 
-  it("Pyrewyrm Blade — Engage (1) buffs ally with +1/+1 and Blade Last Words", () => {
+  it("Pyrewyrm Blade (10242210) — Engage (1) buffs ally with +1/+1 and Blade Last Words", () => {
     setupTurn(R6, { hand: ["10242210"], pp: 3 });
     const blade = createCard("10242210", "board", "first");
     applyKeywordsFromList(blade);
@@ -573,7 +573,7 @@ describe("Batch 2 — Dragoncraft [10003] Heirs of the Omen", () => {
     expect(findOnBoard("second", "Low")!.defense).toBe(3);
   });
 
-  it("Supplicant of Disdain — EOT restores self and leader defense", () => {
+  it("Supplicant of Disdain (10342110) — EOT restores self and leader defense", () => {
     setupTurn(R6, { hand: ["10342110"], pp: 5 });
     state.players.first.hp = 10;
     whenPlayCard("first", 0);
@@ -585,7 +585,7 @@ describe("Batch 2 — Dragoncraft [10003] Heirs of the Omen", () => {
     expect(getHP(state, "first")).toBeGreaterThan(10);
   });
 
-  it("Ocean Rider — 1 Megalorca; 2 in Overflow; Marine ally gains Ward", () => {
+  it("Ocean Rider (10342120) — 1 Megalorca; 2 in Overflow; Marine ally gains Ward", () => {
     setupTurn(R6, { hand: ["10342120"], pp: 3 });
     whenPlayCard("first", 0);
     expect(
@@ -645,7 +645,7 @@ describe("Batch 2 — Dragoncraft [10003] Heirs of the Omen", () => {
     expect(handCard.defense).toBe(2);
   });
 
-  it("Ferocious Flame — 1 dmg ally, 3 to random enemy follower; Overflow draws Dragoncraft follower", () => {
+  it("Ferocious Flame (10343310) — 1 dmg ally, 3 to random enemy follower; Overflow draws Dragoncraft follower", () => {
     setupTurn(R6, {
       hand: ["10343310"],
       pp: 1,

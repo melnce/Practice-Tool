@@ -51,7 +51,7 @@ describe("destroy scenario", () => {
     expect(hasDestroyOnDeathEffects(loadPoolCard("10001110"))).toBe(false);
   });
 
-  it("makeCardFromDB + destroyTarget fires Arms Peddler Last Words draw", () => {
+  it("makeCardFromDB + destroyTarget fires Arms Peddler (10021120) Last Words draw", () => {
     givenGameState({ seed: 42, activePlayer: "first" })
       .withFirstDeck([
         { name: "DeckCard", type: "Follower", attack: 1, defense: 1 },
@@ -71,7 +71,7 @@ describe("destroy scenario", () => {
     expect(state.players.first.hand.length).toBe(before + 1);
   });
 
-  it("driveCard destroy scenario differs from vanilla_place for Arms Peddler", () => {
+  it("driveCard destroy scenario differs from vanilla_place for Arms Peddler (10021120)", () => {
     const raw = loadPoolCard(ARMS_PEDDLER);
     const result = driveCard(raw);
     expect(result.status).toBe("covered");

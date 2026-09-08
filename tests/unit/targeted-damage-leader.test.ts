@@ -113,7 +113,7 @@ describe("targeted damage — leader click and empty-board fallback", () => {
     });
   });
 
-  describe("Ravening Tentacles (can_target_leader + fallback_leader)", () => {
+  describe("Ravening Tentacles (10123310) (can_target_leader + fallback_leader)", () => {
     it("(a) follower present, click leader → leader −5, follower untouched, self heals 5", () => {
       setupTurn({
         hand: [RAVENING_TENTACLES],

@@ -78,7 +78,7 @@ describe("Foundations — Combo (playsThisTurn)", () => {
     expect(findOnBoard("first", "Fay Twinkletoes")!.attack).toBe(2);
   });
 
-  it("Workin' Grasshopper — Fanfare draws follower costing X = Combo", () => {
+  it("Workin' Grasshopper (10111140) — Fanfare draws follower costing X = Combo", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 5 })
       .withFirstHand([FILLER, FILLER, GRASSHOPPER])
       .withFirstDeck(["10113140", "10113140", "10113140"])

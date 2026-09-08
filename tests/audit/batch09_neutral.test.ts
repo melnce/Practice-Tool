@@ -95,7 +95,7 @@ describe("Batch 9 — Neutral [10001] Legends Rise", () => {
     expect(thenHand("first").some((c) => c.name === "DeckCard")).toBe(true);
   });
 
-  it("Vigilant Detective — Last Words adds Detective's Lens", () => {
+  it("Vigilant Detective (10101120) — Last Words adds Detective's Lens", () => {
     setupTurn(R6, { hand: ["10101120"], pp: 3 });
     whenPlayCard("first", 0);
     const det = findOnBoard("first", "Vigilant Detective")!;
@@ -133,7 +133,7 @@ describe("Batch 9 — Neutral [10001] Legends Rise", () => {
     expect(state.players.second.board[0]!.defense).toBe(2);
   });
 
-  it("Seraphic Tidings — draws 2", () => {
+  it("Seraphic Tidings (10102310) — draws 2", () => {
     setupTurn(R6, {
       hand: ["10102310"],
       pp: 3,
@@ -189,7 +189,7 @@ describe("Batch 9 — Neutral [10002] Infinity Evolved", () => {
     state.activePlayer = "first";
   });
 
-  it("Twinblade Goblin — super-evolved ally gate deals 4 to selected enemy", () => {
+  it("Twinblade Goblin (10201110) — super-evolved ally gate deals 4 to selected enemy", () => {
     setupTurn(R7, { hand: ["10201110"], pp: 1 });
     const superAlly = createCard(
       { name: "SuperAlly", type: "Follower", cost: 2, attack: 2, defense: 2 },

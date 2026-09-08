@@ -106,7 +106,7 @@ describe("Set 10009 — Forestcraft", () => {
     expect(thenHand("first").some((c) => c.name === "Fairy")).toBe(true);
   });
 
-  it("Primate Plotters — Fanfare copies random enemy hand card; Evolve replicates", () => {
+  it("Primate Plotters (10912120) — Fanfare copies random enemy hand card; Evolve replicates", () => {
     setupTurn(R6, { hand: ["10912120"], pp: 3 });
     state.players.second.hand.push(
       createCard(

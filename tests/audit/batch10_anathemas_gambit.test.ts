@@ -123,7 +123,7 @@ describe("Set 10007 — Anathema's Gambit", () => {
     }
   });
 
-  it("Tears of Degradation — banishes selected enemy field card", () => {
+  it("Tears of Degradation (10701310) — banishes selected enemy field card", () => {
     setupTurn(4, { hand: ["10701310"], pp: 4 });
     enemyFollower(3, 5, "Target");
     whenPlayCard("first", 0);

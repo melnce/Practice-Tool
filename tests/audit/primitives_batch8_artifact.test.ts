@@ -67,7 +67,7 @@ describe("Artifact feed — real play adds Gears to hand", () => {
     state.activePlayer = "first";
   });
 
-  it("Artifact Recharge adds Gear of Ambition and Gear of Remembrance", () => {
+  it("Artifact Recharge (10171320) adds Gear of Ambition and Gear of Remembrance", () => {
     setupTurn(R6, { hand: ["10171320"], pp: 1 });
     whenPlayCard("first", 0);
     const names = thenHand("first").map((c) => c.name);

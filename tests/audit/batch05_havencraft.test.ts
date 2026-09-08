@@ -124,7 +124,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     expect(maid.hasBarrier || maid.keywordState?.hasBarrier).toBe(true);
   });
 
-  it("Radiant Guiding Angel — Fanfare draws 2 and restores 2 leader defense", () => {
+  it("Radiant Guiding Angel (10161130) — Fanfare draws 2 and restores 2 leader defense", () => {
     setupTurn(R6, {
       hand: ["10161130"],
       pp: 5,
@@ -154,7 +154,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     expect(mainyu.attack).toBe(atkBefore + 1);
   });
 
-  it("Featherfall — 3 damage all enemy followers; summons Holy Falcon", () => {
+  it("Featherfall (10161310) — 3 damage all enemy followers; summons Holy Falcon", () => {
     setupTurn(R6, { hand: ["10161310"], pp: 6 });
     enemyFollower(4, "A");
     enemyFollower(4, "B");
@@ -224,7 +224,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     ).toBe(true);
   });
 
-  it("Pact of the Beast Princess — Engage advances countdown; LW summons Holyflame Tiger", () => {
+  it("Pact of the Beast Princess (10163210) — Engage advances countdown; LW summons Holyflame Tiger", () => {
     setupTurn(R6, { hand: ["10163210"], pp: 3 });
     whenPlayCard("first", 0);
     const pact = findOnBoard("first", "Pact of the Beast Princess")!;
@@ -237,7 +237,7 @@ describe("Batch 5 — Havencraft [10001] Legends Rise", () => {
     );
   });
 
-  it("Unholy Vessel — Engage destroys all followers", () => {
+  it("Unholy Vessel (10163220) — Engage destroys all followers", () => {
     setupTurn(R6, { hand: ["10163220"], pp: 6 });
     enemyFollower(3);
     const ally = createCard(
@@ -333,7 +333,7 @@ describe("Batch 5 — Havencraft [10002] Infinity Evolved", () => {
     ).toBeGreaterThan(0);
   });
 
-  it("Luminous Censer — Engage (1) self-destruct restores 4 leader defense", () => {
+  it("Luminous Censer (10261210) — Engage (1) self-destruct restores 4 leader defense", () => {
     setupTurn(R6, { hand: ["10261210"], pp: 3 });
     state.players.first.hp = 12;
     whenPlayCard("first", 0);
@@ -360,7 +360,7 @@ describe("Batch 5 — Havencraft [10002] Infinity Evolved", () => {
     expect(defBefore - defAfter).toBe(4);
   });
 
-  it("Immaculate Adjudicator — Fanfare banishes selected enemy", () => {
+  it("Immaculate Adjudicator (10262120) — Fanfare banishes selected enemy", () => {
     setupTurn(R6, { hand: ["10262120"], pp: 5 });
     enemyFollower(4);
     whenPlayCard("first", 0);
@@ -431,7 +431,7 @@ describe("Batch 5 — Havencraft [10003] Heirs of the Omen", () => {
     state.activePlayer = "first";
   });
 
-  it("Devotee of Repose — Fanfare gains Devotee crest", () => {
+  it("Devotee of Repose (10361110) — Fanfare gains Devotee crest", () => {
     setupTurn(R6, { hand: ["10361110"], pp: 2 });
     whenPlayCard("first", 0);
     expect(
@@ -461,7 +461,7 @@ describe("Batch 5 — Havencraft [10003] Heirs of the Omen", () => {
     expect(getHP(state, "first")).toBe(19);
   });
 
-  it("Blinding Faith — 3 damage all enemies; Enhance (8) draws 3 and restores 3", () => {
+  it("Blinding Faith (10361310) — 3 damage all enemies; Enhance (8) draws 3 and restores 3", () => {
     setupTurn(R6, { hand: ["10361310"], pp: 4 });
     enemyFollower(5);
     whenPlayCard("first", 0);
@@ -488,7 +488,7 @@ describe("Batch 5 — Havencraft [10003] Heirs of the Omen", () => {
     expect(thenHand("first").length).toBeGreaterThanOrEqual(3);
   });
 
-  it("Supplicant of Repose — Fanfare crest; Ward", () => {
+  it("Supplicant of Repose (10362110) — Fanfare crest; Ward", () => {
     setupTurn(R6, { hand: ["10362110"], pp: 3 });
     whenPlayCard("first", 0);
     expect(
@@ -497,7 +497,7 @@ describe("Batch 5 — Havencraft [10003] Heirs of the Omen", () => {
     expect(findOnBoard("first", "Supplicant of Repose")?.hasWard).toBe(true);
   });
 
-  it("Congregant of Repose — Fanfare destroys enemy; Evolve gains crest", () => {
+  it("Congregant of Repose (10363110) — Fanfare destroys enemy; Evolve gains crest", () => {
     setupTurn(R6, { hand: ["10363110"], pp: 5 });
     enemyFollower(4);
     whenPlayCard("first", 0);

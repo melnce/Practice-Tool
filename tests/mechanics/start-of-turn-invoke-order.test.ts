@@ -189,7 +189,7 @@ describe("start-of-turn Invoke order (engineDispatch)", () => {
     expect(turnDrawIdx).toBeGreaterThan(invokeIdx);
   });
 
-  it("(b) Serene Sanctuary: destroy → invoke → LW draw 2 → return → turn draw", () => {
+  it("(b) Serene Sanctuary (10161210): destroy → invoke → LW draw 2 → return → turn draw", () => {
     givenGameState({
       seed: 42,
       activePlayer: "first",

@@ -52,7 +52,7 @@ describe("whose_turn — leader_restored (Follower of the Tenets 10961110)", () 
 describe("whose_turn — leader_restored (Saint of Rehabilitation 10563110)", () => {
   beforeEach(() => setupTurn("first"));
 
-  it("owner's turn: leader restore summons Fox of Purity", () => {
+  it("owner's turn: leader restore summons Fox of Purity (10061120)", () => {
     const saint = createCard("10563110", "board", "first");
     saint.peak_defense = saint.defense;
     state.players.first.board = [saint];
@@ -63,7 +63,7 @@ describe("whose_turn — leader_restored (Saint of Rehabilitation 10563110)", ()
     ).toBe(true);
   });
 
-  it("opponent's turn: leader restore does not summon Fox of Purity", () => {
+  it("opponent's turn: leader restore does not summon Fox of Purity (10061120)", () => {
     setupTurn("second");
     const saint = createCard("10563110", "board", "first");
     saint.peak_defense = saint.defense;

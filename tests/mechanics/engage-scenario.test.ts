@@ -48,7 +48,7 @@ describe("engage scenario", () => {
     expect(hasEngageAbility(loadPoolCard("10001110"))).toBe(false);
   });
 
-  it("makeCardFromDB + engageAmulet advances Serene Sanctuary countdown", () => {
+  it("makeCardFromDB + engageAmulet advances Serene Sanctuary (10161210) countdown", () => {
     givenGameState({ seed: 42, activePlayer: "first" })
       .withFirstPP(10, 10)
       .build();
@@ -64,7 +64,7 @@ describe("engage scenario", () => {
     expect(host.keywordState?.engagedThisTurn).toBe(true);
   });
 
-  it("driveCard engage scenario differs from vanilla_place for Serene Sanctuary", () => {
+  it("driveCard engage scenario differs from vanilla_place for Serene Sanctuary (10161210)", () => {
     const raw = loadPoolCard(SERENE_SANCTUARY);
     const result = driveCard(raw);
     expect(result.status).toBe("covered");

@@ -103,7 +103,7 @@ describe("Batch 7 — Runecraft [10001] Legends Rise", () => {
     state.activePlayer = "first";
   });
 
-  it("Runeblade Conductor — Fanfare deals X damage (X = attack)", () => {
+  it("Runeblade Conductor (10131110) — Fanfare deals X damage (X = attack)", () => {
     setupTurn(R6, { hand: ["10131110"], pp: 5 });
     const e = enemyFollower(5);
     whenPlayCard("first", 0);
@@ -111,7 +111,7 @@ describe("Batch 7 — Runecraft [10001] Legends Rise", () => {
     expect(e.defense).toBe(4);
   });
 
-  it("Runeblade Conductor — On Spellboost in hand gives +1/+1", () => {
+  it("Runeblade Conductor (10131110) — On Spellboost in hand gives +1/+1", () => {
     setupTurn(R6, { hand: ["10131110", FILLER], pp: 6 });
     const atk0 = Number(
       thenHand("first").find((c) => c.id === "10131110")!.attack,
@@ -219,7 +219,7 @@ describe("Batch 7 — Runecraft [10001] Legends Rise", () => {
     expect(earthSigilOnBoard()?.counters?.earth).toBeGreaterThanOrEqual(2);
   });
 
-  it("Demonic Call — summons a Demonic Shikigami", () => {
+  it("Demonic Call (10133320) — summons a Demonic Shikigami", () => {
     setupTurn(R8, { hand: ["10133320"], pp: 7 });
     whenPlayCard("first", 0);
     expect(thenBoard("first").some((c) => c.name === "Demonic Shikigami")).toBe(
@@ -243,7 +243,7 @@ describe("Batch 7 — Runecraft [10002] Infinity Evolved", () => {
     state.activePlayer = "first";
   });
 
-  it("Arcane Archivist — returns hand card and draws a spell", () => {
+  it("Arcane Archivist (10231120) — returns hand card and draws a spell", () => {
     setupTurn(R6, {
       hand: ["10231120", "10131310"],
       pp: 2,
@@ -254,7 +254,7 @@ describe("Batch 7 — Runecraft [10002] Infinity Evolved", () => {
     expect(thenHand("first").some((c) => c.type === "Spell")).toBe(true);
   });
 
-  it("Glacial Crash — destroys selected enemy follower", () => {
+  it("Glacial Crash (10231310) — destroys selected enemy follower", () => {
     setupTurn(R6, { hand: ["10231310"], pp: 4 });
     const e = enemyFollower(5);
     whenPlayCard("first", 0);
@@ -271,7 +271,7 @@ describe("Batch 7 — Runecraft [10002] Infinity Evolved", () => {
     ).toBe(2);
   });
 
-  it("Flames of Chaos — deals spellboosted X split among enemies", () => {
+  it("Flames of Chaos (10232310) — deals spellboosted X split among enemies", () => {
     setupTurn(R6, { hand: [FILLER, "10232310"], pp: 4 });
     enemyFollower(4);
     whenPlayCard("first", 0);
@@ -287,7 +287,7 @@ describe("Batch 7 — Runecraft [10002] Infinity Evolved", () => {
     expect(owen.hasWard || owen.keywordState?.hasWard).toBe(true);
   });
 
-  it("Pascale's Dance — gains earth sigil and crest", () => {
+  it("Pascale's Dance (10233310) — gains earth sigil and crest", () => {
     setupTurn(R6, { hand: ["10233310"], pp: 2 });
     whenPlayCard("first", 0);
     expect(earthSigilOnBoard()).toBeDefined();
@@ -311,7 +311,7 @@ describe("Batch 7 — Runecraft [10003] Heirs of the Omen", () => {
     state.activePlayer = "first";
   });
 
-  it("Crystal Gazing — gains Crest: Crystal Gazing", () => {
+  it("Crystal Gazing (10331310) — gains Crest: Crystal Gazing", () => {
     setupTurn(R6, { hand: ["10331310"], pp: 4 });
     whenPlayCard("first", 0);
     expect(
@@ -333,7 +333,7 @@ describe("Batch 7 — Runecraft [10003] Heirs of the Omen", () => {
     expect(Number(follower.defense)).toBeGreaterThan(1);
   });
 
-  it("Risky Amalgamation — summons Guardian Golem and Clay Golem", () => {
+  it("Risky Amalgamation (10332310) — summons Guardian Golem and Clay Golem", () => {
     setupTurn(R6, { hand: ["10332310"], pp: 4 });
     whenPlayCard("first", 0);
     expect(thenBoard("first").some((c) => c.name === "Guardian Golem")).toBe(

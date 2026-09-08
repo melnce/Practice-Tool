@@ -154,7 +154,7 @@ describe.each([
   });
 });
 
-describe("Goddess of Starlight evolve select-3 discard history", () => {
+describe("Goddess of Starlight (10502110) evolve select-3 discard history", () => {
   beforeEach(() => {
     resetUidCounter();
     setHistoryEnabled(true);

@@ -376,7 +376,7 @@ describe("official Q&A — Abysscraft batch 4", () => {
     expect(Number(getBoard(state, "second")[0]!.defense)).toBe(1);
   }, 60_000);
 
-  it("10153130 Mukan, Shadowcrypt Ward — reanimated by Ghost Juggler gains Bane (official Q&A)", () => {
+  it("10153130 Mukan, Shadowcrypt Ward — reanimated by Ghost Juggler (10151140) gains Bane (official Q&A)", () => {
     setupTurn(R8, { hand: [GHOST_JUGGLER], pp: 7 });
     putDestroyedCorpse(MUKAN);
     whenPlayCard("first", 0);
