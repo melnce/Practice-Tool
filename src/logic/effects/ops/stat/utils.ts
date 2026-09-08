@@ -75,14 +75,6 @@ export function filterBuffCandidates(
     );
   }
 
-  // Class filtering
-  if (eff.condition && (eff.condition as any).class) {
-    const wantClass = String((eff.condition as any).class).toLowerCase();
-    candidates = candidates.filter(
-      (c) => String(c.class || "").toLowerCase() === wantClass,
-    );
-  }
-
   // Leftmost filtering (string form only; object filters go through getPool condition)
   if (eff.filter === "leftmost" && candidates.length > 0) {
     const first = candidates[0];

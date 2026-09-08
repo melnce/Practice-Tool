@@ -15,6 +15,7 @@ import {
   isPlayCostChangedFromPrinted,
 } from "../../../helpers/alternateForm.js";
 import { hasKeyword, hasAllKeywords } from "../keywords/has.js";
+import { isDev } from "../../../core/env.js";
 
 // -----------------------------------------------------------------------------
 // Types
@@ -49,10 +50,14 @@ export interface CardCondition {
   defense_gte?: number;
   defense_eq?: number;
 
-  // Cost filters
+  // Cost filters (printed base cost)
   base_cost_eq?: number;
   base_cost_gte?: number;
   base_cost_lte?: number;
+  /** Current play cost (may differ from printed after buffs). */
+  cost_eq?: number;
+  cost_gte?: number;
+  cost_lte?: number;
   /** Match if base cost is one of these values. */
   base_cost_in?: number[];
   /** Match if current cost is one of these values. */
@@ -70,6 +75,9 @@ export interface CardCondition {
 
   // Name filter
   name?: string;
+
+  /** Match a specific card instance by uid (test/harness use). */
+  uid?: string;
 }
 
 /**
@@ -99,6 +107,106 @@ function getBaseCost(card: CardInstance): number {
   return card.base_cost !== undefined
     ? Number(card.base_cost)
     : parseInt(card.cost as any) || 0;
+}
+
+/**
+ * Keys understood by evaluateCardCondition. Used by applyFilters and op-keys-gate.
+ */
+export const CARD_CONDITION_KEYS = new Set([
+  "type",
+  "class",
+  "tribe",
+  "exclude_tribe",
+  "has_keyword",
+  "keywords",
+  "exclude_keyword",
+  "attack_lte",
+  "attack_gte",
+  "attack_eq",
+  "defense_lte",
+  "defense_gte",
+  "defense_eq",
+  "base_cost_eq",
+  "base_cost_gte",
+  "base_cost_lte",
+  "base_cost_in",
+  "cost_eq",
+  "cost_gte",
+  "cost_lte",
+  "cost_in",
+  "cost_changed",
+  "unevolved",
+  "is_super_evolved",
+  "damaged",
+  "did_not_attack_this_turn",
+  "still_alive",
+  "name",
+  "uid",
+]);
+
+const warnedCardConditionKeys = new Set<string>();
+
+function nearestCardConditionKey(
+  unknown: string,
+  allowed: Iterable<string>,
+): string {
+  const list = [...allowed];
+  if (!list.length) return "(none)";
+  let best = list[0]!;
+  let bestScore = Infinity;
+  for (const k of list) {
+    const a = unknown.toLowerCase();
+    const b = k.toLowerCase();
+    const m = a.length;
+    const n = b.length;
+    const dp: number[][] = Array.from({ length: m + 1 }, () =>
+      Array(n + 1).fill(0),
+    );
+    for (let i = 0; i <= m; i++) dp[i]![0] = i;
+    for (let j = 0; j <= n; j++) dp[0]![j] = j;
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[i]![j] = Math.min(
+          dp[i - 1]![j]! + 1,
+          dp[i]![j - 1]! + 1,
+          dp[i - 1]![j - 1]! + cost,
+        );
+      }
+    }
+    const score = dp[m]![n]!;
+    if (score < bestScore) {
+      bestScore = score;
+      best = k;
+    }
+  }
+  return best;
+}
+
+/**
+ * Fail loudly on unknown condition keys (dev throw, prod warn-once).
+ */
+export function assertKnownCardConditionKeys(
+  cond: Record<string, unknown>,
+  context = "evaluateCardCondition",
+): void {
+  for (const key of Object.keys(cond)) {
+    if (CARD_CONDITION_KEYS.has(key)) continue;
+    const nearest = nearestCardConditionKey(key, CARD_CONDITION_KEYS);
+    const msg = `Unknown card condition key "${key}" in ${context} (try "${nearest}")`;
+    if (isDev()) {
+      throw new Error(msg);
+    }
+    if (!warnedCardConditionKeys.has(key)) {
+      console.warn(msg);
+      warnedCardConditionKeys.add(key);
+    }
+  }
+}
+
+function getCurrentCost(card: CardInstance): number {
+  const n = parseInt(String(card.cost), 10);
+  return Number.isFinite(n) ? n : 0;
 }
 
 function isCardDamaged(card: CardInstance): boolean {
@@ -139,9 +247,11 @@ export function evaluateCardCondition(
     if (have !== want) return false;
   }
 
-  // Class filter
+  // Class filter (case-insensitive — card data may author lowercase on filters)
   if (cond.class) {
-    if (String(card.class || "") !== String(cond.class)) return false;
+    const want = String(cond.class).toLowerCase();
+    const have = String(card.class || "").toLowerCase();
+    if (have !== want) return false;
   }
 
   // Tribe filter
@@ -217,6 +327,21 @@ export function evaluateCardCondition(
     const lim = toNum(cond.base_cost_lte);
     if (lim != null && getBaseCost(card) > lim) return false;
   }
+
+  // Current cost filter (distinct from base_cost_* — honors temporary reductions)
+  if (cond.cost_eq != null) {
+    const lim = toNum(cond.cost_eq);
+    if (lim != null && getCurrentCost(card) !== lim) return false;
+  }
+  if (cond.cost_gte != null) {
+    const lim = toNum(cond.cost_gte);
+    if (lim != null && getCurrentCost(card) < lim) return false;
+  }
+  if (cond.cost_lte != null) {
+    const lim = toNum(cond.cost_lte);
+    if (lim != null && getCurrentCost(card) > lim) return false;
+  }
+
   if (Array.isArray(cond.base_cost_in) && cond.base_cost_in.length) {
     const base = getBaseCost(card);
     const allowed = cond.base_cost_in
@@ -263,6 +388,11 @@ export function evaluateCardCondition(
   // Name filter
   if (cond.name) {
     if (String(card.name) !== String(cond.name)) return false;
+  }
+
+  // Instance uid filter
+  if (cond.uid) {
+    if (String(card.uid) !== String(cond.uid)) return false;
   }
 
   return true;

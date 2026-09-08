@@ -2,12 +2,35 @@ import { state } from "../../../core/gameState.js";
 import type { CardInstance, Player } from "../../../core/types/index.js";
 import type { TargetQuery, TargetingEnv } from "./types.js";
 import { getBoard, getHand } from "../../../core/playerHelpers.js";
-import type { CardCondition } from "../conditions/evaluator.js";
-
-import { evaluateCardCondition } from "../conditions/evaluator.js";
+import {
+  evaluateCardCondition,
+  assertKnownCardConditionKeys,
+  type CardCondition,
+} from "../conditions/evaluator.js";
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------------
+
+/** Keys handled in applyFilters before evaluateCardCondition (not card-intrinsic). */
+const POOL_ONLY_CONDITION_KEYS = new Set(["not_self", "include_self"]);
+
+function sharedPoolCondition(cond: Record<string, unknown>): CardCondition {
+  const shared: CardCondition = {};
+  for (const [key, value] of Object.entries(cond)) {
+    if (POOL_ONLY_CONDITION_KEYS.has(key)) continue;
+    if (value === undefined) continue;
+    (shared as Record<string, unknown>)[key] = value;
+  }
+  assertKnownCardConditionKeys(
+    shared as Record<string, unknown>,
+    "applyFilters",
+  );
+  return shared;
+}
 
 export function getCardSide(c: CardInstance): Player | null {
   if (getBoard(state, "first")?.includes(c)) return "first";
@@ -67,32 +90,8 @@ export function applyFilters(
     filtered = filtered.filter((c) => c?.uid !== playingUid);
   }
 
-  // 3-9. Use unified condition evaluator for shared conditions
-  // Extract conditions that the evaluator handles
-  const sharedCond: CardCondition = {};
-  if (cond.type) sharedCond.type = cond.type;
-  if (cond.tribe) sharedCond.tribe = cond.tribe;
-  if (cond.exclude_tribe) sharedCond.exclude_tribe = cond.exclude_tribe;
-  if (cond.has_keyword) sharedCond.has_keyword = cond.has_keyword;
-  if (cond.exclude_keyword) sharedCond.exclude_keyword = cond.exclude_keyword;
-  if (cond.unevolved) sharedCond.unevolved = cond.unevolved;
-  if (cond.is_super_evolved)
-    sharedCond.is_super_evolved = cond.is_super_evolved;
-  if (cond.attack_lte != null) sharedCond.attack_lte = cond.attack_lte;
-  if (cond.attack_gte != null) sharedCond.attack_gte = cond.attack_gte;
-  if (cond.attack_eq != null) sharedCond.attack_eq = cond.attack_eq;
-  if (cond.defense_lte != null) sharedCond.defense_lte = cond.defense_lte;
-  if (cond.defense_gte != null) sharedCond.defense_gte = cond.defense_gte;
-  if (cond.defense_eq != null) sharedCond.defense_eq = cond.defense_eq;
-  if (cond.base_cost_eq != null) sharedCond.base_cost_eq = cond.base_cost_eq;
-  if (cond.base_cost_gte != null) sharedCond.base_cost_gte = cond.base_cost_gte;
-  if (cond.base_cost_lte != null) sharedCond.base_cost_lte = cond.base_cost_lte;
-  if (cond.damaged != null) sharedCond.damaged = cond.damaged;
-  if (cond.did_not_attack_this_turn)
-    sharedCond.did_not_attack_this_turn = cond.did_not_attack_this_turn;
-  if (cond.name) sharedCond.name = cond.name;
-
-  // Apply shared conditions via unified evaluator
+  // 3-9. Shared card-intrinsic conditions via unified evaluator
+  const sharedCond = sharedPoolCondition(cond as Record<string, unknown>);
   if (Object.keys(sharedCond).length > 0) {
     filtered = filtered.filter((c) => evaluateCardCondition(c, sharedCond));
   }
