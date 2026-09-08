@@ -23,7 +23,7 @@ describe("Runecraft — Spellboost stress", () => {
     state.activePlayer = "first";
   });
 
-  it("Runeblade Conductor — On Spellboost: +1/+1 in hand", () => {
+  it("Runeblade Conductor (10131110) — On Spellboost: +1/+1 in hand", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
       .withFirstHand(["10131110", FILLER])
       .withFirstPP(6, 6)

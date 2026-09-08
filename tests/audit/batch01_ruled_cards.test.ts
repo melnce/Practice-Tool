@@ -453,7 +453,7 @@ describe("Batch 01 ruled cards — owner table behavioral tests", () => {
     });
   });
 
-  describe("Bug Alert (owner: return own; 2 random enemy follower dmg)", () => {
+  describe("Bug Alert (10012310) (owner: return own; 2 random enemy follower dmg)", () => {
     it("returns selected ally and deals 2 to a random enemy follower only", () => {
       givenGameState({ seed: 3, activePlayer: "first" })
         .withFirstHand([BUG_ALERT])

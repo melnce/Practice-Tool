@@ -754,7 +754,7 @@ describe("Rulebook §176–269 — Storm / Rush / Ward (combat targeting)", () =
     expect(getCardById("10021110")?.description).toMatch(/\bstorm\b/i);
   });
 
-  it("Rush: cannot attack leader same turn (Arms Peddler has Rush not Storm)", () => {
+  it("Rush: cannot attack leader same turn (Arms Peddler (10021120) has Rush not Storm)", () => {
     const peddler = getCardById("10021120");
     expect(peddler?.description).toMatch(/\brush\b/i);
     expect(peddler?.description).not.toMatch(/\bstorm\b/i);

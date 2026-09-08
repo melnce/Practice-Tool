@@ -146,7 +146,7 @@ describe("Set 10009 batch A — C1 Jailor of Antiquity", () => {
   });
 });
 
-describe("Set 10009 batch A — C2 Ripper-Clawed Thief", () => {
+describe("Set 10009 batch A — C2 Ripper-Clawed Thief (10941110)", () => {
   beforeEach(() => {
     resetUidCounter();
     state.gameStarted = true;

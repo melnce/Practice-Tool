@@ -315,7 +315,7 @@ describe("Set 10005 — Blossoming Fate", () => {
     expect(Number(e2.defense) === 2 || Number(e.defense) === 0).toBe(true);
   });
 
-  it("Saint of Rehabilitation — leader restore summons Fox of Purity", () => {
+  it("Saint of Rehabilitation — leader restore summons Fox of Purity (10061120)", () => {
     setupTurn(R6, { hand: ["10563110"], pp: 5 });
     state.players.first.hp = 15;
     whenPlayCard("first", 0);
@@ -350,7 +350,7 @@ describe("Set 10005 — Blossoming Fate", () => {
     expect(wolf.hasBarrier || wolf.keywordState?.hasBarrier).toBeTruthy();
   });
 
-  it("Flowering Friendship — Combo (5) summons a copy and evolves both", () => {
+  it("Flowering Friendship (10512110) — Combo (5) summons a copy and evolves both", () => {
     setupTurn(R6, {
       hand: ["10111310", "10111310", "10111310", "10111310", "10512110"],
       pp: 6,

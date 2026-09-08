@@ -121,7 +121,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     expect(getHP(state, "first")).toBeGreaterThan(15);
   });
 
-  it("Elder Sagebrush — Combo (3) hits 3 random enemies", () => {
+  it("Elder Sagebrush (10111150) — Combo (3) hits 3 random enemies", () => {
     setupTurn(R6, { hand: [FILLER, FILLER, "10111150"], pp: 6 });
     enemyFollower(3, "A");
     enemyFollower(3, "B");
@@ -134,7 +134,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     expect(totalDef).toBeLessThan(9);
   });
 
-  it("Fairy Convocation — adds 2 Fairies to hand", () => {
+  it("Fairy Convocation (10111310) — adds 2 Fairies to hand", () => {
     setupTurn(R6, { hand: ["10111310"], pp: 1 });
     whenPlayCard("first", 0);
     expect(thenHand("first").filter((c) => c.name === "Fairy").length).toBe(2);
@@ -153,7 +153,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     );
   });
 
-  it("Good Fairy of the Pond — Last Words adds Fairy", () => {
+  it("Good Fairy of the Pond (10112120) — Last Words adds Fairy", () => {
     setupTurn(R6, { hand: ["10112120"], pp: 1 });
     whenPlayCard("first", 0);
     const fairy = findOnBoard("first", "Good Fairy of the Pond")!;
@@ -205,7 +205,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     expect(ally.defense).toBe(2);
   });
 
-  it("Fragrantwood Whispers — Deepwood Bounty + draw", () => {
+  it("Fragrantwood Whispers (10112310) — Deepwood Bounty + draw", () => {
     setupTurn(R6, { hand: ["10112310"], pp: 3, deck: ["10111310"] });
     const handBefore = 1;
     whenPlayCard("first", 0);
@@ -245,7 +245,7 @@ describe("Batch 6 — Forestcraft [10001] Legends Rise", () => {
     expect(state.players.second.board[0]!.defense).toBeLessThan(5);
   });
 
-  it("Killer Rhinoceroach — +Combo ATK and Storm", () => {
+  it("Killer Rhinoceroach (10113140) — +Combo ATK and Storm", () => {
     setupTurn(R6, { hand: [FILLER, FILLER, "10113140"], pp: 5 });
     playCombo3(0);
     const roach = findOnBoard("first", "Killer Rhinoceroach")!;
@@ -326,13 +326,13 @@ describe("Batch 6 — Forestcraft [10002] Infinity Evolved", () => {
     state.activePlayer = "first";
   });
 
-  it("Wildheart — Rush on play", () => {
+  it("Wildheart (10211110) — Rush on play", () => {
     setupTurn(R6, { hand: ["10211110"], pp: 3 });
     whenPlayCard("first", 0);
     expect(findOnBoard("first", "Wildheart")!.hasRush).toBe(true);
   });
 
-  it("Dwarven Malletman — Combo (3) AoE instead of single target", () => {
+  it("Dwarven Malletman (10211120) — Combo (3) AoE instead of single target", () => {
     setupTurn(R10, { hand: [FILLER, FILLER, "10211120"], pp: 7 });
     enemyFollower(5, "A");
     enemyFollower(5, "B");
@@ -342,7 +342,7 @@ describe("Batch 6 — Forestcraft [10002] Infinity Evolved", () => {
     );
   });
 
-  it("Woodwalkers — summons 3 Gentle Treant", () => {
+  it("Woodwalkers (10211310) — summons 3 Gentle Treant", () => {
     setupTurn(R10, { hand: ["10211310"], pp: 7 });
     whenPlayCard("first", 0);
     expect(
@@ -359,7 +359,7 @@ describe("Batch 6 — Forestcraft [10002] Infinity Evolved", () => {
     expect(findOnBoard("first", "Lionel, Ardent Elf")!.hasWard).toBe(true);
   });
 
-  it("Ambush from Above — Combo (3) hits twice", () => {
+  it("Ambush from Above (10212310) — Combo (3) hits twice", () => {
     setupTurn(R6, { hand: [FILLER, FILLER, "10212310"], pp: 3 });
     enemyFollower(4);
     playCombo3(0);
@@ -401,7 +401,7 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     state.activePlayer = "first";
   });
 
-  it("Bearer of the Fairy Blade — Pixie enter gives +1 ATK", () => {
+  it("Bearer of the Fairy Blade (10311120) — Pixie enter gives +1 ATK", () => {
     setupTurn(R6, { hand: ["10311120", "10214110"], pp: 6 });
     whenPlayCard("first", 0);
     const bearer = findOnBoard("first", "Bearer of the Fairy Blade")!;
@@ -410,7 +410,7 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     expect(bearer.attack).toBeGreaterThan(atkBefore);
   });
 
-  it("Bestial Swipe — Combo (3) draws a card", () => {
+  it("Bestial Swipe (10311310) — Combo (3) draws a card", () => {
     setupTurn(R6, {
       hand: [FILLER, FILLER, "10311310"],
       pp: 4,
@@ -422,7 +422,7 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     expect(thenHand("first").length).toBeGreaterThan(0);
   });
 
-  it("Greatwood Warrior — Last Words Bounty + Fairy", () => {
+  it("Greatwood Warrior (10312120) — Last Words Bounty + Fairy", () => {
     setupTurn(R6, { hand: ["10312120"], pp: 4 });
     whenPlayCard("first", 0);
     const gw = findOnBoard("first", "Greatwood Warrior")!;
@@ -434,7 +434,7 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     expect(thenHand("first").some((c) => c.name === "Fairy")).toBe(true);
   });
 
-  it("Hamlet of Unkilling — Fanfare discard 1 draw 2; Engage -0/-2", () => {
+  it("Hamlet of Unkilling (10312210) — Fanfare discard 1 draw 2; Engage -0/-2", () => {
     setupTurn(R6, {
       hand: ["10312210", "10111310", "10111310"],
       pp: 3,
@@ -452,7 +452,7 @@ describe("Batch 6 — Forestcraft [10003] Heirs of the Omen", () => {
     expect(e.defense).toBe(2);
   });
 
-  it("Eradicating Arrow — X = Combo random -0/-1", () => {
+  it("Eradicating Arrow (10313310) — X = Combo random -0/-1", () => {
     setupTurn(R6, { hand: [FILLER, FILLER, "10313310"], pp: 3 });
     enemyFollower(3);
     playCombo3(0);

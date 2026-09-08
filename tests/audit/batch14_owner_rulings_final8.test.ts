@@ -88,7 +88,7 @@ describe("Owner rulings — final 8", () => {
   });
 
   describe("Ruling 1 — always visible exact copies", () => {
-    it("Goddess of Starlight — after discard 3, exact-copies the 3 leftmost remaining hand cards (with mods)", () => {
+    it("Goddess of Starlight (10502110) — after discard 3, exact-copies the 3 leftmost remaining hand cards (with mods)", () => {
       setup(7, 6);
       // Hand order: 0..8 left to right. Evolve Goddess; discard rightmost 3;
       // leftmost remaining should be copied exactly (including cost_mod).
@@ -253,7 +253,7 @@ describe("Owner rulings — final 8", () => {
       }
     });
 
-    it("Legacy of the Brave — exact copy of random enemy hand, cost −1, draw", () => {
+    it("Legacy of the Brave (10802310) — exact copy of random enemy hand, cost −1, draw", () => {
       setup(9, 4);
       state.players.second.hand = [
         createCard(

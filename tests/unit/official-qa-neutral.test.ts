@@ -282,7 +282,7 @@ describe("official Q&A — Neutral batch 7", () => {
       expect(thenHand("first").length).toBe(handBefore + 3);
     }, 60_000);
 
-    it("10404110 Sandalphon — Serene Sanctuary invoke then LW draw then return at SOT (official Q&A)", () => {
+    it("10404110 Sandalphon — Serene Sanctuary (10161210) invoke then LW draw then return at SOT (official Q&A)", () => {
       setupTurn(R6, { hand: [], deck: [SANDALPHON, FAIRY, FAIRY], pp: 6 });
       const sanctuary = createCard(SERENE_SANCTUARY, "board", "first");
       sanctuary.countdown = 1;

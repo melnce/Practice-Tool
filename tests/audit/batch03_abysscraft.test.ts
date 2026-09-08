@@ -124,7 +124,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(getHP(state, "first")).toBe(19);
   });
 
-  it("Nameless Demon — Evolve summons 2 Bats", () => {
+  it("Nameless Demon (10151120) — Evolve summons 2 Bats", () => {
     setupTurn(R6);
     const demon = createCard("10151120", "board", "first");
     demon.peak_defense = demon.defense;
@@ -133,7 +133,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(thenBoard("first").filter((c) => c.name === "Bat").length).toBe(2);
   });
 
-  it("Little Miss Bonemancer — Last Words summons 2 Skeletons", () => {
+  it("Little Miss Bonemancer (10151130) — Last Words summons 2 Skeletons", () => {
     setupTurn(R6);
     const bone = createCard("10151130", "board", "first");
     applyKeywordsFromList(bone);
@@ -143,7 +143,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(countSkeletons()).toBe(2);
   });
 
-  it("Ghost Juggler — Fanfare Reanimate (4) from graveyard", () => {
+  it("Ghost Juggler (10151140) — Fanfare Reanimate (4) from graveyard", () => {
     setupTurn(R8, { hand: ["10151140"], pp: 7 });
     const corpse = createCard("10151130", "graveyard", "first");
     state.players.first.graveyard.push(corpse);
@@ -154,7 +154,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     ).toBe(true);
   });
 
-  it("Darkseal Demon — Fanfare draw 2 and 2 damage to your leader; Evolve 6 to selected enemy", () => {
+  it("Darkseal Demon (10151150) — Fanfare draw 2 and 2 damage to your leader; Evolve 6 to selected enemy", () => {
     setupTurn(R6, {
       hand: ["10151150"],
       pp: 6,
@@ -175,7 +175,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(e.defense).toBe(2);
   });
 
-  it("Reaper's Deathslash — destroys 1 allied and 1 enemy follower", () => {
+  it("Reaper's Deathslash (10151310) — destroys 1 allied and 1 enemy follower", () => {
     setupTurn(R6, { hand: ["10151310"], pp: 2 });
     const ally = createCard(
       { name: "Ally", type: "Follower", cost: 2, attack: 1, defense: 2 },
@@ -235,7 +235,7 @@ describe("Batch 3 — Abysscraft [10001] Legends Rise", () => {
     expect(getHP(state, "first")).toBe(17);
   });
 
-  it("Shadowcrypt Memorial — Fanfare +2 shadows; Engage summons 2 Ghosts", () => {
+  it("Shadowcrypt Memorial (10152210) — Fanfare +2 shadows; Engage summons 2 Ghosts", () => {
     setupTurn(R6, { hand: ["10152210"], pp: 4 });
     whenPlayCard("first", 0);
     expect(getShadows(state, "first")).toBe(2);
@@ -390,7 +390,7 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
     expect(getHP(state, "first")).toBe(18);
   });
 
-  it("Cultivator of Malice — Last Words adds Ghost to hand", () => {
+  it("Cultivator of Malice (10251120) — Last Words adds Ghost to hand", () => {
     setupTurn(R6);
     const cult = createCard("10251120", "board", "first");
     applyKeywordsFromList(cult);
@@ -400,7 +400,7 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
     expect(thenHand("first").some((c) => c.name === "Ghost")).toBe(true);
   });
 
-  it("Ghastly Soiree — adds 3 named tokens to hand", () => {
+  it("Ghastly Soiree (10251310) — adds 3 named tokens to hand", () => {
     setupTurn(R6, { hand: ["10251310"], pp: 3 });
     whenPlayCard("first", 0);
     expect(thenHand("first").length).toBeGreaterThanOrEqual(3);
@@ -423,7 +423,7 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
     expect(vuella.attack).toBe(4);
   });
 
-  it("Undead Soldier — Fanfare summons 2 Rotting Zombies", () => {
+  it("Undead Soldier (10252120) — Fanfare summons 2 Rotting Zombies", () => {
     setupTurn(R8, { hand: ["10252120"], pp: 7 });
     whenPlayCard("first", 0);
     expect(
@@ -431,7 +431,7 @@ describe("Batch 3 — Abysscraft [10002] Infinity Evolved", () => {
     ).toBe(2);
   });
 
-  it("Winged Servants — summons a Bat", () => {
+  it("Winged Servants (10252310) — summons a Bat", () => {
     setupTurn(R6, { hand: ["10252310"], pp: 3 });
     whenPlayCard("first", 0);
     expect(thenBoard("first").some((c) => c.name === "Bat")).toBe(true);
@@ -507,7 +507,7 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
     expect(state.players.second.board.every((c) => c.defense === 2)).toBe(true);
   });
 
-  it("Ephemeral Demon Princess — Fanfare destroys 2 enemies and 4 damage to your leader", () => {
+  it("Ephemeral Demon Princess (10351120) — Fanfare destroys 2 enemies and 4 damage to your leader", () => {
     setupTurn(R8, { hand: ["10351120"], pp: 8 });
     const a = enemyFollower(3, "A");
     const b = enemyFollower(3, "B");
@@ -522,7 +522,7 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
     );
   });
 
-  it("March of the Brutes — damages all enemy followers twice", () => {
+  it("March of the Brutes (10351310) — damages all enemy followers twice", () => {
     setupTurn(R6, { hand: ["10351310"], pp: 5 });
     enemyFollower(5);
     whenPlayCard("first", 0);
@@ -538,7 +538,7 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
     expect(e.defense).toBeLessThan(3);
   });
 
-  it("Spirited Gravekeeper — Enhance (7) Reanimate (5) and (3)", () => {
+  it("Spirited Gravekeeper (10352120) — Enhance (7) Reanimate (5) and (3)", () => {
     setupTurn(R9, { hand: ["10352120"], pp: 9 });
     const corpses = [
       createCard("10151130", "graveyard", "first"),
@@ -579,7 +579,7 @@ describe("Batch 3 — Abysscraft [10003] Heirs of the Omen", () => {
     expect(copies.every((c) => c.hasRush)).toBe(true);
   });
 
-  it("Rulenye & Valnareik — Fanfare adds a token spell to hand (mode pick)", () => {
+  it("Rulenye & Valnareik (10354120) — Fanfare adds a token spell to hand (mode pick)", () => {
     setupTurn(R7, { hand: ["10354120"], pp: 8 });
     whenPlayCard("first", 0);
     const handNames = thenHand("first").map((c) => c.name);

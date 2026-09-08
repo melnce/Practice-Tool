@@ -623,7 +623,7 @@ describe("L2 — Runecraft tokens", () => {
   describe("Demonic Shikigami (90031140)", () => {
     const printed = "Rush\nLast Words: Spellboost your hand.";
 
-    it("real path via Demonic Call: summons Demonic Shikigami by uid", () => {
+    it("real path via Demonic Call (10133320): summons Demonic Shikigami by uid", () => {
       setupTurn(R10, { hand: [DEMONIC_CALL], pp: 7 });
       const uidsBefore = boardUids();
       whenPlayCard("first", 0);

@@ -104,7 +104,7 @@ describe("Batch 8 — Portalcraft [10001] Legends Rise", () => {
     );
   });
 
-  it("Puppet Shield — summons 2 Enhanced Puppet", () => {
+  it("Puppet Shield (10171310) — summons 2 Enhanced Puppet", () => {
     setupTurn(R6, { hand: ["10171310"], pp: 3 });
     whenPlayCard("first", 0);
     expect(
@@ -112,7 +112,7 @@ describe("Batch 8 — Portalcraft [10001] Legends Rise", () => {
     ).toBe(2);
   });
 
-  it("Artifact Recharge — adds both Gears", () => {
+  it("Artifact Recharge (10171320) — adds both Gears", () => {
     setupTurn(R6, { hand: ["10171320"], pp: 1 });
     whenPlayCard("first", 0);
     expect(thenHand("first").some((c) => c.name === "Gear of Ambition")).toBe(
@@ -209,7 +209,7 @@ describe("Batch 8 — Portalcraft [10002] Infinity Evolved", () => {
     expect(updated.hasRush || updated.keywordState?.hasRush).toBe(true);
   });
 
-  it("Synchronous Hearts — summons Lloyd and Victoria", () => {
+  it("Synchronous Hearts (10273310) — summons Lloyd and Victoria", () => {
     setupTurn(R8, { hand: ["10273310"], pp: 6 });
     whenPlayCard("first", 0);
     expect(thenBoard("first").some((c) => c.name === "Lloyd")).toBe(true);
@@ -238,7 +238,7 @@ describe("Batch 8 — Portalcraft [10003] Heirs of the Omen", () => {
     ).toBe(true);
   });
 
-  it("Wired Assault — destroys enemy and adds 2 Puppets", () => {
+  it("Wired Assault (10371310) — destroys enemy and adds 2 Puppets", () => {
     setupTurn(R6, { hand: ["10371310"], pp: 4 });
     enemyFollower(5);
     whenPlayCard("first", 0);

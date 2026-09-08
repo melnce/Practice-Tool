@@ -678,7 +678,7 @@ describe("L2 — Abysscraft tokens", () => {
       expect(printed).toContain("Summon 2 copies");
     });
 
-    it("on play: summons exactly 2 Rulenye & Valnareik with Rush", () => {
+    it("on play: summons exactly 2 Rulenye & Valnareik (10354120) with Rush", () => {
       setupTurn(R6, { hand: [SCREAM_DIFFUSION], pp: 0 });
       whenPlayCard("first", 0);
       const copies = thenBoard("first").filter((c) => c.id === RULENYE);

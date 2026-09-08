@@ -53,7 +53,7 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
     state.activePlayer = "first";
   });
 
-  it("Fairy Tamer — Fanfare adds 2 Fairy to hand", () => {
+  it("Fairy Tamer (10011110) — Fanfare adds 2 Fairy to hand", () => {
     givenGameState({ seed: 1, activePlayer: "first" })
       .withFirstHand(["10011110"])
       .withFirstPP(5, 5)
@@ -63,7 +63,7 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
     expect(thenHand("first").filter((c) => c.name === "Fairy")).toHaveLength(2);
   });
 
-  it("Stray Beastman — Fanfare increases Combo counter by 1", () => {
+  it("Stray Beastman (10011120) — Fanfare increases Combo counter by 1", () => {
     givenGameState({ seed: 1, activePlayer: "first" })
       .withFirstHand(["10011120"])
       .withFirstPP(5, 5)
@@ -73,7 +73,7 @@ describe("Batch 01 Part 3 — Class A (card-text derived)", () => {
     expect(getPlaysThisTurn(state, "first")).toBe(2);
   });
 
-  it("Arms Peddler — Last Words draws 1 card", () => {
+  it("Arms Peddler (10021120) — Last Words draws 1 card", () => {
     givenGameState({ seed: 1 })
       .withFirstDeck([
         { name: "DeckCard", type: "Follower", attack: 1, defense: 1 },

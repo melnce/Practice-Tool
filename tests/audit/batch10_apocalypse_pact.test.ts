@@ -93,7 +93,7 @@ describe("Set 10006 — Apocalypse Pact", () => {
     }
   });
 
-  it("Muddled Onlooker — Last Words deal 1 to enemy leader", () => {
+  it("Muddled Onlooker (10601110) — Last Words deal 1 to enemy leader", () => {
     setupTurn(2, { hand: ["10601110"], pp: 2 });
     whenPlayCard("first", 0);
     const onlooker = findOnBoard("first", "Muddled Onlooker")!;
@@ -103,7 +103,7 @@ describe("Set 10006 — Apocalypse Pact", () => {
     expect(getHP(state, "second")).toBe(19);
   });
 
-  it("Disrupted Commoner — Fanfare destroys selected enemy; has Bane", () => {
+  it("Disrupted Commoner (10601120) — Fanfare destroys selected enemy; has Bane", () => {
     setupTurn(5, { hand: ["10601120"], pp: 5 });
     enemyFollower(2, 4);
     whenPlayCard("first", 0);
@@ -112,7 +112,7 @@ describe("Set 10006 — Apocalypse Pact", () => {
     expect(findOnBoard("first", "Disrupted Commoner")?.hasBane).toBe(true);
   });
 
-  it("Monkey of Paradise — Combo (3) evolves this follower", () => {
+  it("Monkey of Paradise (10611120) — Combo (3) evolves this follower", () => {
     setupTurn(5, {
       hand: ["10631110", "10631110", "10611120"],
       pp: 10,

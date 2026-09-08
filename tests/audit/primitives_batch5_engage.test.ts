@@ -34,7 +34,7 @@ describe("Rulebook §290–294 — Engage", () => {
     state.activePlayer = "first";
   });
 
-  it("§294 — Engage usable same turn amulet is played (Serene Sanctuary)", () => {
+  it("§294 — Engage usable same turn amulet is played (Serene Sanctuary (10161210))", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: R6 })
       .withFirstHand(["10161210"])
       .withFirstPP(3, 6)

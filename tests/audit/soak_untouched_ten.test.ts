@@ -104,7 +104,7 @@ describe("Soak-untouched ten — proof of work", () => {
     expect(knight!.hasWard || knight!.keywordState?.hasWard).toBe(true);
   });
 
-  it("Calamity Breath — Deal 5 damage to all followers", () => {
+  it("Calamity Breath (10141310) — Deal 5 damage to all followers", () => {
     setupTurn(6, { hand: ["10141310"], pp: 6 });
     const ally = createCard(
       { name: "Ally", type: "Follower", cost: 2, attack: 2, defense: 5 },

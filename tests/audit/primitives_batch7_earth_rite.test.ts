@@ -60,7 +60,7 @@ describe("Rulebook §804 — Earth Rite (Runecraft)", () => {
     expect(sigil?.counters?.earth).toBeGreaterThanOrEqual(2);
   });
 
-  it("Earth Rite (1) consumes one stack; Glacial Crash bonus damages leader", () => {
+  it("Earth Rite (1) consumes one stack; Glacial Crash (10231310) bonus damages leader", () => {
     givenGameState({ seed: 1, activePlayer: "first", roundCount: 6 })
       .withFirstHand(["10131130", "10231310"])
       .withFirstPP(7, 6)
