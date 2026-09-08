@@ -71,7 +71,7 @@ describe("in-hand triggers", () => {
 
   describe("Sephie, Maven Convict (10934110) — on_fuse in hand", () => {
     const printed =
-      "Whenever you Fuse to this card, spend 2 play points to summon an Obsessed Test Subject.";
+      "Fuse: Cards\nWhenever you Fuse to this card, spend 2 play points to summon an Obsessed Test Subject.\nFanfare: Summon 2 copies of Obsessed Test Subject.\nSuper-Evolve: Gain Crest: Sephie, Maven Convict.";
 
     it("with 2+ PP: spends exactly 2 PP and summons one Obsessed Test Subject", () => {
       setupFuseTurn(4);
